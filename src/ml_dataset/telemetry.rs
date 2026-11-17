@@ -1,5 +1,9 @@
 //! Phase-scoped native PMU and process counters. Missing counters remain missing.
 pub(crate) mod checked;
+#[cfg(target_os = "linux")]
+pub(crate) mod pmu_containment;
+#[cfg(target_os = "linux")]
+pub(crate) mod whole_worker;
 use serde_json::{json, Value};
 use std::path::Path;
 use std::time::Instant;
@@ -87,6 +91,8 @@ mod tests {
             std::env::temp_dir().join(format!("ml-dataset-phase-test-{}", std::process::id()));
         std::fs::create_dir(&root).unwrap();
         let config = CaseConfig {
+            channels: None,
+            factor_base_policy: None,
             family: "koblitz".into(),
             n: 23,
             m: 2,
@@ -96,6 +102,7 @@ mod tests {
             key_index: 0,
             seed: 20261027,
             factor_base_size: 4,
+
             degree_bound: 3,
             work_limit: 20_000,
             solver: "bsgs".into(),

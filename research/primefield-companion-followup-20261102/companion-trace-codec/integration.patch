@@ -1,0 +1,25 @@
+--- frozen-check.py
++++ future-check.py
+@@ -4,11 +4,12 @@
+ import sys,json,hashlib,platform,os,subprocess
+ sys.set_int_max_str_digits(0)
+ D=Path(__file__).resolve().parent;ROOT=D.parent;OUT=D/'runs'
+-sys.path[:0]=[str(ROOT/'companion-fused'),str(ROOT/'structured-block-kernel')]
++sys.path[:0]=[str(ROOT/'companion-fused'),str(ROOT/'structured-block-kernel'),str(ROOT/'companion-trace-codec')]
+ from multiply import apply
+ from kernel import Meter
+ from reference import reference
+ from accounting import reconstruct
++from trace_codec import fingerprint
+ now=lambda:datetime.now(timezone.utc).isoformat()
+ digest=lambda v:hashlib.sha256(json.dumps(v,sort_keys=True).encode()).hexdigest()
+ def sha(p):
+@@ -69,7 +70,7 @@
+    try:guard(beta)
+    except AssertionError:radix_rejections+=1
+    else:raise AssertionError('uncertified radix accepted')
+- return dict(input=x,result=y,transpose=tr,counts=counts,blocks=blocks,trace_sha256=digest(trace),max_coefficients=maxima,mutations_rejected=4,equal_wrap_rejections=equal,radix_guard_rejections=radix_rejections)
++ return dict(input=x,result=y,transpose=tr,counts=counts,blocks=blocks,trace_fingerprint=fingerprint(trace),max_coefficients=maxima,mutations_rejected=4,equal_wrap_rejections=equal,radix_guard_rejections=radix_rejections)
+ 
+ def main():
+  for name in ['source-lock.json','input-lock.json']:

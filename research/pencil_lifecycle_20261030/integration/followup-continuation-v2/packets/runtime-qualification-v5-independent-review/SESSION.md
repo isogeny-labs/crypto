@@ -1,0 +1,1 @@
+T1493 archives existing independent postreview only. Exact81selectedfile evidence preserved in deterministic archive with member hashes. No fresh extraction or runtime. Parent owns publication/indexgrant.

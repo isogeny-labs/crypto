@@ -1,0 +1,1 @@
+T-1513 prepared first integration scope; T-1518 succeeds its lease for corrected closure and canonical application. Root separately authorized each one240s4GiB attempt. First attempt failed before tests; second passed. Shared index not yet granted. No scientific execution.

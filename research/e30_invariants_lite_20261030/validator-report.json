@@ -1,0 +1,2821 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E30; this recompute is its own standard-library Rust program (validate_e30.rs: JSON parser, SHA-256 and leaf comparator taken from the E27 validator's validate_e27.rs, the rest new) and shares no code with examples/e30_audit.rs, examples/e30_tables.rs, crypto_lib or experiments/35_invariants_lite/summary.json",
+ "date": "2026-10-31",
+ "row": "E30 (GLV note §9.28 pre-registration, §9.32 results): invariants-lite, an accounting audit of trivial F_p4 products on E27's 20 Karatsuba solver-A rows (E25's ten GLS curves, both arms) and the matched <±psi> walks. Class: accounting. Evidence directory research/e30_invariants_lite_20261030",
+ "script": "research/e30_invariants_lite_20261030/validate_e30.rs (rustc -O --edition 2021; `validate_e30 report <repo> research/e30_invariants_lite_20261030`)",
+ "status_rule": "pass iff every check holds and every headline agrees with its printed figure within half a unit of the last printed digit (exact for counts)",
+ "raw_data": [
+  {
+   "path": "../../experiments/35_invariants_lite/tables.md",
+   "sha256": "5e2c11af836cf51d123333f3595f4cef2953823602559c35d504e37858dc5f1e"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/stage_w.json",
+   "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/walk_audit.json",
+   "sha256": "5bc698207dad6b04a5e49add4c2357eac473fe92281805acaeb1605b3b5320e4"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p101s1.json",
+   "sha256": "ef38bd38657ad4e276d7957ad524ca5ee1bb78ff01d14554929a7a0656a5ce6e"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s1.json",
+   "sha256": "39d93707a3dc8430fce2df47886012ea6545b63b02d8cdf58990eb4e6d3adadb"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p101s2.json",
+   "sha256": "9f4163f4c11e263cf6da2877116c46e441ab6b82b526c56bc39efd6f44784e8a"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s2.json",
+   "sha256": "bc4c3a81a1a7de63ddf204a4b8b289ae6bcc200f33a7bcc6251e65430afd31f9"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p149s1.json",
+   "sha256": "9db35f55e70bc9a13deabf6b1cba90b0b097e44b0ab192bcd9efcd3a3d855c3e"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s1.json",
+   "sha256": "71618ef39d4b6ca0ec0a38b3667288393d087572cc6d97208e5d331baed0d5f7"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p149s2.json",
+   "sha256": "a233d71f1beacc09ebc4cafe5f4d61b48349417ed5ca7313670c80bb50d14108"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s2.json",
+   "sha256": "683e68771a3615fc2cacfa573736b156478899cbe8d99a81e4edaf611a3a8b24"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p197s1.json",
+   "sha256": "fd5a0a6b2cfd9a4c323eb6ae51661fe377c63c6f993265fb75bcbf9dfc9ae653"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s1.json",
+   "sha256": "db97629bc6887c37fd5b3b06bd62b37e14936c660022af252e653a0a796c0d10"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p197s2.json",
+   "sha256": "e9147534d721c27580ee7785d713c5599e804978e32b7c3a8ed939f8507d25ca"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s2.json",
+   "sha256": "d86f811e85852e311ee8583823ef5a3619635c0511148038c6cf99f83ed1f38a"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p269s1.json",
+   "sha256": "3dc855bd239067fe921b0ad16d8b1d51ed045cc37098da1622aa2215bda94e43"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s1.json",
+   "sha256": "ed045d101098b39e58686b48cc663aaedb8b40920f13f8824be7badebe5c817a"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p269s2.json",
+   "sha256": "ab5cb1d84c884bc0b9113c10c2f5cf041e63a3f13a3a814c5437f4344dae3f18"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s2.json",
+   "sha256": "a67423a8acf8fab3fd32276b31374ab60deef3864d2c4129a0b63db14f232e1a"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p397s1.json",
+   "sha256": "de1fd1031872ded4a8a3fb87413c1db294df47d803a0ff5e4eb97d6543292801"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s1.json",
+   "sha256": "cb469c62cbf518eb8610f42e50dff859b28c480c4d9776fe9921bf1e3465eabd"
+  },
+  {
+   "path": "../../experiments/35_invariants_lite/e2e_audit_p397s2.json",
+   "sha256": "9d25ae1a7eedb51f4bbb7bdb06d656b17cbc5af6a59bf7b5ed59a2a7a0c9ab2f"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s2.json",
+   "sha256": "7fbc78e9ffc61aeca3353f14d70badf51624b15e2344cd380b066951f847fd0c"
+  }
+ ],
+ "check_failures": [],
+ "headline_disagreements": [],
+ "checks": [
+  {
+   "id": "G.1",
+   "check": "G2.110: every field of E27's 20 Karatsuba records reproduced by E30's audited records (leaf by leaf, 10 files x 2 arms); the only new leaf is ic_trivial_product_savings; wall_ms and solve_ms not compared",
+   "holds": true,
+   "detail": "12100 of 12100 fields identical"
+  },
+  {
+   "id": "G.2",
+   "check": "Every audited arm (20) solved and correct, its logarithm equal to the walks' (E25's planted d, as E27's validation), and all 48 in-process walks per arm correct with the same d",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "G.3",
+   "check": "E30's walk audit (binary 0e4fccce1, serial Karatsuba walks) reproduces E27's walk (ii) means exactly on all 20 (curve, fold) pools: the 0e4fccce1 build walks the same walks at the same price as af2504ef1",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "G.4",
+   "check": "The <±psi> walks' psi multipliers (c_x, c_y) are not in F_p on any of the ten curves (so the audit has nothing to re-price in psi)",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "G.5",
+   "check": "Audit scope (validator's own bound): the counter is reset after set-up, so trivial products in precompute, base construction and the [x]G check are not audited; those phases are at most this share of S, which bounds what the audit can have missed",
+   "holds": true,
+   "detail": "0.00083-0.03936 % of S"
+  },
+  {
+   "id": "G.6",
+   "check": "Note's \"F_p4 work ≈ 2 % of S, about one in seven of its counted products trivial\": the F_p4-priced phases (Weil restriction + target generation + lift) are this share of S, and the saving is this share of their multiplications; product counts are not emitted, so \"one in seven products\" is not checkable from the records (a trivial product saves 9 or 13 of 13)",
+   "holds": true,
+   "detail": "F_p4 phases 1.531-1.896 % of S; saving 0.164-0.202 of their multiplications"
+  }
+ ],
+ "headline": [
+  {
+   "name": "s_k_p101s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.6965e10",
+   "claimed": 26965000000,
+   "recomputed": 26964723596,
+   "rel_tol": 0.00001854255518264417,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p101s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "8.3253e7",
+   "claimed": 83253000,
+   "recomputed": 83252899,
+   "rel_tol": 0.0000060057895871620245,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p101s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3087 %",
+   "claimed": 0.3087,
+   "recomputed": 0.3087474592632201,
+   "rel_tol": 0.00016196954988662135,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p101s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "3.5183e5",
+   "claimed": 351830,
+   "recomputed": 351834.8125,
+   "rel_tol": 0.000014211408933291648,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p101s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.6",
+   "claimed": 0.6,
+   "recomputed": 0.5625,
+   "rel_tol": 0.08333333341666668,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p101s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3086 %",
+   "claimed": -0.3086,
+   "recomputed": -0.3085880764585158,
+   "rel_tol": 0.00016202203515878165,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p101s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0838 %",
+   "claimed": -0.0838,
+   "recomputed": -0.08377675968456177,
+   "rel_tol": 0.0005966587118138426,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p101s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0110 %",
+   "claimed": -0.011,
+   "recomputed": -0.01100825857973664,
+   "rel_tol": 0.004545454550000001,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p101s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.3833e10",
+   "claimed": 13833000000,
+   "recomputed": 13833208042,
+   "rel_tol": 0.0000361454493240801,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p101s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "4.2933e7",
+   "claimed": 42933000,
+   "recomputed": 42932977,
+   "rel_tol": 0.000011646053164232643,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p101s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3104 %",
+   "claimed": 0.3104,
+   "recomputed": 0.3103616808888299,
+   "rel_tol": 0.0001610824743878866,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p101s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "3.5183e5",
+   "claimed": 351830,
+   "recomputed": 351834.8125,
+   "rel_tol": 0.000014211408933291648,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p101s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.6",
+   "claimed": 0.6,
+   "recomputed": 0.5625,
+   "rel_tol": 0.08333333341666668,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p101s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3102 %",
+   "claimed": -0.3102,
+   "recomputed": -0.31020230066488574,
+   "rel_tol": 0.00016118633156028372,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p101s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0840 %",
+   "claimed": -0.084,
+   "recomputed": -0.0840185573927843,
+   "rel_tol": 0.0005952380958333333,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p101s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0110 %",
+   "claimed": -0.011,
+   "recomputed": -0.011031848599252214,
+   "rel_tol": 0.004545454550000001,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p101s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "9.8182e9",
+   "claimed": 9818200000,
+   "recomputed": 9818244813,
+   "rel_tol": 0.000005092583166975618,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p101s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "3.0462e7",
+   "claimed": 30461999.999999996,
+   "recomputed": 30462302,
+   "rel_tol": 0.000016413892735211083,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p101s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3103 %",
+   "claimed": 0.3103,
+   "recomputed": 0.3102621963516933,
+   "rel_tol": 0.00016113438623912343,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p101s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.7269e5",
+   "claimed": 272690,
+   "recomputed": 272685.75,
+   "rel_tol": 0.00001833583924969746,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p101s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p101s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3103 %",
+   "claimed": -0.3103,
+   "recomputed": -0.31026219635168495,
+   "rel_tol": 0.00016113438623912343,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p101s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0842 %",
+   "claimed": -0.0842,
+   "recomputed": -0.084162594150472,
+   "rel_tol": 0.0005938242286223278,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p101s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0111 %",
+   "claimed": -0.0111,
+   "recomputed": -0.011134629074460722,
+   "rel_tol": 0.00450450450900901,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p101s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "4.6597e9",
+   "claimed": 4659700000,
+   "recomputed": 4659726750,
+   "rel_tol": 0.000010730304536772753,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p101s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.4428e7",
+   "claimed": 14428000,
+   "recomputed": 14428219,
+   "rel_tol": 0.000034654837850013866,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p101s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3096 %",
+   "claimed": 0.3096,
+   "recomputed": 0.30963658974209163,
+   "rel_tol": 0.00016149870817183464,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p101s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.7269e5",
+   "claimed": 272690,
+   "recomputed": 272685.75,
+   "rel_tol": 0.00001833583924969746,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p101s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p101s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3096 %",
+   "claimed": -0.3096,
+   "recomputed": -0.3096365897420905,
+   "rel_tol": 0.00016149870817183464,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p101s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0841 %",
+   "claimed": -0.0841,
+   "recomputed": -0.08408878482861759,
+   "rel_tol": 0.0005945303216409038,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p101s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0111 %",
+   "claimed": -0.0111,
+   "recomputed": -0.01112896806020336,
+   "rel_tol": 0.00450450450900901,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p149s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.2897e11",
+   "claimed": 228969999999.99997,
+   "recomputed": 228974148611,
+   "rel_tol": 0.000021836921889330484,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p149s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "7.1418e8",
+   "claimed": 714180000,
+   "recomputed": 714177289,
+   "rel_tol": 0.000007001036160351732,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p149s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3119 %",
+   "claimed": 0.3119,
+   "recomputed": 0.3119030219491296,
+   "rel_tol": 0.0001603077911189484,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p149s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "5.6461e5",
+   "claimed": 564610,
+   "recomputed": 564610.5,
+   "rel_tol": 0.000008855670294539595,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p149s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.1",
+   "claimed": 1.1,
+   "recomputed": 1.125,
+   "rel_tol": 0.045454545500000006,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p149s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3117 %",
+   "claimed": -0.3117,
+   "recomputed": -0.3117043906226469,
+   "rel_tol": 0.00016041065142765484,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p149s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0846 %",
+   "claimed": -0.0846,
+   "recomputed": -0.08463719812588089,
+   "rel_tol": 0.0005910165490543737,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p149s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0111 %",
+   "claimed": -0.0111,
+   "recomputed": -0.011113879729585108,
+   "rel_tol": 0.00450450450900901,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p149s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "8.6000e10",
+   "claimed": 86000000000,
+   "recomputed": 85999708286,
+   "rel_tol": 0.000005813953494186046,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p149s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.6778e8",
+   "claimed": 267780000,
+   "recomputed": 267783491,
+   "rel_tol": 0.000018672044234072748,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p149s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3114 %",
+   "claimed": 0.3114,
+   "recomputed": 0.31137720852431405,
+   "rel_tol": 0.00016056518962748875,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p149s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "5.6461e5",
+   "claimed": 564610,
+   "recomputed": 564610.5,
+   "rel_tol": 0.000008855670294539595,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p149s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.1",
+   "claimed": 1.1,
+   "recomputed": 1.125,
+   "rel_tol": 0.045454545500000006,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p149s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3112 %",
+   "claimed": -0.3112,
+   "recomputed": -0.31117857615013955,
+   "rel_tol": 0.00016066838062339333,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p149s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0846 %",
+   "claimed": -0.0846,
+   "recomputed": -0.08456107660803625,
+   "rel_tol": 0.0005910165490543737,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p149s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0111 %",
+   "claimed": -0.0111,
+   "recomputed": -0.01110667333492632,
+   "rel_tol": 0.00450450450900901,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p149s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "3.9561e10",
+   "claimed": 39561000000,
+   "recomputed": 39561022727,
+   "rel_tol": 0.000012638709853138192,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p149s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.2289e8",
+   "claimed": 122890000.00000001,
+   "recomputed": 122888757,
+   "rel_tol": 0.00004068679310765725,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p149s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3106 %",
+   "claimed": 0.3106,
+   "recomputed": 0.31063089002532196,
+   "rel_tol": 0.00016097875096587254,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p149s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "5.5421e5",
+   "claimed": 554210,
+   "recomputed": 554206.3125,
+   "rel_tol": 0.000009021850931957201,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p149s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p149s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3106 %",
+   "claimed": -0.3106,
+   "recomputed": -0.31063089002533184,
+   "rel_tol": 0.00016097875096587254,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p149s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0846 %",
+   "claimed": -0.0846,
+   "recomputed": -0.0846463134175024,
+   "rel_tol": 0.0005910165490543737,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p149s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0112 %",
+   "claimed": -0.0112,
+   "recomputed": -0.011215119856533562,
+   "rel_tol": 0.004464285718750001,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p149s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.2353e10",
+   "claimed": 22353000000,
+   "recomputed": 22353365025,
+   "rel_tol": 0.00002236836221088892,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p149s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "6.9313e7",
+   "claimed": 69313000,
+   "recomputed": 69313307,
+   "rel_tol": 0.000007213654011512992,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p149s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3101 %",
+   "claimed": 0.3101,
+   "recomputed": 0.3100799674790798,
+   "rel_tol": 0.0001612383103837472,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p149s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "5.5421e5",
+   "claimed": 554210,
+   "recomputed": 554206.3125,
+   "rel_tol": 0.000009021850931957201,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p149s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p149s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3101 %",
+   "claimed": -0.3101,
+   "recomputed": -0.3100799674790822,
+   "rel_tol": 0.0001612383103837472,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p149s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0846 %",
+   "claimed": -0.0846,
+   "recomputed": -0.08455360433183845,
+   "rel_tol": 0.0005910165490543737,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p149s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0112 %",
+   "claimed": -0.0112,
+   "recomputed": -0.011205310603001895,
+   "rel_tol": 0.004464285718750001,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p197s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "3.3364e10",
+   "claimed": 33364000000,
+   "recomputed": 33364322762,
+   "rel_tol": 0.000014986212699316629,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p197s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.0349e8",
+   "claimed": 103490000,
+   "recomputed": 103492297,
+   "rel_tol": 0.000048313846796791965,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p197s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3102 %",
+   "claimed": 0.3102,
+   "recomputed": 0.3101885140551141,
+   "rel_tol": 0.00016118633156028372,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p197s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "7.0953e5",
+   "claimed": 709530,
+   "recomputed": 709525.125,
+   "rel_tol": 0.000007046918389638211,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p197s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p197s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3102 %",
+   "claimed": -0.3102,
+   "recomputed": -0.3101885140550986,
+   "rel_tol": 0.00016118633156028372,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p197s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0849 %",
+   "claimed": -0.0849,
+   "recomputed": -0.08489445989319222,
+   "rel_tol": 0.0005889281513545348,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p197s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0113 %",
+   "claimed": -0.0113,
+   "recomputed": -0.011263962747043443,
+   "rel_tol": 0.004424778765486727,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p197s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.4750e10",
+   "claimed": 24750000000,
+   "recomputed": 24750444620,
+   "rel_tol": 0.000020202020222222223,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p197s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "7.6667e7",
+   "claimed": 76667000,
+   "recomputed": 76667280,
+   "rel_tol": 0.000006521710781692254,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p197s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3098 %",
+   "claimed": 0.3098,
+   "recomputed": 0.3097612231905028,
+   "rel_tol": 0.0001613944481923822,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p197s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "7.0953e5",
+   "claimed": 709530,
+   "recomputed": 709525.125,
+   "rel_tol": 0.000007046918389638211,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p197s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p197s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3098 %",
+   "claimed": -0.3098,
+   "recomputed": -0.3097612231905078,
+   "rel_tol": 0.0001613944481923822,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p197s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0848 %",
+   "claimed": -0.0848,
+   "recomputed": -0.08483738182670786,
+   "rel_tol": 0.0005896226420990566,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p197s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0113 %",
+   "claimed": -0.0113,
+   "recomputed": -0.011258987912032836,
+   "rel_tol": 0.004424778765486727,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p197s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.7137e10",
+   "claimed": 17137000000,
+   "recomputed": 17136680229,
+   "rel_tol": 0.00002917663537958803,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p197s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "5.3235e7",
+   "claimed": 53235000,
+   "recomputed": 53235195,
+   "rel_tol": 0.000009392317094017094,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p197s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3107 %",
+   "claimed": 0.3107,
+   "recomputed": 0.31065057110601463,
+   "rel_tol": 0.00016092693933054397,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p197s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "6.7727e5",
+   "claimed": 677270,
+   "recomputed": 677271.3125,
+   "rel_tol": 0.000007382580071463376,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p197s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p197s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3107 %",
+   "claimed": -0.3107,
+   "recomputed": -0.31065057110600813,
+   "rel_tol": 0.00016092693933054397,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p197s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0850 %",
+   "claimed": -0.085,
+   "recomputed": -0.08498473935784068,
+   "rel_tol": 0.0005882352947058823,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p197s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0113 %",
+   "claimed": -0.0113,
+   "recomputed": -0.01127437323963365,
+   "rel_tol": 0.004424778765486727,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p197s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.0122e10",
+   "claimed": 10122000000,
+   "recomputed": 10121590489,
+   "rel_tol": 0.000049397352351313973,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p197s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "3.1454e7",
+   "claimed": 31454000,
+   "recomputed": 31453616,
+   "rel_tol": 0.00001589622943027914,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p197s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3108 %",
+   "claimed": 0.3108,
+   "recomputed": 0.3107576426272466,
+   "rel_tol": 0.00016087516103603604,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p197s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "6.7727e5",
+   "claimed": 677270,
+   "recomputed": 677271.3125,
+   "rel_tol": 0.000007382580071463376,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p197s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p197s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3108 %",
+   "claimed": -0.3108,
+   "recomputed": -0.31075764262724626,
+   "rel_tol": 0.00016087516103603604,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p197s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0850 %",
+   "claimed": -0.085,
+   "recomputed": -0.08500742683552609,
+   "rel_tol": 0.0005882352947058823,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p197s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0113 %",
+   "claimed": -0.0113,
+   "recomputed": -0.011277096896922245,
+   "rel_tol": 0.004424778765486727,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p269s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "5.3286e10",
+   "claimed": 53286000000,
+   "recomputed": 53286038394,
+   "rel_tol": 0.000009383327712720038,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p269s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.6631e8",
+   "claimed": 166310000,
+   "recomputed": 166314803,
+   "rel_tol": 0.00003006433771270519,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p269s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3121 %",
+   "claimed": 0.3121,
+   "recomputed": 0.31211703480423686,
+   "rel_tol": 0.00016020506264017946,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p269s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.1171e6",
+   "claimed": 1117100,
+   "recomputed": 1117087.875,
+   "rel_tol": 0.00004475875038044938,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p269s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p269s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3121 %",
+   "claimed": -0.3121,
+   "recomputed": -0.3121170348042379,
+   "rel_tol": 0.00016020506264017946,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p269s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0853 %",
+   "claimed": -0.0853,
+   "recomputed": -0.08534256581416155,
+   "rel_tol": 0.0005861664718640095,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p269s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0113 %",
+   "claimed": -0.0113,
+   "recomputed": -0.011319966363254608,
+   "rel_tol": 0.004424778765486727,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p269s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "3.0692e10",
+   "claimed": 30692000000,
+   "recomputed": 30691610728,
+   "rel_tol": 0.000016290890150527824,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p269s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "9.5748e7",
+   "claimed": 95748000,
+   "recomputed": 95747963,
+   "rel_tol": 0.00000522204119668296,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p269s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3120 %",
+   "claimed": 0.312,
+   "recomputed": 0.3119678659049621,
+   "rel_tol": 0.00016025641041666667,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p269s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.1171e6",
+   "claimed": 1117100,
+   "recomputed": 1117087.875,
+   "rel_tol": 0.00004475875038044938,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p269s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p269s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3120 %",
+   "claimed": -0.312,
+   "recomputed": -0.31196786590496073,
+   "rel_tol": 0.00016025641041666667,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p269s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0853 %",
+   "claimed": -0.0853,
+   "recomputed": -0.08531892833117949,
+   "rel_tol": 0.0005861664718640095,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p269s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0113 %",
+   "claimed": -0.0113,
+   "recomputed": -0.011317573777902545,
+   "rel_tol": 0.004424778765486727,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p269s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.9775e10",
+   "claimed": 19775000000,
+   "recomputed": 19775127049,
+   "rel_tol": 0.000025284450088495578,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p269s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "6.1918e7",
+   "claimed": 61918000,
+   "recomputed": 61917778,
+   "rel_tol": 0.00000807519623534352,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p269s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3131 %",
+   "claimed": 0.3131,
+   "recomputed": 0.31310938153052775,
+   "rel_tol": 0.0001596933888534015,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p269s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.1071e6",
+   "claimed": 1107100,
+   "recomputed": 1107117.8125,
+   "rel_tol": 0.00004516303861439798,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p269s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p269s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3131 %",
+   "claimed": -0.3131,
+   "recomputed": -0.3131093815305297,
+   "rel_tol": 0.0001596933888534015,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p269s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0855 %",
+   "claimed": -0.0855,
+   "recomputed": -0.08551409914607788,
+   "rel_tol": 0.0005847953222222223,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p269s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0113 %",
+   "claimed": -0.0113,
+   "recomputed": -0.011338404292304816,
+   "rel_tol": 0.004424778765486727,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p269s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "9.7738e9",
+   "claimed": 9773800000,
+   "recomputed": 9773820165,
+   "rel_tol": 0.000005115717535656552,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p269s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "3.0593e7",
+   "claimed": 30593000,
+   "recomputed": 30593409,
+   "rel_tol": 0.00001634360803124898,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p269s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3130 %",
+   "claimed": 0.313,
+   "recomputed": 0.3130138316802149,
+   "rel_tol": 0.00015974440910543133,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p269s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.1071e6",
+   "claimed": 1107100,
+   "recomputed": 1107117.8125,
+   "rel_tol": 0.00004516303861439798,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p269s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p269s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3130 %",
+   "claimed": -0.313,
+   "recomputed": -0.31301383168022,
+   "rel_tol": 0.00015974440910543133,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p269s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0855 %",
+   "claimed": -0.0855,
+   "recomputed": -0.08549435739095834,
+   "rel_tol": 0.0005847953222222223,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p269s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0113 %",
+   "claimed": -0.0113,
+   "recomputed": -0.01133606131816789,
+   "rel_tol": 0.004424778765486727,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p397s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.7928e10",
+   "claimed": 27928000000,
+   "recomputed": 27927862989,
+   "rel_tol": 0.000017903179622600974,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p397s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "8.6623e7",
+   "claimed": 86623000,
+   "recomputed": 86622831,
+   "rel_tol": 0.000005772139045057318,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p397s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3102 %",
+   "claimed": 0.3102,
+   "recomputed": 0.31016634188630293,
+   "rel_tol": 0.00016118633156028372,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p397s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.5328e6",
+   "claimed": 2532800,
+   "recomputed": 2532750.875,
+   "rel_tol": 0.00001974099812460518,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p397s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p397s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3102 %",
+   "claimed": -0.3102,
+   "recomputed": -0.31016634188629766,
+   "rel_tol": 0.00016118633156028372,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p397s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0854 %",
+   "claimed": -0.0854,
+   "recomputed": -0.08544063388642442,
+   "rel_tol": 0.0005854800942622951,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p397s1A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0114 %",
+   "claimed": -0.0114,
+   "recomputed": -0.011360584229702653,
+   "rel_tol": 0.004385964916666667,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p397s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.6189e10",
+   "claimed": 16189000000,
+   "recomputed": 16188662103,
+   "rel_tol": 0.00003088516897275929,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p397s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "5.0296e7",
+   "claimed": 50296000,
+   "recomputed": 50296007,
+   "rel_tol": 0.000009941148411404487,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p397s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3107 %",
+   "claimed": 0.3107,
+   "recomputed": 0.3106866193141396,
+   "rel_tol": 0.00016092693933054397,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p397s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.5328e6",
+   "claimed": 2532800,
+   "recomputed": 2532750.875,
+   "rel_tol": 0.00001974099812460518,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p397s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p397s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3107 %",
+   "claimed": -0.3107,
+   "recomputed": -0.31068661931413777,
+   "rel_tol": 0.00016092693933054397,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p397s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0855 %",
+   "claimed": -0.0855,
+   "recomputed": -0.08551950375511597,
+   "rel_tol": 0.0005847953222222223,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p397s1B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0114 %",
+   "claimed": -0.0114,
+   "recomputed": -0.01136824905612066,
+   "rel_tol": 0.004385964916666667,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p397s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "5.1225e10",
+   "claimed": 51224999999.99999,
+   "recomputed": 51225062800,
+   "rel_tol": 0.000009760858965348954,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p397s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "1.5901e8",
+   "claimed": 159010000,
+   "recomputed": 159011780,
+   "rel_tol": 0.00003144456326646123,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p397s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3104 %",
+   "claimed": 0.3104,
+   "recomputed": 0.3104179308102283,
+   "rel_tol": 0.0001610824743878866,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p397s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.2681e6",
+   "claimed": 2268100,
+   "recomputed": 2268122.8125,
+   "rel_tol": 0.000022044883404611792,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p397s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p397s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3104 %",
+   "claimed": -0.3104,
+   "recomputed": -0.31041793081022506,
+   "rel_tol": 0.0001610824743878866,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p397s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0854 %",
+   "claimed": -0.0854,
+   "recomputed": -0.08544592369787996,
+   "rel_tol": 0.0005854800942622951,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p397s2A",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0114 %",
+   "claimed": -0.0114,
+   "recomputed": -0.011358484531420743,
+   "rel_tol": 0.004385964916666667,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "s_k_p397s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.2044e10",
+   "claimed": 22044000000,
+   "recomputed": 22044076955,
+   "rel_tol": 0.00002268190893213573,
+   "agrees": true,
+   "definition": "total_muls (E27's Karatsuba S, reproduced)"
+  },
+  {
+   "name": "saving_ic_p397s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "6.8418e7",
+   "claimed": 68418000,
+   "recomputed": 68418132,
+   "rel_tol": 0.000007308018365050134,
+   "agrees": true,
+   "definition": "ic_trivial_product_savings"
+  },
+  {
+   "name": "saving_share_pct_p397s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.3104 %",
+   "claimed": 0.3104,
+   "recomputed": 0.3103696840637345,
+   "rel_tol": 0.0001610824743878866,
+   "agrees": true,
+   "definition": "100 * saving / S"
+  },
+  {
+   "name": "walk_iii_p397s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "2.2681e6",
+   "claimed": 2268100,
+   "recomputed": 2268122.8125,
+   "rel_tol": 0.000022044883404611792,
+   "agrees": true,
+   "definition": "mean of E27's 16 <±psi> walks (iii), fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "walk_saving_p397s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "0.0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "walk audit mean_saved, <±psi>"
+  },
+  {
+   "name": "distance_change_pct_0gae_p397s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.3104 %",
+   "claimed": -0.3104,
+   "recomputed": -0.310369684063716,
+   "rel_tol": 0.0001610824743878866,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_0.1gae_p397s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0854 %",
+   "claimed": -0.0854,
+   "recomputed": -0.08544496236140287,
+   "rel_tol": 0.0005854800942622951,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "distance_change_pct_1gae_p397s2B",
+   "source": "experiments/35_invariants_lite/tables.md",
+   "printed": "-0.0114 %",
+   "claimed": -0.0114,
+   "recomputed": -0.011358896135060803,
+   "rel_tol": 0.004385964916666667,
+   "agrees": true,
+   "definition": "100 * ((S - saving + w 97 M)/(rho - ws + w 97 steps)) / ((S + w 97 M)/(rho + w 97 steps)) - 100"
+  },
+  {
+   "name": "saving_share_min_pct",
+   "source": "note §9.32",
+   "printed": "0.3087",
+   "claimed": 0.3087,
+   "recomputed": 0.3087474592632201,
+   "rel_tol": 0.00016196954988662135,
+   "agrees": true,
+   "definition": "least 100 * saving / S over 20 rows"
+  },
+  {
+   "name": "saving_share_max_pct",
+   "source": "note §9.32",
+   "printed": "0.3131",
+   "claimed": 0.3131,
+   "recomputed": 0.31310938153052775,
+   "rel_tol": 0.0001596933888534015,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "saving_min",
+   "source": "note §9.32",
+   "printed": "1.4·10⁷",
+   "claimed": 14000000,
+   "recomputed": 14428219,
+   "rel_tol": 0.03571428575,
+   "agrees": true,
+   "definition": "least saving per run"
+  },
+  {
+   "name": "saving_max",
+   "source": "note §9.32",
+   "printed": "7.1·10⁸",
+   "claimed": 710000000,
+   "recomputed": 714177289,
+   "rel_tol": 0.007042253528169015,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "walk_saving_min",
+   "source": "note §9.32",
+   "printed": "0",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1,
+   "agrees": true,
+   "definition": "least <±psi> walk saving per walk (mean of 16)"
+  },
+  {
+   "name": "walk_saving_max",
+   "source": "note §9.32",
+   "printed": "1.1",
+   "claimed": 1.1,
+   "recomputed": 1.125,
+   "rel_tol": 0.045454545500000006,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "walk_saving_share_max_pct",
+   "source": "note §9.32",
+   "printed": "0.0002",
+   "claimed": 0.0002,
+   "recomputed": 0.00019925240497652806,
+   "rel_tol": 0.25000000025,
+   "agrees": true,
+   "definition": "largest walk saving / walk (iii), in %; claimed as an upper bound (<= 0.0002 %)"
+  },
+  {
+   "name": "change_0gae_min_pct",
+   "source": "note §9.32",
+   "printed": "-0.313",
+   "claimed": -0.313,
+   "recomputed": -0.3131093815305297,
+   "rel_tol": 0.0015974440910543131,
+   "agrees": true,
+   "definition": "most negative distance change at 0 GAE"
+  },
+  {
+   "name": "change_0gae_max_pct",
+   "source": "note §9.32",
+   "printed": "-0.309",
+   "claimed": -0.309,
+   "recomputed": -0.3085880764585158,
+   "rel_tol": 0.0016181229789644016,
+   "agrees": true,
+   "definition": "least negative"
+  },
+  {
+   "name": "change_0.1gae_min_pct",
+   "source": "note §9.32",
+   "printed": "-0.086",
+   "claimed": -0.086,
+   "recomputed": -0.08551950375511597,
+   "rel_tol": 0.005813953494186048,
+   "agrees": true,
+   "definition": "most negative at 0.1 GAE"
+  },
+  {
+   "name": "change_0.1gae_max_pct",
+   "source": "note §9.32",
+   "printed": "-0.084",
+   "claimed": -0.084,
+   "recomputed": -0.08377675968456177,
+   "rel_tol": 0.005952380958333334,
+   "agrees": true,
+   "definition": "least negative"
+  },
+  {
+   "name": "change_1gae_min_pct",
+   "source": "note §9.32",
+   "printed": "-0.011",
+   "claimed": -0.011,
+   "recomputed": -0.01136824905612066,
+   "rel_tol": 0.045454545500000006,
+   "agrees": true,
+   "definition": "most negative at 1 GAE"
+  },
+  {
+   "name": "change_1gae_max_pct",
+   "source": "note §9.32",
+   "printed": "-0.011",
+   "claimed": -0.011,
+   "recomputed": -0.01100825857973664,
+   "rel_tol": 0.045454545500000006,
+   "agrees": true,
+   "definition": "least negative"
+  },
+  {
+   "name": "max_abs_change_pct",
+   "source": "note §9.32 G2.113 and tables.md (\"Largest |distance change| ... 0.3131 %\")",
+   "printed": "0.3131",
+   "claimed": 0.3131,
+   "recomputed": 0.3131093815305297,
+   "rel_tol": 0.0001596933888534015,
+   "agrees": true,
+   "definition": "largest |change| over rows and weights"
+  }
+ ],
+ "rows": [
+  {
+   "p": 101,
+   "seed": 1,
+   "arm": "A",
+   "s": 26964723596,
+   "saving": 83252899,
+   "saving_share": 0.003087474592632201,
+   "walk_iii": 351834.8125,
+   "walk_saving": 0.5625,
+   "walk_saving_share_of_iii": 0.0000015987616347657468,
+   "change": [
+    -0.0030858807645851583,
+    -0.0008377675968456177,
+    -0.0001100825857973664
+   ],
+   "unaudited_setup_share_bound": 0.00006434825833918034,
+   "fp4_work_share": 0.015313410891452774,
+   "saving_over_fp4_work": 0.20161900013768222
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "arm": "B",
+   "s": 13833208042,
+   "saving": 42932977,
+   "saving_share": 0.0031036168088882992,
+   "walk_iii": 351834.8125,
+   "walk_saving": 0.5625,
+   "walk_saving_share_of_iii": 0.0000015987616347657468,
+   "change": [
+    -0.0031020230066488574,
+    -0.000840185573927843,
+    -0.00011031848599252214
+   ],
+   "unaudited_setup_share_bound": 0.00011429517977316631,
+   "fp4_work_share": 0.015396081614139292,
+   "saving_over_fp4_work": 0.2015848503971317
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "arm": "A",
+   "s": 9818244813,
+   "saving": 30462302,
+   "saving_share": 0.0031026219635169328,
+   "walk_iii": 272685.75,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031026219635168495,
+    -0.00084162594150472,
+    -0.00011134629074460722
+   ],
+   "unaudited_setup_share_bound": 0.0002214001627991388,
+   "fp4_work_share": 0.015434180638820051,
+   "saving_over_fp4_work": 0.20102278417768532
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "arm": "B",
+   "s": 4659726750,
+   "saving": 14428219,
+   "saving_share": 0.0030963658974209165,
+   "walk_iii": 272685.75,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.003096365897420905,
+    -0.0008408878482861759,
+    -0.00011128968060203359
+   ],
+   "unaudited_setup_share_bound": 0.00039355011535815917,
+   "fp4_work_share": 0.015392852166706985,
+   "saving_over_fp4_work": 0.20115608620720785
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "arm": "A",
+   "s": 228974148611,
+   "saving": 714177289,
+   "saving_share": 0.0031190302194912963,
+   "walk_iii": 564610.5,
+   "walk_saving": 1.125,
+   "walk_saving_share_of_iii": 0.0000019925240497652806,
+   "change": [
+    -0.0031170439062264688,
+    -0.0008463719812588089,
+    -0.00011113879729585108
+   ],
+   "unaudited_setup_share_bound": 0.000008312488599896742,
+   "fp4_work_share": 0.016414864353903037,
+   "saving_over_fp4_work": 0.19001254912896495
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "arm": "B",
+   "s": 85999708286,
+   "saving": 267783491,
+   "saving_share": 0.0031137720852431406,
+   "walk_iii": 564610.5,
+   "walk_saving": 1.125,
+   "walk_saving_share_of_iii": 0.0000019925240497652806,
+   "change": [
+    -0.0031117857615013955,
+    -0.0008456107660803625,
+    -0.0001110667333492632
+   ],
+   "unaudited_setup_share_bound": 0.00001974528790670833,
+   "fp4_work_share": 0.016388510415789852,
+   "saving_over_fp4_work": 0.18999726065665562
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "arm": "A",
+   "s": 39561022727,
+   "saving": 122888757,
+   "saving_share": 0.0031063089002532195,
+   "walk_iii": 554206.3125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031063089002533184,
+    -0.0008464631341750239,
+    -0.00011215119856533562
+   ],
+   "unaudited_setup_share_bound": 0.00005617923518653527,
+   "fp4_work_share": 0.0164063384427377,
+   "saving_over_fp4_work": 0.1893359027728843
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "arm": "B",
+   "s": 22353365025,
+   "saving": 69313307,
+   "saving_share": 0.003100799674790798,
+   "walk_iii": 554206.3125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031007996747908217,
+    -0.0008455360433183845,
+    -0.00011205310603001895
+   ],
+   "unaudited_setup_share_bound": 0.00008531127183165569,
+   "fp4_work_share": 0.01638214302815019,
+   "saving_over_fp4_work": 0.18927924566783183
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "arm": "A",
+   "s": 33364322762,
+   "saving": 103492297,
+   "saving_share": 0.003101885140551141,
+   "walk_iii": 709525.125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.003101885140550986,
+    -0.0008489445989319222,
+    -0.00011263962747043443
+   ],
+   "unaudited_setup_share_bound": 0.0000876764087455629,
+   "fp4_work_share": 0.017119477595107676,
+   "saving_over_fp4_work": 0.18119040860438307
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "arm": "B",
+   "s": 24750444620,
+   "saving": 76667280,
+   "saving_share": 0.003097612231905028,
+   "walk_iii": 709525.125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.003097612231905078,
+    -0.0008483738182670786,
+    -0.00011258987912032836
+   ],
+   "unaudited_setup_share_bound": 0.0000959105598483588,
+   "fp4_work_share": 0.0170880593659412,
+   "saving_over_fp4_work": 0.18127349429034556
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "arm": "A",
+   "s": 17136680229,
+   "saving": 53235195,
+   "saving_share": 0.0031065057110601464,
+   "walk_iii": 677271.3125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031065057110600813,
+    -0.0008498473935784068,
+    -0.0001127437323963365
+   ],
+   "unaudited_setup_share_bound": 0.0002214346623319956,
+   "fp4_work_share": 0.017188209855345374,
+   "saving_over_fp4_work": 0.18073468599721873
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "arm": "B",
+   "s": 10121590489,
+   "saving": 31453616,
+   "saving_share": 0.003107576426272466,
+   "walk_iii": 677271.3125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031075764262724626,
+    -0.0008500742683552609,
+    -0.00011277096896922245
+   ],
+   "unaudited_setup_share_bound": 0.00027180530599314984,
+   "fp4_work_share": 0.01718370627511761,
+   "saving_over_fp4_work": 0.1808443636383791
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "arm": "A",
+   "s": 53286038394,
+   "saving": 166314803,
+   "saving_share": 0.0031211703480423687,
+   "walk_iii": 1117087.875,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.003121170348042379,
+    -0.0008534256581416155,
+    -0.00011319966363254608
+   ],
+   "unaudited_setup_share_bound": 0.00006684869259113644,
+   "fp4_work_share": 0.017949281159315753,
+   "saving_over_fp4_work": 0.173888320113726
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "arm": "B",
+   "s": 30691610728,
+   "saving": 95747963,
+   "saving_share": 0.0031196786590496207,
+   "walk_iii": 1117087.875,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031196786590496073,
+    -0.0008531892833117949,
+    -0.00011317573777902545
+   ],
+   "unaudited_setup_share_bound": 0.00009239958192916906,
+   "fp4_work_share": 0.017942215118010016,
+   "saving_over_fp4_work": 0.17387366267379958
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "arm": "A",
+   "s": 19775127049,
+   "saving": 61917778,
+   "saving_share": 0.0031310938153052774,
+   "walk_iii": 1107117.8125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.003131093815305297,
+    -0.0008551409914607788,
+    -0.00011338404292304816
+   ],
+   "unaudited_setup_share_bound": 0.00021900233506813309,
+   "fp4_work_share": 0.01808432285233203,
+   "saving_over_fp4_work": 0.1731385709529905
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "arm": "B",
+   "s": 9773820165,
+   "saving": 30593409,
+   "saving_share": 0.003130138316802149,
+   "walk_iii": 1107117.8125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031301383168022,
+    -0.0008549435739095834,
+    -0.00011336061318167889
+   ],
+   "unaudited_setup_share_bound": 0.0003315776170719016,
+   "fp4_work_share": 0.018074929967774784,
+   "saving_over_fp4_work": 0.17317568158674873
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "arm": "A",
+   "s": 27927862989,
+   "saving": 86622831,
+   "saving_share": 0.0031016634188630295,
+   "walk_iii": 2532750.875,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031016634188629766,
+    -0.0008544063388642442,
+    -0.00011360584229702653
+   ],
+   "unaudited_setup_share_bound": 0.00022158559007674314,
+   "fp4_work_share": 0.018944963680479047,
+   "saving_over_fp4_work": 0.1637196814506957
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "arm": "B",
+   "s": 16188662103,
+   "saving": 50296007,
+   "saving_share": 0.0031068661931413963,
+   "walk_iii": 2532750.875,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031068661931413777,
+    -0.0008551950375511597,
+    -0.0001136824905612066
+   ],
+   "unaudited_setup_share_bound": 0.00026982884516383313,
+   "fp4_work_share": 0.018964298287695257,
+   "saving_over_fp4_work": 0.1638271106058929
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "arm": "A",
+   "s": 51225062800,
+   "saving": 159011780,
+   "saving_share": 0.003104179308102283,
+   "walk_iii": 2268122.8125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.0031041793081022506,
+    -0.0008544592369787996,
+    -0.00011358484531420743
+   ],
+   "unaudited_setup_share_bound": 0.00010472332695705353,
+   "fp4_work_share": 0.018750553645002072,
+   "saving_over_fp4_work": 0.1655513414095747
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "arm": "B",
+   "s": 22044076955,
+   "saving": 68418132,
+   "saving_share": 0.003103696840637345,
+   "walk_iii": 2268122.8125,
+   "walk_saving": 0,
+   "walk_saving_share_of_iii": 0,
+   "change": [
+    -0.00310369684063716,
+    -0.0008544496236140287,
+    -0.00011358896135060803
+   ],
+   "unaudited_setup_share_bound": 0.00017758988085514056,
+   "fp4_work_share": 0.018753725676240274,
+   "saving_over_fp4_work": 0.16549761333928026
+  }
+ ],
+ "e30_against_e27": {
+  "schema": "e30-vs-e27/v1 (a = E27's Karatsuba record, b = E30's audited record)",
+  "rule": "every leaf of a against b: integers and floats by their text (equal text, or equal value with the same integer/float form; integers compared exactly as i128), strings and booleans exactly; wall_ms and solve_ms are wall-clock and listed, not compared",
+  "runs_total": 10,
+  "runs_identical": 0,
+  "fields_compared": 12100,
+  "fields_identical": 12100,
+  "all_identical": false,
+  "runs": [
+   {
+    "run": "p101s1",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s1.json",
+     "sha256": "39d93707a3dc8430fce2df47886012ea6545b63b02d8cdf58990eb4e6d3adadb"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p101s1.json",
+     "sha256": "ef38bd38657ad4e276d7957ad524ca5ee1bb78ff01d14554929a7a0656a5ce6e"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 136394.842815,
+      "b": 209873.28271199804
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 51337.761762,
+      "b": 93495.512785
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 77169.00054799994,
+      "b": 104977.05205800071
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 29296.512055,
+      "b": 48159.063831
+     }
+    ],
+    "identical": false
+   },
+   {
+    "run": "p101s2",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s2.json",
+     "sha256": "bc4c3a81a1a7de63ddf204a4b8b289ae6bcc200f33a7bcc6251e65430afd31f9"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p101s2.json",
+     "sha256": "9f4163f4c11e263cf6da2877116c46e441ab6b82b526c56bc39efd6f44784e8a"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 51998.45986600023,
+      "b": 74982.02989300038
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 19659.319679,
+      "b": 34493.923052
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 23965.768885999958,
+      "b": 36449.10295499996
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 9098.002493999998,
+      "b": 17004.923721
+     }
+    ],
+    "identical": false
+   },
+   {
+    "run": "p149s1",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s1.json",
+     "sha256": "71618ef39d4b6ca0ec0a38b3667288393d087572cc6d97208e5d331baed0d5f7"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p149s1.json",
+     "sha256": "9db35f55e70bc9a13deabf6b1cba90b0b097e44b0ab192bcd9efcd3a3d855c3e"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 1456299.635012978,
+      "b": 1400157.5989489737
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 601773.46677,
+      "b": 583451.629404
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 576507.9004280122,
+      "b": 598324.825511005
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 242627.85031100002,
+      "b": 261662.18805
+     }
+    ],
+    "identical": false
+   },
+   {
+    "run": "p149s2",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s2.json",
+     "sha256": "683e68771a3615fc2cacfa573736b156478899cbe8d99a81e4edaf611a3a8b24"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p149s2.json",
+     "sha256": "a233d71f1beacc09ebc4cafe5f4d61b48349417ed5ca7313670c80bb50d14108"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 218213.73770099925,
+      "b": 306614.0736060027
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 85361.26107200001,
+      "b": 141156.216228
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 125267.07518700043,
+      "b": 179250.652215999
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 49244.869125,
+      "b": 82632.884581
+     }
+    ],
+    "identical": false
+   },
+   {
+    "run": "p197s1",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s1.json",
+     "sha256": "db97629bc6887c37fd5b3b06bd62b37e14936c660022af252e653a0a796c0d10"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p197s1.json",
+     "sha256": "fd5a0a6b2cfd9a4c323eb6ae51661fe377c63c6f993265fb75bcbf9dfc9ae653"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 230058.03714700087,
+      "b": 183485.90533499923
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 97716.237757,
+      "b": 69123.785466
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 197440.30496199973,
+      "b": 124195.89907599906
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 88606.692173,
+      "b": 45758.378878
+     }
+    ],
+    "identical": false
+   },
+   {
+    "run": "p197s2",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s2.json",
+     "sha256": "d86f811e85852e311ee8583823ef5a3619635c0511148038c6cf99f83ed1f38a"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p197s2.json",
+     "sha256": "e9147534d721c27580ee7785d713c5599e804978e32b7c3a8ed939f8507d25ca"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 127827.01458599945,
+      "b": 78675.78090599977
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 55369.832723,
+      "b": 28102.20922
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 79254.04378100045,
+      "b": 49181.55083699996
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 35604.72475,
+      "b": 18161.097712
+     }
+    ],
+    "identical": false
+   },
+   {
+    "run": "p269s1",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s1.json",
+     "sha256": "ed045d101098b39e58686b48cc663aaedb8b40920f13f8824be7badebe5c817a"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p269s1.json",
+     "sha256": "3dc855bd239067fe921b0ad16d8b1d51ed045cc37098da1622aa2215bda94e43"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 435933.80424700386,
+      "b": 240904.72916800022
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 191574.340512,
+      "b": 84861.204449
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 208360.57640999972,
+      "b": 147457.77896399982
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 83840.579716,
+      "b": 52952.597202
+     }
+    ],
+    "identical": false
+   },
+   {
+    "run": "p269s2",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s2.json",
+     "sha256": "a67423a8acf8fab3fd32276b31374ab60deef3864d2c4129a0b63db14f232e1a"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p269s2.json",
+     "sha256": "ab5cb1d84c884bc0b9113c10c2f5cf041e63a3f13a3a814c5437f4344dae3f18"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 101386.85601900023,
+      "b": 95369.79282200048
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 37409.229883,
+      "b": 34961.574544999996
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 48301.24646099979,
+      "b": 43121.78610099997
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 17503.611195,
+      "b": 15480.563565
+     }
+    ],
+    "identical": false
+   },
+   {
+    "run": "p397s1",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s1.json",
+     "sha256": "cb469c62cbf518eb8610f42e50dff859b28c480c4d9776fe9921bf1e3465eabd"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p397s1.json",
+     "sha256": "de1fd1031872ded4a8a3fb87413c1db294df47d803a0ff5e4eb97d6543292801"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 194162.2152829994,
+      "b": 174568.15125299979
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 65586.348771,
+      "b": 57978.083644
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 108567.69537399936,
+      "b": 102100.06625599983
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 36818.841596,
+      "b": 34489.732142
+     }
+    ],
+    "identical": false
+   },
+   {
+    "run": "p397s2",
+    "a": {
+     "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s2.json",
+     "sha256": "7fbc78e9ffc61aeca3353f14d70badf51624b15e2344cd380b066951f847fd0c"
+    },
+    "b": {
+     "path": "experiments/35_invariants_lite/e2e_audit_p397s2.json",
+     "sha256": "9d25ae1a7eedb51f4bbb7bdb06d656b17cbc5af6a59bf7b5ed59a2a7a0c9ab2f"
+    },
+    "fields_compared": 1210,
+    "fields_identical": 1210,
+    "mismatches": [],
+    "only_in_a": [],
+    "only_in_b": [
+     "$[0].ic_trivial_product_savings",
+     "$[1].ic_trivial_product_savings"
+    ],
+    "timing_not_compared": [
+     {
+      "path": "$[0].solve_ms",
+      "a": 319760.3586240017,
+      "b": 326316.9953660013
+     },
+     {
+      "path": "$[0].wall_ms",
+      "a": 104249.700203,
+      "b": 106875.926169
+     },
+     {
+      "path": "$[1].solve_ms",
+      "a": 136824.7227269997,
+      "b": 139331.52204199973
+     },
+     {
+      "path": "$[1].wall_ms",
+      "a": 44952.023297,
+      "b": 45929.182965
+     }
+    ],
+    "identical": false
+   }
+  ]
+ },
+ "gae_band": {
+  "definition": "IC: audited S = total_muls - ic_trivial_product_savings, + w * 97 * macaulay_entries; rho: E27's <±psi> walk (iii) mean - the walk audit's mean saving, + w * 97 * mean steps; GAE = 97 F_p multiplications (E25's affine addition), as E27's validation",
+  "arm_b_medians": [
+   {
+    "weight": "0",
+    "ic_median": 19057012459.5,
+    "rho_median": 693398.21875,
+    "ic_over_rho_min": 6371.87267618652,
+    "ic_over_rho_max": 151842.8998721461,
+    "rho_below_ic_on_every_row": true
+   },
+   {
+    "weight": "0.1",
+    "ic_median": 69383180088.3,
+    "rho_median": 744678.1781250001,
+    "ic_over_rho_min": 21233.440616152882,
+    "ic_over_rho_max": 522736.8156936079,
+    "rho_below_ic_on_every_row": true
+   },
+   {
+    "weight": "1",
+    "ic_median": 522318688747.5,
+    "rho_median": 1206197.8125,
+    "ic_over_rho_min": 90659.40790488852,
+    "ic_over_rho_max": 2489846.4115710016,
+    "rho_below_ic_on_every_row": true
+   }
+  ],
+  "all_20_rows": [
+   {
+    "weight": "0",
+    "ic_median": 23478914529,
+    "rho_median": 693398.21875,
+    "ic_over_rho_min": 6371.87267618652,
+    "ic_over_rho_max": 404279.45661015634,
+    "rho_below_ic_on_every_row": true
+   },
+   {
+    "weight": "0.1",
+    "ic_median": 86099644986.6,
+    "rho_median": 744678.1781250001,
+    "ic_over_rho_min": 21233.440616152882,
+    "ic_over_rho_max": 1392884.41111168,
+    "rho_below_ic_on_every_row": true
+   },
+   {
+    "weight": "1",
+    "ic_median": 649686219105,
+    "rho_median": 1206197.8125,
+    "ic_over_rho_min": 90659.40790488852,
+    "ic_over_rho_max": 6636147.267620775,
+    "rho_below_ic_on_every_row": true
+   }
+  ],
+  "order_holds_across_band": true
+ },
+ "verdicts_recomputed": [
+  {
+   "id": "G2.110",
+   "note": "holds",
+   "recomputed": "E30 = E27 on 12100 of 12100 compared leaves; the only extra leaf is the audit counter"
+  },
+  {
+   "id": "G2.111",
+   "note": "holds",
+   "recomputed": "S falls 0.3087-0.3131 % in [0.01 %, 1 %]"
+  },
+  {
+   "id": "G2.112",
+   "note": "holds",
+   "recomputed": "<±psi> walk falls at most 0.000199 % in [0 %, 1 %]"
+  },
+  {
+   "id": "G2.113",
+   "note": "holds",
+   "recomputed": "largest |S/rho change| 0.3131 % < 1 %"
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "claim": "§9.32: \"which here is ≈ 2 % of S, so about one in seven of its counted products is trivial\"",
+   "recomputed": "the F_p4-priced phases are 1.53-1.90 % of S and the saving is 0.164-0.202 of their multiplications; the product count is not emitted, so \"one in seven products\" cannot be checked from the records",
+   "effect": "none on a verdict or headline: explanatory prose"
+  }
+ ],
+ "pre_registration": "§9.28 committed b3ddccb13 (2026-10-30T19:01:45Z) before E30's code 0e4fccce1 (21:47:35Z) and records 22f560ff3/f8be1a0fe; its text at HEAD equals the registered text (one trailing blank line)",
+ "limitations": [
+  "Accounting only: the audit re-prices products by 0, 1 or an F_p element; nothing is computed differently, so it is not an improvement of the index calculus (class fixed in §9.28).",
+  "The audit's window excludes set-up (precompute, base) and the [x]G check (G.5: those phases are 0.0008-0.04 % of S, so the audit can have missed at most that much; G2.111's band is unaffected); the walk audit's counter includes the walk's [d]G check while the walk cost excludes it, so the walk saving is an upper bound (it is <= 1.1 per walk either way).",
+  "The matched rho is E27's walk (iii) from E27's binary af2504ef1 (validated, research/e27_walk_20261030); E30's binary 0e4fccce1 reproduces E27's records leaf for leaf (G.1) and its walks' (ii) means exactly (G.3), and (iii) differs from (ii) only by the price of the recorded F_p inversions (E27 validation).",
+  "Operation counts only. The replay ran locally in the validator's 4-vCPU container, not on isolab-eks; no wall time is compared or claimed."
+ ],
+ "comparator_controls": {
+  "all_hold": true,
+  "cases": [
+   {
+    "control": "record against itself",
+    "fields_compared": 1212,
+    "mismatches": 0,
+    "holds": true
+   },
+   {
+    "control": "ic_trivial_product_savings + 1",
+    "mismatches": 1,
+    "expected": "exactly 1",
+    "holds": true
+   },
+   {
+    "control": "total_muls + 1",
+    "mismatches": 1,
+    "expected": "exactly 1",
+    "holds": true
+   },
+   {
+    "control": "visit_digest + 1 (beyond f64 precision)",
+    "mismatches": 1,
+    "expected": "exactly 1",
+    "holds": true
+   }
+  ]
+ }
+}

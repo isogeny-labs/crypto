@@ -1,0 +1,204 @@
+{
+  "card_id": "CARD-neural-distinguishers-20261102-2",
+  "card_path": "research/neural_distinguishers_20261102/cards/run-20261102-2.yaml",
+  "card_sha256": "c8d0b1846409bc63971935eaacff9a3fc34a3b0edd7ae086c9dd1a2e6a0eb90b",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/home/user/crypto-ml",
+        "rev-parse",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-commit",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5c29e261b65d9b6282e4532e81f77ab5f6454ee587435f6f64f8ebcd6c3d855e",
+      "stdout_tail": [
+        "f0993f8282ddbd2216185a6f3dd4e31d6b27eabf"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--locked"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.1,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/neural_distinguishers_20261102",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.1,
+      "stderr_sha256": "9d4884817284ccd145bfdfea8a98000309b205484a7b197a65b7ca435d38dc8c",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized + debuginfo] target(s) in 0.03s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "target/release/neural-distinguishers"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.009,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/neural_distinguishers_20261102",
+      "exit_code": 0,
+      "id": "binary-sha256",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.009,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "cf5a35e574704a1941b886013c29e06266862f2318c4dc5d1907af2db182129c",
+      "stdout_tail": [
+        "41b8d479741c2a3958e392ddba453932347de2e126d293a1536b27786cbabb31  target/release/neural-distinguishers"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/neural-distinguishers",
+        "run",
+        "results",
+        "aes-r4"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 135.667,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/neural_distinguishers_20261102",
+      "exit_code": 0,
+      "id": "run-cell-aes-r4",
+      "index": 4,
+      "outputs": {
+        "research/neural_distinguishers_20261102/results/rows.jsonl": "ab49ea47153d58d4f34277d5f1fe9c698eeaa97aa58523ba3ea2493c9e24a506"
+      },
+      "seconds": 135.667,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7383c384fa45da6689d107f4b15b7e38ca7c38b61cca5ec89647d4aff3a156f8",
+      "stdout_tail": [
+        "{\"cell\":\"aes-r4\",\"cipher\":\"aes128\",\"rounds\":4,\"role\":\"target\",\"model\":\"mlp\",\"arm\":\"primary\",\"n_train\":524288,\"n_test\":131072,\"correct\":65746,\"accuracy\":0.501602,\"wilson95\":[0.498895,0.504309],\"bonferroni_lower\":0.496741,\"train_loss\":0.692547,\"train_seconds\":42.20,\"gen_seconds\":0.85,\"independent_unit\":\"key (one fresh key per sample)\"}",
+        "{\"cell\":\"aes-r4\",\"cipher\":\"aes128\",\"rounds\":4,\"role\":\"target\",\"model\":\"mlp\",\"arm\":\"aa_seed2\",\"n_train\":524288,\"n_test\":131072,\"correct\":65588,\"accuracy\":0.500397,\"wilson95\":[0.497690,0.503104],\"bonferroni_lower\":0.495536,\"train_loss\":0.693074,\"train_seconds\":41.11,\"gen_seconds\":0.85,\"independent_unit\":\"key (one fresh key per sample)\"}",
+        "{\"cell\":\"aes-r4\",\"cipher\":\"aes128\",\"rounds\":4,\"role\":\"target\",\"model\":\"logreg\",\"arm\":\"primary\",\"n_train\":524288,\"n_test\":131072,\"correct\":65737,\"accuracy\":0.501534,\"wilson95\":[0.498827,0.504240],\"bonferroni_lower\":0.496672,\"train_loss\":0.693402,\"train_seconds\":8.42,\"gen_seconds\":0.85,\"independent_unit\":\"key (one fresh key per sample)\"}",
+        "{\"cell\":\"aes-r4\",\"cipher\":\"aes128\",\"rounds\":4,\"role\":\"target\",\"model\":\"mlp\",\"arm\":\"label_shuffle_control\",\"n_train\":524288,\"n_test\":131072,\"correct\":65394,\"accuracy\":0.498917,\"wilson95\":[0.496210,0.501624],\"bonferroni_lower\":0.494056,\"train_loss\":0.693128,\"train_seconds\":42.05,\"gen_seconds\":0.85,\"independent_unit\":\"key (one fresh key per sample)\"}",
+        "{\"cell\":\"aes-r4\",\"cipher\":\"aes128\",\"rounds\":4,\"role\":\"target\",\"model\":\"difference_table_nb\",\"arm\":\"primary\",\"n_train\":524288,\"n_test\":131072,\"correct\":65745,\"accuracy\":0.501595,\"wilson95\":[0.498888,0.504301],\"bonferroni_lower\":0.496733,\"train_loss\":null,\"train_seconds\":0.05,\"gen_seconds\":0.85,\"independent_unit\":\"key (one fresh key per sample)\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/neural-distinguishers",
+        "summary",
+        "results"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/neural_distinguishers_20261102",
+      "exit_code": 0,
+      "id": "summary",
+      "index": 5,
+      "outputs": {
+        "research/neural_distinguishers_20261102/results/fig_accuracy.svg": "2066b66069239aeb09d314d9105bb6c42a29f795a312e222501f20e7d00f3758",
+        "research/neural_distinguishers_20261102/results/summary.json": "2405a91a078a1da0fffc4d3aba8528882928ed9bc282b128557a5acefa379b6c"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5fba482aa0d4080bbf6d2579b2740ab3b472b0ec3c719e32f90aeda1217bff23",
+      "stdout_tail": [
+        "summary.json and fig_accuracy.svg written (7 cells)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "results/rows.jsonl",
+        "results/summary.json",
+        "results/fig_accuracy.svg"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/neural_distinguishers_20261102",
+      "exit_code": 0,
+      "id": "output-sha256",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3fcef1c189cf7980cba36118fc912f0f424d4a00604397bfe20ba5156b2308b1",
+      "stdout_tail": [
+        "ab49ea47153d58d4f34277d5f1fe9c698eeaa97aa58523ba3ea2493c9e24a506  results/rows.jsonl",
+        "2405a91a078a1da0fffc4d3aba8528882928ed9bc282b128557a5acefa379b6c  results/summary.json",
+        "2066b66069239aeb09d314d9105bb6c42a29f795a312e222501f20e7d00f3758  results/fig_accuracy.svg"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "f0993f8282ddbd2216185a6f3dd4e31d6b27eabf",
+  "dirty_after": [],
+  "dirty_before": [
+    "research/neural_distinguishers_20261102/cards/run-20261102-2.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

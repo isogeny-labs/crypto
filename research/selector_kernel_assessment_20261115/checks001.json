@@ -1,0 +1,92 @@
+{
+  "schema": "selector-kernel-publication-checks/v1",
+  "recorded_at": "2026-11-15T21:56:20.141Z",
+  "base": "b05c8a03af1034fdc6c92c1bb061a9258ad0b555",
+  "claim": "PCC-20261115-26947e",
+  "checks": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "name": "ledger-prefix",
+        "cmd": "python3 tools/pcc/pcc.py ledger verify --base origin/main",
+        "chunk_id": "7b41d2",
+        "wall_time_seconds": 0.087541334,
+        "exit_code": 0,
+        "original_token_count": 8,
+        "output": "ledger: 1093 entries, chain ok\n"
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "name": "claim-standing",
+        "cmd": "python3 tools/pcc/pcc.py standing PCC-20261115-26947e",
+        "chunk_id": "d93034",
+        "wall_time_seconds": 0.006061343,
+        "exit_code": 2,
+        "original_token_count": 8,
+        "output": "PCC-20261115-26947e: unverified\n"
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "name": "lessons",
+        "cmd": "python3 tools/lessons.py verify --base origin/main",
+        "chunk_id": "648600",
+        "wall_time_seconds": 0.294834966,
+        "exit_code": 0,
+        "original_token_count": 10,
+        "output": "lessons verify: 92 entries, 0 error(s)\n"
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "name": "autonomy",
+        "cmd": "python3 tools/autonomy_report.py verify --base origin/main",
+        "chunk_id": "b757eb",
+        "wall_time_seconds": 0.499365578,
+        "exit_code": 0,
+        "original_token_count": 11,
+        "output": "autonomy verify: 166 entries, 0 error(s)\n"
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "name": "prose",
+        "cmd": "python3 tools/pcc/pcc.py lint-prose research/selector_kernel_assessment_20261115/README.md research/selector_kernel_assessment_20261115/PUBLICATION.md research/selector_kernel_assessment_20261115/pr-body001.md research/selector_kernel_assessment_20261115/owner-pr-body001.md research/selector_kernel_assessment_20261115/owner/docs/interpolation-kernels-20261115.md",
+        "chunk_id": "c718fb",
+        "wall_time_seconds": 0.138460288,
+        "exit_code": 0,
+        "original_token_count": 7,
+        "output": "lint-prose: 0 finding(s)\n"
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "name": "diff",
+        "cmd": "git diff --cached --check",
+        "chunk_id": "11b07b",
+        "wall_time_seconds": 0.180310309,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ],
+  "standing_interpretation": "standing exits2 for unverified; this is recorded as unverified, not a verification pass.",
+  "snapshot_check": {
+    "exit_code": 0,
+    "owner_snapshots_matching": 56,
+    "claim_subjects_matching": 6,
+    "byte_prefix_preserved": [
+      "pcc/ledger.jsonl",
+      "docs/session-logs/2026-11-15.md"
+    ]
+  },
+  "prior_prose_attempt": "One missing tag was found and fixed before the claim. The compound invocation's final exit was0; the original lint subcommand status was not separately retained. Final lint output and exit are above.",
+  "scope": "Publication metadata, prose, hash and append-only checks only. No mathematical/numerical experiment performed by these checks."
+}

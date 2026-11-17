@@ -1,5 +1,11 @@
 # Native log-norm optimization and 80-bit candidate evidence
 
+The [13 November record search](record-search-20261113/README.md) reconstructs
+the published 263-bit K-571 conductor factor and retains a PARI primality
+certificate. It reviews vertical construction prerequisites while preserving
+the distinction between a conductor factor and an evaluated crossing. The
+existing 80-bit quotient, full images and endpoint timings remain open.
+
 This study publishes the native C trace optimization, its native checks, and
 the frozen 80-bit source/kernel study. The shared trace functional avoids
 three trace-only polynomial products; a reversed-modulus inverse is also
@@ -92,6 +98,35 @@ contexts under Sage, Python-FLINT and the optimized native backend. Those
 32 contexts are partial sums, not 32 completed isogeny evaluations.
 
 ## Acceptance status and next construction
+
+The [complete native control runner](complete-pipeline/README.md) now wires
+canonical coverage, quotient moments, point maps and paired scalar recovery.
+Two complete ordinary-curve fixtures match independent PARI coefficients
+and 42 evaluated inputs; 34 paired known answers recover on both endpoints.
+These tiny-subgroup software controls do not establish the 80-bit crossing
+or performance. The target's incomplete-prefix gate returns no quotient or
+images, and production S3-resumable coverage remains to be integrated.
+
+The [native polynomial-block stage](poly-blocks/README.md) now prepares
+bounded products and streams six reciprocal-power sums across supplied
+blocks. The 4,096-root fixture matches a direct oracle at 32 source and
+32 actual giant contexts (384 compared values),
+including split-block/order controls. It does not establish global coverage,
+full-work feasibility or an isogeny image; actual giant-batch/codomain
+integration and complete point evaluation are still required.
+
+The [S3 root-chunk storage fixture](s3-chunks/README.md) adds a bounded native
+producer and independent PARI validation of 4,096 roots. Its object-store
+upload uses the trusted artifact workflow's full-byte readback. This prepares
+root data without the full vector allocation; external-memory polynomial
+processing and complete point evaluation remain separate implementation work.
+
+The follow-up [measurement protocol](MEASUREMENT_PROTOCOL.md) and
+[exact native eligibility audit](measurement-readiness.json) identify the
+current launch blockers: the earlier codomain constructor has a 64-bit degree
+parser, its root slots alone exceed 3.4 TB for this 80-bit input, and it has
+no arbitrary-point evaluator. The audit is not a timing measurement. See the
+[readiness report](reports/measurement-readiness.pdf).
 
 | Requested obligation | Evidence/status |
 |:--|:--|

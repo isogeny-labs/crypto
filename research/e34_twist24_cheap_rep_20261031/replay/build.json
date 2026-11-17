@@ -1,0 +1,23 @@
+{
+ "schema": "e34-validator-build/v1",
+ "recorded_binary_commit": "bd0118f393537a2e610336e5d45f5426a6a0fa83",
+ "recorded_binary_sha256": "7552c98ef75034d74356f36a79453fc62ddf5e347468b6ab39b179e30a327a49 (experiments/38_twist24_cheap_rep/binary_commit.txt); that binary is no longer on disk (target/release/examples/e34_cheap_rep hashes fb65df8cd21d12578631faf6abd82d20366763b3eb4f88d8780d1b6239e3429a, a later rebuild) and was not run",
+ "repository_head_at_start": "4852cd4bec (branch claude/glv-endomorphism-index-calculus-pe7ige); untracked files of the E32 validator present, none of E34's; HEAD at report time 61c4dfecc8 (E33 errata only; §9.38, §9.39 and E34's records unchanged, checked)",
+ "source": "git archive bd0118f39 of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/, the six path dependencies (isogeny_algos, crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, tools/factor-base, tools/volcano-cli, research/pencil_large_prime_20261029), every explicit path of Cargo.toml and every include_str!/include_bytes! target present at the commit (210 archive paths; 10 targets inside archived snapshot directories of the pencil crate are absent at the commit and are not compiled). Extracted to /dev/shm/e34val-tree: 4,288 files, each equal to its bd0118f39 blob (git hash-object over the tree against git ls-tree: identical lists). Path list computed by the validator's own script; no producer script used. The tree is a clean export, so E33's uncommitted solver edits that were in the producer's worktree are absent from this build.",
+ "target_dir": "/dev/shm/e34val-target: a fresh, empty target directory on tmpfs. The briefed shared target (/home/user/crypto/target) was not used: a fresh crypto_lib release rlib + rmeta is about 560 MB, and the root filesystem had about 600 MB free against a 300 MB floor; the coordinator approved tmpfs. Nothing was reused from any other target directory.",
+ "command": "cd /dev/shm/e34val-tree && flock <scratchpad>/build.lock env CARGO_TARGET_DIR=/dev/shm/e34val-target CARGO_INCREMENTAL=0 cargo build --release --offline -j 2 --example e34_cheap_rep",
+ "build_window": "2026-11-01T20:24:55Z - 2026-11-01T20:44:06Z; `Finished release profile [optimized] target(s) in 19m 11s`, 231 crates compiled, exit 0, no warnings that change code",
+ "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded",
+ "binaries": [
+  {
+   "name": "e34_cheap_rep",
+   "sha256": "5afe6797ce18ed2c45628bc8dbcf865e50ad6f7a071d00294b7006f32ebf48a0",
+   "bytes": 4940840,
+   "note": "differs from the producer's recorded hash, as expected for a build from another path; record identity, not binary identity, is the claim"
+  }
+ ],
+ "host": "Intel(R) Xeon(R) Processor @ 2.10GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, shared with two other validators; not isolab-eks (no aws CLI or kubectl here). Operation counts only; no wall time is compared or claimed.",
+ "run_command": "BIN=/dev/shm/e34val-target/release/examples/e34_cheap_rep CORE=1 nice -n 5 research/e34_twist24_cheap_rep_20261031/replay/replay.sh (from the repository root)",
+ "run_window": "2026-11-01T20:52:25Z - 2026-11-01T20:56:42Z (4 m 17 s wall, 3 m 48 s user), serial",
+ "environment": "RAYON_NUM_THREADS=1, taskset -c 1, the producer's arguments (examples/e34_cheap_rep.rs header): --stage r --sizes <p> per curve in the nonce-drawn order, --stage i (all 8 curves, default order), --stage n --sizes 241"
+}

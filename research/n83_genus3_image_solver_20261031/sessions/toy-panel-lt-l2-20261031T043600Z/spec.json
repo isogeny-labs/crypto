@@ -1,0 +1,46 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "same-field genus-3 Jacobian image: four-size cold transfer/solver panel",
+  "description": "Preregistered toy panel for the pinned n=83 cubic-pullback workstream. Three substantive arms compare the strong source rho with deterministic rho and BSGS on the exact genus-3 Jacobian image; the fourth arm is the source-rho A/A wall control. Destination operations remain unpriced in source GAE, so this is a transfer and engineering diagnostic, not a speedup claim.",
+  "workloads": {
+    "curves": [
+      {"kind": "koblitz", "a": 0, "n": 7},
+      {"kind": "koblitz", "a": 0, "n": 9},
+      {"kind": "koblitz", "a": 0, "n": 13},
+      {"kind": "koblitz", "a": 0, "n": 19}
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202610310830,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "source-rho-strong",
+      "role": "reference",
+      "method": {"id": "rho.signed_frobenius_strong"}
+    },
+    {
+      "name": "destination-rho3",
+      "role": "baseline",
+      "method": {"id": "jacobian_image.rho3"}
+    },
+    {
+      "name": "destination-bsgs",
+      "role": "candidate",
+      "method": {"id": "jacobian_image.bsgs"}
+    },
+    {
+      "name": "source-rho-strong-aa",
+      "role": "control",
+      "method": {"id": "rho.signed_frobenius_strong"}
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610310831,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

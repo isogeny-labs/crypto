@@ -1,0 +1,130 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hb49f2953ff1e646f",
+  "statement": {
+    "name": "literal target-completed norm evaluation",
+    "source": "NormMembershipElimination.completionRow/normAtTarget; substitute target row and f(q)=Z^2; literal polynomial expansion only",
+    "variables": [
+      "D",
+      "B",
+      "Z"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "D"
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "Z"
+                        },
+                        {
+                          "op": "var",
+                          "args": "B"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "var",
+                        "args": "D"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "D"
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "Z"
+                        },
+                        {
+                          "op": "var",
+                          "args": "B"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "var",
+                        "args": "D"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "Z"
+              },
+              {
+                "op": "var",
+                "args": "Z"
+              },
+              {
+                "op": "var",
+                "args": "B"
+              },
+              {
+                "op": "var",
+                "args": "B"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "const",
+      "args": 0
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2316557831630749698,
+  "value_digest": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+  "independence": "unsigned producer invocation of unchanged canonical issuer/checker; extra stream uses separate fixed seed; no independent signer; Lean pointer checked separately",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/NormMembershipElimination.lean",
+    "sha256": "82d221144e66712b557b3bf78af4cd1e84af9ef63e36a4ca79bc2def69b2b0d1"
+  }
+}

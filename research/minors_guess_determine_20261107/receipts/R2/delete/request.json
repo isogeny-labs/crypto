@@ -1,0 +1,6 @@
+{
+  "schema": "isolab.eks.command-delete/v1",
+  "job_name": "minors-gd-panel-20261107",
+  "job_uid": "8593ac83-fd9b-4eac-b41a-8bd35dc521ae",
+  "reason": "Unschedulable by construction: it requests 14 vCPU (14180m with daemonsets) on cpu-spot, whose nodes are capped at 16 vCPU by the nodepool limit and keep 2 CPUs for kubeReserved + systemReserved (14000m allocatable). Karpenter: 'no instance type has enough resources'. No data exists; relaunch at 12 vCPU under a new name."
+}

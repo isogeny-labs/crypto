@@ -1,0 +1,101 @@
+{
+  "source": "df3b0ec17a324a14e2f474a97e82021fac9a6cfa",
+  "published_metadata_head_at_completion": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+  "argv": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--offline"
+  ],
+  "started_at": "2026-10-27T20:33:58.608813+00:00",
+  "completed_at": "2026-10-27T21:13:23.950710+00:00",
+  "verified_at": "2026-10-27T21:56:41.189239+00:00",
+  "completion": "natural; explicit exit marker and native full summary, not inferred from missing processes",
+  "exit": 101,
+  "native_full_result": {
+    "passed": 4931,
+    "failed": 5,
+    "repository_ignored": 122,
+    "measured": 0,
+    "filtered_out": 0,
+    "declared_tests": 5058,
+    "harness_seconds": "1904.05",
+    "timing_scope": "development validation only; no scientific timing claim"
+  },
+  "per_case_reconciliation": {
+    "unique_terminal_names": 5058,
+    "terminal_records_including_child_duplicate": 5059,
+    "terminal_counts": {
+      "ok": 4931,
+      "FAILED": 5,
+      "ignored": 122
+    },
+    "expected_panic_successes": 19,
+    "child_duplicate": {
+      "cryptanalysis::koblitz_groebner::checkpoint::tests::solver_checkpoint_child": 2
+    },
+    "contradictory_statuses": false,
+    "regex": "^test (\\S+)( - should panic)? \\.\\.\\. (ok|FAILED|ignored)(?:,.*)?$"
+  },
+  "original_supervisor_receipt": {
+    "file": "library-supervisor-final.json",
+    "sha256": "509f16515876b423f272e0c3ad016e969e83c03ccda6eb6b395d090b19bc647c",
+    "original_unique_count": 5039,
+    "limitation": "Original observer regex omitted 19 successful expected-panic lines; original receipt is preserved, independent parser reconciles all 5058 native cases."
+  },
+  "raw_log": {
+    "path": "/workspace/conductor-2684-validation-6420-20261027/release-lib.log",
+    "bytes": 436010,
+    "sha256": "65aa9d798f0f998d92c61a39c2141ad6c05b6afd5ce64d451d727621b3ec5691",
+    "publication": "local only, not durably uploaded"
+  },
+  "preserved_compilation_snapshot": {
+    "bytes": 47,
+    "sha256": "37c463937254791595452889a70ac17527e1b1e5a61b513228f7b27e0cef5960",
+    "exact_prefix_of_final_raw": true
+  },
+  "preserved_2047_checkpoint": {
+    "bytes": 207170,
+    "sha256": "a6158dcb436be3d89ef92f0f4361b75e5be6b834687b7f05f39d6ddc8c42b102",
+    "exact_prefix_of_final_raw": true
+  },
+  "original_full_failures": [
+    "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+    "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+    "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+    "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+    "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed"
+  ],
+  "focused_device_module": {
+    "argv": [
+      "target/release/deps/crypto_lib-af1c9b7f8f6f9b1d",
+      "cryptanalysis::certicom_dlp::device_tests::",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "bytes": 805,
+    "sha256": "886982da06bb60281893a405be25337139877419826070c2f052f7f6518dc2b4",
+    "source": "df3b0ec17a324a14e2f474a97e82021fac9a6cfa",
+    "source_equal_current_parent": true,
+    "full_run_failures_retained": true
+  },
+  "previous_four_source_failures": {
+    "cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity": "ok",
+    "cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians": "ok",
+    "cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed": "ok",
+    "cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them": "ok"
+  },
+  "full_aggregate_relabelled_pass": false,
+  "no_full_rerun_timeout_or_signal": true,
+  "no_test_disabled_or_manually_skipped": true,
+  "process_control_retired": {
+    "cargo_pid": 75822,
+    "supervisor_pid": 75818,
+    "unified_session": 98474,
+    "cargo_observed_absent": true,
+    "supervisor_os_identity_read": "PermissionDenied; no absence inferred",
+    "unified_session_now_unavailable": true,
+    "do_not_reuse_or_signal_these_ids": true
+  }
+}

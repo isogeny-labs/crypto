@@ -1,0 +1,19 @@
+Producer software checks; no independent PCC execution standing.
+
+$ node tools/curve-atlas/checks.mjs
+Passed 42330 finite-field map identity checks, rational isogeny point-count checks, genus checks, and validation checks.
+exit: 0
+
+$ node --check tools/curve-atlas/dist/math.mjs
+exit: 0
+
+$ node --check tools/curve-atlas/dist/app.mjs
+exit: 0
+
+$ node tools/curve-atlas/build-standalone.mjs
+Wrote tools/curve-atlas/curve-atlas.html
+exit: 0
+
+$ cargo test --release --lib
+spawnSync cargo ENOENT
+exit: 127

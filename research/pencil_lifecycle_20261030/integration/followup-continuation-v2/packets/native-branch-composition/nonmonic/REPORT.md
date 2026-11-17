@@ -1,0 +1,25 @@
+# Nonmonic native polynomial division
+
+The checked construction extends native word division from monic divisors to arbitrary canonical nonzero leading words. It derives both inverse branches, strict remainder-length descent, quotient overwrite invariants, fuel termination, and an exact canonical word-quotient endpoint. Nineteen main declarations and twenty-two fixed controls have forty-one named axiom readbacks.
+
+Native source: /home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs lines195–209 (base multiplication/inverse),210–226 (multiplication dispatch),307–333 (inverse dispatch),849–880 (pdiv). The leading divisor word is NOT trimmed: a nonempty divisor ending in zero violates the inverse precondition. For leading word1 the native code sets il=1; otherwise it invokes inv. Each iteration copies the remainder leading word when il=1 and multiplies otherwise.
+
+Assumptions: prime modulus p, 1<p<2^31; canonical divisor/input coefficients; nonempty divisor with actual last word a !=0; n=1 odd-prime/no-table source dispatch. The formal arithmetic also supports p=2, but the native binary dispatch requires its own correspondence. Given fuel at least the original input length, every admissible division terminates in the model. The model recomputes the same pure il expression inside its coefficient function; native code caches it once. This is semantic equality, not an operation-count claim.
+
+Inverse bridge: il_correct and coefficient_correct invoke the existing WideModPow inverseGenerator/generator_decode proof. It derives inversion by the source-shaped widened modular exponentiation loop and Fermat's theorem. No inverse correctness witness or desired quotient equality is assumed. Canonical multiplication uses the inherited no-overflow bound.
+
+Word remainder: raw and selected execute the existing per-index native subtraction traversal with the derived nonmonic coefficient. raw_correct proves the polynomial update; coefficient_cancel cancels the top coefficient. selected_shorter derives strict list-length decrease after trim. This supplies the recursive termination argument.
+
+Quotient: qloop uses the prior writeCoeff assignment and freshness invariant; success_correct proves Q*B+R conservation and terminal shortness. divide_total proves existence, canonicality and normal form. exact_endpoint derives the requested quotient from the explicit exact-input identity A=wanted*B and a strictly smaller terminal remainder. It does not assume the loop returns the desired quotient.
+
+Native quotient storage: NonmonicStorage.wloop uses the existing finite UInt64 array, literal indexed overwrite, capacity check, and zero initialization of input.length-b.length+1 slots. loop_refines composes this storage with qloop. word_projection and word_exact then prove the actual trimmed word output is canonical, decodes to wanted, and has empty remainder. The existing QuotientStorage allocation_bound applies unchanged: positive divisor length and input length below 2^w keep the slot-count expression below 2^w.
+
+Controls: inverse2 mod17=9; both shortcut branches; coefficient6/2=3 and inequality from raw6; zero numerator; two reduction steps; nonexact remainder; zero-leading and empty-divisor boundaries; composite15 Fermat failure. Full word runs include exact quotient[1,1], nonexact remainder[1], zero input, padded input, constant divisor, insufficient fuel, short input, and monic agreement.
+
+Checks: Lean compilation uses native executable with a thin shell wrapper, fresh attempt directories, retained stdout/stderr, native return propagation and SHA256 bindings. Rust checks exact module receipts, current source bytes, dependency hashes, named inventory and allowed axioms. Six native checker controls reject incorrect exits, bindings, modules, empty/missing inventories and sorryAx. No Python verifier or research orchestration is used.
+
+Failures retained: first coefficient proof used rfl for a coerced UInt64 one; replaced by simp. First generalized loop call had a transposed argument; corrected. These are elaboration failures with native failure receipts, not successful evidence.
+
+Boundaries: compiled Rust equivalence, actual allocator byte/isize limits, instrumentation counters and other Field dispatches remain separate. Finite storage uses the mathematical array-length model and source slot count; usize arithmetic uses the prior explicit allocation bound. pegcd and Cantor reduction composition are next interfaces and are not claimed here. The 1,260-target scientific scope and expired campaign limits remain unchanged. No scientific execution, repository edit, or cloud operation occurred.
+
+Literature and reuse: retained WideModPow PLAN/Inversion.lean, monic remainder and quotient/storage packets, and their Mathlib polynomial/finite-field proof dependencies supply the classical Euclidean-division and Fermat basis. This is source-model composition of established algebra, with no novelty claim. Independent review follows publication.

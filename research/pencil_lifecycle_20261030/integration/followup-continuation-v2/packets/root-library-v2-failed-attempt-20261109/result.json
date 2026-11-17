@@ -1,0 +1,53 @@
+{
+  "schema": "root-library.failed-attempt-archive/v1",
+  "run": "t1970-root-library-20261109",
+  "status": "failed",
+  "completion_seal_status": "passed",
+  "supervisor_status": "pending_seal",
+  "supervisor_seal_status": "pending",
+  "compiler_invoked": true,
+  "tests_invoked": false,
+  "commands_recorded": 1,
+  "compile_elapsed_seconds": 153.82128261303296,
+  "compile_reaped_exit": -9,
+  "worker_elapsed_seconds": 427.2413020489621,
+  "attempt_elapsed_seconds": 428.1855087049771,
+  "outer_elapsed_seconds": 428.30240290996153,
+  "charged_seconds": 1800,
+  "supervisor_errors": [
+    {
+      "repr": "ValueError(\"Invalid isoformat string: '2026-11-09T18:10:34.65128+00:00'\")",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v2-20261109/durable-launcher.py\", line 108, in <module>\n    heartbeat()\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v2-20261109/durable-launcher.py\", line 38, in heartbeat\n    expiry=datetime.datetime.fromisoformat(value['expires_at'].replace('Z','+00:00'))\nValueError: Invalid isoformat string: '2026-11-09T18:10:34.65128+00:00'\n"
+    }
+  ],
+  "worker_errors": [
+    {
+      "repr": "RuntimeError('signal 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v2-20261109/durable-worker.py\", line 105, in <module>\n    output=command('compile',base+['--no-run','--message-format=json'])\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v2-20261109/durable-worker.py\", line 70, in command\n    time.sleep(.1)\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v2-20261109/durable-worker.py\", line 18, in interrupted\n    raise RuntimeError('signal '+str(sig))\nRuntimeError: signal 15\n"
+    }
+  ],
+  "invocation_join_verified": true,
+  "invocation_id": "2fe218961dcb4bff958ddfd5301234b7",
+  "terminal": {
+    "MainPID": "0",
+    "Result": "exit-code",
+    "ExecMainStatus": "1",
+    "ControlGroup": "",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "2fe218961dcb4bff958ddfd5301234b7"
+  },
+  "cleanup_complete": true,
+  "cgroup_absent_recorded": true,
+  "native_worker_controls": {
+    "cpu.max": "200000 100000",
+    "memory.max": "17179869184",
+    "memory.swap.max": "0",
+    "pids.max": "512"
+  },
+  "runtime_rerun": false,
+  "archived_file_count": 16,
+  "archive_sha256": "4b0c32cb41616666cb92739d7856697af7f29fc39c53d4b1255fcd9b4200f993",
+  "archive_bytes": 35830,
+  "scope": "Compilation interrupted after supervisor lease timestamp parsing failed; no test outcomes. Completion failed, terminal evidence sealing passed."
+}

@@ -1,0 +1,23 @@
+    Finished `release` profile [optimized] target(s) in 0.44s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-cd696b7f650051ce)
+
+running 5646 tests
+test asymmetric::ec_elgamal::tests::checked_encrypt_rejects_invalid_public_key_and_plaintext_collision ... ok
+
+[Bounded excerpt: middle output omitted; full digest/size in final-receipt.json.]
+
+test cryptanalysis::jv_cover::tests::nagao_finds_planted_six_sums_and_agrees_with_the_oracle ... ok
+test cryptanalysis::jv_cover::tests::negation_rho_finds_the_planted_logarithm_in_fewer_operations ... ok
+test cryptanalysis::jv_cover::tests::polynomial_gcd_and_division ... ok
+test cryptanalysis::jv_cover::tests::replayed_f4_agrees_with_the_full_solver_and_the_oracle ... ok
+test cryptanalysis::jv_cover::tests::solver_is_exact_on_1500_planted_sums_at_p61 ... ignored
+test cryptanalysis::jv_cover::tests::sparse_linear_stage_agrees_with_dense ... ok
+test cryptanalysis::jv_cover::tests::stopped_f4_agrees_with_the_full_solver_and_the_oracle ... ok
+test cryptanalysis::jv_cover::tests::the_solver_loses_no_rational_solution_at_small_p ... ok
+test cryptanalysis::jv_cover::tests::tower_arithmetic ... ok
+test cryptanalysis::jv_cover::tests::tower_field_and_curve_scalars_beyond_u64 ... ok
+test cryptanalysis::jv_cover::tests::transfer_is_a_homomorphism_into_the_jacobian_over_fq ... ok
+test cryptanalysis::jv_isogeny_walk::tests::a_short_walk_reaches_a_weak_curve_at_p7 ... ok
+test cryptanalysis::jv_isogeny_walk::tests::counted_end_to_end_keeps_the_legacy_counts_and_charges_every_phase ... ignored, long end-to-end sieve; run in jv-isogeny-walk CI
+test cryptanalysis::jv_isogeny_walk::tests::ell_targets_are_isogenous_and_three_matches_the_old_code ... ok
+test cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies ... [active at timeout; no final suite summary]

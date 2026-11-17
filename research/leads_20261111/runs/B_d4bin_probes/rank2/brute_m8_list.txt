@@ -1,0 +1,45 @@
+BRUTE trial 5: brute [] | current [] | elim Some([])
+BRUTE trial 6: brute [] | current [] | elim Some([])
+BRUTE trial 7: brute [[218, 30, 178, 243]] | current [[218, 30, 178, 243]] | elim Some([[218, 30, 178, 243]])
+DISAGREE trial 20: current [[200, 3, 133, 58]] elim [[200, 3, 133, 58], [201, 61, 0, 21]]
+BRUTE trial 20: brute [[200, 3, 133, 58], [201, 61, 0, 21]] | current [[200, 3, 133, 58]] | elim Some([[200, 3, 133, 58], [201, 61, 0, 21]])
+DISAGREE trial 131: current [[22, 105, 249, 173], [35, 53, 251, 41], [58, 75, 169, 35]] elim [[22, 105, 249, 173], [35, 53, 251, 41], [58, 75, 169, 35], [161, 68, 0, 110]]
+BRUTE trial 131: brute [[22, 105, 249, 173], [35, 53, 251, 41], [58, 75, 169, 35], [161, 68, 0, 110]] | current [[22, 105, 249, 173], [35, 53, 251, 41], [58, 75, 169, 35]] | elim Some([[22, 105, 249, 173], [35, 53, 251, 41], [58, 75, 169, 35], [161, 68, 0, 110]])
+DISAGREE trial 153: current [] elim [[116, 248, 0, 207]]
+BRUTE trial 153: brute [[116, 248, 0, 207]] | current [] | elim Some([[116, 248, 0, 207]])
+BRUTE 6 targets: brute == current on 3, brute == elim on 6
+RANK2-ELIM m 8 curve seed 1 trials 300 (paired rows 300)
+current fails 0; elim errors 0 {}; agree 297; disagree 3
+rational solutions 307 (1.023/trial); with s4 = 0: 0
+flags {}
+deg F (deg_s4, deg_P, total) after s4-strip: {"[(10, 10, 12), (10, 10, 10)]": 5, "[(10, 12, 12), (10, 10, 10)]": 294, "[(10, 12, 12), (10, 9, 10)]": 1}
+s4 strips (F1, F2), R: {"F [0, 2] R 0": 295, "F [0, 2] R 4": 5}
+evaluation points histogram {121: 300}
+deg R (after stripping s4^k) histogram {116: 7, 120: 293}
+rational nonzero roots of R histogram {0: 39, 1: 76, 2: 77, 3: 75, 4: 24, 5: 7, 6: 1, 7: 1}
+current        baseline   frob_roots
+weil               1425         1425
+triang              127          127
+echelon           54379        54379
+nf                21751        21751
+charpoly          87394        87394
+roots             22558        14410
+eigvec             1753         1753
+verify              211          211
+TOTAL            189599       181451
+elim           baseline   frob_roots
+weil               1425         1425
+reduce              130          130
+build              1414         1414
+resultant         39955        39955
+interp            14520        14520
+roots             51231        42930
+backsub             822          820
+s4zero              251          180
+verify              227          227
+PAIRED baseline: current 189599 elim 109974 muls/trial; ratio elim/current 0.5800 [95% boot 0.5794, 0.5806]; elim cheaper on 300/300 trials
+PAIRED frob_roots: current 181451 elim 101600 muls/trial; ratio elim/current 0.5599 [95% boot 0.5593, 0.5606]; elim cheaper on 300/300 trials
+
+real	1m36.946s
+user	1m34.558s
+sys	0m2.282s

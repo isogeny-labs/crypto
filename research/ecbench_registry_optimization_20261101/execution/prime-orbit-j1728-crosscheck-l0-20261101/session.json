@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hdf484e9fb96b",
+  "label": "Registry optimization development: prime-orbit j=1728 cross-check",
+  "spec_id": "ECS1h60f38db0ed4b",
+  "spec_sha256": "60f38db0ed4b91da3a13fb897db7d97a0bf8e0d2a2d165428bd8b3932264c442",
+  "env_class_id": "ECBENV3h0bb9eb2ab583",
+  "host_sha256": "0c38df6eef85eed974e977df8e70089342526f97f8e3f6a585a5ed18253aa77f",
+  "plan_sha256": "a9f96c7a2773850629690861dc4475b0621980ec3345881f9922df92a1c1430a",
+  "binary_sha256": "e6c1f5048acb071192f83ab996fd9577c152f136e8e62a301e50b62335ec7879",
+  "git_commit": "50c3720060fa2923a70739f3196746010f3150a9",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "5fcca52408a68c08609b1aebe24bb4f03f94c8f0ec0e418fdf510c73a93a4e98",
+  "child_env": {
+    "HOME": "/home/agent",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793555224466,
+  "finished_unix_ms": 1793555225112,
+  "status": "complete",
+  "executions_planned": 15,
+  "records_written": 15,
+  "records_sha256": "9c194e21a052ace71eb2a9fb8e6c1d2bcb6bdba7c9e017945029fc00828fed4b",
+  "status_counts": {
+    "verified": 15
+  },
+  "last_seq": 14
+}

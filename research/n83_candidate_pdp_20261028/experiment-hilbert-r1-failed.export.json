@@ -1,0 +1,485 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/hilbert.rs",
+      "kind": "analysis",
+      "bytes": 15666,
+      "sha256": "876563ab4e218af2b2d119323520a2bead71c78a39abdebf2c7325ef0a42c0bb"
+    },
+    "outputs": [],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "commit": "e1a3c68ae08afacd457b2596799d7753fbb25a40",
+      "binary_sha256": "650396a323b0e0e084fa700b99b555de0f99ef668ebaa4c2a59805c0c40350ed",
+      "image_digest": null
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "commit": "e1a3c68ae08afacd457b2596799d7753fbb25a40",
+      "binary_sha256": "650396a323b0e0e084fa700b99b555de0f99ef668ebaa4c2a59805c0c40350ed",
+      "image_digest": null
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "commit": "e1a3c68ae08afacd457b2596799d7753fbb25a40",
+      "binary_sha256": "650396a323b0e0e084fa700b99b555de0f99ef668ebaa4c2a59805c0c40350ed",
+      "image_digest": null
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-28T16:32:36Z",
+  "export_id": "n83-prime-m2-hilbert-20261028-r1",
+  "files": [
+    {
+      "path": "evidence/hilbert-r1-failed/host.txt",
+      "kind": "raw",
+      "bytes": 3504,
+      "sha256": "773aa1ae9fd8c38357c4afc12f513340e413b777f82301fa7366dfa7c2c7ee87"
+    },
+    {
+      "path": "evidence/hilbert-r1-failed/manifest.sha256",
+      "kind": "raw",
+      "bytes": 3426,
+      "sha256": "1eda7cd222fd12fb72a42d8564dabb50c58c637191650364a795f8655cbc9929"
+    },
+    {
+      "path": "evidence/hilbert-r1-failed/producer.log",
+      "kind": "raw",
+      "bytes": 4470,
+      "sha256": "33e078a6ceb06433f97f6a7b4c5c34ebc6feff1724368bf1d1658948773b8634"
+    },
+    {
+      "path": "evidence/hilbert-r1-failed/replay.log",
+      "kind": "raw",
+      "bytes": 4470,
+      "sha256": "6354e8d3acdd40ed1d36ae5b40a75b891ea8ec34888221eda4749e18a0842b9e"
+    },
+    {
+      "path": "evidence/hilbert-r1-failed/status.json",
+      "kind": "raw",
+      "bytes": 59,
+      "sha256": "1d7741022f9bf23c7db4234fccaf116046ef2223eeb10030cfc2180344980b72"
+    },
+    {
+      "path": "evidence/hilbert-r1-failed/terminal.json",
+      "kind": "raw",
+      "bytes": 203,
+      "sha256": "944c5c090b868974c91e914c5533e7f8b4e24aa20fe0b6ddff78f94d8c140b6a"
+    },
+    {
+      "path": "hilbert-archives/r1-failed.tar.xz",
+      "kind": "raw",
+      "bytes": 274500,
+      "sha256": "9e2a9ee8849dad91834bcbbddd4beac133dc9cd93dcae39fdc4b8e7b3411c295"
+    }
+  ],
+  "flow": {
+    "planned": 6,
+    "attempted": 6,
+    "completed": 1,
+    "not_completed": 5,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "host": {
+    "class_id": "existing-spot-L0",
+    "path": "evidence/hilbert-r1-failed/host.txt",
+    "sha256": "773aa1ae9fd8c38357c4afc12f513340e413b777f82301fa7366dfa7c2c7ee87",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "Amazon EC2",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux ip-172-31-17-173.us-east-2.compute.internal 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+      "logical_cpus": 32,
+      "memory_bytes": null,
+      "spot": true
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "First original planted case failed complete-source matching because existing witness suffix was omitted by template; no source certificate admitted."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Five subsequent cases were not reached; producer and replay exited101."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Primality, controls and Hilbert file were emitted before failure; retained as partial computation, not source-bound results."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Correction requires a new frozen protocol version and new output directory; r1 is immutable."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Export attempts count the single dispatch of all six input cells: all six input hashes were checked by launcher. Only first full-source check was reached; five were cancelled before certificate execution. completed=1 means a terminated failed execution, not a successful certificate; accepted certificates=0."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "role": "producer",
+    "model": null,
+    "session": "n83-prime-m2-hilbert-20261028-r1"
+  },
+  "protocol": {
+    "path": "protocol-hilbert.json",
+    "protocol_id": "N83-PRIME-M2-HILBERT-20261028",
+    "version": 1,
+    "sha256": "419b1cb7a81fce4eeed4c6fc2ec6790ab7a98be109f6133c6c1f2d59e8c91011"
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert-r1-failed/producer.log",
+          "kind": "raw",
+          "bytes": 4470,
+          "sha256": "33e078a6ceb06433f97f6a7b4c5c34ebc6feff1724368bf1d1658948773b8634"
+        },
+        {
+          "path": "evidence/hilbert-r1-failed/status.json",
+          "kind": "raw",
+          "bytes": 59,
+          "sha256": "1d7741022f9bf23c7db4234fccaf116046ef2223eeb10030cfc2180344980b72"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r1/local/",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "error",
+        "verifier": "Complete-source checker failed on omitted existing witness suffix; no input certificate admitted"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert-r1-failed/producer.log",
+          "kind": "raw",
+          "bytes": 4470,
+          "sha256": "33e078a6ceb06433f97f6a7b4c5c34ebc6feff1724368bf1d1658948773b8634"
+        },
+        {
+          "path": "evidence/hilbert-r1-failed/status.json",
+          "kind": "raw",
+          "bytes": 59,
+          "sha256": "1d7741022f9bf23c7db4234fccaf116046ef2223eeb10030cfc2180344980b72"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r1/local/",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "cancelled",
+      "verification": {
+        "status": "not_run",
+        "verifier": "Input hashes checked by launcher; full source certificate cancelled by earlier batch failure"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert-r1-failed/producer.log",
+          "kind": "raw",
+          "bytes": 4470,
+          "sha256": "33e078a6ceb06433f97f6a7b4c5c34ebc6feff1724368bf1d1658948773b8634"
+        },
+        {
+          "path": "evidence/hilbert-r1-failed/status.json",
+          "kind": "raw",
+          "bytes": 59,
+          "sha256": "1d7741022f9bf23c7db4234fccaf116046ef2223eeb10030cfc2180344980b72"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r1/local/",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "cancelled",
+      "verification": {
+        "status": "not_run",
+        "verifier": "Input hashes checked by launcher; full source certificate cancelled by earlier batch failure"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert-r1-failed/producer.log",
+          "kind": "raw",
+          "bytes": 4470,
+          "sha256": "33e078a6ceb06433f97f6a7b4c5c34ebc6feff1724368bf1d1658948773b8634"
+        },
+        {
+          "path": "evidence/hilbert-r1-failed/status.json",
+          "kind": "raw",
+          "bytes": 59,
+          "sha256": "1d7741022f9bf23c7db4234fccaf116046ef2223eeb10030cfc2180344980b72"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r1/local/",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "cancelled",
+      "verification": {
+        "status": "not_run",
+        "verifier": "Input hashes checked by launcher; full source certificate cancelled by earlier batch failure"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert-r1-failed/producer.log",
+          "kind": "raw",
+          "bytes": 4470,
+          "sha256": "33e078a6ceb06433f97f6a7b4c5c34ebc6feff1724368bf1d1658948773b8634"
+        },
+        {
+          "path": "evidence/hilbert-r1-failed/status.json",
+          "kind": "raw",
+          "bytes": 59,
+          "sha256": "1d7741022f9bf23c7db4234fccaf116046ef2223eeb10030cfc2180344980b72"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r1/local/",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "cancelled",
+      "verification": {
+        "status": "not_run",
+        "verifier": "Input hashes checked by launcher; full source certificate cancelled by earlier batch failure"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert-r1-failed/producer.log",
+          "kind": "raw",
+          "bytes": 4470,
+          "sha256": "33e078a6ceb06433f97f6a7b4c5c34ebc6feff1724368bf1d1658948773b8634"
+        },
+        {
+          "path": "evidence/hilbert-r1-failed/status.json",
+          "kind": "raw",
+          "bytes": 59,
+          "sha256": "1d7741022f9bf23c7db4234fccaf116046ef2223eeb10030cfc2180344980b72"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r1/local/",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "cancelled",
+      "verification": {
+        "status": "not_run",
+        "verifier": "Input hashes checked by launcher; full source certificate cancelled by earlier batch failure"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "e1a3c68ae08afacd457b2596799d7753fbb25a40",
+    "dirty": false
+  }
+}

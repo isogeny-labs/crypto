@@ -54,6 +54,7 @@
 
 pub mod attack;
 pub mod class_group;
+pub mod class_group_subexp;
 pub mod cm;
 pub mod experiment;
 pub mod graph;

@@ -80,6 +80,7 @@
 //! - **A. Urquhart**, *Hard examples for resolution*, JACM 1987.
 
 use std::sync::atomic::{AtomicU64, AtomicU8, Ordering};
+
 use std::sync::Arc;
 
 /// Standard SAT literal encoding: positive integer = positive
@@ -87,8 +88,19 @@ use std::sync::Arc;
 /// index (0-based internally; 1-based in DIMACS).
 pub type Lit = i32;
 
+fn capacity_bytes<T>(buffer: &Vec<T>) -> u64 {
+    buffer.capacity() as u64 * std::mem::size_of::<T>() as u64
+}
+
+fn storage_snapshot_due(phase: &str, conflicts: u64) -> bool {
+    matches!(phase, "solve_enter" | "solve_return")
+        || (phase == "conflict_snapshot" && conflicts.is_multiple_of(10_000))
+}
+
 /// Typed semantic search events, not an independently checked UNSAT proof. Clause IDs
-/// are immutable arena offsets; XOR row IDs are indices in the current matrix,
+/// retain the legacy arena-offset names at attachment and remain immutable
+/// through physical reclamation. Later clauses use unrecycled virtual offsets;
+/// XOR row IDs are indices in the current matrix,
 /// reset by `XorMatrixReset`. Literal/variable names use DIMACS indexing.
 /// A unit clause may be declared before assignment and again after installation;
 /// repeated clause IDs must carry the same literal set.
@@ -397,6 +409,9 @@ enum Conflict {
 /// which engine is actually costing the time.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct SolverStats {
+    /// Completed in-place arena compactions and words removed, cumulative.
+    pub arena_reclamations: u64,
+    pub arena_reclaimed_words: u64,
     pub decisions: u64,
     pub conflicts: u64,
     pub restarts: u64,
@@ -419,6 +434,10 @@ pub struct SolverStats {
     pub xor_row_ops: u64,
     /// Rows examined in the parity read-off, each `O(words)`.
     pub xor_row_scans: u64,
+    /// Actual 64-bit matrix updates (dense or indexed engine).
+    pub xor_word_updates: u64,
+    /// Word positions visited while merging nonzero supports.
+    pub xor_support_visits: u64,
     /// Literals written into parity reason clauses.
     pub xor_reason_lits: u64,
     /// Clauses examined by watched-literal propagation.
@@ -611,11 +630,24 @@ impl VarHeap {
     }
 }
 
-/// CDCL SAT solver.
 pub struct Solver {
+    native_admission: Option<NativeAdmission>,
+    native_failure: Option<NativeAdmissionFailure>,
+    native_pending_model: Option<Vec<bool>>,
+    // Slot, original vector, next unread index, compacted prefix length.
+    // On sticky refusal the actual allocation stays owned without suffix copying.
+    native_pending_watch: Option<(usize, Vec<Watcher>, usize, usize)>,
+    native_partial_xor: Option<(usize, usize, usize, bool)>,
+    native_sort_scratch: Vec<usize>,
+    native_pending_clause: Option<Vec<Lit>>,
+    native_pending_reduction: Option<(Vec<bool>, Vec<usize>)>,
     progress: Option<Arc<SolverProgress>>,
     event_observer: Option<EventObserver>,
     event_failure: Option<String>,
+    // Legacy observer names are offsets before any reclamation. Keep a separate
+    // name per immutable insertion slot so moving storage never changes a key.
+    event_clause_ids: Vec<u32>,
+    event_next_clause_id: u32,
     /// Number of variables (1-indexed externally).
     n_vars: u32,
     /// Centre of the literal-indexed tables `values` and `watches`:
@@ -652,8 +684,8 @@ pub struct Solver {
     /// [`Solver::next_cref`] panics past that, where per-clause vectors
     /// had no cap.  And growing it by doubling briefly holds the old and
     /// the new buffer together, about three times the arena at once.
-    /// Forgotten clauses are never freed, which was already so with a
-    /// vector per clause.
+    /// At reductions, detached clauses are compacted to small tautology
+    /// tombstones and excess capacity is returned to the allocator.
     arena: Vec<Lit>,
     /// `clause_at[i]` is clause `i`'s arena offset, in the order clauses
     /// were added; learnt clauses start at `n_orig_clauses`.  Offsets
@@ -762,6 +794,11 @@ pub struct Solver {
     /// chasing a pointer per row.
     matrix: Vec<u64>,
     matrix_rhs: Vec<bool>,
+    /// Sorted exact nonzero word positions; never a stale superset.
+    matrix_support: Vec<Vec<usize>>,
+    indexed_xors: bool,
+    xor_support_src: Vec<usize>,
+    xor_support_merge: Vec<usize>,
     /// `pivot[i]` is row `i`'s basic variable; `None` once the row has
     /// no unassigned variable left.
     pivot: Vec<Option<u32>>,
@@ -787,10 +824,12 @@ pub struct Solver {
     /// comparison key, refreshed wherever either input changes.
     heap_key: Vec<u64>,
     /// Learnt clauses that have been detached from the watch lists and
-    /// are no longer propagated, by clause index.  They stay in the
-    /// arena so that every offset — in `reason`, in `watches` — remains
-    /// valid.
+    /// are no longer propagated, by clause index. Compaction preserves
+    /// their indices so database-reduction scheduling is unchanged.
     detached: Vec<bool>,
+    /// Reclaim detached clause storage at database reductions. Disabling
+    /// this retains the append-only layout for matched diagnostic controls.
+    pub reclaim_detached_clauses: bool,
     /// Learnt-clause budget before the next reduction.  Set it before
     /// `solve()` to force more aggressive forgetting; left at 0 it is
     /// chosen from the problem size.
@@ -809,6 +848,8 @@ struct XorRow {
 
 /// Outcome of one Gauss-Jordan pass over the XOR rows.
 enum XorStep {
+    /// Sticky native admission refusal, never a fixpoint or contradiction.
+    Refused,
     /// Nothing new could be derived.
     Fixpoint,
     /// At least one literal was enqueued; re-run clause propagation.
@@ -858,6 +899,16 @@ impl Solver {
             progress: None,
             event_observer: None,
             event_failure: None,
+            event_clause_ids: Vec::new(),
+            event_next_clause_id: 0,
+            native_admission: None,
+            native_failure: None,
+            native_pending_model: None,
+            native_pending_watch: None,
+            native_partial_xor: None,
+            native_sort_scratch: Vec::new(),
+            native_pending_clause: None,
+            native_pending_reduction: None,
             n_vars,
             lit_base: n_vars,
             arena: Vec::new(),
@@ -889,6 +940,10 @@ impl Solver {
             xor_conflict: Vec::new(),
             matrix: Vec::new(),
             matrix_rhs: Vec::new(),
+            matrix_support: Vec::new(),
+            indexed_xors: true,
+            xor_support_src: Vec::new(),
+            xor_support_merge: Vec::new(),
             pivot: Vec::new(),
             xor_src: Vec::new(),
             seen: vec![false; n],
@@ -899,6 +954,7 @@ impl Solver {
             branch_priority: vec![false; n],
             heap_key: vec![order_key(0.0, false); n],
             detached: Vec::new(),
+            reclaim_detached_clauses: true,
             max_learnts: 0,
             // Initialising the tables: the two literal-indexed ones
             // (`values`, `watches`), eight per-variable ones and the two
@@ -918,9 +974,17 @@ impl Solver {
         &mut self,
         observer: impl FnMut(&SolverEvent) -> Result<(), String> + Send + Sync + 'static,
     ) -> Result<(), String> {
+        if self.native_admission.is_some() || self.native_failure.is_some() {
+            return Err("SAT observer must be installed before native admission".into());
+        }
         if self.event_observer.is_some() || self.event_failure.is_some() {
             return Err("SAT event observer already installed or failed".into());
         }
+        self.event_clause_ids
+            .try_reserve_exact(self.clause_at.len())
+            .map_err(|_| "SAT event clause-name allocation refused".to_string())?;
+        self.event_clause_ids.extend_from_slice(&self.clause_at);
+        self.event_next_clause_id = self.next_cref();
         self.event_observer = Some(Box::new(observer));
         self.emit(SolverEvent::Snapshot {
             version: 1,
@@ -932,10 +996,10 @@ impl Solver {
             if self.event_failure.is_some() {
                 break;
             }
-            let clause_id = self.clause_at[i];
+            let cref = self.clause_at[i];
             self.emit(SolverEvent::Clause {
-                clause_id,
-                literals: clause_in(&self.arena, clause_id).to_vec(),
+                clause_id: self.event_clause_id(cref),
+                literals: clause_in(&self.arena, cref).to_vec(),
                 existing: true,
                 detached: self.detached.get(i).copied().unwrap_or(false),
             });
@@ -992,10 +1056,29 @@ impl Solver {
         emit_to(&mut self.event_observer, &mut self.event_failure, event);
     }
 
+    fn event_clause_id(&self, cref: u32) -> u32 {
+        let index = match self.clause_at.binary_search(&cref) {
+            Ok(index) => index,
+            Err(index) => {
+                assert_eq!(cref, self.next_cref());
+                assert_eq!(index, self.clause_at.len());
+                index
+            }
+        };
+        if index < self.event_clause_ids.len() {
+            self.event_clause_ids[index]
+        } else {
+            assert_eq!(index, self.clause_at.len());
+            self.event_next_clause_id
+        }
+    }
+
     fn event_reason(&self, reason: Reason, variable: usize) -> SolverEventReason {
         match reason {
             Reason::Decision => SolverEventReason::Decision,
-            Reason::Propagated(clause_id) => SolverEventReason::Clause { clause_id },
+            Reason::Propagated(cref) => SolverEventReason::Clause {
+                clause_id: self.event_clause_id(cref),
+            },
             Reason::XorPropagated => SolverEventReason::Xor {
                 explanation: self.xor_reason[variable].clone(),
             },
@@ -1009,7 +1092,9 @@ impl Solver {
     ) -> (SolverEventReason, Vec<Lit>) {
         match conflict {
             Conflict::Clause(clause_id) => (
-                SolverEventReason::Clause { clause_id },
+                SolverEventReason::Clause {
+                    clause_id: self.event_clause_id(clause_id),
+                },
                 clause_in(&self.arena, clause_id).to_vec(),
             ),
             Conflict::Xor => {
@@ -1120,6 +1205,11 @@ impl Solver {
     /// Duplicated variables cancel (`x ⊕ x = 0`), so the caller need
     /// not deduplicate.
     pub fn add_xor(&mut self, vars: &[u32], rhs: bool) -> bool {
+        if self.native_admission.is_some() {
+            self.native_failure
+                .get_or_insert(NativeAdmissionFailure::UncoveredPath);
+            return false;
+        }
         let mut mask = vec![0u64; bs_words(self.n_vars)];
         // One per variable flipped, and the row's words twice: the
         // emptiness test and the copy into the row store.
@@ -1171,6 +1261,11 @@ impl Solver {
     /// symmetry breaking, cardinality chains — over an encoding they
     /// did not size themselves; call it before `solve`, at level 0.
     pub fn add_vars(&mut self, count: u32) -> std::ops::RangeInclusive<u32> {
+        if self.native_admission.is_some() {
+            self.native_failure
+                .get_or_insert(NativeAdmissionFailure::UncoveredPath);
+            return 1..=0;
+        }
         if self.observing() && count != 0 {
             self.event_failure =
                 Some("changing variable count after event attachment is not supported".into());
@@ -1346,6 +1441,11 @@ impl Solver {
     /// Add a clause `lits` (DIMACS literal encoding). Returns false if
     /// the empty clause is added (immediately UNSAT).
     pub fn add_clause(&mut self, mut lits: Vec<Lit>) -> bool {
+        if self.native_admission.is_some() {
+            self.native_failure
+                .get_or_insert(NativeAdmissionFailure::UncoveredPath);
+            return false;
+        }
         // Normalisation: the sort's `k⌈log₂ k⌉` comparisons, then one
         // pass each to deduplicate and to test for a tautology.
         let k = lits.len() as u64;
@@ -1393,7 +1493,7 @@ impl Solver {
                 // reference; push_clause confirms the same declaration.
                 if self.observing() {
                     self.emit(SolverEvent::Clause {
-                        clause_id: self.next_cref(),
+                        clause_id: self.event_clause_id(self.next_cref()),
                         literals: vec![l],
                         existing: false,
                         detached: false,
@@ -1478,7 +1578,9 @@ impl Solver {
             cref: idx,
             blocker: l0,
         });
-        self.detached.resize(self.clause_at.len(), false);
+        if !self.native_fill_detached(self.clause_at.len()) {
+            return None;
+        }
         // Theory clauses are permanent propagation lemmas. Advancing this
         // boundary also retains any learnt clauses that preceded them, which
         // costs memory but cannot change an answer.
@@ -1556,6 +1658,42 @@ impl Solver {
 
     /// Append a clause to the arena, returning its offset.
     fn push_clause(&mut self, lits: &[Lit]) -> u32 {
+        if !self.native_charge(NativeOperation::ClauseGrowth, lits.len() as u64 + 8) {
+            return 0;
+        }
+        let Some(needed) = self
+            .arena
+            .len()
+            .checked_add(lits.len())
+            .and_then(|n| n.checked_add(1))
+        else {
+            self.native_failure = Some(NativeAdmissionFailure::Overflow);
+            return 0;
+        };
+        if !native_reserve(
+            &mut self.arena,
+            needed,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::ClauseGrowth,
+        ) {
+            return 0;
+        }
+        let needed = self.clause_at.len() + 1;
+        if !native_reserve(
+            &mut self.clause_at,
+            needed,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::ClauseGrowth,
+        ) {
+            return 0;
+        }
+        if self.observing() && !self.native_event_payload(lits.len(), std::mem::size_of::<Lit>()) {
+            return 0;
+        }
         let cref = self.next_cref();
         let len = Lit::try_from(lits.len()).expect("clause exceeds 2^31 literals");
         // The length word, the literals, and the index entry.
@@ -1564,8 +1702,20 @@ impl Solver {
         self.arena.extend_from_slice(lits);
         self.clause_at.push(cref);
         if self.observing() {
+            // Observation remains optional and never changes native work counts.
+            // Failure is sticky and censors the trace rather than reusing a key.
+            if self.event_clause_ids.try_reserve(1).is_err() {
+                self.event_failure = Some("SAT event clause-name allocation refused".into());
+            } else if let Some(next) = self.event_next_clause_id.checked_add(len as u32 + 1) {
+                self.event_clause_ids.push(self.event_next_clause_id);
+                self.event_next_clause_id = next;
+            } else {
+                self.event_failure = Some("SAT event clause-name space exhausted".into());
+            }
+        }
+        if self.observing() {
             self.emit(SolverEvent::Clause {
-                clause_id: cref,
+                clause_id: self.event_clause_id(cref),
                 literals: lits.to_vec(),
                 existing: false,
                 detached: false,
@@ -1607,6 +1757,20 @@ impl Solver {
     /// call then costs more than the check it saves.
     #[inline(always)]
     fn assign(&mut self, lit: Lit, r: Reason) {
+        if !self.native_charge(NativeOperation::Assignment, 32) {
+            return;
+        }
+        let needed = self.trail.len() + 1;
+        if !native_reserve(
+            &mut self.trail,
+            needed,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::TrailGrowth,
+        ) {
+            return;
+        }
         debug_assert!(self.lit_value(lit).is_none(), "assign over {lit}");
         let v = var_of(lit) as usize;
         let n = self.lit_base as i32;
@@ -1626,6 +1790,9 @@ impl Solver {
         self.epoch += 1;
         self.stats.propagations += 1;
         if self.observing() {
+            if !self.native_assignment_payload(r, v) {
+                return;
+            }
             self.emit(SolverEvent::Assignment {
                 literal: lit,
                 level: self.level[v],
@@ -1647,7 +1814,7 @@ impl Solver {
     /// no special-casing.
     fn propagate(&mut self) -> Option<Conflict> {
         loop {
-            if self.event_failure.is_some() {
+            if (self.event_failure.is_some() || self.native_failure.is_some()) {
                 return None;
             }
             self.progress_phase(SolverProgressPhase::ClausePropagation);
@@ -1655,7 +1822,7 @@ impl Solver {
             let cnf = self.propagate_clauses();
             self.stats.ns_propagate_clauses += t.elapsed().as_nanos() as u64;
             self.progress_phase(SolverProgressPhase::Idle);
-            if self.event_failure.is_some() {
+            if (self.event_failure.is_some() || self.native_failure.is_some()) {
                 return None;
             }
             if let Some(c) = cnf {
@@ -1700,6 +1867,7 @@ impl Solver {
             }
             self.progress_phase(SolverProgressPhase::Idle);
             match step {
+                XorStep::Refused => return None,
                 XorStep::Conflict => return Some(Conflict::Xor),
                 XorStep::Propagated => continue,
                 XorStep::Fixpoint => return None,
@@ -1717,6 +1885,23 @@ impl Solver {
     /// elimination — which is what lets us read a reason clause straight
     /// off a reduced row.
     fn propagate_xors(&mut self) -> XorStep {
+        if self.native_admission.is_some() {
+            self.propagate_xors_admitted()
+        } else {
+            self.propagate_xors_legacy()
+        }
+    }
+
+    /// One Gauss-Jordan pass over the XOR rows under the current trail.
+    ///
+    /// Each row carries the *full* variable set of its combination, and
+    /// its right-hand side is the combination's original rhs; the value
+    /// implied by the current assignment is therefore
+    /// `rhs ⊕ parity(mask ∩ assigned-true)`.  Because both mask and rhs
+    /// XOR when two rows are combined, that relation survives
+    /// elimination — which is what lets us read a reason clause straight
+    /// off a reduced row.
+    fn propagate_xors_legacy(&mut self) -> XorStep {
         self.stats.xor_passes += 1;
         let words = bs_words(self.n_vars);
         if self.matrix_rhs.len() != self.xors.len() {
@@ -1747,7 +1932,15 @@ impl Solver {
             self.stats.xor_repivots += 1;
 
             let row_i = i * words..(i + 1) * words;
-            match self.lowest_unassigned(&self.matrix[row_i.clone()]) {
+            let next_pivot = if self.indexed_xors {
+                self.matrix_support[i].iter().find_map(|&w| {
+                    let free = self.matrix[i * words + w] & !self.assigned_w[w];
+                    (free != 0).then(|| (w * 64) as u32 + free.trailing_zeros())
+                })
+            } else {
+                self.lowest_unassigned(&self.matrix[row_i.clone()])
+            };
+            match next_pivot {
                 None => {
                     // No unassigned variable left: the row is decided.
                     // Its words were scanned for a pivot, then for the
@@ -1781,8 +1974,19 @@ impl Solver {
                     let (pw, pbit) = (p as usize / 64, 1u64 << (p % 64));
                     let src_rhs = self.matrix_rhs[i];
                     let mut src = std::mem::take(&mut self.xor_src);
-                    src.clear();
-                    src.extend_from_slice(&self.matrix[row_i]);
+                    let mut support = std::mem::take(&mut self.xor_support_src);
+                    let mut merged = std::mem::take(&mut self.xor_support_merge);
+                    if self.indexed_xors {
+                        src.resize(words, 0);
+                        support.clear();
+                        support.extend_from_slice(&self.matrix_support[i]);
+                        for &w in &support {
+                            src[w] = self.matrix[i * words + w];
+                        }
+                    } else {
+                        src.clear();
+                        src.extend_from_slice(&self.matrix[row_i]);
+                    }
                     let matrix = &mut self.matrix[..rows * words];
                     let matrix_rhs = &mut self.matrix_rhs[..rows];
                     let mut row_ops = 0u64;
@@ -1792,7 +1996,40 @@ impl Solver {
                         }
                         row_ops += 1;
                         matrix_rhs[j] ^= src_rhs;
-                        xor_into(&mut matrix[j * words..(j + 1) * words], &src);
+                        let target = &mut matrix[j * words..(j + 1) * words];
+                        if self.indexed_xors {
+                            for &w in &support {
+                                target[w] ^= src[w];
+                            }
+                            self.stats.xor_word_updates += support.len() as u64;
+                            // Merge the sorted supports after cancellation, preserving
+                            // ascending word/pivot/reason order exactly.
+                            merged.clear();
+                            let old = &self.matrix_support[j];
+                            let (mut a, mut b) = (0, 0);
+                            while a < old.len() || b < support.len() {
+                                let w = match (old.get(a), support.get(b)) {
+                                    (Some(&x), Some(&y)) => x.min(y),
+                                    (Some(&x), None) => x,
+                                    (None, Some(&y)) => y,
+                                    _ => unreachable!(),
+                                };
+                                if old.get(a) == Some(&w) {
+                                    a += 1;
+                                }
+                                if support.get(b) == Some(&w) {
+                                    b += 1;
+                                }
+                                self.stats.xor_support_visits += 1;
+                                if target[w] != 0 {
+                                    merged.push(w);
+                                }
+                            }
+                            std::mem::swap(&mut self.matrix_support[j], &mut merged);
+                        } else {
+                            xor_into(target, &src);
+                            self.stats.xor_word_updates += words as u64;
+                        }
                         if self.event_observer.is_some() && self.event_failure.is_none() {
                             emit_to(
                                 &mut self.event_observer,
@@ -1811,6 +2048,8 @@ impl Solver {
                     self.stats.word_ops +=
                         (pw + 1 + words + rows) as u64 + row_ops * (words as u64 + 1);
                     self.xor_src = src;
+                    self.xor_support_src = support;
+                    self.xor_support_merge = merged;
                 }
             }
         }
@@ -1830,27 +2069,36 @@ impl Solver {
                 None => continue, // decided in phase 1
             };
             self.stats.xor_row_scans += 1;
-            let row = &self.matrix[i * words..(i + 1) * words];
-            let mut parity = self.matrix_rhs[i];
-            for (w, ((&m, &assigned), &value)) in row
-                .iter()
-                .zip(&self.assigned_w)
-                .zip(&self.value_w)
-                .enumerate()
-            {
-                if m == 0 {
-                    continue;
-                }
-                let free = m & !assigned;
-                if free.count_ones() > 1
-                    || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
-                {
-                    // The read-off stopped at word `w`.
-                    self.stats.word_ops += w as u64 + 1;
+            let parity = if self.indexed_xors {
+                let Some(parity) =
+                    self.unit_parity(i, words, p, self.matrix_support[i].iter().copied())
+                else {
                     continue 'rows;
+                };
+                parity
+            } else {
+                let row = &self.matrix[i * words..(i + 1) * words];
+                let mut parity = self.matrix_rhs[i];
+                for (w, ((&m, &assigned), &value)) in row
+                    .iter()
+                    .zip(&self.assigned_w)
+                    .zip(&self.value_w)
+                    .enumerate()
+                {
+                    if m == 0 {
+                        continue;
+                    }
+                    let free = m & !assigned;
+                    if free.count_ones() > 1
+                        || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
+                    {
+                        self.stats.word_ops += w as u64 + 1;
+                        continue 'rows;
+                    }
+                    parity ^= ((m & assigned & value).count_ones() & 1) == 1;
                 }
-                parity ^= ((m & assigned & value).count_ones() & 1) == 1;
-            }
+                parity
+            };
 
             // The read-off reached the end of the row.
             self.stats.word_ops += words as u64;
@@ -1898,6 +2146,415 @@ impl Solver {
         }
     }
 
+    /// One Gauss-Jordan pass over the XOR rows under the current trail.
+    ///
+    /// Each row carries the *full* variable set of its combination, and
+    /// its right-hand side is the combination's original rhs; the value
+    /// implied by the current assignment is therefore
+    /// `rhs ⊕ parity(mask ∩ assigned-true)`.  Because both mask and rhs
+    /// XOR when two rows are combined, that relation survives
+    /// elimination — which is what lets us read a reason clause straight
+    /// off a reduced row.
+    fn propagate_xors_admitted(&mut self) -> XorStep {
+        if !self.native_charge(NativeOperation::XorSetup, 32) {
+            return XorStep::Refused;
+        }
+        self.stats.xor_passes += 1;
+        let words = bs_words(self.n_vars);
+        if self.matrix_rhs.len() != self.xors.len() {
+            self.rebuild_matrix();
+            if self.native_failure.is_some() || self.native_observer_refused() {
+                return XorStep::Refused;
+            }
+        }
+        let rows = self.matrix_rhs.len();
+        // Each pass tests every row's pivot (phase 1) and every row's
+        // pivot slot again (phase 2): two per row, plus the epoch test.
+        self.stats.word_ops += 2 * rows as u64 + 1;
+
+        // ── Phase 1: restore the pivot invariant ────────────────────
+        //
+        // Only rows whose pivot has since been assigned are touched, so
+        // the usual cost is `O(broken rows × rows × words)` rather than
+        // the `O(rows² × words)` of re-eliminating from scratch.
+        let mut step = XorStep::Fixpoint;
+        for i in 0..rows {
+            if self.native_failure.is_some() || self.native_observer_refused() {
+                return XorStep::Refused;
+            }
+            if self.event_failure.is_some() {
+                return XorStep::Fixpoint;
+            }
+            if !self.native_charge(NativeOperation::XorPivot, 16) {
+                return XorStep::Refused;
+            }
+            let intact = match self.pivot[i] {
+                Some(p) => self.var_value(p as usize).is_none(),
+                None => false,
+            };
+            if intact {
+                continue;
+            }
+            self.stats.xor_repivots += 1;
+
+            let row_i = i * words..(i + 1) * words;
+            // Prepay bounded scans before helpers borrow the matrix.
+            if !self.native_charge(NativeOperation::XorScan, 2 * words as u64 + 1) {
+                return XorStep::Refused;
+            }
+            let lowest = if self.native_admission.is_some() {
+                match self.native_lowest(row_i.clone()) {
+                    Ok(v) => v,
+                    Err(()) => return XorStep::Refused,
+                }
+            } else {
+                self.lowest_unassigned(&self.matrix[row_i.clone()])
+            };
+            match lowest {
+                None => {
+                    // No unassigned variable left: the row is decided.
+                    // Its words were scanned for a pivot, then for the
+                    // residual parity.
+                    self.stats.word_ops += 2 * words as u64;
+                    self.pivot[i] = None;
+                    let residual = if self.native_admission.is_some() {
+                        match self.native_residual(i, words) {
+                            Ok(v) => v,
+                            Err(()) => return XorStep::Refused,
+                        }
+                    } else {
+                        self.row_residual(i, words)
+                    };
+                    if residual {
+                        if !self.native_charge(
+                            NativeOperation::XorReason,
+                            (words + self.n_vars as usize + 1) as u64,
+                        ) {
+                            return XorStep::Refused;
+                        }
+                        if !native_reserve(
+                            &mut self.xor_conflict,
+                            self.n_vars as usize,
+                            &mut self.native_admission,
+                            &mut self.native_failure,
+                            self.deadline,
+                            NativeOperation::XorGrowth,
+                        ) {
+                            return XorStep::Refused;
+                        }
+                        let mut buf = std::mem::take(&mut self.xor_conflict);
+                        if self.native_admission.is_some() {
+                            if !self.native_reason(row_i, None, &mut buf) {
+                                self.xor_conflict = buf;
+                                return XorStep::Refused;
+                            }
+                        } else {
+                            self.write_xor_reason(&self.matrix[row_i], None, &mut buf);
+                        }
+                        // The reason: one per row word, one per literal.
+                        self.stats.word_ops += (words + buf.len()) as u64;
+                        self.xor_conflict = buf;
+                        self.stats.xor_conflicts += 1;
+                        if self.observing() {
+                            if !self.native_event_payload(
+                                self.xor_conflict.len(),
+                                std::mem::size_of::<Lit>(),
+                            ) {
+                                return XorStep::Refused;
+                            }
+                            self.emit(SolverEvent::XorConflict {
+                                row_id: i,
+                                explanation: self.xor_conflict.clone(),
+                            });
+                        }
+                        if self.native_observer_refused() {
+                            return XorStep::Refused;
+                        }
+                        return XorStep::Conflict;
+                    }
+                }
+                Some(p) => {
+                    self.pivot[i] = Some(p);
+                    // Clear `p` from every other row, so it lives in
+                    // this one alone.  The row is copied out once, the
+                    // matrix is walked through local slices with a local
+                    // counter, and the row XOR is out of line: the
+                    // column test then compiles to a load and a test per
+                    // row instead of sharing registers with the XOR.
+                    let (pw, pbit) = (p as usize / 64, 1u64 << (p % 64));
+                    let src_rhs = self.matrix_rhs[i];
+                    if !self.native_charge(NativeOperation::XorScan, words as u64) {
+                        return XorStep::Refused;
+                    }
+                    if !native_reserve(
+                        &mut self.xor_src,
+                        words,
+                        &mut self.native_admission,
+                        &mut self.native_failure,
+                        self.deadline,
+                        NativeOperation::XorGrowth,
+                    ) {
+                        return XorStep::Refused;
+                    }
+                    let mut src = std::mem::take(&mut self.xor_src);
+                    src.clear();
+                    if self.native_admission.is_some() {
+                        for chunk in self.matrix[row_i].chunks(64) {
+                            if !native_pay(
+                                &mut self.native_admission,
+                                &mut self.native_failure,
+                                self.deadline,
+                                NativeOperation::XorScan,
+                                0,
+                                0,
+                            ) {
+                                self.xor_src = src;
+                                return XorStep::Refused;
+                            }
+                            src.extend_from_slice(chunk);
+                        }
+                    } else {
+                        src.extend_from_slice(&self.matrix[row_i]);
+                    }
+                    let matrix = &mut self.matrix[..rows * words];
+                    let matrix_rhs = &mut self.matrix_rhs[..rows];
+                    let mut row_ops = 0u64;
+                    for j in 0..rows {
+                        if !native_pay(
+                            &mut self.native_admission,
+                            &mut self.native_failure,
+                            self.deadline,
+                            NativeOperation::XorScan,
+                            1,
+                            0,
+                        ) {
+                            break;
+                        }
+                        if j == i || matrix[j * words + pw] & pbit == 0 {
+                            continue;
+                        }
+                        if !native_pay(
+                            &mut self.native_admission,
+                            &mut self.native_failure,
+                            self.deadline,
+                            NativeOperation::XorWord,
+                            words as u64 + 1,
+                            0,
+                        ) {
+                            break;
+                        }
+                        row_ops += 1;
+                        if self.native_admission.is_some() {
+                            self.native_partial_xor = Some((i, j, 0, true));
+                        }
+                        matrix_rhs[j] ^= src_rhs;
+                        if self.native_admission.is_some() {
+                            for (dest, source) in matrix[j * words..(j + 1) * words]
+                                .chunks_mut(64)
+                                .zip(src.chunks(64))
+                            {
+                                if !native_pay(
+                                    &mut self.native_admission,
+                                    &mut self.native_failure,
+                                    self.deadline,
+                                    NativeOperation::XorWord,
+                                    dest.len() as u64,
+                                    0,
+                                ) {
+                                    break;
+                                }
+                                xor_into(dest, source);
+                                if let Some(partial) = &mut self.native_partial_xor {
+                                    partial.2 += dest.len();
+                                }
+                            }
+                            if self.native_failure.is_some() {
+                                break;
+                            }
+                        } else {
+                            xor_into(&mut matrix[j * words..(j + 1) * words], &src);
+                        }
+                        if self.event_observer.is_some()
+                            && (self.event_failure.is_none() && self.native_failure.is_none())
+                        {
+                            if !native_pay(
+                                &mut self.native_admission,
+                                &mut self.native_failure,
+                                self.deadline,
+                                NativeOperation::EventPayload,
+                                32,
+                                128,
+                            ) {
+                                break;
+                            }
+                            emit_to(
+                                &mut self.event_observer,
+                                &mut self.event_failure,
+                                SolverEvent::XorRowXor {
+                                    destination: j,
+                                    source: i,
+                                },
+                            );
+                        }
+                        if self.native_admission.is_some() && self.event_failure.is_some() {
+                            break;
+                        }
+                        if self.event_failure.is_none() {
+                            self.native_partial_xor = None;
+                        }
+                    }
+                    self.stats.xor_row_ops += row_ops;
+                    // Pivot search up to `p`'s word, the row copied out,
+                    // the column tested in every row, and each row
+                    // operation's `words` XORs plus its rhs.
+                    self.stats.word_ops +=
+                        (pw + 1 + words + rows) as u64 + row_ops * (words as u64 + 1);
+                    self.xor_src = src;
+                    if self.native_failure.is_some() || self.native_observer_refused() {
+                        return XorStep::Refused;
+                    }
+                }
+            }
+        }
+
+        // ── Phase 2: read off unit implications ─────────────────────
+        //
+        // With the invariant restored, a row implies something exactly
+        // when its pivot is its *only* unassigned variable — so this is
+        // a popcount, and no further elimination is needed.
+        let mut propagated = false;
+        'rows: for i in 0..rows {
+            if self.native_failure.is_some() || self.native_observer_refused() {
+                return XorStep::Refused;
+            }
+            if self.event_failure.is_some() {
+                return XorStep::Fixpoint;
+            }
+            if !self.native_charge(NativeOperation::XorPivot, 16) {
+                return XorStep::Refused;
+            }
+            let p = match self.pivot[i] {
+                Some(p) => p,
+                None => continue, // decided in phase 1
+            };
+            self.stats.xor_row_scans += 1;
+            let row = &self.matrix[i * words..(i + 1) * words];
+            let mut parity = self.matrix_rhs[i];
+            for (w, ((&m, &assigned), &value)) in row
+                .iter()
+                .zip(&self.assigned_w)
+                .zip(&self.value_w)
+                .enumerate()
+            {
+                if !native_pay(
+                    &mut self.native_admission,
+                    &mut self.native_failure,
+                    self.deadline,
+                    NativeOperation::XorWord,
+                    8,
+                    0,
+                ) {
+                    return XorStep::Refused;
+                }
+                if m == 0 {
+                    continue;
+                }
+                let free = m & !assigned;
+                if free.count_ones() > 1
+                    || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
+                {
+                    // The read-off stopped at word `w`.
+                    self.stats.word_ops += w as u64 + 1;
+                    continue 'rows;
+                }
+                parity ^= ((m & assigned & value).count_ones() & 1) == 1;
+            }
+
+            // The read-off reached the end of the row.
+            self.stats.word_ops += words as u64;
+            let lit = if parity {
+                (p + 1) as Lit
+            } else {
+                -((p + 1) as Lit)
+            };
+            if !self.native_charge(
+                NativeOperation::XorReason,
+                (words + self.n_vars as usize + 1) as u64,
+            ) {
+                return XorStep::Refused;
+            }
+            if !native_reserve(
+                &mut self.xor_reason[p as usize],
+                self.n_vars as usize,
+                &mut self.native_admission,
+                &mut self.native_failure,
+                self.deadline,
+                NativeOperation::XorGrowth,
+            ) {
+                return XorStep::Refused;
+            }
+            let mut buf = std::mem::take(&mut self.xor_reason[p as usize]);
+            if self.native_admission.is_some() {
+                if !self.native_reason(i * words..(i + 1) * words, Some(lit), &mut buf) {
+                    self.xor_reason[p as usize] = buf;
+                    return XorStep::Refused;
+                }
+            } else {
+                self.write_xor_reason(
+                    &self.matrix[i * words..(i + 1) * words],
+                    Some(lit),
+                    &mut buf,
+                );
+            }
+            self.stats.xor_reason_lits += buf.len() as u64;
+            // The reason: one per row word, one per literal.
+            self.stats.word_ops += (words + buf.len()) as u64;
+            self.xor_reason[p as usize] = buf;
+            self.stats.xor_propagations += 1;
+            if self.observing() {
+                if !self.native_event_payload(
+                    self.xor_reason[p as usize].len(),
+                    std::mem::size_of::<Lit>(),
+                ) {
+                    return XorStep::Refused;
+                }
+                self.emit(SolverEvent::XorImplication {
+                    row_id: i,
+                    literal: lit,
+                    explanation: self.xor_reason[p as usize].clone(),
+                });
+            }
+            if self.native_observer_refused() {
+                return XorStep::Refused;
+            }
+            if self.enqueue(lit, Reason::XorPropagated).is_err() {
+                // Unreachable while the invariant holds — the pivot was
+                // unassigned — but treat it as a conflict rather than
+                // silently dropping an implication.
+                std::mem::swap(&mut self.xor_conflict, &mut self.xor_reason[p as usize]);
+                self.stats.xor_conflicts += 1;
+                return XorStep::Conflict;
+            }
+            if self.native_failure.is_some() || self.native_observer_refused() {
+                return XorStep::Refused;
+            }
+            propagated = true;
+        }
+
+        if !self.native_charge(NativeOperation::XorSetup, 1) {
+            return XorStep::Refused;
+        }
+        match step {
+            XorStep::Refused => XorStep::Refused,
+            XorStep::Conflict => XorStep::Conflict,
+            _ if propagated => {
+                step = XorStep::Propagated;
+                step
+            }
+            _ => XorStep::Fixpoint,
+        }
+    }
+
     /// Reset the working matrix to the original rows, dropping every
     /// pivot assignment.  The next pass re-eliminates from scratch.
     ///
@@ -1906,35 +2563,172 @@ impl Solver {
     /// the reason clauses read off them.  Rebuilding at restarts, where
     /// the trail is empty anyway, bounds that drift.
     fn rebuild_matrix(&mut self) {
+        if !self.native_charge(NativeOperation::XorSetup, self.xors.len() as u64) {
+            return;
+        }
+        let mut total = 0usize;
+        for row in &self.xors {
+            if !native_pay(
+                &mut self.native_admission,
+                &mut self.native_failure,
+                self.deadline,
+                NativeOperation::XorSetup,
+                0,
+                0,
+            ) {
+                return;
+            }
+            let Some(next) = total.checked_add(row.mask.len()) else {
+                self.native_failure = Some(NativeAdmissionFailure::Overflow);
+                return;
+            };
+            total = next;
+        }
+        if !native_reserve(
+            &mut self.matrix,
+            total,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::XorGrowth,
+        ) {
+            return;
+        }
+        if !native_reserve(
+            &mut self.matrix_rhs,
+            self.xors.len(),
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::XorGrowth,
+        ) {
+            return;
+        }
+        if !native_reserve(
+            &mut self.pivot,
+            self.xors.len(),
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::XorGrowth,
+        ) {
+            return;
+        }
+        if !self.native_charge(
+            NativeOperation::XorSetup,
+            total as u64 + 2 * self.xors.len() as u64,
+        ) {
+            return;
+        }
         // Every row's words copied, its rhs and its pivot slot reset.
-        self.stats.word_ops += self
-            .xors
-            .iter()
-            .map(|row| row.mask.len() as u64 + 2)
-            .sum::<u64>();
+        self.stats.word_ops += total as u64 + 2 * self.xors.len() as u64;
         self.matrix.clear();
         self.matrix_rhs.clear();
+        self.matrix_support.clear();
         for row in &self.xors {
-            self.matrix.extend_from_slice(&row.mask);
+            if self.native_admission.is_some() {
+                for chunk in row.mask.chunks(64) {
+                    if !native_pay(
+                        &mut self.native_admission,
+                        &mut self.native_failure,
+                        self.deadline,
+                        NativeOperation::XorWord,
+                        chunk.len() as u64,
+                        0,
+                    ) {
+                        return;
+                    }
+                    self.matrix.extend_from_slice(chunk);
+                }
+            } else {
+                self.matrix.extend_from_slice(&row.mask);
+            }
             self.matrix_rhs.push(row.rhs);
+            self.matrix_support.push(if self.indexed_xors {
+                row.mask
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(w, &m)| (m != 0).then_some(w))
+                    .collect()
+            } else {
+                Vec::new()
+            });
         }
         self.pivot.clear();
-        self.pivot.resize(self.matrix_rhs.len(), None);
+        if self.native_admission.is_some() {
+            while self.pivot.len() < self.matrix_rhs.len() {
+                let end = self
+                    .pivot
+                    .len()
+                    .saturating_add(64)
+                    .min(self.matrix_rhs.len());
+                if !self.native_charge(NativeOperation::XorPivot, (end - self.pivot.len()) as u64) {
+                    return;
+                }
+                self.pivot.resize(end, None);
+            }
+        } else {
+            self.pivot.resize(self.matrix_rhs.len(), None);
+        }
         if self.observing() {
+            if !self.native_event_payload(0, 0) {
+                return;
+            }
             self.emit(SolverEvent::XorMatrixReset);
         }
+    }
+
+    /// Select the dense reference or exact nonzero-word engine. Resetting the
+    /// matrix preserves the original constraints and trail.
+    pub fn set_indexed_xors(&mut self, indexed: bool) {
+        self.indexed_xors = indexed;
+        self.clear_matrix();
+        self.xor_epoch = u64::MAX;
     }
 
     /// Drop the working matrix; the next pass rebuilds it from `xors`.
     fn clear_matrix(&mut self) {
         self.matrix.clear();
         self.matrix_rhs.clear();
+        self.matrix_support.clear();
+    }
+
+    fn unit_parity(
+        &self,
+        i: usize,
+        words: usize,
+        p: u32,
+        positions: impl Iterator<Item = usize>,
+    ) -> Option<bool> {
+        let mut parity = self.matrix_rhs[i];
+        for w in positions {
+            let m = self.matrix[i * words + w];
+            if m == 0 {
+                continue;
+            }
+            let free = m & !self.assigned_w[w];
+            if free.count_ones() > 1 || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
+            {
+                return None;
+            }
+            parity ^= ((m & self.assigned_w[w] & self.value_w[w]).count_ones() & 1) == 1;
+        }
+        Some(parity)
     }
 
     /// `rhs ⊕ parity(assigned-true variables of the row)` — zero when a
     /// fully assigned row is satisfied.
     fn row_residual(&self, i: usize, words: usize) -> bool {
         let mut parity = self.matrix_rhs[i];
+        if self.indexed_xors {
+            for &w in &self.matrix_support[i] {
+                parity ^= ((self.matrix[i * words + w] & self.assigned_w[w] & self.value_w[w])
+                    .count_ones()
+                    & 1)
+                    == 1;
+            }
+            return parity;
+        }
         for (w, &m) in self.matrix[i * words..(i + 1) * words].iter().enumerate() {
             if m != 0 {
                 parity ^= ((m & self.assigned_w[w] & self.value_w[w]).count_ones() & 1) == 1;
@@ -2008,7 +2802,10 @@ impl Solver {
     fn propagate_clauses(&mut self) -> Option<u32> {
         let n = self.lit_base as i32;
         let mut conflict: Option<u32> = None;
-        while conflict.is_none() && self.qhead < self.trail.len() && self.event_failure.is_none() {
+        while conflict.is_none()
+            && self.qhead < self.trail.len()
+            && (self.event_failure.is_none() && self.native_failure.is_none())
+        {
             let lit = self.trail[self.qhead];
             self.qhead += 1;
             // Clauses watching `¬lit` — that watcher has just become
@@ -2019,6 +2816,12 @@ impl Solver {
             // cursor.  Building a fresh vector here meant one heap
             // allocation per propagated literal, which at ~280
             // propagations a conflict is millions per solve.
+            if !self.native_charge(
+                NativeOperation::WatchList,
+                1 + self.watches[wi].len() as u64,
+            ) {
+                return None;
+            }
             let mut ws = std::mem::take(&mut self.watches[wi]);
             // The trail read, then every watcher once: its blocker test
             // and write-back in the scan, or its copy after a conflict.
@@ -2028,7 +2831,10 @@ impl Solver {
             let (mut i, mut j) = (0usize, 0usize);
 
             while i < ws.len() {
-                if self.event_failure.is_some() {
+                if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                    break;
+                }
+                if !self.native_charge(NativeOperation::Watcher, 32) {
                     break;
                 }
                 let w = ws[i];
@@ -2064,9 +2870,31 @@ impl Solver {
                 // Look for a literal that is not false to watch instead.
                 let mut moved = false;
                 for slot in rest.iter_mut() {
+                    if !native_pay(
+                        &mut self.native_admission,
+                        &mut self.native_failure,
+                        self.deadline,
+                        NativeOperation::Literal,
+                        1,
+                        0,
+                    ) {
+                        break;
+                    }
                     self.stats.clause_lit_visits += 1;
                     let l = *slot;
                     if self.values[(l + n) as usize] != Some(false) {
+                        let destination = (l + n) as usize;
+                        let needed = self.watches[destination].len() + 1;
+                        if !native_reserve(
+                            &mut self.watches[destination],
+                            needed,
+                            &mut self.native_admission,
+                            &mut self.native_failure,
+                            self.deadline,
+                            NativeOperation::WatchGrowth,
+                        ) {
+                            break;
+                        }
                         // Swap it into the watched position.
                         *slot = watch[0];
                         watch[0] = l;
@@ -2081,6 +2909,11 @@ impl Solver {
                         moved = true;
                         break;
                     }
+                }
+                if self.native_failure.is_some() {
+                    ws[j] = w;
+                    j += 1;
+                    break;
                 }
                 if moved {
                     continue; // the watch now lives elsewhere
@@ -2106,8 +2939,20 @@ impl Solver {
                 }
             }
 
-            // Keep whatever the loop did not reach.
+            // Refusal retains both the compacted prefix and untouched suffix.
+            if self.native_admission.is_some()
+                && (self.native_failure.is_some() || self.event_failure.is_some())
+            {
+                self.native_pending_watch = Some((wi, ws, i, j));
+                return None;
+            }
+            // Successful/conflict cleanup was prepaid by WatchList; check the
+            // original deadline before every bounded copy batch.
             while i < ws.len() {
+                if i % 64 == 0 && !self.native_charge(NativeOperation::WatchList, 0) {
+                    self.native_pending_watch = Some((wi, ws, i, j));
+                    return None;
+                }
                 ws[j] = ws[i];
                 i += 1;
                 j += 1;
@@ -2132,10 +2977,26 @@ impl Solver {
     /// now known to be implied by the clause — and rolled back on
     /// failure, which is what `top` records.
     fn lit_redundant(&mut self, p: Lit, abstract_levels: u32, stack: &mut Vec<Lit>) -> bool {
+        if !self.native_charge(NativeOperation::Analyze, 8 + self.seen_stack.len() as u64) {
+            return false;
+        }
         let top = self.seen_stack.len();
         stack.clear();
+        if !native_reserve(
+            stack,
+            stack.len() + 1,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::AnalyzeGrowth,
+        ) {
+            return false;
+        }
         stack.push(p);
         while let Some(q) = stack.pop() {
+            if !self.native_charge(NativeOperation::Analyze, 8) {
+                return false;
+            }
             let qv = var_of(q) as usize;
             // The reason is borrowed once per step, field by field, so the
             // walk below is a slice iteration; re-matching the source and
@@ -2152,6 +3013,16 @@ impl Solver {
             // for literals it did not reach).
             self.stats.word_ops += 1 + reason.len() as u64;
             for &r in reason {
+                if !native_pay(
+                    &mut self.native_admission,
+                    &mut self.native_failure,
+                    self.deadline,
+                    NativeOperation::Analyze,
+                    16,
+                    0,
+                ) {
+                    return false;
+                }
                 let rv = var_of(r) as usize;
                 // The propagated literal itself, anything already in the
                 // clause, and anything fixed at level 0 are all fine.
@@ -2160,6 +3031,24 @@ impl Solver {
                 }
                 let has_reason = !matches!(self.reason[rv], Reason::Decision);
                 if has_reason && (abstract_level(self.level[rv]) & abstract_levels) != 0 {
+                    let needed = self.seen_stack.len() + 1;
+                    if !native_reserve(
+                        &mut self.seen_stack,
+                        needed,
+                        &mut self.native_admission,
+                        &mut self.native_failure,
+                        self.deadline,
+                        NativeOperation::AnalyzeGrowth,
+                    ) || !native_reserve(
+                        stack,
+                        stack.len() + 1,
+                        &mut self.native_admission,
+                        &mut self.native_failure,
+                        self.deadline,
+                        NativeOperation::AnalyzeGrowth,
+                    ) {
+                        return false;
+                    }
                     self.seen[rv] = true;
                     self.seen_stack.push(rv as u32);
                     stack.push(r);
@@ -2167,6 +3056,9 @@ impl Solver {
                     // The rollback of this walk's marks.
                     self.stats.word_ops += (self.seen_stack.len() - top) as u64;
                     for j in top..self.seen_stack.len() {
+                        if !self.native_charge(NativeOperation::Analyze, 0) {
+                            return false;
+                        }
                         self.seen[self.seen_stack[j] as usize] = false;
                     }
                     self.seen_stack.truncate(top);
@@ -2177,13 +3069,40 @@ impl Solver {
         true
     }
 
-    /// 1-UIP conflict analysis. Returns `(learnt_clause, backjump_level)`.
-    ///
-    /// The `seen` marks are cleared through `seen_stack` rather than by
-    /// re-zeroing a per-variable vector, and reason clauses are copied
-    /// into a reused buffer rather than cloned — both were per-conflict
-    /// allocations on a path taken millions of times.
     fn analyze(&mut self, conflict: Conflict) -> (Vec<Lit>, i32) {
+        if !self.native_charge(NativeOperation::Analyze, 32) {
+            return (Vec::new(), 0);
+        }
+        if !native_reserve(
+            &mut self.learnt_buf,
+            self.n_vars as usize,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::AnalyzeGrowth,
+        ) {
+            return (Vec::new(), 0);
+        }
+        if !native_reserve(
+            &mut self.seen_stack,
+            self.n_vars as usize,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::AnalyzeGrowth,
+        ) {
+            return (Vec::new(), 0);
+        }
+        if !native_reserve(
+            &mut self.redundant_stack,
+            self.n_vars as usize,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::AnalyzeGrowth,
+        ) {
+            return (Vec::new(), 0);
+        }
         let current_level = self.trail_lim.len() as i32;
         let mut learnt = std::mem::take(&mut self.learnt_buf);
         learnt.clear();
@@ -2193,13 +3112,25 @@ impl Solver {
         let mut trail_pos = self.trail.len();
 
         loop {
+            if !self.native_charge(NativeOperation::Analyze, 16) {
+                self.learnt_buf = learnt;
+                return (Vec::new(), 0);
+            }
             if self.observing() {
+                if !self.native_conflict_payload(src, p) {
+                    self.learnt_buf = learnt;
+                    return (Vec::new(), 0);
+                }
                 let (reason, literals) = self.conflict_event(src, p);
                 self.emit(SolverEvent::AnalysisReason {
                     resolved_literal: p,
                     reason,
                     literals,
                 });
+            }
+            if self.native_observer_refused() {
+                self.learnt_buf = learnt;
+                return (Vec::new(), 0);
             }
             // Read the reason in place.  Copying it into a scratch
             // buffer was a memcpy of up to a hundred literals at every
@@ -2216,6 +3147,17 @@ impl Solver {
 
             self.stats.analyze_lit_visits += reason.len() as u64;
             for &q in reason {
+                if !native_pay(
+                    &mut self.native_admission,
+                    &mut self.native_failure,
+                    self.deadline,
+                    NativeOperation::Analyze,
+                    16 + (u32::BITS - self.n_vars.leading_zeros()) as u64 * 8,
+                    0,
+                ) {
+                    self.learnt_buf = learnt;
+                    return (Vec::new(), 0);
+                }
                 // `p` is 0 on the first step, which no literal equals.
                 if q == p {
                     continue;
@@ -2231,11 +3173,34 @@ impl Solver {
                     // The mark, the activity bump and its new key, and the
                     // clause or counter update; the heap charges itself.
                     self.stats.word_ops += 4;
+                    let needed = self.seen_stack.len() + 1;
+                    if !native_reserve(
+                        &mut self.seen_stack,
+                        needed,
+                        &mut self.native_admission,
+                        &mut self.native_failure,
+                        self.deadline,
+                        NativeOperation::AnalyzeGrowth,
+                    ) {
+                        self.learnt_buf = learnt;
+                        return (Vec::new(), 0);
+                    }
                     self.seen[v] = true;
                     self.seen_stack.push(v as u32);
                     // Bump activity, and reposition in the branching heap.
                     self.activity[v] += self.activity_inc;
                     if self.activity[v] > 1e100 {
+                        if !native_pay(
+                            &mut self.native_admission,
+                            &mut self.native_failure,
+                            self.deadline,
+                            NativeOperation::Analyze,
+                            2 * self.activity.len() as u64 + 1,
+                            0,
+                        ) {
+                            self.learnt_buf = learnt;
+                            return (Vec::new(), 0);
+                        }
                         // Rescale: every activity and key rewritten.
                         self.stats.word_ops += 2 * self.activity.len() as u64;
                         for (a, (k, &prio)) in self
@@ -2243,6 +3208,17 @@ impl Solver {
                             .iter_mut()
                             .zip(self.heap_key.iter_mut().zip(&self.branch_priority))
                         {
+                            if !native_pay(
+                                &mut self.native_admission,
+                                &mut self.native_failure,
+                                self.deadline,
+                                NativeOperation::Analyze,
+                                0,
+                                0,
+                            ) {
+                                self.learnt_buf = learnt;
+                                return (Vec::new(), 0);
+                            }
                             *a *= 1e-100;
                             *k = order_key(*a, prio);
                         }
@@ -2253,6 +3229,18 @@ impl Solver {
                     if self.level[v] >= current_level {
                         counter += 1;
                     } else {
+                        let needed = learnt.len() + 1;
+                        if !native_reserve(
+                            &mut learnt,
+                            needed,
+                            &mut self.native_admission,
+                            &mut self.native_failure,
+                            self.deadline,
+                            NativeOperation::AnalyzeGrowth,
+                        ) {
+                            self.learnt_buf = learnt;
+                            return (Vec::new(), 0);
+                        }
                         learnt.push(q);
                     }
                 }
@@ -2260,6 +3248,10 @@ impl Solver {
 
             // Find the next literal to resolve on — walk back the trail.
             while trail_pos > 0 {
+                if !self.native_charge(NativeOperation::Analyze, 4) {
+                    self.learnt_buf = learnt;
+                    return (Vec::new(), 0);
+                }
                 trail_pos -= 1;
                 let l = self.trail[trail_pos];
                 if self.seen[var_of(l) as usize] {
@@ -2303,40 +3295,96 @@ impl Solver {
         if learnt.len() > 1 {
             // Cheap filter: a literal can only be redundant if its
             // reason stays inside the levels the clause already covers.
+            if !self.native_charge(NativeOperation::Analyze, learnt.len() as u64) {
+                self.learnt_buf = learnt;
+                return (Vec::new(), 0);
+            }
             let mut abstract_levels = 0u32;
             for &q in &learnt {
+                if !native_pay(
+                    &mut self.native_admission,
+                    &mut self.native_failure,
+                    self.deadline,
+                    NativeOperation::Analyze,
+                    0,
+                    0,
+                ) {
+                    self.learnt_buf = learnt;
+                    return (Vec::new(), 0);
+                }
                 abstract_levels |= abstract_level(self.level[var_of(q) as usize]);
             }
             let t_min = std::time::Instant::now();
-            let mut stack = std::mem::take(&mut self.redundant_stack);
-            let mut w = 0usize;
-            for r in 0..learnt.len() {
-                let q = learnt[r];
-                let v = var_of(q) as usize;
-                let redundant = !matches!(self.reason[v], Reason::Decision)
-                    && self.lit_redundant(q, abstract_levels, &mut stack);
-                if !redundant {
-                    learnt[w] = q;
-                    w += 1;
-                }
-            }
-            learnt.truncate(w);
-            self.redundant_stack = stack;
+            learnt = match self.minimize_for_search(learnt, abstract_levels) {
+                Some(kept) => kept,
+                None => return (Vec::new(), 0),
+            };
             self.stats.ns_minimize += t_min.elapsed().as_nanos() as u64;
         }
         self.stats.learnt_lits_kept += learnt.len() as u64;
 
+        if !self.native_charge(
+            NativeOperation::Analyze,
+            self.seen_stack.len() as u64 + learnt.len() as u64 + 8,
+        ) {
+            self.learnt_buf = learnt;
+            return (Vec::new(), 0);
+        }
         // Clear only the marks we set.
         self.stats.word_ops += self.seen_stack.len() as u64;
-        for v in self.seen_stack.drain(..) {
-            self.seen[v as usize] = false;
+        if self.native_admission.is_some() {
+            for i in 0..self.seen_stack.len() {
+                if !self.native_charge(NativeOperation::Analyze, 0) {
+                    self.learnt_buf = learnt;
+                    return (Vec::new(), 0);
+                }
+                self.seen[self.seen_stack[i] as usize] = false;
+            }
+            self.seen_stack.clear();
+        } else {
+            for v in self.seen_stack.drain(..) {
+                self.seen[v as usize] = false;
+            }
         }
 
         // Asserting literal: ¬p, then the clause exactly sized for the
         // database.  The accumulator goes back for the next conflict.
-        let mut clause: Vec<Lit> = Vec::with_capacity(learnt.len() + 1);
+        let mut clause: Vec<Lit> = if self.native_admission.is_none() {
+            Vec::with_capacity(learnt.len() + 1)
+        } else {
+            Vec::new()
+        };
+        if !native_reserve(
+            &mut clause,
+            learnt.len() + 1,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::AnalyzeGrowth,
+        ) {
+            self.learnt_buf = learnt;
+            return (Vec::new(), 0);
+        }
         clause.push(-p);
-        clause.extend_from_slice(&learnt);
+        if self.native_admission.is_some() {
+            for chunk in learnt.chunks(64) {
+                if !native_pay(
+                    &mut self.native_admission,
+                    &mut self.native_failure,
+                    self.deadline,
+                    NativeOperation::Analyze,
+                    0,
+                    0,
+                ) {
+                    self.native_pending_clause = Some(clause);
+                    self.learnt_buf = learnt;
+                    return (Vec::new(), 0);
+                }
+                clause.extend_from_slice(chunk);
+            }
+        } else {
+            clause.extend_from_slice(&learnt);
+        }
         learnt.clear();
         self.learnt_buf = learnt;
 
@@ -2345,6 +3393,10 @@ impl Solver {
         if clause.len() > 1 {
             let mut max_i = 1;
             for i in 2..clause.len() {
+                if !self.native_charge(NativeOperation::Analyze, 0) {
+                    self.native_pending_clause = Some(clause);
+                    return (Vec::new(), 0);
+                }
                 if self.level[var_of(clause[i]) as usize]
                     > self.level[var_of(clause[max_i]) as usize]
                 {
@@ -2366,7 +3418,25 @@ impl Solver {
             return;
         }
         let target = self.trail_lim[level];
+        let work = (self.trail.len() - target) as u64
+            * (16 + 8 * (u32::BITS - self.n_vars.leading_zeros()) as u64);
+        if !self.native_charge(NativeOperation::Backjump, work) {
+            return;
+        }
+        if !native_reserve(
+            &mut self.order.heap,
+            self.n_vars as usize,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::AnalyzeGrowth,
+        ) {
+            return;
+        }
         if self.observing() {
+            if !self.native_event_payload(self.trail.len() - target, std::mem::size_of::<Lit>()) {
+                return;
+            }
             self.emit(SolverEvent::Backjump {
                 from_level: self.trail_lim.len(),
                 to_level: level,
@@ -2374,10 +3444,16 @@ impl Solver {
                 removed: self.trail[target..].to_vec(),
             });
         }
+        if self.native_observer_refused() {
+            return;
+        }
         // Each unassignment: the two literal slots, the bitset word and
         // the level; the heap re-insertion charges itself.
         self.stats.word_ops += 3 * (self.trail.len() - target) as u64 + 1;
         while self.trail.len() > target {
+            if !self.native_charge(NativeOperation::Backjump, 0) {
+                return;
+            }
             let l = self.trail.pop().unwrap();
             let v = var_of(l) as usize;
             let n = self.lit_base as i32;
@@ -2399,7 +3475,18 @@ impl Solver {
     /// surface because unassignment re-inserts rather than repositions,
     /// so we skip those.
     fn pick_branching_variable(&mut self) -> Option<u32> {
-        while let Some(v) = self.order.pop_max(&self.heap_key) {
+        let work =
+            (self.n_vars as u64 + 1) * (u32::BITS - self.n_vars.leading_zeros() + 1) as u64 * 8;
+        if !self.native_charge(NativeOperation::Heap, work) {
+            return None;
+        }
+        loop {
+            if !self.native_charge(NativeOperation::Heap, 0) {
+                return None;
+            }
+            let Some(v) = self.order.pop_max(&self.heap_key) else {
+                break;
+            };
             // The popped variable's value test.
             self.stats.word_ops += 1;
             if self.var_value(v as usize).is_none() {
@@ -2416,8 +3503,7 @@ impl Solver {
     /// stopped earning their keep.  Clauses are ranked by length, the
     /// cheap stand-in for LBD: a short clause prunes more.
     ///
-    /// Detached clauses stay in the arena and are only unhooked from
-    /// the watch lists, so every stored offset stays valid; they are
+    /// Detached clauses are unhooked from the watch lists; they are
     /// learnt, hence implied by the original problem, so dropping them
     /// can cost propagation power but never soundness.  A clause that
     /// is currently some variable's reason is kept, or conflict
@@ -2426,6 +3512,29 @@ impl Solver {
     /// Called only at decision level 0, just after a restart, where the
     /// trail holds nothing but level-0 implications.
     fn reduce_db(&mut self) {
+        if self.native_admission.is_some() {
+            self.reduce_db_admitted()
+        } else {
+            self.reduce_db_legacy()
+        }
+    }
+
+    /// **Drop the least useful half of the learnt clauses.**
+    ///
+    /// Learning never stops, so without this the watch lists grow for
+    /// the whole solve and every propagation pays for clauses that
+    /// stopped earning their keep.  Clauses are ranked by length, the
+    /// cheap stand-in for LBD: a short clause prunes more.
+    ///
+    /// Detached clauses are unhooked from the watch lists; they are
+    /// learnt, hence implied by the original problem, so dropping them
+    /// can cost propagation power but never soundness.  A clause that
+    /// is currently some variable's reason is kept, or conflict
+    /// analysis would resolve against something no longer there.
+    ///
+    /// Called only at decision level 0, just after a restart, where the
+    /// trail holds nothing but level-0 implications.
+    fn reduce_db_legacy(&mut self) {
         let n_clauses = self.clause_at.len();
         self.detached.resize(n_clauses, false);
         // The lock table cleared, each trail literal's reason tested and
@@ -2463,8 +3572,165 @@ impl Solver {
             self.detached[i] = true;
             if self.observing() {
                 self.emit(SolverEvent::DeleteClause {
+                    clause_id: self.event_clause_id(self.clause_at[i]),
+                });
+            }
+        }
+
+        if self.reclaim_detached_clauses {
+            self.reclaim_clause_arena();
+        }
+        self.rebuild_clause_watches();
+    }
+
+    /// **Drop the least useful half of the learnt clauses.**
+    ///
+    /// Learning never stops, so without this the watch lists grow for
+    /// the whole solve and every propagation pays for clauses that
+    /// stopped earning their keep.  Clauses are ranked by length, the
+    /// cheap stand-in for LBD: a short clause prunes more.
+    ///
+    /// Detached clauses stay in the arena and are only unhooked from
+    /// the watch lists, so every stored offset stays valid; they are
+    /// learnt, hence implied by the original problem, so dropping them
+    /// can cost propagation power but never soundness.  A clause that
+    /// is currently some variable's reason is kept, or conflict
+    /// analysis would resolve against something no longer there.
+    ///
+    /// Called only at decision level 0, just after a restart, where the
+    /// trail holds nothing but level-0 implications.
+    fn reduce_db_admitted(&mut self) {
+        let n_clauses = self.clause_at.len();
+        let work = (n_clauses as u64 + 1)
+            * (32 + 8 * (usize::BITS - n_clauses.leading_zeros()) as u64)
+            + self.trail.len() as u64 * 64
+            + self.watches.len() as u64;
+        if !self.native_charge(NativeOperation::Reduction, work) {
+            return;
+        }
+        if !native_reserve(
+            &mut self.detached,
+            n_clauses,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::Reduction,
+        ) {
+            return;
+        }
+        if !self.native_fill_detached(n_clauses) {
+            return;
+        }
+        // The lock table cleared, each trail literal's reason tested and
+        // a propagated one's clause found by binary search over the index.
+        let log_clauses = (64 - (n_clauses as u64).leading_zeros()) as u64;
+        self.stats.word_ops += n_clauses as u64 + self.trail.len() as u64 * (1 + log_clauses);
+
+        let mut locked = if self.native_admission.is_none() {
+            vec![false; n_clauses]
+        } else {
+            Vec::new()
+        };
+        if !native_reserve(
+            &mut locked,
+            n_clauses,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::Reduction,
+        ) {
+            self.native_pending_reduction = Some((locked, Vec::new()));
+            return;
+        }
+        while locked.len() < n_clauses {
+            if !self.native_charge(NativeOperation::Reduction, 0) {
+                self.native_pending_reduction = Some((locked, Vec::new()));
+                return;
+            }
+            locked.resize(locked.len().saturating_add(64).min(n_clauses), false);
+        }
+        for &l in &self.trail {
+            if !native_pay(
+                &mut self.native_admission,
+                &mut self.native_failure,
+                self.deadline,
+                NativeOperation::Reduction,
+                0,
+                0,
+            ) {
+                self.native_pending_reduction = Some((locked, Vec::new()));
+                return;
+            }
+            if let Reason::Propagated(cref) = self.reason[var_of(l) as usize] {
+                let idx = self
+                    .clause_at
+                    .binary_search(&cref)
+                    .expect("a reason is a stored clause");
+                locked[idx] = true;
+            }
+        }
+
+        let clause_len = |i: usize| clause_in(&self.arena, self.clause_at[i]).len();
+        let mut candidates = Vec::new();
+        if !native_reserve(
+            &mut candidates,
+            n_clauses - self.n_orig_clauses,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::Reduction,
+        ) {
+            self.native_pending_reduction = Some((locked, candidates));
+            return;
+        }
+        for i in self.n_orig_clauses..n_clauses {
+            if !native_pay(
+                &mut self.native_admission,
+                &mut self.native_failure,
+                self.deadline,
+                NativeOperation::Reduction,
+                0,
+                0,
+            ) {
+                self.native_pending_reduction = Some((locked, candidates));
+                return;
+            }
+            if !self.detached[i] && !locked[i] && clause_len(i) > 2 {
+                candidates.push(i);
+            }
+        }
+        // The learnt clauses filtered: detached, locked, length.
+        self.stats.word_ops += 3 * (n_clauses - self.n_orig_clauses) as u64;
+        if candidates.len() < 2 {
+            return;
+        }
+        // The sort's `c⌈log₂ c⌉` comparisons of two lengths each, and
+        // the front half marked.
+        let c = candidates.len() as u64;
+        self.stats.word_ops += 2 * c * (64 - c.leading_zeros()) as u64 + c / 2;
+        // Longest first, so the front half is the one to drop.
+        if !self.native_clause_sort(&mut candidates) {
+            self.native_pending_reduction = Some((locked, candidates));
+            return;
+        }
+        for &i in candidates.iter().take(candidates.len() / 2) {
+            if !self.native_charge(NativeOperation::Reduction, 2) {
+                self.native_pending_reduction = Some((locked, candidates));
+                return;
+            }
+            self.detached[i] = true;
+            if self.observing() {
+                if !self.native_event_payload(0, 0) {
+                    self.native_pending_reduction = Some((locked, candidates));
+                    return;
+                }
+                self.emit(SolverEvent::DeleteClause {
                     clause_id: self.clause_at[i],
                 });
+            }
+            if self.native_observer_refused() {
+                self.native_pending_reduction = Some((locked, candidates));
+                return;
             }
         }
 
@@ -2474,10 +3740,125 @@ impl Solver {
         // test) and two watchers per survivor, charged as every clause.
         self.stats.word_ops += self.watches.len() as u64 + 4 * n_clauses as u64;
         for w in self.watches.iter_mut() {
+            if !native_pay(
+                &mut self.native_admission,
+                &mut self.native_failure,
+                self.deadline,
+                NativeOperation::Reduction,
+                0,
+                0,
+            ) {
+                self.native_pending_reduction = Some((locked, candidates));
+                return;
+            }
             w.clear();
         }
         let n = self.lit_base as i32;
         for idx in 0..n_clauses {
+            if !self.native_charge(NativeOperation::Reduction, 0) {
+                self.native_pending_reduction = Some((locked, candidates));
+                return;
+            }
+            let cref = self.clause_at[idx];
+            let c = clause_in(&self.arena, cref);
+            if c.len() < 2 || self.detached.get(idx).copied().unwrap_or(false) {
+                continue;
+            }
+            let (l0, l1) = (c[0], c[1]);
+            let (w0, w1) = ((l0 + n) as usize, (l1 + n) as usize);
+            let need0 = self.watches[w0].len() + 2;
+            let need1 = self.watches[w1].len() + 2;
+            if !native_reserve(
+                &mut self.watches[w0],
+                need0,
+                &mut self.native_admission,
+                &mut self.native_failure,
+                self.deadline,
+                NativeOperation::WatchGrowth,
+            ) || !native_reserve(
+                &mut self.watches[w1],
+                need1,
+                &mut self.native_admission,
+                &mut self.native_failure,
+                self.deadline,
+                NativeOperation::WatchGrowth,
+            ) {
+                self.native_pending_reduction = Some((locked, candidates));
+                return;
+            }
+            self.watches[w0].push(Watcher { cref, blocker: l1 });
+            self.watches[w1].push(Watcher { cref, blocker: l0 });
+        }
+    }
+
+    /// Compact in place, preserving every clause ordinal and live clause's
+    /// literal order. Three-word tautologies keep detached slots harmless
+    /// if incremental clause addition later promotes the learnt prefix to
+    /// originals (including DIMACS export); empty tombstones would be UNSAT.
+    /// No live reason may be detached. Stale reasons of unassigned variables
+    /// are cleared, and every surviving reason offset is relocated.
+    ///
+    /// Only compact when at least a quarter of used words can be recovered.
+    /// Retain 50% headroom to avoid an immediate doubling on the next learnt
+    /// clause. Copying in place avoids holding a second full-sized arena;
+    /// the allocator's subsequent shrink may still move its allocation.
+    fn reclaim_clause_arena(&mut self) {
+        debug_assert!(self.trail_lim.is_empty());
+        let reclaimable: usize = self
+            .clause_at
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| self.detached.get(*i).copied().unwrap_or(false))
+            .map(|(_, &cref)| clause_in(&self.arena, cref).len().saturating_sub(2))
+            .sum();
+        if reclaimable == 0 || reclaimable < self.arena.len() / 4 {
+            return;
+        }
+        let old_offsets = self.clause_at.clone();
+        let mut end = 0usize;
+        for (i, &offset) in old_offsets.iter().enumerate() {
+            let start = offset as usize;
+            let words = self.arena[start] as usize + 1;
+            self.clause_at[i] = u32::try_from(end).expect("compacted arena offset");
+            if self.detached.get(i).copied().unwrap_or(false) && words > 3 {
+                self.arena[end..end + 3].copy_from_slice(&[2, 1, -1]);
+                end += 3;
+            } else {
+                self.arena.copy_within(start..start + words, end);
+                end += words;
+            }
+        }
+        for v in 0..self.reason.len() {
+            if let Reason::Propagated(offset) = self.reason[v] {
+                let i = old_offsets
+                    .binary_search(&offset)
+                    .expect("stored reason offset");
+                self.reason[v] = if self.detached.get(i).copied().unwrap_or(false) {
+                    assert!(self.var_value(v).is_none(), "detached live reason");
+                    Reason::Decision
+                } else {
+                    Reason::Propagated(self.clause_at[i])
+                };
+            }
+        }
+        self.stats.arena_reclamations += 1;
+        self.stats.arena_reclaimed_words += (self.arena.len() - end) as u64;
+        self.arena.truncate(end);
+        self.arena
+            .shrink_to(end.saturating_add((end / 2).max(4096)));
+    }
+
+    fn rebuild_clause_watches(&mut self) {
+        // Rebuild the watch lists from what survives.  Cheaper and much
+        // less error-prone than unhooking clauses one at a time.  One per
+        // list cleared, two per clause (offset, length and detached
+        // test) and two watchers per survivor, charged as every clause.
+        self.stats.word_ops += self.watches.len() as u64 + 4 * self.clause_at.len() as u64;
+        for w in self.watches.iter_mut() {
+            w.clear();
+        }
+        let n = self.lit_base as i32;
+        for idx in 0..self.clause_at.len() {
             let cref = self.clause_at[idx];
             let c = clause_in(&self.arena, cref);
             if c.len() < 2 || self.detached.get(idx).copied().unwrap_or(false) {
@@ -2494,11 +3875,14 @@ impl Solver {
     /// internal wall check: callers that need a hard limit must provide an
     /// outer process cap and preserve a checkpoint before entering it.
     pub fn propagate_root(&mut self) -> RootPropagationResult {
+        if !self.native_entry(false) {
+            return RootPropagationResult::Unknown;
+        }
         assert!(
             self.trail_lim.is_empty(),
             "root propagation requires decision level zero"
         );
-        if self.event_failure.is_some() {
+        if (self.event_failure.is_some() || self.native_failure.is_some()) {
             return RootPropagationResult::Unknown;
         }
         let conflict = if self.is_unsat {
@@ -2508,6 +3892,9 @@ impl Solver {
         };
         if let Some(conflict) = conflict {
             if self.observing() {
+                if !self.native_conflict_payload(conflict, 0) {
+                    return RootPropagationResult::Unknown;
+                }
                 let (reason, literals) = self.conflict_event(conflict, 0);
                 self.emit(SolverEvent::Conflict {
                     level: 0,
@@ -2516,7 +3903,10 @@ impl Solver {
                 });
             }
         }
-        if self.event_failure.is_some() {
+        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+            return RootPropagationResult::Unknown;
+        }
+        if !self.native_charge(NativeOperation::Entry, 0) {
             return RootPropagationResult::Unknown;
         }
         if self.is_unsat || conflict.is_some() {
@@ -2557,31 +3947,257 @@ impl Solver {
     where
         F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
     {
-        if self.event_failure.is_some() {
-            return SolveResult::Unknown;
-        }
-        if self.observing() {
-            self.emit(SolverEvent::SolveBegin {
-                conflicts: self.conflicts,
-                conflict_budget: self.conflict_budget,
+        let trace = (std::env::var("N83_SAT_PHASE_TRACE").as_deref() == Ok("1"))
+            .then(std::time::Instant::now);
+        self.trace_solve_phase(trace, "solve_enter", None);
+        let result = (|| {
+            if !self.native_entry(!trigger_vars.is_empty()) {
+                return SolveResult::Unknown;
+            }
+            if self.event_failure.is_some() || self.native_failure.is_some() {
+                return SolveResult::Unknown;
+            }
+            if self.observing() {
+                if !self.native_event_payload(0, 0) {
+                    return SolveResult::Unknown;
+                }
+                self.emit(SolverEvent::SolveBegin {
+                    conflicts: self.conflicts,
+                    conflict_budget: self.conflict_budget,
+                });
+            }
+            if self.event_failure.is_some() || self.native_failure.is_some() {
+                return SolveResult::Unknown;
+            }
+            let result = self.solve_with_lazy_clauses_inner(trigger_vars, theory, trace);
+            if self.event_failure.is_some() || self.native_failure.is_some() {
+                return SolveResult::Unknown;
+            }
+            if self.observing() {
+                if !self.native_event_payload(16, 1) {
+                    return SolveResult::Unknown;
+                }
+                self.emit(SolverEvent::SolveEnd {
+                    result: format!("{result:?}"),
+                });
+            }
+            if !self.native_charge(NativeOperation::Entry, 0) {
+                return SolveResult::Unknown;
+            }
+            if self.event_failure.is_some() || self.native_failure.is_some() {
+                SolveResult::Unknown
+            } else {
+                result
+            }
+        })();
+        self.trace_solve_phase(trace, "solve_return", Some(result));
+        result
+    }
+
+    /// Exact buffer ownership at this point, excluding allocator overhead and
+    /// everything outside this solver. Capacity bytes are not resident bytes.
+    /// The glibc/process observations are captured before allocating the JSON.
+    fn storage_inventory(&self) -> serde_json::Value {
+        #[cfg(all(target_os = "linux", target_env = "gnu"))]
+        let allocator = {
+            // SAFETY: mallinfo2 takes no pointers and returns process allocator
+            // counters by value. This does not inspect or modify allocations.
+            let info = unsafe { libc::mallinfo2() };
+            serde_json::json!({"backend":"glibc_mallinfo2",
+                "arena_bytes":info.arena,"in_use_arena_bytes":info.uordblks,
+                "mmap_bytes":info.hblkhd,"free_arena_bytes":info.fordblks})
+        };
+        #[cfg(not(all(target_os = "linux", target_env = "gnu")))]
+        let allocator = serde_json::Value::Null;
+        let process_status: Option<Vec<String>> = std::fs::read_to_string("/proc/self/status")
+            .ok()
+            .map(|raw| {
+                raw.lines()
+                    .filter(|line| {
+                        [
+                            "VmSize:", "VmRSS:", "VmHWM:", "RssAnon:", "RssFile:", "VmSwap:",
+                        ]
+                        .iter()
+                        .any(|prefix| line.starts_with(prefix))
+                    })
+                    .map(str::to_owned)
+                    .collect()
             });
+        let mut components = std::collections::BTreeMap::from([
+            ("clause_arena", capacity_bytes(&self.arena)),
+            ("clause_offsets", capacity_bytes(&self.clause_at)),
+            ("detached_flags", capacity_bytes(&self.detached)),
+            ("watch_headers", capacity_bytes(&self.watches)),
+            (
+                "watch_entries",
+                self.watches.iter().map(capacity_bytes).sum(),
+            ),
+            ("xor_row_headers", capacity_bytes(&self.xors)),
+            (
+                "xor_row_masks",
+                self.xors.iter().map(|row| capacity_bytes(&row.mask)).sum(),
+            ),
+            ("xor_matrix", capacity_bytes(&self.matrix)),
+            ("xor_matrix_rhs", capacity_bytes(&self.matrix_rhs)),
+            ("xor_support_headers", capacity_bytes(&self.matrix_support)),
+            (
+                "xor_support_words",
+                self.matrix_support.iter().map(capacity_bytes).sum(),
+            ),
+            (
+                "xor_support_scratch",
+                capacity_bytes(&self.xor_support_src) + capacity_bytes(&self.xor_support_merge),
+            ),
+            ("xor_reason_headers", capacity_bytes(&self.xor_reason)),
+            (
+                "xor_reason_literals",
+                self.xor_reason.iter().map(capacity_bytes).sum(),
+            ),
+            ("xor_conflict", capacity_bytes(&self.xor_conflict)),
+            ("xor_pivots", capacity_bytes(&self.pivot)),
+            ("xor_row_scratch", capacity_bytes(&self.xor_src)),
+            ("literal_values", capacity_bytes(&self.values)),
+            (
+                "assignment_bitsets",
+                capacity_bytes(&self.assigned_w) + capacity_bytes(&self.value_w),
+            ),
+            (
+                "levels_and_reasons",
+                capacity_bytes(&self.level) + capacity_bytes(&self.reason),
+            ),
+            (
+                "phase_and_activity",
+                capacity_bytes(&self.saved_phase) + capacity_bytes(&self.activity),
+            ),
+            (
+                "trail",
+                capacity_bytes(&self.trail) + capacity_bytes(&self.trail_lim),
+            ),
+            (
+                "analysis_scratch",
+                capacity_bytes(&self.seen)
+                    + capacity_bytes(&self.seen_stack)
+                    + capacity_bytes(&self.redundant_stack)
+                    + capacity_bytes(&self.learnt_buf),
+            ),
+            (
+                "branch_heap",
+                capacity_bytes(&self.order.heap)
+                    + capacity_bytes(&self.order.pos)
+                    + capacity_bytes(&self.branch_priority)
+                    + capacity_bytes(&self.heap_key),
+            ),
+        ]);
+        // Admission refusals retain the actual in-flight allocations. They
+        // remain solver-owned even while moved out of their ordinary slots.
+        if self.native_admission.is_some()
+            || self.native_pending_model.is_some()
+            || self.native_pending_watch.is_some()
+            || self.native_pending_clause.is_some()
+            || self.native_pending_reduction.is_some()
+            || self.native_sort_scratch.capacity() != 0
+        {
+            components.extend([
+                (
+                    "native_pending_model",
+                    self.native_pending_model.as_ref().map_or(0, capacity_bytes),
+                ),
+                (
+                    "native_pending_watch",
+                    self.native_pending_watch
+                        .as_ref()
+                        .map_or(0, |(_, buffer, _, _)| capacity_bytes(buffer)),
+                ),
+                (
+                    "native_sort_scratch",
+                    capacity_bytes(&self.native_sort_scratch),
+                ),
+                (
+                    "native_pending_clause",
+                    self.native_pending_clause
+                        .as_ref()
+                        .map_or(0, capacity_bytes),
+                ),
+                (
+                    "native_pending_reduction_locked",
+                    self.native_pending_reduction
+                        .as_ref()
+                        .map_or(0, |(locked, _)| capacity_bytes(locked)),
+                ),
+                (
+                    "native_pending_reduction_candidates",
+                    self.native_pending_reduction
+                        .as_ref()
+                        .map_or(0, |(_, candidates)| capacity_bytes(candidates)),
+                ),
+            ]);
         }
-        if self.event_failure.is_some() {
-            return SolveResult::Unknown;
+        if self.event_clause_ids.capacity() != 0 {
+            components.insert("event_clause_ids", capacity_bytes(&self.event_clause_ids));
         }
-        let result = self.solve_with_lazy_clauses_inner(trigger_vars, theory);
-        if self.event_failure.is_some() {
-            return SolveResult::Unknown;
+        let mut original_words = 0u64;
+        let mut active_learnt_words = 0u64;
+        let mut detached_learnt_words = 0u64;
+        let mut detached_learnt_clauses = 0u64;
+        for (index, &offset) in self.clause_at.iter().enumerate() {
+            let words = 1 + clause_in(&self.arena, offset).len() as u64;
+            if index < self.n_orig_clauses {
+                original_words += words;
+            } else if self.detached.get(index).copied().unwrap_or(false) {
+                detached_learnt_words += words;
+                detached_learnt_clauses += 1;
+            } else {
+                active_learnt_words += words;
+            }
         }
-        if self.observing() {
-            self.emit(SolverEvent::SolveEnd {
-                result: format!("{result:?}"),
+        serde_json::json!({"schema":"n83.sat-storage/v1",
+            "scope":"owned Vec buffer capacities, not RSS or allocator usable sizes; allocator/process counters include non-solver storage",
+            "components_capacity_bytes":components,
+            "owned_capacity_bytes":components.values().sum::<u64>(),
+            "arena_used_words":self.arena.len(),"arena_capacity_words":self.arena.capacity(),
+            "arena_reclamations":self.stats.arena_reclamations,
+            "arena_reclaimed_words":self.stats.arena_reclaimed_words,
+            "literal_word_bytes":std::mem::size_of::<Lit>(),
+            "original_clause_words":original_words,"active_learnt_clause_words":active_learnt_words,
+            "detached_learnt_clause_words":detached_learnt_words,
+            "stored_clauses":self.clause_at.len(),"original_clauses":self.n_orig_clauses,
+            "detached_learnt_clauses":detached_learnt_clauses,
+            "allocator":allocator,"worker_pid_in_namespace":std::process::id(),
+            "worker_process_status":process_status})
+    }
+
+    /// Opt-in diagnostic snapshots. Timers and counters are cumulative for this
+    /// solver instance; elapsed time is relative to this particular solve call.
+    /// Writing only at boundaries and every 1,000 conflicts avoids a per-step
+    /// trace cost. Ownership snapshots add a read-only scan at solve boundaries
+    /// and every 10,000 conflicts. A killed worker's last snapshot is not terminal.
+    fn trace_solve_phase(
+        &self,
+        started: Option<std::time::Instant>,
+        phase: &str,
+        outcome: Option<SolveResult>,
+    ) {
+        if let Some(started) = started {
+            use std::io::Write;
+            let storage =
+                storage_snapshot_due(phase, self.stats.conflicts).then(|| self.storage_inventory());
+            let record = serde_json::json!({
+                "schema":"n83.sat-phase/v1", "phase":phase,
+                "elapsed_ms":started.elapsed().as_secs_f64()*1000.0,
+                "outcome":outcome.map(|v| format!("{v:?}")),
+                "counter_scope":"solver_instance_cumulative",
+                "conflicts":self.stats.conflicts, "decisions":self.stats.decisions,
+                "propagations":self.stats.propagations, "xor_passes":self.stats.xor_passes,
+                "xor_propagations":self.stats.xor_propagations,
+                "ns_propagate_clauses":self.stats.ns_propagate_clauses,
+                "ns_propagate_xors":self.stats.ns_propagate_xors,
+                "ns_analyze":self.stats.ns_analyze, "ns_minimize":self.stats.ns_minimize,
+                "ns_reduce_db":self.stats.ns_reduce_db,
+                "storage":storage,
             });
-        }
-        if self.event_failure.is_some() {
-            SolveResult::Unknown
-        } else {
-            result
+            let mut stderr = std::io::stderr().lock();
+            let _ = writeln!(stderr, "{record}");
+            let _ = stderr.flush();
         }
     }
 
@@ -2589,6 +4205,7 @@ impl Solver {
         &mut self,
         trigger_vars: &[u32],
         theory: &mut F,
+        trace: Option<std::time::Instant>,
     ) -> SolveResult
     where
         F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
@@ -2603,8 +4220,14 @@ impl Solver {
         self.backjump(0);
         // Initial propagation at level 0 catches trivial UNSAT from
         // unit clauses.
-        if let Some(conflict) = self.propagate() {
+        self.trace_solve_phase(trace, "initial_propagation_begin", None);
+        let initial_conflict = self.propagate();
+        self.trace_solve_phase(trace, "initial_propagation_complete", None);
+        if let Some(conflict) = initial_conflict {
             if self.observing() {
+                if !self.native_conflict_payload(conflict, 0) {
+                    return SolveResult::Unknown;
+                }
                 let (reason, literals) = self.conflict_event(conflict, 0);
                 self.emit(SolverEvent::Conflict {
                     level: self.trail_lim.len(),
@@ -2614,7 +4237,7 @@ impl Solver {
             }
             return SolveResult::Unsat;
         }
-        if self.event_failure.is_some() {
+        if (self.event_failure.is_some() || self.native_failure.is_some()) {
             return SolveResult::Unknown;
         }
         if self.max_learnts == 0 {
@@ -2622,12 +4245,28 @@ impl Solver {
         }
         // The detached flags extended over the clauses, a word per 64.
         self.stats.word_ops += (self.clause_at.len() as u64).div_ceil(64);
-        self.detached.resize(self.clause_at.len(), false);
+        if !native_reserve(
+            &mut self.detached,
+            self.clause_at.len(),
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::DetachedGrowth,
+        ) {
+            return SolveResult::Unknown;
+        }
+        if !self.native_fill_detached(self.clause_at.len()) {
+            return SolveResult::Unknown;
+        }
         let mut luby_index = 1u64;
         let mut restart_limit = 100u64 * luby(luby_index);
         let mut pending_conflict = None;
+        self.trace_solve_phase(trace, "cdcl_enter", None);
         loop {
-            if self.event_failure.is_some() {
+            if !self.native_charge(NativeOperation::Loop, 64) {
+                return SolveResult::Unknown;
+            }
+            if (self.event_failure.is_some() || self.native_failure.is_some()) {
                 return SolveResult::Unknown;
             }
             if self
@@ -2637,7 +4276,14 @@ impl Solver {
                 return SolveResult::Unknown;
             }
             if let Some(conflict_idx) = pending_conflict.take().or_else(|| self.propagate()) {
+                if self.native_admission.is_some() {
+                    self.native_failure = Some(NativeAdmissionFailure::UncoveredPath);
+                    return SolveResult::Unknown;
+                }
                 if self.observing() {
+                    if !self.native_conflict_payload(conflict_idx, 0) {
+                        return SolveResult::Unknown;
+                    }
                     let (reason, literals) = self.conflict_event(conflict_idx, 0);
                     self.emit(SolverEvent::Conflict {
                         level: self.trail_lim.len(),
@@ -2645,7 +4291,7 @@ impl Solver {
                         literals,
                     });
                 }
-                if self.event_failure.is_some() {
+                if (self.event_failure.is_some() || self.native_failure.is_some()) {
                     return SolveResult::Unknown;
                 }
                 self.conflicts += 1;
@@ -2654,6 +4300,11 @@ impl Solver {
                     progress
                         .conflicts
                         .store(self.stats.conflicts, Ordering::Relaxed);
+                }
+                if trace.is_some()
+                    && (self.stats.conflicts == 1 || self.stats.conflicts % 1000 == 0)
+                {
+                    self.trace_solve_phase(trace, "conflict_snapshot", None);
                 }
                 let lvl = self.trail_lim.len() as u64;
                 self.stats.conflict_level_sum += lvl;
@@ -2673,24 +4324,39 @@ impl Solver {
                 }
                 self.progress_phase(SolverProgressPhase::ConflictAnalysis);
                 let t = std::time::Instant::now();
-                let (learnt, bj_level) = self.analyze(conflict_idx);
+                let Some((learnt, bj_level)) = self.analyze_for_search(conflict_idx) else {
+                    return SolveResult::Unknown;
+                };
                 self.stats.ns_analyze += t.elapsed().as_nanos() as u64;
                 if self.observing() {
+                    if !self.native_event_payload(learnt.len(), std::mem::size_of::<Lit>()) {
+                        self.native_pending_clause = Some(learnt);
+                        return SolveResult::Unknown;
+                    }
                     self.emit(SolverEvent::Learned {
-                        clause_id: self.next_cref(),
+                        clause_id: self.event_clause_id(self.next_cref()),
                         literals: learnt.clone(),
                         backjump_level: bj_level,
                     });
                 }
-                if self.event_failure.is_some() {
+                if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                    self.native_pending_clause = Some(learnt);
                     return SolveResult::Unknown;
                 }
                 self.backjump(bj_level);
+                if self.native_failure.is_some() || self.native_observer_refused() {
+                    self.native_pending_clause = Some(learnt);
+                    return SolveResult::Unknown;
+                }
                 self.progress_phase(SolverProgressPhase::Idle);
                 // Install the learnt clause.
                 if learnt.len() == 1 {
                     // It's a unit at the backjump level (which is 0).
                     let _ = self.enqueue(learnt[0], Reason::Propagated(self.next_cref()));
+                    if self.native_failure.is_some() || self.native_observer_refused() {
+                        self.native_pending_clause = Some(learnt);
+                        return SolveResult::Unknown;
+                    }
                     self.push_clause(&learnt);
                 } else {
                     self.stats.learnt_clauses += 1;
@@ -2698,8 +4364,32 @@ impl Solver {
                     let l1 = learnt[1];
                     // The two watchers; the arena push charges itself.
                     self.stats.word_ops += 2;
-                    let idx = self.push_clause(&learnt);
                     let (w0, w1) = (self.watch_slot(l0), self.watch_slot(l1));
+                    let n0 = self.watches[w0].len() + 2;
+                    let n1 = self.watches[w1].len() + 2;
+                    if !native_reserve(
+                        &mut self.watches[w0],
+                        n0,
+                        &mut self.native_admission,
+                        &mut self.native_failure,
+                        self.deadline,
+                        NativeOperation::WatchGrowth,
+                    ) || !native_reserve(
+                        &mut self.watches[w1],
+                        n1,
+                        &mut self.native_admission,
+                        &mut self.native_failure,
+                        self.deadline,
+                        NativeOperation::WatchGrowth,
+                    ) {
+                        self.native_pending_clause = Some(learnt);
+                        return SolveResult::Unknown;
+                    }
+                    let idx = self.push_clause(&learnt);
+                    if self.native_failure.is_some() || self.native_observer_refused() {
+                        self.native_pending_clause = Some(learnt);
+                        return SolveResult::Unknown;
+                    }
                     self.watches[w0].push(Watcher {
                         cref: idx,
                         blocker: l1,
@@ -2712,16 +4402,32 @@ impl Solver {
                     // implied at the new (lower) level.
                     let _ = self.enqueue(l0, Reason::Propagated(idx));
                 }
+                if self.native_failure.is_some() || self.native_observer_refused() {
+                    self.native_pending_clause = Some(learnt);
+                    return SolveResult::Unknown;
+                }
                 // Restart?
                 if self.conflicts_since_restart >= restart_limit {
+                    if !self.native_charge(NativeOperation::Restart, 128) {
+                        return SolveResult::Unknown;
+                    }
                     if self.observing() {
+                        if !self.native_event_payload(0, 0) {
+                            return SolveResult::Unknown;
+                        }
                         self.emit(SolverEvent::Restart {
                             restart: self.stats.restarts + 1,
                             conflicts: self.conflicts,
                         });
                     }
+                    if self.native_observer_refused() {
+                        return SolveResult::Unknown;
+                    }
                     self.progress_phase(SolverProgressPhase::Restart);
                     self.backjump(0);
+                    if self.native_failure.is_some() || self.native_observer_refused() {
+                        return SolveResult::Unknown;
+                    }
                     self.stats.restarts += 1;
                     // The restart's own bookkeeping: the limit tests, and
                     // the Luby recurrence's at most `⌈log₂ i⌉` steps.
@@ -2731,12 +4437,18 @@ impl Solver {
                     // fill-in in the parity matrix.
                     if !self.xors.is_empty() {
                         self.rebuild_matrix();
+                        if self.native_failure.is_some() || self.native_observer_refused() {
+                            return SolveResult::Unknown;
+                        }
                         self.xor_epoch = u64::MAX;
                     }
                     let learnt_now = self.clause_at.len() - self.n_orig_clauses;
                     if learnt_now > self.max_learnts {
                         let t = std::time::Instant::now();
                         self.reduce_db();
+                        if self.native_failure.is_some() || self.native_observer_refused() {
+                            return SolveResult::Unknown;
+                        }
                         self.stats.ns_reduce_db += t.elapsed().as_nanos() as u64;
                         // Let the budget grow, so reductions get rarer
                         // as the solve goes deeper.
@@ -2752,7 +4464,7 @@ impl Solver {
                     self.progress_phase(SolverProgressPhase::Idle);
                 }
             } else {
-                if self.event_failure.is_some() {
+                if (self.event_failure.is_some() || self.native_failure.is_some()) {
                     return SolveResult::Unknown;
                 }
                 // Through the `n_vars`-long assignment, so a trigger past the
@@ -2800,7 +4512,9 @@ impl Solver {
                                     return SolveResult::Unsat;
                                 }
                             }
-                            self.detached.resize(self.clause_at.len(), false);
+                            if !self.native_fill_detached(self.clause_at.len()) {
+                                return SolveResult::Unknown;
+                            }
                         } else {
                             for clause in normalized {
                                 let conflict = self.add_lazy_clause_at_current_level(clause);
@@ -2815,10 +4529,26 @@ impl Solver {
                 // No conflict — pick a new variable.
                 self.progress_phase(SolverProgressPhase::BranchSelection);
                 match self.pick_branching_variable() {
-                    None => return SolveResult::Sat,
+                    None => {
+                        return if self.native_failure.is_some() || self.native_observer_refused() {
+                            SolveResult::Unknown
+                        } else {
+                            SolveResult::Sat
+                        }
+                    }
                     Some(v) => {
+                        let needed = self.trail_lim.len() + 1;
+                        if !native_reserve(
+                            &mut self.trail_lim,
+                            needed,
+                            &mut self.native_admission,
+                            &mut self.native_failure,
+                            self.deadline,
+                            NativeOperation::LevelGrowth,
+                        ) {
+                            return SolveResult::Unknown;
+                        }
                         self.stats.decisions += 1;
-                        // The level push and the saved phase.
                         self.stats.word_ops += 2;
                         self.trail_lim.push(self.trail.len());
                         let lit = if self.saved_phase[v as usize] {
@@ -2827,6 +4557,9 @@ impl Solver {
                             -((v + 1) as i32)
                         };
                         if self.observing() {
+                            if !self.native_event_payload(0, 0) {
+                                return SolveResult::Unknown;
+                            }
                             self.emit(SolverEvent::Decision {
                                 literal: lit,
                                 level: self.trail_lim.len(),
@@ -2835,7 +4568,7 @@ impl Solver {
                                 priority: self.branch_priority[v as usize],
                             });
                         }
-                        if self.event_failure.is_some() {
+                        if (self.event_failure.is_some() || self.native_failure.is_some()) {
                             return SolveResult::Unknown;
                         }
                         self.assign(lit, Reason::Decision);
@@ -2934,6 +4667,353 @@ impl Solver {
 
     pub fn n_clauses(&self) -> usize {
         self.clause_at.len()
+    }
+
+    /// Attach once without replacing the existing event observer or deadline.
+    /// This increment supports only the audited conflict-free CNF subset.
+    pub fn set_search_admission(
+        &mut self,
+        mut hook: impl FnMut(NativeCharge) -> Result<(), NativeAdmissionFailure> + Send + Sync + 'static,
+    ) -> Result<(), NativeAdmissionFailure> {
+        if self.native_admission.is_some()
+            || self.native_failure.is_some()
+            || self.stats.decisions != 0
+            || self.conflicts != 0
+            || !self.trail_lim.is_empty()
+        {
+            return Err(NativeAdmissionFailure::UncoveredPath);
+        }
+        if self
+            .deadline
+            .is_some_and(|d| std::time::Instant::now() >= d)
+        {
+            self.native_failure = Some(NativeAdmissionFailure::Deadline);
+            return Err(NativeAdmissionFailure::Deadline);
+        }
+        let charge = NativeCharge {
+            operation: NativeOperation::Entry,
+            work: 1,
+            requested_replacement_bytes: std::mem::size_of_val(&hook) as u64,
+        };
+        if let Err(error) = hook(charge) {
+            self.native_failure = Some(error);
+            return Err(error);
+        }
+        if self
+            .deadline
+            .is_some_and(|d| std::time::Instant::now() >= d)
+        {
+            self.native_failure = Some(NativeAdmissionFailure::Deadline);
+            return Err(NativeAdmissionFailure::Deadline);
+        }
+        self.native_admission = Some(Box::new(hook));
+        Ok(())
+    }
+
+    pub fn search_admission_failure(&self) -> Option<NativeAdmissionFailure> {
+        self.native_failure
+    }
+
+    fn native_charge(&mut self, op: NativeOperation, work: u64) -> bool {
+        if self.native_observer_refused() {
+            return false;
+        }
+        native_pay(
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            op,
+            work,
+            0,
+        )
+    }
+
+    fn native_observer_refused(&self) -> bool {
+        self.native_admission.is_some() && self.event_failure.is_some()
+    }
+
+    fn native_fill_detached(&mut self, length: usize) -> bool {
+        if self.native_admission.is_none() {
+            self.detached.resize(length, false);
+            return true;
+        }
+        while self.detached.len() < length {
+            let end = self.detached.len().saturating_add(64).min(length);
+            if !self.native_charge(
+                NativeOperation::DetachedGrowth,
+                (end - self.detached.len()) as u64,
+            ) {
+                return false;
+            }
+            self.detached.resize(end, false);
+        }
+        self.detached.truncate(length);
+        true
+    }
+
+    fn native_event_payload(&mut self, elements: usize, element_bytes: usize) -> bool {
+        let Some(bytes) = elements
+            .checked_mul(element_bytes)
+            .and_then(|b| b.checked_add(128))
+            .and_then(|b| u64::try_from(b).ok())
+        else {
+            self.native_failure = Some(NativeAdmissionFailure::Overflow);
+            return false;
+        };
+        native_pay(
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::EventPayload,
+            elements as u64 + 32,
+            bytes,
+        )
+    }
+
+    fn native_conflict_payload(&mut self, conflict: Conflict, resolved: Lit) -> bool {
+        let n = match conflict {
+            Conflict::Clause(id) => clause_in(&self.arena, id).len(),
+            Conflict::Xor if resolved == 0 => self.xor_conflict.len(),
+            Conflict::Xor => self.xor_reason[var_of(resolved) as usize].len(),
+        };
+        let copies = if matches!(conflict, Conflict::Xor) {
+            2
+        } else {
+            1
+        };
+        match n.checked_mul(copies) {
+            Some(n) => self.native_event_payload(n, std::mem::size_of::<Lit>()),
+            None => {
+                self.native_failure = Some(NativeAdmissionFailure::Overflow);
+                false
+            }
+        }
+    }
+
+    fn native_assignment_payload(&mut self, reason: Reason, variable: usize) -> bool {
+        let n = if matches!(reason, Reason::XorPropagated) {
+            self.xor_reason[variable].len()
+        } else {
+            0
+        };
+        self.native_event_payload(n, std::mem::size_of::<Lit>())
+    }
+
+    fn native_lowest(&mut self, row: std::ops::Range<usize>) -> Result<Option<u32>, ()> {
+        for (w, index) in row.enumerate() {
+            if !self.native_charge(NativeOperation::XorWord, 4) {
+                return Err(());
+            }
+            let free = self.matrix[index] & !self.assigned_w[w];
+            if free != 0 {
+                return Ok(Some((w * 64) as u32 + free.trailing_zeros()));
+            }
+        }
+        Ok(None)
+    }
+
+    fn native_residual(&mut self, i: usize, words: usize) -> Result<bool, ()> {
+        let mut parity = self.matrix_rhs[i];
+        for w in 0..words {
+            if !self.native_charge(NativeOperation::XorWord, 8) {
+                return Err(());
+            }
+            let m = self.matrix[i * words + w];
+            parity ^= ((m & self.assigned_w[w] & self.value_w[w]).count_ones() & 1) == 1;
+        }
+        Ok(parity)
+    }
+
+    fn native_reason(
+        &mut self,
+        row: std::ops::Range<usize>,
+        implied: Option<Lit>,
+        clause: &mut Vec<Lit>,
+    ) -> bool {
+        clause.clear();
+        if let Some(l) = implied {
+            clause.push(l);
+        }
+        for (w, index) in row.enumerate() {
+            if !self.native_charge(NativeOperation::XorReason, 8) {
+                return false;
+            }
+            let mut bits = self.matrix[index] & self.assigned_w[w];
+            let value = self.value_w[w];
+            while bits != 0 {
+                if !self.native_charge(NativeOperation::XorReason, 4) {
+                    return false;
+                }
+                let b = bits.trailing_zeros();
+                bits &= bits - 1;
+                let v = ((w * 64) as u32 + b + 1) as Lit;
+                clause.push(if (value >> b) & 1 == 1 { -v } else { v });
+            }
+        }
+        true
+    }
+
+    /// Stable descending clause-length order with admitted comparisons/copies.
+    /// Partial scratch remains owned on every refusal.
+    fn native_clause_sort(&mut self, candidates: &mut Vec<usize>) -> bool {
+        if self.native_admission.is_none() {
+            candidates.sort_by_key(|&i| {
+                std::cmp::Reverse(clause_in(&self.arena, self.clause_at[i]).len())
+            });
+            return true;
+        }
+        let n = candidates.len();
+        if !native_reserve(
+            &mut self.native_sort_scratch,
+            n,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::Reduction,
+        ) {
+            return false;
+        }
+        self.native_sort_scratch.clear();
+        for _ in 0..n {
+            if !self.native_charge(NativeOperation::Reduction, 1) {
+                return false;
+            }
+            self.native_sort_scratch.push(0);
+        }
+        let mut width = 1usize;
+        while width < n {
+            let mut start = 0usize;
+            while start < n {
+                let middle = start.saturating_add(width).min(n);
+                let end = middle.saturating_add(width).min(n);
+                let (mut left, mut right) = (start, middle);
+                for dest in start..end {
+                    if !self.native_charge(NativeOperation::Reduction, 8) {
+                        return false;
+                    }
+                    let take_left = right == end
+                        || (left < middle
+                            && clause_in(&self.arena, self.clause_at[candidates[left]]).len()
+                                >= clause_in(&self.arena, self.clause_at[candidates[right]]).len());
+                    self.native_sort_scratch[dest] = if take_left {
+                        let v = candidates[left];
+                        left += 1;
+                        v
+                    } else {
+                        let v = candidates[right];
+                        right += 1;
+                        v
+                    };
+                }
+                start = end;
+            }
+            std::mem::swap(candidates, &mut self.native_sort_scratch);
+            width = width.saturating_mul(2);
+        }
+        true
+    }
+
+    fn native_entry(&mut self, theory: bool) -> bool {
+        if !self.native_charge(NativeOperation::Entry, 32) {
+            return false;
+        }
+        if self.native_admission.is_some()
+            && (self.event_observer.is_some()
+                || !self.xors.is_empty()
+                || theory
+                || !self.trail_lim.is_empty())
+        {
+            self.native_failure = Some(NativeAdmissionFailure::UncoveredPath);
+            return false;
+        }
+        true
+    }
+
+    /// Prepaid copy of the actual native assignment; no second solver/model.
+    pub fn admitted_model(&mut self) -> Option<Vec<bool>> {
+        if !self.native_charge(NativeOperation::Model, self.n_vars as u64) {
+            return None;
+        }
+        let mut model = Vec::new();
+        if !native_reserve(
+            &mut model,
+            self.n_vars as usize,
+            &mut self.native_admission,
+            &mut self.native_failure,
+            self.deadline,
+            NativeOperation::Model,
+        ) {
+            return None;
+        }
+        for start in (0..self.n_vars as usize).step_by(64) {
+            let end = start.saturating_add(64).min(self.n_vars as usize);
+            if !self.native_charge(NativeOperation::Model, (end - start) as u64) {
+                self.native_pending_model = Some(model);
+                return None;
+            }
+            model.extend(
+                self.assignment()[start..end]
+                    .iter()
+                    .map(|a| a.unwrap_or(false)),
+            );
+        }
+        if !self.native_charge(NativeOperation::Model, 0) {
+            self.native_pending_model = Some(model);
+            return None;
+        }
+        Some(model)
+    }
+
+    /// Own both actual minimization buffers through every admission boundary.
+    fn minimize_for_search(
+        &mut self,
+        mut learnt: Vec<Lit>,
+        abstract_levels: u32,
+    ) -> Option<Vec<Lit>> {
+        let mut stack = std::mem::take(&mut self.redundant_stack);
+        let mut w = 0usize;
+        for r in 0..learnt.len() {
+            // Decision reasons skip lit_redundant, but still perform real work.
+            if !self.native_charge(NativeOperation::Analyze, 4) {
+                self.redundant_stack = stack;
+                self.learnt_buf = learnt;
+                return None;
+            }
+            let q = learnt[r];
+            let v = var_of(q) as usize;
+            let redundant = !matches!(self.reason[v], Reason::Decision)
+                && self.lit_redundant(q, abstract_levels, &mut stack);
+            if self.native_failure.is_some() || self.native_observer_refused() {
+                self.redundant_stack = stack;
+                self.learnt_buf = learnt;
+                return None;
+            }
+            if !redundant {
+                learnt[w] = q;
+                w += 1;
+            }
+        }
+        learnt.truncate(w);
+        self.redundant_stack = stack;
+        Some(learnt)
+    }
+
+    /// 1-UIP conflict analysis. Returns `(learnt_clause, backjump_level)`.
+    ///
+    /// The `seen` marks are cleared through `seen_stack` rather than by
+    /// re-zeroing a per-variable vector, and reason clauses are copied
+    /// into a reused buffer rather than cloned — both were per-conflict
+    /// allocations on a path taken millions of times.
+    /// Search boundary preserves analysis-owned partial output on refusal.
+    fn analyze_for_search(&mut self, conflict: Conflict) -> Option<(Vec<Lit>, i32)> {
+        let result = self.analyze(conflict);
+        if self.native_failure.is_some() || self.native_observer_refused() {
+            if self.native_pending_clause.is_none() && !result.0.is_empty() {
+                self.native_pending_clause = Some(result.0);
+            }
+            return None;
+        }
+        Some(result)
     }
 }
 
@@ -3736,6 +5816,70 @@ mod tests {
         assert!(sat > 0 && unsat > 0, "sat={sat} unsat={unsat}");
     }
 
+    #[test]
+    fn storage_inventory_partitions_clause_words_and_nested_buffers() {
+        let mut s = Solver::new(8);
+        s.add_clause(vec![1, 2, 3]);
+        s.add_clause(vec![-1, 4]);
+        let originals = s.arena.len() as u64;
+        s.push_clause(&[2, 4, 5, 6]);
+        s.push_clause(&[-2, 7]);
+        s.detached.resize(s.clause_at.len(), false);
+        s.detached[s.n_orig_clauses] = true;
+        s.xor_reason[0] = Vec::with_capacity(19);
+        let inventory = s.storage_inventory();
+        assert_eq!(inventory["original_clause_words"], originals);
+        assert_eq!(inventory["active_learnt_clause_words"], 3);
+        assert_eq!(inventory["detached_learnt_clause_words"], 5);
+        assert_eq!(inventory["detached_learnt_clauses"], 1);
+        assert_eq!(inventory["arena_used_words"], originals + 8);
+        let components = inventory["components_capacity_bytes"].as_object().unwrap();
+        assert_eq!(components["clause_arena"], capacity_bytes(&s.arena));
+        assert_eq!(components["xor_reason_literals"], 19 * 4);
+        assert_eq!(
+            inventory["owned_capacity_bytes"].as_u64().unwrap(),
+            components
+                .values()
+                .map(|v| v.as_u64().unwrap())
+                .sum::<u64>()
+        );
+    }
+
+    #[test]
+    fn storage_observation_leaves_the_search_and_model_unchanged() {
+        let clauses = [vec![1, 2], vec![-1, 3], vec![-2, -3]];
+        let build = || {
+            let mut solver = Solver::new(4);
+            for clause in &clauses {
+                solver.add_clause(clause.clone());
+            }
+            solver.add_xor(&[2, 3, 4], true);
+            solver
+        };
+        let mut observed = build();
+        let mut reference = build();
+        let before_arena = observed.arena.clone();
+        let before_capacity = observed.arena.capacity();
+        let _ = observed.storage_inventory();
+        assert_eq!(observed.arena, before_arena);
+        assert_eq!(observed.arena.capacity(), before_capacity);
+        assert_eq!(observed.solve(), reference.solve());
+        assert_eq!(observed.model(), reference.model());
+        assert_eq!(observed.stats.conflicts, reference.stats.conflicts);
+        assert_eq!(observed.stats.decisions, reference.stats.decisions);
+        assert_eq!(observed.stats.propagations, reference.stats.propagations);
+        assert!(check_model(&clauses, &observed.model()));
+    }
+
+    #[test]
+    fn storage_sampling_is_limited_to_boundaries_and_ten_thousand_conflicts() {
+        assert!(storage_snapshot_due("solve_enter", 0));
+        assert!(storage_snapshot_due("solve_return", 450_000));
+        assert!(storage_snapshot_due("conflict_snapshot", 10_000));
+        assert!(!storage_snapshot_due("conflict_snapshot", 1_000));
+        assert!(!storage_snapshot_due("initial_propagation_complete", 0));
+    }
+
     // ── native XOR reasoning ────────────────────────────────────────
 
     /// `x₁ ⊕ x₂ = 1` and `x₂ ⊕ x₃ = 1` and `x₁ ⊕ x₃ = 1` is the odd-
@@ -3889,6 +6033,107 @@ mod tests {
     ///
     /// A silent incompleteness here would show up as a missed
     /// propagation, not a crash, so it is worth checking explicitly.
+    #[test]
+    fn indexed_words_match_dense_across_growth_and_blocking() {
+        let mut rng = 0x83a9_47d2_1bce_7731u64;
+        fn next(rng: &mut u64) -> u64 {
+            *rng ^= *rng << 13;
+            *rng ^= *rng >> 7;
+            *rng ^= *rng << 17;
+            *rng
+        }
+        for n in [1u32, 63, 64, 65, 127, 130] {
+            for _ in 0..12 {
+                let mut dense = Solver::new(n);
+                dense.set_indexed_xors(false);
+                let mut indexed = Solver::new(n);
+                let truth: Vec<bool> = (0..n).map(|_| next(&mut rng) & 1 != 0).collect();
+                for _ in 0..40 {
+                    let vars: Vec<u32> = (0..5)
+                        .map(|_| 1 + (next(&mut rng) % n as u64) as u32)
+                        .collect();
+                    let rhs = vars.iter().fold(false, |p, &v| p ^ truth[v as usize - 1]);
+                    assert_eq!(dense.add_xor(&vars, rhs), indexed.add_xor(&vars, rhs));
+                }
+                for _ in 0..40 {
+                    let mut clause: Vec<Lit> = (0..4)
+                        .map(|_| {
+                            let v = (1 + next(&mut rng) % n as u64) as Lit;
+                            if next(&mut rng) & 1 == 0 {
+                                v
+                            } else {
+                                -v
+                            }
+                        })
+                        .collect();
+                    if !clause
+                        .iter()
+                        .any(|&l| truth[l.unsigned_abs() as usize - 1] == (l > 0))
+                    {
+                        clause[0] = -clause[0];
+                    }
+                    assert_eq!(dense.add_clause(clause.clone()), indexed.add_clause(clause));
+                }
+                for _ in 0..3 {
+                    dense.conflict_budget = 1000;
+                    indexed.conflict_budget = 1000;
+                    let a = dense.solve();
+                    let b = indexed.solve();
+                    assert_eq!(a, b, "width {n}");
+                    assert_eq!(dense.model(), indexed.model());
+                    assert_eq!(
+                        (
+                            dense.stats.conflicts,
+                            dense.stats.decisions,
+                            dense.stats.xor_row_ops,
+                            dense.stats.xor_passes,
+                            dense.stats.xor_reason_lits
+                        ),
+                        (
+                            indexed.stats.conflicts,
+                            indexed.stats.decisions,
+                            indexed.stats.xor_row_ops,
+                            indexed.stats.xor_passes,
+                            indexed.stats.xor_reason_lits
+                        )
+                    );
+                    let words = bs_words(indexed.n_vars);
+                    for (i, support) in indexed.matrix_support.iter().enumerate() {
+                        let exact: Vec<_> = indexed.matrix[i * words..(i + 1) * words]
+                            .iter()
+                            .enumerate()
+                            .filter_map(|(w, &m)| (m != 0).then_some(w))
+                            .collect();
+                        assert_eq!(*support, exact);
+                    }
+                    if a != SolveResult::Sat {
+                        break;
+                    }
+                    let block: Vec<_> = dense
+                        .model()
+                        .iter()
+                        .enumerate()
+                        .map(|(v, &t)| if t { -((v + 1) as Lit) } else { (v + 1) as Lit })
+                        .collect();
+                    dense.reset_search();
+                    indexed.reset_search();
+                    assert_eq!(dense.add_clause(block.clone()), indexed.add_clause(block));
+                }
+                // Widen the already-used matrix across another word boundary.
+                dense.reset_search();
+                indexed.reset_search();
+                dense.add_vars(65);
+                indexed.add_vars(65);
+                assert_eq!(
+                    dense.add_xor(&[n, n + 1, n + 65], true),
+                    indexed.add_xor(&[n, n + 1, n + 65], true)
+                );
+                assert_eq!(dense.solve(), indexed.solve());
+                assert_eq!(dense.model(), indexed.model());
+            }
+        }
+    }
+
     #[test]
     fn incremental_matrix_matches_full_elimination() {
         let n_vars = 12u32;
@@ -4803,6 +7048,91 @@ mod tests {
         assert_eq!(digests, want, "search trace moved: {digests:#018x?}");
     }
 
+    #[test]
+    fn arena_reclamation_relocates_reasons_and_preserves_incremental_exports() {
+        fn fixture() -> Solver {
+            let mut s = Solver::new(6);
+            s.add_clause(vec![-1, 2, 5]);
+            s.add_clause(vec![-1, 2, -5]);
+            s.add_clause(vec![-2, 3]);
+            s.add_clause(vec![1]);
+            s.add_xor(&[3, 4], false);
+            // Implied by the original root unit, deliberately large enough
+            // to exercise both physical compaction and capacity shrinking.
+            s.push_clause(&vec![1; 20_000]);
+            let live = s.push_clause(&[2]);
+            s.detached.resize(s.clause_at.len(), false);
+            s.detached[s.n_orig_clauses] = true;
+            s.enqueue(2, Reason::Propagated(live)).unwrap();
+            s.reason[5] = Reason::Propagated(s.clause_at[s.n_orig_clauses]);
+            assert!(s.propagate().is_none());
+            s
+        }
+        let mut compact = fixture();
+        let mut retained = fixture();
+        let before = compact.arena.len();
+        let capacity = compact.arena.capacity();
+        let observed = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let sink = observed.clone();
+        compact
+            .set_event_observer(move |event| {
+                sink.lock().unwrap().push(event.clone());
+                Ok(())
+            })
+            .unwrap();
+        let initial_ids = compact.clause_at.clone();
+        for (i, cref) in compact.clause_at.iter().enumerate() {
+            assert_eq!(compact.event_clause_id(*cref), initial_ids[i]);
+        }
+        compact.reclaim_clause_arena();
+        compact.rebuild_clause_watches();
+        assert!(compact.arena.len() < before / 4);
+        assert!(compact.arena.capacity() < capacity);
+        assert_eq!(compact.clause_at.len(), retained.clause_at.len());
+        for (i, cref) in compact.clause_at.iter().enumerate() {
+            assert_eq!(compact.event_clause_id(*cref), initial_ids[i]);
+        }
+        // The next observed name is the old end, not a newly reused offset.
+        assert_eq!(compact.event_next_clause_id, before as u32);
+        assert!(compact.clause_at.windows(2).all(|w| w[0] < w[1]));
+        assert!(matches!(compact.reason[5], Reason::Decision));
+        match compact.reason[1] {
+            Reason::Propagated(c) => assert_eq!(clause_in(&compact.arena, c), &[2]),
+            _ => panic!("live reason lost"),
+        }
+        for s in [&mut compact, &mut retained] {
+            s.add_clause(vec![5, 6]);
+        }
+        fn exported_truth(s: &Solver) -> Vec<bool> {
+            (0..64)
+                .map(|bits| {
+                    s.clause_at.iter().take(s.n_orig_clauses).all(|&c| {
+                        clause_in(&s.arena, c)
+                            .iter()
+                            .any(|&l| ((bits >> var_of(l)) & 1 == 1) == (l > 0))
+                    })
+                })
+                .collect()
+        }
+        assert!(observed.lock().unwrap().iter().any(|event| matches!(
+            event, SolverEvent::Clause { clause_id, existing: false, .. }
+                if *clause_id == before as u32
+        )));
+        assert_eq!(exported_truth(&compact), exported_truth(&retained));
+        assert_eq!(compact.solve(), retained.solve());
+        assert_eq!(compact.model(), retained.model());
+        let mut replay = parse_dimacs(&to_dimacs(&compact)).unwrap();
+        assert_eq!(replay.solve(), SolveResult::Sat);
+        let mut replay_xor = parse_dimacs_xor(&to_dimacs_xor(&compact)).unwrap();
+        assert_eq!(replay_xor.solve(), SolveResult::Sat);
+        assert_eq!(compact.stats.arena_reclamations, 1);
+        // A second pass is harmless, including tombstones now in originals.
+        let after = compact.arena.clone();
+        compact.reset_search();
+        compact.reclaim_clause_arena();
+        assert_eq!(compact.arena, after);
+    }
+
     /// **The search trace is pinned across bitset word boundaries.**
     /// The flat parity matrix, the bit-read XOR reasons and the
     /// literal-indexed tables that `add_vars` re-centres are all laid out
@@ -4964,5 +7294,838 @@ mod tests {
         assert!(z.add_clause(vec![-1, 3]) && z.add_clause(vec![1]));
         assert_eq!(z.solve(), SolveResult::Sat);
         assert!(z.model()[0] && z.model()[2]);
+    }
+}
+
+/// CDCL SAT solver.
+
+/// Partial native admission increment. Not sufficient for owned binary SAT:
+/// observers, XOR, conflict analysis and incremental theories fail closed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NativeAdmissionFailure {
+    Work,
+    Bytes,
+    Deadline,
+    Allocation,
+    Overflow,
+    UncoveredPath,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NativeOperation {
+    Entry,
+    Loop,
+    WatchList,
+    Watcher,
+    Literal,
+    WatchGrowth,
+    Assignment,
+    TrailGrowth,
+    LevelGrowth,
+    DetachedGrowth,
+    Heap,
+    Model,
+    XorSetup,
+    XorGrowth,
+    XorPivot,
+    XorScan,
+    XorWord,
+    XorReason,
+    EventPayload,
+    Analyze,
+    AnalyzeGrowth,
+    ClauseGrowth,
+    Backjump,
+    Reduction,
+    Restart,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct NativeCharge {
+    pub operation: NativeOperation,
+    pub work: u64,
+    pub requested_replacement_bytes: u64,
+}
+
+type NativeAdmission =
+    Box<dyn FnMut(NativeCharge) -> Result<(), NativeAdmissionFailure> + Send + Sync>;
+
+fn native_pay(
+    hook: &mut Option<NativeAdmission>,
+    failure: &mut Option<NativeAdmissionFailure>,
+    deadline: Option<std::time::Instant>,
+    operation: NativeOperation,
+    work: u64,
+    bytes: u64,
+) -> bool {
+    if failure.is_some() {
+        return false;
+    }
+    if hook.is_none() {
+        return true;
+    }
+    if deadline.is_some_and(|d| std::time::Instant::now() >= d) {
+        *failure = Some(NativeAdmissionFailure::Deadline);
+        return false;
+    }
+    if let Err(e) = hook.as_mut().unwrap()(NativeCharge {
+        operation,
+        work,
+        requested_replacement_bytes: bytes,
+    }) {
+        *failure = Some(e);
+        return false;
+    }
+    if deadline.is_some_and(|d| std::time::Instant::now() >= d) {
+        *failure = Some(NativeAdmissionFailure::Deadline);
+        return false;
+    }
+    true
+}
+
+fn native_reserve<T>(
+    v: &mut Vec<T>,
+    needed: usize,
+    hook: &mut Option<NativeAdmission>,
+    failure: &mut Option<NativeAdmissionFailure>,
+    deadline: Option<std::time::Instant>,
+    operation: NativeOperation,
+) -> bool {
+    if failure.is_some() {
+        return false;
+    }
+    if hook.is_none() || needed <= v.capacity() {
+        return true;
+    }
+    let Some(target) = v
+        .capacity()
+        .checked_mul(2)
+        .and_then(|n| n.max(needed).checked_add(0))
+    else {
+        *failure = Some(NativeAdmissionFailure::Overflow);
+        return false;
+    };
+    let Some(bytes) = target
+        .checked_mul(std::mem::size_of::<T>())
+        .and_then(|n| u64::try_from(n).ok())
+    else {
+        *failure = Some(NativeAdmissionFailure::Overflow);
+        return false;
+    };
+    if !native_pay(hook, failure, deadline, operation, v.len() as u64, bytes) {
+        return false;
+    }
+    if v.try_reserve_exact(target - v.len()).is_err() {
+        *failure = Some(NativeAdmissionFailure::Allocation);
+        return false;
+    }
+    if deadline.is_some_and(|d| std::time::Instant::now() >= d) {
+        *failure = Some(NativeAdmissionFailure::Deadline);
+        return false;
+    }
+    true
+}
+
+#[cfg(test)]
+mod native_admission_increment_tests {
+    use super::*;
+    use std::sync::{Arc, Mutex};
+    #[test]
+    fn real_nonroot_cnf_search_preserves_legacy_answer_and_work() {
+        fn fixture() -> Solver {
+            let mut s = Solver::new(4);
+            s.add_clause(vec![-1, 2]);
+            s.add_clause(vec![-2, 3]);
+            s
+        }
+        let mut legacy = fixture();
+        let mut metered = fixture();
+        let charges = Arc::new(Mutex::new(Vec::new()));
+        let sink = Arc::clone(&charges);
+        metered
+            .set_search_admission(move |c| {
+                sink.lock().unwrap().push(c);
+                Ok(())
+            })
+            .unwrap();
+        assert_eq!(legacy.solve(), SolveResult::Sat);
+        assert_eq!(metered.solve(), SolveResult::Sat);
+        assert!(metered.stats.decisions > 0);
+        assert!(metered.stats.propagations > 0);
+        let model = metered.admitted_model().unwrap();
+        assert!(metered.check_original_assignment(&model));
+        assert_eq!(model, legacy.model());
+        assert_eq!(metered.word_ops(), legacy.word_ops());
+        let calls = charges.lock().unwrap();
+        assert!(calls.iter().any(|c| c.operation == NativeOperation::Heap));
+        assert!(calls
+            .iter()
+            .any(|c| c.operation == NativeOperation::Watcher));
+    }
+    #[test]
+    fn late_native_work_and_growth_refusal_are_sticky_unknown() {
+        let mut s = Solver::new(3);
+        let mut assignments = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::Assignment {
+                assignments += 1;
+                if assignments == 2 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(s.solve(), SolveResult::Unknown);
+        assert!(s.trail.len() == 1);
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Work)
+        );
+        let trail = s.trail.clone();
+        assert_eq!(s.solve(), SolveResult::Unknown);
+        assert_eq!(s.trail, trail);
+        let mut allocation = Solver::new(2);
+        allocation
+            .set_search_admission(|c| {
+                if c.operation == NativeOperation::LevelGrowth {
+                    Err(NativeAdmissionFailure::Bytes)
+                } else {
+                    Ok(())
+                }
+            })
+            .unwrap();
+        assert_eq!(allocation.solve(), SolveResult::Unknown);
+        assert!(allocation.trail_lim.is_empty());
+        assert!(allocation.trail.is_empty());
+        assert_eq!(
+            allocation.search_admission_failure(),
+            Some(NativeAdmissionFailure::Bytes)
+        );
+    }
+    #[test]
+    fn original_expired_deadline_precedes_root_propagation() {
+        let mut s = Solver::new(2);
+        s.add_clause(vec![1]);
+        s.add_clause(vec![-1, 2]);
+        s.set_search_admission(|_| Ok(())).unwrap();
+        s.deadline = Some(std::time::Instant::now());
+        let before = (s.qhead, s.trail.clone(), s.stats.propagations);
+        assert_eq!(s.propagate_root(), RootPropagationResult::Unknown);
+        assert_eq!((s.qhead, s.trail.clone(), s.stats.propagations), before);
+        assert_eq!(s.solve(), SolveResult::Unknown);
+    }
+    #[test]
+    fn uncovered_observer_xor_and_analysis_do_not_run_or_replace_observer() {
+        let mut observed = Solver::new(2);
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let sink = Arc::clone(&events);
+        observed
+            .set_event_observer(move |e| {
+                sink.lock().unwrap().push(e.clone());
+                Ok(())
+            })
+            .unwrap();
+        let before = events.lock().unwrap().clone();
+        observed.set_search_admission(|_| Ok(())).unwrap();
+        assert_eq!(observed.solve(), SolveResult::Unknown);
+        assert_eq!(*events.lock().unwrap(), before);
+        assert!(observed.set_event_observer(|_| Ok(())).is_err());
+        let mut xor = Solver::new(2);
+        xor.add_xor(&[1, 2], true);
+        xor.set_search_admission(|_| Ok(())).unwrap();
+        assert_eq!(xor.solve(), SolveResult::Unknown);
+        assert_eq!(xor.stats.xor_passes, 0);
+        let mut conflict = Solver::new(2);
+        for c in [vec![1, 2], vec![-1, 2], vec![1, -2], vec![-1, -2]] {
+            conflict.add_clause(c);
+        }
+        conflict.set_search_admission(|_| Ok(())).unwrap();
+        assert_eq!(conflict.solve(), SolveResult::Unknown);
+        assert_eq!(
+            conflict.search_admission_failure(),
+            Some(NativeAdmissionFailure::UncoveredPath)
+        );
+        assert_eq!(conflict.stats.learnt_clauses, 0);
+    }
+    #[test]
+    fn native_root_unsat_remains_distinct_from_refusal() {
+        let mut s = Solver::new(1);
+        s.add_clause(vec![1]);
+        s.add_clause(vec![-1]);
+        s.set_search_admission(|_| Ok(())).unwrap();
+        assert_eq!(s.solve(), SolveResult::Unsat);
+        assert_eq!(s.search_admission_failure(), None);
+        let mut legacy = Solver::new(1);
+        legacy.add_clause(vec![1]);
+        assert_eq!(legacy.solve(), SolveResult::Sat);
+    }
+}
+
+#[cfg(test)]
+mod native_xor_admission_increment_tests {
+    use super::*;
+    #[test]
+    fn actual_xor_rebuild_word_refusal_preserves_owned_matrix_and_sticky_failure() {
+        let mut s = Solver::new(3);
+        s.add_xor(&[1, 2], true);
+        s.add_xor(&[2, 3], false);
+        let mut word_calls = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::XorWord {
+                word_calls += 1;
+                if word_calls == 2 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert!(matches!(s.propagate_xors(), XorStep::Refused));
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Work)
+        );
+        assert_eq!(s.matrix, vec![0b011u64]);
+        assert_eq!(s.matrix_rhs, vec![true]);
+        assert!(s.pivot.is_empty());
+        assert_eq!(s.solve(), SolveResult::Unknown);
+    }
+    #[test]
+    fn actual_xor_growth_refusal_precedes_clear_and_copy() {
+        let mut s = Solver::new(2);
+        s.add_xor(&[1, 2], true);
+        s.set_search_admission(|c| {
+            if c.operation == NativeOperation::XorGrowth {
+                Err(NativeAdmissionFailure::Bytes)
+            } else {
+                Ok(())
+            }
+        })
+        .unwrap();
+        assert!(matches!(s.propagate_xors(), XorStep::Refused));
+        assert!(s.matrix.is_empty() && s.matrix_rhs.is_empty() && s.pivot.is_empty());
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Bytes)
+        );
+    }
+}
+
+#[cfg(test)]
+mod native_event_admission_increment_tests {
+    use super::*;
+    use std::sync::{Arc, Mutex};
+    #[test]
+    fn existing_observer_is_retained_and_late_reason_copy_refusal_does_not_publish() {
+        let mut s = Solver::new(2);
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let sink = Arc::clone(&events);
+        s.set_event_observer(move |e| {
+            sink.lock().unwrap().push(e.clone());
+            Ok(())
+        })
+        .unwrap();
+        let original = events.lock().unwrap().clone();
+        s.set_search_admission(|c| {
+            if c.operation == NativeOperation::EventPayload {
+                Err(NativeAdmissionFailure::Bytes)
+            } else {
+                Ok(())
+            }
+        })
+        .unwrap();
+        s.assign(1, Reason::Decision);
+        assert_eq!(s.trail, vec![1]);
+        assert_eq!(*events.lock().unwrap(), original);
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Bytes)
+        );
+        assert_eq!(s.solve(), SolveResult::Unknown);
+    }
+}
+
+#[cfg(test)]
+mod native_analysis_admission_increment_tests {
+    use super::*;
+    fn installed() -> Solver {
+        let mut s = Solver::new(2);
+        s.add_clause(vec![-1, 2]);
+        s.add_clause(vec![-1, -2]);
+        s
+    }
+    fn conflict(s: &mut Solver) -> Conflict {
+        assert!(native_reserve(
+            &mut s.trail_lim,
+            1,
+            &mut s.native_admission,
+            &mut s.native_failure,
+            s.deadline,
+            NativeOperation::LevelGrowth
+        ));
+        s.trail_lim.push(0);
+        s.assign(1, Reason::Decision);
+        s.propagate().expect("actual watched propagation conflict")
+    }
+    #[test]
+    fn actual_native_analysis_and_backjump_are_charged_before_use() {
+        let mut s = installed();
+        s.set_search_admission(|_| Ok(())).unwrap();
+        let c = conflict(&mut s);
+        let (learnt, level) = s.analyze(c);
+        assert_eq!(learnt, vec![-1]);
+        assert_eq!(level, 0);
+        assert_eq!(s.search_admission_failure(), None);
+        s.backjump(level);
+        assert!(s.trail.is_empty());
+        let cref = s.push_clause(&learnt);
+        assert_eq!(clause_in(&s.arena, cref), &[-1]);
+    }
+    #[test]
+    fn actual_analysis_growth_refusal_retains_conflicting_native_state() {
+        let mut s = installed();
+        s.set_search_admission(|c| {
+            if c.operation == NativeOperation::AnalyzeGrowth {
+                Err(NativeAdmissionFailure::Bytes)
+            } else {
+                Ok(())
+            }
+        })
+        .unwrap();
+        let c = conflict(&mut s);
+        let before = s.trail.clone();
+        let (learnt, _) = s.analyze(c);
+        assert!(learnt.is_empty());
+        assert_eq!(s.trail, before);
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Bytes)
+        );
+        assert_eq!(s.solve(), SolveResult::Unknown);
+    }
+}
+
+#[cfg(test)]
+mod native_batch_admission_increment_tests {
+    use super::*;
+    #[test]
+    fn charged_stable_clause_sort_matches_legacy_ties_and_retains_scratch_on_refusal() {
+        let mut s = Solver::new(4);
+        s.add_clause(vec![1, 2]);
+        s.add_clause(vec![1, 2, 3]);
+        s.add_clause(vec![-1, 2]);
+        let mut expected = vec![0, 1, 2];
+        expected.sort_by_key(|&i| std::cmp::Reverse(clause_in(&s.arena, s.clause_at[i]).len()));
+        s.set_search_admission(|_| Ok(())).unwrap();
+        let mut actual = vec![0, 1, 2];
+        assert!(s.native_clause_sort(&mut actual));
+        assert_eq!(actual, expected);
+        let mut t = Solver::new(3);
+        t.add_clause(vec![1, 2]);
+        t.add_clause(vec![1, 2, 3]);
+        let mut steps = 0;
+        t.set_search_admission(move |c| {
+            if c.operation == NativeOperation::Reduction {
+                steps += 1;
+                if steps == 4 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        let mut partial = vec![0, 1];
+        assert!(!t.native_clause_sort(&mut partial));
+        assert!(!t.native_sort_scratch.is_empty());
+        assert_eq!(t.solve(), SolveResult::Unknown);
+    }
+}
+
+#[cfg(test)]
+mod native_deadline_retention_increment_tests {
+    use super::*;
+    #[test]
+    fn model_copy_refusal_retains_actual_partial_assignment_buffer() {
+        let mut s = Solver::new(130);
+        let mut copies = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::Model {
+                copies += 1;
+                if copies == 4 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(s.solve(), SolveResult::Sat);
+        assert!(s.admitted_model().is_none());
+        assert!(s
+            .native_pending_model
+            .as_ref()
+            .is_some_and(|v| v.len() == 64));
+        assert_eq!(s.solve(), SolveResult::Unknown);
+    }
+}
+
+#[cfg(test)]
+mod native_analysis_boundary_retention_tests {
+    use super::*;
+    fn fixture(stop: usize) -> (Solver, Conflict) {
+        let mut s = Solver::new(3);
+        s.add_clause(vec![-1, -2, 3]);
+        s.add_clause(vec![-1, -2, -3]);
+        let mut zero_steps = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::Analyze && c.work == 0 {
+                zero_steps += 1;
+                if zero_steps == stop {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        s.trail_lim.push(0);
+        s.assign(1, Reason::Decision);
+        assert!(s.propagate().is_none());
+        s.trail_lim.push(s.trail.len());
+        s.assign(2, Reason::Decision);
+        let conflict = s.propagate().expect("real second-level watched conflict");
+        (s, conflict)
+    }
+    #[test]
+    fn actual_analysis_partial_clause_survives_search_boundary() {
+        // Find the actual output-copy refusal among finitely many zero-work
+        // deadline checkpoints; no synthetic pending clause is installed.
+        let mut witnessed = false;
+        for stop in 1..=64 {
+            let (mut direct, c) = fixture(stop);
+            let output = direct.analyze(c);
+            if direct
+                .native_pending_clause
+                .as_ref()
+                .is_some_and(|v| !v.is_empty())
+            {
+                assert!(output.0.is_empty());
+                let expected = direct.native_pending_clause.clone();
+                let (mut boundary, c) = fixture(stop);
+                assert!(boundary.analyze_for_search(c).is_none());
+                assert_eq!(boundary.native_pending_clause, expected);
+                assert_eq!(
+                    boundary.search_admission_failure(),
+                    Some(NativeAdmissionFailure::Work)
+                );
+                assert_eq!(boundary.solve(), SolveResult::Unknown);
+                assert_eq!(boundary.native_pending_clause, expected);
+                witnessed = true;
+                break;
+            }
+        }
+        assert!(
+            witnessed,
+            "actual analysis must reach retained nonempty output before refusal"
+        );
+    }
+}
+
+#[cfg(test)]
+mod native_observer_boundary_increment_tests {
+    use super::*;
+    #[test]
+    fn observer_backjump_refusal_keeps_actual_trail_and_levels() {
+        let mut s = Solver::new(3);
+        s.set_event_observer(|event| {
+            if matches!(event, SolverEvent::Backjump { .. }) {
+                Err("stop at backjump".into())
+            } else {
+                Ok(())
+            }
+        })
+        .unwrap();
+        s.set_search_admission(|_| Ok(())).unwrap();
+        s.trail_lim.push(0);
+        s.assign(1, Reason::Decision);
+        let before = (
+            s.trail.clone(),
+            s.trail_lim.clone(),
+            s.values.clone(),
+            s.assigned_w.clone(),
+        );
+        s.backjump(0);
+        assert_eq!(
+            (
+                s.trail.clone(),
+                s.trail_lim.clone(),
+                s.values.clone(),
+                s.assigned_w.clone()
+            ),
+            before
+        );
+        assert_eq!(s.event_failure.as_deref(), Some("stop at backjump"));
+        assert_eq!(s.solve(), SolveResult::Unknown);
+        assert_eq!(s.trail, before.0);
+    }
+    #[test]
+    fn detached_fill_charges_reused_capacity_and_retains_prefix() {
+        let mut s = Solver::new(1);
+        s.detached.reserve(192);
+        let mut fills = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::DetachedGrowth {
+                fills += 1;
+                if fills == 2 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert!(!s.native_fill_detached(150));
+        assert_eq!(s.detached, vec![false; 64]);
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Work)
+        );
+        assert!(!s.native_fill_detached(150));
+        assert_eq!(s.detached.len(), 64);
+    }
+    #[test]
+    fn heap_refusal_precedes_next_actual_pop() {
+        let mut s = Solver::new(3);
+        s.assign(1, Reason::Decision);
+        s.assign(2, Reason::Decision);
+        s.assign(3, Reason::Decision);
+        let mut pops = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::Heap && c.work == 0 {
+                pops += 1;
+                if pops == 2 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        let before = s.order.heap.len();
+        assert_eq!(s.pick_branching_variable(), None);
+        assert_eq!(s.order.heap.len(), before - 1);
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Work)
+        );
+    }
+}
+
+#[cfg(test)]
+mod native_pending_watch_increment_tests {
+    use super::*;
+    #[test]
+    fn watcher_refusal_retains_actual_vector_and_two_cursors() {
+        let mut s = Solver::new(4);
+        for v in 2..=4 {
+            s.add_clause(vec![-1, v]);
+        }
+        s.assign(1, Reason::Decision);
+        let mut scans = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::Watcher {
+                scans += 1;
+                if scans == 2 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert!(s.propagate_clauses().is_none());
+        let (slot, ws, read, written) = s.native_pending_watch.as_ref().unwrap();
+        assert_eq!(*slot, s.watch_slot(-1));
+        assert_eq!(ws.len(), 3);
+        assert_eq!((*read, *written), (1, 1));
+        assert!(s.watches[*slot].is_empty());
+        assert_eq!(s.trail, vec![1, 2]);
+        assert_eq!(s.solve(), SolveResult::Unknown);
+        assert_eq!(s.native_pending_watch.as_ref().unwrap().1.len(), 3);
+    }
+    #[test]
+    fn xor_observer_refusal_retains_reason_before_assignment() {
+        let mut s = Solver::new(2);
+        s.add_xor(&[1, 2], true);
+        s.add_clause(vec![1]);
+        s.set_event_observer(|e| {
+            if matches!(e, SolverEvent::XorImplication { .. }) {
+                Err("stop XOR implication".into())
+            } else {
+                Ok(())
+            }
+        })
+        .unwrap();
+        s.set_search_admission(|_| Ok(())).unwrap();
+        let before = s.trail.clone();
+        assert!(matches!(s.propagate_xors(), XorStep::Refused));
+        assert_eq!(s.trail, before);
+        assert!(s.var_value(1).is_none());
+        assert!(!s.xor_reason[1].is_empty());
+        assert_eq!(s.event_failure.as_deref(), Some("stop XOR implication"));
+    }
+}
+
+#[cfg(test)]
+mod native_bulk_boundary_increment_tests {
+    use super::*;
+    #[test]
+    fn pivot_fill_refusal_keeps_actual_matrix_and_initialized_prefix() {
+        let mut s = Solver::new(2);
+        for _ in 0..130 {
+            s.add_xor(&[1, 2], true);
+        }
+        assert_eq!(s.xors.len(), 130);
+        let mut fills = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::XorPivot {
+                fills += 1;
+                if fills == 2 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        s.rebuild_matrix();
+        assert_eq!(s.matrix.len(), 130);
+        assert_eq!(s.matrix_rhs.len(), 130);
+        assert_eq!(s.pivot, vec![None; 64]);
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Work)
+        );
+        s.rebuild_matrix();
+        assert_eq!(s.pivot.len(), 64);
+    }
+    #[test]
+    fn xor_row_observer_refusal_keeps_only_first_actual_row_operation() {
+        let mut s = Solver::new(3);
+        s.add_xor(&[1, 2], true);
+        s.add_xor(&[1, 3], false);
+        s.add_xor(&[1, 2, 3], true);
+        s.set_event_observer(|e| {
+            if matches!(e, SolverEvent::XorRowXor { .. }) {
+                Err("stop first XOR row".into())
+            } else {
+                Ok(())
+            }
+        })
+        .unwrap();
+        s.set_search_admission(|_| Ok(())).unwrap();
+        assert!(matches!(s.propagate_xors(), XorStep::Refused));
+        assert_eq!(s.matrix, vec![0b011, 0b110, 0b111]);
+        assert_eq!(s.matrix_rhs, vec![true, true, true]);
+        assert_eq!(s.native_partial_xor, Some((0, 1, 1, true)));
+        assert_eq!(s.event_failure.as_deref(), Some("stop first XOR row"));
+        assert_eq!(s.stats.xor_row_ops, 1);
+    }
+}
+
+#[cfg(test)]
+mod native_minimize_deletion_increment_tests {
+    use super::*;
+    #[test]
+    fn decision_only_minimization_refusal_retains_both_actual_buffers() {
+        let mut s = Solver::new(3);
+        s.redundant_stack = vec![-3];
+        let mut visits = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::Analyze && c.work == 4 {
+                visits += 1;
+                if visits == 2 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert!(s.minimize_for_search(vec![1, 2, 3], 0).is_none());
+        assert_eq!(s.learnt_buf, vec![1, 2, 3]);
+        assert_eq!(s.redundant_stack, vec![-3]);
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Work)
+        );
+        assert_eq!(s.solve(), SolveResult::Unknown);
+        assert_eq!(s.learnt_buf, vec![1, 2, 3]);
+    }
+    #[test]
+    fn decision_only_minimization_retains_legacy_output_when_admitted() {
+        let mut legacy = Solver::new(3);
+        let mut metered = Solver::new(3);
+        metered.set_search_admission(|_| Ok(())).unwrap();
+        assert_eq!(
+            legacy.minimize_for_search(vec![1, -2, 3], 0),
+            Some(vec![1, -2, 3])
+        );
+        assert_eq!(
+            metered.minimize_for_search(vec![1, -2, 3], 0),
+            Some(vec![1, -2, 3])
+        );
+        assert_eq!(legacy.word_ops(), metered.word_ops());
+    }
+    #[test]
+    fn unobserved_deletion_refusal_precedes_second_actual_flag_mutation() {
+        let mut s = Solver::new(4);
+        for c in [
+            vec![1, 2, 3],
+            vec![-1, 2, 4],
+            vec![1, -3, 4],
+            vec![2, 3, -4],
+        ] {
+            s.push_clause(&c);
+        }
+        s.n_orig_clauses = 0;
+        let mut deletions = 0;
+        s.set_search_admission(move |c| {
+            if c.operation == NativeOperation::Reduction && c.work == 2 {
+                deletions += 1;
+                if deletions == 2 {
+                    return Err(NativeAdmissionFailure::Work);
+                }
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert!(s.event_observer.is_none());
+        s.reduce_db();
+        assert_eq!(s.detached, vec![true, false, false, false]);
+        let (locked, candidates) = s.native_pending_reduction.as_ref().unwrap();
+        assert_eq!(locked, &vec![false; 4]);
+        assert_eq!(candidates, &vec![0, 1, 2, 3]);
+        let inventory = s.storage_inventory();
+        let components = &inventory["components_capacity_bytes"];
+        assert_eq!(
+            components["native_pending_reduction_locked"],
+            locked.capacity() as u64 * std::mem::size_of::<bool>() as u64
+        );
+        assert_eq!(
+            components["native_pending_reduction_candidates"],
+            candidates.capacity() as u64 * std::mem::size_of::<usize>() as u64
+        );
+        assert_eq!(
+            components["native_sort_scratch"],
+            s.native_sort_scratch.capacity() as u64 * std::mem::size_of::<usize>() as u64
+        );
+        assert!(
+            inventory["owned_capacity_bytes"].as_u64().unwrap()
+                >= (locked.capacity() * std::mem::size_of::<bool>()
+                    + candidates.capacity() * std::mem::size_of::<usize>()
+                    + s.native_sort_scratch.capacity() * std::mem::size_of::<usize>())
+                    as u64
+        );
+        assert_eq!(
+            s.search_admission_failure(),
+            Some(NativeAdmissionFailure::Work)
+        );
+        assert_eq!(s.solve(), SolveResult::Unknown);
+        assert_eq!(s.detached, vec![true, false, false, false]);
     }
 }

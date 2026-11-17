@@ -1,0 +1,72 @@
+import WordSameRoot
+set_option autoImplicit false
+namespace SignedWord
+
+def reduced (r a u v:UInt64) (su sv:Int8) : UInt64 :=
+ GraphRingWord.sub r (GraphRingWord.sub r a (signed r su u)) (signed r sv v)
+theorem reduced_correct (r a u v:UInt64) (su sv:Int8)
+ (hp:0<r.toNat) (hr:r.toNat≤2^63) (ha:a.toNat<r.toNat) (hu:u.toNat<r.toNat) (hv:v.toNat<r.toNat)
+ (hs:Sign su) (ht:Sign sv) :
+ (reduced r a u v su sv).toNat<r.toNat ∧ wd r (reduced r a u v su sv)=wd r a-sd r su*wd r u-sd r sv*wd r v := by
+ have h1:=signed_correct r u su hp hu hs
+ have h2:=signed_correct r v sv hp hv ht
+ have h3:=GraphRingWord.sub_correct r a _ hp hr ha h1.1
+ have h4:=GraphRingWord.sub_correct r _ _ hp hr h3.1 h2.1
+ exact ⟨h4.1,by simpa only [reduced,wd,h3.2,h1.2,h2.2] using h4.2⟩
+def after {n:Nat} (r:UInt64) (s:Anchored n) (w:State n) (root:Fin n) (pu pv:Pot) (su sv:Int8) (a b:UInt64) :=
+ sameRoot r ⟨w,s.fixed⟩ root (su*pu.s) (sv*pv.s)
+ (reduced r a pu.a pv.a su sv) (reduced r b pu.b pv.b su sv)
+
+theorem after_refines {n:Nat} (r:UInt64) [Fact r.toNat.Prime] (s:Anchored n) (w:State n) (root:Fin n) (pu pv:Pot) (su sv:Int8) (a b:UInt64)
+ (hp:2<r.toNat) (hr:r.toNat≤2^63) (hg:GoodA r s) (hw:Good r w) (hpu:GoodPot r pu) (hpv:GoodPot r pv)
+ (hs:Sign su) (ht:Sign sv) (ha:a.toNat<r.toNat) (hb:b.toNat<r.toNat) :
+ pairDecode r (after r s w root pu pv su sv a b)=
+ GraphSameRoot.afterSame (decodeA r s) (decode r w) root (decPot r pu) (decPot r pv) (sd r su) (sd r sv) (wd r a) (wd r b) := by
+ have h1:=reduced_correct r a pu.a pv.a su sv (by omega) hr ha hpu.2.1 hpv.2.1 hs ht
+ have h2:=reduced_correct r b pu.b pv.b su sv (by omega) hr hb hpu.2.2 hpv.2.2 hs ht
+ have hh:=same_refines r (⟨w,s.fixed⟩:Anchored n) root (su*pu.s) (sv*pv.s) _ _ hp hr ⟨hw,hg.2⟩ h1.1 h2.1 (sign_mul _ _ hs hpu.1) (sign_mul _ _ ht hpv.1)
+ simpa only [after,GraphSameRoot.afterSame,decodeA,GraphForest.lifted,decPot,h1.2,h2.2,sd_mul r su pu.s hs hpu.1,sd_mul r sv pv.s ht hpv.1,wd] using hh
+
+theorem after_two_word_finds {n:Nat} (r:UInt64) [Fact r.toNat.Prime] (s:Anchored n) (t w:State n)
+ (u v root:Fin n) (pu pv:Pot) (rank:Fin n→Nat) (value:Fin n→F r) (su sv:Int8) (a b:UInt64) (k:F r)
+ (hp:2<r.toNat) (hr:r.toNat≤2^63) (hg:GoodA r s)
+ (hf:GraphFind.Forest (decode r s.graph) rank) (hv:GraphUnion.Valid (decodeA r s) value k)
+ (h1:Run r s.graph u t root pu) (h2:Run r t v w root pv)
+ (hs:Sign su) (ht:Sign sv) (ha:a.toNat<r.toNat) (hb:b.toNat<r.toNat)
+ (he:sd r su*value u+sd r sv*value v=wd r a+wd r b*k) :
+ GoodA r (after r s w root pu pv su sv a b).1 ∧
+ GraphFind.Forest (decodeA r (after r s w root pu pv su sv a b).1).graph rank ∧
+ GraphUnion.Valid (decodeA r (after r s w root pu pv su sv a b).1) value k ∧
+ GraphSameRoot.Safe (outDecode r (after r s w root pu pv su sv a b).2) k := by
+ obtain ⟨hgt,hpu,hu⟩:=run_refines r (by omega) hr s.graph t u root pu h1 hg.1
+ obtain ⟨hgw,hpv,hv'⟩:=run_refines r (by omega) hr t w v root pv h2 hgt
+ have hsu : sd r su*(decPot r pu).s=1 ∨ sd r su*(decPot r pu).s= -1 := by
+   simpa only [decPot,sd_mul r su pu.s hs hpu.1] using sd_sign r (su*pu.s) (sign_mul _ _ hs hpu.1)
+ have hsv : sd r sv*(decPot r pv).s=1 ∨ sd r sv*(decPot r pv).s= -1 := by
+   simpa only [decPot,sd_mul r sv pv.s ht hpv.1] using sd_sign r (sv*pv.s) (sign_mul _ _ ht hpv.1)
+ have hout:=GraphSameRoot.same_after_two_finds (decodeA r s) (decode r t) (decode r w) u v root (decPot r pu) (decPot r pv) rank value (sd r su) (sd r sv) (wd r a) (wd r b) k hf hv hu hv' (two_nonzero r hp) hsu hsv he
+ have href:=after_refines r s w root pu pv su sv a b hp hr hg hgw hpu hpv hs ht ha hb
+ rw [←href] at hout
+ refine ⟨?_,?_⟩
+ · exact same_good r ⟨w,s.fixed⟩ root _ _ _ _ (by omega) ⟨hgw,hg.2⟩
+ · simpa only [pairDecode] using hout
+
+theorem anchor_answer_canonical {n:Nat} (r:UInt64) (s:Anchored n) (root:Fin n) (a b x:UInt64)
+ (hp:0<r.toNat) (h:(anchor r s root a b).2=.answer x) : x.toNat<r.toNat := by
+ cases hf:s.fixed root with
+ | none => simp [anchor,hf] at h
+ | some xy => exact constraint_answer_canonical r _ _ x hp (by simpa [anchor,hf] using h)
+theorem same_answer_canonical {n:Nat} (r:UInt64) (s:Anchored n) (root:Fin n) (cu cv:Int8) (a b x:UInt64)
+ (hp:0<r.toNat) (h:(sameRoot r s root cu cv a b).2=.answer x) : x.toNat<r.toNat := by
+ by_cases hh:cu+cv=0
+ · exact constraint_answer_canonical r _ _ x hp (by simpa [sameRoot,hh] using h)
+ · exact anchor_answer_canonical r s root _ _ x hp (by simpa [sameRoot,hh] using h)
+theorem returned_word_equal {n:Nat} (r:UInt64) (s:Anchored n) (w:State n) (root:Fin n) (pu pv:Pot) (su sv:Int8) (a b x k:UInt64)
+ (hp:0<r.toNat) (hk:k.toNat<r.toNat)
+ (hs:GraphSameRoot.Safe (outDecode r (after r s w root pu pv su sv a b).2) (wd r k))
+ (hx:(after r s w root pu pv su sv a b).2=.answer x) : x=k := by
+ have hxc:=same_answer_canonical r ⟨w,s.fixed⟩ root _ _ _ _ x hp hx
+ have he:wd r x=wd r k := by simpa [hx,outDecode,GraphSameRoot.Safe] using hs
+ apply UInt64.toNat.inj
+ exact (PencilWordRefinement.canonical_equality r.toNat x.toNat k.toNat hxc hk).mp he
+end SignedWord

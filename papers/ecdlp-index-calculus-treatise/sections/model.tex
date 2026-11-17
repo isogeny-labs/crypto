@@ -1,8 +1,9 @@
 \chapter{Where the cost of index calculus lives}\label{ch:model}
 
-An improvement is only useful if it moves a term that matters. This chapter
-writes the cost of one index-calculus solve as a sum of terms, and maps each
-lever of the programme to the term it acts on.
+The cost of one index-calculus solve is a sum of terms. This chapter writes
+them out, maps each lever of the programme to the term it acts on, gives
+the measured cost of the operations the terms are counted in, and reports
+which term dominates on every leaderboard row.
 
 \section{The pipeline}
 
@@ -32,7 +33,10 @@ $mN^2$ for sparse elimination. With rho's cost $\sqrt{\pi r/(2A)}$ on the
 other side, the classical balance at $m=2$ with a constant-cost oracle gives
 $N\approx r^{1/3}$ and $T\approx r^{2/3}$. That is why two-summand
 prime-field index calculus loses ground to rho as $r^{1/6}$
-(Chapter~\ref{ch:distance}).
+(Chapter~\ref{ch:distance}). The $k$-sum oracle, a generic table of
+signed $k$-sums, moves the exponent to $k/(2k-1)$, and no generic
+single-target arm whose base logarithms are unknown can go below the collision floor of
+Proposition~\ref{prop:collisionfloor}.
 
 \section{The levers}
 
@@ -46,40 +50,174 @@ the programme pulled and the sections that report them.
 Term & Levers pulled & Where \\
 \midrule
 $C_{\mathrm{dec}}$ & root finding of $S_3$; pair and meet-in-the-middle
-  tables; inherited F4, F5, F6-IC; gate-first order; harvest gates;
-  $\FF_p$ F4; $D_4$ invariants & Ch.~\ref{sec:rootfinding}, \ref{sec:groebner}, \ref{ch:extension} \\
+  tables; $k$-sum tables; inherited F4, F5, F6-IC; gate-first order;
+  harvest gates; $\FF_p$ F4; $D_4$ invariants; the Hilbert early stop on
+  the weak-class cover & Ch.~\ref{sec:rootfinding}, \ref{sec:groebner},
+  \ref{ch:extension}, \ref{ch:distance}; \S\ref{sec:pg-ksum}, \S\ref{sec:jac-jv} \\
 $\rho_{\mathrm{yield}}$, $N$ & compact Frobenius orbits; free relations;
   stride-renewed targets; greedy coverage; $n=83$ base selection; double
-  large primes & Ch.~\ref{sec:koblitz}, \ref{sec:prime}, \ref{sec:transfer} \\
+  large primes; the Joux--Vitse sieve route & Ch.~\ref{sec:koblitz}, \ref{sec:prime}, \ref{sec:transfer}; \S\ref{sec:jac-jv} \\
 $T_{\mathrm{setup}}$ & stacked producer; cache-blocked pair table; u64 root
   batching & Ch.~\ref{sec:koblitz}, \ref{sec:prime} \\
 $T_{\mathrm{LA}}$ & CADO-style filter and Wiedemann; structured Gaussian
-  elimination; block Wiedemann; first-dependency stop & Ch.~\ref{sec:koblitz}, \ref{sec:prime},
-  Ch.~\ref{ch:extension}, \ref{sec:transfer} \\
+  elimination; block Wiedemann; first-dependency stop; post-Gröbner
+  linear stage & Ch.~\ref{sec:koblitz}, \ref{sec:prime},
+  Ch.~\ref{ch:extension}, \ref{sec:transfer}, \ref{ch:audit} \\
 the exponent & genus-three transfer (cubic GHS); $k=4$ extension fields &
   Ch.~\ref{ch:extension}, \ref{sec:transfer} \\
+fixed floor & none: the collision floor bounds every generic
+  single-target arm with unknown base logarithms at $\ge1.5\times$ rho & \S\ref{sec:gf-collision} \\
 \bottomrule
 \end{tabularx}
 \caption[]{The terms of~\eqref{eq:cost} and the levers that act on them.}
 \label{tab:levers}
 \end{table}
 
-\section{Which term dominates now}
+\section{Measured cost of one operation}\label{sec:model-opcost}
 
-Early in the programme, $C_{\mathrm{dec}}$ dominated. A Gr\"obner solve per
+Every $S$ in this treatise is a count of group-addition equivalents (GAE).
+Native work (lookups, row operations, square roots, Artin--Schreier solves,
+word XORs) enters it through ratios pinned per instance in
+\art{docs/ic/calibration.json}: nanoseconds per native operation over
+nanoseconds per group addition, the median of three frozen boundary-ledger
+runs on one Intel Xeon at 2.1\,GHz. Table~\ref{tab:fm-ledgerhost} gives the
+absolute timings behind those ratios and Figure~\ref{fig:fm-opcost} plots
+them. On that host a group addition costs 155--221\,ns on the prime
+instances and 175--683\,ns on the binary and Koblitz instances; a doubling
+costs $0.96$--$1.15$ additions on every instance (pinned ratios); a lookup
+($2.4$--$4.5$\,ns), a row operation ($3.2$--$3.6$\,ns) and a word XOR
+($0.46$--$0.51$\,ns) are flat in the field size. The ratios move by up to
+$3.7$ between runs on one host, which is why they are pinned rather than
+re-measured (\art{docs/ic/calibration.json}, field \texttt{why}).
+
+\begin{table}[tbp]
+\centering\scriptsize\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-fm-ledgerhost.tex}
+\caption[]{Nanoseconds per operation on the boundary ledger's host (Intel
+Xeon, 2.1\,GHz, 4 logical cores), median of the three frozen runs
+\art{docs/ic/runs/ic-boundary-ledger-round2-2026-09-21.json},
+\art{docs/ic/runs/ic-boundary-ledger-round3-2026-09-21.json} and
+\art{docs/ic/runs/ic-boundary-ledger-round3-rotation-2026-09-21.json}
+(\texttt{ledger.instances[*].calibration}); medians computed by the
+extraction recorded in \art{figures/data-fm-opcost.json}. ``inv.'' is a
+field inversion, ``AS solve'' an Artin--Schreier solve, ``$S_4$ pair'' one
+pair evaluation of the fourth summation polynomial. Prime square roots at
+16 and 24 bits ($\approx1{,}020$\,ns) take the Tonelli--Shanks path. Shared
+host, no isolation receipt: the timings are descriptive and enter $S$ only
+as the pinned ratios. Table built by \art{figures/make_tab_fm.py}.}
+\label{tab:fm-ledgerhost}
+\end{table}
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=\linewidth]{figures/fig-fm-opcost.pdf}
+\caption[Nanoseconds per operation against field size]{Nanoseconds per operation against field size on the boundary
+ledger's host, log scale; markers are medians of three frozen runs and bars
+span their minimum and maximum. The group addition grows with the field;
+lookups, row operations and word XORs do not, so their GAE price falls as
+the field grows. Data: \art{figures/data-fm-opcost.json} (from
+\art{docs/ic/runs/}); plot: \art{figures/make_fig_fm_opcost.py}.}
+\label{fig:fm-opcost}
+\end{figure}
+
+Field arithmetic was measured separately. Table~\ref{tab:fm-fieldops}
+collects the field multiplication, squaring and inversion costs on record.
+On word-sized prime fields a Montgomery \texttt{u64} multiplication costs
+about 10\,ns and an inversion 63 multiplications, or $1.69$ when $1024$
+inversions are batched; the batched affine addition costs 64--133\,ns. In
+$\FF_{2^{97}}$ a squaring is $0.26$ of a multiplication in static GPU
+instruction counts, and an Itoh--Tsujii inversion is 7 multiplications and
+96 squarings against 270 multiplications for a Fermat inversion modulo a
+256-bit prime. Three conventions price an inversion at 2.1, 10 and 91
+multiplications; they are declared, not measured, and a ratio quoted in
+multiplication-equivalents carries the convention it was priced under.
+
+\begin{table}[tbp]
+\centering\footnotesize
+\input{figures/tab-fm-fieldops.tex}
+\caption[]{Field operation costs. Top: nanoseconds per operation for the
+native \texttt{Fp64}/\texttt{FastCurve} arithmetic and the earlier
+\texttt{BigUint} stack, second (lower-load) sample on a shared Apple M4 Pro
+(load average about 50),
+\art{research/prime_fast_bench_20261008/bench2.json}; $^a$the source flags
+the 28-bit inversion as inconsistent with the 61-bit one (contention). The
+derived ratios are computed by \art{figures/make_tab_fm.py}. Middle:
+static PTX instruction counts (\texttt{ptx\_stats2k.sh}, sm\_90; never run
+on a GPU) and counted operations per inversion, \art{gpu/ecc2k/README.md}
+and \art{RESEARCH_KOBLITZ_INDEX_CALCULUS.md} (Itoh--Tsujii, 23 September).
+Bottom: declared or priced ratios, \art{docs/ecbench/README.md},
+\art{research/ic_acct4_inversion_20261021/README.md} and
+\art{RESEARCH_ISOGENY_FIBERS_ECDLP.md}. No row is validated.}
+\label{tab:fm-fieldops}
+\end{table}
+
+The transfer chapters price a genus-$g$ Jacobian addition at $10g^2$ field
+multiplications. Counted textbook Cantor arithmetic exceeds that model by a
+factor $2^{1.83}$--$2^{2.04}$ at $g=2$--$8$ and $2^{3.23}$--$2^{3.32}$ at
+$g=32$ (Table~\ref{tab:fm-cantor}); the fitted exponent in $g$ is $2.347$ $[2.346,2.349]$ at $p=1009$ and
+$2.319$ $[2.319,2.320]$ at $p=65521$, above the model's 2
+(\art{research/jacobian_op_count_20261014/summary.csv}).
+
+\begin{table}[tbp]
+\centering\footnotesize
+\input{figures/tab-fm-cantor.tex}
+\caption[]{Counted multiplications (M) and inversions (I) per textbook
+Cantor addition, mean over 200 trials, against the $10g^2$ model; six of
+the 13 genera measured. Source:
+\art{research/jacobian_op_count_20261014/summary.csv} (rows
+\texttt{kind=genus}, \texttt{op=add}), copied by
+\art{figures/make_tab_fm.py}. Producer-reported; no validation file.}
+\label{tab:fm-cantor}
+\end{table}
+
+\section{Which term dominates now}\label{sec:model-dominant}
+
+Early in the programme $C_{\mathrm{dec}}$ dominated: a Gr\"obner solve per
 trial cost milliseconds to seconds. After root finding
-(Chapter~\ref{sec:rootfinding}), the oracle is a handful of field operations and table
-probes, and the cost has moved elsewhere.
+(Chapter~\ref{sec:rootfinding}) the oracle is a handful of field operations
+and table probes, and the cost sits in set-up and relation collection.
+Table~\ref{tab:fm-phases} gives the phase shares of cold $S$ on the 19
+validated leaderboard rows, and Figure~\ref{fig:fm-phases} adds the nine
+pre-gate rows of Table~C.
 \begin{itemize}
-\item On the Koblitz descent of the leaderboard's Table~A, reusable set-up
-  is $98.5$--$99.7\%$ of cold $S$, and descent is $0.3$--$1.4\%$
-  (\art{docs/ic/LEADERBOARD.md}, phase table).
-\item On the $n=83$ cold pipeline with base K1107, a mean $113.755$\,s
-  process splits into $47.166$\,s of set-up and $66.486$\,s of rank stage.
-  The target stages take $0.099$\,s
+\item Table~A (Koblitz, one target): reusable set-up, which contains the
+  relations and the base logarithms, is $98.65$--$99.60\%$ of cold $S$;
+  descent is $0.40$--$1.33\%$.
+\item Table~B (matched-rho ladder): relation collection is
+  $68.06$--$93.04\%$ on the prime rows and $47.13$--$95.89\%$ on the
+  binary rows, the factor base most of the rest; linear algebra is at most
+  $0.41\%$.
+\item Table~C (Koblitz collection, unvalidated (pre-gate)): no phase holds
+  a majority at $\log_2 r\le39$; relations reach $78.8\%$ at $\FF_{2^{61}}$.
+\item Off the board, the $n=83$ cold pipeline with base K1107 spends a mean
+  $113.755$\,s as $47.166$\,s of set-up and $66.486$\,s of rank stage, and
+  $0.099$\,s on the target stages
   (\art{research/n83_cold_base_confirm_20261021/RESULT.md}).
 \end{itemize}
-So the relation-collection and set-up terms dominate. Their cost is set by
-$N$ and by the yield per probe, not by the oracle. This is the main
-structural fact behind the ledger. Oracle speed-ups of three to five orders
-of magnitude moved the end-to-end gap by one order at most.
+The dominant terms are set by $N$ and by the yield per probe, not by the
+oracle. Oracle speed-ups of $400$--$5\cdot10^4\times$ per decomposition
+against F4 (up to $10^5$ in wall time against the PDP baseline) moved the
+end-to-end gap by one order at most.
+
+\begin{table}[tbp]
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\input{figures/tab-fm-phases.tex}
+\caption[]{Phase shares (\%) of cold $S$ for the best recipe of each
+validated leaderboard row, with $S$ and the ratio to the row's matched rho.
+``--'': the row has no such phase (Table~A rows carry relations and linear
+algebra inside the reusable set-up; Table~B rows put the target in the
+matrix). Each family has its own unit; $S$ compares within a family only.
+Shares computed by \art{figures/make_tab_fm.py} from
+\texttt{board[*].best.phases\_s} of \art{docs/ic/leaderboard.json}, copied
+to \art{figures/data-fm-phases.json}. Standing: validated (19 rows).}
+\label{tab:fm-phases}
+\end{table}
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=\linewidth]{figures/fig-fm-phases.pdf}
+\caption[Phase shares of cold $S$, all leaderboard rows]{Phase shares of cold $S$ for all 28 leaderboard rows, grouped
+into five phases; rows marked ``pre-gate'' are unvalidated (pre-gate).
+Data: \art{figures/data-fm-phases.json} (from
+\art{docs/ic/leaderboard.json}); plot and shares:
+\art{figures/make_fig_fm_phases.py}.}
+\label{fig:fm-phases}
+\end{figure}

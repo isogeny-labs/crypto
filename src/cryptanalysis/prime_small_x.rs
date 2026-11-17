@@ -70,6 +70,9 @@ pub trait PrimeField: Clone + Send + Sync {
     /// Canonical value as three little-endian limbs.
     fn key(&self, a: Self::E) -> Self::K;
 
+    /// Canonical value as a big integer, for representation conversions.
+    fn to_big(&self, a: Self::E) -> BigUint;
+
     fn neg(&mut self, a: Self::E) -> Self::E {
         let z = self.zero();
         self.sub(z, a)
@@ -164,6 +167,9 @@ impl PrimeField for P192Field {
     fn key(&self, a: Fp) -> Key {
         self.ar.canonical(a).0
     }
+    fn to_big(&self, a: Fp) -> BigUint {
+        self.ar.to_biguint(a)
+    }
 }
 
 /// A prime field of fewer than 63 bits, for toy curves.
@@ -229,6 +235,9 @@ impl PrimeField for SmallPrime {
     }
     fn key(&self, a: u64) -> Key {
         [a, 0, 0]
+    }
+    fn to_big(&self, a: u64) -> BigUint {
+        BigUint::from(a)
     }
 }
 
@@ -309,6 +318,9 @@ impl<const L: usize> PrimeField for MontField<L> {
     }
     fn key(&self, a: MElem<L>) -> [u64; L] {
         self.ctx.from_montgomery(&Uint(a.0)).0
+    }
+    fn to_big(&self, a: MElem<L>) -> BigUint {
+        Uint(self.ctx.from_montgomery(&Uint(a.0)).0).to_biguint()
     }
 }
 

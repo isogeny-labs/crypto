@@ -76,7 +76,7 @@ def boundary_map() -> None:
     ax.text(2.0, len(rows) - 0.15, "reference lower", color=RED, fontweight="bold")
     ax.grid(True, which="both", axis="x")
     ax.text(0.0, -0.22,
-            "Ratios are meaningful only within each row's domain and unit. The GHS-weak rows are not generic-curve results.",
+            "Ratios are meaningful only within each row's domain and unit. GHS-weak is restricted-family; generator-orbit is fixed-setup BSGS engineering.",
             transform=ax.transAxes, color=GREY, fontsize=8.5)
     save(fig, "boundary-map")
 

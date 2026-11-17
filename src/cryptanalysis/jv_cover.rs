@@ -132,8 +132,10 @@ impl Fq {
         *a == E2::ZERO || self.pow(a, self.order() / 2) == E2::ONE
     }
     pub fn random(&self, rng: &mut StdRng) -> E2 {
-        super::jv_bitops::rng_words(2);
-        E2([rng.gen_range(0..self.p), rng.gen_range(0..self.p)])
+        E2([
+            super::jv_bitops::uniform_mod_u64(rng, 0, self.p),
+            super::jv_bitops::uniform_mod_u64(rng, 0, self.p),
+        ])
     }
     /// Tonelli–Shanks in `F_{p²}^×`.
     pub fn sqrt(&self, a: &E2, rng: &mut StdRng) -> Option<E2> {
@@ -1290,6 +1292,12 @@ impl WeilForms {
 pub struct ZeroDimStats {
     pub degree_reached: u32,
     pub solving_degree: u32,
+    /// Measured degree-fall diagnostics from the F4 solve, when
+    /// `record_degree_falls` was set on the options. Diagnostic only: never
+    /// priced into the counted unit, never a stopping rule.
+    pub first_fall_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_muls: u64,
@@ -1462,6 +1470,9 @@ pub fn solve_zero_dim_mode(
     st.f4_muls = r.field_ops;
     st.degree_reached = r.degree_reached;
     st.solving_degree = r.solving_degree;
+    st.first_fall_degree = r.first_fall_degree;
+    st.last_fall_degree = r.last_fall_degree;
+    st.degree_of_regularity_observed = r.degree_of_regularity_observed;
     st.max_rows = r.max_rows;
     st.max_cols = r.max_cols;
     st.f4_ms = r.ms;
@@ -2139,6 +2150,10 @@ pub struct Spec {
     pub qj: Div<E2>,
     /// `F_p` multiplications spent building the instance's transfer.
     pub transfer_muls: u64,
+    /// Factor-base line `x = a·s + b` (`a = t²`), when the model of `H` was
+    /// moved by [`search_fb_line`]: `(a, b, t)`.  `None` is the plain model,
+    /// factor base `{x ∈ F_p}`.  `gj`, `qj` are on the moved model.
+    pub line: Option<(E2, E2, E2)>,
 }
 
 /// Per-thread contexts: the tower, the cover, and the `Re`/`Im` tables.
@@ -2156,7 +2171,10 @@ impl Ctx {
     }
     pub fn with_trace(spec: &Spec, trace: bool) -> Ctx {
         let f = Fq3::new(spec.p);
-        let cov = Cover::new(&f, &spec.alpha).expect("cover");
+        let mut cov = Cover::new(&f, &spec.alpha).expect("cover");
+        if let Some((a, b, _)) = spec.line {
+            cov.hx = line_poly(&f.f, &cov.hx, &a, &b);
+        }
         let reim = ReIm::new(spec.p, f.f.w);
         f.reset_muls();
         Ctx {
@@ -2224,6 +2242,7 @@ pub fn generate_spec(p: u64, seed: u64) -> Spec {
             gj,
             qj,
             transfer_muls,
+            line: None,
         };
     }
 }
@@ -2258,6 +2277,7 @@ pub fn spec_from_curve(p: u64, alpha: E6, l: u64, g: PtE6, q: PtE6, d: u64) -> O
         gj,
         qj,
         transfer_muls,
+        line: None,
     })
 }
 
@@ -2295,6 +2315,339 @@ pub fn factor_base(ctx: &Ctx, rng: &mut StdRng) -> Vec<BaseEl> {
     out
 }
 
+// ── Choosing the factor-base line ─────────────────────────────────────────
+//
+// The decomposition test asks for the sextic's six roots to lie in an
+// `F_p`-line of `F_q`.  Nothing ties the line to `F_p` itself: under
+// `x = a·s + b` (`a = t²` a square of `F_q`, so that `y = t⁷·y′` keeps the
+// model monic and over `F_q`, not its twist) the curve `H` becomes
+// `H′ : y′² = h(a s + b)/a⁷`, isomorphic over `F_q`, and the factor base
+// `{x ∈ F_p}` of `H′` is the factor base `{x ∈ a·F_p + b}` of `H`.  The test
+// is the same six quadrics in six unknowns.  What changes is the base's
+// size `B` (the abscissae whose `h` is a non-zero square), and the residuals
+// a run needs scale as `B · (p/2B)⁶ = B^{−5}` (rate `≈ (2B/p)⁶/720`, `B + 1`
+// relations).  `B` fluctuates by `≈ √p/2` from line to line, so a search
+// over lines buys a factor `(1 + k/√p)⁵` for a `k`-sigma line, and every
+// multiplication of the search is charged.
+
+/// `h(a x + b) / lc`, made monic (`lc` the leading coefficient of `h(ax+b)`).
+pub fn line_poly(f: &Fq, h: &[E2], a: &E2, b: &E2) -> Poly<E2> {
+    let lin = [*b, *a];
+    let mut r: Poly<E2> = vec![*h.last().expect("non-zero polynomial")];
+    for c in h.iter().rev().skip(1) {
+        r = pmul(f, &r, &lin);
+        r[0] = f.add(&r[0], c);
+    }
+    let lc = *r.last().unwrap();
+    let il = f.inv(&lc);
+    pscale(f, &r, &il)
+}
+
+/// The divisor `(u, v)` of `H` on `H′`: `u′ = u(a s + b)` made monic,
+/// `v′ = v(a s + b)/t⁷`.
+pub fn line_div(f: &Fq, d: &Div<E2>, a: &E2, b: &E2, t: &E2) -> Div<E2> {
+    let u = if d.u.len() <= 1 {
+        d.u.clone()
+    } else {
+        line_poly(f, &d.u, a, b)
+    };
+    let mut v: Poly<E2> = Vec::new();
+    if !d.v.is_empty() {
+        let lin = [*b, *a];
+        v = vec![*d.v.last().unwrap()];
+        for c in d.v.iter().rev().skip(1) {
+            v = pmul(f, &v, &lin);
+            v[0] = f.add(&v[0], c);
+        }
+        let t2 = f.mul(t, t);
+        let t7 = f.mul(&f.mul(&f.mul(&t2, &t2), &t2), t);
+        v = pscale(f, &v, &f.inv(&t7));
+        while v.last() == Some(&E2::ZERO) {
+            v.pop();
+        }
+    }
+    Div { u, v }
+}
+
+/// What a factor-base line search did, for the run record.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct LineSearch {
+    /// Lines tried, the plain line `a = 1, b = 0` first.
+    pub candidates: u64,
+    /// `B` of the plain line and of the chosen line.
+    pub b_plain: usize,
+    pub b_best: usize,
+    /// Index of the chosen line among the candidates (0: the plain line).
+    pub best_index: u64,
+    /// Every `F_p` multiplication of the search, the move of `G`, `Q` included.
+    pub muls: u64,
+    /// `horner` (per-line Horner at `F_p` points) or `table` (one `χ(h)` table
+    /// over `F_q`, then additions and lookups per line).
+    pub mode: String,
+    /// The table mode enumerated every square-direction line up to equivalence.
+    pub exhaustive: bool,
+    /// `F_p` additions and table lookups the search performs and does not
+    /// count among `muls` (Horner: `2·deg + 1` and one per point; table: the
+    /// table build plus two and one per point of each line walked).
+    pub adds: u64,
+    pub lookups: u64,
+    /// `F_p` multiplications of the `χ(h)` table build (inside `muls`).
+    pub table_muls: u64,
+    /// Points `x ∈ F_q` whose `χ(h(x))` the search read or computed.
+    pub points: u64,
+}
+
+/// `#{s ∈ F_p : h′(s) a non-zero square of F_q}` for monic `h′ ∈ F_q[x]`.
+/// Squareness through the norm: `z ∈ F_q^×` is a square iff `N(z) = z₀² − ω z₁²`
+/// is a square of `F_p^×`, read from a table of the squares of `F_p` built
+/// once.  Charged: Horner at an `F_p` point (two products per step) and the
+/// norm (three); the table lookup is a native operation.
+fn line_count(f: &Fq, hp: &[E2], qr: &[bool]) -> usize {
+    let p = f.p;
+    let deg = hp.len() - 1;
+    let mut cnt = 0usize;
+    for s in 0..p {
+        let mut acc = hp[deg];
+        for k in (0..deg).rev() {
+            acc = E2([
+                am(mm(acc.0[0], s, p), hp[k].0[0], p),
+                am(mm(acc.0[1], s, p), hp[k].0[1], p),
+            ]);
+        }
+        let n = sm(
+            mm(acc.0[0], acc.0[0], p),
+            mm(mm(acc.0[1], acc.0[1], p), f.w, p),
+            p,
+        );
+        if n != 0 && qr[n as usize] {
+            cnt += 1;
+        }
+    }
+    f.count_public(p * (2 * deg as u64 + 3));
+    cnt
+}
+
+/// Search `n` lines `a·F_p + b` (`a = t²`, `t`, `b` uniform from the seed's
+/// stream; the plain line first) for the largest factor base, and move the
+/// instance to the best one.  The returned spec has `line` set and `gj`,
+/// `qj` on the moved model; logarithms are unchanged (an isomorphism).
+pub fn search_fb_line(spec: &Spec, n: u64, seed: u64) -> (Spec, LineSearch) {
+    search_fb_line_mode(spec, n, seed, false)
+}
+
+/// Line search by `JV_FB_LINE=n` and `JV_FB_LINE_MODE=horner|table` (unset or
+/// `n = 0`: no search, `None`).  Returns the moved spec and the record.
+pub fn fb_line_from_env(spec: &Spec, seed: u64) -> (Spec, Option<LineSearch>) {
+    let n: u64 = std::env::var("JV_FB_LINE")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
+    if n == 0 || spec.line.is_some() {
+        return (spec.clone(), None);
+    }
+    let table = match std::env::var("JV_FB_LINE_MODE").as_deref() {
+        Ok("table") => true,
+        Ok("horner") | Err(_) => false,
+        Ok(m) => panic!("JV_FB_LINE_MODE={m}: expected horner or table"),
+    };
+    let (s2, rep) = search_fb_line_mode(spec, n, seed, table);
+    (s2, Some(rep))
+}
+
+/// Number of square-direction lines `a·F_p + b` up to equivalence:
+/// `(p + 1)/2` directions (classes of `a = t²` modulo `F_p^×`) times `p`
+/// offsets (cosets of `a·F_p` in `F_q`).
+pub fn line_classes(p: u64) -> u64 {
+    p.div_ceil(2) * p
+}
+
+/// `χ(h(x))` for every `x = (x₀, x₁) ∈ F_q`, at index `x₀·p + x₁`: `true`
+/// iff `h(x)` is a non-zero square of `F_q`.  Horner with `F_q` products
+/// (five `F_p` products each, seven steps) and the norm (three), the square
+/// table of `F_p` as the native lookup.
+fn chi_table(f: &Fq, h: &[E2], qr: &[bool]) -> Vec<bool> {
+    let p = f.p;
+    let w = f.w;
+    let deg = h.len() - 1;
+    let mut out = vec![false; (p * p) as usize];
+    out.par_chunks_mut(p as usize)
+        .enumerate()
+        .for_each(|(x0, row)| {
+            let x0 = x0 as u64;
+            for (x1, slot) in row.iter_mut().enumerate() {
+                let x1 = x1 as u64;
+                let mut acc = h[deg];
+                for k in (0..deg).rev() {
+                    let m00 = mm(acc.0[0], x0, p);
+                    let m11 = mm(acc.0[1], x1, p);
+                    let r0 = am(m00, mm(w, m11, p), p);
+                    let r1 = am(mm(acc.0[0], x1, p), mm(acc.0[1], x0, p), p);
+                    acc = E2([am(r0, h[k].0[0], p), am(r1, h[k].0[1], p)]);
+                }
+                let n = sm(
+                    mm(acc.0[0], acc.0[0], p),
+                    mm(mm(acc.0[1], acc.0[1], p), w, p),
+                    p,
+                );
+                *slot = n != 0 && qr[n as usize];
+            }
+        });
+    out
+}
+
+/// `B` of the line `x = a·s + b`, `s ∈ F_p`, read from the table: two
+/// additions and one lookup per point.
+fn table_count(p: u64, chi: &[bool], a: &E2, b: &E2) -> usize {
+    let (mut x0, mut x1) = (b.0[0], b.0[1]);
+    let mut cnt = 0usize;
+    for _ in 0..p {
+        cnt += chi[(x0 * p + x1) as usize] as usize;
+        x0 = am(x0, a.0[0], p);
+        x1 = am(x1, a.0[1], p);
+    }
+    cnt
+}
+
+/// [`search_fb_line`] with the Horner count (`table = false`) or the `χ(h)`
+/// table (`table = true`).  Both draw the same candidate lines from the same
+/// stream, so for equal `n` they choose the same line.  In table mode,
+/// `n ≥ line_classes(p) + 1` enumerates every square-direction line up to
+/// equivalence instead (plain line first, then direction by direction).
+pub fn search_fb_line_mode(spec: &Spec, n: u64, seed: u64, table: bool) -> (Spec, LineSearch) {
+    let f = Fq::new(spec.p);
+    let p = spec.p;
+    let f3 = Fq3::new(p);
+    let cov = Cover::new(&f3, &spec.alpha).expect("cover");
+    let h = cov.hx.clone();
+    let deg = (h.len() - 1) as u64;
+    f.reset_muls();
+    let mut qr = vec![false; p as usize];
+    for x in 1..p {
+        qr[mm(x, x, p) as usize] = true;
+    }
+    f.count_public((p - 1) / 2);
+    let mut rep = LineSearch {
+        mode: if table { "table" } else { "horner" }.to_string(),
+        ..Default::default()
+    };
+    let n = n.max(1);
+    let mut chi: Vec<bool> = Vec::new();
+    if table {
+        chi = chi_table(&f, &h, &qr);
+        let q = p * p;
+        // per point: `deg` steps of (product 5 + add 2 + add 2 → counted as
+        // 2 adds per product and 2 per coefficient add) and the norm (3, 1 add)
+        f.count_public(q * (deg * 5 + 3));
+        rep.table_muls = q * (deg * 5 + 3);
+        rep.adds += q * (deg * 4 + 1);
+        rep.lookups += q;
+        rep.points += q;
+    }
+    let exhaustive = table && n > line_classes(p);
+    rep.exhaustive = exhaustive;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xFB_11AE);
+    let mut best = (0usize, 0u64, E2::ONE, E2::ZERO, E2::ONE);
+    let mut b_plain = 0;
+    let mut tried = 0u64;
+    let n_random = if exhaustive { 1 } else { n };
+    for i in 0..n_random {
+        let (t, b) = if i == 0 {
+            (E2::ONE, E2::ZERO)
+        } else {
+            loop {
+                let t = f.random(&mut rng);
+                if t != E2::ZERO {
+                    break (t, f.random(&mut rng));
+                }
+            }
+        };
+        let a = f.mul(&t, &t);
+        tried += 1;
+        let c = if table {
+            rep.adds += 2 * p;
+            rep.lookups += p;
+            rep.points += p;
+            table_count(p, &chi, &a, &b)
+        } else {
+            let hp = if i == 0 {
+                h.clone()
+            } else {
+                line_poly(&f, &h, &a, &b)
+            };
+            rep.adds += p * (2 * deg + 1);
+            rep.lookups += p;
+            rep.points += p;
+            line_count(&f, &hp, &qr)
+        };
+        if i == 0 {
+            b_plain = c;
+        }
+        if c > best.0 {
+            best = (c, i, a, b, t);
+        }
+    }
+    if exhaustive {
+        // directions: classes of t modulo F_p^× (t = (1, u) and (0, 1)), a = t²,
+        // keyed by a normalised to a leading 1; first t of a key is kept
+        let mut dirs: std::collections::BTreeMap<(u64, u64), (E2, E2)> = Default::default();
+        for u in 0..=p {
+            let t = if u < p { E2([1, u]) } else { E2([0, 1]) };
+            let a = f.mul(&t, &t);
+            let key = if a.0[0] != 0 {
+                f.count_public(17);
+                (1, mm(a.0[1], inv_mod(a.0[0], p), p))
+            } else {
+                (0, 1)
+            };
+            dirs.entry(key).or_insert((a, t));
+        }
+        assert_eq!(dirs.len() as u64, p.div_ceil(2), "square directions");
+        let dirs: Vec<(E2, E2)> = dirs.into_values().collect();
+        // (count, first-index) per direction, best offset u of each
+        let res: Vec<(usize, u64)> = dirs
+            .par_iter()
+            .map(|(a, _)| {
+                let a_prime = if a.0[1] == 0 { E2([0, 1]) } else { E2([1, 0]) };
+                let mut bst = (0usize, 0u64);
+                for u in 0..p {
+                    let b = E2([mm(a_prime.0[0], u, p), mm(a_prime.0[1], u, p)]);
+                    let c = table_count(p, &chi, a, &b);
+                    if c > bst.0 {
+                        bst = (c, u);
+                    }
+                }
+                bst
+            })
+            .collect();
+        for (d, (c, u)) in res.iter().enumerate() {
+            if *c > best.0 {
+                let (a, t) = dirs[d];
+                let a_prime = if a.0[1] == 0 { E2([0, 1]) } else { E2([1, 0]) };
+                let b = E2([mm(a_prime.0[0], *u, p), mm(a_prime.0[1], *u, p)]);
+                best = (*c, 1 + d as u64 * p + *u, a, b, t);
+            }
+        }
+        let lines = dirs.len() as u64 * p;
+        tried += lines;
+        rep.adds += 2 * p * lines;
+        rep.lookups += p * lines;
+        rep.points += p * lines;
+    }
+    let (b_best, best_index, a, b, t) = best;
+    let mut out = spec.clone();
+    if best_index != 0 && !(a == E2::ONE && b == E2::ZERO) {
+        out.gj = line_div(&f, &spec.gj, &a, &b, &t);
+        out.qj = line_div(&f, &spec.qj, &a, &b, &t);
+        out.line = Some((a, b, t));
+    }
+    rep.candidates = tried;
+    rep.b_plain = b_plain;
+    rep.b_best = b_best;
+    rep.best_index = best_index;
+    rep.muls = f.muls();
+    (out, rep)
+}
+
 /// `R = Σ ε_i B_i` over six distinct base elements, `ε_i = ±1`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 pub struct Dec6 {
@@ -2326,6 +2679,12 @@ pub struct NagaoCost {
     pub post_muls: u64,
     pub delta: usize,
     pub degree_reached: u32,
+    /// Measured degree-fall diagnostics carried up from the F4 solve
+    /// (`degree_story = "polynomial-system"`). Diagnostic only: never priced
+    /// into the counted unit, never a stopping rule.
+    pub first_fall_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_ms: f64,
@@ -2356,6 +2715,7 @@ impl NagaoCost {
 pub fn jv_options(max_degree: u32, budget_secs: f64) -> F4Options {
     F4Options::new(F4Ordering::Grevlex, max_degree)
         .with_budget(std::time::Duration::from_secs_f64(budget_secs))
+        .recording_degree_falls()
 }
 
 /// [`jv_options`] with F4 stopped as soon as the leading monomials found so
@@ -2426,6 +2786,9 @@ pub fn nagao_decompose(
     cost.lin_muls = st.lin_muls;
     cost.delta = st.delta;
     cost.degree_reached = st.degree_reached;
+    cost.first_fall_degree = st.first_fall_degree;
+    cost.last_fall_degree = st.last_fall_degree;
+    cost.degree_of_regularity_observed = st.degree_of_regularity_observed;
     cost.max_rows = st.max_rows;
     cost.max_cols = st.max_cols;
     cost.f4_ms = st.f4_ms;
@@ -3235,6 +3598,9 @@ pub fn run_cover_ccov_mode(
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct CoverDlpReport {
+    /// Factor-base line search (`JV_FB_LINE=n`; `None` when off), its
+    /// multiplications inside `setup_muls`.
+    pub fb_line: Option<LineSearch>,
     pub p: u64,
     pub seed: u64,
     pub l: u64,
@@ -3366,8 +3732,25 @@ pub fn run_cover_dlp_mode(
     };
     let start = Instant::now();
     let spec = generate_spec(p, seed);
+    // Opt-in: JV_FB_LINE=n searches n factor-base lines and moves the
+    // instance to the largest base (unset or 0: the plain model, unchanged).
+    let line_n: u64 = std::env::var("JV_FB_LINE")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
+    let (spec, fb_line) = if line_n > 0 {
+        let (s2, rep) = search_fb_line(&spec, line_n, seed);
+        (s2, Some(rep))
+    } else {
+        (spec, None)
+    };
+    let line_muls = fb_line.as_ref().map_or(0, |r| r.muls);
     let ctx = Ctx::with_trace(&spec, trace);
     let jac = ctx.jac();
+    assert!(
+        jac.is_valid(&spec.gj) && jac.is_valid(&spec.qj),
+        "moved divisors on H'"
+    );
     let l = spec.l;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x3D1F6);
     let (c_e, c_j) = unit_costs(&spec, &ctx);
@@ -3389,9 +3772,10 @@ pub fn run_cover_dlp_mode(
     let mut a = rng.gen_range(0..l);
     let mut b = rng.gen_range(1..l);
     let mut r = jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128));
-    let setup_muls = ctx.f.muls() + spec.transfer_muls;
+    let setup_muls = ctx.f.muls() + spec.transfer_muls + line_muls;
     ctx.f.reset_muls();
     let mut rep = CoverDlpReport {
+        fb_line,
         p,
         seed,
         l,
@@ -4060,6 +4444,32 @@ mod tests {
         }
     }
 
+    /// The χ(h) table search and the Horner search draw the same lines from
+    /// the same stream, so they agree on every B and on the chosen line; the
+    /// exhaustive enumeration finds a base at least as large.
+    #[test]
+    fn table_search_matches_horner_and_exhaustive_dominates() {
+        let spec = generate_spec(101, 3);
+        let (sh, h) = search_fb_line_mode(&spec, 40, 3, false);
+        let (st, t) = search_fb_line_mode(&spec, 40, 3, true);
+        assert_eq!(
+            (h.b_plain, h.b_best, h.best_index),
+            (t.b_plain, t.b_best, t.best_index)
+        );
+        assert_eq!(sh.line, st.line);
+        assert_eq!(h.candidates, t.candidates);
+        let (_, one) = search_fb_line_mode(&spec, 1, 3, true);
+        assert_eq!(one.b_plain, h.b_plain);
+        let (se, e) = search_fb_line_mode(&spec, line_classes(101) + 1, 3, true);
+        assert!(e.exhaustive && e.b_best >= t.b_best && e.b_best >= e.b_plain);
+        // the moved model's factor base has exactly b_best points
+        let ctx = Ctx::new(&se);
+        let mut rng = StdRng::seed_from_u64(1);
+        assert_eq!(factor_base(&ctx, &mut rng).len(), e.b_best);
+        let ctx = Ctx::new(&st);
+        assert_eq!(factor_base(&ctx, &mut rng).len(), t.b_best);
+    }
+
     fn small_ctx(p: u64, seed: u64) -> (Spec, Ctx, Vec<BaseEl>, HashMap<u64, usize>, StdRng) {
         let spec = generate_spec(p, seed);
         let ctx = Ctx::new(&spec);
@@ -4415,6 +4825,75 @@ mod tests {
             applied >= n - 3,
             "applied {applied} fallbacks {fallbacks} of {n}"
         );
+    }
+
+    /// The cover descent's inner zero-dim solve now records degree-fall
+    /// diagnostics (`jv_options` sets `record_degree_falls`). A regular
+    /// sequence has no fall and its observed degree of regularity is the
+    /// generic bound `n + 1`; an over-determined but consistent system falls,
+    /// so a first-fall degree is recorded and is bounded by the last-fall
+    /// degree. The diagnostic must not change the solutions.
+    #[test]
+    fn solve_zero_dim_records_degree_falls() {
+        let p = 101u64;
+        // x_i^2 - 1 in n variables.
+        let quad = |i: usize, n: usize| -> f4_fp::Poly {
+            let mut e = vec![0u32; n];
+            e[i] = 2;
+            vec![(e, 1u64), (vec![0u32; n], p - 1)]
+        };
+        let opts = jv_options(6, 120.0);
+        let mut rng = StdRng::seed_from_u64(0x0D_FA11);
+
+        // Regular sequence {x^2 - 1, y^2 - 1}: realized Hilbert == semi-regular
+        // prediction at every degree, so no fall and d_reg_obs = n + 1 = 3.
+        let reg: Vec<f4_fp::Poly> = (0..2).map(|i| quad(i, 2)).collect();
+        let (sols, st) = solve_zero_dim(&reg, 2, p, &opts, &mut rng);
+        assert_eq!(
+            st.degree_of_regularity_observed,
+            Some(3),
+            "regular sequence: observed d_reg is the generic bound n+1"
+        );
+        assert_eq!(
+            st.first_fall_degree, None,
+            "regular sequence has no degree fall"
+        );
+        // All four rational roots (±1, ±1) are found and every returned point
+        // satisfies the system (recording did not perturb the solve).
+        for w in [[1u64, 1], [1, 100], [100, 1], [100, 100]] {
+            assert!(
+                sols.iter().any(|s| s[0] == w[0] && s[1] == w[1]),
+                "missing root {w:?} among {sols:?}"
+            );
+        }
+        for s in &sols {
+            assert_eq!((s[0] * s[0]) % p, 1);
+            assert_eq!((s[1] * s[1]) % p, 1);
+        }
+
+        // Over-determined consistent system {x^2-1, y^2-1, xy-1}: the third
+        // relation cuts the four points to {(1,1), (-1,-1)}, forcing a fall.
+        let xy: f4_fp::Poly = vec![(vec![1u32, 1u32], 1u64), (vec![0u32, 0u32], p - 1)];
+        let over: Vec<f4_fp::Poly> = vec![quad(0, 2), quad(1, 2), xy];
+        let (sols2, st2) = solve_zero_dim(&over, 2, p, &opts, &mut rng);
+        assert!(
+            st2.degree_of_regularity_observed.is_some(),
+            "observed d_reg recorded on the over-determined system"
+        );
+        if let (Some(f), Some(l)) = (st2.first_fall_degree, st2.last_fall_degree) {
+            assert!(f <= l, "first-fall {f} must not exceed last-fall {l}");
+        }
+        for w in [[1u64, 1], [100, 100]] {
+            assert!(
+                sols2.iter().any(|s| s[0] == w[0] && s[1] == w[1]),
+                "missing root {w:?} among {sols2:?}"
+            );
+        }
+        for s in &sols2 {
+            assert_eq!((s[0] * s[0]) % p, 1);
+            assert_eq!((s[1] * s[1]) % p, 1);
+            assert_eq!((s[0] * s[1]) % p, 1, "xy = 1");
+        }
     }
 
     #[test]

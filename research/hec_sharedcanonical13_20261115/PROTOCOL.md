@@ -1,0 +1,9 @@
+# Shared canonical divisor auxiliary variable: exact gate
+
+Known linear representation, not novelty. Prior sparse collector repeats h in each (Hi−h)x=0. Lift to Hi x−z=0 plus hx−z=0 once, with z retained in small factorbase. Exact kernel isomorphism x→(x,hx), inverse projection, rank adds1/nullity unchanged. This does not guarantee less fill or time.
+
+Fixed input same F127quotient,48pointfactorbase,314line relations, existingLPeliminator and sparseLanczos/seed20261115/retries32. Pointcolumn map: i=1..47→i−1, auxz→47, i>=48→i. Compare all129logs projectively against independent original dense collector; check all augmented rows, defining equation, ALL original unlifted sparse rows, and all314originalresiduals. Keep twelve planted/corruption kernel controls from preceding gate. Candidate receives only runtimequartic, no oldlogs/matrix/scalar.
+
+Pre-registered structural comparison: original sparseV2 frozen raw run-v2/stdout.txt has2378originalcoefficients, reduced232x47/2413entries, LP14455ops/9480entries. Candidate must print original/augmented counts, LPcounters, reducedsize/entries and retryattempt. Compare all metrics, retain regressions, don't infer runtime from counters. Additional row/column change means no exact pivot-sequence claim. No timing/exponent/tenfold claim. If exactness fails stop and retain; if structural work worsens don't deploy without justification. Standalone once into run/; source/lock/input/binaryhash commit and S3checkpoint/gate BEFORE execution. No scientific rerun or tuning without amendment. Fullcold integration requires separately frozen followup if retained.
+
+Shared corpus search found standard sparse filtering/Wiedemann pointers, not novelty evidence; existing N4v2 is source of Lanczos adapter. This gate is finite F127engineering, no genus2/4or genericfield claim. Full10xgoal remains open. No benchmark-record timing collected.

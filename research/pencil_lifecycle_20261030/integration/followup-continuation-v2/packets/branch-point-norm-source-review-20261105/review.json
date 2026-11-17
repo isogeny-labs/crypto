@@ -1,0 +1,61 @@
+{
+  "schema": "independent-formal-source-review/v1",
+  "producer_commit": "afccdb7d86ba43b9890555406618506a60343da9",
+  "source_sha256": "930259e66702f535984562e037f79d4e91e4aa74c9425a15df7cc217cdc77e9b",
+  "independent_derivation": "c1dedb6021d1ae08acba53b015652a5bd325be0a",
+  "status": "scoped_source_fidelity_supported",
+  "machine_status": "not_verified",
+  "compiler_runs": 0,
+  "claims": [
+    {
+      "name": "actual_branch_conjugate_orders",
+      "finding": "Actual ProjBranchRing and derived DVR instance; selected root gives x-a factor. Nonzero scalar maps to unit. Apply existing orderone lemma at B and -B; additive valuation gives productorder2, finite/toNat conclusions follow."
+    },
+    {
+      "name": "numerator_root_from_norm",
+      "finding": "Exact polynomial norm identity and supportroot at branch imply numeratorroot using existing field squarezero/factor theorem; no local order assumed."
+    },
+    {
+      "name": "two_support_roots_force_b_zero",
+      "finding": "Evaluate norm to get n(a)=0. Differentiate norm; two supportroots kill all product derivative terms and n(a) kills numerator derivative; b\u00b2fprime(a)=0 forces b0."
+    }
+  ],
+  "fixture_hand_check": {
+    "field": "Q",
+    "f": "x^5-x",
+    "u1": "x(x-1)",
+    "u2": "x\u00b2+1",
+    "coefficientData": [
+      -2,
+      0,
+      0,
+      -4,
+      -4
+    ],
+    "n": "0",
+    "U": "-4(x+1)",
+    "identity": "0-u1*u2*U=4f",
+    "base_orders_at0": [
+      1,
+      0,
+      0
+    ],
+    "stalk_orders_at0": [
+      2,
+      0,
+      0
+    ]
+  },
+  "unproved_bridges": [
+    "mapped curve identity and mapped source norm/support product",
+    "base multiplicity to normalized branch valuation transport",
+    "compilation and named axiom readback"
+  ],
+  "scope_notes": [
+    "Lean local statements use any field; char2 still satisfies stated local identities, but conjugates coincide and no distinct quadratic cover interpretation follows.",
+    "Support factor sum2 is not yet a theorem of this new candidate; it remains hand derivation plus missing transport.",
+    "Producer lease expiry is separate coordination history, not mathematical evidence."
+  ],
+  "hash_and_git_match": true,
+  "execution_authorized": false
+}

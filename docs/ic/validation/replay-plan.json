@@ -556,25 +556,33 @@
    "replay": "all",
    "expect": "identical",
    "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
-   "zero_replay_probe": {
-    "schema": "ic-static-zero-replay/v1",
-    "session_id": "ECBS1h302934ff99ed",
-    "records": 96,
-    "planned_executions": 96,
-    "verified_records": 0,
-    "files": {
+   "previous_expectation": {
+    "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n7",
+    "replay": "all",
+    "expect": "identical",
+    "static_only": true,
+    "reason": "Before #3502: audit.rs FAILED_OUTCOME_REPLAY_EXEMPT listed this session, all 96 outcomes were exhausted and the native probe reported 0 replay candidates (static integrity only, pinned zero_replay_probe, evidence reports/ci-repair-integration-20261029/replay-expectation-evidence/f6-n7-static-zero-native-probe.json sha256 f0cc6374b1ff9b1ab61c18104dac46d75b4b47e0169a6d2d42f32f8fe0315d3a).",
+    "input_files": {
      "host.json": "1c7f0072d0316cb06268f508818d937ce2e4ae4b52c2d4169f8b2e6e67eb659b",
      "plan.json": "192cc790de7498736c15c1a810f6513458b3bfd53c73eb9618135e3de55d0966",
      "records.jsonl": "09199b94cd84e0f3998fac744f50c83397cf493337dc8c2120d6159b2cb6e47a",
      "session.json": "3b45eb0274b54e28ddcc1d1ef5f82ef5ce2f86766e25ac2ab271847c88d8c77f",
      "spec.json": "ecc2e4e6142a4fb5d099ceeb83751bd303fae00e788d051f39a37310a1d889e8"
-    },
-    "reason": "Existing audit.rs FAILED_OUTCOME_REPLAY_EXEMPT: historical n7 exhausted outcomes count different phase work under current code. All96 original records are exhausted; the native positive-replay probe reports0 eligible candidates. Static integrity only; no solved scalar or reproduced replay is claimed.",
-    "evidence": {
-     "path": "reports/ci-repair-integration-20261029/replay-expectation-evidence/f6-n7-static-zero-native-probe.json",
-     "sha256": "f0cc6374b1ff9b1ab61c18104dac46d75b4b47e0169a6d2d42f32f8fe0315d3a",
-     "auditor_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646"
     }
+   },
+   "current_replay_evidence": {
+    "native_binary_sha256": "72c66b2b59514cf345c51b2cad7d7299199a14486d8887e6dfcb006dc95379f3",
+    "native_receipt_sha256": "bc27c3bb21ab942e43515b47a2f01718113b16d45ed2fc65d067e237f37f6870",
+    "native_receipt_gz_sha256": "a302b64d4fb2145751322630c3aabef275edcb3dd73d2368dc40882c0be4418c",
+    "command": "ecbench verify --dir research/f6_ic_ecbench_ladder_20261005/sessions/n7 --replay-all",
+    "records": 96,
+    "replay_candidates": 72,
+    "replayed": 72,
+    "reproduced": 72,
+    "problems": 0,
+    "source": "ff30ef0ef2f065d198532f4524e1ec53bc7318ae",
+    "status": "Native replay of all 72 eligible records reproduces. Since #3502 the session is no longer in FAILED_OUTCOME_REPLAY_EXEMPT and the pre-1646 legacy profile turns off the F6-IC partial-support test, so the exhausted outcomes replay instead of being checked statically only. The 24 records outside the 72 are warm-up runs (16 ic.pipeline, 8 rho.signed_frobenius_strong), never replayed.",
+    "receipt": "docs/ic/validation/replay-evidence/f6-n7-replay-all.native-audit.json.gz"
    }
   },
   {

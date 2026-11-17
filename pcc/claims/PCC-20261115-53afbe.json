@@ -1,0 +1,22 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T20:38:43Z",
+ "id": "PCC-20261115-53afbe",
+ "kind": "theorem",
+ "producer": {
+  "commit": "41a9816f5b72800944e025e1e77cd9c7a8fdd782",
+  "model": "",
+  "session": "larger-field-lean-example"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "736806076d36755f27532c96673d7b918cca04a4d4b1c8c5cba3f3cb68a78cfa",
+   "kind": "lean",
+   "project": "examples/cross_characteristic_ecdlp",
+   "theorem": "CrossCharacteristicLarger.example_dlog"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "examples/cross_characteristic_ecdlp; target field size 2^256, subgroup order 7; coordinates defined over F4; abstract transfer without a general efficient evaluator",
+ "statement": "For every integer k, S = [k]R on y^2+omega*y=x^3+omega*x^2 over GaloisField 2 256 if and only if Q = [k]P on y^2-x*y-4*y=x^3-4*x^2 over F_65537, for the stated order-seven points and a primitive cube root omega."
+}

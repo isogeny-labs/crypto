@@ -1,0 +1,114 @@
+{
+  "sources": [
+    {
+      "id": "S-SEMAEV-T2-20261102",
+      "title": "Semaev 2015 t = 2 rows: exact first fall degree and Macaulay degree",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/semaev_t2_trace_20261102/PROTOCOL.md (frozen before computing), semaev_t2_trace.py, results/t2_trace.txt, REPORT.md.",
+      "repository_path": "research/semaev_t2_trace_20261102/PROTOCOL.md"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4",
+      "label": "Semaev: first fall degree of S_3(x1,x2,z) systems 'always 4'",
+      "kind": "heuristic",
+      "status": "refuted",
+      "model": "algebraic_coordinate",
+      "statement": "For the Weil descent of S_3(x_1, x_2, z) with z a constant (deg_F2 = 2), 'the first fall degree for such polynomials was bounded by 5 in [11]. The experiments show it is always 4 again.'",
+      "scope": "Refuted: the first fall degree is 2 (trace identity; 200/200 instances on Semaev's t = 2 cells). Semaev uses this to support Assumption 1 and the first fall degree assumption for the chain system (4).",
+      "assumptions": [
+        "Semaev's definition of first fall degree (Section 4.4)"
+      ],
+      "source_refs": [
+        "S-SP-SEMAEV-2015",
+        "S-SEMAEV-T2-20261102"
+      ],
+      "source_locations": [
+        "Semaev 2015, Section 4.5 (paragraph on S_3(x_1, x_2, z))"
+      ],
+      "tags": [
+        "first-fall-degree",
+        "semaev",
+        "refuted"
+      ],
+      "formula": "d_ff(S_3(x_1, x_2, z)) = 4",
+      "evidence_class": "counterexample"
+    },
+    {
+      "id": "MEAS-SEMAEV-T2-MACAULAY",
+      "label": "Semaev t = 2 rows: degree needed to prove no solution is 2 or 3",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "On 200 instances of Semaev's t = 2 cells (none solvable in V x V), the least Macaulay degree D with 1 in the Boolean span {red(mu [S_3]_j) : deg mu <= D - 2} is 2 on 154 and 3 on 46, never 4; each with a recomputed combination equal to 1. Per cell (sparse / random field polynomial): (15,4) 18/2, 19/1; (15,5) 20/0, 20/0; (16,4) 18/2, 20/0; (19,3) 6/14, 4/16; (21,3) 15/5, 14/6 (degree 2 / degree 3).",
+      "scope": "The systems are overdetermined: their quadratic parts depend on x_1 x_2 in a (2k - 1)-dimensional space with 2k - 1 < n. Boolean Macaulay/XL degree, not F4's step trace.",
+      "assumptions": [],
+      "source_refs": [
+        "S-SEMAEV-T2-20261102"
+      ],
+      "tags": [
+        "measurement",
+        "solving-degree",
+        "semaev",
+        "exact"
+      ],
+      "evidence_class": "measurement",
+      "cited_by": [
+        {
+          "path": "research/semaev_t2_trace_20261102/results/t2_trace.txt",
+          "use": "measures"
+        },
+        {
+          "path": "research/semaev_t2_trace_20261102/REPORT.md",
+          "use": "reports"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "ST-001",
+      "from": "CEX-SP-SEMAEV15-T2-TRACE",
+      "to": "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4",
+      "relation": "refutes",
+      "statement": "Tr(z^-2 S_3) = Tr(x_1) + Tr(x_2) + Tr(B z^-2): a constant-multiplier fall at degree 2; checked on 200/200 instances.",
+      "source_refs": [
+        "S-SEMAEV-T2-20261102",
+        "S-KOSTERS-YEO-2015"
+      ]
+    },
+    {
+      "id": "ST-002",
+      "from": "MEAS-SEMAEV-T2-MACAULAY",
+      "to": "CEX-SP-SEMAEV15-T2-TRACE",
+      "relation": "qualifies",
+      "statement": "The degree the systems require is 2 or 3, not Magma's reported 4; the sharp first-fall assumption fails on 46/200 instances (3 > 2).",
+      "source_refs": [
+        "S-SEMAEV-T2-20261102"
+      ]
+    },
+    {
+      "id": "ST-003",
+      "from": "MEAS-SEMAEV-T2-MACAULAY",
+      "to": "HEUR-SP-SEMAEV15-ASSUMPTION1",
+      "relation": "measures",
+      "statement": "Consistent with d_F4 <= 4 on the t = 2 rows (degree needed <= 3).",
+      "source_refs": [
+        "S-SEMAEV-T2-20261102"
+      ]
+    },
+    {
+      "id": "ST-004",
+      "from": "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4",
+      "to": "HEUR-SP-SEMAEV15-ASSUMPTION1",
+      "relation": "qualifies",
+      "statement": "Semaev's support for Assumption 1 cites first fall degree 4 for S_3(x_1, x_2, z); that support is gone, though the d_F4 <= 4 data stand on their own.",
+      "source_refs": [
+        "S-SEMAEV-T2-20261102"
+      ]
+    }
+  ],
+  "research_targets": []
+}

@@ -1,0 +1,15 @@
+# Current finite pricing reconciliation
+
+The historical nine-category finite source review is complete at its recorded scope, binary and protocol. Ten of its seventeen bound source files still match; seven differ. This is not a new independent review or current binary admission.
+
+Exact inspected deltas: analyzer/importer add nullable prospective session identities while requiring a concrete identity for a present record; arithmetic mapping is unchanged in that mapper diff. The rho event file changes only a test to hash_one. The kernel lib exports relation_stream behind reporting. Native solver adds trace/capture/accounting; pencil and three_leads adapters add the explicit observed route and move target-independent applicability checks before the old method boundary. Review the actual selected route and newly imported modules, not just changed filenames. Counter and phase fidelity must bind the final candidate, not this intermediate source inventory.
+
+The existing mapper covers atomic base/scalar inversion normalization, constructor and outer primality, setup/transfer, disjoint collection/map operations, observed hashes and atomic RNG, source verification, metadata clone nodes and calibration. Diagnostic aggregate counters are intentionally excluded to avoid double counts. The scalar helper subtracts bitlength(r-2)+popcount(r-2) multiplications per inverse, matching the unconditional final square; it does not equate scalar inversion price to base-field I/M.
+
+Allocation, JSON/serialization/digest work, observer traversal, parent/harness/process costs, wall/CPU/RSS and infrastructure/retries have no invented GAE conversion. Retain and report them in their own units. Finite36-cell algorithm prices are not an all-instruction or total-dollar census. The existing mapper explicitly provides calibration separately and combined, requires matching source-addition units, and guards source/protocol/reviewer/binary hashes. Generic importer coverage warnings and old native header text do not supersede the independent finite-model audit.
+
+For the finite-difference candidate, preserve exact SieveResult and instrument the changed primitive stream. Rebind the final source closure, executable mapper, producer/reference binaries and prospective protocol; independently check source sites in all nine categories, reusing exact unchanged coverage. Historical p739 algorithm outputs may remain mathematically equivalent while costs change: old counters are not automatically optimized-candidate counters.
+
+Primary sources inspected: native_price/{README.md,src/analyzer.rs,src/importer.rs,src/disjoint.rs}; src/{meter.rs,scalar_ledger.rs,native_solver.rs}; COST_MODEL_DRAFT.json; validation/accounting/{COST_BOUNDARY.md,finite-nine-category-source-audit.json}; validation/finite_coverage_run_binding_20261030/coverage-review.json and its retained source snapshots. No comparative outputs or scientific data were generated.
+
+Coordinator decision: retain old p739 as old-arm evidence; the optimized candidate requires new execution over all1,260 original targets.

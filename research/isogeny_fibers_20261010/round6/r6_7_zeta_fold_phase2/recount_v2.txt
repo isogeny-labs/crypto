@@ -1,0 +1,48 @@
+(c)/(b) size-matched, m=2, torsion, law 1, n curves = 18
+curve                        point(unp)          unpriced CI             asrun CI         essential CI
+bits9/seed1/p=433                 0.784       [0.707,0.873]        [0.714,0.869]        [0.707,0.872] 
+bits9/seed2/p=277                 1.111       [0.999,1.263]*       [1.006,1.263]        [0.998,1.261]*
+bits9/seed3/p=421                 0.786       [0.679,0.919]        [0.680,0.909]        [0.679,0.919] 
+bits10/seed1/p=919                1.089       [0.902,1.308]*       [0.907,1.286]*       [0.902,1.307]*
+bits10/seed2/p=919                1.114       [0.933,1.401]*       [0.935,1.385]*       [0.934,1.401]*
+bits10/seed3/p=733                0.542       [0.472,0.636]        [0.479,0.635]        [0.472,0.636] 
+bits11/seed1/p=1447               0.809       [0.694,0.946]        [0.706,0.945]        [0.695,0.946] 
+bits11/seed2/p=1531               1.127       [0.974,1.351]*       [0.987,1.346]*       [0.974,1.350]*
+bits11/seed3/p=1669               0.936       [0.811,1.106]*       [0.816,1.106]*       [0.811,1.106]*
+bits12/seed1/p=2647               0.749       [0.660,0.874]        [0.669,0.869]        [0.661,0.875] 
+bits12/seed2/p=2557               0.997       [0.860,1.174]*       [0.852,1.154]*       [0.860,1.174]*
+bits12/seed3/p=3169               0.899       [0.790,1.040]*       [0.777,1.005]*       [0.789,1.038]*
+bits13/seed1/p=6073               0.990       [0.852,1.164]*       [0.859,1.145]*       [0.852,1.164]*
+bits13/seed2/p=4639               0.779       [0.673,0.912]        [0.686,0.914]        [0.673,0.912] 
+bits13/seed3/p=7933               0.763       [0.660,0.905]        [0.677,0.908]        [0.661,0.905] 
+bits14/seed1/p=15349              0.891       [0.772,1.039]*       [0.781,1.032]*       [0.773,1.040]*
+bits14/seed2/p=14923              0.861       [0.744,1.010]*       [0.747,1.000]        [0.744,1.007]*
+bits14/seed3/p=12391              0.974       [0.827,1.140]*       [0.848,1.155]*       [0.826,1.140]*
+(* = CI contains 1)
+  unpriced         : 11 of 18 CIs contain 1
+  priced_as_run    : 9 of 18 CIs contain 1
+  priced_essential : 11 of 18 CIs contain 1
+  unpriced         : point range 0.542 to 1.127
+  priced_as_run    : point range 0.546 to 1.134
+  priced_essential : point range 0.542 to 1.126
+  max |priced as run - unpriced| (points): 0.0221
+  max |priced essential - unpriced| (points): 0.0018
+  curves whose unpriced CI excludes 1: ['bits9/seed1/p=433', 'bits9/seed3/p=421', 'bits10/seed3/p=733', 'bits11/seed1/p=1447', 'bits12/seed1/p=2647', 'bits13/seed2/p=4639', 'bits13/seed3/p=7933']
+  curves whose as-run CI excludes 1: ['bits9/seed1/p=433', 'bits9/seed2/p=277', 'bits9/seed3/p=421', 'bits10/seed3/p=733', 'bits11/seed1/p=1447', 'bits12/seed1/p=2647', 'bits13/seed2/p=4639', 'bits13/seed3/p=7933', 'bits14/seed2/p=14923']
+  curves whose essential CI excludes 1: ['bits9/seed1/p=433', 'bits9/seed3/p=421', 'bits10/seed3/p=733', 'bits11/seed1/p=1447', 'bits12/seed1/p=2647', 'bits13/seed2/p=4639', 'bits13/seed3/p=7933']
+
+cross-check of the other table rows
+  B/A m=3        n= 9 unpriced: 8  priced_as_run: 8  priced_essential: 8
+  C/A m=3        n= 9 unpriced: 8  priced_as_run: 8  priced_essential: 8
+  B/C m=3        n= 9 unpriced: 0  priced_as_run: 0  priced_essential: 0
+  (b)/(a) m=2    n=30 unpriced: 30  priced_as_run: 30  priced_essential: 30
+
+additional checks (statements next to the miscount)
+  inversion share of priced-as-run cost: m=3 0.378 to 0.437 (27 arm-curves); m=2 0.360 to 0.510 (arms (a)/(b) on 30 curves, arm (c) on 18 torsion curves)
+  m=3 max |priced point - unpriced point|, ratio_B_over_A: 0.0151
+  m=3 max |priced point - unpriced point|, ratio_B_over_A_size_matched: 0.0149
+  m=3 max |priced point - unpriced point|, ratio_B_over_C: 0.0093
+  m=3 max |priced point - unpriced point|, ratio_C_over_A: 0.0028
+  m=3 max |priced point - unpriced point|, ratio_C_over_A_size_matched: 0.0025
+  m=3 max over all five ratios: 0.0151  (RESULTS.md / report.typ say 'no more than 0.011')
+  m=2 max |priced - unpriced| for (c)/(b): 0.0221  (statement: <= 0.024)

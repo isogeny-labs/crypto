@@ -18,10 +18,93 @@
 //! in the general arithmetic where the code already did so.
 
 use num_bigint::BigUint;
+use std::cell::Cell;
+use std::sync::{Arc, OnceLock};
 
 use crate::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement};
 use crate::cryptanalysis::group_op_count;
 use crate::cryptanalysis::semaev_decomp::Gf2;
+
+thread_local! {
+    static CACHED_POINT_LIFTS: Cell<bool> = const { Cell::new(false) };
+}
+
+/// Select cached odd-degree point lifts for one synchronous builder call.
+///
+/// The default stays false for replay of existing recipes. Nested calls and
+/// unwinding restore the previous selection; concurrent threads are independent.
+pub fn with_cached_point_lifts<T>(enabled: bool, build: impl FnOnce() -> T) -> T {
+    struct Restore(bool);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            CACHED_POINT_LIFTS.with(|flag| flag.set(self.0));
+        }
+    }
+    let _restore = Restore(CACHED_POINT_LIFTS.with(|flag| flag.replace(enabled)));
+    build()
+}
+
+pub(crate) fn cached_point_lifts_enabled() -> bool {
+    CACHED_POINT_LIFTS.with(Cell::get)
+}
+
+/// The binary-linear halftrace, with a trace admission mask for an odd field.
+/// This is scoped to one field instance, never keyed by degree alone.
+#[derive(Debug)]
+struct OddHalfTrace {
+    degree: u32,
+    modulus: u64,
+    trace_mask: u64,
+    tables: Vec<[u64; 256]>,
+}
+
+impl OddHalfTrace {
+    fn new(field: &Gf2) -> Self {
+        let n = field.n;
+        debug_assert_eq!(n % 2, 1);
+        let mut trace_mask = 0;
+        let basis: Vec<u64> = (0..n)
+            .map(|i| {
+                let value = 1u64 << i;
+                let mut power = value;
+                let mut half_trace = value;
+                for _ in 0..(n - 1) / 2 {
+                    power = field.sqr(field.sqr(power));
+                    half_trace ^= power;
+                }
+                let trace = field.sqr(half_trace) ^ half_trace ^ value;
+                debug_assert!(trace <= 1);
+                trace_mask |= trace << i;
+                half_trace
+            })
+            .collect();
+        let tables = (0..n.div_ceil(8) as usize)
+            .map(|byte_index| {
+                let mut table = [0; 256];
+                for byte in 1usize..256 {
+                    let bit = byte_index * 8 + byte.trailing_zeros() as usize;
+                    table[byte] = table[byte & (byte - 1)] ^ basis.get(bit).copied().unwrap_or(0);
+                }
+                table
+            })
+            .collect();
+        Self {
+            degree: n,
+            modulus: field.irr,
+            trace_mask,
+            tables,
+        }
+    }
+
+    fn solve(&self, rhs: u64) -> Option<u64> {
+        if (rhs & self.trace_mask).count_ones() & 1 != 0 {
+            return None;
+        }
+        Some(self.tables.iter().enumerate().fold(0, |root, (i, table)| {
+            root ^ table[((rhs >> (8 * i)) & 255) as usize]
+        }))
+    }
+}
 
 /// A point with single-word coordinates, or `O`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -85,6 +168,9 @@ pub struct FastCurve {
     pub n: u32,
     pub a: u64,
     pub b: u64,
+    /// Lazy and opt-in: ordinary arithmetic and the legacy lifting path do
+    /// not allocate it. Clones share an initialized immutable cache.
+    half_trace: OnceLock<Arc<OddHalfTrace>>,
     /// The eight-lane AVX-512 kernel for [`Self::add_many_lazy`], when
     /// the CPU has it and the field's reduction polynomial suits it.
     #[cfg(target_arch = "x86_64")]
@@ -111,7 +197,32 @@ impl FastCurve {
             n: curve.m,
             a,
             b,
+            half_trace: OnceLock::new(),
         })
+    }
+
+    /// The same first Artin-Schreier root as the halftrace squaring loop.
+    /// Returns `None` for trace-one inputs or unsupported even degrees.
+    /// Intended for repeated public-input point lifting, not secret arithmetic.
+    pub fn half_trace_root_cached(&self, rhs: u64) -> Option<u64> {
+        if self.n & 1 == 0 || self.n != self.field.n {
+            return None;
+        }
+        let rhs = rhs & self.field.mask;
+        let cache = self
+            .half_trace
+            .get_or_init(|| Arc::new(OddHalfTrace::new(&self.field)));
+        // FastCurve's field is public. A caller may replace the field of an
+        // initialized clone; never reuse another modulus's linear map.
+        if cache.degree != self.field.n || cache.modulus != self.field.irr {
+            let (mut root, mut power) = (rhs, rhs);
+            for _ in 0..(self.n - 1) / 2 {
+                power = self.field.sqr(self.field.sqr(power));
+                root ^= power;
+            }
+            return (self.field.sqr(root) ^ root == rhs).then_some(root);
+        }
+        cache.solve(rhs)
     }
 
     /// Project a general point down.
@@ -330,6 +441,78 @@ impl FastCurve {
         group_op_count::count_adds(sums as u64);
     }
 
+    /// Lazy sums with adjacent addends sharing an abscissa. The two signs
+    /// above one binary-field abscissa have the same denominator `x_P + x_Q`,
+    /// so only one copy of each adjacent equal denominator enters the batch
+    /// product chain. The batch still uses one field inversion in total.
+    /// Singles at either end of a scan block retain their own denominator.
+    ///
+    /// The existing eight-lane SIMD path remains in use where available.
+    /// Infinity falls back to the ordinary batch path. Equal-abscissa
+    /// exceptional sums stay complete, with the same `LAZY_DONE` marker as
+    /// [`Self::add_many_lazy`].
+    pub fn add_many_lazy_paired_x(
+        &self,
+        p: FastPoint,
+        qs: &[FastPoint],
+        out: &mut Vec<FastPoint>,
+        lambdas: &mut Vec<u64>,
+        scratch: &mut BatchScratch,
+    ) {
+        #[cfg(target_arch = "x86_64")]
+        if self.simd.is_some() {
+            self.add_many_lazy(p, qs, out, lambdas, scratch);
+            return;
+        }
+        if p.infinity
+            || qs.iter().any(|q| q.infinity)
+            || !qs.windows(2).any(|pair| pair[0].x == pair[1].x)
+        {
+            self.add_many_lazy(p, qs, out, lambdas, scratch);
+            return;
+        }
+        let first = lambdas.len();
+        scratch.dens.clear();
+        let mut at = 0;
+        while at < qs.len() {
+            let x = qs[at].x;
+            scratch.dens.push(if x == p.x { 0 } else { p.x ^ x });
+            at += 1;
+            while at < qs.len() && qs[at].x == x {
+                at += 1;
+            }
+        }
+        self.field.batch_inv(&mut scratch.dens, &mut scratch.acc);
+        out.reserve(qs.len());
+        lambdas.reserve(qs.len());
+        let mut at = 0;
+        for &inv in &scratch.dens {
+            let x = qs[at].x;
+            let from = at;
+            at += 1;
+            while at < qs.len() && qs[at].x == x {
+                at += 1;
+            }
+            for &q in &qs[from..at] {
+                if inv == 0 {
+                    out.push(self.add(p, q));
+                    lambdas.push(Self::LAZY_DONE);
+                } else {
+                    let lambda = self.field.mul(p.y ^ q.y, inv);
+                    let x3 = self.field.sqr(lambda) ^ lambda ^ p.x ^ q.x ^ self.a;
+                    out.push(FastPoint::affine(x3, 0));
+                    lambdas.push(lambda);
+                }
+            }
+        }
+        group_op_count::count_adds(
+            lambdas[first..]
+                .iter()
+                .filter(|&&lambda| lambda != Self::LAZY_DONE)
+                .count() as u64,
+        );
+    }
+
     fn add_many_lazy_dispatch(
         &self,
         p: FastPoint,
@@ -383,6 +566,40 @@ impl FastCurve {
             return done;
         }
         let _ = (p, qx, qy, x3, lambdas, scratch);
+        false
+    }
+
+    /// [`Self::add_many_lazy_soa`] on summands paired by abscissa: pair
+    /// `j` is `(px[j], pya[j])` then `(px[j], pyb[j])`, one shared inverse
+    /// for both.  Appends `2·px.len()` abscissae and slopes in that order,
+    /// the same field elements the unpaired kernel gives for the
+    /// interleaved list, and counts `counted` additions, the summands the
+    /// caller's scan names (a scan whose window starts or ends inside a
+    /// pair hands the whole pair and drops the extra sum).  Returns
+    /// `false`, having appended and counted nothing, wherever the folding
+    /// kernel does not run or a pair is degenerate; the caller then takes
+    /// the unpaired path, which handles and counts every case as before.
+    #[allow(clippy::too_many_arguments)]
+    pub fn add_many_lazy_soa_paired(
+        &self,
+        p: FastPoint,
+        px: &[u64],
+        pya: &[u64],
+        pyb: &[u64],
+        x3: &mut Vec<u64>,
+        lambdas: &mut Vec<u64>,
+        scratch: &mut BatchScratch,
+        counted: u64,
+    ) -> bool {
+        #[cfg(target_arch = "x86_64")]
+        if let Some(simd) = &self.simd {
+            let done = simd.fold_into_paired(self, p, px, pya, pyb, x3, lambdas, scratch);
+            if done {
+                group_op_count::count_adds(counted);
+            }
+            return done;
+        }
+        let _ = (p, px, pya, pyb, x3, lambdas, scratch, counted);
         false
     }
 
@@ -1116,10 +1333,14 @@ impl FrobeniusCanon {
 
     /// The normal coordinates of a field element.
     #[inline]
-    pub fn coords(&self, x: u64) -> u64 {
+    pub fn coords(&self, mut x: u64) -> u64 {
+        // The low byte is consumed and `x` shifted by a constant eight,
+        // rather than shifting by `8 * i`: no per-byte variable shift or
+        // index to keep.  At most eight tables, so `x` is spent by then.
         let mut acc = 0u64;
-        for (i, table) in self.tables.iter().enumerate() {
-            acc ^= table[((x >> (8 * i)) & 0xff) as usize];
+        for table in &self.tables {
+            acc ^= table[(x & 0xff) as usize];
+            x >>= 8;
         }
         acc
     }
@@ -1245,7 +1466,7 @@ impl FrobeniusCanon {
     /// well — 90% of random words have at most two — and only the rest
     /// loop.  The lanes advance in lockstep so their chains overlap.  Only
     /// the word is returned; ties between rotations do not change it.
-    #[inline]
+    #[inline(always)]
     fn least_rotations<const L: usize>(&self, words: [u64; L]) -> [u64; L] {
         let (n, mask) = (self.n, self.mask);
         // `rotl^t` for any `0 ≤ t < n` without a branch on `t = 0`:
@@ -1260,10 +1481,38 @@ impl FrobeniusCanon {
         let levels = (u32::BITS - (n - 1).leading_zeros()) as usize;
         let mut pow = [[0u64; L]; 6];
         pow[0] = std::array::from_fn(|l| !c[l] & mask);
-        for k in 1..levels {
+        // With five or more levels, build only `Z_1 … Z_16` first: a
+        // random word's longest zero run is a handful of bits, so `Z_16`
+        // is empty in every lane of nearly every block, and then the
+        // levels above `Z_8` have nothing to lift.  The branch is taken
+        // about once in four hundred blocks, so it predicts.  Where it is
+        // not taken the lift below visits `Z_8 … Z_1` only, reaching run
+        // lengths up to 16, which no lane has: the same `run` the full
+        // lift ends on.
+        let shallow = levels >= 5;
+        let built = if shallow { 5 } else { levels };
+        for k in 1..built {
             let w = 1u32 << (k - 1);
             for l in 0..L {
                 pow[k][l] = pow[k - 1][l] & rot(pow[k - 1][l], w);
+            }
+        }
+        let mut top = built;
+        if shallow {
+            let mut deep = 0u64;
+            for l in 0..L {
+                deep |= pow[4][l];
+            }
+            if deep == 0 {
+                top = 4;
+            } else {
+                for k in built..levels {
+                    let w = 1u32 << (k - 1);
+                    for l in 0..L {
+                        pow[k][l] = pow[k - 1][l] & rot(pow[k - 1][l], w);
+                    }
+                }
+                top = levels;
             }
         }
         // Lift from `Z_1`.  A longer run implies a shorter one, so taking
@@ -1271,7 +1520,7 @@ impl FrobeniusCanon {
         // powers below `n` sum past any `L ≤ n − 1`; `len < n` throughout.
         let mut run = pow[0];
         let mut len = [1u32; L];
-        for k in (0..levels).rev() {
+        for k in (0..top).rev() {
             for l in 0..L {
                 let next = run[l] & rot(pow[k][l], len[l]);
                 let longer = next != 0;
@@ -1281,7 +1530,9 @@ impl FrobeniusCanon {
         }
         // `run` marks the top bit `p` of every longest zero run, and the
         // rotation starting there is `rotl^{n − 1 − p}`.
-        std::array::from_fn(|l| {
+        // A plain loop over the lanes, like the stages above.
+        let mut out = [0u64; L];
+        for l in 0..L {
             let (r, c) = (run[l], c[l]);
             let p1 = 63 - r.leading_zeros();
             let rest = r & !(1u64 << p1);
@@ -1293,12 +1544,9 @@ impl FrobeniusCanon {
                 tops &= !(1u64 << p);
                 best = best.min(rot(c, n - 1 - p));
             }
-            if flat[l] {
-                words[l]
-            } else {
-                best
-            }
-        })
+            out[l] = if flat[l] { words[l] } else { best };
+        }
+        out
     }
 
     /// [`Self::canon`] of every element of `xs`, appended to `out` in
@@ -1361,18 +1609,54 @@ impl FrobeniusCanon {
                 // normal element exists, which needs `n ≥ 1`.
                 let mins = unsafe {
                     if funnel && self.n >= 2 {
-                        least_rotation16_funnel_avx512(&c, self.n)
+                        if key_chains_split() {
+                            least_rotation16_funnel_avx512(&c, self.n)
+                        } else {
+                            least_rotation16_funnel_one_chain_avx512(&c, self.n)
+                        }
                     } else {
                         least_rotation16_avx512(&c, self.n, self.mask)
                     }
                 };
                 chunk.copy_from_slice(&mins);
             }
-            for x in chunks.into_remainder() {
-                *x = self.canon(*x);
+            // The tail runs as one padded block: the scalar key costs
+            // several times a vector lane inside a scan, and a window is
+            // rarely a multiple of sixteen. Padding repeats a real key, so
+            // the extra lanes compute a canonical name that is dropped.
+            let rest = chunks.into_remainder();
+            if let Some(&last) = rest.last() {
+                let mut block = [last; 16];
+                block[..rest.len()].copy_from_slice(rest);
+                self.canon_in_place(&mut block);
+                rest.copy_from_slice(&block[..rest.len()]);
             }
             return;
         }
+        #[cfg(target_arch = "x86_64")]
+        if canon_bmi2_enabled() {
+            // SAFETY: `canon_bmi2_enabled` checked BMI1, BMI2 and LZCNT.
+            return unsafe { self.canon_scalar_bmi2(xs) };
+        }
+        self.canon_scalar(xs);
+    }
+
+    /// [`Self::canon_scalar`] compiled with BMI2 and LZCNT: the rotations'
+    /// variable shifts are `shlx`/`shrx` and the leading-zero counts one
+    /// `lzcnt`, where the baseline target spends a `cl` move and a
+    /// `bsr`/`xor` pair on each.
+    ///
+    /// # Safety
+    ///
+    /// The CPU must support BMI1, BMI2 and LZCNT.
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "bmi1,bmi2,lzcnt")]
+    unsafe fn canon_scalar_bmi2(&self, xs: &mut [u64]) {
+        self.canon_scalar(xs);
+    }
+
+    #[inline(always)]
+    fn canon_scalar(&self, xs: &mut [u64]) {
         const LANES: usize = 8;
         let mut chunks = xs.chunks_exact_mut(LANES);
         for chunk in &mut chunks {
@@ -1478,6 +1762,21 @@ fn canon_simd_enabled() -> bool {
     static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ON.get_or_init(|| {
         is_x86_feature_detected!("avx512f") && std::env::var("KIC_SCAN_SIMD").as_deref() != Ok("0")
+    })
+}
+
+/// Whether the scalar [`FrobeniusCanon::canon_in_place`] runs compiled
+/// with BMI2 and LZCNT: the CPU has BMI1, BMI2 and LZCNT, and
+/// `KIC_CANON_BMI2=0` has not asked for the baseline build, which stays as
+/// the same-binary control.  The words computed are the same either way.
+#[cfg(target_arch = "x86_64")]
+fn canon_bmi2_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| {
+        is_x86_feature_detected!("bmi1")
+            && is_x86_feature_detected!("bmi2")
+            && is_x86_feature_detected!("lzcnt")
+            && std::env::var("KIC_CANON_BMI2").as_deref() != Ok("0")
     })
 }
 
@@ -1645,7 +1944,77 @@ unsafe fn least_rotation16_funnel_avx512(c: &[u64; 16], n: u32) -> [u64; 16] {
     };
     let (hi_a, lo_a) = doubled(_mm512_loadu_si512(c.as_ptr().cast()));
     let (hi_b, lo_b) = doubled(_mm512_loadu_si512(c.as_ptr().add(8).cast()));
-    // Rotation 0 is `hi` itself.
+    // Rotation 0 is `hi` itself.  Odd and even rotations fold into two
+    // minima a vector, merged at the end, where the default kernel
+    // ([`least_rotation16_funnel_one_chain_avx512`]) keeps one chain of
+    // `n` dependent minima a vector.  Faster alone (3.9 → 3.5 ns a key at
+    // n = 61), but not established in collection by its A/B, so it is
+    // opt-in (`KIC_KEY_CHAINS=2`;
+    // `research/ic_tool_program/explorations/key-chains-20261114/`).
+    let (mut best_a, mut best_b) = (hi_a, hi_b);
+    let (mut odd_a, mut odd_b) = (hi_a, hi_b);
+    macro_rules! rotations {
+        ($($even:literal $odd:literal)*) => {$(
+            if $even < n {
+                best_a = _mm512_min_epu64(best_a, _mm512_shldi_epi64::<$even>(hi_a, lo_a));
+                best_b = _mm512_min_epu64(best_b, _mm512_shldi_epi64::<$even>(hi_b, lo_b));
+            }
+            if $odd < n {
+                odd_a = _mm512_min_epu64(odd_a, _mm512_shldi_epi64::<$odd>(hi_a, lo_a));
+                odd_b = _mm512_min_epu64(odd_b, _mm512_shldi_epi64::<$odd>(hi_b, lo_b));
+            }
+        )*};
+    }
+    rotations!(2 1 4 3 6 5 8 7 10 9 12 11 14 13 16 15 18 17 20 19 22 21 24 23 26 25 28 27 30 29
+        32 31 34 33 36 35 38 37 40 39 42 41 44 43 46 45 48 47 50 49 52 51 54 53 56 55 58 57
+        60 59 62 61);
+    best_a = _mm512_min_epu64(best_a, odd_a);
+    best_b = _mm512_min_epu64(best_b, odd_b);
+    let mut out = [0u64; 16];
+    _mm512_storeu_si512(
+        out.as_mut_ptr().cast(),
+        _mm512_srl_epi64(best_a, count(64 - n)),
+    );
+    _mm512_storeu_si512(
+        out.as_mut_ptr().add(8).cast(),
+        _mm512_srl_epi64(best_b, count(64 - n)),
+    );
+    out
+}
+
+/// [`least_rotation16_funnel_avx512`] with all its minima in one chain a
+/// vector: the same words, and the default (the split chains are opt-in,
+/// `KIC_KEY_CHAINS=2`).
+///
+/// # Safety
+///
+/// As [`least_rotation16_funnel_avx512`].
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f,avx512vbmi2")]
+unsafe fn least_rotation16_funnel_one_chain_avx512(c: &[u64; 16], n: u32) -> [u64; 16] {
+    use std::arch::x86_64::*;
+    let count = |s: u32| _mm_cvtsi64_si128(i64::from(s));
+    let doubled = |v: __m512i| -> (__m512i, __m512i) {
+        if n > 32 {
+            (
+                _mm512_or_si512(
+                    _mm512_sll_epi64(v, count(64 - n)),
+                    _mm512_srl_epi64(v, count(2 * n - 64)),
+                ),
+                _mm512_sll_epi64(v, count(128 - 2 * n)),
+            )
+        } else {
+            (
+                _mm512_sll_epi64(
+                    _mm512_or_si512(_mm512_sll_epi64(v, count(n)), v),
+                    count(64 - 2 * n),
+                ),
+                _mm512_setzero_si512(),
+            )
+        }
+    };
+    let (hi_a, lo_a) = doubled(_mm512_loadu_si512(c.as_ptr().cast()));
+    let (hi_b, lo_b) = doubled(_mm512_loadu_si512(c.as_ptr().add(8).cast()));
     let (mut best_a, mut best_b) = (hi_a, hi_b);
     macro_rules! rotations {
         ($($t:literal)*) => {$(
@@ -1668,6 +2037,16 @@ unsafe fn least_rotation16_funnel_avx512(c: &[u64; 16], n: u32) -> [u64; 16] {
         _mm512_srl_epi64(best_b, count(64 - n)),
     );
     out
+}
+
+/// Whether the funnel kernel splits its minima into two chains a vector:
+/// only under `KIC_KEY_CHAINS=2`.  Its A/B measured collection about 2%
+/// faster but did not establish it against the same session's A/A, so the
+/// default stays one chain
+/// (`research/ic_tool_program/explorations/key-chains-20261114/`).
+fn key_chains_split() -> bool {
+    static SPLIT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *SPLIT.get_or_init(|| std::env::var("KIC_KEY_CHAINS").as_deref() == Ok("2"))
 }
 
 /// Invert an `n × n` matrix over `F_2` given as its columns, returning
@@ -1858,6 +2237,196 @@ mod simd512 {
             }
             let BatchScratch { pre, lanes, .. } = scratch;
             self.fold_into(curve, p, qx, qy, x3, lambdas, pre, lanes)
+        }
+
+        /// [`Self::fold_into`] for summands that come in pairs sharing an
+        /// abscissa (a base point's ± twins): pair `j` is `(px[j], pya[j])`
+        /// then `(px[j], pyb[j])`, and both sums of a pair share one
+        /// denominator `x_R + x_j`, so one prefix product and one inverse
+        /// serve two summands.  Appends `2·px.len()` abscissae and slopes in
+        /// pair order — the same field elements [`Self::fold_into`] gives
+        /// for the interleaved list — or appends nothing and returns `false`
+        /// on `R = O`, an empty slice or a degenerate pair.  Counts nothing:
+        /// a caller whose pairs decline runs [`Self::fold_into`] instead.
+        #[allow(clippy::too_many_arguments)]
+        pub(super) fn fold_into_paired(
+            &self,
+            curve: &FastCurve,
+            p: FastPoint,
+            px: &[u64],
+            pya: &[u64],
+            pyb: &[u64],
+            x3: &mut Vec<u64>,
+            lambdas: &mut Vec<u64>,
+            scratch: &mut BatchScratch,
+        ) -> bool {
+            assert!(
+                px.len() == pya.len() && px.len() == pyb.len(),
+                "two ordinates per abscissa"
+            );
+            if self.fold == 0 || p.infinity || px.is_empty() {
+                return false;
+            }
+            let BatchScratch { pre, lanes, .. } = scratch;
+            let pairs = px.len();
+            let padded = pairs.div_ceil(8) * 8;
+            let (x0, l0) = (x3.len(), lambdas.len());
+            pre.clear();
+            pre.resize(padded, 0);
+            x3.resize(x0 + 2 * padded, 0);
+            lambdas.resize(l0 + 2 * padded, 0);
+            // SAFETY: a folding `Simd512` is only built after detecting
+            // avx512f and vpclmulqdq, on a field that folds; `pre` holds
+            // `padded` words and both outputs `2·padded`, and the kernel
+            // reads the inputs only below `pairs`.
+            let ok = unsafe {
+                self.kernel_fold_paired(
+                    curve,
+                    p,
+                    px,
+                    pya,
+                    pyb,
+                    pre,
+                    lanes,
+                    &mut x3[x0..],
+                    &mut lambdas[l0..],
+                )
+            };
+            let keep = if ok { 2 * pairs } else { 0 };
+            x3.truncate(x0 + keep);
+            lambdas.truncate(l0 + keep);
+            ok
+        }
+
+        /// [`Self::kernel_fold`] on pairs: the forward and backward passes
+        /// run over the pairs' shared denominators, and each pair's two
+        /// slopes and sums are formed from its one inverse, then
+        /// interleaved so the outputs read `a₀ b₀ a₁ b₁ …`.
+        ///
+        /// # Safety
+        ///
+        /// As [`Self::kernel_fold`], with `pya` and `pyb` as long as `px`,
+        /// `pre` holding `px.len()` rounded up to a multiple of eight
+        /// words, and `x3` and `lambdas` twice that.
+        #[allow(clippy::too_many_arguments)]
+        #[target_feature(enable = "avx512f,vpclmulqdq")]
+        unsafe fn kernel_fold_paired(
+            &self,
+            curve: &FastCurve,
+            p: FastPoint,
+            px: &[u64],
+            pya: &[u64],
+            pyb: &[u64],
+            pre: &mut [u64],
+            lanes: &mut Vec<u64>,
+            x3: &mut [u64],
+            lambdas: &mut [u64],
+        ) -> bool {
+            let len = px.len();
+            let groups = len.div_ceil(8);
+            let last = groups - 1;
+            let last_mask: __mmask8 = 0xff >> (groups * 8 - len);
+            let mask_of = |g: usize| if g == last { last_mask } else { 0xff };
+            let s = _mm512_set1_epi64(i64::from(64 - self.n));
+            let tail = _mm512_set1_epi64(self.fold as i64);
+            let one = _mm512_set1_epi64(1);
+            let rx = _mm512_set1_epi64(p.x as i64);
+            let load = |src: &[u64], g: usize| {
+                _mm512_maskz_loadu_epi64(mask_of(g), src.as_ptr().add(8 * g) as *const i64)
+            };
+            let den = |x: __m512i, g: usize| {
+                _mm512_mask_blend_epi64(mask_of(g), one, _mm512_xor_si512(rx, x))
+            };
+            let half = groups.div_ceil(2);
+            let z_s = _mm512_set1_epi64((1u64 << (64 - self.n)) as i64);
+            let (mut acc_a, mut acc_b) = (z_s, z_s);
+            let mut degenerate: __mmask8 = 0;
+            for i in 0..half {
+                let x = load(px, i);
+                degenerate |= _mm512_mask_cmpeq_epi64_mask(mask_of(i), x, rx);
+                _mm512_storeu_si512(
+                    pre.as_mut_ptr().add(8 * i) as *mut _,
+                    _mm512_srlv_epi64(acc_a, s),
+                );
+                acc_a = mul_fold(den(x, i), acc_a, tail);
+                let g = half + i;
+                if g < groups {
+                    let x = load(px, g);
+                    degenerate |= _mm512_mask_cmpeq_epi64_mask(mask_of(g), x, rx);
+                    _mm512_storeu_si512(
+                        pre.as_mut_ptr().add(8 * g) as *mut _,
+                        _mm512_srlv_epi64(acc_b, s),
+                    );
+                    acc_b = mul_fold(den(x, g), acc_b, tail);
+                }
+            }
+            if degenerate != 0 {
+                return false;
+            }
+            let mut products = [0u64; 16];
+            _mm512_storeu_si512(products.as_mut_ptr() as *mut _, _mm512_srlv_epi64(acc_a, s));
+            _mm512_storeu_si512(
+                products.as_mut_ptr().add(8) as *mut _,
+                _mm512_srlv_epi64(acc_b, s),
+            );
+            curve.field.batch_inv(&mut products, lanes);
+            let mut inv_a = _mm512_sllv_epi64(_mm512_loadu_si512(products.as_ptr() as *const _), s);
+            let mut inv_b =
+                _mm512_sllv_epi64(_mm512_loadu_si512(products.as_ptr().add(8) as *const _), s);
+            let py = _mm512_set1_epi64(p.y as i64);
+            let px_a = _mm512_set1_epi64((p.x ^ curve.a) as i64);
+            // `a₀ b₀ a₁ b₁ a₂ b₂ a₃ b₃` and `a₄ b₄ … a₇ b₇`.
+            let lo_idx = _mm512_set_epi64(11, 3, 10, 2, 9, 1, 8, 0);
+            let hi_idx = _mm512_set_epi64(15, 7, 14, 6, 13, 5, 12, 4);
+            let x3 = x3.as_mut_ptr();
+            let lambdas = lambdas.as_mut_ptr();
+            let step = |g: usize, inv_acc: __m512i| {
+                let x = load(px, g);
+                let inv = mul_fold(
+                    _mm512_loadu_si512(pre.as_ptr().add(8 * g) as *const _),
+                    inv_acc,
+                    tail,
+                );
+                let next = mul_fold(den(x, g), inv_acc, tail);
+                let x_part = _mm512_xor_si512(px_a, x);
+                let sum = |y: __m512i| {
+                    let lambda_s = mul_fold(_mm512_xor_si512(py, y), inv, tail);
+                    let lambda = _mm512_srlv_epi64(lambda_s, s);
+                    let square = _mm512_srlv_epi64(mul_fold(lambda, lambda_s, tail), s);
+                    (
+                        _mm512_ternarylogic_epi64::<0x96>(square, lambda, x_part),
+                        lambda,
+                    )
+                };
+                let (xa, la) = sum(load(pya, g));
+                let (xb, lb) = sum(load(pyb, g));
+                let out = 16 * g;
+                _mm512_storeu_si512(
+                    x3.add(out) as *mut _,
+                    _mm512_permutex2var_epi64(xa, lo_idx, xb),
+                );
+                _mm512_storeu_si512(
+                    x3.add(out + 8) as *mut _,
+                    _mm512_permutex2var_epi64(xa, hi_idx, xb),
+                );
+                _mm512_storeu_si512(
+                    lambdas.add(out) as *mut _,
+                    _mm512_permutex2var_epi64(la, lo_idx, lb),
+                );
+                _mm512_storeu_si512(
+                    lambdas.add(out + 8) as *mut _,
+                    _mm512_permutex2var_epi64(la, hi_idx, lb),
+                );
+                next
+            };
+            for i in (0..half).rev() {
+                let g = half + i;
+                if g < groups {
+                    inv_b = step(g, inv_b);
+                }
+                inv_a = step(i, inv_a);
+            }
+            true
         }
 
         /// The folding kernel on coordinate slices, appending to `x3` and
@@ -2198,6 +2767,115 @@ mod simd512 {
             acc
         }
 
+        /// Micro-benchmark variant of [`Self::kernel_fold`] (test only):
+        /// `square = false` drops `λ²` (lever 1's upper bound: what slope
+        /// keys could save); `qy2 = Some(..)` gives each denominator a
+        /// second numerator, the ± twin's (lever 2's paired form), and
+        /// writes its `x₃`/`λ` to `x3b`/`lambdasb`.  Same arithmetic
+        /// otherwise; the outputs are for timing, not for keys.
+        #[cfg(test)]
+        #[allow(clippy::too_many_arguments)]
+        #[target_feature(enable = "avx512f,vpclmulqdq")]
+        pub(super) unsafe fn kernel_fold_variant(
+            &self,
+            curve: &FastCurve,
+            p: FastPoint,
+            qx: &[u64],
+            qy: &[u64],
+            qy2: Option<&[u64]>,
+            square: bool,
+            pre: &mut [u64],
+            lanes: &mut Vec<u64>,
+            x3: &mut [u64],
+            lambdas: &mut [u64],
+            x3b: &mut [u64],
+            lambdasb: &mut [u64],
+        ) {
+            let len = qx.len();
+            let groups = len.div_ceil(8);
+            let last = groups - 1;
+            let last_mask: __mmask8 = 0xff >> (groups * 8 - len);
+            let mask_of = |g: usize| if g == last { last_mask } else { 0xff };
+            let s = _mm512_set1_epi64(i64::from(64 - self.n));
+            let tail = _mm512_set1_epi64(self.fold as i64);
+            let one = _mm512_set1_epi64(1);
+            let px = _mm512_set1_epi64(p.x as i64);
+            let load = |src: &[u64], g: usize| {
+                _mm512_maskz_loadu_epi64(mask_of(g), src.as_ptr().add(8 * g) as *const i64)
+            };
+            let den = |x: __m512i, g: usize| {
+                _mm512_mask_blend_epi64(mask_of(g), one, _mm512_xor_si512(px, x))
+            };
+            let half = groups.div_ceil(2);
+            let z_s = _mm512_set1_epi64((1u64 << (64 - self.n)) as i64);
+            let (mut acc_a, mut acc_b) = (z_s, z_s);
+            for i in 0..half {
+                let x = load(qx, i);
+                _mm512_storeu_si512(
+                    pre.as_mut_ptr().add(8 * i) as *mut _,
+                    _mm512_srlv_epi64(acc_a, s),
+                );
+                acc_a = mul_fold(den(x, i), acc_a, tail);
+                let g = half + i;
+                if g < groups {
+                    let x = load(qx, g);
+                    _mm512_storeu_si512(
+                        pre.as_mut_ptr().add(8 * g) as *mut _,
+                        _mm512_srlv_epi64(acc_b, s),
+                    );
+                    acc_b = mul_fold(den(x, g), acc_b, tail);
+                }
+            }
+            let mut products = [0u64; 16];
+            _mm512_storeu_si512(products.as_mut_ptr() as *mut _, _mm512_srlv_epi64(acc_a, s));
+            _mm512_storeu_si512(
+                products.as_mut_ptr().add(8) as *mut _,
+                _mm512_srlv_epi64(acc_b, s),
+            );
+            curve.field.batch_inv(&mut products, lanes);
+            let mut inv_a = _mm512_sllv_epi64(_mm512_loadu_si512(products.as_ptr() as *const _), s);
+            let mut inv_b =
+                _mm512_sllv_epi64(_mm512_loadu_si512(products.as_ptr().add(8) as *const _), s);
+            let py = _mm512_set1_epi64(p.y as i64);
+            let px_a = _mm512_set1_epi64((p.x ^ curve.a) as i64);
+            let (x3, lambdas) = (x3.as_mut_ptr(), lambdas.as_mut_ptr());
+            let (x3b, lambdasb) = (x3b.as_mut_ptr(), lambdasb.as_mut_ptr());
+            let finish =
+                |num: __m512i, inv: __m512i, x: __m512i, xo: *mut u64, lo: *mut u64, g: usize| {
+                    let lambda_s = mul_fold(num, inv, tail);
+                    let lambda = _mm512_srlv_epi64(lambda_s, s);
+                    let x3v = if square {
+                        let sq = _mm512_srlv_epi64(mul_fold(lambda, lambda_s, tail), s);
+                        _mm512_ternarylogic_epi64::<0x96>(sq, lambda, _mm512_xor_si512(px_a, x))
+                    } else {
+                        _mm512_xor_si512(lambda, _mm512_xor_si512(px_a, x))
+                    };
+                    _mm512_storeu_si512(xo.add(8 * g) as *mut _, x3v);
+                    _mm512_storeu_si512(lo.add(8 * g) as *mut _, lambda);
+                };
+            let step = |g: usize, inv_acc: __m512i| {
+                let x = load(qx, g);
+                let inv = mul_fold(
+                    _mm512_loadu_si512(pre.as_ptr().add(8 * g) as *const _),
+                    inv_acc,
+                    tail,
+                );
+                let next = mul_fold(den(x, g), inv_acc, tail);
+                finish(_mm512_xor_si512(py, load(qy, g)), inv, x, x3, lambdas, g);
+                if let Some(qy2) = qy2 {
+                    finish(_mm512_xor_si512(py, load(qy2, g)), inv, x, x3b, lambdasb, g);
+                }
+                next
+            };
+            for i in (0..half).rev() {
+                let g = half + i;
+                if g < groups {
+                    inv_b = step(g, inv_b);
+                }
+                inv_a = step(i, inv_a);
+            }
+        }
+
         /// Test hook: multiply eight pairs through the kernel's multiply,
         /// the folding one when the field folds.
         #[cfg(test)]
@@ -2261,10 +2939,280 @@ mod simd512 {
 mod tests {
     use super::*;
 
+    #[test]
+    fn cached_halftrace_matches_definition_and_is_field_local() {
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        for n in [5, 7, 9, 11, 19, 31, 53, 61] {
+            let irr = find_irreducible_sparse(n).expect("test field");
+            let curve = BinaryCurve {
+                m: n,
+                irreducible: irr.clone(),
+                a: F2mElement::zero(n),
+                b: F2mElement::one(n),
+                generator: BinaryPoint::Infinity,
+                order: BigUint::from(1u8),
+                cofactor: BigUint::from(1u8),
+            };
+            let fast = FastCurve::new(&curve).unwrap();
+            assert!(fast.half_trace.get().is_none());
+            let mut state = 0x9e37_79b9_7f4a_7c15u64;
+            for i in 0..if n <= 11 { 1u64 << n } else { 256 } {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let rhs = if n <= 11 { i } else { state & fast.field.mask };
+                let element = F2mElement::from_biguint(&BigUint::from(rhs), n);
+                let expected = (element.trace(&irr) == 0)
+                    .then(|| fast.field.from_element(&element.half_trace(&irr).unwrap()));
+                assert_eq!(
+                    fast.half_trace_root_cached(rhs),
+                    expected,
+                    "n={n}, rhs={rhs}"
+                );
+            }
+            let cloned = fast.clone();
+            assert!(Arc::ptr_eq(
+                fast.half_trace.get().unwrap(),
+                cloned.half_trace.get().unwrap()
+            ));
+        }
+        // Reciprocal irreducibles of the same degree must not share a cache.
+        let mut roots = Vec::new();
+        let mut curves = Vec::new();
+        for low_terms in [vec![0, 2], vec![0, 3]] {
+            let curve = BinaryCurve {
+                m: 5,
+                irreducible: crate::binary_ecc::IrreduciblePoly {
+                    degree: 5,
+                    low_terms,
+                },
+                a: F2mElement::zero(5),
+                b: F2mElement::one(5),
+                generator: BinaryPoint::Infinity,
+                order: BigUint::from(1u8),
+                cofactor: BigUint::from(1u8),
+            };
+            let fast = FastCurve::new(&curve).unwrap();
+            roots.push(
+                (0..32)
+                    .map(|v| fast.half_trace_root_cached(v))
+                    .collect::<Vec<_>>(),
+            );
+            curves.push(fast);
+        }
+        assert_ne!(roots[0], roots[1]);
+        let mut changed = curves[0].clone();
+        changed.field = curves[1].field.clone();
+        for rhs in 0..32 {
+            assert_eq!(changed.half_trace_root_cached(rhs), roots[1][rhs as usize]);
+        }
+    }
+
+    #[test]
+    fn cached_lift_scope_restores_on_nesting_unwind_and_new_threads() {
+        assert!(!cached_point_lifts_enabled());
+        with_cached_point_lifts(true, || {
+            assert!(cached_point_lifts_enabled());
+            with_cached_point_lifts(false, || assert!(!cached_point_lifts_enabled()));
+            assert!(cached_point_lifts_enabled());
+            std::thread::spawn(|| assert!(!cached_point_lifts_enabled()))
+                .join()
+                .unwrap();
+            let caught = std::panic::catch_unwind(|| {
+                with_cached_point_lifts(false, || panic!("restore the outer selection"));
+            });
+            assert!(caught.is_err());
+            assert!(cached_point_lifts_enabled());
+        });
+        assert!(!cached_point_lifts_enabled());
+    }
+
     /// The run-based least rotation, scalar and laned, against the
     /// exhaustive scan, on random words and on the patterns where it could
     /// go wrong: all zeros and ones, single bits, periodic words where
     /// several rotations tie, and runs that wrap around bit `n − 1`.
+    /// The paired kernel gives, word for word, the abscissae and slopes the
+    /// unpaired kernel gives for the interleaved list of ± twins, at every
+    /// pair count around the eight-lane boundaries, and counts the additions
+    /// it is told to.
+    #[test]
+    #[cfg(target_arch = "x86_64")]
+    fn the_paired_kernel_forms_the_interleaved_list_s_sums() {
+        use crate::cryptanalysis::koblitz_index_calculus::{
+            build_subgroup_orbit_factor_base, KoblitzCurve,
+        };
+        for (a, n) in [(0u8, 53u32), (0, 61), (1, 59)] {
+            let Some(kc) = KoblitzCurve::new(a, n) else {
+                continue;
+            };
+            let fc = FastCurve::new(&kc.curve).unwrap();
+            if !fc.simd.as_ref().is_some_and(|s| s.folds()) {
+                continue;
+            }
+            let fb = build_subgroup_orbit_factor_base(&kc, 7, 600).unwrap();
+            let pts: Vec<FastPoint> = fb.points.iter().map(|p| fc.lift(p)).collect();
+            let qx: Vec<u64> = pts.iter().map(|p| p.x).collect();
+            let qy: Vec<u64> = pts.iter().map(|p| p.x ^ p.y).collect();
+            let target = fc.add(fc.add(pts[3], pts[40]), pts[77]);
+            let mut scratch = BatchScratch::default();
+            for pairs in [1usize, 2, 7, 8, 9, 15, 16, 17, 33, 100] {
+                let (ux, uya, uyb): (Vec<u64>, Vec<u64>, Vec<u64>) = (
+                    (0..pairs).map(|j| qx[2 * j]).collect(),
+                    (0..pairs).map(|j| qy[2 * j]).collect(),
+                    (0..pairs).map(|j| qy[2 * j + 1]).collect(),
+                );
+                assert!((0..pairs).all(|j| qx[2 * j] == qx[2 * j + 1]));
+                let (mut x3, mut l3) = (vec![17u64], vec![19u64]);
+                let before = crate::cryptanalysis::group_op_count::ops_snapshot();
+                assert!(fc.add_many_lazy_soa_paired(
+                    target,
+                    &ux,
+                    &uya,
+                    &uyb,
+                    &mut x3,
+                    &mut l3,
+                    &mut scratch,
+                    5
+                ));
+                let added = crate::cryptanalysis::group_op_count::ops_snapshot().adds - before.adds;
+                assert_eq!(added, 5, "n={n}, pairs={pairs}: counts what it is told");
+                let (mut x3u, mut l3u) = (vec![17u64], vec![19u64]);
+                assert!(fc.add_many_lazy_soa(
+                    target,
+                    &qx[..2 * pairs],
+                    &qy[..2 * pairs],
+                    &mut x3u,
+                    &mut l3u,
+                    &mut scratch
+                ));
+                assert_eq!(x3, x3u, "n={n}, pairs={pairs}: abscissae");
+                assert_eq!(l3, l3u, "n={n}, pairs={pairs}: slopes");
+            }
+            // A degenerate pair declines without appending or counting.
+            let degenerate = FastPoint {
+                x: qx[0],
+                y: qy[0] ^ 1,
+                infinity: false,
+            };
+            let (mut x3, mut l3) = (Vec::new(), Vec::new());
+            assert!(!fc.add_many_lazy_soa_paired(
+                degenerate,
+                &qx[..1],
+                &qy[..1],
+                &qy[1..2],
+                &mut x3,
+                &mut l3,
+                &mut scratch,
+                2
+            ));
+            assert!(x3.is_empty() && l3.is_empty());
+        }
+    }
+
+    /// Levers 1 and 2 (untimed elsewhere; a micro-benchmark here, run with
+    /// `--ignored`): ns a summand for the fused kernel as it is, without
+    /// `λ²`, and with one inverse shared by each ± twin pair.
+    #[test]
+    #[cfg(target_arch = "x86_64")]
+    #[ignore]
+    fn lever_kernel_microbench() {
+        use crate::cryptanalysis::koblitz_index_calculus::{
+            build_subgroup_orbit_factor_base, KoblitzCurve,
+        };
+        for (a, n) in [(0u8, 53u32), (0, 61)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fc = FastCurve::new(&kc.curve).unwrap();
+            let Some(simd) = fc.simd.as_ref().filter(|s| s.folds()) else {
+                eprintln!("n={n}: folding kernel unavailable here");
+                continue;
+            };
+            let fb = build_subgroup_orbit_factor_base(&kc, 201, 4096).unwrap();
+            let pts: Vec<FastPoint> = fb.points.iter().map(|p| fc.lift(p)).collect();
+            // the scan's summands: the base negated, twins adjacent as the base holds them
+            let qx: Vec<u64> = pts.iter().map(|p| p.x).collect();
+            let qy: Vec<u64> = pts.iter().map(|p| p.x ^ p.y).collect();
+            assert!(qx.chunks(2).all(|c| c[0] == c[1]), "twins adjacent");
+            let w = 2048usize;
+            let (ux, uy, uy2): (Vec<u64>, Vec<u64>, Vec<u64>) = (
+                qx[..w].iter().step_by(2).copied().collect(),
+                qy[..w].iter().step_by(2).copied().collect(),
+                qy[1..w].iter().step_by(2).copied().collect(),
+            );
+            let target = fc.add(fc.add(pts[1], pts[7]), pts[13]);
+            let mut pre = vec![0u64; w + 8];
+            let mut lanes = Vec::new();
+            let (mut x3, mut l3, mut x3b, mut l3b) = (
+                vec![0u64; w + 8],
+                vec![0u64; w + 8],
+                vec![0u64; w + 8],
+                vec![0u64; w + 8],
+            );
+            let reps = 3000;
+            let mut best = [f64::MAX; 3];
+            for _round in 0..7 {
+                for (v, b) in best.iter_mut().enumerate() {
+                    let t0 = std::time::Instant::now();
+                    for _ in 0..reps {
+                        // SAFETY: folds() and the CPU check above; buffers sized for w.
+                        unsafe {
+                            match v {
+                                0 => simd.kernel_fold_variant(
+                                    &fc,
+                                    target,
+                                    &qx[..w],
+                                    &qy[..w],
+                                    None,
+                                    true,
+                                    &mut pre,
+                                    &mut lanes,
+                                    &mut x3,
+                                    &mut l3,
+                                    &mut x3b,
+                                    &mut l3b,
+                                ),
+                                1 => simd.kernel_fold_variant(
+                                    &fc,
+                                    target,
+                                    &qx[..w],
+                                    &qy[..w],
+                                    None,
+                                    false,
+                                    &mut pre,
+                                    &mut lanes,
+                                    &mut x3,
+                                    &mut l3,
+                                    &mut x3b,
+                                    &mut l3b,
+                                ),
+                                _ => simd.kernel_fold_variant(
+                                    &fc,
+                                    target,
+                                    &ux,
+                                    &uy,
+                                    Some(&uy2),
+                                    true,
+                                    &mut pre,
+                                    &mut lanes,
+                                    &mut x3,
+                                    &mut l3,
+                                    &mut x3b,
+                                    &mut l3b,
+                                ),
+                            }
+                        }
+                        std::hint::black_box((&x3, &x3b));
+                    }
+                    let ns = t0.elapsed().as_nanos() as f64 / (reps * w) as f64;
+                    *b = b.min(ns);
+                }
+            }
+            eprintln!(
+                "n={n}: ns a summand (best of 7): kernel {:.3}, without square {:.3} (saves {:.3}), paired ± {:.3} (saves {:.3})",
+                best[0], best[1], best[0] - best[1], best[2], best[0] - best[2]
+            );
+        }
+    }
+
     #[test]
     fn least_rotation_matches_exhaustive_scan() {
         fn brute(c: u64, n: u32, mask: u64) -> (u64, u32) {
@@ -2385,14 +3333,16 @@ mod tests {
                 let mut c = [0u64; 16];
                 c[..block.len()].copy_from_slice(block);
                 // SAFETY: both features were checked above; `2 ≤ n ≤ 63`.
-                let (funnel, chained) = unsafe {
+                let (funnel, chained, one_chain) = unsafe {
                     (
                         least_rotation16_funnel_avx512(&c, n),
                         least_rotation16_avx512(&c, n, mask),
+                        least_rotation16_funnel_one_chain_avx512(&c, n),
                     )
                 };
                 for lane in 0..16 {
                     assert_eq!(funnel[lane], chained[lane], "n = {n}, c = {:#x}", c[lane]);
+                    assert_eq!(funnel[lane], one_chain[lane], "n = {n}, c = {:#x}", c[lane]);
                     assert_eq!(funnel[lane], canon.least_rotation(c[lane]).0, "n = {n}");
                 }
             }
@@ -2643,6 +3593,39 @@ mod tests {
     }
 
     #[test]
+    fn the_scalar_bulk_keys_agree_with_and_without_bmi2() {
+        // The BMI2/LZCNT build of the scalar bulk key and the baseline
+        // build must give `canon` word for word, on blocks that take the
+        // shallow lift (random words) and the full one (a lane with a
+        // zero run of 16 or more).
+        for n in NB_DEGREES {
+            let f = nb_field(n);
+            let canon = FrobeniusCanon::new(&f, n).unwrap();
+            let mask = (1u64 << n) - 1;
+            let mut rng = StdRng::seed_from_u64(0xB312_0000 + n as u64);
+            let mut xs: Vec<u64> = (0..1000).map(|_| rng.gen::<u64>() & mask).collect();
+            for k in 0..n.min(40) {
+                // Sparse words in the normal basis: a long run of zeros
+                // in the coordinates, pulled back to the field element.
+                xs.push(canon.element_of_coords((1u64 << k) & mask));
+                xs.push(canon.element_of_coords(((1u64 << k) | 1) & mask));
+            }
+            let want: Vec<u64> = xs.iter().map(|&x| canon.canon(x)).collect();
+            let mut plain = xs.clone();
+            canon.canon_scalar(&mut plain);
+            assert_eq!(plain, want, "degree {n}, baseline build");
+            #[cfg(target_arch = "x86_64")]
+            if is_x86_feature_detected!("bmi2") && is_x86_feature_detected!("lzcnt") {
+                let mut fast = xs.clone();
+                // SAFETY: BMI1, BMI2 and LZCNT were just detected (BMI1
+                // accompanies BMI2 on every CPU that has it).
+                unsafe { canon.canon_scalar_bmi2(&mut fast) };
+                assert_eq!(fast, want, "degree {n}, BMI2 build");
+            }
+        }
+    }
+
+    #[test]
     fn the_least_rotation_partitions_exactly_as_the_squaring_chain() {
         // The two keys pick different representatives; the claim is
         // that they cut the field into the *same* orbits.  These degrees
@@ -2742,6 +3725,58 @@ mod tests {
                 assert_eq!((l.x, l.infinity), (e.x, e.infinity));
                 assert_eq!(fc.finish_lazy(p, l, lambda), e);
             }
+        }
+    }
+
+    #[test]
+    fn paired_abscissa_lazy_additions_match_order_and_exceptional_sums() {
+        for (a, n) in [(0u8, 13u32), (1, 19)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fc = FastCurve::new(&kc.curve).unwrap();
+            let points: Vec<FastPoint> = random_points(&kc, 12, 20261115)
+                .iter()
+                .map(|p| fc.lift(p))
+                .collect();
+            let mut qs = Vec::new();
+            for &q in points.iter().take(4) {
+                qs.extend([q, fc.neg(q)]);
+            }
+            qs.push(points[4]); // the last scan block can have one point
+            let mut targets = points.clone();
+            targets.push(fc.neg(points[0]));
+            targets.push(FastPoint::INFINITY);
+            for p in targets {
+                for scan in [&qs[..], &qs[1..]] {
+                    let (mut want, mut want_l) = (Vec::new(), Vec::new());
+                    let (mut got, mut got_l) = (Vec::new(), Vec::new());
+                    let mut scratch = BatchScratch::default();
+                    let before = crate::cryptanalysis::group_op_count::ops_snapshot().adds;
+                    fc.add_many_lazy(p, scan, &mut want, &mut want_l, &mut scratch);
+                    let ordinary_adds =
+                        crate::cryptanalysis::group_op_count::ops_snapshot().adds - before;
+                    let before = crate::cryptanalysis::group_op_count::ops_snapshot().adds;
+                    fc.add_many_lazy_paired_x(p, scan, &mut got, &mut got_l, &mut scratch);
+                    let paired_adds =
+                        crate::cryptanalysis::group_op_count::ops_snapshot().adds - before;
+                    assert_eq!(got, want, "n={n}, p={p:?}: sums");
+                    assert_eq!(got_l, want_l, "n={n}, p={p:?}: slopes");
+                    assert_eq!(
+                        paired_adds, ordinary_adds,
+                        "n={n}, p={p:?}: addition ledger"
+                    );
+                    for ((&sum, &lambda), &q) in got.iter().zip(&got_l).zip(scan) {
+                        assert_eq!(fc.finish_lazy(p, sum, lambda), fc.add(p, q));
+                    }
+                }
+            }
+            let mut nonpaired = qs.clone();
+            nonpaired[0] = FastPoint::INFINITY;
+            let (mut want, mut want_l) = (Vec::new(), Vec::new());
+            let (mut got, mut got_l) = (Vec::new(), Vec::new());
+            let mut scratch = BatchScratch::default();
+            fc.add_many_lazy(points[5], &nonpaired, &mut want, &mut want_l, &mut scratch);
+            fc.add_many_lazy_paired_x(points[5], &nonpaired, &mut got, &mut got_l, &mut scratch);
+            assert_eq!((got, got_l), (want, want_l), "n={n}: fallback");
         }
     }
 

@@ -1,0 +1,11 @@
+name = "elliptic_split_norm_projection_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticSplitNormProjectionAudit"]
+
+[[require]]
+name = "elliptic_infinity_norm_projection_audit"
+path = "../../elliptic_infinity_norm_projection_audit_20261116/lean"
+
+[[lean_lib]]
+name = "EllipticSplitNormProjectionAudit"
+roots = ["SplitBase", "SplitFiber", "SplitImports", "SplitSymbol", "SplitF5", "SplitControls", "SplitCertificate"]

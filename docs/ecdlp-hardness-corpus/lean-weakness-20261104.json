@@ -1,0 +1,115 @@
+{
+  "schema": "ecdlp.claim-corpus/v1",
+  "fragment": "lean-weakness-20261104",
+  "notes": "Kernel-checked results against WEAKNESS_TRIAGE W2 (relation rank) and W7 (xedni hazard recurrence). Lean project research/ecdlp_weakness_lean_20261104/lean (Lean v4.34.1, Mathlib v4.34.1). Repository proof gate pending on the PR that lands this fragment.",
+  "sources": [
+    {
+      "id": "S-WEAKNESS-LEAN",
+      "title": "Lean attacks on two weak points of the ECDLP hardness graph",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/ecdlp_weakness_lean_20261104: LeftKernel.lean and HazardSeparation.lean, with README and AxiomAudit.lean.",
+      "repository_path": "research/ecdlp_weakness_lean_20261104/README.md"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "THM-LEFT-KERNEL-RELATIONS",
+      "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "Over a field, with relations a_i + b_i x = sum_j M_ij f_j: (i) more relations than factor-base columns give a nonzero left-kernel vector lam for every matrix M; (ii) any such lam gives sum lam a + x sum lam b = 0, so x = -(sum lam a)/(sum lam b) when sum lam b != 0; (iii) if lam is any nonzero-valued function of the logs a + b x alone, exactly q^(2n-1) of the q^(2n) pairs (a, b) have sum lam b = 0.",
+      "scope": "Single target, relations built from target-dependent points R_i = a_i P + b_i Q with (a_i, b_i) uniform. Removes the rank condition from the linear-algebra step; it does not bound decomposition yield, and it does not apply when one relation set serves many targets (right-kernel reuse), where HEUR-RELATION-RANK remains load-bearing. The step 'a decomposition of R_i gives row M_i' is the definition of the factor-base logs and is not formalised.",
+      "assumptions": ["Prime group order q (scalar field)", "More relations than factor-base columns", "lam chosen from the relation points only"],
+      "source_refs": ["S-WEAKNESS-LEAN"],
+      "source_locations": ["LeftKernel.exists_left_kernel", "LeftKernel.left_kernel_recovers", "LeftKernel.card_bad_pairs"],
+      "tags": ["index-calculus", "linear-algebra", "rank", "lean"],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          { "path": "research/ecdlp_weakness_lean_20261104/lean/LeftKernel.lean", "decl": "LeftKernel.card_bad_pairs" }
+        ],
+        "notes": "Compiled locally with lake env lean -o against Mathlib v4.34.1; repository proof gate (transitive axiom audit) runs on the landing PR."
+      }
+    },
+    {
+      "id": "THM-HAZARD-MARGINAL-SUFFICES",
+      "label": "Per-trial marginal bounds give the linear waiting time (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "On a finite probability space, if each trial t <= N succeeds with marginal mass at most eps (trials may be correlated or adaptive) and the waiting time is the index of a successful trial, then survival after n <= N trials is at least 1 - n eps, and E[min(tau, N)] >= N/2 whenever N eps <= 1/2.",
+      "scope": "Same conclusion as JKSSTExpectedTrials.truncated_expectation_ge_half_horizon without its conditional-hazard recurrence. Constant 1/2 instead of the geometric sum; asymptotically the same Omega(1/eps) wait.",
+      "assumptions": ["Normalized nonnegative mass", "Per-trial marginal success mass <= eps", "Waiting time is the index of a successful trial"],
+      "source_refs": ["S-WEAKNESS-LEAN"],
+      "source_locations": ["HazardSeparation.survival_ge_of_marginals", "HazardSeparation.truncated_expectation_ge_half_horizon_of_marginals"],
+      "tags": ["xedni", "waiting-time", "lean"],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          { "path": "research/ecdlp_weakness_lean_20261104/lean/HazardSeparation.lean", "decl": "HazardSeparation.truncated_expectation_ge_half_horizon_of_marginals" }
+        ],
+        "notes": "Compiled locally with lake env lean -o against Mathlib v4.34.1; repository proof gate runs on the landing PR."
+      }
+    },
+    {
+      "id": "CLAIM-MARGINAL-IMPLIES-HAZARD",
+      "label": "'Per-trial success bounds give the conditional-hazard recurrence'",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "mathematical",
+      "statement": "Overbroad inference: if every trial succeeds with probability at most eps, then survival masses satisfy the history-uniform recurrence (1 - eps) s(n) <= s(n+1).",
+      "scope": "The inference behind treating a one-shot bound as a geometric waiting time (protocol corpus ONE-SHOT-REPEAT; JKSST audit open item 7). Refuted by a three-point model; the conclusion it was used for survives by THM-HAZARD-MARGINAL-SUFFICES.",
+      "assumptions": [],
+      "source_refs": ["S-PA-CORPUS", "S-WEAKNESS-LEAN"],
+      "tags": ["xedni", "waiting-time", "counterexample"],
+      "evidence_class": "counterexample"
+    },
+    {
+      "id": "CEX-HAZARD-SEPARATION",
+      "label": "Three-point model: marginals <= 1/3, hazard recurrence fails (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "Omega = Fin 3 uniform, outcome k succeeds exactly at trial k+1: every trial's marginal success mass is at most 1/3, the recurrence with eps = 1/3 fails at n = 1 (4/9 > 1/3), and E[min(tau, 3)] = 2.",
+      "scope": "Finite countermodel to the inference only; the waiting time in the model is still linear.",
+      "assumptions": [],
+      "source_refs": ["S-WEAKNESS-LEAN"],
+      "source_locations": ["HazardSeparation.marginals_U", "HazardSeparation.marginals_do_not_give_hazard", "HazardSeparation.wait_U"],
+      "tags": ["xedni", "waiting-time", "lean", "counterexample"],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          { "path": "research/ecdlp_weakness_lean_20261104/lean/HazardSeparation.lean", "decl": "HazardSeparation.marginals_do_not_give_hazard" }
+        ],
+        "notes": "Compiled locally with lake env lean -o against Mathlib v4.34.1; repository proof gate runs on the landing PR."
+      }
+    },
+    {
+      "id": "ASM-XEDNI-TRIAL-MARGINAL",
+      "label": "Each adaptive xedni trial, as run, succeeds with marginal probability O(1/p)",
+      "kind": "assumption",
+      "status": "assumed",
+      "model": "algebraic_coordinate",
+      "statement": "For the adaptive trial process actually run (lifts possibly selected using earlier failures), every individual trial succeeds with marginal probability at most the one-shot bound C0/p.",
+      "scope": "Replaces ASM-XEDNI-HAZARD-RECURRENCE under the obstruction: by THM-HAZARD-MARGINAL-SUFFICES this weaker per-trial statement already gives the linear wait. Adaptive lift selection could still raise a trial's marginal above the fresh one-shot bound; that is the remaining open bridge.",
+      "assumptions": ["Adaptive lift selection allowed"],
+      "source_refs": ["S-WEAKNESS-LEAN", "S-PA-CORPUS"],
+      "tags": ["xedni", "waiting-time", "promoted-assumption"],
+      "evidence_class": "assumption"
+    }
+  ],
+  "edges": [
+    { "id": "LW-001", "from": "THM-LEFT-KERNEL-RELATIONS", "to": "HEUR-RELATION-RANK", "relation": "qualifies", "statement": "With target-dependent (left-kernel) relations no rank condition is needed and failure has density exactly 1/q; the heuristic is load-bearing only for relations reused across targets.", "source_refs": ["S-WEAKNESS-LEAN"] },
+    { "id": "LW-002", "from": "THM-LEFT-KERNEL-RELATIONS", "to": "HEUR-BK-GG-RIGHT-KERNEL-RANK", "relation": "qualifies", "statement": "Kernel-checks the 'much easier to analyze rigorously' left-kernel alternative this survey statement names.", "source_refs": ["S-WEAKNESS-LEAN"] },
+    { "id": "LW-003", "from": "THM-LEFT-KERNEL-RELATIONS", "to": "ALG-SPARSE-LINEAR-ALGEBRA", "relation": "qualifies", "statement": "The assumption 'enough independent relations' is unnecessary for single-target left-kernel index calculus: |F| + 1 relations always suffice.", "source_refs": ["S-WEAKNESS-LEAN"] },
+    { "id": "LW-004", "from": "CEX-HAZARD-SEPARATION", "to": "CLAIM-MARGINAL-IMPLIES-HAZARD", "relation": "refutes", "statement": "Marginals all <= 1/3, yet (2/3)(2/3) = 4/9 > 1/3 = s(2).", "source_refs": ["S-WEAKNESS-LEAN"] },
+    { "id": "LW-005", "from": "THM-HAZARD-MARGINAL-SUFFICES", "to": "OBSTRUCTION-XEDNI-HEIGHT", "relation": "enables", "statement": "The waiting-time step of the obstruction follows from per-trial marginal bounds by a union bound.", "source_refs": ["S-WEAKNESS-LEAN"] },
+    { "id": "LW-006", "from": "THM-HAZARD-MARGINAL-SUFFICES", "to": "ASM-XEDNI-HAZARD-RECURRENCE", "relation": "qualifies", "statement": "The recurrence is stronger than the obstruction needs; the per-trial marginal statement suffices.", "source_refs": ["S-WEAKNESS-LEAN"] },
+    { "id": "LW-007", "from": "CEX-HAZARD-SEPARATION", "to": "GAP-PA-ONE-SHOT-REPEAT", "relation": "qualifies", "statement": "The countermodel half of this protocol-corpus item is kernel-checked; its repair is THM-HAZARD-MARGINAL-SUFFICES.", "source_refs": ["S-WEAKNESS-LEAN"] }
+  ]
+}

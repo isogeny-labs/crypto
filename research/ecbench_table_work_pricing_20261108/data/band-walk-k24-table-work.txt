@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | f1-x05 | 512/512 | 1.812 | 1.971 | 3.402 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | f1-x07 | 512/512 | 1.828 | 1.989 | 3.432 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | f1-x09 | 512/512 | 1.858 | 2.020 | 3.484 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | f2-inc | 512/512 | 2.138 | 2.319 | 3.949 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-aa | 512/512 | 1.164 | 1.269 | 2.212 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 512/512 | 1.164 | 1.269 | 2.212 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs f1-x07 | f1-x05 < f1-x07 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs f1-x09 | f1-x05 < f1-x09 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs f2-inc | f1-x05 < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs rho-aa | rho-aa < f1-x05 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x05 vs rho-neg | rho-neg < f1-x05 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs f1-x09 | f1-x07 < f1-x09 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs f2-inc | f1-x07 < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs rho-aa | rho-aa < f1-x07 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x07 vs rho-neg | rho-neg < f1-x07 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x09 vs f2-inc | f1-x09 < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x09 vs rho-aa | rho-aa < f1-x09 |
+| icv1-fp24-tm1578-e83ed1b2 | f1-x09 vs rho-neg | rho-neg < f1-x09 |
+| icv1-fp24-tm1578-e83ed1b2 | f2-inc vs rho-aa | rho-aa < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | f2-inc vs rho-neg | rho-neg < f2-inc |
+| icv1-fp24-tm1578-e83ed1b2 | rho-aa vs rho-neg | unresolved inside the band |

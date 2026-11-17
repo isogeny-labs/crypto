@@ -28,6 +28,7 @@
 use std::collections::{BTreeSet, HashMap};
 
 mod genus4;
+mod genus5;
 mod quartic;
 mod screen;
 
@@ -1090,7 +1091,8 @@ fn summary(g: i32, family: &str, st: &Stats) {
 }
 
 /// Arguments: genera of the hyperelliptic search (default `2 3`), `q` for plane quartics, or
-/// `s4` for the genus-4 necessary-condition screen at n = 283, 409, 571.
+/// `s4` for the genus-4 necessary-condition screen at n = 283, 409, 571, or `g5 <mode>` for the
+/// genus-5 screen at n = 409, 571 (module `genus5`).
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.get(1).map(String::as_str) == Some("s4") {
@@ -1112,6 +1114,17 @@ fn main() {
                 .unwrap_or(0),
             union.iter().map(|lp| 3 + lp[1]).max().unwrap_or(0)
         );
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("g5") {
+        // genus-5 bases: g0 - 1 = 4 bounds the twist order; n = 409, 571 allow g0 = 5
+        let targets = [409u64, 571];
+        match args.get(2).map(String::as_str) {
+            Some("hyp-enum") => genus5::run_hyp_enum(&targets, 4),
+            Some("trig-enum") => genus5::run_trig_enum(&targets, 4),
+            Some("sourced") => genus5::run_sourced(&args[3], &args[4], &targets, 4),
+            _ => eprintln!("g5 hyp-enum | trig-enum | sourced <ci dir> <mt_curves dir>"),
+        }
         return;
     }
     if args.get(1).map(String::as_str) == Some("q") {

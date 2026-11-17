@@ -1,0 +1,13 @@
+[package]
+name = "c2_volcano"
+version = "0.1.0"
+edition = "2021"
+
+# Standalone on purpose: the worktree manifest cannot resolve its path
+# dependencies (crates/, tools/, isogeny_algos/ are absent in this worktree).
+[workspace]
+
+[dependencies]
+
+[profile.release]
+opt-level = 3

@@ -1,0 +1,9 @@
+error[E0433]: cannot find `residual_walk` in `super`
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:1210:24
+     |
+1210 |             if !super::residual_walk::is_prime_u64(p) {
+     |                        ^^^^^^^^^^^^^ could not find `residual_walk` in `super`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0433`.

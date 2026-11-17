@@ -20,7 +20,8 @@ strings in the field's encoding. Every derived value has a status (proved, proba
 conjectural, unknown, ...); unknown is null, never 0. Transfer costs are formula estimates, not measured speedups. \
 Measured results (IC leaderboard, progress, boundary ledger, benchmarks, ecbench sessions and runs, sibling-repository \
 datasets) keep their producer's unit and reference: ecdb_results, ecdb_ecbench, ecdb_curve_detail part=measurements. \
-Start with ecdb_schema or ecdb_search_curves; use ecdb_sql for anything the other tools do not cover.";
+Saved sweep plans, versioned feature definitions and ML dataset recipes are exposed by ecdb_research. Start with \
+ecdb_schema or ecdb_search_curves; use ecdb_sql for anything the other tools do not cover.";
 
 fn tools() -> Value {
     let s = |props: Value, required: &[&str]| json!({ "type": "object", "properties": props, "required": required });
@@ -50,6 +51,7 @@ fn tools() -> Value {
                 "standard": { "type": "string", "description": "substring of a standard name" },
                 "name": { "type": "string", "description": "substring of any alias or standard name" },
                 "isogeny_class": { "type": "string" }, "has_isogenies": { "type": "boolean" }, "has_covers": { "type": "boolean" },
+                "has_factor_bases": { "type": "boolean" },
                 "sort": { "type": "string", "enum": ["id", "icv1_slug", "field_bits", "group_order_bits", "subgroup_bits", "trace", "class_number", "conductor_bits", "embedding_degree", "cm_discriminant", "isogeny_count", "cover_count"] },
                 "order": { "type": "string", "enum": ["asc", "desc"] },
                 "limit": { "type": "integer", "minimum": 1, "maximum": 1000 }, "offset": { "type": "integer", "minimum": 0 }
@@ -65,7 +67,7 @@ fn tools() -> Value {
             "description": "One part of a curve in full: isogenies (kernel polynomials, codomains, certificates), graph (recorded isogeny graph; depth 0-8, optional ell), transfers (priced DLP routes), covers (cover curves and maps), traits (verbatim producer records), relations (twists, isomorphisms, model changes), endomorphisms (with GLV lattices), division-polynomials (coefficients).",
             "inputSchema": s(json!({
                 "ref": curve_ref,
-                "part": { "type": "string", "enum": ["isogenies", "graph", "transfers", "covers", "traits", "relations", "endomorphisms", "division-polynomials", "measurements"], "description": "measurements: the curve's IC leaderboard rows with recipes, ecbench arm summaries, sibling-dataset measurements and sibling-repository records" },
+                "part": { "type": "string", "enum": ["isogenies", "graph", "transfers", "covers", "traits", "relations", "endomorphisms", "division-polynomials", "measurements", "features"], "description": "measurements: result records; features: the model-ready structural row and typed observations" },
                 "depth": { "type": "integer", "minimum": 0, "maximum": 8 }, "ell": { "type": "string" }
             }), &["ref", "part"]),
         },
@@ -94,9 +96,11 @@ fn tools() -> Value {
         },
         {
             "name": "ecdb_results",
-            "description": "Measured results of the crypto repository as frozen there. kind=leaderboard: IC leaderboard rows (best recipe's cold cost over matched rho, per family A/B/C; filters family, regime, validation; recipes=true adds every recipe). kind=progress: the progress timeline (filter series). kind=boundary: the boundary ledger (filters regime, stage). kind=benchmarks: the benchmarks/ index with VALIDATION.json (filters listed=admitted|archive|unlisted, q, limit, offset). Ratios compare only within one family or series.",
+            "description": "Measured results of the crypto repository as frozen there. kind=leaderboard: IC leaderboard rows (best recipe's cold cost over matched rho, per family A/B/C; filters family, regime, validation; recipes=true adds every recipe). kind=progress: the progress timeline (filter series). kind=boundary: the boundary ledger (filters regime, stage). kind=benchmarks: the benchmarks/ index with VALIDATION.json (filters listed=admitted|archive|unlisted, q, limit, offset). kind=claims: IC tool-program claims, IC online against matched rho per target (filters rule_version, curve, candidate_id, validation_status; summary=true for per-candidate geometric means). online_speedup excludes the IC set-up; cold_ratio_ic_over_rho includes it and is the figure to quote. kind=designs: factor-base design grids (n83). Ratios compare only within one family or series.",
             "inputSchema": s(json!({
-                "kind": { "type": "string", "enum": ["leaderboard", "progress", "boundary", "benchmarks"] },
+                "kind": { "type": "string", "enum": ["leaderboard", "progress", "boundary", "benchmarks", "claims", "designs"] },
+                "rule_version": { "type": "string" }, "curve": { "type": "string" }, "candidate_id": { "type": "string" },
+                "validation_status": { "type": "string" }, "summary": { "type": "boolean" },
                 "family": { "type": "string", "enum": ["A", "B", "C"] }, "regime": { "type": "string" },
                 "validation": { "type": "string" }, "recipes": { "type": "boolean" },
                 "series": { "type": "string" }, "stage": { "type": "string" },
@@ -112,6 +116,28 @@ fn tools() -> Value {
                 "label": { "type": "string" }, "path": { "type": "string" },
                 "limit": { "type": "integer" }, "offset": { "type": "integer" }
             }), &[]),
+        },
+        {
+            "name": "ecdb_factor_bases",
+            "description": "Factor bases of the index-calculus work. Ids: FB1h... (ecbench point set), FBM1h... (measurement configuration), FBS1h... (ecdb id for a base known only by construction), or a cryptanalysis archive digest; plug-in strings, PS1 labels and cited digests resolve too. Without key: a page of bases with sizes, result counts, solved counts and best solved S (filters curve, family, scheme, min_columns, max_columns, solved; sort results|best_s|columns|key). With key: the base with aliases, FBM1 configurations and results by source; results=true pages its results (ecbench runs, large-prime cells, SECG small-x yields; filters source, fbm_id, solved); points=true pages its stored points.",
+            "inputSchema": s(json!({
+                "key": { "type": "string" }, "curve": { "type": "string" }, "family": { "type": "string" },
+                "scheme": { "type": "string", "enum": ["fb1", "fbarchive", "spec", "pointset"] }, "design": { "type": "string" },
+                "min_columns": { "type": "integer" }, "max_columns": { "type": "integer" }, "solved": { "type": "boolean" },
+                "sort": { "type": "string", "enum": ["results", "best_s", "columns", "key"] },
+                "results": { "type": "boolean" }, "points": { "type": "boolean" }, "source": { "type": "string" },
+                "fbm_id": { "type": "string" }, "limit": { "type": "integer" }, "offset": { "type": "integer" }
+            }), &[]),
+        },
+        {
+            "name": "ecdb_research",
+            "description": "Saved research configuration. kind=sweeps returns versioned curve-sweep plans and cells (name selects one); kind=features returns versioned feature contracts (optional scope); kind=datasets returns reproducible model-dataset recipes, feature roles and split policies (name selects one). Plans and recipes are not measurement evidence.",
+            "inputSchema": s(json!({
+                "kind": { "type": "string", "enum": ["sweeps", "features", "datasets"] },
+                "name": { "type": "string" },
+                "scope": { "type": "string", "enum": ["curve", "field", "subgroup", "factor_base", "factor_base_measurement", "sweep_cell"] },
+                "limit": { "type": "integer" }, "offset": { "type": "integer" }
+            }), &["kind"]),
         },
         {
             "name": "ecdb_sql",
@@ -182,6 +208,7 @@ fn route(name: &str, args: &Map<String, Value>) -> Result<(Method, String, Optio
                 "endomorphisms",
                 "division-polynomials",
                 "measurements",
+                "features",
             ];
             if !PARTS.contains(&part) {
                 return Err(format!("part must be one of {PARTS:?}"));
@@ -205,11 +232,37 @@ fn route(name: &str, args: &Map<String, Value>) -> Result<(Method, String, Optio
             "progress" => (Method::GET, format!("/v1/ic/progress{}", query(args, &["kind"])), None),
             "boundary" => (Method::GET, format!("/v1/ic/boundary{}", query(args, &["kind"])), None),
             "benchmarks" => (Method::GET, format!("/v1/benchmarks{}", query(args, &["kind"])), None),
+            "claims" => (Method::GET, format!("/v1/ic/claims{}", query(args, &["kind"])), None),
+            "designs" => (Method::GET, "/v1/factor-base-designs".into(), None),
             other => return Err(format!("unknown results kind {other:?}")),
         },
         "ecdb_ecbench" => match args.get("session_id").and_then(Value::as_str) {
             Some(id) => (Method::GET, format!("/v1/ecbench/sessions/{}", enc(id)), None),
             None => (Method::GET, format!("/v1/ecbench/sessions{}", query(args, &["session_id"])), None),
+        },
+        "ecdb_factor_bases" => {
+            let wants_rows = |k: &str| args.get(k).and_then(Value::as_bool) == Some(true);
+            match args.get("key").and_then(Value::as_str) {
+                Some(k) if wants_rows("results") || wants_rows("points") => (
+                    Method::GET,
+                    format!("/v1/factor-bases/{}/results{}", enc(k), query(args, &["key", "results"])),
+                    None,
+                ),
+                Some(k) => (Method::GET, format!("/v1/factor-bases/{}", enc(k)), None),
+                None => (Method::GET, format!("/v1/factor-bases{}", query(args, &["key", "results", "points"])), None),
+            }
+        }
+        "ecdb_research" => match arg(args, "kind")? {
+            "sweeps" => match args.get("name").and_then(Value::as_str) {
+                Some(name) => (Method::GET, format!("/v1/sweeps/{}", enc(name)), None),
+                None => (Method::GET, format!("/v1/sweeps{}", query(args, &["kind", "name"])), None),
+            },
+            "features" => (Method::GET, format!("/v1/features{}", query(args, &["kind", "name"])), None),
+            "datasets" => match args.get("name").and_then(Value::as_str) {
+                Some(name) => (Method::GET, format!("/v1/datasets/{}", enc(name)), None),
+                None => (Method::GET, format!("/v1/datasets{}", query(args, &["kind", "name"])), None),
+            },
+            other => return Err(format!("unknown research kind {other:?}")),
         },
         "ecdb_sql" => (Method::POST, "/v1/sql".into(), Some(Value::Object(args.clone()))),
         "ecdb_record_evidence" => (Method::POST, "/v1/evidence".into(), Some(Value::Object(args.clone()))),
@@ -356,6 +409,20 @@ mod tests {
         let mut e = Map::new();
         e.insert("session_id".into(), json!("ECBS1hffaa276d8a5c"));
         assert_eq!(route("ecdb_ecbench", &e).unwrap().1, "/v1/ecbench/sessions/ECBS1hffaa276d8a5c");
-        assert_eq!(tools().as_array().unwrap().len(), 11);
+        let mut fb = Map::new();
+        fb.insert("key".into(), json!("FB1h8e805e4ad71c"));
+        assert_eq!(route("ecdb_factor_bases", &fb).unwrap().1, "/v1/factor-bases/FB1h8e805e4ad71c");
+        fb.insert("results".into(), json!(true));
+        fb.insert("solved".into(), json!(true));
+        assert_eq!(route("ecdb_factor_bases", &fb).unwrap().1, "/v1/factor-bases/FB1h8e805e4ad71c/results?solved=true");
+        let mut c = Map::new();
+        c.insert("kind".into(), json!("claims"));
+        c.insert("summary".into(), json!(true));
+        assert_eq!(route("ecdb_results", &c).unwrap().1, "/v1/ic/claims?summary=true");
+        let mut research = Map::new();
+        research.insert("kind".into(), json!("datasets"));
+        research.insert("name".into(), json!("fbm1-solver-outcomes"));
+        assert_eq!(route("ecdb_research", &research).unwrap().1, "/v1/datasets/fbm1-solver-outcomes");
+        assert_eq!(tools().as_array().unwrap().len(), 13);
     }
 }

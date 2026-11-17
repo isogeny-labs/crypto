@@ -1,0 +1,41 @@
+import Identify
+set_option autoImplicit false
+namespace TraversalPolynomial
+open Polynomial AffineCoefficientLoop MumfordNormalization CoefficientTraversal
+variable {K : Type*} [Field K]
+theorem sourcePoly_coefficient (c : Nat→K) (n i : Nat) :
+ (sourcePoly c n).coeff i=if i<n then c i else 0 := by
+ simp [sourcePoly,coeff_C_mul_X_pow]
+
+noncomputable def decodedPoly {n : Nat} (p : UInt64) [Fact p.toNat.Prime] (xs : State n) : (ZMod p.toNat)[X] :=
+ sourcePoly (extend p (fun i=>CoefficientTraversal.read xs i)) n
+
+theorem word_transform_polynomial {n : Nat} (hn : n≤6) (p : UInt64) [Fact p.toNat.Prime]
+ (c : Fin n→UInt64) (a b s : UInt64)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hc : ∀i,(c i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (hs : s.toNat<p.toNat) (hs0 : s≠0) :
+ decodedPoly p (transform hn p c a b s)=
+ C ((s.toNat : ZMod p.toNat)⁻¹)*(sourcePoly (extend p c) n).comp
+  (affine (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat)) := by
+ apply Polynomial.ext
+ intro i
+ rw [decodedPoly,sourcePoly_coefficient]
+ by_cases hi : i<n
+ · rw [if_pos hi]
+   simpa only [extend,dif_pos hi,decode] using
+    word_transform_coefficient hn p c a b s hp hb hc ha hbeta hs hs0 ⟨i,hi⟩
+ · rw [if_neg hi]
+   rw [←eventPoly_composition (extend p c) (a.toNat : ZMod p.toNat)
+    (b.toNat : ZMod p.toNat) (s.toNat : ZMod p.toNat) n hn]
+   exact (eventPoly_high _ _ _ _ n i (by omega)).symm
+
+theorem word_transform_T {n : Nat} (hn : n≤6) (p : UInt64) [Fact p.toNat.Prime]
+ (c : Fin n→UInt64) (a b s : UInt64) (m : Nat)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hc : ∀i,(c i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (hs : s.toNat<p.toNat) (hs0 : s≠0)
+ (hscale : (s.toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)^m) :
+ decodedPoly p (transform hn p c a b s)=
+ T m (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (sourcePoly (extend p c) n) := by
+ rw [word_transform_polynomial hn p c a b s hp hb hc ha hbeta hs hs0,hscale]
+ rfl
+end TraversalPolynomial

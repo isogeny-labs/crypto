@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-11-05T20:19:01.584558+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-transport-accounting/accounting.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-transport-accounting-20261105/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-transport-accounting-20261105/tests",
+        "accounting_tests::",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 53,
+  "binary_sha256": "9c572baf6cbd44cec21807dedd22051067b22dc2fc96b4eeec5c99f9918c8c1e",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

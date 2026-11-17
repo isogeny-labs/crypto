@@ -131,3 +131,48 @@ fn pplus1_wrong_powers_do_not_recover() {
     let o = cheon_pplus1(&c, s.n, s.d, &pows, None);
     assert_ne!(o.alpha, Some(4242));
 }
+
+/// A curve of prime order 101 and an affine point on it, by exhaustive search.
+fn order_101_curve() -> (PrimeCurve, PrimePoint) {
+    for p in 83u64..=121 {
+        if !(2..p).take_while(|q| q * q <= p).all(|q| p % q != 0) {
+            continue;
+        }
+        for a in 0..p {
+            for b in 1..p {
+                if (4 * a % p * a % p * a + 27 * b % p * b) % p == 0 {
+                    continue;
+                }
+                let c = PrimeCurve { p, a, b };
+                let mut count = 1;
+                let mut point = None;
+                for x in 0..p {
+                    for y in 0..p {
+                        if (y * y) % p == (x * x % p * x + a * x + b) % p {
+                            count += 1;
+                            point.get_or_insert(PrimePoint::affine(x, y));
+                        }
+                    }
+                }
+                if count == 101 {
+                    return (c, point.unwrap());
+                }
+            }
+        }
+    }
+    unreachable!("a curve of order 101 exists for some p in [83, 121]");
+}
+
+/// `d = 51` divides `n + 1 = 102` but `2d >= n`, where `(2d)!` vanishes
+/// modulo `n`: rejected with an error, never a wrong answer. A divisor with
+/// `2d < n` still recovers the logarithm.
+#[test]
+fn pplus1_rejects_two_d_at_least_n() {
+    let (c, g0) = order_101_curve();
+    let pows = leaked_powers(&c, 101, g0, 37, 2 * 51);
+    let o = cheon_pplus1(&c, 101, 51, &pows, None);
+    assert!(o.alpha.is_none() && o.error.is_some(), "{:?}", o.alpha);
+    let pows = leaked_powers(&c, 101, g0, 37, 2 * 34);
+    let o = cheon_pplus1(&c, 101, 34, &pows, None);
+    assert_eq!(o.alpha, Some(37), "{:?}", o.error);
+}

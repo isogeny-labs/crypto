@@ -1,0 +1,11 @@
+digraph Faithful {
+ graph [rankdir=TB,bgcolor="white",pad=0.15];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,fillcolor="#e6f4ed"];
+ basis [label="Actual degreeLT product-basis equivalence\nTwo projections = actual assembled polynomials"];
+ caps [label="Degree caps + coordinate injectivity\nExisting completeness supplies every bounded pair"];
+ bil [label="Arbitrary vectors w,z\nActual matrix pairing = mu(A_w A_z-f B_w B_z)\nExplicit finite-sum exchange; no division by2"];
+ poly [label="Actual polynomial branch theorem\nAll monic / Bezout / degree / nonzero guards"];
+ line [label="Actual coordinate-space branch radical\nw=t*w0; nonzero witness coordinates exist"];
+ next [label="Next: genuine branch basis and rank-nullity\nExact reduced corank / adjugate / recovery\nPublic-input finder and bit cost remain open",fillcolor="#fff2d5"];
+ basis -> caps -> bil -> line; poly -> line; line -> next;
+}

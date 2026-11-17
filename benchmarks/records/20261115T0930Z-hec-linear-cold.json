@@ -1,0 +1,243 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-15T09:46:18+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/time",
+        "-p",
+        "/Users/adamburan/pq-work/hec-followup-target/linear-cold",
+        "--linear-cold",
+        "research/hec_anchor_relations_20261114/linear-cold-run",
+        "research/hec_anchor_relations_20261114/heldout-run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T09:34:45Z",
+      "wall_s": 8.18
+    }
+  ],
+  "commit": "ed0fb2c5f9822cdee862b7a8c70c38a5bf193ad3",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T09:34:07Z",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-hec-linear-cold"
+  ],
+  "host": {
+    "cpu": "arm64",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "L0 observational; sequential fresh children, no isolation assertion",
+    "platform": "Darwin 27.2.0 Darwin Kernel Version 27.2.0: Wed Oct 14 23:44:56 PDT 2026; root:xnu-13432.41.4~25/RELEASE_ARM64_T6041 arm64"
+  },
+  "id": "20261115T0930Z-hec-linear-cold",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g2_p1009_f0_linear_primary_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.37177979626761803,
+        1.462308964852973
+      ],
+      "unit": "ratio",
+      "value": 1.4340503452828273
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g2_p1009_f0_linear_generic_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.903057760659564,
+        2.186461561554988
+      ],
+      "unit": "ratio",
+      "value": 2.098843556413121
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g2_p16381_f0_linear_primary_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.6822386476319393,
+        0.8114443369883061
+      ],
+      "unit": "ratio",
+      "value": 0.7504152707001887
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g2_p16381_f0_linear_generic_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2616776793162607,
+        2.1071116867028916
+      ],
+      "unit": "ratio",
+      "value": 1.4557169458656887
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g3_p127_f0_linear_primary_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.6504116393591106,
+        0.9426438180258281
+      ],
+      "unit": "ratio",
+      "value": 0.8389919282093661
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g3_p127_f0_linear_generic_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.774058377945474,
+        2.1653785943328696
+      ],
+      "unit": "ratio",
+      "value": 2.1561937498948596
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g3_p1009_f0_linear_primary_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.6728584955286692,
+        0.6988747264667672
+      ],
+      "unit": "ratio",
+      "value": 0.6960460771656858
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g3_p1009_f0_linear_generic_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.392600473435034,
+        2.795600262276693
+      ],
+      "unit": "ratio",
+      "value": 2.596512716570972
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g4_p31_f0_linear_primary_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7951482479784366,
+        0.9645690704076884
+      ],
+      "unit": "ratio",
+      "value": 0.9045646388513706
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g4_p31_f0_linear_generic_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.3545238662151826,
+        4.065363881401617
+      ],
+      "unit": "ratio",
+      "value": 2.387977743761693
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g4_p127_f0_linear_primary_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5885367877127968,
+        1.0059745237290045
+      ],
+      "unit": "ratio",
+      "value": 0.7551356528106065
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g4_p127_f0_linear_generic_ratio",
+      "note": "Three-target observed median and min/max; L0 producer assertion. Primary=fastest of14existing full cold totals / linear; secondary=generic / linear. No confidence interval. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.8179747871688723,
+        4.1624711389139195
+      ],
+      "unit": "ratio",
+      "value": 3.0202159846691465
+    }
+  ],
+  "problem": "hec:g234-math10x",
+  "raw": [
+    {
+      "bytes": 166699,
+      "path": "research/hec_anchor_relations_20261114/LINEAR-COLD-RAW.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cb/cbe13374eb5f9a7f06cb6955efefee357acfa7d6f68686ed65a96b635aceb08e",
+      "sha256": "cbe13374eb5f9a7f06cb6955efefee357acfa7d6f68686ed65a96b635aceb08e",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-hec-linear-cold/REPORT.pdf",
+    "png": [
+      "benchmarks/20261115-hec-linear-cold/linear-cold.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-hec-linear-cold/linear-cold.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-linear-cold",
+  "status": "measured",
+  "summary": "E6passes:18gates/288coldcells,all answers and exact-count gates pass. E7fails: primary fixture medians0.70..1.43 vs fastest14existing arms, including compact; generic/linear medians1.46..3.02. A/Amax2.55, L0 only. Native scientific path; producer assertions [pcc:unverified].",
+  "validation": null
+}

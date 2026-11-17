@@ -1,0 +1,63 @@
+{
+  "schema": "aps.development-policy-checks/v1",
+  "standing": "unverified producer assertions",
+  "reviewed_source_commit": "79339fa7792ed1c482c4765c55382c0b57f5fe38",
+  "baseline_commit": "d88afc85375e92bff6b5cf508b24c0adc3ff8663",
+  "observations": [
+    {
+      "id": "rustfmt",
+      "exit": 0,
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "actionlint",
+      "exit": 0,
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "custody",
+      "exit": 0,
+      "private_log_sha256": "cecec638980ddd155876baf26fdc55cfb959f34141e7327d24b34afc111dcffb"
+    },
+    {
+      "id": "diff",
+      "exit": 0,
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "prose",
+      "exit": 0,
+      "private_log_sha256": "78860995516e3367bf95a303485b67d572a3b44e8a1165dc117ca264ddb7b3eb"
+    },
+    {
+      "id": "size",
+      "exit": 0,
+      "private_log_sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec"
+    },
+    {
+      "id": "artifacts",
+      "exit": 0,
+      "private_log_sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934"
+    },
+    {
+      "id": "curves",
+      "exit": 1,
+      "private_log_sha256": "4281aaa2f7b112d3bdeec409af72aa661a64f99f8a734ecef2c34ac9418365ec"
+    },
+    {
+      "id": "curves-diff",
+      "exit": 0,
+      "private_log_sha256": "27849e2dbaf2d1b0167e58d27981c6a1f1ebe5fcd18bfe2748a4ccd5136426b4"
+    }
+  ],
+  "scope_notes": [
+    "Scoped Rustfmt checks 20 touched Rust files with skip_children=true; the unrelated whole-tree format failures are retained in format-scope.json.",
+    "Actionlint checks the three touched APS workflows; custody administrative tests pass 12 cases.",
+    "Native size and artifact policy checks pass on the task-relative committed diff; hosted required jobs remain separate.",
+    "Whole-repository curve-name lint exits1 on a missing tracked sparse file before completing. The unchanged native lint_diff function independently reports zero findings on added task lines; this is not a whole-repository pass.",
+    "The workflow-wiring command exhausted its earlier metadata lookup budget; no complete verdict is claimed and no timeout/assertion was changed.",
+    "The global benchmark-record/progress failure is retained; this task adds no benchmark data or canonical progress row."
+  ],
+  "raw_logs_published": false,
+  "benchmark_launched": false
+}

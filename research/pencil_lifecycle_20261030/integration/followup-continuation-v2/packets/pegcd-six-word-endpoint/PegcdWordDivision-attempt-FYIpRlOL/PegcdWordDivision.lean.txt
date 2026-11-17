@@ -1,0 +1,27 @@
+import PegcdWordState
+set_option autoImplicit false
+namespace PegcdWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+theorem division_total (p last : UInt64) [Fact p.toNat.Prime] (a b : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (hl : last.toNat < p.toNat) (hln : last ≠ 0)
+ (ha : Canon p a) (hc : Canon p b) (hm : b.getLast? = some last) :
+ ∃ q r, NonmonicStorage.wordDiv p last b a a.length = some (q,r) ∧
+ Canon p q ∧ Canon p r ∧ Normal r ∧
+ wordsPoly p a = wordsPoly p q*wordsPoly p b+wordsPoly p r ∧
+ (r=[] ∨ r.length<b.length) := by
+ obtain ⟨qf,r,hd,hcr,hnr,heq,hs⟩ := NonmonicDivision.divide_total p last b a hp hb hl hln hc ha hm a.length le_rfl
+ have hproj := NonmonicStorage.word_projection p last b a hp hb hl hln hc ha hm a.length
+ rw [hd] at hproj
+ cases hw : NonmonicStorage.wordDiv p last b a a.length with
+ | none => simp [hw] at hproj
+ | some w =>
+   obtain ⟨qw,rw⟩ := w
+   rw [hw] at hproj
+   have hpair : (wordsPoly p qw,rw)=(qf,r) := Option.some.inj hproj
+   have hr : rw=r := congrArg Prod.snd hpair
+   subst rw
+   have hq : wordsPoly p qw=qf := congrArg Prod.fst hpair
+   have hg := NonmonicStorage.word_good p last b a hp hb hl hln hc ha a.length qw r hw
+   exact ⟨qw,r,hw,hg.1,hcr,hnr,by simpa [hq] using heq,hs⟩
+end PegcdWord

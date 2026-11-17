@@ -1,0 +1,89 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T06:30:37+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/relation-native-qualifiers/phase-driver-856523032-05",
+        "phase-profile",
+        "/workspace/sparse-paid-inputs-33e8f2914-01",
+        "/workspace/replay-phase-results-856523032-01",
+        "/workspace/relation-native-qualifiers/phase-producer-856523032-05",
+        "/workspace/relation-native-qualifiers/pilot-singular-e069707f6-01",
+        "/workspace/relation-native-qualifiers/pilot-msolve-e069707f6-01",
+        "0"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T06:20:44+00:00",
+      "wall_s": 0.976
+    }
+  ],
+  "commit": "78183b28b8cc91fba7e0a5bea07d251e5b37667b",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T06:20:36+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T0620Z-replay-phase-diagnosis-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": null,
+      "name": "complete_phase_observations",
+      "note": "Rust diagnostic count; known inputs, generation excluded, no speed ratio. [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 18.0
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 623932,
+      "path": "research/relation_degree_trace_20261115/phase-profile-01/raw-all.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dc/dcccb03e45548511a3deb4c81f61f8b3f455c70894e769334d097aef255b3688",
+      "sha256": "dcccb03e45548511a3deb4c81f61f8b3f455c70894e769334d097aef255b3688",
+      "uploaded": false
+    },
+    {
+      "bytes": 513100,
+      "path": "research/relation_degree_trace_20261115/phase-profile-01/reporter-executable-02.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c3/c3ca2289131a6a1e6e89c5633916eeb8b4be810fb0cc367785e3d957429df51b",
+      "sha256": "c3ca2289131a6a1e6e89c5633916eeb8b4be810fb0cc367785e3d957429df51b",
+      "uploaded": false
+    },
+    {
+      "bytes": 1972,
+      "path": "research/relation_degree_trace_20261115/phase-profile-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/be/bec3f2adf6203d49d3d4799e39b7a9c0bc621244d2b5d496f267cefcc543f938",
+      "sha256": "bec3f2adf6203d49d3d4799e39b7a9c0bc621244d2b5d496f267cefcc543f938",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/phase-profile-01/report-02/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/phase-profile-01/report-02/phases.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/phase-profile-01/report-02/phases.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "replay-phase-diagnosis-20261116",
+  "status": "measured",
+  "summary": "18 complete known-input phase observations; construction/completion and external arithmetic both substantial. No speed ratios, generation cost, numerical selection or15x result. PCCd6a9a8, unsigned L0. [pcc:unverified]",
+  "validation": null
+}

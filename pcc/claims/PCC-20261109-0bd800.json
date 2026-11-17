@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-09T07:50:13Z",
+ "id": "PCC-20261109-0bd800",
+ "kind": "theorem",
+ "producer": {
+  "commit": "8e62d4dfc182ee3bd41765dda4847100ddf516f6",
+  "model": "",
+  "session": "buffer-budget-20261109"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "0f226d8c06095fcd1311b306ba9111bbbe74dba3f1589059aedcfa124e214240",
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "BufferBudget.weightedIdentity"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "actual prescribed coefficient slot capacity; no measured RSS, unrestricted lower bound or full recursive cost theorem",
+ "statement": "The weighted geometric sum W_r(u)=sum_(j<u)(j+1)r^j satisfies (r-1)^2 W_r(u)=[u(r-1)-1]r^u+1 for every integer r and natural u."
+}

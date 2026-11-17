@@ -1,0 +1,80 @@
+{
+  "schema": "development.provenance/v1",
+  "phase": "pre-call",
+  "timestamp": "2026-11-16T07:49:23.780Z",
+  "qualifier": "/tmp/prime-transfer-round04-qualifier-05",
+  "pins": [
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-05/v5/division.hpp",
+      "sha256": "6011dc7b715ec875b4b5dde30e76af7f4335bcbe353cd12ad54c6b40073a284d",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-05/round-05/v5/division.hpp",
+      "qualifier_sha256": "6011dc7b715ec875b4b5dde30e76af7f4335bcbe353cd12ad54c6b40073a284d"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-05/v5/exact.hpp",
+      "sha256": "7eeb53f92836e884a3818d5707ab207a3aa7f6fcdab575cdbc2800b761f30250",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-05/round-05/v5/exact.hpp",
+      "qualifier_sha256": "7eeb53f92836e884a3818d5707ab207a3aa7f6fcdab575cdbc2800b761f30250"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-05/v5/lattice.hpp",
+      "sha256": "1bc2d86f504f897ee91113962ae9860c524f0fd11b693d60ae52fb13bd50f9d2",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-05/round-05/v5/lattice.hpp",
+      "qualifier_sha256": "1bc2d86f504f897ee91113962ae9860c524f0fd11b693d60ae52fb13bd50f9d2"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-05/v5/recognizer.cpp",
+      "sha256": "25c35ddc967b79b03e3ab420b84e83d689bf557f8829de8bc7a947533c312d02",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-05/round-05/v5/recognizer.cpp",
+      "qualifier_sha256": "25c35ddc967b79b03e3ab420b84e83d689bf557f8829de8bc7a947533c312d02"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-05/native_base.hpp",
+      "sha256": "54fb1e9c5e2f76c0c2afe982b406a81f87b2aea164ab234588327159d9b474a6",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-05/round-05/native_base.hpp",
+      "qualifier_sha256": "54fb1e9c5e2f76c0c2afe982b406a81f87b2aea164ab234588327159d9b474a6"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-05/PROTOCOL.md",
+      "sha256": "58fb13173672742b998f72e54634da6284631bc4bfd95df83938605ff94ce38f",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-05/round-05/PROTOCOL.md",
+      "qualifier_sha256": "58fb13173672742b998f72e54634da6284631bc4bfd95df83938605ff94ce38f"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-05/provenance.cjs",
+      "sha256": "1d96520a726f837435a1f7c769b953d6ca699be5d09d0e6ace6e4a4bc38bc079",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-05/round-05/provenance.cjs",
+      "qualifier_sha256": "1d96520a726f837435a1f7c769b953d6ca699be5d09d0e6ace6e4a4bc38bc079"
+    },
+    {
+      "path": "/workspace/prime-transfer-round05/research/prime_field_transfer_goal_20261116/round-05/freeze.cjs",
+      "sha256": "4007f0b2d2de2771d12318c2d0319f462cae8f5dbebc4aa9ac6cabb255664215",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-05/round-05/freeze.cjs",
+      "qualifier_sha256": "4007f0b2d2de2771d12318c2d0319f462cae8f5dbebc4aa9ac6cabb255664215"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-02/local_torsion.cpp",
+      "sha256": "10943c5719179f30cf939854c5f07894ef33e7cf24f2091b2331665bd0a78a4b",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-05/round-02/local_torsion.cpp",
+      "qualifier_sha256": "10943c5719179f30cf939854c5f07894ef33e7cf24f2091b2331665bd0a78a4b"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/models/u3-v3.model",
+      "sha256": "0b37ca148021c382ff6f4a71752d2bd73c966d8d9629e581bad127dc4373766b"
+    }
+  ],
+  "executable": {
+    "path": "/tmp/prime-transfer-round04-qualifier-05/recognizer",
+    "sha256": "7a7e1fc8bc4cb4b7c3c749421005080c25304f91432f8fc87c72893462e8ea78"
+  },
+  "recorder_sha256": "1d96520a726f837435a1f7c769b953d6ca699be5d09d0e6ace6e4a4bc38bc079",
+  "command": [
+    "timeout",
+    "60s",
+    "/tmp/prime-transfer-round04-qualifier-05/recognizer",
+    "qualify",
+    "research/prime_field_transfer_goal_20261116/receipts/round-04/models/u3-v3.model",
+    "-1"
+  ],
+  "timeout_seconds": 60
+}

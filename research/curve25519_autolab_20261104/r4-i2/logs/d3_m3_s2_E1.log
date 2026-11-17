@@ -1,0 +1,101 @@
+Initial seed for pseudo-random number generator is 1793811157
+
+--------------- INPUT DATA ---------------
+#variables                      12
+#equations                      13
+#invalid equations               0
+field characteristic       1048573
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         1
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  2       2      10       5 x 8          27.50%        2 new       0 zero         0.00 | 0.00         
+  3       1      14       2 x 4          62.50%        1 new       0 zero         0.00 | 0.00         
+  3       2      15       8 x 12         21.88%        1 new       1 zero         0.00 | 0.00         
+  4       9      17      29 x 48          5.89%        8 new       1 zero         0.00 | 0.00         
+  4      20      38      71 x 91          3.64%        4 new      16 zero         0.00 | 0.00         
+  4       2      36      14 x 22         16.56%        0 new       2 zero         0.00 | 0.00         
+  5      28      34     169 x 241         1.48%       14 new      14 zero         0.00 | 0.00         
+  4       1      82       6 x 14         25.00%        1 new       0 zero         0.00 | 0.00         
+  5      36      84     173 x 281         1.70%       15 new      21 zero         0.00 | 0.00         
+  5      36     147     188 x 360         1.51%       14 new      22 zero         0.00 | 0.00         
+  5      25     206     191 x 345         1.91%        5 new      20 zero         0.00 | 0.00         
+  5       6     236      41 x 59         10.83%        0 new       6 zero         0.00 | 0.00         
+  6     180     230    1016 x 1523        0.57%       74 new     106 zero         0.01 | 0.01         
+  5      78     553     435 x 893         1.42%       35 new      43 zero         0.04 | 0.02         
+  5      27     747     211 x 524         3.31%       15 new      12 zero         0.00 | 0.00         
+  5      64     746     558 x 1037        1.78%       38 new      26 zero         0.01 | 0.01         
+  5      49     963     657 x 1200        1.93%       29 new      20 zero         0.01 | 0.01         
+  5      10    1141     440 x 976         2.84%        9 new       1 zero         0.00 | 0.00         
+  5      20    1184     381 x 894         3.64%       10 new      10 zero         0.00 | 0.00         
+  5       8    1247     672 x 1225        2.16%        7 new       1 zero         0.00 | 0.00         
+  6    1244    1310    4381 x 3915        1.21%      295 new     955 zero         0.11 | 0.11         
+  5     497    1992    2293 x 2273        3.48%      255 new     244 zero         0.11 | 0.11         
+  4      30    2610     541 x 735         9.73%       30 new       0 zero         0.02 | 0.02         
+  4     210    2467     741 x 725         9.52%      125 new      85 zero         0.05 | 0.05         
+  3     167    1617     315 x 214         6.59%       34 new     133 zero         0.01 | 0.01         
+  3     120    1274     355 x 267         7.66%       20 new     100 zero         0.01 | 0.01         
+  2      19    1026      69 x 62          9.79%        0 new      19 zero         0.00 | 0.00         
+  3     157    1007     332 x 183         5.66%        0 new     161 zero         0.00 | 0.00         
+  4     256     850     823 x 579         7.67%        0 new     256 zero         0.00 | 0.00         
+  5     340     594    1603 x 1275        4.54%        0 new     340 zero         0.01 | 0.01         
+  6     254     254    2449 x 2207        1.37%        0 new     254 zero         0.01 | 0.01         
+------------------------------------------------------------------------------------------------------
+reduce final basis       37 x 49          8.99%       37 new       0 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ----------------
+overall(elapsed)        0.42 sec
+overall(cpu)            0.39 sec
+select                  0.04 sec   9.3%
+symbolic prep.          0.02 sec   4.2%
+update                  0.26 sec  61.8%
+convert                 0.01 sec   1.9%
+linear algebra          0.09 sec  21.6%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                    37
+#terms in basis                 160
+#pairs reduced                 3898
+#GM criterion                551033
+#redundant elements            1017
+#rows reduced                  7857
+#zero reductions               2869
+max. matrix data               4381 x 3915 (1.209%)
+max. symbolic hash table size  2^13
+max. basis hash table size     2^16
+-----------------------------------------
+
+
+
+------------------------------------------------------------------------------------
+msolve overall time           0.42 sec (elapsed) /  0.39 sec (cpu)
+------------------------------------------------------------------------------------
+Dimension of quotient: 12
+exit=0 wall=0.43

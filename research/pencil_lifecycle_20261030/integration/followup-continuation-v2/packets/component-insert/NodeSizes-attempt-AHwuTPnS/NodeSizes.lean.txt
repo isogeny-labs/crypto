@@ -1,0 +1,36 @@
+import NodeMap
+set_option autoImplicit false
+namespace ComponentMap
+open UnionSize
+variable {n : Nat}
+def oldEmbedding : Fin n ↪ Fin (n+1) := ⟨Fin.castSucc, Fin.castSucc_injective n⟩
+theorem old_fiber (owner : Fin n → Fin n) (root : Fin n) :
+ fiber (extendMap owner) root.castSucc = (fiber owner root).map oldEmbedding := by
+ ext x
+ refine Fin.lastCases ?_ (fun i => ?_) x
+ · simp [fiber, oldEmbedding]
+ · simp [fiber, oldEmbedding]
+theorem new_fiber (owner : Fin n → Fin n) :
+ fiber (extendMap owner) (Fin.last n) = {Fin.last n} := by
+ ext x
+ refine Fin.lastCases ?_ (fun i => ?_) x
+ · simp [fiber]
+ · simp [fiber]
+def insertSizes (sizes : Sizes n) : Sizes (n+1) :=
+ ⟨sizes.val.push 1, by simp [sizes.property]⟩
+@[simp] theorem insert_size_old (sizes : Sizes n) (i : Fin n) :
+ sizeAt (insertSizes sizes) i.castSucc = sizeAt sizes i := by
+ simp [sizeAt,insertSizes,i.isLt,sizes.property]
+@[simp] theorem insert_size_new (sizes : Sizes n) :
+ sizeAt (insertSizes sizes) (Fin.last n) = 1 := by
+ simp [sizeAt,insertSizes,sizes.property]
+theorem insert_sizes_valid (owner : Fin n → Fin n) (sizes : Sizes n)
+ (hs : SizeValid owner sizes) : SizeValid (extendMap owner) (insertSizes sizes) := by
+ intro root
+ refine Fin.lastCases ?_ (fun i => ?_) root
+ · intro _;rw [insert_size_new,new_fiber];simp
+ · intro hi
+   have h : owner i=i := by simpa using hi
+   rw [insert_size_old,old_fiber,Finset.card_map]
+   exact hs i h
+end ComponentMap

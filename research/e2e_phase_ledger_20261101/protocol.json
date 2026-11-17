@@ -1,0 +1,986 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXP-e2e-phase-ledger-k13-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/e2e_phase_ledger_20261101",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "spec_t0": "research/e2e_phase_ledger_20261101/specs/koblitz-n13-phase-ledger-t0.json",
+    "spec_t1": "research/e2e_phase_ledger_20261101/specs/koblitz-n13-phase-ledger-t1.json",
+    "note": "research/e2e_phase_ledger_20261101/PROTOCOL.md"
+  },
+  "question": "On Koblitz E0 at n=13, how do current F4, F5, F6-IC and root-finding PDP backends change the complete cold resource vector when relation collection is followed by full-rank checked relation solving?",
+  "claims": [
+    {
+      "id": "C-correct",
+      "text": "Every reported recovery replays and satisfies [d]G = Q; every IC result also reaches a full-rank relation system and point-checks each factor-base column.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-backend",
+      "text": "At least one registered m=3 PDP backend lowers the complete counted resource vector relative to inherited F4 on this fixed toy cell without moving cost outside the ledger.",
+      "class": "comparative",
+      "decided_by": [
+        "C-matrix-f4",
+        "C-matrix-f5",
+        "C-f6",
+        "C-f6-pair",
+        "C-root",
+        "C-root-window",
+        "C-root-negfold",
+        "C-root-window-negfold"
+      ],
+      "if_supported": "a scoped implementation-level constant-factor improvement on the registered K13 cell",
+      "if_not_supported": "no complete-resource improvement is established for the registered backends"
+    },
+    {
+      "id": "C-scope",
+      "text": "No result establishes novelty in the literature, an asymptotic improvement, or feasibility for ECC2K-130/131.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-ledger",
+      "statement": "F5 and F6 can reduce PDP matrix work, while root-finding can replace repeated algebraic solving by charged table construction and lookup, but only a complete cold phase ledger can show whether those savings survive relation collection and full-rank solving.",
+      "mechanism": "The backends alter symbolic rows, elimination, split search, or reusable pair-table work while the factor base, targets, relation cap, and checked linear algebra remain fixed.",
+      "predictions": [
+        {
+          "id": "P-complete",
+          "metric": "bitop_v1_total",
+          "direction": "lower",
+          "minimum_effect": "paired candidate/inherited-F4 point ratio below 1 with a 95% interval below 1, complete coverage flags, and stable ordering across the declared pricing band",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "data_seen": [
+              {
+                "path": "research/f4_f5_f6_cross_family_20261011",
+                "measured": "historical engine-native and partial end-to-end K13 calibration"
+              },
+              {
+                "path": "research/ecbench_e2e_frontier_20261031",
+                "measured": "phase and accounting contracts; no records from this registered full-rank panel"
+              },
+              {
+                "path": "discarded pre-freeze smoke target_seed 202611010130",
+                "measured": "instrument calibration: all m=3 arms verified; m=2 full-rank diagnostics plateaued at rank 10/11"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "The rotated target streams 202611011130/202611011131 and measurement seeds 202611011230/202611011231 were fixed after calibration; none of their targets or rounds were run before freeze."
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-strong-v2",
+      "role": "reference",
+      "description": "Strong signed-Frobenius rho generic reference",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "id": "ic-inherited-f4-m3",
+      "role": "baseline",
+      "description": "Inherited F4 PDP, m=3, complete checked relation solve",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=5",
+        "oracle": "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-matrix-f4-m3",
+      "role": "candidate",
+      "description": "Matrix F4 PDP, m=3",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=5",
+        "oracle": "pdp3-koblitz:m=3,engine=matrix-f4,degree=3,node_budget=8192",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-matrix-f5-m3",
+      "role": "candidate",
+      "description": "Matrix F5 PDP, m=3",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=5",
+        "oracle": "pdp3-koblitz:m=3,engine=matrix-f5,degree=3,node_budget=8192",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-f6-m3",
+      "role": "candidate",
+      "description": "F6-IC PDP, m=3",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=5",
+        "oracle": "pdp3-koblitz:m=3,engine=f6-ic,degree=3,node_budget=8192",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-f6-pair-m3",
+      "role": "candidate",
+      "description": "Pair-index F6-IC PDP, m=3",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=5",
+        "oracle": "pdp3-koblitz:m=3,engine=f6-ic-pair,degree=3,node_budget=8192",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-rootfind-m2",
+      "role": "candidate",
+      "description": "Full pair-table root finding, m=2 structural rank-ceiling diagnostic; censored outcomes retained",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=4",
+        "oracle": "pdp3-koblitz:m=2,engine=rootfind",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-rootfind-negfold-m2",
+      "role": "candidate",
+      "description": "Negation-folded pair-table root finding, m=2 structural rank-ceiling diagnostic; censored outcomes retained",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=4",
+        "oracle": "pdp3-koblitz:m=2,engine=rootfind-negfold",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-rootfind-m3",
+      "role": "candidate",
+      "description": "Full pair-table root finding, m=3",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=5",
+        "oracle": "pdp3-koblitz:m=3,engine=rootfind",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-rootfind-window-m3",
+      "role": "candidate",
+      "description": "Windowed pair-table root finding, m=3",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=5",
+        "oracle": "pdp3-koblitz:m=3,engine=rootfind-window",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-rootfind-negfold-m3",
+      "role": "candidate",
+      "description": "Negation-folded pair-table root finding, m=3",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=5",
+        "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "ic-rootfind-window-negfold-m3",
+      "role": "candidate",
+      "description": "Windowed negation-folded pair-table root finding, m=3",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "koblitz-standard-subspace:dimension=5",
+        "oracle": "pdp3-koblitz:m=3,engine=rootfind-window-negfold,window_div=3",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 200000
+      },
+      "same_instrument_as": "rho-strong-v2"
+    },
+    {
+      "id": "rho-strong-v2-aa",
+      "role": "control_aa",
+      "description": "Identical strong rho repeat",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.signed_frobenius_strong_v2"
+      },
+      "same_instrument_as": "rho-strong-v2"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every public target is a known-answer construction internally and every successful scalar is independently replayed."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "The claim is exact recovery and comparative cost, not detection on a null population; wrong scalars fail [d]G = Q replay."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "pdp_backend",
+        "levels": [
+          "inherited-f4",
+          "matrix-f4",
+          "matrix-f5",
+          "f6-ic",
+          "f6-ic-pair",
+          "rootfind",
+          "rootfind-window",
+          "rootfind-negfold",
+          "rootfind-window-negfold"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve_and_targets",
+        "treatment": "fixed",
+        "value": "Koblitz E0 n=13; eight public targets in two frozen streams",
+        "how": "Every arm in a shard receives identical target coordinates and algorithm-seed schedule."
+      },
+      {
+        "name": "factor_base",
+        "treatment": "fixed",
+        "value": "koblitz-standard-subspace dimension 5 for m=3",
+        "how": "FBM identity and point hash must match across m=3 arms. The m=2 dimension-4 arms are labelled diagnostics."
+      },
+      {
+        "name": "relation_and_linear_algebra",
+        "treatment": "fixed",
+        "value": "max_trials=200000; incremental-gauss-full-rank-checked",
+        "how": "All IC arms collect to full rank and point-check every base column before target recovery."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "one EKS c8a.2xlarge Spot host per shard",
+        "how": "L2 is required; wall comparisons never cross sessions."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "value": "ecbench alternate order, one warmup, six rounds",
+        "how": "Fixed by the two spec files."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "frozen ecbench replay/table/resources/band/compare commands",
+        "how": "Analysis script hash is bound below."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-aa",
+        "arms": [
+          "rho-strong-v2",
+          "rho-strong-v2-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-matrix-f4",
+        "arms": [
+          "ic-inherited-f4-m3",
+          "ic-matrix-f4-m3"
+        ],
+        "differs_in": [
+          "pdp_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-matrix-f5",
+        "arms": [
+          "ic-inherited-f4-m3",
+          "ic-matrix-f5-m3"
+        ],
+        "differs_in": [
+          "pdp_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-f6",
+        "arms": [
+          "ic-inherited-f4-m3",
+          "ic-f6-m3"
+        ],
+        "differs_in": [
+          "pdp_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-f6-pair",
+        "arms": [
+          "ic-inherited-f4-m3",
+          "ic-f6-pair-m3"
+        ],
+        "differs_in": [
+          "pdp_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-root",
+        "arms": [
+          "ic-inherited-f4-m3",
+          "ic-rootfind-m3"
+        ],
+        "differs_in": [
+          "pdp_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-root-window",
+        "arms": [
+          "ic-inherited-f4-m3",
+          "ic-rootfind-window-m3"
+        ],
+        "differs_in": [
+          "pdp_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-root-negfold",
+        "arms": [
+          "ic-inherited-f4-m3",
+          "ic-rootfind-negfold-m3"
+        ],
+        "differs_in": [
+          "pdp_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-root-window-negfold",
+        "arms": [
+          "ic-inherited-f4-m3",
+          "ic-rootfind-window-negfold-m3"
+        ],
+        "differs_in": [
+          "pdp_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-m2-diagnostic",
+        "arms": [
+          "ic-rootfind-m2",
+          "ic-rootfind-negfold-m2"
+        ],
+        "differs_in": [
+          "pdp_backend"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Balanced deterministic alternation is part of ecbench.spec/v1 and was fixed before data.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        202611011130,
+        202611011131,
+        202611011230,
+        202611011231
+      ],
+      "nonce": null,
+      "note": "Two rotated target seeds and two rotated measurement seeds, fixed after instrument calibration and before affected data."
+    },
+    "instance_sampling": {
+      "rule": "Four public targets from each frozen target_seed on Koblitz E0 n=13.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Backend names are required to audit unlike native units and phase mappings; decision thresholds were frozen prospectively.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 8,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 8,
+      "correction": "holm",
+      "rank_test_n": 8,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "The study is powered only for large implementation effects on this toy cell; no population or scaling claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 330,
+      "threads": 1,
+      "estimated_total_seconds": 2400,
+      "measured_on": "Historical K13 matrix-F4/F5 records were about 30-40 seconds per cold call; each four-target shard is expected below the 3600-second EKS deadline. This is calibration only."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "bitop_v1_total",
+        "name": "Complete cold counted work",
+        "unit": "bitop/v1 gates",
+        "kind": "counted",
+        "definition": "Record work.bitops from factor-base construction through independently verified recovery; scalar comparison only when work.complete is true.",
+        "source": "records.jsonl work",
+        "aggregation": "paired_ratio",
+        "resolution": "exact integer",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "cold_wall_ns",
+        "name": "Complete cold method call",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "ecbench measured method-call interval including all cold phases through verification.",
+        "source": "records.jsonl time",
+        "aggregation": "paired_ratio",
+        "resolution": "monotonic clock",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "phase_ledger",
+        "name": "Exclusive phase resource ledger",
+        "unit": "heterogeneous declared units",
+        "kind": "counted",
+        "definition": "Per phase wall, group and field operations, solver and matrix counters, memory, relations, trials, rank checks and recovery checks. Unlike native units remain separate.",
+        "source": "records.jsonl phases/counters/solver/work",
+        "aggregation": "distribution",
+        "resolution": "native counters",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "gae_band",
+        "name": "Unpriced-work sensitivity band",
+        "unit": "GAE",
+        "kind": "derived",
+        "definition": "ecbench band at u=0,0.1,1 for declared unpriced units.",
+        "formula": "priced_gae + u * declared_unpriced_units for u in {0,0.1,1}",
+        "source": "records.jsonl plus frozen pricing rules",
+        "aggregation": "distribution",
+        "resolution": "declared model",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "factor-base points and columns",
+      "relation trials and accepted relations",
+      "solver calls/ops/degrees/rows/columns/nonzeros/rank/peak bytes",
+      "matrix build and full-rank linear algebra",
+      "group and field operations",
+      "bitop/v1 primitives and coverage flags"
+    ],
+    "record": [
+      "sealed raw records.jsonl",
+      "spec and binary hashes",
+      "host and isolation receipt",
+      "outcomes including timeouts",
+      "all phase clocks and counters",
+      "work.unpriced and work.known_uncounted",
+      "0/0.1/1 GAE band"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "EKS Spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpu": "one pinned worker CPU",
+      "gpu": null
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Run exactly both frozen four-target specs, one warmup and six measured rounds. Each child has the spec's 90-second cap. Retain every timeout and failure; no algorithmic retry or retuning.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop before affected data if spec validation, native tests, binary identity, or isolation preflight fails.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any wrong recovery or replay mismatch invalidates the corresponding shard.",
+    "Any counted wall record below L2, unmatched target/round peer, binary mismatch, or undeclared arm change is excluded from wall comparison and reported.",
+    "Missing work coverage is not imputed as zero: it moves the result to a vector/band report and forbids a complete scalar ranking.",
+    "Timeouts and solver exhaustion remain censored outcomes, not missing data."
+  ],
+  "decision_rule": {
+    "text": "Call a scoped backend winner only when every paired recovery verifies, complete bitop/v1 is lower than inherited F4 with the 95% paired interval below 1, the ordering survives the declared pricing band, and same-session L2 cold wall beats inherited F4 beyond rho A/A spread. Otherwise report the Pareto/resource vector or inconclusive.",
+    "comparison_ids": [
+      "C-matrix-f4",
+      "C-matrix-f5",
+      "C-f6",
+      "C-f6-pair",
+      "C-root",
+      "C-root-window",
+      "C-root-negfold",
+      "C-root-window-negfold"
+    ],
+    "threshold": "all exact checks pass; complete count ratio upper bound <1; pricing-band ordering stable; wall effect exceeds A/A",
+    "statistic": "paired candidate/baseline ratio with 20000 target/round bootstrap resamples",
+    "interval": "95% paired bootstrap interval; same-shard wall only",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "candidate/inherited-F4 ratio and reciprocal factor",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "pareto_tradeoff",
+      "within_control_distribution",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/e2e_phase_ledger_20261101/analyze.sh",
+      "sha256": "2054f14312df6ada530663d8b47dc5bf18cec8ce01adc9eb8a1fbc2a2a443e25"
+    },
+    "inputs": [
+      "sessions/t0/records.jsonl",
+      "sessions/t1/records.jsonl"
+    ],
+    "outputs": [
+      "replay receipts",
+      "one-unit tables",
+      "resource tables",
+      "pricing-band tables",
+      "frozen comparison JSON"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "complete cold bitop/v1 and wall ratios",
+      "factor-base/relation/PDP/matrix/full-rank/verification phase ledger",
+      "solver matrix shape, degree, rank and memory",
+      "censoring and unpriced-work coverage"
+    ],
+    "report_dir": "research/e2e_phase_ledger_20261101/reports"
+  },
+  "inadmissible": [
+    "Calling a PDP or relation-oracle microbenchmark an end-to-end attack",
+    "Comparing unlike F4/F5/F6/root-finder native counters as if they were one unit",
+    "Treating missing or unpriced work as zero",
+    "Pooling wall time across different EKS sessions",
+    "Dropping timeouts, failures, or slow targets",
+    "Extrapolating the K13 result to ECC2K-130/131 or claiming a new asymptotic exponent",
+    "Claiming that this finite literature review proves an idea has never been done before"
+  ],
+  "literature": [
+    {
+      "ref": "Faugere, ISSAC 1999, DOI 10.1145/309831.309887",
+      "provenance": "retrieved",
+      "claim": "F4 batches Groebner reductions as sparse linear algebra; symbolic and matrix work must remain in the ledger.",
+      "verified_by": "primary-source metadata and repository source review 2026-11-01"
+    },
+    {
+      "ref": "Faugere, ISSAC 2002, DOI 10.1145/780506.780516",
+      "provenance": "retrieved",
+      "claim": "F5's criterion may avoid zero reductions; saved rows alone are not complete attack cost.",
+      "verified_by": "primary-source metadata and repository source review 2026-11-01"
+    },
+    {
+      "ref": "Semaev, IACR ePrint 2004/031",
+      "provenance": "retrieved",
+      "claim": "Summation-polynomial relation framework for ECDLP.",
+      "verified_by": "IACR metadata and repository literature review 2026-11-01"
+    },
+    {
+      "ref": "Gaudry, Journal of Symbolic Computation 44(12), 2009",
+      "provenance": "retrieved",
+      "claim": "Index calculus requires factor base, relation collection and linear algebra to be accounted together.",
+      "verified_by": "bibliographic metadata review 2026-11-01"
+    },
+    {
+      "ref": "Faugere, Perret, Petit and Renault, EUROCRYPT 2012",
+      "provenance": "retrieved",
+      "claim": "Binary-field algebraic index calculus context and degree-regularity motivation; no toy-to-130-bit extrapolation.",
+      "verified_by": "bibliographic metadata and repository review 2026-11-01"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "5e29776fe26ddc83978e2c4839987c2f3ba759cc0ee03d5410873dd28c0ee4a9",
+    "commit": "b6ffdca53494d97ac3dde96bcce6363feb802c45",
+    "frozen_at": "2026-11-01T19:40:39Z",
+    "filed_before_affected_data": true
+  }
+}

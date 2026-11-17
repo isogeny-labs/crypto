@@ -1,0 +1,143 @@
+{
+  "created": "2026-11-04T06:42:40Z",
+  "round": 16,
+  "rules": {
+    "exploration_slots": 4,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3f",
+      "ksum4f",
+      "ksum5f",
+      "wsum-b4",
+      "wsum-b5",
+      "wsum-b12",
+      "wsum-b20"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "20": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=7,scan_cap=112",
+            "family": "ksum4f",
+            "n": 7,
+            "name": "ksum4f-n7",
+            "oracle": "ksum:m=4,free=1"
+          },
+          "reason": "alternative ksum4f (best S(0) 8.282 at N = 8): N = 0.85 x 8"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=10,scan_cap=160",
+            "family": "ksum4f",
+            "n": 10,
+            "name": "ksum4f-n10",
+            "oracle": "ksum:m=4,free=1"
+          },
+          "reason": "alternative ksum4f (best S(0) 8.282 at N = 8): N = 1.2 x 8"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=9,scan_cap=144",
+            "family": "ksum3f",
+            "n": 9,
+            "name": "ksum3f-n9",
+            "oracle": "ksum:m=3,free=1"
+          },
+          "reason": "alternative ksum3f (best S(0) 9.043 at N = 11): N = 0.85 x 11"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=13,scan_cap=208",
+            "family": "ksum3f",
+            "n": 13,
+            "name": "ksum3f-n13",
+            "oracle": "ksum:m=3,free=1"
+          },
+          "reason": "alternative ksum3f (best S(0) 9.043 at N = 11): N = 1.2 x 11"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=10,scan_cap=160",
+            "family": "ksum5f",
+            "n": 10,
+            "name": "ksum5f-n10",
+            "oracle": "ksum:m=5,free=1"
+          },
+          "reason": "alternative ksum5f (best S(0) 9.379 at N = 8): N = 1.2 x 8"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=4,scan_cap=64",
+            "family": "wsum-b4",
+            "n": 4,
+            "name": "wsum-b4-n4",
+            "oracle": "wsum:coef=4,free=1"
+          },
+          "reason": "exploration: family wsum-b4 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b5",
+            "n": 3,
+            "name": "wsum-b5-n3",
+            "oracle": "wsum:coef=5,free=1"
+          },
+          "reason": "exploration: family wsum-b5 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b12",
+            "n": 3,
+            "name": "wsum-b12-n3",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "exploration: family wsum-b12 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b20",
+            "n": 3,
+            "name": "wsum-b20-n3",
+            "oracle": "wsum:coef=20,free=1"
+          },
+          "reason": "exploration: family wsum-b20 untried at k = 20, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=11,scan_cap=176",
+        "family": "ksum3",
+        "n": 11,
+        "name": "ksum3-n11",
+        "oracle": "ksum:m=3"
+      },
+      "incumbent_s": [
+        8.987,
+        9.71,
+        16.217
+      ],
+      "tried_before": 35
+    }
+  },
+  "track": "generic"
+}

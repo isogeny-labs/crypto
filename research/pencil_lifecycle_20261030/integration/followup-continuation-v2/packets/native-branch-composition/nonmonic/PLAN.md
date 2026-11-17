@@ -1,0 +1,9 @@
+T-1242 prospective source construction: nonmonic native polynomial division.
+
+Source first: three_leads.rs Field::bm195, bi201, mul210, inv307; pdiv849–880. The prime odd characteristic, n=1, no-table dispatch uses narrow multiplication and widened modpow inversion. Divisor leading word is not trimmed by pdiv; empty/zero-leading inputs violate its inverse precondition. First branch bypasses inv for leading word1; second bypasses multiply for inverseword1.
+
+Retained literature/source basis: wide-modpow-20261031 PLAN and Inversion.lean establish finite-field Fermat inverse by checked UInt64/UInt128 loop, rather than assuming an inverse witness. Existing monic remainder/termination and quotient/storage packets establish per-index subtraction and fresh coefficient overwrites. Reuse these classical Euclidean-division invariants. No novelty claim. Existing Mathlib source identities are the primary formal reference.
+
+Plan before implementation: prove native il and coefficient branch decoding/canonicality, generalized remainder step and strict length descent, quotient assignment invariant and fuel termination, exact quotient endpoint. Reuse native inverseGenerator. Explicit prime/canonical/nonzero leading hypotheses, p<2^31 narrow-product bound, exclude table/binary/extension dispatch. Preserve word storage and pegcd boundaries unless composed.
+
+Controls: leading zero exclusion; nonmonic coefficient versus raw leading word; inverse1 shortcut; composite modulus outside Fermat precondition; exact/nonexact and fuel boundaries. Native Rust/Lean checking and shell orchestration only. Record all attempts. PDF/SVG/structured status, named inventory and allowed axioms. Publication before independent source review. No science or cloud runs; original1260scope and expired limits unchanged.

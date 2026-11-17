@@ -1,0 +1,46 @@
+{
+  "schema": "deployed-controller.readonly-route-review/v1",
+  "task": "T-1986",
+  "observed_utc": "2026-11-09T18:10:16.922824+00:00",
+  "region": "us-east-2",
+  "stack_status": "UPDATE_COMPLETE",
+  "controller_package": {
+    "bucket": "isolab-results-104186811093-us-east-2",
+    "key": "inputs/recovery-controllers/07fba4dd7127965796939af60e529c058a06c0d002f4d8551692b041d0e76668.zip",
+    "version": "tbptdGo2uMixArBkOl8H6XpsSEVsfkQV",
+    "sha256": "07fba4dd7127965796939af60e529c058a06c0d002f4d8551692b041d0e76668",
+    "bytes": 19003581,
+    "members_verified_against_SHA256SUMS": {
+      "bin/isolab-eks-mcp": "3d8a98ef7fb33af10d4da12a99e893c07fc0a1bf1e694d8741d2733742df5de4",
+      "bin/isolab-eks-recovery": "de17f01ff5d6cccb1faf8a24a7fd10d520c739f7ed75a7d590e2fd880e2aeb77",
+      "bin/kubectl": "33bc88a24c3b09cf55bfd59e6ca977881b61fc3f25ab65bc80c65b430248648e",
+      "deploy/submit-job": "def41b1a72b6e48dc4e6f8256455be44ccc5100a017f515d8bd2821558abcbce",
+      "deploy/remote/verify-build": "6a020d533df4f18645726377b53d17fddb9efbe693c4b8a42a1d2e24169f7556",
+      "resume/buildspec.yml": "ce5ff43794e6a75b8880b709da13cde62ec1ae8dde4ee23f18a003c0ee2ab133",
+      "resume/run-controller": "59fd9e1337af8560309cbb52dbb49821ebd2f0a10b19b3b69caef0f84e1d602b"
+    }
+  },
+  "role": "arn:aws:iam::104186811093:role/isolab-recovery-controller-Role-L8mks6myTPFt",
+  "concurrency": 1,
+  "finding": "No exposed authorized read-only NodePool/ResourceQuota audit route found in the deployed controller entrypoint. It requires a hashed recovery request and CodeBuild invocation, validates it, updates kubeconfig, then always runs controller. No audit branch exists. New build/job or alternate role would exceed this read-only task.",
+  "source_compatibility": [
+    "Deployedrun-controller,buildspec,submit-job andverify-build exactlymatch currentGitHEAD scriptbytes.",
+    "Packagedrecoverybinaryde17f01... usagehasvalidate/controller/supervise/rpc/status/archive modes; noNodePool/ResourceQuota tokens. Current sourceCLI likewisehasno cap-auditmode. Stringabsence iscorroboration,notproof ofcompletebinary/sourceidentity.",
+    "ExactRustsourcecommit usedfor packagedbinary cannot be established from ZIPalone: noBUILD/provenancerecord inpackage.",
+    "Publisher uses separately versioned/hashverified runtimearchive over immutablebaseimage; DockerfileonlyCOPYs runtime. ControllerZIPdoesnotbind anewbenchmarkbinary/runtimeimage or prove theirqualification.",
+    "Checked-inRBACnamespacedrole coversconfigmaps/PVC/pods/exec/snapshots andclusterrole nodes/snapshotcontents; noNodePool/ResourceQuota grants. This is sourcereadback,notliveRBACverification."
+  ],
+  "mutations": {
+    "assume_role": false,
+    "new_build": false,
+    "new_job": false,
+    "deployment": false,
+    "cap_change": false,
+    "credential_output": false
+  },
+  "errors_retained": [
+    "First exactDescribeStack usedwrongus-west-2 andreturnednotfound; savedhistoricalARN establishedus-east-2 thenexactreadpassed.",
+    "Migrationreceipt andsomehistoricalruntimefiles permissiondenied; no permissionbypass attempted."
+  ],
+  "next_action": "Use already requested authorized operator liveNodePool/ResourceQuota readback; do not invent a controller audit path or launch a diagnosticbuild."
+}

@@ -1,0 +1,123 @@
+{
+  "main": "CompositeTateDomainAudit.known_composite_tate_control_certificate",
+  "binding": "c0b96f82c9239660a8c2dd7e8d1f5eafad909f0cf6431d8a3a1cc3f49fda1371",
+  "custom_imports": {
+    "CompositeTateCertificate": "research/composite_tate_domain_audit_20261115/lean/CompositeTateCertificate.lean",
+    "CurveDomain": "research/composite_tate_domain_audit_20261115/lean/CurveDomain.lean",
+    "PairingObstruction": "research/composite_tate_domain_audit_20261115/lean/PairingObstruction.lean",
+    "UnitsQuotient": "research/composite_tate_domain_audit_20261115/lean/UnitsQuotient.lean"
+  },
+  "claims": [
+    {
+      "declaration": "CompositeTateDomainAudit.curve_count",
+      "conclusion": "Actual nonsingular E/F5:y²=x³+1 count6 derived."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.three_point_order",
+      "conclusion": "Actual (0,1) has order3."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.mem_six_torsion",
+      "conclusion": "Actual firstdomain exactlykernel of multiplication6."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.mem_six_multiples",
+      "conclusion": "Actual rightdomain denominator exactlyimage of multiplication6."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.left_domain_card",
+      "conclusion": "Actual leftkernel cardinality6."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.right_domain_card",
+      "conclusion": "Actual curve quotient cardinality6."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.target_card",
+      "conclusion": "Actual F5unit-sixthpower quotient cardinality2."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.target_square",
+      "conclusion": "Every actualtarget element squares1."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.negative_unit_order",
+      "conclusion": "Actual -1 sixthroot has exactorder2."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.no_primitive_six",
+      "conclusion": "No actualF5unit primitive6root."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.prime_root_primitive",
+      "conclusion": "Generic prime-order nonidentity root is primitive, arithmetic only."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.left_point_radical",
+      "conclusion": "Explicit actual nonzero3torsion in left radical ofeverybilinear map."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.right_point_radical",
+      "conclusion": "Explicit actual nonzero3torsionclass in right radical ofeverybilinear map."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.bilinear_perfectness_impossible",
+      "conclusion": "No both-nondegeneratebilinear map on exactactualdomains."
+    },
+    {
+      "declaration": "CompositeTateDomainAudit.literal_nontrivial_root_nondegeneracy_false",
+      "conclusion": "Direct necessary-existence consequence ofliteralcomposite rootguardfalse, knowncontrol."
+    }
+  ],
+  "known_prior": "PCC-20261110-5e63e9",
+  "new_source_coverage": false,
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 53,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "known_negative_control_reconstruction": true,
+    "prior_claim": "PCC-20261110-5e63e9",
+    "new_source_coverage": false,
+    "new_all14_gap_closure": false,
+    "no_prior_customproof_modules_imported": true,
+    "independent_implementation_or_physicalhost_validation": false,
+    "actual_kernel_curvequotient_unitpowerquotient_defined": true,
+    "actual_domain_target_counts_derived": [
+      6,
+      6,
+      2
+    ],
+    "actual_both_nonzero_radical_witnesses_proved": true,
+    "prime_nonidentity_root_arithmetic_proved": true,
+    "general_primitive_root_qualified_Tate_positive_proof": false,
+    "canonical_divisor_Miller_identification_proved": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

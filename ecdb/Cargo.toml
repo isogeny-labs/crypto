@@ -22,10 +22,12 @@ path = "src/lib.rs"
 [dependencies]
 anyhow = "1"
 base64 = "0.22"
+bytes = "1"
 axum = { version = "0.8", features = ["macros"] }
 clap = { version = "4", features = ["derive", "env"] }
 deadpool-postgres = "0.14"
 flate2 = "1"
+futures-util = "0.3"
 hex = "0.4"
 # AWS Lambda entry points (`ecdb lambda api|admin`), for the RDS deployment in deploy/.
 lambda_http = "1"
@@ -34,6 +36,8 @@ num-bigint = "0.4"
 num-integer = "0.1"
 num-traits = "0.2"
 regex = "1"
+# HTTP client of `ecdb sync` (a mirror pulling /v1/export); rustls with ring, system roots.
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls-native-roots"] }
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
 rustls-pemfile = "2"
 serde = { version = "1", features = ["derive"] }

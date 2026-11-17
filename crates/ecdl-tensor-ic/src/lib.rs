@@ -10,6 +10,7 @@
 
 use std::fmt;
 
+pub mod cofactor;
 pub mod curve;
 pub mod field;
 pub mod gadgets;
@@ -22,11 +23,17 @@ pub mod schedule;
 pub mod solver;
 pub mod tensor;
 
+pub use cofactor::{
+    cofactor_factor_bases, cofactor_relation_network, random_cofactor_curve, CofactorCurve,
+};
 pub use curve::{random_prime_order_curve, Curve, Point, INFINITY};
 pub use field::is_prime;
 pub use gadgets::{Arith, ArithRef, Builder, Operand, Term, Var};
 pub use linalg::{left_kernel_vector, left_kernel_vector_sparse};
-pub use pointgadget::{gadget_relation_network, gadget_shapes, FieldPoint};
+pub use pointgadget::{
+    cofactor_shape, gadget_cofactor_relation_network, gadget_relation_network, gadget_shapes,
+    FieldPoint,
+};
 pub use relation::{mitm_find_relation, relation_network, FactorBases};
 pub use schedule::{DFSCounter, EdgeHint, Step};
 pub use solver::{Relation, Solver, Stats};

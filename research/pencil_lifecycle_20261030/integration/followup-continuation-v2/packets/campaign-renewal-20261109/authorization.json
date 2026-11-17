@@ -1,0 +1,38 @@
+{
+  "schema": "pencil.campaign-authorization/v1",
+  "campaign_id": "pencil-continuation-20261109",
+  "authorization_received_utc": "2026-11-09T17:11:39Z",
+  "authorization_basis": "Owner approved a twelve-hour continuation. Interpreted as both cumulative active-worker allowance and twelve-hour wall-clock stop; interpretation stated to owner before recording.",
+  "active_worker_seconds_ceiling": 43200,
+  "deadline_utc": "2026-11-10T05:11:39Z",
+  "worker_seconds_charged": 0,
+  "worker_seconds_reserved": 0,
+  "max_active_payloads": 1,
+  "previous_campaign": {
+    "deadline_utc": "2026-11-06T04:00:00Z",
+    "ceiling_seconds": 46800,
+    "historical_charged_seconds": 5400,
+    "historical_remaining_seconds": 41400,
+    "balance_carried_forward": false
+  },
+  "charges_include": [
+    "preparation payloads",
+    "builds",
+    "controls",
+    "warmups",
+    "replay",
+    "failed attempts",
+    "recovery",
+    "Spot restarts"
+  ],
+  "execution_release": false,
+  "retained_requirements": [
+    "frozen 1260-target scope and controls",
+    "published exact inputs and source",
+    "prospective review",
+    "current-host runtime qualification",
+    "existing CPU/RAM and role boundaries",
+    "preserve all earlier failure records"
+  ],
+  "scope": "Existing genus-2 leads and approved follow-ups; no duplicate Diem generator or EKS submission"
+}

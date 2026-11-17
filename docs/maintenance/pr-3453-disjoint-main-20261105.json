@@ -1,0 +1,50 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 3453,
+  "standing": "unverified",
+  "date": "2026-11-05",
+  "head_before": "a51da2a005431215d79b612fb2d5417451cdcfd2",
+  "incoming_main": "3b27a31f7cc3362bccc1bc8f80fbbdab87dcccb9",
+  "merge_base": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "branch_additions": 26,
+  "incoming_paths": 59,
+  "overlap": [],
+  "construction": "Use the complete main tree and overlay the exact disjoint source-head study subtree plus three claim blobs. Retain all file modes, study PDFs and historical malformed records.",
+  "branch_entries": [
+    {
+      "path": "research/aps_leads_20261105",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9a668a146792af01b2c077870cc7c57798d3a841"
+    },
+    {
+      "path": "pcc/claims/PCC-20261105-9d5a6d.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24f322d1f154186873274811043e22db777c3b1e"
+    },
+    {
+      "path": "pcc/claims/PCC-20261105-ac1e93.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "abf267123dc5368e1d82e862fa0ee4f1bb45682e"
+    },
+    {
+      "path": "pcc/claims/PCC-20261105-aca921.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0439a3720d3e92ba3ffaade54ef1a448ada0e0b2"
+    }
+  ],
+  "preservation": {
+    "public_main_ledger": "unchanged exact main bytes; no APS entries added or rewritten",
+    "private_native_ledger": "not published or reconciled",
+    "all_scientific_source_and_frozen_studies": "exact upstream/current-head bytes",
+    "shared_global_private_logs": "not included"
+  },
+  "review": {
+    "source": "Reviewed all lead assumptions/rejection rules, native identity wrapper, source/manifest pins, correction map and validation scope. Identity records are unsigned statements with not_covered standing; implementations and performance trials remain pending.",
+    "old_ci": "Old head had cancelled harness/PCC jobs; no cancelled check is treated as passing.",
+    "current_ci": "Fresh applicable checks required; no new local build/replay or scientific execution claimed."
+  }
+}

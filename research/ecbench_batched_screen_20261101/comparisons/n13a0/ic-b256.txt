@@ -1,0 +1,43 @@
+ops (ok): ic-b256 / ic-b64 = 2.2737 [2.273, 2.274] (linearised_t, df 31) over 128 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 2.2737, w=0.1: n/a, w=1: n/a): unrankable (uncounted unpriced work); wall: admitted ns/GAE ic-b256/ic-b64 1.0591 [1.017, 1.102], bias-corrected 1.0487 [0.985, 1.117] (A/A 1.0099, includes arm A), within noise; end-to-end wall 2.4081 [2.313, 2.507]; ns/GAE of ic-b64, ic-b256 is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 0 / 100; paired attempts 128, verified 128, admitted 0; levels {"L0": 128}; p95 foreign busy unknown%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm ic-b64: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=229120, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=195898, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=1522560, pair_filter_probes_uncharged=16640, vector_declined_lanes_uncharged=uncounted
+arm ic-b256: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=229120, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=135460, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=6019968, pair_filter_probes_uncharged=65792, vector_declined_lanes_uncharged=uncounted
+| curve | log2 r | workloads | ic-b256 / ic-b64 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m13-t181-515ee569 | 10.97 | 32 | 2.2737 | [2.2734, 2.2740] | linearised_t |
+
+| workload | curve | log2 r | ic-b64 mean S | ic-b256 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W133a57cb18d0 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.4358 | 3023.2843 | 2.2741 |
+| W1a06dac71990 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1509 | 3022.3626 | 2.2739 |
+| W1ce6a4fa7e4d | icv1-f2m13-t181-515ee569 | 10.97 | 1328.7711 | 3020.5527 | 2.2732 |
+| W29c2a22772b0 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0504 | 3020.0165 | 2.2723 |
+| W2dfb675a1ebf | icv1-f2m13-t181-515ee569 | 10.97 | 1329.5028 | 3022.3235 | 2.2733 |
+| W35418bbf6bee | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1174 | 3022.9659 | 2.2744 |
+| W3755fa01cbd0 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.8771 | 3024.6529 | 2.2744 |
+| W3d0bccb17870 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5979 | 3022.3235 | 2.2748 |
+| W49cae2f53432 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.2963 | 3020.4466 | 2.2739 |
+| W49effbf55306 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.4358 | 3022.4576 | 2.2735 |
+| W5942c4a18d2f | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8437 | 3020.6589 | 2.2731 |
+| W5f9a1d68304f | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7710 | 3022.3570 | 2.2728 |
+| W60b84d2e7bfb | icv1-f2m13-t181-515ee569 | 10.97 | 1329.0224 | 3019.9327 | 2.2723 |
+| W8915940c4cb3 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.9720 | 3023.5748 | 2.2734 |
+| W9713fa0c64c9 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.8773 | 3017.9050 | 2.2727 |
+| W988c19ee5cc3 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.8604 | 3021.3571 | 2.2736 |
+| Wa36f958d46c7 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.3855 | 3021.8040 | 2.2731 |
+| Wa80439720178 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6369 | 3023.4407 | 2.2739 |
+| Wb369860844b9 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.4136 | 3021.6699 | 2.2746 |
+| Wb948adcd0166 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.1900 | 3022.1001 | 2.2736 |
+| Wb96672143b21 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.5644 | 3020.7036 | 2.2737 |
+| Wb98496f749cb | icv1-f2m13-t181-515ee569 | 10.97 | 1330.2569 | 3023.5021 | 2.2729 |
+| Wc4dfe486c105 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.6872 | 3024.2618 | 2.2744 |
+| Wc53c0c628082 | icv1-f2m13-t181-515ee569 | 10.97 | 1326.5925 | 3020.4634 | 2.2769 |
+| Wcbf4684f61a1 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.9051 | 3021.5359 | 2.2737 |
+| Wd1394f9346ed | icv1-f2m13-t181-515ee569 | 10.97 | 1328.6705 | 3021.1784 | 2.2738 |
+| We04998039864 | icv1-f2m13-t181-515ee569 | 10.97 | 1327.9276 | 3019.6869 | 2.2740 |
+| Web7c1ded2e31 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2012 | 3022.1001 | 2.2736 |
+| Wf872ae998b11 | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7151 | 3022.6363 | 2.2731 |
+| Wfc5f3e005896 | icv1-f2m13-t181-515ee569 | 10.97 | 1328.0616 | 3020.4913 | 2.2744 |
+| Wfd272fdb798e | icv1-f2m13-t181-515ee569 | 10.97 | 1329.2626 | 3022.4073 | 2.2737 |
+| Wfd9ae173df7c | icv1-f2m13-t181-515ee569 | 10.97 | 1329.7486 | 3023.3848 | 2.2737 |

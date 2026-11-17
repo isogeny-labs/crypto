@@ -1,0 +1,51 @@
+(a) LB model (Theorem S: D=ceil(k/2)+1), Boolean, k=160:  m theta  E_pre(w=1) E_1rel(w=1) E_pre(w=2) E_1rel(w=2)
+  m= 2 theta=1.609  inf inf   inf inf
+  m= 3 theta=1.939  0.971 0.980   inf inf
+  m= 4 theta=2.166  0.706 0.791   inf inf
+  m= 5 theta=2.338  0.546 0.668   inf inf
+  m= 6 theta=2.478  0.442 0.580   0.978 0.993
+  m= 7 theta=2.595  0.370 0.514   0.712 0.884
+  m= 8 theta=2.695  0.317 0.462   0.554 0.799
+  m= 9 theta=2.784  0.277 0.420   0.451 0.730
+  m=10 theta=2.863  0.246 0.386   0.379 0.673
+  m=11 theta=2.934  0.221 0.358   0.326 0.624
+  m=12 theta=2.999  0.200 0.333   0.286 0.583
+  m=13 theta=3.059  0.183 0.312   0.254 0.548
+  m=14 theta=3.114  0.168 0.294   0.228 0.516
+  m=15 theta=3.165  0.156 0.278   0.207 0.489
+  m=16 theta=3.213  0.145 0.263   0.189 0.464
+(b) smallest m with E<0.5 (LB model, k=160): 
+  omega=1 E_pre: m>=6
+  omega=1 E_1rel: m>=8
+  omega=2 E_pre: m>=9
+  omega=2 E_1rel: m>=15
+(c) p = 2^256, Boolean digits, one relation per trial, minimise over k (B=2^k <= p^(1/m)) the max(relation, LA) cost;
+    D = proven bound: ffd = m e + floor((k-e)/2)+1 if k>=e (Theorem F), else ceil(k/2)+1 (Theorem S); omega=1
+  m= 2: best k=  1 D=   2 theta=2.00 log2 cost=257.0  E=1.004  (bound used: Thm S)
+  m= 3: best k=  2 D=   2 theta=2.23 log2 cost=256.5  E=1.002  (bound used: Thm S)
+  m= 4: best k=  6 D=   4 theta=2.28 log2 cost=251.7  E=0.983  (bound used: Thm S)
+  m= 5: best k= 15 D=   9 theta=2.47 log2 cost=233.1  E=0.910  (bound used: Thm S)
+  m= 6: best k= 31 D=  17 theta=2.54 log2 cost=179.9  E=0.703  (bound used: Thm S)
+  m= 7: best k= 36 D=  19 theta=2.61 log2 cost=133.9  E=0.523  (bound used: Thm S)
+  m= 8: best k= 32 D=  17 theta=2.72 log2 cost=119.0  E=0.465  (bound used: Thm S)
+  m= 9: best k= 28 D=  15 theta=2.82 log2 cost=110.9  E=0.433  (bound used: Thm S)
+  m=10: best k= 25 D=  14 theta=2.99 log2 cost=105.7  E=0.413  (bound used: Thm S)
+  m=11: best k= 23 D=  13 theta=3.08 log2 cost=96.9  E=0.378  (bound used: Thm S)
+  m=12: best k= 21 D=  12 theta=3.17 log2 cost=91.6  E=0.358  (bound used: Thm S)
+(d) same at p=2^256 but with the protocol's fractional-trial accounting (B may exceed p^(1/m), trials = p/B^m):
+  m= 2: best k=  1 D=   2 theta=2.00 E=1.004
+  m= 3: best k=  2 D=   2 theta=2.23 E=1.002
+  m= 4: best k=113 D=  85 theta=2.75 E=0.891
+  m= 5: best k= 15 D=   9 theta=2.47 E=0.910
+  m= 6: best k= 31 D=  17 theta=2.54 E=0.703
+  m= 7: best k= 48 D=  25 theta=2.60 E=0.375
+  m= 8: best k= 41 D=  22 theta=2.76 E=0.320
+  m= 9: best k= 36 D=  19 theta=2.81 E=0.281
+  m=10: best k= 32 D=  17 theta=2.89 E=0.250
+  m=11: best k= 29 D=  16 theta=3.05 E=0.227
+  m=12: best k= 26 D=  14 theta=3.05 E=0.203
+(e) Hypothesis-G coverage (assumes the closure note's 'G needed only at theta - Delta >= tau_m*m*k' with Delta = deg f = m e):
+  m=3: tau*m=0.074; Theorem F covers the needed degree (tau*m*k <= j*-1) for k >= 6; 256-bit p allows k <= 85
+  m=4: tau*m=0.167; Theorem F covers the needed degree (tau*m*k <= j*-1) for k >= 14; 256-bit p allows k <= 64
+  m=6: tau*m=0.369; Theorem F covers the needed degree (tau*m*k <= j*-1) for k >= 124; 256-bit p allows k <= 42
+  m=8: tau*m=0.580; Theorem F covers the needed degree (tau*m*k <= j*-1) for k >= never (tau*m >= 1/2); 256-bit p allows k <= 32

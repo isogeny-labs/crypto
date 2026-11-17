@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "unit": "pencil-root-log-qualification-t1971-20261109.service",
+  "errors": [],
+  "launch_attempted": true,
+  "compiler_invoked": false,
+  "properties": {
+    "User": "1000",
+    "Group": "1000",
+    "Type": "exec",
+    "RemainAfterExit": "yes",
+    "Restart": "no",
+    "CPUQuota": "100%",
+    "MemoryMax": "134217728",
+    "MemorySwapMax": "0",
+    "TasksMax": "32",
+    "OOMPolicy": "stop",
+    "KillMode": "control-group",
+    "TimeoutStopSec": "5s",
+    "RuntimeMaxSec": "35s",
+    "NoNewPrivileges": "yes",
+    "PrivateTmp": "no",
+    "PrivateNetwork": "yes",
+    "ProtectSystem": "strict",
+    "ProtectHome": "read-only",
+    "ReadWritePaths": "/home/ec2-user/pencil-validation-receipts/t1971-root-log-qualification-20261109",
+    "WorkingDirectory": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-log-qualification-20261109",
+    "UMask": "0077",
+    "StandardOutput": "append:/home/ec2-user/pencil-validation-receipts/t1971-root-log-qualification-20261109/unit.stdout",
+    "StandardError": "append:/home/ec2-user/pencil-validation-receipts/t1971-root-log-qualification-20261109/unit.stderr"
+  },
+  "launch_exit": 0,
+  "launch_stderr": "Running as unit: pencil-root-log-qualification-t1971-20261109.service\n",
+  "ownership_survived_checkpoint_failure": true,
+  "captured_invocation": "9a260668ffe94e34ae85562a76223904",
+  "captured_cgroup": "/system.slice/pencil-root-log-qualification-t1971-20261109.service",
+  "initial_state": {
+    "MainPID": "4075722",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "/system.slice/pencil-root-log-qualification-t1971-20261109.service",
+    "LoadState": "loaded",
+    "ActiveState": "activating",
+    "SubState": "start",
+    "InvocationID": "9a260668ffe94e34ae85562a76223904"
+  },
+  "native_controls": {
+    "cpu.max": "100000 100000",
+    "memory.max": "134217728",
+    "memory.swap.max": "0",
+    "pids.max": "32"
+  },
+  "worker": {
+    "passed": true,
+    "uid": 1000,
+    "invocation": "9a260668ffe94e34ae85562a76223904",
+    "ownership": {
+      "unit.stdout": {
+        "uid": 1000,
+        "gid": 1000,
+        "mode": 384
+      },
+      "unit.stderr": {
+        "uid": 1000,
+        "gid": 1000,
+        "mode": 384
+      }
+    },
+    "prefixes": {
+      "unit.stderr": {
+        "prefix_bytes": 27,
+        "prefix_sha256": "28854c30b3d9272bf01b7ed5a63f714ba24cd3e60bd35d55381e5b2c64737a91",
+        "sealed": false
+      },
+      "unit.stdout": {
+        "prefix_bytes": 27,
+        "prefix_sha256": "135dda7e44a1f69a1240a98749c88d33f2016fa48ca74b318e7263f54afa5d82",
+        "sealed": false
+      }
+    }
+  },
+  "supervisor_prefixes": {
+    "unit.stderr": {
+      "prefix_bytes": 27,
+      "prefix_sha256": "28854c30b3d9272bf01b7ed5a63f714ba24cd3e60bd35d55381e5b2c64737a91",
+      "sealed": false
+    },
+    "unit.stdout": {
+      "prefix_bytes": 27,
+      "prefix_sha256": "135dda7e44a1f69a1240a98749c88d33f2016fa48ca74b318e7263f54afa5d82",
+      "sealed": false
+    }
+  },
+  "payload_passed": true,
+  "owned_cleanup": true,
+  "terminal_state": {
+    "MainPID": "0",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "LoadState": "not-found",
+    "ActiveState": "inactive",
+    "SubState": "dead",
+    "InvocationID": ""
+  },
+  "elapsed_seconds": 3.339560756983701
+}

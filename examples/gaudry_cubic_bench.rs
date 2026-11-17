@@ -75,6 +75,7 @@ fn one(
         small_base: small,
         max_large_primes: max_lp,
         max_merge_level: merge_cap,
+        arity: 3,
     };
     let g = run_gaudry_opts(&inst, &base, seed, &opts);
     let r = run_rho3(&inst, seed);

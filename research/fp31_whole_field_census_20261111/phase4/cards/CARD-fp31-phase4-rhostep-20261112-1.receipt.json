@@ -1,0 +1,103 @@
+{
+  "card_id": "CARD-fp31-phase4-rhostep-20261112-1",
+  "card_path": "research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.yaml",
+  "card_sha256": "58e524daf5732a2b021ad0183de63a808d17c7319200bda2e0afa4b4dded2343",
+  "commands": [
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/phase4/run_phase4.sh",
+        "target/release/ecbench",
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "research/fp31_whole_field_census_20261111/phase4/runs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3526.949,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "run-phase4",
+      "index": 1,
+      "outputs": {},
+      "pid_file": "research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.run/01-run-phase4.pid.json",
+      "seconds": 3526.949,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "699a9860bec10412c6d3c27f830b5b1fe3366beafbd20d577de7866145b7a740",
+      "stdout_tail": [
+        "ok c036 88s",
+        "ok c037 86s",
+        "ok c038 88s",
+        "ok c039 87s",
+        "ok c040 90s",
+        "ok c041 109s",
+        "ok c042 89s",
+        "ok c043 125s",
+        "ok c044 126s",
+        "ok c045 129s",
+        "FAILED c046 (logs kept in research/fp31_whole_field_census_20261111/phase4/runs/c046.partial)",
+        "FAILED c047 (logs kept in research/fp31_whole_field_census_20261111/phase4/runs/c047.partial)",
+        "FAILED c048 (logs kept in research/fp31_whole_field_census_20261111/phase4/runs/c048.partial)",
+        "ok c049 125s",
+        "ok c050 121s",
+        "ok c051 89s",
+        "ok c052 90s",
+        "ok c053 114s",
+        "ok c054 123s",
+        "ok c055 123s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "rho-timing",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase4/runs",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase4/analysis.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.673,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "rho-timing",
+      "index": 2,
+      "outputs": {
+        "research/fp31_whole_field_census_20261111/phase4/analysis.json": "1d6a6472d95f31ec08cf252c843e3c8edc1e15a985dc2d4baa5d26d4c43b863a"
+      },
+      "seconds": 6.673,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 2,
+  "commit": "433929023888966a6ff4c87520f98c4b2c929055",
+  "dirty_after": [
+    "research/fp31_whole_field_census_20261111/phase4/analysis.json"
+  ],
+  "dirty_before": [
+    "research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

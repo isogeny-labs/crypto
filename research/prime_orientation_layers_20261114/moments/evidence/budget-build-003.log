@@ -1,0 +1,8 @@
+'AnchorBudget.penalty_ge_sum' depends on axioms: [propext, Quot.sound]
+'AnchorBudget.mass_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AnchorBudget.fibonacci_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+../evidence/budget-draft-003.lean.txt:85:6: error: 'change' tactic failed, pattern
+  penalty (ms ++ [r]) ≤ m
+is not definitionally equal to target
+  0 + penalty (ms.append [r]) ≤ m
+'AnchorBudget.terminal_fibonacci_bound' depends on axioms: [propext, sorryAx]

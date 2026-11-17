@@ -1,0 +1,14 @@
+{
+  "schema": "observation.command-provenance/v1",
+  "source": "Root message reconstructed from compaction; not byte-exact original commands",
+  "authoritative_invocation_timestamp": null,
+  "commands": {
+    "overview": "isolab_k8s_overview({})",
+    "recovery_status": "isolab_k8s_recovery_status({request: original C1 JSON including memory})",
+    "c1_state": "timeout 25s aws s3api get-object --region us-east-2 --bucket isolab-results-104186811093-us-east-2 --key recovery/runs/pencil-p186379-20261030-c1/state.json --cli-connect-timeout 5 --cli-read-timeout 15 <packet>/c1-state.json",
+    "c1_instance": "timeout 25s aws ec2 describe-instances --region us-east-2 --instance-ids i-04d58c2b309fb6549; query Reservations[].Instances[] fields InstanceId,State,LaunchTime,StateTransitionReason; connect5/read15seconds",
+    "c1_controller": "aws codebuild batch-get-builds exact owner_build ID from state; query fields retained; same timeout/connect/read; exact query text unavailable",
+    "pencil_states": "aws s3api list-objects-v2 bucket isolab-results-104186811093-us-east-2 prefix recovery/runs/pencil-; Contents query ending /state.json, Key/LastModified/Size, default pagination, timeout30seconds; exact query text unavailable"
+  },
+  "new_commands_executed_by_packager": false
+}

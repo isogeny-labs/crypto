@@ -1,0 +1,1 @@
+Source-only review of direct runner delta, four calls/eighteen names, reused compiled artifact custody and import closure, owner/resource/stop logic. Reviewer authored helper runner ancestor; this is an explicit nonblind delta review, independent of direct candidate author. No payload execution.

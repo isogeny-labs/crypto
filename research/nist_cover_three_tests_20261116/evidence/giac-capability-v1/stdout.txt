@@ -1,0 +1,29 @@
+Welcome to giac readline interface, version 1.9.0
+(c) 2002,2023 B. Parisse & others
+Homepage https://www-fourier.univ-grenoble-alpes.fr/~parisse/giac.html
+Released under the GPL license 3.0 or above
+See http://www.gnu.org for license details
+May contain BSD licensed software parts (lapack, atlas, tinymt)
+-------------------------------------------------
+Press CTRL and D simultaneously to finish session
+Type ?commandname for help
+*** Type xcas to launch a light version of Xcas ***
+0>> purge(x,y);
+"No such variable x","No such variable y"
+1>> taskprime:=6277101735386680763835789423207666416083908700390324961279;
+6277101735386680763835789423207666416083908700390324961279
+2>> small_basis:=gbasis([x+y-3,x*y-2] % 109,[x,y],plex);
+[y^2-3*y+2,x+y-3]
+3>> large_basis:=gbasis([x+y-3,x*y-2] % taskprime,[x,y],plex);
+[y^2+321146056631532234635967005367586859970662808433345657718*y+2,x+y-3]
+4>> print("SMALL_ROOT_1",normal(subst(small_basis,[x,y],[2,1]) % 109));
+0
+5>> print("SMALL_ROOT_2",normal(subst(small_basis,[x,y],[1,2]) % 109));
+0
+6>> print("LARGE_ROOT_1",normal(subst(large_basis,[x,y],[2,1]) % taskprime));
+0
+7>> print("LARGE_ROOT_2",normal(subst(large_basis,[x,y],[1,2]) % taskprime));
+0
+8>> print("LARGE_BASIS",large_basis);
+0
+9>> 

@@ -1,0 +1,9 @@
+# Combined exact held-gate software controls
+
+T-1427 fence1. Root-authorized ordinary software validation, one attempt, no retry. Preserve prior build/failure packets. Candidate830406f4c2ddaf900ff4f95ca85f5b1c111b71c9d4d8bf6467ffa46853ae88e9, exact gate6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc. Pin364 musl compiler bindings and explicit environment as prior build.
+
+Compile and run prior45 parser/host-negative controls against exact held gate source, with only mountinfo open redirected to immutable fixtures. Compile and run unchanged154 release helper controls; only uid/gid substituted, filesystem metadata and bytes real. The parser helper calls renamed gate main only as nonPID1, including malformed argument cases. Run pristine candidate once Q1 with fixed nonce as unprivileged nonPID1, require126 and exact PID/UID/GID rejection. No bypass of PID guard; no successful whole-gate path, tested program exec, root/container/cgroup mutation.
+
+Outer exact command: timeout --signal=TERM --kill-after=5s 175s bash -c 'ulimit -v 1048576; exec python3 -B run.py'. One attempt<=180seconds including kill reserve;1GiB virtual memory; each compile<=60seconds, parser<=5seconds, pristine hostnegative<=5seconds, releasehelper<=25seconds. Inherited processgroup termination/reaping and signal registration retained. Check all frozen inputs before creation of attempt1. Freeze before independent nonauthor review; run only after accepted review.
+
+A successful receipt requires all45+154 checks, pristine126 boundary, exact candidate/source hashes, no pending signals/uncertain children and terminal deadline. Receipt status matches qualifier software contract only after those actual controls pass. Software admission binds proposal.json; runtime/image admission remainsfalse. Independent postattempt evidence review is a separate hashed artifact. Kernel/container gate qualification remains pending.

@@ -1,0 +1,18 @@
+{
+  "schema": "software.validation-plan/v1",
+  "recorded_utc": "2026-11-03T17:53:01.375034+00:00",
+  "scope": "compile-time syntax and warnings only; no output binary or execution",
+  "gate_sha256": "6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc",
+  "command": [
+    "gcc",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsyntax-only",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualifier/gate.c"
+  ],
+  "wall_seconds": 30,
+  "virtual_memory_kib": 1048576,
+  "no_runtime_operations": true
+}

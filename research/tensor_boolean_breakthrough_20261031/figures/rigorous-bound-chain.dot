@@ -1,0 +1,22 @@
+digraph Bounds {
+  graph [rankdir=LR, bgcolor="transparent", nodesep=0.45, ranksep=0.65,
+         fontname="DejaVu Sans", fontsize=11];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10,
+        color="#475569", fillcolor="#f8fafc", margin="0.14,0.10"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#64748b", arrowsize=0.7];
+
+  minor [label="Exact certificate\ndet(k × k minor) ≠ 0", fillcolor="#dcfce7", color="#15803d"];
+  rank [label="Finite rank bound\nk ≤ rank_Q(M)", fillcolor="#dcfce7", color="#15803d"];
+  factor [label="Exact linear separator\nM = L R through d coordinates", fillcolor="#e0f2fe", color="#0369a1"];
+  dimension [label="Message lower bound\nk ≤ d", fillcolor="#dcfce7", color="#15803d"];
+  family [label="Open family lemma\n2^{c n} ≤ rank_Q(M_n)", fillcolor="#fef3c7", color="#b45309"];
+  work [label="Conditional work bound\n2^{c n} ≤ W(n)", fillcolor="#fef3c7", color="#b45309"];
+  outside [label="Not implied:\narbitrary ECDLP lower bound", fillcolor="#fee2e2", color="#b91c1c"];
+
+  minor -> rank [label="proved + verified"];
+  rank -> dimension [label="rank(M) ≤ d"];
+  factor -> dimension;
+  family -> work [label="if rank ≤ d ≤ W"];
+  dimension -> work [style=dashed, label="uniformize"];
+  work -> outside [style=dotted, arrowhead=tee, label="scope barrier", color="#b91c1c"];
+}

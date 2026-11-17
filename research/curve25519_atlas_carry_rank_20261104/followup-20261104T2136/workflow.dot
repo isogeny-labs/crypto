@@ -1,0 +1,19 @@
+digraph completion {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.4", ranksep="0.45"];
+  node [shape=box, style="rounded", fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10];
+  source [label="Published native source\nC++ study + Rust controller\nlocked dependencies"];
+  fixture [label="Known-answer fixtures\nRFC 7748 / miniature curves\nisogeny, carry, rank checks"];
+  solver [label="Identical relation queries\nbounded signed bit-vectors\nmod / schoolbook carry"];
+  replay [label="Full-coordinate replay\nproducer arithmetic + OpenSSL\nSAT witnesses / tiny UNSAT census"];
+  export [label="13-arm development records\nA/A + positive controls\ncanonical export; clocks invalid"];
+  admission [label="Required admission\ncheckpoint + AWS + budget\nregistry image digest", style="rounded,dashed"];
+  panel [label="Original 12-cell panel\np=2029,8173,32749; 4 seeds\nN=8; 32 train + 32 holdout", style="rounded,dashed"];
+  decision [label="Matched component decision\nall outcomes and costs retained\nindependent signed verdict", style="rounded,dashed"];
+  {rank=same; source; fixture;}
+  {rank=same; solver; replay;}
+  {rank=same; export; admission;}
+  {rank=same; panel; decision;}
+  source -> fixture; fixture -> solver; solver -> replay; replay -> export;
+  export -> admission [style=dashed]; admission -> panel [style=dashed]; panel -> decision [style=dashed];
+}

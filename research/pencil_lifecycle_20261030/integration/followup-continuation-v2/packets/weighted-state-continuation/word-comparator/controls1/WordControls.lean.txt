@@ -1,0 +1,15 @@
+import WordComparator
+namespace WordComparatorControls
+open WordComparator
+def axis (i : Fin 4) (a : UInt64) : V := fun j => if j=i then a else 0
+theorem same_scaled : sameB 17 (axis 0 3) (axis 0 9)=true := by decide
+theorem different_axes : sameB 17 (axis 0 1) (axis 3 1)=false := by decide
+theorem zero_left : sameB 17 (fun _=>0) (axis 3 1)=true := by decide
+theorem last_coordinate_nonzero : nonzeroB (axis 3 1)=true := by decide
+theorem zero_vector : nonzeroB (fun _=>0)=false := by decide
+theorem endpoint_product : mul 4294967296 4294967295 4294967295=1 := by decide
+theorem large_prime_product : mul 4294967291 4294967290 4294967290=1 := by decide
+theorem overflow_false_positive : sameB 4294967311 (axis 0 4294967296) (axis 1 4294967296)=true := by decide
+theorem overflow_expected_cross_product : ((4294967296 : Nat)*4294967296)%4294967311=225 := by decide
+theorem noncanonical_zero_trap : nonzeroB (axis 0 17)=true ∧ ¬ProjectiveComparator.nonzero (decode 17 (axis 0 17)) := by decide
+end WordComparatorControls

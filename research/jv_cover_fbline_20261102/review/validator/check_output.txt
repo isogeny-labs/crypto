@@ -1,0 +1,394 @@
+== 1. Receipts: arm A (crossover) vs arm B (line search), field-level checks
+p=1301 seed=1
+  [ok] p/seed fields match file names
+  [ok] A has fb_line null, B has fb_line
+  [ok] A solved and correct
+  [ok] B solved and correct
+  [ok] B mismatches 0, timed_out 0
+  B incomplete=0 A incomplete=0 (tests not zero-dim/truncated: can only lose relations)
+  [ok] l equal: 1212282365425721801
+  [ok] c_add_e equal: 331
+  c_add_j A 2122 B 2122
+  [ok] stop_mode full on both
+  [ok] fb_line.candidates = 65536
+  [ok] fb_line.b_plain 634 = A base 634
+  [ok] fb_line.b_best 728 = B base 728
+  [ok] best line is a moved line (index 37845)
+  [ok] A total_muls 544477040187 = setup+base+stream+oracle+verify+la 544477040187
+  [ok] A oracle = weil+f4+lin+post
+  [ok] A la_muls = 16*la_ops
+  [ok] A S recomputed 1.493997 = recorded 1.493997
+  [ok] A decomposition_rate = relations/residuals
+  [ok] B total_muls 265597174434 = setup+base+stream+oracle+verify+la 265597174434
+  [ok] B oracle = weil+f4+lin+post
+  [ok] B la_muls = 16*la_ops
+  [ok] B S recomputed 0.728775 = recorded 0.728775
+  [ok] B decomposition_rate = relations/residuals
+  [ok] B setup_muls 1473110355 contains fb_line.muls 1472135831
+  B setup minus search = 974524 vs A setup 938592 (diff 35932: stream start/step on the moved model, different rng draws)
+  [ok] fb_line.muls 1472135831 vs validator-derived count 1472135851 (diff -20: 2 pmul zero-coefficient skip(s) of 10 mults; never above the executed work)
+  search share of B total: 0.5543%
+  [ok] C4 rate_B/((2B/p)^6/720) = 0.9693
+p=1301 seed=2
+  [ok] p/seed fields match file names
+  [ok] A has fb_line null, B has fb_line
+  [ok] A solved and correct
+  [ok] B solved and correct
+  [ok] B mismatches 0, timed_out 0
+  B incomplete=0 A incomplete=0 (tests not zero-dim/truncated: can only lose relations)
+  [ok] l equal: 1212282366074682901
+  [ok] c_add_e equal: 331
+  c_add_j A 2122 B 2122
+  [ok] stop_mode full on both
+  [ok] fb_line.candidates = 65536
+  [ok] fb_line.b_plain 651 = A base 651
+  [ok] fb_line.b_best 725 = B base 725
+  [ok] best line is a moved line (index 36013)
+  [ok] A total_muls 487116697703 = setup+base+stream+oracle+verify+la 487116697703
+  [ok] A oracle = weil+f4+lin+post
+  [ok] A la_muls = 16*la_ops
+  [ok] A S recomputed 1.336605 = recorded 1.336605
+  [ok] A decomposition_rate = relations/residuals
+  [ok] B total_muls 284731315304 = setup+base+stream+oracle+verify+la 284731315304
+  [ok] B oracle = weil+f4+lin+post
+  [ok] B la_muls = 16*la_ops
+  [ok] B S recomputed 0.781278 = recorded 0.781278
+  [ok] B decomposition_rate = relations/residuals
+  [ok] B setup_muls 1473085195 contains fb_line.muls 1472135851
+  B setup minus search = 949344 vs A setup 970493 (diff -21149: stream start/step on the moved model, different rng draws)
+  [ok] fb_line.muls 1472135851 vs validator-derived count 1472135851 (diff 0: 0 pmul zero-coefficient skip(s) of 10 mults; never above the executed work)
+  search share of B total: 0.5170%
+  [ok] C4 rate_B/((2B/p)^6/720) = 0.9214
+p=1301 seed=3
+  [ok] p/seed fields match file names
+  [ok] A has fb_line null, B has fb_line
+  [ok] A solved and correct
+  [ok] B solved and correct
+  [ok] B mismatches 0, timed_out 0
+  B incomplete=1 A incomplete=0 (tests not zero-dim/truncated: can only lose relations)
+  [ok] l equal: 1212282366205077161
+  [ok] c_add_e equal: 331
+  c_add_j A 2122 B 2122
+  [ok] stop_mode full on both
+  [ok] fb_line.candidates = 65536
+  [ok] fb_line.b_plain 662 = A base 662
+  [ok] fb_line.b_best 730 = B base 730
+  [ok] best line is a moved line (index 8085)
+  [ok] A total_muls 409975021213 = setup+base+stream+oracle+verify+la 409975021213
+  [ok] A oracle = weil+f4+lin+post
+  [ok] A la_muls = 16*la_ops
+  [ok] A S recomputed 1.124935 = recorded 1.124935
+  [ok] A decomposition_rate = relations/residuals
+  [ok] B total_muls 256314105656 = setup+base+stream+oracle+verify+la 256314105656
+  [ok] B oracle = weil+f4+lin+post
+  [ok] B la_muls = 16*la_ops
+  [ok] B S recomputed 0.703303 = recorded 0.703303
+  [ok] B decomposition_rate = relations/residuals
+  [ok] B setup_muls 1473116883 contains fb_line.muls 1472135851
+  B setup minus search = 981032 vs A setup 972686 (diff 8346: stream start/step on the moved model, different rng draws)
+  [ok] fb_line.muls 1472135851 vs validator-derived count 1472135851 (diff 0: 0 pmul zero-coefficient skip(s) of 10 mults; never above the executed work)
+  search share of B total: 0.5743%
+  [ok] C4 rate_B/((2B/p)^6/720) = 0.9910
+p=1451 seed=1
+  [ok] p/seed fields match file names
+  [ok] A has fb_line null, B has fb_line
+  [ok] A solved and correct
+  [ok] B solved and correct
+  [ok] B mismatches 0, timed_out 0
+  B incomplete=0 A incomplete=0 (tests not zero-dim/truncated: can only lose relations)
+  [ok] l equal: 2333159791230987941
+  [ok] c_add_e equal: 331
+  c_add_j A 2122 B 2122
+  [ok] stop_mode full on both
+  [ok] fb_line.candidates = 65536
+  [ok] fb_line.b_plain 735 = A base 735
+  [ok] fb_line.b_best 811 = B base 811
+  [ok] best line is a moved line (index 23659)
+  [ok] A total_muls 496541593633 = setup+base+stream+oracle+verify+la 496541593633
+  [ok] A oracle = weil+f4+lin+post
+  [ok] A la_muls = 16*la_ops
+  [ok] A S recomputed 0.982099 = recorded 0.982099
+  [ok] A decomposition_rate = relations/residuals
+  [ok] B total_muls 304120082739 = setup+base+stream+oracle+verify+la 304120082739
+  [ok] B oracle = weil+f4+lin+post
+  [ok] B la_muls = 16*la_ops
+  [ok] B S recomputed 0.601513 = recorded 0.601513
+  [ok] B decomposition_rate = relations/residuals
+  [ok] B setup_muls 1640218752 contains fb_line.muls 1639252716
+  B setup minus search = 966036 vs A setup 989449 (diff -23413: stream start/step on the moved model, different rng draws)
+  [ok] fb_line.muls 1639252716 vs validator-derived count 1639252726 (diff -10: 1 pmul zero-coefficient skip(s) of 10 mults; never above the executed work)
+  search share of B total: 0.5390%
+  [ok] C4 rate_B/((2B/p)^6/720) = 0.9488
+p=1451 seed=2
+  [ok] p/seed fields match file names
+  [ok] A has fb_line null, B has fb_line
+  [ok] A solved and correct
+  [ok] B solved and correct
+  [ok] B mismatches 0, timed_out 0
+  B incomplete=0 A incomplete=0 (tests not zero-dim/truncated: can only lose relations)
+  [ok] l equal: 2333159789775853813
+  [ok] c_add_e equal: 331
+  c_add_j A 2122 B 2122
+  [ok] stop_mode full on both
+  [ok] fb_line.candidates = 65536
+  [ok] fb_line.b_plain 729 = A base 729
+  [ok] fb_line.b_best 800 = B base 800
+  [ok] best line is a moved line (index 17465)
+  [ok] A total_muls 523987947788 = setup+base+stream+oracle+verify+la 523987947788
+  [ok] A oracle = weil+f4+lin+post
+  [ok] A la_muls = 16*la_ops
+  [ok] A S recomputed 1.036385 = recorded 1.036385
+  [ok] A decomposition_rate = relations/residuals
+  [ok] B total_muls 320046462233 = setup+base+stream+oracle+verify+la 320046462233
+  [ok] B oracle = weil+f4+lin+post
+  [ok] B la_muls = 16*la_ops
+  [ok] B S recomputed 0.633013 = recorded 0.633013
+  [ok] B decomposition_rate = relations/residuals
+  [ok] B setup_muls 1640221168 contains fb_line.muls 1639252726
+  B setup minus search = 968442 vs A setup 982870 (diff -14428: stream start/step on the moved model, different rng draws)
+  [ok] fb_line.muls 1639252726 vs validator-derived count 1639252726 (diff 0: 0 pmul zero-coefficient skip(s) of 10 mults; never above the executed work)
+  search share of B total: 0.5122%
+  [ok] C4 rate_B/((2B/p)^6/720) = 0.9625
+p=1451 seed=3
+  [ok] p/seed fields match file names
+  [ok] A has fb_line null, B has fb_line
+  [ok] A solved and correct
+  [ok] B solved and correct
+  [ok] B mismatches 0, timed_out 0
+  B incomplete=0 A incomplete=1 (tests not zero-dim/truncated: can only lose relations)
+  [ok] l equal: 2333159789820689941
+  [ok] c_add_e equal: 331
+  c_add_j A 2122 B 2122
+  [ok] stop_mode full on both
+  [ok] fb_line.candidates = 65536
+  [ok] fb_line.b_plain 703 = A base 703
+  [ok] fb_line.b_best 804 = B base 804
+  [ok] best line is a moved line (index 49965)
+  [ok] A total_muls 627558142227 = setup+base+stream+oracle+verify+la 627558142227
+  [ok] A oracle = weil+f4+lin+post
+  [ok] A la_muls = 16*la_ops
+  [ok] A S recomputed 1.241234 = recorded 1.241234
+  [ok] A decomposition_rate = relations/residuals
+  [ok] B total_muls 308547908201 = setup+base+stream+oracle+verify+la 308547908201
+  [ok] B oracle = weil+f4+lin+post
+  [ok] B la_muls = 16*la_ops
+  [ok] B S recomputed 0.610270 = recorded 0.610270
+  [ok] B decomposition_rate = relations/residuals
+  [ok] B setup_muls 1640250450 contains fb_line.muls 1639252726
+  B setup minus search = 997724 vs A setup 959670 (diff 38054: stream start/step on the moved model, different rng draws)
+  [ok] fb_line.muls 1639252726 vs validator-derived count 1639252726 (diff 0: 0 pmul zero-coefficient skip(s) of 10 mults; never above the executed work)
+  search share of B total: 0.5313%
+  [ok] C4 rate_B/((2B/p)^6/720) = 0.9765
+p=1601 seed=1
+  [ok] p/seed fields match file names
+  [ok] A has fb_line null, B has fb_line
+  [ok] A solved and correct
+  [ok] B solved and correct
+  [ok] B mismatches 0, timed_out 0
+  B incomplete=0 A incomplete=0 (tests not zero-dim/truncated: can only lose relations)
+  [ok] l equal: 4210057237981759961
+  [ok] c_add_e equal: 331
+  c_add_j A 2122 B 2122
+  [ok] stop_mode full on both
+  [ok] fb_line.candidates = 65536
+  [ok] fb_line.b_plain 764 = A base 764
+  [ok] fb_line.b_best 884 = B base 884
+  [ok] best line is a moved line (index 60117)
+  [ok] A total_muls 759580878890 = setup+base+stream+oracle+verify+la 759580878890
+  [ok] A oracle = weil+f4+lin+post
+  [ok] A la_muls = 16*la_ops
+  [ok] A S recomputed 1.118413 = recorded 1.118413
+  [ok] A decomposition_rate = relations/residuals
+  [ok] B total_muls 355425095903 = setup+base+stream+oracle+verify+la 355425095903
+  [ok] B oracle = weil+f4+lin+post
+  [ok] B la_muls = 16*la_ops
+  [ok] B S recomputed 0.523331 = recorded 0.523331
+  [ok] B decomposition_rate = relations/residuals
+  [ok] B setup_muls 1807382392 contains fb_line.muls 1806369601
+  B setup minus search = 1012791 vs A setup 1004303 (diff 8488: stream start/step on the moved model, different rng draws)
+  [ok] fb_line.muls 1806369601 vs validator-derived count 1806369601 (diff 0: 0 pmul zero-coefficient skip(s) of 10 mults; never above the executed work)
+  search share of B total: 0.5082%
+  [ok] C4 rate_B/((2B/p)^6/720) = 0.9515
+p=1601 seed=2
+  [ok] p/seed fields match file names
+  [ok] A has fb_line null, B has fb_line
+  [ok] A solved and correct
+  [ok] B solved and correct
+  [ok] B mismatches 0, timed_out 0
+  B incomplete=0 A incomplete=0 (tests not zero-dim/truncated: can only lose relations)
+  [ok] l equal: 4210057235037765977
+  [ok] c_add_e equal: 331
+  c_add_j A 2122 B 2122
+  [ok] stop_mode full on both
+  [ok] fb_line.candidates = 65536
+  [ok] fb_line.b_plain 820 = A base 820
+  [ok] fb_line.b_best 883 = B base 883
+  [ok] best line is a moved line (index 9758)
+  [ok] A total_muls 486525196660 = setup+base+stream+oracle+verify+la 486525196660
+  [ok] A oracle = weil+f4+lin+post
+  [ok] A la_muls = 16*la_ops
+  [ok] A S recomputed 0.716363 = recorded 0.716363
+  [ok] A decomposition_rate = relations/residuals
+  [ok] B total_muls 342271428449 = setup+base+stream+oracle+verify+la 342271428449
+  [ok] B oracle = weil+f4+lin+post
+  [ok] B la_muls = 16*la_ops
+  [ok] B S recomputed 0.503963 = recorded 0.503963
+  [ok] B decomposition_rate = relations/residuals
+  [ok] B setup_muls 1807396607 contains fb_line.muls 1806369601
+  B setup minus search = 1027006 vs A setup 991429 (diff 35577: stream start/step on the moved model, different rng draws)
+  [ok] fb_line.muls 1806369601 vs validator-derived count 1806369601 (diff 0: 0 pmul zero-coefficient skip(s) of 10 mults; never above the executed work)
+  search share of B total: 0.5278%
+  [ok] C4 rate_B/((2B/p)^6/720) = 0.9941
+p=1601 seed=3
+  [ok] p/seed fields match file names
+  [ok] A has fb_line null, B has fb_line
+  [ok] A solved and correct
+  [ok] B solved and correct
+  [ok] B mismatches 0, timed_out 0
+  B incomplete=0 A incomplete=0 (tests not zero-dim/truncated: can only lose relations)
+  [ok] l equal: 4210057235982467833
+  [ok] c_add_e equal: 331
+  c_add_j A 2122 B 2122
+  [ok] stop_mode full on both
+  [ok] fb_line.candidates = 65536
+  [ok] fb_line.b_plain 824 = A base 824
+  [ok] fb_line.b_best 883 = B base 883
+  [ok] best line is a moved line (index 55916)
+  [ok] A total_muls 451915087436 = setup+base+stream+oracle+verify+la 451915087436
+  [ok] A oracle = weil+f4+lin+post
+  [ok] A la_muls = 16*la_ops
+  [ok] A S recomputed 0.665403 = recorded 0.665403
+  [ok] A decomposition_rate = relations/residuals
+  [ok] B total_muls 343850212478 = setup+base+stream+oracle+verify+la 343850212478
+  [ok] B oracle = weil+f4+lin+post
+  [ok] B la_muls = 16*la_ops
+  [ok] B S recomputed 0.506288 = recorded 0.506288
+  [ok] B decomposition_rate = relations/residuals
+  [ok] B setup_muls 1807392566 contains fb_line.muls 1806369591
+  B setup minus search = 1022975 vs A setup 1010740 (diff 12235: stream start/step on the moved model, different rng draws)
+  [ok] fb_line.muls 1806369591 vs validator-derived count 1806369601 (diff -10: 1 pmul zero-coefficient skip(s) of 10 mults; never above the executed work)
+  search share of B total: 0.5253%
+  [ok] C4 rate_B/((2B/p)^6/720) = 0.9884
+pmul zero-coefficient skips over the 9 runs: observed 4, expected about 6.01 (21 non-leading Horner coefficients per moved line, each zero w.p. 1/p^2)
+
+== Controls C1, C2 (every field compared)
+C1 vs crossover p1301 s3: differing keys ["f4_ms", "f4_muls_per_test_sum", "fb_line", "lin_ms", "wall_ms"]
+  crossover record has fb_line key: false (C1: null); f4_muls_per_test_sum A 1199281738823 C1 1199743495184 (multi-thread diagnostic, not in S; f4_muls equal: true)
+  [ok] C1: every deterministic field equal (diffs only timing, the racy f4_muls_per_test_sum, and the new fb_line=null key absent from the older schema)
+  [ok] C1 residuals equal: 428147
+  [ok] C1 relation_digest equal: 4667961897523824477
+  [ok] C1 total_muls equal: 409975021213
+  [ok] C1 decompositions equal: 663
+C2 vs C1: differing keys ["f4_ms", "f4_muls_per_test_sum", "fb_line", "lin_ms", "relation_over_rho", "s", "s_over_rho", "setup_muls", "total_muls", "wall_ms"]
+  [ok] C2 residuals/digest/decompositions equal to C1
+  [ok] C2 total and setup exceed C1 by exactly fb_line.muls 22772
+  [ok] C2 fb_line.muls 22772 = derived (p-1)/2 + 17p + 5 = 22772
+  [ok] C2: no other field differs ([])
+
+== 3. Paired recomputation
+| p | seed | B_plain | B_best | S_A | S_B | S_B/S_A | (B_plain/B_best)^5 |
+| 1301 | 1 | 634 | 728 | 1.4940 | 0.7288 | 0.4878 | 0.5009 |
+| 1301 | 2 | 651 | 725 | 1.3366 | 0.7813 | 0.5845 | 0.5837 |
+| 1301 | 3 | 662 | 730 | 1.1249 | 0.7033 | 0.6252 | 0.6133 |
+| 1451 | 1 | 735 | 811 | 0.9821 | 0.6015 | 0.6125 | 0.6114 |
+| 1451 | 2 | 729 | 800 | 1.0364 | 0.6330 | 0.6108 | 0.6283 |
+| 1451 | 3 | 703 | 804 | 1.2412 | 0.6103 | 0.4917 | 0.5111 |
+| 1601 | 1 | 764 | 884 | 1.1184 | 0.5233 | 0.4679 | 0.4822 |
+| 1601 | 2 | 820 | 883 | 0.7164 | 0.5040 | 0.7035 | 0.6907 |
+| 1601 | 3 | 824 | 883 | 0.6654 | 0.5063 | 0.7609 | 0.7077 |
+geo-mean S_B/S_A = 0.5865 [0.5295, 0.6495] (validator bootstrap, 20000, xoshiro, type-7 quantiles); speed-up x1.705 [1.540, 1.888]
+model geo-mean (B_plain/B_best)^5 = 0.5872
+  [ok] H1 decision rule (upper end < 1 and every S_B < S_A) holds
+spread max/min: S_A 2.245x, S_B 1.550x
+log(measured) vs log(model): Pearson r = 0.9920, slope = 1.2032
+
+== Reference: negation-map rhostrong runs of #3278
+  [ok] 126 reference runs at p in {1301,1451,1601} admitted, 0 excluded
+  [ok] p=1301 seed=1: 14 reference runs
+  [ok] p=1301 seed=2: 14 reference runs
+  [ok] p=1301 seed=3: 14 reference runs
+  [ok] p=1451 seed=1: 14 reference runs
+  [ok] p=1451 seed=2: 14 reference runs
+  [ok] p=1451 seed=3: 14 reference runs
+  [ok] p=1601 seed=1: 14 reference runs
+  [ok] p=1601 seed=2: 14 reference runs
+  [ok] p=1601 seed=3: 14 reference runs
+  [ok] l and c_add_e of every reference run equal the cover instance's
+  [ok] s_harness/s_tuned recompute from muls_*/(c_add_e sqrt l): max rel err 2.19e-16 / 1.50e-16
+pooled (b): n 126 mean s_harness 0.9322 mean s_tuned 0.3879 native/sqrt(l) 15.81
+  [ok] pooled reference means agree with 0.9322 / 0.3879 to 4 decimals
+  per-prime (a) p=1301: n 42 s_harness 0.9203 s_tuned 0.3830
+  per-prime (a) p=1451: n 42 s_harness 1.0095 s_tuned 0.4201
+  per-prime (a) p=1601: n 42 s_harness 0.8669 s_tuned 0.3607
+
+== Re-score per prime (estimator (b) pooled, geo-mean over 3 seeds / reference mean; joint bootstrap seeds x refs, 20000)
+arm B (line search):
+  p=1301: geo-mean S 0.7371 | U1 S/rho 0.7906 [0.720, 0.871] below | U2 S/rho 1.9000 [1.731, 2.094] above
+  [ok] p=1301 arm B (line search): U1 0.791 / U2 1.900 equal claimed 0.791 / 1.9 to 3 decimals
+  p=1451: geo-mean S 0.6148 | U1 S/rho 0.6595 [0.607, 0.719] below | U2 S/rho 1.5848 [1.459, 1.729] above
+  [ok] p=1451 arm B (line search): U1 0.659 / U2 1.585 equal claimed 0.659 / 1.585 to 3 decimals
+  p=1601: geo-mean S 0.5111 | U1 S/rho 0.5483 [0.506, 0.596] below | U2 S/rho 1.3176 [1.215, 1.433] above
+  [ok] p=1601 arm B (line search): U1 0.548 / U2 1.318 equal claimed 0.548 / 1.318 to 3 decimals
+arm A (plain; consistency with #3278):
+  p=1301: geo-mean S 1.3097 | U1 S/rho 1.4049 [1.201, 1.633] above | U2 S/rho 3.3760 [2.886, 3.925] above
+  [ok] p=1301 arm A (plain; consistency with #3278): U1 1.405 / U2 3.376 equal claimed 1.405 / 3.376 to 3 decimals
+  p=1451: geo-mean S 1.0810 | U1 S/rho 1.1596 [1.019, 1.338] above | U2 S/rho 2.7867 [2.449, 3.216] above
+  [ok] p=1451 arm A (plain; consistency with #3278): U1 1.160 / U2 2.787 equal claimed 1.16 / 2.787 to 3 decimals
+  p=1601: geo-mean S 0.8108 | U1 S/rho 0.8698 [0.696, 1.182] not resolved | U2 S/rho 2.0902 [1.671, 2.842] above
+  [ok] p=1601 arm A (plain; consistency with #3278): U1 0.870 / U2 2.090 equal claimed 0.87 / 2.09 to 3 decimals
+
+== Section 5a band (w GAE per native op; cover native = f4_native_ops, lower bound)
+as specified (f4_native_ops only)
+  w=0: p=1301 U1 0.791 [0.721,0.872] below / U2 1.900 [1.732,2.096] above; p=1451 U1 0.659 [0.608,0.720] below / U2 1.585 [1.461,1.730] above; p=1601 U1 0.548 [0.505,0.597] below / U2 1.318 [1.214,1.434] above;
+  w=0.1: p=1301 U1 0.822 [0.750,0.907] below / U2 1.050 [0.957,1.158] not resolved; p=1451 U1 0.686 [0.632,0.748] below / U2 0.875 [0.807,0.955] below; p=1601 U1 0.570 [0.526,0.621] below / U2 0.728 [0.671,0.792] below;
+  w=1: p=1301 U1 0.838 [0.764,0.924] below / U2 0.866 [0.790,0.955] below; p=1451 U1 0.699 [0.644,0.763] below / U2 0.722 [0.665,0.789] below; p=1601 U1 0.581 [0.536,0.633] below / U2 0.601 [0.554,0.655] below;
+variant: + the search's 65536*p square-table lookups as cover native ops (validator addition)
+  w=0: p=1301 U1 0.791 [0.721,0.872] below / U2 1.900 [1.732,2.096] above; p=1451 U1 0.659 [0.607,0.719] below / U2 1.585 [1.460,1.728] above; p=1601 U1 0.548 [0.505,0.598] below / U2 1.318 [1.215,1.437] above;
+  w=0.1: p=1301 U1 0.825 [0.754,0.909] below / U2 1.054 [0.962,1.161] not resolved; p=1451 U1 0.688 [0.634,0.751] below / U2 0.878 [0.809,0.959] below; p=1601 U1 0.572 [0.528,0.623] below / U2 0.730 [0.674,0.795] below;
+  w=1: p=1301 U1 0.843 [0.768,0.929] below / U2 0.871 [0.794,0.961] below; p=1451 U1 0.703 [0.646,0.766] below / U2 0.726 [0.668,0.792] below; p=1601 U1 0.584 [0.539,0.636] below / U2 0.604 [0.557,0.657] below;
+
+== Crossover p* (model, slope -2.10 not refit; G = geo-mean of S/rho_i * p_i^2.10)
+  U1: p* = 1185
+  U2: p* = 1799
+
+== Sensitivity of the U1 'below' verdicts to the cover's unemitted F_p additions (ASSUMPTION: k additions per counted F_p mult on the cover; rho's fp_adds are emitted)
+  reference fp_adds in S units (per c_add_e*sqrt l): 0.1272
+  p=1301: S_B 0.7371; with k=0.5: U1 point estimate reaches 1 when an F_p addition costs alpha* = 0.809 F_p mults
+  p=1301: S_B 0.7371; with k=1: U1 point estimate reaches 1 when an F_p addition costs alpha* = 0.320 F_p mults
+  p=1451: S_B 0.6148; with k=0.5: U1 point estimate reaches 1 when an F_p addition costs alpha* = 1.761 F_p mults
+  p=1451: S_B 0.6148; with k=1: U1 point estimate reaches 1 when an F_p addition costs alpha* = 0.651 F_p mults
+  p=1601: S_B 0.5111; with k=0.5: U1 point estimate reaches 1 when an F_p addition costs alpha* = 3.280 F_p mults
+  p=1601: S_B 0.5111; with k=1: U1 point estimate reaches 1 when an F_p addition costs alpha* = 1.097 F_p mults
+
+== Line-search gain vs p (model): B_best = p/2 + k*sqrt(p)/2, gain g(p) = (1 + k/sqrt p)^-5 against a mean plain line
+  B_best z-scores: [4.3, 4.13, 4.41, 4.49, 3.91, 4.12, 4.17, 4.12, 4.12]; mean k = 4.198
+  B_plain z-scores: mean -0.047, sd 1.034 (sd 1 expected if sigma_B = sqrt(p)/2)
+  p=1301: g(p) = 0.5767, local d ln g / d ln p = +0.261
+  p=1451: g(p) = 0.5929, local d ln g / d ln p = +0.248
+  p=1601: g(p) = 0.6072, local d ln g / d ln p = +0.237
+  p=1799: g(p) = 0.6238, local d ln g / d ln p = +0.225
+  p=1850: g(p) = 0.6278, local d ln g / d ln p = +0.222
+  p=2039: g(p) = 0.6412, local d ln g / d ln p = +0.213
+  p=4096: g(p) = 0.7279, local d ln g / d ln p = +0.154
+  p=65536: g(p) = 0.9219, local d ln g / d ln p = +0.040
+  U1: p* with the gain's p-dependence added to slope -2.10: 1152
+  U2: p* with the gain's p-dependence added to slope -2.10: 1850
+
+== 5. Replay comparison: /home/user/crypto/research/jv_cover_fbline_20261102/review/validator/replay/line_p1301_s3.json vs committed results/line_p1301_s3.json
+  fields compared: 67; differing: ["f4_ms", "f4_muls_per_test_sum", "lin_ms", "wall_ms"]
+  total_muls: committed 256314105656 | replay 256314105656
+  residuals: committed 265906 | replay 265906
+  relation_digest: committed 7945254227474834773 | replay 7945254227474834773
+  decompositions: committed 731 | replay 731
+  relations: committed 731 | replay 731
+  base: committed 730 | replay 730
+  setup_muls: committed 1473116883 | replay 1473116883
+  f4_muls: committed 198197818058 | replay 198197818058
+  f4_native_ops: committed 13962232205 | replay 13962232205
+  la_ops: committed 13223299 | replay 13223299
+  solved: committed true | replay true
+  correct: committed true | replay true
+  fb_line: committed {"b_best":730,"b_plain":662,"best_index":8085,"candidates":65536,"muls":1472135851} | replay {"b_best":730,"b_plain":662,"best_index":8085,"candidates":65536,"muls":1472135851}
+  [ok] replay equal in every deterministic field (allowed to differ: wall_ms, f4_ms, lin_ms, f4_muls_per_test_sum); deterministic diffs []
+
+failures: 0

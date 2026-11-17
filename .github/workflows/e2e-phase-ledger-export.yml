@@ -1,0 +1,129 @@
+name: Export fixed E2E phase-ledger analyses
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  analyze:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: t0
+            workflow_run: '41343651715'
+            job_name: gh-41343651715-1
+          - shard: t1
+            workflow_run: '41343654905'
+            job_name: gh-41343654905-1
+    env:
+      AWS_REGION: ${{ vars.ISOLAB_AWS_REGION }}
+      ISOLAB_BUCKET: ${{ vars.ISOLAB_RESULTS_BUCKET }}
+      SOURCE_REVISION: 32303a6d51d7a43ce887cd9da8f6d82afea4793c
+    steps:
+      - name: Check out the measured source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ env.SOURCE_REVISION }}
+          path: source
+          persist-credentials: false
+
+      - name: Download the exact measured binary
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: isolab-build-${{ matrix.workflow_run }}-1
+          github-token: ${{ github.token }}
+          repository: isogeny-labs/crypto
+          run-id: ${{ matrix.workflow_run }}
+          path: ${{ runner.temp }}/isolab-build
+
+      - name: Obtain temporary read credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: e2e-ledger-export-${{ matrix.shard }}-${{ github.run_id }}
+          role-duration-seconds: 7200
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+
+      - name: Download and independently verify the private payload
+        env:
+          JOB_NAME: ${{ matrix.job_name }}
+        run: |
+          set -euo pipefail
+          raw="$RUNNER_TEMP/raw-${{ matrix.shard }}"
+          mkdir -p "$raw"
+          aws s3 cp "s3://$ISOLAB_BUCKET/runs/$JOB_NAME/" "$raw/" --recursive --only-show-errors
+          mapfile -d '' sums < <(find "$raw" -type f -name SHA256SUMS -print0)
+          [[ ${#sums[@]} -ge 1 ]]
+          : > "$RUNNER_TEMP/payload-verification-${{ matrix.shard }}.txt"
+          for manifest in "${sums[@]}"; do
+            (cd "$(dirname "$manifest")" && sha256sum -c SHA256SUMS) \
+              >> "$RUNNER_TEMP/payload-verification-${{ matrix.shard }}.txt"
+          done
+
+      - name: Verify receipt and run the frozen analysis
+        env:
+          JOB_NAME: ${{ matrix.job_name }}
+          WORKFLOW_RUN: ${{ matrix.workflow_run }}
+        run: |
+          set -euo pipefail
+          raw="$RUNNER_TEMP/raw-${{ matrix.shard }}"
+          mapfile -t results < <(find "$raw" -type f -path '*/launcher/*/result.json' | sort)
+          [[ ${#results[@]} -eq 1 ]]
+          result=${results[0]}
+          jq -e --arg source "$SOURCE_REVISION" --arg job "$JOB_NAME" \
+            '.schema=="isolab.eks.result/v1" and .state=="succeeded" and .exit_code==0 and
+             .job_name==$job and .build.source_revision==$source' \
+            "$result" >/dev/null
+
+          mapfile -t records < <(find "$raw" -type f -path '*/session/records.jsonl')
+          [[ ${#records[@]} -eq 1 ]]
+          session=$(dirname "${records[0]}")
+          binary="$RUNNER_TEMP/isolab-build/ecbench"
+          [[ -x "$binary" ]] || chmod +x "$binary"
+          expected=$(jq -er .build.ecbench_sha256 "$result")
+          actual=$(sha256sum "$binary" | cut -d ' ' -f1)
+          [[ "$actual" == "$expected" ]]
+
+          export_dir="$RUNNER_TEMP/export-${{ matrix.shard }}"
+          mkdir -p "$export_dir/comparisons" "$export_dir/receipts"
+          source/research/e2e_phase_ledger_20261101/analyze.sh "$session" "$binary" \
+            > "$export_dir/analysis.log" 2>&1
+          cp "$result" "$export_dir/receipts/launcher-result.json"
+          cp "$RUNNER_TEMP/payload-verification-${{ matrix.shard }}.txt" \
+            "$export_dir/receipts/payload-verification.txt"
+          find "$raw" -type f \( -name audit.json -o -name l2-gate.json -o -name job-exit.json \) \
+            -exec cp '{}' "$export_dir/receipts/" \;
+          cp "$session/session.json" "$export_dir/receipts/session.json"
+          cp "$session/plan.json" "$export_dir/receipts/plan.json"
+          cp "$session"/comparisons/*.json "$export_dir/comparisons/"
+          jq -n --arg shard "${{ matrix.shard }}" --arg run "$WORKFLOW_RUN" \
+            --arg job "$JOB_NAME" --arg source "$SOURCE_REVISION" --arg binary "$actual" \
+            '{schema:"e2e.phase-ledger.export/v1",shard:$shard,workflow_run:$run,
+              job_name:$job,source_revision:$source,ecbench_sha256:$binary,
+              raw_records_exported:false}' > "$export_dir/export.json"
+          (cd "$export_dir" && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS)
+
+      - name: Upload only receipts and derived analysis
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: e2e-phase-ledger-${{ matrix.shard }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/export-${{ matrix.shard }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Report the bounded export
+        run: |
+          printf 'Shard `%s`: private S3 payload verified; exact measured binary replayed all deterministic records; exported only receipts and derived analysis. Raw records were not uploaded.\n' \
+            '${{ matrix.shard }}' >> "$GITHUB_STEP_SUMMARY"

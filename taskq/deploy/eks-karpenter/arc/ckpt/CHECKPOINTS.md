@@ -44,8 +44,10 @@ have passed since the last save, and when the process gets SIGTERM or SIGINT.
    16000 IOPS and 1000 MiB/s, about $0.27 per hour while a node exists), referenced
    from the `gha-xmem` NodePool's `nodeClassRef`, and the xmem scale sets' pod
    templates set `serviceAccountName: arc-xmem-runner` and request 600 GiB (512 GiB
-   pool) or 800 GiB (1 TiB pool) of `ephemeral-storage`. These edits are to files of
-   the PR that adds the pools and are made after it merges.
+   pool) or 800 GiB (1 TiB pool) of `ephemeral-storage`. These edits are made:
+   `nodepool.yaml`, `xmem-values.yaml` and `xmem1t-values.yaml` carry them, and
+   `deploy.sh` applies `nodeclass-xmem.yaml` before the NodePool. The pods stay
+   Pending until step 3's service account exists in `arc-runners`.
 
 Then set the variable `DREG_CKPT_WATCH=c1-deg5` to let the two-hourly watchdog
 start the job and restart it after a node loss, or dispatch

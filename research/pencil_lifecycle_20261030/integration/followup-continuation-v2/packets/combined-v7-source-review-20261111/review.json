@@ -1,0 +1,46 @@
+{
+  "schema": "independent.prospective-source-review/v1",
+  "recorded_utc": "2026-11-11T02:42:15.355435+00:00",
+  "reviewed_manifest_sha256": "81099aee131bbdf3f61117a6f4a20b29751ba0de6f795f980256488af93fc59e",
+  "reviewed_materializer_sha256": "3ca68126236d1448c072b44ce239132357e532d35b2b8a5cce5dc639e0da8cca",
+  "reviewed_worker_sha256": "6d8b1d57ef759d8197b6a1694d1ce81e7cd7cf075b3e3c4d6a209e68128c614a",
+  "status": "no_remaining_static_source_blocker_with_final_admission_obligations",
+  "semantic_members_verified": 32,
+  "runtime_packet_pins_verified": 26,
+  "overlays_verified": 8,
+  "driver_sources_verified": 50,
+  "driver_sources_with_execute_bits": 0,
+  "expected_source_inventory_reconstructed_files": 4485,
+  "cache_regular_file_modes_verified": 2165,
+  "cache_executable_files": 82,
+  "cache_special_bits": 0,
+  "mode_inventory_sha256": "c432da2dff731eaf5cd58593ef3267500c64bc13e53f25e57f22184b990bf241",
+  "observations": [
+    "copy receives exact mode for every cache file, checks source mode before and after copy, fchmods destination, fsyncs metadata and checks destination mode",
+    "All copied cache executable inputs are in the frozen inventory; driver inputs have no execute bits and are source/data, while runtime Python is invoked via interpreter and Rust toolchain remains pinned in place",
+    "Strict target lstat monitor preserved; only FileNotFoundError permits absence during materialization",
+    "Eight overlay bytes and fifty driver sources match declared hashes; reconstructed fullsource inventory matches4485files",
+    "Freshworkspace/durablepaths absent at review; unchanged2CPU16GiB1800+600oneattemptnoautoretry/noondeadline",
+    "Original v6 permission failure remains recorded separately; no tests or native qualification were run by review",
+    "Worker lines 197-199 require the exact inventory hash, 2165 mode-checked files, 82 executable files and cache_modes_preserved=true before proceeding."
+  ],
+  "final_admission_obligations": [
+    {
+      "id": "A1",
+      "requirement": "Use exact inventory.cache_manifest dictionary, not repository-mirror path, because materializer compares path and hash together",
+      "required_fresh_cache_manifest": {
+        "path": "/home/ec2-user/pencil-validation-receipts/root-cache-snapshot-renewal-20261111/current-cache.json",
+        "sha256": "9eae2a2fc003071692c5058e52b6e712f2d3ee0ad87e5c2086bc08240479c850"
+      },
+      "native_path_exists_and_hash_matches": true,
+      "draft_currently_unset": true
+    },
+    {
+      "id": "A2",
+      "requirement": "Bind current charged/reserved ledger, serial terminal, live owner, exact published source/readback and both actual generated lockfiles before release; draft remains unreleased"
+    }
+  ],
+  "execution_performed": false,
+  "source_modified": false,
+  "verdict_scope": "prospective static source fidelity only"
+}

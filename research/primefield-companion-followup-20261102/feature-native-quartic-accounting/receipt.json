@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-11-05T18:56:28.861676+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-accounting/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-quartic-accounting-20261105/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-quartic-accounting-20261105/tests",
+        "accounting_tests::",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 36,
+  "binary_sha256": "c3945673abf36bdcfd4f583a60a9cfcfa9f6a308afa8fefe34dab25def2b0c54",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

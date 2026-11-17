@@ -1,0 +1,116 @@
+negrho_rescore; frozen constants: NB 20000, NPERM 20000, slope -2.1, theory steps/sqrt(l) = sqrt(pi/4)/sqrt(1-1/256) = 0.88796
+l and c_add_e of all 126 rhostrong runs match the cover records: true
+new run indices complete on all 9 instances: [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]; incomplete (excluded from analysis): []
+reference runs per instance: 2 old + 12 new = 14; per prime 42; new primes 126; red-team p=251 64
+instance p=1301 seed=1: n 14 steps/sqrt(l) mean 0.7987 sd 0.422 (l = 1.212282e18)
+instance p=1301 seed=2: n 14 steps/sqrt(l) mean 0.8804 sd 0.520 (l = 1.212282e18)
+instance p=1301 seed=3: n 14 steps/sqrt(l) mean 0.9594 sd 0.368 (l = 1.212282e18)
+instance p=1451 seed=1: n 14 steps/sqrt(l) mean 0.8692 sd 0.385 (l = 2.333160e18)
+instance p=1451 seed=2: n 14 steps/sqrt(l) mean 0.8331 sd 0.436 (l = 2.333160e18)
+instance p=1451 seed=3: n 14 steps/sqrt(l) mean 0.8356 sd 0.377 (l = 2.333160e18)
+instance p=1601 seed=1: n 14 steps/sqrt(l) mean 1.0253 sd 0.431 (l = 4.210057e18)
+instance p=1601 seed=2: n 14 steps/sqrt(l) mean 0.8146 sd 0.345 (l = 4.210057e18)
+instance p=1601 seed=3: n 14 steps/sqrt(l) mean 1.0019 sd 0.523 (l = 4.210057e18)
+s_harness / (steps/sqrt l) - 1 over the 126 new-prime runs: mean -0.00016, min -0.00022, max +0.00034; s_tuned/s_harness: min 0.41611, max 0.41613
+HOMOGENEITY across p in {1301,1451,1601}, steps/sqrt(l): group means [0.8795, 0.846, 0.9473] (n [42, 42, 42]); one-way ANOVA F 0.6273 perm-p 0.5373; Kruskal-Wallis H 0.8423 perm-p 0.6626 chi2(2)-p 0.6563
+  incl. p=251 red-team runs (4 groups, information): means [0.8641, 0.8795, 0.846, 0.9473]; ANOVA F 0.4102 perm-p 0.7533; KW H 1.6443 perm-p 0.6539
+HOMOGENEITY across p in {1301,1451,1601}, s_harness: group means [0.8793, 0.8458, 0.9471] (n [42, 42, 42]); one-way ANOVA F 0.6271 perm-p 0.5325; Kruskal-Wallis H 0.8423 perm-p 0.6532 chi2(2)-p 0.6563
+  incl. p=251 red-team runs (4 groups, information): means [0.8694, 0.8793, 0.8458, 0.9471]; ANOVA F 0.3920 perm-p 0.7632; KW H 1.4968 perm-p 0.6834
+HOMOGENEITY across p in {1301,1451,1601}, s_tuned: group means [0.3659, 0.352, 0.3941] (n [42, 42, 42]); one-way ANOVA F 0.6271 perm-p 0.5387; Kruskal-Wallis H 0.8423 perm-p 0.6638 chi2(2)-p 0.6563
+  incl. p=251 red-team runs (4 groups, information): means [0.3616, 0.3659, 0.352, 0.3941]; ANOVA F 0.3931 perm-p 0.7538; KW H 1.5022 perm-p 0.6783
+  across the 9 instances (diagnostic), steps/sqrt(l): ANOVA F 0.5403 perm-p 0.8191; KW H 3.3244 perm-p 0.9156
+FROZEN CHOICE: homogeneity holds (both permutation p >= 0.05 on steps/sqrt(l)) -> primary reference estimator (b) pooled across the three new primes
+POSITIVE CONTROL (a1301): n 42 steps/sqrt(l) mean 0.8795 sd 0.435 se 0.0672; theory 0.8880; z -0.13; within 3 se: true
+POSITIVE CONTROL (a1451): n 42 steps/sqrt(l) mean 0.8460 sd 0.391 se 0.0603; theory 0.8880; z -0.70; within 3 se: true
+POSITIVE CONTROL (a1601): n 42 steps/sqrt(l) mean 0.9473 sd 0.439 se 0.0677; theory 0.8880; z +0.88; within 3 se: true
+POSITIVE CONTROL (b): n 126 steps/sqrt(l) mean 0.8909 sd 0.421 se 0.0375; theory 0.8880; z +0.08; within 3 se: true
+POSITIVE CONTROL (c): n 190 steps/sqrt(l) mean 0.8819 sd 0.452 se 0.0328; theory 0.8880; z -0.19; within 3 se: true
+positive control on the pooled references (b) and (c): PASSED
+ref (a) p=1301: n 42 steps/sqrt(l) 0.8795 s_harness 0.8793 s_tuned 0.3659 native/sqrt(l) 14.91 fp_adds/sqrt(l) 39.7
+ref (a) p=1451: n 42 steps/sqrt(l) 0.8460 s_harness 0.8458 s_tuned 0.3520 native/sqrt(l) 14.34 fp_adds/sqrt(l) 38.2
+ref (a) p=1601: n 42 steps/sqrt(l) 0.9473 s_harness 0.9471 s_tuned 0.3941 native/sqrt(l) 16.06 fp_adds/sqrt(l) 42.8
+ref (b): n 126 steps/sqrt(l) 0.8909 s_harness 0.8907 s_tuned 0.3707 native/sqrt(l) 15.11 fp_adds/sqrt(l) 40.2
+ref (c): n 190 steps/sqrt(l) 0.8819 s_harness 0.8836 s_tuned 0.3676 native/sqrt(l) 14.95 fp_adds/sqrt(l) 39.9
+U1 group additions | est (a) per-prime | p=1301 | cover geo-mean S 0.3890 | ref 0.8793 | S/rho 0.442 [0.382, 0.521] -> below
+U1 group additions | est (a) per-prime | p=1451 | cover geo-mean S 0.3246 | ref 0.8458 | S/rho 0.384 [0.336, 0.447] -> below
+U1 group additions | est (a) per-prime | p=1601 | cover geo-mean S 0.2697 | ref 0.9471 | S/rho 0.285 [0.250, 0.330] -> below
+U1 group additions | est (b) pooled new primes | p=1301 | cover geo-mean S 0.3890 | ref 0.8907 | S/rho 0.437 [0.398, 0.481] -> below
+U1 group additions | est (b) pooled new primes | p=1451 | cover geo-mean S 0.3246 | ref 0.8907 | S/rho 0.364 [0.336, 0.398] -> below
+U1 group additions | est (b) pooled new primes | p=1601 | cover geo-mean S 0.2697 | ref 0.8907 | S/rho 0.303 [0.280, 0.330] -> below
+U1 group additions | est (c) pooled + p=251 | p=1301 | cover geo-mean S 0.3890 | ref 0.8836 | S/rho 0.440 [0.404, 0.481] -> below
+U1 group additions | est (c) pooled + p=251 | p=1451 | cover geo-mean S 0.3246 | ref 0.8836 | S/rho 0.367 [0.341, 0.397] -> below
+U1 group additions | est (c) pooled + p=251 | p=1601 | cover geo-mean S 0.2697 | ref 0.8836 | S/rho 0.305 [0.284, 0.330] -> below
+U2 textbook F_p mults | est (a) per-prime | p=1301 | cover geo-mean S 0.3890 | ref 0.3659 | S/rho 1.063 [0.919, 1.251] -> not resolved
+U2 textbook F_p mults | est (a) per-prime | p=1451 | cover geo-mean S 0.3246 | ref 0.3520 | S/rho 0.922 [0.807, 1.073] -> not resolved
+U2 textbook F_p mults | est (a) per-prime | p=1601 | cover geo-mean S 0.2697 | ref 0.3941 | S/rho 0.684 [0.601, 0.792] -> below
+U2 textbook F_p mults | est (b) pooled new primes | p=1301 | cover geo-mean S 0.3890 | ref 0.3707 | S/rho 1.050 [0.957, 1.155] -> not resolved
+U2 textbook F_p mults | est (b) pooled new primes | p=1451 | cover geo-mean S 0.3246 | ref 0.3707 | S/rho 0.876 [0.807, 0.956] -> below
+U2 textbook F_p mults | est (b) pooled new primes | p=1601 | cover geo-mean S 0.2697 | ref 0.3707 | S/rho 0.728 [0.672, 0.793] -> below
+U2 textbook F_p mults | est (c) pooled + p=251 | p=1301 | cover geo-mean S 0.3890 | ref 0.3676 | S/rho 1.058 [0.972, 1.155] -> not resolved
+U2 textbook F_p mults | est (c) pooled + p=251 | p=1451 | cover geo-mean S 0.3246 | ref 0.3676 | S/rho 0.883 [0.820, 0.954] -> below
+U2 textbook F_p mults | est (c) pooled + p=251 | p=1601 | cover geo-mean S 0.2697 | ref 0.3676 | S/rho 0.734 [0.683, 0.792] -> below
+### Result per prime, primary estimator (b) pooled new primes (frozen choice: homogeneity holds)
+
+S/rho = geometric mean over the 3 cover seeds of S, divided by the reference mean; 95% percentile bootstrap, 20000 resamples of seeds and reference runs jointly (derived). Distance remaining = the factor by which the cover must improve to reach the matched rho (S/rho itself when above 1; the cover is ahead by 1/(S/rho) otherwise).
+
+| unit | p | cover geo-mean S (measured) | reference mean (derived) | S/rho [95% boot] | verdict | distance remaining |
+|---|---|---|---|---|---|---|
+| U1 group additions | 1301 | 0.389 | 0.8907 | **0.437** [0.398, 0.481] | below | none: ahead by x2.29 [2.08, 2.51] |
+| U1 group additions | 1451 | 0.325 | 0.8907 | **0.364** [0.336, 0.398] | below | none: ahead by x2.74 [2.51, 2.98] |
+| U1 group additions | 1601 | 0.270 | 0.8907 | **0.303** [0.280, 0.330] | below | none: ahead by x3.30 [3.03, 3.58] |
+| U2 textbook F_p mults | 1301 | 0.389 | 0.3707 | **1.050** [0.957, 1.155] | not resolved | x1.05 [0.96, 1.16] |
+| U2 textbook F_p mults | 1451 | 0.325 | 0.3707 | **0.876** [0.807, 0.956] | below | none: ahead by x1.14 [1.05, 1.24] |
+| U2 textbook F_p mults | 1601 | 0.270 | 0.3707 | **0.728** [0.672, 0.793] | below | none: ahead by x1.37 [1.26, 1.49] |
+
+### All three reference estimators (w = 0)
+
+| unit | estimator | n | ref mean | p=1301 | p=1451 | p=1601 |
+|---|---|---|---|---|---|---|
+| U1 group additions | (a) per-prime | 42/42/42 | 0.8793/0.8458/0.9471 | 0.442 [0.382, 0.521] below | 0.384 [0.336, 0.447] below | 0.285 [0.250, 0.330] below |
+| U1 group additions | (b) pooled new primes | 126 | 0.8907 | 0.437 [0.398, 0.481] below | 0.364 [0.336, 0.398] below | 0.303 [0.280, 0.330] below |
+| U1 group additions | (c) pooled + p=251 | 190 | 0.8836 | 0.440 [0.404, 0.481] below | 0.367 [0.341, 0.397] below | 0.305 [0.284, 0.330] below |
+| U2 textbook F_p mults | (a) per-prime | 42/42/42 | 0.3659/0.3520/0.3941 | 1.063 [0.919, 1.251] not resolved | 0.922 [0.807, 1.073] not resolved | 0.684 [0.601, 0.792] below |
+| U2 textbook F_p mults | (b) pooled new primes | 126 | 0.3707 | 1.050 [0.957, 1.155] not resolved | 0.876 [0.807, 0.956] below | 0.728 [0.672, 0.793] below |
+| U2 textbook F_p mults | (c) pooled + p=251 | 190 | 0.3676 | 1.058 [0.972, 1.155] not resolved | 0.883 [0.820, 0.954] below | 0.734 [0.683, 0.792] below |
+
+### Section 5a band (primary estimator; native operations priced at w group-addition equivalents each, on both arms)
+
+Cover native count = `f4_native_ops` (emitted, a LOWER BOUND: F_p additions, pair selection, memory traffic not emitted). Reference native count = canon_cmp + hash + dp_check + scalar_ops + table_ops + cycle_cmp (emitted by the walk; `fp_adds` listed separately below, not priced in the band).
+
+| unit | p | w=0 | w=0.1 | w=1 | same verdict at all w | cover native/sqrt(l) (lower bound) | rho native/sqrt(l) |
+|---|---|---|---|---|---|---|---|
+| U1 group additions | 1301 | 0.437 [0.398, 0.481] below | 0.706 [0.644, 0.778] below | 0.841 [0.767, 0.927] below | yes (below) | 13.08 | 15.11 |
+| U1 group additions | 1451 | 0.364 [0.336, 0.398] below | 0.589 [0.543, 0.643] below | 0.701 [0.646, 0.766] below | yes (below) | 10.90 | 15.11 |
+| U1 group additions | 1601 | 0.303 [0.280, 0.330] below | 0.490 [0.452, 0.534] below | 0.583 [0.539, 0.636] below | yes (below) | 9.06 | 15.11 |
+| U2 textbook F_p mults | 1301 | 1.050 [0.957, 1.155] not resolved | 0.901 [0.822, 0.993] below | 0.870 [0.793, 0.958] below | NO | 13.08 | 15.11 |
+| U2 textbook F_p mults | 1451 | 0.876 [0.807, 0.956] below | 0.752 [0.693, 0.821] below | 0.725 [0.668, 0.792] below | yes (below) | 10.90 | 15.11 |
+| U2 textbook F_p mults | 1601 | 0.728 [0.672, 0.793] below | 0.625 [0.577, 0.681] below | 0.603 [0.557, 0.657] below | yes (below) | 9.06 | 15.11 |
+
+Unpriced counters listed (section 5a): reference `fp_adds` 40.2 per sqrt(l) (about 45.1 per step), emitted; cover F_p additions: NOT emitted (cover is a lower bound); cover residual-table and factor-base bytes: not operations, not charged (5a, 2026-11-01). Because the cover count is a lower bound, an "above" verdict at w = 0 can only widen under complete counts; a "below" or "not resolved" verdict could flip.
+
+p* U1 group additions (a) per-prime: 894 [861, 932] slope -1.99: 870, -2.21: 916
+p* U1 group additions (b) pooled new primes: 893 [860, 931] slope -1.99: 870, -2.21: 915
+p* U1 group additions (c) pooled + p=251: 897 [867, 930] slope -1.99: 874, -2.21: 918
+p* U2 textbook F_p mults (a) per-prime: 1357 [1307, 1415] slope -1.99: 1352, -2.21: 1361
+p* U2 textbook F_p mults (b) pooled new primes: 1356 [1305, 1413] slope -1.99: 1352, -2.21: 1361
+p* U2 textbook F_p mults (c) pooled + p=251: 1362 [1316, 1412] slope -1.99: 1357, -2.21: 1366
+CONTROL (i) original study S/rhodp n=6/9 p=1301: tool 0.236 [0.180, 0.324] vs published 0.793 [0.587, 1.119]: match to 3 decimals: false
+CONTROL (i) original study S/rhostrong n=6/9 p=1301: tool 0.553 [0.435, 0.754] vs published 1.349 [1.085, 1.699]: match to 3 decimals: false
+CONTROL (i) original study S/rhodp n=6/9 p=1451: tool 0.233 [0.201, 0.283] vs published 0.775 [0.645, 0.970]: match to 3 decimals: false
+CONTROL (i) original study S/rhostrong n=6/9 p=1451: tool 0.364 [0.277, 0.530] vs published 1.063 [0.819, 1.477]: match to 3 decimals: false
+CONTROL (i) original study S/rhodp n=6/9 p=1601: tool 0.195 [0.167, 0.232] vs published 0.587 [0.448, 0.811]: match to 3 decimals: false
+CONTROL (i) original study S/rhostrong n=6/9 p=1601: tool 0.322 [0.247, 0.461] vs published 0.910 [0.658, 1.339]: match to 3 decimals: false
+CONTROL (ii) red team R4 per-prime n=6 steps p=1301: tool 0.553 [0.435, 0.754] vs report 1.349 [1.089, 1.699]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R4 per-prime n=6 steps p=1451: tool 0.364 [0.277, 0.529] vs report 1.063 [0.809, 1.476]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R4 per-prime n=6 steps p=1601: tool 0.322 [0.247, 0.462] vs report 0.909 [0.649, 1.339]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R5 pooled 82 steps p=1301: tool 0.456 [0.403, 0.521] vs report 1.480 [1.244, 1.759]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R5 pooled 82 steps p=1451: tool 0.381 [0.338, 0.431] vs report 1.221 [1.042, 1.437]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R5 pooled 82 steps p=1601: tool 0.316 [0.281, 0.358] vs report 0.916 [0.718, 1.239]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R6 theory 0.8880 p=1301: tool 0.438 [0.418, 0.464] vs report 1.475 [1.267, 1.682]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R6 theory 0.8880 p=1451: tool 0.366 [0.358, 0.376] vs report 1.217 [1.106, 1.398]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R6 theory 0.8880 p=1601: tool 0.304 [0.300, 0.311] vs report 0.913 [0.749, 1.260]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R7 pooled 82 tuned p=1301: tool 1.092 [0.961, 1.244] vs report 3.540 [2.971, 4.193]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R7 pooled 82 tuned p=1451: tool 0.911 [0.809, 1.030] vs report 2.922 [2.518, 3.453]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) red team R7 pooled 82 tuned p=1601: tool 0.757 [0.675, 0.855] vs report 2.192 [1.710, 2.977]: point match to 3 decimals false; interval within 0.01 (own RNG stream) false
+CONTROL (ii) pooled 82 runs: steps/sqrt(l) 0.8524 +- 0.0534 (report: 0.885 +- 0.054)
+consistency controls (point estimates to 3 decimals): FAILED

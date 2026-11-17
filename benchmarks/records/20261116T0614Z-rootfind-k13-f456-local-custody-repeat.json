@@ -1,0 +1,217 @@
+{
+  "branch": "codex/rootfind-k13-local-f456-screen-20261116",
+  "closed_utc": "2026-11-16T06:32:18+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target/release/ecbench",
+        "run",
+        "--spec",
+        "research/rootfind_k13_local_f456_screen_20261116/SPEC-K13-SCREEN.json",
+        "--out",
+        "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--wait"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T06:15:12+00:00",
+      "wall_s": 130.984
+    }
+  ],
+  "commit": "8f4cc824c87a236aafd28aa390c744e355a08e45",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T06:14:33+00:00",
+  "curve_uid": "EC1N13Ce0h1dfa32cdf623",
+  "entries": [
+    "research/rootfind_k13_local_f456_screen_20261116"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261116T0614Z-rootfind-k13-f456-local-custody-repeat",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "local_l0_batch_m3_complete_process_wall_median",
+      "note": "Measured on four verified rows; L0 descriptive only",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.010774646
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 4,
+      "name": "local_l0_batch_m3_over_matrix_f4_complete_wall_sum_ratio",
+      "note": "Derived from four exact target-round pairs; L0 descriptive only; PCC-20261116-3b7488 is not_covered",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.000924480426925755
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 4,
+      "name": "local_l0_batch_m3_over_matrix_f5_complete_wall_sum_ratio",
+      "note": "Derived from four exact target-round pairs; L0 descriptive only; PCC-20261116-3b7488 is not_covered",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.0011014841769916715
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 4,
+      "name": "local_l0_batch_m3_over_inherited_f4_complete_wall_sum_ratio",
+      "note": "Derived from four exact target-round pairs; L0 descriptive only; PCC-20261116-3b7488 is not_covered",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.10224557815167018
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 4,
+      "name": "local_l0_batch_m3_over_f6_ic_complete_wall_sum_ratio",
+      "note": "Derived from four exact target-round pairs; L0 descriptive only; PCC-20261116-3b7488 is not_covered",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.22155060492401862
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 4,
+      "name": "local_l0_batch_m3_over_rootfind_m3_complete_wall_sum_ratio",
+      "note": "Derived from four exact target-round pairs; L0 descriptive only; PCC-20261116-3b7488 is not_covered",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.106297622667769
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 4,
+      "name": "local_l0_batch_m3_over_batch_m3_aa_complete_wall_sum_ratio",
+      "note": "Derived from four exact target-round pairs; L0 descriptive only; PCC-20261116-3b7488 is not_covered",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0385716096459026
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 4,
+      "name": "local_l0_batch_m3_over_rho_strong_complete_wall_sum_ratio",
+      "note": "Derived from four exact target-round pairs; L0 descriptive only; PCC-20261116-3b7488 is not_covered",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.139284615944602
+    }
+  ],
+  "problem": "ecdlp:EC1N13Ce0h1dfa32cdf623",
+  "raw": [
+    {
+      "bytes": 3218,
+      "path": "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/spec.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5c/5c6b17ddf935d3e9ba153e0617a8b40522e6bbd79fc346932a830ddcb91e94ee",
+      "sha256": "5c6b17ddf935d3e9ba153e0617a8b40522e6bbd79fc346932a830ddcb91e94ee",
+      "uploaded": true
+    },
+    {
+      "bytes": 1941,
+      "path": "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7f/7fca63dab6d42c3cacd5c85c8d03cddc006526dd28c3642636766427ad56b3da",
+      "sha256": "7fca63dab6d42c3cacd5c85c8d03cddc006526dd28c3642636766427ad56b3da",
+      "uploaded": true
+    },
+    {
+      "bytes": 3549,
+      "path": "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/22/229a8500fd5e314eb13feeb695e2449bf0cf3a30bd162451f48dcfb3a24e989c",
+      "sha256": "229a8500fd5e314eb13feeb695e2449bf0cf3a30bd162451f48dcfb3a24e989c",
+      "uploaded": true
+    },
+    {
+      "bytes": 14725,
+      "path": "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/40/4006d38f50d4118166e760ab16450931f6beef491c1e6782d58ed15cb5fb0740",
+      "sha256": "4006d38f50d4118166e760ab16450931f6beef491c1e6782d58ed15cb5fb0740",
+      "uploaded": true
+    },
+    {
+      "bytes": 453126,
+      "path": "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dc/dc16c97ae21a250cc1d47237231d9642960c100dc3fdb68f4dd210af171bff44",
+      "sha256": "dc16c97ae21a250cc1d47237231d9642960c100dc3fdb68f4dd210af171bff44",
+      "uploaded": true
+    },
+    {
+      "bytes": 5431,
+      "path": "research/rootfind_k13_local_f456_screen_20261116/audits/repeat/replay-all.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8b/8b8211318f57115dc7c0a646c619be130b7b0aa122c8030501d400f742dd11c5",
+      "sha256": "8b8211318f57115dc7c0a646c619be130b7b0aa122c8030501d400f742dd11c5",
+      "uploaded": true
+    },
+    {
+      "bytes": 5580,
+      "path": "research/rootfind_k13_local_f456_screen_20261116/audits/repeat/replay-console.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ce/ce4157b0cb16d3db2ba9144546c330ae509d42e923fa1bdbf922f11c4326dca4",
+      "sha256": "ce4157b0cb16d3db2ba9144546c330ae509d42e923fa1bdbf922f11c4326dca4",
+      "uploaded": true
+    },
+    {
+      "bytes": 78774,
+      "path": "research/rootfind_k13_local_f456_screen_20261116/audits/repeat/work-records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4b/4b98692aea1042f943322b42b49aada45733802f6f2614aab715ef5f55597d5d",
+      "sha256": "4b98692aea1042f943322b42b49aada45733802f6f2614aab715ef5f55597d5d",
+      "uploaded": true
+    },
+    {
+      "bytes": 16529,
+      "path": "research/rootfind_k13_local_f456_screen_20261116/reports/repeat/analysis.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d3/d3294c959cc8c393d1bf0d418c3176a8f4ac28ef9035a3461cc8600d40342c33",
+      "sha256": "d3294c959cc8c393d1bf0d418c3176a8f4ac28ef9035a3461cc8600d40342c33",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/rootfind_k13_local_f456_screen_20261116/reports/repeat/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/rootfind_k13_local_f456_screen_20261116/reports/repeat/paired-ratios-log.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "rootfind-k13-f456-local-custody-repeat",
+  "status": "measured",
+  "summary": "Local L0 K13 custody-correct 48/48 verified repeat with four exact pairs per comparison; ratios descriptive, PCC independent validation not covered; earlier invalid epoch excluded",
+  "validation": "research/rootfind_k13_local_f456_screen_20261116/audits/repeat/replay-all.json"
+}

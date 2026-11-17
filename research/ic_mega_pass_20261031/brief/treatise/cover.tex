@@ -1,0 +1,218 @@
+\chapter{The summation cover: what is fixed for every curve}\label{ch:cover}
+
+Every index calculus on an elliptic curve asks one question many times:
+does a target $R$ decompose as a sum of $m-1$ factor-base points? Semaev's
+summation polynomial answers it algebraically, and every design lever of
+the programme acted on this question. This chapter collects three facts
+about it that hold for \emph{every} curve. They closed, without an experiment, the levers
+that rely on curve-dependent monodromy, on fibre censuses, or on raising
+mean yield at matched base size. They also mark what stays free
+(\S\ref{sec:levers}).
+
+The statements and proofs are those of
+\art{crypto-autoresearcher:papers/semaev-conservation-specialization/}
+(15 pages, anonymized draft, verification script
+\texttt{verify.py}, seed 20260807, which replays byte for byte), and of the
+internal finding \texttt{KN-FIND-bdcd60}. An integrity audit
+(\art{crypto-autoresearcher:research/sheriff/SHF-20261023-7b9227/}) upheld
+the mathematics within its scope. It blindly re-derived the group orders
+$2,24,192,1920,23040$ and checked $2.1$ million admissible fibres with zero
+violations. It also rated as overclaimed a statement that three
+\emph{independent} derivations agree: they came from one model family.
+\textbf{Novelty is not adjudicated} (\S\ref{sec:cover-prior}).
+
+\section{Setting}
+
+Let $K$ be a field, $E/K$ an elliptic curve with inversion $\iota=[-1]$,
+and $\pi:E\to E/\langle\iota\rangle\cong\PP^1$ the quotient (the
+$x$-coordinate in odd characteristic). The $m$-th summation polynomial
+$\Sem m\in K[X_1,\dots,X_m]$ is the reduced defining polynomial of the
+image of $\{(Q_1,\dots,Q_m):\sum Q_i=O\}$ under $\pi^m$. Equivalently,
+$\Sem m(\xi_1,\ldots,\xi_m)=0$ if and only if there are points $Q_i$ with
+$\pi(Q_i)=\xi_i$ summing to $O$~\cite{semaev2004}. For $m\ge3$ it is
+symmetric, absolutely irreducible, and of degree $2^{m-2}$ in each
+variable. It satisfies the resultant recursion
+$\Sem m=\operatorname{Res}_X(\Sem{m-1}(\ldots,X),\Sem3(X_{m-1},X_m,X))$.
+
+Fix $m\ge3$, put $n=m-1$, and let $t_1,\dots,t_n$ be independent
+transcendentals. Write $L=K(t_1,\dots,t_n)$ for the function field of
+$(\PP^1)^n$ and $M=K(E^n)$ for that of $E^n$. The group
+$\Gamma=\langle\iota\rangle^n\cong(\ZZ/2)^n$ acts on $E^n$
+coordinatewise; $\Delta\subset\Gamma$ is its diagonal. $M/L$ is Galois with
+group $\Gamma$. With $P_i$ the generic points ($\pi(P_i)=t_i$), the roots of
+$\Sem m(t_1,\ldots,t_n,T)$ in $T$ are the abscissae of the signed sums
+$\theta_\varepsilon=\pi(\varepsilon_1P_1+\cdots+\varepsilon_nP_n)$,
+$\varepsilon\in\{\pm1\}^n$, with $\theta_\varepsilon=\theta_{-\varepsilon}$.
+
+\section{The Galois group}
+
+\begin{theorem}[Monodromy of the summation cover]\label{thm:cover}
+For every field $K$, every elliptic curve $E/K$ and every $m\ge3$:
+\begin{enumerate}
+\item $\Sem m(t_1,\dots,t_n,T)$ is separable of degree $2^{m-2}$ over $L$,
+  with root set $\{\theta_\varepsilon\}$;
+\item its splitting field is $N=M^\Delta=K(E^n/\Delta)$;
+\item $N/L$ is Galois with group $\Gamma/\Delta\cong(\ZZ/2)^{m-2}$, acting
+  simply transitively on the roots;
+\item $K$ is algebraically closed in $N$, so arithmetic and geometric
+  monodromy coincide, $\mathrm{Mon}^{\mathrm{arith}}=\mathrm{Mon}^{\mathrm{geom}}\cong(\ZZ/2)^{m-2}$.
+\end{enumerate}
+None of the four statements depends on $E$, on $K$ or on its
+characteristic.
+\end{theorem}
+
+\begin{proof}[Proof outline]
+A root-identification lemma shows that the roots are among the
+$\theta_\varepsilon$. A generic-separability lemma shows that the
+$2^{m-2}$ classes $\{\pm\varepsilon\}$ give distinct values. $\Gamma$
+permutes the roots by $\sigma\cdot\theta_\varepsilon=\theta_{\sigma\varepsilon}$,
+and the kernel of this action is exactly $\Delta$. So $\Gamma/\Delta$ acts
+faithfully and regularly on $2^{m-2}$ roots. The stabiliser of one root is
+$\Delta$, which gives $N=M^\Delta$. Finally, $E^n/\Delta$ is geometrically
+integral, so $K$ is algebraically closed in its function field.
+\end{proof}
+
+For a symmetric (unordered) factor base the relevant group is the wreath
+extension $(\ZZ/2)^{m-2}\rtimes S_{m-1}$, of order $2^{m-2}(m-1)!$ for
+$m\ge4$. It is primitive if and only if $m-1$ is odd
+(\texttt{KN-FIND-bdcd60}). Statement (4) is the operative one: a cover
+whose arithmetic monodromy exceeds its geometric monodromy can split
+differently over different base fields, and hence on different curves.
+Here no such room exists.
+
+\section{An exact factorisation law over a finite field}
+
+Over $K=\FF_q$, define for $a\in\PP^1(\FF_q)$ the \emph{splitting
+invariant}:
+\begin{itemize}
+\item $c(a)=0$ if both points above $a$ are rational;
+\item $c(a)=1$ if neither is;
+\item $c(a)=\ast$ at a branch point.
+\end{itemize}
+For odd $q$ and $E:y^2=f(x)$ this is the quadratic character of $f(a)$.
+
+\begin{theorem}[Factorisation law]\label{thm:factor}
+Let $a=(a_1,\ldots,a_n)\in\FF_q^n$ lie outside the degenerate locus, which
+has $O_m(q^{n-1})$ points. Then $\Sem m(a_1,\ldots,a_n,T)$ is squarefree of
+degree $2^{m-2}$, and:
+\begin{enumerate}
+\item if $c(a_1)=\cdots=c(a_n)$, it splits into $2^{m-2}$ distinct
+  linear factors, with roots $x(\pm P_1\pm\cdots\pm P_n)$;
+\item otherwise it is a product of $2^{m-3}$ distinct irreducible
+  quadratics and has no root in $\FF_q$.
+\end{enumerate}
+No irreducible factor of degree $\ge3$ ever occurs.
+\end{theorem}
+
+\begin{proof}
+On the étale locus, the factorisation type is the cycle type of
+Frobenius in $\Gamma/\Delta$ (Dedekind's theorem for specialisations of a
+Galois cover~\cite{friedjarden2008}). The Frobenius element is
+$((-1)^{c(a_i)})_i$. It is trivial in $\Gamma/\Delta$ exactly when every
+$c(a_i)$ agrees. Otherwise it is a non-trivial element of order 2 of a
+regular group, and so has cycle type $2^{2^{m-3}}$.
+\end{proof}
+
+The density of totally split fibres is $2^{-(m-2)}+O(m^2/(2^{m-1}q))$. The
+first-order Hasse terms $\pm t/q$ cancel, so the statistic carries no
+first-order information about the curve.
+
+\section{Specialisation to the factor-base locus}
+
+\begin{theorem}[Complete splitting on the factor-base locus]\label{thm:fbsplit}
+If each $a_i=x(P_i)$ with $P_i\in E(\FF_q)$ and $a$ is non-degenerate, then
+$\Sem m(a_1,\ldots,a_n,T)$ splits into $2^{m-2}$ distinct linear factors
+over $\FF_q$, with roots $\{x(\varepsilon_1P_1+\cdots+\varepsilon_nP_n)\}$.
+\end{theorem}
+
+This is Theorem~\ref{thm:factor}(1) with every $c(a_i)=0$. It is the
+statement behind the root-finding oracle of Chapter~\ref{sec:rootfinding}:
+given $m-1$ base points, the admissible last coordinates are the signed
+sums, computable in $O(2^{m-2})$ group operations. It is \emph{not} an
+algorithm for relation search. Relation search fixes the target and asks
+for the base points. The theorem says nothing about how many tuples must
+be tried, nor about the algebraic difficulty of the system posed in that
+direction. Its value is negative:
+
+\begin{corollary}[Census obstruction]\label{cor:census}
+Every statistic of the form ``factorisation type, cycle type or Frobenius
+class of the fibre of $\Sem m$'' is constant on the factor-base locus, for
+every curve and every $m$. A census of generic fibres measures a quantity
+whose value where relation search operates is known in advance and is the
+same for all curves.
+\end{corollary}
+
+The programme ran such censuses before this corollary was proved. The
+census-as-relation-rate probe was closed by ledger decision
+\texttt{DEC-20261017-435b01} (\texttt{reject\_scoped}, replicated).
+
+\section{Conservation of decomposition yield}
+
+\begin{proposition}[Conservation]\label{prop:conservation}
+Let $G$ be a finite abelian group of order $N$ and
+$\mathcal D\subseteq G\setminus\{0\}$ a set of size $B$. The number of
+size-$m$ multisets from $\mathcal D$, summed over all targets, is
+$\binom{B+m-1}{m}$. The mean number of decompositions per target is
+therefore $\binom{B+m-1}{m}/N$, for every $\mathcal D$ of size $B$.
+\end{proposition}
+
+The proof is a double count, and no novelty is claimed for it. Its
+consequences shaped the programme:
+\begin{itemize}
+\item at matched base size, no factor-base geometry can raise the mean
+  yield;
+\item only the distribution of decompositions is free, and coverage
+  (the fraction of targets with at least one decomposition) is at most
+  $\min(1,\mu)$;
+\item additive structure that repeats sums \emph{lowers} coverage;
+\item typing the summands, each from its own sub-base, is a fixed penalty:
+  $\prod B_i\le(B/m)^m<\binom{B+m-1}{m}$.
+\end{itemize}
+Gaudry and Diem's $1/m!$ decomposition probability over extension fields
+\emph{is} this mean. The extension-field advantage lives in the solve, not
+in the yield.
+
+\section{Which levers are fixed and which are free}\label{sec:levers}
+
+Together the results above divide the design space as follows:
+\begin{itemize}
+\item \emph{Fixed for every curve:}
+  \begin{itemize}
+  \item the monodromy group of the summation cover (Theorem~\ref{thm:cover});
+  \item the fibre statistics on the factor-base locus
+    (Corollary~\ref{cor:census});
+  \item the mean yield at fixed base size (Proposition~\ref{prop:conservation}).
+  \end{itemize}
+\item \emph{Free:}
+  \begin{itemize}
+  \item the coverage distribution (bounded by the mean);
+  \item the cost of deciding membership (the oracle, Part~\ref{part:algorithms});
+  \item the algebraic difficulty of the decomposition system when it is
+    posed as a polynomial system (Chapter~\ref{ch:falldegree});
+  \item the linear algebra;
+  \item where the problem lives (transfers, Chapter~\ref{sec:transfer}).
+  \end{itemize}
+\end{itemize}
+Every measured improvement in Part~\ref{part:algorithms} acts on a free
+item. Chapter~\ref{sec:transfer} shows that transfers by isogeny conserve
+the counts as well.
+
+\section{Prior work and the limits of the novelty assessment}\label{sec:cover-prior}
+
+Absolute irreducibility of $\Sem m$ is classical~\cite{semaev2004,gaudry2009}.
+Corollary~\ref{cor:census}'s ingredient, that the roots are the signed sums,
+is the defining property of $\Sem m$. The action of 2-torsion and of sign
+changes on summation systems is used by Faugère, Gaudry, Huot and
+Renault~\cite{fghr2014} and by Galbraith and
+Gebregiyorgis~\cite{galbraith2014}. Theorem~\ref{thm:cover}'s group may be
+folklore: it is the deck group of $E^n\to(E/\pm)^n$ modulo the diagonal.
+Theorem~\ref{thm:factor} is in essence a 2-descent statement. The draft
+could not reach ePrint during its literature search, and says so.
+Corollary~\ref{cor:census} and the exact dichotomy of
+Theorem~\ref{thm:factor} are the parts most likely to be new. Two items
+must be settled before any of this is submitted:
+\begin{itemize}
+\item an expert check of the separability lemma in characteristic 2,
+  where $E[2]$ is non-reduced;
+\item a full literature search.
+\end{itemize}

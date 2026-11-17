@@ -1,0 +1,114 @@
+{
+  "branch": "claude/novel-ecdlp-algorithm-iams4j",
+  "closed_utc": "2026-11-07T22:45:05+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "launched by executor-mechanical with BENCHREC=<this record> in its environment (hook-accepted form), not via benchrec run; started_utc = run_cells.sh start from provenance.txt (after the 13 s build); wall_s = sum of receipt per-command seconds; exit from the receipt (status completed)",
+      "started_utc": "2026-11-07T21:46:21Z",
+      "wall_s": 2224.755
+    }
+  ],
+  "commit": "72004b435c02aae8bd7e5aff9fb31429e146cec8",
+  "commit_dirty": false,
+  "created_utc": "2026-11-07T21:45:52+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261107T2145Z-split-prime-p1-rr-dickson",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 40,
+      "name": "capped_jobs",
+      "note": "T at m3 t5 (3 primes) and m5 t3 hit 1.5 GiB; recorded as lower bounds, rule 6 undecided",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 8.0
+    }
+  ],
+  "problem": "ic:split-prime-p1-rr-dickson-torus",
+  "raw": [
+    {
+      "bytes": 17465,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-20261107T214621Z/parsed.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7f/7f8c55f5c1d9b679a890f5f40080873b2d172c65e1e390906fe80751717b0cf0",
+      "sha256": "7f8c55f5c1d9b679a890f5f40080873b2d172c65e1e390906fe80751717b0cf0",
+      "uploaded": true
+    },
+    {
+      "bytes": 13540,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-20261107T214621Z/jobs.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6e/6ecc5cafcaf78d420520a6f118ee344211e4346cfb4e548667eef1ee588911e8",
+      "sha256": "6ecc5cafcaf78d420520a6f118ee344211e4346cfb4e548667eef1ee588911e8",
+      "uploaded": true
+    },
+    {
+      "bytes": 414,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-20261107T214621Z/cells.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/3835b17d30a77c8e2fe1e4e9fff4c535fdad273833b9535fa506541b84f84b8b",
+      "sha256": "3835b17d30a77c8e2fe1e4e9fff4c535fdad273833b9535fa506541b84f84b8b",
+      "uploaded": true
+    },
+    {
+      "bytes": 503,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-20261107T214621Z/skips.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4e/4ee1f27db38e4075fa138316275cf55e3928a50baae44c3983999ed94422d9ef",
+      "sha256": "4ee1f27db38e4075fa138316275cf55e3928a50baae44c3983999ed94422d9ef",
+      "uploaded": true
+    },
+    {
+      "bytes": 652,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-20261107T214621Z/provenance.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c8/c8337c7bd2a03be5abbac09115cb7d0d35915e2a064dc3ddf0f4ce2976e534f5",
+      "sha256": "c8337c7bd2a03be5abbac09115cb7d0d35915e2a064dc3ddf0f4ce2976e534f5",
+      "uploaded": true
+    },
+    {
+      "bytes": 1431,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/analysis/derived/decision.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/11/1172d184722c622ea2391afa1a282601c7c39b0d446494e89a3662e3fed4d2ea",
+      "sha256": "1172d184722c622ea2391afa1a282601c7c39b0d446494e89a3662e3fed4d2ea",
+      "uploaded": true
+    },
+    {
+      "bytes": 856,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/analysis/derived/p1_cells.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1e/1e047383a87c412deefa16bbef3caf9f9b3575d3350bb8ef0900733812cb17e9",
+      "sha256": "1e047383a87c412deefa16bbef3caf9f9b3575d3350bb8ef0900733812cb17e9",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/report/REPORT.pdf",
+    "png": [
+      "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/figures/p1_cells.png"
+    ],
+    "svg": [
+      "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/figures/p1_cells.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "split-prime-p1-rr-dickson",
+  "status": "measured",
+  "summary": "P1 RR vs cherry-tree T with a Dickson-torus tower at T24, T31: RR lower D and narrower matrices at m3 t3, t4 on both primes (frozen rule 5); m5 t3 undecided (T capped at 1.5 GiB); D identical to the Kummer tower",
+  "validation": null
+}

@@ -1,0 +1,537 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "hec g2 p41: the hec_bitop_20261020 row as ecbench records",
+ "description": "research/hec_bitop_20261020 genus-2 p=41 row (fb-walk IC, 5 seeds from 20260916; full-width rho, 40 seeds from 0xC0FFEE; k = floor(N/3) + 7) run through ecbench: one arm per study seed (fixed_seed), one round, so each record is one study run.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "hec_thread",
+    "p": 41,
+    "genus": 2
+   }
+  ],
+  "targets_per_curve": 1,
+  "target_seed": 0,
+  "target_kind": "planted_hec_thread"
+ },
+ "arms": [
+  {
+   "name": "ic-s20260916",
+   "role": "candidate",
+   "method": {
+    "id": "hec.ic_fb_walk",
+    "params": {
+     "branches": "64",
+     "d_step_in": "4",
+     "extra_relations": "8",
+     "max_trials": "5000000",
+     "fixed_seed": "20260916"
+    }
+   }
+  },
+  {
+   "name": "ic-s20260917",
+   "role": "candidate",
+   "method": {
+    "id": "hec.ic_fb_walk",
+    "params": {
+     "branches": "64",
+     "d_step_in": "4",
+     "extra_relations": "8",
+     "max_trials": "5000000",
+     "fixed_seed": "20260917"
+    }
+   }
+  },
+  {
+   "name": "ic-s20260918",
+   "role": "candidate",
+   "method": {
+    "id": "hec.ic_fb_walk",
+    "params": {
+     "branches": "64",
+     "d_step_in": "4",
+     "extra_relations": "8",
+     "max_trials": "5000000",
+     "fixed_seed": "20260918"
+    }
+   }
+  },
+  {
+   "name": "ic-s20260919",
+   "role": "candidate",
+   "method": {
+    "id": "hec.ic_fb_walk",
+    "params": {
+     "branches": "64",
+     "d_step_in": "4",
+     "extra_relations": "8",
+     "max_trials": "5000000",
+     "fixed_seed": "20260919"
+    }
+   }
+  },
+  {
+   "name": "ic-s20260920",
+   "role": "candidate",
+   "method": {
+    "id": "hec.ic_fb_walk",
+    "params": {
+     "branches": "64",
+     "d_step_in": "4",
+     "extra_relations": "8",
+     "max_trials": "5000000",
+     "fixed_seed": "20260920"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648430",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648430"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648431",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648431"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648432",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648432"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648433",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648433"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648434",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648434"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648435",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648435"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648436",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648436"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648437",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648437"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648438",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648438"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648439",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648439"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648440",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648440"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648441",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648441"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648442",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648442"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648443",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648443"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648444",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648444"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648445",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648445"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648446",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648446"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648447",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648447"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648448",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648448"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648449",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648449"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648450",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648450"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648451",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648451"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648452",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648452"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648453",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648453"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648454",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648454"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648455",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648455"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648456",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648456"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648457",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648457"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648458",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648458"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648459",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648459"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648460",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648460"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648461",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648461"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648462",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648462"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648463",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648463"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648464",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648464"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648465",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648465"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648466",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648466"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648467",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648467"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648468",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648468"
+    }
+   }
+  },
+  {
+   "name": "rho-s12648469",
+   "role": "reference",
+   "method": {
+    "id": "hec.rho_full_width",
+    "params": {
+     "max_steps": "200000000",
+     "fixed_seed": "12648469"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261021,
+  "isolation_required": "L0",
+  "timeout_seconds": 600
+ }
+}

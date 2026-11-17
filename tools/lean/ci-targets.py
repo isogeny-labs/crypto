@@ -12,6 +12,9 @@ from pathlib import Path
 import subprocess
 
 
+BATCH_SIZE = 4  # 4 * 256 targets fit in the hosted Actions matrix limit.
+
+
 def discover():
     root = Path(__file__).resolve().parents[2]
     output = subprocess.check_output(
@@ -30,15 +33,29 @@ def address(targets, index=None):
     return targets[index]
 
 
+def batches(targets, start=None):
+    if len(set(targets)) != len(targets):
+        raise ValueError("proof discovery returned duplicate targets")
+    if start is None:
+        count = (len(targets) + BATCH_SIZE - 1) // BATCH_SIZE
+        if count > 256:
+            raise ValueError(f"{len(targets)} proof targets exceed the 256-job matrix limit")
+        return json.dumps([i * BATCH_SIZE for i in range(count)], separators=(",", ":"))
+    if start < 0 or start >= len(targets) or start % BATCH_SIZE:
+        raise ValueError(f"batch start {start} is invalid for {len(targets)} targets")
+    return "\n".join(targets[start : start + BATCH_SIZE])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("matrix", "select"))
+    parser.add_argument("mode", choices=("matrix", "select", "batch"))
     parser.add_argument("index", type=int, nargs="?")
     args = parser.parse_args()
-    if (args.mode == "select") != (args.index is not None):
-        parser.error("select requires an index; matrix takes no index")
+    if (args.mode == "matrix") != (args.index is None):
+        parser.error("select and batch require an index; matrix takes no index")
     try:
-        print(address(discover(), args.index))
+        targets = discover()
+        print(address(targets, args.index) if args.mode == "select" else batches(targets, args.index))
     except (ValueError, subprocess.CalledProcessError) as exc:
         parser.exit(1, f"proof target discovery failed: {exc}\n")
 

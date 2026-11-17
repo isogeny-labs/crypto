@@ -1,0 +1,21 @@
+/var/tmp/pencil-fallback-word-divisions-20261101-v1/FallbackWordNormal.lean:25:9: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  NonmonicStorage.wordDiv p last b a a.length
+in the target expression
+  (match some last with
+    | none => none
+    | some last => (NonmonicStorage.wordDiv p last b a a.length).bind fun z => if z.2 = [] then some z.1 else none) =
+    some q
+
+case some.some
+p : UInt64
+a b q : List UInt64
+last : UInt64
+ho :
+  (match some last with
+    | none => none
+    | some last => (NonmonicStorage.wordDiv p last b a a.length).bind fun z => if z.2 = [] then some z.1 else none) =
+    some q
+hl : b.getLast? = some last
+z : List UInt64 × List UInt64
+hw : NonmonicStorage.wordDiv p last b a a.length = some z
+⊢ Normal q

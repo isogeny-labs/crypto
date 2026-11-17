@@ -1,0 +1,39 @@
+{
+  "schema": "exact-source-review/v1",
+  "standing": "unsigned producer review, not a novelty or absence proof",
+  "kb": "unavailable as already recorded; no unchanged infrastructure retry",
+  "prior_review": "research/prime_norm_rank_20261112/weighted-leading-evidence/prior-search-receipt.json",
+  "mathlib_revision": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+  "sources": [
+    {
+      "path": "Mathlib/Algebra/Polynomial/Eval/Degree.lean",
+      "sha256": "542830fa24cc686b9e97a3f603b662b1a89d772fb83b307d516fb0ebe0654f83"
+    },
+    {
+      "path": "Mathlib/Algebra/Polynomial/Eval/Defs.lean",
+      "sha256": "afa7c31da6dcf12342807acae8aaacb8f634cc79214f8fecfe0bbead0ba38b9b"
+    },
+    {
+      "path": "Mathlib/Algebra/Polynomial/Div.lean",
+      "sha256": "1c0ae5b5dea58f0c8bd8425cfa7da2e29ab7826d7b2cce6f2d5acf7ffef1784a"
+    },
+    {
+      "path": "Mathlib/Algebra/Polynomial/Degree/Lemmas.lean",
+      "sha256": "40722e96545ce007a192bbf27ef75c31d517f98afbe073b708c677b622f8caf2"
+    }
+  ],
+  "reused": [
+    "comp_C_mul_X_coeff",
+    "polynomial composition ring identities",
+    "monic division uniqueness",
+    "natDegree_comp_le",
+    "natDegree_C_mul_le",
+    "natDegree_modByMonic_lt"
+  ],
+  "changed_plan": "Lift universal ring identities to actual polynomials, then derive computed remainder transport by monic uniqueness; do not use finite-field evaluation extensionality.",
+  "limitations": [
+    "No complete weighted initial-form/ideal interpretation",
+    "No growing-family weighted closure-degree theorem",
+    "No bit-cost or experimental speed claim"
+  ]
+}

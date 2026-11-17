@@ -1,0 +1,19 @@
+PRESET for the typical-degree hypothesis test (G), written before any G data (2026-11-12). [pcc:unverified]
+Instrument: code/check_G_hypothesis.py (exact reduced-interpolant support on product grids; fastdelta.py).
+Prime p = 786433 (= 3*2^18 + 1). One random curve per instance (seeded). Instances:
+  uni   m=2 d in {8,16,32,64};  m=3 d in {4,8,16};  m=4 d in {3,4,6}
+  tower m=2 k in {2..8};        m=3 k in {2..5};    m=4 k in {2,3,4}
+Per instance: non-decomposable targets (S_R nonzero on grid), decomposable targets (planted zeros),
+5 random-function negative controls, 3 planted low-degree positive controls.
+Quantity: delta = XL interpolation degree (Lemma L4); max = m(d-1) (uni) or m*k (tower).
+Generic prediction (random-function model, Lemma L8):
+  non-dec: delta = max (probability of a vanishing top coefficient is 1/p per target);
+  dec:     delta = least t with #{a : wt(a) > t} <= |V_R|.
+Decision rule (fixed now):
+  CONSISTENT  if in every instance >= 99% of non-dec targets have delta = max and every dec target has
+              delta >= generic_pred - 1, and all controls behave (random: delta = max; planted: delta = t0).
+  REFUTED     if any instance has >= 10% of non-dec targets with delta <= max - 2, or any dec target with
+              delta <= generic_pred - 3.
+  otherwise   AMBIGUOUS.
+Scope note: (G) concerns the XL / Macaulay (Nullstellensatz-type) degree only. It says nothing about
+F4 / polynomial-calculus degrees, which can be lower because of degree falls.

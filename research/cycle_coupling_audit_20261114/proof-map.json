@@ -1,0 +1,36 @@
+{
+  "main": "CycleCouplingAudit.cycle_coupling_certificate",
+  "binding": "dbd609ef808defc71765389c4746628d85d20739fc39bec056a270e1855631f0",
+  "custom_imports": {
+    "AffineWalk": "research/cycle_coupling_audit_20261114/lean/AffineWalk.lean",
+    "CycleCouplingCertificate": "research/cycle_coupling_audit_20261114/lean/CycleCouplingCertificate.lean",
+    "CycleGeometry": "research/cycle_coupling_audit_20261114/lean/CycleGeometry.lean",
+    "CycleMixing": "research/cycle_coupling_audit_20261114/lean/CycleMixing.lean",
+    "FairKernel": "research/cycle_coupling_audit_20261114/lean/FairKernel.lean"
+  },
+  "modules": [
+    {
+      "file": "FairKernel.lean",
+      "role": "Actual fairBool PMF/map-bind laws, real finite-expectation identity, positivity/monotonicity and exact generic telescoping drift bound."
+    },
+    {
+      "file": "CycleGeometry.lean",
+      "role": "Actual ZMod neighbor values, potential nonnegativity/max, concrete coalescent pair map, mismatch absorption and exact drift."
+    },
+    {
+      "file": "CycleMixing.lean",
+      "role": "Actual marginal expectations, pointwise/event coupling, all-cycle quadratic tail, finite translation stationarity and everyevent uniform-distance bound."
+    },
+    {
+      "file": "AffineWalk.lean",
+      "role": "Time-dependent affine expectation formula, actual primefield permutation and everytwo-distinct-equalweight support bound; deterministic alltime nonmixing and zero-time disproof."
+    },
+    {
+      "file": "CycleCouplingCertificate.lean",
+      "role": "Closed complete TYPE binding actuallaws/margins/drift/allcycle/prime-two-support and directnever-mixes/timezero controls."
+    }
+  ],
+  "gate_declarations": 51,
+  "signed_standing": "not established",
+  "open": "Full generalweights/k>=3/randomsupport Hildebrand, staticrho/collisionconstants and remaining original14gaps."
+}

@@ -1,0 +1,2060 @@
+{
+ "schema": "MAP_closed.v1",
+ "generated": "2026-10-31",
+ "purpose": "Closed-routes map with scope limits for the 2026-10-31 ECDLP index-calculus mega pass. One item per treatise-level closure (brief §2 / treatise chapters), per closed_*/exhausted_at_scale lead in the atlas, and per known-results row in the index-calculus frontier map. 'scope_limits' states the hypotheses the closure needs and the settings where it does NOT apply.",
+ "rules": "No security claim is made or withdrawn. Measured closures are toy-scale unless stated. 'closed_known' means the mechanism is literature, not that it is impossible. Superseded KR rows are kept with their successor named.",
+ "sources": [
+  "brief/BRIEF.md §2",
+  "brief/treatise/obstructions.tex",
+  "brief/treatise/cover.tex",
+  "brief/treatise/falldegree.tex (sec:fd-summary, Prop bridges/cert, Thm pkm, tab fd-other)",
+  "brief/treatise/prog_openproblems.tex",
+  "brief/RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md",
+  "brief/LEAD_ATLAS_DISPOSITIONS.tsv",
+  "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/*/LEAD-*.yaml (all 74 closed_*/exhausted_at_scale cards)",
+  "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-*.yaml (all 28 rows)"
+ ],
+ "counts": {
+  "total": 116,
+  "treatise_closures": 14,
+  "leads": 74,
+  "known_results": 28,
+  "leads_by_disposition": {
+   "closed_dominated": 5,
+   "closed_known": 18,
+   "closed_obstructed": 45,
+   "exhausted_at_scale": 6
+  }
+ },
+ "coverage_check": {
+  "atlas_closed_or_exhausted_leads": 74,
+  "atlas_leads_missing_from_map": [],
+  "frontier_rows": 28,
+  "frontier_rows_missing_from_map": [],
+  "lead_items_not_in_atlas_closed_set": []
+ },
+ "items": [
+  {
+   "id": "TREAT-generic-oracle-bound",
+   "name": "Generic oracle bound (Shoup / Corrigan-Gibbs-Kogan) on decomposition oracles",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "theorem",
+   "statement": "Any decomposition oracle that decides 'is R an m-sum of base points' by group operations plus membership tests (tables, MITM, enumeration, root tables, subtraction) makes index calculus a generic-group algorithm with advice: T >= sqrt(r/|Aut|) (Shoup) and S*T^2 >~ r/|Aut| (CGK). All compact-orbit k-sum pipelines measured sit 2^25-2^27 above that line; balanced generic IC costs ~r^{2/3}/n^{4/3}.",
+   "scope_limits": "HYPOTHESES: oracle uses only group operations and equality/membership tests on group elements; prime-order subgroup; |Aut| counted. DOES NOT APPLY to oracles that read the FIELD REPRESENTATION of coordinates non-generically (Weil descent to F_2-subspaces, Coppersmith on integer lifts of x, bit-level/digit structure, algebraic membership of degree << |F|). The 2^25-2^27 figure is measured only on Koblitz rungs n=61-83; the r^{2/3} formula is a two-term cost model, not a theorem.",
+   "source": "BRIEF §2 row 1; obstructions.tex §'Oracle-augmented index calculus stays generic'; RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md §1-2,4",
+   "forecloses": [
+    "table/MITM/enumeration decomposition oracle beats rho",
+    "online IC after precompute compared against plain rho"
+   ],
+   "revisit_when": "an oracle that is not GGM-simulable (returns/uses field or curve data, not a group element) with per-query cost polynomial in n at fixed degree"
+  },
+  {
+   "id": "TREAT-ggm-simulable-augmented-oracles",
+   "name": "GGM-simulability of augmented oracles (jet, p-adic lift, endomorphism image, halving, incidence, elliptic net)",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "theorem",
+   "statement": "Jet / p-adic lift oracles (O(1) overhead), endomorphism-image oracles (O(1), scalar on prime-order G), halving queries (equivalent to an x-oracle), factor-base incidence (O(m)) and elliptic-net evaluations (O(log N)) are each simulable in the generic group model, so Shoup's sqrt(r) bound still applies (KN-FIND-002, -b7e091, -194294). Minimal non-simulable order-based identifier is a threshold oracle C_t, which needs private data (KN-FIND-982fdf).",
+   "scope_limits": "HYPOTHESES: oracle is a function of group elements alone (computable from the abstract group with the stated overhead); prime-order subgroup. DOES NOT APPLY to representation-dependent maps (functions of the F_q coordinates that are not group-functorial). Derivation tier, not a measured result; the x-oracle yield measurement (Y_A = Y_B) is toy and marked preliminary (CORR-20261026-c94668).",
+   "source": "BRIEF §2 row 2; obstructions.tex; LEAD-EXO-augmented-oracle-ggm",
+   "forecloses": [],
+   "revisit_when": "a publicly computable oracle shown NOT GGM-simulable"
+  },
+  {
+   "id": "TREAT-summation-cover-monodromy",
+   "name": "Summation-cover monodromy is (Z/2)^{m-2} for every curve; fibres split completely on the factor-base locus; mean yield is a double count",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "proof",
+   "statement": "For every field K, every E/K and every m>=3: S_m(t_1..t_{m-1},T) is separable of degree 2^{m-2}, its splitting field is K(E^{m-1}/Delta), Galois group (Z/2)^{m-2} acting regularly, arithmetic = geometric monodromy (K algebraically closed in N). Over F_q the fibre splits completely iff all splitting invariants c(a_i) agree, else into 2^{m-3} irreducible quadratics; no factor of degree >=3 ever occurs. On the factor-base locus (a_i = x(P_i), P_i rational) it always splits completely. Mean decompositions per target = C(B+m-1,m)/N for every size-B base (double count). Closes curve selection by monodromy, fibre censuses as relation-rate probes, and 'better geometry raises mean yield'.",
+   "scope_limits": "HYPOTHESES: non-degenerate fibre (degenerate locus has O_m(q^{n-1}) points); symmetric base uses the wreath group (Z/2)^{m-2} x| S_{m-1}; conservation needs only a finite abelian group and a fixed base size. LEAVES FREE: coverage (which targets decompose at all, bounded by min(1,mu)), VARIANCE of yield, oracle cost, solving difficulty, linear algebra, where the problem lives. Characteristic-2 separability lemma (E[2] non-reduced) still needs expert check; novelty not adjudicated; full literature search not done. Typed sub-bases are a fixed penalty prod B_i <= (B/m)^m (not an exponent change).",
+   "source": "BRIEF §2 row 3; cover.tex Thm cover/factor/fbsplit, Cor census, Prop conservation; LEAD-ICE-semaev-cover-monodromy (KN-FIND-bdcd60, -4f0d84)",
+   "forecloses": [],
+   "revisit_when": "a factor-base statistic answering KN-OPEN-62c870 Q1/Q3 that carries curve-specific relation-rate information; rule-12 review breaks the core findings"
+  },
+  {
+   "id": "TREAT-transport-conservation",
+   "name": "Transport conservation under homomorphic transfer (isogenies)",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "proof",
+   "statement": "A homomorphic transfer phi: E -> E' with rational kernel kappa changes the number of ordered m-decompositions of a target by exactly |kappa|^{m-1} (Lemma conservation). Isogenies buy only kernel symmetry (trivial at prime order), destination factor-base geometry, destination arithmetic cost. Chains compose to one homomorphism; loops are endomorphisms acting as known scalars; multi-curve bases glued by isogenies are single-curve bases in disguise. Measured: fibre-aware IC loses to rho as #E^{1/6} at fixed cofactor.",
+   "scope_limits": "HYPOTHESES: transfer is a group homomorphism with rational kernel. DOES NOT COVER non-homomorphic transfers (covers, correspondences, Miller cocycles), which fall under the GHS/cover literature and need an intermediate field or a weak class. The #E^{1/6} loss is measured at fixed cofactor on toy ladders only.",
+   "source": "BRIEF §2 row 4; obstructions.tex §Transport conservation; prog_transfer.tex",
+   "forecloses": [],
+   "revisit_when": "a non-homomorphic correspondence with verified scalar compatibility"
+  },
+  {
+   "id": "TREAT-no-subfield-no-low-degree-membership",
+   "name": "No subfield, no low-degree membership (prime p and prime n are one obstruction)",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "theorem",
+   "statement": "Prime p: no subset of F_p of size B has membership degree below B (RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM §2.3; bounded-degree factor-base theorem IDEA-20260801-021). Prime extension degree n: only F_2 is a proper subfield; no Frobenius-stable F_2-subspace when ord_n(2) = n-1 (n=131, 163); quasi-subfield polynomials closed (beta >= 3/4). Every measured exponent gain (JV cover on F_{p^6}, Gaudry k=3,4, Diem) lives on a field with a proper intermediate subfield.",
+   "scope_limits": "HYPOTHESES: membership is an algebraic locus independent of the target; subspace must be Frobenius-stable for the orbit fold. DOES NOT APPLY to non-invariant F_2-subspaces at prime n (Weil descent still works; the cost is the solving degree, open); over F_p the only algebraic handle left is 'x as an integer mod p' (lattices) or digit presentations (open). The prime-field statement is for target-independent algebraic loci; a target-dependent or non-algebraic (e.g. learned, hashed) base is not covered by the degree argument but is covered by the generic bound.",
+   "source": "BRIEF §2 row 5; RESEARCH_IC_LEADS_AND_CONNECTIONS §0.2, §7(d); LEAD-ICP-algebraic-membership-factor-base; LEAD-ICB-quasi-subfield-polynomials",
+   "forecloses": [],
+   "revisit_when": "KN-OPEN-020 answered positively (size-B set with sub-B-degree membership surviving substitution into S_{m+1})"
+  },
+  {
+   "id": "TREAT-lattice-reach",
+   "name": "Lattice (small-root) reach vs index-calculus demand",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "proof",
+   "statement": "Jochemsz-May small roots of S_{m+1}: delta_max = 1/(m(m+1)2^{m-2}); needed delta >= 0.169 at m=4 vs reach 0.0125 (13.5x short), 6x short at m=3. Strategy-independent bound: any Coppersmith lattice from (p,f)^t on a convex monomial set has reach <= (n! vol Newt(S_3))^{-1/n} per block = 0.3293 (3 unknowns) / 0.3536 (2 unknowns), attained in 11/11 checks; demand 8/9 at (m,w)=(4,2); for direct S_4/S_5 reach caps at 1/21.8 and 1/70.8 vs targets 1/4 and 1/5. m=2,3 cannot beat sqrt(p) even with a free oracle.",
+   "scope_limits": "HYPOTHESES: convex monomial set, lattice of polynomials in (p,f)^t, equal per-variable bounds for the proved part (unequal bounds: numerical only, stops at 1/2), one S_3 block at a time. NOT COVERED: joint three-block lattices for the (4,2) system, non-convex monomial sets, rank-r>=2 GAP substitutions, non-Coppersmith small-root methods, the D4-symmetrised S_5 lattice at m=4 (never run), e-form unequal bounds, multi-ideal lattices. The m=2,3 impossibility is from the two-term cost model with linear algebra included.",
+   "source": "BRIEF §2 row 6; LEAD-ICP-coppersmith-smallroot-semaev; RESEARCH_IC_LEADS_AND_CONNECTIONS §8",
+   "forecloses": [],
+   "revisit_when": "a joint lattice reaching more than the per-block sum; a non-convex or unequal-bound allocation beating 1/2 per block; a non-Coppersmith small-root solver"
+  },
+  {
+   "id": "TREAT-heights",
+   "name": "Heights: sums of small points are not small; xedni lift exponent alpha=3",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "proof",
+   "statement": "Canonical height satisfies h(P+Q)+h(P-Q) = 2h(P)+2h(Q), so a lift of E(F_p) to E(Q)/E(K) has no sub-multiplicative size function and no smoothness notion; this is the common obstruction behind xedni, 'no sub-B membership degree' lifts, and every char-0 lifting idea. On the frozen rational-elliptic-surface family (deg b = 6, monic quadratic x) the exact lift probability is P_lift(p) = (1-2/p+p^{-3})/(2p^3), alpha = 3 (needs alpha < 1/2), checked on 596,268,874 slots, re-derived by parameter count.",
+   "scope_limits": "The alpha=3 result is FAMILY-SPECIFIC: deg b <= 10, deg a <= 4, sections deg x <= 3, p <= 31. A dimension count over ALL section shapes is missing; explicit high-rank K3 fibrations with a dimension surplus are not covered. Height-compressing lifts (CM canonical lifts with cheap field of definition, function-field sections) remain open_next_step in the atlas. The height identity itself is a theorem for any global field.",
+   "source": "BRIEF §2 row 7; obstructions.tex §Lifting sections; RESEARCH_IC_LEADS_AND_CONNECTIONS §7(c); LEAD-ICP-xedni-function-field-sections; EV-XEDN-001",
+   "forecloses": [],
+   "revisit_when": "a surface family with more free section parameters than prescribed conditions whose measured lift exponent is below 1/2"
+  },
+  {
+   "id": "TREAT-twist-no-relations",
+   "name": "Twist points carry no relations",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "proof",
+   "statement": "A curve and its quadratic twist share x-coordinates and summation polynomials, but Frobenius acts as +1 on E(F_q) and -1 on the embedded twist part, so the twist component B of any mixed sum satisfies 2B = 0: mixed sums are never rational. Checked exactly on toy binary curves in the ECC2K-130 model: 0 of 356,530,036 mixed sums rational, 0 violations on 4,954 targets at m=2,3, predicted off-parity solution sets matched 1,154/1,154; positive controls found all planted solutions.",
+   "scope_limits": "HYPOTHESES: odd n, twist a -> a+1 in the binary model (odd characteristic analogue via quadratic character). The obstruction is exact. UNRESOLVED: twist-AVOIDING factor-base subspaces at prime degree. Composite degree N = dn, n >= 3: all-lift F_{2^d}-lines exist when Tr(a)=0 (2^n relations per Gaudry-Diem trial; applies to c2pnb208w1/c2pnb368w1; modelled +0.50 bits, a model output not a measurement). Prime degree: that construction does not exist; all-lift subspaces of dim 4-5 exist at small n (0.921 +- 0.018 of null at N=11, p = 2e-5) but this is toy evidence only; 11 Lean theorems cover the construction, standard axioms.",
+   "source": "BRIEF §2 row 8; obstructions.tex §Twist points carry no relations; research/twist_obstruction_20261026, research/lift_dense_factor_base_20261027",
+   "forecloses": [],
+   "revisit_when": "useful twist-avoiding subspaces at cryptographic prime degree"
+  },
+  {
+   "id": "TREAT-first-fall-degree-constant",
+   "name": "First fall degree is a constant of the presentation; it does not bound the last fall / solving degree",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "proof",
+   "statement": "In the three presentations studied the first fall degree is a proved constant: 2 for binary Weil descent of S_3, B+1 for explicit membership (guarded chain), 4 for prime Kummer towers (t>=2, g != 0, 3x_R^2+a != 0, inconsistent system). The last fall degree is NOT bounded by it: proved for the guarded chain at B=3 (d_F = 5 vs 4), certified d_F >= 5 vs 2 on named binary instances at n=33-45 and the m=t=3 chain, measured 6 vs 4 for Kummer towers at t=10. Dual-certificate Proposition: one accepted certificate for 1 notin W_4(F) proves no F4 run under any selection strategy stays at degree 4. Semaev's Assumption 1 fails as stated. PKM: d_F depends on presentation, not ideal (naive presentation d_F >= 2^t vs tower d_F <= 2t+2). Any complexity argument substituting first fall degree for solving degree is unsupported for these systems.",
+   "scope_limits": "WHAT IS NOT SETTLED: no presentation has a proved last-fall lower bound growing with n (open problem of HKY and Kousidis-Wiemers); upper bounds k+2 and (t-1)k+t are linear in n and far above observed values. Certificates committed only as hashes (regenerable, not publicly hosted); sample small (two instances per n at n>=33, one polynomial instance at n>=41); written proofs need expert review; Kummer-tower raw data never committed (session-reported). Measured D at m=3 fits ceil(l/2)+4, at m=4 fits l+4; cells (m,l)=(4,4),(4,5),(4,6) UNMEASURED; the 106-bit spread between 'levelled at 7' and 'follows l+4' at n=131 is the open security question. Every observed growth is in base size (l, k, t, B, digit count s), none in n at fixed base (measured range n<=63).",
+   "source": "BRIEF §2 row 9; falldegree.tex sec:fd-summary, Prop bridges/cert, Thm pkm, tab fd-other; RESEARCH_IC_LEADS_AND_CONNECTIONS §5; KR-IC-139da0",
+   "forecloses": [],
+   "revisit_when": "a proved d_F lower bound growing with n (kills subexponential heuristics) or a bound f(m) independent of n (revives them)"
+  },
+  {
+   "id": "TREAT-frontier-measurement",
+   "name": "Frontier measurement: no IC below rho on any prime or prime-degree binary curve",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "measured",
+   "statement": "4,848 priced executions: no IC arm below rho on any prime-field or prime-degree binary curve at any price weight. Koblitz 4.7-18x rho at 37-47 bits; prime 5.3-102x at 20-40 bits; random binary 10.6-38x. Every online-class win retired by equal-advice Bernstein-Lange audits (53-317x faster online at equal advice; precomputed rho wins every N83 matched pair, 3.74x-396x).",
+   "scope_limits": "A MEASUREMENT at toy sizes (binary n=13-45, Koblitz n=41-83, prime 20-63 bits), not a theorem; extrapolation to n=131 is by fitted exponents (ln(IC/rho) slope 0.165 [0.117,0.213] per ln r on Koblitz). Weak EXTENSION-FIELD families DO cross rho: genus-3 GHS (exponent ~1.356 vs 1.5), plane quartics via Diem (exponent 0.983, 0.005x rho to q~2^22, pending isolated-host validation), Joux-Vitse covers on E(F_{p^6}) (crossover extrapolated near p~1330), k=4 char-2 near m*~17.6 (16.3-19.2). These are known algorithms fairly measured, on undeployed classes. No measured arm has yet been compared against a PUBLISHED index-calculus reference at the same (q,n,m) (open problem 10).",
+   "source": "BRIEF §2 row 10; prog_openproblems.tex items 2,6,8,9,11; LEAD-ICB-generic-table-oracle; LEAD-ICB-retained-setup-online",
+   "forecloses": [],
+   "revisit_when": "an arm with fitted exponent below 1/2 in r across the whole pricing band"
+  },
+  {
+   "id": "TREAT-wagner-klist",
+   "name": "Wagner / k-list: relation collection is a k-sum problem with no small visible quotient",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "proof",
+   "statement": "Finding P_1+...+P_k = O over k lists is the generalised birthday problem, but Wagner's 2^{n/3} needs a group homomorphism to a small quotient visible in the representation; E(F_q) has none except E/<G> (the cofactor, 2 bits on ECC2K-130), so sort-and-match at n^4K^4/r is the best generic rate; residual and large-prime walks lose above r^{1/4} bases because there is no quotient to walk in.",
+   "scope_limits": "HYPOTHESES: the filter is group-theoretic (homomorphic, sum-compatible). DOES NOT COVER a NON-GROUP filter correlated with sums (an 'x-functional filter' whose single-bucket gain grows), which is KN-OPEN-91d4f6 and open. Also leaves open a curve with a large smooth cofactor (not the deployed ones).",
+   "source": "BRIEF §2 row 11; RESEARCH_IC_LEADS_AND_CONNECTIONS §7(b); LEAD-ICB-cofactor-torsion-quotients",
+   "forecloses": [],
+   "revisit_when": "a non-homomorphic sum-compatible filter with more than log2(cofactor) bits"
+  },
+  {
+   "id": "TREAT-symmetry-inventory",
+   "name": "Symmetry inventory: every symmetry is polynomial in n or constant",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "cost_model",
+   "statement": "Negation (÷2 relations, ÷4 LA, ÷sqrt2 rho), Frobenius on subfield curves (÷n, ÷n^2, ÷sqrt n; Faugere-Svartz character blocks 31-128x on rank at n=11-23), CM automorphisms (÷|Aut|; Z/3 grading costs 12-70x on the solve), 2-torsion translation (FGHR: degree 2^{m-1} -> 2^{m-2}, 30-416x measured on the solve), 4-torsion/Klein (not F_q-valued on subspace bases, Q4 saturation 0.99x), S_m (S_3 17 -> <=10 monomials; S_4-S_8 unmeasured), D4 on S_5 (Bezout 4096 -> 512, projected ~630x on C_4, computed on paper, NEVER RUN), horizontal isogenies (nothing at h(O_K)=1). All polynomial in n or constant; the generic lower bound already includes |Aut|.",
+   "scope_limits": "Symmetry cannot change an exponent; it CAN make the decisive solving-degree cells affordable (equivariant F4 on the full barrel system projected 10-300x, enabler for the (4,l) cells). The D4-symmetrised S_5 lattice/solve is the one symmetry item with projected upside and no measurement. S_4-S_8 symmetrisation unmeasured except saturation at m>=5 balanced l. Gains on the solve compound with base folds (combined >= 0.82) so they should be stacked.",
+   "source": "BRIEF §2 row 12; RESEARCH_IC_LEADS_AND_CONNECTIONS §6; prog_openproblems item 6",
+   "forecloses": [],
+   "revisit_when": "never as an exponent lever; as an enabler, whenever a solving-degree cell becomes affordable"
+  },
+  {
+   "id": "TREAT-digit-presentation-growth",
+   "name": "Prime digit presentation: d_ff = d_F = 4 + floor(s/2) at m=2 grows with digit count, reproduced by a curve-free null",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "measured",
+   "statement": "In the base-B digit presentation of prime-field Semaev systems at m=2 the first and last fall degrees coincide at 4 + floor(s/2), growing with the digit count s; a curve-free null reproduces the same law, so the growth is a property of the presentation size, not of the curve. Bounded-D0 cost models for digit presentations price empty matrices (KN-FIND-0618ab refutes the digit cost tables).",
+   "scope_limits": "Measured at m=2 only; m>=3 digit presentations, their staircase and whether d_F stays flat across >=3 field sizes at fixed s are OPEN (LEAD-ICP-digit-presentation-solving-degree, open_next_step; brief §3 item 9). The curve-free null shows the m=2 law carries no curve information; it does not show that no digit presentation can have bounded degree.",
+   "source": "falldegree.tex §Measured solving degrees in other presentations; KR-IC-401ebf internal note KN-FIND-0618ab",
+   "forecloses": [],
+   "revisit_when": "a digit presentation at m>=3 whose measured solving degree stays flat across >= 3 field sizes"
+  },
+  {
+   "id": "TREAT-linearisation-reach",
+   "name": "Linearisation reach at n=131 is 28-31 bits per trial against 84-99 needed",
+   "kind": "treatise_closure",
+   "disposition": null,
+   "obstruction_kind": "cost_model",
+   "statement": "Linearisation of the Weil-descended S_{m+1} systems resolves l + b_max ~ 28-31 bits per trial at n=131 against the 84-99 bits a decomposition needs; gap >= 56 bits at every arity (research/linearization_reach_20260930).",
+   "scope_limits": "A reach calculation for plain linearisation (XL at degree of the field equations) only; Gröbner/closure methods at higher degree are governed by the solving degree (open). Scope: binary n=131, F_2-subspace bases.",
+   "source": "RESEARCH_IC_LEADS_AND_CONNECTIONS §5",
+   "forecloses": [],
+   "revisit_when": null
+  },
+  {
+   "id": "LEAD-EXO-augmented-oracle-ggm",
+   "name": "Augmented oracles (x-, y-, full-point, halving, endomorphism-image, incidence, jet) and GGM simulability",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Each named oracle is GGM-simulable (jet, endomorphism O(1); incidence O(m); halving equivalent to x; net O(log N)), so Shoup's bound closes the family at exponent 1/2 (KN-FIND-002, -b7e091, -194294; EV-GGM-001 strong). Measured: the x-oracle gives yield Y_A = Y_B exactly; the m=3 MITM split saving is attributable to the split, not the oracle.",
+   "scope_limits": "Scope: ORACLES computable from group elements, not RESOURCES (field/curve data, IDEA-20260808-ea3b4f). The threshold oracle is the minimal non-simulable identifier but needs private data. x-oracle yield measurement is toy and marked preliminary (CORR-20261026-c94668).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/exotic/LEAD-EXO-augmented-oracle-ggm.yaml",
+   "forecloses": [
+    "x-coordinate oracle meet in the middle",
+    "y-coordinate oracle guided decomposition",
+    "full-point oracle",
+    "endomorphism image oracle",
+    "halving query oracle",
+    "generic group model simulable oracle"
+   ],
+   "revisit_when": "a publicly computable oracle that is NOT GGM-simulable",
+   "atlas_title": "Augmented oracles (x-, y-, full-point, halving, endomorphism-image, incidence) and GGM simulability"
+  },
+  {
+   "id": "LEAD-EXO-cryptoscale-candidate-screen",
+   "name": "GOAL-CRYPTO-001 discovery screen for a reproducible non-generic crypto-size algorithm",
+   "kind": "lead",
+   "disposition": "exhausted_at_scale",
+   "obstruction_kind": "measured",
+   "statement": "Thirteen screening batches returned FINAL_NO_CANDIDATE / NO_ADMISSIBLE_NEXT_MECHANISM over the checked source set (EV-CRYPTO-010..013); the hyperplane-signature zero-minor route is not sub-rho under its own pinned model at d=1 (KN-FIND-3d6f78, replicated).",
+   "scope_limits": "Exhausted at the scale of the RECORDED SOURCE SET with zero-compute admission sheets; explicitly 'not an impossibility result' (EV-CRYPTO-012). No crypto-size run. The screen's own sensitivity audit (could it have admitted a known positive?) is unperformed (IDEA-20260805-9430e9).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/exotic/LEAD-EXO-cryptoscale-candidate-screen.yaml",
+   "forecloses": [
+    "crypto-size non-generic ECDLP candidate screen",
+    "hyperplane signature zero-minor route",
+    "compact target-label common factor",
+    "corner-coefficient induction"
+   ],
+   "revisit_when": "an externally sourced candidate with an explicit constructor, or the sensitivity audit fails",
+   "atlas_title": "GOAL-CRYPTO-001 discovery screen for a reproducible non-generic crypto-size algorithm"
+  },
+  {
+   "id": "LEAD-EXO-curve-model-representation",
+   "name": "Alternative curve models and point representations (Edwards, Hessian, Montgomery, Kummer, x-only)",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "measured",
+   "statement": "Model-native PDP solving degree is invariant (d_reg = 2) between Weierstrass Semaev and twisted Edwards at m=2 and m=3, Edwards a constant factor larger (EV-REP-001/002 replicated); the Kummer line is Bezout-optimal among coordinates E -> P^1, capping the model lever by a one-line degree argument. At most constant factors (Hessian <= 2) remain.",
+   "scope_limits": "Measured only at m=2,3 on toy curves; the Bezout-optimality claim is a proposal-level argument (IDEA-20260905-d0fee4), not a refereed theorem. Does not address constant-factor model gains inside an IC engine (those belong to ic-prime). Does not address coordinates to targets other than P^1 (e.g. Kummer surfaces of products) explicitly.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/exotic/LEAD-EXO-curve-model-representation.yaml",
+   "forecloses": [
+    "Edwards model summation polynomial",
+    "Hessian curve index calculus",
+    "Montgomery x-only factor base",
+    "Kummer line coordinate change",
+    "curve model changes solving degree"
+   ],
+   "revisit_when": "a coordinate E -> P^1 with summation-polynomial degree below the Kummer degree",
+   "atlas_title": "Alternative curve models and point representations (Edwards, Hessian, Montgomery, Kummer, x-only)"
+  },
+  {
+   "id": "LEAD-EXO-dl-character-sum-pseudorandom",
+   "name": "Additive-character bias of the discrete log on structured factor bases (H-PSEUDO)",
+   "kind": "lead",
+   "disposition": "exhausted_at_scale",
+   "obstruction_kind": "measured",
+   "statement": "Character-sum constant vs matched random null at 2^20-2^26: R = C_EC/C_null flat at 1.28-1.34, i.e. the small-x set behaves like a random set up to a constant; all six standard analytic proof routes closed (KN-FIND-e7a3b1); EXP7 Fourier flatness (8-14 bit) found no candidate predicate. By Betti-yield duality (KN-FIND-9d2f56) sub-rho combinatorial IC needs exactly such a bias.",
+   "scope_limits": "Measured only for the SMALL-X set at 2^20-2^26 (toy) and Fourier flatness at 8-14 bits; no proof either way. Not measured: other structured sets, trends beyond 2^30, multiplicative characters, or sets defined by non-coordinate predicates.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/exotic/LEAD-EXO-dl-character-sum-pseudorandom.yaml",
+   "forecloses": [
+    "discrete log character sum on small-x factor base",
+    "H-PSEUDO bias",
+    "Fourier bias of x-coordinate sets in log order",
+    "super-random additive yield factor base",
+    "exponential sum cancellation for the elliptic log"
+   ],
+   "revisit_when": "R trends upward with p beyond 2^30 on the same matched null, or a structured set other than small-x shows R growing with N",
+   "atlas_title": "Additive-character bias of the discrete log on structured factor bases (H-PSEUDO)"
+  },
+  {
+   "id": "LEAD-EXO-elliptic-net-eds",
+   "name": "Elliptic nets / elliptic divisibility sequences as a relation or annihilator source",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "Somos identities hold for every k, so net relations encode the group law on one k-fibre and not k; the net oracle is GGM-simulable with O(log N) overhead (KN-FIND-002); Hankel displacement rank of translated x-blocks is tautological, consecutive blocks have linear complexity >= (M-2)/3. Toy p in {101,431,1601}: collision statistics random-oracle-equivalent; charged k-recovery exponent 1.97-2.80 vs BSGS 1.17-1.32, gap growing 24x -> 135x.",
+   "scope_limits": "Toy prime fields only (p <= 1601, n <= 1607). Closed classes: Hankel / translated-block linear annihilators and rank-1 nets. NOT closed: a target-specific NONLINEAR locator outside those classes; rank >= 2 nets with k-specific relations; the NC2 permuted-net asymmetry in EV-NET-001 is unexplained; EDS period-finding mod p proposal unrun.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/exotic/LEAD-EXO-elliptic-net-eds.yaml",
+   "forecloses": [
+    "elliptic net relations for discrete log",
+    "Somos sequence sieve on net exponents",
+    "short annihilator of an elliptic divisibility sequence",
+    "EDS period finding mod p",
+    "division-polynomial value collisions below birthday"
+   ],
+   "revisit_when": "a target-specific nonlinear locator or a rank>=2 net with k-specific relations",
+   "atlas_title": "Elliptic nets / elliptic divisibility sequences as a relation or annihilator source"
+  },
+  {
+   "id": "LEAD-EXO-padic-jet-canonical-lift",
+   "name": "Prime-to-p jets, canonical/Teichmuller lifts and p-adic formal-group digits",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "For gcd(n,p)=1 the prime-to-p torsion lifts uniquely (finite etale) with zero formal defect and multiplication by l is invertible on every native jet / formal / p-typical target, so every additive order-l image is zero (IDEA-004 gate, independently verified); jet oracles are GGM-simulable O(1). The digit identity d(mS^) = m d(S^) holds only on the HARD global lift (1360/1360), whose cost is the lift itself; the computable Teichmuller contrast reads as chance under a resolution-matched test (power >= 0.90 for a 3x effect); the IDEA-436 valuation profile collapses to the +/- fibre indicator.",
+   "scope_limits": "Ordinary prime-field curves; measured parts at toy primes of 10-14 bits only. Not excluded: a computable NON-homomorphic local section with above-chance scalar information at a resolution detecting a 3x effect; a succinct manipulation of the hard lift T^ = mS^ without its coordinates (RQ-ECDLP-c1b7b1). Supersingular / p | #E cases not treated here (anomalous case is LEAD-TRF-anomalous-padic-lift).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/exotic/LEAD-EXO-padic-jet-canonical-lift.yaml",
+   "forecloses": [
+    "prime-to-p jet logarithm",
+    "dual-number lift of the addition law",
+    "canonical lift formal logarithm",
+    "Teichmuller lift digit",
+    "Serre-Tate canonical lift attack",
+    "extend Smart anomalous attack to ordinary curves",
+    "valuation profile of torsion lift"
+   ],
+   "revisit_when": "a computable non-homomorphic local section with above-chance scalar information, or succinct manipulation of the hard lift",
+   "atlas_title": "Prime-to-p jets, canonical/Teichmuller lifts and p-adic formal-group digits"
+  },
+  {
+   "id": "LEAD-EXO-split-jacobian-projection",
+   "name": "Split-Jacobian projected smoothness and the pair (P,Q) as a genus-2 divisor",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "Cross-genus Poincare-factor embedding cannot beat rho on the embedded elliptic factor: the Hasse-Weil order inflation of the ambient Jacobian (#Jac = N * #A, #A = Theta(N^{g-1})) outweighs genus-2 IC savings (KN-FIND-61347e); the projected-smoothness counting gate finds no route with lambda, mu <= 0.45 and its endpoint fails the known-log interface.",
+   "scope_limits": "Same-field embeddings with inflated ambient group order. NOT excluded: a same-field embedding whose ambient group order is O(N) rather than inflated, or a projection with a known-log interface. The (P,Q)-as-one-Mumford-divisor proposal recorded only Stage-0 identities (never run). Extension-field sources are separate leads.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/exotic/LEAD-EXO-split-jacobian-projection.yaml",
+   "forecloses": [
+    "split Jacobian projected smoothness",
+    "glue E to a genus-2 curve and do index calculus",
+    "encode P and Q as one Mumford divisor",
+    "Poincare factor embedding of an elliptic curve"
+   ],
+   "revisit_when": "a same-field embedding with ambient order O(N) or a projection with a known-log interface",
+   "atlas_title": "Split-Jacobian projected smoothness and the pair (P,Q) as a genus-2 divisor"
+  },
+  {
+   "id": "LEAD-EXO-torsor-deck-period",
+   "name": "Torsor, deck-orbit, cubical/biextension and scalar-orbit elliptic-period descent",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "For a generically Galois cover every rational deck-invariant factors through the quotient; a transitive fibre-orbit label is base data; a connected nontrivial cover has no rational section, so a rational target-compatible selector is a missing section/trivialization (IDEA-010 gate, independently verified). The cubical/biextension lift lands on the invertible side of the recognizable/invertible duality: computing its label costs the log.",
+   "scope_limits": "Galois covers and torsors over E with rational labels. NOT excluded: a NON-Galois cover escaping the quotient argument, or a rational target-compatible section of a nontrivial cover. The scalar-orbit elliptic-period idea (IDEA-011) was proposed and never run; closure of it is by the same gate, not by measurement.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/exotic/LEAD-EXO-torsor-deck-period.yaml",
+   "forecloses": [
+    "torsor deck-orbit descent",
+    "cubical lift of the prime-order subgroup",
+    "biextension label of the target",
+    "scalar-orbit elliptic period",
+    "theta-structure linearisation of translation"
+   ],
+   "revisit_when": "a rational target-compatible selector/section of a nontrivial cover, or a non-Galois cover",
+   "atlas_title": "Torsor, deck-orbit, cubical/biextension and scalar-orbit elliptic-period descent"
+  },
+  {
+   "id": "LEAD-RHO-automorphism-class-walks",
+   "name": "Rho on automorphism/Frobenius orbits: sqrt(2m) on Koblitz, order-4/6 maps on j=1728/j=0",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Known and reproduced: rho.signed_frobenius_strong 1.089 [0.927,1.261] x sqrt(pi/4n) on Koblitz log2 r 32-47 (144 runs); strong-rho steps/ideal 0.99/0.92/0.94 at n=41/53/61; j=0 cubic/negation 0.573 [0.562,0.585] vs theory 0.577. The ceiling is sqrt|Aut| and the programme sits on it.",
+   "scope_limits": "Generic walks on prime-order subgroups; the sqrt|Aut| ceiling is a constant, never an exponent. Not measured: secp256k1 six-class throughput; medium-tier shortfalls > 5%. Does not bound a curve family with a larger efficiently computable automorphism group (none known beyond Aut).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-automorphism-class-walks.yaml",
+   "forecloses": [
+    "Frobenius equivalence classes for Koblitz rho",
+    "sqrt(2m) speedup on anomalous binary curves",
+    "GLV automorphism quotient on j=0 curves",
+    "walk on orbits of the automorphism group",
+    "automorphism speedup beyond sqrt(|Aut|)"
+   ],
+   "revisit_when": "a curve family with a larger efficiently computable automorphism group",
+   "atlas_title": "'Rho on automorphism/Frobenius orbits: sqrt(2m) on Koblitz, order-4/6 maps on j=1728/j=0'"
+  },
+  {
+   "id": "LEAD-RHO-batched-inversion-shared-pm",
+   "name": "Batched affine steps: Montgomery simultaneous inversion and the free x(P-Q)",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Known (KR-RHO-cb1c58, -fbd582) and reproduced: batch inversion proved correct in Lean; GPU NIST W-sweep 1.52x/2.61x cumulative; P-256 plain step 179 ns at 1024 walks/inversion.",
+   "scope_limits": "Engineering constants of the rho step; nothing about the exponent. Leaves the use of the free P-Q in a best-of-candidates walk (LEAD-RHO-best-of-candidates-indegree) open.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-batched-inversion-shared-pm.yaml",
+   "forecloses": [
+    "Montgomery trick for rho",
+    "simultaneous inversion across walks",
+    "shared inversion for P+Q and P-Q",
+    "batched affine addition"
+   ],
+   "revisit_when": "an inversion-free step cheaper than 1I/n + 3M per walk",
+   "atlas_title": "Batched affine steps: Montgomery simultaneous inversion and the free x(P-Q) beside x(P+Q)"
+  },
+  {
+   "id": "LEAD-RHO-bsgs-family-memory",
+   "name": "Baby-step giant-step family (textbook, interleaved, negation, paired, signed-Frobenius claw)",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "cost_model",
+   "statement": "bsgs.negation is the prime-toy ops leader at 1.100 [0.978,1.225] x sqrt(pi/4) but needs 0.50 sqrt(r) table entries (rho 0.034); at 256 bits that is 2^127 entries, so DP rho dominates at every cryptographic size; claw.pair_table costs (c+1/c)/sqrt(n) >= 2/sqrt(n), measured 2.20x strong rho.",
+   "scope_limits": "Memory-charged comparison; BSGS wins on operations alone at toy size. Closes BSGS-type schedules with Theta(sqrt r) memory only; a schedule with o(sqrt r) memory and BSGS-level operations would contradict KR-RHO-7d93f6.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-bsgs-family-memory.yaml",
+   "forecloses": [
+    "baby-step giant-step with negation",
+    "interleaved BSGS",
+    "pair claw on Frobenius classes",
+    "BSGS beats rho",
+    "memory-bounded BSGS"
+   ],
+   "revisit_when": "a BSGS-type schedule with o(sqrt r) memory and BSGS-level operations",
+   "atlas_title": "Baby-step giant-step family (textbook, interleaved, negation, paired, signed-Frobenius claw)"
+  },
+  {
+   "id": "LEAD-RHO-cheon-aux-acquisition",
+   "name": "Run Cheon's auxiliary-input algorithm on ordinary ECDLP by generating [x^d]P yourself",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "From (P,[x]P) a generic algorithm can only form [a+bx]P; [x^2]P is outside the span and computing it is square-DH with the same Omega(sqrt r) generic bound as DH (Shoup), so acquiring [x^d]P costs rho-scale work (DEC-20260802-204; Cheon is prior art).",
+   "scope_limits": "GENERIC algorithms only, any curve. Non-generic (representation-using) acquisition of [x^2]P below sqrt(r) is NOT excluded; protocols that release powers (LEAD-RHO-cheon-deployed-applicability, open_blocked) are a separate lead.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-cheon-aux-acquisition.yaml",
+   "forecloses": [
+    "generate auxiliary input from the public key",
+    "Cheon attack on ordinary ECDLP",
+    "r^{1/4} ECDLP via x^d P",
+    "self-supplied auxiliary powers"
+   ],
+   "revisit_when": "a non-generic way to compute [x^2]P from [x]P below sqrt(r)",
+   "atlas_title": "Run Cheon's auxiliary-input algorithm on ordinary ECDLP by generating [x^d]P yourself"
+  },
+  {
+   "id": "LEAD-RHO-correlated-walks-shared-sums",
+   "name": "Correlated walks: one shared index sequence or shared precomputed sums across walks",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "With a shared index sequence pairwise differences P_i - P_j are invariant so walks never meet unless started equal (measured 0.073x, 176/1000 censored, a lower bound on loss); a pair table still costs one addition per step (1.027 [0.982,1.073]); per-epoch representative rule breaks determinism (0.83x).",
+   "scope_limits": "Any parallel rho; measured at N ~ 2^35.6. Does not exclude a sharing scheme keeping walks a deterministic function of the point while saving ADDITIONS (not just lookups).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-correlated-walks-shared-sums.yaml",
+   "forecloses": [
+    "walks share one index sequence",
+    "shared precomputed sums across walks",
+    "pair table R_i + R_j steps",
+    "per-epoch class rule rotation"
+   ],
+   "revisit_when": "a deterministic sharing scheme that saves additions",
+   "atlas_title": "'Correlated walks: one shared index sequence or shared precomputed sums across walks'"
+  },
+  {
+   "id": "LEAD-RHO-dp-multitarget-precomputation",
+   "name": "Distinguished points, multi-target batching and Bernstein-Lange precomputation (incumbent controls)",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Known and reproduced as controls: at equal or smaller advice BL rho solves a fresh Koblitz target 50-500x faster online than compact-orbit IC at n=41,53,61; precomputed rho faster in every matched N83 pair (3.74x-395x); lazy DP test 0.998; Kuhn-Struik is the multi-target margin rule; T^2 S = Theta(C^2 N) bounds many-collision tradeoffs.",
+   "scope_limits": "These are the incumbents, not a closure of a route: every advice/batch comparison must beat them. Scope of the measurement: Koblitz n=41-83; P-256 BEST2 DP deficit not attributed (0.947 estimate derived, not measured). Variants are LEAD-RHO-advice-table-variants (open).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-dp-multitarget-precomputation.yaml",
+   "forecloses": [
+    "distinguished point memory tradeoff",
+    "multi-target rho amortisation",
+    "Kuhn-Struik batch rho",
+    "Bernstein-Lange precomputed table",
+    "online cost with advice",
+    "lazy reduction before DP check"
+   ],
+   "revisit_when": "a table or batch scheme beating the BL l^{1/3}/l^{2/3} tradeoff or the sqrt(2Ln) batch law",
+   "atlas_title": "Distinguished points, multi-target batching and Bernstein-Lange precomputation (incumbent controls)"
+  },
+  {
+   "id": "LEAD-RHO-generic-sqrt-lower-bound",
+   "name": "Beat the square-root exponent with any generic collision algorithm",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Shoup/Nechaev: any generic algorithm needs Omega(sqrt r) group operations for a prime-order-r group; every lead in the family moves only the constant (÷sqrt|Aut|). All generic arms fit alpha <= 0.53 in FRONTIER.",
+   "scope_limits": "ALL generic algorithms, any field, any r. Says nothing about methods that read the representation (index calculus, transfer). Never revisited for generic algorithms.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-generic-sqrt-lower-bound.yaml",
+   "forecloses": [
+    "sub-square-root generic algorithm",
+    "beat sqrt(r) with a smarter walk",
+    "generic collision search below the birthday bound",
+    "new exponent from rho engineering"
+   ],
+   "revisit_when": "never for generic algorithms",
+   "atlas_title": "Beat the square-root exponent with any generic collision algorithm"
+  },
+  {
+   "id": "LEAD-RHO-kangaroo-interval",
+   "name": "Kangaroo / lambda (vOW, Gaudry-Schost) as a full-group ECDLP solver",
+   "kind": "lead",
+   "disposition": "closed_dominated",
+   "obstruction_kind": "measured",
+   "statement": "On every sealed domain kangaroo.vow is dominated on ops and memory: prime toy 2.203 [1.803,2.527] x floor vs rho.negation 1.453; Koblitz medium 15.558 vs signed-Frobenius rho 1.188; constants match the literature.",
+   "scope_limits": "FULL-GROUP single target only. Interval DLP (short interval, low-entropy secret, LHW leads) is the kangaroo's own domain and is not an ECDLP improvement; not closed there.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-kangaroo-interval.yaml",
+   "forecloses": [
+    "kangaroo for full ECDLP",
+    "Pollard lambda constant",
+    "four-kangaroo method",
+    "Gaudry-Schost on the whole group"
+   ],
+   "revisit_when": "a target with a known short interval or low-entropy secret",
+   "atlas_title": "Kangaroo / lambda (van Oorschot-Wiener, Gaudry-Schost) as a full-group ECDLP solver"
+  },
+  {
+   "id": "LEAD-RHO-negation-map-fruitless-cycles",
+   "name": "Negation-map rho on {+-P} classes with fruitless-cycle escape (prime curves)",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Known and reproduced: rho.negation 1.453 [1.184,1.772] x sqrt(pi/4) vs rho.plain 1.920 (ratio 0.757 vs ideal 0.707); fruitless 2-cycle rate 487/1e6 vs 1/(2r) = 488; dead trails fixed. Nothing new in the mechanism.",
+   "scope_limits": "Prime toy curves log2 r 15.7-25.3; the remaining ~7% shortfall is a calibration question (LEAD-RHO-matched-rho-calibration, open). The ledger grid run was heavily censored and produced no evidence record.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-negation-map-fruitless-cycles.yaml",
+   "forecloses": [
+    "negation map sqrt(2) speedup",
+    "fruitless cycle escape rule",
+    "walk on x-coordinate classes",
+    "change the class representative rule each round",
+    "negation map becomes a net loss"
+   ],
+   "revisit_when": "a medium-tier gain over rho.plain below 1.30 with disjoint CIs, or a new escape rule beating the literature constant",
+   "atlas_title": "Negation-map rho on {+-P} classes with fruitless-cycle escape (prime curves)"
+  },
+  {
+   "id": "LEAD-RHO-r-adding-walk-mixing",
+   "name": "Iteration-function choice: Teske r-adding walks, mixing, hashed partitions",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Known and reproduced: plain rho on 3,200 solves over whole 26-bit volcanoes averages 659,263 +- 12,422 iterations vs sqrt(pi n/2) = 654,547 (1.007x); a precomputed pair table gives 1.027 [0.982,1.073].",
+   "scope_limits": "Prime-field toy and 26-bit curves only. In-degree concentration / best-of-candidates walks are a separate open lead (LEAD-RHO-best-of-candidates-indegree).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/generic/LEAD-RHO-r-adding-walk-mixing.yaml",
+   "forecloses": [
+    "choose r for the r-adding walk",
+    "Teske walk constant",
+    "partition index from one coordinate",
+    "random-mapping walk constant",
+    "mixed walk with squarings"
+   ],
+   "revisit_when": "a walk family with provable mixing strictly better than a random mapping",
+   "atlas_title": "'Iteration-function choice: Teske r-adding walks, mixing, hashed partitions'"
+  },
+  {
+   "id": "LEAD-ICB-cofactor-torsion-quotients",
+   "name": "Spending the cofactor and 2-torsion of binary curves: quotient labels, k-tree filters, 2-torsion translation quotients",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "On ECC2K-130 gcd(4,l)=1, so every full-translation homomorphic cofactor quotient reduces to the order-l projection rho already uses; exactly sum-compatible filters on E(F_{2^131}) carry 2 bits (the cofactor), so Wagner k-tree has no quotient to work in; the corrected iota-stable classification (V_d = b^{1/4} F_{2^d}) empties the (subspace base, 2-torsion quotient) cell on every prime-degree standardized curve; the production 2-torsion census adds 0 relations.",
+   "scope_limits": "Prime-degree standardized binary curves with cofactor 2 or 4 and SUBSPACE bases; HOMOMORPHIC / exactly sum-compatible filters. Does not exclude a curve with a large smooth cofactor, or a NON-homomorphic sum-compatible filter with more than log2(cofactor) bits. FGHR 2-torsion symmetrisation of the solve is a separate (valid) constant.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-cofactor-torsion-quotients.yaml",
+   "forecloses": [
+    "Wagner k-tree on ECC2K-130",
+    "cofactor 4 coset label prunes decomposition",
+    "2-torsion translation quotient of a subspace factor base",
+    "spend the cofactor on decomposition"
+   ],
+   "revisit_when": "a large smooth cofactor or a non-homomorphic sum-compatible filter with more bits",
+   "atlas_title": "Spending the cofactor and 2-torsion of binary curves: quotient labels, k-tree filters, 2-torsion translation quotients of the factor base"
+  },
+  {
+   "id": "LEAD-ICB-decomposition-encoding-and-sat",
+   "name": "Decomposition-oracle encodings and SAT/enumeration solving of binary PDP",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "measured",
+   "statement": "Every SAT or enumeration method measured has per-attempt UNSAT cost 2^{alpha l} with alpha ~ m (WDSat 2.9985 bits per unit l at m=3, reproducing 2^{3l}/3!; alpha 4.09-4.33 at m=4, l=3..5) while beating rho needs alpha < m/2 - 1; extrapolates 50-150 bits above budget at n=131. Ladders n=11..31: no arm grows slower than the enumeration floor. Encoding levers are constants: S_m symmetrisation saturates at m>=5 balanced l; closure outcomes basis-invariant (Prop. B); reduction polynomial a constant confound; Nagao coset yield weakened vs chained S_3; trace replay a constant.",
+   "scope_limits": "Measured at n=11..31, m=3,4, l<=5 on binary subspace bases; extrapolation to n=131 by fitted slopes. Does not cover a solver/presentation whose UNSAT cost grows by fewer than m/2-1 bits per unit l (that becomes the open algebraic-decomposition lead). The cited #k-SAT ETH-disproof claim is unverified and does not meet the revisit condition because Tseitin variable count outgrows m*l. Gröbner/SAT arms refuse > 64 Boolean unknowns, so m=4 cells at n>=23 are unmeasured.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-decomposition-encoding-and-sat.yaml",
+   "forecloses": [
+    "SAT or XOR solver for point decomposition beats rho",
+    "Karabina symmetric formulation or crossbred for binary PDP",
+    "direct S_4 instead of chained S_3",
+    "normal basis versus polynomial basis changes decomposition cost",
+    "pentanomial vs trinomial reduction polynomial lever"
+   ],
+   "revisit_when": "a solver or presentation whose UNSAT cost grows by fewer than m/2 - 1 bits per unit l at m >= 3",
+   "atlas_title": "Decomposition-oracle encodings and SAT/enumeration solving of binary PDP: SAT/XOR, Karabina, S_m symmetrisation, chained vs direct S_4, Nagao, basis and reducti"
+  },
+  {
+   "id": "LEAD-ICB-factor-base-subspace-choice",
+   "name": "Choice of the factor-base subspace V at fixed dimension (GP, dim(V.V), trace rank, cosets, greedy, HW pools, trace-parity window)",
+   "kind": "lead",
+   "disposition": "exhausted_at_scale",
+   "obstruction_kind": "measured",
+   "statement": "Measured with nulls to n=41, r=2^39: greedy coverage 1.18x at r=2^13 shrinking to 1.0000 at r=2^39; coset/random 1.020 [0.959,1.083]; GP vs random at matched dim(V.V) weakened and replicated; Spearman tests of dim(V.V)/trace rank vs N_var inconclusive; normal vs polynomial HW pools no yield change at n=17; the Weil bound is vacuous for abscissa density at every IC dimension l <= 66 at n=131. All effects are constants vanishing with size.",
+   "scope_limits": "Subspace bases at FIXED dimension, binary n <= 41; properties tested are the listed ones. Does not exclude a property of V predicting N_var or yield with a null-controlled effect GROWING with n at n>=31, nor non-subspace bases (LEAD-ICB-nonlinear-frob-stable-bases, open). Provenance gaps: original BINSTD f7ca97 captures missing; n=17 invariant-dimension table lacks a Lean bridge; 'support/refutation counts of a base do not establish cheaper successful decomposition'.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-factor-base-subspace-choice.yaml",
+   "forecloses": [
+    "geometric progression subspace beats random subspace",
+    "small dim(V.V) factor base reduces XOR-SAT variables",
+    "Bailey Hamming-weight distinguished points as a factor base",
+    "greedy or coset factor base raises relation yield",
+    "trace-parity half window of Semaev polynomial basis"
+   ],
+   "revisit_when": "a property of V with a null-controlled effect growing with n at n >= 31",
+   "atlas_title": "Choice of the factor-base subspace V at fixed dimension (geometric progression, dim(V.V), trace rank, cosets, greedy coverage, HW pools, trace-parity window)"
+  },
+  {
+   "id": "LEAD-ICB-free-relations-self-collision",
+   "name": "Free relations from self-collisions in the pair-root table (no-probe relations)",
+   "kind": "lead",
+   "disposition": "exhausted_at_scale",
+   "obstruction_kind": "measured",
+   "statement": "The relations exist but are highly correlated: homogeneous rank 49 from 588 verified rows at n61/K600, 746 at K1200, 1,197 at K1500, 6 at n83/K600; rank grows ~K^4 so a free rank stage needs K ~ 1,500-2,050 at n61 and ~2,600 at n83 (36 GB), where scan plus K^2 LA exceed the guided rank stage. In production (n<=63) a constant 0.957-0.960x; in the ic price pair-table pipeline a net loss (+5-9% cold).",
+   "scope_limits": "Scale reached n=41-83, K<=1,500; the original prediction (~11,000 relations, free rank stage) was refuted by RANK, not by existence. Not implemented: a wide-path (n>63) harvest; not excluded: a table structure yielding independent rows faster than K^4. Does not change the exponent in either case (K^3 >= r/n^4 is the same generic line).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-free-relations-self-collision.yaml",
+   "forecloses": [
+    "free relations by sorting the pair-root table",
+    "self-collision relations make the rank stage free",
+    "harvest relations without probes on Koblitz IC"
+   ],
+   "revisit_when": "a wide-path harvest or a table structure yielding independent rows faster than K^4",
+   "atlas_title": "Free relations from self-collisions in the pair-root table (no-probe relations)"
+  },
+  {
+   "id": "LEAD-ICB-frobenius-orbit-factor-base",
+   "name": "Frobenius/endomorphism-invariant factor bases and orbit columns beyond the trivial orbit saving",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "For E/F_q over F_{q^n} the base {x(P) in V} is pi-stable iff V is sigma-stable; stable subspaces form an arithmetic lattice fixed by the factorisation of X^n-1 over F_q; the gain is exactly n on relations (n^2 on LA) and never more (H-FROB-6774fb; tau pilot: per-attempt decomposition probability at matched |FB| equals the birthday value, n=11..23). At prime n with ord_n(2)=n-1 (131,163) usable stable dimensions are empty. Rho gets the matching sqrt(2n). Prime-field phi-stable bases bounded by the eigenvalue-subgroup order (<= 6), +4% at order 6 on j=0. Re-check 2026-10-28 (n=15,31): the stable base wins only through the orbit credit (D_nofold 0.56 [-0.51,1.52] bits).",
+   "scope_limits": "Koblitz/subfield curves over F_{2^n}, n prime, toy to n=61 measured, ECC2K-130 by structure; SUBSPACE bases. Not excluded: a Frobenius-stable base whose per-attempt decomposition probability exceeds the birthday value at matched |FB|, or a stable NON-subspace base with membership degree far below its size (open lead). The 2026-10-28 protocol was frozen by timestamp only (hash mismatch noted). Gap to matched rho stays 22.6-33.0 bits: 'distance remaining, not a verdict'.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-frobenius-orbit-factor-base.yaml",
+   "forecloses": [
+    "Frobenius-invariant factor base gives more than an n-fold saving",
+    "Frobenius-stable subspace factor base for ECC2K-130 or K-163",
+    "orbit columns cut relation collection below rho on Koblitz curves",
+    "phi-stable or mu_3-invariant factor base on j = 0 curves beats the |Aut| fold",
+    "Koblitz structure of the K-curves buys IC more than it buys rho"
+   ],
+   "revisit_when": "a stable base with super-birthday per-attempt probability or a stable non-subspace base with low membership degree",
+   "atlas_title": "Frobenius/endomorphism-invariant factor bases and orbit columns on Koblitz and subfield curves, beyond the trivial orbit saving"
+  },
+  {
+   "id": "LEAD-ICB-frobenius-search-symmetry",
+   "name": "Frobenius as a symmetry of the decomposition search: orbit CNF, conjugate attempts, equivariant elimination",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "Absolute Frobenius is an equivariance between CONJUGATE target instances, not a per-instance search symmetry (replicated); fixed-target tau-orbit CNF clauses are unsound (replicated); sound orbit encodings cost >= 0.95x plain search at n=17,23,31; on a non-stable V the n conjugates of a target are n attempts over n conjugate bases (Prop. T). Equivariant elimination is a constant: 44-73x vs naive kernel is 2-3x vs gf2_elim; whole-oracle 15.5x at n=13 of which fall-row augmentation alone gives 11.6x; regresses 0.29-0.59x on production pipeline systems.",
+   "scope_limits": "Binary subspace bases, n <= 31. Not excluded: a genuine stabilizer of a single target in the descended system (not a conjugation); an equivariant elimination applicable to the production compact-orbit pipeline. Frobenius-equivariant F4 on the full barrel system remains an open ENABLER (brief §3 item 5), closed only as an exponent lever.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-frobenius-search-symmetry.yaml",
+   "forecloses": [
+    "Frobenius symmetry breaking in the SAT encoding",
+    "treat the n Frobenius conjugates of a target as one attempt",
+    "equivariant F4 makes Koblitz decomposition sub-rho",
+    "orbit-quotient CNF for Koblitz point decomposition"
+   ],
+   "revisit_when": "a genuine single-target stabilizer or production-applicable equivariant elimination",
+   "atlas_title": "Frobenius as a symmetry of the decomposition search: orbit CNF encodings, conjugate attempts, equivariant elimination"
+  },
+  {
+   "id": "LEAD-ICB-generic-table-oracle",
+   "name": "Generic decomposition oracles for Koblitz IC: pair tables, compact-orbit 4-sum, MITM, enumeration, cap-locus arity, known-log pools",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Every oracle built from group operations and membership tests makes IC a generic-group algorithm with advice: Shoup T >= sqrt(r/|Aut|), CGK S*T^2 >~ r/|Aut|; with |Aut|=2n no 4-,5-,6-sum table beats sqrt(r/2n) total work; balanced generic IC ~ r^{2/3}/n^{4/3}. Measured rungs 2^25-2^27 above the generic line; ln(IC/rho) grows 0.165 [0.117,0.213] per ln r; at ECC2K-130 needs K* ~ 4e11 columns, ~8e9 core-years. Target-dependent/walk-carried bases are known-log pools.",
+   "scope_limits": "All binary and Koblitz curves, one target, setup charged, GENERIC oracle class. Constant-factor engineering of the pipeline remains valid baseline work. Not covered: an algebraic restriction on the unknowns with membership degree far below |F| (LEAD-ICB-prime-degree-algebraic-decomposition, open_blocked). Open accounting items: N83 prebuilt bases lack matched costs at m=2-4; N12 held-out comparison lacks isolated host; cadence-32 control has no matched rho row.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-generic-table-oracle.yaml",
+   "forecloses": [
+    "bigger pair table or k-sum table for ECC2K-130",
+    "5-sum or 6-sum compact-orbit extraction beats rho",
+    "meet-in-the-middle point decomposition as a sub-rho oracle",
+    "walk-carried or target-dependent factor base",
+    "arity lever at the cap locus for ECC2K-130"
+   ],
+   "revisit_when": "a non-generic oracle (algebraic restriction with low membership degree)",
+   "atlas_title": "Generic decomposition oracles for Koblitz IC: pair tables, compact-orbit 4-sum, MITM and enumeration, cap-locus arity, known-log pools"
+  },
+  {
+   "id": "LEAD-ICB-multi-target-and-portfolio",
+   "name": "Batch IC and IC/rho portfolios: amortising the set-up over many targets, restart portfolios",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "The multi-instance generic bound (L logs cost >~ sqrt(L r/|Aut|)) covers generic-oracle IC including set-up and batch rho (Kuhn-Struik) attains it; 1/L amortisation applies only to the online part after a set-up obeying the same bound; a restart portfolio cannot beat pure rho when IC cost is concentrated at a floor ratio >= 1 (H-BINSTD-32867d). Table C (32 targets) stays 3.62-14.9x above batch rho.",
+   "scope_limits": "GENERIC-oracle IC only; Table C reference rho is from a different session (S20). Not excluded: a non-generic oracle (then amortisation matters); IC attempt costs heavy-tailed with median within ~2 orders of rho. The four-target union column is a rare-event linearisation, not a batch speedup.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-multi-target-and-portfolio.yaml",
+   "forecloses": [
+    "index calculus amortises as 1/L so batch IC beats batch rho",
+    "IC and rho restart portfolio",
+    "four-target union column as a batch speedup",
+    "shared set-up across many Koblitz targets"
+   ],
+   "revisit_when": "a non-generic oracle or heavy-tailed attempt costs near rho",
+   "atlas_title": "Batch IC and IC/rho portfolios: amortising the set-up over many targets, restart portfolios"
+  },
+  {
+   "id": "LEAD-ICB-orbit-linear-algebra",
+   "name": "Linear algebra of the orbit-folded relation matrix (equivariant blocks, sparse filters, Wiedemann, CADO-style merge)",
+   "kind": "lead",
+   "disposition": "exhausted_at_scale",
+   "obstruction_kind": "measured",
+   "statement": "Linear algebra is 0.0-2.7% of S in every Table A-C row, so no LA speed-up moves the board: CADO-style filter 2.48-10.4x on the phase, 1.93x faster than CADO-NFS at 262,144 columns; the F_r[Z/131] structure is exhausted by the orbit quotient (ord_131(r)=1 leaves only the lambda-eigenblock live).",
+   "scope_limits": "Scale reached 262,144 columns; share measured on the Koblitz tables. Not covered: factor bases of 10^6+ columns or a large-prime arm where LA becomes a material share of S. Does not bear on the Macaulay-matrix linear algebra inside the algebraic oracle (that is the fall-degree question).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-orbit-linear-algebra.yaml",
+   "forecloses": [
+    "block Wiedemann for the Koblitz relation matrix",
+    "equivariant linear algebra over F_r[Z/n]",
+    "sparse filtering makes IC beat rho"
+   ],
+   "revisit_when": "factor bases of 10^6+ columns or a large-prime arm making LA material",
+   "atlas_title": "Linear algebra of the orbit-folded relation matrix (equivariant blocks, sparse filters, Wiedemann, CADO-style merge)"
+  },
+  {
+   "id": "LEAD-ICB-quasi-subfield-polynomials",
+   "name": "Quasi-subfield-polynomial factor bases (HKPYY; Euler-Petit) at prime extension degree, ECC2K-130",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Euler-Petit Thm 1: every linearized QSP has beta >= 3/4, so under the HKPYY cost model the exponent is >= 0.93 (>= 2^122 at n=131 vs rho 2^60.9); for F_2-coefficient lambda only X^2+X (n0=1) and L_Phi131 (n0=130) exist at n=131; multiplicative QSPs give |V| = 264 or p+1, beta >= 1.02; Lemma 4.1 tight (witnesses at n=7). Toy n=31, k=15: QSP yield 0.214 vs random 0.204-0.230.",
+   "scope_limits": "LINEARIZED and multiplicative QSPs under the HKPYY cost model, F_2 coefficients at n=131; toy yield at n=31 only. Not excluded: a non-linearized or correspondence-defined QSP family (IDEA-20260916-a17f43) escaping the Frobenius-injection bound; exhaustive search past n=47 finding log2(deg lambda) < n0^2/n at prime n. KR-IC-49c882 records existence of useful families as open in the literature.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-quasi-subfield-polynomials.yaml",
+   "forecloses": [
+    "quasi-subfield polynomial factor base for ECC2K-130",
+    "search for split X^{2^k} - lambda(X) at prime n as a factor base",
+    "QSP no-Weil-descent chain beats rho on binary curves",
+    "remove the n mod n0 term in HKPYY Lemma 4.1"
+   ],
+   "revisit_when": "a non-linearized/correspondence QSP family or a search past n=47 beating the bound",
+   "atlas_title": "Quasi-subfield-polynomial factor bases (Huang-Kosters-Petit-Yeo-Yun; Euler-Petit) at prime extension degree, ECC2K-130"
+  },
+  {
+   "id": "LEAD-ICB-retained-setup-online",
+   "name": "Retained-setup online IC on Koblitz curves (n=61,71,73,83): online ratio after uncharged precomputation",
+   "kind": "lead",
+   "disposition": "closed_dominated",
+   "obstruction_kind": "measured",
+   "statement": "Dominated by Bernstein-Lange preprocessing rho: at equal or smaller advice 53-317x faster online than IC at n61; precomputed-table rho wins every matched N83 pair (K3300: 3.74x time-matched, 40.6x memory-matched; K600: 81.5-215x / 396x). Published online wins used rho with an empty DP table and were marked contradicted (validation sweep 2026-10-20). The IC table sits 2^25-2^27 above the CGK line.",
+   "scope_limits": "Koblitz n=61-83, retained-advice accounting. Not excluded: an online IC whose S*T^2 lies at or below r/|Aut| (non-generic oracle), or advice shared across many CURVES that preprocessing rho cannot share (but see LEAD-STR-isogeny-transport-preprocessing).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-retained-setup-online.yaml",
+   "forecloses": [
+    "IC online after precomputation beats rho on Koblitz curves",
+    "N83 or n61 online speedup over rho",
+    "reuse the pair table across many targets to beat rho",
+    "retained-setup class win"
+   ],
+   "revisit_when": "an online IC with S*T^2 at or below r/|Aut|",
+   "atlas_title": "Retained-setup online IC on Koblitz curves (n = 61, 71, 73, 83): online ratio after an uncharged precomputation"
+  },
+  {
+   "id": "LEAD-ICE-boolean-f4-f5-f6-engines",
+   "name": "Faster Boolean F4/F5/F6-IC/inherited-F4/matrix-F5 engines for the descended Semaev system",
+   "kind": "lead",
+   "disposition": "closed_dominated",
+   "obstruction_kind": "measured",
+   "statement": "Dominated by the root-finding pair-table oracle on Koblitz and random-binary n<=31, m in {2,3,4}: once word XORs are priced, inherited F4 is 22x-33x strong rho at n13 and the complete-S pair table 17x-22x cheaper than F4; F6-IC 55x-6,483x rho; F4 on the S_3 chain and F6-IC grow faster in n than the MITM floor (slope-difference CI above 0) at m=3,4. Engine speedups 1.4x-2.3x are real but constant.",
+   "scope_limits": "Binary n<=31, m<=4 (Gröbner/SAT arms refuse > 64 Boolean unknowns, so m=4 cells at n>=23 unmeasured). Dominance is relative to a GENERIC oracle, which itself is closed; the lead reopens if the pair table is infeasible (m>=4, large n) AND the algebraic degree stays bounded, or a priced engine beats the MITM floor slope on >=3 cells. Known-issue: pre-#1774 F4 S values were lower bounds; cross-ISA BMI2 drift in counters.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-engine/LEAD-ICE-boolean-f4-f5-f6-engines.yaml",
+   "forecloses": [
+    "faster F4 for Weil descent summation polynomial systems",
+    "F5 signature basis for point decomposition",
+    "M4RI GF(2) elimination speedup for PDP",
+    "GPU RREF Groebner decomposition",
+    "F4 trace reuse across decomposition targets",
+    "F6-IC geometric closure decomposition"
+   ],
+   "revisit_when": "a cell where the pair table is infeasible and the algebraic degree stays bounded",
+   "atlas_title": "Faster Boolean F4 / F5 / F6-IC / inherited-F4 / matrix-F5 engines for the descended Semaev system"
+  },
+  {
+   "id": "LEAD-ICE-generic-oracle-arity-cost-floor",
+   "name": "Generic (enumerative / MITM / free) decomposition oracles cannot reach rho at any arity",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "cost_model",
+   "statement": "For ENUM, MITM, MITM_CAPPED oracles on prime-degree binary curves the replicated v2 cost model has zero in-domain sub-rho cells (EV-SEMBIN-b6d042); on ECC2K-130 a FREE oracle at m=3 still costs 2^68.58 vs rho 2^60.81 (product law relations x targets x oracle = m 2^n, independent of dim V); structured generic-group (CHW 2026/384) and non-adaptive time-space (DKM 2025/783) bounds give the same wall.",
+   "scope_limits": "Oracles that do NOT read curve coordinates algebraically; prime-degree binary; cost MODEL level (conditional), toy measurements l=11,12. The FREE control does have 7,850 cells below vOW, so 'the obstruction is the oracle class, not IC'. Not covered: an oracle reading coordinates with per-query cost polynomial in n at fixed degree; a non-generic yield exceeding C(B+m-1,m)/N on average (impossible by conservation for fixed B).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-engine/LEAD-ICE-generic-oracle-arity-cost-floor.yaml",
+   "forecloses": [
+    "free decomposition oracle lifts IC below rho",
+    "arity threshold for point-decomposition index calculus",
+    "generic m-SUM decomposition oracle",
+    "larger arity m makes enumeration IC beat rho",
+    "multi-target amortisation rescues exhaustive-solver IC"
+   ],
+   "revisit_when": "an oracle reading coordinates at polynomial per-query cost with fixed degree",
+   "atlas_title": "Generic (enumerative / MITM / free) decomposition oracles cannot reach rho at any arity"
+  },
+  {
+   "id": "LEAD-ICE-prime-field-semaev-solving-degree",
+   "name": "Gröbner solving degree / eliminants of prime-field S_3/S_4 decomposition systems",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Naive Semaev IC over prime fields cannot beat generic methods (KR-IC-401ebf); reproduced: at balanced L = q^{1/5} on toy ordinary curves beta_work(B1) = 0.797 on interval/random bases and 0.647 on subgroup bases vs the 0.30 sub-rho threshold, 36/36 cells, 105/105 FGLM checks; root-finding/pair-table dominates any prime-field Gröbner arm in ecbench; BKK/mixed-volume elimination toy negatives (m<=5, p<=1009).",
+   "scope_limits": "Interval, random and multiplicative-subgroup bases at toy p; the literature closure is heuristic (statistical assumptions, abstracts only). Not excluded: a prime-field base whose membership equation has bounded degree independent of p (digit-map / PFDR descent, PKM towers) with measured solving degree flat across >=3 field sizes — this test is pre-registered and launch-blocked (LEAD-ICP-pkm-tower-algebraic-oracle). KN-OPEN-004 (BKK elimination) stays open.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-engine/LEAD-ICE-prime-field-semaev-solving-degree.yaml",
+   "forecloses": [
+    "prime-field Semaev Groebner solving degree law",
+    "serial S_3 eliminant for sub-rho prime-field IC",
+    "subresultant pivot tree for prime-field decomposition",
+    "grevlex versus lex solving degree on F_p summation systems",
+    "semi-regular null for prime-field decomposition"
+   ],
+   "revisit_when": "a bounded-degree membership base with solving degree flat across >= 3 field sizes",
+   "atlas_title": "Groebner solving degree / eliminants of prime-field S_3 / S_4 decomposition systems"
+  },
+  {
+   "id": "LEAD-ICE-semaev-chain-cost-model",
+   "name": "Chain length t, merge-tree topology and memory charging in Semaev's charged cost",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "cost_model",
+   "statement": "Under Semaev 2015's own cost model at n in [250,600], t* = m* at every n under all three solving-cost readings (independent optimiser, replicated); N = (t-2)n + tk is invariant over merge topologies so charged cost is topology-blind (factor <= ~4); the n=409 storage indeterminacy is an artefact of the vOW operating point.",
+   "scope_limits": "Semaev 2015's cost model only, n in [250,600]; the model's degree-of-regularity assumption (Assumption 1) is itself disputed. Not excluded: a solver whose DEGREE (not variable count) depends on topology (transfer-matrix / DP Gröbner variant, IDEA-20261016-7a138a) showing topology-dependent closure degree on measured cells.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-engine/LEAD-ICE-semaev-chain-cost-model.yaml",
+   "forecloses": [
+    "chain length t less than m in Semaev chaining",
+    "merge-tree topology of S_3 chaining",
+    "memory-charged Semaev crossover against van Oorschot-Wiener",
+    "recharge Semaev Table 3 at integer k"
+   ],
+   "revisit_when": "a topology-dependent closure degree on measured cells",
+   "atlas_title": "Chain length t, merge-tree topology and memory charging in Semaev's charged cost"
+  },
+  {
+   "id": "LEAD-ICE-semaev-cover-monodromy",
+   "name": "Semaev summation-cover monodromy / Frobenius cycle types as a relation-rate gate",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "For every p>3 and nonsingular E/F_p the generic monodromy is (Z/2)^{m-2} (ordered) and (Z/2)^{m-2} x| S_{m-1} (symmetric, m>=4) with an exact Frobenius rule on unramified fibres (KN-FIND-bdcd60, two blind re-derivations); on the factor-base locus S_m splits completely with an exact root multiset, so the generic-fibre cycle-type census is a no-go as a relation-rate probe at every m>=3 (KN-FIND-4f0d84).",
+   "scope_limits": "Stated for p>3 in the finding (the treatise theorem is for every field, with the char-2 separability lemma flagged for expert check). Closes CENSUS instruments and curve selection by monodromy; leaves open which factor-base statistic (if any) carries curve-specific relation-rate information (KN-OPEN-62c870 Q1/Q3), and variance/coverage of yield.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-engine/LEAD-ICE-semaev-cover-monodromy.yaml",
+   "forecloses": [
+    "exceptional monodromy locus of Semaev summation cover",
+    "Frobenius cycle-type census as relation-rate probe",
+    "Chebotarev density of Semaev fibres",
+    "wreath-group monodromy over symmetric base",
+    "curve family with higher relation rate from Galois group"
+   ],
+   "revisit_when": "a rule-12 review breaking the findings or a factor-base statistic answering KN-OPEN-62c870",
+   "atlas_title": "Semaev summation-cover monodromy / Frobenius cycle types as a relation-rate gate"
+  },
+  {
+   "id": "LEAD-ICP-algebraic-membership-factor-base",
+   "name": "Factor bases with low-degree algebraic membership over F_p (subgroup, coset, Dickson, j=0 orbit, low-degree-map images, character sets)",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "A target-independent algebraic locus of degree d yields O(d) usable points, so a size-B algebraic base has description degree >= B/3 and membership polynomial of degree B (bounded-degree factor-base theorem); mean per-target yield is C(B+m-1,m)/N for every size-B base (conservation; coverage gain <= 1.582, constant). Measured: subgroup/small-x/random within 7% at 32 bits; exact mean-yield ratio 1.000000 for six geometries; 2026-10-28: subgroup, coset, cubes, quadratic-character, Dickson and rational-map images all within 0.0003 bits of size-matched random at m=2 (N 2^13..2^26); learned selector 0.0011 bits headroom.",
+   "scope_limits": "Prime-order E/F_p, TARGET-INDEPENDENT algebraic loci, mean yield at m=2 measured to 2^26. Not covered: KN-OPEN-020 (a size-B set with sub-B-degree membership surviving substitution — the theorem bounds description degree of the locus, not of every presentation, cf. PKM towers where membership x^{2^t} = g^{2^t} IS low degree but the solving degree grows); bases raising coverage or VARIANCE with an excess growing with N. P-256 Dickson/2-isogeny constructions exist but have no costed relation solver.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-algebraic-membership-factor-base.yaml",
+   "forecloses": [
+    "multiplicative subgroup factor base x^B = 1",
+    "Dickson or coset factor base for prime-field index calculus",
+    "algebraic factor base with low-degree membership polynomial",
+    "character sums bias decompositions over a coset base",
+    "image of a low-degree map as factor base"
+   ],
+   "revisit_when": "KN-OPEN-020 answered positively, or coverage/variance excess growing with N",
+   "atlas_title": "Factor bases with low-degree algebraic membership over F_p (subgroup, coset, Dickson, j=0 orbit, images of low-degree maps, character-constant sets)"
+  },
+  {
+   "id": "LEAD-ICP-char0-lifting-xedni-smoothness",
+   "name": "Lifting to characteristic zero: classical xedni, prescribed rational lifts (Cheon 2-isogeny form), smoothness of integer lifts of x",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "JKSST 2000: xedni does not beat rho (logs span rank(E(Q)) unknowns; target must be a bounded combination of generators). Reproduced the p=353 Cheon example; both historical prescribed pairs certified independent modulo torsion (rank exactly two) with a derived signed-square independence lemma; the integer-lift smoothness route has no compositional identity because the x-line addition law is 2-valued.",
+   "scope_limits": "Lifts to E(Q) via classical/prescribed constructions; the independence lemma is pending independent review; Xedni V2 found 0 dependencies among 20 bounded pairs (toy). Not excluded: a certified exact dependent lift from the frozen bounded search with lift+certificate costs charged; a lifting family with bounded relation coefficients at crypto-relevant rank.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-char0-lifting-xedni-smoothness.yaml",
+   "forecloses": [
+    "xedni calculus",
+    "lift points to a rational elliptic curve and reduce relations",
+    "prescribed rational lifts with a dependency",
+    "smoothness of integer lifts of x-coordinates",
+    "Cheon two-isogeny lift"
+   ],
+   "revisit_when": "a certified dependent lift found below p^{1/2} with costs charged",
+   "atlas_title": "Lifting to characteristic zero - classical xedni, prescribed rational lifts (Cheon 2-isogeny form) and smoothness of integer lifts of x"
+  },
+  {
+   "id": "LEAD-ICP-coppersmith-smallroot-semaev",
+   "name": "Small-root (Coppersmith / Jochemsz-May) decomposition with lattice-describable (window, AP, GAP) factor bases",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "Every Coppersmith lattice from (p,f)^t on a convex monomial set (Ryan's optimal shift set and JM basic/extended included) has reach <= (n! vol Newt(S_3))^{-1/n} per S_3 block with equal bounds: 0.3293 (3 unknowns) / 0.3536 (2), attained 11/11; unequal-bound optimiser finds nothing above 1/2; IC demand at (m,w)=(4,2) is 8/9, margin ~ -0.56 proved (equal) / ~ -0.39 best numerical; HG-corrected JM extended reach 0.2803. Direct S_4/S_5: reach caps 1/21.8 and 1/70.8 vs targets 1/4, 1/5.",
+   "scope_limits": "ONE S_3 block (or one S_4/S_5 polynomial), convex monomial sets, lattices of polynomials in (p,f)^t; unequal-bound part numerical not proved. NOT covered: a joint lattice for the three-block (4,2) system reaching more than the per-block sum; non-convex monomial sets; rank-r>=2 GAP substitution changing the block polynomial; e-form unequal bounds; multi-ideal lattices; non-Coppersmith small-root solvers; the D4-symmetrised S_5 lattice (never run). P-256 F6 rectangle/digit lattice failures are 'not a general impossibility'.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-coppersmith-smallroot-semaev.yaml",
+   "forecloses": [
+    "Coppersmith small roots of summation polynomials",
+    "small-x factor base solved by LLL",
+    "windowed addition tree with lattice reduction",
+    "symmetric e1 e2 lattice for S_3",
+    "rank-r generalized arithmetic progression factor base",
+    "lattice-assisted meet-in-the-middle decomposition"
+   ],
+   "revisit_when": "a joint multi-block lattice, non-convex set, unequal-bound allocation above 1/2, rank-r GAP, or non-Coppersmith solver",
+   "atlas_title": "Small-root (Coppersmith / Jochemsz-May) decomposition with lattice-describable (window, AP, GAP) factor bases"
+  },
+  {
+   "id": "LEAD-ICP-extension-field-embedding",
+   "name": "Embedding E(F_p) into E(F_{p^n}) to buy a subfield factor base",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "cost_model",
+   "statement": "Gaudry's cost on E(F_{p^n}) is O~(p^{2-2/n}) against the original sqrt(p): p at n=2, p^{4/3} at n=3; the embedding enlarges the problem faster than the subfield helps.",
+   "scope_limits": "Any FIXED n with Gaudry/Diem decomposition. Reopens only for a decomposition over F_{p^n} with exponent below 1/(2n) in |E(F_{p^n})|, far beyond Gaudry/Diem. Cost-model closure (no experiment).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-extension-field-embedding.yaml",
+   "forecloses": [
+    "lift the prime-field curve to an extension field to get a subfield",
+    "base change to F_{p^2} then Gaudry index calculus",
+    "Weil descent for a prime-field curve"
+   ],
+   "revisit_when": "a decomposition over F_{p^n} with exponent below 1/(2n)",
+   "atlas_title": "Embedding E(F_p) into E(F_{p^n}) to buy a subfield factor base"
+  },
+  {
+   "id": "LEAD-ICP-generic-table-decomposition",
+   "name": "Enumeration, subtraction and MITM pair-table decomposition for prime-field Semaev IC (arity 2-7)",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Any oracle that enumerates or table-looks-up base elements is a generic time/memory trade-off: S*T^2 >~ N (CGK), T >~ sqrt(N) (Shoup); with LA included m=2 >= 3(pT_dec)^{2/3} and m=3 only ties rho even with T_dec = O(1). Measured 12-32 bits: exhaustive exponent 0.99 (m=2), 1.01 (m=3); mitm 0.67/0.75/0.60 at m=3/4/5 vs rho 0.50; Table B gap widens 5.47x -> 13.5x; k=4,5 sum tables 9.7x rho-neg at 40 bits, still above BSGS (10.6x at 48 bits), exponent 0.547 vs generic optimum 5/9.",
+   "scope_limits": "Any generic (enumeration/table) decomposition over F_p; measurements 12-48 bits. k-sum table results are 'quoted, unqualified' (no independent-host replay) and on different curves from Table B. Not excluded: a non-generic oracle with T_dec << p^{1/4} at m=4 (an S_5 oracle at B ~ p^{1/5}), or a decomposition test sub-linear in |F|. Holdout rank/target-coverage limitation of the signed three-sum collector has unknown cause.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-generic-table-decomposition.yaml",
+   "forecloses": [
+    "pair-table meet-in-the-middle decomposition beats rho at higher arity",
+    "faster S_3 root finding or batched subtraction makes prime IC sub-rho",
+    "choose the factor-base size B optimally to cross rho",
+    "free decomposition oracle at m = 2 or m = 3",
+    "generic collision floor for x-key relations",
+    "a larger k-sum table (k = 4, 5, ...) makes prime IC sub-rho"
+   ],
+   "revisit_when": "a non-generic oracle with T_dec << p^{1/4} at m=4",
+   "atlas_title": "Enumeration, subtraction and meet-in-the-middle pair-table decomposition for prime-field Semaev IC (arity 2 to 7)"
+  },
+  {
+   "id": "LEAD-ICP-gfp5-rho-reference-audit",
+   "name": "Rho ruler and SafeCurves-style parameter audit for EcGFp5/EcMasFp5",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Generic costs are the published ones (rho ~2^160 per key; Kuhn-Struik/BL for many keys; kangaroo for narrow intervals); the certificate-bearing audit reproduced both orders and twist securities (EcGFp5 120.66 bits; EcMasFp5 101.9321 vs self-reported 101.93).",
+   "scope_limits": "Reference/instrument work on the F_{p^5} curves; closes nothing about index calculus on them (symmetrized Gaudry, OA-SDH, covers are OPEN leads under GOAL-GFPN-380702). Reopens only for narrow-nonce deployments, many keys per curve, or a measured walk-mixing defect.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-gfp5-rho-reference-audit.yaml",
+   "forecloses": [
+    "Pollard rho cost on EcGFp5",
+    "multi-key rho on a STARK curve",
+    "kangaroo on narrow nonces for EcGFp5",
+    "SafeCurves audit of EcMasFp5 twist"
+   ],
+   "revisit_when": "narrow nonce intervals, many keys on one curve, or a walk-mixing defect",
+   "atlas_title": "Rho ruler and SafeCurves-style parameter audit for EcGFp5/EcMasFp5 (affine F_{p^5} rho cost, inversion paths, partition, multi-instance, interval kangaroo)"
+  },
+  {
+   "id": "LEAD-ICP-icperf-writability-boundary",
+   "name": "Writability of the descended system: arity forced to m>=4 and ANF too large to write inside the rho budget below n ~ 300",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "cost_model",
+   "statement": "At the best viable arity the unchained descended ANF exceeds the whole per-decomposition rho budget by +6.3 bits (n=233), +18.8 (283), +24.2 (113), +25.6 (127), +40.8 (ECC2K-130), +37.4 (K-163); the cost is paid before any solver runs.",
+   "scope_limits": "Standardised binary curves n<=283, UNCHAINED descended ANF; crossover inside (283,409] (-4.9 bits at n=409, m=4). Not covered: n>=409; a chained S_3 representation at m=5,6 (~2^31-2^33 monomials) whose written size plus solve fits under the rho budget with memory charged. This is a size bound on one presentation, not on the solving degree.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-icperf-writability-boundary.yaml",
+   "forecloses": [
+    "index calculus on ECC2K-130 with a better solver",
+    "chained Semaev system at m = 5 or 6 on ECC2K-130",
+    "memory column for block Wiedemann at the cap locus"
+   ],
+   "revisit_when": "n >= 409 or a compact chained representation fitting under budget",
+   "atlas_title": "Writability of the descended system - arity forced to m >= 4 and the ANF too large to write inside the rho budget below n ~ 300"
+  },
+  {
+   "id": "LEAD-ICP-representation-subset-sum",
+   "name": "Representation technique (Howgrave-Graham-Joux style) on the base-B digit subset-sum form of ECDLP",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "The method uses only group operations and equality of encodings, so it is generic: T >~ sqrt(N) (Shoup), S*T^2 >~ N with advice; the filter step has no non-generic handle on E(F_p) (same failure recorded over F_{p^2}, KR-RHO-5b1c0a).",
+   "scope_limits": "Any representation/filter variant on a prime-order group whose filter is group-theoretic. Not excluded: a filter predicate reading non-generic coordinate structure with a MEASURED bias (H-PFDR-673eed localises the failure at the filter; proposed, unrun). The reference join evaluates every candidate pair at 3 < p <= 101 only.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-representation-subset-sum.yaml",
+   "forecloses": [
+    "representation technique for ECDLP",
+    "subset-sum of scalar digits with many representations",
+    "knapsack-style filtering of partial group sums"
+   ],
+   "revisit_when": "a filter predicate reading non-generic coordinate structure with measured bias",
+   "atlas_title": "Representation technique (Howgrave-Graham-Joux style) on the base-B digit subset-sum form of ECDLP"
+  },
+  {
+   "id": "LEAD-ICP-residual-partial-relations",
+   "name": "Crediting residuals as partial relations (single/double large prime) in prime-field IC",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "measured",
+   "statement": "Built and run (39 sessions, 20-44 bits, 7,716 replays identical): the single-large-prime residual sweep is a birthday collision search, not an IC with a better exponent; slope of log2 S vs log2 r at fixed base -0.025/-0.014/-0.017 (B=2/8/128), same as rho.negation, bsgs.negation, kangaroo; collision rows equal the birthday count N^2/(r 2^k) in every variant; the base contributes nothing; memory grows as sqrt(rB); DP variants cost 1.44-5.01x. Curve-free null identical; Lean KeyedInvariance.",
+   "scope_limits": "Prime-order E/F_p, SINGLE large prime at m=2, 20-44 bits. Not measured: double-large-prime or graph-cycle variants on prime fields (the F_{p^4} analogue cut the LA exponent 0.495 -> 0.420 but made the whole solve 2.31x costlier). Owner decision on listing it as its own labelled generic arm is open; relabelling a generic search is not an IC improvement.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-residual-partial-relations.yaml",
+   "forecloses": [
+    "large prime variation for prime-field ECDLP index calculus",
+    "partial relations from residual x-coordinates",
+    "double large prime graph for Semaev relations"
+   ],
+   "revisit_when": "a double-large-prime or graph-cycle variant with fitted exponent below the generic-search slopes at fixed base",
+   "atlas_title": "Crediting residuals as partial relations (single/double large prime) in prime-field"
+  },
+  {
+   "id": "LEAD-ICP-retained-setup-online",
+   "name": "Retained-setup online IC (compact orbit n61, dense K1798 root table n83, orbit-folded m=2) as a per-target win",
+   "kind": "lead",
+   "disposition": "closed_dominated",
+   "obstruction_kind": "measured",
+   "statement": "The online ratios (13.9x n61, 18.5x n83) compared against rho with an empty DP table; BL preprocessing rho with equal or smaller advice is 53-317x faster online at n=41/53/61 and precomputed-table rho wins every N83 pair; orbit-folded m=2 Koblitz IC is BSGS on the quotient and sits on the BL r/P law.",
+   "scope_limits": "Retained-advice, many-target accounting on these binary/Koblitz curves (filed under ic-prime but measured on Koblitz; the prime analogue is Probe A: online steps track 2 sqrt(n/S)). Reopens only for an IC online row beating BL at equal advice bytes and equal setup.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-retained-setup-online.yaml",
+   "forecloses": [
+    "retained factor base makes later targets cheaper than rho",
+    "dense root table online index calculus",
+    "multi-target index calculus beats rho per target",
+    "orbit-folded m = 2 index calculus online"
+   ],
+   "revisit_when": "an IC online row beating BL preprocessing rho at equal advice and setup",
+   "atlas_title": "Retained-setup online IC (compact orbit n61, dense K1798 root table n83, orbit-folded m = 2) as a per-target win"
+  },
+  {
+   "id": "LEAD-ICP-self-pairing-prime-order",
+   "name": "Nondegenerate self-pairings or bilinear maps on a prime-order E(F_p) subgroup",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "On a cyclic group of prime order N every bilinear map is determined by h = b(P,P), so the space of self-pairings is one-dimensional, and Galois equivariance puts t_N(P,P) in mu_N intersected with the base field, trivial above embedding degree 1.",
+   "scope_limits": "Prime-order subgroups of E(F_p) with embedding degree > 1 and BILINEAR maps. Not covered: embedding degree 1 or non-cyclic N-torsion over the base field (a transfer-family case); non-bilinear maps (see LEAD-TRF-one-point-self-pairing revisit clause).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-self-pairing-prime-order.yaml",
+   "forecloses": [
+    "self-pairing on a prime-order elliptic curve",
+    "distortion-free bilinear map recovers the discrete log",
+    "Tate pairing of P with itself"
+   ],
+   "revisit_when": "embedding degree 1 or non-cyclic N-torsion over the base field",
+   "atlas_title": "Nondegenerate self-pairings or bilinear maps on a prime-order E(F_p) subgroup"
+  },
+  {
+   "id": "LEAD-ICP-xedni-function-field-sections",
+   "name": "Function-field xedni: Mordell-Weil sections of elliptic surfaces over F_p(t) as a relation source",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "Exact closed form for the frozen family (deg b=6, monic quadratic x): P_lift(p) = (1-2/p+p^{-3})/(2p^3), alpha = 3 exactly, checked on 596,268,874 slots with zero disagreements; parameter count forces exactly four free prescribed sections and re-derives alpha=3. The four coefficient-bound goals (max|coeff|=1) measured an observable forced by norm-2 / E_8 lattice structure.",
+   "scope_limits": "Rational elliptic surfaces with the FROZEN section shapes (deg b<=10, deg a<=4, sections deg x<=3, p<=31). Not covered: surface families with a dimension surplus (more free section parameters than prescribed conditions, e.g. explicit high-rank K3 fibrations). A dimension-count theorem over all section shapes is missing (obstructions.tex).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-xedni-function-field-sections.yaml",
+   "forecloses": [
+    "Mordell-Weil sections of an elliptic surface as factor base",
+    "function-field xedni lift probability",
+    "bounded relation coefficients among integral sections",
+    "specialise sections of a rational elliptic surface to get relations"
+   ],
+   "revisit_when": "a surface family with dimension surplus and measured lift exponent below 1/2",
+   "atlas_title": "Function-field xedni - Mordell-Weil sections of elliptic surfaces over F_p(t) as a relation source"
+  },
+  {
+   "id": "LEAD-STR-automorphism-quotient-rho",
+   "name": "Rho on E/Aut (negation, j=0 order-6, j=1728 order-4) and anything beyond sqrt(|Aut|)",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "The automorphism quotient gives exactly sqrt(|Aut|): 26-bit j=0 crater cubic/negation 0.573 [0.562,0.585] vs 0.577; j=0 and j=1728 ratio-to-ceiling 1.0043 and 1.0442 over 20 seeds at p=100057. Quotienting by the full End(E) action leaves two classes and is useless: a non-unit endomorphism has orbits of size ord_N(lambda), so the ceiling is sqrt(|Aut|) for any equivalence-class walk on a prime-order group.",
+   "scope_limits": "Prime-order groups, equivalence-class walks. Reopens only for a canonicalisation with per-step cost kappa < 1 group op for a group larger than Aut, or a curve class with a cheap small-orbit non-unit endomorphism (LEAD-STR-small-cm-disc-nonunit-endo). Toy and 26-bit measurements.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-automorphism-quotient-rho.yaml",
+   "forecloses": [
+    "automorphism quotient beats sqrt(|Aut|)",
+    "GLV-split rho walk on j=0 curves",
+    "quotient the walk by the full endomorphism ring",
+    "orbit-choice mixing on E/Aut gives extra speedup",
+    "fruitless cycles at |Aut| greater than 2"
+   ],
+   "revisit_when": "cheap canonicalisation for a group larger than Aut",
+   "atlas_title": "Rho on E/Aut (negation, j=0 order-6, j=1728 order-4) and anything beyond sqrt(|Aut|)"
+  },
+  {
+   "id": "LEAD-STR-curve-generation-provenance-seeds",
+   "name": "Manipulated generation of standard curves (NIST P-curve seeds, Brainpool, BN, rigidity)",
+   "kind": "lead",
+   "disposition": "exhausted_at_scale",
+   "obstruction_kind": "measured",
+   "statement": "All ten NIST prime-field seeds explained (~30 bits of freedom per curve); every public weak-class screen on all 21 published/omitted classes found no anomaly and no separating rule (CM field, class number <= 2000, conductor, embedding degree, twists, invalid-curve surface, odd-degree isogenies <= 10,000, ANSI gates, 21 preregistered features); a hidden weak class would need density >= ~2^-30 and be invisible to all of these. The Elkies split-count pattern does not replicate on 42 held-out curves (p=0.29); prime239v1's low L(1,chi) is the same anomaly restated; no ECDLP method depends on L(1,chi) or h.",
+   "scope_limits": "Exhausted over PUBLIC screens at the recorded list; a weak class of density >= 2^-30 invisible to all listed screens is not excluded. Unknown: the skip rule, B-163 seed generation, NIST base-point generation. Provenance work; changes no ECDLP cost.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-curve-generation-provenance-seeds.yaml",
+   "forecloses": [
+    "NIST P-256 backdoor via the seed",
+    "skipped seed candidates reveal a hidden weak class",
+    "Brainpool or BN parameters were manipulated",
+    "count rejections in verifiably random generation",
+    "published curves have fewer split (Elkies) small primes",
+    "small class number or L(1, chi) of the CM field marks a selected curve"
+   ],
+   "revisit_when": "generator code/logs recovered, or a new publicly testable weak class of density >= 2^-30",
+   "atlas_title": "Manipulated generation of standard curves (NIST P-curve seeds, Brainpool, BN, rigidity)"
+  },
+  {
+   "id": "LEAD-STR-endo-scalar-action-generic",
+   "name": "Endomorphism-augmented generic and witness-lattice attacks on a prime-order subgroup",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "For G of prime order N, End(G) = Z/N, so every endomorphism-image oracle is simulable by group operations and Shoup applies; augmenting the witness lattice with r eigenvalues leaves the index at N and the MITM exponent at 1/2; the EV-ENDO-001 first-minimum-1 contradiction (Vieta 1+lambda_2+lambda_3 = 0 on J0 cells) is a certificate-void k-independent vector.",
+   "scope_limits": "Any prime-field or binary curve, any size, PRIME-ORDER subgroup; oracles returning group elements. Reopens for an oracle shown not GGM-simulable (returns field or curve data, resources R1/R2 in DECOMPOSITION.md).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-endo-scalar-action-generic.yaml",
+   "forecloses": [
+    "add endomorphism images to the oracle to beat sqrt(N)",
+    "endomorphism-augmented witness lattice for ECDLP",
+    "use phi(P) and phi(Q) as extra relations in a generic attack",
+    "eigenvalue lattice reduction recovers k"
+   ],
+   "revisit_when": "an oracle returning field/curve data, not a group element",
+   "atlas_title": "Endomorphism-augmented generic and witness-lattice attacks on a prime-order subgroup"
+  },
+  {
+   "id": "LEAD-STR-glv-gls-isogeny-loop-scalar-mult",
+   "name": "GLV/GLS and isogeny-loop endomorphisms, neighbour-model routing (known-scalar multiplication)",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "These speed up KNOWN-scalar multiplication only. A rho step is one addition; a non-unit loop endomorphism acts as lambda of multiplicative order ~r so its orbits are the whole group and cannot form rho classes; on random challenge curves the cheapest loop costs 20-93x the doublings it would save; on Koblitz the only loop is tau. Measured scalar-mult gains (GLV-2 1.52x; a=-3 neighbour 3.07% on one curve) are real and outside ECDLP cost.",
+   "scope_limits": "ECDLP algorithms whose dominant cost is group additions. Would matter for an algorithm dominated by variable-base scalar multiplication (e.g. IC relation sampling with fresh aP+bQ per candidate if not done incrementally).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-glv-gls-isogeny-loop-scalar-mult.yaml",
+   "forecloses": [
+    "isogeny-loop endomorphism speeds up ECDLP",
+    "GLV decomposition helps Pollard rho",
+    "route kP through an isogenous neighbour with a=-3",
+    "4-dimensional GLV-GLS for discrete logs"
+   ],
+   "revisit_when": "an ECDLP algorithm dominated by variable-base scalar multiplication",
+   "atlas_title": "GLV/GLS and isogeny-loop endomorphisms, neighbour-model routing (known-scalar multiplication)"
+  },
+  {
+   "id": "LEAD-STR-isogeny-class-generic-invariance",
+   "name": "Generic (rho, BSGS) ECDLP cost across an isogeny class and across volcano levels",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Isogenous curves have F_p-isomorphic prime-order subgroups (T1), and rho/BSGS depend only on group order and automorphism group (a class invariant except at the j=0/1728 crater). 26-bit census of three whole volcanoes (403,168 runs, verified Velu maps): 33/35 level ratios equivalent under TOST ±5%, 0 different; rho floor/crater 1.004 [0.990,1.016]; 40/48-bit studies no level effect; transport costs <= 1.3% of a solve.",
+   "scope_limits": "GENERIC-model algorithms; measured at 26-48 bits; ledger VOLC lane blocked at the gate (point-based Velu cannot reach f=3,107 arms). Does not cover algorithms whose cost depends on more than group and Aut (index calculus — constant-factor IC variation across a class is LEAD-STR-class-representative-ic-selection, open), nor level-dependent step cost (a constant).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-isogeny-class-generic-invariance.yaml",
+   "forecloses": [
+    "volcano level changes Pollard rho cost",
+    "endomorphism-ring depth makes ECDLP easier",
+    "walk the volcano to a cheaper curve for rho",
+    "read the volcano level off the group structure to find a weak curve",
+    "conductor of End(E) affects generic ECDLP"
+   ],
+   "revisit_when": "a generic-model algorithm whose cost depends on more than the group and Aut",
+   "atlas_title": "Generic (rho, BSGS) ECDLP cost across an isogeny class and across volcano levels"
+  },
+  {
+   "id": "LEAD-STR-isogeny-transport-preprocessing",
+   "name": "Multi-target and preprocessing tables shared across an isogeny class",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "Transporting each target to the table's curve costs O(1) isogeny evaluations and reduces 'M targets on M isogenous curves' exactly to M targets on one curve — the known single-curve multi-target / BL frontier, which it ties and cannot beat. Transporting the table loses to rebuild for baby-step tables at every odd l from 3 to 31 (1.5x-21x, no crossover) and needs a known path (finding one is vectorization).",
+   "scope_limits": "Preprocessing objects whose value is a function of the (point, scalar) pairing. Not excluded: a preprocessing object NOT carried by target transport that beats the single-curve BL frontier. Toy p=50021, 60013.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-isogeny-transport-preprocessing.yaml",
+   "forecloses": [
+    "transport a precomputation table across the isogeny class",
+    "multi-target attack over isogenous curves",
+    "Bernstein-Lange table reused on isogenous curves",
+    "amortise preprocessing over an isogeny class"
+   ],
+   "revisit_when": "a preprocessing object not carried by target transport",
+   "atlas_title": "Multi-target and preprocessing tables shared across an isogeny class"
+  },
+  {
+   "id": "LEAD-STR-isogeny-walk-weak-neighbour",
+   "name": "Walk or construct isogenies from a deployed curve to find a weak neighbour",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Transfer weaknesses (MOV embedding degree, anomalous trace, CM field, group order) are isogeny-class invariants, so no neighbour can be weaker by them; isogenous curves are equally hard for generic methods. Reproduced: P-256 million-model walk found no structural-screen hit; P-192/P-224 large-degree isogenies found nothing; a huge-degree self-isogeny of secp256k1 (degree 2^44497-1) is an endomorphism, a scalar on G.",
+   "scope_limits": "Weaknesses that ARE class invariants (over prime fields all known transfer weaknesses are). Not excluded: a weakness that is not an isogeny-class invariant (over composite-degree binary fields GHS-weakness is NOT class-invariant — see LEAD-TRF-ghs-binary-composite; constant-factor IC variation across a class is an open lead).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-isogeny-walk-weak-neighbour.yaml",
+   "forecloses": [
+    "isogeny walk from P-256 finds a weak curve",
+    "largest prime degree isogeny weakens secp256k1",
+    "isogenous neighbour with small embedding degree",
+    "search the isogeny class for an anomalous curve"
+   ],
+   "revisit_when": "a weakness that is not an isogeny-class invariant",
+   "atlas_title": "Walk or construct isogenies from a deployed curve to find a weak neighbour"
+  },
+  {
+   "id": "LEAD-STR-jmv-random-self-reduction",
+   "name": "Jao-Miller-Venkatesan isogeny-expander random self-reduction within a level",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "JMV is a hardness EQUIVALENCE (average = worst case within a level), not a speedup; re-derived as a deterministic cost model: required eigenvalue separation is vacuous at q=2^256 for delta <= 0.5 and non-vacuous only at delta = 2.0; the modelled reduction falls below rho only above 192 bits there; moves no ECDLP cost. Point-level Elkies-walk self-reduction is the same mechanism.",
+   "scope_limits": "Cost model only; GRH-conditional in the source. Reopens if the self-reduction is used as a SUBROUTINE of an attack with cost below rho (none proposed).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-jmv-random-self-reduction.yaml",
+   "forecloses": [
+    "JMV random self-reduction gives an attack",
+    "expander isogeny walk re-randomises ECDLP to an easier curve",
+    "dlog cost is constant within a level so pick the best level"
+   ],
+   "revisit_when": "self-reduction used as an attack subroutine below rho",
+   "atlas_title": "Jao-Miller-Venkatesan isogeny-expander random self-reduction within a level"
+  },
+  {
+   "id": "LEAD-STR-koblitz-volcano-descendants",
+   "name": "Curves below a binary Koblitz curve in its volcano (ECC2K-130, K-163, K-283, m=37..83)",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "measured",
+   "statement": "At m=37 and m=41 with negation every level costs the same (KW p=0.76; each level within ±3% of the crater by TOST); only the crater has a cheap non-trivial endomorphism (tau, degree 2, 6.36x steps [6.20,6.53]); below the crater the least non-integer endomorphism degree is 121,046 (ECC2K-130 floor) or 73,324,526 (m=83 floor), making rho 45x-3,000x slower; at m=83 IC floor yield differs by <= 0.014% and Frobenius atlases cost 137-513x the best chart.",
+   "scope_limits": "Measured at m=37, 41 (rho) and m=83 (IC yield, 6,474-curve floor); m=51 replication failed its A/A gate narrowly (labels withheld). K-163/K-283 floor maps not persisted. Reopens if a floor factor base beats the crater tau-orbit base in charged S.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-koblitz-volcano-descendants.yaml",
+   "forecloses": [
+    "descend from ECC2K-130 to a weaker floor curve",
+    "K-163 conductor floor is easier than the Koblitz curve",
+    "isogenous curve to a Koblitz curve better for rho"
+   ],
+   "revisit_when": "a persisted floor map with a floor base beating the crater tau-orbit base in charged S",
+   "atlas_title": "Curves below a binary Koblitz curve in its volcano (ECC2K-130, K-163, K-283, m=37..83)"
+  },
+  {
+   "id": "LEAD-STR-p192-class-cm-relations",
+   "name": "P-192 isogeny class, smooth principal CM relations and loops",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Any CM relation is an endomorphism and acts as a scalar on the prime-order subgroup; a cheap one gives only GLV-type scalar multiplication and its orbits are too large for rho classes; class navigation is generic-cost neutral (T1). All 103 emitted relations in the L <= 2^48 box verified scalar; the P-192 weak-curve review found no structural weakness.",
+   "scope_limits": "Census not provably complete (L <= 2^48 box). Reopens only if a non-isogeny-invariant weakness is found in any class (making navigation matter).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-p192-class-cm-relations.yaml",
+   "forecloses": [
+    "P-192 isogeny class has a weak curve",
+    "smooth principal CM loop on P-192",
+    "non-scalar CM relation in the P-192 class"
+   ],
+   "revisit_when": "a non-isogeny-invariant weakness in any class",
+   "atlas_title": "P-192 isogeny class, smooth principal CM relations and loops"
+  },
+  {
+   "id": "LEAD-STR-safecurves-parameter-audit",
+   "name": "SafeCurves-style parameter audits (twist security, completeness, ladder, cofactor, transfer rows)",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Criteria and verdicts are published (SafeCurves) and reproduced (Ed448 base-point certificates; P-192 x-only singular-companion recovery on an unchecked low-level multiplier is an implementation weakness, not ECDLP); deliberately weak rows fall to known transfers; most SCURVE hypotheses are Stage-0 arithmetic identities with no ECDLP content.",
+   "scope_limits": "Audits of the 20 named curves; implementation-surface findings carry no ECDLP cost. Reopens only if a deployed row violates a criterion bearing on ECDLP cost (rho size, transfer, CM).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-safecurves-parameter-audit.yaml",
+   "forecloses": [
+    "SafeCurves audit finds an ECDLP weakness in Curve25519",
+    "twist security breaks the discrete log",
+    "anomalous or MOV-weak standard curve",
+    "invalid-curve attack as an ECDLP speedup"
+   ],
+   "revisit_when": "a deployed row violating an ECDLP-relevant criterion",
+   "atlas_title": "SafeCurves-style parameter audits (twist security, completeness, ladder, cofactor, transfer rows)"
+  },
+  {
+   "id": "LEAD-STR-secp256k1-cm-class-audit",
+   "name": "secp256k1 CM structure (D=-3, j=0, h=1) and its isogeny class",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "The crater for D=-3 has one vertex (h=1), and secp256k1 is it, already carrying the maximal unit group (order 6); every other class member is lower in some volcano with fewer units, so by T1 and the automorphism-only rho ceiling no class member is cheaper for generic attack; sextic twists have different orders and are not isogenous; the only ECDLP lever is the sqrt 6 constant.",
+   "scope_limits": "GENERIC attack on the class; genus-2 gluing and cover threads belong to the transfer/covers family (closed separately for same-field covers). Reopens if an IC method on j=0 curves beats rho with the sqrt 6 discount (LEAD-STR-special-j-ic-semaev, open).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-secp256k1-cm-class-audit.yaml",
+   "forecloses": [
+    "secp256k1 endomorphism breaks ECDLP",
+    "sextic twist of secp256k1 is weaker",
+    "Bitcoin curve CM weakness"
+   ],
+   "revisit_when": "an IC method on j=0 curves beating rho with the sqrt 6 discount",
+   "atlas_title": "secp256k1 CM structure (D=-3, j=0, h=1) and its isogeny class"
+  },
+  {
+   "id": "LEAD-STR-small-cm-disc-nonunit-endo",
+   "name": "Small |D_0| or a cheap non-unit endomorphism beyond the automorphism constant",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "A non-unit alpha of norm n acting as lambda on G has orbit size h = ord_N(lambda) with n^h >= (sqrt N - 1)^2, so h >= log N / log n; a rho class of size h costs ~h evaluations to canonicalise, net factor <= sqrt(h)/kappa with kappa ~ h c(alpha); on deployed curves |D_K| is large (endosweep); only units of D_0 in {-3,-4} give finite orbits at O(1) cost and those are class invariants.",
+   "scope_limits": "Ordinary prime-field curves, prime-order G. Not excluded (explicit NEW LEAD 1): a prime-field curve where a norm-2 or norm-3 endomorphism has eigenvalue order near log_n N (the equality case, a prime-field Koblitz analogue) AND a canonical orbit representative costs o(h) maps.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-small-cm-disc-nonunit-endo.yaml",
+   "forecloses": [
+    "small CM discriminant makes ECDLP easier",
+    "class number one curves are weak beyond automorphisms",
+    "cheap endomorphism of degree 2 gives rho equivalence classes",
+    "endomorphism claw from small D_0",
+    "closed isogeny-graph walk gives an orbit invariant"
+   ],
+   "revisit_when": "a prime-field Koblitz analogue with o(h)-cost canonical representatives",
+   "atlas_title": "Small |D_0| or a cheap non-unit endomorphism beyond the automorphism constant"
+  },
+  {
+   "id": "LEAD-STR-torsion-module-leak",
+   "name": "l-torsion (l != N) as a Galois/End module leaking k or attack cost",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "Any statistic of the curve alone is k-independent; any homomorphic invariant from prime-order G to an l-primary group (l != N) is trivial (coprimality); a non-homomorphic point statistic is a function of the encoding of Q, so using it is index calculus or a generic query, and partial information about k on the point costs more than it saves by sqrt(M). Toy: psi_5 factor-degree multiset does not change with k.",
+   "scope_limits": "Prime-order G, any l != N; toy p=751. Reopens if a point-dependent l-torsion statistic computable in o(sqrt N) correlates with k beyond a k-resampled null at matched curve. The 'costs more than it saves' step is a proposal-level argument (IDEA-20260811-8cf53a).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/structure/LEAD-STR-torsion-module-leak.yaml",
+   "forecloses": [
+    "division polynomial factorisation leaks the discrete log",
+    "Elkies Atkin split pattern as an ECDLP fingerprint",
+    "l-torsion Galois module carries information about k",
+    "Legendre symbol of psi_l at x(kP)",
+    "torsion translate norms"
+   ],
+   "revisit_when": "a cheap point-dependent l-torsion statistic correlating with k beyond a matched null",
+   "atlas_title": "l-torsion (l != N) as a Galois/End module leaking k or attack cost"
+  },
+  {
+   "id": "LEAD-TRF-anomalous-padic-lift",
+   "name": "Smart / Satoh-Araki / Semaev p-adic lift for anomalous (trace one) curves",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Works exactly on trace-one curves (#E = p), an isogeny-class invariant absent from generic or standard curves; reproduced (Smart certificate p=771853: C_special 157 vs matched rho 779) and the canonical-lift degeneracy re-derived (Smart degenerates exactly on the canonical-lift class mod p^2).",
+   "scope_limits": "Positive control only; never for generic curves. The degenerate next digit matches the random-section null only when pooled (toy).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-anomalous-padic-lift.yaml",
+   "forecloses": [
+    "anomalous curve attack",
+    "Smart attack",
+    "p-adic elliptic logarithm",
+    "Satoh-Araki-Semaev lift",
+    "trace one curves"
+   ],
+   "revisit_when": "never for generic curves; only for #E = p",
+   "atlas_title": "Smart / Satoh-Araki / Semaev p-adic lift for anomalous (trace one) curves"
+  },
+  {
+   "id": "LEAD-TRF-cm-canonical-lift-heights",
+   "name": "Serre-Tate canonical lift with CM: does the CM order shrink heights enough for xedni to bite?",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "cost_model",
+   "statement": "Writing the canonical lift down needs the Hilbert/ring class polynomial of D = t^2-4p, degree h(D) = |D|^{1/2+o(1)} ~ p^{1/2}, already the rho budget; for small |D| (cheap lifts) the height-coverage obstruction of global lifts applies unchanged. Lane L9 closed reject_scoped; red team confirmed the closure but replaced the load-bearing norm-form argument.",
+   "scope_limits": "Ordinary prime-field curves, canonical and CM lifts; cost-model closure, one run (doubling-denominator check), no attack metric. Not excluded: a CM lift whose field of definition has degree O(p^epsilon) AND whose lifted points have height o(log N); the cheap stage-0/1 checks of IDEA-20260815-93f483 were not run. Brief §3 item 11 still lists height-compressing CM lifts as open_next_step (LEAD-EXO-global-lift-height).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-cm-canonical-lift-heights.yaml",
+   "forecloses": [
+    "canonical lift for ECDLP",
+    "CM lifting",
+    "Serre-Tate lift heights",
+    "norm-form gap of the CM order",
+    "Hilbert class polynomial lift"
+   ],
+   "revisit_when": "a CM lift with field degree O(p^epsilon) and lifted heights o(log N)",
+   "atlas_title": "Serre-Tate canonical lift with CM: does the CM order shrink the heights of lifted points enough for xedni to bite?"
+  },
+  {
+   "id": "LEAD-TRF-curve-parameter-transfer-audits",
+   "name": "Transfer-safety audits of deployed curves: embedding degree, anomaly, twist, subfield/descent, seed provenance",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "SafeCurves-type checks are standard; deployed prime curves pass MOV/anomalous/descent checks; NIST seed reproduction is provenance and changes no ECDLP cost; remaining work is certification tooling.",
+   "scope_limits": "Audits only. Reopens if an audit finds a deployed curve with small k, trace one, or a composite-degree binary field in use. Open tooling gaps: large-field certificates, supplied-curve F_{p^2} twist factorizations, one NIST extension-twist composite cofactor unsplit.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-curve-parameter-transfer-audits.yaml",
+   "forecloses": [
+    "embedding degree audit of standard curves",
+    "NIST seed backdoor",
+    "SafeCurves transfer checks",
+    "anomalous standard curve"
+   ],
+   "revisit_when": "an audit hit on a deployed curve",
+   "atlas_title": "Transfer-safety audits of deployed curves: embedding degree, anomaly, twist, subfield/descent, seed provenance"
+  },
+  {
+   "id": "LEAD-TRF-function-field-xedni-lift",
+   "name": "Function-field xedni: lift relations to sections of elliptic surfaces y^2 = x^3 + a(t)x + b(t) over F_p(t)",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "Exact closed form for the frozen family: P_lift(p) = (1-2/p+p^{-3})/(2p^3), alpha = 3 (finite-size exponents 2.986-2.997); relation coefficients stay at max|coeff| = 1 but that value is forced by the lattice (norm-2 vectors at support 3), so the coefficient census carried no discriminating power.",
+   "scope_limits": "deg b <= 10, deg a <= 4, sections deg x <= 3, p <= 31 (same frozen family as LEAD-ICP-xedni-function-field-sections). Reopens for a section shape with prescribed-fibre lift exponent below 1/2 derived BEFORE measurement.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-function-field-xedni-lift.yaml",
+   "forecloses": [
+    "function field xedni",
+    "elliptic surface section lifting",
+    "Mordell-Weil sections over F_p(t)",
+    "rational elliptic surface relation source",
+    "section height relation coefficients"
+   ],
+   "revisit_when": "a section shape with derived lift exponent below 1/2",
+   "atlas_title": "Function-field xedni: lift relations to sections of elliptic surfaces y^2 = x^3 + a(t)x + b(t) over F_p(t)"
+  },
+  {
+   "id": "LEAD-TRF-ghs-binary-composite",
+   "name": "GHS / generalized GHS Weil descent (with GHS isogeny walks) for curves over F_{2^N}, N composite",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "Menezes-Teske-Weng / Menezes-Teske: N prime is not weak; all NIST/SEC binary curves use prime N; subfield curves are not weakened. Composite-N standards (Oakley 3/4, ANSI c2pnb*) are known literature cases; magic numbers and genera re-derived exactly (321 registry curves: only Oakley 3/4 and c2pnb rows non-boundary), densities on toy fields; but no higher-genus GHS solve was ever run (formula only: Oakley Group 4 +10.9 bits, Group 3 +1.1).",
+   "scope_limits": "Closed as KNOWN, not as impossible: composite-degree binary fields ARE weak in the literature sense and the programme has no genus-15/127 Jacobian IC solver to measure them; GHS with magic number >= 2 is 'not executable' in the repo. Says nothing new about prime N beyond the literature. Reopens for an end-to-end measured row on Oakley 3/4 or c2pnb176w1.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-ghs-binary-composite.yaml",
+   "forecloses": [
+    "GHS attack",
+    "Weil descent to a hyperelliptic Jacobian",
+    "isogeny to a GHS-weak curve",
+    "magic number of a binary curve",
+    "Oakley group curves",
+    "c2pnb curves"
+   ],
+   "revisit_when": "an end-to-end measured GHS row (needs a high-genus Jacobian IC solver)",
+   "atlas_title": "GHS / generalized GHS Weil descent (with Galbraith-Hess-Smart isogeny walks) for curves over F_{2^N}, N composite"
+  },
+  {
+   "id": "LEAD-TRF-global-lift-small-height",
+   "name": "Global lifts to E(Q) or E(K) with small canonical height (xedni, SNFS/cyclotomic/Solinas fields, rational 2-torsion lifts)",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "JKSST: lifted points have canonical height of order log(group size) per relation and the number of points of height <= B grows like (log B)^{r/2}, so covering a target residue mod p needs exponentially large height; re-measured: small points on rank 0-11 curves and over Q(2^{1/3}) reduce like uniform points (growth law supported; uniform-reduction clause contradicted as stated); xedni dependence never seen within relation bound 6 (1 tangent relation in 3,200 trials; planted dependence detected).",
+   "scope_limits": "Lifts to E(Q) and E(K) for bounded-degree K, any rank reachable by known constructions; toy measurements. Not excluded: a lift family with rank growing like log p and provably small regulator, or an exact dependent-lift finder hitting a prescribed residue faster than p^{1/2} (RQ-XEDN-3bfe2e). Two run sets were returned as inadmissible.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-global-lift-small-height.yaml",
+   "forecloses": [
+    "xedni calculus",
+    "lift to characteristic zero",
+    "Mordell-Weil relation of lifted points",
+    "small height global lift",
+    "SNFS number field lift of an elliptic curve",
+    "high rank lift"
+   ],
+   "revisit_when": "rank ~ log p with provably small regulator, or a sub-p^{1/2} dependent-lift finder",
+   "atlas_title": "Global lifts to E(Q) or E(K) with small canonical height (xedni, SNFS / cyclotomic / Solinas number fields, rational 2-torsion lifts)"
+  },
+  {
+   "id": "LEAD-TRF-jv-nagao-genus2-cover-decomp",
+   "name": "Nagao decomposition on a genus-2 cover of E(F_{p^6}) (jv_cover.rs) with F4 and sparse-FGLM engineering",
+   "kind": "lead",
+   "disposition": "closed_dominated",
+   "obstruction_kind": "measured",
+   "statement": "On the same weak-class instances the Nagao route sits at S/rho 151-293 after sparse FGLM (p <= 251) while the JV sieve was historically below rho; per-test engineering (1.28x) cannot close a two-order gap; only a large-prime variation could change the exponent.",
+   "scope_limits": "Dominated by the JV SIEVE on the SAME weak class (E(F_{p^6}) with intermediate fields) — this is an engineering dominance, not a closure of covers. The JV sieve lead itself is open_next_step and its crossover with rho unresolved. Reopens if the sieve row fails validation or a large-prime variation for Nagao is built.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-jv-nagao-genus2-cover-decomp.yaml",
+   "forecloses": [
+    "Nagao decomposition on a genus 2 cover",
+    "sparse FGLM for jv_cover",
+    "F5 signatures for cover decomposition"
+   ],
+   "revisit_when": "sieve row fails validation, or a large-prime Nagao variant",
+   "atlas_title": "Nagao decomposition on a genus-2 cover of E(F_{p^6}) (examples/jv_cover.rs), with F4 and sparse-FGLM engineering"
+  },
+  {
+   "id": "LEAD-TRF-mov-small-embedding-degree",
+   "name": "MOV / Frey-Rueck pairing transfer to F_{p^k}^* for small embedding degree k",
+   "kind": "lead",
+   "disposition": "closed_known",
+   "obstruction_kind": "literature",
+   "statement": "k = ord_N(p) is a function of (N,p) alone, hence an isogeny-class invariant (no walk lowers it), and for random prime-field curves it is of size ~N (Balasubramanian-Koblitz); the transfer is a curve check, not an ECDLP algorithm.",
+   "scope_limits": "Ordinary and supersingular curves over any finite field; the target-field cost is a separate open lead (LEAD-TRF-pairing-target-field-recost). Toy pairing checks specified, zero runs. Reopens on an audit hit (deployed curve with small k) or a construction with k << log-size and prime N.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-mov-small-embedding-degree.yaml",
+   "forecloses": [
+    "MOV reduction",
+    "Frey-Rueck Tate pairing transfer",
+    "small embedding degree attack",
+    "pairing transfer to finite field",
+    "CM curves with low embedding degree",
+    "walk the isogeny class to lower the embedding degree"
+   ],
+   "revisit_when": "a deployed curve with small k",
+   "atlas_title": "MOV / Frey-Rueck pairing transfer of the ECDLP to F_{p^k}^* for small embedding degree"
+  },
+  {
+   "id": "LEAD-TRF-one-point-self-pairing",
+   "name": "A non-degenerate self-pairing or distortion map computable from one point of the prime-order subgroup",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "On cyclic G of prime order N every bilinear map G x G -> H is a scalar multiple of one fixed map; a non-trivial self-pairing on the rational N-torsion line needs full E[N] rational (BK: iff N | p^k - 1), i.e. embedding degree 1; every geometric endomorphism of an ordinary curve commutes with Frobenius and preserves the rational eigenline, so it is not a distortion map.",
+   "scope_limits": "Ordinary curves over prime fields, N || #E, N != p, BILINEAR maps. Not excluded: a non-bilinear efficiently computable map out of G with a verified partial-return property (ECDLP-IDEA-008), or an ordinary family with k=1 and crypto-size prime N. Supersingular curves (which do have distortion maps) are outside scope and are MOV-weak anyway.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-one-point-self-pairing.yaml",
+   "forecloses": [
+    "CM self-pairing",
+    "distortion map on an ordinary curve",
+    "pairing of a point with itself",
+    "one-point pairing escape",
+    "partial pairing return cycle"
+   ],
+   "revisit_when": "a non-bilinear map with verified partial return, or an ordinary k=1 family",
+   "atlas_title": "A non-degenerate self-pairing or distortion map computable from one point of the prime-order subgroup"
+  },
+  {
+   "id": "LEAD-TRF-padic-canonical-section",
+   "name": "Canonical point sections E(F_p) -> E(Q_p) and their p-adic digits on non-anomalous curves",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "For p not dividing #E(F_p) the only homomorphic section is the prime-to-p torsion section, which the formal logarithm kills (log vanishes on torsion), exactly as log_p kills the Teichmuller section of F_p^*; any non-homomorphic section recovers d only at the random 1/p rate. Toy runs (p < 2000 and 10^4..10^5) met the frozen criteria; the only failure (naive F_p^* section) is a size effect for g^d < p.",
+   "scope_limits": "Non-anomalous prime-field curves, all lifts of E; toy sizes. Open: decay of the maximal Fourier mass of p-adic digit characters of the torsion section against the n^{-1/4} breakeven (KN-OPEN-d3a6f0, 'exponent-relevant unknown'); control C1 and a rule-12 review outstanding (RQ-CZLIFT-b9f765 cannot close yet). A section with small carry for a positive fraction of targets would be a HEIGHT lead.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-padic-canonical-section.yaml",
+   "forecloses": [
+    "canonical point lift to E(Q_p)",
+    "p-adic digits of the torsion section",
+    "Teichmuller section for elliptic curves",
+    "formal logarithm on non-anomalous curves",
+    "Hensel lift section"
+   ],
+   "revisit_when": "a section with small carry on a positive fraction of targets",
+   "atlas_title": "Canonical point sections E(F_p) -> E(Q_p) and their p-adic digits on non-anomalous curves"
+  },
+  {
+   "id": "LEAD-TRF-prime-field-isogeny-to-weak",
+   "name": "Isogeny transfer of a prime-field ECDLP to a weaker curve (anomalous, low embedding degree, descent-friendly) in the same class",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Tate: ordinary curves over F_p are F_p-isogenous iff same #E(F_p); trace one and k = ord_N(p) are functions of (#E, p); prime fields admit no GHS descent; so the special set inside a generic class is empty at every size (EV-IT-511f3d; rho_special = 0 at 20 (exhaustive), 24, 28 bits).",
+   "scope_limits": "PRIME fields, ordinary or supersingular classes. Over composite-degree binary fields descent weakness is NOT class-invariant (LEAD-TRF-ghs-binary-composite). Reopens if a prime-field weakness is found that is not a function of (#E, p).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-prime-field-isogeny-to-weak.yaml",
+   "forecloses": [
+    "walk the isogeny class to a weak curve",
+    "isogeny transfer to an anomalous curve",
+    "isogeny path to low embedding degree",
+    "isogeny transfer cost gate",
+    "same order same difficulty"
+   ],
+   "revisit_when": "a prime-field weakness not a function of (#E, p)",
+   "atlas_title": "Isogeny transfer of a prime-field ECDLP to a weaker curve (anomalous, low embedding degree, descent-friendly) in the same class"
+  },
+  {
+   "id": "LEAD-TRF-same-field-genus-g-embedding",
+   "name": "Embed E/F_p as an isogeny factor of a genus-g Jacobian over the same field (covers, quadric pencils, quartic/bielliptic models)",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Tate multiplicativity gives #Jac(C)(F_p) = N * #A(F_p) with #A = Theta(N^{g-1}); genus-g IC costs O~(q^{2-2/g}) >= q for g >= 2, a full exponent above rho's N^{1/2}; quadric-pencil and quartic models of E itself are isomorphic models with the same group. Binary same-field check: native J(C) solve 1,160 s vs elliptic 9.27 s at equal steps.",
+   "scope_limits": "PRIME-FIELD (same-field) source curves, any same-field cover; 'never' revisit for same-field covers. Extension-field sources are separate (open) leads. NOTE the tension with brief §3 item 10: Prym / same-field genus-g embeddings have five filed follow-ups (2026-10-27, unexecuted) and several open problems (Prym-assisted router, P-256 genus-3/2 covers inject the r-subgroup through the norm with no costed relation or descent algorithm). The closure is of plain genus-g IC on the whole Jacobian; a PROJECTED relation source on the E-component (sub-sqrt(ell) total work) is not established either way.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-same-field-genus-g-embedding.yaml",
+   "forecloses": [
+    "genus g cover of a prime field curve",
+    "Poincare factor embedding",
+    "split Jacobian projection",
+    "quadric pencil model transfer",
+    "bielliptic quartic relation",
+    "higher genus Jacobian over the same field"
+   ],
+   "revisit_when": "never for same-field plain genus-g IC; a costed projected relation source on the E-component would be a new mechanism",
+   "atlas_title": "Embed E/F_p as an isogeny factor of a genus-g Jacobian over the same field (covers, quadric pencils, quartic/bielliptic models)"
+  },
+  {
+   "id": "LEAD-TRF-second-torsion-direction",
+   "name": "Reach a second N-torsion direction: nonequivariant trace-zero transfer, Kani/Robert graph kernels, Richelot gluing of E with E'",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "theorem",
+   "statement": "Balasubramanian-Koblitz: for N || #E(F_p), N != p, E(F_{p^k})[N] is larger than the rational line iff N | p^k - 1 (embedding degree divides k); hence for N not dividing k, T_k(E)[N] = 0, and an F_p-rational graph-type (N,N) kernel in E x E' exists only when k_emb = 1; both reduce to MOV.",
+   "scope_limits": "Ordinary and supersingular curves over F_p, prime N, HOMOMORPHIC correspondences on N-torsion. Not excluded: a non-group-theoretic correspondence (not a homomorphism on N-torsion) with verified scalar compatibility. Brief §3 item 10 still lists 'second N-torsion direction via Kani/Richelot gluing' among open levers — only the k_emb-divides-k obstruction is settled; Richelot/Kani tooling exists (cd_attack).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-second-torsion-direction.yaml",
+   "forecloses": [
+    "trace zero variety transfer",
+    "nonequivariant transfer to an extension field",
+    "Kani embedding of the ECDLP",
+    "Richelot gluing with an isogenous curve",
+    "Castryck-Decru machinery for ECDLP",
+    "higher dimensional isogeny embedding"
+   ],
+   "revisit_when": "a non-homomorphic correspondence with verified scalar compatibility",
+   "atlas_title": "Reach a second N-torsion direction: nonequivariant trace-zero transfer, Kani/Robert graph kernels, Richelot gluing of E with E'"
+  },
+  {
+   "id": "LEAD-TRF-small-genus-cover-general",
+   "name": "Find small-genus GHS/Kummer covers beyond the Joux-Vitse weak class (other configurations over F_{q^3}, F_{p^k} with k=6,10,14)",
+   "kind": "lead",
+   "disposition": "closed_obstructed",
+   "obstruction_kind": "proof",
+   "statement": "Riemann-Hurwitz census g = 1 - 2^m + 2^{m-2} R: among 2-torsion Kummer covers of E/F_{q^3} only the JV configuration gives g <= 3 (others g in {1,7,9,13}); for E/GF(p^k) with F_p(j) = GF(p^k) every GHS cover has genus >= 9, 49, 41 at k = 6, 10, 14, repricing 247 of 846 cover_descent rows to marginal/boundary.",
+   "scope_limits": "KUMMER/GHS covers of the x-line in ODD characteristic, 2-torsion covers. Not excluded: a non-Kummer cover family (Hess Artin-Schreier analogue, non-x-line function) in odd characteristic. PEXT campaign measured genus floors at prime n in {3,5,7}; the n=7 frozen source binding differs from the corrected Lean source (EXP-PEXT-212d5c approved, not yet evidenced).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/leads/ecdlp/transfer/LEAD-TRF-small-genus-cover-general.yaml",
+   "forecloses": [
+    "generalize the Joux-Vitse weak class",
+    "genus 3 cover outside the weak class",
+    "Kummer cover genus over F_{q^3}",
+    "cover descent at genus k"
+   ],
+   "revisit_when": "a non-Kummer cover family in odd characteristic",
+   "atlas_title": "Find small-genus GHS/Kummer covers beyond the Joux-Vitse weak class (other configurations over F_{q^3}, F_{p^k} with k = 6, 10, 14)"
+  },
+  {
+   "id": "KR-IC-081a58",
+   "name": "Joux-Vitse n-1 decomposition and oracle-assisted static DH",
+   "kind": "known_result",
+   "disposition": "known_result:known_bound",
+   "obstruction_kind": "heuristic",
+   "statement": "Decomposing into n-1 points over F_{q^n} costs ~(n-1)! q^2 poly((n-1)! 2^{(n-1)(n-2)} log q), beating rho only for n >= 5; the same technique solves oracle-assisted static DH on a 130-bit E(F_{p^5}) faster than generic DLP; Granger analyses static DH over extension fields.",
+   "scope_limits": "EXTENSION fields F_{q^n}, n >= 5 for a gain; HEURISTIC; OA-SDH needs a static-DH ORACLE (protocol setting), not plain ECDLP. ecGFp5 OA-SDH estimate ~2^85-2^93 is a prediction, unmeasured. Says nothing about prime fields or prime-degree binary fields.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-081a58.yaml",
+   "forecloses": [
+    "n-1 decomposition",
+    "oracle-assisted static Diffie-Hellman",
+    "static DH over extension field curves"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-0d2021",
+   "name": "Modern Gröbner-basis complexity refinements",
+   "kind": "known_result",
+   "disposition": "known_result:known_bound",
+   "obstruction_kind": "proven",
+   "statement": "Kudo-Yokoyama 2024 refine degree-of-regularity / solving-degree predictions for affine semi-regular sequences; Jaques-Ran-Samardjiska-Seitner 2026 smooth the degree-of-regularity estimate; Sakata-Takagi efficient MQ F4 variants; Demin 2026 Las Vegas F4 with a proven probability bound.",
+   "scope_limits": "Results about SEMI-REGULAR / generic affine systems and F4 engineering. Semi-regular predictions do NOT describe descended summation systems (KR-IC-58213c), so these refinements bound neither the Weil-descent solving degree nor the IC exponent; they foreclose only re-deriving probabilistic/Las Vegas F4 as novelty. Abstract-level sources.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-0d2021.yaml",
+   "forecloses": [
+    "probabilistic row echelon in F4",
+    "Las Vegas F4",
+    "degree of regularity estimate for affine systems"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-139da0",
+   "name": "First fall degree 2 for the S_3 Weil descent: reported trace mechanism vs a reviewed finite counterexample",
+   "kind": "known_result",
+   "disposition": "known_result:dispute",
+   "obstruction_kind": "disputed",
+   "statement": "Abstract/secondary sources report first fall degree 2 for the F_2 Weil descent of S_3 on ordinary binary curves via the trace of x (a group morphism E -> F_2 giving a linear polynomial), and first fall degree of Weil descents bounded independently of n under Hodges-Petit-Schlather conditions. The programme's reviewed finite Boolean control (F_2[t]/(t^4+t+1), n=n'=4, x_R=1, basis [9,3,2,12]) finds no new class at degree 2 and one at degree 3 under its row-space definition; the Lean theorem cited proves only a trace-cancellation identity. Either way the heuristic tying first fall degree to degree of regularity is unsafe for these systems.",
+   "scope_limits": "DISPUTED: whether the sources' definition of first fall degree or their hypotheses exclude the n=4 instance has not been checked against the full texts. Settled regardless: first fall degree (2 or 3) does not bound the solving degree (treatise proves d_ff=2 and certifies d_F>=5). Binary setting only. Supersedes KR-IC-f5c584.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-139da0.yaml",
+   "forecloses": [
+    "trace equation",
+    "linear polynomial from the trace",
+    "trace homomorphism constraint",
+    "Tr(x) group morphism to F_2",
+    "low first fall degree of Weil descent"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-1fcdbc",
+   "name": "Characteristic-2 summation algorithms stay far slower than rho",
+   "kind": "known_result",
+   "disposition": "known_result:known_negative",
+   "obstruction_kind": "measured",
+   "statement": "Galbraith-Gebregiyorgis (2-torsion and halving symmetries, Gröbner and SAT) and Shantz-Teske conclude that summation-polynomial decomposition on prime-degree binary curves of reasonable size is much slower than rho; experiments reach only small n and l. Programme extensions: descended ANF exceeds the whole rho budget for n <= ~283; ECC2K-130 free oracle at m=3 costs 2^68.58 vs rho 2^60.81.",
+   "scope_limits": "A MEASURED negative at small n, l (literature) plus cost-model extrapolations (programme); abstract-level sources. Not a proof; the open question is the solving-degree growth (brief §3 item 1). Prime-degree binary only.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-1fcdbc.yaml",
+   "forecloses": [
+    "summation polynomial attack on binary curves beats rho",
+    "index calculus for sect/Koblitz curves",
+    "2-torsion symmetry in characteristic 2",
+    "halving symmetry for decomposition"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-401ebf",
+   "name": "Naive Semaev index calculus over prime fields cannot beat generic methods",
+   "kind": "known_result",
+   "disposition": "known_result:known_negative",
+   "obstruction_kind": "heuristic",
+   "statement": "Yokoyama-Yasuda-Takahashi-Kogure show, under stated statistical assumptions (a heuristic, not an unconditional proof), that Semaev's naive IC over F_p costs at least as much as generic algorithms; algebraic factor bases (Petit-Kosters-Messeng; Amadori-Pintore-Sala; Kudo et al.) reported to work only at small parameters; McGuire-Mueller's Gröbner-free variant reported still worse than rho. Internal: digit-presentation cost tables refuted; bounded-D0 models price empty matrices.",
+   "scope_limits": "HEURISTIC (statistical assumptions); ALL sources read in abstract only; 'naive' = x-coordinate interval/random base with Gröbner solving. Does not bound a non-naive prime-field IC with a genuinely new oracle (small-root, digit presentation at m>=3, invertible hint subsets). Supersedes KR-IC-5931ee (which had status 'proven' — corrected to heuristic).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-401ebf.yaml",
+   "forecloses": [
+    "index calculus over prime field curves",
+    "prime field summation polynomial attack",
+    "algebraic factor base over F_p",
+    "small x-coordinate factor base over F_p",
+    "Petit-Kosters-Messeng tower"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-46d822",
+   "name": "Gaudry: decomposition over E(F_{q^n}), n fixed",
+   "kind": "known_result",
+   "disposition": "known_result:known_bound",
+   "obstruction_kind": "heuristic",
+   "statement": "For fixed n, Gaudry's decomposition IC on E(F_{q^n}) runs in O~(q^{2-2/n}) (constant ~ n! 2^{n(n-1)}), beating rho's q^{n/2} for n >= 3 asymptotically; F_{q^3}: O(q^{10/7}), F_{q^4}: O(q^{14/9}) with double large primes.",
+   "scope_limits": "FIXED small n, EXTENSION fields with a proper subfield; heuristic; constants enormous in n. Does not apply to prime fields (n=1) or prime n with no intermediate field (the subfield condition x in F_q is what makes membership low-degree). Abstract-level sources.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-46d822.yaml",
+   "forecloses": [
+    "Weil restriction decomposition over F_q^n",
+    "Gaudry decomposition attack",
+    "index calculus on curves over small degree extension fields"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-49c882",
+   "name": "Quasi-subfield polynomials",
+   "kind": "known_result",
+   "disposition": "known_result:known_bound",
+   "obstruction_kind": "conjectured",
+   "statement": "IC over binary (and other) fields could be improved if quasi-subfield polynomials X^{p^{n'}} - lambda(X) with small lambda split completely often enough (HKPYY 2020); Euler-Petit prove beta >= 3/4 for linearised complete splitters; existence of useful families remains open. Internal: beta > 1/2 for every complete splitter with n' not dividing n (possibly novel).",
+   "scope_limits": "The bound beta >= 3/4 is for LINEARISED complete splitters; the HKPYY improvement itself is CONJECTURED; existence of useful (non-linearised) families is OPEN in the literature (KN-OPEN-ac409f). Programme closure at n=131 is under the HKPYY cost model.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-49c882.yaml",
+   "forecloses": [
+    "quasi-subfield polynomial",
+    "linearized polynomial splitting",
+    "subfield-like factor base for prime degree extensions"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-5765d2",
+   "name": "SAT and XOR reasoning for point decomposition",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "measured",
+   "statement": "SAT solvers (CryptoMiniSat) and XOR-aware WDSat solve binary-curve PDP instances faster than Magma F4 (up to 300x on the PDP step, Trimoska-Ionica-Dequen 2020) without changing the exponent relative to rho. Internal: WDSat's advantage on the authors' instances comes from static branching order; XOR-GE 4-7x slower.",
+   "scope_limits": "Binary PDP, measured constant-factor mechanism. Forecloses SAT/XOR as NOVELTY; does not bound a solver with sub-enumeration UNSAT growth (LEAD-ICB-decomposition-encoding-and-sat measures alpha ~ m for all tried).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-5765d2.yaml",
+   "forecloses": [
+    "SAT solver for point decomposition",
+    "XOR clauses for Weil descent",
+    "CryptoMiniSat for summation polynomials",
+    "Gaussian elimination in SAT for PDP"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-58213c",
+   "name": "Last fall degree of zero-dimensional Weil descent systems; solving degree vs last fall degree",
+   "kind": "known_result",
+   "disposition": "known_result:known_bound",
+   "obstruction_kind": "proven",
+   "statement": "For a zero-dimensional radical system F over F_{q^n} in m variables with <= s solutions over the closure and an injective coordinate projection, the last fall degree of its Weil descent with field equations is bounded by a function of q, m, s, deg F and the last fall degree of F, independent of n (HKYY Thm 1.1; univariate HKY Main Thm 1, polynomial time in (n+d)^d). Both papers state this does NOT apply to summation-polynomial systems (not zero-dimensional before field equations); whether their last fall degree depends on n is left open. Solving degree = max(last fall degree, max reduced GB degree) for degree-compatible orders (Caminata-Gorla), so a last-fall bound alone does not bound solving degree. Semi-regular predictions do not describe descended summation systems.",
+   "scope_limits": "ZERO-DIMENSIONAL, radical, injective-projection systems only — explicitly NOT summation systems. The n-independence of d_F for summation systems is the open problem (brief §3 item 1). Full-text read. Supersedes KR-IC-fbdb61.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-58213c.yaml",
+   "forecloses": [
+    "solving degree of Weil descent",
+    "last fall degree bounded for zero-dimensional descent systems",
+    "semi-regular estimate for summation polynomial systems",
+    "degree of regularity grows linearly"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-5931ee",
+   "name": "Naive Semaev index calculus over prime fields cannot beat generic methods (superseded row)",
+   "kind": "known_result",
+   "disposition": "known_result:known_negative;superseded_by=KR-IC-401ebf",
+   "obstruction_kind": "proven(superseded: status corrected to heuristic in KR-IC-401ebf)",
+   "statement": "Same claim as KR-IC-401ebf, originally filed with status 'proven'.",
+   "scope_limits": "SUPERSEDED by KR-IC-401ebf, which downgrades the status to heuristic (statistical assumptions, abstracts only). Use the successor's scope.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-5931ee.yaml",
+   "forecloses": [
+    "index calculus over prime field curves",
+    "prime field summation polynomial attack",
+    "algebraic factor base over F_p",
+    "small x-coordinate factor base over F_p",
+    "Petit-Kosters-Messeng tower"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-5a43e5",
+   "name": "Semaev summation polynomials",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "proven",
+   "statement": "S_m(x_1..x_m) vanishes exactly when points with those x-coordinates sum to O (with some signs); S_2 = x_1 - x_2, S_3 explicit, S_m = Res_X(S_{m-k+1}, S_{k+1}); degree 2^{m-2} in each variable. Using them to decompose points over a factor base is the IC framework itself. Internal: Galois group (Z/2)^{m-2} and factorization dichotomy (novelty unadjudicated).",
+   "scope_limits": "Framework fact: novelty must lie in representation, factor base, elimination or solver, never in 'use summation polynomials'. Not a closure of any route.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-5a43e5.yaml",
+   "forecloses": [
+    "summation polynomials for decomposition",
+    "Semaev polynomial point decomposition",
+    "resultant recursion for summation polynomials",
+    "decompose a point as a sum of factor base points"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-5ea2f8",
+   "name": "GHS Weil descent and cover attacks",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "proven",
+   "statement": "GHS Weil descent maps ECDLP on E(F_{q^n}) to a hyperelliptic Jacobian over F_q; effective only for special fields/curves (Menezes-Teske-Weng weak fields; Iijima-Momose-Chao classify vulnerable odd-characteristic curves incl. degree 5); isogenies can move a curve into a vulnerable class (Tian 2023 for some prime-order curves over F_{q^3}).",
+   "scope_limits": "Needs an EXTENSION field with proper subfield (n > 1) and a curve/field in a weak class; prime p and prime n=131 binary are not covered. Forecloses GHS/cover attacks as novelty; abstract-level sources.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-5ea2f8.yaml",
+   "forecloses": [
+    "GHS attack",
+    "Weil descent to hyperelliptic Jacobian",
+    "cover attack",
+    "isogeny to a GHS-weak curve",
+    "weak binary fields"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-64659b",
+   "name": "Diem: rigorous subexponential ECDLP for suitable n",
+   "kind": "known_result",
+   "disposition": "known_result:known_bound",
+   "obstruction_kind": "proven",
+   "statement": "Diem proves ECDLP on E(F_{q^n}) is subexponential (L(2/3)-type) when n ~ sqrt(log q) (2011) and for n up to about log q (2013). The open cases are prime fields and prime-degree binary fields.",
+   "scope_limits": "Requires n growing with log q (n ~ sqrt(log q) to ~log q) — a family of fields, not a fixed prime field or fixed n=131 over F_2. Rigorous. Explicitly leaves prime fields and prime-degree binary fields open.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-64659b.yaml",
+   "forecloses": [
+    "subexponential ECDLP over extension fields",
+    "rigorous index calculus for E(F_q^n)"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-73db3f",
+   "name": "Choosing the factor-base vector space V (small product spaces)",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "heuristic",
+   "statement": "In binary PDP the factor base is {P: x(P) in V} for an F_2-subspace V; choosing V so product spaces V^(i) have small dimension (span{1,z,..,z^{l-1}} in polynomial basis, or subfield/linearised structure) lowers degree and variable count after Weil descent (FPPR, Petit-Quisquater, HPST 2013); Shantz-Teske study factor-base choices experimentally.",
+   "scope_limits": "Binary subspace bases; heuristic; forecloses 'choose V to minimise dim V^2' as novelty. The programme measured all such effects as constants vanishing with size (LEAD-ICB-factor-base-subspace-choice). Non-subspace bases not covered.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-73db3f.yaml",
+   "forecloses": [
+    "choose V to minimise dim V^2",
+    "factor base as linear subspace",
+    "geometric progression factor base",
+    "polynomial basis subspace span 1 z z^2",
+    "vector space factor base Weil descent"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-791cb7",
+   "name": "Weak binary fields under GHS and generalized GHS with isogeny walks (Menezes-Teske-Weng, Menezes-Teske), exact densities and costs",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "heuristic",
+   "statement": "Over F_{2^N}, N = nl composite, N in [160,600]: N = 5l weak (every non-subfield curve magic number 5, genus 15/16 over F_{2^l}; speedup 2^6 at N=185 to 2^69 at N=600 on 2003 timings); N = 210 particularly weak (2^13 all curves, 2^20 for the Tr(a)=Tr(b)=0 quarter via the (6,5) family of density 2^-34 reached by a ~2^34-step walk costing ~2^60 ops); N = 3l partially weak (genus-3 hyperelliptic family, density 2^-(l-1), q/2 walk steps, Gaudry-Thome O(q^{4/3})); N = 6l potentially weak (Hess genus 14 density ~1, genus 12 density 2^-(l-1)); N = 7l, 8l potentially partially weak; N = 4l only slightly weak (genus 8); N prime, and N not divisible by 3,5,6,7,8, NOT weak under either attack. 'Weak' = cheaper than the hardest rho over the same field, time only; no field known to be bad. Subfield curves not weakened (descent kills the large subgroup). c2pnb176w1 best instance (8,5) would cost 2^61-2^65 vs rho 2^87 but has density ~2^-66 in its class (harder to reach than rho).",
+   "scope_limits": "COMPOSITE N only; prime N (all NIST/SEC binary curves, ECC2K-130) explicitly not weak under GHS/gGHS. Hess-family densities rest on Assumptions A, B (non-hyperelliptic Jacobian costs) and C (uniform density across endomorphism classes); n=5 and n=3 results need neither A nor B. Timings are 2003 ratios. Full-text read.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-791cb7.yaml",
+   "forecloses": [
+    "weak binary field",
+    "composite-degree binary field GHS",
+    "walk the isogeny class to a GHS-weak curve",
+    "magic number 5 genus 16 descent",
+    "F_2^210 weak",
+    "F_2^161 genus 8 over F_2^23",
+    "Hess generalized GHS genus 7 or 12 or 14 or 24",
+    "Tr(b) = 0 iff 8 divides the group order",
+    "isogeny walk to a curve with small magic number",
+    "Galbraith-Hess-Smart extension of GHS",
+    "c2pnb176w1 break by isogeny to magic number 5",
+    "subfield curve Weil descent"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-889857",
+   "name": "Subexponential binary ECDLP under the first fall degree assumption",
+   "kind": "known_result",
+   "disposition": "known_result:dispute",
+   "obstruction_kind": "disputed",
+   "statement": "Petit-Quisquater (2^{c n^{2/3} log n}, crossover n ~ 2000), FPPR, Semaev 2015 (2^{c sqrt(n ln n)}, claimed below rho for some FIPS curves under Assumption 1, regularity <= 4) and Nagao 2015 (polynomial) all rest on first-fall-degree-type assumptions; HKY, Kosters-Yeo, HPST 2015 and later give evidence the assumption fails; Galbraith-Gaudry record no consensus. Internal: memory-charged crossover vs coherent vOW moves to n = 460/520; Assumption 1 measured on the wrong subspaces, first fall degree flat at 3 on the right ones (n=7..63); Nagao Lemma 4 false over F_2 under the equality reading.",
+   "scope_limits": "DISPUTED claims, not closures: the subexponential claims are unsupported (assumption fails), but their FALSITY is not proved either — no d_F lower bound growing with n exists (KN-OPEN-d218ec, -86e7e1). Even if PQ held, the n ~ 2000 crossover leaves n=131 unaffected. Binary only.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-889857.yaml",
+   "forecloses": [
+    "first fall degree assumption",
+    "subexponential binary ECDLP",
+    "degree of regularity bounded by 4",
+    "Semaev 2015 Assumption 1",
+    "polynomial time ECDLP over F_2^n"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-8b9daa",
+   "name": "Point decomposition via symmetric formulations (Karabina)",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "reported",
+   "statement": "Karabina reformulates binary-curve PDP using symmetric functions and Weil restriction to reduce the system; gain is a constant/polynomial factor in the decomposition step.",
+   "scope_limits": "Binary PDP; constant/polynomial factor only; full-text read. Forecloses symmetric-function reformulation as novelty, not as an engineering lever.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-8b9daa.yaml",
+   "forecloses": [
+    "symmetric function formulation of PDP",
+    "Karabina decomposition"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-955fd6",
+   "name": "Symmetries and torsion speed up point decomposition",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "heuristic",
+   "statement": "Exploiting S_m symmetry and small-order torsion (twisted Edwards/Jacobi models, 2- and 4-torsion) reduces PDP cost by about 2^{omega(n-1)}; FGHR estimate ~2^130 word ops for twisted Edwards over F_{q^5}, q ~ 2^64 (vs 2^160 generic); symmetrised summation polynomials (FHJRV) use small-order torsion to shrink systems further.",
+   "scope_limits": "EXTENSION fields F_{q^n} with rational small-order torsion; heuristic estimates; constant/polynomial factors. The ecGFp5 (Z/2)^4 x| S_5 quotient-ideal degree is OPEN (KN-OPEN-9b4a2b). Binary prime-degree: 2-torsion gives FGHR constants only (treatise symmetry inventory).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-955fd6.yaml",
+   "forecloses": [
+    "symmetrized summation polynomials",
+    "use S_m symmetry in decomposition",
+    "torsion point symmetry",
+    "Edwards curve symmetric coordinates",
+    "elementary symmetric polynomial variables"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-9e610d",
+   "name": "Survey consensus (2016)",
+   "kind": "known_result",
+   "disposition": "known_result:textbook_fact",
+   "obstruction_kind": "reported",
+   "statement": "Galbraith-Gaudry 2016: no consensus that binary-field ECDLP is subexponential; IC has no practical impact at deployed sizes; prime-field ECDLP has no known attack better than rho for general curves.",
+   "scope_limits": "A 2016 survey statement; abstract/conclusions only. Forecloses nothing mathematically — it is the baseline any novelty claim is measured against.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-9e610d.yaml",
+   "forecloses": [
+    "index calculus is practical for deployed curves",
+    "prime field ECDLP better than rho"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-a4dd54",
+   "name": "Hyperelliptic index calculus and the genus threshold",
+   "kind": "known_result",
+   "disposition": "known_result:known_bound",
+   "obstruction_kind": "heuristic",
+   "statement": "For genus g Jacobians over F_q, IC with double large primes costs O~(q^{2-2/g}) (Gaudry-Thome-Theriault-Diem), beating rho's q^{g/2} for g >= 3; decomposition attacks extend to Jacobians over extension fields (Nagao 2010; Tsakou-Ionica with endomorphisms).",
+   "scope_limits": "HYPERELLIPTIC (and via Diem, plane quartic at O~(q)) Jacobians of genus >= 3 over F_q; heuristic. For an elliptic curve this bites only after a transfer into such a Jacobian over a SMALLER field (GHS/cover); same-field embeddings inflate the group (LEAD-TRF-same-field-genus-g-embedding).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-a4dd54.yaml",
+   "forecloses": [
+    "genus 3 index calculus beats rho",
+    "double large prime variation",
+    "hyperelliptic decomposition attack"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-ae532f",
+   "name": "Largest practical algebraic ECDLP computations",
+   "kind": "known_result",
+   "disposition": "known_result:record",
+   "obstruction_kind": "reported",
+   "statement": "Cover-and-decomposition IC solved a 149-bit prime-order subgroup of E(F_{p^6}) in ~110,000 CPU-hours (Joux-Vitse 2012); GLS-assisted GHS descent broke a prime-order subgroup over F_{2^{5*31}} in ~1,035 CPU-days (Chi-Dominguez-Rodriguez-Henriquez-Smith 2021). No summation-polynomial method has beaten rho on a cryptographic-size prime-field or prime-degree binary curve.",
+   "scope_limits": "Records on EXTENSION fields with intermediate subfields (p^6, 2^{155}); the negative sentence is a statement about the record books (reported), not a theorem.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-ae532f.yaml",
+   "forecloses": [
+    "practical index calculus record",
+    "largest ECDLP solved by index calculus",
+    "cover and decomposition"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-b0fcda",
+   "name": "Frobenius-invariant factor bases for subfield (Koblitz) curves",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "heuristic",
+   "statement": "For subfield curves E/F_q with ECDLP in E(F_{q^n}), Frobenius-invariant factor bases reduce the number of systems to solve by up to 1/n (best possible) and speed linear algebra by n^2 (Galbraith-Granger-Merz-Petit). Internal: p | n cells, exact spectra; at q=2, n in {131,163} the stable subspace is a net loss.",
+   "scope_limits": "Koblitz/subfield curves; polynomial (n, n^2) factor, 'best possible' at 1/n; heuristic; abstract read (re-derived internally). At prime n with ord_n(2) = n-1 (131, 163) no usable stable subspace exists. KN-OPEN-095df5 open.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-b0fcda.yaml",
+   "forecloses": [
+    "Frobenius-stable factor base",
+    "tau-invariant factor base",
+    "Frobenius invariant decomposition",
+    "factor base closed under Frobenius",
+    "Koblitz index calculus speedup"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-cd159a",
+   "name": "Xedni calculus and lifting to characteristic zero fail",
+   "kind": "known_result",
+   "disposition": "known_result:known_negative",
+   "obstruction_kind": "proven",
+   "statement": "Silverman's xedni calculus (lift points to Q, look for rank-deficient lifts) was shown by Jacobson-Koblitz-Silverman-Stein-Teske to succeed with negligible probability; lifting-based ECDLP approaches inherit this obstruction. Internal: exact-counting closure of FB-geometry and xedni lifting (GOAL-ICLIFT-001, 2026-07-24).",
+   "scope_limits": "Classical xedni over Q (heights grow; small points reduce uniformly). 'Lifting-based approaches inherit this' is an extrapolation: height-compressing lifts (CM canonical lifts with cheap field of definition; function-field sections with dimension surplus) are open_next_step in the atlas; the function-field alpha=3 result is one frozen family. Abstract-level sources.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-cd159a.yaml",
+   "forecloses": [
+    "xedni",
+    "lift to characteristic zero",
+    "canonical lift for ECDLP",
+    "rank of lifted curve"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-e2d81b",
+   "name": "ecGFp5 and degree-5 extension curves: published estimates",
+   "kind": "known_result",
+   "disposition": "known_result:record",
+   "obstruction_kind": "reported",
+   "statement": "ecGFp5 over F_{p^5}, p = 2^64 - 2^32 + 1: designer estimates >= 2^142 for Gaudry-type decomposition and O(C p^2), p^2 = 2^128, for Joux-Vitse; FGHR's ~2^130 for twisted Edwards over F_{q^5} relies on symmetries whose applicability to ecGFp5 is unexamined; no dedicated cryptanalysis found (2026-09-26).",
+   "scope_limits": "Designer ESTIMATES, not measurements; the 2^121 symmetrized-decomposition prediction is unmeasured (EV-GFPN-ba8e4d); the (Z/2)^4 x| S_5 quotient degree is open. These are open leads under GOAL-GFPN-380702, not closures.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-e2d81b.yaml",
+   "forecloses": [
+    "ecGFp5 index calculus",
+    "Goldilocks quintic extension curve security",
+    "degree 5 extension Weil descent",
+    "EcMasFp5"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-e847d1",
+   "name": "Crossbred algorithm for Boolean systems",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "reported",
+   "statement": "Joux-Vitse's crossbred combines Macaulay-matrix preprocessing with exhaustive search for Boolean systems and beats both pure approaches in its regime.",
+   "scope_limits": "Generic Boolean systems; forecloses crossbred/hybrid as novelty only. Programme measurement (research/crossbred_20260920): relation collection stays Theta(2^n) with any oracle polynomial in the base.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-e847d1.yaml",
+   "forecloses": [
+    "crossbred",
+    "hybrid Macaulay plus enumeration for Boolean systems"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-f3da82",
+   "name": "F4 trace reuse across many similar systems",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism",
+   "obstruction_kind": "reported",
+   "statement": "Joux-Vitse's F4 variant records the reduction trace of one system and replays it on many similar systems (as in decomposition), avoiding repeated symbolic work. Internal: the 'learn one trace and replay branch-free' GPU premise failed at n=17.",
+   "scope_limits": "Engineering constant; forecloses trace replay as novelty. The programme found replay is not branch-free on descended Semaev systems at n=17 (closure degrees vary per instance).",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-f3da82.yaml",
+   "forecloses": [
+    "replay an F4 trace",
+    "learn one elimination trace and replay branch-free",
+    "precomputed Groebner trace for decomposition"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-f5c584",
+   "name": "The trace morphism forces a linear equation (first fall degree 2 for S_3) (superseded row)",
+   "kind": "known_result",
+   "disposition": "known_result:known_mechanism;superseded_by=KR-IC-139da0",
+   "obstruction_kind": "proven(superseded: now disputed, KR-IC-139da0)",
+   "statement": "Weil descent to F_2 of S_3 on ordinary binary curves has first fall degree 2 because Tr(x): E -> F_2 is a group morphism yielding a linear polynomial after descent; first fall degree of Weil descents bounded independently of n under Hodges-Petit-Schlather conditions.",
+   "scope_limits": "SUPERSEDED by KR-IC-139da0 (status disputed after a reviewed finite counterexample under the row-space definition). Use the successor's scope. The treatise independently PROVES d_ff = 2 for binary S_3 descent in its own presentation (falldegree.tex); the dispute is about definitions/hypotheses, and in all readings d_ff does not bound d_F.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-f5c584.yaml",
+   "forecloses": [
+    "trace equation",
+    "linear polynomial from the trace",
+    "first fall degree 3 on S3 descent",
+    "trace homomorphism constraint",
+    "Tr(x) group morphism to F_2",
+    "low first fall degree of Weil descent"
+   ],
+   "revisit_when": null
+  },
+  {
+   "id": "KR-IC-fbdb61",
+   "name": "Last fall degree and solving degree of Weil descent systems (superseded row)",
+   "kind": "known_result",
+   "disposition": "known_result:known_bound;superseded_by=KR-IC-58213c",
+   "obstruction_kind": "proven",
+   "statement": "Last fall degree of Weil-descended systems is bounded independently of the extension degree under stated conditions (HKY; HKYY); solving degree, last fall degree and degree of regularity are related but distinct (Caminata-Gorla; Caminata-Ceria-Gorla; Semaev-Tenti); semi-regular predictions do not describe descended summation systems.",
+   "scope_limits": "SUPERSEDED by KR-IC-58213c, which makes the 'stated conditions' explicit (zero-dimensional, radical, injective projection) and records that the papers exclude summation systems. Abstract-level sources in this row.",
+   "source": "/Volumes/SSD990-2/crypto-autoresearcher/knowledge/frontiers/ecdlp/index-calculus/KR-IC-fbdb61.yaml",
+   "forecloses": [
+    "solving degree of Weil descent",
+    "last fall degree bounded",
+    "semi-regular estimate for summation polynomial systems",
+    "degree of regularity grows linearly"
+   ],
+   "revisit_when": null
+  }
+ ]
+}

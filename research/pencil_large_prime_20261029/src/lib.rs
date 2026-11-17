@@ -13,6 +13,8 @@ pub mod collector;
 pub mod meter;
 pub mod outer_primality;
 pub mod residual;
+#[cfg(feature = "reporting")]
+pub mod relation_stream;
 pub mod scalar_ledger;
 pub mod sparse;
 pub mod tracked_set;

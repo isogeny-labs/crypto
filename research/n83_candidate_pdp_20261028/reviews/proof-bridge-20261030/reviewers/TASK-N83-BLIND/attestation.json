@@ -1,0 +1,69 @@
+{
+  "review_attestation": {
+    "task_id": "TASK-N83-BLIND",
+    "archival_task_id": "T-995",
+    "reviewer_id": "TASK-N83-BLIND",
+    "date": "2026-10-30",
+    "joints_owned": [
+      "independent derivation from mathematical system definition"
+    ],
+    "sources_read": [
+      "/home/ec2-user/n83-proof-bridge-blind-20261030/statement.md",
+      "https://math.mit.edu/~rstan/pubs/pubfiles/42.pdf",
+      "https://arxiv.org/html/2211.13548"
+    ],
+    "source_read_scope": {
+      "/home/ec2-user/n83-proof-bridge-blind-20261030/statement.md": "Read in full; sole project mathematical source.",
+      "https://math.mit.edu/~rstan/pubs/pubfiles/42.pdf": "Opened primary paper; returned introductory and Lefschetz material inspected for context. No claim of reading every PDF page.",
+      "https://arxiv.org/html/2211.13548": "Opened primary paper; returned introduction and squarefree algebra section inspected, including the explicit characteristic-greater-than-n condition of Theorem 2.7. No claim of checking every proof in the paper."
+    },
+    "web_discovery": {
+      "query": "Stanley 1980 Weyl groups hard Lefschetz theorem Sperner property squarefree algebra sl2 pdf",
+      "search_result_snippets_returned": true,
+      "search_snippets_used_as_mathematical_evidence": false,
+      "secondary_sources_opened": false
+    },
+    "read_sibling_reports": false,
+    "blind_from_respected": true,
+    "read_producer_code": false,
+    "read_producer_proof_notes": false,
+    "read_producer_results_or_reports": false,
+    "read_checker_or_review_plans": false,
+    "read_git_history": false,
+    "git_commands_run": false,
+    "parameter_sweeps_run": false,
+    "cloud_jobs_run": false,
+    "cryptographic_computation_programs_run": false,
+    "machine_formalization_inspected": false,
+    "machine_formalization_created": false,
+    "native_computation_policy_deviation": false,
+    "method": "Independent symbolic mathematical derivation, with explicit polynomial identities and a filtered Koszul/alternating-projection argument.",
+    "verdicts": {
+      "independent derivation from mathematical system definition": "holds"
+    },
+    "derived_results": {
+      "highest_form_non_koszul_onset": 17,
+      "first_strict_filtered_fall": 17,
+      "last_fall_degree_lower_bound": 17,
+      "last_fall_degree_numerical_upper_bound_established": false,
+      "generic_remainder_degree": 16,
+      "exceptional_remainder_degree": 15,
+      "exceptional_target_for_remainder_degree": "t = (sum of the final selector block weights)/2 in k",
+      "targets_excluded_from_strict_fall": [],
+      "highest_form_quotient_dimension": "ceil((m-2)/2)",
+      "degree_of_regularity_first_vanishing_component_convention": "No finite value, because the highest-form quotient is positive dimensional.",
+      "castelnuovo_mumford_regularity_computed": false
+    },
+    "input_assumptions": [
+      "The stated characteristic is prime.",
+      "All selector weights are nonzero.",
+      "Ordinary total degree and the exact iterated V_d definition in the statement are used.",
+      "No U-field equations are present."
+    ],
+    "outputs": [
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-BLIND/report.md",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-BLIND/attestation.json"
+    ],
+    "claim_boundary": "This attests an independent mathematical derivation from the supplied definition. It does not inspect or certify source data, producer implementations, sibling reviews, or machine formal artifacts."
+  }
+}

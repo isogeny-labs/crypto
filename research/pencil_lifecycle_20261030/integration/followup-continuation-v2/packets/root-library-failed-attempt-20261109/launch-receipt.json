@@ -1,0 +1,246 @@
+{
+  "status": "failed",
+  "unit": "pencil-root-durable-t1958-20261109.service",
+  "errors": [
+    {
+      "durability_failure": "PermissionError"
+    },
+    {
+      "repr": "PermissionError(13, 'Permission denied')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 87, in <module>\n    d=show()\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 61, in show\n    value=call(['/usr/bin/systemctl','show',UNIT]+['--property='+k for k in KEYS]);d=dict(line.split('=',1) for line in value.splitlines() if '=' in line);R['observations'].append(d);return d\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 57, in call\n    checkpoint('query-recorded')\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 13, in checkpoint\n    atomic_json(OUT/'launch-receipt.json',R);flush_logs(OUT)\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable_io.py\", line 22, in flush_logs\n    with path.open('rb') as f:\n  File \"/usr/lib64/python3.9/pathlib.py\", line 1180, in open\n    return io.open(self, mode, buffering, encoding, errors, newline,\n  File \"/usr/lib64/python3.9/pathlib.py\", line 1038, in _opener\n    return self._accessor.open(self, flags, mode)\nPermissionError: [Errno 13] Permission denied: '/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109/supervisor/unit.stderr'\n"
+    },
+    {
+      "durability_failure": "PermissionError"
+    },
+    {
+      "cleanup": "AssertionError('cannot stop unit without exact owned InvocationID')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 110, in <module>\n    assert R.get('invocation_id') and current.get('InvocationID')==R['invocation_id'],'cannot stop unit without exact owned InvocationID'\nAssertionError: cannot stop unit without exact owned InvocationID\n"
+    },
+    {
+      "durability_failure": "PermissionError"
+    },
+    {
+      "sealing": "AssertionError('cannot seal before owned cleanup')"
+    }
+  ],
+  "unit_launch_attempted": true,
+  "observations": [
+    {
+      "MainPID": "0",
+      "Result": "success",
+      "ExecMainCode": "0",
+      "ExecMainStatus": "0",
+      "ControlGroup": "",
+      "CPUUsageNSec": "[not set]",
+      "Id": "pencil-root-durable-t1958-20261109.service",
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "InvocationID": ""
+    },
+    {
+      "MainPID": "4028040",
+      "Result": "success",
+      "ExecMainCode": "0",
+      "ExecMainStatus": "0",
+      "ControlGroup": "/system.slice/pencil-root-durable-t1958-20261109.service",
+      "CPUUsageNSec": "18801000",
+      "Id": "pencil-root-durable-t1958-20261109.service",
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "running",
+      "InvocationID": "4342ad37f3dd4cbbadf95ff27001cf69"
+    }
+  ],
+  "phase": "terminal-unsealed",
+  "elapsed_seconds": 0.4207382969907485,
+  "durable_size": {
+    "total_bytes": 6538,
+    "metadata_bytes": 6538
+  },
+  "heartbeats": [
+    {
+      "status": 200,
+      "task_id": "240a7800-602b-43f3-afa5-7de244cf51d8",
+      "attempt_id": "0e84ee39-565d-402c-8914-a186c1ea6fd2",
+      "lease_id": "cc4e412e-c0a7-44ac-bda2-2c8f1ed4729d",
+      "fencing_epoch": 3,
+      "expires_at": "2026-11-09T17:42:50.717162Z"
+    }
+  ],
+  "queries": [
+    {
+      "argv": [
+        "/usr/bin/systemctl",
+        "show",
+        "pencil-root-durable-t1958-20261109.service",
+        "--property=Id",
+        "--property=LoadState",
+        "--property=ActiveState",
+        "--property=SubState",
+        "--property=MainPID",
+        "--property=InvocationID",
+        "--property=ControlGroup",
+        "--property=Result",
+        "--property=ExecMainCode",
+        "--property=ExecMainStatus",
+        "--property=MemoryPeak",
+        "--property=CPUUsageNSec"
+      ],
+      "exit_code": 0,
+      "stdout": "MainPID=0\nResult=success\nExecMainCode=0\nExecMainStatus=0\nControlGroup=\nCPUUsageNSec=[not set]\nId=pencil-root-durable-t1958-20261109.service\nLoadState=not-found\nActiveState=inactive\nSubState=dead\nInvocationID=\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/usr/bin/sudo",
+        "-n",
+        "/usr/bin/systemd-run",
+        "--no-block",
+        "--unit=pencil-root-durable-t1958-20261109.service",
+        "--property=User=1000",
+        "--property=Group=1000",
+        "--property=Type=exec",
+        "--property=RemainAfterExit=yes",
+        "--property=CPUQuota=200%",
+        "--property=MemoryMax=17179869184",
+        "--property=MemorySwapMax=0",
+        "--property=OOMPolicy=stop",
+        "--property=TasksMax=512",
+        "--property=KillMode=control-group",
+        "--property=TimeoutStopSec=5s",
+        "--property=RuntimeMaxSec=1779s",
+        "--property=NoNewPrivileges=yes",
+        "--property=CapabilityBoundingSet=",
+        "--property=ProtectControlGroups=yes",
+        "--property=RestrictNamespaces=yes",
+        "--property=PrivateNetwork=yes",
+        "--property=PrivateTmp=no",
+        "--property=ProtectSystem=strict",
+        "--property=ProtectHome=read-only",
+        "--property=ReadWritePaths=/var/tmp/pencil-root-materialize-t1953-20261109 /home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109",
+        "--property=WorkingDirectory=/var/tmp/pencil-root-materialize-t1953-20261109/source",
+        "--property=UMask=0077",
+        "--property=StandardOutput=append:/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109/supervisor/unit.stdout",
+        "--property=StandardError=append:/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109/supervisor/unit.stderr",
+        "--setenv=PENCIL_CHECK_END_MONOTONIC=314115.474590393",
+        "/usr/bin/python3",
+        "-B",
+        "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-worker.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Running as unit: pencil-root-durable-t1958-20261109.service\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/systemctl",
+        "show",
+        "pencil-root-durable-t1958-20261109.service",
+        "--property=Id",
+        "--property=LoadState",
+        "--property=ActiveState",
+        "--property=SubState",
+        "--property=MainPID",
+        "--property=InvocationID",
+        "--property=ControlGroup",
+        "--property=Result",
+        "--property=ExecMainCode",
+        "--property=ExecMainStatus",
+        "--property=MemoryPeak",
+        "--property=CPUUsageNSec"
+      ],
+      "exit_code": 0,
+      "stdout": "MainPID=4028040\nResult=success\nExecMainCode=0\nExecMainStatus=0\nControlGroup=/system.slice/pencil-root-durable-t1958-20261109.service\nCPUUsageNSec=126000\nId=pencil-root-durable-t1958-20261109.service\nLoadState=loaded\nActiveState=activating\nSubState=start\nInvocationID=4342ad37f3dd4cbbadf95ff27001cf69\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/usr/bin/systemctl",
+        "show",
+        "pencil-root-durable-t1958-20261109.service",
+        "--property=Id",
+        "--property=LoadState",
+        "--property=ActiveState",
+        "--property=SubState",
+        "--property=MainPID",
+        "--property=InvocationID",
+        "--property=ControlGroup",
+        "--property=Result",
+        "--property=ExecMainCode",
+        "--property=ExecMainStatus",
+        "--property=MemoryPeak",
+        "--property=CPUUsageNSec"
+      ],
+      "exit_code": 0,
+      "stdout": "MainPID=4028040\nResult=success\nExecMainCode=0\nExecMainStatus=0\nControlGroup=/system.slice/pencil-root-durable-t1958-20261109.service\nCPUUsageNSec=18801000\nId=pencil-root-durable-t1958-20261109.service\nLoadState=loaded\nActiveState=active\nSubState=running\nInvocationID=4342ad37f3dd4cbbadf95ff27001cf69\n",
+      "stderr": ""
+    }
+  ],
+  "launch_argv": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/systemd-run",
+    "--no-block",
+    "--unit=pencil-root-durable-t1958-20261109.service",
+    "--property=User=1000",
+    "--property=Group=1000",
+    "--property=Type=exec",
+    "--property=RemainAfterExit=yes",
+    "--property=CPUQuota=200%",
+    "--property=MemoryMax=17179869184",
+    "--property=MemorySwapMax=0",
+    "--property=OOMPolicy=stop",
+    "--property=TasksMax=512",
+    "--property=KillMode=control-group",
+    "--property=TimeoutStopSec=5s",
+    "--property=RuntimeMaxSec=1779s",
+    "--property=NoNewPrivileges=yes",
+    "--property=CapabilityBoundingSet=",
+    "--property=ProtectControlGroups=yes",
+    "--property=RestrictNamespaces=yes",
+    "--property=PrivateNetwork=yes",
+    "--property=PrivateTmp=no",
+    "--property=ProtectSystem=strict",
+    "--property=ProtectHome=read-only",
+    "--property=ReadWritePaths=/var/tmp/pencil-root-materialize-t1953-20261109 /home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109",
+    "--property=WorkingDirectory=/var/tmp/pencil-root-materialize-t1953-20261109/source",
+    "--property=UMask=0077",
+    "--property=StandardOutput=append:/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109/supervisor/unit.stdout",
+    "--property=StandardError=append:/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109/supervisor/unit.stderr",
+    "--setenv=PENCIL_CHECK_END_MONOTONIC=314115.474590393",
+    "/usr/bin/python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-worker.py"
+  ],
+  "properties": {
+    "User": "1000",
+    "Group": "1000",
+    "Type": "exec",
+    "RemainAfterExit": "yes",
+    "CPUQuota": "200%",
+    "MemoryMax": "17179869184",
+    "MemorySwapMax": "0",
+    "OOMPolicy": "stop",
+    "TasksMax": "512",
+    "KillMode": "control-group",
+    "TimeoutStopSec": "5s",
+    "RuntimeMaxSec": "1779s",
+    "NoNewPrivileges": "yes",
+    "CapabilityBoundingSet": "",
+    "ProtectControlGroups": "yes",
+    "RestrictNamespaces": "yes",
+    "PrivateNetwork": "yes",
+    "PrivateTmp": "no",
+    "ProtectSystem": "strict",
+    "ProtectHome": "read-only",
+    "ReadWritePaths": "/var/tmp/pencil-root-materialize-t1953-20261109 /home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109",
+    "WorkingDirectory": "/var/tmp/pencil-root-materialize-t1953-20261109/source",
+    "UMask": "0077",
+    "StandardOutput": "append:/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109/supervisor/unit.stdout",
+    "StandardError": "append:/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109/supervisor/unit.stderr"
+  },
+  "absolute_deadline": "2026-11-10T05:11:39+00:00",
+  "payload_status": "failed",
+  "seal_status": "failed"
+}

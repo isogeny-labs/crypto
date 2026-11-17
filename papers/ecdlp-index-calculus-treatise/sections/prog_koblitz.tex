@@ -27,11 +27,14 @@ instance: divisor bases, SAT-optimised bases, a rank-guided base at $n=53$
 (220 orbits, a complete implicit $\Sem5$ formula of 22{,}887 clauses), and
 finally the \emph{compact signed-Frobenius orbit} base, which stores one
 representative per orbit and no pair table
-(\art{docs/ic/COMPACT_ORBIT_PRODUCER.md}). In the ecbench factor-base
-suite it is the best measured Koblitz construction: $S=9.114$ at $n=17$
-($272$ points, 8 columns), $9.985\times$ matched signed-Frobenius rho,
-against full orbit $18.7\times$ and subspace bases $47\times$
-(\art{research/ecbench_frontier_20261013/}).
+(\art{docs/ic/COMPACT_ORBIT_PRODUCER.md}). In the 13 October ecbench
+factor-base suite it was the best measured Koblitz construction: $S=9.114$
+at $n=17$ ($272$ points, 8 columns), $9.985\times$ matched signed-Frobenius
+rho (L0 operation smoke, a lower bound), against full orbit $18.7\times$
+and subspace bases $47\times$
+(\art{research/ecbench_frontier_20261013/}). The fully priced orbit ladder
+of 14 October and the generator-orbit base of 22 October are later and
+cheaper (\S\ref{sec:kc-closure}, \S\ref{sec:em-frontier}).
 
 \section{The oracle sequence}
 
@@ -255,6 +258,54 @@ rho buys more per byte. The validation sweep later found
 win; it is superseded
 (\art{research/validation_sweep_20261019/B-benchmarks/VERDICT_TABLE.md}).
 
+Table~\ref{tab:bin-koblitz-online} gives the per-target numbers: panel~(a)
+the rows of Figure~\ref{fig:online} with their online times, plus three
+panels the figure omits (the arm64 $K=500$ panel and two 31 October
+panels); panel~(b) the IC arms of the equal-advice studies against rho
+given a table. In panel~(b) the 95\% interval lies
+above 1 in all nine rows. The counted-operation band does not settle the
+order at $n=83$: IC's online work is almost all native, so at $w=0$ it is
+charged about 5\,GAE per target, and the K600 order flips between $w=0$ and
+$w=0.1$. At K3300 the band ranks IC below the time-matched table at all
+three weights, but IC records no root-call count there, so its count is a
+lower bound and no ranking is admitted (README of
+\art{research/20261016-n83-precomputed-rho-control/}).
+
+\begin{table}[p]
+\centering\scriptsize\setlength{\tabcolsep}{2.2pt}
+\input{figures/tab-bin-koblitz-online}
+\caption[Koblitz one-target online phase against rho with and without a
+table]{Koblitz one-target online phase after reusable IC preparation
+(base, index, rank stage and linear algebra excluded), wall time.
+(a)~Against strong rho with no table on the same public point: one point
+repeated ($\times$runs; the row is the median run, range over runs) or a
+panel of one-target workloads (median with bootstrap 95\% interval, range
+over workloads); 600 col.\ is the compact-orbit base of Table~\ref{tab:prog_koblitz-ladder}.
+(b)~Against Bernstein--Lange rho with a distinguished-point table no larger
+than IC's advice ($n\le61$: bytes, IC's in brackets) or matched to IC's
+set-up wall time (time; 650\,s: a fixed budget below it) or peak memory
+(mem.) ($n=83$: table bytes; r1, r2: run of the control). $^{m}$Ratio of means over 64 targets, paired target bootstrap;
+IC and rho ms are means. $^{p}$Median of paired ratios over 16 targets,
+percentile bootstrap; ms are medians. Band: median paired IC/rho ratio of
+counted operations with unpriced native work at $w=0$, $0.1$, $1$\,GAE per
+operation (AGENTS.md \S5a), not computed for $n\le61$. No-table rho/IC: plain strong
+rho on the same targets (ratio of means for $n\le61$, median of paired
+ratios for $n=83$). Standing in (a): e exploratory (no qualifying isolation
+receipt); c contradicted as a win by the validation sweep; r admitted 12
+October, retired as a win 14 October; u producer-reported; q pending
+independent validation. Standing in (b), from the validation sweep:
+validated ($n\le61$), validated with caveats ($n=83$). No row has a \texttt{VALIDATION.json}. Data:
+\art{figures/data-bin-koblitz-online.json}, copied from
+\art{docs/ic/boundary_targets.json},
+\art{research/n83_dense_root_20261013/analysis_primary.json},
+\art{research/ic_next10_20261014/09-equal-advice/results.json} and the
+\texttt{analysis.json} files of
+\art{research/20261016-n83-precomputed-rho-control/records/}; standing from
+\art{research/validation_sweep_20261019/B-benchmarks/VERDICT_TABLE.md};
+layout: \art{figures/make_tab_bin_koblitz_online.py}.}
+\label{tab:bin-koblitz-online}
+\end{table}
+
 \section{The $n=83$ campaign}\label{sec:n83}
 
 Degree 83 was the programme's largest Koblitz target with a working
@@ -263,13 +314,16 @@ pipeline: 145 study directories between 4 and 21 October
 In order:
 \begin{itemize}
 \item \emph{F6 micro-studies, 4--5 October} (24 directories, almost all on
-  the $a=0$ curve). They kept kernel gains (queries up to $2.998\times$
-  faster, resident memory $-52\%$) and shrank SAT encodings, but every
+  the $a=0$ curve). They kept kernel gains (exact queries $3.00$--$6.87\times$
+  faster with ARM64 PMULL, resident memory $-52\%$) and shrank SAT encodings, but every
   ordinary solve timed out; four-summand coverage was at most
   $4.662\cdot10^{-12}$ of the subgroup and no natural relation was found.
   On the 81-bit $a=0$ gate curve, SAT and XCNF decompositions succeed only
   with a known witness, and the prebuilt-base question is an open problem
-  record.
+  record. The 14 November gates on the D18 and K2048 bases solve
+  constructed controls but no public natural query within $10^6$ conflicts,
+  and on K2048 the solver misses a known model once the witness pins are
+  removed (\S\ref{sec:n83l-gates}).
 \item \emph{The $a=1$ point, 7--12 October.} The archived K600 point read
   $8.2\times$ online and was re-measured slower (above).
 \item \emph{Root-index capacity, 13--16 October} (25 directories). Root-index
@@ -305,9 +359,12 @@ In order:
 \item \emph{Cold, 16--21 October} (11 directories). The cold one-target
   process fell from about 150\,s (K1024) to $119.8$\,s (K1120, holdout) and
   $113.8$\,s (K1107; \art{research/n83_cold_base_confirm_20261021/}), against
-  a rho online time of about 2.2--2.6\,s on the same hosts. No matched cold
-  rho was run, so no cold ratio is admitted; the hosted single-target
-  benchmark's $133.7\times$ is the nearest cold figure
+  a rho online time of about 2.2--2.6\,s on the same hosts. No separate
+  cold rho was run, but plain rho has no set-up, so its online wall is its
+  cold cost: the K1120 holdout reads cold IC over same-point plain-rho wall
+  $55.4$ (five points; \art{research/n83_e2e_holdout_20261016/RESULT.md}),
+  the figure Chapter~\ref{ch:distance} cites. The hosted single-target
+  benchmark's $133.7\times$ is the other cold figure
   (\art{benchmarks/20261014-n71-n83-hosted-single-target/}).
 \item \emph{A second pipeline in \texttt{cryptanalysis}} (K600, $a=1$;
   \cite{icprogram2026}). A Tier~1 ratchet of rank-probe, closure,
@@ -324,6 +381,12 @@ In order:
   closest cold Koblitz figure at $n=83$ and is still above rho; the two
   pipelines' numbers are not comparable with each other.
 \end{itemize}
+\paragraph{An instrument correction (24 October).} On 24 October every
+Weil-descent engine's $n=83$ refutation was voided by a 64-bit field-table
+truncation (\S\ref{sec:bo-n83}); after the fix the $m=4$ root finder solves
+in 175--189\,s, $116$--$125\times$ strong rho
+(\art{research/n83_msweep_20261024/}).
+
 The open pull requests at the time of writing include further $n=83$ work
 ($m=4$ queries on a retained 16{,}627-column base, AWS replays, shared-binary
 panels); none is on \texttt{main} (the programme record~\cite{icprogram2026}).
@@ -348,8 +411,10 @@ Rule & Date & IC/rho, cold & Status \\
 v3 & & $5.23$--$21\times$ & printed in Table~A; unvalidated (pre-gate) \\
 v6 & & $3.78$--$12.06\times$ & rho reference $0.57$--$0.85$ of strong walk$^{a}$ \\
 v7 & & $3.43$--$11.51\times$ & rho reference $0.57$--$0.85$ of strong walk$^{a}$ \\
-v8 & 19 October & $4.67$ $[4.34,5.07]$ to $18.07$ $[15.98,20.58]\times$ & matched GFNI rho; archived as incomplete$^{b}$ \\
-v4 recipe & 24 October & $9.9$--$43\times$ & validation file withheld$^{c}$ \\
+v8 & 19 October & $4.67$ $[4.34,5.07]$ to $18.07$ $[15.98,20.58]\times$ & matched GFNI rho; \texttt{VALIDATION.json} present$^{b}$ \\
+v4 recipe & 24 October & $9.2$--$42.1\times$ & validation file withheld$^{c}$ \\
+v9 & 11 November & $4.08$ $[3.76,4.44]$ to $11.13$ $[9.92,12.60]\times$ & Iso Lab EKS; \texttt{VALIDATION.json} present; Table~A reads it$^{d}$ \\
+v10 & 11 November & $3.75$ $[3.49,4.07]$ to $13.64$ $[12.11,15.54]\times$ & local L0, another host; no validation file$^{e}$ \\
 \bottomrule
 \addlinespace
 \multicolumn{4}{@{}l}{(b) Pipeline baselines, 16--17 October: cold speed-up} \\
@@ -370,10 +435,19 @@ and v7: \art{benchmarks/20261016-ic-rule-v7/}; v8:
 \art{benchmarks/20261019-ic-matched-rho-v8/}; v4 recipe:
 \S\ref{sec:ladder3}). $^{a}$Per step, so the distance was understated.
 $^{b}$$1.30$--$1.58\times$ the v7 control, fitted slope $0.168$ per $\ln r$;
-its row is listed although the run is archived as incomplete. $^{c}$A paired
+its directory carries a \texttt{VALIDATION.json} with a replay certificate
+and a passing validator report
+(\art{research/ic_tool_program/rule/v8/VALIDATION.json}); it was not on the
+board, which carried v7 until rule v9. $^{c}$A paired
 retuning improved one size of six; rho is priced in the same process at the
-canonical batched step, and the validation file is withheld because that
-reference may not be the strongest, so it is not an admitted row either.
+canonical batched step (the range is the v4 column, $9.20$--$42.12$; the v3
+recipe at the same step reads $9.89$--$43.46$), and the validation file is
+withheld because that reference may not be the strongest, so it is not an
+admitted row either. $^{d}$Rule v8's matched rho re-run at main; validator
+report, replay certificate and independent review admit it with caveats
+(\art{research/ic_tool_program/rule/v9/VALIDATION.json}). $^{e}$Paired
+against its own control on one host; not comparable with v9's absolute
+figures (\art{research/ic_tool_program/rule/v10/REPORT.md}).
 (b)~Each baseline's recorded speed-up, and the combined cold factor over
 v4 (\art{benchmarks/20261017-ic-r12-admitted-prefetch/}).}
 \label{tab:prog_koblitz-tablea}
@@ -392,6 +466,157 @@ $1.7$--$2.0\times$, and the 24 October validation gate did not check Table~A
 (\art{research/ic_validation_gate_20261024/}). Rules v8 and v4 measure the
 same sizes against differently built rho references and are kept apart
 (Definition~\ref{def:domain}).
+
+\paragraph{Rule v9: rule v8's matched rho at main, 11 November.} Two runs in
+one session on one Iso Lab EKS node (\texttt{c8a.2xlarge} Spot, AMD EPYC
+9R45, no L2 admission): v9, the \texttt{ic} of main, and v9c, rule v8's
+\texttt{ic} rebuilt as a control, each timed against its own in-process
+matched rho over §23's six sizes, 64 targets and four A/A repeats a size.
+All 408 rows of each run pass, the two runs' rho walks take the same steps
+on 64 of 64 paired targets at every size, and the validator verified every
+scalar (838 and 840 certificates) and replayed 8 of 8 seeded runs
+identically. Cold IC/rho for v9 runs from $4.08$ $[3.76,4.44]$ at
+$\log_2r=36.64$ to $11.13$ $[9.92,12.60]$ at $47.21$; the paired ratio v9/v9c
+is $1.013$ at $36.64$ and $0.936$ to $0.980$ at the five larger sizes, from a
+set-up $4.7$\% faster at $n=53$ and $7.8$\% faster at $2^{47.2}$. The fitted
+slope of $\ln(\text{cold ratio})$ on $\ln r$ is $0.113$ $[0.056,0.169]$
+(v9c: $0.119$). Rule v8's figures came from another host and are quoted,
+not paired: on this host v8's own code reads $0.60$--$0.86$ of them, so the
+host moves the ratio more than the code does. A first reading of the
+declared prediction in each binary's own unit (1.025, outside the band) was
+corrected to wall-clock time (0.953 at $n=53$, inside $[0.85,1.00]$),
+because the unit is measured per binary
+(\art{research/ic_tool_program/rule/v9/report/report.pdf}). Rho is cheaper
+cold at every size, across the §5a band. Distance remaining:
+$4.08$--$11.13\times$.
+
+\paragraph{Rule v10: single-word factor-base selection, 11 November.} For
+odd $n<64$ with an endomorphic Frobenius the base is built and projected in
+one machine word per element (one lift per Frobenius orbit, hashed tables,
+one lowering), under a protocol committed before the change and before any
+row. Run locally (L0, 4 vCPU Xeon) against the branch base as control, the
+factor base and every logarithm are unchanged (408 of 408 rows a run;
+prediction P1 met). Selection plus projection costs $0.34$--$0.39$ of the
+control's, short of P2's $0.25$ at every size. The paired cold ratio
+v10/v10c is $0.851$ $[0.848,0.855]$ at $n=47$, inside P3's declared
+$0.81$--$0.86$, and $0.872$--$0.963$ elsewhere ($0.892$ at $n=57$, outside
+its declared band). Set-up is about 99\% of the cold cost. The matched rho
+remains cheaper cold: $3.75\times$ $[3.49,4.07]$ at $n=47$ (control
+$4.41$), $4.43\times$ at $n=57$ and $13.64\times$ at $n=61$. The source
+records this as a measured improvement over the baseline [pcc:unverified]:
+an engineering change to set-up, with the algorithm and its counted work
+unchanged. It has no replay certificate, validator report or EKS rerun, so
+Table~A still reads v9 (\art{research/ic_tool_program/rule/v10/REPORT.md}).
+
+\paragraph{Oversampling the factor-base logarithms, 11 November.} The
+precompute collects relations until the coefficient matrix has full rank,
+then filters and solves. A study frozen before any row (05:54Z, 11 November)
+asked whether a surplus of $\lceil f\cdot\text{columns}\rceil$ relations,
+$f\in\{0.1,0.25,0.5\}$, spent by the filter on the heaviest rows, lowers the
+total cost. It ran four Koblitz cells, 30 seeds and 180 rows each (720 rows,
+no failed arm); linear algebra was $0.8$--$15.7$\% of the $f=0$ wall time. The
+frozen rule chose H0 in every cell: the surplus never lowered total cost.
+Where it did cut linear-algebra row operations ($f=0.1$ in two cells, by
+$17.9$ and $4.2$ on average), it would break even only at a price per row
+operation $98$ and $14{,}389$ times the measured one
+(\art{research/logs_oversampling_20261111/full/break_even.json};
+\texttt{[pcc:unverified]}).
+
+\paragraph{Set-up components of the rule's pipeline, 12--15 November.}
+Table~A on \texttt{origin/main} (\texttt{ec3b88e2c4}) still reads rule v9;
+no Table~A row has changed since. Seven exploration records then
+measured set-up levers of the same Koblitz descent at \texttt{k0n53}
+($\log_2r=44.3$) and \texttt{k0n61} ($\log_2r=47.2$), on a 4-vCPU Xeon
+container with AVX-512, one thread (the build-pairing record names the
+host; the later records say ``this session's container''). A step probe of the folded pair-table
+build put it at $34.58$ and $35.48$\,ns per stored pair, of which pushing
+pairs into partition streams took $15.07$ and $13.85$ and the counting sort
+with the filter fill $11.63$ and $12.88$; forming the pairs (additions and
+keys) took about 7\,ns
+(\art{research/ic_tool_program/explorations/build-steps-20261113/README.md}).
+Table~\ref{tab:prog_koblitz-setupab} lists the A/B records that followed.
+Each was frozen before its first row, ran 41--44 rounds with a
+same-session A/A, and recorded zero identity mismatches between arms. They are component results on this host class: none has a
+validation file, a matched rho or a board row, so the distance remaining to
+rho is still Table~A's $4.08$--$11.13\times$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.2\linewidth}lll>{\raggedright\arraybackslash}X@{}}
+\toprule
+Lever (date) & Stage & \texttt{k0n53} & \texttt{k0n61} & Outcome \\
+\midrule
+Twin pairing in the build (12--13 Nov) & build & $1.044$ $[1.028,1.064]$ & $1.036$ $[0.991,1.068]$ & not established; reverted \\
+Filter lookahead 64 for 32 (12--13 Nov) & collect & $0.997$ $[0.978,1.015]$ & $0.997$ $[0.966,1.055]$ & no effect; reverted \\
+Partition-local filter word, \texttt{Top} (13 Nov) & build & $1.104$ $[1.069,1.142]$ & $1.142$ $[1.098,1.164]$ & established; CPU default \\
+ & set-up & $1.033$ $[1.007,1.061]$ & $1.000$ $[0.983,1.034]$ & not established \\
+One packed stream a partition (14 Nov) & build & $1.244$ $[1.214,1.276]$ & $1.252$ $[1.223,1.266]$ & established; default \\
+ & set-up & $1.068$ $[1.051,1.080]$ & $1.038$ $[1.020,1.050]$ & established at \texttt{k0n53} only \\
+Split least-rotation min chains (14 Nov) & collect & $1.020$ $[1.006,1.034]$ & $1.019$ $[1.004,1.035]$ & not established; opt-in \\
+Block-filled filter tests (15 Nov) & collect & $1.086$ $[1.071,1.121]$ & $1.097$ $[1.076,1.115]$ & established; default \\
+ & set-up & $1.049$ $[1.027,1.074]$ & $1.086$ $[1.056,1.102]$ & established at \texttt{k0n61} only \\
+\bottomrule
+\end{tabularx}
+\caption[]{Set-up A/B records on the Table~A Koblitz descent, 12--15
+November: median ratio old/new with 95\% interval (above 1: the new arm
+is faster), as the sources state them; ``established'' is each frozen
+rule's verdict against its A/A. Measured on one 4-vCPU Xeon container;
+\texttt{[pcc:unverified]}, no validation file. A two-level presence filter
+was dropped at micro-benchmark, and a lagged run prefetch and a doubled
+filter were dropped after three exploratory rounds an arm. Sources: the
+\texttt{README.md} of \texttt{build-pairing-lookahead-20261112},
+\texttt{filter-layout-20261113}, \texttt{fold-pack-20261114},
+\texttt{key-chains-20261114}, \texttt{scan-vfilter-20261115} and
+\texttt{admitted-stage-20261115} under
+\art{research/ic_tool_program/explorations/}.}
+\label{tab:prog_koblitz-setupab}
+\end{table}
+
+The partition-local filter word cut the sort-and-fill step from $10.69$ to
+$7.86$\,ns per stored pair at \texttt{k0n53}
+(\art{research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json}),
+so the \texttt{Top} layout builds faster. The leaderboard's 14 November
+reconciliation printed the same $1.104$ and $1.142$ as ``Top/Low'' and called
+\texttt{Top} slower to build (\art{docs/ic/LEADERBOARD.md}); the source's
+ratios are old (\texttt{Low}) over new (\texttt{Top}), and the board was
+corrected on 15 November (PR~\#4262). The reconciliation
+keeps the old ecbench identifiers on \texttt{Low} and names \texttt{Top}
+only in explicit \texttt{\_v2} identifiers.
+
+\paragraph{K1 pair-table base sized for $n$, 14 November.} Outside
+Tables~A--C, the board gained a validated section on two K1 Koblitz curves
+in ecbench counted GAE, one target per process with every phase priced,
+against strong signed-Frobenius rho in the same session
+(Table~\ref{tab:prog_koblitz-k1lgrow}). The pair-table dimension was
+re-selected per $n$ (9 at $n=23$, 10 at $n=29$) in place of the fixed
+dimension 7. The validator (\texttt{VAL-20261114-d9190c}) admits both
+improvements over dimension 7 as measured and positive across the band;
+rho stays cheaper at every weight. This is a parameter re-selection at fixed
+$n$; the $n=29$ curve has a 15.37-bit subgroup (cofactor 12{,}646), so
+$n$ there is the field degree, not the problem size
+(\art{research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/VALIDATION.json}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrlll@{}}
+\toprule
+$n$ & $\log_2r$ & Gap to rho, bits & Before (dim.~7) & Gain, bits \\
+\midrule
+23 & 22.00 & $5.59/5.66/5.95$ & $6.91/6.94/7.09$ & $1.32/1.28/1.14$ \\
+ & & $[5.54,5.65]$ at $w=0$ & & $[1.26,1.36]$ at $w=0$ \\
+29 & 15.37 & $9.47/9.52/9.86$ & $10.36/10.46/11.06$ & $0.89/0.94/1.20$ \\
+ & & $[9.38,9.54]$ at $w=0$ & & $[0.67,1.06]$ at $w=0$ \\
+\bottomrule
+\end{tabular}
+\caption[]{K1 Koblitz, one target, pair-table base of dimension 9 ($n=23$)
+and 10 ($n=29$). Gap $=\log_2(S_{\mathrm{IC}}/S_{\mathrm{rho}})$ at
+$w=0/0.1/1$ GAE per native operation: the distance remaining. Eight
+targets $\times$ five rounds per $n$, L0 counted cost (wall time not
+certified). Validated (\texttt{VAL-20261114-d9190c}). Source:
+\art{docs/ic/LEADERBOARD.md}, section ``K1 Koblitz, one target, ecbench
+counted GAE''.}
+\label{tab:prog_koblitz-k1lgrow}
+\end{table}
 
 \section{ECC2K-130}\label{sec:ecc2k130}
 
@@ -421,13 +646,15 @@ Linearisation & plain & & $70.19-b_{\max}$ bits \\
 \addlinespace
 Weil descent & $m=3$, free oracle & $2^{68.58}$ & \\
  & $m=4$, degree 4 & $2^{68.43}$ & $+7.62$ bits$^{a}$ \\
- & $m=4$, degree 5, $w=1$ & $2^{71.13}$ & $+10.32$ bits \\
- & $m=4$, degree 5, $w=2$ & $2^{106.52}$ & $+45.71$ bits \\
+ & $m=4$, degree 5, $\omega_c=1$ & $2^{71.13}$ & $+10.32$ bits \\
+ & $m=4$, degree 5, $\omega_c=2$ & $2^{106.52}$ & $+45.71$ bits \\
  & $m=4$, hybrid guess & & $+8.43$ to $+58.27$ bits \\
 \bottomrule
 \end{tabular}
 \caption[]{Priced algebraic routes to ECC2K-130. \emph{Setting}: the
-variant priced ($m$ summands, $w$ as in the source, $\omega$ the
+variant priced ($m$ summands, $\omega_c$ the closure exponent, column
+touches per Macaulay column, written $w$ in the source and unrelated to the
+\S5a band weight; $\omega$ the
 linear-algebra exponent); \emph{Cost}: the route's cost as recorded;
 \emph{Above rho}: its distance to rho, as a factor or in bits. The
 decomposition bottom needs a materialised base of $2^{44.53}$ points at
@@ -495,6 +722,16 @@ that has been constructed or priced is at least about 5 bits above rho (the
 $m=4$ single-relation row, at $2^{70.79}$ bytes), most by tens of bits, and
 the one hypothetical route below rho needs a genus-130 curve that no known
 method can construct.
+
+On 14 November the owner listed seven items believed open for index
+calculus on curves of the ECC2K-130 type. A parallel sweep found items 1,
+6 and 7 and two of item 4's three baselines already built and measured in
+the repositories, measured items 2, 3 and 4(a) at toy scale with no
+improvement, and measured item 5's function-field Coppersmith gap up to
+$n=131$ (\S\ref{sec:bt-open7}; every claim \texttt{[pcc:unverified]}). Its
+consolidated table of 147 complete rows finds every prime-degree Koblitz
+arm moving away from rho as $r$ grows, by $+0.05$ to $+0.15$ in
+$\log_2(\text{IC}/\text{rho})$ per bit of $r$.
 
 \section{Factor bases closed under $\ZZ[\tau]$}
 

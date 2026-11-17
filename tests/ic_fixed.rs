@@ -142,3 +142,129 @@ fn fixed_cli_routes_with_json_model_and_checks_missing_model() {
     );
     fs::remove_dir_all(path).unwrap();
 }
+
+fn relations(path: &PathBuf) -> Vec<Value> {
+    fs::read_to_string(path)
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect()
+}
+
+#[test]
+fn fixed_cli_streams_progress_and_exports_relations() {
+    let path = directory();
+    let export = path.join("relations.jsonl");
+    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+        .args(["fixed", "--params"])
+        .arg(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("docs/ic/params/k0n9-fixed.json"))
+        .arg("--dir")
+        .arg(&path)
+        .args([
+            "--stage",
+            "collect",
+            "--pair-budget",
+            "100000",
+            "--attempts",
+            "64",
+            "--query-seconds",
+            "2",
+            "--progress",
+            "--progress-every",
+            "1",
+            "--relations-out",
+        ])
+        .arg(&export)
+        .arg("--json")
+        .output()
+        .unwrap();
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert!(output.status.success(), "{report}");
+    assert_eq!(report["status"], "complete");
+    assert_eq!(report["relations_out"], export.display().to_string());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("[1/4] pair table:"), "{stderr}");
+    assert!(
+        stderr.contains("[2/4] relation stream=precompute"),
+        "{stderr}"
+    );
+    assert!(stderr.contains("[4/4] done:"), "{stderr}");
+    let rows = relations(&export);
+    assert_eq!(
+        rows.len() as u64,
+        report["relations_saved"].as_u64().unwrap()
+    );
+    assert!(rows
+        .iter()
+        .all(|row| row["operation"] == "fixed-relation" && row["verified"] == true));
+    fs::remove_dir_all(path).unwrap();
+}
+
+#[test]
+fn ecc2k130_cli_defaults_to_progress_and_relations_jsonl() {
+    let path = directory();
+    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+        .args(["ecc2k130", "--params"])
+        .arg(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("docs/ic/params/k0n9-fixed.json"))
+        .arg("--dir")
+        .arg(&path)
+        .args([
+            "--stage",
+            "collect",
+            "--pair-budget",
+            "100000",
+            "--attempts",
+            "64",
+            "--query-seconds",
+            "2",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("Fixed campaign: complete"), "{stdout}");
+    let export = path.join("relations.jsonl");
+    let rows = relations(&export);
+    assert!(!rows.is_empty());
+    assert!(rows
+        .iter()
+        .all(|row| row["operation"] == "fixed-relation" && row["verified"] == true));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("[2/4] collection: starting"), "{stderr}");
+    assert!(stderr.contains("[4/4] done:"), "{stderr}");
+    fs::remove_dir_all(path).unwrap();
+}
+
+#[test]
+fn ecc2k130_json_suppresses_live_progress() {
+    let path = directory();
+    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+        .args(["ecc2k130", "--params"])
+        .arg(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("docs/ic/params/k0n9-fixed.json"))
+        .arg("--dir")
+        .arg(&path)
+        .args([
+            "--stage",
+            "collect",
+            "--pair-budget",
+            "100000",
+            "--attempts",
+            "64",
+            "--query-seconds",
+            "2",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert!(output.status.success(), "{report}");
+    assert_eq!(report["status"], "complete");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(!stderr.contains("[0/4]"), "{stderr}");
+    assert!(path.join("relations.jsonl").is_file());
+    fs::remove_dir_all(path).unwrap();
+}

@@ -5,6 +5,7 @@
 ### What was done (commands, files, features)
 
 - Exact commands, changed files, and verified outcomes.
+- Sources checked (KB `source_id` and `repo:path`, or `KB unavailable: <why>`).
 
 ### Decisions made (and why)
 

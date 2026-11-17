@@ -1,0 +1,58 @@
+{
+  "standing": "unverified producer checks",
+  "qualification": "demonstrated_on_cases",
+  "fresh_source_directory": "/tmp/p192-round61-fresh/native",
+  "fresh_target_directory": "/tmp/p192-round61-fresh-target",
+  "fresh_outputs": [
+    {
+      "record": "orbits.json",
+      "fresh_sha256": "e0e7a69fcafdfd853673cba88e84285b8c79bc4abb916ad791b90652e2a074f0",
+      "byte_identical": true
+    },
+    {
+      "record": "scalar-reference.json",
+      "fresh_sha256": "e0e7a69fcafdfd853673cba88e84285b8c79bc4abb916ad791b90652e2a074f0",
+      "byte_identical": true
+    },
+    {
+      "record": "residue-control.json",
+      "fresh_sha256": "96c4f54e27342b7ad8660bfbf636826be798aef370f0d9b93a35d817d507ea08",
+      "byte_identical": true
+    },
+    {
+      "record": "residue-reference.json",
+      "fresh_sha256": "96c4f54e27342b7ad8660bfbf636826be798aef370f0d9b93a35d817d507ea08",
+      "byte_identical": true
+    },
+    {
+      "record": "large-residue.json",
+      "fresh_sha256": "790deba9685afcd4b4c86bcaa3160d2ba0f791782144ce08a157ab675ddfe993",
+      "byte_identical": true
+    },
+    {
+      "record": "large-residue-reference.json",
+      "fresh_sha256": "790deba9685afcd4b4c86bcaa3160d2ba0f791782144ce08a157ab675ddfe993",
+      "byte_identical": true
+    },
+    {
+      "record": "P192-matrices.json",
+      "fresh_sha256": "47f390597051b1d314e7de46f3da9770acb34274d1475c4929a6e1016d827d1b",
+      "byte_identical": true
+    },
+    {
+      "record": "P192-residue.json",
+      "fresh_sha256": "9411e095a77ddbd5dde52674100f44e73082868a7f0a23ada697956604752c09",
+      "byte_identical": true
+    }
+  ],
+  "mutation_exits": {
+    "changed_transporter_exit": 101,
+    "changed_P192_matrix_exit": 101
+  },
+  "legacy_library_check": {
+    "command": "CARGO_BUILD_JOBS=1 timeout 120 cargo test --release --lib --manifest-path /home/ec2-user/crypto/Cargo.toml",
+    "exit": 124,
+    "result": "timed out compiling isogeny_algos; legacy checkout, no publication-head pass"
+  },
+  "no_new_cloud_submissions": true
+}

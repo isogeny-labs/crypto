@@ -1,0 +1,38 @@
+import WordConstraint
+import Union
+set_option autoImplicit false
+namespace SignedWord
+
+theorem sign_neg (s : Int8) (hs : Sign s) : Sign (-s) := by
+ rcases hs with rfl|rfl <;> norm_num [Sign]
+theorem sd_neg (r : UInt64) (s : Int8) (hs : Sign s) : sd r (-s)= -sd r s := by
+ rcases hs with rfl|rfl <;> norm_num [sd]
+
+def unionPot (r : UInt64) (cu cv : Int8) (a b : UInt64) : Pot :=
+ ⟨-cu*cv,signed r cu a,signed r cu b⟩
+def reversePot (r : UInt64) (p : Pot) : Pot :=
+ ⟨p.s,signed r (-p.s) p.a,signed r (-p.s) p.b⟩
+
+theorem unionPot_correct (r a b : UInt64) (cu cv : Int8) (hp : 0<r.toNat)
+ (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat) (hcu : Sign cu) (hcv : Sign cv) :
+ GoodPot r (unionPot r cu cv a b) ∧
+ decPot r (unionPot r cu cv a b)=SignedGraphAlgebra.unionPotential (sd r cu) (sd r cv) (wd r a) (wd r b) := by
+ have hsa := signed_correct r a cu hp ha hcu
+ have hsb := signed_correct r b cu hp hb hcu
+ refine ⟨⟨sign_mul _ _ (sign_neg cu hcu) hcv,hsa.1,hsb.1⟩,?_⟩
+ change SignedGraphAlgebra.Potential.mk _ _ _=SignedGraphAlgebra.Potential.mk _ _ _
+ congr 1
+ · rw [sd_mul r (-cu) cv (sign_neg cu hcu) hcv,sd_neg r cu hcu]
+ · exact hsa.2
+ · exact hsb.2
+
+theorem reversePot_correct (r : UInt64) (p : Pot) (hp : 0<r.toNat) (hg : GoodPot r p) :
+ GoodPot r (reversePot r p) ∧ decPot r (reversePot r p)=SignedGraphAlgebra.reverse (decPot r p) := by
+ have hsa := signed_correct r p.a (-p.s) hp hg.2.1 (sign_neg p.s hg.1)
+ have hsb := signed_correct r p.b (-p.s) hp hg.2.2 (sign_neg p.s hg.1)
+ refine ⟨⟨hg.1,hsa.1,hsb.1⟩,?_⟩
+ change SignedGraphAlgebra.Potential.mk _ _ _=SignedGraphAlgebra.Potential.mk _ _ _
+ congr 1
+ · simpa [sd_neg r p.s hg.1] using hsa.2
+ · simpa [sd_neg r p.s hg.1] using hsb.2
+end SignedWord

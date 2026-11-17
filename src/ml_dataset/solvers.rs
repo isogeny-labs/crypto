@@ -5,52 +5,90 @@
 //! Native operation counters retain their units; none is an instruction count.
 
 use std::cell::RefCell;
+
 use std::collections::HashMap;
+
 use std::fs::{self, File, OpenOptions};
+
 use std::io::Write;
+
 use std::path::{Path, PathBuf};
+
 use std::sync::{Arc, Mutex};
+
 use std::time::{Duration, Instant};
+
+#[path = "binary_m3_original.rs"]
+mod binary_m3_original;
+
+#[path = "koblitz_m3.rs"]
+mod koblitz_m3;
+
+#[path = "binary_m3_resultant.rs"]
+mod binary_m3_resultant;
+
+pub(in crate::ml_dataset) use koblitz_m3::AdmittedKoblitzNative;
 
 #[path = "prime_f4_wide.rs"]
 mod prime_f4_wide;
+
 #[path = "prime_f4_wide_dynamic.rs"]
 mod prime_f4_wide_dynamic;
+
 #[path = "prime_f4_wide_dynamic_replay.rs"]
 mod prime_f4_wide_dynamic_replay;
+
 #[path = "prime_f4_wide_m3.rs"]
 mod prime_f4_wide_m3;
 
 use num_bigint::BigUint;
+
 use num_traits::ToPrimitive;
+
 use serde_json::{json, Value};
 
 use crate::binary_ecc::{curve as binary, BinaryCurve, BinaryPoint, F2mElement};
+
 use crate::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
+
 use crate::cryptanalysis::f6_wide_geometry::F6WidePairIndex;
+
 use crate::cryptanalysis::koblitz_groebner::{self as boolean, FieldStructure, SymElement};
+
 use crate::cryptanalysis::matrix_f5_f2::matrix_f5_f2;
+
 use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly, Mask};
+
 use crate::cryptanalysis::prime_root_trace::{self, RootEvent, RootLimits, RootReport, RootStop};
+
 use crate::cryptanalysis::sat::{self, SolveResult};
+
 use crate::ecc::Point;
 
 use super::capture::{AttemptBinding, CaptureEmitter, CaptureLimits};
+
 use super::curves;
+
 use super::types::{ArtifactPayload, CaseConfig, CaseData, SolverData};
 
 #[path = "binary_roots.rs"]
 mod binary_roots;
+
 pub(super) const BINARY_ROOT_CERTIFICATE_SCOPE: &str = binary_roots::CERTIFICATE_SCOPE;
 
 const TRACE_EVENT_CAP: u64 = 100_000;
+
 const TRACE_BYTE_CAP: usize = 64 * 1024 * 1024;
+
 pub(super) const PRIME_ROOT_CERTIFICATE_SCOPE: &str =
     "distinct roots per completed prime S3 call; incomplete calls prove no root absence";
+
 const PRIME_ROOT_EVENT_BYTE_CAP: usize = TRACE_BYTE_CAP / 4;
+
 const PRIME_ROOT_BYTE_CAP_REASON: &str = "prime root event byte cap reached";
 
 const SAT_EVENT_BYTE_CAP: usize = TRACE_BYTE_CAP / 4;
+
 const SAT_EVENT_CAP_REASON: &str = "native SAT event trace budget exhausted";
 
 #[derive(Default)]
@@ -58,6 +96,7 @@ struct SatEventLog {
     bytes: Vec<u8>,
     events: u64,
 }
+
 impl SatEventLog {
     fn append(
         &mut self,
@@ -86,11 +125,13 @@ struct LiveSink {
     events: File,
     sequence: u64,
 }
+
 #[allow(clippy::large_enum_variant)] // Keep the bounded sink inline without an additional heap allocation.
 enum EventSink {
     Legacy(LiveSink),
     Bound(CaptureEmitter),
 }
+
 impl EventSink {
     fn event(&mut self, event: &Value) -> Result<(), String> {
         match self {
@@ -105,10 +146,12 @@ impl EventSink {
         }
     }
 }
+
 thread_local! { static LIVE_SINK:RefCell<Option<EventSink>>=const { RefCell::new(None) }; }
 
 #[cfg(test)]
 thread_local! { static FAIL_PRIME_LIFT_EVENT:std::cell::Cell<bool>=const { std::cell::Cell::new(false) }; }
+
 impl LiveSink {
     fn event(&mut self, event: &Value) -> Result<(), String> {
         #[cfg(test)]
@@ -158,16 +201,17 @@ impl LiveSink {
         self.event(&json!({"kind":"artifact_persisted","path":format!("payloads/{}",payload.path),"role":payload.role,"bytes":payload.bytes.len()}))
     }
 }
+
 pub(super) fn live_event(event: &Value) -> Result<(), String> {
     LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
         Some(s) => s.event(event),
         None => Ok(()),
     })
 }
+
 /// New bounded profiles require an attempt-bound sink. The caller debits the
 /// buffer's requested storage once and reuses it; this bridge does not reset
 /// budgets or silently downgrade to the legacy allocating event path.
-#[allow(dead_code)] // Dynamic dispatcher remains gated on complete adapter validation.
 pub(super) fn live_typed_event<T: serde::Serialize + ?Sized>(
     kind: super::capture::TypedEventKind,
     payload: &T,
@@ -183,10 +227,10 @@ pub(super) fn live_typed_event<T: serde::Serialize + ?Sized>(
         None => Err("typed solver events require an active capture sink".into()),
     })
 }
+
 /// Dedicated witness preparation/publication never downgrades to Legacy.
 /// The caller supplies and reconciles remaining original checking/byte budgets;
 /// `global_acknowledged` is the SAME adapter-wide4096 counter, not a new pool.
-#[allow(dead_code)]
 pub(super) fn prepare_bound_witness(
     budget: &mut super::capture::WitnessBudget,
 ) -> Result<super::capture::WitnessCaptureWorkspace, super::capture::WitnessError> {
@@ -195,7 +239,7 @@ pub(super) fn prepare_bound_witness(
         _ => Err(super::capture::WitnessError::Unbound),
     })
 }
-#[allow(dead_code)]
+
 pub(super) fn publish_bound_witness(
     bytes: &[u8],
     workspace: &mut super::capture::WitnessCaptureWorkspace,
@@ -212,7 +256,6 @@ pub(super) fn publish_bound_witness(
 
 /// Borrowed complete artifacts from early dynamic failures use the same bound
 /// outer custody path. Dedicated witness publication is never downgraded here.
-#[allow(dead_code)] // Dormant dynamic parent integration.
 pub(super) fn live_borrowed_payload(
     path: &str,
     role: &str,
@@ -233,7 +276,9 @@ pub(super) fn live_payload(payload: &ArtifactPayload) -> Result<(), String> {
         None => Ok(()),
     })
 }
+
 struct LiveSinkGuard;
+
 impl Drop for LiveSinkGuard {
     fn drop(&mut self) {
         LIVE_SINK.with(|slot| {
@@ -245,6 +290,983 @@ impl Drop for LiveSinkGuard {
 /// Persist each exposed event and complete artifact before proceeding. The
 /// outer worker retains this directory even when a native call is killed.
 /// Native engines' currently unexposed internal states remain explicit gaps.
+/// A worker-owned proof of completed original verification and storage.
+/// It borrows public values only; it never retains the private witness.
+pub(super) struct VerifiedWorkerOriginal<'a> {
+    config: &'a CaseConfig,
+    public: &'a Value,
+    factor_base: &'a Value,
+    root: &'a Path,
+    binding: Option<&'a AttemptBinding>,
+    public_sha256: [u8; 32],
+    factor_base_sha256: [u8; 32],
+    public_bytes: u64,
+    factor_base_bytes: u64,
+}
+
+impl VerifiedWorkerOriginal<'_> {
+    fn matches_bound(
+        &self,
+        config: &CaseConfig,
+        case: &CaseData,
+        directory: &Path,
+        binding: &AttemptBinding,
+    ) -> Result<(), String> {
+        if !std::ptr::eq(self.config, config)
+            || !std::ptr::eq(self.public, &case.public_instance)
+            || !std::ptr::eq(self.factor_base, &case.factor_base)
+            || directory.parent() != Some(self.root)
+            || directory.file_name().is_none_or(|name| name != "live")
+            || self.binding != Some(binding)
+        {
+            return Err("verified worker originals differ from bound solver invocation".into());
+        }
+        if AttemptBinding::from_cell_files(self.root)? != *binding {
+            return Err("verified worker original context changed before dispatch".into());
+        }
+        for (path, sha256, bytes) in [
+            ("public.json", &self.public_sha256, self.public_bytes),
+            (
+                "factor-base.json",
+                &self.factor_base_sha256,
+                self.factor_base_bytes,
+            ),
+        ] {
+            super::storage::check_file(
+                &super::storage::contained_path(self.root, path, false)?,
+                &hex::encode(sha256),
+                bytes,
+            )?;
+        }
+        Ok(())
+    }
+}
+
+/// This replaces, rather than repeats, the worker's existing verification and
+/// original-file writes. Their telemetry remains separate from solver counters.
+pub(super) fn verify_and_store_worker_originals<'a>(
+    config: &'a CaseConfig,
+    case: &'a CaseData,
+    root: &'a Path,
+    binding: Option<&'a AttemptBinding>,
+    registry: &mut Vec<super::types::Artifact>,
+) -> Result<VerifiedWorkerOriginal<'a>, String> {
+    if let Some(binding) = binding {
+        if AttemptBinding::from_cell_files(root)? != *binding
+            || super::read_json::<CaseConfig>(&root.join("config.json"))? != *config
+        {
+            return Err("worker originals differ from admitted attempt/configuration".into());
+        }
+    }
+    super::telemetry::measured(root, registry, "known-answer-replay", || {
+        curves::verify(&case.public_instance, &case.private_witness)
+    })?;
+    super::telemetry::measured(root, registry, "factor-base-replay", || {
+        if case.factor_base["rule"] == "planted-known-log-subgroup/v1" {
+            curves::verify_planted(config, case)
+        } else {
+            curves::verify_factor_base_config(config, &case.public_instance, &case.factor_base)
+        }
+    })?;
+    let public = super::storage::write_json(
+        root,
+        "public.json",
+        "public-instance",
+        &case.public_instance,
+    )?;
+    let mut public_sha256 = [0; 32];
+    hex::decode_to_slice(&public.sha256, &mut public_sha256).map_err(|e| e.to_string())?;
+    let public_bytes = public.bytes;
+    registry.push(public);
+    registry.push(super::storage::write_json(
+        root,
+        "witness.json",
+        "restricted-known-answer",
+        &case.private_witness,
+    )?);
+    let factor_base =
+        super::storage::write_json(root, "factor-base.json", "factor-base", &case.factor_base)?;
+    let mut factor_base_sha256 = [0; 32];
+    hex::decode_to_slice(&factor_base.sha256, &mut factor_base_sha256)
+        .map_err(|e| e.to_string())?;
+    let factor_base_bytes = factor_base.bytes;
+    registry.push(factor_base);
+    Ok(VerifiedWorkerOriginal {
+        config,
+        public: &case.public_instance,
+        factor_base: &case.factor_base,
+        root,
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        public_bytes,
+        factor_base_bytes,
+    })
+}
+
+/// Retained, unacknowledged bytes and rejected actual receipts. This transport
+/// performs no storage retry and makes no durable-publication claim.
+#[derive(Default)]
+pub(super) struct WorkerResidualCustody {
+    boolean_search: Option<koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt>,
+    boolean_search_report_unavailable: bool,
+    search: Option<koblitz_m3::sat_original_owner::search_worker::Custody>,
+    items: Vec<WorkerResidualArtifact>,
+    // Moves the existing admitted owners; no Box, sink reopening or ledger reset.
+    sat: Option<koblitz_m3::sat_original_owner::worker::Custody>,
+    sat_report_unavailable: bool,
+    boolean_rows: Option<koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt>,
+    boolean_rows_report_unavailable: bool,
+    affine_rows: Option<koblitz_m3::sat_original_owner::affine_rows::OwnedAttempt>,
+    affine_rows_report_unavailable: bool,
+}
+
+pub(super) struct WorkerResidualArtifact {
+    path: &'static str,
+    bytes: Vec<u8>,
+    untransferred_root: Option<super::types::Artifact>,
+}
+
+impl WorkerResidualCustody {
+    // Legacy ordinary worst-case9 + optional Boolean anchor/check2 + one spare.
+    const CAPACITY: usize = 12;
+    fn admit(charge: impl FnOnce(u64, u64) -> Result<(), String>) -> Result<Self, String> {
+        charge(
+            4096,
+            (Self::CAPACITY * std::mem::size_of::<WorkerResidualArtifact>()) as u64,
+        )?;
+        let mut items = Vec::new();
+        items
+            .try_reserve_exact(Self::CAPACITY)
+            .map_err(|e| e.to_string())?;
+        Ok(Self {
+            items,
+            search: None,
+            boolean_search: None,
+            boolean_search_report_unavailable: false,
+            sat: None,
+            sat_report_unavailable: false,
+            boolean_rows: None,
+            boolean_rows_report_unavailable: false,
+            affine_rows: None,
+            affine_rows_report_unavailable: false,
+        })
+    }
+    fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
+        if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
+            return Err(item);
+        }
+        self.items.push(item);
+        Ok(())
+    }
+    pub(super) fn boolean_search_report_unavailable(&self) -> bool {
+        self.boolean_search_report_unavailable
+    }
+    pub(super) fn boolean_rows_report_unavailable(&self) -> bool {
+        self.boolean_rows_report_unavailable || self.affine_rows_report_unavailable
+    }
+    pub(super) fn affine_rows_report_unavailable(&self) -> bool {
+        self.affine_rows_report_unavailable
+    }
+    pub(super) fn sat_report_unavailable(&self) -> bool {
+        self.sat_report_unavailable
+    }
+    pub(super) fn has_untransferred_roots(&self) -> bool {
+        self.items.iter().any(|a| a.untransferred_root.is_some())
+    }
+}
+
+/// Private worker transport: acknowledged roots never re-enter payload writers.
+pub(super) struct WorkerSolveOutput {
+    data: SolverData,
+    stored: Vec<super::types::Artifact>,
+    residual: WorkerResidualCustody,
+}
+
+impl WorkerSolveOutput {
+    fn from_original_boolean_search_failure(
+        custody: koblitz_m3::sat_original_owner::worker::Custody,
+    ) -> Self {
+        Self {
+            data: SolverData {
+                outcome: Value::Null,
+                artifacts: Vec::new(),
+            },
+            stored: Vec::new(),
+            residual: WorkerResidualCustody {
+                sat: Some(custody),
+                boolean_search_report_unavailable: true,
+                ..Default::default()
+            },
+        }
+    }
+    // A fixed partial report is admitted against the retained original ledger.
+    // Refused reporting keeps its guard and all native custody.
+    fn from_original_boolean_search(
+        mut custody: koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt,
+    ) -> Self {
+        let outcome = custody.outcome();
+        let unavailable = outcome.is_none();
+        Self {
+            data: SolverData {
+                outcome: outcome.unwrap_or(Value::Null),
+                artifacts: Vec::new(),
+            },
+            stored: Vec::new(),
+            residual: WorkerResidualCustody {
+                boolean_search: Some(custody),
+                boolean_search_report_unavailable: unavailable,
+                ..Default::default()
+            },
+        }
+    }
+
+    fn from_search_custody(
+        mut custody: koblitz_m3::sat_original_owner::search_worker::Custody,
+    ) -> Self {
+        let outcome = custody.outcome();
+        let unavailable = outcome.is_none();
+        Self {
+            data: SolverData {
+                outcome: outcome.unwrap_or(Value::Null),
+                artifacts: Vec::new(),
+            },
+            stored: Vec::new(),
+            residual: WorkerResidualCustody {
+                search: Some(custody),
+                sat_report_unavailable: unavailable,
+                ..Default::default()
+            },
+        }
+    }
+    pub(super) fn legacy(data: SolverData) -> Self {
+        Self {
+            data,
+            stored: Vec::new(),
+            residual: WorkerResidualCustody::default(),
+        }
+    }
+    fn from_original_row_failure(custody: koblitz_m3::sat_original_owner::worker::Custody) -> Self {
+        // Reuse the proven detached pre-native ownership transport; no SAT report
+        // is requested and no producer ledger is recreated.
+        Self {
+            data: SolverData {
+                outcome: Value::Null,
+                artifacts: Vec::new(),
+            },
+            stored: Vec::new(),
+            residual: WorkerResidualCustody {
+                sat: Some(custody),
+                affine_rows_report_unavailable: true,
+                ..Default::default()
+            },
+        }
+    }
+    fn from_original_affine_rows(
+        mut custody: koblitz_m3::sat_original_owner::affine_rows::OwnedAttempt,
+    ) -> Self {
+        let outcome = custody.outcome();
+        let unavailable = outcome.is_none();
+        Self {
+            data: SolverData {
+                outcome: outcome.unwrap_or(Value::Null),
+                artifacts: Vec::new(),
+            },
+            stored: Vec::new(),
+            residual: WorkerResidualCustody {
+                affine_rows: Some(custody),
+                affine_rows_report_unavailable: unavailable,
+                ..Default::default()
+            },
+        }
+    }
+    fn from_original_boolean_rows(
+        mut custody: koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt,
+    ) -> Self {
+        let outcome = custody.outcome();
+        let unavailable = outcome.is_none();
+        Self {
+            data: SolverData {
+                outcome: outcome.unwrap_or(Value::Null),
+                artifacts: Vec::new(),
+            },
+            stored: Vec::new(),
+            residual: WorkerResidualCustody {
+                items: Vec::new(),
+                sat: None,
+                search: None,
+                boolean_search: None,
+                boolean_search_report_unavailable: false,
+                sat_report_unavailable: false,
+                boolean_rows: Some(custody),
+                boolean_rows_report_unavailable: unavailable,
+                affine_rows: None,
+                affine_rows_report_unavailable: false,
+            },
+        }
+    }
+    fn from_sat_custody(mut custody: koblitz_m3::sat_original_owner::worker::Custody) -> Self {
+        // None creates no producer reporting allocation. Parent adopts custody
+        // before using its own existing error-reporting path.
+        let outcome = custody.outcome();
+        let unavailable = outcome.is_none();
+        Self {
+            data: SolverData {
+                outcome: outcome.unwrap_or(Value::Null),
+                artifacts: Vec::new(),
+            },
+            stored: Vec::new(),
+            residual: WorkerResidualCustody {
+                items: Vec::new(),
+                search: None,
+                boolean_search: None,
+                boolean_search_report_unavailable: false,
+                sat: Some(custody),
+                sat_report_unavailable: unavailable,
+                boolean_rows: None,
+                boolean_rows_report_unavailable: false,
+                affine_rows: None,
+                affine_rows_report_unavailable: false,
+            },
+        }
+    }
+    pub(super) fn into_parts(
+        self,
+    ) -> (
+        SolverData,
+        Vec<super::types::Artifact>,
+        WorkerResidualCustody,
+    ) {
+        (self.data, self.stored, self.residual)
+    }
+}
+
+pub(super) const WORKER_STORED_RECEIPT_MAX: usize = 32;
+
+/// Reserved before producer execution; the caller charges its original budget.
+/// Root Artifact strings are moved from storage acknowledgements, not cloned.
+/// This admission prices the transport Vec and bounded identity comparisons;
+/// worker setup/finalization retain their separately stated measurement scope.
+#[allow(dead_code)] // Consumed by the staged native orchestration integration.
+struct WorkerStoredReceipts<'a> {
+    original: &'a VerifiedWorkerOriginal<'a>,
+    records: Vec<super::types::Artifact>,
+    capacity: usize,
+}
+
+#[allow(dead_code)]
+impl<'a> WorkerStoredReceipts<'a> {
+    fn admit(
+        original: &'a VerifiedWorkerOriginal<'a>,
+        capacity: usize,
+        charge: impl FnOnce(u64, u64) -> Result<(), String>,
+    ) -> Result<Self, String> {
+        if original.binding.is_none() || capacity == 0 || capacity > WORKER_STORED_RECEIPT_MAX {
+            return Err(
+                "stored worker receipts require bound original and bounded capacity".into(),
+            );
+        }
+        let bytes = (capacity * std::mem::size_of::<super::types::Artifact>()) as u64;
+        let work = (capacity * capacity * 1024) as u64;
+        charge(work, bytes)?;
+        let mut records = Vec::new();
+        records
+            .try_reserve_exact(capacity)
+            .map_err(|e| e.to_string())?;
+        Ok(Self {
+            original,
+            records,
+            capacity,
+        })
+    }
+    fn push(
+        &mut self,
+        artifact: super::types::Artifact,
+    ) -> Result<(), (String, super::types::Artifact)> {
+        if self.records.len() == self.capacity
+            || artifact.path.len() > 1024
+            || super::worker_reserved_artifact_path(&artifact.path)
+            || self.records.iter().any(|a| a.path == artifact.path)
+        {
+            return Err((
+                "stored worker receipt exceeds admission or collides".into(),
+                artifact,
+            ));
+        }
+        self.records.push(artifact);
+        Ok(())
+    }
+    fn finish(self, data: SolverData) -> WorkerSolveOutput {
+        // Holding original until handoff keeps the original worker lifetime.
+        let _ = self.original;
+        WorkerSolveOutput {
+            data,
+            stored: self.records,
+            residual: WorkerResidualCustody::default(),
+        }
+    }
+}
+
+/// Dispatch only the initial native two-code/four-signed-point profile.
+/// Original worker verification has already authenticated these public values.
+/// This bounded shape check allocates no curve, domain, or payload buffers.
+fn koblitz_worker_profile(config: &CaseConfig, case: &CaseData) -> bool {
+    binary_m3_worker_shape(config, case, "koblitz")
+}
+
+fn ordinary_worker_profile(config: &CaseConfig, case: &CaseData) -> bool {
+    binary_m3_worker_shape(config, case, "binary")
+}
+
+fn binary_m3_worker_shape(config: &CaseConfig, case: &CaseData, family: &str) -> bool {
+    if config.family != family
+        || config.m != 3
+        || !((23..=31).contains(&config.n) || (47..=61).contains(&config.n))
+        || !matches!(config.solver.as_str(), "f4" | "f5")
+        || config.factor_base_size != 4
+        || !(1..=6).contains(&config.degree_bound)
+        || config.work_limit == 0
+    {
+        return false;
+    }
+    let Some(points) = case.factor_base["points"]
+        .as_array()
+        .filter(|points| points.len() == 4)
+    else {
+        return false;
+    };
+    let mut signed = [(0u64, 0u64); 4];
+    for (row, output) in points.iter().zip(&mut signed) {
+        let parse = |name: &str| {
+            row[name]
+                .as_str()
+                .filter(|s| s.len() <= 20)
+                .and_then(|s| s.parse::<u64>().ok())
+        };
+        let (Some(x), Some(y)) = (parse("x"), parse("y")) else {
+            return false;
+        };
+        if x >= (1u64 << config.n) || y >= (1u64 << config.n) {
+            return false;
+        }
+        *output = (x, y);
+    }
+    if signed.iter().enumerate().any(|(i, point)| {
+        signed[..i].contains(point) || !signed.contains(&(point.0, point.0 ^ point.1))
+    }) {
+        return false;
+    }
+    signed
+        .iter()
+        .enumerate()
+        .filter(|(i, point)| !signed[..*i].iter().any(|prior| prior.0 == point.0))
+        .count()
+        == 2
+}
+
+/// Native causal projection seam for the separately owned exporter. Currently
+/// implements independently replayed signed-group prefixes only.
+pub(super) fn is_koblitz_m3_native_source(
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> bool {
+    koblitz_m3::is_native_source(outcome, artifacts)
+}
+
+pub(super) fn project_koblitz_m3_prefixes(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    emit: &mut impl FnMut(Option<Value>, Value) -> Result<(), String>,
+) -> Result<Value, String> {
+    koblitz_m3::project_worker_prefixes(dir, config, outcome, artifacts, emit)
+}
+
+pub(super) fn is_ordinary_m3_native_source(
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> bool {
+    outcome["strategy"] == "ordinary-binary-profile-unsupported"
+        || koblitz_m3::ordinary_construction::persisted::native_ownership::replay::is_source(
+            outcome, artifacts,
+        )
+}
+
+pub(super) fn project_ordinary_m3_prefixes(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    emit: &mut impl FnMut(Option<Value>, Value) -> Result<(), String>,
+) -> Result<Value, String> {
+    koblitz_m3::project_ordinary_worker_prefixes(dir, config, outcome, artifacts, emit)
+}
+
+/// Always invoked by central replay, independently of mutable outcome strategy.
+pub(super) fn verify_koblitz_m3_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<Option<Value>, String> {
+    koblitz_m3::verify_worker_cell(dir, config, outcome, artifacts)
+}
+
+/// Config-bound capability disposition only: never an execution or identity claim.
+/// Bounded by two fixed entries; persisted within the existing capped final outcome.
+pub(super) fn requested_channel_disposition(config: &CaseConfig) -> Result<Option<Value>, String> {
+    let Some(c) = &config.channels else {
+        return Ok(None);
+    };
+    c.validate()?;
+    let owned_boolean_search = c.owned_boolean_search.as_ref().map(|r| {
+        let eligible = koblitz_m3::sat_original_owner::owned_search_worker::supported(config);
+        super::types::ChannelDisposition {
+            request: r.clone(),
+            status: if eligible {
+                super::types::ChannelDispositionStatus::Requested
+            } else {
+                super::types::ChannelDispositionStatus::Unsupported
+            },
+            reason: if eligible {
+                super::types::ChannelDispositionReason::RequiresActualOwnedSearchReplay
+            } else {
+                super::types::ChannelDispositionReason::OutsideOwnedSearchProfile
+            },
+            execution_verified: false,
+            training_export_admitted: false,
+        }
+    });
+    let sat_search = c.sat_search.as_ref().map(|r| {
+        let eligible = koblitz_m3::sat_original_owner::search_worker::supported(config);
+        super::types::ChannelDisposition {
+            request: r.clone(),
+            status: if eligible {
+                super::types::ChannelDispositionStatus::Requested
+            } else {
+                super::types::ChannelDispositionStatus::Unsupported
+            },
+            reason: if eligible {
+                super::types::ChannelDispositionReason::RequiresActualSatSearchReplay
+            } else {
+                super::types::ChannelDispositionReason::OutsideSatSearchProfile
+            },
+            execution_verified: false,
+            training_export_admitted: false,
+        }
+    });
+    let boolean = c.boolean_consequence.as_ref().map(|r| {
+        let eligible = config.family == "binary"
+            && config.m == 3
+            && ((23..=31).contains(&config.n) || (47..=61).contains(&config.n))
+            && matches!(config.solver.as_str(), "f4" | "f5")
+            && config.factor_base_size == 4
+            && (1..=6).contains(&config.degree_bound)
+            && config.work_limit > 0;
+        super::types::ChannelDisposition {
+            request: r.clone(),
+            status: if eligible {
+                super::types::ChannelDispositionStatus::Requested
+            } else {
+                super::types::ChannelDispositionStatus::Unsupported
+            },
+            reason: if eligible {
+                super::types::ChannelDispositionReason::RequiresActualOriginalShapeAndRetainedRow
+            } else {
+                super::types::ChannelDispositionReason::OutsideOrdinaryN3Profile
+            },
+            execution_verified: false,
+            training_export_admitted: false,
+        }
+    });
+    let sat = c.sat_initial.as_ref().map(|r| {
+        let eligible = koblitz_m3::sat_original_owner::worker::eligibility(config)
+            == koblitz_m3::sat_original_owner::worker::Eligibility::Requested;
+        super::types::ChannelDisposition {
+            request: r.clone(),
+            status: if eligible {
+                super::types::ChannelDispositionStatus::Requested
+            } else {
+                super::types::ChannelDispositionStatus::Unsupported
+            },
+            reason: if c.schema == "crypto.ml-dataset.channel-requests/v1" {
+                super::types::ChannelDispositionReason::SatCentralWorkerReplayNotIntegrated
+            } else if eligible {
+                super::types::ChannelDispositionReason::RequiresActualSatInitialReplay
+            } else {
+                super::types::ChannelDispositionReason::OutsideSatInitialProfile
+            },
+            execution_verified: false,
+            training_export_admitted: false,
+        }
+    });
+    let affine_boolean_row = c.affine_boolean_row.as_ref().map(|r| {
+        let eligible = koblitz_m3::sat_original_owner::affine_worker::supported(config);
+        super::types::ChannelDisposition {
+            request: r.clone(),
+            status: if eligible {
+                super::types::ChannelDispositionStatus::Requested
+            } else {
+                super::types::ChannelDispositionStatus::Unsupported
+            },
+            reason: if eligible {
+                super::types::ChannelDispositionReason::RequiresActualAffineUnitRow
+            } else {
+                super::types::ChannelDispositionReason::OutsideAffineUnitRowProfile
+            },
+            execution_verified: false,
+            training_export_admitted: false,
+        }
+    });
+    Ok(Some(
+        serde_json::to_value(super::types::RequestedChannelDispositions {
+            schema: "crypto.ml-dataset.requested-channels/v1".into(),
+            owned_boolean_search,
+            sat_search,
+            boolean_consequence: boolean,
+            sat_initial: sat,
+            affine_boolean_row,
+        })
+        .map_err(|e| e.to_string())?,
+    ))
+}
+
+/// Historical replay allowance explicitly supplied by an authorized caller.
+/// These counters/deadline are independent of original producer execution.
+pub(super) struct SatReplayPolicy {
+    pub work: u64,
+    pub bytes: u64,
+    pub deadline: Instant,
+    pub stream_bytes: u64,
+    pub payload_bytes: u64,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum SatReplayVerdict {
+    CheckedInitial,
+    CheckedPrefixOnly,
+    Incomplete,
+    Unknown,
+    Rejected,
+}
+
+#[allow(clippy::large_enum_variant)]
+enum SatReplayOwner {
+    Terminal(koblitz_m3::sat_original_owner::central::TerminalVerified),
+    Outcome(koblitz_m3::sat_original_owner::central::Outcome),
+    Failed(koblitz_m3::sat_original_owner::central::Failed),
+}
+
+/// Must remain owned by the replay caller across all later errors/publication.
+/// There is deliberately no causal export or training-positive conversion.
+pub(super) struct SatReplayCustody {
+    owner: SatReplayOwner,
+    verdict: SatReplayVerdict,
+}
+
+impl SatReplayCustody {
+    pub(super) fn verdict(&self) -> SatReplayVerdict {
+        self.verdict
+    }
+    pub(super) fn retained_slot_bytes() -> usize {
+        std::mem::size_of::<Self>()
+    }
+    pub(super) fn charged(&self) -> (u64, u64) {
+        match &self.owner {
+            SatReplayOwner::Terminal(t) => t.usage(),
+            SatReplayOwner::Outcome(
+                koblitz_m3::sat_original_owner::central::Outcome::IncompleteMissingProducerLedger(
+                    f,
+                )
+                | koblitz_m3::sat_original_owner::central::Outcome::UnknownOriginalMath(f),
+            ) => f.usage(),
+            SatReplayOwner::Outcome(
+                koblitz_m3::sat_original_owner::central::Outcome::Verified(_),
+            ) => unreachable!("verified seal always joins terminal"),
+            SatReplayOwner::Failed(f) => f.frame.usage(),
+        }
+    }
+    pub(super) fn revalidate(
+        &mut self,
+        dir: &Path,
+        config: &CaseConfig,
+        outcome: &Value,
+        artifacts: &[super::types::Artifact],
+    ) -> SatReplayVerdict {
+        if !matches!(
+            self.verdict,
+            SatReplayVerdict::CheckedInitial | SatReplayVerdict::CheckedPrefixOnly
+        ) {
+            return self.verdict;
+        }
+        match &mut self.owner {
+            SatReplayOwner::Terminal(t) => {
+                if t.revalidate(dir, config, outcome, artifacts).is_err() {
+                    self.verdict = SatReplayVerdict::Rejected;
+                }
+            }
+            _ => self.verdict = SatReplayVerdict::Rejected,
+        }
+        self.verdict
+    }
+}
+
+pub(super) fn needs_sat_initial_replay(
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> bool {
+    koblitz_m3::sat_original_owner::worker::eligibility(config)
+        == koblitz_m3::sat_original_owner::worker::Eligibility::Requested
+        || has_sat_initial_disposition(outcome)
+        || artifacts.iter().any(|a| {
+            a.role == "sat-original-gate-map"
+                || a.path.starts_with("live/payloads/sat-original-pattern-")
+                || a.path.starts_with("payloads/sat-original-pattern-")
+        })
+}
+
+fn sat_terminal_overclaims(outcome: &Value) -> bool {
+    outcome["initial_checked"] == true
+        || outcome["solver_completed"] == true
+        || outcome["scalar_recovered_without_witness"] == true
+        || outcome["ecdlp_pipeline_completed"] == true
+        || outcome["status"] == "verified"
+}
+
+pub(super) fn verify_sat_initial_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    policy: SatReplayPolicy,
+) -> SatReplayCustody {
+    use koblitz_m3::sat_original_owner::central;
+    let result = central::verify(
+        dir,
+        config,
+        artifacts,
+        central::Policy {
+            work: policy.work,
+            bytes: policy.bytes,
+            deadline: policy.deadline,
+            stream_bytes: policy.stream_bytes,
+            payload_bytes: policy.payload_bytes,
+        },
+    );
+    match result {
+        Ok(central::Outcome::Verified(seal)) => {
+            match seal.join_terminal(dir, config, outcome, artifacts) {
+                Ok(joined) => SatReplayCustody {
+                    verdict: if joined.declared_initial {
+                        SatReplayVerdict::CheckedInitial
+                    } else {
+                        SatReplayVerdict::CheckedPrefixOnly
+                    },
+                    owner: SatReplayOwner::Terminal(joined),
+                },
+                Err(failed) => SatReplayCustody {
+                    owner: SatReplayOwner::Failed(failed),
+                    verdict: SatReplayVerdict::Rejected,
+                },
+            }
+        }
+        Ok(retained @ central::Outcome::IncompleteMissingProducerLedger(_)) => SatReplayCustody {
+            owner: SatReplayOwner::Outcome(retained),
+            verdict: if sat_terminal_overclaims(outcome) {
+                SatReplayVerdict::Rejected
+            } else {
+                SatReplayVerdict::Incomplete
+            },
+        },
+        Ok(retained @ central::Outcome::UnknownOriginalMath(_)) => SatReplayCustody {
+            owner: SatReplayOwner::Outcome(retained),
+            verdict: if sat_terminal_overclaims(outcome) {
+                SatReplayVerdict::Rejected
+            } else {
+                SatReplayVerdict::Unknown
+            },
+        },
+        Err(failed) => SatReplayCustody {
+            owner: SatReplayOwner::Failed(failed),
+            verdict: SatReplayVerdict::Rejected,
+        },
+    }
+}
+
+pub(super) fn verify_requested_channel_disposition(
+    config: &CaseConfig,
+    outcome: &Value,
+) -> Result<(), String> {
+    match requested_channel_disposition(config)? {
+        Some(expected) if outcome.get("requested_channels") == Some(&expected) => Ok(()),
+        None if outcome.get("requested_channels").is_none() => Ok(()),
+        _ => Err("requested channel disposition differs from frozen configuration".into()),
+    }
+}
+
+/// Internal worker path; unsupervised callers cannot obtain this token by
+/// setting an outcome flag. Adapter consumption is integrated separately.
+pub(super) fn solve_with_verified_worker_originals(
+    config: &CaseConfig,
+    case: &CaseData,
+    directory: &Path,
+    binding: AttemptBinding,
+    limits: CaptureLimits,
+    context: Option<&super::execution::SolverExecutionContext>,
+    original: &VerifiedWorkerOriginal<'_>,
+) -> Result<WorkerSolveOutput, String> {
+    original.matches_bound(config, case, directory, &binding)?;
+    if context.is_some_and(|c| c.launch.binding != binding) {
+        return Err("verified worker originals differ from execution attempt".into());
+    }
+    if koblitz_m3::sat_original_owner::owned_search_worker::requested(config) {
+        config.channels.as_ref().unwrap().validate()?;
+        if !koblitz_m3::sat_original_owner::owned_search_worker::supported(config) {
+            return Ok(WorkerSolveOutput::legacy(SolverData {
+                outcome: json!({"strategy":"original-boolean-search-unsupported","status":"unsupported","solver_completed":false,"all_patterns_negative":false,"training_export_admitted":false}),
+                artifacts: Vec::new(),
+            }));
+        }
+        let context = context.ok_or("owned Boolean search requires original execution context")?;
+        if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+            return Err("nested live owned search sink".into());
+        }
+        let sink = CaptureEmitter::create(directory, binding, limits.clone())?;
+        return Ok(koblitz_m3::sat_original_owner::owned_search_worker::run(
+            original, case, context, sink, &limits,
+        ));
+    }
+    if config
+        .channels
+        .as_ref()
+        .is_some_and(|c| c.affine_boolean_row.is_some())
+    {
+        config.channels.as_ref().unwrap().validate()?;
+        if !koblitz_m3::sat_original_owner::affine_worker::supported(config) {
+            return Ok(WorkerSolveOutput::legacy(SolverData {
+                outcome: json!({
+                "strategy":"original-affine-unit-row-unsupported","status":"unsupported",
+                "solver_completed":false,"full_span_search":false,"training_export_admitted":false}),
+                artifacts: Vec::new(),
+            }));
+        }
+        let context = context.ok_or("original row requires original execution context")?;
+        if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+            return Err("nested live solver sink".into());
+        }
+        let sink = CaptureEmitter::create(directory, binding, limits.clone())?;
+        return Ok(koblitz_m3::sat_original_owner::affine_worker::run(
+            original, case, context, sink, &limits,
+        ));
+    }
+    // Optional initial channel owns one original-budget pattern. Once selected,
+    // no partial or refused attempt can fall through to the legacy SAT solver.
+    if koblitz_m3::sat_original_owner::search_worker::requested(config) {
+        if !koblitz_m3::sat_original_owner::search_worker::supported(config) {
+            return Ok(WorkerSolveOutput::legacy(SolverData {
+                outcome: json!({"strategy":"sat-search-unsupported","status":"unsupported","solver_completed":false,"scalar_recovered_without_witness":false,"all_patterns_negative":false}),
+                artifacts: Vec::new(),
+            }));
+        }
+        let context = context.ok_or("search requires original execution context")?;
+        if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+            return Err("nested live search sink".into());
+        }
+        let sink = CaptureEmitter::create(directory, binding, limits.clone())?;
+        return Ok(WorkerSolveOutput::from_search_custody(
+            koblitz_m3::sat_original_owner::search_worker::run(
+                original, case, context, sink, &limits,
+            ),
+        ));
+    }
+    if koblitz_m3::sat_original_owner::worker::eligibility(config)
+        == koblitz_m3::sat_original_owner::worker::Eligibility::Requested
+    {
+        let context = context.ok_or("SAT initial requires original execution context")?;
+        if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+            return Err("nested live solver sink".into());
+        }
+        let sink = CaptureEmitter::create(directory, binding, limits.clone())?;
+        let prepared =
+            koblitz_m3::sat_original_owner::worker::prepare(original, case, context, sink, &limits);
+        return Ok(WorkerSolveOutput::from_sat_custody(prepared.detach()));
+    }
+    if config.family == "binary" && config.m == 3 && matches!(config.solver.as_str(), "f4" | "f5") {
+        if !ordinary_worker_profile(config, case) {
+            return Ok(WorkerSolveOutput::legacy(SolverData {
+                outcome: json!({"strategy":"ordinary-binary-profile-unsupported","status":"unsupported",
+                    "reason":"requires original n23..31 or n47..61, both twists, m3, degree1..6 and four signed points/two x codes",
+                    "solver_completed":false,"scalar_recovered_without_witness":false}),
+                artifacts: Vec::new(),
+            }));
+        }
+        let context = context.ok_or("ordinary m3 requires original execution context")?;
+        if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+            return Err("nested live solver sink".into());
+        }
+        let emitter = CaptureEmitter::create(directory, binding.clone(), limits.clone())?;
+        LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
+        let _guard = LiveSinkGuard;
+        if let Some(super::types::BooleanRequest::Produce { row_index }) = config
+            .channels
+            .as_ref()
+            .and_then(|c| c.boolean_consequence.as_ref())
+        {
+            return koblitz_m3::ordinary_construction::persisted::native_ownership::worker::run_with_produced_boolean_row(
+                original, case, context, &binding, &limits, *row_index as usize,
+            );
+        }
+        return koblitz_m3::ordinary_construction::persisted::native_ownership::worker::run(
+            original, case, context, &binding, &limits,
+        );
+    }
+    if koblitz_worker_profile(config, case) {
+        let context = context.ok_or("Koblitz m3 worker requires original execution context")?;
+        if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+            return Err("nested live solver sink".into());
+        }
+        let emitter = CaptureEmitter::create(directory, binding.clone(), limits.clone())?;
+        LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
+        let _guard = LiveSinkGuard;
+        // The entry owns the original ledger, first capture event, retained-root
+        // handoff and capture finalization. Do not run generic wrapper effects.
+        return koblitz_m3::run_verified_worker_entry(original, context, &binding, &limits);
+    }
+    solve_with_bound_event_sink_context(config, case, directory, binding, limits, context)
+        .map(WorkerSolveOutput::legacy)
+}
+
+pub(super) use koblitz_m3::ordinary_construction::persisted::native_ownership::replay::BooleanProjection;
+
+pub(super) fn verify_ordinary_m3_cell_with_projection(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    projection: &mut Option<BooleanProjection>,
+) -> Result<Option<Value>, String> {
+    koblitz_m3::ordinary_construction::persisted::native_ownership::replay::verify_with_projection(
+        dir,
+        config,
+        outcome,
+        artifacts,
+        Some(projection),
+    )
+}
+
+pub(super) fn verify_ordinary_m3_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<Option<Value>, String> {
+    koblitz_m3::ordinary_construction::persisted::native_ownership::replay::verify(
+        dir, config, outcome, artifacts,
+    )
+}
+
 pub fn solve_with_event_sink(
     config: &CaseConfig,
     case: &CaseData,
@@ -359,6 +1381,14 @@ pub(super) fn solve_with_bound_event_sink_context(
     }
     let mut result = solve_with_context(config, case, context);
     if let Ok(data) = &mut result {
+        if is_dynamic_strategy(&data.outcome["strategy"]) {
+            live_event(&json!({"kind":"solver_return","outcome":data.outcome,"error":null}))?;
+            LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+                Some(EventSink::Bound(s)) => s.finish().map_err(|e| e.to_string()),
+                _ => Err("bound capture sink disappeared".into()),
+            })?;
+            return result;
+        }
         if retains_canonical_artifacts(data) {
             flush_prime_chain_payloads(data);
             if data.outcome.get("live_persistence_errors").is_none() {
@@ -394,17 +1424,20 @@ pub(super) fn solve_with_bound_event_sink_context(
 }
 
 pub fn capabilities() -> Value {
+    let ordinary_m3_profile = json!({"adapter_id":"binary-m3-native-v1","family":"binary","m":[3,3],"n_ranges_inclusive":[[23,31],[47,61]],"twists":[false,true],"degree_bound_inclusive":[1,6],"factor_base_size":4,"signed_domain_points":4,"distinct_x_codes":2,"requires_sign_closed_factor_base":true,"requires_distinct_signed_points":true,"requires_positive_work_limit":true,"requires_verified_worker_originals":true,"requires_original_execution_context":true,"requires_bound_capture":true,"curve":"authenticated original a, nonzero b, modulus and twist; no Koblitz substitution","construction":"finite-selector determinant/coordinate ANF with independent replay","extraction":"bounded ordered signed triples including infinity prefixes","replay":"original equations, actual native/signed committed prefix, group witness and receipt delivery","costs":"one original cumulative ledger; modeled reservations and actual group-addition calls","scope":"all listed field degrees and both twists are eligible; original policy/domain and resource refusals are retained","gaps":["independent matrix basis derivation","retired hardware instructions","first and last fall degree certification","larger factor bases","m greater than 3"]});
+    let koblitz_m3_profile = json!({"adapter_id":"koblitz-m3-native-v1","family":"koblitz","m":[3,3],"n_ranges_inclusive":[[23,31],[47,61]],"degree_bound_inclusive":[1,6],"factor_base_size":4,"signed_domain_points":4,"distinct_x_codes":2,"requires_sign_closed_factor_base":true,"requires_positive_work_limit":true,"requires_original_execution_context":true,"requires_bound_capture":true,"twists":[false,true],"extraction":"bounded ordered signed triples including infinity prefixes","replay":"original input, native boundary consistency, signed group prefix and canonical delivery","costs":"modeled work and memory reservations; actual group addition calls","gaps":["independent matrix basis derivation","retired hardware instructions","first and last fall degree certification","larger factor bases","generic binary curves","m greater than 3"],"requires_verified_worker_originals":true,"requires_distinct_signed_points":true,"scope":"dispatch eligibility; completion remains subject to original resource and evidence gates"});
     json!({
         "schema":"ml-dataset.capabilities/v1",
         "solvers":[
+            {"id":"f4-wide-dynamic-v1","families":["prime"],"n":[33,61],"m":[4,15],"degree_bound":12,"requires_original_execution_context":true,"requires_bound_capture":true,"requires_positive_work_limit":true,"requires_positive_original_memory_trace":true,"requires_whole_mib_trace_limit":true,"minimum_signed_domain_points":1,"minimum_x_codes":1,"selection":"explicit f4-wide-dynamic-v1 solver id; not selected automatically by f4","maximum_signed_domain_points":64,"maximum_x_codes":32,"kind":"bounded native dynamic prime F4 and independently replayed finite-domain PDP evidence","trace":"original equations, native boundary reports, linear transitions, group prefixes and durable witnesses","unsupported_cells":"retained with explicit status","gaps":["independent native basis derivation","full instruction trajectory"]},
             {"id":"enumerate","families":["koblitz","binary","prime"],"m":[2,15],"kind":"bounded exact signed finite-domain PDP","trace":"all visited group transitions"},
             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
             {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
             {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
-            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"supervised_wide_prime_m3_profile":{"m":[3,3],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true,"extraction":"bounded ordered signed triples including infinity prefixes"},"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination requires supervised context and is currently m2 or m3","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
-            {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
+            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"supervised_wide_prime_m3_profile":{"m":[3,3],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true,"extraction":"bounded ordered signed triples including infinity prefixes"},"supervised_wide_prime_dynamic_profile":{"m":[4,15],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true,"completion":"replay-gated bounded partials"},"m_scope":"base routes; additional supervised profiles are separately gated","supervised_koblitz_m3_profile":koblitz_m3_profile.clone(),"supervised_ordinary_binary_m3_profile":ordinary_m3_profile.clone(),"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination requires original supervised context; m4..15 also retains the bounded legacy f4 route and separate f4-wide-dynamic-v1","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
+            {"id":"f5","families":["koblitz","binary"],"m":[2,2],"m_scope":"base routes; additional supervised profiles are separately gated","supervised_koblitz_m3_profile":koblitz_m3_profile.clone(),"supervised_ordinary_binary_m3_profile":ordinary_m3_profile.clone(),"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
-            {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"prime bounded field, power, GCD and split states; binary bounded quadratic, trace, half-trace and matrix states; independent distinct-root certificates","gaps":["higher-m root elimination","complete execution and total cost verification"]},
+            {"id":"root","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"kind":"native S3 final-leaf root finding over exact signed domains; prime m3..15 enumerates bounded affine prefixes","trace":"prime bounded field, power, GCD and split states; binary bounded quadratic, trace, half-trace and matrix states; independent distinct-root certificates","gaps":["full higher-m polynomial elimination","affine infinity-prefix branches","complete execution and total cost verification"]},
             {"id":"pkm","families":["prime"],"m":[2,3],"modulus_limit_exclusive":"2147483648","kind":"native PKM Kummer-tower F4 with finite-grid extraction","trace":"exact alternative Kummer base, quotient rules, prepared and specialized equations, native F4 report, extracted roots","gaps":["private elimination pivots and row operations","m>3 or p>=2^31"]},
             {"id":"double-large-prime","families":["koblitz","binary","prime"],"m":[2,15],"kind":"native verified two-residual elimination with signed Frobenius for admitted Koblitz models or identity/sign action with generic sparse filtering; recovery of determined target columns","trace":"residual discovery, exact domains, partial candidates, source coefficients, native sparse filtering and modular rank/recovery certificates","gaps":["internal pivot-selection events","complete private filter mutation stream"]}
         ],
@@ -422,6 +1455,7 @@ enum Group {
     Binary(Box<BinaryCurve>),
     Prime(curves::ExactPrimeCurve),
 }
+
 #[derive(Clone, Debug, PartialEq)]
 enum Element {
     Binary(BinaryPoint),
@@ -543,18 +1577,21 @@ fn outcome(status: &str, reason: &str) -> Value {
         "instruction_count_reason":"Worker-level PMU records, when permitted, are saved separately; this adapter does not invent per-operation instruction attribution",
         "trace_complete":false,"counters":{},"counter_scope":"native adapter operations, not retired instructions"})
 }
+
 fn unsupported(reason: &str) -> SolverData {
     SolverData {
         outcome: outcome("unsupported", reason),
         artifacts: vec![],
     }
 }
+
 fn save(data: &mut SolverData, path: &str, role: &str, value: &Value) -> Result<(), String> {
     let payload = ArtifactPayload::json(path, role, value)?;
     live_payload(&payload)?;
     data.artifacts.push(payload);
     Ok(())
 }
+
 fn set_witness(
     data: &mut SolverData,
     group: &Group,
@@ -563,6 +1600,7 @@ fn set_witness(
 ) -> Result<(), String> {
     set_witness_with_definition(data, group, points, target, None)
 }
+
 fn set_witness_with_definition(
     data: &mut SolverData,
     group: &Group,
@@ -609,6 +1647,26 @@ pub(super) fn solve_with_context(
     if !(2..=15).contains(&config.m) {
         return Err("decomposition arity must be 2..15".into());
     }
+    if config.solver == DYNAMIC_PROFILE && !dynamic_supported(config) {
+        let mut unsupported = outcome(
+            "unsupported",
+            "dynamic profile requires prime n33..61, m4..15, degree12 and positive work",
+        );
+        unsupported["strategy"] = json!(DYNAMIC_STRATEGY);
+        return Ok(SolverData {
+            outcome: unsupported,
+            artifacts: Vec::new(),
+        });
+    }
+    if case.factor_base["schema"] == "ml-ecdlp-factor-base/v2"
+        && case.factor_base["construction_status"] == "unsupported"
+    {
+        return Ok(unsupported(
+            case.factor_base["unsupported_reason"]
+                .as_str()
+                .unwrap_or("The requested factor-base policy is unsupported"),
+        ));
+    }
     let group = Group::read(case)?;
     let target = group.point(&case.public_instance["target"])?;
     if !group.on_curve(&target) {
@@ -617,16 +1675,21 @@ pub(super) fn solve_with_context(
     let points = domain(&group, case)?;
     let field_tally = crate::binary_ecc::operation_tally::OperationTally::begin();
     let mut result = match config.solver.as_str() {
+        DYNAMIC_PROFILE => solve_dynamic_bound(
+            config,
+            case,
+            context.ok_or("dynamic profile requires original execution context")?,
+        )?,
         "enumerate" | "pdp" => enumerate(config, &group, &points, &target)?,
         "bsgs" => bsgs(config, case, &group, &target)?,
         "sat" => sat_solve(config, &group, &points, &target)?,
         "f4" if matches!(group, Group::Prime(_)) => {
-            let result = prime_f4(config, &group, &points, &target, context)?;
+            let result = prime_f4(config, case, &group, &points, &target, context)?;
             if let Some(input) = result
                 .artifacts
                 .iter()
                 .find(|a| a.path == "prime-f4-input.json")
-                .filter(|_| config.m > 2)
+                .filter(|_| config.m > 2 && !is_dynamic_strategy(&result.outcome["strategy"]))
             {
                 verify_prime_f4_chain_input(
                     &case.public_instance,
@@ -752,6 +1815,7 @@ struct Search<'a> {
     exhausted: bool,
     io_error: Option<String>,
 }
+
 impl Search<'_> {
     fn descend(
         &mut self,
@@ -789,6 +1853,7 @@ impl Search<'_> {
         None
     }
 }
+
 fn enumerate(
     config: &CaseConfig,
     group: &Group,
@@ -1231,6 +2296,7 @@ fn finite_selector(
         .collect();
     SymElement { coords }
 }
+
 fn polys_json(polys: &[F2BoolPoly]) -> Value {
     json!(polys.iter().map(|p|json!({"n_vars":p.n_vars,"monomial_masks_hex":p.terms.iter().map(|t|format!("{:x}",t.mask)).collect::<Vec<_>>()})).collect::<Vec<_>>())
 }
@@ -1542,6 +2608,8 @@ pub(super) fn verify_pkm_factor_base(
         r,
         cofactor,
         generator: (generator.x, generator.y),
+
+        representation: None,
     };
     let ctx = InstanceCtx {
         group: &instance.curve,
@@ -1665,6 +2733,8 @@ fn pkm_solve(
         r,
         cofactor,
         generator: (generator.x, generator.y),
+
+        representation: None,
     };
     let ctx = InstanceCtx {
         group: &instance.curve,
@@ -1765,16 +2835,22 @@ fn pkm_solve(
 }
 
 const PRIME_CHAIN_STRATEGY: &str = "prime-affine-s3-chain-f4-visitor/v1";
+
 const PRIME_CHAIN_TRACE_CAP: &str = "prime F4 chain event or byte limit reached";
+
+const DYNAMIC_STRATEGY: &str = "prime_f4_wide_dynamic";
 
 fn retains_canonical_artifacts(data: &SolverData) -> bool {
     data.outcome["strategy"] == PRIME_CHAIN_STRATEGY
         || data.outcome["strategy"] == prime_f4_wide::STRATEGY
         || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
+        || data.outcome["strategy"] == DYNAMIC_STRATEGY
 }
+
 fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, error: &str) {
     if data.outcome["strategy"] == prime_f4_wide::STRATEGY
         || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
+        || data.outcome["strategy"] == DYNAMIC_STRATEGY
     {
         data.outcome["solver_completed"] = json!(false);
         data.outcome["status"] = json!("partial");
@@ -1794,14 +2870,32 @@ fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, erro
         .unwrap()
         .push(json!({"phase":phase,"error":error.chars().take(512).collect::<String>()}));
 }
+
 fn flush_prime_chain_payloads(data: &mut SolverData) {
     if data.outcome.get("live_persistence_errors").is_some() {
         return;
     }
+    let dynamic = data.outcome["strategy"] == DYNAMIC_STRATEGY;
     let failure = data.artifacts.iter().find_map(|payload| {
-        live_payload(payload)
-            .err()
-            .map(|error| (payload.path.clone(), error))
+        let persisted = if dynamic {
+            // This exact artifact has already crossed dedicated publication and
+            // final confirmation. Ordinary capture must never republish it.
+            if payload.path == "pdp-witness.json"
+                && payload.role == "independently-verified-pdp"
+                && payload.encoding == "json"
+            {
+                return None;
+            }
+            live_borrowed_payload(
+                &payload.path,
+                &payload.role,
+                &payload.encoding,
+                &payload.bytes,
+            )
+        } else {
+            live_payload(payload)
+        };
+        persisted.err().map(|error| (payload.path.clone(), error))
     });
     if let Some((path, error)) = failure {
         record_prime_chain_persistence_error(data, &path, &error);
@@ -1815,6 +2909,7 @@ struct PrimeChainLimits {
     lift_additions: u64,
     time: Duration,
 }
+
 impl From<&CaseConfig> for PrimeChainLimits {
     fn from(config: &CaseConfig) -> Self {
         Self {
@@ -1832,6 +2927,7 @@ struct LimitedJsonWriter {
     bytes: Vec<u8>,
     limit: usize,
 }
+
 impl Write for LimitedJsonWriter {
     fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
         if bytes.len() > self.limit.saturating_sub(self.bytes.len()) {
@@ -1844,12 +2940,14 @@ impl Write for LimitedJsonWriter {
         Ok(())
     }
 }
+
 #[derive(Default)]
 struct PrimeChainEvents {
     bytes: Vec<u8>,
     events: u64,
     error: Option<String>,
 }
+
 impl PrimeChainEvents {
     fn append<T: serde::Serialize>(
         &mut self,
@@ -2009,6 +3107,7 @@ struct PrimeChainInput {
     domains: Vec<Option<Vec<u64>>>,
     artifact: Value,
 }
+
 fn prime_chain_input(
     m: usize,
     group: &Group,
@@ -2310,6 +3409,7 @@ fn prime_f4_chain(
 
 fn prime_f4(
     config: &CaseConfig,
+    case: &CaseData,
     group: &Group,
     domain: &[Element],
     target: &Element,
@@ -2317,6 +3417,13 @@ fn prime_f4(
 ) -> Result<SolverData, String> {
     use crate::cryptanalysis::f4_fp::{self, F4Options};
     use crate::cryptanalysis::groebner_f4::Ordering;
+    if (4..=15).contains(&config.m)
+        && matches!(group, Group::Prime(curve) if curve.p.to_u64().is_some_and(|p| p >= 1u64 << 32))
+    {
+        if let Some(context) = context {
+            return prime_f4_wide_dynamic(config, case, context);
+        }
+    }
     if config.m == 3
         && context.is_some()
         && matches!(group, Group::Prime(curve) if curve.p.to_u64().is_some_and(|p| p >= 1u64 << 32))
@@ -2591,13 +3698,17 @@ fn root_solve(
     domain: &[Element],
     target: &Element,
 ) -> Result<SolverData, String> {
-    if config.m != 2 {
-        return Ok(unsupported(
-            "Native S3 univariate root adapter currently supports m=2",
-        ));
-    }
     if matches!(group, Group::Prime(_)) {
+        if (3..=15).contains(&config.m) {
+            return prime_root_chain_solve(config, group, domain, target);
+        }
+        if config.m != 2 {
+            return Ok(unsupported("Prime S3 root adapter supports m=2..15"));
+        }
         return prime_root_solve(config, group, domain, target);
+    }
+    if config.m != 2 {
+        return Ok(unsupported("Binary root adapter currently supports m=2"));
     }
     binary_roots::solve(config, case, group, domain, target)
 }
@@ -2615,9 +3726,8 @@ pub(super) fn binary_root_trace_totals(artifact: &Value) -> Result<(u64, u64), S
     binary_roots::trace_totals(artifact)
 }
 
-// This fixed recipe performs exactly 15 field operations: 3 additions,
-// 4 subtractions and 8 multiplications. Integer encoding/validation is separate.
 const PRIME_S3_SETUP_WORK: u64 = 15;
+
 fn prime_root_coefficients(p: u64, a: u64, b: u64, u: u64, r: u64) -> Vec<u64> {
     let add = |x: u64, y: u64| ((x as u128 + y as u128) % p as u128) as u64;
     let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
@@ -2636,10 +3746,6 @@ fn prime_root_event_envelope(index: usize, fixed_x: &str, event: &RootEvent) -> 
         "fixed_x":fixed_x,"native":event})
 }
 
-// Count only acknowledged envelopes. A byte refusal is the only native sink
-// failure that the adapter can seal: real I/O errors return Err before sealing.
-// The rejected event was computed and charged by the native engine, but is not
-// an acknowledged envelope or a separately saved intermediate state.
 fn verify_prime_root_event_budget(
     report: &RootReport,
     index: usize,
@@ -2913,6 +4019,9 @@ pub(super) fn verify_prime_root_artifact(
     config: &CaseConfig,
     artifact: &Value,
 ) -> Result<(), String> {
+    if (3..=15).contains(&config.m) {
+        return verify_prime_root_chain_artifact(public, base, config, artifact);
+    }
     if base["schema"] == "ml-ecdlp-factor-base/v2" && base["construction_status"] == "unsupported" {
         return Err("root certificate uses an unsupported factor-base policy".into());
     }
@@ -2924,6 +4033,9 @@ pub(super) fn verify_prime_root_artifact(
         || public["n"] != config.n
         || public["twist"] != config.twist
         || artifact["schema"] != "ml-dataset.prime-root-certificates/v1"
+        || !artifact["strategy"].is_null()
+        || !artifact["m"].is_null()
+        || !artifact["infinity_prefix_encountered"].is_null()
         || artifact["target"] != public["target"]
         || artifact["requested_work_limit"] != config.work_limit
         || artifact["distinct_root_certificates_verified"] != true
@@ -3093,13 +4205,14 @@ pub(super) fn verify_prime_root_artifact(
 pub(super) enum WidePrimeReplay {
     Ordinary,
     CensoredM3Prefix,
+    VerifiedDynamic,
 }
+
 /// Semantic wide-prime replay, independent of native basis derivation.
-// Original-input construction is separate from profile dispatch. The versioned
-// solver identifier is deliberately NOT yet accepted by production plan/CLI.
-#[allow(dead_code)]
+// Versioned supervised profile; original-input validation is shared by runtime
+// dispatch and independent central replay.
 const DYNAMIC_PROFILE: &str = "f4-wide-dynamic-v1";
-#[allow(dead_code)]
+
 struct DynamicOriginal {
     p: u64,
     a: u64,
@@ -3112,7 +4225,7 @@ struct DynamicOriginal {
     memory_bytes: u64,
     trace_bytes: u64,
 }
-#[allow(dead_code)]
+
 impl DynamicOriginal {
     fn expected(&self) -> prime_f4_wide_dynamic_replay::Expected<'_> {
         prime_f4_wide_dynamic_replay::Expected {
@@ -3129,10 +4242,10 @@ impl DynamicOriginal {
         }
     }
 }
+
 /// The parent must first authenticate config and execution limits against the
 /// original run. This independently validates/reconstructs public mathematical
 /// inputs; it never consults private_witness or any solver-produced input file.
-#[allow(dead_code)]
 fn dynamic_original(
     config: &CaseConfig,
     case: &CaseData,
@@ -3140,11 +4253,11 @@ fn dynamic_original(
     trace_bytes: u64,
 ) -> Result<DynamicOriginal, String> {
     use prime_f4_wide_dynamic_replay::Point as ReplayPoint;
-    if config.solver != DYNAMIC_PROFILE
+    if config.solver != DYNAMIC_PROFILE && !(config.solver == "f4" && (4..=15).contains(&config.m))
         || config.family != "prime"
         || !(33..=61).contains(&config.n)
         || !(4..=15).contains(&config.m)
-        || config.degree_bound != 12
+        || !(1..=12).contains(&config.degree_bound)
         || config.work_limit == 0
         || memory_bytes == 0
         || trace_bytes == 0
@@ -3161,7 +4274,7 @@ fn dynamic_original(
         return Err("dynamic public inputs differ from original configuration".into());
     }
     curves::verify_public(public)?;
-    curves::verify_factor_base(public, &case.factor_base)?;
+    curves::verify_factor_base_config(config, public, &case.factor_base)?;
     let group = Group::read(case)?;
     let Group::Prime(curve) = &group else {
         return Err("dynamic profile requires a prime curve".into());
@@ -3207,7 +4320,6 @@ fn dynamic_original(
 
 /// Reconcile outer labels with independently checked mathematics and separately
 /// reported native boundary facts. Does not select/admit a profile or run it.
-#[allow(dead_code)]
 fn verify_dynamic_claims(
     outcome: &Value,
     verified: &prime_f4_wide_dynamic_replay::Verified,
@@ -3229,7 +4341,17 @@ fn verify_dynamic_claims(
             return Err(format!("dynamic replay does not certify outer {key}"));
         }
     }
+    let supervisor_censored = matches!(
+        outcome["status"].as_str(),
+        Some("timeout" | "trace_budget_exhausted" | "worker_failed")
+    );
     for key in ["solver_completed", "pdp_witness_verified"] {
+        // terminal_outcome intentionally drops worker witness claims on a
+        // supervisor stop. Absence is not a positive assertion. Explicit null
+        // or a missing completion flag still fails the typed outcome contract.
+        if key == "pdp_witness_verified" && supervisor_censored && outcome.get(key).is_none() {
+            continue;
+        }
         if !outcome[key].is_boolean() {
             return Err(format!("dynamic outcome lacks boolean {key}"));
         }
@@ -3302,6 +4424,531 @@ fn verify_dynamic_claims(
     Ok(())
 }
 
+/// Execute the versioned dynamic profile under the original worker context.
+/// Caller authenticates config/context and owns the attempt-bound sink.
+fn solve_dynamic_bound(
+    config: &CaseConfig,
+    case: &CaseData,
+    context: &super::execution::SolverExecutionContext,
+) -> Result<SolverData, String> {
+    use prime_f4_wide_dynamic as d;
+    const MIB: u64 = 1024 * 1024;
+    if !context.launch.trace_bytes.is_multiple_of(MIB) {
+        return Err("dynamic original trace allowance is not whole MiB".into());
+    }
+    let capture_limits = super::capture::capture_limits(context.launch.trace_bytes / MIB)?;
+    LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+        Some(EventSink::Bound(sink)) => {
+            sink.verify_attempt_limits(&context.launch.binding, &capture_limits)
+        }
+        _ => Err("dynamic runtime requires attempt-bound capture".into()),
+    })?;
+    if Instant::now() >= context.deadline {
+        return Err("dynamic original worker deadline expired".into());
+    }
+    let original = dynamic_original(
+        config,
+        case,
+        context.launch.memory_bytes,
+        context.launch.trace_bytes,
+    )?;
+    let target = d::AffinePoint {
+        x: original.target.x,
+        y: original.target.y,
+    };
+    // Bounded original-domain reconstruction belongs to the existing outer
+    // adapter, separately from the child's admitted polynomial workspaces.
+    let points: Vec<_> = original
+        .domain
+        .iter()
+        .map(|p| d::AffinePoint { x: p.x, y: p.y })
+        .collect();
+    let mut forward = |event: &d::PhaseEvent, buffer: &mut super::capture::TypedEventBuffer| {
+        live_typed_event(
+            super::capture::TypedEventKind::WidePrimeDynamic,
+            event,
+            buffer,
+        )
+        .map_err(|_| ())
+    };
+    let mut prepared = match d::prepare_original(
+        original.p,
+        d::Parameters {
+            m: original.m,
+            a: original.a,
+            b: original.b,
+            target_x: target.x,
+            codes: &original.codes,
+        },
+        target,
+        &points,
+        d::AttemptLimits {
+            work_limit: config.work_limit,
+            memory_bytes: context.launch.memory_bytes,
+            trace_bytes: context.launch.trace_bytes,
+            degree_bound: config.degree_bound,
+            original_deadline: context.deadline,
+        },
+        d::EventPersistence::BoundCapture,
+        &mut forward,
+    ) {
+        Ok(prepared) => prepared,
+        Err(failure) => {
+            let retained =
+                d::visit_prepare_failure_artifacts(&failure, |path, role, encoding, bytes| {
+                    live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
+                });
+            return Ok(dynamic_partial_result(
+                "prepare",
+                &format!("{:?}", failure.stop),
+                retained.is_err(),
+            ));
+        }
+    };
+    let mut publisher = d::BoundWitnessPublisher::default();
+    if let Err(stop) = d::prepare_step4(&mut prepared, &mut publisher) {
+        let retained =
+            d::visit_step4_retained_artifacts(&prepared, |path, role, encoding, bytes| {
+                live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
+            });
+        return Ok(dynamic_partial_result(
+            "capture_admission",
+            &format!("{stop:?}"),
+            retained.is_err(),
+        ));
+    }
+    let mut phase = match d::invoke_original(prepared, &mut forward) {
+        Ok(phase) => phase,
+        Err(failure) => {
+            let retained =
+                d::visit_prepare_failure_artifacts(&failure, |path, role, encoding, bytes| {
+                    live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
+                });
+            return Ok(dynamic_partial_result(
+                "native_admission",
+                &format!("{:?}", failure.stop),
+                retained.is_err(),
+            ));
+        }
+    };
+    let linear = d::extract_reported_linear(&mut phase);
+    let linear_retained = d::retain_linear(&mut phase, &linear);
+    if linear_retained.is_ok() {
+        d::run_group_step4(&mut phase, Some(&linear), &mut forward, &mut publisher);
+        // Confirmation records its own failure in the terminal state and uses
+        // the persistent budget and original deadline. Never silently retry.
+        let _ = d::confirm_step4_witness(&mut phase.prepared, &mut publisher);
+    }
+    let terminal = d::retain_step4_terminal(&mut phase);
+    let facts = terminal
+        .as_ref()
+        .ok()
+        .and_then(|()| d::step4_outcome(&phase).ok());
+    let artifacts = d::take_step4_artifacts(&mut phase.prepared)
+        .map_err(|e| format!("dynamic admitted owner transfer failed: {e:?}"))?;
+    let mut result = if let Some(facts) = facts {
+        let claims = facts.claims;
+        SolverData {
+            outcome: json!({
+                "strategy":DYNAMIC_STRATEGY,
+                "status":if claims.solver_completed && claims.pdp_witness_verified {"verified"} else {"partial"},
+                "solver_completed":claims.solver_completed,
+                "pdp_witness_verified":claims.pdp_witness_verified && claims.certificate_durably_persisted,
+                "certificate_durably_persisted":claims.certificate_durably_persisted,
+                "group_domain_complete":claims.group_domain_complete,
+                "exhaustive_no_decomposition":claims.negative_verified,
+                "native_backend_invoked":facts.native_backend_invoked,
+                "native_statistics_complete":facts.native_statistics_complete,
+                "algebra_completed":facts.native_statistics_complete,
+                "native_basis_derivation_verified":false,
+                "independent_derivation_verified":false,
+                "operation_trajectory_verified":false,
+                "exact_instruction_count_verified":false,
+                "full_execution_trace_verified":false,
+                "fall_degree_verified":false,
+                "scalar_recovered_without_witness":false,
+                "native_metadata_scope":"producer-reported boundary facts; independent replay required"
+            }),
+            artifacts,
+        }
+    } else {
+        let mut result =
+            dynamic_partial_result("terminal_retention", &format!("{terminal:?}"), false);
+        result.artifacts = artifacts;
+        result
+    };
+    if let Err(stop) = linear_retained {
+        result.outcome["linear_retention_stop"] = json!(format!("{stop:?}"));
+    }
+    // The parent flush preserves these owners and never republishes a dedicated
+    // witness. Outer errors suppress completion but retain acknowledged evidence.
+    flush_prime_chain_payloads(&mut result);
+    Ok(result)
+}
+
+fn dynamic_supported(config: &CaseConfig) -> bool {
+    config.family == "prime"
+        && (33..=61).contains(&config.n)
+        && (4..=15).contains(&config.m)
+        && config.degree_bound == 12
+        && config.work_limit > 0
+}
+
+fn dynamic_partial_result(stage: &str, reason: &str, custody_failed: bool) -> SolverData {
+    let mut result = SolverData {
+        outcome: json!({"strategy":DYNAMIC_STRATEGY,"status":"partial",
+            "stage":stage,"reason":reason,"solver_completed":false,
+            "pdp_witness_verified":false,"group_domain_complete":false,
+            "exhaustive_no_decomposition":false,"scalar_recovered_without_witness":false}),
+        artifacts: Vec::new(),
+    };
+    if custody_failed {
+        record_prime_chain_persistence_error(&mut result, stage, "retained prefix capture failed");
+    }
+    result
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum DynamicReplayDisposition {
+    Ordinary,
+    Mathematical,
+    RawPrefix,
+}
+
+fn dynamic_reserved(a: &super::types::Artifact) -> bool {
+    let path = a.path.strip_prefix("live/payloads/").unwrap_or(&a.path);
+    path.starts_with("prime-f4-wide-dynamic-")
+        || a.role.starts_with("restricted-wide-prime-dynamic-")
+}
+
+const DYNAMIC_SLOTS: [(&str, &str, &str); 6] = [
+    (
+        "prime-f4-wide-dynamic-setup.json",
+        "restricted-wide-prime-dynamic-setup/v1",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-native.json",
+        "restricted-wide-prime-dynamic-native/v1",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-events.jsonl",
+        "restricted-wide-prime-dynamic-events/v1",
+        "jsonl",
+    ),
+    (
+        "prime-f4-wide-dynamic-linear.json",
+        "restricted-wide-prime-dynamic-linear/v1",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-group.json",
+        "restricted-wide-prime-dynamic-group/v1",
+        "jsonl",
+    ),
+    (
+        "prime-f4-wide-dynamic-result.json",
+        "restricted-wide-prime-dynamic-result/v1",
+        "json",
+    ),
+];
+
+fn dynamic_slot_identities(artifacts: &[super::types::Artifact]) -> Result<(), String> {
+    for a in artifacts.iter().filter(|a| dynamic_reserved(a)) {
+        if artifacts
+            .iter()
+            .filter(|other| other.path == a.path)
+            .count()
+            != 1
+        {
+            return Err("duplicate dynamic artifact path".into());
+        }
+        let live = a.path.strip_prefix("live/payloads/");
+        let path = live.unwrap_or(&a.path);
+        let Some((_, role, encoding)) = DYNAMIC_SLOTS.iter().find(|slot| slot.0 == path) else {
+            return Err("unknown or displaced reserved dynamic artifact".into());
+        };
+        let raw = a.role == "unregistered-partial-artifact" && a.encoding == "native";
+        if live.is_some() {
+            // Collector assigns raw custody identity to the captured copy.
+            // Its mathematical identity is in the checked committed chain.
+            if !raw {
+                return Err("dynamic live copy has canonical manifest identity".into());
+            }
+        } else if !raw && (a.role != *role || a.encoding != *encoding) {
+            return Err("dynamic canonical artifact identity mismatch".into());
+        }
+    }
+    Ok(())
+}
+
+fn dynamic_no_promoted_claims(outcome: &Value) -> Result<(), String> {
+    prime_f4_wide::verify_unproved_claims(outcome)?;
+    prime_f4_wide::verify_censored_outcome(outcome)?;
+    for key in [
+        "certificate_durably_persisted",
+        "group_domain_complete",
+        "independent_derivation_verified",
+        "operation_trajectory_verified",
+        "exact_instruction_count_verified",
+        "full_execution_trace_verified",
+        "fall_degree_verified",
+        "linear_extraction_complete",
+        "extraction_complete",
+    ] {
+        if !outcome[key].is_null() && outcome[key] != false {
+            return Err(format!("raw dynamic prefix promotes {key}"));
+        }
+    }
+    Ok(())
+}
+
+pub(super) fn verify_dynamic_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<DynamicReplayDisposition, String> {
+    use super::execution;
+    use prime_f4_wide::artifact;
+    let selected = config.solver == DYNAMIC_PROFILE;
+    if !selected
+        && outcome["strategy"] != DYNAMIC_STRATEGY
+        && !artifacts.iter().any(dynamic_reserved)
+    {
+        return Ok(DynamicReplayDisposition::Ordinary);
+    }
+    if !selected {
+        return Err("dynamic evidence differs from original profile".into());
+    }
+    let context = execution::load(dir)?.ok_or("dynamic replay lacks original execution context")?;
+    artifact(artifacts, execution::PATH, execution::ROLE, "json", true)?;
+    let (binding, limits) = super::admit_capture_context(dir)?
+        .ok_or("dynamic replay lacks original capture context")?;
+    verify_dynamic_bound_files(dir, config, outcome, artifacts, &context, &binding, &limits)
+}
+
+/// Checks files against caller-authenticated context; original-run admission is
+/// performed by verify_dynamic_cell. Direct controls test this narrower layer.
+fn verify_dynamic_bound_files(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    context: &super::execution::LaunchContext,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+) -> Result<DynamicReplayDisposition, String> {
+    use super::{capture, storage};
+    use prime_f4_wide::artifact;
+    dynamic_slot_identities(artifacts)?;
+    if &context.binding != binding {
+        return Err("dynamic execution and capture attempts differ".into());
+    }
+    // Bind the committed capture root in the manifest; its payload hashes are
+    // checked transitively by the capture reader and independent child.
+    for path in ["live/committed.json", "live/events.jsonl"] {
+        if fs::symlink_metadata(dir.join(path)).is_ok()
+            && artifacts.iter().filter(|a| a.path == path).count() != 1
+        {
+            return Err(format!(
+                "dynamic capture root lacks manifest binding: {path}"
+            ));
+        }
+    }
+    let load_value = |path: &str| -> Result<Value, String> {
+        storage::contained_path(dir, path, false)?;
+        serde_json::from_slice(&prime_f4_wide::read_bounded(dir, path, 1024 * 1024)?)
+            .map_err(|e| e.to_string())
+    };
+    let censored = matches!(
+        outcome["status"].as_str(),
+        Some("timeout" | "trace_budget_exhausted" | "worker_failed")
+    );
+    let ready = [
+        "prime-f4-input.json",
+        "prime-f4-wide-dynamic-setup.json",
+        "prime-f4-wide-dynamic-native.json",
+        "prime-f4-wide-dynamic-events.jsonl",
+    ]
+    .iter()
+    .all(|path| {
+        artifacts
+            .iter()
+            .any(|a| a.path == *path && a.role != "unregistered-partial-artifact")
+    });
+    let registered_terminal = artifacts.iter().any(|a| {
+        (a.path == "prime-f4-wide-dynamic-result.json"
+            || a.role == "restricted-wide-prime-dynamic-result/v1")
+            && a.role != "unregistered-partial-artifact"
+    });
+    let registered_witness = artifacts.iter().any(|a| {
+        (a.path == "pdp-witness.json" || a.role == "independently-verified-pdp")
+            && a.role != "unregistered-partial-artifact"
+    });
+    if !ready && !registered_terminal && !registered_witness {
+        if !censored
+            && !matches!(
+                outcome["status"].as_str(),
+                Some("partial" | "error" | "unsupported")
+            )
+        {
+            return Err("incomplete dynamic evidence has nonpartial status".into());
+        }
+        dynamic_no_promoted_claims(outcome)?;
+        if artifacts
+            .iter()
+            .any(|a| a.path == "result.json" && a.role == "solver-outcome")
+        {
+            artifact(artifacts, "result.json", "solver-outcome", "json", true)?;
+            let retained = load_value("result.json")?;
+            dynamic_no_promoted_claims(&retained)?;
+            if !censored {
+                let mut outer = outcome.clone();
+                outer
+                    .as_object_mut()
+                    .ok_or("dynamic raw outcome object")?
+                    .remove("supervisor");
+                if retained != outer {
+                    return Err("raw dynamic worker and outer outcome differ".into());
+                }
+            }
+        } else if !censored {
+            return Err("noncensored dynamic prefix lacks retained worker outcome".into());
+        }
+        // Retain oversize raw output for trace-budget failures. It is hash-bound
+        // custody, never admitted to the mathematical parser as a valid bundle.
+        capture::verify_live_committed_prefix(dir, binding, limits)?;
+        return Ok(DynamicReplayDisposition::RawPrefix);
+    }
+    // A registered terminal/witness cannot escape strict replay by removing a
+    // prerequisite or relabelling its status as partial/censored.
+    for (path, role) in [
+        ("public.json", "public-instance"),
+        ("factor-base.json", "factor-base"),
+    ] {
+        artifact(artifacts, path, role, "json", true)?;
+    }
+    let case = CaseData {
+        public_instance: load_value("public.json")?,
+        factor_base: load_value("factor-base.json")?,
+        private_witness: Value::Null,
+    };
+    let original = dynamic_original(config, &case, context.memory_bytes, context.trace_bytes)?;
+    if artifact(
+        artifacts,
+        "solver-domain.json",
+        "exact-signed-factor-base",
+        "json",
+        false,
+    )?
+    .is_some()
+    {
+        let group = Group::read(&case)?;
+        let expected = json!({"points":domain(&group, &case)?.iter().map(Element::json).collect::<Vec<_>>(),
+            "negation_closed":true,"repetitions_allowed":true});
+        if load_value("solver-domain.json")? != expected {
+            return Err("dynamic solver domain differs from original factor base".into());
+        }
+    } else if fs::symlink_metadata(dir.join("solver-domain.json")).is_ok() {
+        return Err("dynamic solver domain lacks manifest identity".into());
+    }
+    let verified = prime_f4_wide_dynamic_replay::verify_files(
+        dir,
+        &original.expected(),
+        artifacts,
+        binding,
+        limits,
+        prime_f4_wide_dynamic_replay::ReplayLimits {
+            work: 10_000_000_000,
+            allocation_bytes: 128 << 20,
+            deadline: Instant::now() + Duration::from_secs(30),
+        },
+    )?;
+    verify_dynamic_claims(outcome, &verified)?;
+    let worker = artifact(
+        artifacts,
+        "result.json",
+        "solver-outcome",
+        "json",
+        !censored,
+    )?;
+    if worker.is_some() {
+        let retained = load_value("result.json")?;
+        verify_dynamic_claims(&retained, &verified)?;
+        if !censored {
+            let mut outer = outcome.clone();
+            outer
+                .as_object_mut()
+                .ok_or("dynamic outcome object")?
+                .remove("supervisor");
+            if retained != outer {
+                return Err("dynamic worker and outer outcome differ".into());
+            }
+        }
+    } else if fs::symlink_metadata(dir.join("result.json")).is_ok() {
+        return Err("dynamic retained outcome lacks manifest binding".into());
+    }
+    Ok(DynamicReplayDisposition::Mathematical)
+}
+
+#[cfg(test)]
+mod dynamic_admission_tests {
+    use super::*;
+    fn record(path: &str, role: &str, encoding: &str) -> super::super::types::Artifact {
+        super::super::types::Artifact {
+            path: path.into(),
+            role: role.into(),
+            encoding: encoding.into(),
+            sha256: "0".repeat(64),
+            bytes: 0,
+        }
+    }
+    #[test]
+    fn dynamic_slot_identity_keeps_raw_live_copies_distinct_from_canonical_slots() {
+        for (path, role, encoding) in DYNAMIC_SLOTS {
+            let canonical = record(path, role, encoding);
+            assert!(dynamic_reserved(&canonical));
+            let raw = record(path, "unregistered-partial-artifact", "native");
+            let live = record(
+                &format!("live/payloads/{path}"),
+                "unregistered-partial-artifact",
+                "native",
+            );
+            dynamic_slot_identities(&[canonical.clone(), live.clone()]).unwrap();
+            dynamic_slot_identities(&[raw]).unwrap();
+            for bad in [
+                record(path, "other", encoding),
+                record(path, role, "utf8"),
+                record("other.json", role, encoding),
+                record(&live.path, role, encoding),
+                record(path, "restricted-wide-prime-dynamic-result/v999", encoding),
+            ] {
+                assert!(dynamic_slot_identities(&[bad]).is_err());
+            }
+            assert!(dynamic_slot_identities(&[canonical.clone(), canonical]).is_err());
+        }
+        let unknown = record(
+            "prime-f4-wide-dynamic-unknown.json",
+            "unregistered-partial-artifact",
+            "native",
+        );
+        assert!(dynamic_reserved(&unknown));
+        assert!(dynamic_slot_identities(&[unknown]).is_err());
+        for shared in [
+            record(
+                "prime-f4-input.json",
+                "complete-prime-field-polynomial-system",
+                "json",
+            ),
+            record("pdp-witness.json", "independently-verified-pdp", "json"),
+        ] {
+            assert!(!dynamic_reserved(&shared));
+        }
+    }
+}
+
 pub(super) fn verify_prime_f4_wide(
     dir: &Path,
     config: &CaseConfig,
@@ -3310,6 +4957,9 @@ pub(super) fn verify_prime_f4_wide(
 ) -> Result<WidePrimeReplay, String> {
     let disposition = prime_f4_wide_m3::verify(dir, config, outcome, artifacts)?;
     if disposition == WidePrimeReplay::Ordinary {
+        if verify_prime_f4_dynamic(dir, config, outcome, artifacts)? {
+            return Ok(WidePrimeReplay::VerifiedDynamic);
+        }
         prime_f4_wide::verify(dir, config, outcome, artifacts)?;
     }
     Ok(disposition)
@@ -3321,6 +4971,9 @@ fn wide_begin_failure(
     context: Option<&super::execution::SolverExecutionContext>,
     error: String,
 ) -> Result<SolverData, String> {
+    if config.solver == DYNAMIC_PROFILE {
+        return Ok(dynamic_partial_result("solver_begin", &error, true));
+    }
     let Some(context) = context else {
         return Err(error);
     };
@@ -3357,13 +5010,450 @@ fn wide_begin_failure(
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn unsupported_factor_base_policy_does_not_become_empty_domain_success() {
+        let cfg = config("prime", "root");
+        let mut case = curves::generate(&cfg).unwrap();
+        case.factor_base = json!({"schema":"ml-ecdlp-factor-base/v2","construction_status":"unsupported",
+            "unsupported_reason":"binary-only policy","points":[]});
+        let result = solve(&cfg, &case).unwrap();
+        assert_eq!(result.outcome["status"], "unsupported");
+        assert_eq!(result.outcome["solver_completed"], false);
+        assert!(result.artifacts.is_empty());
+    }
+
     use super::*;
+
+    use super::*;
+
+    #[test]
+    fn dynamic_unsupported_axes_preserve_outcomes_without_reading_curve_bytes() {
+        let base = CaseConfig {
+            channels: None,
+            factor_base_policy: None,
+            family: "prime".into(),
+            n: 47,
+            m: 4,
+            twist: false,
+            curve_seed: 7,
+            generator_index: 1,
+            key_index: 1,
+            seed: 42,
+            factor_base_size: 2,
+            degree_bound: 12,
+            work_limit: 16384,
+            solver: DYNAMIC_PROFILE.into(),
+        };
+        let case = CaseData {
+            public_instance: Value::Null,
+            private_witness: Value::Null,
+            factor_base: Value::Null,
+        };
+        for mutation in 0..5 {
+            let mut config = base.clone();
+            match mutation {
+                0 => config.family = "binary".into(),
+                1 => config.family = "koblitz".into(),
+                2 => config.n = 23,
+                3 => config.m = 2,
+                _ => config.degree_bound = 8,
+            }
+            let result = solve_with_context(&config, &case, None).unwrap();
+            assert_eq!(result.outcome["status"], "unsupported");
+            assert_eq!(result.outcome["solver_completed"], false);
+            assert_eq!(result.outcome["pdp_witness_verified"], false);
+            assert!(result.artifacts.is_empty());
+        }
+        let refused = wide_begin_failure(
+            &base,
+            &case,
+            None,
+            "fixture begin persistence refusal".into(),
+        )
+        .unwrap();
+        assert_eq!(refused.outcome["solver_completed"], false);
+        assert_eq!(refused.outcome["stage"], "solver_begin");
+        assert!(refused.outcome.get("live_persistence_errors").is_some());
+    }
+
+    #[test]
+    fn dynamic_runtime_composes_actual_bound_capture_and_independent_replay() {
+        for twist in [false, true] {
+            let config = CaseConfig {
+                channels: None,
+                factor_base_policy: None,
+                family: "prime".into(),
+                n: 47,
+                m: 4,
+                twist,
+                curve_seed: 7,
+                generator_index: 1,
+                key_index: 1,
+                seed: 42,
+                factor_base_size: 2,
+                degree_bound: 12,
+                work_limit: 16384,
+                solver: DYNAMIC_PROFILE.into(),
+            };
+            let mut case = curves::generate(&config).unwrap();
+            let group = Group::read(&case).unwrap();
+            let points = domain(&group, &case).unwrap();
+            let mut target = group.zero();
+            for _ in 0..config.m {
+                target = group.add(&target, &points[0]);
+            }
+            case.public_instance["target"] = target.json();
+            case.private_witness = json!({"must_not_be_consulted":true});
+            curves::verify_public(&case.public_instance).unwrap();
+            // Synthetic attempt identity for a software integration control;
+            // central frozen-run admission is deliberately a separate gate.
+            let binding = AttemptBinding {
+                schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+                run_sha256: "1".repeat(64),
+                plan_sha256: "2".repeat(64),
+                protocol_sha256: "3".repeat(64),
+                config_sha256: "4".repeat(64),
+                source_commit: "5".repeat(40),
+                binary_sha256: "6".repeat(64),
+                cell_index: 0,
+                attempt_sha256: "7".repeat(64),
+            };
+            let context = super::super::execution::SolverExecutionContext {
+                launch: super::super::execution::LaunchContext {
+                    schema: "crypto.ml-dataset.execution-context/v1".into(),
+                    binding: binding.clone(),
+                    boot_id: "software-fixture".into(),
+                    start_monotonic_ns: 1,
+                    deadline_monotonic_ns: 30_000_000_001,
+                    seconds_per_case: 30,
+                    memory_bytes: 256 << 20,
+                    trace_bytes: 128 << 20,
+                },
+                deadline: Instant::now() + Duration::from_secs(30),
+            };
+            assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
+            assert!(solve_dynamic_bound(&config, &case, &context).is_err());
+            let nonce = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let root = std::env::temp_dir()
+                .join(format!("dynamic-runtime-{}-{nonce}", std::process::id()));
+            let cell = root.join("cell");
+            fs::create_dir_all(&cell).unwrap();
+            let limits = super::super::capture::capture_limits(128).unwrap();
+            let sink = CaptureEmitter::create(&cell.join("live"), binding.clone(), limits.clone())
+                .unwrap();
+            LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(sink)));
+            let guard = LiveSinkGuard;
+            let before = fs::read(cell.join("live/committed.json")).unwrap();
+            let mut wrong_attempt = context.clone();
+            wrong_attempt.launch.binding.attempt_sha256 = "8".repeat(64);
+            assert!(solve_dynamic_bound(&config, &case, &wrong_attempt).is_err());
+            let mut wrong_limits = context.clone();
+            wrong_limits.launch.trace_bytes = 64 << 20;
+            assert!(solve_dynamic_bound(&config, &case, &wrong_limits).is_err());
+            assert_eq!(fs::read(cell.join("live/committed.json")).unwrap(), before);
+            assert!(fs::read(cell.join("live/events.jsonl")).unwrap().is_empty());
+            let mut expired = context.clone();
+            expired.deadline = Instant::now();
+            assert!(solve_dynamic_bound(&config, &case, &expired).is_err());
+            let result = solve_dynamic_bound(&config, &case, &context).unwrap();
+            let mut artifacts: Vec<_> = result
+                .artifacts
+                .iter()
+                .map(|a| {
+                    super::super::storage::write_bytes(
+                        &cell,
+                        &a.path,
+                        &a.role,
+                        &a.encoding,
+                        &a.bytes,
+                    )
+                    .unwrap()
+                })
+                .collect();
+            assert_eq!(
+                result.outcome["pdp_witness_verified"], true,
+                "{:?}",
+                result.outcome
+            );
+            assert!(
+                result.outcome.get("live_persistence_errors").is_none(),
+                "{:?}",
+                result.outcome
+            );
+            LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+                Some(EventSink::Bound(sink)) => sink.finish().unwrap(),
+                _ => panic!("bound sink lost"),
+            });
+            drop(guard);
+            for (path, role, value) in [
+                ("public.json", "public-instance", &case.public_instance),
+                ("factor-base.json", "factor-base", &case.factor_base),
+                ("result.json", "solver-outcome", &result.outcome),
+            ] {
+                artifacts
+                    .push(super::super::storage::write_json(&cell, path, role, value).unwrap());
+            }
+            for path in ["live/committed.json", "live/events.jsonl"] {
+                let (sha256, bytes) = crate::store::hash_file(&cell.join(path)).unwrap();
+                artifacts.push(super::super::types::Artifact {
+                    path: path.into(),
+                    role: "unregistered-partial-artifact".into(),
+                    encoding: "native".into(),
+                    sha256,
+                    bytes,
+                });
+            }
+            assert_eq!(
+                verify_dynamic_bound_files(
+                    &cell,
+                    &config,
+                    &result.outcome,
+                    &artifacts,
+                    &context.launch,
+                    &binding,
+                    &limits
+                )
+                .unwrap(),
+                DynamicReplayDisposition::Mathematical
+            );
+            for stop in [Some("timeout"), Some("trace_budget_exhausted"), None] {
+                let censored = super::super::execution::terminal_outcome(
+                    result.outcome.clone(),
+                    stop,
+                    false,
+                    Some(137),
+                );
+                assert_eq!(
+                    verify_dynamic_bound_files(
+                        &cell,
+                        &config,
+                        &censored,
+                        &artifacts,
+                        &context.launch,
+                        &binding,
+                        &limits
+                    )
+                    .unwrap(),
+                    DynamicReplayDisposition::Mathematical
+                );
+            }
+            for missing in ["live/committed.json", "public.json", "pdp-witness.json"] {
+                let changed: Vec<_> = artifacts
+                    .iter()
+                    .filter(|a| a.path != missing)
+                    .cloned()
+                    .collect();
+                assert!(
+                    verify_dynamic_bound_files(
+                        &cell,
+                        &config,
+                        &result.outcome,
+                        &changed,
+                        &context.launch,
+                        &binding,
+                        &limits
+                    )
+                    .is_err(),
+                    "{missing}"
+                );
+            }
+            let raw = root.join("raw");
+            fs::create_dir(&raw).unwrap();
+            let partial = json!({"status":"error","reason":"interrupted setup",
+                "solver_completed":false,"pdp_witness_verified":false});
+            let raw_artifacts = vec![super::super::storage::write_json(
+                &raw,
+                "result.json",
+                "solver-outcome",
+                &partial,
+            )
+            .unwrap()];
+            assert_eq!(
+                verify_dynamic_bound_files(
+                    &raw,
+                    &config,
+                    &partial,
+                    &raw_artifacts,
+                    &context.launch,
+                    &binding,
+                    &limits
+                )
+                .unwrap(),
+                DynamicReplayDisposition::RawPrefix
+            );
+            let mut promoted = partial.clone();
+            promoted["pdp_witness_verified"] = json!(true);
+            assert!(verify_dynamic_bound_files(
+                &raw,
+                &config,
+                &promoted,
+                &raw_artifacts,
+                &context.launch,
+                &binding,
+                &limits
+            )
+            .is_err());
+            let mut falsely_complete = raw_artifacts;
+            falsely_complete.push(
+                super::super::storage::write_bytes(
+                    &raw,
+                    "prime-f4-wide-dynamic-result.json",
+                    "restricted-wide-prime-dynamic-result/v1",
+                    "json",
+                    b"{broken",
+                )
+                .unwrap(),
+            );
+            assert!(verify_dynamic_bound_files(
+                &raw,
+                &config,
+                &partial,
+                &falsely_complete,
+                &context.launch,
+                &binding,
+                &limits
+            )
+            .is_err());
+            let original = dynamic_original(
+                &config,
+                &case,
+                context.launch.memory_bytes,
+                context.launch.trace_bytes,
+            )
+            .unwrap();
+            let verified = prime_f4_wide_dynamic_replay::verify_files(
+                &cell,
+                &original.expected(),
+                &artifacts,
+                &binding,
+                &limits,
+                prime_f4_wide_dynamic_replay::ReplayLimits {
+                    work: 10_000_000_000,
+                    allocation_bytes: 128 << 20,
+                    deadline: Instant::now() + Duration::from_secs(20),
+                },
+            )
+            .unwrap();
+            verify_dynamic_claims(&result.outcome, &verified).unwrap();
+            for stop in [Some("timeout"), Some("trace_budget_exhausted"), None] {
+                let censored = super::super::execution::terminal_outcome(
+                    result.outcome.clone(),
+                    stop,
+                    false,
+                    Some(137),
+                );
+                assert!(censored.get("pdp_witness_verified").is_none());
+                verify_dynamic_claims(&censored, &verified).unwrap();
+                for claim in [
+                    "solver_completed",
+                    "pdp_witness_verified",
+                    "certificate_durably_persisted",
+                    "group_domain_complete",
+                    "exhaustive_no_decomposition",
+                ] {
+                    let mut promoted = censored.clone();
+                    promoted[claim] = json!(true);
+                    assert!(
+                        verify_dynamic_claims(&promoted, &verified).is_err(),
+                        "{claim}"
+                    );
+                }
+                let mut malformed = censored.clone();
+                malformed["pdp_witness_verified"] = Value::Null;
+                assert!(verify_dynamic_claims(&malformed, &verified).is_err());
+                malformed = censored;
+                malformed
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("solver_completed");
+                assert!(verify_dynamic_claims(&malformed, &verified).is_err());
+            }
+            assert!(verified.first_witness_verified && verified.witness_capture_committed);
+            assert!(!verified.independent_derivation_verified);
+            let initial = super::super::capture::CaptureCursor::initial(&binding).unwrap();
+            let restored = root.join("restored");
+            let delta = super::super::capture::capture_committed_delta(
+                &cell, &restored, &binding, &initial, &limits,
+            )
+            .unwrap()
+            .unwrap();
+            super::super::capture::verify_captured_delta(&restored, &delta, &initial).unwrap();
+            // Simulate interruption after durable publication but before the
+            // terminal file survives. Preserve the witnessed prefix without
+            // promoting a completed search or a producer lifecycle claim.
+            let terminal_path = "prime-f4-wide-dynamic-result.json";
+            fs::remove_file(cell.join(terminal_path)).unwrap();
+            let prefix_artifacts: Vec<_> = artifacts
+                .iter()
+                .filter(|a| a.path != terminal_path)
+                .cloned()
+                .collect();
+            let prefix = prime_f4_wide_dynamic_replay::verify_files(
+                &cell,
+                &original.expected(),
+                &prefix_artifacts,
+                &binding,
+                &limits,
+                prime_f4_wide_dynamic_replay::ReplayLimits {
+                    work: 10_000_000_000,
+                    allocation_bytes: 128 << 20,
+                    deadline: Instant::now() + Duration::from_secs(20),
+                },
+            )
+            .unwrap();
+            assert!(prefix.first_witness_verified && prefix.witness_capture_committed);
+            assert!(!prefix.solver_completed_verified);
+            assert!(!prefix.independent_group_domain_complete && !prefix.negative_verified);
+            for missing in ["pdp-witness.json", "prime-f4-wide-dynamic-group.json"] {
+                let incomplete: Vec<_> = prefix_artifacts
+                    .iter()
+                    .filter(|a| a.path != missing)
+                    .cloned()
+                    .collect();
+                assert!(
+                    prime_f4_wide_dynamic_replay::verify_files(
+                        &cell,
+                        &original.expected(),
+                        &incomplete,
+                        &binding,
+                        &limits,
+                        prime_f4_wide_dynamic_replay::ReplayLimits {
+                            work: 10_000_000_000,
+                            allocation_bytes: 128 << 20,
+                            deadline: Instant::now() + Duration::from_secs(20),
+                        },
+                    )
+                    .is_err(),
+                    "missing {missing} must not support witnessed prefix"
+                );
+            }
+            let partial = json!({"status":"partial", "solver_completed":false,
+                "pdp_witness_verified":true, "certificate_durably_persisted":true});
+            verify_dynamic_claims(&partial, &prefix).unwrap();
+            for claim in [
+                "solver_completed",
+                "group_domain_complete",
+                "exhaustive_no_decomposition",
+            ] {
+                let mut forged = partial.clone();
+                forged[claim] = json!(true);
+                assert!(verify_dynamic_claims(&forged, &prefix).is_err());
+            }
+            fs::remove_dir_all(root).unwrap();
+        }
+    }
+
     #[test]
     fn dynamic_original_uses_verified_public_inputs_at_requested_boundaries() {
         for n in [47, 61] {
             for m in [4, 15] {
                 for twist in [false, true] {
                     let config = CaseConfig {
+                        channels: None,
+                        factor_base_policy: None,
                         family: "prime".into(),
                         n,
                         m,
@@ -3418,9 +5508,12 @@ mod tests {
             }
         }
     }
+
     #[test]
     fn dynamic_original_rejects_unbound_or_different_profile_limits() {
         let config = CaseConfig {
+            channels: None,
+            factor_base_policy: None,
             family: "prime".into(),
             n: 47,
             m: 4,
@@ -3528,6 +5621,7 @@ mod tests {
         assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
         fs::remove_dir_all(directory).unwrap();
     }
+
     #[test]
     fn native_sat_trace_caps_preserve_an_exact_accepted_prefix() {
         let mut log = SatEventLog::default();
@@ -3557,6 +5651,7 @@ mod tests {
             event
         );
     }
+
     #[test]
     fn finite_domain_selector_is_exact_for_non_subspace_codes() {
         let codes = vec![
@@ -3569,6 +5664,7 @@ mod tests {
             assert_eq!(s.eval(i as Mask, 5).to_biguint(), codes[i % 3]);
         }
     }
+
     #[test]
     fn wrong_target_does_not_pass_group_lift() {
         let c = BinaryCurve::test_curve_f256();
@@ -3580,6 +5676,7 @@ mod tests {
         let (found, _, _) = lift(&group, &domain, &xs, &target, 100);
         assert!(found.is_none());
     }
+
     #[test]
     fn exhaustive_pdp_trace_replays_every_transition() {
         let c = BinaryCurve::test_curve_f256();
@@ -3927,6 +6024,8 @@ mod tests {
 
     fn config(family: &str, solver: &str) -> CaseConfig {
         CaseConfig {
+            channels: None,
+            factor_base_policy: None,
             family: family.into(),
             n: 7,
             m: 2,
@@ -4793,6 +6892,331 @@ mod tests {
         assert!(solve_with_event_sink(&cfg, &case, &dir).is_err());
         fs::remove_dir_all(dir).unwrap();
     }
+
+    #[test]
+    fn dynamic_original_rejects_out_of_profile_or_unbound_inputs() {
+        let config = CaseConfig {
+            family: "prime".into(),
+            n: 47,
+            m: 4,
+            twist: false,
+            curve_seed: 7,
+            generator_index: 1,
+            key_index: 1,
+            seed: 42,
+            factor_base_size: 2,
+            degree_bound: 12,
+            work_limit: 16384,
+            solver: DYNAMIC_PROFILE.into(),
+            factor_base_policy: None,
+            channels: None,
+        };
+        let case = curves::generate(&config).unwrap();
+        for mutation in 0..4 {
+            let mut changed = config.clone();
+            match mutation {
+                0 => changed.solver = "f5".into(),
+                1 => changed.degree_bound = 13,
+                2 => changed.work_limit = 0,
+                _ => changed.m = 3,
+            }
+            assert!(dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err());
+        }
+        assert!(dynamic_original(&config, &case, 0, 128 << 20).is_err());
+        assert!(dynamic_original(&config, &case, 256 << 20, 0).is_err());
+    }
+
+    #[test]
+    fn prime_root_chain_m3_m4_replay_public_prefixes_and_reject_tampering() {
+        for (m, twist) in [(3, false), (3, true), (4, false), (4, true)] {
+            let mut cfg = config("prime", "root");
+            cfg.n = 23;
+            cfg.m = m;
+            cfg.twist = twist;
+            cfg.factor_base_size = 2;
+            cfg.work_limit = 20_000;
+            let mut case = curves::generate(&cfg).unwrap();
+            case.private_witness = Value::Null;
+            let group = Group::read(&case).unwrap();
+            let points = domain(&group, &case).unwrap();
+            let point = &points[0];
+            let mut target = group.zero();
+            for _ in 0..m {
+                target = group.add(&target, point);
+            }
+            assert_ne!(target, group.zero());
+            case.public_instance["target"] = target.json();
+            let result = solve(&cfg, &case).unwrap();
+            let payload = result
+                .artifacts
+                .iter()
+                .find(|a| a.role == "prime-root-certificates/v1")
+                .unwrap();
+            let certificate: Value = serde_json::from_slice(&payload.bytes).unwrap();
+            verify_prime_root_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &cfg,
+                &certificate,
+            )
+            .unwrap();
+            assert_eq!(
+                certificate["strategy"],
+                "prime-affine-s3-chain-prefix-root/v1"
+            );
+            assert_eq!(
+                result.outcome["pdp_witness_verified"], true,
+                "{}",
+                result.outcome
+            );
+            let mut changed = certificate.clone();
+            changed["queries"][0]["prefix_indices"][0] = json!(1);
+            assert!(verify_prime_root_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &cfg,
+                &changed
+            )
+            .is_err());
+            changed = certificate.clone();
+            changed["queries"][0]["coefficients_constant_first"][0] = json!(0);
+            assert!(verify_prime_root_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &cfg,
+                &changed
+            )
+            .is_err());
+        }
+    }
+
+    #[test]
+    fn prime_root_chain_m15_preserves_budget_censoring_on_both_twists() {
+        for twist in [false, true] {
+            let mut cfg = config("prime", "root");
+            cfg.m = 15;
+            cfg.twist = twist;
+            cfg.factor_base_size = 2;
+            cfg.work_limit = 14;
+            let mut case = curves::generate(&cfg).unwrap();
+            case.private_witness = Value::Null;
+            let result = solve(&cfg, &case).unwrap();
+            assert_eq!(result.outcome["status"], "budget_exhausted");
+            let payload = result
+                .artifacts
+                .iter()
+                .find(|a| a.role == "prime-root-certificates/v1")
+                .unwrap();
+            let certificate: Value = serde_json::from_slice(&payload.bytes).unwrap();
+            assert_eq!(certificate["queries"].as_array().unwrap().len(), 0);
+            assert_eq!(certificate["censored"], true);
+            verify_prime_root_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &cfg,
+                &certificate,
+            )
+            .unwrap();
+        }
+    }
+
+    #[test]
+    fn supervised_wide_prime_m4_m5_m15_uses_native_backend_on_both_twists() {
+        use super::super::execution::{LaunchContext, SolverExecutionContext};
+        let mut saw_bounded_linear_retention = false;
+        for m in [4, 5, 15] {
+            for (n, twist) in [(47, false), (47, true), (61, false), (61, true)] {
+                let mut cfg = config("prime", "f4");
+                cfg.n = n;
+                cfg.m = m;
+                cfg.twist = twist;
+                cfg.factor_base_size = 2;
+                cfg.degree_bound = 3;
+                cfg.work_limit = 50_000;
+                let mut case = curves::generate(&cfg).unwrap();
+                case.private_witness = Value::Null;
+                let binding = AttemptBinding {
+                    schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+                    run_sha256: "1".repeat(64),
+                    plan_sha256: "2".repeat(64),
+                    protocol_sha256: "3".repeat(64),
+                    config_sha256: "4".repeat(64),
+                    source_commit: "5".repeat(40),
+                    binary_sha256: "6".repeat(64),
+                    cell_index: n as u64 + u64::from(twist),
+                    attempt_sha256: "7".repeat(64),
+                };
+                let launch = LaunchContext {
+                    schema: "crypto.ml-dataset.execution-context/v1".into(),
+                    binding: binding.clone(),
+                    boot_id: "00000000-0000-0000-0000-000000000000".into(),
+                    start_monotonic_ns: 1,
+                    deadline_monotonic_ns: 30_000_000_001,
+                    seconds_per_case: 30,
+                    memory_bytes: 512 * 1024 * 1024,
+                    trace_bytes: 64 * 1024 * 1024,
+                };
+                let context = SolverExecutionContext {
+                    launch,
+                    deadline: Instant::now() + Duration::from_secs(30),
+                };
+                let root = std::env::temp_dir().join(format!(
+                    "prime-wide-m{m}-{}-{}-{n}-{twist}",
+                    std::process::id(),
+                    std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_nanos()
+                ));
+                struct Cleanup(PathBuf);
+                impl Drop for Cleanup {
+                    fn drop(&mut self) {
+                        let _ = fs::remove_dir_all(&self.0);
+                    }
+                }
+                let _cleanup = Cleanup(root.clone());
+                let data = solve_with_bound_event_sink_context(
+                    &cfg,
+                    &case,
+                    &root.join("capture"),
+                    binding,
+                    super::super::capture::capture_limits(64).unwrap(),
+                    Some(&context),
+                )
+                .unwrap_or_else(|e| panic!("m={m}, n={n}, twist={twist}: {e}"));
+                assert_eq!(data.outcome["strategy"], dynamic_strategy(m).unwrap());
+                assert_eq!(data.outcome["native_backend_invoked"], true);
+                assert_eq!(data.outcome["solver_completed"], false);
+                assert!(data.outcome["first_fall_degree"].is_null());
+                assert!(data.outcome["last_fall_degree"].is_null());
+                assert!(data
+                    .artifacts
+                    .iter()
+                    .any(|a| a.path == "prime-f4-input.json"));
+                assert!(data
+                    .artifacts
+                    .iter()
+                    .any(|a| a.path == "prime-f4-wide-dynamic-result.json"));
+                if data.outcome["linear_retention_stop"] == "work_limit" {
+                    assert_eq!(data.outcome["linear_artifact_retained"], false);
+                    assert!(data
+                        .artifacts
+                        .iter()
+                        .any(|a| a.path == "prime-f4-wide-dynamic-result.json"));
+                    saw_bounded_linear_retention = true;
+                }
+            }
+        }
+        assert!(saw_bounded_linear_retention);
+    }
+
+    #[test]
+    fn wide_linear_retention_only_censors_work_limit() {
+        use super::prime_f4_wide_dynamic::Stop;
+        assert_eq!(super::classify_wide_linear_retention(Ok(())), Ok(true));
+        assert_eq!(
+            super::classify_wide_linear_retention(Err(Stop::WorkLimit)),
+            Ok(false)
+        );
+        for stop in [Stop::Deadline, Stop::StorageLimit, Stop::InvalidInput] {
+            assert!(super::classify_wide_linear_retention(Err(stop))
+                .unwrap_err()
+                .contains(&format!("{stop:?}")));
+        }
+    }
+
+    #[test]
+    fn wide_group_persistence_failure_cannot_seal_as_partial() {
+        use super::prime_f4_wide_dynamic::GroupStop;
+        assert!(super::require_wide_group_persistence(GroupStop::CheckWorkLimit).is_ok());
+        assert!(super::require_wide_group_persistence(GroupStop::Deadline).is_ok());
+        assert!(
+            super::require_wide_group_persistence(GroupStop::PersistenceFailure)
+                .unwrap_err()
+                .contains("event persistence stopped")
+        );
+    }
+
+    #[test]
+    fn wide_frozen_m13_m15_boundary_retains_terminal_on_both_twists() {
+        use super::super::execution::{LaunchContext, SolverExecutionContext};
+        for (n, m, twist) in [
+            (47, 13, false),
+            (47, 13, true),
+            (47, 15, false),
+            (47, 15, true),
+            (61, 15, false),
+            (61, 15, true),
+        ] {
+            let mut cfg = config("prime", "f4");
+            cfg.n = n;
+            cfg.m = m;
+            cfg.twist = twist;
+            cfg.curve_seed = 0;
+            cfg.generator_index = 0;
+            cfg.key_index = 0;
+            cfg.seed = 20261101;
+            cfg.factor_base_size = 2;
+            cfg.degree_bound = 3;
+            cfg.work_limit = 50_000;
+            let mut case = curves::generate(&cfg).unwrap();
+            case.private_witness = Value::Null;
+            let binding = AttemptBinding {
+                schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+                run_sha256: "1".repeat(64),
+                plan_sha256: "2".repeat(64),
+                protocol_sha256: "3".repeat(64),
+                config_sha256: "4".repeat(64),
+                source_commit: "5".repeat(40),
+                binary_sha256: "6".repeat(64),
+                cell_index: n as u64 + u64::from(twist),
+                attempt_sha256: "7".repeat(64),
+            };
+            let context = SolverExecutionContext {
+                launch: LaunchContext {
+                    schema: "crypto.ml-dataset.execution-context/v1".into(),
+                    binding: binding.clone(),
+                    boot_id: "00000000-0000-0000-0000-000000000000".into(),
+                    start_monotonic_ns: 1,
+                    deadline_monotonic_ns: 30_000_000_001,
+                    seconds_per_case: 30,
+                    memory_bytes: 2048 * 1024 * 1024,
+                    trace_bytes: 64 * 1024 * 1024,
+                },
+                deadline: Instant::now() + Duration::from_secs(30),
+            };
+            let root = std::env::temp_dir().join(format!(
+                "prime-wide-m{m}-frozen-{n}-{twist}-{}-{}",
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ));
+            let result = solve_with_bound_event_sink_context(
+                &cfg,
+                &case,
+                &root.join("capture"),
+                binding,
+                super::super::capture::capture_limits(64).unwrap(),
+                Some(&context),
+            );
+            let _ = fs::remove_dir_all(&root);
+            let data = result.unwrap_or_else(|e| panic!("m={m}, n={n}, twist={twist}: {e}"));
+            assert_eq!(data.outcome["status"], "partial");
+            assert_eq!(data.outcome["native_backend_invoked"], true);
+            assert!(data.outcome["first_fall_degree"].is_null());
+            assert!(data.outcome["last_fall_degree"].is_null());
+            let terminal = data
+                .artifacts
+                .iter()
+                .find(|a| a.path == "prime-f4-wide-dynamic-result.json")
+                .unwrap();
+            let terminal: Value = serde_json::from_slice(&terminal.bytes).unwrap();
+            assert_ne!(terminal["native_stop"], "observer");
+            assert_eq!(terminal["accounting"]["events"]["pending"], 0);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -4830,5 +7254,2322 @@ mod bounded_witness_bridge_tests {
             ));
             assert_eq!(budget.reserved_bytes, 0);
         }
+    }
+}
+
+#[cfg(test)]
+mod verified_worker_original_tests {
+    use super::*;
+    use crate::ml_dataset::{self as dataset, storage};
+    pub(super) struct Fixture {
+        pub(super) root: PathBuf,
+        pub(super) config: CaseConfig,
+        pub(super) case: CaseData,
+        pub(super) binding: AttemptBinding,
+    }
+    impl Fixture {
+        fn new() -> Self {
+            Self::with_shape(23, false, 2)
+        }
+        pub(super) fn with_shape(n: u32, twist: bool, factor_base_size: usize) -> Self {
+            Self::with_profile(n, twist, factor_base_size, "enumerate", 100, false, false)
+        }
+        /// Actual frozen software-control plan; no edits to a live attempt.
+        pub(super) fn with_runtime_shape(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+        ) -> Self {
+            Self::with_profile(n, twist, factor_base_size, solver, 16384, true, false)
+        }
+        pub(super) fn with_positive_runtime_shape(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+        ) -> Self {
+            Self::with_profile(n, twist, factor_base_size, solver, 16384, true, true)
+        }
+        fn with_profile(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+            positive_control: bool,
+        ) -> Self {
+            Self::with_policy_profile(
+                n,
+                twist,
+                factor_base_size,
+                solver,
+                work_limit,
+                execution_required,
+                positive_control,
+                None,
+            )
+        }
+        pub(super) fn with_policy_profile(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+            positive_control: bool,
+            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
+        ) -> Self {
+            Self::with_family_policy_profile(
+                n,
+                twist,
+                factor_base_size,
+                solver,
+                work_limit,
+                execution_required,
+                positive_control,
+                policy,
+                "koblitz",
+                3,
+            )
+        }
+        pub(super) fn with_ordinary_runtime_shape(n: u32, twist: bool, solver: &str) -> Self {
+            Self::with_ordinary_control_shape(n, twist, solver, false)
+        }
+        pub(super) fn with_ordinary_control_shape(
+            n: u32,
+            twist: bool,
+            solver: &str,
+            controlled: bool,
+        ) -> Self {
+            Self::with_ordinary_degree_shape(n, twist, solver, controlled, 3)
+        }
+        pub(super) fn with_ordinary_degree_shape(
+            n: u32,
+            twist: bool,
+            solver: &str,
+            controlled: bool,
+            degree_bound: u32,
+        ) -> Self {
+            Self::with_ordinary_limits_shape(n, twist, solver, controlled, degree_bound, 16384)
+        }
+        pub(super) fn with_ordinary_limits_shape(
+            n: u32,
+            twist: bool,
+            solver: &str,
+            controlled: bool,
+            degree_bound: u32,
+            work_limit: u64,
+        ) -> Self {
+            let fixture = Self::with_family_policy_profile(
+                n,
+                twist,
+                4,
+                solver,
+                work_limit,
+                true,
+                controlled,
+                Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),
+                "binary",
+                degree_bound,
+            );
+            Self::finish_original_capture_setup(fixture)
+        }
+        pub(super) fn with_original_row_shape(
+            n: u32,
+            twist: bool,
+            solver: &str,
+            work: u64,
+        ) -> Self {
+            let channels =
+                serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v3",
+                "affine_boolean_row":{"mode":"affine_unit_row","pattern":1,"row_index":0}}))
+                .unwrap();
+            Self::finish_original_capture_setup(Self::with_family_policy_channels(
+                n,
+                twist,
+                4,
+                solver,
+                work,
+                true,
+                false,
+                Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),
+                "binary",
+                3,
+                Some(channels),
+            ))
+        }
+        pub(super) fn with_sat_initial_shape(n: u32, twist: bool) -> Self {
+            Self::with_sat_initial_work(n, twist, 16384)
+        }
+        pub(super) fn with_sat_initial_work(n: u32, twist: bool, work_limit: u64) -> Self {
+            let channels = serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v2", "sat_initial":{"mode":"capture_and_check_initial"}})).unwrap();
+            let fixture = Self::with_family_policy_channels(
+                n,
+                twist,
+                4,
+                "sat",
+                work_limit,
+                true,
+                false,
+                Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),
+                "binary",
+                3,
+                Some(channels),
+            );
+            Self::finish_original_capture_setup(fixture)
+        }
+        fn finish_original_capture_setup(fixture: Self) -> Self {
+            // Test-only supervisor setup: these are the original frozen attempt
+            // and trace limits, not permission to activate ordinary dispatch.
+            dataset::telemetry::checked::install_policy(&fixture.root).unwrap();
+            let binding = AttemptBinding::from_cell_files(&fixture.root).unwrap();
+            assert_eq!(binding, fixture.binding);
+            let run: Value = dataset::read_json(&fixture.root.join("run.json")).unwrap();
+            let limits =
+                dataset::capture::capture_limits(run["trace_mib"].as_u64().unwrap()).unwrap();
+            storage::write_json(
+                &fixture.root,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &binding,
+            )
+            .unwrap();
+            storage::write_json(
+                &fixture.root,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &limits,
+            )
+            .unwrap();
+            let admitted = dataset::admit_capture_context(&fixture.root)
+                .unwrap()
+                .unwrap();
+            assert_eq!(admitted, (binding, limits));
+            assert!(!fixture.root.join("public.json").exists());
+            assert!(!fixture.root.join("factor-base.json").exists());
+            fixture
+        }
+        fn with_family_policy_profile(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+            positive_control: bool,
+            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
+            family: &str,
+            degree_bound: u32,
+        ) -> Self {
+            Self::with_family_policy_channels(
+                n,
+                twist,
+                factor_base_size,
+                solver,
+                work_limit,
+                execution_required,
+                positive_control,
+                policy,
+                family,
+                degree_bound,
+                None,
+            )
+        }
+        fn with_family_policy_channels(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+            positive_control: bool,
+            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
+            family: &str,
+            degree_bound: u32,
+            channels: Option<crate::ml_dataset::types::ChannelRequests>,
+        ) -> Self {
+            Self::with_family_policy_channels_recipe(
+                n,
+                twist,
+                factor_base_size,
+                solver,
+                work_limit,
+                execution_required,
+                positive_control,
+                policy,
+                family,
+                degree_bound,
+                channels,
+                false,
+            )
+        }
+        #[cfg(sat_qualification_child)]
+        pub(super) fn with_fixed_sat_qualification(family: &str, twist: bool) -> Self {
+            let channels=serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v2","sat_initial":{"mode":"capture_and_check_initial"}})).unwrap();
+            Self::finish_original_capture_setup(Self::with_family_policy_channels_recipe(
+                23,
+                twist,
+                4,
+                "sat",
+                16384,
+                true,
+                false,
+                Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),
+                family,
+                3,
+                Some(channels),
+                true,
+            ))
+        }
+        fn with_family_policy_channels_recipe(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+            positive_control: bool,
+            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
+            family: &str,
+            degree_bound: u32,
+            channels: Option<crate::ml_dataset::types::ChannelRequests>,
+            qualification: bool,
+        ) -> Self {
+            let nonce = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let root = if qualification {
+                PathBuf::from(
+                    std::env::var_os("SAT_REFERENCE_RESTRICTED_OUTPUT")
+                        .expect("supervised qualification output required"),
+                )
+                .join("original-case")
+            } else {
+                std::env::temp_dir().join(format!("verified-worker-{}-{nonce}", std::process::id()))
+            };
+            fs::create_dir(&root).unwrap();
+            let mut protocol = json!({"schema":"experiment.protocol/v1", "purpose":"verified worker input software controls"});
+            if positive_control {
+                protocol["software_control"] = json!({
+                    "population":"conditioned-positive-pdp-software-control",
+                    "field_degree":23,
+                    "target_rule":"first nonzero retained factor-base point P; valid tuple P,P,-P",
+                    "negative_control_rule":"first scalar in 1..=65 whose nonzero generator multiple is outside all 64 ordered signed factor-base triples; preserve curve generator and factor base",
+                    "known_answer_rule":"bounded native-arithmetic BSGS relative to unchanged original generator, then independent curves::verify",
+                    "bsgs_baby_slot_cap":4096,
+                    "freeze_boundary":"control rule before generation; all original bytes final before token/capture admission",
+                    "root_failure_rule":"conflicting raw pdp-witness.json before producer entry"
+                });
+            }
+            if qualification {
+                protocol["software_control"] = json!({"schema":"sat-fixed-nonroot-qualification/v3","fixed_rows":[0,0,2],"pattern":0,"qualification":"at least two distinct complete original-map models; conditional candidate","fallback":"forbidden","baby_slot_cap":4096,"reference_work":8000000,"reference_bytes":16777216,"reference_additions":100000,"checkpoint_total_bytes":67108864,"deadline":"original monotonic deadline; no renewal"});
+            }
+            if let Some(request) = &channels {
+                protocol["extensions"]["dataset_channels"] = serde_json::to_value(request).unwrap();
+            }
+            let body = dataset::protocol_canonical_bytes(&protocol).unwrap();
+            protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-31T00:00:00Z"});
+            let bytes = serde_json::to_vec(&protocol).unwrap();
+            let plan = dataset::DatasetPlan {
+                channels: channels.clone(),
+                factor_base_policies: policy.clone().into_iter().collect(),
+                schema: if channels.is_some() {
+                    "crypto.ml-dataset.plan/v3"
+                } else if policy.is_some() {
+                    "crypto.ml-dataset.plan/v2"
+                } else {
+                    "crypto.ml-dataset.plan/v1"
+                }
+                .into(),
+                field_sizes: vec![n],
+                arities: vec![3],
+                families: vec![family.into()],
+                solvers: vec![solver.into()],
+                curve_seeds: 1,
+                generators: 1,
+                keys: 1,
+                seed: 42,
+                factor_base_size,
+                degree_bound,
+                work_limit,
+                twists: true,
+                protocol_sha256: Some(dataset::digest(&bytes)),
+                split_rule: "curve-twist-component-sha256-v1".into(),
+            };
+            let hash = plan.binding_sha256().unwrap();
+            let index = u64::from(twist);
+            let config = plan.cell(index).unwrap();
+            assert_eq!(config.twist, twist);
+            let mut run = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":hash,"source_commit":"a".repeat(40),"binary_sha256":"b".repeat(64)});
+            if execution_required {
+                run["execution_context_required"] = true.into();
+                run["seconds_per_case"] = 60.into();
+                run["memory_mib"] = 256.into();
+                run["trace_mib"] = 128.into();
+            }
+            storage::write_json(&root, "run.json", "run", &run).unwrap();
+            storage::write_json(&root, "plan.json", "plan", &plan).unwrap();
+            storage::write_json(&root, "config.json", "config", &config).unwrap();
+            storage::write_json(
+                &root,
+                "attempt.json",
+                "attempt",
+                &json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":hash}),
+            )
+            .unwrap();
+            storage::write_bytes(&root, "protocol.json", "protocol", "json", &bytes).unwrap();
+            let binding = AttemptBinding::from_cell_files(&root).unwrap();
+            let case = if qualification {
+                CaseData {
+                    public_instance: Value::Null,
+                    private_witness: Value::Null,
+                    factor_base: Value::Null,
+                }
+            } else {
+                curves::generate(&config).unwrap()
+            };
+            Self {
+                root,
+                config,
+                case,
+                binding,
+            }
+        }
+    }
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            if std::thread::panicking() {
+                eprintln!(
+                    "preserved failed verified-worker fixture: {}",
+                    self.root.display()
+                );
+            } else {
+                let _ = fs::remove_dir_all(&self.root);
+            }
+        }
+    }
+    #[test]
+    fn worker_token_rejects_self_consistent_policy_substitution_before_original_writes() {
+        use crate::ml_dataset::types::FactorBasePolicy;
+        for replace_policy in [true, false] {
+            let policy = FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 64,
+            };
+            // Recipe, plan, config and binding are frozen before generating or verifying input.
+            let f = Fixture::with_policy_profile(
+                11,
+                false,
+                4,
+                "enumerate",
+                16384,
+                false,
+                false,
+                Some(policy.clone()),
+            );
+            let seed = dataset::factor_bases::sampling_seed(&f.config);
+            let wrong = if replace_policy {
+                FactorBasePolicy::SampledXProjectedControl {
+                    candidate_limit: 32,
+                }
+            } else {
+                policy
+            };
+            let mut case = f.case.clone();
+            case.factor_base = dataset::factor_bases::build(
+                &case.public_instance,
+                &wrong,
+                f.config.factor_base_size,
+                if replace_policy { seed } else { seed ^ 1 },
+                false,
+            )
+            .unwrap()
+            .0;
+            curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+            let mut registry = Vec::new();
+            let error = verify_and_store_worker_originals(
+                &f.config,
+                &case,
+                &f.root,
+                Some(&f.binding),
+                &mut registry,
+            )
+            .err()
+            .expect("substituted recipe must not mint token");
+            assert!(error.contains("recipe or control seed differs from frozen config"));
+            assert!(!f.root.join("public.json").exists());
+            assert!(!f.root.join("factor-base.json").exists());
+        }
+        let f = Fixture::with_policy_profile(
+            11,
+            false,
+            4,
+            "enumerate",
+            16384,
+            false,
+            false,
+            Some(FactorBasePolicy::Legacy {}),
+        );
+        let mut registry = Vec::new();
+        verify_and_store_worker_originals(
+            &f.config,
+            &f.case,
+            &f.root,
+            Some(&f.binding),
+            &mut registry,
+        )
+        .unwrap();
+        assert!(f.root.join("factor-base.json").exists());
+    }
+
+    #[test]
+    fn worker_koblitz_dispatch_rejects_missing_context_before_capture_creation() {
+        let f = Fixture::with_runtime_shape(23, false, 4, "f4");
+        let mut registry = Vec::new();
+        let original = verify_and_store_worker_originals(
+            &f.config,
+            &f.case,
+            &f.root,
+            Some(&f.binding),
+            &mut registry,
+        )
+        .unwrap();
+        let live = f.root.join("live");
+        let error = solve_with_verified_worker_originals(
+            &f.config,
+            &f.case,
+            &live,
+            f.binding.clone(),
+            dataset::capture::capture_limits(16).unwrap(),
+            None,
+            &original,
+        )
+        .err()
+        .expect("missing original execution context must be refused");
+        assert!(error.contains("requires original execution context"));
+        assert!(!live.exists());
+        assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
+    }
+
+    #[test]
+    fn worker_koblitz_dispatch_requires_exact_supported_profile() {
+        for twist in [false, true] {
+            let mut f = Fixture::with_shape(23, twist, 4);
+            f.config.solver = "f4".into();
+            assert!(koblitz_worker_profile(&f.config, &f.case));
+            f.config.solver = "f5".into();
+            assert!(koblitz_worker_profile(&f.config, &f.case));
+            for variant in 0..8 {
+                let mut config = f.config.clone();
+                match variant {
+                    0 => config.family = "binary".into(),
+                    1 => config.m = 4,
+                    2 => config.n = 32,
+                    3 => config.factor_base_size = 2,
+                    4 => config.degree_bound = 0,
+                    5 => config.degree_bound = 7,
+                    6 => config.work_limit = 0,
+                    _ => config.solver = "f6".into(),
+                }
+                assert!(
+                    !koblitz_worker_profile(&config, &f.case),
+                    "variant {variant}"
+                );
+            }
+            let mut malformed = f.case.clone();
+            malformed.factor_base["points"][1] = malformed.factor_base["points"][0].clone();
+            assert!(!koblitz_worker_profile(&f.config, &malformed));
+        }
+    }
+
+    #[test]
+    fn verified_worker_originals_bind_real_files_and_reject_substitution() {
+        let f = Fixture::new();
+        let mut registry = Vec::new();
+        let original = verify_and_store_worker_originals(
+            &f.config,
+            &f.case,
+            &f.root,
+            Some(&f.binding),
+            &mut registry,
+        )
+        .unwrap();
+        let live = f.root.join("live");
+        original
+            .matches_bound(&f.config, &f.case, &live, &f.binding)
+            .unwrap();
+        assert_eq!(
+            hex::encode(original.public_sha256),
+            dataset::digest(&fs::read(f.root.join("public.json")).unwrap())
+        );
+        assert_eq!(
+            hex::encode(original.factor_base_sha256),
+            dataset::digest(&fs::read(f.root.join("factor-base.json")).unwrap())
+        );
+        assert!(original
+            .matches_bound(&f.config.clone(), &f.case, &live, &f.binding)
+            .is_err());
+        assert!(original
+            .matches_bound(&f.config, &f.case.clone(), &live, &f.binding)
+            .is_err());
+        assert!(original
+            .matches_bound(&f.config, &f.case, &f.root.join("other"), &f.binding)
+            .is_err());
+        let mut wrong = f.binding.clone();
+        wrong.cell_index += 1;
+        assert!(original
+            .matches_bound(&f.config, &f.case, &live, &wrong)
+            .is_err());
+        for name in ["public.json", "factor-base.json", "config.json"] {
+            let path = f.root.join(name);
+            let saved = fs::read(&path).unwrap();
+            fs::write(&path, b"{}").unwrap();
+            assert!(
+                original
+                    .matches_bound(&f.config, &f.case, &live, &f.binding)
+                    .is_err(),
+                "{name}"
+            );
+            fs::write(path, saved).unwrap();
+        }
+        let result = solve_with_verified_worker_originals(
+            &f.config,
+            &f.case,
+            &live,
+            f.binding.clone(),
+            dataset::capture::capture_limits(16).unwrap(),
+            None,
+            &original,
+        )
+        .unwrap();
+        assert!(result.data.outcome.is_object());
+        assert!(result.stored.is_empty());
+        assert!(live.join("committed.json").is_file());
+    }
+    #[test]
+    fn verified_worker_originals_require_both_checks_and_successful_storage() {
+        for failure in 0..4 {
+            let mut f = Fixture::new();
+            let mut registry = Vec::new();
+            match failure {
+                0 => f.case.private_witness["schema"] = json!("invalid"),
+                1 => f.case.factor_base["schema"] = json!("invalid"),
+                2 => {
+                    fs::write(f.root.join("public.json"), b"conflict").unwrap();
+                }
+                _ => f.binding.cell_index += 1,
+            }
+            assert!(
+                verify_and_store_worker_originals(
+                    &f.config,
+                    &f.case,
+                    &f.root,
+                    Some(&f.binding),
+                    &mut registry
+                )
+                .is_err(),
+                "{failure}"
+            );
+            assert!(!f.root.join("factor-base.json").exists());
+            assert!(!f.root.join("live").exists());
+        }
+    }
+}
+
+#[cfg(test)]
+mod capability_dispatch_metadata_controls {
+    use super::*;
+    fn config() -> CaseConfig {
+        CaseConfig {
+            channels: None,
+            factor_base_policy: None,
+            family: "koblitz".into(),
+            n: 23,
+            m: 3,
+            twist: false,
+            curve_seed: 1,
+            generator_index: 0,
+            key_index: 0,
+            seed: 42,
+            factor_base_size: 4,
+            degree_bound: 3,
+            work_limit: 16384,
+            solver: "f4".into(),
+        }
+    }
+    fn entry(caps: &Value, id: &str) -> Value {
+        caps["solvers"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|e| e["id"] == id)
+            .unwrap()
+            .clone()
+    }
+    #[test]
+    fn koblitz_metadata_describes_only_the_supervised_dispatch_extension() {
+        let caps = capabilities();
+        let f4 = entry(&caps, "f4");
+        let f5 = entry(&caps, "f5");
+        assert_eq!(f4["m_by_family"]["binary"], json!([2, 2]));
+        assert_eq!(f4["m_by_family"]["koblitz"], json!([2, 2]));
+        assert_eq!(f5["m"], json!([2, 2]));
+        let p = &f4["supervised_koblitz_m3_profile"];
+        assert_eq!(p, &f5["supervised_koblitz_m3_profile"]);
+        assert_eq!(p["family"], "koblitz");
+        assert_eq!(p["m"], json!([3, 3]));
+        assert_eq!(p["n_ranges_inclusive"], json!([[23, 31], [47, 61]]));
+        assert_eq!(p["degree_bound_inclusive"], json!([1, 6]));
+        assert_eq!(p["factor_base_size"], 4);
+        assert_eq!(p["signed_domain_points"], 4);
+        assert_eq!(p["distinct_x_codes"], 2);
+        assert_eq!(p["twists"], json!([false, true]));
+        for key in [
+            "requires_verified_worker_originals",
+            "requires_original_execution_context",
+            "requires_bound_capture",
+            "requires_positive_work_limit",
+            "requires_distinct_signed_points",
+            "requires_sign_closed_factor_base",
+        ] {
+            assert_eq!(p[key], true, "{key}");
+        }
+        for id in ["weil", "f6", "root", DYNAMIC_PROFILE] {
+            assert!(entry(&caps, id)["supervised_koblitz_m3_profile"].is_null());
+        }
+        // Shape-only dispatcher control, not a mathematical curve fixture.
+        // Original-input verification remains a separate mandatory gate.
+        let case = CaseData {
+            public_instance: Value::Null,
+            private_witness: Value::Null,
+            factor_base: json!({"points":[{"x":"1","y":"2"},{"x":"1","y":"3"},{"x":"2","y":"4"},{"x":"2","y":"6"}]}),
+        };
+        for n in 20..=63 {
+            for solver in ["f4", "f5"] {
+                let mut c = config();
+                c.n = n;
+                c.solver = solver.into();
+                assert_eq!(
+                    koblitz_worker_profile(&c, &case),
+                    (23..=31).contains(&n) || (47..=61).contains(&n)
+                );
+            }
+        }
+        for family in ["binary", "prime"] {
+            let mut c = config();
+            c.family = family.into();
+            assert!(!koblitz_worker_profile(&c, &case));
+        }
+        for m in 2..=15 {
+            let mut c = config();
+            c.m = m;
+            assert_eq!(koblitz_worker_profile(&c, &case), m == 3);
+        }
+        for degree in 0..=7 {
+            let mut c = config();
+            c.degree_bound = degree;
+            assert_eq!(koblitz_worker_profile(&c, &case), (1..=6).contains(&degree));
+        }
+    }
+    #[test]
+    fn dynamic_metadata_preserves_its_separate_solver_and_runtime_gates() {
+        let p = entry(&capabilities(), DYNAMIC_PROFILE);
+        assert_eq!(p["families"], json!(["prime"]));
+        assert_eq!(p["n"], json!([33, 61]));
+        assert_eq!(p["m"], json!([4, 15]));
+        assert_eq!(p["degree_bound"], 12);
+        assert_eq!(p["minimum_signed_domain_points"], 1);
+        assert_eq!(p["maximum_signed_domain_points"], 64);
+        assert_eq!(p["minimum_x_codes"], 1);
+        assert_eq!(p["maximum_x_codes"], 32);
+        for key in [
+            "requires_original_execution_context",
+            "requires_bound_capture",
+            "requires_positive_work_limit",
+            "requires_positive_original_memory_trace",
+            "requires_whole_mib_trace_limit",
+        ] {
+            assert_eq!(p[key], true, "{key}");
+        }
+        for family in ["prime", "binary", "koblitz"] {
+            for n in [23, 32, 33, 47, 61, 62] {
+                for m in [2, 3, 4, 15] {
+                    let mut c = config();
+                    c.family = family.into();
+                    c.n = n;
+                    c.m = m;
+                    c.degree_bound = 12;
+                    c.solver = DYNAMIC_PROFILE.into();
+                    assert_eq!(
+                        dynamic_supported(&c),
+                        family == "prime" && (33..=61).contains(&n) && (4..=15).contains(&m)
+                    );
+                }
+            }
+        }
+        let mut c = config();
+        c.family = "prime".into();
+        c.n = 33;
+        c.m = 4;
+        c.solver = DYNAMIC_PROFILE.into();
+        c.degree_bound = 12;
+        c.work_limit = 0;
+        assert!(!dynamic_supported(&c));
+        c.work_limit = 1;
+        c.degree_bound = 11;
+        assert!(!dynamic_supported(&c));
+    }
+}
+
+#[cfg(test)]
+mod requested_channel_tests {
+    use super::*;
+    #[test]
+    fn full_arity_requests_are_retained_and_unsupported_is_not_success() {
+        let mut c: CaseConfig = serde_json::from_value(json!({"family":"binary","n":23,"m":3,
+            "twist":false,"curve_seed":0,"generator_index":0,"key_index":0,"seed":20261027,
+            "factor_base_size":4,"degree_bound":3,"work_limit":16384,"solver":"f4",
+            "channels":{"schema":"crypto.ml-dataset.channel-requests/v1",
+                "boolean_consequence":{"mode":"produce","row_index":0},
+                "sat_initial":{"mode":"capture_and_check_initial"}}}))
+        .unwrap();
+        for m in 2..=15 {
+            for twist in [false, true] {
+                c.m = m;
+                c.twist = twist;
+                let d = requested_channel_disposition(&c).unwrap().unwrap();
+                assert_eq!(
+                    d["boolean_consequence"]["status"],
+                    if m == 3 { "requested" } else { "unsupported" }
+                );
+                assert_eq!(d["sat_initial"]["status"], "unsupported");
+                let mut outcome = json!({"requested_channels":d});
+                verify_requested_channel_disposition(&c, &outcome).unwrap();
+                outcome["requested_channels"]["sat_initial"]["status"] = json!("verified");
+                assert!(verify_requested_channel_disposition(&c, &outcome).is_err());
+            }
+        }
+        c.channels = None;
+        verify_requested_channel_disposition(&c, &json!({})).unwrap();
+        assert!(
+            verify_requested_channel_disposition(&c, &json!({"requested_channels":null})).is_err()
+        );
+    }
+}
+
+#[cfg(test)]
+mod sat_initial_dispatch_replay_tests {
+    use super::*;
+    use crate::ml_dataset::{self as dataset, capture, storage, telemetry};
+    fn policy() -> SatReplayPolicy {
+        // Explicit software-control historical replay allowance. This creates
+        // no producer authority and changes no producer cap or original deadline.
+        SatReplayPolicy {
+            work: 1_000_000_000_000,
+            bytes: 8_000_000_000,
+            deadline: Instant::now() + Duration::from_secs(120),
+            stream_bytes: 16 * 1024 * 1024,
+            payload_bytes: 16 * 1024 * 1024,
+        }
+    }
+    #[test]
+    fn requested_sat_dispatch_receipt_and_replay_require_genuine_both_twist_success() {
+        for twist in [false, true] {
+            let f = verified_worker_original_tests::Fixture::with_sat_initial_shape(23, twist);
+            dataset::execution::create(&f.root).unwrap();
+            let mut artifacts = Vec::new();
+            let case = telemetry::measured(&f.root, &mut artifacts, "curve-construction", || {
+                dataset::curves::generate(&f.config)
+            })
+            .unwrap();
+            let token = verify_and_store_worker_originals(
+                &f.config,
+                &case,
+                &f.root,
+                Some(&f.binding),
+                &mut artifacts,
+            )
+            .unwrap();
+            let context = dataset::execution::admit(&f.root).unwrap().unwrap();
+            let (_, caps) = dataset::admit_capture_context(&f.root).unwrap().unwrap();
+            let output = solve_with_verified_worker_originals(
+                &f.config,
+                &case,
+                &f.root.join("live"),
+                f.binding.clone(),
+                caps,
+                Some(&context),
+                &token,
+            )
+            .unwrap();
+            let (data, stored, residual) = output.into_parts();
+            assert!(!residual.sat_report_unavailable());
+            assert!(residual.sat.is_some());
+            assert!(stored.is_empty());
+            assert_eq!(
+                data.outcome["initial_checked"], true,
+                "actual original-budget dispatch must finish initial gate"
+            );
+            assert_eq!(data.outcome["patterns_total"], 2);
+            assert_eq!(data.outcome["patterns_checked"], 1);
+            artifacts.push(
+                storage::write_json(&f.root, "result.json", "solver-outcome", &data.outcome)
+                    .unwrap(),
+            );
+            for (path, role) in dataset::CAPTURE_CONTEXT
+                .into_iter()
+                .chain([(dataset::execution::PATH, dataset::execution::ROLE)])
+            {
+                let (sha256, bytes) = crate::store::hash_file(&f.root.join(path)).unwrap();
+                artifacts.push(dataset::types::Artifact {
+                    path: path.into(),
+                    role: role.into(),
+                    encoding: "json".into(),
+                    sha256,
+                    bytes,
+                });
+            }
+            let head = fs::read(f.root.join("live/committed.json")).unwrap();
+            assert!(needs_sat_initial_replay(
+                &f.config,
+                &data.outcome,
+                &artifacts
+            ));
+            let actual_head: capture::CommittedHead = serde_json::from_slice(&head).unwrap();
+            assert!(
+                koblitz_m3::sat_original_owner::central::check_terminal_fields_for_control(
+                    &f.config,
+                    &data.outcome,
+                    &actual_head
+                )
+            );
+            for (field, replacement) in [
+                ("pattern", json!(1)),
+                ("patterns_total", json!(3)),
+                ("patterns_checked", json!(2)),
+                ("checkpoint_sequence", json!(actual_head.event_count + 1)),
+                ("checkpoint_sha256", json!("0".repeat(64))),
+                ("first_stop", json!("Work")),
+                ("solver_completed", json!(true)),
+                ("initial_checked", json!(false)),
+            ] {
+                let mut changed = data.outcome.clone();
+                changed[field] = replacement;
+                assert!(
+                    !koblitz_m3::sat_original_owner::central::check_terminal_fields_for_control(
+                        &f.config,
+                        &changed,
+                        &actual_head
+                    ),
+                    "field {field}"
+                );
+            }
+            let mut checked =
+                verify_sat_initial_cell(&f.root, &f.config, &data.outcome, &artifacts, policy());
+            assert_eq!(checked.verdict(), SatReplayVerdict::CheckedInitial);
+            assert!(matches!(checked.owner, SatReplayOwner::Terminal(_)));
+            let before_repeat = checked.charged();
+            assert_eq!(
+                checked.revalidate(&f.root, &f.config, &data.outcome, &artifacts),
+                SatReplayVerdict::CheckedInitial
+            );
+            let after_repeat = checked.charged();
+            assert!(after_repeat.0 > before_repeat.0 && after_repeat.1 > before_repeat.1);
+            // The committed head stays A while the actual map payload changes.
+            // A cache of manifest/head alone would incorrectly accept this.
+            let map_path = f
+                .root
+                .join("live/payloads/sat-original-pattern-0.gate.json");
+            let saved = fs::read(&map_path).unwrap();
+            let mut changed = saved.clone();
+            changed[0] ^= 1;
+            fs::write(&map_path, &changed).unwrap();
+            assert_eq!(head, fs::read(f.root.join("live/committed.json")).unwrap());
+            assert_eq!(
+                checked.revalidate(&f.root, &f.config, &data.outcome, &artifacts),
+                SatReplayVerdict::Rejected
+            );
+            let stopped = checked.charged();
+            fs::write(&map_path, &saved).unwrap();
+            assert_eq!(
+                checked.revalidate(&f.root, &f.config, &data.outcome, &artifacts),
+                SatReplayVerdict::Rejected
+            );
+            assert_eq!(
+                checked.charged(),
+                stopped,
+                "restoring bytes cannot reset failed owner"
+            );
+            assert!(
+                matches!(&checked.owner, SatReplayOwner::Terminal(_)),
+                "failure keeps prior checked frame and new raw evidence"
+            );
+            assert_eq!(head, fs::read(f.root.join("live/committed.json")).unwrap());
+            let mut forged = data.outcome.clone();
+            forged["patterns_checked"] = serde_json::json!(2);
+            let refused =
+                verify_sat_initial_cell(&f.root, &f.config, &forged, &artifacts, policy());
+            assert_eq!(refused.verdict(), SatReplayVerdict::Rejected);
+            match &refused.owner {
+                SatReplayOwner::Failed(failure) => assert!(failure.frame.has_checked_map()),
+                _ => panic!("terminal rejection must retain mathematical owner"),
+            }
+            let mut exhausted = policy();
+            exhausted.work = 1;
+            let refused =
+                verify_sat_initial_cell(&f.root, &f.config, &data.outcome, &artifacts, exhausted);
+            assert_eq!(refused.verdict(), SatReplayVerdict::Rejected);
+            assert!(matches!(refused.owner, SatReplayOwner::Failed(_)));
+            assert_eq!(head, fs::read(f.root.join("live/committed.json")).unwrap());
+        }
+    }
+    #[test]
+    fn reserved_sat_payload_triggers_replay_without_request_or_outcome_labels() {
+        let f =
+            verified_worker_original_tests::Fixture::with_ordinary_runtime_shape(23, false, "sat");
+        assert!(!needs_sat_initial_replay(&f.config, &Value::Null, &[]));
+        let a = dataset::types::Artifact {
+            path: "live/payloads/sat-original-pattern-0.gate.json".into(),
+            role: "stripped".into(),
+            encoding: "json".into(),
+            sha256: "0".repeat(64),
+            bytes: 0,
+        };
+        assert!(needs_sat_initial_replay(&f.config, &Value::Null, &[a]));
+    }
+}
+
+#[cfg(test)]
+mod sat_versioned_activation_controls {
+    use super::*;
+    #[test]
+    fn delivered_four_cell_v1_metadata_remains_exact_and_does_not_dispatch_sat() {
+        let protocol: Value =
+            serde_json::from_str(include_str!("testdata/sat_channel_v1/protocol.json")).unwrap();
+        for (config, manifest) in [
+            (
+                include_str!("testdata/sat_channel_v1/cell0-config.json"),
+                include_str!("testdata/sat_channel_v1/cell0-manifest.json"),
+            ),
+            (
+                include_str!("testdata/sat_channel_v1/cell1-config.json"),
+                include_str!("testdata/sat_channel_v1/cell1-manifest.json"),
+            ),
+            (
+                include_str!("testdata/sat_channel_v1/cell2-config.json"),
+                include_str!("testdata/sat_channel_v1/cell2-manifest.json"),
+            ),
+            (
+                include_str!("testdata/sat_channel_v1/cell3-config.json"),
+                include_str!("testdata/sat_channel_v1/cell3-manifest.json"),
+            ),
+        ] {
+            let original: CaseConfig = serde_json::from_str(config).unwrap();
+            let m: Value = serde_json::from_str(manifest).unwrap();
+            assert_eq!(serde_json::to_value(&original).unwrap(), m["config"]);
+            assert_eq!(
+                protocol["extensions"]["dataset_channels"],
+                m["config"]["channels"]
+            );
+            let actual = requested_channel_disposition(&original).unwrap().unwrap();
+            assert_eq!(actual, m["outcome"]["requested_channels"]);
+            verify_requested_channel_disposition(&original, &m["outcome"]).unwrap();
+            assert!(!needs_sat_initial_replay(&original, &m["outcome"], &[]));
+            // Historical eligible SAT also remains unsupported, rather than
+            // silently changing meaning when a newer binary sees v1 bytes.
+            let mut eligible = original.clone();
+            eligible.solver = "sat".into();
+            let old = requested_channel_disposition(&eligible).unwrap().unwrap();
+            assert_eq!(old["sat_initial"], actual["sat_initial"]);
+            assert_eq!(
+                koblitz_m3::sat_original_owner::worker::eligibility(&eligible),
+                koblitz_m3::sat_original_owner::worker::Eligibility::Unsupported
+            );
+            let before = serde_json::to_vec(&eligible).unwrap();
+            eligible.channels.as_mut().unwrap().schema =
+                "crypto.ml-dataset.channel-requests/v2".into();
+            eligible.channels.as_ref().unwrap().validate().unwrap();
+            assert_ne!(serde_json::to_vec(&eligible).unwrap(), before);
+            assert_eq!(
+                requested_channel_disposition(&eligible).unwrap().unwrap()["sat_initial"]["status"],
+                "requested"
+            );
+            assert!(needs_sat_initial_replay(&eligible, &Value::Null, &[]));
+        }
+    }
+    #[test]
+    fn every_success_claim_is_rejected_without_complete_initial_evidence() {
+        for (field, value) in [
+            ("initial_checked", json!(true)),
+            ("solver_completed", json!(true)),
+            ("scalar_recovered_without_witness", json!(true)),
+            ("ecdlp_pipeline_completed", json!(true)),
+            ("status", json!("verified")),
+        ] {
+            let mut v = json!({"status":"partial","solver_completed":false});
+            v[field] = value;
+            assert!(sat_terminal_overclaims(&v), "field {field}");
+        }
+        assert!(!sat_terminal_overclaims(
+            &json!({"status":"partial","solver_completed":false,"initial_checked":false})
+        ));
+    }
+}
+
+#[cfg(test)]
+mod sat_report_admission_failure_controls {
+    use super::*;
+    use crate::ml_dataset::{self as dataset, storage, telemetry};
+    #[test]
+    fn frozen_low_original_cap_refuses_report_and_retains_owner_through_parent_errors() {
+        // Source-bound negative arm; never replaces either positive fixture cap.
+        let f = verified_worker_original_tests::Fixture::with_sat_initial_work(23, false, 332);
+        dataset::execution::create(&f.root).unwrap();
+        let mut artifacts = Vec::new();
+        let case = telemetry::measured(&f.root, &mut artifacts, "curve-construction", || {
+            dataset::curves::generate(&f.config)
+        })
+        .unwrap();
+        let token = verify_and_store_worker_originals(
+            &f.config,
+            &case,
+            &f.root,
+            Some(&f.binding),
+            &mut artifacts,
+        )
+        .unwrap();
+        assert_eq!(
+            token.public_bytes, 2849,
+            "source-frozen input quote changed"
+        );
+        assert_eq!(
+            token.factor_base_bytes, 4906,
+            "source-frozen input quote changed"
+        );
+        assert_eq!(case.factor_base["points"].as_array().unwrap().len(), 4);
+        let context = dataset::execution::admit(&f.root).unwrap().unwrap();
+        let launch_len = serde_json::to_vec(&context.launch).unwrap().len();
+        assert!((850..=888).contains(&launch_len));
+        let (_, caps) = dataset::admit_capture_context(&f.root).unwrap().unwrap();
+        let output = solve_with_verified_worker_originals(
+            &f.config,
+            &case,
+            &f.root.join("live"),
+            f.binding.clone(),
+            caps,
+            Some(&context),
+            &token,
+        )
+        .unwrap();
+        let c = output
+            .residual
+            .sat
+            .as_ref()
+            .expect("actual refused SAT owner");
+        assert_eq!(
+            c.stage,
+            koblitz_m3::sat_original_owner::worker::Stage::ReportAdmission
+        );
+        assert!(!c.report_admitted);
+        let before = c
+            .original_ledger_for_control()
+            .expect("paid original owner retained");
+        assert_eq!(before.0, 339968);
+        assert_eq!(before.1, 325472 + 8 * launch_len as u64);
+        assert_eq!(before.3, Some(koblitz_m3::Stop::Work));
+        assert!(before.2 > 2 * 1024 * 1024);
+        assert!(output.data.outcome.is_null());
+        let head = fs::read(f.root.join("live/committed.json")).unwrap();
+        let mut retained = WorkerResidualCustody::default();
+        let failed = dataset::finish_retained_worker_output(
+            &f.root,
+            &mut artifacts,
+            output,
+            Err("injected terminal telemetry failure".into()),
+            &mut retained,
+        );
+        assert!(failed.is_err());
+        assert_eq!(
+            retained.sat.as_ref().unwrap().original_ledger_for_control(),
+            Some(before)
+        );
+        // Genuine failed parent writes after transfer cannot erase that owner.
+        fs::create_dir(f.root.join("result.json")).unwrap();
+        assert!(storage::write_json(
+            &f.root,
+            "result.json",
+            "solver-outcome",
+            &json!({"status":"error"})
+        )
+        .is_err());
+        fs::create_dir(f.root.join("worker-artifacts.json")).unwrap();
+        assert!(storage::write_json(
+            &f.root,
+            "worker-artifacts.json",
+            "artifact-registry",
+            &artifacts
+        )
+        .is_err());
+        assert_eq!(
+            retained.sat.as_ref().unwrap().original_ledger_for_control(),
+            Some(before)
+        );
+        assert_eq!(head, fs::read(f.root.join("live/committed.json")).unwrap());
+    }
+}
+
+#[cfg(test)]
+#[path = "sat_paid_report_telemetry_control.rs"]
+mod sat_paid_report_telemetry_control;
+
+#[cfg(test)]
+#[path = "sat_initial_branch_controls.rs"]
+mod sat_initial_branch_controls;
+
+#[cfg(test)]
+mod original_row_dispatch_controls {
+    use super::*;
+    use crate::ml_dataset::{self as dataset, telemetry};
+    #[test]
+    fn genuine_dispatch_both_twists_retains_published_row() {
+        for twist in [false, true] {
+            let f = verified_worker_original_tests::Fixture::with_original_row_shape(
+                23, twist, "f4", 16384,
+            );
+            dataset::execution::create(&f.root).unwrap();
+            let mut artifacts = Vec::new();
+            let case = telemetry::measured(&f.root, &mut artifacts, "curve-construction", || {
+                dataset::curves::generate(&f.config)
+            })
+            .unwrap();
+            let original = verify_and_store_worker_originals(
+                &f.config,
+                &case,
+                &f.root,
+                Some(&f.binding),
+                &mut artifacts,
+            )
+            .unwrap();
+            let ctx = dataset::execution::admit(&f.root).unwrap().unwrap();
+            let (_, limits) = dataset::admit_capture_context(&f.root).unwrap().unwrap();
+            let result = solve_with_verified_worker_originals(
+                &f.config,
+                &case,
+                &f.root.join("live"),
+                f.binding.clone(),
+                limits,
+                Some(&ctx),
+                &original,
+            )
+            .unwrap();
+            let (data, _, custody) = result.into_parts();
+            assert!(custody.affine_rows.is_some());
+            assert!(!custody.affine_rows_report_unavailable());
+            assert_eq!(data.outcome["finite_row_receipt_committed"], true);
+            assert_eq!(data.outcome["solver_completed"], false);
+            assert_eq!(data.outcome["full_span_search"], false);
+        }
+    }
+    #[test]
+    fn exhausted_original_admission_moves_real_ledger_without_fallback() {
+        let f =
+            verified_worker_original_tests::Fixture::with_original_row_shape(23, false, "f4", 1);
+        dataset::execution::create(&f.root).unwrap();
+        let mut artifacts = Vec::new();
+        let case = telemetry::measured(&f.root, &mut artifacts, "curve-construction", || {
+            dataset::curves::generate(&f.config)
+        })
+        .unwrap();
+        let original = verify_and_store_worker_originals(
+            &f.config,
+            &case,
+            &f.root,
+            Some(&f.binding),
+            &mut artifacts,
+        )
+        .unwrap();
+        let ctx = dataset::execution::admit(&f.root).unwrap().unwrap();
+        let (_, limits) = dataset::admit_capture_context(&f.root).unwrap().unwrap();
+        let result = solve_with_verified_worker_originals(
+            &f.config,
+            &case,
+            &f.root.join("live"),
+            f.binding.clone(),
+            limits,
+            Some(&ctx),
+            &original,
+        )
+        .unwrap();
+        let (data, _, custody) = result.into_parts();
+        assert!(data.outcome.is_null());
+        assert!(custody.affine_rows_report_unavailable());
+        assert!(!custody.sat_report_unavailable());
+        let retained = custody
+            .sat
+            .as_ref()
+            .expect("actual detached original admission owner");
+        let ledger = retained
+            .original_ledger_for_control()
+            .expect("charged original ledger survives");
+        assert_eq!(ledger.0, 1024);
+        assert!(ledger.3.is_some());
+        assert!(custody.affine_rows.is_none());
+    }
+    #[test]
+    fn unsupported_request_never_falls_through_to_enumerator() {
+        let f = verified_worker_original_tests::Fixture::with_original_row_shape(
+            23,
+            false,
+            "enumerate",
+            16384,
+        );
+        dataset::execution::create(&f.root).unwrap();
+        let mut artifacts = Vec::new();
+        let case = telemetry::measured(&f.root, &mut artifacts, "curve-construction", || {
+            dataset::curves::generate(&f.config)
+        })
+        .unwrap();
+        let original = verify_and_store_worker_originals(
+            &f.config,
+            &case,
+            &f.root,
+            Some(&f.binding),
+            &mut artifacts,
+        )
+        .unwrap();
+        let ctx = dataset::execution::admit(&f.root).unwrap().unwrap();
+        let (_, limits) = dataset::admit_capture_context(&f.root).unwrap().unwrap();
+        let result = solve_with_verified_worker_originals(
+            &f.config,
+            &case,
+            &f.root.join("live"),
+            f.binding.clone(),
+            limits,
+            Some(&ctx),
+            &original,
+        )
+        .unwrap();
+        let (data, _, custody) = result.into_parts();
+        assert_eq!(data.outcome["status"], "unsupported");
+        assert_eq!(
+            data.outcome["strategy"],
+            "original-affine-unit-row-unsupported"
+        );
+        assert!(custody.affine_rows.is_none());
+        assert!(custody.sat.is_none());
+        assert!(!f.root.join("live/committed.json").exists());
+    }
+}
+
+#[path = "affine_replay_owner.rs"]
+mod affine_replay_owner;
+
+pub(super) use affine_replay_owner::{
+    needs_affine_row_replay, verify_affine_row_cell, AffineReplayCustody, AffineReplayVerdict,
+};
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum SearchReplayVerdict {
+    CheckedScope,
+    Incomplete,
+    Unknown,
+    Rejected,
+}
+
+enum SearchReplayOwner {
+    Outcome(koblitz_m3::sat_original_owner::central::SearchOutcome),
+    Failed(koblitz_m3::sat_original_owner::central::Failed),
+}
+
+pub(super) struct SearchReplayCustody {
+    owner: SearchReplayOwner,
+    verdict: SearchReplayVerdict,
+}
+
+impl SearchReplayCustody {
+    pub(super) fn verdict(&self) -> SearchReplayVerdict {
+        self.verdict
+    }
+    pub(super) fn retained_slot_bytes() -> usize {
+        std::mem::size_of::<Self>()
+    }
+    pub(super) fn charged(&self) -> (u64, u64) {
+        use koblitz_m3::sat_original_owner::central::SearchOutcome as O;
+        match &self.owner {
+            SearchReplayOwner::Outcome(O::Verified(v)) => v.usage(),
+            SearchReplayOwner::Outcome(O::Incomplete(f) | O::UnknownOriginalMath(f)) => f.usage(),
+            SearchReplayOwner::Failed(f) => f.frame.usage(),
+        }
+    }
+    pub(super) fn revalidate(
+        &mut self,
+        dir: &Path,
+        config: &CaseConfig,
+        outcome: &Value,
+        artifacts: &[super::types::Artifact],
+    ) -> SearchReplayVerdict {
+        if self.verdict != SearchReplayVerdict::CheckedScope {
+            return self.verdict;
+        }
+        if let SearchReplayOwner::Outcome(
+            koblitz_m3::sat_original_owner::central::SearchOutcome::Verified(v),
+        ) = &mut self.owner
+        {
+            if v.revalidate(dir, config, outcome, artifacts).is_err() {
+                self.verdict = SearchReplayVerdict::Rejected
+            }
+        } else {
+            self.verdict = SearchReplayVerdict::Rejected
+        }
+        self.verdict
+    }
+    pub(super) fn project_identity(&mut self) -> Result<Value, String> {
+        if self.verdict != SearchReplayVerdict::CheckedScope {
+            return Err("search scope not joined".into());
+        }
+        if let SearchReplayOwner::Outcome(
+            koblitz_m3::sat_original_owner::central::SearchOutcome::Verified(v),
+        ) = &mut self.owner
+        {
+            match v.project_restricted() {
+                Ok(value) => Ok(value),
+                Err(_) => {
+                    self.verdict = SearchReplayVerdict::Rejected;
+                    Err("search projection refused".into())
+                }
+            }
+        } else {
+            Err("search owner missing".into())
+        }
+    }
+}
+
+pub(super) fn needs_search_replay(config: &CaseConfig, outcome: &Value) -> bool {
+    koblitz_m3::sat_original_owner::search_worker::requested(config)
+        || outcome["adapter_id"] == "sat-search-v1"
+        || outcome.get("search_report").is_some()
+}
+
+pub(super) fn verify_search_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    policy: SatReplayPolicy,
+) -> SearchReplayCustody {
+    use koblitz_m3::sat_original_owner::central;
+    let events = config
+        .channels
+        .as_ref()
+        .and_then(|c| c.sat_search.as_ref())
+        .map(|r| match r {
+            super::types::SatSearchRequest::CaptureAndCheckModel { events, .. } => *events as usize,
+        })
+        .unwrap_or(0);
+    let result = central::verify_search(
+        dir,
+        config,
+        artifacts,
+        central::Policy {
+            work: policy.work,
+            bytes: policy.bytes,
+            deadline: policy.deadline,
+            stream_bytes: policy.stream_bytes,
+            payload_bytes: policy.payload_bytes,
+        },
+        events,
+    );
+    match result {
+        Ok(mut outcome_owner) => {
+            let verdict = match &mut outcome_owner {
+                central::SearchOutcome::Verified(v) => {
+                    if v.join_report(dir, outcome, artifacts).is_ok() {
+                        SearchReplayVerdict::CheckedScope
+                    } else {
+                        SearchReplayVerdict::Rejected
+                    }
+                }
+                central::SearchOutcome::Incomplete(_) => SearchReplayVerdict::Incomplete,
+                central::SearchOutcome::UnknownOriginalMath(_) => SearchReplayVerdict::Unknown,
+            };
+            SearchReplayCustody {
+                owner: SearchReplayOwner::Outcome(outcome_owner),
+                verdict,
+            }
+        }
+        Err(f) => SearchReplayCustody {
+            owner: SearchReplayOwner::Failed(f),
+            verdict: SearchReplayVerdict::Rejected,
+        },
+    }
+}
+
+pub(super) fn search_request_supported(c: &CaseConfig) -> bool {
+    koblitz_m3::sat_original_owner::search_worker::supported(c)
+}
+
+fn next_root_prefix(indices: &mut [usize], radix: usize) -> bool {
+    for digit in indices.iter_mut().rev() {
+        if *digit + 1 < radix {
+            *digit += 1;
+            return true;
+        }
+        *digit = 0;
+    }
+    false
+}
+
+fn lift_root_chain_prefix(
+    group: &Group,
+    domain: &[Element],
+    prefix: &[Element],
+    prefix_sum: &Element,
+    final_x: u64,
+    target: &Element,
+    limit: u64,
+) -> (Option<Vec<Element>>, u64, bool) {
+    let x = BigUint::from(final_x);
+    let choices = domain.iter().filter(|point| point.x().as_ref() == Some(&x));
+    let mut used = 0;
+    for last in choices {
+        if used >= limit {
+            return (None, used, true);
+        }
+        used += 1;
+        if group.add(prefix_sum, last) == *target {
+            let mut witness = prefix.to_vec();
+            witness.push(last.clone());
+            return (Some(witness), used, false);
+        }
+    }
+    (None, used, false)
+}
+
+fn prime_root_chain_solve(
+    config: &CaseConfig,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+) -> Result<SolverData, String> {
+    let Group::Prime(curve) = group else {
+        return Err("prime root chain requires prime curve".into());
+    };
+    let p = curve.p.to_u64().ok_or("prime root modulus exceeds u64")?;
+    let a = curve.a.to_u64().ok_or("prime coefficient exceeds u64")?;
+    let b = curve.b.to_u64().ok_or("prime coefficient exceeds u64")?;
+    let Some(xr) = target.x().and_then(|x| x.to_u64()) else {
+        return Ok(unsupported("affine S3 chain requires affine target"));
+    };
+    let mut codes = domain
+        .iter()
+        .filter_map(Element::x)
+        .map(|x| x.to_u64().ok_or("factor-base x exceeds u64"))
+        .collect::<Result<Vec<_>, _>>()?;
+    codes.sort_unstable();
+    codes.dedup();
+    let limit = config.work_limit.min(TRACE_EVENT_CAP);
+    let mut data = SolverData {
+        outcome: outcome(
+            "partial",
+            "Bounded affine S3-chain prefixes with native final-leaf roots",
+        ),
+        artifacts: vec![],
+    };
+    let mut indices = vec![0usize; config.m - 1];
+    let mut used = 0u64;
+    let mut events = 0u64;
+    let mut event_bytes = 0usize;
+    let mut queries = Vec::new();
+    let mut found = None;
+    let mut censored = false;
+    let mut exhausted = domain.is_empty();
+    let mut infinity_prefix = false;
+    while !exhausted {
+        let call_index = queries.len();
+        // One group addition for each signed prefix leaf, including zero+P.
+        let prefix_cost = indices.len() as u64;
+        if limit.saturating_sub(used) < prefix_cost + PRIME_S3_SETUP_WORK {
+            censored = true;
+            break;
+        }
+        let before = used;
+        let prefix = indices
+            .iter()
+            .map(|&i| domain[i].clone())
+            .collect::<Vec<_>>();
+        let mut sum = group.zero();
+        for point in &prefix {
+            sum = group.add(&sum, point);
+        }
+        used += prefix_cost;
+        // S3 describes affine sums only. Preserve this exception as an
+        // explicit censored prefix; later tuples are not claimed exhausted.
+        let Some(x) = sum.x().and_then(|x| x.to_u64()) else {
+            censored = true;
+            infinity_prefix = true;
+            break;
+        };
+        let coefficients = prime_root_coefficients(p, a, b, x, xr);
+        used += PRIME_S3_SETUP_WORK;
+        let mut io_error = None;
+        let mut byte_cap = false;
+        let report = prime_root_trace::solve(
+            &coefficients,
+            p,
+            config.seed ^ call_index as u64,
+            RootLimits {
+                field_work: limit - used,
+                split_attempts: 1000,
+                events: TRACE_EVENT_CAP.saturating_sub(events),
+                degree: 2,
+            },
+            &mut |event| {
+                let row = prime_root_event_envelope(call_index, &x.to_string(), event);
+                let size = serde_json::to_vec(&row).map_err(|e| e.to_string())?.len();
+                if event_bytes.saturating_add(size) > PRIME_ROOT_EVENT_BYTE_CAP {
+                    byte_cap = true;
+                    return Err(PRIME_ROOT_BYTE_CAP_REASON.into());
+                }
+                if let Err(error) = live_event(&row) {
+                    io_error = Some(error.clone());
+                    return Err(error);
+                }
+                events += 1;
+                event_bytes += size;
+                if matches!(event, RootEvent::PowerEnd { .. } | RootEvent::GcdEnd { .. }) {
+                    if let Err(error) = save(
+                        &mut data,
+                        &format!("root-state-{call_index:04}-{events:06}.json"),
+                        "native-prime-root-intermediate-state",
+                        &row,
+                    ) {
+                        io_error = Some(error.clone());
+                        return Err(error);
+                    }
+                }
+                Ok(())
+            },
+        )?;
+        used += report.counters.field_work();
+        if let Some(error) = io_error {
+            return Err(error);
+        }
+        prime_root_trace::verify(&report)?;
+        let roots = if report.stop == RootStop::AllFieldElements {
+            codes.clone()
+        } else {
+            report.roots.clone()
+        };
+        let mut checks = Vec::new();
+        if report.complete() {
+            for root in roots {
+                let evaluation_work = 2 * coefficients.len() as u64;
+                if limit.saturating_sub(used) < evaluation_work {
+                    censored = true;
+                    break;
+                }
+                used += evaluation_work;
+                let value = coefficients.iter().rev().fold(0u64, |acc, &c| {
+                    ((acc as u128 * root as u128 + c as u128) % p as u128) as u64
+                });
+                if value != 0 {
+                    return Err("native prime root failed polynomial evaluation".into());
+                }
+                let (witness, adds, lift_exhausted) = lift_root_chain_prefix(
+                    group,
+                    domain,
+                    &prefix,
+                    &sum,
+                    root,
+                    target,
+                    limit - used,
+                );
+                used += adds;
+                checks.push(json!({"x":root.to_string(),"evaluation_work":evaluation_work,
+                    "group_lift_add_calls":adds,"in_factor_base":codes.contains(&root),
+                    "group_lift_verified":witness.is_some(),"lift_budget_exhausted":lift_exhausted}));
+                if witness.is_some() {
+                    found = witness;
+                    break;
+                }
+                if lift_exhausted {
+                    censored = true;
+                    break;
+                }
+            }
+        } else {
+            censored = true;
+        }
+        let row = json!({"call_index":call_index,"prefix_indices":indices,
+            "prefix_points":prefix.iter().map(Element::json).collect::<Vec<_>>(),
+            "fixed_x":x.to_string(),"coefficients_constant_first":coefficients,
+            "work_before":before,"prefix_group_add_calls":prefix_cost,
+            "coefficient_setup_work":PRIME_S3_SETUP_WORK,"work_after":used,
+            "trace_byte_cap_reached":byte_cap,"report":report,"checks":checks});
+        save(
+            &mut data,
+            &format!("root-call-{call_index:04}.json"),
+            "native-prime-root-call",
+            &row,
+        )?;
+        queries.push(row);
+        if found.is_some() || censored {
+            break;
+        }
+        exhausted = !next_root_prefix(&mut indices, domain.len());
+    }
+    let certificate = json!({"schema":"ml-dataset.prime-root-certificates/v1",
+        "strategy":"prime-affine-s3-chain-prefix-root/v1","m":config.m,
+        "target":target.json(),"p":p.to_string(),"requested_work_limit":config.work_limit,
+        "effective_work_limit":limit,"charged_work":used,"queries":queries,
+        "root_queries_completed":!censored && exhausted,
+        "censored":censored,"infinity_prefix_encountered":infinity_prefix,
+        "found_pdp":found.is_some(),"distinct_root_certificates_verified":true,
+        "execution_trace_complete_verified":false,"total_operation_count_verified":false,
+        "counter_scope":"signed-prefix group additions + S3 coefficient recipe + native field work + root evaluations + bounded group lifts; excludes serialization and replay",
+        "negative_scope":"affine signed-prefix encoding only; infinity branches are censored"});
+    save(
+        &mut data,
+        "prime-root-certificates.json",
+        "prime-root-certificates/v1",
+        &certificate,
+    )?;
+    data.outcome["counters"] = json!({"aggregate_root_field_and_group_work":used,
+        "root_solver_calls":certificate["queries"].as_array().unwrap().len(),
+        "acknowledged_native_events":events,"acknowledged_native_event_bytes":event_bytes});
+    data.outcome["root_certificate_scope"] = json!(PRIME_ROOT_CERTIFICATE_SCOPE);
+    data.outcome["root_execution_trace_complete_verified"] = json!(false);
+    data.outcome["root_total_operation_count_verified"] = json!(false);
+    data.outcome["strategy"] = json!("prime-affine-s3-chain-prefix-root/v1");
+    data.outcome["root_termination_cause"] = json!(if found.is_some() {
+        "found_pdp"
+    } else if infinity_prefix {
+        "affine_infinity_prefix"
+    } else if censored {
+        "work_or_trace_cap"
+    } else {
+        "affine_prefixes_exhausted"
+    });
+    data.outcome["trace_gaps"] = json!([
+        "Native root events are not a restorable process checkpoint",
+        "Infinity-prefix branches are outside the affine encoding"
+    ]);
+    if let Some(witness) = found {
+        set_witness(&mut data, group, &witness, target)?;
+    } else if censored {
+        data.outcome["status"] = json!(if infinity_prefix {
+            "partial"
+        } else {
+            "budget_exhausted"
+        });
+        data.outcome["reason"] = json!(if infinity_prefix {
+            "Affine S3 prefix reached infinity"
+        } else {
+            "Bounded root-chain work or trace cap reached"
+        });
+    } else {
+        data.outcome["solver_completed"] = json!(true);
+    }
+    Ok(data)
+}
+
+fn verify_prime_root_chain_artifact(
+    public: &Value,
+    base: &Value,
+    config: &CaseConfig,
+    artifact: &Value,
+) -> Result<(), String> {
+    if config.solver != "root"
+        || config.family != "prime"
+        || public["family"] != "prime"
+        || public["m"] != config.m
+        || public["n"] != config.n
+        || public["twist"] != config.twist
+        || artifact["schema"] != "ml-dataset.prime-root-certificates/v1"
+        || artifact["strategy"] != "prime-affine-s3-chain-prefix-root/v1"
+        || artifact["m"] != config.m
+        || artifact["target"] != public["target"]
+        || artifact["requested_work_limit"] != config.work_limit
+        || artifact["distinct_root_certificates_verified"] != true
+        || artifact["execution_trace_complete_verified"] != false
+        || artifact["total_operation_count_verified"] != false
+        || base["construction_status"] == "unsupported"
+    {
+        return Err("prime root chain public/config binding differs".into());
+    }
+    let case = CaseData {
+        public_instance: public.clone(),
+        private_witness: Value::Null,
+        factor_base: base.clone(),
+    };
+    let group = Group::read(&case)?;
+    let Group::Prime(curve) = &group else {
+        return Err("prime curve required".into());
+    };
+    let target = group.point(&public["target"])?;
+    if !group.on_curve(&target) {
+        return Err("root target is off curve".into());
+    }
+    let xr = target
+        .x()
+        .and_then(|x| x.to_u64())
+        .ok_or("affine target required")?;
+    let p = curve.p.to_u64().ok_or("prime modulus exceeds u64")?;
+    let a = curve.a.to_u64().ok_or("prime a exceeds u64")?;
+    let b = curve.b.to_u64().ok_or("prime b exceeds u64")?;
+    let domain = domain(&group, &case)?;
+    let mut codes = domain
+        .iter()
+        .filter_map(Element::x)
+        .map(|x| x.to_u64().ok_or("factor-base x exceeds u64"))
+        .collect::<Result<Vec<_>, _>>()?;
+    codes.sort_unstable();
+    codes.dedup();
+    let limit = config.work_limit.min(TRACE_EVENT_CAP);
+    // The artifact stores p as a decimal string: compare as strings, as before.
+    if artifact["p"].as_str() != Some(p.to_string().as_str())
+        || artifact["effective_work_limit"] != limit
+    {
+        return Err("prime root chain modulus or limit differs".into());
+    }
+    let queries = artifact["queries"]
+        .as_array()
+        .ok_or("missing chain queries")?;
+    prime_root_trace_totals(artifact)?;
+    let mut indices = vec![0usize; config.m - 1];
+    let mut exhausted = domain.is_empty();
+    let mut used = 0u64;
+    let mut events = 0u64;
+    let mut found = false;
+    let mut censored = false;
+    let mut infinity_prefix = false;
+    for (index, row) in queries.iter().enumerate() {
+        if exhausted || found || censored {
+            return Err("chain queries continue past terminal state".into());
+        }
+        let prefix_cost = indices.len() as u64;
+        if limit.saturating_sub(used) < prefix_cost + PRIME_S3_SETUP_WORK {
+            return Err("chain query exceeds prefix budget".into());
+        }
+        let prefix = indices
+            .iter()
+            .map(|&i| domain[i].clone())
+            .collect::<Vec<_>>();
+        let mut sum = group.zero();
+        for point in &prefix {
+            sum = group.add(&sum, point);
+        }
+        let x = sum
+            .x()
+            .and_then(|x| x.to_u64())
+            .ok_or("query claims an infinity prefix")?;
+        let x_decimal = x.to_string();
+        let coeff = prime_root_coefficients(p, a, b, x, xr);
+        if row["call_index"] != index
+            || row["prefix_indices"] != json!(indices)
+            || row["prefix_points"] != json!(prefix.iter().map(Element::json).collect::<Vec<_>>())
+            || row["fixed_x"].as_str() != Some(x_decimal.as_str())
+            || row["coefficients_constant_first"] != json!(coeff)
+            || row["work_before"] != used
+            || row["prefix_group_add_calls"] != prefix_cost
+            || row["coefficient_setup_work"] != PRIME_S3_SETUP_WORK
+        {
+            return Err("chain query prefix or coefficients differ".into());
+        }
+        used += prefix_cost + PRIME_S3_SETUP_WORK;
+        let report: RootReport =
+            serde_json::from_value(row["report"].clone()).map_err(|e| e.to_string())?;
+        let mut canonical_coeff = coeff.clone();
+        while canonical_coeff.last() == Some(&0) {
+            canonical_coeff.pop();
+        }
+        if report.p != p
+            || report.polynomial != canonical_coeff
+            || report.seed != config.seed ^ index as u64
+            || report.limits
+                != (RootLimits {
+                    field_work: limit - used,
+                    split_attempts: 1000,
+                    events: TRACE_EVENT_CAP - events,
+                    degree: 2,
+                })
+        {
+            return Err("chain native report call differs".into());
+        }
+        prime_root_trace::verify(&report)?;
+        used += report.counters.field_work();
+        events += report.events.len() as u64;
+        let checks = row["checks"].as_array().ok_or("chain checks missing")?;
+        let roots = if report.stop == RootStop::AllFieldElements {
+            codes.clone()
+        } else {
+            report.roots.clone()
+        };
+        if checks.len() > roots.len() || (!report.complete() && !checks.is_empty()) {
+            return Err("chain root checks invalid".into());
+        }
+        for (j, check) in checks.iter().enumerate() {
+            if found || censored {
+                return Err("chain lifts continue after terminal state".into());
+            }
+            let root = roots[j];
+            let eval = 2 * coeff.len() as u64;
+            if check["x"].as_str() != Some(root.to_string().as_str())
+                || check["evaluation_work"] != eval
+                || limit.saturating_sub(used) < eval
+            {
+                return Err("chain root evaluation work differs".into());
+            }
+            used += eval;
+            let value = coeff.iter().rev().fold(0u64, |acc, &c| {
+                ((acc as u128 * root as u128 + c as u128) % p as u128) as u64
+            });
+            if value != 0 {
+                return Err("chain certified root does not satisfy S3".into());
+            }
+            let (w, adds, lift_exhausted) =
+                lift_root_chain_prefix(&group, &domain, &prefix, &sum, root, &target, limit - used);
+            if check["group_lift_add_calls"] != adds
+                || check["in_factor_base"] != codes.contains(&root)
+                || check["group_lift_verified"] != w.is_some()
+                || check["lift_budget_exhausted"] != lift_exhausted
+            {
+                return Err("chain independent group replay differs".into());
+            }
+            used += adds;
+            found = w.is_some();
+            censored = lift_exhausted && !found;
+        }
+        if report.complete() && !found && checks.len() < roots.len() {
+            if !censored && limit.saturating_sub(used) >= 2 * coeff.len() as u64 {
+                return Err("chain omitted root lift without budget reason".into());
+            }
+            censored = true;
+        }
+        if !report.complete() {
+            censored = true;
+        }
+        if row["work_after"] != used || used > limit {
+            return Err("chain work total differs".into());
+        }
+        if !found && !censored {
+            exhausted = !next_root_prefix(&mut indices, domain.len());
+        }
+    }
+    if !found && !censored && !exhausted {
+        let prefix_cost = indices.len() as u64;
+        if limit.saturating_sub(used) < prefix_cost + PRIME_S3_SETUP_WORK {
+            censored = true;
+        } else {
+            let mut sum = group.zero();
+            for &i in &indices {
+                sum = group.add(&sum, &domain[i]);
+            }
+            if sum.x().is_none() {
+                used += prefix_cost;
+                censored = true;
+                infinity_prefix = true;
+            } else {
+                return Err("chain omitted affordable affine prefix".into());
+            }
+        }
+    }
+    if artifact["charged_work"] != used
+        || artifact["found_pdp"] != found
+        || artifact["censored"] != censored
+        || artifact["infinity_prefix_encountered"] != infinity_prefix
+        || artifact["root_queries_completed"] != (!censored && exhausted)
+    {
+        return Err("chain aggregate completion differs".into());
+    }
+    Ok(())
+}
+
+const DYNAMIC_M4_STRATEGY: &str = "prime-f4-fp64-affine-chain-m4-bounded/v1";
+
+const DYNAMIC_M5_15_STRATEGY: &str = "prime-f4-fp64-affine-chain-m5-15-bounded/v1";
+
+fn dynamic_strategy(m: usize) -> Option<&'static str> {
+    match m {
+        4 => Some(DYNAMIC_M4_STRATEGY),
+        5..=15 => Some(DYNAMIC_M5_15_STRATEGY),
+        _ => None,
+    }
+}
+
+fn is_dynamic_strategy(strategy: &Value) -> bool {
+    strategy == DYNAMIC_M4_STRATEGY || strategy == DYNAMIC_M5_15_STRATEGY
+}
+
+fn classify_wide_linear_retention(
+    result: Result<(), prime_f4_wide_dynamic::Stop>,
+) -> Result<bool, String> {
+    match result {
+        Ok(()) => Ok(true),
+        Err(prime_f4_wide_dynamic::Stop::WorkLimit) => Ok(false),
+        Err(e) => Err(format!("wide dynamic linear retention stopped: {e:?}")),
+    }
+}
+
+fn require_wide_group_persistence(stop: prime_f4_wide_dynamic::GroupStop) -> Result<(), String> {
+    if stop == prime_f4_wide_dynamic::GroupStop::PersistenceFailure {
+        return Err("wide dynamic group event persistence stopped: PersistenceFailure".into());
+    }
+    Ok(())
+}
+
+/// First activated higher-arity profile. The native reducer and original
+/// signed-group traversal have separate bounded receipts. A positive witness
+/// is useful even when the native or full-domain search remains incomplete.
+fn prime_f4_wide_dynamic(
+    config: &CaseConfig,
+    case: &CaseData,
+    context: &super::execution::SolverExecutionContext,
+) -> Result<SolverData, String> {
+    use prime_f4_wide_dynamic as d;
+    let original = dynamic_original(
+        config,
+        case,
+        context.launch.memory_bytes,
+        context.launch.trace_bytes,
+    )?;
+    let points: Vec<_> = original
+        .domain
+        .iter()
+        .map(|p| d::AffinePoint { x: p.x, y: p.y })
+        .collect();
+    let target = d::AffinePoint {
+        x: original.target.x,
+        y: original.target.y,
+    };
+    let mut forward = |event: &d::PhaseEvent, buffer: &mut super::capture::TypedEventBuffer| {
+        live_typed_event(
+            super::capture::TypedEventKind::WidePrimeDynamic,
+            event,
+            buffer,
+        )
+        .map_err(|_| ())
+    };
+    let mut prepared = d::prepare_original(
+        original.p,
+        d::Parameters {
+            m: original.m,
+            a: original.a,
+            b: original.b,
+            target_x: original.target.x,
+            codes: &original.codes,
+        },
+        target,
+        &points,
+        d::AttemptLimits {
+            work_limit: config.work_limit,
+            memory_bytes: context.launch.memory_bytes,
+            trace_bytes: context.launch.trace_bytes,
+            degree_bound: config.degree_bound,
+            original_deadline: context.deadline,
+        },
+        d::EventPersistence::BoundCapture,
+        &mut forward,
+    )
+    .map_err(|e| format!("wide dynamic original preparation stopped: {:?}", e.stop))?;
+    let mut publisher = d::BoundWitnessPublisher::default();
+    d::prepare_step4(&mut prepared, &mut publisher)
+        .map_err(|e| format!("wide dynamic witness admission stopped: {e:?}"))?;
+    let mut phase = d::invoke_original(prepared, &mut forward)
+        .map_err(|e| format!("wide dynamic native F4 stopped: {:?}", e.stop))?;
+    let linear = d::extract_reported_linear(&mut phase);
+    let linear_retained = classify_wide_linear_retention(d::retain_linear(&mut phase, &linear))?;
+    let group = d::run_group_step4(
+        &mut phase,
+        linear_retained.then_some(&linear),
+        &mut forward,
+        &mut publisher,
+    );
+    require_wide_group_persistence(group.stop)?;
+    if group.certificate_durably_persisted {
+        d::confirm_step4_witness(&mut phase.prepared, &mut publisher)
+            .map_err(|e| format!("wide dynamic witness confirmation stopped: {e:?}"))?;
+    }
+    d::retain_step4_terminal(&mut phase)
+        .map_err(|e| format!("wide dynamic terminal retention stopped: {e:?}"))?;
+    d::visit_step4_retained_artifacts(&phase.prepared, |path, role, encoding, bytes| {
+        if path == "pdp-witness.json" {
+            Ok(()) // Dedicated publication above is the only witness commit.
+        } else {
+            live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
+        }
+    })
+    .map_err(|_| "wide dynamic retained artifact publication stopped".to_string())?;
+    let artifacts = d::take_step4_artifacts(&mut phase.prepared)
+        .map_err(|e| format!("wide dynamic artifact transfer stopped: {e:?}"))?;
+    let mut data = SolverData {
+        outcome: outcome("partial", "Bounded native wide-prime F4 and signed-group traversal retained; completion is replay-gated"),
+        artifacts,
+    };
+    data.outcome["strategy"] =
+        json!(dynamic_strategy(config.m).ok_or("dynamic arity outside 4..15")?);
+    data.outcome["native_backend_invoked"] = json!(phase.report.native_backend_invoked);
+    data.outcome["native_statistics_complete"] = json!(phase.report.native_statistics_complete);
+    data.outcome["algebra_completed"] = json!(phase.report.native_statistics_complete);
+    data.outcome["linear_artifact_retained"] = json!(linear_retained);
+    data.outcome["linear_retention_stop"] = if linear_retained {
+        Value::Null
+    } else {
+        json!("work_limit")
+    };
+    data.outcome["pdp_witness_verified"] =
+        json!(group.pdp_witness_verified && group.certificate_durably_persisted);
+    data.outcome["certificate_durably_persisted"] = json!(group.certificate_durably_persisted);
+    data.outcome["group_domain_complete"] = json!(group.group_domain_complete);
+    data.outcome["exhaustive_no_decomposition"] = json!(false);
+    data.outcome["counters"] = json!({
+        "native_reserved_work": phase.report.reserved.work,
+        "native_reserved_bytes": phase.report.reserved.bytes,
+        "group_tuples_reserved": group.tuples_reserved,
+        "group_additions_reserved": group.additions_reserved,
+        "group_additions_performed": group.additions_performed,
+        "group_checking_work_reserved": group.checking_reserved_work,
+        "units": "backend tariffs and group additions; no machine instruction attribution"
+    });
+    Ok(data)
+}
+
+fn verify_prime_f4_dynamic(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<bool, String> {
+    let reserved = artifacts.iter().any(|a| {
+        a.path.starts_with("prime-f4-wide-dynamic-")
+            || a.role.starts_with("restricted-wide-prime-dynamic-")
+    });
+    if !reserved && !is_dynamic_strategy(&outcome["strategy"]) {
+        return Ok(false);
+    }
+    if config.family != "prime"
+        || config.solver != "f4"
+        || !(4..=15).contains(&config.m)
+        || !(33..=61).contains(&config.n)
+    {
+        return Err("dynamic artifact/config mismatch".into());
+    }
+    let launch = super::execution::load(dir)?
+        .ok_or("dynamic replay lacks original worker execution context")?;
+    let case = CaseData {
+        public_instance: super::read_json(&dir.join("public.json"))?,
+        factor_base: super::read_json(&dir.join("factor-base.json"))?,
+        private_witness: Value::Null,
+    };
+    let original = dynamic_original(config, &case, launch.memory_bytes, launch.trace_bytes)?;
+    let capture_limits = super::capture::capture_limits(launch.trace_bytes / (1024 * 1024))?;
+    let verified = prime_f4_wide_dynamic_replay::verify_files(
+        dir,
+        &original.expected(),
+        artifacts,
+        &launch.binding,
+        &capture_limits,
+        prime_f4_wide_dynamic_replay::ReplayLimits {
+            work: 10_000_000_000,
+            allocation_bytes: 128 * 1024 * 1024,
+            deadline: Instant::now() + Duration::from_secs(30),
+        },
+    )?;
+    if outcome["strategy"] != dynamic_strategy(config.m).ok_or("dynamic arity outside 4..15")? {
+        return Err("dynamic strategy mismatch".into());
+    }
+    verify_dynamic_claims(outcome, &verified)?;
+    Ok(true)
+}
+
+/// Outcome-only initial-mode disposition; shared map artifacts do not select a mode.
+pub(super) fn has_sat_initial_disposition(outcome: &Value) -> bool {
+    outcome["adapter_id"] == "sat-initial-v1"
+        || outcome["strategy"] == "sat-initial-v1"
+        || outcome.get("initial_checked").is_some()
+}
+
+/// Detect independently from mutable outcome labels. Reserved owned capture paths
+/// still require owned replay if a producer removes its strategy/schema fields.
+pub(super) fn needs_owned_search_replay(
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> bool {
+    koblitz_m3::sat_original_owner::owned_search_worker::requested(config)
+        || outcome["adapter_id"] == "original-owned-boolean-search-v1"
+        || outcome["strategy"] == "original-owned-boolean-search-v1"
+        || outcome["schema"] == "crypto.ml-dataset.owned-search-report/v1"
+        || outcome["strategy"] == "original-boolean-search-unsupported"
+        || has_owned_search_artifacts(artifacts)
+}
+
+fn has_owned_search_artifacts(artifacts: &[super::types::Artifact]) -> bool {
+    artifacts.iter().any(|a| {
+        a.role == "boolean-original-owned-search-snapshot-chunk-v1"
+            || a.path.starts_with("live/payloads/boolean-owned-pattern-")
+            || a.path.starts_with("payloads/boolean-owned-pattern-")
+    })
+}
+
+pub(super) fn verify_owned_search_unsupported(
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<(), String> {
+    if !koblitz_m3::sat_original_owner::owned_search_worker::requested(config)
+        || koblitz_m3::sat_original_owner::owned_search_worker::supported(config)
+        || has_owned_search_artifacts(artifacts)
+        || artifacts
+            .iter()
+            .any(|a| a.role == "sat-original-gate-map" || a.path.contains("sat-original-pattern-"))
+        || outcome["strategy"] != "original-boolean-search-unsupported"
+        || outcome["status"] != "unsupported"
+        || outcome["solver_completed"] != false
+        || outcome["all_patterns_negative"] != false
+        || outcome["training_export_admitted"] != false
+    {
+        return Err(
+            "unsupported owned-search request carries execution evidence or overclaims".into(),
+        );
+    }
+    for key in [
+        "scalar_recovered_without_witness",
+        "scalar_recovered",
+        "scalar_replay_verified",
+        "ecdlp_pipeline_completed",
+        "full_span_search",
+        "all_patterns_covered",
+        "pdp_witness_verified",
+        "exhaustive_no_decomposition",
+        "unsat_proved",
+        "original_descent_verified",
+        "row_identities_verified",
+        "identity_verified_relative_captured_equations",
+        "independent_original_source_replay",
+        "s3_custody_verified",
+        "original_public_factor_and_map_verified",
+        "report_capture_join_verified",
+        "producer_counters_verified",
+        "producer_lift_classifications_verified",
+        "producer_model_exclusions_checked",
+        "capture_snapshot_complete",
+        "model_relation_checked",
+        "causal_search_verified",
+        "execution_verified",
+        "initial_checked",
+        "search_complete",
+        "causal_solver_training_admitted",
+    ] {
+        if outcome.get(key).is_some_and(|v| v != &Value::Bool(false)) {
+            return Err("unsupported owned-search completion claim".into());
+        }
+    }
+    for key in [
+        "first_fall_degree",
+        "last_fall_degree",
+        "degree_of_regularity",
+    ] {
+        if outcome.get(key).is_some_and(|v| !v.is_null()) {
+            return Err("unsupported owned-search degree claim".into());
+        }
+    }
+    Ok(())
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum OwnedReplayVerdict {
+    CheckedScope,
+    HistoricalCheckedScope,
+    Incomplete,
+    Unknown,
+    Rejected,
+}
+
+pub(super) struct OwnedReplayCustody {
+    owner: koblitz_m3::sat_original_owner::central::owned::Custody,
+}
+
+impl OwnedReplayCustody {
+    pub(super) fn verdict(&self) -> OwnedReplayVerdict {
+        use koblitz_m3::sat_original_owner::central::owned::Verdict;
+        match self.owner.verdict() {
+            Verdict::CheckedScope => OwnedReplayVerdict::CheckedScope,
+            Verdict::HistoricalCheckedScope => OwnedReplayVerdict::HistoricalCheckedScope,
+            Verdict::Incomplete => OwnedReplayVerdict::Incomplete,
+            Verdict::Unknown => OwnedReplayVerdict::Unknown,
+            Verdict::Rejected => OwnedReplayVerdict::Rejected,
+        }
+    }
+    pub(super) fn charged(&self) -> (u64, u64) {
+        self.owner.usage()
+    }
+    pub(super) fn retained_slot_bytes() -> usize {
+        std::mem::size_of::<Self>()
+    }
+    pub(super) fn revalidate(
+        &mut self,
+        dir: &Path,
+        config: &CaseConfig,
+        outcome: &Value,
+        artifacts: &[super::types::Artifact],
+    ) -> OwnedReplayVerdict {
+        self.owner.revalidate(dir, config, outcome, artifacts);
+        self.verdict()
+    }
+    pub(super) fn project_identity(&mut self) -> Result<Value, String> {
+        self.owner.project_restricted()
+    }
+}
+
+pub(super) fn verify_owned_search_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    policy: SatReplayPolicy,
+) -> OwnedReplayCustody {
+    use koblitz_m3::sat_original_owner::central;
+    OwnedReplayCustody {
+        owner: central::owned::verify(
+            dir,
+            config,
+            outcome,
+            artifacts,
+            central::Policy {
+                work: policy.work,
+                bytes: policy.bytes,
+                deadline: policy.deadline,
+                stream_bytes: policy.stream_bytes,
+                payload_bytes: policy.payload_bytes,
+            },
+        ),
+    }
+}
+
+pub(super) fn verify_owned_search_historical_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    policy: SatReplayPolicy,
+) -> OwnedReplayCustody {
+    use koblitz_m3::sat_original_owner::central;
+    OwnedReplayCustody {
+        owner: central::owned::verify_historical(
+            dir,
+            config,
+            outcome,
+            artifacts,
+            central::Policy {
+                work: policy.work,
+                bytes: policy.bytes,
+                deadline: policy.deadline,
+                stream_bytes: policy.stream_bytes,
+                payload_bytes: policy.payload_bytes,
+            },
+        ),
     }
 }

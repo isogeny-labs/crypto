@@ -1,0 +1,2852 @@
+{
+ "sources": [
+  {
+   "id": "S-WD-FREY-1998",
+   "title": "How to disguise an elliptic curve (Weil descent)",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Gerhard Frey, invited talk at ECC'98, Waterloo, 15 September 1998 (26 slides, dvips PostScript).",
+   "url": "https://cacr.uwaterloo.ca/conferences/1998/ecc98/frey.ps",
+   "sha256": "4c634649b4a48425180357c87b428b015f3347df21349a8f6a02e4611299416a",
+   "notes": "Slides read from the bitmap-font PostScript by string extraction. Slides 20-21 ('Dangers', 'Example'): if a curve C embeds in the Weil restriction A and C admits an effective Riemann-Roch theorem, an index-calculus attack on C solves the DLP on A. The talk is mostly constructive; Galbraith 2018 p.346 fn.10 and Hess 2004 ref. [7] cite it as the origin of the Weil-descent attack."
+  },
+  {
+   "id": "S-WD-MQ-2001",
+   "title": "Analysis of the Weil Descent Attack of Gaudry, Hess and Smart",
+   "kind": "primary_publication",
+   "verification": "metadata_only",
+   "citation": "Alfred Menezes and Minghua Qu, CT-RSA 2001, LNCS 2020, pp. 308-318; technical report CORR 2000-48, University of Waterloo.",
+   "url": "https://doi.org/10.1007/3-540-45353-9_23",
+   "notes": "Only the one-page CORR 2000-48 abstract page was retrievable (uwaterloo.ca). Its results are taken from the restatements in Maurer-Menezes-Teske 2002 (Theorems 5 and 11, both 'see [23]') and Hess 2004 Section 1, which were read."
+  },
+  {
+   "id": "S-WD-MMT-2002",
+   "title": "Analysis of the GHS Weil descent attack on the ECDLP over characteristic two finite fields of composite degree",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Markus Maurer, Alfred Menezes and Edlyn Teske, LMS Journal of Computation and Mathematics 5 (2002), pp. 127-174.",
+   "url": "https://doi.org/10.1112/S1461157000000723",
+   "sha256": "4b48baeb3908f67bad482ab1660fcdcad0d9043bf64368f2bb83bce4104f314b",
+   "notes": "Open-access Cambridge PDF read: Theorem 1 (GHS restated), Definition 4, Theorem 5, Lemmas 6-9, Theorem 11, Definition 12, Section 4.3 cost model (eqs. 10-15), Remarks 2, 18-20, Table 1."
+  },
+  {
+   "id": "S-WD-MTW-2004",
+   "title": "Weak Fields for ECC",
+   "kind": "primary_publication",
+   "verification": "metadata_only",
+   "citation": "Alfred Menezes, Edlyn Teske and Annegret Weng, CT-RSA 2004, LNCS 2964, pp. 366-386; IACR ePrint 2003/128.",
+   "url": "https://eprint.iacr.org/2003/128",
+   "notes": "ePrint abstract page read 2026-11-02 (PDF behind bot check). Karabina-Menezes-Pomerance-Shparlinski 2010 (read) reports the result as: GHS faster than rho for (almost) all cryptographically interesting curves over F_(2^(5l)), l in [32,120]."
+  },
+  {
+   "id": "S-WD-MT-2006",
+   "title": "Cryptographic implications of Hess' generalized GHS attack",
+   "kind": "primary_publication",
+   "verification": "metadata_only",
+   "citation": "Alfred Menezes and Edlyn Teske, Applicable Algebra in Engineering, Communication and Computing 16 (2006), pp. 439-460; IACR ePrint 2004/235.",
+   "url": "https://eprint.iacr.org/2004/235",
+   "notes": "ePrint abstract page read 2026-11-02."
+  },
+  {
+   "id": "S-WD-HESS-2003",
+   "title": "The GHS Attack Revisited",
+   "kind": "primary_publication",
+   "verification": "metadata_only",
+   "citation": "Florian Hess, EUROCRYPT 2003, LNCS 2656, pp. 374-387.",
+   "url": "https://doi.org/10.1007/3-540-39200-9_23",
+   "notes": "IACR archive PDF behind a Cloudflare check; not worked around. The journal version (Hess 2004, LMS JCM) was read instead."
+  },
+  {
+   "id": "S-WD-HESS-2004",
+   "title": "Generalising the GHS attack on the elliptic curve discrete logarithm problem",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Florian Hess, LMS Journal of Computation and Mathematics 7 (2004), pp. 167-192.",
+   "url": "https://doi.org/10.1112/S146115700000108X",
+   "sha256": "0f017dd0c0a3d3056044351ec631dea4d75ec1e7a54d5d66bfdbae456624f3e1",
+   "notes": "Open-access Cambridge PDF read: Sections 1-2, Theorems 3, 8, 11, 12, Corollary 13, Theorems 14, 15, Section 11. Theorems are numbered consecutively; there is no 'Theorem 5.3' (see RT-WD-HESS-KERNEL-DESCENT)."
+  },
+  {
+   "id": "S-WD-GALHS-2002",
+   "title": "Extending the GHS Weil Descent Attack",
+   "kind": "primary_publication",
+   "verification": "metadata_only",
+   "citation": "Steven D. Galbraith, Florian Hess and Nigel P. Smart, EUROCRYPT 2002, LNCS 2332, pp. 29-44; IACR ePrint 2001/054.",
+   "url": "https://eprint.iacr.org/2001/054",
+   "notes": "ePrint abstract page read 2026-11-02. The O(q^(n/4+epsilon)) average isogeny-computation cost is taken from Maurer-Menezes-Teske 2002, Remark 20 (read)."
+  },
+  {
+   "id": "S-WD-DIEM-2003",
+   "title": "The GHS attack in odd characteristic",
+   "kind": "primary_publication",
+   "verification": "secondary_only",
+   "citation": "Claus Diem, Journal of the Ramanujan Mathematical Society 18(1) (2003), pp. 1-32.",
+   "notes": "Author page www.math.uni-leipzig.de/~diem/preprints returned HTTP 404 and the archived copy is blocked here. Content reported by Hess 2004 Section 1 ('similar statements for the norm-conorm homomorphism') and Joux-Vitse 2012 Sections 2.1 and 4.1 (both read)."
+  },
+  {
+   "id": "S-WD-MOMOSE-CHAO-2005",
+   "title": "Scholten Forms and Elliptic/Hyperelliptic Curves with Weak Weil Restrictions",
+   "kind": "primary_publication",
+   "verification": "metadata_only",
+   "citation": "Fumiyuki Momose and Jinhui Chao, IACR ePrint 2005/277 (last revised 2005-12-19).",
+   "url": "https://eprint.iacr.org/2005/277",
+   "notes": "ePrint abstract page read 2026-11-02. Joux-Vitse 2012 [26] cites it for the non-hyperelliptic genus-3 cover family (about half the curves with full 2-torsion over F_(q^3))."
+  },
+  {
+   "id": "S-WD-SCHOLTEN-2003",
+   "title": "Weil restriction of an elliptic curve over a quadratic extension",
+   "kind": "primary_publication",
+   "verification": "secondary_only",
+   "citation": "Jasper Scholten, preprint (2003), cited as [30] in Joux-Vitse 2012.",
+   "notes": "Not retrieved. The Scholten-form statement is taken from Joux-Vitse 2012 Section 4.2 (read)."
+  },
+  {
+   "id": "S-WD-KMPS-2010",
+   "title": "On the asymptotic effectiveness of Weil descent attacks",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Koray Karabina, Alfred Menezes, Carl Pomerance and Igor E. Shparlinski, CACR technical report 2010-03 (updated 31 May 2010); later in the Journal of Mathematical Cryptology.",
+   "url": "https://cacr.uwaterloo.ca/techreports/2010/cacr2010-03.pdf",
+   "sha256": "5ff4103303ec274edd76f369f6479dda938964fbe4fad27f7e31d8430a17a652",
+   "notes": "Read Sections 2-3 and 5: eq. (4) genus formula, the state-of-the-art list (i)-(iii), the effectiveness argument (8), Theorems 7, 8, 9 and the closing remarks."
+  },
+  {
+   "id": "S-WD-ADH-1994",
+   "title": "A subexponential algorithm for discrete logarithms over the rational subgroup of the Jacobians of large genus hyperelliptic curves over finite fields",
+   "kind": "primary_publication",
+   "verification": "secondary_only",
+   "citation": "Leonard M. Adleman, Jonathan DeMarrais and Ming-Deh Huang, ANTS-I, LNCS 877 (1994), pp. 28-40.",
+   "url": "https://doi.org/10.1007/3-540-58691-1_39",
+   "notes": "Paywalled. Reported by Galbraith 2018 Section 15.6.2 (read) and by the abstract record (heuristic, log p <= (2g+1)^0.98)."
+  },
+  {
+   "id": "S-WD-GAUDRY-2000",
+   "title": "An algorithm for solving the discrete log problem on hyperelliptic curves",
+   "kind": "primary_publication",
+   "verification": "secondary_only",
+   "citation": "Pierrick Gaudry, EUROCRYPT 2000, LNCS 1807, pp. 19-34.",
+   "url": "https://doi.org/10.1007/3-540-45539-6_2",
+   "notes": "Paywalled. Reported by Galbraith 2018 Section 15.6.3 and Exercise 15.6.5, Joux-Vitse 2012 Section 2.1 and KMPS 2010 Section 3 (all read)."
+  },
+  {
+   "id": "S-WD-ENGE-GAUDRY-2002",
+   "title": "A general framework for subexponential discrete logarithm algorithms",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Andreas Enge and Pierrick Gaudry, Acta Arithmetica 102(1) (2002), pp. 83-103.",
+   "url": "https://hal.science/inria-00512717",
+   "sha256": "6df75e14a943aed3ca6184e03e87b4b850dc0641185f6be8e5523eec8b899e95",
+   "notes": "HAL author version (dated 23 June 2000) read: Theorem 1, Section 5 (hyperelliptic Jacobians, g >= theta log q), Section 7 (cyclic subgroups)."
+  },
+  {
+   "id": "S-WD-THERIAULT-2003",
+   "title": "Index calculus attack for hyperelliptic curves of small genus",
+   "kind": "primary_publication",
+   "verification": "secondary_only",
+   "citation": "Nicolas Theriault, ASIACRYPT 2003, LNCS 2894, pp. 75-92.",
+   "url": "https://doi.org/10.1007/978-3-540-40061-5_5",
+   "notes": "Paywalled. Bound and exponent table reported by Gaudry-Thome-Theriault-Diem 2007 Section 1 and its comparison table (read)."
+  },
+  {
+   "id": "S-WD-GTTD-2007",
+   "title": "A double large prime variation for small genus hyperelliptic index calculus",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Pierrick Gaudry, Emmanuel Thome, Nicolas Theriault and Claus Diem, Mathematics of Computation 76 (2007), pp. 475-492.",
+   "url": "https://inria.hal.science/inria-00000897",
+   "sha256": "b772463c76bceeef56a5a9e80ae28b4e49cd71f3a0cfb47af593199c3aff4bbd",
+   "notes": "HAL preprint dated 28 November 2005 read: Theorem 1, Section 1 comparisons, the exponent table, Section 6 heuristic extension to general curves."
+  },
+  {
+   "id": "S-WD-DIEM-2006-ANTS",
+   "title": "An index calculus algorithm for plane curves of small degree",
+   "kind": "primary_publication",
+   "verification": "metadata_only",
+   "citation": "Claus Diem, ANTS-VII, LNCS 4076 (2006), pp. 543-557; preprint IACR ePrint 2005/119 'Index Calculus in Class Groups of Plane Curves of Small Degree'.",
+   "url": "https://eprint.iacr.org/2005/119",
+   "notes": "ePrint abstract page read 2026-11-02 (PDF behind bot check); author page offline."
+  },
+  {
+   "id": "S-WD-DIEM-2006-ARXIV",
+   "title": "Index calculus with double large prime variation for curves of small genus with cyclic class group",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Claus Diem, arXiv:math/0606607v1 (23 June 2006).",
+   "url": "https://arxiv.org/abs/math/0606607",
+   "sha256": "caa2bb51bd0fbff5977289126a454d0efa42a24648dde3d6ffda249833b2949c",
+   "notes": "Read the main Theorem (Section 1), Proposition 1 and its appendix statement. KMPS 2010 cites the published form as Diem, 'On the discrete logarithm problem in class groups of curves', Math. Comp. (2011)."
+  },
+  {
+   "id": "S-WD-DIEM-THOME-2008",
+   "title": "Index calculus in class groups of non-hyperelliptic curves of genus three",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Claus Diem and Emmanuel Thome, Journal of Cryptology 21(4) (2008), pp. 593-611.",
+   "url": "https://hal.science/inria-00107290",
+   "sha256": "72114908cd2d14b604cf79255906cde39785faffa2fec00a846d815e25ed37d2",
+   "notes": "HAL preprint (11 July 2006) read: Proposition 7, Heuristic Assumption 12, Heuristic Result 13, Proposition 14."
+  },
+  {
+   "id": "S-WD-SMITH-2009",
+   "title": "Isogenies and the Discrete Logarithm Problem in Jacobians of Genus 3 Hyperelliptic Curves",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Benjamin Smith, Journal of Cryptology 22(4) (2009), pp. 505-529; condensed version EUROCRYPT 2008; arXiv:0806.2995v2 (27 Feb 2009).",
+   "url": "https://arxiv.org/abs/0806.2995",
+   "sha256": "44b809946008b6c5d1e9dcadb54b6103fa46ab56a13c0ebeadf9a191b2763140",
+   "notes": "arXiv v2 read: Lemma 1, Hypotheses 1-4, Lemma 4, Propositions 2-5, Theorem 2, Remarks 4 and 6. Smith's Lemma 4 (a square-root statement about s(t)) is unrelated to Nagao's Lemma 4 (CLAIM-NAGAO-LEMMA4)."
+  },
+  {
+   "id": "S-WD-LAINE-LAUTER-2015",
+   "title": "Time-memory trade-offs for index calculus in genus 3",
+   "kind": "primary_publication",
+   "verification": "metadata_only",
+   "citation": "Kim Laine and Kristin Lauter, Journal of Mathematical Cryptology 9(2) (2015), pp. 95-114; IACR ePrint 2014/346.",
+   "url": "https://eprint.iacr.org/2014/346",
+   "notes": "Abstract-level metadata only (escholarship PDF returned empty, ePrint behind bot check)."
+  },
+  {
+   "id": "S-WD-JV-2012",
+   "title": "Cover and Decomposition Index Calculus on Elliptic Curves made practical. Application to a previously unreachable curve over F_(p^6)",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Antoine Joux and Vanessa Vitse, EUROCRYPT 2012, LNCS 7237, pp. 9-26; IACR ePrint 2011/020.",
+   "url": "https://www-fourier.univ-grenoble-alpes.fr/~viva/research/articles/CoverDecomp.pdf",
+   "sha256": "7ca88c54ebfcb6fac8d05d313bfe8c26d3cb133081c55c4ab6ea4c1b45729b38",
+   "notes": "Author-hosted PDF read: Sections 2.1, 3.3, 4.1-4.3 and Table 1 (cover part). The decomposition part belongs to the summation-polynomial cluster."
+  },
+  {
+   "id": "S-WD-EG-2007",
+   "title": "An L(1/3 + epsilon) Algorithm for the Discrete Logarithm Problem for Low Degree Curves",
+   "kind": "primary_publication",
+   "verification": "primary_read",
+   "citation": "Andreas Enge and Pierrick Gaudry, EUROCRYPT 2007, LNCS 4515, pp. 379-393; arXiv:cs/0703032.",
+   "url": "https://arxiv.org/abs/cs/0703032",
+   "sha256": "1545437aac0012c5eb8c4304e7032d272c3f6aa6743741d7aeb4ec581df399ab",
+   "notes": "Read abstract, Heuristics 1 and 2, Theorem 3 (Hess), Proposition 5."
+  }
+ ],
+ "nodes": [
+  {
+   "id": "DEF-WD-COVER-ATTACK",
+   "label": "Cover (Weil-descent) attack via conorm-norm",
+   "kind": "definition",
+   "status": "definition",
+   "model": "mathematical",
+   "statement": "Given E/K with K = F_(q^n), k = F_q, a cover attack finds a curve C over K with a finite map C -> E and an automorphism sigma of K(C) of order n (or np) extending the q-power Frobenius, with fixed field k(C0). The composition phi = N_(C/C0) o Con_(C/E) maps Pic0(E)(K) = E(K) to Pic0_(C0)(k); if phi does not kill the target subgroup, the ECDLP transfers to the divisor class group of C0 over k.",
+   "scope": "Definition of the transfer only; whether it helps depends on the genus of C0 (needs g >= n for a subgroup of size about q^n) and on index calculus there.",
+   "assumptions": [],
+   "source_refs": [
+    "S-GALBRAITH-MPKC-2018",
+    "S-WD-HESS-2004",
+    "S-WD-FREY-1998"
+   ],
+   "tags": [
+    "weil-descent",
+    "cover-attack",
+    "definition",
+    "conorm-norm"
+   ],
+   "source_locations": [
+    "Galbraith 2018, Section 15.7, p. 346-347",
+    "Hess 2004, Section 2 (phi = N_(C/C^U1) o Con_(C/E))"
+   ],
+   "evidence_class": "definition"
+  },
+  {
+   "id": "DEF-WD-GHS-MAGIC-NUMBER",
+   "label": "GHS magic number m(b) and type of b",
+   "kind": "definition",
+   "status": "definition",
+   "model": "mathematical",
+   "statement": "For E: y^2 + xy = x^3 + a x^2 + b over F_(q^n), q = 2^l, with b_i = sigma^i(b): m(b) = dim_F2 Span_F2{(1, b_0^(1/2)), ..., (1, b_(n-1)^(1/2))}. With n = 2^e n1 (n1 odd), x^n - 1 = (f_0 f_1 ... f_s)^(2^e), f_0 = x - 1, Ord_b the least F_2[x]-annihilator of b under sigma, the type of b is (j_0, ..., j_s) with j_i the exponent of f_i in Ord_b.",
+   "scope": "Characteristic two, the Artin-Schreier form above.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-MMT-2002",
+    "S-GHS-2002"
+   ],
+   "tags": [
+    "ghs",
+    "magic-number",
+    "definition",
+    "binary-extension"
+   ],
+   "source_locations": [
+    "MMT 2002, eq. (5)",
+    "MMT 2002, Definition 4"
+   ],
+   "formula": "m(b) = dim_F2 Span{(1, sqrt(sigma^i b))}",
+   "evidence_class": "definition",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/ec_trapdoor.rs",
+     "use": "depends",
+     "note": "magic_number definition, MMT eq. (5)"
+    },
+    {
+     "path": "src/cryptanalysis/ghs_class_coverage.rs",
+     "use": "depends",
+     "note": "magic_mmt vs magic_plain"
+    }
+   ]
+  },
+  {
+   "id": "COND-WD-FREY-1998",
+   "label": "Frey 1998: Weil descent as an attack methodology",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "Proposal: view E(F_(q^n)) inside its Weil restriction A over F_q (an n-dimensional abelian variety); if a curve C maps to A (C -> J_C -> A) and C admits an effective Riemann-Roch theorem, an index-calculus attack on C solves the DLP on A, hence on E.",
+   "scope": "A methodology, not an algorithm with a cost: it states neither how to find C nor its genus. The concrete construction is GHS 2002.",
+   "assumptions": [
+    "A suitable curve C on the Weil restriction exists and can be found",
+    "Index calculus on J_C is faster than generic attacks on E"
+   ],
+   "source_refs": [
+    "S-WD-FREY-1998",
+    "S-GALBRAITH-MPKC-2018"
+   ],
+   "tags": [
+    "weil-descent",
+    "frey",
+    "proposal",
+    "history"
+   ],
+   "source_locations": [
+    "Frey ECC'98 slides 20-21 ('Dangers', 'Example')",
+    "Galbraith 2018, Section 15.7, footnote 10"
+   ],
+   "evidence_class": "conditional_theorem",
+   "failure_modes": [
+    "No low-genus curve on the Weil restriction",
+    "Transfer kernel kills the target subgroup"
+   ],
+   "cited_by": [
+    {
+     "path": "src/ecc_safety.rs",
+     "use": "mention",
+     "note": "Frey 1998 / Galbraith-Smart cited as relevant for composite n"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-GHS-THM1-GENUS",
+   "label": "GHS Theorem 1: hyperelliptic cover of genus 2^(m-1) or 2^(m-1)-1",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "curve_family_restricted",
+   "statement": "Let q = 2^l and E: y^2 + xy = x^3 + a x^2 + b over K = F_(q^n). If n is odd, or m(b) = n, or Tr_(K/F2)(a) = 0 (condition (6)), the GHS reduction constructs an explicit group homomorphism phi: E(F_(q^n)) -> J_C(F_q) with C a hyperelliptic curve over F_q of genus g = 2^(m-1) or 2^(m-1) - 1.",
+   "scope": "Characteristic two, the GHS (Artin-Schreier, alpha = 1 or beta = 1) construction. It says nothing about the kernel of phi on the large prime subgroup (argued 'highly unlikely' in GHS, proved later by Hess 2004, Theorem 14) nor about the cost of the HCDLP.",
+   "assumptions": [
+    "q = 2^l",
+    "Condition (6)"
+   ],
+   "source_refs": [
+    "S-GHS-2002",
+    "S-WD-MMT-2002"
+   ],
+   "tags": [
+    "ghs",
+    "genus",
+    "theorem",
+    "binary-extension"
+   ],
+   "source_locations": [
+    "MMT 2002, Theorem 1 (restating GHS 2002)",
+    "GHS 2002, Theorem 1"
+   ],
+   "formula": "g in {2^(m-1), 2^(m-1) - 1}",
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/ghs_class_coverage.rs",
+     "use": "depends",
+     "note": "genus 2^(m-1) or 2^(m-1)-1"
+    },
+    {
+     "path": "src/cryptanalysis/ghs_descent.rs",
+     "use": "depends",
+     "note": "genus of the m >= 2 descent"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-MMT-MAGIC-TYPE",
+   "label": "Menezes-Qu/MMT Theorem 5: magic number from the type of b",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "If b in F_(q^n) has type (j_0, ..., j_s) then (i) m(b) = sum_i j_i d_i + c with c = 1 if j_0 = 0 and c = 0 otherwise (d_i = deg f_i); (ii) the number of b of that type is prod_(j_i != 0) (q^(j_i d_i) - q^((j_i - 1) d_i)).",
+   "scope": "Exact count over F_(q^n), characteristic two; feeds the census of attackable isomorphism classes (MMT Lemma 8).",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-MMT-2002",
+    "S-WD-MQ-2001"
+   ],
+   "tags": [
+    "ghs",
+    "magic-number",
+    "census",
+    "theorem"
+   ],
+   "source_locations": [
+    "MMT 2002, Theorem 5 ('see [23]' = Menezes-Qu 2001)",
+    "MMT 2002, Lemma 8"
+   ],
+   "formula": "m(b) = sum j_i d_i + [j_0 = 0]",
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/ec_trapdoor.rs",
+     "use": "depends",
+     "note": "MMT Theorem 5(i), test mmt_theorem5_counts_n12"
+    },
+    {
+     "path": "src/cryptanalysis/ghs_class_coverage.rs",
+     "use": "depends",
+     "note": "magic histogram, MMT Theorem 5(i)"
+    },
+    {
+     "path": "src/bin/transfer_audit/ghs.rs",
+     "use": "depends",
+     "note": "achievable magic numbers per field"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-MMT-LEMMA6",
+   "label": "MMT Lemma 6: weaker applicability condition, correcting GHS Lemma 11's proof",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "curve_family_restricted",
+   "statement": "In GHS Theorem 1, condition (6) can be replaced by the weaker condition (8): n odd, or j_0 = 2^e, or Tr_(K/F2)(a) = 0 (equivalently, Lemma 7: gcd((x^n - 1)/lcm(Ord_b, x - 1), x - 1) = 1 or Tr(a) = 0). The proof replaces the function f 'incorrectly defined in [GHS], Proof of Lemma 11' by f = (x - 1)^c prod f_i^(j_i).",
+   "scope": "A published correction to a step of the GHS proof plus a strengthening; the GHS theorem statement itself survives.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ],
+   "tags": [
+    "ghs",
+    "correction",
+    "applicability",
+    "theorem"
+   ],
+   "source_locations": [
+    "MMT 2002, Lemma 6 and proof",
+    "MMT 2002, Lemma 7"
+   ],
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/ghs_class_coverage.rs",
+     "use": "depends",
+     "note": "MMT Lemma 6 condition (8) for the Tr a = 1 twist"
+    },
+    {
+     "path": "src/bin/transfer_audit/ghs.rs",
+     "use": "depends",
+     "note": "MMT Lemma 6 applicability"
+    },
+    {
+     "path": "src/cryptanalysis/ghs_smooth.rs",
+     "use": "mention",
+     "note": "Menezes-Qu / MMT Lemma 6; not implemented"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-MQ-PRIME-DEGREE",
+   "label": "Menezes-Qu (MMT Theorem 11): magic numbers for odd prime n",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "Let n be an odd prime and t = ord_n(2), s = (n-1)/t. Then x^n - 1 = (x - 1) f_1 ... f_s over F_2 with deg f_i = t; the smallest admissible m(b) > 1 is t + 1; it is attained exactly on B = {b in F_(q^n) \\ F_q : (sigma - 1) f_i(sigma)(b) = 0 for some i}, and #B = q s (q^t - 1).",
+   "scope": "Exact. With GHS Theorem 1 the cover genus for m > 1 is at least 2^(t-1) - 1.",
+   "assumptions": [
+    "n odd prime"
+   ],
+   "source_refs": [
+    "S-WD-MMT-2002",
+    "S-WD-MQ-2001"
+   ],
+   "tags": [
+    "ghs",
+    "prime-degree",
+    "magic-number",
+    "theorem"
+   ],
+   "source_locations": [
+    "MMT 2002, Theorem 11 ('see [23]')"
+   ],
+   "formula": "m_min>1 = ord_n(2) + 1; #B = q s (q^t - 1)",
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "COND-WD-MQ-PRIME-N-FAILS",
+   "label": "Menezes-Qu: GHS fails for prime N in [160, 600]",
+   "kind": "structural_theorem",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "For every cryptographically interesting E over F_(2^N) with N prime in [160, 600], the GHS curve has genus either too small (J_C(F_2) cannot carry the large prime subgroup) or g >= 2^16 - 1, whence the HCDLP is infeasible.",
+   "scope": "Prime extension degree over F_2 only. The 'infeasible' half is a cost judgement against the then-best HCDLP algorithms (Enge-Gaudry type), not a lower bound; it does not cover other covers, isogeny walks or decomposition attacks.",
+   "assumptions": [
+    "Best HCDLP algorithm is Enge-Gaudry-type subexponential index calculus",
+    "Genus >= 2^16 - 1 makes that infeasible"
+   ],
+   "source_refs": [
+    "S-WD-MQ-2001",
+    "S-WD-MMT-2002",
+    "S-WD-HESS-2004"
+   ],
+   "tags": [
+    "ghs",
+    "prime-degree",
+    "obstruction",
+    "binary-extension"
+   ],
+   "source_locations": [
+    "MMT 2002, Section 1 ('proven to fail ... N in [160,600] prime', g >= 2^16 - 1)",
+    "Hess 2004, Section 1"
+   ],
+   "evidence_class": "conditional_theorem",
+   "non_implications": [
+    "Not a proof that ECDLP over F_(2^N), N prime, resists all Weil-descent or cover variants",
+    "Says nothing about decomposition (summation-polynomial) attacks"
+   ]
+  },
+  {
+   "id": "ALG-WD-MMT-EG-COST",
+   "label": "MMT non-asymptotic Enge-Gaudry cost model for GHS curves",
+   "kind": "algorithmic_upper_bound",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "For genus-g hyperelliptic C over F_q and smoothness bound t: factor base F(t) = sum_(l<=t) (1/2)(1/l) sum_(d|l) mu(l/d) q^d; number of t-smooth reduced divisors M(t) = [x^g] prod_(l<=t) ((1 + x^l)/(1 - x^l))^(A_l); expected walk iterations per relation E(t) = #J_C(k)/M(t); relation cost T(t) = (F(t) + 5) E(t); linear algebra L(t) = F(t)^2.",
+   "scope": "Concrete estimate used to compare GHS with rho for each composite N in [100, 600]; counts random-walk steps and modular operations, not bit operations.",
+   "assumptions": [
+    "Proportion of t-smooth divisors in <D1> equals that in J_C(k) (eq. 13)",
+    "Lanczos cost alpha (F+5)^2 with alpha <= g approximated by F^2"
+   ],
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ],
+   "tags": [
+    "ghs",
+    "cost-model",
+    "enge-gaudry",
+    "concrete-estimate"
+   ],
+   "source_locations": [
+    "MMT 2002, Definition 12",
+    "MMT 2002, Section 4.3, eqs. (10)-(15)"
+   ],
+   "evidence_class": "concrete_estimate",
+   "failure_modes": [
+    "Subgroup smoothness differs from full-group smoothness",
+    "Linear-algebra row weight above g",
+    "Estimates imprecise when g l >> N (MMT Remark 17)"
+   ],
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/jacobian_transfer/cost.rs",
+     "use": "depends",
+     "note": "Enge-Gaudry priced by explicit smoothness count, factor base (1/2) sum I_d, linear algebra g F^2"
+    },
+    {
+     "path": "research/jacobian_transfer_scan_20261010/README.md",
+     "use": "reports",
+     "note": "'Enge-Gaudry, explicit count' rows for c2pnb176w1/272w1/304w1"
+    }
+   ]
+  },
+  {
+   "id": "HEUR-WD-SUBGROUP-SMOOTHNESS",
+   "label": "Subgroup smoothness equals full-group smoothness",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "algebraic_coordinate",
+   "statement": "The proportion of t-smooth (or factor-base-smooth) reduced divisors in the cyclic subgroup <D1> where the DLP lives equals the proportion in the whole group J_C(F_q).",
+   "scope": "Used by every index-calculus estimate on a non-cyclic Jacobian or a proper subgroup; the rigorous Enge-Gaudry and GTTD theorems avoid it by assuming a cyclic group (or known structure).",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-MMT-2002",
+    "S-WD-ENGE-GAUDRY-2002",
+    "S-WD-GTTD-2007"
+   ],
+   "tags": [
+    "heuristic",
+    "smoothness",
+    "subgroup",
+    "index-calculus"
+   ],
+   "source_locations": [
+    "MMT 2002, before eq. (13)",
+    "Enge-Gaudry 2002, Section 7",
+    "GTTD 2007, Section 6"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "COND-WD-MMT-COMPOSITE-N",
+   "label": "MMT: GHS beats rho on some curves for many composite N in [160, 600]",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "For composite N in [100, 600], Algorithm 13 lists parameters (n, l, m, g) for which a cryptographically interesting curve should exist and GHS + Enge-Gaudry beats rho on it. Examples: N = 161, 180, 186, 217, 248, 300 feasible; N = 185 about 2^76 steps versus 2^92 for rho on essentially all curves (n = 5, m = 5); N = 600 about 2^79 steps on 2^202 curves versus 2^299. Remark 19: where D3 < 0, rho is faster for all curves.",
+   "scope": "Only curves with the least magic numbers (often a tiny fraction: about 2^94 of 2^162 curves for N = 161); conclusions are conditional on Enge-Gaudry being essentially the best HCDLP algorithm.",
+   "assumptions": [
+    "Enge-Gaudry essentially the best HCDLP index calculus (Remark 19)",
+    "Existence of cryptographically interesting curves with given (N, l, m) (Remark 21)"
+   ],
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ],
+   "tags": [
+    "ghs",
+    "composite-degree",
+    "concrete-estimate",
+    "binary-extension"
+   ],
+   "source_locations": [
+    "MMT 2002, Remarks 18-20",
+    "MMT 2002, Table 1"
+   ],
+   "evidence_class": "concrete_estimate",
+   "cited_by": [
+    {
+     "path": "research/teske_variants_field_types_20261018/REPORT.md",
+     "use": "reports",
+     "note": "Table 1 rows N = 161, 165, 170 and Remark 20 quoted"
+    }
+   ]
+  },
+  {
+   "id": "COND-WD-GALHS-ISOGENY",
+   "label": "Galbraith-Hess-Smart 2002: extend GHS through isogenies",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "Given E1/F_(q^n), search its isogeny class for an E2 with a small GHS magic number, compute an explicit isogeny E1 -> E2 (expected average O(q^(n/4+epsilon)) by their improvement of Galbraith's algorithm) and run GHS on E2. Consequences claimed: fields F_(q^7) are weaker than others; many more curves over F_(2^155) are weak than previously thought.",
+   "scope": "Characteristic two, composite degree. The cost is dominated by finding the target curve in the isogeny class, which can be infeasible (MMT Remark 20: essentially a search through 2^57 curves for N = 165).",
+   "assumptions": [
+    "Target low-magic curve exists in the isogeny class",
+    "Isogeny search cost below the GHS/rho saving"
+   ],
+   "source_refs": [
+    "S-WD-GALHS-2002",
+    "S-WD-MMT-2002"
+   ],
+   "tags": [
+    "ghs",
+    "isogeny",
+    "extension",
+    "binary-extension"
+   ],
+   "source_locations": [
+    "Galbraith-Hess-Smart 2002, abstract (ePrint 2001/054)",
+    "MMT 2002, Remark 20"
+   ],
+   "evidence_class": "conditional_theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/jacobian_transfer/binary.rs",
+     "use": "mention",
+     "note": "Galbraith-Hess-Smart isogeny extension"
+    }
+   ]
+  },
+  {
+   "id": "COND-WD-MTW-WEAK-FIELDS",
+   "label": "Menezes-Teske-Weng: weak fields for ECC (e.g. GF(2^210))",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "Some finite fields, including GF(2^210), are weak: every ECDLP instance on every elliptic curve over them can be solved in significantly less time than Pollard rho needs for the hardest instances (KMPS: GHS beats rho for almost all cryptographically interesting curves over F_(2^(5l)), l in [32, 120]).",
+   "scope": "A finite-range statement compared with rho on the hardest (largest-order) instances; KMPS 2010 shows the advantage does not persist asymptotically.",
+   "assumptions": [
+    "GHS/gGHS reduction plus isogeny walks",
+    "Then-best HCDLP cost model"
+   ],
+   "source_refs": [
+    "S-WD-MTW-2004",
+    "S-WD-KMPS-2010"
+   ],
+   "tags": [
+    "ghs",
+    "weak-field",
+    "binary-extension"
+   ],
+   "source_locations": [
+    "MTW 2004, abstract (ePrint 2003/128)",
+    "KMPS 2010, Section 1, ref. [20]"
+   ],
+   "evidence_class": "concrete_estimate",
+   "cited_by": [
+    {
+     "path": "research/teske_variants_field_types_20261018/REPORT.md",
+     "use": "reports",
+     "note": "MTW abstract quoted"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-HESS-THM3-ORDER",
+   "label": "Hess Theorem 3: order of the Frobenius extension sigma_1",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "For an Artin-Schreier extension C/F with Delta/wp(F) the cyclic F_p[sigma]-module generated by f, with m_f the least polynomial with f m_f(sigma) in wp(F) and c_f = (t^n - 1)/m_f: (i) every extension of sigma has order n or np; (ii) extensions of both orders exist iff f (sigma^n - 1)/(sigma - 1) in wp(F); (iii) in that case they have order n iff v c_f(sigma) = 0 for v in wp^(-1)(f m_f(sigma)).",
+   "scope": "Decides whether the descended function field is defined over k (order n) or needs the larger group; the GHS condition (6)/(8) is a special case.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ],
+   "tags": [
+    "ghs",
+    "artin-schreier",
+    "frobenius-extension",
+    "theorem"
+   ],
+   "source_locations": [
+    "Hess 2004, Theorem 3"
+   ],
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "THM-WD-HESS-THM8-GENUS-BOUNDS",
+   "label": "Hess Theorem 8: upper and lower genus bounds for the Artin-Schreier cover",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "With Delta/wp(F) cyclic of F_p-dimension m generated by f: m <= n and g_C <= ((p^m - 1)/(p - 1)) (g_(E_f) - g_F) + g_F if f has sigma-invariant poles (else with an extra factor n); and if m >= 2 and F(wp^(-1)(f, f^sigma)) has genus > g_(E_f), then g_C >= p^(m-2) g_(E_f)/[K1 : K] + 1.",
+   "scope": "General Artin-Schreier Weil descent; the genus grows exponentially in the module dimension m.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ],
+   "tags": [
+    "ghs",
+    "genus",
+    "bound",
+    "theorem"
+   ],
+   "source_locations": [
+    "Hess 2004, Theorem 8"
+   ],
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "THM-WD-HESS-THM12-GENUS",
+   "label": "Hess Theorem 12: exact genus g = 2^m - 2^(m-deg m_gamma) - 2^(m-deg m_beta) + 1",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "curve_family_restricted",
+   "statement": "For E written as y^2 + y = gamma/x + alpha + beta x over K (characteristic two) with K1 = K, the descended curve C = F(wp^(-1)(Delta)) has genus g_C = 2^m - 2^(m - deg m_gamma) - 2^(m - deg m_beta) + 1, where m = dim and m_gamma, m_beta are the F_2[sigma]-annihilators of gamma, beta. KMPS restate it as g = 2^t - 2^(t-r) - 2^(t-s) + 1 with r = deg Ord_alpha, s = deg Ord_beta, t = deg lcm.",
+   "scope": "Generalised GHS (gGHS) in characteristic two; for gamma in k it recovers GHS (genus 2^(m-1) or 2^(m-1) - 1, hyperelliptic). For general gamma, beta the curve is not hyperelliptic.",
+   "assumptions": [
+    "Characteristic two",
+    "K1 = K (C/K regular)",
+    "Frobenius extension conditions of Hess Theorem 11"
+   ],
+   "source_refs": [
+    "S-WD-HESS-2004",
+    "S-WD-KMPS-2010"
+   ],
+   "tags": [
+    "ghs",
+    "gghs",
+    "genus",
+    "theorem"
+   ],
+   "source_locations": [
+    "Hess 2004, Theorem 12",
+    "KMPS 2010, eq. (4)"
+   ],
+   "formula": "g = 2^m - 2^(m-deg m_gamma) - 2^(m-deg m_beta) + 1",
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "research/ghs_hess_c_parameter_audit_20261026/PROTOCOL.md",
+     "use": "depends",
+     "note": "Hess Theorem 12 genus formula"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-HESS-COR13-GENUS-CRITERION",
+   "label": "Hess Corollary 13: when the GHS genus is 2^(m-1) - 1",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "curve_family_restricted",
+   "statement": "For gamma in k (the original GHS case) the cover is hyperelliptic of genus 2^(m-1) or 2^(m-1) - 1, and the genus is 2^(m-1) - 1 if and only if Tr_(K/F_(q^u))(beta) = 0, where u = 2^(v_2(n)). Hess also shows that MMT Lemma 6 condition (2) is necessary and sufficient and GHS condition (dagger) sufficient for existence of the Frobenius automorphism.",
+   "scope": "Characteristic two, GHS case.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ],
+   "tags": [
+    "ghs",
+    "genus",
+    "criterion",
+    "theorem"
+   ],
+   "source_locations": [
+    "Hess 2004, Corollary 13 and the paragraph before it"
+   ],
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "THM-WD-HESS-THM14-KERNEL",
+   "label": "Hess Theorem 14: kernel of the norm-conorm map",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "curve_family_restricted",
+   "statement": "For phi_h = N_(C/C^U1) o Con_(C/E_h): N^(-1)(0) <= ker(phi_h) <= N^(-1)(Cl0(E_h^(sigma_1^s(h)))[2^(m-1)]), the norms taken from E_h to its fixed field under sigma_1^s(h). If sigma_1 is a Frobenius automorphism, the DLP in a large prime subgroup is preserved iff s(h) = n, i.e. E_h is not a subfield curve.",
+   "scope": "Replaces the GHS 'highly unlikely' kernel argument with a checkable criterion for the (generalised) Artin-Schreier construction in characteristic two.",
+   "assumptions": [
+    "sigma_1 is a Frobenius automorphism of C with respect to K/k (Theorem 11)"
+   ],
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ],
+   "tags": [
+    "ghs",
+    "kernel",
+    "transfer",
+    "theorem"
+   ],
+   "source_locations": [
+    "Hess 2004, Theorem 14 and following paragraph",
+    "Hess 2004, Section 9 (Theorems 18, 20)"
+   ],
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "problems/ghs-higher-magic-descent-not-executable.md",
+     "use": "mention",
+     "note": "needs 'a theorem with checkable hypotheses' for injectivity; cites Hess 2004 'Thm 5.3', which does not exist"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-HESS-THM15-LPOLY",
+   "label": "Hess Theorem 15: L-polynomial of the descended curve",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "curve_family_restricted",
+   "statement": "If sigma_1 is a Frobenius automorphism of C over K/k and S is a set of representatives of the U-orbits on Delta/wp(F), then L_(C^U1)(t) = prod_(h in S) L_((E_h)^(sigma_1^s(h)))(t^(s(h))).",
+   "scope": "Gives #J_(C^U1)(k) and the Jacobian decomposition without constructing the curve.",
+   "assumptions": [
+    "sigma_1 is a Frobenius automorphism"
+   ],
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ],
+   "tags": [
+    "ghs",
+    "l-polynomial",
+    "theorem"
+   ],
+   "source_locations": [
+    "Hess 2004, Theorem 15",
+    "Hess 2004, Theorem 26"
+   ],
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "research/ghs_q16_hess_elliptic_quotient_20261027/PROTOCOL.md",
+     "use": "depends",
+     "note": "prior-work boundary: Hess (2004) Theorem 15"
+    }
+   ]
+  },
+  {
+   "id": "COND-WD-HESS-F2155",
+   "label": "Hess 2004: about 2^123 more curves over F_(2^155) attackable",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "For F_(2^155)/F_(2^5), about 2^104 of the 2^156 isomorphism classes are vulnerable to the isogeny-extended GHS attack of Galbraith-Hess-Smart; the generalised construction adds about 2^123 classes. The new curves are not hyperelliptic, so DLP solving on them is slower by a factor polynomial in the genus; 'the precise efficiency and practical implications have yet to be determined'.",
+   "scope": "Counts of curves reachable by the construction; not a cost theorem.",
+   "assumptions": [
+    "Isogeny search succeeds",
+    "Index calculus on non-hyperelliptic covers is only polynomially slower"
+   ],
+   "source_refs": [
+    "S-WD-HESS-2004",
+    "S-WD-HESS-2003"
+   ],
+   "tags": [
+    "gghs",
+    "binary-extension",
+    "census"
+   ],
+   "source_locations": [
+    "Hess 2004, Section 1 (paragraphs 4-5)",
+    "Hess 2004, Section 6"
+   ],
+   "evidence_class": "concrete_estimate"
+  },
+  {
+   "id": "GAP-WD-GGHS-NONHYP-COST",
+   "label": "Index-calculus cost on non-hyperelliptic gGHS covers",
+   "kind": "open_obligation",
+   "status": "open",
+   "model": "curve_family_restricted",
+   "statement": "Open as stated by Hess (2004, 2003): the generalised GHS curves have the same genera but are not hyperelliptic; how much slower index calculus is on them (claimed 'in general slower by a factor polynomial in the genus') and the practical implications are not determined.",
+   "scope": "Any cost row that prices a gGHS cover with the hyperelliptic formulas (Gaudry, GTTD, Enge-Gaudry) inherits this gap.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-HESS-2004",
+    "S-WD-HESS-2003"
+   ],
+   "tags": [
+    "gghs",
+    "open",
+    "cost-model"
+   ],
+   "source_locations": [
+    "Hess 2004, Section 1 and Section 7",
+    "Hess 2004, Section 11"
+   ],
+   "evidence_class": "open"
+  },
+  {
+   "id": "COND-WD-MT-HESS-FIELDS",
+   "label": "Menezes-Teske 2006: which GF(2^N) are weak under gGHS",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "Under Hess' generalised GHS attack: GF(q^7) are potentially partially weak (likely for the half of curves with #E divisible by 4); GF(q^3) partially weak; GF(q^6) potentially weak; GF(q^8) potentially partially weak; fields GF(2^N) with N not divisible by 3, 5, 6, 7 or 8 are argued not weak.",
+   "scope": "Abstract-level claims; 'potentially' marks dependence on unresolved costs (e.g. non-hyperelliptic index calculus, isogeny search).",
+   "assumptions": [
+    "Hess generalised GHS",
+    "Cost of index calculus on the resulting curves"
+   ],
+   "source_refs": [
+    "S-WD-MT-2006"
+   ],
+   "tags": [
+    "gghs",
+    "weak-field",
+    "binary-extension"
+   ],
+   "source_locations": [
+    "Menezes-Teske 2006, abstract (ePrint 2004/235)"
+   ],
+   "evidence_class": "concrete_estimate",
+   "cited_by": [
+    {
+     "path": "research/teske_variants_field_types_20261018/PROTOCOL.md",
+     "use": "reports",
+     "note": "Menezes-Teske weak-field classes"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-KMPS-THM8-UPPER",
+   "label": "KMPS Theorem 8: gGHS genus upper bounds 2^(3n/4) and 2^(2n/3)",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "curve_family_restricted",
+   "statement": "There is a set of n of asymptotic density 1 such that, as n -> infinity through it, Weil descent on y^2 + xy = x^3 + a x^2 + b with Tr_2(a) = 0 yields a curve of genus g <= 2^(3n/4 + o(n)) for all b in F_(q^n), and g <= 2^(2n/3 + o(n)) for all but o(q^n) of the b.",
+   "scope": "Characteristic two, generalised GHS with optimal decomposition b = (alpha beta)^2.",
+   "assumptions": [
+    "Tr_2(a) = 0 (the authors sketch the other case)"
+   ],
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ],
+   "tags": [
+    "gghs",
+    "genus",
+    "asymptotic",
+    "theorem"
+   ],
+   "source_locations": [
+    "KMPS 2010, Theorem 8 (with Theorems 1, 2, 7)"
+   ],
+   "formula": "g <= 2^(3n/4+o(n)) (all b); g <= 2^(2n/3+o(n)) (almost all b)",
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "THM-WD-KMPS-THM9-LOWER",
+   "label": "KMPS Theorem 9: gGHS genus >= 2^(n/2) for almost all curves",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "curve_family_restricted",
+   "statement": "For all but o(q^n) coefficients b in F_(q^n), Weil descent (any decomposition b = (alpha beta)^2 in the gGHS framework) on the curve (2) leads to genus g >= 2^(n/2 + o(n)) as n -> infinity.",
+   "scope": "Characteristic two, gGHS family of KMPS eq. (4). Does not bound covers outside that construction; the isogeny-class enlargement reaches at most q^(n/2 + O(log n)) curves.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ],
+   "tags": [
+    "gghs",
+    "genus",
+    "lower-bound",
+    "asymptotic",
+    "theorem"
+   ],
+   "source_locations": [
+    "KMPS 2010, Theorem 9",
+    "KMPS 2010, Section 5 closing remarks (Hess, Lemma VIII.6: genus >= n^A outside q^(4A log2 n + O(1)) b)"
+   ],
+   "formula": "g >= 2^(n/2+o(n)) for all but o(q^n) b",
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "COND-WD-KMPS-INEFFECTIVE",
+   "label": "KMPS: Weil descent attacks are asymptotically almost never effective",
+   "kind": "structural_theorem",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "For n fixed, gGHS is asymptotically inferior to index calculus directly on E (Diem: q^(2-2/n)) because g >= n; for n = O(sqrt(log q)) the subexponential HCDLP algorithms are not polynomial in q; for n/sqrt(log q) -> infinity, beating rho would need g(log g + log log q) = O(n^2 log q), i.e. g = O(n^4) even under the optimistic assumption that Hess's L_(q^g)[1/2] algorithm applies to all curves, whereas Theorem 9 gives g >= 2^(n/2+o(n)) for almost all curves.",
+   "scope": "Asymptotic; does not contradict finite-range weak fields (MTW, MMT) where rho and Gaudry-type algorithms are the practical comparators.",
+   "assumptions": [
+    "Optimistic: Hess's L_(q^g)[1/2, kappa] algorithm for all genus-g curves",
+    "Comparison algorithms as listed in KMPS Section 3 (i)-(iii)"
+   ],
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ],
+   "tags": [
+    "gghs",
+    "asymptotic",
+    "obstruction"
+   ],
+   "source_locations": [
+    "KMPS 2010, Section 3 (items (i)-(iii), eqs. (6)-(8))",
+    "KMPS 2010, Theorem 9"
+   ],
+   "evidence_class": "conditional_theorem",
+   "non_implications": [
+    "Not an obstruction to covers other than gGHS",
+    "Not a statement about specific fields such as F_(2^155) or F_(2^210)"
+   ],
+   "cited_by": [
+    {
+     "path": "research/teske_variants_field_types_20261018/REPORT.md",
+     "use": "mention",
+     "note": "Karabina et al. cited for asymptotic ineffectiveness"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-DIEM-GHS-ODD",
+   "label": "Diem 2003: GHS attack in odd characteristic",
+   "kind": "structural_theorem",
+   "status": "proved_external_unread",
+   "model": "curve_family_restricted",
+   "statement": "Generalises the GHS construction to elliptic and hyperelliptic curves over finite fields of odd characteristic (Kummer/quadratic covers), including statements on the kernel of the norm-conorm homomorphism; together with Theriault's Kummer-extension work it classifies, e.g., which E/F_(q^3) get a genus-3 hyperelliptic cover over F_q.",
+   "scope": "Odd characteristic Weil descent. Statement reported, not read.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-DIEM-2003",
+    "S-WD-HESS-2004",
+    "S-WD-JV-2012"
+   ],
+   "tags": [
+    "ghs",
+    "odd-characteristic",
+    "weil-descent"
+   ],
+   "source_locations": [
+    "Diem 2003, J. Ramanujan Math. Soc. 18, pp. 1-32 (as cited)",
+    "Hess 2004, Section 1",
+    "Joux-Vitse 2012, Sections 2.1 and 4.1, ref. [8]"
+   ],
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "THM-WD-JV-GENUS3-FAMILY",
+   "label": "Genus-3 hyperelliptic GHS covers of E/F_(q^3), odd characteristic",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "curve_family_restricted",
+   "statement": "In odd characteristic, the only E/F_(q^3) for which the GHS attack yields a hyperelliptic genus-3 cover H/F_q are y^2 = h(x)(x - alpha)(x - sigma(alpha)) with alpha in F_(q^3) \\ F_q and h in F_q[x] of degree 1 or 2. There are Theta(q^2) such curves, all with #E divisible by 4. Non-hyperelliptic genus-3 covers exist for y^2 = c(x - alpha)(x - sigma alpha)(x - beta)(x - sigma beta) (about half the curves with full 2-torsion over F_(q^3), per Momose-Chao).",
+   "scope": "As stated by Joux-Vitse from Diem 2003, Momose-Chao 2005 and Theriault 2003 (Kummer).",
+   "assumptions": [
+    "Odd characteristic",
+    "Extension degree 3"
+   ],
+   "source_refs": [
+    "S-WD-JV-2012",
+    "S-WD-DIEM-2003",
+    "S-WD-MOMOSE-CHAO-2005"
+   ],
+   "tags": [
+    "cover",
+    "genus-3",
+    "odd-characteristic",
+    "family"
+   ],
+   "source_locations": [
+    "Joux-Vitse 2012, Section 4.1, eqs. (3) and (4)"
+   ],
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/jv_cover.rs",
+     "use": "depends",
+     "note": "curves y^2 = x(x - alpha)(x - sigma(alpha)) and their genus-3 GHS cover"
+    },
+    {
+     "path": "src/cryptanalysis/smith_elliptic_walk.rs",
+     "use": "depends",
+     "note": "Joux-Vitse Eurocrypt 2012 Section 4.1 eq. (3)"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-MOMOSE-CHAO",
+   "label": "Momose-Chao: classes of curves with weak Weil restrictions",
+   "kind": "structural_theorem",
+   "status": "proved_external_unread",
+   "model": "curve_family_restricted",
+   "statement": "Explicit classes of elliptic and low-genus hyperelliptic curves over extension fields whose Weil restrictions admit weak coverings (attackable by hyperelliptic index calculus or by Diem's non-hyperelliptic algorithm), with constructions of the coverings and densities of such curves.",
+   "scope": "Abstract-level statement; Scholten forms are the key normal form.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-MOMOSE-CHAO-2005"
+   ],
+   "tags": [
+    "cover",
+    "scholten-form",
+    "weak-weil-restriction"
+   ],
+   "source_locations": [
+    "Momose-Chao 2005, abstract (ePrint 2005/277)",
+    "Joux-Vitse 2012, ref. [26]"
+   ],
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "THM-WD-SCHOLTEN-GENUS2",
+   "label": "Scholten forms: genus-2 covers over F_q of E/F_(q^2)",
+   "kind": "structural_theorem",
+   "status": "proved_external_unread",
+   "model": "curve_family_restricted",
+   "statement": "In odd characteristic, E/F_(q^2) admits a genus-2 cover defined over F_q when it can be written as y^2 = a x^3 + b x^2 + sigma(b) x + sigma(a) (a, b in F_(q^2)); this is possible as soon as E has full 2-torsion over F_(q^2), or #E is odd and j(E) not in F_q; curves with #E divisible by 4 but without full 2-torsion are 2-isogenous to one with full 2-torsion.",
+   "scope": "Joux-Vitse use it for E/F_(p^6) with the tower F_(p^6) / F_(p^3) / F_p.",
+   "assumptions": [
+    "Odd characteristic"
+   ],
+   "source_refs": [
+    "S-WD-SCHOLTEN-2003",
+    "S-WD-JV-2012",
+    "S-WD-MOMOSE-CHAO-2005"
+   ],
+   "tags": [
+    "cover",
+    "genus-2",
+    "scholten-form"
+   ],
+   "source_locations": [
+    "Joux-Vitse 2012, Section 4.2, eq. (5), refs. [3], [25], [30]"
+   ],
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "HEUR-WD-JV-WEAKNESS-INDEPENDENT",
+   "label": "Joux-Vitse: weakness independent of isogeny class",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "curve_family_restricted",
+   "statement": "The probability that a curve over F_(q^3) belongs to the Theta(q^2) weak family is independent of its isogeny class (about q^(3/2) classes), so an isogeny walk reaches a weak curve after about q = p^2 steps.",
+   "scope": "Stated assumption; must be restricted to classes with #E divisible by 4, since every weak curve has #E = 0 mod 4.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-JV-2012"
+   ],
+   "tags": [
+    "heuristic",
+    "isogeny-walk",
+    "cover"
+   ],
+   "source_locations": [
+    "Joux-Vitse 2012, Section 4.1"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "GAP-WD-JV-ISOGENY-CONJ",
+   "label": "Joux-Vitse conjecture: all #E = 0 mod 4 curves over F_(p^6) are reachable",
+   "kind": "open_obligation",
+   "status": "open",
+   "model": "curve_family_restricted",
+   "statement": "Conjecture (Joux-Vitse 2012, Section 4.1): every elliptic curve over F_(p^6) with cardinality divisible by 4 is vulnerable to the cover-and-decomposition attack through an isogeny walk to the genus-3 hyperelliptic-cover family.",
+   "scope": "Stated as a conjecture; the walk cost (about p^2 steps) dominates and still beats generic p^3.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-JV-2012"
+   ],
+   "tags": [
+    "open",
+    "isogeny-walk",
+    "cover",
+    "conjecture"
+   ],
+   "source_locations": [
+    "Joux-Vitse 2012, Section 4.1 ('we conjecture that all curves with cardinality divisible by 4 are vulnerable')"
+   ],
+   "evidence_class": "open"
+  },
+  {
+   "id": "COND-WD-JV-COVER-DECOMP",
+   "label": "Joux-Vitse 2012: cover-and-decomposition index calculus",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "For E/F_(q^d) with a cover by a small-genus (ideally hyperelliptic) curve H/F_q and q = p^n, transfer the DLP to Jac_H(F_q) at unit cost and run a decomposition (Nagao) index calculus over F_q/F_p: expected Õ(p^(2-2/(ng))) or Õ(p^(2-2/(ng+2))) for fixed n, g with a double large prime variation (Õ(p^(2-2/(2g+1))) with the n = 2 sieving variant). For E/F_(p^6) via a genus-3 cover over F_(p^2): Õ(p^(5/3)) time, Õ(p) memory, versus generic Õ(p^3); a 151-bit F_(p^6) instance was solved.",
+   "scope": "Composite extension degree; needs a low-genus cover (directly or after an isogeny walk). Decomposition-system cost and yield belong to the summation-polynomial cluster.",
+   "assumptions": [
+    "A low-genus cover of E exists and is found",
+    "Double-large-prime analysis of GTTD transfers to decomposition relations",
+    "Quadratic decomposition systems solvable at the assumed cost"
+   ],
+   "source_refs": [
+    "S-WD-JV-2012",
+    "S-JOUX-VITSE-2013"
+   ],
+   "tags": [
+    "cover",
+    "decomposition",
+    "index-calculus",
+    "extension-field"
+   ],
+   "source_locations": [
+    "Joux-Vitse 2012, Section 3.3",
+    "Joux-Vitse 2012, Section 4.3 and Table 1"
+   ],
+   "formula": "Õ(p^(2-2/(ng))) or Õ(p^(2-2/(ng+2))); F_(p^6): Õ(p^(5/3))",
+   "evidence_class": "conditional_theorem",
+   "failure_modes": [
+    "Only Theta(q^2) curves have the direct genus-3 hyperelliptic cover",
+    "Non-hyperelliptic covers: decompositions not computed with available Groebner tools (Section 4.1)"
+   ],
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/jv_cover.rs",
+     "use": "measures",
+     "note": "end-to-end reproduction on E(F_(p^6)) with a genus-3 cover over F_(p^2)"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-ENGE-STEIN-SMOOTH",
+   "label": "Smooth reduced divisors are plentiful (Galbraith Thm 15.6.1, Enge-Stein Thm 6)",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "Let C be a hyperelliptic curve of genus g over F_q, c > 1 and b = ceil(log_q L_(q^g)(1/2, c)). The number of b-smooth reduced divisors of degree g is at least q^g / L_(q^g)(1/2, 1/(2c) + o(1)) for fixed q and g -> infinity.",
+   "scope": "Because b is a ceiling, subexponential running time follows only when g is large compared with log q.",
+   "assumptions": [
+    "q fixed, g -> infinity"
+   ],
+   "source_refs": [
+    "S-GALBRAITH-MPKC-2018"
+   ],
+   "tags": [
+    "smoothness",
+    "hyperelliptic",
+    "subexponential",
+    "theorem"
+   ],
+   "source_locations": [
+    "Galbraith 2018, Theorem 15.6.1, p. 344 (credited there to Enge and Stein)"
+   ],
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "HEUR-WD-ADH-NORM-SMOOTH",
+   "label": "ADH: norms of a(x) + y b(x) are as smooth as random polynomials",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "algebraic_coordinate",
+   "statement": "The norm A(x)^2 - H(x)A(x)B(x) - F(x)B(x)^2 of a random function A(x) + y B(x) is b-smooth with the probability of a uniformly random polynomial of the same degree.",
+   "scope": "Needed for the Adleman-DeMarrais-Huang relation generation (principal divisors), not for the Hafner-McCurley variant covered by Theorem 15.6.1.",
+   "assumptions": [],
+   "source_refs": [
+    "S-GALBRAITH-MPKC-2018",
+    "S-WD-ADH-1994"
+   ],
+   "tags": [
+    "heuristic",
+    "smoothness",
+    "hyperelliptic"
+   ],
+   "source_locations": [
+    "Galbraith 2018, Section 15.6.2"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "ALG-WD-ADH-1994",
+   "label": "Adleman-DeMarrais-Huang: subexponential DLP on large-genus hyperelliptic Jacobians",
+   "kind": "algorithmic_upper_bound",
+   "status": "conditional",
+   "model": "algebraic_coordinate",
+   "statement": "First subexponential algorithm for the DLP in J_C(F_p) of large-genus hyperelliptic curves: heuristically subexponential for sufficiently large g and odd p with log p <= (2g+1)^0.98. Galbraith's reanalysis (dropping the group-structure computation) gives heuristic L_(q^g)(1/2, sqrt(2) + o(1)) bit operations as g -> infinity.",
+   "scope": "High genus relative to the field; irrelevant to fixed-genus covers.",
+   "assumptions": [
+    "Norm smoothness heuristic",
+    "g large compared with log q"
+   ],
+   "source_refs": [
+    "S-WD-ADH-1994",
+    "S-GALBRAITH-MPKC-2018"
+   ],
+   "tags": [
+    "index-calculus",
+    "hyperelliptic",
+    "subexponential",
+    "history"
+   ],
+   "source_locations": [
+    "Galbraith 2018, Section 15.6.2"
+   ],
+   "evidence_class": "asymptotic_heuristic",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/hyperelliptic_index_calculus.rs",
+     "use": "mention",
+     "note": "'The Adleman-DeMarrais-Huang / Gaudry attack'"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-ENGE-GAUDRY-2002",
+   "label": "Enge-Gaudry Theorem 1: rigorous L_(q^g)(sqrt(2)) hyperelliptic DLP",
+   "kind": "algorithmic_upper_bound",
+   "status": "proved_external",
+   "model": "algebraic_coordinate",
+   "statement": "There is a probabilistic algorithm solving the DLP in the Jacobian of a genus-g hyperelliptic curve over F_q, when the group is cyclic of known order and g/log q -> infinity, in expected time L_(q^g)(sqrt(2) + o(1)) (L_x(c) = exp(c sqrt(log x log log x))). For g >= theta log q (Section 5) the time is L_(q^g)(sqrt(2)(sqrt(1 + 1/(2 theta)) + sqrt(1/(2 theta))) + o(1)).",
+   "scope": "Rigorous only for cyclic groups of known order; for a cyclic subgroup of a non-cyclic group the analysis is heuristic (Section 7). Useless for fixed genus as q grows.",
+   "assumptions": [
+    "Cyclic Jacobian of known order",
+    "g/log q -> infinity (or g >= theta log q for the refined constant)"
+   ],
+   "source_refs": [
+    "S-WD-ENGE-GAUDRY-2002"
+   ],
+   "tags": [
+    "index-calculus",
+    "hyperelliptic",
+    "subexponential",
+    "rigorous"
+   ],
+   "source_locations": [
+    "Enge-Gaudry 2002, Theorem 1",
+    "Enge-Gaudry 2002, Section 5 (hyperelliptic Jacobians)",
+    "Enge-Gaudry 2002, Section 7"
+   ],
+   "formula": "L_(q^g)(sqrt(2) + o(1))",
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/jacobian_transfer/cost.rs",
+     "use": "depends",
+     "note": "enge_gaudry_c = SQRT_2; hypothesis 'reported, not enforced'"
+    }
+   ]
+  },
+  {
+   "id": "COND-WD-EG-2007-L13",
+   "label": "Enge-Gaudry 2007: L(1/3 + epsilon) DLP for low-degree curves",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "algebraic_coordinate",
+   "statement": "For plane curves whose degrees in X and Y are low and suitably unbalanced relative to the genus g (base field not growing too fast), the group structure is computable in L_(q^g)(1/3, O(1)) and a discrete logarithm in L_(q^g)(1/3 + epsilon, o(1)) for any epsilon > 0, under Heuristics 1 and 2. KMPS restate: valid when g >= (log q)^delta, delta > 2.",
+   "scope": "Special curve family; not the hyperelliptic covers produced by GHS in general.",
+   "assumptions": [
+    "Heuristic 1 (divisors of b(X)Y - a(X) smooth like random divisors)",
+    "Heuristic 2 (inertia degree > 1 places irrelevant for smoothness)",
+    "Hess's Riemann-Roch based relation computation (Theorem 3)"
+   ],
+   "source_refs": [
+    "S-WD-EG-2007",
+    "S-WD-KMPS-2010"
+   ],
+   "tags": [
+    "index-calculus",
+    "subexponential",
+    "low-degree-curves"
+   ],
+   "source_locations": [
+    "Enge-Gaudry 2007, abstract",
+    "Enge-Gaudry 2007, Heuristics 1 and 2, Proposition 5",
+    "KMPS 2010, Section 3"
+   ],
+   "formula": "L_(q^g)(1/3 + epsilon, o(1))",
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "ALG-WD-GAUDRY-2000",
+   "label": "Gaudry 2000: fixed-genus index calculus, Õ(q^2)",
+   "kind": "algorithmic_upper_bound",
+   "status": "conditional",
+   "model": "algebraic_coordinate",
+   "statement": "With the degree-one factor base (smoothness bound b = 1), a random reduced divisor is 1-smooth with probability about 1/g!; collecting about g! q relations and solving the sparse system costs c1 g^2 g! q M(log q) + c2 g^3 q^2 M(log q) = O(q^2 M(log q)(1 + o(1))) bit operations for fixed g, so the method is asymptotically faster than rho (q^(g/2)) for g >= 5; the constant depends very badly on g.",
+   "scope": "Fixed genus, q -> infinity. Galbraith presents the relation count O(g! q) as a natural conjecture (Exercise 15.6.5).",
+   "assumptions": [
+    "O(g! q (1 + o(1))) random divisors suffice for a dependency (Exercise 15.6.5)",
+    "Sparse linear algebra cost q^2"
+   ],
+   "source_refs": [
+    "S-WD-GAUDRY-2000",
+    "S-GALBRAITH-MPKC-2018"
+   ],
+   "tags": [
+    "index-calculus",
+    "hyperelliptic",
+    "fixed-genus"
+   ],
+   "source_locations": [
+    "Galbraith 2018, Section 15.6.3, eq. (15.11)",
+    "Joux-Vitse 2012, Section 2.1"
+   ],
+   "formula": "O((g^2 log^3 p) g! p + (g^2 log p) p^2)",
+   "evidence_class": "asymptotic_heuristic",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/hyperelliptic_index_calculus.rs",
+     "use": "depends",
+     "note": "1/g! smoothness, crossover against rho"
+    },
+    {
+     "path": "src/cryptanalysis/jacobian_transfer/cost.rs",
+     "use": "depends",
+     "note": "relation term g! q"
+    }
+   ]
+  },
+  {
+   "id": "ALG-WD-THERIAULT-2003",
+   "label": "Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2)))",
+   "kind": "algorithmic_upper_bound",
+   "status": "proved_external_unread",
+   "model": "algebraic_coordinate",
+   "statement": "Reducing the factor base and adding a single large prime variation solves the DLP in genus-g hyperelliptic Jacobians in Õ(q^(2 - 2/(g + 1/2))) = Õ(q^(2 - 4/(2g + 1))), e.g. q^(10/7) for g = 3, beating rho for g >= 3.",
+   "scope": "Fixed genus. Reported by GTTD as 'the previous best bound'; whether the original analysis is fully rigorous was not checked here.",
+   "assumptions": [
+    "Fixed genus g >= 3"
+   ],
+   "source_refs": [
+    "S-WD-THERIAULT-2003",
+    "S-WD-GTTD-2007"
+   ],
+   "tags": [
+    "index-calculus",
+    "large-prime",
+    "hyperelliptic"
+   ],
+   "source_locations": [
+    "GTTD 2007, Section 1 (after Theorem 1) and the large-prime exponent table",
+    "Theriault 2003, ASIACRYPT, LNCS 2894"
+   ],
+   "formula": "Õ(q^(2-4/(2g+1)))",
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "THM-WD-GTTD-THM1",
+   "label": "GTTD Theorem 1: double large prime, Õ(q^(2-2/g)) rigorous",
+   "kind": "algorithmic_upper_bound",
+   "status": "proved_external",
+   "model": "algebraic_coordinate",
+   "statement": "Let g >= 3 be fixed and C a hyperelliptic curve of genus g over F_q given by an imaginary Weierstrass equation with Jac_C(F_q) cyclic. Then the DLP in Jac_C(F_q) can be solved in expected time Õ(q^(2 - 2/g)) as q -> infinity (genus 3: Õ(q^(4/3)) versus rho Õ(q^(3/2)) and single large prime Õ(q^(10/7))).",
+   "scope": "Proved for the simplified algorithm; the faster 'full' algorithm is heuristic. Extends heuristically to non-hyperelliptic and non-cyclic cases (Section 6). The constant grows quickly with g.",
+   "assumptions": [
+    "g >= 3 fixed",
+    "Imaginary Weierstrass model",
+    "Cyclic Jacobian (or known structure)"
+   ],
+   "source_refs": [
+    "S-WD-GTTD-2007"
+   ],
+   "tags": [
+    "index-calculus",
+    "double-large-prime",
+    "hyperelliptic",
+    "rigorous"
+   ],
+   "source_locations": [
+    "GTTD 2007, Theorem 1",
+    "GTTD 2007, Section 6"
+   ],
+   "formula": "Õ(q^(2-2/g))",
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/jacobian_transfer/cost.rs",
+     "use": "depends",
+     "note": "hyperelliptic IC priced g^e q^(2-2/g), applied for g >= 2"
+    }
+   ]
+  },
+  {
+   "id": "HEUR-WD-GTTD-GENERAL",
+   "label": "GTTD Section 6: double-large-prime bound for general curves",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "algebraic_coordinate",
+   "statement": "The double large prime algorithm applies to general curves of genus g >= 3 (not necessarily hyperelliptic, Jacobian not necessarily cyclic) provided Jacobian arithmetic is polynomial time, and heuristically keeps the Õ(q^(2-2/g)) complexity.",
+   "scope": "Partly discharged by Diem (arXiv:math/0606607) for plane models of bounded degree with cyclic class group; still heuristic for non-cyclic groups and proper subgroups.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-GTTD-2007"
+   ],
+   "tags": [
+    "heuristic",
+    "double-large-prime",
+    "general-curves"
+   ],
+   "source_locations": [
+    "GTTD 2007, Section 1 (after Theorem 1)",
+    "GTTD 2007, Section 6"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "THM-WD-DIEM-SPECIAL-DIVISORS",
+   "label": "Diem Proposition 1: special effective divisors of degree g are O(q^(g-1))",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "For curves of fixed genus g over F_q, the number of special effective divisors of degree g is O(q^(g-1)) (straight Hasse-Weil gives only O(q^(g-1/2))).",
+   "scope": "Lets the double-large-prime analysis discard special divisors for arbitrary (non-hyperelliptic) curves.",
+   "assumptions": [
+    "Genus fixed"
+   ],
+   "source_refs": [
+    "S-WD-DIEM-2006-ARXIV"
+   ],
+   "tags": [
+    "lemma",
+    "special-divisors",
+    "counting"
+   ],
+   "source_locations": [
+    "Diem arXiv:math/0606607, Proposition 1 and appendix"
+   ],
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "THM-WD-DIEM-SMALL-GENUS",
+   "label": "Diem 2006: Õ(q^(2-2/g)) for all curves of fixed genus g >= 2 (cyclic class group)",
+   "kind": "algorithmic_upper_bound",
+   "status": "proved_external",
+   "model": "algebraic_coordinate",
+   "statement": "For fixed g >= 2, the DLP in cyclic degree-0 class groups of genus-g curves given by plane models of bounded degree is solvable by a randomized algorithm in expected time Õ(q^(2-2/g)), with storage bounded by a function in Õ(q^(1 - 1/g + 1/g^2)); also when the class-group structure is known.",
+   "scope": "Generalises GTTD Theorem 1 from imaginary hyperelliptic models to arbitrary curves (every genus-g curve has a plane model of degree <= C g by Hess). KMPS cite the published form (Math. Comp. 2011) for both this bound and q^(2-2/n) for ECDLP over F_(q^n).",
+   "assumptions": [
+    "g >= 2 fixed",
+    "Plane model of bounded degree",
+    "Cyclic class group or known structure"
+   ],
+   "source_refs": [
+    "S-WD-DIEM-2006-ARXIV",
+    "S-WD-KMPS-2010"
+   ],
+   "tags": [
+    "index-calculus",
+    "double-large-prime",
+    "rigorous",
+    "general-curves"
+   ],
+   "source_locations": [
+    "Diem arXiv:math/0606607, Theorem (Section 1)",
+    "KMPS 2010, Section 3 item (ii)"
+   ],
+   "formula": "Õ(q^(2-2/g))",
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "COND-WD-DIEM-PLANE-CURVES",
+   "label": "Diem 2006 (ANTS): Õ(q^(2-2/(d-2))) for plane curves of degree d",
+   "kind": "algorithmic_upper_bound",
+   "status": "conditional",
+   "model": "algebraic_coordinate",
+   "statement": "Index calculus with relations from lines (functions of low degree) on a plane model of degree d: heuristically, for essentially all instances, the DLP in degree-0 class groups is solved in expected time Õ(q^(2-2/(d-2))); for plane quartics (non-hyperelliptic genus 3) this is Õ(q). Sufficiently general non-hyperelliptic curves of genus g >= 3 can be represented by plane models of degree g + 1.",
+   "scope": "Heuristic analysis; plane model degree, not genus, drives the exponent.",
+   "assumptions": [
+    "Heuristic analysis of relation yield from lines",
+    "Plane model of degree d available"
+   ],
+   "source_refs": [
+    "S-WD-DIEM-2006-ANTS"
+   ],
+   "tags": [
+    "index-calculus",
+    "plane-curves",
+    "non-hyperelliptic"
+   ],
+   "source_locations": [
+    "Diem 2006 ANTS / ePrint 2005/119, abstract"
+   ],
+   "formula": "Õ(q^(2-2/(d-2)))",
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "THM-WD-DT-LINES",
+   "label": "Diem-Thome Proposition 14: lines meeting a plane quartic in 4 rational points",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "For a non-hyperelliptic genus-3 curve C over F_q given as a plane quartic, the number of lines in P^2 over F_q meeting C in 4 distinct F_q-rational points is q^2/24 + O(q^(3/2)).",
+   "scope": "Counts the potential full relations of the line method; the yield constant 1/24 = 1/4!.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-DIEM-THOME-2008"
+   ],
+   "tags": [
+    "counting",
+    "plane-quartic",
+    "relation-yield"
+   ],
+   "source_locations": [
+    "Diem-Thome 2008, Proposition 14"
+   ],
+   "formula": "q^2/24 + O(q^(3/2))",
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/diem_quartic.rs",
+     "use": "measures",
+     "note": "Diem line relations on m = 2 GHS plane quartics"
+    }
+   ]
+  },
+  {
+   "id": "HEUR-WD-DT-ASSUMPTION12",
+   "label": "Diem-Thome Heuristic Assumption 12: large-prime graph reach",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "algebraic_coordinate",
+   "statement": "With probability Omega(1/log(q)^O(1)), the set of vertices of the graph of large prime relations at distance <= (log q)^2 from the root contains >= q^(5/6) elements.",
+   "scope": "Motivated by comparisons with Bernoulli and uniform random graphs and studied experimentally in the paper; not proved.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-DIEM-THOME-2008"
+   ],
+   "tags": [
+    "heuristic",
+    "large-prime-graph",
+    "plane-quartic"
+   ],
+   "source_locations": [
+    "Diem-Thome 2008, Heuristic Assumption 12 (Section 4)"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "COND-WD-DT-RESULT13",
+   "label": "Diem-Thome Heuristic Result 13: Õ(q) for non-hyperelliptic genus 3",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "algebraic_coordinate",
+   "statement": "The DLP in degree-0 class groups of non-hyperelliptic genus-3 curves over F_q can be solved in expected time Õ(q) when the class group is cyclic or its structure is known; rigorous for any class of curves satisfying Heuristic Assumption 12 (via Proposition 7: factor base O(q^(1/2)), tree with Omega(q^(5/6)) vertices and polylog depth). Versus Õ(q^(3/2)) for rho and Õ(q^(4/3)) for hyperelliptic genus 3.",
+   "scope": "Genus 3 non-hyperelliptic (plane quartic) curves. Memory grows like q in practice.",
+   "assumptions": [
+    "Heuristic Assumption 12",
+    "Cyclic class group or known structure"
+   ],
+   "source_refs": [
+    "S-WD-DIEM-THOME-2008",
+    "S-WD-DIEM-2006-ANTS"
+   ],
+   "tags": [
+    "index-calculus",
+    "plane-quartic",
+    "genus-3"
+   ],
+   "source_locations": [
+    "Diem-Thome 2008, Proposition 7",
+    "Diem-Thome 2008, Heuristic Result 13"
+   ],
+   "formula": "Õ(q)",
+   "evidence_class": "conditional_theorem"
+  },
+  {
+   "id": "COND-WD-LAINE-LAUTER",
+   "label": "Laine-Lauter: time-memory trade-offs for genus-3 index calculus",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "algebraic_coordinate",
+   "statement": "A variant of Diem's Õ(q) index calculus for non-hyperelliptic genus-3 Jacobians improves the computational complexity at the cost of a moderate increase in memory, and parallelisation reduces memory per machine and running time.",
+   "scope": "Abstract-level; exact exponents not read.",
+   "assumptions": [
+    "Diem-Thome heuristics"
+   ],
+   "source_refs": [
+    "S-WD-LAINE-LAUTER-2015"
+   ],
+   "tags": [
+    "index-calculus",
+    "time-memory",
+    "genus-3"
+   ],
+   "source_locations": [
+    "Laine-Lauter 2015, abstract (ePrint 2014/346)"
+   ],
+   "evidence_class": "asymptotic_heuristic",
+   "cited_by": [
+    {
+     "path": "research/more_leads_20261019/README.md",
+     "use": "mention",
+     "note": "Q2 motivated by Laine-Lauter time-memory work"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-SMITH-PROP5",
+   "label": "Smith Proposition 5: genus-3 isogenous Jacobians exist iff maximal l-isotropic kernel",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "Let H/F_q be hyperelliptic of genus 3 with J_H absolutely simple and S a finite nontrivial F_q-rational subgroup. There is a genus-3 curve X/F_q and an isogeny J_H -> J_X with kernel S iff S is maximal l-isotropic in J_H[l] for some l; the isogeny is defined over F_(q^2) (over F_q or a quadratic twist). Fails in genus >= 4 (Remark 6).",
+   "scope": "Existence only; explicit equations are known only for the tractable (Z/2Z)^3 kernels.",
+   "assumptions": [
+    "Genus 3",
+    "J_H absolutely simple"
+   ],
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ],
+   "tags": [
+    "isogeny",
+    "genus-3",
+    "theorem"
+   ],
+   "source_locations": [
+    "Smith 2009, Proposition 5 and Remark 6"
+   ],
+   "evidence_class": "theorem"
+  },
+  {
+   "id": "THM-WD-SMITH-LEMMA4",
+   "label": "Smith Lemma 4: s(t) is a square over F_q(sqrt(alpha))",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "For the trigonal construction with polynomial s in F_q[t] of eq. (7) and leading coefficient alpha, s has a square root in F_q(sqrt(alpha))[t] (every root of s has multiplicity 2 because the Weierstrass points of H occur in pairs in the fibres of the trigonal map g).",
+   "scope": "Distinct from Nagao's Lemma 4 (CLAIM-NAGAO-LEMMA4).",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ],
+   "tags": [
+    "isogeny",
+    "genus-3",
+    "lemma",
+    "trigonal"
+   ],
+   "source_locations": [
+    "Smith 2009, Lemma 4, eq. (7)"
+   ],
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/smith_prop24.rs",
+     "use": "depends",
+     "note": "Lemma 4: s / lc(s) is a square in F_p[t], checked per pair"
+    }
+   ]
+  },
+  {
+   "id": "THM-WD-SMITH-PROP4",
+   "label": "Smith Proposition 4: rationality of the explicit isogeny",
+   "kind": "structural_theorem",
+   "status": "proved_external",
+   "model": "mathematical",
+   "statement": "If S in S(H) has an F_q-rational trigonal map g, the explicit trigonal construction yields an isogeny defined over F_q iff the leading coefficient of s(t) is a square in F_q (otherwise J_X is a quadratic twist of J_H/S, Remark 4).",
+   "scope": "Explicit construction for tractable (Z/2Z)^3 kernels in characteristic > 3.",
+   "assumptions": [
+    "Characteristic not 2 or 3",
+    "Rational trigonal map exists (Proposition 2)"
+   ],
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ],
+   "tags": [
+    "isogeny",
+    "genus-3",
+    "rationality"
+   ],
+   "source_locations": [
+    "Smith 2009, Proposition 4",
+    "Smith 2009, Proposition 2",
+    "Smith 2009, Remark 4"
+   ],
+   "evidence_class": "theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/smith_prop24.rs",
+     "use": "depends",
+     "note": "Propositions 2 and 4 rationality conditions"
+    }
+   ]
+  },
+  {
+   "id": "HEUR-WD-SMITH-HYP1",
+   "label": "Smith Hypothesis 1: trigonal codomain is non-hyperelliptic",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "curve_family_restricted",
+   "statement": "For random H/F_q and S in S(H), the probability that the curve X of the trigonal construction is hyperelliptic is negligible for large q.",
+   "scope": "Experimental support in Smith Section 8.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ],
+   "tags": [
+    "heuristic",
+    "genus-3",
+    "isogeny"
+   ],
+   "source_locations": [
+    "Smith 2009, Hypothesis 1"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "HEUR-WD-SMITH-HYP2",
+   "label": "Smith Hypothesis 2: rational trigonal map with probability 1/2",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "curve_family_restricted",
+   "statement": "For random H and uniformly random S in S(H), an F_q-rational trigonal map exists with probability 1/2 (a discriminant is a square).",
+   "scope": "Smith reports about 50% in experiments.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ],
+   "tags": [
+    "heuristic",
+    "genus-3",
+    "isogeny"
+   ],
+   "source_locations": [
+    "Smith 2009, Hypothesis 2",
+    "Smith 2009, Section 8 experiments"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "HEUR-WD-SMITH-HYP3",
+   "label": "Smith Hypothesis 3: rational isogeny with probability 1/2",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "curve_family_restricted",
+   "statement": "For random H and S in S(H) with a rational trigonal map, the explicit isogeny with kernel S is F_q-rational with probability 1/2 (leading coefficient of s(t) is a square).",
+   "scope": "Smith reports 49.95% of 250560 cases.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ],
+   "tags": [
+    "heuristic",
+    "genus-3",
+    "isogeny"
+   ],
+   "source_locations": [
+    "Smith 2009, Hypothesis 3",
+    "Smith 2009, Section 8 experiments"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "HEUR-WD-SMITH-HYP4",
+   "label": "Smith Hypothesis 4: independence across tractable subgroups",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "curve_family_restricted",
+   "statement": "For random H, the events 'an F_q-rational isogeny with kernel S can be computed' for the different S in S(H) are mutually independent.",
+   "scope": "Stated as consistent with experiments.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ],
+   "tags": [
+    "heuristic",
+    "genus-3",
+    "independence"
+   ],
+   "source_locations": [
+    "Smith 2009, Hypothesis 4"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  },
+  {
+   "id": "COND-WD-SMITH-THM2",
+   "label": "Smith Theorem 2: about 18.57% of genus-3 hyperelliptic DLPs move to plane quartics",
+   "kind": "conditional_attack",
+   "status": "conditional",
+   "model": "curve_family_restricted",
+   "statement": "Assuming Hypotheses 1-4, as q -> infinity the expectation that the construction reduces a DLP in J_H(F_q) for random hyperelliptic genus-3 H to J_C(F_q) for a nonsingular plane quartic C is sum_(T partitions of 8) (1 - (3/4)^(s(T))) / prod_n (nu_T(n)! n^(nu_T(n))) ~ 0.1857; combined with Diem's Õ(q) this beats the Õ(q^(4/3)) of GTTD for those curves.",
+   "scope": "Characteristic > 3; tractable (Z/2Z)^3 kernels only; curves whose hyperelliptic polynomial has an irreducible factor of degree 5 or 7 (or a single cubic factor) have no such isogeny.",
+   "assumptions": [
+    "Hypotheses 1-4",
+    "Diem-Thome Õ(q) on the quartic side"
+   ],
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ],
+   "tags": [
+    "isogeny",
+    "genus-3",
+    "transfer",
+    "density"
+   ],
+   "source_locations": [
+    "Smith 2009, Theorem 2, eq. (12)",
+    "Smith 2009, Lemma 1 (table of #S(H))",
+    "Smith 2009, Section 1"
+   ],
+   "formula": "sum_T (1-(3/4)^s(T)) / prod (nu_T(n)! n^nu_T(n)) ~ 0.1857",
+   "evidence_class": "conditional_theorem",
+   "cited_by": [
+    {
+     "path": "src/cryptanalysis/smith_prop24.rs",
+     "use": "depends",
+     "note": "full_success density compared with 0.1857"
+    },
+    {
+     "path": "research/smith_elliptic_walk_20261018/README.md",
+     "use": "measures",
+     "note": "full_success share against Smith's 0.1857 on the JV family"
+    }
+   ]
+  },
+  {
+   "id": "HEUR-WD-EG07-SMOOTHNESS",
+   "label": "Enge-Gaudry 2007 Heuristics 1 and 2",
+   "kind": "heuristic",
+   "status": "heuristic",
+   "model": "algebraic_coordinate",
+   "statement": "Heuristic 1: the divisor of a random b(X)Y - a(X) with affine part of degree nu is F-smooth with the probability that a random effective divisor of degree nu is mu-smooth. Heuristic 2: a random effective divisor of degree nu is F-smooth essentially as often as it is mu-smooth (places of inertia degree > 1 do not matter).",
+   "scope": "Analogous to number-field-sieve smoothness heuristics.",
+   "assumptions": [],
+   "source_refs": [
+    "S-WD-EG-2007"
+   ],
+   "tags": [
+    "heuristic",
+    "smoothness",
+    "subexponential"
+   ],
+   "source_locations": [
+    "Enge-Gaudry 2007, Heuristic 1 and Heuristic 2"
+   ],
+   "evidence_class": "asymptotic_heuristic"
+  }
+ ],
+ "edges": [
+  {
+   "id": "E-WD-001",
+   "from": "COND-WD-FREY-1998",
+   "to": "DEF-WD-COVER-ATTACK",
+   "relation": "enables",
+   "statement": "Frey's Weil-restriction idea is what the conorm-norm cover attack makes concrete.",
+   "source_refs": [
+    "S-WD-FREY-1998",
+    "S-GALBRAITH-MPKC-2018"
+   ]
+  },
+  {
+   "id": "E-WD-002",
+   "from": "DEF-WD-COVER-ATTACK",
+   "to": "ATTACK-GHS-WEIL-DESCENT",
+   "relation": "defines",
+   "statement": "GHS is the cover attack with an Artin-Schreier cover and phi = N o Con.",
+   "source_refs": [
+    "S-GALBRAITH-MPKC-2018",
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-003",
+   "from": "DEF-WD-GHS-MAGIC-NUMBER",
+   "to": "THM-WD-GHS-THM1-GENUS",
+   "relation": "defines",
+   "statement": "The genus is expressed through m(b).",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-004",
+   "from": "DEF-WD-GHS-MAGIC-NUMBER",
+   "to": "THM-WD-MMT-MAGIC-TYPE",
+   "relation": "defines",
+   "statement": "Theorem 5 computes m(b) from the type of b.",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-005",
+   "from": "THM-WD-GHS-THM1-GENUS",
+   "to": "ATTACK-GHS-WEIL-DESCENT",
+   "relation": "enables",
+   "statement": "The explicit homomorphism into J_C(F_q) with genus 2^(m-1) or 2^(m-1) - 1 is the reduction step of the GHS attack.",
+   "source_refs": [
+    "S-GHS-2002",
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-006",
+   "from": "THM-WD-MMT-LEMMA6",
+   "to": "THM-WD-GHS-THM1-GENUS",
+   "relation": "qualifies",
+   "statement": "Weakens condition (6) to (8) and repairs the function f in the proof of GHS Lemma 11 ('incorrectly defined').",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-007",
+   "from": "THM-WD-HESS-COR13-GENUS-CRITERION",
+   "to": "THM-WD-GHS-THM1-GENUS",
+   "relation": "qualifies",
+   "statement": "Decides exactly which of the two genera occurs (Tr_(K/F_(q^u))(beta) = 0) and shows MMT's condition is necessary and sufficient.",
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-008",
+   "from": "THM-WD-HESS-THM12-GENUS",
+   "to": "THM-WD-HESS-COR13-GENUS-CRITERION",
+   "relation": "enables",
+   "statement": "Corollary 13 is Theorem 12 specialised to gamma in k.",
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-009",
+   "from": "THM-WD-HESS-THM3-ORDER",
+   "to": "THM-WD-HESS-THM12-GENUS",
+   "relation": "enables",
+   "statement": "The order of the Frobenius extension decides whether the descended field is defined over k (Theorem 11 conditions).",
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-010",
+   "from": "THM-WD-HESS-THM14-KERNEL",
+   "to": "ATTACK-GHS-WEIL-DESCENT",
+   "relation": "qualifies",
+   "statement": "Discharges the GHS kernel hypothesis for non-subfield curves: the large prime subgroup survives iff s(h) = n, kernel inside the 2^(m-1)-torsion preimage.",
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-011",
+   "from": "THM-WD-MMT-MAGIC-TYPE",
+   "to": "THM-WD-MQ-PRIME-DEGREE",
+   "relation": "enables",
+   "statement": "For prime n the type structure of x^n - 1 gives the admissible magic numbers.",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-012",
+   "from": "THM-WD-MQ-PRIME-DEGREE",
+   "to": "COND-WD-MQ-PRIME-N-FAILS",
+   "relation": "enables",
+   "statement": "Smallest m > 1 is ord_n(2) + 1, so the genus jumps from tiny to >= 2^(ord_n(2)) - 1.",
+   "source_refs": [
+    "S-WD-MMT-2002",
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-013",
+   "from": "ALG-WD-MMT-EG-COST",
+   "to": "COND-WD-MQ-PRIME-N-FAILS",
+   "relation": "conditions",
+   "statement": "The 'infeasible for g >= 2^16 - 1' half rests on index-calculus cost estimates of this type.",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-014",
+   "from": "COND-WD-MQ-PRIME-N-FAILS",
+   "to": "ATTACK-GHS-WEIL-DESCENT",
+   "relation": "obstructs",
+   "statement": "For prime N in [160, 600] the GHS construction yields no useful cover.",
+   "source_refs": [
+    "S-WD-MQ-2001",
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-015",
+   "from": "THEOREM-GHS-GENUS-131",
+   "to": "THM-WD-MQ-PRIME-DEGREE",
+   "relation": "instantiates",
+   "statement": "N = 131 with ord_131(2) = 130 gives smallest m > 1 equal to 131, hence genus 2^130 - 1 or 2^130: the repository classification is the n = 131 instance of Menezes-Qu.",
+   "source_refs": [
+    "S-WD-MMT-2002",
+    "S-KOBLITZ-PROGRAM"
+   ]
+  },
+  {
+   "id": "E-WD-016",
+   "from": "THEOREM-FROB-SUBSPACES-131",
+   "to": "THM-WD-MQ-PRIME-DEGREE",
+   "relation": "instantiates",
+   "statement": "x^131 - 1 = (x - 1) f_1 with deg f_1 = 130 is part (i) of Theorem 11 at n = 131.",
+   "source_refs": [
+    "S-WD-MMT-2002",
+    "S-KOBLITZ-PROGRAM"
+   ]
+  },
+  {
+   "id": "E-WD-017",
+   "from": "HEUR-WD-SUBGROUP-SMOOTHNESS",
+   "to": "ALG-WD-MMT-EG-COST",
+   "relation": "conditions",
+   "statement": "Eq. (13) assumes smooth divisors are as frequent in <D1> as in J_C(k).",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-018",
+   "from": "THM-WD-ENGE-GAUDRY-2002",
+   "to": "ALG-WD-MMT-EG-COST",
+   "relation": "enables",
+   "statement": "The cost model instantiates the Enge-Gaudry algorithm non-asymptotically.",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-019",
+   "from": "ALG-WD-MMT-EG-COST",
+   "to": "COND-WD-MMT-COMPOSITE-N",
+   "relation": "conditions",
+   "statement": "Every GHS-versus-rho comparison in Table 1 uses this cost model.",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-020",
+   "from": "THM-WD-GHS-THM1-GENUS",
+   "to": "COND-WD-MMT-COMPOSITE-N",
+   "relation": "enables",
+   "statement": "The genus 2^(m-1) - 1 or 2^(m-1) for least magic numbers fixes the HCDLP instance.",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-021",
+   "from": "THM-WD-MMT-LEMMA6",
+   "to": "COND-WD-MMT-COMPOSITE-N",
+   "relation": "enables",
+   "statement": "Counts of attackable classes use condition (8) via Lemma 8.",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-022",
+   "from": "COND-WD-MMT-COMPOSITE-N",
+   "to": "PROB-ECDLP",
+   "relation": "attacks_when",
+   "statement": "Faster than Pollard rho only for curves over composite-degree binary fields with least magic numbers, often a tiny fraction of all curves.",
+   "source_refs": [
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-023",
+   "from": "RED-ISOGENY-DLP-TRANSPORT",
+   "to": "COND-WD-GALHS-ISOGENY",
+   "relation": "enables",
+   "statement": "An explicit isogeny moves the ECDLP to a GHS-weak curve in the same isogeny class.",
+   "source_refs": [
+    "S-WD-GALHS-2002",
+    "S-WD-MMT-2002"
+   ]
+  },
+  {
+   "id": "E-WD-024",
+   "from": "COND-WD-GALHS-ISOGENY",
+   "to": "ATTACK-GHS-WEIL-DESCENT",
+   "relation": "qualifies",
+   "statement": "Enlarges the set of curves the GHS attack reaches, at the cost of an isogeny search.",
+   "source_refs": [
+    "S-WD-GALHS-2002",
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-025",
+   "from": "COND-WD-GALHS-ISOGENY",
+   "to": "COND-WD-MTW-WEAK-FIELDS",
+   "relation": "enables",
+   "statement": "Weak-field statements for all curves rely on isogeny walks to low-magic curves.",
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-026",
+   "from": "THM-WD-HESS-THM12-GENUS",
+   "to": "COND-WD-HESS-F2155",
+   "relation": "enables",
+   "statement": "New Artin-Schreier choices with the same genera reach about 2^123 more classes over F_(2^155).",
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-027",
+   "from": "GAP-WD-GGHS-NONHYP-COST",
+   "to": "COND-WD-HESS-F2155",
+   "relation": "leaves_open",
+   "statement": "The new curves are not hyperelliptic; their index-calculus cost is undetermined.",
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-028",
+   "from": "GAP-WD-GGHS-NONHYP-COST",
+   "to": "COND-WD-MT-HESS-FIELDS",
+   "relation": "leaves_open",
+   "statement": "'Potentially' weak classifications depend on index-calculus cost on non-hyperelliptic gGHS curves.",
+   "source_refs": [
+    "S-WD-MT-2006",
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "E-WD-029",
+   "from": "THM-WD-HESS-THM12-GENUS",
+   "to": "COND-WD-MT-HESS-FIELDS",
+   "relation": "enables",
+   "statement": "Menezes-Teske apply Hess's genus formula field by field.",
+   "source_refs": [
+    "S-WD-MT-2006"
+   ]
+  },
+  {
+   "id": "E-WD-030",
+   "from": "THM-WD-HESS-THM12-GENUS",
+   "to": "THM-WD-KMPS-THM8-UPPER",
+   "relation": "enables",
+   "statement": "KMPS bound the genus formula g = 2^t - 2^(t-r) - 2^(t-s) + 1 over decompositions b = (alpha beta)^2.",
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-031",
+   "from": "THM-WD-HESS-THM12-GENUS",
+   "to": "THM-WD-KMPS-THM9-LOWER",
+   "relation": "enables",
+   "statement": "The lower bound counts b with small deg lcm(Ord_alpha, Ord_beta) in eq. (4).",
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-032",
+   "from": "THM-WD-KMPS-THM9-LOWER",
+   "to": "COND-WD-KMPS-INEFFECTIVE",
+   "relation": "enables",
+   "statement": "Exponential genus for almost all curves exceeds the g = O(n^4) needed to beat rho.",
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-033",
+   "from": "THM-WD-DIEM-SMALL-GENUS",
+   "to": "COND-WD-KMPS-INEFFECTIVE",
+   "relation": "enables",
+   "statement": "For fixed n, direct index calculus at q^(2-2/n) (and q^(2-2/g), g >= n) makes descent asymptotically inferior.",
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-034",
+   "from": "COND-WD-KMPS-INEFFECTIVE",
+   "to": "ATTACK-GHS-WEIL-DESCENT",
+   "relation": "obstructs",
+   "statement": "Asymptotically, (g)GHS is almost never faster than the best non-descent solver.",
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-035",
+   "from": "COND-WD-KMPS-INEFFECTIVE",
+   "to": "COND-WD-MTW-WEAK-FIELDS",
+   "relation": "qualifies",
+   "statement": "Weak fields are a finite-range phenomenon; they do not extend to infinite families.",
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-036",
+   "from": "COND-WD-KMPS-INEFFECTIVE",
+   "to": "COND-WD-MT-HESS-FIELDS",
+   "relation": "qualifies",
+   "statement": "Partial weakness of GF(q^3), GF(q^7) etc. under gGHS is not asymptotic.",
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-037",
+   "from": "ALG-WD-GAUDRY-2000",
+   "to": "ATTACK-GHS-WEIL-DESCENT",
+   "relation": "enables",
+   "statement": "The O(q^(2+epsilon)) GHS bound for fixed n uses Gaudry's fixed-genus index calculus on the cover.",
+   "source_refs": [
+    "S-GHS-2002",
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-038",
+   "from": "COND-WD-FREY-1998",
+   "to": "COND-WD-DIEM-PLANE-CURVES",
+   "relation": "enables",
+   "statement": "Frey's 'effective Riemann-Roch on C' requirement is what plane-curve index calculus provides for non-hyperelliptic covers.",
+   "source_refs": [
+    "S-WD-FREY-1998"
+   ]
+  },
+  {
+   "id": "E-WD-039",
+   "from": "DEF-WD-COVER-ATTACK",
+   "to": "THM-WD-DIEM-GHS-ODD",
+   "relation": "defines",
+   "statement": "Diem's odd-characteristic construction is a cover attack with Kummer/quadratic covers.",
+   "source_refs": [
+    "S-WD-HESS-2004",
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-040",
+   "from": "THM-WD-DIEM-GHS-ODD",
+   "to": "THM-WD-JV-GENUS3-FAMILY",
+   "relation": "enables",
+   "statement": "The genus-3 hyperelliptic family over F_(q^3) comes from Diem's analysis (with Theriault, Momose-Chao).",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-041",
+   "from": "THM-WD-MOMOSE-CHAO",
+   "to": "THM-WD-JV-GENUS3-FAMILY",
+   "relation": "enables",
+   "statement": "Momose-Chao give the non-hyperelliptic genus-3 cover family (eq. (4)).",
+   "source_refs": [
+    "S-WD-JV-2012",
+    "S-WD-MOMOSE-CHAO-2005"
+   ]
+  },
+  {
+   "id": "E-WD-042",
+   "from": "THM-WD-MOMOSE-CHAO",
+   "to": "THM-WD-SCHOLTEN-GENUS2",
+   "relation": "enables",
+   "statement": "Scholten forms underlie the genus-2 covers used for F_(p^6)/F_(p^3).",
+   "source_refs": [
+    "S-WD-MOMOSE-CHAO-2005",
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-043",
+   "from": "THM-WD-JV-GENUS3-FAMILY",
+   "to": "COND-WD-JV-COVER-DECOMP",
+   "relation": "enables",
+   "statement": "The genus-3 hyperelliptic cover over F_(p^2) is the transfer step for E(F_(p^6)).",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-044",
+   "from": "THM-WD-SCHOLTEN-GENUS2",
+   "to": "COND-WD-JV-COVER-DECOMP",
+   "relation": "enables",
+   "statement": "Genus-2 covers over F_(p^3) give the alternative tower.",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-045",
+   "from": "THM-WD-GTTD-THM1",
+   "to": "COND-WD-JV-COVER-DECOMP",
+   "relation": "conditions",
+   "statement": "The Õ(p^(2-2/(ng))) exponent transfers the GTTD double-large-prime analysis to decomposition relations.",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-046",
+   "from": "HEUR-DECOMPOSITION-PROBABILITY",
+   "to": "COND-WD-JV-COVER-DECOMP",
+   "relation": "conditions",
+   "statement": "Relation yield 1/(ng)! per random divisor is the decomposition-probability heuristic.",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-047",
+   "from": "HEUR-WD-JV-WEAKNESS-INDEPENDENT",
+   "to": "GAP-WD-JV-ISOGENY-CONJ",
+   "relation": "conditions",
+   "statement": "The conjecture and the p^2 walk length come from assuming weakness independent of isogeny class.",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-048",
+   "from": "RED-ISOGENY-DLP-TRANSPORT",
+   "to": "GAP-WD-JV-ISOGENY-CONJ",
+   "relation": "enables",
+   "statement": "The walk transports the instance to the weak family.",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-049",
+   "from": "THM-WD-JV-GENUS3-FAMILY",
+   "to": "HEUR-WD-JV-WEAKNESS-INDEPENDENT",
+   "relation": "qualifies",
+   "statement": "All weak curves have #E = 0 mod 4, so independence can hold only within classes with that cardinality.",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "E-WD-050",
+   "from": "THM-WD-ENGE-STEIN-SMOOTH",
+   "to": "THM-WD-ENGE-GAUDRY-2002",
+   "relation": "enables",
+   "statement": "Rigorous smooth-divisor counts make the subexponential analysis provable.",
+   "source_refs": [
+    "S-GALBRAITH-MPKC-2018",
+    "S-WD-ENGE-GAUDRY-2002"
+   ]
+  },
+  {
+   "id": "E-WD-051",
+   "from": "HEUR-WD-ADH-NORM-SMOOTH",
+   "to": "ALG-WD-ADH-1994",
+   "relation": "conditions",
+   "statement": "ADH relations come from norms of a(x) + y b(x), assumed as smooth as random polynomials.",
+   "source_refs": [
+    "S-GALBRAITH-MPKC-2018"
+   ]
+  },
+  {
+   "id": "E-WD-052",
+   "from": "ALG-WD-ADH-1994",
+   "to": "THM-WD-ENGE-GAUDRY-2002",
+   "relation": "qualifies",
+   "statement": "Enge-Gaudry replace ADH's heuristic analysis by a rigorous one with a better constant.",
+   "source_refs": [
+    "S-WD-ENGE-GAUDRY-2002",
+    "S-GALBRAITH-MPKC-2018"
+   ]
+  },
+  {
+   "id": "E-WD-053",
+   "from": "DEF-SUBEXPONENTIAL-L",
+   "to": "THM-WD-ENGE-GAUDRY-2002",
+   "relation": "defines",
+   "statement": "The bound is stated in L notation.",
+   "source_refs": [
+    "S-WD-ENGE-GAUDRY-2002",
+    "S-GALBRAITH-MPKC-2018"
+   ]
+  },
+  {
+   "id": "E-WD-054",
+   "from": "HEUR-WD-SUBGROUP-SMOOTHNESS",
+   "to": "THM-WD-ENGE-GAUDRY-2002",
+   "relation": "does_not_cover",
+   "statement": "The theorem is proved for cyclic groups; DLP in a cyclic subgroup of a non-cyclic Jacobian needs the heuristic (Section 7).",
+   "source_refs": [
+    "S-WD-ENGE-GAUDRY-2002"
+   ]
+  },
+  {
+   "id": "E-WD-055",
+   "from": "ALG-WD-GAUDRY-2000",
+   "to": "ALG-WD-THERIAULT-2003",
+   "relation": "enables",
+   "statement": "Theriault reduces Gaudry's factor base and adds a large prime.",
+   "source_refs": [
+    "S-WD-GTTD-2007",
+    "S-GALBRAITH-MPKC-2018"
+   ]
+  },
+  {
+   "id": "E-WD-056",
+   "from": "ALG-WD-THERIAULT-2003",
+   "to": "THM-WD-GTTD-THM1",
+   "relation": "enables",
+   "statement": "GTTD extend the single large prime algorithm to two large primes and improve q^(2-2/(g+1/2)) to q^(2-2/g).",
+   "source_refs": [
+    "S-WD-GTTD-2007"
+   ]
+  },
+  {
+   "id": "E-WD-057",
+   "from": "ALG-SPARSE-LINEAR-ALGEBRA",
+   "to": "ALG-WD-GAUDRY-2000",
+   "relation": "enables",
+   "statement": "The q^2 term is sparse linear algebra on about q relations.",
+   "source_refs": [
+    "S-GALBRAITH-MPKC-2018"
+   ]
+  },
+  {
+   "id": "E-WD-058",
+   "from": "THM-WD-GTTD-THM1",
+   "to": "ATTACK-GHS-WEIL-DESCENT",
+   "relation": "qualifies",
+   "statement": "With the double large prime variation the HCDLP on a genus-g cover costs Õ(q^(2-2/g)) rather than Õ(q^2); KMPS note this still loses to direct index calculus for fixed n.",
+   "source_refs": [
+    "S-WD-GTTD-2007",
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-059",
+   "from": "HEUR-WD-GTTD-GENERAL",
+   "to": "THM-WD-DIEM-SMALL-GENUS",
+   "relation": "qualifies",
+   "statement": "Diem proves the GTTD heuristic extension for plane models of bounded degree with cyclic class group.",
+   "source_refs": [
+    "S-WD-DIEM-2006-ARXIV"
+   ]
+  },
+  {
+   "id": "E-WD-060",
+   "from": "THM-WD-DIEM-SPECIAL-DIVISORS",
+   "to": "THM-WD-DIEM-SMALL-GENUS",
+   "relation": "enables",
+   "statement": "Proposition 1 lets the analysis discard special divisors.",
+   "source_refs": [
+    "S-WD-DIEM-2006-ARXIV"
+   ]
+  },
+  {
+   "id": "E-WD-061",
+   "from": "THM-WD-GTTD-THM1",
+   "to": "THM-WD-DIEM-SMALL-GENUS",
+   "relation": "enables",
+   "statement": "Diem's algorithm modifies GTTD's 'simplified algorithm'.",
+   "source_refs": [
+    "S-WD-DIEM-2006-ARXIV"
+   ]
+  },
+  {
+   "id": "E-WD-062",
+   "from": "THM-WD-DT-LINES",
+   "to": "COND-WD-DT-RESULT13",
+   "relation": "enables",
+   "statement": "Lines through 4 rational points supply the full relations (yield about q^2/24).",
+   "source_refs": [
+    "S-WD-DIEM-THOME-2008"
+   ]
+  },
+  {
+   "id": "E-WD-063",
+   "from": "HEUR-WD-DT-ASSUMPTION12",
+   "to": "COND-WD-DT-RESULT13",
+   "relation": "conditions",
+   "statement": "The Õ(q) result is rigorous exactly for curve classes satisfying Assumption 12.",
+   "source_refs": [
+    "S-WD-DIEM-THOME-2008"
+   ]
+  },
+  {
+   "id": "E-WD-064",
+   "from": "COND-WD-DIEM-PLANE-CURVES",
+   "to": "COND-WD-DT-RESULT13",
+   "relation": "enables",
+   "statement": "Diem-Thome specialise the plane-curve method to quartics (d = 4).",
+   "source_refs": [
+    "S-WD-DIEM-THOME-2008",
+    "S-WD-DIEM-2006-ANTS"
+   ]
+  },
+  {
+   "id": "E-WD-065",
+   "from": "COND-WD-DT-RESULT13",
+   "to": "COND-WD-LAINE-LAUTER",
+   "relation": "enables",
+   "statement": "Laine-Lauter modify Diem's Õ(q) algorithm.",
+   "source_refs": [
+    "S-WD-LAINE-LAUTER-2015"
+   ]
+  },
+  {
+   "id": "E-WD-066",
+   "from": "HEUR-WD-SUBGROUP-SMOOTHNESS",
+   "to": "COND-WD-DT-RESULT13",
+   "relation": "does_not_cover",
+   "statement": "Result 13 assumes a cyclic class group or known structure; proper subgroups are covered only heuristically.",
+   "source_refs": [
+    "S-WD-DIEM-THOME-2008"
+   ]
+  },
+  {
+   "id": "E-WD-067",
+   "from": "COND-WD-EG-2007-L13",
+   "to": "COND-WD-KMPS-INEFFECTIVE",
+   "relation": "qualifies",
+   "statement": "KMPS show even L(1/3 + epsilon) is not polynomial in q for n = O(sqrt(log q)), so it does not rescue descent.",
+   "source_refs": [
+    "S-WD-KMPS-2010"
+   ]
+  },
+  {
+   "id": "E-WD-068",
+   "from": "THM-WD-SMITH-LEMMA4",
+   "to": "THM-WD-SMITH-PROP4",
+   "relation": "enables",
+   "statement": "Lemma 4 places the isogeny's field of definition in F_q(sqrt(alpha)).",
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ]
+  },
+  {
+   "id": "E-WD-069",
+   "from": "THM-WD-SMITH-PROP4",
+   "to": "COND-WD-SMITH-THM2",
+   "relation": "enables",
+   "statement": "Rationality per subgroup is the event whose probability Hypothesis 3 sets to 1/2.",
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ]
+  },
+  {
+   "id": "E-WD-070",
+   "from": "THM-WD-SMITH-PROP5",
+   "to": "COND-WD-SMITH-THM2",
+   "relation": "qualifies",
+   "statement": "General isogenous genus-3 Jacobians exist for any maximal isotropic kernel, but only tractable (Z/2Z)^3 kernels are explicit, so Theorem 2 is a lower estimate.",
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ]
+  },
+  {
+   "id": "E-WD-071",
+   "from": "HEUR-WD-SMITH-HYP1",
+   "to": "COND-WD-SMITH-THM2",
+   "relation": "conditions",
+   "statement": "Theorem 2 assumes Hypothesis 1.",
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ]
+  },
+  {
+   "id": "E-WD-072",
+   "from": "HEUR-WD-SMITH-HYP2",
+   "to": "COND-WD-SMITH-THM2",
+   "relation": "conditions",
+   "statement": "Theorem 2 assumes Hypothesis 2 (factor 1/2).",
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ]
+  },
+  {
+   "id": "E-WD-073",
+   "from": "HEUR-WD-SMITH-HYP3",
+   "to": "COND-WD-SMITH-THM2",
+   "relation": "conditions",
+   "statement": "Theorem 2 assumes Hypothesis 3 (factor 1/2).",
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ]
+  },
+  {
+   "id": "E-WD-074",
+   "from": "HEUR-WD-SMITH-HYP4",
+   "to": "COND-WD-SMITH-THM2",
+   "relation": "conditions",
+   "statement": "Theorem 2 assumes independence over S(H): 1 - (3/4)^#S(H).",
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ]
+  },
+  {
+   "id": "E-WD-075",
+   "from": "COND-WD-DT-RESULT13",
+   "to": "COND-WD-SMITH-THM2",
+   "relation": "conditions",
+   "statement": "The payoff of the transfer (Õ(q) instead of Õ(q^(4/3))) is Diem-Thome's heuristic result.",
+   "source_refs": [
+    "S-WD-SMITH-2009",
+    "S-WD-DIEM-THOME-2008"
+   ]
+  },
+  {
+   "id": "E-WD-076",
+   "from": "COND-WD-SMITH-THM2",
+   "to": "THM-WD-GTTD-THM1",
+   "relation": "qualifies",
+   "statement": "For about 18.57% of genus-3 hyperelliptic curves (heuristically) the GTTD Õ(q^(4/3)) is not the relevant bound.",
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ]
+  },
+  {
+   "id": "E-WD-077",
+   "from": "HEUR-WD-EG07-SMOOTHNESS",
+   "to": "COND-WD-EG-2007-L13",
+   "relation": "conditions",
+   "statement": "Both the relation collection and the descent rest on Heuristics 1 and 2.",
+   "source_refs": [
+    "S-WD-EG-2007"
+   ]
+  },
+  {
+   "id": "E-WD-078",
+   "from": "ALG-WD-GAUDRY-2000",
+   "to": "DEF-INDEX-CALCULUS-PIPELINE",
+   "relation": "instantiates",
+   "statement": "Factor base of degree-one divisors, relations, sparse linear algebra.",
+   "source_refs": [
+    "S-GALBRAITH-MPKC-2018"
+   ]
+  },
+  {
+   "id": "E-WD-079",
+   "from": "COND-WD-JV-COVER-DECOMP",
+   "to": "ALG-GAUDRY-FIXED-EXTENSION",
+   "relation": "qualifies",
+   "statement": "Applies the fixed-extension decomposition method on an intermediate Jacobian after a cover, lowering n g instead of n.",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  }
+ ],
+ "research_targets": [
+  {
+   "id": "RT-WD-COST-MODEL-HYPOTHESES",
+   "label": "Audit the Jacobian-transfer cost model against its theorems' hypotheses",
+   "status": "ready",
+   "priority": 1,
+   "objective": "jacobian_transfer/cost.rs prices every cover with g^e q^(2-2/g) (GTTD Theorem 1: proved only for g >= 3, imaginary Weierstrass model, cyclic Jacobian) and Enge-Gaudry L(sqrt 2) (proved only for cyclic groups with g/log q -> infinity, 'reported, not enforced'). gGHS covers are non-hyperelliptic (Hess), and DLPs live in proper subgroups. Label each priced row with the theorem whose hypotheses it meets, or with the heuristic it needs.",
+   "depends_on": [
+    "THM-WD-GTTD-THM1",
+    "THM-WD-ENGE-GAUDRY-2002",
+    "THM-WD-DIEM-SMALL-GENUS",
+    "HEUR-WD-SUBGROUP-SMOOTHNESS",
+    "GAP-WD-GGHS-NONHYP-COST",
+    "ALG-WD-MMT-EG-COST"
+   ],
+   "acceptance": "Every cost row produced by cost.rs and transfer_audit carries one of: GTTD-rigorous, Diem-rigorous (plane model, cyclic), EG-rigorous, or heuristic (naming HEUR-WD-SUBGROUP-SMOOTHNESS / GAP-WD-GGHS-NONHYP-COST); no row cites a theorem whose hypotheses fail.",
+   "next_step": "Add a hypothesis field to the cost.rs outputs (genus >= 3, model type, cyclicity, g/log q) and re-run the jacobian_transfer_scan table.",
+   "source_refs": [
+    "S-WD-GTTD-2007",
+    "S-WD-ENGE-GAUDRY-2002",
+    "S-WD-DIEM-2006-ARXIV",
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "RT-WD-HESS-KERNEL-DESCENT",
+   "label": "Use Hess Theorem 14 as the injectivity theorem for the m >= 2 descent",
+   "status": "ready",
+   "priority": 2,
+   "objective": "problems/ghs-higher-magic-descent-not-executable.md asks for 'a theorem with checkable hypotheses' for injectivity on <G>; Hess 2004 Theorem 14 gives it (kernel within the preimage of the 2^(m-1)-torsion; preserved iff s(h) = n). The repository cites 'Hess 2004, Theorem 5.3', which does not exist: the construction is Section 5 (Theorems 11, 12, Corollary 13) and the kernel is Theorem 14.",
+   "depends_on": [
+    "THM-WD-HESS-THM14-KERNEL",
+    "THM-WD-HESS-THM12-GENUS",
+    "THM-WD-HESS-THM3-ORDER"
+   ],
+   "acceptance": "For each m >= 2 candidate the audit checks s(h) = n and gcd(#<G>, 2) = 1 and records Theorem 14 as the injectivity certificate; the citation in ghs_descent.rs and the problem file names Hess 2004 Theorems 11, 12, 14.",
+   "next_step": "Correct the citation and add an s(h) computation next to magic_mmt in ghs_class_coverage.rs.",
+   "source_refs": [
+    "S-WD-HESS-2004"
+   ]
+  },
+  {
+   "id": "RT-WD-SMITH-HYPOTHESES",
+   "label": "Measure Smith's Hypotheses 1-4 on random genus-3 curves",
+   "status": "open",
+   "priority": 3,
+   "objective": "Smith's 18.57% rests on four probabilistic hypotheses (1/2, 1/2, negligible hyperelliptic codomain, independence). The repository measured 0.53-0.61 on the Joux-Vitse family, a structured population; random-H rates with confidence intervals and an independence test across S(H) are missing.",
+   "depends_on": [
+    "HEUR-WD-SMITH-HYP1",
+    "HEUR-WD-SMITH-HYP2",
+    "HEUR-WD-SMITH-HYP3",
+    "HEUR-WD-SMITH-HYP4",
+    "COND-WD-SMITH-THM2"
+   ],
+   "acceptance": "Per-hypothesis rates with 95% intervals over uniformly random H at three or more primes p > 3, a chi-square test of independence across S(H), and the measured full_success share against 0.1857.",
+   "next_step": "Reuse smith_prop24.rs with a uniform sampler of squarefree octics as the control arm beside the JV-family arm.",
+   "source_refs": [
+    "S-WD-SMITH-2009"
+   ]
+  },
+  {
+   "id": "RT-WD-JV-ISOGENY-CONJ",
+   "label": "Test the Joux-Vitse isogeny-walk conjecture at toy size",
+   "status": "open",
+   "priority": 4,
+   "objective": "Joux-Vitse conjecture that every curve over F_(p^6) with #E divisible by 4 reaches the genus-3 weak family by an isogeny walk of about p^2 steps, assuming weakness independent of isogeny class. Exhaustively count, per isogeny class with #E = 0 mod 4, the weak members at small p.",
+   "depends_on": [
+    "GAP-WD-JV-ISOGENY-CONJ",
+    "HEUR-WD-JV-WEAKNESS-INDEPENDENT",
+    "THM-WD-JV-GENUS3-FAMILY"
+   ],
+   "acceptance": "For every p in a declared range, the share of #E = 0 mod 4 isogeny classes containing a weak curve and the distribution of weak-member counts against the independence prediction; any class with none is a counterexample at that p.",
+   "next_step": "Extend the smith_elliptic_walk exhaustive data (which already tags jv-weak nodes) to all classes with #E = 0 mod 4.",
+   "source_refs": [
+    "S-WD-JV-2012"
+   ]
+  },
+  {
+   "id": "RT-WD-DT-ASSUMPTION12",
+   "label": "Measure Diem-Thome Heuristic Assumption 12 on GHS plane quartics",
+   "status": "open",
+   "priority": 5,
+   "objective": "Diem-Thome's Õ(q) (and Smith's payoff) rests on the large-prime graph reaching >= q^(5/6) vertices within depth (log q)^2. diem_quartic.rs builds SLP/DLP relation graphs on m = 2 GHS quartics; record the reach statistic directly.",
+   "depends_on": [
+    "HEUR-WD-DT-ASSUMPTION12",
+    "COND-WD-DT-RESULT13",
+    "THM-WD-DT-LINES"
+   ],
+   "acceptance": "Reach within depth (log q)^2 versus q^(5/6) over a range of q with a random-quartic control arm.",
+   "next_step": "Add a breadth-first reach counter to the DLP arm of diem_quartic.rs.",
+   "source_refs": [
+    "S-WD-DIEM-THOME-2008"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-05T22:58:13Z",
+ "id": "PCC-20261105-8538a7",
+ "kind": "statement",
+ "producer": {
+  "commit": "180d8ea25b00083894ba794f1c593c0850da4c9b",
+  "model": "",
+  "session": "codex-cubic-native-measurement-20261105"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cubic_extension_transfer_20261025/native_end_to_end/measure/evidence/deadline-regression.log",
+    "sha256": "6ccc3714ec7e26c602e02afe5004a398de20d8cb2a284cc938cd3dd8042a3b30"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cubic_extension_transfer_20261025/native_end_to_end/measure/evidence/deadline-regression-final.log",
+    "sha256": "b40af1970896c3387b2fbcb4a1cbf2bbb90dc0a45a8314ec75d9dbaf3dbf3997"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Superseding producer correction for the deadline regression receipt; all standing remains unverified, no scientific benchmark.",
+ "statement": "Correction to PCC-20261105-a3f112: its receipt was copied while compilation was still running, so its passing-test assertion was premature and unsupported by that partial transcript. The original partial receipt is preserved. After observed command completion with exit 0, the separate final release lifecycle transcript reports one passing test for the deadline change."
+}

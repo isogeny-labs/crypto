@@ -1,0 +1,5 @@
+# Prospective algebra identity screen
+
+[pcc:unverified] Qualification of DERIVATION.md, not a timing or solve experiment. Exhaust all coefficients A,B,C over F11,F31 and all nonzero fifth-power r; compare explicit norm formula to five-factor product (includes A=0). Then use original 12 target fixtures, all 16 successive anchors, all nonzero-x canonical factor-base points and both signs. Compare polynomial coefficients in T against direct five-factor product; retain denominator-zero cases and assert every base-point product is identically zero. Report degree-five and five-distinct-parameter counts; require positive base-point and distinct cases. No filtering/retries/new target selection. Degree/non-descent proof remains mathematical review, finite checks not proof of generality. No operation performance claim.
+
+Freeze source/import/native/protocol/binary hashes and push Git before one 120CPU-second invocation. Retain raw/exit/hashes; failure requires new amendment, no rerun. S3 unavailable, Git custody, no cloud. Input construction is for diagnostic algebra checks only.

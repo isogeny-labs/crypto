@@ -1,0 +1,55 @@
+import WordPotential
+set_option autoImplicit false
+namespace SignedWord
+structure State (n:Nat) where
+ parent:Fin n→Fin n
+ pot:Fin n→Pot
+def Good {n:Nat} (r:UInt64) (s:State n) : Prop := ∀i,GoodPot r (s.pot i)
+def decode {n:Nat} (r:UInt64) (s:State n) : GraphFind.State (ZMod r.toNat) n :=
+ ⟨s.parent,fun i=>decPot r (s.pot i)⟩
+def compress {n:Nat} (s:State n) (x root:Fin n) (p:Pot) : State n :=
+ ⟨fun i=>if i=x then root else s.parent i,fun i=>if i=x then p else s.pot i⟩
+theorem compress_good {n:Nat} (r:UInt64) (s:State n) (x root:Fin n) (p:Pot)
+ (hs:Good r s) (hp:GoodPot r p) : Good r (compress s x root p) := by
+ intro i
+ by_cases hi:i=x
+ · simpa [compress,hi] using hp
+ · simpa [compress,hi] using hs i
+theorem compress_decode {n:Nat} (r:UInt64) (s:State n) (x root:Fin n) (p:Pot) :
+ decode r (compress s x root p)=GraphFind.compress (decode r s) x root (decPot r p) := by
+ unfold decode compress GraphFind.compress
+ congr 1
+ funext i
+ by_cases h : i=x <;> simp [h]
+inductive Run {n:Nat} (r:UInt64) : State n→Fin n→State n→Fin n→Pot→Prop
+ | root (s:State n) (x:Fin n) (h:s.parent x=x) : Run r s x s x ident
+ | step (s t:State n) (x root:Fin n) (q:Pot)
+   (hne:s.parent x≠x) (rec:Run r s (s.parent x) t root q) :
+   Run r s x (compress t x root (compose r (t.pot x) q)) root (compose r (t.pot x) q)
+theorem run_refines {n:Nat} (r:UInt64) (hp:0<r.toNat) (hb:r.toNat≤2^63)
+ (s t:State n) (x root:Fin n) (p:Pot) (h:Run r s x t root p) (hg:Good r s) :
+ Good r t ∧ GoodPot r p ∧ GraphFind.Run (decode r s) x (decode r t) root (decPot r p) := by
+ induction h with
+ | root x he =>
+   refine ⟨hg,ident_good r hp,?_⟩
+   rw [ident_decode]
+   exact GraphFind.Run.root _ _ he
+ | step t x root q hn hrec ih =>
+   obtain ⟨ht,hq,hr⟩:=ih hg
+   have hc:=compose_correct r hp hb (t.pot x) q (ht x) hq
+   refine ⟨compress_good r t x root _ ht hc.1,hc.1,?_⟩
+   rw [compress_decode,hc.2]
+   exact GraphFind.Run.step _ _ _ _ _ hn hr
+theorem run_exists {n:Nat} (r:UInt64) (s:State n) (rank:Fin n→Nat)
+ (hf:GraphFind.Forest (decode r s) rank) (x:Fin n) :
+ ∃t root p,Run r s x t root p := by
+ induction hx:rank x using Nat.strong_induction_on generalizing x with
+ | h m ih =>
+   by_cases hr:s.parent x=x
+   · exact ⟨s,x,ident,Run.root s x hr⟩
+   · have hd:rank (s.parent x)<m:=by
+      rw [←hx]
+      exact (hf x).resolve_left hr
+     obtain ⟨t,root,q,hq⟩:=ih (rank (s.parent x)) hd (s.parent x) rfl
+     exact ⟨_,root,_,Run.step s t x root q hr hq⟩
+end SignedWord

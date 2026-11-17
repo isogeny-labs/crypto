@@ -1,0 +1,32 @@
+set -euo pipefail
+job_root="${ISOLAB_RESULTS_URI%/*/*}/"
+job_id="${job_root%/}"
+job_id="${job_id##*/}"
+if [[ "$job_id" =~ ^n83-fb-variants-r([0-9]+)-20261031-r[0-9]+$ ]]; then
+  coordinate_bit="${BASH_REMATCH[1]}"
+else
+  echo "Job-root name does not encode the frozen N83 coordinate: $job_id" >&2
+  exit 2
+fi
+[[ "$coordinate_bit" =~ ^(29|3[0-9])$ ]] || { echo "v9 launcher only admits r=29..39" >&2; exit 2; }
+src4="s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r27-20261031-r4/source-v4"
+src9="${job_root}source-v9"
+mkdir -p /work/source/src/bin /work/source/target/release /work/results
+aws s3 cp "$src4/src/bin/factor_base.rs" /work/source/src/bin/factor_base.rs --only-show-errors --region us-east-2
+aws s3 cp "$src4/src/field.rs" /work/source/src/field.rs --only-show-errors --region us-east-2
+aws s3 cp "$src4/FORMAT.json" /work/source/FORMAT.json --only-show-errors --region us-east-2
+aws s3 cp "$src4/FACTOR_BASE_VARIANT_SWEEP_DESIGN.md" /work/source/FACTOR_BASE_VARIANT_SWEEP_DESIGN.md --only-show-errors --region us-east-2
+aws s3 cp "$src4/RUN_OUTPUT_FORMAT.json" /work/source/RUN_OUTPUT_FORMAT.json --only-show-errors --region us-east-2
+aws s3 cp "$src4/target/release/factor_base" /work/source/target/release/factor_base --only-show-errors --region us-east-2
+aws s3 cp "$src9/run-base-variant-v2.sh" /work/source/run-base-variant-v2.sh --only-show-errors --region us-east-2
+aws s3 cp "$src9/protocol-factor-base-variants-v9-r29-39.json" /work/source/protocol-factor-base-variants-v9-r29-39.json --only-show-errors --region us-east-2
+aws s3 cp "$src9/protocol-factor-base-variants-v9-r29-39.sha256" /work/source/protocol-factor-base-variants-v9-r29-39.sha256 --only-show-errors --region us-east-2
+aws s3 cp "$src9/factor-base-variant-source-index-v9-r29-39.json" /work/source/factor-base-variant-source-index-v9-r29-39.json --only-show-errors --region us-east-2
+aws s3 cp "$src9/factor-base-variant-source-index-v9-r29-39.sha256" /work/source/factor-base-variant-source-index-v9-r29-39.sha256 --only-show-errors --region us-east-2
+cd /work/source
+sha256sum -c protocol-factor-base-variants-v9-r29-39.sha256
+sha256sum -c factor-base-variant-source-index-v9-r29-39.sha256
+jq -r '.entries[] | "\(.sha256)  \(.path)"' factor-base-variant-source-index-v9-r29-39.json > source-files.sha256
+sha256sum -c source-files.sha256
+chmod 755 run-base-variant-v2.sh target/release/factor_base
+exec ./run-base-variant-v2.sh ./target/release/factor_base "$coordinate_bit" "/work/results/r${coordinate_bit}" "$job_root" ./protocol-factor-base-variants-v9-r29-39.json

@@ -1,0 +1,19 @@
+{
+ "idea_id": "MP-ml_empirical-2",
+ "skeptic_lens": "prior-art and closure collision",
+ "verdict": "survives_with_fix",
+ "confidence": 0.6,
+ "reason": "Partly covered. (1) Cheap UNSAT early-abort exists as an exact test: KN-OPEN-3c8f51/CERTBIN found the constant in the degree-4 Macaulay row space for 324/386 (0.839) of unsatisfiable binary m=2 S_3 descents at n=17, l=9, 0/386 at D=3, with a sound certificate (Prop S). A classifier on degree-2 rank features competes with this deterministic, zero-false-positive abort. (2) KN-FIND-006: Macaulay deficit is 1 at D=3 and 8k-1 at D=4 for full systems, i.e. a fixed structural constant per dim(V). Degree-2 deficit is constant given d_ff=2, so the proposed features carry no per-instance signal. The idea's own stated risk is correct. (3) LEAD-ICE-decomposition-probability-audit: learned decomposability predictors (GNN, symbolic regression, learned selector) null at N<=2^26, held-out gain +0.00001 bits, oracle headroom 0.0011 bits (prime fields, mean-yield statistic). (4) LEAD-ICB-decomposition-encoding-and-sat: UNSAT cost grows 2^(alpha*l) with alpha~m for all arms tried; trace replay is a constant; needs alpha<m/2-1. A saved-ops fraction cannot change alpha. (5) KR-IC-f3da82 (F4 trace reuse) and E-ML-2 (row-skip classifier in literature/ml_cryptanalysis.json) cover the nearby learn-and-replay mechanism. (6) Brief closure Generic oracle bound and Wagner: the idea admits expected_class engineering; constant factor <= m!. Web search (3 queries, extended): no published ML classifier for PDP/Semaev UNSAT prediction; only generic SAT-satisfiability prediction (AAAI-20 NeuroSAT-style) and Kosters-Yeo / Trimoska-Ionica-Dequen SAT work. Mechanism not published as such, but the components are closed or constants.",
+ "fix": "Not an advance; at most an engineering measurement. To survive: (a) use binary S_3 at m=3 and l>=6 where CERTBIN (m=2 only) has no data, and use per-instance features beyond the degree-2 deficit, e.g. the degree-3 deficit-1 and 8k-1 baseline subtracted, or the dim(V.V) and trace-rank statistics already in LEAD-ICB-factor-base-subspace-choice; (b) the baseline to beat is the CERTBIN fixed-degree Macaulay refutation at its own cost (not no-abort), counted net of feature cost, with the abort priced as a lower-degree Macaulay solve; (c) reuse the existing null rule (A/A seed, size-matched random) and report only constant-factor saving; (d) state that a classifier cannot lower alpha.",
+ "collisions": [
+  "KN-OPEN-3c8f51 / EV-CERTBIN-6c3e0a: degree-4 Macaulay UNSAT certificate, 0.839 of unsat attempts at n=17 m=2",
+  "KN-FIND-006: Macaulay deficit 1 at D=3, 8k-1 at D=4, constant per dim(V) (features degenerate)",
+  "LEAD-ICE-decomposition-probability-audit: learned decomposability predictors null, headroom 0.0011 bits (prime, mean-yield)",
+  "LEAD-ICB-decomposition-encoding-and-sat: UNSAT cost alpha~m, trace replay is a constant",
+  "KR-IC-f3da82 F4 trace reuse; E-ML-2 row-skip classifier (literature/ml_cryptanalysis.json)",
+  "LEAD-ICB-learned-cost-model-factor-base-selection (open_next_step, learned features of V)",
+  "KR-IC-5765d2 SAT/XOR for PDP, constant-factor only",
+  "Web: Trimoska-Ionica-Dequen 2020 SAT index calculus; Kosters-Yeo d_ff=2; generic ML SAT-prediction (AAAI-20); no ML PDP early-abort found"
+ ],
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-ml_empirical-2.collision.json"
+}

@@ -1,0 +1,113 @@
+import GlobalSmooth
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace BZero
+open Polynomial MixedCancellation
+variable {K : Type*} [Field K]
+def sourceB (a : D2 K) : K := 2*((a.q*a.s-a.t)*a.t-(a.r*a.s)*a.s)
+def point (a : D2 K) : WeightedAdd11.Input K :=
+ let n1 := a.q*a.s-a.t
+ let x := -(n1*a.s)
+ ⟨x,(a.s*a.t+x)*((a.s*a.s)*(a.s*a.s)),a.s*a.z,a.w⟩
+theorem scale (a : D2 K) (hz : a.z≠0) (hw : a.w≠0) :
+ sourceB a = a.z^10*a.w^2*2*((nq a*ns a-nt a)*nt a-nr a*(ns a)^2) := by
+ dsimp [sourceB,nq,nr,ns,nt]
+ field_simp <;> ring
+
+theorem decode (a : D2 K) (hz : a.z≠0) (hw : a.w≠0) (hs : a.s≠0) :
+ (point a).z≠0 ∧ (point a).w≠0 ∧
+ WeightedAdd11.nx (point a)=nt a/ns a-nq a ∧
+ WeightedAdd11.ny (point a)=2*nt a-nq a*ns a := by
+ refine ⟨mul_ne_zero hs hz,hw,?_,?_⟩
+ all_goals dsimp [point,WeightedAdd11.nx,WeightedAdd11.ny,nq,ns,nt]; field_simp <;> ring
+
+theorem normalized_root (q r s t : K) (hs : s≠0)
+ (hb : (q*s-t)*t-r*s^2=0) : (t/s-q)^2+q*(t/s-q)+r=0 := by
+ apply (mul_eq_zero.mp (show s^2*((t/s-q)^2+q*(t/s-q)+r)=0 from ?_)).resolve_left (pow_ne_zero 2 hs)
+ field_simp
+ calc
+  _ = -((q*s-t)*t-r*s^2) := by ring
+  _ = 0 := by rw [hb];ring
+
+theorem extraction (f : K[X]) (a : D2 K) (hz : a.z≠0) (hw : a.w≠0)
+ (hs : a.s≠0) (h2 : (2:K)≠0) (hb : sourceB a=0) (ha : validTwo f a) :
+ (point a).z≠0 ∧ (point a).w≠0 ∧ validPoint f (point a) := by
+ have hsn : ns a≠0 := div_ne_zero hs (mul_ne_zero (pow_ne_zero 3 hz) hw)
+ have hb' : (nq a*ns a-nt a)*nt a-nr a*(ns a)^2=0 := by
+  rw [scale a hz hw] at hb
+  exact (mul_eq_zero.mp hb).resolve_left (mul_ne_zero (mul_ne_zero (pow_ne_zero 10 hz) (pow_ne_zero 2 hw)) h2)
+ have hr := normalized_root (nq a) (nr a) (ns a) (nt a) hsn hb'
+ have hv := (extracted_valid f (nt a/ns a-nq a) (nq a) (nr a) (ns a) (nt a) hr ha).1
+ have hy : ns a*(nt a/ns a-nq a)+nt a=2*nt a-nq a*ns a := by field_simp;ring
+ obtain ⟨hpz,hpw,hpx,hpy⟩ := decode a hz hw hs
+ refine ⟨hpz,hpw,?_⟩
+ unfold validPoint
+ rw [hpx,hpy]
+ rwa [hy] at hv
+
+theorem zero_y_square (f : K[X]) (q r s t : K) (hs : s≠0)
+ (hb : (q*s-t)*t-r*s^2=0) (ha : support q r ∣ f-(ordinate s t)^2)
+ (hy : 2*t-q*s=0) : (X-C (t/s-q))^2 ∣ f := by
+ let x := t/s-q
+ have hx : x^2+q*x+r=0 := normalized_root q r s t hs hb
+ have he : s*x=t-s*q := by dsimp [x];field_simp <;> ring
+ have hq0 : s*(q+2*x)=0 := by
+  calc
+   _ = 2*(s*x)+s*q := by ring
+   _ = 2*t-q*s := by rw [he];ring
+   _ = 0 := hy
+ have hq : q= -2*x := by
+  have hh := (mul_eq_zero.mp hq0).resolve_left hs
+  calc q = (q+2*x)-2*x := by ring
+       _ = -2*x := by rw [hh];ring
+ have ht : t= -(s*x) := by
+  have hh : s*x+t=0 := by calc
+   _ = 2*t-q*s := by rw [he];ring
+   _ = 0 := hy
+  exact eq_neg_of_add_eq_zero_right hh
+ have hr : r=x^2 := by
+  rw [hq] at hx
+  calc r = (x^2+(-2*x)*x+r)+x^2 := by ring
+       _ = x^2 := by rw [hx];ring
+ have hu : support q r=(X-C x)^2 := by
+  rw [hq,hr]
+  simp only [MixedCancellation.support,C_mul,C_neg,C_pow,map_ofNat];ring
+ have hv : ordinate s t=C s*(X-C x) := by
+  rw [ht];simp only [ordinate,C_neg,C_mul];ring
+ rw [hu,hv] at ha
+ have hd : (X-C x)^2 ∣ (C s*(X-C x))^2 := by
+  refine ⟨(C s)^2,?_⟩;ring
+ simpa only [sub_add_cancel] using dvd_add ha hd
+
+theorem doubling (a0 a1 a2 a3 : K) (a : D2 K)
+ (hz : a.z≠0) (hw : a.w≠0) (hs : a.s≠0) (h2 : (2:K)≠0)
+ (hb : sourceB a=0) (ha : validTwo (WeightedDoubling.curve a0 a1 a2 a3) a)
+ (hg : IsCoprime (WeightedDoubling.curve a0 a1 a2 a3) (WeightedDoubling.curve a0 a1 a2 a3).derivative) :
+ (point a).y≠0 ∧
+ let c := WeightedDoubling.output a0 a1 a2 a3 (point a).x (point a).y (point a).z (point a).w
+ c.z≠0 ∧ c.w≠0 ∧
+ (X^2+C (c.q/c.z^2)*X+C (c.r/c.z^4)) ∣
+ WeightedDoubling.curve a0 a1 a2 a3-(C (c.s/(c.z^3*c.w))*X+C (c.t/(c.z^5*c.w)))^2 := by
+ have hsn : ns a≠0 := div_ne_zero hs (mul_ne_zero (pow_ne_zero 3 hz) hw)
+ have hb' : (nq a*ns a-nt a)*nt a-nr a*(ns a)^2=0 := by
+  rw [scale a hz hw] at hb
+  exact (mul_eq_zero.mp hb).resolve_left (mul_ne_zero (mul_ne_zero (pow_ne_zero 10 hz) (pow_ne_zero 2 hw)) h2)
+ obtain ⟨hpz,hpw,hpx,hpy⟩ := decode a hz hw hs
+ have hn : 2*nt a-nq a*ns a≠0 := by
+  intro hy
+  exact (SameUGlobal.global_implies_local a0 a1 a2 a3 hg _) (SameULocal.square_factor_value_derivative a0 a1 a2 a3 _ (zero_y_square _ _ _ _ _ hsn hb' ha hy))
+ have hraw : (point a).y≠0 := by
+  intro hy
+  apply hn
+  rw [←hpy]
+  simp [WeightedAdd11.ny,hy]
+ refine ⟨hraw,?_⟩
+ have hv := (extraction _ a hz hw hs h2 hb ha).2.2
+ obtain ⟨g,heq⟩ := hv
+ have he := congrArg (Polynomial.eval (WeightedAdd11.nx (point a)) : K[X] → K) heq
+ have hp : WeightedDoubling.value a0 a1 a2 a3 (WeightedAdd11.nx (point a))=(WeightedAdd11.ny (point a))^2 := by
+  have hh : (WeightedDoubling.curve a0 a1 a2 a3).eval (WeightedAdd11.nx (point a))-(WeightedAdd11.ny (point a))^2=0 := by simpa using he
+  rw [SameUGlobal.curve_eval] at hh
+  exact sub_eq_zero.mp hh
+ exact WeightedDoubling.weighted_preserves a0 a1 a2 a3 _ _ _ _ hpz hpw h2 hraw hp
+end BZero

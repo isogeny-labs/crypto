@@ -1,0 +1,20 @@
+/var/tmp/pencil-scale-trim-20261031-v1/Bridge.lean:29:26: error: unexpected token ':='; expected term
+/var/tmp/pencil-scale-trim-20261031-v1/Bridge.lean:29:13: error: Application type mismatch: The argument
+  (↑xs).size
+has type
+  ℕ
+of sort `Type` but is expected to have type
+  Type ?u.27
+of sort `Type (?u.27 + 1)` in the application
+  @InitialSeg (↑xs).size
+/var/tmp/pencil-scale-trim-20261031-v1/Bridge.lean:29:8: error: Missing cases:
+/var/tmp/pencil-scale-trim-20261031-v1/Bridge.lean:29:1: error: unsolved goals
+case neg
+n : ℕ
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+xs : State n
+i : ℕ
+hi : ¬i < n
+hb : InitialSeg (fun x1 x2 => sorry) fun x1 x2 => sorry
+⊢ ↑((↑xs).toList[i]?.getD 0).toNat = if i < n then extend p (fun i => CoefficientTraversal.read xs i) i else 0

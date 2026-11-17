@@ -1,0 +1,56 @@
+name: NIST journal development controls
+on:
+  push:
+    branches: [main]
+    paths:
+      - research/nist_skip_criterion_20261025/journal_qualification_20261104/**
+      - research/nist_skip_criterion_20261025/random_curve_validation_20261029/sampler.cpp
+      - research/nist_skip_criterion_20261025/strict_elkies_20261029/inputs.tsv
+      - .github/workflows/nist-journal-development.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/nist_skip_criterion_20261025/journal_qualification_20261104
+            research/nist_skip_criterion_20261025/random_curve_validation_20261029/sampler.cpp
+            research/nist_skip_criterion_20261025/strict_elkies_20261029/inputs.tsv
+            tools/artifacts
+            .artifacts
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/nist_skip_criterion_20261025
+      - name: Install native development libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y g++ make libpari-dev pari-seadata libgmp-dev libssl-dev
+      - name: Compile and exercise bounded development fixtures
+        working-directory: research/nist_skip_criterion_20261025/journal_qualification_20261104
+        shell: bash
+        run: |
+          set -euo pipefail
+          make PARI_ROOT=/usr PARI_LDLIBS=-lpari BUILD_DIR="$RUNNER_TEMP/nist-journal" test

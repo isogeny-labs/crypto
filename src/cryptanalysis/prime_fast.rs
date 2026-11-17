@@ -301,6 +301,75 @@ pub fn inv_mod_u64(a: u64, p: u64) -> u64 {
     }
 }
 
+/// `a·b mod m` for a fixed modulus, with the value of
+/// `((a as u128 * b as u128) % m as u128) as u64` for every input.
+///
+/// For an odd `m < 2^63` and reduced operands the product goes through two
+/// Montgomery reductions (`a·b·R⁻¹`, then `·R²·R⁻¹`), which return the
+/// canonical remainder in `[0, m)` — the same value the 128-bit `%`
+/// (`__umodti3`, a library call) returns, without a division.  Anything
+/// else (even modulus, `m ≥ 2^63`, unreduced operand) takes the 128-bit
+/// path unchanged, so no input changes its result.  Replay class WALL:
+/// callers that swap their `u128 %` for this keep every value and every
+/// counted unit (assessment 2026-11-10, R1/R2).
+#[derive(Clone, Copy, Debug)]
+pub struct MulModN {
+    pub m: u64,
+    /// `−m⁻¹ mod 2^64` (0 when the Montgomery path is off).
+    n_inv: u64,
+    /// `2^128 mod m`.
+    r2: u64,
+    mont: bool,
+}
+
+impl MulModN {
+    pub fn new(m: u64) -> Self {
+        let mont = m & 1 == 1 && m > 1 && m < (1u64 << 63);
+        if !mont {
+            return MulModN {
+                m,
+                n_inv: 0,
+                r2: 0,
+                mont,
+            };
+        }
+        let mut inv: u64 = 1;
+        for _ in 0..6 {
+            inv = inv.wrapping_mul(2u64.wrapping_sub(m.wrapping_mul(inv)));
+        }
+        let r = ((1u128 << 64) % m as u128) as u64;
+        let r2 = ((r as u128 * r as u128) % m as u128) as u64;
+        MulModN {
+            m,
+            n_inv: inv.wrapping_neg(),
+            r2,
+            mont,
+        }
+    }
+
+    /// Montgomery reduction of `t < m·2^64`: `t·2^-64 mod m` in `[0, m)`.
+    #[inline(always)]
+    fn redc(&self, t: u128) -> u64 {
+        let q = (t as u64).wrapping_mul(self.n_inv);
+        // t + q·m < 2m·2^64 ≤ 2^128 for m < 2^63, and the quotient by 2^64
+        // is below 2m, so one conditional subtraction makes it canonical.
+        let u = ((t + q as u128 * self.m as u128) >> 64) as u64;
+        // A select, not a branch: on field data the comparison is a coin
+        // flip a branch predictor cannot learn.
+        let (d, borrow) = u.overflowing_sub(self.m);
+        std::hint::select_unpredictable(borrow, u, d)
+    }
+
+    #[inline(always)]
+    pub fn mul(&self, a: u64, b: u64) -> u64 {
+        if self.mont && a < self.m && b < self.m {
+            self.redc(self.redc(a as u128 * b as u128) as u128 * self.r2 as u128)
+        } else {
+            ((a as u128 * b as u128) % self.m as u128) as u64
+        }
+    }
+}
+
 #[inline(always)]
 fn add_mod(a: u64, b: u64, n: u64) -> u64 {
     let s = a + b;
@@ -454,6 +523,14 @@ impl FastCurve {
         let x3 = f.sub(f.sub(f.sqr(lam), p1.x), p2.x);
         let y3 = f.sub(f.mul(lam, f.sub(p1.x, x3)), p1.y);
         Pt { x: x3, y: y3 }
+    }
+
+    /// Montgomery x of `p1 + p2` for `x1 != x2` given `inv_dx = 1 / (x2 - x1)`; skips the y coordinate.
+    #[inline]
+    pub fn add_x_with_inv(&self, p1: Pt, p2: Pt, inv_dx: u64) -> u64 {
+        let f = &self.f;
+        let lam = f.mul(f.sub(p2.y, p1.y), inv_dx);
+        f.sub(f.sub(f.sqr(lam), p1.x), p2.x)
     }
 
     #[inline]
@@ -719,6 +796,22 @@ pub struct RhoConfig {
     pub seed: u64,
     /// Give up after this many total steps (0 = unlimited).
     pub max_steps: u64,
+    /// Wiener–Zuccherato look-ahead under the negation map: a flipped step
+    /// that would take the same jump again is rejected (one counted
+    /// addition) and retried with the next jump.  Off: legacy.
+    pub look_ahead: bool,
+    /// Short-cycle detection over the last `cycle_window` points of every
+    /// lane, escaping by doubling the smallest-x member and abandoning the
+    /// trail on a repeat.  0: legacy (2-cycle check against the previous
+    /// point only).
+    pub cycle_window: usize,
+    /// Table coefficients are drawn below `2^coeff_bits` (cheap table
+    /// build); 0: full range `[1, n)`.
+    pub coeff_bits: u32,
+    /// Walk starts are `T, 2T, 3T, …` for one random `T` per worker (one
+    /// addition each) instead of an independent `[a]G + [b]Q` (a joint
+    /// multiplication each).  Off: legacy.
+    pub stride_starts: bool,
 }
 
 impl RhoConfig {
@@ -748,6 +841,43 @@ impl RhoConfig {
             negation,
             seed: 1,
             max_steps: 0,
+            look_ahead: false,
+            cycle_window: 0,
+            coeff_bits: 0,
+            stride_starts: false,
+        }
+    }
+
+    /// The step-efficient single-thread configuration for a prime-order
+    /// group of order `r`: negation map with look-ahead and windowed cycle
+    /// escape, a 4..16-entry table of short-coefficient jumps, stride
+    /// starts, and `walkers · 2^dp_bits` (the lock-step detection delay)
+    /// held to about 2% of the expected `√(πr/4)` steps.
+    pub fn tuned(r: u64) -> Self {
+        let bits = 64 - r.leading_zeros();
+        let expected = (std::f64::consts::PI * r as f64 / 4.0).sqrt();
+        let table_bits = match bits {
+            0..=15 => 2,
+            16..=22 => 3,
+            _ => 4,
+        };
+        let walkers = if bits <= 30 { 32 } else { 64 };
+        let dp_bits = (0.02 * expected / walkers as f64)
+            .log2()
+            .floor()
+            .clamp(0.0, 24.0) as u32;
+        RhoConfig {
+            threads: 1,
+            walkers,
+            table_bits,
+            dp_bits,
+            negation: true,
+            seed: 1,
+            max_steps: 0,
+            look_ahead: true,
+            cycle_window: 16,
+            coeff_bits: (3 * table_bits).clamp(6, 12),
+            stride_starts: true,
         }
     }
 }
@@ -762,6 +892,56 @@ pub struct RhoResult {
     pub threads: usize,
     pub walkers_per_thread: usize,
     pub dp_bits: u32,
+    /// Group operations behind the walk, counted without touching it.
+    pub ops: RhoOpCounts,
+}
+
+/// Group operations of a [`rho_parallel`] run outside the walk steps
+/// (which are `total_steps` additions): the shared table, every walk
+/// start, the cycle-escape doublings and the collision checks.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct RhoOpCounts {
+    /// Additions/doublings of the table build (the `G + Q` sum included).
+    pub table_adds: u64,
+    pub table_doubles: u64,
+    /// The same for the first start of every walker.
+    pub initial_start_adds: u64,
+    pub initial_start_doubles: u64,
+    /// The same for every later restart (reset, cap, escape failure).
+    pub restart_adds: u64,
+    pub restart_doubles: u64,
+    /// Doublings of the 2-cycle escape.
+    pub escape_doubles: u64,
+    /// Candidate collisions checked by a scalar multiplication.
+    pub collision_checks: u64,
+    // Diagnostics, all inside `total_steps` or the counts above:
+    /// Look-ahead's rejected additions (part of `total_steps`).
+    pub look_ahead_adds: u64,
+    pub cycles_2: u64,
+    pub cycles_4: u64,
+    pub cycles_other: u64,
+    /// Trails abandoned on a repeated escape, trails capped, restarts.
+    pub abandoned: u64,
+    pub capped: u64,
+    pub restarts: u64,
+    /// Lane steps on trails that reached a distinguished point.
+    pub dp_trail_steps: u64,
+    /// Lane steps on trails that were then restarted.
+    pub lost_steps: u64,
+    /// Lane steps on trails still running when the solve ended.
+    pub in_flight_steps: u64,
+}
+
+/// Additions and doublings [`FastCurve::combine`] performs for `[u]G + [v]Q`:
+/// the `G + Q` sum, then one doubling per bit below the top and one
+/// addition per nonzero bit pair below the top (the top pair is loaded).
+pub fn combine_ops(u: u64, v: u64) -> (u64, u64) {
+    let top = 64 - (u | v).leading_zeros();
+    if top == 0 {
+        return (0, 1);
+    }
+    let low = (u | v) & ((1u64 << (top - 1)) - 1);
+    (low.count_ones() as u64 + 1, (top - 1) as u64)
 }
 
 #[derive(Clone, Copy)]
@@ -777,6 +957,7 @@ struct Shared {
     answer: Mutex<Option<u64>>,
     total_steps: AtomicU64,
     dp_count: AtomicU64,
+    ops: Mutex<RhoOpCounts>,
 }
 
 #[inline(always)]
@@ -830,9 +1011,18 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
     let mut rng = StdRng::seed_from_u64(cfg.seed ^ 0xA5A5_5A5A_1234_5678);
     let table_len = 1usize << cfg.table_bits;
     let mut table = Vec::with_capacity(table_len);
+    let mut table_ops = RhoOpCounts::default();
     while table.len() < table_len {
-        let u = rng.gen_range(1..n);
-        let v = rng.gen_range(1..n);
+        let short = if cfg.coeff_bits == 0 {
+            n
+        } else {
+            n.min(1u64 << cfg.coeff_bits).max(2)
+        };
+        let u = rng.gen_range(1..short);
+        let v = rng.gen_range(1..short);
+        let (a, d) = combine_ops(u, v);
+        table_ops.table_adds += a;
+        table_ops.table_doubles += d;
         if let Some(pt) = curve.combine(g, q, u, v) {
             table.push(TableEntry { pt, u, v });
         }
@@ -843,6 +1033,7 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
         answer: Mutex::new(None),
         total_steps: AtomicU64::new(0),
         dp_count: AtomicU64::new(0),
+        ops: Mutex::new(RhoOpCounts::default()),
     };
     std::thread::scope(|s| {
         for tid in 0..cfg.threads {
@@ -852,6 +1043,9 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
         }
     });
     let log = (*shared.answer.lock().unwrap())?;
+    let mut ops = *shared.ops.lock().unwrap();
+    ops.table_adds = table_ops.table_adds;
+    ops.table_doubles = table_ops.table_doubles;
     let wall = started.elapsed().as_secs_f64();
     let total_steps = shared.total_steps.load(Ordering::Relaxed);
     Some(RhoResult {
@@ -863,7 +1057,89 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
         threads: cfg.threads,
         walkers_per_thread: cfg.walkers,
         dp_bits: cfg.dp_bits,
+        ops,
     })
+}
+
+/// Per-lane state of one worker's lock-step walkers.
+struct Lanes {
+    xs: Vec<u64>,
+    ys: Vec<u64>,
+    as_: Vec<u64>,
+    bs: Vec<u64>,
+    prev: Vec<u64>,
+    /// Steps since the lane's last distinguished point or restart.
+    steps: Vec<u32>,
+    /// Look-ahead: jumps already tried (and rejected) from this point.
+    tried: Vec<u32>,
+    /// Look-ahead: the jump the next round must use instead of the hash's.
+    forced: Vec<usize>,
+    /// Cycle window: ring of the last `window` points per lane.
+    wx: Vec<u64>,
+    wy: Vec<u64>,
+    wa: Vec<u64>,
+    wb: Vec<u64>,
+    wpos: Vec<usize>,
+    wlen: Vec<usize>,
+    last_escape: Vec<u64>,
+}
+
+const NO_JUMP: usize = usize::MAX;
+
+impl Lanes {
+    fn new(w: usize, window: usize) -> Self {
+        let ring = w * window;
+        Lanes {
+            xs: vec![0; w],
+            ys: vec![0; w],
+            as_: vec![0; w],
+            bs: vec![0; w],
+            prev: vec![u64::MAX; w],
+            steps: vec![0; w],
+            tried: vec![0; w],
+            forced: vec![NO_JUMP; w],
+            wx: vec![u64::MAX; ring],
+            wy: vec![0; ring],
+            wa: vec![0; ring],
+            wb: vec![0; ring],
+            wpos: vec![0; w],
+            wlen: vec![0; w],
+            last_escape: vec![u64::MAX; w],
+        }
+    }
+
+    /// Put lane `i` at `[a]G + [b]Q = pt` (sign-canonical when `negation`).
+    fn place(&mut self, i: usize, curve: &FastCurve, pt: Pt, a: u64, b: u64, negation: bool) {
+        let n = curve.n;
+        let (pt, flipped) = if negation {
+            curve.canonical_sign(pt)
+        } else {
+            (pt, false)
+        };
+        self.xs[i] = pt.x;
+        self.ys[i] = pt.y;
+        self.as_[i] = if flipped { neg_mod(a, n) } else { a };
+        self.bs[i] = if flipped { neg_mod(b, n) } else { b };
+        self.prev[i] = u64::MAX;
+        self.steps[i] = 0;
+        self.tried[i] = 0;
+        self.forced[i] = NO_JUMP;
+        self.wpos[i] = 0;
+        self.wlen[i] = 0;
+        let ring = self.wx.len() / self.xs.len();
+        self.wx[i * ring..(i + 1) * ring].fill(u64::MAX);
+        self.last_escape[i] = u64::MAX;
+    }
+}
+
+/// The start-point stream of a worker: random `[a]G + [b]Q` (legacy) or
+/// `T, 2T, 3T, …` for one random `T = [ta]G + [tb]Q` (one addition per
+/// start after the first).
+struct Starts {
+    stride: Option<(Pt, u64, u64)>,
+    cur: Option<Pt>,
+    ca: u64,
+    cb: u64,
 }
 
 fn rho_worker(
@@ -878,54 +1154,107 @@ fn rho_worker(
     let f = curve.f;
     let n = curve.n;
     let w = cfg.walkers;
+    // The ring is a power of two, so the index arithmetic is a mask.
+    let window = if cfg.cycle_window == 0 {
+        0
+    } else {
+        cfg.cycle_window.next_power_of_two()
+    };
+    let mask = window.wrapping_sub(1);
+    let jumps = table.len();
+    // The tuned walk also counts the final partial round exactly; the
+    // legacy walk's `total_steps` stays as it was.
+    let tuned = cfg.look_ahead || cfg.cycle_window > 0 || cfg.stride_starts;
     let mut rng =
         StdRng::seed_from_u64(cfg.seed ^ (tid as u64 + 1).wrapping_mul(0x9E37_79B9_7F4A_7C15));
     let step_cap: u32 = (40u64 << cfg.dp_bits).max(256).min(u32::MAX as u64) as u32;
 
-    let mut xs = vec![0u64; w];
-    let mut ys = vec![0u64; w];
-    let mut as_ = vec![0u64; w];
-    let mut bs = vec![0u64; w];
-    let mut prev = vec![u64::MAX; w];
-    let mut steps = vec![0u32; w];
+    let mut lanes = Lanes::new(w, window.max(1));
     let mut d = vec![0u64; w];
     let mut js = vec![0usize; w];
     let mut reset = vec![false; w];
     let mut scratch = Vec::with_capacity(w);
+    let counts = std::cell::Cell::new(RhoOpCounts::default());
+    let initial = std::cell::Cell::new(true);
+    let starts = std::cell::RefCell::new(Starts {
+        stride: None,
+        cur: None,
+        ca: 0,
+        cb: 0,
+    });
+    let mut escape_doubles = 0u64;
+    let mut collision_checks = 0u64;
+    // Diagnostics (never charged).
+    let (mut la_adds, mut cycles_2, mut cycles_4, mut cycles_other) = (0u64, 0u64, 0u64, 0u64);
+    let (mut abandoned, mut capped, mut restarts) = (0u64, 0u64, 0u64);
+    let mut dp_trail_steps = 0u64;
 
-    let restart = |i: usize,
-                   rng: &mut StdRng,
-                   xs: &mut [u64],
-                   ys: &mut [u64],
-                   as_: &mut [u64],
-                   bs: &mut [u64],
-                   prev: &mut [u64],
-                   steps: &mut [u32]| {
+    let restart = |i: usize, rng: &mut StdRng, lanes: &mut Lanes| {
+        let mut c0 = counts.get();
+        c0.lost_steps += lanes.steps[i] as u64;
+        counts.set(c0);
         loop {
-            let a = rng.gen_range(1..n);
-            let b = rng.gen_range(1..n);
-            if let Some(pt) = curve.combine(g, q, a, b) {
-                let (pt, flipped) = if cfg.negation {
-                    curve.canonical_sign(pt)
+            let mut c = counts.get();
+            let (pt, a, b) = if cfg.stride_starts {
+                let mut st = starts.borrow_mut();
+                if st.stride.is_none() {
+                    // The stride and the first start: one full-width combine.
+                    let (ta, tb) = (rng.gen_range(1..n), rng.gen_range(1..n));
+                    let (da, dd) = combine_ops(ta, tb);
+                    c.initial_start_adds += da;
+                    c.initial_start_doubles += dd;
+                    counts.set(c);
+                    match curve.combine(g, q, ta, tb) {
+                        Some(t) => {
+                            st.stride = Some((t, ta, tb));
+                            st.cur = Some(t);
+                            st.ca = ta;
+                            st.cb = tb;
+                            (t, ta, tb)
+                        }
+                        None => continue,
+                    }
                 } else {
-                    (pt, false)
-                };
-                xs[i] = pt.x;
-                ys[i] = pt.y;
-                as_[i] = if flipped { neg_mod(a, n) } else { a };
-                bs[i] = if flipped { neg_mod(b, n) } else { b };
-                prev[i] = u64::MAX;
-                steps[i] = 0;
-                return;
-            }
+                    let (t, ta, tb) = st.stride.unwrap();
+                    if initial.get() {
+                        c.initial_start_adds += 1;
+                    } else {
+                        c.restart_adds += 1;
+                    }
+                    counts.set(c);
+                    st.ca = add_mod(st.ca, ta, n);
+                    st.cb = add_mod(st.cb, tb, n);
+                    st.cur = curve.add(st.cur, Some(t));
+                    match st.cur {
+                        Some(p) => (p, st.ca, st.cb),
+                        None => continue,
+                    }
+                }
+            } else {
+                let a = rng.gen_range(1..n);
+                let b = rng.gen_range(1..n);
+                let (da, dd) = combine_ops(a, b);
+                if initial.get() {
+                    c.initial_start_adds += da;
+                    c.initial_start_doubles += dd;
+                } else {
+                    c.restart_adds += da;
+                    c.restart_doubles += dd;
+                }
+                counts.set(c);
+                match curve.combine(g, q, a, b) {
+                    Some(pt) => (pt, a, b),
+                    None => continue,
+                }
+            };
+            lanes.place(i, curve, pt, a, b, cfg.negation);
+            return;
         }
     };
     for i in 0..w {
-        restart(
-            i, &mut rng, &mut xs, &mut ys, &mut as_, &mut bs, &mut prev, &mut steps,
-        );
+        restart(i, &mut rng, &mut lanes);
     }
-
+    initial.set(false);
     let mut local_steps = 0u64;
     let mut local_dps = 0u64;
     'outer: loop {
@@ -936,9 +1265,13 @@ fn rho_worker(
             break;
         }
         for i in 0..w {
-            let j = branch_index(xs[i], cfg.table_bits);
+            let j = if lanes.forced[i] != NO_JUMP {
+                lanes.forced[i]
+            } else {
+                branch_index(lanes.xs[i], cfg.table_bits)
+            };
             js[i] = j;
-            let dd = f.sub(table[j].pt.x, xs[i]);
+            let dd = f.sub(table[j].pt.x, lanes.xs[i]);
             if dd == 0 {
                 reset[i] = true;
                 d[i] = f.one;
@@ -950,31 +1283,126 @@ fn rho_worker(
         f.batch_inv(&mut d, &mut scratch);
         for i in 0..w {
             if reset[i] {
-                restart(
-                    i, &mut rng, &mut xs, &mut ys, &mut as_, &mut bs, &mut prev, &mut steps,
-                );
+                restarts += 1;
+                restart(i, &mut rng, &mut lanes);
                 continue;
             }
             let t = &table[js[i]];
-            let lam = f.mul(f.sub(t.pt.y, ys[i]), d[i]);
-            let x3 = f.sub(f.sub(f.sqr(lam), xs[i]), t.pt.x);
-            let mut y3 = f.sub(f.mul(lam, f.sub(xs[i], x3)), ys[i]);
-            let mut a = add_mod(as_[i], t.u, n);
-            let mut b = add_mod(bs[i], t.v, n);
+            let lam = f.mul(f.sub(t.pt.y, lanes.ys[i]), d[i]);
+            let x3 = f.sub(f.sub(f.sqr(lam), lanes.xs[i]), t.pt.x);
+            let mut y3 = f.sub(f.mul(lam, f.sub(lanes.xs[i], x3)), lanes.ys[i]);
+            let mut a = add_mod(lanes.as_[i], t.u, n);
+            let mut b = add_mod(lanes.bs[i], t.v, n);
+            let mut flipped = false;
             if cfg.negation && y3 > f.half {
                 y3 = f.p - y3;
                 a = neg_mod(a, n);
                 b = neg_mod(b, n);
+                flipped = true;
             }
-            if x3 == prev[i] {
+            // Look-ahead: a flipped step that would take the same jump
+            // again is rejected (one wasted addition) and the next round
+            // retries this lane from the same point with the next jump, so
+            // the retry rides the next batch's inversion.
+            if cfg.look_ahead
+                && flipped
+                && ((lanes.tried[i] + 1) as usize) < jumps
+                && branch_index(x3, cfg.table_bits) == js[i]
+            {
+                la_adds += 1;
+                lanes.tried[i] += 1;
+                lanes.forced[i] = (js[i] + 1) % jumps;
+                continue;
+            }
+            lanes.tried[i] = 0;
+            lanes.forced[i] = NO_JUMP;
+            if window > 0 {
+                // Short cycle: x3 is one of the last `window` points.
+                let base = i * window;
+                let len = lanes.wlen[i];
+                let pos = lanes.wpos[i];
+                let mut hit = 0usize;
+                // Unused slots hold `u64::MAX`, never an x: the common
+                // no-hit case is one branch-free pass over the ring.
+                if lanes.wx[base..base + window].contains(&x3) {
+                    for k in 1..=len {
+                        let idx = base + ((pos + window - k) & mask);
+                        if lanes.wx[idx] == x3 {
+                            hit = k;
+                            break;
+                        }
+                    }
+                }
+                if hit > 0 {
+                    match hit {
+                        2 => cycles_2 += 1,
+                        4 => cycles_4 += 1,
+                        _ => cycles_other += 1,
+                    }
+                    // Leave from the member with the smallest x.
+                    let mut best = base + ((pos + window - 1) & mask);
+                    for k in 2..=hit {
+                        let idx = base + ((pos + window - k) & mask);
+                        if lanes.wx[idx] < lanes.wx[best] {
+                            best = idx;
+                        }
+                    }
+                    let (cx, cy, ca, cb) = (
+                        lanes.wx[best],
+                        lanes.wy[best],
+                        lanes.wa[best],
+                        lanes.wb[best],
+                    );
+                    if lanes.last_escape[i] == cx {
+                        abandoned += 1;
+                        restarts += 1;
+                        restart(i, &mut rng, &mut lanes);
+                        continue;
+                    }
+                    escape_doubles += 1;
+                    match curve.double(Pt { x: cx, y: cy }) {
+                        Some(pt) => {
+                            let kept = lanes.steps[i];
+                            lanes.place(
+                                i,
+                                curve,
+                                pt,
+                                add_mod(ca, ca, n),
+                                add_mod(cb, cb, n),
+                                cfg.negation,
+                            );
+                            lanes.last_escape[i] = cx;
+                            lanes.steps[i] = kept;
+                        }
+                        None => {
+                            restarts += 1;
+                            restart(i, &mut rng, &mut lanes);
+                        }
+                    }
+                    continue;
+                }
+                let slot = base + pos;
+                lanes.wx[slot] = x3;
+                lanes.wy[slot] = y3;
+                lanes.wa[slot] = a;
+                lanes.wb[slot] = b;
+                lanes.wpos[i] = (pos + 1) & mask;
+                lanes.wlen[i] = (len + 1).min(window);
+                lanes.prev[i] = lanes.xs[i];
+                lanes.xs[i] = x3;
+                lanes.ys[i] = y3;
+                lanes.as_[i] = a;
+                lanes.bs[i] = b;
+            } else if x3 == lanes.prev[i] {
                 // Fruitless 2-cycle {prev, cur}: both members are known
                 // (prev == new).  Escape deterministically by doubling the
                 // member with the smaller x, so merged walks stay merged.
-                let (cx, cy, ca, cb) = if xs[i] < x3 {
-                    (xs[i], ys[i], as_[i], bs[i])
+                let (cx, cy, ca, cb) = if lanes.xs[i] < x3 {
+                    (lanes.xs[i], lanes.ys[i], lanes.as_[i], lanes.bs[i])
                 } else {
                     (x3, y3, a, b)
                 };
+                escape_doubles += 1;
                 match curve.double(Pt { x: cx, y: cy }) {
                     Some(pt) => {
                         let (pt, flipped) = if cfg.negation {
@@ -984,54 +1412,57 @@ fn rho_worker(
                         };
                         let a2 = add_mod(ca, ca, n);
                         let b2 = add_mod(cb, cb, n);
-                        xs[i] = pt.x;
-                        ys[i] = pt.y;
-                        as_[i] = if flipped { neg_mod(a2, n) } else { a2 };
-                        bs[i] = if flipped { neg_mod(b2, n) } else { b2 };
-                        prev[i] = u64::MAX;
+                        lanes.xs[i] = pt.x;
+                        lanes.ys[i] = pt.y;
+                        lanes.as_[i] = if flipped { neg_mod(a2, n) } else { a2 };
+                        lanes.bs[i] = if flipped { neg_mod(b2, n) } else { b2 };
+                        lanes.prev[i] = u64::MAX;
                     }
                     None => {
-                        restart(
-                            i, &mut rng, &mut xs, &mut ys, &mut as_, &mut bs, &mut prev, &mut steps,
-                        );
+                        restart(i, &mut rng, &mut lanes);
                         continue;
                     }
                 }
             } else {
-                prev[i] = xs[i];
-                xs[i] = x3;
-                ys[i] = y3;
-                as_[i] = a;
-                bs[i] = b;
+                lanes.prev[i] = lanes.xs[i];
+                lanes.xs[i] = x3;
+                lanes.ys[i] = y3;
+                lanes.as_[i] = a;
+                lanes.bs[i] = b;
             }
-            steps[i] += 1;
-            if is_distinguished(xs[i], cfg.dp_bits) {
+            lanes.steps[i] += 1;
+            let (xi, yi, ai, bi) = (lanes.xs[i], lanes.ys[i], lanes.as_[i], lanes.bs[i]);
+            if is_distinguished(xi, cfg.dp_bits) {
                 local_dps += 1;
+                dp_trail_steps += lanes.steps[i] as u64;
                 let mut dps = shared.dps.lock().unwrap();
-                match dps.get(&xs[i]) {
+                match dps.get(&xi) {
                     Some(&other) => {
-                        if (other.1, other.2) != (as_[i], bs[i]) {
-                            if let Some(k) =
-                                solve_collision(curve, g, q, (ys[i], as_[i], bs[i]), other)
-                            {
+                        if (other.1, other.2) != (ai, bi) {
+                            collision_checks += 1;
+                            if let Some(k) = solve_collision(curve, g, q, (yi, ai, bi), other) {
                                 *shared.answer.lock().unwrap() = Some(k);
                                 shared.done.store(true, Ordering::Relaxed);
                                 drop(dps);
+                                if tuned {
+                                    // The additions of the final partial round.
+                                    local_steps += i as u64 + 1;
+                                }
                                 break 'outer;
                             }
                         }
                     }
                     None => {
-                        dps.insert(xs[i], (ys[i], as_[i], bs[i]));
+                        dps.insert(xi, (yi, ai, bi));
                     }
                 }
                 drop(dps);
-                steps[i] = 0;
-            } else if steps[i] > step_cap {
+                lanes.steps[i] = 0;
+            } else if lanes.steps[i] > step_cap {
                 // Probable fruitless cycle of length ≥ 4: abandon the trail.
-                restart(
-                    i, &mut rng, &mut xs, &mut ys, &mut as_, &mut bs, &mut prev, &mut steps,
-                );
+                capped += 1;
+                restarts += 1;
+                restart(i, &mut rng, &mut lanes);
             }
         }
         local_steps += w as u64;
@@ -1044,6 +1475,25 @@ fn rho_worker(
     }
     shared.total_steps.fetch_add(local_steps, Ordering::Relaxed);
     shared.dp_count.fetch_add(local_dps, Ordering::Relaxed);
+    let in_flight: u64 = lanes.steps.iter().map(|&s| s as u64).sum();
+    let mut tot = shared.ops.lock().unwrap();
+    let c = counts.get();
+    tot.initial_start_adds += c.initial_start_adds;
+    tot.initial_start_doubles += c.initial_start_doubles;
+    tot.restart_adds += c.restart_adds;
+    tot.restart_doubles += c.restart_doubles;
+    tot.escape_doubles += escape_doubles;
+    tot.collision_checks += collision_checks;
+    tot.look_ahead_adds += la_adds;
+    tot.cycles_2 += cycles_2;
+    tot.cycles_4 += cycles_4;
+    tot.cycles_other += cycles_other;
+    tot.abandoned += abandoned;
+    tot.capped += capped;
+    tot.restarts += restarts;
+    tot.dp_trail_steps += dp_trail_steps;
+    tot.lost_steps += c.lost_steps;
+    tot.in_flight_steps += in_flight;
 }
 
 // ── Index calculus: factor base, pair table, relations, linear algebra ─
@@ -1109,13 +1559,21 @@ impl FastFactorBase {
 }
 
 /// Meet-in-the-middle table for 3-decompositions: every
-/// `x(F_j + F_k)` (`j ≤ k`) and `x(F_j − F_k)` (`j < k`), sorted by
-/// canonical x.  `B²` entries of 16 bytes.
+/// `x(F_j + F_k)` (`j ≤ k`) and `x(F_j − F_k)` (`j < k`), bucketed by the
+/// high bits of the canonical x (entries inside a bucket are unordered).  `B²` entries of 16 bytes.
 #[derive(Clone, Debug)]
 pub struct PairTable {
     /// `(x_canonical, j, k_with_sign)`; the top bit of the third field
     /// is set for a difference `F_j − F_k`.
     entries: Vec<(u64, u32, u32)>,
+    /// Bucket index over the high bits of x: bucket `b` holds `entries[starts[b]..starts[b + 1]]`,
+    /// the buckets are monotone in x; entries inside a bucket are in construction order.
+    starts: Vec<u32>,
+    shift: u32,
+    /// Largest canonical x in the table (0 when empty).
+    max_x: u64,
+    /// Legacy layout (one bucket, globally sorted, binary-search lookup); `IC_PAIR_SORTED=1`.
+    sorted: bool,
 }
 
 const PAIR_DIFF_BIT: u32 = 1 << 31;
@@ -1124,6 +1582,7 @@ impl PairTable {
     pub fn build(curve: &FastCurve, fb: &FastFactorBase) -> Self {
         let f = curve.f;
         let b = fb.len();
+        let t_build = Instant::now();
         let mut entries = Vec::with_capacity(b * b);
         let mut d = Vec::with_capacity(b);
         let mut scratch = Vec::with_capacity(b);
@@ -1141,14 +1600,62 @@ impl PairTable {
             for (idx, k) in ((j + 1)..b).enumerate() {
                 let fk = fb.pts[k];
                 let inv = d[idx];
-                let sum = curve.add_with_inv(fj, fk, inv);
-                let diff = curve.add_with_inv(fj, curve.neg(fk), inv);
-                entries.push((f.from_mont(sum.x), j as u32, k as u32));
-                entries.push((f.from_mont(diff.x), j as u32, k as u32 | PAIR_DIFF_BIT));
+                let sum_x = curve.add_x_with_inv(fj, fk, inv);
+                let diff_x = curve.add_x_with_inv(fj, curve.neg(fk), inv);
+                entries.push((f.from_mont(sum_x), j as u32, k as u32));
+                entries.push((f.from_mont(diff_x), j as u32, k as u32 | PAIR_DIFF_BIT));
             }
         }
-        entries.sort_unstable();
-        PairTable { entries }
+        let add_ms = t_build.elapsed().as_secs_f64() * 1e3;
+        let t_sort = Instant::now();
+        if std::env::var_os("IC_PAIR_SORTED").is_some() {
+            entries.sort_unstable();
+            let max_x = entries.last().map(|e| e.0).unwrap_or(0);
+            let len = entries.len() as u32;
+            return PairTable {
+                entries,
+                starts: vec![0, len],
+                shift: 63,
+                max_x,
+                sorted: true,
+            };
+        }
+        // Counting sort over the high bits of x (monotone buckets), then a tiny sort inside each bucket.
+        let bits_p = 64 - (f.p.max(2) - 1).leading_zeros();
+        let target_bits = (usize::BITS - 1 - (entries.len().max(32) / 2).leading_zeros()).max(4);
+        let shift = bits_p.saturating_sub(target_bits);
+        let nb = (((f.p.max(2) - 1) >> shift) + 1) as usize;
+        let mut starts = vec![0u32; nb + 1];
+        for e in &entries {
+            starts[((e.0 >> shift) as usize) + 1] += 1;
+        }
+        for i in 0..nb {
+            starts[i + 1] += starts[i];
+        }
+        let mut cursor: Vec<u32> = starts[..nb].to_vec();
+        let mut sorted: Vec<(u64, u32, u32)> = vec![(0, 0, 0); entries.len()];
+        for e in &entries {
+            let b = (e.0 >> shift) as usize;
+            sorted[cursor[b] as usize] = *e;
+            cursor[b] += 1;
+        }
+        let max_x = entries.iter().map(|e| e.0).max().unwrap_or(0);
+        let entries = sorted;
+        if std::env::var_os("IC_MULTI_TIMING").is_some() {
+            eprintln!(
+                "pair table: {} entries, adds {:.1} ms, sort {:.1} ms",
+                entries.len(),
+                add_ms,
+                t_sort.elapsed().as_secs_f64() * 1e3
+            );
+        }
+        PairTable {
+            entries,
+            starts,
+            shift,
+            max_x,
+            sorted: false,
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -1161,13 +1668,27 @@ impl PairTable {
 
     /// All `(j, k, sigma)` with `x(F_j + sigma·F_k) == x`.
     #[inline]
-    pub fn lookup(&self, x: u64) -> &[(u64, u32, u32)] {
-        let lo = self.entries.partition_point(|e| e.0 < x);
-        let mut hi = lo;
-        while hi < self.entries.len() && self.entries[hi].0 == x {
-            hi += 1;
+    pub fn lookup(&self, x: u64) -> impl Iterator<Item = &(u64, u32, u32)> {
+        let b = (x >> self.shift) as usize;
+        let mut bucket: &[(u64, u32, u32)] = if b + 1 >= self.starts.len() {
+            &[]
+        } else {
+            &self.entries[self.starts[b] as usize..self.starts[b + 1] as usize]
+        };
+        if self.sorted {
+            let lo = bucket.partition_point(|e| e.0 < x);
+            let mut hi = lo;
+            while hi < bucket.len() && bucket[hi].0 == x {
+                hi += 1;
+            }
+            bucket = &bucket[lo..hi];
         }
-        &self.entries[lo..hi]
+        bucket.iter().filter(move |e| e.0 == x)
+    }
+
+    /// Largest canonical x in the table (0 when empty).
+    pub fn max_x(&self) -> u64 {
+        self.max_x
     }
 }
 
@@ -1294,7 +1815,7 @@ pub fn collect_relations(
                     }
                 }
                 if let Some(pairs) = pairs {
-                    if xc <= pairs.entries.last().map(|e| e.0).unwrap_or(0) {
+                    if xc <= pairs.max_x() {
                         for &(_, j, k_raw) in pairs.lookup(xc) {
                             if (j as usize) < i {
                                 continue;
@@ -1316,6 +1837,111 @@ pub fn collect_relations(
             }
         }
         let mut productive = false;
+        for entries in found {
+            let merged = merge_entries(entries);
+            if merged.is_empty() || !seen.insert(merged.clone()) {
+                continue;
+            }
+            if !relation_holds(curve, fb, r, &merged) {
+                stats.rejected += 1;
+                continue;
+            }
+            match merged.len() {
+                1 => stats.rows_one += 1,
+                2 => stats.rows_two += 1,
+                _ => stats.rows_three += 1,
+            }
+            rels.push(FastRelation {
+                a,
+                b,
+                entries: merged,
+            });
+            productive = true;
+            if rels.len() >= needed {
+                break;
+            }
+        }
+        if productive {
+            let (na, nb, nr) = fresh(&mut rng);
+            a = na;
+            b = nb;
+            r = nr;
+        } else {
+            match curve.add(Some(r), Some(g)) {
+                Some(nr) => {
+                    r = nr;
+                    a = add_mod(a, 1, n);
+                }
+                None => {
+                    let (na, nb, nr) = fresh(&mut rng);
+                    a = na;
+                    b = nb;
+                    r = nr;
+                }
+            }
+        }
+    }
+    stats.relations = rels.len();
+    (rels, stats)
+}
+
+/// Table-lookup 2-decomposition: like [`collect_relations`] but, instead of subtracting every
+/// factor-base element from `R` (O(fb) work per target), looks `x(R)` up in the pair table of
+/// `x(F_j ± F_k)` (plus the factor base itself for 1-term rows), O(1) per target.  The decomposable
+/// set is the same as the 2-decomposition sweep's (`R = ±F_j ± F_k`), found in the same walk
+/// (`R ← R + G`, fresh `(a, b)` after a productive target); relations are verified in the group.
+/// Experimental (`ic_solve_table`); the existing paths are unchanged.
+pub fn collect_relations_table(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb: &FastFactorBase,
+    pairs: &PairTable,
+    needed: usize,
+    max_targets: u64,
+    seed: u64,
+) -> (Vec<FastRelation>, CollectStats) {
+    let f = curve.f;
+    let n = curve.n;
+    let mut rng = StdRng::seed_from_u64(seed);
+    let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
+    let mut stats = CollectStats::default();
+    let max_pair_x = pairs.max_x();
+
+    let fresh = |rng: &mut StdRng| -> (u64, u64, Pt) {
+        loop {
+            let a = rng.gen_range(1..n);
+            let b = rng.gen_range(1..n);
+            if let Some(r) = curve.combine(g, q, a, b) {
+                return (a, b, r);
+            }
+        }
+    };
+    let (mut a, mut b, mut r) = fresh(&mut rng);
+
+    while rels.len() < needed && stats.targets < max_targets {
+        stats.targets += 1;
+        let xc = f.from_mont(r.x);
+        let mut found: Vec<Vec<(u32, i8)>> = Vec::new();
+        if let Some(j) = fb.lookup(xc) {
+            let s = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+            found.push(vec![(j as u32, s)]);
+        }
+        if xc <= max_pair_x {
+            for &(_, j, k_raw) in pairs.lookup(xc) {
+                let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                let fk = fb.pts[k];
+                let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                    continue;
+                };
+                let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                found.push(vec![(j, tau), (k as u32, tau * sigma)]);
+            }
+        }
+        let mut productive = false;
+        let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
         for entries in found {
             let merged = merge_entries(entries);
             if merged.is_empty() || !seen.insert(merged.clone()) {
@@ -1512,6 +2138,515 @@ pub fn ic_solve(
     ))
 }
 
+/// Solve for the discrete logs of the factor-base points to base `G` from relations `sum s_j x_j = a + b`
+/// (every relation collected against `Q = G`, so `R = (a + b) G`).  Returns `Some(x_j)` only for columns
+/// whose value is determined (pivot column with no free column in its reduced row).
+pub fn solve_fb_logs(curve: &FastCurve, m: usize, rels: &[FastRelation]) -> Vec<Option<u64>> {
+    let fnum = curve.scalar_field();
+    let n = curve.n;
+    let mut rows: Vec<Vec<u64>> = Vec::with_capacity(rels.len());
+    let mut rhs: Vec<u64> = Vec::with_capacity(rels.len());
+    for rel in rels {
+        let mut row = vec![0u64; m];
+        for &(j, sg) in &rel.entries {
+            let v = if sg < 0 {
+                neg_mod(sg.unsigned_abs() as u64 % n, n)
+            } else {
+                sg as u64 % n
+            };
+            row[j as usize] = fnum.to_mont(v);
+        }
+        rows.push(row);
+        rhs.push(fnum.to_mont(add_mod(rel.a % n, rel.b % n, n)));
+    }
+    let nrows = rows.len();
+    let mut pivot_of_col = vec![usize::MAX; m];
+    let mut row = 0usize;
+    for col in 0..m {
+        if row >= nrows {
+            break;
+        }
+        let Some(piv) = (row..nrows).find(|&r| rows[r][col] != 0) else {
+            continue;
+        };
+        rows.swap(row, piv);
+        rhs.swap(row, piv);
+        let inv = fnum.inv(rows[row][col]);
+        for c in 0..m {
+            rows[row][c] = fnum.mul(rows[row][c], inv);
+        }
+        rhs[row] = fnum.mul(rhs[row], inv);
+        let (pv, pr) = (rows[row].clone(), rhs[row]);
+        for r in 0..nrows {
+            if r == row || rows[r][col] == 0 {
+                continue;
+            }
+            let factor = rows[r][col];
+            for c in col..m {
+                if pv[c] != 0 {
+                    rows[r][c] = fnum.sub(rows[r][c], fnum.mul(factor, pv[c]));
+                }
+            }
+            rhs[r] = fnum.sub(rhs[r], fnum.mul(factor, pr));
+        }
+        pivot_of_col[col] = row;
+        row += 1;
+    }
+    (0..m)
+        .map(|c| {
+            let r = pivot_of_col[c];
+            if r == usize::MAX {
+                return None;
+            }
+            let free = (0..m).any(|c2| c2 != c && rows[r][c2] != 0);
+            if free {
+                None
+            } else {
+                Some(fnum.from_mont(rhs[r]))
+            }
+        })
+        .collect()
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct MultiReport {
+    pub setup_ms: f64,
+    pub per_target_ms: Vec<f64>,
+    pub total_ms: f64,
+    pub factor_base_size: usize,
+    pub determined_logs: usize,
+    pub targets_walked: Vec<u64>,
+}
+
+/// Relation collection against `Q = G` for the shared factor-base solve, with `lanes` walkers advanced in
+/// lock-step (one batched inversion per round) and the pair-table lookup of [`collect_relations_table`].
+/// Relations are returned as `a = a_eff, b = 0` (so `R = a G`).
+fn collect_setup_batched(
+    curve: &FastCurve,
+    g: Pt,
+    fb: &FastFactorBase,
+    pairs: &PairTable,
+    needed: usize,
+    lanes: usize,
+    seed: u64,
+) -> Vec<FastRelation> {
+    let n = curve.n;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x5E70_BA7C);
+    let max_pair_x = pairs.max_x();
+    let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
+    let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
+    let fresh = |rng: &mut StdRng| -> (u64, Pt) {
+        loop {
+            let a = rng.gen_range(1..n);
+            if let Some(r) = curve.mul(Some(g), a) {
+                return (a, r);
+            }
+        }
+    };
+    let mut a_l: Vec<u64> = Vec::with_capacity(lanes);
+    let mut cur: Vec<Option<Pt>> = Vec::with_capacity(lanes);
+    for _ in 0..lanes {
+        let (a, r) = fresh(&mut rng);
+        a_l.push(a);
+        cur.push(Some(r));
+    }
+    let gv: Vec<Option<Pt>> = vec![Some(g); lanes];
+    let mut scratch = BatchAddScratch::default();
+    let mut guard = 0u64;
+    while rels.len() < needed && guard < 50_000_000 {
+        guard += 1;
+        for l in 0..lanes {
+            let Some(r) = cur[l] else {
+                let (a, nr) = fresh(&mut rng);
+                a_l[l] = add_mod(a, 1, n);
+                cur[l] = Some(nr);
+                continue;
+            };
+            let xc = curve.f.from_mont(r.x);
+            let mut cands: Vec<Vec<(u32, i8)>> = Vec::new();
+            if let Some(j) = fb.lookup(xc) {
+                let sg = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+                cands.push(vec![(j as u32, sg)]);
+            }
+            if xc <= max_pair_x {
+                for &(_, j, k_raw) in pairs.lookup(xc) {
+                    let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                    let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                    let fk = fb.pts[k];
+                    let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                    let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                        continue;
+                    };
+                    let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                    cands.push(vec![(j, tau), (k as u32, tau * sigma)]);
+                }
+            }
+            let mut productive = false;
+            for entries in cands {
+                let merged = merge_entries(entries);
+                if merged.is_empty() || !seen.insert(merged.clone()) {
+                    continue;
+                }
+                if !relation_holds(curve, fb, r, &merged) {
+                    continue;
+                }
+                rels.push(FastRelation {
+                    a: a_l[l],
+                    b: 0,
+                    entries: merged,
+                });
+                productive = true;
+                if rels.len() >= needed {
+                    break;
+                }
+            }
+            if productive {
+                // restart this lane at a fresh point, pre-shifted by -G so the batched step below lands on it
+                let (a, nr) = fresh(&mut rng);
+                a_l[l] = a;
+                cur[l] = Some(nr);
+            }
+            a_l[l] = add_mod(a_l[l], 1, n);
+        }
+        curve.add_many_batched(&mut cur, &gv, &mut scratch);
+    }
+    rels
+}
+
+/// Same as [`ic_multi_solve_ex`] without the batched per-target phase.
+pub fn ic_multi_solve(
+    curve: &FastCurve,
+    g: Pt,
+    qs: &[Pt],
+    fb_size: usize,
+    extra_relations: usize,
+    max_walk: u64,
+    seed: u64,
+    table: bool,
+) -> Option<(Vec<Option<u64>>, MultiReport)> {
+    ic_multi_solve_ex(
+        curve,
+        g,
+        qs,
+        fb_size,
+        extra_relations,
+        max_walk,
+        seed,
+        table,
+        false,
+    )
+}
+
+/// Multi-target index calculus: one shared factor-base log solve (relations against `G`), then per target
+/// one relation `aG + bQ_t = sum s_j F_j` (3-term decompositions) gives `log Q_t = (sum s_j x_j - a)/b`.
+/// Every returned log is verified `k G == Q_t`; `None` entries failed (no relation within `max_walk`
+/// points, an undetermined factor-base log, or b = 0).
+pub fn ic_multi_solve_ex(
+    curve: &FastCurve,
+    g: Pt,
+    qs: &[Pt],
+    fb_size: usize,
+    extra_relations: usize,
+    max_walk: u64,
+    seed: u64,
+    table: bool,
+    batched: bool,
+) -> Option<(Vec<Option<u64>>, MultiReport)> {
+    let t0 = Instant::now();
+    let fb = FastFactorBase::build(curve, fb_size);
+    if fb.is_empty() {
+        return None;
+    }
+    let t_pt = Instant::now();
+    let pairs = PairTable::build(curve, &fb);
+    let pair_ms = t_pt.elapsed().as_secs_f64() * 1e3;
+    let needed = fb.len() + extra_relations;
+    let collect = |q: Pt, need: usize, maxw: u64, sd: u64| {
+        if table {
+            collect_relations_table(curve, g, q, &fb, &pairs, need, maxw, sd)
+        } else {
+            collect_relations(curve, g, q, &fb, Some(&pairs), need, maxw, sd)
+        }
+    };
+    let t_col = Instant::now();
+    let (rels, _) = if table && batched {
+        (
+            collect_setup_batched(curve, g, &fb, &pairs, needed, 256, seed),
+            CollectStats::default(),
+        )
+    } else {
+        collect(g, needed, u64::MAX, seed)
+    };
+    let col_ms = t_col.elapsed().as_secs_f64() * 1e3;
+    if rels.len() < needed {
+        return None;
+    }
+    let t_sol = Instant::now();
+    let logs = solve_fb_logs(curve, fb.len(), &rels);
+    if std::env::var_os("IC_MULTI_TIMING").is_some() {
+        eprintln!(
+            "multi setup: fb {} pair_table {:.1} ms collect {:.1} ms solve {:.1} ms",
+            fb.len(),
+            pair_ms,
+            col_ms,
+            t_sol.elapsed().as_secs_f64() * 1e3
+        );
+    }
+    let determined = logs.iter().filter(|l| l.is_some()).count();
+    let setup_ms = t0.elapsed().as_secs_f64() * 1e3;
+    let fnum = curve.scalar_field();
+    let n = curve.n;
+    if table && batched {
+        // All targets walk in lock-step: one batched inversion per round advances every active R_t <- R_t + G;
+        // each point is looked up in the pair table (O(1)); a relation using only determined logs retires the lane.
+        let m = qs.len();
+        let mut rng = StdRng::seed_from_u64(seed ^ 0xBA7C_4ED0);
+        let max_pair_x = pairs.max_x();
+        let mut ab: Vec<(u64, u64)> = vec![(0, 0); m];
+        let mut cur: Vec<Option<Pt>> = Vec::with_capacity(m);
+        let fresh = |rng: &mut StdRng, q: Pt| -> (u64, u64, Pt) {
+            loop {
+                let a = rng.gen_range(1..n);
+                let b = rng.gen_range(1..n);
+                if let Some(r) = curve.combine(g, q, a, b) {
+                    return (a, b, r);
+                }
+            }
+        };
+        for (t, &q) in qs.iter().enumerate() {
+            let (a, b, r) = fresh(&mut rng, q);
+            ab[t] = (a, b);
+            cur.push(Some(r));
+        }
+        let mut res: Vec<Option<u64>> = vec![None; m];
+        let mut act: Vec<usize> = (0..m).collect();
+        let mut scratch = BatchAddScratch::default();
+        let mut walked = vec![0u64; m];
+        let mut round = 0u64;
+        while !act.is_empty() && round < max_walk {
+            round += 1;
+            let mut act2: Vec<usize> = Vec::with_capacity(act.len());
+            let mut cur2: Vec<Option<Pt>> = Vec::with_capacity(act.len());
+            for (pos, &t) in act.iter().enumerate() {
+                walked[t] += 1;
+                let (a, b) = ab[t];
+                let Some(r) = cur[pos] else {
+                    let (na, nb, nr) = fresh(&mut rng, qs[t]);
+                    ab[t] = (add_mod(na, 1, n), nb);
+                    act2.push(t);
+                    cur2.push(Some(nr));
+                    continue;
+                };
+                let xc = curve.f.from_mont(r.x);
+                let mut cands: Vec<Vec<(u32, i8)>> = Vec::new();
+                if let Some(j) = fb.lookup(xc) {
+                    let sg = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+                    cands.push(vec![(j as u32, sg)]);
+                }
+                if xc <= max_pair_x {
+                    for &(_, j, k_raw) in pairs.lookup(xc) {
+                        let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                        let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                        let fk = fb.pts[k];
+                        let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                        let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                            continue;
+                        };
+                        let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                        cands.push(vec![(j, tau), (k as u32, tau * sigma)]);
+                    }
+                }
+                let mut done = false;
+                let mut restart = false;
+                for entries in cands {
+                    let merged = merge_entries(entries);
+                    if merged.is_empty() || !relation_holds(curve, &fb, r, &merged) {
+                        continue;
+                    }
+                    let usable =
+                        b % n != 0 && merged.iter().all(|&(j, _)| logs[j as usize].is_some());
+                    if !usable {
+                        restart = true;
+                        continue;
+                    }
+                    let mut sum = 0u64;
+                    for &(j, sg) in &merged {
+                        let x = logs[j as usize].unwrap() % n;
+                        let term = if sg < 0 { neg_mod(x, n) } else { x };
+                        let term = fnum.from_mont(fnum.mul(
+                            fnum.to_mont(term),
+                            fnum.to_mont((sg.unsigned_abs() as u64) % n),
+                        ));
+                        sum = add_mod(sum, term, n);
+                    }
+                    let num = add_mod(sum, neg_mod(a % n, n), n);
+                    let k = ((num as u128 * inv_mod_u64(b % n, n) as u128) % n as u128) as u64;
+                    if curve.mul(Some(g), k) == Some(qs[t]) {
+                        res[t] = Some(k);
+                        done = true;
+                        break;
+                    }
+                    restart = true;
+                }
+                if done {
+                    continue;
+                }
+                if restart {
+                    let (na, nb, nr) = fresh(&mut rng, qs[t]);
+                    ab[t] = (add_mod(na, 1, n), nb);
+                    act2.push(t);
+                    cur2.push(Some(nr));
+                } else {
+                    ab[t].0 = add_mod(a, 1, n);
+                    act2.push(t);
+                    cur2.push(Some(r));
+                }
+            }
+            // every lane in act2 now holds R = a*G + b*Q - G... i.e. a has been incremented to match R + G below
+            let gv: Vec<Option<Pt>> = vec![Some(g); cur2.len()];
+            curve.add_many_batched(&mut cur2, &gv, &mut scratch);
+            act = act2;
+            cur = cur2;
+        }
+        let total_ms = t0.elapsed().as_secs_f64() * 1e3;
+        let m_f = m.max(1) as f64;
+        return Some((
+            res,
+            MultiReport {
+                setup_ms,
+                per_target_ms: vec![(total_ms - setup_ms) / m_f; m],
+                total_ms,
+                factor_base_size: fb.len(),
+                determined_logs: determined,
+                targets_walked: walked,
+            },
+        ));
+    }
+    let mut out = Vec::with_capacity(qs.len());
+    let mut per = Vec::with_capacity(qs.len());
+    let mut walked = Vec::with_capacity(qs.len());
+    for (t, &q) in qs.iter().enumerate() {
+        let tt = Instant::now();
+        let mut rs: Vec<FastRelation> = Vec::new();
+        let mut st = CollectStats::default();
+        for attempt in 0..32u64 {
+            let (r1, s1) = collect(
+                q,
+                1,
+                max_walk,
+                seed ^ (0x9E37_79B9 + t as u64 * 7919 + attempt * 104_729),
+            );
+            st.targets += s1.targets;
+            let usable = r1.first().is_some_and(|r| {
+                r.b % n != 0 && r.entries.iter().all(|&(j, _)| logs[j as usize].is_some())
+            });
+            if usable {
+                rs = r1;
+                break;
+            }
+        }
+        walked.push(st.targets);
+        let mut res = None;
+        if let Some(rel) = rs.first() {
+            let mut acc: Option<u64> = Some(0);
+            for &(j, sg) in &rel.entries {
+                match (acc, logs[j as usize]) {
+                    (Some(a0), Some(x)) => {
+                        let term = if sg < 0 {
+                            neg_mod(x.wrapping_mul(1) % n, n)
+                        } else {
+                            x % n
+                        };
+                        let term = fnum.from_mont(fnum.mul(
+                            fnum.to_mont(term),
+                            fnum.to_mont((sg.unsigned_abs() as u64) % n),
+                        ));
+                        acc = Some(add_mod(a0, term, n));
+                    }
+                    _ => acc = None,
+                }
+            }
+            if let (Some(sum), true) = (acc, rel.b % n != 0) {
+                let num = add_mod(sum, neg_mod(rel.a % n, n), n);
+                let k = ((num as u128 * inv_mod_u64(rel.b % n, n) as u128) % n as u128) as u64;
+                if curve.mul(Some(g), k) == Some(q) {
+                    res = Some(k);
+                }
+            }
+        }
+        per.push(tt.elapsed().as_secs_f64() * 1e3);
+        out.push(res);
+    }
+    Some((
+        out,
+        MultiReport {
+            setup_ms,
+            per_target_ms: per,
+            total_ms: t0.elapsed().as_secs_f64() * 1e3,
+            factor_base_size: fb.len(),
+            determined_logs: determined,
+            targets_walked: walked,
+        },
+    ))
+}
+
+/// End-to-end index calculus with the table-lookup collector ([`collect_relations_table`]): factor
+/// base → pair table → relations → linear algebra → group verification.  Same report and the same
+/// fail-closed verification as [`ic_solve`].  Experimental.
+pub fn ic_solve_table(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb_size: usize,
+    extra_relations: usize,
+    max_targets: u64,
+    seed: u64,
+) -> Option<(u64, IcReport)> {
+    let t0 = Instant::now();
+    let fb = FastFactorBase::build(curve, fb_size);
+    let factor_base_ms = t0.elapsed().as_secs_f64() * 1e3;
+    if fb.is_empty() {
+        return None;
+    }
+    let t1 = Instant::now();
+    let pairs = PairTable::build(curve, &fb);
+    let pair_table_ms = t1.elapsed().as_secs_f64() * 1e3;
+    let needed = fb.len() + extra_relations;
+    let t2 = Instant::now();
+    let (rels, stats) =
+        collect_relations_table(curve, g, q, &fb, &pairs, needed, max_targets, seed);
+    let relations_ms = t2.elapsed().as_secs_f64() * 1e3;
+    if rels.len() < needed {
+        return None;
+    }
+    let t3 = Instant::now();
+    let x = solve_relations(curve, fb.len(), &rels)?;
+    let linear_algebra_ms = t3.elapsed().as_secs_f64() * 1e3;
+    let t4 = Instant::now();
+    if curve.mul(Some(g), x) != Some(q) {
+        return None;
+    }
+    let verify_ms = t4.elapsed().as_secs_f64() * 1e3;
+    Some((
+        x,
+        IcReport {
+            factor_base_ms,
+            pair_table_ms,
+            relations_ms,
+            linear_algebra_ms,
+            verify_ms,
+            total_ms: t0.elapsed().as_secs_f64() * 1e3,
+            factor_base_size: fb.len(),
+            pair_table_entries: pairs.len(),
+            relations: rels.len(),
+            targets: stats.targets,
+            rows_one: stats.rows_one,
+            rows_two: stats.rows_two,
+            rows_three: stats.rows_three,
+        },
+    ))
+}
+
 // ── Point counting and bench-curve generation ─────────────────────────
 
 /// Order of `g` found as the unique `N` in the Hasse interval with
@@ -1626,6 +2761,34 @@ pub fn find_a3_curve(bits: u32, residue_mod_4: u64) -> Option<(FastCurve, Pt)> {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn add_x_with_inv_matches_the_full_addition() {
+        let (curve, g) = find_a3_curve(24, 3).expect("curve");
+        let f = curve.f;
+        let mut pts = vec![g];
+        for k in 2..40u64 {
+            pts.push(curve.mul(Some(g), k).expect("multiple"));
+        }
+        for a in &pts {
+            for b in &pts {
+                if a.x == b.x {
+                    continue;
+                }
+                let inv = f.inv(f.sub(b.x, a.x));
+                assert_eq!(
+                    curve.add_x_with_inv(*a, *b, inv),
+                    curve.add_with_inv(*a, *b, inv).x
+                );
+                let nb = curve.neg(*b);
+                let inv2 = f.inv(f.sub(nb.x, a.x));
+                assert_eq!(
+                    curve.add_x_with_inv(*a, nb, inv2),
+                    curve.add_with_inv(*a, nb, inv2).x
+                );
+            }
+        }
+    }
     use super::*;
     use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
 
@@ -1966,6 +3129,34 @@ mod tests {
     }
 
     #[test]
+    fn ic_solve_table_agrees_with_sweep() {
+        // The pair-table 2-decomposition solver recovers the same log as the
+        // sweep `ic_solve(summands = 2)` on the same instance (both decide the
+        // identical decomposable set R = ±F_i ± F_j), and collects the same
+        // number of relations.  Pins the correctness measured in
+        // research/prime_ic_collection_frontier_20261117/.
+        for bits in [16u32, 20, 24] {
+            let (fc, g) = ladder(bits);
+            let mut rng = StdRng::seed_from_u64(101 + bits as u64);
+            let k = rng.gen_range(1..fc.n);
+            let q = fc.mul(Some(g), k).unwrap();
+            let (x_sweep, rep_sweep) = ic_solve(&fc, g, q, 120, 16, 2, 50_000_000, 7)
+                .unwrap_or_else(|| panic!("sweep ic bits={bits}"));
+            let (x_table, rep_table) = ic_solve_table(&fc, g, q, 120, 16, 50_000_000, 7)
+                .unwrap_or_else(|| panic!("table ic bits={bits}"));
+            assert_eq!(x_sweep, k, "sweep wrong log bits={bits}");
+            assert_eq!(x_table, k, "table wrong log bits={bits}");
+            assert_eq!(x_sweep, x_table, "sweep/table logs differ bits={bits}");
+            assert_eq!(rep_sweep.relations, rep_table.relations);
+            // Same seed, same walk rule, same decomposable set: identical target stream.
+            assert_eq!(
+                rep_sweep.targets, rep_table.targets,
+                "sweep/table walked different target counts bits={bits}"
+            );
+        }
+    }
+
+    #[test]
     fn fast_relations_match_the_s3_sweep() {
         // Every 2-decomposition the direct subtraction finds satisfies
         // S₃(x_R, x_i, x_j) = 0, and the staged BigUint driver's relation
@@ -2053,5 +3244,92 @@ mod tests {
         cfg.threads = cfg.threads.min(4);
         let res = rho_parallel(&fc, g, q, &cfg).unwrap();
         assert_eq!(res.log, k);
+    }
+    /// The tuned walk (look-ahead, windowed cycle escape, stride starts,
+    /// short table) recovers the log, exercises its look-ahead and cycle
+    /// paths, and leaves the legacy configuration's output untouched.
+    #[test]
+    fn tuned_walk_exercises_look_ahead_and_cycles_and_solves() {
+        let fc = FastCurve::new("t", 53411, 4589, 186, 53117);
+        let g = fc.point(43982, 22687);
+        let (mut la, mut cyc, mut esc) = (0u64, 0u64, 0u64);
+        let mut steps = 0u64;
+        for k in (1u64..53117).step_by(997) {
+            let q = fc.mul(Some(g), k).unwrap();
+            for seed in 1..4u64 {
+                let mut cfg = RhoConfig::tuned(53117);
+                cfg.seed = seed;
+                let res = rho_parallel(&fc, g, q, &cfg).unwrap();
+                assert_eq!(res.log, k, "k={k} seed={seed}");
+                la += res.ops.look_ahead_adds;
+                cyc += res.ops.cycles_2 + res.ops.cycles_4 + res.ops.cycles_other;
+                esc += res.ops.escape_doubles;
+                steps += res.total_steps;
+                assert!(res.ops.look_ahead_adds <= res.total_steps);
+            }
+        }
+        assert!(la > 0, "look-ahead never fired");
+        assert!(cyc > 0 && esc > 0, "cycle escape never fired");
+        assert!(steps > 0);
+        // Legacy defaults: no tuned counters move.
+        let q = fc.mul(Some(g), 12345).unwrap();
+        let mut cfg = RhoConfig::for_bits(16, true);
+        cfg.threads = 1;
+        let res = rho_parallel(&fc, g, q, &cfg).unwrap();
+        assert_eq!(res.log, 12345);
+        assert_eq!(res.ops.look_ahead_adds, 0);
+        assert_eq!(
+            res.ops.cycles_2 + res.ops.cycles_4 + res.ops.cycles_other,
+            0
+        );
+    }
+}
+
+#[cfg(test)]
+mod mulmod_n_tests {
+    use super::MulModN;
+
+    /// `MulModN::mul` against the 128-bit remainder it replaces, on edge
+    /// and pseudo-random inputs for odd, even, small and large moduli.
+    #[test]
+    fn mulmod_n_matches_the_128_bit_remainder() {
+        let mut s = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            s
+        };
+        let moduli = [
+            1u64,
+            2,
+            3,
+            5,
+            15,
+            53_411,
+            65_521,
+            4_294_967_291,
+            4_294_967_296,
+            (1 << 61) - 1,
+            (1 << 62) - 57,
+            (1 << 63) - 25,
+            (1 << 63) + 29,
+            u64::MAX,
+        ];
+        for &m in &moduli {
+            let f = MulModN::new(m);
+            let mut cases = vec![(0, 0), (0, m - 1), (m - 1, m - 1), (1, m - 1)];
+            for _ in 0..2000 {
+                cases.push((next() % m, next() % m));
+                cases.push((next(), next() % m)); // unreduced operand
+            }
+            for (a, b) in cases {
+                assert_eq!(
+                    f.mul(a, b),
+                    ((a as u128 * b as u128) % m as u128) as u64,
+                    "mul {a} {b} mod {m}"
+                );
+            }
+        }
     }
 }

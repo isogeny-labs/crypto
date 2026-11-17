@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+"""Frozen analysis (PROTOCOL.md §7): reads results/*/ and the merged W0 and bw analysis.json only.
+
+Writes analysis.json, analysis.md and figures/presentation.{svg,png}.
+"""
+import json
+import math
+import re
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+W0 = json.loads((HERE.parent / "ecgfp5_quotient_solve_20261101" / "analysis.json").read_text())
+BW = json.loads((HERE.parent / "ecgfp5_quotient_bw_finish_20261102" / "analysis.json").read_text())
+ARMS = ["A0", "V1", "V2", "U1"]
+ORDER = {"A0": "s1,s2,s3,s4,s5,w", "V1": "s5,s4,s3,s2,s1,w", "V2": "w,s1,s2,s3,s4,s5", "U1": "s1,s2,s3,s4,s5,w (u ring)"}
+CLOCK = 2.8e9
+CLOSE, PROMOTE = 46.0, 38.0
+BAR = 1.5
+W0_F4 = W0["phase_split"]["m5_p4111"]["f4_cpu_s"]
+BW4111 = next(c for c in BW["cells"] if c["p"] == 4111)
+BASE_C = BW4111["c_new_cpu_s"]
+F4_RE = re.compile(r"^overall\(cpu\)\s+([\d.]+)", re.M)
+F4W_RE = re.compile(r"^overall\(elapsed\)\s+([\d.]+)", re.M)
+BW_F4 = float(F4_RE.search((HERE.parent / "ecgfp5_quotient_bw_finish_20261102" / "results" / "m5_p4111" / "msolve.log").read_text()).group(1))
+
+
+def lg(cpu):
+    return math.log2(cpu * CLOCK)
+
+
+def kv(path):
+    return dict(l.split("=", 1) for l in path.read_text().split()) if path.exists() else {}
+
+
+rows = {}
+for a in ARMS:
+    d = HERE / "results" / a
+    ex = kv(d / "exit_codes.txt")
+    run = json.loads((d / "msolve.run.json").read_text())
+    log = (d / "msolve.log").read_text()
+    m = F4_RE.search(log)
+    capped = run["killed_by_rss_cap"] or run["killed_by_wall_cap"]
+    ok = ex.get("msolve_exit") == "0" and not capped and m is not None
+    r = {"arm": a, "order": ORDER[a], "msolve_exit": ex.get("msolve_exit"), "cap_stop": capped,
+         "f4_cpu_s": float(m.group(1)) if ok else None,
+         "f4_wall_s": float(F4W_RE.search(log).group(1)) if ok else None,
+         "msolve_cpu_s": round(run["user_seconds"] + run["sys_seconds"], 1),
+         "msolve_maxrss_gib": round(run["maxrss_kib"] / 2**20, 2), "measured": ok}
+    if a == "U1":
+        g = json.loads(re.search(r"\{.*\}", (d / "gen.json").read_text(), re.S).group(0))
+        r["generator"] = {k: g.get(k) for k in ("uring_fresh_decompositions", "uring_zero_on_R_plus_N", "uring_zero_on_random")}
+        r["generator"]["planted_satisfies"] = g["systems"]["uring"]["planted_satisfies"]
+        gen_ok = (r["generator"]["uring_fresh_decompositions"] == "24/24" and r["generator"]["uring_zero_on_R_plus_N"] == "0/8"
+                  and r["generator"]["uring_zero_on_random"] == "0/8" and r["generator"]["planted_satisfies"] is True)
+        r["generator_gate"] = gen_ok
+        dl = (d / "dump.log").read_text() if (d / "dump.log").exists() else ""
+        st = re.search(r"stab_fail=(\d+) maxchain=(\d+)", dl)
+        hcpu = sum(float(x) for x in re.findall(r"\[hnfsolve\] (?:parse_gb|staircase|dump_P): [\d.]+ s wall, ([\d.]+) s cpu", dl))
+        r["hnfsolve_exit"] = ex.get("hnfsolve_exit")
+        r["stab_fail"] = int(st.group(1)) if st else None
+        bwp = d / "bw.json"
+        if bwp.exists() and ex.get("bwfinish_exit") == "0":
+            bw = json.loads(bwp.read_text())
+            c = r["msolve_cpu_s"] + hcpu + bw["total_cpu_s"]
+            gates = gen_ok and ok and bw["elim_degree"] == 65536 and bw["D"] == 65536 and r["stab_fail"] == 0 and bw["planted"] == "recovered"
+            r.update({"D": bw["D"], "elim_degree": bw["elim_degree"], "t": bw["t"], "planted": bw["planted"],
+                      "hnfsolve_cpu_s": round(hcpu, 1), "finish_cpu_s": bw["total_cpu_s"], "c_cpu_s": round(c, 1),
+                      "whole_gates": gates, "log2_c_cyc": round(lg(c), 3), "band_log2": [round(lg(c / 4), 2), round(lg(4 * c), 2)],
+                      "c_vs_baseline": round(BASE_C / c, 3), "whole_improvement": gates and c <= BASE_C / BAR})
+        else:
+            r.update({"c_cpu_s": None, "whole_gates": False, "whole_improvement": False, "whole": "not_measured"})
+    rows[a] = r
+
+a0 = rows["A0"]["f4_cpu_s"]
+for a in ARMS:
+    r = rows[a]
+    f = r["f4_cpu_s"]
+    if f is None or a0 is None:
+        r["f4_ratio_A0_over_arm"] = None
+        r["f4_improvement"] = False
+        continue
+    r["f4_ratio_A0_over_arm"] = round(a0 / f, 3)
+    gate = r.get("generator_gate", True)
+    r["f4_improvement"] = a != "A0" and gate and f <= a0 / BAR
+    r["f4_within_pred_25pct"] = abs(f / a0 - 1) <= 0.25 if a != "A0" else abs(f / W0_F4 - 1) <= 0.25
+
+out = {"p": 4111, "unit": "CPU-s; c_cyc = CPU-s x 2.8e9", "bar": BAR,
+       "references": {"W0_f4_cpu_s": W0_F4, "bw_cell_f4_cpu_s": BW_F4, "ratchet_c_cpu_s": BASE_C},
+       "A0_vs_W0_f4": round(a0 / W0_F4 - 1, 4) if a0 else None,
+       "A0_vs_bw_cell_f4": round(a0 / BW_F4 - 1, 4) if a0 else None,
+       "arms": rows,
+       "any_f4_improvement": any(rows[a]["f4_improvement"] for a in ARMS)}
+(HERE / "analysis.json").write_text(json.dumps(out, indent=1) + "\n")
+
+L = ["# Analysis (generated by analyze.py; do not edit)", "",
+     f"References: W0 F4 {W0_F4:,.0f} CPU-s; bw-cell F4 {BW_F4:,.0f}; ratcheted whole-solve c {BASE_C:,.0f} (p = 4111).", "",
+     "| arm | variable order | F4 CPU-s | F4 wall s | A0 / arm | F4 improvement (≤ A0/1.5) | maxrss GiB |",
+     "|---|---|---:|---:|---:|---|---:|"]
+for a in ARMS:
+    r = rows[a]
+    fc = f"{r['f4_cpu_s']:,.0f}" if r["f4_cpu_s"] else "not_measured"
+    fw = f"{r['f4_wall_s']:,.0f}" if r["f4_wall_s"] else "-"
+    ra = f"{r['f4_ratio_A0_over_arm']:.3f}" if r["f4_ratio_A0_over_arm"] else "-"
+    L.append(f"| {a} | {r['order']} | {fc} | {fw} | {ra} | {r['f4_improvement']} | {r['msolve_maxrss_gib']} |")
+u = rows["U1"]
+L += ["", f"A0 vs W0 F4: {100*out['A0_vs_W0_f4']:+.1f} %; A0 vs bw-cell F4: {100*out['A0_vs_bw_cell_f4']:+.1f} %" if a0 else "A0 not measured", "",
+      f"U1 generator gate: {u.get('generator_gate')} ({u.get('generator')})", ""]
+if u.get("c_cpu_s"):
+    L.append(f"U1 whole solve: c = {u['c_cpu_s']:,.0f} CPU-s (msolve {u['msolve_cpu_s']:,.0f} + hnfsolve {u['hnfsolve_cpu_s']:,.0f} + finish {u['finish_cpu_s']:,.0f}); "
+             f"D = {u['D']}, planted {u['planted']}, gates {u['whole_gates']}; log2 c_cyc {u['log2_c_cyc']} band {u['band_log2']}; "
+             f"baseline/U1 = {u['c_vs_baseline']}; whole-solve improvement (≤ {BASE_C/BAR:,.0f}): {u['whole_improvement']}")
+else:
+    L.append(f"U1 whole solve: not_measured (hnfsolve_exit={u.get('hnfsolve_exit')}, stab_fail={u.get('stab_fail')})")
+(HERE / "analysis.md").write_text("\n".join(L) + "\n")
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+FIG = HERE / "figures"
+FIG.mkdir(exist_ok=True)
+fig, ax = plt.subplots(figsize=(8.5, 4.8))
+xs = list(range(len(ARMS)))
+vals = [rows[a]["f4_cpu_s"] or 0 for a in ARMS]
+cols = ["#777777", "#3182bd", "#3182bd", "#e6550d"]
+ax.bar(xs, vals, color=cols)
+for i, a in enumerate(ARMS):
+    t = f"{vals[i]:,.0f}" if vals[i] else "not measured"
+    ax.text(i, vals[i] * 1.01 if vals[i] else 100, t, ha="center", va="bottom", fontsize=8)
+if a0:
+    ax.axhline(a0 / BAR, color="k", ls="--", lw=1, label="improvement bar (A0 / 1.5)")
+ax.axhline(W0_F4, color="#3182bd", ls=":", lw=1, label=f"W0 F4 ({W0_F4:,.0f})")
+ax.axhline(BW_F4, color="#e6550d", ls=":", lw=1, label=f"bw-cell F4 ({BW_F4:,.0f})")
+ax.set_xticks(xs, [f"{a}\n{ORDER[a]}" for a in ARMS], fontsize=7)
+ax.set_ylabel("msolve F4 CPU-s (4 threads)")
+ax.set_title("EcGFp5 m = 5 quotient, p = 4111: F4 cost by presentation (frozen arms)", fontsize=10)
+ax.legend(fontsize=7, frameon=False, loc="lower right")
+fig.tight_layout()
+fig.savefig(FIG / "presentation.svg")
+fig.savefig(FIG / "presentation.png", dpi=150)
+print((HERE / "analysis.md").read_text())

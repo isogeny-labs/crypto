@@ -423,6 +423,7 @@ fn run_binary_analogue(
         };
         let m = spec.oracle_params.u64_or("m", 2)? as u32;
         let mut subtract = SubtractOracle;
+        let mut subtract_binary = crate::cryptanalysis::ic_framework::binary_subtract::BinarySubtractOracle::new();
         let mut mitm = MitmOracle::new(m);
         let mut frob =
             crate::cryptanalysis::ic_framework::plugins::FrobeniusMitmOracle::new(m, inst);
@@ -434,9 +435,10 @@ fn run_binary_analogue(
         );
         let mut algebraic = match spec.oracle.as_str() {
             "descent-algebraic" => {
-                let raw = spec.solver.as_deref().ok_or(
-                    "descent-algebraic needs --solver (try buchberger-f2, sat-cdcl, fes-f2, crossbred-f2 or exhaustive)",
-                )?;
+                let raw = spec
+                    .solver
+                    .as_deref()
+                    .unwrap_or(crate::cryptanalysis::ic_framework::solvers::DEFAULT_DESCENT_SOLVER);
                 let (sname, sparams) = parse_plugin(raw)?;
                 let budget = (spec.solver_budget_seconds > 0)
                     .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
@@ -452,6 +454,7 @@ fn run_binary_analogue(
         };
         let oracle: &mut dyn DecompositionOracle<BinaryGroup> = match spec.oracle.as_str() {
             "subtract" => &mut subtract,
+            "subtract-binary-batch" => &mut subtract_binary,
             "mitm" => &mut mitm,
             "mitm-frobenius" => &mut frob,
             "sixsum-extract" => &mut sixsum,

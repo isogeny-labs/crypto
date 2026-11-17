@@ -1,0 +1,13 @@
+{
+  "native_exit": 0,
+  "native_terminal_marker": true,
+  "native_error_lines": false,
+  "complete_point_checks": 10,
+  "native_acceptance_reconciled": true,
+  "wrapper_exit": 1,
+  "operator_observed_stderr": "tar: runs: file changed as we read it",
+  "cause": "shared directory snapshot raced another active run",
+  "original_stderr_was_not_a_per_run_log": true,
+  "native_repeated": false,
+  "correction": "snapshot only the completed run; use separate archive per invocation for later runners"
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "source.review/v1",
+  "task": "T-1973",
+  "reviewer": "/root/materializer_qualification",
+  "utc": "2026-11-09T17:46:30.657510+00:00",
+  "verdict": "bounded_native_log_fixture_source_supported",
+  "harness_sha256": "9bf9b24a6d0105060dbcb499350665cf229af1f3b20c48c1724e58ccb5952d21",
+  "plan_sha256": "d731e13f20d53a9ea38234eb54e2c3f5440d50d03eb63cd2c41440ab037a2af6",
+  "source_pins": {
+    "launcher": "da57c82264e5fab555526b772221f0933fb9d114d2cf2f2852f2189a7eef4aaf",
+    "io": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+  },
+  "blocking_findings": [],
+  "findings": [
+    {
+      "id": "R1",
+      "finding": "Actual AST-extracted precreate_unit_logs creates0600 caller-owned files with O_EXCL/O_NOFOLLOW, checksuid/gid/mode and fsyncsfiles+directory. Same source hash bound before extraction."
+    },
+    {
+      "id": "R2",
+      "finding": "One fixed fresh unit runs UID/GID1000, CPU100%,128MiB,zeroSwap,32tasks,private network,readonly system/home and only output writepath. Worker emits fixed sentinels, checks actual logownership/mode and uses exacthelperflush. No compiler or scientific target."
+    },
+    {
+      "id": "R3",
+      "finding": "Actual extracted show saves invocation/cgroup before injected checkpoint OSError. Harness transfers capturedowner to cleanup variables before its own save. It requires the injected failure and retainedowner, then binds worker INVOCATION_ID to thatowner."
+    },
+    {
+      "id": "R4",
+      "finding": "Beforestop current InvocationID must equalcapturedowner; no name-only cleanup when missing. Afterstop requiresinactive/failed,PID0,empty/absentcapturedcgroup. If capture fails, fixture retains failure forrootreconciliation; it cannot reportpass. No retry."
+    },
+    {
+      "id": "R5",
+      "finding": "Worker3s delay supports5s initial capturewindow. Native RuntimeMax35s+5sstop; controller50s monotonicbudget, external55s+5skill, conservative60s charge. Commands bounded byremaining time (max4s). Blockingfilesystem I/O remains externallybounded and rootmust reconcile if external interruption preventsreceipt."
+    },
+    {
+      "id": "R6",
+      "finding": "Success requires native Resultsuccess/ExecMainStatus0, matchingworkerreceipt, supervisorflush,ownedcleanup,noerrors andelapsed<50s. It tests actual redirectedlogownership plus one injectedpostcapturecheckpointfailure; not complete validationorallnativefaults."
+    }
+  ],
+  "execution_performed": false,
+  "compiler_invoked": false,
+  "tests_executed": 0,
+  "release_performed": false,
+  "next_action": "Publish exactfixture/source/review, thenroot mayrelease one60s serial qualification after currentnativepayloadterminal. Preserve failedfirstrootvalidation andcharge."
+}

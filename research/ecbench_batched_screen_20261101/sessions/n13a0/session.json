@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hdaaf5e8715d0",
+  "label": "batch_trials development screen: Koblitz a=0 n=13",
+  "spec_id": "ECS1hd059717a19b0",
+  "spec_sha256": "d059717a19b0aabc9e84025ee46741e4c5f536c8bb479e927cf8741266668ca8",
+  "env_class_id": "ECBENV3hc4d998f5ae3f",
+  "host_sha256": "9c28a48a9c9700c811c8f489432202f376db6dfa42d55aaa88d44386c106d1de",
+  "plan_sha256": "a6a6929961c15ec5e140604e0512a4f83f28ad11425a51aaf1dad9f9d0ba6241",
+  "binary_sha256": "447a6d3c4842b5dadb5c1601e9648cda5cc08c41668bfd87741e6fc369bc24c0",
+  "git_commit": "39f147d96bc78a46a2e124ec466f9b8abb44f7f6",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 1.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793555511958,
+  "finished_unix_ms": 1793555631738,
+  "status": "complete",
+  "executions_planned": 1600,
+  "records_written": 1600,
+  "records_sha256": "f84da25517c647e0237a40fd54834ee90bdbfd7e77c7bddcf4acc29c71224cf7",
+  "status_counts": {
+    "verified": 1600
+  },
+  "last_seq": 1599
+}

@@ -1,0 +1,141 @@
+{
+  "created": "2026-11-04T05:09:59Z",
+  "round": 13,
+  "rules": {
+    "exploration_slots": 3,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3s",
+      "ksum4s",
+      "ksum3f",
+      "ksum4f",
+      "ksum5f"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "20": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=16,scan_cap=256",
+            "family": "ksum4",
+            "n": 16,
+            "name": "ksum4-n16",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 2 x 8 (ksum4 from k = 24)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=10,scan_cap=160",
+            "family": "ksum5",
+            "n": 10,
+            "name": "ksum5-n10",
+            "oracle": "ksum:m=5"
+          },
+          "reason": "alternative ksum5 (best S(0) 9.930 at N = 8): N = 1.2 x 8"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=27,scan_cap=432",
+            "family": "mitm2",
+            "n": 27,
+            "name": "mitm2-n27",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "reason": "alternative mitm2 (best S(0) 11.170 at N = 32): N = 0.85 x 32"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=38,scan_cap=608",
+            "family": "mitm2",
+            "n": 38,
+            "name": "mitm2-n38",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "reason": "alternative mitm2 (best S(0) 11.170 at N = 32): N = 1.2 x 32"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=27,scan_cap=432",
+            "family": "rfmitm2",
+            "n": 27,
+            "name": "rfmitm2-n27",
+            "oracle": "rootfind-mitm:m=2"
+          },
+          "reason": "alternative rfmitm2 (best S(0) 11.254 at N = 32): N = 0.85 x 32"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=38,scan_cap=608",
+            "family": "rfmitm2",
+            "n": 38,
+            "name": "rfmitm2-n38",
+            "oracle": "rootfind-mitm:m=2"
+          },
+          "reason": "alternative rfmitm2 (best S(0) 11.254 at N = 32): N = 1.2 x 32"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=11,scan_cap=176",
+            "family": "ksum3f",
+            "n": 11,
+            "name": "ksum3f-n11",
+            "oracle": "ksum:m=3,free=1"
+          },
+          "reason": "exploration: family ksum3f untried at k = 20, at its parent ksum3's best N = 11"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+            "family": "ksum4f",
+            "n": 8,
+            "name": "ksum4f-n8",
+            "oracle": "ksum:m=4,free=1"
+          },
+          "reason": "exploration: family ksum4f untried at k = 20, at its parent ksum4's best N = 8"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+            "family": "ksum5f",
+            "n": 8,
+            "name": "ksum5f-n8",
+            "oracle": "ksum:m=5,free=1"
+          },
+          "reason": "exploration: family ksum5f untried at k = 20, at its parent ksum5's best N = 8"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=11,scan_cap=176",
+        "family": "ksum3",
+        "n": 11,
+        "name": "ksum3-n11",
+        "oracle": "ksum:m=3"
+      },
+      "incumbent_s": [
+        8.987,
+        9.71,
+        16.217
+      ],
+      "tried_before": 26
+    }
+  },
+  "track": "generic"
+}

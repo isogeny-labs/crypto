@@ -1,0 +1,64 @@
+{
+  "schema": "source.review/v1",
+  "task": "T-1748",
+  "reviewer": "/root/review_journal_reader",
+  "recorded_utc": "2026-11-07T00:51:50.579443+00:00",
+  "plan_sha256": "6aa88ee2584e40b50d1b7ee3f295e9402043c765bcbe2732ab032b23a481c793",
+  "candidate_sha256": "021215e4b46f84c63e0b297acc427fce244bbe675647fe13b88eb60a0326e2e9",
+  "producer_abi_sha256": "085234b563a2c766040706ed7d805b2971074efba14da022265a6aa6db33ca63",
+  "verdict": "bounded_storage_consistency_source_and_fixture_checks_supported",
+  "fixture_methods": 21,
+  "fixture_result": "passed",
+  "fixture_seconds": 0.004,
+  "scientific_execution": false,
+  "runtime_fault_qualification": false,
+  "findings": [
+    {
+      "id": "R1",
+      "finding": "Dir-fd component walk with O_NOFOLLOW rejects symlink parents and final files. Nonblocking open plus regular-file check rejects FIFO without blocking."
+    },
+    {
+      "id": "R2",
+      "finding": "Bounded exact byte prefix, lowercase SHA256, integer count excluding booleans, newline termination, strict UTF8/JSON, nested duplicate keys and nonfinite values checked."
+    },
+    {
+      "id": "R3",
+      "finding": "Canonical serialization distinguishes bool/integer and integer/float inline values. Passed final requires full-file equality, no suffix, matching inline prefix. Failed final may preserve unacknowledged suffix."
+    },
+    {
+      "id": "R4",
+      "finding": "Initial source1b8c allowed incomplete final with suffix. Static inspection finding corrected by f31e7f final status gate; no initial failing execution claimed. Final021215 retains correction."
+    },
+    {
+      "id": "R5",
+      "finding": "Root identified ambiguous complete label. Final source labels storage_complete and explicitly returns cleanup_semantics_verified:false, terminal_owner_authenticated:false, terminal_established:false. Matching error-bearing synthetic receipt confirms narrow scope."
+    }
+  ],
+  "iterations": {
+    "initial_source": "1b8c97b39631854b0c064ae80439192eb2498134e2bec6feb1c3d50f7fc70b30",
+    "intermediate_source": "f31e7f7f64c10d63dfac58e96347696e4cb932db1ceaee84a446dd58e2c56276",
+    "initial_fixture_file": "initial-tests.txt",
+    "initial_fixture_scope": "18 passing cases ran against f31e7f after producer revised source before test invocation; not a reproduced initial failure."
+  },
+  "limits": {
+    "receipt_bytes": 16777216,
+    "prefix_bytes": 16777216,
+    "journal_bytes": 67108864,
+    "records": 100000
+  },
+  "limitations": [
+    "Storage-only consistency does not validate cleanup semantics, errors, process termination, source authenticity, leases, filesystem durability or materialization success.",
+    "No concurrent mutation or real crash fault injection performed. Before/after file identity check is not a transactional snapshot or protection from a malicious writer with matching metadata.",
+    "Missing pointer acknowledges no prefix; it establishes neither zero spawned children nor a terminal owner.",
+    "Legacy inline-only input receives no journal guarantee.",
+    "This packet changes no scientific evidence or campaign authorization."
+  ],
+  "sources": [
+    "../materializer-source-successor-20261107/materialize.py",
+    "../materializer-source-successor-review-20261107/review.json",
+    "../materializer-journal-reader-20261107/receipt_reader.py"
+  ],
+  "knowledge_promotion": "Not warranted: scoped storage reader software validation; no scientific transition.",
+  "source_publication_commit": "876e66b5bfb89d89b5377b36a000b1dae174ddac",
+  "publication_evidence": "Producer reported exact GitHub ref readback; root independently verifies delivery."
+}

@@ -119,7 +119,12 @@ single-index table and sample-only certificate controls both failed with
 the expected nontrivial counterexamples and exit status 12. Lean 4.19.0
 checked all ten theorems without admitted proofs. Axiom inspection reports
 only standard propext and Quot.sound where used. All source, pinned tool
-hashes, finite bounds and [final logs](formal/logs/final/) are retained.
+hashes, finite bounds and [final logs](formal/logs/final/) are retained; those
+logs come from the Lean 4.19.0 run. The project's Lean pin has since moved to
+v4.34.1, the version the repository's proof gate pins. A manual run of the
+proof gate on 2026-10-31 (run 41242505114, `main` at 805b3c4487) built both
+modules under v4.34.1 and audited 22 theorems across them, more than the ten
+above, with no trusted axioms (`PASS 22 thm 0 trusted`).
 
 These are finite-state model checks and unbounded abstract lemmas, not a
 machine-checked refinement of compiled Rust. The [proof map](VERIFICATION.md)

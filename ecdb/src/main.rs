@@ -45,9 +45,11 @@ impl ServeArgs {
             Some(url) => Some(db::pool(&DbArgs { database_url: url.clone(), ..self.db.clone() })?),
             None => None,
         };
+        // An empty variable (as docker compose passes an unset one) means unset.
+        let nonempty = |t: &Option<String>| t.clone().filter(|t| !t.is_empty());
         let config = Config {
-            read_token: self.read_token.clone(),
-            write_token: self.write_token.clone(),
+            read_token: nonempty(&self.read_token),
+            write_token: nonempty(&self.write_token),
             sql_role: self.sql_role.clone(),
             sql_timeout_ms: self.sql_timeout_ms,
             sql_max_rows: self.sql_max_rows,
@@ -74,6 +76,32 @@ enum Command {
         repository: String,
         #[command(subcommand)]
         what: ImportWhat,
+    },
+    /// Apply migrations, then create or re-password the API logins: ecdb_api
+    /// (in ecdb_reader) from ECDB_API_PASSWORD, and ecdb_api_writer (in
+    /// ecdb_writer) when ECDB_WRITER_PASSWORD is set. Needs an admin login.
+    Bootstrap {
+        #[command(flatten)]
+        db: DbArgs,
+    },
+    /// Copy a whole ecdb into this database through the remote API's bulk
+    /// export (/v1/export). Needs a superuser login; see deploy/nas/.
+    Sync {
+        #[command(flatten)]
+        db: DbArgs,
+        /// Base URL of the ecdb API to copy from.
+        #[arg(
+            long,
+            env = "ECDB_URL",
+            default_value = "https://l6zg6lz4dr45t75p5qn5aocnme0pckrm.lambda-url.us-west-2.on.aws"
+        )]
+        from: String,
+        /// Read token of that API.
+        #[arg(long, env = "ECDB_TOKEN", hide_env_values = true)]
+        token: Option<String>,
+        /// Overwrite a local catalogue that already holds rows.
+        #[arg(long, env = "ECDB_SYNC_REPLACE")]
+        replace: bool,
     },
     /// Serve the HTTP API.
     Serve {
@@ -150,6 +178,36 @@ enum ImportWhat {
     Ecbench,
     /// Curve records, dataset curves and measurements of the sibling checkouts (src/import/siblings.rs).
     Siblings,
+    /// Complete rational ℓ-isogeny graphs for ℓ = 7, 11, 13 over F_p, p < 2^10 (src/import/ell_isogenies.rs).
+    EllIsogenies,
+    /// ℓ-volcano levels, isogeny directions and End(E) derived from the stored census isogeny graphs.
+    Volcanoes,
+    /// End(E) of every ordinary curve over F_p, p < 2^10 (Kohel's l^k-torsion criterion, src/import/end_ring.rs).
+    EndRings,
+    /// Frobenius on E[l], l <= 13, of every curve over F_p, p < 2^10: action, isogeny count, torsion and
+    /// isogeny field degrees, psi_l factor degrees (src/import/ell_torsion.rs).
+    EllTorsion,
+    /// Certified ℓ = 5, 7 volcano levels of the census-fp curves from computed rational isogenies
+    /// (src/import/levels57.rs).
+    Levels57,
+    /// Genus-2 curves glued from census-fp pairs along their 2-torsion, with the two degree-2 maps
+    /// and L(Jac C) (Howe–Leprévost–Poonen Prop. 4, src/import/gluing.rs).
+    Gluings,
+    /// End(E) of every supersingular curve over F_p, p < 2^10 (Delfs-Galbraith, src/import/supersingular.rs).
+    SupersingularEndRings,
+    /// Factor bases of the IC work: FB1/FBM1 from ecbench records, the catalog and dumps,
+    /// large-prime and SECG small-x results, the cryptanalysis archive (src/import/factor_bases.rs).
+    FactorBases,
+    /// Cl(End(E)) of every census-fp curve with End(E) known and the order of the class above l = 2, 3, 5, 7
+    /// (src/import/class_group.rs).
+    ClassGroups,
+    /// Ciani plane quartics over F_p, 5 <= p < 64 (seeded sample), verified L(Jac C) = L(E_x) L(E_y) L(E_z),
+    /// with their quotient maps (src/import/ciani.rs).
+    CianiQuartics,
+    /// Curves written by ecdb/sage/generate.sage (JSONL files or directories of them), re-verified.
+    Generated { paths: Vec<String> },
+    /// Versioned curve sweeps, feature definitions and model-ready dataset recipes.
+    Research,
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
     LmfdbAvFq {
         path: PathBuf,
@@ -187,10 +245,13 @@ async fn main() -> Result<()> {
             let (sessions, runs, parts) = import::ecbench::write_pack(&repo_root, &pack_dir)?;
             let bench = import::results::collect_benchmarks(&repo_root)?;
             let bench_sha = import::pack::write(&pack_dir, "benchmarks", &bench)?;
+            let fbs = import::factor_bases::collect(&repo_root)?;
+            let fbs_sha = import::pack::write(&pack_dir, import::factor_bases::PACK, &fbs)?;
             let staged = import::siblings::stage(&repo_root, &out)?;
             print(&serde_json::json!({
                 "ecbench": { "sessions": sessions, "runs": runs, "parts": parts },
                 "benchmarks": { "entries": bench.len(), "sha256": bench_sha },
+                "factor_bases": { "rows": fbs.len(), "sha256": fbs_sha },
                 "sibling_files": staged.len(),
             }))?;
         }
@@ -199,6 +260,28 @@ async fn main() -> Result<()> {
             let mut client = pool.get().await?;
             let applied = ecdb::migrate::run(&mut client).await?;
             print(&serde_json::json!({ "applied": applied, "schema_version": ecdb::migrate::schema_version() }))?;
+        }
+        Command::Bootstrap { db } => {
+            let pool = db::pool(&db)?;
+            let mut client = pool.get().await?;
+            let applied = ecdb::migrate::run(&mut client).await?;
+            let mut logins = Vec::new();
+            for (login, group, var) in db::LOGINS {
+                match std::env::var(var) {
+                    Ok(p) if !p.is_empty() => logins.push((*login, *group, p)),
+                    _ if *login == "ecdb_api" => anyhow::bail!("{var} is not set"),
+                    _ => {}
+                }
+            }
+            let roles = db::bootstrap_logins(&client, &logins).await?;
+            print(
+                &serde_json::json!({ "applied": applied, "schema_version": ecdb::migrate::schema_version(), "roles": roles }),
+            )?;
+        }
+        Command::Sync { db, from, token, replace } => {
+            let pool = db::pool(&db)?;
+            let mut client = pool.get().await?;
+            print(&ecdb::sync::run(&mut client, &from, token, replace).await?)?;
         }
         Command::Import { db, repo_root, repository, what } => {
             let pool = db::pool(&db)?;
@@ -220,6 +303,18 @@ async fn main() -> Result<()> {
                 ImportWhat::Results => import::run(&ctx, Selection::Results, None).await?,
                 ImportWhat::Ecbench => import::run(&ctx, Selection::Ecbench, None).await?,
                 ImportWhat::Siblings => import::run(&ctx, Selection::Siblings, None).await?,
+                ImportWhat::EllIsogenies => import::run(&ctx, Selection::EllIsogenies, None).await?,
+                ImportWhat::Volcanoes => import::run(&ctx, Selection::Volcanoes, None).await?,
+                ImportWhat::EndRings => import::run(&ctx, Selection::EndRings, None).await?,
+                ImportWhat::EllTorsion => import::run(&ctx, Selection::EllTorsion, None).await?,
+                ImportWhat::Levels57 => import::run(&ctx, Selection::Levels57, None).await?,
+                ImportWhat::Gluings => import::run(&ctx, Selection::Gluings, None).await?,
+                ImportWhat::SupersingularEndRings => import::run(&ctx, Selection::SupersingularEndRings, None).await?,
+                ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
+                ImportWhat::ClassGroups => import::run(&ctx, Selection::ClassGroups, None).await?,
+                ImportWhat::CianiQuartics => import::run(&ctx, Selection::CianiQuartics, None).await?,
+                ImportWhat::Research => import::run(&ctx, Selection::Research, None).await?,
+                ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };
             print(&reports)?;

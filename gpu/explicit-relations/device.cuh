@@ -6,6 +6,12 @@
 #if defined(ER_QUERY_PROFILE) && (!defined(ER_QUERY_PERSISTENT) || !defined(ER_RIGHT_FULL_CACHE) || !defined(ER_AFFINE_QUERY))
 #error "ER_QUERY_PROFILE requires persistent full-cache affine queries"
 #endif
+#if defined(ER_QUERY_FULL_CACHE) && (!defined(ER_QUERY_PERSISTENT) || !defined(ER_RIGHT_FULL_CACHE) || !defined(ER_AFFINE_QUERY))
+#error "ER_QUERY_FULL_CACHE requires persistent full-cache affine queries"
+#endif
+#if defined(ER_QUERY_FULL_CACHE) && defined(ER_QUERY_PROFILE)
+#error "ER_QUERY_FULL_CACHE is an uninstrumented production specialization"
+#endif
 #include <cuda_runtime.h>
 #ifdef ER_QUERY_PERSISTENT
 #include <cuda/atomic>
@@ -376,6 +382,9 @@ __global__ void search_right_persistent(
   if (!threadIdx.x)
     atomicAdd(result + 2, static_cast<unsigned long long>(visited));
 }
+#ifdef ER_QUERY_FULL_CACHE
+#include "query-fullcache.cuh"
+#endif
 #ifdef ER_QUERY_PROFILE
 #include "query-profile.cuh"
 #endif
@@ -744,6 +753,13 @@ public:
             c, target, p.right, data(rows), p.left, data(winner),
             prefixes.empty() ? nullptr : data(prefixes), prefix_shift,
             partials, data(profile));
+      else
+#endif
+#ifdef ER_QUERY_FULL_CACHE
+      if (partials.full)
+        search_right_fullcache<<<std::min(persistent_grid, blocks(p.right)), BLOCK>>>(
+            c, target, p.right, data(rows), p.left, data(winner),
+            prefixes.empty() ? nullptr : data(prefixes), prefix_shift, partials);
       else
 #endif
       search_right_persistent<<<std::min(persistent_grid, blocks(p.right)), BLOCK>>>(

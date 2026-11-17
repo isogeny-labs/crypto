@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T15:42:02Z",
+ "id": "PCC-20261116-4ddb26",
+ "kind": "statement",
+ "producer": {
+  "commit": "575b3cf41082596ebf8757a4974d1a27bdcd0301",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/fourteen-store-merge-ENOSPC-and-complete-rollback-18/ACTUAL_FAILURE_AND_COMPLETE_ROLLBACK.json",
+    "sha256": "dd7a45a088c3002c83f2dde969dc0e6b17268ba681808633d6e78db93929fba5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/fourteen-store-merge-ENOSPC-and-complete-rollback-18/ENTIRE_CURRENT_HOLD_BEFORE.json.xz",
+    "sha256": "734dbb6be40e55fbbeb511752ff4f388e26c9433362943e09750e9c2ae90bed2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/fourteen-store-merge-ENOSPC-and-complete-rollback-18/actual-normal-merge.exit.xz",
+    "sha256": "6572b0a8bca1464a1fcc02b7c7cfde7e8e695e8def7de53e5906deeecf3f4c62"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/fourteen-store-merge-ENOSPC-and-complete-rollback-18/ct447-entire-extra-Root-pack-and-failure-ENTIRE_RELOCATION_RECEIPT.json",
+    "sha256": "c86c8ad93911fb81b54bcaf4e55abdd498bcc597ef2d9fe64f0aa443e574955d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/fourteen-store-merge-ENOSPC-and-complete-rollback-18/ct448-entire-new-Root-pack-recovery-ENTIRE_RELOCATION_RECEIPT.json",
+    "sha256": "121e682f1e802e943819c7e0021881b6b63c9d0819fb78017e691fe409cef65e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/fourteen-store-merge-ENOSPC-and-complete-rollback-18/entire-actual-normal-merge.stderr.xz",
+    "sha256": "ea9b3624c59ad513e2e492042c488378f0036094ecb09333ba73597974a1c0ee"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/fourteen-store-merge-ENOSPC-and-complete-rollback-18/entire-actual-normal-merge.stdout.xz",
+    "sha256": "0040f94d11d0039505328a90b2ff48968db873e9e7967307631bf40ef5679275"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Original guarded integration446 reaches actual exit128 ENOSPC during checkout before any merge commit. Entire current before table/full byte backups/index and actual stderr retained. Only original raw payload paths were missing; full failed-checkout delta captured, every current byte/shape/mode row restored exactly from complete regular backups, canonical and attempt index bytes unchanged, HEAD575b3 unchanged and MERGE_HEAD absent. Any newly created genuine metadata retained whole separately. No reset/rebase/history/ledger/side choice or retry. First extra long-target pack-link allocation also ENOSPC before mutation; full copied pack retained and short explicit aliases complete byte-preserving links, old partial Consumer pack untouched. Two newly created complete Root indexed packs moved to existing RAM with original bytes/modes/paths retained; observed space recovery used for this negative checkpoint. More actual allocation diagnosis/storage reserve required before distinct retry; no scientific/paid/signed promotion."
+}

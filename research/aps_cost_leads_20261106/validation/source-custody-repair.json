@@ -1,0 +1,37 @@
+{
+  "schema": "aps.source-custody-repair/v1",
+  "standing": "unverified producer assertions",
+  "public_failed_source_commit": "89c9f5258f1f10a5c8ad4434a572b7f8dd9fcbd4",
+  "hosted_job": 128168820740,
+  "hosted_run": 42298200024,
+  "hosted_preflight": "failed: untracked payload differs from reviewed source capture",
+  "hosted_standard_gate": "skipped",
+  "hosted_upload_occurred": false,
+  "authentication_observed": false,
+  "local_native_git_ignored_source": [
+    "aps-checkpoint-source/tools/aps-export/Cargo.lock"
+  ],
+  "regression_before_repair": {
+    "exit": 1,
+    "tests": 13,
+    "errors": 1,
+    "private_log_sha256": "71b0d47ea7f5cee2b5de329ca09555574159bbbaf18ea2fd34b67279981dcf51"
+  },
+  "after_repair": {
+    "exit": 0,
+    "tests": 13,
+    "failures": 0,
+    "private_log_sha256": "c437dfe30f58e86795942e6f40714b6732ad4bd02a49313de99d832497349686"
+  },
+  "source_files": {
+    ".github/scripts/aps_checkpoint_source.py": "83b53a75b333c82df284a82472db444d2753ddd1a07b4fd2efcddfde6010bd39",
+    ".github/scripts/test_aps_checkpoint_source.py": "3662e90039a6422d336b4e9ba3eadc3103dc062762ff7a4808d8c8dee14d58eb",
+    "research/aps_cost_leads_20261106/SOURCE_CHECKPOINT.md": "ca3b630de55786b57e9e344d8f7467f449338eb76c8995295e3fa58c3aab9bc2"
+  },
+  "source_tree_fully_pinned": false,
+  "repair": "A deterministic capture-local ignore file exposes only the reviewed source paths and custody metadata. Exact payload equality remains mandatory; repository ignore rules, stock gate, assertions and publication exclusions are unchanged.",
+  "earlier_native_source_fence": "released ready after the only hosted job completed preflight failure; no transfer was running",
+  "new_upload": "not attempted by this receipt",
+  "raw_logs_published": false,
+  "benchmark_launched": false
+}

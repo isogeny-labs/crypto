@@ -57,8 +57,25 @@ use rayon::prelude::*;
 /// Whether table buffers are reused across pivot blocks (see the module
 /// documentation); off unless `KIC_GF2_REUSE_TABLE=1`.
 fn reuse_table_enabled() -> bool {
+    if let Some(on) = REUSE_TABLE_THREAD.with(std::cell::Cell::get) {
+        return on;
+    }
     static REUSE_TABLE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *REUSE_TABLE.get_or_init(|| std::env::var("KIC_GF2_REUSE_TABLE").as_deref() == Ok("1"))
+}
+
+thread_local! {
+    /// A per-thread override of `KIC_GF2_REUSE_TABLE` (`None`: the
+    /// environment decides), set by the `inherited-f4-next` engine
+    /// ([`crate::cryptanalysis::koblitz_groebner::with_next_kernels`]).
+    static REUSE_TABLE_THREAD: std::cell::Cell<Option<bool>> = const { std::cell::Cell::new(None) };
+}
+
+/// Override table reuse on this thread; returns the previous override.
+/// Table reuse leaves the rows and the word count unchanged (see the
+/// module documentation), so this changes only how the tables are filled.
+pub(crate) fn set_reuse_table_thread(on: Option<bool>) -> Option<bool> {
+    REUSE_TABLE_THREAD.with(|c| c.replace(on))
 }
 
 /// Largest pattern width of one Gray-code table.
@@ -1118,6 +1135,40 @@ pub fn simd_available() -> bool {
 mod tests {
     use super::*;
     use rand::{rngs::StdRng, Rng, SeedableRng};
+
+    /// The `inherited-f4-next` table reuse override changes neither the
+    /// echelon rows nor the word XORs charged, on shapes from one block to
+    /// many (including a last table only partly filled).
+    #[test]
+    fn reuse_table_override_leaves_rows_and_count_unchanged() {
+        let mut rng = StdRng::seed_from_u64(20261112);
+        for &(rows, cols) in &[(130usize, 260usize), (300, 470), (600, 1794), (257, 900)] {
+            let words = cols.div_ceil(64);
+            let matrix: Vec<Vec<u64>> = (0..rows)
+                .map(|_| {
+                    let mut r: Vec<u64> = (0..words)
+                        .map(|_| rng.gen::<u64>() & rng.gen::<u64>())
+                        .collect();
+                    if cols % 64 != 0 {
+                        r[words - 1] &= (1u64 << (cols % 64)) - 1;
+                    }
+                    r
+                })
+                .collect();
+            let run = |reuse: Option<bool>| {
+                let previous = set_reuse_table_thread(reuse);
+                let mut m = matrix.clone();
+                let mut ops = 0u64;
+                let rank = echelon_counted(&mut m, cols, &mut ops);
+                let mut r = matrix.clone();
+                let mut rops = 0u64;
+                let rrank = rref_counted(&mut r, cols, &mut rops);
+                set_reuse_table_thread(previous);
+                (rank, m, ops, rrank, r, rops)
+            };
+            assert_eq!(run(Some(false)), run(Some(true)), "{rows} x {cols}");
+        }
+    }
 
     #[test]
     fn branchless_strip_matches_conditional_clear() {

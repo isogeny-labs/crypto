@@ -1,0 +1,158 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-p3-cross-trace-20261107-1
+experiment_id: split_prime_ecdlp_20261107-p3-cross-trace
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/cards/CARD-p3-cross-trace-20261107-1.receipt.json
+binds:
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/PROTOCOL.md, sha256: 6d35462baf661e275c918ef7a224a0df145bdeb3f35dd9887e9fe44428a7efa1}
+  - {path: research/split_prime_ecdlp_20261107/followups/README.md, sha256: aa622e0b61297bd71a55a30626e0a561c28281ed73fd26093a0267770a580af2}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/README.md, sha256: 00db3b32535af2ba9e3e58e750db63232dcc8a928c57911932c344440c7e5120}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/Cargo.toml, sha256: 944122522b9c97737abb96869da85645bbb9e837ebfb246ada7ac4cc4f4f9eb9}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/Cargo.lock, sha256: a938d06710178b7aad37edd2289a0d917e1d99416d2cdf94fc1a3945c0aaab47}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/analyze.rs, sha256: ed2fe72881dd2bb4800a29d3bb9be6d161c66d8baa846f65f97dbcc8cdbe8b3e}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/cov.rs, sha256: d1ab84a39f65555f0cf357f498f3b18fdbfed0ea577e25f3322a363c2db9e890}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/curves.rs, sha256: 6a5278da9fe84e8b0b68ed9346465c3535ee95baf24c431f2aff222a974fc66e}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/ec.rs, sha256: e722e651eede01ed126d4a130a3e3743e187f8265f5917bb716719250abd190a}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/main.rs, sha256: f3f1252d54529caa9de9168b037f1ee7e44a324b90f313ec93edea5e7a81ed2a}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/poly.rs, sha256: acf4a5f136303e646ac6a2f0b7d801a9eccabf3b7e5878aa6d4b32ce6adced60}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/rho.rs, sha256: a49b9b26110f6f0269bad9d7f7b8ae59486e0eab6fb205ff620b2c7369bc2dcf}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/selftest.rs, sha256: 06742fd7f4150286ea91f4e7b85a69a20fd8c735bd07cfb42b4f210d3a7a6283}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/stats.rs, sha256: bcb58ba345c49ae0f4210f6ec13b5deefebdae2ff85eb69bb210aa353d81c0c1}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/util.rs, sha256: 51a51f957665a700b5736558d424af4ea926c2603606eddaaa91b1e3b5ff5366}
+  - {path: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census/src/yieldcov.rs, sha256: 9261d4aa43e6637e4e79f94e04da6c2aecfd84f45154a9a694c44911b9bcf07b}
+must_not_exist:
+  - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z
+commands:
+  - id: build
+    cwd: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census
+    argv: ["nice", "-n", "10", "cargo", "build", "--release"]
+    env:
+      CARGO_TARGET_DIR: "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run"
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/build.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/build.stderr
+  - id: binary-sha256
+    argv: ["sha256sum", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/binary-sha256.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/binary-sha256.stderr
+  - id: selftest
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "selftest"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/selftest.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/selftest.stderr
+  - id: mkdir-prime-dirs
+    argv: ["mkdir", "-p", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/mkdir-prime-dirs.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/mkdir-prime-dirs.stderr
+  - id: p24-curves
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "curves", "--p", "16777213", "--count", "2000", "--seed", "11787384277891755733", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/curves.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-curves.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-curves.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/curves.jsonl
+  - id: p24-covariates
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "covariates", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/curves.jsonl", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/cov.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-covariates.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-covariates.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/cov.jsonl
+  - id: p24-rho-a
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "rho", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/curves.jsonl", "--targets", "256", "--seed", "11424068243091161927", "--run", "A", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/rhoA.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-rho-a.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-rho-a.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/rhoA.jsonl
+  - id: p24-rho-b
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "rho", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/curves.jsonl", "--targets", "256", "--seed", "16739699506839864087", "--run", "B", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/rhoB.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-rho-b.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-rho-b.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/rhoB.jsonl
+  - id: p24-yield
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "yield", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/curves.jsonl", "--N", "502", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/yield.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-yield.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-yield.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/yield.jsonl
+  - id: p24-analyze
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "analyze", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/curves.jsonl", "--cov", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/cov.jsonl", "--rho-a", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/rhoA.jsonl", "--rho-b", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/rhoB.jsonl", "--yield", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/yield.jsonl", "--seed", "9456636048090206450", "--perms", "1000", "--alpha", "0.05", "--planted", "0.02", "--covariates", "z_691,logL1_200000,psi3_roots,psi5_roots", "--family-size", "16", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/analysis.json"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-analyze.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24-analyze.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p24/analysis.json
+  - id: p28-curves
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "curves", "--p", "268435399", "--count", "2000", "--seed", "9196315568214002056", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/curves.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-curves.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-curves.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/curves.jsonl
+  - id: p28-covariates
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "covariates", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/curves.jsonl", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/cov.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-covariates.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-covariates.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/cov.jsonl
+  - id: p28-rho-a
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "rho", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/curves.jsonl", "--targets", "256", "--seed", "6471924370547007479", "--run", "A", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/rhoA.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-rho-a.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-rho-a.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/rhoA.jsonl
+  - id: p28-rho-b
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "rho", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/curves.jsonl", "--targets", "256", "--seed", "13467469337155996127", "--run", "B", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/rhoB.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-rho-b.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-rho-b.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/rhoB.jsonl
+  - id: p28-yield
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "yield", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/curves.jsonl", "--N", "2007", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/yield.jsonl"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-yield.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-yield.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/yield.jsonl
+  - id: p28-analyze
+    argv: ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3run/release/p3census", "analyze", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/curves.jsonl", "--cov", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/cov.jsonl", "--rho-a", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/rhoA.jsonl", "--rho-b", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/rhoB.jsonl", "--yield", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/yield.jsonl", "--seed", "14287345612908892213", "--perms", "1000", "--alpha", "0.05", "--planted", "0.02", "--covariates", "z_691,logL1_200000,psi3_roots", "--family-size", "16", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/analysis.json"]
+    timeout_seconds: 14400
+    success_exit_codes: [0]
+    stdout: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-analyze.stdout
+    stderr: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28-analyze.stderr
+    outputs:
+      - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/p28/analysis.json
+bus_address: executor-mechanical-p3-cross-trace
+background: true
+write_scope:
+  - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/cards/
+  - research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T214600Z/
+stop_when:
+  - Any command exits nonzero or reaches its timeout; report the exit status and the step id, and run nothing further.
+  - The tool exits 2; return the IMPEDIMENT line.

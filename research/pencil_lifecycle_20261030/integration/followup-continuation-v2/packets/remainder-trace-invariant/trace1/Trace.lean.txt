@@ -1,0 +1,52 @@
+import Stored
+set_option autoImplicit false
+namespace RemainderTrace
+open Polynomial
+variable {K : Type*} [Field K]
+noncomputable def term (e : ℕ×K) : K[X] := C e.2*X^e.1
+noncomputable def cancel (b r : K[X]) (e : ℕ×K) : K[X] := r-term e*b
+noncomputable def run (b : K[X]) : List (ℕ×K)→K[X]→K[X]
+ | [],r=>r
+ | e::es,r=>run b es (cancel b r e)
+noncomputable def quotient : List (ℕ×K)→K[X]
+ | []=>0
+ | e::es=>term e+quotient es
+
+theorem cancel_identity (b r : K[X]) (e : ℕ×K) :
+ r=b*term e+cancel b r e := by unfold cancel; ring
+
+theorem run_identity (b r : K[X]) (es : List (ℕ×K)) :
+ r=b*quotient es+run b es r := by
+ induction es generalizing r with
+ | nil => simp [quotient,run]
+ | cons e es ih =>
+   simp only [quotient,run]
+   have h:=ih (cancel b r e)
+   rw [←h]
+   unfold cancel
+   ring
+
+theorem cancel_dvd_iff (b r : K[X]) (e : ℕ×K) :
+ b∣cancel b r e ↔ b∣r := by
+ unfold cancel
+ exact dvd_sub_left (dvd_mul_left b (term e))
+
+theorem run_dvd_iff (b r : K[X]) (es : List (ℕ×K)) :
+ b∣run b es r ↔ b∣r := by
+ induction es generalizing r with
+ | nil => rfl
+ | cons e es ih => rw [run,ih,cancel_dvd_iff]
+
+theorem zero_remainder_dvd (b r : K[X]) (es : List (ℕ×K)) (h : run b es r=0) : b∣r := by
+ apply (run_dvd_iff b r es).1
+ rw [h]
+ exact dvd_zero _
+
+theorem zero_remainder_witness (b r : K[X]) (es : List (ℕ×K)) (h : run b es r=0) :
+ r=b*quotient es := by
+ have hi:=run_identity b r es
+ simpa only [h,add_zero] using hi
+
+theorem residual_sound (b f v : K[X]) (es : List (ℕ×K))
+ (h : run b es (f-v^2)=0) : b∣f-v^2 := zero_remainder_dvd b (f-v^2) es h
+end RemainderTrace

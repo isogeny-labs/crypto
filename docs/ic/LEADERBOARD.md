@@ -33,6 +33,7 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-27 | [Residual collector res2 vs rho.negation, one target cold, best cell icv1-fp36-t454193-44a20818 (r = 2^36.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_exhaustive_20261026/README.md) | 2.59× | matched | S |
 | 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 | 2026-10-20 | [k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 1,236,267× | matched | F_p multiplications |
+| 2026-11-01 | [Prime-orbit relation collector, affine eight-orbit candidate vs negation rho, generic 14-bit toy curve](https://github.com/isogeny-labs/crypto/blob/main/research/ecbench_e2e_frontier_20261031/REPORT.md#late-main-79th-method-reconciliation) | 5.42× | matched | counted GAE lower-bound diagnostic |
 
 ## Native candidate tournament, round 0026 (separate Ir unit)
 
@@ -150,24 +151,98 @@ Does `columns = 2` beat the per-curve column count frozen on 2026-10-14 now that
 
 Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
-## Table A: Koblitz, one target (§23, re-run at baseline v7)
+## Component improvement: Hilbert early stop in the Joux–Vitse cover IC (2026-10-28, engineering)
 
-- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).
-- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).
+On the weak class (`jv_cover --exp dlp`, six-quadric cover over `F_p`, p = 53–503), the Hilbert stop certifies the leading forms are a regular sequence and drops every pending F4 pair the complete intersection's Hilbert function proves reduces to zero; the reduced basis is unchanged. The baseline arm reproduces the recorded S; every cell has equal residuals, relations, decompositions and relation digest, every logarithm is verified, and A/A is 1.000. The as-found form (B0) is a relabelling: S fell 2.53–2.64× while the emitted native-ops counter rose 8.3–8.5×. Counted F_p multiplications only (`S = counted F_p multiplications per sqrt(l) (c_add_E normalised), one thread`), a lower bound: the F4 driver's pair selection, matrix assembly and table lookups are unpriced, and the IC side's unpriced work is not emitted. These curves have no row in tables A–C. The log–log slope of S/rho over p is -2.27 (full F4) and -2.27 (Hilbert arm). S/rho uses the negation-map reference added for validation; distance remaining, not a gate, and no cross-method rank is claimed.
+
+| p | cells | S before → after | S_A/S_B | IC ÷ rho-neg after (w = 0 / 0.1 / 1) | IC ÷ rho-neg before |
+|---:|--:|:--|:--|:--|:--|
+| 53 | 8 | 1980 → 1062 | **1.848** [1.825, 1.878] | 271.5 / 227.5 / 92.5 | 506.6 / 424.4 / 172.5 |
+| 101 | 8 | 259.8 → 138.5 | **1.875** [1.870, 1.879] | 70.8 / 59.2 / 23.8 | 132.9 / 111.0 / 44.7 |
+| 251 | 6 | 47.9 → 25.64 | **1.868** [1.866, 1.870] | 25.0 / 20.8 / 8.4 | 46.7 / 39.0 / 15.7 |
+| 503 | 3 | 9.786 → 5.291 | **1.849** [1.848, 1.850] | 5.5 / 4.6 / 1.8 | 10.1 / 8.4 / 3.4 |
+
+[Report](../../research/ic_cover_weakclass_20261023/REPORT.pdf) · [study](../../research/ic_cover_weakclass_20261023/) · [data](../../research/ic_cover_weakclass_20261023/summary.json).
+
+validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)
+
+## Joux–Vitse cover sieve against a matched negation rho, weak class only (outside tables A–C)
+
+Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} (never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; `U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each`. The band is layer A: every unemitted cover F_p operation is also priced as native, the upper-bound convention. The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in research/jv_walk_charge_20261111 (walk charged, still below rho): pooled 0.0155 / 0.0858 / 0.0900 at w = 0 / 0.1 / 1 with the walk, against 0.0141 / 0.0857 / 0.0900 without it. That charge covers starts within the implemented walk's reach: from a random admitted curve it reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak curve (all depth-1 2-volcanoes) cannot use the route. Distance remaining is IC ÷ rho; "below" means the 95% interval's upper end is under 1 at all three prices.
+
+| arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |
+|:--|:--|:--|:--|:--|
+| P | p=1009 | **0.0656** [0.0456, 0.0956] | 0.066 / 0.360 / 0.378 | yes |
+| P | p=1511 | **0.0177** [0.0135, 0.0246] | 0.018 / 0.133 / 0.140 | yes |
+| P | p=1823 | **0.0125** [0.0103, 0.0157] | 0.012 / 0.092 / 0.096 | yes |
+| P | pooled | **0.0244** [0.0206, 0.0292] | 0.024 / 0.164 / 0.172 | yes |
+| H | p=1009 | **0.0314** [0.0239, 0.0435] | 0.031 / 0.167 / 0.176 | yes |
+| H | p=1511 | **0.0124** [0.0099, 0.0165] | 0.012 / 0.075 / 0.079 | yes |
+| H | p=1823 | **0.0094** [0.0078, 0.0113] | 0.009 / 0.060 / 0.063 | yes |
+| H | pooled | **0.0154** [0.0135, 0.0180] | 0.015 / 0.091 / 0.095 | yes |
+| U | p=1009 | **0.0306** [0.0224, 0.0440] | 0.031 / 0.158 / 0.165 | yes |
+| U | p=1511 | **0.0115** [0.0085, 0.0160] | 0.011 / 0.071 / 0.075 | yes |
+| U | p=1823 | **0.0081** [0.0074, 0.0088] | 0.008 / 0.056 / 0.059 | yes |
+| U | pooled | **0.0141** [0.0122, 0.0167] | 0.014 / 0.086 / 0.090 | yes |
+
+[Report](../../research/jv_sieve_line_vs_rho_20261103/REPORT.pdf) · [study](../../research/jv_sieve_line_vs_rho_20261103/) · [data](../../research/jv_sieve_line_vs_rho_20261103/fit.json).
+
+validated with caveats (weak class only; the isogeny walk is charged in a separate study): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)
+
+## K1 Koblitz, one target, ecbench counted GAE: pair-table factor base sized for n (outside tables A–C)
+
+One target per process, cold (every phase, the pair table included, priced for the one target), on two K1 Koblitz curves. Unit: ecbench counted GAE per sqrt(r); IC native operations and rho *_uncharged counters at w GAE each (AGENTS.md section 5a); bitop/v1 as a calibration-free cross-check. Reference: strong signed-Frobenius rho (all 2n automorphisms, negation × Frobenius) on the same targets in the same ecbench session and binary; every solve of every arm verified. The before mark is the same pipeline with the fixed pair-table dimension 7 on the same targets, the figure this row supersedes. Gap = log2(S_IC / S_rho) at w = 0 / 0.1 / 1 GAE per native operation: the distance remaining to rho, not a pass/fail gate. L0 (counted cost only; wall time not certified). Class: engineering (parameter re-selection at fixed n).
+
+| curve | n | r | recipe | gap to rho, bits (w = 0 / 0.1 / 1) [95%] | before: dimension 7 | improvement, bits [95%] | S, IC (w = 0 / 0.1 / 1) | S, rho (w = 0 / 0.1 / 1) | bitop/v1 gap | targets × rounds |
+|:--|--:|:--|:--|:--|:--|:--|:--|:--|:--|:--|
+| `icv1-f2m23-tm5197-1f85e9e1` | 23 | 2^22.00 (4196903, cofactor 2) | `ic.pipeline: koblitz-standard-subspace:dimension=9, pdp3-koblitz:m=3,engine=rootfind-negfold` | **5.59 / 5.66 / 5.95** [5.54, 5.65] / [5.60, 5.73] / [5.85, 6.06] | 6.91 / 6.94 / 7.09 | 1.32 / 1.28 / 1.14 [1.26, 1.36] / [1.23, 1.33] / [1.08, 1.20] | 43.90 / 49.39 / 98.88 | 0.908 / 0.978 / 1.601 | 5.52 (before 5.96) | 8 × 5 |
+| `icv1-f2m29-tm40309-30c52b96` | 29 | 2^15.37 (42457, cofactor 12646) | `ic.pipeline: koblitz-standard-subspace:dimension=10, pdp3-koblitz:m=3,engine=rootfind-negfold` | **9.47 / 9.52 / 9.86** [9.38, 9.54] / [9.43, 9.59] / [9.74, 9.95] | 10.36 / 10.46 / 11.06 | 0.89 / 0.94 / 1.20 [0.67, 1.06] / [0.72, 1.11] / [0.98, 1.38] | 3181.65 / 3375.46 / 5119.79 | 4.490 / 4.592 / 5.510 | 9.23 (before 10.13) | 8 × 5 |
+
+- Rho is cheaper than both rows at every weight and in bitop/v1: these gaps are the distance remaining.
+- The improvement over dimension 7 is an engineering improvement at fixed n. D (slope difference over n = 17..29) equals (R_n23 + 7 R_n29) / 84 by construction: an offset, not a bent slope; it is not shown as a row.
+- These rows rank only against their own before mark, never against tables A–C or other sections: table C's K1 n = 23 figure is a 32-target batch, pre-gate figure in another unit (a batched-addition clock against batch rho), table A is a clock reading too, and the Frobenius-orbit component sections above measure other methods on K1 n = 29 under other protocols.
+- K1 n = 29 has r = 2^15.37 (cofactor 12646), a smaller prime subgroup than K1 n = 17's 2^16.0, so n here is the field degree, not a problem size; at n = 29 rho is set-up dominated.
+- Dimensions 9 and 10 were chosen on two disclosed sizing targets per n, separate from the measured targets. Records are L0 (counted cost; wall time not certified); the replays used the producer's binary.
+
+[Report](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/report.md) · [study](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/) · [data](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json). Evidence copied from github.com/aburan28/ml-cryptanalysis experiments/fb-pt-lgrow-k1 at main 7d4e8e0f (VAL-20261114-d9190c); validator files from b504b611 (ml-cryptanalysis PR #314: model id redacted, sha256 re-pinned).
+
+validated: replay certificate, validator report (VAL-20261114-d9190c) and the matched strong signed-Frobenius rho reference with the §5a band (research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/VALIDATION.json)
+
+## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)
+
+On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction (`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. These curves have no row in tables A–C. S = counted cost in GAE per sqrt(r), ecbench; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.
+
+| curve | target | S before → after | after ÷ before | IC ÷ rho-neg before → after (w = 0 / 0.1 / 1) |
+|:--|--:|:--|:--|:--|
+| m = 12 | 0 | 44.03 → 37.62 | **0.8543** | 47.23 → 40.35 / 42.94 → 36.68 / 23.62 → 20.18 |
+| m = 12 | 1 | 42.59 → 36.39 | **0.8543** | 50.29 → 42.97 / 45.72 → 39.06 / 25.15 → 21.48 |
+| m = 12 | 2 | 41.47 → 35.43 | **0.8543** | 39.88 → 34.07 / 36.26 → 30.98 / 19.94 → 17.04 |
+| m = 14 | 0 | 5.37 → 4.379 | **0.8154** | 4.27 → 3.48 / 3.88 → 3.16 / 2.13 → 1.74 |
+
+Paired lever ÷ base (ecbench compare): m = 12: 0.8543 [0.8543, 0.8543] over 3 pair(s); m = 14: 0.8154 [0.8154, 0.8154] over 1 pair(s). Rho stays ahead at every weight; the IC ÷ rho column is the distance remaining, not a gate.
+
+[Report](../../research/ic_d4_char2_lever_20261023/REPORT.pdf) · [study](../../research/ic_d4_char2_lever_20261023/) · [data](../../research/ic_d4_char2_lever_20261023/results/table-m12.tsv).
+
+validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_d4_char2_lever_20261023/VALIDATION.json)
+
+## Table A: Koblitz, one target (§23, re-run at main as rule v9 against a matched rho)
+
+- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md; rule/v9/PROTOCOL.md).
+- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v9 at main, with rule v8's matched rho: batched canonicalisation).
 - **Floor:** √(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed Frobenius and negation, n the extension degree. Stated in steps and not rescaled to units, so × floor here divides units by steps.
 - **Targets:** one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks
 - **Status:** primary comparison: one target, as AGENTS.md's one-target rule requires
 - **Online reading:** The archived online-only ratios compare IC after its reusable set-up with rho as built in that experiment. They do not establish an equal-advice online advantage. Later retained-setup claims were superseded by equal-advice rho controls; see the frontier audit above. The cold rows remain the ranked comparison.
-- **Rho step:** rho's walk as built costs 9.4–10.6 units a step; the canonical step costs 4.2–4.92
+- **Rho step:** rho's walk as built costs 4.65–5.8 units a step; the canonical step costs 2.95–3.33
 
 | curve | log₂ r | recipe | |F| | columns | IC operations | rho operations | S, IC | S, reference | IC / rho | S, floor | × floor | ok | validation |
 |:--|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|:--|
-| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 5264 | 56 | — | — | 6.03 | 1.76 | **3.43×** (was 4.95×, §23) | 0.129 | 46.6× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 7296 | 64 | — | — | 6.37 | 1.6 | **3.97×** (was 1.98×, §23) | 0.117 | 54.2× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6560 | 80 | — | — | 6.63 | 1.4 | **4.74×** (was 8.04×, §23) | 0.138 | 47.9× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 27984 | 264 | — | — | 8.15 | 1.16 | **7.03×** (was 14.7×, §23) | 0.122 | 66.9× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 30208 | 256 | — | — | 7.82 | 1.23 | **6.37×** (was 15.7×, §23) | 0.115 | 67.8× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 39040 | 320 | — | — | 12.4 | 1.08 | **11.5×** (was 31.6×, §23) | 0.113 | 109× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 5264 | 56 | — | — | 4.15 | 1.02 | **4.08×** (was 3.43×, rule v7, rho as then) | 0.129 | 32.1× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 7296 | 64 | — | — | 4.38 | 0.926 | **4.73×** (was 3.97×, rule v7, rho as then) | 0.117 | 37.3× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6560 | 80 | — | — | 4.48 | 0.729 | **6.14×** (was 4.74×, rule v7, rho as then) | 0.138 | 32.4× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 27984 | 264 | — | — | 4.42 | 0.593 | **7.46×** (was 7.03×, rule v7, rho as then) | 0.122 | 36.3× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 30208 | 256 | — | — | 4.24 | 0.62 | **6.83×** (was 6.37×, rule v7, rho as then) | 0.115 | 36.7× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 39040 | 320 | — | — | 5.9 | 0.53 | **11.1×** (was 11.5×, rule v7, rho as then) | 0.113 | 52× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
 
 ## Table B: Prime and random-binary ladder (§18)
 
@@ -192,6 +267,93 @@ Validation standing: not validated under the 2026-10-19 gate. No replay certific
 | Random binary | `icv1-f2m21-t2591-de54d72e` | 20.0 | folded, walked, base at the family optimum, m = 2 | 62 | 31 | 2^14.61 GAE | 2^10.44 GAE | 24.4 | 1.36 | **18×** | 0.886 | 27.5× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial) |
 | Random binary | `icv1-f2m24-tm3047-2d0c0e8c` | 21.0 | folded, walked, base at the family optimum, m = 2 | 134 | 67 | 2^15.27 GAE | 2^10.74 GAE | 27.2 | 1.18 | **23×** | 0.886 | 30.7× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial) |
 | Random binary | `icv1-f2m27-t12543-569dca8b` | 24.4 | folded, walked, base at the family optimum, m = 2 | 254 | 127 | 2^17.41 GAE | 2^12.16 GAE | 36.9 | 0.966 | **38.2×** | 0.886 | 41.7× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial) |
+
+## Table B prime rows re-measured with the k = 5 sum table (2026-11-15, counted component improvement, outside tables A-C)
+
+Three Table B prime rows re-measured with the k = 5 sum table (ksum5) against the strictest in-session incumbent, matched negation-map rho (rho-neg) and BSGS (bsgs-neg), same ecbench session and binary. Unit: ecbench counted GAE per sqrt(r), native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a). Table B's recorded before-mark is another harness's figure: it is shown for reference and never divided into the new S. S, ratios and the distance remaining to rho (ksum5 S / rho-neg S) are in the new unit only; the distance remaining is not a pass/fail gate. It is read under the section 5a band: the independent validator found it depends on how uncharged native work is priced (bitop/v1: 5.6-5.8x; all work_native priced at w: 3.0-3.2x at w = 0.1 and 1.4x at w = 1); rho stays ahead in every reading.
+
+| curve | role | w | Table B before-mark (another harness) | strictest incumbent: S | S, ksum5 | ksum5 / incumbent [95%] | per-replicate ratios | S, rho-neg | distance remaining: ksum5 / rho-neg | ksum5 / bsgs-neg |
+|:--|:--|:--|:--|:--|--:|:--|:--|--:|--:|--:|
+| `icv1-fp20-t1293-3c2999ba` | primary | 0 | S_IC 10.723, S_rho 1.292 | inc-tb: 10.295 | 7.111 | **0.6908** [0.6768, 0.7050] | 0.6835 / 0.7015 / 0.6876 | 1.269 | 5.603 | 6.727 |
+| `icv1-fp20-t1293-3c2999ba` | primary | 0.1 | S_IC 10.723, S_rho 1.292 | inc-sel: 11.769 | 7.859 | **0.6678** [0.6564, 0.6794] | 0.6717 / 0.6623 / 0.6693 | 1.380 | 5.696 | 6.764 |
+| `icv1-fp20-t1293-3c2999ba` | primary | 1 | S_IC 10.723, S_rho 1.292 | inc-sel: 24.486 | 14.588 | **0.5958** [0.5836, 0.6081] | 0.6006 / 0.5892 / 0.5974 | 2.375 | 6.143 | 6.928 |
+| `icv1-fp22-tm1267-a5acaf6d` | secondary | 0 | S_IC 12.770, S_rho 1.216 | inc-tb: 11.147 | 6.649 | **0.5965** [0.5825, 0.6108] | 0.5951 / 0.5831 / 0.6120 | 1.172 | 5.674 | 6.745 |
+| `icv1-fp22-tm1267-a5acaf6d` | secondary | 0.1 | S_IC 12.770, S_rho 1.216 | inc-tb: 12.892 | 7.391 | **0.5733** [0.5593, 0.5876] | 0.5719 / 0.5601 / 0.5886 | 1.280 | 5.776 | 6.820 |
+| `icv1-fp22-tm1267-a5acaf6d` | secondary | 1 | S_IC 12.770, S_rho 1.216 | inc-hi: 28.040 | 14.065 | **0.5016** [0.4914, 0.5121] | 0.4917 / 0.5005 / 0.5130 | 2.249 | 6.254 | 7.160 |
+| `icv1-fp24-t1577-77336155` | primary | 0 | S_IC 13.966, S_rho 1.038 | inc-w0: 12.738 | 6.383 | **0.5011** [0.4909, 0.5114] | 0.5072 / 0.5009 / 0.4951 | 1.087 | 5.871 | 6.100 |
+| `icv1-fp24-t1577-77336155` | primary | 0.1 | S_IC 13.966, S_rho 1.038 | inc-w0: 14.781 | 7.158 | **0.4843** [0.4740, 0.4947] | 0.4905 / 0.4842 / 0.4780 | 1.185 | 6.042 | 6.222 |
+| `icv1-fp24-t1577-77336155` | primary | 1 | S_IC 13.966, S_rho 1.038 | inc-w0: 33.164 | 14.132 | **0.4261** [0.4156, 0.4368] | 0.4327 / 0.4265 / 0.4191 | 2.063 | 6.851 | 6.768 |
+
+Registered rule L1 (PROTOCOL.md): L1 holds on a row if the upper end of the 95% interval of R_w = cost(ksum5) / cost(strictest incumbent) is below 1 at all three weights, pooled and in each replicate session alone, and the improvement exceeds the replicate noise delta (1 - max_w R_w(upper) > delta - 1); L1 is falsified if on both primary rows the pooled upper bound is at or above 1 at any weight. Result: l1_holds_on_a_primary_row = true, l1_falsified = false; replicate noise delta per row: icv1-fp20-t1293-3c2999ba (primary) 1.0392; icv1-fp22-tm1267-a5acaf6d (secondary) 1.0521; icv1-fp24-t1577-77336155 (primary) 1.0623.
+
+- Unit: ecbench counted GAE per sqrt(r), native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a).
+- Isolation: L0 (counted cost; wall time not claimed); wall time is not claimed.
+- Track: generic decomposition (bounded by sqrt(r); cannot beat rho or BSGS); it cannot beat rho or BSGS.
+- Binary sha256 `7d46e5ee0778a741193c4af08274fa4861406182e479b06770f5dd8303c5c9cb`, commit `7b3c057e1cef83ccf5712950473ef91e10153499`, registered at 2026-11-15T03:46:33Z.
+- 9 sessions, 48 targets per curve, 3 rounds, 3 replicates; replay: 13824 records, 10368 replays (second host class (Intel Xeon 2.10 GHz container); recorded on a RunPod pod (AMD EPYC)).
+
+[Report](../../research/ic_tableb_ksum_20261115/report.pdf) · [protocol](../../research/ic_tableb_ksum_20261115/PROTOCOL.md) · [data](../../research/ic_tableb_ksum_20261115/summary.json).
+
+validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-tableb-ksum/VALIDATION.json)
+
+
+## Table B random-binary rows re-measured with the k-sum tables (2026-11-15, counted component improvement, outside tables A-C)
+
+ecbench now runs the generic `ksum` oracle (one probe a target into a negation-folded table of every signed m-sum of the base) on binary curves. On Table B's five random-binary curves, each of three replicate sessions per curve (48 targets × 3 rounds) runs matched negation-map rho (rho-neg), BSGS, Table B's own recipe base (inc-tb, binary-subspace at the row's dimension), three tuned pair-table incumbents on the smallest-abscissa base (binary-multiplier) and ksum:m=4 and m=5 at sizes fixed by a disclosed sizing pilot. Registered rule L1: the upper end of the 95% interval of cost(ksum5) / cost(strictest incumbent) below 1 at every weight, pooled and in every replicate, beyond the replicate noise. Primary rows n21, n24, n27; n15, n18 secondary. Track: generic decomposition (bounded by sqrt(r); cannot beat rho or BSGS). validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-tableb-binary-ksum/VALIDATION.json). Table B's recorded figures are another harness's before marks, shown, never divided into the new S. Part of the gain over Table B's own row comes from tuning the incumbent's base (inc-tb is 1.4–3.4× the tuned incumbent at w = 0, 1.5–3.9× at w = 1); the claim is only against the tuned incumbent.
+
+| curve | role | w | Table B before (S_IC, S_rho) | S rho-neg | S inc-tb | strictest incumbent: S | S ksum4 | S ksum5 | ksum5 / incumbent [95%] | ksum4 / incumbent | L1 ksum5 | distance remaining: ksum5 / rho-neg |
+|:--|:--|--:|:--|--:|--:|:--|--:|--:|:--|--:|:--|--:|
+| `icv1-f2m15-t131-ed7256f0` | secondary | 0 | 26.31, 2.01 | 1.966 | 16.27 | inc-n18: 11.84 | 11.19 | 13.47 | 1.138 [1.120, 1.155] | 0.945 | does not hold | 6.85 |
+| `icv1-f2m15-t131-ed7256f0` | secondary | 0.1 | 26.31, 2.01 | 2.106 | 17.71 | inc-n18: 12.75 | 11.89 | 14.19 | 1.113 [1.095, 1.131] | 0.933 | does not hold | 6.74 |
+| `icv1-f2m15-t131-ed7256f0` | secondary | 1 | 26.31, 2.01 | 3.365 | 30.65 | inc-n18: 20.92 | 18.17 | 20.64 | 0.987 [0.967, 1.007] | 0.869 | does not hold | 6.13 |
+| `icv1-f2m18-t393-d2c04152` | secondary | 0 | 21.30, 2.01 | 1.877 | 20.82 | inc-n21: 10.85 | 9.79 | 11.26 | 1.038 [1.019, 1.057] | 0.902 | does not hold | 6.00 |
+| `icv1-f2m18-t393-d2c04152` | secondary | 0.1 | 21.30, 2.01 | 2.023 | 23.42 | inc-n21: 11.77 | 10.52 | 11.98 | 1.018 [0.998, 1.037] | 0.894 | does not hold | 5.92 |
+| `icv1-f2m18-t393-d2c04152` | secondary | 1 | 21.30, 2.01 | 3.333 | 46.75 | inc-n21: 20.12 | 17.12 | 18.50 | 0.920 [0.898, 0.942] | 0.851 | does not hold | 5.55 |
+| `icv1-f2m21-t2591-de54d72e` | primary | 0 | 24.39, 1.36 | 1.261 | 22.15 | inc-n62: 10.28 | 6.73 | 7.01 | 0.681 [0.668, 0.695] | 0.654 | holds | 5.56 |
+| `icv1-f2m21-t2591-de54d72e` | primary | 0.1 | 24.39, 1.36 | 1.371 | 26.13 | inc-n62: 11.67 | 7.57 | 7.73 | 0.662 [0.649, 0.677] | 0.649 | holds | 5.64 |
+| `icv1-f2m21-t2591-de54d72e` | primary | 1 | 24.39, 1.36 | 2.359 | 61.88 | inc-n62: 24.18 | 15.16 | 14.27 | 0.590 [0.575, 0.605] | 0.627 | holds | 6.05 |
+| `icv1-f2m24-tm3047-2d0c0e8c` | primary | 0 | 27.24, 1.18 | 1.211 | 22.60 | inc-n67: 10.99 | 6.58 | 6.99 | 0.636 [0.621, 0.652] | 0.598 | holds | 5.77 |
+| `icv1-f2m24-tm3047-2d0c0e8c` | primary | 0.1 | 27.24, 1.18 | 1.320 | 26.55 | inc-n80: 12.52 | 7.33 | 7.87 | 0.629 [0.614, 0.644] | 0.586 | holds | 5.96 |
+| `icv1-f2m24-tm3047-2d0c0e8c` | primary | 1 | 27.24, 1.18 | 2.303 | 62.07 | inc-n80: 26.14 | 14.14 | 15.81 | 0.605 [0.588, 0.622] | 0.541 | holds | 6.86 |
+| `icv1-f2m27-t12543-569dca8b` | primary | 0 | 36.93, 0.97 | 1.069 | 47.91 | inc-n150: 13.95 | 6.70 | 6.41 | 0.460 [0.452, 0.468] | 0.481 | holds | 6.00 |
+| `icv1-f2m27-t12543-569dca8b` | primary | 0.1 | 36.93, 0.97 | 1.168 | 57.04 | inc-n150: 16.16 | 7.58 | 7.17 | 0.444 [0.435, 0.452] | 0.469 | holds | 6.14 |
+| `icv1-f2m27-t12543-569dca8b` | primary | 1 | 36.93, 0.97 | 2.059 | 139.22 | inc-n178: 36.05 | 15.46 | 13.95 | 0.387 [0.379, 0.395] | 0.429 | holds | 6.78 |
+
+Study: [research/ic_tableb_binary_ksum_20261115/](../../research/ic_tableb_binary_ksum_20261115/); [report](../../research/ic_tableb_binary_ksum_20261115/report.pdf); source `research/ic_tableb_binary_ksum_20261115/summary.json`. Counted cost (L0), 15 sessions, one ecbench binary (sha256 bc96a44a3342…). [pcc:unverified]
+
+
+## k-sum table build without dead-end partial sums (2026-11-15, component speed-up, outside tables A-C)
+
+`ksum:m=k,prune=1` (commit 6d6aa93b8f) stops each lower level of the k-sum table build where too few abscissae remain to complete k summands, so no add is spent on a partial sum that can never be inserted. The table, its keys, inserts, collisions and probes are unchanged; only build adds drop. Default off, so recorded sessions replay. Measured on Table B's eight k-sum rows (the prime and random-binary studies' curves, seeds and sizes), 24 sessions, 48 targets × 3 rounds, pruned and unpruned arms paired by target; 9216 target pairs recover the same log with identical counters outside the table build. Track: generic decomposition (bounded by sqrt(r); cannot beat rho or BSGS). validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-ksum-prune-tableb/VALIDATION.json). Headline: the cheapest k-sum arm before (ksum4 or ksum5, unpruned) against the cheapest after, since unpruned ksum4 is the cheaper arm at w = 0 on 7 of 8 rows; the saving is a constant factor that shrinks as the base grows (about 1/a² of the build), no exponent changes.
+
+| curve | w | S rho-neg | best k-sum before → after | best after / before | distance remaining: best k-sum / rho-neg, before → after | S ksum5 → pruned | ksum5 pruned / unpruned [95%] | S ksum4 → pruned | ksum4 ratio | build adds saved (ksum5) |
+|:--|--:|--:|:--|--:|:--|:--|:--|:--|--:|--:|
+| `icv1-fp20-t1293-3c2999ba` (P20) | 0 | 1.269 | 6.64 → 6.44 | 0.971 | 5.23 → 5.07 | 7.11 → 6.44 | 0.906 [0.905, 0.907] | 6.64 → 6.46 | 0.974 | 20% |
+| `icv1-fp20-t1293-3c2999ba` (P20) | 0.1 | 1.380 | 7.47 → 7.19 | 0.963 | 5.41 → 5.21 | 7.86 → 7.19 | 0.915 [0.914, 0.916] | 7.47 → 7.29 | 0.977 | 20% |
+| `icv1-fp20-t1293-3c2999ba` (P20) | 1 | 2.375 | 14.59 → 13.92 | 0.954 | 6.14 → 5.86 | 14.59 → 13.92 | 0.954 [0.953, 0.955] | 14.96 → 14.79 | 0.988 | 20% |
+| `icv1-fp22-tm1267-a5acaf6d` (P22) | 0 | 1.172 | 6.28 → 6.11 | 0.973 | 5.36 → 5.22 | 6.65 → 6.11 | 0.919 [0.918, 0.920] | 6.28 → 6.14 | 0.977 | 16% |
+| `icv1-fp22-tm1267-a5acaf6d` (P22) | 0.1 | 1.280 | 7.09 → 6.85 | 0.967 | 5.54 → 5.36 | 7.39 → 6.85 | 0.927 [0.926, 0.928] | 7.09 → 6.95 | 0.980 | 16% |
+| `icv1-fp22-tm1267-a5acaf6d` (P22) | 1 | 2.249 | 14.07 → 13.53 | 0.962 | 6.25 → 6.01 | 14.07 → 13.53 | 0.962 [0.961, 0.962] | 14.34 → 14.20 | 0.990 | 16% |
+| `icv1-fp24-t1577-77336155` (P24) | 0 | 1.087 | 6.37 → 5.98 | 0.939 | 5.85 → 5.50 | 6.38 → 5.98 | 0.937 [0.936, 0.937] | 6.37 → 6.26 | 0.983 | 12% |
+| `icv1-fp24-t1577-77336155` (P24) | 0.1 | 1.185 | 7.16 → 6.75 | 0.943 | 6.04 → 5.70 | 7.16 → 6.75 | 0.943 [0.943, 0.944] | 7.22 → 7.11 | 0.985 | 12% |
+| `icv1-fp24-t1577-77336155` (P24) | 1 | 2.063 | 14.13 → 13.73 | 0.971 | 6.85 → 6.66 | 14.13 → 13.73 | 0.971 [0.971, 0.972] | 14.95 → 14.85 | 0.993 | 12% |
+| `icv1-f2m15-t131-ed7256f0` (B15) | 0 | 1.966 | 11.19 → 10.55 | 0.943 | 5.69 → 5.37 | 13.47 → 11.20 | 0.831 [0.830, 0.832] | 11.19 → 10.55 | 0.943 | 36% |
+| `icv1-f2m15-t131-ed7256f0` (B15) | 0.1 | 2.106 | 11.89 → 11.25 | 0.946 | 5.65 → 5.34 | 14.19 → 11.92 | 0.840 [0.839, 0.841] | 11.89 → 11.25 | 0.946 | 36% |
+| `icv1-f2m15-t131-ed7256f0` (B15) | 1 | 3.365 | 18.17 → 17.53 | 0.965 | 5.40 → 5.21 | 20.64 → 18.37 | 0.890 [0.889, 0.891] | 18.17 → 17.53 | 0.965 | 36% |
+| `icv1-f2m18-t393-d2c04152` (B18) | 0 | 1.877 | 9.79 → 9.34 | 0.954 | 5.22 → 4.97 | 11.26 → 9.65 | 0.858 [0.856, 0.859] | 9.79 → 9.34 | 0.954 | 36% |
+| `icv1-f2m18-t393-d2c04152` (B18) | 0.1 | 2.023 | 10.52 → 10.07 | 0.957 | 5.20 → 4.98 | 11.98 → 10.38 | 0.866 [0.865, 0.868] | 10.52 → 10.07 | 0.957 | 36% |
+| `icv1-f2m18-t393-d2c04152` (B18) | 1 | 3.333 | 17.12 → 16.67 | 0.974 | 5.14 → 5.00 | 18.50 → 16.90 | 0.913 [0.912, 0.915] | 17.12 → 16.67 | 0.974 | 36% |
+| `icv1-f2m21-t2591-de54d72e` (B21) | 0 | 1.261 | 6.73 → 6.34 | 0.942 | 5.34 → 5.03 | 7.01 → 6.34 | 0.904 [0.903, 0.905] | 6.73 → 6.55 | 0.974 | 20% |
+| `icv1-f2m21-t2591-de54d72e` (B21) | 0.1 | 1.371 | 7.57 → 7.06 | 0.933 | 5.52 → 5.15 | 7.73 → 7.06 | 0.913 [0.912, 0.914] | 7.57 → 7.40 | 0.977 | 20% |
+| `icv1-f2m21-t2591-de54d72e` (B21) | 1 | 2.359 | 14.27 → 13.60 | 0.953 | 6.05 → 5.76 | 14.27 → 13.60 | 0.953 [0.952, 0.954] | 15.16 → 14.98 | 0.989 | 20% |
+| `icv1-f2m24-tm3047-2d0c0e8c` (B24) | 0 | 1.211 | 6.58 → 6.40 | 0.972 | 5.43 → 5.28 | 6.99 → 6.52 | 0.932 [0.931, 0.934] | 6.58 → 6.40 | 0.972 | 20% |
+| `icv1-f2m24-tm3047-2d0c0e8c` (B24) | 0.1 | 1.320 | 7.33 → 7.15 | 0.975 | 5.56 → 5.42 | 7.87 → 7.40 | 0.940 [0.939, 0.941] | 7.33 → 7.15 | 0.975 | 20% |
+| `icv1-f2m24-tm3047-2d0c0e8c` (B24) | 1 | 2.303 | 14.14 → 13.96 | 0.987 | 6.14 → 6.06 | 15.81 → 15.34 | 0.970 [0.969, 0.971] | 14.14 → 13.96 | 0.987 | 20% |
+| `icv1-f2m27-t12543-569dca8b` (B27) | 0 | 1.069 | 6.41 → 6.04 | 0.941 | 6.00 → 5.65 | 6.41 → 6.04 | 0.941 [0.941, 0.942] | 6.70 → 6.60 | 0.985 | 10% |
+| `icv1-f2m27-t12543-569dca8b` (B27) | 0.1 | 1.168 | 7.17 → 6.79 | 0.947 | 6.14 → 5.82 | 7.17 → 6.79 | 0.947 [0.947, 0.948] | 7.58 → 7.48 | 0.987 | 10% |
+| `icv1-f2m27-t12543-569dca8b` (B27) | 1 | 2.059 | 13.95 → 13.57 | 0.973 | 6.78 → 6.59 | 13.95 → 13.57 | 0.973 [0.973, 0.973] | 15.46 → 15.36 | 0.993 | 10% |
+
+Study: [research/ic_ksum_prune_20261115/](../../research/ic_ksum_prune_20261115/); [report](../../research/ic_ksum_prune_20261115/report.pdf); source `research/ic_ksum_prune_20261115/summary.json`. Counted cost (L0), one ecbench binary (sha256 6c60b4c93129…). [pcc:unverified]
 
 ## Table C: Koblitz, 32-target batch (§19–§22)
 
@@ -239,12 +401,12 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 | table | curve | Reusable set-up | Curve and subgroup | Workflow constructions | Factor base | Pair table | Relations (PDP) | Linear algebra | Descent | Verification |
 |:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| A | `icv1-f2m47-t22705043-f4e44623` | 99.0% | — | — | — | — | — | — | 1.0% | 0.0% |
-| A | `icv1-f2m57-tm747311035-c1f545af` | 99.1% | — | — | — | — | — | — | 0.9% | 0.0% |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.7% | — | — | — | — | — | — | 1.3% | 0.0% |
-| A | `icv1-f2m53-tm56619371-dac20a85` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
-| A | `icv1-f2m59-tm943548413-98844ecc` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
+| A | `icv1-f2m47-t22705043-f4e44623` | 98.9% | — | — | — | — | — | — | 1.0% | 0.0% |
+| A | `icv1-f2m57-tm747311035-c1f545af` | 99.0% | — | — | — | — | — | — | 1.0% | 0.0% |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.5% | — | — | — | — | — | — | 1.5% | 0.0% |
+| A | `icv1-f2m53-tm56619371-dac20a85` | 99.4% | — | — | — | — | — | — | 0.6% | 0.0% |
+| A | `icv1-f2m59-tm943548413-98844ecc` | 99.5% | — | — | — | — | — | — | 0.5% | 0.0% |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.4% | — | — | — | — | — | — | 0.6% | 0.0% |
 | B | `icv1-fp10-t5-192cb216` | — | — | — | 5.3% | — | 93.0% | 0.2% | — | 1.5% |
 | B | `icv1-fp12-t19-d4a315df` | — | — | — | 30.2% | — | 68.1% | 0.4% | — | 1.4% |
 | B | `icv1-fp14-tm43-158b6914` | — | — | — | 12.3% | — | 86.5% | 0.1% | — | 1.1% |
@@ -276,12 +438,12 @@ The registry overview below uses current links. Frozen measurement rows retain t
 
 | table | curve | curves.yaml record | factor base (points, recipe) | factor-base source | refs |
 |:--|:--|:--|:--|:--|:--|
-| A | `icv1-f2m47-t22705043-f4e44623` | `icv1_f2m47_t22705043_f4e44623` | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m57-tm747311035-c1f545af` | `icv1_f2m57_tm747311035_c1f545af` | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | `icv1_f2m41_tm2308219_7f48b14a` | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m53-tm56619371-dac20a85` | `icv1_f2m53_tm56619371_dac20a85` | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m59-tm943548413-98844ecc` | `icv1_f2m59_tm943548413_98844ecc` | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | `icv1_f2m61_t158598901_ab42b6c5` | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m47-t22705043-f4e44623` | `icv1_f2m47_t22705043_f4e44623` | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m57-tm747311035-c1f545af` | `icv1_f2m57_tm747311035_c1f545af` | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | `icv1_f2m41_tm2308219_7f48b14a` | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m53-tm56619371-dac20a85` | `icv1_f2m53_tm56619371_dac20a85` | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m59-tm943548413-98844ecc` | `icv1_f2m59_tm943548413_98844ecc` | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | `icv1_f2m61_t158598901_ab42b6c5` | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
 | B | `icv1-fp10-t5-192cb216` | `icv1_fp10_t5_192cb216` | 10, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
 | B | `icv1-fp12-t19-d4a315df` | `icv1_fp12_t19_d4a315df` | 32, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
 | B | `icv1-fp14-tm43-158b6914` | `icv1_fp14_tm43_158b6914` | 26, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
@@ -363,6 +525,40 @@ The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 con
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | ic-k16-control | 0/80 | — | — | — | A/A control |
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | K16 / K8 | — | — | — | — | unknown (0 verified pairs) |
 
+## Structured factor-base growth screen, outside tables A–C
+
+The preregistered `EXP-PFDR-2d36f9-R2-FAM` census ran 19,887 deterministic local jobs across 30 cells and five sizes (16–32 bits). It asks whether the coincidence multiplier κ for Dickson, geometric-progression, or quadratic-progression x-bases grows with N fast enough to reach the frozen break-even slope δ* = 0.333. It does not price a complete index-calculus pipeline and has no matched rho arm.
+
+All six structured lines are valid and read `O-SUB-BE`. Their five-rung slopes range from -0.0047 to 0.0068; the largest upper 95% limit is 0.0147, far below 1/3. Self-test and controls C3–C6 pass; the null calibration is n=10, mean 0.22, sd 0.88.
+
+| family | θ | slope of log2 κ on log2 N | 95% interval | reading |
+|:--|--:|--:|:--|:--|
+| Dickson | 0.30 | -0.0047 | [-0.0130, 0.0041] | `SUB-BE` |
+| Dickson | 0.35 | -0.0014 | [-0.0088, 0.0070] | `SUB-BE` |
+| geometric progression | 0.30 | 0.0054 | [-0.0031, 0.0136] | `SUB-BE` |
+| geometric progression | 0.35 | 0.0024 | [-0.0049, 0.0098] | `SUB-BE` |
+| quadratic progression | 0.30 | 0.0066 | [-0.0017, 0.0147] | `SUB-BE` |
+| quadratic progression | 0.35 | 0.0068 | [-0.0004, 0.0144] | `SUB-BE` |
+
+This is negative structural evidence, not a performance promotion: no ranked row moves and rho is not being inferred from an unpriced component. Read the [analysis](../../research/pfdr_other_families_20261101/results/analysis-main.json) and [study limits](../../research/pfdr_other_families_20261101/README.md).
+
+## N83 four-byte root-index loop, outside tables A–C
+
+The plain four-byte ID31 root index and its packed two-bit fingerprint (FP2) variant ran in both alternating orders on the same K1107 base and public point. Every arm completed the full process, recovered the same scalar, and passed independent replay. Ratios below are plain / FP2, so values above 1 favor FP2.
+
+| order | plain / FP2 index build | plain / FP2 whole process | plain wall (s) | FP2 wall (s) |
+|:--|--:|--:|--:|--:|
+| plain → fp2 | 1.001× | 1.017× | 154.066 | 151.435 |
+| fp2 → plain | 1.493× | 1.294× | 250.171 | 193.284 |
+
+The observed index-build range is 1.001–1.493× and the whole-process range is 1.017–1.294×. The host was shared and its load varied substantially; two pairs do not select the K5500 layout. This is a correctness-backed optimization diagnostic, not a Tier 1 result or a matched-rho speedup, so no ranked row moves. Read the [study and limits](../../research/n83_fourbyte_pair_20261027/README.md).
+
+## N83 degree-two image calculus, outside tables A–C
+
+The exact `n83-image-closed-degree-two-fiber` transfer audit is `rejected_by_structural_and_cost_gates`. Generic odd-degree fibers of `phi(u,v)=(u^3,uv+1)` split into closed support degrees 1+2, but their projected labels give only `[3]P=P+[2]P`. Useful relation probability and independent rank per identity are both 0; the collector and timing stages therefore stop under the frozen protocol.
+
+The ordinary ambient genus-three scale is `(4/3)*83`, about approximately 70.17 bits above `0.5*log2(r)`. This is a scoped structural rejection, not zero-cost attack data: no wall time or speedup was measured, and no ranked row moves. A compact growing-degree or adaptive target-local router remains open. Read the [assessment](../../research/n83_image_closed_degree2_20261101/ASSESSMENT.json) and [scope](../../research/n83_image_closed_degree2_20261101/README.md).
+
 ## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)
 
 Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact decomposition oracle, selected on train curves, decided per size on a fresh holdout curve (48 targets × 2 rounds, every arm in one session). Train picked the incumbent `ic-pair` oracle (`mitm:negation_folded=1`) at every size; only N changed. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.
@@ -381,6 +577,38 @@ Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-
 [Report](../../research/prime_base_oracle_tuning_20261029/README.pdf) · [study](../../research/prime_base_oracle_tuning_20261029/).
 
 Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.
+
+## Prime-field k-sum tables against the tuned incumbent (2026-10-30, engineering)
+
+Track: generic decomposition, bounded by sqrt(r), cannot beat rho. Registered protocol; the incumbent and both k-sum families were tuned on separate train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets × 2 rounds, every arm in one session per size). `ksum5-sel` is the k = 5 sum table, `inc-sel` the tuned pair-table incumbent. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation, in the study's pre-2026-11-08 pricing reading (counted table work, table_insert_attempts, is not charged); under the 2026-11-08 default no rank changes but the w > 0 figures move, and the w = 1 distance to rho grows to 6.30x-8.52x. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.
+
+| bits | S holdout mean: inc-sel / ksum5-sel / rho-neg (w = 0) | ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum4-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum5-sel ÷ rho-neg, distance remaining (w = 0 / 0.1 / 1) | pairs |
+|--:|:--|:--|:--|:--|--:|
+| 20 | 10.66 / 7.46 / 1.24 | 0.700 [0.682, 0.718] / 0.685 [0.666, 0.705] / 0.615 [0.591, 0.640] | 0.632 [0.611, 0.654] / 0.633 [0.610, 0.656] / 0.637 [0.606, 0.669] | 5.99 / 5.87 / 5.26 | 192 |
+| 24 | 14.27 / 6.37 / 1.09 | 0.446 [0.432, 0.461] / 0.448 [0.432, 0.464] / 0.454 [0.432, 0.476] | 0.452 [0.440, 0.465] / 0.458 [0.445, 0.472] / 0.486 [0.467, 0.505] | 5.82 / 5.84 / 5.92 | 192 |
+| 28 | 21.45 / 6.96 / 0.95 | 0.324 [0.318, 0.331] / 0.319 [0.312, 0.326] / 0.293 [0.284, 0.304] | 0.336 [0.329, 0.344] / 0.337 [0.329, 0.345] / 0.341 [0.330, 0.353] | 7.33 / 7.12 / 6.16 | 192 |
+| 32 | 32.18 / 6.99 / 0.95 | 0.217 [0.212, 0.222] / 0.218 [0.212, 0.223] / 0.220 [0.212, 0.229] | 0.253 [0.248, 0.258] / 0.256 [0.250, 0.262] / 0.271 [0.262, 0.280] | 7.34 / 7.22 / 6.70 | 192 |
+
+The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that index-calculus baseline. Rho stays ahead at every size and weight (`rho-neg` < `ksum5-sel` < `inc-sel` on 16 of 16 curves); the ÷ rho column is the distance remaining, not a gate. The method is generic, so its limit is BSGS, and it stays above BSGS at every size.
+
+[Report](../../research/prime_ksum_pooled_20261029/report.pdf) · [README](../../research/prime_ksum_pooled_20261029/README.md) · [study](../../research/prime_ksum_pooled_20261029/).
+
+Validated with caveats: replay certificate (count-identical replay of all 8 sessions, 9,216 of 9,216 replays identical, on an x86 Linux host with an ecbench built from a clean archive of 6edb2cb36d), validator report (independent recompute) and the matched rho reference with the §5a band are filed in `research/prime_ksum_pooled_20261029/VALIDATION.json`. Scope: the counted unit under the pre-2026-11-08 reading; 16 fresh public synthetic curves, one recording host, isolation L0, no external ECDLP tool run. One non-blocking discrepancy in the validator report: README §4(c) gives inc-w0 / inc-rec at 32 bits as 0.88, the records give 0.87 (0.8737); a secondary derived remark, no registered test or headline uses it.
+
+## Component speed-up: membership filter on the packed pair table (2026-10-29, engineering)
+
+Frozen protocol (backlog XP-20261029-packed-filter); track generic (prime-table; docs/ic/SWEEPER.md, Tracks). Label: whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table, `mitm-prime-blocked:m=2,filter=1` against `mitm-prime-blocked:m=2` at b = 32. It moves no row of tables A–C and is ranked against nothing in them.
+
+- **Wall:** corrected 0.9601 [0.9569, 0.9633], that is 3.99% less wall per charged GAE (95%: 3.67% to 4.31%), at identical charged GAE.
+- **`bitop/v1`** +0.301%: the rise is build-side only; the probe-side filter test is not counted separately; the build's pass over the empty slots is not counted.
+- **S′ `dgbf / dgb`** 1.0000 / 1.0505 / 1.3586 at w = 0 / 0.1 / 1: `dgbf`'s counted cost exceeds `dgb`'s at w > 0 by that ratio; `table_insert_attempts` is unpriced on every IC arm, identically between `dgb` and `dgbf`, a gap that predates this study; these figures decide nothing.
+- **Distance remaining at 32 bits:** `dgbf / rho-neg` 31.47 / 31.50 / 31.63 and `dgb / rho-neg` 31.47 / 29.99 / 23.28. `rho-neg` is cheaper than both IC arms at every weight on every curve, so the §5a band permits that ranking; `dgbf` is never ranked ahead of `dgb` in the counted unit.
+- **Scope:** c8a.2xlarge (AMD EPYC 9R45) on EKS, L2; two curves at 32 bits; one session, 288 pairs.
+- **Other sizes:** At 24 bits the same comparison read a regression (1.0032 [1.0006, 1.0058]); 28 bits is undecidable (infrastructure); see the README.
+
+[README](../../research/ic_packed_filter_20261029/README.md) · [report PDF](../../research/ic_packed_filter_20261029/REPORT.pdf).
+
+validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_packed_filter_20261029/VALIDATION.json); single session, not replicated. Caveats: the validator re-priced the bitops with its own code rather than re-running `ecbench work`; the image digest is bound through the binary hashes, not pod status
 
 ## Linear-algebra engine, outside tables A–C
 
@@ -404,6 +632,15 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 4,096 | 8.40 s | 3.82 s | 1.04 s | 0.27 [0.23, 0.32] | 0.12 [0.10, 0.15] | 0.16 | 0.63 → 0.34 GiB |
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
+
+## Aimed-subset gather in relation collection, outside tables A–C
+
+`ic price` on icv1-f2m53-tm56619371-dac20a85 (rule v3 `k0n53/T01`, aimed m = 3 collection): main against the change that gathers the aimed subset's coordinates once per unit instead of on every trial (class: engineering, #2448). On these params every arm counts the same operations and recovers the same logarithm, so S and every row above are unchanged; the board's rule v7 row for this curve was timed before the change and is not re-priced. Callgrind instructions per process, main / candidate: 1.023 at n53, 1.029 at n61. Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where its lower end clears 1 and the same-session A/A's upper end. Intervals are corrected: the bootstrap as first run drew only odd-numbered rounds (CORRECTION.md in the study); a verdict that holds only under the correction is marked marginal and not claimed. 126 processes, none contended. validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261029-ic-aimed-gather/VALIDATION.json). Study: [research/ic_aimed_gather_20261023/](../../research/ic_aimed_gather_20261023/).
+
+| metric | 2026-10-29 A/B | rounds > 1 | 2026-10-29 A/A (42 rounds) | verdict | before: 2026-10-23 A/B | before: A/A (5 pairs) | before: verdict |
+|:--|:--|--:|:--|:--|:--|:--|:--|
+| collect phase | 1.093 [1.068, 1.136] | 38 / 42 | 0.999 [0.977, 1.026] | **established** | 1.111 [1.082, 1.149] | 0.998 [0.944, 1.087] | not established |
+| whole set-up | 1.042 [1.020, 1.082] | 29 / 42 | 0.985 [0.946, 1.015] | marginal (+0.005), not claimed | 1.037 [1.018, 1.080] | 0.993 [0.953, 1.121] | not established |
 
 ## Quartic-twist pair index, outside tables A–C
 
@@ -486,6 +723,78 @@ A separate exact 24-action cache diagnostic found only 2 same-residual orbit col
 
 On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay reduces the plain-S₅ solve's mean C₄ from 1.209e+12 to 8.690e+10 counted Fₚ multiplications (13.90×; class: engineering). The committed arm covers 13 solves; the replay arm's mean covers 12 later solves, with 13 total outputs oracle-equal. It includes 11 shape replays and 1 fallback. Paired ratios are 13.90× by ratio of means and [7.24, 15.37] across paired instances. This is a solver-stage change: no full-pipeline row or curve verdict changes. Study: [research/s5_plain_c4_options_20261019/](../../research/s5_plain_c4_options_20261019/); [report](../../research/s5_plain_c4_options_20261019/REPORT.pdf).
 
+## Multi-target IC against multi-target rho: the order flips with the hash price, outside tables A–C
+
+Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^32, 33 fresh curves, 22 paired configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, 1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four ic5 variants (4-term x-only table, paired trials with one shared inversion; with or without retention and random-walk offsets); the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, 10 runs per configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The IC is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a decision is unranked. Class: multi-target method. validated: replay certificate, validator report and the rho reference (cheapest standard multi-target rho of this harness: retention rho or distinguished-point rho) with the §5a band (benchmarks/20261112-mt-fieldops-v5/VALIDATION.json).
+
+| bits | T | IC/rho h=0 | h=0.1 | h=1 | §5a | IC/BSGS h=0 | h=1 |
+|--:|--:|--:|--:|--:|:--|--:|--:|
+| 24 | 1024 | 1.146 [1.138, 1.152] | 1.054 [1.046, 1.062] | 0.748 [0.742, 0.755] | unranked | 1.28 | 1.40 |
+| 24 | 4096 | 1.095 [1.089, 1.096] | 1.028 [1.022, 1.031] | 0.765 [0.761, 0.768] | unranked | 1.18 | 1.33 |
+| 24 | 16384 | 1.063 [1.060, 1.064] | 1.020 [1.016, 1.022] | 0.799 [0.796, 0.802] | unranked | 1.11 | 1.26 |
+| 28 | 1024 | 1.139 [1.131, 1.151] | 1.029 [1.020, 1.040] | 0.731 [0.724, 0.736] | unranked | 1.31 | 1.44 |
+| 28 | 4096 | 1.136 [1.127, 1.142] | 1.035 [1.029, 1.037] | 0.731 [0.724, 0.736] | unranked | 1.27 | 1.40 |
+| 28 | 16384 | 1.096 [1.090, 1.100] | 1.015 [1.010, 1.018] | 0.739 [0.735, 0.743] | unranked | 1.20 | 1.35 |
+| 32 | 1024 | 1.159 [1.143, 1.173] | 1.037 [1.024, 1.052] | 0.728 [0.717, 0.735] | unranked | 1.36 | 1.47 |
+| 32 | 4096 | 1.130 [1.126, 1.138] | 1.014 [1.010, 1.021] | 0.717 [0.710, 0.718] | unranked | 1.31 | 1.43 |
+| 32 | 16384 | 1.101 [1.097, 1.108] | 0.998 [0.992, 1.005] | 0.713 [0.711, 0.716] | unranked | 1.26 | 1.41 |
+
+Study: [research/mt_fieldops_v5_20261112/](../../research/mt_fieldops_v5_20261112/); [report](../../research/mt_fieldops_v5_20261112/REPORT.pdf); source `research/mt_fieldops_v5_20261112/results/holdout/summary.json`. v4, without native work priced: [research/mt_fieldops_v4_20261112/](../../research/mt_fieldops_v4_20261112/). Earlier rows were measured against a rho without retention: IC5 (v3, [research/mt_fieldops_v3_20261111/](../../research/mt_fieldops_v3_20261111/); its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [research/mt_rho_start_fix_20261111/](../../research/mt_rho_start_fix_20261111/)).
+
+## 14 November live-source frontier reconciliation (diagnostic; no ranked-row change)
+
+The live source tree now exposes **105 top-level ECBench methods** and **34 nested algorithms** (21 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.
+
+### Solver and GPU diagnostics
+
+The newly registered `primo-smt` backend is correctness-qualified for binary-field `descent-algebraic` systems and returns one independently checked Boolean model. It has no matched performance record and no prime-field route, so it changes the implementation census but not the measured frontier. [Integration boundary](../../integrations/primo/README.md).
+
+The validated `fes-then-batched` composition costs 0.739–0.889× inherited F4 at the calibration points, but remains 35.24–3012.56× matched rho. Across the §5a band its strict order against inherited F4 is unresolved, so this is a solver-local result, not a frontier promotion. [Study](../../research/fes_then_batched_20261112/README.md).
+
+The GPU FES end-to-end probe is one-pod, `[pcc:unverified]`, with no independent replay. Wall time improves sharply while counted work becomes worse, so the wall column cannot substitute for the ranked cost column:
+
+| instance | GPU FES counted / inherited F4 | inherited-F4 wall / GPU wall | CPU-FES wall / GPU wall | inherited F4 / rho | GPU FES / rho |
+|:--|--:|--:|--:|--:|--:|
+| char2-n25 | 53.0× | 10.4× | 44.1× | 4362× | 231367× |
+| char2-n29 | 106.0× | 23.1× | — | 30856× | 3270693× |
+| koblitz-n23 | 10.0× | 17.7× | 12.3× | 2014× | 20054× |
+
+At kernel scope, Gray-code FES is 18.6× (n=26) and 25.8× (n=30) faster than the old kernel; block-six then adds 3.88× at n=30 and 4.11× at n=32 (about 100× cumulative at n=30). Shared-1024 Macaulay is 3.41–4.15× faster than the old global kernel; the later 2-D change adds only 1.11–1.12×. These are component results only. [GPU E2E report](../../research/ic_gpu_e2e_20261113/REPORT.md).
+
+### Rho, root finding, transfer and whole-Jacobian probes
+
+The unverified L0 rho lane diagnostic trades more counted operations for lower wall time: lanes=8 is 1.043× operations and 0.761× E2E wall; lanes=32 is 1.149× operations and 0.639× wall. The §5a ranking still selects base negation rho. Prime batched root finding preserves counted S exactly and changes wall ns/GAE by 0.486× [0.468, 0.504]. [Audit](../../docs/perf/20261112-rust-deep-audit.md).
+
+The admitted transfer remeasurement has **0/162 below rho**, 156 above and 6 unresolved lower-bound rows. The whole-Jacobian L0 probe is above the calibrated band in 7/7 cells for both arms and has a minimum group-only ratio of 18.0×, but remains unresolved because the frozen slope rule fails (A slope 0.421, CI lower -0.070; B slope -0.053, CI lower -0.654).
+
+### Current construction bottlenecks
+
+The table-free `lin21-ht` collector uses 15.7 MB at n=41 versus 2558.1 MB for the pair-table floor, and reaches n=59 at 518.7 MB. Its online count is still 2.89–10.87× the floor; the counted slope delta 0.0006 has CI [-0.0004, 0.0016], crossing zero. This removes a memory barrier, not the work barrier.
+
+- `k0n53` folded-pair construction: 34.58 ns/pair; streaming plus sort/fill is 26.70 ns/pair (77.2% of the whole).
+- `k0n61` folded-pair construction: 35.48 ns/pair; streaming plus sort/fill is 26.73 ns/pair (75.4% of the whole).
+
+The current Top filter layout is identity-equivalent in these A/B rounds and faster to build than the frozen Low layout (Low build time over Top build time; above 1 means Top builds faster):
+
+| cell | Low / Top build time [95%] | rounds | dropped | identity mismatches |
+|:--|--:|--:|--:|--:|
+| k0n53 | 1.104 [1.070, 1.143] | 41 | 1 | 0 |
+| k0n61 | 1.142 [1.098, 1.165] | 42 | 0 | 0 |
+
+The old ECBench IDs therefore remain frozen on Low while the explicit `_v2` IDs name Top; this prevents a silent benchmark mutation. The prime-leads chase remains prospective/inconclusive and has no sub-square-root prime result. All entries in this reconciliation are diagnostic unless separately marked admitted above.
+
+## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C
+
+Writing the Kummer membership and S₅ in the elementary symmetric functions before expansion (m = 4, N = 12, f4_fp, p = 786433, two random targets, uncontended) reduces the F4 stage from 1.102e+11 to 4.010e+05 counted field operations (2.75e+05×), the widest matrix from 21,619 to 3,663 columns (5.90×) and the time per system from 70.2 s to 0.0087 s (8.07e+03×). Class: solver-stage diagnostic; no pipeline is priced and no curve verdict changes. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+
+| N | arm | D | last productive | widest matrix | field ops | s per system |
+|--:|:--|--:|--:|--:|--:|--:|
+| 12 | plain-chain | 7 | 6 | 21,619 | 1.102e+11 | 70.2 |
+| 12 | symmetric | 8 | 5 | 3,663 | 4.010e+05 | 0.0087 |
+| 16 | symmetric | 8 | 6 | 13,926 | 1.079e+10 | 11.8 |
+
+Study: [research/pkm_symmetric_lead1_20261026/](../../research/pkm_symmetric_lead1_20261026/); source `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl`.
+
 ## Large-prime conductor-gap counted diagnostics
 
 Copied from native analysis: eight independent one-target workloads per fixed curve; no transported targets. Counted S has unpriced native work. These observations do not enter tables A–C or change a full-cost ranking.
@@ -494,6 +803,17 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 |---:|---:|---|
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
+
+## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC
+
+Component speed-up, class engineering: `f4_fp` before and after #1717 in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same seeds and the same relations. Both builds recorded `solved=true` and `correct=true` for every DLP row (`research/f4_fp_ic_effect_20261018`, run-20261018T1548Z); the archived rows have no recovered-scalar certificate for an independent replay. It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
+
+| p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 53 | 1 | 31 | 4734 | 936.9 | 5.05 | 4297 | 850 |
+| 53 | 2 | 33 | 2121 | 425.2 | 4.99 | 1843 | 370 |
+| 101 | 1 | 53 | 1455 | 287.5 | 5.06 | 981 | 194 |
+| 101 | 2 | 50 | 2370 | 466.4 | 5.08 | 1897 | 373 |
 
 ## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho
 
@@ -652,6 +972,105 @@ Crossover against negation-map rho:
 - DL, wall: resolved from q = 8191, interpolated q* = 5704.2 [1495.3, 7612.6]
 
 
+## GHS-weak E0/F_{q^3}: c_D = 1.7 with a fixed-exponent square root against the frozen DL, outside tables A–C
+
+Same instances as the N4 v2 section (k = 18..22, seeds 1–3): the double-large-prime factor base shrunk from c_D = 2.0 to 1.7 and the per-pair square root computed by a fixed addition chain (same values). Cold M-eq of the new configuration divided by the frozen DL on the same instance; geometric mean over seeds, with mod-ell and F_q additions priced at 0 (the frozen model), 0.5 and 1 M-eq each. ✓ = below 1 at every seed. Class: component improvement over the frozen N4 v2 DL (restricted to the GHS-weak family). validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json).
+
+| IC arm | k | additions 0 | 0.5 | 1 |
+|:--|--:|--:|--:|--:|
+| DL | 18 | 0.726 ✓ | 0.814 ✓ | 0.860 ✓ |
+| DL | 19 | 0.737 ✓ | 0.831 ✓ | 0.877 ✓ |
+| DL | 20 | 0.694 ✓ | 0.796 ✓ | 0.848 ✓ |
+| DL | 21 | 0.710 ✓ | 0.812 ✓ | 0.862 ✓ |
+| DL | 22 | 0.681 ✓ | 0.794 ✓ | 0.851 ✓ |
+| DL1 | 18 | 0.729 ✓ | 0.878 ✓ | 0.942 ✓ |
+| DL1 | 19 | 0.754 ✓ | 0.913 ✓ | 0.975 ✓ |
+| DL1 | 20 | 0.668 ✓ | 0.846 ✓ | 0.921 ✓ |
+| DL1 | 21 | 0.700 ✓ | 0.871 ✓ | 0.941 ✓ |
+| DL1 | 22 | 0.644 ✓ | 0.841 ✓ | 0.922 ✓ |
+| D | 18 | 1.092 | 1.100 | 1.106 |
+| D | 19 | 1.122 | 1.127 | 1.130 |
+| D | 20 | 1.072 | 1.083 | 1.090 |
+| D | 21 | 1.089 | 1.098 | 1.104 |
+| D | 22 | 1.078 | 1.089 | 1.098 |
+
+DL with both changes against the frozen negation-map rho at k = 22 (mean cold M-eq, §5a band): w = 0: 0.0027, w = 0.1: 0.0025, w = 1: 0.0018.
+
+Study: [research/quartic_dl1_cd_sqrt_20261113/](../../research/quartic_dl1_cd_sqrt_20261113/); [report](../../research/quartic_dl1_cd_sqrt_20261113/REPORT.pdf); source `research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json`. Wall time is not claimed (local L0 runs; CPU diagnostic in the study).
+
+
+## GHS-weak E0/F_{q^3}: relation-stage speed-up at identical counted work, outside tables A–C
+
+Same instances and configuration as the section above (c_D = 1.7, square-root chain): the relation stage rewritten with open-addressing hash tables, no per-candidate allocation, prefetch of large-prime vertex slots and a compiled square-root chain. Every counted field is identical to v3, so cold M-eq and the distance to rho do not move; the gain is CPU time. Ratio of relations-stage CPU (and DL phase-sum CPU) to v3 on the same unit, one unit at a time on a shared 4-vCPU container (L0), two passes in reversed order; A/A floor 0.207. Pre-registered decision: SUPPORTED. Class: phase speed-up (relation stage, CPU time) at identical counted work; GHS-weak family only. validated: replay certificate (counted replay and an independent timing replay), validator report and the negation-map rho reference (research/ic_gw_fasthash_20261114/validation/VALIDATION.json).
+
+| k | relations CPU (geomean over seeds) | worst seed | DL phase-sum CPU |
+|--:|--:|--:|--:|
+| 18 | 0.493 | 0.521 | 0.838 |
+| 19 | 0.545 | 0.561 | 0.884 |
+| 20 | 0.500 | 0.509 | 0.881 |
+| 21 | 0.467 | 0.496 | 0.874 |
+| 22 | 0.463 | 0.470 | 0.796 |
+
+Study: [research/ic_gw_fasthash_20261114/](../../research/ic_gw_fasthash_20261114/); [report](../../research/ic_gw_fasthash_20261114/REPORT.pdf); source `research/ic_gw_fasthash_20261114/analysis.json`. Times are L0 (local container, not an isolated host). The DL phase sum leaves out the instance search and the D and DL1 linear algebra; whole-process CPU fell only to 0.90–0.96 of v3 in the validator's timing replay (relation stage 0.43–0.50 there).
+
+
+## GHS-weak E0/F_{q^3}: block Lanczos without two redundant products, outside tables A–C
+
+Same instances and configuration as the two sections above (c_D = 1.7, square-root chain, fast relation stage). The DL arm's block Lanczos (width 4) no longer computes MV_prev^T MV (it equals columns of this iteration's V^T MV by M-orthogonality, exact in every path) or V_i^T V_0 for i >= 2 (it follows from the three-term recurrence's k x k coefficients while no column has been narrowed away; the validator found the frozen guard too weak in general, and amendment 1, used here, falls back to the direct product from any narrowing on, costing at most 0.04% more). Every other counted field, the iteration count and every logarithm are unchanged. Cold M-eq of the DL arm divided by the previous configuration on the same instance, k = 18..22, seeds 1–6; geometric mean (worst seed) with additions priced at 0, 0.5 and 1 M-eq. Pre-registered decision: improvement. Class: component improvement (linear algebra) over the previous GHS-weak DL configuration; GHS-weak family only. validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_gw_bl_reuse_20261115/validation/VALIDATION.json).
+
+| k | additions 0 | 0.5 | 1 | mod-ell multiplications in linear algebra |
+|--:|--:|--:|--:|--:|
+| 18 | 0.818 (0.822) | 0.864 (0.866) | 0.883 (0.886) | 0.739 |
+| 19 | 0.811 (0.814) | 0.862 (0.865) | 0.884 (0.886) | 0.735 |
+| 20 | 0.815 (0.816) | 0.866 (0.866) | 0.886 (0.887) | 0.732 |
+| 21 | 0.819 (0.819) | 0.869 (0.870) | 0.889 (0.891) | 0.730 |
+| 22 | 0.813 (0.813) | 0.868 (0.869) | 0.889 (0.891) | 0.729 |
+
+DL against the frozen negation-map rho at k = 22 (mean cold M-eq over seeds 1–3, §5a band): w = 0: 0.00222, w = 0.1: 0.00207, w = 1: 0.00170 (before: 0.00274, 0.00246, 0.00183).
+
+Study: [research/ic_gw_bl_reuse_20261115/](../../research/ic_gw_bl_reuse_20261115/); [report](../../research/ic_gw_bl_reuse_20261115/REPORT.pdf); source `research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json`. Counted operations (host-independent); local L0 runs.
+
+
+## GHS-weak E0/F_{q^3}: normalised-coordinate relation stage and scalar Lanczos dot reuse, outside tables A–C
+
+Same instances and configuration as the sections above. (1) Factor-base and residual points have first coordinate 1, so the relation stage no longer multiplies by that coordinate (or by its square) and forms 4·g1 by two additions: waste removed from the baseline rather than a new algorithm, and the operations are really not executed. (2) Scalar Lanczos (arms D and DL1) takes v^T v_prev = s from local A-orthogonality and w^T y from the three-term recurrence (exact: scalar Lanczos never narrows). Same relations, graph, matrix, iterates and logarithms. Cold M-eq with both changes divided by the previous configuration on the same instance, k = 18..22, seeds 1–6; geometric mean (worst seed), additions priced at 0, 0.5 and 1 M-eq. The headline DL arm gains from (1) only. Class: component improvement (relation stage; scalar linear algebra) over the previous GHS-weak configuration; GHS-weak family only. validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_gw_nrm_lz_20261115/validation/VALIDATION.json).
+
+| IC arm | k | additions 0 | 0.5 | 1 |
+|:--|--:|--:|--:|--:|
+| DL | 18 | 0.961 (0.962) | 0.979 (0.980) | 0.987 (0.987) |
+| DL | 19 | 0.958 (0.959) | 0.979 (0.979) | 0.987 (0.987) |
+| DL | 20 | 0.959 (0.959) | 0.979 (0.979) | 0.987 (0.987) |
+| DL | 21 | 0.959 (0.959) | 0.979 (0.980) | 0.987 (0.987) |
+| DL | 22 | 0.957 (0.957) | 0.979 (0.979) | 0.987 (0.987) |
+| DL1 | 18 | 0.850 (0.856) | 0.917 (0.919) | 0.939 (0.941) |
+| DL1 | 19 | 0.835 (0.841) | 0.915 (0.918) | 0.939 (0.941) |
+| DL1 | 20 | 0.843 (0.845) | 0.918 (0.919) | 0.941 (0.942) |
+| DL1 | 21 | 0.849 (0.849) | 0.921 (0.922) | 0.943 (0.944) |
+| DL1 | 22 | 0.838 (0.839) | 0.920 (0.921) | 0.943 (0.944) |
+| D | 18 | 0.971 (0.973) | 0.974 (0.976) | 0.976 (0.977) |
+| D | 19 | 0.972 (0.972) | 0.975 (0.975) | 0.977 (0.977) |
+| D | 20 | 0.972 (0.973) | 0.975 (0.975) | 0.977 (0.977) |
+| D | 21 | 0.973 (0.974) | 0.976 (0.977) | 0.978 (0.978) |
+| D | 22 | 0.974 (0.974) | 0.976 (0.977) | 0.978 (0.979) |
+
+DL against the frozen negation-map rho at k = 22 (mean cold M-eq over seeds 1–3, §5a band): w = 0: 0.00213, w = 0.1: 0.00199, w = 1: 0.00168 (before: 0.00222, 0.00207, 0.00170).
+
+Study: [research/ic_gw_nrm_lz_20261115/](../../research/ic_gw_nrm_lz_20261115/); [report](../../research/ic_gw_nrm_lz_20261115/REPORT.pdf); source `research/ic_gw_nrm_lz_20261115/analysis.json`. Counted operations (host-independent); local L0 runs.
+
+
+## GHS-weak E0/F_{q^3}: headline arm DL1 (owner decision 2026-11-15), outside tables A–C
+
+The double-large-prime IC on this family is measured with three linear-algebra arms in every unit: D (plain Lanczos), DL1 (structured Gaussian elimination + scalar Lanczos) and DL (structured Gaussian elimination + block Lanczos of width 4). Block Lanczos's vector work grows with its width while its matrix work is the same, so under the counted model DL1 is cheaper than DL at every size and addition price; block width buys parallel wall time, which the counted model does not value. By owner decision (2026-11-15) the headline arm of the GHS-weak sections is DL1 from now on. This is an arm choice, not an improvement: no cost changed, and the earlier sections keep their DL figures. evidence: research/ic_gw_nrm_lz_20261115/validation/VALIDATION.json (validated).
+
+| w | DL, mean cold M-eq (k = 22) | DL1 | rho-neg (frozen band) | DL / rho | DL1 / rho |
+|--:|--:|--:|--:|--:|--:|
+| 0 | 8.077e+08 | 4.413e+08 | 3.796e+11 | 0.00213 | 0.00116 |
+| 0.1 | 9.777e+08 | 6.113e+08 | 4.909e+11 | 0.00199 | 0.00125 |
+| 1 | 2.508e+09 | 2.141e+09 | 1.493e+12 | 0.00168 | 0.00143 |
+
+Configuration: the latest GHS-weak configuration (c_D = 1.7, square-root chain, fast relation stage, block Lanczos reuse, normalised-coordinate relation stage, scalar Lanczos reuse); seeds 1–3; [pcc:unverified].
+
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
@@ -668,6 +1087,21 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 [Frozen IC1 rows and candidate identities](../../research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json). The cold process includes base and index construction, relation rank, target recovery and producer verification. Rho's interval starts with its target-dependent walk and ends with scalar verification. This wall-time panel is kept separate from Tables A–C and their operation-unit S rankings.
 
 
+<!-- native-xor-component:begin -->
+## Native N83 indexed XOR component (2026-10-19), outside tables A–C
+
+Engineering component on icv1-f2m83-tm6151469093347-debefd74 (a=0). Seven verified observations per solver; all native search and selector signatures agree. Actual models, original constraints and original group sums replay independently.
+
+Dense native solve wall: median 182074.425421 ms, range 177459.286074–216393.804510 ms. Indexed native solve wall: median 17767.144183 ms, range 17731.849428–17862.255509 ms. Five paired dense/indexed ratios: 12.163633, 9.994469, 9.958668, 10.169527, 10.193249.
+
+Counted indexed word updates: 14,064,862 versus native-derived dense 5,551,462,287 (row operations × words per row); ratio 394.704355. This is deterministic component work, not total IC cost.
+
+CryptoMiniSat 5.17.0 is faster: reported solve/simplify CPU 2810–2840 ms. Candidate solve wall / external algorithm CPU ratios: 6.286300, 6.274116, 6.349290, 6.278143, 6.289527. These are different timer kinds; external process parsing/startup is separate. No fastest-tool claim.
+
+Same host, one thread, CPU15/SMT31 reservation, quiet preflight, 1CPU/4GiB guarded Docker. Wall observations are descriptive: A/A drift and missing worker context-switch/fault accounting prevent an automatic L2 claim. Natural K2048/K4096 trials at 1000 and separately 10000 conflicts each returned zero models, relations and rank. No natural winner, full-cold runtime or matched-rho ratio.
+
+[Native frozen summary](../../research/koblitz_n83_factor_base_sweep_20261008/verification/native-xor-indexed-20261019/SUMMARY.json) — SHA256 `ab4c77811a681437494b184c12eabd9fdc834eba1c524de79c8b4b664087f41c`.
+<!-- native-xor-component:end -->
 ## Prime ladder in bitop/v1, 16–40 bits: index calculus with a per-size base, outside tables A–C
 
 The bitop/v1 study fixed every index-calculus base at 32 or 128 abscissae. This study lets the pair-table arm (`ic-pair-rule`) and the m = 3 root-finding arm (`ic-rootfind-m3-rule`) use, per bit size, the base with the smallest mean bitop/v1 cost on a separate train panel, frozen before the hold-out sessions, and measures every arm on 25 deterministic a = −3 prime-order curves from 16 to 40 bits. `ic-pair-b32` keeps the fixed 32-point base as the before mark.
@@ -788,13 +1222,14 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `c28c21260d1bc66f…`
+- `docs/ic/progress-timeline.json` — sha256 `f864a80b77f1f5f6…`
 - `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
 - `research/ic_single_target_20260930/analysis.json` — sha256 `109326d7c2882b71…`
 - `research/ic_tool_program/rule/v7/analysis.json` — sha256 `af81dd9ab2879632…`
+- `research/ic_tool_program/rule/v9/analysis.json` — sha256 `5773ba15d4512ebb…`
 - `docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json` — sha256 `2271c4aa5236e2bd…`
 - `research/ecbench_n37_rank_columns_20261004/RESULT.json` — sha256 `f7b950edc74978cb…`
 - `research/ecbench_n37_k8_k16_20261004/DECISION.json` — sha256 `c4a33ffd9045a479…`
@@ -808,16 +1243,51 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json` — sha256 `69ca54385c62a50e…`
 - `research/f4_f5_f6_cross_family_20261011/ANALYSIS.json` — sha256 `143247c6b81d3539…`
 - `research/ecbench_e2e_frontier_20261031/establishment/certificate.json` — sha256 `fb5759832dd0f80a…`
+- `research/pfdr_other_families_20261101/results/analysis-main.json` — sha256 `2ccae7f1ac7a97a8…`
+- `research/pfdr_other_families_20261101/README.md` — sha256 `2697b3eb35f65e6d…`
+- `research/n83_fourbyte_pair_20261027/runs/plain_fp2/independent_replay.json` — sha256 `dacd097373ef436c…`
+- `research/n83_fourbyte_pair_20261027/runs/fp2_plain/independent_replay.json` — sha256 `62960a9ec213b858…`
+- `research/n83_fourbyte_pair_20261027/README.md` — sha256 `51e6392e1c20509d…`
+- `research/n83_image_closed_degree2_20261101/ASSESSMENT.json` — sha256 `4064a29534615349…`
+- `research/n83_image_closed_degree2_20261101/README.md` — sha256 `6de3fa411f8c52d1…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
+- `research/f4_fp_ic_effect_20261018/summary.json` — sha256 `7eff13424e0e9b1a…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_main.json` — sha256 `bca0162f22f19c74…`
+- `research/f4_fp_ic_effect_20261018/reports/run-20261018T1548Z/raw/dlp_new.json` — sha256 `114f27cd5a3eb091…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
+- `research/glv_k4_pipeline_d4_20261017/summary.json` — sha256 `369769457fdf5657…`
+- `research/glv_gls_v4_20261018/summary.json` — sha256 `c8de6d58008176d6…`
+- `research/e31_chain_solve_20261024/summary.json` — sha256 `0ebac1878e112a7d…`
+- `experiments/32_walk_karatsuba/summary.json` — sha256 `b20666d943bd0c3e…`
+- `experiments/35_invariants_lite/summary.json` — sha256 `62eb026c0dd363a6…`
+- `experiments/36_handover_ladder/summary.json` — sha256 `342fe7c9f0b1d120…`
+- `experiments/37_solver_b_pivot_count/summary.json` — sha256 `d95a3ce1c2032805…`
+- `experiments/38_twist24_cheap_rep/summary.json` — sha256 `0f8ebdeecee3c4a7…`
+- `experiments/47_macaulay_entries/summary.json` — sha256 `c878e26ce3064774…`
+- `experiments/48_twist24_shortfall/summary.json` — sha256 `041270b2abc1233e…`
+- `experiments/46_pivot_rules_confirm3/summary.json` — sha256 `79aa1095c052299d…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/ecbench_generator_orbit_20261022/figures/summary.json` — sha256 `c4f567d49a2875e7…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/ecbench_lazy_columns2_20261018/figures/ratios.json` — sha256 `e97bc0f02c39695a…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
+- `research/ic_cover_weakclass_20261023/summary.json` — sha256 `3fa28e7ff48dc590…`
+- `research/ic_cover_weakclass_20261023/validation/rho-neg.json` — sha256 `41b2bcd995ec1595…`
+- `research/jv_sieve_line_vs_rho_20261103/fit.json` — sha256 `0a83239fe76f0502…`
+- `research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json` — sha256 `06b648eb1b7beacb…`
+- `research/ic_tableb_ksum_20261115/summary.json` — sha256 `12e525b585794584…`
+- `research/ic_tableb_binary_ksum_20261115/summary.json` — sha256 `adaee4d13ea5575f…`
+- `research/ic_ksum_prune_20261115/summary.json` — sha256 `31f140297b9e4bd6…`
+- `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
+- `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
+- `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`
+- `research/ic_d4_char2_lever_20261023/results/cmp-m14-ic-base__ic-lever.json` — sha256 `f0a9ddb6f02528e6…`
 - `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
+- `research/ic_aimed_gather_20261023/aa2_20261029/summary.json` — sha256 `4be9dd4755ad6bb2…`
+- `research/ic_aimed_gather_20261023/summary.json` — sha256 `a3e06802bada65df…`
+- `research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json` — sha256 `6df1dfcc98784b7b…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json` — sha256 `706bc2efaf2c1a36…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json` — sha256 `baddefec00f04f0b…`
@@ -850,9 +1320,33 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json` — sha256 `4772cf301a459700…`
 - `experiments/hyperelliptic_sparse_solve_r7/fits.json` — sha256 `4953de656e198a89…`
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
+- `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl` — sha256 `4360d61a47960810…`
+- `research/mt_fieldops_v5_20261112/results/holdout/summary.json` — sha256 `130f9c0da9b3546b…`
+- `research/fes_then_batched_20261112/validation/headline.json` — sha256 `468787a41a6aa47b…`
+- `research/fes_then_batched_20261112/README.md` — sha256 `6dc894448c5dcbff…`
+- `research/ic_gpu_e2e_20261113/results.json` — sha256 `9ec25e5885ed5cb5…`
+- `research/ic_gpu_e2e_20261113/REPORT.md` — sha256 `6146ddab0f94a6d1…`
+- `research/ic_gpu_measure_20261112/results.json` — sha256 `23ddce3bb25d9594…`
+- `research/ic_gpu_measure_20261112/results2.json` — sha256 `e39fadca413cea84…`
+- `docs/perf/20261112-rust-deep-audit.md` — sha256 `e995c613c4a3e50c…`
+- `research/negation_remeasure_20261113/summary.json` — sha256 `34c71b094865a835…`
+- `research/negation_remeasure_20261113/VALIDATION.json` — sha256 `eba6273e3ff0f482…`
+- `research/full_jacobian_ic_20261113/full_jacobian.json` — sha256 `e65114ea8bf019ac…`
+- `research/groebner_free_matched_20261113/SUMMARY.json` — sha256 `c69cfd5628ea8e20…`
+- `research/ic_tool_program/explorations/build-steps-20261113/summary.json` — sha256 `34edc872ae14d24b…`
+- `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
+- `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
+- `src/cryptanalysis/ecbench/methods.rs` — sha256 `5df3bdcdde3f43a0…`
+- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `3dbda3647cb57390…`
+- `integrations/primo/README.md` — sha256 `c75c86afe2f82334…`
+- `src/cryptanalysis/ecbench/optimization.rs` — sha256 `ad90945be0c09c37…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
+- `research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json` — sha256 `d363ee50d3da05c2…`
+- `research/ic_gw_fasthash_20261114/analysis.json` — sha256 `504ae961cf2d994b…`
+- `research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json` — sha256 `d8db1947a8082a94…`
+- `research/ic_gw_nrm_lz_20261115/analysis.json` — sha256 `340a83a64dbc1249…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
@@ -861,7 +1355,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `88390d7b472098e3…`
+- `docs/curves/registry.json` — sha256 `c0e1027ac8023409…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
@@ -948,3 +1442,193 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_aa_v1.json` — sha256 `8f306ff8388bddaf…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_v1.json` — sha256 `0e21b267b9612dcc…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_aa_v1.json` — sha256 `0e21b267b9612dcc…`
+## k = 4 decomposition oracle on curves with rational 2-torsion, outside tables A–C
+
+Before: E19: tau_T line, weighted D4 solve (degree 26, quotient 512). After: E24: full-2-torsion V4 line, V4-invariant solve (degree 11, quotient 64). Both end to end over F_p^4 (10 and 12 curves, every logarithm verified), every phase charged in F_p multiplications against 16 matched negation walks per curve. Handover from each pipeline's own constants: 2^116.7 → 2^90.1 (extrapolated). Class: engineering, a constant; every row still 1.31e+04–1.69e+05× slower than rho. Read the [report](../../research/glv_k4_pipeline_d4_20261017/REPORT.pdf) and [summary](../../research/glv_k4_pipeline_d4_20261017/summary.json).
+
+| p | log2 n | E19 S/rho | E24 S/rho | E19 / E24 (by seed) | E19 C per call | E24 C per call |
+|--:|--:|--:|--:|--:|--:|--:|
+| 53 | 20.9 | 7.08e+06–8.75e+06 | — | — | 1.37e+09–1.37e+09 | — |
+| 101 | 24.6 | 5.85e+06–6.33e+06 | 3.43e+04–1.69e+05 | 37–170 | 1.39e+09–1.39e+09 | 1.62e+06–1.62e+06 |
+| 149 | 26.9 | 3.40e+06–4.09e+06 | 3.80e+04–5.54e+04 | 61–108 | 1.40e+09–1.40e+09 | 1.63e+06–1.63e+06 |
+| 197 | 28.5 | 2.83e+06–4.91e+06 | 5.44e+04–1.40e+05 | 35–52 | 1.41e+09–1.41e+09 | 1.64e+06–1.65e+06 |
+| 269 | 30.3 | 2.57e+06–5.51e+06 | 2.30e+04–2.34e+04 | 110–240 | 1.41e+09–1.41e+09 | 1.65e+06–1.65e+06 |
+| 397 | 32.5 | — | 1.31e+04–1.58e+04 | — | — | 1.66e+06–1.66e+06 |
+| 521 | 34.1 | — | 1.88e+04–2.15e+04 | — | — | 1.66e+06–1.66e+06 |
+
+**The GLS endomorphism on the V₄ line (E25).** Before: arm A: the V4-folded base on the same GLS curve (4 points a column). After: arm B: the same points folded by <V4, psi> (8 points a column), against the matched <±psi> walk. Same curve, base and target stream (10 GLS curves, h = 16, every logarithm verified); handover from each arm's own constants 2^93.2 → 2^88.0 (extrapolated). Class: engineering, a constant, on this family only. Read the [report](../../research/glv_gls_v4_20261018/REPORT.pdf) and [summary](../../research/glv_gls_v4_20261018/summary.json).
+
+| p | seed | log2 n | cols A / B | S_A / S_B | S_A / rho (negation) | S_B / rho (±ψ) |
+|--:|--:|--:|:--|--:|--:|--:|
+| 101 | 2 | 22.6 | 14 / 7 | 2.11 | 6.02e+04 | 2.93e+04 |
+| 101 | 1 | 22.6 | 10 / 5 | 1.94 | 1.53e+05 | 6.77e+04 |
+| 149 | 2 | 24.9 | 14 / 7 | 1.77 | 1.58e+05 | 7.01e+04 |
+| 149 | 1 | 24.9 | 10 / 5 | 2.67 | 8.31e+05 | 2.65e+05 |
+| 197 | 2 | 26.5 | 30 / 15 | 1.69 | 3.97e+04 | 2.62e+04 |
+| 197 | 1 | 26.5 | 22 / 11 | 1.35 | 7.71e+04 | 6.11e+04 |
+| 269 | 2 | 28.3 | 40 / 20 | 2.02 | 2.24e+04 | 1.56e+04 |
+| 269 | 1 | 28.3 | 30 / 15 | 1.74 | 7.45e+04 | 4.84e+04 |
+| 397 | 1 | 30.5 | 60 / 30 | 1.72 | 1.99e+04 | 1.13e+04 |
+| 397 | 2 | 30.5 | 48 / 24 | 2.32 | 3.38e+04 | 1.71e+04 |
+
+The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call 2.62–2.69× (A) and 4.99–5.32× (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is 2.50–2.56× at 0 GAE, 1.39–1.43× at 0.1 and 1.034–1.053× at 1 (ahead across the §5a band under the registered model). B is 4.53–4.76× at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A 4.42e+03–2.79e+05× at 0 GAE (E25 1.13e+04–7.07e+05×); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24). Read the [report](../../research/e31_chain_solve_20261024/REPORT.pdf), [summary](../../research/e31_chain_solve_20261024/summary.json) and [validation](../../benchmarks/20261024-e31-chain-solve/VALIDATION.json).
+
+| p | seed | arm | S E25 | S A | S B | E25 / A (0, 0.1, 1 GAE) | E25 / B (0 GAE) | S_A / rho (0 GAE) |
+|--:|--:|:--|--:|--:|--:|:--|--:|--:|
+| 101 | 1 | A | 6.76e+10 | 2.71e+10 | 1.49e+10 | 2.50, 1.39, 1.034 | 4.53 | 5.27e+04 |
+| 101 | 1 | B | 3.48e+10 | 1.39e+10 | 7.63e+09 | 2.51, 1.40, 1.036 | 4.57 | 2.70e+04 |
+| 101 | 2 | A | 2.47e+10 | 9.87e+09 | 5.42e+09 | 2.50, 1.40, 1.035 | 4.56 | 2.47e+04 |
+| 101 | 2 | B | 1.17e+10 | 4.68e+09 | 2.58e+09 | 2.50, 1.39, 1.034 | 4.54 | 1.17e+04 |
+| 149 | 1 | A | 5.83e+11 | 2.30e+11 | 1.25e+11 | 2.53, 1.41, 1.043 | 4.66 | 2.79e+05 |
+| 149 | 1 | B | 2.19e+11 | 8.64e+10 | 4.70e+10 | 2.53, 1.41, 1.042 | 4.65 | 1.05e+05 |
+| 149 | 2 | A | 1.01e+11 | 3.98e+10 | 2.17e+10 | 2.53, 1.41, 1.042 | 4.64 | 4.92e+04 |
+| 149 | 2 | B | 5.67e+10 | 2.25e+10 | 1.23e+10 | 2.52, 1.41, 1.041 | 4.62 | 2.78e+04 |
+| 197 | 1 | A | 8.53e+10 | 3.35e+10 | 1.83e+10 | 2.54, 1.42, 1.046 | 4.67 | 3.24e+04 |
+| 197 | 1 | B | 6.32e+10 | 2.49e+10 | 1.36e+10 | 2.54, 1.42, 1.045 | 4.66 | 2.40e+04 |
+| 197 | 2 | A | 4.39e+10 | 1.72e+10 | 9.37e+09 | 2.55, 1.42, 1.046 | 4.68 | 1.74e+04 |
+| 197 | 2 | B | 2.59e+10 | 1.02e+10 | 5.53e+09 | 2.55, 1.42, 1.046 | 4.68 | 1.03e+04 |
+| 269 | 1 | A | 1.37e+11 | 5.36e+10 | 2.90e+10 | 2.56, 1.42, 1.049 | 4.73 | 3.29e+04 |
+| 269 | 1 | B | 7.88e+10 | 3.09e+10 | 1.67e+10 | 2.55, 1.42, 1.049 | 4.72 | 1.90e+04 |
+| 269 | 2 | A | 5.10e+10 | 1.99e+10 | 1.07e+10 | 2.56, 1.42, 1.050 | 4.76 | 1.23e+04 |
+| 269 | 2 | B | 2.52e+10 | 9.83e+09 | 5.30e+09 | 2.56, 1.42, 1.050 | 4.75 | 6.09e+03 |
+| 397 | 1 | A | 7.19e+10 | 2.81e+10 | 1.52e+10 | 2.56, 1.43, 1.053 | 4.72 | 7.62e+03 |
+| 397 | 1 | B | 4.17e+10 | 1.63e+10 | 8.82e+09 | 2.56, 1.43, 1.053 | 4.73 | 4.42e+03 |
+| 397 | 2 | A | 1.31e+11 | 5.15e+10 | 2.79e+10 | 2.55, 1.42, 1.052 | 4.70 | 1.56e+04 |
+| 397 | 2 | B | 5.65e+10 | 2.22e+10 | 1.20e+10 | 2.55, 1.42, 1.052 | 4.70 | 6.71e+03 |
+
+The matched walk made stronger (E27, reference correction). Karatsuba F_p⁴ products and the norm inversions of 16 lockstep walks batched by Montgomery's trick take an affine addition from 97 to 79 F_p multiplications (66.3–66.7 with the batch share); every walk is bit-identical across the three arithmetics. The matched ⟨±ψ⟩ / negation walk becomes 1.453–1.463× cheaper; the index-calculus side, whose non-solve F_p⁴ work is about 2 % of S, only 1.0048–1.0057×. Every row therefore moves further from rho, by 1.448–1.456× at 0 GAE, 1.415–1.443× at 0.1 and 1.236–1.325× at 1; distance remaining 6.39e+03–4.06e+05× at 0 GAE. Rho ahead at every weight. Class: a correction to the rho reference, not an improvement; validated (independent replay 11/11 runs, note §9.25 and §9.29). Read the [report](../../research/e27_walk_20261030/REPORT.pdf), [summary](../../experiments/32_walk_karatsuba/summary.json) and [validation](../../research/e27_walk_20261030/VALIDATION.json).
+
+| p | seed | arm | S (E31 A) | S (E27) | rho E25 walk | rho E27 walk | S / rho before → after (0 GAE) | growth (0, 0.1, 1 GAE) |
+|--:|--:|:--|--:|--:|--:|--:|:--|:--|
+| 101 | 1 | A | 2.709e+10 | 2.696e+10 | 5.143e+05 | 3.518e+05 | 5.268e+04 → 7.664e+04 | 1.455, 1.436, 1.297 |
+| 101 | 1 | B | 1.390e+10 | 1.383e+10 | 5.143e+05 | 3.518e+05 | 2.703e+04 → 3.932e+04 | 1.455, 1.436, 1.297 |
+| 101 | 2 | A | 9.866e+09 | 9.818e+09 | 3.991e+05 | 2.727e+05 | 2.472e+04 → 3.601e+04 | 1.456, 1.443, 1.325 |
+| 101 | 2 | B | 4.682e+09 | 4.660e+09 | 3.991e+05 | 2.727e+05 | 1.173e+04 → 1.709e+04 | 1.456, 1.443, 1.325 |
+| 149 | 1 | A | 2.301e+11 | 2.290e+11 | 8.24e+05 | 5.646e+05 | 2.793e+05 → 4.055e+05 | 1.452, 1.428, 1.270 |
+| 149 | 1 | B | 8.643e+10 | 8.600e+10 | 8.24e+05 | 5.646e+05 | 1.049e+05 → 1.523e+05 | 1.452, 1.428, 1.270 |
+| 149 | 2 | A | 3.976e+10 | 3.956e+10 | 8.088e+05 | 5.542e+05 | 4.916e+04 → 7.138e+04 | 1.452, 1.428, 1.271 |
+| 149 | 2 | B | 2.247e+10 | 2.235e+10 | 8.088e+05 | 5.542e+05 | 2.778e+04 → 4.033e+04 | 1.452, 1.428, 1.271 |
+| 197 | 1 | A | 3.354e+10 | 3.336e+10 | 1.035e+06 | 7.095e+05 | 3.240e+04 → 4.702e+04 | 1.451, 1.425, 1.263 |
+| 197 | 1 | B | 2.488e+10 | 2.475e+10 | 1.035e+06 | 7.095e+05 | 2.404e+04 → 3.488e+04 | 1.451, 1.425, 1.263 |
+| 197 | 2 | A | 1.723e+10 | 1.714e+10 | 9.88e+05 | 6.773e+05 | 1.743e+04 → 2.530e+04 | 1.451, 1.425, 1.265 |
+| 197 | 2 | B | 1.017e+10 | 1.012e+10 | 9.88e+05 | 6.773e+05 | 1.030e+04 → 1.494e+04 | 1.451, 1.425, 1.265 |
+| 269 | 1 | A | 5.357e+10 | 5.329e+10 | 1.628e+06 | 1.117e+06 | 3.291e+04 → 4.770e+04 | 1.450, 1.420, 1.250 |
+| 269 | 1 | B | 3.086e+10 | 3.069e+10 | 1.628e+06 | 1.117e+06 | 1.895e+04 → 2.747e+04 | 1.450, 1.420, 1.250 |
+| 269 | 2 | A | 1.988e+10 | 1.978e+10 | 1.613e+06 | 1.107e+06 | 1.232e+04 → 1.786e+04 | 1.449, 1.420, 1.250 |
+| 269 | 2 | B | 9.827e+09 | 9.774e+09 | 1.613e+06 | 1.107e+06 | 6.091e+03 → 8.828e+03 | 1.449, 1.420, 1.250 |
+| 397 | 1 | A | 2.809e+10 | 2.793e+10 | 3.687e+06 | 2.533e+06 | 7.616e+03 → 1.103e+04 | 1.448, 1.415, 1.236 |
+| 397 | 1 | B | 1.628e+10 | 1.619e+10 | 3.687e+06 | 2.533e+06 | 4.415e+03 → 6.392e+03 | 1.448, 1.415, 1.236 |
+| 397 | 2 | A | 5.151e+10 | 5.123e+10 | 3.302e+06 | 2.268e+06 | 1.560e+04 → 2.258e+04 | 1.448, 1.416, 1.238 |
+| 397 | 2 | B | 2.217e+10 | 2.204e+10 | 3.302e+06 | 2.268e+06 | 6.713e+03 → 9.719e+03 | 1.448, 1.416, 1.238 |
+
+Trivial products repriced (E30, accounting). An audit of E27's records reprices every F_p multiplication by 0, 1 or an F_p element inside an F_p⁴ product at what it would really cost: such products are 0.309 to 0.313 % of S on the index-calculus side and at most 0.0002 % of the walk, so the distance to the matched rho changes by -0.313 to -0.309 % at 0 GAE, -0.0855 to -0.0838 % at 0.1 and -0.0114 to -0.0110 % at 1. Every other field reproduces E27's. Class: accounting, not an improvement; validated (independent replay, note §9.28 and §9.32). E28 (ψ fold on E19's τ_T line) and E29 (order-24 twist action on E18's j = 0 line) were replayed and their measured stages verified, but are not shown: E28's end-to-end S is a model and E29 has no index-calculus cost, so neither can pass the validation gate (note §9.30–§9.31; research/e28_tau_20261030, research/e29_twists_20261030). Read the [report](../../research/e30_invariants_lite_20261030/REPORT.pdf), [summary](../../experiments/35_invariants_lite/summary.json) and [validation](../../research/e30_invariants_lite_20261030/VALIDATION.json).
+
+| p | seed | arm | S (E27) | trivial-product saving | share of S | walk saving | distance change (0, 0.1, 1 GAE) |
+|--:|--:|:--|--:|--:|--:|--:|:--|
+| 101 | 1 | A | 2.696e+10 | 8.325e+07 | 0.309 % | 0.562 | -0.3086 %, -0.0838 %, -0.0110 % |
+| 101 | 1 | B | 1.383e+10 | 4.293e+07 | 0.310 % | 0.562 | -0.3102 %, -0.0840 %, -0.0110 % |
+| 101 | 2 | A | 9.818e+09 | 3.046e+07 | 0.310 % | 0 | -0.3103 %, -0.0842 %, -0.0111 % |
+| 101 | 2 | B | 4.660e+09 | 1.443e+07 | 0.310 % | 0 | -0.3096 %, -0.0841 %, -0.0111 % |
+| 149 | 1 | A | 2.290e+11 | 7.142e+08 | 0.312 % | 1.12 | -0.3117 %, -0.0846 %, -0.0111 % |
+| 149 | 1 | B | 8.600e+10 | 2.678e+08 | 0.311 % | 1.12 | -0.3112 %, -0.0846 %, -0.0111 % |
+| 149 | 2 | A | 3.956e+10 | 1.229e+08 | 0.311 % | 0 | -0.3106 %, -0.0846 %, -0.0112 % |
+| 149 | 2 | B | 2.235e+10 | 6.931e+07 | 0.310 % | 0 | -0.3101 %, -0.0846 %, -0.0112 % |
+| 197 | 1 | A | 3.336e+10 | 1.035e+08 | 0.310 % | 0 | -0.3102 %, -0.0849 %, -0.0113 % |
+| 197 | 1 | B | 2.475e+10 | 7.667e+07 | 0.310 % | 0 | -0.3098 %, -0.0848 %, -0.0113 % |
+| 197 | 2 | A | 1.714e+10 | 5.324e+07 | 0.311 % | 0 | -0.3107 %, -0.0850 %, -0.0113 % |
+| 197 | 2 | B | 1.012e+10 | 3.145e+07 | 0.311 % | 0 | -0.3108 %, -0.0850 %, -0.0113 % |
+| 269 | 1 | A | 5.329e+10 | 1.663e+08 | 0.312 % | 0 | -0.3121 %, -0.0853 %, -0.0113 % |
+| 269 | 1 | B | 3.069e+10 | 9.575e+07 | 0.312 % | 0 | -0.3120 %, -0.0853 %, -0.0113 % |
+| 269 | 2 | A | 1.978e+10 | 6.192e+07 | 0.313 % | 0 | -0.3131 %, -0.0855 %, -0.0113 % |
+| 269 | 2 | B | 9.774e+09 | 3.059e+07 | 0.313 % | 0 | -0.3130 %, -0.0855 %, -0.0113 % |
+| 397 | 1 | A | 2.793e+10 | 8.662e+07 | 0.310 % | 0 | -0.3102 %, -0.0854 %, -0.0114 % |
+| 397 | 1 | B | 1.619e+10 | 5.030e+07 | 0.311 % | 0 | -0.3107 %, -0.0855 %, -0.0114 % |
+| 397 | 2 | A | 5.123e+10 | 1.590e+08 | 0.310 % | 0 | -0.3104 %, -0.0854 %, -0.0114 % |
+| 397 | 2 | B | 2.204e+10 | 6.842e+07 | 0.310 % | 0 | -0.3104 %, -0.0854 %, -0.0114 % |
+
+The handover ladder (E32, measurement). E25's GLS curves at eleven sizes, 33 paired curves from 2^22.6 to 2^42.4: E31 solver A with Karatsuba products against E27's matched ⟨±ψ⟩ walk (iii). No crossover in the measured range: rho is ahead on every curve at every weight, so n* > 2^42.4 is what is measured; the best curve is 1,143× from rho at 0 GAE. The fitted slope of log D against log n is -0.243 [-0.279, -0.205] (theory −1/4), and the extrapolated crossover order log₂ n* is 85.5 [79.2, 94.3] at 0 GAE, 91.2 [84.4, 100.7] at 0.1 and 97.6 [90.1, 107.9] at 1, an extrapolation 37–66 bits past the top size, not a measured crossing. Class: measurement, not an improvement; validated (independent replay 66/66 runs, note §9.34 and §9.36). Read the [report](../../research/e32_handover_ladder_20261031/REPORT.pdf), [summary](../../experiments/36_handover_ladder/summary.json) and [validation](../../research/e32_handover_ladder_20261031/VALIDATION.json).
+
+| p | log₂ n | curves | median D (0 GAE) | median D (0.1) | median D (1) | D range (0 GAE) |
+|:--|--:|--:|--:|--:|--:|--:|
+| 101 | 22.6 | 3 | 2.07e+04 | 7.21e+04 | 3.83e+05 | 1.71e+04–3.93e+04 |
+| 149 | 24.9 | 3 | 4.03e+04 | 1.38e+05 | 6.59e+05 | 8.26e+03–1.52e+05 |
+| 197 | 26.5 | 3 | 1.49e+04 | 5.09e+04 | 2.38e+05 | 1.07e+04–3.49e+04 |
+| 269 | 28.3 | 3 | 1.75e+04 | 5.9e+04 | 2.61e+05 | 8.83e+03–2.75e+04 |
+| 397 | 30.5 | 3 | 8.75e+03 | 2.91e+04 | 1.24e+05 | 6.39e+03–9.72e+03 |
+| 557 | 32.5 | 3 | 6.46e+03 | 2.13e+04 | 8.94e+04 | 4.98e+03–7.43e+03 |
+| 773 | 34.4 | 3 | 7.63e+03 | 2.5e+04 | 1.04e+05 | 6.52e+03–1.15e+04 |
+| 1093 | 36.4 | 3 | 4.37e+03 | 1.42e+04 | 5.84e+04 | 3.67e+03–5.06e+03 |
+| 1549 | 38.4 | 3 | 2.37e+03 | 7.66e+03 | 3.14e+04 | 2.07e+03–3.72e+03 |
+| 2213 | 40.4 | 3 | 1.61e+03 | 5.15e+03 | 2.1e+04 | 1.34e+03–2.05e+03 |
+| 3089 | 42.4 | 3 | 1.54e+03 | 4.93e+03 | 2.01e+04 | 1.14e+03–1.7e+03 |
+
+Solver B's pivot selection counted (E33, accounting). E31 left solver B's pivot-selection pass unpriced; counted, it is 1,049,178–1,056,762 native operations per call (B′, the same pivots with incremental counts, 293,196–298,389; B″, a counted sparsity estimate with different pivots, 12,694–12,802). With that work priced, no B variant is ranked against solver A or E25 across the §5a band: B and B′ lead only at 0 GAE, B″ at 0 and 0.1 but not at 1. Solver A stays the ranked solve, and rho is ahead of every row at every weight. Class: accounting, not an improvement; validated (independent replay, note §9.35 and §9.37, with a fourteen-figure erratum). Read the [report](../../research/e33_solver_b_pivot_count_20261031/REPORT.pdf), [summary](../../experiments/37_solver_b_pivot_count/summary.json) and [validation](../../research/e33_solver_b_pivot_count_20261031/VALIDATION.json).
+
+| solver | ratio | 0 GAE | 0.1 GAE | 1 GAE | rank across the band |
+|:--|:--|--:|--:|--:|:--|
+| B (as built, counted) | S_E25 / S_X | 4.529–4.755 | 0.274–0.276 | 0.157–0.158 | unresolved (order changes inside the band or across rows) |
+| B (as built, counted) | S_A / S_X | 1.822–1.863 | 0.193–0.197 | 0.149–0.152 | unresolved (order changes inside the band or across rows) |
+| B (as built, counted) | S_X / rho | 3.45e+03–2.19e+05 | 1.1e+05–7.17e+06 | 6.1e+05–4.4e+07 | X behind across the band |
+| B′ (incremental counts) | S_E25 / S_X | 4.529–4.755 | 0.678–0.683 | 0.404–0.407 | unresolved (order changes inside the band or across rows) |
+| B′ (incremental counts) | S_A / S_X | 1.822–1.863 | 0.478–0.487 | 0.384–0.393 | unresolved (order changes inside the band or across rows) |
+| B′ (incremental counts) | S_X / rho | 3.45e+03–2.19e+05 | 4.45e+04–2.89e+06 | 2.36e+05–1.71e+07 | X behind across the band |
+| B″ (counted estimate) | S_E25 / S_X | 3.827–3.984 | 1.457–1.497 | 0.980–0.997 | unresolved (order changes inside the band or across rows) |
+| B″ (counted estimate) | S_A / S_X | 1.538–1.558 | 1.046–1.048 | 0.946–0.948 | unresolved (order changes inside the band or across rows) |
+| B″ (counted estimate) | S_X / rho | 4.12e+03–2.61e+05 | 2.03e+04–1.33e+06 | 9.58e+04–7.01e+06 | X behind across the band |
+
+A cheaper order-24 walk on E18's j = 0 curves (E34, reference correction; not shown as a row). A class representative that compares one coordinate of the twelve candidates first makes the order-24 walk cheaper than both order-6 walks, pooled, at every weight (1.563 / 1.254 / 1.126 against E29's order-6 walk at 0 / 0.1 / 1 GAE; 1.505 / 1.167 / 1.026 against an equally cheap order-6 walk, the last within sampling noise). E18's ψ-arm distances to rho therefore lengthen by 1.63×, 1.25× and 1.13× and the modelled handover moves 2.8, 1.3 and 0.7 bits later. Independently replayed byte for byte from a fresh build (validator report: pass), but it compares rho walks only and has no index-calculus arm, so like E29 it cannot pass the validation gate (note §9.38 and §9.39). Read the [report](../../research/e34_twist24_cheap_rep_20261031/REPORT.pdf), [summary](../../experiments/38_twist24_cheap_rep/summary.json) and [validator report](../../research/e34_twist24_cheap_rep_20261031/validator-report.json).
+
+Macaulay rows stored from their lead (E40, component speed-up of the chain solve's matrix build). Solver A builds every Macaulay row over all 448 columns, 176,064 cells per call, and 41.6 % of them lie left of each row's lead, where the echelon and the normal forms never read. Variant V stores each row from its lead on (102,826–102,827 cells per call) with exactly A's arithmetic and pays 22,340–22,489 counted offset operations per call. Field multiplications are identical, so V equals A at 0 GAE; with the cell traffic priced at the band V is cheaper than A by 1.2518–1.2618× at 0.1 GAE and 1.3629–1.3807× at 1 GAE on all 32 rows, and cheaper than E25 at every weight. That is the registered weak rank (equal at 0, strictly ahead at 0.1 and 1); the size of the gain depends on pricing one cell at 0.1 or 1 GAE (at 0.01 GAE per cell it would be about 1.06×). It moves no row of tables A–C and no 0-GAE S value. Rho is ahead of every row at every weight: on the closest row V is 6,000×, 15,821× and 61,697× the matched walk (iii), A 6,000×, 19,939× and 85,056×. Class: engineering (a native-work constant), validated (independent rebuild and replay, 466 recomputed figures, gate valid; note §9.50 and §9.51). Read the [report](../../research/e40_macaulay_entries_20261102/REPORT.pdf), [summary](../../experiments/47_macaulay_entries/summary.json) and [validation](../../research/e40_macaulay_entries_20261102/VALIDATION.json).
+
+| ratio (32 rows) | 0 GAE | 0.1 GAE | 1 GAE |
+|:--|--:|--:|--:|
+| S_A / S_V | 1.0000 | 1.2518–1.2618 | 1.3629–1.3807 |
+| S_E25 / S_V | 2.5054–2.5766 | 1.7455–1.8033 | 1.4105–1.4558 |
+| S_A / S_V, lead scans priced (σ1) | 1.0000 | 1.6024–1.6217 | 1.8572–1.8921 |
+| S_A / S_V, structural work priced (σ4) | 1.0000 | 1.2362–1.2449 | 1.3312–1.3461 |
+| S_V / rho (distance remaining) | 6,000–197,861 | 15,821–541,270 | 61,697–2,362,608 |
+| S_A / rho | 6,000–197,861 | 19,939–679,973 | 85,056–3,236,952 |
+
+Pivot rules F, S and H in the chain solve (E39, engineering of the echelon; third pre-registered confirmation). E31's ranked solver A orders each pivot bucket by a counted rule; F takes the first row to arrive (no selection work), S a fixed per-call order from each equation's support, H takes F where an untouched row exists and S otherwise. On fresh target streams over E25's 20 GLS rows and E24's 12 rows, each of F, S and H is ahead of A and of E25 at 0, 0.1 and 1 GAE on all 32 rows; against B″ the order is unresolved, and the negative-control rule L is behind A everywhere. E36 and E37 measured the same effect but voided the rank on a failed control, and E38 stopped at its pilot; E39 registered controls that touch rows the solve reads, and every gating control passed. The gain is in the solve's own multiplications (F: 1.46–1.54× fewer at 0 GAE) and shrinks to about 1.2 % at 1 GAE, where the Macaulay build dominates (E40 above attacks that part). Rho is ahead of every row at every weight: F is 5,184–232,416× rho at 0 GAE and 94,020–5,622,167× at 1 GAE across the rows, A 7,911–347,433× and 95,225–5,689,946×. Class: engineering, validated (independent rebuild and replay of 31 runs, 7,286 summary values recomputed, gate valid; six errata, none changing a verdict; note §9.48 and §9.49). Read the [report](../../research/e39_pivot_rules_confirm3_20261102/REPORT.pdf), [summary](../../experiments/46_pivot_rules_confirm3/summary.json) and [validation](../../research/e39_pivot_rules_confirm3_20261102/VALIDATION.json).
+
+| rule X | against | 0 GAE | 0.1 GAE | 1 GAE | order across the band |
+|:--|:--|--:|--:|--:|:--|
+| F (first arrival) | A | 1.4572–1.5372 | 1.0937–1.1064 | 1.0115–1.0130 | ahead across the band (32/32/32 of 32 rows ahead) |
+| F (first arrival) | E25 | 3.6261–3.9454 | 1.5202–1.5809 | 1.0439–1.0676 | ahead across the band (32/32/32 of 32 rows ahead) |
+| F (first arrival) | B″ (E33) | 0.9518–0.9883 | 1.0457–1.0557 | 1.0668–1.0704 | unresolved (0/32/32 of 32 rows ahead) |
+| S (static order) | A | 1.4017–1.4492 | 1.0825–1.0908 | 1.0077–1.0086 | ahead across the band (32/32/32 of 32 rows ahead) |
+| S (static order) | E25 | 3.4879–3.7190 | 1.5047–1.5585 | 1.0400–1.0631 | ahead across the band (32/32/32 of 32 rows ahead) |
+| S (static order) | B″ (E33) | 0.9134–0.9317 | 1.0350–1.0408 | 1.0628–1.0658 | unresolved (0/32/32 of 32 rows ahead) |
+| H (F, else S) | A | 1.4971–1.5415 | 1.0957–1.1028 | 1.0076–1.0083 | ahead across the band (32/32/32 of 32 rows ahead) |
+| H (F, else S) | E25 | 3.7253–3.9570 | 1.5229–1.5757 | 1.0399–1.0627 | ahead across the band (32/32/32 of 32 rows ahead) |
+| H (F, else S) | B″ (E33) | 0.9773–0.9910 | 1.0476–1.0523 | 1.0627–1.0655 | unresolved (0/32/32 of 32 rows ahead) |
+| B″ (E33) | A | 1.5299–1.5582 | 1.0459–1.0480 | 0.9464–0.9482 | unresolved (32/32/0 of 32 rows ahead) |
+| L (last arrival, negative control) | A | 0.7103–0.7246 | 0.9006–0.9053 | 0.9856–0.9863 | behind across the band (0/0/0 of 32 rows ahead) |
+| L (last arrival, negative control) | E25 | 1.7775–1.8598 | 1.2531–1.2934 | 1.0173–1.0395 | ahead across the band (32/32/32 of 32 rows ahead) |
+| L (last arrival, negative control) | B″ (E33) | 0.4574–0.4669 | 0.8603–0.8638 | 1.0396–1.0422 | unresolved (0/0/32 of 32 rows ahead) |
+
+The order-24 shortfall was noise (E41, reference correction; not shown as a row). E34's apparent step shortfall of the order-24 walk is two sampling errors in opposite directions; on 512 fresh walks per arm both walks run at their ideal step count, and a 32-jump table fix is not resolved. Re-measured, the order-24 reference on E18's j = 0 curves is stronger than E34 reported: 1.761 / 1.418 / 1.275 against E29's order-6 walk and 1.696 / 1.320 / 1.162 against the cheap order-6 walk at 0 / 0.1 / 1 GAE (the band-ranked order-24 arm), so E18's ψ-row distances to rho lengthen by those factors; the GLS rows above are unchanged (order 24 does not apply there). Independently replayed byte for byte (validator report: pass, six errata), but like E34 it compares rho walks only and cannot pass the validation gate (note §9.52 and §9.53). Read the [report](../../research/e41_twist24_shortfall_20261102/REPORT.pdf), [summary](../../experiments/48_twist24_shortfall/summary.json) and [validator report](../../research/e41_twist24_shortfall_20261102/validator-report.json).
+
+
+<!-- BEGIN RELATION IDENTITY 20261117 -->
+## Exact Rust identity checking (development polynomial kernel)
+
+engineering diagnostic; unsigned producer evidence. Fixed p2147483647, seed7, n3/4/6 polynomial kernels. Ordinary95 neutral controls reject n4/n6; prospective simultaneous screens pass. No15x, new-target, intrinsic-regularity or ranked ECDLP claim. [pcc:unverified]
+
+Ratios above1 favor the denominator.25 paired main blocks/case; work and full-paid accounting. [pcc:unverified]
+
+|n|Comparison|Work median|Work lower1/720|Paid median|Paid lower1/720|Ordinary95 pass|Simultaneous pass|
+|---|---|---:|---:|---:|---:|---|---|
+|3|prefix-Singular/prefix-Rust|3.242510|3.084746|1.306792|1.285010|True|True|
+|3|frontier-Rust/prefix-Rust|1.158349|1.080994|1.023303|1.010834|True|True|
+|3|frontier-Singular/frontier-Rust|3.022390|2.743968|1.301915|1.271720|True|True|
+|4|prefix-Singular/prefix-Rust|3.067128|2.938723|1.286039|1.266683|False|True|
+|4|frontier-Rust/prefix-Rust|1.236276|1.183741|1.033552|1.024787|False|True|
+|4|frontier-Singular/frontier-Rust|2.643183|2.556982|1.275320|1.260958|False|True|
+|6|prefix-Singular/prefix-Rust|2.907275|2.799336|1.254269|1.234975|False|True|
+|6|frontier-Rust/prefix-Rust|1.355531|1.284129|1.048089|1.035972|False|True|
+|6|frontier-Singular/frontier-Rust|2.430102|2.348420|1.241667|1.228848|False|True|
+
+[Result](../../research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md); native source `research/relation_degree_trace_20261115/native-identity-20261117/report-01/audit.json`. All checks remain included; old rejected studies retained. [pcc:unverified]
+
+<!-- END RELATION IDENTITY 20261117 -->

@@ -1,0 +1,66 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "tableb_binary_descent_pilot_20261115 n24 (pilot, not data)",
+ "description": "Pilot: descent-algebraic m=3 vs ksum5 vs tuned pair-table incumbent. Public synthetic curve; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 24,
+    "modulus": 16777243,
+    "a": 0,
+    "b": 6277594,
+    "group_order": 16780264,
+    "r": 2097533,
+    "gx": 11058037,
+    "gy": 14510317
+   }
+  ],
+  "targets_per_curve": 1,
+  "target_seed": 20261115824,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "desc3-D8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8",
+     "oracle": "descent-algebraic:m=3",
+     "solver": "f4-f2",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "desc3-D7",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=7",
+     "oracle": "descent-algebraic:m=3",
+     "solver": "f4-f2",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261115924,
+  "isolation_required": "L0",
+  "timeout_seconds": 300
+ }
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "point-table-journal.retention/v1",
+  "at": "2026-11-15T23:06:55.575996+00:00",
+  "normalization": "Remove only conflict-marker lines and outer block newlines; retain every other byte of every block. Block identity is full SHA256, never heading. Common identical block occurrences are shared up to maximum parent multiplicity.",
+  "sources": [
+    {
+      "ref": "149d208dd9019adcccc85a8e82c3f9d89c38971f",
+      "raw_sha256": "368009cffe5e10f2f1ce46c49a972899a36b07cde121ae913f67cded85f149d2",
+      "blob": "a70b561111186723079d60ad6021a58bee9df007",
+      "blocks": 268,
+      "complete_blocks_and_multiplicity_retained": true,
+      "parent_order_retained": true
+    },
+    {
+      "ref": "2615f313a6fb95cdeb441efeb6051c874be7ecca",
+      "raw_sha256": "ec9604c09470ba71e86cfb755dd9eabd8165ae7baeeeb8960f08975e378e932d",
+      "blob": "0982458ccd60a86b9b7b829f5f0354f98230000f",
+      "blocks": 285,
+      "complete_blocks_and_multiplicity_retained": true,
+      "parent_order_retained": true
+    },
+    {
+      "ref": "3a40114e3570d88d7aa50ba0b3e1ddbddcec3743",
+      "raw_sha256": "1a77b8dbcbe6bd27b861fe15143afe186fcc37440758a5ee40fbb2a54f77c50b",
+      "blob": "73754256b83dda15af219c93531738c2a42b4467",
+      "blocks": 259,
+      "complete_blocks_and_multiplicity_retained": true,
+      "parent_order_retained": true
+    },
+    {
+      "ref": "683647fbb2c9d21bf8a87161d7e9d4b0f3ffe23f",
+      "raw_sha256": "69fb84586c3234b3459fd09818abbbe85f45ad5f542ef78dbd0e56a872db54df",
+      "blob": "6345582f1024ad7018601007a013d4ae576f1301",
+      "blocks": 263,
+      "complete_blocks_and_multiplicity_retained": true,
+      "parent_order_retained": true
+    },
+    {
+      "ref": "02cc5b6a9183a64acccc9ee58a319e58fc2cf54a",
+      "raw_sha256": "cb9a269879bd04a7354e7c7c8ba53ac4024e13e6f040508efa9e8958613d91b6",
+      "blob": "8611a8c85817b66eb0c4fe4160be18099941891f",
+      "blocks": 254,
+      "complete_blocks_and_multiplicity_retained": true,
+      "parent_order_retained": true
+    },
+    {
+      "ref": "b05c8a03af1034fdc6c92c1bb061a9258ad0b555",
+      "raw_sha256": "afe720e2ac3ca5c98e8a56e7bc82b2aebdb5e2c861b2f1fb6fb938ab54759f0b",
+      "blob": "b455879ca25b761b638b31ab45f6c0b05163bef9",
+      "blocks": 253,
+      "complete_blocks_and_multiplicity_retained": true,
+      "parent_order_retained": true
+    }
+  ],
+  "result_blocks": 291,
+  "result_bytes": 507620,
+  "result_sha256": "85ebc785d9a1737ac6369f9004377e4c8c5bde51f26e03d2b4d631b766971e6b",
+  "conflict_markers": 0,
+  "ordering": "Stable topological union preserving each complete source block sequence; time priority between independent ready blocks only.",
+  "standing": "Producer retention controls; not signed scientific/execution evidence",
+  "final_journal_with_new_handoff_sha256": "a525b3b86038ffd740297586bd9ebf8037c4bf97af1adbbdcf017fc189a69faa"
+}

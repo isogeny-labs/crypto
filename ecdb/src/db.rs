@@ -50,10 +50,57 @@ fn tls_connector(ca_file: Option<&str>) -> Result<tokio_postgres_rustls::MakeRus
 
 pub fn pool(args: &DbArgs) -> Result<Pool> {
     let cfg: tokio_postgres::Config = args.database_url.parse().context("parsing DATABASE_URL")?;
+    // Fast runs no SQL on recycle (the /v1/sql route resets its own session,
+    // api/sql.rs SESSION_RESET). Never recycle with DISCARD ALL or DEALLOCATE
+    // (RecyclingMethod::Custom): it drops the statements tokio-postgres keeps
+    // per connection for type lookups and breaks the next non-built-in column.
     let mgr_cfg = ManagerConfig { recycling_method: RecyclingMethod::Fast };
     let mgr = match args.pg_tls {
         TlsMode::Disable => Manager::from_config(cfg, tokio_postgres::NoTls, mgr_cfg),
         TlsMode::Require => Manager::from_config(cfg, tls_connector(args.pg_ca_file.as_deref())?, mgr_cfg),
     };
     Ok(Pool::builder(mgr).max_size(args.pool_size).build()?)
+}
+
+/// The API's login roles: (login, the one group role it joins, the variable
+/// holding its password).
+pub const LOGINS: &[(&str, &str, &str)] =
+    &[("ecdb_api", "ecdb_reader", "ECDB_API_PASSWORD"), ("ecdb_api_writer", "ecdb_writer", "ECDB_WRITER_PASSWORD")];
+
+/// Create or re-password login roles, each granted its group role (created
+/// by migration 0008). Returns what each login is now a member of.
+pub async fn bootstrap_logins(
+    client: &tokio_postgres::Client,
+    logins: &[(&str, &str, String)],
+) -> Result<Vec<serde_json::Value>> {
+    let mut done = Vec::new();
+    for (login, group, password) in logins {
+        let exists: bool =
+            client.query_one("SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = $1)", &[login]).await?.get(0);
+        // format() quotes the name and the password; neither is interpolated by hand.
+        let verb = if exists { "ALTER" } else { "CREATE" };
+        let stmt: String = client
+            .query_one(
+                &format!("SELECT format('{verb} ROLE %I LOGIN PASSWORD %L', $1::text, $2::text)"),
+                &[login, password],
+            )
+            .await?
+            .get(0);
+        client.batch_execute(&stmt).await?;
+        let grant: String =
+            client.query_one("SELECT format('GRANT %I TO %I', $1::text, $2::text)", &[group, login]).await?.get(0);
+        client.batch_execute(&grant).await?;
+        let member_of: Vec<String> = client
+            .query(
+                "SELECT g.rolname::text FROM pg_auth_members m JOIN pg_roles g ON g.oid = m.roleid
+                  JOIN pg_roles u ON u.oid = m.member WHERE u.rolname = $1 ORDER BY 1",
+                &[login],
+            )
+            .await?
+            .iter()
+            .map(|r| r.get(0))
+            .collect();
+        done.push(serde_json::json!({ "login": login, "created": !exists, "member_of": member_of }));
+    }
+    Ok(done)
 }

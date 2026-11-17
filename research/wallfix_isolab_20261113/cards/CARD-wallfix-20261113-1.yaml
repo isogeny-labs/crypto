@@ -1,0 +1,159 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-wallfix-20261113-1
+experiment_id: wallfix_isolab_20261113
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/wallfix_isolab_20261113/cards/CARD-wallfix-20261113-1.receipt.json
+binds:
+- path: research/wallfix_isolab_20261113/cards/gates/budget-gate.sh
+  sha256: ac7a7ea23fc0b9c41e1597996a37b8577f28ffc2f32d852788a3d8bd617039db
+must_not_exist:
+- research/wallfix_isolab_20261113/cards/CARD-wallfix-20261113-1.runs.json
+commands:
+- id: budget-gate
+  argv:
+  - bash
+  - research/wallfix_isolab_20261113/cards/gates/budget-gate.sh
+  env:
+    AWS_REGION: us-east-2
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/wallfix_isolab_20261113/cards/CARD-wallfix-20261113-1.budget.stdout
+  stderr: research/wallfix_isolab_20261113/cards/CARD-wallfix-20261113-1.budget.stderr
+  outputs:
+  - research/wallfix_isolab_20261113/cards/CARD-wallfix-20261113-1.budget.stdout
+- id: dispatch-3850-a
+  argv:
+  - gh
+  - workflow
+  - run
+  - isolab-experiment.yml
+  - --repo
+  - isogeny-labs/crypto
+  - --ref
+  - main
+  - -f
+  - source_revision=5382b439bca6a0cd7f35ad6ed34735e5c6fd6a33
+  - -f
+  - publish_only=true
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+- id: dispatch-3850-b
+  argv:
+  - gh
+  - workflow
+  - run
+  - isolab-experiment.yml
+  - --repo
+  - isogeny-labs/crypto
+  - --ref
+  - main
+  - -f
+  - source_revision=43e68a1d567635b05601fdd6335d7aea0b543a82
+  - -f
+  - publish_only=true
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+- id: dispatch-3991-a
+  argv:
+  - gh
+  - workflow
+  - run
+  - isolab-experiment.yml
+  - --repo
+  - isogeny-labs/crypto
+  - --ref
+  - main
+  - -f
+  - source_revision=6745ba0a5fed7d55a7005c6ed12d5c5298fb3e0f
+  - -f
+  - publish_only=true
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+- id: dispatch-3991-b
+  argv:
+  - gh
+  - workflow
+  - run
+  - isolab-experiment.yml
+  - --repo
+  - isogeny-labs/crypto
+  - --ref
+  - main
+  - -f
+  - source_revision=94c682e0218189a546b3b663e50497b3da9bf616
+  - -f
+  - publish_only=true
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+- id: dispatch-4009-a
+  argv:
+  - gh
+  - workflow
+  - run
+  - isolab-experiment.yml
+  - --repo
+  - isogeny-labs/crypto
+  - --ref
+  - main
+  - -f
+  - source_revision=2c1dc30e16f5337fd0afaade871d996dfe2e6274
+  - -f
+  - publish_only=true
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+- id: dispatch-4009-b
+  argv:
+  - gh
+  - workflow
+  - run
+  - isolab-experiment.yml
+  - --repo
+  - isogeny-labs/crypto
+  - --ref
+  - main
+  - -f
+  - source_revision=21f21a45a3149fc926a62fb27a17d337dd066595
+  - -f
+  - publish_only=true
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+- id: list-runs
+  argv:
+  - gh
+  - run
+  - list
+  - --workflow
+  - isolab-experiment.yml
+  - --repo
+  - isogeny-labs/crypto
+  - --limit
+  - '10'
+  - --json
+  - databaseId,createdAt,status,conclusion,event,headSha,url
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/wallfix_isolab_20261113/cards/CARD-wallfix-20261113-1.runs.json
+  stderr: research/wallfix_isolab_20261113/cards/CARD-wallfix-20261113-1.runs.stderr
+  outputs:
+  - research/wallfix_isolab_20261113/cards/CARD-wallfix-20261113-1.runs.json
+bus_address: executor-mechanical-wallfix-build
+background: false
+write_scope:
+- research/wallfix_isolab_20261113/cards/
+stop_when:
+- Any command exits with a status other than 0, or reaches its timeout.
+- The budget-gate command exits with a status other than 0; no dispatch command runs and nothing is retried.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'
+- 'Never run a dispatch command a second time: each dispatch is a separate paid image build.'
+notes: 'Image-build card only: it dispatches six publish-only builds and lists the runs; no experiment is submitted. The image digests and binary hashes are read from the build receipts afterwards, and
+  the experiment cards are compiled from them.'

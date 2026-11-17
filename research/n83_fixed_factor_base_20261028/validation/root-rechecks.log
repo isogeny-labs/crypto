@@ -1,0 +1,62 @@
+
+running 28 tests
+test cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar ... ok
+test cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures ... ok
+test cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic ... ok
+test cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver ... ok
+test cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed ... ok
+test cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means ... ok
+test cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload ... FAILED
+test cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible ... FAILED
+test cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too ... ok
+test cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples ... FAILED
+test cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version ... ok
+test cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band ... FAILED
+test cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2 ... ok
+test cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload ... ok
+test cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup ... ok
+test cryptanalysis::ecbench::gpu::lock_and_capsule_tests::a_gpu_stage_writes_a_host_capsule_the_receipt_binds ... ok
+test cryptanalysis::ecbench::gpu::tests::selftest_gates_stage_and_outputs_are_bound ... ok
+test cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files ... ok
+test cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks ... ok
+test cryptanalysis::ic_framework::planner::tests::every_cited_file_exists ... ok
+test cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42 ... ok
+test ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused - should panic ... ok
+test ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree ... ok
+test ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares ... ok
+test ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors ... ok
+test ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused ... ok
+test ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path ... ok
+test ecc::endo_generic_chain_set::tests::tampered_sets_are_refused ... ok
+
+failures:
+
+---- cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload' (1056854) panicked at src/cryptanalysis/ecbench/bounds.rs:2393:10:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/ecbench_all_candidates_20261003/audit-prime.json: No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible' (1056915) panicked at src/cryptanalysis/ecbench/bounds.rs:2351:10:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/ecbench_all_candidates_20261003/audit-koblitz.json: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples' (1056931) panicked at src/cryptanalysis/ecbench/bounds.rs:2257:10:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/ecbench_all_candidates_20261003/audit-prime.json: No such file or directory (os error 2)"
+
+---- cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band' (1056958) panicked at src/cryptanalysis/ecbench/bounds.rs:2421:10:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/ecbench_all_candidates_20261003/audit-prime.json: No such file or directory (os error 2)"
+
+
+failures:
+    cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload
+    cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible
+    cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples
+    cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band
+
+test result: FAILED. 24 passed; 4 failed; 0 ignored; 0 measured; 5060 filtered out; finished in 28.28s

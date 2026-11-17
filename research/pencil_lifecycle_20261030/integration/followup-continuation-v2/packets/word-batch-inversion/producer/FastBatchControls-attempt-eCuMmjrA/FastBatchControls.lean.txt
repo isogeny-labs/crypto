@@ -1,0 +1,25 @@
+import FastBatchInverse
+set_option autoImplicit false
+namespace FastBatchControls
+open FastBatch
+instance : Fact (17:UInt64).toNat.Prime := ⟨by decide⟩
+
+theorem literal_nonunit : product 17 3 2=6 ∧ both 17 3 2=3 ∧ ni 17 3 2=6 ∧ si 17 3 2=9 := by decide
+
+theorem full_si_decode : ((si 17 3 2).toNat : ZMod (17:UInt64).toNat)=
+ ((2:UInt64).toNat : ZMod (17:UInt64).toNat)⁻¹ := by
+ obtain ⟨_,_,_,_,_,_,h⟩ := batch_decode 17 3 2 (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+ exact h
+
+theorem equal_negative_one : product 17 16 16=1 ∧ ni 17 16 16=16 ∧ si 17 16 16=16 := by decide
+
+theorem noncanonical_guard_gap : (17:UInt64)≠0 ∧ (1:UInt64)≠0 ∧ product 17 17 1=0 ∧
+ ¬(17:UInt64).toNat<(17:UInt64).toNat := by decide
+
+theorem composite_guard_gap : (3:UInt64)≠0 ∧ (5:UInt64)≠0 ∧ product 15 3 5=0 := by decide
+
+theorem overflow_guard_gap : product 17 9223372036854775808 2=0 ∧
+ (9223372036854775808*2:ℕ)%17=1 := by decide
+
+theorem zero_guard_excluded : ¬ ((0:UInt64)≠0 ∧ (2:UInt64)≠0) := by decide
+end FastBatchControls

@@ -1,0 +1,77 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-neural-distinguishers-20261102-2
+experiment_id: neural_distinguishers_20261102
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: f0993f8282ddbd2216185a6f3dd4e31d6b27eabf
+receipt: research/neural_distinguishers_20261102/cards/CARD-neural-distinguishers-20261102-2.receipt.json
+execution_route: >-
+  Stated deviation from AGENTS.md section 9a: the default EKS route (isolab-eks) is not used because this
+  session has no AWS identity and the aws CLI is absent. Backend: session container, 4 vCPU, CPU only,
+  zero cloud spend, no retries (protocol section 5, owner choice 2026-11-02). No other backend is substituted.
+recovery_of: CARD-neural-distinguishers-20261102-1
+binds:
+  - {path: research/neural_distinguishers_20261102/PROTOCOL.md, sha256: 94fc12ee72e14b892f1b7205b7c540c64bdc36d352199c09a9391cb3c1b75e1c}
+  - {path: research/neural_distinguishers_20261102/Cargo.toml, sha256: 8e625b9458a7e5db58c4a475ffb88779360a954c771c828fade07d226af7eef0}
+  - {path: research/neural_distinguishers_20261102/Cargo.lock, sha256: 5077e8f1fc3a48e0656189589d4ffc47f53282db1e9618936bc8051a2e90ae75}
+  - {path: research/neural_distinguishers_20261102/src/main.rs, sha256: 8d521fb08e486dba056c595e4997ca65e8b8b72f900de1f4549643bb87bd292f}
+  - {path: research/neural_distinguishers_20261102/src/ciphers.rs, sha256: 6ed7e17f1dc294fd410d1e3841fd8f4f88a899d3de3056c5f093e9f24aa370a0}
+commands:
+  - id: head-commit
+    argv: [git, -C, /home/user/crypto-ml, rev-parse, HEAD]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/neural_distinguishers_20261102/cards/run-20261102-2.step1.stdout
+  - id: build
+    argv: [cargo, build, --release, --locked]
+    cwd: research/neural_distinguishers_20261102
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    stdout: research/neural_distinguishers_20261102/cards/run-20261102-2.step2.stdout
+    stderr: research/neural_distinguishers_20261102/cards/run-20261102-2.step2.stderr
+  - id: binary-sha256
+    argv: [sha256sum, target/release/neural-distinguishers]
+    cwd: research/neural_distinguishers_20261102
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/neural_distinguishers_20261102/cards/run-20261102-2.step3.stdout
+  - id: run-cell-aes-r4
+    argv: [./target/release/neural-distinguishers, run, results, aes-r4]
+    cwd: research/neural_distinguishers_20261102
+    timeout_seconds: 900
+    success_exit_codes: [0]
+    stdout: research/neural_distinguishers_20261102/cards/run-20261102-2.step4.stdout
+    stderr: research/neural_distinguishers_20261102/cards/run-20261102-2.step4.stderr
+    outputs: [research/neural_distinguishers_20261102/results/rows.jsonl]
+  - id: summary
+    argv: [./target/release/neural-distinguishers, summary, results]
+    cwd: research/neural_distinguishers_20261102
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/neural_distinguishers_20261102/cards/run-20261102-2.step5.stdout
+    stderr: research/neural_distinguishers_20261102/cards/run-20261102-2.step5.stderr
+    outputs:
+      - research/neural_distinguishers_20261102/results/summary.json
+      - research/neural_distinguishers_20261102/results/fig_accuracy.svg
+  - id: output-sha256
+    argv: [sha256sum, results/rows.jsonl, results/summary.json, results/fig_accuracy.svg]
+    cwd: research/neural_distinguishers_20261102
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/neural_distinguishers_20261102/cards/run-20261102-2.step6.stdout
+bus_address: executor-mechanical-neural-distinguishers
+background: true
+write_scope:
+  - research/neural_distinguishers_20261102/
+stop_when:
+  - Any command exits nonzero or reaches its timeout; return the receipt summary and do not rerun any command.
+  - The tool refuses to start (exit 2); return the IMPEDIMENT line and do not run any command yourself.
+  - The checkpoint hook refuses the launcher; return its message verbatim and do not set CHECKPOINT_SKIP.
+notes: >-
+  Recovery of CARD-neural-distinguishers-20261102-1, which was killed by the harness background limit after
+  33 of 35 rows. This card re-runs only cell aes-r4 and appends its 5 rows to results/rows.jsonl.
+  Execution route is the session container (stated deviation from AGENTS.md section 9a, no AWS identity).
+  Deadline 30 minutes wall clock across all six commands; the six timeouts sum to 1500 seconds.
+  No retries and no cloud spend. Do not interpret any output.
+  Launch the tool's command with a background time limit of 7200000 ms (the Bash tool's timeout parameter) — the previous attempt was killed by the default 30-minute background limit.

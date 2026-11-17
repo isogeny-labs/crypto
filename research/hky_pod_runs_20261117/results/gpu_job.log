@@ -1,0 +1,432 @@
+2026-11-17T15:56:18Z
+48
+               total        used        free      shared  buff/cache   available
+Mem:             251          35         117           0          99         216
+Tue Nov 17 15:56:18 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.112.07             Driver Version: 595.112.07     CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA RTX 2000 Ada Gene...    On  |   00000000:C3:00.0 Off |                  Off |
+| 30%   32C    P8              7W /   70W |       2MiB /  16380MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+/usr/local/cuda/bin/nvcc
+/usr/local/cuda/bin/ncu
+/usr/bin/gcc
+Cuda compilation tools, release 12.8, V12.8.93
+Build cuda_12.8.r12.8/compiler.35583870_0
+=== probe
+{
+ "host": {
+  "cpu_model": "AMD EPYC 7443 24-Core Processor",
+  "arch": "x86_64",
+  "kernel": "6.8.0-138-generic",
+  "logical_cpus": 48,
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47
+  ],
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "bmi2",
+   "fma",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "hypervisor": false,
+  "caches_bytes": {
+   "L1d": 32768,
+   "L1i": 32768,
+   "L2": 524288,
+   "L3": 33554432
+  },
+  "mem_total_bytes": 270090555392,
+  "smt_active": "1",
+  "thread_siblings_cpu0": "0,24",
+  "numa_nodes": 1,
+  "cpufreq_governor": "schedutil",
+  "turbo_disabled": null,
+  "cpufreq_boost": "1",
+  "event_sources": [
+   "breakpoint",
+   "cpu",
+   "ibs_fetch",
+   "ibs_op",
+   "kprobe",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "perf_event_paranoid": "4",
+  "cgroup_cpu_max": null,
+  "fingerprint": "4fe71887c51cb441"
+ },
+ "cpu_tier": "T-timing",
+ "perf": null,
+ "pmu_unavailable_reason": "no working perf binary (event sources: breakpoint cpu ibs_fetch ibs_op kprobe msr power software tracepoint uprobe)",
+ "gpu": [
+  "NVIDIA RTX 2000 Ada Generation, 16380 MiB, 595.112.07, 8.9"
+ ],
+ "gpu_unavailable_reason": null,
+ "ncu": "/usr/local/cuda/bin/ncu",
+ "uncore_imc": []
+}
+=== gpu probe
+{
+ "gpus": [
+  "NVIDIA RTX 2000 Ada Generation, 16380 MiB, 595.112.07, 8.9"
+ ],
+ "nvcc": "/usr/local/cuda/bin/nvcc",
+ "ncu": "/usr/local/cuda/bin/ncu",
+ "nsys": null
+}
+rc=0
+usage: optlevel.py gpu calibrate [-h] --out OUT [--repeat REPEAT]
+
+options:
+  -h, --help       show this help message and exit
+  --out OUT
+  --repeat REPEAT
+usage: optlevel.py gpu measure [-h] --out OUT [--label LABEL]
+                               [--repeat REPEAT] [--ops OPS]
+                               [--ops-regex OPS_REGEX] [--op-class OP_CLASS]
+                               [--bytes-per-op BYTES_PER_OP]
+                               [--working-set-bytes WORKING_SET_BYTES]
+                               [--cwd CWD]
+                               ...
+
+positional arguments:
+  cmd
+
+options:
+  -h, --help            show this help message and exit
+  --out OUT
+  --label LABEL
+  --repeat REPEAT       A/B pairs of the single-thread point (>= 5 for a full
+                        noise floor)
+  --ops OPS             operation count of one run, when the command prints
+                        none
+  --ops-regex OPS_REGEX
+                        regex with one group; matches in stdout+stderr are
+                        summed
+  --op-class OP_CLASS
+  --bytes-per-op BYTES_PER_OP
+                        declared memory traffic per operation
+  --working-set-bytes WORKING_SET_BYTES
+                        bytes the kernel touches repeatedly; at or below the
+                        LLC, declared traffic is not charged to DRAM
+  --cwd CWD
+=== gpu calibrate
+gpu calibrate rc=0
+{
+ "build": {
+  "compiler": "/usr/local/cuda/bin/nvcc",
+  "flags": [
+   "-O3",
+   "-std=c++17"
+  ],
+  "source_sha256": "d4df8fd7cad827dfbd6d0659ddeefcb5fa8bf219edaa90b9e89bcf3cc026e8cd"
+ },
+ "ceiling_rule": "max over repeats of the device rate with every SM occupied; threads '1' means one whole device",
+ "compute": {
+  "fma_f64": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "a <- a*s + b in binary64 (one fused multiply-add; float-encoded modular arithmetic)",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 92803970796.38242,
+     "median": 92255328795.848,
+     "min": 92254635229.77594,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  },
+  "muladd_u32": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "a <- a*m + c on 32-bit words (wrapping)",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 3156948695001.0864,
+     "median": 3156224516528.877,
+     "min": 3155822217560.8726,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  },
+  "muladd_u64": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "a <- a*m + c on 64-bit words (wrapping)",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 639300721551.6548,
+     "median": 639265826003.04,
+     "min": 639013103812.7855,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  },
+  "popcnt_u64": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "popcount(a and b) on 64-bit words",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 414683885231.3431,
+     "median": 414522775472.34924,
+     "min": 412138643274.00684,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  },
+  "xor_u64": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "a <- a xor b on 64-bit words (one F_2 row-add word)",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 1442859914152.8845,
+     "median": 1441246403040.7007,
+     "min": 1434909294429.7844,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  }
+ },
+ "conditions": null,
+ "created_utc": "2026-11-17T15:57:04Z",
+ "device": "gpu",
+ "flags": [
+  "GPU_CEILING_UNVALIDATED_BY_AUTHOR"
+ ],
+ "host": {
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47
+  ],
+  "arch": "x86_64",
+  "caches_bytes": {
+   "L1d": 32768,
+   "L1i": 32768,
+   "L2": 524288,
+   "L3": 33554432
+  },
+  "cgroup_cpu_max": null,
+  "cpu_model": "AMD EPYC 7443 24-Core Processor",
+  "cpufreq_boost": "1",
+  "cpufr=== cpu controls on this host
+optlevel: muladd_u32     peak 2.108e+10 ops/s/core (muladd_u32@native); all 48 cores 1.568e+11
+optlevel: muladd_u64     peak 5.544e+09 ops/s/core (muladd_u64@native); all 48 cores 4.092e+10
+optlevel: mulwide_u64    peak 1.252e+09 ops/s/core (mulwide_u64@native); all 48 cores 1.018e+10
+optlevel: modmuladd_p31  peak 1.137e+09 ops/s/core (modmuladd_p31@w512); all 48 cores 1.072e+10
+optlevel: modmuladd_p62  peak 6.918e+08 ops/s/core (modmuladd_p62@native); all 48 cores 5.487e+09
+optlevel: xor_u64        peak 6.335e+09 ops/s/core (xor_u64@native); all 48 cores 4.782e+10
+optlevel: popcnt_u64     peak 1.840e+09 ops/s/core (popcnt_u64@w512); all 48 cores 1.381e+10
+optlevel: fma_f64        peak 8.639e+09 ops/s/core (fma_f64@native); all 48 cores 6.697e+10
+optlevel: ptr_hop        peak 9.202e+08 ops/s/core (chase@scalar); all 48 cores 8.528e+09
+optlevel: bandwidth 1 core(s): 43.18 GB/s (xor_u64; triad 40.15, xor_u64 43.18, popcnt_u64 20.51)
+optlevel: bandwidth 2 core(s): 59.09 GB/s (xor_u64; triad 53.82, xor_u64 59.09, popcnt_u64 36.57)
+optlevel: bandwidth 4 core(s): 58.63 GB/s (xor_u64; triad 55.24, xor_u64 58.63, popcnt_u64 43.86)
+optlevel: bandwidth 8 core(s): 66.79 GB/s (xor_u64; triad 63.85, xor_u64 66.79, popcnt_u64 50.73)
+optlevel: bandwidth 16 core(s): 50.48 GB/s (xor_u64; triad 49.28, xor_u64 50.48, popcnt_u64 50.47)
+optlevel: bandwidth 32 core(s): 108.09 GB/s (triad; triad 108.09, xor_u64 104.35, popcnt_u64 88.55)
+optlevel: bandwidth 48 core(s): 103.25 GB/s (xor_u64; triad 88.43, xor_u64 103.25, popcnt_u64 81.23)
+optlevel: wrote /workspace/out/optlevel_gpu/controls/calibration.json (host 4fe71887c51cb441, flags ['CONTENDED'])
+optlevel: T-timing modmuladd_p31 single 1.136e+09 ops/s [1.130e+09, 1.136e+09] noise 0.005 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel_gpu/controls/positive-simd-incache.measurement.json
+positive-simd-incache  [T-timing]  class modmuladd_p31
+  attainment single 0.999 [0.994, 1.000]  of 1.137e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.762 [0.733, 0.881]  of 1.072e+10 ops/s (compute roof, 48 thread(s))
+  parallel   raw 0.150, roofline-normalised 0.763 at 48 threads
+  grade      A (score 0.999, scope single-thread only)
+  limiting   none above threshold: near the roofline; what remains is the algorithmic axis  [roofline]
+  noise      A/A 0.005 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing modmuladd_p31 single 7.657e+08 ops/s [7.639e+08, 7.678e+08] noise 0.005 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel_gpu/controls/scalar-incache.measurement.json
+scalar-incache  [T-timing]  class modmuladd_p31
+  attainment single 0.674 [0.672, 0.676]  of 1.137e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.426 [0.404, 0.504]  of 1.072e+10 ops/s (compute roof, 48 thread(s))
+  parallel   raw 0.124, roofline-normalised 0.632 at 48 threads
+  grade      B (score 0.674, scope single-thread only)
+  limiting   core bound below the compute roof: instruction overhead, partial vectorization or dependency chains (timing tier cannot split these)  [timing inference]
+  noise      A/A 0.005 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing modmuladd_p31 single 2.420e+08 ops/s [2.418e+08, 2.421e+08] noise 0.001 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel_gpu/controls/serial-dependency.measurement.json
+serial-dependency  [T-timing]  class modmuladd_p31
+  attainment single 0.213 [0.213, 0.213]  of 1.137e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.175 [0.160, 0.190]  of 1.072e+10 ops/s (compute roof, 48 thread(s))
+  parallel   raw 0.161, roofline-normalised 0.821 at 48 threads
+  grade      C (score 0.213, scope single-thread only)
+  limiting   core bound below the compute roof: instruction overhead, partial vectorization or dependency chains (timing tier cannot split these)  [timing inference]
+  noise      A/A 0.001 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing fma_f64 single 1.893e+09 ops/s [1.771e+09, 1.922e+09] noise 0.080 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel_gpu/controls/stream-daxpy.measurement.json
+stream-daxpy  [T-timing]  class fma_f64
+  attainment single 1.052 [0.984, 1.069]  of 1.799e+09 ops/s (memory roof, 1 thread(s))
+  attainment full   0.884 [0.841, 0.978]  of 4.302e+09 ops/s (memory roof, 48 thread(s))
+  parallel   raw 0.042, roofline-normalised 0.841 at 48 threads
+  grade      A (score 1.052, scope single-thread only)
+  limiting   at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, fewer bytes per operation) or a different algorithm helps  [roofline]
+  noise      A/A 0.080 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing ptr_hop single 1.191e+07 ops/s [1.060e+07, 1.285e+07] noise 0.188 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel_gpu/controls/pointer-chase.measurement.json
+pointer-chase  [T-timing]  class ptr_hop
+  attainment single 0.018 [0.016, 0.019]  of 6.747e+08 ops/s (memory roof, 1 thread(s))
+  attainment full   0.040 [0.034, 0.044]  of 1.613e+09 ops/s (memory roof, 48 thread(s))
+  parallel   raw 0.112, roofline-normalised 2.243 at 48 threads
+  grade      E (score 0.018, scope single-thread only)
+  limiting   memory latency bound: the rate matches one outstanding dependent miss at a time (latency attainment 1.12); far below the bandwidth roof  [roofline + latency calibration]
+  noise      A/A 0.188 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing modmuladd_p31 single 1.136e+09 ops/s [1.135e+09, 1.137e+09] noise 0.002 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel_gpu/controls/aa-repeat.measurement.json
+aa-repeat  [T-timing]  class modmuladd_p31
+  attainment single 0.999 [0.998, 1.001]  of 1.137e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.569 [0.546, 0.655]  of 1.072e+10 ops/s (compute roof, 48 thread(s))
+  parallel   raw 0.112, roofline-normalised 0.569 at 48 threads
+  grade      A (score 0.999, scope single-thread only)
+  limiting   none above threshold: near the roofline; what remains is the algorithmic axis  [roofline]
+  noise      A/A 0.002 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+| control | tier | class | binding roof | A single [low, high] | A full | raw par. eff. | norm. par. eff. | score | grade | A/A noise | other CPU (cores) | limiting factor |
+|:--|:--|:--|:--|:--|--:|--:|--:|--:|:--|--:|--:|:--|
+| positive-simd-incache | T-timing | modmuladd_p31 | compute | 0.999 [0.994, 1.000] | 0.762 | 0.150 | 0.763 | 0.999 | A | 0.005 | 6.52 | none above threshold: near the roofline; what remains is the algorithmic axis |
+| scalar-incache | T-timing | modmuladd_p31 | compute | 0.674 [0.672, 0.676] | 0.426 | 0.124 | 0.632 | 0.674 | B | 0.005 | 6.75 | core bound below the compute roof: instruction overhead, partial vectorization or dependency chains (timing tier cannot split these) |
+| serial-dependency | T-timing | modmuladd_p31 | compute | 0.213 [0.213, 0.213] | 0.175 | 0.161 | 0.821 | 0.213 | C | 0.001 | 5.64 | core bound below the compute roof: instruction overhead, partial vectorization or dependency chains (timing tier cannot split these) |
+| stream-daxpy | T-timing | fma_f64 | memory | 1.052 [0.984, 1.069] | 0.884 | 0.042 | 0.841 | 1.052 | A | 0.080 | 5.57 | at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, fewer bytes per operation) or a different algorithm helps |
+| pointer-chase | T-timing | ptr_hop | memory | 0.018 [0.016, 0.019] | 0.040 | 0.112 | 2.243 | 0.018 | E | 0.188 | 3.24 | memory latency bound: the rate matches one outstanding dependent miss at a time (latency attainment 1.12); far below the bandwidth roof |
+| aa-repeat | T-timing | modmuladd_p31 | compute | 0.999 [0.998, 1.001] | 0.569 | 0.112 | 0.569 | 0.999 | A | 0.002 | 1.91 | none above threshold: near the roofline; what remains is the algorithmic axis |
+controls rc=0
+=== ALL DONE
+2026-11-17T16:03:51Z

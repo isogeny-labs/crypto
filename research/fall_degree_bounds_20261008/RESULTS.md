@@ -552,3 +552,109 @@ These are verified output files, not a solver-memory checkpoint. No closure
 replay, independent algorithm validation, retry or deadline extension accompanies
 this preservation. Earlier still-running records are historical; the requested
 E12a degree determination and the general first-/last-fall questions remain open.
+
+## E13 (Amendments 17 and 18): independent-engine check, degree 5 at (3, 21, 7), and (4, 28, 7), 2026-11-08
+
+Local route (Amendment 18): 4 vCPU, 15 GB, `ulimit -v` 13 GiB, sequential, frozen source
+main `a2be6609`. Run 2026-11-07 22:56 → 2026-11-08 10:05 UTC. One container restart
+(01:37 UTC): B_3-21-7_d0 was recomputed from scratch, and attempt 1 is kept as `.err.attempt1`.
+Gates G0 (7 tests ok) and G1 (closure_rank 131,588, empty diff) passed.
+Scored by `e13/score_e13.py` from committed files → `e13/score.json`. Report, graph
+and PDF: `reports/run-20261108-e13/`.
+
+| part | registered reading | prediction (A17 / A18) |
+|:--|:--|:--|
+| E13b | **disagreement** (rule as written): **no draw differs**, but 3 of 8 controls (6:10:3 d1, d3, d4, `N = 58`) are not completed (memory), so "every control refutes" is not met | agreement 0.85 / `N = 58` controls not completed 0.5 |
+| E13a | **not completed**: 0 of 4 draws measured; each exceeded 13 GiB at degree 5 after ~19 min | not completed 0.1 / 0.85 |
+| E13c | **no reading**: gate 0 did not build (rustc/LLVM out of memory under the cap, which the runner applied to the whole `run_window.sh`, build included); no draw computed | no reading 0.8 / not completed 0.95 |
+
+**E13b detail.**
+- **Censored draws:** all 12 E10 `d_F ≥ 5` draws saturate unrefuted at degree 4 under
+  `pe`, with `closure_rank` equal to `hky_par`'s degree-4 `dim`. The degree-3 ranks are equal too.
+
+  | cell | degree-4 ranks |
+  |:--|:--|
+  | 3:21:7 | 117,335, 116,485, 118,185, 117,505 |
+  | 3:24:8 | 186,549, 187,453, 186,323, 185,193 |
+  | 3:27:9 | 160,259 ×4 |
+
+- **Controls:** 4:12:3 ×4 refute at degree 4 and 6:10:3 d2 at degree 3, each as recorded.
+  The suspension clause of "disagreement" lists **no cell**, so the E10 `≥ 5` readings are
+  not suspended.
+- **What the "disagreement" label reflects:** the rule had no case for an unmeasured
+  control. It does not reflect a mismatch.
+- **What is shown:** a second closure implementation reproduces every censored draw. Its
+  positive detection of a degree-4 refutation is confirmed only at `N = 48` (4:12:3),
+  not at `N = 58`.
+
+**Open:** the exact `d_F` at (3, 21, 7) and any reading at (4, 28, 7) need more than
+13 GiB. That means a pod under a new amendment. Nothing was retried under Amendments 17 and 18.
+
+## E14 (Amendment 19): RunPod run of the E13 parts that ran out of 13 GiB, 2026-11-09
+
+**Not completed.** RunPod terminated the pod, a 64-vCPU AMD EPYC 7702P with 504 GiB of memory,
+part-way through the first E14b draw. The pod's last upload landed at 10:17:27 UTC and the next
+10-minute upload never arrived. At 13:07 UTC the API returned "pod not found" and the account
+balance was −0.04 USD. Termination for a zero balance is inferred from those two facts; no
+provider event log was read. Another pod on the same account (not part of this study) was billing
+1.19 USD/h at the same time. Records: `e14/pod/` (last `out.tgz`, sha256 `0f8603c6…751965`) and
+`e14/score.json`. Report: `reports/run-20261109-e14/`.
+
+| Unit | Status | Registered reading | Prediction outcome |
+|---|---|---|---|
+| Gates G0 and G1 | passed (G0 7/7 tests; G1 diff against `S3.d0.b4.jsonl` empty) | — | — |
+| E14b 6:10:3 d1 | ran ≥ 16,428 s (05:43:39 to 10:17:27 UTC) without output | **not completed** | "controls confirmed" (0.85) failed |
+| E14b d3, d4 | not started | | |
+| E14a 3:21:7, degree 5, draws 0/1/3/4 | not started | **not completed** | "not completed" (0.15) occurred |
+| E14c 4:28:7, hky_window | not started | **no reading** | "no reading" (0.75) occurred |
+
+The combined statement "independent agreement (E13b + E14b)" is not made. E13b's recorded reading
+stays "disagreement" (3 controls unmeasured; no measured draw differs).
+
+**Observation (not a registered reading).** On draw d1 of 6:10:3 the reference hky_par closed at
+degree 4 in 190.4 s on 32 threads (E9). pe with `--to 4 --max-cols 600000` on 64 threads had not
+finished after 4.56 h. Locally, in E13, it exceeded 13 GiB after 2,343 s. So the pe degree-4 system
+for this 58-variable, 50-equation control costs at least two orders of magnitude more wall time
+than hky_par's. A rerun as registered would probably spend most of its window on the three
+controls. Before any rerun, measure pe's matrix size on d1 and decide whether E14a should run
+first. That is a design question for a new amendment, not a result.
+
+Binary: `dreg_linear_guess` sha256 `f902edfd…321a99`, built on the pod from the frozen source
+archive `fd-src-a2be6609.tgz` (hash checked: OK). Cost: about 6.3 h × 2.56 USD/h ≈ 16 USD,
+including the idle first hour.
+
+## E14 r2 (Amendments 20, 21, 25, 27–30): first exact last fall degree above 4, cell "split"
+
+**E14a: two of four draws measured, both read "`d_F = 5`"; cell reading "split".** The run used
+RunPod pod `gjr9mpprgga8eb` (32 vCPU AMD EPYC 9575F, 503 GiB, USD 2.08/h) from 2026-11-12 04:57 UTC
+to its deadline at 2026-11-13 16:57 UTC, with source `a2be6609` (tree hash checked) and `hky_par`
+sha256 `f4264c24…6ea6`. Gates G0–G3 passed. G1 and G2 gave empty diffs, so `hky_par` at the frozen
+commit reproduces E10 on (3, 21, 7). Records: `e14/score.json` (section `r2`) and
+`e14/pod-r2/out-r2j/`. Report: `reports/run-20261114-e14r2/`.
+
+| Unit | What happened | Registered reading | Prediction outcome |
+|---|---|---|---|
+| E14a draw 0 | `d_f = 5` in 37,890 s; degree ≤ 4 equal to E10 | "`d_F = 5`" `[pcc:unverified]` | |
+| E14a draw 1 | `d_f = 5` in 38,240 s; degree ≤ 4 equal to E10 | "`d_F = 5`" `[pcc:unverified]` | |
+| E14a draw 3 | running at the last pull (2026-11-13 02:50 UTC); record lost with the pod | not completed | |
+| E14a draw 4 | cut off by the deadline | not completed | |
+| **E14a cell** | 2 measured, both 5; "`d_F = 5`" needs ≥ 3 of 4 | **split** | "split" (0.05) occurred |
+| E14b 6:10:3 controls | not started; E14a held the pod until the deadline | **not completed** | "not completed" (0.35) occurred |
+| E14c 4:28:7 | not started | **no reading** | "no reading" (0.80) occurred |
+| G2 | passed | — | 0.90, occurred |
+
+"Split" here comes from the count alone. No measured draw disagrees: both closed degree 5 at full
+rank (974,982 of 974,982 columns, 4 rounds) and read 5. The combined statement "independent agreement
+(E13b + E14b)" is not made, and E13b stays "disagreement". No Lean row is added, because the cell
+registers no value of `d_F`.
+
+**Process failures.** The check-ins scheduled for 13:35 and 17:10 UTC on 2026-11-13 reached the
+session only at 19:08 UTC on 2026-11-14. By then the pod returned 404, and no pull had been taken
+after 02:50 UTC. Draw 3's record, if one was written, was lost: whether draw 3 finished is unknown.
+The in-pod script kept its output only on the pod's disk. The cost was not read from billing; at
+USD 2.08/h, the 36 h to the deadline plus up to 6 h of grace is at most about USD 87.
+
+**Design observation (not a reading).** Degree 5 on (3, 21, 7) costs about 10.6 h per draw on 32
+threads. Four draws in one invocation cannot finish inside a 36 h deadline, so E14b and E14c could
+never run in this order. A follow-up needs a new amendment. One option is draws 3 and 4 alone, about
+22 h and USD 46, with an upload after every draw.

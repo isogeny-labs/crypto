@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-09T07:58:13Z",
+ "id": "PCC-20261109-eb2e7e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "15ab03e54a929ce076fd6b58edc6bb646a110cb8",
+  "model": "",
+  "session": "stream-precision-20261109"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "80532e223b2802dfcbbfeabee6ec09a8961897ec5d194cc5feab2b20e99cee7a",
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "StreamPrecision.computedScaledFunctionalResidue"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "rational scaled-accumulator algebra only; no native unscaling, construction cost, measured memory gain or full recursive bound",
+ "statement": "The constructed scaled functional on actual computed finite quotient buffers has the2^K-scaled original target residue at p+K, using original source child precision and3<=u<=a,u<=M,injective supplied placement; target values are absent from functional inputs."
+}

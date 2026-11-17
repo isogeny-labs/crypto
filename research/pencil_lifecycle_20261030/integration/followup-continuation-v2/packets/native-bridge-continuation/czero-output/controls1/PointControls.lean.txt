@@ -1,0 +1,45 @@
+import CurvePoint
+set_option autoImplicit false
+namespace CZeroPointControls
+open Polynomial CZeroInterpolation CZeroOutput
+noncomputable def u1 : ℚ[X] := CZeroInterpolation.support 1 2
+noncomputable def u2 : ℚ[X] := CZeroInterpolation.support 0 1
+noncomputable def v1 : ℚ[X] := ordinate 4 5
+noncomputable def v2 : ℚ[X] := ordinate 1 2
+noncomputable def l : ℚ[X] := v1-C 3*u1
+noncomputable def f : ℚ[X] := l^2+u1*u2*(X-C 10)
+
+theorem fixture_shape : f=X^5-C 13*X^3-C 22*X^2-C 10*X-C 19 := by
+ simp only [f,l,v1,u1,u2,ordinate,CZeroInterpolation.support]
+ norm_num [map_ofNat]
+ ring
+
+theorem fixture_degree : f.natDegree=5 := by
+ rw [fixture_shape]
+ apply natDegree_eq_of_le_of_coeff_ne_zero
+ · apply le_trans (natDegree_sub_le _ _); apply max_le
+   · apply le_trans (natDegree_sub_le _ _); apply max_le
+     · apply le_trans (natDegree_sub_le _ _); apply max_le
+       · apply le_trans (natDegree_sub_le _ _); apply max_le
+         · simp
+         · apply le_trans natDegree_mul_le; simp
+       · apply le_trans natDegree_mul_le; simp
+     · apply le_trans natDegree_mul_le; simp
+   · simp
+ · simp
+
+theorem fixture_top : f.coeff 5=1 ∧ f.coeff 4=0 := by rw [fixture_shape]; simp
+
+theorem fixture_divides : u1*u2∣f-l^2 := by
+ refine ⟨X-C 10,?_⟩
+ simp [f]
+
+theorem full_output_application : (-l.eval 10)^2=f.eval 10 := by
+ have h:=output_on_curve f (1:ℚ) 2 4 5 0 1 3 fixture_degree fixture_top.1 fixture_top.2 fixture_divides
+ norm_num at h
+ exact h
+
+theorem exact_ordinate : -l.eval 10=291 := by norm_num [l,v1,u1,ordinate,CZeroInterpolation.support]
+
+theorem nonzero_fourth_boundary : ((X^5+X^4 : ℚ[X]).coeff 4)≠0 := by simp
+end CZeroPointControls

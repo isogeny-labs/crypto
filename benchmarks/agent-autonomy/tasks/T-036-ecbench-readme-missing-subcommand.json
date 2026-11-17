@@ -1,0 +1,33 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-036",
+  "title": "Document the `optimize` subcommand in the ecbench README table",
+  "class": "docs-tooling",
+  "difficulty": 2,
+  "source": [
+    "docs/ecbench/README.md ('Every subcommand, and where it is described')",
+    "src/bin/ecbench.rs (module header)"
+  ],
+  "prompt": "The module header of `src/bin/ecbench.rs` lists every `ecbench` subcommand, and `docs/ecbench/README.md` has a table of every subcommand. One subcommand is in the header but not in the table. Find it, read what it does in the source, and add an accurate row in the table's style. Do not describe behaviour you did not read.",
+  "setup": "Restore the pre-fix files: `git checkout 0b9d7b861ed51b73c83187b5c03e17de73ea117a -- docs/ecbench/README.md` (that commit holds the broken starting state).  Not a harness-written fixture.",
+  "acceptance": [
+    "every `//! ecbench <word>` in src/bin/ecbench.rs appears as a table row in docs/ecbench/README.md",
+    "the new row describes both optimize inventory and optimize audit, and cites a section or file",
+    "only docs/ecbench/README.md changed"
+  ],
+  "check_command": "python3 -c \"import re;h={re.match(r'//! ecbench (\\S+)',l).group(1) for l in open('src/bin/ecbench.rs') if l.startswith('//! ecbench ')};r=open('docs/ecbench/README.md').read();t=r.split('### Every subcommand')[1].split('## 1. Quick start')[0];m=[c for c in h if ('\\x60'+c) not in t];print(m);raise SystemExit(1 if m else 0)\" && grep -q 'inventory' docs/ecbench/README.md && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc '^docs/ecbench/README.md$')\" = 0 ]",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "describing the subcommand from its name alone"
+  ],
+  "max_wall_minutes": 20,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Gap verified 2026-11-15: only `optimize` is missing."
+}

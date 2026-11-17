@@ -1,0 +1,34 @@
+{
+  "decision": "failed_compile_no_tests_cleanup_observed",
+  "artifact_hashes": {
+    "exporter2-attempt1/receipt.json": "699b07f049922bd7ebfe5ff473fb2a67dc145e835f65a203e5f7aaf43619b956",
+    "exporter2-attempt1/cleanup-receipt.json": "1871570d0716426032573ae15a3c117eae7f4e2f21094e394aaad014a57d6cbd",
+    "exporter2-attempt1/1.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exporter2-attempt1/1.stderr": "d472f042a1f5f29a7fca33c5ceb7920c7b9e7649f7f6068c373f1217cdd6a7dd",
+    "exporter2-execution.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "elapsed_seconds": 52.9140838989988,
+  "failure": "E0624 Spec::identity_view private at spec.rs235; fixture controls.rs24",
+  "review_correction": "Reviewer missed third private fixture API after catching prepare_lifecycle_child/recompute_class_identity. Prospective acceptance is preserved as historical review, not evidence of build success.",
+  "test_count": 0,
+  "input_changes": [],
+  "compiler_reaped": true,
+  "remaining_process_group": [],
+  "retry_authorized_by_this_review": false,
+  "minimal_prospective_correction": "Construct fixed synthetic spec identity JSON from public schema/workloads/arms/measurement fields and call existing public canonical short_id; preserve real validation, exporter and test assertions.",
+  "remaining_public_calls_audited": [
+    "canonical::sha256_hex",
+    "canonical::short_id",
+    "canonical::reject_duplicate_keys",
+    "Spec::from_json",
+    "host::recompute_class",
+    "DiagnosticLaunch::from_bytes",
+    "DiagnosticLaunch::document",
+    "DiagnosticLaunch::raw_sha256",
+    "diagnostic_launch::resolved_method_binding",
+    "SessionResourceJournal::begin",
+    "SessionResourceJournal::close_fresh_enclosing_evidence",
+    "diagnostic_file_adapter::check_file"
+  ],
+  "scope": "Read-only retained failure review; no compiler or test invocation."
+}

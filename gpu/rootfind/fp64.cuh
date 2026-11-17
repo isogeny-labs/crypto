@@ -39,7 +39,7 @@
 
 #ifdef __CUDACC__
 #define RF_HD __host__ __device__ __forceinline__
-#define RF_BIG __host__ __device__ __noinline__
+#define RF_BIG __host__ __device__ __noinline__ inline
 #else
 #define RF_HD inline
 #define RF_BIG inline

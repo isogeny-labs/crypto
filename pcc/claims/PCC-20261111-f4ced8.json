@@ -1,0 +1,61 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T20:24:40Z",
+ "id": "PCC-20261111-f4ced8",
+ "kind": "theorem",
+ "producer": {
+  "commit": "6905c86363f5ba499214c5488149ae46a3ba9bec",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "b23b69e07c14e2345dd20cc3d1d09eeac4133a5809105b8875e58297c83cfd8d",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/RichelotDescent.lean",
+   "theorem": "RichelotDescent.not_neg_fixed_of_bezout"
+  },
+  {
+   "decl_sha256": "87ed4b1ce5f669add4723a35c0dda63eb1f87501b2eeb6d465245c4a6454ccb7",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/RichelotDescent.lean",
+   "theorem": "RichelotDescent.sign_ambiguity_removed_by_odd_witness"
+  },
+  {
+   "decl_sha256": "0f9643726032547d3c2e0abca387a1f6af50c3b6dbfc65a7a3225da32bcdd35b",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/RichelotDescent.lean",
+   "theorem": "RichelotDescent.quarter_order109"
+  },
+  {
+   "decl_sha256": "3a310cb93eca5d640ce5695287809a267a1d644babead6ff439bcaf3da202ceb",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/RichelotDescent.lean",
+   "theorem": "RichelotDescent.quarter_order113"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/richelot-descent-lean-02.txt",
+    "sha256": "656d69ef885136309abe719e581bbb0a161bee497cf6f0bf8ca0f0c63d1f6071"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/richelot-descent-lean-02-build.txt",
+    "sha256": "0ee9c95f2e8c8cfba64be9acc508008733ac1a242ca8ed9c0807a9a4b102ecc0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/richelot-descent-lean-02-audit.txt",
+    "sha256": "6b3c11bc71f78f86d4ec196d5ebe3ef3b3ab7690954233af49e5bb1eaedaa8d8"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Four conditional algebra lemmas for the exact Richelot descent sign witness and rational quarter evaluator:nonzero odd-annihilated element is not fixed by negation under explicit Bezout identity,plus/minus map ambiguity is removed by one such fixed witness,and inverse4=82/85 on109/113 torsion. No Galois action,finite field,regular map,curve,polarization,Torelli or global descent is formalized by these helpers. Lean4.35.0 gate4,standard foundations only,zero trusted native,unsigned standing."
+}

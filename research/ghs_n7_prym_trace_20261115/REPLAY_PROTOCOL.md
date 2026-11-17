@@ -1,0 +1,3 @@
+# Direct point-count replay
+
+Frozen before replay, 2026-11-15 UTC. Input is the 112-row `reports/run-20261115T0821Z/curves.csv`, field polynomial 0x83, and exact E(a,b) equation in `PROTOCOL.md`. A second Rust program uses carryless polynomial multiplication followed by reduction and counts every affine (x,y) solution directly, plus infinity, for each row. This is independent of the producer's trace criterion for counting y values. It compares the integer group order, t, and `18-t` in every CSV row, and asserts 112 rows and unique (a,b) pairs. Stop on first mismatch. Output goes to `reports/replay-20261115T0833Z/`; it is a local independent algorithmic replay, not an externally signed verification.

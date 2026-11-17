@@ -399,12 +399,37 @@ def alias_map_text(registry: dict) -> str:
     src/ because workflows that sparse-check-out src/ must still build."""
     aliases = {}
     for c in registry["curves"]:
-        for name in c["aliases"] + c["standard_names"] + [c["slug"], c["icv1"]]:
+        names = c["aliases"] + c["standard_names"] + [c["slug"], c["icv1"]]
+        if c.get("panel_alias"):  # docs/ic/STANDARD_PANEL.md
+            names.append(c["panel_alias"])
+        for name in names:
             aliases[normalise_alias(name)] = c["slug"]
     doc = {"schema_version": 1, "generated_from": "docs/curves/registry.json",
            "generated_by": "scripts/build_curve_registry.py",
            "aliases": dict(sorted(aliases.items()))}
     return json.dumps(doc, indent=0, ensure_ascii=False) + "\n"
+
+
+REGISTRY_INDEX = REPO / "src" / "cryptanalysis" / "ecbench" / "registry_index.txt"
+
+
+def registry_index_text(registry_text: str) -> str:
+    """The registry index `crypto::cryptanalysis::ecbench::workload` compiles
+    in: for every `"slug": "<slug>"` pair of the registry *text* (its first
+    occurrence in document order), the byte offset in the UTF-8 text of the
+    value's opening quote, one decimal offset per line, the lines ordered by
+    slug.  The reader takes the slug from the registry at the offset, so the
+    file holds offsets only and stays well under the artifact policy's size
+    limit for text.  A measured child cuts its curve's entry out of the
+    20 MB document at that offset instead of scanning the document to it.
+    Derived from the text, not the parsed document, because the offsets are
+    into the text; written beside the registry by build_curve_registry.py,
+    and check_curve_names.py fails when the two disagree."""
+    data = registry_text.encode("utf-8")
+    first: dict[bytes, int] = {}
+    for m in re.finditer(rb'"slug"\s*:\s*"([^"\\]*)"', data):
+        first.setdefault(m.group(1), m.start(1) - 1)
+    return "".join(f"{at}\n" for _, at in sorted(first.items()))
 
 
 def load_registry(path: Path = REGISTRY) -> dict:

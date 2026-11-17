@@ -1,0 +1,915 @@
+{
+  "schema": "replay-certificate/v1",
+  "status": "verified",
+  "independent": true,
+  "scalars_verified": true,
+  "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E40: fresh builds of the recorded commits from git exports into a fresh tmpfs target directory; nothing reused from the producer target directory or its pinned binaries (/dev/shm/e40bin was not used)",
+  "date": "2026-11-02",
+  "row": "E40 (GLV note §9.50/§9.51): chain-profile (V) end to end on E37's stream and on E40E0002, its Stage A, controls and identity configurations, the E25 references of E37 and the matched rho walk (iii)",
+  "snapshot": "af58c1af72 (remote head of claude/glv-endomorphism-index-calculus-pe7ige); committed records read from a git archive of it",
+  "build": {
+    "schema": "e40-validator-build/v1",
+    "recorded": {
+      "source": "experiments/47_macaulay_entries/binary_sha256.txt and binary_commit.txt",
+      "commit": "9b2a47238b (quartic_pipeline_gls, quartic_pipeline_v4, e40_stage_a, e40_checks v1, e40_tables); 86d0f86c25 (e40_checks_v2)",
+      "binary_sha256": {
+        "quartic_pipeline_gls": "487a674037161ac9bf42d102d2d972c0d47ed28cb6ca836c999484fa6d6969bd",
+        "quartic_pipeline_v4": "7b5fb06d91805d0f2859d4566bec355f22ad2d25e17c04c72156d28f9be06d48",
+        "e40_stage_a": "975d2df772b6dde16c1b40afe47b6822a0458180244aa3aa6fcaa029042bb226",
+        "e40_checks": "55e43e56487dfa6868955ee5657fcac05e552a38ad5de0a41c4ed4fb31bb979e",
+        "e40_tables": "3df317895e34eb45c69a27351bce367ca16eea1324ba9d9e84f8d74f074b8b8c",
+        "e40_checks_v2": "91bbd78e9e20e96ad45b09450ac17f1e818474c5e410ca048c5f641aa9ca3e61"
+      }
+    },
+    "repository_state_at_start": "local branch claude/glv-endomorphism-index-calculus-pe7ige at 4ad9692d5a; remote head af58c1af72 (a merge of main on top of 4ad9692d5a that touches no E40, E37 or E27 path: git diff 4ad9692d5a af58c1af72 over src/cryptanalysis, examples, experiments/{47,44,32}, research/e40_*, the note and Cargo files changes only f4_fp_tower.rs and ic_framework/pkm_semaev.rs); untracked files of E39 and E41 present in the checkout, not read except where named. Records were read from a git archive of af58c1af72, not from the working tree.",
+    "export_1": {
+      "commit": "9b2a47238b",
+      "path": "/dev/shm/e40_src (the producer's recorded source path; it did not exist before)",
+      "method": "one `git archive 9b2a47238b -- <215 paths> | tar -x`; the paths computed by the validator's own commands: Cargo.toml, Cargo.lock, src/, examples/, benches/, the six path dependencies (isogeny_algos, crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, tools/factor-base, tools/volcano-cli, research/pencil_large_prime_20261029), every `path = \"...\"` of Cargo.toml (44) and every literal include_str!/include_bytes! target present at the commit (171; 11 targets inside archived snapshot directories of the pencil crate are absent at the commit and are not compiled). No producer script was used.",
+      "files": 4409,
+      "blob_check": "git hash-object --no-filters over every exported file against git ls-tree 9b2a47238b: 4,409/4,409 equal"
+    },
+    "build_1": {
+      "command": "cd /dev/shm/e40_src && flock <scratchpad>/build.lock env CARGO_TARGET_DIR=/dev/shm/v40 nice -n 5 cargo build --release --offline -j 2 --example quartic_pipeline_gls --example quartic_pipeline_v4 --example e40_stage_a --example e40_checks --example e40_tables",
+      "target_dir": "/dev/shm/v40, fresh and empty (the producer's differed); nothing reused from any other target directory",
+      "window": "2026-11-02T21:48:03Z - 22:08:36Z, `Finished release profile [optimized] target(s) in 20m 32s`, exit 0, no warnings",
+      "binary_sha256": {
+        "quartic_pipeline_gls": "487a674037161ac9bf42d102d2d972c0d47ed28cb6ca836c999484fa6d6969bd",
+        "quartic_pipeline_v4": "7b5fb06d91805d0f2859d4566bec355f22ad2d25e17c04c72156d28f9be06d48",
+        "e40_stage_a": "975d2df772b6dde16c1b40afe47b6822a0458180244aa3aa6fcaa029042bb226",
+        "e40_checks": "55e43e56487dfa6868955ee5657fcac05e552a38ad5de0a41c4ed4fb31bb979e",
+        "e40_tables": "3df317895e34eb45c69a27351bce367ca16eea1324ba9d9e84f8d74f074b8b8c"
+      },
+      "matches_recorded": true
+    },
+    "build_walks": {
+      "command": "same tree and target directory, `cargo build --release --offline -j 2 --example e27_walk --example e37_walk_e24` (3.89 s; links the crypto_lib of build_1)",
+      "purpose": "replay the matched rho (walk (iii)) from the same crypto_lib build as the IC arms; neither binary has a recorded hash at this commit (E27's and E37's records were produced by earlier builds), so the check is on their outputs",
+      "binary_sha256": {
+        "e27_walk": "e526d8b4e39a816119ac40837f9f4ea334da96d0201aca8abfd06d7c612b1af8",
+        "e37_walk_e24": "66ffc5da03ca144df44448dea46f6c4b86b63799e5c113b367aa8f1a3b150a6b"
+      }
+    },
+    "export_2": {
+      "commit": "86d0f86c25",
+      "method": "the four build-input files that differ from 9b2a47238b over the same path rules (examples/e40_checks.rs, examples/e41_run.rs, examples/e41_tables.rs, src/cryptanalysis/twist24_shortfall.rs) written from `git show 86d0f86c25:<path>` into the same export, after build_1's binaries were copied out; Cargo.toml's paths and the include targets are unchanged between the two commits",
+      "blob_check": "4,411/4,411 build-input files equal their 86d0f86c25 blobs"
+    },
+    "build_2": {
+      "command": "same, `cargo build --release --offline -j 2 --example e40_checks` (copied out as e40_checks_v2)",
+      "window": "2026-11-02T22:09:37Z - 22:25:03Z, `Finished ... in 15m 26s`, exit 0",
+      "binary_sha256": {
+        "e40_checks_v2": "91bbd78e9e20e96ad45b09450ac17f1e818474c5e410ca048c5f641aa9ca3e61"
+      },
+      "matches_recorded": true
+    },
+    "byte_identity": "All six recorded binaries are reproduced byte for byte from clean exports of their recorded commits (same source path, same toolchain, a different target directory). The records were therefore produced by code committed after the pre-registration 5a0dd20af9 (9b2a47238b and 86d0f86c25 both descend from it), and the shared, dirty checkout (E39 and E41 editing it) did not reach the builds.",
+    "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); no .cargo/config, no RUSTFLAGS",
+    "host": "Intel(R) Xeon(R) Processor @ 2.10GHz, 4 vCPU, 15.7 GiB RAM, Linux 6.18.44-fc-v185: the local container, shared with E39's end-to-end runs (load 10-17). Not isolab-eks. Operation counts only; no wall time is compared or claimed.",
+    "cleanup": "/dev/shm/v40 deleted after the builds; /dev/shm/e40_src deleted after the replay"
+  },
+  "nonce": {
+    "value": "8f4ddb6e7bde5b97353cb489f74d3546",
+    "draw": "replay/nonce_draw.txt",
+    "selection": [
+      "gls_v p101s1 3beaa1f6e990e334",
+      "gls_v p397s2 5f9544ce45bea296",
+      "gls_v p397s1 712048283e4edd38",
+      "e24_v p521s2 34915c8fe17d9579",
+      "e24_v p269s1 37ccfad0296ab0e1",
+      "e24_v p397s2 3d0f5c83f67485ed",
+      "neg_curve p397s1 0ca0639bcc7e9f49",
+      "e25_ref e24_p521s1 0217b06427907330 (pool added after the draw)",
+      "e25_ref gls_p101s1 19eeda47d476b343 (pool added after the draw)"
+    ],
+    "rule": "for each pool rank candidates by sha256(\"<nonce>:<pool>:<candidate>\") ascending, take the first k (k = 3 GLS V files, 3 E24 V files, 1 curve for A′/V′); the e25_ref pool (k = 2) was added after the draw, its members chosen by the same rule"
+  },
+  "coverage": "Stage A (10 curves x 1,000 calls x 4 solvers), both control runs, all 7 identity configurations, E27's stage_w.json and E37's walk_e24.json: replayed in full. End to end: nonce-selected 6 of the 22 V files (9 of 32 rows), one curve of the negative control (A′ and V′, 4 rows), 2 E25 reference files of E37 (3 rows).",
+  "comparison": "each replayed output against its committed record, every JSON leaf, timing keys (*_ms, ms, *wall*) skipped, by the validator's comparator (validate_e40 compare/cert); identity configurations also by identity.sh's canonical hash against E33's and E37's reference hashes (replay/comparison.txt); stage_a.json, checks*.json, stage_w.json and walk_e24.json are raw-byte-identical",
+  "runs_total": 22,
+  "runs_matched": 22,
+  "fields_compared": 235414,
+  "fields_identical": 235414,
+  "scalar_verification": "total_muls, macaulay_entries, macaulay_stored_entries, profile_offset_ops, lead_scan_reads, residuals, solver_fallbacks, the recovered logarithm and walk correctness of every replayed pipeline record equal the committed values (they are leaves of the comparison; listed per run under scalars)",
+  "runs": [
+    {
+      "run": "gls_chain-profile_p101s1",
+      "kind": "end to end, V on E37's stream (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/e2e/gls_chain-profile_p101s1.json",
+        "sha256": "bb7f4913e78e08bfc244a4f9f467dcaa6be7c05c5cc980d20ab9a7cd596d2008"
+      },
+      "replay_output": {
+        "sha256": "853b6e496f0317bccc85c69b1df9500f85187fcaad7a8647140166256669ef9a",
+        "path": "replay/out/gls_chain-profile_p101s1.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1226,
+      "fields_identical": 1226,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-profile",
+          "residuals": 31631,
+          "solver_fallbacks": 360,
+          "total_muls": 20743188390,
+          "macaulay_entries": 5734286208,
+          "macaulay_stored_entries": 3444065202,
+          "profile_offset_ops": 706477885,
+          "lead_scan_reads": 185945117,
+          "ic_correct": true,
+          "ic_recovered": 1538068,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-profile",
+          "residuals": 11766,
+          "solver_fallbacks": 129,
+          "total_muls": 7695524923,
+          "macaulay_entries": 2130812544,
+          "macaulay_stored_entries": 1278544314,
+          "profile_offset_ops": 262798143,
+          "lead_scan_reads": 69166819,
+          "ic_correct": true,
+          "ic_recovered": 1538068,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "gls_chain-profile_p397s1",
+      "kind": "end to end, V on E37's stream (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/e2e/gls_chain-profile_p397s1.json",
+        "sha256": "8a9a280ab3da700ad861cd392f0d36d89284a4614b15a9ad0c12b3d5114638fe"
+      },
+      "replay_output": {
+        "sha256": "4e66029a7296dec73b8ab6368f6fb7fbbd228b4c687afa675ec4377da94c1ff5",
+        "path": "replay/out/gls_chain-profile_p397s1.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1225,
+      "fields_identical": 1225,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-profile",
+          "residuals": 44115,
+          "solver_fallbacks": 135,
+          "total_muls": 28901919764,
+          "macaulay_entries": 7829372544,
+          "macaulay_stored_entries": 4608399144,
+          "profile_offset_ops": 992138023,
+          "lead_scan_reads": 259277852,
+          "ic_correct": true,
+          "ic_recovered": 1275612762,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-profile",
+          "residuals": 23246,
+          "solver_fallbacks": 63,
+          "total_muls": 15197024347,
+          "macaulay_entries": 4121995584,
+          "macaulay_stored_entries": 2424138079,
+          "profile_offset_ops": 522805408,
+          "lead_scan_reads": 136623254,
+          "ic_correct": true,
+          "ic_recovered": 1275612762,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "gls_chain-profile_p397s2",
+      "kind": "end to end, V on E37's stream (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/e2e/gls_chain-profile_p397s2.json",
+        "sha256": "cb46d2b47bae5b9f482ce62e33c9079f4f0d5e10cd1a206e7709c3cc78424df7"
+      },
+      "replay_output": {
+        "sha256": "e38638b14ac33a31ffca21030505305d764506c21533f74fcc118a9f756caf54",
+        "path": "replay/out/gls_chain-profile_p397s2.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1226,
+      "fields_identical": 1226,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-profile",
+          "residuals": 86701,
+          "solver_fallbacks": 242,
+          "total_muls": 56625412718,
+          "macaulay_entries": 15375417792,
+          "macaulay_stored_entries": 9043403593,
+          "profile_offset_ops": 1949941896,
+          "lead_scan_reads": 509577641,
+          "ic_correct": true,
+          "ic_recovered": 1421554453,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-profile",
+          "residuals": 52707,
+          "solver_fallbacks": 147,
+          "total_muls": 34435926992,
+          "macaulay_entries": 9347686656,
+          "macaulay_stored_entries": 5498339448,
+          "profile_offset_ops": 1185403760,
+          "lead_scan_reads": 309779916,
+          "ic_correct": true,
+          "ic_recovered": 1421554453,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "e24_chain-profile_p269s1",
+      "kind": "end to end, V on E37's stream (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/e2e/e24_chain-profile_p269s1.json",
+        "sha256": "8270461f5a6359ca86e7743dc22280591727d49e48451b08b48b9ee23b2838bb"
+      },
+      "replay_output": {
+        "sha256": "868f26c56e50a6498a3d08ef923cb33f131b7cbb3bc6827a5d184fdcc2f750c8",
+        "path": "replay/out/e24_chain-profile_p269s1.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 436,
+      "fields_identical": 436,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-profile",
+          "residuals": 77698,
+          "solver_fallbacks": 303,
+          "total_muls": 50391302981,
+          "macaulay_entries": 13819170624,
+          "macaulay_stored_entries": 8150964945,
+          "profile_offset_ops": 1745425178,
+          "lead_scan_reads": 456617649,
+          "ic_correct": true,
+          "ic_recovered": 1223824752,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "e24_chain-profile_p397s2",
+      "kind": "end to end, V on E37's stream (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/e2e/e24_chain-profile_p397s2.json",
+        "sha256": "2d8ab4efa76809206ffc65a3097d4f6055b548f11feb79eeb87b564202a1beac"
+      },
+      "replay_output": {
+        "sha256": "020599236285dbff8d1b959850c31f1790f2fc99a952b14197cb0b2458d94071",
+        "path": "replay/out/e24_chain-profile_p397s2.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 436,
+      "fields_identical": 436,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-profile",
+          "residuals": 107571,
+          "solver_fallbacks": 268,
+          "total_muls": 70197972839,
+          "macaulay_entries": 19063363200,
+          "macaulay_stored_entries": 11204790088,
+          "profile_offset_ops": 2419247852,
+          "lead_scan_reads": 632180550,
+          "ic_correct": true,
+          "ic_recovered": 3059412718,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "e24_chain-profile_p521s2",
+      "kind": "end to end, V on E37's stream (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/e2e/e24_chain-profile_p521s2.json",
+        "sha256": "ce0247875ce706c6c242f1136480ce305123d15ecb21a38852746ee2f6e0fe8d"
+      },
+      "replay_output": {
+        "sha256": "38eade739eaa67a9823c2f313b4d1b5b671a9d44da79f6cf022bbd6f8fbe9db4",
+        "path": "replay/out/e24_chain-profile_p521s2.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 436,
+      "fields_identical": 436,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-profile",
+          "residuals": 122786,
+          "solver_fallbacks": 208,
+          "total_muls": 79915877243,
+          "macaulay_entries": 21714353472,
+          "macaulay_stored_entries": 12737089695,
+          "profile_offset_ops": 2763002164,
+          "lead_scan_reads": 721599406,
+          "ic_correct": true,
+          "ic_recovered": 743731013,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "gls_chain-counted_E40E0002_p397s1",
+      "kind": "negative control N, A′ / V′ on E40E0002 (nonce-selected curve)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/e2e/gls_chain-counted_E40E0002_p397s1.json",
+        "sha256": "d72367903f6ea966c88ebabe1d2a7b1918bce9a3fa44edd69a347a1120e02d34"
+      },
+      "replay_output": {
+        "sha256": "1e3f49ab4ac321221d9cf41447c8569370c2efb3a9f3f42fb6fb3eeec962ccba",
+        "path": "replay/out/gls_chain-counted_E40E0002_p397s1.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1222,
+      "fields_identical": 1222,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-counted",
+          "residuals": 36878,
+          "solver_fallbacks": 107,
+          "total_muls": 24128057550,
+          "macaulay_entries": 6541639104,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": 2917590214,
+          "ic_correct": true,
+          "ic_recovered": 1275612762,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-counted",
+          "residuals": 20031,
+          "solver_fallbacks": 65,
+          "total_muls": 13140273325,
+          "macaulay_entries": 3556589568,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": 1584744547,
+          "ic_correct": true,
+          "ic_recovered": 1275612762,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "gls_chain-profile_E40E0002_p397s1",
+      "kind": "negative control N, A′ / V′ on E40E0002 (nonce-selected curve)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/e2e/gls_chain-profile_E40E0002_p397s1.json",
+        "sha256": "2ddd400692ef275a8928e7e2e0c7d700ac0085d7512ff50379744e52ffd63cdf"
+      },
+      "replay_output": {
+        "sha256": "dc7b623a83d5f6409f61d3c8200d0d2d13e0066386a4849fbc0c19adad4444a6",
+        "path": "replay/out/gls_chain-profile_E40E0002_p397s1.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1226,
+      "fields_identical": 1226,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-profile",
+          "residuals": 36878,
+          "solver_fallbacks": 107,
+          "total_muls": 24128057550,
+          "macaulay_entries": 6541639104,
+          "macaulay_stored_entries": 3848633343,
+          "profile_offset_ops": 829397295,
+          "lead_scan_reads": 216748094,
+          "ic_correct": true,
+          "ic_recovered": 1275612762,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-profile",
+          "residuals": 20031,
+          "solver_fallbacks": 65,
+          "total_muls": 13140273325,
+          "macaulay_entries": 3556589568,
+          "macaulay_stored_entries": 2094334790,
+          "profile_offset_ops": 450504581,
+          "lead_scan_reads": 117729364,
+          "ic_correct": true,
+          "ic_recovered": 1275612762,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "gls_macaulay_p101s1",
+      "kind": "E25 reference record of E37 (nonce-selected), replayed with the E40 build",
+      "committed": {
+        "path": "../../experiments/44_pivot_rules_confirm/e2e/gls_macaulay_p101s1.json",
+        "sha256": "e1f988db81120d35b7a36e8c364bce0bebadbad65b6874a2d85231f65ed7b94b"
+      },
+      "replay_output": {
+        "sha256": "fbd62d9b283c082790f7de68006230b313dd14ba2aae81f03478253316e2b94d",
+        "path": "replay/out/gls_macaulay_p101s1.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1208,
+      "fields_identical": 1208,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": null,
+          "residuals": 31631,
+          "solver_fallbacks": null,
+          "total_muls": 51970367327,
+          "macaulay_entries": 5619995136,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 1538068,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": null,
+          "residuals": 11766,
+          "solver_fallbacks": null,
+          "total_muls": 19326115603,
+          "macaulay_entries": 2089836672,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 1538068,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "e24_macaulay_p521s1",
+      "kind": "E25 reference record of E37 (nonce-selected), replayed with the E40 build",
+      "committed": {
+        "path": "../../experiments/44_pivot_rules_confirm/e2e/e24_macaulay_p521s1.json",
+        "sha256": "de7284b64318e2aa7e299c895c2cf170b67f5d6b7a2af4c493b9bfaf32ff3cb6"
+      },
+      "replay_output": {
+        "sha256": "e6888613611326e4eb79c764b2e3f45c5c095085c146902056234d0bfea25034",
+        "path": "replay/out/e24_macaulay_p521s1.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 427,
+      "fields_identical": 427,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": null,
+          "residuals": 132135,
+          "solver_fallbacks": null,
+          "total_muls": 221083744331,
+          "macaulay_entries": 23298875712,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 3458567944,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "id_macaulay",
+      "kind": "identity G2.204, existing configuration under the E40 build",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/identity/macaulay.json",
+        "sha256": "6937d22fdb72eedea57efed0fa1065920e25793c6699e23084f56393fad43cd4"
+      },
+      "replay_output": {
+        "sha256": "29e2118026020a1864580ba31ad3970f1e243001dcb5ff4c01ee009c33452c8d",
+        "path": "replay/out/id_macaulay.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1202,
+      "fields_identical": 1202,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": null,
+          "residuals": 15010,
+          "solver_fallbacks": null,
+          "total_muls": 24712296642,
+          "macaulay_entries": 2665742016,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": null,
+          "residuals": 7106,
+          "solver_fallbacks": null,
+          "total_muls": 11695092130,
+          "macaulay_entries": 1262331840,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "id_chain",
+      "kind": "identity G2.204, existing configuration under the E40 build",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/identity/chain.json",
+        "sha256": "9ac45ad1bc5d511066413ff07bfdcaf617663032783ddacf9afb53499afbda70"
+      },
+      "replay_output": {
+        "sha256": "8f7829cbeab1f1cd81e13b38f64fa20c8afdc5ad699e73ca3bddd853a1e25904",
+        "path": "replay/out/id_chain.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1206,
+      "fields_identical": 1206,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain",
+          "residuals": 15010,
+          "solver_fallbacks": 173,
+          "total_muls": 9865699461,
+          "macaulay_entries": 2719210368,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain",
+          "residuals": 7106,
+          "solver_fallbacks": 85,
+          "total_muls": 4682498928,
+          "macaulay_entries": 1288514304,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "id_chainsparsest",
+      "kind": "identity G2.204, existing configuration under the E40 build",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/identity/chainsparsest.json",
+        "sha256": "2c4cc9497160f7a523fa5ff667105b65f36270ef88bba1a6a485266677e3947a"
+      },
+      "replay_output": {
+        "sha256": "21e2d0261abb608f760f891b35c4ef7be8b023f5a116bdec0e14842af2f1767a",
+        "path": "replay/out/id_chainsparsest.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1206,
+      "fields_identical": 1206,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-sparsest",
+          "residuals": 15010,
+          "solver_fallbacks": 173,
+          "total_muls": 5416154893,
+          "macaulay_entries": 2719210368,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-sparsest",
+          "residuals": 7106,
+          "solver_fallbacks": 85,
+          "total_muls": 2576029693,
+          "macaulay_entries": 1288514304,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "id_chain_karatsuba",
+      "kind": "identity G2.204, existing configuration under the E40 build",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/identity/chain_karatsuba.json",
+        "sha256": "ea4b96fd61d4dff5c79ac13b5cdb07e6804b419c8d901a59bfefe877c882d234"
+      },
+      "replay_output": {
+        "sha256": "22eb9c71252436737c43e87b37a693fb9dbffa61ea2fdf60746d0907d368b625",
+        "path": "replay/out/id_chain_karatsuba.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1210,
+      "fields_identical": 1210,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain",
+          "residuals": 15010,
+          "solver_fallbacks": 173,
+          "total_muls": 9818244813,
+          "macaulay_entries": 2719210368,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain",
+          "residuals": 7106,
+          "solver_fallbacks": 85,
+          "total_muls": 4659726750,
+          "macaulay_entries": 1288514304,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": null,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "id_gls_counted_e37",
+      "kind": "identity G2.204, existing configuration under the E40 build",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/identity/gls_counted_e37.json",
+        "sha256": "79650a9bc51096ecaf6fd4dabe7cda30cdfa2901564a036ad230a161b41d47e1"
+      },
+      "replay_output": {
+        "sha256": "27e60be8d86cd37d8283b1a165d127d4e2c1dfd6f14a4b896dd6e5f80efe9b8d",
+        "path": "replay/out/id_gls_counted_e37.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1222,
+      "fields_identical": 1222,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-counted",
+          "residuals": 11767,
+          "solver_fallbacks": 129,
+          "total_muls": 7687691141,
+          "macaulay_entries": 2130129792,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": 930969272,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-counted",
+          "residuals": 6424,
+          "solver_fallbacks": 71,
+          "total_muls": 4203565671,
+          "macaulay_entries": 1163385216,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": 508248367,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "id_gls_fifo_e37",
+      "kind": "identity G2.204, existing configuration under the E40 build",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/identity/gls_fifo_e37.json",
+        "sha256": "e823c682c5858b5922db96e797b208c8a8425595e503902ebfff8f394b225355"
+      },
+      "replay_output": {
+        "sha256": "0becf10efe0fbcecd7c5d9892ed99b85b793a16337f54a0d6132df8881311103",
+        "path": "replay/out/id_gls_fifo_e37.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 1222,
+      "fields_identical": 1222,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-fifo",
+          "residuals": 11767,
+          "solver_fallbacks": 129,
+          "total_muls": 5235501655,
+          "macaulay_entries": 2130129792,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": 930969272,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-fifo",
+          "residuals": 6424,
+          "solver_fallbacks": 71,
+          "total_muls": 2864226303,
+          "macaulay_entries": 1163385216,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": 508248367,
+          "ic_correct": true,
+          "ic_recovered": 557533,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "id_e24_counted_e37",
+      "kind": "identity G2.204, existing configuration under the E40 build",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/identity/e24_counted_e37.json",
+        "sha256": "50e60548d3178663c83354fc4a7bbe9989d3706d66fbe236a5ff157cc8b84081"
+      },
+      "replay_output": {
+        "sha256": "ca58b546de8b5897b920e6e514607d8faae1c8928856fd122e3b41b25e012968",
+        "path": "replay/out/id_e24_counted_e37.json"
+      },
+      "raw_bytes_equal": false,
+      "fields_compared": 434,
+      "fields_identical": 434,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-counted",
+          "residuals": 47771,
+          "solver_fallbacks": 452,
+          "total_muls": 30956959343,
+          "macaulay_entries": 8618931048,
+          "macaulay_stored_entries": null,
+          "profile_offset_ops": null,
+          "lead_scan_reads": 3779390823,
+          "ic_correct": true,
+          "ic_recovered": 4448698,
+          "walks_correct": true
+        }
+      ]
+    },
+    {
+      "run": "checks_v2",
+      "kind": "controls G2.205 (e40_checks_v2, 320 calls)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/checks.json",
+        "sha256": "424a8e923682d30df13a5a7f29f96b267c5062736d19006c82d203d80e0420df"
+      },
+      "replay_output": {
+        "sha256": "424a8e923682d30df13a5a7f29f96b267c5062736d19006c82d203d80e0420df",
+        "path": "replay/out/checks_v2.json"
+      },
+      "raw_bytes_equal": true,
+      "fields_compared": 88,
+      "fields_identical": 88,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": null
+    },
+    {
+      "run": "checks_v1",
+      "kind": "controls, first harness (e40_checks, kept as disclosed)",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/checks_v1.json",
+        "sha256": "1627b2cc3e8feec715957a6c921dcca7d18e3ab074ffe4f14447a92b3e934a14"
+      },
+      "replay_output": {
+        "sha256": "1627b2cc3e8feec715957a6c921dcca7d18e3ab074ffe4f14447a92b3e934a14",
+        "path": "replay/out/checks_v1.json"
+      },
+      "raw_bytes_equal": true,
+      "fields_compared": 88,
+      "fields_identical": 88,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": null
+    },
+    {
+      "run": "stage_a",
+      "kind": "Stage A, all 10 curves x 1,000 calls x 4 solvers",
+      "committed": {
+        "path": "../../experiments/47_macaulay_entries/stage_a.json",
+        "sha256": "7e23c58f3004d861b073847212db7308d2a500f91c42adedfd2ddaca283e03c8"
+      },
+      "replay_output": {
+        "sha256": "7e23c58f3004d861b073847212db7308d2a500f91c42adedfd2ddaca283e03c8",
+        "path": "not committed: raw-byte-identical to the committed record or artifact (replay/local_only.sha256)"
+      },
+      "raw_bytes_equal": true,
+      "fields_compared": 200820,
+      "fields_identical": 200820,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": null
+    },
+    {
+      "run": "walk_e24",
+      "kind": "matched rho on E24's curves, walk (iii) (e37_walk_e24, same crypto_lib build)",
+      "committed": {
+        "path": "../../experiments/44_pivot_rules_confirm/walk_e24.json",
+        "sha256": "c5b36693489ad9f43c9ed63e05d88ea536b217d27eee84aaf0fabab2f223027a"
+      },
+      "replay_output": {
+        "sha256": "c5b36693489ad9f43c9ed63e05d88ea536b217d27eee84aaf0fabab2f223027a",
+        "path": "not committed: raw-byte-identical to the committed record or artifact (replay/local_only.sha256)"
+      },
+      "raw_bytes_equal": true,
+      "fields_compared": 6604,
+      "fields_identical": 6604,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": null
+    },
+    {
+      "run": "stage_w",
+      "kind": "matched rho on E25's GLS curves, walk (iii) (e27_walk, same crypto_lib build)",
+      "committed": {
+        "path": "../../experiments/32_walk_karatsuba/stage_w.json",
+        "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+      },
+      "replay_output": {
+        "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1",
+        "path": "not committed: raw-byte-identical to the committed record or artifact (replay/local_only.sha256)"
+      },
+      "raw_bytes_equal": true,
+      "fields_compared": 11044,
+      "fields_identical": 11044,
+      "differing_paths": [],
+      "matched": true,
+      "scalars": null
+    }
+  ]
+}

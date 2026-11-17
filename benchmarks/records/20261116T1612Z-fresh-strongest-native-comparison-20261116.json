@@ -1,0 +1,115 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T16:20:39+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/fresh-native-isolation-03556f439-01.jsonl",
+        "--label",
+        "fixed-independent-fresh-three-native-comparison",
+        "--",
+        "/workspace/relation-native-qualifiers/fresh-driver-03556f439-45",
+        "fresh-native",
+        "/workspace/fresh-native-results-03556f439-01",
+        "research/relation_degree_trace_20261115/followup-development/fresh-config-45.json",
+        "fresh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T16:12:19+00:00",
+      "wall_s": 34.715
+    }
+  ],
+  "commit": "8b65e91f08ca737251f4eba2a82d5fce17e299c8",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T16:12:18+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T1612Z-fresh-strongest-native-comparison-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 324,
+      "name": "checked_uninstrumented_answers",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 324.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "registered_all_case_increment",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "kernel:certified-relations-fresh-matched",
+  "raw": [
+    {
+      "bytes": 30860,
+      "path": "research/relation_degree_trace_20261115/fresh-native-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/07/0722b7519bc85fd298f750cb9385142769e8c34cc0255270f2aaebae1673059a",
+      "sha256": "0722b7519bc85fd298f750cb9385142769e8c34cc0255270f2aaebae1673059a",
+      "uploaded": false
+    },
+    {
+      "bytes": 66100,
+      "path": "research/relation_degree_trace_20261115/fresh-native-01/raw-last-n16-s41011.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9b/9bb97190351357a16d73bca77c0ead255982f0abde7b8598d4dbc22393509e81",
+      "sha256": "9bb97190351357a16d73bca77c0ead255982f0abde7b8598d4dbc22393509e81",
+      "uploaded": false
+    },
+    {
+      "bytes": 65884,
+      "path": "research/relation_degree_trace_20261115/fresh-native-01/raw-last-n16-s43013.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0e/0efa6b041010684f3ea528bd16f8cf37cb23b21383b49ab6b5b3d1c5ee406995",
+      "sha256": "0efa6b041010684f3ea528bd16f8cf37cb23b21383b49ab6b5b3d1c5ee406995",
+      "uploaded": false
+    },
+    {
+      "bytes": 65928,
+      "path": "research/relation_degree_trace_20261115/fresh-native-01/raw-last-n16-s47017.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cf/cf54f9af29775d0e33d50cf4f922cb40286258fcd552c75a00d62065ba181e95",
+      "sha256": "cf54f9af29775d0e33d50cf4f922cb40286258fcd552c75a00d62065ba181e95",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/fresh-native-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/fresh-native-01/report-01/ratios.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/fresh-native-01/report-01/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "fresh-strongest-native-comparison-20261116",
+  "status": "measured",
+  "summary": "All three fixed fresh cases complete;324 answers and6 separate diagnostics match, all A/A gates pass, no sustained increment across all three against previous fastest and same-source controls. Original reserved seeds untouched. PCCe67478/91e8cf unsigned; local L0/checkpoint waiver.",
+  "validation": null
+}

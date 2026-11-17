@@ -1,0 +1,64 @@
+{
+  "recorded_at": "2026-11-07T00:36:13.875976+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "research/primefield-companion-followup-20261102/feature-native-monomial-recovery/check.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-monomial-recovery-20261107/checker"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "positive",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-monomial-recovery-20261107/checker",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/program.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/corrections.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-monomial-recovery/recovery.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0,
+      "packet_sha256": "1da82499ad1c6266b485283045d55337be74a4e95d1ef83f67c5c36bdb241d61"
+    },
+    {
+      "step": "scalar-negative",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-monomial-recovery-20261107/checker",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/program.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/corrections.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-monomial-recovery/negative-scalar.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 101,
+      "packet_sha256": "01a4229cb2b335d1dcd7fa1b8442090c68fd20062f41f58b2639d663bc6f081c"
+    },
+    {
+      "step": "initialization-negative",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-monomial-recovery-20261107/checker",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/program.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-recovery/corrections.tsv",
+        "research/primefield-companion-followup-20261102/feature-native-monomial-recovery/negative-initialization.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 101,
+      "packet_sha256": "eb6ea69f4f184b94bee0284a341cfd5829dfbb62e8dfa1271bff37ca37ed635b"
+    }
+  ],
+  "inputs": {
+    "feature-native-quartic-recovery/program.tsv": "5abcccfd3b9fcd250cdf3bac720f08e953624855500632bdfdfb6b07b237b4fb",
+    "feature-native-quartic-recovery/corrections.tsv": "810d9f69f4ee11864d3ef4bc01c66f98b3f6a6b0bb5eb4130aff87318dbf417d",
+    "feature-native-monomial-recovery/check.rs": "700a64546e1e42d1bfc0553724f7ee3d77ee600fef0475d57acaf2809fc2017b"
+  },
+  "binary_sha256": "270d05cc3dc908d5fd9893e0e5aeb5d90fdd1aa608b618c76a6b3ae86425327c",
+  "producer_imports": 0,
+  "checker_author": "producing session; no independent-review standing"
+}

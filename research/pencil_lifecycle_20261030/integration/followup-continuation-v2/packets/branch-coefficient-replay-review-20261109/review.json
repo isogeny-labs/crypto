@@ -1,0 +1,50 @@
+{
+  "schema": "scoped-source-review/v1",
+  "task": "T-1987",
+  "status": "source_supported_pending_release_and_execution",
+  "freeze_sha256": "ca39355cb95192cec082591e9b0d3ef1dfe025a921b16d5e98e0d6a28f0a656c",
+  "manifest_sha256": "3fc098a5060118572d824ca42cc9591f428e26098afc49cbca1f6a3d5a94c64e",
+  "candidate_sha256": "4e8cfd2ff984359b4fbd92e8fd0432db04b82e08fd19223eb5dac9d718995b76",
+  "compiler_calls_planned": 18,
+  "axiom_names_planned": 13,
+  "source_files_bound": 33,
+  "direct_imports_reviewed": 41,
+  "blocking_findings": [],
+  "mathematical_scope": "Under the exact field, separable quintic, branch-root, nonzero coefficient determinant, support congruence and vanishing-product hypotheses, the three support/residual root multiplicities at the branch root sum to one, and each polynomial is nonzero.",
+  "rational_control": {
+    "F": "X^5-X",
+    "u": "X^2+1",
+    "v": "X^2-1",
+    "U": "-16X",
+    "b": -4,
+    "bezout": "(-25X^3)F+(5X^4-4)Fprime=4",
+    "branch": 0,
+    "rejected_branch": 2
+  },
+  "execution": {
+    "performed_by_reviewer": false,
+    "compiler_seconds": 0,
+    "planned_worker_seconds": 3600,
+    "phases_seconds": [
+      900,
+      1800,
+      900
+    ],
+    "cpu": 1,
+    "memory_gib": 8,
+    "campaign_total_seconds": 43200,
+    "deadline": "2026-11-10T05:11:39Z",
+    "automatic_retry": false
+  },
+  "pending": [
+    "Publish exact source and this independent review",
+    "Bind live remaining campaign debit and current lease in release",
+    "Confirm previous payload terminal and serial ownership",
+    "Run compiler and independent axiom readback with expected mathematical rejection; preserve any failure"
+  ],
+  "trust_limits": [
+    "Source review and elementary identity derivation only; controls have not been elaborated.",
+    "Pinned shared-cache pre/post hashes cannot exclude transient concurrent modification.",
+    "No independent binary kernel rechecker or scientific status promotion."
+  ]
+}

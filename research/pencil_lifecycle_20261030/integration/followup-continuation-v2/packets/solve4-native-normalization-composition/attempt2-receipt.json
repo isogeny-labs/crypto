@@ -1,0 +1,83 @@
+{
+  "status": "failed",
+  "error": "AssertionError({'module': 'Controls', 'command': ['/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean', '-j1', '-M3500', '-s16384', '-o', '/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Controls.olean', '/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Controls.lean'], 'expected_exit': 0, 'reaped': True, 'pid': 28436, 'exit': 1})",
+  "commands": [
+    {
+      "module": "Narrow",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Narrow.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Narrow.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 28297,
+      "exit": 0
+    },
+    {
+      "module": "Normalization",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Normalization.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Normalization.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 28307,
+      "exit": 0
+    },
+    {
+      "module": "Composition",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Composition.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Composition.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 28334,
+      "exit": 0
+    },
+    {
+      "module": "Controls",
+      "command": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Controls.olean",
+        "/var/tmp/pencil-native-normalization-composition-20261103-v1/attempt2/Controls.lean"
+      ],
+      "expected_exit": 0,
+      "reaped": true,
+      "pid": 28436,
+      "exit": 1
+    }
+  ],
+  "elapsed_seconds": 22.418846929009305,
+  "inputs": 28807,
+  "changed_inputs": [],
+  "scientific_runs": 0,
+  "pending_signal": null,
+  "limits": {
+    "outer_seconds": 95,
+    "address_space_bytes": 8589934592,
+    "lean_heap_MiB": 3500,
+    "hard_OS_stack_bytes": 10485760,
+    "lean_stack_KiB": 16384,
+    "workers": 1
+  }
+}

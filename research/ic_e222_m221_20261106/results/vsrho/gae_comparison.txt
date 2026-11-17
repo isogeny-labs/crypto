@@ -1,0 +1,5 @@
+sizes | IC walk best-time fb | trials | est. group additions (lower bound) | matched negation rho ops (S*sqrt r) | IC/rho (ops, lower bound)
+20 | fb 64 | 9219 trials | 36617 | 1444 | 25.4x
+22 | fb 64 | 32131 trials | 108706 | 2622 | 41.5x
+24 | fb 128 | 63097 trials | 240140 | 4568 | 52.6x
+note: table build counted as 2*fb^2 additions, restarts as 2 scalar multiplications per 32 steps; linear algebra (fb^3 modular multiplications mod n), factor-base construction and hashing are unpriced here, so the ratios are lower bounds.

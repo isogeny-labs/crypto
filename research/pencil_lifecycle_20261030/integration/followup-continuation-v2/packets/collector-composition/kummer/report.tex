@@ -1,0 +1,20 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\begin{document}
+\section*{Kummer signed-pair uniqueness and transition obligations}
+2026-11-01. Source: preserved graph-integration candidate, not deployed-runtime certification.
+
+\textbf{Checked component.} Three Lean declarations and three controls pass, with six separate axiom readbacks. Assuming the projection fibers are exactly $\{D,-D\}$ and $2G\ne0$, matching both $\pi(D)$ and $\pi(G+D)$ uniquely identifies the signed divisor. A zero-anchor control proves the sign ambiguity when that condition is dropped. This matches the source candidate filter; the coordinate fiber property remains a geometric obligation.
+
+\textbf{Original-G invariant.} For $D=aG+bQ$, inputs must represent $(\pi(D),\pi(D+G))$. Choice $c\in\{0,1\}$ requires successor $(\pi(2D+cG),\pi(2D+(c+1)G))$. The scalar recurrence alone does not establish these equations.
+
+\textbf{Transition branches.} Ordinary addition, equal-input doubling, repaired addition, failed-pair signed fallback, and optional transition validation require separate obligations. The source calls xADD on equal inputs with difference $\pi(0)$; the literature's abstract xADD interface assumes unequal points. That specialization needs a geometric argument. Each repair action must implement rational two-torsion translation, square to projective identity and preserve nonzero vectors. Cross-product equality alone accepts zero vectors and cannot establish those premises.
+
+\textbf{Exact formula obligation.} Let $W=H((H(X)_iH(Y)_i/t_i)_i)$ and $F_i=W_i^2\prod_{j\ne i}Z_j$, matching source xadd. Prove $F_i\pi(P+Q)_j=F_j\pi(P+Q)_i$ for all indices and $F\ne0$ on each claimed domain. Repeat the domain analysis for doubling and repaired calls.
+
+\textbf{Signed recovery branches.} Generic Recover has special-anchor, $D=0$, $\Delta=0$ and $h_1=0$ exclusions. For its returned $U=X^2-q_1X+q_2$, $V=b_1X+b_0$, prove $U\mid f-V^2$ and both projection matches. Exceptional enumerators require candidate completeness. The conditional uniqueness theorem handles the final matching-candidate step but not existence or formula soundness.
+
+\textbf{Next source-specific construction.} Bind project\_any and general\_homogeneous as inverse projective maps on the chosen theta-model domain, then prove their quotient-fiber property for valid Mumford divisors. This supplies the missing geometric premise of the checked uniqueness result. Equal-input xADD specialization remains an immediate separate closure obligation.
+
+\textbf{Evidence limits.} Existing cached helper binaries retain their trust boundary. Initial proof attempt and a wrong-working-directory invocation failed and are retained. Corrected proof, controls and readback pass. Independent semantic review is pending. No target enumeration, scientific execution or cost comparison occurred.
+
+Primary reference: Chung, Costello and Smith, Fast, uniform, and compact scalar multiplication, sections 2 and 6 (Microsoft recovery.pdf). Detailed finite branch equations and source locations: REPORT.md. Editable graph, structured status, bindings and native receipts accompany this PDF.
+\end{document}

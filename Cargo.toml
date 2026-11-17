@@ -5,6 +5,13 @@ edition = "2021"
 default-run = "crypto"
 description = "Educational comprehensive cryptography library: ECC, RSA, AES, ChaCha20, SHA, KDF, PQC"
 
+# Helper module of b0_pdp_sat_baseline (included there with #[path]); built as a
+# library example so Cargo's example discovery does not require a `main`.
+[[example]]
+name = "pdp_lin_cdcl"
+path = "examples/pdp_lin_cdcl.rs"
+crate-type = ["lib"]
+
 [[example]]
 name = "performance_gains_audit"
 path = "examples/performance_gains_audit.rs"
@@ -27,8 +34,18 @@ name = "koblitz_n53_compact_protocol"
 path = "experiments/koblitz-n53-compact-cold-20261009/native_run.rs"
 
 [[bin]]
+name = "ct_dynamic_audit"
+path = "research/ct_dynamic_audit_20261102/src/main.rs"
+
+[[bin]]
 name = "crypto"
 path = "src/main.rs"
+
+# `torsionguard` — common-kernel certificates for declared finite primary
+# modules, with explicit non-algebraic soundness obligations.
+[[bin]]
+name = "torsionguard"
+path = "src/bin/torsionguard.rs"
 
 [[bin]]
 name = "n83-exclusion-audit"
@@ -41,6 +58,10 @@ path = "src/bin/ecdlp_audit.rs"
 [[bin]]
 name = "ic"
 path = "src/bin/ic.rs"
+
+[[bin]]
+name = "ecdlp-challenges"
+path = "src/bin/ecdlp_challenges.rs"
 
 # `volcano-rho` — one ECDLP instance carried by explicit Vélu maps to every
 # curve of an ℓ-isogeny volcano, with Pollard rho timed on each stratum.
@@ -59,6 +80,11 @@ path = "src/bin/isoclass_rho/main.rs"
 name = "volcano-stats"
 path = "src/bin/volcano_stats.rs"
 
+# `volcano-gap` — two deep 2-volcanoes on either side of a large prime
+# conductor gap, joined by an explicit, verified degree-N Vélu isogeny.
+[[bin]]
+name = "volcano-gap"
+path = "src/bin/volcano_gap.rs"
 # `generator-n0` — E3a of research/generator_effect_ic_20261019: the base's
 # cofactor-class count N0 against the volcano study's IC relation yield.
 [[bin]]
@@ -70,6 +96,10 @@ name = "pkm-aux-search"
 path = "src/bin/pkm_aux_search.rs"
 
 [[bin]]
+name = "pkm-smooth-tower"
+path = "src/bin/pkm_smooth_tower.rs"
+
+[[bin]]
 name = "quartic-ic"
 path = "src/bin/quartic_ic.rs"
 
@@ -78,6 +108,12 @@ path = "src/bin/quartic_ic.rs"
 [[bin]]
 name = "hyperelliptic-cover"
 path = "src/bin/hyperelliptic_cover.rs"
+
+# `hecx` — inspect, estimate and solve HECDLP instances over prime and binary
+# fields, with arbitrary genus, coefficients and subgroup orders.
+[[bin]]
+name = "hecx"
+path = "src/bin/hecx.rs"
 
 # `icx` — index calculus across every standardized curve (catalog + engine).
 [[bin]]
@@ -178,6 +214,9 @@ redis-native-tls = ["redis/tls-native-tls"]
 wide-vars = []
 # Explicit selected-bin CLI contracts; production builds keep their behavior.
 ic-cli-contracts = []
+# examples/mt_fieldops.rs: fast multiplicative hasher for every arm's hash tables (timing sensitivity only;
+# counted operations are identical with and without it).
+mt-fasthash = []
 f4-four-tables = []
 f4-five-tables = []
 f4-wide-tables = []
@@ -193,13 +232,16 @@ endo-chain-opcount = []
 # Field-operation counters in the one-word field of `semaev_decomp` (`semaev_decomp::opcount`),
 # for PS-0 of research/pdp_oracle_speedup_20261011; timing builds leave it off.
 pdp-opcount = []
+# R04's in-scan stage counters (research/ic_tool_program/rounds/R04-scan-probes):
+# a separate build that prices the collection scan's stages, never the default.
+scan-probes = []
 
 [lints.rust]
 # `hashclash_linked` is set by a downstream build script that links the
 # HashClash C library (see src/cryptanalysis/md5_hashclash_ffi.rs).
 # `ecbench_reader` is set by tools/backend-leaderboard/build.rs, which compiles
 # shared ecbench sources without the full harness.
-unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hashclash_linked)", "cfg(ecbench_reader)"] }
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hashclash_linked)", "cfg(ecbench_reader)", "cfg(sat_qualification_child)"] }
 
 [lints.clippy]
 # The whole allow list; CI runs clippy with -D warnings for everything else.
@@ -220,6 +262,8 @@ result_unit_err = "allow"
 chunks_exact_to_as_chunks = "allow"
 
 [dependencies]
+certified-relations = { path = "crates/certified-relations" }
+relation-replay-checker = { path = "crates/relation-replay-checker" }
 hashed-ecdl-tensor = { path = "crates/hashed-ecdl-tensor" }
 ecdl-tensor-ic = { path = "crates/ecdl-tensor-ic" }
 pencil-symbolic-graph = { path = "research/pencil_large_prime_20261029", features = ["reporting"] }
@@ -302,6 +346,47 @@ path = "research/conductor_gap_followups_20261016/native/followups.rs"
 name = "conductor_gap_followup_posthoc"
 path = "research/conductor_gap_followups_20261016/native/posthoc.rs"
 
+# `gae-reference` — a tuned (Montgomery / carry-less, batched-inversion)
+# affine addition timed beside the CountedGroup addition that defines the GAE
+# unit, with a per-addition cross-check against it.
+[[bin]]
+name = "gae-reference"
+path = "src/bin/gae_reference.rs"
 [[bin]]
 name = "factor-base-sweep"
 path = "src/bin/factor_base_sweep.rs"
+
+# `classgroup` — exact class number of an imaginary quadratic field by the
+# relation method (crypto::isogeny::class_group_subexp).
+[[bin]]
+name = "classgroup"
+path = "src/bin/classgroup.rs"
+
+# `classgroup-structure` — Sylow structure, subgroup orders and generation
+# indices of Cl(D_K) given its order h.
+[[bin]]
+name = "classgroup-structure"
+path = "src/bin/classgroup_structure.rs"
+
+[[bin]]
+name = "semaev-descent-treewidth"
+path = "src/bin/semaev_descent_treewidth.rs"
+# `lab` — an opt-in build profile for long measured runs (assessment
+# 2026-11-10, R8). One codegen unit and thin LTO let the compiler inline
+# across modules (for example the `#[target_feature]` pclmul kernels into
+# their callers) and keep line tables for profilers. It changes machine code
+# only: values, counted units and RNG consumption are those of `release`,
+# but `binary_sha256` in host records differs, so name the profile beside
+# any wall-time figure and never pool timings across profiles. `release`
+# is unchanged (CI build budgets), and `panic` stays `unwind`: 31
+# `catch_unwind` sites depend on it. Build and use:
+#
+#     cargo build --profile lab --bin ecbench      # -> target/lab/ecbench
+#     ./target/lab/ecbench run --spec SPEC --out DIR
+#
+# Expect a markedly longer build than `release` (single codegen unit).
+[profile.lab]
+inherits = "release"
+codegen-units = 1
+lto = "thin"
+debug = "line-tables-only"

@@ -1,0 +1,139 @@
+{
+    "Budgets": [
+        {
+            "BudgetName": "isolab-daily-cost-100",
+            "BudgetLimit": {
+                "Amount": "200.0",
+                "Unit": "USD"
+            },
+            "CostTypes": {
+                "IncludeTax": true,
+                "IncludeSubscription": true,
+                "UseBlended": false,
+                "IncludeRefund": true,
+                "IncludeCredit": true,
+                "IncludeUpfront": true,
+                "IncludeRecurring": true,
+                "IncludeOtherSubscription": true,
+                "IncludeSupport": true,
+                "IncludeDiscount": true,
+                "UseAmortized": false
+            },
+            "TimeUnit": "DAILY",
+            "TimePeriod": {
+                "Start": "2026-10-23T00:00:00+00:00",
+                "End": "2087-06-15T00:00:00+00:00"
+            },
+            "CalculatedSpend": {
+                "ActualSpend": {
+                    "Amount": "104.44",
+                    "Unit": "USD"
+                }
+            },
+            "BudgetType": "COST",
+            "LastUpdatedTime": "2026-11-05T11:47:42.975000+00:00",
+            "HealthStatus": {
+                "Status": "HEALTHY",
+                "LastUpdatedTime": "2026-11-05T11:47:42.834000+00:00"
+            }
+        },
+        {
+            "BudgetName": "isolab-monthly-account-cost",
+            "BudgetLimit": {
+                "Amount": "1000.0",
+                "Unit": "USD"
+            },
+            "CostTypes": {
+                "IncludeTax": true,
+                "IncludeSubscription": true,
+                "UseBlended": false,
+                "IncludeRefund": true,
+                "IncludeCredit": true,
+                "IncludeUpfront": true,
+                "IncludeRecurring": true,
+                "IncludeOtherSubscription": true,
+                "IncludeSupport": true,
+                "IncludeDiscount": true,
+                "UseAmortized": false
+            },
+            "TimeUnit": "MONTHLY",
+            "TimePeriod": {
+                "Start": "2026-10-01T00:00:00+00:00",
+                "End": "2087-06-15T00:00:00+00:00"
+            },
+            "CalculatedSpend": {
+                "ActualSpend": {
+                    "Amount": "538.72",
+                    "Unit": "USD"
+                }
+            },
+            "BudgetType": "COST",
+            "LastUpdatedTime": "2026-11-05T11:55:08.334000+00:00",
+            "HealthStatus": {
+                "Status": "HEALTHY",
+                "LastUpdatedTime": "2026-11-05T11:55:07.817000+00:00"
+            }
+        },
+        {
+            "BudgetName": "spot-experiments-daily-25",
+            "BudgetLimit": {
+                "Amount": "200.0",
+                "Unit": "USD"
+            },
+            "TimeUnit": "DAILY",
+            "TimePeriod": {
+                "Start": "2026-10-25T07:00:00+00:00",
+                "End": "2087-06-15T00:00:00+00:00"
+            },
+            "CalculatedSpend": {
+                "ActualSpend": {
+                    "Amount": "44.765",
+                    "Unit": "USD"
+                }
+            },
+            "BudgetType": "COST",
+            "LastUpdatedTime": "2026-11-05T11:51:51.009000+00:00",
+            "FilterExpression": {
+                "And": [
+                    {
+                        "Or": [
+                            {
+                                "Tags": {
+                                    "Key": "SpotSystem",
+                                    "Values": [
+                                        "spot-experiments"
+                                    ]
+                                }
+                            },
+                            {
+                                "Tags": {
+                                    "Key": "project",
+                                    "Values": [
+                                        "isolab"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Not": {
+                            "Tags": {
+                                "Key": "workload",
+                                "Values": [
+                                    "github-actions"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "Metrics": [
+                "UnblendedCost"
+            ],
+            "HealthStatus": {
+                "Status": "HEALTHY",
+                "LastUpdatedTime": "2026-11-05T11:51:50.855000+00:00"
+            }
+        }
+    ]
+}

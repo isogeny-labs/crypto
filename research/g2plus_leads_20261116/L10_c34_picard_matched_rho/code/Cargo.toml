@@ -1,0 +1,15 @@
+[package]
+name = "l10"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[profile.release]
+opt-level = 3
+debug = false
+
+[[bin]]
+name = "l10"
+path = "src/main.rs"
+test = false

@@ -1,0 +1,25 @@
+{
+ "created_at": "2026-11-08T20:51:51Z",
+ "id": "PCC-20261108-24cbda",
+ "kind": "theorem",
+ "producer": {
+  "commit": "92c5b02820c0e748c5fffd10632628f9654f5cda",
+  "model": "",
+  "session": "finite-buffers-20261108"
+ },
+ "proofs": [
+  {
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "FiniteBuffers.actual_invertBuffer_correct"
+  },
+  {
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "ResidueEncoding.modular_inverse_correct"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "FiniteBuffers.actual_invertBuffer_correct and ResidueEncoding.modular_inverse_correct; all a,nodes,precision p,length q. Mathematical operator, not native runtime or full recovery.",
+ "statement": "The finite inverse-buffer operator applied to the actual denominator coefficients and genuine mapped source unit equals the actual inverse coefficient buffer, also after concrete modular encoding."
+}

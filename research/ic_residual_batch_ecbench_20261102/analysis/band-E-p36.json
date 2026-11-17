@@ -1,0 +1,152 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "log2_r": 35.9999904645676,
+      "arm": "pool16",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        4.2199214678755235,
+        4.640921329152197,
+        8.429920080642267
+      ],
+      "charged_sum": 53098725.0,
+      "native_sum": 52973867,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "log2_r": 35.9999904645676,
+      "arm": "pool64",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        8.653692869099674,
+        9.516026044316993,
+        17.277024621272854
+      ],
+      "charged_sum": 108888296.0,
+      "native_sum": 108506266,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "log2_r": 35.9999904645676,
+      "arm": "res16",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        4.416026880888061,
+        4.856611542121662,
+        8.82187349322409
+      ],
+      "charged_sum": 55566294.0,
+      "native_sum": 55438197,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "log2_r": 35.9999904645676,
+      "arm": "res64",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        8.720345387341455,
+        9.589299762431237,
+        17.409889138239304
+      ],
+      "charged_sum": 109726976.0,
+      "native_sum": 109339403,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "log2_r": 35.9999904645676,
+      "arm": "rho",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        0.9002410916301994,
+        0.9901096242089316,
+        1.7989264174175246
+      ],
+      "charged_sum": 11327617.0,
+      "native_sum": 11308041,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "pool16",
+      "b": "pool64",
+      "verdict": "pool16 < pool64"
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "pool16",
+      "b": "res16",
+      "verdict": "pool16 < res16"
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "pool16",
+      "b": "res64",
+      "verdict": "pool16 < res64"
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "pool16",
+      "b": "rho",
+      "verdict": "rho < pool16"
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "pool64",
+      "b": "res16",
+      "verdict": "res16 < pool64"
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "pool64",
+      "b": "res64",
+      "verdict": "pool64 < res64"
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "pool64",
+      "b": "rho",
+      "verdict": "rho < pool64"
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "res16",
+      "b": "res64",
+      "verdict": "res16 < res64"
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "res16",
+      "b": "rho",
+      "verdict": "rho < res16"
+    },
+    {
+      "curve": "icv1-fp36-t454193-44a20818",
+      "a": "res64",
+      "b": "rho",
+      "verdict": "rho < res64"
+    }
+  ]
+}

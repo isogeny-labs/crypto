@@ -29,6 +29,6 @@ jobs:
           export PATH="$HOME/.elan/bin:$PATH"
           lean Capacity.lean > /tmp/n83-finegrid-proof-check.log
           diff -u proof_check.log /tmp/n83-finegrid-proof-check.log
-          if rg -n '\b(sorry|admit|sorryAx)\b' Capacity.lean; then
+          if grep -nE '\b(sorry|admit|sorryAx)\b' Capacity.lean; then
             exit 1
           fi

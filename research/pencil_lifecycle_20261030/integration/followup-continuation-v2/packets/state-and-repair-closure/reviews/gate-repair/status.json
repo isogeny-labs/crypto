@@ -1,0 +1,98 @@
+{
+  "schema": "formal-workflow-review/v1",
+  "subject": "graph-find-gate-repair",
+  "producer_commit": "e095d1e2a7120ef4c86f5b3117d92eb2c165c155",
+  "gate_sha256": "9bd8c6370e7a50214036933c3b08372510c64d799829c868db0a2b6b90bafbba",
+  "producer_manifest_matches": 307,
+  "machine_status": "passed",
+  "source_fidelity": "faithful_scoped",
+  "review_outcome": "validated_scoped",
+  "scope": "fresh invocation snapshots and tested native failure propagation",
+  "controls": [
+    {
+      "case": "success1",
+      "process_exit": 0,
+      "gate_exit": 0,
+      "native_exits": [
+        0,
+        0,
+        0
+      ],
+      "bindings_unchanged": true,
+      "directory": "/var/tmp/pencil-graph-gate-repair-review-20261101/subject/invocation-5xhnkksr"
+    },
+    {
+      "case": "success2",
+      "process_exit": 0,
+      "gate_exit": 0,
+      "native_exits": [
+        0,
+        0,
+        0
+      ],
+      "bindings_unchanged": true,
+      "directory": "/var/tmp/pencil-graph-gate-repair-review-20261101/subject/invocation-_nz9hs93"
+    },
+    {
+      "case": "false",
+      "process_exit": 1,
+      "gate_exit": 1,
+      "native_exits": [
+        1
+      ],
+      "bindings_unchanged": true,
+      "directory": "/var/tmp/pencil-graph-gate-repair-review-20261101/subject/invocation-2mpxprsc"
+    },
+    {
+      "case": "missing",
+      "process_exit": 1,
+      "gate_exit": 1,
+      "native_exits": [
+        1
+      ],
+      "bindings_unchanged": true,
+      "directory": "/var/tmp/pencil-graph-gate-repair-review-20261101/subject/invocation-oo_653s3"
+    },
+    {
+      "case": "empty",
+      "process_exit": 0,
+      "gate_exit": 0,
+      "native_exits": [
+        0
+      ],
+      "bindings_unchanged": true,
+      "directory": "/var/tmp/pencil-graph-gate-repair-review-20261101/subject/invocation-_msw8464"
+    },
+    {
+      "case": "empty-required-readback",
+      "process_exit": 0,
+      "gate_exit": 0,
+      "native_exits": [
+        0,
+        0,
+        0
+      ],
+      "bindings_unchanged": true,
+      "directory": "/var/tmp/pencil-graph-gate-repair-review-20261101/empty-required-readback/invocation-q0baov57"
+    }
+  ],
+  "named_acceptance": "inventory-acceptance.json",
+  "named_declarations_per_positive": 10,
+  "complete_inventory_verifier_in_helper": false,
+  "untested": [
+    "forced timeout",
+    "concurrent input mutation",
+    "early setup errors",
+    "independent kernel rechecker"
+  ],
+  "scientific_runs": 0,
+  "repository_edits": false,
+  "visual_inspection": {
+    "pdf_pages": [
+      1,
+      2
+    ],
+    "svg_embedded": true,
+    "result": "all pages inspected; legible and no clipping"
+  }
+}

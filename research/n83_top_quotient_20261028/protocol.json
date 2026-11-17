@@ -1,0 +1,569 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-TOP-QUOTIENT-20261028",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/n83_top_quotient_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "DESIGN.md"
+  },
+  "question": "What regularity bounds or positive-dimensional top-ideal certificates follow from explicit graded quotients of all48 saved fixed-ell27 PDP systems?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Verified graded quotient maps imply the reported finite intervals or positive-dimensional top-form ideals for the exact saved input presentations.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "No exact regularity inside an interval, solving degree, global LFD, elite-base selection or cryptographic speedup is established.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "koblitz",
+      "role": "reference",
+      "description": "koblitz public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2de2ca48ec7e9fbb584146bf7e0b776d18ab6198",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_top_quotient_20261028/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "bf754a69325c7cd97f06114676b01b98cef88a68e79e6b01d552206c3dff1505",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "graded_quotient_certificate"
+        ],
+        "seconds": 600,
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      }
+    },
+    {
+      "id": "binary",
+      "role": "candidate",
+      "description": "binary public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2de2ca48ec7e9fbb584146bf7e0b776d18ab6198",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_top_quotient_20261028/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "bf754a69325c7cd97f06114676b01b98cef88a68e79e6b01d552206c3dff1505",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "graded_quotient_certificate"
+        ],
+        "seconds": 600,
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      }
+    },
+    {
+      "id": "prime",
+      "role": "candidate",
+      "description": "prime public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2de2ca48ec7e9fbb584146bf7e0b776d18ab6198",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_top_quotient_20261028/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "bf754a69325c7cd97f06114676b01b98cef88a68e79e6b01d552206c3dff1505",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "graded_quotient_certificate"
+        ],
+        "seconds": 600,
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No extra experimental arm: five native tests check explicit square-zero quotients and prime formula fixtures before data."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No null-population claim: retained nonzero top monomials invalidate projections; missing field equation and changed prime selectors must be rejected."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "e5bffc16e0bea114cd95ac8fc90a98c0dc3b8e0fc692f695052f9b87e2fc1f60",
+        "how": "Committed native quotient certificate producer and fresh-process replay"
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 20261027,
+        "how": "SplitMix64 family and m seed rule in PROTOCOL.md"
+      },
+      {
+        "name": "factor_base",
+        "treatment": "fixed",
+        "how": "Same ell27 per-curve manifest for m2..9; every planted point checked against stored shard"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Sequential native processes"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing host after recorded EKS S3 permission failure; no timing claim"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Original inputs.json order;48 producer certificates then48 fresh replays"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen parsing; no discretionary exclusion"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "8GiB virtual memory;600s producer and600s replay;1500s outer budget; no retries"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Every top generator maps to zero under the stated graded quotient; source checks and fresh replay pass"
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Counted exact outputs; no timed comparison. Stable sharding makes reproduction explicit.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "SplitMix64: seed xor m<<32 xor family tag; source defines all draws."
+    },
+    "instance_sampling": {
+      "rule": "One public planted sum and one independently rejection-lifted point per cell",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 16,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "16 original input cases per family,48 total, one producer pass and one fresh replay. No statistical test."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.01,
+      "per_sample_seconds": 25,
+      "threads": 1,
+      "estimated_total_seconds": 1500,
+      "measured_on": "Five development controls finish below timer resolution; per-case25s is allocation of batch budgets, not a measured pilot"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "dreg_lower_bound",
+        "name": "Certified lower bound on top-form regularity",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "k+1 from a verified graded surjection onto a square-zero quotient on k variables; null if not a finite-interval certificate",
+        "source": "summary.json dreg_lower_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "dreg_upper_bound",
+        "name": "dreg_upper_bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "nvars+1 only when all original variable squares lie in the top ideal",
+        "source": "summary.json dreg_upper_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "top_quotient_dimension_lower_bound",
+        "name": "top_quotient_dimension_lower_bound",
+        "unit": "dimension",
+        "kind": "counted",
+        "definition": "1 from a verified surjection onto Fp[u0], otherwise the trivial0",
+        "source": "summary.json top_quotient_dimension_lower_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "dreg_lower_bound",
+      "dreg_upper_bound",
+      "top_quotient_dimension_lower_bound"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 1500,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All48 original saved systems, two fixed binary projection candidates per case, one prime structural certificate per case, then fresh replay of all48",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "600s per whole producer/replay pass,5s kill grace,8GiB virtual memory,1500s outer budget; no retries",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Source hash/presentation mismatch or failed replay invalidates certificate",
+    "Any surviving projected top monomial invalidates that candidate map",
+    "Unverified candidates and resource limits provide no mathematical bound",
+    "All elapsed times remain diagnostic,wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report verified finite intervals, positive-dimensional top-ideal certificates, and all failed projection candidates or incomplete cases; no scientific promotion",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact per-input value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "finite_interval",
+      "positive_dimensional_top_ideal",
+      "unresolved",
+      "error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/main.rs",
+      "sha256": "e5bffc16e0bea114cd95ac8fc90a98c0dc3b8e0fc692f695052f9b87e2fc1f60"
+    },
+    "inputs": [
+      "original inputs.json and system.sing files"
+    ],
+    "outputs": [
+      "certificates/*.json",
+      "certificates/summary.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Certified regularity intervals and positive-dimensional status by m and family"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Summation polynomial formulas and distinction between first fall and regularity",
+      "verified_by": "Read primary HTML and checked formulas with controls"
+    },
+    {
+      "ref": "https://www.singular.uni-kl.de/index.php/singular.pdf",
+      "provenance": "internal",
+      "claim": "Standard bases and Hilbert functions; installed-version behavior checked by controls",
+      "verified_by": "Previously checked manual and installed4.3.1 controls; current manual fetch failed"
+    },
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "Definitions of bounded multiplication closure and last fall degree; distinction from regularity",
+      "verified_by": "Primary text checked before implementation; restricted upper certificate documented in DESIGN.md"
+    }
+  ],
+  "amendments": [],
+  "extensions": {
+    "detailed_design": "DESIGN.md",
+    "fixed_factor_base_index": {
+      "candidate_x_count_per_curve": 134217728,
+      "complete": true,
+      "ell": 27,
+      "families": [
+        {
+          "compressed_bytes": 1329389614,
+          "family": "koblitz",
+          "liftable_x": 67110393,
+          "manifest": "koblitz/manifest.json",
+          "manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+          "point_count": 134220785,
+          "same_base_for_m": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "compressed_bytes": 1329453079,
+          "family": "binary",
+          "liftable_x": 67113567,
+          "manifest": "binary/manifest.json",
+          "manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+          "point_count": 134227133,
+          "same_base_for_m": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "compressed_bytes": 1849491803,
+          "family": "prime",
+          "liftable_x": 67106828,
+          "manifest": "prime/manifest.json",
+          "manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5",
+          "point_count": 134213656,
+          "same_base_for_m": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        }
+      ],
+      "schema": "n83.shared-factor-bases/v1"
+    },
+    "backend_reason": "EKS shared-bucket access denied in prior run; existing-host fallback retains native solver and limits",
+    "factor_base_encoding": "Fixed candidate x-domain; saved point membership checked for planted target, candidate roots require lift/sign verification",
+    "input_index_sha256": "c9e5a0ff7e38e792c2cbfa196e6e6b7d5fc231bdc6d683784de8774f94afad4e",
+    "executables": {
+      "quotient": {
+        "sha256": "bf754a69325c7cd97f06114676b01b98cef88a68e79e6b01d552206c3dff1505",
+        "source_commit": "2de2ca48ec7e9fbb584146bf7e0b776d18ab6198"
+      }
+    },
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-top-quotient-20261028-r1/local/",
+    "file_layout": "FORMAT.json",
+    "previous_fixed_fall_summary_sha256": "d52e568bba11829ce01928c85a525e06e496de3392e96417d1c3d5a1f9cbe911"
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "4337e3059205595ab6839558e65b162f68077b30c025bff3175d39203adec660",
+    "commit": "2de2ca48ec7e9fbb584146bf7e0b776d18ab6198",
+    "frozen_at": "2026-10-28T05:24:03Z",
+    "filed_before_affected_data": true
+  }
+}

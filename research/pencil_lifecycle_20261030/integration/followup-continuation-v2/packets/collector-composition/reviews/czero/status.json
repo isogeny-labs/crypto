@@ -1,0 +1,66 @@
+{
+  "schema": "research.independent-component-review/v1",
+  "verdict": "no blocking discrepancy at normalized field interpolation scope",
+  "source_review": true,
+  "fresh_isolated_replay": true,
+  "producer_main": 9,
+  "producer_controls": 6,
+  "reviewer_controls_and_input_witnesses": 6,
+  "axiom_readbacks": 21,
+  "allowed_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "checks": {
+    "main1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "reviewer1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "reviewer2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "reviewer_readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "bindings": {
+    "CZero.lean": {
+      "producer": "d49cfb8435d1dd420c7aa318f3e56477d60fb04a870a239faf02413174306683",
+      "review_copy": "d49cfb8435d1dd420c7aa318f3e56477d60fb04a870a239faf02413174306683"
+    },
+    "CZeroControls.lean": {
+      "producer": "930703d41dc2fa9c5faee691e4481874e326d0a8cd2784a502a76c3c3b89d5c5",
+      "review_copy": "930703d41dc2fa9c5faee691e4481874e326d0a8cd2784a502a76c3c3b89d5c5"
+    },
+    "CZeroReadback.lean": {
+      "producer": "444a720b2639baf0b203ddefceef898a24dae86f4cf4c2572de763f0d57a92e6",
+      "review_copy": "444a720b2639baf0b203ddefceef898a24dae86f4cf4c2572de763f0d57a92e6"
+    }
+  },
+  "producer_modified": false,
+  "scientific_execution": false,
+  "weighted_source_correspondence": false,
+  "compiled_equivalence": false,
+  "class_sum": false
+}

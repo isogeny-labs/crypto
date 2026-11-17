@@ -1,0 +1,999 @@
+{
+  "files": [
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/admission.json",
+      "bytes": 3504,
+      "sha256": "425b39de942b3624e595a7bdd0158e9e619585475ef0c24309ed5e3e63a960b2"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/owner-dollar-waiver.json",
+      "bytes": 556,
+      "sha256": "109f9f249b8a02b57254afb39e5168ffa2a1c4d55b66015d719b5f60ad2e67ef"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-active_worker_seconds_ceiling/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-approved/admission.json",
+      "bytes": 3483,
+      "sha256": "fafdb70dcbff8c8340caf8d5be6f5e12a19f2eeff6f81cc4df7a8492a85c433e"
+    },
+    {
+      "path": "fixtures/bad-approved/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-approved/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-approved/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-approved/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-approved/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-approved/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-approved/owner-dollar-waiver.json",
+      "bytes": 557,
+      "sha256": "a91e81ed9474b4cc53424f0581041e1c7fd834409432be5ac3a3e2acc749ce88"
+    },
+    {
+      "path": "fixtures/bad-approved/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-approved/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-approved/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-control/admission.json",
+      "bytes": 3361,
+      "sha256": "3873802bce4bc42436b5fdfa81cf5fc9527eb266c5b68ac5f0c336d1f90a56ad"
+    },
+    {
+      "path": "fixtures/bad-control/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-control/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-control/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-control/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-control/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-control/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-control/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/bad-control/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-control/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-control/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-deadline/admission.json",
+      "bytes": 3483,
+      "sha256": "342369c614de82fe47c1e206de86dac94f470698b112ff0356086011dfe3e3ee"
+    },
+    {
+      "path": "fixtures/bad-deadline/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-deadline/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-deadline/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-deadline/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-deadline/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-deadline/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-deadline/owner-dollar-waiver.json",
+      "bytes": 556,
+      "sha256": "9fc787a7d211be7c4f1626212a002411ef48d7ac1d591e41be26e1e84de07ed2"
+    },
+    {
+      "path": "fixtures/bad-deadline/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-deadline/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-deadline/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-fence/admission.json",
+      "bytes": 3480,
+      "sha256": "bf5af0d7a7c21ac83a08e7a0e62546497aa03fba8a177e7b97c4bdaf418091ce"
+    },
+    {
+      "path": "fixtures/bad-fence/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-fence/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-fence/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-fence/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-fence/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-fence/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-fence/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/bad-fence/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-fence/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-fence/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-hash/admission.json",
+      "bytes": 3479,
+      "sha256": "913e320a6a441af945672c79b28c3a476f33fa8c7b6a732788a14e00d1c4396c"
+    },
+    {
+      "path": "fixtures/bad-hash/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-hash/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-hash/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-hash/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-hash/fixture.json",
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "path": "fixtures/bad-hash/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-hash/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/bad-hash/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-hash/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-hash/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/admission.json",
+      "bytes": 3492,
+      "sha256": "c9bffa57677924910943d37029838ee5294ed1f4cfa1ba9f42059b2863482ab1"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/owner-dollar-waiver.json",
+      "bytes": 556,
+      "sha256": "9f1c06bff1fabc7f24eb44c15b96cf8c102953df14c4afdc15749d7c2ad148fb"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-one_attempt_limit/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/admission.json",
+      "bytes": 3513,
+      "sha256": "53964895ab7a0af46088403dc3456e18296f0a1d51b90b386152218878851720"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/owner-dollar-waiver.json",
+      "bytes": 557,
+      "sha256": "0b5b45f5f8fef6d7a38f18c2c5e5b09a00ae999f85d3d1376d0bee8e5a816ce2"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-preserve_resource_and_ownership_checks/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-pub/admission.json",
+      "bytes": 3450,
+      "sha256": "529833c69344233f207f1d323f88a993633d43720a5862fda858e7d23bdf1def"
+    },
+    {
+      "path": "fixtures/bad-pub/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-pub/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-pub/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-pub/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-pub/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-pub/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-pub/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/bad-pub/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-pub/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-pub/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-resource/admission.json",
+      "bytes": 3483,
+      "sha256": "aef7a950db20cd1da17517b8ee683884d5459df61a7ddfb4e07237c3d86149ae"
+    },
+    {
+      "path": "fixtures/bad-resource/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-resource/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-resource/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-resource/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-resource/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-resource/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-resource/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/bad-resource/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-resource/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-resource/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-scope/admission.json",
+      "bytes": 3480,
+      "sha256": "fac5f6ac72f818a706db4c536efe8995bc79078cb143f437eac1fe28488fb4b1"
+    },
+    {
+      "path": "fixtures/bad-scope/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-scope/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-scope/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-scope/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-scope/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-scope/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-scope/owner-dollar-waiver.json",
+      "bytes": 509,
+      "sha256": "fcd8c7f69e1b560bc02df7a8c61d26c9b03ed0f0a33a8bd833e0b6d0b369f373"
+    },
+    {
+      "path": "fixtures/bad-scope/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-scope/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-scope/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/admission.json",
+      "bytes": 3501,
+      "sha256": "1fd69c9f39f0b20f0388f4eaf525641cebba2d802faa25b7e18aca1d857e3a41"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/owner-dollar-waiver.json",
+      "bytes": 556,
+      "sha256": "e1c0e4f84aca5c4c2d027a366b9359421bc4f06e7785d0f0596fe440dac03e73"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/bad-validation_attempt_seconds/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/logs/log-prefix-checkpoint.json",
+      "bytes": 161,
+      "sha256": "4afe02e1adc685a1b43366d011fc206d325c575481a2dab86970f6191f055f36"
+    },
+    {
+      "path": "fixtures/logs/old.json",
+      "bytes": 3,
+      "sha256": "cba06b5736faf67e54b07b561eae94395e774c517a7d910a54369e1263ccfbd4"
+    },
+    {
+      "path": "fixtures/logs/worker.stdout",
+      "bytes": 6,
+      "sha256": "e7a2e8b216e5aec3facf743962d3997f2e7d70088ef257de472d6a258049832e"
+    },
+    {
+      "path": "fixtures/nonnull/admission.json",
+      "bytes": 3475,
+      "sha256": "b1fe98c12303254d8e890b9e36d7eb9130a8933799c14ab263248421f5bb7296"
+    },
+    {
+      "path": "fixtures/nonnull/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/nonnull/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/nonnull/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/nonnull/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/nonnull/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/nonnull/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/nonnull/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/nonnull/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/nonnull/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/nonnull/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/admission.json",
+      "bytes": 3435,
+      "sha256": "cf454d9380c838262dd237e6bff41db192d3cc73548aedd4d6c0917265f8ed71"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/allocation.json",
+      "bytes": 123,
+      "sha256": "6e96cc3b8f302688fa0c2625c59bf44964b29d98f1a416e4b4978fd81759576a"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/ordinary-boolean/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/admission.json",
+      "bytes": 3440,
+      "sha256": "9eab08f1a0713da8032d58191826ed681a9a341d8288a40fd73039d6dc3416f1"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/allocation.json",
+      "bytes": 123,
+      "sha256": "6e96cc3b8f302688fa0c2625c59bf44964b29d98f1a416e4b4978fd81759576a"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/ordinary-infinite/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/ordinary-valid/admission.json",
+      "bytes": 3430,
+      "sha256": "6b850690b67fbb2fbe3a9d033662ba555dd73858938ecd26ad07041376e4f5d1"
+    },
+    {
+      "path": "fixtures/ordinary-valid/allocation.json",
+      "bytes": 123,
+      "sha256": "6e96cc3b8f302688fa0c2625c59bf44964b29d98f1a416e4b4978fd81759576a"
+    },
+    {
+      "path": "fixtures/ordinary-valid/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/ordinary-valid/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/ordinary-valid/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/ordinary-valid/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/ordinary-valid/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/ordinary-valid/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/ordinary-valid/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/ordinary-valid/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/ordinary-valid/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/ordinary-valid/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "fixtures/permit/supervisor-permit.json",
+      "bytes": 74,
+      "sha256": "77b0bb433e24ee673afe356063ae5c8c35cdc9e83ea7d8f8fc55fddbe022662d"
+    },
+    {
+      "path": "fixtures/result.json",
+      "bytes": 2095,
+      "sha256": "0967061d5b77e9cbe9f93d075c93d414f0d2f5285d96245650ffd049acc6563b"
+    },
+    {
+      "path": "fixtures/waiver-valid/admission.json",
+      "bytes": 3483,
+      "sha256": "03bbaf13128d09f2c70874a89a55139a156ee5a964da48be2d7f7d515f7f414a"
+    },
+    {
+      "path": "fixtures/waiver-valid/candidate.patch",
+      "bytes": 5220,
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75"
+    },
+    {
+      "path": "fixtures/waiver-valid/durable-launcher.py",
+      "bytes": 9982,
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c"
+    },
+    {
+      "path": "fixtures/waiver-valid/durable-worker.py",
+      "bytes": 8805,
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+    },
+    {
+      "path": "fixtures/waiver-valid/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    },
+    {
+      "path": "fixtures/waiver-valid/fixture.json",
+      "bytes": 2238,
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980"
+    },
+    {
+      "path": "fixtures/waiver-valid/materialized-inputs.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/waiver-valid/owner-dollar-waiver.json",
+      "bytes": 580,
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+    },
+    {
+      "path": "fixtures/waiver-valid/publication.json",
+      "bytes": 20,
+      "sha256": "729cd4435656683931ea719191f6786bbca51754bd7e573f413a655d71fdde49"
+    },
+    {
+      "path": "fixtures/waiver-valid/recipe-proposal.json",
+      "bytes": 2596,
+      "sha256": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298"
+    },
+    {
+      "path": "fixtures/waiver-valid/source-bindings.json",
+      "bytes": 861,
+      "sha256": "1df863413f2034609862d450fea95dccceb9888f264e6d3045bc6af50d4f11a4"
+    },
+    {
+      "path": "control/exit.json",
+      "bytes": 77,
+      "sha256": "4b2e32e56ec729e896c79dd6dd0dc98548db36531278b6e38615ac86b2dc1bb9"
+    },
+    {
+      "path": "control/publication.json",
+      "bytes": 160,
+      "sha256": "aee84fef9dc8060028b54c2a743721a4f42b05c51886c31ebe2eb593b85d1467"
+    },
+    {
+      "path": "control/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "control/stdout",
+      "bytes": 2095,
+      "sha256": "0967061d5b77e9cbe9f93d075c93d414f0d2f5285d96245650ffd049acc6563b"
+    }
+  ]
+}

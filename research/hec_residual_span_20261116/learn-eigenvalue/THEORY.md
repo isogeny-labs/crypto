@@ -1,0 +1,29 @@
+# Deferred scalar action and a cyclotomic sparse representation
+
+Classical finite-algebra derivation for review, not mathematical priority, formal certification or a tenfold theorem. This note explains the positive consistency gate and a possible implementation that must still be cost-qualified. [pcc:unverified]
+
+## Complete hypotheses without the character sum
+
+For C:y²=x5+c over Fp with a rational primitive5throotz, sigma(x,y)=(z*x,y) fixesinfinity. The quotient hascoordinatey andgenus0. The normendomorphism1+sigma+...+sigma4 factors throughJac(C/sigma)=0. For the retained primecyclicrationalgroupoforderell!=5, sigma acts as lambda withPhi5(lambda)=0. Thus ell=1mod5 and the4nontrivial5throotsareacompletehypothesisset. This uses exactorder/primalitypreconditions; it doesnotassert everyrationalell-torsioncomponentofanarbitrarycofactorgroupisone-dimensional.
+
+A conditionalcolumnmapforapossiblerootisnotyetagroup-respectingfactorbase. Principalrelationsandpublicsource-normalizationbecomeconditionalhypotheses. A trueactioncannotyieldinconsistentrows. Inconsistencycanrejectwrongroots; finiteconsistentdata neednotidentifyone,so ambiguitymustremainexplicit. Finaldirectsigma(D)=[lambda]Dand[k]D=Tarequalification,notsecretinputsusedtoselectarootduringinference.
+
+## Single product algebra
+
+R=Fell[Z]/Phi5(Z) isisomorphictoFell^4onthispanel. Treat anorbitrepresentative'scoefficientweights as signedpowers ofZinstead of supplyinglambda. A variable/targetvalueoverR representsall4candidatecomponents. Inconsistentcomponentsmustbeexcludedbyverifiedlinearalgebra,notdiscardedbecauseanexpectedactionisavailable.
+
+For theone-coredegree3residuals,atmost2LPpointsremain. A two-LPedgeondistinctorbits hasmonomialcoefficients±Z^a. A one-LPaggregateoftwopoints hascoefficient±Z^a±Z^b. After cancellation, thisis aunit: monomialsareunits; 2isnonzero; and1-Z^j or1+Z^j hasnonzeroevaluationateverynontrivial5throotforjnot0mod5 (forplusalsoj=0). Hence free-componentedgegainsare signedpowersofZ. A cyclewithgainexactly1isbalanced; otherwise1-gainisaunitinR. These are identities about the restrictedinput/supportclass,notgeneralringmatrices.
+
+Therefore theweightedLPunion/groundingphase caninprincipleoperateoverRwithouta zerodivisorpivot onthissupportclass. LabelconstraintsinC,k neednot haveunitpivots,so arbitraryinversiontherewouldbeincorrect. Generalgenus3/4rowsandunrestrictedsourceconstraintsneedseparatequalification; theobservedgenus2publicsourceequationhasatmost2LPpoints andfits thissupportargument.
+
+## Label consistency and zero divisors
+
+For labelrowsa_i*C+b_i*k=c_i, a2by2minorDelta=a1*b2-a2*b1 canbe azerodivisor. Ifunit, solveC,k inR andevaluatefurtherlabelresidualpolynomialh(Z). Keepinggcd(Phi5,h) retains exactlythecomponentsconsistentwiththatresidual; thetrueone survives. IfDelta isnotunit, gcd(Delta,Phi5) splitscomponentswhereTHISpivotvanishes. Suchcomponents areNOTautomaticallywrong: theymustremainpendinganduseanotherpivot/consistencytest. A correctalgorithmneedsa fraction-freeorCRT-awarelabelsolver; no inverseofazerodivisor maybeguessed.
+
+The4fieldhypothesisgateis a straightforward reference forsuchfutureR/CRTcode,notanimplementationofit. ItsdenseandBTreeMapsolversuseoppositeFBpivotordersandcheckeverysurvivingprefix. Thedatasetidentifiesonecomponentinall12streams,butthisdoesnotproveuniversalseparationorthecostofmodularpolynomialarithmetic.
+
+## Cost admission
+
+Deferringlambda removesaneagercharacterinputfrominference, nottheentireinitialcost. CanonicalFB,geometricorbitconstruction,sourcequalification/normalization,relations,additionalrows,ringoperations,componentrejectionsandfinaloriginal-groupchecksremain. Fourindependentellsolvesmaybemoreexpensivethancharacterpreparation. A sharedRimplementationandfreshfullcostcomparisonarerequired; known-rootfoldingmustremainthestrongcomparator. ThischangesbootstrapandisnotexcludedbythepreviousUNCHANGEDbootstrapcounterfloor,butnothereprovesa10xgain.
+
+KBsource:08f3e36526264f46e4eca5d5381c7e31,docs/ic/FRAMEWORK.md,known-eigenvaluefoldingcontractreadatlexicalrevision9b2119e8fbac482b98b50521c0d604bb. Itsvalid-columnmaprequirementisrespectedbykeepinghypothesesconditionalandqualifyingthefinalmap. No searchabsence/noveltyclaim. Generalmathematical10xgenus2+objective remainsactive.

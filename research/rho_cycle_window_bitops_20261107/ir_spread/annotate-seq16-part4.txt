@@ -1,0 +1,60 @@
+--------------------------------------------------------------------------------
+Profile data file '/tmp/claude-0/-home-user/0175cce0-2ca5-5248-8a75-97acf3a20a50/scratchpad/acct7/ladder/16.callgrind.4' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 35388643 - 35485833
+Trigger: Client Request: generic_ic_setup
+Profiled target:  /home/user/crypto/target/release/ecbench exec (PID 20534, part 4)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir               
+--------------------------------------------------------------------------------
+796,358 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                file:function
+--------------------------------------------------------------------------------
+796,358 (100.0%)  ./csu/../csu/libc-start.c:__libc_start_main@@GLIBC_2.34 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+796,358 (100.0%)  ./csu/../sysdeps/nptl/libc_start_call_main.h:(below main) [/usr/lib/x86_64-linux-gnu/libc.so.6]
+796,358 (100.0%)  ???:(below main) [/home/user/crypto/target/release/ecbench]
+796,358 (100.0%)  ???:0x000000000001f540 [/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2]
+796,358 (100.0%)  ???:crypto_lib::cryptanalysis::ecbench::methods::solve [/home/user/crypto/target/release/ecbench]
+796,358 (100.0%)  ???:crypto_lib::cryptanalysis::ecbench::record::child_main [/home/user/crypto/target/release/ecbench]
+796,358 (100.0%)  ???:ecbench::main [/home/user/crypto/target/release/ecbench]
+796,358 (100.0%)  ???:ecbench::run [/home/user/crypto/target/release/ecbench]
+796,358 (100.0%)  ???:main [/home/user/crypto/target/release/ecbench]
+796,358 (100.0%)  ???:std::rt::lang_start::<std::process::ExitCode>::{closure#0} [/home/user/crypto/target/release/ecbench]
+796,358 (100.0%)  ???:std::rt::lang_start_internal [/home/user/crypto/target/release/ecbench]
+796,358 (100.0%)  ???:std::sys::backtrace::__rust_begin_short_backtrace::<fn() -> std::process::ExitCode, std::process::ExitCode> [/home/user/crypto/target/release/ecbench]
+780,295 (97.98%)  ???:crypto_lib::cryptanalysis::ecbench::full_price::reprice [/home/user/crypto/target/release/ecbench]
+739,274 (92.83%)  ???:<&mut serde_json::de::Deserializer<serde_json::read::StrRead> as serde_core::de::Deserializer>::deserialize_any::<<serde_json::value::Value as serde_core::de::Deserialize>::deser
+389,156 (48.87%)  ???:crypto_lib::hash::sha256::sha256 [/home/user/crypto/target/release/ecbench]
+363,436 (45.64%)  ???:crypto_lib::hash::sha256::compress [/home/user/crypto/target/release/ecbench]
+334,219 (41.97%)  ???:crypto_lib::cryptanalysis::ecbench::full_price::row [/home/user/crypto/target/release/ecbench]
+272,713 (34.25%)  ???:serde_json::de::from_trait::<serde_json::read::StrRead, serde_json::value::Value> [/home/user/crypto/target/release/ecbench]
+272,488 (34.22%)  ???:<&mut serde_json::de::Deserializer<serde_json::read::StrRead> as serde_core::de::Deserializer>::deserialize_any::<<serde_json::value::Value as serde_core::de::Deserialize>::deser
+129,456 (16.26%)  ???:core::ptr::drop_glue::<serde_json::value::Value>'2 [/home/user/crypto/target/release/ecbench]
+116,226 (14.59%)  ???:__rustc::__rust_alloc [/home/user/crypto/target/release/ecbench]
+115,671 (14.53%)  ???:__rustc::__rdl_alloc [/home/user/crypto/target/release/ecbench]
+110,676 (13.90%)  ./malloc/./malloc/malloc.c:malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 88,322 (11.09%)  ???:<serde_json::de::Deserializer<serde_json::read::StrRead>>::parse_any_number [/home/user/crypto/target/release/ecbench]
+ 86,351 (10.84%)  ./malloc/./malloc/malloc.c:_int_malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 71,995 ( 9.04%)  ???:<serde_json::de::MapAccess<serde_json::read::StrRead> as serde_core::de::MapAccess>::next_value::<serde_json::value::Value> [/home/user/crypto/target/release/ecbench]
+ 59,678 ( 7.49%)  ???:<alloc::collections::btree::map::BTreeMap<alloc::string::String, serde_json::value::Value>>::insert [/home/user/crypto/target/release/ecbench]
+ 55,881 ( 7.02%)  ???:<<serde_json::value::Value as serde_core::de::Deserialize>::deserialize::ValueVisitor as serde_core::de::Visitor>::visit_map::<serde_json::number::NumberDeserializer> [/home/user
+ 53,241 ( 6.69%)  ???:<serde_json::number::NumberDeserializer as serde_core::de::MapAccess>::next_value_seed::<core::marker::PhantomData<serde_json::number::NumberFromString>> [/home/user/crypto/targe
+ 50,856 ( 6.39%)  ???:core::ptr::drop_glue::<serde_json::value::Value> [/home/user/crypto/target/release/ecbench]
+ 50,292 ( 6.32%)  ???:core::ptr::drop_glue::<alloc::collections::btree::map::IntoIter<alloc::string::String, serde_json::value::Value>> [/home/user/crypto/target/release/ecbench]
+ 49,442 ( 6.21%)  ???:__rustc::__rust_dealloc [/home/user/crypto/target/release/ecbench]
+ 48,960 ( 6.15%)  ???:__rustc::__rdl_dealloc [/home/user/crypto/target/release/ecbench]
+ 48,478 ( 6.09%)  ./malloc/./malloc/malloc.c:free [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 43,321 ( 5.44%)  ???:<serde_json::number::Number as core::str::traits::FromStr>::from_str [/home/user/crypto/target/release/ecbench]

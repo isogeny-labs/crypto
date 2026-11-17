@@ -13,8 +13,8 @@ from research.n83_crossfamily_current_20261025 import source_bundle
 
 
 ACCOUNT_ID = "590183823895"
-REGION = "us-east-1"
-VPC_ID = "vpc-0da45a1bf46c94fa9"
+REGION = "us-west-2"
+VPC_ID = "vpc-0394e002d95674fe6"
 INSTANCE_TYPE = "g5g.4xlarge"
 VCPU_PER_INSTANCE = 16
 MEMORY_MIB_PER_INSTANCE = 32768
@@ -30,10 +30,10 @@ AMI_PARAMETER = (
     "arm64/hvm/ebs-gp3/ami-id"
 )
 ZONES = (
-    {"stratum": 0, "zone": "us-east-1d", "subnet_id":
-     "subnet-0561480728d2b1ffd", "max_hourly_usd": Decimal("0.27")},
-    {"stratum": 1, "zone": "us-east-1d", "subnet_id":
-     "subnet-0561480728d2b1ffd", "max_hourly_usd": Decimal("0.27")},
+    {"stratum": 0, "zone": "us-west-2c", "subnet_id":
+     "subnet-0fe2fa8824df57aea", "max_hourly_usd": Decimal("0.27")},
+    {"stratum": 1, "zone": "us-west-2c", "subnet_id":
+     "subnet-0fe2fa8824df57aea", "max_hourly_usd": Decimal("0.27")},
 )
 
 

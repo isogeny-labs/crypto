@@ -1,0 +1,30 @@
+{
+  "id": "20261019-012707-boolean-native-optimizat-abf14c",
+  "created": "2026-10-19T01:27:11Z",
+  "owner": "ec2-user@ip-172-31-35-131",
+  "instance_type": "c7i.2xlarge",
+  "spot": false,
+  "ttl": "2h",
+  "deadline": 1792380430,
+  "disk_gb": 60,
+  "ami": "resolve:ssm:/ephemeral/ami/rust-x86_64",
+  "toolchain": "rust",
+  "setup": "",
+  "repo_url": "https://github.com/aburan28/crypto",
+  "commit": "1e2bf0715a2a927afc92e6730d6e65b59f15ab9e",
+  "local_head": "1340a6176701b3f541a36112a02a3d4a90d1075a",
+  "patch": true,
+  "keep": false,
+  "command_display": "bash research/f4_f5_boolean_runtime_20261019/run-optimization.sh",
+  "paths": [
+    "src",
+    "examples",
+    "tools/generalized-rootfinder",
+    "tools/volcano-cli",
+    "isogeny_algos",
+    "research/f4_f5_boolean_runtime_20261019"
+  ],
+  "artifacts": [],
+  "cache": true,
+  "cargo_dir": "."
+}

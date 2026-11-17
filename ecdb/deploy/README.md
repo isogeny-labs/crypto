@@ -17,7 +17,7 @@ agents ──HTTPS──▶ Lambda function URL ─▶ ecdb-api (VPC) ──TLS 
   - `ecdb-admin` has no URL. Each invocation runs one action:
     `{"action": "status" | "migrate" | "bootstrap_roles"}` or
     `{"action": "import", "what": "registry" | "walks" | "traits" | "covers" | "transfers" | "certificates" | "siblings" | "derived" | "enrich" | "results" | "ecbench" | "all"}`,
-    or `{"action": "import_pack", "name": "ecbench", "data": "<base64 of one gzipped pack part>"}`.
+    or `{"action": "import_pack", "name": "ecbench" | "generated", "data": "<base64 of one gzipped pack part>"}`.
 - **Network.**
   - Lambda security group `ecdb-lambda`: egress only to 5432 on `ecdb-rds`.
   - RDS security group `ecdb-rds`: ingress only from `ecdb-lambda`.
@@ -70,6 +70,14 @@ one `import_pack` invocation per ecbench part, and status. Re-running it after a
 idempotent. `ECDB_SKIP_IMPORT=1` skips the import. The first run waits about
 10 minutes for RDS to become available.
 
+## Loading Sage-generated curves
+
+`ecdb/deploy/load-generated.sh OUT_DIR [set ...]` sends the finished units of
+`ecdb/sage/generate.sage` output to the admin function. It splits them into
+chunks of about 12 MB and makes one `import_pack` invocation per chunk. The
+importer re-verifies every record and is idempotent, so rerun the script as
+more units finish.
+
 ## Using it
 
 ```sh
@@ -82,6 +90,9 @@ MCP clients point at `${URL}mcp` with the header
 `Authorization: Bearer $TOKEN`. In this repository, `.mcp.json` registers it
 as server `ecdb` and reads the token from `ECDB_TOKEN`; see
 [`../docs/AGENTS.md`](../docs/AGENTS.md).
+
+A private copy on a LAN host (a NAS) is in [`nas/`](nas/README.md): docker
+compose with Postgres and the API, filled by `ecdb sync` from `/v1/export`.
 
 Rotate a token or password by editing `ecdb/api`, then re-run
 `deploy-aws.sh` with `ECDB_SKIP_IMPORT=1`. The script refreshes the function

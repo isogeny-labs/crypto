@@ -1,0 +1,157 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261104-nist-random-curve-baseline",
+  "title": "Qualify and collect the six-field accepted real-curve baseline",
+  "created": "2026-11-04",
+  "authors": [
+    "Codex NIST evidence lane"
+  ],
+  "status": "blocked",
+  "status_note": "No lease, nonce draw, build publication, paid job or production sample. Toy journal recovery is development only. Resource/deadline fields below are provisional pilot ceilings and must be amended before a primary run.",
+  "blocked_on": [
+    "problem:problems/nist-candidate-selection-weakness-hypotheses.md",
+    "hw:authenticated PARI worker image and supported EKS submission/recovery route",
+    "note:successful uploaded checkpoint, canonical protocol/export, finite dollar cap and production deadline amendment",
+    "note:independent current-source replay and canonical shard-resume adapter"
+  ],
+  "links": {
+    "lead": "research/nist_skip_criterion_20261025/journal_qualification_20261104/README.md",
+    "notes": [
+      "research/nist_skip_criterion_20261025/random_curve_validation_20261029/PROTOCOL.md"
+    ],
+    "prs": []
+  },
+  "question": "Where do all ten published strict-splitting scores at 691 fall among 10000 actually counted and accepted seeded curves per fixed prime field?",
+  "decision_value": "A complete six-field primary cohort supplies the requested matched-seed percentiles, tied CDF endpoints and multiplicity correction; a model-null calculation or pilot cannot supply those observations. Every attempted index must remain in the retained contiguous prefix, including slow candidates and duplicates.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "branch": "codex/nist-conditioning-20261104",
+    "commit": null,
+    "build": [
+      [
+        "make",
+        "-C",
+        "research/nist_skip_criterion_20261025/journal_qualification_20261104",
+        "PARI_ROOT=/usr",
+        "PARI_LDLIBS=-lpari",
+        "BUILD_DIR=/work/nist-journal",
+        "all"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 20,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Per-field provisional pilot ceiling from the October 29 design, not a production estimate. First measure a separate 10-acceptance pilot per field within 3600 seconds, a finite dollar cap and original absolute deadline; freeze primary resources/deadline afterward."
+  },
+  "run": {
+    "argv": [
+      "/work/nist-journal/sampler_resume",
+      "--generate",
+      "research/nist_skip_criterion_20261025/strict_elkies_20261029/inputs.tsv",
+      "{bits}",
+      "{nonce}",
+      "{out}",
+      "NEW",
+      "ACK_FROZEN_CHECKPOINT"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "count": 6,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "vars": {
+            "bits": "192",
+            "nonce": "unassigned-after-freeze"
+          }
+        },
+        {
+          "vars": {
+            "bits": "224",
+            "nonce": "unassigned-after-freeze"
+          }
+        },
+        {
+          "vars": {
+            "bits": "239",
+            "nonce": "unassigned-after-freeze"
+          }
+        },
+        {
+          "vars": {
+            "bits": "256",
+            "nonce": "unassigned-after-freeze"
+          }
+        },
+        {
+          "vars": {
+            "bits": "384",
+            "nonce": "unassigned-after-freeze"
+          }
+        },
+        {
+          "vars": {
+            "bits": "521",
+            "nonce": "unassigned-after-freeze"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "native-random-curve-sampling/v1",
+    "verify": [
+      "/work/nist-journal/journal_check",
+      "verify",
+      "research/nist_skip_criterion_20261025/strict_elkies_20261029/inputs.tsv",
+      "{bits}",
+      "{nonce}",
+      "{out}/attempts.tsv",
+      "{out}/accepted.tsv",
+      "sampler-v1",
+      "10000"
+    ],
+    "land": "research/nist_skip_criterion_20261025/random_curve_primary"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unconfigured",
+    "tasks": [
+      "XP-20261104-nist-random-curve-baseline/shard-{k}"
+    ],
+    "ttl_s": 7200,
+    "env": {
+      "name": "crypto-pari-native",
+      "recipe": "Build the reviewed merged commit into a matching PARI/GMP/OpenSSL task image; current ecbench-only portable route is unsuitable."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 4096,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261104-nist-random-curve-baseline"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unfunded blocked card, matching existing blocked NIST cards; no spending permission or lease is created."
+    },
+    "notes": "Do not publish or dispatch while blocked. A launch acknowledgement is not a checkpoint receipt. Nonce and canonical production settings remain unfrozen."
+  }
+}

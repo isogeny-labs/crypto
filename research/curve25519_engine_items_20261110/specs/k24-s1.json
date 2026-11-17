@@ -1,0 +1,70 @@
+{
+ "arms": [
+  {
+   "method": {
+    "id": "rho.negation"
+   },
+   "name": "rho-neg",
+   "role": "reference"
+  },
+  {
+   "method": {
+    "id": "rho.negation_chained"
+   },
+   "name": "rho-neg-chained",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=16,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "twcj",
+   "role": "baseline"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=16,seed=run,cv=0",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "twcj-cv0",
+   "role": "candidate"
+  }
+ ],
+ "description": "research/curve25519_engine_items_20261110: (A) the F=1 target-in-walk arm without per-collision recomputation (wwalk cv=0) vs the current arm; (B) rho.negation_chained vs rho.negation; one public target per session. Frozen before data (PROTOCOL.md). Public synthetic Curve25519-family miniature; no security claim.",
+ "label": "engine items (cv=0, chained rho set-up), single target, k=24, session 1",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 64,
+  "seed": 3026113401,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 16743506,
+    "b": 2381926,
+    "group_order": 16778792,
+    "gx": 109,
+    "gy": 3123379,
+    "kind": "prime_explicit",
+    "p": 16777213,
+    "r": 2097349
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 3026117401,
+  "targets_per_curve": 1
+ }
+}

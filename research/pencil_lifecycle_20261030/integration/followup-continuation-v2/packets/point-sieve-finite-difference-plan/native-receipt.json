@@ -1,0 +1,36 @@
+{
+  "status": "failed",
+  "error": "AssertionError({'name': 'check', 'argv': ['/var/tmp/point-sieve-native-2sm_tj36/check'], 'reaped': True, 'exit': 101})",
+  "commands": [
+    {
+      "name": "compile",
+      "argv": [
+        "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc",
+        "--edition=2021",
+        "-C",
+        "opt-level=1",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/point-sieve-finite-difference-plan/native/check.rs",
+        "-o",
+        "/var/tmp/point-sieve-native-2sm_tj36/check"
+      ],
+      "reaped": true,
+      "exit": 0
+    },
+    {
+      "name": "check",
+      "argv": [
+        "/var/tmp/point-sieve-native-2sm_tj36/check"
+      ],
+      "reaped": true,
+      "exit": 101
+    }
+  ],
+  "elapsed_seconds": 2.858138426003279,
+  "freeze_sha256": "38ccd6f6329125f1aeb2742a76f4cc64a9b0bfdb5d519f8078e8bae87c465adc",
+  "inputs_unchanged": true,
+  "workspace": "/var/tmp/point-sieve-native-2sm_tj36",
+  "scientific_execution": false,
+  "full_crate_integration": false
+}

@@ -1,0 +1,86 @@
+{
+  "branch": "claude/relation-finding-no-groebner-vrg7ec",
+  "closed_utc": "2026-11-13T15:54:21+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/groebner_free_matched_20261113/run_grid.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-13T15:39:36+00:00",
+      "wall_s": 703.334
+    }
+  ],
+  "commit": "c90b1d9d54aa663b9fd5e7c05b2734fe06f3fda3",
+  "commit_dirty": true,
+  "created_utc": "2026-11-13T15:39:29+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261113-ic-m3-linear21-vs-floor"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v445-x86_64-with-glibc2.39"
+  },
+  "id": "20261113T1539Z-ic-m3-linear21-vs-floor",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2048,
+      "name": "lin21ht_over_floor_online_wall_per_relation_n41",
+      "note": "whole pool, paired bootstrap; stage diagnostic, L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        6.27,
+        6.48
+      ],
+      "unit": "ratio",
+      "value": 6.37
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "counted_slope_delta_trials_minus_floor_adds",
+      "note": "difference of OLS slopes of log2 counted work per relation per bit of n (not a ratio; closest unit)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        -0.0004,
+        0.0016
+      ],
+      "unit": "ratio",
+      "value": 0.0006
+    }
+  ],
+  "problem": "ic-decomposition-oracle",
+  "raw": [
+    {
+      "bytes": 404076,
+      "path": "research/groebner_free_matched_20261113/runs.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/41/41b3eea14728ac67e605063765aa2fcfacdac753358a45fb2a21d18e770b0dcc",
+      "sha256": "41b3eea14728ac67e605063765aa2fcfacdac753358a45fb2a21d18e770b0dcc",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/groebner_free_matched_20261113/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/groebner_free_matched_20261113/figures/cost_per_relation.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-m3-linear21-vs-floor",
+  "status": "measured",
+  "summary": "Table-free linear 2+1 m=3 decomposition (lin21-ht) vs pair-table floor on the frozen 2026-10-14 targets: 0/16384 verdict disagreements, counted slope delta 0.0006 [-0.0004,0.0016], wall 2.9-10.9x floor online, 15.7 MB vs 2558 MB at n=41, runs to n=59. Stage diagnostic, unverified.",
+  "validation": null
+}

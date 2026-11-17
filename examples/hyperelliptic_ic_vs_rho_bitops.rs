@@ -8,8 +8,9 @@
 //!
 //! The instance rule is the thread's (`thread_instance`), the index-calculus
 //! arms and seeds are those of `hyperelliptic_ic_vs_rho`, and the rho
-//! reference is the round-twelve default, the full-width distinguished-point
-//! walk (`RhoVariant::default()`), unless `--rho-variant` says otherwise.
+//! reference is `RhoVariant::default()` (since round fifteen the collide-first
+//! folded walk, whose cycle window is charged), unless `--rho-variant` says
+//! otherwise; the hec bitop study ran `--rho-variant full-width`.
 //!
 //! Counts are thread-local and every counted path runs on the calling
 //! thread, so they are identical across runs with the same seeds whatever
@@ -70,6 +71,9 @@ fn rho_variant(name: &str) -> Option<RhoVariant> {
         "dp-mixed" => RhoVariant::DistinguishedPointsMixed,
         "dp-negation-mixed" => RhoVariant::DistinguishedPointsNegationMixed,
         "floyd" => RhoVariant::Floyd,
+        "negation-full-width" => RhoVariant::DistinguishedPointsNegationFullWidth,
+        "cycle-escape" => RhoVariant::DistinguishedPointsNegationFullWidthCycleEscape,
+        "collide-first" => RhoVariant::DistinguishedPointsNegationFullWidthCollideFirst,
         _ => return None,
     })
 }
@@ -200,7 +204,8 @@ fn usage() -> ! {
     eprintln!(
         "usage: hyperelliptic_ic_vs_rho_bitops [--genus G] [--p P[,P..]] \
          [--arms baseline,ab-walk,fb-walk] [--ic-trials N] [--rho-trials N] \
-         [--rho-variant full-width|dp|dp-negation|dp-mixed|dp-negation-mixed|floyd] \
+         [--rho-variant full-width|dp|dp-negation|dp-mixed|dp-negation-mixed|floyd|\
+         negation-full-width|cycle-escape|collide-first] \
          [--json PATH]"
     );
     std::process::exit(2)

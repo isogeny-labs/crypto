@@ -1,0 +1,60 @@
+== F1: field and Frobenius
+  CHECK p = 2^64-2^32+1                                                PASS
+  CHECK p mod 5 == 1                                                   PASS
+  CHECK omega=3^((p-1)/5) != 1 (so z^5-3 irreducible), omega^5 == 1    PASS
+  CHECK z^p (generic square-multiply in K) == omega*z                  PASS
+  omega = 1041288259238279555
+  CHECK a^p == diagonal Frobenius on 4 random elements                 PASS
+  CHECK chi_K via norm == Euler a^((p^5-1)/2) on 6 random elements     PASS
+  CHECK K inverse                                                      PASS
+  CHECK Tonelli-Shanks sqrt in K                                       PASS
+== F2: the two curves (frozen-source constants)
+  CHECK EcGFp5 short-Weierstrass A,B from (a=2,b=263z) == HackMD constants PASS
+  chi_K(b=263z) = -1   chi_K(disc of x^2+2x+b = 4-4b) = -1
+  CHECK b=263z is a non-square in K (Pornin: double-odd)               PASS
+  EcGFp5: #roots of f in K = 1   #roots of x^2+2x+b in K = 0   => |E[2](K)| = 2
+  CHECK EcGFp5: exactly one rational 2-torsion x-coordinate (x=0); other two conjugate over K PASS
+  j(EcGFp5) = [17742316375809492393,17649701345420796003,11738692422608684218,1746377629747217703,15453223576919436169]   in F_p? false   sigma(j)==j? false
+  CHECK EcGFp5: j not in F_p (E is not a twist of a subfield curve)    PASS
+  2-isogenous E': disc(x^2-4x+4(1-b)) = 16b => chi = -1, #roots of f' in K = 1
+  CHECK E' (2-isogeny via (0,0)) again has exactly one rational 2-torsion point PASS
+  EcMasFp5: chi_K(disc f)= 1   #roots of f in K = 0
+  CHECK EcMasFp5: f irreducible over K (no rational 2-torsion); disc is a square (3-cycle) PASS
+  j(EcMasFp5) = [8598441009306907028,15461608744965279595,8651251081325589087,11549945149803902039,14159287087664536601]   in F_p? false
+  CHECK EcMasFp5: j not in F_p                                         PASS
+== F3: validation of the relation/genus machinery on toy models with known answers
+  [toy1 f=x^3+3x+7 over F_p  (expect m=1,|B|=4,g=1)] squarefree_conjugates=true relations(masks of S with prod f_i square)=[3, 5, 6, 9, 10, 12, 15, 17, 18, 20, 23, 24, 27, 29, 30] closed_under_shift=true rank=4 m=1 |B|=4 genus=1 hyperelliptic_possible=check
+  CHECK toy1: m=1, |B|=4, genus 1, 15 even-weight relations            PASS
+  [toy2 f=prod_{i<4}(x-w^i z)  (literature (d,n)=(5,4): m=4,g=5)] squarefree_conjugates=true relations(masks of S with prod f_i square)=[31] closed_under_shift=true rank=1 m=4 |B|=5 genus=5 hyperelliptic_possible=no (m>=4 forces non-hyperelliptic)
+  CHECK toy2: weak class has m=4, |B|=5, genus 5 (= d*g0), single relation 11111 PASS
+  [toy3 = toy2 times a non-square constant (expect m=5,g=9)] squarefree_conjugates=true relations(masks of S with prod f_i square)=[] closed_under_shift=true rank=0 m=5 |B|=5 genus=9 hyperelliptic_possible=no (m>=4 forces non-hyperelliptic)
+  CHECK toy3: non-square leading constant kills the relation: m=5, genus 9 PASS
+  [toy4 generic cubic x^3+zx+1 (expect m=5,|B|=16,g=97)] squarefree_conjugates=true relations(masks of S with prod f_i square)=[] closed_under_shift=true rank=0 m=5 |B|=16 genus=97 hyperelliptic_possible=no (m>=4 forces non-hyperelliptic)
+  CHECK toy4: generic cubic gives m=5, |B|=16, genus 97                PASS
+== F4: canonical x-coordinate cover (T=O, M=id) of the two curves
+  [EcGFp5   y^2=x(x^2+2x+263z)] squarefree_conjugates=true relations(masks of S with prod f_i square)=[] closed_under_shift=true rank=0 m=5 |B|=12 genus=65 hyperelliptic_possible=no (m>=4 forces non-hyperelliptic)
+  [EcMasFp5 y^2=x^3+3x+8z^4] squarefree_conjugates=true relations(masks of S with prod f_i square)=[] closed_under_shift=true rank=0 m=5 |B|=16 genus=97 hyperelliptic_possible=no (m>=4 forces non-hyperelliptic)
+  CHECK EcGFp5 canonical: m=5, |B|=12 (0, inf, 10 roots), genus 65     PASS
+  CHECK EcMasFp5 canonical: m=5, |B|=16, genus 97                      PASS
+== F5: random Moebius changes x -> (ax+b)/(cx+d), a,b,c,d in K (the degree-2 maps E->P^1 with T=O)
+  EcGFp5 random M: (m,|B|,genus) = [(5, 20, 129), (5, 20, 129), (5, 20, 129)]
+  CHECK EcGFp5 random M: all m=5, |B|=20, genus 129                    PASS
+  EcMasFp5 random M: (m,|B|,genus) = [(5, 20, 129), (5, 20, 129), (5, 20, 129)]
+  CHECK EcMasFp5 random M: all m=5, |B|=20, genus 129                  PASS
+== F6: best explicit cover found for EcMasFp5 (cubic normalised to an F_p-rational cubic)
+  cubic form after x'=(x-u)/(x-v): degree 3 coefficients of x'^2,x' = [0,0,0,0,0] , [0,0,0,0,0]
+  CHECK Hessian roots diagonalise the cubic: x'^2 and x' coefficients vanish PASS
+  CHECK kappa = -delta/alpha is a non-cube (cubic irreducible) and kappa/c0 is a cube for some c0 in F_p PASS
+  f'' = lc * (x - 1/mu) * (x^3 - c0), c0 = 2, 1/mu in F_p? false
+  CHECK transformed quartic == lc*(x-1/mu)*(x^3-c0) with c0 in F_p (three branch points F_p-rational as a set) PASS
+  [EcMasFp5 normalised cover] squarefree_conjugates=true relations(masks of S with prod f_i square)=[] closed_under_shift=true rank=0 m=5 |B|=8 genus=33 hyperelliptic_possible=no (m>=4 forces non-hyperelliptic)
+  CHECK EcMasFp5 normalised cover: m=5, |B|=8, genus 33 (non-hyperelliptic) PASS
+== F7: best explicit cover found for EcGFp5 (quadratic factor -> F_p-rational quadratic, M(0)=0)
+  c0 = 7, M(inf) = -eD/2 in F_p? false
+  CHECK transformed quartic == lc*x*(x-M(inf))*(x^2-c0): x=0 and the quadratic are F_p-rational PASS
+  [EcGFp5 explicit cover] squarefree_conjugates=true relations(masks of S with prod f_i square)=[] closed_under_shift=true rank=0 m=5 |B|=8 genus=33 hyperelliptic_possible=no (m>=4 forces non-hyperelliptic)
+  CHECK EcGFp5 explicit cover: m=5, |B|=8, genus 33 (non-hyperelliptic) PASS
+== F8: toy of the (2,2) pattern (two conjugate pairs) that the analysis allows for EcGFp5-type 2-torsion
+  [toy5 f=(x^2-t)(x^2-sigma t), t non-square] squarefree_conjugates=true relations(masks of S with prod f_i square)=[31] closed_under_shift=true rank=1 m=4 |B|=10 genus=25 hyperelliptic_possible=no (m>=4 forces non-hyperelliptic)
+  CHECK toy5: m=4, |B|=10, genus 25, single relation 11111             PASS
+== SUMMARY: all checks PASS

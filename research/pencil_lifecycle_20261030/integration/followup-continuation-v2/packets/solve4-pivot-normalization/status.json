@@ -1,0 +1,33 @@
+{
+  "schema": "research.component-evidence/v1",
+  "status": "producer_checked_review_pending",
+  "component": "solve4-pivot-row-normalization",
+  "declarations": 9,
+  "controls": 7,
+  "axiom_readbacks": 16,
+  "source_hashes": {
+    "Normalization.lean.txt": "c324197f137c6b781e8d50ce0c2fcaf2ab76db4178b2bd5f41ebec7fb8e3c807",
+    "Controls.lean.txt": "bc43895538e7f24bf499050d47e77cb12efb7697c4b3ceaaac9008e1bb5ddcdc",
+    "ExpectedFailure.lean.txt": "11cd67047e80a3e05de7be1544e4d8bfb8cc990b94861c86c4ba7e2db2bd87c6"
+  },
+  "native_inverse_correspondence_proved": false,
+  "native_inverse_premises": [
+    "unit is canonical",
+    "decoded unit equals inverse of decoded pivot coefficient"
+  ],
+  "other_premises": [
+    "prime modulus at most2^32",
+    "canonical pivot row",
+    "zero prefix before column",
+    "decoded pivot coefficient nonzero"
+  ],
+  "derived": [
+    "canonical normalized row",
+    "same augmented solution set",
+    "pivot coefficient exactly one",
+    "zero prefix preserved"
+  ],
+  "full_solve4_proved": false,
+  "non_author_review": "pending publication and separate reviewer",
+  "scientific_runs": 0
+}

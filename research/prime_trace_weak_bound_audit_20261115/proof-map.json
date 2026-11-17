@@ -1,0 +1,116 @@
+{
+  "main": "PrimeTraceWeakBoundAudit.prime_trace_weak_bound_certificate",
+  "binding": "d190809525ceaf4787000e559cc18b79c39b86f3c811bddb94579290d7c2c638",
+  "custom_imports": {
+    "PrimeTraceCertificate": "research/prime_trace_weak_bound_audit_20261115/lean/PrimeTraceCertificate.lean",
+    "CubicCharacter": "research/prime_trace_weak_bound_audit_20261115/lean/CubicCharacter.lean",
+    "WeakCount": "research/prime_trace_weak_bound_audit_20261115/lean/WeakCount.lean",
+    "ActualFibers": "research/prime_trace_weak_bound_audit_20261115/lean/ActualFibers.lean",
+    "CyclotomicDegree": "research/prime_trace_weak_bound_audit_20261115/lean/CyclotomicDegree.lean",
+    "PrimeTrace": "research/prime_trace_weak_bound_audit_20261115/lean/PrimeTrace.lean",
+    "SmallControls": "research/prime_trace_weak_bound_audit_20261115/lean/SmallControls.lean"
+  },
+  "claims": [
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.field_vanishing_divides",
+      "conclusion": "Actual Xq-X divides every polynomial vanishing on all finite-field elements."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.cubic_euler_nonconstant",
+      "conclusion": "Every degree3 polynomial has nonconstant Euler-power function for oddq>3, by derivative/degree identity."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.nonsingularFiberEquiv",
+      "conclusion": "Actual general-Weierstrass nonsingular points correspond to completed-square fibers."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.actual_point_fiber_count",
+      "conclusion": "Actual Point cardinality equals1+sum of actual square-fiber sizes."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.actual_weak_point_bound",
+      "conclusion": "Actual1<N<2q+1 over oddq>3, no Hasse premise."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.actual_weak_trace_bound",
+      "conclusion": "Actual count-defined integer trace strictly between-q andq."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.prime_source_iff_trace_zero",
+      "conclusion": "Everyp>=5/all nonsingular general models: exact sourcegcd SS iff actualtrace0."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.prime_source_count",
+      "conclusion": "Actual pointcountp+1 derived from sourceSS, no count/Hasse premise."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.prime_source_modular_order",
+      "conclusion": "Everyr>2 countdivisor has exactmodularorder2, composite allowed."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.roots_field_degree_two",
+      "conclusion": "Actual algebraic-closure roots-adjoin field has degree2 forr>2 dividesp+1; derive primitive/simple finiteness/Frobenius order."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.prime_source_cyclotomic_degree",
+      "conclusion": "Actual sourceSS elliptic curve gives actual cyclotomic fielddegree2."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.three_source_controls",
+      "conclusion": "Actual nonsingularF3count1/7/sourceSS/trace3,-3 refutes deleting small-field guard."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.literal_prime_field_degree_two_false",
+      "conclusion": "ActualF5sourceSSpointorder2 has actualdegree1, not2."
+    },
+    {
+      "declaration": "PrimeTraceWeakBoundAudit.eight_control_actual_degree",
+      "conclusion": "ActualF7order8point positive composite cyclotomic-degree2 control."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 56,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_cubic_euler_nonconstancy_proved": true,
+    "actual_general_Weierstrass_fiber_equivalence_proved": true,
+    "actual_weak_point_and_trace_bounds_proved": true,
+    "source_primefield_trace_zero_count_and_degree_proved": true,
+    "actual_root_adjoin_finiteness_Frobenius_degree_derived": true,
+    "Hasse_or_trace_zero_premise": false,
+    "actual_q3_and_r2_countercontrols_proved": true,
+    "actual_composite_order8_degree2_control_proved": true,
+    "alternate_geometric_SS_comparison_proved": false,
+    "general_Hasse_bound_proved": false,
+    "general_nonprime_at_most6_proved": false,
+    "full_geometric_torsion_field_proved": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

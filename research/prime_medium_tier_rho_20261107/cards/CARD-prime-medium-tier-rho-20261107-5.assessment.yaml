@@ -1,0 +1,13 @@
+card_id: CARD-prime-medium-tier-rho-20261107-5
+relay_verbatim: not_applicable
+outcome: impeded
+stopped_at_step: launch-j4
+recommendation: rerun_after_infrastructure_fix
+reasons:
+  - "no cards/CARD-...-5.receipt.json exists and run.log is empty: the tool process ended before it wrote its receipt, so there is no tool summary to relay or check; per the main session the likely cause is the paused container killing a detached process, which is infrastructure, not the card or spec"
+  - "completed before the end, by the files on disk: stdout/stderr of commands 1-11, wait-j2, admit-j2, record-j2, launch-j3 (stdout/stderr present), admit-j3 and record-j3; no launch-j4 stdout file; receipts/J2 and receipts/J3 each hold result.json, admission.json and s3/"
+  - "J2 and J3 admission (receipts/J2/admission.json, receipts/J3/admission.json, written by check_session_complete.sh): job_exit_code 42 and l2_accepted false for both, audit_records 560 and 140, admitted_for_counts true; pod_uid 1c33cf16-ab53-419a-86f9-e4d59b9d08ae (J2) and 219601d2-9e79-470c-9fd9-280530fd360f (J3)"
+  - "launch-j4 had started a build before the process ended: receipts/J4/build-start.json names isolab-experiment-launcher:96ff43a7-16f8-4b4c-9282-7b746c77b152 (written 22:03:26Z), receipts/J4/request.json is byte-identical to requests/final/J4.request.json, build.json last written 22:05:17Z, no result.json; read by the director at 22:20Z that build is FAILED, phase COMPLETED, ended 22:16:29Z (the launcher state is read by the next card, not interpreted here)"
+  - "the benchmark record has the J2 wait and J3 launch entries (exit 0 and 26); the J4 launch is not recorded because benchrec appends only when its child returns"
+  - "recommendation is a card that does not resubmit J4 (PROTOCOL.md section 10, fixed N): it finishes the already-started J4 build and continues with J5 and J6"
+interpretation: not_assessed

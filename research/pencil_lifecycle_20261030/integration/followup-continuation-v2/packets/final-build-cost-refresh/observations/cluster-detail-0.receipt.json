@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "timeout",
+    "-k",
+    "2s",
+    "30s",
+    "aws",
+    "eks",
+    "describe-cluster",
+    "--name",
+    "isolab",
+    "--query",
+    "cluster.{Name:name,Status:status,Version:version,Created:createdAt,Platform:platformVersion,Upgrade:upgradePolicy}",
+    "--region",
+    "us-east-2",
+    "--cli-connect-timeout",
+    "5",
+    "--cli-read-timeout",
+    "15",
+    "--output",
+    "json"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T22:29:39.572136+00:00",
+  "observed_utc": "2026-11-03T22:29:40.399970+00:00",
+  "elapsed_seconds": 0.8278398199763615,
+  "stdout_sha256": "2ad111f7269729702420614674cf4d5e07529ca2f73019f80cf8e980d185c223",
+  "stdout_bytes": 207,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_bytes": 0
+}

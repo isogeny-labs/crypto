@@ -1,0 +1,217 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1h4fc0b3ce3a9d",
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "resample_seed": 20261002,
+  "a": {
+    "session_id": "ECBS1hf36aaddb1ae3",
+    "arm": "ic-descent-inherited-f4",
+    "method_id": "ECM1h64f4e294a4c0",
+    "method": "ic.pipeline",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 117.62233827082295,
+    "mean_ratio_to_floor": 478.53812561467885,
+    "lower_bound": false,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 115.70500963740757,
+      "max_s": 155.288752031143,
+      "max_over_median": 1.342109149100645,
+      "top_run_share": 0.33005795139353955,
+      "top_run_id": "ECM1h64f4e294a4c0W36123866dc8dR3",
+      "heavy_tail": false
+    },
+    "unpriced_counts": {},
+    "table_work_counts": {
+      "table_insert_attempts": 0
+    }
+  },
+  "b": {
+    "session_id": "ECBS1hf36aaddb1ae3",
+    "arm": "ic-descent-fes-f2",
+    "method_id": "ECM1h3289794fce5c",
+    "method": "ic.pipeline",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 75.43634495654283,
+    "mean_ratio_to_floor": 306.907409335876,
+    "lower_bound": false,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 69.15205703155785,
+      "max_s": 108.37594107865704,
+      "max_over_median": 1.5672121080823265,
+      "top_run_share": 0.3591635475614903,
+      "top_run_id": "ECM1h3289794fce5cW36123866dc8dR3",
+      "heavy_tail": false
+    },
+    "unpriced_counts": {},
+    "table_work_counts": {
+      "table_insert_attempts": 0
+    }
+  },
+  "workloads": [
+    {
+      "workload_id": "W06626ec90423",
+      "slug": "icv1-f2m13-t181-515ee569",
+      "r": 2003,
+      "floor_s": 0.2457951247243632,
+      "pairs": 2,
+      "a_mean_s": 105.63571396655456,
+      "b_mean_s": 58.88191700824529,
+      "ratio_b_over_a": 0.5574053963121597,
+      "censored_pairs": 0
+    },
+    {
+      "workload_id": "W36123866dc8d",
+      "slug": "icv1-f2m13-t181-515ee569",
+      "r": 2003,
+      "floor_s": 0.2457951247243632,
+      "pairs": 2,
+      "a_mean_s": 129.60896257509137,
+      "b_mean_s": 91.99077290484038,
+      "ratio_b_over_a": 0.7097562628166537,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "workloads": 2,
+      "pairs": 4,
+      "ratio_b_over_a": 0.6413436942806922,
+      "ci95": [
+        0.1440358679919641,
+        2.8556896273680517
+      ],
+      "ci_method": "linearised_t",
+      "indicative": true,
+      "censored_pairs": 0,
+      "ci95_bootstrap": [
+        0.48879942991973224,
+        0.7367584415367656
+      ]
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 0.6413436942806922,
+    "ci95": [
+      0.1440358679919641,
+      2.8556896273680517
+    ],
+    "ci_method": "linearised_t",
+    "pairs": 4,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": false,
+    "resamples": 4000,
+    "workloads": 2,
+    "dof": 1.0,
+    "indicative": true,
+    "interval_scope": "workloads",
+    "ci95_bootstrap": [
+      0.48879942991973224,
+      0.7367584415367656
+    ],
+    "ci_bootstrap_method": "cluster",
+    "censored_pairs": 0,
+    "verified_only_ratio": 0.6413436942806922,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        0.9664250286150325,
+        0.595559023464566,
+        0.5944636111490578
+      ],
+      "order": "ic-descent-fes-f2 < ic-descent-inherited-f4 at every weight",
+      "pairs": 4,
+      "note": "point ratios of totals; rank only where the order holds at every weight; counted table work priced in U with the unpriced counters: table_insert_attempts",
+      "priced_table_work": [
+        "table_insert_attempts"
+      ]
+    }
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "4 of 4 pairs did not reach L2",
+      "0 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L2",
+    "pairs": 4,
+    "pairs_below_level": 4,
+    "median_ratio": 0.09423851622151419,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ratio_b_over_a": 0.13814892579898058,
+    "ns_per_gae_a": 7957.852868895712,
+    "ns_per_gae_b": 1099.3688255042784,
+    "method_call_wall_ratio": 0.09534838514071951,
+    "method_call_wall_ci95": [
+      0.04552866467045073,
+      0.19968331192554117
+    ],
+    "method_call_wall_ci95_bootstrap": [
+      0.06838498404633778,
+      0.14977027365840787
+    ],
+    "process_wall_ratio": 0.21199873595309626,
+    "process_wall_ci95": [
+      0.10607394884386603,
+      0.42369935818892246
+    ],
+    "process_wall_ci95_bootstrap": [
+      0.15882560570544837,
+      0.309013669529465
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 40,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 4,
+    "verified_pairs": 4,
+    "admitted_pairs": 0,
+    "levels": {
+      "L1": 4
+    },
+    "p95_foreign_busy_percent": 57.73099258138976,
+    "p95_run_queue_percent": 0.784835406520695,
+    "contention_observed_runs": 8,
+    "notes": [
+      "no admitted A/A interval; calibration bonus unavailable"
+    ]
+  },
+  "verdict": "ops (ok): ic-descent-fes-f2 / ic-descent-inherited-f4 = 0.6413 [0.144, 2.856] (linearised_t, df 1) over 4 pairs on 2 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads; band (w=0: 0.9664, w=0.1: 0.5956, w=1: 0.5945): ic-descent-fes-f2 < ic-descent-inherited-f4 at every weight; wall: descriptive (ns/GAE 0.1381, not a result: 4 of 4 pairs did not reach L2; 0 admitted pairs; at least 5 are needed)",
+  "legacy_comparison_id": "ECC1hef3454426cad",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

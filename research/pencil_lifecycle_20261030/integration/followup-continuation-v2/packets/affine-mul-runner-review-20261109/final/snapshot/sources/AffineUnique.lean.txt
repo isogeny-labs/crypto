@@ -1,0 +1,58 @@
+import AffineDeterminism
+set_option autoImplicit false
+namespace AffineDispatch
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput FastPrelude FastCalls
+
+theorem runs_unique (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a b x y : Stored)
+ (tag : Tag) (hx : Runs p f a b tag x) (hy : Runs p f a b tag y) : x=y := by
+ cases hx with
+ | left ha =>
+  cases hy with
+  | left => rfl
+  | fallback tag h ht => simp [IsFallback] at ht
+ | right ha hb =>
+  cases hy with
+  | right => rfl
+  | fallback tag h ht => simp [IsFallback] at ht
+ | fast h q r x hq hr hl hc =>
+  cases hy with
+  | fast h' q' r' y hq' hr' hl' hc' =>
+   have eq : q=q' := Option.some.inj (hq.symm.trans hq')
+   subst q'
+   have er : r=r' := Option.some.inj (hr.symm.trans hr')
+   subst r'
+   exact Option.some.inj (hc.symm.trans hc')
+  | fallback tag h' ht => simp [IsFallback] at ht
+ | fallback tag h ht ch u w r v0 au bv x hd hr hv run hc =>
+  cases hy with
+  | left => simp [IsFallback] at ht
+  | right => simp [IsFallback] at ht
+  | fast => simp [IsFallback] at ht
+  | fallback tag h' ht' ch' u' w' r' v0' au' bv' y hd' hr' hv' run' hc' =>
+   obtain ⟨_,ee1,ee2,ed,ec1,ec2⟩:=chain_unique p (up a) (up b) (vp a) (vp b) ch ch'
+   have hdu:=hd'.1
+   rw [←ed] at hdu
+   have eu : u=u' := Option.some.inj (hd.1.symm.trans hdu)
+   subst u'
+   have hdw:=hd'.2.1
+   rw [←ed,←ec1,←ec2,←ee1,←ee2] at hdw
+   have ew : w=w' := Option.some.inj (hd.2.1.symm.trans hdw)
+   subst w'
+   have er : r=r' := Option.some.inj (hr.symm.trans hr')
+   subst r'
+   have ev : v0=v0' := Option.some.inj (hv.symm.trans hv')
+   subst v0'
+   obtain ⟨eau,ebv⟩:=reduction_unique p f _ _ au bv au' bv' run run'
+   subst au';subst bv'
+   exact Option.some.inj (hc.symm.trans hc')
+
+theorem every_execution_preserves (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a b out : Stored)
+ (hp : 2<p.toNat) (hbound : p.toNat<2^31) (hf : Canon p f) (hfd : (wordsPoly p f).natDegree=5)
+ (ha : WellFormed p (wordsPoly p f) a) (hb : WellFormed p (wordsPoly p f) b)
+ (tag : Tag) (hr : Runs p f a b tag out) : WellFormed p (wordsPoly p f) out := by
+ obtain ⟨out',hr',hw⟩:=total_preserving_execution p f a b hp hbound hf hfd ha hb
+ have he:=runs_tag p f a b out tag hr
+ rw [he] at hr'
+ have hout:=runs_unique p f a b out' out tag hr' hr
+ rw [←hout];exact hw
+end AffineDispatch

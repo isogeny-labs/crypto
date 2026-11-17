@@ -1,0 +1,135 @@
+✖ [3149/3150] Building NormInputBudget (5.1s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/NormInputBudget.lean -o /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormInputBudget.olean -i /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormInputBudget.ilean -c /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormInputBudget.c --setup /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormInputBudget.setup.json --json
+error: NormInputBudget.lean:100:6: Function expected at
+  natDegree_le_natDegree ?m.103
+but this term has type
+  natDegree ?m.100 ≤ natDegree ?m.102
+
+Note: Expected a function because this term is being applied to the argument
+  h.1
+error: NormInputBudget.lean:100:39: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce
+
+K : Type u_1
+σ : Type u_2
+inst✝ : CommRing K
+w : σ → ℕ
+k : ℕ
+P Q : (MvPolynomial σ K)[X]
+hQ : Q.Monic
+hQB : Budget w k Q (k * Q.natDegree)
+D : ℕ
+hP : Budget w k P D
+h : Q.degree ≤ P.degree ∧ P ≠ 0
+z : (MvPolynomial σ K)[X] := Polynomial.C P.leadingCoeff * X ^ (P.natDegree - Q.natDegree)
+⊢ degree ?m.100 ≤ degree ?m.102
+error: NormInputBudget.lean:110:6: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  g ≥ 0
+  f ≥ 0
+  f - g ≥ 1
+  d ≥ 0
+  d + g ≥ 0
+  c ≥ 0
+  c - d ≤ -1
+  c - d - g ≤ 0
+  c - d + f - g ≤ 0
+  b ≥ 0
+  a ≥ 0
+  a - b ≥ 0
+where
+ a := ↑P.natDegree
+ b := ↑Q.natDegree
+ c := ↑k * ↑P.natDegree
+ d := ↑k * ↑Q.natDegree
+ f := ↑((Finsupp.weight w) e)
+ g := ↑(D - k * Q.natDegree)
+warning: NormInputBudget.lean:119:10: `dif_pos` has been deprecated: Use `dite_eq_left` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵p̵o̵s̵d̲i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
+warning: NormInputBudget.lean:119:22: `dif_pos` has been deprecated: Use `dite_eq_left` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵p̵o̵s̵d̲i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
+warning: NormInputBudget.lean:120:17: `dif_pos` has been deprecated: Use `dite_eq_left` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵p̵o̵s̵d̲i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
+error: NormInputBudget.lean:117:37: unsolved goals
+K : Type u_1
+σ : Type u_2
+inst✝ : CommRing K
+w : σ → ℕ
+k : ℕ
+P Q : (MvPolynomial σ K)[X]
+hQ : Q.Monic
+hQB : Budget w k Q (k * Q.natDegree)
+D : ℕ
+hP : Budget w k P D
+h : Q.degree ≤ P.degree ∧ P ≠ 0
+z : (MvPolynomial σ K)[X] := Polynomial.C P.leadingCoeff * X ^ (P.natDegree - Q.natDegree)
+hQP : Q.natDegree ≤ P.natDegree
+hD : k * P.natDegree ≤ D
+hQD : k * Q.natDegree ≤ D
+hz : Budget w k z (D - k * Q.natDegree)
+hs : Budget w k (P - Q * z) D
+hwf : (P - Q * (Polynomial.C P.leadingCoeff * X ^ (P.natDegree - Q.natDegree))).degree < P.degree
+ih : Budget w k ((P - Q * z) %ₘ Q) D ∧ Budget w k ((P - Q * z) /ₘ Q) (D - k * Q.natDegree)
+⊢ ((P - Q * (Polynomial.C P.leadingCoeff * X ^ (P.natDegree - Q.natDegree))).divModByMonicAux hQ).2 =
+    ((P - Q * z).divModByMonicAux hQ).2
+warning: NormInputBudget.lean:123:10: `dif_pos` has been deprecated: Use `dite_eq_left` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵p̵o̵s̵d̲i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
+warning: NormInputBudget.lean:123:22: `dif_pos` has been deprecated: Use `dite_eq_left` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵p̵o̵s̵d̲i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
+warning: NormInputBudget.lean:124:17: `dif_pos` has been deprecated: Use `dite_eq_left` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵p̵o̵s̵d̲i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
+error: NormInputBudget.lean:121:39: unsolved goals
+K : Type u_1
+σ : Type u_2
+inst✝ : CommRing K
+w : σ → ℕ
+k : ℕ
+P Q : (MvPolynomial σ K)[X]
+hQ : Q.Monic
+hQB : Budget w k Q (k * Q.natDegree)
+D : ℕ
+hP : Budget w k P D
+h : Q.degree ≤ P.degree ∧ P ≠ 0
+z : (MvPolynomial σ K)[X] := Polynomial.C P.leadingCoeff * X ^ (P.natDegree - Q.natDegree)
+hQP : Q.natDegree ≤ P.natDegree
+hD : k * P.natDegree ≤ D
+hQD : k * Q.natDegree ≤ D
+hz : Budget w k z (D - k * Q.natDegree)
+hs : Budget w k (P - Q * z) D
+hwf : (P - Q * (Polynomial.C P.leadingCoeff * X ^ (P.natDegree - Q.natDegree))).degree < P.degree
+ih : Budget w k ((P - Q * z) %ₘ Q) D ∧ Budget w k ((P - Q * z) /ₘ Q) (D - k * Q.natDegree)
+hr : P %ₘ Q = (P - Q * z) %ₘ Q
+⊢ Polynomial.C P.leadingCoeff * X ^ (P.natDegree - Q.natDegree) +
+      ((P - Q * (Polynomial.C P.leadingCoeff * X ^ (P.natDegree - Q.natDegree))).divModByMonicAux hQ).1 =
+    z + ((P - Q * z).divModByMonicAux hQ).1
+warning: NormInputBudget.lean:129:10: `dif_pos` has been deprecated: Use `dite_eq_left` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵p̵o̵s̵d̲i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
+warning: NormInputBudget.lean:130:17: `dif_neg` has been deprecated: Use `dite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵n̵e̵g̵d̲i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+warning: NormInputBudget.lean:133:10: `dif_pos` has been deprecated: Use `dite_eq_left` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵p̵o̵s̵d̲i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
+warning: NormInputBudget.lean:134:17: `dif_neg` has been deprecated: Use `dite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  d̵i̵f̵_̵n̵e̵g̵d̲i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+error: NormInputBudget.lean:137:0: one parameter bound in `termination_by`, but the body of NormInputBudget.division only binds 0 parameters.
+Some required targets logged failures:
+- NormInputBudget
+error: build failed

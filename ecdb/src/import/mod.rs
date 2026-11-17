@@ -10,17 +10,34 @@ use std::path::{Path, PathBuf};
 use tokio_postgres::Client;
 
 pub mod certs;
+pub mod ciani;
+pub mod class_group;
+pub mod cover_lpoly;
+pub mod cover_prym;
 pub mod covers;
 pub mod derive;
 pub mod ecbench;
+pub mod ell_isogenies;
+pub mod ell_torsion;
+pub mod embedding;
+pub mod end_ring;
 pub mod enrich;
+pub mod factor_bases;
+pub mod generated;
+pub mod gluing;
+pub mod levels57;
 pub mod lmfdb;
 pub mod pack;
 pub mod registry;
+pub mod research;
 pub mod results;
+pub mod richelot;
+pub mod schoof;
 pub mod siblings;
+pub mod supersingular;
 pub mod traits;
 pub mod transfers;
+pub mod volcano;
 pub mod walks;
 
 pub const TOOL: &str = "ecdb import";
@@ -203,6 +220,28 @@ pub enum Selection {
     Ecbench,
     /// The sibling repositories' curve records, dataset curves and measurements.
     Siblings,
+    /// Complete rational ℓ-isogeny graphs for ℓ = 7, 11, 13 over F_p, p < 2^10 (computed, cross-checked by Φ_ℓ).
+    EllIsogenies,
+    /// ℓ-volcano levels, directions and End(E) from the stored census isogeny graphs.
+    Volcanoes,
+    /// End(E) of every ordinary curve over F_p, p < 2^10, by Kohel's l^k-torsion criterion.
+    EndRings,
+    /// Certified l = 5, 7 volcano levels from computed rational isogenies (census-fp).
+    Levels57,
+    /// Genus-2 (2,2)-gluings of census-fp pairs with full rational 2-torsion (src/import/gluing.rs).
+    Gluings,
+    /// End(E) of every supersingular curve over F_p, p < 2^10 (Delfs-Galbraith; Deuring for j = 0, 1728).
+    SupersingularEndRings,
+    /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
+    FactorBases,
+    /// Frobenius on E[l], l <= 13, of every curve over F_p, p < 2^10 (curve_ell_torsion, frobenius_ell).
+    EllTorsion,
+    /// Cl(End(E)) of the census-fp curves and the orders of the l-classes, l = 2, 3, 5, 7.
+    ClassGroups,
+    /// Ciani plane quartics (genus 3, non-hyperelliptic) and their three elliptic quotients (src/import/ciani.rs).
+    CianiQuartics,
+    /// Versioned curve sweeps, feature definitions and model-ready dataset recipes.
+    Research,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -237,6 +276,9 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     if all || what == Selection::Enrich {
         reports.push(enrich::import(ctx).await?);
     }
+    if all || what == Selection::CianiQuartics {
+        reports.push(ciani::import(ctx).await?);
+    }
     if all || what == Selection::Results {
         reports.push(results::leaderboard(ctx).await?);
         reports.push(results::progress(ctx).await?);
@@ -245,6 +287,46 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     }
     if all || what == Selection::Ecbench {
         reports.push(ecbench::import(ctx).await?);
+    }
+    // Before volcanoes: they derive the ℓ = 7, 11, 13 levels and directions from these edges.
+    if all || what == Selection::EllIsogenies {
+        reports.push(ell_isogenies::import(ctx).await?);
+    }
+    if all || what == Selection::Volcanoes {
+        reports.push(volcano::import(ctx).await?);
+    }
+    // After volcanoes: it cross-checks their levels and End(E) rows.
+    if all || what == Selection::EndRings {
+        reports.push(end_ring::import(ctx).await?);
+    }
+    // After volcanoes and end-rings: it cross-checks the census graph and the stored levels.
+    if all || what == Selection::EllTorsion {
+        reports.push(ell_torsion::import(ctx).await?);
+    }
+    // After volcanoes and end-rings: it checks its l = 5, 7 levels against the levels and
+    // End(E) rows they stored (two independent methods), then fills in what is missing.
+    if all || what == Selection::Levels57 {
+        reports.push(levels57::import(ctx).await?);
+    }
+    // After end-rings and volcanoes: it reads End(E) and cross-checks the craters.
+    if all || what == Selection::ClassGroups {
+        reports.push(class_group::import(ctx).await?);
+    }
+    // After the census: it reads the census-fp curves and their traces.
+    if all || what == Selection::Gluings {
+        reports.push(gluing::import(ctx).await?);
+    }
+    if all || what == Selection::SupersingularEndRings {
+        reports.push(supersingular::import(ctx).await?);
+    }
+    // After ecbench, results and siblings: it links their rows.
+    if all || what == Selection::FactorBases {
+        reports.push(factor_bases::import(ctx).await?);
+    }
+    // After factor bases: dataset recipes and views may select their identities,
+    // though importing the recipes does not freeze any samples.
+    if all || what == Selection::Research {
+        reports.extend(research::import(ctx).await?);
     }
     Ok(reports)
 }

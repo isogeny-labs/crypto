@@ -1,0 +1,11 @@
+name = "markov_green_bound_audit"
+version = "0.1.0"
+defaultTargets = ["MarkovGreenBoundAudit"]
+
+[[require]]
+name = "markov_birthday_rounding_audit"
+path = "../../markov_birthday_rounding_audit_20261116/lean"
+
+[[lean_lib]]
+name = "MarkovGreenBoundAudit"
+roots = ["GreenImports", "GreenKernel", "GreenCore", "GreenBound", "GreenControls", "GreenUniformFamily", "GreenCertificate"]

@@ -1,0 +1,15 @@
+# Shared-sign interpolation circuit and charged primitive gate
+
+Same5eligiblefirst-promotioninputpointsets fromimmutableaffine-promotion/PROMOTErecords. Sixthno-triggercase retainedexplicitly,notreplaced. Fixedpositivepromotedpointplus5positivecoreorbitpoints; all6abscissasdistinct. For eachcorepairi<j,all4signs inpreviousorder. No newtargets,heldoutclaims orrelationproducer rerun. Thisgatequalifiesaprimitivespecialization,notfullruntime/10xobjective.
+
+Reference:independent3-pointLagrangeinterpolationandH=(f-v²)/u forEVERYsignvariant,followedbyretainedquadraticsplitter. Candidate:batchinvertall15nonzeropairdifferencesof6abscissasONCEper40outputburst;prepare3scaledLagrangepartsA,B,Cforeachpair. Let Q_AB=AB/u=gamma_A*gamma_B*(x-x_C),andanalogouslyQ_AC,Q_BC,alllinear. With Hpp=(f-(A+B+C)²)/u,
+
+ Hpm=Hpp+4*(Q_AC+Q_BC),
+ Hmp=Hpp+4*(Q_AB+Q_BC),
+ Hmm=Hpp+4*(Q_AB+Q_AC).
+
+All4vpolynomialsareformedfromthesameparts. Theidentitiesfollowbydifferenceofsquares;fullH/v/rootsequencemustmatchreferenceexactly,notjustsplitting. OutsidecountedintervalcheckallH*u=f-v²andmonicquadraticdegree. Inputsoriginatefrompreviousoriginalgroup-qualifiedpointsets; thisgatecheckscompiledarithmetic,notnewindependentgroupcertification.
+
+BotharmschargeALLburstpreparation,includingcandidate15inversebatch,bases,linearcorrections,polynomialdivisionsandALL40quadraticfactorattempts. No warmedcache frompreviousarm.5inputs×2arms×2repetitions=20calls,800qualifiedsignedoutputs. Alternatearmorder,requireexactvectorsandoutputsrepeat,everyREDCidentity,separatefieldcounts. Discovery/fullFB/character/sourcepreparation,weightedrowassembly,LA andfinalscalarverificationareoutsideprimitive andmuststillbechargedinafullcomparison. Noarbitraryweights,CPU/wall,externalfastest,novelty or10xclaimfrominversecountalone.
+
+Compile/freeze/pushsource/native/import/input/protocol/binaryhashesbeforeonceonly600CPUsecondrun. Nooverwrite/retry/sign/subsetselection/budgetextension. Saveallraw/stderr/exit/run/hashdata inGitduringS3outage. LocalRust1.93.1/sharedARM,noS3/cloudspend. Generalgenus2+objectiveactive;g3/g4notcoveredbythisquadraticresidualprimitive.

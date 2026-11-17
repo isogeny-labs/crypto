@@ -1,0 +1,15 @@
+{
+  "action": "strip the generated block before discovery and declare indirect inputs explicitly; otherwise an entry the tool once wrote counts as a reference to itself and never drops out",
+  "created": "2026-11-15T06:19:58Z",
+  "evidence": [
+    "tools/artifacts/wire_workflows.py",
+    "research/lab_checks_fix_20261114/NOTE.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "*"
+  ],
+  "trigger": "a generator scans a file that also contains its own generated output (e.g. tools/artifacts/wire_workflows.py and the pull step it writes into workflows)",
+  "why": ""
+}

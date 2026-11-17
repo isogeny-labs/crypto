@@ -1,0 +1,78 @@
+error[E0432]: unresolved import `num_bigint::RandBigInt`
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:2742:9
+     |
+2742 |     use num_bigint::RandBigInt;
+     |         ^^^^^^^^^^^^----------
+     |                     |
+     |                     no `RandBigInt` in the root
+
+error[E0599]: no method named `gen_biguint_below` found for mutable reference `&mut StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:2824:24
+     |
+2824 |             v.push(rng.gen_biguint_below(p));
+     |                        ^^^^^^^^^^^^^^^^^ method not found in `&mut StdRng`
+
+error[E0599]: no method named `gen_biguint` found for struct `StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:2868:34
+     |
+2868 |             let e: BigUint = rng.gen_biguint(f.bits() as u64 + 7);
+     |                                  ^^^^^^^^^^^ method not found in `StdRng`
+
+error[E0599]: no method named `gen_biguint_below` found for mutable reference `&mut StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:2920:62
+     |
+2920 |         let rand_el = |rng: &mut StdRng| f.from_biguint(&rng.gen_biguint_below(&p));
+     |                                                              ^^^^^^^^^^^^^^^^^ method not found in `&mut StdRng`
+
+error[E0599]: no method named `gen_biguint_below` found for struct `StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:3132:25
+     |
+3132 |             let x = rng.gen_biguint_below(&p192());
+     |                         ^^^^^^^^^^^^^^^^^ method not found in `StdRng`
+
+error[E0599]: no method named `gen_biguint_below` found for struct `StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:3133:25
+     |
+3133 |             let y = rng.gen_biguint_below(&p192());
+     |                         ^^^^^^^^^^^^^^^^^ method not found in `StdRng`
+
+error[E0599]: no method named `gen_biguint_below` found for struct `StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:3148:45
+     |
+3148 |                 let a = f.from_biguint(&rng.gen_biguint_below(&p));
+     |                                             ^^^^^^^^^^^^^^^^^ method not found in `StdRng`
+
+error[E0599]: no method named `gen_biguint_below` found for struct `StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:3149:45
+     |
+3149 |                 let b = f.from_biguint(&rng.gen_biguint_below(&p));
+     |                                             ^^^^^^^^^^^^^^^^^ method not found in `StdRng`
+
+error[E0599]: no method named `gen_biguint_below` found for struct `StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:3152:41
+     |
+3152 |             let a = f.from_biguint(&rng.gen_biguint_below(&p));
+     |                                         ^^^^^^^^^^^^^^^^^ method not found in `StdRng`
+
+error[E0599]: no method named `gen_biguint_below` found for struct `StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:3180:41
+     |
+3180 |             let a = f.from_biguint(&rng.gen_biguint_below(&p224()));
+     |                                         ^^^^^^^^^^^^^^^^^ method not found in `StdRng`
+
+error[E0599]: no method named `gen_biguint_below` found for struct `StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:3191:47
+     |
+3191 |             let a = f.sqr(f.from_biguint(&rng.gen_biguint_below(&p224())));
+     |                                               ^^^^^^^^^^^^^^^^^ method not found in `StdRng`
+
+error[E0599]: no method named `gen_biguint_below` found for mutable reference `&mut StdRng` in the current scope
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:3217:29
+     |
+3217 |                 xs.push(rng.gen_biguint_below(p));
+     |                             ^^^^^^^^^^^^^^^^^ method not found in `&mut StdRng`
+
+error: aborting due to 12 previous errors
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.

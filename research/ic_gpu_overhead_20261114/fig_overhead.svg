@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 316" width="760" height="316" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">fes-f2-gpu solver time per call, before and after</title>
+<desc id="d">Milliseconds per solver call, old text-serve engine against new binary-serve engine, per instance and target, A100; counted ops identical.</desc>
+<style>.bg{fill:#fcfcfb}.s1{fill:#eb6834}.s2{fill:#2a78d6}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.s1{fill:#d95926}.s2{fill:#3987e5}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>
+<rect class="bg" width="760" height="316"/>
+<text class="p" x="16" y="24" font-size="15" font-weight="600">fes-f2-gpu: solver time per call, before and after</text>
+<text class="q" x="16" y="42" font-size="12">ms per call (round trip to the CUDA worker plus Rust-side work), mean of two runs each, A100; counted ops identical</text>
+<rect class="s1" x="16" y="52" width="12" height="12" rx="2"/><text class="p" x="34" y="62" font-size="12">before (text protocol, AnfRow route)</text>
+<rect class="s2" x="290" y="52" width="12" height="12" rx="2"/><text class="p" x="308" y="62" font-size="12">after (binary protocol, direct from_poly)</text>
+<line class="g" x1="230.0" x2="230.0" y1="72" y2="286" stroke-width="1"/>
+<text class="q" x="230.0" y="302" font-size="11" text-anchor="middle">0 ms</text>
+<line class="g" x1="376.7" x2="376.7" y1="72" y2="286" stroke-width="1"/>
+<text class="q" x="376.7" y="302" font-size="11" text-anchor="middle">1 ms</text>
+<line class="g" x1="523.3" x2="523.3" y1="72" y2="286" stroke-width="1"/>
+<text class="q" x="523.3" y="302" font-size="11" text-anchor="middle">2 ms</text>
+<line class="g" x1="670.0" x2="670.0" y1="72" y2="286" stroke-width="1"/>
+<text class="q" x="670.0" y="302" font-size="11" text-anchor="middle">3 ms</text>
+<text class="p" x="220" y="94.0" font-size="12" text-anchor="end">Koblitz n=23 · 24 unk. · target 1</text>
+<g><title>Koblitz n=23 · 24 unk. · target 1: 1.094 ms per call (before)</title><path class="s1" d="M230,76 h156.4 a4,4 0 0 1 4,4 v8 a4,4 0 0 1 -4,4 h-156.4 z"/></g>
+<text class="p" x="396.4" y="88.0" font-size="11">1.09 ms</text>
+<g><title>Koblitz n=23 · 24 unk. · target 1: 0.580 ms per call (after)</title><path class="s2" d="M230,95 h81.1 a4,4 0 0 1 4,4 v8 a4,4 0 0 1 -4,4 h-81.1 z"/></g>
+<text class="p" x="321.1" y="107.0" font-size="11">0.58 ms  (1.9× less)</text>
+<text class="p" x="220" y="145.0" font-size="12" text-anchor="end">Koblitz n=23 · 24 unk. · target 2</text>
+<g><title>Koblitz n=23 · 24 unk. · target 2: 0.653 ms per call (before)</title><path class="s1" d="M230,127 h91.8 a4,4 0 0 1 4,4 v8 a4,4 0 0 1 -4,4 h-91.8 z"/></g>
+<text class="p" x="331.8" y="139.0" font-size="11">0.65 ms</text>
+<g><title>Koblitz n=23 · 24 unk. · target 2: 0.236 ms per call (after)</title><path class="s2" d="M230,146 h30.6 a4,4 0 0 1 4,4 v8 a4,4 0 0 1 -4,4 h-30.6 z"/></g>
+<text class="p" x="270.6" y="158.0" font-size="11">0.24 ms  (2.8× less)</text>
+<text class="p" x="220" y="196.0" font-size="12" text-anchor="end">char-2 n=25 · 26 unk.</text>
+<g><title>char-2 n=25 · 26 unk.: 1.107 ms per call (before)</title><path class="s1" d="M230,178 h158.4 a4,4 0 0 1 4,4 v8 a4,4 0 0 1 -4,4 h-158.4 z"/></g>
+<text class="p" x="398.4" y="190.0" font-size="11">1.11 ms</text>
+<g><title>char-2 n=25 · 26 unk.: 0.484 ms per call (after)</title><path class="s2" d="M230,197 h67.0 a4,4 0 0 1 4,4 v8 a4,4 0 0 1 -4,4 h-67.0 z"/></g>
+<text class="p" x="307.0" y="209.0" font-size="11">0.48 ms  (2.3× less)</text>
+<text class="p" x="220" y="247.0" font-size="12" text-anchor="end">char-2 n=29 · 30 unk.</text>
+<g><title>char-2 n=29 · 30 unk.: 2.619 ms per call (before)</title><path class="s1" d="M230,229 h380.1 a4,4 0 0 1 4,4 v8 a4,4 0 0 1 -4,4 h-380.1 z"/></g>
+<text class="p" x="620.1" y="241.0" font-size="11">2.62 ms</text>
+<g><title>char-2 n=29 · 30 unk.: 1.543 ms per call (after)</title><path class="s2" d="M230,248 h222.3 a4,4 0 0 1 4,4 v8 a4,4 0 0 1 -4,4 h-222.3 z"/></g>
+<text class="p" x="462.3" y="260.0" font-size="11">1.54 ms  (1.7× less)</text>
+</svg>

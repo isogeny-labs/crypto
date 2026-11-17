@@ -1,0 +1,155 @@
+{
+  "accepted": true,
+  "main": 15,
+  "producer_controls": 13,
+  "reviewer_controls": 8,
+  "readbacks": 36,
+  "axioms": [
+    [
+      "QuotientStorage.put_good",
+      "propext"
+    ],
+    [
+      "QuotientStorage.put_decode",
+      "propext, Classical.choice, Quot.sound"
+    ],
+    [
+      "QuotientStorage.allocation_bound",
+      "propext, Quot.sound"
+    ],
+    [
+      "QuotientStorage.current_index_bound",
+      "propext, Quot.sound"
+    ],
+    [
+      "QuotientStorage.loop_refines",
+      "propext, Classical.choice, Quot.sound"
+    ],
+    [
+      "QuotientStorage.loop_good",
+      "propext, Classical.choice, Quot.sound"
+    ],
+    [
+      "QuotientStorage.finish_decode",
+      "propext, Classical.choice, Quot.sound"
+    ],
+    [
+      "QuotientStorage.finish_good",
+      "propext"
+    ],
+    [
+      "QuotientStorage.word_projection",
+      "propext, Classical.choice, Quot.sound"
+    ],
+    [
+      "QuotientStorage.word_good",
+      "propext, Classical.choice, Quot.sound"
+    ],
+    [
+      "QuotientStorage.word_exact",
+      "propext, Classical.choice, Quot.sound"
+    ],
+    [
+      "QuotientStorage.finish_normal",
+      "propext, Quot.sound"
+    ],
+    [
+      "QuotientStorage.word_normal",
+      "propext, Quot.sound"
+    ],
+    [
+      "QuotientStorage.word_success",
+      "propext, Classical.choice, Quot.sound"
+    ],
+    [
+      "QuotientStorage.word_total",
+      "propext, Classical.choice, Quot.sound"
+    ],
+    [
+      "StorageControls.empty_input",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.all_zero_input",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.empty_divisor",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.exact_words",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.nonexact_words",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.leading_zero_input",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.constant_divisor",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.insufficient_fuel",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.repeated_write",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.zero_capacity_guard",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageControls.largest_usize_input",
+      "propext"
+    ],
+    [
+      "StorageControls.empty_divisor_overflow_boundary",
+      "propext"
+    ],
+    [
+      "StorageControls.allocation_is_nonzero",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageReview.raw_not_rejected",
+      "propext"
+    ],
+    [
+      "StorageReview.canonicality_required",
+      "propext"
+    ],
+    [
+      "StorageReview.repeated_zero_trim",
+      "propext"
+    ],
+    [
+      "StorageReview.full_capacity_endpoint",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageReview.insufficient_capacity",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageReview.short_zero_capacity",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageReview.nonmonic_rejected",
+      "propext, Quot.sound"
+    ],
+    [
+      "StorageReview.final_high_zero_trim",
+      "propext"
+    ]
+  ],
+  "successful_invocation": "/var/tmp/independent-quotient-storage-review-20261101/invocation-pyojnbw9",
+  "known_false": "/var/tmp/independent-quotient-storage-review-20261101/invocation-mrx_tv3s"
+}

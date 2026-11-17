@@ -1,0 +1,1 @@
+T-2062 source-only preparation. Retains independent helper runner custody/containment, selects four direct-polynomial calls and18readbacks. AST parsing only; no compilation or payload. Direct proof-source independent review and actual release fields remain pending.

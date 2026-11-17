@@ -1,0 +1,100 @@
+[
+  {
+    "id": "prime-pair-sum-oracles-20261116-v95",
+    "hypothesis": "Denominator-free exact sum scan may beat strong O(M) one-source quadratic recovery;compare all registered fields/targets and retain refutations.",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.prime_pair_sum_20261116_v95.oracles",
+      "prime-pair-sum-oracles-20261116-v95",
+      "oracles_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance_gate.py",
+      "performance/GATE.md",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/odd_cached_quadratic_20261116_v94b/kernel.py",
+      "research/prime_pair_sum_20261116_v95/PROOF_AND_REVIEW.md",
+      "research/prime_pair_sum_20261116_v95/cold.py",
+      "research/prime_pair_sum_20261116_v95/child.py",
+      "research/prime_pair_sum_20261116_v95/oracles.py",
+      "research/prime_pair_sum_20261116_v95/kernel.py",
+      "research/prime_pair_sum_20261116_v95/common.py"
+    ],
+    "input_paths": [
+      "research/prime_pair_sum_20261116_v95/DATA.json"
+    ],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/odd_cached_quadratic_20261116_v94b/kernel.py": "8557d67949924122999dbc08b0dc98a5923b73afe7125392aec3479ebdacd3d1",
+      "research/prime_pair_sum_20261116_v95/PROOF_AND_REVIEW.md": "4d2ce5d426a2efe0b2dded609d432038a93ff4241b488d13d79f2ecd9c9aa26a",
+      "research/prime_pair_sum_20261116_v95/cold.py": "7d0ba36481415612ae5d289bd38124319174087d1b4f7f5c7c81ce19608e1834",
+      "research/prime_pair_sum_20261116_v95/child.py": "347fa9c4bc910395bbf752fb9f765a1d1ba199a14c57651372d63f348d427670",
+      "research/prime_pair_sum_20261116_v95/oracles.py": "5b638707d4fde31a304683972d542553e411be2422122ee9eb1950fce644ee04",
+      "research/prime_pair_sum_20261116_v95/kernel.py": "befefc22812b15fab72245354206c2b084bb3fa4a4963f7199a7e1f40c50e9f7",
+      "research/prime_pair_sum_20261116_v95/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/prime_pair_sum_20261116_v95/DATA.json": "a648da9f361469810bd1e8b0383b21a5be5b0725a7053c4c3ffe82cd6d72449b"
+    },
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [],
+    "artifact_paths": [
+      "research/prime_pair_sum_20261116_v95/oracles_raw.json"
+    ]
+  },
+  {
+    "id": "prime-pair-sum-cold-20261116-v95",
+    "hypothesis": "Denominator-free exact sum scan may beat strong O(M) one-source quadratic recovery;compare all registered fields/targets and retain refutations.",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.prime_pair_sum_20261116_v95.cold",
+      "prime-pair-sum-cold-20261116-v95",
+      "cold_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance_gate.py",
+      "performance/GATE.md",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/odd_cached_quadratic_20261116_v94b/kernel.py",
+      "research/prime_pair_sum_20261116_v95/PROOF_AND_REVIEW.md",
+      "research/prime_pair_sum_20261116_v95/cold.py",
+      "research/prime_pair_sum_20261116_v95/child.py",
+      "research/prime_pair_sum_20261116_v95/oracles.py",
+      "research/prime_pair_sum_20261116_v95/kernel.py",
+      "research/prime_pair_sum_20261116_v95/common.py"
+    ],
+    "input_paths": [
+      "research/prime_pair_sum_20261116_v95/DATA.json"
+    ],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/odd_cached_quadratic_20261116_v94b/kernel.py": "8557d67949924122999dbc08b0dc98a5923b73afe7125392aec3479ebdacd3d1",
+      "research/prime_pair_sum_20261116_v95/PROOF_AND_REVIEW.md": "4d2ce5d426a2efe0b2dded609d432038a93ff4241b488d13d79f2ecd9c9aa26a",
+      "research/prime_pair_sum_20261116_v95/cold.py": "7d0ba36481415612ae5d289bd38124319174087d1b4f7f5c7c81ce19608e1834",
+      "research/prime_pair_sum_20261116_v95/child.py": "347fa9c4bc910395bbf752fb9f765a1d1ba199a14c57651372d63f348d427670",
+      "research/prime_pair_sum_20261116_v95/oracles.py": "5b638707d4fde31a304683972d542553e411be2422122ee9eb1950fce644ee04",
+      "research/prime_pair_sum_20261116_v95/kernel.py": "befefc22812b15fab72245354206c2b084bb3fa4a4963f7199a7e1f40c50e9f7",
+      "research/prime_pair_sum_20261116_v95/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/prime_pair_sum_20261116_v95/DATA.json": "a648da9f361469810bd1e8b0383b21a5be5b0725a7053c4c3ffe82cd6d72449b"
+    },
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [
+      "prime-pair-sum-oracles-20261116-v95"
+    ],
+    "artifact_paths": [
+      "research/prime_pair_sum_20261116_v95/cold_raw.json"
+    ]
+  }
+]

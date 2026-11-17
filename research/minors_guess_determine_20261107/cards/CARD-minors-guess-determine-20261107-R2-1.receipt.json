@@ -1,0 +1,438 @@
+{
+  "card_id": "CARD-minors-guess-determine-20261107-R2-1",
+  "card_path": "research/minors_guess_determine_20261107/cards/CARD-minors-guess-determine-20261107-R2-1.yaml",
+  "card_sha256": "49d0350bfdbdbc6a53e9d98da57073709bff92902f0fb0a9a26804575bbd538a",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "dfc7d74752f2f2e260075a98daa51006f10d74ff",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "dfc7d74752f2f2e260075a98daa51006f10d74ff",
+        "HEAD",
+        "--",
+        "research/minors_guess_determine_20261107",
+        ":(exclude)research/minors_guess_determine_20261107/cards",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "8f4f85b43546bf57efe7bca78aa7ef3bc83d6bd70ebe885c3f51e14d23764ebd",
+        ".provenance.protocol_sha256 == $h",
+        "research/minors_guess_determine_20261107/eks/r2img_request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "-n",
+        "--slurpfile",
+        "r",
+        "research/minors_guess_determine_20261107/eks/r2img_request.json",
+        "--slurpfile",
+        "l",
+        "research/minors_guess_determine_20261107/eks/layer-receipt.json",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:72934ab9ea2d9d93c50088972aca1924cfde23af87755cd8a802a04f6254dd4c",
+        "--arg",
+        "job",
+        "minors-gd-panel-20261107",
+        "$r[0].job.image == $i and $l[0].image_uri == $i and $r[0].job.job_name == $job and $r[0].job.cpu == 14 and $r[0].job.memory == \"32Gi\" and $r[0].job.seconds == 43200 and $r[0].job.command == [\"/opt/minors/entry.sh\", \"14\"]"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-identity",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/minors_guess_determine_20261107/eks/r2img_validate.sh",
+        "research/minors_guess_determine_20261107/eks/r2img_request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.029,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-request",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.029,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "11711fc0762c06ac62cb4ed5fbc2aa0891ca25ad6519dbdd57be7e54579e7978",
+      "stdout_tail": [
+        "validator: /home/user/crypto/taskq/deploy/eks-karpenter/remote/run-command (sha256 1cdaa7447893fd5c...), 22 jq lines",
+        "VALID    research/minors_guess_determine_20261107/eks/r2img_request.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "ecr",
+        "describe-images",
+        "--repository-name",
+        "isolab/tasks",
+        "--image-ids",
+        "imageDigest=sha256:72934ab9ea2d9d93c50088972aca1924cfde23af87755cd8a802a04f6254dd4c",
+        "--region",
+        "us-east-2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.962,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "image-exists-in-ecr",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.962,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "84c08aefd811605e00ba895c65e252d88f3e1ed8e826c75d19bd35297036fbae",
+      "stdout_tail": [
+        "{",
+        "    \"imageDetails\": [",
+        "        {",
+        "            \"registryId\": \"104186811093\",",
+        "            \"repositoryName\": \"isolab/tasks\",",
+        "            \"imageDigest\": \"sha256:72934ab9ea2d9d93c50088972aca1924cfde23af87755cd8a802a04f6254dd4c\",",
+        "            \"imageTags\": [",
+        "                \"minors-f13a690df016\"",
+        "            ],",
+        "            \"imageSizeInBytes\": 147555567,",
+        "            \"imagePushedAt\": 1794113102.863,",
+        "            \"imageManifestMediaType\": \"application/vnd.docker.distribution.manifest.v2+json\",",
+        "            \"artifactMediaType\": \"application/vnd.docker.container.image.v1+json\",",
+        "            \"lastRecordedPullTime\": 1794113228.852,",
+        "            \"imageStatus\": \"ACTIVE\"",
+        "        }",
+        "    ]",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/minors_guess_determine_20261107/cards/no_active_jobs.sh",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/minors_guess_determine_20261107/receipts/R2/pool-check",
+        "sgsecant-panel-20261107",
+        "ecld-panel-20261107",
+        "mllc-all-20261108",
+        "pfd-a-20261108"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 211.352,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pool-check",
+      "index": 7,
+      "outputs": {},
+      "seconds": 211.352,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c50aa699bfbd238fb7efeb7e4bcad69b02947df37b5858dec59a0d8332d2d8cf",
+      "stdout_tail": [
+        "2026-11-08T06:50:05Z job sgsecant-panel-20261107 launcher_exit 0 state failed",
+        "2026-11-08T06:50:58Z job ecld-panel-20261107 launcher_exit 0 state succeeded",
+        "2026-11-08T06:51:51Z job mllc-all-20261108 launcher_exit 0 state failed",
+        "2026-11-08T06:52:44Z job pfd-a-20261108 launcher_exit 0 state missing",
+        "pool check: every named job is missing, succeeded or failed"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.413,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 8,
+      "outputs": {},
+      "seconds": 4.413,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c5ed35d2f9cdb020d0a68d10c531d1bd7ee95dbac691f4e5c66782c7e98c1365",
+      "stdout_tail": [
+        "checkpoint: s3://setec-astronomy-artifacts/checkpoints/crypto/claude__serene-davinci-ujoi58/20261108T065245Z-c27ab1ad60b6/ (0 unpushed commit(s), 0 spec file(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261108T0449Z-minors-gd-panel.json",
+        "--",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/minors_guess_determine_20261107/eks/r2img_request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 114.678,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch",
+      "index": 9,
+      "outputs": {
+        "research/minors_guess_determine_20261107/receipts/R2/launch/result.json": "025af7e55c9b3c28ffc1ee6693d69e1488e8029127228728a7e6565d94ca93b3"
+      },
+      "seconds": 114.678,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0b1f2e021f75bc525889153047b8900e522c0b87fced546c96f5a24bc2055cdc",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"isolab.eks.command-result/v1\",",
+        "  \"state\": \"active\",",
+        "  \"job_name\": \"minors-gd-panel-20261107\",",
+        "  \"job_uid\": \"8593ac83-fd9b-4eac-b41a-8bd35dc521ae\",",
+        "  \"pods\": [",
+        "    {",
+        "      \"uid\": \"e0b41bed-6779-45dd-96fa-f9c7753c5b7b\",",
+        "      \"phase\": \"Pending\",",
+        "      \"node\": null,",
+        "      \"exit_code\": null",
+        "    }",
+        "  ],",
+        "  \"results_prefix\": \"s3://isolab-results-104186811093-us-east-2/runs/minors-gd-panel-20261107/\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/minors-gd-panel-20261107/launcher/4ebff2e6-2751-4458-a09a-1e9d70c268fb/\",",
+        "  \"request_sha256\": \"0c52866f09de72a4ae3a32c9cb23429e1e9b16824a19a26fdd1d6cd409fc082a\",",
+        "  \"manifest_sha256\": \"11241590c3179f77bacafdb8fbf8fb249c213aee9895b17935b21a8b4d85060b\",",
+        "  \"launcher\": \"isolab-experiment-launcher:4ebff2e6-2751-4458-a09a-1e9d70c268fb\",",
+        "  \"exit_code\": 0",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-c",
+        "{job_name, job_uid, pods, state, exit_code, launcher, receipt_uri, results_prefix, request_sha256, manifest_sha256}",
+        "research/minors_guess_determine_20261107/receipts/R2/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-launch",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c2300c119dd33feb7d40e384e813c6458b53555dde37356e804baf60a0a2f8bd",
+      "stdout_tail": [
+        "{\"job_name\":\"minors-gd-panel-20261107\",\"job_uid\":\"8593ac83-fd9b-4eac-b41a-8bd35dc521ae\",\"pods\":[{\"uid\":\"e0b41bed-6779-45dd-96fa-f9c7753c5b7b\",\"phase\":\"Pending\",\"node\":null,\"exit_code\":null}],\"state\":\"active\",\"exit_code\":0,\"launcher\":\"isolab-experiment-launcher:4ebff2e6-2751-4458-a09a-1e9d70c268fb\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/minors-gd-panel-20261107/launcher/4ebff2e6-2751-4458-a09a-1e9d70c268fb/\",\"results_prefix\":\"s3://isolab-results-104186811093-us-east-2/runs/minors-gd-panel-20261107/\",\"request_sha256\":\"0c52866f09de72a4ae3a32c9cb23429e1e9b16824a19a26fdd1d6cd409fc082a\",\"manifest_sha256\":\"11241590c3179f77bacafdb8fbf8fb249c213aee9895b17935b21a8b4d85060b\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261108T0449Z-minors-gd-panel.json",
+        "--",
+        "research/minors_guess_determine_20261107/cards/wait_command_status.sh",
+        "research/minors_guess_determine_20261107/cards/status_request.json",
+        "minors-gd-panel-20261107",
+        "research/minors_guess_determine_20261107/receipts/R2/status",
+        "900",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 41,
+          "seconds": 904.908,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 41,
+      "id": "wait-short",
+      "index": 11,
+      "outputs": {},
+      "seconds": 904.908,
+      "stderr_sha256": "afff388e89e5795304cefbc887a5b1dcc355ce8d20f98a2ff4d4b44937d602f1",
+      "stderr_tail": [
+        "FAIL: no terminal state within 900 seconds (last state active)"
+      ],
+      "stdout_sha256": "beb8b6fbed803745f968702cbb9a632b7a73ca9fb3a5785369c26e57a3c104b9",
+      "stdout_tail": [
+        "2026-11-08T06:55:35Z poll 1 launcher_exit 0 state active",
+        "2026-11-08T06:56:38Z poll 2 launcher_exit 255 state none",
+        "2026-11-08T06:58:31Z poll 3 launcher_exit 0 state active",
+        "2026-11-08T07:00:23Z poll 4 launcher_exit 0 state active",
+        "2026-11-08T07:02:15Z poll 5 launcher_exit 0 state active",
+        "2026-11-08T07:03:53Z poll 6 launcher_exit 0 state active",
+        "2026-11-08T07:05:46Z poll 7 launcher_exit 0 state active",
+        "2026-11-08T07:07:55Z poll 8 launcher_exit 0 state active",
+        "2026-11-08T07:09:48Z poll 9 launcher_exit 0 state active"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 11,
+  "commit": "5f72e0806c76d845da45ec65aa4f9179284e3a9e",
+  "dirty_after": [
+    "enchmarks/records/20261108T0449Z-minors-gd-panel.json"
+  ],
+  "dirty_before": [
+    "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-R2-S1.yaml",
+    "research/ml_learnability_control_20261107/cards/verify_salvage.sh",
+    "research/ml_learnability_control_20261107/mllc_harness_r2m16.py",
+    "research/ml_learnability_control_20261107/r2m16_harness.diff"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

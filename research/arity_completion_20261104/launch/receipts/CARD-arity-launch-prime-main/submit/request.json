@@ -1,0 +1,24 @@
+{
+  "job": {
+    "command": [
+      "/opt/study/launch/job-prime-tower.sh",
+      "main"
+    ],
+    "cpu": 2,
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+    "isolation_profile": "standard",
+    "job_name": "arity-prime-m5-main-20261104",
+    "memory": "10Gi",
+    "retries": 0,
+    "seconds": 42000,
+    "wait_seconds": 600
+  },
+  "provenance": {
+    "harness": "claude-code-main-session",
+    "note": "research/arity_completion_20261104/launch/README.md: command Job on Iso Lab EKS; no L2 admission exists for command Jobs, so seconds are diagnostic only",
+    "protocol_sha256": "2b82eecd46c9e9023cb2d5e1ec01a31d28647355decbd39653fffe81c7058a19",
+    "source_revision": "4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+    "study": "prime_tower_m5"
+  },
+  "schema": "isolab.eks.command-request/v1"
+}

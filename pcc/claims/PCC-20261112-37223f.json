@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T12:23:59Z",
+ "id": "PCC-20261112-37223f",
+ "kind": "statement",
+ "producer": {
+  "commit": "4e94d77251455793687ff954931f06620e8929cd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/ci-43202427032-byte-count-correction-01.json",
+    "sha256": "cc84563f3a0b0abaa6f55b4cb736c25e07afd7b192d7e9e3c0798873ce64b569"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/consumer1508-ci-43202427032-custody-01.json",
+    "sha256": "d61c18877671d9da85aa983d41394f85e503912d9278be7f84173e114670199b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/consumer1508-ci-43202427032-job-131128987039-01.log.xz",
+    "sha256": "b1b16810f049e6cdc30616329fa3b8cb775d3268c4cf12f225dcff5c2ec0c6d0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/consumer1508-ci-43202427032-api-01.json",
+    "sha256": "40e1fb211df301501630fcc0a827166031eba11d004ab61d9157312daf9d5de6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned exactconsumer1508/c712 CI43202427032 SUCCESS25native/98reference+5integration/1historicalignored.Complete decodedreferencejob131128987039 has 249037 UTF8bytes\u2192standardXZ30820/raw+archiveSHA256/exactroundtrip/API/custody.Corrects only rawbytecount in PCC-20261112-802b40:249023 was JSstring length,not UTF8 bytes;allattestedarchivebytes/digests/custody andCIresults unchanged.Oldclaimretained.No signing/othermergegatepromotion orrepeatpoll."
+}

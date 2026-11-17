@@ -63,6 +63,7 @@
 //! report what comes out.
 
 pub mod archive;
+pub mod binary_subtract;
 pub mod cm_orbit;
 pub mod explicit_base;
 pub mod fiber;
@@ -73,11 +74,15 @@ pub mod pkm_semaev;
 pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
+pub mod recursive_adapter;
 pub mod residual;
 pub mod rootfind;
+pub mod rootfind_gpu;
 pub mod shared_rank;
+pub mod solver_units;
 pub mod solvers;
 pub mod stages;
+pub mod subgroup_semaev;
 pub mod subspace_select;
 pub mod useful_rank;
 
@@ -86,9 +91,9 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations, price_phase, Calibration, CompletionRule, CountedGroup,
-    FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver, RestartPool,
-    TargetSource,
+    collect_and_solve_relations_touching_ladder, price_phase, Calibration, CompletionRule,
+    CountedGroup, FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver,
+    RestartPool, TargetSource,
 };
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
@@ -217,7 +222,41 @@ pub struct SolverReport {
     /// Mean solving degree over that bound: below one is structure the
     /// solver exploited.
     pub degree_over_bound: Option<f64>,
+    /// Sum of the per-call solving degrees over the run (the "total" solving
+    /// degree): `solving_degree_mean * calls_with_a_degree`.
+    pub solving_degree_sum: u64,
+    /// Measured degree-fall observables over the run (diagnostic, never
+    /// priced): the smallest working degree at which a fall occurred
+    /// (first fall), the largest (last fall), and the observed degree of
+    /// regularity of the system shape where the engine exposes its Hilbert
+    /// series.  Distinct from the advisory `forecaster` below.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// The per-working-degree history of the richest solver call, for the
+    /// trace drawing.  Empty unless the engine recorded a trace.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub degree_trace: Vec<crate::cryptanalysis::ic_framework::stages::DegreeStep>,
     pub extra: std::collections::BTreeMap<String, u64>,
+    /// The advisory degree-of-regularity forecaster over the run's solver
+    /// calls, with the relation matrix's columns and rank set; the
+    /// consumer (ecbench) prices its hope band with the curve's
+    /// automorphism fold and writes the forecast.  Not serialised here.
+    #[serde(skip)]
+    pub forecaster: Option<crate::cryptanalysis::dreg_forecast::Forecaster>,
+    /// Why no forecaster exists, when the oracle's solver gave none.
+    #[serde(skip)]
+    pub forecast_unavailable: Option<String>,
+    /// Why a pinned calibration key for `op_unit` was not used to charge
+    /// the count (`solvers::solver_unit_key`: the count does not cover the
+    /// engine's whole run).  Absent, and not serialised, whenever the unit's
+    /// key is not pinned, so an unpinned report is byte-identical to one
+    /// written before the key existed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pricing_qualification: Option<String>,
 }
 
 /// What the relation matrix did.
@@ -378,6 +417,34 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
+    run_pipeline_inner(ctx, spec, base_builder, oracle, Some(planted), calib, rho_s)
+}
+
+/// Run the pipeline using only public instance and target inputs; recovery is
+/// checked against the source point, without supplying a held answer.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_public<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<RunReport, String> {
+    run_pipeline_inner(ctx, spec, base_builder, oracle, None, calib, rho_s)
+        .map(|(report, _)| report)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_pipeline_inner<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: Option<u64>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -509,13 +576,41 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             }
         }
     }
+    let seed_start = std::time::Instant::now();
+    let (mut setup_seed_independent, mut setup_seed_dependent) = (0u64, 0u64);
+    for seed_row in oracle.setup_rows() {
+        if seed_row.len() != fb.columns {
+            return Err(format!(
+                "oracle setup row has {} columns, expected {}",
+                seed_row.len(),
+                fb.columns
+            ));
+        }
+        let mut row = seed_row.clone();
+        row.push(0);
+        match matrix.add_row(row, 0) {
+            crate::cryptanalysis::ic_boundary::RowStatus::Independent => {
+                setup_seed_independent += 1
+            }
+            crate::cryptanalysis::ic_boundary::RowStatus::Dependent => setup_seed_dependent += 1,
+            crate::cryptanalysis::ic_boundary::RowStatus::Inconsistent => {
+                return Err("verified oracle setup row was inconsistent".into());
+            }
+        }
+    }
+    let setup_seed_ns = seed_start.elapsed().as_nanos() as u64;
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
         Targets::StrideRenew => TargetSource::StrideRenew,
         Targets::StrideGenerator => TargetSource::StrideGenerator,
         Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
-        Targets::Walk | Targets::Residual => TargetSource::Walk,
+        Targets::Walk
+        | Targets::Residual
+        | Targets::ResidualFused
+        | Targets::ResidualFusedDp
+        | Targets::ResidualFusedEq
+        | Targets::ResidualFusedEqChain => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
             lanes: 4,
@@ -541,6 +636,14 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             lanes: 16,
             batched: true,
         },
+        Targets::WalkPrimeBatch256 => TargetSource::WalkPrimeLanes {
+            lanes: 256,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch1024 => TargetSource::WalkPrimeLanes {
+            lanes: 1024,
+            batched: true,
+        },
     };
     if matches!(spec.targets, Targets::WalkPrimeFast) && ctx.group.native_walk_adder().is_none() {
         return Err("walk-prime-fast requires a prime curve with p < 2^62".into());
@@ -562,14 +665,32 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     } else {
         CompletionRule::TargetPinned
     };
-    let mut outcome: PipelineOutcome = if spec.targets == Targets::Residual {
+    let mut outcome: PipelineOutcome = if matches!(
+        spec.targets,
+        Targets::Residual
+            | Targets::ResidualFused
+            | Targets::ResidualFusedDp
+            | Targets::ResidualFusedEq
+            | Targets::ResidualFusedEqChain
+    ) {
         if completion != CompletionRule::TargetPinned {
             return Err(
                 "the residual collector stops when the target is pinned; use incremental-gauss"
                     .into(),
             );
         }
-        residual_mod::collect_residual_and_solve(
+        let collect = if spec.targets == Targets::ResidualFusedEqChain {
+            residual_mod::collect_residual_fused_eq_chain_and_solve
+        } else if spec.targets == Targets::ResidualFusedEq {
+            residual_mod::collect_residual_fused_eq_and_solve
+        } else if spec.targets == Targets::ResidualFusedDp {
+            residual_mod::collect_residual_fused_dp_and_solve
+        } else if spec.targets == Targets::ResidualFused {
+            residual_mod::collect_residual_fused_and_solve
+        } else {
+            residual_mod::collect_residual_and_solve
+        };
+        collect(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -585,7 +706,10 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         // large primes (the trait default), so this is the loop every
         // recorded run took; the large-prime collector returns merged
         // rows through the same call.
-        collect_and_solve_relations(
+        let line_guard = oracle.line_guard();
+        let recovery_ladder = oracle.recovery_ladder();
+        let oracle_cell = std::cell::RefCell::new(&mut *oracle);
+        collect_and_solve_relations_touching_ladder(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -599,12 +723,33 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             matrix,
             completion,
             |ops, counters, point, a, b| {
-                oracle.decompose_relations(ctx, &fb, ops, counters, point, a, b)
+                oracle_cell
+                    .borrow_mut()
+                    .decompose_relations(ctx, &fb, ops, counters, point, a, b)
             },
+            |point| oracle_cell.borrow().touch(ctx, point),
+            line_guard,
+            recovery_ladder.as_deref(),
         )
     };
     for (name, value) in oracle.relation_counters() {
         outcome.relations.count(&name, value);
+    }
+    let setup_seed_rows = setup_seed_independent + setup_seed_dependent;
+    if setup_seed_rows > 0 {
+        outcome.linear_algebra.wall_ns += setup_seed_ns;
+        outcome
+            .linear_algebra
+            .count("setup_seed_rows", setup_seed_rows);
+        outcome
+            .linear_algebra
+            .count("setup_seed_independent", setup_seed_independent);
+        outcome
+            .linear_algebra
+            .count("setup_seed_dependent", setup_seed_dependent);
+        outcome
+            .linear_algebra
+            .work("row_build_words", setup_seed_rows * (fb.columns as u64 + 1));
     }
     outcome.relations.work_all(&oracle.relation_work_native());
     // Kept opt-in so the previously recorded full-rank sessions retain
@@ -632,12 +777,19 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         audit.audit
     });
     let mut unpriced_work = Vec::new();
+    // A pinned `ns_per_hashed_tensor_step` charges the steps
+    // (`price_phase`, `PINNABLE_NATIVE`) and lifts only the step clauses:
+    // the tensor curve's certification is still omitted work, so a
+    // hashed-affine run stays qualified until that is charged too.
+    let tensor_steps_pinned = calib.pinned_unit_ns("ns_per_hashed_tensor_step").is_some();
     if base_builder.name() == "hashed-affine" {
-        unpriced_work.push(
-            "hashed-affine setup has uncalibrated hashed_tensor_steps and omitted tensor-curve certification work",
-        );
+        unpriced_work.push(if tensor_steps_pinned {
+            "hashed-affine setup omits tensor-curve certification work (hashed_tensor_steps are charged at the pinned ns_per_hashed_tensor_step)"
+        } else {
+            "hashed-affine setup has uncalibrated hashed_tensor_steps and omitted tensor-curve certification work"
+        });
     }
-    if oracle.name() == "hashed-tensor" {
+    if oracle.name() == "hashed-tensor" && !tensor_steps_pinned {
         unpriced_work.push(
             "tensor-contraction primitive steps are uncalibrated, so S excludes most of the relation phase",
         );
@@ -679,9 +831,31 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     // Buchberger "monomial operation" costs about 50 ns here against
     // 0.4 ns for a word XOR, and pricing it at the word ratio would have
     // flattered the engine a hundredfold.  `ns_per_op` records the
-    // measured conversion so the count can be re-priced later.
+    // measured conversion so the count can be re-priced later.  Since
+    // 2026-11-12 each other unit has its own key (conflicts, monomial
+    // operations and tests, vector XORs, F_p multiply-adds, …; the audit
+    // table in docs/ic/FRAMEWORK.md), priced by count only where
+    // `docs/ic/calibration.json` pins it — no curve does yet.
     let solver_report = oracle.solver_totals().map(|t| {
         let wall_per_op = (t.ops > 0).then(|| t.wall_ns as f64 / t.ops as f64);
+        // Every unit outside the word-XOR family and the counted field
+        // multiplications has its own key (`solvers::solver_unit_key`).
+        // It charges by count only once pinned for the curve; a pinned key
+        // whose count does not cover the whole run is refused and the
+        // reason recorded.  With no key pinned — every curve today — both
+        // are `None` and the match below is the one it always was.
+        let unit_key = solvers::solver_unit_key(&t.op_unit);
+        let pinned_unit_ns = unit_key
+            .filter(|k| k.refused.is_none())
+            .and_then(|k| calib.pinned_unit_ns(k.key));
+        let pricing_qualification = unit_key.and_then(|k| {
+            let why = k.refused?;
+            calib.pinned_unit_ns(k.key)?;
+            Some(format!(
+                "{} is pinned for this curve but not charged by count: {why}; priced as an unpinned unit",
+                k.key
+            ))
+        });
         // `pinned` means the ratio came from the repository's table, and
         // only `Calibration::pin` can say so: a word-XOR factor that is
         // merely present was measured on this host (every bench
@@ -721,10 +895,15 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
                         None,
                     )
                 }
-                _ if calib.ns_per_add > 0.0 => {
-                    (t.wall_ns as f64 / calib.ns_per_add, "measured", wall_per_op)
-                }
-                _ => (0.0, "unpriced", wall_per_op),
+                _ => match pinned_unit_ns {
+                    Some(ns) if calib.ns_per_add > 0.0 => {
+                        (t.ops as f64 * ns / calib.ns_per_add, "pinned", Some(ns))
+                    }
+                    _ if calib.ns_per_add > 0.0 => {
+                        (t.wall_ns as f64 / calib.ns_per_add, "measured", wall_per_op)
+                    }
+                    _ => (0.0, "unpriced", wall_per_op),
+                },
             };
         rel.count("solver_calls", t.calls);
         rel.count("solver_ops", t.ops);
@@ -745,7 +924,19 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             solving_degree_max: t.solving_degree_max,
             semi_regular_degree: t.semi_regular_degree(),
             degree_over_bound: t.degree_over_bound(),
+            solving_degree_sum: t.solving_degree_sum,
+            first_fall_degree: t.first_fall_degree,
+            last_fall_degree: t.last_fall_degree,
+            degree_of_regularity_observed: t.degree_of_regularity_observed,
+            degree_trace: t.degree_trace.clone(),
             extra: t.extra.clone(),
+            forecaster: t.forecaster.clone().map(|mut f| {
+                f.set_relation_state(fb.columns, outcome.rank as usize);
+                f.set_linear_algebra_total(outcome.relations_found as usize, work, work_unit);
+                f
+            }),
+            forecast_unavailable: t.forecast_unavailable.clone(),
+            pricing_qualification,
         }
     });
     let total_gae = fb_phase.gae + prep_cost.gae + rel.gae + la.gae + ver.gae;
@@ -795,7 +986,8 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             cost_qualification: cost_qualification.clone(),
             verify: ver,
             recovered: outcome.recovered,
-            verified: outcome.verified && outcome.recovered == Some(planted),
+            verified: outcome.verified
+                && planted.is_none_or(|known| outcome.recovered == Some(known)),
             total_gae,
             s,
             rho_s,
@@ -808,7 +1000,6 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         fb,
     ))
 }
-
 /// The table a sweep prints.
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
@@ -1007,16 +1198,17 @@ mod tests {
     }
 
     /// **The `k`-sum table oracle recovers the planted logarithm** on a
-    /// 24-bit prime-order curve with `k = 3` and `k = 4`: every relation
-    /// has `k` summands, and the table holds one entry per negation orbit
-    /// of the signed `k`-sums of the base.
+    /// 24-bit prime-order curve with `k = 3` to `7` (`k = 6, 7` pack their
+    /// summand indices in 10 and 9 bits): every relation has `k` summands,
+    /// and the table holds one entry per negation orbit of the signed
+    /// `k`-sums of the base.
     #[test]
-    fn ksum_oracle_recovers_logs_with_three_four_and_five_summands() {
+    fn ksum_oracle_recovers_logs_with_three_to_seven_summands() {
         use super::plugins::{KSumOracle, PrimeAbscissaBase};
         use crate::cryptanalysis::ic_boundary::prime_instance_for;
         let inst = prime_instance_for(24, 5);
         let (ctx, planted) = ctx_and_planted(&inst);
-        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10)] {
+        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10), (6, 10), (7, 10)] {
             let mut spec = PipelineSpec {
                 factor_base: "prime-abscissa".into(),
                 oracle: "ksum".into(),
@@ -1116,6 +1308,8 @@ mod tests {
             r: 562021,
             cofactor: 16,
             generator: (4890799, 2220468),
+
+            representation: None,
         };
         let mut scratch = GroupOps::default();
         let g = inst.generator_point();
@@ -1232,6 +1426,19 @@ mod tests {
         assert!(report.s > 0.0 && report.s.is_finite());
         assert!(report.factor_base.columns > 0);
         assert!(report.decomposition.relations_found >= report.linear_algebra.rank);
+
+        let mut public_oracle = MitmOracle::new(2);
+        let public_report = run_pipeline_public(
+            &ctx,
+            &spec,
+            &base,
+            &mut public_oracle,
+            &Calibration::default(),
+            None,
+        )
+        .expect("public-only pipeline should run");
+        assert!(public_report.verified, "public source-point check failed");
+        assert_eq!(public_report.recovered, report.recovered);
         // Every stage marks the work it now counts for `bitop/v1`, and
         // counts some: the base's indexes, the table's inserts, the walk's
         // bookkeeping, the rows and the elimination's scans.
@@ -1619,6 +1826,289 @@ mod tests {
             bare.decomposition.solver.as_ref().unwrap().priced_by,
             "unpriced"
         );
+    }
+
+    /// The descent-algebraic + `sat-cdcl` run the solver-unit keys are
+    /// tested on: binary `n = 11`, a 5-dimensional subspace base, `m = 2`.
+    fn sat_descent_run(calib: &Calibration, relabel: Option<&'static str>) -> (RunReport, String) {
+        use super::plugins::{BinarySubspaceBase, DescentAlgebraicOracle};
+        use super::solvers::solver_by_name;
+        use crate::cryptanalysis::ic_boundary::{random_binary_instance, BinaryGroup};
+        let inst = random_binary_instance(11, 3, 8).expect("a curve at n = 11");
+        let group = BinaryGroup(&inst.fast);
+        let planted = 1 + 30_011 % (inst.r - 1);
+        let ctx = binary_ctx_and_planted(&inst, &group, planted);
+        let base = BinarySubspaceBase { instance: &inst };
+        let mut spec = PipelineSpec {
+            factor_base: "binary-subspace".into(),
+            oracle: "descent-algebraic".into(),
+            solver: Some("sat-cdcl".into()),
+            targets: Targets::Walk,
+            max_trials: 200_000,
+            seed: 7,
+            ..Default::default()
+        };
+        spec.factor_base_params.set("dimension", "5");
+        let engine: Box<dyn super::stages::SystemSolver> = match relabel {
+            None => solver_by_name("sat-cdcl").unwrap(),
+            Some(unit) => Box::new(RelabelledEngine(solver_by_name("sat-cdcl").unwrap(), unit)),
+        };
+        let mut oracle = DescentAlgebraicOracle::new(2, &inst, engine, Params::default(), None);
+        let r = run_pipeline(&ctx, &spec, &base, &mut oracle, planted, calib, None).unwrap();
+        (r, serde_json::to_string(calib).unwrap())
+    }
+
+    /// `sat-cdcl` with its cost relabelled, to put another engine's unit
+    /// through the pricing path on the same systems.
+    struct RelabelledEngine(Box<dyn super::stages::SystemSolver>, &'static str);
+
+    impl super::stages::SystemSolver for RelabelledEngine {
+        fn name(&self) -> &str {
+            "relabelled-engine"
+        }
+        fn describe(&self) -> String {
+            format!("sat-cdcl reporting its conflicts as `{}`", self.1)
+        }
+        fn accepts(&self, shape: &super::stages::SystemShape) -> bool {
+            self.0.accepts(shape)
+        }
+        fn solve(
+            &self,
+            system: &super::stages::BooleanSystem,
+            params: &Params,
+            budget: Option<std::time::Duration>,
+        ) -> (super::stages::SolverVerdict, super::stages::SolverCost) {
+            let (verdict, mut cost) = self.0.solve(system, params, budget);
+            cost.op_unit = self.1.into();
+            (verdict, cost)
+        }
+    }
+
+    /// **No solver-unit key pinned: the run is the one it was.**  Snapshot
+    /// taken on this checkout before the keys existed (2026-11-12): the
+    /// same `S` bits, the same `priced_by`, no qualification, and the
+    /// calibration serialises to the same JSON (the new keys are absent).
+    #[test]
+    fn solver_pricing_is_unchanged_with_no_solver_unit_key_pinned() {
+        let (bare, json) = sat_descent_run(&Calibration::default(), None);
+        let s = bare.decomposition.solver.as_ref().unwrap();
+        assert!(bare.verified);
+        assert_eq!((s.op_unit.as_str(), s.ops), ("conflicts", 6260));
+        assert_eq!(s.priced_by, "unpriced");
+        assert!(s.pricing_qualification.is_none());
+        assert_eq!(
+            bare.decomposition.gae_before_solver.to_bits(),
+            4646201887446532096
+        );
+        assert_eq!(bare.total_gae.to_bits(), 4646958351446441984);
+        assert_eq!(bare.cost_qualification, None);
+        assert_eq!(
+            json,
+            r#"{"ns_per_add":0.0,"ns_per_double":0.0,"ns_per_sqrt":null,"ns_per_as_solve":null,"ns_per_s4_pair":null,"ns_per_lookup":0.0,"ns_per_row_op":0.0,"ns_per_word_xor":null,"ns_per_legendre":null,"ns_per_inversion":null,"ns_per_frobenius":null,"ns_per_canon":null,"pinned_units":[]}"#
+        );
+
+        let calib = Calibration {
+            ns_per_add: 1.0,
+            ns_per_double: 1.0,
+            ns_per_word_xor: Some(0.002),
+            pinned_units: vec!["ns_per_word_xor".into()],
+            ..Default::default()
+        };
+        let (measured, _) = sat_descent_run(&calib, None);
+        let s = measured.decomposition.solver.as_ref().unwrap();
+        assert_eq!(s.priced_by, "measured");
+        assert!(s.pricing_qualification.is_none());
+        assert_eq!(
+            measured.decomposition.gae_before_solver.to_bits(),
+            4645832451539599360
+        );
+        assert_eq!(measured.cost_qualification, None);
+        assert!(
+            serde_json::to_value(s)
+                .unwrap()
+                .get("pricing_qualification")
+                .is_none(),
+            "an unpinned solver block serialises as before"
+        );
+    }
+
+    /// **A pinned `ns_per_conflict` charges `sat-cdcl`'s conflicts by
+    /// count**, and only a pinned one: the same value merely present is a
+    /// host figure and prices nothing by count.
+    #[test]
+    fn a_pinned_conflict_key_charges_sat_conflicts_by_count() {
+        let mut calib = Calibration {
+            ns_per_add: 2.0,
+            ns_per_double: 2.0,
+            ns_per_conflict: Some(3.0),
+            ..Default::default()
+        };
+        let (present, _) = sat_descent_run(&calib, None);
+        let s = present.decomposition.solver.as_ref().unwrap();
+        assert_eq!(s.priced_by, "measured", "present but not pinned");
+
+        calib.pinned_units = vec!["ns_per_conflict".into()];
+        let (pinned, json) = sat_descent_run(&calib, None);
+        let p = pinned.decomposition.solver.as_ref().unwrap();
+        assert_eq!(p.priced_by, "pinned");
+        assert_eq!(p.ns_per_op, Some(3.0));
+        assert_eq!(p.ops, s.ops, "the same run does the same work");
+        assert_eq!(p.gae, p.ops as f64 * 3.0 / 2.0);
+        assert!(p.pricing_qualification.is_none());
+        assert_eq!(
+            pinned.decomposition.cost.gae,
+            pinned.decomposition.gae_before_solver + p.gae
+        );
+        assert_eq!(pinned.cost_qualification, None);
+        assert!(json.contains(r#""ns_per_conflict":3.0"#));
+        assert!(json.contains(r#""pinned_units":["ns_per_conflict"]"#));
+    }
+
+    /// **A count that does not cover the engine's whole run is refused even
+    /// when its key is pinned**, and the solver block says why: the
+    /// `crossbred-f2` partial unit and the `xl-f2` modelled unit price
+    /// exactly as with no key at all.
+    #[test]
+    fn a_partial_coverage_unit_stays_uncharged_even_when_pinned() {
+        for (unit, key) in [
+            (
+                "word operations (partial: extraction, transform and filter; per-point solves in solve_row_ops)",
+                "ns_per_word_op",
+            ),
+            ("monomial operations (modelled)", "ns_per_monomial_op"),
+        ] {
+            let k = super::solvers::solver_unit_key(unit).unwrap();
+            assert_eq!(k.key, key);
+            assert!(k.refused.is_some());
+            let mut calib = Calibration {
+                pinned_units: vec![key.into()],
+                ..Default::default()
+            };
+            match key {
+                "ns_per_word_op" => calib.ns_per_word_op = Some(0.5),
+                _ => calib.ns_per_monomial_op = Some(0.5),
+            }
+            // `ns_per_add = 0`: an unpinned unit is `unpriced` at zero, so a
+            // refused pin must leave exactly that.
+            let (r, _) = sat_descent_run(&calib, Some(unit));
+            let s = r.decomposition.solver.as_ref().unwrap();
+            assert_eq!(s.op_unit, unit);
+            assert_eq!(s.priced_by, "unpriced", "{unit}");
+            assert_eq!(s.gae, 0.0);
+            let why = s.pricing_qualification.as_deref().expect("says why");
+            assert!(why.starts_with(key), "{why}");
+            assert!(why.contains("does not cover the engine's whole run"), "{why}");
+            assert_eq!(
+                r.decomposition.cost.gae, r.decomposition.gae_before_solver,
+                "nothing charged by count"
+            );
+            // And with a host calibration it is the wall-time price.
+            calib.ns_per_add = 1.0;
+            calib.ns_per_double = 1.0;
+            let (r, _) = sat_descent_run(&calib, Some(unit));
+            let s = r.decomposition.solver.as_ref().unwrap();
+            assert_eq!(s.priced_by, "measured");
+            assert_eq!(s.gae, s.wall_ns as f64);
+            assert!(s.pricing_qualification.is_some());
+        }
+    }
+
+    /// Every solver unit the framework ships maps to its key, and the word-
+    /// XOR family and `F_q multiplications` keep their own path (a field
+    /// multiplication unit with `fp_muls_per_add` is `counted` first).
+    #[test]
+    fn every_shipped_solver_unit_has_its_calibration_key() {
+        use super::solvers::solver_unit_key;
+        use crate::cryptanalysis::ic_boundary::SOLVER_UNIT_KEYS;
+        for (unit, key, refused) in [
+            ("conflicts", Some("ns_per_conflict"), false),
+            ("monomial operations", Some("ns_per_monomial_op"), false),
+            (
+                "monomial operations (modelled)",
+                Some("ns_per_monomial_op"),
+                true,
+            ),
+            ("monomial tests", Some("ns_per_monomial_test"), false),
+            (
+                "vector XORs (Gray-code steps, 8 lanes of 32 bits)",
+                Some("ns_per_vector_xor_8x32"),
+                false,
+            ),
+            (
+                "vector XORs (Gray-code steps, 16 lanes of 32 bits)",
+                Some("ns_per_vector_xor_16x32"),
+                false,
+            ),
+            (
+                "F_p multiply-adds (elimination only)",
+                Some("ns_per_f4_muladd"),
+                false,
+            ),
+            ("F_p multiplications (grid)", Some("ns_per_fp_mul"), false),
+            ("word XORs (elimination only)", None, false),
+            ("word XORs (Gray-code steps)", None, false),
+            ("F_p multiplications", Some("ns_per_fp_mul"), false),
+            ("F_q multiplications", None, false),
+            ("none (external process; wall time only)", None, false),
+        ] {
+            let got = solver_unit_key(unit);
+            assert_eq!(got.map(|k| k.key), key, "{unit}");
+            assert_eq!(got.is_some_and(|k| k.refused.is_some()), refused, "{unit}");
+            if let Some(k) = key {
+                assert!(SOLVER_UNIT_KEYS.contains(&k), "{k}");
+            }
+        }
+    }
+
+    /// **A pinned `ns_per_hashed_tensor_step` charges the hashed-affine
+    /// set-up's steps and lifts only the step clause**: the run stays
+    /// qualified for the tensor curve's uncharged certification.
+    #[test]
+    fn a_pinned_hashed_tensor_step_key_charges_the_steps() {
+        use super::hashed::HashedAffineBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+
+        let inst = prime_instance_for(24, 11);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = HashedAffineBase { instance: &inst };
+        let spec = PipelineSpec {
+            factor_base: "hashed-affine".into(),
+            oracle: "subtract".into(),
+            targets: Targets::Walk,
+            max_trials: 1,
+            ..Default::default()
+        };
+        let run = |calib: &Calibration| {
+            let mut oracle = SubtractOracle;
+            run_pipeline(&ctx, &spec, &base, &mut oracle, planted, calib, Some(1.0)).unwrap()
+        };
+        let mut calib = Calibration {
+            ns_per_add: 1.0,
+            ns_per_double: 1.0,
+            ns_per_hashed_tensor_step: Some(0.25),
+            ..Default::default()
+        };
+        let present = run(&calib);
+        calib.pinned_units = vec!["ns_per_hashed_tensor_step".into()];
+        let pinned = run(&calib);
+
+        let steps = present.factor_base.cost.get("hashed_tensor_steps");
+        assert!(steps > 0);
+        assert_eq!(pinned.factor_base.cost.get("hashed_tensor_steps"), steps);
+        let charged = pinned.factor_base.cost.gae - present.factor_base.cost.gae;
+        assert!(
+            (charged - 0.25 * steps as f64).abs() < 1e-6 * steps as f64,
+            "{charged} GAE for {steps} steps"
+        );
+        let before = present.cost_qualification.as_deref().unwrap();
+        assert!(before.contains("uncalibrated hashed_tensor_steps"));
+        let after = pinned
+            .cost_qualification
+            .as_deref()
+            .expect("still qualified");
+        assert!(!after.contains("uncalibrated"), "{after}");
+        assert!(after.contains("tensor-curve certification"), "{after}");
+        assert!(pinned.s_over_rho.is_none());
     }
 
     /// An engine that reports its work as `word XORs`, the one unit with
@@ -2459,5 +2949,133 @@ mod tests {
             "the solver is inside the phase"
         );
         assert!(report.s > 0.0 && report.s.is_finite());
+
+        // `bitop/v1` completeness.  The base's phase and the oracle's
+        // set-up each carry what `bitop_tally` saw as `tally_*` counters,
+        // every one of them nonzero (the subspace's XORs and set probes,
+        // the lifts' products, squarings and inversions, the Artin–
+        // Schreier squarings, the frame's inversions; the set-up repeats
+        // the base and adds the membership probes), the set-up carries
+        // the marker, `native` carries none of it, and every solve set
+        // `bitop_complete`.
+        use crate::cryptanalysis::bitop_tally::WORK_NATIVE_KEYS;
+        use std::collections::BTreeMap;
+        for (phase, cost) in [
+            ("factor_base", &report.factor_base.cost),
+            ("oracle_setup", &report.decomposition.setup),
+        ] {
+            for key in WORK_NATIVE_KEYS {
+                assert!(
+                    cost.work_native.get(key).copied().unwrap_or(0) > 0,
+                    "{phase}: {key} is zero"
+                );
+                assert!(
+                    !cost.native.contains_key(key),
+                    "{phase}: {key} leaked into native"
+                );
+            }
+        }
+        assert_eq!(
+            report
+                .decomposition
+                .setup
+                .work_native
+                .get("counted:table_insert_attempts"),
+            Some(&1)
+        );
+        assert_eq!(solver.extra.get("bitop_complete"), Some(&1));
+        // Priced as `ecbench work` prices a record, the run is complete:
+        // nothing unpriced, nothing known uncounted.
+        use crate::cryptanalysis::ecbench::methods::{phase_of, SolverStats};
+        use crate::cryptanalysis::ecbench::work::{price, Priceable};
+        use crate::cryptanalysis::ecbench::workload::CurveFacts;
+        let phases = vec![
+            phase_of("factor_base", &report.factor_base.cost),
+            phase_of("oracle_setup", &report.decomposition.setup),
+            phase_of("relations", &report.decomposition.cost),
+            phase_of("linear_algebra", &report.linear_algebra.cost),
+            phase_of("verify", &report.verify),
+        ];
+        let stats = SolverStats::from_report(solver, oracle.last_system().as_ref());
+        let curve = CurveFacts {
+            slug: inst.name.clone(),
+            icv1: String::new(),
+            family: "koblitz".into(),
+            construction: String::new(),
+            field_degree: Some(inst.n),
+            field_bits: None,
+            group_order: u128::from(inst.group_order).into(),
+            r: u128::from(inst.r).into(),
+            cofactor: u128::from(inst.cofactor).into(),
+            generator: [String::new(), String::new()],
+            automorphisms_available: 2 * inst.n,
+            registered: false,
+            ec1: None,
+            curve_uid: None,
+        };
+        let params = BTreeMap::new();
+        let counters = BTreeMap::new();
+        let work = price(&Priceable {
+            method_id: "ic.pipeline",
+            method_params: &params,
+            curve: &curve,
+            phases: &phases,
+            counters: &counters,
+            solver: Some(&stats),
+        })
+        .expect("the record prices");
+        assert!(work.unpriced.is_empty(), "unpriced: {:?}", work.unpriced);
+        assert!(
+            work.known_uncounted.is_empty(),
+            "known_uncounted: {:?}",
+            work.known_uncounted
+        );
+        assert!(work.complete);
+        let setup = work
+            .phases
+            .iter()
+            .find(|p| p.name == "oracle_setup")
+            .expect("the set-up phase is priced");
+        assert!(setup.prims.get("field_inv").copied().unwrap_or(0) > 0);
+        assert!(setup.prims.get("hash_probe").copied().unwrap_or(0) > 0);
+
+        // Nothing is priced twice.  `koblitz_factor_base` still writes
+        // the natives `as_solves` and `frobenius_maps` (replay compares
+        // them), and marks them as carried by the builder's tally; the
+        // base's phase then prices to exactly its tally plus the index
+        // build, primitive for primitive, with no Artin–Schreier solve
+        // of its own.
+        let fbc = &report.factor_base.cost;
+        for native in ["as_solves", "frobenius_maps"] {
+            assert!(fbc.native.get(native).copied().unwrap_or(0) > 0, "{native}");
+            assert_eq!(
+                fbc.work_native.get(&format!("tallied:{native}")),
+                Some(&1),
+                "{native} is not marked"
+            );
+        }
+        let wn = |k: &str| u128::from(fbc.work_native.get(k).copied().unwrap_or(0));
+        let expect: BTreeMap<String, u128> = [
+            ("word_op", wn("tally_word_ops") + wn("index_sort_word_ops")),
+            ("hash_probe", wn("tally_hash_probes") + wn("index_inserts")),
+            (
+                "field_add",
+                wn("tally_field_adds") + wn("index_point_negations"),
+            ),
+            ("field_mul", wn("tally_field_muls")),
+            ("field_sqr", wn("tally_field_sqrs")),
+            ("field_inv", wn("tally_field_invs")),
+            ("group_add", u128::from(fbc.group_ops.adds)),
+            ("group_double", u128::from(fbc.group_ops.doubles)),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .collect();
+        let base = work
+            .phases
+            .iter()
+            .find(|p| p.name == "factor_base")
+            .expect("the base's phase is priced");
+        assert_eq!(base.prims, expect, "the base's phase is priced twice");
     }
 }

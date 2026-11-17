@@ -1,0 +1,24 @@
+import WordUnionPotential
+set_option autoImplicit false
+namespace SignedWord
+
+def pairDecode (r : UInt64) (ab : UInt64×UInt64) : F r × F r := (wd r ab.1,wd r ab.2)
+def GoodPair (r : UInt64) (ab : UInt64×UInt64) : Prop := ab.1.toNat<r.toNat ∧ ab.2.toNat<r.toNat
+def transportPair (r : UInt64) (p : Pot) (ab : UInt64×UInt64) : UInt64×UInt64 :=
+ (signed r p.s (GraphRingWord.sub r ab.1 p.a),signed r p.s (GraphRingWord.sub r ab.2 p.b))
+
+theorem transportPair_correct (r : UInt64) [Fact r.toNat.Prime] (p : Pot) (ab : UInt64×UInt64)
+ (hp : 0<r.toNat) (hb : r.toNat≤2^63) (hg : GoodPot r p) (hab : GoodPair r ab) :
+ GoodPair r (transportPair r p ab) ∧
+ pairDecode r (transportPair r p ab)=GraphUnion.transport (decPot r p) (pairDecode r ab) := by
+ have ha := GraphRingWord.sub_correct r ab.1 p.a hp hb hab.1 hg.2.1
+ have hb' := GraphRingWord.sub_correct r ab.2 p.b hp hb hab.2 hg.2.2
+ have hsa := signed_correct r _ p.s hp ha.1 hg.1
+ have hsb := signed_correct r _ p.s hp hb'.1 hg.1
+ refine ⟨⟨hsa.1,hsb.1⟩,?_⟩
+ apply Prod.ext
+ · change ((signed r p.s (GraphRingWord.sub r ab.1 p.a)).toNat : F r)=_
+   rw [hsa.2,ha.2]; rfl
+ · change ((signed r p.s (GraphRingWord.sub r ab.2 p.b)).toNat : F r)=_
+   rw [hsb.2,hb'.2]; rfl
+end SignedWord

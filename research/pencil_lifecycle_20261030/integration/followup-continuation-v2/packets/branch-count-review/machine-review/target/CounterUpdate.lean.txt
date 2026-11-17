@@ -1,0 +1,22 @@
+import CountDispatch
+set_option autoImplicit false
+namespace BranchCount
+structure Counters where
+ operations : UInt64
+ cycles : UInt64
+ negative : UInt64
+ zero : UInt64
+def update (c : Counters) (visits : Nat) (d : Counts) : Counters :=
+ ⟨FindCount.ticks c.operations visits,FindCount.ticks c.cycles d.cycles,
+ FindCount.ticks c.negative d.negative,FindCount.ticks c.zero d.zero⟩
+theorem update_exact (c : Counters) (visits : Nat) (d : Counts)
+ (ho : c.operations.toNat+visits<UInt64.size)
+ (hc : c.cycles.toNat+d.cycles<UInt64.size)
+ (hn : c.negative.toNat+d.negative<UInt64.size)
+ (hz : c.zero.toNat+d.zero<UInt64.size) :
+ (update c visits d).operations.toNat=c.operations.toNat+visits ∧
+ (update c visits d).cycles.toNat=c.cycles.toNat+d.cycles ∧
+ (update c visits d).negative.toNat=c.negative.toNat+d.negative ∧
+ (update c visits d).zero.toNat=c.zero.toNat+d.zero := by
+ exact ⟨FindCount.ticks_exact _ _ ho,FindCount.ticks_exact _ _ hc,FindCount.ticks_exact _ _ hn,FindCount.ticks_exact _ _ hz⟩
+end BranchCount

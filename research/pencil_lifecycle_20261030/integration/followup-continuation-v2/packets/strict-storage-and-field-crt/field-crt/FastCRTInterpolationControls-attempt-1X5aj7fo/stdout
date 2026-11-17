@@ -1,0 +1,52 @@
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolationControls.lean:11:69: error: Ambiguous term
+  support
+Possible interpretations:
+  FastCRT.support : ?m.42 → ?m.42 → ?m.42[X]
+  
+  Polynomial.support : ?m.42[X] → Finset ℕ
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolationControls.lean:10:72: error: unsolved goals
+⊢ 1 - X * FastCRT.support 0 0 = 1 - X ^ 3
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolationControls.lean:19:28: error: Ambiguous term
+  support
+Possible interpretations:
+  FastCRT.support : ?m.114 → ?m.114 → ?m.114[X]
+  
+  Polynomial.support : ?m.114[X] → Finset ℕ
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolationControls.lean:18:1: error: unsolved goals
+case ha
+⊢ -X ^ 3 - X ^ 4 + X ^ 5 = -(X * FastCRT.support 0 0) - X ^ 2 * FastCRT.support 0 0 + X ^ 3 * FastCRT.support 0 0
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolationControls.lean:22:28: error: Ambiguous term
+  support
+Possible interpretations:
+  FastCRT.support : ?m.167 → ?m.167 → ?m.167[X]
+  
+  Polynomial.support : ?m.167[X] → Finset ℕ
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolationControls.lean:21:1: error: unsolved goals
+case hb
+⊢ -(X * 2) - X ^ 2 - X ^ 3 - X ^ 4 + X ^ 5 =
+    -(X * FastCRT.support 0 1 * 2) - X ^ 2 * FastCRT.support 0 1 + X ^ 3 * FastCRT.support 0 1
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolationControls.lean:22:36: warning: This simp argument is unused:
+  map_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [fixture, delta, support, map_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

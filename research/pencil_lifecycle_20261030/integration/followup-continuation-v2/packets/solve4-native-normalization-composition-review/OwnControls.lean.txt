@@ -1,0 +1,9 @@
+import Composition
+set_option autoImplicit false
+namespace IndependentComposition
+open Solve4Stage Solve4Normalize Solve4NativeNormalize
+ theorem composite_failure : normalize 15 0 (fun _ => 2) 0 ≠ 1 := by decide
+ theorem zero_failure : normalize 7 3 (fun _ => 0) 3 ≠ 1 := by decide
+ theorem unit_row_identity : normalize 7 0 (fun j => (#[1,2,3,4,5] : Array UInt64)[j.val]!) = (fun j => (#[1,2,3,4,5] : Array UInt64)[j.val]!) := by decide
+ theorem noncanonical_prefix_retained : normalize 7 1 (fun j => (#[8,2,0,0,6] : Array UInt64)[j.val]!) 0 = 8 := by decide
+end IndependentComposition

@@ -13,19 +13,28 @@
 #[macro_use]
 mod serialization;
 
+pub mod admission;
 pub mod arithmetic;
 pub mod binary;
+pub mod canonical;
+pub mod census;
 pub mod contraction;
 pub mod curve;
 pub mod encoding;
 pub mod factoring;
 pub mod finite;
+pub mod joint;
+pub mod metrics;
 pub mod network;
 pub mod partial;
+pub mod prepared;
 pub mod primality;
 pub mod reduction;
+pub mod relations;
 pub mod ring;
 pub mod structured;
+pub mod structured_runner;
+pub mod treewidth;
 pub mod weighted;
 pub mod width;
 

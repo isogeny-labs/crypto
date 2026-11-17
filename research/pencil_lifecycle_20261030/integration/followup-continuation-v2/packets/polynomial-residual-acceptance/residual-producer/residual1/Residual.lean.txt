@@ -1,0 +1,103 @@
+import Product
+import WordAdd11
+set_option autoImplicit false
+namespace ResidualPolynomial
+open Polynomial ScaleTrim MonicRemainder PencilWordRefinement
+
+def pneg (p : UInt64) (xs : List UInt64) : List UInt64 := xs.map (wordNeg p)
+
+theorem neg_correct (p : UInt64) (xs : List UInt64) (hp : 0<p.toNat) (hx : Canon p xs) :
+ Canon p (pneg p xs) ∧ wordsPoly p (pneg p xs) = -wordsPoly p xs := by
+ induction xs with
+ | nil => simp [pneg,Canon,wordsPoly,listPoly]
+ | cons x xs ih =>
+   have hh:=wordNeg_composition p x hp (hx x (by simp))
+   have ht:=ih (by intro a ha; exact hx a (by simp [ha]))
+   constructor
+   · intro a ha
+     simp only [pneg,List.map_cons,List.mem_cons] at ha
+     rcases ha with rfl | ha
+     · exact hh.1
+     · exact ht.1 a ha
+   · simp only [pneg,List.map_cons,wordsPoly,listPoly]
+     change C _ + X*wordsPoly p (pneg p xs) = -(C _+X*wordsPoly p xs)
+     rw [ht.2,hh.2,map_neg]
+     ring
+
+def slots (p : UInt64) : List UInt64 → List UInt64 → List UInt64
+ | [],[]=>[]
+ | a::as,[]=>wordAdd p a 0::slots p as []
+ | [],b::bs=>wordAdd p 0 b::slots p [] bs
+ | a::as,b::bs=>wordAdd p a b::slots p as bs
+
+theorem slots_correct (p : UInt64) (as bs : List UInt64) (hp : 0<p.toNat)
+ (hb : p.toNat<2^31) (ha : Canon p as) (hbs : Canon p bs) :
+ Canon p (slots p as bs) ∧ wordsPoly p (slots p as bs)=wordsPoly p as+wordsPoly p bs := by
+ induction as generalizing bs with
+ | nil =>
+   induction bs with
+   | nil => simp [slots,Canon,wordsPoly,listPoly]
+   | cons b bs ih =>
+     have hh:=wordAdd_composition p 0 b hp hb (by simpa using hp) (hbs b (by simp))
+     have ht:=ih (by intro x hx; exact hbs x (by simp [hx]))
+     constructor
+     · intro x hx; simp only [slots,List.mem_cons] at hx
+       rcases hx with rfl|hx
+       · exact hh.1
+       · exact ht.1 x hx
+     · simp only [slots,wordsPoly,List.map_cons,List.map_nil,listPoly]
+       change C _+X*wordsPoly p (slots p [] bs)=0+(C _+X*wordsPoly p bs)
+       rw [ht.2,hh.2]; simp [wordsPoly,listPoly]
+ | cons a as ih =>
+   have hac:=ha a (by simp)
+   have hat : Canon p as := by intro x hx; exact ha x (by simp [hx])
+   cases bs with
+   | nil =>
+     have hh:=wordAdd_composition p a 0 hp hb hac (by simpa using hp)
+     have ht:=ih [] hat (by simp [Canon])
+     constructor
+     · intro x hx; simp only [slots,List.mem_cons] at hx
+       rcases hx with rfl|hx
+       · exact hh.1
+       · exact ht.1 x hx
+     · simp only [slots,wordsPoly,List.map_cons,List.map_nil,listPoly]
+       change C _+X*wordsPoly p (slots p as [])=(C _+X*wordsPoly p as)+0
+       rw [ht.2,hh.2]; simp [wordsPoly,listPoly]
+   | cons b bs =>
+     have hh:=wordAdd_composition p a b hp hb hac (hbs b (by simp))
+     have ht:=ih bs hat (by intro x hx; exact hbs x (by simp [hx]))
+     constructor
+     · intro x hx; simp only [slots,List.mem_cons] at hx
+       rcases hx with rfl|hx
+       · exact hh.1
+       · exact ht.1 x hx
+     · change C _+X*wordsPoly p (slots p as bs)=(C _+X*wordsPoly p as)+(C _+X*wordsPoly p bs)
+       rw [ht.2,hh.2,map_add]; ring
+
+def padd (p : UInt64) (as bs : List UInt64) : List UInt64 :=
+ let out:=slots p as bs; trimFuel out.length out
+
+def psub (p : UInt64) (as bs : List UInt64) := padd p as (pneg p bs)
+
+theorem add_correct (p : UInt64) (as bs : List UInt64) (hp : 0<p.toNat)
+ (hb : p.toNat<2^31) (ha : Canon p as) (hbs : Canon p bs) :
+ Canon p (padd p as bs) ∧ wordsPoly p (padd p as bs)=wordsPoly p as+wordsPoly p bs := by
+ have h:=slots_correct p as bs hp hb ha hbs
+ exact ⟨trim_good p _ _ h.1,by simpa [padd,trim_preserves] using h.2⟩
+
+theorem sub_correct (p : UInt64) (as bs : List UInt64) (hp : 0<p.toNat)
+ (hb : p.toNat<2^31) (ha : Canon p as) (hbs : Canon p bs) :
+ Canon p (psub p as bs) ∧ wordsPoly p (psub p as bs)=wordsPoly p as-wordsPoly p bs := by
+ have hn:=neg_correct p bs hp hbs
+ have h:=add_correct p as (pneg p bs) hp hb ha hn.1
+ exact ⟨h.1,by simpa [psub,hn.2,sub_eq_add_neg] using h.2⟩
+
+def residual (p : UInt64) (f v : List UInt64) := psub p f (ProductPolynomial.product p v v)
+
+theorem residual_correct (p : UInt64) [Fact p.toNat.Prime] (f v : List UInt64)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hf : Canon p f) (hv : Canon p v) :
+ Canon p (residual p f v) ∧ wordsPoly p (residual p f v)=wordsPoly p f-(wordsPoly p v)^2 := by
+ have hm:=ProductPolynomial.product_correct p v v hp hb hv hv
+ have h:=sub_correct p f _ hp hb hf hm.1
+ exact ⟨h.1,by simpa [residual,hm.2,pow_two] using h.2⟩
+end ResidualPolynomial

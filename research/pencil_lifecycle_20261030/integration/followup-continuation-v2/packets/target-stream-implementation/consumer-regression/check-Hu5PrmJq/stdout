@@ -1,0 +1,35 @@
+
+running 6 tests
+test tests::bad_domains_maps_limits_and_unknown_contracts ... ok
+test tests::cap_pending_never_enters_admitted_space ... ok
+test tests::corruption_controls ... ok
+test tests::dispositions_and_candidate_order_are_checked ... ok
+test tests::pencil_signs_duplicates_zero_and_target_candidate ... ok
+test tests::rejected_large_row_has_generated_but_no_admitted_prefix ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test cli_reports_only_a_syntactic_complete_stream_and_rejects_truncation ... FAILED
+
+failures:
+
+---- cli_reports_only_a_syntactic_complete_stream_and_rejects_truncation stdout ----
+
+thread 'cli_reports_only_a_syntactic_complete_stream_and_rejects_truncation' (2554500) panicked at tests/cli.rs:10:21:
+target-stream rejected: JSON packet: u128 is not supported at line 1 column 940
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cli_reports_only_a_syntactic_complete_stream_and_rejects_truncation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

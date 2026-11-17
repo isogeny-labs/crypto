@@ -1,0 +1,45 @@
+   Compiling isogeny_algos v0.1.0 (/workspace/crypto-audit/isogeny_algos)
+   Compiling aws-sdk-s3 v1.155.0
+   Compiling volcano-cli v0.1.0 (/workspace/crypto-audit/tools/volcano-cli)
+   Compiling aws-sdk-sts v1.119.0
+   Compiling rayon v1.12.0
+   Compiling aws-smithy-http-client v1.5.2
+   Compiling clap v4.6.7
+   Compiling flate2 v1.1.10
+   Compiling ecdl-tensor-ic v0.1.0 (/workspace/crypto-audit/crates/ecdl-tensor-ic)
+   Compiling pencil-symbolic-graph v0.1.0 (/workspace/crypto-audit/research/pencil_large_prime_20261029)
+   Compiling streebog v0.10.2
+   Compiling base64 v0.21.7
+   Compiling crypto v0.1.0 (/workspace/crypto-audit)
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/ic/boundary_targets.json`: No such file or directory (os error 2)
+  --> src/cryptanalysis/ecbench/claim.rs:39:32
+   |
+39 | pub const CLAIM_LEDGER: &str = include_str!("../../../docs/ic/boundary_targets.json");
+   |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+  --> src/cryptanalysis/ecbench/three_leads.rs:74:38
+   |
+74 |                 serde_json::from_str(include_str!("../../../docs/curves/registry.json"))
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/workload.rs:955:24
+    |
+955 | const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/../../docs/ic/calibration.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ic_boundary.rs:260:34
+    |
+260 | const PINNED_CALIBRATION: &str = include_str!("../../docs/ic/calibration.json");
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/../../docs/curves/standards/parameters.json`: No such file or directory (os error 2)
+  --> src/cryptanalysis/secg_standards.rs:20:31
+   |
+20 | const PARAMETERS_JSON: &str = include_str!("../../docs/curves/standards/parameters.json");
+   |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `crypto` (lib) due to 5 previous errors
+warning: build failed, waiting for other jobs to finish...

@@ -1,0 +1,631 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "date": "2026-10-31",
+ "row": "E30 (GLV note §9.28/§9.32): the walk audit (10 curves x {<±psi>, negation} x 16 serial Karatsuba walks with the audit counter) and the ten audited end-to-end runs (E31 solver A with Karatsuba products and --audit, both arms); evidence directory research/e30_invariants_lite_20261030",
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E30: fresh build from an export of the recorded binary commit in a fresh target directory, fresh runs, own comparison (validate_e30.rs compare)",
+ "recorded_binary": "0e4fccce1ad1baf7ace18a550483771f02315838 (experiments/35_invariants_lite/binary_commit.txt)",
+ "local_replay_note": "Replayed locally in the validator's 4-vCPU container, not on isolab-eks: the replay admits operation counts only; no wall time is compared or claimed (wall_ms and solve_ms listed, not compared).",
+ "build": {
+  "schema": "e2x-validator-build/v1",
+  "repository_head_at_start": "f23c53871 (branch claude/glv-endomorphism-index-calculus-pe7ige, PR #2152); working tree clean except .resume/ (gitignored)",
+  "source": "git archive <commit> of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/, crates/, tools/, isogeny_algos/, benches/, research/pencil_large_prime_20261029, every explicit [[bin]]/[[example]]/[[bench]] path of Cargo.toml, and the 58 include_str!/include_bytes! targets of the library present at the commit (under docs/, research/, tests/). Every exported file was checked equal to its blob at the commit (git hash-object): 789dc2ff6 tree 4,591 files, 0e4fccce1 tree 4,594 files, 0 mismatches each.",
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+  "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, not isolab-eks. The replay admits operation counts only (no wall time is compared or claimed), so a local run suffices.",
+  "flags": "CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline",
+  "recorded_binary_commits": {
+   "all": "0e4fccce1ad1baf7ace18a550483771f02315838"
+  },
+  "builds": [
+   {
+    "commit": "0e4fccce1ad1baf7ace18a550483771f02315838",
+    "tree": "/dev/shm/val-tree-0e4 (re-exported after the restart, 2026-10-31T14:04Z; 4,594 files equal to their blobs)",
+    "target_dir": "/dev/shm/val-target-0e4: a fresh, empty target directory on tmpfs (the root filesystem has ~0.5 GB free); nothing reused from the producer's target/",
+    "command": "cd /dev/shm/val-tree-0e4 && CARGO_TARGET_DIR=/dev/shm/val-target-0e4 CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline --example e28_tau --example e29_twist --example e30_audit --example quartic_pipeline_gls",
+    "attempts": [
+     "2026-10-31T07:36:44Z attempt 1: shared target directory with the 789dc2ff6 build. VOID: cargo hashes the workspace's own path package by its relative path and judged the 789dc2ff6 library fresh by mtime (the exported files carry the commits' older mtimes), so the 0e4fccce1 examples failed to compile against it (unresolved E29/E30 imports). No binary of this attempt was used.",
+     "2026-10-31T07:37:25Z attempt 2: fresh target directory /dev/shm/val-target-0e4; lost when the container restarted (~14:00Z wiped /dev/shm) before its binaries were used.",
+     "2026-10-31 attempt 3: 2026-10-31T14:17:06Z Finished `release` profile [optimized] target(s) in 12m 20s (started 2026-10-31T14:04:35Z); fresh target dir /dev/shm/val-target-0e4"
+    ],
+    "binaries": [
+     {
+      "name": "e30_audit (0e4fccce1)",
+      "sha256": "eae15491e0ac78e1f0fbb3b998aa6b97b56ab0b2e222b58ac7d2fa1723024abb",
+      "bytes": 4849944
+     },
+     {
+      "name": "quartic_pipeline_gls (0e4fccce1)",
+      "sha256": "0daf9e744bd5262c56de9eefde917e6ba2a8e8044eb340b314855f52ad9d85cb",
+      "bytes": 5815560
+     }
+    ]
+   }
+  ],
+  "run_command": "BIN_A=<e30_audit 0e4fccce1> BIN_P=<quartic_pipeline_gls 0e4fccce1> research/e30_invariants_lite_20261030/replay/replay.sh",
+  "environment": "Walk audit: serial. End to end: RAYON_NUM_THREADS=4 as in experiments/35_invariants_lite/run_e2e.sh, which fixes the target stream (§9.19)."
+ },
+ "build_record": {
+  "path": "replay/build.json",
+  "sha256": "51686d1922b732e906b3dd6efbd9e3cbe318b32012f12ee8593e943e40ccb74a"
+ },
+ "comparison": {
+  "path": "replay/replay_comparison.json",
+  "sha256": "7df1815c1f1006814f0d6135df77129fb10fcc9cc0af6ece2d8c96c196a97c53",
+  "rule": "every leaf of a against b: integers and floats by their text (equal text, or equal value with the same integer/float form; integers compared exactly as i128), strings and booleans exactly; wall_ms and solve_ms are wall-clock and listed, not compared"
+ },
+ "runs_total": 11,
+ "runs_matched": 11,
+ "fields_compared": 12281,
+ "fields_identical": 12281,
+ "coverage": "full: every recorded run replayed (the walk audit and all ten audited end-to-end runs, both arms each, 48 walks per arm); no sampling",
+ "scalar_verification": "Every replayed index-calculus arm (20) is solved and correct (Wiedemann logarithm checked against the planted d and [x]G = Q in the binary) and recovers E25's planted d as recorded by E27's walks; every in-process walk (960) is correct with the same d.",
+ "runs": [
+  {
+   "run": "walk_audit",
+   "committed": {
+    "path": "experiments/35_invariants_lite/walk_audit.json",
+    "sha256": "5bc698207dad6b04a5e49add4c2357eac473fe92281805acaeb1605b3b5320e4"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/walk_audit.json",
+    "sha256": "5bc698207dad6b04a5e49add4c2357eac473fe92281805acaeb1605b3b5320e4"
+   },
+   "fields_compared": 161,
+   "fields_identical": 161,
+   "mismatches": [],
+   "matched": true
+  },
+  {
+   "run": "e2e_audit_p101s1",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p101s1.json",
+    "sha256": "ef38bd38657ad4e276d7957ad524ca5ee1bb78ff01d14554929a7a0656a5ce6e"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p101s1.json",
+    "sha256": "68ca229128acaa39eab59bbebaebb01d4a730aec2cda19658ef662f2750672b3"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 1538068,
+     "walks_correct": 48,
+     "total_muls": 26964723596,
+     "ic_trivial_product_savings": 83252899
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 1538068,
+     "walks_correct": 48,
+     "total_muls": 13833208042,
+     "ic_trivial_product_savings": 42932977
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 209873.28271199804,
+     "b": 151696.76196900036
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 93495.512785,
+     "b": 57122.704922
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 104977.05205800071,
+     "b": 82500.76531199935
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 48159.063831,
+     "b": 30891.822382000002
+    }
+   ]
+  },
+  {
+   "run": "e2e_audit_p101s2",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p101s2.json",
+    "sha256": "9f4163f4c11e263cf6da2877116c46e441ab6b82b526c56bc39efd6f44784e8a"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p101s2.json",
+    "sha256": "5cdc65d06226c257c09ad2d169cd1cfe6ff3639ecf10fe13616424582fc0d857"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 557533,
+     "walks_correct": 48,
+     "total_muls": 9818244813,
+     "ic_trivial_product_savings": 30462302
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 557533,
+     "walks_correct": 48,
+     "total_muls": 4659726750,
+     "ic_trivial_product_savings": 14428219
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 74982.02989300038,
+     "b": 56523.99881700016
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 34493.923052,
+     "b": 20289.984704
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 36449.10295499996,
+     "b": 26831.576686999997
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 17004.923721,
+     "b": 10034.600961
+    }
+   ]
+  },
+  {
+   "run": "e2e_audit_p149s1",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p149s1.json",
+    "sha256": "9db35f55e70bc9a13deabf6b1cba90b0b097e44b0ab192bcd9efcd3a3d855c3e"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p149s1.json",
+    "sha256": "f5fbfb10121f9a49b0e6ea50db3d031489bb92ea9d2c0d7d9ac71e3412a71ec1"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 4914788,
+     "walks_correct": 48,
+     "total_muls": 228974148611,
+     "ic_trivial_product_savings": 714177289
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 4914788,
+     "walks_correct": 48,
+     "total_muls": 85999708286,
+     "ic_trivial_product_savings": 267783491
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 1400157.5989489737,
+     "b": 1327408.7917860232
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 583451.629404,
+     "b": 477875.122173
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 598324.825511005,
+     "b": 531264.1003519972
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 261662.18805,
+     "b": 186720.38247
+    }
+   ]
+  },
+  {
+   "run": "e2e_audit_p149s2",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p149s2.json",
+    "sha256": "a233d71f1beacc09ebc4cafe5f4d61b48349417ed5ca7313670c80bb50d14108"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p149s2.json",
+    "sha256": "b9357664b4c655a954e91ef66f7603adb4f7b1f9c97be450527de798855b21ec"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 2874927,
+     "walks_correct": 48,
+     "total_muls": 39561022727,
+     "ic_trivial_product_savings": 122888757
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 2874927,
+     "walks_correct": 48,
+     "total_muls": 22353365025,
+     "ic_trivial_product_savings": 69313307
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 306614.0736060027,
+     "b": 236957.19328500004
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 141156.216228,
+     "b": 84901.349154
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 179250.652215999,
+     "b": 132809.76781100026
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 82632.884581,
+     "b": 48274.828035
+    }
+   ]
+  },
+  {
+   "run": "e2e_audit_p197s1",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p197s1.json",
+    "sha256": "fd5a0a6b2cfd9a4c323eb6ae51661fe377c63c6f993265fb75bcbf9dfc9ae653"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p197s1.json",
+    "sha256": "e9e9338ceb6ff4768398da8f343f090398c958d621199eea4ab1810f9511d213"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 79622603,
+     "walks_correct": 48,
+     "total_muls": 33364322762,
+     "ic_trivial_product_savings": 103492297
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 79622603,
+     "walks_correct": 48,
+     "total_muls": 24750444620,
+     "ic_trivial_product_savings": 76667280
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 183485.90533499923,
+     "b": 207026.10866700023
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 69123.785466,
+     "b": 73867.907956
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 124195.89907599906,
+     "b": 155056.37138100035
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 45758.378878,
+     "b": 55493.121602
+    }
+   ]
+  },
+  {
+   "run": "e2e_audit_p197s2",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p197s2.json",
+    "sha256": "e9147534d721c27580ee7785d713c5599e804978e32b7c3a8ed939f8507d25ca"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p197s2.json",
+    "sha256": "1d41457edbc5d4d0a76f7d924cae54dd2a4779de30e24c475735a8d90fc95bc3"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 7399960,
+     "walks_correct": 48,
+     "total_muls": 17136680229,
+     "ic_trivial_product_savings": 53235195
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 7399960,
+     "walks_correct": 48,
+     "total_muls": 10121590489,
+     "ic_trivial_product_savings": 31453616
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 78675.78090599977,
+     "b": 107268.72389299986
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 28102.20922,
+     "b": 38714.711404
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 49181.55083699996,
+     "b": 65369.76696099992
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 18161.097712,
+     "b": 22291.431103
+    }
+   ]
+  },
+  {
+   "run": "e2e_audit_p269s1",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p269s1.json",
+    "sha256": "3dc855bd239067fe921b0ad16d8b1d51ed045cc37098da1622aa2215bda94e43"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p269s1.json",
+    "sha256": "40c6ce418d00181b0123790d995b65b7bc7d3134577f0e44a47ccd4ec7adcbdc"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 270725152,
+     "walks_correct": 48,
+     "total_muls": 53286038394,
+     "ic_trivial_product_savings": 166314803
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 270725152,
+     "walks_correct": 48,
+     "total_muls": 30691610728,
+     "ic_trivial_product_savings": 95747963
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 240904.72916800022,
+     "b": 343838.73360799527
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 84861.204449,
+     "b": 117932.33171500001
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 147457.77896399982,
+     "b": 189402.87161300253
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 52952.597202,
+     "b": 67266.833648
+    }
+   ]
+  },
+  {
+   "run": "e2e_audit_p269s2",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p269s2.json",
+    "sha256": "ab5cb1d84c884bc0b9113c10c2f5cf041e63a3f13a3a814c5437f4344dae3f18"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p269s2.json",
+    "sha256": "9a8ce46e57882718caa76d1428e27d6e8a93c5ed8e092ac5eb5bd73f4e6fc872"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 309622187,
+     "walks_correct": 48,
+     "total_muls": 19775127049,
+     "ic_trivial_product_savings": 61917778
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 309622187,
+     "walks_correct": 48,
+     "total_muls": 9773820165,
+     "ic_trivial_product_savings": 30593409
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 95369.79282200048,
+     "b": 127490.49876200054
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 34961.574544999996,
+     "b": 44285.969276
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 43121.78610099997,
+     "b": 61314.05756299998
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 15480.563565,
+     "b": 21411.775766000002
+    }
+   ]
+  },
+  {
+   "run": "e2e_audit_p397s1",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p397s1.json",
+    "sha256": "de1fd1031872ded4a8a3fb87413c1db294df47d803a0ff5e4eb97d6543292801"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p397s1.json",
+    "sha256": "02cde4edbbcb3dc2e89ec996971a9eb7ba5187df9149e7bb0bf0425afb60ab4d"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 1275612762,
+     "walks_correct": 48,
+     "total_muls": 27927862989,
+     "ic_trivial_product_savings": 86622831
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 1275612762,
+     "walks_correct": 48,
+     "total_muls": 16188662103,
+     "ic_trivial_product_savings": 50296007
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 174568.15125299979,
+     "b": 218438.52847000002
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 57978.083644,
+     "b": 74190.5022
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 102100.06625599983,
+     "b": 114004.26763700014
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 34489.732142,
+     "b": 38606.863861
+    }
+   ]
+  },
+  {
+   "run": "e2e_audit_p397s2",
+   "committed": {
+    "path": "experiments/35_invariants_lite/e2e_audit_p397s2.json",
+    "sha256": "9d25ae1a7eedb51f4bbb7bdb06d656b17cbc5af6a59bf7b5ed59a2a7a0c9ab2f"
+   },
+   "replay_output": {
+    "path": "research/e30_invariants_lite_20261030/replay/e2e/e2e_audit_p397s2.json",
+    "sha256": "d98a009b65bbc8f2f17d098d96ba2ed12b8aefe26f96e3b5aa083d80f1c5d380"
+   },
+   "fields_compared": 1212,
+   "fields_identical": 1212,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 1421554453,
+     "walks_correct": 48,
+     "total_muls": 51225062800,
+     "ic_trivial_product_savings": 159011780
+    },
+    {
+     "arm": "B",
+     "ic_solved_correct_equal_to_d": true,
+     "d": 1421554453,
+     "walks_correct": 48,
+     "total_muls": 22044076955,
+     "ic_trivial_product_savings": 68418132
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "a": 326316.9953660013,
+     "b": 398277.55229100276
+    },
+    {
+     "path": "$[0].wall_ms",
+     "a": 106875.926169,
+     "b": 133061.37913699998
+    },
+    {
+     "path": "$[1].solve_ms",
+     "a": 139331.52204199973,
+     "b": 161063.63646099975
+    },
+    {
+     "path": "$[1].wall_ms",
+     "a": 45929.182965,
+     "b": 54622.924561
+    }
+   ]
+  }
+ ]
+}

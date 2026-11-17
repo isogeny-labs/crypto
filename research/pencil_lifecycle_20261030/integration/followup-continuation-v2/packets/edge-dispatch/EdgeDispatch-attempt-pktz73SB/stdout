@@ -1,0 +1,37 @@
+/var/tmp/pencil-edge-dispatch-20261101-v1/EdgeDispatch.lean:40:11: error: Application type mismatch: The argument
+  hgood.left
+has type
+  Good r (after r { graph := s.graph, fixed := s.fixed } w ru pu pv su sv a b).1.graph
+but is expected to have type
+  Good r (run r s w sizes ru ru pu pv su sv a b).state.graph
+in the application
+  And.intro hgood.left
+/var/tmp/pencil-edge-dispatch-20261101-v1/EdgeDispatch.lean:40:22: error: Application type mismatch: The argument
+  hsafe
+has type
+  GraphSameRoot.Safe (outDecode r (after r { graph := s.graph, fixed := s.fixed } w ru pu pv su sv a b).2) k
+but is expected to have type
+  GraphSameRoot.Safe (outDecode r (run r s w sizes ru ru pu pv su sv a b).result) k
+in the application
+  And.intro hsafe
+/var/tmp/pencil-edge-dispatch-20261101-v1/EdgeDispatch.lean:42:31: error: Application type mismatch: The argument
+  h
+has type
+  (run r s w sizes ru ru pu pv su sv a b).state.fixed i = some ab
+but is expected to have type
+  (after r { graph := s.graph, fixed := s.fixed } w ru pu pv su sv a b).1.fixed i = some (ab.1, ab.2)
+in the application
+  hgood.right i ab.1 ab.2 h
+/var/tmp/pencil-edge-dispatch-20261101-v1/EdgeDispatch.lean:43:5: error: Type mismatch
+  hforest
+has type
+  GraphFind.Forest (decodeA r (after r { graph := s.graph, fixed := s.fixed } w ru pu pv su sv a b).1).graph rank
+but is expected to have type
+  GraphFind.Forest (unionDecode r (run r s w sizes ru ru pu pv su sv a b).state).graph rank
+/var/tmp/pencil-edge-dispatch-20261101-v1/EdgeDispatch.lean:44:5: error: Type mismatch
+  hvalid
+has type
+  GraphUnion.Valid (decodeA r (after r { graph := s.graph, fixed := s.fixed } w ru pu pv su sv a b).1) value k
+but is expected to have type
+  GraphUnion.Valid (unionDecode r (run r s w sizes ru ru pu pv su sv a b).state) value k
+/var/tmp/pencil-edge-dispatch-20261101-v1/EdgeDispatch.lean:47:19: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead

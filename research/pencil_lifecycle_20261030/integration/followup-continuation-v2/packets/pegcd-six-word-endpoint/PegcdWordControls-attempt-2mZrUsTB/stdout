@@ -1,0 +1,239 @@
+/var/tmp/pencil-pegcd-six-word-20261101-v1/PegcdWordControls.lean:17:1: error: Tactic `decide` failed for proposition
+  finish 17
+      { r0 := [2], r1 := [],
+        s0 :=
+          ScaleTrim.trimFuel
+            (ResidualWord.slots 17 [1]
+                (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))).length
+            (ResidualWord.slots 17 [1]
+              (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))),
+        s1 :=
+          ScaleTrim.trimFuel
+            (ResidualWord.slots 17 []
+                (List.map (PencilWordRefinement.wordNeg 17)
+                  (ProductPolynomial.product 17 [9, 9]
+                    (ScaleTrim.trimFuel
+                      (ResidualWord.slots 17 [1]
+                          (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))).length
+                      (ResidualWord.slots 17 [1]
+                        (List.map (PencilWordRefinement.wordNeg 17)
+                          (ProductPolynomial.product 17 [16, 1] []))))))).length
+            (ResidualWord.slots 17 []
+              (List.map (PencilWordRefinement.wordNeg 17)
+                (ProductPolynomial.product 17 [9, 9]
+                  (ScaleTrim.trimFuel
+                    (ResidualWord.slots 17 [1]
+                        (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))).length
+                    (ResidualWord.slots 17 [1]
+                      (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))))))),
+        t0 :=
+          ScaleTrim.trimFuel
+            (ResidualWord.slots 17 []
+                (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))).length
+            (ResidualWord.slots 17 []
+              (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))),
+        t1 :=
+          ScaleTrim.trimFuel
+            (ResidualWord.slots 17 [1]
+                (List.map (PencilWordRefinement.wordNeg 17)
+                  (ProductPolynomial.product 17 [9, 9]
+                    (ScaleTrim.trimFuel
+                      (ResidualWord.slots 17 []
+                          (List.map (PencilWordRefinement.wordNeg 17)
+                            (ProductPolynomial.product 17 [16, 1] [1]))).length
+                      (ResidualWord.slots 17 []
+                        (List.map (PencilWordRefinement.wordNeg 17)
+                          (ProductPolynomial.product 17 [16, 1] [1]))))))).length
+            (ResidualWord.slots 17 [1]
+              (List.map (PencilWordRefinement.wordNeg 17)
+                (ProductPolynomial.product 17 [9, 9]
+                  (ScaleTrim.trimFuel
+                    (ResidualWord.slots 17 []
+                        (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))).length
+                    (ResidualWord.slots 17 []
+                      (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))))))) } =
+    some ([1], [9], [9, 8])
+because its `Decidable` instance
+  (finish 17
+        { r0 := [2], r1 := [],
+          s0 :=
+            ScaleTrim.trimFuel
+              (ResidualWord.slots 17 [1]
+                  (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))).length
+              (ResidualWord.slots 17 [1]
+                (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))),
+          s1 :=
+            ScaleTrim.trimFuel
+              (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 [9, 9]
+                      (ScaleTrim.trimFuel
+                        (ResidualWord.slots 17 [1]
+                            (List.map (PencilWordRefinement.wordNeg 17)
+                              (ProductPolynomial.product 17 [16, 1] []))).length
+                        (ResidualWord.slots 17 [1]
+                          (List.map (PencilWordRefinement.wordNeg 17)
+                            (ProductPolynomial.product 17 [16, 1] []))))))).length
+              (ResidualWord.slots 17 []
+                (List.map (PencilWordRefinement.wordNeg 17)
+                  (ProductPolynomial.product 17 [9, 9]
+                    (ScaleTrim.trimFuel
+                      (ResidualWord.slots 17 [1]
+                          (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))).length
+                      (ResidualWord.slots 17 [1]
+                        (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))))))),
+          t0 :=
+            ScaleTrim.trimFuel
+              (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))).length
+              (ResidualWord.slots 17 []
+                (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))),
+          t1 :=
+            ScaleTrim.trimFuel
+              (ResidualWord.slots 17 [1]
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 [9, 9]
+                      (ScaleTrim.trimFuel
+                        (ResidualWord.slots 17 []
+                            (List.map (PencilWordRefinement.wordNeg 17)
+                              (ProductPolynomial.product 17 [16, 1] [1]))).length
+                        (ResidualWord.slots 17 []
+                          (List.map (PencilWordRefinement.wordNeg 17)
+                            (ProductPolynomial.product 17 [16, 1] [1]))))))).length
+              (ResidualWord.slots 17 [1]
+                (List.map (PencilWordRefinement.wordNeg 17)
+                  (ProductPolynomial.product 17 [9, 9]
+                    (ScaleTrim.trimFuel
+                      (ResidualWord.slots 17 []
+                          (List.map (PencilWordRefinement.wordNeg 17)
+                            (ProductPolynomial.product 17 [16, 1] [1]))).length
+                      (ResidualWord.slots 17 []
+                        (List.map (PencilWordRefinement.wordNeg 17)
+                          (ProductPolynomial.product 17 [16, 1] [1]))))))) }).instDecidableEq
+    (some ([1], [9], [9, 8]))
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqFin`, `instDecidableEqList`, `instDecidableEqNat`, `instDecidableEqProd`, `instDecidableEqUInt64`, `BitVec.decEq`, `List.hasDecEq`, `Nat.decEq`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match
+    scale 17 (WideModPow.inverseGenerator 17 ([2].getLast ⋯))
+      { r0 := [2], r1 := [],
+          s0 :=
+            ScaleTrim.trimFuel
+              (ResidualWord.slots 17 [1]
+                  (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))).length
+              (ResidualWord.slots 17 [1]
+                (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))),
+          s1 :=
+            ScaleTrim.trimFuel
+              (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 [9, 9]
+                      (ScaleTrim.trimFuel
+                        (ResidualWord.slots 17 [1]
+                            (List.map (PencilWordRefinement.wordNeg 17)
+                              (ProductPolynomial.product 17 [16, 1] []))).length
+                        (ResidualWord.slots 17 [1]
+                          (List.map (PencilWordRefinement.wordNeg 17)
+                            (ProductPolynomial.product 17 [16, 1] []))))))).length
+              (ResidualWord.slots 17 []
+                (List.map (PencilWordRefinement.wordNeg 17)
+                  (ProductPolynomial.product 17 [9, 9]
+                    (ScaleTrim.trimFuel
+                      (ResidualWord.slots 17 [1]
+                          (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))).length
+                      (ResidualWord.slots 17 [1]
+                        (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] []))))))),
+          t0 :=
+            ScaleTrim.trimFuel
+              (ResidualWord.slots 17 []
+                  (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))).length
+              (ResidualWord.slots 17 []
+                (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))),
+          t1 :=
+            ScaleTrim.trimFuel
+              (ResidualWord.slots 17 [1]
+                  (List.map (PencilWordRefinement.wordNeg 17)
+                    (ProductPolynomial.product 17 [9, 9]
+                      (ScaleTrim.trimFuel
+                        (ResidualWord.slots 17 []
+                            (List.map (PencilWordRefinement.wordNeg 17)
+                              (ProductPolynomial.product 17 [16, 1] [1]))).length
+                        (ResidualWord.slots 17 []
+                          (List.map (PencilWordRefinement.wordNeg 17)
+                            (ProductPolynomial.product 17 [16, 1] [1]))))))).length
+              (ResidualWord.slots 17 [1]
+                (List.map (PencilWordRefinement.wordNeg 17)
+                  (ProductPolynomial.product 17 [9, 9]
+                    (ScaleTrim.trimFuel
+                      (ResidualWord.slots 17 []
+                          (List.map (PencilWordRefinement.wordNeg 17)
+                            (ProductPolynomial.product 17 [16, 1] [1]))).length
+                      (ResidualWord.slots 17 []
+                        (List.map (PencilWordRefinement.wordNeg 17)
+                          (ProductPolynomial.product 17 [16, 1] [1]))))))) }.s0 with
+  | [] =>
+    match [9] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [9] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯
+/var/tmp/pencil-pegcd-six-word-20261101-v1/PegcdWordControls.lean:16:86: warning: This simp argument is unused:
+  ResidualWord.slots
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [w2, w1, w0, advance, initial, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-pegcd-six-word-20261101-v1/PegcdWordControls.lean:20:1: error: Tactic `decide` failed for proposition
+  ScaleTrim.trimFuel
+        (ResidualWord.slots 17 []
+            (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))).length
+        (ResidualWord.slots 17 []
+          (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))) =
+      [1, 16] ∧
+    ¬ScaleTrim.trimFuel
+          (ResidualWord.slots 17 []
+              (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))).length
+          (ResidualWord.slots 17 []
+            (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))) =
+        [16, 1]
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `instDecidableAnd` and `instDecidableEqList`, reduction got stuck at the `Decidable` instance
+  match
+    ScaleTrim.trimFuel
+      (ResidualWord.slots 17 []
+          (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))).length
+      (ResidualWord.slots 17 []
+        (List.map (PencilWordRefinement.wordNeg 17) (ProductPolynomial.product 17 [16, 1] [1]))) with
+  | [] =>
+    match [1, 16] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [1, 16] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯
+/var/tmp/pencil-pegcd-six-word-20261101-v1/PegcdWordControls.lean:19:83: warning: This simp argument is unused:
+  ResidualWord.slots
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [w1, w0, advance, initial, ResidualWord.psub, ResidualWord.padd, ResidualWord.pneg]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

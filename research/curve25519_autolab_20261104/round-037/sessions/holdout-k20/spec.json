@@ -1,0 +1,82 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wsum:coef=15,free=1",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "inc",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "sel",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wsum:coef=15,free=1",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "inc-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    }
+  ],
+  "description": "research/curve25519_autolab_20261104/round-037/PROTOCOL.md (frozen before data), fresh holdout: sel = tw2l-x20-j16-n2 (prime-projected-abscissa:size=2,scan_cap=32 + wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run). Public synthetic Curve25519-family miniature and targets; no security claim.",
+  "label": "ic_autolab round 37 holdout, generic track, k = 20",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 4,
+    "seed": 2026147927,
+    "timeout_seconds": 1800,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 63700,
+        "b": 872826,
+        "group_order": 1049624,
+        "gx": 349837,
+        "gy": 122,
+        "kind": "prime_explicit",
+        "p": 1048573,
+        "r": 131203
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026147920,
+    "targets_per_curve": 64
+  }
+}

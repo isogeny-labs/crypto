@@ -1,0 +1,32 @@
+flowchart LR
+  subgraph g1p["GF(p), p odd — EFD g1p — 471 formulas, 33 charts"]
+    direction LR
+    m_2dik_g1p["2dik<br/>y^2=x^3+a*x^2+16*a*x<br/>1 chart"]
+    m_3dik_g1p["3dik<br/>y^2=x^3+3*a*(x+1)^2<br/>1 chart"]
+    m_edwards_g1p["edwards<br/>x^2+y^2=c^2(1+d*x^2*y^2)<br/>4 charts"]
+    m_hessian_g1p["hessian<br/>x^3+y^3+1=3*d*x*y<br/>2 charts"]
+    m_jintersect_g1p["jintersect<br/>s^2+c^2=1, a*s^2+d^2=1<br/>2 charts"]
+    m_jquartic_g1p["jquartic<br/>y^2=x^4+2*a*x^2+1<br/>6 charts"]
+    m_montgom_g1p["montgom<br/>b*y^2=x^3+a*x^2+x<br/>1 chart"]
+    m_shortw_g1p["shortw<br/>y^2=x^3+ax+b<br/>11 charts"]
+    m_twisted_g1p["twisted<br/>a*x^2+y^2=1+d*x^2*y^2<br/>4 charts"]
+    m_twistedhessian_g1p["twistedhessian<br/>a*x^3+y^3+1=d*x*y<br/>1 chart"]
+    m_2dik_g1p -.->|identity u=x, v=y| m_shortw_g1p
+    m_3dik_g1p -.->|identity u=x, v=y| m_shortw_g1p
+    m_edwards_g1p -->|rational map| m_shortw_g1p
+    m_hessian_g1p -->|rational map| m_shortw_g1p
+    m_jintersect_g1p -->|rational map| m_shortw_g1p
+    m_jquartic_g1p -->|rational map| m_shortw_g1p
+    m_montgom_g1p -.->|identity u=x, v=y| m_shortw_g1p
+    m_twisted_g1p -->|rational map| m_shortw_g1p
+    m_twistedhessian_g1p -->|rational map| m_shortw_g1p
+  end
+  subgraph g12o["GF(2^m) — EFD g12o — 135 formulas, 19 charts"]
+    direction LR
+    m_edwards_g12o["edwards<br/>x^2+y^2=c^2(1+d*x^2*y^2)<br/>8 charts"]
+    m_hessian_g12o["hessian<br/>x^3+y^3+1=3*d*x*y<br/>1 chart"]
+    m_shortw_g12o["shortw<br/>y^2=x^3+ax+b<br/>10 charts"]
+    m_edwards_g12o -->|rational map| m_shortw_g12o
+    m_hessian_g12o -->|rational map| m_shortw_g12o
+  end
+  m_shortw_g1p -. no conversion (different characteristic) .- m_shortw_g12o

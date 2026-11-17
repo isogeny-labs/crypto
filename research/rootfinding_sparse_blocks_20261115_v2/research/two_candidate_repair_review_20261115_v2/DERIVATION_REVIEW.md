@@ -1,0 +1,9 @@
+# Derivation review
+
+For B!=0, z outside additive V and b=h²+h+z in V, h!=0,1. H=(X+b)(X+a)^4 iff H3=H2=0, H0=bH1, H1=a^4 with a inV. e2=0 gives r²+hr+K=0, K=k+h²A+zb. Write r=hu: u²+u=K/h². Over odd n, trace-zero iff solvable and halftrace yields one root, second differs by1. Over even n the full F2 matrix has kernel{0,1} and rankn-1; Gaussian records complete independent kernel and particular. e3=0 forces s=(kr+k²)/h. Each candidate literal norm is rebuilt; exact shape/source-product tests are necessary and sufficient. Inverse fourth Frobenius is repeated squaring n-2 modn; includes n2. Every distinct source ordering is retained by permutations+set, preserving repeated/zero/equal sources.
+
+The prefix Gaussian translates H by b; since b is inV this changes (b,a,a,a,a) into (0,a+b,a+b,a+b,a+b), and fourth-image support is equivalent. Nonprefix Gaussian packs untranslated H3,H2,H0+bH1 and fourth-image residual. At fixed b all maps are F2-linear. Exact pivot combinations, contradiction, independent full kernel and particular replay support completeness.
+
+For k0, N'=(h²+h)X4+hsX² and factorization gives (z+b)(X+a)^4. Nonzero h²+h forces a0 and s0. Nconstant=t² forces t0; target gives r=z+hy/z. Curve equation makes e2=h²B/z²!=0, contradiction. This closes only the4+1 branch, not global source tuples. Affine centroid of (b,a,a,a,a) is b, so differences span atmost1: all coverage overlaps old affine rank1.
+
+Costs are bounded tiny exhaustive r/s and ordered-source controls; direct per-cell has atmost2 parameter candidates with <=120 source orders each, not a global h/k bound. Profile/actual repeated-run gains and full-original-root closure remain untested. GF8 fixture count proof: for A1/B1, #E(F2)=2, t1=1, t3=-5, hence #E(F8)=14. Ramified x0 plus6 paired nonzero abscissas gives7 finite abscissas, guaranteeing target outside either size2/4 domain. Old A0/B1 has #E(F8)=4, x0/1 only.

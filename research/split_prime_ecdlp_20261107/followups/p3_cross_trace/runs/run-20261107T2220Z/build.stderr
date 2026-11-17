@@ -1,0 +1,39 @@
+warning: fields `p_mod` and `pr` are never read
+  --> src/cov.rs:18:9
+   |
+16 | pub struct PerL {
+   |            ---- fields in this struct
+17 |     pub l: u64,
+18 |     pub p_mod: u64,
+   |         ^^^^^
+19 |     pub ps: f64,
+20 |     pub pr: f64,
+   |         ^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `on_curve` is never used
+  --> src/ec.rs:40:12
+   |
+35 | impl Curve {
+   | ---------- method in this implementation
+...
+40 |     pub fn on_curve(&self, pt: Pt) -> bool {
+   |            ^^^^^^^^
+
+warning: function `padd` is never used
+  --> src/poly.rs:13:8
+   |
+13 | pub fn padd(a: &Poly, b: &Poly, p: u64) -> Poly {
+   |        ^^^^
+
+warning: field `l` is never read
+  --> src/selftest.rs:21:13
+   |
+20 |     pub struct Ref {
+   |                --- field in this struct
+21 |         pub l: u64,
+   |             ^
+
+warning: `p3census` (bin "p3census") generated 4 warnings
+    Finished `release` profile [optimized] target(s) in 0.01s

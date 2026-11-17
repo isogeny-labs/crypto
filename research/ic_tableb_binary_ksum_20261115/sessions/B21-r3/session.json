@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h8f13db3aa574",
+  "label": "ic_tableb_binary_ksum_20261115 random-binary-n21-b1b6f3b replicate 3",
+  "spec_id": "ECS1h4c80a0f86197",
+  "spec_sha256": "4c80a0f8619776d8fa233f02488f7c37a331f90221bc66ee1978a1f21362697e",
+  "env_class_id": "ECBENV3h4c00cb718a45",
+  "host_sha256": "beae6769a77a2c77e07f210641b1fc7a4def477df38ab188c902f5521ce61756",
+  "plan_sha256": "5e294a107dc63c9bdea76bf438677ec989d4ce1a9369d97e17e18d402bae3feb",
+  "binary_sha256": "bc96a44a3342d24569e7f2bbe7e24e55400eda47d955960e766ae66df3e08f8d",
+  "git_commit": "77bc2141984f3279d854e51f444d8dc1ac0f23ee",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794763957702,
+  "finished_unix_ms": 1794763971910,
+  "status": "complete",
+  "executions_planned": 1728,
+  "records_written": 1728,
+  "records_sha256": "c7e71a70b34b3c3a5fd24fe38790c4a82f9d94fdaff150ed12d6be48786e84b5",
+  "status_counts": {
+    "verified": 1728
+  },
+  "last_seq": 1727
+}

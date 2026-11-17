@@ -1,0 +1,4736 @@
+{
+  "config": {
+    "a": 1,
+    "include_cnf": false,
+    "l": 4,
+    "n": 13,
+    "prefix": "",
+    "satisfiable": 60,
+    "seed": 7,
+    "unsatisfiable": 60
+  },
+  "formats": {
+    "<name>.anf": "one GF(2) polynomial per line in the shared variable naming",
+    "<name>.cnf": "the same system with every parity row Tseitin-expanded to clauses",
+    "<name>.dimacs": "DIMACS CNF with native parity rows as `x` lines (CryptoMiniSat / WDSat convention)",
+    "<name>.magma": "the system as a Magma script computing its Groebner basis",
+    "INFO<name>": "curve, modulus, target abscissa, certified label, planted witness and its SAT assignment, encoding sizes"
+  },
+  "instances": [
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1360
+      },
+      "blake3": {
+        "anf": "5ead27c99558072cad2d53e96f28d7732d13412f8c549f8124e5c55a55998ded",
+        "dimacs_cnf": "22b75decd1f9eb08eb5fd16a62977ff11d56651d223893f084ca932235afaf2a",
+        "dimacs_xor": "ec2e9e449554c69e9d9b0a9b94e09c404ebcc2f2933953334718da0ba04baf69",
+        "magma": "bff28889b02cc14e8785e1403ee9869fb3d47a0977498617b78de819c91df749"
+      },
+      "dimacs_cnf": {
+        "bytes": 171330,
+        "clauses": 7679,
+        "variables": 935,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14651,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-1-S",
+      "planted": [
+        "0x4",
+        "0xa",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        6,
+        8,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x379"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1353
+      },
+      "blake3": {
+        "anf": "976851452d3902e995a6fa627a4528f81363e78be14a8cbcf2ac2354b38a7160",
+        "dimacs_cnf": "b6ad4f3be9e2550d723c44bdf7dca94fe507d5681812beb6dd56a62aae7c1ca9",
+        "dimacs_xor": "2b528c8b281074918bfb8e9c920cd4c0d45bfd19322e84c5dd92028c39392294",
+        "magma": "5ed967d7e46c7bcf7fc9db22bef6bc22bfb74b05c5e1510f2ca492da046120ea"
+      },
+      "dimacs_cnf": {
+        "bytes": 170720,
+        "clauses": 7647,
+        "variables": 931,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14640,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-2-S",
+      "planted": [
+        "0xe",
+        "0x2",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        3,
+        4,
+        6,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1adb"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1269
+      },
+      "blake3": {
+        "anf": "96dcfa74339929f8e3b91a47cbd8e7abeb09e0072793904ec9bf840019f82e72",
+        "dimacs_cnf": "75355985a79ce1a4b865b587ec23ad17574b058feb28912f4a6c1ff89c8adb3c",
+        "dimacs_xor": "2ce33bf273e430394654cc214070a78cc17a73a4c39d8301e6b23e55d2bb1c98",
+        "magma": "419d91f0c76750d4221ad681a59a0b09cad1118e06fc79e99350c14d52d018cb"
+      },
+      "dimacs_cnf": {
+        "bytes": 160334,
+        "clauses": 7209,
+        "variables": 890,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14323,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-3-S",
+      "planted": [
+        "0xa",
+        "0x2",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        6,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0xec"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1228
+      },
+      "blake3": {
+        "anf": "ae1b8374edff309991da0e7879662eacdffa1ea16884b181607255e098c604bf",
+        "dimacs_cnf": "3973c882f86e013a607ab9ebe27f9e36b217fc1d66d45c63f67c2c7e366e8b62",
+        "dimacs_xor": "82ac76aa7504c39f623bd89035983ef0ec52650cc21f91e643e981082e8b2402",
+        "magma": "f8738141de73e043fd07bdd4d2fee8b5cb532fa343283d6846bd76f7bdf867b0"
+      },
+      "dimacs_cnf": {
+        "bytes": 154402,
+        "clauses": 6989,
+        "variables": 869,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14133,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-4-S",
+      "planted": [
+        "0xc",
+        "0x2",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        4,
+        6,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0xc90"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 782
+      },
+      "blake3": {
+        "anf": "82255337c5eb247c7ef15c2db1fb9242a7d7c1527dcf6fa48dc33981c2556324",
+        "dimacs_cnf": "b598c1129837de00736929021ab0a9046803688800ab2c5e23054191c6930a2d",
+        "dimacs_xor": "69fcf0f854668e2e22b56fdb18bb213b808357d1bdc29769c320bc4f8eb925f8",
+        "magma": "b312e2bc1381dc358d275d899a4673d458a4f3e23fe08b279e60946ed1ecd2be"
+      },
+      "dimacs_cnf": {
+        "bytes": 97950,
+        "clauses": 4646,
+        "variables": 649,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 12426,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-5-S",
+      "planted": [
+        "0xa",
+        "0xa",
+        "0x2"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        6,
+        8,
+        10
+      ],
+      "satisfiable": true,
+      "x_r": "0x2"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 984
+      },
+      "blake3": {
+        "anf": "66f3b13e7c86ea34d8662210088ac30d5265a334e681c0f10c65f5b88a795d30",
+        "dimacs_cnf": "7737ef7ba2f8811c672a9b64c0780b44551e0e9d3cb6cce6c77c3e8af23fd1e0",
+        "dimacs_xor": "7346c7fb7e9f5eddb21cd54a3b612477d82a79057b2677249d49772f9067d638",
+        "magma": "98ee5f8c89c201934297b1f7dd6422b872d4b52c26f0cd93405650dd997a1b20"
+      },
+      "dimacs_cnf": {
+        "bytes": 123550,
+        "clauses": 5709,
+        "variables": 750,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13206,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-6-S",
+      "planted": [
+        "0x9",
+        "0x2",
+        "0x2"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        6,
+        10
+      ],
+      "satisfiable": true,
+      "x_r": "0x9"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1260
+      },
+      "blake3": {
+        "anf": "d773414fc04d52bc8dfe44efcd5953404d61bb0d64af5634e5e7cdaff3c3f5b1",
+        "dimacs_cnf": "1434b295604b42fa4ad96f8acc2ca155d4660a052d3125341e66b50814aef356",
+        "dimacs_xor": "d80f0f4c1e907170614f9dacffd9710aa807c79e95442ee57129298703ab2ad8",
+        "magma": "15288cb66484d6c15801da221bc46be877d791f48195f6a4a294a8de18f15d5d"
+      },
+      "dimacs_cnf": {
+        "bytes": 158668,
+        "clauses": 7154,
+        "variables": 885,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14285,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-7-S",
+      "planted": [
+        "0xa",
+        "0x2",
+        "0xc"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        6,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x150c"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1338
+      },
+      "blake3": {
+        "anf": "677f0861d93268122083af6ecbce64daa8ea9cbbdabfe26c1f2bf6236fdfa250",
+        "dimacs_cnf": "f4443d954a1fe3975d2ebacf9e7c1a619433d6bd4d2142b44640da0a9c9a794f",
+        "dimacs_xor": "3458c97597fa2c4344f895696b28fd161f940549c61777a00e26933e777484c1",
+        "magma": "8af29338cfec8640e0f2aaef2207d26dbe1f0a47d2291c6674b304519d661c55"
+      },
+      "dimacs_cnf": {
+        "bytes": 168992,
+        "clauses": 7579,
+        "variables": 924,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14582,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-8-S",
+      "planted": [
+        "0x2",
+        "0xe",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        6,
+        7,
+        8,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x163b"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1341
+      },
+      "blake3": {
+        "anf": "342b0f9b0b4d13e23d824504fce9fa881850e683e0e54daf4ebf5f978a2c7a5c",
+        "dimacs_cnf": "1bc27c159082e1b22c2dd94299721b51017d1b93c3d6b6cd360727d62ff6e524",
+        "dimacs_xor": "7d9bc9e005e2f5a2a2f570dec84f54b036cd78dafd4bb700b9d25d686342d890",
+        "magma": "d99ceee6e0e606d818b25d86ddd6dd76abdf81a32ae2db0cad22c5a21bc1b29d"
+      },
+      "dimacs_cnf": {
+        "bytes": 168750,
+        "clauses": 7568,
+        "variables": 924,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14581,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-9-S",
+      "planted": [
+        "0x9",
+        "0xa",
+        "0x2"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        6,
+        8,
+        10
+      ],
+      "satisfiable": true,
+      "x_r": "0xe1e"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1308
+      },
+      "blake3": {
+        "anf": "4a6b9b2992430dbea15c2d5d7241f32f587abb664fc8e83a304bc1faa324b370",
+        "dimacs_cnf": "9269a9bf2d0afb6c49c5e374cca99fec39af82672cb4f1358f0b63bad59efe70",
+        "dimacs_xor": "a268d19c9a87b92cf534a29c38c87472675237705468b6cd9b562f7f74cdb536",
+        "magma": "f11eec296f4f2d08944ce469c21f7b9f3b3fa9a688c1a0aea0265f5e911e6d4c"
+      },
+      "dimacs_cnf": {
+        "bytes": 164347,
+        "clauses": 7392,
+        "variables": 908,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14443,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-10-S",
+      "planted": [
+        "0xa",
+        "0xc",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        7,
+        8,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x12c2"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1334
+      },
+      "blake3": {
+        "anf": "8c86e28a9079ac0262a8f7048af9806553ccda9a2221ab79c84992282aac6ef5",
+        "dimacs_cnf": "b88c18634c40bd6986808b8b329b57831602205f7fed075a74d14e6f14c8fe26",
+        "dimacs_xor": "52687378de3534ba81697339796bdd5bf6865d3a8a98d922f933b8716dbb86aa",
+        "magma": "d991d410a68d31d9152a119d75de238d68d9e9281f4cbfe237ab6bfcff173a5d"
+      },
+      "dimacs_cnf": {
+        "bytes": 167850,
+        "clauses": 7536,
+        "variables": 921,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14549,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-11-S",
+      "planted": [
+        "0x9",
+        "0xc",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        7,
+        8,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x14fb"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1262
+      },
+      "blake3": {
+        "anf": "9c630b36d1707ac931cbb903b556864112d500f97fb07debd4381a50d2d1b1f1",
+        "dimacs_cnf": "4db3039b64d5d0050ed8be77e976c2963cf31c9a1f45e80c769bc173c05dbe1b",
+        "dimacs_xor": "4bdf1d2c1cb496437a4061c78f5b46a2c8ad8082fb1b1de9d1373b2c01d72dec",
+        "magma": "38effbb37a056c9f630680718da4233d0e13d944e23f76fcce674a1a866b82b2"
+      },
+      "dimacs_cnf": {
+        "bytes": 158606,
+        "clauses": 7148,
+        "variables": 884,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14264,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-12-S",
+      "planted": [
+        "0xe",
+        "0x4",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        3,
+        4,
+        7,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x51c"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1133
+      },
+      "blake3": {
+        "anf": "717a87160b574eec4aedb578c93788bc4899f8a359512edd9f20ed26b51038ff",
+        "dimacs_cnf": "2dfca8649e7ec02fa6dbf987727fb63a2a25cff92b1e524ac4028396c8ef8bd2",
+        "dimacs_xor": "b8919dd54e3119d0f922bd7e760da73b347e929525ab40bbbde6db3262362ef1",
+        "magma": "6589f1cf7a3a5285f27b0502e086766f4bc63cd30a95c18156b89589e903973f"
+      },
+      "dimacs_cnf": {
+        "bytes": 142024,
+        "clauses": 6464,
+        "variables": 820,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13774,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-13-S",
+      "planted": [
+        "0x4",
+        "0xa",
+        "0xc"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        6,
+        8,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1ff9"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1065
+      },
+      "blake3": {
+        "anf": "c7044e2b5a57d1d1a12b81e2389dd86277705360e42af341c84ffa1636fecc8a",
+        "dimacs_cnf": "46122d0732f3d454de4e3adc7a8d904439f37ccc78d98ff0b09bcc5b553d0412",
+        "dimacs_xor": "bb8d5cc893df8e98fb5e353a7a163c9d29aeea5e7b3e8ada1b199ad194d83fa6",
+        "magma": "8d57ccc818f5270f301a19d48bd90e30b38459836ff5a84a61323567eea6f71c"
+      },
+      "dimacs_cnf": {
+        "bytes": 132988,
+        "clauses": 6098,
+        "variables": 789,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13502,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-14-S",
+      "planted": [
+        "0x2",
+        "0xe",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        6,
+        7,
+        8,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1e09"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1306
+      },
+      "blake3": {
+        "anf": "182c837579a6b40db7a7917f8b079967ccc26cb5255361a0bbd8ee18faa08a0f",
+        "dimacs_cnf": "7fec24073eb329321bd84701de29053e940abb5befa7dc4c08552583cd837d05",
+        "dimacs_xor": "db1c03aade4066420833a59b81450696b0b2d7db5171b31505a7c6f2aa761e42",
+        "magma": "6739b34679599697989fb9602ab764dcae8c4bdb4f0dba62289f6ffbd1acc664"
+      },
+      "dimacs_cnf": {
+        "bytes": 163976,
+        "clauses": 7366,
+        "variables": 907,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14451,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-15-S",
+      "planted": [
+        "0xa",
+        "0x9",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        5,
+        8,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0xcf5"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1145
+      },
+      "blake3": {
+        "anf": "a8ea15c3a9bfa03736deac18f3f6529da90f4c7a1ff103b74b5b4112ac3f51fe",
+        "dimacs_cnf": "9498920f20f19f3c507c51b2c454844043df851bef9a5b24a2ef5a7698b32e25",
+        "dimacs_xor": "5cecb91b8ebdb7a4138007a6cb197a0316298295bf50b6610494463784592af8",
+        "magma": "4bb1c597c2243d5bc19bd807becd4632ae41a5c065efd7bb6582cfba6629ee3c"
+      },
+      "dimacs_cnf": {
+        "bytes": 143987,
+        "clauses": 6548,
+        "variables": 829,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13843,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-16-S",
+      "planted": [
+        "0xe",
+        "0xa",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        3,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0xa"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1299
+      },
+      "blake3": {
+        "anf": "c0d2dc4dfefb3323399acc1c6d3d8c70fce7df8e6b70cd6202485c8d68bb7bf0",
+        "dimacs_cnf": "d7f16be4dae4f897268e90cc836dde346f3f4d06e6a529e2965e8c2ae969fb1e",
+        "dimacs_xor": "13b9cdf076ffe7ce170e7a2bfea000c20147cbb210615bf77ee4e110ead98b86",
+        "magma": "5a232503070e5d4dc1f24aaf8670293a06c2a78544f17c04c1070c6061113d0c"
+      },
+      "dimacs_cnf": {
+        "bytes": 163975,
+        "clauses": 7370,
+        "variables": 905,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14426,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-17-S",
+      "planted": [
+        "0x9",
+        "0x2",
+        "0xc"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        6,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x7d6"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1360
+      },
+      "blake3": {
+        "anf": "970d9093a1fbf1aa23b76972e20b12fb02dfc5c858ec2d89793389a64a248a41",
+        "dimacs_cnf": "11e448f1abbaacbe314fd8fa89616bb737c2148b959cdd31954a16422537ad48",
+        "dimacs_xor": "e9f0d3a1cd5c074e53a183bc2d7c95236c05502c36bcca4ae180142b30e81f30",
+        "magma": "77d21392d13a52cf9886ea11bc3cbe34631776c8c64af67995c4ccff11b6e4fd"
+      },
+      "dimacs_cnf": {
+        "bytes": 171810,
+        "clauses": 7693,
+        "variables": 936,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14666,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-18-S",
+      "planted": [
+        "0x9",
+        "0xc",
+        "0xc"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        7,
+        8,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0xca7"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1228
+      },
+      "blake3": {
+        "anf": "f20b03b48c91c2e91e8cdc142c1f730eab955c54d2a3962ee330823dd4255989",
+        "dimacs_cnf": "bf3ab6252190b19521a9b5a1040fe2dfdac52b995039a3a488d99dbd3354185a",
+        "dimacs_xor": "edb30d62427fd68e0e1845217544bb13e7b6a2a48eb5db87f12c43dc62d1ea81",
+        "magma": "174b4f7efeb8f4635d4186b7bfaf03daeb25915e8f74b905411208081a983a2d"
+      },
+      "dimacs_cnf": {
+        "bytes": 153968,
+        "clauses": 6966,
+        "variables": 869,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14141,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-19-S",
+      "planted": [
+        "0xa",
+        "0x2",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        6,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x5d5"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1177
+      },
+      "blake3": {
+        "anf": "ace5f9da058cce6e8436252700ae70a4cd471271b15dd33c584162c35ac79d37",
+        "dimacs_cnf": "5bda5981a86b5def56f604e88bea19e51661a58787c4019efdf5348318162dd5",
+        "dimacs_xor": "ae326e0ef65c247946894fe8580b046e94b45e3310a033a4e0f98f8a57b1468a",
+        "magma": "0b7ed2a8ff5c6c74f1dd9f9ada6de827f8c0208c0dd3fd6cc967052f27d98bcb"
+      },
+      "dimacs_cnf": {
+        "bytes": 148469,
+        "clauses": 6731,
+        "variables": 844,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13959,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-20-S",
+      "planted": [
+        "0xc",
+        "0x4",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        4,
+        7,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x18e8"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1276
+      },
+      "blake3": {
+        "anf": "8f7e1889443d4dbf6f8dfc4e078dd8461e586824d085747d246a4db84c804f4f",
+        "dimacs_cnf": "67c0131affb1db8a89200a7863b682d57f02d16588ef911776531b3d70db40c2",
+        "dimacs_xor": "d1211a5cd921b4c42fe4fa3c378a95b61a37e7035fa8aa9216f39e42d9312681",
+        "magma": "29b5192b243978fb4c54d25a5213f1bd808c1282412bf0a376667520413fb928"
+      },
+      "dimacs_cnf": {
+        "bytes": 161232,
+        "clauses": 7267,
+        "variables": 893,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14319,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-21-S",
+      "planted": [
+        "0xc",
+        "0x2",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        4,
+        6,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x968"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1213
+      },
+      "blake3": {
+        "anf": "3d0e20125d27290c93a3a5dba8cdf843a8c4d867ba669380fc4ea11d7da1856c",
+        "dimacs_cnf": "f4c53b621519ea2d6489c748cdb1c34ecb6f4fa1482a60b29bc9933b0886ca8d",
+        "dimacs_xor": "96323b7a21a7aae5723ebf804ad6402fe0980f4e2ef86d8e785ca95e05d230b1",
+        "magma": "3e2a9ace36c8171bf4271c00dfc6ba12015fbede1fbfca6b31752fd5360119a8"
+      },
+      "dimacs_cnf": {
+        "bytes": 153207,
+        "clauses": 6923,
+        "variables": 864,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14109,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-22-S",
+      "planted": [
+        "0x4",
+        "0x4",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        7,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0xe"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1372
+      },
+      "blake3": {
+        "anf": "09f48c71025f04d72ebdbf99fa4fffb71f11ce9f1cda281bab3d5ada7be1ebfa",
+        "dimacs_cnf": "18120e554a194020608bad80360e4a4506f1828a5c3a7b5a55ed697d5bcd7734",
+        "dimacs_xor": "67350291815ae270eb0a66d8c81eaffad34157f7b187355fc6b97b33994e9e1c",
+        "magma": "9fd9cae60a70a8c2cfdd658f3ff1e35d857fc7e9017d9c73b08597827ef8655f"
+      },
+      "dimacs_cnf": {
+        "bytes": 172935,
+        "clauses": 7744,
+        "variables": 942,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14706,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-23-S",
+      "planted": [
+        "0x9",
+        "0x9",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        5,
+        8,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0x19c6"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1252
+      },
+      "blake3": {
+        "anf": "1a0ad317c632b4e5654bd1375c5eca2e63db5e4e55bbb79030a0db7a84a3cd27",
+        "dimacs_cnf": "d3a8dc1dcbc92d7349958ff42760d43444b9bcbab01364155be67cc129e8800f",
+        "dimacs_xor": "24cf6d30c47270e142e9c5fe09693cae1895de607bac597898c05b1046c32aba",
+        "magma": "52745b60351f3fdf65555cc20d07caba7df6620d8b480bb58884189df80daf0f"
+      },
+      "dimacs_cnf": {
+        "bytes": 157385,
+        "clauses": 7103,
+        "variables": 881,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14231,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-24-S",
+      "planted": [
+        "0x9",
+        "0xc",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        7,
+        8,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0xfc2"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1117
+      },
+      "blake3": {
+        "anf": "de65eadb728db37e93ff09a237bf6c9c69189251a6162ea7dcc2f586f7577989",
+        "dimacs_cnf": "534414d8b71db56433f69a6295cec60864e94ac874298aa47f3ad09eefb68a7b",
+        "dimacs_xor": "72e63ddb78f015f4a48f9d28cfc809f18a64c5a9837989299dd0c49f00ddc4f8",
+        "magma": "12d93bb6317ff33d5606db8350abe3edf3e6c6bc92496f30ba78964a19163879"
+      },
+      "dimacs_cnf": {
+        "bytes": 140466,
+        "clauses": 6401,
+        "variables": 814,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13732,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-25-S",
+      "planted": [
+        "0xc",
+        "0x9",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        4,
+        5,
+        8,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0xc"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1392
+      },
+      "blake3": {
+        "anf": "f3df1d9a044286e742b4866f235553b3e5763bddc5dca56b7c554f20bf5a55da",
+        "dimacs_cnf": "cb7192dc8c6111e606895a6a27bd2b4f1bb7358e85d1892483e5514502c6901e",
+        "dimacs_xor": "03ad2fbd54e4804c67f017f6a73bd6a179bd4cba1117269b42972c72987bdf19",
+        "magma": "2495d7dafa62b1f7d52ece216cdb14562fab3c6076cc9d063adf8718612ecbe3"
+      },
+      "dimacs_cnf": {
+        "bytes": 176611,
+        "clauses": 7879,
+        "variables": 951,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14813,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-26-S",
+      "planted": [
+        "0xa",
+        "0xa",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1fbf"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1130
+      },
+      "blake3": {
+        "anf": "9f637667a1fa997fd072c84747d4460dd533507fd88791d8f644095ad027f68f",
+        "dimacs_cnf": "7f13c42d35974cb72a59b680a3e53c2bca74efedaeec4fa580259ed69f113c8d",
+        "dimacs_xor": "28012c2c5a3a195976716f49aecdb6fe724ba3ebc5ea6f564c250a250030630b",
+        "magma": "493615b1a1a9f71378423cc4868ca127b124bf43ac423c20df6b27c688e2651f"
+      },
+      "dimacs_cnf": {
+        "bytes": 141839,
+        "clauses": 6462,
+        "variables": 820,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13759,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-27-S",
+      "planted": [
+        "0x9",
+        "0x4",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        7,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1702"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 984
+      },
+      "blake3": {
+        "anf": "1038d0942fe61c5aed307d3e775b5ff1f2547258216de766226592e27c5873fc",
+        "dimacs_cnf": "7737ef7ba2f8811c672a9b64c0780b44551e0e9d3cb6cce6c77c3e8af23fd1e0",
+        "dimacs_xor": "7346c7fb7e9f5eddb21cd54a3b612477d82a79057b2677249d49772f9067d638",
+        "magma": "b426d75e4aea8ace31bddef6ad6cbd38c90c5e78c2fb11996eea12dea53a06c9"
+      },
+      "dimacs_cnf": {
+        "bytes": 123550,
+        "clauses": 5709,
+        "variables": 750,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13206,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-28-S",
+      "planted": [
+        "0xc",
+        "0x9",
+        "0xc"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        4,
+        5,
+        8,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x9"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1274
+      },
+      "blake3": {
+        "anf": "d7751135d1c2033b63ba520743e539b3d16675c97a9f5ceaea57aa98aec21fc3",
+        "dimacs_cnf": "ba5d475c676a726e01a9d91d4f4a6faa8a4868ed976d56f0843ab41c3d7ab6f8",
+        "dimacs_xor": "2dcc6fe4b495b5f5c7ab0a7db888e106dfc3662e7eae7472b894f9ca6695956d",
+        "magma": "a78f6e470571aab8255892fffce8dace9b9b9efff4c9fc630697017d5db3688d"
+      },
+      "dimacs_cnf": {
+        "bytes": 159494,
+        "clauses": 7192,
+        "variables": 892,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14311,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-29-S",
+      "planted": [
+        "0x4",
+        "0xe",
+        "0x2"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        6,
+        7,
+        8,
+        10
+      ],
+      "satisfiable": true,
+      "x_r": "0x4d8"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1182
+      },
+      "blake3": {
+        "anf": "9a6795120ed36c64ddab69601e3970189bb653f7d39658b644f0d014f322ac31",
+        "dimacs_cnf": "ae6d6fe0afa0db0e721aa48e059ffee68c00609c52f03260d8ba4b52477dd57a",
+        "dimacs_xor": "cc55d52c71616506b555eb88f1659e6fe1cc0c45d7e0577779ec0e1f2a9cd7d7",
+        "magma": "98994b7fa005196101af65929377696c8fb8a4022d6285eec2b812718b3f6b7c"
+      },
+      "dimacs_cnf": {
+        "bytes": 148680,
+        "clauses": 6749,
+        "variables": 846,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13962,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-30-S",
+      "planted": [
+        "0x9",
+        "0x2",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        6,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1632"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 885
+      },
+      "blake3": {
+        "anf": "d95920fe777be6e1ff5cb006328d38ea39ba8d804f76cd0042c0ca983115e7a4",
+        "dimacs_cnf": "a00e70edbbb734ca6badfbbb3b80dd3568c7f0e3768f94fbdc21180707aea1d3",
+        "dimacs_xor": "d905ecfafe1ce8f88d872f2f5dc560ee1d279e6daa6d9bf770f1ec487ff4ec58",
+        "magma": "71808f30bcaf345f3fdab58bdafa508f07e50b75362c922191d1e9fe21c98dde"
+      },
+      "dimacs_cnf": {
+        "bytes": 110756,
+        "clauses": 5182,
+        "variables": 701,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 12818,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-31-S",
+      "planted": [
+        "0xe",
+        "0xe",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0x4"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1243
+      },
+      "blake3": {
+        "anf": "a210ea178f2b392cbe2c4a9c512fc6a609ad60cdbb6f96e8190e812b77b9439d",
+        "dimacs_cnf": "b267a8da8ec73a6d879080a734ec209cd17251c50b5190fb546f818a0a772c46",
+        "dimacs_xor": "5f7b2371ee3015a0aa9d5e8d031b6ca275b33190fc2572ccd72c0a7d6394d4b7",
+        "magma": "6e2212e1c2a8cf08243b11571d10d416ffb8141cc9529a7c7e232c7bc8e27332"
+      },
+      "dimacs_cnf": {
+        "bytes": 156879,
+        "clauses": 7079,
+        "variables": 877,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14207,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-32-S",
+      "planted": [
+        "0x9",
+        "0x4",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        7,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1867"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1132
+      },
+      "blake3": {
+        "anf": "66e5fdba944a9e551253a6bc8e89eb84d5a864385e1744602262a37cd3708791",
+        "dimacs_cnf": "a983131cb9068c8f7b6904bf5b6aa1b9a4c68a88641938df3b512e5ccd674691",
+        "dimacs_xor": "9930ec57495e01f2af1413a0ee7be6e71c1bbbbacb69c9c68c340bc4d4d71889",
+        "magma": "712cdc4e3efb1bc1353ed5b7e5c3ec9e50ef74e88a005b1f2ec581df9255e9c0"
+      },
+      "dimacs_cnf": {
+        "bytes": 141732,
+        "clauses": 6461,
+        "variables": 820,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13750,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-33-S",
+      "planted": [
+        "0xc",
+        "0x4",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        4,
+        7,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1208"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1133
+      },
+      "blake3": {
+        "anf": "935e095122578c248de8adcbf1b644ec014e8005e6f8b80c41e259d364f3985c",
+        "dimacs_cnf": "2dfca8649e7ec02fa6dbf987727fb63a2a25cff92b1e524ac4028396c8ef8bd2",
+        "dimacs_xor": "b8919dd54e3119d0f922bd7e760da73b347e929525ab40bbbde6db3262362ef1",
+        "magma": "5ff7a3b64405ad0d44916e5b5ddffbf5c2be7955ee98053003119cc9be1b13ca"
+      },
+      "dimacs_cnf": {
+        "bytes": 142024,
+        "clauses": 6464,
+        "variables": 820,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13774,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-34-S",
+      "planted": [
+        "0x4",
+        "0xc",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        7,
+        8,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1ff9"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1163
+      },
+      "blake3": {
+        "anf": "b60f7ad7475c1cd364424a5295ca27e6a5fb13e0c347f23cd1d7f0f23ab4bf17",
+        "dimacs_cnf": "e722d532a62a39b5708c6cf8549f07ca0802391c6ea161686e36ecbd7448576d",
+        "dimacs_xor": "4b0f09374caacb23033826d3f201e383a7f6a1b7136124a91471e63ad1bd8db5",
+        "magma": "2d8b6bd6015b8c2f4829184fc6db10c3210aac955597ee04e57a23c1c9bedcca"
+      },
+      "dimacs_cnf": {
+        "bytes": 146241,
+        "clauses": 6648,
+        "variables": 836,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13883,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-35-S",
+      "planted": [
+        "0xa",
+        "0x2",
+        "0x2"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        6,
+        10
+      ],
+      "satisfiable": true,
+      "x_r": "0x1f23"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1267
+      },
+      "blake3": {
+        "anf": "afe9d3079f0ce9923c6732a9dea636317c04be93352714661451ef68d47f45f7",
+        "dimacs_cnf": "a768da4ce967eae435cc902254c333b2e0d5348d96322b0532a59cb0efe20110",
+        "dimacs_xor": "2c3782c88a9b6c9eb59d58884089d90f2468aec0851dd90d2cedcee6be97cd77",
+        "magma": "14402ebe87139e78e1990119ac93c22b4a467750591a4d6ff69ddf1fc78c50b7"
+      },
+      "dimacs_cnf": {
+        "bytes": 160576,
+        "clauses": 7224,
+        "variables": 889,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14325,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-36-S",
+      "planted": [
+        "0xa",
+        "0xa",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        6,
+        8,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0xbf5"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1213
+      },
+      "blake3": {
+        "anf": "7ca7ad210243e81b8cf87b92593fd58e7aeefd010ec507d134ade999a9590e1b",
+        "dimacs_cnf": "f4c53b621519ea2d6489c748cdb1c34ecb6f4fa1482a60b29bc9933b0886ca8d",
+        "dimacs_xor": "96323b7a21a7aae5723ebf804ad6402fe0980f4e2ef86d8e785ca95e05d230b1",
+        "magma": "b4eb68a00111d4457b554521169b7497e1f64b8123270732a3f4b965abf96872"
+      },
+      "dimacs_cnf": {
+        "bytes": 153207,
+        "clauses": 6923,
+        "variables": 864,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14109,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-37-S",
+      "planted": [
+        "0xe",
+        "0x4",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        3,
+        4,
+        7,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0xe"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1288
+      },
+      "blake3": {
+        "anf": "980d6411cd2377e9d5e816dee212c5f20afcc1f7389ffafd18cc4e9e687376db",
+        "dimacs_cnf": "bfa7fdf407950c1d96ed01027afc46603208a1a1dca0687d90219d4a2f9ccfd8",
+        "dimacs_xor": "9cfed0f7d6ac9f215ab8c9ebff00b9b55892fceedcd72caf7fdd2be0f66f95a1",
+        "magma": "61b3f080f40543756dafaaacbf321240707165e00085eb2edafb903ca33034f1"
+      },
+      "dimacs_cnf": {
+        "bytes": 162540,
+        "clauses": 7305,
+        "variables": 899,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14385,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-38-S",
+      "planted": [
+        "0x4",
+        "0xc",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        7,
+        8,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x13c"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1132
+      },
+      "blake3": {
+        "anf": "355f2dc39044dd94a32b0872d3022e447a36f1ea47e16a8619e28f22699c8aad",
+        "dimacs_cnf": "a983131cb9068c8f7b6904bf5b6aa1b9a4c68a88641938df3b512e5ccd674691",
+        "dimacs_xor": "9930ec57495e01f2af1413a0ee7be6e71c1bbbbacb69c9c68c340bc4d4d71889",
+        "magma": "aa8f48a8cf5689bc13086bfeb37a887df112866d66b2d3b16cc4d1df614298f2"
+      },
+      "dimacs_cnf": {
+        "bytes": 141732,
+        "clauses": 6461,
+        "variables": 820,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13750,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-39-S",
+      "planted": [
+        "0xc",
+        "0x4",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        4,
+        7,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1208"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 885
+      },
+      "blake3": {
+        "anf": "99457f4f883fd95f9e3a51751331ea50614f392ebe965c613bc91309bad3e374",
+        "dimacs_cnf": "a00e70edbbb734ca6badfbbb3b80dd3568c7f0e3768f94fbdc21180707aea1d3",
+        "dimacs_xor": "d905ecfafe1ce8f88d872f2f5dc560ee1d279e6daa6d9bf770f1ec487ff4ec58",
+        "magma": "37ce52e8a178384e52d28a493a77f702e45d9035ef8270d8a7f77c37c58c644e"
+      },
+      "dimacs_cnf": {
+        "bytes": 110756,
+        "clauses": 5182,
+        "variables": 701,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 12818,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-40-S",
+      "planted": [
+        "0x4",
+        "0x4",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        7,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0x4"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 984
+      },
+      "blake3": {
+        "anf": "b3b58b82d1ad6779085289262bd89d5a5dd1c1c33744d68316602b5fd1574c69",
+        "dimacs_cnf": "7737ef7ba2f8811c672a9b64c0780b44551e0e9d3cb6cce6c77c3e8af23fd1e0",
+        "dimacs_xor": "7346c7fb7e9f5eddb21cd54a3b612477d82a79057b2677249d49772f9067d638",
+        "magma": "5a574527f4da2a80b81bf07ab38c7ad614c4b97550fcebcccda3b979c4f08ffc"
+      },
+      "dimacs_cnf": {
+        "bytes": 123550,
+        "clauses": 5709,
+        "variables": 750,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13206,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-41-S",
+      "planted": [
+        "0x4",
+        "0x9",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        5,
+        8,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0x9"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1263
+      },
+      "blake3": {
+        "anf": "3069ef6f234e2dc26ee6ab678c040427a04d55d4d84bc9de2f390bfd29ac714c",
+        "dimacs_cnf": "7b81c9d6268e6977891fe3c1bc31ba933b059fe9d072b61509f42f792544a58b",
+        "dimacs_xor": "896e44936ed6c928d75c85fe4c2c84d11b0d840bacb9b64f7fd7a091193fb106",
+        "magma": "0e125e3b81dad6f7ada09fc00cde871a5f0c78c830ec066163bc45e7802cd658"
+      },
+      "dimacs_cnf": {
+        "bytes": 159076,
+        "clauses": 7173,
+        "variables": 887,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14300,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-42-S",
+      "planted": [
+        "0x9",
+        "0x4",
+        "0x2"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        7,
+        10
+      ],
+      "satisfiable": true,
+      "x_r": "0x1346"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1243
+      },
+      "blake3": {
+        "anf": "622d9ff21ba52e94ffecb606cadfd209fdfa8dfa6f08758572ca75e744070dae",
+        "dimacs_cnf": "bedc490097a0df6efc4b4b9c8e810a5a329bcedc2081a6698a6533b4b7dfef0b",
+        "dimacs_xor": "5434d9d66586aed2fe7ed3defa114bf52d9024e5b55cc93c144ff376d2c8ac40",
+        "magma": "9f5d3874162cfdf295d5173ba0cb041c63a1a1f6e3a52bd81ed8651a017dcf70"
+      },
+      "dimacs_cnf": {
+        "bytes": 155817,
+        "clauses": 7041,
+        "variables": 877,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14189,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-43-S",
+      "planted": [
+        "0x4",
+        "0xe",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        6,
+        7,
+        8,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1b40"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1145
+      },
+      "blake3": {
+        "anf": "d432916ef0afb8a04cfd7135371bb6d2256fb949f0b15bc94b3069c18b255e82",
+        "dimacs_cnf": "9498920f20f19f3c507c51b2c454844043df851bef9a5b24a2ef5a7698b32e25",
+        "dimacs_xor": "5cecb91b8ebdb7a4138007a6cb197a0316298295bf50b6610494463784592af8",
+        "magma": "b3d5fe075319c263c2c1d037a3498e532fbf25e3f5ed33d736e6444375311230"
+      },
+      "dimacs_cnf": {
+        "bytes": 143987,
+        "clauses": 6548,
+        "variables": 829,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13843,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-44-S",
+      "planted": [
+        "0xc",
+        "0xc",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        4,
+        7,
+        8,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0xa"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1287
+      },
+      "blake3": {
+        "anf": "fd4e1a9e59a599c7e53570f927a1c73ffec51c77b262ba886d7d0af9268dd7e3",
+        "dimacs_cnf": "63e1d88409fcd5bcca697d55ca0d24e175422fa756afec14fdb97581a50ae5cb",
+        "dimacs_xor": "00fd87c5096fe78f612a1cf5d7b2b0991e872a36a14efacf2bc66ded3394823f",
+        "magma": "9a10aceb2ebeec22e0dc5d29fdc1bd4db3872bbd08590d0fdcf26c328747d489"
+      },
+      "dimacs_cnf": {
+        "bytes": 162945,
+        "clauses": 7308,
+        "variables": 900,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14415,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-45-S",
+      "planted": [
+        "0xc",
+        "0x4",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        4,
+        7,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1f1a"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1243
+      },
+      "blake3": {
+        "anf": "cd85e57f270845fbfc6e362e9efc10fb3f33305bbe3927e6289e4da21e2c7dd0",
+        "dimacs_cnf": "bedc490097a0df6efc4b4b9c8e810a5a329bcedc2081a6698a6533b4b7dfef0b",
+        "dimacs_xor": "5434d9d66586aed2fe7ed3defa114bf52d9024e5b55cc93c144ff376d2c8ac40",
+        "magma": "89aaadd2411fede394fd5db94e645d8bd035c0961b04fac51a960d7827b95872"
+      },
+      "dimacs_cnf": {
+        "bytes": 155817,
+        "clauses": 7041,
+        "variables": 877,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14189,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-46-S",
+      "planted": [
+        "0x4",
+        "0x9",
+        "0xe"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        5,
+        8,
+        10,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1b40"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1403
+      },
+      "blake3": {
+        "anf": "d3ae00284c035e64faff01b06fcca1a73cf8928f1004503158ec5790ffd3580b",
+        "dimacs_cnf": "2f3f8411bc384f2e4bc484e02cf9805148c4d86a770145c020a446738d65aac7",
+        "dimacs_xor": "cadff39f8372e97afb126e85c0d37c8d9b37cc070ea40608f356be16449287a1",
+        "magma": "b90aa016a240e7605c53a1b983602ce439e1c92cdda57c22aff135de8ca1b4cb"
+      },
+      "dimacs_cnf": {
+        "bytes": 177237,
+        "clauses": 7915,
+        "variables": 955,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14829,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-47-S",
+      "planted": [
+        "0xe",
+        "0x9",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        3,
+        4,
+        5,
+        8,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0x1b3a"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1372
+      },
+      "blake3": {
+        "anf": "fee315fe20ae8ed5dff9a308cbdfa23090ec2f6102cb52f871c9e727c8c53bb1",
+        "dimacs_cnf": "18120e554a194020608bad80360e4a4506f1828a5c3a7b5a55ed697d5bcd7734",
+        "dimacs_xor": "67350291815ae270eb0a66d8c81eaffad34157f7b187355fc6b97b33994e9e1c",
+        "magma": "049e5b00b4f8e1926c1fa8a9888f2c7a15a1e590d69d0557a11b81d6d8f93d31"
+      },
+      "dimacs_cnf": {
+        "bytes": 172935,
+        "clauses": 7744,
+        "variables": 942,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14706,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-48-S",
+      "planted": [
+        "0x9",
+        "0x4",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        7,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x19c6"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1240
+      },
+      "blake3": {
+        "anf": "b833139ce045ddbd80b47b46e4077fba7e3fb6ae497f6ac25148988f609f5c63",
+        "dimacs_cnf": "70e2dda9ae4a98062ff2e3b7ad04a1c041a82ec48a8368a91cefd672749bdf3a",
+        "dimacs_xor": "4a85fddcffa69c5ffef52625e94903958403886f365bb2256a9c5dc2cffc7683",
+        "magma": "da8cb7fdd78831842884bb5313339e79a9e0f298cb20eaafd607acf2c41d479c"
+      },
+      "dimacs_cnf": {
+        "bytes": 155729,
+        "clauses": 7035,
+        "variables": 873,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14174,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-49-S",
+      "planted": [
+        "0xa",
+        "0xc",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        7,
+        8,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0xa22"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 782
+      },
+      "blake3": {
+        "anf": "97015b4fdef46bf1e2e4d5e5017ef413b48bcb98b968794a274b72d32d7b7a74",
+        "dimacs_cnf": "b598c1129837de00736929021ab0a9046803688800ab2c5e23054191c6930a2d",
+        "dimacs_xor": "69fcf0f854668e2e22b56fdb18bb213b808357d1bdc29769c320bc4f8eb925f8",
+        "magma": "5176ad5248290c935ec47556de111f079f53235dccb73070afaaff04d0ddda57"
+      },
+      "dimacs_cnf": {
+        "bytes": 97950,
+        "clauses": 4646,
+        "variables": 649,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 12426,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-50-S",
+      "planted": [
+        "0xa",
+        "0x2",
+        "0xa"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        6,
+        10,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x2"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1451
+      },
+      "blake3": {
+        "anf": "0f1dd71f0118f4e1d7ae061e9457422f348b8bcde38d98305575c7a21bb18c83",
+        "dimacs_cnf": "217fad2253591fe230b9c8e9828811c78297fd637c6757a1d51210b00dfcbce5",
+        "dimacs_xor": "5feb5ce703cab584f10832c507ebe5121ef7e509d09de95e7cdfc9f32dcaa735",
+        "magma": "6f3bd62439e37d6d719e4738be1fd0f6352493aea58a22781225d40fb2c5e095"
+      },
+      "dimacs_cnf": {
+        "bytes": 183968,
+        "clauses": 8185,
+        "variables": 981,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 15042,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-51-S",
+      "planted": [
+        "0x2",
+        "0xc",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        7,
+        8,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x19f7"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1177
+      },
+      "blake3": {
+        "anf": "d2cdb204e49a51c0f6ded9b8d170136c6d65ef15bdad1424add758fd3db4dab1",
+        "dimacs_cnf": "5bda5981a86b5def56f604e88bea19e51661a58787c4019efdf5348318162dd5",
+        "dimacs_xor": "ae326e0ef65c247946894fe8580b046e94b45e3310a033a4e0f98f8a57b1468a",
+        "magma": "4f7be0e360543a7ca568b583e45198194b3757bb79e97ef8e6193664395e9156"
+      },
+      "dimacs_cnf": {
+        "bytes": 148469,
+        "clauses": 6731,
+        "variables": 844,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13959,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-52-S",
+      "planted": [
+        "0xa",
+        "0x4",
+        "0xc"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        7,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x18e8"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1287
+      },
+      "blake3": {
+        "anf": "42a5808ba1609c39058329148bbc633d383e92a643a9bea4da490b130b488384",
+        "dimacs_cnf": "63e1d88409fcd5bcca697d55ca0d24e175422fa756afec14fdb97581a50ae5cb",
+        "dimacs_xor": "00fd87c5096fe78f612a1cf5d7b2b0991e872a36a14efacf2bc66ded3394823f",
+        "magma": "69cfc6cea185a95bfaee8939e21151dfa9ac04c464d94f8eb159897b7c375d8f"
+      },
+      "dimacs_cnf": {
+        "bytes": 162945,
+        "clauses": 7308,
+        "variables": 900,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14415,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-53-S",
+      "planted": [
+        "0x9",
+        "0xc",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        1,
+        4,
+        7,
+        8,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0x1f1a"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1145
+      },
+      "blake3": {
+        "anf": "52245c32d730924a3a41339587ddbb2ac5916dce476429d42d22e61741db0999",
+        "dimacs_cnf": "9498920f20f19f3c507c51b2c454844043df851bef9a5b24a2ef5a7698b32e25",
+        "dimacs_xor": "5cecb91b8ebdb7a4138007a6cb197a0316298295bf50b6610494463784592af8",
+        "magma": "ac64ffe446f2ad57170824cf7135b88be58b55430d06b9acbc895cc4c92fe728"
+      },
+      "dimacs_cnf": {
+        "bytes": 143987,
+        "clauses": 6548,
+        "variables": 829,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13843,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-54-S",
+      "planted": [
+        "0x2",
+        "0xa",
+        "0x2"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        6,
+        8,
+        10
+      ],
+      "satisfiable": true,
+      "x_r": "0xa"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1234
+      },
+      "blake3": {
+        "anf": "896e66f5704495ea78c08b33084b5e9cccaaef163e67d2200db4cf21ecb3656c",
+        "dimacs_cnf": "c2dcc6d1c744f309a5fba775849435556a47cc629b3d38abb6793d6976f6adb3",
+        "dimacs_xor": "32f8c457bd191b8c63214ca7fe56dfed858c635c511695283dd8c7dc6b6ea330",
+        "magma": "a9872edcb97e3026ebaf04d6d73b3044f2111bdd04a76f9b072c79d409bd387f"
+      },
+      "dimacs_cnf": {
+        "bytes": 154909,
+        "clauses": 7005,
+        "variables": 871,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14154,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-55-S",
+      "planted": [
+        "0xe",
+        "0xa",
+        "0x2"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        3,
+        4,
+        6,
+        8,
+        10
+      ],
+      "satisfiable": true,
+      "x_r": "0x15a0"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1407
+      },
+      "blake3": {
+        "anf": "4b9fa7d8e48ad200caab43ab44260a0d2431b2b4c0130b384e08ab7b00df8e36",
+        "dimacs_cnf": "b14187de8eb7169402b891bb6eee21144872e093a7fe79d39c33bf94e2f42d3d",
+        "dimacs_xor": "41cf7f254e0923d80a699e3f032594584b9e9b5d88e53d5b2f60b02496fd5778",
+        "magma": "756fe342504403eaa29676b4a126eced66de0d67a9d6523408da521ffa01167e"
+      },
+      "dimacs_cnf": {
+        "bytes": 177342,
+        "clauses": 7923,
+        "variables": 959,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14847,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-56-S",
+      "planted": [
+        "0xa",
+        "0x4",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        7,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0x11c6"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1237
+      },
+      "blake3": {
+        "anf": "b0ec72139aefc02f59d70b4a0024306640534f754e1d321122355edf0c4d778f",
+        "dimacs_cnf": "eec70a0beeb78685f06e518ea23b2daf38c5e6950e453d26ce8bce778368360c",
+        "dimacs_xor": "56af84194343bbeec3f9650dcc6a61b65d541d24c81f2625bd393542f8614cce",
+        "magma": "bc633e95c740fe4213eebb87736d291103e90e842f1faa4620043e27c63983dd"
+      },
+      "dimacs_cnf": {
+        "bytes": 155149,
+        "clauses": 7011,
+        "variables": 873,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14171,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-57-S",
+      "planted": [
+        "0x2",
+        "0x2",
+        "0xc"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        6,
+        11,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x1bcb"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1213
+      },
+      "blake3": {
+        "anf": "e2690347d4786d4c6670a6dbe49a52719b2ec3ede25a34f6cff2f38f01aaeae0",
+        "dimacs_cnf": "f4c53b621519ea2d6489c748cdb1c34ecb6f4fa1482a60b29bc9933b0886ca8d",
+        "dimacs_xor": "96323b7a21a7aae5723ebf804ad6402fe0980f4e2ef86d8e785ca95e05d230b1",
+        "magma": "3967cb82d668892d1d954bb0a23d684171466fd2b6a575154b96d4bdce6e845b"
+      },
+      "dimacs_cnf": {
+        "bytes": 153207,
+        "clauses": 6923,
+        "variables": 864,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14109,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-58-S",
+      "planted": [
+        "0xe",
+        "0x4",
+        "0x4"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        3,
+        4,
+        7,
+        11
+      ],
+      "satisfiable": true,
+      "x_r": "0xe"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1291
+      },
+      "blake3": {
+        "anf": "b3c33e475c373fe65ac554c3524fe05d4016722816dd304e5a0278bbfe146deb",
+        "dimacs_cnf": "c2c2577630450de82cdcbde74ac244daf2cf23595846fccf4bacbfe73664cdd1",
+        "dimacs_xor": "85a5b262df86034b99c18a841b51ae9b83101574db20afd5d7d85d09acded113",
+        "magma": "e9f2c8b091e8990c8cb5f389ad17fbc6ec3adfb72b45af1259ef0861af68a732"
+      },
+      "dimacs_cnf": {
+        "bytes": 162851,
+        "clauses": 7323,
+        "variables": 902,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14398,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-59-S",
+      "planted": [
+        "0xa",
+        "0xc",
+        "0x2"
+      ],
+      "planted_true_sat_variables": [
+        2,
+        4,
+        7,
+        8,
+        10
+      ],
+      "satisfiable": true,
+      "x_r": "0x164f"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1372
+      },
+      "blake3": {
+        "anf": "e712ce68bd5be4fb06eae8c53ace5e977ce6562e6c6240c225bb69d7f5e6f615",
+        "dimacs_cnf": "18120e554a194020608bad80360e4a4506f1828a5c3a7b5a55ed697d5bcd7734",
+        "dimacs_xor": "67350291815ae270eb0a66d8c81eaffad34157f7b187355fc6b97b33994e9e1c",
+        "magma": "7cdb54cef451ea230bc81a46dacc6ed649f682ab4b1b5de7ce92c774e60320be"
+      },
+      "dimacs_cnf": {
+        "bytes": 172935,
+        "clauses": 7744,
+        "variables": 942,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14706,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-60-S",
+      "planted": [
+        "0x4",
+        "0x9",
+        "0x9"
+      ],
+      "planted_true_sat_variables": [
+        3,
+        5,
+        8,
+        9,
+        12
+      ],
+      "satisfiable": true,
+      "x_r": "0x19c6"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1365
+      },
+      "blake3": {
+        "anf": "c0545707d100fa5cf401e1cd8ec51953c8ca4260c95222f3c7b9cf3647a7aa7e",
+        "dimacs_cnf": "91bfa85b12478c44cde4fee98952fc483b0bcf35fb5c73c708b23b7118732348",
+        "dimacs_xor": "25cd39edbb9c5d707c15d8b4ff2cc629d09c45394f76568e4e41a34d16ac325e",
+        "magma": "e1b9b8280a5708eaa618f52325133f0be17e4ca52b406ee5da8d4dfe7c43786b"
+      },
+      "dimacs_cnf": {
+        "bytes": 171722,
+        "clauses": 7693,
+        "variables": 936,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14657,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-61-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1198"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1262
+      },
+      "blake3": {
+        "anf": "b16704a8daf2809d446cf01cf427874ba7a5fe18159fcd7532540eb84aa71824",
+        "dimacs_cnf": "599d1b6fff94f46967dc6366cf55f55f788c6eb42c15ffcb156b98a025592c18",
+        "dimacs_xor": "117d908ebcb47a1c7715ee8edeeef6f95e8a76e2f18483af0e6c93ce7d74f71a",
+        "magma": "d13b9d15647caff4fca8ddcb0796b3591b7bc5b9a4af518065dba5f65d5664d0"
+      },
+      "dimacs_cnf": {
+        "bytes": 159377,
+        "clauses": 7181,
+        "variables": 887,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14293,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-62-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x4bb"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1301
+      },
+      "blake3": {
+        "anf": "7cca601160912f2e7bae756218de0c35927bed1d33f4647d5f03dcf9f2e66e29",
+        "dimacs_cnf": "53b2f1b883948b856bcf1e49fedd64c32d99eb9c7d530ed938b7b4a0d57a00f6",
+        "dimacs_xor": "ab78be4b02c70a4de1a0229d93c5c1d6822264103f947abae9493d3ba14653bf",
+        "magma": "0932683e44ed7e8da9a3f315527265cf23f6c030216c5a77d8b3a2f58a808209"
+      },
+      "dimacs_cnf": {
+        "bytes": 163646,
+        "clauses": 7353,
+        "variables": 908,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14449,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-63-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1f86"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1162
+      },
+      "blake3": {
+        "anf": "3ead6cac50bb4a66b804cd5faf8a7b88d6dc244829ff3c854ce648652238fbf6",
+        "dimacs_cnf": "3b9a9db55c96fa2275cd03c44632fdb140f098bebe33b4c30c701c6f1355b67b",
+        "dimacs_xor": "bc8f8763eedcdaaaa60c20f9e4bf072ba6971bbf150c6c180aa60dce041da0c9",
+        "magma": "6b0271ceb8338724a2961ab63365018e5e849a23257a8eb02e069f46eb63682e"
+      },
+      "dimacs_cnf": {
+        "bytes": 145647,
+        "clauses": 6627,
+        "variables": 839,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13879,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-64-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x3c5"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1190
+      },
+      "blake3": {
+        "anf": "8a34df4666c089bd46ff0ad3eb69fd8ab1f70baf924c91acd3157cb7640e5122",
+        "dimacs_cnf": "32113dffca811b999951ceaa6916c62f2ac24b6bdada7cf28acf63c9249539bd",
+        "dimacs_xor": "a00e7d91925f974923723f494e459764bfc0094e6f541731521bd47bc615c6a8",
+        "magma": "ab5ea76e8536ecb455f115e63c7321ef33bea26d53da70b257ba60743cbe886c"
+      },
+      "dimacs_cnf": {
+        "bytes": 149113,
+        "clauses": 6771,
+        "variables": 850,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13980,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-65-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0xcc2"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1289
+      },
+      "blake3": {
+        "anf": "7158d9f81c4d4180cbf3e8eb85a6fade0c27fda388ad9066810b8dcc11e31913",
+        "dimacs_cnf": "d484285a44816aef7d3e50bfba7a89bab7e91fd2db75b4a092070811d3a220de",
+        "dimacs_xor": "13c51cc592095689e92eed826fa1c460c3fae7afb908ec5e2ee4277c55986808",
+        "magma": "0c742e91cd1d56c24a42f50d75f9947e03cd6242cc68f8aa45d510ff35fc687b"
+      },
+      "dimacs_cnf": {
+        "bytes": 162041,
+        "clauses": 7294,
+        "variables": 899,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14368,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-66-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x2f7"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1349
+      },
+      "blake3": {
+        "anf": "676cc683d2150fa3f59e2a7e84db6646c3f8fed4fd0fad345baf21b144cf20b2",
+        "dimacs_cnf": "302572283d12865cc173d68a31b8c24cef95f10676255c4e1a52336ea0f404d6",
+        "dimacs_xor": "c6856782749f368a69a02d3029e444bd4a33c1639d90fd88e4aa2c7858b25cc4",
+        "magma": "4ec9991c9133774762f112529b928de32acdcf75d133efe5171543df5c4febe4"
+      },
+      "dimacs_cnf": {
+        "bytes": 170305,
+        "clauses": 7629,
+        "variables": 930,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14627,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-67-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1405"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1215
+      },
+      "blake3": {
+        "anf": "8bce8867bd8710de6ef648e219f6d190493713f6a2944a2b9d77932fd73b4e9e",
+        "dimacs_cnf": "68eb5795fbeeb01c090e557bf04f97d49e8ea70a59086251a8afe895c0e29545",
+        "dimacs_xor": "39ad4352eb26768d45106c8ea649cc70d7bd6790c683899b96bab41bb3cdb440",
+        "magma": "a5f9e2799286675df917b885ef41270c8220887fe5b9b75fd3f7382c9af5cf33"
+      },
+      "dimacs_cnf": {
+        "bytes": 152597,
+        "clauses": 6910,
+        "variables": 865,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14085,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-68-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x263"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1283
+      },
+      "blake3": {
+        "anf": "920478f93dcad7fcfaa9a07e2af6db9d05fa41720194f517433de375c4b0a172",
+        "dimacs_cnf": "5c4e690f9ee243643170bf3ba88f53858a2d20f0530dc6afffe6dc7db6988858",
+        "dimacs_xor": "b69dd4bd2c8121e83c9d04624a7e49b009f7f04f56a7ea686b44a0622584f65f",
+        "magma": "3e1b8d5ed76984ac43d574f455ac01096d1582f1e66b78011bec9a3c7bb4cd49"
+      },
+      "dimacs_cnf": {
+        "bytes": 161259,
+        "clauses": 7263,
+        "variables": 896,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14348,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-69-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1ae2"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1392
+      },
+      "blake3": {
+        "anf": "57f9210ef5febbbe39e07b5a70000785e60dbac65a570e4576477c3c1893d106",
+        "dimacs_cnf": "04ba5f259d5ba75f4e758f23dad20ec81159a679566bba107f1467ec783d2002",
+        "dimacs_xor": "ec707f5f2ae9dcbac6cfde639b23e273c1ed10f6b9e473ab51c779332b76551f",
+        "magma": "087160131a6b9a06b96a6c4753feba280dec9c93ba26128cb7ef3dbcabb727d5"
+      },
+      "dimacs_cnf": {
+        "bytes": 175466,
+        "clauses": 7840,
+        "variables": 951,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14789,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-70-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x677"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1310
+      },
+      "blake3": {
+        "anf": "0c48b3d4879e74db86b046728e24b762fdcfa91194094cd26fb288e8d9d89b12",
+        "dimacs_cnf": "8f7bfd4149908647d986c25ff6fb1932db792b6494c3eac98192a14a9ce06b16",
+        "dimacs_xor": "b8a2e1d578f86c57b6571cdbe3439de3775e6e5a70942f25c425c37ce2b56f14",
+        "magma": "ef0328e867313652adfeefaf79ddf12c716147a0872e7062d44149c6980306e1"
+      },
+      "dimacs_cnf": {
+        "bytes": 165131,
+        "clauses": 7417,
+        "variables": 909,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14461,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-71-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1b56"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1316
+      },
+      "blake3": {
+        "anf": "cc67a8ffbfae8bbe803dd7065d6dc25bae5272bce26283650e76ce2da97ed104",
+        "dimacs_cnf": "787dad716eb490dcbc7f148aa7c3879cf176735c731aec3d171e16ec03881354",
+        "dimacs_xor": "e05d84f8521f15fdcfd12027e56f69b0afc67d45f5a5416a026adbc2919655e0",
+        "magma": "9a90ba83659d9f058b974cd3703ba9f8a4d8978d61ea533f677d2868b7f0189d"
+      },
+      "dimacs_cnf": {
+        "bytes": 166444,
+        "clauses": 7462,
+        "variables": 912,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14499,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-72-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x7fc"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1249
+      },
+      "blake3": {
+        "anf": "ced790ff57c3dd7174e2c3259c0bdb2a5932f36eed071c659447cb48a58778fc",
+        "dimacs_cnf": "caef3689c62468b26786db247e40359db623cf0654aa5d31c9687d33598324dc",
+        "dimacs_xor": "fec00fdeb79fbb3c38a0670d1c6c81747aa02c5cf76d6d8c5264be2b520f7d5b",
+        "magma": "3c029c6421f4341cb1a674385cf425469420ba18ed77065b9408884bdf37a643"
+      },
+      "dimacs_cnf": {
+        "bytes": 157367,
+        "clauses": 7103,
+        "variables": 880,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14229,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-73-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1f36"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1315
+      },
+      "blake3": {
+        "anf": "f3f87147244c0cc4a59817550ea4a848a6a7100bbf675de4ca06c446099f4bc5",
+        "dimacs_cnf": "fe00e28cd049c757cadcf932b30fe21b53f0e9e899aca222ff227353455c79a1",
+        "dimacs_xor": "6d3b59ee0ac8828af5c8c4f11a4dc68d0841bcf09f3e66f15adaf6fb071492e8",
+        "magma": "190502f46eab351f5cef9f151babb099c6884227b1c42febecc7dbe1d5762b9a"
+      },
+      "dimacs_cnf": {
+        "bytes": 165606,
+        "clauses": 7440,
+        "variables": 913,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14488,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-74-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x4b1"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1217
+      },
+      "blake3": {
+        "anf": "6e5ae7a51f6a4f1c2d78137ad48bac3b3ac502ba5d843cc2d71670042fa5d33d",
+        "dimacs_cnf": "af5e33f1cfe08d5e87c740130935531986cf04acac587f480a8a391e397ebaf0",
+        "dimacs_xor": "d818301d6f1332b6da2e7fa524f909ccc95d18291e832f5e55f113a5de109d18",
+        "magma": "ed0c5cae68f77078cfd6ba464fe067658710699e85db733b4210ca3f6a505053"
+      },
+      "dimacs_cnf": {
+        "bytes": 152812,
+        "clauses": 6914,
+        "variables": 863,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14097,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-75-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0xe00"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1340
+      },
+      "blake3": {
+        "anf": "80087a72c8d3a8a6a52f560cdccfe964d548edb784df60a6ecc49234cbc40ce2",
+        "dimacs_cnf": "19fa020b35bfc7166246dda032ca4cb7c9308d80c38a3731112b00a1bf783333",
+        "dimacs_xor": "1d7f8bd73cd56fd16c30b2fa6db5284c2aa728388d1b457977b736061be9f140",
+        "magma": "bcbd737db2a57efb3cf7fe7cfd67be258a11a02b4adc0ce3e4f901f23477b311"
+      },
+      "dimacs_cnf": {
+        "bytes": 168829,
+        "clauses": 7579,
+        "variables": 925,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14565,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-76-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x117"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1347
+      },
+      "blake3": {
+        "anf": "5a1f5857ee92b073b6fcc6767974f52df24b84df9449843e5176e218654d2757",
+        "dimacs_cnf": "6ced73409a42bd4d0c64dafd075102858a2e845dd170d2d139e0b1b1f76b8736",
+        "dimacs_xor": "250ffa25dc505c108d735e1d595ee22a3b447e4f1337df58d337721cda86c79c",
+        "magma": "af4fd775271896e9d9183ad9ce933ef7e07fa219977b0b9b8df45362f00ae725"
+      },
+      "dimacs_cnf": {
+        "bytes": 170260,
+        "clauses": 7630,
+        "variables": 930,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14624,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-77-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x72f"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1354
+      },
+      "blake3": {
+        "anf": "9816e34b9582aad325cacb1fb88f8344a0f1a8a82371fd39fcf6f6353a6e503d",
+        "dimacs_cnf": "531d788c985bf91ef0c5dc98023f4ef9ba18a6a81c0c50fdf9d8f13ef81fc9e0",
+        "dimacs_xor": "6c1b8c2c7a5c08dcdcac491b2d52fe2239ab80b93c0309021ebd170aa16ae661",
+        "magma": "c4a50a35a5a2651372dfc27770b9d66aa081eff8dae728a991697463b5caca29"
+      },
+      "dimacs_cnf": {
+        "bytes": 171025,
+        "clauses": 7658,
+        "variables": 933,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14643,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-78-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x15a5"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1358
+      },
+      "blake3": {
+        "anf": "b86eb7908670d6281d169db12e961bffbb5495a5d1bb3d880ef2166113c93f87",
+        "dimacs_cnf": "ce69a9c319d41002226494cc92d219773637472e61880b4f97646bf99b1d9ade",
+        "dimacs_xor": "d4fa410e2495ab81145af6e7fc36f13535837c6581b2bf062c7be7b0976215e1",
+        "magma": "26f372b0b3c6be363e6b10ecb31f7b0f1cc73861a0d95a3c892425581f52eb7b"
+      },
+      "dimacs_cnf": {
+        "bytes": 171147,
+        "clauses": 7665,
+        "variables": 934,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14656,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-79-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x16a2"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1367
+      },
+      "blake3": {
+        "anf": "7b22ecc9148a8255f9f9e8e4cf4c2793b6ed3576f20b716e9a6bc31d9fb6b1f7",
+        "dimacs_cnf": "d50759e5038781b49e54999c527b178ce949c3406e39ddf11842d443dd41618f",
+        "dimacs_xor": "5e6c9acfe6c0823b6b6f85bd86d788eb5f83be8e317dabe91c21fbb41b7b2453",
+        "magma": "c821c37221cb2e59e7015f6386f1588196b852c39b98e5e7e636e60b79fc7d1a"
+      },
+      "dimacs_cnf": {
+        "bytes": 172395,
+        "clauses": 7713,
+        "variables": 938,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14698,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-80-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1e96"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1288
+      },
+      "blake3": {
+        "anf": "674593499ba1e0488daf929da791296dac8c2839c241aa36de3a73634ec49589",
+        "dimacs_cnf": "10ede77d1ece2f0cfa1c72754336d2cba3973ce3d136f1b2d58448f2e971a868",
+        "dimacs_xor": "a067069344c577134b0455ca0d8a562c93f92b241b4d3cb62f969c3b6dd30f73",
+        "magma": "52a708756e3086a1ccad72ae8a62af5f0874c59400509f239b91607793036302"
+      },
+      "dimacs_cnf": {
+        "bytes": 162143,
+        "clauses": 7296,
+        "variables": 900,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14377,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-81-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x282"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1419
+      },
+      "blake3": {
+        "anf": "0c9aaa5a5fe166072e754541ac6906aba52bd10cd261d91602d3df4df4291950",
+        "dimacs_cnf": "fd2e9d4479c3bec6058fc11145d129143b5adc6e2081de8bd3af8548e8d50f74",
+        "dimacs_xor": "a604e4ea075e44c771b40c37507e5484e9f0454c54d926c047f6563932473be1",
+        "magma": "498598c84c3aa0e88ab2efde930b9ee6129ed72c43a42014965d5cf52d0367a2"
+      },
+      "dimacs_cnf": {
+        "bytes": 179566,
+        "clauses": 8012,
+        "variables": 964,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14907,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-82-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x933"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1117
+      },
+      "blake3": {
+        "anf": "b26f827ec4ec0209a8db3b0f26f022d4394a66f1ad88af54083e75b9d7416c85",
+        "dimacs_cnf": "5fff761820dda107d6d66e8f250ec2ecf8772511268057d36dda35b9f3315cb1",
+        "dimacs_xor": "a02b55ef628485add01ad2947ba2e64574fb61b6c5d2b5e600ee8a2fd6df7f8c",
+        "magma": "24fa1a5c132a1f16ff50df5f65d45739a2940bde81b2bdfd6b4e1fbfee9a923e"
+      },
+      "dimacs_cnf": {
+        "bytes": 139322,
+        "clauses": 6363,
+        "variables": 814,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13706,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-83-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1c0c"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1252
+      },
+      "blake3": {
+        "anf": "88e08b4a84e7bb36a34f387cf5901066aa4ddf381724f0b6483bb3889549d150",
+        "dimacs_cnf": "b6663b301da139d3ad58f7fa0189df5c3219d6b35d7b82646c2f7eef36f89874",
+        "dimacs_xor": "763509d48feccbddb34f80b696ad0969dd2e9bcb4beced2b31a578afca97d734",
+        "magma": "f77cf773e40979f3573ea72d50a0b034ce68ed623fd1735746b64beab00ee781"
+      },
+      "dimacs_cnf": {
+        "bytes": 157519,
+        "clauses": 7107,
+        "variables": 883,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14250,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-84-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x192a"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1117
+      },
+      "blake3": {
+        "anf": "d31c99d79bd37152804bd89d0d821f544584ed2a32ee15c17ddb283ab2a12d83",
+        "dimacs_cnf": "a9555abdbdf37c91b700c9e2c336f1b8d05f91edbc9fb982c7596d3dbde67115",
+        "dimacs_xor": "5ac4108b781ce2740745fafafd926acac966d50823185715325316c83d24e818",
+        "magma": "fb51612d11023eb93fef5fceafdf30e81905f84b28393efca6cbab29708df150"
+      },
+      "dimacs_cnf": {
+        "bytes": 140026,
+        "clauses": 6396,
+        "variables": 812,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13695,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-85-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x13ac"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1237
+      },
+      "blake3": {
+        "anf": "d39917c12ad518676aea4314ed613f4d8d09e9c733d7628c40327e61f9fcb143",
+        "dimacs_cnf": "fe40a08e62e41e0a2062fe217ad2c2c5bf2614039a5f84fae367bd9ced36d9a7",
+        "dimacs_xor": "af5f714ba332718bb12ed24650deba34bb1a3601ef63084577656557bdbba952",
+        "magma": "f66e33f1360be80f77729789c1aa96201547f85c0ae0487d127970a997f88c47"
+      },
+      "dimacs_cnf": {
+        "bytes": 155575,
+        "clauses": 7028,
+        "variables": 873,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14191,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-86-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0xfb6"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1314
+      },
+      "blake3": {
+        "anf": "e7be5523b08c7fd217b196cfee164563f244f6f2c7a0bd4ce9c51319491bba69",
+        "dimacs_cnf": "e8895c8250bfd4fa27511aa61b2899b22164b820df84bc82732487b4b625f0ce",
+        "dimacs_xor": "4ce68f998b3fb5a0c69eab2d01339935c416101e22cfad698dce0eac8d732b86",
+        "magma": "f35c0060b41829b2fc1af38c2a4962deb0be9abdeca9f7a702686b608d856b5b"
+      },
+      "dimacs_cnf": {
+        "bytes": 165413,
+        "clauses": 7441,
+        "variables": 912,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14474,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-87-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x19a"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1350
+      },
+      "blake3": {
+        "anf": "5851573498331c6c87d756fa0c3cfff1c4a9ce7a60f9c67efb08bbcc5b090f38",
+        "dimacs_cnf": "36b257bd821e1ad2176b6aff77b35e705b2709f353f73e3a1c116b7f7cd5dc3d",
+        "dimacs_xor": "8ae7436283e46b513397bf47eceecb966232fc7214b1a9fdfa8884d07c2e286f",
+        "magma": "2f7f20f8c8d47c033aa4fa804148553caa6009fbbeb1c53932e4f730d44be3cc"
+      },
+      "dimacs_cnf": {
+        "bytes": 169759,
+        "clauses": 7605,
+        "variables": 931,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14628,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-88-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x13f2"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1303
+      },
+      "blake3": {
+        "anf": "f3290f6e90798f0bc7a6d4e04a1e4467f0facf7169e2a0d38f6c3366b4a94057",
+        "dimacs_cnf": "e192e936ab01adc1024005e553f2aa9cf16ef09060d541cedd6272194ed58da6",
+        "dimacs_xor": "2bdde03a0dce56e756d6318b26b24f90acf4f198697ca332cb82f82a8baa425a",
+        "magma": "8e9415ee7c95fde918139b81d18cbabda324f4ee620ac3b1ae25d398404d1b28"
+      },
+      "dimacs_cnf": {
+        "bytes": 163690,
+        "clauses": 7359,
+        "variables": 906,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14423,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-89-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0xe12"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1203
+      },
+      "blake3": {
+        "anf": "7f79650e688cebfff1266c6c0de84f0868658934effd932570d7fdbcac55fc2b",
+        "dimacs_cnf": "47b6e9736404df20ef3b1c55d43997e6adf6ad883ee6b2436e1d3c3fd1e770a5",
+        "dimacs_xor": "be6fe96a2fd7106c6387631a4dc6a02625af98499fe7c98d5a456f7f8fae804e",
+        "magma": "495aeae2fb086037990293bb5f647b32192236d9675186378e14510b533836ca"
+      },
+      "dimacs_cnf": {
+        "bytes": 150917,
+        "clauses": 6832,
+        "variables": 856,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14038,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-90-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1d57"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1334
+      },
+      "blake3": {
+        "anf": "c281622525b4ca6fd461b3531751925e1d30088328d9e366efe897140b88dc89",
+        "dimacs_cnf": "8624cf315128fac0bc43c605e687f1c1f367e79ebec8b029084d88fea8eb8f6c",
+        "dimacs_xor": "e5600175fa3849b69ceedef2f309ae10ca84e6a2ba3cb6d836fece30dad1cecb",
+        "magma": "54a454fe303a0280719aa72e383c08a03293bdde29ebc687e110fc46124c3d30"
+      },
+      "dimacs_cnf": {
+        "bytes": 167761,
+        "clauses": 7525,
+        "variables": 923,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14556,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-91-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x187b"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1175
+      },
+      "blake3": {
+        "anf": "2a914c590db037981195488928a7b5ea72dfcb5ed9d53756e975587be590a163",
+        "dimacs_cnf": "be68a58e9813ef47ee4be7e56cceb6b8c548e1c6f6f030f7542be8ba742c3662",
+        "dimacs_xor": "ae05b5793485d2bab0e43884b245d55bedc0bea528a0e7c1bfc62a43829cd1ff",
+        "magma": "fed9fecf446b401a2f50de14fed252587b1527d7fcb5e1e8ad3373bbad34dd37"
+      },
+      "dimacs_cnf": {
+        "bytes": 147289,
+        "clauses": 6700,
+        "variables": 842,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13905,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-92-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x11ba"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1388
+      },
+      "blake3": {
+        "anf": "7f5fc4b48262d0eb76071383da2acc590bdc1a6464a768e43db448cd212e1303",
+        "dimacs_cnf": "113188e762e42baa823c5ce8071458551fe06ab14e6df9231803ed94d688289b",
+        "dimacs_xor": "d4bdb708f51aee3fbebaaca264408cea9919ffd83a703814ffbcea04c618d200",
+        "magma": "11fb6e1caf5d8fce117027b06023c037de6e9fd6824e88f9c9cc14b20711097f"
+      },
+      "dimacs_cnf": {
+        "bytes": 174703,
+        "clauses": 7809,
+        "variables": 947,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14762,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-93-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1b19"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1244
+      },
+      "blake3": {
+        "anf": "8a86bcfd174e57056af6a4f5399a8d550ee46c2be8606cd47dae00a47605f995",
+        "dimacs_cnf": "025923ca2c72b6d0a67429b8533809ccbdd5f0113d97726eebe77763088a2f96",
+        "dimacs_xor": "1b59af1a165f5ca369b33fe70bb57bc7d68292b1cb92ede4608b09d700c411ee",
+        "magma": "275a8bd11de016159518bdf4c0d324bec2f69db60cea125b7e5f14ea64255067"
+      },
+      "dimacs_cnf": {
+        "bytes": 157161,
+        "clauses": 7095,
+        "variables": 877,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14207,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-94-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x17e9"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1191
+      },
+      "blake3": {
+        "anf": "b85f6594e759271866289a094cb166df88a49d5559aaab33cc1a70cbdecb66c7",
+        "dimacs_cnf": "58a4033ca75235d365713d452b96f954008a5184e15f2857b72c958de8eaed53",
+        "dimacs_xor": "2a4b1bc0cf0299e8a2e1f5cd4bf097bb3d9b4b653a912841e216c9c80280afc3",
+        "magma": "fd8c531826ee8e511f0a13280c665837bbdfccd221089befb1ac4370bcfe0796"
+      },
+      "dimacs_cnf": {
+        "bytes": 149465,
+        "clauses": 6781,
+        "variables": 851,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13988,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-95-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x447"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1261
+      },
+      "blake3": {
+        "anf": "eccf82792a7dfddbf42e151c217283b6d45b6fe8a31d03d3f5c8f8adf005110e",
+        "dimacs_cnf": "8c814c461d8df3e423f53891c3758ff4f45effed223fcb422d43d1a36f9f6371",
+        "dimacs_xor": "3ddd8f3298975843daa4658a15a8c05d088e2ded8b23def7e33951d8d5f3c2f9",
+        "magma": "48eb63ed477548d7897d04217445b1142ccaaeda7f5c5b0aa56aabff30a95b57"
+      },
+      "dimacs_cnf": {
+        "bytes": 158585,
+        "clauses": 7149,
+        "variables": 885,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14266,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-96-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x18d7"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1296
+      },
+      "blake3": {
+        "anf": "894dfdf2c9f13c4789595fbd55fc3526aa6508920779a481aa1482754af5fe57",
+        "dimacs_cnf": "dc6825b185a8e5dfd5112f30a329e06d8aead02b3ee2f7fd733b404d0d758882",
+        "dimacs_xor": "fd7d9dbb5b00297279dec0b68b1060297b05a99c699e3221ab62105f1de15463",
+        "magma": "297e15b8a78ba83f647750ccb640a0759b420de211299c1d30e5f3b98eb830b9"
+      },
+      "dimacs_cnf": {
+        "bytes": 163305,
+        "clauses": 7341,
+        "variables": 903,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14413,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-97-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x291"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1368
+      },
+      "blake3": {
+        "anf": "636cfef751e5e9530d276b2a539370fdbda2a34e17175d508c4949dcbafc79f1",
+        "dimacs_cnf": "c7b0273dc01b00f1dc8a9248e39c811e4042d7bf34849be5ef24f4c24ac3b4ce",
+        "dimacs_xor": "d22937e3ce98b5176497f5ff0add2979af0f658d10ba2b2a67876fb2cc661975",
+        "magma": "f628eaddab2682eb9e6030101083a793f6bdd79966a5a36138b3212659cd63ea"
+      },
+      "dimacs_cnf": {
+        "bytes": 172201,
+        "clauses": 7705,
+        "variables": 939,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14708,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-98-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0xf8f"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1301
+      },
+      "blake3": {
+        "anf": "12ad2deb278b63b61c3bd0b3ff7e79364820205209363f376f12fa0d94f1a78f",
+        "dimacs_cnf": "053625a8103b0cd5ad1394b7dd668fbf19e891382b4d19ddc79c362fb6a3adf3",
+        "dimacs_xor": "d6d400717d26eee8fa1228158090f95cc66b289ea2fa475248beec0f74ead86c",
+        "magma": "4fc312e070fd3e3c61064eb3d30bf0bb7afc5e972871ee49fa0d4742ea0b87fa"
+      },
+      "dimacs_cnf": {
+        "bytes": 164049,
+        "clauses": 7372,
+        "variables": 906,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14433,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-99-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x144d"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1349
+      },
+      "blake3": {
+        "anf": "8fba00966e3b8ec8c90cc47d48475c5172ab8334d7d7122c94eff7c91c7842f8",
+        "dimacs_cnf": "d13161f97fe6b9fc36971dcd98c3745348792f1422f95a76007921edb5e57de7",
+        "dimacs_xor": "f633335b1a8d17ec1125c705cc0f62707cda8e55fda0dd1097d8486a16f705e0",
+        "magma": "374f9c763aa4cbd6b20c2b0f484faac522c08d24575ca6773c23deab5fc811d0"
+      },
+      "dimacs_cnf": {
+        "bytes": 170281,
+        "clauses": 7630,
+        "variables": 929,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14625,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-100-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x992"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1396
+      },
+      "blake3": {
+        "anf": "63d6221445dcd9aa0312cf07d71bfcce52c9ebc9bc2f1168a9942b7b67cdda72",
+        "dimacs_cnf": "cd00376a5b4492992ffb694ae47cbca49a715307493937cfa840059d742af1b5",
+        "dimacs_xor": "40275006057f6e81cddffaba97a0ce8c61d5694374d23980779d180ca9d84089",
+        "magma": "43d4a92448fab7ef35609c80108022f3ae6b4d5d43663cddea66264f9028ae7f"
+      },
+      "dimacs_cnf": {
+        "bytes": 176246,
+        "clauses": 7873,
+        "variables": 954,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14810,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-101-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0xd6"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1332
+      },
+      "blake3": {
+        "anf": "429745c349785b3506e8adaada62062af3c044dd325dac894b01a2ccd43e703f",
+        "dimacs_cnf": "6f785d80a634507e89881dcddf508d03bdcad2fb27fe2fa7cbe13987260ce6e0",
+        "dimacs_xor": "bce0169c6d00c5a80dc830ba3a5ec1892300e4003029e6553d58b471d50652c8",
+        "magma": "af278948db5a64be7d6bc8d6c11dd4fba6625f73cf78ab2b52dce0f7018ad9d2"
+      },
+      "dimacs_cnf": {
+        "bytes": 167864,
+        "clauses": 7535,
+        "variables": 921,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14548,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-102-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0xdb9"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1222
+      },
+      "blake3": {
+        "anf": "83b4f52abf742492eb6d53f22410cd03c244d27ec461dc379f20e2bdf2e62346",
+        "dimacs_cnf": "9d69d3685ed6a72ba9e2ef07661208b760738af8441ba856faeb9aabb47cba51",
+        "dimacs_xor": "7b55321f2252e658a1ce88c9dcd16dbdaed4f06f042b40143231e4eb21565214",
+        "magma": "c6c44e490c0768c11544cc86624671c719307ed189ac522eb30a2db8fe282dcf"
+      },
+      "dimacs_cnf": {
+        "bytes": 154067,
+        "clauses": 6967,
+        "variables": 866,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14111,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-103-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x105f"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1418
+      },
+      "blake3": {
+        "anf": "b375f986b8181fe98342d83a46f570a424b147b8221f8a79fed9a01a11db3512",
+        "dimacs_cnf": "e6797dda189c2fe9fafd24bfd542f25ee57903ff78309ca06e600063ac092bca",
+        "dimacs_xor": "4bed5d3fd0d47f548fcf157c2ebcbb84b015136f23e2875d9566f95b950e0266",
+        "magma": "67651c557ea50299d65dcc22a73e2c699c5633c8cefc805e3c51b7adc17324c0"
+      },
+      "dimacs_cnf": {
+        "bytes": 179373,
+        "clauses": 7995,
+        "variables": 964,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14902,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-104-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1749"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1155
+      },
+      "blake3": {
+        "anf": "eb4f80fa4885deb8d7b2f7e27f691d1836b25d160f00fc8563c4d74f95b21e6b",
+        "dimacs_cnf": "fbd0bfde4058e06236905840a6591ecf341a95de54dfa9b8748d2f8a8703e2aa",
+        "dimacs_xor": "3662651922df4fd102c8a7fdaa0d1de1c76dacb307e9ab64c8d6c93425536196",
+        "magma": "03e828e98925291f43912aad5deaa2317e1a6c177e5f56287dd2f70eaad13b7b"
+      },
+      "dimacs_cnf": {
+        "bytes": 145152,
+        "clauses": 6601,
+        "variables": 832,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13844,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-105-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x797"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1236
+      },
+      "blake3": {
+        "anf": "291af42460557004df528092acf4a0b630f3f93b23f66fe27312858384c6bc6a",
+        "dimacs_cnf": "cc8e6f547637b685f006d161a29100d3047af8b5a89a6f106f06380fed8dfccf",
+        "dimacs_xor": "98c0631ec0678b951ba556ed0aaf172b92e0397951497ffa1c19e1bc77356d8b",
+        "magma": "34a70a645f4e962cfbd30a71bd4cf0ab37292455d52fe0e074d4b3dfc7c6eb5e"
+      },
+      "dimacs_cnf": {
+        "bytes": 155414,
+        "clauses": 7021,
+        "variables": 873,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14175,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-106-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1c1"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1249
+      },
+      "blake3": {
+        "anf": "dcbb8e93133a8aec56ddaee37092b9d6f1524234f8327d4e4c87a54e5225053f",
+        "dimacs_cnf": "79481e1abfcb5c298d6277838b833635ff7db69d2e38ddf92aa0d73b9aeb142f",
+        "dimacs_xor": "0de5118f372a4cde70687d694ecb426665062059e153f9039a8b9c890e882a59",
+        "magma": "4e62758fec130dd922d195887e600e46a94a0afe9e0c5d127ace8ac7522a4837"
+      },
+      "dimacs_cnf": {
+        "bytes": 156702,
+        "clauses": 7076,
+        "variables": 879,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14218,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-107-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1786"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1187
+      },
+      "blake3": {
+        "anf": "9e9aa3be702a65bd5d98654de6b879ca5aa3ba8d87c7f5459851d4f1430069f2",
+        "dimacs_cnf": "806bd4c4d5a7cfd7e315593a1da780119bfff94242cd6bb094339e1a61ee1fd8",
+        "dimacs_xor": "210810660efe88958a394d740cf7072a2d278bceb73a9dc75d6ac1e2de30ab22",
+        "magma": "7db91b82acb7065668a44e288e4832a2802c842580a8973f4f6fe8824d2ff60e"
+      },
+      "dimacs_cnf": {
+        "bytes": 148173,
+        "clauses": 6727,
+        "variables": 847,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13962,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-108-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1112"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1251
+      },
+      "blake3": {
+        "anf": "8abea077524389548ac52bcf30cf81498f3cce82181f2e50d889fa074005c18a",
+        "dimacs_cnf": "200c60f8eeb2d5b81f19e6a204273eebcffd90a7fa9d043eaecd31e59766180a",
+        "dimacs_xor": "e3e8b1141af0961256ad6cc997763a8ce06868ddc04013898b0b84ae638f441b",
+        "magma": "b859305fa3ac1abea043b9e4b70727d987adf6f341a638f137bf9e382af6659f"
+      },
+      "dimacs_cnf": {
+        "bytes": 157306,
+        "clauses": 7096,
+        "variables": 878,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14217,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-109-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1048"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1420
+      },
+      "blake3": {
+        "anf": "ff72dd46551d6576249053220fd72723e0133cd2a40127b8e0da02fe2ab20a90",
+        "dimacs_cnf": "9c196af5e8cefd9c73673fd08de5cf909f2b21af7c57c3cf0acba182854e3b05",
+        "dimacs_xor": "6d9926fce3ece67f181771be420f916f54adc4606754cb1b54bdc1b609877f31",
+        "magma": "0540d3db2b3ddd38a2bf08a67c23c2bf6abf4f1e9b76873f6efab52315e828b1"
+      },
+      "dimacs_cnf": {
+        "bytes": 180896,
+        "clauses": 8065,
+        "variables": 969,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14927,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-110-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0xb0f"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1303
+      },
+      "blake3": {
+        "anf": "c19f467b87080575c9c5d57d3b51ee35b922739b1c77805d87841c702fcfda94",
+        "dimacs_cnf": "1653bb3090c51ad220a5cca7ca930195f5d87a51cd4798a4b01c44e75083c979",
+        "dimacs_xor": "4ddd6ec63a911372b2fda3947acf9ddd09659092a311f007fd51fee086966c8e",
+        "magma": "a79806b63b6af43da9e4ff64af85e23e35a8712fc86e39a0d6ae6d1fb7cfbd0f"
+      },
+      "dimacs_cnf": {
+        "bytes": 164220,
+        "clauses": 7379,
+        "variables": 908,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14450,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-111-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1982"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1294
+      },
+      "blake3": {
+        "anf": "814c3851bedfe5668b1453f1dc6f4969ad8bcf9659236b5549cc67e2b5883c8e",
+        "dimacs_cnf": "225a86918955ce4e7fd62565cda25c8bab5edeab637c0cc844e604fbce6a6591",
+        "dimacs_xor": "5ab4c72b789f8e53a7f65bebbf901089870ee57a2c6494211ea8220059c4e02d",
+        "magma": "ea2a686f03bdc162033043cac9f1c9b884c661af5071914f133d35d9d1b6b540"
+      },
+      "dimacs_cnf": {
+        "bytes": 162787,
+        "clauses": 7329,
+        "variables": 904,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14400,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-112-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1d1c"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1155
+      },
+      "blake3": {
+        "anf": "a4a1ebda8a36b31bf83c661576bcb58055237342894c43ad0f42912d5d9a5d67",
+        "dimacs_cnf": "a2aa91683cb7a154dc7d118b30bc415d4eedb95767d371102215dbf129cf78d1",
+        "dimacs_xor": "9f3ad2aa59212bf4bd22f17a70bee4f2837439d7a2913843c4b35b5a109a5cfb",
+        "magma": "adefc2b8eb53ae7c60475eeabaa17972dfe7262d20406818873508061b66f32f"
+      },
+      "dimacs_cnf": {
+        "bytes": 145254,
+        "clauses": 6593,
+        "variables": 833,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13874,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-113-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0xaab"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1207
+      },
+      "blake3": {
+        "anf": "73a059f3c4d7b446c6b17cadcdbaf26981e2dadccb966fab7c51afd4830b78fa",
+        "dimacs_cnf": "18ca2b2d225aa8d3b4ff20f5cefae1989713bf703769667606eeabdea1d68801",
+        "dimacs_xor": "91397f4f5f32b8b3830c34a8fbc94e363fdd4f90d73d480958aa2f4b4963f8a6",
+        "magma": "a91a27163c31287f1bd0bc3a831c518dd237237958ac05663452f81de48110fc"
+      },
+      "dimacs_cnf": {
+        "bytes": 151557,
+        "clauses": 6859,
+        "variables": 857,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14049,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-114-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1019"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1275
+      },
+      "blake3": {
+        "anf": "5433fb10838d0263b13d570ce2acbc8036861a115f6d805f76d57a9582819823",
+        "dimacs_cnf": "214bf5865619305c10453adbe474c741db0301dc0fd000ffe4118d96fb7cc3cc",
+        "dimacs_xor": "ce4778df5a16a208e6380a681adb5e63f0d8451b96f71e2c21e2247e296dc3dc",
+        "magma": "446ab0129570e318e2efe3bc96bed72a40d40550bf186a7afd166fcda1feb4db"
+      },
+      "dimacs_cnf": {
+        "bytes": 160432,
+        "clauses": 7228,
+        "variables": 891,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14321,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-115-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x350"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1306
+      },
+      "blake3": {
+        "anf": "02e6047bf30fc4d8220b019ca61316f1cf7a5b9ce70761aa5662fd69547f94d1",
+        "dimacs_cnf": "52fa7c388f1b09488d433244969cbbebad915b96bc7b2a9c7993f03f2a658539",
+        "dimacs_xor": "3dcfe811e8213dba726b970b153e5d10f7b77a5eb9634a551a6ea0151add093a",
+        "magma": "358d83c39714cda936f4ddae9872401f27007e311e9add347ab8d318a3e01e1c"
+      },
+      "dimacs_cnf": {
+        "bytes": 164314,
+        "clauses": 7384,
+        "variables": 909,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14466,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-116-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x136a"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1336
+      },
+      "blake3": {
+        "anf": "b469827809d139123562b61428c980981cd1fa7450e1b2887134d8a475c23677",
+        "dimacs_cnf": "29fe8038404b1869937c84f9daa76d7dd3abdf77025d999f72dab7622a0d79a3",
+        "dimacs_xor": "42039681d6db0ebbba8d4b0bb089375fc0e0438288fcf52959c881210396cf2e",
+        "magma": "a0209bf03c843f1a1168f30b0a01831ac78e662dd9eee8d0aa4921c82ac80fea"
+      },
+      "dimacs_cnf": {
+        "bytes": 168703,
+        "clauses": 7566,
+        "variables": 924,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14577,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-117-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1424"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1190
+      },
+      "blake3": {
+        "anf": "28a4010e3960fa014648049b9e58d6bb4b6611b235ca7a4b2e3057dc6b339740",
+        "dimacs_cnf": "e7bf301683c1a57aa7ec3aeb191c664e93e0421087c5b4290c7a7fa3dd0982c0",
+        "dimacs_xor": "c8f44a86a113150fc13eabe6870b9dbcdc4b2a998a465f35dad5ea4de6893ca8",
+        "magma": "49c031a54756537d9d1354a0da8446f47d726a60415ae75a431fffde7fb33123"
+      },
+      "dimacs_cnf": {
+        "bytes": 149260,
+        "clauses": 6768,
+        "variables": 849,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 13984,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-118-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x3a6"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1358
+      },
+      "blake3": {
+        "anf": "4744f3aee2fd762c0e5902c73d21b47bf65ed4f2716e15c47c825bba7953415b",
+        "dimacs_cnf": "8a5957dacc298979c11698e02a8685e04e6b4769db7d97e3aba5d3860ec34f54",
+        "dimacs_xor": "33dba9e3c3d1da89b6c9bf36c6141886382aa99f4569d205425b3f6a961e0de4",
+        "magma": "e9dba8bc7bfef9196d610714d694a5a24cea1d23e8758cef1b1b289e5a01f19b"
+      },
+      "dimacs_cnf": {
+        "bytes": 170875,
+        "clauses": 7651,
+        "variables": 934,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14651,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-119-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x1c02"
+    },
+    {
+      "anf": {
+        "equations": 34,
+        "monomials": 1285
+      },
+      "blake3": {
+        "anf": "456a4e2f67a08060c6204ccdffeec5a562179e72d259c2275a834e73be4926ca",
+        "dimacs_cnf": "775a413aae6efe5b481154695f26fc5d67a9f98f8d8bfdec619caf35b7d71370",
+        "dimacs_xor": "32affc42eaa3711006218c6f512338736889d1874ba7fddc5f6991632893c6bc",
+        "magma": "3e6ce2006157caa2a79689417db5142a57f13f94f721d5d2443743c32447ce7e"
+      },
+      "dimacs_cnf": {
+        "bytes": 161258,
+        "clauses": 7254,
+        "variables": 896,
+        "xor_rows": 0
+      },
+      "dimacs_xor": {
+        "bytes": 14368,
+        "clauses": 865,
+        "variables": 300,
+        "xor_rows": 34
+      },
+      "label_checked_by_own_solver": true,
+      "name": "n13l4-120-U",
+      "planted": null,
+      "planted_true_sat_variables": [],
+      "satisfiable": false,
+      "x_r": "0x5c2"
+    }
+  ],
+  "operation": "corpus",
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "44e7df92948cd25a282e90398a0361d9165da2783e5e0d670466b13ae477ee30",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "written": [
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-1-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-1-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-1-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-1-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-2-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-2-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-2-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-2-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-3-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-3-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-3-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-3-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-4-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-4-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-4-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-4-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-5-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-5-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-5-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-5-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-6-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-6-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-6-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-6-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-7-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-7-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-7-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-7-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-8-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-8-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-8-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-8-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-9-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-9-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-9-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-9-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-10-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-10-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-10-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-10-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-11-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-11-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-11-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-11-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-12-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-12-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-12-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-12-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-13-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-13-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-13-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-13-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-14-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-14-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-14-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-14-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-15-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-15-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-15-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-15-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-16-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-16-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-16-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-16-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-17-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-17-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-17-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-17-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-18-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-18-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-18-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-18-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-19-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-19-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-19-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-19-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-20-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-20-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-20-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-20-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-21-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-21-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-21-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-21-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-22-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-22-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-22-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-22-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-23-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-23-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-23-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-23-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-24-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-24-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-24-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-24-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-25-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-25-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-25-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-25-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-26-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-26-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-26-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-26-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-27-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-27-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-27-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-27-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-28-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-28-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-28-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-28-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-29-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-29-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-29-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-29-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-30-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-30-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-30-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-30-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-31-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-31-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-31-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-31-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-32-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-32-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-32-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-32-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-33-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-33-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-33-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-33-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-34-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-34-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-34-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-34-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-35-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-35-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-35-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-35-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-36-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-36-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-36-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-36-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-37-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-37-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-37-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-37-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-38-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-38-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-38-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-38-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-39-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-39-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-39-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-39-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-40-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-40-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-40-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-40-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-41-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-41-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-41-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-41-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-42-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-42-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-42-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-42-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-43-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-43-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-43-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-43-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-44-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-44-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-44-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-44-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-45-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-45-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-45-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-45-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-46-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-46-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-46-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-46-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-47-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-47-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-47-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-47-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-48-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-48-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-48-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-48-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-49-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-49-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-49-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-49-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-50-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-50-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-50-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-50-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-51-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-51-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-51-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-51-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-52-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-52-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-52-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-52-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-53-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-53-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-53-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-53-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-54-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-54-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-54-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-54-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-55-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-55-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-55-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-55-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-56-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-56-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-56-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-56-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-57-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-57-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-57-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-57-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-58-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-58-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-58-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-58-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-59-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-59-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-59-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-59-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-60-S",
+    "/tmp/claude-501/corp_n13l4/n13l4-60-S.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-60-S.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-60-S.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-61-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-61-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-61-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-61-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-62-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-62-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-62-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-62-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-63-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-63-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-63-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-63-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-64-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-64-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-64-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-64-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-65-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-65-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-65-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-65-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-66-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-66-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-66-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-66-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-67-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-67-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-67-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-67-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-68-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-68-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-68-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-68-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-69-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-69-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-69-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-69-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-70-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-70-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-70-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-70-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-71-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-71-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-71-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-71-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-72-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-72-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-72-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-72-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-73-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-73-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-73-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-73-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-74-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-74-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-74-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-74-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-75-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-75-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-75-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-75-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-76-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-76-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-76-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-76-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-77-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-77-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-77-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-77-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-78-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-78-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-78-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-78-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-79-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-79-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-79-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-79-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-80-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-80-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-80-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-80-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-81-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-81-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-81-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-81-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-82-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-82-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-82-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-82-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-83-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-83-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-83-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-83-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-84-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-84-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-84-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-84-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-85-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-85-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-85-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-85-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-86-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-86-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-86-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-86-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-87-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-87-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-87-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-87-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-88-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-88-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-88-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-88-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-89-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-89-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-89-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-89-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-90-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-90-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-90-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-90-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-91-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-91-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-91-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-91-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-92-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-92-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-92-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-92-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-93-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-93-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-93-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-93-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-94-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-94-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-94-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-94-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-95-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-95-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-95-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-95-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-96-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-96-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-96-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-96-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-97-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-97-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-97-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-97-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-98-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-98-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-98-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-98-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-99-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-99-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-99-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-99-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-100-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-100-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-100-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-100-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-101-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-101-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-101-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-101-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-102-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-102-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-102-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-102-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-103-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-103-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-103-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-103-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-104-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-104-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-104-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-104-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-105-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-105-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-105-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-105-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-106-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-106-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-106-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-106-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-107-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-107-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-107-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-107-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-108-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-108-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-108-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-108-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-109-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-109-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-109-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-109-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-110-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-110-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-110-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-110-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-111-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-111-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-111-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-111-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-112-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-112-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-112-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-112-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-113-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-113-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-113-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-113-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-114-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-114-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-114-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-114-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-115-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-115-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-115-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-115-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-116-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-116-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-116-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-116-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-117-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-117-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-117-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-117-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-118-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-118-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-118-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-118-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-119-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-119-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-119-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-119-U.magma",
+    "/tmp/claude-501/corp_n13l4/INFOn13l4-120-U",
+    "/tmp/claude-501/corp_n13l4/n13l4-120-U.dimacs",
+    "/tmp/claude-501/corp_n13l4/n13l4-120-U.anf",
+    "/tmp/claude-501/corp_n13l4/n13l4-120-U.magma"
+  ]
+}

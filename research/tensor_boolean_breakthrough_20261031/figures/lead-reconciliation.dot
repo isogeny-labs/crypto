@@ -1,0 +1,21 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="transparent", pad="0.2", nodesep="0.35", ranksep="0.55"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, color="#334155", fillcolor="#f8fafc"];
+  edge [fontname="Helvetica", fontsize=9, color="#64748b"];
+
+  request [label="Requested next leads\nseparator rank · small roots · special primes", fillcolor="#dbeafe", color="#2563eb"];
+  e1 [label="Existing E1 protocol\nactual BTNIR boundary tensor\npaired rewired null", fillcolor="#dcfce7", color="#16a34a"];
+  instrument [label="Implemented in this PR\nexact contraction + balanced ranks\ncontrols + strict JSON", fillcolor="#bbf7d0", color="#15803d"];
+  blockers [label="Still required before data\nsemantic cuts · null generator · A/A\npower · freeze · image", fillcolor="#fef3c7", color="#d97706"];
+  run [label="Future accepted E1 run\nIso Lab + S3 receipts", fillcolor="#f1f5f9", color="#475569"];
+
+  small [label="Small-root branch\none-block reach already tested\njoint construction not supplied", fillcolor="#fee2e2", color="#dc2626"];
+  special [label="Special-prime branch\nfactorial protocol exists\nproduction Fp backend blocked", fillcolor="#fef3c7", color="#d97706"];
+
+  request -> e1 [label="most faithful rank test"];
+  e1 -> instrument [label="missing core"];
+  instrument -> blockers [label="no affected data"];
+  blockers -> run [label="freeze first"];
+  request -> small [label="reconciled"];
+  request -> special [label="reconciled"];
+}

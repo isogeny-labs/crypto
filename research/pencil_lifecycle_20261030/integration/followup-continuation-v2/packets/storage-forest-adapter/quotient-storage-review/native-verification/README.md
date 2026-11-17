@@ -1,0 +1,9 @@
+# Additive native verification correction
+
+The original quotient-storage review used Python for acceptance/inventory verification and for formal-build orchestration. That did not follow AGENTS.md's no-Python rule for correctness and certificate tooling. The historical sources, receipts, reports and manifests are preserved unchanged. This directory adds a Rust implementation and fresh native verification; it does not rewrite the earlier history or claim the original workflow complied.
+
+The Rust executable rechecked the retained successful/failing Lean receipts, exact module order and exits, before/after input hashes against current bytes, exact 36-declaration inventory, and allowed axiom sets. It then orchestrated a fresh replay of the same eight unchanged Lean source modules using native subprocesses and the pinned Lean toolchain. Each output directory was created exclusively. All eight returned zero; the native runner returned zero. The known-false Lean equality returned one and the Rust runner propagated one. The fresh native verifier accepted these receipts and the 36 exact readbacks. A mutated readback name was rejected with exit101.
+
+No Python verifier or orchestration was executed for this correction. The verifier and orchestration logic is in src/main.rs, with explicit inventory in src/inventory.txt. Cargo.lock pins dependencies; compilation used cargo build --offline. Source hashes are rechecked by Rust sha2. Cached Lean dependencies and compiler remain trusted. Proof sources and the scientific scope did not change; no scientific run or cloud action occurred.
+
+Artifacts: retained-native-acceptance.json, fresh-native-acceptance.json, replay-1/receipt.json, known-false-1/receipt.json, mutated-readback.stderr, status.json, source-and-output.sha256. The deliberately mutated readback links to the unchanged fresh snapshot; it only modifies its own stdout fixture.

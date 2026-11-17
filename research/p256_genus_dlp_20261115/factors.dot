@@ -1,0 +1,22 @@
+digraph factors {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", label="P-256 covers and Jacobian factors\nSame original field; derived relations, unsigned producer assertions", labelloc=t, fontsize=18, nodesep=0.45, ranksep=0.8];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fb", color="#365778", fontname="Helvetica", fontsize=13];
+  edge [style=dashed, color="#60768d", fontname="Helvetica", fontsize=11];
+  C2 [label="C2: z^2 = t^6 - 3t^2 + b"];
+  C3 [label="C3: z^2 = t^7 + bt^4 + t"];
+  C4 [label="C4: z^2 = t^9 - 3t^3 + b"];
+  C5 [label="C5: z^2 = t^12 - 3t^4 + b"];
+  E [label="E: NIST P-256\nY^2 = X^3 - 3X + b", fillcolor="#d8eee5"];
+  J2 [label="J(C2) ~ E x F2"];
+  J3 [label="J(C3) ~ E^2 x F3"];
+  J4 [label="J(C4) ~ E x A3\ndim(A3) = 3"];
+  J5 [label="J(C5) ~ E x F2 x J(H5)"];
+  C2 -> E [label="degree 2"];
+  C3 -> E [label="degree 2"];
+  C4 -> E [label="degree 3"];
+  C5 -> E [label="degree 4"];
+  E -> J2 [label="pullback embeds order n"];
+  E -> J3 [label="pullback embeds order n"];
+  E -> J4 [label="pullback embeds order n"];
+  E -> J5 [label="pullback embeds order n"];
+}

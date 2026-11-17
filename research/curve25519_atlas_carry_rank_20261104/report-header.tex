@@ -1,0 +1,5 @@
+\usepackage{fvextra}
+\RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true}
+\usepackage{seqsplit}
+\let\OriginalTexttt\texttt
+\renewcommand{\texttt}[1]{\OriginalTexttt{\seqsplit{#1}}}

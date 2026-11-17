@@ -1,0 +1,32 @@
+    Updating crates.io index
+     Locking 4 packages to highest compatible versions
+      Adding autocfg v1.5.1
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+      Adding num-integer v0.1.47
+      Adding num-traits v0.2.19
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling autocfg v1.5.1
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling num-traits v0.2.19
+   Compiling serde_json v1.0.154
+   Compiling serde v1.0.229
+   Compiling libc v0.2.191
+   Compiling syn v3.0.10
+   Compiling num-integer v0.1.47
+   Compiling itoa v1.0.19
+   Compiling memchr v2.8.3
+   Compiling num-bigint v0.4.8
+   Compiling serde_derive v1.0.229
+   Compiling base64 v0.22.1
+   Compiling relation-root-source-tests v0.1.0 (/workspace/relation-fusion-live/research/relation_fusion_20261117/root-source-tests)
+error[E0432]: unresolved import `crate::cryptanalysis::ecbench`
+   --> ../../../src/cryptanalysis/ecbench/exact_scalar.rs:274:31
+    |
+274 |     use crate::cryptanalysis::ecbench::canonical as legacy;
+    |                               ^^^^^^^ could not find `ecbench` in `cryptanalysis`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `relation-root-source-tests` (lib test) due to 1 previous error

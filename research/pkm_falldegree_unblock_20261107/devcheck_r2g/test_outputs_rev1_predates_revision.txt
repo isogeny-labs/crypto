@@ -1,0 +1,221 @@
+##### T1
+rc=0
+91
+25
+B-m3-tower B-m3-tower-p0-kummer B-m3-tower-p0-isogeny B-m4-tower B-m4-tower-p0-kummer B-m4-tower-p0-isogeny B-m5-tower B-m5-tower-p0-kummer B-m5-tower-p0-isogeny B-m6-tower B-m6-tower-p0-kummer B-m6-tower-p0-isogeny B-m3-null DB-m3-tower DB-m3-tower-p0-kummer DB-m3-tower-p0-isogeny DB-m4-tower DB-m4-tower-p0-kummer DB-m4-tower-p0-isogeny DB-m5-tower DB-m5-tower-p0-kummer DB-m5-tower-p0-isogeny DB-m6-tower DB-m6-tower-p0-kummer DB-m6-tower-p0-isogeny 
+49
+42
+13
+B-m3-null max-t=8
+B-m3-tower max-t=8
+B-m3-tower-p0-isogeny max-t=5
+B-m3-tower-p0-kummer max-t=5
+B-m4-tower max-t=6
+B-m4-tower-p0-isogeny max-t=4
+B-m4-tower-p0-kummer max-t=4
+B-m5-tower max-t=6
+B-m5-tower-p0-isogeny max-t=3
+B-m5-tower-p0-kummer max-t=3
+B-m6-tower max-t=6
+B-m6-tower-p0-isogeny max-t=2
+B-m6-tower-p0-kummer max-t=2
+DB-m3-tower max-t=8
+DB-m3-tower-p0-isogeny max-t=5
+DB-m3-tower-p0-kummer max-t=5
+DB-m4-tower max-t=6
+DB-m4-tower-p0-isogeny max-t=4
+DB-m4-tower-p0-kummer max-t=4
+DB-m5-tower max-t=6
+DB-m5-tower-p0-isogeny max-t=3
+DB-m5-tower-p0-kummer max-t=3
+DB-m6-tower max-t=6
+DB-m6-tower-p0-isogeny max-t=2
+DB-m6-tower-p0-kummer max-t=2
+##### T2
+rc=0
+2026-11-10T15:56:44Z start g1
+2026-11-10T15:56:44Z end g1 exit 0
+2026-11-10T15:56:44Z start B-m3-tower-t2
+2026-11-10T15:56:44Z end B-m3-tower-t2 exit 0
+2026-11-10T15:56:44Z start B-m3-tower-t3
+2026-11-10T15:56:46Z end B-m3-tower-t3 exit 0
+2026-11-10T15:56:46Z start DB-m3-tower-t2
+2026-11-10T15:56:46Z end DB-m3-tower-t2 exit 0
+   3 $T/T2/w-j1/runs/B-m3-tower-t2.jsonl
+   3 $T/T2/w-j1/runs/B-m3-tower-t3.jsonl
+   3 $T/T2/w-j1/runs/DB-m3-tower-t2.jsonl
+   9 total
+$T/T2/s3/b/j1:
+binary.sha256
+gates
+host.txt
+ladders_closed.txt
+progress.txt
+runs
+units_done.txt
+
+$T/T2/s3/b/j1/runs:
+B-m3-tower-t2.jsonl
+B-m3-tower-t2.log
+B-m3-tower-t2.out
+B-m3-tower-t3.jsonl
+B-m3-tower-t3.log
+B-m3-tower-t3.out
+DB-m3-tower-t2.jsonl
+DB-m3-tower-t2.log
+DB-m3-tower-t2.out
+B-m3-tower-t2
+B-m3-tower-t3
+DB-m3-tower-t2
+argv: stageb 
+nproc: 4
+rayon: 2
+model name	: Intel(R) Xeon(R) Processor @ 2.10GHz
+MemTotal:       16472400 kB
+6.18.44-fc-v338
+2026-11-10T15:56:44Z
+prev: 
+##### T3
+=== T3 budget 0: runner, ladder B-m3-tower
+rc=0
+2026-11-10T15:55:59Z start g1
+2026-11-10T15:55:59Z end g1 exit 0
+2026-11-10T15:55:59Z start B-m3-tower-t2
+2026-11-10T15:55:59Z end B-m3-tower-t2 exit 0
+2026-11-10T15:55:59Z closed B-m3-tower at t=2
+2026-11-10T15:55:59Z skip B-m3-tower-t3 ladder-closed
+2026-11-10T15:55:59Z skip B-m3-tower-t4 ladder-closed
+2026-11-10T15:55:59Z skip B-m3-tower-t5 ladder-closed
+2026-11-10T15:55:59Z skip B-m3-tower-t6 ladder-closed
+2026-11-10T15:55:59Z skip B-m3-tower-t7 ladder-closed
+2026-11-10T15:55:59Z skip B-m3-tower-t8 ladder-closed
+B-m3-tower t=2 this-job
+$T/T3/w-b0/runs/B-m3-tower-t2.log:-- kummer m=3 tower: every run at t = 2 timed out; stopping
+--- registered-style single invocation, same extra flags
+kummer   m=3 tower  t= 2 hky d_F=None ffd=None falls=[] censored_at=Some(3) 0 ms
+kummer   m=3 tower  t= 2 N= 6 g= 1 random  Dmax=  0 reached=  0 cols_to_sol=      0 cols=      0      0.0 ms  TIMEOUT
+kummer   m=3 tower  t= 2 hky d_F=None ffd=None falls=[] censored_at=Some(3) 0 ms
+kummer   m=3 tower  t= 2 N= 6 g= 1 random  Dmax=  0 reached=  0 cols_to_sol=      0 cols=      0      0.0 ms  TIMEOUT
+-- kummer m=3 tower: every run at t = 2 timed out; stopping
+=== T3 budget 2: runner, ladder B-m3-tower
+rc=0
+2026-11-10T15:55:59Z start g1
+2026-11-10T15:55:59Z end g1 exit 0
+2026-11-10T15:55:59Z start B-m3-tower-t2
+2026-11-10T15:55:59Z end B-m3-tower-t2 exit 0
+2026-11-10T15:55:59Z start B-m3-tower-t3
+2026-11-10T15:56:02Z end B-m3-tower-t3 exit 0
+2026-11-10T15:56:02Z start B-m3-tower-t4
+2026-11-10T15:56:11Z end B-m3-tower-t4 exit 0
+2026-11-10T15:56:11Z closed B-m3-tower at t=4
+2026-11-10T15:56:11Z skip B-m3-tower-t5 ladder-closed
+2026-11-10T15:56:11Z skip B-m3-tower-t6 ladder-closed
+2026-11-10T15:56:11Z skip B-m3-tower-t7 ladder-closed
+2026-11-10T15:56:11Z skip B-m3-tower-t8 ladder-closed
+B-m3-tower t=4 this-job
+$T/T3/w-b2/runs/B-m3-tower-t4.log:-- kummer m=3 tower: every run at t = 4 timed out; stopping
+--- registered-style single invocation, same extra flags
+kummer   m=3 tower  t= 2 hky d_F=Some(5) ffd=Some(4) falls=[4, 5] censored_at=None 13 ms
+kummer   m=3 tower  t= 2 hky d_F=Some(5) ffd=Some(4) falls=[4, 5] censored_at=None 9 ms
+kummer   m=3 tower  t= 3 hky d_F=Some(6) ffd=Some(4) falls=[4, 5, 6] censored_at=None 1135 ms
+kummer   m=3 tower  t= 3 hky d_F=Some(6) ffd=Some(4) falls=[4, 5, 6] censored_at=None 1240 ms
+kummer   m=3 tower  t= 4 hky d_F=None ffd=Some(4) falls=[4, 5] censored_at=Some(6) 4756 ms
+kummer   m=3 tower  t= 4 N=12 g= 1 random  Dmax=  0 reached=  0 cols_to_sol=      0 cols=      0   4756.3 ms  TIMEOUT
+kummer   m=3 tower  t= 4 hky d_F=None ffd=Some(4) falls=[4, 5] censored_at=Some(6) 4808 ms
+kummer   m=3 tower  t= 4 N=12 g= 1 random  Dmax=  0 reached=  0 cols_to_sol=      0 cols=      0   4808.1 ms  TIMEOUT
+-- kummer m=3 tower: every run at t = 4 timed out; stopping
+##### T4
+=== T4a hky B-m3-tower levels 2..4
+rc=0
+    6 reg-B.stripped
+    6 units-B.stripped
+   12 total
+IDENTICAL (all fields except ms, wall_s, closures[].ms)
+=== T4b F4 DB-m3-tower levels 2..3
+rc=0
+   4 reg-DB.stripped
+   4 units-DB.stripped
+   8 total
+IDENTICAL (all fields except ms, wall_s, closures[].ms)
+=== T4c P0 isogeny B-m3-tower-p0-isogeny levels 2..3 (extra)
+rc=0
+   4 reg-P0.stripped
+   4 units-P0.stripped
+   8 total
+IDENTICAL
+=== T4d null chain B-m3-null levels 2..3 (extra)
+rc=0
+   4 reg-N.stripped
+   4 units-N.stripped
+   8 total
+IDENTICAL
+##### T5
+=== job A (PREV none), killed with SIGKILL while B-m3-tower-t4 is in flight
+no live pilot left after the kill (defunct zombie entries ignored)
+S3 progress of A:
+2026-11-10T16:11:00Z start g1
+2026-11-10T16:11:00Z end g1 exit 0
+2026-11-10T16:11:00Z start B-m3-tower-t2
+2026-11-10T16:11:00Z end B-m3-tower-t2 exit 0
+2026-11-10T16:11:00Z start B-m3-tower-t3
+2026-11-10T16:11:02Z end B-m3-tower-t3 exit 0
+2026-11-10T16:11:02Z start B-m3-tower-t4
+B-m3-tower-t2.jsonl
+B-m3-tower-t2.log
+B-m3-tower-t2.out
+B-m3-tower-t3.jsonl
+B-m3-tower-t3.log
+B-m3-tower-t3.out
+=== job D (PREV = A): resume to the end
+rc=0
+2026-11-10T16:11:03Z start g1
+2026-11-10T16:11:03Z end g1 exit 0
+2026-11-10T16:11:03Z skip B-m3-tower-t2 done-in 0
+2026-11-10T16:11:03Z skip B-m3-tower-t3 done-in 0
+2026-11-10T16:11:03Z start B-m3-tower-t4
+2026-11-10T16:12:17Z end B-m3-tower-t4 exit 0
+2026-11-10T16:12:17Z start DB-m3-tower-t2
+2026-11-10T16:12:17Z end DB-m3-tower-t2 exit 0
+B-m3-tower-t4
+DB-m3-tower-t2
+prev: s3://b/A
+=== job B (PREV = A), killed again while B-m3-tower-t4 is in flight
+2026-11-10T16:12:17Z start g1
+2026-11-10T16:12:17Z end g1 exit 0
+2026-11-10T16:12:17Z skip B-m3-tower-t2 done-in 0
+2026-11-10T16:12:17Z skip B-m3-tower-t3 done-in 0
+2026-11-10T16:12:17Z start B-m3-tower-t4
+=== job C (PREV = A, B): t4 in flight in two prevs
+lost B-m3-tower-t4
+rc=75
+2026-11-10T16:12:18Z start g1
+2026-11-10T16:12:18Z end g1 exit 0
+2026-11-10T16:12:18Z lost B-m3-tower-t4
+lost_units.txt:
+B-m3-tower-t4
+binary.sha256
+gates
+host.txt
+ladders_closed.txt
+lost_units.txt
+progress.txt
+runs
+units_done.txt
+##### T6
+rc=20
+2026-11-10T15:56:47Z start g1
+2026-11-10T15:56:47Z end g1 exit 0
+2026-11-10T15:56:47Z start B-m3-tower-t2
+2026-11-10T15:56:47Z end B-m3-tower-t2 exit 0
+2026-11-10T15:56:47Z start B-m3-tower-t3
+2026-11-10T15:56:47Z end B-m3-tower-t3 exit 3
+0
+2026-11-10T15:56:47Z end B-m3-tower-t2 exit 0
+2026-11-10T15:56:47Z start B-m3-tower-t3
+2026-11-10T15:56:47Z end B-m3-tower-t3 exit 3
+B-m3-tower-t2.jsonl
+B-m3-tower-t2.log
+B-m3-tower-t2.out
+B-m3-tower-t3.log
+B-m3-tower-t3.out
+B-m3-tower-t2

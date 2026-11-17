@@ -1,0 +1,54 @@
+{
+  "schema": "n83.prime-terminal-format/v1",
+  "root_files": {
+    "inputs/KEY/input.json": "Immutable original metadata; canonical decimal strings for field values",
+    "inputs/KEY/system.sing": "Exact original source bytes, including planted witness checks",
+    "results/KEY/certificate.json": "Original metadata, source/projection checks, polynomial factor hashes and exact circuit",
+    "results/KEY/A0.poly": "H on normalized last selector block",
+    "results/KEY/A1.poly": "NF(H*X)",
+    "results/KEY/A2.poly": "NF(H*X^2)",
+    "results/summary.json": "All42 outcomes; FFD upper bound only; strict LFD unknown",
+    "results/primality.json": "Lucas certificate for production field",
+    "manifest.sha256": "Every raw payload before archive, excluding manifest itself"
+  },
+  "sparse_factor": {
+    "magic": "N83PFF1\\n",
+    "header_bytes": 40,
+    "fields": [
+      {
+        "offset": 8,
+        "type": "u32le",
+        "meaning": "selector count27"
+      },
+      {
+        "offset": 12,
+        "type": "u32le",
+        "meaning": "degree"
+      },
+      {
+        "offset": 16,
+        "type": "u64le",
+        "meaning": "term count"
+      },
+      {
+        "offset": 24,
+        "type": "u128le",
+        "meaning": "prime modulus"
+      }
+    ],
+    "record_bytes": 24,
+    "record_fields": [
+      "mask:u64le",
+      "coefficient:u128le"
+    ],
+    "invariants": "Sorted unique masks<2^27; canonical nonzero coefficient<p; exact byte length40+24*count"
+  },
+  "reconstruction": {
+    "normalized_variable": "z_i=2^position_i*v_((m-1)*27+i), zero-based i and v",
+    "U": "Original final intermediate, zero-based variable n_vars-1; no U field equation",
+    "B": "certificate.witness_circuit.B_coefficients_low_to_high[i][k] is coefficient of U^k, k0..2,canonical decimal string",
+    "formula": "g=A0*B0(U)+A1*B1(U)+A2*B2(U)",
+    "no_omitted_terms": true
+  },
+  "scope": "FFD<=17 under written nontriviality argument; affine consequence membership at derivationdegree17 is not strict nonmembership inV16; exactFFD and LFD null"
+}

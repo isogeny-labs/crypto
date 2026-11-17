@@ -114,6 +114,39 @@ class Curve:
         y3 = f.add(f.add(f.mul(lam, f.add(x1, x3)), x3), y1)
         return (x3, y3)
 
+    def addBatch(self, pairs):
+        """Affine sums with one field inversion for the whole batch.
+
+        Identical-x pairs (doubling or inverse) are rare and take the scalar
+        path; all other pairs share a Montgomery batch inversion. The result
+        is index-aligned with `pairs` and matches `add` point for point.
+        """
+        f = self.f
+        result = [None] * len(pairs)
+        regular = []
+        for index, (p, q) in enumerate(pairs):
+            if p is None:
+                result[index] = q
+            elif q is None:
+                result[index] = p
+            else:
+                x1, y1 = p
+                x2, y2 = q
+                if x1 == x2:
+                    result[index] = self.dbl(p) if y1 == y2 else None
+                else:
+                    regular.append(index)
+        denominators = [f.add(pairs[index][0][0], pairs[index][1][0]) for index in regular]
+        inverses = f.batchInv(denominators)
+        for index, d, inverse in zip(regular, denominators, inverses):
+            x1, y1 = pairs[index][0]
+            x2, y2 = pairs[index][1]
+            lam = f.mul(f.add(y1, y2), inverse)
+            x3 = f.add(f.add(f.mul(lam, lam), lam), d)
+            y3 = f.add(f.add(f.mul(lam, f.add(x1, x3)), x3), y1)
+            result[index] = (x3, y3)
+        return result
+
     def mul(self, p, k):
         r = None
         b = p

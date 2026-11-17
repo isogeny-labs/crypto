@@ -1,0 +1,758 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-12T16:45:03+00:00",
+  "commands": [
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "./target/release/cover_pushforward --seeds 3 --json research/cover_pushforward_20261112/pushforward.json --svg research/cover_pushforward_20261112/pushforward.svg > research/cover_pushforward_20261112/run.log 2>&1"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T15:58:39+00:00",
+      "wall_s": 12.832
+    },
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "./target/release/cover_pushforward --seeds 15 --json research/cover_pushforward_20261112/pushforward_15seeds.json > research/cover_pushforward_20261112/run_15seeds.log 2>&1"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T15:59:30+00:00",
+      "wall_s": 59.362
+    }
+  ],
+  "commit": "e9d5dbdccdeb55b6d8527ebae1113135b42b26bf",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T15:50:35+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-chained-prime-transfer"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T1550Z-cover-pushforward",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_jc_group_ops_p211",
+      "note": "IC on J(C), full relation set; median over 3 seeds, range 3305-3419; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 441.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        3305.0,
+        3419.0
+      ],
+      "unit": "gae",
+      "value": 3354.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_e1_two_term_group_ops_p211",
+      "note": "generic two-term IC on E1 over B_r incl. base build; median over 3 seeds, range 759-765; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 441.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        759.0,
+        765.0
+      ],
+      "unit": "gae",
+      "value": 761.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_jc_group_ops_p419",
+      "note": "IC on J(C), full relation set; median over 3 seeds, range 8475-9626; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 393.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        8475.0,
+        9626.0
+      ],
+      "unit": "gae",
+      "value": 8694.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_e1_two_term_group_ops_p419",
+      "note": "generic two-term IC on E1 over B_r incl. base build; median over 3 seeds, range 657-684; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 393.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        657.0,
+        684.0
+      ],
+      "unit": "gae",
+      "value": 679.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_jc_group_ops_p821",
+      "note": "IC on J(C), full relation set; median over 3 seeds, range 11306-11620; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 377.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        11306.0,
+        11620.0
+      ],
+      "unit": "gae",
+      "value": 11353.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_e1_two_term_group_ops_p821",
+      "note": "generic two-term IC on E1 over B_r incl. base build; median over 3 seeds, range 455-478; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 377.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        455.0,
+        478.0
+      ],
+      "unit": "gae",
+      "value": 469.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_jc_group_ops_p1619",
+      "note": "IC on J(C), full relation set; median over 3 seeds, range 34193-35914; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 485.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        34193.0,
+        35914.0
+      ],
+      "unit": "gae",
+      "value": 34521.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_e1_two_term_group_ops_p1619",
+      "note": "generic two-term IC on E1 over B_r incl. base build; median over 3 seeds, range 2744-2766; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 485.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        2744.0,
+        2766.0
+      ],
+      "unit": "gae",
+      "value": 2754.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_jc_group_ops_p3203",
+      "note": "IC on J(C), full relation set; median over 3 seeds, range 59635-60494; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 614.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        59635.0,
+        60494.0
+      ],
+      "unit": "gae",
+      "value": 60059.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_e1_two_term_group_ops_p3203",
+      "note": "generic two-term IC on E1 over B_r incl. base build; median over 3 seeds, range 2190-2224; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 614.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        2190.0,
+        2224.0
+      ],
+      "unit": "gae",
+      "value": 2194.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_jc_group_ops_p6421",
+      "note": "IC on J(C), full relation set; median over 3 seeds, range 185244-190874; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 963.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        185244.0,
+        190874.0
+      ],
+      "unit": "gae",
+      "value": 188130.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_e1_two_term_group_ops_p6421",
+      "note": "generic two-term IC on E1 over B_r incl. base build; median over 3 seeds, range 28377-28600; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 963.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        28377.0,
+        28600.0
+      ],
+      "unit": "gae",
+      "value": 28546.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_jc_group_ops_p12841",
+      "note": "IC on J(C), full relation set; median over 3 seeds, range 370762-375321; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 942.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        370762.0,
+        375321.0
+      ],
+      "unit": "gae",
+      "value": 372157.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_e1_two_term_group_ops_p12841",
+      "note": "generic two-term IC on E1 over B_r incl. base build; median over 3 seeds, range 28613-29202; 1 GAE = one counted group op; LA unpriced here (w=0); gap to rho = distance remaining",
+      "reference": 942.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        28613.0,
+        29202.0
+      ],
+      "unit": "gae",
+      "value": 28897.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "ic_e1_fibre_first_collision_group_ops_p211",
+      "note": "E1 fibre-arm stopped at first collision; median over 15 seeds, range 47-548; below matched rho on 13/15 seeds",
+      "reference": 425.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        47.0,
+        548.0
+      ],
+      "unit": "gae",
+      "value": 221.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "birthday_e1_first_collision_group_ops_p211",
+      "note": "control: birthday on E1, no cover; median over 15 seeds, range 47-280; below matched rho on 15/15 seeds",
+      "reference": 425.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        47.0,
+        280.0
+      ],
+      "unit": "gae",
+      "value": 149.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "b_over_e1_p211",
+      "note": "|B|/#E1 = 117/218; |B cap subgroup|/r = 0.5505",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.5367
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "ic_e1_fibre_first_collision_group_ops_p419",
+      "note": "E1 fibre-arm stopped at first collision; median over 15 seeds, range 45-491; below matched rho on 14/15 seeds",
+      "reference": 417.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        45.0,
+        491.0
+      ],
+      "unit": "gae",
+      "value": 231.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "birthday_e1_first_collision_group_ops_p419",
+      "note": "control: birthday on E1, no cover; median over 15 seeds, range 45-261; below matched rho on 15/15 seeds",
+      "reference": 417.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        45.0,
+        261.0
+      ],
+      "unit": "gae",
+      "value": 147.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "b_over_e1_p419",
+      "note": "|B|/#E1 = 223/452; |B cap subgroup|/r = 0.4071",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.4934
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "ic_e1_fibre_first_collision_group_ops_p821",
+      "note": "E1 fibre-arm stopped at first collision; median over 15 seeds, range 40-250; below matched rho on 15/15 seeds",
+      "reference": 308.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        40.0,
+        250.0
+      ],
+      "unit": "gae",
+      "value": 114.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "birthday_e1_first_collision_group_ops_p821",
+      "note": "control: birthday on E1, no cover; median over 15 seeds, range 40-218; below matched rho on 15/15 seeds",
+      "reference": 308.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        40.0,
+        218.0
+      ],
+      "unit": "gae",
+      "value": 102.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "b_over_e1_p821",
+      "note": "|B|/#E1 = 401/852; |B cap subgroup|/r = 0.4789",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.4707
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "ic_e1_fibre_first_collision_group_ops_p1619",
+      "note": "E1 fibre-arm stopped at first collision; median over 15 seeds, range 81-1512; below matched rho on 7/15 seeds",
+      "reference": 559.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        81.0,
+        1512.0
+      ],
+      "unit": "gae",
+      "value": 543.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "birthday_e1_first_collision_group_ops_p1619",
+      "note": "control: birthday on E1, no cover; median over 15 seeds, range 81-665; below matched rho on 13/15 seeds",
+      "reference": 559.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        81.0,
+        665.0
+      ],
+      "unit": "gae",
+      "value": 448.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "b_over_e1_p1619",
+      "note": "|B|/#E1 = 773/1604; |B cap subgroup|/r = 0.4638",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.4819
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "ic_e1_fibre_first_collision_group_ops_p3203",
+      "note": "E1 fibre-arm stopped at first collision; median over 15 seeds, range 111-728; below matched rho on 7/15 seeds",
+      "reference": 517.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        111.0,
+        728.0
+      ],
+      "unit": "gae",
+      "value": 524.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "birthday_e1_first_collision_group_ops_p3203",
+      "note": "control: birthday on E1, no cover; median over 15 seeds, range 111-644; below matched rho on 11/15 seeds",
+      "reference": 517.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        111.0,
+        644.0
+      ],
+      "unit": "gae",
+      "value": 325.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "b_over_e1_p3203",
+      "note": "|B|/#E1 = 1535/3130; |B cap subgroup|/r = 0.5112",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.4904
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "ic_e1_fibre_first_collision_group_ops_p6421",
+      "note": "E1 fibre-arm stopped at first collision; median over 15 seeds, range 652-4694; below matched rho on 2/15 seeds",
+      "reference": 925.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        652.0,
+        4694.0
+      ],
+      "unit": "gae",
+      "value": 2254.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "birthday_e1_first_collision_group_ops_p6421",
+      "note": "control: birthday on E1, no cover; median over 15 seeds, range 413-3090; below matched rho on 3/15 seeds",
+      "reference": 925.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        413.0,
+        3090.0
+      ],
+      "unit": "gae",
+      "value": 1644.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "b_over_e1_p6421",
+      "note": "|B|/#E1 = 3141/6382; |B cap subgroup|/r = 0.4951",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.4922
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "ic_e1_fibre_first_collision_group_ops_p12841",
+      "note": "E1 fibre-arm stopped at first collision; median over 15 seeds, range 751-5953; below matched rho on 3/15 seeds",
+      "reference": 876.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        751.0,
+        5953.0
+      ],
+      "unit": "gae",
+      "value": 1699.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "birthday_e1_first_collision_group_ops_p12841",
+      "note": "control: birthday on E1, no cover; median over 15 seeds, range 587-2929; below matched rho on 6/15 seeds",
+      "reference": 876.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        587.0,
+        2929.0
+      ],
+      "unit": "gae",
+      "value": 1176.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "b_over_e1_p12841",
+      "note": "|B|/#E1 = 6379/12676; |B cap subgroup|/r = 0.5080",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.5032
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "pushed_relations_primary",
+      "note": "summed over the 7 primes, 3 seeds each (primary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 37866.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "pushed_e1_valid_primary",
+      "note": "summed over the 7 primes, 3 seeds each (primary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 37866.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 21,
+      "name": "pushed_e1_invalid_primary",
+      "note": "summed over the 7 primes, 3 seeds each (primary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "pushed_e2_valid_primary",
+      "note": "summed over the 7 primes, 3 seeds each (primary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 37866.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 21,
+      "name": "pushed_e2_invalid_primary",
+      "note": "summed over the 7 primes, 3 seeds each (primary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 21,
+      "name": "pushed_e2_rows_carrying_target_primary",
+      "note": "summed over the 7 primes, 3 seeds each (primary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "pushed_fibre_type_e1_primary",
+      "note": "summed over the 7 primes, 3 seeds each (primary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 37866.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "pushed_fibre_type_e2_primary",
+      "note": "summed over the 7 primes, 3 seeds each (primary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 21,
+      "name": "pushed_push_mismatch_primary",
+      "note": "summed over the 7 primes, 3 seeds each (primary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 105,
+      "name": "pushed_relations_15seeds",
+      "note": "summed over the 7 primes, 15 seeds each (supplementary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 189330.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 105,
+      "name": "pushed_e1_invalid_15seeds",
+      "note": "summed over the 7 primes, 15 seeds each (supplementary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 105,
+      "name": "pushed_e2_invalid_15seeds",
+      "note": "summed over the 7 primes, 15 seeds each (supplementary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 105,
+      "name": "pushed_e2_rows_carrying_target_15seeds",
+      "note": "summed over the 7 primes, 15 seeds each (supplementary run)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 135336,
+      "path": "research/cover_pushforward_20261112/pushforward.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ad/ad9375a1c6fd9954ad379b8ed49df98a7021ad94566726335d42d21d67b3e392",
+      "sha256": "ad9375a1c6fd9954ad379b8ed49df98a7021ad94566726335d42d21d67b3e392",
+      "uploaded": false
+    },
+    {
+      "bytes": 1101,
+      "path": "research/cover_pushforward_20261112/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/25/25ead9821c6776949b3515c524c20f5d84abe0ad1a969c1988181c3abe142373",
+      "sha256": "25ead9821c6776949b3515c524c20f5d84abe0ad1a969c1988181c3abe142373",
+      "uploaded": false
+    },
+    {
+      "bytes": 8365,
+      "note": "re-rendered after the run (cosmetic row-label fix in the SVG writer, reported by the producer); data in pushforward.json unchanged and matches its recorded hash; original SVG bytes not retained. Updated by the integration session 2026-11-12. Previous sha256: 2bdc2a6665d5fbf054530ef792afdb25842a79ce679a9a898112c5c31c49fd53",
+      "path": "research/cover_pushforward_20261112/pushforward.svg",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2b/2bdc2a6665d5fbf054530ef792afdb25842a79ce679a9a898112c5c31c49fd53",
+      "sha256": "072bfee2de65c264d5aad0a4e2ea39e36bf41ef4194f0492e73a1bd1f3c42bef",
+      "uploaded": false
+    },
+    {
+      "bytes": 601253,
+      "path": "research/cover_pushforward_20261112/pushforward_15seeds.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/72/726bbe77c2e610b273c4659bad29a57828a6f7c10592a16251c65fd596735d89",
+      "sha256": "726bbe77c2e610b273c4659bad29a57828a6f7c10592a16251c65fd596735d89",
+      "uploaded": false
+    },
+    {
+      "bytes": 1051,
+      "path": "research/cover_pushforward_20261112/run_15seeds.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fe/feecdadce2d2ef22f43cbbeb73d5ed58e529b40106b3d2cb3f710e81be1c8301",
+      "sha256": "feecdadce2d2ef22f43cbbeb73d5ed58e529b40106b3d2cb3f710e81be1c8301",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261111-chained-prime-transfer/REPORT_cover_census_20261112.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261111-chained-prime-transfer/pushforward.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "cover-pushforward",
+  "status": "measured",
+  "summary": "Genus-2 IC on the transferred subgroup is a birthday search on E: 100% of relations are fibres P+iota(P), push-forward [2]Q=Q+Q; identical cost to the same search on E1; every full-stop arm above rho [pcc:unverified]",
+  "validation": null
+}

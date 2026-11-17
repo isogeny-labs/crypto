@@ -1,0 +1,30 @@
+{
+ "frozen": "2026-11-09, before any run of spec-p36.json",
+ "ideal_rho_adds": 232318.30339557503,
+ "definitions": "ideal = sqrt(pi r / 4) group additions (negation-map rho, one collision). Ratios use mean counted group additions per solve (adds + doubles, all phases) unless named S.",
+ "predictions": [
+  {
+   "id": "F1",
+   "claim": "res1 (baseline residual walk, every point stored) needs 2 table hits per solve almost always; its walk adds / ideal follow 2 * 1.5 / sqrt(h_base/2) with h_base = 15/16 + 1/2 + 1 = 2.4375, i.e. 2.718",
+   "metric": "res1 walk-step group ops / ideal",
+   "prediction": 2.7174648819470297,
+   "pass": "inside the 95% interval"
+  },
+  {
+   "id": "F2",
+   "claim": "res1eq total adds / ideal >= 1.45 (floor 1.5 for two collisions, plus set-up and detection delay; a value below 1.45 falsifies the floor argument)",
+   "metric": "res1eq group ops / ideal",
+   "prediction_lower": 1.45,
+   "pass": "lower 95% bound >= 1.40 and point >= 1.45"
+  },
+  {
+   "id": "F3",
+   "claim": "rho.negation walk adds / ideal is within [0.95, 1.15]; any excess of its S over 0.886 beyond that is pricing or set-up, not the walk",
+   "metric": "rho group ops / ideal, and S",
+   "prediction_range": [
+    0.95,
+    1.15
+   ]
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+⚠ [3155/3160] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [3156/3160] Replayed StructuralAudit
+warning: StructuralAudit.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: StructuralAudit.lean: imports `Mathlib.Algebra.Group.Subgroup.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: StructuralAudit.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [3157/3160] Replayed FrobeniusCore
+warning: FrobeniusCore.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [3158/3160] Built S3Completion (3.3s)
+warning: S3Completion.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Completion.lean:25:2: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Completion.lean:25:2: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Completion.lean:67:44: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [WeierstrassCurve.Affine.addX, ha1, ha2, hn, zero_mul, mul_zero, add_zero, sub_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+ℹ [3159/3160] Built Audit (2.5s)
+info: Audit.lean:5:0: 'TheoremAudit.S3_repeated_identity' depends on axioms: [propext, Quot.sound]
+info: Audit.lean:6:0: 'TheoremAudit.S3_repeated_factor' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:7:0: 'TheoremAudit.S3_repeated_root_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:8:0: 'TheoremAudit.S3_two_torsion_no_root' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:9:0: 'TheoremAudit.S3_signed_zero_sum_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:10:0: 'TheoremAudit.cyclic_restriction_trivial' depends on axioms: [propext, Quot.sound]
+info: Audit.lean:11:0: 'TheoremAudit.sum_confined' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:12:0: 'TheoremAudit.outside_subgroup_not_smooth' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:13:0: 'TheoremAudit.branch_collision_mass' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Audit.lean:14:0: 'TheoremAudit.minus_one_embedding_order' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (3160 jobs).

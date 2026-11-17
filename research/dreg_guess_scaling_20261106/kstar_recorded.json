@@ -1,0 +1,18 @@
+{
+  "schema": "dreg-guess-scaling/recorded/v1",
+  "note": "Hand-transcribed from committed RESULTS files (paths below); every value is an unverified assertion [pcc:unverified] until a pcc claim covers it. k_star = fewest guessed variables for which every branch refutes at degree 4 (MutantXL closure), m = 3.",
+  "rows": [
+    {"ell": 6, "cell": "(3,16,6) and (3,18,6)", "draws": 8, "k_star": [0,0,0,0,0,0,0,0], "unspecialised_degree": 4,
+     "source": "research/dreg_closure_slope_20261018/results.pdf (committed anchors, degree 4 on every draw)"},
+    {"ell": 7, "cell": "(3,19,7),(3,21,7) + 2 fresh", "draws": 10, "k_star": [1,1,1,1,1,2,2,2,2,2], "unspecialised_degree": 5,
+     "source": "research/dreg_hybrid_guess_20261024/RESULTS.md (k*=1 on 5 draws, k*=2 on 5); degree 5: research/koblitz_ic_leads_build_20261024 C1 (draws 0, 3)"},
+    {"ell": 8, "cell": "(3,22,8)", "draws": 4, "k_star_bounds": {"raw_3_suffices": "1 of 4", "raw_4_suffices": "4 of 4 (+8 of 8 as control in the more study)", "invariant_3_suffices": "7 of 12"},
+     "k_star_point": 4, "unspecialised_degree": ">4 (degree 4 saturates unrefuted on 4 of 4)",
+     "source": "research/dreg_closure_guess_20261022/RESULTS.md, research/dreg_closure_guess3_20261023/RESULTS.md, research/dreg_invariant_guess_20261029/RESULTS.md, research/dreg_invariant_guess_more_20261029/RESULTS.md"}
+  ],
+  "models": {
+    "K_excess": "k = m*(ell-6)",
+    "K_marginal": "k = m*(ell-7)+1",
+    "source": "research/dreg_closure_guess_20261022/PREREGISTRATION.md"
+  }
+}

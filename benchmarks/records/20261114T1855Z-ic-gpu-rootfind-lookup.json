@@ -1,0 +1,95 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-14T19:37:24+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_gpu_measure_20261112/rp_gpu.sh",
+        "exec",
+        "icgpu-7",
+        "./job.sh 5"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T18:56:24+00:00",
+      "wall_s": 0.399
+    }
+  ],
+  "commit": "1e757ab5511292beed907122b1f308c9ce798750",
+  "commit_dirty": false,
+  "created_utc": "2026-11-14T18:55:30+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/ic_gpu_rootfind_lookup_20261114"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T1855Z-ic-gpu-rootfind-lookup",
+  "metrics": [
+    {
+      "baseline": 0.4017,
+      "better": "lower",
+      "n": 5,
+      "name": "rootfind_best_s_f65536",
+      "note": "kernel time at the best configuration (sorted/C16) with all three lookup variants; A/A 0.06%; selftests pass",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.36019
+    },
+    {
+      "baseline": 0.01987,
+      "better": "lower",
+      "n": 5,
+      "name": "rootfind_best_s_f1024",
+      "note": "kernel time at the best configuration (hash/C16) with all three lookup variants; A/A 0.06%",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.01773
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 5,
+      "name": "rootfind_global_hash_c64_ratio",
+      "note": "all three vs main, hash/C64 at |F|=65536 (packed slots)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.646
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 14334,
+      "path": "research/ic_gpu_rootfind_lookup_20261114/raw/out_lk.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9a/9ad094d30ea977fe367b8933dde9b613b82381b736c2fbacad36e83d302772ef",
+      "sha256": "9ad094d30ea977fe367b8933dde9b613b82381b736c2fbacad36e83d302772ef",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_rootfind_lookup_20261114/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_rootfind_lookup_20261114/fig_lookup.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-rootfind-lookup",
+  "status": "measured",
+  "summary": "rootfind lookup variants (Eytzinger search, packed hash slots, paired lookups), all on: 1.115x (|F|=65536) and 1.121x (|F|=1024) at each workload's best configuration on an A100, faster than main at all 12 configurations, identical relations (device selftests). Kernel component, [pcc:unverified].",
+  "validation": null
+}

@@ -113,6 +113,67 @@ pub fn modulus_exponents(modulus: &BigUint) -> Vec<u64> {
     (0..modulus.bits()).rev().filter(|&i| modulus.bit(i)).collect()
 }
 
+/// Remainder of a modulo b in GF(2)[x] (bit i = coefficient of x^i); b != 0.
+fn gf2_rem(mut a: BigUint, b: &BigUint) -> BigUint {
+    let db = b.bits();
+    while a.bits() >= db {
+        a ^= b << (a.bits() - db) as usize;
+    }
+    a
+}
+
+/// a * b mod f in GF(2)[x], a and b reduced, deg f = m.
+fn gf2_mulmod(a: &BigUint, b: &BigUint, f: &BigUint, m: u64) -> BigUint {
+    let mut r = BigUint::zero();
+    for i in (0..b.bits()).rev() {
+        r <<= 1usize;
+        if r.bit(m) {
+            r ^= f;
+        }
+        if b.bit(i) {
+            r ^= a;
+        }
+    }
+    r
+}
+
+/// Whether the bitset `f` (bit i = coefficient of x^i) is an irreducible polynomial over GF(2).
+/// Rabin's test: x^(2^m) = x mod f, and gcd(x^(2^(m/r)) - x, f) = 1 for every prime r dividing m.
+pub fn gf2_is_irreducible(f: &BigUint) -> bool {
+    if f.bits() < 2 || !f.bit(0) && f.bits() > 2 {
+        return false; // constants, and anything with x as a factor, except x itself
+    }
+    let m = f.bits() - 1;
+    let x_pow_2k = |k: u64| {
+        let mut t = gf2_rem(BigUint::from(2u8), f);
+        for _ in 0..k {
+            t = gf2_mulmod(&t, &t, f, m);
+        }
+        t
+    };
+    if x_pow_2k(m) != gf2_rem(BigUint::from(2u8), f) {
+        return false;
+    }
+    let mut n = m;
+    let mut r = 2;
+    while n > 1 {
+        if n.is_multiple_of(r) {
+            while n.is_multiple_of(r) {
+                n /= r;
+            }
+            let (mut a, mut b) = (f.clone(), x_pow_2k(m / r) ^ BigUint::from(2u8));
+            while !b.is_zero() {
+                (a, b) = (b.clone(), gf2_rem(a, &b));
+            }
+            if a != BigUint::from(1u8) {
+                return false;
+            }
+        }
+        r += 1;
+    }
+    true
+}
+
 pub fn polynomial_shape(weight: usize) -> &'static str {
     match weight {
         3 => "trinomial",

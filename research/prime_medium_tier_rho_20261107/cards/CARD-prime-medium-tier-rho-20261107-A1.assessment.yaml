@@ -1,0 +1,14 @@
+card_id: CARD-prime-medium-tier-rho-20261107-A1
+relay_verbatim: true
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "receipt status 'completed', 53 of 53 commands succeeded, no failing step (cards/CARD-...-A1.receipt.json); commit 5b566039d3bb745b204dac1a61492162deeb5ffb; summed command time 3344.8 s"
+  - "relay: tools check_relay on cards/CARD-...-A1.run.log (the executor's copied output) gave relay_verbatim true, missing_lines []; assessment_facts reports outputs_changed_since_run [] and writes_outside_scope []"
+  - "binary identity: the frozen-ecbench-sha step printed a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9 for the frozen ecbench and 7457cb7ce67a6eff8137606150779c8f268450857595c140903d3b5697210768 for the rfit example binary"
+  - "audits read from the files, sessions/J1..J6.audit.json: all ok true, session_status complete, problems 0, every replay reproduced; records and replays J1 1680/1440 (ECBS1h881c1908f874), J2 560/480 (ECBS1h577690f38604), J3 140/120 (ECBS1he7f3f85340ea), J4 140/120 (ECBS1h267ee2c9e742), J5 140/120 (ECBS1hfa2e81023676), J6 140/120 (ECBS1h437b6c69de79); verified_records equal records in each"
+  - "receipts/J1/admission.json written by admit-j1: job_exit_code 42, audit_records 1680, expected_executions 1680, admitted_for_counts true"
+  - "outputs present: sessions/Jn and Jn.pod for n = 1..6, analysis/table-Jn.md, band-Jn.txt and band-Jn.json, 24 compare-Jn-X.txt, and sessions/Jn/comparisons/rho-neg__X.json for the four X"
+  - "wall time: no step quotes it as a result; the table, band and compare text files hold the tool's own wall columns, which PROTOCOL.md section 10 does not admit (all six pods ended with exit 42)"
+interpretation: not_assessed

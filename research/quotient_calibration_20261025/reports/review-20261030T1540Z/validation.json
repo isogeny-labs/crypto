@@ -1,0 +1,114 @@
+{
+  "schema": "quotient-development-validation/v1",
+  "date": "2026-10-30",
+  "source_implementation_commit": "bab10bbf50950e13d26a07582618c406aaa234e5",
+  "integration_commit": "1733dc59ec16b14aad1f6cbc4de228d7e909b904",
+  "main_source_revision": "423ea37eca55e459028adae4276d628ea6249738",
+  "focused_tests": {
+    "target_components": 8,
+    "canonical_identity_certificate": 9,
+    "original_source": 4,
+    "total": 21,
+    "failed": 0
+  },
+  "strict_clippy": "passed",
+  "canonical_protocol_validation": {
+    "schema": "experiment.protocol/v1",
+    "status": "draft",
+    "findings": 0
+  },
+  "trace_identity": {
+    "id": "IDC1h368ff5f1ba01b556",
+    "proof_bytes_unchanged": true,
+    "integer_expansion_bytes_unchanged": true,
+    "formal_prover_used": false,
+    "independent_runner_review": false
+  },
+  "frozen_target_inputs_sha256": {
+    "fixtures/coordinate-inputs.json": "6e2893b0870efca6660882a8aae72d14fd1bf869010f2a637c5f95c7d4418fdb",
+    "fixtures/historical-controls.json": "db62b80619135fe96ed8c1f93c451d6ffc68c88faa8d0770a93206a61ac9e755",
+    "fixtures/public-target.json": "d33a6cbb4ec6d57628bef31c51d78177bd9e04f3eef078a80db920fdfdee32cf"
+  },
+  "parent_source_manifest_sha256": "cfca312b80fe7a35da6cd8d31ee44b195885aad5fbd6b1de07b1fc9dfe33dc65",
+  "source_files_sha256": {
+    "research/quotient_calibration_20261025/target-native/src/bin/trace-certificate.rs": "19600751cf94178cb489d45f93cf4d9c87f4431cc58c60bc205a652f380d4968",
+    "research/quotient_calibration_20261025/target-native/src/coordinate_ring.rs": "3199ddc33c4b043d8b8fc45e134ba6375d750e62bb0d15e0187bbe4cc8cf1d27",
+    "research/quotient_calibration_20261025/target-native/src/divisor.rs": "7c5ea72e84984c21b1a1d74bdefa2f478a4853b39e44b8ed3d8b72aeb49262a5",
+    "research/quotient_calibration_20261025/target-native/src/kummer.rs": "d45e0ffa0c892489b3be393a3cce498cdfe0a1227dec1142e95d98a9cc3a6712",
+    "research/quotient_calibration_20261025/target-native/src/linear.rs": "9f7d929399adb731960e00a07b0bdceca36177d65ada83d6bab668cf145f6b60",
+    "research/quotient_calibration_20261025/target-native/src/main.rs": "308c1a5540297b893300a7d69dcb652fddc5fc9e2691f33cbf4e5a0509b624bf",
+    "src/cryptanalysis/identity_certificate.rs": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270"
+  },
+  "new_target_frame_images_computed": 0,
+  "new_target_challenge_images_computed": 0,
+  "divisor_inversion_executed": false,
+  "checkpoint": {
+    "user_approved": "2026-10-30",
+    "approved_prefix": "s3://setec-astronomy-artifacts/checkpoints/crypto/codex__quotient-target-calibration-20261026/",
+    "environment_configuration_revision": "34",
+    "configured_outbound_identities": 0,
+    "configured_secret_bindings": 0,
+    "configured_runtime_variables": 0,
+    "gate_exit": 1,
+    "gate_receipt": "checkpoint-gate.log",
+    "upload_attempted": false,
+    "raw_key_reuse_attempted": false
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
+    "qualified_target_image": false,
+    "supported_target_submission_qualified": false,
+    "experiment_launched": false
+  },
+  "root_library": {
+    "full_suite_pass_claimed": false,
+    "prior_run": {
+      "source_base": "c12346cb7",
+      "passed": 4845,
+      "failed": 17,
+      "ignored": 121,
+      "diagnostics": "absent runtime fixtures/evidence",
+      "retained_full_log": "/workspace/quotient-target-validation/root-release-library-materialized.log",
+      "bytes": 435102,
+      "sha256": "4b5fcefaafb6979b299859f696d74fe70c1a2af7a71d74300070030dd14419c6",
+      "unaltered_failure_excerpt": "root-prior-failures.log"
+    },
+    "current_locked_check": {
+      "exit": 101,
+      "root_source_identical_to_main": true,
+      "error": "root Cargo.lock needs updating; left unchanged",
+      "receipt": "root-current-lock-attempt.log"
+    },
+    "earlier_setup_probes": [
+      "root-offline-attempt.log",
+      "root-online-path-attempt.log"
+    ]
+  },
+  "jobs_in_flight": [],
+  "evidence_sha256": {
+    "checkpoint-gate.log": "2f1014b06fd1d5dbb602d7aef98a2e484b85b75101c52555f59d783097048012",
+    "merge-preservation.json": "05326f8c0670604962f8cf5a5da55f77006fe7fad4e20d259911fca6ffa3e6fe",
+    "root-current-lock-attempt.log": "c04dd5187b6af9feff8ec2a0023f5bb819cae68697e73274756a9069ef04d778",
+    "root-offline-attempt.log": "006792d184972065c89bdfcfab1cbe0f5905b1056917d6747b4b1f8cbb52fac7",
+    "root-online-path-attempt.log": "67d004441a183a4fb9076aed656ef669068293ef071742784106b0a2869cd000",
+    "root-prior-failures.log": "cbcae76f96e99e325d4e29aad45d786218bfdbfc53fdc0b9351cda2d4a1a87c8",
+    "source-tests.log": "98c6f31f8342d0869b54c68ccc94144d60d498706a66655907a43059abddebc3",
+    "target-clippy.log": "6c2ca50d9b49a441ccc5602047df3ec192de0476b707754a03ea09fbab0d3ea1",
+    "target-tests.log": "e3f30a917becf74dc3db206c63456578d9155390d1d545b45d3167da0990abb6",
+    "trace-replay.log": "2fa2b6fc4b2af87376302f447814a65992e15014056051e17b7474b5efd96acd"
+  },
+  "formatting": "passed",
+  "actionlint": "passed",
+  "local_report_links_checked": 34,
+  "workflow_triggers": [
+    "push_to_main",
+    "workflow_dispatch"
+  ],
+  "required_pr_merge_checks_unchanged": [
+    "gate",
+    "size",
+    "artifacts"
+  ],
+  "workflow_sha256": "69e0c6ad693f89ec30b848dc1427e5ca81aae5d6fae76a76f0f8e638ea763785"
+}

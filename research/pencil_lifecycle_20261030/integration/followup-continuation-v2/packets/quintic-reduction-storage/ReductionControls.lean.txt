@@ -1,0 +1,16 @@
+import ReductionFinalStorage
+set_option autoImplicit false
+namespace ReductionWord
+open Polynomial
+
+theorem control_empty_monic : monic 17 []=[] := by rfl
+
+theorem control_already_monic : monic 17 [3,1]=[3,1] := by decide
+
+-- An even-degree residual may vanish; the degree-five condition matters.
+theorem control_even_residual : (X^6 : (ZMod 17)[X])-X^3*X^3=0 := by ring
+
+-- A length bound alone permits trailing zero, hence cannot replace normalization.
+theorem control_trailing_zero : ([1,0] : List UInt64).length≤3 ∧
+ ¬ MonicZeroTest.Normal ([1,0] : List UInt64) := by simp [MonicZeroTest.Normal]
+end ReductionWord

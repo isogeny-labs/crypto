@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# T11: an interval factor base (prime-interval:t=T,lo=L) priced end to end in ecbench.
+# PROTOCOL.md (frozen before data). This script starts AFTER the code stage:
+#   the Rust change is made, built with CARGO_TARGET_DIR=/home/user/ctarget-t11,
+#   rustfmt/clippy/unit tests are run, and their logs are in ../build/ (PROTOCOL.md "Code stage").
+# It executes exactly the planned measurement runs, one heavy process at a time:
+#   (p) ecbench plan  - the frozen spec must plan to 84 executions (spec id ECS1hd4f9ace982f5) with no warning
+#   (c) ecbench run   - one session, then band, the frozen paired compares, replay verify
+# Writes only under ../data. No git. No rebuilds. Never touches /home/user/ctarget.
+# Precondition (main session, not this script): .resume/RESUME.md filled and pushed
+# (scripts/checkpoint.sh init), AGENTS.md "Resume checkpoints in S3 before every run".
+set -euo pipefail
+D=/home/user/crypto/research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base
+OUT="$D/data"
+B="$D/build"
+ECB=${ECB:-/home/user/ctarget-t11/release/ecbench}
+# Frozen spec identity (sha256 at protocol freeze, 2026-11-03).
+WANT_SPEC=630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2
+# The incumbent shared binary; the t11 binary must differ from it (it carries the new base).
+SHARED_ECB_SHA=54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b
+WANT_EXEC=84
+WANT_SPEC_ID=ECS1hd4f9ace982f5
+mkdir -p "$OUT"
+LOG="$OUT/run.log"
+log() { echo "$(date -u +%FT%TZ) $*" | tee -a "$LOG"; }
+
+# ---- identity and code-stage gates (abort before any run on failure) ----
+case "$ECB" in /home/user/ctarget/*) log "ABORT: ECB points into /home/user/ctarget (shared tree)"; exit 2;; esac
+[ -x "$ECB" ] || { log "ABORT: $ECB missing (code stage not done)"; exit 2; }
+h_ecb=$(sha256sum "$ECB" | cut -d' ' -f1)
+[ "$h_ecb" != "$SHARED_ECB_SHA" ] || { log "ABORT: t11 ecbench is the shared binary (no new base)"; exit 2; }
+[ -s "$B/ecbench.sha256" ] || { log "ABORT: $B/ecbench.sha256 missing (code stage not recorded)"; exit 2; }
+[ "$h_ecb" = "$(cut -d' ' -f1 "$B/ecbench.sha256")" ] || { log "ABORT: ecbench hash $h_ecb != code-stage record"; exit 2; }
+for f in rustfmt.log clippy.log test.log; do
+  [ -s "$B/$f" ] || { log "ABORT: $B/$f missing"; exit 2; }
+done
+grep -q "^RC=0$" "$B/rustfmt.log" || { log "ABORT: rustfmt --check did not pass"; exit 2; }
+grep -q "^RC=0$" "$B/clippy.log" || grep -q "^CHANGED_FILE_LINTS=0$" "$B/clippy_changed.log" 2>/dev/null \
+  || { log "ABORT: clippy -D warnings reports lints in the changed files"; exit 2; }
+grep -q "^RC=0$" "$B/test.log"    || { log "ABORT: unit tests did not pass"; exit 2; }
+grep -q "prime_interval" "$B/test.log" || { log "ABORT: test log has no prime_interval test"; exit 2; }
+h=$(sha256sum "$D/ecbench/spec.json" | cut -d' ' -f1); [ "$h" = "$WANT_SPEC" ] || { log "ABORT spec hash $h != frozen"; exit 2; }
+{ echo "ecbench $h_ecb $ECB"; echo "spec $WANT_SPEC"; } > "$OUT/binary.sha256"
+[ -s "$B/source.sha256" ] && cp "$B/source.sha256" "$OUT/source.sha256"
+log "identity ok; ecbench=$h_ecb"
+
+S="$OUT/ecbench/s1"
+[ -e "$S" ] && { log "ABORT: $S exists (a session directory is never reused)"; exit 3; }
+mkdir -p "$OUT/ecbench"
+cp "$D/ecbench/spec.json" "$OUT/ecbench/spec.json"
+
+# ---- (p) plan: must accept the new base, 84 executions, frozen spec id, no ordering warning ----
+log "START p: $ECB plan --spec $D/ecbench/spec.json"
+set +e; "$ECB" plan --spec "$D/ecbench/spec.json" > "$OUT/ecbench/plan.txt" 2>&1; rc=$?; set -e
+log "END p rc=$rc"
+[ $rc -eq 0 ] || { log "ABORT p: plan failed (see plan.txt); no data taken"; exit 4; }
+if grep -qi "warning" "$OUT/ecbench/plan.txt"; then log "ABORT p: plan printed a warning; no data taken"; exit 4; fi
+grep -q "^spec $WANT_SPEC_ID .*: $WANT_EXEC executions$" "$OUT/ecbench/plan.txt" || { log "ABORT p: plan is not spec $WANT_SPEC_ID with $WANT_EXEC executions"; exit 4; }
+
+# ---- (c) end-to-end ecbench session at k=20 ----
+uptime > "$OUT/ecbench/load_start.txt"
+log "START c run: $ECB run --wait --allow-busy --spec $D/ecbench/spec.json --out $S"
+set +e; "$ECB" run --wait --allow-busy --spec "$D/ecbench/spec.json" --out "$S" > "$OUT/ecbench/run.log" 2>&1; rc=$?; set -e
+log "END c run rc=$rc"
+uptime > "$OUT/ecbench/load_end.txt"
+set +e
+"$ECB" band --dir "$S" --ranks --json "$OUT/ecbench/band.json" > "$OUT/ecbench/band.txt" 2>&1
+log "c band rc=$?"
+# Frozen paired compares (ratio = b / a) at the three band weights.
+for pair in "pkm-int-t5-g3-lo0 pkm-int-t5-g3-L976503" \
+            "pkm-int-t5-g3-lo0 pkm-int-t5-g3-L541434" \
+            "pkm-int-t5-g3-L976503 pkm-int-t5-g3-L541434" \
+            "pkm-iso-t6-g4-s1093 pkm-int-t5-g3-L976503" \
+            "pkm-iso-t6-g4 pkm-int-t5-g3-L976503" \
+            "pkm-iso-t6-g4 pkm-iso-t6-g4-s1093" \
+            "proj-a pkm-int-t5-g3-L976503" \
+            "rho-neg pkm-int-t5-g3-L976503"; do
+  set -- $pair
+  for w in 0 0.1 1; do
+    f="$OUT/ecbench/compare_${2}__over__${1}_w${w}"
+    "$ECB" compare --dir "$S" --a "$1" --b "$2" --weight "$w" > "$f.txt" 2>&1
+    "$ECB" compare --dir "$S" --a "$1" --b "$2" --weight "$w" --json > "$f.json" 2>"$f.json.stderr"
+    log "c compare $2/$1 w=$w rc=$?"
+  done
+done
+# Replay audit: 12 nonce-selected runs (auditor seed from OS entropy, recorded in the receipt).
+"$ECB" verify --dir "$S" --replay 12 --out "$OUT/ecbench/verify.json" > "$OUT/ecbench/verify.txt" 2>&1
+log "c verify rc=$?"
+set -e
+
+( cd "$OUT" && find . -type f ! -name SHA256SUMS ! -name run.log -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS )
+log "done"

@@ -1,0 +1,29 @@
+/var/tmp/graph-union-mutation-20261101/invocation-ypj898n4/snapshot/Union.lean:41:26: error(lean.unknownIdentifier): Unknown identifier `i`
+/var/tmp/graph-union-mutation-20261101/invocation-ypj898n4/snapshot/Union.lean:43:26: error(lean.unknownIdentifier): Unknown identifier `i`
+/var/tmp/graph-union-mutation-20261101/invocation-ypj898n4/snapshot/Union.lean:45:47: error: Type mismatch: After simplification, term
+  ha
+ has type
+  (match some ab, s.fixed parent with
+    | some ab, none => some (transport p ab)
+    | x, x_1 => s.fixed parent) =
+    some (a, b)
+but is expected to have type
+  transport p ab = (a, b)
+/var/tmp/graph-union-mutation-20261101/invocation-ypj898n4/snapshot/Union.lean:46:55: error(lean.unknownIdentifier): Unknown identifier `i`
+/var/tmp/graph-union-mutation-20261101/invocation-ypj898n4/snapshot/Union.lean:47:18: error(lean.unknownIdentifier): Unknown identifier `i`
+/var/tmp/graph-union-mutation-20261101/invocation-ypj898n4/snapshot/Union.lean:49:31: error(lean.unknownIdentifier): Unknown identifier `i`
+/var/tmp/graph-union-mutation-20261101/invocation-ypj898n4/snapshot/Union.lean:49:41: error: Type mismatch: After simplification, term
+  ha
+ has type
+  (match some ab, s.fixed parent with
+    | some ab, none => some (transport p ab)
+    | x, x_1 => s.fixed parent) =
+    some (a, b)
+but is expected to have type
+  xy = (a, b)
+/var/tmp/graph-union-mutation-20261101/invocation-ypj898n4/snapshot/Union.lean:72:0: warning: automatically included section variable(s) unused in theorem `GraphUnion.both_fixed_zero_consistent`:
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`

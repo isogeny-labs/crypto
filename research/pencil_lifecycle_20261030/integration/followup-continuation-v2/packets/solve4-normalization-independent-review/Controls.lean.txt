@@ -1,0 +1,43 @@
+import Normalization
+set_option autoImplicit false
+namespace NormalizationControls
+open Solve4Stage Solve4Normalize
+instance : Fact (Nat.Prime 7) := ⟨by decide⟩
+instance : Fact (Nat.Prime (7:UInt64).toNat) := ⟨by decide⟩
+def row : WRow := fun j => (#[0,2,4,0,6] : Array UInt64)[j.val]!
+def x : Vector (ZMod 7) := fun j => (#[0,1,1,0] : Array (ZMod 7))[j.val]!
+theorem native_row : wordScale 7 1 row 4=(fun j => (#[0,1,2,0,3] : Array UInt64)[j.val]!) := by decide
+theorem actual_hypotheses : canonical 7 row ∧ (4:UInt64).toNat<(7:UInt64).toNat ∧ (∀ j:Fin 5,j.val<1→ row j=0) ∧ decode 7 row 1≠0 ∧ ((4:UInt64).toNat:ZMod ((7:UInt64).toNat))=(decode 7 row 1)⁻¹  := by
+ refine ⟨by unfold canonical; decide, by decide, by decide, by decide, ?_⟩
+ change (4:ZMod ((7:UInt64).toNat))=(decode 7 row 1)⁻¹
+ have hn:decode 7 row 1≠0 := by decide
+ have hm:(4:ZMod ((7:UInt64).toNat))*(decode 7 row 1)=1 := by decide
+ calc
+  (4:ZMod ((7:UInt64).toNat)) = 4*((decode 7 row 1)*(decode 7 row 1)⁻¹) := by rw [mul_inv_cancel₀ hn];simp
+  _ = (4*(decode 7 row 1))*(decode 7 row 1)⁻¹ := by ring
+  _ = (decode 7 row 1)⁻¹ := by rw [hm,one_mul]
+theorem preserved_solution : residual (decode 7 row) x=0 ∧ residual (decode 7 (wordScale 7 1 row 4)) x=0 := by decide
+theorem zero_pivot_not_one : wordScale 7 1 (fun _=>0) 0 1≠1 := by decide
+theorem wrong_unit_not_one : wordScale 7 1 row 2 1≠1 := by decide
+theorem zero_unit_loses_equation : residual (decode 7 row) (fun _=>0)≠0 ∧ residual (decode 7 (wordScale 7 1 row 0)) (fun _=>0)=0 := by decide
+theorem prefix_needed :
+ let v:WRow:=fun j=>(#[1,2,0,0,3]:Array UInt64)[j.val]!
+ let y:Vector (ZMod 7):=fun j=>(#[1,1,0,0]:Array (ZMod 7))[j.val]!
+ residual (decode 7 v) y=0 ∧ residual (decode 7 (wordScale 7 1 v 4)) y≠0 := by decide
+end NormalizationControls
+#print axioms Solve4Normalize.prefix_preserved
+#print axioms Solve4Normalize.scale_full
+#print axioms Solve4Normalize.scaled_residual
+#print axioms Solve4Normalize.equation_equiv
+#print axioms Solve4Normalize.inverse_pivot_one
+#print axioms Solve4Normalize.inverse_equation_equiv
+#print axioms Solve4Normalize.word_refines
+#print axioms Solve4Normalize.word_prefix
+#print axioms Solve4Normalize.word_inverse_contract
+#print axioms NormalizationControls.native_row
+#print axioms NormalizationControls.actual_hypotheses
+#print axioms NormalizationControls.preserved_solution
+#print axioms NormalizationControls.zero_pivot_not_one
+#print axioms NormalizationControls.wrong_unit_not_one
+#print axioms NormalizationControls.zero_unit_loses_equation
+#print axioms NormalizationControls.prefix_needed

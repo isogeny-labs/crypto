@@ -1,0 +1,81 @@
+name: Prime31 APS linear-chord full-cold same-Q panel
+
+on:
+  push:
+    branches: [research/prime31-aps-linear-chord-20261117]
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+      - research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs
+      - research/prime31_ic_20261115/native/APS_LINEAR_CHORD_PROTOCOL_20261117.md
+      - .github/workflows/prime31-aps-linear-chord.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+      - research/prime31_ic_20261115/native/APS_LINEAR_CHORD_PROTOCOL_20261117.md
+      - .github/workflows/prime31-aps-linear-chord.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prime31-chord-cold:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      RAYON_NUM_THREADS: '1'
+      CARGO_BUILD_JOBS: '2'
+    steps:
+      - name: Checkout experiment protocol and candidate source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+            research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout immutable Rust baseline with complete native dependencies
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/
+            src/cryptanalysis/f4_fp_tower.rs
+            src/cryptanalysis/sig_fp_tower.rs
+          sparse-checkout-cone-mode: false
+      - name: Overlay only candidate Rust source on immutable exact-scientific baseline
+        run: |
+          set -euo pipefail
+          src=research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+          cp "$src" "aps-pinned/$src"
+          cp research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs aps-pinned/research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs
+          sha256sum "$src" "aps-pinned/$src" > prime31-linear-chord-source-hashes.txt
+          test "$(sha256sum "$src" | cut -d' ' -f1)" = "$(sha256sum "aps-pinned/$src" | cut -d' ' -f1)"
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Run complete source-specific native Rust test gates
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_linear_chord_audit
+      - name: Five full-cold Rust solver arms for 24 fresh public Q
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release             --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml             --example prime31_aps_one_relation -- --aps-linear-chord-24q > prime31-linear-chord-24q.json
+          echo "Cold panel summary from source-produced JSON (not independent PCC):"
+          cargo +1.100.0 run --locked --release             --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml             --example prime31_linear_chord_audit -- prime31-linear-chord-24q.json             > prime31-linear-chord-audit.json
+          cat prime31-linear-chord-audit.json
+      - name: Upload all raw records and source pins even if the run fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-aps-linear-chord-24q
+          retention-days: 30
+          if-no-files-found: warn
+          path: |
+            prime31-linear-chord-source-hashes.txt
+            prime31-linear-chord-24q.json
+            prime31-linear-chord-audit.json

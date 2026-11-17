@@ -1,0 +1,2546 @@
+{
+  "aa_in_session_identical_relation_counts": {
+    "identical": 0,
+    "note": "ecbench derives one algorithm seed per (workload, round) shared by every arm, so the in-session A/A arm reproduces the counts exactly (determinism check) and differs only in wall; the yield A/A is the round-parity split below",
+    "pairs": 0
+  },
+  "aa_online_wall_log_ratio": null,
+  "bootstrap": 2000,
+  "class": "c32B",
+  "class_facts": {
+    "D": -414651,
+    "h": 300,
+    "log2_p": 31.90808885383359,
+    "n": 4029750583,
+    "p": 4029877543
+  },
+  "isolation_levels_of_rows": {
+    "L1": 3401,
+    "L2": 6455
+  },
+  "m": 2,
+  "metrics": {
+    "online_wall_ns_per_attempt": {
+      "aa_round_halves": {
+        "curves": 300,
+        "max_ratio": 1.3468034595884337,
+        "median_abs_log_ratio": 0.06285060068663517,
+        "q95_abs_log_ratio": 0.1782728953468116,
+        "sd_log_ratio": 0.09150659274513487
+      },
+      "cells_per_curve": 16.0,
+      "curve_mean_cv": 0.04361152868269652,
+      "curves": 300,
+      "grand_mean": 556.4106163304211,
+      "icc_bootstrap_median": 0.07141100908599075,
+      "icc_bootstrap_upper95": 0.09300238084610073,
+      "icc_clipped": 0.010501828477019127,
+      "icc_perm_null_q95": 0.00865180219899752,
+      "icc_perm_p": 0.02348825587206397,
+      "icc_raw": 0.010501828477019127,
+      "isomorphic_model_control": {
+        "max_ratio": 1.2412992385563844,
+        "median_abs_log_ratio": 0.06364849662412854,
+        "note": "a u-scaling changes x to u^2 x and so the smallest-abscissa factor base; the same curve under another model is the presentation noise",
+        "pairs": 8,
+        "rms_log_ratio": 0.10386619656729257
+      },
+      "max_abs_z": 4.969523206945635,
+      "max_abs_z_perm_null_q95": 6.67689696196483,
+      "max_abs_z_perm_p": 0.5817091454272864,
+      "max_over_min": 1.3168263970093275,
+      "max_over_min_perm_null_q95": 1.4280839565594872,
+      "max_over_min_perm_p": 0.784607696151924,
+      "sigma2_between": 85.47656254474822,
+      "sigma2_within": 8053.73107465808
+    },
+    "rel_gae_per_attempt": {
+      "aa_round_halves": {
+        "curves": 300,
+        "max_ratio": 1.0015964353144367,
+        "median_abs_log_ratio": 0.0003177529362599401,
+        "q95_abs_log_ratio": 0.0009049649228179303,
+        "sd_log_ratio": 0.00047279152709482544
+      },
+      "cells_per_curve": 16.0,
+      "curve_mean_cv": 0.0002405545207051546,
+      "curves": 300,
+      "grand_mean": 1.0110577028972338,
+      "icc_bootstrap_median": 0.05984700914690509,
+      "icc_bootstrap_upper95": 0.0753635996994974,
+      "icc_clipped": 0.0,
+      "icc_perm_null_q95": 0.009176432510957117,
+      "icc_perm_p": 0.6761619190404797,
+      "icc_raw": -0.002808503768829476,
+      "isomorphic_model_control": {
+        "max_ratio": 1.0006147163281973,
+        "median_abs_log_ratio": 0.0004351101471336643,
+        "note": "a u-scaling changes x to u^2 x and so the smallest-abscissa factor base; the same curve under another model is the presentation noise",
+        "pairs": 8,
+        "rms_log_ratio": 0.0004181613841243697
+      },
+      "max_abs_z": 2.4807430640334904,
+      "max_abs_z_perm_null_q95": 3.807547053284344,
+      "max_abs_z_perm_p": 0.9825087456271864,
+      "max_over_min": 1.0011736605723422,
+      "max_over_min_perm_null_q95": 1.0016475562161373,
+      "max_over_min_perm_p": 0.9810094952523738,
+      "sigma2_between": -2.775020812489994e-9,
+      "sigma2_within": 9.908530299249942e-7
+    },
+    "yield": {
+      "aa_round_halves": {
+        "curves": 300,
+        "max_ratio": 1.0964169381107491,
+        "median_abs_log_ratio": 0.02469261259037141,
+        "q95_abs_log_ratio": 0.06340372325296414,
+        "sd_log_ratio": 0.03397394399429265
+      },
+      "cells_per_curve": 16.0,
+      "curve_mean_cv": 0.017104346096777027,
+      "curves": 300,
+      "grand_mean": 0.0010389437376969513,
+      "icc_bootstrap_median": 0.05918689484685751,
+      "icc_bootstrap_upper95": 0.07522847637652057,
+      "icc_clipped": 0.0,
+      "icc_perm_null_q95": 0.008840799067959761,
+      "icc_perm_p": 0.7096451774112944,
+      "icc_raw": -0.0028846381542564667,
+      "isomorphic_model_control": {
+        "max_ratio": 1.0326121041078709,
+        "median_abs_log_ratio": 0.025501145768727567,
+        "note": "a u-scaling changes x to u^2 x and so the smallest-abscissa factor base; the same curve under another model is the presentation noise",
+        "pairs": 8,
+        "rms_log_ratio": 0.022000082449644836
+      },
+      "max_abs_z": 2.826517717112162,
+      "max_abs_z_perm_null_q95": 3.7521545180970275,
+      "max_abs_z_perm_p": 0.7616191904047976,
+      "max_over_min": 1.0951596970694768,
+      "max_over_min_perm_null_q95": 1.1243351063829785,
+      "max_over_min_perm_p": 0.8645677161419291,
+      "positive_control": {
+        "detect_icc_gt_null_q95": 1.0,
+        "detect_max_abs_z_gt_null_q95": 1.0,
+        "detect_max_over_min_gt_null_q95": 1.0,
+        "note": "null thresholds are the 95th percentile of the cell-permutation null of the unplanted data",
+        "planted_curve_trials": 200,
+        "planted_effect_pc_over_main_median": 1.201038802322029
+      },
+      "sigma2_between": -1.5234168344381588e-11,
+      "sigma2_within": 5.296370841206663e-9
+    }
+  },
+  "outcome_status_of_rows": {
+    "exhausted": 9856
+  },
+  "per_curve": [
+    {
+      "attempts": 3075120.0,
+      "curve": 0,
+      "j": 3858176,
+      "pooled_yield": 0.001014594552407711,
+      "relations": 3120.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 1,
+      "j": 72573905,
+      "pooled_yield": 0.001043211321834595,
+      "relations": 3208.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 2,
+      "j": 89518496,
+      "pooled_yield": 0.0010373578917245506,
+      "relations": 3190.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 3,
+      "j": 152991580,
+      "pooled_yield": 0.0010484143708213013,
+      "relations": 3224.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 4,
+      "j": 156684184,
+      "pooled_yield": 0.0010448372746429408,
+      "relations": 3213.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 5,
+      "j": 162341309,
+      "pooled_yield": 0.0010253258409427925,
+      "relations": 3153.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 6,
+      "j": 179348433,
+      "pooled_yield": 0.0010542678009313458,
+      "relations": 3242.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 7,
+      "j": 183347903,
+      "pooled_yield": 0.001026951793751138,
+      "relations": 3158.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 8,
+      "j": 186151452,
+      "pooled_yield": 0.0010506907047529853,
+      "relations": 3231.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 9,
+      "j": 217781553,
+      "pooled_yield": 0.0010461380368896173,
+      "relations": 3217.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 10,
+      "j": 234121261,
+      "pooled_yield": 0.0010155701240927182,
+      "relations": 3123.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 11,
+      "j": 236921498,
+      "pooled_yield": 0.0010461380368896173,
+      "relations": 3217.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 12,
+      "j": 255047223,
+      "pooled_yield": 0.0010386586539712272,
+      "relations": 3194.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 13,
+      "j": 270657507,
+      "pooled_yield": 0.0010610968027263976,
+      "relations": 3263.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 14,
+      "j": 277456862,
+      "pooled_yield": 0.0010123182184760269,
+      "relations": 3113.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 15,
+      "j": 300458769,
+      "pooled_yield": 0.0010302036993678296,
+      "relations": 3168.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 16,
+      "j": 301422922,
+      "pooled_yield": 0.0010659746611514347,
+      "relations": 3278.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 17,
+      "j": 318656666,
+      "pooled_yield": 0.0010188220297094098,
+      "relations": 3133.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 18,
+      "j": 323042269,
+      "pooled_yield": 0.0010516662764379927,
+      "relations": 3234.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 19,
+      "j": 329589601,
+      "pooled_yield": 0.0010490647519446395,
+      "relations": 3226.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 20,
+      "j": 341335787,
+      "pooled_yield": 0.001047763989697963,
+      "relations": 3222.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 21,
+      "j": 348359741,
+      "pooled_yield": 0.0010757303780015088,
+      "relations": 3308.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 22,
+      "j": 349108152,
+      "pooled_yield": 0.0010302036993678296,
+      "relations": 3168.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 23,
+      "j": 359124315,
+      "pooled_yield": 0.0010350815577928666,
+      "relations": 3183.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 24,
+      "j": 366577875,
+      "pooled_yield": 0.0010162205052160567,
+      "relations": 3125.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 25,
+      "j": 373123530,
+      "pooled_yield": 0.0009999609771325997,
+      "relations": 3075.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 26,
+      "j": 389239592,
+      "pooled_yield": 0.0010175212674627331,
+      "relations": 3129.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 27,
+      "j": 396889271,
+      "pooled_yield": 0.0010136189807227036,
+      "relations": 3117.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 28,
+      "j": 408273853,
+      "pooled_yield": 0.001019147220271079,
+      "relations": 3134.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 29,
+      "j": 424050142,
+      "pooled_yield": 0.0010523166575613309,
+      "relations": 3236.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 30,
+      "j": 434549891,
+      "pooled_yield": 0.0010487395613829704,
+      "relations": 3225.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 31,
+      "j": 436496007,
+      "pooled_yield": 0.0009941075470225552,
+      "relations": 3057.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 32,
+      "j": 454107347,
+      "pooled_yield": 0.0010302036993678296,
+      "relations": 3168.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 33,
+      "j": 462877806,
+      "pooled_yield": 0.0010578448971097062,
+      "relations": 3253.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 34,
+      "j": 479073934,
+      "pooled_yield": 0.0010487395613829704,
+      "relations": 3225.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 35,
+      "j": 482808539,
+      "pooled_yield": 0.0010155701240927182,
+      "relations": 3123.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 36,
+      "j": 514224557,
+      "pooled_yield": 0.0010129685995993653,
+      "relations": 3115.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 37,
+      "j": 535120048,
+      "pooled_yield": 0.0010542678009313458,
+      "relations": 3242.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 38,
+      "j": 542165372,
+      "pooled_yield": 0.0010350815577928666,
+      "relations": 3183.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 39,
+      "j": 549682026,
+      "pooled_yield": 0.0010162205052160567,
+      "relations": 3125.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 40,
+      "j": 557512750,
+      "pooled_yield": 0.0010656494705897656,
+      "relations": 3277.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 41,
+      "j": 578995558,
+      "pooled_yield": 0.0010302036993678296,
+      "relations": 3168.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 42,
+      "j": 587489549,
+      "pooled_yield": 0.0010178464580244022,
+      "relations": 3130.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 43,
+      "j": 613556366,
+      "pooled_yield": 0.0010516662764379927,
+      "relations": 3234.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 44,
+      "j": 631590143,
+      "pooled_yield": 0.0010350815577928666,
+      "relations": 3183.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 45,
+      "j": 677015901,
+      "pooled_yield": 0.0010360571294778741,
+      "relations": 3186.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 46,
+      "j": 699888241,
+      "pooled_yield": 0.001014594552407711,
+      "relations": 3120.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 47,
+      "j": 727938404,
+      "pooled_yield": 0.001028902937121153,
+      "relations": 3164.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 48,
+      "j": 735306344,
+      "pooled_yield": 0.0010227243164494394,
+      "relations": 3145.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 49,
+      "j": 758512080,
+      "pooled_yield": 0.0010461380368896173,
+      "relations": 3217.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 50,
+      "j": 831632834,
+      "pooled_yield": 0.0010298785088061603,
+      "relations": 3167.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 51,
+      "j": 862290738,
+      "pooled_yield": 0.0010370327011628815,
+      "relations": 3189.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 52,
+      "j": 865052344,
+      "pooled_yield": 0.0010321548427378443,
+      "relations": 3174.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 53,
+      "j": 868783360,
+      "pooled_yield": 0.0010158953146543876,
+      "relations": 3124.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 54,
+      "j": 869210456,
+      "pooled_yield": 0.0010484143708213013,
+      "relations": 3224.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 55,
+      "j": 886494339,
+      "pooled_yield": 0.001040609797341242,
+      "relations": 3200.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 56,
+      "j": 888387825,
+      "pooled_yield": 0.0010445120840812717,
+      "relations": 3212.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 57,
+      "j": 890284903,
+      "pooled_yield": 0.0010240250786961158,
+      "relations": 3149.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 58,
+      "j": 908938976,
+      "pooled_yield": 0.0010220739353261012,
+      "relations": 3143.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 59,
+      "j": 931163630,
+      "pooled_yield": 0.0010142693618460418,
+      "relations": 3119.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 60,
+      "j": 933059729,
+      "pooled_yield": 0.001021748744764432,
+      "relations": 3142.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 61,
+      "j": 954359178,
+      "pooled_yield": 0.0010354067483545357,
+      "relations": 3184.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 62,
+      "j": 980995070,
+      "pooled_yield": 0.0010516662764379927,
+      "relations": 3234.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 63,
+      "j": 981768551,
+      "pooled_yield": 0.0010458128463279482,
+      "relations": 3216.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 64,
+      "j": 1003158890,
+      "pooled_yield": 0.0010620723744114052,
+      "relations": 3266.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 65,
+      "j": 1017468910,
+      "pooled_yield": 0.001026951793751138,
+      "relations": 3158.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 66,
+      "j": 1023495593,
+      "pooled_yield": 0.0010116678373526887,
+      "relations": 3111.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 67,
+      "j": 1043451625,
+      "pooled_yield": 0.0010373578917245506,
+      "relations": 3190.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 68,
+      "j": 1049448266,
+      "pooled_yield": 0.001021423554202763,
+      "relations": 3141.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 69,
+      "j": 1070789364,
+      "pooled_yield": 0.0010354067483545357,
+      "relations": 3184.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 70,
+      "j": 1085395204,
+      "pooled_yield": 0.0010441868935196024,
+      "relations": 3211.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 71,
+      "j": 1089658077,
+      "pooled_yield": 0.0010627227555347434,
+      "relations": 3268.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 72,
+      "j": 1090128773,
+      "pooled_yield": 0.001052641848123,
+      "relations": 3237.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 73,
+      "j": 1099500086,
+      "pooled_yield": 0.0010357319389162048,
+      "relations": 3185.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 74,
+      "j": 1103086568,
+      "pooled_yield": 0.0010676006139597805,
+      "relations": 3283.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 75,
+      "j": 1147040142,
+      "pooled_yield": 0.001033455604984521,
+      "relations": 3178.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 76,
+      "j": 1221760925,
+      "pooled_yield": 0.0010233746975727776,
+      "relations": 3147.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 77,
+      "j": 1248556185,
+      "pooled_yield": 0.0010370327011628815,
+      "relations": 3189.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 78,
+      "j": 1277238559,
+      "pooled_yield": 0.0010285777465594839,
+      "relations": 3163.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 79,
+      "j": 1280766257,
+      "pooled_yield": 0.0010597960404797211,
+      "relations": 3259.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 80,
+      "j": 1284036193,
+      "pooled_yield": 0.0010516662764379927,
+      "relations": 3234.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 81,
+      "j": 1284902155,
+      "pooled_yield": 0.0010750799968781706,
+      "relations": 3306.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 82,
+      "j": 1289651798,
+      "pooled_yield": 0.0010045136449959677,
+      "relations": 3089.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 83,
+      "j": 1308975398,
+      "pooled_yield": 0.0010744296157548323,
+      "relations": 3304.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 84,
+      "j": 1332426575,
+      "pooled_yield": 0.001042886131272926,
+      "relations": 3207.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 85,
+      "j": 1348228795,
+      "pooled_yield": 0.0010584952782330445,
+      "relations": 3255.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 86,
+      "j": 1366210969,
+      "pooled_yield": 0.0010256510315044616,
+      "relations": 3154.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 87,
+      "j": 1373232340,
+      "pooled_yield": 0.0010272769843128074,
+      "relations": 3159.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 88,
+      "j": 1374054805,
+      "pooled_yield": 0.0010298785088061603,
+      "relations": 3167.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 89,
+      "j": 1389011828,
+      "pooled_yield": 0.0010552433726163531,
+      "relations": 3245.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 90,
+      "j": 1400115248,
+      "pooled_yield": 0.0010461380368896173,
+      "relations": 3217.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 91,
+      "j": 1403128762,
+      "pooled_yield": 0.0010331304144228519,
+      "relations": 3177.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 92,
+      "j": 1409713152,
+      "pooled_yield": 0.0010367075106012123,
+      "relations": 3188.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 93,
+      "j": 1428078101,
+      "pooled_yield": 0.0010656494705897656,
+      "relations": 3277.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 94,
+      "j": 1467393931,
+      "pooled_yield": 0.00104516246520461,
+      "relations": 3214.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 95,
+      "j": 1479445794,
+      "pooled_yield": 0.00103378079554619,
+      "relations": 3179.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 96,
+      "j": 1481076256,
+      "pooled_yield": 0.0009876037357891725,
+      "relations": 3037.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 97,
+      "j": 1481467494,
+      "pooled_yield": 0.001012643409037696,
+      "relations": 3114.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 98,
+      "j": 1484304925,
+      "pooled_yield": 0.001005489216680975,
+      "relations": 3092.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 99,
+      "j": 1496353879,
+      "pooled_yield": 0.0010295533182444912,
+      "relations": 3166.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 100,
+      "j": 1498349437,
+      "pooled_yield": 0.0010285777465594839,
+      "relations": 3163.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 101,
+      "j": 1504164055,
+      "pooled_yield": 0.0010584952782330445,
+      "relations": 3255.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 102,
+      "j": 1504208738,
+      "pooled_yield": 0.001047763989697963,
+      "relations": 3222.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 103,
+      "j": 1507798147,
+      "pooled_yield": 0.001007765550612659,
+      "relations": 3099.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 104,
+      "j": 1507850653,
+      "pooled_yield": 0.0010516662764379927,
+      "relations": 3234.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 105,
+      "j": 1520486042,
+      "pooled_yield": 0.001031179271052837,
+      "relations": 3171.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 106,
+      "j": 1531549379,
+      "pooled_yield": 0.0010623975649730743,
+      "relations": 3267.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 107,
+      "j": 1539058551,
+      "pooled_yield": 0.0010441868935196024,
+      "relations": 3211.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 108,
+      "j": 1562317047,
+      "pooled_yield": 0.0010396342256562346,
+      "relations": 3197.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 109,
+      "j": 1563553943,
+      "pooled_yield": 0.001038333463409558,
+      "relations": 3193.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 110,
+      "j": 1567198527,
+      "pooled_yield": 0.0010448372746429408,
+      "relations": 3213.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 111,
+      "j": 1570910580,
+      "pooled_yield": 0.0010422357501495877,
+      "relations": 3205.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 112,
+      "j": 1607373609,
+      "pooled_yield": 0.0010815838081115533,
+      "relations": 3326.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 113,
+      "j": 1706663555,
+      "pooled_yield": 0.001043211321834595,
+      "relations": 3208.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 114,
+      "j": 1715272230,
+      "pooled_yield": 0.0010653242800280965,
+      "relations": 3276.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 115,
+      "j": 1727906810,
+      "pooled_yield": 0.0010396342256562346,
+      "relations": 3197.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 116,
+      "j": 1755115281,
+      "pooled_yield": 0.0010614219932880667,
+      "relations": 3264.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 117,
+      "j": 1764591898,
+      "pooled_yield": 0.0010399594162179037,
+      "relations": 3198.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 118,
+      "j": 1787983298,
+      "pooled_yield": 0.0010106922656676813,
+      "relations": 3108.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 119,
+      "j": 1804633868,
+      "pooled_yield": 0.001056869325424699,
+      "relations": 3250.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 120,
+      "j": 1812645264,
+      "pooled_yield": 0.0010480891802596322,
+      "relations": 3223.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 121,
+      "j": 1813148110,
+      "pooled_yield": 0.0010207731730794245,
+      "relations": 3139.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 122,
+      "j": 1821103301,
+      "pooled_yield": 0.0010236998881344467,
+      "relations": 3148.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 123,
+      "j": 1833594862,
+      "pooled_yield": 0.0010705273290148028,
+      "relations": 3292.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 124,
+      "j": 1840934976,
+      "pooled_yield": 0.0010197976013944171,
+      "relations": 3136.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 125,
+      "j": 1841695903,
+      "pooled_yield": 0.0010656494705897656,
+      "relations": 3277.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 126,
+      "j": 1857318365,
+      "pooled_yield": 0.0010318296521761752,
+      "relations": 3173.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 127,
+      "j": 1913609522,
+      "pooled_yield": 0.0010601212310413903,
+      "relations": 3260.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 128,
+      "j": 1940910524,
+      "pooled_yield": 0.0010562189443013607,
+      "relations": 3248.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 129,
+      "j": 1953790827,
+      "pooled_yield": 0.0010175212674627331,
+      "relations": 3129.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 130,
+      "j": 1958884835,
+      "pooled_yield": 0.0010282525559978147,
+      "relations": 3162.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 131,
+      "j": 1966529551,
+      "pooled_yield": 0.0010536174198080075,
+      "relations": 3240.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 132,
+      "j": 1977681368,
+      "pooled_yield": 0.0010113426467910195,
+      "relations": 3110.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 133,
+      "j": 1996200682,
+      "pooled_yield": 0.0010513410858763235,
+      "relations": 3233.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 134,
+      "j": 1998637159,
+      "pooled_yield": 0.0010584952782330445,
+      "relations": 3255.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 135,
+      "j": 2008182771,
+      "pooled_yield": 0.0010464632274512864,
+      "relations": 3218.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 136,
+      "j": 2026171124,
+      "pooled_yield": 0.0010386586539712272,
+      "relations": 3194.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 137,
+      "j": 2026987889,
+      "pooled_yield": 0.0010458128463279482,
+      "relations": 3216.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 138,
+      "j": 2034795308,
+      "pooled_yield": 0.0010500403236296469,
+      "relations": 3229.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 139,
+      "j": 2044927630,
+      "pooled_yield": 0.0010318296521761752,
+      "relations": 3173.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 140,
+      "j": 2052690509,
+      "pooled_yield": 0.0010620723744114052,
+      "relations": 3266.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 141,
+      "j": 2054441698,
+      "pooled_yield": 0.0010282525559978147,
+      "relations": 3162.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 142,
+      "j": 2054618752,
+      "pooled_yield": 0.001026951793751138,
+      "relations": 3158.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 143,
+      "j": 2101893177,
+      "pooled_yield": 0.0010565441348630298,
+      "relations": 3249.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 144,
+      "j": 2156413798,
+      "pooled_yield": 0.0010555685631780222,
+      "relations": 3246.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 145,
+      "j": 2158837193,
+      "pooled_yield": 0.001047438799136294,
+      "relations": 3221.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 146,
+      "j": 2168821306,
+      "pooled_yield": 0.0010464632274512864,
+      "relations": 3218.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 147,
+      "j": 2173573128,
+      "pooled_yield": 0.0010240250786961158,
+      "relations": 3149.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 148,
+      "j": 2176977459,
+      "pooled_yield": 0.001038333463409558,
+      "relations": 3193.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 149,
+      "j": 2181114225,
+      "pooled_yield": 0.0010132937901610344,
+      "relations": 3116.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 150,
+      "j": 2191279118,
+      "pooled_yield": 0.0010328052238611826,
+      "relations": 3176.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 151,
+      "j": 2199680497,
+      "pooled_yield": 0.0010396342256562346,
+      "relations": 3197.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 152,
+      "j": 2230285999,
+      "pooled_yield": 0.001061747183849736,
+      "relations": 3265.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 153,
+      "j": 2231766708,
+      "pooled_yield": 0.001016870886339395,
+      "relations": 3127.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 154,
+      "j": 2233342199,
+      "pooled_yield": 0.001040934987902911,
+      "relations": 3201.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 155,
+      "j": 2251070119,
+      "pooled_yield": 0.0010562189443013607,
+      "relations": 3248.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 156,
+      "j": 2263197120,
+      "pooled_yield": 0.0010441868935196024,
+      "relations": 3211.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 157,
+      "j": 2264316831,
+      "pooled_yield": 0.0010363823200395432,
+      "relations": 3187.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 158,
+      "j": 2298405979,
+      "pooled_yield": 0.0010328052238611826,
+      "relations": 3176.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 159,
+      "j": 2332880205,
+      "pooled_yield": 0.0010490647519446395,
+      "relations": 3226.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 160,
+      "j": 2336910962,
+      "pooled_yield": 0.0010539426103696767,
+      "relations": 3241.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 161,
+      "j": 2343460462,
+      "pooled_yield": 0.001043211321834595,
+      "relations": 3208.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 162,
+      "j": 2348969017,
+      "pooled_yield": 0.00107150290069981,
+      "relations": 3295.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 163,
+      "j": 2349265072,
+      "pooled_yield": 0.0010640235177814198,
+      "relations": 3272.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 164,
+      "j": 2359261731,
+      "pooled_yield": 0.0010142693618460418,
+      "relations": 3119.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 165,
+      "j": 2376804675,
+      "pooled_yield": 0.0010067899789276515,
+      "relations": 3096.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 166,
+      "j": 2391369159,
+      "pooled_yield": 0.0010441868935196024,
+      "relations": 3211.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 167,
+      "j": 2391735976,
+      "pooled_yield": 0.0010601212310413903,
+      "relations": 3260.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 168,
+      "j": 2394411790,
+      "pooled_yield": 0.001028902937121153,
+      "relations": 3164.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 169,
+      "j": 2472321314,
+      "pooled_yield": 0.0010578448971097062,
+      "relations": 3253.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 170,
+      "j": 2473185532,
+      "pooled_yield": 0.001033455604984521,
+      "relations": 3178.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 171,
+      "j": 2484893842,
+      "pooled_yield": 0.0010347563672311974,
+      "relations": 3182.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 172,
+      "j": 2485409282,
+      "pooled_yield": 0.001054918182054684,
+      "relations": 3244.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 173,
+      "j": 2498283314,
+      "pooled_yield": 0.0010197976013944171,
+      "relations": 3136.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 174,
+      "j": 2500936489,
+      "pooled_yield": 0.001052641848123,
+      "relations": 3237.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 175,
+      "j": 2526892559,
+      "pooled_yield": 0.001068901376206457,
+      "relations": 3287.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 176,
+      "j": 2544122685,
+      "pooled_yield": 0.0009976846432009157,
+      "relations": 3068.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 177,
+      "j": 2558839529,
+      "pooled_yield": 0.0010302036993678296,
+      "relations": 3168.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 178,
+      "j": 2568109755,
+      "pooled_yield": 0.0010565441348630298,
+      "relations": 3249.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 179,
+      "j": 2604340322,
+      "pooled_yield": 0.001052641848123,
+      "relations": 3237.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 180,
+      "j": 2605988784,
+      "pooled_yield": 0.0010422357501495877,
+      "relations": 3205.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 181,
+      "j": 2619847611,
+      "pooled_yield": 0.001026626603189469,
+      "relations": 3157.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 182,
+      "j": 2643432551,
+      "pooled_yield": 0.0010295533182444912,
+      "relations": 3166.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 183,
+      "j": 2652355073,
+      "pooled_yield": 0.0010597960404797211,
+      "relations": 3259.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 184,
+      "j": 2696110134,
+      "pooled_yield": 0.0010419105595879186,
+      "relations": 3204.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 185,
+      "j": 2698759028,
+      "pooled_yield": 0.0010445120840812717,
+      "relations": 3212.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 186,
+      "j": 2698946007,
+      "pooled_yield": 0.0010467884180129555,
+      "relations": 3219.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 187,
+      "j": 2733437521,
+      "pooled_yield": 0.0010197976013944171,
+      "relations": 3136.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 188,
+      "j": 2740076739,
+      "pooled_yield": 0.0010350815577928666,
+      "relations": 3183.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 189,
+      "j": 2742555684,
+      "pooled_yield": 0.001052641848123,
+      "relations": 3237.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 190,
+      "j": 2753254919,
+      "pooled_yield": 0.0010562189443013607,
+      "relations": 3248.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 191,
+      "j": 2758335141,
+      "pooled_yield": 0.0010341059861078592,
+      "relations": 3180.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 192,
+      "j": 2781224293,
+      "pooled_yield": 0.0010399594162179037,
+      "relations": 3198.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 193,
+      "j": 2797656367,
+      "pooled_yield": 0.0010263014126277998,
+      "relations": 3156.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 194,
+      "j": 2798771949,
+      "pooled_yield": 0.00107150290069981,
+      "relations": 3295.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 195,
+      "j": 2802996598,
+      "pooled_yield": 0.0010318296521761752,
+      "relations": 3173.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 196,
+      "j": 2830362386,
+      "pooled_yield": 0.0010259762220661307,
+      "relations": 3155.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 197,
+      "j": 2832454639,
+      "pooled_yield": 0.0010285777465594839,
+      "relations": 3163.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 198,
+      "j": 2847976724,
+      "pooled_yield": 0.0010506907047529853,
+      "relations": 3231.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 199,
+      "j": 2851726199,
+      "pooled_yield": 0.001045487655766279,
+      "relations": 3215.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 200,
+      "j": 2853955151,
+      "pooled_yield": 0.001057194515986368,
+      "relations": 3251.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 201,
+      "j": 2870932781,
+      "pooled_yield": 0.0010259762220661307,
+      "relations": 3155.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 202,
+      "j": 2885042223,
+      "pooled_yield": 0.0010048388355576368,
+      "relations": 3090.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 203,
+      "j": 2891322967,
+      "pooled_yield": 0.001061747183849736,
+      "relations": 3265.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 204,
+      "j": 2897212501,
+      "pooled_yield": 0.0010493899425063086,
+      "relations": 3227.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 205,
+      "j": 2920329151,
+      "pooled_yield": 0.0010370327011628815,
+      "relations": 3189.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 206,
+      "j": 2921842265,
+      "pooled_yield": 0.0009970342620775775,
+      "relations": 3066.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 207,
+      "j": 2929307112,
+      "pooled_yield": 0.001031179271052837,
+      "relations": 3171.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 208,
+      "j": 2951197902,
+      "pooled_yield": 0.0010698769478914643,
+      "relations": 3290.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 209,
+      "j": 2959049350,
+      "pooled_yield": 0.001026951793751138,
+      "relations": 3158.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 210,
+      "j": 3019949086,
+      "pooled_yield": 0.0010243502692577852,
+      "relations": 3150.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 211,
+      "j": 3031412827,
+      "pooled_yield": 0.0010464632274512864,
+      "relations": 3218.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 212,
+      "j": 3040091155,
+      "pooled_yield": 0.0010503655141913162,
+      "relations": 3230.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 213,
+      "j": 3073397006,
+      "pooled_yield": 0.0010347563672311974,
+      "relations": 3182.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 214,
+      "j": 3082436163,
+      "pooled_yield": 0.0010197976013944171,
+      "relations": 3136.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 215,
+      "j": 3088821914,
+      "pooled_yield": 0.001017196076901064,
+      "relations": 3128.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 216,
+      "j": 3094297585,
+      "pooled_yield": 0.0010389838445328964,
+      "relations": 3195.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 217,
+      "j": 3094753963,
+      "pooled_yield": 0.001061747183849736,
+      "relations": 3265.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 218,
+      "j": 3109581746,
+      "pooled_yield": 0.001057194515986368,
+      "relations": 3251.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 219,
+      "j": 3170393658,
+      "pooled_yield": 0.001061747183849736,
+      "relations": 3265.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 220,
+      "j": 3188545581,
+      "pooled_yield": 0.0010308540804911679,
+      "relations": 3170.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 221,
+      "j": 3201984264,
+      "pooled_yield": 0.001047763989697963,
+      "relations": 3222.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 222,
+      "j": 3221310892,
+      "pooled_yield": 0.0010513410858763235,
+      "relations": 3233.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 223,
+      "j": 3230191069,
+      "pooled_yield": 0.0010256510315044616,
+      "relations": 3154.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 224,
+      "j": 3230593431,
+      "pooled_yield": 0.0010305288899294988,
+      "relations": 3169.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 225,
+      "j": 3244519794,
+      "pooled_yield": 0.0010259762220661307,
+      "relations": 3155.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 226,
+      "j": 3275964973,
+      "pooled_yield": 0.0010523166575613309,
+      "relations": 3236.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 227,
+      "j": 3302028257,
+      "pooled_yield": 0.001026951793751138,
+      "relations": 3158.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 228,
+      "j": 3309060319,
+      "pooled_yield": 0.0010542678009313458,
+      "relations": 3242.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 229,
+      "j": 3315714939,
+      "pooled_yield": 0.0010555685631780222,
+      "relations": 3246.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 230,
+      "j": 3330787887,
+      "pooled_yield": 0.0010272769843128074,
+      "relations": 3159.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 231,
+      "j": 3333654095,
+      "pooled_yield": 0.0010464632274512864,
+      "relations": 3218.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 232,
+      "j": 3344143712,
+      "pooled_yield": 0.0010627227555347434,
+      "relations": 3268.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 233,
+      "j": 3363740593,
+      "pooled_yield": 0.0010363823200395432,
+      "relations": 3187.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 234,
+      "j": 3364074627,
+      "pooled_yield": 0.0010584952782330445,
+      "relations": 3255.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 235,
+      "j": 3369601383,
+      "pooled_yield": 0.0010106922656676813,
+      "relations": 3108.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 236,
+      "j": 3369798694,
+      "pooled_yield": 0.0010532922292463384,
+      "relations": 3239.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 237,
+      "j": 3377637859,
+      "pooled_yield": 0.0010041884544342984,
+      "relations": 3088.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 238,
+      "j": 3413552078,
+      "pooled_yield": 0.0010425609407112568,
+      "relations": 3206.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 239,
+      "j": 3421348886,
+      "pooled_yield": 0.001040934987902911,
+      "relations": 3201.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 240,
+      "j": 3424669374,
+      "pooled_yield": 0.0010067899789276515,
+      "relations": 3096.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 241,
+      "j": 3428663309,
+      "pooled_yield": 0.0010201227919560863,
+      "relations": 3137.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 242,
+      "j": 3435198513,
+      "pooled_yield": 0.0010308540804911679,
+      "relations": 3170.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 243,
+      "j": 3442177064,
+      "pooled_yield": 0.0010165456957777258,
+      "relations": 3126.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 244,
+      "j": 3516046692,
+      "pooled_yield": 0.001017196076901064,
+      "relations": 3128.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 245,
+      "j": 3519067885,
+      "pooled_yield": 0.0010802830458648768,
+      "relations": 3322.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 246,
+      "j": 3521413176,
+      "pooled_yield": 0.0010328052238611826,
+      "relations": 3176.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 247,
+      "j": 3535387162,
+      "pooled_yield": 0.0010467884180129555,
+      "relations": 3219.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 248,
+      "j": 3563937084,
+      "pooled_yield": 0.0010090663128593355,
+      "relations": 3103.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 249,
+      "j": 3578731666,
+      "pooled_yield": 0.0010484143708213013,
+      "relations": 3224.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 250,
+      "j": 3584327201,
+      "pooled_yield": 0.0010363823200395432,
+      "relations": 3187.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 251,
+      "j": 3594074985,
+      "pooled_yield": 0.0010324800332995134,
+      "relations": 3175.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 252,
+      "j": 3600737378,
+      "pooled_yield": 0.0010425609407112568,
+      "relations": 3206.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 253,
+      "j": 3611413976,
+      "pooled_yield": 0.0010220739353261012,
+      "relations": 3143.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 254,
+      "j": 3645609581,
+      "pooled_yield": 0.0010246754598194543,
+      "relations": 3151.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 255,
+      "j": 3658526174,
+      "pooled_yield": 0.0010402846067795728,
+      "relations": 3199.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 256,
+      "j": 3660951700,
+      "pooled_yield": 0.0010373578917245506,
+      "relations": 3190.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 257,
+      "j": 3682061435,
+      "pooled_yield": 0.001028902937121153,
+      "relations": 3164.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 258,
+      "j": 3695504958,
+      "pooled_yield": 0.0010419105595879186,
+      "relations": 3204.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 259,
+      "j": 3703502625,
+      "pooled_yield": 0.0010503655141913162,
+      "relations": 3230.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 260,
+      "j": 3707516389,
+      "pooled_yield": 0.0010493899425063086,
+      "relations": 3227.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 261,
+      "j": 3712690500,
+      "pooled_yield": 0.0010136189807227036,
+      "relations": 3117.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 262,
+      "j": 3716923333,
+      "pooled_yield": 0.0010321548427378443,
+      "relations": 3174.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 263,
+      "j": 3723972588,
+      "pooled_yield": 0.0010363823200395432,
+      "relations": 3187.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 264,
+      "j": 3735546032,
+      "pooled_yield": 0.0010399594162179037,
+      "relations": 3198.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 265,
+      "j": 3744429514,
+      "pooled_yield": 0.001026626603189469,
+      "relations": 3157.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 266,
+      "j": 3752676319,
+      "pooled_yield": 0.0010276021748744765,
+      "relations": 3160.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 267,
+      "j": 3755087992,
+      "pooled_yield": 0.001043211321834595,
+      "relations": 3208.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 268,
+      "j": 3760708745,
+      "pooled_yield": 0.0010331304144228519,
+      "relations": 3177.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 269,
+      "j": 3763901032,
+      "pooled_yield": 0.0010263014126277998,
+      "relations": 3156.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 270,
+      "j": 3783437772,
+      "pooled_yield": 0.001066625042274773,
+      "relations": 3280.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 271,
+      "j": 3784986063,
+      "pooled_yield": 0.0010380082728478888,
+      "relations": 3192.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 272,
+      "j": 3801383302,
+      "pooled_yield": 0.0010467884180129555,
+      "relations": 3219.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 273,
+      "j": 3803314401,
+      "pooled_yield": 0.0010419105595879186,
+      "relations": 3204.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 274,
+      "j": 3805450699,
+      "pooled_yield": 0.0010396342256562346,
+      "relations": 3197.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 275,
+      "j": 3806447349,
+      "pooled_yield": 0.000991180831967533,
+      "relations": 3048.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 276,
+      "j": 3807156384,
+      "pooled_yield": 0.001056869325424699,
+      "relations": 3250.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 277,
+      "j": 3808388598,
+      "pooled_yield": 0.0010318296521761752,
+      "relations": 3173.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 278,
+      "j": 3810970695,
+      "pooled_yield": 0.001064348708343089,
+      "relations": 3273.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 279,
+      "j": 3824612683,
+      "pooled_yield": 0.0010344311766695283,
+      "relations": 3181.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 280,
+      "j": 3825379428,
+      "pooled_yield": 0.0010607716121647285,
+      "relations": 3262.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 281,
+      "j": 3859796226,
+      "pooled_yield": 0.001080933426988215,
+      "relations": 3324.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 282,
+      "j": 3863333616,
+      "pooled_yield": 0.0010503655141913162,
+      "relations": 3230.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 283,
+      "j": 3873756856,
+      "pooled_yield": 0.0010604464216030594,
+      "relations": 3261.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 284,
+      "j": 3874284849,
+      "pooled_yield": 0.001000936548817607,
+      "relations": 3078.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 285,
+      "j": 3890539602,
+      "pooled_yield": 0.0010425609407112568,
+      "relations": 3206.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 286,
+      "j": 3893697088,
+      "pooled_yield": 0.001047763989697963,
+      "relations": 3222.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 287,
+      "j": 3895538147,
+      "pooled_yield": 0.0010204479825177554,
+      "relations": 3138.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 288,
+      "j": 3900984529,
+      "pooled_yield": 0.0010419105595879186,
+      "relations": 3204.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 289,
+      "j": 3947516723,
+      "pooled_yield": 0.0010659746611514347,
+      "relations": 3278.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 290,
+      "j": 3954326321,
+      "pooled_yield": 0.0010389838445328964,
+      "relations": 3195.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 291,
+      "j": 3964334125,
+      "pooled_yield": 0.0010630479460964125,
+      "relations": 3269.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 292,
+      "j": 3971325748,
+      "pooled_yield": 0.0010487395613829704,
+      "relations": 3225.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 293,
+      "j": 3977881339,
+      "pooled_yield": 0.0010373578917245506,
+      "relations": 3190.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 294,
+      "j": 3979668982,
+      "pooled_yield": 0.0010484143708213013,
+      "relations": 3224.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 295,
+      "j": 3980813316,
+      "pooled_yield": 0.001031504461614506,
+      "relations": 3172.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 296,
+      "j": 3992268943,
+      "pooled_yield": 0.0010487395613829704,
+      "relations": 3225.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 297,
+      "j": 4011773902,
+      "pooled_yield": 0.0010282525559978147,
+      "relations": 3162.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 298,
+      "j": 4014208294,
+      "pooled_yield": 0.001038333463409558,
+      "relations": 3193.0,
+      "setup_gae_mean": 4194856.0
+    },
+    {
+      "attempts": 3075120.0,
+      "curve": 299,
+      "j": 4021523718,
+      "pooled_yield": 0.0010763807591248472,
+      "relations": 3310.0,
+      "setup_gae_mean": 4194856.0
+    }
+  ],
+  "permutations": 2000,
+  "plants": 200,
+  "schema": "p2.analysis/v1",
+  "seed": 20261102,
+  "sessions": [
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/c32B_m2/session"
+  ]
+}

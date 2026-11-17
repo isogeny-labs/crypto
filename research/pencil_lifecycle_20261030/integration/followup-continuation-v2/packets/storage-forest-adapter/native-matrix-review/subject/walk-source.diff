@@ -1,0 +1,27 @@
+--- /var/tmp/pencil-kummer-matrix-binding-20261101/inputs/historical-walk.rs	2026-11-01 05:35:47.826723695 +0000
++++ /var/tmp/pencil-kummer-matrix-binding-20261101/walk-source.rs	2026-11-01 05:32:04.473085093 +0000
+@@ -4,15 +4,8 @@
+ #[derive(Clone,Copy,Default,serde::Serialize)]
+ pub struct Ops { pub m:u64,pub a:u64,pub i:u64 }
+ thread_local! { static OPS:std::cell::Cell<Ops>=std::cell::Cell::new(Ops{m:0,a:0,i:0}); }
+-thread_local! { static THETA_INV:std::cell::Cell<Option<([u64;4],[u64;4])>>=const{std::cell::Cell::new(None)}; }
+ pub fn reset_ops(){ OPS.with(|o|o.set(Ops::default())); }
+ pub fn read_ops()->Ops{ OPS.with(|o|o.get()) }
+-pub fn setup_constants(t:[u64;4],p:u64){
+-    THETA_INV.with(|c|c.set(Some((t,t.map(|x|inv(x,p))))));
+-}
+-fn inverse_constant(t:[u64;4],i:usize,p:u64)->u64{
+-    THETA_INV.with(|c|match c.get(){Some((cached,values)) if cached==t=>values[i],_=>inv(t[i],p)})
+-}
+ fn tally_m(){OPS.with(|o|{let mut v=o.get();v.m+=1;o.set(v);});}
+ fn tally_a(){OPS.with(|o|{let mut v=o.get();v.a+=1;o.set(v);});}
+ fn tally_i(){OPS.with(|o|{let mut v=o.get();v.i+=1;o.set(v);});}
+@@ -71,7 +64,7 @@
+     let hx = h(x, p);
+     let hy = h(y, p);
+     let out0 = h(
+-        std::array::from_fn(|i| mul(mul(hx[i], hy[i], p), inverse_constant(t,i,p), p)),
++        std::array::from_fn(|i| mul(mul(hx[i], hy[i], p), inv(t[i], p), p)),
+         p,
+     );
+     let out = std::array::from_fn(|i| {

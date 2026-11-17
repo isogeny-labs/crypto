@@ -1,0 +1,76 @@
+{
+  "schema": "research.source-review/v1",
+  "created_utc": "2026-11-11T00:32:36Z",
+  "reviewer_role": "independent_source_reviewer",
+  "packet": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-managed-stream-integration-20261110",
+  "repository_head": "f3c1b8cc7663ca7d15374ae5e9a16c86839c9d18",
+  "bindings": {
+    "overlay_manifest_sha256": "703148cc9d9861693b4bd40be181db94ce251dbdaa02a75fef9fd47b7e37c7c7",
+    "superseded_manifest_sha256": "5608333063882f0e6f8688d6f608d5706b26c185a9a42207e56d4c184d6c14b2",
+    "manifest_supersession_sha256": "8440425eb79e3ef3bfeb0275d6787d67b73f21971933dc4c10f2c6b306862342",
+    "integration_patch_sha256": "a402e5a1dabdc7c9cb0c9e0cccbc6f521091e6b7271f356e4ac1b1510460164b",
+    "managed_stream_semantic_sketch_sha256": "88fae1304d47d256eedd33de99ef7a66728fa4bc646e98df4025e083931123e3",
+    "actual_byte_snapshot_sha256": "58d0f69e1dfbc8a5866a046dd46e9846094dbae14cf169d06a54e469c4fe8cf8",
+    "pencil_overlay_sha256": "6561b93037b2b005763e64f428af43d24c251732e1a6480980d0f0367ed98249",
+    "progress_native_overlay_sha256": "5b7580b1a9d5109cfe171cd88638451da6400cf392ddf3d6f46d26be17f2cf69",
+    "relation_sink_overlay_sha256": "be2ae6e6a25ac5205fa5fef0e7b7d3efe857d864bdffa4f75ab73c0b75077393",
+    "retained_attempt_join_overlay_sha256": "8e47a8ce34e7dac49b224171a6a8414f708be5bc4b00eb6ebb9e60b6620d42c1",
+    "retained_attempt_cli_overlay_sha256": "ca167cc3a6edcb996078f15cc55a150a9928cafa534f26ee7cf2efc45d2a5998",
+    "donor_native_solver_sha256": "cffa75c07a84cabeadec48b874edbeecf7dc275da8cada28ba620691d0dce753",
+    "donor_relation_stream_sha256": "f062af1c896111cdbbf06f9044f24acec4f99f6a88078424b7c8bcff2a490526"
+  },
+  "checks": {
+    "replacement_manifest_all_hashes_match": true,
+    "originals_match_repository_head": true,
+    "git_apply_check_strip_1": "pass",
+    "patch_applied_to_canonical_worktree": false,
+    "trace_disabled_relation_source_equivalence": "source_review_pass",
+    "donor_event_field_and_order_match": "source_review_pass",
+    "progress_error_nonfatal": "source_review_pass",
+    "trace_error_no_fallback": "source_review_pass",
+    "post_begin_result_returns_close_online_guard": "source_review_pass",
+    "source_revision_external_not_derived": "source_review_pass",
+    "full_prepared_plan_slot_bijection": "fail",
+    "retry_primary_identity_binding": "fail",
+    "file_pin_and_cost_revalidation": "fail"
+  },
+  "findings": [
+    {
+      "id": "B1",
+      "severity": "blocking",
+      "title": "Aggregate row counts do not prove the prepared-plan slot bijection",
+      "locations": [
+        "overlay/src/cryptanalysis/ecbench/retained_attempt_join.rs:84-117",
+        "overlay/src/cryptanalysis/ecbench/retained_attempt_join.rs:211-292"
+      ],
+      "evidence": "The validator accepts seven caller-supplied hex digests and counts primary/measured rows and arm-seed triplets. It does not read plan files, represent plan sequence/round/role, require 1260 workload identities or 18 slots per workload, compare complete identity across a pair, or bind retries to primaries.",
+      "impact": "Fabricated schedules, cross-workload/cross-plan pairs, and arbitrary retry rows can pass the advertised 22680/18900/6300 geometry.",
+      "required_correction": "Parse hash-bound prepared plans, recompute all slots, join every primary and retry to those slots, and compare the complete scheduled identity."
+    },
+    {
+      "id": "B2",
+      "severity": "blocking",
+      "title": "The public exporter trusts caller-supplied FilePins, eligibility, and raw costs",
+      "locations": [
+        "overlay/src/bin/ecbench_retained_attempt_export.rs:20-63",
+        "overlay/src/cryptanalysis/ecbench/retained_attempt_join.rs:18-69",
+        "overlay/src/cryptanalysis/ecbench/retained_attempt_join.rs:123-203"
+      ],
+      "evidence": "The CLI never invokes checked_file or parses referenced evidence. raw_costs is an unconstrained JSON Value, while eligible_for_pair is accepted from the request after shallow presence/status checks.",
+      "impact": "Synthetic pins and null costs can be serialized as an eligible cohort without re-establishing custody, stream completeness, resource/process/controller consistency, or scientific/cost gates.",
+      "required_correction": "Bind a validated retained-session/custody output or re-open, hash, parse, and cross-check every input and recompute eligibility before export."
+    }
+  ],
+  "limits": {
+    "compile_run": false,
+    "tests_run": false,
+    "formatter_run": false,
+    "payload_run": false,
+    "cloud_action": false,
+    "runtime_parity_checked": false,
+    "scientific_ratio_checked": false,
+    "wall_or_allocation_parity_claimed": false,
+    "source_review_only": true
+  },
+  "verdict": "managed_solver_source_path_supported_exporter_admission_blocked"
+}

@@ -1,0 +1,35 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling relation-replay-checker v0.1.0 (/workspace/crypto-integrate/crates/relation-replay-checker)
+   Compiling certified-relations v0.1.0 (/workspace/crypto-integrate/crates/certified-relations)
+   Compiling crypto v0.1.0 (/workspace/crypto-integrate)
+   Compiling relation-native-qualification v0.1.0 (/workspace/crypto-integrate/research/relation_degree_trace_20261115/rust-integration)
+    Finished `release` profile [optimized] target(s) in 9m 35s
+     Running unittests src/bin/native-root-worker.rs (target/release/build/relation-native-qualification/d293c5db7b4ac02b/out/native_root_worker-d293c5db7b4ac02b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/native_api.rs (target/release/build/relation-native-qualification/557b9ec072df5629/out/native_api-557b9ec072df5629)
+
+running 7 tests
+test invalid_and_unrecognized_inputs_are_explicit_errors ... ok
+test native_polynomial_trace_preserves_incomplete_status ... ok
+test separate_replay_public_api_checks_complete_basis_and_changed_identity ... ok
+test wide_field_duplicates_scaling_and_tampered_results ... ok
+test compact_chain_crosses_native_boundary_and_rejects_mutation ... ok
+test agrees_with_complete_native_f4_on_development_cycles ... ok
+test six_variable_breadth_first_basis_passes_on_both_fields ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running tests/root_worker.rs (target/release/build/relation-native-qualification/c5bedf77019e5dae/out/root_worker-c5bedf77019e5dae)
+
+running 3 tests
+test wide_control_is_explicitly_unsupported ... ok
+test capped_f4_cannot_supply_a_complete_basis_or_solving_degree ... ok
+test actual_root_arms_agree_on_complete_development_basis ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

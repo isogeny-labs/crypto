@@ -1,0 +1,520 @@
+{
+ "schema": "replay-certificate/v1",
+ "study": "research/quartic_dl1_cd_sqrt_20261113/combo",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "validated_snapshot": {
+  "repository": "/home/user/crypto (origin/main)",
+  "head": "5f832cf95ac6f027c1fc66ee147637b93800236d",
+  "data_commit": "42114425dd (quartic DL1 follow-up 2 ... measured), merged in PR #4097 (9685c69c3d)",
+  "protocol_freeze_commit": "a595db838d",
+  "dirty_paths_under_study": []
+ },
+ "binaries": {
+  "v2": {
+   "sha256": "183810cf9e1f9ed8ecaedf0295d3b8080528418bb208a71bcabbc3eb03d79bb1",
+   "build": "cd research/quartic_n4v2_20261020 && rustc --edition 2021 -O v2.rs -o <scratch>/bin/v2",
+   "matches_published": true
+  },
+  "v3": {
+   "sha256": "de500bc154f3074359badf434255605ae103b974f4ac2b00159fc84bd3a76bb6",
+   "build": "cd research/quartic_dl1_cd_sqrt_20261113/src && rustc --edition 2021 -O v3.rs -o <scratch>/bin/v3",
+   "matches_published": true
+  },
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+  "published_reference": "research/quartic_dl1_cd_sqrt_20261113/launch/image.json binary_sha256 and combo/runs/binary.sha256",
+  "source_drift_since_image_revision_978de1aef2c9": "none (git diff empty for v2.rs/v3.rs trees, quartic_n4_20261019 includes, src/cryptanalysis/plane_quartic_pic.rs)"
+ },
+ "sample_seed": "dc374f8d226fa5836e29faebf066b4c06a871ca4a41bda8eb0d61bc16adce9c4",
+ "sample_seed_derivation": "sha256 of the UTF-8 string '2026-11-14T05:57:37.716021423Z' (validator's start time, `date -u +%Y-%m-%dT%H:%M:%S.%NZ`, taken before any unit was selected or replayed)",
+ "selection_rule": "rank the 45 units of combo/units.tsv by sha256('<sample_seed>:<ARM>_<q>_<seed>') ascending; take the first 9; then append in rank order any unit needed to cover all three arms and q = 4194271 (none needed). Validator addition outside the random draw: B170_4194271_3, to complete the q = 4194271 BASE/C170/B170 triplet of the headline size.",
+ "runs": [
+  {
+   "unit": "BASE_4194271_3",
+   "arm": "BASE",
+   "q": 4194271,
+   "seed": 3,
+   "c": 2.0,
+   "binary": "v2",
+   "binary_sha256": "183810cf9e1f9ed8ecaedf0295d3b8080528418bb208a71bcabbc3eb03d79bb1",
+   "command": "v2 ic 4194271 3 D 3.0 2.0",
+   "selection": "sampled",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/BASE_4194271_3.jsonl",
+   "committed_sha256": "52636388c9ede0584f21b5465b06dd441fa3e280d9f025a163047ed2317155d3",
+   "replay_record_sha256": "c8e3d39b2e59218097508fda11216271db9325f625b2f3df7b261d6653cd85c9",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 24.5519,
+     "replay": 24.892
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 0.9926,
+     "replay": 1.017
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 6.582,
+     "replay": 6.4
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  },
+  {
+   "unit": "C170_1048507_1",
+   "arm": "C170",
+   "q": 1048507,
+   "seed": 1,
+   "c": 1.7,
+   "binary": "v2",
+   "binary_sha256": "183810cf9e1f9ed8ecaedf0295d3b8080528418bb208a71bcabbc3eb03d79bb1",
+   "command": "v2 ic 1048507 1 D 3.0 1.7",
+   "selection": "sampled",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/C170_1048507_1.jsonl",
+   "committed_sha256": "79da1026441080b8a261d8af45d976cc2963143e18a0e1902e1e72fcfd094211",
+   "replay_record_sha256": "de4dcf5bb0063f6f628c31483d96039bc60c8e112eefaaf9ea371f9e02ac392d",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 21.9399,
+     "replay": 22.0627
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 0.9802,
+     "replay": 0.9837
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 2.59,
+     "replay": 2.645
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  },
+  {
+   "unit": "B170_1048507_1",
+   "arm": "B170",
+   "q": 1048507,
+   "seed": 1,
+   "c": 1.7,
+   "binary": "v3",
+   "binary_sha256": "de500bc154f3074359badf434255605ae103b974f4ac2b00159fc84bd3a76bb6",
+   "command": "v3 ic 1048507 1 D 3.0 1.7",
+   "selection": "sampled",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/B170_1048507_1.jsonl",
+   "committed_sha256": "201cc139b85be5d0903019b3fcbe0c67923bc5d8cce12ad47c9a100a248448ac",
+   "replay_record_sha256": "9b8f2dc2f1bdb082b998471f1926fc7a4915e5db0b9a7aac4187d4d28bab9e28",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 22.1408,
+     "replay": 23.8553
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 0.9831,
+     "replay": 1.0072
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 2.529,
+     "replay": 2.717
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  },
+  {
+   "unit": "B170_1048507_2",
+   "arm": "B170",
+   "q": 1048507,
+   "seed": 2,
+   "c": 1.7,
+   "binary": "v3",
+   "binary_sha256": "de500bc154f3074359badf434255605ae103b974f4ac2b00159fc84bd3a76bb6",
+   "command": "v3 ic 1048507 2 D 3.0 1.7",
+   "selection": "sampled",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/B170_1048507_2.jsonl",
+   "committed_sha256": "184e18dfbba525a067f6fc888d824511b5ac8024b06df7cb26abeea77f1bea54",
+   "replay_record_sha256": "5e24f265aa25ae3e8f0b0bbac862e6b4aabf6b1623d27ac2064fc707587c09b2",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 22.0939,
+     "replay": 23.1908
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 0.9666,
+     "replay": 1.0046
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 1.741,
+     "replay": 1.748
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  },
+  {
+   "unit": "B170_524287_2",
+   "arm": "B170",
+   "q": 524287,
+   "seed": 2,
+   "c": 1.7,
+   "binary": "v3",
+   "binary_sha256": "de500bc154f3074359badf434255605ae103b974f4ac2b00159fc84bd3a76bb6",
+   "command": "v3 ic 524287 2 D 3.0 1.7",
+   "selection": "sampled",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/B170_524287_2.jsonl",
+   "committed_sha256": "860b3c5899ec8b17a45a30a65788856c1f89a6cf2d26a1b8374f5f12cca64c57",
+   "replay_record_sha256": "535caf2ddb3c37f8b440a5488e697c021208a50237bd4a4718e0cbaf700fe393",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 19.5669,
+     "replay": 20.0056
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 0.9119,
+     "replay": 0.9499
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 10.32,
+     "replay": 10.666
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  },
+  {
+   "unit": "BASE_2097091_1",
+   "arm": "BASE",
+   "q": 2097091,
+   "seed": 1,
+   "c": 2.0,
+   "binary": "v2",
+   "binary_sha256": "183810cf9e1f9ed8ecaedf0295d3b8080528418bb208a71bcabbc3eb03d79bb1",
+   "command": "v2 ic 2097091 1 D 3.0 2.0",
+   "selection": "sampled",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/BASE_2097091_1.jsonl",
+   "committed_sha256": "f552d0e49efcc02d47090b618be6313bf8bfa7f9d242dc3e080562f8dd0972a4",
+   "replay_record_sha256": "828b5122d739ead910e9adaa5c0c46f560272ba68ba1fe20456bc4e974e69902",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 23.2673,
+     "replay": 23.2498
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 0.9959,
+     "replay": 1.006
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 5.11,
+     "replay": 5.222
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  },
+  {
+   "unit": "BASE_524287_2",
+   "arm": "BASE",
+   "q": 524287,
+   "seed": 2,
+   "c": 2.0,
+   "binary": "v2",
+   "binary_sha256": "183810cf9e1f9ed8ecaedf0295d3b8080528418bb208a71bcabbc3eb03d79bb1",
+   "command": "v2 ic 524287 2 D 3.0 2.0",
+   "selection": "sampled",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/BASE_524287_2.jsonl",
+   "committed_sha256": "7572e40f013b39278b2259227fdb81fe2bbc02a30a75f98d97bc7580101410d0",
+   "replay_record_sha256": "dcb32b9fd0f902cc5d5b3716f537cbb9a8decf7f599795998b159b5678e0d78d",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 19.1687,
+     "replay": 19.8183
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 0.9341,
+     "replay": 0.9084
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 10.508,
+     "replay": 10.916
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  },
+  {
+   "unit": "C170_4194271_3",
+   "arm": "C170",
+   "q": 4194271,
+   "seed": 3,
+   "c": 1.7,
+   "binary": "v2",
+   "binary_sha256": "183810cf9e1f9ed8ecaedf0295d3b8080528418bb208a71bcabbc3eb03d79bb1",
+   "command": "v2 ic 4194271 3 D 3.0 1.7",
+   "selection": "sampled",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/C170_4194271_3.jsonl",
+   "committed_sha256": "aef45d84b48a87c0b759c4ffe38fe26bf4cb082d15aa38c99a21d407e530568a",
+   "replay_record_sha256": "901515a985c0671ea1368a55cad132b1b024bd6fadfa3b371ba6dc474c0143a5",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 24.7009,
+     "replay": 25.6085
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 1.0282,
+     "replay": 0.9878
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 6.268,
+     "replay": 6.284
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  },
+  {
+   "unit": "BASE_1048507_1",
+   "arm": "BASE",
+   "q": 1048507,
+   "seed": 1,
+   "c": 2.0,
+   "binary": "v2",
+   "binary_sha256": "183810cf9e1f9ed8ecaedf0295d3b8080528418bb208a71bcabbc3eb03d79bb1",
+   "command": "v2 ic 1048507 1 D 3.0 2.0",
+   "selection": "sampled",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/BASE_1048507_1.jsonl",
+   "committed_sha256": "d803be081b2c658465490f8d6c8016aaf72f0c2eaafc0dbd2155a864cc478df4",
+   "replay_record_sha256": "6e92cfc67ce7789bc4207d921c60bf5ff2abb88e0d17ac7a47e78c00bf3b7afa",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 21.9201,
+     "replay": 21.6092
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 0.9803,
+     "replay": 0.9726
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 2.602,
+     "replay": 2.744
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  },
+  {
+   "unit": "B170_4194271_3",
+   "arm": "B170",
+   "q": 4194271,
+   "seed": 3,
+   "c": 1.7,
+   "binary": "v3",
+   "binary_sha256": "de500bc154f3074359badf434255605ae103b974f4ac2b00159fc84bd3a76bb6",
+   "command": "v3 ic 4194271 3 D 3.0 1.7",
+   "selection": "validator-added",
+   "exit_code": 0,
+   "committed_record": "research/quartic_dl1_cd_sqrt_20261113/combo/runs/units/B170_4194271_3.jsonl",
+   "committed_sha256": "f252f7917fdc2a99798fb4fb31547506ca5c0b76c62ee7c5eeaecce690e5582a",
+   "replay_record_sha256": "8cfd0f8869f0b455b655e985d3854879a86f66afaedc1f7a14975c9da078467b",
+   "records_compared": 5,
+   "fields_compared": 301,
+   "mismatches": [],
+   "timing_derived_differences": [
+    {
+     "record": "ratios/D",
+     "field": "r_inv",
+     "committed": 24.1801,
+     "replay": 25.0921
+    },
+    {
+     "record": "ratios/D",
+     "field": "r_lmul",
+     "committed": 0.9977,
+     "replay": 1.0318
+    },
+    {
+     "record": "ratios/D",
+     "field": "search_s",
+     "committed": 6.403,
+     "replay": 6.642
+    }
+   ],
+   "k_found_equals_k": true,
+   "k_found_equals_k_by_ic_arm": {
+    "D": true,
+    "DL1": true,
+    "DL": true
+   },
+   "verified": true
+  }
+ ],
+ "coverage": {
+  "units": 10,
+  "arms": [
+   "B170",
+   "BASE",
+   "C170"
+  ],
+  "q": [
+   524287,
+   1048507,
+   2097091,
+   4194271
+  ]
+ },
+ "comparison_rule": "every record (ratios, ic D/DL1/DL per attempt, runner 'unit') and every field compared by exact equality of the parsed JSON value, except timing fields: keys ending in 'wall' or 'cpu', 'load1', 's.controls_*', and the runner's 'wall_ms'. The ratios record's r_inv, r_lmul and search_s are wall-clock calibrations (v2.rs ratios() lines 36-60 and preamble() line 196); they are compared and listed under timing_derived_differences but not counted as mismatches; the frozen driver's own A/A excludes the same three (research/quartic_n4v2_20261020/summ2.rs:621). The headline M-eq does not use them (it uses summary.json ic_size constants).",
+ "replay_environment": "local session container, Intel(R) Xeon(R) Processor @ 2.10GHz, 4 vCPU; units run one at a time (validator scratchpad, not the producer's j2 directory)",
+ "replay_log": [
+  "2026-11-14T06:00:50Z start",
+  "2026-11-14T06:01:30Z BASE_4194271_3 rc=0",
+  "2026-11-14T06:01:43Z C170_1048507_1 rc=0",
+  "2026-11-14T06:01:56Z B170_1048507_1 rc=0",
+  "2026-11-14T06:02:08Z B170_1048507_2 rc=0",
+  "2026-11-14T06:02:24Z B170_524287_2 rc=0",
+  "2026-11-14T06:02:49Z BASE_2097091_1 rc=0",
+  "2026-11-14T06:03:05Z BASE_524287_2 rc=0",
+  "2026-11-14T06:03:44Z C170_4194271_3 rc=0",
+  "2026-11-14T06:03:56Z BASE_1048507_1 rc=0",
+  "2026-11-14T06:04:35Z B170_4194271_3 rc=0",
+  "2026-11-14T06:04:35Z done"
+ ],
+ "notes": [
+  "10 units replayed, 3010 non-timing fields compared, 0 mismatches; 30 differences in timing-derived ratios-record fields (expected, not counted).",
+  "Every replayed D, DL1 and DL record has ok = true and k_found == k (the planted discrete log was recovered); exit code 0 for every unit.",
+  "Both binaries rebuilt from repository sources are byte-identical to the published v2/v3 used for the committed records.",
+  "Independence caveat: the validator is a subagent dispatched by the session that produced the study and runs in the same container; the replay and recompute share no code or binaries with the producer's run (own build, own runner, own comparison script), but this certificate carries no keyring signature (docs/SABOTAGE_RESISTANCE.md)."
+ ]
+}

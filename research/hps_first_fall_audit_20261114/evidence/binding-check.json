@@ -1,0 +1,36 @@
+{
+  "schema": "native-hps-first-fall-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "hps-first-fall",
+      "expected_decl_sha256": "e1eb8e2ab8f67dad4a4467cb03e2437b6ff46b888c2c36fc6c36c6373abfea9e",
+      "full_characters": 1506,
+      "full_decl_sha256": "e1eb8e2ab8f67dad4a4467cb03e2437b6ff46b888c2c36fc6c36c6373abfea9e",
+      "full_normalized_signature": "theorem hps_first_fall_certificate : (∀ (K : Type) [Field K] (q : ℕ), iSupIndep (fun i : Fin (powerBasis K q).dim => piece K q i.val) ∧ (⨆ i : Fin (powerBasis K q).dim, piece K q i.val) = ⊤ ∧ (∀ i j : ℕ, ∀ a b : Truncated K q, a ∈ piece K q i → b ∈ piece K q j → a * b ∈ piece K q (i + j)) ∧ (∀ a : Truncated K q, a ∈ positivePart K q → a ^ q = 0)) ∧ (∀ (p : ℕ) [Fact p.Prime], 5 ≤ p → Fintype.card (ZMod p) = p ∧ Module.finrank (ZMod p) (Truncated (ZMod p) p) = p ∧ (∀ k : ℕ, x (ZMod p) p ^ 2 ∈ piece (ZMod p) p k ↔ k = 2) ∧ linearGeneratorRank (ZMod p) p (x (ZMod p) p ^ 2) = 1 ∧ firstFallDegree (ZMod p) p 2 = p ∧ (linearGeneratorRank (ZMod p) p (x (ZMod p) p ^ 2) * (p - 1) + 2 + 2 : ℕ) < 2 * firstFallDegree (ZMod p) p 2) ∧ (¬ (∀ d : ℕ, 1 < d → d < 5 → (firstFallDegree (ZMod 5) 5 d : ℚ) ≤ ((linearGeneratorRank (ZMod 5) 5 (x (ZMod 5) 5 ^ d) : ℚ) * (5 - 1) + d + 2) / 2)) ∧ gamma 5 1 2 4 2 = 0 ∧ (¬ (∀ q n d : ℕ, q.Prime → 0 < n → 2 ≤ d → d ≤ n * (q - 1) → 0 < gamma q n d (q - 1) ((n * (q - 1) - d + 2) / 2))) ∧ (∀ (K : Type) [Field K] (q d : ℕ), 3 ≤ q → 2 ≤ d → d < q → firstFallDegree K q d = q ∧ linearGeneratorRank K q (x K q ^ d) = 1) ∧ ((∀ k : ℕ, k < 3 → Subsingleton (sourceHomology (ZMod 5) 5 2 k)) ∧ Nontrivial (sourceHomology (ZMod 5) 5 2 3)) ∧ (firstFallDegree (ZMod 3) 3 2 = 3 ∧ linearGeneratorRank (ZMod 3) 3 (x (ZMod 3) 3 ^ 2) = 1 ∧ 2 * firstFallDegree (ZMod 3) 3 2 = linearGeneratorRank (ZMod 3) 3 (x (ZMod 3) 3 ^ 2) * (3 - 1) + 2 + 2) ∧ (x (ZMod 2) 2 ^ 2 = 0 ∧ piece (ZMod 2) 2 2 = ⊥)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "hps_first_fall_certificate",
+        "end_byte": 2087,
+        "file": "/workspace/scratch/hps-native-input01/HPSCertificate.lean",
+        "qualified_decl_id": "HPSFirstFallAudit.hps_first_fall_certificate",
+        "signature": "theorem hps_first_fall_certificate :\n    (∀ (K : Type) [Field K] (q : ℕ),\n      iSupIndep (fun i : Fin (powerBasis K q).dim => piece K q i.val) ∧\n      (⨆ i : Fin (powerBasis K q).dim, piece K q i.val) = ⊤ ∧\n      (∀ i j : ℕ, ∀ a b : Truncated K q,\n        a ∈ piece K q i → b ∈ piece K q j → a * b ∈ piece K q (i + j)) ∧\n      (∀ a : Truncated K q, a ∈ positivePart K q → a ^ q = 0)) ∧\n    (∀ (p : ℕ) [Fact p.Prime], 5 ≤ p →\n      Fintype.card (ZMod p) = p ∧ Module.finrank (ZMod p) (Truncated (ZMod p) p) = p ∧\n      (∀ k : ℕ, x (ZMod p) p ^ 2 ∈ piece (ZMod p) p k ↔ k = 2) ∧\n      linearGeneratorRank (ZMod p) p (x (ZMod p) p ^ 2) = 1 ∧\n      firstFallDegree (ZMod p) p 2 = p ∧\n      (linearGeneratorRank (ZMod p) p (x (ZMod p) p ^ 2) * (p - 1) + 2 + 2 : ℕ) <\n        2 * firstFallDegree (ZMod p) p 2) ∧\n    (¬ (∀ d : ℕ, 1 < d → d < 5 →\n      (firstFallDegree (ZMod 5) 5 d : ℚ) ≤\n        ((linearGeneratorRank (ZMod 5) 5 (x (ZMod 5) 5 ^ d) : ℚ) * (5 - 1) + d + 2) / 2)) ∧\n    gamma 5 1 2 4 2 = 0 ∧\n    (¬ (∀ q n d : ℕ, q.Prime → 0 < n → 2 ≤ d → d ≤ n * (q - 1) →\n      0 < gamma q n d (q - 1) ((n * (q - 1) - d + 2) / 2))) ∧\n    (∀ (K : Type) [Field K] (q d : ℕ), 3 ≤ q → 2 ≤ d → d < q →\n      firstFallDegree K q d = q ∧ linearGeneratorRank K q (x K q ^ d) = 1) ∧\n    ((∀ k : ℕ, k < 3 → Subsingleton (sourceHomology (ZMod 5) 5 2 k)) ∧\n      Nontrivial (sourceHomology (ZMod 5) 5 2 3)) ∧\n    (firstFallDegree (ZMod 3) 3 2 = 3 ∧\n      linearGeneratorRank (ZMod 3) 3 (x (ZMod 3) 3 ^ 2) = 1 ∧\n      2 * firstFallDegree (ZMod 3) 3 2 =\n        linearGeneratorRank (ZMod 3) 3 (x (ZMod 3) 3 ^ 2) * (3 - 1) + 2 + 2) ∧\n    (x (ZMod 2) 2 ^ 2 = 0 ∧ piece (ZMod 2) 2 2 = ⊥)",
+        "start_byte": 279
+      },
+      "recorded_statement": "theorem hps_first_fall_certificate : (∀ (K : Type) [Field K] (q : ℕ), iSupIndep (fun i : Fin (powerBasis K q).dim => piece K q i.val) ∧ (⨆ i : Fin (powerBasis K q).dim, piece K q i.val) = ⊤ ∧ (∀ i j : ℕ, ∀ a b : Truncated K q, a ∈ piece K q i → b ∈ piece K q j → a * b ∈ piece K q (i + j)) ∧ (∀ a : Truncated K q, a ∈ positivePart K q → a ^ q = 0)) ∧ (∀ (p : ℕ) [Fact p.Prime], 5 ≤ p → Fintype.card (ZMod p) = p ∧ Module.finrank (ZMod p) (Truncated (ZMod p) p) = p ∧ (∀ k : ℕ, x (ZMod p) p ^ 2 ∈ piece (ZMod p) p k ↔ k = 2) ∧ linearGeneratorRank (ZMod p) p (x (ZMod p) p ^ 2) = 1 ∧ firstFallDegree (ZMod p) p 2 = p ∧ (linearGeneratorRank (ZMod p) p (x (ZMod p) p ^ 2) * (p - 1) + 2 + 2 : ℕ) < 2 * firstFallDegree (ZMod p) p 2) ∧ (¬ (∀ d : ℕ, 1 < d → d < 5 → (firstFallDegree (ZMod 5) 5 d : ℚ) ≤ ((linearGeneratorRank (ZMod 5) 5 (x (ZMod 5) 5 ^ d) : ℚ) * (5 - 1) + d + 2) / 2)) ∧ gamma 5 1 2 4 2 = 0 ∧ (¬ (∀ q n d : ℕ, q.Prime → 0 < n → 2 ≤ d → d ≤ n * (q - 1) → 0 < gamma q n d (q - 1) ((n * (q - 1) - d + 2) / 2))) ∧ (∀ (K : Type) [Field K] (q d : ℕ), 3 ≤ q → 2 ≤ d → d < q → firstFallDegree K q d = q ∧ linearGeneratorRank K q (x K q ^ d) = 1) ∧ ((∀ k : ℕ, k < 3 → Subsingleton (sourceHomology (ZMod 5) 5 2 k)) ∧ Nontrivial (sourceHomology (ZMod 5) 5 2 3)) ∧ (firstFallDegree (ZMod 3) 3 2 = 3 ∧ linearGeneratorRank (ZMod 3) 3 (x (ZMod 3) 3 ^ 2) = 1 ∧ 2 * firstFallDegree (ZMod 3) 3 2 = linearGeneratorRank (ZMod 3) 3 (x (ZMod 3) 3 ^ 2) * (3 - 1) + 2 + 2) ∧ (x (ZMod 2) 2 ^ 2 = 0 ∧ piece (ZMod 2) 2 2 = ⊥)",
+      "recorded_text_sha256": "e1eb8e2ab8f67dad4a4467cb03e2437b6ff46b888c2c36fc6c36c6373abfea9e",
+      "source_plan": "research/hps_first_fall_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "HPSFirstFallAudit.hps_first_fall_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native source processing, not kernel parser/hash/physicalhost/execution refinement."
+}

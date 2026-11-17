@@ -1,0 +1,192 @@
+{
+  "extraction_method": "unique named fn header, balanced braces; asserts no strings or comments in selected bodies",
+  "sources": {
+    "canonical": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/five_leads_e2e_20261019/native/genus2_model_gate.rs",
+      "full_sha256": "989d1bd50e66ce40953162b2cc0eef894a3f81542f3b5a8f1e5a7bba90408e7f",
+      "functions": {
+        "choose": {
+          "start_line": 8,
+          "end_line": 14,
+          "sha256": "22d2949733f4cba57394d9ce4a7821d31dfd3e782fcfc3fefb958f57571b5fb7",
+          "text": "fn choose(n: usize, k: usize) -> u64 {\n    let mut x = 1;\n    for i in 0..k {\n        x = x * (n - i) as u64 / (i + 1) as u64;\n    }\n    x\n}"
+        },
+        "transform": {
+          "start_line": 15,
+          "end_line": 34,
+          "sha256": "596ae0e7e2225f0f936e1019cf5cf5741c4604dc167edbfdfe4a2681928c76ce",
+          "text": "fn transform(poly: &[u64], alpha: u64, beta: u64, scale: u64, f: &Field) -> Vec<u64> {\n    let mut out = vec![0; poly.len()];\n    let inv = f.inv(scale);\n    for (k, &coefficient) in poly.iter().enumerate() {\n        for (j, slot) in out.iter_mut().enumerate().take(k + 1) {\n            let term = f.mul(\n                coefficient,\n                f.mul(\n                    choose(k, j) % f.p,\n                    f.mul(f.pow(alpha, j as u64), f.pow(beta, (k - j) as u64)),\n                ),\n            );\n            *slot = f.add(*slot, f.mul(term, inv));\n        }\n    }\n    while out.last() == Some(&0) {\n        out.pop();\n    }\n    out\n}"
+        },
+        "map_divisor": {
+          "start_line": 35,
+          "end_line": 55,
+          "sha256": "27454dacb6a1fecb5f7b3b69175d1cdc2d19003b71e70f05e06eda61e4fcf49e",
+          "text": "fn map_divisor(d: Divisor, alpha: u64, beta: u64, f: &Field) -> Divisor {\n    if d.degree == 0 {\n        return d;\n    }\n    let u = transform(\n        &d.u[..=d.degree],\n        alpha,\n        beta,\n        f.pow(alpha, d.degree as u64),\n        f,\n    );\n    let v = transform(&d.v[..d.degree], alpha, beta, f.pow(alpha, 3), f);\n    let mut result = Divisor {\n        degree: d.degree,\n        u: [0; 3],\n        v: [0; 2],\n    };\n    result.u[..u.len()].copy_from_slice(&u);\n    result.v[..v.len()].copy_from_slice(&v);\n    result\n}"
+        }
+      }
+    },
+    "related-gate": {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/src/bin/projective_law_gate.rs",
+      "full_sha256": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+      "functions": {
+        "choose": {
+          "start_line": 436,
+          "end_line": 442,
+          "sha256": "4a87bfd4d05ab9f4531690ecc92ac590f1339206595f5df8071790e556bd119d",
+          "text": "fn choose(n: usize, k: usize) -> u64 {\n    let mut out = 1;\n    for i in 0..k {\n        out = out * (n - i) as u64 / (i + 1) as u64;\n    }\n    out\n}"
+        },
+        "transform": {
+          "start_line": 443,
+          "end_line": 462,
+          "sha256": "2600c9ce17a4e8833a009e1b3bdc5f95b568592cf867e01eda88d7b774c9ac2e",
+          "text": "fn transform(poly: &[u64], alpha: u64, beta: u64, scale: u64, f: &Field) -> Vec<u64> {\n    let mut out = vec![0; poly.len()];\n    let scale_inv = f.inv(scale);\n    for (k, &coefficient) in poly.iter().enumerate() {\n        for (j, slot) in out.iter_mut().enumerate().take(k + 1) {\n            let term = f.mul(\n                coefficient,\n                f.mul(\n                    choose(k, j) % f.p,\n                    f.mul(f.pow(alpha, j as u64), f.pow(beta, (k - j) as u64)),\n                ),\n            );\n            *slot = f.add(*slot, f.mul(term, scale_inv));\n        }\n    }\n    while out.last() == Some(&0) {\n        out.pop();\n    }\n    out\n}"
+        },
+        "map_divisor": null
+      }
+    },
+    "state-collector": {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/src/bin/projective_state_collector.rs",
+      "full_sha256": "96246448e56f46b57e0ddd751990cf11fab122fbc04355b3e0ec6530194f1e35",
+      "functions": {
+        "choose": {
+          "start_line": 73,
+          "end_line": 79,
+          "sha256": "22d2949733f4cba57394d9ce4a7821d31dfd3e782fcfc3fefb958f57571b5fb7",
+          "text": "fn choose(n: usize, k: usize) -> u64 {\n    let mut x = 1;\n    for i in 0..k {\n        x = x * (n - i) as u64 / (i + 1) as u64;\n    }\n    x\n}"
+        },
+        "transform": {
+          "start_line": 80,
+          "end_line": 99,
+          "sha256": "596ae0e7e2225f0f936e1019cf5cf5741c4604dc167edbfdfe4a2681928c76ce",
+          "text": "fn transform(poly: &[u64], alpha: u64, beta: u64, scale: u64, f: &Field) -> Vec<u64> {\n    let mut out = vec![0; poly.len()];\n    let inv = f.inv(scale);\n    for (k, &coefficient) in poly.iter().enumerate() {\n        for (j, slot) in out.iter_mut().enumerate().take(k + 1) {\n            let term = f.mul(\n                coefficient,\n                f.mul(\n                    choose(k, j) % f.p,\n                    f.mul(f.pow(alpha, j as u64), f.pow(beta, (k - j) as u64)),\n                ),\n            );\n            *slot = f.add(*slot, f.mul(term, inv));\n        }\n    }\n    while out.last() == Some(&0) {\n        out.pop();\n    }\n    out\n}"
+        },
+        "map_divisor": {
+          "start_line": 100,
+          "end_line": 120,
+          "sha256": "ff6b5cdd5eaa6a4749dc69e3a5362a76c34d19a6701b38779d91c918456ca70e",
+          "text": "fn map_divisor(d: Divisor, alpha: u64, beta: u64, f: &Field) -> Divisor {\n    if d.degree == 0 {\n        return d;\n    }\n    let u = transform(\n        &d.u[..=d.degree],\n        alpha,\n        beta,\n        f.pow(alpha, d.degree as u64),\n        f,\n    );\n    let v = transform(&d.v[..d.degree], alpha, beta, f.pow(alpha, 3), f);\n    let mut out = Divisor {\n        degree: d.degree,\n        u: [0; 3],\n        v: [0; 2],\n    };\n    out.u[..u.len()].copy_from_slice(&u);\n    out.v[..v.len()].copy_from_slice(&v);\n    out\n}"
+        }
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "source": "related-gate",
+      "function": "choose",
+      "present": true,
+      "byte_identical": false,
+      "identifier_replacements": {
+        "out": "x"
+      },
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    },
+    {
+      "source": "related-gate",
+      "function": "transform",
+      "present": true,
+      "byte_identical": false,
+      "identifier_replacements": {
+        "scale_inv": "inv"
+      },
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    },
+    {
+      "source": "related-gate",
+      "function": "map_divisor",
+      "present": false
+    },
+    {
+      "source": "state-collector",
+      "function": "choose",
+      "present": true,
+      "byte_identical": true,
+      "identifier_replacements": {},
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    },
+    {
+      "source": "state-collector",
+      "function": "transform",
+      "present": true,
+      "byte_identical": true,
+      "identifier_replacements": {},
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    },
+    {
+      "source": "state-collector",
+      "function": "map_divisor",
+      "present": true,
+      "byte_identical": false,
+      "identifier_replacements": {
+        "out": "result"
+      },
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    }
+  ],
+  "affected_packets": [
+    {
+      "packet": "coefficient-array-storage",
+      "excerpt_sha256": "396fc8c38664cc860d967aae7950cf489d1fd850389e8f44c6eb146ff3486715",
+      "excerpt_matches_related_gate_first61": true,
+      "named_functions_present": {
+        "choose": false,
+        "transform": false,
+        "map_divisor": false
+      },
+      "correction": "Use named canonical function excerpts and source map in this correction; preserve prior packet unchanged."
+    },
+    {
+      "packet": "coefficient-traversal",
+      "excerpt_sha256": "396fc8c38664cc860d967aae7950cf489d1fd850389e8f44c6eb146ff3486715",
+      "excerpt_matches_related_gate_first61": true,
+      "named_functions_present": {
+        "choose": false,
+        "transform": false,
+        "map_divisor": false
+      },
+      "correction": "Use named canonical function excerpts and source map in this correction; preserve prior packet unchanged."
+    },
+    {
+      "packet": "traversal-polynomial-composition",
+      "excerpt_sha256": "396fc8c38664cc860d967aae7950cf489d1fd850389e8f44c6eb146ff3486715",
+      "excerpt_matches_related_gate_first61": true,
+      "named_functions_present": {
+        "choose": false,
+        "transform": false,
+        "map_divisor": false
+      },
+      "correction": "Use named canonical function excerpts and source map in this correction; preserve prior packet unchanged."
+    },
+    {
+      "packet": "scale-trim-storage",
+      "excerpt_sha256": "396fc8c38664cc860d967aae7950cf489d1fd850389e8f44c6eb146ff3486715",
+      "excerpt_matches_related_gate_first61": true,
+      "named_functions_present": {
+        "choose": false,
+        "transform": false,
+        "map_divisor": false
+      },
+      "correction": "Use named canonical function excerpts and source map in this correction; preserve prior packet unchanged."
+    }
+  ],
+  "original_binding": {
+    "repository_head": "f0bb99af10860281a47c070a75abaced6624e578",
+    "loop_source_path": "research/five_leads_e2e_20261019/native/genus2_model_gate.rs",
+    "loop_source_full_sha256": "989d1bd50e66ce40953162b2cc0eef894a3f81542f3b5a8f1e5a7bba90408e7f",
+    "excerpt_lines": [
+      1,
+      56
+    ],
+    "excerpt_sha256": "0f430cb6a363e4f95025f2d258d1ba3005dd3e5c3f4f5cc685f613718bdf7aa5",
+    "field_source_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs",
+    "field_source_sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+    "source_field_inverse_requires_nonzero": true,
+    "remaining_bridge": "Prime-field encoding, arithmetic correspondence and literal vector/compiler correspondence require separate binding; symbolic loop and bounded UInt64 choose are checked here."
+  },
+  "canonical_full_hash_matches_original": true,
+  "independent_source_fidelity_review": "pending"
+}

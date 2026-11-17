@@ -1,0 +1,56 @@
+{
+  "files": [
+    {
+      "path": "native/src/main.rs",
+      "sha256": "506d1093bc9b88acff2f47f0f61983dbb02a3eda097c79ac73c2866423c24175",
+      "bytes": 11384
+    },
+    {
+      "path": "native/src/helpers.rs",
+      "sha256": "11572b16ef8fb2361786b8a94b2f92c24912707a6c8dbb039046b4437a977c90",
+      "bytes": 9730
+    },
+    {
+      "path": "native/src/big.rs",
+      "sha256": "24485366af25ffa6df9d094c34815052723689ff3edf4a206f0f762f2b54fafb",
+      "bytes": 4076
+    },
+    {
+      "path": "native/src/poly.rs",
+      "sha256": "b96768c3b3d98498040980685004f8206a180d2712bfdfe8277a51e2e92dde01",
+      "bytes": 4634
+    },
+    {
+      "path": "native/src/p192.rs",
+      "sha256": "6300169683f7dbc83c9a4fc756dc01466133a6e734a1d30004fd4cc7ab73a4f2",
+      "bytes": 16079
+    },
+    {
+      "path": "native/Cargo.toml",
+      "sha256": "19400048ad2d3ab6b4630a9db8874e8577e154311bb6762f296c48388a762e7d",
+      "bytes": 254
+    },
+    {
+      "path": "native/Cargo.lock",
+      "sha256": "aff2a39e37b181e134f454030569c408515bfdee850a0f646876996e12750228",
+      "bytes": 3564
+    },
+    {
+      "path": "input-p192.json",
+      "sha256": "25dd564a3bbe97139e8bc2e2a57a63191ed173e74493937eeda7c0a5f7d9e88f",
+      "bytes": 551
+    },
+    {
+      "path": "input-blocks-r63.json",
+      "sha256": "dc8ddbbc36ce3382cf5478a8325549464b73f07e1768cd02a00f12e22c5cf3dd",
+      "bytes": 24785
+    }
+  ],
+  "launches": [
+    "CARGO_BUILD_JOBS=1 CARGO_TARGET_DIR=/tmp/p192-round70-target timeout 120 cargo build --release --locked --offline --manifest-path native/Cargo.toml",
+    "timeout 120 /tmp/p192-round70-target/release/shifted-fiber",
+    "timeout 120 /tmp/p192-round70-target/release/fiber-p192 ."
+  ],
+  "scientific_data_taken": false,
+  "scope": "Frozen Round70 exact panel; no timing/statistical comparison; fresh-copy verification is declared, zero scientific retries"
+}

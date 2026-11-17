@@ -83,11 +83,23 @@ non-secret environment, receipt directory and timeout before delegation. Follow
    not a newly named duplicate. A GitHub rerun is a new experiment, not resume.
 3. Verify live capacity. Ordinary jobs use `cpu-spot`; native L2 jobs select
    `cpu-l2-spot` and its benchmark taint automatically. Both span x86 compute,
-   general-purpose and memory families. Each pool is capped at 32 vCPUs and
-   128 GiB; nodes must fit their individual pool, with no cross-pool borrowing.
-   The combined worker cap is 64 vCPUs and the account's Standard Spot quota is
-   currently 96 in `us-east-2`; other consumers share it. Do not request a quota
-   increase or raise pool caps implicitly. Count default instance vCPUs even
+   general-purpose and memory families. The desired ordinary ceiling is 16 vCPUs /
+   128 GiB; L2 is 8 vCPUs / 32 GiB (24 vCPUs / 160 GiB combined). Verify actual
+   NodePool limits and the namespace quota; the MCP overview's compiled-in
+   numbers are not a live readback. Run the read-only
+   `scripts/isolab_pool_check.sh --cpu N --memory M [--pool cpu-spot] --save <receipt>/pool.json`:
+   it counts every pod on the pool's nodes and every pod pending for the pool,
+   in all namespaces, against node allocatable, the NodePool limit and the
+   quota, and names the jobs in the way (exit 10). A check that reads only this
+   study's own Jobs by name is blind to other tenants (2026-11-10: 38 min
+   pending). Follow
+   [COST_CONTROLS.md](../../../taskq/deploy/eks-karpenter/COST_CONTROLS.md).
+   Commit and push source, protocol and launch configuration before builds or
+   trials; run `check-experiment-git` as documented there and retain its receipt.
+   Record a finite dollar ceiling and charge all attempts, including failures.
+   Stop new launches when the budget is exhausted or its remaining balance is
+   unknown. Queue work instead of raising quotas, changing providers or reducing
+   the frozen experiment. Do not request a quota increase or raise pool caps implicitly. Count default instance vCPUs even
    when SMT is disabled. `m8a.2xlarge` and the contract default `c8a.2xlarge`
    have verified no-SMT L2 evidence. GPU and ARM builds are separate work.
 4. For resumable work, check the implemented recovery contract and a real
@@ -119,3 +131,22 @@ private S3 receipt/results locations and any remaining gap. Keep process-memory
 checkpoints in private encrypted storage, never GitHub artifacts or Git. An
 infrastructure pass is not an algorithm speedup. For performance claims, follow
 the repository's measurement, independent replay and report-evidence rules.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope isolab-eks`. Apply the
+   adopted lessons; treat candidates as hypotheses this run can test.
+2. **While acting**: resolve a blocker yourself within your authority
+   (diagnose the cause, try the documented remedy, then a materially different
+   approach) before escalating; AGENTS.md "Persistent scientific research loop".
+   Persistence grants no extra execution or spending authority.
+3. **After acting**: record the outcome with evidence,
+   `python3 tools/lessons.py outcome --scope isolab-eks --task "..." --result success|partial|fail|blocked --evidence <receipt|commit|job> [--applied L-...]`,
+   and `lessons.py test --lesson L-... --outcome confirm|refute --evidence ...`
+   for each lesson you applied. A surprise that would change what the next run
+   does becomes `lessons.py add --scope isolab-eks --trigger "..." --action "..." --evidence ...`.
+4. **Adapt**: when a lesson scoped to `isolab-eks` is adopted (two distinct
+   confirmations), propose the edit to this file in a PR that cites the lesson
+   id; when one is refuted twice more than confirmed, it retires itself.

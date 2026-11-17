@@ -1,0 +1,45 @@
+{
+  "recorded_at": "2026-11-05T19:31:38.944946+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "research/primefield-companion-followup-20261102/feature-native-normalized-transport/check.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-normalized-transport-20261105/checker"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "positive",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-normalized-transport-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-normalized-transport/columns.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0,
+      "packet_sha256": "1c5b66180755a6dbeb8fd29cc3cc7d032183627d76b7a40d31a296b323da84db"
+    },
+    {
+      "step": "negative",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-normalized-transport-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-normalized-transport/negative-columns.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 101,
+      "packet_sha256": "9b2cd7660e9a103a041e080d4405f77b90821c833f0ff90fd79d056d029674e4"
+    }
+  ],
+  "binary_sha256": "ad00a7ade6a4545aa3cba8e8326f3547e227c479556f8396d793201362209d7b",
+  "source_sha256": "49062c6ae762d6de98ffd7127d560e7eff19805d38342b8aa46193a37efa71c0",
+  "transport_imports": 0,
+  "frozen_jet_import": true,
+  "negative_control": "changed one finite numerator; expected normalized-value rejection"
+}

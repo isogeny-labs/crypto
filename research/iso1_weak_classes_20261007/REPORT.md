@@ -22,7 +22,8 @@ the remaining requested primes through p = 199.
 > **Update 2026-10-16** ([continuation report](residual_model_20261016/REPORT.md)):
 > a certifying point counter reproduces every retained census from p = 37 to 59
 > byte for byte, so those zero labels are now exact rather than probabilistic.
-> The certified census continues past p = 59; p = 61 through 127 are complete. Inside the
+> The certified census continues past p = 59; p = 61 through 113 are complete. Inside the
+> The certified census continues past p = 59; p = 61 through 109 are complete. Inside the
 > high-depth classes, the residual zeros follow a parameter-free random
 > thinning of an exactly computed 8th-power mass. The registered predictions
 > pass at the pristine holdouts p = 53 and 59 and at the forward predictions
@@ -423,9 +424,7 @@ without `--derive-twists`; p = 37, 41, 43 used twist derivation.
 The p = 11 and 17 orbit-derived CSVs correct the two anomalous
 individual counts. The p = 47 command was:
 
-```sh
 RAYON_NUM_THREADS=4 target/release/examples/iso1_class_census 47 research/iso1_weak_classes_20261007/p47_orbit.csv --derive-twists --orbit-quotient
-```
 
 The [orbit validation receipt](orbit_run_receipt.txt) records its binary
 hash and build snapshot. Current `main` has unrelated duplicate Rust
@@ -470,3 +469,58 @@ The [theorem continuation receipt](theorem_validation_20261008.txt) records
 the exact p = 7 and p = 13 checks, generalized controls, native tests,
 PDF compilation, and the running queue's source freeze. Failed preliminary
 API and launch attempts remain explicitly recorded alongside the successful runs.
+
+
+
+> The certified census continues past p = 59; p = 61 through 137 are complete. Inside the
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

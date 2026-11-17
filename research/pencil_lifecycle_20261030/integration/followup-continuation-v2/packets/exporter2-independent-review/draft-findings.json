@@ -1,0 +1,23 @@
+{
+  "status": "prefreeze_changes_required_no_invocation",
+  "findings": [
+    {
+      "file": "controls.rs.txt",
+      "issue": "External test crate imports runner::prepare_lifecycle_child, declared pub(crate) in exact built runner.rs:83.",
+      "severity": "compile_blocker"
+    },
+    {
+      "file": "controls.rs.txt",
+      "issue": "External test crate calls host::recompute_class_identity, declared pub(crate) in exact built host.rs:672.",
+      "severity": "compile_blocker"
+    }
+  ],
+  "pins": {
+    "/var/tmp/retained-native-export-rebuild-20261103-v1/source/src/cryptanalysis/ecbench/runner.rs": "80a2945eba59c0f617e45c22d78b5996b882c44c4ac66527259fcfce82e2377d",
+    "/var/tmp/retained-native-export-rebuild-20261103-v1/source/src/cryptanalysis/ecbench/host.rs": "4aea4d3151a137f12a364065a9e4181b8111f70d5f2a63e8a3c92b57301c159a",
+    "/var/tmp/retained-native-export-rebuild-20261103-v1/source/src/cryptanalysis/ecbench/diagnostic_resources.rs": "fa98efc5d3b4458c867679b0496379f401fd12de1dc89c52c5951e149375d5e5",
+    "/var/tmp/retained-native-export-rebuild-20261103-v1/source/src/cryptanalysis/ecbench/diagnostic_file_adapter.rs": "53dd46ff6a7b4857fc11d191d2c2e39dfb27aed801d9d9acbac5b56d7b6bfa07"
+  },
+  "review_scope": "Static source reading only. No compiler invocation.",
+  "correction_boundary": "Fixture metadata may be constructed through reviewed public APIs; actual owner/session/custody/file validators must remain real imported implementations."
+}

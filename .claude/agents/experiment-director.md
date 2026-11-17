@@ -86,6 +86,8 @@ Input: the frozen spec or protocol path and the main session's dispatch.
        outputs: [<receipt_directory>/result.json]
    bus_address: executor-mechanical-<topic>
    background: <true when the run exceeds ten minutes>
+   # detach_above_seconds: 540 (default) -- a command with a larger timeout_seconds
+   # runs detached and needs stdout and stderr; the executor runs `wait` after `run`
    write_scope: [research/<topic>_<date>/]
    stop_when:
      - Any command exits nonzero or reaches its timeout; retain the original request and build identity.
@@ -165,3 +167,19 @@ Input: the card and the executor's returned text, saved to a file.
 - Run the measurement yourself, dispatch a subagent, or recommend a rerun to
   change a result.
 - Read raw `*.jsonl`, logs or session trees whole; read by key or range.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`. Your role's
+limits above still hold: the loop adds records, never authority.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope experiment-director`; apply
+   adopted lessons, treat candidates as hypotheses to test.
+2. **While acting**: resolve blockers within your role first (diagnose, the
+   documented remedy, a materially different approach); escalate only what
+   needs authority you do not have.
+3. **After acting**: `lessons.py outcome --scope experiment-director ...` with evidence;
+   `lessons.py test` for each lesson applied; `lessons.py add --scope experiment-director`
+   for a repeatable surprise, with the evidence that showed it.
+4. **Adapt**: an adopted lesson for `experiment-director` is folded into this file by a PR
+   that cites its id.

@@ -1,0 +1,5 @@
+# R135: repeated lambda residue fibers at the two exceptional base places
+
+Use the pinned R130 G51 source excerpt and R133's exact exceptional linear y-residues: P11/y=1242 over F2^11 and P22/y=1612991 over F2^22. Specialize all 29 G51 terms. Determine the largest power `2^k` dividing every nonzero lambda exponent, form the unique `2^k`-th root polynomial by inverse Frobenius on its coefficients, and multiply the power back to G51. Check the root polynomial is squarefree, compute its complete distinct-degree factor products, and record the residue-support factors with their multiplicities in the monogenic order.
+
+These are repeated specialized factors, not normalized lambda branches. Their multiplicity cannot be promoted to ramification or a divisor valuation without a Hasse/Newton local lift. Bound each accepted local process to one core, 4 GiB and 600 seconds, at most two attempts; no cloud spend. Commit and push source/protocol before data. Require independent field/product/irreducibility checks, byte replay, changed-input rejection, Lean finite arithmetic, and a visual record before publication.

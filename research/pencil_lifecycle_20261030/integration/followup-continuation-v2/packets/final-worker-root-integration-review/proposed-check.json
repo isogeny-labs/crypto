@@ -1,0 +1,45 @@
+{
+  "execution_authorized": false,
+  "cwd": "fresh exact published root source snapshot",
+  "environment_requirements": [
+    "offline locked dependency closure",
+    "owned target directory",
+    "single Cargo job and libtest thread",
+    "published source/toolchain/input manifest",
+    "externally reviewed finite wall/aggregate resource limits",
+    "no network fallback/no automatic retry"
+  ],
+  "root_compile_argv": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--locked",
+    "--offline",
+    "--no-run",
+    "--message-format=json"
+  ],
+  "selection": "Read executable from compiler-artifact JSON for package crypto/lib target crypto_lib with profile.test=true; reject0/multiple matches. Hash executable and verify --list includes exact three names.",
+  "focused_execution_argv_template": [
+    "<exact_root_libtest_executable>",
+    "<one_of_exact_three_names>",
+    "--exact",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "focused_calls": 3,
+  "expected_each_passed": 1,
+  "required_full_suite_argv": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--locked",
+    "--offline",
+    "--",
+    "--test-threads=1"
+  ],
+  "full_suite_expected": "All nonignored library tests, no testname filter; derive inventory first and preserve ignored count. Compiling/--list alone is not executed test success.",
+  "feature_scope": "Keep defaults for owner-required full suite; separately bind no-default musl worker. Reuse same root libtest artifact for focus/full commands when identities match.",
+  "additional_actual_dispatch_test": "If an end-to-end Some/None solver-trace claim is needed, add a separately frozen bounded public synthetic fixture test invoking actual solve_with_progress in both branches with recorder sink; compare nonobservational result/counters and expected event sites. Existing fake-dispatch test cannot supply that claim. No fixture/new test authored or admitted in this review."
+}

@@ -6,21 +6,35 @@
 //! here requires an independently replayable exact-point-order certificate.
 //! Koblitz counts use the library's Frobenius trace recurrence.
 use super::types::{CaseConfig, CaseData};
+
 use crate::binary_ecc::curve::{point_add, scalar_mul};
+
 use crate::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly};
+
 use crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve;
+
 use crate::cryptanalysis::koblitz_index_calculus::{
     find_irreducible_sparse, is_irreducible_f2, koblitz_point_count,
 };
+
 use crate::cryptanalysis::p256_structural::deep_factor;
+
 use crate::cryptanalysis::prime_fast::FastCurve;
+
 use crate::cryptanalysis::residual_walk::is_prime_u64;
+
 use crate::ecc::field::FieldElement;
+
 use crate::ecc::point::Point;
+
 use num_bigint::BigUint;
+
 use num_traits::ToPrimitive;
+
 use rand::{rngs::StdRng, Rng, SeedableRng};
+
 use serde_json::{json, Value};
+
 use std::collections::{HashMap, HashSet};
 
 pub(super) type WPoint = Option<(u64, u64)>;
@@ -177,7 +191,7 @@ impl Arithmetic {
             }
         }
     }
-    fn frobenius(&self, p: WPoint, power: u32) -> WPoint {
+    pub(super) fn frobenius(&self, p: WPoint, power: u32) -> WPoint {
         match self {
             Self::Binary { fast, .. } => {
                 p.map(|(x, y)| (fast.gf.sqr_k(x, power), fast.gf.sqr_k(y, power)))
@@ -274,9 +288,11 @@ impl Arithmetic {
 fn u(v: u64) -> Value {
     Value::String(v.to_string())
 }
+
 pub(super) fn point_json(p: WPoint) -> Value {
     p.map_or(Value::Null, |(x, y)| json!({"x": u(x), "y": u(y)}))
 }
+
 pub(super) fn number(v: &Value, name: &str) -> Result<u64, String> {
     let s = v
         .as_str()
@@ -287,6 +303,7 @@ pub(super) fn number(v: &Value, name: &str) -> Result<u64, String> {
     }
     Ok(n)
 }
+
 pub(super) fn point_words(v: &Value) -> Result<WPoint, String> {
     if v.is_null() {
         return Ok(None);
@@ -307,11 +324,13 @@ fn sqrt_floor(v: u64) -> u64 {
     }
     x
 }
+
 fn hasse(q: u64) -> (u64, u64) {
     // sqrt(4*q), not 2*floor(sqrt(q)); the latter loses valid boundary orders.
     let radius = sqrt_floor(4 * q);
     (q + 1 - radius, q + 1 + radius)
 }
+
 fn factor(n: u64) -> Result<Vec<(u64, u32)>, String> {
     let raw = deep_factor(&BigUint::from(n), 4096, 300_000);
     let mut factors = Vec::new();
@@ -335,7 +354,7 @@ fn factor(n: u64) -> Result<Vec<(u64, u32)>, String> {
     Ok(factors)
 }
 
-fn prime_projection(
+pub(super) fn prime_projection(
     c: &Arithmetic,
     p: WPoint,
     order: u64,
@@ -373,25 +392,37 @@ fn prime_projection(
     (result, multiplier)
 }
 
-struct CyclicMembership {
+pub(super) struct CyclicMembership {
     babies: HashMap<WPoint, u64>,
-    stride: u64,
+    pub(super) stride: u64,
     negative_stride: WPoint,
     order: u64,
 }
+
 impl CyclicMembership {
     fn new(c: &Arithmetic, g: WPoint, r: u64) -> Self {
+        Self::new_with_reference(c, g, r, false)
+    }
+    pub(super) fn new_with_reference(c: &Arithmetic, g: WPoint, r: u64, reference: bool) -> Self {
         let stride = sqrt_floor(r) + 1;
         let mut babies = HashMap::new();
         let mut current = None;
         for j in 0..stride {
             babies.entry(current).or_insert(j);
-            current = c.add(current, g);
+            current = if reference {
+                c.reference_add(current, g)
+            } else {
+                c.add(current, g)
+            };
         }
         Self {
             babies,
             stride,
-            negative_stride: c.neg(current),
+            negative_stride: if reference {
+                c.reference_mul(g, (r - stride % r) % r)
+            } else {
+                c.neg(current)
+            },
             order: r,
         }
     }
@@ -399,6 +430,14 @@ impl CyclicMembership {
         self.logarithm_counted(c, p).0
     }
     fn logarithm_counted(&self, c: &Arithmetic, p: WPoint) -> (Option<u64>, u64) {
+        self.logarithm_with_reference(c, p, false)
+    }
+    pub(super) fn logarithm_with_reference(
+        &self,
+        c: &Arithmetic,
+        p: WPoint,
+        reference: bool,
+    ) -> (Option<u64>, u64) {
         let mut current = p;
         let mut additions = 0;
         for i in 0..=self.order / self.stride {
@@ -408,7 +447,11 @@ impl CyclicMembership {
                     return (Some(k), additions);
                 }
             }
-            current = c.add(current, self.negative_stride);
+            current = if reference {
+                c.reference_add(current, self.negative_stride)
+            } else {
+                c.add(current, self.negative_stride)
+            };
             additions += 1;
         }
         (None, additions)
@@ -428,6 +471,7 @@ pub(super) struct SubgroupProjector {
     giant_additions: u64,
     reference_log_checks: u64,
 }
+
 impl SubgroupProjector {
     pub(super) fn new(public: &Value) -> Result<Self, String> {
         let arithmetic = arithmetic(public)?;
@@ -501,6 +545,7 @@ impl SubgroupProjector {
             "membership_logs_restricted":true,"membership_logs_used_in_relation_elimination":false})
     }
 }
+
 fn factors_json(f: &[(u64, u32)]) -> Value {
     Value::Array(
         f.iter()
@@ -508,6 +553,7 @@ fn factors_json(f: &[(u64, u32)]) -> Value {
             .collect(),
     )
 }
+
 fn read_factors(v: &Value, n: u64) -> Result<Vec<(u64, u32)>, String> {
     let mut factors = Vec::new();
     let mut product = 1u128;
@@ -757,6 +803,9 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
     if config.factor_base_size == 0 || config.factor_base_size > 4096 {
         return Err("factor base size must lie in 1..4096".into());
     }
+    if let Some(policy) = &config.factor_base_policy {
+        policy.validate(config.n)?;
+    }
     let (arithmetic, field, mut model, order, certificate, k) = construct(config)?;
     let factors = factor(order)?;
     let subgroup = factors.last().ok_or("empty group order factorization")?.0;
@@ -795,8 +844,7 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
     );
     let multiplier = generator_rng.gen_range(1..subgroup);
     let generator = arithmetic.mul(base_generator, multiplier);
-    let membership = cofactor
-        .is_multiple_of(subgroup)
+    let membership = (config.factor_base_policy.is_none() && cofactor.is_multiple_of(subgroup))
         .then(|| CyclicMembership::new(&arithmetic, generator, subgroup));
     let mut key_rng = StdRng::seed_from_u64(
         config.seed.rotate_left(7)
@@ -813,78 +861,6 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
     model["cofactor"] = u(cofactor);
     model["group_order_factorization"] = factors_json(&factors);
     model["order_certificate"] = certificate;
-    let mut points = Vec::new();
-    let mut seen = HashSet::new();
-    let mut candidates = Vec::new();
-    let mut private_membership_logs = Vec::new();
-    let limit = (config.factor_base_size as u64 * 32 + 128).min(arithmetic.q());
-    for x in 1..limit {
-        let lifts = arithmetic.lift(x);
-        let mut row = Vec::new();
-        for p in lifts {
-            let (projected, projection_multiplier) =
-                prime_projection(&arithmetic, p, order, subgroup, false);
-            let membership_log = membership
-                .as_ref()
-                .and_then(|test| test.logarithm(&arithmetic, projected));
-            let subgroup_member = projected.is_some()
-                && arithmetic.mul(projected, subgroup).is_none()
-                && (membership.is_none() || membership_log.is_some());
-            let accepted = subgroup_member && seen.insert(projected);
-            row.push(json!({"lifted":point_json(p),"projected":point_json(projected),"projection_multiplier":u(projection_multiplier),"cyclic_subgroup_member":subgroup_member,"accepted":accepted}));
-            if accepted {
-                points.push(projected);
-                private_membership_logs.push(membership_log.map(|k| k.to_string()));
-            }
-        }
-        candidates.push(json!({"x":u(x),"lifts":row}));
-        if points.len() >= config.factor_base_size || points.len() as u64 == subgroup - 1 {
-            break;
-        }
-    }
-    let lookup: HashMap<_, _> = points
-        .iter()
-        .copied()
-        .enumerate()
-        .map(|(i, p)| (p, i))
-        .collect();
-    let negation: Vec<_> = points
-        .iter()
-        .map(|&p| lookup.get(&arithmetic.neg(p)).copied())
-        .collect();
-    let frobenius: Vec<_> = points
-        .iter()
-        .map(|&p| lookup.get(&arithmetic.frobenius(p, k)).copied())
-        .collect();
-    let orbits: Vec<_> = points
-        .iter()
-        .map(|&p| {
-            let mut orbit = vec![point_json(p)];
-            let mut cur = arithmetic.frobenius(p, k);
-            while cur != p && orbit.len() <= config.n as usize {
-                orbit.push(point_json(cur));
-                cur = arithmetic.frobenius(cur, k);
-            }
-            let action_order = if config.family == "prime" {
-                1
-            } else {
-                config.n as usize / k as usize
-            };
-            json!({"points":orbit,"closed":cur==p,"stabilizer_size":action_order / orbit.len()})
-        })
-        .collect();
-    let factor_base = json!({
-        "schema":"ml-ecdlp-factor-base/v1","rule":"small-x-prime-primary-projection-with-cyclic-membership",
-        "projection_rule":"multiply by N/r^v_r(N), then trim by r until exact order r; multiplier retained for every candidate",
-        "cyclic_membership_method":if membership.is_some(){"bounded-bsgs-diagnostic; computed membership logs restricted to private provenance; setup cost must be charged"}else{"unique subgroup because r divides N once"},
-        "points":points.into_iter().map(point_json).collect::<Vec<_>>(),
-        "requested_size":config.factor_base_size,"negation_closed":negation.iter().all(Option::is_some),
-        "size_policy":"retain-both-signs; may exceed requested size by one; capped by subgroup cardinality",
-        "construction_candidates":candidates,"negation_action":negation,"frobenius_action":frobenius,
-        "frobenius_power":k,"orbits":orbits,
-        "construction_status":if lookup.len()>=config.factor_base_size || lookup.len() as u64==subgroup-1 {"verified"} else {"budget_exhausted"},
-        "known_log_features":false
-    });
     let public_instance = json!({
         "schema":"ml-ecdlp-instance/v1","family":config.family,"n":config.n,"m":config.m,"twist":config.twist,
         "field":field,"curve":model,"generator":point_json(generator),"target":point_json(target),
@@ -896,14 +872,961 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
         "split_component":format!("field-size-n{}",config.n),
         "split_policy":"conservative whole-size holdout: all seeds, families, isomorphic models, generators, keys and twists at the same n stay together; cross-size algebraic transfer links require a future merged-component index"
     });
+    let (factor_base, private_membership_logs) = if let Some(policy) = &config.factor_base_policy {
+        super::factor_bases::build(
+            &public_instance,
+            policy,
+            config.factor_base_size,
+            super::factor_bases::sampling_seed(config),
+            false,
+        )?
+    } else {
+        let mut points = Vec::new();
+        let mut seen = HashSet::new();
+        let mut candidates = Vec::new();
+        let mut private_membership_logs = Vec::new();
+        let limit = (config.factor_base_size as u64 * 32 + 128).min(arithmetic.q());
+        for x in 1..limit {
+            let lifts = arithmetic.lift(x);
+            let mut row = Vec::new();
+            for p in lifts {
+                let (projected, projection_multiplier) =
+                    prime_projection(&arithmetic, p, order, subgroup, false);
+                let membership_log = membership
+                    .as_ref()
+                    .and_then(|test| test.logarithm(&arithmetic, projected));
+                let subgroup_member = projected.is_some()
+                    && arithmetic.mul(projected, subgroup).is_none()
+                    && (membership.is_none() || membership_log.is_some());
+                let accepted = subgroup_member && seen.insert(projected);
+                row.push(json!({"lifted":point_json(p),"projected":point_json(projected),"projection_multiplier":u(projection_multiplier),"cyclic_subgroup_member":subgroup_member,"accepted":accepted}));
+                if accepted {
+                    points.push(projected);
+                    private_membership_logs.push(membership_log.map(|k| k.to_string()));
+                }
+            }
+            candidates.push(json!({"x":u(x),"lifts":row}));
+            if points.len() >= config.factor_base_size || points.len() as u64 == subgroup - 1 {
+                break;
+            }
+        }
+        let lookup: HashMap<_, _> = points
+            .iter()
+            .copied()
+            .enumerate()
+            .map(|(i, p)| (p, i))
+            .collect();
+        let negation: Vec<_> = points
+            .iter()
+            .map(|&p| lookup.get(&arithmetic.neg(p)).copied())
+            .collect();
+        let frobenius: Vec<_> = points
+            .iter()
+            .map(|&p| lookup.get(&arithmetic.frobenius(p, k)).copied())
+            .collect();
+        let orbits: Vec<_> = points
+            .iter()
+            .map(|&p| {
+                let mut orbit = vec![point_json(p)];
+                let mut cur = arithmetic.frobenius(p, k);
+                while cur != p && orbit.len() <= config.n as usize {
+                    orbit.push(point_json(cur));
+                    cur = arithmetic.frobenius(cur, k);
+                }
+                let action_order = if config.family == "prime" {
+                    1
+                } else {
+                    config.n as usize / k as usize
+                };
+                json!({"points":orbit,"closed":cur==p,"stabilizer_size":action_order / orbit.len()})
+            })
+            .collect();
+        let factor_base = json!({
+            "schema":"ml-ecdlp-factor-base/v1","rule":"small-x-prime-primary-projection-with-cyclic-membership",
+            "projection_rule":"multiply by N/r^v_r(N), then trim by r until exact order r; multiplier retained for every candidate",
+            "cyclic_membership_method":if membership.is_some(){"bounded-bsgs-diagnostic; computed membership logs restricted to private provenance; setup cost must be charged"}else{"unique subgroup because r divides N once"},
+            "points":points.into_iter().map(point_json).collect::<Vec<_>>(),
+            "requested_size":config.factor_base_size,"negation_closed":negation.iter().all(Option::is_some),
+            "size_policy":"retain-both-signs; may exceed requested size by one; capped by subgroup cardinality",
+            "construction_candidates":candidates,"negation_action":negation,"frobenius_action":frobenius,
+            "frobenius_power":k,"orbits":orbits,
+            "construction_status":if lookup.len()>=config.factor_base_size || lookup.len() as u64==subgroup-1 {"verified"} else {"budget_exhausted"},
+            "known_log_features":false
+        });
+        (
+            factor_base,
+            private_membership_logs
+                .into_iter()
+                .map(|v| json!(v))
+                .collect::<Vec<Value>>(),
+        )
+    };
     let private_witness = json!({"schema":"ml-ecdlp-private-witness/v1","scalar":u(scalar),"generator_multiplier":u(multiplier),"base_generator":point_json(base_generator),"generator_construction_attempts":generator_attempts,"factor_base_membership_logs":private_membership_logs,"sampling_provenance":{"seed":config.seed,"curve_seed":config.curve_seed,"generator_index":config.generator_index,"key_index":config.key_index},"feature_access":"forbidden; replay and supervised-label store only"});
     verify(&public_instance, &private_witness)?;
-    verify_factor_base(&public_instance, &factor_base)?;
+    verify_factor_base_config(config, &public_instance, &factor_base)?;
     Ok(CaseData {
         public_instance,
         private_witness,
         factor_base,
     })
+}
+
+/// Reconstruct binary arithmetic after strict field and coordinate validation.
+pub fn binary_curve(v: &Value) -> Result<BinaryCurve, String> {
+    let n = v["n"].as_u64().ok_or("missing n")?;
+    if !(3..=61).contains(&n)
+        || v["field"]["degree"].as_u64() != Some(n)
+        || v["field"]["characteristic"] != "2"
+    {
+        return Err("invalid binary field degree/characteristic".into());
+    }
+    let terms = v["field"]["irreducible_low_terms"]
+        .as_array()
+        .ok_or("missing field polynomial")?;
+    let mut low_terms = Vec::new();
+    let mut mask = 1u64 << n;
+    for x in terms {
+        let x = x.as_u64().ok_or("invalid polynomial exponent")?;
+        if x >= n || low_terms.contains(&(x as u32)) {
+            return Err("invalid or duplicate polynomial exponent".into());
+        }
+        low_terms.push(x as u32);
+        mask |= 1u64 << x;
+    }
+    if !is_irreducible_f2(mask) {
+        return Err("reducible field polynomial".into());
+    }
+    let a = number(&v["curve"]["a"], "a")?;
+    let b = number(&v["curve"]["b"], "b")?;
+    if a >= 1u64 << n || b == 0 || b >= 1u64 << n {
+        return Err("invalid binary coefficients".into());
+    }
+    Ok(BinaryCurve {
+        m: n as u32,
+        irreducible: IrreduciblePoly {
+            degree: n as u32,
+            low_terms,
+        },
+        a: F2mElement::from_biguint(&a.into(), n as u32),
+        b: F2mElement::from_biguint(&b.into(), n as u32),
+        generator: binary_point(&v["generator"], n as u32)?,
+        order: number(&v["curve"]["subgroup_order"], "subgroup order")?.into(),
+        cofactor: number(&v["curve"]["cofactor"], "cofactor")?.into(),
+    })
+}
+
+pub fn binary_point(v: &Value, n: u32) -> Result<BinaryPoint, String> {
+    if !(1..=63).contains(&n) {
+        return Err("invalid binary point degree".into());
+    }
+    match point_words(v)? {
+        None => Ok(BinaryPoint::Infinity),
+        Some((x, y)) if x < (1u64 << n) && y < (1u64 << n) => Ok(BinaryPoint::Affine {
+            x: F2mElement::from_biguint(&x.into(), n),
+            y: F2mElement::from_biguint(&y.into(), n),
+        }),
+        _ => Err("noncanonical binary point coordinates".into()),
+    }
+}
+
+pub fn prime_curve(v: &Value) -> Result<ExactPrimeCurve, String> {
+    let p = number(&v["field"]["modulus"], "modulus")?;
+    if p <= 3 || p >= 1u64 << 62 || !is_prime_u64(p) || v["field"]["characteristic"] != u(p) {
+        return Err("invalid prime field".into());
+    }
+    if v["n"].as_u64() != Some((64 - p.leading_zeros()) as u64)
+        || v["field"]["degree"].as_u64() != Some(1)
+    {
+        return Err("prime field size metadata differs from modulus".into());
+    }
+    let a = number(&v["curve"]["a"], "a")?;
+    let b = number(&v["curve"]["b"], "b")?;
+    if a >= p || b >= p {
+        return Err("noncanonical prime coefficients".into());
+    }
+    let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
+    if (4u128 * mul(mul(a, a), a) as u128 + 27u128 * mul(b, b) as u128).is_multiple_of(p as u128) {
+        return Err("singular prime curve".into());
+    }
+    let (gx, gy) = point_words(&v["generator"])?.ok_or("infinite generator")?;
+    if gx >= p || gy >= p {
+        return Err("noncanonical generator".into());
+    }
+    let subgroup = number(&v["curve"]["subgroup_order"], "subgroup order")?;
+    let cofactor = number(&v["curve"]["cofactor"], "cofactor")?;
+    let group_order = number(&v["curve"]["group_order"], "group order")?;
+    if subgroup == 0 || cofactor == 0 {
+        return Err("invalid zero subgroup or cofactor".into());
+    }
+    let curve = ExactPrimeCurve {
+        p: p.into(),
+        a: a.into(),
+        b: b.into(),
+        gx: gx.into(),
+        gy: gy.into(),
+        n: subgroup.into(),
+        cofactor,
+    };
+    if curve.group_order() != BigUint::from(group_order) {
+        return Err("prime subgroup and cofactor do not match group order".into());
+    }
+    Ok(curve)
+}
+
+pub fn prime_point(v: &Value, c: &ExactPrimeCurve) -> Result<Point, String> {
+    match point_words(v)? {
+        None => Ok(Point::Infinity),
+        Some((x, y)) if BigUint::from(x) < c.p && BigUint::from(y) < c.p => Ok(Point::Affine {
+            x: c.fe(x.into()),
+            y: c.fe(y.into()),
+        }),
+        _ => Err("noncanonical prime point coordinates".into()),
+    }
+}
+
+pub(super) fn arithmetic(v: &Value) -> Result<Arithmetic, String> {
+    match v["family"].as_str() {
+        Some("prime") => Ok(Arithmetic::Prime(prime_curve(v)?.fast()?)),
+        Some("koblitz" | "binary") => {
+            let c = binary_curve(v)?;
+            Ok(Arithmetic::Binary {
+                fast: FastBinaryCurve::new(
+                    &c.irreducible,
+                    c.a.to_biguint().to_u64().ok_or("a overflow")?,
+                )
+                .ok_or("invalid binary parameters")?,
+                b: c.b.to_biguint().to_u64().ok_or("b overflow")?,
+            })
+        }
+        _ => Err("invalid family".into()),
+    }
+}
+
+fn verify_certificate(
+    c: &Arithmetic,
+    certificate: &Value,
+    order: u64,
+    base_a: u64,
+    base_b: u64,
+    twist: bool,
+) -> Result<(), String> {
+    let (lo, hi) = hasse(c.q());
+    if !(lo..=hi).contains(&order) {
+        return Err("order outside Hasse interval".into());
+    }
+    match certificate["method"].as_str() {
+        Some("exact-small-field-exhaustive-v1") => {
+            if c.q() > 4096
+                || number(
+                    &certificate["field_cardinality"],
+                    "exhaustive field cardinality",
+                )? != c.q()
+            {
+                return Err("invalid exhaustive cardinality certificate bounds".into());
+            }
+            let counts: Vec<_> = (0..c.q()).map(|x| c.lift(x).len()).collect();
+            if certificate["x_point_counts"] != json!(counts)
+                || 1 + counts.iter().map(|x| *x as u64).sum::<u64>() != order
+            {
+                return Err("exhaustive cardinality replay failed".into());
+            }
+        }
+        Some("koblitz-frobenius-trace-recurrence-v1") => {
+            let Arithmetic::Binary { fast, b } = c else {
+                return Err("Koblitz certificate on prime curve".into());
+            };
+            if twist
+                || fast.a > 1
+                || *b != 1
+                || certificate["a"].as_u64() != Some(fast.a)
+                || certificate["n"].as_u64() != Some(fast.n as u64)
+                || koblitz_point_count(fast.a as u8, fast.n) != BigUint::from(order)
+            {
+                return Err("invalid Koblitz order certificate".into());
+            }
+        }
+        Some("exact-point-order-unique-hasse-multiple-v1") => {
+            let p = point_words(&certificate["point"])?;
+            let r = number(&certificate["point_order"], "certificate point order")?;
+            if r == 0
+                || r > order
+                || !order.is_multiple_of(r)
+                || p.is_none()
+                || !c.on_curve(p)
+                || c.reference_mul(p, r).is_some()
+            {
+                return Err("invalid certificate point or annihilator".into());
+            }
+            let factors = read_factors(&certificate["point_order_factorization"], r)?;
+            if factors
+                .iter()
+                .any(|&(pdiv, _)| c.reference_mul(p, r / pdiv).is_none())
+            {
+                return Err("point order not exact".into());
+            }
+            let first = lo.div_ceil(r) * r;
+            if first != order
+                || first + r <= hi
+                || number(&certificate["hasse_lower"], "Hasse lower")? != lo
+                || number(&certificate["hasse_upper"], "Hasse upper")? != hi
+            {
+                return Err("point order does not isolate cardinality".into());
+            }
+        }
+        Some("quadratic-twist-order-v1") => {
+            if !twist {
+                return Err("twist certificate attached to untwisted model".into());
+            }
+            let base = match c {
+                Arithmetic::Prime(c) => {
+                    Arithmetic::Prime(FastCurve::new("certificate base", c.f.p, base_a, base_b, 1))
+                }
+                Arithmetic::Binary { fast, .. } => {
+                    let mut base = fast.clone();
+                    base.a = base_a;
+                    Arithmetic::Binary {
+                        fast: base,
+                        b: base_b,
+                    }
+                }
+            };
+            let base_order = number(&certificate["base_order"], "base order")?;
+            if order.checked_add(base_order) != Some(2 * (c.q() + 1)) {
+                return Err("twist order identity failed".into());
+            }
+            verify_certificate(
+                &base,
+                &certificate["base_certificate"],
+                base_order,
+                base_a,
+                base_b,
+                false,
+            )?;
+        }
+        _ => return Err("unknown cardinality certificate".into()),
+    }
+    Ok(())
+}
+
+/// Verify public curve, twist, cardinality and subgroup facts without witness
+/// access. Exact target membership in <G> follows only from a scalar replay.
+pub fn verify_public(public: &Value) -> Result<(), String> {
+    if public["schema"] != "ml-ecdlp-instance/v1"
+        || !public["m"].as_u64().is_some_and(|m| (2..=15).contains(&m))
+    {
+        return Err("invalid instance/witness schema or arity".into());
+    }
+    let c = arithmetic(public)?;
+    let model = &public["curve"];
+    let order = number(&model["group_order"], "group order")?;
+    let subgroup = number(&model["subgroup_order"], "subgroup order")?;
+    let cofactor = number(&model["cofactor"], "cofactor")?;
+    if subgroup <= 2
+        || !is_prime_u64(subgroup)
+        || subgroup as u128 * cofactor as u128 != order as u128
+    {
+        return Err("invalid prime subgroup/cofactor".into());
+    }
+    let factors = read_factors(&model["group_order_factorization"], order)?;
+    if factors.last().map(|x| x.0) != Some(subgroup) {
+        return Err("subgroup is not declared largest prime factor".into());
+    }
+    let base_a = number(&model["base_a"], "base a")?;
+    let base_b = number(&model["base_b"], "base b")?;
+    let d = number(&model["twist_parameter"], "twist parameter")?;
+    let a = number(&model["a"], "a")?;
+    let b = number(&model["b"], "b")?;
+    let twist = public["twist"].as_bool().ok_or("missing twist boolean")?;
+    if base_a >= c.q() || base_b >= c.q() || d >= c.q() {
+        return Err("noncanonical twist data".into());
+    }
+    match &c {
+        Arithmetic::Prime(c) => {
+            let mul = |x: u64, y: u64| ((x as u128 * y as u128) % c.f.p as u128) as u64;
+            if d == 0 || c.f.pow(c.f.to_mont(d), (c.f.p - 1) / 2) != c.f.neg(c.f.one) {
+                return Err("twist parameter is not a nonsquare".into());
+            }
+            let expected = if twist {
+                (mul(base_a, mul(d, d)), mul(base_b, mul(d, mul(d, d))))
+            } else {
+                (base_a, base_b)
+            };
+            if (a, b) != expected {
+                return Err("wrong prime twist coefficients".into());
+            }
+        }
+        Arithmetic::Binary { fast, .. } => {
+            let generic = binary_curve(public)?;
+            if F2mElement::from_biguint(&d.into(), fast.n).trace(&generic.irreducible) != 1 {
+                return Err("binary twist parameter does not have trace one".into());
+            }
+            if b != base_b || a != if twist { base_a ^ d } else { base_a } {
+                return Err("wrong binary twist coefficients".into());
+            }
+            if public["family"] == "koblitz" && (base_a > 1 || base_b != 1) {
+                return Err("family mislabeled as Koblitz".into());
+            }
+        }
+    }
+    verify_certificate(
+        &c,
+        &model["order_certificate"],
+        order,
+        base_a,
+        base_b,
+        twist,
+    )?;
+    let degree = match &c {
+        Arithmetic::Prime(_) => 1,
+        Arithmetic::Binary { fast, b } => (1..=fast.n)
+            .find(|&k| {
+                fast.n.is_multiple_of(k)
+                    && fast.gf.sqr_k(fast.a, k) == fast.a
+                    && fast.gf.sqr_k(*b, k) == *b
+            })
+            .ok_or("no coefficient field")?,
+    };
+    if public["symmetry"]["coefficient_field_degree"].as_u64() != Some(degree as u64)
+        || public["symmetry"]["frobenius_power"].as_u64() != Some(degree as u64)
+    {
+        return Err("incorrect coefficient field or Frobenius action".into());
+    }
+    for name in ["generator", "target"] {
+        let p = point_words(&public[name])?;
+        if p.is_none() || !c.on_curve(p) || c.reference_mul(p, subgroup).is_some() {
+            return Err(format!("invalid public subgroup point {name}"));
+        }
+    }
+    Ok(())
+}
+
+/// Verify the algebra and scalar with the library's separate general point
+/// arithmetic, rather than trusting the fast arithmetic used for construction.
+pub fn verify(public: &Value, private: &Value) -> Result<(), String> {
+    verify_public(public)?;
+    if private["schema"] != "ml-ecdlp-private-witness/v1" {
+        return Err("invalid private witness schema".into());
+    }
+    let subgroup = number(&public["curve"]["subgroup_order"], "subgroup order")?;
+    let scalar = number(&private["scalar"], "private scalar")?;
+    let multiplier = number(&private["generator_multiplier"], "generator multiplier")?;
+    if scalar == 0 || scalar >= subgroup || multiplier == 0 || multiplier >= subgroup {
+        return Err("scalar/multiplier outside nonzero subgroup".into());
+    }
+    if public["family"] == "prime" {
+        let c = prime_curve(public)?;
+        let g = c.generator();
+        let q = prime_point(&public["target"], &c)?;
+        let base = prime_point(&private["base_generator"], &c)?;
+        if matches!(g, Point::Infinity)
+            || matches!(q, Point::Infinity)
+            || matches!(base, Point::Infinity)
+            || !c.is_on_curve(&g)
+            || !c.is_on_curve(&q)
+            || !c.is_on_curve(&base)
+        {
+            return Err("invalid prime point".into());
+        }
+        if g.scalar_mul_vartime(&subgroup.into(), &c.a_fe()) != Point::Infinity
+            || base.scalar_mul_vartime(&subgroup.into(), &c.a_fe()) != Point::Infinity
+            || base.scalar_mul_vartime(&multiplier.into(), &c.a_fe()) != g
+            || g.scalar_mul_vartime(&scalar.into(), &c.a_fe()) != q
+        {
+            return Err("independent prime scalar replay failed".into());
+        }
+    } else {
+        let c = binary_curve(public)?;
+        let g = &c.generator;
+        let q = binary_point(&public["target"], c.m)?;
+        let base = binary_point(&private["base_generator"], c.m)?;
+        if *g == BinaryPoint::Infinity
+            || q == BinaryPoint::Infinity
+            || base == BinaryPoint::Infinity
+            || !c.is_on_curve(g)
+            || !c.is_on_curve(&q)
+            || !c.is_on_curve(&base)
+        {
+            return Err("invalid binary point".into());
+        }
+        // Reverse-bit reference multiplication gives a different schedule from
+        // the native fast constructor and compares the library group formulas.
+        let reference_mul = |p: &BinaryPoint, k: u64| {
+            let mut result = BinaryPoint::Infinity;
+            let mut addend = p.clone();
+            let mut k = k;
+            while k > 0 {
+                if k & 1 == 1 {
+                    result = point_add(&c, &result, &addend);
+                }
+                addend = point_add(&c, &addend, &addend);
+                k >>= 1;
+            }
+            result
+        };
+        if scalar_mul(&c, g, &subgroup.into()) != BinaryPoint::Infinity
+            || scalar_mul(&c, &base, &subgroup.into()) != BinaryPoint::Infinity
+            || reference_mul(&base, multiplier) != *g
+            || reference_mul(g, scalar) != q
+        {
+            return Err("independent binary scalar replay failed".into());
+        }
+    }
+    Ok(())
+}
+
+pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+    if base["schema"] == "ml-ecdlp-factor-base/v2" {
+        return super::factor_bases::verify(public, base);
+    }
+    if base["rule"] == "planted-known-log-subgroup/v1" {
+        return Err(
+            "planted factor base requires restricted witness replay via verify_planted".into(),
+        );
+    }
+    verify_natural_factor_base(public, base)
+}
+
+/// Bind the reconstructed base to the frozen cell, including restricted
+/// sampling provenance. Base-only replay verifies its declared recipe; this
+/// additional check ensures that recipe is the one the plan selected.
+pub fn verify_factor_base_config(
+    config: &CaseConfig,
+    public: &Value,
+    base: &Value,
+) -> Result<(), String> {
+    verify_factor_base_config_inner(config, public, base, None)
+}
+
+pub(super) fn verify_factor_base_config_bounded(
+    config: &CaseConfig,
+    public: &Value,
+    base: &Value,
+    bounds: super::factor_bases::ReplayBounds,
+) -> Result<(), String> {
+    verify_factor_base_config_inner(config, public, base, Some(bounds))
+}
+
+fn verify_factor_base_config_inner(
+    config: &CaseConfig,
+    public: &Value,
+    base: &Value,
+    bounds: Option<super::factor_bases::ReplayBounds>,
+) -> Result<(), String> {
+    if base["requested_size"].as_u64() != Some(config.factor_base_size as u64)
+        || public["n"].as_u64() != Some(config.n as u64)
+        || public["m"].as_u64() != Some(config.m as u64)
+        || public["family"] != config.family
+        || public["twist"] != config.twist
+    {
+        return Err("factor base or public identity differs from frozen config".into());
+    }
+    match &config.factor_base_policy {
+        None if base["schema"] == "ml-ecdlp-factor-base/v1" => {}
+        Some(policy) if base["schema"] == "ml-ecdlp-factor-base/v2" => {
+            policy.validate(config.n)?;
+            let saved: super::types::FactorBasePolicy =
+                serde_json::from_value(base["policy"].clone()).map_err(|e| e.to_string())?;
+            if saved != *policy
+                || number(
+                    &base["construction_context"]["sampling_seed"],
+                    "policy sampling seed",
+                )? != super::factor_bases::sampling_seed(config)
+            {
+                return Err("factor-base recipe or control seed differs from frozen config".into());
+            }
+        }
+        _ => return Err("factor-base schema differs from frozen policy version".into()),
+    }
+    match bounds {
+        Some(b) => super::factor_bases::verify_bounded(public, base, b),
+        None => verify_factor_base(public, base),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn config(family: &str, n: u32, twist: bool) -> CaseConfig {
+        CaseConfig {
+            channels: None,
+            family: family.into(),
+            n,
+            m: 2,
+            twist,
+            curve_seed: 7,
+            generator_index: 1,
+            key_index: 1,
+            seed: 42,
+            factor_base_size: 8,
+            factor_base_policy: None,
+            degree_bound: 4,
+            work_limit: 1000,
+            solver: "enumerate".into(),
+        }
+    }
+
+    #[test]
+    fn exact_prime_context_matches_legacy_small_cofactor_arithmetic() {
+        use crate::ecc::curve::CurveParams;
+        for twist in [false, true] {
+            let data = generate(&config("prime", 11, twist)).unwrap();
+            let exact = prime_curve(&data.public_instance).unwrap();
+            let legacy = CurveParams {
+                name: "compatibility fixture",
+                p: exact.p.clone(),
+                a: exact.a.clone(),
+                b: exact.b.clone(),
+                gx: exact.gx.clone(),
+                gy: exact.gy.clone(),
+                n: exact.n.clone(),
+                h: u32::try_from(exact.cofactor).unwrap(),
+            };
+            assert_eq!(exact.generator(), legacy.generator());
+            let old_fast = FastCurve::from_params(&legacy).unwrap();
+            let new_fast = exact.fast().unwrap();
+            assert_eq!(
+                (old_fast.f.p, old_fast.a, old_fast.b, old_fast.n),
+                (new_fast.f.p, new_fast.a, new_fast.b, new_fast.n)
+            );
+            for scalar in [0u64, 1, 2, 7, 31] {
+                let old = legacy
+                    .generator()
+                    .scalar_mul_vartime(&scalar.into(), &legacy.a_fe());
+                let new = exact
+                    .generator()
+                    .scalar_mul_vartime(&scalar.into(), &exact.a_fe());
+                assert_eq!(old, new);
+                assert_eq!(legacy.is_on_curve(&old), exact.is_on_curve(&new));
+            }
+            verify(&data.public_instance, &data.private_witness).unwrap();
+        }
+    }
+
+    #[test]
+    fn exact_prime_cofactor_above_u32_replays_and_solves_without_witness() {
+        // A deterministic, bounded software fixture, not campaign sampling.
+        // Certify the actual order instead of attaching a made-up cofactor.
+        let h = 1u64 << 33;
+        // Frozen from the first prime r in the declared odd 3..=1023 search.
+        let r = 31;
+        let p = 266_287_972_351;
+        assert!(is_prime_u64(r) && is_prime_u64(p));
+        assert_eq!(p + 1, r * h);
+        let c = Arithmetic::Prime(FastCurve::new("large-cofactor fixture", p, p - 1, 0, r));
+        let (order, certificate) =
+            certify_count(&c, &mut StdRng::seed_from_u64(0xeca0fac7)).unwrap();
+        assert_eq!(order, p + 1);
+        verify_certificate(&c, &certificate, order, p - 1, 0, false).unwrap();
+        let factors = factor(order).unwrap();
+        assert_eq!(factors, vec![(2, 33), (r, 1)]);
+        let generator = (1..=1024)
+            .flat_map(|x| c.lift(x))
+            .find_map(|point| {
+                let (projected, multiplier) = prime_projection(&c, point, order, r, false);
+                assert_eq!(projected, c.reference_mul(point, multiplier));
+                projected
+            })
+            .expect("bounded nonzero subgroup generator");
+        let generator = Some(generator);
+        assert_eq!(c.reference_mul(generator, r), None);
+        let public = json!({
+            "schema":"ml-ecdlp-instance/v1", "family":"prime",
+            "n":64-p.leading_zeros(), "m":2, "twist":false,
+            "field":{"characteristic":u(p),"degree":1,"modulus":u(p)},
+            "curve":{"a":u(p-1),"b":"0","base_a":u(p-1),"base_b":"0",
+                "twist_parameter":u(p-1),"group_order":u(order),
+                "subgroup_order":u(r),"cofactor":u(h),
+                "group_order_factorization":factors_json(&factors),"order_certificate":certificate},
+            "generator":point_json(generator),"target":point_json(c.reference_mul(generator,2)),
+            "symmetry":{"coefficient_field_degree":1,"frobenius_power":1}
+        });
+        let witness = json!({"schema":"ml-ecdlp-private-witness/v1", "scalar":"2",
+            "generator_multiplier":"1","base_generator":point_json(generator)});
+        verify(&public, &witness).unwrap();
+        let exact = prime_curve(&public).unwrap();
+        assert!(exact.cofactor > u32::MAX as u64);
+        assert_eq!(exact.cofactor, h);
+        assert_eq!(exact.group_order(), BigUint::from(order));
+        assert_eq!(exact.fast().unwrap().n, r);
+        let case = CaseData {
+            public_instance: public,
+            private_witness: Value::Null,
+            // BSGS needs only a public domain. This minimal adapter fixture is
+            // not a claimed factor-base construction transcript or export.
+            factor_base: json!({"points":[point_json(generator)]}),
+        };
+        let mut cfg = config("prime", 64 - p.leading_zeros(), false);
+        cfg.solver = "bsgs".into();
+        let solved = super::super::solvers::solve(&cfg, &case).unwrap();
+        assert_eq!(solved.outcome["scalar_recovered_without_witness"], true);
+        assert_eq!(solved.outcome["scalar_replay_verified"], true);
+        let label = solved
+            .artifacts
+            .iter()
+            .find(|a| a.role == "restricted-independent-scalar-label")
+            .unwrap();
+        let mut value: Value = serde_json::from_slice(&label.bytes).unwrap();
+        assert_eq!(value["scalar"], "2");
+        super::super::solvers::verify_solution_artifact(
+            &case.public_instance,
+            &case.factor_base,
+            &label.role,
+            &value,
+        )
+        .unwrap();
+        value["scalar"] = json!("3");
+        assert!(super::super::solvers::verify_solution_artifact(
+            &case.public_instance,
+            &case.factor_base,
+            &label.role,
+            &value
+        )
+        .is_err());
+        // Bridge the exact arithmetic context into the bounded native root
+        // adapter on this same frozen public fixture; no target resampling.
+        cfg.solver = "root".into();
+        assert!(case.private_witness.is_null());
+        let rooted = super::super::solvers::solve(&cfg, &case).unwrap();
+        let certificates: Vec<_> = rooted
+            .artifacts
+            .iter()
+            .filter(|a| a.role == "prime-root-certificates/v1")
+            .collect();
+        assert_eq!(certificates.len(), 1);
+        let certificate: Value = serde_json::from_slice(&certificates[0].bytes).unwrap();
+        assert!(!certificate["queries"].as_array().unwrap().is_empty());
+        super::super::solvers::verify_prime_root_artifact(
+            &case.public_instance,
+            &case.factor_base,
+            &cfg,
+            &certificate,
+        )
+        .unwrap();
+        super::super::verify_prime_root_outcome(&rooted.outcome, &certificate, cfg.m).unwrap();
+        assert_eq!(rooted.outcome["scalar_recovered_without_witness"], false);
+        assert_eq!(certificate["execution_trace_complete_verified"], false);
+        assert_eq!(certificate["total_operation_count_verified"], false);
+        if certificate["censored"] == true {
+            assert_eq!(rooted.outcome["status"], "budget_exhausted");
+            assert_eq!(rooted.outcome["solver_completed"], false);
+            assert_eq!(certificate["root_queries_completed"], false);
+        }
+        for solver in ["f4", "pkm"] {
+            cfg.solver = solver.into();
+            let result = super::super::solvers::solve(&cfg, &case).unwrap();
+            assert_eq!(
+                result.outcome["status"], "unsupported",
+                "{solver}: {}",
+                result.outcome
+            );
+        }
+        eprintln!(
+            "exact-cofactor fixture p={p} r={r} h={h} public={}",
+            case.public_instance
+        );
+    }
+
+    #[test]
+    fn exact_prime_cofactor_rejects_invalid_metadata_without_overflow() {
+        let data = generate(&config("prime", 11, false)).unwrap();
+        for bad in ["0", "01", "-1", "18446744073709551616"] {
+            let mut public = data.public_instance.clone();
+            public["curve"]["cofactor"] = json!(bad);
+            assert!(prime_curve(&public).is_err(), "accepted {bad}");
+        }
+        let mut public = data.public_instance.clone();
+        public["curve"]["group_order"] = u(1);
+        assert!(prime_curve(&public).is_err());
+        public["curve"]["group_order"] = u(u64::MAX);
+        public["curve"]["cofactor"] = u(u64::MAX);
+        public["curve"]["subgroup_order"] = u(3);
+        assert!(prime_curve(&public).is_err());
+        public["curve"]["subgroup_order"] = u(0);
+        assert!(prime_curve(&public).is_err());
+    }
+
+    #[test]
+    fn independent_replay_rejects_tampering() {
+        for family in ["koblitz", "binary", "prime"] {
+            for twist in [false, true] {
+                let data = generate(&config(family, 11, twist)).unwrap();
+                verify(&data.public_instance, &data.private_witness).unwrap();
+                verify_factor_base(&data.public_instance, &data.factor_base).unwrap();
+                let mut witness = data.private_witness.clone();
+                witness["scalar"] = json!("0");
+                assert!(verify(&data.public_instance, &witness).is_err());
+                let mut public = data.public_instance.clone();
+                public["twist"] = json!(!twist);
+                assert!(verify(&public, &data.private_witness).is_err());
+                let mut public = data.public_instance.clone();
+                public["curve"]["group_order"] = json!("123");
+                assert!(verify(&public, &data.private_witness).is_err());
+                let mut public = data.public_instance.clone();
+                public["generator"] = json!({"x":"invalid","y":"0"});
+                assert!(verify_factor_base(&public, &data.factor_base).is_err());
+                let mut public = data.public_instance.clone();
+                public["curve"]["subgroup_order"] = json!("0");
+                assert!(verify_factor_base(&public, &data.factor_base).is_err());
+                let mut public = data.public_instance.clone();
+                let r = number(&public["curve"]["subgroup_order"], "r").unwrap();
+                let h = number(&public["curve"]["cofactor"], "h").unwrap();
+                let fake_h = if h == 3 { 5 } else { 3 };
+                public["curve"]["group_order"] = u(fake_h * r);
+                public["curve"]["cofactor"] = u(fake_h);
+                assert!(verify_factor_base(&public, &data.factor_base).is_err());
+                public["curve"]["group_order"] = u(0);
+                public["curve"]["cofactor"] = u(0);
+                assert!(verify_factor_base(&public, &data.factor_base).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn repeated_prime_projection_checks_actual_cyclic_subgroup() {
+        // Seed7 selects a=1; its odd-degree quadratic twist is a=0 and has
+        // #E=2116=4*23^2 with rank-two rational23-torsion.
+        let data = generate(&config("koblitz", 11, true)).unwrap();
+        let public = &data.public_instance;
+        assert_eq!(public["curve"]["a"], "0");
+        assert_eq!(public["curve"]["group_order"], "2116");
+        assert_eq!(public["curve"]["subgroup_order"], "23");
+        let c = arithmetic(public).unwrap();
+        let order = number(&public["curve"]["group_order"], "order").unwrap();
+        let r = number(&public["curve"]["subgroup_order"], "r").unwrap();
+        assert!(order.is_multiple_of(r * r));
+        let generator = point_words(&public["generator"]).unwrap();
+        let mut projector = SubgroupProjector::new(public).unwrap();
+        let mut admitted = HashSet::new();
+        let mut rejected_nonzero = 0;
+        for x in 1..c.q() {
+            for input in c.lift(x) {
+                let (p, multiplier, member, log) = projector.project(&point_json(input)).unwrap();
+                let p = point_words(&p).unwrap();
+                assert_eq!(c.reference_mul(input, multiplier), p);
+                if member {
+                    admitted.insert(p);
+                    assert_eq!(c.reference_mul(generator, log.unwrap()), p);
+                } else if p.is_some() {
+                    rejected_nonzero += 1;
+                    assert!(log.is_none());
+                }
+            }
+        }
+        assert_eq!(admitted.len() as u64, r - 1);
+        assert!(rejected_nonzero > 0);
+        assert_eq!(projector.counters()["method"], "bounded-bsgs-diagnostic");
+    }
+
+    #[test]
+    fn even_binary_twist_is_nontrivial_and_orders_pair() {
+        let base = generate(&config("koblitz", 12, false)).unwrap();
+        let twist = generate(&config("koblitz", 12, true)).unwrap();
+        let c = binary_curve(&twist.public_instance).unwrap();
+        let d = number(&twist.public_instance["curve"]["twist_parameter"], "d").unwrap();
+        assert_ne!(d, 1);
+        assert_eq!(
+            F2mElement::from_biguint(&d.into(), 12).trace(&c.irreducible),
+            1
+        );
+        assert_eq!(
+            number(&base.public_instance["curve"]["group_order"], "N").unwrap()
+                + number(&twist.public_instance["curve"]["group_order"], "N").unwrap(),
+            2 * ((1 << 12) + 1)
+        );
+        let mut bad = twist.public_instance.clone();
+        bad["curve"]["twist_parameter"] = json!("1");
+        assert!(verify(&bad, &twist.private_witness).is_err());
+    }
+
+    #[test]
+    fn hasse_counter_matches_exhaustive_count() {
+        let mut rng = StdRng::seed_from_u64(3);
+        let c = Arithmetic::Prime(FastCurve::new("unit", 2039, 2036, 17, 1));
+        let exhaustive = 1 + (0..c.q()).map(|x| c.lift(x).len() as u64).sum::<u64>();
+        let (count, cert) = certify_count(&c, &mut rng).unwrap();
+        assert_eq!(count, exhaustive);
+        verify_certificate(&c, &cert, count, 2036, 17, false).unwrap();
+    }
+
+    #[test]
+    fn requested_boundaries_all_families_and_twists_replay() {
+        // Correctness checks at the requested field boundaries, not timing or
+        // comparative experiments. Constructors have fixed 16 Hasse samples,
+        // 300000 factoring iterations per factor, and 1024 generator samples.
+        for n in [23, 24, 31, 47, 61] {
+            for family in ["koblitz", "binary", "prime"] {
+                for twist in [false, true] {
+                    let mut cfg = config(family, n, twist);
+                    cfg.factor_base_size = 2;
+                    let data = generate(&cfg)
+                        .unwrap_or_else(|e| panic!("{family} n={n} twist={twist}: {e}"));
+                    verify(&data.public_instance, &data.private_witness).unwrap();
+                    verify_factor_base(&data.public_instance, &data.factor_base).unwrap();
+                    assert!(data.public_instance.get("curve_seed").is_none());
+                    assert!(data.public_instance.get("generator_index").is_none());
+                    assert!(data.public_instance.get("key_index").is_none());
+                    if family == "prime" && n == 61 {
+                        assert_eq!(
+                            number(&data.public_instance["field"]["modulus"], "p").unwrap(),
+                            (1u64 << 61) - 1
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn planted_control_is_deterministic_and_independently_replayed() {
+        let mut cfg = config("koblitz", 23, false);
+        let mut invalid_size = cfg.clone();
+        invalid_size.factor_base_size = usize::MAX;
+        assert!(generate_planted(&invalid_size).is_err());
+        cfg.factor_base_size = 4;
+        cfg.m = 15; // Terms are sampled with replacement, even above base size.
+        let natural = generate(&cfg).unwrap();
+        let planted = generate_planted(&cfg).unwrap();
+        assert!(planted.public_instance.get("population").is_none());
+        assert!(planted.public_instance.get("sampling").is_none());
+        assert!(planted.public_instance.get("construction_trace").is_none());
+        assert_eq!(
+            planted.private_witness["planted_construction"]["population"],
+            "planted-pdp-v1"
+        );
+        assert_eq!(
+            natural.public_instance["population"],
+            "unconditioned-uniform-nonzero-subgroup-scalar"
+        );
+        assert_eq!(planted.factor_base["rule"], "planted-known-log-subgroup/v1");
+        assert_eq!(planted.factor_base["points"].as_array().unwrap().len(), 4);
+        assert_eq!(
+            planted.private_witness["planted_construction"]["target_draws"][0]["terms"]
+                .as_array()
+                .unwrap()
+                .len(),
+            15
+        );
+        assert_eq!(
+            serde_json::to_value(&planted).unwrap(),
+            serde_json::to_value(generate_planted(&cfg).unwrap()).unwrap()
+        );
+        verify_planted(&cfg, &planted).unwrap();
+        assert!(verify_factor_base(&planted.public_instance, &planted.factor_base).is_err());
+        let mut leaked = planted.clone();
+        leaked.public_instance["population"] = json!("planted-pdp-v1");
+        assert!(verify_planted(&cfg, &leaked).is_err());
+        let mut wrong_sign = planted.clone();
+        wrong_sign.private_witness["planted_construction"]["target_draws"][0]["terms"][0]["sign"] =
+            json!(0);
+        assert!(verify_planted(&cfg, &wrong_sign).is_err());
+        let mut wrong_log = planted.clone();
+        wrong_log.private_witness["planted_construction"]["base_logs"][0] = json!("0");
+        assert!(verify_planted(&cfg, &wrong_log).is_err());
+        let mut wrong_target = planted.clone();
+        wrong_target.public_instance["target"] = natural.public_instance["target"].clone();
+        assert!(verify_planted(&cfg, &wrong_target).is_err());
+    }
 }
 
 /// Isolated positive-control constructor. The native planner does not route
@@ -1210,415 +2133,6 @@ pub fn verify_planted(config: &CaseConfig, case: &CaseData) -> Result<(), String
     Ok(())
 }
 
-/// Reconstruct binary arithmetic after strict field and coordinate validation.
-pub fn binary_curve(v: &Value) -> Result<BinaryCurve, String> {
-    let n = v["n"].as_u64().ok_or("missing n")?;
-    if !(3..=61).contains(&n)
-        || v["field"]["degree"].as_u64() != Some(n)
-        || v["field"]["characteristic"] != "2"
-    {
-        return Err("invalid binary field degree/characteristic".into());
-    }
-    let terms = v["field"]["irreducible_low_terms"]
-        .as_array()
-        .ok_or("missing field polynomial")?;
-    let mut low_terms = Vec::new();
-    let mut mask = 1u64 << n;
-    for x in terms {
-        let x = x.as_u64().ok_or("invalid polynomial exponent")?;
-        if x >= n || low_terms.contains(&(x as u32)) {
-            return Err("invalid or duplicate polynomial exponent".into());
-        }
-        low_terms.push(x as u32);
-        mask |= 1u64 << x;
-    }
-    if !is_irreducible_f2(mask) {
-        return Err("reducible field polynomial".into());
-    }
-    let a = number(&v["curve"]["a"], "a")?;
-    let b = number(&v["curve"]["b"], "b")?;
-    if a >= 1u64 << n || b == 0 || b >= 1u64 << n {
-        return Err("invalid binary coefficients".into());
-    }
-    Ok(BinaryCurve {
-        m: n as u32,
-        irreducible: IrreduciblePoly {
-            degree: n as u32,
-            low_terms,
-        },
-        a: F2mElement::from_biguint(&a.into(), n as u32),
-        b: F2mElement::from_biguint(&b.into(), n as u32),
-        generator: binary_point(&v["generator"], n as u32)?,
-        order: number(&v["curve"]["subgroup_order"], "subgroup order")?.into(),
-        cofactor: number(&v["curve"]["cofactor"], "cofactor")?.into(),
-    })
-}
-pub fn binary_point(v: &Value, n: u32) -> Result<BinaryPoint, String> {
-    if !(1..=63).contains(&n) {
-        return Err("invalid binary point degree".into());
-    }
-    match point_words(v)? {
-        None => Ok(BinaryPoint::Infinity),
-        Some((x, y)) if x < (1u64 << n) && y < (1u64 << n) => Ok(BinaryPoint::Affine {
-            x: F2mElement::from_biguint(&x.into(), n),
-            y: F2mElement::from_biguint(&y.into(), n),
-        }),
-        _ => Err("noncanonical binary point coordinates".into()),
-    }
-}
-pub fn prime_curve(v: &Value) -> Result<ExactPrimeCurve, String> {
-    let p = number(&v["field"]["modulus"], "modulus")?;
-    if p <= 3 || p >= 1u64 << 62 || !is_prime_u64(p) || v["field"]["characteristic"] != u(p) {
-        return Err("invalid prime field".into());
-    }
-    if v["n"].as_u64() != Some((64 - p.leading_zeros()) as u64)
-        || v["field"]["degree"].as_u64() != Some(1)
-    {
-        return Err("prime field size metadata differs from modulus".into());
-    }
-    let a = number(&v["curve"]["a"], "a")?;
-    let b = number(&v["curve"]["b"], "b")?;
-    if a >= p || b >= p {
-        return Err("noncanonical prime coefficients".into());
-    }
-    let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
-    if (4u128 * mul(mul(a, a), a) as u128 + 27u128 * mul(b, b) as u128).is_multiple_of(p as u128) {
-        return Err("singular prime curve".into());
-    }
-    let (gx, gy) = point_words(&v["generator"])?.ok_or("infinite generator")?;
-    if gx >= p || gy >= p {
-        return Err("noncanonical generator".into());
-    }
-    let subgroup = number(&v["curve"]["subgroup_order"], "subgroup order")?;
-    let cofactor = number(&v["curve"]["cofactor"], "cofactor")?;
-    let group_order = number(&v["curve"]["group_order"], "group order")?;
-    if subgroup == 0 || cofactor == 0 {
-        return Err("invalid zero subgroup or cofactor".into());
-    }
-    let curve = ExactPrimeCurve {
-        p: p.into(),
-        a: a.into(),
-        b: b.into(),
-        gx: gx.into(),
-        gy: gy.into(),
-        n: subgroup.into(),
-        cofactor,
-    };
-    if curve.group_order() != BigUint::from(group_order) {
-        return Err("prime subgroup and cofactor do not match group order".into());
-    }
-    Ok(curve)
-}
-pub fn prime_point(v: &Value, c: &ExactPrimeCurve) -> Result<Point, String> {
-    match point_words(v)? {
-        None => Ok(Point::Infinity),
-        Some((x, y)) if BigUint::from(x) < c.p && BigUint::from(y) < c.p => Ok(Point::Affine {
-            x: c.fe(x.into()),
-            y: c.fe(y.into()),
-        }),
-        _ => Err("noncanonical prime point coordinates".into()),
-    }
-}
-
-pub(super) fn arithmetic(v: &Value) -> Result<Arithmetic, String> {
-    match v["family"].as_str() {
-        Some("prime") => Ok(Arithmetic::Prime(prime_curve(v)?.fast()?)),
-        Some("koblitz" | "binary") => {
-            let c = binary_curve(v)?;
-            Ok(Arithmetic::Binary {
-                fast: FastBinaryCurve::new(
-                    &c.irreducible,
-                    c.a.to_biguint().to_u64().ok_or("a overflow")?,
-                )
-                .ok_or("invalid binary parameters")?,
-                b: c.b.to_biguint().to_u64().ok_or("b overflow")?,
-            })
-        }
-        _ => Err("invalid family".into()),
-    }
-}
-
-fn verify_certificate(
-    c: &Arithmetic,
-    certificate: &Value,
-    order: u64,
-    base_a: u64,
-    base_b: u64,
-    twist: bool,
-) -> Result<(), String> {
-    let (lo, hi) = hasse(c.q());
-    if !(lo..=hi).contains(&order) {
-        return Err("order outside Hasse interval".into());
-    }
-    match certificate["method"].as_str() {
-        Some("exact-small-field-exhaustive-v1") => {
-            if c.q() > 4096
-                || number(
-                    &certificate["field_cardinality"],
-                    "exhaustive field cardinality",
-                )? != c.q()
-            {
-                return Err("invalid exhaustive cardinality certificate bounds".into());
-            }
-            let counts: Vec<_> = (0..c.q()).map(|x| c.lift(x).len()).collect();
-            if certificate["x_point_counts"] != json!(counts)
-                || 1 + counts.iter().map(|x| *x as u64).sum::<u64>() != order
-            {
-                return Err("exhaustive cardinality replay failed".into());
-            }
-        }
-        Some("koblitz-frobenius-trace-recurrence-v1") => {
-            let Arithmetic::Binary { fast, b } = c else {
-                return Err("Koblitz certificate on prime curve".into());
-            };
-            if twist
-                || fast.a > 1
-                || *b != 1
-                || certificate["a"].as_u64() != Some(fast.a)
-                || certificate["n"].as_u64() != Some(fast.n as u64)
-                || koblitz_point_count(fast.a as u8, fast.n) != BigUint::from(order)
-            {
-                return Err("invalid Koblitz order certificate".into());
-            }
-        }
-        Some("exact-point-order-unique-hasse-multiple-v1") => {
-            let p = point_words(&certificate["point"])?;
-            let r = number(&certificate["point_order"], "certificate point order")?;
-            if r == 0
-                || r > order
-                || !order.is_multiple_of(r)
-                || p.is_none()
-                || !c.on_curve(p)
-                || c.reference_mul(p, r).is_some()
-            {
-                return Err("invalid certificate point or annihilator".into());
-            }
-            let factors = read_factors(&certificate["point_order_factorization"], r)?;
-            if factors
-                .iter()
-                .any(|&(pdiv, _)| c.reference_mul(p, r / pdiv).is_none())
-            {
-                return Err("point order not exact".into());
-            }
-            let first = lo.div_ceil(r) * r;
-            if first != order
-                || first + r <= hi
-                || number(&certificate["hasse_lower"], "Hasse lower")? != lo
-                || number(&certificate["hasse_upper"], "Hasse upper")? != hi
-            {
-                return Err("point order does not isolate cardinality".into());
-            }
-        }
-        Some("quadratic-twist-order-v1") => {
-            if !twist {
-                return Err("twist certificate attached to untwisted model".into());
-            }
-            let base = match c {
-                Arithmetic::Prime(c) => {
-                    Arithmetic::Prime(FastCurve::new("certificate base", c.f.p, base_a, base_b, 1))
-                }
-                Arithmetic::Binary { fast, .. } => {
-                    let mut base = fast.clone();
-                    base.a = base_a;
-                    Arithmetic::Binary {
-                        fast: base,
-                        b: base_b,
-                    }
-                }
-            };
-            let base_order = number(&certificate["base_order"], "base order")?;
-            if order.checked_add(base_order) != Some(2 * (c.q() + 1)) {
-                return Err("twist order identity failed".into());
-            }
-            verify_certificate(
-                &base,
-                &certificate["base_certificate"],
-                base_order,
-                base_a,
-                base_b,
-                false,
-            )?;
-        }
-        _ => return Err("unknown cardinality certificate".into()),
-    }
-    Ok(())
-}
-
-/// Verify public curve, twist, cardinality and subgroup facts without witness
-/// access. Exact target membership in <G> follows only from a scalar replay.
-pub fn verify_public(public: &Value) -> Result<(), String> {
-    if public["schema"] != "ml-ecdlp-instance/v1"
-        || !public["m"].as_u64().is_some_and(|m| (2..=15).contains(&m))
-    {
-        return Err("invalid instance/witness schema or arity".into());
-    }
-    let c = arithmetic(public)?;
-    let model = &public["curve"];
-    let order = number(&model["group_order"], "group order")?;
-    let subgroup = number(&model["subgroup_order"], "subgroup order")?;
-    let cofactor = number(&model["cofactor"], "cofactor")?;
-    if subgroup <= 2
-        || !is_prime_u64(subgroup)
-        || subgroup as u128 * cofactor as u128 != order as u128
-    {
-        return Err("invalid prime subgroup/cofactor".into());
-    }
-    let factors = read_factors(&model["group_order_factorization"], order)?;
-    if factors.last().map(|x| x.0) != Some(subgroup) {
-        return Err("subgroup is not declared largest prime factor".into());
-    }
-    let base_a = number(&model["base_a"], "base a")?;
-    let base_b = number(&model["base_b"], "base b")?;
-    let d = number(&model["twist_parameter"], "twist parameter")?;
-    let a = number(&model["a"], "a")?;
-    let b = number(&model["b"], "b")?;
-    let twist = public["twist"].as_bool().ok_or("missing twist boolean")?;
-    if base_a >= c.q() || base_b >= c.q() || d >= c.q() {
-        return Err("noncanonical twist data".into());
-    }
-    match &c {
-        Arithmetic::Prime(c) => {
-            let mul = |x: u64, y: u64| ((x as u128 * y as u128) % c.f.p as u128) as u64;
-            if d == 0 || c.f.pow(c.f.to_mont(d), (c.f.p - 1) / 2) != c.f.neg(c.f.one) {
-                return Err("twist parameter is not a nonsquare".into());
-            }
-            let expected = if twist {
-                (mul(base_a, mul(d, d)), mul(base_b, mul(d, mul(d, d))))
-            } else {
-                (base_a, base_b)
-            };
-            if (a, b) != expected {
-                return Err("wrong prime twist coefficients".into());
-            }
-        }
-        Arithmetic::Binary { fast, .. } => {
-            let generic = binary_curve(public)?;
-            if F2mElement::from_biguint(&d.into(), fast.n).trace(&generic.irreducible) != 1 {
-                return Err("binary twist parameter does not have trace one".into());
-            }
-            if b != base_b || a != if twist { base_a ^ d } else { base_a } {
-                return Err("wrong binary twist coefficients".into());
-            }
-            if public["family"] == "koblitz" && (base_a > 1 || base_b != 1) {
-                return Err("family mislabeled as Koblitz".into());
-            }
-        }
-    }
-    verify_certificate(
-        &c,
-        &model["order_certificate"],
-        order,
-        base_a,
-        base_b,
-        twist,
-    )?;
-    let degree = match &c {
-        Arithmetic::Prime(_) => 1,
-        Arithmetic::Binary { fast, b } => (1..=fast.n)
-            .find(|&k| {
-                fast.n.is_multiple_of(k)
-                    && fast.gf.sqr_k(fast.a, k) == fast.a
-                    && fast.gf.sqr_k(*b, k) == *b
-            })
-            .ok_or("no coefficient field")?,
-    };
-    if public["symmetry"]["coefficient_field_degree"].as_u64() != Some(degree as u64)
-        || public["symmetry"]["frobenius_power"].as_u64() != Some(degree as u64)
-    {
-        return Err("incorrect coefficient field or Frobenius action".into());
-    }
-    for name in ["generator", "target"] {
-        let p = point_words(&public[name])?;
-        if p.is_none() || !c.on_curve(p) || c.reference_mul(p, subgroup).is_some() {
-            return Err(format!("invalid public subgroup point {name}"));
-        }
-    }
-    Ok(())
-}
-
-/// Verify the algebra and scalar with the library's separate general point
-/// arithmetic, rather than trusting the fast arithmetic used for construction.
-pub fn verify(public: &Value, private: &Value) -> Result<(), String> {
-    verify_public(public)?;
-    if private["schema"] != "ml-ecdlp-private-witness/v1" {
-        return Err("invalid private witness schema".into());
-    }
-    let subgroup = number(&public["curve"]["subgroup_order"], "subgroup order")?;
-    let scalar = number(&private["scalar"], "private scalar")?;
-    let multiplier = number(&private["generator_multiplier"], "generator multiplier")?;
-    if scalar == 0 || scalar >= subgroup || multiplier == 0 || multiplier >= subgroup {
-        return Err("scalar/multiplier outside nonzero subgroup".into());
-    }
-    if public["family"] == "prime" {
-        let c = prime_curve(public)?;
-        let g = c.generator();
-        let q = prime_point(&public["target"], &c)?;
-        let base = prime_point(&private["base_generator"], &c)?;
-        if matches!(g, Point::Infinity)
-            || matches!(q, Point::Infinity)
-            || matches!(base, Point::Infinity)
-            || !c.is_on_curve(&g)
-            || !c.is_on_curve(&q)
-            || !c.is_on_curve(&base)
-        {
-            return Err("invalid prime point".into());
-        }
-        if g.scalar_mul_vartime(&subgroup.into(), &c.a_fe()) != Point::Infinity
-            || base.scalar_mul_vartime(&subgroup.into(), &c.a_fe()) != Point::Infinity
-            || base.scalar_mul_vartime(&multiplier.into(), &c.a_fe()) != g
-            || g.scalar_mul_vartime(&scalar.into(), &c.a_fe()) != q
-        {
-            return Err("independent prime scalar replay failed".into());
-        }
-    } else {
-        let c = binary_curve(public)?;
-        let g = &c.generator;
-        let q = binary_point(&public["target"], c.m)?;
-        let base = binary_point(&private["base_generator"], c.m)?;
-        if *g == BinaryPoint::Infinity
-            || q == BinaryPoint::Infinity
-            || base == BinaryPoint::Infinity
-            || !c.is_on_curve(g)
-            || !c.is_on_curve(&q)
-            || !c.is_on_curve(&base)
-        {
-            return Err("invalid binary point".into());
-        }
-        // Reverse-bit reference multiplication gives a different schedule from
-        // the native fast constructor and compares the library group formulas.
-        let reference_mul = |p: &BinaryPoint, k: u64| {
-            let mut result = BinaryPoint::Infinity;
-            let mut addend = p.clone();
-            let mut k = k;
-            while k > 0 {
-                if k & 1 == 1 {
-                    result = point_add(&c, &result, &addend);
-                }
-                addend = point_add(&c, &addend, &addend);
-                k >>= 1;
-            }
-            result
-        };
-        if scalar_mul(&c, g, &subgroup.into()) != BinaryPoint::Infinity
-            || scalar_mul(&c, &base, &subgroup.into()) != BinaryPoint::Infinity
-            || reference_mul(&base, multiplier) != *g
-            || reference_mul(g, scalar) != q
-        {
-            return Err("independent binary scalar replay failed".into());
-        }
-    }
-    Ok(())
-}
-
-pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
-    if base["rule"] == "planted-known-log-subgroup/v1" {
-        return Err(
-            "planted factor base requires restricted witness replay via verify_planted".into(),
-        );
-    }
-    verify_natural_factor_base(public, base)
-}
-
 fn verify_planted_factor_base(public: &Value, base: &Value) -> Result<(), String> {
     if base["schema"] == "ml-ecdlp-factor-base/v1"
         && base["rule"] == "planted-known-log-subgroup/v1"
@@ -1880,381 +2394,4 @@ fn verify_natural_factor_base(public: &Value, base: &Value) -> Result<(), String
         }
     }
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    fn config(family: &str, n: u32, twist: bool) -> CaseConfig {
-        CaseConfig {
-            family: family.into(),
-            n,
-            m: 2,
-            twist,
-            curve_seed: 7,
-            generator_index: 1,
-            key_index: 1,
-            seed: 42,
-            factor_base_size: 8,
-            degree_bound: 4,
-            work_limit: 1000,
-            solver: "enumerate".into(),
-        }
-    }
-    #[test]
-    fn planted_control_is_deterministic_and_independently_replayed() {
-        let mut cfg = config("koblitz", 23, false);
-        let mut invalid_size = cfg.clone();
-        invalid_size.factor_base_size = usize::MAX;
-        assert!(generate_planted(&invalid_size).is_err());
-        cfg.factor_base_size = 4;
-        cfg.m = 15; // Terms are sampled with replacement, even above base size.
-        let natural = generate(&cfg).unwrap();
-        let planted = generate_planted(&cfg).unwrap();
-        assert!(planted.public_instance.get("population").is_none());
-        assert!(planted.public_instance.get("sampling").is_none());
-        assert!(planted.public_instance.get("construction_trace").is_none());
-        assert_eq!(
-            planted.private_witness["planted_construction"]["population"],
-            "planted-pdp-v1"
-        );
-        assert_eq!(
-            natural.public_instance["population"],
-            "unconditioned-uniform-nonzero-subgroup-scalar"
-        );
-        assert_eq!(planted.factor_base["rule"], "planted-known-log-subgroup/v1");
-        assert_eq!(planted.factor_base["points"].as_array().unwrap().len(), 4);
-        assert_eq!(
-            planted.private_witness["planted_construction"]["target_draws"][0]["terms"]
-                .as_array()
-                .unwrap()
-                .len(),
-            15
-        );
-        assert_eq!(
-            serde_json::to_value(&planted).unwrap(),
-            serde_json::to_value(generate_planted(&cfg).unwrap()).unwrap()
-        );
-        verify_planted(&cfg, &planted).unwrap();
-        assert!(verify_factor_base(&planted.public_instance, &planted.factor_base).is_err());
-        let mut leaked = planted.clone();
-        leaked.public_instance["population"] = json!("planted-pdp-v1");
-        assert!(verify_planted(&cfg, &leaked).is_err());
-        let mut wrong_sign = planted.clone();
-        wrong_sign.private_witness["planted_construction"]["target_draws"][0]["terms"][0]["sign"] =
-            json!(0);
-        assert!(verify_planted(&cfg, &wrong_sign).is_err());
-        let mut wrong_log = planted.clone();
-        wrong_log.private_witness["planted_construction"]["base_logs"][0] = json!("0");
-        assert!(verify_planted(&cfg, &wrong_log).is_err());
-        let mut wrong_target = planted.clone();
-        wrong_target.public_instance["target"] = natural.public_instance["target"].clone();
-        assert!(verify_planted(&cfg, &wrong_target).is_err());
-    }
-    #[test]
-    fn exact_prime_context_matches_legacy_small_cofactor_arithmetic() {
-        use crate::ecc::curve::CurveParams;
-        for twist in [false, true] {
-            let data = generate(&config("prime", 11, twist)).unwrap();
-            let exact = prime_curve(&data.public_instance).unwrap();
-            let legacy = CurveParams {
-                name: "compatibility fixture",
-                p: exact.p.clone(),
-                a: exact.a.clone(),
-                b: exact.b.clone(),
-                gx: exact.gx.clone(),
-                gy: exact.gy.clone(),
-                n: exact.n.clone(),
-                h: u32::try_from(exact.cofactor).unwrap(),
-            };
-            assert_eq!(exact.generator(), legacy.generator());
-            let old_fast = FastCurve::from_params(&legacy).unwrap();
-            let new_fast = exact.fast().unwrap();
-            assert_eq!(
-                (old_fast.f.p, old_fast.a, old_fast.b, old_fast.n),
-                (new_fast.f.p, new_fast.a, new_fast.b, new_fast.n)
-            );
-            for scalar in [0u64, 1, 2, 7, 31] {
-                let old = legacy
-                    .generator()
-                    .scalar_mul_vartime(&scalar.into(), &legacy.a_fe());
-                let new = exact
-                    .generator()
-                    .scalar_mul_vartime(&scalar.into(), &exact.a_fe());
-                assert_eq!(old, new);
-                assert_eq!(legacy.is_on_curve(&old), exact.is_on_curve(&new));
-            }
-            verify(&data.public_instance, &data.private_witness).unwrap();
-        }
-    }
-
-    #[test]
-    fn exact_prime_cofactor_above_u32_replays_and_solves_without_witness() {
-        // A deterministic, bounded software fixture, not campaign sampling.
-        // Certify the actual order instead of attaching a made-up cofactor.
-        let h = 1u64 << 33;
-        // Frozen from the first prime r in the declared odd 3..=1023 search.
-        let r = 31;
-        let p = 266_287_972_351;
-        assert!(is_prime_u64(r) && is_prime_u64(p));
-        assert_eq!(p + 1, r * h);
-        let c = Arithmetic::Prime(FastCurve::new("large-cofactor fixture", p, p - 1, 0, r));
-        let (order, certificate) =
-            certify_count(&c, &mut StdRng::seed_from_u64(0xeca0fac7)).unwrap();
-        assert_eq!(order, p + 1);
-        verify_certificate(&c, &certificate, order, p - 1, 0, false).unwrap();
-        let factors = factor(order).unwrap();
-        assert_eq!(factors, vec![(2, 33), (r, 1)]);
-        let generator = (1..=1024)
-            .flat_map(|x| c.lift(x))
-            .find_map(|point| {
-                let (projected, multiplier) = prime_projection(&c, point, order, r, false);
-                assert_eq!(projected, c.reference_mul(point, multiplier));
-                projected
-            })
-            .expect("bounded nonzero subgroup generator");
-        let generator = Some(generator);
-        assert_eq!(c.reference_mul(generator, r), None);
-        let public = json!({
-            "schema":"ml-ecdlp-instance/v1", "family":"prime",
-            "n":64-p.leading_zeros(), "m":2, "twist":false,
-            "field":{"characteristic":u(p),"degree":1,"modulus":u(p)},
-            "curve":{"a":u(p-1),"b":"0","base_a":u(p-1),"base_b":"0",
-                "twist_parameter":u(p-1),"group_order":u(order),
-                "subgroup_order":u(r),"cofactor":u(h),
-                "group_order_factorization":factors_json(&factors),"order_certificate":certificate},
-            "generator":point_json(generator),"target":point_json(c.reference_mul(generator,2)),
-            "symmetry":{"coefficient_field_degree":1,"frobenius_power":1}
-        });
-        let witness = json!({"schema":"ml-ecdlp-private-witness/v1", "scalar":"2",
-            "generator_multiplier":"1","base_generator":point_json(generator)});
-        verify(&public, &witness).unwrap();
-        let exact = prime_curve(&public).unwrap();
-        assert!(exact.cofactor > u32::MAX as u64);
-        assert_eq!(exact.cofactor, h);
-        assert_eq!(exact.group_order(), BigUint::from(order));
-        assert_eq!(exact.fast().unwrap().n, r);
-        let case = CaseData {
-            public_instance: public,
-            private_witness: Value::Null,
-            // BSGS needs only a public domain. This minimal adapter fixture is
-            // not a claimed factor-base construction transcript or export.
-            factor_base: json!({"points":[point_json(generator)]}),
-        };
-        let mut cfg = config("prime", 64 - p.leading_zeros(), false);
-        cfg.solver = "bsgs".into();
-        let solved = super::super::solvers::solve(&cfg, &case).unwrap();
-        assert_eq!(solved.outcome["scalar_recovered_without_witness"], true);
-        assert_eq!(solved.outcome["scalar_replay_verified"], true);
-        let label = solved
-            .artifacts
-            .iter()
-            .find(|a| a.role == "restricted-independent-scalar-label")
-            .unwrap();
-        let mut value: Value = serde_json::from_slice(&label.bytes).unwrap();
-        assert_eq!(value["scalar"], "2");
-        super::super::solvers::verify_solution_artifact(
-            &case.public_instance,
-            &case.factor_base,
-            &label.role,
-            &value,
-        )
-        .unwrap();
-        value["scalar"] = json!("3");
-        assert!(super::super::solvers::verify_solution_artifact(
-            &case.public_instance,
-            &case.factor_base,
-            &label.role,
-            &value
-        )
-        .is_err());
-        // Bridge the exact arithmetic context into the bounded native root
-        // adapter on this same frozen public fixture; no target resampling.
-        cfg.solver = "root".into();
-        assert!(case.private_witness.is_null());
-        let rooted = super::super::solvers::solve(&cfg, &case).unwrap();
-        let certificates: Vec<_> = rooted
-            .artifacts
-            .iter()
-            .filter(|a| a.role == "prime-root-certificates/v1")
-            .collect();
-        assert_eq!(certificates.len(), 1);
-        let certificate: Value = serde_json::from_slice(&certificates[0].bytes).unwrap();
-        assert!(!certificate["queries"].as_array().unwrap().is_empty());
-        super::super::solvers::verify_prime_root_artifact(
-            &case.public_instance,
-            &case.factor_base,
-            &cfg,
-            &certificate,
-        )
-        .unwrap();
-        super::super::verify_prime_root_outcome(&rooted.outcome, &certificate).unwrap();
-        assert_eq!(rooted.outcome["scalar_recovered_without_witness"], false);
-        assert_eq!(certificate["execution_trace_complete_verified"], false);
-        assert_eq!(certificate["total_operation_count_verified"], false);
-        if certificate["censored"] == true {
-            assert_eq!(rooted.outcome["status"], "budget_exhausted");
-            assert_eq!(rooted.outcome["solver_completed"], false);
-            assert_eq!(certificate["root_queries_completed"], false);
-        }
-        for solver in ["f4", "pkm"] {
-            cfg.solver = solver.into();
-            let result = super::super::solvers::solve(&cfg, &case).unwrap();
-            assert_eq!(
-                result.outcome["status"], "unsupported",
-                "{solver}: {}",
-                result.outcome
-            );
-        }
-        eprintln!(
-            "exact-cofactor fixture p={p} r={r} h={h} public={}",
-            case.public_instance
-        );
-    }
-
-    #[test]
-    fn exact_prime_cofactor_rejects_invalid_metadata_without_overflow() {
-        let data = generate(&config("prime", 11, false)).unwrap();
-        for bad in ["0", "01", "-1", "18446744073709551616"] {
-            let mut public = data.public_instance.clone();
-            public["curve"]["cofactor"] = json!(bad);
-            assert!(prime_curve(&public).is_err(), "accepted {bad}");
-        }
-        let mut public = data.public_instance.clone();
-        public["curve"]["group_order"] = u(1);
-        assert!(prime_curve(&public).is_err());
-        public["curve"]["group_order"] = u(u64::MAX);
-        public["curve"]["cofactor"] = u(u64::MAX);
-        public["curve"]["subgroup_order"] = u(3);
-        assert!(prime_curve(&public).is_err());
-        public["curve"]["subgroup_order"] = u(0);
-        assert!(prime_curve(&public).is_err());
-    }
-
-    #[test]
-    fn independent_replay_rejects_tampering() {
-        for family in ["koblitz", "binary", "prime"] {
-            for twist in [false, true] {
-                let data = generate(&config(family, 11, twist)).unwrap();
-                verify(&data.public_instance, &data.private_witness).unwrap();
-                verify_factor_base(&data.public_instance, &data.factor_base).unwrap();
-                let mut witness = data.private_witness.clone();
-                witness["scalar"] = json!("0");
-                assert!(verify(&data.public_instance, &witness).is_err());
-                let mut public = data.public_instance.clone();
-                public["twist"] = json!(!twist);
-                assert!(verify(&public, &data.private_witness).is_err());
-                let mut public = data.public_instance.clone();
-                public["curve"]["group_order"] = json!("123");
-                assert!(verify(&public, &data.private_witness).is_err());
-                let mut public = data.public_instance.clone();
-                public["generator"] = json!({"x":"invalid","y":"0"});
-                assert!(verify_factor_base(&public, &data.factor_base).is_err());
-                let mut public = data.public_instance.clone();
-                public["curve"]["subgroup_order"] = json!("0");
-                assert!(verify_factor_base(&public, &data.factor_base).is_err());
-                let mut public = data.public_instance.clone();
-                let r = number(&public["curve"]["subgroup_order"], "r").unwrap();
-                let h = number(&public["curve"]["cofactor"], "h").unwrap();
-                let fake_h = if h == 3 { 5 } else { 3 };
-                public["curve"]["group_order"] = u(fake_h * r);
-                public["curve"]["cofactor"] = u(fake_h);
-                assert!(verify_factor_base(&public, &data.factor_base).is_err());
-                public["curve"]["group_order"] = u(0);
-                public["curve"]["cofactor"] = u(0);
-                assert!(verify_factor_base(&public, &data.factor_base).is_err());
-            }
-        }
-    }
-    #[test]
-    fn repeated_prime_projection_checks_actual_cyclic_subgroup() {
-        // Seed7 selects a=1; its odd-degree quadratic twist is a=0 and has
-        // #E=2116=4*23^2 with rank-two rational23-torsion.
-        let data = generate(&config("koblitz", 11, true)).unwrap();
-        let public = &data.public_instance;
-        assert_eq!(public["curve"]["a"], "0");
-        assert_eq!(public["curve"]["group_order"], "2116");
-        assert_eq!(public["curve"]["subgroup_order"], "23");
-        let c = arithmetic(public).unwrap();
-        let order = number(&public["curve"]["group_order"], "order").unwrap();
-        let r = number(&public["curve"]["subgroup_order"], "r").unwrap();
-        assert!(order.is_multiple_of(r * r));
-        let generator = point_words(&public["generator"]).unwrap();
-        let mut projector = SubgroupProjector::new(public).unwrap();
-        let mut admitted = HashSet::new();
-        let mut rejected_nonzero = 0;
-        for x in 1..c.q() {
-            for input in c.lift(x) {
-                let (p, multiplier, member, log) = projector.project(&point_json(input)).unwrap();
-                let p = point_words(&p).unwrap();
-                assert_eq!(c.reference_mul(input, multiplier), p);
-                if member {
-                    admitted.insert(p);
-                    assert_eq!(c.reference_mul(generator, log.unwrap()), p);
-                } else if p.is_some() {
-                    rejected_nonzero += 1;
-                    assert!(log.is_none());
-                }
-            }
-        }
-        assert_eq!(admitted.len() as u64, r - 1);
-        assert!(rejected_nonzero > 0);
-        assert_eq!(projector.counters()["method"], "bounded-bsgs-diagnostic");
-    }
-    #[test]
-    fn even_binary_twist_is_nontrivial_and_orders_pair() {
-        let base = generate(&config("koblitz", 12, false)).unwrap();
-        let twist = generate(&config("koblitz", 12, true)).unwrap();
-        let c = binary_curve(&twist.public_instance).unwrap();
-        let d = number(&twist.public_instance["curve"]["twist_parameter"], "d").unwrap();
-        assert_ne!(d, 1);
-        assert_eq!(
-            F2mElement::from_biguint(&d.into(), 12).trace(&c.irreducible),
-            1
-        );
-        assert_eq!(
-            number(&base.public_instance["curve"]["group_order"], "N").unwrap()
-                + number(&twist.public_instance["curve"]["group_order"], "N").unwrap(),
-            2 * ((1 << 12) + 1)
-        );
-        let mut bad = twist.public_instance.clone();
-        bad["curve"]["twist_parameter"] = json!("1");
-        assert!(verify(&bad, &twist.private_witness).is_err());
-    }
-    #[test]
-    fn hasse_counter_matches_exhaustive_count() {
-        let mut rng = StdRng::seed_from_u64(3);
-        let c = Arithmetic::Prime(FastCurve::new("unit", 2039, 2036, 17, 1));
-        let exhaustive = 1 + (0..c.q()).map(|x| c.lift(x).len() as u64).sum::<u64>();
-        let (count, cert) = certify_count(&c, &mut rng).unwrap();
-        assert_eq!(count, exhaustive);
-        verify_certificate(&c, &cert, count, 2036, 17, false).unwrap();
-    }
-    #[test]
-    fn requested_boundaries_all_families_and_twists_replay() {
-        // Correctness checks at the requested field boundaries, not timing or
-        // comparative experiments. Constructors have fixed 16 Hasse samples,
-        // 300000 factoring iterations per factor, and 1024 generator samples.
-        for n in [23, 24, 31, 47, 61] {
-            for family in ["koblitz", "binary", "prime"] {
-                for twist in [false, true] {
-                    let mut cfg = config(family, n, twist);
-                    cfg.factor_base_size = 2;
-                    let data = generate(&cfg)
-                        .unwrap_or_else(|e| panic!("{family} n={n} twist={twist}: {e}"));
-                    verify(&data.public_instance, &data.private_witness).unwrap();
-                    verify_factor_base(&data.public_instance, &data.factor_base).unwrap();
-                    assert!(data.public_instance.get("curve_seed").is_none());
-                    assert!(data.public_instance.get("generator_index").is_none());
-                    assert!(data.public_instance.get("key_index").is_none());
-                    if family == "prime" && n == 61 {
-                        assert_eq!(
-                            number(&data.public_instance["field"]["modulus"], "p").unwrap(),
-                            (1u64 << 61) - 1
-                        );
-                    }
-                }
-            }
-        }
-    }
 }

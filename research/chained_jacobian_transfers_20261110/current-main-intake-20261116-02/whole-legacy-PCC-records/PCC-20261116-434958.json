@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T20:08:31Z",
+ "id": "PCC-20261116-434958",
+ "kind": "theorem",
+ "producer": {
+  "commit": "278339b4b8da4ab25654a3d4bea97e6116b066cb",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "0528a25808157cb0a8616f271b8b20573607e61f63fbe836d1e9834b324c4988",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+   "theorem": "CubicFiniteNorm22308.every_nonzero_coefficient_inverse"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Universal finite q223 coefficient norm/nonzero and derived two-sided inverse, exact full04 polynomial definitions, original dual37/0/j1/120/default memory. No223^3 enumeration, actual field typeclass/native Rust/compiler/Jacobian/counter/runtime or signed standing.",
+ "statement": "theorem every_nonzero_coefficient_inverse (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hx : x\u2260(0,0,0)) : coefficientProduct x (scale ((coefficientNorm x)^221) (cofactor x))=(1,0,0) \u2227 coefficientProduct (scale ((coefficientNorm x)^221) (cofactor x)) x=(1,0,0)"
+}

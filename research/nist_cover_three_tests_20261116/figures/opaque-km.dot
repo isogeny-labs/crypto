@@ -1,0 +1,11 @@
+digraph opaque {
+  graph [rankdir=TB, bgcolor="white", label="P-192 opaque target class to dual image\nProducer-unverified", labelloc=t, fontsize=15, ranksep=0.35];
+  node [shape=box, style="rounded,filled", fillcolor="#e8f0fe", fontname="Helvetica", fontsize=11];
+  input [label="Opaque target class W_D\n22 dimensions in the 34-dimensional ambient"];
+  rr [label="Negate and solve RR difference\ncandidate 13; multiplier 19"];
+  intersection [label="Quartic / sextic intersection\n24 = negative 12 + fixed 9 + effective 3\nprojective chart + separating shear"];
+  cycle [label="Explicit degree-3 divisor E\nre-encode E - Eref and compare"];
+  dual [label="Closed-point transpose + Frobenius trace\nreduced source Mumford class"];
+  check [shape=note, fillcolor="#fff3cd", label="Passed: zero, public image, KM double,\ngeneric source image and target point class\nDual compositions are [3], not identity"];
+  input -> rr -> intersection -> cycle -> dual -> check;
+}

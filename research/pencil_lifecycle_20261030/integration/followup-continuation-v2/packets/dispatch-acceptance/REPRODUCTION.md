@@ -1,0 +1,5 @@
+# Reproduction
+
+Sources, named readback inventory, exact commands and attempt receipts are retained in this directory. check.sh declares the pinned Lean executable, imported roots, -j1, -M4096 and per-module timeout of 120 seconds. It hashes source/native/toolchain/dependency files before checking and verifies those bytes afterward. Imported compiled dependencies are reused rather than rebuilt. A fresh review must restore and bind those inputs before replay; absolute locations are not a portable dependency bundle.
+
+Successful modules: DispatchAcceptance, AcceptanceControls, AcceptanceReadback. ExpectedFailure must exit 1. audit-readback.py checks exact names and allowed axioms and rejects three malformed inventories. No execution should be inferred from merely rendering this report. Render with python3 render-report.py. The one-page PDF was rasterized and visually inspected. The archive manifest excludes itself and includes the retained compiler outputs; repository publication must follow the existing artifact-store and source-text policies.

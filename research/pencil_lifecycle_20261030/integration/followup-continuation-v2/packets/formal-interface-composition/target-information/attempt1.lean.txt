@@ -1,0 +1,58 @@
+import Mathlib.LinearAlgebra.Span.Basic
+import Mathlib.Tactic
+set_option autoImplicit false
+namespace TargetInformation
+variable {K V W : Type*} [Field K] [AddCommGroup V] [Module K V]
+ [AddCommGroup W] [Module K W]
+def Solves (A : V →ₗ[K] W) (b c : W) (x : V) (k : K) : Prop := A x + k • b + c = 0
+
+theorem shift_solution (A : V →ₗ[K] W) (b c : W) (x h : V) (k l : K)
+ (hx : Solves A b c x k) (hh : A h = b) :
+ Solves A b c (x + (k-l) • h) l := by
+ unfold Solves at *
+ rw [map_add,map_smul,hh]
+ calc A x + (k-l) • b + l • b + c = A x + k • b + c := by module
+      _ = 0 := hx
+
+theorem in_range_all_targets (A : V →ₗ[K] W) (b c : W) (x : V) (k : K)
+ (hx : Solves A b c x k) (hb : b ∈ LinearMap.range A) :
+ ∀ l : K, ∃ y : V, Solves A b c y l := by
+ obtain ⟨h,hh⟩ := hb
+ intro l
+ exact ⟨x+(k-l) • h, shift_solution A b c x h k l hx hh⟩
+
+theorem unequal_solutions_range (A : V →ₗ[K] W) (b c : W) (x y : V) (k l : K)
+ (hx : Solves A b c x k) (hy : Solves A b c y l) (hne : k ≠ l) :
+ b ∈ LinearMap.range A := by
+ have hdiff : A (x-y) = (l-k) • b := by
+  rw [map_sub]
+  unfold Solves at hx hy
+  have h := congrArg (fun z : W => z - (A y + l • b + c)) hx
+  rw [hy] at h
+  module at h ⊢
+  exact h
+ have hn : l-k ≠ 0 := sub_ne_zero.mpr (Ne.symm hne)
+ refine ⟨(l-k)⁻¹ • (x-y), ?_⟩
+ rw [map_smul,hdiff,smul_smul,inv_mul_cancel₀ hn,one_smul]
+
+theorem outside_range_unique (A : V →ₗ[K] W) (b c : W) (x y : V) (k l : K)
+ (hb : b ∉ LinearMap.range A) (hx : Solves A b c x k) (hy : Solves A b c y l) : k=l := by
+ by_contra hn
+ exact hb (unequal_solutions_range A b c x y k l hx hy hn)
+
+theorem unique_iff_outside_range (A : V →ₗ[K] W) (b c : W) (x : V) (k : K)
+ (hx : Solves A b c x k) :
+ (∀ y l, Solves A b c y l → l=k) ↔ b ∉ LinearMap.range A := by
+ constructor
+ · intro hu hb
+   obtain ⟨y,hy⟩ := in_range_all_targets A b c x k hx hb (k+1)
+   have h := hu y (k+1) hy
+   exact one_ne_zero (add_left_cancel (show k+1=k+0 by simpa using h))
+ · intro hb y l hy
+   exact outside_range_unique A b c y x l k hb hy hx
+end TargetInformation
+#print axioms TargetInformation.shift_solution
+#print axioms TargetInformation.in_range_all_targets
+#print axioms TargetInformation.unequal_solutions_range
+#print axioms TargetInformation.outside_range_unique
+#print axioms TargetInformation.unique_iff_outside_range

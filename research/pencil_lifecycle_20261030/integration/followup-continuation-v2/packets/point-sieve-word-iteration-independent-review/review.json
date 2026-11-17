@@ -1,0 +1,79 @@
+{
+  "schema": "formal-composition-review/v1",
+  "decision": "accepted_scoped_word_iteration_composition",
+  "producer_commit": "05dadecd27cb4ab52d0eaef9e750ff312ac55c6a",
+  "source_sha256": "51cef3539b371165a910d8c3167d57f01d40ac1e5f9598bbc448c457006bbf6d",
+  "reviewer": "assembler_independent_review_v2",
+  "producer": "first_information",
+  "independence": {
+    "new_composition_not_authored_by_reviewer": true,
+    "reviewer_authored_imported_Difference_and_Rust_recurrence": true,
+    "blind": false,
+    "scope": "Independent evaluation of new composition; inherited proof dependency authorship disclosed."
+  },
+  "fresh_validation": {
+    "status": "passed",
+    "outer_exit": 0,
+    "elapsed_seconds": 59.9885005140095,
+    "lean_calls": 6,
+    "producer_names": 17,
+    "own_names": 4,
+    "named_type_and_axiom_readbacks": 21,
+    "dependency_toolchain_entries": 28797,
+    "pre_post_final_match": true,
+    "allowed_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "observed_axioms": [
+      "propext",
+      "Quot.sound"
+    ],
+    "known_false_rejected": true,
+    "malformed_audit_controls_rejected": 3,
+    "independent_binary_kernel_rechecker": false
+  },
+  "findings": [
+    {
+      "joint": "Canonical step",
+      "judgment": "accepted",
+      "detail": "Canonical output uses modulo even if word addition wraps; correct ring decoding separately requires canonical operands and modulus<=2^63."
+    },
+    {
+      "joint": "Iteration",
+      "judgment": "accepted",
+      "detail": "Induction derives canonical state and dd before each word-add decode. Initial(a,b+c,e), simultaneous update and arbitrary Nat n match intended pure state."
+    },
+    {
+      "joint": "Ordered values and branch fold",
+      "judgment": "accepted_scoped",
+      "detail": "List.range retains old-state observation order; same_fold compares the same abstract decoded-state branch function. It does not prove Rust exceptional branch code."
+    },
+    {
+      "joint": "Equality/zero and wrap",
+      "judgment": "accepted_scoped",
+      "detail": "Canonical decode injective and zero equivalence proved; final_wrap is decoded-state equality at p and0. Canonical natural-value projection is not separately named."
+    },
+    {
+      "joint": "Source correspondence",
+      "judgment": "accepted_with_limits",
+      "detail": "Native add(a+b)%p and initializer/updateorder match model. Model recomputes constantdd in iterate successor while Rust initializes once; pure-value equality only, no matching meter count inferred. Active array slicing, Rust iterator/compiler semantics and whole SieveResult are separate."
+    }
+  ],
+  "premises": [
+    "0<p.toNat",
+    "p.toNat<=2^63",
+    "a,b,c,e,f canonical modulo p"
+  ],
+  "no_primality_needed_for_recurrence": true,
+  "trust": "Exact pinned shared Lean/mathlib caches; inventory cannot exclude transient concurrent changes. No independent kernel binary rechecker.",
+  "archive": {
+    "sha256": "e246397c14ed5611da1180071920c2243a68210f5529b0af87e1d8e952faf36b",
+    "bytes": 4055390,
+    "members": 29,
+    "official_delivery_pending": true
+  },
+  "scientific_execution": false,
+  "scientific_admission": false
+}

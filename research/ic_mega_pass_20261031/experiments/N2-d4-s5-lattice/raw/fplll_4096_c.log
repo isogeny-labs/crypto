@@ -1,0 +1,8 @@
+PARI stack size set to 2000000000 bytes, maximum size set to 2000011264
+{"L": 4096, "seed": 7, "xstar_bits": 1.926464284385119, "below": {"X": 3, "delta": 0.00039977896526546656, "Ys": [-2, 2, -3, 3], "info": {"consistent": true, "fresh_bad": 0, "support": 105, "lambda_evenflip": 1, "lambda_swap": 1, "oddflip_is_1": false}, "lll_s": 7.6, "vecs": [{"vanish": true, "log2norm": 3836.5}, {"vanish": true, "log2norm": 3836.5}, {"vanish": true, "log2norm": 3836.5}]}, "null": {"X": 3, "H_at_Ys_modp_zero": false, "lll_s": 80.1, "vecs": [{"vanish": false, "log2norm": 4063.5}, {"vanish": false, "log2norm": 4063.5}, {"vanish": false, "log2norm": 4063.5}]}, "above": {"X": 5, "delta": 0.0005408774235944547, "Ys": [3, -2, 2, -3], "info": {"consistent": true, "fresh_bad": 0, "support": 105, "lambda_evenflip": 1, "lambda_swap": 1, "oddflip_is_1": false}, "lll_s": 6.7, "vecs": [{"vanish": true, "log2norm": 3852.0}, {"vanish": true, "log2norm": 3852.0}, {"vanish": true, "log2norm": 3852.0}]}, "armX": {"xbox_bits": 16, "log_p_abs_invariants": [0.9995, 0.9996, 0.9992, 0.9983], "fiat_X": 3, "lll_s": 81.5, "vecs": [{"vanish": false, "log2norm": 4063.5}, {"vanish": false, "log2norm": 4063.5}, {"vanish": false, "log2norm": 4064.0}]}}
+Traceback (most recent call last):
+  File "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/experiments/N2-d4-s5-lattice/run_fplll.py", line 13, in <module>
+    X=int(round(2**(f*xs))); Ys,xR=plant(p,A,B,c,X,rng,'Y')
+  File "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/experiments/N2-d4-s5-lattice/./build_h.py", line 99, in plant
+    yy=sqrt34(x*(x*x+A*x+B)%p,p)
+RuntimeError: sum is O

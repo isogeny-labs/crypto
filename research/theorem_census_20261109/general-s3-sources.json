@@ -1,0 +1,78 @@
+{
+  "schema": "theorem-source-audit/v1",
+  "created": "2026-11-09T15:54:14.435Z",
+  "scope": "General Weierstrass S3 and model-domain/p-torsion controls; original item1 and geometric side of item3.",
+  "claims": {
+    "universal": "PCC-20261109-4d5cd7",
+    "controls": "PCC-20261109-b32b34"
+  },
+  "sources": [
+    {
+      "id": "Kosters-Yeo2015",
+      "url": "https://arxiv.org/pdf/1503.08001",
+      "version": "arXiv1503.08001v3",
+      "pdf_sha256": "b5ea5e4c5de7dcacf579e283168d9463b2b6977b031002ddee134a3a0d7868eb",
+      "text_sha256": "49a35941e7f8b2a7d33c7d4a387a967354c48a16b172f66d443e72ee57e85345",
+      "read_scope": "Section2 p3 general b-invariant S3 formula and Proposition2.1, including visual PDF inspection; not a claim to audit all r, NP-completeness or first-fall results."
+    },
+    {
+      "id": "Semaev2015",
+      "url": "https://arxiv.org/pdf/1504.01175",
+      "version": "arXiv1504.01175v1",
+      "pdf_sha256": "4db8433bdd7a32fab22bdc53dc9455bf08c7a3d9fe4af9022b135e951ee8bf6c",
+      "text_sha256": "0aaa6355cf0227bde141eb541301a5c5055f9127b769adbb1a9e6eb37ba93e15",
+      "read_scope": "Section2 pp2-3 algebraic-closure zero-sum condition, normal-form assumptions and formulas. No claim to prove/audit its first-fall or complexity conclusions."
+    },
+    {
+      "id": "Semaev2004",
+      "url": "https://eprint.iacr.org/2004/031.pdf",
+      "status": "still_unread",
+      "observed": "Distinct web retrieval transport returnedHTTP403 on resumed2026-11-09session. Related arXiv texts do not replace reading the original."
+    },
+    {
+      "id": "Mathlib",
+      "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+      "read_scope": "Actual affine point addition/negation, general coefficient invariants, nonsingularity partials, base change and algebraic-closure roots."
+    }
+  ],
+  "kb": "Unavailable: no kb_status/search_knowledge tools; scripts/research-kb status reports no executable. Narrow repository and primary-source fallback; no novelty claim.",
+  "formal": {
+    "lean": "leanprover/lean4:v4.35.0",
+    "gate": {
+      "path": "evidence/general-s3-gate.log",
+      "sha256": "cb855406247b8b467195a3978a0be1635a069e78121c3c8e53f4cf899e8491e2",
+      "declarations": 167,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "files": [
+      {
+        "path": "lean/GeneralS3.lean",
+        "sha256": "13ffefd385f4e20e60df00483802c80c00cc21c9f25caf41987d41845d375633"
+      },
+      {
+        "path": "lean/GeneralS3Controls.lean",
+        "sha256": "d6e1c36ef211edbbb21c708972de95d1a086a5b730215267a91bc71a5bdfa32d"
+      }
+    ]
+  },
+  "identity_verification_plan": {
+    "class": "theorem/identity verification supplement, not a curve census or statistical experiment",
+    "issuer": "identity/src/bin/general_s3.rs",
+    "source_sha256": "cb00540e00cdde95ccbbe4677cfd084d68059f4a78b3b6621c636487c5a898af",
+    "repository_checker_sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+    "sha256_implementation_sha256": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf",
+    "seed": "0x202611091532",
+    "points": 32,
+    "extra_seed": "0x5e4ae002",
+    "extra_points": 11,
+    "status": "planned; source commit then actual verification receipt is separate",
+    "standing": "one host, producer checked; no signed/independent-host promotion",
+    "require_source_commit_before_issue": true
+  },
+  "execution": {
+    "paid_spend": 0,
+    "new_native_curve_population": false,
+    "checkpoint_exception": "User approved local checkpoints for this audit."
+  }
+}

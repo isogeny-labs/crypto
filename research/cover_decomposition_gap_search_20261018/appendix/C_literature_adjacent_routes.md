@@ -59,7 +59,10 @@ provably fails on Koblitz curves for every n because the descent to F_2 only yie
 
 ## 3. Lifting
 
-- Xedni (Silverman) killed by Jacobson–Koblitz–Silverman–Stein–Teske (DCC 2000): success ≤ C₀/p.
+- Classic xedni (Silverman) is conditionally obstructed by
+  Jacobson–Koblitz–Silverman–Stein–Teske (DCC 2000): their `C₀/p` success
+  bound assumes the displayed height/discriminant comparison, Lang, and a
+  probabilistic correspondence that must be instantiated for the algorithm.
   Huang–Kueh–Tan (ANTS 2000); Cheng–Huang (Algorithmica 2006) reduce ECDLP to partial lifting
   under rank conjectures. No 2015–2026 revival using BKZ/Coppersmith found. Gadiyar–Padma
   arXiv 1702.07107 is a speculative note.

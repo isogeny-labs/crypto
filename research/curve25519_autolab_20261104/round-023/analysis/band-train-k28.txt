@@ -1,0 +1,50 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc | 32/32 | 3.083 | 3.380 | 6.062 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | rho-neg | 32/32 | 0.961 | 1.051 | 1.857 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | wsum-b12-n4 | 32/32 | 34.018 | 34.033 | 34.168 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | wsum-b30-n3 | 32/32 | 19.931 | 19.954 | 20.162 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | wsum-b8-n4 | 32/32 | 7.746 | 7.808 | 8.363 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | wsum2-b120-n2 | 32/32 | 5.520 | 5.577 | 6.091 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | wsum2-b200-n2 | 32/32 | 14.212 | 14.234 | 14.436 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | wsum2-b30-n2 | 32/32 | 4.929 | 5.784 | 13.484 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | wsum2-b60-n2 | 32/32 | 2.670 | 2.904 | 5.016 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm27314-a41e3b62 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs wsum-b12-n4 | inc < wsum-b12-n4 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs wsum-b30-n3 | inc < wsum-b30-n3 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs wsum-b8-n4 | inc < wsum-b8-n4 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs wsum2-b120-n2 | inc < wsum2-b120-n2 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs wsum2-b200-n2 | inc < wsum2-b200-n2 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs wsum2-b30-n2 | inc < wsum2-b30-n2 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs wsum2-b60-n2 | wsum2-b60-n2 < inc |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs wsum-b12-n4 | rho-neg < wsum-b12-n4 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs wsum-b30-n3 | rho-neg < wsum-b30-n3 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs wsum-b8-n4 | rho-neg < wsum-b8-n4 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs wsum2-b120-n2 | rho-neg < wsum2-b120-n2 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs wsum2-b200-n2 | rho-neg < wsum2-b200-n2 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs wsum2-b30-n2 | rho-neg < wsum2-b30-n2 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs wsum2-b60-n2 | rho-neg < wsum2-b60-n2 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b12-n4 vs wsum-b30-n3 | wsum-b30-n3 < wsum-b12-n4 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b12-n4 vs wsum-b8-n4 | wsum-b8-n4 < wsum-b12-n4 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b12-n4 vs wsum2-b120-n2 | wsum2-b120-n2 < wsum-b12-n4 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b12-n4 vs wsum2-b200-n2 | wsum2-b200-n2 < wsum-b12-n4 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b12-n4 vs wsum2-b30-n2 | wsum2-b30-n2 < wsum-b12-n4 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b12-n4 vs wsum2-b60-n2 | wsum2-b60-n2 < wsum-b12-n4 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b30-n3 vs wsum-b8-n4 | wsum-b8-n4 < wsum-b30-n3 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b30-n3 vs wsum2-b120-n2 | wsum2-b120-n2 < wsum-b30-n3 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b30-n3 vs wsum2-b200-n2 | wsum2-b200-n2 < wsum-b30-n3 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b30-n3 vs wsum2-b30-n2 | wsum2-b30-n2 < wsum-b30-n3 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b30-n3 vs wsum2-b60-n2 | wsum2-b60-n2 < wsum-b30-n3 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b8-n4 vs wsum2-b120-n2 | wsum2-b120-n2 < wsum-b8-n4 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b8-n4 vs wsum2-b200-n2 | wsum-b8-n4 < wsum2-b200-n2 |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b8-n4 vs wsum2-b30-n2 | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | wsum-b8-n4 vs wsum2-b60-n2 | wsum2-b60-n2 < wsum-b8-n4 |
+| icv1-fp28-tm27314-a41e3b62 | wsum2-b120-n2 vs wsum2-b200-n2 | wsum2-b120-n2 < wsum2-b200-n2 |
+| icv1-fp28-tm27314-a41e3b62 | wsum2-b120-n2 vs wsum2-b30-n2 | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | wsum2-b120-n2 vs wsum2-b60-n2 | wsum2-b60-n2 < wsum2-b120-n2 |
+| icv1-fp28-tm27314-a41e3b62 | wsum2-b200-n2 vs wsum2-b30-n2 | wsum2-b30-n2 < wsum2-b200-n2 |
+| icv1-fp28-tm27314-a41e3b62 | wsum2-b200-n2 vs wsum2-b60-n2 | wsum2-b60-n2 < wsum2-b200-n2 |
+| icv1-fp28-tm27314-a41e3b62 | wsum2-b30-n2 vs wsum2-b60-n2 | wsum2-b60-n2 < wsum2-b30-n2 |

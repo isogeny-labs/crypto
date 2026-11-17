@@ -1,0 +1,42 @@
+{
+  "schema": "signed.target-witness.source-review/v1",
+  "reviewed_commit": "9c6d9c61c52bdbfb42b79148aef694d4bebdafdc",
+  "reviewer": "witness_independent_review_v2",
+  "reviewer_authored_original": false,
+  "blinded": false,
+  "machine_certificate_replay_during_original_review": false,
+  "findings": [
+    {
+      "id": "R1",
+      "status": "supported",
+      "claim": "All three mathematical implications and consistency requirement",
+      "basis": "Static inspection of elimination, direct checker and PROOF.md; determined point proves existence."
+    },
+    {
+      "id": "R2",
+      "status": "supported",
+      "claim": "Actual complete input/row/result joins",
+      "basis": "Independent read-only reconstruction: 64 unique streams, 6900 edges, 39 determined scalar 2, 25 undetermined/capped. Member hashes, archive bindings, publication manifest and summary source hashes match."
+    },
+    {
+      "id": "R3",
+      "status": "gap",
+      "claim": "Original checker enforces complete coverage",
+      "basis": "check_only.py:25-32 checks length only; duplicate entries can omit sources. Actual inventory complete."
+    },
+    {
+      "id": "R4",
+      "status": "gap",
+      "claim": "Original checker enforces retained scalar/status and summary agreement",
+      "basis": "check_only.py:22-23 binds terminal metadata but does not compare certificate classification/scalar or summary. Actual joins agree."
+    }
+  ],
+  "limits": [
+    "No fresh mathematical equality replay in original review; subsequent wrapper execution is separately recorded.",
+    "All actual rows are edges; identity extraction reviewed statically only.",
+    "Geometry/source-group replay inherited, not newly performed.",
+    "Reviewer later authored checker-v2; that wrapper has no independent source review.",
+    "No blind derivation or official scientific promotion."
+  ],
+  "reviewer_error": "Initial read-only inventory check compared 64 JSONL entries with 192 archive members including sidecars; corrected .jsonl scope passed unchanged inputs."
+}

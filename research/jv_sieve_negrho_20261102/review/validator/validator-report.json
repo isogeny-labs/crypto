@@ -1,0 +1,776 @@
+{
+  "schema": "validator-report/validator-v1",
+  "id": "VAL-20261103-c31c76",
+  "study": "research/jv_sieve_negrho_20261102",
+  "status": "pass",
+  "independent": true,
+  "checker": {
+    "path": "review/validator/check/src/main.rs",
+    "output": "review/validator/check_output.txt",
+    "recompute": "review/validator/recompute.json",
+    "language": "Rust",
+    "shares_code_with_producer": false
+  },
+  "raw_data": [
+    {
+      "path": "results/inputs/ic_1511_sparse.json",
+      "sha256": "e3fae4b3626e2246b1d3dbfc640c5cd8e23968321d1d9a7e6c29507a304f0a63"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s17_run0.json",
+      "sha256": "931f722b32137aef9f5450be098b2b0a6f43a0ac9ad631e478f7141428a80361"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s17_run1.json",
+      "sha256": "a6cfdb65d6e60bee861717a44053409b7c39b0c7c80ddb1963d4fe1645ed9cd3"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s18_run0.json",
+      "sha256": "f301c4f87357bf75a7f7a5a7b25b74d2c93dcebac7c643ae785982a3573fc1df"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s18_run1.json",
+      "sha256": "4ce1b8eb77b79f7e4a92c9b842d2248a609f82af94cf26b7fb5dc68a2064803c"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s19_run0.json",
+      "sha256": "8a24380fdeb715c41ccd618e84f008498ca7e630fb6bd55d281805a719b797e1"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s19_run1.json",
+      "sha256": "081468fb34fcb51e1aaab364b0d337ea8c406e3d2d6d5f20e34d41834eb85d26"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s20_run0.json",
+      "sha256": "4160d451ab1db6618d4e174827139c17629f9cfe490eba7959c55ee3c8683bac"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s20_run1.json",
+      "sha256": "125b7b5e392415b53557682a78c06bbb98332ba37cf3725841e4b39780616acf"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s21_run0.json",
+      "sha256": "c29c6bf9a766877fc6f7e1fe1d873a0356377101f1ff5b5bfe7d6d02c25b229f"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s21_run1.json",
+      "sha256": "7e96295e1f553d9ff7cac3bdc4816d4c629cf580700226341786dd092c7e6d3a"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s22_run0.json",
+      "sha256": "1a37b049418b0866fc15e03aa147705660ea48aa437f447bf4ba688da2a10249"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s22_run1.json",
+      "sha256": "e5c8f6e9a5c6cf464edb92d034727a3c3dff8965744513be2a28fd25ccd157c9"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s23_run0.json",
+      "sha256": "f5d0d6728c2c6c254f1f039587dbb7c5b1d8ccbdce73034928fbffdc38e1f85a"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s23_run1.json",
+      "sha256": "df2e27cf3027a6b847f944a485042b7fd73a4ef14d2c98a5a23f9492a8370053"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s24_run0.json",
+      "sha256": "6c867c4d9cadbf39892a7def6e0a44d12a36faea2dcb4518a228281dc9e2637e"
+    },
+    {
+      "path": "results/runs/rhostrong_p1511_s24_run1.json",
+      "sha256": "10ed121c57e213f1d070ae5f7585e27a1ba586da033c639d2ac23415bd6d7308"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1301_run0.json",
+      "sha256": "f2b4c751d4bae4d6635708ac15acf0e00ee5ac7b55514089a458163c49659362"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1301_run1.json",
+      "sha256": "086ce4afb6ba9fd9c67261610d77ba77e6144eec86228d5f360cfda34c8cf03f"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1451_run0.json",
+      "sha256": "c033e1bc0850ce38e1b2a470e42b5f52abfd0190684013f7a1ddda222153d022"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1451_run1.json",
+      "sha256": "f9b6736eddeddc00e4bae787e39e4674a52f10d07a6ddb672c9ceeb59272ac14"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1601_run0.json",
+      "sha256": "9af9efbc4ce71c642ffcc2fb6c6dde8d7a2ab1de75e5165f0f48584b76995ed3"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1601_run1.json",
+      "sha256": "bde21b5fd7d11e8e44d06679220002035821604e19c7fc802d9498a0e4d26493"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run10.json",
+      "sha256": "b45493fc782da896d9b526339f7f2d59c31bc0baa46e53a328544b3a98f6c169"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run11.json",
+      "sha256": "6f754375e87be15ff5bedfb84f1a537effc88ee8b6c8b193bd519d5bf0a5f9a1"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run12.json",
+      "sha256": "f8d0d60cca188cbc7b2d534fd7a8658ddea542559d01d73d5313723c1d21fdf9"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run13.json",
+      "sha256": "7d73d5cc5098b8b672b5b5280a2e7cd6cbae448557207db610a9590187730559"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run2.json",
+      "sha256": "8eb8fc501797099dd2bb9774b7c21aebb7aee1a692f05a7689c53c62e540ba45"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run3.json",
+      "sha256": "d2aa8a77b03c217e9bae9c3c84b3e4a5df2590d62b2d03c67fb0bed87a63ceb6"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run4.json",
+      "sha256": "cf137cdd31dd7911accca9357044ca710a6367f02131a25a8443237a65e3872f"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run5.json",
+      "sha256": "9905ba5b582cff13f9c2454478c7c8c7a420e0c1d6fcef5d1a207b3e41fa68d2"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run6.json",
+      "sha256": "8c94e1d5c4fc35558ae1d9423fc21e93fb0b9eec35deda37c99345cdc2d3e54a"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run7.json",
+      "sha256": "5a195089500b7b3ba51e5f67e72386f7a38bd79d08edb5fe3839f31d889b07c4"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run8.json",
+      "sha256": "3719d0466cc7d70e4b7edad8ec0df9f297bd9101abbacb47ccf3af8bd9753ed7"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run9.json",
+      "sha256": "f3f4a84d9aaaba358ea97b0d3d3f977b95872ec9a439811dbace1f793878e2c6"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run10.json",
+      "sha256": "787faaf460ef689bafd7a30c439e3ee58f54008ad68aaf70626f32c5f40f71f7"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run11.json",
+      "sha256": "664a8843402e7af60c4d13d6afd0069381eed192d548fffda0d917fbe5bfa721"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run12.json",
+      "sha256": "e5fe54ec9345f5858d5b80dd52cad0ca843b2e46e6388499c0e1f40117f64982"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run13.json",
+      "sha256": "97aae5ddc32d62e00ef896bb0f70586822d4ef761fd7434938b3c2fbdd26998b"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run2.json",
+      "sha256": "e4e79107191b0aaad9fb58b151caace82177c45d86791b09f4038d306568c371"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run3.json",
+      "sha256": "32d022f2cf3cec2e8592df48c1528424ab45ddeb6231e83393793aef7445aec2"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run4.json",
+      "sha256": "2b212adfda694b8da2a33702455cc8816697b52b9804e3083f0da7daace79798"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run5.json",
+      "sha256": "cabbb06d8c89cf61e650041f4c045c063012f1ed5645d3255bfbba1d4f5da721"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run6.json",
+      "sha256": "abf00ebbfa16d87dfb1936266c1650e4fa39f56e5269d6a33b30c38b2620b283"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run7.json",
+      "sha256": "94902413c7b0e5e01b8181fdb9b16a9abb74e246d9278b5d83a6a9b3b2391d43"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run8.json",
+      "sha256": "88c8449f7e3319577dc40c69b649f964ac8ee120f985d433dc328c4c5704a417"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run9.json",
+      "sha256": "f461003870bfce1d3e90175b609e58ce95559596a187fc58bee133fc2e7856f8"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run10.json",
+      "sha256": "c42bbc697c2ebee1cf0a2955bb91bbf1ee719602ab237737daefa5ea3bda3ce3"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run11.json",
+      "sha256": "85afd2c7ab4d4dec0fe4dcff04dbbbdd0b8cc78da59b3b8287fd725567c84603"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run12.json",
+      "sha256": "b3ae3e968964248a5957c3cd4b37f23e305c28c12e4291789a4a2ea015d7b657"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run13.json",
+      "sha256": "b0214f30d0202cbe730022155363315c3fcde1a4370379069b0b32e1a1469cd9"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run2.json",
+      "sha256": "160ddb34f1231d9a34c045c07742fa579bb3f22083a23d31f0b3aa36b9df1593"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run3.json",
+      "sha256": "f33e01391dd713b33db1a6dad8455a5d0502b5552e4aec141e0b6b6b86a495da"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run4.json",
+      "sha256": "694a37052815318ee998bfd4684857e50f256585d68982fea98d039231544568"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run5.json",
+      "sha256": "3bf4517a0e1a66ddfc753259b7a2b160d22b7bb3010902e298707c4494392578"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run6.json",
+      "sha256": "11b2b7fb648be69edde1817cc676caacdebe763fb20a80c3e0a21a6dc715f387"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run7.json",
+      "sha256": "454f7739e663f4cec1902ffae7913b8553c48a300c260478e5e93dce647c5703"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run8.json",
+      "sha256": "e641ff76c18bc048bb96ffdeabca0c7f5fd58f5d291f023bed631bb0fa2a7fea"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run9.json",
+      "sha256": "abf57395a309f15aa6edb2ba1d1fc42d7a000c9b2ee1da19177c26286c66ed27"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run10.json",
+      "sha256": "bddb411da27ef0a88cd6c6dfbcb9bbbf4d9f6680439314da760eb55489edb95f"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run11.json",
+      "sha256": "90c273d9454de78cbeaf035114a75cdb8b5c7ede5fc569cf3c0fe600382ae8b7"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run12.json",
+      "sha256": "c51098d1eccaaea795652a0324ee8bf88d19e5b9d13d62d336d78f1223219e2c"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run13.json",
+      "sha256": "6484eceeb1e1207da3dfa1a8a4f1a30deb342a5c2dbac07ab8ec4e6c82d1ce70"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run2.json",
+      "sha256": "3137a8be6bf08ce143ea7b0021619114d9aaf30510fc6bc90fa8c01b913fc7fa"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run3.json",
+      "sha256": "73e1bcdf697c7353ab1b540273cf9422b42af3bd914067229377b8e482f8334f"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run4.json",
+      "sha256": "9cf4ce7a0128b71ea3b1c831c8a7b78f17de916bdf48cfc36df5e44257ee270a"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run5.json",
+      "sha256": "6a9e84fcda78759cb47ea2e74e3074ea1a764382fda2deb0443988c5a1e915df"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run6.json",
+      "sha256": "b6d4d94a854e389ebef6c8490114668b0fdfa14b16051b77a498b3b7a62f0398"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run7.json",
+      "sha256": "a5c1a7732b900b02e6862fc3f5dcfda543d27227d86b042bdd34f2323997b666"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run8.json",
+      "sha256": "51e2941898dc76deec1744abc8f7c699d4571166dfcd4fed22a378e23a5b951c"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run9.json",
+      "sha256": "45d1c264e8e6ad173b9e90e5a9558ac01e04551695f2e8cef5a62228d82becce"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run10.json",
+      "sha256": "eeb8f41cb054be98fc1d594eec97c34d36a693ca5fae578f3faa4ffc62053d8f"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run11.json",
+      "sha256": "50ec28e00af5db65cddc8f33c66f949bec7880bc158a0461bb585f631f88e7a7"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run12.json",
+      "sha256": "827ebeaa32f2de28f034e131ed4b49709ee4a0bd04f5bfe343873dc6d2c99bc1"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run13.json",
+      "sha256": "6850f1403b4e22781433ed2c62c57e250313c07fedc03c23515af151e010a938"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run2.json",
+      "sha256": "dd5ba23ed59600f4feb4a10374345d398125a37390cdf6f9745bca4bd6a9510c"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run3.json",
+      "sha256": "75c201ce9f8c2cf61370cd022a9b8c1634669a5bdba2fd6e94f89755a9238f97"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run4.json",
+      "sha256": "af485fe52c760af6e1af3d76e1f0d0ac6f6a55d1624c748007be8a8d2a077d52"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run5.json",
+      "sha256": "06a097db387aee9f3d4a09765ebd5595668aae53de007281fe15b8a70f365f8a"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run6.json",
+      "sha256": "dfd71c22c49dadd6cec78f378914dc27d9a28d8125b66e222a87a49c5224eb1b"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run7.json",
+      "sha256": "278d35930b3913551896fa675f8b6ea64391bc021d1cf083b0ed4b0e9adeb62e"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run8.json",
+      "sha256": "1b602cbd3cec1c0626589573aaa22d244fccd5e7c4654edf3936d318104c33fa"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run9.json",
+      "sha256": "7a0ddf7f44e9a4a34251151e81b41e8688a33e1c94814ae9ec8b3eb7bb0332b9"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run10.json",
+      "sha256": "aca6d323142cc2626a0cf1bc5b9a2173c7ec228661af619f526c254af227de1e"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run11.json",
+      "sha256": "73c3797b614b21ff6a7be4df3611e775acf51ec79859cba09635d1cbcbe80129"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run12.json",
+      "sha256": "c480c0933e15b8c902ad0d43a757a28fdc295a039f62e614a58aca0fc4aab541"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run13.json",
+      "sha256": "f2dc2dd9f171e36d7800e39c0c4bf8c0ace74287d5bc029a4557273d9621cf02"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run2.json",
+      "sha256": "7e84d24ca856b1e320a15786be2f9db14aa241dcf3cd6a4b9dcfcefb12c9669c"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run3.json",
+      "sha256": "a153f312efa6daf199e1bd8415a284349270cf3b4a00b60b723c4b9189a55253"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run4.json",
+      "sha256": "482844250ec0de56afaee0caee596193e0c824c07cb8f972bb9aae157aa0997f"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run5.json",
+      "sha256": "a4064e05cebd6eca4a0ca792c3fb1d066382e29f31bffb9c5536eda01df18c71"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run6.json",
+      "sha256": "3e10663f10a6d65c6d30df5d28a966fdf71d08a690f9b68a6ce7c2a231a7e5e0"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run7.json",
+      "sha256": "9a5af0ddd0b714f65c8675fd46b6a4cc638fe201b3e1d1b1672af353e8c06aaa"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run8.json",
+      "sha256": "211e4c22ce399fd0f27d6ab2717a92acc9c5b3ef6ce02d47980ebbb3e2c3955b"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run9.json",
+      "sha256": "2fdc213cd143fa22a260692bcf1af4f9c41869484fb602fd0a3050a9307cdf3a"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run10.json",
+      "sha256": "bf6b873b70a08cc54532073306677476732e564aee1627aa67ade465fd1ddf81"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run11.json",
+      "sha256": "c6de8c37a5b7dc0096cddebd375ed32f7f4cc2d034d5614b2c88fa72f9314360"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run12.json",
+      "sha256": "7b7aa3f6cfb8382c757f3c9d5cb3bdef6f7e160c2151939b1606e70a4fb7c8ac"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run13.json",
+      "sha256": "6a0d61cfa6281887e017271008a2e4a45cd350edcbded8dc3a86145c3fd85e4d"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run2.json",
+      "sha256": "6ef815dc38b908897deab8f9492f478f8e0a535bf3664ee9312c4dd317d38436"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run3.json",
+      "sha256": "bd62f866b41d8903e6fc414d21566a2ffa3e9ab1a201cecf71296a87b74a453b"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run4.json",
+      "sha256": "843746340d2bf1f8855f7b4f3bc8ac61fbce6623f468885dee1a974aa7c11828"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run5.json",
+      "sha256": "f3d4e17be180bc7c134c548f03c030d9dad05bd26e83c95e954fd90dd2bd6c65"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run6.json",
+      "sha256": "0bae5ba6c016aad9a78e8c0ff65780641a645c81493c279d6d924c3261b42f3a"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run7.json",
+      "sha256": "385e0601e6c6e0f81c37dc3e6dc6a3278091499d3fce33b8c9bff39b87b5200c"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run8.json",
+      "sha256": "98b8070d18b01cd6488cece67116e9c76f75d4781a780b06db1a3decf3cbbd55"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run9.json",
+      "sha256": "7be8c9544b533ad0d311fd643bec743a83a87f7319d38f12934017a7159116fb"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run10.json",
+      "sha256": "1f9233dfffacb21a35557f541e9fd151582cc05bd187ba5a6195f27141fb2cd6"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run11.json",
+      "sha256": "1b0c191a00be67a23225bf1d8ea61d7aad443bd4a82fe747fc072915a5ef8d3b"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run12.json",
+      "sha256": "6f4f5e07dc45ac1539cf1b5c186bb94143f7697f0cf51a3e480ac96f1ac2f33d"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run13.json",
+      "sha256": "c72f57e248acad6f0b6788565c5298255d0ab1b2ea11bc6f45a61cc6c883987f"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run2.json",
+      "sha256": "25d15742a0fd9fe3b3b452cab82575cda0ae934afdd760f68c8098e8a8c8418e"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run3.json",
+      "sha256": "3f4398170012cbc144ec1840fa49fb4357c40fdd98637f54471a07a4c202c357"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run4.json",
+      "sha256": "5dbb1d8535d9b7dafd861d31643ad93f25ac41a31cbc70451b71f681faf5ce3f"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run5.json",
+      "sha256": "9dba5d2feb46cdc3eed0cb423b64f0f5f52bb139fddd657d1c5e2d57c2eaa5b8"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run6.json",
+      "sha256": "eb2faca05751582e77d8a5893b7d1d6168b147f788b29b6c8ae4e39f69b3871d"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run7.json",
+      "sha256": "e9b646d20d622c692aa364ea8864d6296517a3514a1e85d3bb092dcff24f81b2"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run8.json",
+      "sha256": "2d4ece58def3431c078ee1f42a3105d122ef4369ee3859bcf12937c7bc96dfc8"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run9.json",
+      "sha256": "ec388aa7d524dfd276c87d92c46292c6d84867fc565b53cb3af14b8c3f8131b7"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run10.json",
+      "sha256": "fdd16771b974d3761be7e43867aedc0a7d7bf85c7958d0399450d5c8f95be889"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run11.json",
+      "sha256": "ce20c778b4eae49f47e3174109a0783b37d3324c11f771e2b6cdb1d4adc7fed2"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run12.json",
+      "sha256": "f11f59ef0d5dfc730ca1a6075de9c3e1a5586459b6aca7029cf74a1080bc2b60"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run13.json",
+      "sha256": "50053e5c624edf5514fe0b5152487dd629a16f235844aba08943ad708502c8f3"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run2.json",
+      "sha256": "3d084a00ba39e42a3d8b8392006c309d460c75e213caf0edd3e46464f44abd6b"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run3.json",
+      "sha256": "9318f97d12d14524902485ca56b1c7c0b45a9569723c7da697fb4497c49b3abd"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run4.json",
+      "sha256": "ad7135ecca300e82caa858d1aa1de4be0ee6489b7158aa68ddd5a87979ae13b8"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run5.json",
+      "sha256": "fc609f88b2af84cb8acbb9a721fe7aace13f553eb43a934781a01b5ad4d05f1f"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run6.json",
+      "sha256": "31b2a8f68ae64275224ca243a79dc86fd423346e48584e1d64684521aad8a5a7"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run7.json",
+      "sha256": "e3c2f954d4d136c1a91e9e00abd9c6ad91f08cc2ced61708549c373237be6d97"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run8.json",
+      "sha256": "b339a26873e148fc826f7d4f45ba65d21b98581bce9250b91851b32d9cacfa15"
+    },
+    {
+      "path": "../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run9.json",
+      "sha256": "cce827505e3ed1c8dc7412a2264d995e03d18c120e4d33aa19252765a52bc7c9"
+    },
+    {
+      "path": "results/replay/new_p1451_s1_run0.json",
+      "sha256": "c2e80affbc23334b8df529c8cdf15426f896217ed2f48182a326c421ee8e740d"
+    },
+    {
+      "path": "results/replay/old_p1451_s1_run0.json",
+      "sha256": "8dda8d86c233a94b8c6b5ebea2756e55bc75c7a41bb6a1bd59892ab3debf5377"
+    },
+    {
+      "path": "results/replay/old_p1451_allseeds_run0.json",
+      "sha256": "c033e1bc0850ce38e1b2a470e42b5f52abfd0190684013f7a1ddda222153d022"
+    },
+    {
+      "path": "../jv_sieve_strong_rho_v2_20261020/raw/ic_1511_sparse.json",
+      "sha256": "e3fae4b3626e2246b1d3dbfc640c5cd8e23968321d1d9a7e6c29507a304f0a63"
+    },
+    {
+      "path": "PROTOCOL.md",
+      "sha256": "0513c0a8c341b15400c81f00cd17f00e7beff2c8e594646a9dfb04af12cf0970"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "3bdc2cb28f539e9acd83d60fc4eb05d704aa34284c963a0d81f8edcc182adaa3"
+    },
+    {
+      "path": "fit.json",
+      "sha256": "ee8610de78ea5eb4e39056f47b207debff2a2902cfed630ada597bf0e751d9c1"
+    }
+  ],
+  "headline": [
+    {
+      "claimed": 0.02684903344090166,
+      "name": "seeds 17-24|pooled|S+/rho U1 (rho unpriced)",
+      "recomputed": 0.026849033440901674,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.06452112727321216,
+      "name": "seeds 17-24|pooled|S+/rho U2 (rho unpriced)",
+      "recomputed": 0.06452112727321212,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.02260700936486935,
+      "name": "seeds 17-24|pooled|S+/rhoS+ U1",
+      "recomputed": 0.022607009364869365,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.04446899311336924,
+      "name": "seeds 17-24|pooled|S+/rhoS+ U2",
+      "recomputed": 0.04446899311336923,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.0064738208628393615,
+      "name": "seeds 17-24|pooled|S/rho U1",
+      "recomputed": 0.006473820862839365,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.006714554735893337,
+      "name": "seeds 17-24|pooled|S/rho U1 (ratio of means)",
+      "recomputed": 0.006714554735893341,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.015557290758888755,
+      "name": "seeds 17-24|pooled|S/rho U2",
+      "recomputed": 0.015557290758888748,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.01613580025706037,
+      "name": "seeds 17-24|pooled|S/rho U2 (ratio of means)",
+      "recomputed": 0.01613580025706036,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.0064738208628393615,
+      "name": "seeds 17-24|pooled|band A U1 w=0",
+      "recomputed": 0.006473820862839365,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.10709777016187448,
+      "name": "seeds 17-24|pooled|band A U1 w=0.1",
+      "recomputed": 0.10709777016187456,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.12142450855901124,
+      "name": "seeds 17-24|pooled|band A U1 w=1",
+      "recomputed": 0.12142450855901135,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.015557290758888755,
+      "name": "seeds 17-24|pooled|band A U2 w=0",
+      "recomputed": 0.015557290758888748,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.1165335151794881,
+      "name": "seeds 17-24|pooled|band A U2 w=0.1",
+      "recomputed": 0.1165335151794882,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.1225583860406243,
+      "name": "seeds 17-24|pooled|band A U2 w=1",
+      "recomputed": 0.12255838604062443,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.0064738208628393615,
+      "name": "seeds 17-24|pooled|band B U1 w=0",
+      "recomputed": 0.006473820862839365,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.009343692875290167,
+      "name": "seeds 17-24|pooled|band B U1 w=0.1",
+      "recomputed": 0.009343692875290171,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.010668175259489803,
+      "name": "seeds 17-24|pooled|band B U1 w=1",
+      "recomputed": 0.010668175259489808,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.015557290758888755,
+      "name": "seeds 17-24|pooled|band B U2 w=0",
+      "recomputed": 0.015557290758888748,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.011926840720313695,
+      "name": "seeds 17-24|pooled|band B U2 w=0.1",
+      "recomputed": 0.011926840720313695,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.011026680219521698,
+      "name": "seeds 17-24|pooled|band B U2 w=1",
+      "recomputed": 0.011026680219521702,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.9179564055802344,
+      "name": "pooled reference mean s_harness (142 runs)",
+      "recomputed": 0.9179564055802338,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.3819871609860451,
+      "name": "pooled reference mean s_tuned (142 runs)",
+      "recomputed": 0.38198716098604535,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.9181280209006952,
+      "name": "pooled reference mean steps_per_sqrt_l (142 runs)",
+      "recomputed": 0.9181280209006959,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 15.567063682044113,
+      "name": "pooled reference mean native_per_sqrt_l (142 runs)",
+      "recomputed": 15.567063682044106,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 41.44674648333597,
+      "name": "pooled reference mean fp_adds_per_sqrt_l (142 runs)",
+      "recomputed": 41.446746483335914,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": -0.681549472536148,
+      "name": "positive control z (matched 16 runs vs 0.88796)",
+      "recomputed": -0.6815494725361477,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.12682872204362694,
+      "name": "homogeneity statistic absdiff (steps/sqrt l)",
+      "recomputed": 0.12682872204362694,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 0.2777777777777778,
+      "name": "homogeneity statistic ks (steps/sqrt l)",
+      "recomputed": 0.2777777777777778,
+      "rel_tol": 1E-9
+    },
+    {
+      "claimed": 1.924117549117568,
+      "name": "homogeneity statistic kw (steps/sqrt l)",
+      "recomputed": 1.9241175491175682,
+      "rel_tol": 1E-9
+    }
+  ],
+  "headline_note": "claimed = producer fit.json (full precision); recomputed independently from the raw records; all 89 deterministic numbers of fit.json agree to 1.4e-15 relative (the 29 of the primary set and reference are listed). Bootstrap intervals and permutation p-values use an independent stream and agree within Monte Carlo error (recompute.json).",
+  "primary": {
+    "cover": "V2 ic_1511_sparse rows, seeds 17-24",
+    "reference": "pooled 142 negation-map runs (16 matched + 126 of #3278), chosen by the frozen homogeneity rule",
+    "S/rho U1": [
+      0.006473820862839365,
+      0.0054559997513950725,
+      0.008019874291688926
+    ],
+    "S/rho U2": [
+      0.015557290758888748,
+      0.013111358601644517,
+      0.019272625127136445
+    ],
+    "S+/rho U1": [
+      0.026849033440901674,
+      0.02428310156743824,
+      0.02975720529381368
+    ],
+    "S+/rho U2": [
+      0.06452112727321212,
+      0.058354908408730165,
+      0.0715097953753432
+    ]
+  },
+  "caveats": [
+    "claim class: accounting (plain sieve route vs matched rho at p = 1511, weak class only); no improvement is claimed",
+    "cover F4/descent/linear-algebra additions are not emitted; band layer A prices the unemitted multiplications as native (upper-bound proxy); the order at w = 1 survives up to 69 unemitted additions per unemitted multiplication",
+    "homogeneity has low power (16 vs 126 runs); not rejected, p = 0.28 / 0.19",
+    "strongest_available rests on the instance generator (alpha uniform in F_{q^3} minus F_q, no subfield structure imposed); j-invariants were not checked per instance",
+    "memory (rho distinguished-point table, cover structures) is not reported"
+  ]
+}

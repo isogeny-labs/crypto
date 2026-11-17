@@ -1,0 +1,193 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1194",
+  "kind": "monic_remainder_loop_success_soundness",
+  "main_declarations": 9,
+  "control_declarations": 10,
+  "checks": {
+    "canon1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "outer3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "admit2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "readback": [
+    {
+      "name": "MonicRemainder.state_good",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainder.list_good",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "MonicRemainder.trim_good",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "MonicRemainder.state_polynomial",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainder.selected_correct",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainder.loop_correct",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainder.success_sound",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainder.monic_nonempty",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "MonicRemainder.checked_success_sound",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.exact_division",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.insufficient_fuel",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.zero_fuel_active",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.nonzero_remainder",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.already_terminal",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.initial_trim",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.empty_rejected",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.nonmonic_rejected",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.zero_input",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicRemainderControls.constant_divisor",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "failed_attempts": [
+    "outer1",
+    "controls1"
+  ],
+  "superseded_passing_attempts": [
+    "outer2",
+    "admit1"
+  ],
+  "assumptions": [
+    "prime 0<p<2^31",
+    "canonical divisor/input words"
+  ],
+  "wrapper_guard": "divisor getLast? = some 1",
+  "successful_empty_result": "implies divisor polynomial divides input polynomial",
+  "exhaustion": "None, distinct from Some empty",
+  "termination_bound": "not proved",
+  "native_quotient_model": "excluded",
+  "compiled_rust_equivalence": "not proved",
+  "independent_source_fidelity_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "upstream_compiled_dependencies": "retained trust boundary"
+}

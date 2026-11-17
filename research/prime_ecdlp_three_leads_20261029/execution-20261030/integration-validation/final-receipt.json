@@ -1,0 +1,172 @@
+{
+  "schema": "pkm.integrated-development-validation/v1",
+  "recorded_utc": "2026-10-30T12:10:22.502910+00:00",
+  "tested_source_merge": "2acf618dd960011237d6628d32edc1ea5e018785",
+  "reviewed_merge_parents": [
+    "e0963790c613b6dcb3c018556fcb59fa0b48a4d8",
+    "954c0bb023f33657fe3cb6b95720f572655d0b12"
+  ],
+  "metadata_head_before_publication": "42b0b59cecb921a1e9c191606c0d27899a4e71f3",
+  "scope": "software integration only; scoped checks pass, complete-library validation capped incomplete; G1-G6 scientific acceptance incomplete",
+  "source_objects": {
+    "src": "5ce39be7d8d70c4bf250ef67f0d041940eb741ce",
+    "crates": "58421f9db55a9d525480e8be7189cb604970013d",
+    "tools/factor-base": "f9174d17fb0dd4d628e7873af65024eb6590f544",
+    "tools/volcano-cli": "f7b0683e86a320729dc28eb287158826786dd1ff",
+    "Cargo.toml": "33b564da80e3ced6f4ec8df6feaee862c9fa2333",
+    "Cargo.lock": "1c792ecacbbd8c46e82443a95b35ee9400888080",
+    "examples/pkm_oracle_program.rs": "401b724fd002139db3c184a1abe15c9276e94c43",
+    "examples/pkm_oracle_program": "c8a7700ee497c2a4228ab5d1bd2cbbb1e07c29d2",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/lean": "7717e915c52bc3e7d05636f8607e468cf64da5fd",
+    "scripts/checkpoint.sh": "6a2a37967047b1a46ed62a4123f4c69f08a55d04",
+    "research/prime_ecdlp_three_leads_20261029/lean": "4be707064b1430fc0e16b00fc1f3b0c3b6a82ade",
+    "tests": "8fa07275361911cb2e21ac3cf0a33f0394b79091",
+    "research/aps_measurement_20261029/spec-controls.json": "c11e5f1515b0080aae37539e8321cc82be573f3c",
+    "research/aps_measurement_20261029/spec-orbit-controls.json": "4f832f6190d8347f42892e304fec986453e59f66"
+  },
+  "completed_scoped_receipt": "refreshed-scoped-checks.json",
+  "example_tests": {
+    "passed": 20,
+    "failed": 0,
+    "ignored": 0,
+    "suites": {
+      "pkm_oracle_program": 12,
+      "pkm_symmetric_complete": 4,
+      "hecke_target_router": 4
+    },
+    "scope": "development checks; includes all35 finite m4 fixture targets and positive 2sum control in all3 presentations"
+  },
+  "scoped_phase_outcomes": {
+    "native-tests": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T09:50:37Z",
+      "finished": "2026-10-30T10:14:54Z"
+    },
+    "clippy": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:14:57Z",
+      "finished": "2026-10-30T10:17:28Z"
+    },
+    "rustfmt": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:30Z",
+      "finished": "2026-10-30T10:17:30Z"
+    },
+    "cli-build": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:32Z",
+      "finished": "2026-10-30T10:17:43Z"
+    },
+    "cli-gate": {
+      "exit": 1,
+      "expected_exit": 1,
+      "started": "2026-10-30T10:17:44Z",
+      "finished": "2026-10-30T10:17:46Z"
+    },
+    "backlog-build": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:48Z",
+      "finished": "2026-10-30T10:17:57Z"
+    },
+    "backlog-validate": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:58Z",
+      "finished": "2026-10-30T10:17:58Z"
+    },
+    "library-build": {
+      "exit": 0,
+      "expected_exit": 0,
+      "started": "2026-10-30T10:17:59Z",
+      "finished": "2026-10-30T10:50:14Z"
+    }
+  },
+  "binaries": [
+    {
+      "path": "target/release/examples/hecke_target_router-400337dfe79d54df",
+      "bytes": 5157160,
+      "sha256": "fb4a346b5fd6ddd2320d529e7a97d75f51f4ee1cea84c507ba2180d05e991d17"
+    },
+    {
+      "path": "target/release/examples/pkm_oracle_program-9b34922ca9c096c6",
+      "bytes": 6944352,
+      "sha256": "8a9703d7c024da219f6836dc4072204b97aaaca8e4f554a0c20b47213eaf2bf8"
+    },
+    {
+      "path": "target/release/examples/pkm_symmetric_complete-54795fd1798bb6d4",
+      "bytes": 6512072,
+      "sha256": "bb12866b71de01259633483b5d5f4000b40d15f2beb29e5d1752157868a99497"
+    },
+    {
+      "path": "target/release/examples/pkm_oracle_program",
+      "bytes": 6529216,
+      "sha256": "efe4205197a5e06f15aed48e0451fb583ff84b52fd289662e55274ed176e1848"
+    },
+    {
+      "path": "target/release/backlog",
+      "bytes": 5744144,
+      "sha256": "e492375dfb9e5186a1aea12b89949f6624ce34a0b046f51087aa4b5b06172505"
+    },
+    {
+      "path": "target/release/deps/crypto_lib-cd696b7f650051ce",
+      "bytes": 282333088,
+      "sha256": "020595221168d602a333f93832f7a180f8a8f3d04c178c4a15201a7764ed86a1"
+    }
+  ],
+  "full_library": {
+    "status": "capped incomplete; no full-suite pass",
+    "declared": 5646,
+    "passed_observed": 2208,
+    "failed_observed": 0,
+    "ignored_observed": 47,
+    "active_at_cap": [
+      "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies"
+    ],
+    "not_reached": 3390,
+    "started": "2026-10-30T10:50:16Z",
+    "finished": "2026-10-30T11:30:16Z",
+    "execution_cap_seconds": 2400,
+    "timeout_wrapper_exit": 124,
+    "cargo_exit": null,
+    "terminal_suite_summary": false,
+    "failure_names": [],
+    "raw_log": {
+      "local_path": "/workspace/pr2949-integration-20261030/refresh-954c0bb02/library-test.log",
+      "bytes": 214615,
+      "sha256": "d41f2749c59315e4f1c11d5315c212e67489ab983662dd94633aabc39c0977ca",
+      "upload_state": "NOT_UPLOADED",
+      "reason": "no configured approved artifact transport; no durable upload claimed"
+    },
+    "bounded_excerpt": "final-library-excerpt.log"
+  },
+  "jv_source_git_blob": "568a67fb3a7e4067036c7b5985648c477a46290d",
+  "jv_source_unchanged_since": "8baeee2d446968936882adc503570fb957bb1429",
+  "all_validation_processes_terminal": true,
+  "lean": "project/gate objects unchanged from earlier fresh13-declaration/zero-trusted audit and kernel replay; no repeated run claimed",
+  "preservation": {
+    "original_sources_inputs_reports_and_all_receipt_snapshots_unchanged": true,
+    "original_non_log_index_blobs_unchanged_before_active_problem_append": 58,
+    "original_non_log_index_blobs_unchanged_after_append": 57,
+    "active_problem_update": "problems/release-suite-jv-isogeny-walk-budget.md appended with current evidence; original body preserved as prefix",
+    "log_parent_paragraphs_latest_merge": [
+      824,
+      742
+    ]
+  },
+  "newer_main_snapshot_not_merged": "da7a63b11b486861bbc0ee6ac7695a9c756486f8",
+  "newer_main_validation": "changes hashed-ecdl-tensor dependency; this receipt does not validate its eventual integration",
+  "remote_merge_checks": "not established for publication head; require exact-head gate,size,artifacts and current reviews",
+  "auto_merge_paused": true,
+  "scientific_panels_run": 0,
+  "comparison_admissible": false,
+  "goal_complete": false,
+  "panel_card_status": "blocked/unfunded/unimplemented full-panel entrypoint at historical pin",
+  "no_funding_lease_iam_quota_pool_change": true
+}

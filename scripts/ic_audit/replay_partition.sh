@@ -106,7 +106,7 @@ for ((offset=0; offset<n; offset++)); do
   jq -s '[.[] | select(.warmup == false and
     (.outcome.status == "verified" or
       ((.outcome.status == "wrong_answer" or .outcome.status == "exhausted" or .outcome.status == "error") and
-       (.session_id as $sid | ["ECBS1hedc734e1870d","ECBS1h4c7b9db8a389","ECBS1h302934ff99ed"] | index($sid) | not))) and
+       (.session_id as $sid | ["ECBS1h4c7b9db8a389"] | index($sid) | not))) and
     (.method.id | startswith("ic.cm_folded_") | not) and
     (if ((.method.params.solver_budget_seconds // "0" | tonumber? // 0) > 0)
      then .cost.deterministic == true and (.cost.total_gae | type == "number")

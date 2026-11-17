@@ -1,0 +1,124 @@
+{
+  "schema": "f4-model-verification/v1",
+  "created": "2026-11-10T07:42:57.974642+00:00",
+  "source_plan": "f4-model-sources.json",
+  "source_commit": "2ff49e4904fd792036f876d5d8b3fa5fe6f81c2b",
+  "source_plan_pins_match": true,
+  "full_gate": {
+    "theorems": 573,
+    "failing": 0,
+    "trusted_native": 0,
+    "exit": 0,
+    "archive": "evidence/f4-model-gate.tar.gz",
+    "roundtrip_equal": true
+  },
+  "theorem_packet": {
+    "claim_id": "PCC-20261110-0f3faf",
+    "claim_sha256": "c04478a7d669402d45cdcc59d1bed7722330bac36cef2c83c0c0973a870f8321",
+    "commit": "608f40db67a2464eaee56ae7f056c42b397b1de5",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/theorem_census_20261109/lean (F4ExpectedOutputs.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T07:41:50Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "theorem_standing": {
+    "claim_id": "PCC-20261110-0f3faf",
+    "claim_sha256": "c04478a7d669402d45cdcc59d1bed7722330bac36cef2c83c0c0973a870f8321",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "native_packet": {
+    "claim_id": "PCC-20261110-5286d7",
+    "claim_sha256": "144a0473b7511ba850a7e5530ff7b4415b2f93731c3f64c7d54c1c81a3bbaff9",
+    "commit": "608f40db67a2464eaee56ae7f056c42b397b1de5",
+    "proofs": [
+      {
+        "kind": "attestation",
+        "notes": [
+          "artifact: unsigned; independence needs a keyring signature"
+        ],
+        "reasons": [],
+        "verdict": "not_covered"
+      },
+      {
+        "kind": "attestation",
+        "notes": [
+          "artifact: unsigned; independence needs a keyring signature"
+        ],
+        "reasons": [],
+        "verdict": "not_covered"
+      }
+    ],
+    "reasons": [
+      "claim kind measurement is not covered: recompute; replay"
+    ],
+    "schema": "pcc.verdict/v1",
+    "verdict": "not_covered",
+    "verified_at": "2026-11-10T07:42:15Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "native_standing": {
+    "claim_id": "PCC-20261110-5286d7",
+    "claim_sha256": "144a0473b7511ba850a7e5530ff7b4415b2f93731c3f64c7d54c1c81a3bbaff9",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "native": {
+    "v1": {
+      "frozen_before_data": true,
+      "frozen_bytes_match": true,
+      "source_commit": "2ff49e49",
+      "ordinary": "exit0 / fixture_pass",
+      "saturation": "exit1 / unsupported characteristic",
+      "export_check": "fail3planningfindings, retainedregistrationdefect"
+    },
+    "v2": {
+      "frozen_before_data": true,
+      "frozen_bytes_match": true,
+      "source_commit": "608f40db",
+      "ordinary": "exit139 / segmentationfault / not_validated",
+      "saturation": "exit124 / timeout60s / not_validated",
+      "export_check": "PASS0findings; filehasheschecked",
+      "flow": {
+        "planned": 2,
+        "attempted": 2,
+        "completed": 1,
+        "not_completed": 1,
+        "interrupted": 0,
+        "resumed": 0,
+        "excluded": []
+      }
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-f4-model/report.pdf",
+    "bytes": 64064,
+    "sha256": "474e09fef9d73e15a4084625ffa87de19338d2595c3887ee300afe5a2f46f9d5",
+    "pages": 2,
+    "visually_inspected_pages": [
+      1,
+      2
+    ],
+    "diagram_inspected": true
+  },
+  "scope": "Original model ideal invariant, direct unrestricted saturation-model negation and literal F101 expected output certificate. Actual C execution/refinement, native saturation conformance, independent host and crash/hang cause not established.",
+  "paid_compute": 0,
+  "fresh_checker": "lean4checker unavailable; actual kernel plus whole axiom gate",
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "elaboration": "No added elaboration/linter option or native exception."
+}

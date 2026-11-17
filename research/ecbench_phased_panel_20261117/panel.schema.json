@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/isogeny-labs/crypto/research/ecbench_phased_panel_20261117/panel.schema.json",
+  "title": "ECBench phased curve panel",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "size_metric",
+    "source_snapshot",
+    "gate_defaults",
+    "phases"
+  ],
+  "properties": {
+    "schema": {"const": "ecbench.phased-panel/v1"},
+    "status": {"const": "planned_unmeasured"},
+    "size_metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "definition", "field_size_is_separate"],
+      "properties": {
+        "name": {"const": "subgroup_bits"},
+        "definition": {"const": "ceil(log2(r))"},
+        "field_size_is_separate": {"const": true}
+      }
+    },
+    "source_snapshot": {
+      "type": "object",
+      "required": ["crypto_commit", "ecc_challenges_commit", "ecc_challenges_instances_blob"],
+      "properties": {
+        "crypto_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "ecc_challenges_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "ecc_challenges_instances_blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "gate_defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "familywise_alpha",
+        "minimum_terminal_episodes",
+        "minimum_full_rank_success_probability",
+        "maximum_yield_shortfall_factor",
+        "next_phase_resource_headroom_factor",
+        "targets_per_curve_below_64_bits",
+        "targets_per_curve_at_or_above_64_bits"
+      ],
+      "properties": {
+        "familywise_alpha": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "minimum_terminal_episodes": {"type": "integer", "minimum": 1},
+        "minimum_full_rank_success_probability": {"type": "number", "minimum": 0, "maximum": 1},
+        "maximum_yield_shortfall_factor": {"type": "number", "minimum": 1},
+        "next_phase_resource_headroom_factor": {"type": "number", "minimum": 1},
+        "targets_per_curve_below_64_bits": {"type": "integer", "minimum": 1},
+        "targets_per_curve_at_or_above_64_bits": {"type": "integer", "minimum": 1}
+      }
+    },
+    "phases": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {"$ref": "#/$defs/phase"}
+    }
+  },
+  "$defs": {
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "nominal_subgroup_bits",
+        "subgroup_bit_window",
+        "objective",
+        "minimum_public_targets_per_curve",
+        "admission_state",
+        "curves"
+      ],
+      "properties": {
+        "phase": {"type": "integer", "minimum": 1, "maximum": 4},
+        "nominal_subgroup_bits": {"enum": [20, 30, 60, 80]},
+        "subgroup_bit_window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["minimum", "maximum"],
+          "properties": {
+            "minimum": {"type": "integer", "minimum": 1},
+            "maximum": {"type": "integer", "minimum": 1}
+          }
+        },
+        "objective": {"type": "string", "minLength": 1},
+        "minimum_public_targets_per_curve": {"type": "integer", "minimum": 1},
+        "admission_state": {
+          "enum": ["ready_to_preregister", "partially_blocked", "blocked"]
+        },
+        "curves": {
+          "type": "array",
+          "minItems": 3,
+          "items": {"$ref": "#/$defs/curve"}
+        }
+      }
+    },
+    "curve": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cell_id",
+        "family",
+        "role",
+        "mandatory",
+        "identity",
+        "size",
+        "cofactor",
+        "traits",
+        "evidence_status",
+        "ecbench"
+      ],
+      "properties": {
+        "cell_id": {"type": "string", "pattern": "^P[1-4]-[A-Z0-9-]+$"},
+        "family": {"enum": ["koblitz", "binary", "prime"]},
+        "role": {"enum": ["core", "sentinel", "external_anchor"]},
+        "mandatory": {"type": "boolean"},
+        "identity": {
+          "type": "object",
+          "required": ["status"],
+          "properties": {
+            "status": {"enum": ["registered", "pending_local_import"]},
+            "icv1": {"type": ["string", "null"]},
+            "ec1": {"type": ["string", "null"]},
+            "curve_uid": {"type": ["string", "null"]},
+            "external_name": {"type": ["string", "null"]},
+            "source_blob": {"type": ["string", "null"]},
+            "external_parameters": {"type": ["object", "null"]}
+          }
+        },
+        "size": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["subgroup_order", "subgroup_bits", "field_bits_or_degree"],
+          "properties": {
+            "subgroup_order": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+            "subgroup_bits": {"type": "integer", "minimum": 1},
+            "field_bits_or_degree": {"type": "integer", "minimum": 1}
+          }
+        },
+        "cofactor": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+        "traits": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "evidence_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["order", "subgroup"],
+          "properties": {
+            "order": {"enum": ["proved", "external_primary_source"]},
+            "subgroup": {"enum": ["proved", "external_primary_source"]}
+          }
+        },
+        "ecbench": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "curve_spec", "required_reference"],
+          "properties": {
+            "status": {
+              "enum": [
+                "runnable_narrow",
+                "reference_only_wide",
+                "blocked_pending_registry_and_wide_backend"
+              ]
+            },
+            "curve_spec": {"type": ["object", "null"]},
+            "required_reference": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    }
+  }
+}

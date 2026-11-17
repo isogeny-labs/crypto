@@ -1,0 +1,25 @@
+import Reconstruct
+set_option autoImplicit false
+namespace ScaleTrim
+open Polynomial MumfordNormalization AffineCoefficientLoop CoefficientTraversal TraversalPolynomial WordCoefficient PencilWordRefinement
+
+theorem scale_nonzero (p a : UInt64) [Fact p.toNat.Prime] (m : Fin 6)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (ha : a.toNat<p.toNat) (ha0 : a≠0) :
+ smallPow p a m≠0 := by
+ have h := (smallPow_decode p a m hp hb ha).2
+ have hn := pow_ne_zero m.val (canonical_word_nonzero p a (by omega) ha ha0)
+ intro hz
+ rw [hz] at h
+ have he : (0 : ZMod p.toNat)=(a.toNat : ZMod p.toNat)^m.val := by simpa using h
+ exact hn he.symm
+
+theorem transform_computed_scale {n : Nat} (hn : n≤6) (p : UInt64) [Fact p.toNat.Prime]
+ (c : Fin n→UInt64) (a b : UInt64) (m : Fin 6)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hc : ∀i,(c i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (ha0 : a≠0) :
+ decodedPoly p (transform hn p c a b (smallPow p a m))=
+ T m.val (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (sourcePoly (extend p c) n) :=
+ word_transform_T hn p c a b (smallPow p a m) m.val hp hb hc ha hbeta
+  (smallPow_decode p a m hp hb ha).1 (scale_nonzero p a m hp hb ha ha0)
+  (smallPow_decode p a m hp hb ha).2
+end ScaleTrim

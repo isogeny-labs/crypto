@@ -409,26 +409,30 @@ pub fn rank_and_refute(rows: &mut [Vec<u64>], cols: usize) -> (usize, bool) {
 /// XOR (symmetric difference) of two sorted, deduplicated index lists.
 /// Keeps elements appearing in exactly one input — the `F_2` row sum.
 fn symdiff(a: &[u32], b: &[u32]) -> Vec<u32> {
-    let mut out = Vec::with_capacity(a.len() + b.len());
-    let (mut i, mut j) = (0, 0);
+    // Branch-free merge: every step stores the smaller head, then moves
+    // the output cursor unless the heads are equal (a cancelling pair,
+    // whose stored value the next step overwrites) and each input cursor
+    // when its head is not larger.  Which input advances is close to a
+    // coin flip on the refutation rows, so the three-way `match` this
+    // replaces was mostly branch mispredictions (1.28x wall on
+    // `sparse_rank_refute_macaulay_k5m3d5` for 18 % more instructions).
+    // `k ≤ i + j` while both heads exist, so `out` (room for every input
+    // index) never overflows; the unspent tail is appended as before.
+    let mut out = vec![0u32; a.len() + b.len()];
+    let (mut i, mut j, mut k) = (0usize, 0usize, 0usize);
     while i < a.len() && j < b.len() {
-        match a[i].cmp(&b[j]) {
-            std::cmp::Ordering::Less => {
-                out.push(a[i]);
-                i += 1;
-            }
-            std::cmp::Ordering::Greater => {
-                out.push(b[j]);
-                j += 1;
-            }
-            std::cmp::Ordering::Equal => {
-                i += 1;
-                j += 1;
-            }
-        }
+        let (x, y) = (a[i], b[j]);
+        out[k] = x.min(y);
+        k += (x != y) as usize;
+        i += (x <= y) as usize;
+        j += (y <= x) as usize;
     }
-    out.extend_from_slice(&a[i..]);
-    out.extend_from_slice(&b[j..]);
+    let (tail_a, tail_b) = (&a[i..], &b[j..]);
+    out[k..k + tail_a.len()].copy_from_slice(tail_a);
+    k += tail_a.len();
+    out[k..k + tail_b.len()].copy_from_slice(tail_b);
+    k += tail_b.len();
+    out.truncate(k);
     out
 }
 

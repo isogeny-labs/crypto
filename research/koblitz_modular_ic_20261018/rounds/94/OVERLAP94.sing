@@ -1,0 +1,82 @@
+proc require94(int ok,string tag){if(!ok){print("OVERLAP94_FATAL "+tag);exit;}}
+string saved94=read("rr-pid50.sing");
+int start94=find(saved94,"ring inverseBaseCertificate50=");
+require94(start94>0,"PID_HEADER");
+execute(saved94[start94,size(saved94)-start94+1]);
+setring inverseBaseCertificate50;
+matrix B094=matrix(basis50);
+matrix S094=sourceLift50;
+poly F094=commonDenominator50;
+execute(read("relative-infinity50.sing"));
+ring polynomial94=2,(u,v,l),dp;
+poly E94=v^2+u^2*v+u+u^3;
+poly h94=u+v;
+poly k94=u+v+u^2;
+poly H94=1+u+u^2+u*v;
+poly J94=1+u+u^2+u^3+u*v;
+poly N94=v+u*v+u^2;
+require94(h94^2+u*H94==E94,"H_UNIT_POLYNOMIAL_IDENTITY");
+require94(k94^2+u*J94==E94,"K_UNIT_POLYNOMIAL_IDENTITY");
+require94(h94+N94+1==H94,"FORWARD_OVERLAP_NUMERATOR");
+ring field94=(2,u),(l,v),dp;
+map relativeMap94=relativeInfinity50,l,v,u;
+ideal I94=std(relativeMap94(relativeInfinityIdeal50));
+require94(vdim(I94)==32,"SOURCE_FIELD_DIMENSION");
+qring Q94=I94;
+map pidMap94=inverseBaseCertificate50,u;
+matrix B94=pidMap94(B094);
+matrix S94=pidMap94(S094);
+poly F94=pidMap94(F094);
+matrix identity94[32][32];int i94;
+for(i94=1;i94<=32;i94++){identity94[i94,i94]=1;}
+require94(B94*S94==F94*identity94,"PID_SOURCE_EMBEDDING");
+ideal functions94=1,u,v,u+v,u+v+u^2,1+u+u^2+u*v,1+u+u^2+u^3+u*v;
+matrix C94[32][7];matrix W94[32][7];
+poly remaining94;poly reconstructed94;intvec exp94;int pos94;int coordinate94;
+for(int col94=1;col94<=7;col94++){
+ remaining94=reduce(functions94[col94],std(0));reconstructed94=0;
+ while(remaining94!=0){
+  exp94=leadexp(remaining94);
+  require94(exp94[1]<16 && exp94[2]<2,"NONSTANDARD_REMAINDER");
+  pos94=exp94[1]+16*exp94[2]+1;
+  W94[pos94,col94]=W94[pos94,col94]+leadcoef(remaining94);
+  reconstructed94=reconstructed94+leadcoef(remaining94)*l^exp94[1]*v^exp94[2];
+  remaining94=remaining94-lead(remaining94);
+ }
+ require94(reduce(reconstructed94+functions94[col94],std(0))==0,"POWER_RECONSTRUCTION");
+}
+C94=S94*W94;
+require94(B94*C94==F94*W94,"FULL_SEVEN_COLUMN_PRODUCT");
+for(int col94=1;col94<=7;col94++){
+ for(int row94=1;row94<=32;row94++){
+  require94(C94[row94,col94]==leadcoef(C94[row94,col94]) && denominator(leadcoef(C94[row94,col94]))==1,"NONPOLYNOMIAL_COORDINATE_"+string(col94)+"_"+string(row94));
+  coordinate94=coordinate94+1;
+ }
+ print("OVERLAP94_MEMBER column="+string(col94)+" polynomial_coordinates=32 full_product=1");
+}
+matrix badC94=C94;badC94[1,1]=badC94[1,1]+1;
+require94(B94*badC94!=F94*W94,"CORRUPTED_MODULE_PRODUCT_ACCEPTED");
+poly hfield94=u+v;poly kfield94=u+v+u^2;
+poly Hfield94=1+u+u^2+u*v;poly Jfield94=1+u+u^2+u^3+u*v;
+require94(reduce(hfield94^2+u*Hfield94,std(0))==0,"H_FIELD_UNIT_IDENTITY");
+require94(reduce(kfield94^2+u*Jfield94,std(0))==0,"K_FIELD_UNIT_IDENTITY");
+poly hinv94=lift(hfield94,1)[1,1];poly kinv94=lift(kfield94,1)[1,1];
+number uinv94=1/u;
+require94(reduce(hfield94*hinv94,std(0))==1 && reduce(kfield94*kinv94,std(0))==1,"GENERIC_OVERLAP_INVERSES");
+require94(u*uinv94==1,"GENERIC_U_INVERSE");
+poly fz94=hinv94;poly fv94=reduce((v+u*v+u^2)*hinv94^2,std(0));
+require94(reduce(fz94+fv94+fz94^2+uinv94,std(0))==0,"FORWARD_K_TO_U_INVERSE");
+poly iz94=kinv94;poly iv94=reduce(kinv94+uinv94,std(0));
+require94(reduce(iz94+iv94+uinv94,std(0))==0,"REVERSE_H_TO_U_INVERSE");
+require94(reduce(fz94+fv94+fz94^2+uinv94+1,std(0))!=0,"CORRUPTED_FORWARD_IDENTITY_ACCEPTED");
+link out94="ASCII:w overlap94.sing";open(out94);
+write(out94,"matrix C94[32][7];matrix W94[32][7];");
+for(int col94=1;col94<=7;col94++){
+ for(int row94=1;row94<=32;row94++){
+  write(out94,"C94["+string(row94)+","+string(col94)+"]="+string(C94[row94,col94])+";W94["+string(row94)+","+string(col94)+"]="+string(W94[row94,col94])+";");
+ }
+}
+close(out94);
+print("OVERLAP94_RESULT members=7 polynomial_coordinates="+string(coordinate94)+" forward_unit=1 reverse_unit=1");
+print("OVERLAP94_ALL_CHECKS_PASS");
+quit;

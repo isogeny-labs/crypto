@@ -72,7 +72,6 @@ it inapplicable (state why).
 Global provenance on every beat report: fixture hash, executable / source
 hash, host id, resource caps, seeds, and an explicit non-claim list.
 
----
 
 ## Pipeline stages
 
@@ -93,7 +92,6 @@ scalar in both arms, exclusive target-dependent online phases, matched
 resources, and the host-isolation receipt. Faster planted decompositions alone
 never promote to `vs_rho`.
 
----
 
 ## How to beat a row
 
@@ -115,7 +113,6 @@ never promote to `vs_rho`.
    required for any `vs_rho` or `end_to_end_dlp` promotion past the previous
    bit-length / degree.
 
----
 
 ## Regime A — Binary fields (non-Koblitz / Weil–Semaev)
 
@@ -136,7 +133,6 @@ subspace factor bases (`semaev_decomp`, `semaev_sat`, `pq_descent`,
 `m' ≤ 8` (S₃) / `m' ≤ 5` (S₄) in `pq_descent`; higher-genus GHS smooth model
 + Jac index calculus **not implemented**.
 
----
 
 ## Regime B — Koblitz (`K_a / F_{2^n}`)
 
@@ -150,14 +146,12 @@ admitted degrees.
 
 Unknowns formula (chained Semaev): `unknowns(n,ℓ,m) = m·ℓ + (m−2)·n`.
 
-| Stage | Current best (measured knobs) | Next target to beat | Acceptance gates | Evidence |
-|-------|-------------------------------|---------------------|------------------|----------|
 | `factor_base` | **n=53 finite batch winner plus exact Frobenius-orbit SAT domain**: the certified 23,320-point/220-column base is exactly 220 Frobenius x-orbits. Representative-plus-shift encoding reduces the complete n=53 S5 formula from 1,815,492 to 22,887 clauses (79.32x), with 24.34 ms encoding and no pair/edge domain. On the retained base (hash `d859319…`), compact regular-root extraction (5.08M canonical roots, 0 pair edges) plus a pinned orbit-formula SAT check gives 12/12 SAT-confirmed group-valid relations (8/8 natural), 0 conflicts, median 625 ms extraction, ~600 MB peak RSS vs 9.74 GB for the pair table — pending independent replay | Independent replay, then cut per-relation extraction toward the table's 7.49 ms without a pair table | Same base hash; no pair/edge selectors; group-valid; claim-check PASS; UNKNOWN stays censored | `autolab_orbit_extract_20260924/` |
 | `decomposition` | **n=31 dim-16 m=2 F₄ completes** with zero disagreements. Block-6 M4RI gives exact degree-3 kernel speedups of 1.613x (x) and 1.574x (sym); the selected two-target paired repeat finds 2/2 x relations at 637 ms median and refutes 2/2 sym targets at 30.012 s median, with FFD 3/4 and zero inconclusive/gate failures. At **n=53**, the compact orbit-factorized SAT arm remains **UNKNOWN** | Repeat the selected F4 policy over the retained 8-target distribution, then advance the quadratic cell only if verdict mix and FFD remain stable; separately propagate pair support in the n=53 SAT arm | Byte-exact RREF controls; exhaustive small root sets; paired enumeration/group gates; process receipts; UNKNOWN stays censored | `autolab_groebner_hyperopt_20260921/results.json`; `autolab_implicit_s5_20260912/results.json` |
 | `relation_yield` | At n=53, rank-guided eta 1/10 produced one verified four-sum relation for every requested public target; 1,244 target trials yielded 1,244 relations in the 1,024-target batch. Post-precomputation cost: 7.49 ms median, 27.38 ms p95 | Freeze and measure the same policy at growing n with target/probe tails and support density | Public-natural fixture domain; exact group checks; trials, probes, timing distribution, and policy hash retained | `autolab_n53_eta_sweep_20260912/results.json` |
 | `rank` | **n=53 minimum-rank accumulation**: guided eta 1/10 reached rank 221 in exactly 221 rows on every measured selection/holdout fixture; one factor-log table then served 1,023 targets with one row each; full transcript independently replayed | Growing-n shared-log rank/yield panel with the same guidance policy | Preserved rows or independent replay; matrix dimensions and LA time explicit; relation LA kept distinct from FFD | `runs/shared_factor_logs_n53_eta_1_10_full_batch4/`; `runs/shared_factor_logs_independent_replay.json` |
 | `end_to_end_dlp` | **1,024 public-synthetic n=53 known-answer targets** recovered with one retained factor-log table; all `[d]G = Q`, relation equations, and factor logs verified with zero replay discrepancies | Repeat at a second n≥53 rung or independent host under the same staged accounting | Public synthetic only; every target group-verified; support → rank → recover → verify timers present | `runs/shared_factor_logs_n53_eta_1_10_batch1024/`; independent replay |
-| `vs_rho` | **n=61 a=0 isolated rung (2026-10-12):** compact-orbit IC (K=500, 61,000 base points, 500 orbit columns) beat strong rho rung 3 on the identical public point per workload, 64 one-target workloads per host, claim-check PASS 64/64 on both hosts: an unpinned arm64 macOS host (median 12.9×) and a taskset-pinned x86_64 gvisor host (median 13.9×, 95% CI 9.8–19.1) with the qualifying CPU-isolation receipt (`cpus_allowed_list: 2`). Identical candidate manifest on both hosts; five exclusive IC online phases and the exact rho interval recorded; IC setup (~28 s) excluded and reported via the cold ratio (median 83.4); certificates replayed out of process. Constant-factor win only. The prior n=83 a=1 shared-host observation (median 8.2, no isolation receipt) moves to history. | Extend the isolated-host protocol to n=71 and n=83 with the same five-phase interval and taskset receipt, then a Bernstein–Lange rho reference arm at n=61+. | Exactly one unseen public target; identical point; five exclusive IC online phase costs and exact rho interval; matched resource envelope; independent replay; host-isolation receipt; claim-check PASS; preserve failed rows | `research/sat_factor_base_review_20260908/autolab/runs/20261012T173628Z-3fd988ea23/`; modal volume `ic-autolab-runs` `20261012T210541Z-20261012T202048Z-5521627904.tar.gz` |
+| `vs_rho` | **n=61 a=0 isolated rung (2026-10-12):** compact-orbit IC (K=500, 61,000 base points, 500 orbit columns) beat strong rho rung 3 on the identical public point per workload, 64 one-target workloads per host, claim-check PASS 64/64 on both hosts: an unpinned arm64 macOS host (median 12.9×) and a taskset-pinned x86_64 gvisor host (median 13.9×, 95% CI 9.8–19.1) with the qualifying CPU-isolation receipt (`cpus_allowed_list: 2`). Identical candidate manifest on both hosts; five exclusive IC online phases and the exact rho interval recorded; IC setup (~28 s) excluded and reported via the cold ratio (median 83.4); certificates replayed out of process. Constant-factor win only. The prior n=83 a=1 shared-host observation (median 8.2, no isolation receipt) moves to history. | Extend the isolated-host protocol to n=71 and n=83 with the same five-phase interval and taskset receipt, the Bernstein–Lange preprocessing-rho reference arm has run and wins online at equal advice at n = 41/53/61 (`research/ic_next10_20261014/09-equal-advice/`, 50–500×) and at n = 83 (`research/20261016-n83-precomputed-rho-control/`), so the online-after-precompute rows are read against it, not against plain rho. | Exactly one unseen public target; identical point; five exclusive IC online phase costs and exact rho interval; matched resource envelope; independent replay; host-isolation receipt; claim-check PASS; preserve failed rows | `research/sat_factor_base_review_20260908/autolab/runs/20261012T173628Z-3fd988ea23/`; modal volume `ic-autolab-runs` `20261012T210541Z-20261012T202048Z-5521627904.tar.gz` |
 
 **Complete cold compact-orbit panel (disjoint public points).** The
 [preregistered six-cell W64 result](../../research/notes/ecc2k130/disjoint_cold_v2_outcome_20261001/RESULT.md)
@@ -236,7 +230,6 @@ their mean probe count does not measure how fortunate a frozen target was.
 See the [accounting review](./PLAN_IC_ACCOUNTING_FIXES_20261007.md) for the
 claim-check audit, native-counter boundary, and next measurements.
 
----
 
 ## Regime C — Prime fields
 
@@ -244,8 +237,6 @@ claim-check audit, native-counter boundary, and next measurements.
 **j=0 ζ-orbit-reduced** (`ec_index_calculus`, `ec_index_calculus_j0`). Dense
 3-sum Autolab harvester does not scale.
 
-| Stage | Current best (measured knobs) | Next target to beat | Acceptance gates | Evidence |
-|-------|-------------------------------|---------------------|------------------|----------|
 | `factor_base` | Small-x and ζ-orbit bases on small-instance primes; Eisenstein-smooth FB implemented; sizes from bench ladder | Orbit-reduced base on a **16-bit** j=0 prime-order curve with certified orbit count; construction time + retained bytes | No duplicate orbits; size vs theory within 5% | `docs/RESEARCH_BENCH_LOG.md`; `ec_index_calculus_j0` |
 | `decomposition` | **First S₄ 3-decomposition relation family past small instances (2026-10-06):** `R = aG + bQ` into **three** factor-base points on the a=−3 deployed shape (16-bit P-256 class) via the S₄ quartic + **Cantor–Zassenhaus root finding** (`find_roots_fp_fast`, new); measured **trials/relation = 1.0** (~13 expected hits/trial at fb=120 — the p/B³ density confirmed), 128 relations, staged timers, verified + ρ-agreeing. FFD **inapplicable with reason** (direct univariate root finding; no GB/SAT system — schema-allowed). Per-relation wall 3.3 s is dominated by the B²/2 quartic sweep at fixed B, so 2-decomp stays faster at these sizes; the density is the input for the larger-B design | Cut the S₄ per-relation cost (batch the pair sweep / share X^p mod f across quartics / vectorize CZ) and extend ≥20 bits; or pair the 3-decomp density with larger B where p/B³ beats 2-decomp total cost | Witnesses sum in the group; trials-per-relation + per-relation wall logged; FFD status explicit; no "3-decomp wins" claim unless the wall shows it | `runs_manual/prime_a3_s4_ladder_20261006/`; `examples/a3_s4_ladder.rs`; `ec_index_calculus.rs` |
 | `relation_yield` | **First prime yield curves (2026-10-05):** j=0 staged ladder 16/20 bits (median 14 → 171.5 trials/relation) and the new generic **a=−3 (P-256/CryptoPro-B shape) ladder** at 16/20/24 bits, fb=120 fixed (median 2 → 28 → 379/506; ≈×16 per +4 bits); all runs verified + ρ-agreeing | Extend both curves to 24–32 bits with fixed policy; per-size CI on trials-per-relation | ≥3 bitlengths; frozen policy; ≥3 seeds per size with median and max | `runs_manual/prime_j0_e2e_20bit_20261005/`; `runs_manual/prime_a3_ladder_20261005/` |
@@ -257,7 +248,6 @@ claim-check audit, native-counter boundary, and next measurements.
 `O(p^{1/2})`. A `vs_rho` win requires a genuinely better decomposition regime
 (or a structural special case), not a constant-factor sieve tweak.
 
----
 
 ## Global agent priorities (beat these in order)
 
@@ -272,7 +262,6 @@ claim-check audit, native-counter boundary, and next measurements.
 5. **Prime end-to-end DLP → extend the j=0 staged ladder past 20 bits (landed 2026-10-05 with split timers, 3-seed replay PASS, rho agreement) and push the a=−3 deployed-shape ladder past 24 bits** *(first a=−3 ladder at 16/20/24 bits, both p mod 4 classes, all verified + rho-agreeing — no vs_rho crossover anywhere; gap widens 19× → 403× over 16→24 bits)*.
 6. Fill missing binary/prime one-target yield and rank evidence and backfill FFD/DoR where only wall or conflicts are cited.
 
----
 
 ## Related documents
 
@@ -288,3 +277,56 @@ claim-check audit, native-counter boundary, and next measurements.
 - `research/sat_factor_base_review_20260908/TASK-KIC-SAT-RHO-CROSSOVER-20260909.md`
 
 **n=63 rung closed (2026-10-02):** the attempt to extend the ladder to n=63 fails closed for a mathematical reason: `KoblitzCurve::new` returns `None` for both a=0 and a=1 — `#E_0(F_{2^63}) = 2^2·29·43·127^2·421·757·359731` and `#E_1(F_{2^63}) = 2·7^3·37·43·71·379·631·497701` have largest primes ~2^18.5/2^18.9, far below their cofactors (same at n=62). Composite n=3^2·7 splits both orders into small cyclotomic pieces; an irreducible field polynomial exists (x^63+x+1) — the obstruction is purely the subgroup structure. **n=61 is therefore the u64-packing ceiling for this curve family**; the next rung is beyond-63 multi-word field arithmetic targeting n=71, a=0 (r=5513228015079457 ~ 2^52.3, cofactor 428276).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| `vs_rho` | **n=61 a=0 isolated rung (2026-10-12):** compact-orbit IC (K=500, 61,000 base points, 500 orbit columns) beat strong rho rung 3 on the identical public point per workload, 64 one-target workloads per host, claim-check PASS 64/64 on both hosts: an unpinned arm64 macOS host (median 12.9×) and a taskset-pinned x86_64 gvisor host (median 13.9×, 95% CI 9.8–19.1) with the qualifying CPU-isolation receipt (`cpus_allowed_list: 2`). Identical candidate manifest on both hosts; five exclusive IC online phases and the exact rho interval recorded; IC setup (~28 s) excluded and reported via the cold ratio (median 83.4); certificates replayed out of process. Constant-factor win only. The prior n=83 a=1 shared-host observation (median 8.2, no isolation receipt) moves to history. **First n=71 single-target online rung (2026-10-31, PENDING_INDEPENDENT_VALIDATION):** K=600 tuned over {200,600}, 16 one-target workloads on the unpinned arm64 host, claim-check PASS 16/16, median online speedup 6.12× (95% CI 4.0–11.9), cold ratio median 177.7; promotion awaits a taskset-pinned or second-host replay. Run `20261031T071642Z-140c04e457`; note `docs/ic/N71_SINGLE_TARGET_METHOD_20261031.md`. | Extend the isolated-host protocol to n=71 and n=83 with the same five-phase interval and taskset receipt, then a Bernstein–Lange rho reference arm at n=61+. | Exactly one unseen public target; identical point; five exclusive IC online phase costs and exact rho interval; matched resource envelope; independent replay; host-isolation receipt; claim-check PASS; preserve failed rows | `research/sat_factor_base_review_20260908/autolab/runs/20261012T173628Z-3fd988ea23/`; modal volume `ic-autolab-runs` `20261012T210541Z-20261012T202048Z-5521627904.tar.gz` |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

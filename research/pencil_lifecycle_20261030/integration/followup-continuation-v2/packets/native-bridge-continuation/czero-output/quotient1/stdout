@@ -1,0 +1,65 @@
+/var/tmp/pencil-czero-output-20261101-v1/Quotient.lean:39:39: error: unknown tactic
+/var/tmp/pencil-czero-output-20261101-v1/Quotient.lean:39:8: error: Application type mismatch: The argument
+  Eq.symm he5
+has type
+  ∑ x ∈ Finset.antidiagonal 5,
+      (∑ x ∈ Finset.antidiagonal x.1,
+          ((if x.1 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.1, (C q1).coeff x.1 * X.coeff x.2 +
+              (C r1).coeff x.1) *
+            ((if x.2 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.2, (C q2).coeff x.1 * X.coeff x.2 +
+              (C r2).coeff x.2)) *
+        ((C (t.coeff 0)).coeff x.2 + ∑ x ∈ Finset.antidiagonal x.2, (C (t.coeff 1)).coeff x.1 * X.coeff x.2) =
+    1 - ((C s1 * X + C t1 - C a * (X ^ 2 + C q1 * X + C r1)) ^ 2).coeff 5
+but is expected to have type
+  t.coeff 1 = 1
+in the application
+  And.intro (Eq.symm he5)
+/var/tmp/pencil-czero-output-20261101-v1/Quotient.lean:39:24: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ∑ x ∈ Finset.antidiagonal 5,
+    (∑ x ∈ Finset.antidiagonal x.1,
+        ((if x.1 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.1, (C q1).coeff x.1 * X.coeff x.2 +
+            (C r1).coeff x.1) *
+          ((if x.2 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.2, (C q2).coeff x.1 * X.coeff x.2 +
+            (C r2).coeff x.2)) *
+      ((C (t.coeff 0)).coeff x.2 + ∑ x ∈ Finset.antidiagonal x.2, (C (t.coeff 1)).coeff x.1 * X.coeff x.2)
+in the target expression
+  -((C s1 * X + C t1 - C a * (X ^ 2 + C q1 * X + C r1)) ^ 2).coeff 4 =
+    ∑ x ∈ Finset.antidiagonal 4,
+      (∑ x ∈ Finset.antidiagonal x.1,
+          ((if x.1 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.1, (C q1).coeff x.1 * X.coeff x.2 +
+              (C r1).coeff x.1) *
+            ((if x.2 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.2, (C q2).coeff x.1 * X.coeff x.2 +
+              (C r2).coeff x.2)) *
+        ((C (t.coeff 0)).coeff x.2 + ∑ x ∈ Finset.antidiagonal x.2, (C (t.coeff 1)).coeff x.1 * X.coeff x.2)
+
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+q1 r1 s1 t1 q2 r2 a : K
+t : K[X]
+hf : f.natDegree = 5
+h5 : f.coeff 5 = 1
+h4 : f.coeff 4 = 0
+he :
+  f - (ordinate s1 t1 - C a * CZeroInterpolation.support q1 r1) ^ 2 =
+    CZeroInterpolation.support q1 r1 * CZeroInterpolation.support q2 r2 * t
+ht : t = C (t.coeff 0) + C (t.coeff 1) * X
+he5 :
+  1 - ((C s1 * X + C t1 - C a * (X ^ 2 + C q1 * X + C r1)) ^ 2).coeff 5 =
+    ∑ x ∈ Finset.antidiagonal 5,
+      (∑ x ∈ Finset.antidiagonal x.1,
+          ((if x.1 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.1, (C q1).coeff x.1 * X.coeff x.2 +
+              (C r1).coeff x.1) *
+            ((if x.2 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.2, (C q2).coeff x.1 * X.coeff x.2 +
+              (C r2).coeff x.2)) *
+        ((C (t.coeff 0)).coeff x.2 + ∑ x ∈ Finset.antidiagonal x.2, (C (t.coeff 1)).coeff x.1 * X.coeff x.2)
+he4 :
+  -((C s1 * X + C t1 - C a * (X ^ 2 + C q1 * X + C r1)) ^ 2).coeff 4 =
+    ∑ x ∈ Finset.antidiagonal 4,
+      (∑ x ∈ Finset.antidiagonal x.1,
+          ((if x.1 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.1, (C q1).coeff x.1 * X.coeff x.2 +
+              (C r1).coeff x.1) *
+            ((if x.2 = 2 then 1 else 0) + ∑ x ∈ Finset.antidiagonal x.2, (C q2).coeff x.1 * X.coeff x.2 +
+              (C r2).coeff x.2)) *
+        ((C (t.coeff 0)).coeff x.2 + ∑ x ∈ Finset.antidiagonal x.2, (C (t.coeff 1)).coeff x.1 * X.coeff x.2)
+⊢ t.coeff 0 = -(q1 + q2 + a ^ 2)

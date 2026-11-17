@@ -1,19 +1,24 @@
 # ECBench end-to-end frontier refresh (2026-10-31)
 
 This directory is the evidence-backed refresh of the elliptic-curve discrete-log
-performance frontier requested on 2026-10-31.  It binds the review to source
-commit `48c8a4767d2d1eed6a7b379f74410bc729239380`, inventories the live ECBench
-registry, separates comparable domains, and prepares the next isolated run.
+performance frontier requested on 2026-10-31. It binds the executable audit to
+source commit `ff7ad61cfed11908fb79de9dd485b696d0ada779`, inventories both the
+top-level registry and the named implementations multiplexed by `ic.pipeline`,
+separates comparable domains, and prepares the next isolated run. Historical
+performance rows keep the source and binary that actually produced them.
 
 ## Current answer
 
 No admitted result on the repository's generic prime, random-binary, or
-Koblitz ladders beats the matched, one-target, cold Pollard-rho reference.
-That is the generic frontier boundary, not a claim that every component is
-slower in every unit or that every curve family has the same boundary:
+medium/scaling Koblitz ladders beats the matched, one-target, cold Pollard-rho
+reference. That is the generic frontier boundary, not a claim that every
+component is slower in every unit or that every curve family has the same
+boundary:
 
 - the 74 live ECBench method IDs contain 31 IC, 32 rho/transfer, seven BSGS,
-  two kangaroo, and two claw methods;
+  two kangaroo, and two claw methods, but that count alone is not a census of
+  the factor-base, oracle, target-source, and linear-algebra implementations
+  hidden behind the pipeline IDs;
 - the algebraic framework contains 11 nested solver engines, including F4,
   matrix F4, matrix F5, inherited F4, SAT-CDCL, FES/Gray code, wide FES,
   Crossbred, XL, Buchberger, and exhaustive search;
@@ -31,13 +36,24 @@ slower in every unit or that every curve family has the same boundary:
   measurement, but it has no matched ECBench rho arm and is therefore not a
   leaderboard win.
 
+A narrow Koblitz engineering crossover must remain explicit. On the n=29,
+one-column, fixed-setup generator-orbit panel, the Frobenius-layout pipeline's
+S band is 0.546/0.611/1.196 versus 1.569 for rho-frob, with paired ratio 0.366
+[0.241, 0.523]. The repository classifies that pipeline at one column as
+Frobenius-folded BSGS; the crossing rests on rho's fixed setup at log2(r)=15.4
+and the gap grows with r. It is not a uniform-target, medium-tier, or
+asymptotic IC win.
+
 There is one important, deliberately separate exception.  The plane-quartic
 attack on the special GHS-weak `E_0/F_{q^3}` family is below matched rho in its
 own cold one-target, `F_q`-multiplication-equivalent comparison.  It is a real
 frontier for that restricted family, but not for generic curves, prime-order
 `E/F_{q^3}`, any standard curve, or ECC2K-130.  Combining that result with the
 generic ladders would compare different problem classes and give a false
-global ranking.
+global ranking. It is the historically admitted exception; the merged
+`strong-b8` same-family rho control is an unmeasured re-establishment round,
+not evidence that the historical boundary has already moved
+`[pcc:unverified]`.
 
 The newest validated factor-base improvement is the 20-bit prime row.  On the
 second-host EKS replay, `prime-abscissa:size=45` costs 0.836, 0.817, and 0.746
@@ -66,28 +82,51 @@ and GAE do not become comparable merely because they are numbers.
 |:--|:--|
 | `method-registry.json` | exact `ecbench methods --json` snapshot from the pinned release binary |
 | `coverage.json` / `COVERAGE.md` | disposition for every live method and every nested solver backend |
+| `IMPLEMENTATIONS.md` | closed roster of factor bases, oracles, solver engines, matrix engines, target sources, and symmetry references |
 | `LITERATURE.md` | primary-source and repository evidence reviewed before the refresh |
-| `PROTOCOL.md` / `protocol.json` | frozen comparison rules and machine-readable protocol |
-| `specs/` | L2 ECBench specs for the best prime and Koblitz cells and their rho A/A controls |
-| `execution/` | exact build, EKS request, checkpoint, and current blocker receipts |
+| `PROTOCOL.md` / `protocol.json` | draft comparison rules and machine-readable protocol; not yet frozen |
+| `specs/` | nine original broad drafts plus 92 exact-build queue-safe planning shards |
+| `SHARDS.md` | shard arithmetic, panel coverage, target-law limits and fixed reference rules |
+| `analyze_shards.py` | hash-bound replay, pricing-band and paired-comparison driver; validated before data |
+| `execution/` | exact publication identity, both plan-only receipts, shard manifest, and current blocker receipts |
 | `establishment/` | executable claim certificate and fresh all-replay receipts |
 | `REPORT.md` / `REPORT.pdf` | comprehensive frontier and bottleneck report |
 
 ## Execution status
 
-The source builds locally as release binary SHA-256
-`91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b`
-with Rust 1.99.1.  Local execution is limited to spec validation,
-correctness, and counted-operation preflight.  This workspace has no AWS CLI,
-no AWS identity, no Iso Lab connector, and an invalid GitHub token, so it
-cannot freeze and submit the prepared EKS run or publish a PR.  That infrastructure failure
-is retained in `execution/BLOCKER.md`; no local wall result is substituted.
+Trusted publication run 41241104247 built source
+`ff7ad61cfed11908fb79de9dd485b696d0ada779` as static x86-64 release binary
+SHA-256 `924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d`
+and ECR image digest
+`sha256:b8c20f9c151360b78f505360e8d47068c4068f00a8f6faa7ebd3086fa0a791c6`.
+That workflow was publication-only and launched no experiment.
+
+Local execution is limited to registry capture, spec validation, correctness,
+and counted-operation preflight. The exact binary accepted all 92 new shards
+and expanded them to 13,888 processes; each shard reserves at least 1,220
+seconds of the one-hour queue envelope outside child timeout ceilings. No
+benchmark process ran. The mandatory `scripts/checkpoint.sh gate` still cannot
+pass: this workspace has no `CHECKPOINT_UPLOAD_TOKEN`, checkpoint token file,
+AWS CLI, or AWS identity, and its GitHub Actions token now fails authentication.
+The deterministic analysis driver is now hash-bound and passes its 92-spec
+check-only gate. Exact-image runtime preflight still remains before freeze.
+These blockers are retained in `execution/BLOCKER.md`; no local wall result is
+substituted.
+
+The separate GHS re-establishment package is now frozen in
+`research/quartic_ghs_strong_rho_20261114/`. PR #4171 supplied the optimized
+same-target rho implementation. Round A keeps every scientific setting and
+changes only high/top active deadlines to 7,200/10,800 seconds, with low+mid
+then high+top waves. Its historical archive audit reads 261/261 successful IC
+units and all 33 targets from the pinned archive, but no primary strong-rho
+record exists. Live budget, checkpoint, and all-tenant pool receipts remain
+the explicit launch gate `[pcc:unverified]`.
 
 The follow-up establishment audit passed 19/19 cross-artifact checks. The
 optimized-rho session reproduced 720/720 deterministic rows with the current
 binary. The historical F4/F5/F6 sessions reproduced 72/144, with all failures
 retained in `establishment/receipts/`; this narrows those solver claims to the
-original measured binary until the prepared current-source campaign runs.
+original measured binary until the closed current-source campaign runs.
 
 ## Reproduction
 
@@ -99,7 +138,9 @@ target/release/ecbench plan --spec research/ecbench_e2e_frontier_20261031/specs/
 target/release/ecbench plan --spec research/ecbench_e2e_frontier_20261031/specs/koblitz-n13.json --json
 ```
 
-The campaign uses six measured rounds so alternating arm order is balanced.
-The EKS executor must run every spec in `execution/manifest.json`, preserve
-failed and censored rows, replay all records, and only then rebuild the
-frontier and report.
+The final campaign will use six measured rounds so alternating arm order is
+balanced. The roster and queue-envelope split are now explicit in `SHARDS.md`.
+Before submission, the executor must complete exact-image runtime preflight,
+preserve the hash-bound analysis driver, freeze the exact 92-spec roster on
+`main`, pass the checkpoint gate, preserve failed and censored rows, replay all
+records, and only then rebuild the frontier and report.

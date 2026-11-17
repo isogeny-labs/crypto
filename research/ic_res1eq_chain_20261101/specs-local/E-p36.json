@@ -1,0 +1,103 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "res1eq chained restarts, prime curve p36",
+ "description": "research/ic_res1eq_chain_20261101/PROTOCOL.md",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 68719476731,
+    "a": 68719476728,
+    "b": 33,
+    "group_order": 68719022539,
+    "r": 68719022539,
+    "gx": 2,
+    "gy": 51741851039
+   }
+  ],
+  "targets_per_curve": 256,
+  "target_seed": 20261701
+ },
+ "arms": [
+  {
+   "name": "rho",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "res1eq",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual-fused-eq"
+    }
+   }
+  },
+  {
+   "name": "res1eqc",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual-fused-eq-chain"
+    }
+   }
+  },
+  {
+   "name": "res1eqaa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual-fused-eq"
+    }
+   }
+  },
+  {
+   "name": "res2eq",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual-fused-eq"
+    }
+   }
+  },
+  {
+   "name": "res2eqc",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual-fused-eq-chain"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate_measured",
+  "seed": 20261702,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

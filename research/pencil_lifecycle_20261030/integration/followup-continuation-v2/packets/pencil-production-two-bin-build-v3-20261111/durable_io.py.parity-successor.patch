@@ -1,0 +1,33 @@
+--- pencil-production-two-bin-build-v2-20261111/durable_io.py
++++ pencil-production-two-bin-build-v3-20261111/durable_io.py
+@@ -53,7 +53,7 @@
+     assert a['campaign_remaining_seconds']>=2400
+     assert set(a['lease'])=={'task_id','attempt_id','lease_id','fencing_epoch'}
+     assert type(a['lease']['fencing_epoch']) is int and a['lease']['fencing_epoch']>0
+-    assert len(a['exact_tests'])==11 and len(set(a['exact_tests']))==11
++    assert len(a['exact_tests'])==15 and len(set(a['exact_tests']))==15
+     commands=json.loads((p/'commands.json').read_text());assert a['exact_tests']==commands['prerequisite_exact_tests']
+     assert a['production_binaries']=={'ecbench':'src/bin/ecbench.rs','ecbench_retained_attempt_export_v4':'src/bin/ecbench_retained_attempt_export_v4.rs'}
+     assert a['uid']==a['gid']==1000
+@@ -72,7 +72,7 @@
+     synthetic=qualification['synthetic_file_summary'];assert synthetic['attempt_rows']==22680 and synthetic['triplets']==6300 and synthetic['eligible_pairs']==0 and synthetic['scientific_evidence'] is False
+     materialization=json.loads(Path(a['release_receipts']['exporter_materialization']['path']).read_text())
+     assert qualification['materialization_receipt_sha256']==a['release_receipts']['exporter_materialization']['sha256']
+-    assert materialization['status']=='passed' and materialization['source_manifest_sha256']==a['source_manifest_sha256'] and materialization['source_files']==4500
++    assert materialization['status']=='passed' and materialization['source_manifest_sha256']==a['source_manifest_sha256'] and materialization['source_files']==4501
+     combined=json.loads(Path(a['release_receipts']['combined_qualification']['path']).read_text());assert combined['status']=='passed'
+     pub=json.loads(Path(a['release_receipts']['publication']['path']).read_text());assert pub['verified_github_commit']==a['published_source_revision']
+     authorization=json.loads(Path(a['release_receipts']['campaign_authorization']['path']).read_text())
+@@ -80,9 +80,9 @@
+     assert a['fresh_cache_manifest']['sha256'] and a['fresh_cache_manifest']['path']
+     assert a['source_manifest_sha256']==hashlib.sha256((p/'expected-source-manifest.json').read_bytes()).hexdigest()
+     assert a['immutable_manifest']['sha256']=='c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2'
+-    assert a['workspace']=='/var/tmp/pencil-pencil-production-two-bin-build-v2-20261111'
+-    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/pencil-production-two-bin-build-v2-20261111'
+-    assert a['unit']=='pencil-pencil-production-two-bin-build-v2-20261111.service'
++    assert a['workspace']=='/var/tmp/pencil-pencil-production-two-bin-build-v3-20261111'
++    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/pencil-production-two-bin-build-v3-20261111'
++    assert a['unit']=='pencil-pencil-production-two-bin-build-v3-20261111.service'
+     assert a['limits']=={'target_stop_threshold_bytes':6*1024**3,'workspace_stop_threshold_bytes':8*1024**3,'logs_stop_threshold_bytes':256*1024**2,'minimum_free_bytes':6*1024**3,'durable_metadata_stop_bytes':64*1024**2,'durable_total_stop_bytes':384*1024**2,'supervisor_permit_seconds':10}
+     return a
+ 

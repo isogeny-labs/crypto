@@ -1,0 +1,9 @@
+# N83 touched-example release validation result
+
+The [frozen example protocol](EXAMPLES_PROTOCOL.md) and [launcher](launch-examples.sh) were committed at 8e5ffc56747d before execution. The exact source-path diff gate against the passing full-fixture library source a702129de8e5 passed. The Linux arm64 run used the pinned image, hard 12 GiB/zero-swap/four-CPU/512-PID cgroup and the completed library Cargo target as a validation cache.
+
+From **2026-11-16 03:56:14 to 04:15:08 UTC**, a derived outer interval of **1,134 seconds**, all five existing touched examples passed: factor-base export **27/27**, budget controller **5/5**, Linux build producer **2/2**, native arms **15/15**, native preflight **6/6**. Total: **55 passed, zero failed**. Cargo reported 10m55s for the release build; because the target cache was reused, this is not a cold-build timing or a performance comparison. Two other changed example files were deleted on the PR head and have no runnable targets.
+
+The [child receipt](../../reports/run-20261116-full-fixture/examples/child.receipt), [outer receipt](../../reports/run-20261116-full-fixture/examples/outer.receipt) and [Docker inspect](../../reports/run-20261116-full-fixture/examples/container.inspect.json) show child/Docker/launcher exit 0, OOMKilled=false, source_clean=true and successful container removal. The [raw log and visual report](../../reports/run-20261116-full-fixture/examples/REPORT.md) preserve every target summary. The source is local commit 8e5ffc56747d; any later base merge requires affected validation again before push or merge.
+
+This closes the touched-example **local validation gate** at this source snapshot. It does not measure relation yield, rank, descent, answer verification, matched rho or cold one-target IC runtime, and it does not select a factor base.

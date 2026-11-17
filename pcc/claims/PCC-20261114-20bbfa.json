@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T01:28:43Z",
+ "id": "PCC-20261114-20bbfa",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d265c35a0efc1efb609a396e451fd543ab838c21",
+  "model": "",
+  "session": "norm-target-fiber-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "495866857fc2dce9a5139b363c4238ca7ec177eb3b0a001077dbc6771dbd4a4f",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormTargetFiber.supportTargetValue"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual declaration/context hypotheses: CommRing, Nontrivial ring where needed, and Field for field specializations/factor removal. Curve equation, d>=3, bounded remainder and e!=0 premises are explicit. Actual computed norm/division/remainder and base change only; no weighted-degree29, low closure, finder or sub-exponential claim. Unsigned source-bound evidence.",
+ "statement": "Exact source-bound theorem NormTargetFiber.supportTargetValue: theorem supportTargetValue (a b a1 a2 c0 c1 r z : R) (hp : z^2=r^3+a*r+b) : (support a b a1 a2 c0 c1 r z).eval r=(c0+c1*r)*polar a a1 a2 c0 c1 r z"
+}

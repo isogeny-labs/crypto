@@ -1,0 +1,132 @@
+{
+ "schema": "validation-gate/v1",
+ "covers": "sib8-p512-aut3 (ic.pipeline, wwalk ... sib=8,pool=512,aut=3) against rho-cubic (rho.cubic, A = 6) on the j0b7 sessions at p = 34, 37, 40 bits (five curves each) of this directory",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "2ab96f6eb52f37f1ba75a871d5a2ca96e73df2ffaee8f3b628e11de31864970b"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "b31138dbfd385dd71ec64ae27f16ae8bd704f288d567e6b5e4665a90879dea72"
+ },
+ "rho_reference": {
+  "kind": "automorphism_fold",
+  "protocol": "PROTOCOL.md (frozen at 4ae92d4a40): rho-cubic, ecbench rho.cubic, the walk on {+-zeta3^i(P)} (A = 6) of the j = 0 curve's order-3 automorphism, named as the matched rho",
+  "unit": "S = GAE / sqrt(r) per run (ecbench.gae), mean over the 180 paired measured runs of one size; the band adds w GAE per unpriced native operation",
+  "binary_or_process": "ecbench sha256 cb49203e769721be2da6347ecb778e5e8933761c6ce91e29b2e33e8197a76846; both arms in the same session per size (same spec, workloads, targets and seeds)",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 0.47824973376083557,
+    "rho": 0.5145437761946405
+   },
+   "0.1": {
+    "ic": 0.7223223057430705,
+    "rho": 0.56593786448096
+   },
+   "1": {
+    "ic": 2.918975453583182,
+    "rho": 1.0284846590578338
+   }
+  },
+  "gae_band_size": "p = 40 bits (sessions/j0b7-40), the largest size; every size in gae_band_by_size",
+  "gae_band_reading": "AGENTS.md 5a applied alike to both arms: cost.unpriced counts, plus the counted table and sibling work (table_insert_attempts, sibling_second_points, sibling_lift_products), plus one native operation per aut=3 canonicalisation (tw_aut_canonicalisations), as rho-cubic's canonicalisations_uncharged are priced. The committed band.rs reading omits the last term (validator-report.json erratum E1) and is given as gae_band_by_size.*.committed_reading.",
+  "gae_band_by_size": {
+   "j0b7-34": {
+    "symmetric_reading": {
+     "0": {
+      "ic": 0.4915005659478305,
+      "rho": 0.554981112457871
+     },
+     "0.1": {
+      "ic": 0.7384948440828394,
+      "rho": 0.610094962565617
+     },
+     "1": {
+      "ic": 2.9614433472979234,
+      "rho": 1.106119613535333
+     }
+    },
+    "committed_reading": {
+     "0": {
+      "ic": 0.4915005659478305,
+      "rho": 0.554981112457871
+     },
+     "0.1": {
+      "ic": 0.6421039036216438,
+      "rho": 0.610094962565617
+     },
+     "1": {
+      "ic": 1.9975339426859642,
+      "rho": 1.106119613535333
+     }
+    }
+   },
+   "j0b7-37": {
+    "symmetric_reading": {
+     "0": {
+      "ic": 0.49082015226613673,
+      "rho": 0.5449638973345986
+     },
+     "0.1": {
+      "ic": 0.7402055908582923,
+      "rho": 0.5993042471618433
+     },
+     "1": {
+      "ic": 2.984674538187695,
+      "rho": 1.0883673956070403
+     }
+    },
+    "committed_reading": {
+     "0": {
+      "ic": 0.49082015226613673,
+      "rho": 0.5449638973345986
+     },
+     "0.1": {
+      "ic": 0.6428730846330946,
+      "rho": 0.5993042471618433
+     },
+     "1": {
+      "ic": 2.0113494759357176,
+      "rho": 1.0883673956070403
+     }
+    }
+   },
+   "j0b7-40": {
+    "symmetric_reading": {
+     "0": {
+      "ic": 0.47824973376083557,
+      "rho": 0.5145437761946405
+     },
+     "0.1": {
+      "ic": 0.7223223057430705,
+      "rho": 0.56593786448096
+     },
+     "1": {
+      "ic": 2.918975453583182,
+      "rho": 1.0284846590578338
+     }
+    },
+    "committed_reading": {
+     "0": {
+      "ic": 0.47824973376083557,
+      "rho": 0.5145437761946405
+     },
+     "0.1": {
+      "ic": 0.6270604066294029,
+      "rho": 0.56593786448096
+     },
+     "1": {
+      "ic": 1.9663564624465042,
+      "rho": 1.0284846590578338
+     }
+    }
+   }
+  },
+  "order_holds_across_band": false,
+  "order_note": "Unresolved at every size under both readings: sib8-p512-aut3 is below rho-cubic at w = 0 (0.886 / 0.901 / 0.929) and above it at w = 0.1 and w = 1. No ranking of the two arms is supported."
+ }
+}

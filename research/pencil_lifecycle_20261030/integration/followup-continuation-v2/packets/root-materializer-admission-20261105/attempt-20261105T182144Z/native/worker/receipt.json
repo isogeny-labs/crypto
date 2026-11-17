@@ -1,0 +1,58 @@
+{
+  "status": "failed",
+  "revision": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+  "compiler_invoked": false,
+  "errors": [
+    {
+      "repr": "AssertionError('fatal: packfile /home/ec2-user/crypto-pr2304-persist/.git/objects/pack/pack-8e88d862f17b7553b5b19078f38e1547d491f3a5.pack cannot be mapped, check sys.vm.max_map_count and/or RLIMIT_DATA: Cannot allocate memory\\n')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-materializer-admission-20261105/materialize.py\", line 75, in <module>\n    for line in cmd(['git','ls-tree','-r','-l','-z',REV]).split(b'\\0'):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-materializer-admission-20261105/materialize.py\", line 47, in cmd\n    assert ACTIVE.returncode==0,err.decode(errors='replace')[:2000];return out\nAssertionError: fatal: packfile /home/ec2-user/crypto-pr2304-persist/.git/objects/pack/pack-8e88d862f17b7553b5b19078f38e1547d491f3a5.pack cannot be mapped, check sys.vm.max_map_count and/or RLIMIT_DATA: Cannot allocate memory\n\n"
+    }
+  ],
+  "files": 0,
+  "phase": "admission",
+  "outer_cgroup_confirmation_required": true,
+  "elapsed_seconds": 0.36322675200062804,
+  "cgroup": {
+    "path": "/sys/fs/cgroup/system.slice/pencil-root-materialize-t1656-20261105-1800.service",
+    "controls": {
+      "cpu.max": "200000 100000",
+      "memory.max": "4294967296",
+      "memory.swap.max": "0",
+      "pids.max": "512"
+    }
+  },
+  "child_cleanup": [
+    {
+      "pid": 1005662,
+      "pgid": 1005662,
+      "wait_bound_seconds": 2,
+      "errors": [],
+      "outer_cgroup_confirmation_required": true,
+      "reaped_exit_code": 0,
+      "reaped": true,
+      "group_absent": true
+    },
+    {
+      "pid": 1005663,
+      "pgid": 1005663,
+      "wait_bound_seconds": 2,
+      "errors": [],
+      "outer_cgroup_confirmation_required": true,
+      "reaped_exit_code": 0,
+      "reaped": true,
+      "group_absent": true
+    },
+    {
+      "pid": 1005665,
+      "pgid": 1005665,
+      "wait_bound_seconds": 2,
+      "errors": [],
+      "outer_cgroup_confirmation_required": true,
+      "reaped_exit_code": 128,
+      "reaped": true,
+      "group_absent": true
+    }
+  ],
+  "workspace_mount": "{\n   \"filesystems\": [\n      {\n         \"target\": \"/\",\n         \"source\": \"/dev/nvme0n1p1\",\n         \"fstype\": \"xfs\",\n         \"options\": \"rw,noatime,seclabel,inode64,logbufs=8,logbsize=32k,sunit=1024,swidth=1024,noquota\"\n      }\n   ]\n}\n",
+  "output_mount": "{\n   \"filesystems\": [\n      {\n         \"target\": \"/home/ec2-user\",\n         \"source\": \"127.0.0.1:/agent-migration/home\",\n         \"fstype\": \"nfs4\",\n         \"options\": \"rw,relatime,vers=4.1,rsize=1048576,wsize=1048576,namlen=255,hard,noresvport,fatal_neterrors=none,proto=tcp,port=20465,timeo=600,retrans=2,sec=sys,clientaddr=127.0.0.1,local_lock=none,addr=127.0.0.1\"\n      }\n   ]\n}\n"
+}

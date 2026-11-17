@@ -1,0 +1,44 @@
+{
+  "recorded_at": "2026-11-05T17:40:50.630380+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/check.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-adaptive-fibers-20261105/checker"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "positive",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-adaptive-fibers-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/program.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0,
+      "packet_sha256": "0578f57f48a0447ef0b01acf2fd3d04956f1446fac553b6f55c8e2cc2ecf8e19"
+    },
+    {
+      "step": "negative",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-adaptive-fibers-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/negative-program.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 101,
+      "packet_sha256": "925cf9f94958dc30b7d514a362a5885a6ed0a94c116adc3a61f6746cd505e2b8"
+    }
+  ],
+  "binary_sha256": "28a93d4bd27bb5e012be91259d3c64caa35a2e0581a280e610f71a06c3a6452a",
+  "source_sha256": "7924d49492e369a11e75d5916784a2554c42bbbd465fb9e86f576cc0c43f900f",
+  "producer_imports": 0,
+  "negative_control": "negated one nonconstant coefficient; expected pair-mean polynomial rejection"
+}

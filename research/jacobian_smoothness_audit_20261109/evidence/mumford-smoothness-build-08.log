@@ -1,0 +1,19 @@
+MumfordSmoothness.lean:299:61: error: Expected type must not contain free variables
+  CoefficientValid D ↔ ∃ i, representative i = D
+
+Hint: Use the `+revert` option to automatically clean up and revert free variables
+MumfordSmoothness.lean:349:2: error: Type mismatch: After simplification, term
+  representative_splits i
+ has type
+  (uPolynomial (representative i)).Splits ↔ i ≠ 7
+but is expected to have type
+  (uPolynomial (representative i)).Splits ↔ representative i ≠ representative 7
+'MumfordSmoothnessAudit.candidate_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MumfordSmoothnessAudit.valid_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MumfordSmoothnessAudit.canonical_valid_shape' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MumfordSmoothnessAudit.reducedPair_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MumfordSmoothnessAudit.curve_separable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MumfordSmoothnessAudit.smooth_reducedPair_cardinality' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

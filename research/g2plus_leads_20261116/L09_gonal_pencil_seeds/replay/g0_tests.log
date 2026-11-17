@@ -1,0 +1,45 @@
+   Compiling l09 v0.1.0 (/home/user/crypto/research/g2plus_leads_20261116/L09_gonal_pencil_seeds/code)
+warning: field `n_cols` is never read
+   --> src/arms.rs:140:9
+    |
+139 | pub struct State {
+    |            ----- field in this struct
+140 |     pub n_cols: usize,
+    |         ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `p` is never read
+  --> src/curve.rs:10:9
+   |
+ 9 | pub struct Curve {
+   |            ----- field in this struct
+10 |     pub p: u64,
+   |         ^
+
+warning: method `fpm` is never used
+  --> src/field.rs:51:12
+   |
+10 | impl Fp {
+   | ------- method in this implementation
+...
+51 |     pub fn fpm(&self) -> u64 {
+   |            ^^^
+
+warning: `l09` (bin "l09" test) generated 3 warnings
+    Finished `release` profile [optimized] target(s) in 1.68s
+     Running unittests src/main.rs (/tmp/claude-0/-home-user/6fd00ecc-ad17-50e3-84b9-4e7db4d013e1/scratchpad/cargo-target/release/deps/l09-c64db2ac18065f49)
+
+running 9 tests
+test tests::t1_points ... ok
+test tests::t2_pencil_census ... ok
+test tests::t3_line_trials ... ok
+test tests::t4_polys ... ok
+test tests::t5_counters ... ok
+test tests::t6_t7_graph_and_exact ... ok
+test tests::t8_dedup ... ok
+test tests::t9_determinism ... ok
+test tests::t10_integration ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+

@@ -181,6 +181,7 @@ enum Kind {
     KoblitzTable,
     PrimeTable,
     PrimeRootfind,
+    PrimeAlgebraic,
 }
 
 #[derive(Clone, Debug)]
@@ -201,6 +202,7 @@ pub const SPACE_NAMES: &[&str] = &[
     "koblitz-table",
     "prime-table",
     "prime-rootfind",
+    "prime-algebraic",
 ];
 
 /// The space called `name`, for an instance.
@@ -265,6 +267,10 @@ pub fn space_for(name: &str, instance: &InstanceKind) -> Result<Space, String> {
         "prime-rootfind" => {
             want("prime")?;
             Ok(prime_rootfind_space(instance))
+        }
+        "prime-algebraic" => {
+            want("prime")?;
+            Ok(prime_algebraic_space(instance))
         }
         other => Err(format!(
             "unknown space `{other}`; the spaces are {}",
@@ -437,6 +443,117 @@ fn prime_rootfind_space(inst: &InstanceKind) -> Space {
     space
 }
 
+/// Highest tower the prime algebraic space builds: `|V| = 2^t`, so a base
+/// of up to `2^t` columns; `t ≤ log2(MAX_BASE) = 12` keeps it inside the
+/// same memory guard as every other space (and `m · t ≤ 36` tower
+/// variables, inside the engine's 64).  The baseline's `t = ⌈bits/2⌉`
+/// therefore tracks size only up to 24-bit rungs.
+const MAX_TOWER: i64 = 12;
+
+/// The tower height `t = round(t_frac · bits)`, clamped to `[2, MAX_TOWER]`.
+fn tower_height(t_frac: f64, scale: u32) -> i64 {
+    ((t_frac * scale as f64).round() as i64).clamp(2, MAX_TOWER)
+}
+
+/// The algebraic track over prime fields: `pkm-semaev` (S_{m+1} with the
+/// base's membership written as low-degree equations, solved by F4 over the
+/// tower quotient ring) on PKM's auxiliary-curve base, against Semaev's
+/// naive small-abscissa base written in bits on the same oracle and engine.
+///
+/// - `prime-isogeny`: `V = x(R' + <Q>)`, `Q` of order `2^t` on an ordinary
+///   auxiliary curve `E'/F_p` from a seeded search (charged to the
+///   factor-base phase), the zeros of `t` Vélu 2-isogeny x-maps.
+/// - `prime-abscissa-bits`: every abscissa in `[1, 2^t)`, membership as `t`
+///   bits `b_j² = b_j`.  The naive arm, so the search can prefer it.
+///
+/// Only F4 is offered: `engine=exhaustive` counts in another unit (`F_p
+/// multiplications (grid)`), so a rung on it could not be ranked against the
+/// baseline; run it as a separate control.  The aux-search seed is fixed at
+/// 0: a seed is not a design choice, and searching it would select luck.
+/// A supersingular `E'` (`aux=supersingular`, no search) is not offered: its
+/// 2-Sylow has order `2^{v₂(p+1)}`, and on the primes `ic bench` draws that
+/// is usually below `2^t`, so most trials would be refused and the refusals
+/// would poison the sampler's model of the other parameters (a development
+/// smoke on 2026-11-02 saw `v₂(p + 1) = 2` at both rungs).  `ic bench` runs
+/// it directly.
+/// `prime-kummer` is not offered: `ic bench` draws `p` without `2^t | p − 1`,
+/// so it would be refused on most rungs.
+fn prime_algebraic_space(inst: &InstanceKind) -> Space {
+    let params = vec![
+        Param::cat("m", &["2", "3"], "summands of S_{m+1}"),
+        Param::cat(
+            "base",
+            &["prime-isogeny", "prime-abscissa-bits"],
+            "auxiliary-curve tower or the naive small-abscissa interval",
+        ),
+        Param::float(
+            "t_frac",
+            0.2,
+            0.6,
+            false,
+            "tower height t = round(t_frac · bits), clamped to [2, 12]; |V| = 2^t",
+        ),
+        Param::cat(
+            "mode",
+            &["chain", "full"],
+            "S3 chain with free unknowns, or S4 itself",
+        )
+        .when("m", &["3"]),
+        Param::int(
+            "degree",
+            6,
+            16,
+            false,
+            "F4 degree bound; a system it cannot decide is decided on the counted grid",
+        ),
+        Param::cat(
+            "linalg",
+            &["incremental-gauss", "structured-gauss"],
+            "relation matrix",
+        ),
+        Param::cat(
+            "targets",
+            &["walk", "random"],
+            "how trial points are produced",
+        ),
+    ];
+    Space {
+        name: "prime-algebraic",
+        track: Track::Algebraic,
+        doc: "Algebraic track over prime fields: pkm-semaev (S_{m+1} plus low-degree membership, F4) on PKM's auxiliary-curve isogeny tower or the naive small-abscissa interval. Baseline: the naive interval, m = 2, t = ceil(bits/2).",
+        params,
+        kind: Kind::PrimeAlgebraic,
+        instance: inst.clone(),
+    }
+}
+
+/// `(factor base, oracle)` for the prime algebraic space.
+fn prime_algebraic_pipeline(
+    m: &str,
+    base: &str,
+    t: i64,
+    aux: Option<&str>,
+    mode: Option<&str>,
+    degree: i64,
+) -> Result<(String, String), String> {
+    let mut oracle = format!("pkm-semaev:m={m},engine=f4,degree={degree}");
+    if let Some(mode) = mode {
+        oracle.push_str(&format!(",mode={mode}"));
+    }
+    let fb = match base {
+        "prime-isogeny" => format!(
+            "prime-isogeny:t={t},seed=0,aux={}",
+            aux.unwrap_or("ordinary")
+        ),
+        "prime-abscissa-bits" => {
+            oracle.push_str(&format!(",bits={t},lo=0"));
+            format!("prime-abscissa:below={}", 1u64 << t)
+        }
+        other => return Err(format!("prime-algebraic has no base `{other}`")),
+    };
+    Ok((fb, oracle))
+}
+
 // ── Assignment accessors ────────────────────────────────────────────
 
 fn text<'a>(a: &'a Assignment, k: &str) -> Result<&'a str, String> {
@@ -604,6 +721,21 @@ impl Space {
                 cfg.targets = text(a, "targets")?.into();
                 Ok(cfg)
             }
+            Kind::PrimeAlgebraic => {
+                let t = tower_height(float(a, "t_frac")?, scale);
+                let (fb, oracle) = prime_algebraic_pipeline(
+                    text(a, "m")?,
+                    text(a, "base")?,
+                    t,
+                    a.get("aux").and_then(Value::as_str),
+                    a.get("mode").and_then(Value::as_str),
+                    int(a, "degree")?,
+                )?;
+                let mut cfg = self.base_config(scale, fb, oracle, None);
+                cfg.linalg = text(a, "linalg")?.into();
+                cfg.targets = text(a, "targets")?.into();
+                Ok(cfg)
+            }
         }
     }
 
@@ -649,6 +781,22 @@ impl Space {
                 "rootfind-subtract:m=2".into(),
                 None,
             ),
+            // Semaev's naive small-abscissa system on the same oracle and
+            // engine as the candidates: every abscissa in [1, 2^t), written
+            // in t bits, m = 2, t = ⌈bits/2⌉ (about one decomposition per
+            // two targets).  F4 on <S3, b_j² = b_j>, multiply-adds counted.
+            // Provisional: the reference arm the owner approved (the same
+            // system on a pinned msolve, research/prime_ic_program_20261029/
+            // reference_arm) is not implemented, and this is not published
+            // index calculus.  It is the incumbent the auxiliary-curve tower
+            // has to improve on.
+            Kind::PrimeAlgebraic => {
+                let t = (i64::from(scale) + 1).div_euclid(2).clamp(2, MAX_TOWER);
+                let (fb, oracle) =
+                    prime_algebraic_pipeline("2", "prime-abscissa-bits", t, None, None, 12)
+                        .expect("the baseline's base exists");
+                self.base_config(scale, fb, oracle, None)
+            }
             // The leaderboard's prime recipe: a folded table, m = 2, base at
             // the family optimum ≈ 2^(bits/3).
             Kind::PrimeTable => self.base_config(
@@ -938,5 +1086,58 @@ mod tests {
         };
         assert_eq!(bases(&generic), vec!["prime-abscissa"]);
         assert!(bases(&j0).contains(&"glv-orbit".to_string()));
+    }
+
+    #[test]
+    fn the_prime_algebraic_space_is_counted_and_prime_only() {
+        let space = space_for("prime-algebraic", &generic_prime()).unwrap();
+        assert_eq!(space.track, Track::Algebraic);
+        assert!(space.track.counted());
+        assert!(space_for("prime-algebraic", &koblitz0()).is_err());
+    }
+
+    #[test]
+    fn the_prime_tower_cap_is_the_base_memory_guard() {
+        assert_eq!(1u64 << MAX_TOWER, MAX_BASE);
+        assert_eq!(tower_height(0.6, 40), MAX_TOWER);
+        assert_eq!(tower_height(0.01, 16), 2);
+        assert_eq!(tower_height(0.5, 16), 8);
+    }
+
+    #[test]
+    fn prime_algebraic_assignments_build_the_auxiliary_curve_and_naive_arms() {
+        let space = space_for("prime-algebraic", &generic_prime()).unwrap();
+        let mut a = Assignment::new();
+        sample(&mut a, "m", json!("3"));
+        sample(&mut a, "base", json!("prime-isogeny"));
+        sample(&mut a, "t_frac", json!(0.25));
+        sample(&mut a, "mode", json!("chain"));
+        sample(&mut a, "degree", json!(10));
+        sample(&mut a, "linalg", json!("incremental-gauss"));
+        sample(&mut a, "targets", json!("walk"));
+        let cfg = space.build(&a, 16).unwrap();
+        assert_eq!(cfg.factor_base, "prime-isogeny:t=4,seed=0,aux=ordinary");
+        assert_eq!(cfg.oracle, "pkm-semaev:m=3,engine=f4,degree=10,mode=chain");
+        assert_eq!(cfg.regime, "prime");
+        assert_eq!(cfg.solver, None);
+
+        // The naive arm: the base is exactly the interval the oracle writes in bits.
+        sample(&mut a, "m", json!("2"));
+        a.remove("mode");
+        sample(&mut a, "base", json!("prime-abscissa-bits"));
+        let cfg = space.build(&a, 16).unwrap();
+        assert_eq!(cfg.factor_base, "prime-abscissa:below=16");
+        assert_eq!(cfg.oracle, "pkm-semaev:m=2,engine=f4,degree=10,bits=4,lo=0");
+    }
+
+    #[test]
+    fn the_prime_algebraic_baseline_is_the_naive_interval_at_half_the_bits() {
+        let space = space_for("prime-algebraic", &generic_prime()).unwrap();
+        let b = space.baseline(16);
+        assert_eq!(b.factor_base, "prime-abscissa:below=256");
+        assert_eq!(b.oracle, "pkm-semaev:m=2,engine=f4,degree=12,bits=8,lo=0");
+        // ⌈17/2⌉ = 9; the cap holds above 24 bits.
+        assert_eq!(space.baseline(17).factor_base, "prime-abscissa:below=512");
+        assert_eq!(space.baseline(30).factor_base, "prime-abscissa:below=4096");
     }
 }

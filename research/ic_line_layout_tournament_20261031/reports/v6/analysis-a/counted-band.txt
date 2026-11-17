@@ -1,0 +1,25 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm10425-13a2119a | 27.51 | candidate | 64/64 | 20.970 | 22.751 | 38.778 | — |
+| icv1-fp28-tm10425-13a2119a | 27.51 | incumbent | 64/64 | 20.970 | 22.751 | 38.778 | — |
+| icv1-fp28-tm10425-13a2119a | 27.51 | rho-neg | 64/64 | 0.960 | 1.053 | 1.893 | — |
+| icv1-fp28-tm10425-13a2119a | 27.51 | rho-neg-aa | 64/64 | 0.960 | 1.053 | 1.893 | — |
+| icv1-fp28-t15757-68bdca4a | 27.89 | candidate | 64/64 | 20.572 | 22.571 | 40.557 | — |
+| icv1-fp28-t15757-68bdca4a | 27.89 | incumbent | 64/64 | 20.572 | 22.571 | 40.557 | — |
+| icv1-fp28-t15757-68bdca4a | 27.89 | rho-neg | 64/64 | 0.846 | 0.928 | 1.668 | — |
+| icv1-fp28-t15757-68bdca4a | 27.89 | rho-neg-aa | 64/64 | 0.846 | 0.928 | 1.668 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm10425-13a2119a | candidate vs incumbent | unresolved inside the band |
+| icv1-fp28-tm10425-13a2119a | candidate vs rho-neg | rho-neg < candidate |
+| icv1-fp28-tm10425-13a2119a | candidate vs rho-neg-aa | rho-neg-aa < candidate |
+| icv1-fp28-tm10425-13a2119a | incumbent vs rho-neg | rho-neg < incumbent |
+| icv1-fp28-tm10425-13a2119a | incumbent vs rho-neg-aa | rho-neg-aa < incumbent |
+| icv1-fp28-tm10425-13a2119a | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp28-t15757-68bdca4a | candidate vs incumbent | unresolved inside the band |
+| icv1-fp28-t15757-68bdca4a | candidate vs rho-neg | rho-neg < candidate |
+| icv1-fp28-t15757-68bdca4a | candidate vs rho-neg-aa | rho-neg-aa < candidate |
+| icv1-fp28-t15757-68bdca4a | incumbent vs rho-neg | rho-neg < incumbent |
+| icv1-fp28-t15757-68bdca4a | incumbent vs rho-neg-aa | rho-neg-aa < incumbent |
+| icv1-fp28-t15757-68bdca4a | rho-neg vs rho-neg-aa | unresolved inside the band |

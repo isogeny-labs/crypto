@@ -1,0 +1,12 @@
+digraph Branch {
+ graph [rankdir=TB,bgcolor="white",pad=0.15];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,fillcolor="#e6f4ed"];
+ full [label="Existing full polynomial radical\n(A,B)=(cF,dH)"];
+ project [label="Actual degree-preserving branch projection\nQ'=Q-((Q(q)-yT(q))/F(q))F\nGuard: F(q) nonzero"];
+ pair [label="Quotient moment kills every F multiple\nActual pairing is unchanged"];
+ restrict [label="Branch tests detect exactly the full radical\nNo extra branch radical directions"];
+ line [label="Two actual branch equations\nGuards: alpha and F(q) nonzero\n(A,B)=t(alpha F,beta H)"];
+ norm [label="Witness direction nonzero\nActual norm scales to t^2 cG"];
+ next [label="Next: faithful coordinates and exact matrix corank\nPublic-input certificate finder remains open",fillcolor="#fff2d5"];
+ project -> pair -> restrict; full -> line; restrict -> line -> norm -> next;
+}

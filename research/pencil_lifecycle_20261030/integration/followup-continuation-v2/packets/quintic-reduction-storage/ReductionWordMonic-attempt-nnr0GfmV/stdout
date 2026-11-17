@@ -1,0 +1,47 @@
+/var/tmp/pencil-reduction-monic-20261101-v1/ReductionWordMonic.lean:9:13: error: unsolved goals
+case succ
+xs : List UInt64
+hn : Normal xs
+fuel : ℕ
+⊢ xs.getLast? = some 0 → trimFuel fuel xs.dropLast = xs
+/var/tmp/pencil-reduction-monic-20261101-v1/ReductionWordMonic.lean:9:31: warning: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [trimFuel]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-reduction-monic-20261101-v1/ReductionWordMonic.lean:46:20: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-reduction-monic-20261101-v1/ReductionWordMonic.lean:46:30: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/pencil-reduction-monic-20261101-v1/ReductionWordMonic.lean:47:16: error: Application type mismatch: The argument
+  rfl
+has type
+  ?m.65 = ?m.65
+but is expected to have type
+  True
+in the application
+  And.intro rfl
+/var/tmp/pencil-reduction-monic-20261101-v1/ReductionWordMonic.lean:53:21: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-reduction-monic-20261101-v1/ReductionWordMonic.lean:53:31: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-reduction-monic-20261101-v1/ReductionWordMonic.lean:53:3: error: Type mismatch: After simplification, term
+  inverse_scale_shape p (xs.getLast he) xs hp hb hc hl ha hanz
+ has type
+  Canon p (PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs) ∧
+    Normal (PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs) ∧
+      (PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs).length = xs.length ∧
+        (PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs).getLast? = some 1 ∧
+          ∃ c, c ≠ 0 ∧ wordsPoly p (PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs) = C c * wordsPoly p xs
+but is expected to have type
+  Canon p (if some (xs.getLast he) = some 1 then xs else PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs) ∧
+    Normal (if some (xs.getLast he) = some 1 then xs else PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs) ∧
+      (if some (xs.getLast he) = some 1 then xs else PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs).length =
+          xs.length ∧
+        (if some (xs.getLast he) = some 1 then xs
+              else PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs).getLast? =
+            some 1 ∧
+          ∃ c,
+            c ≠ 0 ∧
+              wordsPoly p
+                  (if some (xs.getLast he) = some 1 then xs
+                  else PegcdWord.scale p (inverseGenerator p (xs.getLast he)) xs) =
+                C c * wordsPoly p xs

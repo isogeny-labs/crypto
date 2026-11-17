@@ -1,0 +1,21 @@
+digraph APSLeads {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.2", ranksep="0.4", fontname="Helvetica", label="APS follow-ups | proposals, no measured speedups", labelloc=t];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3f8", color="#577089", fontname="Helvetica", fontsize=11, margin="0.14,0.1"];
+  edge [color="#577089", fontname="Helvetica", fontsize=10];
+  existing [label="Existing APS implementation\n6 encodings + replay/export components", fillcolor="#e4efdf"];
+  chart [label="L1: nonhorizontal chart\nU = t^2; V = c/t\n2 parameters; horizontal exception", style="rounded,filled,dashed"];
+  traces [label="L2: F4 trace pool\nReuse native record/replay\nMismatch -> charged fallback", style="rounded,filled,dashed"];
+  frontier [label="L3: grow base\nDisjoint new-tuple cells\nIncomplete old regions retained", style="rounded,filled,dashed"];
+  unequal [label="L4: unequal profiles\nJoint size + elimination choice\nActual informative yield", style="rounded,filled,dashed"];
+  { rank=same; chart; traces; }
+  { rank=same; frontier; unequal; }
+  chart -> frontier [style=invis, weight=20];
+  traces -> unequal [style=invis, weight=20];
+  correctness [label="Pending: exact correctness checks\nComplete witnesses + informative recovery\nRefusal, exception and timeout cases", fillcolor="#fff3d5"];
+  admission [label="Pending performance admission\nSuccessful checkpoint + full accounting/replay/export\nFrozen held-out 4-size protocol", fillcolor="#fff3d5"];
+  compare [label="Pending: cold complete-cost comparison\nLearning, setup, failures, decoding, memory\nKeep negative and inconclusive outcomes", fillcolor="#fff3d5"];
+  existing -> {chart traces frontier unequal} [style=dashed];
+  {chart traces frontier unequal} -> correctness [style=dashed];
+  correctness -> admission [style=dashed];
+  admission -> compare [style=dashed];
+}

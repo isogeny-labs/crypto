@@ -1,0 +1,105 @@
+{
+  "recorded_utc": "2026-11-05T15:05:47.992374+00:00",
+  "commands": [
+    {
+      "argv": [
+        "systemctl",
+        "show",
+        "pencil-root-positive-t1566-1nchhc1e.service",
+        "--property=LoadState,ActiveState,SubState,MainPID,Result,InvocationID"
+      ],
+      "exit": 0,
+      "stdout": "MainPID=0\nResult=success\nLoadState=not-found\nActiveState=inactive\nSubState=dead\nInvocationID=\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "sudo",
+        "-n",
+        "journalctl",
+        "-u",
+        "pencil-root-positive-t1566-1nchhc1e.service",
+        "--no-pager",
+        "-n",
+        "40"
+      ],
+      "exit": 0,
+      "stdout": "-- No entries --\n",
+      "stderr": ""
+    }
+  ],
+  "task": {
+    "id": "eb8051d9-af31-4b09-99fb-65e0bb11e22f",
+    "ref": "T-1566",
+    "project_id": "850c4e0f-a5aa-4610-940c-20271c73ac52",
+    "status": "failed",
+    "visibility": "team_summary",
+    "owner": "ec2-user",
+    "priority": 0,
+    "risk_level": "unknown",
+    "scopes": [],
+    "fencing_epoch": 8,
+    "attempts_count": 4,
+    "updated_at": "2026-11-03T22:54:58.571505Z",
+    "created_at": "2026-11-03T22:15:12.629372Z",
+    "title": "Prepare actual root pencil adapter Some/None positive control",
+    "harness": "cli"
+  },
+  "task/attempts": {
+    "attempts": [
+      {
+        "id": "ef3721d5-916a-4071-85f7-56da7b574147",
+        "attempt_number": 1,
+        "state": "stale",
+        "role": "implementer",
+        "harness": "cli",
+        "reasoning_effort": "medium",
+        "worktree_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029",
+        "project_config_sha": "5bb65035656aa150d404852e3e6c7ab445660ae102ac52d0c919f5057162552f",
+        "failure_class": "lease_expired",
+        "ended_at": "2026-11-03T22:25:20.576834Z",
+        "last_event_at": "2026-11-03T22:25:20.576834Z"
+      },
+      {
+        "id": "0cec663c-89df-49e3-a5e1-10a983f4e339",
+        "attempt_number": 2,
+        "state": "stale",
+        "role": "implementer",
+        "harness": "cli",
+        "reasoning_effort": "medium",
+        "worktree_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029",
+        "project_config_sha": "5bb65035656aa150d404852e3e6c7ab445660ae102ac52d0c919f5057162552f",
+        "failure_class": "lease_expired",
+        "ended_at": "2026-11-03T22:35:42.560622Z",
+        "last_event_at": "2026-11-03T22:35:42.560622Z"
+      },
+      {
+        "id": "5020024a-ee52-413f-99ac-366d5d4f4995",
+        "attempt_number": 3,
+        "state": "stale",
+        "role": "implementer",
+        "harness": "cli",
+        "reasoning_effort": "medium",
+        "worktree_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029",
+        "project_config_sha": "5bb65035656aa150d404852e3e6c7ab445660ae102ac52d0c919f5057162552f",
+        "failure_class": "lease_expired",
+        "ended_at": "2026-11-03T22:46:06.558537Z",
+        "last_event_at": "2026-11-03T22:46:06.558537Z"
+      },
+      {
+        "id": "149c98ac-1fcd-460e-9aa2-970ecd8171c2",
+        "attempt_number": 4,
+        "state": "stale",
+        "role": "implementer",
+        "harness": "cli",
+        "reasoning_effort": "medium",
+        "worktree_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029",
+        "project_config_sha": "5bb65035656aa150d404852e3e6c7ab445660ae102ac52d0c919f5057162552f",
+        "failure_class": "lease_expired",
+        "ended_at": "2026-11-03T22:54:58.571505Z",
+        "last_event_at": "2026-11-03T22:54:58.571505Z"
+      }
+    ]
+  },
+  "temporary_workspace_exists": false
+}

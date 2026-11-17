@@ -1,0 +1,5 @@
+# Session 2026-11-02
+
+Previous turn verified real local driver controls. T-1403 reserved this new math packet. Added tracked modular elimination and a separate direct certificate checker. Initial manifest lookup failed before reading inputs; preserved source/logs and corrected only files nesting. All64 retained streams yield checked certificates:39 determined scalar 2 and25 target-varying affine families. Fresh checker matches6900 edge rows to raw input and rejects four actual-artifact mutations; four synthetic cases also pass with corruptions rejected. No collector rerun or scientific execution. Independent review remains pending; full 1260 scope preserved. PDF/SVG/CSV/JSON and raw certificate archive target PR3237.
+
+Strengthened scalar certificates with explicit particular solutions after identifying the conditional-consistency boundary; kept conditional-v1 sources/artifacts. Final fresh checker verifies all 64 and rejects five actual mutations plus an inconsistent-system isolator. Classifications stay39/25.

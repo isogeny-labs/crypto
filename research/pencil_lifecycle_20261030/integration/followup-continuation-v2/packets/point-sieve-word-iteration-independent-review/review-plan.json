@@ -1,0 +1,47 @@
+{
+  "task": "T-1543",
+  "created_at": "2026-11-03T21:34:54.768614+00:00",
+  "producer_commit": "05dadecd27cb4ab52d0eaef9e750ff312ac55c6a",
+  "publication_confirmation": "Root confirmed published05dadecd27 before review",
+  "source_sha256": "51cef3539b371165a910d8c3167d57f01d40ac1e5f9598bbc448c457006bbf6d",
+  "claim": "New UInt64 finite-difference iteration composition preserves canonical states and ring polynomial evaluation, building on prior Difference proofs. Exact theorem hypotheses and scope to inspect.",
+  "reviewer": "assembler_independent_review_v2",
+  "new_composition_author": "first_information",
+  "independence": "Reviewer authored original Rust recurrence and imported Difference. Did not author WordIteration. Nonblind inherited context; independent review only of newly composed step/iteration/sequence bridge, root assesses sufficiency.",
+  "prior": "Expect canonical add refinement sufficient to induct step correctness; check initializer, simultaneous old delta state, wrap bounds, sequence order and exceptional/empty cases rather than presume full Rust/compiler equivalence.",
+  "joints": [
+    {
+      "owner": "reviewer",
+      "joint": "Canonical initializer and transition",
+      "attack": "Use coefficients near modulus and changed update ordering; establish bounds before each UInt64 addition."
+    },
+    {
+      "owner": "reviewer",
+      "joint": "Iteration induction",
+      "attack": "Check zero state and successor exact simultaneous-step semantics; reject induction claiming unrestricted u64 modulus."
+    },
+    {
+      "owner": "reviewer",
+      "joint": "Ordered output bridge",
+      "attack": "Check x order and off-by-one length, final update, and no hidden premise assuming desired projection."
+    },
+    {
+      "owner": "reviewer",
+      "joint": "Source fidelity",
+      "attack": "Compare model with integrated Rust active slice padding, capture-before-advance and three updates; keep arbitrary Rust control/compiler equivalence outside proof."
+    }
+  ],
+  "proposed_validation": {
+    "outer_seconds": 300,
+    "kill_grace_included_seconds": 5,
+    "address_space_bytes": 8589934592,
+    "lean_heap_MiB": 3500,
+    "lean_internal_stack_KiB": 16384,
+    "os_stack_MiB": 10,
+    "workers": 1,
+    "retries": 0,
+    "maximum_lean_invocations": 8,
+    "work": "Fresh exact precursor/WordIteration/Controls build,17namedaxiom readbacks plus up to4 reviewer declarations, one known-false control; recursive source/dependency/toolchain pre/post hashes and fail-closed axiom audit. No scientific workload."
+  },
+  "execution_release_received": false
+}

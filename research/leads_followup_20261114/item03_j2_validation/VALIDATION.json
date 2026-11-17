@@ -1,0 +1,48 @@
+{
+ "schema": "validation-gate/v1",
+ "rows": [
+  "j2-percolation-fb-size"
+ ],
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "80985d9e3d8b5178e015d827ed0f7d53f4f6f460ec4021aa4f6e4e66e6642191"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "4e9bfda8206252b2a8111340a4aaa10d3fa8cf89d2840cbcf32c56f5a09cfb2e"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "N4v2 PROTOCOL.md (frozen 82a9e87de3): negation-map rho is the pre-registered comparison, plain rho alongside; the J2 PROTOCOL.md (dccf37b62b, amended 0056acedae) names no rho reference",
+  "unit": "M-eq (F_q multiplication equivalents: mul + r_inv*inv + r_lmul*lmul, every attempt charged), unpriced hash + cmp priced at w in {0, 0.1, 1} GAE, GAE = gae_mul + r_inv*gae_inv; same calibration (J2 Xeon medians) on both sides in gae_band",
+  "binary_or_process": "IC c-sweep: research/leads_chase_20261112/j2/v2.bin (rustc 1.97.0, Xeon 2.3 GHz, 2026-11-12, sha 183810cf...); rho: N4v2 v2_grid (rustc 1.93.1, Apple M4 Pro, 2026-10-25, sha 07f1b742...). Counters replay identically across both builds (V3, rho replays) but the arms did not run in one binary or process",
+  "matches_protocol": false,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": false,
+  "gae_band": {
+   "0": {
+    "ic": 449062843.63128006,
+    "rho": 372780990024.0595
+   },
+   "0.1": {
+    "ic": 594594377.3826879,
+    "rho": 462073805014.0779
+   },
+   "1": {
+    "ic": 1904378181.1453602,
+    "rho": 840134053311.3827
+   }
+  },
+  "order_holds_across_band": true,
+  "notes": {
+   "size": "q=4194271 (k=22), DL1 c=1.60 held-out mean vs the cheaper of rho-plain / rho-neg at each w (post-hoc 6-run supplement; the frozen 2-run k=22 rho fails the calibration rule); k=21 in evidence/recompute.json ic_vs_rho",
+   "strongest_available": "true in the symmetry sense: j(E0) is not in F_q and not 0 or 1728 for all 22 instances, so negation is the only automorphism; rho is single-trail with one inversion per step (batched inversion would cut at most 56+r_inv to about 56+3 M-eq per step, a factor <= 1.4, which cannot move a ratio of 1e-3)",
+   "order_holds_across_band": "IC < rho at every w, both rho arms, both sizes, frozen and strict readings; the within-IC order c=1.60 < c=2.00 holds only under the frozen reading (validator-report.json V6, V11)"
+  }
+ },
+ "disposition": "insufficient_evidence",
+ "signed": false,
+ "signature": null,
+ "unsigned_reason": "no keyring signature is available in this session"
+}

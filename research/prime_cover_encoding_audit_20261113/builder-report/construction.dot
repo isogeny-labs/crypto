@@ -1,0 +1,13 @@
+digraph paired {
+ graph [rankdir=TB, bgcolor="white", nodesep=0.3, ranksep=0.35, fontname="Helvetica"];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4fb", fontname="Helvetica", fontsize=12];
+ edge [fontname="Helvetica", fontsize=10];
+ input [label="One SHA-pinned saved case\ncurve, map, coset, target"];
+ direct [label="Direct substitution\n18 variables / 19 equations\ncubic maximum degree 12"];
+ lifted [label="Graph coordinates x_i = N(g y_i0)\n22 variables / 23 equations\ncubic maximum degree 4"];
+ check [label="Exact coefficient projection\n19 originals reproduced; 4 graph constraints vanish", fillcolor="#e7f3e7"];
+ pending [label="Pending: consumer, genuine witness, admitted solver comparison\nNo measured solver gain or complexity bound", fillcolor="#fff1d9"];
+ input -> direct; input -> lifted;
+ direct -> check; lifted -> check;
+ check -> pending [style=dashed];
+}

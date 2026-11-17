@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T19:35:39Z",
+ "id": "PCC-20261115-a65a43",
+ "kind": "statement",
+ "producer": {
+  "commit": "f651965dba321339f0b7615769bfa3e46230df67",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/orientation_yx_validation_20261115/unit-tests.log",
+    "sha256": "81f2a81b4357a1eaa4ed36abe316f87795a525fd9c9f2194597465ba21d4c20d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/orientation_yx_validation_20261115/validation.rs",
+    "sha256": "e192ed535c44974a7cd3ed60cb2cc49e0a986d02fd92ddf18496d4fa8507a237"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/orientation_yx_validation_20261115",
+ "statement": "Producer correctness checks for ordinary binary-curve third summation polynomials: six native Rust tests pass, including 24782 affine triples on 18 curves, 19664 nonzero-x hybrid triples, formal characteristic-two anchor identity, trace/sign negative controls and repeated/zero-x counterexamples. This is a mathematical-model check, not an execution-verified or independently signed claim, library integration test, solver benchmark or general higher-arity validation."
+}

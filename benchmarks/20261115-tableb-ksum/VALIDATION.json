@@ -1,0 +1,38 @@
+{
+ "note": "Counted-cost measurement (L0) of the k = 5 sum table against the strictest pair-table incumbent on three Table B prime curves (study research/ic_tableb_ksum_20261115). The rho reference is the matched negation-map rho arm every session runs beside every other arm. gae_band is the fp24 row (ic = ksum5); every row's band is in research/ic_tableb_ksum_20261115/band/. [pcc:unverified]",
+ "replay_certificate": {
+  "path": "../../research/ic_tableb_ksum_20261115/replay-certificate.json",
+  "sha256": "1f135a6e61ceea57e9ce9c0b9386f9f08999f23a91662db89e3b9ae48a04e114"
+ },
+ "rho_reference": {
+  "band_source": "../../research/ic_tableb_ksum_20261115/band/P24.json (ecbench band --ranks, 3 replicate sessions, fp24)",
+  "binary_or_process": "one ecbench binary, sha256 7d46e5ee0778a741193c4af08274fa4861406182e479b06770f5dd8303c5c9cb; every arm of a session runs in it",
+  "gae_band": {
+   "0": {
+    "ic": 6.383007476400372,
+    "rho": 1.0872239713560443
+   },
+   "0.1": {
+    "ic": 7.157859173063904,
+    "rho": 1.1847649638714108
+   },
+   "1": {
+    "ic": 14.13152444303565,
+    "rho": 2.0626338965097077
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "matched rho.negation reference arm (role reference), run in every session on the same curve, targets and algorithm seeds as every IC arm; prime-order curves (A = 2 usable automorphisms), so negation is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r)); native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a)"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "../../research/ic_tableb_ksum_20261115/validator/validator-report.json",
+  "sha256": "8d09e0cb302c4b8f47c60b91ef2b7764bce823053295e2e44ad7f0e7346de106"
+ }
+}

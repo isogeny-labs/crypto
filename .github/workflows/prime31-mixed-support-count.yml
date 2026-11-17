@@ -1,0 +1,72 @@
+name: Prime31 mixed 4+4 exact integer-net theorem (Rust)
+
+on:
+  push:
+    branches: [research/prime31-mixed-base-count-20261117]
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_mixed_signature_count.rs
+      - research/prime31_ic_20261115/mixed_base/MIXED_FORMAL_SUPPORT_THEOREM_20261117.md
+      - .github/workflows/prime31-mixed-support-count.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_mixed_signature_count.rs
+      - research/prime31_ic_20261115/mixed_base/MIXED_FORMAL_SUPPORT_THEOREM_20261117.md
+      - .github/workflows/prime31-mixed-support-count.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-mixed-support:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout theorem and Rust controls
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout immutable native Rust arithmetic dependencies
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+      - name: Install Rust 1.100
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay theorem-only Rust source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f research/prime31_ic_20261115/mixed_base/MIXED_FORMAL_SUPPORT_THEOREM_20261117.md
+          cp research/prime31_ic_20261115/native/examples/prime31_mixed_signature_count.rs aps-pinned/research/prime31_ic_20261115/native/examples/
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_mixed_signature_count.rs > prime31-mixed-count-source.sha256
+          git -C aps-pinned rev-parse HEAD >> prime31-mixed-count-source.sha256
+      - name: Check Rust exact combinatorics including exhaustive B2 B3 B4 overlap
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_mixed_signature_count
+      - name: Recompute exact 381-billion net result
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_mixed_signature_count > prime31-mixed-count.json
+          jq -e '
+             .schema == "prime31.mixed_4p4_integer_signature_theorem.v1" and
+             .half_nets_per_base == "618885" and
+             .mixed_distinct_formal_nets == "381434284809" and
+             .ordered_formal_pairs == "383018643225" and
+             .homogeneous_distinct_formal_nets == "5654193417" and
+             .actual_group_coverage_or_ECDLP_speedup_verified == false
+          ' prime31-mixed-count.json
+      - name: Retain raw exact theorem output and source identity
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-mixed-formal-support-theorem
+          path: |
+            prime31-mixed-count-source.sha256
+            prime31-mixed-count.json
+          if-no-files-found: warn
+          retention-days: 30

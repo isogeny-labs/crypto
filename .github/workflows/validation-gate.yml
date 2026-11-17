@@ -11,6 +11,37 @@ name: validation-gate
 # This runs on every pull request (no paths filter): the check is cheap, and a
 # filter would let a row slip in through a file the filter forgot.
 
+# Store data the gate reads through VALIDATION.json (session records named as
+# raw_data, replay inputs) and that this file never names: tools/artifacts/
+# wire_workflows.py pulls these declared paths with the ones it finds.
+# tools/artifacts pull: benchmarks/20261029-ic-aimed-gather/registry-binding-20261116
+# tools/artifacts pull: benchmarks/20261115-fes-k13-runpod/session experiments/31_solve_cost
+# tools/artifacts pull: experiments/37_solver_b_pivot_count
+# tools/artifacts pull: research/blindspots_20261018/01-fp2-gaudry-k2/raw
+# tools/artifacts pull: research/cheon_ecbench_20261022/sessions
+# tools/artifacts pull: research/cheon_ecbench_wide_20261106/sessions
+# tools/artifacts pull: research/ecbench_generator_orbit_20261022/sessions
+# tools/artifacts pull: research/ecbench_overhead_review_20261022/sessions
+# tools/artifacts pull: research/fes_k13_validated_20261112/runpod-a1/session
+# tools/artifacts pull: research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst
+# tools/artifacts pull: research/four_followups_20261021/results/matched
+# tools/artifacts pull: research/four_followups_20261021/results/pencil-pilot
+# tools/artifacts pull: research/ic_aimed_gather_20261023/aa2_20261029/runs
+# tools/artifacts pull: research/ic_packed_filter_20261029
+# tools/artifacts pull: research/ic_gw_bl_reuse_20261115
+# tools/artifacts pull: research/ic_gw_nrm_lz_20261115
+# tools/artifacts pull: research/ic_tableb_binary_ksum_20261115
+# tools/artifacts pull: research/ic_ksum_prune_20261115
+# tools/artifacts pull: research/ic_tableb_ksum_20261115/sessions
+# tools/artifacts pull: research/icb_large_prime_n53_n61_20261029/sessions
+# tools/artifacts pull: research/kummer_coordinates_20261022/results
+# tools/artifacts pull: research/kummer_differential_collector_20261022/results
+# tools/artifacts pull: research/ml_cryptanalysis_pt_lgrow_k1_20261114
+# tools/artifacts pull: research/pencil_sparse_20261022/results
+# tools/artifacts pull: research/pkm_tower_rootfind_20261018/sessions
+# tools/artifacts pull: research/projective_law_followup_20261022/results
+# tools/artifacts pull: research/wallfix_runpod_20261114/sessions/run2
+
 on:
   pull_request:
   push:
@@ -53,7 +84,12 @@ jobs:
         with:
           fetch-depth: 1
           filter: blob:none
+      # TEMPORARY store-outage fallback (2026-11-16): the artifact store
+      # bucket returns AllAccessDisabled/403 for every object. Keep the gate
+      # usable by continuing without the pulled data; remove this tolerance
+      # and the continue-on-error below once the store is reachable again.
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -72,7 +108,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/blindspots_20261018/01-fp2-gaudry-k2/raw research/ecbench_generator_orbit_20261022/sessions research/ecbench_overhead_review_20261022/sessions research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/ic_aimed_gather_20261023/aa2_20261029/runs research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/pencil_sparse_20261022/results research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results
+          python3 tools/artifacts/artifacts.py pull --jobs 16 benchmarks/20261115-fes-k13-runpod/session experiments/31_solve_cost experiments/37_solver_b_pivot_count research/blindspots_20261018/01-fp2-gaudry-k2/raw research/cheon_ecbench_20261022/sessions research/cheon_ecbench_wide_20261106/sessions research/ecbench_generator_orbit_20261022/sessions research/ecbench_overhead_review_20261022/sessions research/fes_k13_validated_20261112/runpod-a1/session research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/ic_aimed_gather_20261023/aa2_20261029/runs research/ic_gw_bl_reuse_20261115 research/ic_gw_nrm_lz_20261115 research/ic_ksum_prune_20261115 research/ic_packed_filter_20261029 research/ic_tableb_binary_ksum_20261115 research/ic_tableb_ksum_20261115/sessions research/icb_large_prime_n53_n61_20261029/sessions research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/ml_cryptanalysis_pt_lgrow_k1_20261114 research/pencil_sparse_20261022/results research/pkm_tower_rootfind_20261018/sessions research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results research/wallfix_runpod_20261114/sessions/run2
       - name: Fetch the base tip
         if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.local_runner)
         env:
@@ -80,8 +116,8 @@ jobs:
         run: |
           git fetch --no-tags --depth=1 --filter=blob:none origin \
             "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
-          # validation_gate.py treats an unreadable base file as absent, so
-          # fail here rather than let the freeze comparison pass silently.
+          # validation_gate.py refuses a base ref that does not resolve; check
+          # it here too so the failure names the fetch.
           git rev-parse --verify "origin/$BASE_REF^{commit}"
       - uses: actions/setup-python@v5
         # EKS runners may default to Python 3.12; the dedicated local runner
@@ -95,7 +131,11 @@ jobs:
             research/postgb_linear_stage_20261026 \
             research/ic_m2_linear_ladder_20261024 \
             research/s5_plain_c4_options_20261019 \
-            benchmarks/20261029-ic-aimed-gather/registry-binding-20261030
+            benchmarks/20261029-ic-aimed-gather/registry-binding-20261030 \
+            benchmarks/20261029-ic-aimed-gather/registry-binding-20261101 \
+            benchmarks/20261029-ic-aimed-gather/registry-binding-20261105
+      - name: Historical aimed-gather numeric custody controls
+        run: python3 benchmarks/20261029-ic-aimed-gather/registry-binding-20261116/test_numeric_fidelity.py
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Reject stale native curve catalog bindings

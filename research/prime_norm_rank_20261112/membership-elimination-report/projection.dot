@@ -1,0 +1,15 @@
+digraph projection {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.20,ranksep=0.30,pad=0.12];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",color="#254d70",fontname="DejaVu Sans",fontsize=11,margin="0.12,0.08"];
+ edge [color="#254d70",arrowsize=0.7];
+ original [label="Frozen original RR input:23 variables,25 quadrics/linear rows\nExact original bytes preserved; m=5,t=4,seed2"];
+ core [label="Keep only a1,a2,c0,c1\nC=c0+c1 X; target row uniquely determines a0"];
+ norm [label="Actual target-completed A; N=A^2-f C^2\nN divisible by X-r; U=N/(X-r), monic degree5"];
+ division [label="Monic division uniquely recovers Q3,R3,Q4\nRemaining condition: R4=0, five coefficients"];
+ equality [label="Substitute recovered lift into all25 original equations\n20 vanish identically; last5 equal the reduced constraints"];
+ trade [label="Recorded trade:4 variables,5 polynomials,degree24\nExpanded input191962 bytes; original1554 bytes",fillcolor="#fff1d8",color="#90631f"];
+ controls [label="Supplied plant + four fixed perturbations agree\nBad auxiliary rejected; no coefficient/branch/log search"];
+ cost [label="OPEN: solve the structured reduced constraints efficiently\nNo solver-cost gain or sub-exponential bound established",fillcolor="#fff1d8",color="#90631f"];
+ original -> core -> norm -> division -> equality -> trade -> cost;
+ equality -> controls;
+}

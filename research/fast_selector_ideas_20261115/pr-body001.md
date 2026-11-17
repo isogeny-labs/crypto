@@ -1,0 +1,5 @@
+Develop three candidate selectors for independent colored point lists on prime-field elliptic curves: rational interpolation of a principal zero divisor, batching the two-point completions of implicit anchor families, and redundant representations with canceling auxiliary shifts. Each specifies a witness interface, full-cost target, missing lemma and first discriminating check. These are unimplemented hypotheses and hand/literature reformulations; PCC-20261115-ac8e3b remains unverified. [pcc:unverified]
+
+The plan retains the complete end-to-end algorithm criterion and the hidden-label recovery contract. No numerical/native/paid run, implementation or speed result. The source-linked plan includes an editable diagram and a three-page PDF; all pages were visually inspected. KB was unavailable, and full-paper access gaps are explicit. [pcc:unverified]
+
+This planning branch starts from main rather than extending PR4311 through its frozen PCC-history conflict, reported in comment6900752042. Old inputs, evidence and001/002/003 receipts remain unchanged. Required CI must assess this branch's own head; a planning PR does not complete the algorithm.

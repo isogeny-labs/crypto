@@ -1,0 +1,133 @@
+{
+  "schema": "ic-tournament.local-plan/v1",
+  "selected_at": "2026-11-15T22:20:34.247741+00:00",
+  "authorization": "Owner explicitly selected local execution; same four rungs, original deadline and zero automatic retries retained.",
+  "algorithm_revision": "a10cb7b4f8e48f094efe70c31d9a24b6d72aee4a",
+  "worktree": "/Volumes/SSD990-2/ic-boundary-local-20261115",
+  "original_deadline_utc": "2026-11-16T08:11:12.640103+00:00",
+  "retry_allowance": 0,
+  "run_prefix": "mac-20261115T2220Z",
+  "beats": [
+    {
+      "beat": "koblitz.compact_orbit.n61_single_target",
+      "n": 61,
+      "a": 0,
+      "workloads": 64,
+      "tune_workloads_per_k": 4,
+      "k_candidates": [
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "command": [
+        "python3",
+        "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py",
+        "launch-single",
+        "--beat",
+        "koblitz.compact_orbit.n61_single_target",
+        "--workloads",
+        "64",
+        "--tune-workloads",
+        "4",
+        "--cpu",
+        "CPU_SELECTED_FROM_RESERVED_LINUX_CORE"
+      ],
+      "timeout_seconds": 10800
+    },
+    {
+      "beat": "koblitz.compact_orbit.n71_single_target",
+      "n": 71,
+      "a": 0,
+      "workloads": 16,
+      "tune_workloads_per_k": 1,
+      "k_candidates": [
+        200,
+        600
+      ],
+      "command": [
+        "python3",
+        "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py",
+        "launch-single",
+        "--beat",
+        "koblitz.compact_orbit.n71_single_target",
+        "--workloads",
+        "16",
+        "--tune-workloads",
+        "1",
+        "--cpu",
+        "CPU_SELECTED_FROM_RESERVED_LINUX_CORE"
+      ],
+      "timeout_seconds": 10800
+    },
+    {
+      "beat": "koblitz.compact_orbit.n73_single_target",
+      "n": 73,
+      "a": 0,
+      "workloads": 16,
+      "tune_workloads_per_k": 1,
+      "k_candidates": [
+        200,
+        600
+      ],
+      "command": [
+        "python3",
+        "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py",
+        "launch-single",
+        "--beat",
+        "koblitz.compact_orbit.n73_single_target",
+        "--workloads",
+        "16",
+        "--tune-workloads",
+        "1",
+        "--cpu",
+        "CPU_SELECTED_FROM_RESERVED_LINUX_CORE"
+      ],
+      "timeout_seconds": 10800
+    },
+    {
+      "beat": "koblitz.compact_orbit.n83_single_target",
+      "n": 83,
+      "a": 1,
+      "workloads": 16,
+      "tune_workloads_per_k": 1,
+      "k_candidates": [
+        200,
+        600
+      ],
+      "command": [
+        "python3",
+        "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py",
+        "launch-single",
+        "--beat",
+        "koblitz.compact_orbit.n83_single_target",
+        "--workloads",
+        "16",
+        "--tune-workloads",
+        "1",
+        "--cpu",
+        "CPU_SELECTED_FROM_RESERVED_LINUX_CORE"
+      ],
+      "timeout_seconds": 10800
+    }
+  ],
+  "runtime": {
+    "os": "macOS",
+    "architecture": "arm64",
+    "compiler": "Rust 1.99.1 native Apple toolchain",
+    "cargo_build_jobs": 2,
+    "rayon_threads_per_arm": 1,
+    "cpu_pinning": null,
+    "isolation": "shared Mac; other research jobs active; no Linux core reservation",
+    "timing_admission": "diagnostic shared-host wall timings; do not promote a primary speedup from these readings"
+  },
+  "stage_time_policy": "After one build, share remaining original deadline across remaining rungs; each attempt capped at three hours. Preserve full workloads and K grids; timeouts/failures retained.",
+  "cloud_disposition": {
+    "original_job_uid": "751ec9e0-1e39-4c6e-a592-cc76c66a59a9",
+    "original_pod_uid": "9f402ce0-5662-49d9-91d4-6caad89e16fe",
+    "measurement_started": false,
+    "action": "UID-guarded suspension followed by foreground deletion; verified no associated pods remain; cloud observer stopped"
+  }
+}

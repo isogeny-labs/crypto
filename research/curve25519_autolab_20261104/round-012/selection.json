@@ -1,0 +1,88 @@
+{
+  "holdout_spec_sha256": {},
+  "round": 12,
+  "rule": "lowest mean S at w = 0 among candidates whose every run verified; a challenger only if below inc at w = 0",
+  "schema": "ic_autolab.selection/v1",
+  "selected": "2026-11-04T04:45:48Z",
+  "sizes": {
+    "24": {
+      "alt_w1": {
+        "factor_base": "prime-projected-abscissa:size=12,scan_cap=192",
+        "family": "ksum4s",
+        "n": 12,
+        "name": "ksum4s-n12",
+        "oracle": "ksum:m=4",
+        "params": {
+          "targets": "stride"
+        }
+      },
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=17,scan_cap=272",
+            "family": "ksum3",
+            "n": 17,
+            "name": "ksum3-n17",
+            "oracle": "ksum:m=3"
+          },
+          "s": [
+            7.931489037782345,
+            8.860571799988671,
+            17.22231665984561
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=28,scan_cap=448",
+            "family": "ksum3s",
+            "n": 28,
+            "name": "ksum3s-n28",
+            "oracle": "ksum:m=3",
+            "params": {
+              "targets": "stride"
+            }
+          },
+          "s": [
+            12.16434975984219,
+            12.641924357417917,
+            16.940095735599463
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=12,scan_cap=192",
+            "family": "ksum4s",
+            "n": 12,
+            "name": "ksum4s-n12",
+            "oracle": "ksum:m=4",
+            "params": {
+              "targets": "stride"
+            }
+          },
+          "s": [
+            7.413073432230425,
+            8.175846741921854,
+            15.040806529144737
+          ],
+          "status": "verified"
+        }
+      ],
+      "inc_s": [
+        6.856788133119969,
+        7.3588431679276916,
+        11.877338481197187
+      ],
+      "rho_s": [
+        1.2375297978775617,
+        1.3495550406573065,
+        2.3577822256750114
+      ],
+      "sel": null,
+      "session_id": "ECBS1hfca3141f22a2",
+      "status": "no_challenger"
+    }
+  },
+  "track": "generic"
+}

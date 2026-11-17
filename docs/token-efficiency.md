@@ -100,3 +100,11 @@ Each of these was found in real transcripts, and each changes the answer:
 `python3 tools/test_token_usage.py` covers deduplication, the subagent patch
 and lower-bound flag, per-component pricing, the Haiku long-context
 threshold, fast mode, the action file (both paths) and the ledger summary.
+
+## Session ledger (Stop hook)
+
+`.claude/hooks/token-usage-hook.sh` keeps one line per session in
+`benchmarks/token-usage/ledger.jsonl`. Read it with
+`python3 tools/token_usage.py summary benchmarks/token-usage/ledger.jsonl`.
+First metric: US$ per card and per evidence record (cards and evidence
+records counted from the same dates; `--units` for a card session).

@@ -1,0 +1,20 @@
+{
+ "created_at": "2026-11-06T17:51:20Z",
+ "id": "PCC-20261106-e8b5a4",
+ "kind": "statement",
+ "producer": {
+  "commit": "63f168e4aaad06dc1d6999d8e814891140c081ee",
+  "model": "codex",
+  "session": "aps-cost-leads-20261106"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "path": "research/aps_cost_leads_20261106/validation/early-boundaries.json",
+   "sha256": "e499ffb03921576275b1a22383d911c8fdfe0d7c366c94a4fbd71eb20e84dcf3"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/aps_cost_leads_20261106/validation/early-boundaries.json; only the explicitly recorded development commands and their separate source boundaries",
+ "statement": "The scoped APS development-boundaries receipt records local producer observations, including failed and superseded tests. It reports an earlier APS-only 39-test pass, an earlier 53-library plus five-CLI standalone export pass, a three-declaration Lean build and strict stable standalone lint at their separate boundaries. No receipt is a final-source full-suite pass, performance measurement, source checkpoint or signed independent execution verdict."
+}

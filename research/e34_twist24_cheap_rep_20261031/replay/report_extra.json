@@ -1,0 +1,157 @@
+{
+ "id": "VAL-20261101-146a90",
+ "replay": {
+  "certificate": {
+   "path": "replay-certificate.json",
+   "sha256": "cb59334f82d38f72f539a2a7db462be49533388e46744f1bf8f3837058d6e2df"
+  },
+  "comparison": {
+   "path": "replay/replay_comparison.json",
+   "sha256": "e618d3122e03d8ac72da208445cb6c30e230faa63f55cc551e12856b5ccbfde3"
+  },
+  "summary": "fresh build of bd0118f39 from a clean export; all eight curves replayed in a nonce-drawn order (nonce 7d808504472a563714d9994b38194cc2: 601, 241, 769 mandatory, then 1069, 997, 733, 337, 541), the identity stage on all eight and the negative-control walks at p = 241: 10 of 10 records byte-identical to the committed ones (34,076 leaves compared, all identical), 1,296 walks all correct, the ten logs text-identical"
+ },
+ "gate_refusal": "No VALIDATION.json is written for E34 (coordinator's decision, 2026-11-01). E34 is a rho-against-rho measurement with no index-calculus arm: there is no measured S in this unit for the gate's gae_band 'ic' slot. E18's psi arm, whose distances the result corrects, is linear algebra only with a modelled handover (note §9.3), not a measured end-to-end S. Putting a rho walk in the 'ic' slot would pass the gate by relabelling. Same reason as E29 (research/e29_twists_20261030/validator-report.json, gate_refusal). This report and the replay certificate stand on their own as evidence that E34's records and figures are what they say.",
+ "rho_reference_finding": {
+  "statement": "The strongest walk implemented on E18's eight j = 0 curves, pooled, at each weight of the band: the mul-lean cheap order-24 walk at 0 GAE and the op-lean cheap order-24 walk at 0.1 and 1 GAE, in each arithmetic; the cheapest arithmetic is Karatsuba at every weight (pooled cost per sqrt(n) 26.904, 97.956, 724.552 at 0, 0.1, 1 GAE). Against E29's order-6 walk, the walk E18's psi rows were measured against: 1.632 / 1.254 / 1.126 (schoolbook), 1.627 / 1.232 / 1.122 (Karatsuba).",
+  "band_ranking": "The op-lean cheap order-24 walk is ranked above both order-6 walks across the band, pooled, in both arithmetics (point estimates). The mul-lean walk is not ranked across the band against either order-6 walk (E29 order 6 / mul-lean 1.632 / 1.120 / 0.948 schoolbook; cheap order 6 / mul-lean 1.572 / 1.042 / 0.864): it supplies the 0 GAE factor as the cheaper implementation of the same walk (identical steps and digests). Against the band-ranked op-lean walk alone the 0 GAE factor is 1.563 (schoolbook) / 1.544 (Karatsuba), a handover shift of 2.58 / 2.51 bits instead of 2.83 / 2.81.",
+  "gae_band_values_for_the_record": {
+   "unit": "mean over the 8 curves of walk F_p multiplications / sqrt(n), every emitted native operation at w * 97, [d]G check excluded, schoolbook",
+   "0": {
+    "e29_order6": 52.876,
+    "strongest": 32.401,
+    "strongest_walk": "Order24CheapMulLean"
+   },
+   "0.1": {
+    "e29_order6": 129.78,
+    "strongest": 103.453,
+    "strongest_walk": "Order24Cheap"
+   },
+   "1": {
+    "e29_order6": 821.92,
+    "strongest": 730.048,
+    "strongest_walk": "Order24Cheap"
+   }
+  }
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "claim": "§9.39 G2.138 row: cheap order-24 representative '15.16-15.18' F_p multiplications a call",
+   "recomputed": "15.161-15.168 per curve (15.16-15.17); the producer's per-curve table prints 15.16-15.17 too",
+   "effect": "none: G2.138 [12, 20] holds"
+  },
+  {
+   "id": "E2",
+   "claim": "§9.39 per-step table: mul-lean '112.1-115.1' F_p multiplications a step (schoolbook, p >= 541)",
+   "recomputed": "112.08-115.05 (p = 541: 115.047), i.e. 112.1-115.0; 115.1 is 115.05 rounded twice",
+   "effect": "none"
+  },
+  {
+   "id": "E3",
+   "claim": "§9.39 per-step table: cheap order 24 '25.82' native operations a step (schoolbook, p >= 541)",
+   "recomputed": "25.811 pooled over p >= 541 (per curve 25.806-25.819); the other four arms' figures in that column reproduce as pooled values",
+   "effect": "none: G2.140 [22, 30] holds; the task's '25.8' agrees"
+  },
+  {
+   "id": "E4",
+   "claim": "§9.39 band table, row E29 / E29 schoolbook, 'curves: order 24 / unresolved: 0 / 0 (order 6 on all 8)'",
+   "recomputed": "0 / 3: with every operation priced, E29's order-6 walk is cheaper across the band on 5 of 8 curves (schoolbook) and 6 of 8 (Karatsuba); on p = 601, 997, 1069 (schoolbook; 601 and 1069 Karatsuba) E29's order-24 walk is cheaper at 0 GAE (1.202, 1.042, 1.133, as E29 found) and dearer at 0.1 and 1 GAE, so the order changes inside the band per curve",
+   "effect": "none on any registered verdict or on which walk is the matched reference. The §9.33 correction holds as the note states it (pooled: 0.962 / 0.562 / 0.453 schoolbook, 0.884 / 0.535 / 0.449 Karatsuba, below 1 at every weight); per curve it holds at 1 GAE on 8 of 8 (one op per step had 7 of 8 the other way), not across the band on all 8"
+  },
+  {
+   "id": "E5",
+   "claim": "§9.39: 'on the other five it is cheaper at 0 (1.16-1.86)'",
+   "recomputed": "1.159-1.457 on those five (schoolbook; 1.135-1.427 Karatsuba); 1.86 is p = 601 (1.863), one of the three curves where the cheap order-24 walk is cheaper across the band; 1.16-1.86 is the range over all eight",
+   "effect": "none; the 1 GAE range 0.78-0.99 on the five reproduces"
+  },
+  {
+   "id": "E6",
+   "claim": "§9.39 Identity (a): the counted copies reproduce all 512 E29 records 'in every field'",
+   "recomputed": "true for every field except visit_digest on the 256 order-24 records, which E29 recorded as 0 (E29's order-24 walk computed no digest); disclosed in tables.md, not in §9.39. The order-24 digest identity is carried instead by the walk identity (cheap = built, 768/768) and the cross-arithmetic agreement",
+   "effect": "none on G2.135"
+  }
+ ],
+ "heuristic_validation_checks": [
+  {
+   "check": "pre-registered prediction",
+   "result": "G2.134-G2.143 committed in 45378560d (2026-10-31 16:45 UTC) before the code commit bd0118f39 (17:16) and the records commit d3a23e791 (17:47); §9.38 unchanged since (checked byte for byte). The walk-cost prediction is the counted per-step cost model of §9.38, not a fitted distribution."
+  },
+  {
+   "check": "sample integrity",
+   "result": "seeds 1000-1015 per arm and arithmetic in the records and in order; identity sampling (200 random points + 8 forced x0 = 0 per curve) is deterministic in the binary and reproduced byte for byte; sample sizes are the registered ones"
+  },
+  {
+   "check": "null control for the statistical signal",
+   "result": "The deciding quantity is a ratio of walk costs, dominated by step counts of 16 walks per curve and arm. Null: the rho heuristic sqrt(pi n / (2 m)) for class size m. Observed order 6 at 0.924 and order 24 at 1.086 of the heuristic (mean over curves); pooled steps ratio 1.701 against the heuristic's 2.000. Per-curve steps-ratio standard errors are 13-21 %, so the per-curve ranks (3 of 8 against the cheap order-6 walk) are within sampling noise. The pooled cheap / cheap ratio at 1 GAE, 1.026 +- 0.067 (schoolbook) and 1.021 +- 0.066 (Karatsuba), is 0.4 and 0.3 standard errors from 1: the registered point-estimate rule ranks it, but the measurement does not resolve it statistically. Under the heuristic's step counts the ratio would be 1.772 / 1.373 / 1.207, so the shortfall comes from the observed pooled steps ratio, 1.701 +- 0.111, which is 2.7 standard errors below 2 (E29 registered [1.7, 2.3] for it, G2.105). What should happen as the parameter grows: the representative's per-step cost is independent of n and the heuristic steps ratio is constant, so the ratios should not trend with n; the per-curve steps ratio (1.29-2.10) shows no monotone trend in n over p = 241-1069."
+  },
+  {
+   "check": "correspondence validity",
+   "result": "not applicable (direct walks on the curves, no substitute sampler)"
+  },
+  {
+   "check": "scale binding",
+   "result": "p = 241-1069, n = 2^31.7-2^40.2, 8 curves x 16 walks x 5 arms x 2 arithmetics; the representative costs are size-independent, but the ranking at 1 GAE rests on the measured steps ratio of these 8 curves (assumption: it does not drift with n)"
+  }
+ ],
+ "cost_model_checks": [
+  {
+   "check": "unit declared",
+   "result": "F_p multiplications (F_p4 products at 19 schoolbook / 13 Karatsuba), the walk's set-up (32 jump points, start point) and the cheap arms' per-walk constants (40 or 42 F_p multiplications, 12 mod-n operations) included, the [d]G = Q check excluded; native operations cmp, neg, modn, hash, table each one count, priced at w * 97 F_p multiplications"
+  },
+  {
+   "check": "optimistic assumptions flagged",
+   "result": "every native operation is priced alike (a 40-bit mod-n multiplication and an F_p comparison both count one); GAE 97 (schoolbook affine addition) is used for the Karatsuba arm too, with 79 as a sensitivity; the walk stores every visited point (no distinguished points) and no batching of inversions across walks is implemented for these j = 0 walks (E27's batched arithmetic would lower rho further)"
+  },
+  {
+   "check": "memory reported alongside time",
+   "result": "not reported by the producer. The walks store every visited class representative, so memory is proportional to steps: the order-24 walk stores 1.70x fewer points (pooled). Not a cost claim of E34; noted as a limitation"
+  },
+  {
+   "check": "per-attempt cost x inverse success probability",
+   "result": "every walk is run to its collision and every one of the 1,280 (and 16 control) walks succeeds (correct = true, recovered log 271 on every curve), so the measured mean cost per walk is the expected cost; no success-probability scaling applies"
+  }
+ ],
+ "observations": [
+  "The planted logarithm is 271 on all eight curves (E29's instances); the walks start from random combinations aG + bQ, so its size does not help them.",
+  "The counters obey identities derived from the counting rule on all 1,280 walks: table = 2 steps - escapes - 1, hash = 2 (steps - escapes - 1), mod-n outside the representative = 2 + 4 (steps - escapes - 1) + 5 escapes + 4 (+ 12 set-up on the cheap arms); every cmp and neg is the representative's.",
+  "The omitted-candidate control mismatches exactly members / 12 = 416 per curve: in a class of 24 members with twelve distinct abscissae the omitted candidate (3, 2) is the winner for exactly two members (+-), so the control is caught at its analytic rate.",
+  "Every n is prime and n = 1 mod 24 (validator's own Miller-Rabin), so an order-24 multiplier group exists; the order-24 action itself rests on E29's kill-test records (order_lambda_p = 24, group_order = 24) and E29's validator's own group computation (research/e29_twists_20261030/validator-report.json, K.2).",
+  "E34's code commit touches only examples/e34_cheap_rep.rs, src/cryptanalysis/mod.rs and src/cryptanalysis/twist24_rep.rs; E29's functions are untouched by it. Since then twist24_rep.rs changed by one behaviour-identical clippy line and quartic_folds.rs gained E33's pipeline-report fields; neither is in the replayed binary (built from bd0118f39)."
+ ],
+ "limitations": [
+  "Operation counts only; local container, not isolab-eks (unreachable). No wall time is claimed or compared.",
+  "The build target was on tmpfs, not the briefed shared target (disk); the build is still a fresh, independent build from a clean export of the recorded commit.",
+  "The producer's in-crate unit tests (twist24_rep::tests) were not re-run: the release test build needs about 9 GB of disk, which this container does not have; the replay of every record stands in for them.",
+  "The x = 0 identity case has no point on these curves (b0 t^3 is not a square), so it is untested by points, as §9.39 says.",
+  "Per-curve ranks and the 1 GAE pooled margin over the cheap order-6 walk are within the sampling error of 16 walks per curve and arm (see heuristic_validation_checks); the registered ranking rule uses point estimates.",
+  "The order-24 group order itself is not recomputed here from curve coefficients (they are not in E34's records); it rests on E29's kill test and its validator.",
+  "A CI job may move data files to the artifact store after push (it moved E34's PNGs); every replayed file is pinned by SHA-256 in the certificate."
+ ],
+ "review_attestation": {
+  "joints_owned": [
+   "replay of E34's recorded runs from a fresh build of bd0118f39",
+   "independent recompute of E34's headline figures, the band, the per-curve ranks, the E18 consequence, the §9.33 correction and G2.134-G2.143",
+   "pre-registration ordering"
+  ],
+  "sources_read": [
+   "/home/user/crypto-autoresearcher/docs/agent-runtime-core.md",
+   "/home/user/crypto-autoresearcher/agents/validator.md",
+   "docs/session-logs/2026-11-01.md",
+   "docs/VALIDATION_GATE.md",
+   "scripts/validation_gate.py (lines 150-260 and constants)",
+   "research/e27_walk_20261030/VALIDATION.json, replay-certificate.json and validator-report.json (key summary), replay/build.json (template)",
+   "research/e29_twists_20261030/validator-report.json (pooling definition, walk_band_5a, gate_refusal)",
+   "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.33, §9.38 (HEAD and 45378560d), §9.39, the opening of §9.3, lines mentioning E18",
+   "experiments/38_twist24_cheap_rep/: binary_commit.txt, identity.json, negative_walks.json, stage_r_p*.json and their logs; tables.md line 5 and its per-curve rows (grep), read after the recompute only to locate the source of disagreeing figures, not used in any computation",
+   "experiments/34_twist24_stage_r/: stage_r_p241.json, stage_r_rest.json, binary_commit.txt",
+   "experiments/26_quartic_folds_psi.json (structure only)",
+   "src/cryptanalysis/twist24_rep.rs at bd0118f39 (NativeOps, rho_j0_counted, test header) and examples/e34_cheap_rep.rs at bd0118f39 (the code under test, to run it and to read the counting rule)",
+   "docs/ic/LEADERBOARD.md (grep for E18, E27, E29)",
+   "scratchpad: the E32 validator's build.log first and last lines (build duration) and directory listings; another validator's export_tree.sh (40 lines, not used)"
+  ],
+  "read_sibling_reports": false,
+  "sibling_note": "The E32 and E33 validators' reports exist untracked in the same worktree; they were not opened.",
+  "verdict_on_joints": "holds"
+ }
+}

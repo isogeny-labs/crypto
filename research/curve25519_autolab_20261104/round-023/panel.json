@@ -1,0 +1,131 @@
+{
+  "created": "2026-11-04T07:54:07Z",
+  "round": 23,
+  "rules": {
+    "exploration_slots": 4,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3f",
+      "ksum4f",
+      "ksum5f",
+      "wsum-b4",
+      "wsum-b5",
+      "wsum-b12",
+      "wsum-b20",
+      "wsum-b8",
+      "wsum-b16",
+      "wsum-b24",
+      "wsum-b30",
+      "wsum2-b30",
+      "wsum2-b60",
+      "wsum2-b120",
+      "wsum2-b200"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "28": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=4,scan_cap=64",
+            "family": "wsum-b12",
+            "n": 4,
+            "name": "wsum-b12-n4",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "incumbent neighbourhood: N = 1.2 x 3"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2-b120",
+            "n": 2,
+            "name": "wsum2-b120-n2",
+            "oracle": "wsum:coef=120,free=1"
+          },
+          "reason": "cross-size transfer: wsum2-b120-n2 is the k = 32 incumbent at N / N_a = 0.004"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=4,scan_cap=64",
+            "family": "wsum-b8",
+            "n": 4,
+            "name": "wsum-b8-n4",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "cross-size transfer: wsum-b8-n3 is the k = 24 incumbent at N / N_a = 0.037"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2-b30",
+            "n": 2,
+            "name": "wsum2-b30-n2",
+            "oracle": "wsum:coef=30,free=1"
+          },
+          "reason": "exploration: family wsum2-b30 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2-b60",
+            "n": 2,
+            "name": "wsum2-b60-n2",
+            "oracle": "wsum:coef=60,free=1"
+          },
+          "reason": "exploration: family wsum2-b60 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wsum2-b200",
+            "n": 2,
+            "name": "wsum2-b200-n2",
+            "oracle": "wsum:coef=200,free=1"
+          },
+          "reason": "exploration: family wsum2-b200 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+            "family": "wsum-b30",
+            "n": 3,
+            "name": "wsum-b30-n3",
+            "oracle": "wsum:coef=30,free=1"
+          },
+          "reason": "exploration: family wsum-b30 untried at k = 28, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+        "family": "wsum-b12",
+        "n": 3,
+        "name": "wsum-b12-n3",
+        "oracle": "wsum:coef=12,free=1"
+      },
+      "incumbent_s": [
+        2.9492570322298226,
+        3.221967811129487,
+        5.6763648212264695
+      ],
+      "tried_before": 47
+    }
+  },
+  "track": "generic"
+}

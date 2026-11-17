@@ -579,7 +579,19 @@ fn ladder(args: &[String]) {
         row["y_columns"] = json!(ncols);
         row["y_oracle_setup_ops"] = json!(oracle.setup_ops);
         row["y_oracle_build_s"] = json!(tb.elapsed().as_secs_f64());
-        let mut arms = vec![Arm::new("d4", col, ncols, 0, r)];
+        // E20 (`RESEARCH_GLV_INVARIANT_FACTOR_BASES.md` §9.7): double large
+        // primes on the same τ_T-folded columns, small base the first
+        // ⌈cols^{3/4}⌉ classes, and its F' = F null control.
+        let s = ((ncols as f64).powf(0.75)).ceil() as usize;
+        let dlp_col: Vec<(usize, i64)> = col
+            .iter()
+            .map(|&(c, v)| (if c < s { c } else { c + 1 }, v))
+            .collect();
+        let mut arms = vec![Arm::new("d4", col.clone(), ncols, 0, r)];
+        if only.contains("d4dlp") {
+            arms.push(Arm::new("d4-dlp", dlp_col, s, 2, r));
+            arms.push(Arm::new("d4-dlp-null", col, ncols, 2, r));
+        }
         let cap = 2000 * ncols as u64;
         let (st, mut out) = run_stream(
             &inst,

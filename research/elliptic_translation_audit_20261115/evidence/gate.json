@@ -1,0 +1,49 @@
+{
+  "archive": "research/elliptic_translation_audit_20261115/evidence/gate.tar.gz",
+  "files": 5,
+  "unique_objects": 5,
+  "losslessly_deduplicated": false,
+  "roundtrip_equal": true,
+  "inventory": [
+    {
+      "member": "research_elliptic_translation_audit_20261115_lean/audit.log",
+      "bytes": 8640,
+      "sha256": "ea9962d0490b8c589b6ed8bf04b6797e57fdc208e4f436fa29a9c22a58192dd1"
+    },
+    {
+      "member": "research_elliptic_translation_audit_20261115_lean/build.log",
+      "bytes": 27712,
+      "sha256": "15756d85aa9d4455eee92c83a2843e324e6f36a5a3b2fd467dd364b2d2eb5652"
+    },
+    {
+      "member": "research_elliptic_translation_audit_20261115_lean/cache.log",
+      "bytes": 138,
+      "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+    },
+    {
+      "member": "research_elliptic_translation_audit_20261115_lean/source-build.log",
+      "bytes": 27712,
+      "sha256": "d83e109e8e46e39d025fd179f78751932aba058567ec6357adf152ff900d8eb1"
+    },
+    {
+      "member": "research_elliptic_translation_audit_20261115_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+    }
+  ],
+  "declarations": 82,
+  "failing": 0,
+  "trusted_native": 0,
+  "new_modules": 12,
+  "new_concrete_modules": 12,
+  "credited_dependency_modules": 84,
+  "credited_prior_gate": 35,
+  "new_source_warnings": 0,
+  "inherited_advisories": {
+    "build.log": [],
+    "source-build.log": [],
+    "audit.log": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ]
+  }
+}

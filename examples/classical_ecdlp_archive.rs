@@ -540,6 +540,8 @@ fn native_solve(archive: &Archive) -> Result<usize, String> {
             r: case.r,
             cofactor: 1,
             generator: (case.generator[0], case.generator[1]),
+
+            representation: None,
         };
         let report = engine::zero_minor_solve(
             &inst,

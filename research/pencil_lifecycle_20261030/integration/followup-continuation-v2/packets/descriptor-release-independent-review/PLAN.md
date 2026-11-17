@@ -1,0 +1,11 @@
+# Independent descriptor release review plan
+Frozen2026-11-03 before reading candidate implementation. T1480.
+Reviewer authored enclosing private supervisor, not descriptor release writer; integration context is nonblind. Producer DESIGN.md ed60668b4c86e4e7970b0d756968e4475a6b4db0719453ed4953cda0e2079f6b read as proposed contract, not evidence of implementation.
+
+Prior: safe publication can be descriptor-relative after stable process identity checks, but liveness remains racy. Kernel proc-root magic-link traversal must be a single narrow exception to ordinary nofollow rules. pidfd prevents PID identity confusion but does not freeze lifetime. RENAME_NOREPLACE prevents overwriting an existing final token. Primary documentation checked: man7 pidfd_open(2),proc_pid_root(5),renameat2(2), and cited kernel proc documentation in design.
+
+Load-bearing checks: pin decimal PID/procdir/starttime/pidfd, container identity and cgroup ancestry; root readonly and exact held work descriptor tmpfs16MiB flags/custody; fixed component staging with37 canonical UUID/newline bytes, explicit0444 under077, nlink1 and readback; prepublication revalidation and deadline; single atomic noreplace attempt with possible-release uncertainty preserved; no final-token rollback or retry; all FD cleanup paths and inode-bound staging cleanup.
+
+Attacks: PID reuse between anchors; process death between revalidation and rename; root/work replaced or symlink; writable root/wrong tmpfs/capacity/flags; stale container/cgroup; existing final regular/link/FIFO/directory; short/zero write; permission failure; unsupported ABI; signal around rename; malformed UUID; stale inode during cleanup. Check producer controls cover material cases and add bounded independent controls where useful. Live proc writes/container/systemd/Docker are prohibited.
+
+One software-control wrapper only, maximum120 seconds total including cleanup,2GiB address-space ceiling. Exact candidate source/tests hash before and after. Mock proc/FS properties plus temporary-file operations only. No scientific run, runtime admission, or budget decision. Freeze exact execution command after producer pins; preserve failure and do not retry beyond this envelope. PDF/SVG/JSON review and scoped commit after root grants index.

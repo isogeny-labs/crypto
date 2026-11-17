@@ -1,0 +1,10 @@
+digraph intervals {
+ graph [rankdir=TB,bgcolor="white",pad="0.12",nodesep="0.28",ranksep="0.28"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=11,margin="0.15,0.10"];
+ edge [color="#455566"];
+ model [label="Actual interval point set S; |S| = s\nP,Q independent uniform in S; |G| = r"];
+ count [label="Explicit nontrivial character-sum bound M\nActual triple count: |T(S) − s³/r| ≤ Ms",fillcolor="#e7f4ed"];
+ rate [label="Normalize by the actual input-pair count s²\n|Pr[P+Q in S] − s/r| ≤ M/s"];
+ result [label="Abscissa interval density 1/b; balanced b\nPr[retain old constraint] ~ 1/b, not near one",fillcolor="#fbe8df"];
+ model -> count -> rate -> result;
+}

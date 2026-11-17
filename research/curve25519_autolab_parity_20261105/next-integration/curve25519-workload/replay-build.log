@@ -1,0 +1,178 @@
+warning: method `is_square` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:283:8
+    |
+162 | pub trait PrimeField: Clone + Debug + Send + Sync {
+    |           ---------- method in this trait
+...
+283 |     fn is_square(&self, a: Self::Elem) -> bool {
+    |        ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated items `zeros` and `axpy` are never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:381:12
+    |
+380 | impl<F: PrimeField> LazyRow<F> {
+    | ------------------------------ associated items in this implementation
+381 |     pub fn zeros(f: &F, len: usize) -> Self {
+    |            ^^^^^
+...
+403 |     pub fn axpy(&mut self, f: &F, off: usize, c: F::Elem, row: &[F::Elem]) {
+    |            ^^^^
+
+warning: method `p` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:892:12
+    |
+858 | impl Fp32 {
+    | --------- method in this implementation
+...
+892 |     pub fn p(&self) -> u64 {
+    |            ^
+
+warning: method `p` is never used
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:1318:12
+     |
+1292 | impl Fp64 {
+     | --------- method in this implementation
+...
+1318 |     pub fn p(&self) -> u64 {
+     |            ^
+
+warning: associated items `from_hex`, `inv_canonical`, `inv_plain_binary`, and `legendre_euler` are never used
+    --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/fp_backend.rs:1924:12
+     |
+1889 | impl<const N: usize, const SPARE: bool> FpWide<N, SPARE> {
+     | -------------------------------------------------------- associated items in this implementation
+...
+1924 |     pub fn from_hex(hex: &str) -> Self {
+     |            ^^^^^^^^
+...
+2040 |     pub fn inv_canonical(&self, a: &[u64; N]) -> [u64; N] {
+     |            ^^^^^^^^^^^^^
+...
+2045 |     pub fn inv_plain_binary(&self, a: [u64; N]) -> Option<[u64; N]> {
+     |            ^^^^^^^^^^^^^^^^
+...
+2053 |     pub fn legendre_euler(&self, a: [u64; N]) -> i32 {
+     |            ^^^^^^^^^^^^^^
+
+warning: associated items `merge` and `total` are never used
+  --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/research/curve25519_autolab_parity_20261105/next-integration/curve25519-workload/boundary-extraction.rs:9:12
+   |
+ 8 | impl FieldOps {
+   | ------------- associated items in this implementation
+ 9 |     pub fn merge(&mut self, other: FieldOps) {
+   |            ^^^^^
+...
+15 |     pub fn total(ledgers: &[GroupOps]) -> FieldOps {
+   |            ^^^^^
+
+warning: methods `gae` and `merge` are never used
+  --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/research/curve25519_autolab_parity_20261105/next-integration/curve25519-workload/boundary-extraction.rs:44:12
+   |
+42 | impl GroupOps {
+   | ------------- methods in this implementation
+43 |     /// Group-addition equivalents: additions plus doublings.
+44 |     pub fn gae(&self) -> f64 {
+   |            ^^^
+...
+50 |     pub fn merge(&mut self, other: GroupOps) {
+   |            ^^^^^
+
+warning: methods `neg`, `key`, `native_walk_adder`, `native_lane_walk_adder`, `supports_native_lane_walk`, and `counts_field_ops` are never used
+  --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/research/curve25519_autolab_parity_20261105/next-integration/curve25519-workload/boundary-extraction.rs:64:8
+   |
+58 | pub trait CountedGroup {
+   |           ------------ methods in this trait
+...
+64 |     fn neg(&self, p: Self::Elt) -> Self::Elt;
+   |        ^^^
+65 |     /// A key that identifies the element (both walks must agree on it).
+66 |     fn key(&self, p: &Self::Elt) -> u64;
+   |        ^^^
+...
+70 |     fn native_walk_adder(
+   |        ^^^^^^^^^^^^^^^^^
+...
+81 |     fn native_lane_walk_adder(
+   |        ^^^^^^^^^^^^^^^^^^^^^^
+...
+92 |     fn supports_native_lane_walk(&self) -> bool {
+   |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+99 |     fn counts_field_ops(&self) -> bool {
+   |        ^^^^^^^^^^^^^^^^
+
+warning: method `key` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/curve25519_wide.rs:211:12
+    |
+ 75 | impl Curve25519Wide {
+    | ------------------- method in this implementation
+...
+211 |     pub fn key(&self, p: &WidePoint) -> u64 {
+    |            ^^^
+
+warning: fields `group`, `generator`, `target`, and `name` are never read
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/curve25519_wide.rs:300:9
+    |
+299 | pub struct WideInstanceCtx<'a> {
+    |            --------------- fields in this struct
+300 |     pub group: &'a Curve25519Wide,
+    |         ^^^^^
+301 |     pub generator: WidePoint,
+    |         ^^^^^^^^^
+302 |     pub target: WidePoint,
+    |         ^^^^^^
+...
+306 |     pub name: String,
+    |         ^^^^
+    |
+    = note: `WideInstanceCtx` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: method `matrix_work` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/curve25519_wide.rs:558:12
+    |
+521 | impl<'a> WideRelationSystem<'a> {
+    | ------------------------------- method in this implementation
+...
+558 |     pub fn matrix_work(&self) -> WideMatrixWork {
+    |            ^^^^^^^^^^^
+
+warning: function `scan_row` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/curve25519_wide.rs:722:8
+    |
+722 | pub fn scan_row(base: usize, max_trials: u64, seed: u64) -> Value {
+    |        ^^^^^^^^
+
+warning: function `bare_id` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/ecbench/canonical.rs:204:8
+    |
+204 | pub fn bare_id(prefix: &str, v: &Value) -> Result<(String, String), String> {
+    |        ^^^^^^^
+
+warning: function `splitmix64` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/ecbench/canonical.rs:211:8
+    |
+211 | pub fn splitmix64(mut x: u64) -> u64 {
+    |        ^^^^^^^^^^
+
+warning: function `derive_u64` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/ecbench/canonical.rs:222:8
+    |
+222 | pub fn derive_u64(domain: &str, parts: &[u64]) -> u64 {
+    |        ^^^^^^^^^^
+
+warning: function `derive_u128` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/ecbench/canonical.rs:232:8
+    |
+232 | pub fn derive_u128(domain: &str, parts: &[String]) -> u128 {
+    |        ^^^^^^^^^^^
+
+warning: function `value` is never used
+   --> /home/ec2-user/crypto-curve25519-autolab-parity-20261105/src/cryptanalysis/ecbench/canonical.rs:286:12
+    |
+286 |     pub fn value(v: u128) -> serde_json::Value {
+    |            ^^^^^
+
+warning: 17 warnings emitted
+

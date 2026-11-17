@@ -1,0 +1,11 @@
+[package]
+name="twist-integrated-timing-audit"
+version="0.1.0"
+edition="2021"
+publish=false
+[[bin]]
+name="twist-integrated-isolated-audit"
+path="../audit-isolated.rs"
+[dependencies]
+serde_json="=1.0.145"
+sha2="=0.10.9"

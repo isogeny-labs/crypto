@@ -1,0 +1,19 @@
+/var/tmp/pencil-fast-quotient-shape-20261101-v1/FastQuotientShape.lean:16:55: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+f v u : K[X]
+hf : f.natDegree = 5
+hv : v.natDegree = 3
+hu : u.natDegree = 4
+hm : u.Monic
+hdiv : u ∣ f - v ^ 2
+hv0 : v ≠ 0
+hv2 : (v ^ 2).natDegree = 6
+hlt : f.natDegree < (v ^ 2).natDegree
+hd : (f - v ^ 2).natDegree = 6
+hr0 : f - v ^ 2 ≠ 0
+⊢ -(v.leadingCoeff * v.leadingCoeff) = -v.leadingCoeff ^ 2
+/var/tmp/pencil-fast-quotient-shape-20261101-v1/FastQuotientShape.lean:42:77: error(lean.invalidField): Invalid field `mul`: The environment does not contain `Eq.mul`, so it is not possible to project the field `mul` from an expression
+  ham
+of type
+  (support qa ra).leadingCoeff = 1

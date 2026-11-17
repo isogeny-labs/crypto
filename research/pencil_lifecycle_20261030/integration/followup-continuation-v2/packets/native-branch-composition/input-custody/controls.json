@@ -1,0 +1,221 @@
+{
+  "accepted": true,
+  "count": 35,
+  "fixture_directory": "/var/tmp/pencil-native-input-custody-20261101-v1/fixed-fixtures-1",
+  "gate_executed": false,
+  "rows": [
+    {
+      "accepted": true,
+      "error": null,
+      "expected_accept": true,
+      "name": "valid-json"
+    },
+    {
+      "accepted": false,
+      "error": "duplicate JSON key at line 1 column 10",
+      "expected_accept": false,
+      "name": "duplicate"
+    },
+    {
+      "accepted": false,
+      "error": "duplicate JSON key at line 1 column 15",
+      "expected_accept": false,
+      "name": "nested-duplicate"
+    },
+    {
+      "accepted": false,
+      "error": "duplicate JSON key at line 1 column 11",
+      "expected_accept": false,
+      "name": "array-duplicate"
+    },
+    {
+      "accepted": false,
+      "error": "duplicate JSON key at line 1 column 15",
+      "expected_accept": false,
+      "name": "escaped-duplicate"
+    },
+    {
+      "accepted": false,
+      "error": "trailing characters at line 1 column 4",
+      "expected_accept": false,
+      "name": "trailing-value"
+    },
+    {
+      "accepted": false,
+      "error": "expected value at line 1 column 1",
+      "expected_accept": false,
+      "name": "nan"
+    },
+    {
+      "accepted": false,
+      "error": "number out of range at line 1 column 5",
+      "expected_accept": false,
+      "name": "infinite"
+    },
+    {
+      "accepted": false,
+      "error": "EOF while parsing an object at line 1 column 1",
+      "expected_accept": false,
+      "name": "truncated"
+    },
+    {
+      "accepted": false,
+      "error": "EOF while parsing a value at line 1 column 0",
+      "expected_accept": false,
+      "name": "empty"
+    },
+    {
+      "accepted": true,
+      "error": null,
+      "expected_accept": true,
+      "name": "whitespace"
+    },
+    {
+      "accepted": false,
+      "error": "JSON byte cap",
+      "expected_accept": false,
+      "name": "json-cap"
+    },
+    {
+      "accepted": false,
+      "error": "expected value at line 1 column 1",
+      "expected_accept": false,
+      "name": "nonutf8"
+    },
+    {
+      "accepted": true,
+      "error": null,
+      "expected_accept": true,
+      "name": "custody-valid"
+    },
+    {
+      "accepted": false,
+      "error": "file digest",
+      "expected_accept": false,
+      "name": "wrong-digest"
+    },
+    {
+      "accepted": false,
+      "error": "file digest",
+      "expected_accept": false,
+      "name": "wrong-gate-digest"
+    },
+    {
+      "accepted": false,
+      "error": "file byte cap",
+      "expected_accept": false,
+      "name": "file-cap"
+    },
+    {
+      "accepted": false,
+      "error": "empty fixture inventory",
+      "expected_accept": false,
+      "name": "empty-inventory"
+    },
+    {
+      "accepted": false,
+      "error": "fixture member name",
+      "expected_accept": false,
+      "name": "parent-member"
+    },
+    {
+      "accepted": false,
+      "error": "normal path components",
+      "expected_accept": false,
+      "name": "parent-directory"
+    },
+    {
+      "accepted": false,
+      "error": "absolute path",
+      "expected_accept": false,
+      "name": "relative-directory"
+    },
+    {
+      "accepted": false,
+      "error": "fixture directory type/mode",
+      "expected_accept": false,
+      "name": "directory-writable"
+    },
+    {
+      "accepted": false,
+      "error": "file type/mode/link count",
+      "expected_accept": false,
+      "name": "member-writable"
+    },
+    {
+      "accepted": false,
+      "error": "file type/mode/link count",
+      "expected_accept": false,
+      "name": "gate-writable"
+    },
+    {
+      "accepted": false,
+      "error": "canonical path spelling",
+      "expected_accept": false,
+      "name": "symlink-directory"
+    },
+    {
+      "accepted": false,
+      "error": "file type/mode/link count",
+      "expected_accept": false,
+      "name": "hardlink-member"
+    },
+    {
+      "accepted": false,
+      "error": "exact fixture inventory",
+      "expected_accept": false,
+      "name": "extra-member"
+    },
+    {
+      "accepted": true,
+      "error": null,
+      "expected_accept": true,
+      "name": "Q1"
+    },
+    {
+      "accepted": true,
+      "error": null,
+      "expected_accept": true,
+      "name": "Q2"
+    },
+    {
+      "accepted": true,
+      "error": null,
+      "expected_accept": true,
+      "name": "Q3"
+    },
+    {
+      "accepted": false,
+      "error": "mount source custody join",
+      "expected_accept": false,
+      "name": "custody-context-mismatch"
+    },
+    {
+      "accepted": false,
+      "error": "diff final newline",
+      "expected_accept": false,
+      "name": "valid-custody-bad-diff"
+    },
+    {
+      "accepted": false,
+      "error": "diff transport exit",
+      "expected_accept": false,
+      "name": "valid-custody-bad-transport"
+    },
+    {
+      "accepted": false,
+      "error": "duplicate JSON key at line 1 column 1166",
+      "expected_accept": false,
+      "name": "duplicate-inspect-composed"
+    },
+    {
+      "accepted": true,
+      "error": null,
+      "expected_accept": true,
+      "name": "final-custody"
+    }
+  ],
+  "runtime_qualification": false,
+  "schema": "software.native-input-custody-controls/v1",
+  "scientific_execution": false
+}

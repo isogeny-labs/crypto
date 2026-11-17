@@ -1,0 +1,61 @@
+//! Independent projective branch implementation from Ozbay Gurler–Hisil:
+//! sampled 1+1 and 1+2 formulas, generic 2+2, and targeted 2+2 exceptions.
+//! https://doi.org/10.1007/s13389-024-00351-7 (CC BY 4.0 article).
+//! This is a finite arithmetic gate; the separate collector binaries run DLP cohorts.
+#![recursion_limit = "256"]
+#![allow(unused_attributes, dead_code)]
+use five_leads_study::three_leads::{Divisor, Field, Jacobian, Scholten};
+use serde_json::json;
+use std::cell::Cell;
+
+thread_local! {
+    static NORMALIZED_OUTPUTS: Cell<u64> = const { Cell::new(0) };
+    static NORMALIZATION_INVERSIONS: Cell<u64> = const { Cell::new(0) };
+}
+pub(crate) fn reset_normalization_counts() {
+    NORMALIZED_OUTPUTS.with(|c| c.set(0));
+    NORMALIZATION_INVERSIONS.with(|c| c.set(0));
+}
+pub(crate) fn normalization_counts() -> (u64, u64) {
+    (
+        NORMALIZED_OUTPUTS.with(Cell::get),
+        NORMALIZATION_INVERSIONS.with(Cell::get),
+    )
+}
+
+const PRIMES: [u64; 21] = [
+    739, 1151, 1187, 3371, 3527, 3931, 11731, 11887, 12143, 48383, 48823, 49451, 186379, 186451,
+    186583, 741967, 748807, 749299, 2967343, 2968367, 2972219,
+];
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub(crate) struct D1 {
+    pub(crate) x: u64,
+    pub(crate) y: u64,
+    pub(crate) z: u64,
+    pub(crate) w: u64,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub(crate) enum ResultPoint {
+    Identity,
+    DegreeOne(D1),
+    DegreeTwo([u64; 6]),
+}
+fn add22_shared(a: Divisor, b: Divisor, curve: &[u64], f: &Field) -> Option<ResultPoint> {
+    // Equation (21): recover the common and remaining points projectively.
+    let [r1, q1, _] = a.u;
+    let [t1, s1] = a.v;
+    let [r2, q2, _] = b.u;
+    let [t2, s2] = b.v;
+    let k = f.sub(q1, q2);
+    if k == 0 {
+        return None;
+    }
+    let k2 = f.sq(k);
+    let k3 = f.mul(k2, k);
+    let k5 = f.mul(k3, k2);
+    let x = f.mul(f.sub(r2, r1), k);
+    let point = |xx: u64, ss: u64, tt: u64| D1 {
+        x: xx,
+        y: f.add(f.mul(ss, f.mul(xx, k3)), f.mul(tt, k5)),
+        z: k,

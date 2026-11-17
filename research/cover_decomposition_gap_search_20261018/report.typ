@@ -87,7 +87,7 @@ So the family inside the window reduces to genus-3 curves over $FF_2$ with Jacob
 
 == What to stop searching for
 
-Covers of prime-field curves; GHS, Hess or isogeny-extended descents of Koblitz ($m = 1$, $h = 1$) and prime-degree random binary curves ($m = n$), once item 3 is recorded; table-lookup decomposition oracles of any arity; first-fall-degree measurements; small-$x$ Coppersmith at $S_3$, $S_4$; cyclic covers carrying $A$ at any base genus, and any carrier with an order-131 automorphism; trace-zero transfers, Kani gluing, xedni, canonical lifts, elliptic nets, Drinfeld analogues and Belyi/Hurwitz constructions for the three target families (reasons in README §5).
+Covers of prime-field curves; GHS, Hess or isogeny-extended descents of Koblitz ($m = 1$, $h = 1$) and prime-degree random binary curves ($m = n$), once item 3 is recorded; table-lookup decomposition oracles of any arity; first-fall-degree measurements; small-$x$ Coppersmith at $S_3$, $S_4$; cyclic covers carrying $A$ at any base genus, and any carrier with an order-131 automorphism; trace-zero transfers, Kani gluing, canonical lifts, elliptic nets, Drinfeld analogues and Belyi/Hurwitz constructions for the three target families. Classic xedni instead remains a strongly negative conditional obstruction whose open interfaces are listed in README §5.
 
 = Recommended next experiments on this host
 

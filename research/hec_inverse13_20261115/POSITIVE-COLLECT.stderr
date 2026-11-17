@@ -1,0 +1,8 @@
+shasum: research/hec_inverse13_20261115/deps/msolve/.libs/msolve: No such file or directory
+shasum: research/hec_inverse13_20261115/deps/msolve/src/neogb/.libs/libneogb.4.dylib: No such file or directory
+shasum: WARNING: 2 listed files could not be read
+
+thread 'main' (8965121) panicked at collect.rs:16:5:
+assertion failed: Command::new("shasum").args(["-a", "256", "-c",
+                        "solver-runtime.sha256"]).status().unwrap().success()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

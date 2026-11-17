@@ -25,3 +25,13 @@ is not on this host, so the replay uses one rebuilt from the same commit with
 `--locked`, recorded as such in each run (`binary_rebuilt`). Rule v8c's runs
 set `KIC_RHO_CANON=scalar` (`rule/v8/run.sh`), which the records do not carry;
 its replays set it too and also compare `rho_policy`.
+
+## Amendment 2 (2026-11-11, before any replay of these directories)
+
+The same seed and draw extend to **rule v9** and its control **rule v9c**
+(`research/ic_tool_program/rule/v9`, `research/ic_tool_program/rule/v9c`).
+Their rows ran on Iso Lab EKS (`rule/v9/launch/`). The replays use the exact
+binaries that ran: `ic-v9` and `ic-v9c` are the image's (`rule/v9/binaries.sha256`,
+`rule/v9/launch/image.json`), checked by SHA-256 against each run's `host.json`.
+Neither run sets `KIC_RHO_CANON`. The replays run on this session's container,
+not the pod's node; timings are not compared.

@@ -29,11 +29,12 @@ one() { # name draw timeout [flags]
   log "$name d$k: exit $? after $(( $(date +%s) - s )) s"
 }
 TMO5=${TMO5:-14400}
-status "DEG5 C1 draws=0,3,5,7 TMO5=$TMO5"
-for k in 0 3 5 7; do one deg5-m3-19-7 "$k" "$TMO5"; done
+DRAWS=${DRAWS:-"0 3 5 7"}
+status "DEG5 C1 draws=$DRAWS TMO5=$TMO5"
+for k in $DRAWS; do one deg5-m3-19-7 "$k" "$TMO5"; done
 status C1_UNSAT_DONE
 TC=$(( $(remaining) - ${SERVE_SECONDS:-2700} - 900 ))
-if [ "$TC" -gt 1800 ]; then status "CONTROL d1 tmo=$TC"; one control5-m3-19-7 1 "$TC" --satisfiable; fi
+if [ "${CONTROL:-1}" = 1 ] && [ "$TC" -gt 1800 ]; then status "CONTROL d1 tmo=$TC"; one control5-m3-19-7 1 "$TC" --satisfiable; fi
 status DONE
 sleep "${SERVE_SECONDS:-2700}"
 echo "$(date -u +%FT%TZ) serving window over" >> "$OUT/STATUS"

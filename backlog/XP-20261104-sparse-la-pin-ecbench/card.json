@@ -1,0 +1,135 @@
+{
+  "authors": [
+    "sparse-LA lane (claude session)"
+  ],
+  "blocked_on": [
+    "hw:a runner that can push the resume checkpoint to S3 (isolab-eks, or any session with AWS credentials); this container had none, so the stage run's checkpoint hook was bypassed by mistake and every later launcher refused",
+    "pr:3384 merged; this card follows its next-improvement section"
+  ],
+  "cairn": {
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "cargo build --release at code.branch (the build argv of this card); toolchain: stable Rust, no other dependencies"
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 1024,
+      "publish": "runs/XP-20261104-sparse-la-pin-ecbench",
+      "sandbox": "auto",
+      "timeout_s": 14400
+    },
+    "funding": {
+      "rationale": "proposed by the authoring session; a few core-hours to decide predictions P3 and P4 of the frozen protocol and the stage trend past 1,024 columns; approval by the reviewer who merges the PR",
+      "units": 0
+    },
+    "mode": "lab-task",
+    "notes": "",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261104-sparse-la-pin-ecbench/shard-0",
+      "XP-20261104-sparse-la-pin-ecbench/shard-1"
+    ],
+    "ttl_s": 86400
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "code": {
+    "branch": "claude/sparse-la-target-pin-20261104",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--bin",
+        "ecbench"
+      ]
+    ],
+    "commit": null,
+    "repo": "crypto"
+  },
+  "created": "2026-11-04",
+  "decision_value": "Predictions P3 and P4 and the 4,096-column +counted factor of the frozen protocol are decided only here. If pin-wiedemann ties structured-gauss's S within 5 percent (the preregistered prediction) the pin solver is closed as no end-to-end gain and effort moves to the genus-3 matrices; if its S is below structured-gauss's at every \u00a75a band weight on the F(p^4) rows it is an improvement and lands on the leaderboard validated.",
+  "id": "XP-20261104-sparse-la-pin-ecbench",
+  "links": {
+    "lead": "research/sparse_la_target_pin_20261104/README.md",
+    "notes": [
+      "research/sparse_la_target_pin_20261104/PROTOCOL.md",
+      "research/sparse_la_target_pin_20261104/stacked_d4_2lp/README.md",
+      "research/sparse_la_target_pin_20261104/genus3_la_share/la_share.md"
+    ],
+    "prs": [
+      3384
+    ]
+  },
+  "outputs": {
+    "land": "research/sparse_la_target_pin_20261104/sessions/",
+    "result_schema": "ecbench session directory (ecbench.session/v1), audited with `ecbench verify --replay-all`",
+    "verify": [
+      "target/release/ecbench",
+      "verify",
+      "--dir",
+      "{out}/{name}",
+      "--replay-all",
+      "--exit-code"
+    ]
+  },
+  "owner_hint": "a session with the isolab-eks route",
+  "protocol": {
+    "blob": null,
+    "path": null
+  },
+  "question": "Does a sparse relation matrix that stops at the target pin (pin-wiedemann), or the +counted accounting of the deferred solvers, change end-to-end S on the F(p^4) ladder or the 30-bit prime scaling set?",
+  "resources": {
+    "cpus": 4,
+    "disk_gb": 2,
+    "est_core_hours": 4,
+    "est_wall_hours": 4,
+    "gpu": null,
+    "notes": "S2 (366 runs) took about 45 minutes in the previous study at isolation L0; S1 is 10 runs of about 220 s; each session is then replayed in full (--replay-all) at about the same cost. README.md of the study has the derivation.",
+    "ram_gb": 4
+  },
+  "run": {
+    "argv": [
+      "target/release/ecbench",
+      "run",
+      "--wait",
+      "--cpus",
+      "auto",
+      "--spec",
+      "{spec}",
+      "--out",
+      "{out}/{name}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 14400
+  },
+  "schema": "backlog.card/v1",
+  "shards": {
+    "count": 2,
+    "params": {
+      "items": [
+        {
+          "name": "fp4-p29-pin",
+          "vars": {
+            "name": "fp4-p29-pin",
+            "spec": "research/sparse_la_target_pin_20261104/specs/SPEC-fp4-p29-pin.json"
+          }
+        },
+        {
+          "name": "prime-scaling-pin",
+          "vars": {
+            "name": "prime-scaling-pin",
+            "spec": "research/sparse_la_target_pin_20261104/specs/SPEC-prime-scaling-pin.json"
+          }
+        }
+      ]
+    },
+    "scheme": "list",
+    "stop": "all"
+  },
+  "status": "blocked",
+  "status_note": "Specs frozen at commit 33bf99c1a and validated by `ecbench plan` (10 and 366 executions); not run for want of a checkpoint-capable runner.",
+  "title": "Sparse target-pin solver: the two frozen ecbench sessions and their replays"
+}
