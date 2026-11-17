@@ -44,6 +44,11 @@ jobs:
             /Cargo.toml
             /Cargo.lock
             /build.rs
+            /docs/ic/boundary_targets.json
+            /docs/ic/calibration.json
+            /docs/ecbench/schema.sql
+            /docs/curves/registry.json
+            /docs/curves/standards/parameters.json
             /src/
             /crates/
             /tools/factor-base/
@@ -60,6 +65,44 @@ jobs:
           sparse-checkout: |
             research/prime31_ic_20261115/native
             src/cryptanalysis
+      - name: Reconcile pinned F4 diagnostic-only API for unrelated APS observers
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C primefast-pinned hash-object src/cryptanalysis/f4_fp.rs)" = "3c0603d219cd310b612c668f6c54ddb0aeb6404f"
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("primefast-pinned/src/cryptanalysis/f4_fp.rs")
+          source = p.read_text()
+          # This 2026-11-17 bridge only repairs unused, opt-in fall-degree
+          # observations. No prime_fast source, arithmetic, or solver is edited.
+          old = "    pub full_field_branches: u64,\n}\n\n#[derive(Clone, Copy, PartialEq, Eq)]\nenum VisitEnd"
+          new = ("    pub full_field_branches: u64,\n"
+                 "    /// Unobserved APS diagnostic; old pinned engine does not record it.\n"
+                 "    pub first_fall_degree: Option<u32>,\n"
+                 "    pub last_fall_degree: Option<u32>,\n"
+                 "    pub degree_of_regularity_observed: Option<u32>,\n"
+                 "}\n\n#[derive(Clone, Copy, PartialEq, Eq)]\nenum VisitEnd")
+          assert source.count(old) == 1, "pinned VisitReport changed"
+          source = source.replace(old, new, 1)
+          old = ("    pub fn capturing_run_log(mut self) -> Self {\n"
+                 "        self.capture_run_log = true;\n"
+                 "        self\n"
+                 "    }\n}\n")
+          new = ("    pub fn capturing_run_log(mut self) -> Self {\n"
+                 "        self.capture_run_log = true;\n"
+                 "        self\n"
+                 "    }\n"
+                 "    /// Compatibility-only APS request; old pinned F4 does not record falls.\n"
+                 "    pub fn recording_degree_falls(self) -> Self { self }\n"
+                 "}\n")
+          assert source.count(old) == 1, "pinned F4Options impl changed"
+          source = source.replace(old, new, 1)
+          assert source.count("pub fn recording_degree_falls") == 1
+          assert source.count("pub first_fall_degree: Option<u32>") == 1
+          p.write_text(source)
+          print("Pinned F4 compatibility shim installed; prime_fast.rs untouched")
+          PY
       - name: Pin Rust toolchain
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Rebuild source-identical original native BSGS and public corpus
