@@ -731,3 +731,17 @@ Executeonce,quantifyscan/anchor/setup/residualshares,thennewgeneratorcandidateag
 
 ### Errors
 None.
+
+## C4 exclusive phases matched original and changed diagnosis
+
+### What was done
+Atade52b8357cphaseinstrumentexits0,all72calls,CONTROLbyte-identical,1164phasevectorrepeatsand16componentsums exact. Pencilscan30.652–44.618%ofpREDC;eigenvalue18.788–25.314%;verification9.519–13.757%. Conditionaldelete-scan ceiling1.442–1.806. Localobservations. [pcc:unverified]
+
+### Decisions made
+Correctearlierinference: base-fielddifferencebetweenwalksandpencildoesnotmeanpencilcostispredominantlyscanning. Needaddressalgebraicsetup/verificationaswell. InvestigateGaussianFrobeniusnorm/eigenspacetraceorientationnext, no newmathclaimbeforeproof/uniquenesscostgate.
+
+### Open threads
+RecordphasePRsuccessor(parent4523mergedexternallyatc0f639385eechead565181f737f). Develop/checkGaussianroutewithsamepublicNmetadataandallambiguitiesretained.
+
+### Errors
+None. No arithmetic changes or timingmeasurements.
