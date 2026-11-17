@@ -16,9 +16,11 @@ Run the index-calculus autolab (`ic-autolab` skill, Curve25519-family loop `rese
 ## Active items (top = next)
 
 - [x] Reconcile upstream with the local checkpoint: ledger at round 37, no autolab changes on `main` since; the generic incumbents sit at the K = 3 collision floor (`ideas/OBSTRUCTION.md`); sibling points already measured (`siblings/`, Stages 1 to 5).
-- [ ] Build `ecbench` and `ic_autolab` from `main`: the standalone `hashed-ecdl-tensor` crate fails to compile at `origin/main` (8 E0433 errors, `crate::metrics` undeclared in `lib.rs`); use the binary already built on Nov 14 for provenance, or report and fix the crate separately.
-- [ ] Choose and freeze round 38 (`propose`, `freeze`): sizes and arms with a falsifiable prediction from the cost model, not a knob re-sweep.
-- [ ] Resume checkpoint and benchmark record before any `run` (S3 gate: owner waiver needed, the repository AWS credential is invalid).
-- [ ] Train, select, fresh holdout, assess, ratchet, report and PDF; PR with the result and `ratchet.svg`.
+- [x] Build `ecbench` and `ic_autolab` from `main`: the standalone `hashed-ecdl-tensor` crate fails to compile at `origin/main` (8 E0433 errors, `crate::metrics` undeclared in `lib.rs`); use the binary already built on Nov 14 for provenance, or report and fix the crate separately.
+- [x] Choose and freeze round 38 (`propose`, `freeze`): sizes and arms with a falsifiable prediction from the cost model, not a knob re-sweep.
+- [x] Resume checkpoint and benchmark record before any `run`: S3 gate waived by the owner for round 38 (no upload token in this session); no benchrec record filed.
+- [x] Train, select, assess, ratchet, report and PDF for round 38: no challenger at k = 20 or 24 (no holdout); PR with the result and `ratchet.svg`.
+- [ ] Next lever (code, not a re-sweep): the generic configuration space is exhausted at k = 20, 24, 28, 32; add a family (fewer unknowns, cheaper price per point, or a construction change per `ideas/OBSTRUCTION.md`) to `families.json` and its oracle in ecbench, then round 39.
+- [ ] Fix or report the `hashed-ecdl-tensor` standalone build failure on `main` (`crate::metrics` undeclared in `lib.rs`).
 
 ## Blocked / questions for the owner
