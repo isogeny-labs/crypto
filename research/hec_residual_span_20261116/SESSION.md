@@ -2100,3 +2100,10 @@ What was done: newv2source/binary fixesonlyclosingbrace debugspace; v1rawfailure
 Decisions made: original12targets/24calls andallmutation/cost gates unchanged; pushnewfreeze beforeonce-only120CPU invocation. Assertions [pcc:unverified].
 Open threads: runv2afterpush andinterpretcompletecost.
 Errors: originalformatfailureexplicit, no v2scientificexecutionyet.
+
+## Collector-emitted anchor cover v2 qualified
+
+What was done: freeze511d29299e7 once-onlyexit0;24calls/12targets packetgeometry/root/branch/scalar andsubgroup/controlvectors/repeats pass.216commonmutations eachverifier+96anchor mutations newverifier rejected. Fullbasecost5.8-9.8percent fewer vsoldcover, subgroupunchanged; allcertificateemission/fallback overheadcharged. Assertions [pcc:unverified].
+Decisions made: retainactualcoldgain, no10x/novelty claim. V1formatfailure preserved;v2prospectivecomparisononlyfix. Anchoridentity nowboundbyinduction, nofreeconstruction.
+Open threads: remainingprincipalgeometry/collection/setup/newrelation mechanism withcompletecost; originalgenus2+10x,independentreview/publication/genus3/4coverage.
+Errors: v1debugspacecomparison failure correctedprospectively,no otherexecutionerror/S3/cloud.
