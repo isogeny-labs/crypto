@@ -2541,3 +2541,10 @@ What was done: implemented exact greedy cyclic R=P-1/S orbit-norm reduction with
 Decisions made: use X^n-1 not Phi9 on full genus-four points; no global shortest/novelty claim. Same optimistic free preparation as scalar floor; retain all80complete-count inequalities and reference replay. One120CPU invocation after Git freeze.
 Open threads: execute new arithmetic kernel; a passing equivalence or component gain does not imply full10x or improve h1case.
 Errors: only inherited two unused root-helper warnings, no scientific execution yet. Own scope check allows, attach reports existing reservation. No S3/cloud/merge.
+
+## Short projector improves component, fails all20strongest complete budgets
+
+What was done: freeze461a0eed144 hashes passed, sole run exit0. Every raw canonical point passes exact R/S/scalar equivalence, integer witnesses verified; repeats exact. Scalar full16vectors match old floor. Polynomial REDC11978/63270/25012/21172/16764, component ratios3.229/5.191/1.242/5.310/9.354.
+Decisions made: count reduction is a real component result, not full solver or novelty.70/80all-arm inequalities reject, ten weaker comparisons do not; strongest equal-information controls reject all20workloads even with all remaining phases free. Preserve kernel/certificates, do not chase10xcomponent headline or build alias solver on this setup.
+Open threads: genuinely different producer/verification/coordinate construction capable of full10x; original h1genus-two and genus-three reduction/genus-four scope remain open. Goal active/unachieved.
+Errors: no scientific failure; inherited unused-helper warnings only. No S3/cloud/merge, shared arithmetic remains independently unreviewed.
