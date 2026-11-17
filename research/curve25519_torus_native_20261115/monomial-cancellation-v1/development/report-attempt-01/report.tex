@@ -1,0 +1,103 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=17mm]{geometry}
+\usepackage{graphicx,hyperref,booktabs,amsmath}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\begin{document}
+\begin{center}\Large Bounded quadratic-monomial cancellation\\[3pt]
+\normalsize Checked polynomial units; unchanged curve search --- 17 November2026\end{center}
+The Rust module cancels degree-two monomial columns using constant-weight
+combinations of original rows. It solves new coupled-quadratic polynomial
+controls over Fp29 and the Curve25519 prime. On28curve controls, outcomes and
+node counts remain unchanged. Core PCC-20261117-1ab7fd; literature3187dc;
+separate runtime-contract6a68d9. All unsigned/unverified. [pcc:unverified]
+
+\begin{center}\begin{tabular}{lrrr}\toprule
+Same28curve inputs & Root & Unsupported & Model cap\\\midrule
+Old v1 / exact Off &15&13&0\\
+Bounded monomial v1 &15&13&0\\\bottomrule
+\end{tabular}\end{center}
+Fixed preservation and polynomial-cancellation gates pass; completed-curve
+pruning is not observed at this implementation/domain. This does not reject
+all linearization, other solvers or index calculus. [pcc:unverified]
+
+\includegraphics[width=\linewidth,height=34mm,keepaspectratio]{pipeline.pdf}\par
+\includegraphics[width=\linewidth]{outcomes.pdf}\par
+Native recorded values only, all28curve outcomes retained. No timing,
+statistical fit or scaling inference. Caps/Unsupported are not absence
+certificates. [pcc:unverified]
+
+\textbf{Construction.} Share original System/dependencies/cache. A greedy
+connected slice retains at most32rows/64original unknown variables/256input
+coefficients. Pivot quadratic columns before linear; constant stays augmented.
+Carry original-row weights and admit only a checked linear unit/nonzero
+constant, with exact premises and labelled unit applications. Drop leases
+before LIFO Undo. No row products, degree growth or monomial multipliers;
+composed univariate quadratics are discarded. This is incomplete classical
+degree-two linearization, not full XL/F4 or a Gr\"obner basis. [pcc:unverified]
+
+\textbf{Controls and interface.} Core35unique systems retain old33 plus two
+polynomial controls. Old/Off match full answers, decisions,counters,schedule.
+All returned curve roots receive original-equation and indexed-row/group
+replay. Only public System/roles/mode/limits enter solve; witness/scalar/signs/
+labels/point lists and replay tables do not. [pcc:unverified]
+
+\textbf{Domains.} Toy p101/A95/h(17,12)/a17/q3/k8,arity2,13image targets,
+aliases retained, identity columns excluded. Actual curve $p=2^{255}-19$,
+A486662,$h_{new}=h_{old}^{213156431}$,a60824497/q1/k2,arity2,TWOcolumns.
+Huge originalq213156431 systems receive zero solver calls. [pcc:unverified]
+
+\newpage
+\begin{center}\Large Runtime contract, custody and next gate\end{center}
+\textbf{Polynomial controls.} Public $xy+x-1=0$, $xy+2x-3=0$ exposes a
+checked unit. Both Fp29 and $p=2^{255}-19$ produce a root in1node where old
+extraction is Unsupported in1node. These are not curve decompositions.
+Core synthetic rollback now finishes at root (3to1nodes). Its AUTHORED
+lease-reader fixture has placeholder counters, not measured engine behavior.
+All10core trace/root/unit corruptions,8forced caps and4malformed refusals
+remain. [pcc:unverified]
+
+\textbf{Separate actual-engine contract.} Fp29 equations $z^2-z=0$,
+$zu+u+v-1=0$, $zv+u+v-2=0$, branch role $z$. Old extraction is Unsupported
+after3nodes; new engine returns $(1,0,1)$ in3nodes with2activations,2Drops,
+1Undo. Full24,389original assignments have1root; full reader accepts, while
+missing-Drop/wrong-Undo refuse. This separate one-system correctness round
+closes runtime coverage without editing/rerunning core35. [pcc:unverified]
+
+\textbf{Accounting stays open.} Caps remain1024nodes/depth128/10million
+diagnostic events/64MiB CUMULATIVE MODELED reservations,4096vars/8192equations/
+32768terms/degree2; extra1024pass/65536trace guards and fixed slice remain.
+New arithmetic/scans/weights/checker/model reservations are charged. Whole
+cold parsing/serialization/replay/allocator/container/live-storage costs remain
+unpriced. No timing,speedup,complete-cost or exponent result. [pcc:unverified]
+
+\textbf{Frozen core.} Composite140inputs=old133+7newCargo/Rust; exact28old
+request bytes reused,7archive round-trips/36compiled bindings matched.
+New16508-byte source delta SHA-256:\\
+\texttt{debfd1a9bac20a2899ee329f6f56685b6f88eee0a19be7910348dafe2f3a4abb}.\par
+Copied3375440-byte executable SHA-256:\\
+\texttt{7c3f639c461a4cfaa7d480f0e26d044708f2246357e36d274e3737b84fa4c6b5}.\par
+Raw262files/9294358bytes,36380-byte archive SHA-256:\\
+\texttt{ce91078fa0379457663df2d2454e94b25fa0b6b459b960b9f24da71600c62d14}.\par
+Separate runtime context143=core140+3helper inputs,4396-byte source delta.
+Copied1163056-byte executable SHA-256:\\
+\texttt{a33cf3b2053489e8632f8a094f5d39a64fbc9fb20dae8db63c915f84a4c13625}.\par
+Raw8files/36567bytes,2020-byte archive SHA-256:\\
+\texttt{2bbb7a93b2d338dffa88e69f670bd49fd3c7f42b1f8345ebff2a11eebd67f1a5}.\par
+No monolithic140/143archive. Distinct copied qualifiers and build/pre/post
+records precede calls. Native results aggregate in Rust. Core first release
+library/fmt/strict Clippy/build and helper checks pass; no source correction
+or cap tuning. Initial sparse-archive metadata refusal preceded any qualified
+call; exact tracked blobs restored, existing new bytes retained. [pcc:unverified]
+
+\textbf{Prior art and next hypothesis.} Courtois/Klimov/Patarin/Shamir,
+author full text, section3 Definition3.01 and appendix8:
+\url{https://www.nicolascourtois.com/papers/xlfull.pdf}.
+Linearization is classical; generic independence heuristics are not assumed.
+KB absent/wrapper127; IACR conference/Diem full PDFs403, no Diem proof imported.
+Next proposed successor admits certified univariate degree-at-most-two rows
+with complete root-set/nonresidue checking and allowed public roles. Original
+route-criteria V3 family/yield/selection/rank/kernel/recovery/cold-work gates
+remain open. No successor campaign or performance-graph promotion.
+[pcc:unverified]
+\end{document}

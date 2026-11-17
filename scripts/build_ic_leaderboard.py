@@ -53,6 +53,7 @@ LEDGER = "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md"
 LEDGER_COVERED_THROUGH = 24
 
 SOURCES = {
+    "relation_identity_component": "research/relation_degree_trace_20261115/native-identity-20261117/report-01/audit.json",
     "n83_basis_cold": "research/n83_basis_setup_20261015/reports/run-20261015T1842Z/native_statistics.json",
     "n83_basis_final": "research/n83_basis_setup_20261015/reports/final-20261016/native_final.json",
     "round5": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
@@ -3099,6 +3100,81 @@ def f4_fp_ic_component() -> dict:
     return load(SOURCES["f4_fp_ic_effect"])
 
 
+def relation_identity_component() -> dict:
+    """Copy native frozen evidence; no Python measurement or statistic."""
+    value = load(SOURCES["relation_identity_component"])
+    if (value.get("schema") != "native-identity-audit/v1"
+            or value.get("checked_answers") != 816
+            or value.get("monitor_ok") is not True
+            or value.get("costs_orders_and_statistics_recomputed") is not True
+            or [row.get("n") for row in value.get("cases", [])] != [3, 4, 6]):
+        raise ValueError("complete native identity audit required")
+    return {"source": SOURCES["relation_identity_component"],
+            "class": "engineering diagnostic; unsigned producer evidence",
+            "report": "research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md",
+            "measurement_date": "2026-11-17", "audit": value,
+            "limits": "Fixed p2147483647, seed7, n3/4/6 polynomial kernels. Ordinary95 neutral controls reject n4/n6; prospective simultaneous screens pass. No15x, new-target, intrinsic-regularity or ranked ECDLP claim."}
+
+
+def relation_identity_md(component: dict) -> list[str]:
+    lines = ["## Exact Rust identity checking (development polynomial kernel)", "",
+             component["class"] + ". " + component["limits"] + " [pcc:unverified]", "",
+             "Ratios above1 favor the denominator.25 paired main blocks/case; work and full-paid accounting. [pcc:unverified]", "",
+             "|n|Comparison|Work median|Work lower1/720|Paid median|Paid lower1/720|Ordinary95 pass|Simultaneous pass|",
+             "|---|---|---:|---:|---:|---:|---|---|"]
+    for case in component["audit"]["cases"]:
+        stats = case["result"]["statistics"]
+        for j, label in enumerate(("prefix-Singular/prefix-Rust", "frontier-Rust/prefix-Rust", "frontier-Singular/frontier-Rust")):
+            work, paid = stats[2*j], stats[2*j+1]
+            lines.append(f"|{case['n']}|{label}|{work['median_paired_ratio']:.6f}|{work['adjusted_lower_1_over_720']:.6f}|{paid['median_paired_ratio']:.6f}|{paid['adjusted_lower_1_over_720']:.6f}|{case['aa_statistics']['ordinary_95_admitted']}|{case['aa_admitted']}|")
+    lines += ["", f"[Result](../../{component['report']}); native source `{component['source']}`. All checks remain included; old rejected studies retained. [pcc:unverified]", ""]
+    return lines
+
+
+def relation_identity_html(component: dict) -> str:
+    lines = relation_identity_md(component)
+    header = next(x for x in lines if x.startswith("|n|"))
+    rows = [x for x in lines if x.startswith("|") and not x.startswith("|---") and x != header]
+    cells = lambda line, tag: "".join(f"<{tag}>{html.escape(x)}</{tag}>" for x in line.strip("|").split("|"))
+    return ('<section id="relation-identity-20261117"><h2>Exact Rust identity checking · engineering diagnostic</h2><p>'
+            + html.escape(component["class"] + ". " + component["limits"]) + ' [pcc:unverified]</p>'
+            + '<p>25 paired main blocks/case; work and full-paid accounting. Ratios above1 favor the denominator. [pcc:unverified]</p><div class="scroll"><table><thead><tr>'
+            + cells(header, "th") + '</tr></thead><tbody>' + "".join('<tr>' + cells(row, "td") + '</tr>' for row in rows)
+            + '</tbody></table></div><p><a href="https://github.com/isogeny-labs/crypto/blob/main/' + component["report"]
+            + '">Result and raw replay</a>. Complete checks retained; unsigned evidence. [pcc:unverified]</p></section>')
+
+
+def refresh_relation_identity() -> int:
+    """Narrow presentation refresh when unrelated full-build inputs are broken.
+
+    Preserve existing ranked/native fields and their source pins byte-for-value;
+    the ordinary full --check still validates the complete source set.
+    """
+    original = load(str(OUT_JSON.relative_to(REPO)))
+    component = relation_identity_component()
+    rendered_md = "\n".join(relation_identity_md(component))
+    rendered_html = relation_identity_html(component)
+    original["relation_identity_component"] = component
+    original["sources"]["relation_identity_component"] = {"path": component["source"], "sha256": sha256(component["source"])}
+    updates = {OUT_JSON: json.dumps(original, indent=1, ensure_ascii=False) + "\n"}
+    start, end = "<!-- BEGIN RELATION IDENTITY 20261117 -->", "<!-- END RELATION IDENTITY 20261117 -->"
+    for target, content in ((OUT_MD, rendered_md), (OUT_HTML, rendered_html), (REPO / "docs/index-calculus-scoreboard.html", rendered_html)):
+        text = target.read_text()
+        block = start + "\n" + content + "\n" + end
+        if start in text:
+            a, b = text.index(start), text.index(end) + len(end)
+            text = text[:a] + block + text[b:]
+        elif target.suffix == ".html":
+            text = text.replace("</body>", block + "\n</body>")
+        else:
+            text += "\n" + block + "\n"
+        updates[target] = text
+    for target, text in updates.items():
+        target.write_text(text)
+        print(f"component-only refresh {target.relative_to(REPO)}; full baseline not certified")
+    return 0
+
+
 def build(allow_unvalidated: bool = False) -> dict:
     names = Names()
     frontier_audit = latest_frontier_audit()
@@ -3611,6 +3687,7 @@ def build(allow_unvalidated: bool = False) -> dict:
                            "largest": {"slug": top["slug"], "log2_r": top["log2_r"],
                                        "ratio_rho": top["best"]["ratio_rho"]}}
     return {
+        "relation_identity_component": relation_identity_component(),
         "schema_version": 1,
         "generated_by": "scripts/build_ic_leaderboard.py",
         "unit": "none: the board has three families, each with its own unit, reference and floor "
@@ -5193,6 +5270,7 @@ def markdown(doc: dict) -> str:
     L += ["| " + " | ".join(r) + " |" for r in t["e39_rows"]]
     L += ["", t["e41"] + f" Read the [report](../../{k['e41']['report']}), [summary](../../{k['e41']['source']}) "
           f"and [validator report](../../{k['e41']['validator_report']}).", ""]
+    L += ["<!-- BEGIN RELATION IDENTITY 20261117 -->"] + relation_identity_md(doc["relation_identity_component"]) + ["<!-- END RELATION IDENTITY 20261117 -->"]
     return "\n".join(L) + "\n"
 
 
@@ -7118,6 +7196,7 @@ def page(doc: dict, standalone: bool) -> str:
     if doc.get("native_augmentation"):
         P.append((REPO / "docs/ic/ecbench-diagnostics.fragment.html").read_text())
     body = "\n".join(P)
+    body += "<!-- BEGIN RELATION IDENTITY 20261117 -->\n" + relation_identity_html(doc["relation_identity_component"]) + "\n<!-- END RELATION IDENTITY 20261117 -->\n"
     if standalone:
         return ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
                 '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
@@ -7147,12 +7226,17 @@ def stable(o):
 
 def main() -> int:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--refresh-relation-identity", action="store_true", help="refresh only frozen identity component; no full-build/gate assertion")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--artifact", type=Path)
     ap.add_argument("--allow-unvalidated", action="store_true",
                     help="local build only: mark rows without a VALIDATION.json 'unvalidated' "
                          "instead of refusing them (CI never passes this)")
     args = ap.parse_args()
+    if args.refresh_relation_identity:
+        if args.check or args.allow_unvalidated or args.artifact:
+            ap.error("component-only refresh cannot stand in for full --check")
+        return refresh_relation_identity()
     if args.check and args.allow_unvalidated:
         ap.error("--check never allows unvalidated rows")
     doc = build(allow_unvalidated=args.allow_unvalidated)
@@ -7162,6 +7246,7 @@ def main() -> int:
     # preserve their full binary64 values instead of rounding their evidence.
     serialized["n83_matched_process_diagnostic"] = doc["n83_matched_process_diagnostic"]
     serialized["n83_basis_setup_diagnostic"] = doc["n83_basis_setup_diagnostic"]
+    serialized["relation_identity_component"] = doc["relation_identity_component"]
     outs = {OUT_JSON: json.dumps(serialized, indent=1, ensure_ascii=False) + "\n",
             OUT_MD: markdown(doc), OUT_HTML: page(doc, standalone=True)}
     if args.check:
