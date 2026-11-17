@@ -2401,3 +2401,10 @@ What was done: finalexecutedfreezedbeedb44ff5hashespass;3consumersexit0usingimmu
 Decisions made: oneisometricquotientclasscomplexnonhypercandidate, not2classes/independentexperiments. Ballcontains0notzeroproof; complexnonzeroDOESNOTimply421-adicunit orF421nonhyper. No finitefieldcurve/transport/speedclaim. [pcc:unverified].
 Open threads: certified421-adic/algebraicCMdataorrationalkernel/quotientbridge, finitefielddestination/transport/costandfull10xgenus2/4objective; independentreview.
 Errors: originalloaderfailureandunexecutedheaderpadpreparationkept; pinnedrunpassedwithoutscientificsourcechangesorretry. NoS3/cloud/merge.
+
+## Modularinvariant reductionbridge andabsolute-simplicity gate frozen
+
+What was done: compiledweightzeroJ/Rballconsumer withexacttheta/invariantdump+separatereloadcomparator; source/partner/precisionchecks retained. RustFrob14mod1009rankgateforabsolutesimplicity. Derivedsufficientv421(R)<=0exclusion usingSigma140 denominator andconditional94classpolynomialoverKtarget.
+Decisions made: noactualvaluation/recognition; denominator/normalization/finitecharcriterion andSerreobstructionexplicit. Priorprintddecimalsdiagnosticonly, newexactdumpclosesportableballgap. Primarytheta/FLINTsourcesread, KBbadreductionpointerdoesnotgiveboundhere. Gitfreeze beforemax5once120CPUprocesses.
+Open threads: executecomplexscalar/rankgate then exactalgebraic/421-adicconstructionandcost; original10x/fullscopeintact.
+Errors: no buildfailure, inheritedindentation/unusedhelperwarnings; noS3/cloud/merge.
