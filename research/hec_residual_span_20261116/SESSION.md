@@ -535,3 +535,17 @@ Execute fixed screen, inspect actual ordinary/simple/group-qualified coverage be
 
 ### Errors
 Previously referenced Rust1.99 stable binaries became unavailable; adapted to Homebrew Rust1.93.1 and recorded version before measurement. No old timing comparison or scientific rerun. Build assertions not executed yet.
+
+## Order-four classification completes; two absolute certificates await independent replay
+
+### What was done
+At86581ac8f26all6fixedcurves smooth/count/action/controlchecks passEXIT0. TwoF17modelsordinary/Fq-simple/absolute-certified andgroup-qualified(ell89,h1600,lambda55;ell53,h1856,lambda30). ThreeothersordinaryreducibleWeilpolynomials;F13model1Fq-simplebutevenWeilpolynomial,exactroot-signcollisionafterFrob²impliesnotabsolute. Allrawhashesverify.
+
+### Decisions made
+No targetsolves/speedclaim. Weaksubgroups/largecofactorsreported;newclassgeometricallyqualifiedonly. Independentlyreplaymodularwitnessarithmeticbeforeusingclass;notrerunpointcounts. Flagsseparategeometry/group;unresolvednotautomaticallydecomposable.
+
+### Open threads
+Compile/freezeindependentmodularverifierfromretainedrawrecords. Broad10xgoalopen;stronggenus4subgroups/actualsolverstillneeded.
+
+### Errors
+Onecurvehas nonbranch-negativecontrol unavailable because allcataloguepoints are branch points; retained in stderr, no model replacement. Originalstabletoolchainpathmissing, recordedHomebrew1.93.1build;nooldtimingcomparison.
