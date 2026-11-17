@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Pursue 15x relation-pipeline speedup with qualified Rust integration and matched measurements (Codex, started 2026-11-17, branch lane/relation-fusion-next, PR #4530; in progress)
+- [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
@@ -25,4 +25,4 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Blocked / questions for the owner
 
-- Relation15x / PR #4530: complete packed constructor and native integration qualified. Repeated200/211 completes1260calls/full-proof replays; primary ratios1.0027–1.1244 inside A/A spread, no15x/improvement admitted. All raw archive214/215 reproduces analysis; clock closure218 passes. Next descriptive parent trace216/324calls, preserving same fixed inputs, strongest matched controls and every proof check. Ordinary root165/historical gates remain incomplete/unchanged. Goal active. [pcc:unverified]
+- Vieta:504/504 primary and72/72 calibration calls completed/replayed. Canonical seed-registration360/60 failures retained; no L2 admission. Official censored-close blocked by unchanged main20261105T0828Z archive command1 lacking successful integer exit. Shared crypto-lean PR26 CI cannot start due account billing lock; no bypass/spend. Full general tower NF instance remains unverified.
