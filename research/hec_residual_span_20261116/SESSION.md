@@ -1291,3 +1291,17 @@ MeasureR/CRTcostagainsteagerknown-actionand4fieldreferences;retainedsource/FB/fi
 
 ### Errors
 No build/runtime/gatefailureorretry,S3/cloud. Matchedall416oldprefixrecordswithoutproducerrun.
+
+## Cyclotomic preparation and elimination cost measured
+
+### What was done
+Frozeneafc7d8ae1d compares eagercharacter+known-actionaffineagainstgeometry-only+R/CRT on6retainedstreams,24calls/48records. Source/rowassembly/linear/finalscalarcostscharged;producerexcluded. Allaction/kchecksandrepeatsagree. BaseREDCgain1.058–1.251;ellREDCregresses5of6. [pcc:unverified]
+
+### Decisions made
+Closeunchangedringstage/fixedcollector as10xroute: commonnonnegativeweightedtwo-REDCstagebound<=1.2514 andcommonproducer+extra1–8rowscannotimprovethatbound. Conditionalcounterproof,notfullCPU/wall/fullsolve. Neednewconstruction/costcase;goalactive,g3/g4open.
+
+### Open threads
+Changedkernel/bootstrap/producerorgenuinegeometry;correctnessandlogicalsetupdeferralalonearenotcostbreakthrough.
+
+### Errors
+No build/scientificfailureorretry/S3/cloud. No hiddenfreeproducerworkorweightedmoduluscancellation.
