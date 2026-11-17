@@ -23,3 +23,18 @@
 ### Errors (what went wrong, how it was handled)
 - No local Rust compiler or direct GitHub network in this runtime; used authenticated GitHub source check-in and pinned GitHub Actions for compilation. Exact-source result pending.
 - Research-KB unavailable; recorded GitHub and paper fallback rather than making an unsupported novelty claim.
+
+## 2026-11-17 ~09:32Z — failed exact-source CI preserved; narrow compiler correction
+
+### What was done (commands, files, features)
+- Read complete [source-specific CI #44055897564](https://github.com/isogeny-labs/crypto/actions/runs/44055897564) job 133945061394 at source `7caa5349...`. Pinned Rust compiled all native library code, **40/40 library tests passed**; the new RR9 example was not executed because the Rust example compilation failed with two E0308 argument-type errors at lines 841 and 890: `Err("literal")` where return type was `Result<_, String>`.
+- Other compiler errors: none in the complete log. No numeric or algebraic measurements or correctness assertions ran, and the workflow uploaded no JSON artifact.
+
+### Decisions made (and why)
+- Preserve failed CI; change only the two literal-String conversions to `.into()`, with frozen protocol and test data unchanged. Rerun source-specific Actions, do not claim a passing verifier until actual run.
+
+### Open threads (unfinished, pick up next time)
+- Verify compilation and exhaustive B8 signed fibres on corrected SHA; inspect all failures, preserve logs. Update report/PR after passing.
+ 
+### Errors (what went wrong, how it was handled)
+- Two local compiler type errors in new helper functions; source-specific compiler identified precise lines. No relaxation of scientific gates.
