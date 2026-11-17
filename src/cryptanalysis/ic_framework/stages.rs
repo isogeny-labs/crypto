@@ -39,7 +39,7 @@
 use std::collections::BTreeMap;
 use std::time::Duration;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::cryptanalysis::ic_boundary::{
     CompletionRule, CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
@@ -420,6 +420,15 @@ pub struct SolverTotals {
     pub solving_degree_sum: u64,
     pub solving_degree_max: u32,
     pub calls_with_a_degree: u64,
+    /// Smallest first-fall degree seen over the calls (the run's measured
+    /// first fall), largest last-fall degree, and the observed degree of
+    /// regularity of the shared system shape.  Diagnostic, never priced.
+    pub first_fall_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
+    /// The per-degree history of the single most detailed call seen (the
+    /// one with the most recorded steps), kept for the trace drawing.
+    pub degree_trace: Vec<DegreeStep>,
     /// The shape of the last system, which is the shape of every system
     /// on one base: the descent's variable and equation counts do not
     /// depend on the target.
@@ -466,6 +475,25 @@ impl SolverTotals {
             self.solving_degree_sum += d as u64;
             self.solving_degree_max = self.solving_degree_max.max(d);
             self.calls_with_a_degree += 1;
+        }
+        // Degree falls: first fall is the smallest over the run, last fall
+        // the largest; the observed degree of regularity is a property of
+        // the shared system shape, so keep the largest any call reported.
+        if let Some(ff) = c.first_fall_degree {
+            self.first_fall_degree = Some(self.first_fall_degree.map_or(ff, |cur| cur.min(ff)));
+        }
+        if let Some(lf) = c.last_fall_degree {
+            self.last_fall_degree = Some(self.last_fall_degree.map_or(lf, |cur| cur.max(lf)));
+        }
+        if let Some(dr) = c.degree_of_regularity_observed {
+            self.degree_of_regularity_observed = Some(
+                self.degree_of_regularity_observed
+                    .map_or(dr, |cur| cur.max(dr)),
+            );
+        }
+        // Keep the richest single-call trace (most recorded steps).
+        if c.degree_trace.len() > self.degree_trace.len() {
+            self.degree_trace = c.degree_trace.clone();
         }
         // A key that names a maximum (`*_max`) is the maximum over
         // calls; every other key is a total over the run.
@@ -682,6 +710,60 @@ pub enum SolverVerdict {
     BudgetExceeded,
 }
 
+/// One working degree of a Gröbner/Macaulay solve, recorded so a run's
+/// degree history can be replayed and drawn.  Purely diagnostic: nothing
+/// here is priced into `S`, compared by the audit replay, or used as a
+/// stopping rule — it is the same contract the solver block carries.
+///
+/// A **degree fall** at working degree `degree` is a step that produced a
+/// fresh generator of degree strictly below `degree` (`fresh_min_degree <
+/// degree`), or the constant polynomial `1` (an inconsistency fall), or a
+/// realized Hilbert value below the semi-regular prediction at this degree.
+/// `is_fall` is the engine's own verdict; `hilbert_expected`/`_realized`
+/// carry the series values when the engine exposes them (`None` otherwise).
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct DegreeStep {
+    /// The working (step) degree `d`.
+    pub degree: u32,
+    /// Critical pairs / S-polynomials processed at this degree.
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub pairs: u64,
+    /// Fresh generators (new leading terms) produced at this degree.
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub fresh: u64,
+    /// The smallest degree among the fresh generators; a fall when `< degree`.
+    #[serde(default, skip_serializing_if = "is_zero_u32")]
+    pub fresh_min_degree: u32,
+    /// Macaulay/echelon matrix shape at this degree, where the engine reports it.
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub rows: u64,
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub cols: u64,
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub rank: u64,
+    #[serde(default, skip_serializing_if = "is_zero_u64")]
+    pub nnz: u64,
+    /// The engine's verdict that a degree fall occurred at this degree.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub is_fall: bool,
+    /// Semi-regular (expected) and realized Hilbert values at this degree,
+    /// when the engine computes the series.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hilbert_expected: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hilbert_realized: Option<i64>,
+}
+
+fn is_zero_u64(v: &u64) -> bool {
+    *v == 0
+}
+fn is_zero_u32(v: &u32) -> bool {
+    *v == 0
+}
+fn is_false(v: &bool) -> bool {
+    !*v
+}
+
 /// What a solver call cost, in the engine's own units plus the ones
 /// every engine can report.
 #[derive(Clone, Debug, Default, Serialize)]
@@ -702,9 +784,22 @@ pub struct SolverCost {
     /// The highest degree at which it learned something new — the
     /// solving degree, and the one to compare against a degree bound.
     pub solving_degree: Option<u32>,
+    /// First-fall degree: the smallest working degree at which a degree
+    /// fall occurred (the measured onset of structure the solver exploits).
+    pub first_fall_degree: Option<u32>,
+    /// Last-fall degree: the largest working degree at which a degree fall
+    /// occurred (governs the solving degree of a structured system).
+    pub last_fall_degree: Option<u32>,
+    /// Observed degree of regularity: the first degree at which the realized
+    /// Hilbert series of the computed ideal is non-positive, when the engine
+    /// exposes the series.  Distinct from the advisory `dreg_forecast`.
+    pub degree_of_regularity_observed: Option<u32>,
     pub timed_out: bool,
     /// Anything else the engine counts and wants in the report.
     pub extra: BTreeMap<String, u64>,
+    /// Per-working-degree history of this call (diagnostic; empty unless the
+    /// engine was asked to record it).
+    pub degree_trace: Vec<DegreeStep>,
 }
 
 /// **Stage 3b — the polynomial system solver.**

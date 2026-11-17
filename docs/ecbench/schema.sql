@@ -266,6 +266,12 @@ CREATE TABLE IF NOT EXISTS run_solver (
   sat_conflicts        INTEGER,
   sat_decisions        INTEGER,
   sat_propagations     INTEGER,
+  first_fall_degree              INTEGER,  -- measured degree-fall observables
+  last_fall_degree               INTEGER,  -- (polynomial-system solves only)
+  solving_degree_sum             INTEGER,
+  degree_of_regularity_observed  INTEGER,
+  degree_story                   TEXT,     -- polynomial-system | sat | sparse-la | generic-transfer | table-enumeration
+  degree_trace_json              TEXT,     -- per-degree Hilbert-deviation trace, JSON
   extra_json           TEXT NOT NULL
 );
 
@@ -492,7 +498,9 @@ SELECT r.record_id, r.session_id, r.arm, r.round, r.status, r.run_id,
        s.name AS solver, s.calls AS solver_calls, s.ops AS solver_ops, s.op_unit AS solver_op_unit,
        s.budget_exceeded, s.n_vars, s.n_equations, s.semi_regular_degree, s.solving_degree_max,
        s.macaulay_rows, s.macaulay_columns, s.macaulay_degree, s.macaulay_rank,
-       s.sat_variables, s.sat_clauses, s.sat_conflicts, s.sat_decisions, s.sat_propagations
+       s.sat_variables, s.sat_clauses, s.sat_conflicts, s.sat_decisions, s.sat_propagations,
+       s.first_fall_degree, s.last_fall_degree, s.solving_degree_sum,
+       s.degree_of_regularity_observed, s.degree_story
 FROM runs r
 JOIN sessions ss ON ss.session_id = r.session_id AND ss.status = 'complete'
 JOIN algorithms a ON a.method_id = r.method_id
@@ -572,4 +580,4 @@ FROM store_objects o
 LEFT JOIN factor_bases f ON f.fb_id = o.fb_id
 WHERE o.kind = 'factor-bases';
 
-INSERT OR REPLACE INTO schema_info (key, value) VALUES ('ecbench_schema_version', '4');
+INSERT OR REPLACE INTO schema_info (key, value) VALUES ('ecbench_schema_version', '5');

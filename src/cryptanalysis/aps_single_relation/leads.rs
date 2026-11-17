@@ -244,7 +244,9 @@ pub fn visit_plan(
                 &cell.system.equations,
                 cell.system.variables,
                 p,
-                &F4Options::new(Ordering::Grevlex, degree).with_budget(remaining),
+                &F4Options::new(Ordering::Grevlex, degree)
+                    .with_budget(remaining)
+                    .recording_degree_falls(),
                 &cell.system.domains,
                 pool,
                 |root| match decode_root(&cell.system, root).and_then(|x| emit(&x)) {
@@ -267,6 +269,9 @@ pub fn visit_plan(
                 max_rows: r.max_rows,
                 max_columns: r.max_cols,
                 f4_field_multiplications: r.field_ops,
+                first_fall_degree: r.first_fall_degree,
+                last_fall_degree: r.last_fall_degree,
+                degree_of_regularity_observed: r.degree_of_regularity_observed,
                 roots: Some(RootDiagnostics {
                     equation_roots_visited: r.solutions_visited,
                     candidates_rejected: r.candidates_rejected,
