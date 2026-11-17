@@ -1019,11 +1019,13 @@ def vieta_component(ref, since):
 
 def vieta_native_speedup(ref, since):
     """Copy frozen Rust medians only: no Python estimates or timing admission."""
+    # Git date-only --since retains the current time; use the UTC day boundary.
+    since_day = since + "T00:00:00Z" if len(since) == 10 else since
     root = "research/vieta_coset_rust_20261115/speedup-20261117/evidence"
     for panel, filename in (("primary", "primary-summary.json"),
                             ("budget8b", "budget-summary.json")):
         path = f"{root}/{filename}"
-        for date, commit, text in file_history(ref, path, since):
+        for date, commit, text in file_history(ref, path, since_day):
             data = json.loads(text)
             source = f"{path}@{commit}"
             emit(f"vieta.native.{panel}.failed_calls", data.get("failed"),

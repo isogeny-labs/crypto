@@ -1,6 +1,6 @@
 # Vieta2–6x goal: code and local data complete, independent standing pending
 
-Tracking PR4535: https://github.com/isogeny-labs/crypto/pull/4535
+Tracking PR4535: https://github.com/isogeny-labs/crypto/pull/4535 [pcc:unverified]
 Branch lane/vieta-speedup-20261117, isolated /workspace/crypto-vieta-speedup.
 Latest pinned goal stays active. No measurement is active; do not rerun these
 completed matrices or spend on cloud. Local/Git-only authorization, no local
@@ -85,3 +85,10 @@ closed records to make a gate pass.
 Keep observations and hand bound unverified pending independent signed standing
 and appropriate timing admission. If checks remain pending, use bounded cadence
 rather than busy-polling; no new experiments are needed for this publication.
+
+Final report head01de32d6bd has full local artifact policy PASS. New progress
+function emits20 stored-native series in scoped validation with explicit UTC
+day filtering. Full exporter fails earlier on unchanged-main progress-timeline
+JSON syntax line565; protected history unchanged. Effective rules require
+gate/size/artifacts,0approvals, resolved threads and conditional unattributed
+change approval. See official PR status for the final published head.
