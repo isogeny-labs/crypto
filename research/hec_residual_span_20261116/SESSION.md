@@ -2849,3 +2849,10 @@ What was done: derived rankincrement=rank(RN), targetdetermination iff e_kN lies
 Decisions made: do notimplement invalidscalarfilter orcallrankoraclefree; onlyfullnullity1 permits exactonescalar dependence test. Futureselectorneedscertifiedquotientbasis/update/scanning/substitutioncostcase andheldoutprefixfalsifier. No newmeasurement/experiment orpostoutcomecutfit.
 Open threads: constructefficientexactlow-nullitysignature scheme orothernewrelationmechanism againststaticforest;10xgoalactiveunachieved/independentreviewopen.
 Errors: none. No S3/cloud/merge/unchangedrerun.
+
+## Restricted grounded-row dual signature window diagnostic frozen
+
+What was done: refineddualscreen: allgroundedrowshavezerofreerootsignature, so rho1smallnullspace permits exactscalarfilterfortheserows evenifglobalq>0. Addedreadonlytopology/rank/payloadlabels atanchorboundaries andallrho<=2rawprefixes, no arithmetic/schedulechanges. Prepared44callsrequiringexactoldFULL16/Report/lookup/nativeanswerreplay andtracerepeats.
+Decisions made: newdiagnosticevidencenotperformancecampaign; checkintraanchoreventsaswellasboundaries. Groundedrho1availabilitynotnullvectorconstructionor10xgain. One600CPUprocessafterGitfreeze.
+Open threads: executegate;onlyiflowdimwindowexists derivepricedexactfinisher/certifiedsignature construction. Fullgoalactiveunachieved.
+Errors: inheritedunusedhelper/importwarningsonly;no scientificexecutionbeforefreeze. No S3/cloud/merge.
