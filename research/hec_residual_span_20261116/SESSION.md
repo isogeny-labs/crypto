@@ -1343,3 +1343,10 @@ What was done: at654f7ac52e1 all400trials/181splitgrouprelations pass with three
 Decisions made: family qualifies exact rows but more signs are not a speed result. Two attempt improvements and three regressions prevent promoting a yield claim. Shared cross-term arithmetic remains unqualified and full costs remain required.
 Open threads: strong prepared six-cross-term comparison before cold full-cost work; original genus2+tenfold objective remains open.
 Errors: none; no retry/S3/cloud or target substitution.
+
+## Four-point shared arithmetic frozen
+
+What was done: compiled prepared-reference/shared-six-cross-term driver, all5unchanged panels,20alternating repeated calls/1600signedoutputs. Monic normalization and all80factorattempts charged percall; all source/native/import/input/binary hashes frozen.
+Decisions made: isolate residual arithmetic after equal shared preparation; preserve degree drops and prior mixed rank outcomes. Push before scientific execution.
+Open threads: once-only counter gate and split-total comparison with prior four-point qualification; full objective unresolved.
+Errors: none; own T7071lease retained, no scientific execution yet.
