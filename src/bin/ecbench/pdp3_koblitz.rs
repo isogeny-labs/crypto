@@ -1277,7 +1277,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                         table
                     }
                     Pdp3Engine::RootfindNegfoldBatchHarvestTorsion => {
-                        if ctx.r % 2 == 0 || ctx.cofactor % 2 != 0 {
+                        if ctx.r.is_multiple_of(2) || !ctx.cofactor.is_multiple_of(2) {
                             return Err(
                                 "torsion harvest requires odd subgroup order and even cofactor"
                                     .into(),

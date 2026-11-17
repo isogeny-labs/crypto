@@ -5024,7 +5024,7 @@ mod tests {
 
     use super::*;
 
-    
+    use super::*;
 
     #[test]
     fn dynamic_unsupported_axes_preserve_outcomes_without_reading_curve_bytes() {

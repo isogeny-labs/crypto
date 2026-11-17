@@ -384,7 +384,7 @@ mod tests {
             n_vars: 3,
             terms: (0..8)
                 .filter(|i| bits & (1 << i) != 0)
-                .map(F2BoolMono::from_mask)
+                .map(|i| F2BoolMono::from_mask(i))
                 .collect(),
         }
     }

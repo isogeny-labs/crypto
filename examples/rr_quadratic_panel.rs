@@ -1102,7 +1102,7 @@ fn run_f4(
     let t0 = Instant::now();
     let (gb, stats) = groebner_basis_f4(polys.to_vec(), n_vars, Some(budget));
     let mut out = Map::new();
-    if let Value::Object(mm) = serde_json::to_value(&stats).expect("serialize F4Stats") {
+    if let Value::Object(mm) = serde_json::to_value(stats).expect("serialize F4Stats") {
         for (k, v) in mm {
             if !v.is_array() {
                 out.insert(k, v);

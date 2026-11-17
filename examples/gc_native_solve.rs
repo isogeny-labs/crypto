@@ -112,7 +112,7 @@ fn solutions_from_linear_part(
             if t.mask == 0 {
                 c ^= 1;
             } else {
-                mask ^= t.mask as u64;
+                mask ^= t.mask;
             }
         }
         for &(v, pm, pc) in &pivots {
@@ -174,7 +174,7 @@ fn solutions_from_linear_part(
 }
 
 fn masks(points: &[Mask]) -> Vec<u64> {
-    let mut v: Vec<u64> = points.iter().map(|&p| p as u64).collect();
+    let mut v: Vec<u64> = points.iter().map(|&p| p).collect();
     v.sort_unstable();
     v.dedup();
     v
@@ -254,7 +254,7 @@ fn replay_columns(polys: &[F2BoolPoly], trace: &F4Trace) -> usize {
             if let Some(p) = polys.get(i as usize) {
                 let mut count: BTreeMap<u64, u32> = BTreeMap::new();
                 for term in &p.terms {
-                    *count.entry(term.mask as u64 | t).or_default() += 1;
+                    *count.entry(term.mask | t).or_default() += 1;
                 }
                 cols.extend(
                     count

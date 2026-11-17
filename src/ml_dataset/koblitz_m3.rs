@@ -3313,7 +3313,7 @@ mod bound_signed_publisher_tests {
             assert!(original
                 .signed
                 .iter()
-                .any(|&(x, y)| p["x"] == x && p["y"] == y));
+                .any(|&(x, y)| p["x"] == x.to_string() && p["y"] == y.to_string()));
             sum = group.add(&sum, &point);
         }
         assert_eq!(sum, group.point(&value["target"]).unwrap());

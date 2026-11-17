@@ -550,29 +550,6 @@ impl OwnedSearch<'_> {
     }
 }
 
-pub(in crate::ml_dataset::solvers) struct ReportedSearch {
-    pub owner:OwnedSearch<'static>, report_admitted:bool, report_taken:bool,
-}
-pub(in crate::ml_dataset::solvers) fn continue_reported(initial:WithLedger<'static>,caps:SearchCaps)->ReportedSearch {
-    let admitted={let mut state=initial.stage.shared.lock().unwrap_or_else(|e|e.into_inner());
-        state.budget.reserve_checking(16*4096+4096,65536,Instant::now()).is_ok()};
-    // A failed reservation is sticky: continue_search retains it and cannot solve.
-    ReportedSearch{owner:continue_search(initial,caps),report_admitted:admitted,report_taken:false}
-}
-impl ReportedSearch {
-    pub(in crate::ml_dataset::solvers) fn outcome(&mut self)->Option<serde_json::Value>{
-        if !self.report_admitted||self.report_taken{return None} self.report_taken=true;
-        let report=self.owner.search_report()?;
-        let ack=self.owner.search_terminal_ack();
-        let value=serde_json::json!({"adapter_id":"sat-search-v1","strategy":"sat-search-v1","status":"partial",
-            "solver_completed":false,"scalar_recovered_without_witness":false,"all_patterns_negative":false,
-            "search_report":report,"terminal_sequence":ack.map(|a|a.event_count),
-            "terminal_sha256":ack.map(|a|a.last_event_sha256.as_str())});
-        assert!(super::super::super::super::worker_terminal_encoded_size(&value,4096).is_ok(),"paid search parent schema cap");
-        Some(value)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -708,6 +685,29 @@ mod tests {
                 *owned.initial.ack.as_ref().unwrap()
             );
         }
+    }
+}
+
+pub(in crate::ml_dataset::solvers) struct ReportedSearch {
+    pub owner:OwnedSearch<'static>, report_admitted:bool, report_taken:bool,
+}
+pub(in crate::ml_dataset::solvers) fn continue_reported(initial:WithLedger<'static>,caps:SearchCaps)->ReportedSearch {
+    let admitted={let mut state=initial.stage.shared.lock().unwrap_or_else(|e|e.into_inner());
+        state.budget.reserve_checking(16*4096+4096,65536,Instant::now()).is_ok()};
+    // A failed reservation is sticky: continue_search retains it and cannot solve.
+    ReportedSearch{owner:continue_search(initial,caps),report_admitted:admitted,report_taken:false}
+}
+impl ReportedSearch {
+    pub(in crate::ml_dataset::solvers) fn outcome(&mut self)->Option<serde_json::Value>{
+        if !self.report_admitted||self.report_taken{return None} self.report_taken=true;
+        let report=self.owner.search_report()?;
+        let ack=self.owner.search_terminal_ack();
+        let value=serde_json::json!({"adapter_id":"sat-search-v1","strategy":"sat-search-v1","status":"partial",
+            "solver_completed":false,"scalar_recovered_without_witness":false,"all_patterns_negative":false,
+            "search_report":report,"terminal_sequence":ack.map(|a|a.event_count),
+            "terminal_sha256":ack.map(|a|a.last_event_sha256.as_str())});
+        assert!(super::super::super::super::worker_terminal_encoded_size(&value,4096).is_ok(),"paid search parent schema cap");
+        Some(value)
     }
 }
 

@@ -60,11 +60,10 @@ fn decode_selector(
     };
     let mut selected = None;
     for i in 0..count {
-        if read(first + u32::try_from(i)?)? {
-            if selected.replace(i).is_some() {
+        if read(first + u32::try_from(i)?)?
+            && selected.replace(i).is_some() {
                 return Err("multiple selected representatives".into());
             }
-        }
     }
     let index = selected.ok_or("no selected representative")?;
     let mut phase = 0;

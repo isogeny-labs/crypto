@@ -932,7 +932,7 @@ mod tests {
         let mut record=RestrictedEquationRecord{schema:"crypto.ml-dataset.boolean-equation-record/v1",status:EquationStatus::VerifiedNonzero,
             assessment:serde_json::json!({}),target:Some(vec![vec![0]]),receipt:Some(serde_json::json!({"wire_hex":"aa","row_index":0})),
             native_operation_witness:false,producer_execution_verified:false};
-        let feature=PublicEquations::from_admitted(&math,&config,&[0u8; 23]).unwrap();
+        let feature=PublicEquations::from_admitted(&math,&config,&vec![0u8;23]).unwrap();
         let before=bounded_projection_json(&feature,32768).unwrap();
         record.receipt=Some(serde_json::json!({"wire_hex":"bbbb","row_index":7,"watermark":99}));
         record.target=Some(vec![vec![1,2]]);

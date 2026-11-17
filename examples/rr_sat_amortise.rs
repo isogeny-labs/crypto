@@ -1087,7 +1087,7 @@ fn main() {
     let ell: usize = args
         .get("--ell")
         .map(|s| s.parse().expect("--ell"))
-        .unwrap_or(((m + 2) / 3) as usize);
+        .unwrap_or(m.div_ceil(3) as usize);
     let seed: u64 = args.num("--seed", "20261115");
     let (curve, curve_source) = make_curve(m);
     let st = FieldStructure::new(m, &curve.irreducible);

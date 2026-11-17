@@ -383,13 +383,13 @@ mod owned_tests {
             assert_eq!(published.publication.ack.as_ref().unwrap().event_count,before+1);
             let output=solvers::WorkerSolveOutput::from_original_affine_rows(published);
             let mut retained=solvers::WorkerResidualCustody::default();
-            let outcome=crate::ml_dataset::finish_retained_worker_output(root,&mut artifacts,output,Ok(()),&mut retained).unwrap();
-            artifacts.push(crate::ml_dataset::storage::write_json(root,"result.json","solver-outcome",&outcome).unwrap());
+            let outcome=crate::ml_dataset::finish_retained_worker_output(&root,&mut artifacts,output,Ok(()),&mut retained).unwrap();
+            artifacts.push(crate::ml_dataset::storage::write_json(&root,"result.json","solver-outcome",&outcome).unwrap());
             assert!(retained.affine_rows.as_ref().unwrap().publication.committed);
             assert_eq!(outcome["status"],"partial");
             let policy=super::super::affine_central::Policy{work:1_000_000_000_000,bytes:8_000_000_000,deadline:Instant::now()+std::time::Duration::from_secs(120),stream_bytes:128<<20,payload_bytes:128<<20};
             let c=caps();
-            let checked=super::super::affine_central::verify_affine_row(root,config,&outcome,&artifacts,policy,super::super::affine_central::RowLimits{expansion:c.expansion,audit:c.audit,checker:c.checker});
+            let checked=super::super::affine_central::verify_affine_row(&root,&config,&outcome,&artifacts,policy,super::super::affine_central::RowLimits{expansion:c.expansion,audit:c.audit,checker:c.checker});
             match checked {Ok(super::super::affine_central::RowOutcome::Verified(v))=>{assert!(v.audit().result.is_ok());assert!(!v.audit().source_authenticated);assert!(v.usage().0>0)},_=>panic!("actual original/receipt/source-bound replay required")}
         }
     }
@@ -407,8 +407,8 @@ mod owned_tests {
             assert_eq!(published.publication.ack.as_ref().unwrap().event_count,before+1);
             let output=solvers::WorkerSolveOutput::from_original_affine_rows(published);
             let mut retained=solvers::WorkerResidualCustody::default();
-            let outcome=crate::ml_dataset::finish_retained_worker_output(root,&mut artifacts,output,Ok(()),&mut retained).unwrap();
-            artifacts.push(crate::ml_dataset::storage::write_json(root,"result.json","solver-outcome",&outcome).unwrap());
+            let outcome=crate::ml_dataset::finish_retained_worker_output(&root,&mut artifacts,output,Ok(()),&mut retained).unwrap();
+            artifacts.push(crate::ml_dataset::storage::write_json(&root,"result.json","solver-outcome",&outcome).unwrap());
             assert!(retained.affine_rows.as_ref().unwrap().publication.committed);
             assert_eq!(outcome["status"],"partial");
             let receipt=root.join("affine-invocation-receipt.json");let policy=root.join("affine-policy.json");
@@ -447,15 +447,15 @@ mod owned_tests {
             assert_eq!(published.publication.ack.as_ref().unwrap().event_count,before+1);
             let output=solvers::WorkerSolveOutput::from_original_affine_rows(published);
             let mut retained=solvers::WorkerResidualCustody::default();
-            let outcome=crate::ml_dataset::finish_retained_worker_output(root,&mut artifacts,output,Ok(()),&mut retained).unwrap();
-            artifacts.push(crate::ml_dataset::storage::write_json(root,"result.json","solver-outcome",&outcome).unwrap());
+            let outcome=crate::ml_dataset::finish_retained_worker_output(&root,&mut artifacts,output,Ok(()),&mut retained).unwrap();
+            artifacts.push(crate::ml_dataset::storage::write_json(&root,"result.json","solver-outcome",&outcome).unwrap());
             assert!(retained.affine_rows.as_ref().unwrap().publication.committed);
             assert_eq!(outcome["status"],"partial");
             let policy=super::super::affine_central::Policy{work:1_000_000_000_000,bytes:8_000_000_000,deadline:Instant::now()+std::time::Duration::from_secs(120),stream_bytes:128<<20,payload_bytes:128<<20};
             let c=caps();
-            let checked=super::super::affine_central::verify_affine_row(root,config,&outcome,&artifacts,policy,super::super::affine_central::RowLimits{expansion:c.expansion,audit:c.audit,checker:c.checker});
+            let checked=super::super::affine_central::verify_affine_row(&root,&config,&outcome,&artifacts,policy,super::super::affine_central::RowLimits{expansion:c.expansion,audit:c.audit,checker:c.checker});
             match checked {Ok(super::super::affine_central::RowOutcome::Verified(mut v))=>{
-                let before=v.usage();v.revalidate(root,config,&outcome,&artifacts).unwrap();assert!(v.usage().0>before.0);
+                let before=v.usage();v.revalidate(&root,&config,&outcome,&artifacts).unwrap();assert!(v.usage().0>before.0);
                 let first=v.project_identity().unwrap();let projection_usage=v.usage();
                 let second=v.project_identity().unwrap();assert_eq!(first,second);assert!(v.usage().0>projection_usage.0);
                 assert_eq!(first["finite_identity_training_admitted"],true);
@@ -465,8 +465,8 @@ mod owned_tests {
                 
                 let path=root.join("live/payloads").join(receipt::path(1,0));
                 let mut bytes=std::fs::read(&path).unwrap();bytes.push(b' ');std::fs::write(&path,bytes).unwrap();
-                assert!(v.revalidate(root,config,&outcome,&artifacts).is_err());let failed=v.usage();
-                assert!(v.revalidate(root,config,&outcome,&artifacts).is_err());assert_eq!(v.usage(),failed);
+                assert!(v.revalidate(&root,&config,&outcome,&artifacts).is_err());let failed=v.usage();
+                assert!(v.revalidate(&root,&config,&outcome,&artifacts).is_err());assert_eq!(v.usage(),failed);
             },_=>panic!("actual original/receipt/source-bound replay required")}
         }
     }

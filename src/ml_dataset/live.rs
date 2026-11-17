@@ -1050,56 +1050,6 @@ fn observation(
     }
 }
 
-// Snapshot upload helpers use the original process-group owner. Solver
-// workers separately retain the gated whole-worker telemetry owner.
-struct SnapshotChild {
-    child: Child,
-    finished: bool,
-}
-
-impl SnapshotChild {
-    fn kill_group(&mut self) {
-        #[cfg(unix)]
-        unsafe {
-            libc::kill(-(self.child.id() as i32), libc::SIGKILL);
-        }
-        let _ = self.child.kill();
-    }
-    fn stop(&mut self) -> Result<ExitStatus, String> {
-        self.kill_group();
-        let exit = self.child.wait().map_err(|e| e.to_string())?;
-        self.finished = true;
-        Ok(exit)
-    }
-    fn poll(&mut self) -> Result<Option<ExitStatus>, String> {
-        let exit = self.child.try_wait().map_err(|e| e.to_string())?;
-        if exit.is_some() {
-            // A backend may have spawned children. Its process group must not
-            // survive the supervised invocation even after the worker exits.
-            self.kill_group();
-            self.finished = true;
-        }
-        Ok(exit)
-    }
-}
-
-impl Drop for SnapshotChild {
-    fn drop(&mut self) {
-        if !self.finished {
-            self.kill_group();
-            let _ = self.child.wait();
-        }
-    }
-}
-
-#[cfg(test)]
-pub(super) fn snapshot_child_for_test(child: Child) -> impl Sized {
-    SnapshotChild {
-        child,
-        finished: false,
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1564,5 +1514,55 @@ mod tests {
         assert!(capture_limits(0).is_err());
         assert!(capture_limits(u64::MAX).is_err());
         assert!(capture_limits(64).is_ok());
+    }
+}
+
+// Snapshot upload helpers use the original process-group owner. Solver
+// workers separately retain the gated whole-worker telemetry owner.
+struct SnapshotChild {
+    child: Child,
+    finished: bool,
+}
+
+impl SnapshotChild {
+    fn kill_group(&mut self) {
+        #[cfg(unix)]
+        unsafe {
+            libc::kill(-(self.child.id() as i32), libc::SIGKILL);
+        }
+        let _ = self.child.kill();
+    }
+    fn stop(&mut self) -> Result<ExitStatus, String> {
+        self.kill_group();
+        let exit = self.child.wait().map_err(|e| e.to_string())?;
+        self.finished = true;
+        Ok(exit)
+    }
+    fn poll(&mut self) -> Result<Option<ExitStatus>, String> {
+        let exit = self.child.try_wait().map_err(|e| e.to_string())?;
+        if exit.is_some() {
+            // A backend may have spawned children. Its process group must not
+            // survive the supervised invocation even after the worker exits.
+            self.kill_group();
+            self.finished = true;
+        }
+        Ok(exit)
+    }
+}
+
+impl Drop for SnapshotChild {
+    fn drop(&mut self) {
+        if !self.finished {
+            self.kill_group();
+            let _ = self.child.wait();
+        }
+    }
+}
+
+#[cfg(test)]
+pub(super) fn snapshot_child_for_test(child: Child) -> impl Sized {
+    SnapshotChild {
+        child,
+        finished: false,
     }
 }
