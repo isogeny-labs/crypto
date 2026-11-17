@@ -2177,3 +2177,10 @@ What was done: freezeed408645ff9 once-onlyexit0;1894trials/12originalcells exact
 Decisions made: rejectstandaloneuniformbootstrapwithin16anchors, no40rows=rank/solve inference. Retainquadraticrecognizer/standardunitgrounding identity, no novelty/performanceclaim.
 Open threads: materiallydifferent useful-rank/collectionconstruction orcostjustifiedhybridwithnegativefallbacks/independenttargets; originalgenus2+10x/review/publication/genus3/4coverage.
 Errors: noneinrun,no retry/S3/cloud.
+
+## Paid orbit-pair bootstrap prefix frozen
+
+What was done: coldprefixvalidation/publicroot/batchedinverses/point-addanchor scans untilfirstgroundingor16cap, diagnosticprincipal/nativechecks separate. No fulloracle/action/expectedscalar inprefix, original12targets/24repeats.
+Decisions made: compareoptimisticprefix to10percent retainedcompletecontrols, no fullsolve/gain inference orunavoidablefreshfallbackdoublecount. Gitfreeze beforeone120CPU. Assertions [pcc:unverified]. Sources priororbit-pair algebra/gain-graph/nativebatchcost.
+Open threads: executeafterpush, testwhetherany10xhybridretainingthisprefixhascostroom.
+Errors: onlyunusedwarning,noscienceyet.
