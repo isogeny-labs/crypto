@@ -2,7 +2,7 @@
 
 Status: design gate completed before the first Lean edit. Lean 4.34.1 and
 Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612` build all declarations.
-The repository proof gate passes 16 audited declarations with zero failing
+The repository proof gate passes 19 audited declarations with zero failing
 and zero trusted-native; retained receipt:
 `proof-gate-v1/research_h113_binary_trinary_winding_20261117/`.
 
@@ -45,6 +45,9 @@ It does not assert that any measured winding predicate is exact.
 
    r • G=0 and inv6*6=1+q*r
      => inv6 • (6 • ([m]G)) = [m]G,
+
+   |{q in cohort | candidate(q)=label(q)}| = |cohort|
+     => for every q in cohort, candidate(q)=label(q),
    ```
 
    followed by generic radix-six reconstruction and an independent injective
@@ -72,6 +75,9 @@ It does not assert that any measured winding predicate is exact.
 | `commuting_carry_paths` | endpoint | `H113BinaryTrinaryWinding` | `AddCommGroup A` | none beyond the structure |
 | `representative_winding_range` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `ℤ` | `0 < p`, four canonical intervals, `p ∣ N` |
 | `exact_predicate_supplies_baseSix` | endpoint | `H113BinaryTrinaryWinding` | functions on semantic public points | exactness hypothesis |
+| `agreementScore` | finite certificate definition | `H113BinaryTrinaryWinding` | finite point type and decidable label equality | none beyond the structure |
+| `full_agreement_score_implies_exact` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | finite point type and decidable label equality | agreement score equals cohort cardinality |
+| `full_score_supplies_baseSix` | endpoint | `H113BinaryTrinaryWinding` | finite point type and natural-valued candidate/label | native score equals cohort cardinality |
 | `radixReconstruct_eq` | generic law; crypto-lean upstream candidate | `H113BinaryTrinaryWinding` | `ℕ` | radix at least two; exact remainder oracle |
 | `baseSixReconstruct_eq` | endpoint | `H113BinaryTrinaryWinding` | `ℕ` | exact base-six oracle |
 | `baseSix_group_step` | endpoint | `H113BinaryTrinaryWinding` | `AddCommGroup A` | exact digit and inverse-six action |
@@ -91,6 +97,7 @@ It does not assert that any measured winding predicate is exact.
 | integer divisibility witness | `p ∣ N` | `dvd_def`/witness elimination |
 | integer linear bounds | order and ring operations on `ℤ` | existing `ℤ` instances; `omega` closes the stated linear chain |
 | canonical base-six digit | `m % 6` | `Nat.mod` |
+| native exact-ID score | `agreementScore` | `Finset.univ.filter` cardinality; full cardinality forces every finite-cohort member to pass |
 | quotient update | `m / 6` | `Nat.div` |
 | radix decomposition | `(m % 6) + 6 * (m / 6) = m` | `Nat.mod_add_div` plus commutativity normalization |
 | termination of recursive decoding | quotient is smaller for radix `≥ 2` | existing natural division bound, discharged by `omega` |
@@ -131,6 +138,23 @@ inv6 • ([m]G - [digit(m)]G)
 = inv6 • (6 • ([m/6]G))                                  [nsmul_nsmul]
 = [m/6]G.                                                 [inverse-six action]
 ```
+
+### Finite exact-ID certificate
+
+```text
+good = {q in cohort | candidate(q)=label(q)}
+good subset cohort                                        [filter subset]
+|good| = |cohort|                                         [verified score]
+good = cohort                                             [finite subset/cardinality]
+candidate(q)=label(q) for every q in cohort.              [filter membership]
+```
+
+`full_score_supplies_baseSix` takes `label(q)=scalar(q)%6`. On the frozen
+prime-order rows, the native score covers every nonidentity subgroup point;
+the decoder stops at identity and does not query a digit there. This theorem
+connects a source-independently verified full score to the existing conditional
+decoder premise for that finite row. It does not extrapolate to an unmeasured
+curve or a larger field.
 
 Repeated application is represented by `radixReconstruct`; its generic
 strong-induction theorem is instantiated at radix six. Final EC verification
@@ -176,7 +200,7 @@ ELAN_HOME=/workspace/.elan-h113 XDG_CACHE_HOME=/workspace/.cache-h113 \
   tools/lean/proof-gate.sh \
   --out research/h113_binary_trinary_winding_20261117/proof-gate-v1 \
   research/h113_binary_trinary_winding_20261117
-# PASS  16 thm  0 trusted
+# PASS  19 thm  0 trusted
 ```
 
 The transitive axiom audit reports only `propext`, `Classical.choice`, and

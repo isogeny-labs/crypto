@@ -87,6 +87,43 @@ theorem exact_predicate_supplies_baseSix
     predicate (observable q) = scalar q % 6 := by
   exact hexact q
 
+/-- The native exact-ID score: the number of finite-cohort points on which a
+candidate and its frozen label agree. -/
+def agreementScore {Cohort Label : Type*}
+    [Fintype Cohort] [DecidableEq Cohort] [DecidableEq Label]
+    (candidate label : Cohort → Label) : ℕ :=
+  (Finset.univ.filter fun q => candidate q = label q).card
+
+/-- A full finite-cohort score is a pointwise exactness certificate on that
+cohort. -/
+theorem full_agreement_score_implies_exact
+    {Cohort Label : Type*}
+    [Fintype Cohort] [DecidableEq Cohort] [DecidableEq Label]
+    (candidate label : Cohort → Label)
+    (hfull : agreementScore candidate label = Fintype.card Cohort) :
+    ∀ q, candidate q = label q := by
+  let good : Finset Cohort :=
+    Finset.univ.filter fun q => candidate q = label q
+  have hcard : good.card = (Finset.univ : Finset Cohort).card := by
+    simpa [good, agreementScore] using hfull
+  have hgood : good = (Finset.univ : Finset Cohort) :=
+    Finset.eq_of_subset_of_card_le (Finset.filter_subset _ _)
+      (Nat.le_of_eq hcard.symm)
+  intro q
+  have hmem : q ∈ good := by rw [hgood]; simp
+  exact (Finset.mem_filter.mp hmem).2
+
+/-- A source-independently verified full score supplies the base-six oracle
+premise on the frozen finite cohort. -/
+theorem full_score_supplies_baseSix
+    {Cohort : Type*} [Fintype Cohort] [DecidableEq Cohort]
+    (observable : Cohort → Value) (predicate : Value → ℕ)
+    (scalar : Cohort → ℕ)
+    (hfull : agreementScore (fun q => predicate (observable q))
+        (fun q => scalar q % 6) = Fintype.card Cohort) :
+    ∀ q, predicate (observable q) = scalar q % 6 := by
+  exact full_agreement_score_implies_exact _ _ hfull
+
 /-- Reconstruct a natural number from successive exact remainder queries in
 an arbitrary radix at least two. -/
 def radixReconstruct (base : ℕ) (hbase : 2 ≤ base)
@@ -265,6 +302,9 @@ end GroupDecoder
 #print axioms commuting_carry_paths
 #print axioms representative_winding_range
 #print axioms exact_predicate_supplies_baseSix
+#print axioms agreementScore
+#print axioms full_agreement_score_implies_exact
+#print axioms full_score_supplies_baseSix
 #print axioms radixReconstruct_eq
 #print axioms baseSixReconstruct_eq
 #print axioms baseSix_group_step
