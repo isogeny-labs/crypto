@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Publish frozen joint-chart Richelot divisor map14 and full evidence (Codex, started 2026-11-17, branch lane/chained-richelot-map14; in progress)
+- [ ] Publish frozen joint-chart Richelot divisor map14 and full evidence (Codex, started 2026-11-17, branch lane/chained-richelot-map14, PR #4544; in progress)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 
