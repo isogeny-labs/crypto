@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T21:06:58Z",
+ "id": "PCC-20261116-3718bc",
+ "kind": "statement",
+ "producer": {
+  "commit": "ebb99bcb445c6dff8f8c02f8aca175845416a225",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/worklist-solver-v1/transfer-provenance/TRANSFER.json",
+    "sha256": "1dea64cde4d9107c591ccf2d95756b33b8012188a7551354aca2f9193e4a2863"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/worklist-solver-v1/transfer-provenance/unpublished-ledger-suffix.jsonl",
+    "sha256": "59b97659bc2bcc3134a2407b86dd169e28d15b7afeac98a3fac43c3c506299d4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/worklist-solver-v1/transfer-provenance/unpublished-journal-suffix.md",
+    "sha256": "0eea634ef1b2c767ff4b9867aa3de6e95abcda0f216568fe360d719097e3e478"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/worklist-solver-v1/transfer-provenance/canonical-ledger-baseline.log",
+    "sha256": "6929a19f7f652a9d3c1d4fb1c814550e98834927f2f71c9f90330f09fbe59136"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/worklist-solver-v1/transfer-provenance/working-ledger-check.log",
+    "sha256": "ad3fa2ef461a8b3e0de348a920080af5a65f65fa2b5f012dc004aed4670a1715"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Worklist component canonical transfer metadata",
+ "statement": "Unsigned metadata: source/evidence/report/claim bytes transferred unchanged from local unpublished checkpoint to current-main worktree; only three genuinely unpublished claim bodies appended via maintained pcc.append_entry, canonical1215-row ledger and journal prefixes retained. All55 working source hashes match. Full ledger verification fails with the same125 inherited missing claim_type diagnostics as an untouched exact-HEAD baseline; chain-only, prefix and new claim schema checks pass. No historical claim edited or published registration reconstructed. Original workspace clean at local checkpoint, no native rerun for metadata. This is not a hosted gate or signed execution/scientific receipt."
+}

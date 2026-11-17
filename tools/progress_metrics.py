@@ -29,6 +29,8 @@ Sources (all committed, read at --ref unless noted):
                                 exact fixed-score allocation coverage, not sampled curves or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
+  research/ic_stride_renew_prime_20261029/P{20,24,28,32}/analysis/compare-*.json
+                                stride-renew / walk and stride-renew / matched rho, recorded ratios
   research/explicit_relations_e2e_20261030/results-v*/
                                 exact recovery counts and bounded two-target frontier; no L0 timing rank
   research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/audit.json
@@ -765,6 +767,32 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+def ic_stride_renew(ref, since):
+    """Prime-field IC baseline, relation targets stride-renew against walk
+    (XP-20261029-stride-renew-prime), per size: the measured ratio
+    sum S_srenew / sum S_walk and the distance remaining to the matched rho,
+    sum S_srenew / sum S_rho-neg, at each 5a band weight, with the upper end
+    of each recorded 95% cluster-bootstrap interval. Values are the `ops`
+    block `ecbench compare` recorded; nothing is recomputed. 20 and 28 bits
+    are validated improvements; 24 and 32 bits are nulls."""
+    study = "research/ic_stride_renew_prime_20261029"
+    for bits in (20, 24, 28, 32):
+        for w in ("0", "0.1", "1"):
+            for pair, name, label in (
+                    ("walk__srenew", "srenew_over_walk", "stride-renew / walk (the baseline target source)"),
+                    ("rho-neg__srenew", "srenew_over_rho", "stride-renew / matched rho.negation (distance remaining)")):
+                path = f"{study}/P{bits}/analysis/compare-{pair}-w{w}.json"
+                for date, commit, text in file_history(ref, path, since):
+                    ops = json.loads(text).get("ops", {})
+                    ci = ops.get("ci95_bootstrap") or [None, None]
+                    metric = f"ic_baseline.stride_renew.p{bits}.{name}.w{w}"
+                    what = f"Prime-field IC {bits}-bit, {label}, sum S at w = {w}"
+                    src = f"{path}@{commit}"
+                    emit(metric, ops.get("ratio_b_over_a"), date=date, problem=P_IC, unit="ratio of S",
+                         better="lower", label=what, source=src)
+                    emit(f"{metric}.ci95_hi", ci[1], date=date, problem=P_IC, unit="ratio of S",
+                         better="lower", label=f"{what}: upper end of the 95% cluster-bootstrap interval",
+                         source=src)
 def ic_packed_filter(ref, since):
     """The membership filter on the packed pair table (a wall component, not a whole-pipeline row):
     at 32 bits, the corrected whole-solve wall per charged GAE dgbf / dgb and its 95% upper end,
@@ -974,13 +1002,16 @@ def n83_d18_vsids_gate(ref, since):
 def vieta_component(ref, since):
     """Export stored native observations; censored records do not imply admission."""
     for slug in ("20261115T2104Z-vieta-coset-local-scale",
-                 "20261115T2147Z-vieta-three-fixture-repair"):
+                 "20261115T2147Z-vieta-three-fixture-repair",
+                 "20261116T1553Z-vieta-polynomial-backends",
+                 "20261116T1646Z-vieta-polynomial-registration",
+                 "20261116T1938Z-vieta-half-gcd-rational"):
         path = f"benchmarks/records/{slug}.json"
         for date, commit, text in file_history(ref, path, since):
             record = json.loads(text)
             for metric in record.get("metrics", []):
                 emit(f"vieta.component.{metric['name']}", metric.get("value"),
-                     date=date, problem="vieta-coset-component",
+                     date=date, problem=("vieta-rational-component" if slug == "20261116T1938Z-vieta-half-gcd-rational" else "vieta-coset-component"),
                      unit=metric.get("unit", ""), better="neutral",
                      label="Generic-reference operation counts; censored epoch, PCC unverified",
                      source=f"{path}@{commit}")
@@ -1020,6 +1051,7 @@ def main():
     koblitz_modular_geometry(a.ref, a.since)
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
+    ic_stride_renew(a.ref, a.since)
     ic_packed_filter(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",

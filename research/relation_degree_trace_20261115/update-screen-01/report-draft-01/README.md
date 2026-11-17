@@ -1,0 +1,1 @@
+Draft uses a placeholder claim label. Final report-02 uses corrective PCCb94249; the earlier selection sentence in c231a8 was wrong and is explicitly superseded. Raw costs and mathematical report computations are unchanged. No timing retry. [pcc:unverified]

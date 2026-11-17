@@ -2361,6 +2361,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
         &[
             ("m", "summands, 3 to 9 (the packed index is 12 bits for m <= 5, 64/m bits above: bases of up to 1023, 511, 255, 127 points for m = 6..9)"),
             ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
+            ("prune", "1: skip the adds of partial sums that cannot be completed to m summands; same table, fewer build adds (default 0)"),
         ]
     }
 
@@ -2373,7 +2374,13 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     ) -> Result<(), String> {
         self.free = params.flag("free");
         self.free_pending = self.free;
-        let table = KSumTable::build_negation_folded_with(ctx.group, fb, self.k, self.free)?;
+        let table = KSumTable::build_negation_folded_opts(
+            ctx.group,
+            fb,
+            self.k,
+            self.free,
+            params.flag("prune"),
+        )?;
         // The table's construction is part of the pipeline's cost.
         ops.merge(table.build_ops);
         self.table = Some(table);
@@ -3198,19 +3205,41 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
 pub struct ResidualSweepOracle {
     /// Residuals kept at most; later ones are still looked up.
     cap: usize,
+    /// Identify `Z` with `−Z` (the signed-class fold).  Off: only equal points collide.
+    fold: bool,
+    /// Distinguished-point filter: only residuals whose hashed abscissa has this
+    /// many trailing zero bits are stored or probed.
+    dp_bits: u32,
+    /// Also probe the negation-folded pair table once a target (hybrid).
+    pairs: bool,
+    table: Option<PairTable>,
     negs: Vec<PrimePoint>,
+    /// key -> (a, b, index, y bit)
     store: HashMap<u64, (u64, u64, u32, bool)>,
     stored: u64,
     sweeps: u64,
     collisions: u64,
     identity_hits: u64,
     cap_misses: u64,
+    dp_skipped: u64,
+    pair_hits: u64,
+}
+
+fn sweep_mix(x: u64) -> u64 {
+    let mut z = x.wrapping_add(0x9E37_79B9_7F4A_7C15);
+    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    z ^ (z >> 31)
 }
 
 impl ResidualSweepOracle {
     pub fn new() -> Self {
         Self {
             cap: 1 << 24,
+            fold: true,
+            dp_bits: 0,
+            pairs: false,
+            table: None,
             negs: Vec::new(),
             store: HashMap::new(),
             stored: 0,
@@ -3218,6 +3247,8 @@ impl ResidualSweepOracle {
             collisions: 0,
             identity_hits: 0,
             cap_misses: 0,
+            dp_skipped: 0,
+            pair_hits: 0,
         }
     }
 }
@@ -3239,7 +3270,7 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
 
     fn describe(&self, _params: &Params) -> String {
         "every residual R − P_i of a target stored by abscissa; a collision of two residuals is a \
-         base-only relation (single large prime, no pair table)"
+         base-only relation (single large prime, no pair table unless pairs=1)"
             .into()
     }
 
@@ -3247,6 +3278,15 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
         &[
             ("m", "must be 2"),
             ("cap", "most residuals kept (default 16777216)"),
+            ("fold", "1 (default): Z and −Z collide; 0: only equal points collide"),
+            (
+                "dp",
+                "k (default 0): store and probe only residuals whose hashed abscissa has k trailing zero bits",
+            ),
+            (
+                "pairs",
+                "1: also probe the negation-folded pair table once a target (hybrid); default 0",
+            ),
         ]
     }
 
@@ -3255,15 +3295,37 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
         ctx: &InstanceCtx<PrimeCurve>,
         fb: &FactorBase<PrimePoint>,
         params: &Params,
-        _ops: &mut GroupOps,
+        ops: &mut GroupOps,
     ) -> Result<(), String> {
-        if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| key != "m" && key != "cap") {
-            return Err("residual-sweep accepts only m=2 and cap".into());
+        const KEYS: [&str; 5] = ["m", "cap", "fold", "dp", "pairs"];
+        if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| !KEYS.contains(&key.as_str())) {
+            return Err("residual-sweep accepts only m=2, cap, fold, dp and pairs".into());
         }
         self.cap = params.u64_or("cap", 1 << 24)? as usize;
+        self.fold = params.u64_or("fold", 1)? != 0;
+        self.dp_bits = params.u64_or("dp", 0)? as u32;
+        if self.dp_bits > 40 {
+            return Err("residual-sweep dp must be at most 40".into());
+        }
+        self.pairs = params.u64_or("pairs", 0)? != 0;
         self.negs = fb.points.iter().map(|p| ctx.group.neg(*p)).collect();
         self.store.clear();
+        self.table = None;
+        if self.pairs {
+            let table = PairTable::build_negation_folded_prime_batch(ctx.group, fb)?;
+            ops.merge(table.build_ops);
+            self.table = Some(table);
+        }
         Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(PairTable::work_counters)
+                .unwrap_or_default(),
+        )
     }
 
     fn decompose(
@@ -3291,6 +3353,13 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
         let g = ctx.group;
         let mut out = Vec::new();
         self.sweeps += 1;
+        if let Some(table) = self.table.as_ref() {
+            if let Some(summands) = decompose_mitm(g, fb, table, 2, ops, counters, point) {
+                self.pair_hits += 1;
+                out.push(Relation::Summands(summands));
+            }
+        }
+        let dp_mask = (1u64 << self.dp_bits) - 1;
         for (i, neg) in self.negs.iter().enumerate() {
             let z = g.add(ops, point, *neg);
             if g.is_identity(&z) {
@@ -3302,12 +3371,21 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
                 });
                 continue;
             }
+            if self.dp_bits > 0 && sweep_mix(z.x) & dp_mask != 0 {
+                self.dp_skipped += 1;
+                continue;
+            }
             counters.lookups += 1;
             let ybit = z.y > g.neg(z).y;
-            match self.store.get(&z.x) {
+            let key = if self.fold {
+                z.x
+            } else {
+                (z.x << 1) | u64::from(ybit)
+            };
+            match self.store.get(&key) {
                 Some(&(a2, b2, i2, ybit2)) => {
                     let i2 = i2 as usize;
-                    let t_plus = ybit == ybit2;
+                    let t_plus = !self.fold || ybit == ybit2;
                     self.collisions += 1;
                     let (ra, rb, second) = if t_plus {
                         (
@@ -3326,7 +3404,7 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
                 }
                 None => {
                     if self.store.len() < self.cap {
-                        self.store.insert(z.x, (a, b, i as u32, ybit));
+                        self.store.insert(key, (a, b, i as u32, ybit));
                         self.stored += 1;
                     } else {
                         self.cap_misses += 1;
@@ -3344,6 +3422,8 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
             ("collisions".to_string(), self.collisions),
             ("identity_hits".to_string(), self.identity_hits),
             ("cap_misses".to_string(), self.cap_misses),
+            ("dp_skipped".to_string(), self.dp_skipped),
+            ("pair_hits".to_string(), self.pair_hits),
         ])
     }
 }
@@ -7117,6 +7197,495 @@ mod free_rows_probe {
                 cols.saturating_sub(1),
                 (r as f64).log2()
             );
+        }
+    }
+}
+
+// ── k-sum folded by the signed Frobenius (Koblitz) ───────────────────
+
+/// Most `k`-sum completions [`FrobeniusKSumTable::build`] agrees to try:
+/// a guard against a base whose folded table would not fit in memory.
+pub const FROB_KSUM_MAX_ATTEMPTS: u64 = 1 << 28;
+
+use crate::cryptanalysis::ic_boundary::{fast_map, FastMap};
+
+/// **A table of every signed `k`-sum of a Frobenius-closed base, folded by
+/// the signed Frobenius `⟨σ, −1⟩`** (Koblitz curves, `k = 3` to `5`).
+///
+/// `σ` is a group automorphism, so `σ^t(Σ ε_i P_i) = Σ ε_i σ^t(P_i)`, and
+/// the `2n` images of a sum share one canonical name of its abscissa
+/// ([`FrobeniusCanon`]).  The table keeps one sum per such orbit: the
+/// first summand is the representative of the least orbit the sum meets
+/// (the rotation and sign that bring a summand there are absorbed by the
+/// fold), the others are base points at strictly later positions of the
+/// orbit-sorted base, no two on one abscissa.  About `1/(2n)` of the
+/// unfolded table of the same signed points.
+///
+/// A probe canonicalises the target's abscissa once; the entry's shift and
+/// the target's give the rotation `t`; the summands `σ^t(P_i)` are read
+/// from an orbit-member index built once (`n − 1` Frobenius maps and
+/// lookups a base point, charged at build); `k − 1` additions confirm
+/// `±R`.  A relation is a [`Relation::Summands`] over base points, which
+/// the base's column map turns into `±λ^t` coefficients on orbit columns.
+pub struct FrobeniusKSumTable {
+    /// Canonical key → (packed summand indices, the entry's shift).
+    map: FastMap<(u64, u8)>,
+    canon: crate::cryptanalysis::koblitz_fast::FrobeniusCanon,
+    /// `member_of[i·n + t]`: the base index of `σ^t(P_i)`.
+    member_of: Vec<u32>,
+    n: u32,
+    bits: u32,
+    pub k: u32,
+    pub entries: u64,
+    pub representatives: u64,
+    pub build_ops: GroupOps,
+    pub build_wall_ns: u64,
+    /// Canonicalisations of the build: one a base point (the orbit
+    /// pass) and one a completed sum.
+    pub build_canonicalisations: u64,
+    pub build_frobenius_maps: u64,
+    pub build_lookups: u64,
+    /// Completed sums offered to the map, kept or not.
+    pub insert_attempts: u64,
+}
+
+impl FrobeniusKSumTable {
+    pub fn build(
+        inst: &BinaryInstance,
+        fb: &FactorBase<FastPoint>,
+        k: u32,
+    ) -> Result<Self, String> {
+        use crate::cryptanalysis::ic_boundary::ksum_index_bits;
+        if !(3..=5).contains(&k) {
+            return Err(format!("ksum-frobenius needs m = 3, 4 or 5, not {k}"));
+        }
+        let bits = ksum_index_bits(k);
+        let f = fb.points.len();
+        if f >= 1 << bits {
+            return Err(format!(
+                "ksum-frobenius packs base indices in {bits} bits; the base has {f} points (fewer than {} are allowed)",
+                1u64 << bits
+            ));
+        }
+        if inst.koblitz.is_none() {
+            return Err("ksum-frobenius needs a Koblitz curve".into());
+        }
+        let start = Instant::now();
+        let n = inst.n as usize;
+        let g = BinaryGroup(&inst.fast);
+        let canon = crate::cryptanalysis::koblitz_fast::FrobeniusCanon::new(&inst.gf, inst.n)
+            .ok_or("no normal basis found for the Frobenius canonical form")?;
+        // The orbit-member index: σ^t(P_i) for every base point.
+        let mut member_of = vec![0u32; f * n];
+        let (mut frob, mut lookups) = (0u64, 0u64);
+        for i in 0..f {
+            let mut p = fb.points[i];
+            member_of[i * n] = i as u32;
+            for t in 1..n {
+                p = inst.fast.frobenius_k(p, 1);
+                frob += 1;
+                lookups += 1;
+                let idx = *fb
+                    .point_index
+                    .get(&p.pack())
+                    .ok_or("ksum-frobenius needs a base closed under the Frobenius")?;
+                member_of[i * n + t] = idx as u32;
+            }
+        }
+        // Orbits by the canonical name of the abscissa (±P share it), the
+        // representative the first point of each in index order.
+        let mut orbit_of = vec![0u32; f];
+        let mut rep_of_orbit: Vec<usize> = Vec::new();
+        let mut canons = 0u64;
+        {
+            let mut orbit_index: FastMap<u32> = fast_map(f / n + 1);
+            for i in 0..f {
+                canons += 1;
+                let key = canon.canon(fb.points[i].x);
+                let next = rep_of_orbit.len() as u32;
+                let id = *orbit_index.entry(key).or_insert(next);
+                if id == next {
+                    rep_of_orbit.push(i);
+                }
+                orbit_of[i] = id;
+            }
+        }
+        // Orbit-sorted positions: each orbit's block starts at its
+        // representative.
+        let mut order: Vec<usize> = (0..f).collect();
+        order.sort_by_key(|&i| (orbit_of[i], i));
+        let mut block_start = vec![0usize; rep_of_orbit.len()];
+        for (pos, &i) in order.iter().enumerate().rev() {
+            block_start[orbit_of[i] as usize] = pos;
+        }
+        // Completions tried: Σ_o C(f − start_o − 1, k − 1).
+        let choose = |a: u64, b: u64| -> u64 {
+            (0..b).fold(1u64, |c, i| c.saturating_mul(a.saturating_sub(i)) / (i + 1))
+        };
+        let estimate = block_start
+            .iter()
+            .map(|&s| choose((f - s - 1) as u64, u64::from(k - 1)))
+            .fold(0u64, |a, b| a.saturating_add(b));
+        if estimate > FROB_KSUM_MAX_ATTEMPTS {
+            return Err(format!(
+                "a Frobenius-folded {k}-sum table over {f} points would try about {estimate} sums, above the limit {FROB_KSUM_MAX_ATTEMPTS}"
+            ));
+        }
+        let mut t = Self {
+            map: fast_map((estimate / 2).min(1 << 24) as usize + 1),
+            canon,
+            member_of,
+            n: inst.n,
+            bits,
+            k,
+            entries: 0,
+            representatives: rep_of_orbit.len() as u64,
+            build_ops: GroupOps::default(),
+            build_wall_ns: 0,
+            build_canonicalisations: canons,
+            build_frobenius_maps: frob,
+            build_lookups: lookups,
+            insert_attempts: 0,
+        };
+        let mut idx = [u32::MAX; 5];
+        for (o, &rep) in rep_of_orbit.iter().enumerate() {
+            idx[0] = rep as u32;
+            t.extend(
+                &g,
+                fb,
+                &order,
+                1,
+                block_start[o] + 1,
+                fb.points[rep],
+                &mut idx,
+            );
+        }
+        t.entries = t.map.len() as u64;
+        t.build_wall_ns = start.elapsed().as_nanos() as u64;
+        Ok(t)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn extend(
+        &mut self,
+        g: &BinaryGroup,
+        fb: &FactorBase<FastPoint>,
+        order: &[usize],
+        depth: usize,
+        from: usize,
+        partial: FastPoint,
+        idx: &mut [u32; 5],
+    ) {
+        let last = depth + 1 == self.k as usize;
+        for pos in from..order.len() {
+            let j = order[pos];
+            // Distinct abscissae: never a point beside its negative.
+            let neg = fb.neg_index[j] as u32;
+            if idx[..depth].contains(&neg) {
+                continue;
+            }
+            let s = g.add(&mut self.build_ops, partial, fb.points[j]);
+            if g.is_identity(&s) {
+                continue;
+            }
+            idx[depth] = j as u32;
+            if last {
+                self.build_canonicalisations += 1;
+                self.insert_attempts += 1;
+                let (key, shift) = self.canon.canon_with_shift(s.x);
+                let bits = self.bits;
+                let packed = idx[..self.k as usize]
+                    .iter()
+                    .rev()
+                    .fold(0u64, |w, &i| (w << bits) | u64::from(i));
+                self.map.entry(key).or_insert((packed, shift as u8));
+            } else {
+                self.extend(g, fb, order, depth + 1, pos + 1, s, idx);
+            }
+        }
+        idx[depth] = u32::MAX;
+    }
+
+    /// The build's work that only `bitop/v1` prices.
+    pub fn work_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        let canon = self.canon.build_work();
+        for (name, v) in [
+            ("table_insert_attempts", self.insert_attempts),
+            ("canon_build_word_ops", canon.word_ops),
+            ("canon_build_field_sqrs", canon.field_sqrs),
+        ] {
+            if v > 0 {
+                out.insert(name.to_string(), v);
+            }
+        }
+        out
+    }
+
+    /// Signed indices of `k` base points summing to `target`, if some
+    /// `⟨σ, −1⟩`-image of a stored sum is `±target`: one canonicalisation,
+    /// one probe, `k − 1` additions.
+    pub fn probe(
+        &self,
+        g: &BinaryGroup,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        ctr: &mut OracleCounters,
+        target: FastPoint,
+    ) -> Option<Vec<usize>> {
+        if g.is_identity(&target) {
+            return None;
+        }
+        ctr.canonicalisations += 1;
+        let (key, t_r) = self.canon.canon_with_shift(target.x);
+        ctr.lookups += 1;
+        let &(packed, t_u) = self.map.get(&key)?;
+        let n = self.n;
+        // x_R = σ^t(x_U), t = t_u − t_r (as FrobeniusPairTable::probe).
+        let t = ((u32::from(t_u) + n - t_r) % n) as usize;
+        let mask = (1u64 << self.bits) - 1;
+        let summands: Vec<usize> = (0..self.k)
+            .map(|d| {
+                let i = ((packed >> (d * self.bits)) & mask) as usize;
+                self.member_of[i * n as usize + t] as usize
+            })
+            .collect();
+        let mut s = fb.points[summands[0]];
+        for &i in &summands[1..] {
+            s = g.add(ops, s, fb.points[i]);
+        }
+        if s == target {
+            Some(summands)
+        } else if s == g.neg(target) {
+            Some(summands.iter().map(|&i| fb.neg_index[i]).collect())
+        } else {
+            ctr.frobfold_mismatches += 1;
+            None
+        }
+    }
+}
+
+/// `ksum-frobenius:m=3|4|5`: one probe a target into a
+/// [`FrobeniusKSumTable`] over a Frobenius-closed Koblitz base
+/// (`koblitz-standard-subspace`, `koblitz-closure`, `compact-orbit-scan`).
+/// Every group operation, Frobenius map, lookup and canonicalisation of
+/// the build and of every probe is counted.
+pub struct FrobeniusKSumOracle<'i> {
+    k: u32,
+    instance: &'i BinaryInstance,
+    table: Option<FrobeniusKSumTable>,
+}
+
+impl<'i> FrobeniusKSumOracle<'i> {
+    pub fn new(k: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            k,
+            instance,
+            table: None,
+        }
+    }
+
+    pub fn table(&self) -> Option<&FrobeniusKSumTable> {
+        self.table.as_ref()
+    }
+}
+
+impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusKSumOracle<'_> {
+    fn name(&self) -> &str {
+        "ksum-frobenius"
+    }
+
+    fn summands(&self) -> u32 {
+        self.k
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        format!(
+            "a table of every signed {}-sum of a Frobenius-closed base, one entry per signed Frobenius orbit, probed once per target",
+            self.k
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[(
+            "m",
+            "summands, 3 to 5 (base of fewer than 4096 signed points, closed under the Frobenius)",
+        )]
+    }
+
+    fn prepare(
+        &mut self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        _params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let table = FrobeniusKSumTable::build(self.instance, fb, self.k)?;
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(FrobeniusKSumTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn setup_native(&self) -> BTreeMap<String, u64> {
+        let mut counts = BTreeMap::new();
+        if let Some(table) = &self.table {
+            counts.insert("canonicalisations".into(), table.build_canonicalisations);
+            counts.insert("frobenius_maps".into(), table.build_frobenius_maps);
+            counts.insert("lookups".into(), table.build_lookups);
+            counts.insert("ksum_table_entries".into(), table.entries);
+            counts.insert("ksum_table_representatives".into(), table.representatives);
+        }
+        counts
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+    ) -> Option<Vec<usize>> {
+        let table = self.table.as_ref()?;
+        table.probe(ctx.group, fb, ops, counters, point)
+    }
+}
+
+#[cfg(test)]
+mod ksum_frobenius_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{koblitz_instance, Calibration};
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+    fn ctx<'a>(
+        inst: &BinaryInstance,
+        g: &'a BinaryGroup<'a>,
+        q: FastPoint,
+    ) -> InstanceCtx<'a, BinaryGroup<'a>> {
+        InstanceCtx {
+            group: g,
+            generator: inst.generator,
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        }
+    }
+
+    /// Every probe hit re-sums to its target, the fold leaves no
+    /// mismatches, and the folded table finds every decomposition the
+    /// unfolded `KSumTable` over the same signed points finds.
+    #[test]
+    fn folded_ksum_agrees_with_the_unfolded_table() {
+        let inst = koblitz_instance(1, 17).expect("K1 n17");
+        let g = BinaryGroup(&inst.fast);
+        let c = ctx(&inst, &g, inst.generator);
+        let (_, params) = Params::parse_spec("koblitz-closure:dimension=2").unwrap();
+        let mut ops = GroupOps::default();
+        let fb = KoblitzClosureBase { instance: &inst }
+            .build(&c, &params, &mut ops)
+            .unwrap();
+        for k in [3u32, 4] {
+            let folded = FrobeniusKSumTable::build(&inst, &fb, k).unwrap();
+            let full = KSumTable::build_negation_folded(&g, &fb, k).unwrap();
+            assert!(
+                folded.entries * inst.n as u64 <= full.entries,
+                "k={k}: {} folded entries against {} unfolded",
+                folded.entries,
+                full.entries
+            );
+            let mut ctr = OracleCounters::default();
+            let mut lk = 0u64;
+            let (mut both, mut only_full, mut only_fold) = (0, 0, 0);
+            for e in 1..inst.r.min(4000) {
+                let q = g.mul(&mut ops, inst.generator, e);
+                let a = full.probe(&g, &fb, &mut ops, &mut lk, q);
+                let b = folded.probe(&g, &fb, &mut ops, &mut ctr, q);
+                if let Some(w) = &b {
+                    assert_eq!(w.len(), k as usize);
+                    let mut s = fb.points[w[0]];
+                    for &i in &w[1..] {
+                        s = g.add(&mut ops, s, fb.points[i]);
+                    }
+                    assert_eq!(s, q, "k={k} e={e}");
+                }
+                match (a.is_some(), b.is_some()) {
+                    (true, true) => both += 1,
+                    (true, false) => only_full += 1,
+                    (false, true) => only_fold += 1,
+                    _ => {}
+                }
+            }
+            assert_eq!(ctr.frobfold_mismatches, 0);
+            assert!(both > 0, "k={k}: no hits");
+            assert_eq!(only_full, 0, "k={k}: the fold lost decompositions");
+            // The unfolded table keeps one sum per key and sees nothing
+            // the fold misses; the fold can see more (distinct-abscissa
+            // sums both cover), so only the one direction is asserted.
+            std::hint::black_box(only_fold);
+        }
+    }
+
+    /// End to end: the pipeline recovers planted logs on a small Koblitz
+    /// curve with the folded oracle over a Frobenius-closed base (two
+    /// projected signed Frobenius orbits).
+    #[test]
+    fn ksum_frobenius_recovers_planted_logs() {
+        let inst = koblitz_instance(1, 17).expect("K1 n17");
+        let g = BinaryGroup(&inst.fast);
+        for k in [3u32, 4] {
+            for s in 0..3u64 {
+                let planted = (1234 + 977 * s) % inst.r;
+                let mut ops = GroupOps::default();
+                let q = g.mul(&mut ops, inst.generator, planted);
+                let c = ctx(&inst, &g, q);
+                let (fb_name, fb_params) =
+                    Params::parse_spec("compact-orbit-scan:columns=2,raw_x_cap=1000000").unwrap();
+                let (name, oracle_params) =
+                    Params::parse_spec(&format!("ksum-frobenius:m={k}")).unwrap();
+                let ps = PipelineSpec {
+                    factor_base: fb_name,
+                    factor_base_params: fb_params,
+                    oracle: name,
+                    oracle_params,
+                    linalg: "incremental-gauss".into(),
+                    max_trials: 5_000_000,
+                    seed: s,
+                    ..Default::default()
+                };
+                let mut oracle = FrobeniusKSumOracle::new(k, &inst);
+                let rep = run_pipeline(
+                    &c,
+                    &ps,
+                    &CompactOrbitScanBase { instance: &inst },
+                    &mut oracle,
+                    planted,
+                    &Calibration {
+                        ns_per_add: 1.0,
+                        ns_per_double: 1.0,
+                        ..Default::default()
+                    },
+                    None,
+                )
+                .unwrap();
+                assert!(
+                    rep.verified && rep.recovered == Some(planted),
+                    "k={k} s={s}: planted log not recovered"
+                );
+                let native = DecompositionOracle::<BinaryGroup>::setup_native(&oracle);
+                assert!(native["canonicalisations"] > 0 && native["frobenius_maps"] > 0);
+            }
         }
     }
 }

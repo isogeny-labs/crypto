@@ -1,0 +1,115 @@
+{
+  "corrected_unified": {
+    "out": {
+      "toy_cases": 64,
+      "toy_original_assignments": 7680,
+      "toy_compiled_assignments": 668,
+      "actual_controls": 64,
+      "original_complete": false,
+      "separate_charts": [
+        {
+          "chart": 0,
+          "inputs": 67,
+          "variables": 53765,
+          "clauses": 199649,
+          "graph_sha256": "68aef85b3c519fb13983866486246df40009ed752879d983c42c2da5cd47bfad"
+        },
+        {
+          "chart": 1,
+          "inputs": 67,
+          "variables": 53683,
+          "clauses": 199319,
+          "graph_sha256": "7574ef01ff549fdd9e3d708e979a358f763d9c72884d052fc846e66233eb3392"
+        }
+      ],
+      "separate_total_variables": 107448,
+      "separate_total_clauses": 398968,
+      "inputs": 68,
+      "common_dimension": 66,
+      "selector_products_before_import": 1,
+      "variables": 54084,
+      "clauses": 200916,
+      "gate_kinds": {
+        "false": 1,
+        "true": 1,
+        "input": 68,
+        "and": 15344,
+        "not": 25,
+        "xor": 38647
+      },
+      "graph_sha256": "9c3e3fb3f088b9ba2b3fee918a6c54dcbb5211f90cbc102a7ed7ecdedf3aff2d",
+      "native_search_promotion": false,
+      "total_seconds": 2.364757320989156
+    },
+    "error": null
+  },
+  "recount_parity": {
+    "out": {
+      "linear_cases": 40,
+      "linear_assignments": 1984,
+      "toy_cases": 64,
+      "toy_original_assignments": 7680,
+      "toy_compiled_assignments": 668,
+      "actual_controls": 32,
+      "original_complete": false,
+      "inputs": 68,
+      "variables": 50299,
+      "clauses": 185756,
+      "gate_kinds": {
+        "false": 1,
+        "true": 1,
+        "input": 68,
+        "and": 15344,
+        "xor": 34852,
+        "not": 35
+      },
+      "synthesis": {
+        "synthesis_rounds": 51,
+        "pair_events": 7895317,
+        "stop_reason": "pair_event_cap",
+        "target_forms": 407,
+        "fallback_forms": 0
+      },
+      "graph_sha256": "343ad000dea00cec02e66876f52b31046b28d1039e882fbff92bb3c97429e561",
+      "native_search_promotion": false,
+      "total_seconds": 1.5513610169873573
+    },
+    "error": null
+  },
+  "incremental_parity": {
+    "out": {
+      "linear_cases": 40,
+      "linear_assignments": 1984,
+      "toy_cases": 64,
+      "toy_original_assignments": 7680,
+      "toy_compiled_assignments": 668,
+      "actual_controls": 32,
+      "original_complete": false,
+      "inputs": 68,
+      "variables": 47661,
+      "clauses": 175144,
+      "gate_kinds": {
+        "false": 1,
+        "true": 1,
+        "input": 68,
+        "and": 15344,
+        "xor": 32184,
+        "not": 65
+      },
+      "synthesis": {
+        "synthesis_rounds": 256,
+        "pair_events": 792874,
+        "stop_reason": "round_cap",
+        "target_forms": 407,
+        "pair_index_entries": 29690,
+        "fallback_forms": 0
+      },
+      "graph_sha256": "dc4197d6932c221515e3f9c81217f9793dc11e6ad486c08f17b9d3dd441a2128",
+      "native_search_promotion": true,
+      "total_seconds": 1.2326033349963836
+    },
+    "error": null
+  },
+  "qualified_speedup": null,
+  "original_complete": false
+}

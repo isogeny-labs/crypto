@@ -236,7 +236,7 @@ fn reduces_to_zero(
     true
 }
 
-fn certify(
+pub(super) fn certify(
     input: &[Poly],
     basis: &[Poly],
     p: u64,

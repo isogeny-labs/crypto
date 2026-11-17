@@ -23,5 +23,10 @@ Its PCC record is unverified; no x86 measurement has been made.
 
 [`validate_v2.py`](validate_v2.py) reproduces the
 [historical v2 static check](VALIDATION.json); [`validate_v3.py`](validate_v3.py)
-reproduces the [v3 static check](VALIDATION-v3.json). The native launcher and
-a source-bound `ecbench plan` remain execution prerequisites.
+reproduces the [v3 static check](VALIDATION-v3.json). The
+[source-bound plan audit](../rootfind_k13_source_plan_audit_20261116/REPORT.md)
+checked the 288 admission cells against the frozen panel. A separate
+[source-compiled native launcher check](../rootfind_k13_native_launcher_check_20261116/REPORT.md)
+accepted the exact v3 spec without submitting a Job. The deployed launcher,
+verified image, current budget and checkpoint gates, L2 execution, and
+independent replay remain outstanding. [pcc:unverified]

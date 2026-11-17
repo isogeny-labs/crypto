@@ -1,5 +1,14 @@
 # Extension-field algebraic IC with graph elimination
 
+The [native quadratic remainder component](quadratic-remainder-component/README.md)
+adds a reusable opt-in degree-nine extractor and bounded signed class-graph
+adapter to the library. Its separate frozen-source release suite reports19
+passing checks, including4 new controls and actual p251/seed2 support. The
+incoming stage40 prototype and its recorded rank comparison below remain
+unchanged; these library controls do not reprice or compose that experiment.
+The original development claims and journal fork are preserved; canonical
+integration references are in the component report. [pcc:unverified]
+
 The [Runpod quadratic-remainder component40](runpod-extension-remainders-20261116-40/README.md)
 retains verified irreducible quadratic classes over Fp² as signed graph vertices.
 It reaches actual homogeneous rank491 at251904B rather than452608B for full
@@ -38,7 +47,6 @@ independent batch linear solve finds the same target, with rank398 over
 incomplete: the reused RREF's7,711,970modular products and local subtractions
 bypass hooks, as explicitly recorded in a post-call audit without rewriting
 the frozen measurements. No speed/cost/rho verdict is asserted.
-[pcc:unverified]
 
 The [recorded-matrix arithmetic replay](local-recorded-rref-counter-20261116-30/report.pdf)
 adds exact counted RREF products/subtractions without changing its arithmetic:
@@ -57,7 +65,6 @@ and exact source/descent prefixes pass. Observed primitive subtotals are
 these are incomplete counts without a full-cost or speed ranking. Native
 26sieve(two existing ignored),1public-input and17qualifier checks pass,
 with release builds/strictClippy and byte-exact29summary replay.
-[pcc:unverified]
 
 The [Runpod native-rho validation](runpod-rho-native-price-validation-20261116-32/report.pdf)
 checks the reference's actual tower pricing through the new opt-in Rust
@@ -151,7 +158,6 @@ the local controls passed. The best graph arm, symmetric hybrid S3, took
 95% interval 24.16–27.62). See the [pilot report](local-p67-all5-20261115-02/report.pdf)
 and [evidence](local-p67-all5-20261115-02/README.md). Standard lab admission
 and S3 custody are not asserted.
-[pcc:unverified]
 
 The [native Rust analysis](native_analysis/README.md) checks the full planned
 schedule, provenance/instance identity, graph/pivot fingerprints, scalar
@@ -184,7 +190,6 @@ graph/pivot prefixes match within each oracle block. [pcc:unverified]
 The reference is the repository's existing cubic r-adding rho. The fastest
 external reference and full native pricing remain required for a broader
 parity claim. The local pilot is exploratory and does not meet that claim.
-[pcc:unverified]
 
 [Amendment 3](AMENDMENT_3_SAMPLING.md) freezes the next matched fresh/r-adding
 sampler comparison. The native incremental sampler charges construction,
@@ -204,7 +209,6 @@ and [walk 04](local-p67-radding-20261115-04/report.pdf). [pcc:unverified]
 17/23/37 on source `2c4292443`. All 270 executions recover. At p1039,
 subgroup orders exceed 2^30 and graph/rho is 5.36–14.27. One p127/seed23
 A/A failure remains an inconclusive diagnostic. No measurement was retried.
-[pcc:unverified]
 
 The [prepared-oracle and epoch controls](AMENDMENT_5_PREPARED_EPOCH.md)
 completed on source `5f575deda`: 1080 executions recover and all paired
@@ -228,7 +232,6 @@ with basis/full-reference wall ratios 0.135–0.173. Two reference closure
 failures and one A/A rejection remain invalid/inconclusive; both reference
 failures have finite dimension-60 native quotients. This is a basis-phase
 comparison with extraction still outside that measured boundary.
-[pcc:unverified]
 
 Native F4 quotient/action-matrix extraction is now integrated as
 `Solver::F4Groebner` and comparison CLI `--oracles f4`. It reuses group sign
@@ -236,7 +239,6 @@ settlement, preserves charged fallbacks and labels the native field counter's
 unpriced scalar housekeeping. The two observed reference failures recover
 without fallback in the new coordinate tests. Full cold pipeline trials are
 frozen by [Amendment 7](AMENDMENT_7_F4_FULL_IC.md) and have not run yet.
-[pcc:unverified]
 
 Current checks report 39 passing cubic release tests and seven passing
 native-analysis tests, plus release example build/test target and both
@@ -248,12 +250,10 @@ admitted benchmark index and leaderboard remain unchanged: independent
 replay/recompute, strongest-reference coverage and full pricing are missing.
 Historical plans retain their original component hashes; use their pinned
 source checkpoints for replay, rather than the current source by default.
-[pcc:unverified]
 
 ## Scope and status
 
 | Requirement | State | Evidence / remaining step |
-| --- | --- | --- |
 | Native Rust integration with other IC code | Final targeted tests pass locally | `src/cryptanalysis/gaudry_cubic_graph.rs`; `run_gaudry_with_eliminator` |
 | Extension-field algebraic relation finding | Existing native engines reused | Weil-restricted S3 pair test, symmetrised S4, and hybrid scan/S3 |
 | Named baseline/candidate comparison | First local pilot complete | Driver, pilot report, frozen protocol/amendments |
@@ -341,7 +341,6 @@ reproduced a missing archived session; a device case passed after its tracked
 emulator assets were restored. Other failing causes are not all classified.
 The [incomplete-run record](validation/full-library-interrupted.txt) pins the
 raw local output; durable upload of that larger raw file is still pending.
-[pcc:unverified]
 
 The checkpoint gate reports no configured AWS profile or upload token. This
 shares the existing [launch-gate access obstruction](../../problems/arity-completion-launch-gates.md#2026-11-15-cubic-extension-symbolic-graph-comparison).
@@ -406,7 +405,6 @@ no standard lab admission or canonical export validation is asserted.
 Native summaries, every local stratum, flow and raw custody hashes accompany
 each PDF. The local scalar and timing checks are producer observations;
 independent replay/recompute and strongest references are still absent.
-[pcc:unverified]
 
 ## Original frozen measurement commands
 
@@ -414,15 +412,12 @@ Only launch after publishing the exact source, checkpointing, and admitting the
 prescribed EKS run. The driver refuses to overwrite raw data, retains failed
 attempts, and reverses arm order between rounds.
 
-```sh
 cargo build --release --no-default-features --example gaudry_cubic_graph_compare
 target/release/examples/gaudry_cubic_graph_compare \
   --primes 7,13,19,31 --seeds 3,7,11,23 --warmup-rounds 1 --rounds 5 \
   --max-residuals 10000 --source-revision SOURCE_SHA --out cohort.jsonl
-target/release/examples/gaudry_cubic_graph_compare \
   --primes 43 --seeds 101,103 --warmup-rounds 1 --rounds 5 \
   --max-residuals 10000 --source-revision SOURCE_SHA --out holdout.jsonl
-```
 
 `legacy_model_cold_gae` is the existing multiplication-equivalent model plus
 fresh base setup. It is explicitly a diagnostic, **not** a complete native-cost
@@ -479,4 +474,79 @@ Jacobian and the Rust qualifier independently checks modular rank/replay.
 The new public jv_sieve::two_large_prime API emits standard SparseRel rows
 with certificates. Complete costs and full scalar-recovery integration remain
 open; this is an equation-yield observation without a speed/rho verdict.
-[pcc:unverified]
+
+The [fresh scalar-recovery comparison41](runpod-extension-pipeline-20261116-41/README.md)
+integrates the checked quadratic-remainder graph into the Rust IC library.
+All seven public-input IC/rho workers recover242624768583643540; every
+source/Cantor/witness/kernel/descent/affine/target/counter check passes.
+The paired graph reaches homogeneous rank508at223232B versus363520B,
+with observed incomplete subtotals5645040401736versus6415031980400.
+OriginalIC4525556132414is lower on this sample; all complete costs/bands/
+ratios remain null. Exact records/report/custody are retained and the owned
+runner is deleted. ResultPCC-7d4d7e remains unverified. [pcc:unverified]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

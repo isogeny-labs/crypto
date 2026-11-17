@@ -22,9 +22,7 @@ use std::collections::HashSet;
 mod structural_rank_bound;
 use structural_rank_bound::{BoundSnapshot, StructuralRankBound};
 
-#[path = "jv_homogeneous_quotient.rs"]
-mod homogeneous_quotient;
-use homogeneous_quotient::{ExtraCounts, Quotient};
+use super::homogeneous_quotient::{ExtraCounts, Quotient};
 
 fn charge_quotient_delta(before: &ExtraCounts, after: &ExtraCounts, modulus: u64) {
     work::hook_muls(modulus, after.products - before.products);

@@ -1,0 +1,73 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | k1-l9 | 432/432 | 43.823 | 52.783 | 133.419 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf3-c1g-sr | 432/432 | 0.782 | 1.050 | 3.467 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf3-c1g-sr-full | 0/432 | — | — | — | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kf3-c1g-w | 432/432 | 1.199 | 1.467 | 3.882 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | lazy-c3 | 432/432 | 1.152 | 1.508 | 4.711 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | lazy-c4 | 432/432 | 0.997 | 1.314 | 4.166 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | lazy-c4-full | 0/432 | — | — | — | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-neg | 432/432 | 1.182 | 1.282 | 2.185 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-strong | 432/432 | 0.886 | 0.950 | 1.533 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-strong-aa | 432/432 | 0.886 | 0.950 | 1.533 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-strong-full | 0/432 | — | — | — | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf3-c1g-sr | kf3-c1g-sr < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf3-c1g-sr-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs kf3-c1g-w | kf3-c1g-w < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs lazy-c3 | lazy-c3 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs lazy-c4 | lazy-c4 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs lazy-c4-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs rho-neg | rho-neg < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs rho-strong | rho-strong < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs rho-strong-aa | rho-strong-aa < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs rho-strong-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr vs kf3-c1g-sr-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr vs kf3-c1g-w | kf3-c1g-sr < kf3-c1g-w |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr vs lazy-c3 | kf3-c1g-sr < lazy-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr vs lazy-c4 | kf3-c1g-sr < lazy-c4 |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr vs lazy-c4-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr vs rho-neg | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr vs rho-strong | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr vs rho-strong-aa | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr vs rho-strong-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr-full vs kf3-c1g-w | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr-full vs lazy-c3 | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr-full vs lazy-c4 | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr-full vs lazy-c4-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr-full vs rho-neg | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr-full vs rho-strong | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr-full vs rho-strong-aa | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-sr-full vs rho-strong-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-w vs lazy-c3 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-w vs lazy-c4 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-w vs lazy-c4-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-w vs rho-neg | rho-neg < kf3-c1g-w |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-w vs rho-strong | rho-strong < kf3-c1g-w |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-w vs rho-strong-aa | rho-strong-aa < kf3-c1g-w |
+| icv1-f2m23-tm5197-1f85e9e1 | kf3-c1g-w vs rho-strong-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c3 vs lazy-c4 | lazy-c4 < lazy-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c3 vs lazy-c4-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c3 vs rho-neg | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c3 vs rho-strong | rho-strong < lazy-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c3 vs rho-strong-aa | rho-strong-aa < lazy-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c3 vs rho-strong-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c4 vs lazy-c4-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c4 vs rho-neg | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c4 vs rho-strong | rho-strong < lazy-c4 |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c4 vs rho-strong-aa | rho-strong-aa < lazy-c4 |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c4 vs rho-strong-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c4-full vs rho-neg | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c4-full vs rho-strong | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c4-full vs rho-strong-aa | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | lazy-c4-full vs rho-strong-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-neg vs rho-strong | rho-strong < rho-neg |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-neg vs rho-strong-aa | rho-strong-aa < rho-neg |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-neg vs rho-strong-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-strong vs rho-strong-aa | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-strong vs rho-strong-full | incomplete |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-strong-aa vs rho-strong-full | incomplete |

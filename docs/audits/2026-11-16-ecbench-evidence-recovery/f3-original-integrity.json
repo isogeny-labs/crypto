@@ -1,0 +1,48 @@
+{
+  "schema": "ecbench.audit/v1",
+  "session_id": "ECBS1hbc0ef04c4f34",
+  "session_status": "complete",
+  "records_bound": false,
+  "ok": false,
+  "problems": [
+    "records_hash: records.jsonl does not hash to session.records_sha256",
+    "record_count: 16 records, 24 written, 24 planned",
+    "status_counts: session.json counts {\"verified\": 24}, the records have {\"verified\": 16}",
+    "last_seq: session.json says the last record is seq 23, the records end at 16"
+  ],
+  "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": false,
+    "plan_hash": true,
+    "record_count": false,
+    "records": true,
+    "records_hash": false,
+    "regraded": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": false,
+    "workloads": true
+  },
+  "records": 16,
+  "verified_records": 16,
+  "planned_executions": 24,
+  "regraded": true,
+  "replays": [],
+  "files": {
+    "host.json": "167988b12eda141660753bf325975b5f489aa8e4239dfb1c39e7e51719dc3dc8",
+    "plan.json": "dc5462a368f57b58ddfe3e0c8c6d3b8cc503fca1e8a702ea1f8a96590deac359",
+    "records.jsonl": "5c937b749f9bb20f6541b19c9ed9e21c16f2392e103ee3b47e0995a272c629fb",
+    "session.json": "4ed022b5b868e402cbfe10197d0f03b9176f966ec15009c6bf1b0c034000a75b",
+    "spec.json": "e050606f483a02297378cce2b761bd254e9036f4c839ef436c2c986cc48e9314"
+  },
+  "auditor_binary_sha256": "1d8ee2ffeba0b407a060937fa27258bb3d69466e79c2f7bc822a69bcec988e29",
+  "auditor_env_class_id": "ECBENV3h32d7ea52a547",
+  "auditor_hardware_class_id": "ECBHW1h7d1934655eee",
+  "audited_unix_ms": 1794846131843
+}
