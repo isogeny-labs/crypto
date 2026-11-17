@@ -149,6 +149,25 @@ mod tests {
     use super::*;
     #[test]
     fn actual_counted_checkpoint_has_owned_conserved_tallies() {
+        // This control asserts a process-wide foreign-thread flag. Other
+        // arithmetic tests intentionally trigger those hooks, so run the
+        // complete assertion in a fresh process with exactly this test.
+        const ISOLATED: &str = "CRYPTO_JV_CHECKPOINT_ISOLATED";
+        if std::env::var_os(ISOLATED).is_none() {
+            let result = std::process::Command::new(std::env::current_exe().unwrap())
+                .args(["--exact", "cryptanalysis::jv_sieve::two_large_prime::sparse_collection_rank::tests::actual_counted_checkpoint_has_owned_conserved_tallies", "--nocapture"])
+                .env(ISOLATED, "1")
+                .output()
+                .unwrap();
+            assert!(
+                result.status.success(),
+                "{}\n{}",
+                String::from_utf8_lossy(&result.stdout),
+                String::from_utf8_lossy(&result.stderr)
+            );
+            assert!(String::from_utf8_lossy(&result.stdout).contains("1 passed"));
+            return;
+        }
         let l = 263807419614139553;
         work::claim();
         work::set_moduli(1009, l);

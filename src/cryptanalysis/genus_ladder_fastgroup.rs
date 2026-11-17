@@ -113,6 +113,8 @@ struct Mid2 {
     lead: u64,
 }
 
+// Mid1 stays inline so a batched group operation performs no per-point heap allocation.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Copy)]
 enum Stage1 {
     Done(JDiv),

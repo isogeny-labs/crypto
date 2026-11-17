@@ -1750,6 +1750,45 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
             solved = true;
             continue;
         }
+        if answer.is_none() {
+            let sol = match prm.sge {
+                None => wiedemann(
+                    &core,
+                    cc,
+                    r,
+                    &mut rng,
+                    dense || ext.coord_square,
+                    &mut w_nat,
+                )
+                .map(|x| x[ct as usize]),
+                Some(sp) => {
+                    let mut s_nat = Nat::default();
+                    let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+                    res.la_sge.merge(s_nat);
+                    res.la.merge(s_nat);
+                    res.sge = st;
+                    // The merged system is solved with a copy of the stream; the
+                    // stream itself advances as the unmerged solve would, so a
+                    // failed attempt resumes the relation phase identically.
+                    let mut wrng = rng.clone();
+                    skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
+                    wiedemann(&red, rcc, r, &mut wrng, dense, &mut w_nat).map(|x| x[rct as usize])
+                }
+            };
+            if let Some(t) = sol.map(to_log) {
+                if certify(t, &mut ops, &mut res.verify_ops) {
+                    answer = Some(t);
+                }
+            }
+        }
+        res.la_wied.merge(w_nat);
+        res.la.merge(w_nat);
+        if let Some(t) = answer {
+            res.recovered = Some(t);
+            res.certified = true;
+            solved = true;
+            continue;
+        }
         next_check = rels.len() as u64 + (nunk as u64 / 20).max(16);
     }
     res.la.add += dsu.ops;

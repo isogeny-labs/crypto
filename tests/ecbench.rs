@@ -3482,6 +3482,8 @@ fn hyperelliptic_ic_and_rho_run_verify_replay_and_price_completely() {
     assert!(lines
         .iter()
         .all(|l| l["work"]["Ok"]["complete"] == true || l["work"]["complete"] == true));
+}
+
 /// A quartic session the current harness writes, on the smallest curve of
 /// `research/prime_rho_automorphism_20261015/sessions/quartic`.
 const QUARTIC_SPEC: &str = r#"{

@@ -3,6 +3,9 @@ use hashed_ecdl_tensor::optimized;
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
+use std::sync::atomic::{AtomicU64, Ordering};
+
+static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
 const BINARY: &str = env!("CARGO_BIN_EXE_hashed-ecdl");
 const PROBLEM: &str = r#"{
@@ -20,8 +23,11 @@ impl Fixture {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos();
-        let dir =
-            std::env::temp_dir().join(format!("optimized-cli-{}-{nonce}", std::process::id()));
+        let serial = NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed);
+        let dir = std::env::temp_dir().join(format!(
+            "optimized-cli-{}-{nonce}-{serial}",
+            std::process::id()
+        ));
         std::fs::create_dir(&dir).unwrap();
         std::fs::write(dir.join("problem.json"), PROBLEM).unwrap();
         Self(dir)
@@ -75,7 +81,7 @@ fn default_options_match_the_old_joint_receipt_and_replay() {
     success(&result);
     assert_eq!(
         result.stdout,
-        format!("receipt written {}\n", output.display()).as_bytes()
+        format!("verified scalar 3; receipt {}\n", output.display()).as_bytes()
     );
     let bytes = std::fs::read(&output).unwrap();
     let receipt: Value = serde_json::from_slice(&bytes).unwrap();
@@ -122,7 +128,7 @@ fn all_five_options_produce_a_v1_receipt_with_effective_configuration() {
     success(&result);
     assert_eq!(
         result.stdout,
-        format!("receipt written {}\n", output.display()).as_bytes()
+        format!("verified scalar 3; receipt {}\n", output.display()).as_bytes()
     );
     let receipt: Value = serde_json::from_slice(&std::fs::read(&output).unwrap()).unwrap();
     assert_eq!(receipt["certificate"]["version"], 1);

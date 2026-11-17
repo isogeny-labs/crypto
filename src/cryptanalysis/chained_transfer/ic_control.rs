@@ -882,6 +882,9 @@ pub struct IcResult {
     pub core_rows: usize,
     pub core_cols: usize,
     pub attempts: u32,
+    /// Coordinate solves ([`LaMode::Coord`], [`LaMode::CoordSquare`]) whose
+    /// answer failed the group check and fell back to the baseline solver.
+    pub la_fallbacks: u32,
     pub wall_ns: u64,
 }
 
@@ -1360,6 +1363,33 @@ pub(crate) fn wiedemann(
     }
 }
 
+/// How the linear-algebra stage finds the target's logarithm.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LaMode {
+    /// The baseline: [`wiedemann`] on `AᵀDA x = AᵀD c` with a sparse
+    /// random projection, then the whole solution vector by Horner.
+    Baseline,
+    /// Same system `AᵀDA`, but the projection is the unit vector at the
+    /// target column and only that coordinate is formed, from the Krylov
+    /// sequence itself ([`wiedemann_coord`]): no projection products and no
+    /// reconstruction pass.
+    Coord,
+    /// [`LaMode::Coord`] on a random square subset `A'` of the rows
+    /// (non-symmetric Wiedemann): no `AᵀA`, no diagonal `D`, half the
+    /// matrix touches per step.
+    CoordSquare,
+}
+
+impl LaMode {
+    pub fn name(self) -> &'static str {
+        match self {
+            LaMode::Baseline => "baseline",
+            LaMode::Coord => "coord",
+            LaMode::CoordSquare => "coord_square",
+        }
+    }
+}
+
 /// `x[ct]` for `A x = c`, one coordinate only.
 ///
 /// With `M` invertible and `M x = b`, let `s_k = e_ctᵀ M^k b` and let
@@ -1458,6 +1488,20 @@ pub fn run_ic_oracle(
     prm: IcParams,
     restart: u64,
     oracle: SplitOracle,
+) -> IcResult {
+    run_ic_cfg(inst, prm, restart, oracle, LaMode::Baseline)
+}
+
+/// [`run_ic_oracle`] with the linear-algebra stage chosen by `la`
+/// ([`LaMode`]).  A coordinate solve whose answer fails the group check
+/// falls back, in the same attempt and fully counted, to the baseline
+/// dense-projection [`wiedemann`].
+pub fn run_ic_cfg(
+    inst: &Instance,
+    prm: IcParams,
+    restart: u64,
+    oracle: SplitOracle,
+    la: LaMode,
 ) -> IcResult {
     let start = std::time::Instant::now();
     let curve = &inst.curve;
@@ -1661,15 +1705,63 @@ pub fn run_ic_oracle(
         }
         let mut w_nat = Nat::default();
         let dense = res.attempts > 1;
-        let sol = wiedemann(&core, cc, r, &mut rng, dense, &mut w_nat);
+        let certify = |t: u64, ops: &mut GroupOps| {
+            curve.mul(ops, inst.g, t) == inst.target && curve.mul_rtl(inst.g, t) == inst.target
+        };
+        let coord = match la {
+            LaMode::Baseline => None,
+            LaMode::Coord | LaMode::CoordSquare => {
+                let t = wiedemann_coord(
+                    &core,
+                    cc,
+                    ct as usize,
+                    r,
+                    &mut rng,
+                    la == LaMode::CoordSquare,
+                    &mut w_nat,
+                );
+                match t {
+                    Some(t) => {
+                        let v0 = ops.adds + ops.doubles;
+                        let ok = certify(t, &mut ops);
+                        res.verify_ops += ops.adds + ops.doubles - v0;
+                        if ok {
+                            Some(t)
+                        } else {
+                            res.la_fallbacks += 1;
+                            None
+                        }
+                    }
+                    None => {
+                        res.la_fallbacks += 1;
+                        None
+                    }
+                }
+            }
+        };
+        if let Some(t) = coord {
+            res.la_wied.merge(w_nat);
+            res.la.merge(w_nat);
+            res.recovered = Some(t);
+            res.certified = true;
+            solved = true;
+            continue;
+        }
+        let sol = wiedemann(
+            &core,
+            cc,
+            r,
+            &mut rng,
+            dense || la != LaMode::Baseline,
+            &mut w_nat,
+        );
         res.la_wied.merge(w_nat);
         res.la.merge(w_nat);
         if let Some(x) = sol {
             let t = x[ct as usize];
             let v0 = ops.adds + ops.doubles;
-            let chk = curve.mul(&mut ops, inst.g, t);
-            res.verify_ops = ops.adds + ops.doubles - v0;
-            let ok = chk == inst.target && curve.mul_rtl(inst.g, t) == inst.target;
+            let ok = certify(t, &mut ops);
+            res.verify_ops += ops.adds + ops.doubles - v0;
             if ok {
                 res.recovered = Some(t);
                 res.certified = true;
@@ -1833,6 +1925,82 @@ mod tests {
                     luc.rel.mul,
                     base.rel.mul
                 );
+            }
+        }
+    }
+
+    /// On random full-rank systems the coordinate solve returns the true
+    /// coordinate, in both modes, with fewer multiplications than the
+    /// baseline solve of the whole vector.
+    #[test]
+    fn coordinate_wiedemann_returns_the_target_coordinate() {
+        let r = 1_000_003u64;
+        let mut rng = StdRng::seed_from_u64(5);
+        for trial in 0..20 {
+            let n = 30 + trial;
+            let nr = n + 5;
+            let x: Vec<u64> = (0..n).map(|_| rng.gen_range(0..r)).collect();
+            let rows: Vec<Row> = (0..nr)
+                .map(|i| {
+                    let mut t: Vec<(u32, u64)> = vec![((i % n) as u32, 1)];
+                    for _ in 0..4 {
+                        let c = rng.gen_range(0..n) as u32;
+                        if t.iter().all(|e| e.0 != c) {
+                            let v = [1, r - 1, 2, r - 2][rng.gen_range(0..4)];
+                            t.push((c, v));
+                        }
+                    }
+                    let rhs = t
+                        .iter()
+                        .fold(0u64, |a, &(c, v)| addm(a, mulmod(v, x[c as usize], r), r));
+                    (t, rhs)
+                })
+                .collect();
+            let ct = n - 1;
+            let mut nb = Nat::default();
+            let base = wiedemann(&rows, n, r, &mut rng, true, &mut nb).expect("baseline solves");
+            assert_eq!(base[ct], x[ct]);
+            for square in [false, true] {
+                let mut nc = Nat::default();
+                // a random square subset can be singular: retry a few times,
+                // as the caller's certified fallback would
+                let got = (0..8).find_map(|_| {
+                    let v = wiedemann_coord(&rows, n, ct, r, &mut rng, square, &mut nc)?;
+                    (v == x[ct]).then_some(v)
+                });
+                assert_eq!(got, Some(x[ct]), "trial {trial} square={square}");
+                if !square {
+                    assert!(nc.mul < nb.mul, "coord {} vs baseline {}", nc.mul, nb.mul);
+                }
+            }
+        }
+    }
+
+    /// Every LA mode certifies on real instances, and the coordinate modes
+    /// spend fewer LA multiplications than the baseline on the same rows.
+    #[test]
+    fn la_modes_certify_and_cut_la_work() {
+        for p in [101u64, 131] {
+            let inst = small_instance(p);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: 9,
+                seed: 11,
+                max_trials: 3_000_000,
+                verify_relations: true,
+            };
+            let o = SplitOracle::LucasRoots;
+            let b = run_ic_cfg(&inst, prm, RESTART_DEFAULT, o, LaMode::Baseline);
+            assert!(b.certified);
+            for la in [LaMode::Coord, LaMode::CoordSquare] {
+                let x = run_ic_cfg(&inst, prm, RESTART_DEFAULT, o, la);
+                assert!(x.certified, "{la:?} p={p}");
+                assert_eq!(x.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+                assert_eq!(x.relations, b.relations);
+                assert_eq!(x.trials, b.trials);
+                if x.la_fallbacks == 0 {
+                    assert!(x.la_wied.mul < b.la_wied.mul, "{la:?} p={p}");
+                }
             }
         }
     }

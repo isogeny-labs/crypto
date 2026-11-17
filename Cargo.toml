@@ -9,7 +9,7 @@ description = "Educational comprehensive cryptography library: ECC, RSA, AES, Ch
 # library example so Cargo's example discovery does not require a `main`.
 [[example]]
 name = "pdp_lin_cdcl"
-path = "examples/pdp_lin_cdcl.rs"
+path = "examples/support/pdp_lin_cdcl.rs"
 crate-type = ["lib"]
 
 [[example]]
@@ -35,7 +35,7 @@ path = "experiments/koblitz-n53-compact-cold-20261009/native_run.rs"
 
 [[bin]]
 name = "ct_dynamic_audit"
-path = "research/ct_dynamic_audit_20261102/src/main.rs"
+path = "src/bin/ct_dynamic_audit.rs"
 
 [[bin]]
 name = "crypto"
@@ -195,7 +195,7 @@ path = "src/lib.rs"
 # Checkpointed native ecbench orchestration and recorded-value aggregation.
 [[bin]]
 name = "volcano-ic-driver"
-path = "research/full_volcano_graphwide_ic_20261017/execution/driver.rs"
+path = "src/bin/volcano_ic_driver.rs"
 
 [[bin]]
 name = "volcano-ic-summarize"
@@ -390,3 +390,259 @@ inherits = "release"
 codegen-units = 1
 lto = "thin"
 debug = "line-tables-only"
+
+[[example]]
+name = "dreg_score"
+path = "examples/maintained/dreg_score.rs"
+test = true
+
+
+[[example]]
+name = "nonisomorphic_extension_isogeny"
+path = "examples/maintained/nonisomorphic_extension_isogeny.rs"
+test = true
+
+
+[[example]]
+name = "koblitz_n83_factor_base_export"
+path = "examples/maintained/koblitz_n83_factor_base_export.rs"
+test = true
+
+
+[[example]]
+name = "n83_d18_shared_bits"
+path = "examples/maintained/n83_d18_shared_bits.rs"
+test = true
+
+
+[[example]]
+name = "n83_rho_speed_eval"
+path = "examples/maintained/n83_rho_speed_eval.rs"
+test = true
+
+
+[[example]]
+name = "ic_campaign_pricing_audit"
+path = "examples/maintained/ic_campaign_pricing_audit.rs"
+test = true
+
+
+[[example]]
+name = "conductor_gap_replication"
+path = "examples/maintained/conductor_gap_replication.rs"
+test = true
+
+
+[[example]]
+name = "trace_incidence_rho"
+path = "examples/maintained/trace_incidence_rho.rs"
+test = true
+
+
+[[example]]
+name = "ic_quartic_core_probe"
+path = "examples/maintained/ic_quartic_core_probe.rs"
+test = true
+
+
+[[example]]
+name = "koblitz_orbit_dlp_fast"
+path = "examples/maintained/koblitz_orbit_dlp_fast.rs"
+test = true
+
+
+[[example]]
+name = "r6_1_direct_s5"
+path = "examples/maintained/r6_1_direct_s5.rs"
+test = true
+
+
+[[example]]
+name = "smith_isogeny"
+path = "examples/maintained/smith_isogeny.rs"
+test = true
+
+
+[[example]]
+name = "koblitz_n83_free_selector_export_control"
+path = "examples/maintained/koblitz_n83_free_selector_export_control.rs"
+test = true
+
+
+[[example]]
+name = "fp_backend_bench"
+path = "examples/maintained/fp_backend_bench.rs"
+test = true
+
+
+[[example]]
+name = "chained_richelot_automorphisms"
+path = "examples/maintained/chained_richelot_automorphisms.rs"
+test = true
+
+
+[[example]]
+name = "ic_quartic_wide_audit"
+path = "examples/maintained/ic_quartic_wide_audit.rs"
+test = true
+
+
+[[example]]
+name = "rr_quadratic_panel"
+path = "examples/maintained/rr_quadratic_panel.rs"
+test = true
+
+
+[[example]]
+name = "n83_factor_base_sweep_v5"
+path = "examples/maintained/n83_factor_base_sweep_v5.rs"
+test = true
+
+
+[[example]]
+name = "rr_sat_amortise"
+path = "examples/maintained/rr_sat_amortise.rs"
+test = true
+
+
+[[example]]
+name = "jv_sieve_extension_sparse_compare"
+path = "examples/maintained/jv_sieve_extension_sparse_compare.rs"
+test = true
+
+
+[[example]]
+name = "jv_sieve_quadratic_pair_graph_controls"
+path = "examples/jv_sieve_quadratic_pair_graph_controls.rs"
+crate-type = ["lib"]
+
+[[example]]
+name = "jv_sieve_quadratic_pair_relation_controls"
+path = "examples/jv_sieve_quadratic_pair_relation_controls.rs"
+crate-type = ["lib"]
+
+[[example]]
+name = "gc_native_solve"
+path = "examples/maintained/gc_native_solve.rs"
+test = true
+
+
+[[example]]
+name = "koblitz_ic_leads_bench"
+path = "examples/maintained/wide/koblitz_ic_leads_bench.rs"
+test = true
+
+
+[[example]]
+name = "ic_cas_correctness"
+path = "examples/maintained/wide/ic_cas_correctness.rs"
+test = true
+
+
+[[example]]
+name = "hky_crosscheck"
+path = "examples/maintained/wide/hky_crosscheck.rs"
+test = true
+
+
+[[example]]
+name = "ic_algebraic_followup"
+path = "examples/maintained/wide/ic_algebraic_followup.rs"
+test = true
+
+
+[[example]]
+name = "dreg_hybrid"
+path = "examples/maintained/wide/dreg_hybrid.rs"
+test = true
+
+
+[[example]]
+name = "xl_dense_degree"
+path = "examples/maintained/wide/xl_dense_degree.rs"
+test = true
+
+
+[[example]]
+name = "f4_f5_boolean_perf"
+path = "examples/maintained/wide/f4_f5_boolean_perf.rs"
+test = true
+
+
+[[example]]
+name = "ic_qualified_closure_audit"
+path = "examples/maintained/wide/ic_qualified_closure_audit.rs"
+test = true
+
+
+[[example]]
+name = "dreg_closure"
+path = "examples/maintained/wide/dreg_closure.rs"
+test = true
+
+
+[[example]]
+name = "fb_koblitz_ek1"
+path = "examples/maintained/wide/fb_koblitz_ek1.rs"
+test = true
+
+
+[[example]]
+name = "dreg_eliminated_s4"
+path = "examples/maintained/wide/dreg_eliminated_s4.rs"
+test = true
+
+
+[[example]]
+name = "isogeny_gap_round7_runs"
+path = "examples/maintained/wide/isogeny_gap_round7_runs.rs"
+test = true
+
+
+[[example]]
+name = "ecbench_open_questions"
+path = "examples/maintained/wide/ecbench_open_questions.rs"
+test = true
+
+
+[[example]]
+name = "hky_grid"
+path = "examples/maintained/wide/hky_grid.rs"
+test = true
+
+
+[[example]]
+name = "ic_guess_completed_audit"
+path = "examples/maintained/wide/ic_guess_completed_audit.rs"
+test = true
+
+
+[[example]]
+name = "hky_last_fall_degree"
+path = "examples/maintained/wide/hky_last_fall_degree.rs"
+test = true
+
+
+[[example]]
+name = "ic_guess_symmetry"
+path = "examples/maintained/wide/ic_guess_symmetry.rs"
+test = true
+
+
+[[example]]
+name = "hky_par"
+path = "examples/maintained/wide/hky_par.rs"
+test = true
+
+
+[[example]]
+name = "isogeny_gap_f4_phase_profile"
+path = "examples/maintained/wide/isogeny_gap_f4_phase_profile.rs"
+test = true
+
+
+[[example]]
+name = "ecbench_open_questions_replay_failures"
+path = "examples/maintained/wide/ecbench_open_questions_replay_failures.rs"
+test = true
+

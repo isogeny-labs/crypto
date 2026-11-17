@@ -197,6 +197,19 @@ struct Algebra {
     _max_columns: usize,
     #[serde(rename = "f4_field_multiplications")]
     _f4_field_multiplications: u64,
+    // Optional reported diagnostics are not mathematical or execution attestations.
+    #[serde(default, rename = "first_hilbert_deviation_degree")]
+    _first_hilbert_deviation_degree: Option<u32>,
+    #[serde(default, rename = "last_hilbert_deviation_degree")]
+    _last_hilbert_deviation_degree: Option<u32>,
+    #[serde(default, rename = "staircase_extinction_degree")]
+    _staircase_extinction_degree: Option<u32>,
+    #[serde(default, rename = "first_fall_degree")]
+    _first_fall_degree: Option<u32>,
+    #[serde(default, rename = "last_fall_degree")]
+    _last_fall_degree: Option<u32>,
+    #[serde(default, rename = "degree_of_regularity_observed")]
+    _degree_of_regularity_observed: Option<u32>,
     #[serde(default, rename = "roots")]
     _roots: Option<Roots>,
 }
@@ -1030,6 +1043,16 @@ mod tests {
         for attempt in value["attempts"].as_array_mut().unwrap() {
             attempt["algebra"]["f4_field_multiplications"] = json!(0);
             attempt["algebra"]["solver_calls"] = json!(0);
+            for key in [
+                "first_hilbert_deviation_degree",
+                "last_hilbert_deviation_degree",
+                "staircase_extinction_degree",
+                "first_fall_degree",
+                "last_fall_degree",
+                "degree_of_regularity_observed",
+            ] {
+                attempt["algebra"][key] = json!(1);
+            }
         }
         let report = check(&value).unwrap();
         assert!(!report.costs_attested);

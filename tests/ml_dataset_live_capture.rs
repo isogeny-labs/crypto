@@ -145,6 +145,7 @@ impl Fixture {
         });
         write_json(&cell.join("protocol.json"), &protocol);
         let plan = DatasetPlan {
+            channels: None,
             schema: "crypto.ml-dataset.plan/v1".into(),
             field_sizes: vec![23],
             arities: vec![2],

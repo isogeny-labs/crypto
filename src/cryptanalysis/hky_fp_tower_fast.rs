@@ -370,7 +370,21 @@ unsafe fn axpy_avx512(acc: &mut [u64], row: &[u32], f: u64, p2: u64) {
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum Simd {
     Portable,
+    #[cfg_attr(
+        not(target_arch = "x86_64"),
+        allow(
+            dead_code,
+            reason = "Preserves the explicit x86 backend vocabulary on other architectures."
+        )
+    )]
     Avx2,
+    #[cfg_attr(
+        not(target_arch = "x86_64"),
+        allow(
+            dead_code,
+            reason = "Preserves the explicit x86 backend vocabulary on other architectures."
+        )
+    )]
     Avx512,
 }
 
@@ -636,7 +650,7 @@ fn sigma_key(k: Key, perm: &[usize]) -> Key {
 pub fn check_symmetry(ring: &HkyRing, perm: &[usize], gens: &[NfPoly]) -> Result<Vec<i8>, String> {
     let nt = ring.n_tower();
     let p = ring.p;
-    if p % 2 == 0 {
+    if p.is_multiple_of(2) {
         return Err("p = 2".into());
     }
     if perm.len() != nt {
@@ -1122,10 +1136,7 @@ pub fn closure_fast(
     let mul_ns = AtomicU64::new(0);
     stats.setup_s = started.elapsed().as_secs_f64();
     let mut seq = Scratch::new(max_n);
-    'outer: loop {
-        let Some(b) = queue.iter().position(|q| !q.is_empty()) else {
-            break;
-        };
+    'outer: while let Some(b) = queue.iter().position(|q| !q.is_empty()) {
         if started.elapsed() > limits.budget {
             stats.multiply_cpu_s = mul_ns.load(AtOrd::Relaxed) as f64 * 1e-9;
             return censored("budget", rows_reduced, entries, muladds, stats);
