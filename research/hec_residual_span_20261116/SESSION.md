@@ -1770,3 +1770,10 @@ What was done: freezeb712a22d7b0 once-onlyexit0;12originalcertificates accepted,
 Decisions made: separateverifier notindependentlysigned/sharednativearithmetic; wholeprimefixedinstancepremise explicit. No speedclaim, action/generatorchecks maydominate.
 Open threads: fullcertificateconstruction/verifier costs and standalone replay; nativefinalcontrolretained.
 Errors: none,no rerun/S3/cloud.
+
+## Complete first certificate cost gate frozen
+
+What was done: compiled12originaltargets/24calls withunchangedqualified verifier checks, countedwitnessconstruction, externalnativecontrol separated, exclusiveverifierphases.
+Decisions made: candidatecost explicitly producer-nativecontrol+fullverifier; no checkomission/freecertificate. Producerbasevectors mustmatcholdsourceexact, repeats/sums exact. Assertions [pcc:unverified].
+Open threads: pushfreeze then single120CPU costinvocation.
+Errors: none in compile, no science yet.
