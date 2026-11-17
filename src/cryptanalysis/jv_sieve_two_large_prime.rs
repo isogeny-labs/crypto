@@ -27,6 +27,10 @@ pub use dlp::{
 mod counted_linear;
 pub use counted_linear::CountedRelationSystem;
 
+/// Sparse homogeneous kernels reusable by extension-field IC collectors.
+#[path = "jv_sparse_kernel.rs"]
+pub mod sparse_kernel;
+
 #[path = "jv_homogeneous_quotient.rs"]
 mod homogeneous_quotient;
 

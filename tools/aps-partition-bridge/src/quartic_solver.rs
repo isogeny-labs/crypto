@@ -20,10 +20,12 @@ pub struct CellResult {
     pub error: Option<String>,
     pub expected: Vec<Vec<u64>>,
     pub observed: Vec<Vec<u64>>,
+    pub raw_witnesses: Vec<Vec<u64>>,
 }
 
 #[derive(Serialize)]
 pub struct Route {
+    pub encoding: Encoding,
     pub shared: bool,
     pub cells: Vec<CellResult>,
     pub expected_roots: Vec<Vec<u64>>,
@@ -37,18 +39,31 @@ pub struct Route {
     pub complete_and_equal: bool,
 }
 
+struct VisitResult {
+    complete: bool,
+    timed_out: bool,
+    roots: BTreeSet<Vec<u64>>,
+    witnesses: Vec<Vec<u64>>,
+}
+
 fn visit(
     f: &Fixture,
     cell: &Cell,
     pool: Option<&mut TracePool>,
-) -> Result<(bool, bool, BTreeSet<Vec<u64>>), String> {
-    let system = aps::build_system(&f.curve, &cell.parts, Encoding::Expanded4)?;
+    encoding: Encoding,
+) -> Result<VisitResult, String> {
+    let system = aps::build_system(&f.curve, &cell.parts, encoding)?;
     let options =
         F4Options::new(Ordering::Grevlex, 24).with_budget(Duration::from_millis(CALL_BUDGET_MS));
-    let domains: Vec<_> = cell.parts.iter().cloned().map(Some).collect();
+    let mut domains: Vec<_> = cell.parts.iter().cloned().map(Some).collect();
+    domains.resize(system.variables(), None);
     let mut roots = BTreeSet::new();
+    let mut witnesses = Vec::new();
     let mut callback = |point: &[u64]| {
-        let mut tuple = point.to_vec();
+        witnesses.push(point.to_vec());
+        // Split4's fifth coordinate is an unrestricted auxiliary abscissa.
+        // Project it out only after retaining the complete native witness.
+        let mut tuple = point[..4].to_vec();
         tuple.sort_unstable();
         roots.insert(tuple);
         false
@@ -72,10 +87,27 @@ fn visit(
             &mut callback,
         )?,
     };
-    Ok((report.complete, report.timed_out, roots))
+    Ok(VisitResult {
+        complete: report.complete,
+        timed_out: report.timed_out,
+        roots,
+        witnesses,
+    })
 }
 
 pub fn run(f: &Fixture, seed: u64, shared: bool) -> Result<Route, String> {
+    run_encoding(f, seed, shared, Encoding::Expanded4)
+}
+
+pub fn run_encoding(
+    f: &Fixture,
+    seed: u64,
+    shared: bool,
+    encoding: Encoding,
+) -> Result<Route, String> {
+    if !matches!(encoding, Encoding::Expanded4 | Encoding::Split4) {
+        return Err("matched quartic routes require Expanded4 or Split4".into());
+    }
     let cells = quartic_cells::plan(f)?;
     let expected = quartic_oracle::roots(&f.base, &quartic_cells::universe(f))?;
     let mut pool = TracePool::new(&format!("quartic-label-cells:{seed}"), 8, 100000)?;
@@ -98,11 +130,21 @@ pub fn run(f: &Fixture, seed: u64, shared: bool) -> Result<Route, String> {
             zero += zero_b;
             correct &= !cell.valuation_safe || zero_b == 0;
         }
-        let (complete, timed_out, observed, error) =
-            match visit(f, &cell, if shared { Some(&mut pool) } else { None }) {
-                Ok((complete, timed_out, roots)) => (complete, timed_out, roots, None),
-                Err(error) => (false, false, BTreeSet::new(), Some(error)),
-            };
+        let (complete, timed_out, observed, raw_witnesses, error) = match visit(
+            f,
+            &cell,
+            if shared { Some(&mut pool) } else { None },
+            encoding,
+        ) {
+            Ok(result) => (
+                result.complete,
+                result.timed_out,
+                result.roots,
+                result.witnesses,
+                None,
+            ),
+            Err(error) => (false, false, BTreeSet::new(), Vec::new(), Some(error)),
+        };
         correct &= complete && !timed_out && error.is_none() && observed == reference;
         union.extend(observed.iter().cloned());
         rows.push(CellResult {
@@ -112,6 +154,7 @@ pub fn run(f: &Fixture, seed: u64, shared: bool) -> Result<Route, String> {
             error,
             expected: reference.into_iter().collect(),
             observed: observed.into_iter().collect(),
+            raw_witnesses,
         });
     }
     correct &= union == expected;
@@ -133,6 +176,7 @@ pub fn run(f: &Fixture, seed: u64, shared: bool) -> Result<Route, String> {
             && curve.mul(Some(Point { x: gx, y: gy }), r.logarithm) == Some(Point { x: qx, y: qy });
     }
     Ok(Route {
+        encoding,
         shared,
         cells: rows,
         expected_roots: expected.into_iter().collect(),
