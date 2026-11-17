@@ -64,8 +64,10 @@ the study; its row is retained.
 ## Pre-registered predictions and falsifiers
 
 - **P1 — exactness.** Both projection oracles have zero disagreements with the
-  signed group-law control at every bound. Any disagreement falsifies the
-  implementation and no cost or compression result is accepted.
+  signed group-law control at every bound, and every returned tuple itself
+  reaches the target under an independently enumerated sign choice. Any set or
+  witness disagreement falsifies the implementation and no cost or compression
+  result is accepted.
 - **P2 — the projection cost remains a table cost.** The number of distinct
   finite pair roots grows with the factor-base size and the four-summand query
   performs one quadratic classification per distinct finite pair root. This
@@ -106,3 +108,12 @@ the study; its row is retained.
   favorable compression verdict.
 - Excluding the pair-table build or verification from any later end-to-end
   cost.
+
+## Amendments
+
+1. **2026-11-17, before any measured run.** P1 now checks each returned tuple,
+   not only the set of targets for which a witness exists. The signed group-law
+   control enumerates the signs of that exact tuple and requires its sum to have
+   the requested x-coordinate. This closes the case where an incorrect witness
+   could be hidden by a different valid tuple for the same target. No input,
+   ladder, cost metric or compression threshold changed.

@@ -30,11 +30,19 @@
     "control": "independent signed elliptic-curve group additions"
   },
   "predictions": {
-    "P1": "zero exactness disagreements",
+    "P1": "zero target-set disagreements and every returned tuple independently reaches its target",
     "P2": "projection retains O(B^2) table/query class",
     "P3": "compatibility interpolant degree >= 0.75p and support >= 0.50p",
     "P4": "recurrence order >= 0.20p or holdout correctness < 0.90",
     "P5": "Boolean saturation is not evidence of compression"
   },
+  "amendments": [
+    {
+      "number": 1,
+      "date": "2026-11-17",
+      "timing": "before any measured run",
+      "change": "independently re-add every returned tuple under all sign choices"
+    }
+  ],
   "canonical_schema_status": "unavailable: sibling autoresearcher checkout is encrypted VLT1 in this environment"
 }

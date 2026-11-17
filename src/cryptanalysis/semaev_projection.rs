@@ -411,6 +411,18 @@ mod tests {
         tuples(curve, base, target, arity, 0, None)
     }
 
+    fn witness_reaches(curve: &Curve, xs: &[u64], target: u64) -> bool {
+        fn visit(curve: &Curve, xs: &[u64], target: u64, depth: usize, sum: Pt) -> bool {
+            if depth == xs.len() {
+                return sum.is_some_and(|(x, _)| x == target);
+            }
+            signed_points(curve, xs[depth])
+                .into_iter()
+                .any(|point| visit(curve, xs, target, depth + 1, curve.add(sum, point)))
+        }
+        visit(curve, xs, target, 0, None)
+    }
+
     #[test]
     fn quadratic_coefficients_match_s3() {
         let e = curve();
@@ -461,16 +473,24 @@ mod tests {
             if sqrtm(e.rhs(target), e.p).is_none() {
                 continue;
             }
+            let three = projection.decompose_three(target).0;
             assert_eq!(
-                projection.decompose_three(target).0.is_some(),
+                three.is_some(),
                 direct(&e, &base, target, 3),
                 "three-sum target {target}"
             );
+            if let Some(witness) = three {
+                assert!(witness_reaches(&e, &witness.x, target));
+            }
+            let four = projection.decompose_four(target).0;
             assert_eq!(
-                projection.decompose_four(target).0.is_some(),
+                four.is_some(),
                 direct(&e, &base, target, 4),
                 "four-sum target {target}"
             );
+            if let Some(witness) = four {
+                assert!(witness_reaches(&e, &witness.x, target));
+            }
         }
     }
 

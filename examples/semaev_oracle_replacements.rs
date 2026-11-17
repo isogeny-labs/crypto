@@ -188,6 +188,18 @@ fn group_control(curve: &Curve, base: &[u64]) -> (HashSet<u64>, HashSet<u64>) {
     (three, four)
 }
 
+fn tuple_reaches_target(curve: &Curve, xs: &[u64], target: u64) -> bool {
+    fn visit(curve: &Curve, xs: &[u64], target: u64, depth: usize, sum: Pt) -> bool {
+        if depth == xs.len() {
+            return sum.is_some_and(|(x, _)| x == target);
+        }
+        signed_points(curve, xs[depth])
+            .into_iter()
+            .any(|point| visit(curve, xs, target, depth + 1, curve.add(sum, point)))
+    }
+    visit(curve, xs, target, 0, None)
+}
+
 fn add_query(total: &mut QueryStats, value: QueryStats) {
     total.quadratics += value.quadratics;
     total.root_keys += value.root_keys;
@@ -243,6 +255,8 @@ fn main() -> Result<(), String> {
         let mut compatibility = Vec::with_capacity(p as usize);
         let mut three_mismatches = 0usize;
         let mut four_mismatches = 0usize;
+        let mut three_bad_witnesses = 0usize;
+        let mut four_bad_witnesses = 0usize;
         let mut three_total = QueryStats::default();
         let mut four_total = QueryStats::default();
         for target in 0..p {
@@ -250,6 +264,14 @@ fn main() -> Result<(), String> {
             let (four, four_stats) = projection.decompose_four(target);
             three_mismatches += usize::from(three.is_some() != control_three.contains(&target));
             four_mismatches += usize::from(four.is_some() != control_four.contains(&target));
+            three_bad_witnesses += three
+                .as_ref()
+                .is_some_and(|witness| !tuple_reaches_target(&curve, &witness.x, target))
+                as usize;
+            four_bad_witnesses += four
+                .as_ref()
+                .is_some_and(|witness| !tuple_reaches_target(&curve, &witness.x, target))
+                as usize;
             existence.push(u64::from(four.is_some()));
             compatibility.push(four_stats.compatible_keys % p);
             add_query(&mut three_total, three_stats);
@@ -270,7 +292,10 @@ fn main() -> Result<(), String> {
                     "four_reachable_x": control_four.len(),
                     "three_mismatches": three_mismatches,
                     "four_mismatches": four_mismatches,
+                    "three_bad_witnesses": three_bad_witnesses,
+                    "four_bad_witnesses": four_bad_witnesses,
                     "passed": three_mismatches == 0 && four_mismatches == 0
+                        && three_bad_witnesses == 0 && four_bad_witnesses == 0
                 },
                 "online_totals_all_targets": {
                     "three": three_total,
