@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Derive implicit section restriction and zero-extraction cost recurrences (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117, PR #4526; in progress)
+- [x] Derive implicit section restriction and zero-extraction cost recurrences (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117, PR #4526; analytic interface complete, constructor open)
 
 - [x] Derive and check the six-section elliptic relation operator with pole/alias handling (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117, PR #4526; in progress)
 
