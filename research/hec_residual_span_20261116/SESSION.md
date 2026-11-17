@@ -2079,3 +2079,10 @@ What was done: freezed77d601fbc3 once-onlyexit0;192originalsteps, sharedsupport/
 Decisions made: retainproofcomponent; constructioncharged separately, build+verify/single-native ratio notcoldpipeline comparison sinceoldproduceralsobuildsanchors. Needexactintegrationwithproducer-emittedcerts.
 Open threads: completeoriginaltarget collector/verifier certificateemission gate withfallbacks/sourcebinding/principalgeometry charged, original10xscope andreview/genus3/4coverage.
 Errors: externalPDF403/502gapexplicit,no scientificfailure/retry/S3/cloud.
+
+## Collector-emitted anchor cover frozen
+
+What was done: integrated polynomialcertificatebuild intoeachlazyanchorcomposition, retainedexactnativefallback; boundcovercarriescerts, verifierchecksallanchoridentities byinduction fromvalidexpectedsource/target. Added96anchor-specificmutations, common216eachverifierretained.
+Decisions made: allproducerproof-emission overheadcharged, no freecertconstruction;24completecalls/12targets/exactrepeats, subgroup/controlreplay andgeometry/root/scalarpacketfields exact. Assertions [pcc:unverified].
+Open threads: pushfreeze thenone120CPU invocation, comparecompletecost witholdcover/single-action/botharms.
+Errors: onlyunusedwarnings,no scientificexecutionyet.
