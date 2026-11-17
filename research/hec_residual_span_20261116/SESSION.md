@@ -2765,3 +2765,10 @@ What was done: freeze5bc31259f9e inputhashpass,44freshcalls exit0, alloldtotals/
 Decisions made: nextmechanismmustaccountforrowproduction/LPpayload andsoundpublicvalidation/verify; no fixed-collector-only10xbaseclaim. Conditionalfieldboundsnotruntimeoruniversal mathlowerbounds. Avoidphasecount-to-wallpromotion and vacuousInfinitysubgroupbound.
 Open threads: derive integratedconstruction costcase; deferredLPpayload graph classicalcandidateonly, not10x ornovelty. Fullgoalactive/unachieved.
 Errors: no scientificfailures, inheritedunusedimportwarnings. No S3/cloud/merge; no unchangedrerun.
+
+## Shared quadratic images prepared and frozen
+
+What was done: derived Horner quotientring recurrence(c,d)->(d-Ac,ai-Bc); newgeneric signedrowpath sharesubar/vbar once, evaluateslinearimages forunknownresidualroots, reuses knownbucket ordinates/nonzeroanchorchecks. Qlinearfall back reusesu; multiplicitiesunchanged. Compiled22audit+44countprospectivecalls, exactoldReport/subgroup16vector/repeat gates.
+Decisions made: ordinary quotientring circuitoptimizationnotnewmath/10x; mustqualify everyunknownimage/nativeprincipalidentity and measurewholecost against strongestpreparedquadratic. Single600CPUexecutionafterGitfreeze.
+Open threads: qualify/measure, thenintegrateLPandvalidationcostcase;10xobjectiveactive.
+Errors: inheritedunusedimport/helperwarnings only; no scientificexecutionbeforefreeze. No S3/cloud/merge.
