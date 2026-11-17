@@ -2338,3 +2338,10 @@ What was done: pushedfreeze222e527102c, hashespass, onceexit0;1316module matrice
 Decisions made: abstractnormalizedbasis notMumfordtorsion/geometrickernelideal. Rationalkerneldefinition staysFp; knownrational-equation algorithm avoidsfullpointfield butneedsunsuppliedequations. Do notlaunch286mpointenumerationwithoutconstructivecostcase; no upperbound-as-lowerbound/speedclaim. PrimaryLubiczRobertTheorem1.1/Milioinputboundary readandlinked.
 Open threads: boundedbridgeabstractmixedlines->geometrickerneldata/rationalequations, allinput/theta/pairing/quotient/transportcosts; original10xscopeandindependentvalidation intact.
 Errors: none,no retry/S3/cloud/merge.
+
+## Exceptional659 multiplier order and lattice identifications frozen
+
+What was done: derived allmixedquotients orderindex659²/conductornorm659^4; conditionalwithin-familymu14orbits94 andcrossfamily normonequasiendomorphism giving94classes total. Built exactorder/conductor/traceGram,1316stabilizers andboundednorm659search withCramerbridgechecks.
+Decisions made: classcount geometricinterpretation independentlyunreviewed; no actualCMlattice/curve/transport constructed. Fixednormsearchbox failure retained; sourceCMtype/polarizedlattice/reduction required fornextbridge. PrimaryMarseglia1805.10223 ideal/polarizationframework read, KBWaterhouse/powersElliptic pointersnotproof.
+Open threads: executeafterGitfreeze, thenboundedpolarizedCMlattice reconstruction path; original10x/fullgenus2/4scope unchanged.
+Errors: copiedunusedhelpers warnings, no compilefailure/S3/cloud/merge.
