@@ -465,3 +465,17 @@ Executeonceafterpushedfreeze,pollsamehandle,retainallcoverage/censoring. Broadgo
 
 ### Errors
 FoundoldfixtureactualBSGSbudget20000duringinspection;prospectivelyraisedcopiedqualificationbudgetratherthansilentlychangingoldsourceorexcludinglargerfields. No scientificrunyet.
+
+## Largerfieldholdout passes; subgroup/geometry coverage limits identified
+
+### What was done
+At pushed77a705f6a14,6models/192sourceverifiedcalls/24workloads passEXIT0,missing/incomplete0. Allrepeat/prefix/flag/REDCgatespass. Newg2REDCratiosp2510.33–1.18,p10211.23–1.80;g4p271wide0.20–37.45withell397. Allrawhashesverify;Rustsummariesretained.
+
+### Decisions made
+Nouniform10claim, no cherrypickhighcomponent. Largerfieldsnotuniformlyhardersubgroups (ell101,631,301267,77152909,48781,397). Derivedexplicitg4x9+cdegree3quotientE:y2=z3+c, JisogenousE×A3;holdoutellordersaboveE-HasseboundssoD/TinA3,notgeneric4dimensionalclassorfreeelliptictransfer. Newcoverageproofscopeexplicit.
+
+### Open threads
+Needprospective strong-subgroupg2/g3anddifferentjustifiedg4classbeforegenericclaims, plusactualnew10mechanism. Broadgoalopen. PR4507currentlyopenaslastchecked;updateshouldincludefinalholdoutscope.
+
+### Errors
+No scientificfailures/retries. Weaksubgroupsretainedasregisteredratherthanreplaced. No boundsorbudgets changedafterexecution.
