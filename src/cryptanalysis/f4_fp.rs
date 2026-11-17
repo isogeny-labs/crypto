@@ -2792,8 +2792,8 @@ fn reduce_pairs_fl(
     // Integration of the f4-memory and f4-parallel leads: under
     // `F4_FP_PAR_OLD=1` the fused `B'` build runs with the old thread
     // dispatch exactly as the f4-memory lead wrote it; otherwise the new
-    // dispatch below applies the fused updates (`fuse`) at the same places,
-    // and `F4_FP_MEM_OLD=1` / `F4_FP_MEM_B=0` keep the one-update path.
+    // dispatch below applies the fused updates (`fuse`) at the same places.
+    // The fused updates are opt-in (`F4_FP_MEM=1`, see [`mem_site`]).
     if mem_site(1) && par_old() {
         return reduce_pairs_fl_mem(
             pair_rows, reducers, reducer_at, free_cols, n_cols, fp, deadline,
@@ -3592,24 +3592,33 @@ fn add_lazy_range(acc: &mut [u64], pivot: &[u32], from: usize, to: usize, factor
 // to [`MEM_K`] updates of one accumulator and applies them in one pass,
 // the partial sum held in a register: the same products and the same
 // exact integer sums, one accumulator pass per group instead of one per
-// update.  `F4_FP_MEM_OLD=1` restores the one-update-at-a-time path;
-// `F4_FP_MEM_A=0`, `F4_FP_MEM_B=0`, `F4_FP_MEM_C=0` turn off one site
-// each (the deferred reduction, the `B'` build, the blocked pair rows).
+// update.
+//
+// Opt-in: `F4_FP_MEM=1` turns the fused path on; it is off by default.  In
+// the serial interleaved A/B (research/f4_groebner_speed_leads_20261116)
+// its pre-registered endpoint (quad_n9, 1.2-1.4x) was not met (0.97-1.06),
+// its significant gains (overdet_n10/n12 at 4 threads, 1.22x/1.67x) were not
+// predicted, and it slowed small systems at 1 thread (quad_n5 0.80x), so it
+// stays off until a pre-registered confirmation passes.  With it on,
+// `F4_FP_MEM_A=0`, `F4_FP_MEM_B=0`, `F4_FP_MEM_C=0` turn off one site each
+// (the deferred reduction, the `B'` build, the blocked pair rows), and
+// `F4_FP_MEM_OLD=1` still forces the one-update path.
 
 /// Updates of one accumulator applied together.
 const MEM_K: usize = 8;
 
 /// Whether fused site `site` (0 deferred reduction, 1 `B'` build, 2
-/// blocked pair rows) is on.
+/// blocked pair rows) is on.  Off unless `F4_FP_MEM=1`.
 fn mem_site(site: usize) -> bool {
     static ON: std::sync::OnceLock<[bool; 3]> = std::sync::OnceLock::new();
     ON.get_or_init(|| {
-        let old = std::env::var("F4_FP_MEM_OLD").as_deref() == Ok("1");
+        let on = std::env::var("F4_FP_MEM").as_deref() == Ok("1")
+            && std::env::var("F4_FP_MEM_OLD").as_deref() != Ok("1");
         let off = |v: &str| std::env::var(v).as_deref() == Ok("0");
         [
-            !old && !off("F4_FP_MEM_A"),
-            !old && !off("F4_FP_MEM_B"),
-            !old && !off("F4_FP_MEM_C"),
+            on && !off("F4_FP_MEM_A"),
+            on && !off("F4_FP_MEM_B"),
+            on && !off("F4_FP_MEM_C"),
         ]
     })[site]
 }
