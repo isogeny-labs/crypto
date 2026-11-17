@@ -1,1 +1,0 @@
-Git preserves installed code under src/ml_dataset and integration records here. MANIFEST.json describes the complete S3 packet, including duplicate installed-source snapshots omitted from this directory. S3_RECEIPT.json and this layout note are Git delivery metadata outside that packet manifest.
