@@ -49,3 +49,19 @@ Per pod: `snapshot.json` (what this session recorded, with the HTTP codes and th
 the fetched archive), `status.json` and `manifest.json` (the runner's answers), and
 `results.tar.gz` (the runner's archive, unmodified). The archives were not checked against the
 manifests file by file here.
+
+## Shutdown (2026-11-17, 06:02 UTC, on the owner's instruction "shut them down if idle")
+
+Each pod was checked again immediately before deletion: name matched, RunPod API CPU and memory
+utilisation 0, and for the eight `pfd-*` pods the runner's `state` was `done`. All ten were then
+deleted through the REST v2 API (HTTP 204 each, 06:02:37 to 06:02:53 UTC); a following listing
+no longer shows them.
+
+- The eight `pfd-*` pods and `bdr-growthlaw`: everything they held, except the study binaries, is
+  in this directory.
+- `pkm-dense-rerun-20261115`: not read before deletion. Its supervisor keeps its state on network
+  volume `yuzuh9rmej`, which is not deleted with the pod and still exists (and is billed as storage).
+
+Left running, not part of this shutdown: `replead-r1-20261116` (another session asks the owner
+to copy `/work/out/` before terminating it) and `bdr-traceline-20261117b` (started by a session
+that is active now).
