@@ -1,0 +1,430 @@
+{
+  "schema": "ecbench.phased-panel/v1",
+  "status": "planned_unmeasured",
+  "size_metric": {
+    "name": "subgroup_bits",
+    "definition": "ceil(log2(r))",
+    "field_size_is_separate": true
+  },
+  "source_snapshot": {
+    "crypto_commit": "46ad9d87de45e372f8a741a3a38dee5b385425eb",
+    "ecc_challenges_commit": "efd49aa0a802cda679748533ec5bc5e44ab9ea71",
+    "ecc_challenges_instances_blob": "a82dc0ee00a6d25bbfc09f260a4e5430a2a52f9e"
+  },
+  "gate_defaults": {
+    "familywise_alpha": 0.05,
+    "minimum_terminal_episodes": 16,
+    "minimum_full_rank_success_probability": 0.8,
+    "maximum_yield_shortfall_factor": 2.0,
+    "next_phase_resource_headroom_factor": 4.0,
+    "targets_per_curve_below_64_bits": 32,
+    "targets_per_curve_at_or_above_64_bits": 8
+  },
+  "phases": [
+    {
+      "phase": 1,
+      "nominal_subgroup_bits": 20,
+      "subgroup_bit_window": {"minimum": 18, "maximum": 23},
+      "objective": "Calibrate relation, rank, cofactor, field-structure, Koblitz-sign, and automorphism effects before scaling.",
+      "minimum_public_targets_per_curve": 32,
+      "admission_state": "ready_to_preregister",
+      "curves": [
+        {
+          "cell_id": "P1-K0-23",
+          "family": "koblitz",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-f2m23-t5197-69e76b73",
+            "ec1": "EC1N23Ce0h27a979171a13",
+            "curve_uid": "urn:ec-record:1:sha256:27a979171a138afd2371cf229d26f042414a913f28fd274811c6bfc81390bb31"
+          },
+          "size": {"subgroup_order": "2095853", "subgroup_bits": 21, "field_bits_or_degree": 23},
+          "cofactor": "4",
+          "traits": ["binary", "koblitz_a0", "prime_extension_degree", "frobenius", "cm_discriminant_minus_7"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "koblitz", "a": 0, "n": 23},
+            "required_reference": "cheapest applicable signed-Frobenius rho"
+          }
+        },
+        {
+          "cell_id": "P1-K1-23",
+          "family": "koblitz",
+          "role": "sentinel",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-f2m23-tm5197-1f85e9e1",
+            "ec1": "EC1N23Ce1heec6a3619e3f",
+            "curve_uid": "urn:ec-record:1:sha256:eec6a3619e3fdf05035e0ef5d3ec8cf3af507268cf760c77d47518d62141b00f"
+          },
+          "size": {"subgroup_order": "4196903", "subgroup_bits": 23, "field_bits_or_degree": 23},
+          "cofactor": "2",
+          "traits": ["binary", "koblitz_a1", "prime_extension_degree", "frobenius", "cm_discriminant_minus_7"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "koblitz", "a": 1, "n": 23},
+            "required_reference": "cheapest applicable signed-Frobenius rho"
+          }
+        },
+        {
+          "cell_id": "P1-B21-PRIME-DEGREE",
+          "family": "binary",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-f2m21-t2591-de54d72e",
+            "ec1": "EC1N21Crbh30df0435638d",
+            "curve_uid": "urn:ec-record:1:sha256:30df0435638d7b3c21982c00bc9eb97e58b6ee193bc8884a07767dcb84a98f60"
+          },
+          "size": {"subgroup_order": "1047281", "subgroup_bits": 20, "field_bits_or_degree": 21},
+          "cofactor": "2",
+          "traits": ["binary", "general_binary", "prime_extension_degree", "no_proper_intermediate_field", "definition_degree_21"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "binary_explicit", "n": 21, "modulus": 2097157, "a": 1, "b": 1797947, "group_order": 2094562, "r": 1047281, "gx": 232919, "gy": 1480205},
+            "required_reference": "cheapest applicable generic binary rho"
+          }
+        },
+        {
+          "cell_id": "P1-B24-COMPOSITE-DEGREE",
+          "family": "binary",
+          "role": "sentinel",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-f2m24-tm3047-2d0c0e8c",
+            "ec1": "EC1N24Crbh1d71c3dc9cbc",
+            "curve_uid": "urn:ec-record:1:sha256:1d71c3dc9cbc1598f27eb08472572d8beeb2f1a5713a2b617d66f8118974fec5"
+          },
+          "size": {"subgroup_order": "2097533", "subgroup_bits": 22, "field_bits_or_degree": 24},
+          "cofactor": "8",
+          "traits": ["binary", "general_binary", "composite_extension_degree", "ambient_field_has_intermediate_subfields", "curve_definition_degree_24"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "binary_explicit", "n": 24, "modulus": 16777243, "a": 0, "b": 6277594, "group_order": 16780264, "r": 2097533, "gx": 11058037, "gy": 14510317},
+            "required_reference": "cheapest applicable generic binary rho"
+          }
+        },
+        {
+          "cell_id": "P1-P20-GENERIC",
+          "family": "prime",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-fp20-t157-e39da206",
+            "ec1": "EC1P20Cfph3457d3ae5cdc",
+            "curve_uid": "urn:ec-record:1:sha256:3457d3ae5cdcf49fa4438d4bda76f8724457afbc06e0921c76e9cc38172a838f"
+          },
+          "size": {"subgroup_order": "550657", "subgroup_bits": 20, "field_bits_or_degree": 20},
+          "cofactor": "1",
+          "traits": ["prime_field", "generic_short_weierstrass", "cofactor_one"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "prime_explicit", "p": 550813, "a": 310059, "b": 228047, "group_order": 550657, "r": 550657, "gx": 470175, "gy": 462863},
+            "required_reference": "cheapest applicable prime-field rho"
+          }
+        },
+        {
+          "cell_id": "P1-P25-J0",
+          "family": "prime",
+          "role": "sentinel",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-fp25-t9734-bcfe9f51",
+            "ec1": "EC1P25Cfphd101e242028f",
+            "curve_uid": "urn:ec-record:1:sha256:d101e242028f73307c69ef69d4608398c4d68f57da1c89a70ac87e22aad31096"
+          },
+          "size": {"subgroup_order": "1977259", "subgroup_bits": 21, "field_bits_or_degree": 25},
+          "cofactor": "12",
+          "traits": ["prime_field", "j_invariant_0", "order_6_automorphisms", "cm_discriminant_minus_3", "high_cofactor_sentinel"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "prime_explicit", "p": 23736841, "a": 0, "b": 1, "group_order": 23727108, "r": 1977259, "gx": 19157303, "gy": 13563414},
+            "required_reference": "cheapest verified negation-or-cubic rho after subgroup-action check"
+          }
+        },
+        {
+          "cell_id": "P1-P28-J1728",
+          "family": "prime",
+          "role": "sentinel",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-fp28-t29432-1e9623dd",
+            "ec1": "EC1P28Cfph3731fea44c23",
+            "curve_uid": "urn:ec-record:1:sha256:3731fea44c23801a072981ffe791ca9568b86ff89acaff8b782e34c05bab81ad"
+          },
+          "size": {"subgroup_order": "4338437", "subgroup_bits": 23, "field_bits_or_degree": 28},
+          "cofactor": "50",
+          "traits": ["prime_field", "j_invariant_1728", "order_4_automorphisms", "cm_discriminant_minus_4", "high_cofactor_sentinel"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "prime_explicit", "p": 216951281, "a": 6, "b": 0, "group_order": 216921850, "r": 4338437, "gx": 107482900, "gy": 107145750},
+            "required_reference": "cheapest verified negation-or-quartic rho after subgroup-action check"
+          }
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "nominal_subgroup_bits": 30,
+      "subgroup_bit_window": {"minimum": 27, "maximum": 33},
+      "objective": "Confirm calibrated relation and rank behavior at the first scaling step with one curve from each core family.",
+      "minimum_public_targets_per_curve": 32,
+      "admission_state": "ready_to_preregister",
+      "curves": [
+        {
+          "cell_id": "P2-KOBLITZ-37",
+          "family": "koblitz",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-f2m37-tm534059-32aad96b",
+            "ec1": "EC1N37Ce0h0c51aa4aa7c3",
+            "curve_uid": "urn:ec-record:1:sha256:0c51aa4aa7c3c76c45885e230d717aedcbefad98e2604d1664ac38b57299f180"
+          },
+          "size": {"subgroup_order": "230603167", "subgroup_bits": 28, "field_bits_or_degree": 37},
+          "cofactor": "596",
+          "traits": ["binary", "koblitz_a0", "frobenius", "high_cofactor_stress", "off_standard_panel_no_low_cofactor_registered_match_in_window"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "koblitz", "a": 0, "n": 37},
+            "required_reference": "cheapest applicable signed-Frobenius rho"
+          }
+        },
+        {
+          "cell_id": "P2-B27",
+          "family": "binary",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-f2m27-tm20293-ca4ad8af",
+            "ec1": "EC1N27Crbhb0097f5ebc1e",
+            "curve_uid": "urn:ec-record:1:sha256:b0097f5ebc1e4c3c46728a7c7a06e05981bb0aaf163bfb029c8fde36fdb2257d"
+          },
+          "size": {"subgroup_order": "67119011", "subgroup_bits": 27, "field_bits_or_degree": 27},
+          "cofactor": "2",
+          "traits": ["binary", "general_binary", "prime_extension_degree", "cofactor_two"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "binary_explicit", "n": 27, "modulus": 134217767, "a": 1, "b": 36116894, "group_order": 134238022, "r": 67119011, "gx": 38501142, "gy": 126727261},
+            "required_reference": "cheapest applicable generic binary rho"
+          }
+        },
+        {
+          "cell_id": "P2-P32A",
+          "family": "prime",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-fp32-t7319-90da43e9",
+            "ec1": "EC1P32Cfph06b9f59ff156",
+            "curve_uid": "urn:ec-record:1:sha256:06b9f59ff156b2f3aeeab601b5415a88dc72fc7a3c281e508231f68bd3309e21"
+          },
+          "size": {"subgroup_order": "4294959973", "subgroup_bits": 32, "field_bits_or_degree": 32},
+          "cofactor": "1",
+          "traits": ["prime_field", "generic_short_weierstrass", "a_minus_3", "cofactor_one", "standard_panel_P32a"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "prime_explicit", "p": 4294967291, "a": 4294967288, "b": 31, "group_order": 4294959973, "r": 4294959973, "gx": 2, "gy": 2120051858},
+            "required_reference": "cheapest applicable prime-field rho"
+          }
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "nominal_subgroup_bits": 60,
+      "subgroup_bit_window": {"minimum": 56, "maximum": 62},
+      "objective": "Test whether the surviving candidates and their relation/rank models remain viable near the current narrow-backend boundary.",
+      "minimum_public_targets_per_curve": 32,
+      "admission_state": "partially_blocked",
+      "curves": [
+        {
+          "cell_id": "P3-KOBLITZ-73",
+          "family": "koblitz",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-f2m73-tm184271214331-9d25cc67",
+            "ec1": "EC1N73Ce0h243f847bccdd",
+            "curve_uid": "urn:ec-record:1:sha256:243f847bccdd57c5fb0e458c368f5dee255dbd26406ce6c72e727b45cede73d3"
+          },
+          "size": {"subgroup_order": "86020738150056119", "subgroup_bits": 57, "field_bits_or_degree": 73},
+          "cofactor": "109796",
+          "traits": ["binary", "koblitz_a0", "frobenius", "high_cofactor_stress", "wide_field"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "reference_only_wide",
+            "curve_spec": {"kind": "koblitz", "a": 0, "n": 73},
+            "required_reference": "cheapest applicable wide signed-Frobenius rho; index-calculus admission remains blocked"
+          }
+        },
+        {
+          "cell_id": "P3-B59",
+          "family": "binary",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-f2m59-tm247403969-f6f9b926",
+            "ec1": "EC1N59Crbhff0a665d9c7b",
+            "curve_uid": "urn:ec-record:1:sha256:ff0a665d9c7b982755e16c4c0f5e8efafb61319563046c40a28e78bb06e8ba46"
+          },
+          "size": {"subgroup_order": "288230376275413729", "subgroup_bits": 59, "field_bits_or_degree": 59},
+          "cofactor": "2",
+          "traits": ["binary", "general_binary", "prime_extension_degree", "cofactor_two", "narrow_backend_limit"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "binary_explicit", "n": 59, "modulus": 576460752303423637, "a": 1, "b": 181385871876602388, "group_order": 576460752550827458, "r": 288230376275413729, "gx": 181385871876602389, "gy": 515117338489141979},
+            "required_reference": "cheapest applicable generic binary rho"
+          }
+        },
+        {
+          "cell_id": "P3-P61-J0",
+          "family": "prime",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-fp61-t205-983ecb51",
+            "ec1": "EC1P61Cfph54bb8886c801",
+            "curve_uid": "urn:ec-record:1:sha256:54bb8886c801f554147f1141dae46acdceafb07f67334b50f486c08cc6f3bca5"
+          },
+          "size": {"subgroup_order": "2305842958741182829", "subgroup_bits": 61, "field_bits_or_degree": 61},
+          "cofactor": "1",
+          "traits": ["prime_field", "j_invariant_0", "order_6_automorphisms", "cm_discriminant_minus_3", "cofactor_one", "narrow_backend_limit"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "prime_explicit", "p": 2305842958741183033, "a": 0, "b": 5, "group_order": 2305842958741182829, "r": 2305842958741182829, "gx": 1252822335198115259, "gy": 126380799876567860},
+            "required_reference": "cheapest verified negation-or-cubic rho after subgroup-action check"
+          }
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "nominal_subgroup_bits": 80,
+      "subgroup_bit_window": {"minimum": 76, "maximum": 84},
+      "objective": "Run the final registered/challenge-anchored panel only after wide generic arithmetic, method parity, and local curve identities are available.",
+      "minimum_public_targets_per_curve": 8,
+      "admission_state": "blocked",
+      "curves": [
+        {
+          "cell_id": "P4-KOBLITZ-83",
+          "family": "koblitz",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "registered",
+            "icv1": "icv1-f2m83-tm6151469093347-debefd74",
+            "ec1": "EC1N83Ce0h5ad08e3bea59",
+            "curve_uid": "urn:ec-record:1:sha256:5ad08e3bea59aae5a686e5c0796ddda536d455b2fb3371f2641d4524ccbdd618"
+          },
+          "size": {"subgroup_order": "2417851639230796216685689", "subgroup_bits": 82, "field_bits_or_degree": 83},
+          "cofactor": "4",
+          "traits": ["binary", "koblitz_a0", "frobenius", "prime_extension_degree", "registered_confidence_gate"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "reference_only_wide",
+            "curve_spec": {"kind": "koblitz", "a": 0, "n": 83},
+            "required_reference": "cheapest applicable wide signed-Frobenius rho; index-calculus admission remains blocked"
+          }
+        },
+        {
+          "cell_id": "P4-ECC2-79",
+          "family": "binary",
+          "role": "external_anchor",
+          "mandatory": true,
+          "identity": {
+            "status": "pending_local_import",
+            "icv1": null,
+            "ec1": null,
+            "curve_uid": null,
+            "external_name": "ECC2-79",
+            "source_blob": "a82dc0ee00a6d25bbfc09f260a4e5430a2a52f9e",
+            "external_parameters": {
+              "equation": "y^2 + x*y = x^3 + a*x^2 + b",
+              "m": "79",
+              "modulus": "0x80000000000000000201",
+              "a": "0x4a2e38a8f66d7f4c385f",
+              "b": "0x2c0bb31c6becc03d68a7",
+              "r": "0x40000000004531a2562b",
+              "h": "2",
+              "gx": "0x30cb127b63e42792f10f",
+              "gy": "0x547b2c88266bb04f713b",
+              "qx": "0x202a9f035014497325",
+              "qy": "0x5175a64859552f97c129"
+            }
+          },
+          "size": {"subgroup_order": "302231454903954479142443", "subgroup_bits": 79, "field_bits_or_degree": 79},
+          "cofactor": "2",
+          "traits": ["binary", "general_binary", "prime_extension_degree", "cofactor_two", "certicom_challenge_anchor"],
+          "evidence_status": {"order": "external_primary_source", "subgroup": "external_primary_source"},
+          "ecbench": {
+            "status": "blocked_pending_registry_and_wide_backend",
+            "curve_spec": null,
+            "required_reference": "wide generic binary rho selected after local import and method-parity checks"
+          }
+        },
+        {
+          "cell_id": "P4-ECCP-79",
+          "family": "prime",
+          "role": "external_anchor",
+          "mandatory": true,
+          "identity": {
+            "status": "pending_local_import",
+            "icv1": null,
+            "ec1": null,
+            "curve_uid": null,
+            "external_name": "ECCp-79",
+            "source_blob": "a82dc0ee00a6d25bbfc09f260a4e5430a2a52f9e",
+            "external_parameters": {
+              "equation": "y^2 = x^3 + a*x + b",
+              "p": "0x62ce5177412aca899cf5",
+              "a": "0x39c95e6dddb1bc45733c",
+              "b": "0x1f16d880e89d5a1c0ed1",
+              "r": "0x62ce5177407b7258dc31",
+              "h": "1",
+              "gx": "0x315d4b201c208475057d",
+              "gy": "0x35f3df5ab370252450a",
+              "qx": "0x679834cefb7215dc365",
+              "qy": "0x4084bc50388c4e6fdfab"
+            }
+          },
+          "size": {"subgroup_order": "466597814831947642887217", "subgroup_bits": 79, "field_bits_or_degree": 79},
+          "cofactor": "1",
+          "traits": ["prime_field", "generic_short_weierstrass", "cofactor_one", "certicom_challenge_anchor"],
+          "evidence_status": {"order": "external_primary_source", "subgroup": "external_primary_source"},
+          "ecbench": {
+            "status": "blocked_pending_registry_and_wide_backend",
+            "curve_spec": null,
+            "required_reference": "wide prime-field rho selected after local import and method-parity checks"
+          }
+        }
+      ]
+    }
+  ]
+}
