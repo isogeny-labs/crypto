@@ -88168,3 +88168,21 @@ Implement/freeze/publish full source before offline/j1/120s compiler/native call
 
 ## Errors
 Conductor remains127 on the explicit new code scope; exact new request/output retained, documented unavailable fallback. No new adapter code/build/call yet. All earlier ledger forks, missing baseline trust, PDF typing, connector squash rejection and original CI/storage failures remain preserved. [pcc:unverified]
+
+
+---
+
+2026-11-17T00:47:05.543673+00:00
+# Freeze actual shifted balanced class source before compiler and native calls
+
+## What was done
+PCC-20261117-65ffd2: actual adapter97b38286, coefficient transform plus pointwise quadratic/rational oracle, full planned226 witnesses/3952 pairs/39 mutants/sign-negation/roundtrip/coverage checks. Exact unchanged FpPoly/Fp2 and241-line balanced core method bodies are compiler inputs, all hashes pinned; wrappers/new code formatted. Four cached registry dependencies locked offline, no compiler/native call yet. [pcc:unverified]
+
+## Decisions made
+Normal source-only child tag before compilation/calls, remote PR4472bd8 held for01:07 own CI. Compiler-only first, copied chmod555 qualifier/hash before one-worker native unit120s; strict all-target no-deps Clippy/format and original/copied source guards. Preserve every failure/timeout without limit increases or reclassifying infrastructure as semantic control. [pcc:unverified]
+
+## Open threads
+First native12 outcomes and report, then actual Richelot factor/correspondence normalization and dual[2]. New4472CI/full artifacts01:07; canonical trust/store/required gates, fullLP/admission/strongest costs/paidSTOP/vault remain. [pcc:unverified]
+
+## Errors
+No new compiler/native result. Existing code uses a clearly named compiler include to preserve copied core bytes, not hidden or replaced arithmetic; unchanged vendor format is retained, strict compilation/Clippy still checks it. Original source/ledger/CI/storage/connector failures remain, no green/signed promotion. [pcc:unverified]
