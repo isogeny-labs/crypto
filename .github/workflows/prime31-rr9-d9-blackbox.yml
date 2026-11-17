@@ -82,6 +82,11 @@ jobs:
             .negative_index == 0 and .rows == 27456 and .columns == 11440 and
             .krylov_moments == 22880 and .gram_applications == 22880 and
             .no_sign_mask_or_secret_scalar_passed == true and
+            .one_sided_full_rank_certified == true and
+            .unit_bezout_identity_replayed == true and
+            .unit_bezout_witness_nonzeros > 0 and
+            (.unit_bezout_coefficients | length) == 27456 and
+            .inverse_gram_applications == 11439 and
             .complete_unknown_ecdlp_solves == 0 and .pcc == "unverified"' prime31-rr9-d9-neg0.json
       - name: Public-only second frozen negative D9 exact-rank attempt
         shell: bash
@@ -94,6 +99,11 @@ jobs:
             .negative_index == 1 and .rows == 27456 and .columns == 11440 and
             .krylov_moments == 22880 and .gram_applications == 22880 and
             .no_sign_mask_or_secret_scalar_passed == true and
+            .one_sided_full_rank_certified == true and
+            .unit_bezout_identity_replayed == true and
+            .unit_bezout_witness_nonzeros > 0 and
+            (.unit_bezout_coefficients | length) == 27456 and
+            .inverse_gram_applications == 11439 and
             .complete_unknown_ecdlp_solves == 0 and .pcc == "unverified"' prime31-rr9-d9-neg1.json
       - name: Preserve bounded experimental evidence including failures
         uses: actions/upload-artifact@v4
