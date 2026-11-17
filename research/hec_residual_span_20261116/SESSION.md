@@ -2751,3 +2751,10 @@ What was done: freeze410f3d9c91b hashespass,44freshcalls exit0/allnativeanswers/
 Decisions made: cubic schedule loses bothfields on allg2/g3; retainnegative result and quadraticstrongcontrol, no wallgate justified on this schedule. Oneg4fixture isolated gain notgeneric10x. Futureselectiveternarystrategy needsnewcostcase/protocol; rawanchor/rowgain failscompletecosttest.
 Open threads: mathematical useful-rank/LPstructure construction with credible fullcostcase; objective active/unachieved, noindependentreview.
 Errors: bookkeeping Rubyfilter_map unsupported by systemRuby; replaced withmap/compact, no scientificrerun. No S3/cloud/merge.
+
+## Generic quadratic-pencil phase partition frozen
+
+What was done: added exclusive nonarithmetic counterlabels around validate/preparation/anchor/scan/tail/oracle/row/LP/solve/verify, exactretained quadratic algorithm. Prepared44freshcalls requiring original16vector/Report/lookup replay, exact phase sum and repeats, nativeanswers.
+Decisions made: newpartitionnotwallbenchmark. Conditionalperfield Amdahlbudgets only fixedstage substitutions, notuniversal lowerbound; require90percentremovablecountfor10x withinthat model. One600CPUrun afterGitfreeze.
+Open threads: executepartition and choose next mathematicalconstruction bydominantcompletecost; no10xestablished.
+Errors: inherited unusedimport/helper warnings only; no S3/cloud/merge. Ownscopecheckallows/attachsameexistingreservation.
