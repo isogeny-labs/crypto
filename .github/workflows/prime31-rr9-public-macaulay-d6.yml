@@ -34,6 +34,7 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             research/prime31_ic_20261115/native
+            src/cryptanalysis
       - name: Pin Rust 1.100.0
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Overlay only original Macaulay example plus prospective degree6 wrapper
