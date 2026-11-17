@@ -1,7 +1,13 @@
-//! Exact Curve25519 model binding for prime-field index-calculus research.
+//! Independent exact Curve25519 oracle for prime-field index-calculus research.
 //!
-//! The prime-field Semaev/PKM machinery in this crate is written for short
-//! Weierstrass curves, while RFC 7748 specifies Curve25519 as
+//! The canonical full-width implementation is
+//! [`curve25519_wide`](crate::cryptanalysis::curve25519_wide). This module is
+//! deliberately independent: it derives the same RFC 7748 model with
+//! `BigUint`/the generic ECC reference path, evaluates the exact third Semaev
+//! polynomial, and supplies a replayable integer-polynomial certificate for
+//! the coordinate translation.
+//!
+//! RFC 7748 specifies Curve25519 as
 //!
 //! `v^2 = u^3 + A*u^2 + u`, `A = 486662`, over `F_(2^255-19)`.
 //!
@@ -9,8 +15,10 @@
 //! `y^2 = x^3 + a*x + b`, with
 //! `a = 1 - A^2/3` and `b = 2*A^3/27 - A/3`. This module makes that
 //! binding executable at the full field size and evaluates the standard
-//! third Semaev polynomial there. It is a representation adapter, not a
-//! claim that index calculus beats generic rho on Curve25519.
+//! third Semaev polynomial there. Cross-backend tests require this reference
+//! model and `curve25519_wide` to agree byte-for-byte on the field, curve,
+//! subgroup, and generator. It is a correctness oracle, not a second primary
+//! backend or a performance claim.
 //!
 //! The accompanying study and replay artifacts are in
 //! `research/curve25519_index_calculus_20261102/`.
@@ -225,7 +233,7 @@ impl Curve25519IcModel {
         let limits = self.pkm_binary_tower_limits();
         serde_json::json!({
             "schema": "curve25519-index-calculus-model/v1",
-            "status": "exact_model_adapter_not_an_attack",
+            "status": "independent_exact_oracle_not_an_attack",
             "standard_source": "RFC 7748 section 4.1",
             "curve": {
                 "name": "Curve25519",
@@ -252,12 +260,19 @@ impl Curve25519IcModel {
                 "max_kummer_abscissae": limits.kummer_abscissae,
                 "v2_p_plus_1": limits.torus_height_from_p_plus_1,
                 "max_binary_torus_abscissae": limits.torus_abscissae,
-                "scope": "binary Kummer and norm-one/Dickson towers only; auxiliary-isogeny and mixed-radix PKM constructions remain separate"
+                "scope": "binary Kummer and norm-one/Dickson towers only; auxiliary-isogeny and mixed-radix PKM constructions are separate (the auxiliary-isogeny miniature route was implemented later)"
+            },
+            "integration": {
+                "canonical_full_width_backend": "src/cryptanalysis/curve25519_wide.rs",
+                "cross_check": "independent BigUint model agrees with the Fp256 backend on p, A, a, b, subgroup, cofactor, and generator",
+                "later_scaled_algebraic_evidence": "research/curve25519_algebraic_ladder_20261102/README.md",
+                "role": "replayable model/S3 oracle and translation certificate"
             },
             "implementation_boundary": {
                 "exact_field_arithmetic": "BigUint",
                 "semaev_polynomial": "S3 on the exact short-Weierstrass model",
-                "existing_end_to_end_pkm_harness": "single-word p < 2^63; not wired to this exact model",
+                "full_size_relation_collection": "not performed by this artifact",
+                "scaled_algebraic_measurements": "later canonical miniature studies are referenced, not regenerated here",
                 "performance_measurement": false
             }
         })
@@ -308,6 +323,8 @@ pub fn montgomery_translation_identity() -> IdentityStatement {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::cryptanalysis::curve25519_wide::{Curve25519Wide, A25519};
+    use crate::cryptanalysis::fp_backend::PrimeField;
     use crate::cryptanalysis::identity_certificate::{
         check_with_extra, IdentityCertificate, Verdict,
     };
@@ -324,6 +341,22 @@ mod tests {
             model.short_to_montgomery(&short.0, &short.1),
             (model.base_u.clone(), model.base_v.clone())
         );
+    }
+
+    #[test]
+    fn independent_model_matches_the_current_wide_backend() {
+        let model = Curve25519IcModel::rfc7748();
+        let wide = Curve25519Wide::new();
+        let (wide_x, wide_y) = wide.generator.expect("the canonical generator is finite");
+
+        assert_eq!(wide.field.modulus(), &model.p);
+        assert_eq!(BigUint::from(A25519), model.montgomery_a);
+        assert_eq!(wide.field.to_biguint(wide.a), model.short_a);
+        assert_eq!(wide.field.to_biguint(wide.b), model.short_b);
+        assert_eq!(wide.r, model.subgroup_order);
+        assert_eq!(wide.cofactor, u64::from(model.cofactor));
+        assert_eq!(wide.field.to_biguint(wide_x), model.base_x);
+        assert_eq!(wide.field.to_biguint(wide_y), model.base_y);
     }
 
     #[test]

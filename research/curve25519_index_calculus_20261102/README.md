@@ -1,8 +1,8 @@
 ---
-title: "Index calculus for Curve25519: exact model binding and the remaining algebraic bottleneck"
+title: "Index calculus for Curve25519: independent exact-model oracle and current algebraic boundary"
 author: "Codex research session"
-date: "2026-11-02"
-geometry: margin=0.8in
+date: "2026-11-02; synchronized with main on 2026-11-17"
+geometry: margin=0.7in
 fontsize: 10pt
 colorlinks: true
 linkcolor: blue
@@ -14,29 +14,37 @@ header-includes:
 
 # Result
 
-Curve25519 can now be fed **exactly** into this repository's
-short-Weierstrass Semaev machinery. The new Rust adapter carries RFC 7748's
-full 255-bit field, prime-order subgroup, base point, and a reversible
-Montgomery-to-short-Weierstrass translation; it also evaluates the exact third
-Semaev polynomial $S_3$. Six focused tests verify the map, the subgroup order,
-an $S_3$ zero-sum witness, the committed manifest, and a replayable identity
-certificate.
+This study supplies an **independent exact oracle** for the repository's
+current full-width [`curve25519_wide`](../../src/cryptanalysis/curve25519_wide.rs)
+backend. The Rust oracle re-derives RFC 7748's 255-bit field, prime-order
+subgroup, base point, and reversible Montgomery-to-short-Weierstrass
+translation through a separate `BigUint`/generic-ECC path. It also evaluates
+the exact third Semaev polynomial $S_3$ and carries a replayable certificate
+for the integer identity behind the translation. A seventh focused test added
+during the 2026-11-17 synchronization requires both implementations to agree
+on every curve and subgroup parameter.
 
-This does **not** produce a practical Curve25519 discrete-log attack. It makes
-the representation boundary exact and identifies the next real obstruction:
-constructing and solving a prime-field algebraic point-decomposition system at
-the required factor-base scale. In particular,
+This is correctness evidence, not a second primary backend and not a practical
+Curve25519 discrete-log attack. The exact Curve25519 facts are:
 
 - $v_2(p-1)=2$, so a binary Kummer base $g\mu_{2^t}\subset\mathbb F_p$
   has at most $2^2=4$ abscissae;
 - $v_2(p+1)=1$, so the analogous binary norm-one/Dickson tower has at most
   $2$ abscissae;
-- auxiliary-isogeny and mixed-radix PKM constructions are not ruled out by
-  those two facts, but the repository's end-to-end PKM harness is currently
-  single-word ($p<2^{63}$) and its measured solver degree is not bounded.
+- those two obstructions do not apply to auxiliary-isogeny or mixed-radix
+  constructions. Since the original 2026-11-02 draft, PRs #3284/#3287 have
+  implemented isogeny-tower, bit-interval, and hybrid-guessing forms on
+  Curve25519-family miniatures;
+- the later canonical $k=20,m=2$ study verified those forms end to end, but
+  its best measured algebraic configuration remained about $3\cdot10^5$ times
+  the generic-decomposition baseline at $w=0.1$ for that two-target protocol;
+- the actual 255-bit module now supplies group arithmetic, wide linear
+  algebra/relation components, and bounded scans, but this artifact performs
+  no full-size relation collection or solver measurement.
 
-The correct status is therefore **exact adapter verified; full-size algebraic
-index calculus blocked at factor-base/solver integration**.
+The synchronized status is therefore **independent exact oracle and certificate
+verified; the miniature auxiliary-isogeny lane exists but is cost-limited;
+full-size algebraic relation collection remains unmeasured**.
 
 ![Curve25519 index-calculus mechanism and boundary](mechanism.png)
 
@@ -45,9 +53,11 @@ is [`mechanism.svg`](mechanism.svg).
 
 # Question and scope
 
-The question was: *what concrete index-calculus work can be completed for
-Curve25519 without presenting a toy curve or a coordinate change as an attack
-on the deployed curve?*
+The original question was: *what concrete index-calculus work can be completed
+for Curve25519 without presenting a toy curve or a coordinate change as an
+attack on the deployed curve?* The 2026-11-17 synchronization adds a second
+requirement: preserve only the part that remains independent of the later
+full-width implementation and later miniature experiments.
 
 The exact target is the prime-order subgroup specified by RFC 7748:
 
@@ -67,8 +77,10 @@ uses only a $u$-coordinate and a clamped scalar; conflating that interface
 with an ECDLP instance would obscure the subgroup and sign information needed
 by relation collection.
 
-No timing or scaling experiment was launched. The work consists of literature
-review, exact arithmetic, executable identities, and unit/property checks.
+No timing or scaling experiment was launched by this artifact. The work
+consists of literature review, exact arithmetic, executable identities, and
+unit/property checks. Later repository measurements are cited as later
+evidence and are not re-labelled as results of this study.
 
 # Literature boundary
 
@@ -87,12 +99,20 @@ The literature was reviewed before choosing the implementation.
    system, but explicitly do not claim a sub-$p^{1/2}$ algorithm; their
    experiments cover only 11--22-bit prime fields and leave the system-solving
    cost unresolved.
-4. The repository's existing PKM tower study measures a growing solving degree:
+4. At the time of the original study, the repository's PKM tower evidence
+   measured a growing solving degree:
    $m=2$ reaches degree 6, $m=3$ reaches 7, and the $m=4,N=16$ systems
    require roughly an hour and up to 8.1 GiB in the recorded round. Those are
    scaled systems, not Curve25519 measurements, but they directly reject the
    optimistic assumption that the current solver degree is already known to be
    bounded.
+5. The later canonical Curve25519-family algebraic ladder implemented
+   isogeny-tower and bit-interval membership plus hybrid guessing. Its verified
+   $k=20,m=2$ end-to-end checks move the obstruction from construction
+   existence to measured cost. See
+   [`curve25519_algebraic_ladder_20261102`](../curve25519_algebraic_ladder_20261102/README.md)
+   and the updated
+   [`curve25519-family-algebraic-ic-tower` problem record](../../problems/curve25519-family-algebraic-ic-tower.md).
 
 PKM's partial cost analysis makes the missing condition explicit. With
 $(\deg L)^m\approx m!p$, the decomposition solver $T(E,m,L)$ must beat
@@ -100,7 +120,13 @@ $p^{1/2-1/m}$ (up to the paper's other terms) before the construction can
 beat a generic square-root method. An exact model conversion changes constants
 and representation; it does not establish that solver bound.
 
-# Exact model adapter
+# Independent exact model oracle
+
+The primary full-width implementation now lives in
+[`curve25519_wide.rs`](../../src/cryptanalysis/curve25519_wide.rs) and uses the
+repository's `Fp256` backend. The implementation in this study deliberately
+uses a separate `BigUint` and generic-ECC path. Agreement between them is a
+cross-backend check rather than duplicated authority.
 
 For a Montgomery cubic
 
@@ -184,22 +210,22 @@ This audit is deliberately narrow:
 
 - it does not rule out a mixed-radix composition using odd factors;
 - it does not rule out PKM's auxiliary-curve/isogeny construction, which does
-  not require $2^t\mid p\pm1$;
-- it does not show that either remaining construction has an affordable
-  precomputation or solver at Curve25519 scale.
+  not require $2^t\mid p\pm1$ and was implemented later on miniatures;
+- the later implementation establishes existence and measured miniature cost,
+  not an affordable precomputation or solver at Curve25519 scale.
 
 # Evidence and status
 
 | Requirement | Evidence | Status |
 |---|---|---|
-| Exact standard curve and subgroup | RFC 7748 parameters in `model.json` | Verified against source and native constants |
+| Exact standard curve and subgroup | RFC 7748 parameters in `model.json` | Verified against source and cross-checked against `curve25519_wide` |
 | Montgomery/short equivalence | inverse-map tests plus `IDC1h32739202ad9d0c15` | Verified |
 | Correct subgroup generator | full-size test $[\ell]G=\mathcal O$ | Verified |
 | Semaev binding on the exact curve | $G,2G,-3G$ zero-sum test | Verified |
 | Binary PKM capacity | exact $v_2(p-1)=2,v_2(p+1)=1$ tests | Verified, narrow scope |
-| Full relation collection and linear algebra | no full-size harness | Blocked |
-| Solver beats rho | no such evidence | Not established |
-| Performance claim | no experiment run | Not claimed |
+| Auxiliary-isogeny/bit-interval PKM | later canonical miniature ladder | Implemented and verified later; cost-limited at measured sizes |
+| Full relation collection and solver | no full-size run in this artifact | Not measured |
+| Performance claim by this artifact | no experiment run | Not claimed |
 
 The exact replay commands are:
 
@@ -210,29 +236,32 @@ cargo run --quiet --example curve25519_ic_artifact -- \
   replay research/curve25519_index_calculus_20261102/montgomery-translation.identity.json
 ```
 
-Observed focused result: 6 passed, 0 failed; certificate replay accepted with
-32 original and 32 extra points. The initial monolithic test link took 4m46s in
-this cloud environment; the tests themselves completed in 0.02s. That build
-time is environment context, not an algorithm measurement.
+The original focused result was 6 passed, 0 failed; certificate replay accepted
+with 32 original and 32 extra points. The synchronized revision adds one
+cross-backend test; its exact current-base result is recorded in the session
+log and PR validation. The initial monolithic test link took 4m46s in the
+original cloud environment. Build time is environment context, not an
+algorithm measurement.
 
-# Next research step
+# Current research frontier
 
-The next useful step is not another coordinate model. It is a frozen,
-bounded **exact-versus-scaled isogeny-tower integration study**:
+The exact-versus-scaled isogeny-tower study proposed by the original draft was
+subsequently implemented and measured. Repeating it is not the next step. The
+current discriminating work is tracked in repository problem records:
 
-1. define an exact Curve25519 auxiliary-isogeny factor-base descriptor without
-   enumerating its full set;
-2. bind it to a scaled family whose tower equations have the same degrees and
-   variable ordering;
-3. pre-register (m,t), solver caps, null controls, and exact extrapolation
-   rules;
-4. measure solving degree and memory on the scaled family;
-5. promote nothing to Curve25519 unless the exact descriptor and the scaling
-   law both survive review.
+1. freeze and qualify the public-input four-point torus decomposition protocol
+   and connect its bounded solver evidence to full-base distribution;
+2. qualify a maintained isolated runner for the actual-field native workload;
+3. test target-conditioned section coefficients under a frozen cold-search
+   budget without relabelling a bounded search as a general solver.
 
-This preserves the repository's separation between exact-curve facts, scaled
-measurements, and extrapolation. It also targets the one route not closed by
-the $p\pm1$ audit.
+See
+[`curve25519-torus-four-point-decomposition.md`](../../problems/curve25519-torus-four-point-decomposition.md),
+[`curve25519-singular-isolated-runner.md`](../../problems/curve25519-singular-isolated-runner.md),
+and
+[`curve25519-section-coefficient-selection.md`](../../problems/curve25519-section-coefficient-selection.md).
+This artifact supplies the independent model oracle those lanes can reuse; it
+does not claim to resolve them.
 
 # Sources and local evidence
 
@@ -261,9 +290,15 @@ the $p\pm1$ audit.
   [`RESEARCH_PKM_TOWER_ORACLE.md`](../notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md),
   [`DERIVED.md`](../prime_fall_degree_20261027/DERIVED.md), and
   [`DECISIONS.md`](../prime_ic_program_20261029/DECISIONS.md).
+- Later canonical Curve25519 context:
+  [`curve25519_wide.rs`](../../src/cryptanalysis/curve25519_wide.rs),
+  [`curve25519_ic_baseline_20261102`](../curve25519_ic_baseline_20261102/README.md),
+  and
+  [`curve25519_algebraic_ladder_20261102`](../curve25519_algebraic_ladder_20261102/README.md).
 
-`ecdb` was not exposed in this environment, so standard parameters were taken
-from RFC 7748 and new values were labelled as native derivations. The canonical
-mechanism graph was checked conceptually and left unchanged: this study binds an
-existing PKM/Semaev mechanism to one standard curve; it does not introduce a
-new graph node or a measured edge.
+`ecdb` was not exposed in the original environment, so standard parameters
+were taken from RFC 7748 and new values were labelled as native derivations.
+The artifact mechanism diagram was updated on 2026-11-17 to distinguish the
+independent certificate from the canonical backend and the later miniature
+measurements. No canonical leaderboard or mechanism edge is promoted by this
+study.
