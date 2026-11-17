@@ -941,3 +941,17 @@ A substantially cheaper generic circuit needs a fresh cost case before a full co
 
 ### Errors
 No execution or exception failure. Cost gate failed; no producer retry or favorable-input substitution. Counter summaries are derived after the frozen run, not a new scientific execution.
+
+## Oriented rational recovery derived
+
+### What was done
+Derived degree-one-source recovery from the two neighboring u polynomials by exact CRT coefficient comparison. Proved that translation by a nonzero Q does not descend from a single sign-quotient coordinate in an odd-prime-order subgroup. Read primary recovery framework and KB sign-resolution overlap. No scientific execution.
+
+### Decisions made
+Keep rational recovery as an untested classical component, with s=0/shared-support/degree-drop fallbacks required. Do not spend a full performance campaign on recovery alone: the retained kernel optimistic bound already falls short of tenfold. Differential orientation does not remove relation sign obligations or unknown source logs.
+
+### Open threads
+A cheaper kernel or mathematically justified higher-yield relation mechanism is needed before another full collector run. Broader genus2/3/4 objective remains active.
+
+### Errors
+Conductor reports this scope held by our own live T7044 lease; no competing scope was taken. No source failure or producer retry. Algebraic derivation is not advertised as replay validation.
