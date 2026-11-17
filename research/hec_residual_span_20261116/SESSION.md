@@ -1714,3 +1714,10 @@ What was done: freeze0ef439d7d09 single invocation exit0; invertibleGL4, alpha25
 Decisions made: recoveredcurve identified by fullquarticidentity beyondcounts; no globalJacobianlift/degreeproof claim.
 Open threads: explicitMumfordlift and originalrationalgroup compatibility then cost.
 Errors: none,no rerun/S3/cloud.
+
+## Full rational-group map/lift gate frozen
+
+What was done: compiled fixedstandardquintic map, generalquintic Mumfordlift, originalsource firstFBgenerator andcandidate lift; all411491scalarpositions nativewalk/map/validity/lift compatibility scheduled.
+Decisions made: includeall degree0/1/repeatedsupports andsignambiguity; no unknowntargetsolve/performance claim. Assertions [pcc:unverified].
+Open threads: pushfreeze then once-only120CPU invocation, cost/targettransport afterward.
+Errors: none in compile, no science yet.
