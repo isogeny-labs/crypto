@@ -244,7 +244,8 @@ RF_HD void rf_pair_run(const Fp64Ctx &f, uint64_t a_m, const uint64_t *x, const 
     uint64_t acc = d0;
     for (uint32_t k = 1; k < m; k++) {
         const uint32_t bi = b0 + k;
-        uint64_t dk = (bi == ai) ? F::add(f, y1, y1) : F::sub(f, x[bi], x1);
+        /* b0 >= ai and k >= 1, so this is never the doubling case. */
+        uint64_t dk = F::sub(f, x[bi], x1);
         if (dk == 0) { bad |= 1u << k; dk = F::one(f); }
         d[k] = dk;
         acc = F::mul(f, acc, dk);
