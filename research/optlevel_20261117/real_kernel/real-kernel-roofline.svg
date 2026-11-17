@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" width="920" height="560" role="img" aria-label="lfd closure m=4 k=2 p=7681: engine and BLAS replay: roofline, operations per second against operations per byte">
+<style>text{font-family:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif}.surface{fill:#fcfcfb}.t1{fill:#0b0b0b}.t2{fill:#52514e}.mut{fill:#898781}.grid{stroke:#e4e3dd}.axis{stroke:#c3c2b7}.ring{stroke:#fcfcfb}.halo{stroke:#fcfcfb}.l0{stroke:#2a78d6}.f0{fill:#2a78d6}.l1{stroke:#eb6834}.f1{fill:#eb6834}.l2{stroke:#1baf7a}.f2{fill:#1baf7a}.l3{stroke:#898781}.f3{fill:#898781}@media (prefers-color-scheme: dark){.surface{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.mut{fill:#898781}.grid{stroke:#2c2c2a}.axis{stroke:#383835}.ring{stroke:#1a1a19}.halo{stroke:#1a1a19}.l0{stroke:#3987e5}.f0{fill:#3987e5}.l1{stroke:#d95926}.f1{fill:#d95926}.l2{stroke:#199e70}.f2{fill:#199e70}.l3{stroke:#898781}.f3{fill:#898781}}</style>
+<rect class="surface" x="0" y="0" width="920" height="560" fill="#fcfcfb"/>
+<text class="t1" x="86" y="24" font-size="16" font-weight="600" fill="#0b0b0b">lfd closure m=4 k=2 p=7681: engine and BLAS replay</text>
+<text class="t2" x="86" y="42" font-size="11.5" fill="#52514e">host Intel(R) Xeon(R) Processor @ 2.10GHz (44113cdb2d87e834); attainment = marker / roof at its intensity; not a speed claim</text>
+<line class="grid" x1="86.0" y1="54" x2="86.0" y2="498" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="86.0" y="516" font-size="11" text-anchor="middle" fill="#898781">0.1</text>
+<line class="grid" x1="378.0" y1="54" x2="378.0" y2="498" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="378.0" y="516" font-size="11" text-anchor="middle" fill="#898781">1</text>
+<line class="grid" x1="670.0" y1="54" x2="670.0" y2="498" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="670.0" y="516" font-size="11" text-anchor="middle" fill="#898781">10</text>
+<line class="grid" x1="86" y1="498.0" x2="670" y2="498.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="502.0" font-size="11" text-anchor="end" fill="#898781">1G</text>
+<line class="grid" x1="86" y1="350.0" x2="670" y2="350.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="354.0" font-size="11" text-anchor="end" fill="#898781">10G</text>
+<line class="grid" x1="86" y1="202.0" x2="670" y2="202.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="206.0" font-size="11" text-anchor="end" fill="#898781">100G</text>
+<line class="grid" x1="86" y1="54.0" x2="670" y2="54.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="58.0" font-size="11" text-anchor="end" fill="#898781">1T</text>
+<line class="axis" x1="86" y1="498" x2="670" y2="498" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t2" x="378.0" y="546" font-size="12" text-anchor="middle" fill="#52514e">arithmetic intensity (operations per byte of memory traffic)</text>
+<text class="t2" transform="translate(18 276.0) rotate(-90)" font-size="12" text-anchor="middle" fill="#52514e">operations per second</text>
+<path class="l0" d="M86.0,455.9 L484.6,253.8 L670.0,253.8" fill="none" stroke="#2a78d6" stroke-width="2"><title>fma_f64 roof, 1 core(s): peak 44.7G ops/s, bandwidth 19.3G B/s</title></path>
+<path class="l0" d="M86.0,378.2 L438.1,199.7 L670.0,199.7" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="6 4"><title>fma_f64 roof, 4 core(s): peak 104G ops/s, bandwidth 64.5G B/s</title></path>
+<line class="l0" x1="660.0" y1="272.1" x2="660.0" y2="263.6" stroke="#2a78d6" stroke-width="2"/>
+<circle class="f0 ring" cx="660.0" cy="266.0" r="5.5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>lfd closure m4 k2 p7681 (BLAS replay) (single, 1 thread(s), T-timing): 36.9G ops/s [33.6G, 38.3G], attainment 0.827; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,266.0 L642.0,266.0" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="270.0" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">lfd closure m4 k2 p7681 (BLAS replay) 1t: 0.83 (in cache)</text>
+<line class="l0" x1="660.0" y1="338.1" x2="660.0" y2="330.4" stroke="#2a78d6" stroke-width="2"/>
+<circle class="l0 surface" cx="660.0" cy="335.5" r="5" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>lfd closure m4 k2 p7681 (BLAS replay) (full, 4 thread(s), T-timing): 12.5G ops/s [12G, 13.6G], attainment 0.121; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,335.5 L642.0,335.5" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="339.5" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">lfd closure m4 k2 p7681 (BLAS replay) 4t: 0.12 (in cache)</text>
+<line class="l0" x1="660.0" y1="406.3" x2="660.0" y2="401.1" stroke="#2a78d6" stroke-width="2"/>
+<circle class="f0 ring" cx="660.0" cy="402.8" r="5.5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>lfd closure m4 k2 p7681 (engine) (single, 1 thread(s), T-timing): 4.4G ops/s [4.17G, 4.51G], attainment 0.098; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,402.8 L642.0,402.8" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="406.8" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">lfd closure m4 k2 p7681 (engine) 1t: 0.10 (in cache)</text>
+<line class="l0" x1="660.0" y1="439.3" x2="660.0" y2="423.5" stroke="#2a78d6" stroke-width="2"/>
+<circle class="l0 surface" cx="660.0" cy="436.1" r="5" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>lfd closure m4 k2 p7681 (engine) (full, 4 thread(s), T-timing): 2.62G ops/s [2.49G, 3.19G], attainment 0.025; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,436.1 L642.0,436.1" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="440.1" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">lfd closure m4 k2 p7681 (engine) 4t: 0.03 (in cache)</text>
+<text class="t2" x="688" y="60" font-size="11.5" font-weight="600" fill="#52514e">roof per operation class</text>
+<line class="l0" x1="688" y1="76" x2="714" y2="76" stroke="#2a78d6" stroke-width="2"/>
+<text class="t1" x="720" y="80" font-size="11.5" fill="#0b0b0b">fma_f64</text>
+<text class="t2" x="688" y="110" font-size="11" fill="#52514e">solid: 1 core</text>
+<text class="t2" x="688" y="126" font-size="11" fill="#52514e">dashed: all 4 cores</text>
+<text class="t2" x="688" y="142" font-size="11" fill="#52514e">filled marker: single thread</text>
+<text class="t2" x="688" y="158" font-size="11" fill="#52514e">ring: full parallelism</text>
+<text class="t2" x="688" y="174" font-size="11" fill="#52514e">bar: min to max over runs</text>
+<text class="t2" x="688" y="190" font-size="11" fill="#52514e">label: attainment</text>
+<text class="t2" x="688" y="206" font-size="11" fill="#52514e">in cache: no DRAM traffic (right edge)</text>
+<text class="t2" x="688" y="222" font-size="11" fill="#52514e">*: traffic unknown (right edge)</text>
+</svg>
