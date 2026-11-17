@@ -2,6 +2,12 @@
 
 ## Results publication tracking — PR4525
 
+New bounded publication follow-up is confirmed enabled: first10:20:13UTC,
+then4hour intervals, maximum3occurrences. Exact service receipt is
+`speed-20261117/evidence/followup-schedule.json`; inherited environment details
+are unavailable, so no future local execution availability is asserted.
+Old terminal automation stays OFF. No measurement active or permitted rerun.
+
 Full results are pushed; draft PR4525 tracks remaining official record/publication
 blockers under the newly merged draft-first AGENTS.md rule. No measurement is
 active and no benchmark should be rerun. All source/protocol/binary pins match.
