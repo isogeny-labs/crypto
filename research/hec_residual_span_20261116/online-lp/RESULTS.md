@@ -1,0 +1,25 @@
+# Streaming weighted LP elimination: exact, no consistent arithmetic win
+
+Once-onlyexecution at pushed92a556e0a02 exited0. OnlineLP-firststate matchesindependentLP/labelranks and fullnativeFastOptionk atall1528acceptedpartialprefixes. Incrementalfull-matrixcontrolmatchesrank andOptionk atallprefixes. Everyreturnedscalarverifiesinoriginalgroup. StoredLPpivotwidthneverexceeds2. Original18targetrecoveries/31008bucketchecks/892relations/3falsecyclenegativecontrolsremainpassing. Samefilteredg4small2missretained;noadaptivecuts/anchors/retry.
+
+StatisticsbelowuseFIRSTdeterminingprefix forcompletedstreams, finalfixedbudgetprefixfortheoneincompletestream. Laterrowswererunonlyforcorrectnessandarenotheadlinedasarithmeticsavings. Allratiosareell-fieldREDCcount(control/onlineLP), notwalltime/totalcost.
+
+|Genus|Smallorbitcolumns|Status/streams|ScratchFast/OnlineLP|Fullincremental/OnlineLP|
+|---|---|---|---|---|
+|2|2|complete6|0.655172–1.218750|1.118644–1.974359|
+|2|4|complete6|0.438462–1.555556|0.780488–1.517241|
+|3|2|complete6|0.615385–1.333333|1.000000–1.719298|
+|3|3|complete6|0.719512–1.318182|0.837500–1.700000|
+|4|2|complete5|1.392857–1.715789|1.539216–2.431579|
+|4|2|incomplete1|0.436364|2.072727|
+|4|4|complete6|0.975904–1.385714|1.006024–1.358108|
+
+Valuesbelow1meanonlineLP doesMOREofthe specifiedprimitive. Itdoesnotconsistentlybeat eithercontrol. ScratchFastcanavoidworkthattheLP-firstmethodspendsonnormalizingpartials, so incrementalreusealone isnotalwayscheaper for thissmalltarget-onlysystem. No algorithmic10xclaimfollows. Fullincrementalcontrolusesoriginalcolumnorder;LP-firstalsochangesorder,soanycomponentdifferencecannotbeuniquelyattributedtographstructureversuspivotorder. Neithercontrolisclaimedexternalfastest.
+
+Storagecellsalsohavelimits: firstg2/source1/target37/small2 online41storedcoefficientcells versus38retainedinputentriesand72fullincrementalbasiscells. Thesedifferentrepresentationcounts excludemetadata/temporarybuffers/pointerwidthandarenotpeakbytes;nofullmemoryspeedclaim. SUMMARY.tsvretainsall36filteredstreams,includingoneincomplete. ARITH.tsvandFULL.tsvretaincumulativeprefixvectorsbeforeoriginalgroupverification;nativegroup/sourceproducer/setup/filter/densechecksoutsideallstagecounterintervals. ThisisLP-STAGE-ONLYaccounting,notcompleteattackcost. No fittedweights,overlappingcounteraggregation or wallmeasurements.
+
+## Decision
+
+ExactstreamingweightedeliminationisqualifiedasacorrectcomponentwithboundedLPsupport,butcurrentevidencedoesnotjustifyit as a10xroute. Astrongerproposalneedsachangeinusefulrelationarrivaloradifferentcomplete-costcase,especiallygenus2. Donotclaim10fromtotalcycles,leftnullity,latepost-successwork,apoorerrestart-onlyreference,orsmallerstoredgraph. ExistinggenericexactLPeliminationandknownweightedgraphpriorartremainexplicit.
+
+TheinitialcheckpointwasNEVEREXECUTED; strongerfullincrementalcontrolandfirst-successanalysisboundarywereamendedprospectivelybeforefinalsource/binaryfreeze. Onlyfinalcheckpointran. Allraw/control/fixture/prefix/graph/arithmetic/full/run/exitSHA256receiptsverify. PostrunRustsummarize.rsretained. GitcustodywhileS3down,no upload/retry/thresholdchange. Broad10xgenus2+objective remainsopen.

@@ -31,12 +31,18 @@ pub use counted_linear::CountedRelationSystem;
 #[path = "jv_sparse_kernel.rs"]
 pub mod sparse_kernel;
 
-#[path = "jv_sparse_collection_rank.rs"]
-mod sparse_collection_rank;
 #[path = "jv_extension_sparse_dlp.rs"]
 mod extension_sparse_dlp;
-pub use extension_sparse_dlp::{run_extension_sparse_dlp_on, ExtensionSparseDlpOptions};
+#[path = "jv_sparse_collection_rank.rs"]
+mod sparse_collection_rank;
+pub use extension_sparse_dlp::{
+    run_extension_sparse_dlp_on, run_extension_sparse_table_dlp_on, ExtensionSparseDlpOptions,
+};
 pub use sparse_collection_rank::Options as SparseCollectionRankOptions;
+
+/// Grounded signed witnesses for already-checked one/two-quadratic relations.
+#[path = "jv_quadratic_pair_graph.rs"]
+pub mod quadratic_pair_graph;
 
 #[path = "jv_homogeneous_quotient.rs"]
 mod homogeneous_quotient;
