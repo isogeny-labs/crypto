@@ -1,0 +1,16 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=.2,ranksep=.35];
+ node [shape=box,fontname="Helvetica",fontsize=12,style="rounded,filled",fillcolor="#edf4fa",margin=".13,.09"];
+ edge [fontname="Helvetica",fontsize=10];
+ inv [label="Actual dense integral inverse\n+ finite matrix ring maps"];
+ J [label="172: J(0)=I\nChanged nodes W(t) S^-1"];
+ C [label="173: full crossing Content(u-i)\n+ exact node crossing zeros"];
+ group [label="174: actual group locality\nPacket arity <=2L; conditional shrink"];
+ direct [label="Direct public sign predicate\nAll sign ports at one old vertex"];
+ pack [label="175: dummy padding preserves degree\nSource squared packing => signs <= M/u"];
+ next [label="OPEN: explicit low-degree public reduction\nor counted discrete branch finder",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ inv -> J -> C -> group;
+ direct -> pack;
+ group -> next [style=dashed,label="entry / mode / public costs open"];
+ pack -> next [style=dashed,label="scope: chosen representation only"];
+}

@@ -1,0 +1,12 @@
+# Next discriminating public-input integration check
+
+Start165source/25new since171; accepted172-175, receipts095-098. The actual identity origin and entire crossing bound are local Lean evidence; no public ECDLP reduction is supplied. Source D.1 is a primary claim being audited, not an independently accepted complete algorithm. [pcc:unverified]
+
+1. Read the actual signed-Hankel map, point/subgroup scalar bridge and NEXT_FINDER.md. Fix n=ceil(log2 subgroupOrder), k=n+margin support/sign variables, logp=O(n), general prime-field nonsingular curve and explicit exceptions. No weak-curve or supplied-successful-sign substitution.
+2. Write an actual operation/DAG specification using shared public moments, field arithmetic, determinant predicate and sign input; distinguish input-description bits from structural edge count. No assumed oracle for a determinant entry, relation or factorization.
+3. Construct bounded-fanout copies and graph side/degree interface; count actual wires s(n), degree and ring/entry/bit preparation cost. Unit-cost field gates are insufficient. First derive a conservative upper bound using explicit existing algorithms, then compare the resulting claimed envelope with exp(o(n)). Do not infer a runtime lower bound from an expensive chosen implementation.
+4. The direct one-predicate+dummies route has checked finite signs<=M/u under squared source packing. Do not use padding to claim its old vertex degree was lowered. An actual different decomposition may avoid that finite screen; it must be constructed rather than presumed. [pcc:unverified]
+5. If that explicit decomposition loses the target bound, do not endlessly formalize its checker. Return to an actual constrained discrete branch/support-selection rule and count its candidate visits. Every branch must remain on the curve and pass full norm/degree/target validity. A rank or continuous cofactor repair alone is not such a rule.
+6. Any future actual solver/campaign requires its own admission and complete frozen protocol. Current authorization covers literature/source/Lean work, not new native crypto/paid/F4/msolve/timing/scaling. All preparation/failed attempts/recovery/retry/public expected costs remain open.
+
+Preserve immutable archives001-025, receipt sets/base6/owner10 and original source/claims/raw evidence. Add versioned files. One Lean process, default limits, six-field instance map and exclusive pre-call before a new attempt. Protected ledger divergence is publication-only; no push/merge/rechain/reissue/automation changes.

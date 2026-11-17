@@ -252,3 +252,28 @@ cutoff. The next discriminating question is constructive bounded full
 closure on this actual family. Preserve public finder, coverage,
 field-extraction, retry and complete expected bit-cost exit criteria;
 no solver/native/paid experiment was launched [pcc:unverified].
+
+
+## 2026-11-17: direct public predicate tensor integration screen
+
+The orientation continuation now has actual identity-origin J and full
+crossing content, group-node locality and conditional packet/child counts.
+These are local Lean components, not a public branch finder; see
+[versioned status005](../research/prime_orientation_layers_20261114/transport/modular-evidence/STATUS-20261117-005.md).
+For the direct representation with all signs at one predicate vertex,
+dummy padding preserves that vertex degree. Source packing
+M>=2*(groups^(2*a))^2*Delta, u<=a, groups>=2 and signs<=Delta
+gives signs*u<=M, and positiveu gives signs<=M/u. Source175/receipt098,
+unsigned PCC-20261117-2eb7b3. This is a finite condition on the direct
+representation, not an actual runtime lower bound or universal exclusion
+of other tensor/circuit reductions [pcc:unverified].
+
+Next require the actual public signed-Hankel bounded-fanout network and
+field-bit preparation, wire/degree/entry-cost bound as a function of
+subgroup bit length. Structural graph size and coefficient-description
+length remain distinct. Test that explicit bound before more supplied-input
+checker proofs; an alternative discrete branch-selection rule must count
+visits and preserve full curve/norm/target validity. No attack/scaling/paid
+campaign was launched; original finder and total expected-cost exit
+criteria remain open. The separate old W-jet correction map remains absent;
+no identification of its correction H with the norm H is made.
