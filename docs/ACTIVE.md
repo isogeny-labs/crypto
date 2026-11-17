@@ -21,6 +21,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
+- [ ] Run the lazy-orbit column sweep vs strong rho (research/ic_lead_chase_20261116/protocol.json): bind ecbench commit/binary, analysis script, queue freeze, isolab L2 run + perf-ipc w_cal (claude, started 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #TBD)
 - [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
 
 ## Blocked / questions for the owner
