@@ -40,6 +40,10 @@ pub use extension_sparse_dlp::{
 };
 pub use sparse_collection_rank::Options as SparseCollectionRankOptions;
 
+/// Grounded signed witnesses for already-checked one/two-quadratic relations.
+#[path = "jv_quadratic_pair_graph.rs"]
+pub mod quadratic_pair_graph;
+
 #[path = "jv_homogeneous_quotient.rs"]
 mod homogeneous_quotient;
 
