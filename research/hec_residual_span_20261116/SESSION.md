@@ -3080,3 +3080,10 @@ What was done: freezef749102e1c5 hashespass/exit0. Bothmodels66points/3783lines/
 Decisions made: completesfixed-inputnativecorrectnesschain,notnewattack/10xgain. Alllinesq²+genericPicverificationcosthigh;sharedsetupnotamortizedclaim,countercoverageincomplete. Preservetwist/othergeneraobligations.
 Open threads: prospectiveon-demandlinegenerationandcompleteledger, matchedstrongoriginalIC/rho comparison;full10xgenus2+goalactiveunachieved/independentreviewopen.
 Errors: no scientificfailure;prefreezelineincidencefixrecorded,unusedimport/helperwarnings.Gitcustody/noS3/no merge.
+
+## Rank-stopped secant setup comparison frozen
+
+What was done: compiled knownpairquarticfactor removal/quadratic residual/infinitymultiplicitycertificates, deduplicatedsecantshuffle/targetrank66collector, frozen209linecatalog/spanaudit outsideproducer, freshpairedexhaustivecontrolsetup withfullnativephasedeltas. Same4targetwalks/answersgated.
+Decisions made: prospectiveengineeringcomponentcomparison,referencecontrolnewprotocolnotretry;noCPU/end-to-end10xclaim.Catalogabsentfromproducer.Gitfreeze precedes sole600CPUprocess.
+Open threads: executequalification,inspectbasefield/elltradeoffs andfullcostledger;originalIC/rhocomparison/othergenera/fullgoalremainopen.
+Errors: no compilefailure;unusedcopiedmodulewarnings.Noscientificexecutionyet.
