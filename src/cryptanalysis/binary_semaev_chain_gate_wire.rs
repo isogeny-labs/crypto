@@ -81,6 +81,7 @@ fn reserve(
 }
 /// The caller owns one cumulative admission ledger and raw-read allocation.
 /// This function separately admits typed parsing and exact formula expansion.
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 pub fn decode_checked<'a>(
     raw: &'a [u8],
     original: &Original<'_>,

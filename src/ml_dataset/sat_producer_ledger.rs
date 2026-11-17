@@ -2,6 +2,7 @@
 //! measurement of instructions; old records without a checkpoint are incomplete.
 use serde::{Deserialize, Serialize};
 pub(super) const SCHEMA: &str = "ml-dataset.sat-owner-ledger/v1";
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) const MAX_WIRE_BYTES: u64 = 1536;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub(super) enum Phase {
@@ -55,10 +56,12 @@ pub(super) struct Checkpoint {
     pub first_stop: Option<Stop>,
 }
 /// Actual capture receipt, not self-reported checkpoint fields.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) struct Receipt<'a> {
     pub sequence: u64,
     pub hash: &'a str,
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) struct Bound<'a> {
     pub original_binding: [u8; 32],
     pub pattern: u32,
@@ -68,6 +71,7 @@ pub(super) struct Bound<'a> {
     pub covered: Receipt<'a>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) enum Error {
     Identity,
     Range,
@@ -75,15 +79,18 @@ pub(super) enum Error {
     Rollback,
     Stopped,
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) struct Prior<'a> {
     pub checkpoint: &'a Checkpoint,
     pub receipt: Receipt<'a>,
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn digest(s: &str) -> bool {
     s.len() == 64
         && s.bytes()
             .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn phase(p: Phase) -> u8 {
     match p {
         Phase::Setup => 0,
@@ -97,6 +104,7 @@ fn phase(p: Phase) -> u8 {
 }
 /// Call only after the capture visitor authenticates the exact raw event and
 /// the wrapper independently authenticates bound original launch and marker.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) fn verify(
     c: &Checkpoint,
     b: &Bound<'_>,

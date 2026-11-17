@@ -6,6 +6,7 @@
 use super::sparse::{Charge, Monomial, Owner, Polynomial};
 use std::{cmp::Ordering, mem::size_of, time::Instant};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub enum Failure {
     Cap,
     Owner,
@@ -15,6 +16,7 @@ pub enum Failure {
     Malformed,
 }
 #[derive(Clone, Copy)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub struct Limits {
     pub batch_rows: usize,
     pub batch_ops: usize,
@@ -40,18 +42,21 @@ pub struct Row {
     pub proof: Vec<ProofTerm>,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub enum Kind {
     Original(usize),
     Pair(usize, usize),
     Field(usize, u32),
 }
 #[derive(Debug, Clone, Copy)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub struct Task {
     pub kind: Kind,
     pub degree: usize,
     pub serial: u64,
 }
 #[derive(Debug)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub struct Attempt {
     pub batches: Vec<Batch>,
     pub result: Result<(), Failure>,
@@ -68,9 +73,11 @@ pub struct Attempt {
     pub ordinary_tasks: u64,
     pub last_degree: usize,
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn order(a: &[u32], b: &[u32]) -> Ordering {
     a.len().cmp(&b.len()).then_with(|| a.cmp(b))
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 struct Meter<'a, T: Owner> {
     owner: &'a mut T,
     limits: Limits,
@@ -78,6 +85,7 @@ struct Meter<'a, T: Owner> {
     charge: Charge,
 }
 impl<T: Owner> Meter<'_, T> {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn pay(&mut self, w: u64, b: u64) -> Result<(), Failure> {
         if Instant::now() >= self.deadline {
             return Err(Failure::Deadline);
@@ -99,6 +107,7 @@ impl<T: Owner> Meter<'_, T> {
         }
         Ok(())
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn scan(&mut self, n: usize) -> Result<(), Failure> {
         self.pay(
             u64::try_from(n)
@@ -108,6 +117,7 @@ impl<T: Owner> Meter<'_, T> {
             0,
         )
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn alloc<V>(&mut self, n: usize) -> Result<Vec<V>, Failure> {
         let b = n
             .checked_mul(size_of::<V>())
@@ -118,12 +128,14 @@ impl<T: Owner> Meter<'_, T> {
         v.try_reserve_exact(n).map_err(|_| Failure::Allocation)?;
         Ok(v)
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn mono(&mut self, a: &[u32]) -> Result<Monomial, Failure> {
         self.scan(a.len())?;
         let mut v = self.alloc(a.len())?;
         v.extend_from_slice(a);
         Ok(v)
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn union(&mut self, a: &[u32], b: &[u32]) -> Result<Monomial, Failure> {
         self.scan(a.len().checked_add(b.len()).ok_or(Failure::Overflow)?)?;
         let mut v = self.alloc(a.len().checked_add(b.len()).ok_or(Failure::Overflow)?)?;
@@ -150,6 +162,7 @@ impl<T: Owner> Meter<'_, T> {
         }
         Ok(v)
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn difference(&mut self, a: &[u32], b: &[u32]) -> Result<Monomial, Failure> {
         self.scan(
             a.len()
@@ -164,6 +177,7 @@ impl<T: Owner> Meter<'_, T> {
         }
         Ok(v)
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn divides(&mut self, a: &[u32], b: &[u32]) -> Result<bool, Failure> {
         self.scan(
             a.len()
@@ -172,10 +186,12 @@ impl<T: Owner> Meter<'_, T> {
         )?;
         Ok(a.iter().all(|x| b.contains(x)))
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn cmp(&mut self, a: &[u32], b: &[u32]) -> Result<Ordering, Failure> {
         self.scan(a.len().checked_add(b.len()).ok_or(Failure::Overflow)?)?;
         Ok(order(a, b))
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn toggle(&mut self, p: &mut Polynomial, t: Monomial) -> Result<(), Failure> {
         let mut at = 0;
         while at < p.len() {
@@ -196,6 +212,7 @@ impl<T: Owner> Meter<'_, T> {
         p.insert(at, t);
         Ok(())
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn proof_toggle(&mut self, p: &mut Vec<ProofTerm>, t: ProofTerm) -> Result<(), Failure> {
         let mut at = 0;
         while at < p.len() {
@@ -223,6 +240,7 @@ impl<T: Owner> Meter<'_, T> {
         p.insert(at, t);
         Ok(())
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn scaled(&mut self, r: &Row, t: &[u32]) -> Result<Row, Failure> {
         let mut out = Row {
             polynomial: self.alloc(r.polynomial.len())?,
@@ -244,6 +262,7 @@ impl<T: Owner> Meter<'_, T> {
         }
         Ok(out)
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn xor(&mut self, a: &Row, b: &Row) -> Result<Row, Failure> {
         let mut out = Row {
             polynomial: self.alloc(
@@ -277,6 +296,7 @@ impl<T: Owner> Meter<'_, T> {
         }
         Ok(out)
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn validate(&mut self, p: &Polynomial, n: u32) -> Result<(), Failure> {
         if p.len() > self.limits.terms {
             return Err(Failure::Cap);
@@ -298,6 +318,7 @@ impl<T: Owner> Meter<'_, T> {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub enum Stage {
     Build,
     Symbolic,
@@ -306,17 +327,20 @@ pub enum Stage {
     Committed,
 }
 #[derive(Debug)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub struct Reducer {
     pub basis: usize,
     pub multiplier: Monomial,
     pub row: usize,
 }
 #[derive(Debug, Clone, Copy)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub struct Pivot {
     pub target: usize,
     pub source: usize,
 }
 #[derive(Debug)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub struct Batch {
     pub basis_before: usize,
     pub degree: usize,
@@ -335,6 +359,7 @@ pub struct Batch {
     pub staged_tasks: Vec<Task>,
     pub additions: Vec<(usize, usize)>,
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn build_task<T: Owner>(
     task: Task,
     g: &[Polynomial],
@@ -373,6 +398,7 @@ fn build_task<T: Owner>(
 /// owned by the attempt. Complete means queued ordinary/Boolean pairs exhausted;
 /// no reduced-basis, F5, solution-search, or original-source admission claim.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub enum CheckpointStop {
     InvalidPolicy,
     SnapshotCap,
@@ -381,6 +407,7 @@ pub enum CheckpointStop {
     Postcheck(Failure),
 }
 /// Single live invocation controller; never reconstructed by a child node.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub struct CheckpointControl {
     every_batches: u64,
     max_snapshots: u64,
@@ -389,6 +416,7 @@ pub struct CheckpointControl {
     stop: Option<CheckpointStop>,
 }
 impl CheckpointControl {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub fn new(every_batches: u64, max_snapshots: u64) -> Result<Self, CheckpointStop> {
         if every_batches == 0 || max_snapshots == 0 {
             return Err(CheckpointStop::InvalidPolicy);
@@ -401,13 +429,16 @@ impl CheckpointControl {
             stop: None,
         })
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub fn snapshots(&self) -> u64 {
         self.snapshots
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub fn stop(&self) -> Option<CheckpointStop> {
         self.stop
     }
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub fn run(
     n: u32,
     g: &[Polynomial],
@@ -417,6 +448,7 @@ pub fn run(
 ) -> Attempt {
     run_inner(n, g, limits, deadline, owner, None)
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub fn run_with_checkpoint<T: Owner>(
     n: u32,
     g: &[Polynomial],
@@ -428,6 +460,7 @@ pub fn run_with_checkpoint<T: Owner>(
 ) -> Attempt {
     run_inner(n, g, limits, deadline, owner, Some((control, hook)))
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn run_inner<T: Owner>(
     n: u32,
     g: &[Polynomial],
@@ -792,5 +825,6 @@ fn run_inner<T: Owner>(
     a
 }
 
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "dynamic_boolean_search.rs"]
 pub mod search;

@@ -127,8 +127,11 @@ pub struct Attempt {
     pub raw: Vec<u8>,
     pub value: Option<Value>,
     pub result: Result<(), Failure>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub consumed: usize,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub nodes: u64,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub charge: Charge,
 }
 struct Meter<'a, T: Admission> {

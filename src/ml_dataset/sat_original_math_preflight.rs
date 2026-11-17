@@ -17,10 +17,15 @@ pub(super) enum Error {
 pub(super) struct Plan {
     pub work: u64,
     pub bytes: u64,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub scalar_steps: u64,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub scalar_calls: u64,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub primality_calls: u64,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub generated_wire_bound: u64,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub generated_owner_bytes: u64,
     pub bounds: ReplayBounds,
 }

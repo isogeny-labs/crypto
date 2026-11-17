@@ -36,6 +36,7 @@ pub struct Envelope {
 #[derive(Debug)]
 pub struct Audit {
     pub result: Result<Envelope, Failure>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub charged_work: u64,
 }
 struct Meter<'a, O> {

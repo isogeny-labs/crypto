@@ -41,6 +41,7 @@ fn limits() -> identity::Limits {
 }
 #[derive(Debug)]
 pub(super) enum Refusal {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     SharedBudget(Stop),
     Owner,
     Shape,
@@ -56,6 +57,7 @@ pub(super) enum Refusal {
 }
 #[derive(Debug)]
 pub(super) enum PostCheckFailure {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     SharedBudget(Stop),
     Watermark,
 }
@@ -78,6 +80,7 @@ pub(super) struct Attempt {
 // An explicitly source-only view: no target, proof, row index, outcome,
 // watermark, observed counters or runtime labels. Borrowed originals preserve
 // family/twist/field/policy identities without a caller-supplied replacement.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) struct SourceView<'a> {
     pub(super) config: &'a types::CaseConfig,
     pub(super) public: &'a serde_json::Value,
@@ -100,6 +103,8 @@ fn same_owners(
 }
 // This function does not mint a published feature record; it exposes only
 // already-admitted source data to a future exporter inside this owner module.
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) fn source_view<'a>(
     registry: &'a OrdinaryRootRegistry<'_>,
     input: &'a RegisteredMatrixInput<'_>,
@@ -117,6 +122,7 @@ pub(super) fn source_view<'a>(
         selector_codes: input.math.codes,
     })
 }
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 fn current_head(events: &OrdinaryEvents<'_>) -> Result<capture::CommittedEventPosition, Refusal> {
     solvers::LIVE_SINK.with(|cell| {
         let mut cell = cell.borrow_mut();
@@ -136,6 +142,7 @@ fn current_head(events: &OrdinaryEvents<'_>) -> Result<capture::CommittedEventPo
 // Fixed three-selector adapter only. General checker remains arbitrary-width.
 // Native degree order is not wire lexicographic order; preserve generator
 // order and zeros while converting each polynomial independently.
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 fn write_poly(out: &mut impl Write, p: &F2BoolPoly) -> Result<(), Refusal> {
     if p.n_vars != 3 || p.terms.len() > 8 {
         return Err(Refusal::Shape);
@@ -164,6 +171,7 @@ fn write_poly(out: &mut impl Write, p: &F2BoolPoly) -> Result<(), Refusal> {
 // Successful OwnedSlot::store moves its acknowledgement into this actual
 // transport owner. An untransferred local root is not an accepted receipt.
 // Caller prepays the bounded scan/hash in ADAPTER_WORK; no new allocation.
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 pub(super) fn transferred_result<'a>(
     slot: &OwnedSlot,
     receipts: &'a solvers::WorkerStoredReceipts<'_>,
@@ -198,6 +206,7 @@ pub(super) fn transferred_result<'a>(
     Ok(root)
 }
 
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) fn check(
     registry: &OrdinaryRootRegistry<'_>,
     input: &mut RegisteredMatrixInput<'_>,
@@ -254,6 +263,7 @@ pub(super) fn check_anchor(
         outcome,
     }
 }
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 fn check_inner(
     registry: &OrdinaryRootRegistry<'_>,
     input: &mut RegisteredMatrixInput<'_>,
@@ -632,6 +642,7 @@ struct BoundTarget {
     row_index: usize,
     selector_codes: [u64; 2],
 }
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 fn coefficient_bits(p: &F2BoolPoly) -> Result<u8, Refusal> {
     if p.n_vars != 3 || p.terms.len() > 8 {
         return Err(Refusal::Shape);
@@ -645,6 +656,7 @@ fn coefficient_bits(p: &F2BoolPoly) -> Result<u8, Refusal> {
     }
     Ok(bits)
 }
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 fn write_bits(out: &mut impl Write, bits: u8) -> Result<(), Refusal> {
     write!(out, " {}", bits.count_ones()).map_err(|_| Refusal::Encoding)?;
     for mask in [0u8, 1, 3, 7, 5, 2, 6, 4] {
@@ -743,6 +755,7 @@ mod produced_bound_tests {
 // Full anchor/source admission was paid and performed by mint_bound_target.
 // Recheck the retained scalar source/target and watermark before independent
 // arithmetic; do not decode/re-serialize the same acknowledged report twice.
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 fn check_bound_target(
     registry: &OrdinaryRootRegistry<'_>,
     input: &mut RegisteredMatrixInput<'_>,
@@ -847,6 +860,7 @@ fn check_bound_target(
     }
 }
 // Call only after charging ADAPTER_WORK/ADAPTER_BYTES to the same ledger.
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 fn mint_bound_target(
     registry: &OrdinaryRootRegistry<'_>,
     input: &RegisteredMatrixInput<'_>,
@@ -903,6 +917,7 @@ fn mint_bound_target(
         selector_codes: input.math.codes,
     })
 }
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 pub(super) fn produce_and_check(
     registry: &OrdinaryRootRegistry<'_>,
     input: &mut RegisteredMatrixInput<'_>,

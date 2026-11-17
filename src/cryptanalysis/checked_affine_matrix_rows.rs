@@ -277,6 +277,7 @@ fn certify_inner(
     }
     out
 }
+#[allow(clippy::large_enum_variant)] // variants carry owned state; boxing would change the API
 enum ReplaySource {
     Checked(CheckedMap),
     Constructed(Attempt),

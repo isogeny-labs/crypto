@@ -2,6 +2,7 @@
 //! deliberately exposes no solve method: search-prefix admission comes next.
 #[path = "sat_initial_checkpoint.rs"]
 pub(in crate::ml_dataset::solvers) mod checkpoint;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "sat_initial_packed.rs"]
 mod packed;
 use super::*;
@@ -102,6 +103,7 @@ fn quote(
 
 /// All original evidence remains owned across native or capture failure.
 struct Evidence<'a> {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     original: Option<&'a VerifiedWorkerOriginal<'a>>,
     original_hashes: ([u8; 32], [u8; 32]),
     binding: [u8; 32],
@@ -116,12 +118,15 @@ struct Evidence<'a> {
     map_published: bool,
 }
 struct BatchAck {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     valid: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     first: usize,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     last: usize,
     position: capture::CommittedEventPosition,
 }
-struct CaptureState {
+pub(in crate::ml_dataset::solvers) struct CaptureState {
     search: Option<checkpoint::search::SearchCapture>,
     budget: Budget,
     sink: capture::CaptureEmitter,
@@ -144,7 +149,7 @@ struct CaptureState {
     seal_ack: Option<capture::CommittedEventPosition>,
 }
 #[allow(clippy::large_enum_variant)]
-pub(super) enum Failure<'a> {
+pub(in crate::ml_dataset::solvers) enum Failure<'a> {
     BeforeNative {
         owner: OriginalOwner<'a>,
         sink: capture::CaptureEmitter,
@@ -417,6 +422,7 @@ impl CaptureState {
 }
 
 impl<'a> NativeInitial<'a> {
+    #[allow(clippy::result_large_err)] // the error hands owned state back to the caller
     pub(super) fn prepare(
         mut owner: OriginalOwner<'a>,
         sink: capture::CaptureEmitter,

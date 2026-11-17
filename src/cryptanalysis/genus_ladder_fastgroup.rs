@@ -114,6 +114,7 @@ struct Mid2 {
 }
 
 #[derive(Clone, Copy)]
+#[allow(clippy::large_enum_variant)] // variants carry owned state; boxing would change the API
 enum Stage1 {
     Done(JDiv),
     Mid(Mid1),

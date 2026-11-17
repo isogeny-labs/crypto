@@ -45,6 +45,7 @@ pub(super) struct PersistedOrdinaryInput<'a> {
     ledger: &'a mut Budget,
 }
 impl PersistedOrdinaryInput<'_> {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(super) fn equations(&self) -> &[crate::cryptanalysis::pq_groebner_f2::F2BoolPoly] {
         &self
             .retained
@@ -105,7 +106,9 @@ pub(super) struct PersistenceFailure<'a> {
     pub encoding_complete: bool,
     pub capture_sequence: Option<u64>,
     pub root_artifact: Option<types::Artifact>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub stop: Option<Stop>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub error: String,
 }
 
@@ -155,6 +158,7 @@ fn admit_storage(
 /// Caller passes the bridge's original retained owner and actual attempt ledger.
 /// Full mathematical verification is performed again under charged checking
 /// admission before any capture/root publication; no retained bytes are trusted.
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 pub(super) fn persist<'a>(
     token: &VerifiedWorkerOriginal<'_>,
     case: &types::CaseData,

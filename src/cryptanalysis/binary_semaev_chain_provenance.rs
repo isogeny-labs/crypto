@@ -418,6 +418,7 @@ fn formula_checked(
     Ok(out)
 }
 
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 pub fn build_original(
     o: &Original<'_>,
     limits: Limits,
@@ -1149,6 +1150,7 @@ mod tests {
 /// Import without rerunning the producer or cloning its raw map. Decoding must
 /// already have been bounded and charged by the caller. On refusal the decoded
 /// map remains owned in BuildFailure; deserialization alone never mints a seal.
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 pub fn check_imported(
     original: &Original<'_>,
     map: Map,

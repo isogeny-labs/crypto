@@ -1,8 +1,10 @@
 //! Child of checked_boolean_equations; source authority remains the borrowed CheckedMap.
 //! Integration source only: wrapper requires full library compilation and original-owner controls.
 use super::{sparse, Admission, Error, Expansion, Quote};
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "boolean_identity_bqi.rs"]
 mod bqi;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "matrix_rows.rs"]
 mod rows;
 pub use bqi::{Audit, Limits as CheckerLimits};

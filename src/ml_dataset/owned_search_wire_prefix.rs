@@ -16,6 +16,7 @@ pub struct Audit {
     charge: Charge,
 }
 impl Audit {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub fn raw(&self) -> &[u8] {
         &self.raw
     }
@@ -29,12 +30,15 @@ impl Audit {
             None
         }
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub fn consumed(&self) -> usize {
         self.consumed
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub fn nodes(&self) -> u64 {
         self.nodes
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub fn charge(&self) -> Charge {
         self.charge
     }

@@ -214,6 +214,7 @@ impl OrdinarySignedOwned<'_> {
     }
 }
 impl OrdinarySignedOwned<'_> {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(super) fn roots_complete(&self) -> bool {
         self.group.transferred && (self.publisher.receipt.is_none() || self.witness.transferred)
     }

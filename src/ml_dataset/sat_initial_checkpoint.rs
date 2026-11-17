@@ -1,5 +1,6 @@
 //! Mandatory producer-ledger boundary after mathematical initial marking.
 use super::*;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "sat_producer_ledger.rs"]
 pub(super) mod ledger;
 pub(in crate::ml_dataset::solvers) struct WithLedger<'a> {
@@ -12,6 +13,7 @@ pub(in crate::ml_dataset::solvers) struct Failed<'a> {
     pub stop: Stop,
 }
 /// Consumes the actual native owner. No new Budget, deadline or sink is created.
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 pub(in crate::ml_dataset::solvers) fn finish<'a>(
     stage: NativeInitial<'a>,
 ) -> Result<WithLedger<'a>, Failed<'a>> {

@@ -1630,6 +1630,7 @@ pub(super) fn verify(public: &Value, base: &Value, saved: &Value) -> Result<(), 
 
 /// Structural consistency only; mathematical replay remains verify(). Used in
 /// hash-only cell verification as well as before the full replay gate.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) fn verify_v2_labels(
     public: &Value,
     base: &Value,
@@ -1717,6 +1718,7 @@ pub(super) fn verify_v2_labels(
     }
     Ok(())
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) fn expected_filter_payloads(saved: &Value) -> Result<Vec<ArtifactPayload>, String> {
     let t: TranscriptV2 =
         serde_json::from_value(saved.clone()).map_err(|e| format!("generic v2 payloads: {e}"))?;

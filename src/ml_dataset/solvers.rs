@@ -408,20 +408,26 @@ pub(super) fn verify_and_store_worker_originals<'a>(
 /// performs no storage retry and makes no durable-publication claim.
 #[derive(Default)]
 pub(super) struct WorkerResidualCustody {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     boolean_search: Option<koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt>,
     boolean_search_report_unavailable: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     search: Option<koblitz_m3::sat_original_owner::search_worker::Custody>,
     items: Vec<WorkerResidualArtifact>,
     // Moves the existing admitted owners; no Box, sink reopening or ledger reset.
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     sat: Option<koblitz_m3::sat_original_owner::worker::Custody>,
     sat_report_unavailable: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     boolean_rows: Option<koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt>,
     boolean_rows_report_unavailable: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     affine_rows: Option<koblitz_m3::sat_original_owner::affine_rows::OwnedAttempt>,
     affine_rows_report_unavailable: bool,
 }
 
 pub(super) struct WorkerResidualArtifact {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     path: &'static str,
     bytes: Vec<u8>,
     untransferred_root: Option<super::types::Artifact>,
@@ -452,6 +458,7 @@ impl WorkerResidualCustody {
             affine_rows_report_unavailable: false,
         })
     }
+    #[allow(clippy::result_large_err)] // the error hands owned state back to the caller
     fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
         if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
             return Err(item);
@@ -465,6 +472,7 @@ impl WorkerResidualCustody {
     pub(super) fn boolean_rows_report_unavailable(&self) -> bool {
         self.boolean_rows_report_unavailable || self.affine_rows_report_unavailable
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(super) fn affine_rows_report_unavailable(&self) -> bool {
         self.affine_rows_report_unavailable
     }
@@ -580,6 +588,7 @@ impl WorkerSolveOutput {
             },
         }
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn from_original_boolean_rows(
         mut custody: koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt,
     ) -> Self {
@@ -679,6 +688,7 @@ impl<'a> WorkerStoredReceipts<'a> {
             capacity,
         })
     }
+    #[allow(clippy::result_large_err)] // the error hands owned state back to the caller
     fn push(
         &mut self,
         artifact: super::types::Artifact,
@@ -954,7 +964,9 @@ pub(super) enum SatReplayVerdict {
 #[allow(clippy::large_enum_variant)]
 enum SatReplayOwner {
     Terminal(koblitz_m3::sat_original_owner::central::TerminalVerified),
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Outcome(koblitz_m3::sat_original_owner::central::Outcome),
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Failed(koblitz_m3::sat_original_owner::central::Failed),
 }
 
@@ -972,6 +984,7 @@ impl SatReplayCustody {
     pub(super) fn retained_slot_bytes() -> usize {
         std::mem::size_of::<Self>()
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(super) fn charged(&self) -> (u64, u64) {
         match &self.owner {
             SatReplayOwner::Terminal(t) => t.usage(),
@@ -5023,8 +5036,6 @@ mod tests {
     }
 
     use super::*;
-
-    
 
     #[test]
     fn dynamic_unsupported_axes_preserve_outcomes_without_reading_curve_bytes() {

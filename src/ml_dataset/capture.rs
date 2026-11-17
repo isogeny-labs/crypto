@@ -2047,6 +2047,7 @@ pub(super) fn verify_live_committed_prefix_visit(
 /// Read-only replay pinned to the caller's already admitted exact head.
 /// Check before any stream read/record parse, so a larger substituted head
 /// cannot consume work or allocations outside that caller's admitted prefix.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) fn verify_live_committed_prefix_visit_at_head(
     cell_dir: &Path,
     binding: &AttemptBinding,
@@ -2075,6 +2076,7 @@ pub(super) enum RecordPhase {
     BeforeRecordDecode,
     Authenticated,
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) fn verify_live_committed_prefix_visit_at_head_preflight(
     cell_dir: &Path,
     binding: &AttemptBinding,

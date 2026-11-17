@@ -328,6 +328,7 @@ fn token_poly(p: &Polynomial) -> Result<usize, Failure> {
 pub struct Encoded {
     pub result: Result<(), Failure>,
     pub raw: Vec<u8>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub charge: Charge,
 }
 pub fn encode_retained(
@@ -410,6 +411,7 @@ pub fn encode_retained(
     }
 }
 #[cfg(test)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub fn encode(
     n: u32,
     g: &[Polynomial],
@@ -423,10 +425,12 @@ pub fn encode(
     e.result.map(|_| e.raw)
 }
 /// Prepay checker independently on the SAME owner; its audit authenticates arithmetic only.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub struct Checked {
     pub audit: Option<super::bqi::Audit>,
     pub failure: Option<Failure>,
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub fn independent_check_retained(
     raw: &[u8],
     limits: super::bqi::Limits,
@@ -457,6 +461,7 @@ pub fn independent_check_retained(
     out
 }
 #[cfg(test)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub fn independent_check(
     raw: &[u8],
     limits: super::bqi::Limits,

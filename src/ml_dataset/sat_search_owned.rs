@@ -360,9 +360,11 @@ impl OwnedSearch<'_> {
         self.verdict = Verdict::CheckedSignedRelation;
         Ok(())
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn verdict(&self) -> Verdict {
         self.verdict
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn stop(&self) -> Option<Stop> {
         self.first_stop
     }

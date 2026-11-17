@@ -5,7 +5,9 @@ use std::time::Instant;
 pub enum State {
     Complete,
     BoundTruncatedPrefix,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Unavailable,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Invalid,
 }
 #[derive(Clone, Copy, Debug)]

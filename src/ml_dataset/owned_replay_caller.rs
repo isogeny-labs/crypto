@@ -147,6 +147,7 @@ pub(super) struct Session {
     caller: CallerAdmission,
 }
 impl Session {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(super) fn historical(&self) -> bool {
         ReplayMode::parse(&self.policy.mode) == Some(ReplayMode::Historical)
     }

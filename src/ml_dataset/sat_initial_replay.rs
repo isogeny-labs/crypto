@@ -207,7 +207,9 @@ pub(super) struct Transcript {
 /// Mathematical consistency of this transcript against a checked original map.
 /// Not a release token for exporter callbacks or proof of producer costs.
 pub(super) struct VerifiedInitialTranscript<'a> {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     initial: provenance::initial::VerifiedInitial<'a>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     transcript: &'a Transcript,
 }
 fn admit(a: &mut impl Admission, work: u64, bytes: u64) -> Result<(), Error> {

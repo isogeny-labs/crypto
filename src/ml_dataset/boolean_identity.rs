@@ -42,6 +42,7 @@ pub struct Limits {
 }
 impl Limits {
     /// Frozen proposed software limits; no exponential-in-N allocation.
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub const fn software() -> Self {
         Self {
             variables: 4096,
@@ -108,7 +109,9 @@ pub struct Audit {
     pub result: Result<Degrees, Failure>,
     pub charges: Charges,
     /// Always false. Arithmetic equality is not original-system admission.
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub source_authenticated: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub native_operation_witness: bool,
 }
 struct Meter {

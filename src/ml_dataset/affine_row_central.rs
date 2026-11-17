@@ -118,6 +118,7 @@ impl Frame {
     pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
         (self.budget.work, self.budget.bytes)
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn has_checked_map(&self) -> bool {
         self.map.is_some()
     }
@@ -129,6 +130,7 @@ pub(in crate::ml_dataset::solvers) enum Outcome {
 }
 pub(in crate::ml_dataset::solvers) struct Failed {
     pub frame: Frame,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub stop: Stop,
 }
 pub(in crate::ml_dataset::solvers) struct VerifiedInitialCapture {
@@ -136,15 +138,18 @@ pub(in crate::ml_dataset::solvers) struct VerifiedInitialCapture {
 }
 impl VerifiedInitialCapture {
     /// Deliberately no export or training release method. This is initial-only.
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn initial_and_ledger_consistent(&self) -> bool {
         self.frame.budget.first_stop.is_none()
     }
 }
 /// Whole terminal admission remains initial-only: it never grants search export.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(in crate::ml_dataset::solvers) struct TerminalVerified {
     pub capture: VerifiedInitialCapture,
     pub declared_initial: bool,
 }
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn terminal_fields(
     config: &CaseConfig,
     outcome: &Value,
@@ -198,6 +203,7 @@ fn terminal_fields(
     Ok(true)
 }
 #[cfg(test)]
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(in crate::ml_dataset::solvers) fn check_terminal_fields_for_control(
     config: &CaseConfig,
     outcome: &Value,
@@ -208,6 +214,8 @@ pub(in crate::ml_dataset::solvers) fn check_terminal_fields_for_control(
 impl VerifiedInitialCapture {
     /// Consume the same admitted replay owner. Failure is terminal and retains
     /// all original/map/transcript/checkpoint and terminal raw/parsed owners.
+    #[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn join_terminal(
         mut self,
         dir: &Path,
@@ -408,6 +416,7 @@ fn capture_buffer_owners(head: &capture::CommittedHead, dir: &Path) -> Result<u6
 }
 /// Historical verification uses LaunchContext::validate through execution::verify,
 /// never execution::admit (which would inspect today's clock as producer entry).
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 fn verify_mode(
     dir: &Path,
     config: &CaseConfig,
@@ -1470,11 +1479,13 @@ mod map_path_tests {
 }
 
 impl TerminalVerified {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
         self.capture.frame.usage()
     }
     /// Recheck every persisted input against the already checked original and
     /// exact capture chain. All costs accrue to this same retained replay owner.
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn revalidate(
         &mut self,
         dir: &Path,
@@ -1854,6 +1865,8 @@ pub(in crate::ml_dataset::solvers) enum RowOutcome {
     UnknownOriginalMath(Frame),
     Incomplete(Frame),
 }
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(in crate::ml_dataset::solvers) fn verify(
     dir: &Path,
     config: &CaseConfig,
@@ -1862,6 +1875,7 @@ pub(in crate::ml_dataset::solvers) fn verify(
 ) -> Result<Outcome, Failed> {
     verify_mode(dir, config, artifacts, policy, None)
 }
+#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
 pub(in crate::ml_dataset::solvers) fn verify_affine_row(
     dir: &Path,
     config: &CaseConfig,
@@ -1896,6 +1910,7 @@ impl VerifiedRow {
     pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
         self.frame.usage()
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn audit(&self) -> &row_matrix::Audit {
         self.frame
             .row_mode

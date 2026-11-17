@@ -2203,6 +2203,7 @@ mod signed_binding_tests {
 }
 /// Checked mathematical candidate. Durable custody is a separate publication.
 pub(super) struct CheckedSignedWitness {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     indices: [u8; 3],
     points: [(u64, u64); 3],
     target: (u64, u64),
@@ -4100,7 +4101,9 @@ struct SavedGroupReplay {
 }
 pub(super) struct VerifiedGroupReplay {
     math: VerifiedSignedMath,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     reported_witness_check_additions: u8,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     reported_total_additions: u64,
 }
 pub(super) fn verify_group_replay(
@@ -4484,7 +4487,9 @@ struct SavedMatrixReport {
 /// This is not a derivation certificate, full row-space check or solver verdict.
 struct MatrixAssessment {
     input_zero_assignments: usize,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     rows_checked: usize,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     reported_native_step_complete: bool,
 }
 fn check_saved_boolean_polynomial(poly: &SavedEquation) -> Result<(), String> {
@@ -6427,9 +6432,12 @@ impl Budget {
     }
 }
 struct BudgetLedgerAssessment {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     reported_work: u64,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     reported_bytes: u64,
     reported_over_limit: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     completion_eligible: bool,
 }
 fn verify_budget_ledger(
@@ -7620,6 +7628,7 @@ struct SavedReceipt {
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SavedPersistenceResult {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     reason: String,
     serialized_complete: bool,
     retained_bytes: usize,
@@ -7975,8 +7984,10 @@ mod terminal_result_reader_tests {
 struct VerifiedCanonicalComponents {
     producer_ledger: SavedBudgetLedger,
     math: VerifiedCanonicalMath,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     native_boundaries: usize,
     reported_group_complete: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     input_zero_assignments: usize,
 }
 /// Join canonical arithmetic, reported terminal metadata and authenticated
@@ -10337,10 +10348,14 @@ fn verify_native_projection_receipt(
 }
 #[derive(Debug)]
 struct VerifiedParentDelivery {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     producer_transition_valid: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     producer_entry_anchor_verified: bool,
     delivery_complete: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     root_artifacts: usize,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     capture_acknowledgements: usize,
 }
 /// Admission and original mathematical replay supply expected_before. This

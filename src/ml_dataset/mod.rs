@@ -8317,6 +8317,7 @@ use telemetry::pmu_containment;
 #[cfg(target_os = "linux")]
 use telemetry::whole_worker::{Collector, GatedWorker};
 
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 const NATURAL_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/v1";
 
 const PLANTED_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/planted-pdp-v1";

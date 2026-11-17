@@ -42,6 +42,7 @@ pub struct Limits {
 }
 impl Limits {
     /// Frozen proposed software limits; no exponential-in-N allocation.
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub const fn software() -> Self {
         Self {
             variables: 4096,
@@ -113,9 +114,12 @@ pub struct Degrees {
 #[derive(Clone, Copy, Debug)]
 pub struct Audit {
     pub result: Result<Degrees, Failure>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub charges: Charges,
     /// Always false. Arithmetic equality is not original-system admission.
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub source_authenticated: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub native_operation_witness: bool,
 }
 struct Meter<'a> {
@@ -431,6 +435,7 @@ fn arithmetic(
 /// it. All failures retain accepted charges. Limit refusals are UNKNOWN, never
 /// nonmembership. Resource counters are modeled work/requested allocation,
 /// not hardware instruction counts or exact allocator consumption.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub fn verify_untrusted(bytes: &[u8], limits: Limits, deadline: Instant) -> Audit {
     let mut meter = Meter {
         limits,
@@ -458,6 +463,7 @@ pub fn verify_untrusted(bytes: &[u8], limits: Limits, deadline: Instant) -> Audi
 /// in Unknown(Admission); an ancestor may already have reserved before returning
 /// a postcheck failure, so this is not a claim that the parent spent zero.
 /// The caller must retain its original ledger, including that refused request.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub fn verify_untrusted_admitted(
     bytes: &[u8],
     limits: Limits,
@@ -481,6 +487,7 @@ pub fn verify_untrusted_admitted(
 
 /// Private to the checked-map parent module. Expected source is supplied only
 /// after checked-map reconstruction; comparison itself does not mint authority.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(super) fn verify_expected(
     bytes: &[u8],
     variables: u32,

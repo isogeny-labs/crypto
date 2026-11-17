@@ -52,7 +52,7 @@ pub(super) enum AdmissionStage {
 /// Fixed-size typed reporting, with no format!/String/Box allocation on refusal.
 /// An error before the budget is returned is distinct from charged admission.
 #[allow(clippy::large_enum_variant)]
-pub(super) enum AdmissionFailure<'a> {
+pub(in crate::ml_dataset::solvers) enum AdmissionFailure<'a> {
     BeforeBudget(AdmissionStage),
     Retained(FailedAdmission<'a>),
 }
@@ -74,7 +74,7 @@ impl FailedAdmission<'_> {
     }
 }
 
-pub(super) struct OriginalOwner<'a> {
+pub(in crate::ml_dataset::solvers) struct OriginalOwner<'a> {
     original: &'a VerifiedWorkerOriginal<'a>,
     budget: Budget,
     binding: [u8; 32],
@@ -276,6 +276,7 @@ fn decode_into(
 impl<'a> OriginalOwner<'a> {
     /// Original attempt and sink joins precede construction. Reuses the admitted
     /// absolute deadline; no Instant::now()+10 seconds or per-pattern reset.
+    #[allow(clippy::result_large_err)] // the error hands owned state back to the caller
     pub(super) fn admit(
         original: &'a VerifiedWorkerOriginal<'a>,
         case: &crate::ml_dataset::types::CaseData,
@@ -501,6 +502,7 @@ impl<'a> OriginalOwner<'a> {
 
     /// This seal authenticates insertion only. It intentionally provides no
     /// durable acknowledgement and authorizes no search or public export.
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(super) fn verify_snapshot<'s>(
         &'s mut self,
         events: &'s [crate::cryptanalysis::sat::SolverEvent],

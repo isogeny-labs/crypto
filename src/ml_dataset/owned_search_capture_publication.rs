@@ -22,6 +22,7 @@ pub(in crate::ml_dataset::solvers) struct Snapshot {
     pub capture_error: Option<capture::CaptureError>,
 }
 pub(in crate::ml_dataset::solvers) struct Chunk {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub index: u64,
     pub path: String,
     pub bytes: u64,
@@ -339,6 +340,7 @@ impl OwnedAttempt {
         let _ = self.checkpoint_capture();
         self
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn capture_publication(&self) -> &Publication {
         &self.publication
     }

@@ -35,6 +35,7 @@ impl Audit {
     pub fn source(&self) -> &CheckedMap {
         self.expansion.source()
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub fn expansion(&self) -> &equations::OwnedExpansion {
         &self.expansion
     }

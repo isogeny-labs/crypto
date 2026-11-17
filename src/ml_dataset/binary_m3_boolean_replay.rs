@@ -1,6 +1,7 @@
 //! Historical ordinary N3 semantic identity admission. No feature emission.
 use super::*;
 use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
 #[path = "boolean_identity.rs"]
 mod identity;
 use std::io::Write;

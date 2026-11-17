@@ -235,6 +235,7 @@ pub(in crate::ml_dataset::solvers) struct Custody {
     checkpoint: Option<checkpoint::WithLedger<'static>>,
     sink: Option<capture::CaptureEmitter>,
     pub coverage: Coverage,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub stage: Stage,
     pub stop: Option<Stop>,
     pub report_admitted: bool,
@@ -242,16 +243,27 @@ pub(in crate::ml_dataset::solvers) struct Custody {
     admission_stage: Option<AdmissionStage>,
 }
 struct MapParts {
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     binding: [u8; 32],
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     launch_sha256: [u8; 32],
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     math: Math,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     checked: Option<provenance::CheckedMap>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     retained_unchecked: Option<provenance::Map>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pattern: Option<u32>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     retained_bytes: Vec<u8>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     map_ack: Option<capture::CommittedEventPosition>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     publication_attempted: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     map_published: bool,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     capture_limits: capture::CaptureLimits,
 }
 impl Prepared<'_> {

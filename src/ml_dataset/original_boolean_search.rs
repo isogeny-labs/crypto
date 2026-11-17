@@ -103,12 +103,18 @@ pub(in crate::ml_dataset::solvers) struct Caps {
 #[derive(Clone, Copy, Debug)]
 pub(in crate::ml_dataset::solvers) enum Failure {
     Admission(Stop),
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Expansion(equations::Failure),
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Search(scheduler::Failure),
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Audit(check::Failure),
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     LiftStopped(provenance::Error),
     Continuation(continuation::Failure),
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Coverage(continuation::Failure),
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Exclusions(exclusions::Failure),
     Publication(Stop),
 }
@@ -146,6 +152,7 @@ struct OriginalParts {
     launch_sha256: [u8; 32],
     math: Math,
     checked: Option<provenance::CheckedMap>,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     unchecked: Option<provenance::Map>,
     pattern: Option<u32>,
     map_bytes: Vec<u8>,
@@ -153,6 +160,7 @@ struct OriginalParts {
     publication_attempted: bool,
     map_published: bool,
     capture_limits: capture::CaptureLimits,
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     boolean_attempted: bool,
 }
 /// Contains no lifetime parameters, borrowed maps or borrowed execution tokens.
@@ -184,12 +192,14 @@ impl OwnedAttempt {
     pub(in crate::ml_dataset::solvers) fn first_stop(&self) -> Option<Stop> {
         self.original.budget.stopped
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn charged(&self) -> (u64, u64) {
         (
             self.original.budget.native.work + self.original.budget.checking_work,
             self.original.budget.native.bytes + self.original.budget.adapter_bytes,
         )
     }
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn lift_records(&self) -> &[LiftRecord] {
         &self.lift_records
     }
@@ -219,6 +229,7 @@ impl OwnedAttempt {
         self.coverage.as_ref().filter(|v| v.result.is_ok())
     }
     /// Raw replay diagnostics survive failed admission or arithmetic replay.
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     pub(in crate::ml_dataset::solvers) fn exclusion_audit(&self) -> Option<&exclusions::Audit> {
         self.exclusion_audit.as_ref()
     }
