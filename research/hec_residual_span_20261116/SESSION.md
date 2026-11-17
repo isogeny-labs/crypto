@@ -1700,3 +1700,10 @@ What was done: freeze7eb6ff0b323 single invocation exit0, nonsingularconic/exact
 Decisions made: candidatecurve/countqualification, not automaticmaplift; explicit conicbranchpoint/directions retained forGLcoordinate reconstruction.
 Open threads: exactstandardKummer coordinateidentity then originaltargetlift and completecost.
 Errors: none, no rerun/S3/cloud.
+
+## Standard Kummer coordinate identity frozen
+
+What was done: compiled conicmatrix inversion, polar cubiclinear correction, explicit generalquinticKummer quartic, fullpolynomialidentity andGL4/transformedquintic output.
+Decisions made: no identification fromcounts alone; no pointfilter/fittedGL. All assertions [pcc:unverified]. Primary paper section2Eq2.2-2.4read.
+Open threads: pushfreeze then once-only invocation; targetMumfordlift remains.
+Errors: none in compile, no science yet; ownT7093lease confirmed.
