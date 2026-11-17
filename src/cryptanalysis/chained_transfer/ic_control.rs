@@ -79,7 +79,7 @@ pub(crate) fn pa(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
     }
 }
 #[inline]
-fn ps(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
+pub(crate) fn ps(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
     n.add += 1;
     if a >= b {
         a - b
@@ -1314,6 +1314,81 @@ pub(crate) fn wiedemann(
     } else {
         None
     }
+}
+
+/// `x[ct]` for `A x = c`, one coordinate only.
+///
+/// With `M` invertible and `M x = b`, let `s_k = e_ctᵀ M^k b` and let
+/// `P(z) = z^L + c_1 z^{L−1} + … + c_L` be the minimal polynomial of `(s_k)`
+/// (Berlekamp–Massey on `2n + 2` terms).  The sequence `t_k = e_ctᵀ M^k x`
+/// has `t_{k+1} = s_k`; its minimal polynomial divides `M`'s, so it has a
+/// nonzero constant term and divides `z·P(z)`, hence divides `P`.  So
+/// `P` annihilates `t` too, and its first relation gives
+/// `x[ct] = t_0 = −c_L⁻¹ (s_{L−1} + c_1 s_{L−2} + … + c_{L−1} s_0)`.
+///
+/// `square = false`: `M = AᵀDA`, `b = AᵀD c` (the baseline system).
+/// `square = true`: `M = A'`, `b = c'` for a random choice of `ncols` rows.
+/// The caller certifies the answer by group arithmetic; a singular `M`
+/// gives a wrong value or `None`, never an unchecked answer.
+pub(crate) fn wiedemann_coord(
+    rows: &[Row],
+    ncols: usize,
+    ct: usize,
+    r: u64,
+    rng: &mut StdRng,
+    square: bool,
+    nat: &mut Nat,
+) -> Option<u64> {
+    let len = 2 * ncols + 2;
+    let mut seq = Vec::with_capacity(len);
+    if square {
+        if rows.len() < ncols {
+            return None;
+        }
+        let mut idx: Vec<usize> = (0..rows.len()).collect();
+        for i in 0..ncols {
+            let j = rng.gen_range(i..idx.len());
+            idx.swap(i, j);
+        }
+        let sub: Vec<Row> = idx[..ncols].iter().map(|&i| rows[i].clone()).collect();
+        let mut v: Vec<u64> = sub.iter().map(|row| row.1).collect();
+        let mut w = vec![0u64; ncols];
+        for _ in 0..len {
+            seq.push(v[ct]);
+            mat_vec(&sub, &v, &mut w, r, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    } else {
+        let nr = rows.len();
+        let d: Vec<u64> = (0..nr).map(|_| rng.gen_range(1..r)).collect();
+        let mut tmp = vec![0u64; nr];
+        for ((t, row), &di) in tmp.iter_mut().zip(rows.iter()).zip(d.iter()) {
+            nat.mul += 1;
+            *t = mulmod(row.1, di, r);
+        }
+        let mut v = vec![0u64; ncols];
+        mat_t_vec(rows, &tmp, &mut v, r, nat);
+        let mut w = vec![0u64; ncols];
+        for _ in 0..len {
+            seq.push(v[ct]);
+            m_apply(rows, &d, &v, &mut tmp, &mut w, r, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    }
+    let c = berlekamp_massey(&seq, r, nat);
+    let l = c.len() - 1;
+    if l == 0 || c[l] == 0 {
+        return None;
+    }
+    // Σ_{j=0}^{L−1} c_{L−1−j} s_j
+    let mut acc = 0u64;
+    for j in 0..l {
+        nat.mul += 1;
+        nat.add += 1;
+        acc = addm(acc, mulmod(c[l - 1 - j], seq[j], r), r);
+    }
+    nat.mul += pivot_inversion_steps(r) + 1;
+    Some(mulmod(acc, subm(0, invm(c[l], r), r), r))
 }
 
 /// Walk length between fresh random starts in [`run_ic`].

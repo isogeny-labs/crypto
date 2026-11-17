@@ -19,3 +19,9 @@ Preserve every rawfailure/outlier,originalproofobligation andsourcecontext. Late
 ## Later recovery106
 
 Work/relation-root-recovery reconstructs live source prerequisites from trusted branches; once merged into the lane, three earlier small repairs and SAT/custody recovery are applied. ActualSAT46 plus actualpacked-codec1 tests pass (47total). No full crypto_lib success: after include hydration,109 other API/type diagnostics remain; ROOT_BUILD_BLOCKERS_104.json and ROOT_RECOVERY_REPORT.md describe them. Rootadapter stillpending; applyonlyits certified.rs hunk after remaining baseline recovery. No accepted15x, no goalclosure.
+
+## Wide recovery119 / index erratum120
+
+Currentactualrootcheck114fails29diagnostics after109/53. Reviewedwideworkload/claw/interfaces pluscheckednarrowing,coordinateWiedemann andexistingmoduleexport recovered. SOURCE_CHECKS_119.json pins75passingactualsourceSAT/codec/scalar/canonical/SHA256tests. Fixturehydrationscript pins3historicalf57blobsandrefusesdifferingfiles. Earlier110/113/115failuresretained. No actualrootadapter orbenchran. ROOT_BUILD_BLOCKERS_120.json supersedes114indexparserbug; raw114stderrunchanged.
+
+Dataset3wayitemreviewpendingoutside runtime: /workspace/ml-{solvers,curves,mod,types}-items-116.rs, conflictlist/source-index metadata. Primaryff02728b58andd4f4dc3799/common45c84d06ef needmanualunionofstrongpolicy/custody/channelchecks andplanted/PMU/root-chainfeatures. Do notapplynaive3waywithduplicatedmovedfunctions. Snapshotfields areinitializerswithnobackendfoundyet; do notaddno-opfieldstomakebuildgreen. Missingtrace-zerochainAPIsarenotfoundinavailableprimarychainhistory; fullpointrequiresCircuitvisibilityandmethods. Preserveallalgorithms/tests.15xgoalactive.

@@ -245,6 +245,16 @@ pub fn derive_digest(domain: &str, parts: &[String]) -> [u8; 32] {
     sha256(canonical(&v).expect("strings only").as_bytes())
 }
 
+/// A 256-bit value derived like [`derive_u128`] (the same canonical JSON of
+/// `{domain, parts}` with decimal-string parts), the whole SHA-256 digest
+/// read big-endian: scalars and abscissae on curves whose subgroup order
+/// is past `2^128`.
+pub fn derive_biguint(domain: &str, parts: &[String]) -> num_bigint::BigUint {
+    let v = serde_json::json!({"domain": domain, "parts": parts});
+    let d = sha256(canonical(&v).expect("strings only").as_bytes());
+    num_bigint::BigUint::from_bytes_be(&d)
+}
+
 /// Serde for a `u128` that is written as a JSON number while it fits a
 /// `u64` and as a decimal string above that.  Every record and identity
 /// written before wide curves existed therefore serialises byte for byte

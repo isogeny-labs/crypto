@@ -282,7 +282,7 @@ fn report(
     let total = phases.iter().map(|p| p.gae).sum();
     let recovered = recovered.and_then(|k| k.to_u128());
     SolveReport {
-        recovered,
+        recovered: recovered.map(Into::into),
         exhausted: recovered.is_none(),
         phases,
         total_gae: total,

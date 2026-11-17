@@ -5275,9 +5275,6 @@ fn solve_ext(
             }
             solve_endo_orbit(m, &i.curve, i.frobenius, i.generator, target, i.r, seed, "frobenius-orbit walk on {±π^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts")
         }
-        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::ThreeLeads(_), _) => {
-            unreachable!("returned above")
-        }
     }
 }
 
@@ -8814,7 +8811,8 @@ pub fn dump_factor_base(
         | Instance::Genus2(_)
         | Instance::Quartic(_)
         | Instance::Ghs(_)
-        | Instance::Hyper(_) | Instance::ThreeLeads(_) => unreachable!("returned above"),
+        | Instance::Hyper(_)
+        | Instance::ThreeLeads(_) => unreachable!("returned above"),
     }
 }
 

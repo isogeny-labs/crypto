@@ -440,7 +440,7 @@ pub fn solve(
         ),
     ]);
     Ok(SolveReport {
-        recovered,
+        recovered: recovered.map(Into::into),
         exhausted: recovered.is_none(),
         total_gae: phases.iter().map(|p| p.gae).sum(),
         phases,
