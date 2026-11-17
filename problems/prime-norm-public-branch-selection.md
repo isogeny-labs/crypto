@@ -304,3 +304,33 @@ keep a useful nonzero target-scalar coefficient and charge complete expected
 bit work. No native/paid/attack/scaling campaign was launched.
 
 Readable final: [versioned final report](../research/prime_orientation_layers_20261114/transport/public-input-evidence/report/report-final-001.pdf) makes natural subtraction explicit at m=0; all frozen earlier reports/source evidence stay exact.
+
+
+## 2026-11-17: full uniform multiplicity and fixed target controls
+
+[Versioned status002](../research/prime_orientation_layers_20261114/transport/public-input-evidence/STATUS-20261117-002.md)
+and [report](../research/prime_orientation_layers_20261114/transport/public-input-evidence/report/report-uniform-001.pdf)
+extend the exact symmetric interpolation obstruction to EVERY uniform
+multiplicity using full mixed Taylor coefficients, not factorial derivatives.
+At both nonzero opposite branches on all2a abscissas, the natural strict
+homogeneous budget<2ar forces helperzero. Source011/receipt006, unsigned
+PCC-20261117-3bcc1a. This is not an ECDLP algorithm nonexistence proof
+[pcc:unverified].
+
+The actual target's known sign is a changed hypothesis: source013/receipt007
+checks one target branch plus paired othernodes at multiplicityONE only.
+Singleton-target higher multiplicity is outside that theorem. Source014/008
+checks the PRIMARY sufficient count condition: it fails for a>=3 with at
+least3unresolved pairs, all r>=1; failure of that sufficient bound is not
+helper/rank nonexistence. The changed fixed control a2,u3,r4,ell7 passes
+72variables>70constraints, not an asymptotic attack or field-characteristic2
+result. Unsigned PCC-20261117-bb5895/896a0c [pcc:unverified].
+
+Next actual anchored coefficient-to-full-jet operator must handle repeated
+abscissas and be bound to the finite coefficient encoding, beginning with
+that positive control. No supplied successful signs or kernel oracle.
+Generation, factor/root results, full norm validity, useful target scalar
+coefficient and complete expected bit cost remain separate. Published fast
+interpolation with one Lagrange ordinate per abscissa is not automatically
+admitted for this list input. Optional anchored cubic/norm restriction
+sketch is unvalidated and does not close the finder.

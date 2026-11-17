@@ -1,0 +1,18 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=.25,ranksep=.33];
+ node [shape=box,fontname="Helvetica",fontsize=12,style="rounded,filled",fillcolor="#edf4fa",margin=".12,.08"];
+ full [label="BOTH branches at every position\nFull mixed Taylor multiplicity r"];
+ lead [label="Leading Y-degree d < 2r\ns = r - floor(d/2)\nLeading coefficient has nodal^s divisor"];
+ zero [label="Strict natural budget contradicts degree\nNo nonzero helper, all uniform r"];
+ target [label="Known target has ONE branch\nOthers retain both signs"];
+ one [label="Multiplicity ONE: helper zero\nSeparate actual-target theorem"];
+ count [label="Higher r: source sufficient count fails\na >= 3 and unknown pairs >= 3\nThis is NOT rank nonexistence"];
+ positive [label="Small changed control: a=2, r=4, ell=7\n72 variables > 70 constraints\nParameter arithmetic only"];
+ next [label="OPEN: actual anchored mixed-jet operator\nPublic candidate, validity and complete cost",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ full -> lead -> zero;
+ target -> one;
+ target -> count;
+ count -> positive [style=dashed,label="different finite regime"];
+ positive -> next [style=dashed];
+ zero -> next [style=dashed,label="changed hypotheses required"];
+}
