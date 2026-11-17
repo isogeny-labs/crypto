@@ -2982,3 +2982,10 @@ What was done: checked primary Proposition4/Remark4/equation11 and derived nonsq
 Decisions made: extension transport preserves k but belongs to ker(pi+1); Fp rational-point solver cannot accept it. Unrestricted quartic soft-O(p²) extension substitution gives no exponent improvement against soft-O(p^(4/3)); not a lower bound or exclusion of a purpose-built anti-invariant method.
 Open threads: canonical normalization/explicit map for rational p61 route; anti-invariant relation/cost mechanism prerequisite for p211/p401 extension work; full10x genus2+ goal active.
 Errors: no scientific execution this stage; existing own T7093 scope remains held, attach reports self-overlap.
+
+## Rational Smith chart gate frozen
+
+What was done: compiled native exhaustive rho/sigma reconstruction on both original p61 maps, full congruence/sign/inverse/mutation/incidence checks and split/nonsplit accounting.
+Decisions made: restricted nonsingular-projection open only, no global normalization or transport claim; Git freeze precedes sole600CPU execution.
+Open threads: run gate and retain coverage; canonical model and complete transport still required.
+Errors: Smith source-code page unreachable (403/timeout), Magma absent; unused copied helper warnings only. No scientific execution yet.
