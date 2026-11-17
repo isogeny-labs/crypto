@@ -60,6 +60,11 @@ a generic source image and an actual target point class. See
 PCC-20261117-ef5e0c andPCC-20261117-a5c634,producer standing.
 [pcc:unverified]
 
+The [boundary supplement](../research/nist_cover_three_tests_20261116/OPAQUE_KM_BOUNDARIES.md)
+adds the dimension2 RR case and exact3/2+1 repeated output supports,all with
+decoded/re-encoded and direct dual agreement. PCC-20261117-b9e8ca retains
+the three fixed cases under the same immutable decoder. [pcc:unverified]
+
 Remaining map obligations are independent/compiled verification and universal
 reverse search-bound certification under the declared execution limits.
 Do not continue to list opaque-space decoding,the rational/closed transpose
