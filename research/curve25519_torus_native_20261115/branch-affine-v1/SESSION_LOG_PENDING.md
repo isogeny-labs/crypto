@@ -102,3 +102,18 @@
 
 ### Errors (what went wrong, how it was handled)
 - Source publication/identity readback succeeded at scoped level. No artifact upload,all-green CI,signature,full cost or exponent claim. Metadata owner/historical recovery limitations remain recorded. Do not re-register now-published1228events as unpublished.
+
+## 2026-11-17T00:50:01.289874+00:00 — Follow-on regular PR4475 opened
+
+### What was done (commands, files, features)
+- Final pre-review metadata localb6739bb325 published as0a5e32c46943adbcafe79cf0b155fe3945df3f4d onlane/curve25519-affine. Created regular PR4475 against exact pinned context345652eb after intended-body lint0 and checking no existing open lane PR. Source/report and both terminal closure records are concrete in the PR. [pcc:unverified]
+- PUBLICATION_PR.json records actual PR identity. Artifact5332de1c/280300byte receipt remains pending; no native source/output edit or rerun and no main merge/retarget issued.
+
+### Decisions made (and why)
+- Only this final publication journal/identity metadata changes after opening; inspect its actual new head once,not carry prior results. Restore SAME checker for4475 only. Terminal4447/4456 episodes already recorded; no duplicate/routine closed queries or new schedule.
+
+### Open threads (unfinished, pick up next time)
+- Genuine artifact receipt,main dependency integration,history/gate/review blockers. Broader science remains open; next reversible-component/accounting work is not scheduled by the CI checker.
+
+### Errors (what went wrong, how it was handled)
+- PR creation succeeded and is regular. No all-green,signed scientific,upload,full-cost or exponent conclusion. Preserve raw/pinned whitespace and all qualified bytes.
