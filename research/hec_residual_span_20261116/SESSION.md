@@ -353,3 +353,17 @@ Needstrongerchargedrelation-generation/anchorworkmechanismbeyondnormalization, e
 
 ### Errors
 No scientificfailures/retries. Priorwallnoiseunchanged; source/buildwarningsretained.
+
+## Batched denominator inversion frozen
+
+### What was done
+Implementedclassicalprefix-productoneinversebackwardpassfornonzerodenominatorlists,cost1inverse+3(n−1)multiplications. Pencilcollectsnonzerouvaluespreservingpoint/sign/bucket/anchororder. Prepared774helperexactness/costprobesplus144freshsolvesacrossbatch/scalarPencil/Folded/Expandedwithunchangeddeterminingtuples.
+
+### Decisions made
+Chargeextramultiplications/storage; notsinglecounterwall/noveltyclaim. Sourceinfo/sharedsetup/verificationequal. Freeze/pushbeforeonce-onlyrun; no unchangednoisererun.
+
+### Open threads
+Qualifyexacthelperformula/prefixes andinspectcompletefieldvectortradeoff. Broadgoalopen.
+
+### Errors
+GenerationstringindentmismatchandRustnestedmodulepathcaughtbeforefreeze/run, fixed; finalreleasebuilds. Unusedimports/reportwarningsretained. No scientificretry.
