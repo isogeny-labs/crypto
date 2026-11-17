@@ -2408,3 +2408,10 @@ What was done: compiledweightzeroJ/Rballconsumer withexacttheta/invariantdump+se
 Decisions made: noactualvaluation/recognition; denominator/normalization/finitecharcriterion andSerreobstructionexplicit. Priorprintddecimalsdiagnosticonly, newexactdumpclosesportableballgap. Primarytheta/FLINTsourcesread, KBbadreductionpointerdoesnotgiveboundhere. Gitfreeze beforemax5once120CPUprocesses.
 Open threads: executecomplexscalar/rankgate then exactalgebraic/421-adicconstructionandcost; original10x/fullscopeintact.
 Errors: no buildfailure, inheritedindentation/unusedhelperwarnings; noS3/cloud/merge.
+
+## InvariantJ source-domain failure retained, quotientR/absoluterank pass
+
+What was done: freeze32bf5d34104hashpass; absolutesimplicityauxrank6exit0, quotientconsumers2exit0bothprecisions/nonzeroJ/R/exactballfiles. Sourceexit134Sdenominatorcontains0beforeR, comparatorskippedasincompleteinputs.
+Decisions made: nooverallpass, preservefailure. Sourceorder7automorphism forcesweight4zero(proposedlemma), soJundefinedratherthanprecisionissue. Prospectivelydomainawarev2computesRindependentlywithSigma140, Joptional/undefined; nochangingquotientcriteria.
+Open threads: v2sourceR+exactreload/isometrycomparison, thenreal421-adicbridge/cost; fullgoalunchanged.
+Errors: unnecessarysourceJdenominatorassumptionfailed; no overwrite/retry/S3/cloud/merge.
