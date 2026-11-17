@@ -1812,3 +1812,10 @@ What was done: compiled cacheanchorvalidity plus disjointdistinctresidualroot ce
 Decisions made: scoped equivalence onproducerdisjointdomain, not unrestricted multiplicities; onepositive/fournegativelemma controls plus12cert/84mutationagreement and24costcalls. Assertions [pcc:unverified].
 Open threads: pushfreeze then once-only120CPU invocation.
 Errors: none in compile, no science yet.
+
+## Degree/root principal certificate qualified
+
+What was done: freeze201de1a202e once-onlyexit0;12certificates/84mutations agree, polynomiallemma1positive4negative includingoverlap,24costcalls replay/phases/repeats exact. p601verifierbase1.118-1.128old/new,ellunchanged. Assertions [pcc:unverified].
+Decisions made: retain guardedsmallverificationgain, no fullpipelinegain; nativebindingunchanged, actionproof/producer remain.
+Open threads: soundFrobeniusaction qualification and originalsource producer mechanism, full10xgoalunchanged.
+Errors: none,no rerun/S3/cloud.
