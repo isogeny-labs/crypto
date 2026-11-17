@@ -2,7 +2,7 @@
 title: "Index calculus for Curve25519: independent exact-model oracle and current algebraic boundary"
 author: "Codex research session"
 date: "2026-11-02; synchronized with main on 2026-11-17"
-geometry: margin=0.7in
+geometry: margin=0.6in
 fontsize: 10pt
 colorlinks: true
 linkcolor: blue
@@ -169,6 +169,19 @@ accept verdict and a Schwartz--Zippel false-accept bound below $2^{-3802}$
 for that replay. This is an evaluated certificate, not a formal proof pointer;
 the displayed expansion is also directly inspectable.
 
+## Lean proof map
+
+[`lean/Curve25519Model.lean`](lean/Curve25519Model.lean) supplies the
+kernel-checked algebraic layer. It deliberately does not certify the Rust
+implementation, factor-base construction, solver cost, or an ECDLP result.
+
+| Report claim | Lean declaration(s) | Exact scope |
+|---|---|---|
+| Montgomery translation identity | `Curve25519Model.montgomery_translation_identity` | all commutative rings; no division assumption |
+| $v_2(p-1)=2$ | `p_minus_one_factorization`, `p_minus_one_cofactor_odd` | exact integer factorization with odd residual factor |
+| $v_2(p+1)=1$ | `p_plus_one_factorization`, `p_plus_one_cofactor_odd` | exact integer factorization with odd residual factor |
+| Exact $S_3$ zero-sum witness | no Lean theorem in this artifact | executable full-field Rust check only |
+
 # Exact $S_3$ binding
 
 For the translated curve $y^2=x^3+ax+b$, the implementation evaluates
@@ -234,6 +247,7 @@ cargo check --example curve25519_ic_artifact
 cargo test --lib curve25519_ic::tests -- --nocapture
 cargo run --quiet --example curve25519_ic_artifact -- \
   replay research/curve25519_index_calculus_20261102/montgomery-translation.identity.json
+tools/lean/proof-gate.sh research/curve25519_index_calculus_20261102/lean
 ```
 
 The original focused result was 6 passed, 0 failed; certificate replay accepted
