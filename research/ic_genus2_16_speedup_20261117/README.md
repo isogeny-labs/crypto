@@ -19,7 +19,7 @@ Phase 3: build and measure against the lab baseline and matched rho.
 | P0 lab instrument recovered | done; exact count identity at g=4 | `P0/` |
 | P1 genus 6-10 instrument, arms D (degree-2 base) and E (degree-2 large primes) | done; 11 cells, all solves certified | `P1/RESULTS.md` |
 | P2 lever F (partial degree-2 base) | pilot, negative: no interior optimum | `P2/RESULTS_F.md` |
-| P2 crossover p*(g) at g=7 and g=8 | running | `P2/crossover/` |
+| P2 crossover p*(g) | measured at g=6, extrapolated at g=7-8: about 270, 830, and above 10^4 | `P2/RESULTS_crossover.md` |
 | P3 non-hyperelliptic small-e models | not started | `PLAN.md` |
 
 Headline (P1, counted cost against expected matched rho):
