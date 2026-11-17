@@ -1490,3 +1490,10 @@ What was done:55e07dcb164single invocation exits0,48calls exactvectors/traces,12
 Decisions made: unchangedimplementationfails10xcostcase; subgroupgainandcoverage notwholewin. Extraactionscalarmulcharged; anyeliminationrequiresproofandnewvalidationcontract,notposthoc omission.
 Open threads: mathematicallycertifiedverification/normalizationmechanism, fullgenus2+goalopen.
 Errors: none,no scientificretry/S3/cloud; fallbackcoverage andcoldcostseparate.
+
+## Conditional action survival and target consensus frozen
+
+What was done:derived whole-prime-Jacobian trueaction survival from principaldivisorPhi5(sigma)=0andinductiveconditionalpointlabels. Consensuskcanbeacceptedwithoutuniqueaction undercertifiedhypotheses; finaltargetcheckretained. CopiedCRTmodule common_kaccessor,8syntheticscenariosand4independentfieldrefs,buildpasses; hashesfrozen.
+Decisions made: proofconditional/unformalized,wholeorderreceiptsverifiedincurrentfiles; nochangeoldproducer/runtimecontractorcost. Syntheticgatebeforeintegration.
+Open threads: execute once; then prospectivevalidationcontract/producerintegration/fullcostrequired.
+Errors: oldT7080leaseexpired, newT7083claimed; connectorownlease mismatchretained,no scientificexecutionyet.
