@@ -1,0 +1,207 @@
+use hec_native_ic::{
+    fp::Fp,
+    instance::factor_base,
+    jac::{Curve, Div},
+    poly::Poly,
+};
+fn rational_roots(mut p: Poly, f: &Fp) -> (Vec<(u64, usize)>, Poly) {
+    let mut roots = vec![];
+    for x in 0..f.p {
+        let mut m = 0;
+        while p.deg() > 0 && p.eval(x, f) == 0 {
+            p = p.div_exact(&Poly::x_minus(x, f), f);
+            m += 1;
+        }
+        if m > 0 {
+            roots.push((x, m));
+        }
+    }
+    (roots, p)
+}
+fn irreducible(p: &Poly, f: &Fp) -> bool {
+    let n = p.deg() as usize;
+    let mut xp = Poly::x();
+    for i in 1..=n {
+        xp = xp.powmod(f.p, p, f);
+        if i <= n / 2 && Poly::gcd(p, &xp.sub(&Poly::x(), f), f).deg() > 0 {
+            return false;
+        }
+    }
+    xp == Poly::x()
+}
+fn group_sum(c: &Curve, fb: &[(u64, u64)], row: &[i64]) -> Div {
+    let mut d = c.zero();
+    for (p, &s) in fb.iter().zip(row) {
+        if s != 0 {
+            let z = c.mul(&c.place(p.0, p.1), s.unsigned_abs());
+            d = c.add(&d, &if s < 0 { c.neg(&z) } else { z });
+        }
+    }
+    d
+}
+fn norm_row(c: &Curve, fb: &[(u64, u64)], h: &Poly, roots: &[(u64, usize)]) -> Vec<i64> {
+    let mut row = vec![0; fb.len()];
+    for &(x, m) in roots {
+        let j = fb.iter().position(|p| p.0 == x).unwrap();
+        let y = h.eval(x, &c.fp);
+        assert!(y == fb[j].1 || y == c.fp.neg(fb[j].1));
+        row[j] += if y == fb[j].1 { m as i64 } else { -(m as i64) };
+    }
+    row
+}
+fn automorphism(c: &Curve, d: &Div, z: u64) -> Div {
+    let n = d.u.deg() as u64;
+    let inverse = c.fp.inv(z);
+    let mut u = Poly::zero();
+    let mut v = Poly::zero();
+    for i in 0..d.u.n {
+        u.c[i] = c.fp.mul(d.u.c[i], c.fp.pow(z, n - i as u64));
+    }
+    u.n = d.u.n;
+    for i in 0..d.v.n {
+        v.c[i] = c.fp.mul(d.v.c[i], c.fp.pow(inverse, i as u64));
+    }
+    v.n = d.v.n;
+    let out = Div { u, v };
+    assert!(c.is_valid(&out));
+    out
+}
+fn orbit_logs(c: &Curve, fb: &[(u64, u64)], source: &Div) -> (Vec<u64>, usize, usize, usize, u64) {
+    let f = Fp::new(8623);
+    let z = (2..c.fp.p)
+        .find(|&z| c.fp.pow(z, 9) == 1 && c.fp.pow(z, 3) != 1)
+        .expect("field primitive ninth root");
+    assert_eq!((c.fp.p - 1) % 9, 0);
+    assert_eq!((f.p - 1) % 9, 0);
+    let mut root_search = 0;
+    let root = (2..f.p)
+        .find_map(|a| {
+            root_search += 1;
+            let r = f.pow(a, (f.p - 1) / 9);
+            (f.pow(r, 9) == 1 && f.pow(r, 3) != 1).then_some(r)
+        })
+        .expect("scalar primitive ninth root");
+    let image = automorphism(c, source, z);
+    let mut cycle = *source;
+    for _ in 0..9 {
+        cycle = automorphism(c, &cycle, z)
+    }
+    assert_eq!(cycle, *source);
+    let mut lambda_candidates = vec![];
+    let mut candidate = 1;
+    for _ in 0..9 {
+        lambda_candidates.push(candidate);
+        candidate = f.mul(candidate, root)
+    }
+    assert_eq!(candidate, 1);
+    lambda_candidates.sort_unstable();
+    lambda_candidates.dedup();
+    assert_eq!(lambda_candidates.len(), 9);
+    let matched: Vec<_> = lambda_candidates
+        .iter()
+        .copied()
+        .filter(|&a| c.mul(source, a) == image)
+        .collect();
+    if matched.len() != 1 {
+        eprintln!("INELIGIBLE_SUBGROUP_ACTION matches={}", matched.len());
+        std::process::exit(2)
+    }
+    let lambda = matched[0];
+    let mut logs = vec![None; fb.len()];
+    let mut x = fb[0].0;
+    let y = fb[0].1;
+    let mut value = 1;
+    for _ in 0..9 {
+        let j = fb
+            .iter()
+            .position(|p| p.0 == x)
+            .expect("full rational orbit coverage");
+        let sign = if fb[j].1 == y {
+            1
+        } else {
+            assert_eq!(fb[j].1, c.fp.neg(y));
+            -1
+        };
+        assert!(logs[j].is_none());
+        logs[j] = Some(if sign > 0 { value } else { f.neg(value) });
+        x = c.fp.mul(x, z);
+        value = f.mul(value, lambda);
+    }
+    assert_eq!(x, fb[0].0);
+    assert_eq!(value, 1);
+    let logs: Vec<_> = logs
+        .into_iter()
+        .map(|v| v.expect("catalogue outside source orbit"))
+        .collect();
+    for (j, &log) in logs.iter().enumerate() {
+        assert_eq!(c.mul(source, log), c.mul(&c.place(fb[j].0, fb[j].1), 13));
+    }
+    eprintln!("orbit zeta={z} scalar_root={root} scalar_root_search={root_search} eigenvalue_candidates={} lambda={lambda} coverage={} norm_candidates=0 gauss_mulmods=0",lambda_candidates.len(),logs.len());
+    (logs, 0, fb.len(), lambda_candidates.len(), 0)
+}
+fn recover(
+    c: &Curve,
+    fb: &[(u64, u64)],
+    source: &Div,
+    target: &Div,
+    logs: &[u64],
+) -> (Option<u64>, usize, usize) {
+    let scalar = Fp::new(8623);
+    let inv13 = scalar.inv(13);
+    let mut r = *target;
+    for offset in 0..2048usize {
+        let (roots, rest) = rational_roots(r.u, &c.fp);
+        if rest.deg() == 0 {
+            let signed = norm_row(c, fb, &r.v, &roots);
+            assert_eq!(group_sum(c, fb, &signed), r);
+            let projected = signed.iter().zip(logs).fold(0, |s, (&a, &b)| {
+                scalar.add(s, scalar.mul(scalar.from_i64(a), b))
+            });
+            // Projection gives log(13*R)=13*(k+offset); do not omit inverse13.
+            let k = scalar.sub(scalar.mul(inv13, projected), offset as u64 % scalar.p);
+            assert_eq!(c.mul(source, k), *target);
+            return (Some(k), offset + 1, offset);
+        }
+        if offset + 1 < 2048 {
+            r = c.add(&r, source)
+        }
+    }
+    (None, 2048, 2047)
+}
+fn main() {
+    use hec_native_ic::ic::{solve_dlp, IcParams};
+    let c = Curve::new(
+        Fp::new(19),
+        Poly::from_coeffs(&[2, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    );
+    assert_eq!(c.g, 4);
+    assert!(irreducible(&c.f, &c.fp));
+    assert_eq!(hec_native_ic::instance::prime_factors(8623), vec![8623]);
+    let fb = factor_base(&c);
+    assert_eq!(fb.len(), 9);
+    let source = c.mul(&c.place(fb[0].0, fb[0].1), 13);
+    assert!(!c.is_zero(&source));
+    assert!(c.is_zero(&c.mul(&source, 8623)));
+    println!("case\tnorm_candidates\torbit_size\teigenvalue_checks\tgauss_mulmods\trecovered\tdescent_trials\tdescent_adds\tnative_k\tnative_trials\tnative_precompute_ops\tnative_group_ops\tnative_solve_mulmods");
+    let mut failures = 0;
+    for (case, known) in [37u64, 2026, 7001].into_iter().enumerate() {
+        let target = c.mul(&source, known);
+        eprintln!("public_input case={case} source={source:?} target={target:?}");
+        let (logs, candidates, labels, cache_rows, muls) = orbit_logs(&c, &fb, &source);
+        let (k, trials, adds) = recover(&c, &fb, &source, &target, &logs);
+        let params = IcParams {
+            seed: 2026111600 + case as u64,
+            max_trials: 200000,
+            ..IcParams::default()
+        };
+        let native = solve_dlp(&c, &source, &target, 8623, &params);
+        if k != Some(known) || native.k != Some(known) {
+            failures += 1
+        }
+        println!("{case}\t{candidates}\t{labels}\t{cache_rows}\t{muls}\t{}\t{trials}\t{adds}\t{}\t{}\t{}\t{}\t{}",k.map_or_else(||"incomplete".into(),|x|x.to_string()),native.k.map_or_else(||"incomplete".into(),|x|x.to_string()),native.trials,native.precompute_ops,native.group_ops,native.solve.mulmods);
+    }
+    if failures != 0 {
+        eprintln!("INCOMPLETE_SINGLE_TARGET_CONTROLS count={failures}");
+        std::process::exit(2)
+    }
+}
