@@ -63,4 +63,5 @@ Reading: the gain over the `wwalkGg` incumbent is about 5.6 percent at k = 28, t
 
 - Owner waiver (2026-11-17, second in-session answer): the S3 resume-checkpoint gate was waived for round 39 as well; runs used `CHECKPOINT_SKIP`. No benchmark record (`benchrec`) was filed.
 - Nov-14 `ecbench` and `ic_autolab` binaries, as in round 38 (`hashed-ecdl-tensor` does not build standalone on `main`).
+- Producer-side replay at 64 and an independent recompute of the w = 0 ratio are in `recompute/README.md` (0.9439, matching 0.944); not a validator run.
 - Development evidence only: counted GAE, no wall time, no validation gate; the IC leaderboard is not regenerated, because no row reaches it without the gate's replay certificate and validator report.
