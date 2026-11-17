@@ -351,11 +351,11 @@ pub(super) fn verify_optional(
         return Err("Boolean anchor original/phase/retained-prefix mismatch".into());
     }
     let anchored_ledger = ledger(
-        &serde_json::to_value(&anchor.ledger).map_err(|e| e.to_string())?,
+        &serde_json::to_value(anchor.ledger).map_err(|e| e.to_string())?,
         original_limits,
     )?;
     monotone(&anchored_ledger, &outer_after)?;
-    if check["before"] != serde_json::to_value(&anchor.ledger).map_err(|e| e.to_string())? {
+    if check["before"] != serde_json::to_value(anchor.ledger).map_err(|e| e.to_string())? {
         return Err("Boolean anchor/outer ledger join mismatch".into());
     }
     let report = anchor
@@ -601,7 +601,7 @@ pub(super) fn verify_optional(
                     "Boolean saved equality/degree claim differs from independent checker".into(),
                 );
             }
-            if let Some(slot)=projection.as_deref_mut() {
+            if let Some(slot)=projection {
                 let final_custody_work=artifacts.iter().try_fold(0u64,|sum,a|sum.checked_add(a.bytes))
                     .and_then(|bytes|bytes.checked_mul(16)).and_then(|work|work.checked_add(2_097_152))
                     .ok_or("Boolean final custody quote overflow")?;
@@ -932,7 +932,7 @@ mod tests {
         let mut record=RestrictedEquationRecord{schema:"crypto.ml-dataset.boolean-equation-record/v1",status:EquationStatus::VerifiedNonzero,
             assessment:serde_json::json!({}),target:Some(vec![vec![0]]),receipt:Some(serde_json::json!({"wire_hex":"aa","row_index":0})),
             native_operation_witness:false,producer_execution_verified:false};
-        let feature=PublicEquations::from_admitted(&math,&config,&vec![0u8;23]).unwrap();
+        let feature=PublicEquations::from_admitted(&math,&config,&[0u8; 23]).unwrap();
         let before=bounded_projection_json(&feature,32768).unwrap();
         record.receipt=Some(serde_json::json!({"wire_hex":"bbbb","row_index":7,"watermark":99}));
         record.target=Some(vec![vec![1,2]]);

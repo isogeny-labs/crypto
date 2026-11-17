@@ -420,16 +420,14 @@ impl<T: Admission> Admission for Timed<'_, T> {
             self.expired = true;
             return Err(Error::Admission);
         }
-        self.owner.check().map_err(|e| {
+        self.owner.check().inspect_err(|&e| {
             self.last = Some(e);
-            e
         })
     }
     fn reserve(&mut self, q: Quote) -> Result<(), Error> {
         self.check()?;
-        self.owner.reserve(q).map_err(|e| {
+        self.owner.reserve(q).inspect_err(|&e| {
             self.last = Some(e);
-            e
         })?;
         self.check()
     }

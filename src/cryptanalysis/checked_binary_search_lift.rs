@@ -6,10 +6,10 @@ use std::time::Instant;
 struct Bound<'a,T:VerificationAdmission>{owner:&'a mut T,deadline:Instant,expired:bool,stop:Option<Error>}
 impl<T:VerificationAdmission> Bound<'_,T>{fn time(&mut self)->Result<(),Error>{if Instant::now()>=self.deadline{self.expired=true;Err(Error::Admission)}else{Ok(())}}}
 impl<T:VerificationAdmission> Admission for Bound<'_,T>{
- fn reserve(&mut self,q:Quote)->Result<(),Error>{self.time()?;self.owner.reserve(q).map_err(|e|{self.stop=Some(e);e})?;self.time()}
- fn check(&mut self)->Result<(),Error>{self.time()?;self.owner.check().map_err(|e|{self.stop=Some(e);e})?;self.time()}
+ fn reserve(&mut self,q:Quote)->Result<(),Error>{self.time()?;self.owner.reserve(q).inspect_err(|&e|{self.stop=Some(e);})?;self.time()}
+ fn check(&mut self)->Result<(),Error>{self.time()?;self.owner.check().inspect_err(|&e|{self.stop=Some(e);})?;self.time()}
 }
-impl<T:VerificationAdmission> VerificationAdmission for Bound<'_,T>{fn addition(&mut self)->Result<(),Error>{self.time()?;self.owner.addition().map_err(|e|{self.stop=Some(e);e})?;self.time()}}
+impl<T:VerificationAdmission> VerificationAdmission for Bound<'_,T>{fn addition(&mut self)->Result<(),Error>{self.time()?;self.owner.addition().inspect_err(|&e|{self.stop=Some(e);})?;self.time()}}
 /// Caller supplies its retained checked map, actual signed domain/target, original
 /// absolute deadline and original owner. Progress is caller-owned before entry.
 /// Only the classified terminal sign-mask verdict is ExhaustedForModel.

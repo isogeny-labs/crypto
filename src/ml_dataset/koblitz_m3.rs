@@ -3313,7 +3313,7 @@ mod bound_signed_publisher_tests {
             assert!(original
                 .signed
                 .iter()
-                .any(|&(x, y)| p["x"] == x.to_string() && p["y"] == y.to_string()));
+                .any(|&(x, y)| p["x"] == x && p["y"] == y));
             sum = group.add(&sum, &point);
         }
         assert_eq!(sum, group.point(&value["target"]).unwrap());
@@ -5280,11 +5280,10 @@ fn decode_boundary_record(
                 MatrixBoundaryStage::MainCandidate {
                     generator,
                     multiplier,
-                } => {
-                    if generator >= equations || multiplier > 7 {
+                }
+                    if (generator >= equations || multiplier > 7) => {
                         return Err("native main candidate mismatch".into());
                     }
-                }
                 _ => {}
             }
             reserved
@@ -5559,8 +5558,8 @@ fn verify_boundary_stream(
                 let valid = match next_phase {
                     1 => matrix_phase == 0,
                     2 => matches!(matrix_phase, 1 | 2),
-                    3 => matches!(matrix_phase, 1 | 2 | 3),
-                    4 => matches!(matrix_phase, 1 | 2 | 3),
+                    3 => matches!(matrix_phase, 1..=3),
+                    4 => matches!(matrix_phase, 1..=3),
                     5..=7 => matrix_phase + 1 == next_phase,
                     _ => false,
                 };
@@ -6815,8 +6814,8 @@ fn run_bound_pipeline<'a>(
         let counter = std::cell::RefCell::new(global);
         out.signed = Some(enumerate_prepared_signed(
             prepared,
-            &mut |event, b| events.emit(event, b, &mut **counter.borrow_mut()),
-            &mut |witness, b| publisher.publish(witness, b, &mut **counter.borrow_mut()),
+            &mut |event, b| events.emit(event, b, &mut counter.borrow_mut()),
+            &mut |witness, b| publisher.publish(witness, b, &mut counter.borrow_mut()),
         ));
         if let Some(stop) = out.signed.as_ref().unwrap().stop {
             return Err(stop);
@@ -10584,7 +10583,7 @@ fn verify_parent_delivery(
         if let Some(p) = producer {
             if let Some(sequence) = p.capture_sequence {
                 if committed[0].0 != sequence
-                    || p.payload_sha256.map(|h| hex::encode(h)).as_deref()
+                    || p.payload_sha256.map(hex::encode).as_deref()
                         != Some(committed[0].1.sha256.as_str())
                 {
                     return Err("producer input capture receipt mismatch".into());
@@ -12176,8 +12175,8 @@ pub(super) fn verify_worker_cell(
             input_verified = true;
         }
     }
-    if input_sha.is_none() {
-        if artifact(
+    if input_sha.is_none()
+        && artifact(
             artifacts,
             "partial-koblitz-m3-input.raw",
             "unregistered-partial-artifact",
@@ -12204,7 +12203,6 @@ pub(super) fn verify_worker_cell(
                 raw_input_verified = true;
             }
         }
-    }
     let native = if canonical(KOBLITZ_SLOTS[1]) {
         let bytes = read_bounded(dir, KOBLITZ_SLOTS[1].0, 4096 * 2048)?;
         Some(verify_native_capture(

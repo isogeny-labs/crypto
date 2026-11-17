@@ -41,7 +41,7 @@ fn solve_inner<T:Owner>(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Insta
     super::run_with_checkpoint(n,&a.nodes[idx].equations,limits.native,deadline,&mut bridge,control,&mut |native,owner|{
      owner.meter.pay(0,0).map_err(|_|())?;
      let result=hook(&a,idx,native,owner.meter.charge,&mut *owner.meter.owner);
-     if result.is_err(){return result}owner.meter.pay(0,0).map_err(|_|())
+     result?;owner.meter.pay(0,0).map_err(|_|())
     })
    }else{super::run(n,&a.nodes[idx].equations,limits.native,deadline,&mut bridge)};
    let failure=bridge.failure;

@@ -70,7 +70,7 @@ fn bounded_candidates(
                     let k = public["symmetry"]["frobenius_power"]
                         .as_u64()
                         .ok_or_else(error)?;
-                    if k == 0 || k > config.n as u64 || config.n as u64 % k != 0 {
+                    if k == 0 || k > config.n as u64 || !(config.n as u64).is_multiple_of(k) {
                         return Err(error());
                     }
                     1usize

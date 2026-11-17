@@ -494,6 +494,329 @@ fn residual_batch(c: &BinaryCurve, target: &BinaryPoint, base: &[BinaryPoint]) -
     out
 }
 
+/// Monic specialization: avoid inverting the known leading coefficient 1.
+/// The variety admits odd fields, so half-trace gives both actual roots.
+fn monic_roots(
+    u: &F2mElement,
+    product: &F2mElement,
+    n: u32,
+    irr: &IrreduciblePoly,
+) -> Vec<F2mElement> {
+    if u.is_zero() {
+        return vec![product.square_k_times(n - 1, irr)];
+    }
+    let inv = u
+        .flt_inverse(irr)
+        .expect("nonzero monic linear coefficient");
+    let arg = product.mul(&inv.square(irr), irr);
+    if arg.trace(irr) != 0 {
+        return Vec::new();
+    }
+    let root = u.mul(&arg.half_trace(irr).expect("odd field"), irr);
+    vec![root.clone(), root.add(u)]
+}
+fn x_key(x: &F2mElement) -> WordMask {
+    let w = words(x);
+    [w[2], w[1], w[0]]
+}
+fn word_basis(values: impl IntoIterator<Item = WordMask>, n: u32) -> Vec<F2mElement> {
+    let mut pivots: Vec<Option<WordMask>> = vec![None; n as usize];
+    for mut v in values {
+        loop {
+            let Some(word) = (0..3).rev().find(|&i| v[i] != 0) else {
+                break;
+            };
+            let bit = word * 64 + 63 - v[word].leading_zeros() as usize;
+            if let Some(p) = pivots[bit] {
+                for i in 0..3 {
+                    v[i] ^= p[i];
+                }
+            } else {
+                pivots[bit] = Some(v);
+                break;
+            }
+        }
+    }
+    pivots
+        .into_iter()
+        .flatten()
+        .map(|w| F2mElement::from_words(&w, n))
+        .collect()
+}
+
+/// For each actual final point R, solve the necessary linear equation
+/// v²+z*v+z²*u²+b=0 with u in span(B_x), v in span(B_x*B_x),
+/// z=x(T-R). Factor X²+uX+v and replay actual supplied point signs.
+/// All candidates of a deficient affine space are required for Refuted.
+pub fn decompose_trace_zero_linearized(
+    v: &TraceZeroVariety,
+    base: &[BinaryPoint],
+    target: &BinaryPoint,
+    limits: Limits,
+) -> TraceZeroLinearizedReport {
+    let mut out = TraceZeroLinearizedReport::default();
+    let deadline = limits.wall_budget.map(|d| Instant::now() + d);
+    if !v.contains(target) {
+        out.relation.reason = Some("invalid linearized target/base");
+        return out;
+    }
+    if limits.max_models == 0 || limits.max_patterns == 0 || limits.max_variables == 0 {
+        out.relation.reason = Some(
+            if base
+                .iter()
+                .any(|p| matches!(p, BinaryPoint::Infinity) || !v.contains(p))
+            {
+                "invalid linearized target/base"
+            } else {
+                "zero linearized budget"
+            },
+        );
+        return out;
+    }
+    if base.is_empty() {
+        out.relation.disposition = Disposition::Refuted;
+        return out;
+    }
+    let c = v.curve();
+    let compact = (c.m >= 31 && base.len() >= 64).then(|| WordField::new(c));
+    let mut by_x: BTreeMap<WordMask, Vec<usize>> = BTreeMap::new();
+    for (i, p) in base.iter().enumerate() {
+        let BinaryPoint::Affine { x: fx, y: fy } = p else {
+            out.relation.reason = Some("invalid linearized target/base");
+            return out;
+        };
+        if fx.m_value() != c.m || fy.m_value() != c.m {
+            out.relation.reason = Some("invalid linearized target/base");
+            return out;
+        }
+        let x = x_key(fx);
+        let known_sign = by_x.get(&x).is_some_and(|ids| {
+            let BinaryPoint::Affine { y: known, .. } = &base[ids[0]] else {
+                unreachable!()
+            };
+            fy == known || *fy == known.add(fx)
+        });
+        // is_in_4e performs the field-width and curve-equation checks itself.
+        // Once one ordinate is admitted, its identical/opposite lift is also
+        // admitted; every supplied sign/index is still retained below.
+        if !known_sign
+            && !compact
+                .as_ref()
+                .map_or_else(|| c.is_in_4e(p) == Some(true), |f| f.admit(p))
+        {
+            out.relation.reason = Some("invalid linearized target/base");
+            return out;
+        }
+        by_x.entry(x).or_default().push(i);
+    }
+    let xs = word_basis(by_x.keys().map(|w| [w[2], w[1], w[0]]), c.m);
+    let products: Vec<_> = xs
+        .iter()
+        .enumerate()
+        .flat_map(|(i, x)| xs[i..].iter().map(|y| words(&x.mul(y, &c.irreducible))))
+        .collect();
+    let ws = word_basis(products, c.m);
+    out.source_dimension = xs.len();
+    out.product_dimension = ws.len();
+    out.linear_columns = xs.len() + ws.len();
+    if out.linear_columns > limits.max_variables as usize {
+        out.relation.reason = Some("linear-column allocation cap");
+        return out;
+    }
+    let xs_squared: Vec<_> = xs.iter().map(|x| x.square(&c.irreducible)).collect();
+    let ws_squared: Vec<_> = ws.iter().map(|w| w.square(&c.irreducible)).collect();
+    // Small bases keep scalar admission/search costs. Larger bases amortize
+    // each inversion over at most 256 consecutive residuals, in original order.
+    // Unused tail residuals are computed and charged even for an early answer.
+    let batch_size = if base.len() >= 64 { 256 } else { 1 };
+    let mut residuals = Vec::new();
+    let mut residual_start = 0;
+    let use_projection =
+        c.m >= 31 && base.len() >= 64 && xs.len() < 63 && out.linear_columns < c.m as usize;
+    let mut projection = None;
+    let mut incomplete = false;
+    for (r, p) in base.iter().enumerate() {
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            out.relation.reason = Some("linearized total deadline");
+            return out;
+        }
+        if r == 0 || r == residual_start + residuals.len() {
+            residual_start = r;
+            // An immediate relation should not pay for 31 unused residuals.
+            residuals = if r == 0 || batch_size == 1 {
+                vec![WordPoint::from_point(&point_add(c, target, &point_neg(p)))]
+            } else if let Some(f) = &compact {
+                f.residuals(c, target, &base[r..base.len().min(r + batch_size)])
+            } else {
+                residual_batch(c, target, &base[r..base.len().min(r + batch_size)])
+                    .iter()
+                    .map(WordPoint::from_point)
+                    .collect()
+            };
+        }
+        let residual = residuals[r - residual_start];
+        out.relation.patterns_attempted += 1;
+        let mut residual_incomplete = false;
+        let found = if residual == WordPoint::Infinity {
+            base.iter().enumerate().find_map(|(i, q)| {
+                let BinaryPoint::Affine { x, .. } = q else {
+                    unreachable!()
+                };
+                let negative = point_neg(q);
+                by_x.get(&x_key(x))
+                    .and_then(|ids| ids.iter().copied().find(|&j| base[j] == negative))
+                    .map(|j| (i, j))
+            })
+        } else {
+            let WordPoint::Affine { x: zw, y: yw } = residual else {
+                unreachable!()
+            };
+            out.systems += 1;
+            let projected = if r > 0 && use_projection {
+                let p = projection.get_or_insert_with(|| {
+                    ProductProjection::new_with_field(
+                        &xs,
+                        &ws,
+                        c,
+                        compact.as_ref().expect("projected compact workspace"),
+                    )
+                });
+                out.projected_columns = xs.len() + 1;
+                out.projected_systems += 1;
+                let (answer, rows) = p.solve_compact(
+                    &xs,
+                    c,
+                    zw,
+                    yw,
+                    compact.as_ref().expect("projected compact workspace"),
+                );
+                out.projected_rows += rows;
+                Some(answer)
+            } else {
+                None
+            };
+            let mut unique_pair = None;
+            let (solution, kernel, rank) = match projected {
+                Some(ProjectedResult::Inconsistent) => {
+                    out.projected_inconsistent += 1;
+                    out.relation.patterns_refuted += 1;
+                    continue;
+                }
+                Some(ProjectedResult::Unique(u, v)) => {
+                    unique_pair = Some((u, v));
+                    (BigUint::default(), Vec::new(), out.linear_columns)
+                }
+                Some(ProjectedResult::Deficient) | None => {
+                    let z = F2mElement::from_words(&zw, c.m);
+                    let z2 = z.square(&c.irreducible);
+                    let columns: Vec<_> = xs_squared
+                        .iter()
+                        .map(|x2| z2.mul(x2, &c.irreducible))
+                        .chain(
+                            ws.iter()
+                                .zip(&ws_squared)
+                                .map(|(w, w2)| w2.add(&z.mul(w, &c.irreducible))),
+                        )
+                        .collect();
+                    let Some(answer) = linear_solutions(&columns, &c.b, c.m) else {
+                        out.relation.patterns_refuted += 1;
+                        continue;
+                    };
+                    answer
+                }
+            };
+            let z = F2mElement::from_words(&zw, c.m);
+            out.maximum_rank = out.maximum_rank.max(rank);
+            out.maximum_nullity = out.maximum_nullity.max(kernel.len());
+            let available = limits.max_models.saturating_sub(out.relation.models);
+            let total = 1usize.checked_shl(kernel.len() as u32);
+            let count = total.unwrap_or(usize::MAX).min(available);
+            if total.is_none_or(|t| count < t) {
+                incomplete = true;
+                residual_incomplete = true;
+            }
+            let mut pair = None;
+            for selector in 0..count {
+                if deadline.is_some_and(|d| Instant::now() >= d) {
+                    out.relation.reason = Some("linearized coefficient deadline");
+                    return out;
+                }
+                let mut coefficients = solution.clone();
+                for (j, k) in kernel.iter().enumerate().take(usize::BITS as usize) {
+                    if selector >> j & 1 != 0 {
+                        coefficients ^= k;
+                    }
+                }
+                let (u, product) = if let Some(pair) = &unique_pair {
+                    pair.clone()
+                } else {
+                    let mut u = F2mElement::zero(c.m);
+                    let mut product = F2mElement::zero(c.m);
+                    for (j, x) in xs.iter().enumerate() {
+                        if coefficients.bit(j as u64) {
+                            u = u.add(x);
+                        }
+                    }
+                    for (j, w) in ws.iter().enumerate() {
+                        if coefficients.bit((xs.len() + j) as u64) {
+                            product = product.add(w);
+                        }
+                    }
+                    (u, product)
+                };
+                out.relation.models += 1;
+                let roots = monic_roots(&u, &product, c.m, &c.irreducible);
+                for x in roots {
+                    let y = x.add(&u);
+                    let (Some(is), Some(js)) = (by_x.get(&x_key(&x)), by_x.get(&x_key(&y))) else {
+                        continue;
+                    };
+                    if !binary_semaev_s3(&x, &y, &z, &c.b, &c.irreducible).is_zero() {
+                        out.relation.reason = Some("linearized S3 replay failed");
+                        return out;
+                    }
+                    for &i in is {
+                        for &j in js {
+                            if point_add(c, &base[i], &base[j]) == residual.point(c.m) {
+                                pair = Some((i, j));
+                                break;
+                            }
+                        }
+                        if pair.is_some() {
+                            break;
+                        }
+                    }
+                    if pair.is_some() {
+                        break;
+                    }
+                }
+                if pair.is_some() {
+                    break;
+                }
+            }
+            pair
+        };
+        if let Some((i, j)) = found {
+            if point_add(c, &point_add(c, &base[i], &base[j]), p) != *target {
+                out.relation.reason = Some("linearized original replay failed");
+                return out;
+            }
+            out.relation.indices = Some(vec![i, j, r]);
+            out.relation.disposition = Disposition::Found;
+            return out;
+        }
+        if !residual_incomplete {
+            out.relation.patterns_refuted += 1;
+        }
+    }
+    if incomplete {
+        out.relation.reason = Some("linearized affine-model cap");
+    } else {
+        out.relation.disposition = Disposition::Refuted;
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -822,327 +1145,4 @@ mod tests {
             }
         }
     }
-}
-
-/// Monic specialization: avoid inverting the known leading coefficient 1.
-/// The variety admits odd fields, so half-trace gives both actual roots.
-fn monic_roots(
-    u: &F2mElement,
-    product: &F2mElement,
-    n: u32,
-    irr: &IrreduciblePoly,
-) -> Vec<F2mElement> {
-    if u.is_zero() {
-        return vec![product.square_k_times(n - 1, irr)];
-    }
-    let inv = u
-        .flt_inverse(irr)
-        .expect("nonzero monic linear coefficient");
-    let arg = product.mul(&inv.square(irr), irr);
-    if arg.trace(irr) != 0 {
-        return Vec::new();
-    }
-    let root = u.mul(&arg.half_trace(irr).expect("odd field"), irr);
-    vec![root.clone(), root.add(u)]
-}
-fn x_key(x: &F2mElement) -> WordMask {
-    let w = words(x);
-    [w[2], w[1], w[0]]
-}
-fn word_basis(values: impl IntoIterator<Item = WordMask>, n: u32) -> Vec<F2mElement> {
-    let mut pivots: Vec<Option<WordMask>> = vec![None; n as usize];
-    for mut v in values {
-        loop {
-            let Some(word) = (0..3).rev().find(|&i| v[i] != 0) else {
-                break;
-            };
-            let bit = word * 64 + 63 - v[word].leading_zeros() as usize;
-            if let Some(p) = pivots[bit] {
-                for i in 0..3 {
-                    v[i] ^= p[i];
-                }
-            } else {
-                pivots[bit] = Some(v);
-                break;
-            }
-        }
-    }
-    pivots
-        .into_iter()
-        .flatten()
-        .map(|w| F2mElement::from_words(&w, n))
-        .collect()
-}
-
-/// For each actual final point R, solve the necessary linear equation
-/// v²+z*v+z²*u²+b=0 with u in span(B_x), v in span(B_x*B_x),
-/// z=x(T-R). Factor X²+uX+v and replay actual supplied point signs.
-/// All candidates of a deficient affine space are required for Refuted.
-pub fn decompose_trace_zero_linearized(
-    v: &TraceZeroVariety,
-    base: &[BinaryPoint],
-    target: &BinaryPoint,
-    limits: Limits,
-) -> TraceZeroLinearizedReport {
-    let mut out = TraceZeroLinearizedReport::default();
-    let deadline = limits.wall_budget.map(|d| Instant::now() + d);
-    if !v.contains(target) {
-        out.relation.reason = Some("invalid linearized target/base");
-        return out;
-    }
-    if limits.max_models == 0 || limits.max_patterns == 0 || limits.max_variables == 0 {
-        out.relation.reason = Some(
-            if base
-                .iter()
-                .any(|p| matches!(p, BinaryPoint::Infinity) || !v.contains(p))
-            {
-                "invalid linearized target/base"
-            } else {
-                "zero linearized budget"
-            },
-        );
-        return out;
-    }
-    if base.is_empty() {
-        out.relation.disposition = Disposition::Refuted;
-        return out;
-    }
-    let c = v.curve();
-    let compact = (c.m >= 31 && base.len() >= 64).then(|| WordField::new(c));
-    let mut by_x: BTreeMap<WordMask, Vec<usize>> = BTreeMap::new();
-    for (i, p) in base.iter().enumerate() {
-        let BinaryPoint::Affine { x: fx, y: fy } = p else {
-            out.relation.reason = Some("invalid linearized target/base");
-            return out;
-        };
-        if fx.m_value() != c.m || fy.m_value() != c.m {
-            out.relation.reason = Some("invalid linearized target/base");
-            return out;
-        }
-        let x = x_key(fx);
-        let known_sign = by_x.get(&x).is_some_and(|ids| {
-            let BinaryPoint::Affine { y: known, .. } = &base[ids[0]] else {
-                unreachable!()
-            };
-            fy == known || *fy == known.add(fx)
-        });
-        // is_in_4e performs the field-width and curve-equation checks itself.
-        // Once one ordinate is admitted, its identical/opposite lift is also
-        // admitted; every supplied sign/index is still retained below.
-        if !known_sign
-            && !compact
-                .as_ref()
-                .map_or_else(|| c.is_in_4e(p) == Some(true), |f| f.admit(p))
-        {
-            out.relation.reason = Some("invalid linearized target/base");
-            return out;
-        }
-        by_x.entry(x).or_default().push(i);
-    }
-    let xs = word_basis(by_x.keys().map(|w| [w[2], w[1], w[0]]), c.m);
-    let products: Vec<_> = xs
-        .iter()
-        .enumerate()
-        .flat_map(|(i, x)| xs[i..].iter().map(|y| words(&x.mul(y, &c.irreducible))))
-        .collect();
-    let ws = word_basis(products, c.m);
-    out.source_dimension = xs.len();
-    out.product_dimension = ws.len();
-    out.linear_columns = xs.len() + ws.len();
-    if out.linear_columns > limits.max_variables as usize {
-        out.relation.reason = Some("linear-column allocation cap");
-        return out;
-    }
-    let xs_squared: Vec<_> = xs.iter().map(|x| x.square(&c.irreducible)).collect();
-    let ws_squared: Vec<_> = ws.iter().map(|w| w.square(&c.irreducible)).collect();
-    // Small bases keep scalar admission/search costs. Larger bases amortize
-    // each inversion over at most 256 consecutive residuals, in original order.
-    // Unused tail residuals are computed and charged even for an early answer.
-    let batch_size = if base.len() >= 64 { 256 } else { 1 };
-    let mut residuals = Vec::new();
-    let mut residual_start = 0;
-    let use_projection =
-        c.m >= 31 && base.len() >= 64 && xs.len() < 63 && out.linear_columns < c.m as usize;
-    let mut projection = None;
-    let mut incomplete = false;
-    for (r, p) in base.iter().enumerate() {
-        if deadline.is_some_and(|d| Instant::now() >= d) {
-            out.relation.reason = Some("linearized total deadline");
-            return out;
-        }
-        if r == 0 || r == residual_start + residuals.len() {
-            residual_start = r;
-            // An immediate relation should not pay for 31 unused residuals.
-            residuals = if r == 0 || batch_size == 1 {
-                vec![WordPoint::from_point(&point_add(c, target, &point_neg(p)))]
-            } else if let Some(f) = &compact {
-                f.residuals(c, target, &base[r..base.len().min(r + batch_size)])
-            } else {
-                residual_batch(c, target, &base[r..base.len().min(r + batch_size)])
-                    .iter()
-                    .map(WordPoint::from_point)
-                    .collect()
-            };
-        }
-        let residual = residuals[r - residual_start];
-        out.relation.patterns_attempted += 1;
-        let mut residual_incomplete = false;
-        let found = if residual == WordPoint::Infinity {
-            base.iter().enumerate().find_map(|(i, q)| {
-                let BinaryPoint::Affine { x, .. } = q else {
-                    unreachable!()
-                };
-                let negative = point_neg(q);
-                by_x.get(&x_key(x))
-                    .and_then(|ids| ids.iter().copied().find(|&j| base[j] == negative))
-                    .map(|j| (i, j))
-            })
-        } else {
-            let WordPoint::Affine { x: zw, y: yw } = residual else {
-                unreachable!()
-            };
-            out.systems += 1;
-            let projected = if r > 0 && use_projection {
-                let p = projection.get_or_insert_with(|| {
-                    ProductProjection::new_with_field(
-                        &xs,
-                        &ws,
-                        c,
-                        compact.as_ref().expect("projected compact workspace"),
-                    )
-                });
-                out.projected_columns = xs.len() + 1;
-                out.projected_systems += 1;
-                let (answer, rows) = p.solve_compact(
-                    &xs,
-                    c,
-                    zw,
-                    yw,
-                    compact.as_ref().expect("projected compact workspace"),
-                );
-                out.projected_rows += rows;
-                Some(answer)
-            } else {
-                None
-            };
-            let mut unique_pair = None;
-            let (solution, kernel, rank) = match projected {
-                Some(ProjectedResult::Inconsistent) => {
-                    out.projected_inconsistent += 1;
-                    out.relation.patterns_refuted += 1;
-                    continue;
-                }
-                Some(ProjectedResult::Unique(u, v)) => {
-                    unique_pair = Some((u, v));
-                    (BigUint::default(), Vec::new(), out.linear_columns)
-                }
-                Some(ProjectedResult::Deficient) | None => {
-                    let z = F2mElement::from_words(&zw, c.m);
-                    let z2 = z.square(&c.irreducible);
-                    let columns: Vec<_> = xs_squared
-                        .iter()
-                        .map(|x2| z2.mul(x2, &c.irreducible))
-                        .chain(
-                            ws.iter()
-                                .zip(&ws_squared)
-                                .map(|(w, w2)| w2.add(&z.mul(w, &c.irreducible))),
-                        )
-                        .collect();
-                    let Some(answer) = linear_solutions(&columns, &c.b, c.m) else {
-                        out.relation.patterns_refuted += 1;
-                        continue;
-                    };
-                    answer
-                }
-            };
-            let z = F2mElement::from_words(&zw, c.m);
-            out.maximum_rank = out.maximum_rank.max(rank);
-            out.maximum_nullity = out.maximum_nullity.max(kernel.len());
-            let available = limits.max_models.saturating_sub(out.relation.models);
-            let total = 1usize.checked_shl(kernel.len() as u32);
-            let count = total.unwrap_or(usize::MAX).min(available);
-            if total.is_none_or(|t| count < t) {
-                incomplete = true;
-                residual_incomplete = true;
-            }
-            let mut pair = None;
-            for selector in 0..count {
-                if deadline.is_some_and(|d| Instant::now() >= d) {
-                    out.relation.reason = Some("linearized coefficient deadline");
-                    return out;
-                }
-                let mut coefficients = solution.clone();
-                for (j, k) in kernel.iter().enumerate().take(usize::BITS as usize) {
-                    if selector >> j & 1 != 0 {
-                        coefficients ^= k;
-                    }
-                }
-                let (u, product) = if let Some(pair) = &unique_pair {
-                    pair.clone()
-                } else {
-                    let mut u = F2mElement::zero(c.m);
-                    let mut product = F2mElement::zero(c.m);
-                    for (j, x) in xs.iter().enumerate() {
-                        if coefficients.bit(j as u64) {
-                            u = u.add(x);
-                        }
-                    }
-                    for (j, w) in ws.iter().enumerate() {
-                        if coefficients.bit((xs.len() + j) as u64) {
-                            product = product.add(w);
-                        }
-                    }
-                    (u, product)
-                };
-                out.relation.models += 1;
-                let roots = monic_roots(&u, &product, c.m, &c.irreducible);
-                for x in roots {
-                    let y = x.add(&u);
-                    let (Some(is), Some(js)) = (by_x.get(&x_key(&x)), by_x.get(&x_key(&y))) else {
-                        continue;
-                    };
-                    if !binary_semaev_s3(&x, &y, &z, &c.b, &c.irreducible).is_zero() {
-                        out.relation.reason = Some("linearized S3 replay failed");
-                        return out;
-                    }
-                    for &i in is {
-                        for &j in js {
-                            if point_add(c, &base[i], &base[j]) == residual.point(c.m) {
-                                pair = Some((i, j));
-                                break;
-                            }
-                        }
-                        if pair.is_some() {
-                            break;
-                        }
-                    }
-                    if pair.is_some() {
-                        break;
-                    }
-                }
-                if pair.is_some() {
-                    break;
-                }
-            }
-            pair
-        };
-        if let Some((i, j)) = found {
-            if point_add(c, &point_add(c, &base[i], &base[j]), p) != *target {
-                out.relation.reason = Some("linearized original replay failed");
-                return out;
-            }
-            out.relation.indices = Some(vec![i, j, r]);
-            out.relation.disposition = Disposition::Found;
-            return out;
-        }
-        if !residual_incomplete {
-            out.relation.patterns_refuted += 1;
-        }
-    }
-    if incomplete {
-        out.relation.reason = Some("linearized affine-model cap");
-    } else {
-        out.relation.disposition = Disposition::Refuted;
-    }
-    out
 }

@@ -3,7 +3,7 @@
 //! private fields while writers receive no mutation capability or owned clone.
 use super::{OwnedAttempt,LiftRecord,Failure,Stop,equations,continuation,exclusions,capture};
 #[path="borrowed_page.rs"] mod paging;
-pub(in crate::ml_dataset::solvers) use paging::{Page,Error as PageError,page as page_retained};
+pub(in crate::ml_dataset::solvers) use paging::{Page,Error as PageError};
 /// Exact original hashes retained by admission. These are not synthesized from
 /// labels, nor a replacement for the CaptureEmitter's full AttemptBinding.
 pub(in crate::ml_dataset::solvers) struct SourceIdentity<'a>{

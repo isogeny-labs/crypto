@@ -1817,8 +1817,8 @@ fn verify_row_math(f:&mut Frame,config:&CaseConfig,original_binding:[u8;32],laun
     let map=f.map.take().unwrap();
     let raw=std::mem::take(&mut stored.wire).into_bytes();
     r.arithmetic=Some(row_matrix::replay_from_checked_map(map,r.limits.expansion,r.limits.audit,raw,
-        stored.metadata.encoding.clone(),r.limits.checker,f.budget.policy.deadline,&mut f.budget));
-    if stored.metadata.encoding.generators as u64 != m.generators{return Err("affine row generator count mismatch".into())}
+        stored.metadata.encoding,r.limits.checker,f.budget.policy.deadline,&mut f.budget));
+    if stored.metadata.encoding.generators != m.generators{return Err("affine row generator count mismatch".into())}
     if r.arithmetic.as_ref().unwrap().failure().is_some(){return Err("row source-bound arithmetic refused".into())}
     Ok(())
 }

@@ -44,32 +44,6 @@ impl Certificate<'_,'_>{
  pub fn audit(&self)->Option<&bqi::Audit>{self.audit.as_ref()}
  pub fn owner_failure(&self)->Option<Error>{self.owner_failure}
 }
-#[cfg(test)]
-mod integration_tests {
- use super::*;
- use crate::binary_ecc::{F2mElement,IrreduciblePoly};
- use num_bigint::BigUint;
- use super::super::super::{build_original,Original,Limits as MapLimits};
- struct Ledger{work:u64,bytes:u64,deadline:Instant}
- impl Admission for Ledger{
-  fn reserve(&mut self,q:Quote)->Result<(),Error>{self.check()?;let w=self.work.checked_add(q.work).ok_or(Error::Admission)?;let b=self.bytes.checked_add(q.bytes).ok_or(Error::Admission)?;if w>2_000_000_000||b>256_000_000{return Err(Error::Admission)}self.work=w;self.bytes=b;Ok(())}
-  fn check(&mut self)->Result<(),Error>{if Instant::now()>=self.deadline{Err(Error::Admission)}else{Ok(())}}
- }
- #[test]
- fn genuine_checked_map_matrix_certificate_both_twists_requires_nontrivial_row(){
-  for twist in [false,true]{
-   let irr=IrreduciblePoly{degree:2,low_terms:vec![0,1]};let a=F2mElement::one(2);let b=F2mElement::from_bit_positions(&[1],2);let target=F2mElement::one(2);let codes=vec![BigUint::from(0u8),BigUint::from(1u8),BigUint::from(3u8)];
-   let original=Original{binding:[19;32],a:&a,b:&b,irr:&irr,twist,m:4,target:Some(&target),pattern:0,codes:&codes};
-   let deadline=Instant::now()+std::time::Duration::from_secs(30);let mut owner=Ledger{work:0,bytes:0,deadline};
-   let map=build_original(&original,MapLimits{variables:10000,codes:16,domain_clauses:10000,work:32_000_000,bytes:16_000_000},&mut owner).unwrap();
-   let source=super::super::expand(&map,sparse::Limits{variables:10000,generators:10000,terms:64,degree:64,work:32_000_000,bytes:16_000_000},&mut owner);assert!(source.status().is_ok());
-   let window=vec![vec![]];let limits=Limits{variables:10000,generators:10000,window:1,candidates:10000,basis:10000,terms:1024,degree:64,proof:10000,wire:4_000_000,work:100_000_000,bytes:64_000_000};
-   let before=owner.work;let rows=reduce(source,&window,limits,&mut owner);assert!(owner.work>before);assert_eq!(rows.failure(),None);
-   let target=rows.attempt.as_ref().unwrap().basis.iter().position(|row|row.proof.len()>1&&!row.polynomial.is_empty()).expect("real map must yield nontrivial reduced row");
-   let result=certify(rows,target,limits,CheckerLimits::software(),deadline,&mut owner);assert_eq!(result.failure(),None);assert!(result.audit().unwrap().result.is_ok());assert!(std::ptr::eq(result.rows().source().source(),&map));
-  }
- }
-}
 
 /// Static window avoids a borrowed local buffer or a second copied window owner.
 /// The source itself is moved, never rebound from a digest or raw polynomial list.
@@ -149,4 +123,30 @@ impl OwnedReplay {
     pub fn audit(&self)->Option<&Audit>{self.audit.as_ref()}
     pub fn failure(&self)->Option<Failure>{self.failure}
     pub fn owner_failure(&self)->Option<Error>{self.owner_failure}
+}
+#[cfg(test)]
+mod integration_tests {
+ use super::*;
+ use crate::binary_ecc::{F2mElement,IrreduciblePoly};
+ use num_bigint::BigUint;
+ use super::super::super::{build_original,Original,Limits as MapLimits};
+ struct Ledger{work:u64,bytes:u64,deadline:Instant}
+ impl Admission for Ledger{
+  fn reserve(&mut self,q:Quote)->Result<(),Error>{self.check()?;let w=self.work.checked_add(q.work).ok_or(Error::Admission)?;let b=self.bytes.checked_add(q.bytes).ok_or(Error::Admission)?;if w>2_000_000_000||b>256_000_000{return Err(Error::Admission)}self.work=w;self.bytes=b;Ok(())}
+  fn check(&mut self)->Result<(),Error>{if Instant::now()>=self.deadline{Err(Error::Admission)}else{Ok(())}}
+ }
+ #[test]
+ fn genuine_checked_map_matrix_certificate_both_twists_requires_nontrivial_row(){
+  for twist in [false,true]{
+   let irr=IrreduciblePoly{degree:2,low_terms:vec![0,1]};let a=F2mElement::one(2);let b=F2mElement::from_bit_positions(&[1],2);let target=F2mElement::one(2);let codes=vec![BigUint::from(0u8),BigUint::from(1u8),BigUint::from(3u8)];
+   let original=Original{binding:[19;32],a:&a,b:&b,irr:&irr,twist,m:4,target:Some(&target),pattern:0,codes:&codes};
+   let deadline=Instant::now()+std::time::Duration::from_secs(30);let mut owner=Ledger{work:0,bytes:0,deadline};
+   let map=build_original(&original,MapLimits{variables:10000,codes:16,domain_clauses:10000,work:32_000_000,bytes:16_000_000},&mut owner).unwrap();
+   let source=super::super::expand(&map,sparse::Limits{variables:10000,generators:10000,terms:64,degree:64,work:32_000_000,bytes:16_000_000},&mut owner);assert!(source.status().is_ok());
+   let window=vec![vec![]];let limits=Limits{variables:10000,generators:10000,window:1,candidates:10000,basis:10000,terms:1024,degree:64,proof:10000,wire:4_000_000,work:100_000_000,bytes:64_000_000};
+   let before=owner.work;let rows=reduce(source,&window,limits,&mut owner);assert!(owner.work>before);assert_eq!(rows.failure(),None);
+   let target=rows.attempt.as_ref().unwrap().basis.iter().position(|row|row.proof.len()>1&&!row.polynomial.is_empty()).expect("real map must yield nontrivial reduced row");
+   let result=certify(rows,target,limits,CheckerLimits::software(),deadline,&mut owner);assert_eq!(result.failure(),None);assert!(result.audit().unwrap().result.is_ok());assert!(std::ptr::eq(result.rows().source().source(),&map));
+  }
+ }
 }

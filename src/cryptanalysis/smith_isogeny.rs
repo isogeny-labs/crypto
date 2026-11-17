@@ -93,7 +93,7 @@ fn largest_prime_factor(mut n: u128) -> u128 {
     let mut best = 1;
     let mut d = 2u128;
     while d * d <= n {
-        while n % d == 0 {
+        while n.is_multiple_of(d) {
             best = d;
             n /= d;
         }

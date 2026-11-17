@@ -126,7 +126,7 @@ fn exact_index_endpoint(
             }
 }
 
-fn root<'a>(artifacts: &'a [Artifact], slot: Slot) -> Result<Option<&'a Artifact>, String> {
+fn root(artifacts: &[Artifact], slot: Slot) -> Result<Option<&Artifact>, String> {
     let (path, role, _encoding) = slot.identity();
     let selected: Vec<_> = artifacts
         .iter()
@@ -1080,8 +1080,8 @@ fn check_matrix_events(
         let ordered = match next {
             1 => phase == 0,
             2 => matches!(phase, 1 | 2),
-            3 => matches!(phase, 1 | 2 | 3),
-            4 => matches!(phase, 1 | 2 | 3),
+            3 => matches!(phase, 1..=3),
+            4 => matches!(phase, 1..=3),
             5..=7 => phase + 1 == next,
             _ => false,
         };

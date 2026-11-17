@@ -1,5 +1,5 @@
 //! Exact ordered retained evidence encoding; encoding completeness is not solver completeness.
-use super::{OwnedAttempt,Budget,capture,equations,continuation,exclusions,scheduler,check,bridge,bqi,checked_model,LiftRecord,Failure as OwnerFailure,Stop,capture_projection};
+use super::{OwnedAttempt,Budget,capture,equations,continuation,exclusions,scheduler,check,bridge,checked_model,LiftRecord,Failure as OwnerFailure,Stop,capture_projection};
 use std::time::Instant;
 #[path="capture_wire.rs"] mod wire;
 pub(in crate::ml_dataset::solvers) use wire::{AdmissionSink,Limits,Failure,Attempt};

@@ -21,7 +21,6 @@ mod sparse {
 #[path="retained_exclusion_verifier.rs"] pub(in crate::ml_dataset::solvers) mod exclusions;
 pub(in crate::ml_dataset::solvers) use continuation::Limits as ContinuationLimits;
 pub(in crate::ml_dataset::solvers) use scheduler::search::SearchLimits;
-pub(in crate::ml_dataset::solvers) use check::Limits as AuditLimits;
 // Charge incremental algorithm quotes against the ORIGINAL cumulative phase
 // counter. observe also enforces global headroom and the phase's absolute clock.
 // This is reservation accounting, not a retired-instruction measurement.
@@ -267,7 +266,7 @@ impl OwnedAttempt{
         let result=replay.result;self.exclusion_audit=Some(replay);
         if let Err(e)=result{
             let stop=if e==exclusions::Failure::Deadline{Stop::Deadline}else{Stop::NativeFailure};
-            self.fail(Failure::Exclusions(e),stop);return
+            self.fail(Failure::Exclusions(e),stop);
         }
         // Stay Matrix. This proves only this source model partition's exhaustion;
         // exceptional-pattern completeness and public negative transport are separate.

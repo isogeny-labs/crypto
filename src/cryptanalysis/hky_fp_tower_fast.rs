@@ -636,7 +636,7 @@ fn sigma_key(k: Key, perm: &[usize]) -> Key {
 pub fn check_symmetry(ring: &HkyRing, perm: &[usize], gens: &[NfPoly]) -> Result<Vec<i8>, String> {
     let nt = ring.n_tower();
     let p = ring.p;
-    if p % 2 == 0 {
+    if p.is_multiple_of(2) {
         return Err("p = 2".into());
     }
     if perm.len() != nt {

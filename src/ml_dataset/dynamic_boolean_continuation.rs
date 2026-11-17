@@ -113,7 +113,7 @@ fn next<T:Owner>(n:u32,g:&[Polynomial],a:&mut Attempt,m:&mut Meter<T>,mut checkp
    search::solve_with_checkpoint(n,&a.partitions[id].equations,bridge.meter.limits.search,bridge.meter.deadline,&mut bridge,control,&mut |search,node,native,search_charge,owner|{
     owner.meter.pay(0,0).map_err(|_|())?;
     let result=hook(a,id,search,node,native,owner.meter.charge,search_charge,&mut *owner.meter.owner);
-    if result.is_err(){return result}owner.meter.pay(0,0).map_err(|_|())
+    result?;owner.meter.pay(0,0).map_err(|_|())
    })
   }else{search::solve(n,&a.partitions[id].equations,bridge.meter.limits.search,bridge.meter.deadline,&mut bridge)};
   let failed=bridge.failure;let result=s.result;let p=&mut a.partitions[id];p.search=Some(s);

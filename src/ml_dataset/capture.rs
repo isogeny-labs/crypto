@@ -2271,7 +2271,7 @@ fn verify_live_committed_prefix_owned_inner(
                     && verified.sha256 == payload.sha256
                     && verified.bytes == payload.bytes =>
             {
-                ()
+                
             }
             _ => return Err("missing or mismatched bounded payload proof".into()),
         }
@@ -2600,6 +2600,27 @@ pub fn verify_captured_delta(
         return Err("captured delta artifact set/cursor/head mismatch".into());
     }
     Ok(())
+}
+
+#[cfg(test)]
+pub(super) fn native_single_pass_reference_wire<T: serde::Serialize + ?Sized>(
+    sequence: u64,
+    payload: &T,
+) -> Vec<u8> {
+    let digest = "f".repeat(64);
+    let record = TypedEventRecord {
+        schema: EVENT_SCHEMA,
+        binding_sha256: &digest,
+        sequence,
+        previous_event_sha256: &digest,
+        event: TypedSolverEvent {
+            kind: TypedEventKind::KoblitzM3Native,
+            payload,
+        },
+    };
+    let mut bytes = serde_json::to_vec(&record).unwrap();
+    bytes.push(b'\n');
+    bytes
 }
 
 #[cfg(test)]
@@ -4376,25 +4397,4 @@ mod tests {
         assert!(!g.live().join("payloads/pdp-witness.json").exists());
         assert_eq!(emitter.head.payload_count, 0);
     }
-}
-
-#[cfg(test)]
-pub(super) fn native_single_pass_reference_wire<T: serde::Serialize + ?Sized>(
-    sequence: u64,
-    payload: &T,
-) -> Vec<u8> {
-    let digest = "f".repeat(64);
-    let record = TypedEventRecord {
-        schema: EVENT_SCHEMA,
-        binding_sha256: &digest,
-        sequence,
-        previous_event_sha256: &digest,
-        event: TypedSolverEvent {
-            kind: TypedEventKind::KoblitzM3Native,
-            payload,
-        },
-    };
-    let mut bytes = serde_json::to_vec(&record).unwrap();
-    bytes.push(b'\n');
-    bytes
 }

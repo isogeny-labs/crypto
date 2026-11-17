@@ -1881,7 +1881,7 @@ impl Solver {
     /// no special-casing.
     fn propagate(&mut self) -> Option<Conflict> {
         loop {
-            if (self.event_failure.is_some() || self.native_failure.is_some()) {
+            if self.event_failure.is_some() || self.native_failure.is_some() {
                 return None;
             }
             self.progress_phase(SolverProgressPhase::ClausePropagation);
@@ -1889,7 +1889,7 @@ impl Solver {
             let cnf = self.propagate_clauses();
             self.stats.ns_propagate_clauses += t.elapsed().as_nanos() as u64;
             self.progress_phase(SolverProgressPhase::Idle);
-            if (self.event_failure.is_some() || self.native_failure.is_some()) {
+            if self.event_failure.is_some() || self.native_failure.is_some() {
                 return None;
             }
             if let Some(c) = cnf {
@@ -2916,7 +2916,7 @@ impl Solver {
             let (mut i, mut j) = (0usize, 0usize);
 
             while i < ws.len() {
-                if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                if self.event_failure.is_some() || self.native_failure.is_some() {
                     break;
                 }
                 if !self.native_charge(NativeOperation::Watcher, 32) {
@@ -3968,7 +3968,7 @@ impl Solver {
             self.trail_lim.is_empty(),
             "root propagation requires decision level zero"
         );
-        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+        if self.event_failure.is_some() || self.native_failure.is_some() {
             return RootPropagationResult::Unknown;
         }
         let conflict = if self.is_unsat {
@@ -3989,7 +3989,7 @@ impl Solver {
                 });
             }
         }
-        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+        if self.event_failure.is_some() || self.native_failure.is_some() {
             return RootPropagationResult::Unknown;
         }
         if !self.native_charge(NativeOperation::Entry, 0) {
@@ -4412,7 +4412,7 @@ impl Solver {
             }
             return SolveResult::Unsat;
         }
-        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+        if self.event_failure.is_some() || self.native_failure.is_some() {
             return SolveResult::Unknown;
         }
         if self.max_learnts == 0 {
@@ -4441,7 +4441,7 @@ impl Solver {
             if !self.native_charge(NativeOperation::Loop, 64) {
                 return SolveResult::Unknown;
             }
-            if (self.event_failure.is_some() || self.native_failure.is_some()) {
+            if self.event_failure.is_some() || self.native_failure.is_some() {
                 return SolveResult::Unknown;
             }
             if self
@@ -4466,7 +4466,7 @@ impl Solver {
                         literals,
                     });
                 }
-                if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                if self.event_failure.is_some() || self.native_failure.is_some() {
                     return SolveResult::Unknown;
                 }
                 self.conflicts += 1;
@@ -4477,7 +4477,7 @@ impl Solver {
                         .store(self.stats.conflicts, Ordering::Relaxed);
                 }
                 if trace.is_some()
-                    && (self.stats.conflicts == 1 || self.stats.conflicts % 1000 == 0)
+                    && (self.stats.conflicts == 1 || self.stats.conflicts.is_multiple_of(1000))
                 {
                     self.trace_solve_phase(trace, "conflict_snapshot", None);
                 }
@@ -4517,7 +4517,7 @@ impl Solver {
                         backjump_level: bj_level,
                     });
                 }
-                if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                if self.event_failure.is_some() || self.native_failure.is_some() {
                     self.native_pending_clause = Some(learnt);
                     return SolveResult::Unknown;
                 }
@@ -4642,7 +4642,7 @@ impl Solver {
                     self.progress_phase(SolverProgressPhase::Idle);
                 }
             } else {
-                if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                if self.event_failure.is_some() || self.native_failure.is_some() {
                     return SolveResult::Unknown;
                 }
                 // Through the `n_vars`-long assignment, so a trigger past the
@@ -4798,7 +4798,7 @@ impl Solver {
                                 priority: self.branch_priority[v as usize],
                             });
                         }
-                        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                        if self.event_failure.is_some() || self.native_failure.is_some() {
                             return SolveResult::Unknown;
                         }
                         self.assign(lit, Reason::Decision);

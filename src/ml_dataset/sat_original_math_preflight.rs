@@ -147,7 +147,7 @@ pub(super) fn plan(
     let k = public["symmetry"]["frobenius_power"]
         .as_u64()
         .ok_or(Error::Shape)?;
-    if k == 0 || k > n || n % k != 0 {
+    if k == 0 || k > n || !n.is_multiple_of(k) {
         return Err(Error::Shape);
     }
     let groups = array(&public["curve"]["group_order_factorization"])?;

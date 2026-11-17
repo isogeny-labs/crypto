@@ -86,7 +86,7 @@ pub(super) fn checkpoint_parts(source:&encoding::EncodingSource<'_>,budget:&mut 
    let work=budget.native_work_limit.checked_sub(budget.native.work).and_then(|v|v.checked_sub(budget.checking_work)).ok_or(Stop::Overflow)?;
    let chunk_bytes=usize::try_from(limits.chunk_bytes.min(limits.max_payload_bytes).min(16384)).map_err(|_|Stop::Overflow)?;
    let cap=encoding::Limits{chunk_bytes,total_bytes:limits.max_payload_bytes,chunks:limits.max_payload_count,work};
-   let mut bridge=Bridge{budget,sink,limits:&limits,pattern,snapshot,expected:&expected};
+   let mut bridge=Bridge{budget,sink,limits:limits,pattern,snapshot,expected:&expected};
    let encoded=encoding::encode(source,index,cap,&mut bridge);
    let complete=encoded.complete&&encoded.result.is_ok();
    let encoding_stop=match encoded.result{Ok(())=>Stop::Serialization,Err(encoding::Failure::Deadline)=>Stop::Deadline,Err(encoding::Failure::Overflow)=>Stop::Overflow,Err(encoding::Failure::Allocation)=>Stop::Allocation,Err(encoding::Failure::Format)=>Stop::Serialization,Err(_)=>Stop::NativeFailure};
