@@ -689,3 +689,31 @@ Freeze/push/run boundedcomparison, classify vectorcost and failures, then choose
 
 ### Errors
 Unused copied imports removed; retained diagnostic reports alloweddeadcode. No scientific retries.
+
+## Strong C4 solves completed with exact controls
+
+### What was done
+At4ed203d724bonce-onlyrunexits0;72calls/12freshworkloads/all3armscomplete,expectedscalarandgroupchecks pass,repeatvectors exact,folded/expandedfirstprefix identical. Rustsummarizerchecksall144recordsandreductionidentity. BatchedpencilbaseREDCgain2.262–4.871;subgroup8.535–31.244. Local observations only. [pcc:unverified]
+
+### Decisions made
+Classifyclassicalengineering/controlresult,not10xtotal/newmath. Noarbitraryp/ellweighting. Group-ordercertificationoutsidepublicmetadata contract; allcountedalgorithmsetupchargedafresh. Bothwalksidenticalpcounts, so nextmechanismmustaddressrelationworkratherthanfurtherorbitalelimination alone.
+
+### Open threads
+Attributepfieldcostbyexclusivephase; novelty-screen a generator that canreducecurrentchargedpencilcost ratherthanmerelybeatoldwalk. Broadergenus2+mathematical10xgoalactive. Sharednativegroup/extensioncountlimitationsretained.
+
+### Errors
+No runtimefailure/censoring/retry. Allboundsunchanged; output hashes retained. PR4518needs updatedscope andpush.
+
+## Solve outputs moved to successor PR4523
+
+### What was done
+Remote state showsPR4518mergedexternallyat3e3440abfb7withhead4ed203d724b, before resultscommit9ca2c636668. Createdsuccessorbranchresearch/hec-c4-solve-results-20261116andreadyPR4523withretainedoutputs. No program rerun.
+
+### Decisions made
+Preserveoriginalexecutionhashandallrawrecords. NewPRcontainsresultsonlyaftermergedproducerfreeze. No mergeperformedbythissession.
+
+### Open threads
+Exclusivepfieldphaseattributionandnewrelation-generationmechanismsremainthenextscientificwork. Broadgoalactive; complete-cost10xunestablished.
+
+### Errors
+ExternalmergeracedPRupdate: gh edit targeted4518justbeforeitsmergedstatewasobserved. CorrectedbysuccessorPR; no code/result loss.
