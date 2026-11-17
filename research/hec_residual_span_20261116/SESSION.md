@@ -1539,3 +1539,10 @@ What was done:readoriginalWiedemannsectionsII/III; implemented3attemptdiagonally
 Decisions made: boundedfailureisunknown,neverinconsistency; no matrix/referenceanswerfinderinput,no seedretuning; allcallback/rejectioncountsretained,no10xclaim.
 Open threads: executeonceandretainallsolverfailures; cost/integrationremain.
 Errors: none, nosciencebeforepushedfreeze.
+
+## Callback-only Krylov witness qualified
+
+What was done:5ff034f1672single invocation exits0;all18retainedpanels verifiedfirstattempt,witness/target/originaloperatorcheckspass. Stdoutbyteidenticalpreviousoperatorgate. 5synthetics:2impossible referencecasesunknownafter3attempts,3solvableincludingrankdeficient/isotropic verifiedfirstattempt. ActualS/STcalls7-205each; nofullmatrixfinderinput.
+Decisions made: efficientstorage/correctnessbackendonly,callbackcountsnotfield/CPUgain; unknownnotinfeasibility. Comparewithincrementalsparseatmatchedprefixbeforeperformanceclaim,scaledproducer/CRTstillrequired.
+Open threads: matchedsolvercostandproductionintegration; originalgenus2+10xgoalopen.
+Errors: none,no scientificretry/S3/cloud.
