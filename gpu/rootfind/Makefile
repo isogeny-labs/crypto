@@ -49,7 +49,7 @@ RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
-.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 ptxas-info clean
+.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core ptxas-info clean
 
 all: test
 
@@ -71,6 +71,13 @@ bench_host_inv256: bench_host_inv256.cpp fp256x64.cuh fp64.cuh
 
 bench-host-inv256: bench_host_inv256
 	./bench_host_inv256
+
+# Compare frozen pre-optimization inversion cores against the current loops.
+bench_batch_core: bench_batch_core.cpp fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_batch_core.cpp
+
+bench-batch-core: bench_batch_core
+	./bench_batch_core
 
 # --- emulation-only static library (no CUDA toolchain required) -------
 rootfind_api_emul.o: rootfind_api.cpp $(HDRS)
@@ -112,4 +119,4 @@ ptxas-info: rootfind_cuda.cu $(HDRS)
 	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -Xptxas -v -c -o /dev/null rootfind_cuda.cu
 
 clean:
-	rm -f test_cpu bench bench_host_inv bench_host_inv256 rootfind_serve rootfind_serve_cuda *.o *.a
+	rm -f test_cpu bench bench_host_inv bench_host_inv256 bench_batch_core rootfind_serve rootfind_serve_cuda *.o *.a
