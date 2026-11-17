@@ -414,6 +414,34 @@ fn rr9_from_signed_chart(
     Ok([u[0], u[1], v[0], u[2], v[1], u[3], v[2], u[4], v[3]])
 }
 
+/// Direct monic degree-eight residual x-factor on the signed R chart:
+/// M = (X²+rX+r²+a)V² - (X-r)A² - 2s A V, where R=(r,s) and V3=1.
+/// No full norm, synthetic division, factor-base candidates, or EC additions.
+fn rr9_signed_chart_monic_factor(
+    a: &[u64; 4], v: &[u64; 4], residual: Point,
+) -> Result<[u64; 9], String> {
+    let (r, s) = residual.ok_or("R=O needs an infinity chart")?;
+    if r >= P || s >= P || a.iter().chain(v.iter()).any(|&x| x >= P) || v[3] != 1 {
+        return Err("invalid chart coefficient or nonnormalized V3".into());
+    }
+    let rhs = fp_add(fp_add(fp_mul(fp_mul(r, r), r), fp_mul(PRIME31.a, r)), PRIME31.b);
+    if fp_mul(s, s) != rhs { return Err("signed chart residual off curve".into()); }
+    let d = [fp_add(fp_mul(r, r), PRIME31.a), r, 1u64];
+    let d_vv = rr9_poly_mul(&d, &rr9_poly_mul(v, v));
+    let xm_r_aa = rr9_poly_mul(&[fp_sub(0, r), 1u64], &rr9_poly_mul(a, a));
+    let av = rr9_poly_mul(a, v);
+    assert_eq!((d_vv.len(), xm_r_aa.len(), av.len()), (9, 8, 7));
+    let two_s = fp_mul(2, s);
+    let factor = std::array::from_fn(|i| {
+        let mut z = d_vv[i];
+        if i < xm_r_aa.len() { z = fp_sub(z, xm_r_aa[i]); }
+        if i < av.len() { z = fp_sub(z, fp_mul(two_s, av[i])); }
+        z
+    });
+    if factor[8] != 1 { return Err("chart factor not monic of degree eight".into()); }
+    Ok(factor)
+}
+
 /// Recover unique normalized A,V from a *supplied* F with F(-R)=0 and V3 !=0.
 /// It does not discover F or an unknown DLP. Invalid signed input returns None.
 fn rr9_to_signed_chart(
@@ -542,12 +570,32 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         ).expect("nine coefficient witness values");
         assert!(rr9_public_norm_support(&coeff, r, &h)
             .expect("public coefficient-only positive support test"));
-        assert!(rr9_to_signed_chart(&coeff, r)
-            .expect("signed target chart") .is_some());
+        let (chart_a, chart_v) = rr9_to_signed_chart(&coeff, r)
+            .expect("signed target chart").expect("true norm has V3!=0");
+        let chart_factor = rr9_signed_chart_monic_factor(&chart_a, &chart_v, r)
+            .expect("direct signed monic eight-factor");
+        assert!(rr9_poly_pow_mod(&h, 8, &chart_factor)
+            .expect("direct M divides public H^8").iter().all(|&z| z == 0));
+        let chart_coeff = rr9_from_signed_chart(&chart_a, &chart_v, r).unwrap();
+        let normalized_norm = rr9_norm(&chart_coeff);
+        let mut quotient = [0u64; 9];
+        quotient[8] = normalized_norm[9];
+        for i in (0..8).rev() {
+            quotient[i] = fp_add(normalized_norm[i+1], fp_mul(r.unwrap().0, quotient[i+1]));
+        }
+        assert_eq!(fp_add(normalized_norm[0], fp_mul(r.unwrap().0, quotient[0])), 0);
+        let inv_lead = fp_pow(quotient[8], P-2);
+        for z in &mut quotient { *z = fp_mul(*z, inv_lead); }
+        assert_eq!(quotient, chart_factor, "direct chart factor differs from full x-norm quotient");
         let changed_coeff = rr9_preserve_target_mutation(&coeff, r)
             .expect("negative control preserves signed F(-R)=0");
-        assert!(rr9_to_signed_chart(&changed_coeff, r)
-            .expect("altered F remains on target chart").is_some());
+        let (mut_a, mut_v) = rr9_to_signed_chart(&changed_coeff, r)
+            .expect("altered F remains on target chart").expect("mutation V3!=0");
+        let altered_factor = rr9_signed_chart_monic_factor(&mut_a, &mut_v, r)
+            .expect("target-preserving mutation monic factor");
+        assert_ne!(altered_factor, chart_factor, "altered F has unchanged norm factor");
+        assert!(rr9_poly_pow_mod(&h, 8, &altered_factor)
+            .unwrap().iter().any(|&z| z != 0));
         assert!(!rr9_public_norm_support(&changed_coeff, r, &h)
             .expect("same-target altered F support test"),
             "altered F unexpectedly has eight factor-base x roots");
@@ -622,12 +670,31 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
         ).expect("confluent RR9 coefficients");
         assert!(rr9_public_norm_support(&coeff, true_r, &h)
             .expect("public support with repeated signed leaves"));
-        assert!(rr9_to_signed_chart(&coeff, true_r)
-            .expect("confluent signed target chart").is_some());
+        let (chart_a, chart_v) = rr9_to_signed_chart(&coeff, true_r)
+            .expect("confluent signed target chart").expect("nonzero residual chart");
+        let chart_factor = rr9_signed_chart_monic_factor(&chart_a, &chart_v, true_r)
+            .expect("direct repeated-point chart factor");
+        assert!(rr9_poly_pow_mod(&h, 8, &chart_factor)
+            .unwrap().iter().all(|&z| z == 0));
+        let norm = rr9_norm(&rr9_from_signed_chart(&chart_a, &chart_v, true_r).unwrap());
+        let rx = true_r.unwrap().0;
+        let mut quotient = [0u64; 9];
+        quotient[8] = norm[9];
+        for i in (0..8).rev() {
+            quotient[i] = fp_add(norm[i+1], fp_mul(rx, quotient[i+1]));
+        }
+        assert_eq!(fp_add(norm[0], fp_mul(rx, quotient[0])), 0);
+        let inv_lead = fp_pow(quotient[8], P-2);
+        for z in &mut quotient { *z = fp_mul(*z, inv_lead); }
+        assert_eq!(quotient, chart_factor);
         let changed_coeff = rr9_preserve_target_mutation(&coeff, true_r)
             .expect("target-preserving repeated mutation");
-        assert!(rr9_to_signed_chart(&changed_coeff, true_r)
-            .expect("confluent changed chart").is_some());
+        let (mut_a, mut_v) = rr9_to_signed_chart(&changed_coeff, true_r)
+            .expect("confluent changed chart").expect("changed V3!=0");
+        let altered_factor = rr9_signed_chart_monic_factor(&mut_a, &mut_v, true_r)
+            .expect("confluent changed monic factor");
+        assert_ne!(altered_factor, chart_factor);
+        assert!(rr9_poly_pow_mod(&h, 8, &altered_factor).unwrap().iter().any(|&z| z != 0));
         assert!(!rr9_public_norm_support(&changed_coeff, true_r, &h)
             .expect("altered repeated support check"));
         higher_controls.push(json!({
@@ -740,6 +807,10 @@ mod tests {
         assert!(rr9_public_norm_support(&zero, None, &h).is_err());
         assert!(rr9_to_signed_chart(&zero, None).is_err());
         assert!(rr9_to_signed_chart(&zero, Some(PRIME31.g)).unwrap().is_none());
+        let aa = [0u64; 4];
+        let invalid_v = [0u64; 4];
+        assert!(rr9_signed_chart_monic_factor(&aa, &invalid_v, Some(PRIME31.g)).is_err());
+        assert!(rr9_signed_chart_monic_factor(&aa, &[0,0,0,1], None).is_err());
         let mut bad = zero;
         bad[0] = P;
         assert!(rr9_public_norm_support(&bad, Some(PRIME31.g), &h).is_err());
