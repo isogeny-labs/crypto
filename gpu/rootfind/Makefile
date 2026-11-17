@@ -2,6 +2,7 @@
 #
 #   make test            CPU verification of the shared headers (no GPU, no nvcc)
 #   make bench-host-inv  public-input host Fp64 inversion + batch benchmark
+#   make bench-host-inv256  P-256 sparse-exponent host inverse + batch benchmark
 #   make lib             librootfind_oracle.a, emulation backend only
 #                        (what gpu/rootfind/rs/build.rs builds for the gpu-rootfind cargo crate)
 #   make lib-cuda        librootfind_cuda.a, emulation + CUDA backend (needs nvcc)
@@ -48,7 +49,7 @@ RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
-.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv ptxas-info clean
+.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 ptxas-info clean
 
 all: test
 
@@ -64,6 +65,12 @@ bench_host_inv: bench_host_inv.cpp fp64.cuh
 
 bench-host-inv: bench_host_inv
 	./bench_host_inv
+
+bench_host_inv256: bench_host_inv256.cpp fp256x64.cuh fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_host_inv256.cpp
+
+bench-host-inv256: bench_host_inv256
+	./bench_host_inv256
 
 # --- emulation-only static library (no CUDA toolchain required) -------
 rootfind_api_emul.o: rootfind_api.cpp $(HDRS)
@@ -105,4 +112,4 @@ ptxas-info: rootfind_cuda.cu $(HDRS)
 	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -Xptxas -v -c -o /dev/null rootfind_cuda.cu
 
 clean:
-	rm -f test_cpu bench bench_host_inv rootfind_serve rootfind_serve_cuda *.o *.a
+	rm -f test_cpu bench bench_host_inv bench_host_inv256 rootfind_serve rootfind_serve_cuda *.o *.a
