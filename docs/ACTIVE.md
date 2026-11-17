@@ -15,9 +15,9 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Unbreak main's library check: drop the duplicate f4_fp fall-degree shim and update tests/rust_extension_security.rs for ExactScalar (claude, started 2026-11-17, branch claude/unbreak-main-f4-exactscalar-20261117)
+- [ ] Unbreak main's library check: drop the duplicate f4_fp fall-degree shim and update tests/rust_extension_security.rs for ExactScalar (claude, started 2026-11-17, branch claude/unbreak-main-f4-exactscalar-20261117, PR #4620)
 
-- [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
+- [x] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117, PR #4584; superseded by #4593 — fair-CZ gain is quadratic 5–20×, quartic 1.3–1.9×; the PR's 13–113× was against an unfair CZ)
 
 - [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
 
