@@ -2387,3 +2387,10 @@ What was done: copiedexistingFLINT/MPFR/GMP intotaskspecificruntime, patchedonly
 Decisions made: systemHomebrewlinks untouched; allpriornumericalgates unchanged,oneconsumer/descriptoreach120CPUafternewGitfreeze; originalloaderfailuresretained.
 Open threads: numericalevaluation/sourcecontrols/quotienttheta, thenboundedreconstruction/reduction, nofinitefield/10xclaimyet.
 Errors: loaderincompatibilityremedy structuralnotunchangedretry; install_name_toolsignaturewarnings resolvedbyad-hocsigningprivatecopies. NoS3/cloud/merge.
+
+## Numericalv2 unexecutedpreparation corrected forloadcommandspace
+
+What was done: initialprivate-librarypatchingpassedbutexecutablepatchfailedinsufficientMachOheaderpadding; prior1e871f8be5e NEVEREXECUTED. RelinkidenticalCsourcewithheaderpad_max_install_names, pin/signprivatebinary, RUNTIMEreceiptconfirmsalldependenciesprivateandnoglobaloptpaths.
+Decisions made: prospectivelyupdatedbinary/protocol/inputhashesbeforeANYv2execution; no sciencecodechange. Priorentry'sruntimepreparationclaimwasprematureandissupersededbythiscompletedreceipt.
+Open threads: pushupdatedfreeze then3consumerinvocations; fullgoalunchanged.
+Errors: install_name_toolheaderpaddingbuildissue, correctedbeforeexecution; no scientificretry/S3/cloud/merge.
