@@ -2611,3 +2611,10 @@ What was done: inspected tracked initial PLAN/S2results/instance source via gits
 Decisions made: recent 'original' terminology refers only to later frozen binomial panels, not initialnative mixed-term models; explicit correction required in PR. Do not extend special-family shortverification/quotient/phase claims to native11without admitted transport. One deterministic applicability invocation after Gitfreeze, no benchmark rerun.
 Open threads: execute audit and publish prominent scope map; next fullscope construction must address original families or explicitly delimit special-class result without claiming fullgoal.
 Errors: initial files absent from sparse checkout; authoritative tracked blobs read with gitshow, no checkout expansion needed. Compile passes, no S3/cloud/merge.
+
+## Initial family applicability audit passes and scope terminology corrected
+
+What was done: freeze57ba63dd5bd hashes passed; all11initialnative equations/subgroup identities(55seeds) audited. Native nonidentity xscalings0/11; sameg/p/cbinomial controls distinct, primitive rotation availablein4controlfields. Exactcoeff witnesses and originalbenchmarkblob retained. Initialg2p101c2ell4663 differs from laterbinomialell7481.
+Decisions made: recent 'original' means originalwithinlaterbinomialpanel, notinitialnative; prominent PRclarification required. No binomialshortverification/CM/phasebound transposed to initialmixed-termfamilies. Not a proof of absence of all automorphisms/models. Restore initial T1same-instance production2LPbaseline priority; existing large_prime.rs correctnesscontrol reused, not called absent/new.
+Open threads: arbitrary-public-target 2LPcontrol on originalfamilies with small-base history/weighted cycles/allcosts and targetverification, primary GTTD review before implementation. Baseline work notmathematicalbreakthrough; full10xgenus2+goal open.
+Errors: sparse paths handled via trackedgitblobs; initialbroad 'original' wording corrected without rewriting frozenevidence. No S3/cloud/merge.
