@@ -1364,3 +1364,10 @@ What was done: compiled equal batch normalization for prepared reference and sha
 Decisions made: charge batching in both arms and compare retained three-point split/REDC with explicit structural-only boundary; freeze/push before run.
 Open threads: execute once, inspect inversion/counter tradeoff and panel yield per work before full-cost qualification.
 Errors: none; own existing T7071task remains claimed.
+
+## Batch normalization qualification completed
+
+What was done: one invocation at a41ba58e57b exits0,20calls/1600outputs exact across arms and ordinary-monic roots; repeated vectors/polynomial checks pass. Inversions80-81to2; shared REDC increases to7582/7842/7746/7746/16264. Split totals unchanged; every fixed-panel split/REDC lower than retained three-point shared circuit. Raw/summary/hashes retained.
+Decisions made: no arbitrary pricing of inversions versus REDC, no tenfold/full-runtime claim. Full-burst four-point variant not justified as replacement on these panels; retain useful-rank/early-stop limits.
+Open threads: different mechanism with original genus2+target fidelity and complete cost case; tenfold goal unresolved. Keep exact circuits available without advancing unchanged combination to expensive full-cost trials.
+Errors: none; no retry/S3/cloud.
