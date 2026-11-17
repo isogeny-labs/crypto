@@ -18,9 +18,9 @@ Achieve a measured 2–6× speedup in the Rust Vieta evaluator over Euclid/Newto
 - [ ] Chase measured 2–6× Vieta speedup over Euclid/Newton (codex, started 2026-11-17, branch lane/vieta-speedup-20261117, PR #4535; in progress).
 - [x] Profile unchanged baseline and record limited attribution; test the modular-reduction hypothesis (same task/branch).
 - [x] Implement native-field NTT/half-GCD and exact small roots; check relations against schoolbook/lookup (same task/branch).
-- [ ] Validate canonical fixtures (done) and publish/freeze the fresh primary comparison before data (same task/branch).
-- [ ] Measure complete/query costs at larger sizes with A/A and positive controls; replay all successful calls (same task/branch).
-- [ ] Report gains/regressions and limits, then follow required publication checks (same task/branch).
+- [x] Validate canonical fixtures and publish/freeze all affected protocols before data; preserve failed metadata exports/corrections (same task/branch).
+- [x] Measure complete/query costs through word32768 with controls; replay176+48 successful calls and preserve16cap failures (same task/branch).
+- [ ] Publish completed report/data and finish required PR gates; local unverified gains documented, independent standing pending (same task/branch).
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
 

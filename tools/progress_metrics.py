@@ -1017,6 +1017,39 @@ def vieta_component(ref, since):
                      source=f"{path}@{commit}")
 
 
+def vieta_native_speedup(ref, since):
+    """Copy frozen Rust medians only: no Python estimates or timing admission."""
+    root = "research/vieta_coset_rust_20261115/speedup-20261117/evidence"
+    for panel, filename in (("primary", "primary-summary.json"),
+                            ("budget8b", "budget-summary.json")):
+        path = f"{root}/{filename}"
+        for date, commit, text in file_history(ref, path, since):
+            data = json.loads(text)
+            source = f"{path}@{commit}"
+            emit(f"vieta.native.{panel}.failed_calls", data.get("failed"),
+                 date=date, problem="vieta-relation-component", unit="calls",
+                 better="neutral", label="Stored failed-call count; PCC unverified",
+                 source=source)
+            for group in data.get("groups", []):
+                identity = group["group"].replace(":", "_").replace("-", "_")
+                ratio = group["paired_ratios"].get("newton/fiber-half:cold_ns", {})
+                if "median" in ratio:
+                    emit(f"vieta.native.{panel}.{identity}.cold_newton_ratio",
+                         ratio["median"], date=date,
+                         problem="vieta-relation-component", unit="ratio",
+                         better="higher",
+                         label="Stored native paired median, full cold; below L2, PCC unverified",
+                         source=source)
+                query = group["arms"].get("fiber-half", {}).get("query_work_muls", {})
+                if "median" in query:
+                    emit(f"vieta.native.{panel}.{identity}.query_muls",
+                         query["median"], date=date,
+                         problem="vieta-relation-component", unit="field multiplications",
+                         better="lower",
+                         label="Stored native evaluator query median; native field constructor ops unpriced, PCC unverified",
+                         source=source)
+
+
 def trace_local_runtime(ref, since):
     """Export already-computed native observations, without re-estimating them."""
     path = "research/trace_incidence_20261116/measure_20261117/results/report-data.json"
@@ -1086,6 +1119,7 @@ def main():
     explicit_gpu_fullcache(a.ref, a.since)
     n83_d18_vsids_gate(a.ref, a.since)
     vieta_component(a.ref, a.since)
+    vieta_native_speedup(a.ref, a.since)
     trace_local_runtime(a.ref, a.since)
 
 if __name__ == "__main__":
