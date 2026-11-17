@@ -1960,3 +1960,10 @@ What was done: freeze34645397fe6 once-onlyexit0;24completecalls/12targets fullpr
 Decisions made: retain soundzero-weight rowremoval, charge fullproofgeneration; nofuturewitness leakage asonline selection. Full10xgatefails,mixed vs sourcecontrols.
 Open threads: public-data onlineproductive-relation mechanism reducing proofgeneration/collection together; originalgenus2+goal, independentreview/publication artifacts.
 Errors: none in execution,no retry/S3/cloud.
+
+## Triangular witness frozen
+
+What was done: derived exact discoverylabel+primitiveprovenance invariant; built one-unknownpoint triangular substitution then2variable constraints, composite original-row witness, fullmatrix witnessidentity check charged.
+Decisions made: same producer/rows/scalars, witnessmaychange and bothverifiers84mutations mustpass;24completecalls original12targets, comparison to supportedpacket/bothcontrols. Assertions [pcc:unverified]. Sources core/ring/sparse/KB exactcombination receipt inprotocol; standard elimination no noveltyclaim.
+Open threads: pushfreeze then once-only120CPU invocation, inspect fullcost/constructiveness; originalgenus2+10xgoal unchanged.
+Errors: onlyunusedimportwarnings, no scientificexecutionyet.
