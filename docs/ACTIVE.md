@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Unbreak main's library check: drop the duplicate f4_fp fall-degree shim and update tests/rust_extension_security.rs for ExactScalar (claude, started 2026-11-17, branch claude/unbreak-main-f4-exactscalar-20261117, PR #4620)
+- [x] Unbreak main's library check: drop the duplicate f4_fp fall-degree shim and update tests/rust_extension_security.rs for ExactScalar (claude, started 2026-11-17, branch claude/unbreak-main-f4-exactscalar-20261117, PR #4620; library + lib tests compile again; 29 other targets remain broken on main — corrupted sources and removed APIs, listed on the PR)
 
 - [x] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117, PR #4584; superseded by #4593 — fair-CZ gain is quadratic 5–20×, quartic 1.3–1.9×; the PR's 13–113× was against an unfair CZ)
 
