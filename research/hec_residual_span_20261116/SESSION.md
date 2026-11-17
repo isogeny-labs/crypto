@@ -1179,3 +1179,17 @@ Constructiveconstantcore/weightedLPcompressionwithfreshfullcostqualificationorne
 
 ### Errors
 No analysisassertionfailure,scientificproducerretry,S3/cloud. Fullrankisnotrequiredfortargetuniqueness; preservedcounterexamples.
+
+## Affine LP path compression qualified and counted
+
+### What was done
+Implementedweightedunion-find withaffine(core,k,constant)potentials,unbalancedcomponentgrounding,pathcompression and2variablelabelsolver. Frozen ca06f28e1c2 agrees inrank/kwithSparse/nativeFast at17001prefixes across204cores.24core0LAstagecalls repeat exactly. EllREDC gains1.392–1.657 versusgeneralSparse; inversionsidentical. [pcc:unverified]
+
+### Decisions made
+Retainasclassicalengineeringcomponentgain,notmathbreakthrough/fullruntime/10x. Nofullcollectorcampaignsolelyfromthisstage. Excludedproducer/setup/factor/verifycostsexplicit. g3/g4remainunqualifiedandgoalactive.
+
+### Open threads
+Fullcostcaseandnewusefulgeometryrequired; nofaircomparisonagainstdense-onlybaseline. Potentialproductionintegrationneedsfreshinputs/protocol.
+
+### Errors
+No failedgate/retry/S3/cloud. Previousonlinekernelhadpivotchainsbutnotgraphpathcompression; no falseassertionthatthiswasalreadymeasured.
