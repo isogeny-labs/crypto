@@ -238,6 +238,7 @@ pub mod hec_dlp;
 pub mod hilbert_class_poly;
 pub mod hky_fp_tower;
 pub mod hky_fp_tower_fast;
+pub mod hky_fp_tower_fast2;
 pub mod hnp_ecdsa;
 pub mod hwcost;
 pub mod hyperelliptic_ic_bench;
