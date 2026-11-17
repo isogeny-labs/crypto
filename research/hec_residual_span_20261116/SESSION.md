@@ -1322,3 +1322,10 @@ What was done: prepared std-only Rust exhaustive subspace enumeration and fixed-
 Decisions made: push checkpoint before once-only gate; exact subspace counts and model eligibility required, with no fixture substitution.
 Open threads: execute frozen checker, retain output and assess the conditional obstruction on both original models.
 Errors: own task already claimed; no competing holder or scientific execution.
+
+## Rational kernel gate completed
+
+What was done: single invocation at pushed 923c5f6c85c exits0; 1395 subspaces,135 isotropic,2 invariant, both exactly the proposed Gaussian-period kernels. Models (113,3),(421,2) have nonseventh-power residues49,370 and no branch roots. All frozen hashes pass; raw/exit/outputhashes/results retained.
+Decisions made: rational polarized degree-eight escape closed on both original genus-three controls subject to the written standard-theory proof; no transport implementation justified on this route.
+Open threads: different-degree rational kernel/quotient and explicit map/cost case, or another relation mechanism addressing original genus2+ targets; tenfold objective unresolved.
+Errors: none during the gate. No S3, cloud, producer retry or runtime claim.
