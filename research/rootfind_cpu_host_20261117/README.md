@@ -162,3 +162,30 @@ to its exact base Git blob (SHA-1
 unrelated, accidental deletion of approximately 1.71 million lines
 that had leaked into this PR. All rootfinder measurement detail lives
 in this scoped report instead.
+
+## Perf-arm isolation (prepared; not executed on this restricted VM)
+
+The two host benchmarks expose `--perf-inv-before`,
+`--perf-inv-after`, `--perf-batch32-before` and
+`--perf-batch32-after`. Each mode uses the *same deterministic
+corpus* but executes only the named arm, so instruction and cycle
+counts are not contaminated by the alternative algorithm's benchmark.
+Run the normal no-argument mode first for bitwise correctness checks.
+
+Example for a host with `perf` and authorized PMU counters:
+
+```sh
+CPU=0  # choose a CPU actually allowed by the host cpuset
+for bin in bench_host_inv bench_host_inv256; do
+  for arm in inv-before inv-after batch32-before batch32-after; do
+    perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses \\
+      -- taskset -c "$CPU" "gpu/rootfind/$bin" "--perf-$arm"
+  done
+done
+```
+
+Compare counts for each *same*-field, same-kernel before/after pair.
+The perf modes include deterministic corpus generation and standard
+benchmark-loop overhead; report this fact, and also use
+`perf record -g` to identify actual hotspots before interpreting
+whole-call impact. No `perf` counter numbers are claimed for this run.
