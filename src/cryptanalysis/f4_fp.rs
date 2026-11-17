@@ -717,16 +717,6 @@ impl F4Options {
         self.weights = Some(weights);
         self
     }
-    /// Opt in to fall-degree diagnostics in [`VisitReport`]
-    /// (`first_fall_degree`, `last_fall_degree`,
-    /// `degree_of_regularity_observed`).  The streaming/domain solver does not
-    /// yet record these, so this is currently a no-op builder: the fields stay
-    /// `None`.  It exists so callers can request the diagnostics without a
-    /// behaviour change, and so the recording can be wired in later behind this
-    /// same opt-in.
-    pub fn recording_degree_falls(self) -> Self {
-        self
-    }
     pub fn with_budget(mut self, budget: Duration) -> Self {
         self.deadline = Some(Instant::now() + budget);
         self
@@ -6459,14 +6449,6 @@ pub struct VisitReport {
     /// Counted coefficient multiplications in the reused root finder only.
     pub root_field_multiplications: u64,
     pub full_field_branches: u64,
-    /// Fall-degree diagnostics, recorded only when the run opts in with
-    /// [`F4Options::recording_degree_falls`].  `None` means "not recorded on
-    /// this run" (the default); the streaming/domain solver does not yet emit
-    /// them, so they stay `None` until that recording is wired in.  Consumers
-    /// (e.g. `aps_single_relation`) treat `None` as "unobserved".
-    pub first_fall_degree: Option<u32>,
-    pub last_fall_degree: Option<u32>,
-    pub degree_of_regularity_observed: Option<u32>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
