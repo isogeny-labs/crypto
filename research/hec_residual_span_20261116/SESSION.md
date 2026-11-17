@@ -969,3 +969,17 @@ Complete factored differential circuit and stronger relation-yield mechanism; si
 
 ### Errors
 No symbolic execution failure or retry. No S3 access. Current task remains the same own live lease.
+
+## Full first-chart factorization checked
+
+### What was done
+At frozen3ae4ff9195b the exact coordinate transform and inverse passed all4 first-chart integer-polynomial identities. Derived a complete shared-intermediate schedule and explicit upper-cost ledger, retaining source normalization and exceptional-chart obligations.
+
+### Decisions made
+The straightforward schedule uses23 products/squares plus10 generic reconstruction products before specializations, so it supplies no tenfold cost case. This is an upper schedule, not a mathematical lower bound. Retain the circuit without launching an unjustified full collector run.
+
+### Open threads
+Cheaper all-cost arithmetic or a justified independent-relation-yield mechanism is required; broad genus2/3/4 objective remains active.
+
+### Errors
+No execution failure/retry. No field or wall benchmark performed. Own T7044 lease held throughout edits.
