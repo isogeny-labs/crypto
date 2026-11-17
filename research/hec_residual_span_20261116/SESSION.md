@@ -2107,3 +2107,10 @@ What was done: freeze511d29299e7 once-onlyexit0;24calls/12targets packetgeometry
 Decisions made: retainactualcoldgain, no10x/novelty claim. V1formatfailure preserved;v2prospectivecomparisononlyfix. Anchoridentity nowboundbyinduction, nofreeconstruction.
 Open threads: remainingprincipalgeometry/collection/setup/newrelation mechanism withcompletecost; originalgenus2+10x,independentreview/publication/genus3/4coverage.
 Errors: v1debugspacecomparison failure correctedprospectively,no otherexecutionerror/S3/cloud.
+
+## Root/anchor complete pipeline frozen
+
+What was done: integrate previouslyqualified distinct-degree/root principalidentity with exactrepeated/overlap fallback, native-recompute/boundcommon216+anchor96 mutations, allproducer/constructionvectors exact gate. Synthetic overlap/repeated controls retained.
+Decisions made: no relation/setup change, verifyacceptedpointcurve membership via finalphasecheck, allgeometryfallback costsincluded; original12targets/24calls/repeats,Gitfreeze beforeone120CPU. Assertions [pcc:unverified].
+Open threads: executeafterpush, reportcoldgain andremaininggap.
+Errors: onlyunusedwarning,noscienceyet.
