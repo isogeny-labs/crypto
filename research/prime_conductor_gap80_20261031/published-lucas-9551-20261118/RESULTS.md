@@ -94,3 +94,12 @@ named-record exception in AGENTS.md §13a. Earlier committed evidence is
 neither repacked nor renamed; the new fixed-case files satisfy configured
 storage thresholds. The previous wide-harness S3 violation remains separate.
 [pcc:unverified]
+
+
+The committed-state check emits the new row from commit e0d501a78a02,
+retains the prior row, and preserves the explicit scope label. Its first
+qualification call used Git's date-only `--since`, which retained the current
+time of day and excluded the just-written commit; the corrected call uses
+explicit UTC midnight. Both the initial assertion failure and corrected
+receipt are recorded in metrics-committed-qualification.json. No production
+exporter change or arithmetic rerun was needed. [pcc:unverified]
