@@ -189,6 +189,12 @@ fixed locus promote to the global point-endomorphism equation and the exact
 `V-1` orientation. A checked `ZMod 3` mutation shows that a single fixed locus
 does not suffice. This reduces the generic premise to the family of finite
 fixed loci but does not prove the characteristic identity on that family.
+The corresponding frozen orbit census passes all eight cells with independent
+replay: 5,066 points split into least-period counts 64, 282, 1,740 and 2,980
+for periods one through four. The base locus omits 5,002 points, and all
+proper-period strata omit 4,924 full-period points. Correct characteristic
+failures are zero in every stratum; these finite data do not discharge the
+generic restricted premise.
 For `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
 the exact `z -> z^p` formula for a supplied coordinatewise `p`-power
 endomorphism. Connecting those formulas to the actual elliptic formal-group

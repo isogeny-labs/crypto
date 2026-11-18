@@ -606,8 +606,12 @@ adjoin is finite, the `n`th point Frobenius raises coordinates to `p^n`, and
 every algebraic point is consequently periodic. Vanishing on every positive
 fixed locus promotes to a global endomorphism equality and composes to
 pointwise `V-1`. The `ZMod 3` single-locus control retains an identity mutation
-that is invisible at period one but exposed at period two. The prospective
-fixed-loci census is frozen but has not run. [pcc:unverified]
+that is invisible at period one but exposed at period two. The frozen
+fixed-loci census passes all eight cells with exact replay: the base locus
+omits 5,002 of 5,066 points, proper-period strata omit 4,924 full-period
+points, and the correct characteristic expression has zero stratum failures.
+This instantiates but does not prove the restricted characteristic family.
+[pcc:unverified]
 
 ## Short-Weierstrass local-parameter instance gate
 

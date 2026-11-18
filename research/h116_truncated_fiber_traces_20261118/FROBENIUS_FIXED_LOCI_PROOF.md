@@ -51,14 +51,19 @@ is fixed and exposes the nonzero mutation. This proves that one fixed locus
 cannot replace the theorem's quantifier over all positive periods.
 [pcc:unverified]
 
-## Prospective finite test
+## Finite test
 
 Protocol `H116-FROBENIUS-FIXED-LOCI-001`, SHA-256
 `0191f93cc986b025224fcad313e8be85842f1599a223f92aa2e94aefb2a2772d`,
-is frozen before new producer or verifier implementation. It will measure
-least-period strata, every fixed-locus count, full-period coverage and
-characteristic failures on the unchanged eight-cell panel. It has no result
-rows yet. [pcc:unverified]
+was frozen before new producer or verifier implementation. All eight cells
+pass with exact independent replay. Every point has a period dividing the
+extension degree; checking only the base locus omits 5,002 of 5,066 points,
+and all proper-period strata together omit 4,924 full-period points. Result
+SHA-256 is
+`c2661066c46778b96d7d47a98b0ee903ac0de04b638d48589efd79c8b86a2c`;
+verification SHA-256 is
+`21f7eec8b20de45d373f6f93a4f901749b62d1985a879b24308fd89ead021734`.
+[pcc:unverified]
 
 ## Boundary
 

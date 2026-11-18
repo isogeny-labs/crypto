@@ -219,9 +219,11 @@ locus therefore implies the global point-endomorphism equation and the exact
 `V-1` orientation. A `ZMod 3` control proves that checking only one fixed locus
 is insufficient. The restricted characteristic identities themselves remain
 unproved. [pcc:unverified]
-The prospective `H116-FROBENIUS-FIXED-LOCI-001` protocol is frozen before its
-new implementations. It will census least Frobenius periods and fixed-locus
-coverage on the unchanged eight cells; it has no result rows yet.
+The frozen `H116-FROBENIUS-FIXED-LOCI-001` census passes all eight cells with
+exact independent replay. Every one of 5,066 points has a period dividing the
+extension degree. The base locus omits 5,002 points, and the union of every
+proper-period stratum omits 4,924 full-period points; the correct
+characteristic expression has zero failures in all strata.
 [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
