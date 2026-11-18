@@ -39,6 +39,7 @@ RECORDED_EXACT = (
 # GH_TOKEN and GITHUB_TOKEN are credentials read by `ic update`: they must never
 # be written into a run record, whatever they could change.
 NOT_RESULT_AFFECTING = frozenset({"HOSTNAME", "PATH", "TMPDIR", "CRYPTO_AUDIT_DIR", "TASKQ_TASK_ID",
+                                  "NOINTERLEAVE",  # Fp64::batch_inv chain layout: same inverses, timing only
                                   "FASTGROUP_SMOKE_OUT",  # output path only
                                   "GH_TOKEN", "GITHUB_TOKEN"})
 
