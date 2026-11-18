@@ -1096,9 +1096,19 @@ impl RadicalRootCtx {
     /// Degrees 1..=4 are supported; the zero polynomial and constants return an error / no roots.
     pub fn roots(&self, f: &[u64]) -> Result<RadicalRoots, String> {
         let fp = &self.f;
-        let mut c: Vec<u64> = f.iter().map(|&x| x % fp.p).collect();
-        while c.last() == Some(&0) {
-            c.pop();
+        // Polynomials of degree <=4 fit in a stack buffer. Scan trailing
+        // zeroes first (including coefficients congruent to 0 mod p) so
+        // arbitrarily padded input remains accepted without a heap Vec.
+        let mut n = f.len();
+        while n > 0 && f[n - 1] % fp.p == 0 {
+            n -= 1;
+        }
+        if n > 5 {
+            return Err("radical root finder supports degree <= 4".into());
+        }
+        let mut c = [0u64; 5];
+        for j in 0..n {
+            c[j] = f[j] % fp.p;
         }
         let ok = |roots: Vec<u64>| {
             Ok(RadicalRoots {
@@ -1106,7 +1116,7 @@ impl RadicalRootCtx {
                 frobenius_fallback: false,
             })
         };
-        match c.len() {
+        match n {
             0 => Err("zero polynomial".into()),
             1 => ok(vec![]),
             2 => {
