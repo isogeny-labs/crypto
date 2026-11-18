@@ -931,6 +931,9 @@ pub enum Targets {
     /// `StrideRenew` probing the repeat guard only on targets that
     /// decompose.  See `TargetSource::StrideRenewDeferredGuard`.
     StrideRenewDeferredGuard,
+    /// `StrideRenew` with each set-up `[a]G + [b]Q` one joint
+    /// double-and-add.  See `TargetSource::StrideRenewJoint`.
+    StrideRenewJoint,
 }
 
 impl Targets {
@@ -956,6 +959,7 @@ impl Targets {
             Targets::StrideRenew => "stride-renew",
             Targets::StrideGenerator => "stride-generator",
             Targets::StrideRenewDeferredGuard => "stride-renew-deferred-guard",
+            Targets::StrideRenewJoint => "stride-renew-joint",
         }
     }
 
@@ -981,8 +985,9 @@ impl Targets {
             "stride-renew" => Ok(Targets::StrideRenew),
             "stride-generator" => Ok(Targets::StrideGenerator),
             "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
+            "stride-renew-joint" => Ok(Targets::StrideRenewJoint),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16/256/1024, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew or stride-renew-deferred-guard"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16/256/1024, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew, stride-renew-deferred-guard or stride-renew-joint"
             )),
         }
     }

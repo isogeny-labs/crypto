@@ -752,6 +752,7 @@ fn run_pipeline_inner<G: CountedGroup>(
         Targets::StrideRenew => TargetSource::StrideRenew,
         Targets::StrideGenerator => TargetSource::StrideGenerator,
         Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
+        Targets::StrideRenewJoint => TargetSource::StrideRenewJoint,
         Targets::Walk
         | Targets::Residual
         | Targets::ResidualFused
