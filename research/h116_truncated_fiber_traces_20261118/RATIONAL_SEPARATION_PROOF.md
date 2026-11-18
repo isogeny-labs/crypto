@@ -14,8 +14,8 @@ polynomial root bound.  The companion control proves over `ZMod 3` that
 therefore replacing the strict degree bound by `<= |S|` is unsound.
 
 The current source has SHA-256
-`0399fa0d64f2d6915c67fc5530fa085eb249dc770a3942f0738ab1683b53a71e`.
-The pinned build succeeded and the exact repository auditor reports 124
+`a05e9234e616611fe955008ff6239cc70c32256049f122b25c83265379528628`.
+The pinned build succeeded and the exact repository auditor reports 125
 theorems, zero failures, and zero trusted native decisions.
 
 | Requirement | Evidence | State |

@@ -641,6 +641,12 @@ maps. The maps are stable across extension degrees and have zero mismatches on
 degree/cardinality statement remain open elliptic obligations.
 [pcc:unverified]
 
+The next audited ring step proves `(V-1)(pi-1)=p+1-t` directly from
+`V*pi=p` and `V+pi=t`, even in a noncommutative ring. This supplies the exact
+algebraic norm factor behind the observed degree `N`; only the elliptic
+morphism theorem translating that factor into degree and kernel cardinality is
+missing. [pcc:unverified]
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

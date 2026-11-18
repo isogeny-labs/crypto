@@ -243,6 +243,10 @@ independent interpolation windows. All eight extension cells agree within
 their base-curve family, all 2,524 regular evaluations match, and the predicted
 visible-kernel sizes match. Generic degree, cyclicity, scheme semantics and
 local-series transport remain open. [pcc:unverified]
+At the abstract endomorphism-ring layer, Lean also proves the exact factor
+identity `(V-1)(pi-1)=p+1-t`. Thus the algebraic norm calculation behind the
+predicted degree is closed; its scheme-theoretic degree/kernel interpretation
+is the remaining geometric step. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

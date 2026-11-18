@@ -593,6 +593,22 @@ theorem frobeniusVerschiebung_sum_of_characteristic
         _ = 0 := hchar
     _ = pi * trace := htraceComm.eq.symm
 
+/-- The norm and sum relations factor the scalar point count exactly:
+`(V-1)(pi-1)=p+1-trace`.  This ring identity is the algebraic input for the
+expected degree of `V-1`; converting it into a morphism-degree statement is a
+separate elliptic-geometric obligation. -/
+theorem verschiebung_sub_one_mul_frobenius_sub_one
+    {R : Type*} [Ring R]
+    (verschiebung pi trace cardinality : R)
+    (hnorm : verschiebung * pi = cardinality)
+    (hsum : verschiebung + pi = trace) :
+    (verschiebung - 1) * (pi - 1) = cardinality + 1 - trace := by
+  calc
+    (verschiebung - 1) * (pi - 1) =
+        verschiebung * pi - (verschiebung + pi) + 1 := by noncomm_ring
+    _ = cardinality - trace + 1 := by rw [hnorm, hsum]
+    _ = cardinality + 1 - trace := by abel
+
 /-- Specialize the Frobenius--Verschiebung ring calculation to additive
 endomorphisms of a point group. Integer scalars are central automatically, and
 pointwise injectivity of Frobenius supplies cancellation of left composition.
@@ -2592,6 +2608,7 @@ theorem rationalMap_separation_strict_control :
 #print axioms PowerSeriesPrefixEq.subst_inv
 #print axioms PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv
 #print axioms frobeniusVerschiebung_sum_of_characteristic
+#print axioms verschiebung_sub_one_mul_frobenius_sub_one
 #print axioms endomorphism_frobeniusVerschiebung_sum
 #print axioms endomorphism_injectivity_control
 #print axioms affineFrobeniusPointEnd_injective

@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-0399fa0d64f2d6915c67fc5530fa085eb249dc770a3942f0738ab1683b53a71e  H116FiberTrace.lean
+a05e9234e616611fe955008ff6239cc70c32256049f122b25c83265379528628  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  124 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  125 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -54,6 +54,8 @@ b469ffae036437ff01c0318340771c04e62b1fded7b7eb2775d16631f71cbcc3  receipts/ratio
 673b57e3ca150bf88154f6193e14278944aae9de240501e4ae32d5036c665744  receipts/rational-separation-second-build-failure.txt
 b7efb787302ea2dfa9aa223d42ac1aec148da29a8a2c358b08a34b1b59c4dc5f  receipts/kernel-eigenspace-build.txt
 64bc81bfa8577086492d0220e137ffb82dac8306a3b6df28300096475c456d9e  receipts/kernel-eigenspace-audit.txt
+f6b367568557629e55b46748360a01a251768e8c0d8ce4ed53953eb8e65a9e58  receipts/norm-factor-build.txt
+f61a96a76811c2cd4736b7515e2f2a4126a1b500e397894ff6c090dc4a8864c2  receipts/norm-factor-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -230,6 +232,12 @@ by `V` satisfies `pi(P)=[trace-1]P`; iteration gives
 `ker(V-1)` is exactly the corresponding scalar condition.  This proves the
 eigenvalue reduction but not the cyclic-kernel cardinality formula used as a
 finite-panel prediction. [pcc:unverified]
+
+The 125-theorem checkpoint proves the exact noncommutative-ring factorization
+`(V-1)(pi-1)=p+1-trace` from the norm relation `V*pi=p` and sum relation
+`V+pi=trace`. This is the algebraic norm identity behind the expected degree
+`#E(F_p)` of `V-1`; interpreting it as a degree and kernel-cardinality theorem
+still requires the missing elliptic morphism infrastructure. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made
