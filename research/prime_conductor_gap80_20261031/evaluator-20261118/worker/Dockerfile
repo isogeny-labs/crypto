@@ -22,7 +22,7 @@ ARG SOURCE_REVISION
 RUN test "${#SOURCE_REVISION}" -eq 40 \
     && case "$SOURCE_REVISION" in *[!0-9a-f]*) exit 1;; esac \
     && apt-get update && apt-get install -y --no-install-recommends \
-       libflint19=3.1.3-2 libpari-gmp-tls9=2.17.2-1 \
+       libflint19=3.1.3-2 libpari-gmp-tls9=2.17.2-1 libgmpxx4ldbl=2:6.3.0+dfsg-3 \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /work && chown 1000:1000 /work
 COPY --from=builder /opt/conductor /opt/conductor

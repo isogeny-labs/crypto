@@ -1,5 +1,9 @@
 # Standalone native evaluator worker
 
+The [qualification report](QUALIFICATION.md) records the retained loader failure,
+corrected non-root fixture replay, image/source/binary manifests and a separately
+prepared 47-bit supplied case. The local worker is not a published EKS image.
+
 This packages the existing FLINT/PARI evaluator for a later authenticated
 command job. It does not submit a job, configure AWS, or certify a conductor gap.
 The runtime uses UID/GID 1000, accepts the existing CLI and reads its supplied
