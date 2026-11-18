@@ -1056,8 +1056,10 @@ pub fn find_one_relation_counted(
     find_one_relation_counted_with_rng(curve, g, q, factor_base, max_trials, &mut rng)
 }
 
-/// x-coordinate → factor-base index, for O(1) lookups.
-fn factor_base_x_index(
+/// x-coordinate → factor-base index, for O(1) lookups.  Depends only on the
+/// factor base, so callers that draw many relations from one factor base build
+/// it once and pass it to [`find_one_relation_with_index`].
+pub(crate) fn factor_base_x_index(
     factor_base: &[FactorBaseEntry],
 ) -> std::collections::HashMap<BigUint, usize> {
     let mut x_to_idx = std::collections::HashMap::new();
@@ -1079,6 +1081,31 @@ fn find_one_relation_counted_with_rng<R: rand::RngCore>(
 ) -> Option<(Relation, usize)> {
     let x_to_idx = factor_base_x_index(factor_base);
     find_one_relation_sweep_with_index(curve, g, q, factor_base, &x_to_idx, None, max_trials, rng)
+}
+
+/// [`find_one_relation`] with a prebuilt x-index (from [`factor_base_x_index`]
+/// over the same `factor_base`): the same search on the same random stream,
+/// without rebuilding the index on every call.
+pub(crate) fn find_one_relation_with_index(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    factor_base: &[FactorBaseEntry],
+    x_to_idx: &std::collections::HashMap<BigUint, usize>,
+    max_trials: usize,
+) -> Option<Relation> {
+    let mut rng = rand::rngs::OsRng;
+    find_one_relation_sweep_with_index(
+        curve,
+        g,
+        q,
+        factor_base,
+        x_to_idx,
+        None,
+        max_trials,
+        &mut rng,
+    )
+    .map(|(rel, _)| rel)
 }
 
 /// The sweep's inner loop on `u64` words (small odd prime fields below 2^40): the same candidate set,
@@ -1175,8 +1202,9 @@ impl WordSweep {
     }
 }
 
-/// The square-root sweep with a prebuilt x-index.  The default path builds the
-/// index on every call (as before); `IC_HOIST_SWEEP=1` builds it once per solve.
+/// The square-root sweep with a prebuilt x-index.  The solver builds the index
+/// once per factor base; `IC_HOIST_SWEEP=0` restores the old per-attempt rebuild
+/// (via [`find_one_relation_counted_with_rng`]) for A/A comparison.
 fn find_one_relation_sweep_with_index<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
@@ -1798,9 +1826,11 @@ pub fn ec_index_calculus_dlp(
     }
     let target = fb.len() + extra_relations;
 
+    let x_to_idx = factor_base_x_index(&fb);
     let mut relations = Vec::with_capacity(target);
     while relations.len() < target {
-        let rel = find_one_relation(curve, g, q, &fb, max_trials_per_relation)?;
+        let rel =
+            find_one_relation_with_index(curve, g, q, &fb, &x_to_idx, max_trials_per_relation)?;
         relations.push(rel);
     }
 
@@ -2393,9 +2423,14 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     } else {
         None
     };
-    // Experimental: IC_HOIST_SWEEP=1 builds the sweep's x-index once per solve.
+    // The sweep's x-index depends only on the factor base, so it is built once
+    // per solve (and only when the sweep is used).  `IC_HOIST_SWEEP=0` restores
+    // the old per-attempt rebuild for A/A comparison (ignored with
+    // `IC_FAST_SWEEP=1`, whose word loop always takes the hoisted index);
+    // `IC_HOIST_SWEEP=1` is accepted and is the default.
     let fast_sweep = std::env::var("IC_FAST_SWEEP").as_deref() == Ok("1");
-    let hoisted_index = if fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() == Ok("1") {
+    let hoist_sweep = fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() != Ok("0");
+    let hoisted_index = if !use_table && hoist_sweep {
         Some(factor_base_x_index(&fb))
     } else {
         None
@@ -3251,6 +3286,44 @@ mod tests {
                 assert_eq!(slow.0.coef_b, fast.0.coef_b);
                 assert_eq!(slow.0.entries, fast.0.entries);
             }
+        }
+    }
+
+    /// The sweep with the x-index built once per factor base (the solver's
+    /// default) returns exactly the relations, and trial counts, of the old
+    /// per-attempt rebuild (`IC_HOIST_SWEEP=0`) on the same random stream, with
+    /// a factor base above the sum-table cutoff (fb > 64 selects the sweep).
+    #[test]
+    fn hoisted_sweep_index_matches_per_attempt_rebuild() {
+        use rand::SeedableRng;
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = Point::Affine {
+            x: FieldElement::new(curve.gx.clone(), curve.p.clone()),
+            y: FieldElement::new(curve.gy.clone(), curve.p.clone()),
+        };
+        let q = g.scalar_mul(&BigUint::from(101u32), &a_fe);
+        let fb = build_factor_base(&curve, 80);
+        assert!(
+            fb.len() > 64,
+            "fb {} does not reach the sweep path",
+            fb.len()
+        );
+        let x_to_idx = factor_base_x_index(&fb);
+        let mut rng_a = rand::rngs::StdRng::seed_from_u64(2026);
+        let mut rng_b = rand::rngs::StdRng::seed_from_u64(2026);
+        for _ in 0..(fb.len() + 10) {
+            let per_attempt =
+                find_one_relation_counted_with_rng(&curve, &g, &q, &fb, 100_000, &mut rng_a)
+                    .expect("per-attempt sweep relation");
+            let hoisted = find_one_relation_sweep_with_index(
+                &curve, &g, &q, &fb, &x_to_idx, None, 100_000, &mut rng_b,
+            )
+            .expect("hoisted sweep relation");
+            assert_eq!(per_attempt.1, hoisted.1, "trial counts differ");
+            assert_eq!(per_attempt.0.coef_a, hoisted.0.coef_a);
+            assert_eq!(per_attempt.0.coef_b, hoisted.0.coef_b);
+            assert_eq!(per_attempt.0.entries, hoisted.0.entries);
         }
     }
 
