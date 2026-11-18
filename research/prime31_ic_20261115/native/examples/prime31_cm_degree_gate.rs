@@ -56,6 +56,10 @@ fn exact_gate() -> Value {
     // (conductor 1) or Z[pi] (conductor 3).
     let minimum_maximal_order_nonscalar_norm = (1 - d_k) / 4;
     assert_eq!(minimum_maximal_order_nonscalar_norm, 200_956_753);
+    // If End(E)=Z[pi] (the conductor-three order), b is divisible
+    // by three, strengthening the conditional bound by a factor ~9.
+    let conditional_conductor_three_bound = (1 - 9 * d_k) / 4;
+    assert_eq!(conditional_conductor_three_bound, 1_808_610_775);
     for b in -6i128..=6 {
         for a in -10i128..=10 {
             if b == 0 { continue; }
@@ -82,6 +86,7 @@ fn exact_gate() -> Value {
         "proved_prime_factors_DK":[3,13,q],
         "noninteger_endomorphism_degree_lower_bound":minimum_maximal_order_nonscalar_norm.to_string(),
         "no_nonscalar_endomorphism_degree_below":minimum_maximal_order_nonscalar_norm.to_string(),
+        "conditional_if_end_eq_Z_pi_degree_lower_bound":conditional_conductor_three_bound.to_string(),
         "j_special_automorphisms":false,
         "proof":"4*N(a+b*omega)=(2a+b)^2+|D_K|b^2; b != 0",
         "scope":"exact quadratic-order bound, not proof of slow factored isogeny loops or a DLP speed result",
@@ -103,6 +108,7 @@ mod tests {
         assert_eq!(record["trace"], "36817");
         assert_eq!(record["fundamental_discriminant"], "-803827011");
         assert_eq!(record["noninteger_endomorphism_degree_lower_bound"], "200956753");
+        assert_eq!(record["conditional_if_end_eq_Z_pi_degree_lower_bound"], "1808610775");
         assert_eq!(record["performance_measured"], false);
     }
     #[test]
