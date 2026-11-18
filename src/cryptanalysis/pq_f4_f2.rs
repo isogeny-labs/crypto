@@ -2014,11 +2014,75 @@ pub fn groebner_basis_f4_until(
     budget: Option<Duration>,
     max_free: Option<usize>,
 ) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_inner(
+        initial,
+        n_vars,
+        budget,
+        max_free,
+        max_matrix_words(),
+        EARLY_GUARD,
+    )
+}
+
+/// Tuning of the early size guard; tests shrink it to reach the guarded
+/// path on small systems.
+#[derive(Clone, Copy)]
+struct EarlyGuard {
+    /// Source terms of a step (the sparse terms its S-rows start from)
+    /// above which the dimension pre-pass runs before any row is stored.
+    terms: usize,
+    /// Rows or monomials handled between two checks of the deadline and
+    /// of the size bound in the pre-pass.
+    slab: usize,
+    /// Deadline of the pre-pass (default: the budget's deadline).
+    deadline: Option<Instant>,
+}
+
+/// 8 bytes a term: 64 MiB of sparse S-row terms.
+const EARLY_GUARD: EarlyGuard = EarlyGuard {
+    terms: 1 << 23,
+    slab: 256,
+    deadline: None,
+};
+
+/// Dense words of a `rows × cols` bit matrix.
+#[inline]
+fn dense_words(rows: usize, cols: usize) -> u64 {
+    cols.div_ceil(64).max(1) as u64 * rows as u64
+}
+
+/// [`groebner_basis_f4_until`] with the dense-matrix guard at `max_words`.
+///
+/// **Early refusal.**  The guard used to be consulted only after every
+/// sparse row of a step existed (8 bytes a term, several times the dense
+/// matrix), so an oversized step was OOM-killed before it could be
+/// refused, and the budget was checked only in the elimination.  For a
+/// step whose S-rows start from more than [`EarlyGuard::terms`] terms, a
+/// *dimension pre-pass* now runs first: it forms the S-rows and the
+/// reducers one slab at a time, keeps only the set of monomials examined
+/// and a row count (memory proportional to the columns), checks the
+/// deadline between slabs, stops as soon as the rows counted so far times
+/// the columns so far (both lower bounds that only grow) exceed
+/// `max_words`, and at its end holds the step's exact rows and columns,
+/// the very ones the late check computes.  A step that fits is therefore
+/// never refused, and it is then built exactly as before: the pre-pass is
+/// uncounted (no `bitop` charge) and changes no result.  The late check
+/// stays as the exact one for steps below the threshold.  A refusal sets
+/// `oversize` (or `timed_out`), the flags callers already handle.
+fn groebner_basis_f4_inner(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+    max_free: Option<usize>,
+    max_words: u64,
+    guard: EarlyGuard,
+) -> (Vec<F2BoolPoly>, F4Stats) {
     static BATCH_INSERTS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let batch_inserts =
         *BATCH_INSERTS.get_or_init(|| std::env::var("F4_F2_BATCH_INSERTS").as_deref() != Ok("0"));
     let started = Instant::now();
     let deadline = budget.map(|b| started + b);
+    let pre_deadline = guard.deadline.or(deadline);
     let mut st = F4Stats {
         inner_build_parallel_disabled_calls: u64::from(!inner_build_parallel_enabled()),
         ..F4Stats::default()
@@ -2106,7 +2170,7 @@ pub fn groebner_basis_f4_until(
     let mut field_keys: Vec<(Mask, usize)> = Vec::new();
     let mut lcm_columns: FxSet<Mask> = FxSet::default();
     let mut active: Vec<usize> = Vec::new();
-    while !s.pairs.is_empty() {
+    'steps: while !s.pairs.is_empty() {
         if deadline.is_some_and(|d| Instant::now() >= d) {
             st.timed_out = true;
             break;
@@ -2186,6 +2250,88 @@ pub fn groebner_basis_f4_until(
                 keys.iter().map(product).collect()
             }
         };
+        // The dimension pre-pass (see `groebner_basis_f4_inner`).
+        let src_terms: usize = half_keys
+            .iter()
+            .chain(&field_keys)
+            .map(|&(_, g)| s.polys[g].terms.len())
+            .sum();
+        if src_terms > guard.terms {
+            let act: Vec<usize> = (0..s.polys.len()).filter(|&g| s.active[g]).collect();
+            // 1 = oversize, 2 = timed out
+            let verdict: u8 = 'pre: {
+                let mut rows_n = 0usize;
+                let mut srow_monos: FxSet<Mask> = FxSet::default();
+                for keys in [&half_keys, &field_keys] {
+                    for slab in keys.chunks(guard.slab) {
+                        for p in products(slab) {
+                            if !p.is_zero() {
+                                rows_n += 1;
+                                srow_monos.extend(p.terms.iter().map(|t| t.mask));
+                            }
+                        }
+                        if dense_words(rows_n, srow_monos.len()) > max_words {
+                            break 'pre 1;
+                        }
+                        if pre_deadline.is_some_and(|d| Instant::now() >= d) {
+                            break 'pre 2;
+                        }
+                    }
+                }
+                let mut examined: FxSet<Mask> = lcm_columns.iter().copied().collect();
+                let mut frontier: Vec<Mask> = srow_monos
+                    .into_iter()
+                    .filter(|m| !lcm_columns.contains(m))
+                    .collect();
+                examined.extend(frontier.iter().copied());
+                while !frontier.is_empty() {
+                    let mut next: Vec<Mask> = Vec::new();
+                    for slab in frontier.chunks(guard.slab) {
+                        // a reducer's monomials after its lead (its lead is `m`)
+                        let tails = |&m: &Mask| -> Option<Vec<Mask>> {
+                            s.reducer_among(m, &act).map(|g| {
+                                let r = s.polys[g].mul_mono(F2BoolMono::from_mask(m & !s.lm[g]));
+                                r.terms[1..].iter().map(|t| t.mask).collect()
+                            })
+                        };
+                        let found: Vec<Option<Vec<Mask>>> = if slab.len() >= PAR_REDUCERS
+                            && inner_build_parallel_enabled()
+                            && rayon::current_num_threads() > 1
+                        {
+                            slab.par_iter().map(tails).collect()
+                        } else {
+                            slab.iter().map(tails).collect()
+                        };
+                        for tail in found.into_iter().flatten() {
+                            rows_n += 1;
+                            for m in tail {
+                                if examined.insert(m) {
+                                    next.push(m);
+                                }
+                            }
+                        }
+                        if dense_words(rows_n, examined.len()) > max_words {
+                            break 'pre 1;
+                        }
+                        if pre_deadline.is_some_and(|d| Instant::now() >= d) {
+                            break 'pre 2;
+                        }
+                    }
+                    frontier = next;
+                }
+                0
+            };
+            if verdict != 0 {
+                if verdict == 1 {
+                    st.oversize = true;
+                } else {
+                    st.timed_out = true;
+                }
+                st.build_ns += t.elapsed().as_nanos() as u64;
+                s.pairs.extend_from_slice(&selected);
+                break 'steps;
+            }
+        }
         let half_rows = products(&half_keys);
         let mut field_rows = products(&field_keys);
         tally::word_ops(
@@ -2342,7 +2488,7 @@ pub fn groebner_basis_f4_until(
         let n_rows = reducers.len() + half_rows.len() + field_rows.len();
         let cols = Columns::from_monomials(examined.into_values());
         let words = cols.words() as u64;
-        if words * n_rows as u64 > max_matrix_words() {
+        if words * n_rows as u64 > max_words {
             st.oversize = true;
             st.build_ns += t.elapsed().as_nanos() as u64;
             s.pairs.extend_from_slice(&selected);
@@ -3483,6 +3629,104 @@ mod tests {
         let eqs = random_quadratic(18, 17, &mut rng);
         let (_, st) = groebner_basis_f4(eqs, 18, Some(Duration::from_nanos(1)));
         assert!(st.timed_out);
+    }
+
+    fn counted(
+        eqs: Vec<F2BoolPoly>,
+        n: usize,
+        max_words: u64,
+        guard: EarlyGuard,
+    ) -> (Vec<F2BoolPoly>, F4Stats, tally::Tally) {
+        let before = tally::snapshot();
+        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard);
+        (gb, st, tally::snapshot().since(before))
+    }
+
+    const EAGER: EarlyGuard = EarlyGuard {
+        terms: 0,
+        slab: 1,
+        deadline: None,
+    };
+
+    /// The early guard refuses exactly what the late guard refuses: the
+    /// smallest cap at which a run is not oversize is the same with the
+    /// pre-pass on every step (`EAGER`) as with it off, and at that cap the
+    /// guarded run reproduces the basis, the stats and the counted
+    /// operations; one word lower both refuse.
+    #[test]
+    fn the_early_guard_keeps_fitting_steps_identical() {
+        const OFF: EarlyGuard = EarlyGuard {
+            terms: usize::MAX,
+            slab: 256,
+            deadline: None,
+        };
+        for seed in 0..3u64 {
+            let mut rng = StdRng::seed_from_u64(100 + seed);
+            let eqs = random_quadratic(11, 10, &mut rng);
+            let (gb0, st0, _) = counted(eqs.clone(), 11, MAX_MATRIX_WORDS, OFF);
+            assert!(!st0.oversize && !st0.timed_out);
+            // smallest fitting cap under the late guard alone
+            let (mut lo, mut hi) = (0u64, st0.peak_matrix_bytes / 8);
+            while lo + 1 < hi {
+                let mid = (lo + hi) / 2;
+                if counted(eqs.clone(), 11, mid, OFF).1.oversize {
+                    lo = mid;
+                } else {
+                    hi = mid;
+                }
+            }
+            let cap = hi;
+            let (gb_l, st_l, t_l) = counted(eqs.clone(), 11, cap, OFF);
+            let (gb_e, st_e, t_e) = counted(eqs.clone(), 11, cap, EAGER);
+            assert!(!st_l.oversize && !st_e.oversize);
+            assert_eq!(gb0, gb_e);
+            assert_eq!(gb_l, gb_e);
+            assert_eq!(t_l, t_e, "counted operations must not change");
+            assert_eq!(st_l.word_xors, st_e.word_xors);
+            assert_eq!(st_l.steps, st_e.steps);
+            assert_eq!(st_l.reducer_rows, st_e.reducer_rows);
+            assert_eq!(st_l.divisor_tests, st_e.divisor_tests);
+            if cap > 1 {
+                let (_, a, _) = counted(eqs.clone(), 11, cap - 1, OFF);
+                let (_, b, _) = counted(eqs, 11, cap - 1, EAGER);
+                assert!(a.oversize && b.oversize && !b.timed_out);
+            }
+        }
+    }
+
+    /// An oversized step is refused before any sparse row is stored: the refusal arrives with `oversize` set and the
+    /// step's pairs put back, whatever the cap.
+    #[test]
+    fn an_oversized_step_is_refused_while_building() {
+        let mut rng = StdRng::seed_from_u64(7);
+        let eqs = random_quadratic(14, 14, &mut rng);
+        for cap in [1u64, 8, 64] {
+            let (_, st, _) = counted(eqs.clone(), 14, cap, EAGER);
+            assert!(st.oversize, "cap {cap}");
+            assert!(st.pairs_left > 0);
+            // refused before any matrix of the step was recorded
+            assert!(st.matrix_rows_max == 0 || st.peak_matrix_bytes / 8 <= cap);
+        }
+        // the public entry point keeps the 1 GiB guard and is unchanged
+        let (_, st) = groebner_basis_f4(eqs, 14, None);
+        assert!(!st.oversize);
+    }
+
+    /// The deadline is honoured while building rows, not only in the
+    /// elimination: a build deadline already past stops the first step
+    /// that reaches row building.
+    #[test]
+    fn the_budget_is_honoured_while_building_rows() {
+        let mut rng = StdRng::seed_from_u64(9);
+        let eqs = random_quadratic(14, 14, &mut rng);
+        let guard = EarlyGuard {
+            deadline: Some(Instant::now()),
+            ..EAGER
+        };
+        let (_, st, _) = counted(eqs, 14, MAX_MATRIX_WORDS, guard);
+        assert!(st.timed_out && !st.oversize);
+        assert_eq!(st.matrix_rows_max, 0, "no matrix of the step was built");
+        assert!(st.pairs_left > 0);
     }
 }
 

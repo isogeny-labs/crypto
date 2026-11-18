@@ -18,6 +18,13 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Prime31 CM endomorphism-degree exclusion and non-generic solver lead triage (automation, started 2026-11-18, branch automation/prime31-cm-degree-gate-20261118, PR #4657; exact gate implemented, CI pending)
 
+- [x] Root-finding 100x: baseline and plan (claude, 2026-11-17, branch claude/rootfind-baseline-100x, PR #4619, stacked on #4607; report in research/rootfind_baseline_100x_20261117)
+  - [x] Survey what the repository already measured and ruled out for root finding (`SURVEY.md`)
+  - [x] Local baseline: per-phase time and counted operations, prime and Koblitz, with an A/A noise floor (`RESULTS.md`)
+  - [x] Component breakdown of where the time goes (addition kernels, probe, table build)
+  - [ ] Roofline and cycle counts: not possible here (no hardware PMU); needs the lab's isolated runner
+  - [x] Plan: ranked levers with predicted factors and the cheapest falsifying test each (`PLAN.md`); lever 1 prototyped and measured
+- [ ] Root-finding 100x, next: land lever 1 as an oracle with witness recovery and ledger parity, then run the cheap tests for levers 2–4 (interleaving, L2-resident filter, threads)
 - [ ] Repair the 28 examples/tests/bins on main broken by lossy merges (syntax, struct drift, lost library APIs) (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw; in progress)
 - [x] Fix the `wide-vars` build (u64 vs `Mask` in f4_trace, pq_f4_f2, koblitz_groebner) and clear `clippy-maintained.sh` -D warnings (claude, 2026-11-17, branch claude/wide-vars-clippy-cleanup, PR #4607, stacked on #4589; done, awaiting review)
 - [x] Clean up main CI breakages and add an ecbench CI check (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4569 merged; ecbench-smoke check passing; remaining main blockers need the owner: AWS key, pcc claim_type, hec-multi record, rho currency)
@@ -39,6 +46,10 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 - [ ] LEAD-ICE-hybrid-guess-determine-l7: stretch cell E8 (3, 22, 8), k* under R1 and its nested extension, k = 0 baseline, fresh draws, on a RunPod CPU pod (claude, started 2026-11-18, branch claude/ic-lead-hybrid-gd-l7)
 
 - [x] k-sum table build with x-only siblings at the last level (P2 KSUM-SIB): paired benchmark on the Table B curves, plus the P1 x(iP) recurrence probe (claude, started 2026-11-18, branch aburan28/inspiring-dijkstra-ay05qi, PR #4649): done; record close blocked by main's malformed 20261117T0334Z-hec-multi-production-cold.json
+
+- [ ] Table B k-sum: profile the cost split of the pruned k-sum arm and land the next measured lever (claude, started 2026-11-18, branch claude/f4-f5-algorithm-speed-bvp7qd, PR #4651)
+
+- [ ] Koblitz K1 small rows (n23/n29/n37): next lever on the generator-orbit IC arm, gap reported against both rho strong and v5 (claude, started 2026-11-18, branch claude/f4-f5-algorithm-speed-bvp7qd, PR #4651)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
