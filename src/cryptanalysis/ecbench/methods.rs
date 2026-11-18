@@ -227,7 +227,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "solver",
             default: Some(""),
-            help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
+            help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, f4-f2-full-width, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
         },
         ParamDecl {
             name: "linalg",
