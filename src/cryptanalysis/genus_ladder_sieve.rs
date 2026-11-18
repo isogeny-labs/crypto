@@ -526,7 +526,7 @@ impl<'a> Solver<'a> {
             col,
             chi,
             sq,
-            inv2: (p + 1) / 2,
+            inv2: p.div_ceil(2),
             head: vec![NONE; p as usize],
             cnt: vec![0; p as usize],
             recs: Vec::new(),

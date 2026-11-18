@@ -1,0 +1,11 @@
+{
+ "frozen_before_run": "2026-11-18",
+ "method": "multi-target 4-summand: shared factor-base logs from one collection, each target decomposed into 4 signed orbit elements via the triple-sum table (examples/prime_fast_j0_multi4.rs), vs ic_multi_solve_ex (in-row) and the folded multi-target BSGS (prime_fast_j0_bsgs_multi, same curves and instance seeds)",
+ "tuning": "CSKIP=150, 32 bits, extra=20, 6 rows per cell (2 curves x 3 instances), baseline c=0.5; sym4 total ms by B at T=64: B=20/28/36/44/52/64/80 = 168.5/63.4/47.6/46.9/70.6/143.6/323.2; at T=512: 869.1/333.9/190.4/136.3/127.3/180.2/353.4. All targets verified in all rows. Rows in multi4_tune/.",
+ "frozen_parameters": {"T=64": {"B4": 44}, "T=512": {"B4": 52}, "extra": 20, "baseline_c": [0.5, 0.8]},
+ "holdout_command": "CSKIP=1700 prime_fast_j0_multi4 out.jsonl 32 <B4> <T> 4 20 <baseline_c>  (baseline_c in {0.5, 0.8}, two passes); CSKIP=1700 prime_fast_j0_bsgs_multi out.jsonl 32 <T> 4",
+ "holdout": "CSKIP=1700 (curves never used in tuning or debugging), 2 curves x 4 instances = 8 rows per cell, T in {64, 512}; wall clock, one host, no isolation; every target verified in every arm",
+ "prediction": "pooled sum(base_total_ms)/sum(sym4_total_ms) >= 2.5 (T=64) and >= 1.8 (T=512), where base is the better of the two baseline c passes in that cell; no prediction against BSGS (reported as measured)",
+ "abandon_rule": "any pooled ratio against the better baseline c < 1.3, or any unverified target or failed setup row => the claim that multi-target 4-summand collection beats the tuned ic_multi_solve_ex is withdrawn",
+ "known_limits": "one group per size, no isolation or A/A, 8 rows per cell, B grid optimum at T=512 near 52 (64 was worse, 80 worse still), baseline c grid is two values, BSGS and the sym4 arms use different binaries (timing scope checked only by reading), the earlier T=64/512 BSGS numbers were on other curves"
+}

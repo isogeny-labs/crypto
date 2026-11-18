@@ -1,35 +1,35 @@
 {
   "schema": "ecdlp.attack-graph/v1",
-  "corpus_version": "2026-11-01",
+  "corpus_version": "2026-11-17",
   "support_relations": [
     "conditions",
     "enables",
     "model_bridge"
   ],
   "counts": {
-    "nodes": 613,
-    "frontier": 395,
+    "nodes": 631,
+    "frontier": 411,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
-      "definition": 43,
+      "definition": 45,
       "assumed": 18,
       "proved_external": 132,
       "algorithm": 12,
-      "conditional": 89,
+      "conditional": 91,
       "measured": 31,
-      "proved_internal_unreviewed": 70,
-      "open": 70,
+      "proved_internal_unreviewed": 72,
+      "open": 82,
       "heuristic": 71,
       "refuted": 33,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 560,
+      "none": 576,
       "kernel_checked": 45,
       "stated_open": 3,
       "lean_written_unchecked": 1,
-      "native_exact": 4
+      "native_exact": 6
     }
   },
   "frontier": [
@@ -39,10 +39,11 @@
       "status": "heuristic",
       "formal": "none",
       "action": "prove, or measure on a scaling family without censoring",
-      "impact": 13,
+      "impact": 14,
       "downstream": [
         "ALG-SP-GAUDRY-ABELIAN-IC",
         "ALG-SP-JV-COVER-DECOMPOSITION",
+        "COND-HASHED-ECDL-TENSOR-BOUND",
         "COND-PF-APS-COST",
         "COND-PF-EP-BETA-THRESHOLD",
         "COND-PF-HKPYY-COMPLEXITY",
@@ -58,7 +59,8 @@
       "depends_citations": [],
       "research_targets": [
         "RT-END-TO-END-IC",
-        "RT-BK-DECOMP-MEASURE"
+        "RT-BK-DECOMP-MEASURE",
+        "RT-PRIME-YIELD-RANK-WRITEONCE"
       ],
       "pressure": [
         {
@@ -101,13 +103,14 @@
       "status": "heuristic",
       "formal": "none",
       "action": "prove, or measure on a scaling family without censoring",
-      "impact": 10,
+      "impact": 11,
       "downstream": [
         "ALG-SP-JV-COVER-DECOMPOSITION",
         "ALG-SPARSE-LINEAR-ALGEBRA",
         "ALG-WD-GAUDRY-2000",
         "ALG-WD-THERIAULT-2003",
         "ATTACK-GHS-WEIL-DESCENT",
+        "COND-HASHED-ECDL-TENSOR-BOUND",
         "COND-RP-TWO-SUMMAND-FAMILY-LAW",
         "COND-WD-JV-COVER-DECOMP",
         "COND-WD-KMPS-INEFFECTIVE",
@@ -115,7 +118,9 @@
         "THM-WD-GTTD-THM1"
       ],
       "depends_citations": [],
-      "research_targets": [],
+      "research_targets": [
+        "RT-PRIME-YIELD-RANK-WRITEONCE"
+      ],
       "pressure": [
         {
           "from": "HEUR-RP-WALK-TARGET-GUARD",
@@ -554,6 +559,27 @@
       "pressure": []
     },
     {
+      "id": "GAP-RP-COMMON-KERNEL",
+      "label": "Common-kernel construction for a prime-field correlated-packet route",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 3,
+      "downstream": [
+        "COND-HASHED-ECDL-TENSOR-BOUND",
+        "COND-WAGNER-ECDLP-FILTER-GAIN",
+        "GAP-END-TO-END-IC-EXPONENT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-RP-COMMON-KERNEL-WITNESSES",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "HEUR-BK-GG-DECOMP-PROPORTION",
       "label": "Decomposable proportion ~1/n! (l=1) or q^(lk-n)/k!",
       "status": "heuristic",
@@ -860,6 +886,24 @@
       "pressure": []
     },
     {
+      "id": "THM-ARITY3-FP-UNIT-EXPLANATION",
+      "label": "Source-bound Fp unit-equation explanation checker",
+      "status": "proved_internal_unreviewed",
+      "formal": "native_exact",
+      "action": "independent review, then kernel-check",
+      "impact": 3,
+      "downstream": [
+        "GAP-ARITY3-BOOLEAN-BINDING",
+        "GAP-ARITY3-PROOF-COMPOSITION",
+        "GAP-RP-SAT-SCALING"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-ARITY3-PROOF-COMPOSITION"
+      ],
+      "pressure": []
+    },
+    {
       "id": "THM-GB-HPS-FIRST-FALL-WEIL",
       "label": "Hodges-Petit-Schlather: first fall degree bounds for Weil descent",
       "status": "proved_external_unread",
@@ -960,6 +1004,54 @@
       "depends_citations": [],
       "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "GAP-ARITY3-BOOLEAN-BINDING",
+      "label": "Bind Fp explanations to Boolean trail literals",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 2,
+      "downstream": [
+        "GAP-ARITY3-PROOF-COMPOSITION",
+        "GAP-RP-SAT-SCALING"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-ARITY3-PROOF-COMPOSITION"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-END-TO-END-IC-EXPONENT",
+      "label": "End-to-end index-calculus exponent obligation",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 2,
+      "downstream": [
+        "COND-HASHED-ECDL-TENSOR-BOUND",
+        "COND-WAGNER-ECDLP-FILTER-GAIN"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-END-TO-END-IC",
+        "RT-REPRESENTATION-FILTER"
+      ],
+      "pressure": [
+        {
+          "from": "THM-RP-GUARDED-GROWING-B",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-RP-IC-BOUNDARY-ROUND1",
+          "relation": "qualifies"
+        },
+        {
+          "from": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+          "relation": "obstructs"
+        }
+      ]
     },
     {
       "id": "GAP-SP-JV-CONJECTURE",
@@ -1316,6 +1408,22 @@
       ]
     },
     {
+      "id": "GAP-ARITY3-PROOF-COMPOSITION",
+      "label": "Compose finite-field and Boolean proof logs",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "GAP-RP-SAT-SCALING"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-ARITY3-PROOF-COMPOSITION"
+      ],
+      "pressure": []
+    },
+    {
       "id": "GAP-PF-PKM-ASYMPTOTIC-OPEN",
       "label": "PKM asymptotic complexity is open by the authors' statement",
       "status": "open",
@@ -1330,25 +1438,6 @@
         "RT-PF-PROVE-HT-OR-BOUNDED"
       ],
       "pressure": []
-    },
-    {
-      "id": "GAP-RP-COMMON-KERNEL",
-      "label": "Common-kernel construction for a prime-field correlated-packet route",
-      "status": "open",
-      "formal": "none",
-      "action": "prove or refute",
-      "impact": 1,
-      "downstream": [
-        "GAP-END-TO-END-IC-EXPONENT"
-      ],
-      "depends_citations": [],
-      "research_targets": [],
-      "pressure": [
-        {
-          "from": "CEX-RP-COMMON-KERNEL-WITNESSES",
-          "relation": "qualifies"
-        }
-      ]
     },
     {
       "id": "GAP-SP-BOUNDED-ROOT-SUMPOLY",
@@ -1368,6 +1457,118 @@
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "GAP-TENSOR-AGGREGATE-COST-CERTIFICATE",
+      "label": "Tensor aggregate construction and space certificate",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "COND-HASHED-ECDL-TENSOR-BOUND"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-TENSOR-TYPED-COST-CERTIFICATION"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-TENSOR-PREDICATE-COST-CERTIFICATE",
+      "label": "Typed tensor predicate-cost certificate",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "COND-HASHED-ECDL-TENSOR-BOUND"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-TENSOR-TYPED-COST-CERTIFICATION"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-WAGNER-FILTER-GAIN-BRIDGE",
+      "label": "Wagner variance to useful filter-gain bridge",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "COND-WAGNER-ECDLP-FILTER-GAIN"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WAGNER-W-NATIVE"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-WAGNER-W-SCALING",
+      "label": "Wagner bucket-variance scaling law",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "COND-WAGNER-ECDLP-FILTER-GAIN"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WAGNER-W-NATIVE"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-XEDNI-MINIMAL-MODEL-HEIGHT",
+      "label": "Selected-lift height versus global minimal discriminant",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "OBSTRUCTION-XEDNI-HEIGHT"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XEDNI-SELECTOR-MINIMAL-HEIGHT"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-XEDNI-REDUCTION-CORRESPONDENCE",
+      "label": "Xedni selected-lift reduction and subgroup correspondence",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "OBSTRUCTION-XEDNI-HEIGHT"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XEDNI-SELECTOR-MINIMAL-HEIGHT"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-XEDNI-SELECTOR-TERMINATION",
+      "label": "Explicit terminating xedni lift selector",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "OBSTRUCTION-XEDNI-HEIGHT"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-XEDNI-SELECTOR-MINIMAL-HEIGHT"
+      ],
+      "pressure": []
     },
     {
       "id": "OPEN-BK-EMBEDDING-THRESHOLD-DISAGREEMENT",
@@ -1806,6 +2007,23 @@
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "HEUR-WAGNER-FOUR-SUM",
+      "label": "Wagner four-sum cube-root heuristic",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-WAGNER-ECDLP-FILTER-GAIN"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-REPRESENTATION-FILTER",
+        "RT-WAGNER-W-NATIVE"
+      ],
+      "pressure": []
     },
     {
       "id": "HEUR-WD-ADH-NORM-SMOOTH",
@@ -3247,34 +3465,6 @@
       ]
     },
     {
-      "id": "GAP-END-TO-END-IC-EXPONENT",
-      "label": "End-to-end index-calculus exponent obligation",
-      "status": "open",
-      "formal": "none",
-      "action": "prove or refute",
-      "impact": 0,
-      "downstream": [],
-      "depends_citations": [],
-      "research_targets": [
-        "RT-END-TO-END-IC",
-        "RT-REPRESENTATION-FILTER"
-      ],
-      "pressure": [
-        {
-          "from": "THM-RP-GUARDED-GROWING-B",
-          "relation": "qualifies"
-        },
-        {
-          "from": "MEAS-RP-IC-BOUNDARY-ROUND1",
-          "relation": "qualifies"
-        },
-        {
-          "from": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-          "relation": "obstructs"
-        }
-      ]
-    },
-    {
       "id": "GAP-FALL-DEGREE-COST-BRIDGE",
       "label": "Every degree-based cost must pass through sd or last fall",
       "status": "open",
@@ -3871,6 +4061,39 @@
       ]
     },
     {
+      "id": "GAP-PKM-GROWING-DUAL-CERTIFICATE",
+      "label": "Growing PKM closure-dual certificate family",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PKM-DUAL-WIDTH-CERTIFICATES"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PKM-MATRIX-WIDTH-BRIDGE",
+      "label": "PKM closure degree to matrix-width bridge",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PKM-DUAL-WIDTH-CERTIFICATES"
+      ],
+      "pressure": [
+        {
+          "from": "THM-PF-REPO-KUMMER-FFD-FOUR",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "GAP-PKM-SOLVING-DEGREE",
       "label": "Prime-field PKM solving-degree growth",
       "status": "open",
@@ -3881,7 +4104,8 @@
       "depends_citations": [],
       "research_targets": [
         "RT-PKM-DEGREE",
-        "RT-PF-CSTEP-T14"
+        "RT-PF-CSTEP-T14",
+        "RT-PKM-DUAL-WIDTH-CERTIFICATES"
       ],
       "pressure": [
         {
@@ -3890,6 +4114,10 @@
         },
         {
           "from": "THM-GB-SALIZZONI-SD-LE-DREG-PLUS-1",
+          "relation": "qualifies"
+        },
+        {
+          "from": "GAP-PKM-MATRIX-WIDTH-BRIDGE",
           "relation": "qualifies"
         }
       ]
@@ -3910,6 +4138,20 @@
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "GAP-PRIME-YIELD-RANK-POPULATION",
+      "label": "Fixed-population prime-field yield and rank evidence",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PRIME-YIELD-RANK-WRITEONCE"
+      ],
+      "pressure": []
     },
     {
       "id": "GAP-PROTOCOL-ASSUMPTION-MAPPING",
@@ -3987,7 +4229,9 @@
       "impact": 0,
       "downstream": [],
       "depends_citations": [],
-      "research_targets": [],
+      "research_targets": [
+        "RT-ARITY3-PROOF-COMPOSITION"
+      ],
       "pressure": []
     },
     {
@@ -4072,7 +4316,8 @@
       "depends_citations": [],
       "research_targets": [
         "RT-XEDNI-END-TO-END",
-        "RT-XT-SZPIRO-XEDNI-LIFTS"
+        "RT-XT-SZPIRO-XEDNI-LIFTS",
+        "RT-XEDNI-SELECTOR-MINIMAL-HEIGHT"
       ],
       "pressure": [
         {
@@ -4358,20 +4603,6 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
-    },
-    {
-      "id": "HEUR-WAGNER-FOUR-SUM",
-      "label": "Wagner four-sum cube-root heuristic",
-      "status": "heuristic",
-      "formal": "none",
-      "action": "prove, or measure on a scaling family without censoring",
-      "impact": 0,
-      "downstream": [],
-      "depends_citations": [],
-      "research_targets": [
-        "RT-REPRESENTATION-FILTER"
-      ],
       "pressure": []
     },
     {
@@ -5072,6 +5303,25 @@
       "pressure": []
     },
     {
+      "id": "COND-HASHED-ECDL-TENSOR-BOUND",
+      "label": "Hashed-ECDL Boolean tensor contraction bound",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-TENSOR-TYPED-COST-CERTIFICATION"
+      ],
+      "pressure": [
+        {
+          "from": "THM-TENSOR-D4-NUMERIC-BOUNDARY",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "COND-PA-FS-BATCH-SOUNDNESS",
       "label": "Fiat-Shamir RLC batch verification fails with probability <= d/|F|",
       "status": "conditional",
@@ -5284,6 +5534,20 @@
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "COND-WAGNER-ECDLP-FILTER-GAIN",
+      "label": "Wagner-style ECDLP representation-filter gain",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-WAGNER-W-NATIVE"
+      ],
+      "pressure": []
     },
     {
       "id": "COND-WD-EG-2007-L13",
@@ -6691,6 +6955,20 @@
       "depends_citations": [],
       "research_targets": [
         "RT-SP-DIEM-READ"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "THM-TENSOR-D4-NUMERIC-BOUNDARY",
+      "label": "Exact D.4 numeric recursion boundary",
+      "status": "proved_internal_unreviewed",
+      "formal": "native_exact",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-TENSOR-TYPED-COST-CERTIFICATION"
       ],
       "pressure": []
     },

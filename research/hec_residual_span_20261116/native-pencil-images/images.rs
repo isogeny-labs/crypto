@@ -1,0 +1,5 @@
+use hec_native_ic::{jac::{Curve,Div},poly::Poly,fp::Fp};
+use std::collections::BTreeMap;
+// c*X+d, Horner reduction modulo X²+A*X+B, including zero polynomials.
+fn rem(p:&Poly,a:u64,b:u64,f:&Fp)->(u64,u64){if p.n==0{return(0,0);}let(mut c,mut d)=(0,p.c[p.n-1]);for i in(0..p.n-1).rev(){if c==0{c=d;d=p.c[i];}else{let next=f.sub(d,f.mul(a,c));d=f.sub(p.c[i],f.mul(b,c));c=next;}}(c,d)}
+pub fn recover(c:&Curve,r:&Div,t:u64,q:&Poly,xs:&[u64],audit:bool)->BTreeMap<u64,(u64,u64)>{let mut out=BTreeMap::new();if xs.is_empty(){return out;}let f=&c.fp;if q.deg()==2{assert_eq!(q.c[2],1);let(uc,ud)=rem(&r.u,q.c[1],q.c[0],f);let(vc,vd)=rem(&r.v,q.c[1],q.c[0],f);let wc=f.add(vc,f.mul(t,uc));let wd=f.add(vd,f.mul(t,ud));for &x in xs{let u=f.add(f.mul(uc,x),ud);let y=f.add(f.mul(wc,x),wd);out.insert(x,(y,u));}}else{for &x in xs{let u=r.u.eval(x,f);let y=f.add(r.v.eval(x,f),f.mul(t,u));out.insert(x,(y,u));}}if audit{for(&x,&(y,u))in &out{assert_eq!(u,r.u.eval(x,f));assert_eq!(y,f.add(r.v.eval(x,f),f.mul(t,u)));}}out}

@@ -1,0 +1,34 @@
++ l06r/target/release/l06r gate-enum --tag pilot --p 257 --count 20 --force C --out pilot/pilot_ge_p257_C.jsonl (run directly; exit=0 seconds=104)
++ l06r/target/release/l06r gate-enum --tag pilot --p 257 --count 200 --force auto --out pilot/pilot_ge_p257_auto.jsonl
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 257 --u-count 3000 --prime-target 20 --draw-cap 40000 --out pilot/pilot_census_p257.jsonl
+exit=0 seconds=9
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 521 --u-count 1000 --prime-target 10 --draw-cap 40000 --out pilot/pilot_census_p521.jsonl
+exit=0 seconds=8
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 1031 --u-count 500 --prime-target 10 --draw-cap 40000 --out pilot/pilot_census_p1031.jsonl
+exit=0 seconds=9
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 2053 --u-count 300 --prime-target 10 --draw-cap 40000 --out pilot/pilot_census_p2053.jsonl
+exit=0 seconds=12
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 4099 --u-count 300 --prime-target 10 --draw-cap 40000 --out pilot/pilot_census_p4099.jsonl
+exit=0 seconds=25
+# above: small pilot census (moved to pilot/small/); below: decision-size pilot census
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 257 --u-count 3000 --prime-target 120 --draw-cap 40000 --out pilot/pilot_census_p257.jsonl
+exit=0 seconds=21
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 521 --u-count 3000 --prime-target 120 --draw-cap 40000 --out pilot/pilot_census_p521.jsonl
+exit=0 seconds=40
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 1031 --u-count 3000 --prime-target 120 --draw-cap 40000 --out pilot/pilot_census_p1031.jsonl
+exit=0 seconds=75
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 2053 --u-count 1000 --prime-target 120 --draw-cap 40000 --out pilot/pilot_census_p2053.jsonl
+exit=0 seconds=82
++ timeout 900 l06r/target/release/l06r census --tag pilot --p 4099 --u-count 1000 --prime-target 120 --draw-cap 40000 --out pilot/pilot_census_p4099.jsonl
++ l06r/target/release/l06r lagr2 --out pilot/pilot_l2_lagrangians.json
+exit=0
+exit=0 seconds=183
++ l06r/target/release/l06r gsp --samples 200000 --out pilot/pilot_gsp_reference.json
+exit=0 seconds=103
+gsp identical to L06
+exit=0 seconds=676
++ l06r/target/release/l06r gate-enum --tag pilot --p 257 --count 40 --force B --out pilot/pilot_ge_p257_B.jsonl
+exit=0 seconds=128
++ python3 -I analyze.py pilot --census-prefix pilot_census_p --gate-prefix pilot_ge_p257_ --tag pilot --g1-counts auto=200,B=40,C=20 --aux-prefix pilot_ --gates-only > pilot/pilot_gates.json
+exit=0
+# pilot census JSONL (per-curve rows, 3-5 MB each, incl. criterion fields) deleted after hashing; regenerate with pilot/run_pilot.sh census

@@ -36,6 +36,10 @@ fn authenticate_cached_original(
 #[serde(tag = "phase", rename_all = "snake_case", deny_unknown_fields)]
 enum Boundary {
     Matrix {
+        #[allow(
+            dead_code,
+            reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+        )]
         snapshot: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Event,
     },
     Signed {
@@ -47,6 +51,10 @@ enum Boundary {
 struct NativePayload {
     schema: String,
     binding_sha256: String,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     input_sha256: [u8; 32],
     input_capture_sequence: u64,
     sequence: u64,
@@ -446,7 +454,7 @@ mod tests {
     use super::*;
     fn ordinary_original() -> MathInput {
         let config = CaseConfig {
-                        channels: None,
+            channels: None,
             family: "binary".into(),
             n: 23,
             m: 3,
@@ -472,7 +480,7 @@ mod tests {
     #[test]
     fn foreign_family_and_non_m3_reject_before_hooks_or_callbacks() {
         let mut config = CaseConfig {
-                        channels: None,
+            channels: None,
             family: "binary".into(),
             n: 23,
             m: 3,

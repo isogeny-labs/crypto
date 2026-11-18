@@ -1,0 +1,55 @@
+digraph Curve25519IC {
+  graph [
+    rankdir=TB,
+    bgcolor="white",
+    pad="0.25",
+    nodesep="0.38",
+    ranksep="0.48",
+    fontname="DejaVu Sans",
+    label="Curve25519 index calculus: independent certificate and current boundary",
+    labelloc="t",
+    fontsize=18
+  ];
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="DejaVu Sans",
+    fontsize=11,
+    color="#334155",
+    fillcolor="#f8fafc",
+    margin="0.14,0.09"
+  ];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#64748b"];
+
+  rfc [label="RFC 7748 exact target\np = 2^255 - 19\nMontgomery A = 486662\nprime subgroup order l", fillcolor="#dbeafe", color="#2563eb"];
+  wide [label="Canonical full-width backend\ncurve25519_wide / Fp256\ngroup + wide relation components\nbounded actual-field scans", fillcolor="#dbeafe", color="#2563eb"];
+  oracle [label="Independent exact oracle\nBigUint + generic ECC\nx = u + A/3\nexact S3", fillcolor="#dcfce7", color="#16a34a"];
+  cert [label="Replay evidence\nIDC1h32739202ad9d0c15\n[l]P = O\nS3(G, 2G, -3G) = 0", fillcolor="#ecfccb", color="#65a30d"];
+
+  kummer [label="Exact binary Kummer audit\nv2(p-1)=2\nmax 4 abscissae", fillcolor="#fee2e2", color="#dc2626"];
+  dickson [label="Exact norm-one / Dickson audit\nv2(p+1)=1\nmax 2 abscissae", fillcolor="#fee2e2", color="#dc2626"];
+  mini [label="Later miniature algebraic lane\nisogeny tower + bit interval\nhybrid guessing\nimplemented and replayed", fillcolor="#fef3c7", color="#d97706"];
+  cost [label="Later k=20, m=2 evidence\nbest measured algebraic cell\nabout 3e5 x generic baseline\nat w=0.1 (two-target protocol)", fillcolor="#ffedd5", color="#ea580c"];
+  full [label="Actual 255-bit algebraic run\nno full-size relation collection\nor solver measurement in this artifact", fillcolor="#fee2e2", color="#b91c1c", penwidth=2];
+  frontier [label="Current tracked frontiers\ntorus four-point distribution\nactual-field isolated runner\nsection-coefficient selection", fillcolor="#f1f5f9", color="#475569"];
+  outcome [label="Synchronized status\nindependent oracle verified\nauxiliary route exists but is cost-limited\nfull-size algebraic lane unmeasured", fillcolor="#ede9fe", color="#7c3aed", penwidth=2];
+
+  { rank=same; wide; oracle; }
+  { rank=same; kummer; dickson; mini; }
+  { rank=same; cost; full; }
+
+  rfc -> wide [label="primary implementation"];
+  rfc -> oracle [label="independent derivation"];
+  wide -> oracle [dir=both, label="exact parameter cross-check", color="#16a34a"];
+  oracle -> cert [label="certify + replay"];
+  oracle -> kummer [label="p - 1"];
+  oracle -> dickson [label="p + 1"];
+  kummer -> mini [label="auxiliary route avoids this limit"];
+  mini -> cost [label="later canonical measurement"];
+  wide -> full [label="components exist; run absent"];
+  dickson -> frontier [label="narrow audit only"];
+  cost -> frontier [label="cost, not existence, is open"];
+  frontier -> outcome;
+  full -> outcome;
+  cert -> outcome [label="this artifact's result", color="#16a34a"];
+}

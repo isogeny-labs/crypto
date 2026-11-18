@@ -313,6 +313,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for StructuredOracle<'_> {
             ("incomplete_queries".into(), u64::from(exhausted)),
         ]);
         let cost = SolverCost {
+            first_fall_degree: None,
+            last_fall_degree: None,
+            degree_of_regularity_observed: None,
+            degree_trace: Vec::new(),
             ops: words,
             op_unit: super::pdp3_koblitz::WORD_XOR_UNIT.into(),
             wall_ns: started.elapsed().as_nanos() as u64,
@@ -321,7 +325,6 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for StructuredOracle<'_> {
             solving_degree: None,
             timed_out: exhausted,
             extra,
-            ..Default::default()
         };
         self.totals.absorb(&shape, Some(&cost), exhausted);
         relation
