@@ -231,6 +231,8 @@ pub(crate) struct Cube<R: Ring> {
     s: u32,
     e3: u128,
     c: R::E,
+    // c^{-1} in the 3-Sylow; computed once for rolling digit corrections.
+    c_inv: R::E,
     pub w: R::E,
     p3s: u128,
 }
@@ -256,6 +258,7 @@ impl<R: Ring> Cube<R> {
                 s,
                 e3,
                 c: one,
+                c_inv: one,
                 w: one,
                 p3s: 1,
             };
@@ -270,6 +273,7 @@ impl<R: Ring> Cube<R> {
         };
         let c = rpow(&r, g, t); // generator of the 3-Sylow, order 3^s
         let p3s = 3u128.pow(s);
+        let c_inv = if s >= 2 { rpow(&r, c, p3s - 1) } else { r.one() };
         let w = rpow(&r, c, p3s / 3); // primitive cube root of unity
         let e3 = if t % 3 == 1 {
             (2 * t + 1) / 3
@@ -282,6 +286,7 @@ impl<R: Ring> Cube<R> {
             s,
             e3,
             c,
+            c_inv,
             w,
             p3s,
         }
@@ -313,13 +318,46 @@ impl<R: Ring> Cube<R> {
         }
         let x0 = rpow(r, a, self.e3); // x0^3 = a * h, h in the 3-Sylow
         let h = if t % 3 == 1 { r.mul(g, g) } else { g };
+        // For s=1, a cube has h=1 and x0 is already a root.
+        if self.s == 1 {
+            return Some(x0);
+        }
         let w2 = r.mul(self.w, self.w);
-        let mut l: u128 = 0; // h = c^l, l found digit by digit
+        // For s=2, cube membership forces h into <w> of order 3.
+        // The correction is c^{-d} for h=w^d, d=0,1,2.
+        if self.s == 2 {
+            let factor = if h == r.one() {
+                r.one()
+            } else if h == self.w {
+                self.c_inv
+            } else if h == w2 {
+                r.mul(self.c_inv, self.c_inv)
+            } else {
+                return None;
+            };
+            return Some(r.mul(x0, factor));
+        }
+        // General s: find 3-adic digits of log_c(h), but maintain
+        // c^{-l} incrementally instead of recomputing c^{-l} for each
+        // digit. For cubes, the low digit is zero, so accumulate
+        // c^{-l/3} at the same time and eliminate the final power.
+        // Public root-finding inputs only: branches are variable-time.
+        let mut correction = r.one();
+        let mut root_correction = r.one();
+        let mut inverse_power = self.c_inv; // c^{-3^j}
+        let mut previous_power = r.one();   // c^{-3^(j-1)}
         for j in 0..self.s {
-            let corr = rpow(r, self.c, (self.p3s - l) % self.p3s); // c^{-l}
-            let x = r.mul(h, corr);
-            let z = rpow(r, x, 3u128.pow(self.s - 1 - j)); // w^digit
-            let d = if z == r.one() {
+            let mut z = if j == 0 {
+                h
+            } else {
+                r.mul(h, correction)
+            };
+            // z = (h*c^{-l})^(3^(s-1-j)). Repeated cubing uses only
+            // 2(s-1-j) field multiplications, not binary exponentiation.
+            for _ in (j + 1)..self.s {
+                z = r.mul(z, r.mul(z, z));
+            }
+            let digit = if z == r.one() {
                 0
             } else if z == self.w {
                 1
@@ -328,13 +366,32 @@ impl<R: Ring> Cube<R> {
             } else {
                 return None;
             };
-            l += d * 3u128.pow(j);
+            if digit != 0 {
+                // The low digit of a cube's 3-Sylow log must be zero.
+                if j == 0 {
+                    return None;
+                }
+                let factor = if digit == 1 {
+                    previous_power
+                } else {
+                    r.mul(previous_power, previous_power)
+                };
+                root_correction = r.mul(root_correction, factor);
+                if j + 1 < self.s {
+                    let term = if digit == 1 {
+                        inverse_power
+                    } else {
+                        r.mul(inverse_power, inverse_power)
+                    };
+                    correction = r.mul(correction, term);
+                }
+            }
+            previous_power = inverse_power;
+            if j + 1 < self.s {
+                inverse_power = r.mul(inverse_power, r.mul(inverse_power, inverse_power));
+            }
         }
-        if !l.is_multiple_of(3) {
-            return None;
-        }
-        let y_inv = rpow(r, self.c, (self.p3s - l / 3) % self.p3s); // c^{-l/3}
-        Some(r.mul(x0, y_inv))
+        Some(r.mul(x0, root_correction))
     }
 }
 
