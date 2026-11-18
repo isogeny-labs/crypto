@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-a43586d07cf5344e930a53f9a43cbf610213085b8e237b2441a871cbaf3358df  H116FiberTrace.lean
+c7e24fef4e4b1a4d53194dd1b1a55af9185505d8b3820dcd25901f3ae38c1360  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  112 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  119 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -46,6 +46,8 @@ d394c8993e2163bbf80c4cdb313da455d456402cdee0eb4d62edbf559431157d  receipts/point
 47b5ab662d6ffb77e3b5e0a098741d3c2bc293d3c7a05f69764b4f39a133a7ab  receipts/point-observable-audit.txt
 6c773a22800689a181321a476fa59f95e0478132e0a1da72007d1bc318ca39cd  receipts/generator-certificate-build.txt
 8c9eb79f902c872b7860f8089d6bc5b280bfce3151aa6428e346df874a04b6a0  receipts/generator-certificate-audit.txt
+4165925670b0621960cfbf9f0361276bf60b7b3c134653a847aeb2377ca9f2fb  receipts/periodic-fixed-loci-build.txt
+b04c0644adf3fbb0fe15e4cbe36456b2bec88be2f226f29e2c6376066161068a  receipts/periodic-fixed-loci-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -191,6 +193,19 @@ the Frobenius characteristic expression, defines the trace as
 `V-1` orientation. Producing a finite-extension closure certificate remains an
 external verification task. Such a certificate does not prove the equation on
 the algebraic closure or identify rational/formal maps. [pcc:unverified]
+
+The 119-theorem checkpoint proves an exact algebraic-point exhaustion bridge.
+Any coordinate pair in an algebraic extension of `ZMod p` lies in one finite
+intermediate field, so a common positive Frobenius power fixes both
+coordinates. Iterating Mathlib's point Frobenius therefore proves that every
+affine algebraic point lies in some positive fixed locus. A generic
+endomorphism lemma promotes vanishing on every such locus to global vanishing,
+and H116 composes it to the exact pointwise `V-1` orientation. The checked
+`ZMod 3` mutation control shows why one fixed locus is insufficient: negation
+fixes only zero at period one, where the identity mutation is invisible, while
+period two exposes it at one. This reduction does not prove the characteristic
+identity on the finite fixed loci, identify rational/scheme morphisms, or
+imply an ECDLP speedup. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

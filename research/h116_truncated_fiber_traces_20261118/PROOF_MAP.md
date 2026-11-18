@@ -587,7 +587,11 @@ unchanged. [pcc:unverified]
 | generator checks imply characteristic equation | proof-carrying certificate | H116 | `AddMonoid.End G` | closure certificate and per-generator evaluations |
 | trace equals `p+1-#E(F_p)` | definition | H116 over `Nat.card` | prime-field affine point type | finite base field |
 | generator certificate implies pointwise `V-1` orientation | elliptic specialization | H116 | finite algebraic extension points | closure and per-generator checks |
-| generic algebraic-closure/rational-map equality | endpoint obligation | future elliptic owner | elliptic morphisms | separating theorem or standard Frobenius characteristic theorem |
+| algebraic coordinate pair has a common Frobenius period | finite-subfield theorem | Mathlib plus H116 composition | algebraic prime-field extension | finite-dimensional adjoin of both coordinates |
+| algebraic affine points exhaust positive Frobenius-fixed loci | elliptic specialization | H116 | algebraic extension points | coordinate iteration and common period |
+| fixed-locus checks imply global characteristic equation | generic endomorphism theorem | H116 | `AddMonoid.End G` | every point periodic and checks on every positive fixed locus |
+| fixed-locus characteristic family implies pointwise `V-1` | elliptic specialization | H116 | algebraic extension points | restricted characteristic identity for every positive period |
+| restricted characteristic identities and rational-map equality | endpoint obligation | future elliptic owner | elliptic morphisms | standard Frobenius theorem on all fixed loci plus morphism identification |
 
 `H116-GENERATOR-CHARPOLY-002` instantiates the finite certificate on the eight
 parent groups. Three cells are cyclic and five use two generators, compressing
@@ -595,6 +599,15 @@ parent groups. Three cells are cyclic and five use two generators, compressing
 dropped-generator control reject; the independent verifier has zero field
 mismatches. This measures the finite interface only and does not discharge the
 generic endpoint row. [pcc:unverified]
+
+The 119-theorem checkpoint replaces the remaining unstructured quantifier over
+algebraic points by an exact family of finite fixed loci. The pair-coordinate
+adjoin is finite, the `n`th point Frobenius raises coordinates to `p^n`, and
+every algebraic point is consequently periodic. Vanishing on every positive
+fixed locus promotes to a global endomorphism equality and composes to
+pointwise `V-1`. The `ZMod 3` single-locus control retains an identity mutation
+that is invisible at period one but exposed at period two. The prospective
+fixed-loci census is frozen but has not run. [pcc:unverified]
 
 ## Short-Weierstrass local-parameter instance gate
 

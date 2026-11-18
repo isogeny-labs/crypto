@@ -4,6 +4,7 @@ import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
 import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
 import Mathlib.RingTheory.FormalGroup.Basic
 import Mathlib.RingTheory.LaurentSeries
 import Mathlib.RingTheory.PowerSeries.Derivative
@@ -949,6 +950,177 @@ theorem zmodAffineVerschiebung_sub_one_eq_of_generators
   apply zmodAffineVerschiebung_sub_one_eq
   exact endomorphism_characteristic_of_generators
     _ (zmodAffineTrace W) p generators hgenerate hchar
+
+/-- Two elements of an algebraic prime-field extension lie in one finite
+intermediate field, so a common positive Frobenius power fixes both. -/
+theorem zmodAlgebraicPair_frobeniusPeriodic
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E] (x y : E) :
+    ∃ n : ℕ, 0 < n ∧ x ^ (p ^ n) = x ∧ y ^ (p ^ n) = y := by
+  let L : IntermediateField (ZMod p) E :=
+    IntermediateField.adjoin (ZMod p) {x, y}
+  let _ : FiniteDimensional (ZMod p) L :=
+    IntermediateField.finiteDimensional_adjoin_pair
+      (Algebra.IsIntegral.isIntegral (R := ZMod p) x)
+      (Algebra.IsIntegral.isIntegral (R := ZMod p) y)
+  let _ : Finite L := Module.finite_of_finite (ZMod p)
+  let _ : Fintype L := Fintype.ofFinite L
+  let xL : L := ⟨x, IntermediateField.mem_adjoin_pair_left (ZMod p) x y⟩
+  let yL : L := ⟨y, IntermediateField.mem_adjoin_pair_right (ZMod p) x y⟩
+  refine ⟨Module.finrank (ZMod p) L, Module.finrank_pos, ?_, ?_⟩
+  all_goals
+    have hcard : Fintype.card L = p ^ Module.finrank (ZMod p) L := by
+      calc
+        Fintype.card L = Fintype.card (ZMod p) ^ Module.finrank (ZMod p) L :=
+          Module.card_eq_pow_finrank (K := ZMod p) (V := L)
+        _ = p ^ Module.finrank (ZMod p) L := by rw [ZMod.card]
+  · exact Subtype.ext_iff.mp (by
+      simpa only [hcard] using (FiniteField.pow_card xL))
+  · exact Subtype.ext_iff.mp (by
+      simpa only [hcard] using (FiniteField.pow_card yL))
+
+/-- The `n`th power of point Frobenius raises both affine coordinates to
+`p^n`. The dependent nonsingularity witness is constructed internally. -/
+theorem zmodAffineFrobeniusPointEnd_pow_some
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p)) {x y : E}
+    (h : WeierstrassCurve.Affine.Nonsingular (W.baseChange E) x y)
+    (n : ℕ) :
+    ∃ hn : WeierstrassCurve.Affine.Nonsingular (W.baseChange E)
+        (x ^ (p ^ n)) (y ^ (p ^ n)),
+      ((affineFrobeniusPointEnd (E := E) W) ^ n)
+          (WeierstrassCurve.Affine.Point.some x y h) =
+        WeierstrassCurve.Affine.Point.some
+          (x ^ (p ^ n)) (y ^ (p ^ n)) hn := by
+  induction n with
+  | zero =>
+      refine ⟨?_, ?_⟩
+      · simpa using h
+      · simp
+  | succ n ih =>
+      obtain ⟨hn, ih⟩ := ih
+      have hn' : WeierstrassCurve.Affine.Nonsingular (W.baseChange E)
+          (x ^ (p ^ (n + 1))) (y ^ (p ^ (n + 1))) := by
+        simpa only [FiniteField.coe_frobeniusAlgHom, ZMod.card, pow_succ,
+          pow_mul] using
+          ((W.baseChange_nonsingular
+            (FiniteField.frobeniusAlgHom (ZMod p) E).injective ..).mpr hn)
+      refine ⟨hn', ?_⟩
+      rw [pow_succ']
+      change affineFrobeniusPointEnd (E := E) W
+        (((affineFrobeniusPointEnd (E := E) W) ^ n)
+          (WeierstrassCurve.Affine.Point.some x y h)) = _
+      rw [ih]
+      simpa only [hn', pow_succ, pow_mul] using
+        (zmodAffineFrobeniusPointEnd_some W hn)
+
+/-- Every affine point over an algebraic prime-field extension is fixed by a
+positive power of point Frobenius. Thus the finite Frobenius-fixed loci exhaust
+the algebraic point group. -/
+theorem zmodAffineFrobeniusPointEnd_periodic
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p))
+    (point : WeierstrassCurve.Affine.Point (W.baseChange E)) :
+    ∃ n : ℕ, 0 < n ∧
+      ((affineFrobeniusPointEnd (E := E) W) ^ n) point = point := by
+  cases point with
+  | zero =>
+      refine ⟨1, by omega, ?_⟩
+      change affineFrobeniusPointEnd (E := E) W 0 = 0
+      rfl
+  | some x y h =>
+      obtain ⟨n, hn, hx, hy⟩ :=
+        zmodAlgebraicPair_frobeniusPeriodic (p := p) x y
+      obtain ⟨hpow, heq⟩ :=
+        zmodAffineFrobeniusPointEnd_pow_some W h n
+      refine ⟨n, hn, ?_⟩
+      calc
+        _ = WeierstrassCurve.Affine.Point.some
+            (x ^ (p ^ n)) (y ^ (p ^ n)) hpow := heq
+        _ = WeierstrassCurve.Affine.Point.some x y h := by
+          simpa only [WeierstrassCurve.Affine.Point.some.injEq] using
+            And.intro hx hy
+
+/-- If every point is periodic under `pi`, then vanishing on every positive
+fixed locus of `pi^n` proves that an additive endomorphism is globally zero. -/
+theorem endomorphism_eq_zero_of_periodic_fixedLoci
+    {G : Type*} [AddCommGroup G]
+    (pi f : AddMonoid.End G)
+    (hperiodic : ∀ point, ∃ n : ℕ, 0 < n ∧ (pi ^ n) point = point)
+    (hzero : ∀ n : ℕ, 0 < n → ∀ point, (pi ^ n) point = point → f point = 0) :
+    f = 0 := by
+  ext point
+  obtain ⟨n, hn, hfix⟩ := hperiodic point
+  exact hzero n hn point hfix
+
+/-- The Frobenius characteristic equation on every positive fixed locus
+promotes to the global endomorphism equation when those loci exhaust points. -/
+theorem endomorphism_characteristic_of_periodic_fixedLoci
+    {G : Type*} [AddCommGroup G]
+    (pi : AddMonoid.End G) (trace cardinality : ℤ)
+    (hperiodic : ∀ point, ∃ n : ℕ, 0 < n ∧ (pi ^ n) point = point)
+    (hchar : ∀ n : ℕ, 0 < n → ∀ point, (pi ^ n) point = point →
+      (pi ^ 2 - (trace : AddMonoid.End G) * pi +
+        (cardinality : AddMonoid.End G)) point = 0) :
+    pi ^ 2 - (trace : AddMonoid.End G) * pi +
+      (cardinality : AddMonoid.End G) = 0 := by
+  exact endomorphism_eq_zero_of_periodic_fixedLoci
+    pi _ hperiodic hchar
+
+/-- Checking only one fixed locus cannot replace exhaustion by every positive
+Frobenius period: negation on `ZMod 3` fixes only zero at period one, where the
+identity mutation vanishes, but period two exposes the mutation at one. -/
+theorem endomorphism_single_fixedLocus_control :
+    let pi : AddMonoid.End (ZMod 3) := -1
+    let f : AddMonoid.End (ZMod 3) := 1
+    (∀ point, pi point = point → f point = 0) ∧
+      f ≠ 0 ∧
+      ∃ point, (pi ^ 2) point = point ∧ f point ≠ 0 := by
+  dsimp
+  constructor
+  · intro point hfix
+    change -point = point at hfix
+    have : (2 : ZMod 3) * point = 0 := by linear_combination -hfix
+    have htwo : (2 : ZMod 3) ≠ 0 := by decide
+    exact (mul_eq_zero.mp this).resolve_left htwo
+  constructor
+  · intro h
+    have h1 := DFunLike.congr_fun h (1 : ZMod 3)
+    norm_num at h1
+  · refine ⟨1, ?_, by norm_num⟩
+    change -(-(1 : ZMod 3)) = 1
+    simp
+
+/-- Algebraic point exhaustion reduces the generic characteristic premise to
+its restrictions on every positive Frobenius-fixed locus, and then yields the
+exact pointwise `V-1` orientation. It does not prove the restricted
+characteristic identities themselves. -/
+theorem zmodAffineVerschiebung_sub_one_eq_of_fixedLoci
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p))
+    (hchar : ∀ n : ℕ, 0 < n →
+      ∀ point : WeierstrassCurve.Affine.Point (W.baseChange E),
+        ((affineFrobeniusPointEnd (E := E) W) ^ n) point = point →
+        (affineFrobeniusPointEnd (E := E) W ^ 2 -
+          (zmodAffineTrace W : AddMonoid.End
+            (WeierstrassCurve.Affine.Point (W.baseChange E))) *
+              affineFrobeniusPointEnd (E := E) W +
+          (p : AddMonoid.End
+            (WeierstrassCurve.Affine.Point (W.baseChange E)))) point = 0) :
+    zmodAffineVerschiebungPointEnd W - 1 =
+      ((zmodAffineTrace W - 1 : ℤ) : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))) -
+          affineFrobeniusPointEnd (E := E) W := by
+  apply zmodAffineVerschiebung_sub_one_eq
+  exact endomorphism_characteristic_of_periodic_fixedLoci
+    _ (zmodAffineTrace W) p
+    (zmodAffineFrobeniusPointEnd_periodic W) hchar
 
 /-- Every one-dimensional formal group law differs from its first input by a
 multiple of its second variable. This is the algebraic filtration statement
@@ -2353,6 +2525,13 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms endomorphism_eq_zero_of_eq_zero_on_generators
 #print axioms endomorphism_characteristic_of_generators
 #print axioms zmodAffineVerschiebung_sub_one_eq_of_generators
+#print axioms zmodAlgebraicPair_frobeniusPeriodic
+#print axioms zmodAffineFrobeniusPointEnd_pow_some
+#print axioms zmodAffineFrobeniusPointEnd_periodic
+#print axioms endomorphism_eq_zero_of_periodic_fixedLoci
+#print axioms endomorphism_characteristic_of_periodic_fixedLoci
+#print axioms endomorphism_single_fixedLocus_control
+#print axioms zmodAffineVerschiebung_sub_one_eq_of_fixedLoci
 #print axioms FormalGroup.secondVariable_dvd_sub_X
 #print axioms FormalGroup.add_correction_eq
 #print axioms FormalGroup.filtered_correction_prefix

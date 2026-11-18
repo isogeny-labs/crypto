@@ -211,6 +211,18 @@ independent implementation matches all generator coordinates, orders and
 closures. Generator discovery still enumerates these small groups; this is a
 finite verification compression, not a generic algorithmic speedup.
 [pcc:unverified]
+Lean now also proves an algebraic-point exhaustion theorem. Both coordinates
+of any affine point over an algebraic extension lie in one finite intermediate
+field, so some positive power of the actual point Frobenius fixes the point.
+Vanishing of the characteristic expression on every positive Frobenius-fixed
+locus therefore implies the global point-endomorphism equation and the exact
+`V-1` orientation. A `ZMod 3` control proves that checking only one fixed locus
+is insufficient. The restricted characteristic identities themselves remain
+unproved. [pcc:unverified]
+The prospective `H116-FROBENIUS-FIXED-LOCI-001` protocol is frozen before its
+new implementations. It will census least Frobenius periods and fixed-locus
+coverage on the unchanged eight cells; it has no result rows yet.
+[pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

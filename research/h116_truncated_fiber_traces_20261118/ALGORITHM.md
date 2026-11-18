@@ -182,6 +182,13 @@ instead of 5,066: three groups are cyclic and five need two generators. Exact
 independent replay matches every coordinate, order and closure; wrong trace,
 wrong norm and dropped-generator controls all reject. The measured compression
 begins only after group enumeration and is not an ECDLP runtime claim.
+Over an arbitrary algebraic extension, Lean now proves that every affine point
+is fixed by some positive Frobenius power: its two coordinates generate one
+finite intermediate field. Hence characteristic checks on every positive
+fixed locus promote to the global point-endomorphism equation and the exact
+`V-1` orientation. A checked `ZMod 3` mutation shows that a single fixed locus
+does not suffice. This reduces the generic premise to the family of finite
+fixed loci but does not prove the characteristic identity on that family.
 For `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
 the exact `z -> z^p` formula for a supplied coordinatewise `p`-power
 endomorphism. Connecting those formulas to the actual elliptic formal-group
