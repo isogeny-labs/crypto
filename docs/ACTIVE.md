@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Test y-ranked vs x-first B31 factor-base selection with matched complete prime31 Rust IC controls (automation, started 2026-11-18, branch automation/prime31-y-ranked-base-complete-20261118)
+- [ ] Test y-ranked vs x-first B31 factor-base selection with matched complete prime31 Rust IC controls (automation, started 2026-11-18, branch automation/prime31-y-ranked-base-complete-20261118, PR #4652)
 
 - [x] Prime31 negation-quotient paired complements in original Rust, exact B31 full-cost controls (automation, started 2026-11-18, branch automation/prime31-b31-negation-quotient-20261118, PR #4647)
 
