@@ -550,6 +550,45 @@ unchanged. [pcc:unverified]
 | `z=-x/y` agrees on the two point expressions | elliptic observable instance | H116 | actual affine points | supplied characteristic equation |
 | equality of retained rational/formal maps | endpoint obligation | future morphism owner | rational morphism and completed local ring | representation and local-series transport |
 
+## Generating-set characteristic-certificate gate
+
+1. **Structure above.** Work in `AddMonoid.End G` and a set `S : Set G` whose
+   additive-subgroup closure is top. For the elliptic specialization, `G` is a
+   finite extension-field affine point group and the trace is tied by
+   definition to `p+1-Nat.card E(F_p)`.
+2. **Theorems used as stated.** `AddMonoidHom.eq_of_eqOn_dense` promotes
+   equality of additive homomorphisms on `S` to global equality when
+   `AddSubgroup.closure S=top`. Evaluation of the characteristic-polynomial
+   endomorphism on `S` supplies the equality with the zero homomorphism.
+3. **Object as an instance.** The certificate contains a generating set, a
+   checked closure-to-top proof and one characteristic-equation value per
+   generator. The resulting global equation feeds the already audited
+   pointwise `V-1` orientation and observable theorems.
+4. **Assembly probe.** A temporary module checked the generic
+   zero-on-generators theorem, the characteristic-polynomial wrapper, the
+   point-count trace definition and the affine-point specialization at default
+   limits. Probe source SHA-256 is
+   `f928c423eca1b6b279ea54f79f7fd5675ac4bc6b66a3c15fd98787d5cda3bccc`;
+   successful empty output SHA-256 is
+   `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+5. **Missing components only.** A certificate for one finite extension point
+   group does not prove equality on the algebraic closure or equality of
+   rational maps. Generic Frobenius theory or a separating morphism theorem is
+   still required for the family-level endpoint.
+6. **Inheritance table.** Additive subgroup closure and homomorphism extensionality
+   are inherited from Mathlib. H116 packages the characteristic expression and
+   the already constructed point maps. No enumeration algorithm, curve group
+   law, point-count proof, asymptotic claim or trusted procedure enters Lean.
+   [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| zero on generators implies zero endomorphism | generic group law | Mathlib plus H116 wrapper | additive commutative group | closure of supplied set is top |
+| generator checks imply characteristic equation | proof-carrying certificate | H116 | `AddMonoid.End G` | closure certificate and per-generator evaluations |
+| trace equals `p+1-#E(F_p)` | definition | H116 over `Nat.card` | prime-field affine point type | finite base field |
+| generator certificate implies pointwise `V-1` orientation | elliptic specialization | H116 | finite algebraic extension points | closure and per-generator checks |
+| generic algebraic-closure/rational-map equality | endpoint obligation | future elliptic owner | elliptic morphisms | separating theorem or standard Frobenius characteristic theorem |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

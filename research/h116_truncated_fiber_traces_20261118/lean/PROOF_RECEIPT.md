@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-b864765cafe7f48c0856549cad8f17fbb483ddda783d0e10dc72daa16b56562e  H116FiberTrace.lean
+a43586d07cf5344e930a53f9a43cbf610213085b8e237b2441a871cbaf3358df  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  109 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  112 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -44,6 +44,8 @@ d394c8993e2163bbf80c4cdb313da455d456402cdee0eb4d62edbf559431157d  receipts/point
 7032125ddbcf9a9ed2cbfabea7cc42f7bb3fbc045637bf72133e57158de58902  receipts/point-observable-first-build-failure.txt
 7089cef1d434cf9a73ca41ef2d0e1a3b03fe7ffdd1016e7e03c19c8344e123b7  receipts/point-observable-build.txt
 47b5ab662d6ffb77e3b5e0a098741d3c2bc293d3c7a05f69764b4f39a133a7ab  receipts/point-observable-audit.txt
+6c773a22800689a181321a476fa59f95e0478132e0a1da72007d1bc318ca39cd  receipts/generator-certificate-build.txt
+8c9eb79f902c872b7860f8089d6bc5b280bfce3151aa6428e346df874a04b6a0  receipts/generator-certificate-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -180,6 +182,15 @@ premise. This closes additive orientation and pointwise observation only.
 Identifying the constructed pointwise map with the retained rational or scheme
 morphism, and transporting that representation to equality of completed local
 power series, remain open. [pcc:unverified]
+
+The 112-theorem checkpoint adds a proof-carrying finite-group interface.
+Mathlib's additive-subgroup closure theorem promotes equality on a supplied
+generating set to equality of additive endomorphisms. H116 instantiates it with
+the Frobenius characteristic expression, defines the trace as
+`p+1-Nat.card E(F_p)`, and composes generator checks directly to the pointwise
+`V-1` orientation. Producing a finite-extension closure certificate remains an
+external verification task. Such a certificate does not prove the equation on
+the algebraic closure or identify rational/formal maps. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

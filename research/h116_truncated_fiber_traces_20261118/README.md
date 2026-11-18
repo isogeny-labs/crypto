@@ -197,6 +197,12 @@ to have the same observed `z` value under the explicit characteristic
 premise. This closes pointwise orientation but not identification with the
 retained rational/scheme morphism or equality of completed local series.
 [pcc:unverified]
+For finite point groups, the characteristic premise now has a proof-carrying
+compressed form. Lean proves that checking the characteristic expression on a
+set whose additive-subgroup closure is top proves the global endomorphism
+equation, fixes the trace definition to `p+1-Nat.card E(F_p)`, and composes the
+certificate to the pointwise `V-1` orientation. This does not extend a finite
+certificate to the algebraic closure. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

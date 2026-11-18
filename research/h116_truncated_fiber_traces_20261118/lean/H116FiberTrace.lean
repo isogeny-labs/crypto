@@ -866,6 +866,42 @@ theorem endomorphism_sub_one_eq_trace_sub_one_sub
   rw [hV, Int.cast_sub, Int.cast_one]
   abel
 
+/-- An additive endomorphism that vanishes on a set of additive generators
+vanishes everywhere. This is the proof-carrying interface used to compress a
+finite point-group characteristic check. -/
+theorem endomorphism_eq_zero_of_eq_zero_on_generators
+    {G : Type*} [AddCommGroup G]
+    (f : AddMonoid.End G) (generators : Set G)
+    (hgenerate : AddSubgroup.closure generators = ⊤)
+    (hzero : ∀ point ∈ generators, f point = 0) :
+    f = 0 := by
+  apply AddMonoidHom.eq_of_eqOn_dense hgenerate
+  intro point hpoint
+  change f point = 0
+  exact hzero point hpoint
+
+/-- Checking the Frobenius characteristic expression on a generating set is
+sufficient to establish the global additive-endomorphism equation. -/
+theorem endomorphism_characteristic_of_generators
+    {G : Type*} [AddCommGroup G]
+    (pi : AddMonoid.End G) (trace cardinality : ℤ)
+    (generators : Set G)
+    (hgenerate : AddSubgroup.closure generators = ⊤)
+    (hchar : ∀ point ∈ generators,
+      (pi ^ 2 - (trace : AddMonoid.End G) * pi +
+        (cardinality : AddMonoid.End G)) point = 0) :
+    pi ^ 2 - (trace : AddMonoid.End G) * pi +
+        (cardinality : AddMonoid.End G) = 0 := by
+  exact endomorphism_eq_zero_of_eq_zero_on_generators
+    _ generators hgenerate hchar
+
+/-- The prime-field Frobenius trace attached to an affine Weierstrass curve,
+defined by the exact point-count formula `p+1-#E(F_p)`. -/
+noncomputable def zmodAffineTrace
+    {p : ℕ} [Fact p.Prime]
+    (W : WeierstrassCurve.Affine (ZMod p)) : ℤ :=
+  (p : ℤ) + 1 - (Nat.card W.Point : ℤ)
+
 /-- Under the explicit Frobenius characteristic equation, the constructed
 pointwise Verschiebung has exactly the `V-1=[trace-1]-pi` orientation used by
 the candidate rational map. This is still an equality of additive point
@@ -887,6 +923,32 @@ theorem zmodAffineVerschiebung_sub_one_eq
           affineFrobeniusPointEnd (E := E) W := by
   apply endomorphism_sub_one_eq_trace_sub_one_sub
   exact zmodAffineVerschiebung_sum_of_characteristic W trace hchar
+
+/-- A proof-carrying finite-group endpoint: characteristic checks on a supplied
+generating set, with trace fixed to `p+1-#E(F_p)`, imply the exact pointwise
+`V-1` orientation. This does not promote a finite extension certificate to an
+algebraic-closure or rational-map theorem. -/
+theorem zmodAffineVerschiebung_sub_one_eq_of_generators
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p))
+    (generators : Set (WeierstrassCurve.Affine.Point (W.baseChange E)))
+    (hgenerate : AddSubgroup.closure generators = ⊤)
+    (hchar : ∀ point ∈ generators,
+      (affineFrobeniusPointEnd (E := E) W ^ 2 -
+        (zmodAffineTrace W : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) *
+            affineFrobeniusPointEnd (E := E) W +
+        ((p : ℤ) : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E)))) point = 0) :
+    zmodAffineVerschiebungPointEnd W - 1 =
+      ((zmodAffineTrace W - 1 : ℤ) : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))) -
+          affineFrobeniusPointEnd (E := E) W := by
+  apply zmodAffineVerschiebung_sub_one_eq
+  exact endomorphism_characteristic_of_generators
+    _ (zmodAffineTrace W) p generators hgenerate hchar
 
 /-- Every one-dimensional formal group law differs from its first input by a
 multiple of its second variable. This is the algebraic filtration statement
@@ -2288,6 +2350,9 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms endomorphism_sub_one_eq_trace_sub_one_sub
 #print axioms zmodAffineVerschiebung_sub_one_eq
 #print axioms zmodAffineVerschiebung_sub_one_localParameter
+#print axioms endomorphism_eq_zero_of_eq_zero_on_generators
+#print axioms endomorphism_characteristic_of_generators
+#print axioms zmodAffineVerschiebung_sub_one_eq_of_generators
 #print axioms FormalGroup.secondVariable_dvd_sub_X
 #print axioms FormalGroup.add_correction_eq
 #print axioms FormalGroup.filtered_correction_prefix

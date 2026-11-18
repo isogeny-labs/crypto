@@ -172,6 +172,11 @@ the point-endomorphism equality is rearranged to `V-1=[t-1]-pi`, and evaluating
 both sides through a total affine-point observable proves equality of the
 chosen `z=-x/y` value. This is pointwise observation, not yet equality of the
 retained rational map or its formal power series.
+For a finite extension point group, the characteristic equation may now be
+supplied by a generating-set certificate: Lean promotes zero evaluations on a
+set with additive closure top to the global endomorphism equality and fixes
+the trace to `p+1-Nat.card E(F_p)`. This compresses finite verification only;
+it does not establish the algebraic-closure theorem.
 for `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
 the exact `z -> z^p` formula for a supplied coordinatewise `p`-power
 endomorphism. Connecting those formulas to the actual elliptic formal-group
