@@ -48,6 +48,8 @@ This uses the **existing Rust** `prime31_algebraic_ic::Arithmetic`, `PRIME31`, a
 
 Exact **B31 preparation** additionally charged 118,540,993 finite-field multiplications and 1,852,188 inversions. Stage-only wall times are GitHub-runner diagnostics, not a controlled total-ECDLP benchmark; base selection, public-target construction and the separate B=2 control are not included in the displayed candidate preparation. The fixed 12-target corpus cannot support a robust general hit-rate inference. B31 weighted positive-slot parity produced a natural relation for 7 of 12 public residuals; the uniform positive-slot control produced 0/12 at every B. The candidate is **not competitive as written**: its 12 B31 lookups alone needed ~3.41 seconds and 11.1 million original curve additions, prior to any rank learning or full logarithm recovery.
 
+**Important parity-only positive-control failure:** The public target explicitly planted as the sum of the same first base point in each of the eight weighted slots has a valid known eight-point decomposition at every B. Yet its odd-parity result is **true for B8, false for B16 and B31**; additional decompositions cancel its coefficient in characteristic two. A planted *existence* witness is therefore not automatically a positive *parity* control. Every future candidate must check the exact parity of its planted fixtures and offer separately proved singleton-odd controls; do not use mere existence as the acceptance criterion.
+
 ## 3. Validation, reproducibility, and archived evidence
 
 [Exact-source GitHub Actions #44277371478](https://github.com/isogeny-labs/crypto/actions/runs/44277371478) completed successfully:
