@@ -1020,3 +1020,83 @@ Every number is `[pcc:unverified]`.
 - **Coordination.** These are the same cells as Amendment 28 items 1 and 2. They run here, once. Session
   01TCbLH9vZ4sepWADHKijoFX is told before launch, so that it does not launch them too.
 - No hypothesis, §6 rule, reading, seed or budget changes. The Amendment 8 readings apply to the `t = 5`, `c = 7` rows.
+
+## Amendment 31 (2026-11-15; `t = 14` by two routes: the registered `-m112` capped F4, and the exact closure; before any row of these jobs)
+
+Every number is `[pcc:unverified]`.
+
+- **Owner instruction (2026-11-15, ~23:10Z, session 01TCbLH6osebpnEbutNogBzD).** Offered three choices for deciding `t = 14`, the
+  owner answered "1-2" ("err 1-2"):
+  1. the exact closure route;
+  2. the registered `-m112` capped-F4 re-run at up to US$60 per job.
+  This is also the per-batch balance confirmation (decision 18, Amendment 29).
+- **State.** At `t = 14`, cap 5 and cap 6 complete without refuting on both draws, so `d_F ≥ 7`. Cap 7 at 56Gi stopped
+  `oversize` at degree 6 on both draws (Amendment 30). This is not a reading.
+
+### Route F (registered; Amendment 14's `-m112` step)
+
+- **Jobs.** `pfd-x-t14-k{0,1}-c7-m112-rp`, stage `cap:14:K:7:27900000000` (entry `entry_r2.sh`, unchanged).
+- **Host.** 32 vCPU / 256 GB reserved pods.
+- **Limits.** Job limit 90,000 s, per-job cap US$60 (owner-approved).
+- **Reading (Amendment 7 B).**
+  - Refutes: `d_F = 7`.
+  - Completes without refuting: `d_F ≥ 8`.
+  - `oversize` or a memory kill at 112Gi: censored, `d_F ≥ 7` stands.
+
+### Route C (new instrument use: the exact closure, the study's primary engine)
+
+- **Why.** The capped F4 holds a dense block that outgrew 112Gi at `t = 14`. At degree 7 with `N = 28` the closure has about
+  1.6·10⁶ normal-form columns (derived, `Σ_{k≤7} C(28, k)`), within `max_cols 4·10⁶`. Amendment 5 had restricted `t ≥ 11` to
+  `cmax 5` only for the shared 32 GB host.
+- **The instrument.** `runpod/entry_m2c.sh` (committed with this amendment; sha256 in `runpod/m2c.sha256`) runs one closure
+  cell.
+  - Flags: those of `run.sh`'s `A-m2-tower-big` line, with `--hky-cmax 7`, `--targets K`, and the limits below.
+  - After the closure: `pfd_grid_zeros`.
+  - The runner gains an `m2c` entry that installs only the gated pilot, `pfd_grid_zeros` and this script, each
+    SHA-256-checked.
+- **Local smoke test (measured).** `t = 6`, draw 0 reproduces stage A: `x_R = 464833983`, `d_F = 5`.
+- **Validation gate, fixed now.** The `t = 14` closure value is admitted only if the closure reproduces `d_F = 6` on all four
+  draws of `t = 12` and `t = 13`. Those values are known from the capped-F4 brackets (`RESULTS_T12_BRACKET.md`,
+  `RESULTS_T13_BRACKET.md`, Amendment 18).
+  - Any disagreement: no route-C value is admitted, and the owner is told.
+  - A validation cell censored by a limit: the gate is undecided for that cell, and the `t = 14` value is reported but not
+    admitted.
+- **Jobs.**
+  - Validation: `pfd-m2c-t{12,13}-k{0,1}-rp`, stage `m2c:T:K:7:13958643712:4000000:86400`, on 16 vCPU / 128 GB pods. Job limit
+    14,400 s, cap US$40 (about US$8 at the limit).
+  - Decisive: `pfd-m2c-t14-k{0,1}-rp`, stage `m2c:14:K:7:30064771072:4000000:86400`, on 32 vCPU / 256 GB pods. Job limit
+    86,400 s, cap US$60.
+- **Reading.** `1` enters the closure at `c = 7`: `d_F = 7`. Complete to `c = 7` without `1`: `d_F ≥ 8`. Censored by a limit:
+  `d_F ≥` the last complete degree plus one. `grid_zeros > 0`: decomposable, excluded (Amendment 7 C).
+
+### Both routes
+
+- **What the result decides.** Both routes measure the same quantity on the same two systems. If both give a value, they
+  must agree; a disagreement is a reproducibility failure (Amendment 2). With `m = 4` reading "rise" (Amendment 30):
+  - `d_F(14) = 7` on both draws means C-step holds at `t = 12–14`, so Amendment 8 closes the PKM-tower lane;
+  - `d_F(14) ≥ 8` means C-step is refuted (upward): "no change" under Amendment 8.
+- **Spend.** Batch worst case: US$120 (F) + US$120 (C decisive) + 4 × US$8 (C validation). With about US$95 spent, that stays
+  within the US$500 ceiling (Amendment 20).
+- **Fetch cadence.** Results are fetched every 15 minutes (Amendment 29).
+- No hypothesis, §6 rule, seed or draw changes.
+
+## Amendment 32 (2026-11-18; route procedure and spend record; no job launched)
+
+Every number is `[pcc:unverified]`.
+
+- **Owner instruction (2026-11-18, session 01TCbLH6osebpnEbutNogBzD).** After the Amendment 31 batch was found lost, the owner
+  said "Try again", then "Use run pod api v2".
+- **Route change.** REST v1 (`rest.runpod.io/v1`) returned 502. `runpod/rp.sh` now uses REST v2 (`api.runpod.io/v2`): body
+  `{name, cloud: SECURE, cpu: {id, vcpuCount}, image, disk: 20, ports, env, entrypoint, cmd}`, price field `cost`. The flavor is
+  `CPU_ID` (default `cpu5m`, 8 GB per vCPU). Same image digest, same `server.py`, same guards. A 2-vCPU smoke pod reached the
+  runner's `/status` and was deleted.
+- **The Amendment 31 batch: what it cost (measured, `GET /v2/billing/pods?podId=…`, 2026-11-14 to 2026-11-19).**
+  - Route F `t14 k0`, `k1`: US$63.40 each. Route C decisive `t14 k0`: US$63.40; `k1`: US$53.66.
+  - Validation `t12/t13 k0/k1`: US$31.74 each.
+  - Total: **US$370.84**. Every pod was billed for about 30.5 h, then disappeared. No row was fetched.
+- **Why it overran.** The runner's guard bounds the *job*, not the *pod*. A pod stays billed after its job ends until the client
+  deletes it, and the session that would delete it was down. The validation pods ran 30.5 h for a 4 h job.
+- **Ceiling.** About US$95 before Amendment 31 plus US$370.84 is about US$466 of the US$500 ceiling (Amendment 20). The
+  Amendment 31 batch at v2 prices (worst about US$220) does not fit. **No job is launched under this amendment.** A relaunch
+  needs the owner to raise the ceiling or to choose a subset, and a pod-lifetime fix: the client deletes each pod when its job
+  ends, and no batch starts unless a check-in is scheduled within the shortest job limit.
