@@ -216,10 +216,9 @@ fn solver_mitm_results_are_unchanged_by_table_reuse() {
     // (bits, m, tally) -> (xi, relations, attempts, restarts, N, old
     // relation_search.adds of the per-call path, which rebuilt the table on
     // every attempt).
-    let pins: [(
-        (usize, usize, bool),
-        (u64, usize, usize, usize, usize, Option<u64>),
-    ); 6] = [
+    type Case = (usize, usize, bool);
+    type Pinned = (u64, usize, usize, usize, usize, Option<u64>);
+    let pins: [(Case, Pinned); 6] = [
         ((10, 2, false), (448, 351, 368, 0, 91, None)),
         ((10, 3, false), (666, 146, 160, 0, 39, None)),
         ((10, 2, true), (448, 92, 95, 0, 91, Some(1691))),
