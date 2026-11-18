@@ -95,3 +95,30 @@ obtained from `[t-1]` alone because the Frobenius term begins beyond the frozen
 precision. The scoped search did not locate this exact fixed-prefix
 specialization, but that search gap is not evidence of publication novelty.
 [pcc:unverified]
+
+## First omitted Frobenius coefficient follow-up
+
+The unavailable KB wrapper was queried again for Verschiebung/Frobenius formal-
+group local parameters, endomorphism equality as a power-series substitution,
+and `pi(z)=z^p`; theorem lookup used the same terms. It returned no executable,
+so the fallback searched this repository, the available sibling checkouts and
+the pinned Mathlib source. Mathlib supplies ring Frobenius and Weierstrass base
+change, but this search found no elliptic formal-group or Verschiebung instance.
+[pcc:unverified]
+
+Milne, *Elliptic Curves* (2006),
+[online text](https://www.jmilne.org/math/Books/ectext6.pdf), PDF SHA-256
+`14a89055a0a7f52b08fad1d53786c9165caba8be837491024b9b210afa384486`,
+was read at Remark II.4.3 and Propositions IV.9.1--9.4. Remark II.4.3 states
+the one-parameter commutative formal-group axioms and their consequences
+`F(X,0)=X` and the existence of formal inverse. Proposition IV.9.1 gives the
+coordinate-p Frobenius and its zero tangent action; Theorem IV.9.4 identifies
+its characteristic polynomial `X^2-tX+p`. These support the filtered boundary
+calculation, while the identification of the dual Frobenius with the actual
+retained `V` remains an explicit endpoint premise. [pcc:unverified]
+
+The new control therefore asks a narrower falsifiable question: does the first
+coefficient beyond the previously checked scalar prefix agree with the formal-
+group prediction on the excluded full map? It is a mechanism check, not a
+claim that the missing elliptic instance already exists in the library.
+[pcc:unverified]
