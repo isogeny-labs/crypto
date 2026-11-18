@@ -35,14 +35,14 @@ S at P24 (w = 0 / 1):
 
 ### L2-STACK holds
 
-- **S-a (identity):** 144 of 144 paired runs per size made identical trials and relations. The only change is the build: adds fell from 2,424 to 1,738, from 4,266 to 3,290, and from 7,106 to 5,768. The P24 figure is exactly the 5,768 the proposal derived.
+- **S-a (identity):** 144 of 144 paired runs per size made identical trials and relations. The only change is the build: adds fell from 2,424 to 1,738, from 4,266 to 3,290, and from 7,106 to 5,768. The P24 figure is exactly the 5,768 the proposal derived. [pcc:unverified]
 - **S-b (cost):** the ratio is below 1 at every size and every weight, with the upper ends of the intervals at most 0.926. `ecbench band` orders ksum5-ps < ksum5-sib at every weight.
 - **Verdict:** STACK improves on the Table B incumbent across the whole band. At w = 0 the cut is 8–11%, shrinking as size grows because the build share falls. At w = 1 it is 3–5%, since prune removes priced table work.
 - **Distance remaining to rho:** 4.0–4.7× at w = 0.
 
 ### L2-FEWCOL holds, beating its predicted magnitude
 
-- **Verification:** every tw2l run verified ([d]G = Q), and every replay reproduced.
+- **Verification:** every tw2l run verified ([d]G = Q), and every replay reproduced. [pcc:unverified]
 - **Ratio:** tw2l / ksum5-sib is 0.41–0.48 at w = 0 and 0.28–0.32 at w = 1, against the registered maxima of 0.60 and 0.55. `ecbench band` orders tw2l < ksum5-sib at every weight. The ratio falls with size.
 - **Verdict:** FEWCOL is an improvement over the Table B incumbent at every size and weight. With it the distance to matched rho falls from 4.6–5.3× to 2.1–2.2× at w = 0, and from 6.3–6.7× to 1.8–2.0× at w = 1. That is inside the predicted 1.7–2.4×.
 - **Wall time:** tw2l pays 1.37× more wall time per GAE (`compare-P24`). End to end it still takes 0.57–0.64× of the incumbent's wall time.
@@ -54,7 +54,7 @@ S at P24 (w = 0 / 1):
 
 ## Reading
 
-Neither result breaks the generic √r wall. Both arms are table-and-probe designs bounded near the generic collision floor, which is about 1.88× rho at F = 2 (Γ(F+3/2)/(Γ(F+1)Γ(3/2)) × rho). tw2l reaches about 2.1× at w = 0. The owner's 2026-11-04 ruling counts C = 2 seed arms with known-log jumps as index calculus (`research/curve25519_autolab_20261104/README.md`).
+Neither result breaks the generic √r wall. Both arms are table-and-probe designs bounded near the generic collision floor, which is about 1.88× rho at F = 2 (Γ(F+3/2)/(Γ(F+1)Γ(3/2)) × rho). tw2l reaches about 2.1× at w = 0. The owner's 2026-11-04 ruling counts C = 2 seed arms with known-log jumps as index calculus (`research/curve25519_autolab_20261104/README.md`). [pcc:unverified]
 
 FEWCOL transfers the Curve25519-autolab incumbent to Table B, where it had never been run. The remaining headroom in this family is at most about 1.88/2.14 ≈ 0.88× at w = 0. Beating rho needs a non-generic relation source. The hit-rate diagnostic found none in the k-sum table: L2-HRATE closed with H = 0.97–1.02 ([`HRATE.md`](../../docs/leads/2026-11-18/ic-leads-round2/HRATE.md)).
 

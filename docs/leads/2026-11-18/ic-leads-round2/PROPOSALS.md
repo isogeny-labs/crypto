@@ -20,7 +20,7 @@ Floor, for orientation (quoted from the brief): generic table-plus-walk cost is 
 
 ## 1. Ranking and the one-line verdict
 
-Ranked by (expected effect) / (cost of the cheapest discriminating test). "Wall" = can it beat the generic sqrt(r) wall; **none of 1-5 can**.
+Ranked by (expected effect) / (cost of the cheapest discriminating test). "Wall" = can it beat the generic sqrt(r) wall; **none of 1-5 can**. [pcc:unverified]
 
 | # | id | lever | w = 0 effect (P24, predicted) | survives w = 1 | cheapest test | beats sqrt(r) wall |
 |--:|:--|:--|:--|:--|:--|:--|
