@@ -14,6 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [ ] Prepare a native driver for matched endpoint scalar/ECDLP trials, actual transported known-answer pairs, coordinate/A-A controls and explicit IC/backend status; local checks only until cloud admission (Codex, started 2026-11-18, branch research/conductor-paired-driver-20261118)
 - [x] Add optional bounded projective walks, retain the exact 80-bit window audit, and record small-pipeline plus target-field coordinate controls without target timing claims (Codex, completed 2026-11-18, branch research/conductor-window-audit-20261118, PR #4703)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
