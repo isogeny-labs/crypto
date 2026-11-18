@@ -6,23 +6,23 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-1a1413ee2964b6b97057d6d15d85c806e18066e0a17baae13700b80724921867  H116FiberTrace.lean
+0615c0af032906a8150bae06212106e2db6217d5a37d175b0da1ebd686fc0cad  H116FiberTrace.lean
 ```
 
 The repository proof gate built both the default target and the explicitly
 tracked source, then transitively audited all theorem declarations:
 
 ```text
-PASS  28 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS  29 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
 
 ```text
-9e6192be91c898704493baf7012ade180435004d09b971d2fa9ba52d5a5d169e  receipts/audit.log
-104c4688c8d806f44d7d62b6ab34e484fe80b654ccb1953f145e5aa6021f4eaf  receipts/build.log
+d6443adb511caff8d49ab4f0028243d13c50e316628c000ad14504b4c7f2bc4f  receipts/audit.log
+62524d04155a989e82fa2a1f34467f8e00a81804b93e4e98193374da80587d7f  receipts/build.log
 29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483  receipts/cache.log
-46c87e1fc1319eb0b35ee9462e979da44f0a6c4d495e180e1dcac421b23df215  receipts/source-build.log
+5728a9e7a4118f207327adbae7b48997cd8a8f43383d1d9d1f15d51d95ff70d7  receipts/source-build.log
 c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/status.txt
 6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
 ```
@@ -47,9 +47,11 @@ the exact finite recurrence, proves its seven coefficients unique, and proves
 that any two solutions induce identical `F_U` coefficients through degree
 eight. It formalizes transformed equation (15) as a PowerSeries identity and
 proves that this identity plus the two initial coefficients implies the exact
-recurrence, including the prime `p>19` specialization. It does not yet derive
-that formal-series identity from an actual normalized rational isogeny map or
-construct the `V-1` formal jet, a
+recurrence, including the prime `p>19` specialization. It also proves that
+differentiating equation (14) and cancelling an explicitly nonzero map
+derivative gives equation (15). It does not yet prove that an actual normalized
+rational isogeny map satisfies equation (14), transport equation (15) through
+the at-infinity PowerSeries substitution or construct the `V-1` formal jet, a
 scalar predicate or an ECDLP decoder. [pcc:unverified]
 
 The first integration build is retained at

@@ -44,8 +44,12 @@ after writing `R(x)=xU(w)` with `w=1/x` and multiplying by `w²`:
 Lean now proves that this equation, the `h1` and `h2` initial identities and
 the nonzero denominators imply `BostanJetRecurrence`; the `ZMod p`
 specialization discharges the denominator premises from prime `p>19`.
-Deriving the displayed equation from the actual normalized rational isogeny
-map remains the geometric bridge. [pcc:unverified]
+Lean also proves the preceding differential-algebra step: differentiating
+`(x³+Ax+B)(R')²=R³+Atilde*R+Btilde` and cancelling a nonzero `R'`
+gives equation (15). The remaining geometric bridge must prove that the actual
+normalized isogeny coordinate satisfies that first-order curve equation and
+transport equation (15) through the at-infinity PowerSeries substitution.
+[pcc:unverified]
 
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 

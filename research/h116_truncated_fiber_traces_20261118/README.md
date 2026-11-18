@@ -84,8 +84,13 @@ The coefficient-extraction part of that bridge is now formalized as well.
 al. construction after `R(x)=xU(1/x)`. Lean proves that this PowerSeries
 equation plus the two initial coefficients implies the exact seven-term native
 recurrence, with every division discharged for prime `p>19`. What remains is
-to obtain this formal-series equation from the actual normalized isogeny map;
-the theorem does not assume or construct that map. [pcc:unverified]
+to obtain this formal-series equation from the actual normalized isogeny map.
+The preceding paper step is now formalized separately:
+`normalizedMapEquation_implies_secondOrder` differentiates the normalized
+rational-map curve equation and cancels its explicitly nonzero derivative to
+obtain equation (15). The actual isogeny-to-curve-equation fact and the
+at-infinity substitution remain open; the theorem does not construct that map.
+[pcc:unverified]
 
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly

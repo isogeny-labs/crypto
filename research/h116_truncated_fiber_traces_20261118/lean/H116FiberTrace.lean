@@ -57,6 +57,28 @@ theorem denominator_cancellation (D : Derivation K L L) {nu nv d : L}
   rw [logDeriv_div D hnu hd, logDeriv_div D hnv hd]
   ring
 
+/-- Differentiating equation (14) of Bostan--Morain--Salvy--Schost and
+cancelling the nonzero derivative of a separable normalized coordinate map
+gives their equation (15). All curve coefficients are represented by explicit
+constants for the supplied derivation. -/
+theorem normalizedMapEquation_implies_secondOrder
+    (D : Derivation K L L) (x R sourceA sourceB targetA targetB : L)
+    (hx : D x = 1)
+    (hsourceA : D sourceA = 0) (hsourceB : D sourceB = 0)
+    (htargetA : D targetA = 0) (htargetB : D targetB = 0)
+    (hseparable : D R ≠ 0)
+    (hcurve : (x ^ 3 + sourceA * x + sourceB) * (D R) ^ 2 =
+      R ^ 3 + targetA * R + targetB) :
+    (3 * x ^ 2 + sourceA) * D R +
+        2 * (x ^ 3 + sourceA * x + sourceB) * D (D R) =
+      3 * R ^ 2 + targetA := by
+  have hd := congrArg D hcurve
+  simp only [D.map_add, D.leibniz, D.leibniz_pow, hx, hsourceA,
+    hsourceB, htargetA, htargetB, smul_eq_mul, nsmul_eq_mul,
+    mul_zero, add_zero, mul_one] at hd
+  apply (mul_right_cancel₀ hseparable)
+  linear_combination hd
+
 /-- A factored fiber polynomial has logarithmic derivative equal to the sum of
 its reciprocal linear factors. Root multiplicities are represented by indices. -/
 theorem rootProductLogDeriv (D : Derivation K L L) {ι : Type*} [DecidableEq ι]
@@ -507,6 +529,7 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms logDeriv_finset
 #print axioms logDeriv_div
 #print axioms denominator_cancellation
+#print axioms normalizedMapEquation_implies_secondOrder
 #print axioms rootProductLogDeriv
 #print axioms rootPowerSumOfCoeff
 #print axioms relativeCoeffCancellation
