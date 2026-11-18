@@ -1,0 +1,10 @@
+[package]
+name="hec-singleton-prefix"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="singleton-prefix"
+path="../main.rs"
