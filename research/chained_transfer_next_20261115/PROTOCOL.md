@@ -753,3 +753,94 @@ freeze; no arm cost, rho cost or timing of this protocol was seen. G5, G6,
 G7, G10 and G13 use the red team's models and the O3 rho record
 (`research/full_jacobian_ic_20261113/full_jacobian.json`) as quoted in
 REDTEAM.md; no number from a run of this protocol exists.
+
+## Amendment 2 (2026-11-18, before any data)
+
+Written after the measurement code (PR #4319) and before any measured run.
+No arm cost, rho cost, timing or verdict of this protocol has been seen. The
+only outputs seen are the unit tests, `--select-only`, the `p = 53`
+`--exhaustive` replay, and a smoke run at 229, 421 and 821. The smoke run had
+one instance and two seeds per arm, used unit class times, and its numbers
+were not read as data. It showed one fact used here: at 421, a tampered row
+removed by peeling was caught only by the factor-base log replay (B1). The
+code settled eight points where Amendment 1 is open (PROGRESS.md, "Choices
+where the protocol is open"). This amendment freezes them. B4 changes the
+stopping rule; the rest freeze readings already in the code.
+
+**B1 (A9 iii). Tamper control, detection.** A changed entry in a row that
+peeling removes is absorbed by the peeled column. The residual then holds,
+and `[t]G == T` holds unless the target uses that column.
+
+- The tamper is applied to the system of the clean run's final solve. That
+  system goes through one solve, with a fresh linear-algebra stream and no retry. The
+  changed entry is the first entry of row `mix64(0x7A3B ^ p) mod rows`,
+  counted over relation rows; the anchor is row 0 and is not a candidate.
+- Detected means any of the following, and the report names which: the
+  solve fails, the residual fails, `[t]G == T` fails, or any factor-base log
+  fails its replay `[x_c]G == P_c`.
+- The control's prediction (G11) reads with this definition.
+
+**B2 (A7). Row count.** "Rows reach `n + 20`" counts relation rows. The
+anchor row is extra.
+
+**B3 (A10). Target shifts.** `h = 0..511`: 512 shifts, the old module's
+`MAX_TARGET_SHIFTS`. This replaces "`h = 0..512`". If no shift folds onto a
+column, the run fails as `target_shifts_exhausted`.
+
+**B4 (A7, change). Acceptance test.** A rank-deficient core can pass the
+Wiedemann residual with a kernel-shifted solution. Under Amendment 1 a wrong
+target log then ended the run as uncertified, and no retry was made.
+
+- After a solve passes its residual, the target log is computed from it, and
+  `[t]G == T` is checked with a counted scalar multiplication in the log
+  phase. The shift search is counted as in A1.
+- If the check fails, the attempt is a failed attempt (`wrong_log`), and the
+  A7 retry rule applies: `ceil(0.1 n)` more rows, then solve again. Every
+  attempt's linear algebra, shift search and check are charged. The budget
+  covers all attempts.
+- A run is certified when the accepted solve's target log also passes the
+  uncounted independent check (`mul_independent`) of A6. A difference
+  between the counted and the independent check stops the run as an
+  instrument defect.
+- Rho checks its collision answer the same way and is charged for it, so the
+  acceptance test is not an extra cost Q alone pays.
+
+**B5 (A10). Arm D, identity sums.** A triple with `P1 + P2 + P3 = O` is
+discarded and counted as rejected; `O` is not a column.
+
+**B6 (A1, A16). Calibrated weights.**
+
+- Q's and D's class times are measured on their own code paths
+  (`measure_quartic_class_times`); rho's come from `measure_class_times`.
+- Every class time is divided by Q's `F_p` multiplication time, so all arms
+  are in one unit.
+- The calibration runs alone, before the arms (A17).
+
+**B7 (A11, A16). Secondary verdict.** `verdict_gae` uses the §5a band and
+the calibrated GAE vectors only. The slope condition applies to the primary
+(field-unit) verdict alone. `verdict_gae` stays labelled secondary and is not
+predicted.
+
+**B8 (A5, A9). Where the controls run.**
+
+- Dense cross-check: every run with a kept system at `p ≤ 421`.
+- BSGS check: Q and D seed `j = 0` at `k = 0`, every prime run.
+- Altered certificate: at `12841` and at every stage-2 prime run. This is a
+  superset of "the largest".
+- Determinism check: the four Q seeds at `k = 0` for 229, 421 and 821.
+
+**What stays.** Everything else in the original protocol and Amendment 1,
+including the predictions G1 to G14, except as restated below.
+
+**Predictions under Amendment 2.**
+
+- G11 reads with B1's definition of detected.
+- **G15** (new, B4): over all stage-1 runs of Q and D, `wrong_log` attempts
+  occur in at most 5% of runs. P = 0.85.
+- **G16** (new, B4): every certified run has the counted and the
+  independent check agree. P = 0.99.
+
+The 2026-11-16 lead review classed O4 as closed by obstruction: the
+line-section factor base grows like `p` against rho's `√p`. This amendment
+does not change that expectation (G2 to G7). It makes the confirmatory run
+unambiguous.

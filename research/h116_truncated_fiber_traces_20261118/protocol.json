@@ -1,0 +1,220 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "H116-TRUNCATED-FROBENIUS-FIBER-TRACES-V2",
+  "version": 2,
+  "created": "2026-11-18",
+  "repository": "crypto",
+  "study_dir": "research/h116_truncated_fiber_traces_20261118",
+  "authors": ["Codex H116 lane"],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/4630",
+    "bostan": "https://arxiv.org/abs/cs/0609020",
+    "sqrt_velu": "https://arxiv.org/abs/2003.10118",
+    "predecessor": "https://github.com/isogeny-labs/crypto/pull/4625"
+  },
+  "question": "Can fixed low-order moments of the degree-r Frobenius fiber be reproduced by a short base-field Laurent calculation, and does one fixed frozen radix-six predicate return the scalar digit on every public toy target?",
+  "claims": [
+    {
+      "id": "C-identity",
+      "text": "Candidate and direct enumeration return identical 16-moment vectors on every in-domain target and coordinate isomorphism.",
+      "class": "exact_computation",
+      "decided_by": ["C-candidate-direct"],
+      "if_supported": "Exact finite identity support for the frozen cohort; generic theorem remains separate.",
+      "if_not_supported": "Retain the first mismatch and refute the frozen implementation claim."
+    },
+    {
+      "id": "C-digit",
+      "text": "One predeclared predicate ID is exact across every frozen row and target.",
+      "class": "comparative",
+      "decided_by": ["C-digit-family"],
+      "if_supported": "Requires independent replay and a new held-out protocol before decoder use.",
+      "if_not_supported": "Record the complete score distribution; select no fallback family."
+    }
+  ],
+  "hypotheses": [
+    {
+      "id":"H-jet",
+      "statement":"The denominator-cancelled trace and residue formulas require only the first fixed Laurent coefficients of R.",
+      "mechanism":"logarithmic-derivative denominator cancellation and partial-fraction residue extraction",
+      "predictions":[{"id":"P-jet-exact","metric":"moment_mismatches","direction":"equal_within","minimum_effect":"exactly zero mismatched coordinates","provenance":{"written_at":"2026-11-18","first_recorded_in":"protocol.json v1","data_seen":[],"sample_status":"out_of_sample","decisive_scope":"five deterministic H116 curves"},"role":"decisive"}]
+    },
+    {
+      "id":"H-cost",
+      "statement":"For fixed J=8, candidate online field-operation growth is polylogarithmic in p while direct enumeration grows with r.",
+      "mechanism":"fixed-length Laurent recurrence versus explicit r-term extension-field sum",
+      "predictions":[{"id":"P-cost-lower","metric":"field_ops","direction":"lower","minimum_effect":"candidate base-field operation total is below direct total on every selected curve","provenance":{"written_at":"2026-11-18","first_recorded_in":"protocol.json v1","data_seen":[],"sample_status":"out_of_sample","decisive_scope":"finite component counts only; asymptotic statement needs proof"},"role":"calibration"}]
+    },
+    {
+      "id":"H-digit",
+      "statement":"At least one of 648 frozen public predicate IDs is exact on every row.",
+      "mechanism":"one fixed cross-curve radix-six channel applied to scalar-blind moment vectors",
+      "predictions":[{"id":"P-digit-exact","metric":"exact_predicate_rows","direction":"higher","minimum_effect":"one ID is exact on every row and target","provenance":{"written_at":"2026-11-18","first_recorded_in":"protocol.json v1","data_seen":[],"sample_status":"out_of_sample","decisive_scope":"discovery cohort only; held-out confirmation separately required"},"role":"decisive"}]
+    }
+  ],
+  "arms": [
+    {
+      "id": "truncated_trace",
+      "role": "candidate",
+      "description": "Base-field normalized-isogeny Laurent recurrence plus relative trace and residue extraction, J=8.",
+      "instrument": {"repo":"crypto","commit":null,"build":[["rustc","--edition=2021","-O","-D","warnings","h116_producer.rs","-o","h116_producer"]],"binary_sha256":null,"flags":{"labels":"forbidden during moment construction","moment_bound":"8"},"env":{"RUST_BACKTRACE":"1"},"threads":1},
+      "parameters": {"moment_bound":8,"characteristic_rule":"p>19"},
+      "same_instrument_as": null
+    },
+    {
+      "id": "direct_fiber",
+      "role": "baseline",
+      "description": "Explicit extension-field construction of H=ker(V-1), all r fiber points and direct sums.",
+      "instrument": {"repo":"crypto","commit":null,"build":[["rustc","--edition=2021","-O","-D","warnings","h116_producer.rs","-o","h116_producer"]],"binary_sha256":null,"flags":{"reuse":"only within one declared curve batch"},"env":{"RUST_BACKTRACE":"1"},"threads":1},
+      "parameters": {"moment_bound":8},
+      "same_instrument_as": "truncated_trace"
+    },
+    {
+      "id": "direct_aa",
+      "role": "control_aa",
+      "description": "Identical direct-fiber implementation and workload under a distinct randomized arm label.",
+      "instrument": {"repo":"crypto","commit":null,"build":[["rustc","--edition=2021","-O","-D","warnings","h116_producer.rs","-o","h116_producer"]],"binary_sha256":null,"flags":{},"env":{"RUST_BACKTRACE":"1"},"threads":1},
+      "parameters": {"moment_bound":8},
+      "same_instrument_as": "direct_fiber"
+    },
+    {
+      "id": "planted_polynomial",
+      "role": "control_positive",
+      "description": "Separately generated separable roots with analytic direct power sums and a reconstructed rational function.",
+      "instrument": {"repo":"crypto","commit":null,"build":[["rustc","--edition=2021","-O","-D","warnings","h116_producer.rs","-o","h116_producer"]],"binary_sha256":null,"flags":{},"env":{"RUST_BACKTRACE":"1"},"threads":1},
+      "parameters": {"cases":32},
+      "same_instrument_as": "truncated_trace"
+    },
+    {
+      "id": "characteristic_boundary",
+      "role": "control_negative",
+      "description": "H115 p=5,7,13 fixtures; the v1 recurrence must reject before producing scoreable moments.",
+      "instrument": {"repo":"crypto","commit":null,"build":[["rustc","--edition=2021","-O","-D","warnings","h116_producer.rs","-o","h116_producer"]],"binary_sha256":null,"flags":{},"env":{"RUST_BACKTRACE":"1"},"threads":1},
+      "parameters": {"primes":[5,7,13]},
+      "same_instrument_as": "truncated_trace"
+    }
+  ],
+  "controls": {
+    "aa": {"present":true,"comparison":"C-direct-aa","not_applicable_reason":null},
+    "positive": {"present":true,"arm":"planted_polynomial","expected_detection":"32/32 exact planted moment vectors and rejection of each one-coordinate tamper","not_applicable_reason":null},
+    "negative": {"present":true,"arm":"characteristic_boundary","null_population":{"description":"large-characteristic recurrence applied outside its frozen unit-denominator range","generator":"fixed H115 p=5,7,13 fixtures","n":3,"why_n":"all predecessor fixtures below p>19","matched_on":["curve model","moment bound","producer binary"]},"not_applicable_reason":null}
+  },
+  "variable_ledger": {
+    "independent": [{"name":"method","levels":["truncated_trace","direct_fiber","direct_aa"]}],
+    "factors": [
+      {"name":"curve","treatment":"fixed","value":"COHORT_RULE_V2.json deterministic first five","how":"same exact curve across arms"},
+      {"name":"generator_label","treatment":"crossed","value":[1,2,3],"how":"same target scalar and point across arms"},
+      {"name":"target","treatment":"crossed","value":"every nonidentity target","how":"shared seeded order"},
+      {"name":"coordinate_model","treatment":"crossed","value":["native","lambda=2"],"how":"isomorphic points compared after canonical transport"},
+      {"name":"host","treatment":"measured","value":"EKS L2 x86","how":"record CPU, kernel, affinity, NUMA, SMT, PSI and image digest"}
+    ],
+    "comparisons": [
+      {"id":"C-candidate-direct","arms":["truncated_trace","direct_fiber"],"differs_in":["method"],"design":"one_factor"},
+      {"id":"C-direct-aa","arms":["direct_fiber","direct_aa"],"differs_in":[],"design":"aa"},
+      {"id":"C-digit-family","arms":["truncated_trace"],"differs_in":["predicate_id"],"design":"one_factor"}
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": true
+  },
+  "randomization": {
+    "arm_order": "randomized",
+    "arm_order_reason": "interleave candidate, reference and A/A within each target and measured round",
+    "seed_derivation": {"method":"explicit_list","seeds":[116001,116002,116003,116004,116005],"nonce":"H116-20261118","note":"one fixed measured-round seed; selector itself is deterministic and unseeded"},
+    "instance_sampling": {"rule":"COHORT_RULE_V2.json; every selected curve, generator label, target and coordinate model","independent_of_arm":true},
+    "blinding": {"analysis_labels_masked":true,"how":"packet uses target digests during moment construction; scalar labels are joined only by the independent scorer","unmasked_at":null}
+  },
+  "sample_size": {
+    "instances": 5,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {"method":"exact","alpha":0.05,"tests_in_family":648,"correction":"holm","rank_test_n":null,"min_attainable_two_sided_p":null,"passes":true,"note":"Identity is an exact all-target census. Predicate family uses no p-value for promotion; Holm is retained for any descriptive inferential summaries."},
+    "preflight_runtime": {"fixed_seconds":null,"per_sample_seconds":null,"threads":1,"estimated_total_seconds":1800,"measured_on":"Conservative admission cap before implementation; one smoke selftest must finish locally without score data."}
+  },
+  "metrics": {
+    "primary": [
+      {"id":"moment_mismatches","name":"Candidate/direct moment mismatches","unit":"coordinates","kind":"exact","definition":"Count unequal field coordinates over 16 moments for every paired target","source":"raw packet and independent replay","aggregation":"sum","resolution":"one coordinate","uncertainty":"none_exact"},
+      {"id":"exact_predicate_rows","name":"Rows exact for each predicate ID","unit":"rows","kind":"exact","definition":"Number of generator rows on which every target digit is correct","source":"independent scorer","aggregation":"distribution","resolution":"one row","uncertainty":"none_exact"}
+    ],
+    "secondary": [
+      {"id":"field_ops","name":"Native field-operation vector","unit":"operations","kind":"counted","definition":"base and extension add/sub/mul/square/invert/Frobenius separately, including setup","source":"producer counters","aggregation":"per_row","resolution":"one operation","uncertainty":"none_exact"},
+      {"id":"cold_ns","name":"Cold batch time","unit":"ns","kind":"timed","definition":"construction through verification for one curve/generator batch","source":"monotonic clock","aggregation":"median","resolution":"integer ns subject to L2 admission","uncertainty":"range"},
+      {"id":"online_ns","name":"Per-target online time","unit":"ns","kind":"timed","definition":"target moment computation after declared reusable setup","source":"monotonic clock","aggregation":"median","resolution":"integer ns subject to L2 admission","uncertainty":"range"},
+      {"id":"rss","name":"Peak resident memory","unit":"KiB","kind":"counted","definition":"per process high-water RSS","source":"harness","aggregation":"max","resolution":"1 KiB","uncertainty":"none_exact"}
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "randomized",
+    "clock": "monotonic",
+    "counters": ["field_ops","targets","moment_coordinates","predicate_evaluations"],
+    "record": ["source_commit","binary_sha256","image_digest","protocol_sha256","CPU","kernel","NUMA","SMT","affinity","PSI","raw_packet_sha256"],
+    "timed_primary_justification": "Timing is secondary; exact identity and score counts are primary. L2 and A/A still gate any timing comparison."
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {"cpu":4,"memory_gib":8,"threads":1,"max_cloud_cost_usd":2.0,"instance_preference":"c8a.2xlarge","source_revision_required":true},
+    "measurement_class": "measurement",
+    "timeout_seconds": 1800,
+    "checkpoint": {"policy":"none","interval_seconds":null,"grace_seconds":null,"restore_validation":"none","after_restore":{"wall_time":"invalid","counted_units":"valid"}},
+    "retries": {"infrastructure_only":true,"max_attempts":2}
+  },
+  "stopping_rules": [
+    {"rule":"Stop after the five deterministic curves, all rows/targets, one warmup and five measured rounds; retain every failure and missing row.","kind":"fixed_n","preregistered":true},
+    {"rule":"Stop affected scoring at the first candidate/direct mismatch, label implementation invalid, and retain the complete packet generated to that point.","kind":"invalidation","preregistered":true},
+    {"rule":"Stop new launches when the 2 USD cumulative ceiling, 1800-second job deadline or two infrastructure attempts is exhausted.","kind":"budget","preregistered":true}
+  ],
+  "invalidation_rules": [
+    "Any scalar-label read before moment serialization invalidates the candidate packet.",
+    "Any selector deviation, H115 fixture collision, wrong group order, nonprime r, violated p>19 or extension bound invalidates the cohort.",
+    "Any moment mismatch, coordinate-isomorphism mismatch, missing operation count, binary/source/protocol hash mismatch or failed tamper test blocks scoring or timing admission.",
+    "A/A outside [0.90,1.10], failed L2, automatic scientific retry or heterogeneous host blocks timing claims but preserves exact counts.",
+    "No discovered predicate may be used on a held-out cohort without a new committed protocol."
+  ],
+  "decision_rule": {
+    "text": "Identity is supported within the finite scope only if mismatches=0 and all controls pass. A digit candidate exists only if one fixed ID is exact on every row and target; ties retain all IDs and require the same held-out rule. Otherwise report the full score distribution and no selected ID.",
+    "comparison_ids": ["C-candidate-direct","C-direct-aa","C-digit-family"],
+    "threshold": "zero mismatches; exact predicate on every row and target",
+    "statistic": "exact counts, plus median/range for admitted timing",
+    "interval": "none for exact census; measured range for timing",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "absolute operation/time difference and ratio by phase; exact-row deficit from total",
+    "verdict_vocabulary": ["supported_within_scope","refuted_within_scope","no_exact_predicate","invalid","blocked"]
+  },
+  "analysis_plan": {
+    "script": {"path":"research/h116_truncated_fiber_traces_20261118/h116_producer.rs","sha256":null},
+    "inputs": ["COHORT_V2.json","raw candidate/reference packet","independent verifier output"],
+    "outputs": ["experiment.export/v1","raw JSONL","score matrix","phase cost table","SVG/PNG graph","report PDF"],
+    "blinded": true,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": ["candidate/direct operations by r","cold and online timing by r","predicate exact-row distribution"],
+    "report_dir": "reports/run-<UTC>"
+  },
+  "inadmissible": [
+    "curve or target survivor filtering",
+    "per-curve or post-run predicate definitions",
+    "hidden scalar use in candidate moment construction",
+    "unpriced kernel, extension, table, verification or recovery work",
+    "reporting an admitted component ratio as an end-to-end ECDLP ratio",
+    "claiming subexponential ECDLP from finite data without the named proof obligations"
+  ],
+  "literature": [
+    {"ref":"https://arxiv.org/abs/cs/0609020","provenance":"retrieved","claim":"Laurent/power-sum recurrence and quasi-linear full isogeny construction are prior art.","verified_by":"PDF sha256 0fdb9c1b5b0568e0149ec5dd67479562c090df4359c1f1070cda829d74dbc78e; Sections 2.2 and 4.2-4.3 read 2026-11-18"},
+    {"ref":"https://arxiv.org/abs/2003.10118","provenance":"retrieved","claim":"Structured kernel polynomial and isogeny point evaluation can take quasi-square-root degree work under the paper's index-system hypotheses.","verified_by":"PDF sha256 058162905a84b39fc6e23f12341b02899cce9328e9b45ac20750fa86cdfedd11; Theorem 4.11 and Sections 4.14,5 read 2026-11-18"}
+  ],
+  "amendments": [
+    {
+      "id": "A-COHORT-CAP",
+      "filed": "2026-11-18",
+      "filed_before_affected_data": true,
+      "reason": "The v1 structural rule yielded only two of five required curves and emitted no candidate moment, score, or timing. The precommitted feasibility ladder requires the smallest successful cap.",
+      "changes": ["Increase maximum extension size from 100000000 to 10000000000", "Use COHORT_RULE_V2.json and COHORT_V2.json; retain every other selector, arm, control, metric, stopping, and invalidation rule"],
+      "supersedes_fields": ["variable_ledger.factors.curve.value", "randomization.instance_sampling.rule", "analysis_plan.inputs[0]"]
+    }
+  ],
+  "freeze": {"status":"frozen","protocol_sha256":"42b510bd0f67d23ad49e5827d947510de5e1c68bf82d29c78fa35e4861fe4bf3","commit":"189053138811e03e2fae58cb1d8ad414c89b0cab","frozen_at":"2026-11-18T01:19:53Z","filed_before_affected_data":true}
+}
