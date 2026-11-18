@@ -867,6 +867,19 @@ impl RadicalRootCtx {
     /// F_p-roots of the depressed cubic t^3 + P t + Q = 0 (Cardano; F_{p^2} when D is a non-residue).
     pub fn cubic_depressed(&self, pp: u64, q: u64) -> Vec<u64> {
         let f = &self.f;
+        // x^3 + P*x = x*(x^2 + P): no Cardano or AMM cube root.
+        if q == 0 {
+            if pp == 0 { return vec![0]; }
+            return match self.sqrt(f.neg(pp)) {
+                None => vec![0],
+                Some(s) => {
+                    let mut roots = vec![0, s, f.neg(s)];
+                    roots.sort_unstable();
+                    roots.dedup();
+                    roots
+                }
+            };
+        }
         if pp == 0 {
             if q == 0 {
                 return vec![0];
@@ -960,6 +973,16 @@ impl RadicalRootCtx {
     /// F_p-roots of the monic cubic x^3 + c2 x^2 + c1 x + c0.
     pub fn cubic_monic(&self, c2: u64, c1: u64, c0: u64) -> Vec<u64> {
         let f = &self.f;
+        // x divides a cubic with zero constant; reduce to quadratic roots.
+        if c0 == 0 {
+            let mut roots = self.quad_monic(c2, c1);
+            roots.push(0);
+            roots.sort_unstable();
+            roots.dedup();
+            return roots;
+        }
+        // Already depressed: avoid cubic translation and coefficient products.
+        if c2 == 0 { return self.cubic_depressed(c1, c0); }
         // Shift x=t-sh, sh=c2/3. Reuse sh:
         // P=c1-c2*sh; Q=2*sh^3-c1*sh+c0.
         // Five field multiplications instead of seven.
@@ -1029,6 +1052,22 @@ impl RadicalRootCtx {
         e: u64,
     ) -> Result<(Vec<u64>, bool), String> {
         let f = &self.f;
+        // For nonmonic even quartics, set z=x^2 and solve a*z^2+c*z+e.
+        // Avoid Ferrari depression and coefficient normalization.
+        // Keep monic even quartics on the old path: local GCC/Clang screening
+        // found that direct reduction neutral or slightly slower there.
+        if a != 1 && b == 0 && d == 0 {
+            let mut roots = Vec::new();
+            for z in self.quad_roots(a, c, e) {
+                if let Some(s) = self.sqrt(z) {
+                    roots.push(s);
+                    if s != 0 { roots.push(f.neg(s)); }
+                }
+            }
+            roots.sort_unstable();
+            roots.dedup();
+            return Ok((roots, false));
+        }
         // monic
         let (b1, c1, d1, e1) = if a == 1 {
             (b, c, d, e)
@@ -1128,6 +1167,14 @@ impl RadicalRootCtx {
             },
             3 => ok(self.quad_roots(c[2], c[1], c[0])),
             4 => {
+                // Factor x before normalizing a nonmonic cubic.
+                if c[0] == 0 {
+                    let mut roots = self.quad_roots(c[3], c[2], c[1]);
+                    roots.push(0);
+                    roots.sort_unstable();
+                    roots.dedup();
+                    return ok(roots);
+                }
                 // Monic cubics are common in normalized rootfinding.
                 // Avoid one inversion and three modular products.
                 let mut v = if c[3] == 1 {
@@ -3461,5 +3508,350 @@ mod stack_normalization_round18_tests {
         paired("linear input (5 coefficients, padded) p=1000000007",&padded,64,
             |x|ctx.roots_before_stack(&x).unwrap().roots.iter().fold(0u64,|h,&v|h^v),
             |x|ctx.roots(&x).unwrap().roots.iter().fold(0u64,|h,&v|h^v));
+    }
+}
+
+#[cfg(test)]
+impl RadicalRootCtx {
+    // Frozen pre-round19 implementations. Actual Rust before/after comparison
+    // uses the same Fp, Fp2 and context as the new production entry points.
+    fn cubic_depressed_before_sparse(&self, pp: u64, q: u64) -> Vec<u64> {
+        let f = &self.f;
+        if pp == 0 {
+            if q == 0 {
+                return vec![0];
+            }
+            return match self.cube_p.root(f.neg(q)) {
+                None => vec![],
+                Some(u) => {
+                    if self.cube_p.bijective() {
+                        vec![u]
+                    } else {
+                        let w = self.cube_p.w;
+                        let uw = f.mul(u, w);
+                        vec![u, uw, f.mul(uw, w)]
+                    }
+                }
+            };
+        }
+        let q2 = f.half(q);
+        // Keep the original discriminant: algebraic m^3 reuse measured
+        // 0.61-0.69x in actual Rust CI despite faster C++ screening.
+        let p2 = f.sqr(pp);
+        let d = f.add(f.sqr(q2), f.mul(f.mul(p2, pp), self.inv27));
+        if d == 0 {
+            // double root -3Q/(2P), simple root 3Q/P
+            let ip = f.inv(pp);
+            let triple_q = f.add(f.add(q, q), q);
+            let r1 = f.mul(triple_q, ip);
+            let r2 = f.half(f.neg(r1));
+            return vec![r1, r2];
+        }
+        let nq2 = f.neg(q2);
+        let m = f.neg(f.mul(pp, self.inv3));
+        match self.sqrt(d) {
+            Some(sg) => {
+                let u3 = f.add(nq2, sg);
+                match self.cube_p.root(u3) {
+                    None => vec![],
+                    Some(u) => {
+                        let v = f.mul(m, f.inv(u));
+                        if self.cube_p.bijective() {
+                            vec![f.add(u, v)]
+                        } else {
+                            let w = self.cube_p.w;
+                            let w_2 = f.sqr(w);
+                            let (mut uk, mut vk) = (u, v);
+                            let mut out = vec![f.add(u, v)];
+                            for _ in 0..2 {
+                                uk = f.mul(uk, w);
+                                vk = f.mul(vk, w_2);
+                                out.push(f.add(uk, vk));
+                            }
+                            out
+                        }
+                    }
+                }
+            }
+            None => {
+                // casus irreducibilis route: sqrt(D) = i * sqrt(D/n) in F_{p^2}
+                let sg = self
+                    .sqrt(f.mul(d, self.inv_n))
+                    .expect("D/n must be a residue");
+                let u3 = (nq2, sg);
+                let k = &self.cube_q;
+                let u = match k.root(u3) {
+                    None => return vec![],
+                    Some(u) => u,
+                };
+                // 1/u = conj(u)/N(u)
+                let nrm = f.sub(f.sqr(u.0), f.mul(self.n, f.sqr(u.1)));
+                let ni = f.inv(nrm);
+                let uinv = (f.mul(u.0, ni), f.mul(f.neg(u.1), ni));
+                let v = (f.mul(m, uinv.0), f.mul(m, uinv.1));
+                let w = self.w2;
+                let w_2 = k.r.mul(w, w);
+                let mut out = vec![];
+                let (mut uk, mut vk) = (u, v);
+                for kk in 0..3 {
+                    if kk > 0 {
+                        uk = k.r.mul(uk, w);
+                        vk = k.r.mul(vk, w_2);
+                    }
+                    let im = f.add(uk.1, vk.1);
+                    if im == 0 {
+                        out.push(f.add(uk.0, vk.0));
+                    }
+                }
+                out
+            }
+        }
+    }
+
+    fn cubic_monic_before_sparse(&self, c2: u64, c1: u64, c0: u64) -> Vec<u64> {
+        let f = &self.f;
+        // Shift x=t-sh, sh=c2/3. Reuse sh:
+        // P=c1-c2*sh; Q=2*sh^3-c1*sh+c0.
+        // Five field multiplications instead of seven.
+        let sh = f.mul(c2, self.inv3);
+        let pp = f.sub(c1, f.mul(c2, sh));
+        let sh3 = f.mul(f.sqr(sh), sh);
+        let q = f.add(f.sub(f.add(sh3, sh3), f.mul(c1, sh)), c0);
+        self.cubic_depressed_before_sparse(pp, q)
+            .into_iter()
+            .map(|t| f.sub(t, sh))
+            .collect()
+    }
+
+    fn quartic_before_sparse(
+        &self,
+        a: u64,
+        b: u64,
+        c: u64,
+        d: u64,
+        e: u64,
+    ) -> Result<(Vec<u64>, bool), String> {
+        let f = &self.f;
+        // monic
+        let (b1, c1, d1, e1) = if a == 1 {
+            (b, c, d, e)
+        } else {
+            let ia = f.inv(a);
+            (f.mul(b, ia), f.mul(c, ia), f.mul(d, ia), f.mul(e, ia))
+        };
+        // x divides the quartic when e1=0. Solve the cubic cofactor,
+        // bypassing Ferrari's resolvent and the Frobenius fallback.
+        if e1 == 0 {
+            let mut roots = self.cubic_monic_before_sparse(b1, c1, d1);
+            roots.push(0);
+            roots.sort_unstable();
+            roots.dedup();
+            return Ok((roots, false));
+        }
+        // x = y - B, B = b1/4
+        let (bb, pp, qq, rr) = self.quartic_depressed_coeffs(b1, c1, d1, e1);
+        let mut ys: Vec<u64> = vec![];
+        let mut fallback = false;
+        if qq == 0 {
+            for z in self.quad_monic(pp, rr) {
+                match self.sqrt(z) {
+                    None => {}
+                    Some(0) => ys.push(0),
+                    Some(s) => {
+                        ys.push(s);
+                        ys.push(f.neg(s));
+                    }
+                }
+            }
+        } else {
+            // resolvent in z = (r1+r2)^2:  z^3 + 2P z^2 + (P^2 - 4R) z - Q^2 = 0
+            let (z2, z1, z0) = self.quartic_resolvent_coeffs(pp, qq, rr);
+            let zs = self.cubic_monic_before_sparse(z2, z1, z0);
+            if zs.is_empty() {
+                // Frobenius type (1,3): no rational pairing; the unique root needs F_{p^3} radicals.
+                // Use the distinct-degree (CZ) path on the depressed quartic - NOT radical.
+                fallback = true;
+                ys = frobenius_roots(f.p, &[rr, qq, pp, 0, 1])?;
+            } else {
+                for &z in &zs {
+                    if let Some(al) = self.sqrt(z) {
+                        // quartic = (y^2 + al y + be)(y^2 - al y + ga)
+                        let qa = f.mul(qq, f.inv(al));
+                        let s = f.add(pp, z);
+                        let be = f.half(f.sub(s, qa));
+                        let ga = f.half(f.add(s, qa));
+                        ys.extend(self.quad_monic(al, be));
+                        ys.extend(self.quad_monic(f.neg(al), ga));
+                        break;
+                    }
+                }
+            }
+        }
+        let mut xs: Vec<u64> = ys.into_iter().map(|y| f.sub(y, bb)).collect();
+        xs.sort_unstable();
+        xs.dedup();
+        Ok((xs, fallback))
+    }
+
+    fn roots_before_sparse(&self, f: &[u64]) -> Result<RadicalRoots, String> {
+        let fp = &self.f;
+        // Polynomials of degree <=4 fit in a stack buffer. Scan trailing
+        // zeroes first (including coefficients congruent to 0 mod p) so
+        // arbitrarily padded input remains accepted without a heap Vec.
+        let mut n = f.len();
+        while n > 0 && f[n - 1] % fp.p == 0 {
+            n -= 1;
+        }
+        if n > 5 {
+            return Err("radical root finder supports degree <= 4".into());
+        }
+        let mut c = [0u64; 5];
+        for j in 0..n {
+            c[j] = f[j] % fp.p;
+        }
+        let ok = |roots: Vec<u64>| {
+            Ok(RadicalRoots {
+                roots,
+                frobenius_fallback: false,
+            })
+        };
+        match n {
+            0 => Err("zero polynomial".into()),
+            1 => ok(vec![]),
+            2 => {
+                // x + c0 and a*x have roots without an inversion.
+                let root = if c[0] == 0 { 0 }
+                    else if c[1] == 1 { fp.neg(c[0]) }
+                    else { fp.mul(fp.neg(c[0]), fp.inv(c[1])) };
+                ok(vec![root])
+            },
+            3 => ok(self.quad_roots(c[2], c[1], c[0])),
+            4 => {
+                // Monic cubics are common in normalized rootfinding.
+                // Avoid one inversion and three modular products.
+                let mut v = if c[3] == 1 {
+                    self.cubic_monic_before_sparse(c[2], c[1], c[0])
+                } else {
+                    let ia = fp.inv(c[3]);
+                    self.cubic_monic_before_sparse(fp.mul(c[2], ia), fp.mul(c[1], ia), fp.mul(c[0], ia))
+                };
+                v.sort_unstable();
+                v.dedup();
+                ok(v)
+            }
+            5 => {
+                let (roots, fb) = self.quartic_before_sparse(c[4], c[3], c[2], c[1], c[0])?;
+                Ok(RadicalRoots {
+                    roots,
+                    frobenius_fallback: fb,
+                })
+            }
+            _ => Err("radical root finder supports degree <= 4".into()),
+        }
+    }
+}
+#[cfg(test)]
+mod sparse_round19_tests {
+    use super::*;
+    fn next(seed: &mut u64) -> u64 {
+        *seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+        *seed
+    }
+    fn sorted(mut r: Vec<u64>) -> Vec<u64> {
+        r.sort_unstable(); r.dedup(); r
+    }
+    #[test]
+    fn sparse_cubics_and_even_quartics_match_frozen_reference() {
+        let mut seed = 0x2f00_2026_1118_0019u64;
+        for p in [5u64,7,11,17,97,487,17_497,998_244_353,
+                  1_000_000_007,1_000_000_009,MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = &ctx.f;
+            for j in 0..96 {
+                let a = 1 + next(&mut seed) % (p-1);
+                let b = next(&mut seed) % p;
+                let c = next(&mut seed) % p;
+                let d = next(&mut seed) % p;
+                let pp = if j % 4 == 0 {0} else {c};
+                let q = if j % 3 == 0 {0} else {d};
+                if q == 0 {
+                    assert_eq!(sorted(ctx.cubic_depressed_before_sparse(pp,q)),
+                               sorted(ctx.cubic_depressed(pp,q)),
+                               "depressed cubic p={p} j={j}");
+                }
+                let (c2,c1,c0) = if j%2 == 0 {(b,c,0)} else {(0,c,d)};
+                assert_eq!(sorted(ctx.cubic_monic_before_sparse(c2,c1,c0)),
+                           sorted(ctx.cubic_monic(c2,c1,c0)),
+                           "monic cubic p={p} j={j}");
+                let cubic = [0,c,b,a];
+                assert_eq!(ctx.roots_before_sparse(&cubic).unwrap(),
+                           ctx.roots(&cubic).unwrap(), "general cubic p={p} j={j}");
+                let e = if j%2==0 {next(&mut seed)%p} else {
+                    let r=next(&mut seed)%p; let s=next(&mut seed)%p;
+                    f.mul(a,f.mul(f.sqr(r),f.sqr(s)))
+                };
+                let even = [e,0,c,0,a];
+                assert_eq!(ctx.roots_before_sparse(&even).unwrap(),
+                           ctx.roots(&even).unwrap(), "even quartic p={p} j={j}");
+            }
+        }
+    }
+    fn digest(r: &RadicalRoots) -> u64 {
+        r.roots.iter().fold(r.frobenius_fallback as u64,|h,&v|h.wrapping_mul(33).wrapping_add(v))
+    }
+    #[test]
+    #[ignore]
+    fn bench_sparse_round19_actual_rust() {
+        fn timed<T:Copy,F:Fn(T)->u64>(xs:&[T],reps:usize,f:&F)->f64 {
+            let t=std::time::Instant::now(); let mut digest=0u64;
+            for _ in 0..reps {for &x in xs {
+                digest=digest.wrapping_add(std::hint::black_box(f(std::hint::black_box(x))));
+            }}
+            std::hint::black_box(digest);
+            t.elapsed().as_nanos() as f64/(xs.len()*reps) as f64
+        }
+        fn paired<T:Copy,F:Fn(T)->u64,G:Fn(T)->u64>(
+            label:&str,xs:&[T],reps:usize,old:F,new:G) {
+            let mut a=Vec::new();let mut b=Vec::new();
+            for i in 0..13 {
+                if i%2==0 {a.push(timed(xs,reps,&old));b.push(timed(xs,reps,&new))}
+                else {b.push(timed(xs,reps,&new));a.push(timed(xs,reps,&old))}
+            }
+            a.sort_by(f64::total_cmp); b.sort_by(f64::total_cmp);
+            println!("{label}: before={:.3}ns after={:.3}ns speedup={:.3}x",
+                     a[6],b[6],a[6]/b[6]);
+        }
+        let ctx=RadicalRootCtx::new(1_000_000_007).unwrap();
+        let mut seed=0x1118_2026_0019_0abcu64;
+        let mut depressed=Vec::new();let mut monic=Vec::new();
+        let mut general=Vec::new();let mut even=Vec::new();
+        let mut even_monic=Vec::new();let mut dense=Vec::new();
+        for _ in 0..256 {
+            let a=2+next(&mut seed)%(ctx.f.p-2);
+            let b=next(&mut seed)%ctx.f.p;
+            let c=next(&mut seed)%ctx.f.p;
+            let e=1+next(&mut seed)%(ctx.f.p-1);
+            depressed.push(c); monic.push([0,c,b,1]);
+            general.push([0,c,b,a]); even.push([e,0,c,0,a]);
+            even_monic.push([e,0,c,0,1]); dense.push([e,c,b,a]);
+        }
+        paired("depressed Q=0 p=1000000007",&depressed,64,
+            |p| sorted(ctx.cubic_depressed_before_sparse(p,0)).iter().fold(0u64,|h,&v|h.wrapping_mul(33).wrapping_add(v)),
+            |p| sorted(ctx.cubic_depressed(p,0)).iter().fold(0u64,|h,&v|h.wrapping_mul(33).wrapping_add(v)));
+        paired("monic cubic c0=0 p=1000000007",&monic,64,
+            |x|digest(&ctx.roots_before_sparse(&x).unwrap()),
+            |x|digest(&ctx.roots(&x).unwrap()));
+        paired("nonmonic cubic c0=0 p=1000000007",&general,64,
+            |x|digest(&ctx.roots_before_sparse(&x).unwrap()),
+            |x|digest(&ctx.roots(&x).unwrap()));
+        paired("nonmonic even quartic p=1000000007",&even,64,
+            |x|digest(&ctx.roots_before_sparse(&x).unwrap()),
+            |x|digest(&ctx.roots(&x).unwrap()));
+        paired("monic even quartic unchanged control",&even_monic,64,
+            |x|digest(&ctx.roots_before_sparse(&x).unwrap()),
+            |x|digest(&ctx.roots(&x).unwrap()));
+        paired("dense cubic unchanged control",&dense,64,
+            |x|digest(&ctx.roots_before_sparse(&x).unwrap()),
+            |x|digest(&ctx.roots(&x).unwrap()));
     }
 }
