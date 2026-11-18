@@ -74,6 +74,9 @@ g++ -std=c++20 -O3 -Wall -Wextra -Werror verify_one.cpp -o verify_one
 ./verify_one                              # independent cross-check of one cell
 ```
 
-SHA-256 (this run): `coverage_t3.cpp` `4847204905fed6e9...`, `per_dilation.csv`
-`ca20fb90ec6cb566...`. Full digests in `SHA256SUMS`. Per-dilation values in `per_dilation.csv`
-(columns: p, arm, a, b, n, X, u, s, f, coverage, E2overX2).
+The per-dilation CSV (`per_dilation.csv`, columns p, arm, a, b, n, X, u, s, f, coverage,
+E2overX2) is **regenerated** by `./coverage_t3 per_dilation.csv` and is not committed to Git
+(it exceeds the 64 KiB in-repo data limit and this runtime has no artifact-store push access);
+its SHA-256 is pinned in `SHA256SUMS` as the reproducibility check. `reports/coverage.py` reads
+that regenerated CSV to produce `reports/coverage.svg`. SHA-256 (this run): `coverage_t3.cpp`
+`4847204905fed6e9...`, `per_dilation.csv` `ca20fb90ec6cb566...`; full digests in `SHA256SUMS`.
