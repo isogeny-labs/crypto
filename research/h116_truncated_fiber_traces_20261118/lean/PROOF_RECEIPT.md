@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-8e991e6dc4a096a62c3c20e922c6a40fdea0677bef2418ecde7decece31b1cfb  H116FiberTrace.lean
+dd03887630a75e45d7543fbf5ac8632b054b6fe3fb97dbafe2dce68559e4edc7  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  163 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  170 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -78,6 +78,9 @@ e94fe66e359305ddbae083f9d86559ad5984ca577e5ccede00fc8cbfaaf36fc6  receipts/algeb
 118466f845c4c9efdfd729cfcdb9254fbac8a198c9a260c3bfa7da9752a4734a  receipts/affine-point-lift-build.txt
 2bf8d5c08ebb3d7273efbe0fd0035fc5765ff1367afa1c766f0dd0c72d2d613d  receipts/affine-point-lift-full-build.txt
 16c2e15deef97c7e76e47a664f9c7b0822b6e511abb322d5d17087290fa8063a  receipts/affine-point-lift-audit.txt
+f5beab595d8df926ce8d0c4cd16d80c35c58d22fd24cb2f618f89f4ec3db9603  receipts/odd-eds-parity-build.txt
+3b6b4e6857cbaf5bf4d464ab4bb7bb49ba43f7f52ce33f18bdcbeadc1e40f74c  receipts/odd-eds-parity-full-build.txt
+11a8caa16d979f24c3d3019e5b2fd9c44453505557e266bbce39aaef46f6097d  receipts/odd-eds-parity-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -356,6 +359,17 @@ pointwise scalar equations.  The negative control proves that
 `y^2=x^3+x+1` over `ZMod 5` has no point above `x=1`, so the algebraic-closure
 hypothesis cannot simply be removed.  The remaining gap is the generic
 division-polynomial root-to-scalar-multiplication theorem. [pcc:unverified]
+
+The 170-theorem checkpoint closes the generic parity-factor premise on
+nonsingular short curves outside characteristic two.  A strong induction on
+Mathlib's exact odd normalized-EDS recurrence proves every odd term coprime to
+`s` from the base pair; a compact Bezout identity with constant
+`4*(4*A^3+27*B^2)` supplies that pair for `Psi3,Psi2Sq`.  Consequently the
+generic `Phi n,PsiSq n` no-cancellation theorem now requires only the two
+adjacent EDS factors for every natural scalar.  The singular `A=B=0` pair over
+`ZMod 5` is proved non-coprime by evaluation at zero.  Adjacent-factor
+coprimality remains the sole generic no-cancellation obligation in this
+specialization. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

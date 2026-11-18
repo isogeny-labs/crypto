@@ -1142,6 +1142,192 @@ theorem divisionPolynomialCoprimality_missingFactor_control :
       ¬IsCoprime ((0 : ℤ) * 2 - 2 * 1 * 1) 2 := by
   norm_num [IsCoprime]
 
+/-- For a normalized EDS whose recurrence parameter is a square `s^2`, every
+odd term is coprime to `s` as soon as the third term is. -/
+theorem preNormEDS'_odd_isCoprime
+    {R : Type*} [CommRing R] (s c d : R)
+    (hc : IsCoprime c s) :
+    ∀ n : ℕ, Odd n → IsCoprime (preNormEDS' (s ^ 2) c d n) s := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | h n ih =>
+      intro hn
+      obtain ⟨k, rfl⟩ := hn.exists_bit1
+      rcases k with _ | k
+      · simpa using (isCoprime_one_left : IsCoprime (1 : R) s)
+      rcases k with _ | m
+      · simpa using hc
+      rw [show 2 * (m + 2) + 1 = 2 * (m + 2) + 1 by rfl,
+        preNormEDS'_odd]
+      by_cases hm : Even m
+      · simp only [ite_eq_left hm, mul_one]
+        have hm1 : Odd (m + 1) := hm.add_one
+        have hm3 : Odd (m + 3) := by
+          simpa [show m + 3 = (m + 1) + 2 by omega] using
+            hm1.add_even (even_two : Even (2 : ℕ))
+        have h1 := ih (m + 1) (by omega) hm1
+        have h3 := ih (m + 3) (by omega) hm3
+        have hprod : IsCoprime
+            (preNormEDS' (s ^ 2) c d (m + 1) *
+              preNormEDS' (s ^ 2) c d (m + 3) ^ 3) s :=
+          h1.mul_left (h3.pow_left (m := 3))
+        rw [show preNormEDS' (s ^ 2) c d (m + 4) *
+              preNormEDS' (s ^ 2) c d (m + 2) ^ 3 * s ^ 2 -
+              preNormEDS' (s ^ 2) c d (m + 1) *
+                preNormEDS' (s ^ 2) c d (m + 3) ^ 3 =
+            (preNormEDS' (s ^ 2) c d (m + 4) *
+              preNormEDS' (s ^ 2) c d (m + 2) ^ 3 * s) * s -
+              (preNormEDS' (s ^ 2) c d (m + 1) *
+                preNormEDS' (s ^ 2) c d (m + 3) ^ 3) by ring]
+        rwa [IsCoprime.mul_sub_right_left_iff]
+      · have hmOdd : Odd m := Nat.not_even_iff_odd.mp hm
+        simp only [ite_eq_right hm, mul_one]
+        have hm2 : Odd (m + 2) := by
+          exact hmOdd.add_even (even_two : Even (2 : ℕ))
+        have hm4 : Odd (m + 4) := by
+          exact hmOdd.add_even (by decide : Even (4 : ℕ))
+        have h2 := ih (m + 2) (by omega) hm2
+        have h4 := ih (m + 4) (by omega) hm4
+        have hprod : IsCoprime
+            (preNormEDS' (s ^ 2) c d (m + 4) *
+              preNormEDS' (s ^ 2) c d (m + 2) ^ 3) s :=
+          h4.mul_left (h2.pow_left (m := 3))
+        rw [show preNormEDS' (s ^ 2) c d (m + 4) *
+              preNormEDS' (s ^ 2) c d (m + 2) ^ 3 -
+              preNormEDS' (s ^ 2) c d (m + 1) *
+                preNormEDS' (s ^ 2) c d (m + 3) ^ 3 * s ^ 2 =
+            (preNormEDS' (s ^ 2) c d (m + 4) *
+              preNormEDS' (s ^ 2) c d (m + 2) ^ 3) -
+              (preNormEDS' (s ^ 2) c d (m + 1) *
+                preNormEDS' (s ^ 2) c d (m + 3) ^ 3 * s) * s by ring]
+        rwa [IsCoprime.sub_mul_right_left_iff]
+
+/-- Explicit short-curve Bezout certificate for the base odd EDS term
+`Psi3` and the two-torsion factor `Psi2Sq`. -/
+theorem shortWeierstrassPsiThree_PsiTwoSq_explicit_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    IsCoprime
+      (3 * X ^ 4 + C (6 * A) * X ^ 2 + C (12 * B) * X - C (A ^ 2))
+      (C 4 * (X ^ 3 + C A * X + C B)) := by
+  let d : F := 4 * A ^ 3 + 27 * B ^ 2
+  let s : Polynomial F := C 4 * (X ^ 3 + C A * X + C B)
+  let q : Polynomial F :=
+    3 * X ^ 4 + C (6 * A) * X ^ 2 + C (12 * B) * X - C (A ^ 2)
+  let U : Polynomial F := C 3 * (C (7 * A) * X + C (9 * B) + C 3 * X ^ 3)
+  let V : Polynomial F := -C 4 * (C (4 * A) + C 3 * X ^ 2)
+  have hbezout : U * s + V * q = C (4 * d) := by
+    dsimp [U, V, s, q, d]
+    simp only [map_add, map_mul, map_pow, map_ofNat]
+    ring
+  have h4d : (4 : F) * d ≠ 0 := by
+    apply mul_ne_zero
+    · rw [show (4 : F) = 2 * 2 by norm_num]
+      exact mul_ne_zero h2 h2
+    · exact hdisc
+  change IsCoprime q s
+  refine ⟨C ((4 * d)⁻¹) * V, C ((4 * d)⁻¹) * U, ?_⟩
+  calc
+    _ = C ((4 * d)⁻¹) * (U * s + V * q) := by ring
+    _ = C ((4 * d)⁻¹) * C (4 * d) := by rw [hbezout]
+    _ = 1 := by
+      rw [← Polynomial.C_mul, inv_mul_cancel₀ h4d, Polynomial.C_1]
+
+/-- Mathlib's exact short-curve `Psi3` and `Psi2Sq` are coprime on a
+nonsingular curve outside characteristic two. -/
+theorem shortWeierstrassPsiThree_PsiTwoSq_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime W.Ψ₃ W.Ψ₂Sq := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have hbase := shortWeierstrassPsiThree_PsiTwoSq_explicit_isCoprime
+    A B hdisc h2
+  have hq : W.Ψ₃ =
+      3 * X ^ 4 + C (6 * A) * X ^ 2 + C (12 * B) * X - C (A ^ 2) := by
+    dsimp [W, WeierstrassCurve.Ψ₃, WeierstrassCurve.b₂,
+      WeierstrassCurve.b₄, WeierstrassCurve.b₆, WeierstrassCurve.b₈]
+    norm_num [Polynomial.C_mul, Polynomial.C_ofNat]
+    ring
+  have hs : W.Ψ₂Sq = C 4 * (X ^ 3 + C A * X + C B) := by
+    dsimp [W, WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂,
+      WeierstrassCurve.b₄, WeierstrassCurve.b₆]
+    norm_num [Polynomial.C_mul, Polynomial.C_ofNat]
+    ring
+  dsimp only
+  rw [hq, hs]
+  exact hbase
+
+/-- Every odd-index Mathlib auxiliary division polynomial is coprime to the
+two-torsion factor on a nonsingular short curve outside characteristic two. -/
+theorem shortWeierstrass_prePsi_odd_isCoprime_PsiTwoSq
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) (n : ℕ) (hn : Odd n) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.preΨ' n) W.Ψ₂Sq := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have hbase : IsCoprime W.Ψ₃ W.Ψ₂Sq :=
+    shortWeierstrassPsiThree_PsiTwoSq_isCoprime A B hdisc h2
+  exact preNormEDS'_odd_isCoprime W.Ψ₂Sq W.Ψ₃ W.preΨ₄ hbase n hn
+
+/-- The parity factor in Mathlib's `Phi` definition is always coprime to the
+full squared division-polynomial denominator for natural scalar indices. -/
+theorem shortWeierstrass_parityFactor_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) (n : ℕ) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (if Even (n : ℤ) then 1 else W.Ψ₂Sq) (W.ΨSq n) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  dsimp only
+  by_cases hn : Even n
+  · have hnz : Even (n : ℤ) := by exact_mod_cast hn
+    rw [ite_eq_left hnz]
+    exact isCoprime_one_left
+  · have hnOdd : Odd n := Nat.not_even_iff_odd.mp hn
+    have hnz : ¬Even (n : ℤ) := by
+      intro h
+      apply hn
+      exact_mod_cast h
+    have hpre := shortWeierstrass_prePsi_odd_isCoprime_PsiTwoSq
+      A B hdisc h2 n hnOdd
+    rw [WeierstrassCurve.ΨSq_ofNat]
+    simp only [ite_eq_right hn, mul_one, ite_eq_right hnz]
+    exact hpre.symm.pow_right
+
+/-- On nonsingular short curves, generic numerator/denominator coprimality is
+reduced to the two adjacent EDS factors; the parity premise is discharged. -/
+theorem shortWeierstrassPhi_isCoprime_of_adjacent
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) (n : ℕ) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.preΨ ((n : ℤ) + 1)) (W.ΨSq n) →
+    IsCoprime (W.preΨ ((n : ℤ) - 1)) (W.ΨSq n) →
+    IsCoprime (W.Φ n) (W.ΨSq n) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  dsimp only
+  intro hplus hminus
+  apply divisionPolynomialPhi_isCoprime_of_factors W n hplus hminus
+  exact shortWeierstrass_parityFactor_isCoprime A B hdisc h2 n
+
+/-- Singular negative control: for `A=B=0`, both short-curve base
+polynomials vanish at zero and are not coprime. -/
+theorem shortWeierstrassPsiThree_PsiTwoSq_singular_control :
+    let W : WeierstrassCurve (ZMod 5) := WeierstrassCurve.mk 0 0 0 0 0
+    ¬IsCoprime W.Ψ₃ W.Ψ₂Sq := by
+  let _ : Fact (Nat.Prime 5) := Fact.mk (by norm_num)
+  let W : WeierstrassCurve (ZMod 5) := WeierstrassCurve.mk 0 0 0 0 0
+  dsimp only
+  intro h
+  have heval := h.map (Polynomial.evalRingHom (0 : ZMod 5))
+  norm_num [WeierstrassCurve.Ψ₃, WeierstrassCurve.Ψ₂Sq,
+    WeierstrassCurve.b₂, WeierstrassCurve.b₄, WeierstrassCurve.b₆,
+    WeierstrassCurve.b₈] at heval
+
 /-- Over an algebraically closed field, absence of a common root is an exact
 certificate that two polynomials are coprime. -/
 theorem polynomial_isCoprime_of_no_common_root
@@ -3310,6 +3496,13 @@ theorem rationalMap_separation_strict_control :
 #print axioms subMultiple_isCoprime_of_factors
 #print axioms divisionPolynomialPhi_isCoprime_of_factors
 #print axioms divisionPolynomialCoprimality_missingFactor_control
+#print axioms preNormEDS'_odd_isCoprime
+#print axioms shortWeierstrassPsiThree_PsiTwoSq_explicit_isCoprime
+#print axioms shortWeierstrassPsiThree_PsiTwoSq_isCoprime
+#print axioms shortWeierstrass_prePsi_odd_isCoprime_PsiTwoSq
+#print axioms shortWeierstrass_parityFactor_isCoprime
+#print axioms shortWeierstrassPhi_isCoprime_of_adjacent
+#print axioms shortWeierstrassPsiThree_PsiTwoSq_singular_control
 #print axioms polynomial_isCoprime_of_no_common_root
 #print axioms adjacentIntegerTorsion_eq_zero
 #print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics

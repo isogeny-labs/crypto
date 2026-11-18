@@ -893,6 +893,50 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | `IsCoprime (W.Phi n) (W.PsiSq n)` | exact division-polynomial reduction | H116 over Mathlib `Phi` | arbitrary Weierstrass curve over a commutative ring | adjacent and parity factors coprime to `PsiSq n` |
 | omitted first factor premise can fail | negative control | H116 integer arithmetic | fixed `x=0,m=2,a=2,b=c=1` | only the retained factors are coprime |
 
+## Odd-EDS parity-factor coprimality gate
+
+1. **Structure above.** For `preNormEDS' (s^2) c d`, the odd recurrence
+   modulo `s` retains only products of smaller odd-index terms: when the
+   recurrence index is even, the first summand contains `s^2`; when it is
+   odd, the second does. Strong induction therefore proves every odd term
+   coprime to `s` from the single base certificate `IsCoprime c s`.  For a
+   short Weierstrass curve, `s=Psi2Sq` and `c=Psi3`.
+2. **Theorems used as stated.** Mathlib's `preNormEDS'_odd` supplies the exact
+   recurrence. `IsCoprime.mul_left`, `pow_left`,
+   `mul_sub_right_left_iff`, and `sub_mul_right_left_iff` propagate the
+   induction.  A direct H116 Bezout identity proves the short-curve base case:
+   with `d=4*A^3+27*B^2`, `s=4(X^3+AX+B)`, and
+   `q=3X^4+6AX^2+12BX-A^2`,
+   `3(7AX+9B+3X^3)s-4(4A+3X^2)q=4d`.
+3. **Object as an instance.** The generic recurrence theorem is instantiated
+   with Mathlib's exact `prePsi'`.  For every natural scalar on a nonsingular
+   short curve outside characteristic two, it proves the parity factor
+   coprime to `PsiSq n`.  Composing with the earlier generic reduction leaves
+   only the two adjacent `prePsi` certificates.
+4. **Assembly probe.** The recurrence induction, explicit base certificate,
+   Mathlib specialization, parity wrapper, reduced two-premise assembly and
+   singular control first elaborated in a temporary importing module.  The
+   tracked project then completed all 3,162 build jobs; the exact repository
+   auditor reports `170 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The parity-factor premise is closed for
+   natural scalars on short curves.  Coprimality of `prePsi(n-1)` and
+   `prePsi(n+1)` against `PsiSq n` remains open; this is now the only generic
+   no-cancellation obligation in this specialization. [pcc:unverified]
+6. **Inheritance table.** The EDS recurrence and coprimality algebra are
+   inherited from Mathlib. H116 supplies the strong-induction composition and
+   short-curve Bezout certificate.  The singular `A=B=0` curve over `ZMod 5`
+   is a negative control: both base polynomials vanish at zero and are proved
+   not coprime.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| every odd `preNormEDS' (s^2) c d` term is coprime to `s` | generic recurrence law | H116 over Mathlib normalized EDS | arbitrary commutative ring | `IsCoprime c s` |
+| short-curve `Psi3` is coprime to `Psi2Sq` | constructive instance law | H116 polynomial Bezout certificate | short Weierstrass curve over a field | `4*A^3+27*B^2 != 0`, `2 != 0` |
+| every odd `prePsi' n` is coprime to `Psi2Sq` | exact division-polynomial specialization | H116 over Mathlib `prePsi'` | same short curve | odd natural `n` and base hypotheses |
+| parity factor is coprime to `PsiSq n` | exact factor closure | H116 | same short curve | natural `n` and base hypotheses |
+| `Phi n` coprimality reduces to two adjacent factors | semantic assembly | H116 over generic reduction | same short curve | the two adjacent `prePsi` certificates |
+| singular base pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 5` | none |
+
 ## Adjacent-torsion root-semantics gate
 
 1. **Structure above.** Over an algebraically closed field, two polynomials
