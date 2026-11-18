@@ -1,0 +1,7 @@
+2026-11-18T01:29:33Z launch I1 L_p2013265921_m8_N12_s1k4_r0 T=3 AS=12e9 wall=7200
+2026-11-18T02:54:15Z launch I4 m10 N12 r0 c7 AS=11e9 wall=7200
+2026-11-18T02:54:32Z restart m10 N12 r0 c7 with T=3 (aborted T=1 start after 6 s)
+2026-11-18T03:52:39Z launch I1-lowmem (-m 5000) L_p2013265921_m8_N12_s1k4_r0 T=3 AS=12e9 wall=7200 (I1 default died: cgroup OOM 7.2 GB at 5063 s)
+2026-11-18T04:34:50Z launch I1-lowmem (-m 5000) L_p2013265921_m8_N12_s1k4_r1 T=3 AS=12e9 wall=7200 (r0 lowmem finished: D=8, unit, 2499 s, 7.39 GB)
+2026-11-18T05:08:15Z launch I4 m10 N12 r0 c7 retry with -m 5000, AS=12e9 wall=7200
+2026-11-18T05:18:20Z STOPPED m10 N12 r0 c7 retry (-m 5000) at ~10 min, RSS 3.8 GB, still in degree-7 rounds (pair list 145k): co-tenant msolve (another agent, /dev/shm/bkk) at 7.0 GB; continuing would push the shared 15 GB cgroup into OOM and could kill the co-tenant's job. m10 N12 left unresolved.
