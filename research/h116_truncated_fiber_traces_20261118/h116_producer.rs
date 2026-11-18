@@ -367,8 +367,7 @@ fn prepare_targets(target_path: &Path, label_path: &Path) -> Result<(), String> 
     writeln!(labels, "{LABEL_HEADER}\t{PROTOCOL_SHA256}\t{COHORT_SHA256}").map_err(|e| e.to_string())?;
     let mut rows = 0_u64;
     for (curve_index, spec) in CURVES.iter().copied().enumerate() {
-        let modulus = first_irreducible(spec.p, spec.degree)?;
-        let field = Field::new(spec.p, spec.degree, &modulus)?;
+        let field = Field::new(spec.p, 1, &[0, 1])?;
         let curve = Curve { field: &field, a: field.from_base(spec.a), b: field.from_base(spec.b) };
         let base_generator = first_base_point(&curve, spec.p)?;
         if curve.scalar_mul(spec.order, base_generator)? != Point::Infinity {

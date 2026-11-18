@@ -73,6 +73,24 @@ Corrected optimized self-test stdout was `h116 producer selftest: pass`; it
 exited zero in 0.243s user CPU. The corrected source and binary bindings must be committed and pushed
 before `--run` is invoked on `COHORT_V2.json`.
 
+The first complete target-preparation attempt then revealed that the preparer
+unnecessarily represented base-field targets in the extension field. It was
+stopped with an incomplete, unhashed artifact and produced no moment. The
+partial files were deleted. Target preparation alone now uses the exact
+degree-one representation `F_p[x]/(x)`; the candidate and direct moment paths
+are unchanged and continue to use the selected extension degree. Current
+source and binary bindings are:
+
+```text
+e5f508ffb20586f500b0c54c8f6529a6157893a339f9dc42cdd5356c689ecdc8  h116_producer.rs
+0f4cb9f7d36d5bdff00593515e2397ae30d021181d49961481af90ea720df101  h116_producer.debug
+d46f3627db7b75142324b7c926e6840e90b25e9e0890ccb34e938161d6132263  h116_producer.opt
+```
+
+The current optimized self-test exited zero in 0.239s user CPU. Deterministic
+preparation of all 4560 blinded targets exited zero in 0.023s user CPU and a
+second preparation was byte-identical for both outputs.
+
 The pre-data development test initially omitted the normalization `U=a^2u` and
 failed the p=31 comparison. That attempt is retained in the session log. The
 corrected source above passed without changing the frozen H116 cohort, metrics
