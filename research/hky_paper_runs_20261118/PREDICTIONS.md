@@ -82,3 +82,17 @@ machine's disk, `README.md` §3) while the closure's peak RSS was 5.0 GB, so a c
 ≈ 1 × RSS, and while one is written the previous one is still on disk (2 × RSS). Disk needs: J1/J2
 ≥ 150 GB, J3 ≥ 350 GB, J4 ≥ 700 GB with the export (or `EXPORT=0`). `--hky3-verify-closed on`
 (optional, re-checks closedness at the end) doubles peak memory: fits J1–J3 on a 256 GB host, not J4.
+
+## Revision for the skip binary (J4 only; written 2026-11-18, before any pod data with it)
+
+J4 is relaunched with `bin/pilot_skip` (sha256 36a047ff…, commit 43d5c40d1f; `pod/J4.sh`, flags
+`--hky3-skip on --hky3-skip-witness leads`, `EXPORT=0`): the lead-cover criterion of
+`research/hky_engine_skip_20261118/` (proof, gate PASS) skips products proved to lie in V_6, and checkpoints
+are packed. Measured on the k = 14, D = 6 no-1 proxy: 1.5–1.65× fewer multiply-adds / engine seconds to the
+same rank (growing with the rank); ≈ 1× on closures where 1 enters at the end. Every number `[pcc:unverified]`.
+
+| job | wall: central [band] | peak RSS | checkpoint (two on disk while writing) | basis |
+|:--|:--|:--|:--|:--|
+| J4 (k = 16), skip binary | **230,000 s (2.7 d)** [100,000 – 950,000 s] | 160 GB [100 – 260] | ≈ 120 GB each, ≈ 240 GB peak [80 – 200 each] | off |
+
+J1–J3 are unchanged (they keep `pod/BINARY.sha256`).

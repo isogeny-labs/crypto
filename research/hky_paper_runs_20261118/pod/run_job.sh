@@ -5,7 +5,7 @@
 #
 # Environment (defaults): BIN=/workspace/bin/pkm_tower_pilot, SHA_FILE=<this dir>/BINARY.sha256,
 # OUT_ROOT=/workspace/out, CKPT_MIN=30, MEM_SOFT_PCT=85 (SIGTERM: checkpoint + clean censored exit),
-# MEM_HARD_PCT=97 (SIGKILL), SAMPLE_S=60, EXPORT=1, VERIFY=0 (1: engine re-checks closedness at the end,
+# MEM_HARD_PCT=97 (SIGKILL), SAMPLE_S=60, EXPORT=1, ENGINE_FLAGS (extra engine flags), VERIFY=0 (1: engine re-checks closedness at the end,
 # doubling peak memory: J1-J3 on 256 GB, not J4), MEM_LIMIT_KB (test override of the detected limit).
 #
 # Writes /workspace/out/<job>/: record.json (the engine's record), job.json (this script's record:
@@ -61,6 +61,9 @@ if [ -f "$OUT/job.json" ] && grep -q '"status": "ok"' "$OUT/job.json"; then
   say "already complete (job.json status ok); nothing to do"; exit 0
 fi
 args=(--instance "$INST" --D "$D" --checkpoint-every "$CKPT_MIN" --out "$OUT/record.json")
+# ENGINE_FLAGS (engine-skip round): extra engine flags, e.g. "--hky3-skip on" (J4.sh); recorded in job.log
+# shellcheck disable=SC2206
+[ -n "${ENGINE_FLAGS:-}" ] && args+=($ENGINE_FLAGS)
 if [ -s "$CK/state.ckpt" ]; then
   say "resuming from $CK/state.ckpt: $(cat "$CK/state.json" 2>/dev/null)"
   args+=(--resume "$CK")
