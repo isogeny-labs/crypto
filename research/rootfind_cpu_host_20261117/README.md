@@ -452,3 +452,91 @@ for the retained commit's actual-header results. The local
 performance counters; CI hardware counters remain unavailable
 (`perf_event_paranoid=4`). Neither microbenchmark represents the
 whole root-finding algorithm or establishes GPU speedups.
+
+
+## Pair-table and two-sign S3 sweep reductions (2026-11-17, follow-up)
+
+Changes in `gpu/rootfind/rootfind.cuh`:
+
+1. `rf_pair_run`: when computing the two signs of `x(P_ai +/- P_bi)`,
+   compute `xsum = x_ai + x_bi` once and use `lam^2 - xsum` for both
+   keys, rather than twice evaluating `(lam^2 - x_ai) - x_bi`.
+   For the minus point, `(-y_bi-y_ai)^2 = (y_bi+y_ai)^2`;
+   use the positive numerator for the *square only* to eliminate an
+   additional field negation. The diagonal doubling and degenerate
+   fallback branches are unchanged.
+2. `rf_decompose_thread`: compute `xsum = x_R + x_i` once per
+   factor-base entry and use `lam^2 - xsum` for both candidate roots.
+   This applies to both paired and unpaired lookup paths, and both Fp64
+   and P-256 field instantiations. No variable-time secret-dependent
+   operations were introduced by these algebraic transformations.
+3. Regression benchmark `gpu/rootfind/bench_pair_sweep.cpp` embeds
+   frozen-before `rf_pair_run` and slope formulas; it executes the
+   **actual new header implementation**, compares all pair keys for
+   128 rows including diagonals/short tails and an injected repeated
+   abscissa and zero-y denominator, then compares 4096 public random
+   two-slope outputs bit-for-bit before timing. `make -C gpu/rootfind
+   bench-pair-sweep` runs it. `--perf-pair-before`,
+   `--perf-pair-after`, `--perf-sweep-before`, and
+   `--perf-sweep-after` isolate PMU arms.
+
+### CPU wall-clock measurements, actual repository header
+
+[GitHub Actions run 44208155014](https://github.com/isogeny-labs/crypto/actions/runs/44208155014)
+used Ubuntu 24.04 and GCC `-O2`. All C++ correctness tests passed.
+The harness reports nine-sample medians with the same synthetic
+public corpus and checksum guarding observable results:
+
+| Microkernel | Before | After | Speedup |
+|---|---:|---:|---:|
+| Pair-table run, 16 cells | 295.018 ns/run | 273.887 ns/run | **1.077x** |
+| 2-sign x3 computation | 5.821 ns/point | 5.057 ns/point | **1.151x** |
+
+The two values are microkernel timings, **not** full root-finding or
+GPU throughput. They omit most table probing, target orchestration,
+kernel launches, and memory transfers. The GitHub runner installed
+`perf version 7.0.14` but reports its hardware counters unavailable.
+
+### Local perf measurements and restrictions
+
+On a CPU-pinned AMD EPYC 9V74 (KVM, GCC 14.2 `-O2`),
+a manually mirrored C++ microbenchmark ran both original and
+algebraically transformed formulas with identical synthetic inputs.
+Pair-table and two-sign x3 outputs agreed. Linux's
+`perf_event_open(PERF_TYPE_SOFTWARE, PERF_COUNT_SW_TASK_CLOCK)`
+**was available locally**, and was read with explicit
+`PERF_EVENT_IOC_RESET/ENABLE/DISABLE` around each timed arm.
+The two runs below report nine-plus-run medians, in nanoseconds of
+process CPU task-clock per operation:
+
+| Local perf task-clock | Before (ns/op) | After (ns/op) | Speedup |
+|---|---:|---:|---:|
+| Pair-table run, run A | 468.460 | 447.343 | **1.047x** |
+| Pair-table run, run B | 515.511 | 495.590 | **1.040x** |
+| 2-sign x3, run A | 7.743 | 7.386 | **1.048x** |
+| 2-sign x3, run B | 7.659 | 7.080 | **1.082x** |
+
+The local mirror includes inversion and the same Fp64 operations but
+is **not a checkout of the repository header**, so the actual-header
+CI results above remain the stronger correctness evidence. CPU times
+vary with runner/compiler/cache/clock and are not comparable between
+the local VM and GitHub-hosted runner. Attempted
+`perf_event_open` hardware `cpu-cycles` and `instructions`
+both returned `ENOENT`: no exposed CPU PMU in this KVM sandbox.
+The local `perf` CLI is not installed and package mirrors cannot be
+resolved; local counters are from the standard Linux **perf API**,
+not the CLI, and they measure *software task-clock*, **not** retired
+hardware cycles, instructions or cache misses.
+
+The shared source and CI job remain draft pending PMU measurements on a
+suitable self-hosted runner, GPU validation, and matched before/after
+full `rf64_decompose`/`rf256_decompose` workloads. To reproduce the
+header-based benchmark and isolate arms on such a host:
+
+```sh
+make -C gpu/rootfind test bench-pair-sweep
+for arm in pair-before pair-after sweep-before sweep-after; do
+    perf stat -r 5 -e cycles,instructions,branches,branch-misses \
+        -- gpu/rootfind/bench_pair_sweep "--perf-$arm"
+done
+```
