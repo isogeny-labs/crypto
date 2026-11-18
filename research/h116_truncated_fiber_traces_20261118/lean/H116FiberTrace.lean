@@ -1189,6 +1189,29 @@ theorem polynomial_isCoprime_of_adjacent_torsion_root_semantics
   have hnext := hspec.2.2
   exact hP (adjacentIntegerTorsion_eq_zero n P hn hnext)
 
+/-- Base-field root criterion: it is enough to exclude common roots after
+mapping both polynomials into any algebraically closed field extension. -/
+theorem polynomial_isCoprime_of_no_common_root_after_map
+    {F E : Type*} [Field F] [Field E] [IsAlgClosed E]
+    (f : F →+* E) {p q : Polynomial F}
+    (hroot : ∀ x : E, (p.map f).IsRoot x → (q.map f).IsRoot x → False) :
+    IsCoprime p q := by
+  rw [← Polynomial.isCoprime_map f]
+  exact polynomial_isCoprime_of_no_common_root hroot
+
+/-- Base-field semantic bridge: adjacent-torsion evidence attached to common
+roots after algebraic-closure base change proves coprimality before the base
+change. -/
+theorem polynomial_isCoprime_of_adjacent_torsion_root_semantics_after_map
+    {F E : Type*} [Field F] [Field E] [IsAlgClosed E]
+    (f : F →+* E) {p q : Polynomial F}
+    {G : Type*} [AddCommGroup G] (n : ℤ)
+    (hsemantic : ∀ x : E, (p.map f).IsRoot x → (q.map f).IsRoot x →
+      ∃ P : G, P ≠ 0 ∧ n • P = 0 ∧ (n + 1) • P = 0) :
+    IsCoprime p q := by
+  rw [← Polynomial.isCoprime_map f]
+  exact polynomial_isCoprime_of_adjacent_torsion_root_semantics n hsemantic
+
 /-- Boundary control: the zero point always satisfies both adjacent torsion
 equations, so the nonzero clause in the root-semantics bridge is essential. -/
 theorem adjacentIntegerTorsion_zero_control
@@ -3223,6 +3246,8 @@ theorem rationalMap_separation_strict_control :
 #print axioms polynomial_isCoprime_of_no_common_root
 #print axioms adjacentIntegerTorsion_eq_zero
 #print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics
+#print axioms polynomial_isCoprime_of_no_common_root_after_map
+#print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics_after_map
 #print axioms adjacentIntegerTorsion_zero_control
 #print axioms endomorphism_frobeniusVerschiebung_sum
 #print axioms endomorphism_injectivity_control

@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-a020149d495ac2c26c2332d463c43a55817d5c4b6cf617f27d69a4d47cacd282  H116FiberTrace.lean
+1294011dc4296e71719a41a815ae9aaedb0a50db18fe1c87ddbd9dff9065e169  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  157 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  159 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -72,6 +72,9 @@ ea01d069a7682bd04bb64a5aa113cba204622e24b66ef16a0fd376403eb8f584  receipts/scala
 1932e63c3f78d6ed02cba849b8c5040c19c4fccee3c541e930c35b3848c8a664  receipts/generic-coprimality-reduction-audit.txt
 912ad7b074051d0da17a004b556754ab5aeb2c4932d8aa788c23a3225afdf3f9  receipts/adjacent-root-semantics-build.txt
 c2024fa98bfb039e1e161b9ee6128ef176a1c04af4c80e3bcaa9952c64f80356  receipts/adjacent-root-semantics-audit.txt
+27c565391615e9df1a9b95db99860bd257b2a3ef95b816033ad5cbae69b9f27d  receipts/algebraic-closure-descent-build.txt
+e0bd5924933c7d079a435effee25447e7a4a1b3feb4abdcc007e0c17ebd08f02  receipts/algebraic-closure-descent-full-build.txt
+e94fe66e359305ddbae083f9d86559ad5984ca577e5ccede00fc8cbfaaf36fc6  receipts/algebraic-closure-descent-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -331,6 +334,15 @@ common root to a nonzero adjacent-torsion point implies polynomial
 coprimality.  A zero-point control proves the nonzero clause is essential.
 Constructing that point and proving the division-polynomial root semantics
 remain open. [pcc:unverified]
+
+The 159-theorem checkpoint descends that semantic layer to the original
+coefficient field.  For any field homomorphism into an algebraically closed
+field, absence of common mapped roots proves coprimality over the base field;
+the adjacent-torsion semantic wrapper now has the same base-field endpoint.
+The proof composes Mathlib's exact `Polynomial.isCoprime_map` equivalence with
+the preceding audited theorems.  This closes algebraic-closure descent but
+does not yet construct the elliptic point or prove division-polynomial
+root-to-scalar-multiplication semantics. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

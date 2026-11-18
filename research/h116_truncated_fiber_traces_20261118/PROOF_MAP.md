@@ -928,6 +928,39 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | root-to-adjacent-torsion semantics implies coprimality | semantic assembly | H116 over the preceding laws | algebraically closed field plus additive group | each common root supplies a nonzero adjacent-torsion point |
 | zero point satisfies both equations | boundary control | H116 group simplification | arbitrary additive group | `P=0` |
 
+## Algebraic-closure descent for root semantics gate
+
+1. **Structure above.** Let `f : F ->+* K` be a homomorphism from an
+   arbitrary base field into an algebraically closed field.  If the mapped
+   polynomials `p.map f` and `q.map f` have no common root in `K`, they are
+   coprime in `K[X]`; field-map invariance then descends coprimality to
+   `F[X]`.  The same descent applies after common mapped roots are converted
+   to nonzero points killed by adjacent integer scalars.
+2. **Theorems used as stated.** The preceding H116 algebraically closed root
+   criterion and adjacent-torsion contradiction are composed with Mathlib's
+   `Polynomial.isCoprime_map`, whose reverse implication is the required
+   descent.  Ring homomorphisms between fields are injective automatically;
+   no chosen algebraic closure or coefficient-level inverse is introduced.
+3. **Object as an instance.** One wrapper accepts no-common-root evidence for
+   `p.map f,q.map f`; a second accepts the mapped-root-to-adjacent-torsion
+   semantic certificate.  Both conclude `IsCoprime p q` over the original
+   coefficient field.
+4. **Assembly probe.** Both wrappers first elaborated in a temporary module.
+   The tracked project then completed all 3,162 build jobs; the exact
+   repository auditor reports `159 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This closes coefficient-field descent but
+   does not construct an algebraic closure, lift a division-polynomial root to
+   an elliptic point, or prove the pointwise scalar-multiplication formula.
+   Those geometric obligations remain explicit. [pcc:unverified]
+6. **Inheritance table.** Polynomial mapping and coprimality invariance are
+   inherited from Mathlib. H116 supplies only the composition with the already
+   audited root and group-semantic theorems.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| mapped no-common-root evidence descends to `IsCoprime p q` | generic field-extension law | H116 over Mathlib `Polynomial.isCoprime_map` | base field, algebraically closed extension field, field homomorphism | no shared mapped root |
+| mapped root-to-adjacent-torsion semantics descends to `IsCoprime p q` | semantic assembly | H116 over the preceding descent and group law | same fields plus additive commutative group | every shared mapped root supplies a nonzero adjacent-torsion point |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression
