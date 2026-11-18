@@ -8,10 +8,11 @@ profile and benchmark are checkpoint-blocked in the current runtime, so it has
 no measured throughput result, frontier change, or leaderboard row. The live
 execution-admission gap is tracked in
 [the problem record](../../problems/ghs-strong-rho-measurement-admission.md).
-[Round C](ROUND_C.md) prospectively replaces run-time base-field remainder
-division with fixed-modulus reciprocal reduction and separately re-screens
-batch widths 4, 8, and 16. Its `q=223` cell is correctness/count sensitivity,
-not throughput or a primary-width selection.
+[Round C](ROUND_C.md) replaces run-time base-field remainder division with
+fixed-modulus reciprocal reduction and separately re-screens batch widths 4,
+8, and 16. Its [partial result](round-c/RESULTS.md) passes producer-side
+correctness/count identity on `q=223`, while checkpoint refusal leaves profile,
+throughput, and a primary-width selection unmeasured `[pcc:unverified]`.
 
 This study reopens the restricted `E0/F_{q^3}` plane-quartic program for one
 specific obligation: compare its end-to-end index-calculus result with a rho
@@ -41,11 +42,13 @@ is made [pcc:unverified].
   [`round-b/RESULTS.md`](round-b/RESULTS.md) retains its partial
   correctness/count result and checkpoint blocker.
 - [`ROUND_C.md`](ROUND_C.md) freezes reciprocal-reduction correctness and
-  count-identity gates plus a prospective b4/b8/b16 development screen.
+  count-identity gates plus a prospective b4/b8/b16 development screen;
+  [`round-c/RESULTS.md`](round-c/RESULTS.md) retains its producer controls and
+  the performance-admission blocker.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
   source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
-  the prospective Round B candidate; Round A remains bound by the source hash
-  in [`ROUND_A.md`](ROUND_A.md).
+  the prospective Round C reciprocal candidate layered on Round B's square;
+  Round A remains bound by the source hash in [`ROUND_A.md`](ROUND_A.md).
   [`pod_run.sh`](pod_run.sh) compiles it for the worker and seals each split.
 - [`build_context.sh`](build_context.sh) and [`Dockerfile`](Dockerfile) create
   the exact-revision private image; [`LAUNCH.md`](LAUNCH.md) specifies the

@@ -84,8 +84,30 @@ impl NativeCounts {
 }
 
 /// Native arithmetic for `F_q[z]/(z^3-c)`, `q = 7 mod 12`.
+fn barrett_reciprocal(q: u64) -> u64 {
+    assert!(
+        (2..1u64 << 31).contains(&q),
+        "strong-rho field modulus must satisfy 1 < q < 2^31"
+    );
+    (u128::from(u64::MAX) + 1).div_euclid(u128::from(q)) as u64
+}
+
+#[inline(always)]
+fn barrett_reduce_product(q: u64, reciprocal: u64, x: u64) -> u64 {
+    debug_assert!((2..1u64 << 31).contains(&q));
+    debug_assert!(x < q * q);
+    let quotient = ((u128::from(x) * u128::from(reciprocal)) >> 64) as u64;
+    let residual = x - quotient * q;
+    if residual >= q {
+        residual - q
+    } else {
+        residual
+    }
+}
+
 pub struct FastF3 {
     q: u64,
+    reciprocal: u64,
     c: u64,
     w: u64,
     w2: u64,
@@ -96,6 +118,7 @@ impl FastF3 {
     pub fn from_instance(inst: &Inst) -> Self {
         Self {
             q: inst.q,
+            reciprocal: barrett_reciprocal(inst.q),
             c: inst.kf.c,
             w: inst.kf.w,
             w2: inst.kf.w2,
@@ -147,9 +170,12 @@ impl FastF3 {
     #[inline(always)]
     fn fm(&self, a: u64, b: u64) -> u64 {
         self.bump(|c| c.fq_mul += 1);
-        // The inherited family invariant is q < 2^31, so a*b < 2^62.
-        // Avoid widening division in the hottest kernel.
-        a * b % self.q
+        debug_assert!(a < self.q && b < self.q);
+        // For R=2^64 and m=floor(R/q), floor(x*m/R) undershoots
+        // floor(x/q) by at most one for x<R.  Here x=a*b<q^2<2^62,
+        // so the residual is in [0,2q) and one subtraction is enough.
+        let x = a * b;
+        barrett_reduce_product(self.q, self.reciprocal, x)
     }
 
     fn fmul_small(&self, a: u64, k: u64) -> u64 {
@@ -840,6 +866,45 @@ pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> Stro
 /// the frozen standalone N4 module is compiled exactly as it is in its driver
 /// (its own `cfg(test)` suite depends on Cargo-only test dependencies).
 pub fn selftest() {
+    {
+        let reduce = |q: u64, a: u64, b: u64| {
+            assert!(a < q && b < q);
+            barrett_reduce_product(q, barrett_reciprocal(q), a * b)
+        };
+        let reference =
+            |q: u64, a: u64, b: u64| (u128::from(a) * u128::from(b) % u128::from(q)) as u64;
+        for q in 2..=257 {
+            for a in 0..q {
+                for b in 0..q {
+                    assert_eq!(reduce(q, a, b), reference(q, a, b), "q={q} a={a} b={b}");
+                }
+            }
+        }
+        let mut rng = Rng::new(0x5245_4455_4345_5233);
+        for q in [
+            2u64,
+            3,
+            7,
+            223,
+            4051,
+            65_535,
+            65_536,
+            65_537,
+            (1u64 << 30) - 35,
+            (1u64 << 31) - 1,
+        ] {
+            for a in [0, 1, q / 2, q - 2, q - 1] {
+                for b in [0, 1, q / 2, q - 2, q - 1] {
+                    assert_eq!(reduce(q, a, b), reference(q, a, b), "q={q} a={a} b={b}");
+                }
+            }
+            for _ in 0..10_000 {
+                let (a, b) = (rng.below(q), rng.below(q));
+                assert_eq!(reduce(q, a, b), reference(q, a, b), "q={q} a={a} b={b}");
+            }
+        }
+        eprintln!("selftest: reciprocal reduction matches widened remainder");
+    }
     let instance = || Inst::search(223, 1, 200_000).expect("q=223 instance");
     {
         let inst = instance();
@@ -916,7 +981,7 @@ pub fn selftest() {
     }
     {
         let inst = instance();
-        for (i, width) in [1usize, 8, 32].into_iter().enumerate() {
+        for (i, width) in [1usize, 4, 8, 16, 32].into_iter().enumerate() {
             let k = 17 + i as u64 * 101;
             let out = strong_rho(
                 &inst,
@@ -934,7 +999,7 @@ pub fn selftest() {
                 assert!(out.walk_field.fq_inv < out.steps);
             }
         }
-        eprintln!("selftest: planted logs recovered at widths 1, 8, and 32");
+        eprintln!("selftest: planted logs recovered at widths 1, 4, 8, 16, and 32");
     }
     println!("SELFTEST OK");
 }

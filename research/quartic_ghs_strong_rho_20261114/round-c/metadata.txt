@@ -1,0 +1,25 @@
+$ rustc --version --verbose
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+$ uname -a
+Linux 3cea2d080a5b 6.18.57 #1 SMP Tue Oct 20 21:56:04 UTC 2026 x86_64 GNU/Linux
+$ lscpu selected fields
+CPU(s):                                  5
+Model name:                              Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+Thread(s) per core:                      1
+Core(s) per socket:                      5
+Socket(s):                               1
+$ sha256sum source main binaries raw normalized
+77ec7654292f107b041adc34d2b7e016d453311c5c3c602c6fe64423d45e32fc  research/quartic_ghs_strong_rho_20261114/strong_rho.rs
+b2244ffece12855622a88f9a2af4926b1fac6113b9519fdf11e2bc7449fa27c8  research/quartic_ghs_strong_rho_20261114/main.rs
+636df5139d45efc3b2d9a284a49cdd24540befe05ef75bc19943b5db36539a89  /dev/shm/ghs-r3-baseline
+4327d6ebac858b43870a75aee742b2fa4c5167caf00df2fc7fe0e7b53218b228  /dev/shm/ghs-r3-candidate
+7c92484cf1cac5e67c8391d391fa62edc52ea129bab4d67b0fbe65aa6b1d2073  research/quartic_ghs_strong_rho_20261114/round-c/q223-baseline.jsonl
+844daf13fd3870099a2157b6a5af465f14b73dd0a91a1d4da04f0624796af412  research/quartic_ghs_strong_rho_20261114/round-c/q223-candidate.jsonl
+2f28d058b934027b2d4a849d51e4c8be1a919957ba50d962dc57fa15f9f9af0e  research/quartic_ghs_strong_rho_20261114/round-c/q223-baseline-normalized.jsonl
+2f28d058b934027b2d4a849d51e4c8be1a919957ba50d962dc57fa15f9f9af0e  research/quartic_ghs_strong_rho_20261114/round-c/q223-candidate-normalized.jsonl
