@@ -93,7 +93,12 @@ def main() -> None:
     args.out.mkdir(parents=True, exist_ok=True)
 
     fig = chart(summary)
-    fig.savefig(args.out / "speedups.svg")
+    svg_path = args.out / "speedups.svg"
+    fig.savefig(svg_path)
+    # Matplotlib's embedded font paths carry insignificant trailing spaces;
+    # normalize them so `git diff --check` remains an evidence gate.
+    svg_text = svg_path.read_text()
+    svg_path.write_text("\n".join(line.rstrip() for line in svg_text.splitlines()) + "\n")
     fig.savefig(args.out / "speedups.png", dpi=180)
     with PdfPages(args.out / "REPORT.pdf") as pdf:
         pdf.savefig(fig)
