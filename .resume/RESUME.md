@@ -1,3 +1,49 @@
+# Resume: crypto @ codex/ghs-rho-opt-20261118
+
+## Goal
+Optimize the matched strong-rho comparator for the restricted GHS-weak
+`E0/F_{q^3}` frontier while preserving the frozen Round A record, then open a
+ready PR with correctness, count, profile, and local timing evidence.
+
+## Lead / hypothesis
+`strong_rho.rs::sq` currently calls the six-product generic cubic multiply.
+The prospective Round B protocol derives a five-product cubic square. It
+should preserve the exact walk and remove one priced `F_q` multiplication per
+`F_{q^3}` square; it cannot alone move the E2E leaderboard.
+
+## Spec
+`research/quartic_ghs_strong_rho_20261114/ROUND_B.md`; baseline revision
+`9ec88b7637aac4ce816739155f12f518b393da37`; public diagnostic `q=4051`, seed
+1, target 0, `ic-repeat`, `strong-b8`, calibration triples 3, one thread.
+
+## State
+Fresh branch `codex/ghs-rho-opt-20261118` at the baseline revision. Literature
+and source audit complete; research-KB and Conductor executables unavailable.
+Round B is frozen before candidate implementation or measurement. No run has
+started and no result or frontier claim exists.
+
+## Next steps
+1. Commit and push this protocol/handoff, then run `scripts/checkpoint.sh push`
+   and `scripts/checkpoint.sh gate`.
+2. Probe/profile the baseline with `tools/profile.sh`, retaining unsupported
+   output if applicable.
+3. Implement and test the five-product square, compare exact counts and
+   identity, then run the frozen A/A and ABAB local diagnostic.
+4. Archive the evidence, update the report/session log, run scoped and full
+   required tests, push, open a ready PR, and enable auto-merge.
+
+## Runs in flight
+None.
+
+## Stop and success conditions
+Stop on checkpoint refusal before any experiment, a wrong square or DLP,
+walk/count divergence outside the frozen formula, or missing raw output.
+Success for this round is exact correctness plus one fewer `fq_mul` per
+`f3_sq`; local wall time remains diagnostic. The leaderboard changes only
+after a complete isolated, validated, source-bound grid.
+
+---
+
 # Resume: crypto @ claude/peaceful-babbage-wddn3o (genus 2-16 IC speed-up)
 
 ## Goal
