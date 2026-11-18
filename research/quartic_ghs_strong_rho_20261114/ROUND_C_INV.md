@@ -47,11 +47,14 @@ a^-1 = N^-1 * (A + B*z + C*z^2).
 
 Both paths use one base-field inversion and three final base-field products.
 With the existing `fmul_small` helper, the frozen Frobenius path uses 16
-counted `fq_mul` when `c <= 16` and 19 when `c > 16`; the direct path must use
-12 and 15 respectively. Thus the required delta is exactly four `fq_mul` for
-both the small-constant path and the fallback path. Addition counts may differ
-and remain explicit. The direct path must not increment `f3_mul`; this is a
-kernel specialization, not a general cubic multiplication.
+counted `fq_mul` when `c <= 16`, while the direct path must use 12. When
+`c > 16`, let `k_c` be the number of the three constant-product operands that
+are nonzero. The two algebraically equivalent paths have the same three
+operands, so their counts must be `16 + k_c` and `12 + k_c` (at most 19 and
+15). Thus the required delta is exactly four `fq_mul` even when the fallback
+short-circuits on zero. Addition counts may differ and remain explicit. The
+direct path must not increment `f3_mul`; this is a kernel specialization, not
+a general cubic multiplication.
 
 ## Frozen deterministic controls
 
