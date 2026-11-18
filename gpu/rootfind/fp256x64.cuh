@@ -146,24 +146,13 @@ RF_HD U256x64 fp256_add(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
 }
 
 RF_HD U256x64 fp256_sub(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
-#ifdef __CUDA_ARCH__
-    /* Preserve the original CUDA instruction path pending GPU profiling. */
+    /* Retain the original candidate-select implementation. Actual-header
+     * CI benchmarks found masked-modulus addition regressed on GCC -O2. */
     U256x64 d, t;
     uint64_t bw = u256_sbb(d, a, b);
     u256_adc(t, d, f.p);
     u256_cmov(d, t, bw);
     return d;
-#else
-    /* Host-only: add a masked modulus when the subtraction borrowed.
-     * This needs no second full-width result or conditional move.
-     * The operands are canonical Montgomery residues in [0,p). */
-    U256x64 d, addend;
-    const uint64_t bw = u256_sbb(d, a, b);
-    const uint64_t mask = (uint64_t)0 - bw;
-    for (int i = 0; i < 4; ++i) addend.v[i] = f.p.v[i] & mask;
-    u256_adc(d, d, addend); /* 256-bit wrap is intentional */
-    return d;
-#endif
 }
 
 RF_HD U256x64 fp256_neg(const Fp256Ctx &f, const U256x64 &a) {
