@@ -253,6 +253,21 @@ def BostanJetRecurrence (sourceA sourceB targetA targetB : K) (h : ℕ → K) : 
         (2 * ((k - 3 : ℕ) : K) * sourceB * h (k - 3)) /
           ((2 * k + 3 : ℕ) : K)
 
+/-- Equation (15) of Bostan--Morain--Salvy--Schost after substituting
+`R(x)=x U(1/x)` and multiplying by `w²`. It is written in distributed form so
+that coefficient extraction does not hide work in nested Cauchy products. -/
+def NormalizedIsogenySecondOrderEquation
+    (sourceA sourceB targetA : K) (h : ℕ → K) : Prop :=
+  let U := normalizedMapAtInfinitySeries h
+  let W := U - PowerSeries.X * PowerSeries.derivative U
+  let Udd := PowerSeries.derivative (PowerSeries.derivative U)
+  PowerSeries.C 3 * W +
+      PowerSeries.C sourceA * (PowerSeries.X ^ 2 * W) +
+      PowerSeries.C 2 * (PowerSeries.X ^ 2 * Udd) +
+      PowerSeries.C (2 * sourceA) * (PowerSeries.X ^ 4 * Udd) +
+      PowerSeries.C (2 * sourceB) * (PowerSeries.X ^ 5 * Udd) =
+    PowerSeries.C 3 * (U * U) + PowerSeries.C targetA * PowerSeries.X ^ 2
+
 /-- For prime characteristic `p > 19`, every denominator occurring while the
 H116 producer constructs `h₁,…,h₇` from Bostan et al. recurrence (16) is
 nonzero in `ZMod p`. The denominators above `19` are handled by their displayed
@@ -300,6 +315,141 @@ theorem bostanStepDenominatorsNonzero {p k : ℕ} [Fact p.Prime]
     ⟨_, _, h9, h11, h13, h15, h17, h22, h39, h60, h85⟩
   interval_cases k <;> norm_num at hk3 hk7 ⊢
   all_goals aesop
+
+private theorem normalizedODE_step3
+    (sourceA sourceB targetA : K) (h : ℕ → K)
+    (hode : NormalizedIsogenySecondOrderEquation sourceA sourceB targetA h)
+    (_hprod : (9 : K) ≠ 0) (hsimple : (9 : K) ≠ 0) :
+    h 3 = 3 * (∑ i ∈ Finset.Icc 1 (3 - 2), h i * h (3 - 1 - i)) /
+          (((3 - 2) * (2 * 3 + 3) : ℕ) : K) -
+        (((2 * 3 - 3 : ℕ) : K) * sourceA * h (3 - 2)) /
+          ((2 * 3 + 3 : ℕ) : K) -
+        (2 * ((3 - 3 : ℕ) : K) * sourceB * h (3 - 3)) /
+          ((2 * 3 + 3 : ℕ) : K) := by
+  have hc := congrArg (PowerSeries.coeff 4) hode
+  simp [normalizedMapAtInfinitySeries, PowerSeries.coeff_mul,
+    PowerSeries.coeff_derivative, PowerSeries.coeff_X] at hc
+  simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+  norm_num [Finset.sum_range_succ,
+    show Finset.Icc 1 1 = {1} by decide] at hc ⊢
+  field_simp [hsimple]
+  ring_nf at hc ⊢
+  linear_combination hc
+
+private theorem normalizedODE_step4
+    (sourceA sourceB targetA : K) (h : ℕ → K)
+    (hode : NormalizedIsogenySecondOrderEquation sourceA sourceB targetA h)
+    (hprod : (22 : K) ≠ 0) (hsimple : (11 : K) ≠ 0) :
+    h 4 = 3 * (∑ i ∈ Finset.Icc 1 (4 - 2), h i * h (4 - 1 - i)) /
+          (((4 - 2) * (2 * 4 + 3) : ℕ) : K) -
+        (((2 * 4 - 3 : ℕ) : K) * sourceA * h (4 - 2)) /
+          ((2 * 4 + 3 : ℕ) : K) -
+        (2 * ((4 - 3 : ℕ) : K) * sourceB * h (4 - 3)) /
+          ((2 * 4 + 3 : ℕ) : K) := by
+  have hc := congrArg (PowerSeries.coeff 5) hode
+  simp [normalizedMapAtInfinitySeries, PowerSeries.coeff_mul,
+    PowerSeries.coeff_derivative, PowerSeries.coeff_X] at hc
+  simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+  norm_num [Finset.sum_range_succ,
+    show Finset.Icc 1 2 = {1, 2} by decide] at hc ⊢
+  field_simp [hprod, hsimple]
+  ring_nf at hc ⊢
+  linear_combination 11 * hc
+
+private theorem normalizedODE_step5
+    (sourceA sourceB targetA : K) (h : ℕ → K)
+    (hode : NormalizedIsogenySecondOrderEquation sourceA sourceB targetA h)
+    (hprod : (39 : K) ≠ 0) (hsimple : (13 : K) ≠ 0) :
+    h 5 = 3 * (∑ i ∈ Finset.Icc 1 (5 - 2), h i * h (5 - 1 - i)) /
+          (((5 - 2) * (2 * 5 + 3) : ℕ) : K) -
+        (((2 * 5 - 3 : ℕ) : K) * sourceA * h (5 - 2)) /
+          ((2 * 5 + 3 : ℕ) : K) -
+        (2 * ((5 - 3 : ℕ) : K) * sourceB * h (5 - 3)) /
+          ((2 * 5 + 3 : ℕ) : K) := by
+  have hc := congrArg (PowerSeries.coeff 6) hode
+  simp [normalizedMapAtInfinitySeries, PowerSeries.coeff_mul,
+    PowerSeries.coeff_derivative, PowerSeries.coeff_X] at hc
+  simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+  norm_num [Finset.sum_range_succ,
+    show Finset.Icc 1 3 = {1, 2, 3} by decide] at hc ⊢
+  field_simp [hprod, hsimple]
+  ring_nf at hc ⊢
+  linear_combination 13 * hc
+
+private theorem normalizedODE_step6
+    (sourceA sourceB targetA : K) (h : ℕ → K)
+    (hode : NormalizedIsogenySecondOrderEquation sourceA sourceB targetA h)
+    (hprod : (60 : K) ≠ 0) (hsimple : (15 : K) ≠ 0) :
+    h 6 = 3 * (∑ i ∈ Finset.Icc 1 (6 - 2), h i * h (6 - 1 - i)) /
+          (((6 - 2) * (2 * 6 + 3) : ℕ) : K) -
+        (((2 * 6 - 3 : ℕ) : K) * sourceA * h (6 - 2)) /
+          ((2 * 6 + 3 : ℕ) : K) -
+        (2 * ((6 - 3 : ℕ) : K) * sourceB * h (6 - 3)) /
+          ((2 * 6 + 3 : ℕ) : K) := by
+  have hc := congrArg (PowerSeries.coeff 7) hode
+  simp [normalizedMapAtInfinitySeries, PowerSeries.coeff_mul,
+    PowerSeries.coeff_derivative, PowerSeries.coeff_X] at hc
+  simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+  norm_num [Finset.sum_range_succ,
+    show Finset.Icc 1 4 = {1, 2, 3, 4} by decide] at hc ⊢
+  field_simp [hprod, hsimple]
+  ring_nf at hc ⊢
+  linear_combination 15 * hc
+
+private theorem normalizedODE_step7
+    (sourceA sourceB targetA : K) (h : ℕ → K)
+    (hode : NormalizedIsogenySecondOrderEquation sourceA sourceB targetA h)
+    (hprod : (85 : K) ≠ 0) (hsimple : (17 : K) ≠ 0) :
+    h 7 = 3 * (∑ i ∈ Finset.Icc 1 (7 - 2), h i * h (7 - 1 - i)) /
+          (((7 - 2) * (2 * 7 + 3) : ℕ) : K) -
+        (((2 * 7 - 3 : ℕ) : K) * sourceA * h (7 - 2)) /
+          ((2 * 7 + 3 : ℕ) : K) -
+        (2 * ((7 - 3 : ℕ) : K) * sourceB * h (7 - 3)) /
+          ((2 * 7 + 3 : ℕ) : K) := by
+  have hc := congrArg (PowerSeries.coeff 8) hode
+  simp [normalizedMapAtInfinitySeries, PowerSeries.coeff_mul,
+    PowerSeries.coeff_derivative, PowerSeries.coeff_X] at hc
+  simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+  norm_num [Finset.sum_range_succ,
+    show Finset.Icc 1 5 = {1, 2, 3, 4, 5} by decide] at hc ⊢
+  field_simp [hprod, hsimple]
+  ring_nf at hc ⊢
+  linear_combination 17 * hc
+
+/-- A normalized at-infinity jet satisfying the transformed isogeny equation
+and the two initial coefficient identities satisfies the exact finite recurrence
+used by H116. -/
+theorem BostanJetRecurrence.of_normalizedSecondOrderEquation
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (hbase1 : h 1 = (sourceA - targetA) / 5)
+    (hbase2 : h 2 = (sourceB - targetB) / 7)
+    (hode : NormalizedIsogenySecondOrderEquation sourceA sourceB targetA h)
+    (hden : ∀ k, 3 ≤ k → k ≤ 7 →
+      ((((k - 2) * (2 * k + 3) : ℕ) : K) ≠ 0) ∧
+        (((2 * k + 3 : ℕ) : K) ≠ 0)) :
+    BostanJetRecurrence sourceA sourceB targetA targetB h := by
+  refine ⟨hbase1, hbase2, ?_⟩
+  intro k hk3 hk7
+  have hd := hden k hk3 hk7
+  interval_cases k
+  · exact normalizedODE_step3 sourceA sourceB targetA h hode hd.1 hd.2
+  · exact normalizedODE_step4 sourceA sourceB targetA h hode hd.1 hd.2
+  · exact normalizedODE_step5 sourceA sourceB targetA h hode hd.1 hd.2
+  · exact normalizedODE_step6 sourceA sourceB targetA h hode hd.1 hd.2
+  · exact normalizedODE_step7 sourceA sourceB targetA h hode hd.1 hd.2
+
+/-- Prime-field specialization with every recurrence denominator discharged by
+`p > 19`. -/
+theorem BostanJetRecurrence.of_normalizedSecondOrderEquation_zmod
+    {p : ℕ} [Fact p.Prime] (hp : 19 < p)
+    (sourceA sourceB targetA targetB : ZMod p) (h : ℕ → ZMod p)
+    (hbase1 : h 1 = (sourceA - targetA) / 5)
+    (hbase2 : h 2 = (sourceB - targetB) / 7)
+    (hode : NormalizedIsogenySecondOrderEquation sourceA sourceB targetA h) :
+    BostanJetRecurrence sourceA sourceB targetA targetB h := by
+  exact BostanJetRecurrence.of_normalizedSecondOrderEquation
+    sourceA sourceB targetA targetB h hbase1 hbase2 hode
+      (fun k hk3 hk7 ↦ bostanStepDenominatorsNonzero hp hk3 hk7)
 
 /-- The seven coefficients satisfying the H116 recurrence are unique. -/
 theorem BostanJetRecurrence.unique
@@ -375,6 +525,8 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero
 #print axioms bostanStepDenominatorsNonzero
+#print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation
+#print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation_zmod
 #print axioms BostanJetRecurrence.unique
 #print axioms fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 

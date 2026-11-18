@@ -33,6 +33,20 @@ that uniqueness into every `F_U` coefficient through degree eight. This is a
 uniqueness/interface result; the geometric proof that the normalized isogeny
 jet satisfies the recurrence remains open. [pcc:unverified]
 
+The paper's second-order rational-map equation becomes the following equation
+after writing `R(x)=xU(w)` with `w=1/x` and multiplying by `w²`:
+
+```text
+(3+A w²)(U-wU') + 2w²(1+A w²+B w³)U'' = 3U² + Atilde w².
+```
+
+`NormalizedIsogenySecondOrderEquation` is its distributed PowerSeries form.
+Lean now proves that this equation, the `h1` and `h2` initial identities and
+the nonzero denominators imply `BostanJetRecurrence`; the `ZMod p`
+specialization discharges the denominator premises from prime `p>19`.
+Deriving the displayed equation from the actual normalized rational isogeny
+map remains the geometric bridge. [pcc:unverified]
+
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 
 ```text

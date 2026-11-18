@@ -79,6 +79,14 @@ is no longer ambiguity about the native formula: it is the geometric statement
 that the actual normalized isogeny Laurent jet satisfies this recurrence.
 [pcc:unverified]
 
+The coefficient-extraction part of that bridge is now formalized as well.
+`NormalizedIsogenySecondOrderEquation` is equation (15) of the cited Bostan et
+al. construction after `R(x)=xU(1/x)`. Lean proves that this PowerSeries
+equation plus the two initial coefficients implies the exact seven-term native
+recurrence, with every division discharged for prime `p>19`. What remains is
+to obtain this formal-series equation from the actual normalized isogeny map;
+the theorem does not assume or construct that map. [pcc:unverified]
+
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
 `(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying

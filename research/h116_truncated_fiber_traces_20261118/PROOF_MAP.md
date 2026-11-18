@@ -32,12 +32,13 @@ This map is written before the first H116 Lean declaration.
    coefficient except the target-dependent linear term. For prime `p>19`, all
    denominators used by the native `h₁,...,h₇` recurrence are now proved
    nonzero in `ZMod p`. The exact finite recurrence is encoded, proved unique
-   on `h₁,...,h₇`, and proved to determine `F_U` through degree eight. The
-   remaining geometric bridge identifies the series at `w=1/x` with the actual
-   isogeny Laurent expansion and proves that its jet satisfies the encoded
-   recurrence. The formal-group congruence for `V-1` is a separate endpoint
-   premise unless an existing verified elliptic formal-group theorem is
-   located. [pcc:unverified]
+   on `h₁,...,h₇`, and proved to determine `F_U` through degree eight.
+   Equation (15), transformed by `R(x)=xU(1/x)`, is formalized as a PowerSeries
+   identity and is proved to imply the recurrence. The remaining geometric
+   bridge derives this identity from the actual normalized isogeny coordinate
+   map. The formal-group congruence for `V-1` is a separate endpoint premise
+   unless an existing verified elliptic formal-group theorem is located.
+   [pcc:unverified]
 6. **Inheritance table.** Below. A blank or `lookup pending` entry blocks the
    first Lean edit.
 
@@ -74,6 +75,7 @@ This map is written before the first H116 Lean declaration.
 | target/reference denominators share the same higher jet | instance law | H116 Lean module | field, `U`, `U0`, coefficient function `h` | none |
 | native Bostan denominators are nonzero | instance law | H116 Lean module | `ZMod p` | `p` prime and `p>19` |
 | finite Bostan recurrence determines `h₁,...,h₇` and `F_U` through degree eight | instance law | H116 Lean module | field, source/target coefficients, two coefficient functions | both functions satisfy `BostanJetRecurrence` |
+| transformed normalized-isogeny equation implies the finite recurrence | instance law | H116 Lean module | field or `ZMod p`, source/target coefficients, coefficient function | PowerSeries equation (15), initial `h₁,h₂`; generic denominator premises or prime `p>19` |
 | `Y_j` fiber identity | endpoint | H116 | isogeny coordinate data | normalized differential formula, non-2-torsion target |
 | Frobenius low-jet specialization | instance obligation or explicit premise | crypto-lean candidate | elliptic formal group | ordinary `E/F_p`, `V+pi=[t]` |
 | conditional decoder cost | endpoint | H116/H115 theorem reuse | cyclic prime-order group | exact public digit predicate and `r^o(1)` evaluator |
@@ -86,7 +88,7 @@ This map is written before the first H116 Lean declaration.
 | finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
 | finite sums and coefficient extraction | Mathlib finite sums plus proved H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
 | field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
-| isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; crypto-lean lookup pending |
+| isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; its rational-map equation must still be connected to `NormalizedIsogenySecondOrderEquation`; crypto-lean lookup pending |
 | `V+pi=[t]` and `pi(z)=z^p` | H115 algebra plus formal-group instance; lookup pending |
 | radix-six decoder | reuse H115 generic theorem after source import/binding |
 

@@ -6,23 +6,23 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-e2d60b4de7719f2309df671eb71d9ad27d17358cfd1d3e00aa75e805e6d6cbad  H116FiberTrace.lean
+1a1413ee2964b6b97057d6d15d85c806e18066e0a17baae13700b80724921867  H116FiberTrace.lean
 ```
 
 The repository proof gate built both the default target and the explicitly
 tracked source, then transitively audited all theorem declarations:
 
 ```text
-PASS  26 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS  28 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
 
 ```text
-3315564a25a534f38f9ac556762ed717806b31ba7f0d39f776150a8e15ca2eac  receipts/audit.log
-79fccc1cda04dc7b127aaeec4b2dca8dc11e97f0a7a84954b017f87d3f87fee7  receipts/build.log
+9e6192be91c898704493baf7012ade180435004d09b971d2fa9ba52d5a5d169e  receipts/audit.log
+104c4688c8d806f44d7d62b6ab34e484fe80b654ccb1953f145e5aa6021f4eaf  receipts/build.log
 29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483  receipts/cache.log
-465749ce8d9a1f4e3481eb51856902450e66aa5c8e6794bf1f9e2603102882d8  receipts/source-build.log
+46c87e1fc1319eb0b35ee9462e979da44f0a6c4d495e180e1dcac421b23df215  receipts/source-build.log
 c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/status.txt
 6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
 ```
@@ -45,9 +45,11 @@ also proves that every denominator used by the native `h₁,...,h₇` Bostan
 recurrence is nonzero in `ZMod p` when `p` is prime and `p>19`. It also encodes
 the exact finite recurrence, proves its seven coefficients unique, and proves
 that any two solutions induce identical `F_U` coefficients through degree
-eight. It does not yet identify the formal normalized-map series with the
-actual isogeny at `w=1/x`, prove that the geometric jet satisfies the encoded
-recurrence or construct the `V-1` formal jet, a
+eight. It formalizes transformed equation (15) as a PowerSeries identity and
+proves that this identity plus the two initial coefficients implies the exact
+recurrence, including the prime `p>19` specialization. It does not yet derive
+that formal-series identity from an actual normalized rational isogeny map or
+construct the `V-1` formal jet, a
 scalar predicate or an ECDLP decoder. [pcc:unverified]
 
 The first integration build is retained at
