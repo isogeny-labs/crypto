@@ -36,3 +36,24 @@
 
 ### Errors
 - No failed Rust mathematical tests in first CI. An earlier GitHub API fetch with a disallowed filtered workflow URL was replaced with allowed commit-workflow-run and job retrieval; no data loss. Independent signed PCC verification remains separate/unavailable.
+
+## 03:31–03:34 UTC — Final original Rust CI, independent Python BigInt replay, committed result
+
+### What was done
+- Exact-source [GitHub Actions #44230869392](https://github.com/isogeny-labs/crypto/actions/runs/44230869392) passed Rust 1.100 pinned original source 40/40 library tests; AB and BA 256-log complete test 1/1 each; all final JSON assertions and independent Python replay.
+- Fully charged final AB: x-first 1327.643481 ms versus y-ranked 1722.114269 ms; BA reversed x-first 1330.056300 ms versus y-ranked 1809.574317 ms. Earlier original Rust-only run #44230419721 had AB 2194.191246 versus 2824.345782 ms, BA 2160.964930 versus 2771.233421 ms; all four paired comparisons y slower by 28–36%. Final 256/256 logs and rank31/31 for each panel, no fallbacks, first-hit coverage 244 vs 232 and failed target queries 12 vs 24.
+- Committed independent reproducible Python checker, self-contained immutable-prime31 validation, CI invocation, source-specific logs and artifact [#14395146631](https://github.com/isogeny-labs/crypto/actions/runs/44230869392/artifacts/14395146631) (provider SHA256 ZIP digest `ff4808f9f9a28b77031ab4db3e56c1f19b2e39c3df3449dbcc71235e24823863`, not independently rehashed).
+- Python checked 124/124 basis logs, 124/124 modular rows, 1024/1024 public-target scalar equality, 1024/1024 signed eight-point identities and deterministic y-base/AB-BA matching. Frozen `B31_Y_RANKED_COMPLETE_RAW_SUMMARY_20261118.json` and `B31_Y_RANKED_COMPLETE_RESULT_20261118.md` with lead audit, measured/scoped distinction and ranked no-duplicate next experiment queue.
+- Marked the active item complete, ready to mark PR #4652 review-ready (stacked on open #4647; no automatic merge).
+
+### Decisions made
+- Retire canonical-low-y ranking as an optimization of this fixed generic-equivalent 4A+4A B31 control. Preserve first-x31 baseline and prioritize truly public-only algebraic S4/S3 or RR9 extractor with no 4A enumeration; matched BSGS/strong rho gate remains separate.
+- Treat absolute host time drift between Actions runs as uncontrolled; report only matched same-runner ratios and exact failure/hit counts.
+- Results are producer-side, `[pcc:unverified]`; no independently signed PCC exists, no paid compute was launched.
+
+### Open threads
+- #4604 full RR9 D9 algebraic certificate/extraction, #4596 actual-prime31 matched cached BSGS and #4647 parent integration are independently owned. Do not duplicate or merge the stack out of order.
+- The next scientifically decisive run must produce natural target-conditioned algebraic relations from a public R, then enter the unchanged 1024-log Rust rank solver and fully charged competing baselines.
+
+### Errors
+- No new CI failures. The exact-source Rust and Python checker tests passed in final run; independent signed PCC is a separate outstanding evidence gate.
