@@ -735,6 +735,42 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | `rationalFunctionCoordinateExtension_degree` | inherited rational-function law | H116 wrapper over Mathlib `RatFunc.finrank_eq_max_natDegree` | one rational function over an arbitrary field | none; numerator and denominator are canonical reduced forms |
 | `unequalCoordinateLineDegrees_control` | boundary control | H116 arithmetic | natural numbers | concrete equality `4*3=2*6` with unequal adjacent degrees |
 
+## Reduced quotient and no-cancellation instance gate
+
+1. **Structure above.** For `p,q in F[X]`, the displayed rational function is
+   `f=(p:RatFunc F)/(q:RatFunc F)`. Mathlib's `RatFunc.num` and
+   `RatFunc.denom` divide by `gcd p q` and scale by a nonzero constant so that
+   the denominator is monic.
+2. **Theorems used as stated.** `RatFunc.num_div` and `RatFunc.denom_div`
+   expose the canonical normalization. `IsCoprime.isRelPrime` together with
+   `gcd_isUnit_iff_isRelPrime`, `normalize_eq_one`, and `normalize_gcd` makes
+   the normalized gcd equal to one. `Polynomial.natDegree_C_mul` preserves
+   degree under the remaining nonzero scalar. The existing
+   `rationalFunctionCoordinateExtension_degree` then computes the extension
+   degree.
+3. **Object as an instance.** The planned theorem is generic over a field and
+   two polynomials. It assumes `q != 0` and `IsCoprime p q`; it does not assume
+   that any particular division polynomials are coprime.
+4. **Assembly probe.** First check the generic reduction in a temporary module
+   importing the tracked H116 file, at default limits. Only after the exact
+   numerator and denominator degree equalities elaborate may the theorem move
+   into the tracked module and enter the exact axiom audit.
+5. **Missing components only.** Instantiating the theorem with
+   `Phi_n,Psi_n^2` still requires a proof of `IsCoprime`; identifying that
+   quotient with scalar multiplication and constructing the curve-field tower
+   remain separate. The frozen polynomial-gcd panel below measures this premise
+   on out-of-sample toy cells but cannot prove it generically. [pcc:unverified]
+6. **Inheritance table.** Polynomial gcd, coprimality, rational-function
+   normalization and finite extension degree all come from Mathlib. The local
+   theorem merely connects their exact public APIs. A shared-factor mutation
+   and a singular cubic are retained as negative controls.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| displayed coprime quotient retains numerator and denominator degrees | generic bridge | H116 over Mathlib RatFunc normalization | field and two polynomials | nonzero denominator and `IsCoprime p q` |
+| displayed coprime quotient has extension degree `max(deg p,deg q)` | generic assembly | H116 over the preceding bridge and `RatFunc.finrank_eq_max_natDegree` | rational function field | same hypotheses |
+| shared-factor mutation is not coprime | negative control | native finite polynomial arithmetic | fixed toy polynomials | multiply both sides by the same linear factor |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression
