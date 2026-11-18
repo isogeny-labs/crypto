@@ -66,3 +66,31 @@ A GitHub Actions workflow [`prime31-w8-windowed-rank.yml`](../../../.github/work
 **Decisive next experiment:** instantiate the **same four-window public-R interface** with an RR9/F4 unknown-index extractor that receives no generic sum tables, no planted witnesses and no hidden target scalar. Test each window's natural hit/miss oracle equivalence and exact 31-rank/1024-target recovery. Count every failed F4 call and memory allocation, then AB/BA benchmark the full system against the strongest reused Rust index-calculus control and same-runner shared BSGS and optimized rho. Given ~1,000+ algebraic calls for 1,024 logs, the historical 144.049ms shared-BSGS result leaves at most on the order of 100 microseconds per call **before setup/rank costs**; this is an arithmetic budget, not a measured constraint-solver runtime.
 
 **Standing:** an actionable structural reduction to small B8 solves with original-curve local rank evidence and check-in, but **not yet** a cheaper complete non-generic prime-field solver. Independent signed validation pending.
+
+## Actual source-specific native verdict — two CI PASS executions (2026-11-18 22:38 UTC)
+
+**Pass:** [PR workflow #44412897116](https://github.com/isogeny-labs/crypto/actions/runs/44412897116) and [push workflow #44412887094](https://github.com/isogeny-labs/crypto/actions/runs/44412887094), pinned original arithmetic commit `1df714645aa683cf975bc76fcacb9842cb4780fd`, candidate source commit `ffb5d89969abfa2c67901373d001f0dd5bf06028`, Rust 1.100.0, Ubuntu 24.04. Each run passed original 40 library tests, both (2/2) focused original-curve Rust tests, full production of **1,024/1,024** verified target logs, and independently implemented Python BigInt replay of **31 natural training relations, 31 factor logs, all 1,024 recovered target scalar identities**. The signed external PCC verdict remains `[pcc:unverified]`.
+
+The complete source-specific [raw 1,024-target JSON artifact #14478900939](https://github.com/isogeny-labs/crypto/actions/runs/44412897116/artifacts/14478900939) (ZIP SHA256 `cd76ee0008805d1f53ce057aa7d225866d52f2dba9393ed2df9ed1869fb30db8`, 50,636 compressed bytes) was re-downloaded and independently hash-checked on 2026-11-18. GitHub retention expires **2026-12-18**; the [durable frozen summary](W8_WINDOWED_B8_RANK_SUMMARY_20261118.json) retains all main measurements but not the 1,024-row transcript.
+
+| Same exact-source GitHub producer run metric | Result |
+|---|---:|
+| Independent natural training relations | **31** in 37 queries |
+| Factor logs learned and verified | **31/31** |
+| Public unknown-target logarithms recovered and verified | **1,024/1,024** |
+| Shifted public target relation queries | **1,312** (288 unsuccessful) |
+| EC additions setup / training / online | 560,630 / 1,036,373 / 42,919,320 |
+| Total EC additions | **44,516,323** |
+| Field multiplications / inversions | 2,848,160,879 / 44,500,854 |
+| Setup time | 182.508 ms |
+| Training and factor-log verification | 326.207 ms |
+| Online target recovery and verification | 13,589.425 ms |
+| **Charged total end-to-end time** | **14,098.140 ms** |
+
+Public-target relation queries per recovered log average **1.28125**, and the natural rank recovered in 8+8+10+11 training queries for each of the four windows (incremental rank 8,16,24,31). All six target attempts or fewer succeeded; 803 first-try, 168 second-try, 43 third-try, 7 fourth-try, 2 fifth-try, 1 sixth-try.
+
+**Interpretation/limit:** This is **the first complete source-specific 1,024-target original-Rust test of the four-B8-window factor-base assembly**; it uses explicit **generic 4+4 EC group-sum grader tables**, 44.5 million EC additions, and costs 14.10 seconds. The historical fastest shared BSGS batch measured 144.049 ms (about **97.87× smaller numeric wall time**, **not** same-runner, **not** a matched new comparison), so this test does **not** demonstrate a faster solver. The substantive contribution is that one may replace the B31-wide unknown coefficient extraction requirement with **four B8-sized independent algebraic extraction requirements**, and still achieve real full rank plus 1,024 complete scalar recoveries if those extraction oracles become fast.
+
+**Corrections/failures:** Initial run [#44412198556](https://github.com/isogeny-labs/crypto/actions/runs/44412198556) compiled 40/40 original tests but failed new Rust E0499 because a mutable scalar-multiplication call was nested inside `ar.add`; commit `ffb5d899` separated the calls. The final two passing runs above are source-specific and preserve that failed predecessor. Producer-side original-curve check plus separate Python replay are not signed external validation.
+
+**Next non-generic gate remains open:** Reuse the same 4-window interface, but replace every 4+4 grader with a **public-residual-only RR9/F4/quotient solver** for the degree-≤16 B8 signed-slot factored resultants, with strict zero generic-table accesses, unseen positive/negative truth panels and all failures/memory charged. Repeat rank-31+1,024 full logs and matched cold/cached IC, BSGS and optimized rho costs on a single host. Until that is achieved, this is a correct *generic-equivalent* control.
