@@ -223,11 +223,12 @@ monotonicity lemma, so no limit was raised and no theorem was weakened.
    `X` as `X^1` and hit the default recursion-depth limit. The checked proof
    instead invokes `coeff_X_pow_mul` explicitly. `lake build` then passed at
    default limits, and the exact repository axiom auditor reported
-   `73 theorems, 0 failing, 0 trusted`.
+   `80 theorems, 0 failing, 0 trusted` after the curve-coordinate instance was
+   added.
 5. **Missing components only.** This now proves the double-pole and regular-unit
-   substitution algebra for a supplied outer series. Identifying that series
-   with the actual elliptic x-coordinate unit, then proving `V+pi=[t]`, local
-   Frobenius and formal subtraction still require instances.
+   substitution algebra. The curve-coordinate instance below identifies the
+   supplied series. Proving `V+pi=[t]`, local Frobenius and formal subtraction
+   still requires an instance.
 6. **Inheritance table.** Truncation, coefficient shifts and unit inverses are
    Mathlib operations; prefix arithmetic is the pre-existing H116 wrapper. The
    only new local laws reconstruct a prefix from coefficients, cancel `X`,
@@ -244,7 +245,7 @@ monotonicity lemma, so no limit was raised and no theorem was weakened.
 | normalized double-pole prefix transfer | generic assembly | H116 | field power series | leading-`X` prefix and two unit hypotheses |
 | regular-unit substitution and inverse | generic law | H116 over Mathlib substitution | field power series | zero inner constants and nonzero outer constant |
 | normalized pole with regular unit | generic assembly | H116 | field power series | leading-`X` prefix and unit hypotheses |
-| actual normalized elliptic x-ratio prefix | endpoint obligation | future elliptic formal-group owner | ordinary elliptic curve | identification of the regular series plus endomorphism identities |
+| actual normalized elliptic x-ratio prefix | curve-coordinate instance plus open endpoint | H116/future formal-group owner | ordinary elliptic curve | checked `q` equation plus endomorphism parameter identity |
 
 The current source and direct repository-auditor receipts are pinned in
 `lean/PROOF_RECEIPT.md`. The proof-gate cache-fetch preflight itself is recorded
@@ -266,6 +267,41 @@ All 20 substitution and inverse-substitution differences occur at degree
 `m`; and all three independent boundary formulas plus the frozen control
 triplets pass. This still supplies no elliptic identification of the outer
 series. [pcc:unverified]
+
+## Short-Weierstrass coordinate-unit instance gate
+
+1. **Structure above.** `WeierstrassCoordinateUnit A B q` is the exact fixed-
+   point equation `q=1+A X⁴q²+B X⁶q³` obtained from the short-Weierstrass curve
+   after writing `x(z)=z⁻²q(z)⁻¹`. No curve group law is copied.
+2. **Theorems used as stated.** Mathlib constant coefficients show `q(0)=1`;
+   unit cancellation proves the regularized affine identity. Mathlib power-
+   series substitution, composition and coefficient maps prove coordinate
+   rescaling and double substitution.
+3. **Object as an instance.** `normalizedWeierstrassXRatio` is exactly the
+   implementation expression `qSource*f⁻²*qTarget(Xf)⁻¹`. The generic prefix
+   theorem is instantiated with source and target coordinate-unit equations.
+4. **Assembly probe.** The source builds at default limits and the exact axiom
+   auditor reports `80 theorems, 0 failing, 0 trusted`. The first rescaling
+   proof exposed the distinction between `MvPowerSeries.C` and the univariate
+   wrapper `PowerSeries.C`; rewriting through Mathlib's definitional bridge
+   resolved it without changing the statement.
+5. **Missing components only.** The algebra now proves the target coefficients
+   `(a⁴A,a⁶B)` and the exact identity
+   `qTarget(zNormalized)=qSource(zScalar)` whenever
+   `a*zNormalized=zScalar`. The remaining endpoint must derive that parameter
+   equality from `V+pi=[t]`, `pi(z)=z^p` and formal subtraction.
+6. **Inheritance table.** Curve-unit arithmetic uses PowerSeries ring laws;
+   rescaling uses `subst_comp_subst_apply`; prefix transfer reuses the prior
+   H116 theorem. No isogeny semantics, decoder, complexity bound, limit
+   override or native decision procedure is introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Hypotheses |
+| --- | --- | --- | --- |
+| `q(0)=1` and cleared affine identity | curve-coordinate instance | H116 | coordinate-unit equation |
+| `(A,B,q) -> (a⁴A,a⁶B,q(aX))` | generic scaling law | H116 over Mathlib substitution | field and scale |
+| target/source substitution identity | generic assembly | H116 | zero-constant normalized parameter and `a*zNormalized=zScalar` |
+| normalized x-ratio prefix | curve-coordinate assembly | H116 | source/target coordinate units plus leading-parameter prefix |
+| derive normalized/scalar parameter identity | endpoint obligation | future formal-group owner | `V+pi=[t]`, local Frobenius and formal subtraction |
 
 ## Inheritance table
 

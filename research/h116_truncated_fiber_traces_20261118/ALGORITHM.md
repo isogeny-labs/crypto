@@ -130,10 +130,12 @@ degree implies equality of `f⁻¹²` and `g⁻¹²` through the requested degre
 both unit factors have nonzero constant coefficient. This discharges the pure
 double-pole algebra. A follow-up substitution theorem also preserves any fixed
 regular outer unit, its inverse and its product with the pole term for
-prefix-equal zero-constant parameters. Proving that the actual elliptic
-endomorphism instantiates the monomial model, and identifying the supplied
-outer series with the regular factor in the elliptic x-coordinate, remain
-separate steps. [pcc:unverified]
+prefix-equal zero-constant parameters. The curve-specific instance identifies
+the outer unit by `q=1+A X^4q^2+B X^6q^3`, proves its cleared affine identity,
+rescales it to target coefficients `(a^4A,a^6B)`, and proves the exact double-
+substitution identity used by the constructor whenever
+`a*zNormalized=zScalar`. Proving that the actual elliptic endomorphism supplies
+that parameter identity remains separate. [pcc:unverified]
 
 A frozen 20-case boundary panel over five primes and four cutoffs measures this
 loss directly. All local-parameter pairs first differ at `m+1`, all normalized

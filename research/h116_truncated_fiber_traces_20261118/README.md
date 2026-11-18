@@ -148,8 +148,11 @@ the remaining unit-series prefix. Thus the double-pole core of the x-coordinate
 bridge is checked. A further generic theorem now shows that substitution of
 prefix-equal zero-constant parameters into any fixed regular unit series, its
 inverse, and its product with the inverse-square pole preserve the same output
-prefix. The actual formal-group identities and identification of that supplied
-regular series with the elliptic x-coordinate remain open. [pcc:unverified]
+prefix. The curve-specific instance now defines that series by
+`q=1+A X^4q^2+B X^6q^3`, proves the cleared affine identity, proves rescaling to
+`(a^4A,a^6B)`, and matches the complete source/target x-ratio used by the
+implementation. The remaining formal-group obligation is the parameter
+identity derived from `V+pi=[t]` and local Frobenius. [pcc:unverified]
 
 The frozen [prefix-transfer boundary control](PREFIX_TRANSFER_EXPERIMENT.md)
 then tests that precision loss on 20 finite-field series cases. In every case a
@@ -157,7 +160,7 @@ correction first visible at degree `m+1` in the local parameter is first visible
 at degree `m` after normalized inverse-square transfer, and the boundary
 coefficient matches `-2 c f(0)^-3`. Zero and one-degree-shifted controls pass in
 all 20 cases. This demonstrates that the proved one-degree loss is sharp; it
-does not identify the regular outer unit with an elliptic coordinate series.
+does not establish the endomorphism parameter identity.
 [pcc:unverified]
 
 The frozen [regular-unit substitution control](REGULAR_SUBSTITUTION_EXPERIMENT.md)
@@ -165,7 +168,8 @@ adds a nonconstant outer unit. Across the same 20 prime/cutoff cells,
 substitution and its inverse first differ at `m+1`, the full normalized pole
 coordinate first differs at `m`, and all three closed-form boundary deltas
 match. Zero-correction, constant-outer and nonunit-outer controls all pass.
-This tests the generic composition theorem, not its elliptic instantiation.
+This tests the generic composition theorem; the new Lean curve-coordinate
+instance supplies its elliptic algebra but not the `V-1` semantics.
 [pcc:unverified]
 
 The preregistered

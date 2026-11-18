@@ -33,7 +33,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Freeze H115 Frobenius--Kummer resolvent-moment ECDLP lead, derive its cohomological cost obligations, and preregister exact small-curve controls (Codex, started 2026-11-17, branch research/h115-frobenius-kummer-resolvent-freeze, PR #4625)
 
-- [ ] H116 formal-scalar low jet: lift the excluded-fixture constructor through the elliptic formal-group/Frobenius bridge and test an unchanged out-of-sample cohort (Codex, started 2026-11-18, branch research/h116-truncated-fiber-traces-freeze, PR #4667; continuation after merged PR #4630; five full-map matches, generic leading-X/inverse-square/regular-unit substitution transfer proved, 20/20 sharp-boundary controls; elliptic series and endomorphism instantiation remain open) [pcc:unverified]
+- [ ] H116 formal-scalar low jet: lift the excluded-fixture constructor through the elliptic formal-group/Frobenius bridge and test an unchanged out-of-sample cohort (Codex, started 2026-11-18, branch research/h116-truncated-fiber-traces-freeze, PR #4667; continuation after merged PR #4630; five full-map matches, 80-theorem curve-coordinate/leading-X/substitution bridge, two 20/20 boundary panels; local V+Frobenius parameter identity remains open) [pcc:unverified]
 
 - [ ] Audit the tensor-contraction and fixed-arity proof routes to total subexponential ECDLP, and test the other assessed leads against the same scaling criterion (Codex, started 2026-11-18, branch codex/ecdlp-subexponential-proof-20261118)
 
