@@ -962,7 +962,9 @@ impl RelationSolver for MixedPeel {
                 }
                 st.bloom_false_positive += 1;
             }
-            st.bloom.as_mut().expect("bloom").insert(h);
+            if let Some(bloom) = st.bloom.as_mut() {
+                bloom.insert(h);
+            }
             st.hashes.entry(h).or_default().push(st.rows.len());
         }
         let cols: Vec<u32> = entries.iter().map(|e| e.0).collect();
