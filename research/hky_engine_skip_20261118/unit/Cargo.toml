@@ -1,0 +1,18 @@
+# Unit tests of the hky3 engine with the skip criterion (`cargo test --release --offline`), as
+# research/hky_engine_opt_20261118/harness/unit, plus hky_closure_io (the merged engine needs it).
+[package]
+name = "hky-skip-unit"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[lib]
+name = "crypto_lib"
+path = "src/lib.rs"
+
+[dependencies]
+rayon = "1.10"
+sha2 = "0.10"
+libc = "0.2"

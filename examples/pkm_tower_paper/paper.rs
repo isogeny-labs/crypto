@@ -16,6 +16,8 @@
 //! `[--checkpoint-every MINUTES]` `[--checkpoint-every-batches N]`
 //! `[--resume DIR]` `[--max-entries N]` `[--budget SECONDS]`
 //! `[--hky3-verify-closed on]` (engine-opt: re-check closedness at the end; doubles memory)
+//! `[--hky3-skip on]` (engine-skip: skip the products PROOF.md proves to lie in the span; same space)
+//! `[--hky3-fault N]` (negative controls only)
 //! `[--override-a A]` `[--override-x X]` (negative controls: change the curve
 //! coefficient or the target abscissa; the cross-check against the file's
 //! generator is then skipped and the record says so).
@@ -105,6 +107,11 @@ struct PArgs {
     override_a: Option<u64>,
     override_x: Option<u64>,
     verify_closed: bool,
+    skip: bool,
+    skip_order: u8,
+    skip_witness: u8,
+    skip_witness_max: u16,
+    fault: u8,
 }
 
 fn parse(argv: &[String]) -> PArgs {
@@ -120,6 +127,11 @@ fn parse(argv: &[String]) -> PArgs {
         override_a: None,
         override_x: None,
         verify_closed: false,
+        skip: false,
+        skip_order: 1,
+        skip_witness: 1,
+        skip_witness_max: 0,
+        fault: 0,
     };
     let mut i = 1;
     while i < argv.len() {
@@ -153,6 +165,18 @@ fn parse(argv: &[String]) -> PArgs {
             "--override-a" => a.override_a = Some(v.parse().expect("--override-a")),
             "--override-x" => a.override_x = Some(v.parse().expect("--override-x")),
             "--hky3-verify-closed" => a.verify_closed = v == "on",
+            "--hky3-skip" => a.skip = v == "on",
+            "--hky3-skip-order" => a.skip_order = v.parse().expect("--hky3-skip-order"),
+            "--hky3-skip-witness" => {
+                a.skip_witness = match v.as_str() {
+                    "off" => 0,
+                    "leads" => 1,
+                    "span" | "on" => 2,
+                    o => o.parse().expect("--hky3-skip-witness off|leads|span"),
+                }
+            }
+            "--hky3-skip-witness-max" => a.skip_witness_max = v.parse().expect("--hky3-skip-witness-max"),
+            "--hky3-fault" => a.fault = v.parse().expect("--hky3-fault"),
             o => panic!("--instance mode: unknown flag `{o}`"),
         }
         i += 2;
@@ -280,6 +304,11 @@ pub fn run(argv: &[String]) {
                 symmetry: perm,
                 io: pa.io.clone(),
                 verify_closed: pa.verify_closed,
+                skip: pa.skip,
+                skip_order: pa.skip_order,
+                skip_witness: pa.skip_witness,
+                skip_witness_max: pa.skip_witness_max,
+                fault: pa.fault,
                 ..Fast2Options::default()
             };
             let (cl, st) = hky_fp_tower_fast2::closure_fast2(&ring, &gens, pa.d, &limits, &opts);
@@ -301,6 +330,9 @@ pub fn run(argv: &[String]) {
                 "core_muladds": st.core_muladds, "zero_muladds": st.zero_muladds, "swept_batches": st.swept_batches,
                 "verify_products": st.verify_products, "verify_nonzero": st.verify_nonzero, "verify_s": st.verify_s,
                 "final_row_bytes": st.final_row_bytes, "sweep_bytes": st.sweep_bytes,
+                "skip": st.skip_on, "queued_items": st.queued_items, "skipped_items": st.skipped_items,
+                "covered_cols": st.covered_cols, "witness_muladds": st.witness_muladds, "witness_s": st.witness_s, "cover_hist": st.cover_hist, "rank_by_deg": st.rank_by_deg, "witness_seq_s": st.witness_seq_s, "witness_survivors": st.witness_survivors, "witness_rows": st.witness_rows, "coverable_items": st.coverable_items, "coverable_ops": st.coverable_ops,
+                "ops_by_src": st.ops_by_src, "prods_by_src": st.prods_by_src, "muladds": st.muladds,
                 "peak_words": st.peak_words, "stored_words": st.stored_words,
                 "parallel_s": st.parallel_s, "second_s": st.second_s, "interreduce_s": st.interreduce_s,
                 "options": {"batch_min": o.batch_min, "batch_max": o.batch_max, "target_pivots": o.target_pivots,
@@ -309,7 +341,7 @@ pub fn run(argv: &[String]) {
                   "bitmap": o.bitmap, "deg_weight": o.deg_weight, "dense": [o.dense_num, o.dense_den],
                   "np_epochs": o.np_epochs, "sweep": o.sweep, "sweep_ratio": o.sweep_ratio,
                   "sweep_tile_bytes": o.sweep_tile_bytes, "sweep_max_words": o.sweep_max_words,
-                  "verify_closed": o.verify_closed}});
+                  "verify_closed": o.verify_closed, "skip": o.skip, "skip_order": o.skip_order, "skip_witness": o.skip_witness, "skip_witness_max": o.skip_witness_max, "fault": o.fault}});
             (cl, ej, io)
         }
         _ => {

@@ -2,16 +2,17 @@
 # Checkpoint/resume test: an uninterrupted closure against one killed with SIGKILL midway and resumed
 # (and one stopped with SIGTERM, which checkpoints and exits cleanly, then resumed). Compares dims,
 # profile, muladds, rows_reduced and the exported basis SHA-256.
+# EXTRA_FLAGS: extra engine flags for every run (engine-skip round: "--hky3-skip on").
 # Usage: ckpt_test.sh <pilot> <instance.json> <D> <out dir> <kill after N checkpoints>
 set -u
 BIN=$1; INST=$2; D=$3; OUT=$4; NK=${5:-3}
 rm -rf "$OUT"; mkdir -p "$OUT"
 summ() { jq -c '{columns, profile, contains_one, closed, muladds, rows_reduced, sha: .io.export.content_sha256, file_sha: .io.export.file_sha256, ckpts: .io.checkpoints, resumes: .io.resumes, resumed_at_batch: .io.resumed_at_batch}' "$1"; }
-"$BIN" --instance "$INST" --D "$D" --export-basis "$OUT/ref.basis" --out "$OUT/ref.json" > /dev/null 2> "$OUT/ref.err"
+"$BIN" --instance "$INST" --D "$D" ${EXTRA_FLAGS:-} --export-basis "$OUT/ref.basis" --out "$OUT/ref.json" > /dev/null 2> "$OUT/ref.err"
 echo "reference:  $(summ "$OUT/ref.json")"
 for sig in KILL TERM; do
   dir="$OUT/ckpt-$sig"
-  "$BIN" --instance "$INST" --D "$D" --checkpoint-dir "$dir" --checkpoint-every-batches 25 \
+  "$BIN" --instance "$INST" --D "$D" ${EXTRA_FLAGS:-} --checkpoint-dir "$dir" --checkpoint-every-batches 25 \
       --export-basis "$OUT/$sig.basis" --out "$OUT/$sig-first.json" > /dev/null 2> "$OUT/$sig-first.err" &
   pid=$!
   if [ "${NK#t}" != "$NK" ]; then
@@ -22,7 +23,7 @@ for sig in KILL TERM; do
   fi
   kill -$sig $pid; wait $pid; rc=$?
   echo "$sig: first process rc=$rc after $(grep -c 'hky3 checkpoint' "$OUT/$sig-first.err") checkpoints; state: $(cat "$dir/state.json")"
-  "$BIN" --instance "$INST" --D "$D" --resume "$dir" --checkpoint-every-batches 25 \
+  "$BIN" --instance "$INST" --D "$D" ${EXTRA_FLAGS:-} --resume "$dir" --checkpoint-every-batches 25 \
       --export-basis "$OUT/$sig.basis" --out "$OUT/$sig.json" > /dev/null 2> "$OUT/$sig.err"
   echo "$sig resumed: $(summ "$OUT/$sig.json")"
   same=$(jq -n --slurpfile a "$OUT/ref.json" --slurpfile b "$OUT/$sig.json" \

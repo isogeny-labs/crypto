@@ -194,6 +194,13 @@ pub fn fingerprint(
     h.update(o.sweep_ratio.to_le_bytes());
     h.update((o.sweep_tile_bytes as u64).to_le_bytes());
     h.update((o.sweep_max_words as u64).to_le_bytes());
+    // engine-skip: another schedule (nothing added when off, so earlier
+    // checkpoints keep their fingerprint)
+    if o.skip {
+        h.update(b"skip/v1");
+        h.update([o.skip_order, o.skip_witness as u8]);
+        h.update(o.skip_witness_max.to_le_bytes());
+    }
     match &o.symmetry {
         None => h.update([0u8]),
         Some(p) => {
@@ -374,21 +381,55 @@ fn stats_fields(s: &Fast2Stats) -> ([f64; 4], [u64; 14]) {
     )
 }
 
+/// Bytes needed for `x` (1..=4).
+fn width(x: u32) -> usize {
+    (((32 - x.leading_zeros()) as usize).div_ceil(8)).max(1)
+}
+
+fn pack(buf: &mut Vec<u8>, x: u32, w: usize) {
+    buf.extend_from_slice(&x.to_le_bytes()[..w]);
+}
+
+/// A row in the checkpoint. engine-skip round: rows are written packed
+/// (tags 2 and 3: each column and coefficient in the fewest bytes its row
+/// needs; 3 + 3 bytes per sparse term and 3 per dense word for p < 2^24 and
+/// fewer than 2^24 columns, against 8 and 4); tags 0 and 1 (unpacked, the
+/// earlier format) are still read.
 fn write_row<W: Write>(w: &mut HW<W>, r: &RowS) {
     match r {
         RowS::Sparse(r) => {
-            w.u8(0);
+            let cw = width(r.iter().map(|t| t.0).max().unwrap_or(0));
+            let vw = width(r.iter().map(|t| t.1).max().unwrap_or(0));
+            w.u8(2);
             w.u32(r.len() as u32);
-            w.pairs(r);
+            w.u8((cw | vw << 4) as u8);
+            let mut buf = Vec::with_capacity(r.len() * (cw + vw));
+            for &(c, x) in r {
+                pack(&mut buf, c, cw);
+                pack(&mut buf, x, vw);
+            }
+            w.put(&buf);
         }
         RowS::Dense { lead, v, nnz } => {
-            w.u8(1);
+            let vw = width(v.iter().copied().max().unwrap_or(0));
+            w.u8(3);
             w.u32(*lead);
             w.u32(v.len() as u32);
             w.u32(*nnz);
-            w.u32s(v);
+            w.u8(vw as u8);
+            let mut buf = Vec::with_capacity(v.len() * vw);
+            for &x in v {
+                pack(&mut buf, x, vw);
+            }
+            w.put(&buf);
         }
     }
+}
+
+fn unpack(b: &[u8]) -> u32 {
+    let mut x = [0u8; 4];
+    x[..b.len()].copy_from_slice(b);
+    u32::from_le_bytes(x)
 }
 
 fn read_row<R: Read>(r: &mut HR<R>) -> RowS {
@@ -402,6 +443,23 @@ fn read_row<R: Read>(r: &mut HR<R>) -> RowS {
             let n = r.u32() as usize;
             let nnz = r.u32();
             RowS::Dense { lead, v: r.u32s(n), nnz }
+        }
+        2 => {
+            let n = r.u32() as usize;
+            let wd = r.u8() as usize;
+            let (cw, vw) = (wd & 15, wd >> 4);
+            assert!((1..=4).contains(&cw) && (1..=4).contains(&vw), "hky_closure_io: bad widths");
+            let b = r.get(n * (cw + vw));
+            RowS::Sparse(b.chunks_exact(cw + vw).map(|c| (unpack(&c[..cw]), unpack(&c[cw..]))).collect())
+        }
+        3 => {
+            let lead = r.u32();
+            let n = r.u32() as usize;
+            let nnz = r.u32();
+            let vw = r.u8() as usize;
+            assert!((1..=4).contains(&vw), "hky_closure_io: bad width");
+            let b = r.get(n * vw);
+            RowS::Dense { lead, v: b.chunks_exact(vw).map(unpack).collect(), nnz }
         }
         t => panic!("hky_closure_io: bad row tag {t}"),
     }
@@ -451,6 +509,18 @@ pub(super) fn checkpoint_now(io: &IoOptions, fp: &[u8; 32], st: &ClosureState, r
         w.u64(if i == 13 { x + 1 } else { x });
     }
     w.u64(st.stats.io.resumes);
+    if st.stats.skip_on {
+        // engine-skip: counters and the cover table (only in checkpoints of
+        // skip runs; the fingerprint tells a reader whether they are here)
+        w.u64(st.stats.queued_items);
+        w.u64(st.stats.skipped_items);
+        w.u32(st.cover.len() as u32);
+        for cv in &st.cover {
+            w.u64(cv.len() as u64);
+            let wide: Vec<u32> = cv.iter().map(|&x| u32::from(x)).collect();
+            w.u32s(&wide);
+        }
+    }
     w.u32(st.ech.len() as u32);
     for e in &st.ech {
         w.u64(e.pivot.len() as u64);
@@ -524,7 +594,7 @@ pub(super) fn checkpoint_now(io: &IoOptions, fp: &[u8; 32], st: &ClosureState, r
 
 /// The checkpoint of `io`, if resuming is asked for and one exists.
 /// Panics on a corrupt checkpoint or one of another closure (fingerprint).
-pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space) -> Option<ClosureState> {
+pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space, skip: bool) -> Option<ClosureState> {
     if !io.resume {
         return None;
     }
@@ -581,6 +651,23 @@ pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space) -> Option
     stats.io.checkpoints = us[13];
     stats.io.resumes = resumes;
     stats.io.resumed_at_batch = us[0];
+    let mut cover: Vec<Vec<u16>> = Vec::new();
+    if skip {
+        stats.skip_on = true;
+        stats.queued_items = r.u64();
+        stats.skipped_items = r.u64();
+        let nc = r.u32() as usize;
+        for q in 0..nc {
+            let n = r.u64() as usize;
+            assert_eq!(n, space.parts[q].keys.len(), "hky_closure_io: cover of part {q}");
+            cover.push(
+                r.u32s(n)
+                    .into_iter()
+                    .map(|x| u16::try_from(x).expect("hky_closure_io: cover entry"))
+                    .collect(),
+            );
+        }
+    }
     let np = r.u32() as usize;
     assert_eq!(np, space.parts.len(), "hky_closure_io: part count");
     let mut ech = Vec::with_capacity(np);
@@ -658,6 +745,7 @@ pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space) -> Option
         rank_at_ir,
         stats,
         elapsed_before_s,
+        cover,
     })
 }
 

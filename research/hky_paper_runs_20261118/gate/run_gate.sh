@@ -34,7 +34,9 @@ for cell in "${CELLS[@]}"; do
   t0=$(date +%s.%N)
   # CKPT_ROOT set: checkpoint every CKPT_MIN minutes and resume after a restart (re-run the same command)
   ck=(); [ -n "${CKPT_ROOT:-}" ] && ck=(--resume "$CKPT_ROOT/$name" --checkpoint-every "${CKPT_MIN:-10}")
-  "$BIN" --instance "$inst" --D "$D" "${ck[@]}" --out "$OUT/$name.json" 2>> "$OUT/$name.err" > /dev/null
+  # EXTRA_FLAGS (engine-skip round): extra engine flags, e.g. "--hky3-skip on --hky3-verify-closed on"
+  # shellcheck disable=SC2086
+  "$BIN" --instance "$inst" --D "$D" "${ck[@]}" ${EXTRA_FLAGS:-} --out "$OUT/$name.json" 2>> "$OUT/$name.err" > /dev/null
   rc=$?
   t1=$(date +%s.%N)
   exp=$(jq -c '{columns, profile, contains_one}' "$rec")
@@ -44,7 +46,9 @@ for cell in "${CELLS[@]}"; do
      --arg sha "$SHA" --argjson rc $rc --arg wall "$(echo "$t1 - $t0" | bc)" \
      --slurpfile r "$OUT/$name.json" --arg load "$(cut -d' ' -f1-3 /proc/loadavg)" \
      '{cell:$cell, expected:$exp, got:$got, match:$match, rc:$rc, wall_s:($wall|tonumber),
-       muladds:$r[0].muladds, maxrss_mb:$r[0].maxrss_mb, threads:$r[0].rayon_threads,
+       muladds:$r[0].muladds, maxrss_mb:$r[0].maxrss_mb, skipped_items:$r[0].engine.skipped_items,
+       queued_items:$r[0].engine.queued_items, verify_products:$r[0].engine.verify_products,
+       verify_nonzero:$r[0].engine.verify_nonzero, extra_flags:"'"${EXTRA_FLAGS:-}"'", threads:$r[0].rayon_threads,
        engine:$r[0].engine.name, instance_sha256:$r[0].instance.sha256,
        generator_matches_file:$r[0].system.generator_matches_file, binary_sha256:$sha, load:$load}' \
      | tee -a "$OUT/rows.jsonl"

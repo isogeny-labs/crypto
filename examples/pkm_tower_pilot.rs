@@ -2167,7 +2167,7 @@ fn measure_hky(
                     "interreductions": st.interreductions,
                     "interreduce_muladds": st.interreduce_muladds,
                     "second_muladds": st.second_muladds, "products": st.products,
-                    "zero": st.zero, "reducers": st.reducers, "core_muladds": st.core_muladds, "zero_muladds": st.zero_muladds, "swept_batches": st.swept_batches, "verify_products": st.verify_products, "verify_nonzero": st.verify_nonzero, "verify_s": st.verify_s, "final_row_bytes": st.final_row_bytes, "sweep_bytes": st.sweep_bytes,
+                    "zero": st.zero, "reducers": st.reducers, "core_muladds": st.core_muladds, "zero_muladds": st.zero_muladds, "swept_batches": st.swept_batches, "verify_products": st.verify_products, "verify_nonzero": st.verify_nonzero, "verify_s": st.verify_s, "final_row_bytes": st.final_row_bytes, "sweep_bytes": st.sweep_bytes, "skip": st.skip_on, "queued_items": st.queued_items, "skipped_items": st.skipped_items, "covered_cols": st.covered_cols, "witness_muladds": st.witness_muladds, "witness_s": st.witness_s, "cover_hist": st.cover_hist, "rank_by_deg": st.rank_by_deg, "witness_seq_s": st.witness_seq_s, "witness_survivors": st.witness_survivors, "witness_rows": st.witness_rows, "coverable_items": st.coverable_items, "coverable_ops": st.coverable_ops, "ops_by_src": st.ops_by_src, "prods_by_src": st.prods_by_src,
                     "dense_rows": st.dense_rows, "sparse_rows": st.sparse_rows,
                     "stored_words": st.stored_words, "peak_words": st.peak_words,
                     "threads": st.threads, "simd": st.simd,
@@ -3078,6 +3078,17 @@ fn parse_args() -> Args {
             "--hky3-np" => a.hky3.np_epochs = v == "on",
             "--hky3-sweep" => a.hky3.sweep = v == "on",
             "--hky3-verify-closed" => a.hky3.verify_closed = v == "on",
+            "--hky3-skip" => a.hky3.skip = v == "on",
+            "--hky3-skip-order" => a.hky3.skip_order = v.parse().expect("--hky3-skip-order"),
+            "--hky3-skip-witness" => {
+                a.hky3.skip_witness = match v.as_str() {
+                    "off" => 0,
+                    "leads" => 1,
+                    "span" | "on" => 2,
+                    o => o.parse().expect("--hky3-skip-witness off|leads|span"),
+                }
+            }
+            "--hky3-skip-witness-max" => a.hky3.skip_witness_max = v.parse().expect("--hky3-skip-witness-max"),
             "--hky3-sweep-ratio" => a.hky3.sweep_ratio = v.parse().expect("--hky3-sweep-ratio"),
             "--hky3-sweep-tile-bytes" => {
                 a.hky3.sweep_tile_bytes = v.parse().expect("--hky3-sweep-tile-bytes")

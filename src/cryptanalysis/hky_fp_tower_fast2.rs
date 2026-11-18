@@ -98,7 +98,10 @@ pub struct Fast2Options {
     /// 2: the delayed reduction subtracts `p² − 1`. 3: the interreduction
     /// drops the last term of every row it rewrites. 4: a new epoch drops
     /// the last term of every row with two or more tail terms. 5: the sweep
-    /// skips its first tile of every part.
+    /// skips its first tile of every part. 6, 7, 8 (with
+    /// [`Fast2Options::skip`]; skips PROOF.md does not cover): 6 also skips
+    /// a variable whose order equals the cover's, 7 takes covers from leads
+    /// of any degree, 8 skips whenever the leading column is covered at all.
     pub fault: u8,
     /// After a closure without 1, check that it is closed
     /// ([`verify_closed`]): every generator and every variable times every
@@ -123,6 +126,29 @@ pub struct Fast2Options {
     pub sweep_ratio: u64,
     pub sweep_tile_bytes: usize,
     pub sweep_max_words: usize,
+    /// Skip products proved in advance to lie in the final span
+    /// (`research/hky_engine_skip_20261118/PROOF.md`, "lead cover"). Fix an
+    /// order κ on the variables whose products are formed. When a product
+    /// `x_a · s` (a projection of it, with the symmetry) of a row `s` of
+    /// degree `d − 1 ≤ c − 2` is formed and its leading column `ℓ` has
+    /// degree `d`, the column `ℓ` is *covered* with `κ(a)`; a queued
+    /// product `x_b · r` of a row `r` whose leading column is covered with
+    /// some `κ(a) < κ(b)` is not formed. The space is the same; counters
+    /// differ. Faults 6 and 7 are negative controls that skip products the
+    /// proof does not cover.
+    pub skip: bool,
+    /// The order κ: 0 ascending variable index, 1 descending.
+    pub skip_order: u8,
+    /// Witnesses at insertion (PROOF.md §2.1–2.3): when a row of degree
+    /// at most `c − 2` is inserted, the top-degree parts of its products by
+    /// every variable cover (1) their own leading columns, or (2) the
+    /// leading columns of the labelled spans they generate (`Witness`;
+    /// more covers, more work). 0: only the covers of formed products.
+    pub skip_witness: u8,
+    /// Witness vectors are inserted only for variables with κ below this
+    /// (a cover κ₀ only lets the variables above κ₀ skip, so large labels
+    /// buy little); 0 means no limit. Fewer inserts only cover less.
+    pub skip_witness_max: u16,
     /// Append one JSON line per batch and per interreduction to this file.
     pub trace: Option<String>,
     /// Checkpoint/resume and basis export (`hky_closure_io`); off by
@@ -153,6 +179,10 @@ impl Default for Fast2Options {
             sweep_ratio: 4,
             sweep_tile_bytes: 1 << 20,
             sweep_max_words: 1 << 28,
+            skip: false,
+            skip_order: 1,
+            skip_witness: 1,
+            skip_witness_max: 0,
             trace: None,
             io: Default::default(),
         }
@@ -200,6 +230,32 @@ pub struct Fast2Stats {
     /// word), and of the sweep's accumulators.
     pub final_row_bytes: u64,
     pub sweep_bytes: u64,
+    /// [`Fast2Options::skip`]: product items (row × variable) queued, and
+    /// of those, served without being formed; columns covered at the end.
+    pub skip_on: bool,
+    pub queued_items: u64,
+    pub skipped_items: u64,
+    pub covered_cols: u64,
+    /// Analysis (not checkpointed): items served that the criterion covers
+    /// (formed only when the skip is off), and their multiply-adds; and
+    /// multiply-adds and products by source class `2 · degree + covered`
+    /// (31: generator rows).
+    pub coverable_items: u64,
+    /// Witness spaces: multiply-adds, seconds, rows at the end.
+    pub witness_muladds: u64,
+    pub witness_s: f64,
+    /// Unused (0); and the rounds of `Witness::insert_batch`.
+    pub witness_seq_s: f64,
+    /// Covered columns by degree and κ: entry `d · (m + 1) + κ` (m the
+    /// number of κ values; entry `d · (m + 1) + m` unused), at the end (or
+    /// at a budget stop). And the rank (pivots) by degree.
+    pub cover_hist: Vec<u64>,
+    pub rank_by_deg: Vec<u64>,
+    pub witness_survivors: u64,
+    pub witness_rows: u64,
+    pub coverable_ops: u64,
+    pub ops_by_src: Vec<u64>,
+    pub prods_by_src: Vec<u64>,
     pub dense_rows: u64,
     pub sparse_rows: u64,
     pub stored_words: u64,
@@ -262,6 +318,312 @@ pub(super) struct ClosureState {
     pub(super) stats: Fast2Stats,
     /// Wall seconds of the closure before this process (restarts).
     pub(super) elapsed_before_s: f64,
+    /// [`Fast2Options::skip`]: per part and column, the smallest κ that
+    /// covers it ([`NO_COVER`]: none). Empty when the skip is off.
+    pub(super) cover: Vec<Vec<u16>>,
+}
+
+/// A column no formed product covers ([`Fast2Options::skip`]).
+pub(super) const NO_COVER: u16 = u16::MAX;
+
+/// PROOF.md, the witness spaces of one part: a semi-echelon basis (distinct
+/// leading columns, monic) of homogeneous vectors, each with a label κ,
+/// such that for every κ the rows with label ≤ κ are a basis of `E_κ`, the
+/// span of the vectors inserted with label ≤ κ. The leading columns of
+/// `E_κ` are then exactly those of its rows, so the label of the row at a
+/// column is the least κ whose space has that leading column.
+pub(super) struct Witness {
+    pub(super) pivot: Vec<u32>,
+    pub(super) rows: Vec<Row>,
+    pub(super) label: Vec<u16>,
+    /// Scratch: a dense accumulator over the part's columns (zero between calls).
+    acc: Vec<u64>,
+}
+
+impl Witness {
+    pub(super) fn new(n: usize) -> Self {
+        Witness { pivot: vec![NONE; n], rows: Vec::new(), label: Vec::new(), acc: vec![0; n] }
+    }
+
+    /// Takes the accumulator's entries in `from..=hi` as a monic row (and
+    /// zeroes them).
+    fn gather(&mut self, from: usize, hi: usize, p: u64) -> Row {
+        let mut r: Row = Vec::new();
+        for j in from..=hi {
+            let x = std::mem::take(&mut self.acc[j]) % p;
+            if x != 0 {
+                r.push((j as u32, x as u32));
+            }
+        }
+        normalise(&mut r, p);
+        r
+    }
+
+    /// `v` minus rows of label ≤ `k`, reduced at its lead while the row
+    /// there has label ≤ `k` (read-only: many in parallel before
+    /// [`Witness::insert`], which does the rest). The result stays in E_k.
+    /// `acc` is a zeroed scratch of at least the part's columns (left zeroed).
+    pub(super) fn prereduce(&self, v: &Row, k: u16, p: u64, acc: &mut [u64]) -> (Row, u64) {
+        let mut ops = 0u64;
+        let Some(&(first, _)) = v.first() else { return (Vec::new(), 0) };
+        let p2 = p * p;
+        let mut hi = 0usize;
+        for &(j, x) in v {
+            acc[j as usize] = u64::from(x);
+            hi = hi.max(j as usize);
+        }
+        let mut j = first as usize;
+        loop {
+            while j <= hi && acc[j] % p == 0 {
+                acc[j] = 0;
+                j += 1;
+            }
+            if j > hi {
+                return (Vec::new(), ops);
+            }
+            let x = acc[j] % p;
+            let ri = self.pivot[j];
+            if ri == NONE || self.label[ri as usize] > k {
+                let mut r: Row = Vec::new();
+                for (jj, a) in acc.iter_mut().enumerate().take(hi + 1).skip(j) {
+                    let y = std::mem::take(a) % p;
+                    if y != 0 {
+                        r.push((jj as u32, y as u32));
+                    }
+                }
+                return (r, ops);
+            }
+            let nf = p - x;
+            let row = &self.rows[ri as usize];
+            for &(c, y) in row {
+                let a = &mut acc[c as usize];
+                *a += nf * u64::from(y);
+                if *a >= p2 {
+                    *a -= p2;
+                }
+                hi = hi.max(c as usize);
+            }
+            ops += row.len() as u64;
+            acc[j] = 0;
+        }
+    }
+
+    /// Inserts a batch of `(label, vector)` by parallel rounds (as the
+    /// engine's second pass): every candidate is reduced in parallel against
+    /// the rows of label ≤ its own; for each leading column the survivor
+    /// of smallest label (first among equals) is placed — at a free column,
+    /// or in place of a row of larger label, which then goes on, minus the
+    /// new row, with its own label; the others go to the next round.
+    /// Every placement keeps the invariant of [`Witness::insert`].
+    fn insert_batch(
+        &mut self,
+        mut cands: Vec<(u16, Row)>,
+        p: u64,
+        pool: &Pool,
+        set: &mut impl FnMut(u32, u16),
+    ) -> (u64, u64) {
+        let (mut ops, mut rounds) = (0u64, 0u64);
+        while !cands.is_empty() {
+            rounds += 1;
+            let me = &*self;
+            let pre: Vec<(u16, Row, u64)> = cands
+                .par_iter()
+                .with_max_len(4)
+                .map(|(k, v)| {
+                    let (r, o) = pool.with(|sc| me.prereduce(v, *k, p, &mut sc.acc));
+                    (*k, r, o)
+                })
+                .collect();
+            cands = Vec::new();
+            // winner per leading column: smallest label, first among equals
+            let mut best: std::collections::HashMap<u32, usize> = std::collections::HashMap::new();
+            let mut surv: Vec<(u16, Row)> = Vec::new();
+            for (k, r, o) in pre {
+                ops += o;
+                if r.is_empty() {
+                    continue;
+                }
+                let i = surv.len();
+                let lead = r[0].0;
+                surv.push((k, r));
+                match best.get(&lead) {
+                    Some(&b) if surv[b].0 <= k => {}
+                    _ => {
+                        best.insert(lead, i);
+                    }
+                }
+            }
+            let winners: std::collections::HashSet<usize> = best.values().copied().collect();
+            for (i, (k, mut r)) in surv.into_iter().enumerate() {
+                if !winners.contains(&i) {
+                    cands.push((k, r));
+                    continue;
+                }
+                let lead = r[0].0 as usize;
+                normalise(&mut r, p);
+                let ri = self.pivot[lead];
+                if ri == NONE {
+                    self.pivot[lead] = self.rows.len() as u32;
+                    self.rows.push(r);
+                    self.label.push(k);
+                    set(lead as u32, k);
+                } else {
+                    // held by a larger label (prereduce stopped there)
+                    let ri = ri as usize;
+                    debug_assert!(self.label[ri] > k);
+                    let old = std::mem::replace(&mut self.rows[ri], r);
+                    let ol = std::mem::replace(&mut self.label[ri], k);
+                    set(lead as u32, k);
+                    let mut rest: Row = Vec::new();
+                    ops += sub_monic(&old, &self.rows[ri], p, &mut rest);
+                    if !rest.is_empty() {
+                        cands.push((ol, rest));
+                    }
+                }
+            }
+        }
+        (ops, rounds)
+    }
+
+    /// Inserts `v` (ascending columns, non-zero coefficients) with label
+    /// `k`; calls `set(column, label)` for every row placed. Every row placed
+    /// with label `k` is a combination of inserted vectors of label at most
+    /// `k` and has the column it is placed at as its leading column
+    /// (PROOF.md). Returns the multiply-adds.
+    pub(super) fn insert(&mut self, v: Row, mut k: u16, p: u64, set: &mut impl FnMut(u32, u16)) -> u64 {
+        let mut ops = 0u64;
+        let Some(&(first, _)) = v.first() else { return 0 };
+        let mut hi = 0usize;
+        for &(j, x) in &v {
+            self.acc[j as usize] = u64::from(x);
+            hi = hi.max(j as usize);
+        }
+        // entries are kept below p² (lazy reduction); zero means 0 mod p
+        let p2 = p * p;
+        let mut j = first as usize;
+        loop {
+            while j <= hi && self.acc[j] % p == 0 {
+                self.acc[j] = 0;
+                j += 1;
+            }
+            if j > hi {
+                return ops;
+            }
+            let x = self.acc[j] % p;
+            self.acc[j] = x;
+            let ri = self.pivot[j];
+            if ri == NONE {
+                let r = self.gather(j, hi, p);
+                self.pivot[j] = self.rows.len() as u32;
+                self.rows.push(r);
+                self.label.push(k);
+                set(j as u32, k);
+                return ops;
+            }
+            let ri = ri as usize;
+            if self.label[ri] > k {
+                // the accumulator takes the column with the smaller label;
+                // the old row minus it goes on with the old label
+                let r = self.gather(j, hi, p);
+                let old = std::mem::replace(&mut self.rows[ri], r);
+                let ol = std::mem::replace(&mut self.label[ri], k);
+                set(j as u32, k);
+                k = ol;
+                for &(c, y) in &old {
+                    self.acc[c as usize] = u64::from(y);
+                    hi = hi.max(c as usize);
+                }
+                // subtract the new row (both monic at j)
+                let nf = p - 1;
+                let new = &self.rows[ri];
+                for &(c, y) in new {
+                    let a = &mut self.acc[c as usize];
+                    *a += nf * u64::from(y);
+                    if *a >= p2 {
+                        *a -= p2;
+                    }
+                    hi = hi.max(c as usize);
+                }
+                ops += new.len() as u64;
+            } else {
+                let nf = p - x;
+                let row = &self.rows[ri];
+                for &(c, y) in row {
+                    let a = &mut self.acc[c as usize];
+                    *a += nf * u64::from(y);
+                    if *a >= p2 {
+                        *a -= p2;
+                    }
+                    hi = hi.max(c as usize);
+                }
+                ops += row.len() as u64;
+            }
+            debug_assert_eq!(self.acc[j] % p, 0);
+            self.acc[j] = 0;
+        }
+    }
+}
+
+fn cover_hist(cover: &[Vec<u16>], space: &Space, c: u32, kappa: &[u16]) -> Vec<u64> {
+    let m = kappa.iter().filter(|&&k| k != NO_COVER).count();
+    let mut h = vec![0u64; (c as usize + 1) * (m + 1)];
+    for (cv, part) in cover.iter().zip(&space.parts) {
+        for (col, &k) in cv.iter().enumerate() {
+            if k != NO_COVER {
+                h[part.deg[col] as usize * (m + 1) + (k as usize).min(m)] += 1;
+            }
+        }
+    }
+    h
+}
+
+fn rank_by_deg(ech: &[Echelon], space: &Space, c: u32) -> Vec<u64> {
+    let mut r = vec![0u64; c as usize + 1];
+    for (e, part) in ech.iter().zip(&space.parts) {
+        for (col, &pv) in e.pivot.iter().enumerate() {
+            if pv != NONE {
+                r[part.deg[col] as usize] += 1;
+            }
+        }
+    }
+    r
+}
+
+/// `out = a − b` for two rows monic at the same leading column (sparse,
+/// ascending, zeros dropped).
+fn sub_monic(a: &Row, b: &Row, p: u64, out: &mut Row) -> u64 {
+    out.clear();
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() || j < b.len() {
+        let ca = a.get(i).map_or(u32::MAX, |t| t.0);
+        let cb = b.get(j).map_or(u32::MAX, |t| t.0);
+        if ca < cb {
+            out.push(a[i]);
+            i += 1;
+        } else if cb < ca {
+            out.push((cb, (p - u64::from(b[j].1)) as u32));
+            j += 1;
+        } else {
+            let z = (u64::from(a[i].1) + p - u64::from(b[j].1)) % p;
+            if z != 0 {
+                out.push((ca, z as u32));
+            }
+            i += 1;
+            j += 1;
+        }
+    }
+    b.len() as u64
+}
+
+/// PROOF.md: the product by a variable of order `kb` of a row with leading
+/// column `lead` (of `part`) lies in the final span, because `lead` is
+/// covered with a smaller order. Fault 6 (negative control) also accepts
+/// an equal order, fault 8 any order; the proof covers neither.
+fn covered(cover: &[Vec<u16>], part: u8, lead: u32, kb: u16, fault: u8) -> bool {
+    let Some(x) = cover.get(part as usize).and_then(|v| v.get(lead as usize)) else {
+        return false;
+    };
+    *x != NO_COVER && (*x < kb || (fault == 6 && *x == kb) || fault == 8)
 }
 
 struct Scratch {
@@ -756,6 +1118,11 @@ struct ItemOut {
     zero_ops: u64,
     /// Tracing only: the epoch pivot rows the products need (part << 32 | row).
     core: Vec<u64>,
+    /// Source class (`2 · degree + covered`, 31 for a generator row), and
+    /// the covers this item's products give (part, column, κ).
+    cls: u8,
+    coverable: bool,
+    covers: Vec<(u8, u32, u16)>,
 }
 
 struct Pool(Vec<Mutex<Scratch>>);
@@ -1139,6 +1506,7 @@ pub fn closure_fast2(
     let mut stats = Fast2Stats {
         symmetry: "off".into(),
         threads: rayon::current_num_threads(),
+        skip_on: opts.skip,
         ..Fast2Stats::default()
     };
     let censored = |why: &str, rows: u64, entries: u64, stats: Fast2Stats| {
@@ -1216,6 +1584,25 @@ pub fn closure_fast2(
         }
     }
     let pool = Pool::new(max_n);
+    // PROOF.md: the order κ of the variables whose products are formed
+    let kappa: Vec<u16> = {
+        let reps: Vec<usize> = (0..nv).filter(|&v| applies(v)).collect();
+        let mut k = vec![NO_COVER; nv];
+        for (i, &v) in reps.iter().enumerate() {
+            k[v] = if opts.skip_order == 0 { i } else { reps.len() - 1 - i } as u16;
+        }
+        k
+    };
+    let mut cover: Vec<Vec<u16>> = space.parts.iter().map(|q| vec![NO_COVER; q.keys.len()]).collect();
+    // one witness space per part and degree (the vectors are homogeneous;
+    // spaces of different degrees are independent), filled on demand
+    let mut witness: Vec<Vec<Witness>> = space
+        .parts
+        .iter()
+        .map(|_| (0..=c).map(|_| Witness::new(0)).collect())
+        .collect();
+    stats.ops_by_src = vec![0; 32];
+    stats.prods_by_src = vec![0; 32];
     let mut sweep_buf: Vec<u64> = Vec::new();
     let mut trace = opts.trace.as_ref().map(|path| {
         std::io::BufWriter::new(
@@ -1240,8 +1627,11 @@ pub fn closure_fast2(
     let mut io_clock = crate::cryptanalysis::hky_closure_io::Clock::new(&opts.io);
     let mut elapsed_before_s = 0.0f64;
     let mut io_report = crate::cryptanalysis::hky_closure_io::IoReport::default();
-    if let Some(st) = crate::cryptanalysis::hky_closure_io::try_resume(&opts.io, &io_fp, &space) {
+    if let Some(st) = crate::cryptanalysis::hky_closure_io::try_resume(&opts.io, &io_fp, &space, opts.skip) {
         (ech, queue, rows_reduced, contains_one) = (st.ech, st.queue, st.rows_reduced, st.contains_one);
+        if opts.skip {
+            cover = st.cover;
+        }
         (yield_q16, fresh_since_ir, rank_at_ir) = (st.yield_q16, st.fresh_since_ir, st.rank_at_ir);
         // counters from the checkpoint; this host's facts from this process
         let here = std::mem::take(&mut stats);
@@ -1251,6 +1641,9 @@ pub fn closure_fast2(
             part_cols: here.part_cols,
             threads: here.threads,
             simd: here.simd,
+            skip_on: here.skip_on,
+            ops_by_src: here.ops_by_src,
+            prods_by_src: here.prods_by_src,
             ..st.stats
         };
         elapsed_before_s = st.elapsed_before_s;
@@ -1264,7 +1657,8 @@ pub fn closure_fast2(
             // a checkpoint first (if configured), then a censored result
             let st = ClosureState { ech, queue, rows_reduced, contains_one, yield_q16, fresh_since_ir, rank_at_ir,
                 stats: Fast2Stats { io: io_report.clone(), ..stats.clone() },
-                elapsed_before_s: elapsed_before_s + started.elapsed().as_secs_f64() };
+                elapsed_before_s: elapsed_before_s + started.elapsed().as_secs_f64(),
+                cover: if opts.skip { cover } else { Vec::new() } };
             crate::cryptanalysis::hky_closure_io::checkpoint_now(&opts.io, &io_fp, &st, &mut io_report);
             let entries: u64 = st.ech.iter().flat_map(|e| &e.rows).map(|r| r.nnz() as u64).sum();
             stats.io = io_report;
@@ -1276,18 +1670,46 @@ pub fn closure_fast2(
                 .flat_map(|e| &e.rows)
                 .map(|r| r.nnz() as u64)
                 .sum();
+            stats.cover_hist = cover_hist(&cover, &space, c, &kappa);
+            stats.part_rank = ech.iter().map(|e| e.rows.len() as u64).collect();
+            stats.rank_by_deg = rank_by_deg(&ech, &space, c);
             return censored("budget", rows_reduced, entries, stats);
         }
         let want = ((opts.target_pivots as u64 * 65536).div_ceil(yield_q16.max(1)) as usize).clamp(
             opts.batch_min.max(1),
             opts.batch_max.max(opts.batch_min).max(1),
         );
-        let take = queue[b].len().min(want);
-        let at = queue[b].len() - take;
-        let batch: Vec<Item> = queue[b].drain(at..).collect();
+        let batch: Vec<Item> = if opts.skip {
+            // PROOF.md: a product x_b · r whose row's leading column is
+            // covered with κ(a) < κ(b) is not formed
+            let mut got: Vec<Item> = Vec::with_capacity(want);
+            while got.len() < want {
+                let Some(it) = queue[b].pop() else { break };
+                if let Item::Prod { part, row, var } = &it {
+                    let ld = lead_of(&ech[*part as usize].rows[*row as usize]);
+                    if covered(&cover, *part, ld, kappa[*var as usize], opts.fault) {
+                        stats.skipped_items += 1;
+                        continue;
+                    }
+                }
+                got.push(it);
+            }
+            got.reverse();
+            got
+        } else {
+            let take = queue[b].len().min(want);
+            let at = queue[b].len() - take;
+            queue[b].drain(at..).collect()
+        };
+        if batch.is_empty() {
+            continue 'outer;
+        }
+        let take = batch.len();
         stats.batches += 1;
         let t0 = Instant::now();
         let ech_ref = &ech;
+        let cov = &cover;
+        let kappa = &kappa;
         let formed_items: Vec<(ItemOut, Vec<(u8, Row)>)> = batch
             .par_iter()
             .with_max_len(1)
@@ -1305,6 +1727,9 @@ pub fn closure_fast2(
                     ops0: 0,
                     zero_ops: 0,
                     core: Vec::new(),
+                    cls: 31,
+                    coverable: false,
+                    covers: Vec::new(),
                 };
                 let mut formed: Vec<(u8, Row)> = Vec::new();
                 match item {
@@ -1315,6 +1740,23 @@ pub fn closure_fast2(
                         // products are formed in the part's columns
                         let full = RowS::Sparse(e.row_full(*row as usize));
                         o.ops += space.multiply(*part as usize, &full, *var as usize, &mut formed);
+                        // PROOF.md: covers given by this product, and whether
+                        // the criterion covers it (counted when formed)
+                        let ld = lead_of(src);
+                        let ds = u32::from(space.parts[*part as usize].deg[ld as usize]);
+                        let ka = kappa[*var as usize];
+                        o.coverable = covered(cov, *part, ld, ka, opts.fault);
+                        o.cls = (2 * ds.min(14) as u8 + u8::from(covered(cov, *part, ld, NO_COVER, 0))).min(30);
+                        {
+                            for (q, r) in &formed {
+                                if let Some(&(pl, _)) = r.first() {
+                                    let dp = u32::from(space.parts[*q as usize].deg[pl as usize]);
+                                    if (dp == ds + 1 && ds + 2 <= c) || opts.fault == 7 {
+                                        o.covers.push((*q, pl, ka));
+                                    }
+                                }
+                            }
+                        }
                         if tracing {
                             o.src_deg = space.parts[*part as usize].deg[lead_of(src) as usize];
                             o.src_age = (e.rows.len() - *row as usize) as u64;
@@ -1407,6 +1849,16 @@ pub fn closure_fast2(
             b_age += o.src_age;
             b_src += o.src_nnz;
             b_deg[(o.src_deg as usize).min(15)] += 1;
+            stats.ops_by_src[o.cls as usize] += o.ops;
+            stats.prods_by_src[o.cls as usize] += u64::from(o.formed);
+            if o.coverable {
+                stats.coverable_items += 1;
+                stats.coverable_ops += o.ops;
+            }
+            for &(q, col, ka) in &o.covers {
+                let x = &mut cover[q as usize][col as usize];
+                *x = (*x).min(ka);
+            }
             cands.extend(o.cands);
         }
         stats.muladds += b_ops;
@@ -1541,6 +1993,7 @@ pub fn closure_fast2(
                 let bucket = bucket_of(stored.nnz(), d);
                 for v in 0..nv {
                     if applies(v) {
+                        stats.queued_items += 1;
                         queue[bucket].push(Item::Prod {
                             part: q,
                             row: ri,
@@ -1553,6 +2006,143 @@ pub fn closure_fast2(
             if qi == 0 && lead == one_col {
                 contains_one = true;
             }
+        }
+        // PROOF.md, witnesses at insertion: for an inserted row s of degree
+        // d − 1 ≤ c − 2 and every variable a, the leading column of x_a · s
+        // (each projection) when it has degree d covers that column with
+        // κ(a). Only the degree-d part of x_a · s decides it, and that is
+        // the degree-d part of x_a · top(s).
+        if opts.skip && opts.skip_witness == 1 {
+            // (1) leading columns of the single products
+            let ech_ref = &ech;
+            let found: Vec<(u8, u32, u16)> = inserted
+                .par_iter()
+                .with_max_len(1)
+                .flat_map_iter(|&(q, ri)| {
+                    let e = &ech_ref[q as usize];
+                    let degs = &space.parts[q as usize].deg;
+                    let ds = u32::from(degs[lead_of(&e.rows[ri as usize]) as usize]);
+                    let mut out: Vec<(u8, u32, u16)> = Vec::new();
+                    if ds + 2 <= c {
+                        let top = RowS::Sparse(
+                            e.row_full(ri as usize)
+                                .into_iter()
+                                .filter(|&(col, _)| u32::from(degs[col as usize]) == ds)
+                                .collect(),
+                        );
+                        let mut formed: Vec<(u8, Row)> = Vec::new();
+                        for v in 0..nv {
+                            if !applies(v) {
+                                continue;
+                            }
+                            formed.clear();
+                            space.multiply(q as usize, &top, v, &mut formed);
+                            for (q2, r) in &formed {
+                                if let Some(&(pl, _)) = r.first() {
+                                    let dp = u32::from(space.parts[*q2 as usize].deg[pl as usize]);
+                                    if dp == ds + 1 || opts.fault == 7 {
+                                        out.push((*q2, pl, kappa[v]));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    out
+                })
+                .collect();
+            for (q, col, ka) in found {
+                let x = &mut cover[q as usize][col as usize];
+                *x = (*x).min(ka);
+            }
+        }
+        if opts.skip && opts.skip_witness == 2 {
+            let ech_ref = &ech;
+            let found: Vec<(u8, u16, Row)> = inserted
+                .par_iter()
+                .with_max_len(1)
+                .flat_map_iter(|&(q, ri)| {
+                    let e = &ech_ref[q as usize];
+                    let degs = &space.parts[q as usize].deg;
+                    let ds = u32::from(degs[lead_of(&e.rows[ri as usize]) as usize]);
+                    let mut out: Vec<(u8, u16, Row)> = Vec::new();
+                    if ds + 2 <= c {
+                        let top: Row = e
+                            .row_full(ri as usize)
+                            .into_iter()
+                            .filter(|&(col, _)| u32::from(degs[col as usize]) == ds)
+                            .collect();
+                        let top = RowS::Sparse(top);
+                        let mut formed: Vec<(u8, Row)> = Vec::new();
+                        for v in 0..nv {
+                            if !applies(v) || (opts.skip_witness_max > 0 && kappa[v] >= opts.skip_witness_max) {
+                                continue;
+                            }
+                            formed.clear();
+                            space.multiply(q as usize, &top, v, &mut formed);
+                            for (q2, r) in formed.drain(..) {
+                                // the degree-(ds + 1) part of the product
+                                let dq = &space.parts[q2 as usize].deg;
+                                let hv: Row = if opts.fault == 7 {
+                                    r
+                                } else {
+                                    r.into_iter().filter(|&(col, _)| u32::from(dq[col as usize]) == ds + 1).collect()
+                                };
+                                if !hv.is_empty() {
+                                    out.push((q2, kappa[v], hv));
+                                }
+                            }
+                        }
+                    }
+                    out
+                })
+                .collect();
+            let tw = Instant::now();
+            // each part's witness space on its own task (insertion order kept)
+            let mut tasks: Vec<(usize, usize, &mut Witness, Vec<(u16, &Row)>)> = Vec::new();
+            for (qi, ws) in witness.iter_mut().enumerate() {
+                for (d, w) in ws.iter_mut().enumerate() {
+                    let mine: Vec<(u16, &Row)> = found
+                        .iter()
+                        .filter(|(q, _, hv)| {
+                            *q as usize == qi && usize::from(space.parts[qi].deg[hv[0].0 as usize]) == d
+                        })
+                        .map(|(_, ka, hv)| (*ka, hv))
+                        .collect();
+                    if !mine.is_empty() {
+                        // smaller labels first: fewer swaps
+                        let mut mine = mine;
+                        mine.sort_by_key(|t| t.0);
+                        if w.pivot.is_empty() {
+                            *w = Witness::new(space.parts[qi].keys.len());
+                        }
+                        tasks.push((qi, d, w, mine));
+                    }
+                }
+            }
+            let (seq, mut surv) = (0.0f64, 0u64);
+            let results: Vec<(usize, u64, Vec<(u32, u16)>)> = tasks
+                .into_iter()
+                .map(|(qi, _d, w, mine)| {
+                    // by parallel rounds (Witness::insert_batch)
+                    let mut set: Vec<(u32, u16)> = Vec::new();
+                    let cands: Vec<(u16, Row)> = mine.iter().map(|&(k, hv)| (k, hv.clone())).collect();
+                    let (ops, rounds) = w.insert_batch(cands, p, &pool, &mut |col, k| set.push((col, k)));
+                    surv += rounds;
+                    (qi, ops, set)
+                })
+                .collect();
+            let mut ops = 0u64;
+            for (qi, o, set) in results {
+                ops += o;
+                for (col, k) in set {
+                    let x = &mut cover[qi][col as usize];
+                    *x = (*x).min(k);
+                }
+            }
+            stats.witness_muladds += ops;
+            stats.witness_seq_s += seq;
+            stats.witness_survivors += surv;
+            stats.witness_s += tw.elapsed().as_secs_f64();
         }
         stats.peak_words = stats.peak_words.max(stats.stored_words);
         stats.muladds += second_ops;
@@ -1703,9 +2293,10 @@ pub fn closure_fast2(
         if io_clock.due(stats.batches) {
             let st = ClosureState { ech, queue, rows_reduced, contains_one, yield_q16, fresh_since_ir, rank_at_ir,
                 stats: Fast2Stats { io: io_report.clone(), ..stats.clone() },
-                elapsed_before_s: elapsed_before_s + started.elapsed().as_secs_f64() };
+                elapsed_before_s: elapsed_before_s + started.elapsed().as_secs_f64(),
+                cover: std::mem::take(&mut cover) };
             crate::cryptanalysis::hky_closure_io::checkpoint_now(&opts.io, &io_fp, &st, &mut io_report);
-            (ech, queue) = (st.ech, st.queue);
+            (ech, queue, cover) = (st.ech, st.queue, st.cover);
             io_clock.reset();
         }
         // ── end io hook 2 ──────────────────────────────────────────────
@@ -1728,6 +2319,10 @@ pub fn closure_fast2(
         stats.verify_s = tv.elapsed().as_secs_f64();
     }
     stats.part_rank = ech.iter().map(|e| e.rows.len() as u64).collect();
+    stats.cover_hist = cover_hist(&cover, &space, c, &kappa);
+    stats.rank_by_deg = rank_by_deg(&ech, &space, c);
+    stats.witness_rows = witness.iter().flatten().map(|w| w.rows.len() as u64).sum();
+    stats.covered_cols = cover.iter().flatten().filter(|&&x| x != NO_COVER).count() as u64;
     stats.final_row_bytes = ech
         .iter()
         .flat_map(|e| &e.rows)
@@ -1983,7 +2578,12 @@ mod tests {
                                     sweep_ratio: [0, 1, 4][(bmin + block) % 3],
                                     sweep_tile_bytes: [64, 4096, 1 << 20][block % 3],
                                     sweep_max_words: 1 << 28,
+                                    skip: (bmin + block + usize::from(par)) % 2 == 0,
+                                    skip_order: (bmax % 2) as u8,
+                                    skip_witness: [0u8, 1, 2][(bmax + block) % 3],
+                                    skip_witness_max: (block % 3) as u16,
                                     trace: None,
+                                    io: Default::default(),
                                 };
                                 out.push((format!("{o:?}"), o));
                             }
@@ -2248,5 +2848,95 @@ mod opt_tests {
             assert!(!cl.contains_one);
             assert!(st.verify_nonzero > 0, "products by variable 0 left out: not closed");
         }
+    }
+
+    /// The operators x_v commute on every monomial (Kummer and general
+    /// rules, t = 3, two blocks): the fact PROOF.md uses, x_b x_a = x_a x_b.
+    #[test]
+    fn variable_products_commute() {
+        use crate::cryptanalysis::hky_fp_tower_fast::mul_tower_var_pub as mul;
+        for general in [false, true] {
+            let t = 3;
+            let mut rules = Vec::new();
+            for b in 0..2 {
+                for j in 0..t {
+                    let last = j + 1 == t;
+                    rules.push(SquareRule {
+                        next: (!last).then_some((b * t + j + 1) as u8),
+                        a: if general && !last { 3 + j as u64 } else { 0 },
+                        b: u64::from(!last) * if general { 5 } else { 1 },
+                        c: if general { 7 } else { 0 },
+                        d: if last { 11 } else if general { 13 } else { 0 },
+                    });
+                }
+            }
+            let ring = HkyRing::new(P, rules, 0);
+            let n = 2 * t;
+            let apply = |v: usize, x: &std::collections::BTreeMap<u64, u64>| {
+                let mut out = std::collections::BTreeMap::new();
+                for (&m, &c) in x {
+                    let mut tmp = Vec::new();
+                    mul(&ring, m, v, c, &mut tmp);
+                    for (mm, cc) in tmp {
+                        let e = out.entry(mm).or_insert(0u64);
+                        *e = (*e + cc) % P;
+                    }
+                }
+                out.retain(|_, c| *c != 0);
+                out
+            };
+            for m in 0..(1u64 << n) {
+                let x: std::collections::BTreeMap<u64, u64> = [(m, 1u64)].into();
+                for a in 0..n {
+                    for b in 0..n {
+                        assert_eq!(apply(b, &apply(a, &x)), apply(a, &apply(b, &x)), "m {m} a {a} b {b}");
+                    }
+                    // degree rises by at most one
+                    let d = m.count_ones();
+                    assert!(apply(a, &x).keys().all(|mm| mm.count_ones() <= d + 1));
+                }
+            }
+        }
+    }
+
+    /// The skip gives the same space as the reference and the closedness
+    /// check passes, with and without the symmetry, both orders, with and
+    /// without the witness spaces; it does skip; fault 8 (skip every product
+    /// of a covered row but the first by order) is seen by the check.
+    #[test]
+    fn the_skip_keeps_the_space() {
+        let limits = HkyLimits::default();
+        let mut skipped = 0u64;
+        let mut fault_seen = false;
+        for planted in [false, true] {
+            for t in [3usize, 4] {
+                let (ring, gens) = system(t, planted);
+                for sym in [None, swap_first_two_blocks(t, 2)] {
+                    for c in 3..=6 {
+                        let (a, _) = closure_fast2(&ring, &gens, c, &limits, &opts(true, true, sym.clone()));
+                        for (order, wit) in [(0u8, 0u8), (1, 0), (0, 1), (1, 1), (0, 2), (1, 2)] {
+                            let mut o = opts(true, true, sym.clone());
+                            o.skip = true;
+                            o.skip_order = order;
+                            o.skip_witness = wit;
+                            o.verify_closed = true;
+                            let (b, sb) = closure_fast2(&ring, &gens, c, &limits, &o);
+                            let tag = format!("planted {planted} t {t} c {c} order {order} witness {wit}");
+                            assert_eq!(a.dims, b.dims, "{tag}");
+                            assert_eq!(a.contains_one, b.contains_one, "{tag}");
+                            if !b.contains_one {
+                                assert_eq!(sb.verify_nonzero, 0, "{tag}");
+                            }
+                            skipped += sb.skipped_items;
+                            o.fault = 8;
+                            let (f, sf) = closure_fast2(&ring, &gens, c, &limits, &o);
+                            fault_seen |= f.dims != a.dims || f.contains_one != a.contains_one || sf.verify_nonzero > 0;
+                        }
+                    }
+                }
+            }
+        }
+        assert!(skipped > 0, "the criterion must skip something");
+        assert!(fault_seen, "fault 8 must be detected");
     }
 }
