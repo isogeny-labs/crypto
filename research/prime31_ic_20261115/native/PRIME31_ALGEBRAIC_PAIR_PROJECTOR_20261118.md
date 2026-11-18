@@ -1,40 +1,41 @@
 # Prime31 original-curve signed-pair algebraic projector: exact mechanism and bounded controls
 
-2026-11-18 UTC · PR [#4720](https://github.com/isogeny-labs/crypto/pull/4720) · `[pcc:unverified]`
+2026-11-18 UTC · PR [#4720](https://github.com/isogeny-labs/crypto/pull/4720) · \`[pcc:unverified]\`
 
 ## New precise result
 
 For the **unchanged** ordinary cofactor-one source curve
-(E:y^2=x^3+847514846x+2087444724) over (\mathbb F_{2147483647}),
-(n=2147446831) prime, the target-conditioned two-summand signed-membership problem has an exact **homogeneous polynomial** screen that needs no point-sum table and no per-candidate field inversion.
 
-With the first rational-x factor base (B\in\{4,8,31\}),
-(H_B(T)=\prod_{j<B}(T-x_j)), and public (Q=(u,v)), define for each positive base point (P_i=(x_i,y_i)):
+$$
+E: y^2=x^3+847514846x+2087444724 \quad \text{over }\mathbb F_{2147483647},
+$$
 
-[
-D_i=(u-x_i)^2,\qquad
+with prime group order $n=2147446831$, the public-target two-summand signed-membership problem has an exact **homogeneous-polynomial** screen requiring no point-sum table and no per-candidate field inversion.
+
+For the first rational-x factor base $B\in\{4,8,31\}$, let $H_B(T)=\prod_{j<B}(T-x_j)=\sum_{k=0}^{B} h_kT^k$. Given a public point $Q=(u,v)$ and positive base point $P_i=(x_i,y_i)$, define
+
+$$
+D_i=(u-x_i)^2,\quad
 N_i=(v+y_i)^2-(u+x_i)D_i,
-]
-[
-\mathcal P_i(Q)=\sum_{k=0}^{B}h_kN_i^kD_i^{B-k},
-\quad H_B(T)=\sum_{k=0}^{B}h_kT^k.
-]
+$$
 
-For (u\ne x_i), **iff** (\mathcal P_i(Q)=0), there exists a base point (P_j) such that (Q=P_i\pm P_j). This follows from the elliptic addition law
-(x(Q-P_i)=N_i/D_i) and the exact root set of (H_B). On a positive screen, exact signed-point replay identifies the correct sign. The screen evaluates using (3B+O(1)) field multiplications per i by streaming powers of (D), with zero inversions and zero EC additions on negative decisions.
+$$
+\mathcal P_i(Q)=\sum_{k=0}^{B}h_kN_i^kD_i^{B-k}.
+$$
+
+When $u\ne x_i$, $\mathcal P_i(Q)=0$ **if and only if** there exists $P_j$ in the base such that $Q=P_i\pm P_j$. This follows from the addition law $x(Q-P_i)=N_i/D_i$ and the exact root set of $H_B$. Upon a positive screen, replay the signed witness by group subtraction, checking the correct sign. The homogeneous polynomial costs $3B+O(1)$ base-field multiplications per candidate $i$, but no field inversions or EC additions on negative decisions.
 
 ### Proven exceptional branch
 
-It is **incorrect** to extend the above equivalence to (u=x_i) by simply clearing denominators. At (Q=-P_i), both (N_i) and (D_i) become zero, so the unguarded homogeneous polynomial vanishes even if (x(Q-P_i)=x(-2P_i)) is *outside* the factor base.
+Simply clearing denominators is **incorrect** when $u=x_i$. At $Q=-P_i$, both $D_i$ and $N_i$ vanish, so the unguarded polynomial reports a spurious root even if $x(Q-P_i)=x(-2P_i)$ is outside the factor base.
 
-Correct branch split:
+The correct branches are:
 
-- (Q=P_i): (Q-P_i=O), no finite x, so skip candidate i.
-- (Q=-P_i): use the tangent formula (D_t=4y_i^2\ne0) and
-  (N_t=(3x_i^2+a)^2-2x_iD_t); test (H_B(N_t/D_t)=0) by the same homogeneous polynomial.
-- (Q=O): the signed relation (O=P_0-P_0) is a valid immediate witness.
+- $Q=P_i$: then $Q-P_i=O$ and has no finite $x$-coordinate; skip candidate $i$.
+- $Q=-P_i$: use the tangent $D_t=4y_i^2\ne0$ and $N_t=(3x_i^2+a)^2-2x_iD_t$, evaluating $H_B(N_t/D_t)$ by the homogeneous polynomial.
+- $Q=O$: immediately return the signed witness $O=P_0-P_0$.
 
-The exact group order is odd prime, so chosen base points cannot have (y_i=0). The control explicitly checks the unguarded false positive at (-P_0).
+Since the group has odd prime order, the chosen base points have no $y_i=0$. The controls explicitly reject the unguarded false positive at $-P_0$.
 
 ## Fixed-panel independent arithmetic replay (not a Rust benchmark)
 
@@ -46,7 +47,7 @@ An independently written Python BigInt implementation of the exact original curv
 | B8 | 273 | 129 | 16 |
 | B31 | 273 | 129 | 16 |
 
-Counts include **deliberately planted** (P_i\pm P_j) cases, duplicates, identity and vertical exceptions, and 128 additional deterministic scalar-generated public targets per base. No natural random-target hit occurred in the 128-target segment; such absence is expected under the following bound, not evidence of solver failure.
+Counts include **deliberately planted** $P_i\pm P_j$ cases, duplicates, identity and vertical exceptions, and 128 additional deterministic scalar-generated public targets per base. No natural random-target hit occurred in the 128-target segment; such absence is expected under the following bound, not evidence of solver failure.
 
 The source-specific Rust example [`prime31_signed_pair_projector.rs`](examples/prime31_signed_pair_projector.rs) reuses the original `Arithmetic,Point,check_curve,PRIME31` code, generates the same public targets, compares each screened answer against an independent **O(B) group-subtraction + x-index lookup** control (not a generic O(B^2) pair table), checks every individual screen against point subtraction, and outputs counts plus diagnostic times. The separate Python verifier [`verify_prime31_signed_pair_projector.py`](verify_prime31_signed_pair_projector.py) reconstructs the public cases and replays the signed point and exceptional branches using independent modular-integer arithmetic.
 
@@ -66,11 +67,11 @@ The algebraic counts exclude the EC verification/replay costs, which appear sepa
 
 ## New exact yield ceiling and its consequence
 
-For a signed two-summand base of (B) distinct positive points, at most (2B^2) distinct group elements are representable as (P_i\pm P_j). Consequently, on this prime-order group, a uniform public residual has probability at most:
+For a signed two-summand base of $B$ distinct positive points, at most $2B^2$ group elements are representable as $P_i\pm P_j$. Consequently, on this prime-order group, a uniform public residual has probability at most:
 
-[
+$
 \Pr[R\in S_{2,B}^{\pm}]\le\frac{2B^2}{2147446831}.
-]
+$
 
 At B31 this is **8.9501633859 × 10^{-7}**, less than one in 1.1 million. A 128-query uniformly random panel has an expected hit count at most **0.0001145621**. This is an exact uniform-support upper bound, not an independence/Poisson approximation and not a target-conditioned F4 cost.
 
