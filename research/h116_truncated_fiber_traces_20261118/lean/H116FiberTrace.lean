@@ -337,6 +337,110 @@ def BostanJetRecurrence (sourceA sourceB targetA targetB : K) (h : ℕ → K) : 
         (2 * ((k - 3 : ℕ) : K) * sourceB * h (k - 3)) /
           ((2 * k + 3 : ℕ) : K)
 
+/-- Equality of power series below degree `n`. This is a finite congruence:
+`PowerSeries.trunc n` keeps exactly the coefficients of degrees `< n`. -/
+def PowerSeriesPrefixEq {R : Type*} [Semiring R]
+    (n : ℕ) (f g : PowerSeries R) : Prop :=
+  PowerSeries.trunc n f = PowerSeries.trunc n g
+
+namespace PowerSeriesPrefixEq
+
+variable {R : Type*} [Field R]
+variable {n m : ℕ} {f g h k : PowerSeries R}
+
+theorem refl (f : PowerSeries R) : PowerSeriesPrefixEq n f f := rfl
+
+theorem of_eq (hfg : f = g) : PowerSeriesPrefixEq n f g := by
+  subst g
+  exact refl f
+
+theorem symm (hfg : PowerSeriesPrefixEq n f g) : PowerSeriesPrefixEq n g f :=
+  Eq.symm hfg
+
+theorem trans (hfg : PowerSeriesPrefixEq n f g)
+    (hgh : PowerSeriesPrefixEq n g h) : PowerSeriesPrefixEq n f h :=
+  Eq.trans hfg hgh
+
+theorem mono (hmn : m ≤ n) (hfg : PowerSeriesPrefixEq n f g) :
+    PowerSeriesPrefixEq m f g := by
+  unfold PowerSeriesPrefixEq at hfg ⊢
+  calc
+    PowerSeries.trunc m f =
+        PowerSeries.trunc m (PowerSeries.trunc n f : PowerSeries R) :=
+      (PowerSeries.trunc_trunc_of_le f hmn).symm
+    _ = PowerSeries.trunc m (PowerSeries.trunc n g : PowerSeries R) := by rw [hfg]
+    _ = PowerSeries.trunc m g := PowerSeries.trunc_trunc_of_le g hmn
+
+theorem add (hfg : PowerSeriesPrefixEq n f g)
+    (hhk : PowerSeriesPrefixEq n h k) :
+    PowerSeriesPrefixEq n (f + h) (g + k) := by
+  unfold PowerSeriesPrefixEq at hfg hhk ⊢
+  simpa only [map_add] using congrArg₂ (· + ·) hfg hhk
+
+theorem neg (hfg : PowerSeriesPrefixEq n f g) :
+    PowerSeriesPrefixEq n (-f) (-g) := by
+  unfold PowerSeriesPrefixEq at hfg ⊢
+  simpa only [map_neg] using congrArg Neg.neg hfg
+
+theorem sub (hfg : PowerSeriesPrefixEq n f g)
+    (hhk : PowerSeriesPrefixEq n h k) :
+    PowerSeriesPrefixEq n (f - h) (g - k) := by
+  simpa only [sub_eq_add_neg] using add hfg (neg hhk)
+
+theorem mul (hfg : PowerSeriesPrefixEq n f g)
+    (hhk : PowerSeriesPrefixEq n h k) :
+    PowerSeriesPrefixEq n (f * h) (g * k) := by
+  unfold PowerSeriesPrefixEq at hfg hhk ⊢
+  calc
+    PowerSeries.trunc n (f * h) =
+        PowerSeries.trunc n
+          ((PowerSeries.trunc n f : PowerSeries R) *
+            (PowerSeries.trunc n h : PowerSeries R)) :=
+      (PowerSeries.trunc_trunc_mul_trunc f h).symm
+    _ = PowerSeries.trunc n
+          ((PowerSeries.trunc n g : PowerSeries R) *
+            (PowerSeries.trunc n k : PowerSeries R)) := by rw [hfg, hhk]
+    _ = PowerSeries.trunc n (g * k) :=
+      PowerSeries.trunc_trunc_mul_trunc g k
+
+theorem pow (hfg : PowerSeriesPrefixEq n f g) (a : ℕ) :
+    PowerSeriesPrefixEq n (f ^ a) (g ^ a) := by
+  unfold PowerSeriesPrefixEq at hfg ⊢
+  calc
+    PowerSeries.trunc n (f ^ a) =
+        PowerSeries.trunc n ((PowerSeries.trunc n f : PowerSeries R) ^ a) :=
+      (PowerSeries.trunc_trunc_pow f n a).symm
+    _ = PowerSeries.trunc n ((PowerSeries.trunc n g : PowerSeries R) ^ a) := by
+      rw [hfg]
+    _ = PowerSeries.trunc n (g ^ a) := PowerSeries.trunc_trunc_pow g n a
+
+/-- Differentiating a known prefix consumes exactly one coefficient. -/
+theorem derivative (hfg : PowerSeriesPrefixEq (n + 1) f g) :
+    PowerSeriesPrefixEq n (PowerSeries.derivative f) (PowerSeries.derivative g) := by
+  unfold PowerSeriesPrefixEq at hfg ⊢
+  rw [PowerSeries.trunc_derivative, PowerSeries.trunc_derivative]
+  exact congrArg Polynomial.derivative hfg
+
+theorem coeff_eq (hfg : PowerSeriesPrefixEq n f g) {i : ℕ} (hi : i < n) :
+    PowerSeries.coeff i f = PowerSeries.coeff i g := by
+  unfold PowerSeriesPrefixEq at hfg
+  calc
+    PowerSeries.coeff i f =
+        PowerSeries.coeff i (PowerSeries.trunc n f) :=
+      (PowerSeries.coeff_coe_trunc_of_lt hi).symm
+    _ = PowerSeries.coeff i (PowerSeries.trunc n g) := by rw [hfg]
+    _ = PowerSeries.coeff i g := PowerSeries.coeff_coe_trunc_of_lt hi
+
+/-- A power-series unit can be cancelled without losing prefix precision. -/
+theorem cancel_left (D : PowerSeries R)
+    (hD : PowerSeries.constantCoeff D ≠ 0)
+    (hfg : PowerSeriesPrefixEq n (D * f) (D * g)) :
+    PowerSeriesPrefixEq n f g := by
+  have hi := mul (refl (D⁻¹)) hfg
+  simpa only [← mul_assoc, PowerSeries.inv_mul_cancel D hD, one_mul] using hi
+
+end PowerSeriesPrefixEq
+
 /-- Equation (14) after substituting `R(x)=xU(w)`, `w=1/x`, and multiplying
 by `w³`. The factor `W=U-wU'` is the transformed derivative `R'(x)`. -/
 def NormalizedIsogenyFirstOrderEquation
@@ -412,6 +516,128 @@ theorem NormalizedRationalMapPolynomialCertificate.to_firstOrder
   exact NormalizedRationalMapSeriesCertificate.to_firstOrder
     sourceA sourceB targetA targetB h N D hcert
 
+/-- The first-order normalized curve equation, only below degree ten. -/
+def NormalizedIsogenyFirstOrderPrefix
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K) : Prop :=
+  let U := normalizedMapAtInfinitySeries h
+  let W := U - PowerSeries.X * PowerSeries.derivative U
+  PowerSeriesPrefixEq 10
+    ((1 + PowerSeries.C sourceA * PowerSeries.X ^ 2 +
+        PowerSeries.C sourceB * PowerSeries.X ^ 3) * W ^ 2)
+    (U ^ 3 + PowerSeries.C targetA * PowerSeries.X ^ 2 * U +
+      PowerSeries.C targetB * PowerSeries.X ^ 3)
+
+/-- A fixed-size rational-map certificate. Eleven quotient coefficients are
+needed because quotient differentiation consumes one; the cleared curve
+identity itself is checked only below degree ten. -/
+def NormalizedRationalMapJetCertificate
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (N D : PowerSeries K) : Prop :=
+  let U := normalizedMapAtInfinitySeries h
+  let Np := PowerSeries.derivative N
+  let Dp := PowerSeries.derivative D
+  let H := D * (N - PowerSeries.X * Np) + PowerSeries.X * Dp * N
+  PowerSeries.constantCoeff D = 1 ∧
+    PowerSeriesPrefixEq 11 (D * U) N ∧
+    PowerSeriesPrefixEq 10
+      ((1 + PowerSeries.C sourceA * PowerSeries.X ^ 2 +
+          PowerSeries.C sourceB * PowerSeries.X ^ 3) * H ^ 2)
+      (D * N ^ 3 + PowerSeries.C targetA * PowerSeries.X ^ 2 * N * D ^ 3 +
+        PowerSeries.C targetB * PowerSeries.X ^ 3 * D ^ 4)
+
+/-- The eleven-coefficient quotient certificate implies the transformed curve
+equation through degree nine. Every substitution and cancellation occurs in
+the checked truncated power-series congruence. -/
+theorem NormalizedRationalMapJetCertificate.to_firstOrderPrefix
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (N D : PowerSeries K)
+    (hcert : NormalizedRationalMapJetCertificate
+      sourceA sourceB targetA targetB h N D) :
+    NormalizedIsogenyFirstOrderPrefix sourceA sourceB targetA targetB h := by
+  let U := normalizedMapAtInfinitySeries h
+  let Up := PowerSeries.derivative U
+  let Np := PowerSeries.derivative N
+  let Dp := PowerSeries.derivative D
+  let X : PowerSeries K := PowerSeries.X
+  let W := U - X * Up
+  let F := 1 + PowerSeries.C sourceA * X ^ 2 + PowerSeries.C sourceB * X ^ 3
+  let G := U ^ 3 + PowerSeries.C targetA * X ^ 2 * U +
+    PowerSeries.C targetB * X ^ 3
+  let H := D * (N - X * Np) + X * Dp * N
+  change PowerSeries.constantCoeff D = 1 ∧
+    PowerSeriesPrefixEq 11 (D * U) N ∧
+    PowerSeriesPrefixEq 10 (F * H ^ 2)
+      (D * N ^ 3 + PowerSeries.C targetA * X ^ 2 * N * D ^ 3 +
+        PowerSeries.C targetB * X ^ 3 * D ^ 4) at hcert
+  rcases hcert with ⟨hconst, hquot, hpoly⟩
+  have hN : PowerSeriesPrefixEq 10 N (D * U) :=
+    PowerSeriesPrefixEq.symm
+      (PowerSeriesPrefixEq.mono (by omega) hquot)
+  have hderiv : PowerSeriesPrefixEq 10
+      (PowerSeries.derivative (D * U)) Np := by
+    simpa [Np] using PowerSeriesPrefixEq.derivative (n := 10) hquot
+  have hNp : PowerSeriesPrefixEq 10 Np (Dp * U + D * Up) := by
+    apply PowerSeriesPrefixEq.trans (PowerSeriesPrefixEq.symm hderiv)
+    apply PowerSeriesPrefixEq.of_eq
+    simp only [PowerSeries.derivative.leibniz, smul_eq_mul]
+    dsimp only [Dp, Up]
+    ring
+  have hInner : PowerSeriesPrefixEq 10
+      (N - X * Np) (D * U - X * (Dp * U + D * Up)) :=
+    PowerSeriesPrefixEq.sub hN
+      (PowerSeriesPrefixEq.mul (PowerSeriesPrefixEq.refl X) hNp)
+  have hHraw : PowerSeriesPrefixEq 10 H
+      (D * (D * U - X * (Dp * U + D * Up)) + X * Dp * (D * U)) :=
+    PowerSeriesPrefixEq.add
+      (PowerSeriesPrefixEq.mul (PowerSeriesPrefixEq.refl D) hInner)
+      (PowerSeriesPrefixEq.mul
+        (PowerSeriesPrefixEq.mul (PowerSeriesPrefixEq.refl X)
+          (PowerSeriesPrefixEq.refl Dp)) hN)
+  have hH : PowerSeriesPrefixEq 10 H (D ^ 2 * W) := by
+    apply PowerSeriesPrefixEq.trans hHraw
+    apply PowerSeriesPrefixEq.of_eq
+    dsimp only [W]
+    ring
+  have hleft : PowerSeriesPrefixEq 10 (F * H ^ 2) (D ^ 4 * (F * W ^ 2)) := by
+    apply PowerSeriesPrefixEq.trans
+      (PowerSeriesPrefixEq.mul (PowerSeriesPrefixEq.refl F)
+        (PowerSeriesPrefixEq.pow hH 2))
+    apply PowerSeriesPrefixEq.of_eq
+    ring
+  have hr1 : PowerSeriesPrefixEq 10 (D * N ^ 3) (D * (D * U) ^ 3) :=
+    PowerSeriesPrefixEq.mul (PowerSeriesPrefixEq.refl D)
+      (PowerSeriesPrefixEq.pow hN 3)
+  have hr2 : PowerSeriesPrefixEq 10
+      (PowerSeries.C targetA * X ^ 2 * N * D ^ 3)
+      (PowerSeries.C targetA * X ^ 2 * (D * U) * D ^ 3) :=
+    PowerSeriesPrefixEq.mul
+      (PowerSeriesPrefixEq.mul
+        (PowerSeriesPrefixEq.mul (PowerSeriesPrefixEq.refl _)
+          (PowerSeriesPrefixEq.refl _)) hN)
+      (PowerSeriesPrefixEq.refl _)
+  have hr3 : PowerSeriesPrefixEq 10
+      (PowerSeries.C targetB * X ^ 3 * D ^ 4)
+      (PowerSeries.C targetB * X ^ 3 * D ^ 4) :=
+    PowerSeriesPrefixEq.refl _
+  have hrightRaw := PowerSeriesPrefixEq.add
+    (PowerSeriesPrefixEq.add hr1 hr2) hr3
+  have hright : PowerSeriesPrefixEq 10
+      (D * N ^ 3 + PowerSeries.C targetA * X ^ 2 * N * D ^ 3 +
+        PowerSeries.C targetB * X ^ 3 * D ^ 4)
+      (D ^ 4 * G) := by
+    apply PowerSeriesPrefixEq.trans hrightRaw
+    apply PowerSeriesPrefixEq.of_eq
+    dsimp only [G]
+    ring
+  have hcleared : PowerSeriesPrefixEq 10
+      (D ^ 4 * (F * W ^ 2)) (D ^ 4 * G) :=
+    PowerSeriesPrefixEq.trans (PowerSeriesPrefixEq.symm hleft)
+      (PowerSeriesPrefixEq.trans hpoly hright)
+  have hD4 : PowerSeries.constantCoeff (D ^ 4) ≠ 0 := by
+    simp [hconst]
+  have hfirst := PowerSeriesPrefixEq.cancel_left (D ^ 4) hD4 hcleared
+  simpa [NormalizedIsogenyFirstOrderPrefix, U, Up, X, W, F, G] using hfirst
+
 /-- Equation (15) of Bostan--Morain--Salvy--Schost after substituting
 `R(x)=x U(1/x)` and multiplying by `w²`. It is written in distributed form so
 that coefficient extraction does not hide work in nested Cauchy products. -/
@@ -459,6 +685,107 @@ theorem NormalizedIsogenyFirstOrderEquation.to_secondOrder
   dsimp only
   simp only [map_ofNat, map_mul] at hcompact ⊢
   linear_combination hcompact
+
+/-- The distributed normalized ODE, only below degree nine. -/
+def NormalizedIsogenySecondOrderPrefix
+    (sourceA sourceB targetA : K) (h : ℕ → K) : Prop :=
+  let U := normalizedMapAtInfinitySeries h
+  let W := U - PowerSeries.X * PowerSeries.derivative U
+  let Udd := PowerSeries.derivative (PowerSeries.derivative U)
+  PowerSeriesPrefixEq 9
+    (PowerSeries.C 3 * W +
+      PowerSeries.C sourceA * (PowerSeries.X ^ 2 * W) +
+      PowerSeries.C 2 * (PowerSeries.X ^ 2 * Udd) +
+      PowerSeries.C (2 * sourceA) * (PowerSeries.X ^ 4 * Udd) +
+      PowerSeries.C (2 * sourceB) * (PowerSeries.X ^ 5 * Udd))
+    (PowerSeries.C 3 * (U * U) + PowerSeries.C targetA * PowerSeries.X ^ 2)
+
+/-- Differentiating the ten-coefficient first-order congruence gives the
+nine-coefficient ODE congruence. The factor `U-XU'` is cancellable because its
+constant coefficient is one. -/
+theorem NormalizedIsogenyFirstOrderPrefix.to_secondOrderPrefix
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (hfirst : NormalizedIsogenyFirstOrderPrefix
+      sourceA sourceB targetA targetB h) :
+    NormalizedIsogenySecondOrderPrefix sourceA sourceB targetA h := by
+  let U := normalizedMapAtInfinitySeries h
+  let Up := PowerSeries.derivative U
+  let Udd := PowerSeries.derivative Up
+  let X : PowerSeries K := PowerSeries.X
+  let W := U - X * Up
+  let F := 1 + PowerSeries.C sourceA * X ^ 2 + PowerSeries.C sourceB * X ^ 3
+  let G := U ^ 3 + PowerSeries.C targetA * X ^ 2 * U +
+    PowerSeries.C targetB * X ^ 3
+  let OL := PowerSeries.C 3 * W +
+    PowerSeries.C sourceA * (X ^ 2 * W) +
+    PowerSeries.C 2 * (X ^ 2 * Udd) +
+    PowerSeries.C (2 * sourceA) * (X ^ 4 * Udd) +
+    PowerSeries.C (2 * sourceB) * (X ^ 5 * Udd)
+  let OR := PowerSeries.C 3 * (U * U) + PowerSeries.C targetA * X ^ 2
+  change PowerSeriesPrefixEq 10 (F * W ^ 2) G at hfirst
+  have hcurve9 := PowerSeriesPrefixEq.mono (m := 9) (by omega) hfirst
+  have hderiv : PowerSeriesPrefixEq 9
+      (PowerSeries.derivative (F * W ^ 2)) (PowerSeries.derivative G) := by
+    simpa using PowerSeriesPrefixEq.derivative (n := 9) hfirst
+  have hcombined : PowerSeriesPrefixEq 9
+      (PowerSeries.C 3 * (F * W ^ 2) -
+        X * PowerSeries.derivative (F * W ^ 2))
+      (PowerSeries.C 3 * G - X * PowerSeries.derivative G) :=
+    PowerSeriesPrefixEq.sub
+      (PowerSeriesPrefixEq.mul (PowerSeriesPrefixEq.refl _) hcurve9)
+      (PowerSeriesPrefixEq.mul (PowerSeriesPrefixEq.refl X) hderiv)
+  have hleft :
+      PowerSeries.C 3 * (F * W ^ 2) -
+          X * PowerSeries.derivative (F * W ^ 2) = W * OL := by
+    dsimp only [F, W, OL, Udd, Up, X]
+    simp only [PowerSeries.derivative.leibniz, PowerSeries.derivative_pow,
+      PowerSeries.derivative_X, PowerSeries.derivative_C, smul_eq_mul,
+      PowerSeries.derivative_one, map_ofNat, map_mul, map_add, map_sub]
+    ring
+  have hright :
+      PowerSeries.C 3 * G - X * PowerSeries.derivative G = W * OR := by
+    dsimp only [G, W, OR, Up, X]
+    simp only [PowerSeries.derivative.leibniz, PowerSeries.derivative_pow,
+      PowerSeries.derivative_X, PowerSeries.derivative_C, smul_eq_mul,
+      map_ofNat, map_add]
+    ring
+  have hfactored : PowerSeriesPrefixEq 9 (W * OL) (W * OR) :=
+    PowerSeriesPrefixEq.trans (PowerSeriesPrefixEq.symm
+      (PowerSeriesPrefixEq.of_eq hleft))
+      (PowerSeriesPrefixEq.trans hcombined (PowerSeriesPrefixEq.of_eq hright))
+  have hW0 : PowerSeries.constantCoeff W ≠ 0 := by
+    simp [W, U, Up, X, normalizedMapAtInfinitySeries, fiberDenominatorSeries]
+  have hode := PowerSeriesPrefixEq.cancel_left W hW0 hfactored
+  simpa [NormalizedIsogenySecondOrderPrefix, U, Up, Udd, X, W, OL, OR] using hode
+
+/-- Degrees two and three of the first-order prefix already force the two base
+recurrence coefficients. -/
+theorem NormalizedIsogenyFirstOrderPrefix.base_coefficients
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (hfirst : NormalizedIsogenyFirstOrderPrefix
+      sourceA sourceB targetA targetB h)
+    (h5 : (5 : K) ≠ 0) (h7 : (7 : K) ≠ 0) :
+    h 1 = (sourceA - targetA) / 5 ∧
+      h 2 = (sourceB - targetB) / 7 := by
+  unfold NormalizedIsogenyFirstOrderPrefix at hfirst
+  dsimp only at hfirst
+  constructor
+  · have hc := PowerSeriesPrefixEq.coeff_eq hfirst (i := 2) (by omega)
+    simp [normalizedMapAtInfinitySeries, fiberDenominatorSeries, pow_succ,
+      PowerSeries.coeff_mul, PowerSeries.coeff_derivative,
+      PowerSeries.coeff_X] at hc
+    simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+    norm_num [Finset.sum_range_succ] at hc
+    apply (eq_div_iff h5).2
+    linear_combination -hc
+  · have hc := PowerSeriesPrefixEq.coeff_eq hfirst (i := 3) (by omega)
+    simp [normalizedMapAtInfinitySeries, fiberDenominatorSeries, pow_succ,
+      PowerSeries.coeff_mul, PowerSeries.coeff_derivative,
+      PowerSeries.coeff_X] at hc
+    simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+    norm_num [Finset.sum_range_succ] at hc
+    apply (eq_div_iff h7).2
+    linear_combination -hc
 
 /-- The degree-two and degree-three coefficients of transformed equation (14)
 force the two initial Bostan jet coefficients. These are therefore consequences
@@ -636,6 +963,50 @@ private theorem normalizedODE_step7
   ring_nf at hc ⊢
   linear_combination 17 * hc
 
+private theorem normalizedODEPrefix_step6
+    (sourceA sourceB targetA : K) (h : ℕ → K)
+    (hode : NormalizedIsogenySecondOrderPrefix sourceA sourceB targetA h)
+    (hprod : (60 : K) ≠ 0) (hsimple : (15 : K) ≠ 0) :
+    h 6 = 3 * (∑ i ∈ Finset.Icc 1 (6 - 2), h i * h (6 - 1 - i)) /
+          (((6 - 2) * (2 * 6 + 3) : ℕ) : K) -
+        (((2 * 6 - 3 : ℕ) : K) * sourceA * h (6 - 2)) /
+          ((2 * 6 + 3 : ℕ) : K) -
+        (2 * ((6 - 3 : ℕ) : K) * sourceB * h (6 - 3)) /
+          ((2 * 6 + 3 : ℕ) : K) := by
+  unfold NormalizedIsogenySecondOrderPrefix at hode
+  dsimp only at hode
+  have hc := PowerSeriesPrefixEq.coeff_eq hode (i := 7) (by omega)
+  simp [normalizedMapAtInfinitySeries, PowerSeries.coeff_mul,
+    PowerSeries.coeff_derivative, PowerSeries.coeff_X] at hc
+  simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+  norm_num [Finset.sum_range_succ,
+    show Finset.Icc 1 4 = {1, 2, 3, 4} by decide] at hc ⊢
+  field_simp [hprod, hsimple]
+  ring_nf at hc ⊢
+  linear_combination 15 * hc
+
+private theorem normalizedODEPrefix_step7
+    (sourceA sourceB targetA : K) (h : ℕ → K)
+    (hode : NormalizedIsogenySecondOrderPrefix sourceA sourceB targetA h)
+    (hprod : (85 : K) ≠ 0) (hsimple : (17 : K) ≠ 0) :
+    h 7 = 3 * (∑ i ∈ Finset.Icc 1 (7 - 2), h i * h (7 - 1 - i)) /
+          (((7 - 2) * (2 * 7 + 3) : ℕ) : K) -
+        (((2 * 7 - 3 : ℕ) : K) * sourceA * h (7 - 2)) /
+          ((2 * 7 + 3 : ℕ) : K) -
+        (2 * ((7 - 3 : ℕ) : K) * sourceB * h (7 - 3)) /
+          ((2 * 7 + 3 : ℕ) : K) := by
+  unfold NormalizedIsogenySecondOrderPrefix at hode
+  dsimp only at hode
+  have hc := PowerSeriesPrefixEq.coeff_eq hode (i := 8) (by omega)
+  simp [normalizedMapAtInfinitySeries, PowerSeries.coeff_mul,
+    PowerSeries.coeff_derivative, PowerSeries.coeff_X] at hc
+  simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+  norm_num [Finset.sum_range_succ,
+    show Finset.Icc 1 5 = {1, 2, 3, 4, 5} by decide] at hc ⊢
+  field_simp [hprod, hsimple]
+  ring_nf at hc ⊢
+  linear_combination 17 * hc
+
 /-- A normalized at-infinity jet satisfying the transformed isogeny equation
 and the two initial coefficient identities satisfies the exact finite recurrence
 used by H116. -/
@@ -657,6 +1028,72 @@ theorem BostanJetRecurrence.of_normalizedSecondOrderEquation
   · exact normalizedODE_step5 sourceA sourceB targetA h hode hd.1 hd.2
   · exact normalizedODE_step6 sourceA sourceB targetA h hode hd.1 hd.2
   · exact normalizedODE_step7 sourceA sourceB targetA h hode hd.1 hd.2
+
+/-- The nine-coefficient ODE prefix is sufficient for all five recurrence
+steps: the last step reads only coefficient eight. -/
+theorem BostanJetRecurrence.of_normalizedSecondOrderPrefix
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (hbase1 : h 1 = (sourceA - targetA) / 5)
+    (hbase2 : h 2 = (sourceB - targetB) / 7)
+    (hode : NormalizedIsogenySecondOrderPrefix sourceA sourceB targetA h)
+    (hden : ∀ k, 3 ≤ k → k ≤ 7 →
+      ((((k - 2) * (2 * k + 3) : ℕ) : K) ≠ 0) ∧
+        (((2 * k + 3 : ℕ) : K) ≠ 0)) :
+    BostanJetRecurrence sourceA sourceB targetA targetB h := by
+  refine ⟨hbase1, hbase2, ?_⟩
+  intro k hk3 hk7
+  rcases hden k hk3 hk7 with ⟨hprod, hsimple⟩
+  interval_cases k <;> norm_num at hprod hsimple
+  · have hc := PowerSeriesPrefixEq.coeff_eq hode (i := 4) (by omega)
+    simp [normalizedMapAtInfinitySeries,
+      PowerSeries.coeff_mul, PowerSeries.coeff_derivative,
+      PowerSeries.coeff_X] at hc
+    simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+    norm_num [Finset.sum_range_succ,
+      show Finset.Icc 1 1 = {1} by decide] at hc ⊢
+    field_simp [hsimple]
+    ring_nf at hc ⊢
+    linear_combination hc
+  · have hc := PowerSeriesPrefixEq.coeff_eq hode (i := 5) (by omega)
+    simp [normalizedMapAtInfinitySeries,
+      PowerSeries.coeff_mul, PowerSeries.coeff_derivative,
+      PowerSeries.coeff_X] at hc
+    simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+    norm_num [Finset.sum_range_succ,
+      show Finset.Icc 1 2 = {1, 2} by decide] at hc ⊢
+    field_simp [hprod, hsimple]
+    ring_nf at hc ⊢
+    linear_combination 11 * hc
+  · have hc := PowerSeriesPrefixEq.coeff_eq hode (i := 6) (by omega)
+    simp [normalizedMapAtInfinitySeries,
+      PowerSeries.coeff_mul, PowerSeries.coeff_derivative,
+      PowerSeries.coeff_X] at hc
+    simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+    norm_num [Finset.sum_range_succ,
+      show Finset.Icc 1 3 = {1, 2, 3} by decide] at hc ⊢
+    field_simp [hprod, hsimple]
+    ring_nf at hc ⊢
+    linear_combination 13 * hc
+  · exact normalizedODEPrefix_step6 sourceA sourceB targetA h hode hprod hsimple
+  · exact normalizedODEPrefix_step7 sourceA sourceB targetA h hode hprod hsimple
+
+/-- A ten-coefficient first-order prefix supplies the base coefficients and the
+nine-coefficient ODE prefix, hence the complete finite recurrence. -/
+theorem BostanJetRecurrence.of_normalizedFirstOrderPrefix
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (hfirst : NormalizedIsogenyFirstOrderPrefix
+      sourceA sourceB targetA targetB h)
+    (h5 : (5 : K) ≠ 0) (h7 : (7 : K) ≠ 0)
+    (hden : ∀ k, 3 ≤ k → k ≤ 7 →
+      ((((k - 2) * (2 * k + 3) : ℕ) : K) ≠ 0) ∧
+        (((2 * k + 3 : ℕ) : K) ≠ 0)) :
+    BostanJetRecurrence sourceA sourceB targetA targetB h := by
+  rcases NormalizedIsogenyFirstOrderPrefix.base_coefficients
+    sourceA sourceB targetA targetB h hfirst h5 h7 with ⟨hbase1, hbase2⟩
+  exact BostanJetRecurrence.of_normalizedSecondOrderPrefix
+    sourceA sourceB targetA targetB h hbase1 hbase2
+      (NormalizedIsogenyFirstOrderPrefix.to_secondOrderPrefix
+        sourceA sourceB targetA targetB h hfirst) hden
 
 /-- Transformed equation (14) alone implies the finite recurrence whenever the
 displayed small denominators are nonzero. The initial coefficients and the
@@ -716,6 +1153,22 @@ theorem BostanJetRecurrence.of_normalizedRationalMapPolynomialCertificate_zmod
     sourceA sourceB targetA targetB h
       (NormalizedRationalMapPolynomialCertificate.to_firstOrder
         sourceA sourceB targetA targetB h N D hcert)
+
+/-- The fixed eleven-coefficient rational-map certificate implies the complete
+H116 recurrence over every prime field in the frozen characteristic range. -/
+theorem BostanJetRecurrence.of_normalizedRationalMapJetCertificate_zmod
+    {p : ℕ} [Fact p.Prime] (hp : 19 < p)
+    (sourceA sourceB targetA targetB : ZMod p) (h : ℕ → ZMod p)
+    (N D : PowerSeries (ZMod p))
+    (hcert : NormalizedRationalMapJetCertificate
+      sourceA sourceB targetA targetB h N D) :
+    BostanJetRecurrence sourceA sourceB targetA targetB h := by
+  rcases bostanDenominatorsNonzero hp with ⟨h5, h7, _⟩
+  exact BostanJetRecurrence.of_normalizedFirstOrderPrefix
+    sourceA sourceB targetA targetB h
+      (NormalizedRationalMapJetCertificate.to_firstOrderPrefix
+        sourceA sourceB targetA targetB h N D hcert)
+      h5 h7 (fun k hk3 hk7 ↦ bostanStepDenominatorsNonzero hp hk3 hk7)
 
 /-- The seven coefficients satisfying the H116 recurrence are unique. -/
 theorem BostanJetRecurrence.unique
@@ -798,11 +1251,19 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms NormalizedIsogenyFirstOrderEquation.base_coefficients
 #print axioms NormalizedRationalMapSeriesCertificate.to_firstOrder
 #print axioms NormalizedRationalMapPolynomialCertificate.to_firstOrder
+#print axioms PowerSeriesPrefixEq.derivative
+#print axioms PowerSeriesPrefixEq.cancel_left
+#print axioms NormalizedRationalMapJetCertificate.to_firstOrderPrefix
+#print axioms NormalizedIsogenyFirstOrderPrefix.to_secondOrderPrefix
+#print axioms NormalizedIsogenyFirstOrderPrefix.base_coefficients
 #print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation
+#print axioms BostanJetRecurrence.of_normalizedSecondOrderPrefix
 #print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation_zmod
 #print axioms BostanJetRecurrence.of_normalizedFirstOrderEquation
+#print axioms BostanJetRecurrence.of_normalizedFirstOrderPrefix
 #print axioms BostanJetRecurrence.of_normalizedFirstOrderEquation_zmod
 #print axioms BostanJetRecurrence.of_normalizedRationalMapPolynomialCertificate_zmod
+#print axioms BostanJetRecurrence.of_normalizedRationalMapJetCertificate_zmod
 #print axioms BostanJetRecurrence.unique
 #print axioms fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 

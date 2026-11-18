@@ -76,6 +76,26 @@ independently validating `N,D` for the actual isogeny remains open; the
 certificate theorem does not assert that arbitrary polynomials are an isogeny.
 [pcc:unverified]
 
+For the frozen `J=8` endpoint, the full polynomial equality is stronger than
+needed. `NormalizedRationalMapJetCertificate` replaces it by
+
+```text
+D(0) = 1,
+D U = N                         mod w^11,
+(1+A w²+B w³)H² =
+  D N³ + Atilde w² N D³ + Btilde w³ D⁴   mod w^10.
+```
+
+Lean proves this fixed certificate implies the same recurrence for every prime
+`p>19`. The quotient needs one extra coefficient because it is differentiated;
+the resulting first-order identity is known modulo `w^10`, and differentiating
+again yields the second-order identity modulo `w^9`. The final recurrence step
+reads coefficient eight, so no higher coefficient is used. Verification thus
+accepts 11 coefficients of each of `N,D`, independent of `r`. Constructing the
+correct prefixes and proving that they encode the intended kernel quotient are
+not supplied by this theorem and remain in the candidate cost boundary.
+[pcc:unverified]
+
 The excluded `p=31`, `r=37` control now constructs an actual Vélu `N,D`,
 checks this identity twice in independent Rust/Python implementations and
 matches the recurrence through degree eight. The full degree-`r` construction

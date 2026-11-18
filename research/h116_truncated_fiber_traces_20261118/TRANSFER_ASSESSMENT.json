@@ -29,7 +29,7 @@
   },
   "obligations": {
     "existence": {"state":"supported","evidence":["H115 factorization and prime-order fixtures", "COHORT_V2_GATE.md independent structural verification"],"scope":"ordinary non-anomalous toy curves"},
-    "explicit_construction": {"state":"unknown","evidence":[],"scope":"short Laurent jet without dense degree-r map"},
+    "explicit_construction": {"state":"unknown","evidence":["JET_CERTIFICATE_EXPERIMENT.md proves fixed-size verification only"],"scope":"construct the correct eleven-coefficient N,D jet without dense degree-r map"},
     "map_correctness": {"state":"unknown","evidence":[],"scope":"all frozen targets and coordinate isomorphisms"},
     "subgroup_preservation": {"state":"supported","evidence":["same Q and full fiber of V-1; no destination DLP transfer"],"scope":"prime-order source subgroup"},
     "computational_advantage": {"state":"unknown","evidence":[],"scope":"cold and online candidate versus direct enumeration"},
@@ -40,7 +40,7 @@
     "kernel_intersection": "not_applicable: destination is a fiber trace, not an injective group transfer",
     "recovery_map": "candidate moments feed the separately frozen radix-six predicate/decoder",
     "scalar_multiplier": null,
-    "proof_artifact": "PROOF_MAP.md and lean/H116FiberTrace.lean; a finite reversed numerator/denominator certificate implies the recurrence, and MAP_CERTIFICATE_EXPERIMENT.md records one independently replayed excluded-fixture Vélu certificate"
+    "proof_artifact": "PROOF_MAP.md and lean/H116FiberTrace.lean; a full finite certificate and an eleven-coefficient quotient/ten-coefficient curve-identity certificate each imply the recurrence. MAP_CERTIFICATE_EXPERIMENT.md and JET_CERTIFICATE_EXPERIMENT.md record independently replayed excluded-fixture controls"
   },
   "mechanism": {
     "proposed_benefit": "replace r explicit extension-field summands by a fixed-length base-field Laurent calculation",
@@ -97,7 +97,7 @@
   ],
   "open_obligations": [
     "prove trace and residue identities",
-    "produce the actual normalized isogeny reversed numerator/denominator polynomials and independently validate NormalizedRationalMapPolynomialCertificate; that finite certificate now implies the complete recurrence for frozen prime p>19",
+    "construct the correct eleven reversed numerator/denominator coefficients without first constructing the dense degree-r map, and prove that this prefix represents the intended kernel quotient; the fixed certificate already implies the complete recurrence for frozen prime p>19",
     "construct and validate candidate source",
     "bind independent verifier before scoring",
     "measure through EKS and test the fixed predicate family",

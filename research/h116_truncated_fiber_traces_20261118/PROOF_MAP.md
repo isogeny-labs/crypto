@@ -51,7 +51,10 @@ This map is written before the first H116 Lean declaration.
    be discharged by a checked polynomial identity rather than a trusted map
    evaluator. One excluded `p=31`, `r=37` Vélu control constructs this
    certificate and passes an independent Python replay; this is not an admitted
-   H116 run or a fast-construction proof.
+   H116 run or a fast-construction proof. A second formal bridge now proves
+   that only eleven quotient coefficients and ten cleared-identity
+   coefficients are required to force the same nine recurrence coefficients;
+   the excluded fixture passes the exact boundary and mutation controls.
    [pcc:unverified]
 6. **Inheritance table.** Below. A blank or `lookup pending` entry blocks the
    first Lean edit.
@@ -93,10 +96,61 @@ This map is written before the first H116 Lean declaration.
 | transformed equation (14) implies transformed equation (15) | instance law | H116 Lean module | field, source/target coefficients, normalized PowerSeries | `NormalizedIsogenyFirstOrderEquation`; the normalized series definition proves the cancelled factor nonzero |
 | transformed equation (14) forces the initial coefficients and finite recurrence | instance law | H116 Lean module | field or `ZMod p`, source/target coefficients, normalized PowerSeries | nonzero 5, 7 and recurrence denominators; prime specialization uses `p>19` |
 | reversed numerator/denominator certificate implies transformed equation (14) and the recurrence | instance law | H116 Lean module | field or `ZMod p`, normalized series, finite polynomials `N,D` | `D(0)=1`, `DU=N`, one displayed cleared-denominator polynomial identity; prime specialization uses `p>19` |
+| fixed rational-map jet certificate implies the recurrence | instance law | H116 Lean module | field or `ZMod p`, normalized series, finite prefixes of `N,D` | `D(0)=1`, `DU=N mod X^11`, cleared identity modulo `X^10`; prime specialization uses `p>19` |
 | transformed normalized-isogeny equation implies the finite recurrence | instance law | H116 Lean module | field or `ZMod p`, source/target coefficients, coefficient function | PowerSeries equation (15), initial `h₁,h₂`; generic denominator premises or prime `p>19` |
 | `Y_j` fiber identity | endpoint | H116 | isogeny coordinate data | normalized differential formula, non-2-torsion target |
 | Frobenius low-jet specialization | instance obligation or explicit premise | crypto-lean candidate | elliptic formal group | ordinary `E/F_p`, `V+pi=[t]` |
 | conditional decoder cost | endpoint | H116/H115 theorem reuse | cyclic prime-order group | exact public digit predicate and `r^o(1)` evaluator |
+
+## Low-jet certificate instance gate
+
+The fixed-size certificate is expressed by equality after
+`PowerSeries.trunc n`; `trunc n` retains exactly the coefficients of degrees
+strictly below `n`.  The local definition is
+`PowerSeriesPrefixEq n f g := trunc n f = trunc n g`.  It adds no new
+structure above Mathlib power series and polynomials.
+
+The exact proof dependencies frozen before the first Lean source edit were:
+
+| Required step | Theorem used as stated / planned local lemma | Precision effect |
+| --- | --- | --- |
+| replace either factor by an equal prefix | `PowerSeries.trunc_trunc_mul`, `PowerSeries.trunc_mul_trunc`, `PowerSeries.trunc_trunc_mul_trunc` | preserves `n` |
+| replace a power by an equal prefix | `PowerSeries.trunc_trunc_pow` | preserves `n` |
+| differentiate an equal prefix | `PowerSeries.trunc_derivative` plus congruence of `Polynomial.derivative` | input `n+1`, output `n` |
+| read an individual coefficient | `PowerSeries.coeff_coe_trunc_of_lt` | requires `k<n` |
+| cancel a unit series | `PowerSeries.inv_mul_cancel`, after multiplying both prefixes by the inverse | preserves `n`; requires nonzero constant coefficient |
+| lower the known precision | `PowerSeries.trunc_trunc_of_le` | from `n` to any `m<=n` |
+
+The certificate object consists of the reversed numerator and denominator
+series `N,D`, the normalized quotient prefix `U`, and the two cleared factors
+already used by `NormalizedRationalMapSeriesCertificate`.  It requires only:
+
+1. `D(0)=1`;
+2. `D*U=N` modulo `X^11`;
+3. the displayed cleared rational-map identity modulo `X^10`.
+
+The assembly probe established prefix reflexivity, symmetry,
+transitivity, monotonicity, addition, subtraction, multiplication, powers,
+derivation and unit cancellation in a temporary file importing the pre-edit
+H116 module. Only after those laws typechecked was the fixed certificate added
+to the project source. No limit override was used.
+
+The precision budget is explicit.  The quotient identity loses one
+coefficient when differentiated, giving the first-order curve equation modulo
+`X^10`.  Differentiating that equation loses one more coefficient, giving the
+normalized ODE modulo `X^9`.  Coefficients of degrees zero through eight then
+force the same two base coefficients and seven recurrence steps already proved
+for the full identity.  Thus the certificate carries eleven coefficients
+(degrees zero through ten) to certify the nine recurrence coefficients; the
+last two are derivative guards, not decoded moments.
+[pcc:unverified]
+
+This gate discharges only fixed-size verification.  Constructing those eleven
+correct coefficients from a generic prime-field isogeny, proving that they
+represent the intended kernel quotient, and bounding that construction below
+generic square-root work remain separate endpoint obligations.  The generic
+prefix congruence lemmas are plausible `crypto-lean` candidates, but remain
+local to H116 until the study demonstrates a reusable theorem boundary.
 
 ## Inheritance table
 

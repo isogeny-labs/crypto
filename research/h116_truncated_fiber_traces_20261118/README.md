@@ -116,6 +116,16 @@ one-coefficient mutation. This is proof/control evidence only: the degree-`r`
 construction is not charged as the fixed-length candidate and no gated H116
 target was read. [pcc:unverified]
 
+The follow-on [fixed low-jet experiment](JET_CERTIFICATE_EXPERIMENT.md) removes
+the full polynomial degree from the **verification** interface. Lean proves
+that `D*U=N mod X^11` plus the cleared curve identity modulo `X^10` forces the
+nine coefficients needed by the complete recurrence for prime `p>19`. The
+excluded `p=31`, `r=37` replay used 22 numerator/denominator coefficient slots
+instead of all 75, and passed in-window, derivative-guard and out-of-window
+mutation controls. This does not remove the degree-`r` cost of constructing the
+correct low jet or certify its intended kernel semantics; those remain the
+active algorithmic obligations. [pcc:unverified]
+
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
 `(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying

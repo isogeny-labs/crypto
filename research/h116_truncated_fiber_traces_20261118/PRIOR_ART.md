@@ -52,3 +52,27 @@ degree-`r` endomorphism `V-1` in the H115 digit experiment. That search gap is
 not a novelty claim. The identities themselves are elementary consequences to
 prove and test [pcc:unverified]; the ECDLP-relevant question is whether a fixed public predicate
 of the resulting moments returns scalar digits on held-out curves.
+
+## Fixed-prefix certificate follow-up
+
+Before formalizing the low-jet certificate, the shared KB wrapper was queried
+for all of the following phrases:
+
+```text
+truncated power series congruence unit cancellation coefficient prefix isogeny
+Bostan isogeny differential equation truncated jet recurrence formal power series
+low jet certificate rational map elliptic curve isogeny numerator denominator
+negative full degree isogeny map required low coefficients
+```
+
+The theorem lookup also queried truncation, multiplication, differentiation and
+unit cancellation for `PowerSeries`. The shared wrapper returned no executable
+result, so the fallback was a declaration-level search in the pinned Mathlib
+source. That located `PowerSeries.trunc_trunc_mul_trunc`,
+`PowerSeries.trunc_trunc_pow`, `PowerSeries.trunc_derivative`,
+`PowerSeries.coeff_coe_trunc_of_lt` and `PowerSeries.inv_mul_cancel`, which are
+used as stated in the Lean proof. The Bostan et al. paper remains the primary
+source for the differential equation and recurrence. This scoped search found
+no cited result asserting H116's exact `11 -> 10 -> 9` fixed-prefix certificate,
+but absence from these queries is not a publication-novelty claim.
+[pcc:unverified]
