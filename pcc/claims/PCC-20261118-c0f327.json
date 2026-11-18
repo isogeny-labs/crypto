@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T19:31:54Z",
+ "id": "PCC-20261118-c0f327",
+ "kind": "statement",
+ "producer": {
+  "commit": "724b6d2f18e46efd943498729401d1db9fd5cddd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/metrics-development-qualification.json",
+    "sha256": "8d00a2f151708dfbae3014868299199951e72bd6cafec03f79e66f20ea32a3fa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "tools/progress_metrics.py",
+    "sha256": "22b1924d0aa4ab2272ba149cf71671d7c64ce2307306c4302c1f9e36cc13ed5c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118",
+ "statement": "Scoped progress-metric development controls preserve the prior fixed n7351 row and emit the separately labelled new n9551 row only with generated/replayed/changed-subject gates. Missing new source and five negative admission controls produce no new row. This does not assert a passing full exporter; the separately retained malformed timeline JSON failure remains. No measured crossing or speed result is emitted."
+}

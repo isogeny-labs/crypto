@@ -187,3 +187,19 @@ the 96-case direct-root oracle and PARI verification passed in the publishing
 runtime. Cargo is not installed: `cargo test --release --lib` returned 127;
 no Rust/library execution path changed. Conductor is not installed, as
 documented as nonblocking in `docs/CONDUCTOR.md`.
+
+
+## Larger fixed conductor arithmetic, 18 November
+
+The separate [published n=9551 fixture](published-lucas-9551-20261118/RESULTS.md)
+now has a complete PARI ECPP certificate and fresh-process replay for its
+4774-bit prime Frobenius conductor (1438 decimal digits). Native GP and
+C++/GMP arithmetic agree. The original direct timeout and successful staged
+continuation are both retained. PCC-20261118-0282a8 remains an unsigned,
+unverified/not_covered producer statement. [pcc:unverified]
+
+The source y²+xy=x³+1 over GF(2^9551) still has geometric endomorphism
+conductor 1. This arithmetic fixture supplies no lower endpoint or evaluated
+map; the original 80-bit source/kernel and measurement criteria remain open.
+The [paired planner component](paired-schedule-20261118/README.md) is qualified
+separately; no new endpoint performance session has executed.

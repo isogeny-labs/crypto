@@ -1,0 +1,86 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T19:30:12Z",
+ "id": "PCC-20261118-0282a8",
+ "kind": "statement",
+ "producer": {
+  "commit": "724b6d2f18e46efd943498729401d1db9fd5cddd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/summary.json",
+    "sha256": "9a2afb8003f69915e195aec76ea57a863dd9550b54da9b69878bf3243c05ebd6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/attempt-b/conductor.cert",
+    "sha256": "8e644db3eb73426d96209c5e4547d07958b2a56a4f4e79049a7103dc73521be9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/attempt-b/certificate.stdout",
+    "sha256": "523ff97dd087f72fbf7d5f5e43e7a92a202632b2f1ba06ea82e12bb9a4ccbbc0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/attempt-b/replay.stdout",
+    "sha256": "e8f30382e80a91f38fec61b37ec162ebcdd26b35f042a541525a96d45f762c46"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/attempt-b/qualification.stdout",
+    "sha256": "fc201ef4978cba8955d3a3701f08f5daba078fd04f3940c4b18062e9023e8569"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/attempt-a/certificate.exit",
+    "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/pre-check.sha256",
+    "sha256": "3c408ad09b64f6c096330a98e45608d9dd34c30e42f86558b66a045a3dd79eab"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/staged-pre-check.sha256",
+    "sha256": "bafd5daf6c474e97a9b8f23915fc414da7a3ee0c7e892f2517ae63e5881939b0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/post-check-final.stdout",
+    "sha256": "9ed36a5697bec4e2a786e2a4d614d7d44d228ce21df9788f44c3b8b53586c205"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/staged-post-check.stdout",
+    "sha256": "27e951fd43a24aec47d5dfef0b9070998bb007b14a3bef088a63e5072aa015b7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118",
+ "statement": "Fixed published n=9551 has an exact 4774-bit Frobenius conductor with 1438 decimal digits. Native C++/GMP and GP recurrence/matrix arithmetic agree. After the retained direct-attempt timeout, documented staged ECPP produces a complete 506338-byte PARI certificate; a fresh GP process recomputes the subject, accepts replay and rejects a changed subject, with zero exits/empty stderr. Source geometric endomorphism conductor remains 1. No second curve, evaluated isogeny, endpoint timing or world record is established. This is unsigned producer evidence; partial chains alone were never accepted."
+}
