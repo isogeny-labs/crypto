@@ -619,8 +619,534 @@ fn check_run(
     );
 }
 
+fn check_batch(
+    base_path: &str,
+    full_base_path: &str,
+    prior_path: &str,
+    public_path: &str,
+    checker_path: &str,
+    run_path: &str,
+) {
+    let base_bytes = fs::read(base_path).unwrap();
+    let full_base_bytes = fs::read(full_base_path).unwrap();
+    let prior_bytes = fs::read(prior_path).unwrap();
+    let public_bytes = fs::read(public_path).unwrap();
+    let checker_bytes = fs::read(checker_path).unwrap();
+    let run_bytes = fs::read(run_path).unwrap();
+    let base: Value = serde_json::from_slice(&base_bytes).unwrap();
+    let full_base: Value = serde_json::from_slice(&full_base_bytes).unwrap();
+    let prior: Value = serde_json::from_slice(&prior_bytes).unwrap();
+    let public: Value = serde_json::from_slice(&public_bytes).unwrap();
+    let checker: Value = serde_json::from_slice(&checker_bytes).unwrap();
+    let records: Vec<Value> = run_bytes
+        .split(|&byte| byte == b'\n')
+        .filter(|line| !line.is_empty())
+        .map(|line| serde_json::from_slice(line).unwrap())
+        .collect();
+    assert_eq!(
+        records.len(),
+        65,
+        "64 target records plus one summary required"
+    );
+    let summary = &records[64];
+    let arm = summary["arm"].as_str().unwrap();
+    let round = summary["round"].as_u64().unwrap();
+    assert!(round < 3);
+    assert!(matches!(
+        arm,
+        "direct-dual"
+            | "direct-inverse"
+            | "destination-direct"
+            | "source-bsgs"
+            | "rho-negation"
+            | "rho-negation-aa"
+    ));
+    let relation_arm = matches!(arm, "direct-dual" | "direct-inverse" | "destination-direct");
+    let destination_relation = arm == "destination-direct";
+    assert_eq!(public["schema"], "isogeny_dual_batch_public/v1");
+    assert_eq!(checker["schema"], "isogeny_dual_batch_checker/v1");
+    assert_eq!(checker["public_sha256"], sha256_hex(&public_bytes));
+    assert_eq!(public["prior_public_sha256"], sha256_hex(&prior_bytes));
+    assert_eq!(public["targets"].as_array().unwrap().len(), 64);
+    assert_eq!(checker["scalars"].as_array().unwrap().len(), 64);
+    assert_eq!(summary["schema"], "isogeny_dual_batch_summary/v1");
+    assert_eq!(summary["base_public_sha256"], sha256_hex(&base_bytes));
+    assert_eq!(summary["batch_public_sha256"], sha256_hex(&public_bytes));
+    assert_eq!(summary["columns"], 64);
+    assert_eq!(summary["target_count"], 64);
+    assert_eq!(summary["completed_targets"], 64);
+    assert_eq!(summary["status"], "pass");
+    assert_eq!(full_base["schema"], "isogeny_fiber_base_grid_public/v1");
+    if arm == "direct-dual" {
+        assert_eq!(base["schema"], "isogeny_dual_projected_public/v1");
+        assert!(base.get("base_witness_source").is_none());
+        assert_eq!(
+            base["parent_full_base_sha256"],
+            sha256_hex(&full_base_bytes)
+        );
+    } else {
+        assert_eq!(base_bytes, full_base_bytes);
+    }
+    let f = Field { p: 211, nu: 2 };
+    let torsion = Point {
+        x: [3, 0],
+        y: [1, 0],
+        infinity: false,
+    };
+    let generator = point(&public["generator"]);
+    let mapped_generator = point(&public["mapped_generator"]);
+    assert_eq!(generator, point(&prior["generator"]));
+    assert_eq!(mapped_generator, point(&prior["mapped_generator"]));
+    assert_eq!(velu(f, generator, torsion), mapped_generator);
+    assert_eq!(scalar_mul(f, [190, 0], generator, 229), identity());
+    let mut signed = Vec::new();
+    let mut expected_positive = Vec::new();
+    if relation_arm {
+        if destination_relation {
+            let (projected, scanned) = destination_direct_base_check(f, 64);
+            assert_eq!(summary["candidate_count"], scanned);
+            expected_positive = projected;
+        } else {
+            let dual_kernel = if arm == "direct-dual" {
+                let (kernel, searched) = independent_dual_kernel(f);
+                assert_eq!(summary["dual_stats"]["kernel_x"][0], kernel.x[0]);
+                assert_eq!(summary["dual_stats"]["kernel_x"][1], kernel.x[1]);
+                assert_eq!(summary["dual_stats"]["kernel_y"][0], kernel.y[0]);
+                assert_eq!(summary["dual_stats"]["kernel_y"][1], kernel.y[1]);
+                assert_eq!(summary["dual_stats"]["kernel_points_scanned"], searched);
+                assert_eq!(dual_codomain_check(f, kernel), ([198, 0], [176, 0]));
+                let (_, scanned) = destination_direct_base_check(f, 64);
+                assert_eq!(summary["candidate_count"], searched + scanned);
+                assert_eq!(summary["dual_stats"]["destination_points_scanned"], scanned);
+                assert_eq!(summary["dual_stats"]["dual_evaluations"], 64);
+                assert_eq!(summary["dual_stats"]["source_multiplications"], 64);
+                assert_eq!(summary["dual_stats"]["forward_checks"], 64);
+                Some(kernel)
+            } else {
+                None
+            };
+            for index in 0..64 {
+                let witness = point(&full_base["base_witness_source"][index]);
+                let subgroup = scalar_mul(f, [190, 0], witness, 195);
+                let projected = point(&full_base["base_projected_destination"][index]);
+                assert_eq!(velu(f, subgroup, torsion), projected);
+                assert_eq!(point(&base["base_projected_destination"][index]), projected);
+                if let Some(kernel) = dual_kernel {
+                    let back = dual_eval_check(f, kernel, projected);
+                    assert_eq!(scalar_mul(f, [190, 0], back, 153), subgroup);
+                }
+                expected_positive.push(subgroup);
+            }
+            if arm == "direct-inverse" {
+                let stats = &summary["inverse_stats"];
+                let scanned = stats["destination_points"].as_u64().unwrap();
+                assert_eq!(summary["candidate_count"], scanned);
+                assert_eq!(stats["polynomial_calls"], scanned);
+                assert_eq!(
+                    stats["rejected_no_root"].as_u64().unwrap()
+                        + stats["rejected_no_lift"].as_u64().unwrap()
+                        + stats["rejected_map_mismatch"].as_u64().unwrap()
+                        + stats["accepted_image_points"].as_u64().unwrap(),
+                    scanned
+                );
+            }
+        }
+        let reported: Vec<Point> = summary["positive_base"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(point)
+            .collect();
+        assert_eq!(reported, expected_positive);
+        for subgroup in expected_positive {
+            signed.push(subgroup);
+            signed.push(neg(f, subgroup));
+        }
+    } else {
+        assert_eq!(summary["candidate_count"], 0);
+        assert!(summary["positive_base"].as_array().unwrap().is_empty());
+    }
+    let query_a = if destination_relation {
+        [130, 0]
+    } else {
+        [190, 0]
+    };
+    let query_g = if destination_relation {
+        mapped_generator
+    } else {
+        generator
+    };
+    let mut used_scalars = BTreeSet::new();
+    let mut total_query_adds = 0u64;
+    let mut total_query_doubles = 0u64;
+    let mut total_verify_adds = 0u64;
+    let mut total_verify_doubles = 0u64;
+    let mut total_query_fp_muls = 0u64;
+    let mut total_query_fp_invs = 0u64;
+    let mut total_verify_fp_muls = 0u64;
+    let mut total_verify_fp_invs = 0u64;
+    let mut total_query_cpu = 0u64;
+    let mut total_verify_cpu = 0u64;
+    let mut total_trials = 0u64;
+    let mut total_witnesses = 0usize;
+    for (position, record) in records.iter().take(64).enumerate() {
+        assert_eq!(record["schema"], "isogeny_dual_batch_target/v1");
+        assert_eq!(record["base_public_sha256"], sha256_hex(&base_bytes));
+        assert_eq!(record["batch_public_sha256"], sha256_hex(&public_bytes));
+        assert_eq!(record["arm"], arm);
+        assert_eq!(record["round"], round);
+        assert_eq!(record["position"], position);
+        let seed = (0x2026_1015u64 ^ 211)
+            .wrapping_add(round.wrapping_mul(0x9e37_79b9))
+            .wrapping_add(((position + 64) as u64).wrapping_mul(0x0123_4567));
+        assert_eq!(record["seed"], seed);
+        let target = point(&public["targets"][position]["source"]);
+        let mapped_target = point(&public["targets"][position]["destination"]);
+        if position < 4 {
+            assert_eq!(public["targets"][position], prior["targets"][position]);
+        }
+        assert_eq!(point(&record["target"]), target);
+        assert_eq!(point(&record["mapped_target"]), mapped_target);
+        assert!(on_curve(f, [190, 0], [37, 0], target));
+        assert!(on_curve(f, [130, 0], [179, 0], mapped_target));
+        assert_eq!(velu(f, target, torsion), mapped_target);
+        let expected_scalar = checker["scalars"][position].as_u64().unwrap();
+        assert!(expected_scalar > 0 && expected_scalar < 229);
+        assert!(used_scalars.insert(expected_scalar));
+        assert_eq!(scalar_mul(f, [190, 0], generator, expected_scalar), target);
+        assert_eq!(
+            scalar_mul(f, [130, 0], mapped_generator, expected_scalar),
+            mapped_target
+        );
+        assert_eq!(record["recovered"], expected_scalar);
+        assert_eq!(record["verified"], true);
+        assert_eq!(record["status"], "pass");
+        let query_q = if destination_relation {
+            mapped_target
+        } else {
+            target
+        };
+        let mut rows = Vec::new();
+        for witness in record["relation_witnesses"].as_array().unwrap() {
+            let a = witness["a"].as_u64().unwrap();
+            let b = witness["b"].as_u64().unwrap();
+            let i = witness["i"].as_u64().unwrap() as usize;
+            let j = witness["j"].as_u64().unwrap() as usize;
+            assert!(a < 229 && b < 229 && i <= j && j < signed.len());
+            let probe = add(
+                f,
+                query_a,
+                scalar_mul(f, query_a, query_g, a),
+                scalar_mul(f, query_a, query_q, b),
+            );
+            let projected = scalar_mul(f, query_a, probe, 195);
+            assert_eq!(point(&witness["projected"]), projected);
+            assert_eq!(add(f, query_a, signed[i], signed[j]), projected);
+            let mut row = vec![0u64; 66];
+            for index in [i, j] {
+                let coefficient = if index % 2 == 0 { 1 } else { 228 };
+                row[index / 2] = (row[index / 2] + coefficient) % 229;
+            }
+            row[64] = (229 - modmul_229(195, b)) % 229;
+            row[65] = modmul_229(195, a);
+            rows.push(row);
+        }
+        if relation_arm {
+            assert_eq!(record["relations"], rows.len());
+            assert!(record["trials"].as_u64().unwrap() <= 1832);
+            let (rank, answer) = independent_row_solve(&rows, 65);
+            assert_eq!(record["rank"], rank);
+            assert_eq!(rank, 65);
+            assert_eq!(answer.unwrap()[64], expected_scalar);
+        } else {
+            assert!(rows.is_empty());
+            assert_eq!(record["relations"], 0);
+            assert_eq!(record["rank"], 0);
+        }
+        let query_cpu = record["query_cpu_ns"].as_u64().unwrap();
+        assert_eq!(
+            record["relation_cpu_ns"].as_u64().unwrap()
+                + record["row_cpu_ns"].as_u64().unwrap()
+                + record["recovery_cpu_ns"].as_u64().unwrap(),
+            query_cpu
+        );
+        total_query_cpu += query_cpu;
+        total_verify_cpu += record["verify_cpu_ns"].as_u64().unwrap();
+        total_query_adds += record["query_group_ops"]["adds"].as_u64().unwrap();
+        total_query_doubles += record["query_group_ops"]["doubles"].as_u64().unwrap();
+        total_verify_adds += record["verify_group_ops"]["adds"].as_u64().unwrap();
+        total_verify_doubles += record["verify_group_ops"]["doubles"].as_u64().unwrap();
+        total_query_fp_muls += record["query_fp_muls"].as_u64().unwrap();
+        total_query_fp_invs += record["query_fp_invs"].as_u64().unwrap();
+        total_verify_fp_muls += record["verify_fp_muls"].as_u64().unwrap();
+        total_verify_fp_invs += record["verify_fp_invs"].as_u64().unwrap();
+        total_trials += record["trials"].as_u64().unwrap();
+        total_witnesses += rows.len();
+    }
+    assert_eq!(used_scalars.len(), 64);
+    assert_eq!(summary["query_group_ops"]["adds"], total_query_adds);
+    assert_eq!(summary["query_group_ops"]["doubles"], total_query_doubles);
+    assert_eq!(summary["verify_group_ops"]["adds"], total_verify_adds);
+    assert_eq!(summary["verify_group_ops"]["doubles"], total_verify_doubles);
+    assert_eq!(summary["query_fp_muls"], total_query_fp_muls);
+    assert_eq!(summary["query_fp_invs"], total_query_fp_invs);
+    assert_eq!(summary["verify_fp_muls"], total_verify_fp_muls);
+    assert_eq!(summary["verify_fp_invs"], total_verify_fp_invs);
+    assert_eq!(summary["query_cpu_ns"], total_query_cpu);
+    assert_eq!(summary["verify_cpu_ns"], total_verify_cpu);
+    assert_eq!(summary["trials"], total_trials);
+    assert_eq!(summary["relation_witnesses"], total_witnesses);
+    assert_eq!(
+        summary["setup_cpu_ns"].as_u64().unwrap()
+            + total_query_cpu
+            + total_verify_cpu
+            + summary["other_cpu_ns"].as_u64().unwrap(),
+        summary["total_cpu_ns"].as_u64().unwrap()
+    );
+    assert!(summary["total_wall_ns"].as_u64().unwrap() > 0);
+    assert!(summary["peak_rss_bytes"].as_u64().unwrap() <= 512 * 1024 * 1024);
+    println!(
+        "{}",
+        json!({"schema":"isogeny_dual_batch_replay/v1",
+        "run_sha256":sha256_hex(&run_bytes),"arm":arm,"round":round,
+        "scalar_checks":128,"target_count":64,"relation_witnesses":total_witnesses,
+        "rank_checks":if relation_arm {64} else {0},"status":"pass"})
+    );
+}
+
+fn audit_batch(run_dir: &str) {
+    let arms = [
+        "direct-dual",
+        "direct-inverse",
+        "destination-direct",
+        "source-bsgs",
+        "rho-negation",
+        "rho-negation-aa",
+    ];
+    let mut compared = 0usize;
+    let mut matched_witnesses = 0usize;
+    let mut mismatches = Vec::new();
+    for round in 0..3 {
+        let mut records = BTreeMap::new();
+        for arm in arms {
+            let path = format!("{run_dir}/r{round}-{arm}.jsonl");
+            let bytes = fs::read(&path).unwrap();
+            let parsed: Vec<Value> = bytes
+                .split(|&byte| byte == b'\n')
+                .filter(|line| !line.is_empty())
+                .map(|line| serde_json::from_slice(line).unwrap())
+                .collect();
+            assert_eq!(parsed.len(), 65, "{path} has an incomplete target panel");
+            assert_eq!(parsed[64]["status"], "pass");
+            records.insert(arm, parsed);
+        }
+        let dual = &records["direct-dual"];
+        let inverse = &records["direct-inverse"];
+        let destination = &records["destination-direct"];
+        let rho = &records["rho-negation"];
+        let rho_aa = &records["rho-negation-aa"];
+        assert_eq!(dual[64]["positive_base"], inverse[64]["positive_base"]);
+        for position in 0..64 {
+            let d = &dual[position];
+            let i = &inverse[position];
+            let e = &destination[position];
+            for key in [
+                "seed",
+                "position",
+                "target",
+                "mapped_target",
+                "trials",
+                "relations",
+                "rank",
+                "recovered",
+                "query_group_ops",
+                "relation_witnesses",
+            ] {
+                if d[key] != i[key] {
+                    mismatches.push(format!(
+                        "round {round} target {position} dual/inverse {key}"
+                    ));
+                }
+            }
+            for key in [
+                "seed",
+                "position",
+                "trials",
+                "relations",
+                "rank",
+                "recovered",
+            ] {
+                if d[key] != e[key] {
+                    mismatches.push(format!("round {round} target {position} destination {key}"));
+                }
+            }
+            let d_witnesses = d["relation_witnesses"].as_array().unwrap();
+            let e_witnesses = e["relation_witnesses"].as_array().unwrap();
+            if d_witnesses.len() != e_witnesses.len() {
+                mismatches.push(format!(
+                    "round {round} target {position} destination witness count"
+                ));
+            } else {
+                for (dw, ew) in d_witnesses.iter().zip(e_witnesses) {
+                    for key in ["a", "b", "i", "j"] {
+                        if dw[key] != ew[key] {
+                            mismatches.push(format!(
+                                "round {round} target {position} destination witness {key}"
+                            ));
+                        }
+                    }
+                }
+            }
+            for key in [
+                "seed",
+                "position",
+                "target",
+                "mapped_target",
+                "trials",
+                "recovered",
+                "query_group_ops",
+            ] {
+                if rho[position][key] != rho_aa[position][key] {
+                    mismatches.push(format!("round {round} target {position} rho A/A {key}"));
+                }
+            }
+            matched_witnesses += d_witnesses.len();
+            compared += 1;
+        }
+    }
+    let passed = mismatches.is_empty();
+    println!(
+        "{}",
+        json!({"schema":"isogeny_dual_batch_pair_audit/v1",
+        "paired_targets":compared,"relation_witnesses":matched_witnesses,
+        "mismatches":mismatches,"status":if passed {"pass"} else {"fail"}})
+    );
+    assert!(passed, "paired batch relation or control mismatch");
+}
+
+fn summarize_batch(run_dir: &str, summary_path: &str, svg_path: &str) {
+    let arms = [
+        "direct-dual",
+        "direct-inverse",
+        "destination-direct",
+        "source-bsgs",
+        "rho-negation",
+        "rho-negation-aa",
+    ];
+    let denominator = 64.0 * (229.0f64).sqrt();
+    let mut rows = Vec::new();
+    let mut per_target = BTreeMap::new();
+    for arm in arms {
+        let mut totals = Vec::new();
+        let mut setup = Vec::new();
+        let mut query = Vec::new();
+        let mut verify = Vec::new();
+        let mut cpu = Vec::new();
+        let mut wall = Vec::new();
+        let mut witnesses = 0u64;
+        for round in 0..3 {
+            let path = format!("{run_dir}/children/r{round}-{arm}.jsonl");
+            let bytes = fs::read(path).unwrap();
+            let last = bytes
+                .split(|&byte| byte == b'\n')
+                .rfind(|line| !line.is_empty())
+                .unwrap();
+            let record: Value = serde_json::from_slice(last).unwrap();
+            assert_eq!(record["schema"], "isogeny_dual_batch_summary/v1");
+            assert_eq!(record["arm"], arm);
+            assert_eq!(record["round"], round);
+            assert_eq!(record["completed_targets"], 64);
+            assert_eq!(record["status"], "pass");
+            let count = |key: &str| {
+                record[key]["adds"].as_u64().unwrap() + record[key]["doubles"].as_u64().unwrap()
+            };
+            let setup_count = count("setup_group_ops");
+            let query_count = count("query_group_ops");
+            let verify_count = count("verify_group_ops");
+            setup.push(setup_count as f64);
+            query.push(query_count as f64);
+            verify.push(verify_count as f64);
+            totals.push((setup_count + query_count + verify_count) as f64);
+            cpu.push(record["total_cpu_ns"].as_u64().unwrap() as f64 / 1e6);
+            wall.push(record["total_wall_ns"].as_u64().unwrap() as f64 / 1e6);
+            witnesses += record["relation_witnesses"].as_u64().unwrap();
+        }
+        let mean = |values: &[f64]| values.iter().sum::<f64>() / values.len() as f64;
+        let s = mean(&totals) / denominator;
+        per_target.insert(arm, s);
+        rows.push(json!({"arm":arm,"rounds":3,"targets_per_round":64,
+            "mean_whole_batch_group_ops":mean(&totals),
+            "mean_setup_group_ops":mean(&setup),
+            "mean_query_group_ops":mean(&query),
+            "mean_verify_group_ops":mean(&verify),
+            "min_whole_batch_group_ops":totals.iter().copied().reduce(f64::min).unwrap(),
+            "max_whole_batch_group_ops":totals.iter().copied().reduce(f64::max).unwrap(),
+            "mean_s_group_per_target":s,
+            "mean_total_cpu_ms_l0":mean(&cpu),
+            "mean_total_wall_ms_l0":mean(&wall),
+            "relation_witnesses_across_rounds":witnesses}));
+    }
+    let result = json!({"schema":"isogeny_dual_batch_summary_table/v1",
+        "population":"same 64 public order-229 targets in each of three rounds",
+        "unit":"mean whole-batch additions and doublings / (64 sqrt(229))",
+        "isolation":"L0 shared Darwin",
+        "complete_portable_s":null,
+        "rows":rows,
+        "ratios":{"inverse_over_dual_s_group":per_target["direct-inverse"]/per_target["direct-dual"],
+            "dual_over_rho_s_group":per_target["direct-dual"]/per_target["rho-negation"],
+            "destination_over_dual_s_group":per_target["destination-direct"]/per_target["direct-dual"]}});
+    fs::write(
+        summary_path,
+        format!("{}\n", serde_json::to_string_pretty(&result).unwrap()),
+    )
+    .unwrap();
+    let mut svg = String::from("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"980\" height=\"540\" viewBox=\"0 0 980 540\"><rect width=\"980\" height=\"540\" fill=\"white\"/><text x=\"45\" y=\"38\" font-family=\"sans-serif\" font-size=\"23\">64-target reused-setup fiber panel</text><text x=\"45\" y=\"65\" font-family=\"sans-serif\" font-size=\"14\">Mean whole-batch group additions and doublings / (64 sqrt(229)); three rounds, L0 Darwin</text>");
+    for exponent in 0..=4 {
+        let y = 420 - exponent * 75;
+        svg.push_str(&format!("<line x1=\"75\" y1=\"{y}\" x2=\"945\" y2=\"{y}\" stroke=\"#dddddd\"/><text x=\"38\" y=\"{}\" font-family=\"sans-serif\" font-size=\"12\">10^{exponent}</text>", y + 4));
+    }
+    for (index, arm) in arms.iter().enumerate() {
+        let value = per_target[arm];
+        let height = value.log10().max(0.0) * 75.0;
+        let x = 92 + index * 143;
+        let y = 420.0 - height;
+        let color = if *arm == "direct-dual" {
+            "#2769a8"
+        } else if *arm == "rho-negation" {
+            "#b06520"
+        } else {
+            "#6b858e"
+        };
+        svg.push_str(&format!("<rect x=\"{x}\" y=\"{y:.1}\" width=\"78\" height=\"{height:.1}\" fill=\"{color}\"/><text x=\"{x}\" y=\"{}\" font-family=\"sans-serif\" font-size=\"13\">{value:.2}</text><text x=\"{x}\" y=\"448\" font-family=\"sans-serif\" font-size=\"12\">{arm}</text>", y - 7.0));
+    }
+    svg.push_str("<text x=\"45\" y=\"505\" font-family=\"sans-serif\" font-size=\"13\">Counted group work only; native field, square-root, table, allocation, startup, and I/O conversion remains open.</text></svg>\n");
+    fs::write(svg_path, svg).unwrap();
+    println!(
+        "{}",
+        json!({"schema":"isogeny_dual_batch_summary_written/v1",
+        "summary_sha256":sha256_hex(&fs::read(summary_path).unwrap()),
+        "svg_sha256":sha256_hex(&fs::read(svg_path).unwrap()),
+        "status":"pass"})
+    );
+}
+
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("summarize-batch") {
+        assert_eq!(args.len(), 5);
+        summarize_batch(&args[2], &args[3], &args[4]);
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("audit-batch") {
+        assert_eq!(args.len(), 3);
+        audit_batch(&args[2]);
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("check-batch") {
+        assert_eq!(args.len(), 8);
+        check_batch(&args[2], &args[3], &args[4], &args[5], &args[6], &args[7]);
+        return;
+    }
     if args.get(1).map(String::as_str) == Some("verify-dual") {
         assert_eq!(args.len(), 3);
         verify_dual_identity_check(&args[2]);
