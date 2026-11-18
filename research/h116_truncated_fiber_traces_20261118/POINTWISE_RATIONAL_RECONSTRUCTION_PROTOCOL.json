@@ -1,0 +1,80 @@
+{
+  "schema": "h116.pointwise-rational-reconstruction-protocol/v1",
+  "protocol_id": "H116-POINTWISE-RATIONAL-RECONSTRUCTION-001",
+  "status": "frozen-before-implementation-and-execution",
+  "question": "Can the pointwise formula [t-1]P-pi(P) on each frozen extension cell be reconstructed as one base-field rational x-map of predicted degrees (N,N-1), with poles exactly at nonidentity base points, enough regular samples for the proved strict separation bound, and identical coefficients across extension degrees?",
+  "parent_pointwise_protocol_sha256": "36dbefbbd7d7efba055e94d1deaa427a63dc13a94ed6561bc38e1784a3efba4a",
+  "parent_pointwise_result_sha256": "5c8f506a81280c650470dac6d2b32deca78c9e63a45282b1a579a6ace66368eb",
+  "capacity_protocol_sha256": "d58dd2215ca4922dbfc00480dabc218a59ec78e9afcd63bed5257bd04a9ce4fa",
+  "capacity_result_sha256": "eb4c9f7912f151a503c364732d0795cc3c0730515054bd42bd6a372d33a099e6",
+  "lean_source_sha256": "63ba08391dcf0de78d97df5b173d400c85f212cbd4f615f74d25573c6bde5588",
+  "cells": [
+    {"slug":"fp5-a2-b1-d2","p":5,"a":2,"b":1,"degree":2},
+    {"slug":"fp5-a2-b1-d3","p":5,"a":2,"b":1,"degree":3},
+    {"slug":"fp5-a2-b1-d4","p":5,"a":2,"b":1,"degree":4},
+    {"slug":"fp7-a1-b1-d2","p":7,"a":1,"b":1,"degree":2},
+    {"slug":"fp7-a1-b1-d3","p":7,"a":1,"b":1,"degree":3},
+    {"slug":"fp7-a1-b1-d4","p":7,"a":1,"b":1,"degree":4},
+    {"slug":"fp11-a1-b1-d2","p":11,"a":1,"b":1,"degree":2},
+    {"slug":"fp11-a1-b1-d3","p":11,"a":1,"b":1,"degree":3}
+  ],
+  "field_construction": {
+    "representation": "GF(p)[u] modulo the lexicographically first monic irreducible polynomial of the frozen degree",
+    "maximum_field_size": 2401
+  },
+  "pointwise_map": "P maps to [t-1]P-pi(P), with pi the coordinatewise p-power Frobenius; infinity is retained as a pole value",
+  "predicted_map_model": {
+    "N": "parent base-field point count",
+    "numerator_degree": "N",
+    "denominator_degree": "N-1",
+    "finite_poles": "x-values of nonidentity E(F_p) points, with multiplicity equal to the affine x-fiber size",
+    "strict_cross_degree_bound": "2*N-1",
+    "required_regular_samples": "strictly more than 2*N-1"
+  },
+  "reconstruction": {
+    "denominator": "the monic product over observed pole x-values, each repeated by its source x-fiber multiplicity",
+    "first_numerator": "degree-at-most-N interpolation of x(image)*D(x) on the first N+1 regular x-values in canonical field-index order",
+    "second_numerator": "the same interpolation on the last N+1 regular x-values",
+    "normalization": "ascending coefficients; denominator monic; every recovered coefficient must lie in the embedded base field"
+  },
+  "producer": {
+    "path": "h116_pointwise_rational_reconstruction.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "source_hash": "to be sealed before execution"
+  },
+  "independent_verifier": {
+    "path": "h116_pointwise_rational_reconstruction_verify.py",
+    "method": "separate Python field/group implementation and separate Lagrange interpolation; reconstruct every pointwise image, pole and coefficient",
+    "source_hash": "to be sealed before execution"
+  },
+  "positive_checks": [
+    "the two points above every paired x-value have the same image x-coordinate or are both mapped to infinity",
+    "the pole x-count equals the independently enumerated base-field affine x-count and total pole multiplicity equals N-1",
+    "the reconstructed denominator has degree N-1 and is nonzero exactly on every frozen regular sample",
+    "both canonical interpolation windows recover identical degree-N numerators",
+    "the recovered numerator and denominator coefficients all lie in F_p",
+    "the reconstructed fraction matches every regular sample and its numerator is nonzero at every pole",
+    "regular_sample_count is strictly greater than 2*N-1",
+    "coefficient encodings are identical across all frozen extension degrees of the same base curve"
+  ],
+  "controls": [
+    "adding one to the numerator constant coefficient rejects every regular sample",
+    "adding one to the denominator constant coefficient destroys every observed pole",
+    "restricting the regular sample to exactly 2*N-1 is recorded as failing the strict Lean cardinality premise"
+  ],
+  "measurements": [
+    "pole and regular distinct-x counts, pole multiplicity, predicted degrees and strict separation margin",
+    "both full numerator encodings and the denominator encoding",
+    "point-pair consistency, full-sample mismatches, pole cancellation failures and control rejection counts",
+    "producer and verifier elapsed nanoseconds as single-run diagnostics"
+  ],
+  "acceptance": {
+    "primary": "every positive check passes in all eight cells, every exact field matches the independent replay, and all three base-curve coefficient families are stable across extension degrees",
+    "controls": "both coefficient mutations reject at every applicable sample and the equality-boundary premise fails at exactly 2*N-1 samples",
+    "failure_policy": "retain every row and do not replace a curve, degree, interpolation window, degree model, pole rule, check, or control"
+  },
+  "claim_boundary": "This reconstructs finite-panel rational x-coordinate candidates for the pointwise formula and tests the predicted degree/pole model. It does not independently prove deg(V-1)=N, identify the candidate as a scheme morphism over the algebraic closure, transport it to the completed local series, solve ECDLP, or establish runtime or asymptotic improvement.",
+  "filed_before_affected_code": true,
+  "filed_before_affected_data": true
+}
+
