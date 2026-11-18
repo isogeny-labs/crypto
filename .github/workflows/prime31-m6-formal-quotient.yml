@@ -1,0 +1,70 @@
+name: Prime31 M6 exact formal quotient (no solver-speed claim)
+
+on:
+  push:
+    branches:
+      - automation/prime31-m6-throughput-ceiling-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_m6_formal_quotient.rs
+      - research/prime31_ic_20261115/native/verify_prime31_m6_formal_quotient.py
+      - research/prime31_ic_20261115/native/PRIME31_M6_FORMAL_COLLISION_PROTOCOL_20261118.md
+      - .github/workflows/prime31-m6-formal-quotient.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_m6_formal_quotient.rs
+      - research/prime31_ic_20261115/native/verify_prime31_m6_formal_quotient.py
+      - .github/workflows/prime31-m6-formal-quotient.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prime31-m6-formal-quotient:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout candidate branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout immutable native Rust baseline
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay ONLY the new formal-quotient example
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_m6_formal_quotient.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_m6_formal_quotient.rs
+      - name: Reused original Rust library tests
+        run: |
+          cargo +1.100.0 test --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Exact formal quotient example tests
+        run: |
+          cargo +1.100.0 test --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_m6_formal_quotient
+      - name: Original-curve exact integer and witness record
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_m6_formal_quotient > prime31-m6-formal-quotient.json
+          test -s prime31-m6-formal-quotient.json
+          cat prime31-m6-formal-quotient.json
+      - name: Independently recalculate quotient and EC collision
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_m6_formal_quotient.py \
+            prime31-m6-formal-quotient.json
+      - name: Archive exact-source record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-m6-formal-quotient-original-curve
+          path: prime31-m6-formal-quotient.json
+          if-no-files-found: warn
+          retention-days: 30
