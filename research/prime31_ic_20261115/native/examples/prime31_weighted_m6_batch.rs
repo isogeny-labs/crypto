@@ -282,7 +282,46 @@ fn exact_b2_parity_control(ar: &mut Arithmetic, base: &[Point]) {
     }
 }
 
+// Frozen external source corpus is validated by the *caller*, outside solver timing.
+// Only public points are ever passed into query_batched().
+fn load_frozen_original_1024(path: &str) -> Result<Vec<(Point, u64)>, String> {
+    let bytes = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
+    let d: serde_json::Value = serde_json::from_str(&bytes).map_err(|e| e.to_string())?;
+    if d["schema"] != "prime31.mixed_4p4_amortized_complete_ic.v1"
+        || d["target_count"] != TARGETS
+        || d["completed_unknown_target_logs"] != TARGETS
+        || d["setup_rank"] != 61
+        || d["base_log_point_replays"] != 61
+        || d["is_nongeneric_s9_extraction"] != false
+    { return Err("source corpus has wrong schema, rank or success controls".into()); }
+    let rows = d["targets"].as_array().ok_or("missing source targets")?;
+    if rows.len() != TARGETS { return Err("wrong source target count".into()); }
+    let mut ar = Arithmetic::default();
+    check_curve(PRIME31, &mut ar)?;
+    let mut seen = HashSet::<(u64, u64)>::with_capacity(TARGETS);
+    let mut result = Vec::with_capacity(TARGETS);
+    for (i, row) in rows.iter().enumerate() {
+        if row["solver"]["case"].as_u64() != Some(i as u64)
+            || row["solver"]["status"] != "complete" || row["caller_check"] != true
+        { return Err(format!("source target {i} lacks a completed caller replay")); }
+        let xy: [u64;2] = serde_json::from_value(row["solver"]["public_q"].clone())
+            .map_err(|e| format!("invalid original public point row {i}: {e}"))?;
+        let k = row["caller_only_scalar"].as_u64()
+            .ok_or_else(|| format!("source known-answer missing row {i}"))?;
+        let q = Some((xy[0], xy[1]));
+        if k == 0 || k >= PRIME31.n || !seen.insert((xy[0], xy[1]))
+            || !ar.on_curve(PRIME31, q)
+            || ar.scalar(PRIME31, k, Some(PRIME31.g)) != q
+        { return Err(format!("invalid, duplicate or false scalar row {i}")); }
+        result.push((q,k));
+    }
+    Ok(result)
+}
+
 fn main() {
+    let external = std::env::args().nth(1).map(|p| {
+        load_frozen_original_1024(&p).expect("invalid frozen original 1,024-Q corpus")
+    });
     let total_t0 = Instant::now();
     let mut ar = Arithmetic::default();
     check_curve(PRIME31, &mut ar).expect("original ordinary cofactor-one curve");
@@ -329,6 +368,8 @@ fn main() {
         "theoretical_ordered_mean_b31": format!("{:.12}",(31f64).powi(6)/PRIME31.n as f64),
         "train_seed":format!("{TRAIN_SEED:#018x}"),
         "target_seed":format!("{TARGET_SEED:#018x}"),
+        "target_corpus":if external.is_some() {"original_mixed_1024q"} else {"weighted_m6_seed"},
+        "external_corpus_validation_excluded_from_solver_timer":true,
         "setup_ns":setup_ns,"setup_cost":setup_cost,
         "train_calls":calls,"train_odd":positive,"train_rank":ranker.rank,
         "train_ns":training_ns,"train_cost":training_cost,"training":train_rows,
@@ -350,8 +391,12 @@ fn main() {
         let mut total_attempts = 0usize;
         for idx in 0..TARGETS {
             // The caller's expected scalar is NEVER passed to the query oracle.
-            let secret_for_verification_only = 1 + splitmix64(&mut rng) % (PRIME31.n - 1);
-            let q = ar.scalar(PRIME31, secret_for_verification_only, Some(PRIME31.g));
+            let (q, secret_for_verification_only) = if let Some(ref external_rows) = external {
+                external_rows[idx]
+            } else {
+                let secret = 1 + splitmix64(&mut rng) % (PRIME31.n - 1);
+                (ar.scalar(PRIME31, secret, Some(PRIME31.g)), secret)
+            };
             let mut r = q;
             let mut solved = None;
             for shift in 0..SHIFT_CAP {
@@ -396,6 +441,10 @@ mod tests {
         check_curve(PRIME31, &mut ar).unwrap();
         let b = first_rational_points(&mut ar, 2);
         exact_b2_parity_control(&mut ar, &b);
+    }
+    #[test]
+    fn frozen_corpus_fails_closed_on_missing_source() {
+        assert!(load_frozen_original_1024("/path/that/must/not/exist/for/source-gate.json").is_err());
     }
     #[test]
     fn modular_elimination_and_weighted_coefficients() {
