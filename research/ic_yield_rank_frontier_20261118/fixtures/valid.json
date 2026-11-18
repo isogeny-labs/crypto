@@ -1,0 +1,48 @@
+{
+  "schema_version": "ic.fixed-population/v1",
+  "spec_digest": "c1bad3d53e00991313717994a3357a598dfff33f8b0834c231f86b00f3e73505",
+  "identity": {
+    "curve_id": "synthetic-curve",
+    "subgroup_order": "101",
+    "generator": "G",
+    "factor_base_id": "synthetic-fb-3",
+    "factor_base_columns": 3,
+    "symmetry_quotient": "negation-pairs",
+    "target_generator": "enumerated-manifest",
+    "arity": 2,
+    "solver_version": "synthetic-1",
+    "checker_version": "population-contract-1",
+    "scalar_field": "ZMod(101)",
+    "budgets": {"max_attempts": 10, "max_seconds": 1},
+    "registered_scales": [3],
+    "row_normalization": "first-nonzero-unit"
+  },
+  "registered_targets": ["t0", "t1", "t2"],
+  "targets": [
+    {
+      "target_id": "t0", "scale": 3, "outcome": "verified",
+      "decomposition_count": 1, "attempts": 1, "terminal": true,
+      "witnesses": [{"witness_id": "w0", "summands": ["P0", "P1"], "chart": "affine", "multiplicity": 1, "verified": true}]
+    },
+    {
+      "target_id": "t1", "scale": 3, "outcome": "zero",
+      "decomposition_count": 0, "attempts": 1, "terminal": true,
+      "witnesses": []
+    },
+    {
+      "target_id": "t2", "scale": 3, "outcome": "solver_failure",
+      "decomposition_count": null, "attempts": 1, "terminal": true,
+      "witnesses": []
+    }
+  ],
+  "relations": [
+    {"relation_id": "r0", "source_target_id": "t0", "coefficients": ["1", "1", "0"], "accepted": true, "rejection_reason": null},
+    {"relation_id": "r1", "source_target_id": "t1", "coefficients": ["0", "1", "1"], "accepted": true, "rejection_reason": null},
+    {"relation_id": "r2", "source_target_id": "t2", "coefficients": ["0", "0", "0"], "accepted": false, "rejection_reason": "solver failure"}
+  ],
+  "rank_trace": [
+    {"prefix": 0, "rank": 0, "live_columns": 0, "dead_columns": 3, "support_components": 0, "duplicate_rows": 0},
+    {"prefix": 1, "rank": 1, "live_columns": 2, "dead_columns": 1, "support_components": 1, "duplicate_rows": 0},
+    {"prefix": 2, "rank": 2, "live_columns": 3, "dead_columns": 0, "support_components": 1, "duplicate_rows": 0}
+  ]
+}
