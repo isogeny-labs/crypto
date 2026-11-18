@@ -514,3 +514,10 @@ observable: `kP` and `(r-k)P=-kP` have equal negation-invariant observations
 but opposite parity when `r` is odd. The 219-theorem audit has zero failures
 and zero trusted/native decisions. A new parity route must use signed y-data or
 another nonsymmetric cover. [pcc:unverified]
+
+The frozen [signed-y follow-up](SIGNED_KUMMER_PARITY_EXPERIMENT.md) then tests
+184 nonsymmetric covers `z^2=product(y-y([j]P))`. Its selected two-anchor rule
+scores 792/1,498 with no exact rule, but 3,726/4,096 shuffled family maxima are
+at least as large (p=0.90969). Thus escaping the x-only obstruction is
+necessary but not sufficient. A more structured nonsymmetric lead must change
+the divisor, not merely the coordinate sign. [pcc:unverified]
