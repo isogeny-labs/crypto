@@ -28,6 +28,8 @@ For any fixed sets of signed slot points, the total **ordered** eight-slot witne
 | 16 | 1,099,511,627,776 | 512.008778 |
 | 31 | 218,340,105,584,896 | 101,674.277767 |
 
+For the same seven-variable RR9 resultant encoding, each B8 slot resultant has total degree **at most 16** (eight quadratic norm evaluations multiplied together), whereas B31 has degree at most **62**. The space of seven-variable monomials of *total degree ≤16* has \(\binom{23}{7}=245157\) elements versus \(\binom{69}{7}=1078897248\) at degree ≤62: an exact **4400.84× difference in the full dense monomial envelopes**, **not** a measured reduction in F4 matrix size or runtime. A factored/saturated implementation must be benchmarked before treating either envelope as a memory bill.
+
 These are unconditional first moments, not hit probabilities. They quantify a practical high-degree/multiple-root obstacle: B31 yields roughly 101,674 ordered witnesses per uniformly random residual, whereas B8 offers an expectation near two. An algebraic solver that only needs one root could still exploit higher B; these first moments do **not** prove an F4 complexity bound or preclude any attack.
 
 ## Actual local original-curve preflight (independent Python implementation, not native CI)
