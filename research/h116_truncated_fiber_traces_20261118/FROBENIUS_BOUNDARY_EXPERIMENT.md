@@ -84,4 +84,3 @@ does not establish a growing-family law or a subexponential ECDLP algorithm.
 The inspected report is
 [`reports/run-20261118T0645Z/REPORT.pdf`](reports/run-20261118T0645Z/REPORT.pdf).
 Primary source context is recorded in `PRIOR_ART.md`.
-

@@ -23,4 +23,3 @@ The frozen producer subtracted the last term. Version two may change only this
 sign and output path; it keeps the fixture, retained map, precision, controls,
 first-difference prediction 15 and delta prediction 10 unchanged. Version-one
 files and hashes remain byte-equal. [pcc:unverified]
-
