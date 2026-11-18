@@ -642,3 +642,32 @@ header, checks count 1/2/8/16/17/31/32, and exposes separate
 arms. `make -C gpu/rootfind test bench-tail-core` checks the full host
 oracle alongside this inversion-core reproduction. Hardware PMU and
 GPU validation still remain separate gates.
+
+
+### Actual-header CI validation of retained changes
+
+[Workflow run 44217847255](https://github.com/isogeny-labs/crypto/actions/runs/44217847255)
+built the actual repository headers on Ubuntu 24.04 with GCC -O2,
+passed the complete rootfinder C++ test suite, and passed the
+new deterministic standalone benchmark correctness checks.
+
+| Retained host optimization | Actual-header before | Actual-header after | Wall-clock speedup |
+|---|---:|---:|---:|
+| P-256 negate | 12.299 ns/op | 11.040 ns/op | **1.114x** |
+| Fp64 subtract | 4.270 ns/op | 2.459 ns/op | **1.737x** |
+| Short tail, cnt=1 of 32 | 366.536 ns/core | 97.097 ns/core | **3.775x** |
+| Short tail, cnt=8 of 32 | 364.895 ns/core | 169.272 ns/core | **2.156x** |
+| Short tail, cnt=16 of 32 | 363.432 ns/core | 235.291 ns/core | **1.545x** |
+| Full chunk, cnt=32 of 32 (control) | 367.264 ns/core | 366.409 ns/core | 1.002x |
+
+After reverting the rejected P-256 subtraction candidate, its
+actual-header control compared 11.641 against 11.570 ns/op (1.006x),
+consistent with no intended change.
+
+The 1/8/16-element timings are **Fp64 batch-inversion-core** measurements,
+not complete rootfinder calls; they deliberately isolate one part of the
+algorithm. The normal full-chunk control confirms no meaningful change
+in that core. End-to-end rootfinder throughput is not measured.
+The workflow installed `perf version 7.0.14` but the Azure VM had
+`perf_event_paranoid=4` and no permitted hardware PMU events,
+so these CI figures are **wall-clock**, not hardware cycles.
