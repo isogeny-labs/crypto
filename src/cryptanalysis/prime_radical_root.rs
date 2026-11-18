@@ -1234,6 +1234,147 @@ impl RadicalRootCtx {
 mod tests {
     use super::*;
 
+    // Frozen, previously optimized Frobenius powering for AB/BA comparisons.
+    fn fp2_pow_before_sparse(q: &Fq2, x: (u64, u64), e: u128) -> (u64, u64) {
+        let p = q.f.p as u128;
+        if e < p || e >= q.order() || x == (0, 0)
+            || x.0 >= q.f.p || x.1 >= q.f.p
+        {
+            return rpow(q, x, e);
+        }
+        let lo = (e % p) as u64;
+        let hi = (e / p) as u64;
+        let f = &q.f;
+        let norm = f.sub(f.sqr(x.0), f.mul(q.n, f.sqr(x.1)));
+        if lo == hi { return (f.powm(norm, lo), 0); }
+        let conjugate = (x.0, f.neg(x.1));
+        let mut acc = q.one();
+        let bits = u64::BITS - (lo | hi).leading_zeros();
+        for bit in (0..bits).rev() {
+            acc = q.sqr(acc);
+            match ((lo >> bit) & 1) | (((hi >> bit) & 1) << 1) {
+                1 => acc = q.mul(acc, x),
+                2 => acc = q.mul(acc, conjugate),
+                3 => acc = (f.mul(acc.0, norm), f.mul(acc.1, norm)),
+                _ => {}
+            }
+        }
+        acc
+    }
+
+    #[test]
+    fn round20_sparse_fp2_and_depressed_quartic_match_reference() {
+        let mut seed = 0x741b_20a6_5c43_2026u64;
+        for &p in &[5u64, 7, 11, 13, 31, 97, 487, 17_497,
+                    998_244_353, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let q = &ctx.cube_q.r;
+            let order = q.order();
+            let mut t = order;
+            while t % 3 == 0 { t /= 3; }
+            let e3 = if t % 3 == 1 { (2 * t + 1) / 3 } else { (t + 1) / 3 };
+            let exponents = [0, 1, (p - 1) as u128, p as u128,
+                             order / 3, e3, order - 1, order, u128::MAX];
+            for j in 0..64 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let b = seed % p;
+                for x in [(a, 0), (0, b), (a, b), (0, 0)] {
+                    for &e in &exponents {
+                        assert_eq!(q.pow(x, e), fp2_pow_before_sparse(q, x, e),
+                                   "Fp2 sparse p={p}, x={x:?}, e={e}");
+                    }
+                }
+                if j < 12 && p <= 487 {
+                    // Compare full quartic roots to exhaustive field evaluation.
+                    let lead = a % (p - 1) + 1;
+                    let c = b;
+                    let d = (seed >> 7) % p;
+                    let e = if j % 4 == 0 { 0 } else { (seed >> 13) % p };
+                    let (got, _) = ctx.quartic(lead, 0, c, d, e).unwrap();
+                    let mut expected = Vec::new();
+                    for x in 0..p {
+                        let value = ctx.f.add(e, ctx.f.mul(x, ctx.f.add(d,
+                            ctx.f.mul(x, ctx.f.add(c, ctx.f.mul(lead, ctx.f.sqr(x))))));
+                        if value == 0 { expected.push(x); }
+                    }
+                    assert_eq!(got, expected,
+                               "quartic p={p}, a={lead}, c={c}, d={d}, e={e}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired production Rust Fp2 sparse-power and quartic depression timing"]
+    fn bench_round20_sparse_fp2_and_quartic_depression() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn run<T: Copy, F: Fn(T) -> u64>(xs: &[T], reps: usize, func: &F) -> f64 {
+            let start = Instant::now();
+            let mut sum = 0u64;
+            for _ in 0..reps {
+                for &x in xs { sum ^= black_box(func(black_box(x))); }
+            }
+            black_box(sum);
+            start.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+        fn paired<T: Copy, B: Fn(T)->u64, A: Fn(T)->u64>(
+            name: &str, xs: &[T], reps: usize, before: B, after: A,
+        ) {
+            for &x in xs { assert_eq!(before(x), after(x), "{name}"); }
+            let (mut b, mut a) = (Vec::new(), Vec::new());
+            for i in 0..13 {
+                if i % 2 == 0 {
+                    b.push(run(xs, reps, &before));
+                    a.push(run(xs, reps, &after));
+                } else {
+                    a.push(run(xs, reps, &after));
+                    b.push(run(xs, reps, &before));
+                }
+            }
+            b.sort_by(f64::total_cmp);
+            a.sort_by(f64::total_cmp);
+            println!("{name} {:.3} -> {:.3} ns/op ({:.3}x)",
+                     b[6], a[6], b[6] / a[6]);
+        }
+        let mut seed = 0x7133_e02a_2026_1118u64;
+        for &p in &[487u64, 17_497, 998_244_353, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let q = &ctx.cube_q.r;
+            let mut t = q.order();
+            while t % 3 == 0 { t /= 3; }
+            let e3 = if t % 3 == 1 { (2 * t + 1) / 3 } else { (t + 1) / 3 };
+            let mut real = Vec::new();
+            let mut imag = Vec::new();
+            let mut general = Vec::new();
+            let mut depressed = Vec::new();
+            for _ in 0..512 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = 1 + seed % (p - 1);
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let b = 1 + seed % (p - 1);
+                real.push((a, 0));
+                imag.push((0, b));
+                general.push((a, b));
+                depressed.push((0, a, b, seed % p));
+            }
+            for (label, xs) in [("real", &real), ("imag", &imag), ("generic", &general)] {
+                paired(&format!("p={p} Fp2 {label} AMM_e3"), xs, 10,
+                       |x| { let y=fp2_pow_before_sparse(q,x,e3); y.0 ^ y.1 },
+                       |x| { let y=q.pow(x,e3); y.0 ^ y.1 });
+            }
+            paired(&format!("p={p} already-depressed quartic coefficients"), &depressed, 50,
+                   |(b,c,d,e)| {
+                       let (x,y,z,w)=ctx.quartic_depressed_coeffs(b,c,d,e);
+                       x^y^z^w
+                   },
+                   |(b,c,d,e)| { b^c^d^e });
+        }
+    }
+
+
     // Frozen immediate-pre-optimization Tonelli path (no p=5 mod 8 shortcut).
     fn sqrt_before_mod8_5(ctx: &RadicalRootCtx, a: u64) -> Option<u64> {
         let f = &ctx.f;
