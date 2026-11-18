@@ -589,6 +589,13 @@ unchanged. [pcc:unverified]
 | generator certificate implies pointwise `V-1` orientation | elliptic specialization | H116 | finite algebraic extension points | closure and per-generator checks |
 | generic algebraic-closure/rational-map equality | endpoint obligation | future elliptic owner | elliptic morphisms | separating theorem or standard Frobenius characteristic theorem |
 
+`H116-GENERATOR-CHARPOLY-002` instantiates the finite certificate on the eight
+parent groups. Three cells are cyclic and five use two generators, compressing
+5,066 exhaustive evaluations to 13. Both coefficient mutations and every
+dropped-generator control reject; the independent verifier has zero field
+mismatches. This measures the finite interface only and does not discharge the
+generic endpoint row. [pcc:unverified]
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

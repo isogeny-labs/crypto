@@ -177,7 +177,12 @@ supplied by a generating-set certificate: Lean promotes zero evaluations on a
 set with additive closure top to the global endomorphism equality and fixes
 the trace to `p+1-Nat.card E(F_p)`. This compresses finite verification only;
 it does not establish the algebraic-closure theorem.
-for `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
+On the frozen eight-cell panel, the corresponding certificate uses 13 points
+instead of 5,066: three groups are cyclic and five need two generators. Exact
+independent replay matches every coordinate, order and closure; wrong trace,
+wrong norm and dropped-generator controls all reject. The measured compression
+begins only after group enumeration and is not an ECDLP runtime claim.
+For `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
 the exact `z -> z^p` formula for a supplied coordinatewise `p`-power
 endomorphism. Connecting those formulas to the actual elliptic formal-group
 object and retained map remains the endpoint. [pcc:unverified]

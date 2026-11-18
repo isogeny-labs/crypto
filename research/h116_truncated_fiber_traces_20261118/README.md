@@ -203,6 +203,14 @@ set whose additive-subgroup closure is top proves the global endomorphism
 equation, fixes the trace definition to `p+1-Nat.card E(F_p)`, and composes the
 certificate to the pointwise `V-1` orientation. This does not extend a finite
 certificate to the algebraic closure. [pcc:unverified]
+The frozen generator-certificate experiment instantiates that interface on the
+eight parent groups. Three groups are cyclic and five use two generators, so
+5,066 exhaustive characteristic checks compress to 13 generator checks. Both
+coefficient mutations and every dropped-generator control reject, and an
+independent implementation matches all generator coordinates, orders and
+closures. Generator discovery still enumerates these small groups; this is a
+finite verification compression, not a generic algorithmic speedup.
+[pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from
