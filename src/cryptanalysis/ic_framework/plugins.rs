@@ -73,7 +73,7 @@ use crate::cryptanalysis::koblitz_symmetrised::{
     build_symmetrised_factor_base, build_symmetrised_system, frobenius_view_of_symmetrised,
     symmetrised_groebner_decompose, SymmetrisedFactorBase,
 };
-use crate::cryptanalysis::pq_descent_symbolic::{descend, max_n_prime, SymbolicDescent};
+use crate::cryptanalysis::pq_descent_symbolic::{max_n_prime, SymbolicDescent};
 use crate::cryptanalysis::prime_fast::{Fp64, MAX_BITS as PRIME_FAST_MAX_BITS};
 
 // ── Factor bases ───────────────────────────────────────────────────
@@ -4157,6 +4157,18 @@ pub struct DescentAlgebraicOracle<'i> {
     slot_rotations: Option<u32>,
     harness: SolverHarness,
     totals: SolverTotals,
+    /// The target-independent descents
+    /// ([`DescentTemplate`](crate::cryptanalysis::pq_descent_symbolic::DescentTemplate)),
+    /// one a rotation: `templates[0]` is the plain descent (every summand
+    /// over `V`, which is also τ-slot 0), built in `prepare` and charged
+    /// to `oracle_setup`; with slots, `templates[j]` (summand 2 over
+    /// `σ^{j}(V)`) is built the first time a target reaches rotation `j`,
+    /// from slot `j − 1`'s shifted basis by one squaring an element, and
+    /// charged once, to that target's solver block.  Per target only the
+    /// substitution of `x_R` and the split into coordinates remain.
+    templates: Vec<Option<crate::cryptanalysis::pq_descent_symbolic::DescentTemplate>>,
+    /// What building `templates[0]` in `prepare` cost, for `oracle_setup`.
+    setup_work: crate::cryptanalysis::pq_descent_symbolic::DescentWork,
     /// Systems the solver decided satisfiable none of whose solutions
     /// lifted to base points summing to the target.  Expected, not a
     /// defect: a summation polynomial vanishes over the algebraic
@@ -4187,50 +4199,68 @@ impl<'i> DescentAlgebraicOracle<'i> {
             slot_rotations: None,
             harness: SolverHarness::new(solver, solver_params, budget),
             totals,
+            templates: Vec::new(),
+            setup_work: Default::default(),
             unliftable: 0,
         }
     }
 
-    /// The descent with summand 2 over `σ^{j}(V)`: the τ-slot system.
-    fn descend_slot(&self, x_r: u64, j: u32) -> SymbolicDescent {
-        let gf = &self.instance.gf;
-        // The `j` squarings of each basis element (field squarings, put
-        // through the descent's own counter so they reach the same
-        // block) and the copies of the bases.
-        charge_slot_bases(self.v_basis.len() as u64, j, self.summands);
-        let shifted: Vec<u64> = self
-            .v_basis
-            .iter()
-            .map(|&e| (0..j).fold(e, |acc, _| gf.sqr(acc)))
-            .collect();
-        let mut bases = vec![self.v_basis.clone(), shifted];
-        if self.summands == 3 {
-            bases.push(self.v_basis.clone());
+    /// The template of rotation `j` (summand 2 over `σ^{j}(V)`; `j = 0` is
+    /// the plain descent), built on first use and kept for the run.  Its
+    /// construction is counted on the descent counter of the calling
+    /// thread, so it lands in whatever block reads that counter next:
+    /// `oracle_setup` for `j = 0` in `prepare`, the solver block of the
+    /// first target to reach rotation `j` otherwise.  Rotations are tried
+    /// in order, so slot `j − 1`'s shifted basis is there to square once.
+    fn template(&mut self, j: u32) -> &crate::cryptanalysis::pq_descent_symbolic::DescentTemplate {
+        let j = j as usize;
+        if self.templates.len() <= j {
+            self.templates.resize(j + 1, None);
         }
-        crate::cryptanalysis::pq_descent_symbolic::descend_with_bases(
-            gf,
-            self.instance.b,
-            x_r,
-            &bases,
-        )
-        .expect("prepare checked the dimension")
+        if self.templates[j].is_none() {
+            let inst = self.instance;
+            let gf = &inst.gf;
+            let shifted: Vec<u64> = if j == 0 {
+                self.v_basis.clone()
+            } else {
+                let prev = self.templates[j - 1]
+                    .as_ref()
+                    .expect("rotations are built in order");
+                // One squaring of each element of slot `j − 1`'s basis
+                // (put through the descent's counter so it reaches the
+                // same block) and the copies of the bases.
+                charge_slot_bases(self.v_basis.len() as u64, 1, self.summands);
+                prev.summand_bases[1].iter().map(|&e| gf.sqr(e)).collect()
+            };
+            let mut bases = vec![self.v_basis.clone(), shifted];
+            if self.summands == 3 {
+                bases.push(self.v_basis.clone());
+            }
+            self.templates[j] = Some(
+                crate::cryptanalysis::pq_descent_symbolic::descent_template_with_bases(
+                    gf, inst.b, &bases,
+                )
+                .expect("prepare checked the dimension"),
+            );
+        }
+        self.templates[j].as_ref().expect("built above")
+    }
+
+    /// The descended system of rotation `j` at the target abscissa `x_r`:
+    /// the template specialised.  Its `lift` maps a solution back to
+    /// abscissae.  `prepare` must have run.
+    fn descend_rotation(&mut self, x_r: u64, j: u32) -> SymbolicDescent {
+        let inst = self.instance;
+        let gf = &inst.gf;
+        let _ = self.template(j);
+        self.templates[j as usize]
+            .as_ref()
+            .expect("built above")
+            .specialise(gf, x_r)
     }
 
     pub fn solver_name(&self) -> &str {
         self.harness.solver.name()
-    }
-
-    /// The descended system for a target abscissa; its `lift` maps a
-    /// solution back to abscissae.  `prepare` must have run.
-    fn descend(&self, x_r: u64) -> SymbolicDescent {
-        descend(
-            &self.instance.gf,
-            self.instance.b,
-            x_r,
-            &self.v_basis,
-            self.summands,
-        )
-        .expect("prepare checked the dimension")
     }
 }
 
@@ -4311,9 +4341,22 @@ pub(crate) fn charge_lift(
 
 impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
     fn setup_work_native(&self) -> BTreeMap<String, u64> {
-        // No table: the descent builds each target's system in the
-        // relation phase, charged to the solver block.
-        table_counted(BTreeMap::new())
+        // No table.  The target-independent descent (the template of
+        // `S_{m+1}` in `X`) is built once in `prepare` and charged here;
+        // each target's specialisation is charged to the solver block in
+        // the relation phase.
+        let w = &self.setup_work;
+        let mut out = BTreeMap::new();
+        crate::cryptanalysis::bitop_tally::Tally {
+            word_ops: w.word_ops,
+            hash_probes: w.hash_probes,
+            field_adds: w.field_adds,
+            field_muls: w.field_muls,
+            field_sqrs: w.field_sqrs,
+            field_invs: 0,
+        }
+        .add_work_native(&mut out);
+        table_counted(out)
     }
 
     fn name(&self) -> &str {
@@ -4380,12 +4423,17 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
             ));
         }
         self.v_basis = basis.clone();
+        // The target-independent template, built once and charged to
+        // `oracle_setup`.
+        self.templates.clear();
+        let _ = crate::cryptanalysis::pq_descent_symbolic::take_descent_work();
+        let _ = self.template(0);
+        self.setup_work = crate::cryptanalysis::pq_descent_symbolic::take_descent_work();
         // Every system on one base has the same shape, so descend one
         // abscissa now and let the engine decline the shape here, once,
         // with a reason a sweep can report — rather than target by
         // target, which would run the whole relation phase for nothing.
-        let _ = crate::cryptanalysis::pq_descent_symbolic::take_descent_work();
-        let probe = system_of(&self.descend(self.instance.generator.x));
+        let probe = system_of(&self.descend_rotation(self.instance.generator.x, 0));
         let shape = probe.shape();
         charge_system_build(&mut self.totals.extra, &probe, &shape, 1);
         if !self.harness.solver.accepts(&shape) {
@@ -4418,11 +4466,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
             // Work left on this thread's descent counter by anything else
             // is not this target's.
             let _ = crate::cryptanalysis::pq_descent_symbolic::take_descent_work();
-            let sys = if self.slot_rotations.is_some() {
-                self.descend_slot(point.x, j)
-            } else {
-                self.descend(point.x)
-            };
+            let sys = self.descend_rotation(point.x, j);
             let system = system_of(&sys);
             let shape = system.shape();
             let verdict = self.harness.solve(&system);
@@ -5315,6 +5359,71 @@ mod tests {
             b0,
             trace_kernel_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap()
         );
+    }
+
+    /// **The oracle's templates give exactly the systems the per-target
+    /// descent built**: for the plain descent and every τ-slot rotation,
+    /// at two and three summands, on a small Koblitz curve and several
+    /// targets, the specialised template equals `descend` /
+    /// `descend_with_bases` over the `j`-fold squared basis, equation for
+    /// equation, so the solver sees the same systems and the lifts the
+    /// same abscissae.  The template is built once: a second target
+    /// charges no slot-basis squarings.
+    #[test]
+    fn the_descent_templates_give_the_per_target_systems() {
+        use super::super::solvers::solver_by_name;
+        use crate::cryptanalysis::pq_descent_symbolic::{
+            descend, descend_with_bases, take_descent_work,
+        };
+        let inst = koblitz_instance(0, 13).expect("a = 0 over F_2^13");
+        let gf = &inst.gf;
+        let basis = trace_kernel_basis(&inst, 3).unwrap();
+        let targets = [inst.generator.x, 0x1, 0x2b5 & gf.mask, 0x1f0f & gf.mask, 0];
+        for summands in [2u32, 3] {
+            for slots in [None, Some(inst.n)] {
+                let mut oracle = DescentAlgebraicOracle::new(
+                    summands,
+                    &inst,
+                    solver_by_name("exhaustive").unwrap(),
+                    Params::default(),
+                    None,
+                );
+                oracle.v_basis = basis.clone();
+                oracle.slot_rotations = slots;
+                for (t, &x_r) in targets.iter().enumerate() {
+                    for j in 0..slots.unwrap_or(1) {
+                        let _ = take_descent_work();
+                        let new = oracle.descend_rotation(x_r, j);
+                        let squarings = take_descent_work().field_sqrs;
+                        let old = if slots.is_none() {
+                            descend(gf, inst.b, x_r, &basis, summands).unwrap()
+                        } else {
+                            let shifted: Vec<u64> = basis
+                                .iter()
+                                .map(|&e| (0..j).fold(e, |acc, _| gf.sqr(acc)))
+                                .collect();
+                            let mut bases = vec![basis.clone(), shifted];
+                            if summands == 3 {
+                                bases.push(basis.clone());
+                            }
+                            descend_with_bases(gf, inst.b, x_r, &bases).unwrap()
+                        };
+                        assert_eq!(
+                            new.equations, old.equations,
+                            "m = {summands}, slots {slots:?}, x_R = {x_r:#x}, j = {j}"
+                        );
+                        assert_eq!(new.summand_bases, old.summand_bases);
+                        assert_eq!(new.field_monomials, old.field_monomials);
+                        let v = (0x5a5a_5a5a_u64) & ((1u64 << new.n_vars) - 1);
+                        assert_eq!(new.lift(v), old.lift(v));
+                        if t > 0 {
+                            // Only the powers of `x_R` are squared now.
+                            assert!(squarings <= 2, "the template was rebuilt");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /// The command-line form of a multi-factor divisor, end to end from
