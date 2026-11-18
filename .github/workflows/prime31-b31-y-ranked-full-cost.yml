@@ -1,0 +1,80 @@
+name: Prime31 B31 y-ranked vs x-first complete Rust control
+on:
+  push:
+    branches: [automation/prime31-y-ranked-base-complete-20261118]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - 'research/prime31_ic_20261115/native/B31_Y_RANKED_COMPLETE_PROTOCOL_20261118.md'
+      - '.github/workflows/prime31-b31-y-ranked-full-cost.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - '.github/workflows/prime31-b31-y-ranked-full-cost.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  y-ranked-compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout candidate example
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout pinned original Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only the candidate example
+        run: cp research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Pinned original arithmetic regressions
+        run: cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Complete same-256-Q AB x then y-ranked
+        shell: bash
+        env:
+          PRIME31_B31_Y_RANKED_COMPARE: '1'
+        run: |
+          set -o pipefail
+          cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle actual_prime31_b31_firstx_vs_dickson_256q_complete_cost -- --nocapture --test-threads=1 2>&1 | tee prime31-y-ranked-ab.log
+      - name: Complete same-256-Q BA y-ranked then x
+        shell: bash
+        env:
+          PRIME31_B31_Y_RANKED_COMPARE: '1'
+          PRIME31_B31_BASECHOICE_REVERSE: '1'
+        run: |
+          set -o pipefail
+          cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle actual_prime31_b31_firstx_vs_dickson_256q_complete_cost -- --nocapture --test-threads=1 2>&1 | tee prime31-y-ranked-ba.log
+      - name: Check full-solver and corpus gates
+        run: |
+          grep -Fq 'test result: ok. 1 passed;' prime31-y-ranked-ab.log
+          grep -Fq 'test result: ok. 1 passed;' prime31-y-ranked-ba.log
+          grep -Fq 'PRIME31_B31_Y_RANKED_COMPLETE_JSON=' prime31-y-ranked-ab.log
+          grep -Fq 'PRIME31_B31_Y_RANKED_COMPLETE_JSON=' prime31-y-ranked-ba.log
+          grep -Fq '"panel_order":["first_x31_paired","y_ranked31_paired"]' prime31-y-ranked-ab.log
+          grep -Fq '"panel_order":["y_ranked31_paired","first_x31_paired"]' prime31-y-ranked-ba.log
+          grep -Fq '"unknown_logs_recovered":256' prime31-y-ranked-ab.log
+          grep -Fq '"rank":31' prime31-y-ranked-ba.log
+          grep -Fq '"same_public_target_count":256' prime31-y-ranked-ba.log
+      - name: Archive raw Rust corpus, rows and wall times
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-y-ranked-full-cost-raw
+          path: |
+            prime31-y-ranked-ab.log
+            prime31-y-ranked-ba.log
+          retention-days: 30
+          if-no-files-found: warn
