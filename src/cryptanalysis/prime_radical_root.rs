@@ -3623,7 +3623,7 @@ impl RadicalRootCtx {
             .collect()
     }
 
-    fn quartic_before_sparse(
+    fn quartic_before_round19(
         &self,
         a: u64,
         b: u64,
@@ -3740,7 +3740,7 @@ impl RadicalRootCtx {
                 ok(v)
             }
             5 => {
-                let (roots, fb) = self.quartic_before_sparse(c[4], c[3], c[2], c[1], c[0])?;
+                let (roots, fb) = self.quartic_before_round19(c[4], c[3], c[2], c[1], c[0])?;
                 Ok(RadicalRoots {
                     roots,
                     frobenius_fallback: fb,
