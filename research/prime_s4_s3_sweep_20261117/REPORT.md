@@ -57,7 +57,7 @@ ladder example re-checks `n` prime and `[n]G = O` on every run.
    (`try_finalise_s4`), in both oracles.
 3. **Every rung recovers a known-answer log**: `[x]G = Q`, `x = x_sidecar`
    (never a solver input), and the paired ρ control on the identical public
-   point returns the same scalar.  All 22 rows in `ladder.jsonl`, all 7 in
+   point returns the same scalar.  All 22 rows in `ladder.jsonl`, all 8 in
    `two_decomp.jsonl` and all 4 control rows pass.
 4. `s3_staged_driver_matches_the_quartic_driver` checks both staged drivers
    return the same log and the same relation count.  The module's 37 tests
