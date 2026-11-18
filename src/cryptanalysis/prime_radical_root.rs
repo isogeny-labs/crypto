@@ -843,6 +843,102 @@ mod tests {
         Some(r.mul(x0, y_inv))
     }
 
+
+    #[inline(never)]
+    fn cardano_before(f: Fp, inv2: u64, inv3: u64, inv27: u64,
+                      pp: u64, q: u64) -> (u64, u64) {
+        let q2 = f.mul(q, inv2);
+        let p2 = f.sqr(pp);
+        let d = f.add(f.mul(q2, q2), f.mul(f.mul(p2, pp), inv27));
+        let m = f.neg(f.mul(pp, inv3));
+        (d, m)
+    }
+
+    #[inline(never)]
+    fn cardano_after(f: Fp, inv2: u64, inv3: u64, _inv27: u64,
+                     pp: u64, q: u64) -> (u64, u64) {
+        let q2 = f.mul(q, inv2);
+        let m = f.neg(f.mul(pp, inv3));
+        let d = f.sub(f.sqr(q2), f.mul(f.sqr(m), m));
+        (d, m)
+    }
+
+    #[test]
+    fn cardano_discriminant_reuse_matches_reference() {
+        let mut seed = 0x1459_1749_c0de_2026u64;
+        for &p in &[5u64, 7, 17, 163, 487, 1459, 17_497,
+                    998_244_353, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            for _ in 0..10_000 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let pp = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let q = seed % p;
+                assert_eq!(
+                    cardano_before(ctx.f, ctx.inv2, ctx.inv3, ctx.inv27, pp, q),
+                    cardano_after(ctx.f, ctx.inv2, ctx.inv3, ctx.inv27, pp, q),
+                    "p={p} P={pp} Q={q}"
+                );
+                assert_eq!(ctx.f.mul(2, ctx.inv27),
+                           ctx.f.add(ctx.inv27, ctx.inv27));
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "manual paired actual-Rust Cardano arithmetic timing"]
+    fn bench_cardano_discriminant() {
+        use std::hint::black_box;
+        use std::time::Instant;
+
+        fn time(
+            ctx: &RadicalRootCtx, xs: &[(u64, u64)], reps: usize,
+            op: fn(Fp, u64, u64, u64, u64, u64) -> (u64, u64),
+        ) -> f64 {
+            let mut hash = 0u64;
+            let start = Instant::now();
+            for _ in 0..reps {
+                for &(pp, q) in xs {
+                    let (d, m) = op(ctx.f, ctx.inv2, ctx.inv3, ctx.inv27,
+                                    black_box(pp), black_box(q));
+                    hash ^= d ^ m;
+                }
+            }
+            black_box(hash);
+            start.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+
+        let mut seed = 0xfaced00d_12345678u64;
+        for &p in &[17u64, 487, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let mut xs = Vec::new();
+            for _ in 0..8192 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let pp = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                xs.push((pp, seed % p));
+            }
+            let (mut before, mut after) = (Vec::new(), Vec::new());
+            for i in 0..13 {
+                if i % 2 == 0 {
+                    before.push(time(&ctx, &xs, 32, cardano_before));
+                    after.push(time(&ctx, &xs, 32, cardano_after));
+                } else {
+                    after.push(time(&ctx, &xs, 32, cardano_after));
+                    before.push(time(&ctx, &xs, 32, cardano_before));
+                }
+            }
+            before.sort_by(f64::total_cmp);
+            after.sort_by(f64::total_cmp);
+            println!("Cardano discriminant p={p}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                     before[6], after[6], before[6] / after[6]);
+        }
+    }
+
     #[test]
     fn amm_digit_loop_matches_previous_reference() {
         // Cover s=0,1,2 and large s=3..7 on Fp, plus Fp2 and non-cubes.
