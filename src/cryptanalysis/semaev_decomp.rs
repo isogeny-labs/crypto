@@ -154,6 +154,33 @@ pub struct Gf2 {
     /// through `red`.  No tail is zero — an irreducible polynomial has a
     /// constant term — so the one word is also the switch.
     fold_tail: u64,
+    /// Byte tables for the inversion chain's two longest squaring runs
+    /// ([`InvSquareTables`]), shared by every `Gf2` of this field in the
+    /// process; `None` off the folding path or under `KIC_INV_TABLES=0`.
+    inv_tables: Option<std::sync::Arc<InvSquareTables>>,
+}
+
+/// **`a^(2^k)` by table, for the two longest runs of squarings in
+/// [`Gf2::inv`]'s Itoh–Tsujii chain.**
+///
+/// Squaring `k` times is `F₂`-linear, so `a^(2^k)` is the XOR over the
+/// bytes `aᵢ` of `a` of `T[i][aᵢ] = (aᵢ·2^{8i})^(2^k)`: eight lookups in
+/// place of `k` dependent carry-less squarings.  The two longest runs of
+/// the chain hold most of its `n − 1` squarings (45 of 60 at `n = 61`),
+/// and the chain is one serial dependency, so they are most of an
+/// inversion's latency.  The result is the same element; only the route
+/// changes.
+#[derive(Debug)]
+pub struct InvSquareTables {
+    k: [u32; 2],
+    t: [Box<[[u64; 256]; 8]>; 2],
+}
+
+/// Whether [`Gf2`] builds [`InvSquareTables`] (`KIC_INV_TABLES`, default
+/// on); `0` keeps every squaring a carry-less multiply, for A/B timing.
+fn inv_tables_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_INV_TABLES").map_or(true, |v| v != "0"))
 }
 
 /// Spread the low 32 bits of `x` so that bit `i` lands at bit `2i`.
@@ -259,14 +286,85 @@ impl Gf2 {
             Self::reduction_table(n, bits)
         };
 
-        Self {
+        let mut gf = Self {
             n,
             irr: bits,
             mask: (1u64 << n) - 1,
             red,
             has_clmul,
             fold_tail,
+            inv_tables: None,
+        };
+        if fold_tail != 0 && n >= 16 && inv_tables_enabled() {
+            gf.inv_tables = Some(gf.shared_inv_tables());
         }
+        gf
+    }
+
+    /// The squaring-run lengths of [`Self::inv`]'s chain for this degree,
+    /// in the order the chain takes them.
+    fn inv_chain_runs(n: u32) -> Vec<u32> {
+        let e = n - 1;
+        let mut runs = Vec::new();
+        let mut len = 1u32;
+        for bit in (0..(31 - e.leading_zeros())).rev() {
+            runs.push(len);
+            len *= 2;
+            if (e >> bit) & 1 == 1 {
+                len += 1;
+            }
+        }
+        runs
+    }
+
+    /// This field's [`InvSquareTables`], built once per process and field
+    /// from the basis images and shared after that.
+    fn shared_inv_tables(&self) -> std::sync::Arc<InvSquareTables> {
+        use std::collections::HashMap;
+        use std::sync::{Arc, Mutex, OnceLock};
+        type Cache = Mutex<HashMap<(u32, u64), Arc<InvSquareTables>>>;
+        static CACHE: OnceLock<Cache> = OnceLock::new();
+        let cache = CACHE.get_or_init(|| Mutex::new(HashMap::new()));
+        let mut cache = cache.lock().unwrap_or_else(|e| e.into_inner());
+        Arc::clone(cache.entry((self.n, self.irr)).or_insert_with(|| {
+            let mut runs = Self::inv_chain_runs(self.n);
+            runs.sort_unstable();
+            let k = [runs[runs.len() - 1], runs[runs.len() - 2]];
+            let table = |k: u32| {
+                let basis: Vec<u64> = (0..self.n).map(|i| self.sqr_k(1u64 << i, k)).collect();
+                let mut t = Box::new([[0u64; 256]; 8]);
+                for (byte, row) in t.iter_mut().enumerate() {
+                    for v in 1..256usize {
+                        let low = v & (v - 1);
+                        let bit = (v ^ low).trailing_zeros() as usize + 8 * byte;
+                        row[v] = row[low] ^ basis.get(bit).copied().unwrap_or(0);
+                    }
+                }
+                t
+            };
+            Arc::new(InvSquareTables {
+                k,
+                t: [table(k[0]), table(k[1])],
+            })
+        }))
+    }
+
+    /// `a^(2^k)` within [`Self::inv`]: by table for the two runs that
+    /// have one, else [`Self::sqr_k`].
+    #[inline(always)]
+    fn inv_sqr_k(&self, a: u64, k: u32) -> u64 {
+        if let Some(tables) = &self.inv_tables {
+            for (j, &tk) in tables.k.iter().enumerate() {
+                if k == tk {
+                    let mut acc = 0u64;
+                    for (i, row) in tables.t[j].iter().enumerate() {
+                        acc ^= row[((a >> (8 * i)) & 0xff) as usize];
+                    }
+                    return acc;
+                }
+            }
+        }
+        self.sqr_k(a, k)
     }
 
     /// The same field on the portable multiply and the table, whatever
@@ -627,7 +725,7 @@ impl Gf2 {
         let mut beta = a;
         let mut len = 1u32;
         for bit in (0..(31 - e.leading_zeros())).rev() {
-            beta = self.mul(self.sqr_k(beta, len), beta);
+            beta = self.mul(self.inv_sqr_k(beta, len), beta);
             len *= 2;
             if (e >> bit) & 1 == 1 {
                 beta = self.mul(self.sqr(beta), a);
@@ -2144,6 +2242,42 @@ mod tests {
     /// `find_irreducible_sparse` supplies, for every operation built on
     /// them.  The fold must also actually be chosen there whenever the
     /// CPU has the instruction, or this would test the table three times.
+    #[test]
+    fn inversion_by_square_tables_matches_the_portable_inverse() {
+        // `inv` through `InvSquareTables` must give the portable field's
+        // inverse, and `a · a⁻¹ = 1`, at every width that builds them.
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        let mut s = 0x1A7E_5EED_0F_1A7Eu64;
+        let mut tabled = 0;
+        for n in 16u32..=63 {
+            let Some(irr) = find_irreducible_sparse(n) else {
+                continue;
+            };
+            let fast = Gf2::new(&irr);
+            let portable = Gf2::portable(&irr);
+            assert!(portable.inv_tables.is_none());
+            tabled += usize::from(fast.inv_tables.is_some());
+            for _ in 0..500 {
+                let a = xorshift(&mut s) & fast.mask;
+                if a == 0 {
+                    continue;
+                }
+                let inv = fast.inv(a);
+                assert_eq!(inv, portable.inv(a), "inv n = {n}");
+                assert_eq!(fast.mul(a, inv), 1, "a·a⁻¹ n = {n}");
+            }
+            // The run lengths the tables cover are runs of the chain.
+            if let Some(t) = &fast.inv_tables {
+                let runs = Gf2::inv_chain_runs(n);
+                assert!(t.k.iter().all(|k| runs.contains(k)), "n = {n}");
+            }
+        }
+        #[cfg(target_arch = "x86_64")]
+        if std::arch::is_x86_feature_detected!("pclmulqdq") && inv_tables_enabled() {
+            assert!(tabled > 40, "only {tabled} widths built tables");
+        }
+    }
+
     #[test]
     fn folded_reduction_matches_the_table_at_every_width() {
         use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
