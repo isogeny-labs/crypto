@@ -22,7 +22,10 @@ pub(in crate::ml_dataset::solvers) struct Snapshot {
     pub capture_error: Option<capture::CaptureError>,
 }
 pub(in crate::ml_dataset::solvers) struct Chunk {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub index: u64,
     pub path: String,
     pub bytes: u64,
@@ -340,7 +343,10 @@ impl OwnedAttempt {
         let _ = self.checkpoint_capture();
         self
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn capture_publication(&self) -> &Publication {
         &self.publication
     }

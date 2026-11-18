@@ -99,7 +99,10 @@ impl EncodingSource<'_> {
     pub fn deadline(&self) -> Instant {
         self.deadline
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn binding_sha256(&self) -> &[u8; 32] {
         self.identity.binding_sha256
     }

@@ -5,10 +5,16 @@ use provenance::boolean_equations::{self as equations, matrix_rows as rows};
 use std::mem::size_of;
 
 // Empty monomial is one. Static storage needs no per-attempt allocation.
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+)]
 static UNIT_WINDOW: [equations::Monomial; 1] = [Vec::new()];
 #[derive(Clone, Copy)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(in crate::ml_dataset::solvers) struct Caps {
     pub expansion: equations::Limits,
     pub reduction: rows::Limits,
@@ -16,24 +22,44 @@ pub(in crate::ml_dataset::solvers) struct Caps {
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(in crate::ml_dataset::solvers) enum Failure {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Admission(Stop),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     MissingMap,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Expansion(equations::Failure),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Reduction(rows::Failure),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Certification(rows::Failure),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Publication(Stop),
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 enum State<'s> {
     Before,
     Expanded(equations::Expansion<'s>),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     Reduced(rows::BoundRows<'s, 'static>),
     Certified(rows::Certificate<'s, 'static>),
 }
@@ -42,7 +68,10 @@ enum State<'s> {
 /// Dropping this view cannot refund the original ledger or clear its first stop.
 /// A parent must keep it until evidence/custody transfer; this increment does not
 /// implement that later publication operation.
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(in crate::ml_dataset::solvers) struct Attempt<'s, 'o> {
     original: &'s VerifiedWorkerOriginal<'o>,
     map: Option<&'s provenance::CheckedMap>,
@@ -52,19 +81,31 @@ pub(in crate::ml_dataset::solvers) struct Attempt<'s, 'o> {
     deadline: Instant,
 }
 impl Attempt<'_, '_> {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn failure(&self) -> Option<Failure> {
         self.failure
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn first_stop(&self) -> Option<Stop> {
         self.ledger.stopped
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn charged(&self) -> (u64, u64) {
         (self.ledger.checking_work, self.ledger.adapter_bytes)
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn certificate(
         &self,
     ) -> Option<&rows::Certificate<'_, 'static>> {
@@ -73,7 +114,10 @@ impl Attempt<'_, '_> {
             _ => None,
         }
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn stop(&mut self, failure: Failure, stop: Stop) {
         self.failure = Some(failure);
         let _: Result<(), Stop> = self.ledger.fail(stop);
@@ -82,7 +126,10 @@ impl Attempt<'_, '_> {
 impl<'o> OriginalOwner<'o> {
     /// One-shot, caller-selected row in the full unit-window reduction. Local
     /// limits only restrict operations; they never replace the original ledger.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn produce_boolean_row<'s>(&'s mut self, row: usize, caps: Caps) -> Attempt<'s, 'o> {
         let repeated = self.boolean_attempted;
         self.boolean_attempted = true;
@@ -330,94 +377,193 @@ mod tests {
 /// Owned worker custody, with no lifetime tied to the local original token/map.
 /// These are the existing admitted source fields moved once, never reconstructed.
 struct OriginalParts {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     public_sha256: [u8; 32],
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     factor_sha256: [u8; 32],
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     budget: Budget,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     binding: [u8; 32],
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     launch_sha256: [u8; 32],
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     math: Math,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     checked: Option<provenance::CheckedMap>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     unchecked: Option<provenance::Map>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pattern: Option<u32>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     map_bytes: Vec<u8>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     map_ack: Option<capture::CommittedEventPosition>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     publication_attempted: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     map_published: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     capture_limits: capture::CaptureLimits,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     boolean_attempted: bool,
 }
 enum OwnedState {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Before,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Expanded(equations::OwnedExpansion),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Reduced(rows::OwnedRows),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Certified(rows::OwnedCertificate),
 }
 pub(in crate::ml_dataset::solvers) struct OwnedAttempt {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     original: OriginalParts,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     sink: capture::CaptureEmitter,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     state: OwnedState,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     failure: Option<Failure>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     deadline: Instant,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     diagnostic: Option<String>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     selected_row: usize,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     publication: Publication,
 }
 impl OwnedAttempt {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn failure(&self) -> Option<Failure> {
         self.failure
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn charged(&self) -> (u64, u64) {
         (
             self.original.budget.checking_work,
             self.original.budget.adapter_bytes,
         )
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn first_stop(&self) -> Option<Stop> {
         self.original.budget.stopped
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn certificate(&self) -> Option<&rows::OwnedCertificate> {
         match &self.state {
             OwnedState::Certified(c) => Some(c),
             _ => None,
         }
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn stop(&mut self, failure: Failure, stop: Stop) {
         self.failure = Some(failure);
         let _: Result<(), Stop> = self.original.budget.fail(stop);
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn run(&mut self, row: usize, caps: Caps) {
         let Some(map) = self.original.checked.take() else {
             self.stop(Failure::MissingMap, Stop::Phase);
@@ -461,7 +607,10 @@ impl OwnedAttempt {
 impl OriginalOwner<'_> {
     /// Consumes the original owner and actual bound sink. It always returns
     /// custody, including on initial frame admission or sink-identity failure.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn into_boolean_row(
         mut self,
         sink: capture::CaptureEmitter,
@@ -558,7 +707,10 @@ mod owned_tests {
     use super::tests::caps;
     use super::*;
     use crate::ml_dataset::solvers;
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained independent checker/control interface; not producer-completion admission."
+    )]
     fn genuine_owned(twist: bool, refuse_wire: bool) -> OwnedAttempt {
         genuine_owned_fixture(twist, refuse_wire).0
     }
@@ -707,24 +859,51 @@ mod owned_tests {
 pub(in crate::ml_dataset::solvers) mod receipt;
 #[derive(Default)]
 struct Publication {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     attempted: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     metadata: Option<receipt::Metadata>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     bytes: Vec<u8>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     ack: Option<capture::CommittedEventPosition>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     committed: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     report_taken: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     path: Option<String>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     capture_error: Option<capture::CaptureError>,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 struct ReceiptWriter<'a> {
     bytes: &'a mut Vec<u8>,
     cap: usize,
@@ -748,7 +927,10 @@ impl std::io::Write for ReceiptWriter<'_> {
     }
 }
 impl OwnedAttempt {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn publish(mut self) -> Self {
         if self.failure.is_some() {
             return self;
@@ -758,7 +940,10 @@ impl OwnedAttempt {
         }
         self
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn publish_inner(&mut self) -> Result<(), Stop> {
         if self.publication.attempted {
             return Err(Stop::Phase);
@@ -912,7 +1097,10 @@ impl OwnedAttempt {
         self.publication.committed = true;
         Ok(())
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn outcome(&mut self) -> Option<Value> {
         if !self.publication.committed || self.failure.is_some() || self.publication.report_taken {
             return None;

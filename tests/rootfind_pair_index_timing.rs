@@ -403,3 +403,14 @@ fn fixed_koblitz_pair_index_build_probe_timing() {
         }
     }
 }
+
+#[test]
+fn inline_backing_counts_reserved_directory_and_spill_storage() {
+    let index = InlinePagePairIndex::new(13, 3).unwrap();
+    assert_eq!(index.directory_words(), (1 << (13 - 4)) + 1);
+    assert!(index.spill_capacity() >= 3);
+    assert_eq!(
+        index.requested_backing_bytes(),
+        index.directory_words() * 4 + index.spill_capacity() * 16 * 4
+    );
+}

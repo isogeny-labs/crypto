@@ -52,7 +52,7 @@ pub(in crate::ml_dataset::solvers) struct Coverage {
     pub checked: u32,
 }
 #[allow(clippy::large_enum_variant)]
-pub(in crate::ml_dataset::solvers) enum Owned<'a> {
+pub(super) enum Owned<'a> {
     Admission {
         failure: AdmissionFailure<'a>,
         sink: capture::CaptureEmitter,
@@ -66,7 +66,7 @@ pub(in crate::ml_dataset::solvers) enum Owned<'a> {
     Ready(checkpoint::WithLedger<'a>),
 }
 pub(in crate::ml_dataset::solvers) struct Prepared<'a> {
-    pub owner: Owned<'a>,
+    pub(super) owner: Owned<'a>,
     pub coverage: Coverage,
     pub stage: Stage,
     pub stop: Option<Stop>,
@@ -235,7 +235,10 @@ pub(in crate::ml_dataset::solvers) struct Custody {
     checkpoint: Option<checkpoint::WithLedger<'static>>,
     sink: Option<capture::CaptureEmitter>,
     pub coverage: Coverage,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub stage: Stage,
     pub stop: Option<Stop>,
     pub report_admitted: bool,
@@ -243,27 +246,60 @@ pub(in crate::ml_dataset::solvers) struct Custody {
     admission_stage: Option<AdmissionStage>,
 }
 struct MapParts {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     binding: [u8; 32],
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     launch_sha256: [u8; 32],
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     math: Math,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     checked: Option<provenance::CheckedMap>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     retained_unchecked: Option<provenance::Map>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pattern: Option<u32>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     retained_bytes: Vec<u8>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     map_ack: Option<capture::CommittedEventPosition>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     publication_attempted: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     map_published: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     capture_limits: capture::CaptureLimits,
 }
 impl Prepared<'_> {

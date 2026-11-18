@@ -10,8 +10,7 @@ use crypto_lib::cryptanalysis::{
     koblitz_fast::FastCurve,
     koblitz_groebner::{
         build_decomposition_system, f4_profile, f4_profile_reset, matrix_f4_f2_counted,
-        solve_boolean_system, with_matrix_runtime, FieldStructure, MatrixRuntime, SolveOptions,
-        SolverEngine,
+        solve_boolean_system, FieldStructure, SolveOptions, SolverEngine,
     },
     koblitz_index_calculus::{
         build_frobenius_factor_base, groebner_decompose, groebner_decompose_f6_ic,
@@ -84,12 +83,9 @@ fn profile_stop(label: &Value) {
 }
 
 fn main() {
-    let policy = flag("--matrix-runtime", "default");
-    if policy == "default" {
-        benchmark();
-    } else {
-        with_matrix_runtime(MatrixRuntime::parse(&policy).unwrap(), benchmark);
-    }
+    // The `--matrix-runtime` selector was removed with the koblitz_groebner matrix-runtime API
+    // (gb-baseline refresh, #4580); the benchmark runs the default runtime.
+    benchmark();
 }
 
 fn benchmark() {

@@ -1152,8 +1152,10 @@ mod tests {
                     manifest.outcome["adapter_id"] = serde_json::Value::Null;
                     manifest.outcome["strategy"] = serde_json::Value::Null;
                     storage::write_json(&f.root, "manifest.json", "manifest", &manifest).unwrap();
-                    let outer_error = dataset::verify_cell(&f.root, false)
-                        .expect_err("corrupt delivery accepted without optional replay");
+                    let outer_error = match dataset::verify_cell(&f.root, false) {
+                        Err(error) => error,
+                        Ok(_) => panic!("corrupt delivery accepted without optional replay"),
+                    };
                     assert!(
                         outer_error.contains("delivery addition ledger differs"),
                         "{outer_error}"

@@ -20,7 +20,7 @@ fn main() {
     };
     if let (Some(a), Some(b)) = (&old, &new) {
         assert_eq!(a.f.modulus, b.f.modulus);
-        assert_eq!(a.c.map(u32::from), b.c);
+        assert_eq!(a.c, b.c);
         for i in 0..64u16 {
             for j in 0..64u16 {
                 if u32::from(i) < a.f.q && u32::from(j) < a.f.q {
@@ -37,7 +37,7 @@ fn main() {
         (f.f.modulus, f.c)
     } else {
         let f = old.unwrap();
-        (f.f.modulus, f.c.map(u32::from))
+        (f.f.modulus, f.c)
     };
     println!(
         "{}",

@@ -147,7 +147,10 @@ pub(super) struct Session {
     caller: CallerAdmission,
 }
 impl Session {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn historical(&self) -> bool {
         ReplayMode::parse(&self.policy.mode) == Some(ReplayMode::Historical)
     }

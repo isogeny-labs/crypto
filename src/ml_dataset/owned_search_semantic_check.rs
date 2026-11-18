@@ -85,9 +85,15 @@ pub struct Audit {
     pub nodes: usize,
     pub partial: usize,
     pub rows: Vec<RowAudit>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub original_descent_verified: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub search_complete: bool,
 }
 struct Meter<'a, T: wire::Admission> {

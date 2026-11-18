@@ -308,7 +308,10 @@ fn large_prime_feature_projection(
             projected["large_prime_action"] = json!({"kind":"frobenius-with-signed-negation",
                 "lambda":actual["lambda"],"frobenius_power":1});
         }
-        Some("ml-ecdlp-generic-large-prime-transcript/v1") => {
+        Some(
+            "ml-ecdlp-generic-large-prime-transcript/v1"
+            | "ml-ecdlp-generic-large-prime-transcript/v2",
+        ) => {
             if domain["orbit_action"] != "identity-with-signed-negation" {
                 return Err("invalid generic large-prime orbit action".into());
             }
@@ -389,7 +392,15 @@ fn large_prime_cell_projection(
     }
     let domain: Value = super::read_json(&directory.join(&domain.path))?;
     let transcript: Value = super::read_json(&directory.join(&transcript.path))?;
-    if generic != (transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1") {
+    if generic
+        != matches!(
+            transcript["schema"].as_str(),
+            Some(
+                "ml-ecdlp-generic-large-prime-transcript/v1"
+                    | "ml-ecdlp-generic-large-prime-transcript/v2"
+            )
+        )
+    {
         return Err("large-prime transcript path/schema mismatch".into());
     }
     let inputs = large_prime_feature_projection(public, base, &domain, &transcript)?;

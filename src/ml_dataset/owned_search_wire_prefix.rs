@@ -16,7 +16,10 @@ pub struct Audit {
     charge: Charge,
 }
 impl Audit {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn raw(&self) -> &[u8] {
         &self.raw
     }
@@ -30,15 +33,24 @@ impl Audit {
             None
         }
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn consumed(&self) -> usize {
         self.consumed
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn nodes(&self) -> u64 {
         self.nodes
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn charge(&self) -> Charge {
         self.charge
     }

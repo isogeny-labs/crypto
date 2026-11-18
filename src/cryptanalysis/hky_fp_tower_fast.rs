@@ -68,9 +68,9 @@ use crate::cryptanalysis::hky_fp_tower::{
 
 const FREE_SHIFT: u32 = 56;
 const DEG_SHIFT: u32 = 120;
-const NONE: u32 = u32::MAX;
+pub(super) const NONE: u32 = u32::MAX;
 
-type Key = u128;
+pub(super) type Key = u128;
 
 fn key(mask: u64, free: &[u8; MAX_FREE]) -> Key {
     let deg = mask.count_ones() + free.iter().map(|&e| u32::from(e)).sum::<u32>();
@@ -263,7 +263,7 @@ pub struct FastStats {
 }
 
 /// A stored echelon row, monic, leading column first.
-enum RowS {
+pub(super) enum RowS {
     Sparse(Vec<(u32, u32)>),
     /// `v[i]` is the coefficient of column `lead + i`; `v[0] = 1`.
     Dense {
@@ -274,19 +274,19 @@ enum RowS {
 }
 
 impl RowS {
-    fn nnz(&self) -> usize {
+    pub(super) fn nnz(&self) -> usize {
         match self {
             RowS::Sparse(r) => r.len(),
             RowS::Dense { nnz, .. } => *nnz as usize,
         }
     }
-    fn words(&self) -> usize {
+    pub(super) fn words(&self) -> usize {
         match self {
             RowS::Sparse(r) => r.len(),
             RowS::Dense { v, .. } => v.len(),
         }
     }
-    fn for_each(&self, mut f: impl FnMut(u32, u32)) {
+    pub(super) fn for_each(&self, mut f: impl FnMut(u32, u32)) {
         match self {
             RowS::Sparse(r) => {
                 for &(c, x) in r {
@@ -304,13 +304,13 @@ impl RowS {
     }
 }
 
-type Row = Vec<(u32, u32)>;
+pub(super) type Row = Vec<(u32, u32)>;
 
 /// One part of the space: its columns (orbit representatives when split),
 /// highest degree first.
-struct Part {
-    keys: Vec<Key>,
-    deg: Vec<u8>,
+pub(super) struct Part {
+    pub(super) keys: Vec<Key>,
+    pub(super) deg: Vec<u8>,
 }
 
 struct Echelon {
@@ -368,13 +368,27 @@ unsafe fn axpy_avx512(acc: &mut [u64], row: &[u32], f: u64, p2: u64) {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
-enum Simd {
+pub(super) enum Simd {
     Portable,
+    #[cfg_attr(
+        not(target_arch = "x86_64"),
+        allow(
+            dead_code,
+            reason = "Preserves the explicit x86 backend vocabulary on other architectures."
+        )
+    )]
     Avx2,
+    #[cfg_attr(
+        not(target_arch = "x86_64"),
+        allow(
+            dead_code,
+            reason = "Preserves the explicit x86 backend vocabulary on other architectures."
+        )
+    )]
     Avx512,
 }
 
-fn detect_simd() -> Simd {
+pub(super) fn detect_simd() -> Simd {
     #[cfg(target_arch = "x86_64")]
     {
         if std::env::var_os("HKY2_SIMD").is_some_and(|v| v == "portable") {
@@ -396,7 +410,7 @@ fn detect_simd() -> Simd {
 }
 
 #[inline]
-fn axpy_dense(simd: Simd, acc: &mut [u64], row: &[u32], f: u64, p2: u64) {
+pub(super) fn axpy_dense(simd: Simd, acc: &mut [u64], row: &[u32], f: u64, p2: u64) {
     match simd {
         Simd::Portable => axpy_portable(acc, row, f, p2),
         #[cfg(target_arch = "x86_64")]
@@ -414,7 +428,7 @@ fn axpy_dense(simd: Simd, acc: &mut [u64], row: &[u32], f: u64, p2: u64) {
 /// Reduction of a value below `p²` modulo `p` without a division: `m` is
 /// `⌊2⁶⁴ / p⌋`, the quotient estimate is at most 2 too small.
 #[inline(always)]
-fn barrett(v: u64, p: u64, m: u64) -> u64 {
+pub(super) fn barrett(v: u64, p: u64, m: u64) -> u64 {
     let q = ((u128::from(v) * u128::from(m)) >> 64) as u64;
     let mut r = v - q * p;
     if r >= p {
@@ -598,7 +612,7 @@ impl Echelon {
     }
 }
 
-fn normalise(out: &mut Row, p: u64) -> u64 {
+pub(super) fn normalise(out: &mut Row, p: u64) -> u64 {
     if let Some(&(_, lead)) = out.first() {
         let s = inv(u64::from(lead), p);
         for e in out.iter_mut() {
@@ -694,9 +708,9 @@ pub fn check_symmetry(ring: &HkyRing, perm: &[usize], gens: &[NfPoly]) -> Result
 
 // ── the space: columns, products ───────────────────────────────────────
 
-struct Space<'a> {
+pub(super) struct Space<'a> {
     ring: &'a HkyRing,
-    parts: Vec<Part>,
+    pub(super) parts: Vec<Part>,
     /// Column of a monomial (unsplit), or of an orbit representative in the
     /// `+` part (split).
     index: Index,
@@ -758,7 +772,12 @@ fn all_keys(ring: &HkyRing, c: u32) -> Vec<Key> {
 }
 
 impl<'a> Space<'a> {
-    fn build(ring: &'a HkyRing, c: u32, perm: Option<Vec<usize>>, fast_index: bool) -> Self {
+    pub(super) fn build(
+        ring: &'a HkyRing,
+        c: u32,
+        perm: Option<Vec<usize>>,
+        fast_index: bool,
+    ) -> Self {
         let all = all_keys(ring, c);
         let nt = ring.n_tower();
         let mk_index = |keys: &[Key]| -> Index {
@@ -824,12 +843,12 @@ impl<'a> Space<'a> {
         }
     }
 
-    fn split(&self) -> bool {
+    pub(super) fn split(&self) -> bool {
         self.perm.is_some()
     }
 
     /// The variables whose products are formed (one of each swapped pair).
-    fn applies(&self, v: usize) -> bool {
+    pub(super) fn applies(&self, v: usize) -> bool {
         match &self.perm {
             Some(perm) if v < self.nt => perm[v] >= v,
             _ => true,
@@ -839,7 +858,7 @@ impl<'a> Space<'a> {
     /// `x_v · row` for a row of part `s`, as rows of the parts it lands in.
     /// Returns the number of terms formed before merging (the unit the
     /// reference counts) through `terms_out`.
-    fn multiply(&self, s: usize, row: &RowS, v: usize, out: &mut Vec<(u8, Row)>) -> u64 {
+    pub(super) fn multiply(&self, s: usize, row: &RowS, v: usize, out: &mut Vec<(u8, Row)>) -> u64 {
         let ring = self.ring;
         let p = ring.p;
         let nt = self.nt;
@@ -940,7 +959,7 @@ impl<'a> Space<'a> {
     }
 
     /// A generator as a row of its part.
-    fn gen_row(&self, g: &NfPoly, sign: i8) -> (u8, Row) {
+    pub(super) fn gen_row(&self, g: &NfPoly, sign: i8) -> (u8, Row) {
         match &self.perm {
             None => {
                 let mut r: Row = g
@@ -979,7 +998,7 @@ impl<'a> Space<'a> {
 
 /// The bucket of a row with `nnz` terms in [`QueueOrder::SparseFirst`]:
 /// `1 + ⌊log₂ nnz / width⌋` (`width` doublings per bucket).
-fn sparse_bucket(nnz: usize, width: usize) -> usize {
+pub(super) fn sparse_bucket(nnz: usize, width: usize) -> usize {
     let lg = (usize::BITS - 1 - nnz.max(1).leading_zeros()) as usize;
     1 + lg / width.max(1)
 }

@@ -174,7 +174,10 @@ impl<'a, T: Owner> Session<'a, T> {
             },
         }
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn candidate(&self) -> Option<&[bool]> {
         if self.attempt.failure.is_some() || self.attempt.outcome != Outcome::CandidateRetained {
             return None;

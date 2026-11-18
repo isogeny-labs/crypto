@@ -122,7 +122,7 @@ impl Budget {
             .min(original_deadline);
         static NEXT_OWNERSHIP: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
         let ownership_id = NEXT_OWNERSHIP
-            .fetch_update(
+            .try_update(
                 std::sync::atomic::Ordering::Relaxed,
                 std::sync::atomic::Ordering::Relaxed,
                 |id| id.checked_add(1),
@@ -2203,7 +2203,10 @@ mod signed_binding_tests {
 }
 /// Checked mathematical candidate. Durable custody is a separate publication.
 pub(super) struct CheckedSignedWitness {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     indices: [u8; 3],
     points: [(u64, u64); 3],
     target: (u64, u64),
@@ -3311,10 +3314,12 @@ mod bound_signed_publisher_tests {
         for p in value["summands"].as_array().unwrap() {
             let point = group.point(p).unwrap();
             assert!(group.on_curve(&point));
-            assert!(original
-                .signed
-                .iter()
-                .any(|&(x, y)| p["x"] == x && p["y"] == y));
+            assert!(original.signed.iter().any(|&(x, y)| {
+                let expected_x = x.to_string();
+                let expected_y = y.to_string();
+                p["x"].as_str() == Some(expected_x.as_str())
+                    && p["y"].as_str() == Some(expected_y.as_str())
+            }));
             sum = group.add(&sum, &point);
         }
         assert_eq!(sum, group.point(&value["target"]).unwrap());
@@ -4101,9 +4106,15 @@ struct SavedGroupReplay {
 }
 pub(super) struct VerifiedGroupReplay {
     math: VerifiedSignedMath,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_witness_check_additions: u8,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_total_additions: u64,
 }
 pub(super) fn verify_group_replay(
@@ -4487,9 +4498,15 @@ struct SavedMatrixReport {
 /// This is not a derivation certificate, full row-space check or solver verdict.
 struct MatrixAssessment {
     input_zero_assignments: usize,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     rows_checked: usize,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_native_step_complete: bool,
 }
 fn check_saved_boolean_polynomial(poly: &SavedEquation) -> Result<(), String> {
@@ -5769,11 +5786,12 @@ impl serde::Serialize for AdmittedKoblitzNative<'_> {
         serde::Serialize::serialize(&self.view, serializer)
     }
 }
-impl AdmittedKoblitzNative<'_> {
-    pub(in crate::ml_dataset) fn expected_wire_bytes(&self) -> usize {
+impl super::admitted_native_payload::Sealed for AdmittedKoblitzNative<'_> {}
+impl super::AdmittedKoblitzNativePayload for AdmittedKoblitzNative<'_> {
+    fn expected_wire_bytes(&self) -> usize {
         self.expected_wire_bytes
     }
-    pub(in crate::ml_dataset) fn capture_sequence(&self) -> u64 {
+    fn capture_sequence(&self) -> u64 {
         self.view.capture_sequence
     }
 }
@@ -6432,12 +6450,21 @@ impl Budget {
     }
 }
 struct BudgetLedgerAssessment {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_work: u64,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_bytes: u64,
     reported_over_limit: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     completion_eligible: bool,
 }
 fn verify_budget_ledger(
@@ -7628,7 +7655,10 @@ struct SavedReceipt {
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SavedPersistenceResult {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reason: String,
     serialized_complete: bool,
     retained_bytes: usize,
@@ -7984,10 +8014,16 @@ mod terminal_result_reader_tests {
 struct VerifiedCanonicalComponents {
     producer_ledger: SavedBudgetLedger,
     math: VerifiedCanonicalMath,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     native_boundaries: usize,
     reported_group_complete: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     input_zero_assignments: usize,
 }
 /// Join canonical arithmetic, reported terminal metadata and authenticated
@@ -9130,28 +9166,30 @@ mod parent_retention_admission_tests {
         let phase = b.phase;
         let deadline = b.deadline;
         let before = (b.checking_work, b.adapter_bytes, b.trace_bytes);
-        let mut parent = ParentRetention::begin(&mut b).unwrap();
-        let r = parent.execute(
-            RetentionQuote {
-                work: 7,
-                bytes: 11,
-                trace: 13,
-            },
-            || Ok::<_, ()>("saved"),
-        );
-        assert_eq!(r.value, Some("saved"));
-        assert!(r.error.is_none() && r.stop.is_none());
-        assert_eq!(parent.budget.stopped, Some(Stop::Observer));
-        assert_eq!(parent.budget.phase, phase);
-        assert_eq!(parent.budget.deadline, deadline);
-        assert_eq!(
-            (
-                parent.budget.checking_work,
-                parent.budget.adapter_bytes,
-                parent.budget.trace_bytes
-            ),
-            (before.0 + 7, before.1 + 11, before.2 + 13)
-        );
+        {
+            let mut parent = ParentRetention::begin(&mut b).unwrap();
+            let r = parent.execute(
+                RetentionQuote {
+                    work: 7,
+                    bytes: 11,
+                    trace: 13,
+                },
+                || Ok::<_, ()>("saved"),
+            );
+            assert_eq!(r.value, Some("saved"));
+            assert!(r.error.is_none() && r.stop.is_none());
+            assert_eq!(parent.budget.stopped, Some(Stop::Observer));
+            assert_eq!(parent.budget.phase, phase);
+            assert_eq!(parent.budget.deadline, deadline);
+            assert_eq!(
+                (
+                    parent.budget.checking_work,
+                    parent.budget.adapter_bytes,
+                    parent.budget.trace_bytes
+                ),
+                (before.0 + 7, before.1 + 11, before.2 + 13)
+            );
+        }
         assert!(matches!(ParentRetention::begin(&mut b), Err(Stop::Phase)));
         assert_eq!(b.check(Instant::now()), Err(Stop::Observer));
     }
@@ -10348,14 +10386,26 @@ fn verify_native_projection_receipt(
 }
 #[derive(Debug)]
 struct VerifiedParentDelivery {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     producer_transition_valid: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     producer_entry_anchor_verified: bool,
     delivery_complete: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     root_artifacts: usize,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     capture_acknowledgements: usize,
 }
 /// Admission and original mathematical replay supply expected_before. This
@@ -11888,6 +11938,7 @@ pub(super) fn run_verified_worker_entry(
     if let Some(artifact) = delivery.artifact.take() {
         accept_receipt(artifact);
     }
+    drop(accept_receipt);
     let receipt_rejected = !rejected_roots.is_empty();
     let ledger = budget.saved_ledger();
     let completed = ledger.phase == Phase::Complete

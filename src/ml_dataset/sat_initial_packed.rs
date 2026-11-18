@@ -14,15 +14,24 @@ fn bucket(n: usize) -> usize {
         _ => 0,
     }
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 fn zz(v: i64) -> u64 {
     ((v << 1) ^ (v >> 63)) as u64
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 fn unzz(v: u64) -> i64 {
     ((v >> 1) as i64) ^ (-((v & 1) as i64))
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 fn var<E>(mut n: u64, out: &mut impl FnMut(u8) -> Result<(), E>) -> Result<(), E> {
     while n >= 128 {
         out((n as u8) | 128)?;
@@ -30,7 +39,10 @@ fn var<E>(mut n: u64, out: &mut impl FnMut(u8) -> Result<(), E>) -> Result<(), E
     }
     out(n as u8)
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 pub(super) fn supported(e: &SolverEvent) -> bool {
     matches!(
         e,
@@ -45,7 +57,10 @@ pub(super) fn supported(e: &SolverEvent) -> bool {
 }
 /// Caller checks supported before entry. State is copied by the caller until
 /// this entire event has been counted/admitted, so refusal keeps prior state.
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 pub(super) fn encode<E>(
     e: &SolverEvent,
     state: &mut State,
@@ -130,12 +145,18 @@ pub(super) fn encode<E>(
     }
     Ok(())
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(super) struct Packed<'a> {
     pub events: &'a [SolverEvent],
     pub state: State,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 struct Text<'a>(&'a Packed<'a>);
 impl fmt::Display for Text<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -161,6 +182,7 @@ impl fmt::Display for Text<'_> {
         for e in self.0.events {
             encode(e, &mut state, &mut emit)?;
         }
+        drop(emit);
         if used != 0 {
             let s = [
                 ABC[(buf[0] >> 2) as usize],
@@ -189,7 +211,10 @@ impl Serialize for Packed<'_> {
     }
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(super) enum DecodeError {
     Truncated,
     Overflow,
@@ -198,25 +223,37 @@ pub(super) enum DecodeError {
     Cap,
     Admission,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(super) struct DecodeLimits {
     pub events: usize,
     pub slots: usize,
     pub words: usize,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 struct Reader<'a> {
     raw: &'a [u8],
     at: usize,
 }
 impl Reader<'_> {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn byte(&mut self) -> Result<u8, DecodeError> {
         let b = *self.raw.get(self.at).ok_or(DecodeError::Truncated)?;
         self.at += 1;
         Ok(b)
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn var(&mut self) -> Result<u64, DecodeError> {
         let mut n = 0u64;
         for i in 0..10 {
@@ -234,15 +271,24 @@ impl Reader<'_> {
         }
         Err(DecodeError::Overflow)
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn size(&mut self) -> Result<usize, DecodeError> {
         usize::try_from(self.var()?).map_err(|_| DecodeError::Overflow)
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn u32(&mut self) -> Result<u32, DecodeError> {
         u32::try_from(self.var()?).map_err(|_| DecodeError::Overflow)
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn i32(&mut self) -> Result<i32, DecodeError> {
         i32::try_from(unzz(self.var()?)).map_err(|_| DecodeError::Overflow)
     }
@@ -250,7 +296,10 @@ impl Reader<'_> {
 /// Raw binary is already bounded, decoded from canonical base64 and retained by
 /// caller. Each event and all payload storage are prepaid through reserve before
 /// allocation. Completed events remain in output on every error. No success seal.
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 pub(super) fn decode_into(
     raw: &[u8],
     state: &mut State,

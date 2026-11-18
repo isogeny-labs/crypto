@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# NOTE (2026-11-17): a copy of the lfd-summation-systems pod launcher, awaiting replacement (AGENTS.md "Implementation language: no Python"); kept unchanged because its control server runs on pods that only guarantee python3.
 """Launcher and remote control for ONE rented Runpod CPU pod (IC bounds, k=14 runs).
 
 Standard library only. Runpod calls and pod calls both go through curl (this

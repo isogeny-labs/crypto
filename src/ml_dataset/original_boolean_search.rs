@@ -21,10 +21,16 @@ mod sparse {
         fn check(&mut self) -> Result<(), ()>;
     }
 }
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "../cryptanalysis/boolean_identity_bqi.rs"]
 mod bqi;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "dynamic_boolean_search_bqi.rs"]
 mod bridge;
 #[path = "dynamic_boolean_search_check.rs"]
@@ -33,7 +39,10 @@ mod check;
 pub(in crate::ml_dataset::solvers) mod continuation;
 #[path = "retained_exclusion_verifier.rs"]
 pub(in crate::ml_dataset::solvers) mod exclusions;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "dynamic_boolean_search_scheduler.rs"]
 mod scheduler;
 pub(in crate::ml_dataset::solvers) use continuation::Limits as ContinuationLimits;
@@ -101,23 +110,41 @@ impl checked_model::VerificationAdmission for LiftAdmission<'_> {
 pub(in crate::ml_dataset::solvers) struct Caps {
     pub expansion: equations::Limits,
     pub continuation: ContinuationLimits,
-    pub checkpoint: Option<policy::CheckpointCadence>,
+    checkpoint: Option<policy::CheckpointCadence>,
 }
 #[derive(Clone, Copy, Debug)]
 pub(in crate::ml_dataset::solvers) enum Failure {
     Admission(Stop),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Expansion(equations::Failure),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Search(scheduler::Failure),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Audit(check::Failure),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     LiftStopped(provenance::Error),
     Continuation(continuation::Failure),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Coverage(continuation::Failure),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Exclusions(exclusions::Failure),
     Publication(Stop),
 }
@@ -155,7 +182,10 @@ struct OriginalParts {
     launch_sha256: [u8; 32],
     math: Math,
     checked: Option<provenance::CheckedMap>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     unchecked: Option<provenance::Map>,
     pattern: Option<u32>,
     map_bytes: Vec<u8>,
@@ -163,7 +193,10 @@ struct OriginalParts {
     publication_attempted: bool,
     map_published: bool,
     capture_limits: capture::CaptureLimits,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     boolean_attempted: bool,
 }
 /// Contains no lifetime parameters, borrowed maps or borrowed execution tokens.
@@ -195,14 +228,20 @@ impl OwnedAttempt {
     pub(in crate::ml_dataset::solvers) fn first_stop(&self) -> Option<Stop> {
         self.original.budget.stopped
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn charged(&self) -> (u64, u64) {
         (
             self.original.budget.native.work + self.original.budget.checking_work,
             self.original.budget.native.bytes + self.original.budget.adapter_bytes,
         )
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn lift_records(&self) -> &[LiftRecord] {
         &self.lift_records
     }
@@ -232,7 +271,10 @@ impl OwnedAttempt {
         self.coverage.as_ref().filter(|v| v.result.is_ok())
     }
     /// Raw replay diagnostics survive failed admission or arithmetic replay.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn exclusion_audit(&self) -> Option<&exclusions::Audit> {
         self.exclusion_audit.as_ref()
     }

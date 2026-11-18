@@ -1,0 +1,17 @@
+Prime-field coverage follow-up — frozen before the first solver call
+Parent objective: validate the initial pilot's Dickson D4 coverage signal with a broader paired exact census.
+Boundaries: local synthetic curves and producer-only evidence. This is a coverage experiment for a toy model, not an optimized solver, a timing comparison, or an exponent or novelty claim.
+
+Cohort:
+* Field primes: 101, 211, 503, 1009, 2003, 4001, 8009, 16001.
+* Per prime, the first six accepted distinct-j curves from seeded uniform nonzero (a,b) candidate draws, seed 0x202611170101 XOR p. Accept nonsingular curves of odd prime order r != p and with no embedding degree 1 through 6. Cap 8192 draws per prime. Confirm the enumerated generator order and one-to-one table.
+* B0 is the smallest integer B with 16*C(B,4) >= r. Test B0-1, B0, B0+1. This places the panel around a simple random occupancy threshold without fitting to observed coverage.
+* Bases: first rational x values (interval), first distinct rational x values encountered in D4(z,1) parameter order (Dickson), and 16 independently seeded, uniform samples without replacement from the same rational x pool (random). Use canonical y=min(y,p-y), sort each selected base by x before attaching label vectors. Preserve an explicit failure if the fixed Dickson prefix is too short. Enumerate all signed four-tuples of distinct base points for each base.
+* Conditional labels: all-one vector and four seeded independent nonzero vectors per curve and B, paired by positions across all bases. Compute informative coverage separately at residual Q-coefficient offsets v=0 and v=1. For fixed q=17, each point's label is (alpha_i - q*beta_i, beta_i), with P_i=[alpha_i]G. On a residual labelled (u,v), where u=alpha_R-q*v, a sum is informative if signed beta sum minus v is nonzero mod r. These labels measure conditional coverage with known toy scalars and do not model production APS label generation.
+
+Checks and observables:
+* Exact raw hits, raw energy, informative hits, sum and energy. Check 16*C(B,4) tuples, subset inequality and Cauchy bound at every cell.
+* For at least 32 deterministic signed tuples per base, separately sum affine points with the group law and check the scalar histogram index. Validate one labelled recovery whenever an informative witness exists for each base/law/v, independently through the point identity [q]G. Keep raw output and seed definitions.
+* Primary contrast at B0, v=0, with seeded labels: Dickson D4 coverage minus mean coverage across 16 random bases, pairing by curve and averaging four label seeds. Secondary comparison vs interval; report B0 +/- 1, label-law differences conditional on v, and raw support as descriptive.
+* Report percentage-point contrast with 95% percentile bootstrap (10,000 fixed-seed replicates, resample curves within original field-prime blocks and maintain each curve's paired base set). Equal weight per curve. This is uncertainty over the sampled curve design, conditional on the selected primes and base/label seed panel. Report paired win/tie/loss counts and across-seed per-curve spread. No multiplicity claim. Carry the Dickson advantage forward only if primary lower endpoint exceeds zero; describe a negative or inconclusive result explicitly.
+* Single process, 150 seconds maximum solve, 768 MiB virtual memory. Native C++20. Source, executable hash, raw output, diagnostics and summary retained in scratch. No repository changes.

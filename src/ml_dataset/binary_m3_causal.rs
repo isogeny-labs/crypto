@@ -36,7 +36,10 @@ fn authenticate_cached_original(
 #[serde(tag = "phase", rename_all = "snake_case", deny_unknown_fields)]
 enum Boundary {
     Matrix {
-        #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+        #[allow(
+            dead_code,
+            reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+        )]
         snapshot: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Event,
     },
     Signed {
@@ -48,7 +51,10 @@ enum Boundary {
 struct NativePayload {
     schema: String,
     binding_sha256: String,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     input_sha256: [u8; 32],
     input_capture_sequence: u64,
     sequence: u64,

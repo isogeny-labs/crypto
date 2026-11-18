@@ -5,9 +5,15 @@ use std::time::Instant;
 pub enum State {
     Complete,
     BoundTruncatedPrefix,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Unavailable,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Invalid,
 }
 #[derive(Clone, Copy, Debug)]

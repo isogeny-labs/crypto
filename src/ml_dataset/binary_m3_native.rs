@@ -91,7 +91,10 @@ pub(super) struct OrdinaryRootRegistry<'o> {
     slots: Option<retained_storage::RetainedSlots>,
 }
 impl<'o> OrdinaryRootRegistry<'o> {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn admit(
         original: &'o VerifiedWorkerOriginal<'o>,
         ledger: &mut Budget,
@@ -145,7 +148,10 @@ impl<'o> OrdinaryRootRegistry<'o> {
             input_identity_used: false,
         })
     }
-    #[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+    #[allow(
+        clippy::result_large_err,
+        reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+    )]
     pub(super) fn adopt_input<'a>(
         &mut self,
         step: OrdinaryMatrixStep<'a>,
@@ -260,7 +266,10 @@ impl<'o> OrdinaryRootRegistry<'o> {
     }
     // Future orchestrator consumes this registry with its completed/failed data;
     // actual root receipts move directly into the existing worker transport.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn finish(self, data: solvers::SolverData) -> OrdinaryWorkerOutput {
         OrdinaryWorkerOutput {
             worker: self.receipts.finish(data),
@@ -270,7 +279,10 @@ impl<'o> OrdinaryRootRegistry<'o> {
 }
 /// Handoff keeps incomplete encodings, rejected roots and authoritative bytes
 /// alive alongside accepted worker roots. The orchestrator must retain both.
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(super) struct OrdinaryWorkerOutput {
     worker: solvers::WorkerSolveOutput,
     retained_slots: Option<retained_storage::RetainedSlots>,
@@ -280,7 +292,10 @@ pub(super) struct OrdinaryWorkerOutput {
 pub(super) struct RegisteredMatrixInput<'a> {
     input_sha256: [u8; 32],
     retained: Retained,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     bytes: Vec<u8>,
     capture_sequence: u64,
     math: MathInput,

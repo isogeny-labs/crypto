@@ -5,7 +5,10 @@ pub(in crate::ml_dataset::solvers) const SCHEMA: &str =
     "crypto.ml-dataset.original-unit-boolean-row/v1";
 pub(in crate::ml_dataset::solvers) const ROLE: &str = "boolean-original-unit-row";
 pub(in crate::ml_dataset::solvers) const META_CAP: u64 = 8192;
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+)]
 pub(in crate::ml_dataset::solvers) const REPORT_CAP: u64 = 4096;
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -34,7 +37,10 @@ pub(in crate::ml_dataset::solvers) struct Metadata {
     pub scalar_recovered: bool,
 }
 #[derive(Serialize)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(in crate::ml_dataset::solvers) struct Wire<'a> {
     pub schema: &'static str,
     pub metadata: &'a Metadata,

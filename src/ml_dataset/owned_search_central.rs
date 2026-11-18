@@ -7,10 +7,16 @@ mod sparse {
         fn check(&mut self) -> Result<(), ()>;
     }
 }
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "../cryptanalysis/boolean_identity_bqi.rs"]
 mod bqi;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "dynamic_boolean_search_bqi.rs"]
 mod bridge;
 #[path = "owned_search_checkpoint_selection.rs"]
@@ -19,7 +25,10 @@ mod checkpoint_selection;
 mod descent;
 #[path = "owned_search_interrupted_outcome.rs"]
 mod interrupted_outcome;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "dynamic_boolean_search_scheduler.rs"]
 mod scheduler;
 #[path = "owned_search_semantic_check.rs"]
@@ -194,11 +203,17 @@ impl Custody {
     pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
         self.frame.usage()
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn charged(&self) -> (u64, u64) {
         self.usage()
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn retained_slot_bytes(&self) -> u64 {
         self.frame.budget.bytes
     }
