@@ -757,6 +757,102 @@ theorem zmodAffinePoint_frobeniusVerschiebung_sum
     simpa only [ZMod.card] using hchar
   exact affinePoint_frobeniusVerschiebung_sum W verschiebung trace hnorm' hchar'
 
+/-- Inverse Frobenius on the affine point group over an algebraic extension of
+the prime field. Mathlib supplies the field-level Frobenius algebra
+automorphism; this definition maps its inverse functorially to points. -/
+noncomputable def zmodAffineFrobeniusPointInvEnd
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p)) :
+    AddMonoid.End (WeierstrassCurve.Affine.Point (W.baseChange E)) :=
+  WeierstrassCurve.Affine.Point.map (W' := W)
+    (FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod p) E).symm.toAlgHom
+
+/-- Frobenius composed with the point map induced by inverse Frobenius is the
+identity endomorphism. -/
+theorem zmodAffineFrobeniusPointEnd_mul_inv
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p)) :
+    affineFrobeniusPointEnd (E := E) W *
+      zmodAffineFrobeniusPointInvEnd W = 1 := by
+  ext point
+  change WeierstrassCurve.Affine.Point.map
+      (FiniteField.frobeniusAlgHom (ZMod p) E)
+      (WeierstrassCurve.Affine.Point.map
+        (FiniteField.frobeniusAlgEquivOfAlgebraic
+          (ZMod p) E).symm.toAlgHom point) = point
+  rw [WeierstrassCurve.Affine.Point.map_map]
+  have hcomp : (FiniteField.frobeniusAlgHom (ZMod p) E).comp
+      (FiniteField.frobeniusAlgEquivOfAlgebraic
+        (ZMod p) E).symm.toAlgHom =
+      AlgHom.id (ZMod p) E := by
+    ext x
+    exact (FiniteField.frobeniusAlgEquivOfAlgebraic
+      (ZMod p) E).apply_symm_apply x
+  rw [hcomp]
+  cases point <;> rfl
+
+/-- Pointwise Verschiebung over an algebraic prime-field extension, defined as
+`[p]` followed by inverse Frobenius. This is an additive point endomorphism;
+identifying it with a particular rational or scheme morphism remains a
+separate semantic obligation. -/
+noncomputable def zmodAffineVerschiebungPointEnd
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p)) :
+    AddMonoid.End (WeierstrassCurve.Affine.Point (W.baseChange E)) :=
+  (p : AddMonoid.End
+      (WeierstrassCurve.Affine.Point (W.baseChange E))) *
+    zmodAffineFrobeniusPointInvEnd W
+
+/-- The constructed pointwise Verschiebung satisfies the exact norm relation
+`pi * V = [p]`. -/
+theorem zmodAffineFrobenius_mul_verschiebung
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p)) :
+    affineFrobeniusPointEnd (E := E) W *
+      zmodAffineVerschiebungPointEnd W =
+        (p : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) := by
+  rw [zmodAffineVerschiebungPointEnd, ← mul_assoc]
+  have hcomm : Commute (affineFrobeniusPointEnd (E := E) W)
+      (p : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))) := by
+    rw [Commute]
+    ext point
+    change affineFrobeniusPointEnd (E := E) W (p • point) =
+      p • affineFrobeniusPointEnd (E := E) W point
+    exact (affineFrobeniusPointEnd (E := E) W).map_nsmul p point
+  rw [hcomm.eq, mul_assoc, zmodAffineFrobeniusPointEnd_mul_inv, mul_one]
+
+/-- For the constructed pointwise Verschiebung, the Frobenius characteristic
+equation is the only remaining algebraic premise needed to derive
+`V + pi = [trace]` on affine points. -/
+theorem zmodAffineVerschiebung_sum_of_characteristic
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p)) (trace : ℤ)
+    (hchar : affineFrobeniusPointEnd (E := E) W ^ 2 -
+        (trace : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) *
+            affineFrobeniusPointEnd (E := E) W +
+        ((p : ℤ) : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) = 0) :
+    zmodAffineVerschiebungPointEnd W +
+        affineFrobeniusPointEnd (E := E) W =
+      (trace : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))) := by
+  exact zmodAffinePoint_frobeniusVerschiebung_sum W
+    (zmodAffineVerschiebungPointEnd W) trace
+    (zmodAffineFrobenius_mul_verschiebung W) hchar
+
 /-- Every one-dimensional formal group law differs from its first input by a
 multiple of its second variable. This is the algebraic filtration statement
 behind the H116 Frobenius cutoff; it uses Mathlib's actual `FormalGroup`, not a
@@ -2111,6 +2207,9 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms affinePoint_frobeniusVerschiebung_sum
 #print axioms zmodAffineFrobeniusPointEnd_some
 #print axioms zmodAffinePoint_frobeniusVerschiebung_sum
+#print axioms zmodAffineFrobeniusPointEnd_mul_inv
+#print axioms zmodAffineFrobenius_mul_verschiebung
+#print axioms zmodAffineVerschiebung_sum_of_characteristic
 #print axioms FormalGroup.secondVariable_dvd_sub_X
 #print axioms FormalGroup.add_correction_eq
 #print axioms FormalGroup.filtered_correction_prefix

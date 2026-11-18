@@ -173,10 +173,14 @@ one, while the sum conclusion fails. The positive Frobenius instance is now
 constructed on Mathlib's actual nonsingular affine points by applying
 `Affine.Point.map` to the finite-field Frobenius algebra homomorphism. Mathlib
 proves this point map additive and injective; over `ZMod p`, Lean proves its
-coordinates are exactly `(x^p,y^p)`. The remaining point-group obligations are
-the actual Verschiebung plus the norm and characteristic equations. Connecting
-the resulting equality to the formal parameter, negation, sign and target
-scaling remains open.
+coordinates are exactly `(x^p,y^p)`. Over any algebraic extension of
+`ZMod p`, inverse field Frobenius now induces an inverse point endomorphism.
+Defining the pointwise candidate `V=[p]*piInverse`, Lean proves
+`pi*piInverse=1`, hence `pi*V=[p]`. The characteristic equation is therefore
+the only remaining positive point-group algebraic premise needed to derive
+`V+pi=[t]`. Identifying this pointwise candidate with the retained
+rational/scheme Verschiebung and transporting the equality to the formal
+parameter, negation, sign and target scaling remain open.
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

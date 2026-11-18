@@ -154,10 +154,13 @@ mutation control satisfies both equations with noninjective zero `pi` but
 rejects the sum conclusion. The positive Frobenius is now an actual Mathlib
 affine-point endomorphism induced by `FiniteField.frobeniusAlgHom`; it is
 additive and injective, and over `ZMod p` sends `(x,y)` exactly to
-`(x^p,y^p)`. The remaining positive point-group certificates are the actual
-Verschiebung, norm equation and characteristic equation. Binding their
-resulting equality, elliptic negation, sign and scaling identifications to the
-formal parameter is still the endpoint. The coordinate formulas
+`(x^p,y^p)`. Over algebraic extensions of `ZMod p`, inverse Frobenius now
+induces an inverse point map. Defining `V=[p]*piInverse` proves the norm
+relation `pi*V=[p]` internally, so the characteristic equation is the only
+remaining positive point-group algebraic premise for `V+pi=[t]`. Identifying
+this pointwise `V` with the retained rational/scheme Verschiebung and binding
+the resulting equality, elliptic negation, sign and scaling identifications to
+the formal parameter are still endpoint obligations. The coordinate formulas
 themselves are now formal:
 for `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
 the exact `z -> z^p` formula for a supplied coordinatewise `p`-power

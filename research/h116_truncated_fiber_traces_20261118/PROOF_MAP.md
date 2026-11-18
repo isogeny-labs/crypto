@@ -428,12 +428,13 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
    `7a5401d3108c1e58a5838a9bbfacb8356c0a5b163bcfa484e73282388a660aa4`.
 5. **Missing components only.** The point Frobenius map, its additive law,
    injectivity and exact prime-field coordinate action are discharged. The
-   endpoint still needs an actual Verschiebung endomorphism on this point
-   group, the norm and characteristic-polynomial equalities, and a transport
-   from point-endomorphism equality to equality of the chosen local
-   formal-group series. A decidable-equality instance for the extension field
-   is explicit because the pinned affine group-law API requires it; a classical
-   instance is admissible but no computability claim is made.
+   following gate constructs the point-group Verschiebung and proves the norm
+   relation over an algebraic extension. The characteristic-polynomial
+   equality and transport from point-endomorphism equality to equality of the
+   chosen local formal-group series remain open. A decidable-equality instance
+   for the extension field is explicit because the pinned affine group-law API
+   requires it; a classical instance is admissible but no computability claim
+   is made.
 6. **Inheritance table.** The curve, nonsingular point group, base change,
    coordinate map, additive-homomorphism proof, injectivity proof, finite-field
    Frobenius and `ZMod` cardinality are all inherited from Mathlib. H116 names
@@ -447,7 +448,53 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
 | coordinatewise finite-field Frobenius is an injective additive point endomorphism | elliptic instance | H116 over Mathlib | nonsingular points of `W.baseChange F` | finite base field, field extension, decidable equality used by pinned point API |
 | over `ZMod p`, point coordinates map as `(x,y) -> (x^p,y^p)` | prime-field instance | H116 over Mathlib | base-changed affine Weierstrass points | `Fact p.Prime` |
 | `V+pi=[t]` on actual affine points | composed endpoint | H116 | `AddMonoid.End ((W.baseChange F).Point)` | supplied `V`, norm equation, characteristic equation |
-| formal-series equality for the retained `V-1` map | endpoint obligation | future elliptic owner | local formal group and rational map | construct `V`; prove norm/characteristic equations; transport point equality to local series and bind sign/scaling |
+| pointwise Verschiebung and norm refinement | following instance gate | H116 over Mathlib | algebraic extension affine points | construct `[p]*piInverse`; prove norm internally; leave characteristic equation and local-series semantics explicit |
+
+## Algebraic-extension pointwise Verschiebung instance gate
+
+1. **Structure above.** Specialize the extension field `E/ZMod p` to an
+   algebraic field extension. Mathlib's
+   `FiniteField.frobeniusAlgEquivOfAlgebraic` makes the field Frobenius an
+   algebra automorphism. Mapping its inverse through the same affine-point
+   functor gives an inverse Frobenius point endomorphism. Define the pointwise
+   Verschiebung candidate as `[p]` composed with that inverse.
+2. **Theorems used as stated.** `Affine.Point.map_map` identifies composition
+   of point maps with composition of algebra maps; the Frobenius algebra
+   equivalence's `apply_symm_apply` law makes the composite the identity.
+   `AddMonoidHom.map_nsmul` centralizes `[p]` against Frobenius. The preceding
+   prime-field affine-point theorem then consumes the proved norm relation.
+3. **Object as an instance.** `zmodAffineFrobeniusPointInvEnd W` is the point
+   map of inverse Frobenius, and
+   `zmodAffineVerschiebungPointEnd W=[p]*piInverse`. Lean proves
+   `pi*piInverse=1`, hence `pi*V=[p]`. Consequently the characteristic equation
+   alone implies `V+pi=[t]` on the actual nonsingular affine point group.
+4. **Assembly probe.** A temporary module importing the tracked H116 module
+   checked inverse composition, the pointwise Verschiebung definition, the norm
+   equation and the characteristic-only sum theorem at default limits. Probe
+   source SHA-256 is
+   `f1f896488d960bfb19ae6f72277371f0bceb7e60d4927511c209695b74d7db7e`;
+   successful output SHA-256 is
+   `428c1eaefa5fbef1303cb11a5e250595caf4da3a9f6c0524ac38ac0ae8edc730`.
+5. **Missing components only.** This constructs an additive point-group map
+   with the defining norm identity of Verschiebung. It does not prove that the
+   map is represented by the retained rational/scheme morphism, nor that point
+   equality implies equality of local formal power series. The Frobenius
+   characteristic equation remains an explicit premise. Those three items are
+   the semantic endpoint; no asymptotic claim follows from the pointwise
+   construction.
+6. **Inheritance table.** Algebraicity, Frobenius automorphism, inverse laws,
+   affine-point functoriality, scalar multiplication and additive composition
+   are inherited from Mathlib. H116 only defines `[p]*piInverse` and composes
+   the inherited laws. No curve addition formula, isogeny evaluator,
+   point-counting proof, decoder, runtime claim, trusted decision procedure or
+   limit override is introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| inverse field Frobenius induces an inverse point endomorphism | elliptic point instance | H116 over Mathlib | nonsingular affine points after algebraic base change | `Algebra.IsAlgebraic (ZMod p) E` |
+| pointwise `V=[p]*piInverse` satisfies `pi*V=[p]` | constructed norm identity | H116 | additive point endomorphism ring | same algebraic extension |
+| characteristic equation implies `V+pi=[t]` | composed point theorem | H116 | actual affine point group | supplied characteristic equation only |
+| identify pointwise `V` with retained rational/scheme map and local series | endpoint obligation | future elliptic owner | rational morphism and local formal group | morphism semantics, characteristic equation, equality-to-series transport |
 
 ## Short-Weierstrass local-parameter instance gate
 
