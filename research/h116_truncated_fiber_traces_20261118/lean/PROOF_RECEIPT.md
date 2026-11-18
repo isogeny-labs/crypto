@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-158fb904645af9ddf79b7a250f085b91b3fd9a116cbd936a394502afcc6d267a  H116FiberTrace.lean
+83c952672f7ae6ad8f3f5e06bc45079af407d7077ff28ce146af003723b37d59  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  96 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  101 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -37,6 +37,8 @@ e799ca27fd505fd3bd6d62389f8a609bf2a99e23765c810eb2c8ab8fff7210e1  receipts/forma
 555c4dbcbbc1bf204023d35b37e47b1211b2dfc2eacc0aa1b4c9d5be673849fd  receipts/formal-cancellation-audit.txt
 d0b4471bb8940fdc9338cdafd1a2067462d9b7dcaa8d872b3ab3b17b35ad047e  receipts/endomorphism-specialization-build.txt
 79e02a8aac2abe78f8053a1c859a4617a379e25cb973f0beacaa86992af0243e  receipts/endomorphism-specialization-audit.txt
+b07aea6e5114e29df4209e1c4548be6a807dffb4853c91323e2ceb574a994c2c  receipts/affine-frobenius-build.txt
+9b5f3da4fc8ef2c694fdd9942086c3a7f42e936a4512ba3c0067ca94257164f4  receipts/affine-frobenius-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -141,8 +143,17 @@ additive endomorphisms. A checked `ZMod 2` mutation control sets `pi=V=0`,
 sum conclusion fails, demonstrating that injectivity is a necessary boundary.
 Constructing the actual elliptic maps, proving the three positive certificates,
 and transporting pointwise equality to the local formal group remain explicit
-endpoint obligations.
-[pcc:unverified]
+endpoint obligations. [pcc:unverified]
+
+The 101-theorem checkpoint constructs the positive Frobenius map on Mathlib's
+actual nonsingular affine point group. For a curve over a finite field `k`
+base-changed to a field `E`, `FiniteField.frobeniusAlgHom k E` induces an
+injective additive point endomorphism whose affine coordinates are raised to
+`#k`; over `ZMod p` they are exactly raised to `p`. The composed prime-field
+theorem therefore needs only a supplied Verschiebung plus `pi*V=[p]` and the
+Frobenius characteristic equation to derive `V+pi=[t]` on points. Constructing
+that Verschiebung, proving those two endomorphism equalities, and transporting
+point equality to the local formal-group series remain open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

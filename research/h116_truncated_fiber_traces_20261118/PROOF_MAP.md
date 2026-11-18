@@ -379,11 +379,12 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
    `46055e171c5b3dd5f6753c2d0a0ac3e7ca4c82cd0546d98a958ccd9bd9da98ba`.
 5. **Missing components only.** Scalar centrality and the abstract
    left-cancellation premise are no longer endpoint certificates. An actual
-   elliptic instance must still define Frobenius and Verschiebung on the chosen
-   point group, prove pointwise injectivity of Frobenius, and supply the norm
-   and characteristic-polynomial equalities. Equality on points must still be
-   connected to the local formal-group series; this specialization does not
-   silently identify the two categories.
+   elliptic instance must still bind this theorem to the chosen point group and
+   supply Frobenius, Verschiebung, norm and characteristic-polynomial data.
+   The following affine-point gate discharges Frobenius construction and
+   injectivity. Equality on points must still be connected to the local
+   formal-group series; this specialization does not silently identify the two
+   categories.
 6. **Inheritance table.** Composition, the endomorphism ring, integer scalar
    maps, preservation of integer multiples, and function extensionality are
    inherited from Mathlib. H116 only specializes its preceding abstract ring
@@ -397,7 +398,56 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
 | injective `pi` cancels left composition | inherited instance law | H116 over function extensionality | additive commutative group | `Function.Injective pi` |
 | `V+pi=[trace]` on an additive point group | endomorphism specialization | H116 | `AddMonoid.End G` | injective `pi`, norm equation, characteristic equation |
 | noninjective mutation rejects the sum conclusion | negative control | H116 | `AddMonoid.End (ZMod 2)` | `pi=V=0`, `trace=1`, `cardinality=2`; norm and characteristic equations hold but the conclusion fails |
-| actual elliptic-point instance | endpoint obligation | future elliptic owner | geometric points of an elliptic curve | construct `pi,V`; prove injectivity, norm and characteristic equations |
+| affine elliptic-point refinement | following instance gate | H116 over Mathlib | nonsingular points of a base-changed Weierstrass curve | bind `pi` via field Frobenius; leave `V`, norm and characteristic equations explicit |
+
+## Affine elliptic-point Frobenius instance gate
+
+1. **Structure above.** Let `K` be a finite field, `F` a field extension of
+   `K`, and `W` an affine Weierstrass curve over `K`. Mathlib's nonsingular
+   point type on `W.baseChange F` is an additive commutative group. The
+   endomorphism is `WeierstrassCurve.Affine.Point.map` applied to
+   `FiniteField.frobeniusAlgHom K F`, which raises coordinates to `#K`.
+2. **Theorems used as stated.** `Affine.Point.map` is already an additive group
+   homomorphism induced by a base-preserving algebra map;
+   `Affine.Point.map_injective` proves it injective;
+   `FiniteField.coe_frobeniusAlgHom` identifies its field action with the
+   `#K`-power map; and `ZMod.card` specializes `#(ZMod p)` to `p`.
+3. **Object as an instance.** `affineFrobeniusPointEnd W` is an actual
+   `AddMonoid.End` of nonsingular points on the base-changed curve. On an
+   affine point `(x,y)` it maps coordinates to `(x^(#K),y^(#K))`; for
+   `K=ZMod p` these are exactly `(x^p,y^p)`. The composed theorem derives
+   `V+pi=[t]` from only `pi*V=[p]` and
+   `pi^2-[t]*pi+[p]=0`, because construction and injectivity of `pi` are now
+   internal.
+4. **Assembly probe.** A temporary module importing the tracked H116 module,
+   Mathlib's affine point API and finite-field Frobenius API checked the
+   constructor, injectivity, coordinate formula, generic finite-field sum
+   theorem and `ZMod p` specialization at default limits. Probe source SHA-256
+   is `8482c86b0afb73ef9b5ac7fbce0a4155ad0f652b1b2b64c497069daaa4c2e217`;
+   successful output SHA-256 is
+   `7a5401d3108c1e58a5838a9bbfacb8356c0a5b163bcfa484e73282388a660aa4`.
+5. **Missing components only.** The point Frobenius map, its additive law,
+   injectivity and exact prime-field coordinate action are discharged. The
+   endpoint still needs an actual Verschiebung endomorphism on this point
+   group, the norm and characteristic-polynomial equalities, and a transport
+   from point-endomorphism equality to equality of the chosen local
+   formal-group series. A decidable-equality instance for the extension field
+   is explicit because the pinned affine group-law API requires it; a classical
+   instance is admissible but no computability claim is made.
+6. **Inheritance table.** The curve, nonsingular point group, base change,
+   coordinate map, additive-homomorphism proof, injectivity proof, finite-field
+   Frobenius and `ZMod` cardinality are all inherited from Mathlib. H116 names
+   their composition and applies the previously audited endomorphism theorem.
+   No curve addition formula, isogeny law, point-counting result, decoder,
+   complexity claim, trusted decision procedure or limit override is added.
+   [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| coordinatewise finite-field Frobenius is an injective additive point endomorphism | elliptic instance | H116 over Mathlib | nonsingular points of `W.baseChange F` | finite base field, field extension, decidable equality used by pinned point API |
+| over `ZMod p`, point coordinates map as `(x,y) -> (x^p,y^p)` | prime-field instance | H116 over Mathlib | base-changed affine Weierstrass points | `Fact p.Prime` |
+| `V+pi=[t]` on actual affine points | composed endpoint | H116 | `AddMonoid.End ((W.baseChange F).Point)` | supplied `V`, norm equation, characteristic equation |
+| formal-series equality for the retained `V-1` map | endpoint obligation | future elliptic owner | local formal group and rational map | construct `V`; prove norm/characteristic equations; transport point equality to local series and bind sign/scaling |
 
 ## Short-Weierstrass local-parameter instance gate
 

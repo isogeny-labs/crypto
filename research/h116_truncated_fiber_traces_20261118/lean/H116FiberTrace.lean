@@ -1,7 +1,9 @@
 import Mathlib.Algebra.Polynomial.Derivation
 import Mathlib.Algebra.Group.Hom.End
+import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
+import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.RingTheory.FormalGroup.Basic
 import Mathlib.RingTheory.LaurentSeries
 import Mathlib.RingTheory.PowerSeries.Derivative
@@ -643,6 +645,117 @@ theorem endomorphism_injectivity_control :
   · intro h
     have h1 := DFunLike.congr_fun h (1 : ZMod 2)
     norm_num at h1
+
+/-- Coordinatewise finite-field Frobenius as an actual additive endomorphism
+of Mathlib's nonsingular affine points. The curve is defined over the finite
+field `k`, then base-changed to the field `E`. -/
+noncomputable def affineFrobeniusPointEnd
+    {k E : Type*} [Field k] [Fintype k] [Field E] [DecidableEq E]
+    [Algebra k E] (W : WeierstrassCurve.Affine k) :
+    AddMonoid.End
+      (WeierstrassCurve.Affine.Point (W.baseChange E)) :=
+  WeierstrassCurve.Affine.Point.map (W' := W)
+    (FiniteField.frobeniusAlgHom k E)
+
+/-- The coordinatewise finite-field Frobenius on affine elliptic points is
+injective. This is inherited from Mathlib's injectivity theorem for the point
+map induced by a field algebra homomorphism. -/
+theorem affineFrobeniusPointEnd_injective
+    {k E : Type*} [Field k] [Fintype k] [Field E] [DecidableEq E]
+    [Algebra k E] (W : WeierstrassCurve.Affine k) :
+    Function.Injective (affineFrobeniusPointEnd (E := E) W) := by
+  exact WeierstrassCurve.Affine.Point.map_injective (W' := W)
+    (FiniteField.frobeniusAlgHom k E)
+
+/-- On a finite-field base change, the point Frobenius raises both affine
+coordinates to the cardinality of the base field. -/
+theorem affineFrobeniusPointEnd_some
+    {k E : Type*} [Field k] [Fintype k] [Field E] [DecidableEq E]
+    [Algebra k E] (W : WeierstrassCurve.Affine k) {x y : E}
+    (h : WeierstrassCurve.Affine.Nonsingular (W.baseChange E) x y) :
+    affineFrobeniusPointEnd (E := E) W
+        (WeierstrassCurve.Affine.Point.some x y h) =
+      WeierstrassCurve.Affine.Point.some
+        (x ^ Fintype.card k) (y ^ Fintype.card k)
+        ((W.baseChange_nonsingular
+          (FiniteField.frobeniusAlgHom k E).injective ..).mpr h) := by
+  rfl
+
+/-- The Frobenius--Verschiebung sum identity on Mathlib's actual affine point
+group. Frobenius construction and injectivity are now internal; only the
+Verschiebung, norm, and characteristic equations remain explicit. -/
+theorem affinePoint_frobeniusVerschiebung_sum
+    {k E : Type*} [Field k] [Fintype k] [Field E] [DecidableEq E]
+    [Algebra k E] (W : WeierstrassCurve.Affine k)
+    (verschiebung : AddMonoid.End
+      (WeierstrassCurve.Affine.Point (W.baseChange E))) (trace : ℤ)
+    (hnorm : affineFrobeniusPointEnd (E := E) W * verschiebung =
+      ((Fintype.card k : ℤ) : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))))
+    (hchar : affineFrobeniusPointEnd (E := E) W ^ 2 -
+        (trace : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) *
+            affineFrobeniusPointEnd (E := E) W +
+        ((Fintype.card k : ℤ) : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) = 0) :
+    verschiebung + affineFrobeniusPointEnd (E := E) W =
+      (trace : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))) := by
+  exact endomorphism_frobeniusVerschiebung_sum
+    (affineFrobeniusPointEnd (E := E) W) verschiebung trace (Fintype.card k)
+    (affineFrobeniusPointEnd_injective (E := E) W) hnorm hchar
+
+/-- Over a prime field, the actual affine-point Frobenius sends coordinates
+exactly to their `p`-th powers. -/
+theorem zmodAffineFrobeniusPointEnd_some
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p)) {x y : E}
+    (h : WeierstrassCurve.Affine.Nonsingular (W.baseChange E) x y) :
+    affineFrobeniusPointEnd (E := E) W
+        (WeierstrassCurve.Affine.Point.some x y h) =
+      WeierstrassCurve.Affine.Point.some
+        (x ^ p) (y ^ p)
+        (by
+          simpa only [FiniteField.coe_frobeniusAlgHom, ZMod.card] using
+            ((W.baseChange_nonsingular
+              (FiniteField.frobeniusAlgHom (ZMod p) E).injective ..).mpr h)) := by
+  simpa only [ZMod.card] using affineFrobeniusPointEnd_some W h
+
+/-- Prime-field specialization: on the actual affine point group,
+`V + pi = [trace]` follows from the norm and characteristic equations alone;
+the coordinatewise `p`-power Frobenius and its injectivity are constructed by
+the preceding declarations. -/
+theorem zmodAffinePoint_frobeniusVerschiebung_sum
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p))
+    (verschiebung : AddMonoid.End
+      (WeierstrassCurve.Affine.Point (W.baseChange E))) (trace : ℤ)
+    (hnorm : affineFrobeniusPointEnd (E := E) W * verschiebung =
+      ((p : ℤ) : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))))
+    (hchar : affineFrobeniusPointEnd (E := E) W ^ 2 -
+        (trace : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) *
+            affineFrobeniusPointEnd (E := E) W +
+        ((p : ℤ) : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) = 0) :
+    verschiebung + affineFrobeniusPointEnd (E := E) W =
+      (trace : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))) := by
+  have hnorm' : affineFrobeniusPointEnd (E := E) W * verschiebung =
+      ((Fintype.card (ZMod p) : ℤ) : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))) := by
+    simpa only [ZMod.card] using hnorm
+  have hchar' : affineFrobeniusPointEnd (E := E) W ^ 2 -
+        (trace : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) *
+            affineFrobeniusPointEnd (E := E) W +
+        ((Fintype.card (ZMod p) : ℤ) : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) = 0 := by
+    simpa only [ZMod.card] using hchar
+  exact affinePoint_frobeniusVerschiebung_sum W verschiebung trace hnorm' hchar'
 
 /-- Every one-dimensional formal group law differs from its first input by a
 multiple of its second variable. This is the algebraic filtration statement
@@ -1993,6 +2106,11 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms frobeniusVerschiebung_sum_of_characteristic
 #print axioms endomorphism_frobeniusVerschiebung_sum
 #print axioms endomorphism_injectivity_control
+#print axioms affineFrobeniusPointEnd_injective
+#print axioms affineFrobeniusPointEnd_some
+#print axioms affinePoint_frobeniusVerschiebung_sum
+#print axioms zmodAffineFrobeniusPointEnd_some
+#print axioms zmodAffinePoint_frobeniusVerschiebung_sum
 #print axioms FormalGroup.secondVariable_dvd_sub_X
 #print axioms FormalGroup.add_correction_eq
 #print axioms FormalGroup.filtered_correction_prefix

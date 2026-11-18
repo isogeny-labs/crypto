@@ -167,12 +167,16 @@ theorem derives `V+pi=[t]` from the Frobenius characteristic polynomial,
 `pi*V=[p]`, left cancellation by `pi`, and centrality of `[t]`. Binding those
 abstract premises to additive endomorphisms now removes two certificates:
 integer scalar maps are central automatically, and injective `pi` supplies
-left-composition cancellation. Thus an actual point-group instance needs
-injective Frobenius plus the norm and characteristic equations. A checked
-`ZMod 2` mutation shows injectivity is necessary: the two equations hold for
-zero `pi,V`, cardinality two and trace one, while the sum conclusion fails.
-Constructing the elliptic maps and connecting their equality to the formal
-parameter, negation, order-`p` Frobenius, sign and target scaling remains open.
+left-composition cancellation. A checked `ZMod 2` mutation shows injectivity
+is necessary: the two equations hold for zero `pi,V`, cardinality two and trace
+one, while the sum conclusion fails. The positive Frobenius instance is now
+constructed on Mathlib's actual nonsingular affine points by applying
+`Affine.Point.map` to the finite-field Frobenius algebra homomorphism. Mathlib
+proves this point map additive and injective; over `ZMod p`, Lean proves its
+coordinates are exactly `(x^p,y^p)`. The remaining point-group obligations are
+the actual Verschiebung plus the norm and characteristic equations. Connecting
+the resulting equality to the formal parameter, negation, sign and target
+scaling remains open.
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

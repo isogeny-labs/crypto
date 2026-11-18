@@ -149,13 +149,15 @@ constructed inverse series. An abstract possibly noncommutative-ring theorem
 now derives `V+pi=[t]` from the Frobenius characteristic polynomial,
 `pi*V=[p]`, left cancellation by `pi`, and centrality of `[t]`. Binding those
 premises to `AddMonoid.End G` now proves scalar centrality automatically and
-derives cancellation from pointwise injectivity of `pi`. The remaining
-positive point-group certificates are therefore Frobenius injectivity, the
-norm equation and the characteristic equation. A formal `ZMod 2` mutation
-control satisfies both equations with noninjective zero `pi` but rejects the
-sum conclusion. Binding the positive certificates, exact local Frobenius
-order, elliptic negation, sign and scaling identifications to the curve is
-still the endpoint. The coordinate formulas
+derives cancellation from pointwise injectivity of `pi`. A formal `ZMod 2`
+mutation control satisfies both equations with noninjective zero `pi` but
+rejects the sum conclusion. The positive Frobenius is now an actual Mathlib
+affine-point endomorphism induced by `FiniteField.frobeniusAlgHom`; it is
+additive and injective, and over `ZMod p` sends `(x,y)` exactly to
+`(x^p,y^p)`. The remaining positive point-group certificates are the actual
+Verschiebung, norm equation and characteristic equation. Binding their
+resulting equality, elliptic negation, sign and scaling identifications to the
+formal parameter is still the endpoint. The coordinate formulas
 themselves are now formal:
 for `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
 the exact `z -> z^p` formula for a supplied coordinatewise `p`-power
