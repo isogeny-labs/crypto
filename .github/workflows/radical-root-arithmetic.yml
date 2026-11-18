@@ -58,7 +58,7 @@ jobs:
   radical:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     env:
       CARGO_INCREMENTAL: 0
       CARGO_TERM_COLOR: always

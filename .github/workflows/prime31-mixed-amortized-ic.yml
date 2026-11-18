@@ -22,7 +22,7 @@ jobs:
   mixed-ic-amortized:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 35 }}
     env:
       RAYON_NUM_THREADS: '1'
       CARGO_BUILD_JOBS: '2'

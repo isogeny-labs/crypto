@@ -24,7 +24,7 @@ jobs:
   identical-1024q:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 50
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 50 }}
     env:
       RAYON_NUM_THREADS: '1'
       CARGO_BUILD_JOBS: '2'
