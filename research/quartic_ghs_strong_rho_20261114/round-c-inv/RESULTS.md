@@ -65,9 +65,9 @@ GHS_SOURCE_REVISION=a973d173465aa6983e97a393664bf2c0548903b2 \
   rustc --edition 2021 -O research/quartic_ghs_strong_rho_20261114/main.rs \
   -o /dev/shm/ghs-leads/ghs-inv-a973d17346
 /dev/shm/ghs-leads/ghs-inv-a973d17346 selftest
-jq -s -f research/quartic_ghs_strong_rho_20261114/round-c/check_q223.jq \
-  research/quartic_ghs_strong_rho_20261114/round-c/q223-baseline.jsonl \
-  research/quartic_ghs_strong_rho_20261114/round-c/q223-candidate.jsonl
+jq -s -f research/quartic_ghs_strong_rho_20261114/round-c-inv/check_q223.jq \
+  research/quartic_ghs_strong_rho_20261114/round-c-inv/q223-baseline.jsonl \
+  research/quartic_ghs_strong_rho_20261114/round-c-inv/q223-candidate.jsonl
 ```
 
 The self-test transcript, raw paired JSONL, machine count/identity result,

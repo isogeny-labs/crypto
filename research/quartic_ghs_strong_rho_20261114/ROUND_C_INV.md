@@ -4,6 +4,9 @@ Status: prospective deterministic code/count protocol, frozen before candidate
 implementation or output inspection on 2026-11-18. Round ID:
 `ghs-strong-rho-r3-direct-adjugate-inverse`.
 
+The later execution artifacts are namespaced under `round-c-inv/` so this
+inversion round remains disjoint from other Round C engineering leads.
+
 This round asks one bounded engineering question: can the matched strong-rho
 comparator replace its Frobenius/product cubic inverse by the direct adjugate
 formula while preserving every field value and rho walk and removing exactly
