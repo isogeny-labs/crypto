@@ -1,0 +1,71 @@
+{
+  "schema": "crypto.transfer-assessment/v3",
+  "case_id": "n83-projector-only-adaptive-image-router",
+  "status": "projector_only_router_rejected_broader_adaptive_design_open",
+  "source": {
+    "object": "E/GF(2^83)",
+    "curve": "y^2+xy=x^3+1",
+    "target_prime": "2417851639230796216685689"
+  },
+  "destination": {
+    "object": "J(C)",
+    "curve": "v^2+u^2v=u^7+u",
+    "dimension": 3
+  },
+  "transformation": {
+    "map": "phi(u,v)=(u^3,uv+1)",
+    "degree": 3,
+    "norm": "phi_*",
+    "image_endomorphism": "e=phi^*phi_*",
+    "normalized_projector": "p=[3^(-1) mod r]e"
+  },
+  "certificates": [
+    "general arbitrary-Mumford-class norm with nonsplit support",
+    "phi_*phi^*=[3] on the pinned point",
+    "e^2=[3]e",
+    "normalized projector idempotence on the pinned r-torsion image",
+    "kernel-coset collapse p(D+K)=p(D)",
+    "486-class GF(8) exhaustive norm and ordered-pair control"
+  ],
+  "exhaustive_control": {
+    "ambient_classes": 486,
+    "elliptic_labels": 6,
+    "kernel_size": 81,
+    "ordered_pairs": 236196,
+    "projected_zero_pairs": 39366,
+    "exact_zero_pairs": 486,
+    "false_projected_zero_pairs": 38880,
+    "conditional_exact_lift_fraction": "1/81",
+    "scope": "finite correctness and ambiguity fixture; not an n=83 probability model"
+  },
+  "relation_router": {
+    "candidate": "project arbitrary ambient classes and collect or factor after normalized projection",
+    "independent_rank_added_by_projector": false,
+    "reason": "the output depends only on the elliptic norm label and erases the kernel/Prym residue",
+    "image_closed_relation_module": "isomorphic to the selected source r-torsion relation module",
+    "projected_only_relation_is_ambient_relation": false
+  },
+  "complete_cost": {
+    "relation_probability_n83": "not estimated; candidate stopped at formula/information gate",
+    "matrix_dimensions": "not admitted",
+    "matrix_memory": "not admitted",
+    "individual_log": "not supplied",
+    "finite_crossover_against_strong_source_rho": false,
+    "eks_timing_admitted": false,
+    "speedup_claim": false
+  },
+  "controls": [
+    "all exact inverse pairs push to inverse elliptic labels",
+    "nonzero kernel class paired with identity is projected-zero but not Jacobian-zero",
+    "six norm fibers each contain exactly 81 classes",
+    "pinned n=83 r-torsion pullback is fixed by the normalized projector",
+    "formal Lean kernel-coset theorem PCC-20261118-81b046"
+  ],
+  "open_obligations": [
+    "name a non-generic source-label/descent or Prym-cancellation oracle not supplied by the projector",
+    "define the non-reduced effective-divisor or Riemann--Roch representation required for growing degree",
+    "measure distinct projected columns and verified independent rank on n=9,13,19,23",
+    "cost relation collection, matrix, memory, blind individual logarithms, and verification in order r",
+    "predict a finite crossover against the strong source rho control before n=83 timing"
+  ]
+}
