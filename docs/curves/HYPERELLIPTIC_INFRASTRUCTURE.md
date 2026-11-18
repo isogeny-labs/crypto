@@ -12,9 +12,10 @@ That schema records EC1/ICV1 identity, source curves, Jacobian contexts,
 morphisms, induced maps, evidence, and unsupported cases. It is not the CLI
 request schema. The CLI wire contract is specified below.
 
-## Direct packaged invocation
+## Standalone invocation and release status
 
-After unpacking a release artifact, invoke the executable directly:
+After unpacking a release artifact that contains this revision, invoke the
+executable directly:
 
 ```text
 ./hyperelliptic-cover --help
@@ -26,41 +27,41 @@ A local release build has the equivalent path:
 ./target/release/hyperelliptic-cover --help
 ```
 
-Users of a packaged artifact do not need `cargo run`. The four command shapes
+Users of a packaged artifact do not need `cargo run`. The five command shapes
 are:
 
 ```text
 ./hyperelliptic-cover construct --input MODEL.json [--output RESPONSE.json]
 ./hyperelliptic-cover verify --input VERIFY.json [--output RESPONSE.json]
 ./hyperelliptic-cover arithmetic --input OPERATION.json [--output RESPONSE.json]
+./hyperelliptic-cover transfer --input TRANSFER.json [--output RESPONSE.json]
 ./hyperelliptic-cover catalog-export --registry REGISTRY.json [--output covers.json]
 ```
 
-The catalog-wide assessment distinguishes current source from the executable
-that has actually been published. Current-source tests accept all 20,051 catalog
-map inputs (20,049 distinct cover models) at catalog commit
-`a857883776846d01b13355996ea433951a6ff9d7`. The pinned
-`v0.1.0-main.1371` source allowlist and an earlier 2,100-row model-profile
-partition implied a historical 746-row syntactic support boundary: 160 binary
-and 586 direct prime-field inputs were within that allowlist, while 1,324
-odd-characteristic extension-field and 30 normalized-target inputs were
-outside it. That historical 746/1,354 split is a static
-source/applicability classification, not a direct replay of either the earlier
-or current catalog with the published executable. The artifact was directly
-replayed only against its own bundled 592-row registry. A new release and
-direct replay of all 20,051 current commands remain open obligations.
+The source capabilities documented here are active-branch work. The release
+workflow is being extended to package `hyperelliptic-cover` and
+`curve-transfer-sweep` and to smoke-test transfer, malformed-input, and bounded
+sweep requests, but no package containing this revision has been published.
+Do not attribute these commands to an older published archive. A fresh
+artifact digest, installed-layout replay, and direct replay of the complete
+live registry remain open release obligations.
 
-For the first three commands, `--input -` reads standard input. Omitting
+At the 2026-11-18 source snapshot, the regenerated geometry graph covers all
+22,417 registry models with 22,417 maps and 22,415 distinct cover models. Its
+1,090 EC1 links are identity records, not subgroup certificates. The dated
+15,791-map transfer assessment remains bound to its historical catalog commit;
+it is not silently relabelled as live-package evidence.
+
+For the first four commands, `--input -` reads standard input. Omitting
 `--output` writes JSON to standard output. Successful `catalog-export` writes
 the existing deterministic `curve-covers/v1` catalog shape; it does not
 silently claim enriched Jacobian or transfer evidence. `--registry` is always
 required because the executable does not embed a registry. The repository's
 release workflow stages `docs/curves/registry.json`, `covers.json`, and
-`cover-links.yaml` beside the executables, and the pinned published archive
-replay confirmed those files were present. Callers may use that bundled
-registry or supply another explicit path. All input paths, including the
-catalog registry, are capped at 32 MiB. A larger file or standard-input stream
-returns `invalid_input` rather than being partially parsed.
+`cover-links.yaml` beside the executables. Callers may use that exact bundled
+registry after a new package is published or supply another explicit path.
+All command inputs are capped at 32 MiB. A larger file or standard-input
+stream returns `invalid_input` rather than being partially parsed.
 
 Command response status and process exit status are distinct and stable:
 
@@ -76,7 +77,7 @@ Every enveloped response has:
 ```json
 {
   "schema": "hyperelliptic-infrastructure-command/v1",
-  "command": "construct | verify | arithmetic",
+  "command": "construct | verify | arithmetic | transfer",
   "status": "ok | unsupported | invalid_input | error",
   "result": {}
 }
@@ -162,14 +163,19 @@ following members:
 | Member | Required | Contract |
 |---|---|---|
 | `schema` | yes | Exact string `hyperelliptic-jacobian-operation/v1` |
-| `model` | exactly one curve selector | Exact binary or prime elliptic model object accepted by `construct` |
-| `odd_curve` | exactly one curve selector | Separate odd-prime, odd-degree, one-infinity hyperelliptic curve object |
+| `model` | exactly one curve selector | Exact binary or prime elliptic model object accepted by `construct`; a supported prime model reconstructs its split-sextic cover |
+| `odd_curve` | exactly one curve selector | Separately typed odd-prime one-infinity or split-sextic hyperelliptic curve object |
 | `operation` | yes | `validate`, `identity`, `equal`, `negate`, `add`, or `scalar_multiply` |
 | `left` | by operation | Required by `validate`, `equal`, `negate`, `add`, and `scalar_multiply` |
 | `right` | by operation | Required by `equal` and `add` |
 | `scalar` | by operation | Required by `scalar_multiply`; unsigned decimal or `0x` string |
 
-`left` and `right` are canonical Mumford pairs:
+Operations reject unused operands as well as missing ones: `identity` accepts
+none; `validate` and `negate` accept only `left`; `equal` and `add` require
+only `left` and `right`; and `scalar_multiply` requires only `left` and
+`scalar`.
+
+One-infinity `left` and `right` values are canonical Mumford pairs:
 
 ```json
 {
@@ -183,6 +189,20 @@ empty array. Coefficients must be canonical field elements; trailing zeroes
 are rejected. In particular, binary Mumford `u` and `v` polynomials must not
 carry a redundant final zero coefficient. The identity divisor is
 `{"u":["0x1"],"v":[]}`.
+
+Split-sextic balanced divisors add the required infinity counter:
+
+```json
+{
+  "u": ["coefficient of x^0", "coefficient of x^1"],
+  "v": ["coefficient of x^0"],
+  "n_plus": 0
+}
+```
+
+The balanced identity is `{"u":["0x1"],"v":[],"n_plus":1}`.
+`n_plus` is rejected on binary and odd-prime one-infinity inputs, and is
+required on split-sextic inputs. The two representations are not coerced.
 
 The two curve selectors are intentionally not interchangeable.
 
@@ -284,35 +304,72 @@ Its complete successful response is:
 }
 ```
 
-## Prime even-sextic boundary
+## Prime split-sextic balanced arithmetic
 
-Passing a supported prime elliptic `model` to `arithmetic` does not apply the
-odd-degree code to its constructed cover. The cover is a monic sextic with
-two rational infinity points and needs balanced/real-model arithmetic. The
-command returns exit 2 and this structured result:
+Passing a supported prime elliptic `model` to `arithmetic` reconstructs and
+replays its monic sextic cover, then initializes the distinct balanced
+two-infinity backend when the prime fits the deterministic 64-bit domain. It
+never applies the odd-degree one-infinity representation to that cover.
+
+This complete model-derived F5 request returns the balanced identity for
+`v^2=u^6+1`, the cover of `y^2=x^3+1` under `(x,y)=(u^2,v)`:
 
 ```json
 {
-  "schema": "hyperelliptic-infrastructure-command/v1",
-  "command": "arithmetic",
-  "status": "unsupported",
-  "result": {
-    "reason": "the explicit prime cover is an even-degree sextic with two rational points at infinity; the checked odd-characteristic implementation currently supports only odd-degree one-infinity models",
-    "construction_status": "explicit_verified",
-    "arithmetic_status": "unsupported_infinity_configuration"
-  }
+  "schema": "hyperelliptic-jacobian-operation/v1",
+  "model": {
+    "a": "0",
+    "b": "1",
+    "field": "fp-5",
+    "form": "y^2=x^3+a*x+b",
+    "p": "5",
+    "v": "1"
+  },
+  "operation": "identity"
 }
 ```
 
-Generic odd-degree/one-infinity prime arithmetic is available only through
-the separate `odd_curve` selector. That does not turn the prime cover into an
-odd-degree model and is not a transfer certificate for that cover.
+A caller may instead supply the exact split curve through `odd_curve`:
+
+```json
+{
+  "schema": "hyperelliptic-jacobian-operation/v1",
+  "odd_curve": {
+    "family": "odd_prime_split_sextic_balanced_v1",
+    "p": "5",
+    "genus": 2,
+    "f": ["1", "0", "0", "0", "0", "0", "1"],
+    "infinity": "two_rational"
+  },
+  "operation": "validate",
+  "left": {"u": ["1"], "v": [], "n_plus": 1}
+}
+```
+
+The canonical triple `(u,v,n_plus)` has `deg(u)<=2` and
+`0<=n_plus<=2-deg(u)`. Infinity plus and minus are labelled by
+`y/x^3=+1` and `y/x^3=-1`. The implementation checks validity, reduction,
+equality, negation, addition, and scalar multiplication. Reference enumeration
+is separately capped at `p<=31`; ordinary arithmetic is not an enumeration.
+
+This backend does not yet implement the degree-two induced pullback or
+pushforward. Odd extension fields return structured
+`unsupported_extension_field`, and prime moduli larger than 64 bits return
+structured `unsupported_prime_size`. A supplied nonprime, nonsquarefree,
+nonmonic, wrong-degree, or malformed balanced input is `invalid_input`, not an
+unsupported existence claim.
+
+Calling `transfer` with a prime or odd-extension target returns status
+`unsupported` and `transfer_status=unsupported_infinity_configuration`; it
+does not reinterpret balanced classes as binary Mumford divisors. A failed
+odd-map request is not a nonexistence result.
 
 ### Prime validation and diagnostic bounds
 
-`HyperellipticCurveP` accepts only deterministically validated odd primes of
-at most 64 bits. This replaces the earlier probable-prime wording for the
-feature implementation. Its optional quadratic-extension reference backend
+`HyperellipticCurveP` and `SplitHyperellipticCurveP` accept only
+deterministically validated odd primes of at most 64 bits. This replaces the
+earlier probable-prime wording for these arithmetic implementations. The
+optional quadratic-extension reference backend
 has the narrower `p <= 4096` boundary, matching the bounded quadratic point
 counter: `Fp2Ctx` rechecks that `p` is an odd prime, constructs and validates
 a canonical nonzero quadratic nonresidue, and every element operation
@@ -332,24 +389,61 @@ within its declared 64-bit prime-field contract.
 
 ## Transfer boundary and evidence records
 
-The library feature snapshot has a bounded binary transfer for rational
-elliptic point classes, rational source-point divisors, and its own typed
-pullback fibers. It checks infinity, the exceptional ramified two-torsion
-fiber, the degree-three composition, and the exact F2^7/order-29 catalog
-subgroup. It does not expose a CLI transfer subcommand. The arbitrary-class
-pushforward is implemented only for the exact polynomial-basis F8 fixture
-`a=1`, `b=3`, `d=7`: its checked table covers 486 reduced classes. Every
-other binary model returns a typed
-`Unsupported(ArbitraryJacobianPushforward)` result in the library API.
-The fixture is a norm-mechanics test, not an injective full-group ECDLP
+The binary library and structured `transfer` command support the checked
+degree-three family. Every request has exact schema
+`hyperelliptic-transfer-operation/v1`, an exact binary elliptic `model`, one
+operation, and only that operation's operands:
+
+| Operation | Required operands | Result boundary |
+|---|---|---|
+| `pushforward` | `divisor` | Elliptic image of a valid reduced source class |
+| `pushforward_certificate` | `divisor` | Closed-point components, reconstructed support, and component-sum checks |
+| `image_endomorphism_certificate` | `divisor` | Checked image endomorphism and kernel relation fields |
+| `torsion_projector_certificate` | `divisor`, declared `order` | Conditional projector; exactness of `order` is not checked |
+| `pullback` | target `point` | Pullback of a rational elliptic point class |
+| `pull_push_composition_certificate` | target `point` | Typed `phi_* phi^*=[3]` witness |
+| `pullback_closed_point_certificate` | target `point` | Fiber and closed-point component witness |
+| `subgroup_status` | declared `order` | Conditional coprimality/kernel status; no order proof |
+
+Unknown fields, missing operands, and irrelevant operands are rejected. Binary
+points use `{"kind":"infinity"}` or hexadecimal affine coordinates. Divisors
+use canonical one-infinity `(u,v)` pairs and must not include `n_plus`.
+
+This complete non-F8 F2^7 request checks the ramified infinity composition:
+
+```json
+{
+  "schema": "hyperelliptic-transfer-operation/v1",
+  "model": {
+    "a": "0x0",
+    "b": "0x1",
+    "field": "f2m-7-e1a6f45a",
+    "form": "y^2+xy=x^3+a*x^2+b",
+    "modulus": "0x83",
+    "v": "1"
+  },
+  "operation": "pull_push_composition_certificate",
+  "point": {"kind": "infinity"}
+}
+```
+
+The successful response binds the exact target model, reconstructed cover
+certificate, field degree, source genus, map degree, and formula
+`(x,y)=(u^3,u*v+d)`. The composition result contains both the formal
+pushforward and `[3]` input and requires `identity_holds=true`.
+
+`pushforward_arbitrary_jacobian_class` handles every valid reduced class of
+support degree at most three on the supplied checked binary model. It factors
+the support, evaluates each closed point in its residue field, and takes the
+Frobenius-orbit norm. Malformed, foreign, or noncanonical divisors fail closed.
+The exact polynomial-basis F8 fixture `a=1`, `b=3`, `d=7` remains an exhaustive
+control with 486 reduced classes and 236,196 ordered additivity pairs; it is no
+longer the implementation's field/model boundary.
+
+That F8 control is a norm-mechanics test, not an injective full-group ECDLP
 transfer: its target has order 6, the six norm fibers each have size 81, and
 the map degree 3 is not coprime to 6. The generic degree-coprime subgroup
 argument therefore does not resolve its full target-group kernel.
-The standalone construction receipt's
-`implemented_in_library_only_for_exact_fixed_f8_fixture` field is a compiled
-capability declaration: that command replays the geometry certificate but
-does not initialize or execute the 486-class norm. It is not a per-invocation
-transfer proof; the CLI still has no transfer subcommand.
 
 The fixed fixture's Jacobian cardinality has a separate machine-readable
 [order certificate](fixed-f8-genus3-order-certificate.json). Its
@@ -376,12 +470,18 @@ keys, and the certificate UID.
 
 The generic subgroup classifier proves only the conditional statement
 “pullback is injective if the supplied integer is independently known to be
-the exact subgroup order and is coprime to 3.” The CLI accepts no subgroup
-order and makes no unconditional subgroup claim. The F2^7 evidence fixture is
-stronger because the same native stack directly checks, independently of the
-catalog declaration, that the named generator is nonidentity and is killed by
-the prime 29, and therefore has exact order 29 before applying the
-degree-inverse argument. This is not an independent implementation or oracle.
+the exact subgroup order and is coprime to 3.” The CLI accepts a declared
+integer for `subgroup_status` and the projector operation, but reports
+`exact_order_verified_by_command=false`; it makes no unconditional subgroup
+claim. The F2^7 evidence fixture is stronger because the same native stack
+directly checks, independently of the catalog declaration, that the named
+generator is nonidentity and is killed by the prime 29, and therefore has
+exact order 29 before applying the degree-inverse argument. This is not an
+independent source-order implementation. A separate test-only GF(8) oracle
+reimplements support factorization, residue fields, Frobenius trace, and the
+target elliptic group law for all 486 classes and all 236,196 ordered image
+sums. Its source additions still use the production Jacobian law, so it does
+not independently validate that group law or establish catalog-wide support.
 
 The conforming machine-readable envelope is
 [`../../research/hyperelliptic_cover_infrastructure_20261006/evidence.json`](../../research/hyperelliptic_cover_infrastructure_20261006/evidence.json).
@@ -395,44 +495,42 @@ Its F2^7 record binds all of the following:
 - content hashes and local test receipts; and
 - a structured refutation of arbitrary-class pushforward support.
 
-That last item describes the immutable October 6 snapshot, not the newer
-fixed-F8 exception. The current-catalog
-crosswalk is the generated v2
+That last item describes the immutable October 6 snapshot, not current binary
+support. The dated crosswalk is the generated v2
 [`cover-transfer-assessments.json`](cover-transfer-assessments.json), with
 structural contract
 [`cover-transfer-assessment.schema.json`](cover-transfer-assessment.schema.json)
 and a dated
 [transfer report](../../research/cover_transfer_assessment_20261013/README.md).
-It classifies all 20,051 map rows, representing 20,049 distinct cover models,
-and all 987 exact EC1 representations on 981 curve models. Its map profiles
-contain 192 binary cubic covers, 18,458 direct prime-field quadratic covers,
-30 normalized-target prime-field covers, and 1,371 odd-characteristic
-extension-field covers. Its subgroup profiles contain 148 binary and 839
-odd-characteristic representations. “Assessed” means that every declared claim
-has an explicit status; it does not mean that every capability is supported.
+It classifies the exact catalog at commit
+`728304718cb0ab6df70da620a908a5f76f175293`: 15,791 maps, 15,789 distinct
+cover models, and 979 exact EC1 bindings. Its map profiles contain 165 binary
+cubic covers, 14,272 direct prime-field quadratic covers, 30
+normalized-target prime-field covers, and 1,324 odd-characteristic extension
+covers. Its subgroup profiles contain 142 binary and 837 odd-characteristic
+representations. “Assessed” means that every declared claim in that frozen
+cohort has an explicit status; it does not mean that every capability is
+supported or that later rows inherit a result.
 
-This current population is pinned to catalog commit
-`a857883776846d01b13355996ea433951a6ff9d7`. The SHA-256 digests are
-`7ed7e190945636d32fae4d5865a6f265d23999522de47356b4830954571c237e`
-for `registry.json`,
-`e0b158fde852d3884ab248762f4e12f960ed6aa693f4b08ee9e353ffc03e101d`
-for `covers.json`, and
-`0b3cc6e201fc0ee4652c686175f63f7a902055b3a2c8f89a841000178cbbfd37`
-for `cover-links.yaml`. The generated typed bindings contain 759 declared
-fields, 20,049 Jacobian contexts, and 20,051 map contexts.
+The 2026-11-18 live graph instead has 22,417 maps and 22,415 distinct covers:
+174 binary, 20,808 direct prime-field, 30 normalized-target prime-field, and
+1,405 odd-extension maps. It links 1,090 EC1 representations: 150 binary, 909
+direct prime, 22 normalized prime, and 9 odd extension. Every live
+`subgroup_transport` field remains `not_tested` with null evidence. Geometry
+coverage and identity linkage do not promote a transfer or subgroup claim.
 
-The binary profile has checked one-infinity Jacobian arithmetic and a bounded
-typed transfer domain. The odd-characteristic covers are even-degree sextics
-with two rational infinity points, so their balanced Jacobian arithmetic and
-induced maps remain unavailable. Numeric exact-order evidence also remains
-open catalog-wide except for the order-29 overlay and the
+Current binary source has checked one-infinity arithmetic and arbitrary-class
+degree-at-most-three transfer. The bounded odd-prime balanced backend supplies
+arithmetic for checked split sextics, but not the induced degree-two maps;
+extensions and larger primes remain unsupported. Numeric exact-order evidence
+also remains open catalog-wide except for the order-29 overlay and the
 implementation-separated cardinality-486 certificate for the separate fixed
-F8 source fixture. The
-latter is not an EC1 subgroup-order certificate. All computational-advantage
-and end-to-end solver costs for these 20,051 assessed cover paths remain
-unknown. The retained cryptanalysis parity receipt predates the fixed-F8 norm,
-so current mirror/integration evidence is also open. The assessment does not change
-the geometry semantics or browser status fields in `covers.json` and
+F8 source fixture. The latter is not an EC1 subgroup-order certificate. All
+computational-advantage and end-to-end solver costs for both the 15,791-row
+historical assessment and the larger live graph remain unknown. The retained
+cryptanalysis parity receipt predates the general binary norm, so current
+mirror/integration evidence is also open. The assessment does not change the
+geometry semantics or browser status fields in `covers.json` and
 `cover-links.yaml`.
 
 Regenerate and check the assessment deterministically with:
@@ -446,17 +544,47 @@ node research/cover_transfer_assessment_20261013/verify_assessment.mjs
 ```
 
 The verifier replays membership partitions, claim/evidence bindings, source
-pins, and all 20,051 cover formulas. The accompanying Lean package formalizes
+pins, and all 15,791 frozen cover formulas. The accompanying Lean package
+formalizes
 only the conditional group-theoretic injectivity step under an already-proved
 push-pull identity, exact finite subgroup cardinality, and coprimality. It does
 not construct the maps or certify catalog subgroup orders. A full Jacobian
 index-calculus solver remains a separate deliverable.
 
-The same envelope records the prime F827 cover as an explicit verified
+The historical envelope records the prime F827 cover as an explicit
 construction while marking use of one-infinity arithmetic on its even sextic
-as `refuted`. The original PR #1383 artifact contains 115 rows (28 prime and
-87 binary); the later audit-baseline catalog contains 121. These populations
-must not be conflated.
+as `refuted`. That record predates the balanced backend and must not be
+silently rewritten. The original PR #1383 artifact contains 115 rows (28
+prime and 87 binary); the later audit-baseline catalog contains 121. These
+populations must not be conflated.
+
+## Bounded transfer sweeper
+
+`curve-transfer-sweep` is a separate standalone binary for deterministic,
+finite candidate inventories:
+
+```text
+./curve-transfer-sweep sweep \
+  --request REQUEST.json --registry docs/curves/registry.json \
+  --output SWEEP.json
+./curve-transfer-sweep verify \
+  --input SWEEP.json --registry docs/curves/registry.json \
+  --output REPLAY.json
+```
+
+It resolves an exact EC1 alias, ICV1 identity/slug, or model and enumerates
+only requested parameters from `binary_cubic_pullback_v1` and
+`prime_quadratic_pullback_v1`. Requests declare inclusive prime-shift bounds,
+maximum attempts, field bits, genus, and degree. Search spaces larger than the
+declared attempt budget fail rather than returning a truncated prefix.
+
+Every output retains exact coefficients, HC1/CV1 identities, map formulas,
+field, degree, attempt dispositions, subgroup obligations, and separate
+construction/arithmetic/transfer/solver statuses. “Exhaustive” means only the
+declared finite family and bounds. Zero candidates is not a proof that no
+cover, isogeny, correspondence, higher-dimensional representation, or
+transfer exists. The sweeper is not an index-calculus solver and does not
+establish an advantage.
 
 ## Catalog export
 
@@ -478,10 +606,9 @@ The exported catalog identifies its wrapper with
 `generated_by = "hyperelliptic-cover catalog-export"`. Its
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
-that order. For the current source it is
-`1db54f0953ef0c75a15948df432e6a238436f0c801900050f512ed8042887693`.
-Thus changing any of the three producer inputs changes the provenance digest.
-Both
+that order. Read the value from the exact export rather than copying a digest
+from an earlier revision. Changing any of the three producer inputs changes
+the provenance digest. Both
 `hyperelliptic-cover catalog-export` and `curve_cover_check` require callers
 to supply a registry path; the release archive bundles one, but neither
 executable embeds it.

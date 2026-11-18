@@ -1,6 +1,6 @@
 ---
 title: "Catalog-wide curve-cover transfer assessment"
-subtitle: "All 15,791 current maps and all 979 EC1 bindings"
+subtitle: "Dated 15,791-map cohort and 979 EC1 bindings"
 date: "2026-10-24"
 subject: "cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; geometry_verified_maps=15791; ec1_representations=979; assessed_maps=15791; unassessed_maps=0; assessed_subgroups=979; unassessed_subgroups=0"
 geometry: margin=0.8in
@@ -13,9 +13,10 @@ fontsize: 10pt
 
 Throughout this dated report, "current" refers to catalog commit
 `728304718cb0ab6df70da620a908a5f76f175293`, the 15,791-map cohort assessed on
-2026-10-24. The live geometry catalog has since grown to 20,592 maps. Its
-4,801 added maps and 15 added EC1 representations are outside this assessment;
-they inherit no transfer or subgroup-support conclusion from it. See the
+2026-10-24. As of 2026-11-18 the live geometry catalog has grown to 22,417 maps
+and 1,090 EC1 representations. The 6,626 added maps and 111 added
+representations are outside this assessment; they inherit no transfer or
+subgroup-support conclusion from it. See the
 [coverage gap](../../problems/catalog-cover-subgroup-certificates-incomplete.md)
 for the separate current-catalog obligation.
 
@@ -23,15 +24,15 @@ The legacy formula-inventory finding is also historical: its source artifact
 now declares `source_commit` =
 `0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5`, preserving the exact 2,572-entry
 inventory that the finding describes. Separately, the live Jacobian formula
-catalog now screens 20,592 registry entries with the same cost model. This
+catalog now screens 22,417 registry entries with the same cost model. This
 completes the metadata refresh in historical obligation 7 below; it supplies no
 new transfer certificate, solver execution, or measured advantage. All other
 implementation artifacts still bind their current repository bytes.
 
-Every current cover map and every linked EC1 representation now has an
-explicit v2 assessment. Classification is complete; implementation support is
-not. In particular, the complete inventory must not be read as a complete
-Jacobian-transfer pipeline.
+Every cover map and linked EC1 representation in the pinned cohort has an
+explicit v2 assessment. Classification of that cohort is complete;
+implementation support is not. In particular, the complete dated inventory
+must not be read as a complete live Jacobian-transfer pipeline.
 
 The main results are:
 
@@ -69,6 +70,35 @@ It uses only `supported`, `refuted`, `unknown`, and `not_applicable`.
 never turns a missing implementation or failed bounded search into a theorem
 of nonexistence.
 
+## 2026-11-18 live follow-up outside the assessed cohort
+
+The live registry and regenerated graph now contain 22,417 maps, 22,415
+distinct cover models, and 1,090 EC1 representations. The live profiles are
+174 binary maps with 150 EC1 links, 20,808 direct-prime maps with 909 links,
+30 normalized-prime maps with 22 links, and 1,405 odd-extension maps with 9
+links. All live models have geometry records, while every graph
+`subgroup_transport` field remains `not_tested` with null evidence. These
+numbers do not replace the 15,791-map membership or conclusions of this dated
+assessment.
+
+Current binary code implements arbitrary-class pushforward for the supported
+catalog family and exposes structured pushforward, pullback, composition,
+projector, and conditional subgroup-status operations in the standalone CLI.
+A separate GF(8) oracle independently reimplements factorization, residue
+fields, Frobenius trace, and the target law for all 486 control classes; its
+homomorphism loop still uses production source-Jacobian addition, so it is not
+an independent source group law or catalog-wide replay. Proof-grade catalog
+source orders and a freshly published package receipt remain open. A separate
+balanced two-infinity backend implements canonical arithmetic for monic squarefree
+genus-two sextics over deterministically checked odd prime fields of at most
+64 bits. It does not implement the degree-two induced maps, extension fields,
+or larger prime fields.
+
+These additions do not establish subgroup preservation for a live graph row,
+a Jacobian relation solver, key recovery, or a computational advantage. The
+historical tables and receipts below retain their original cohort and status;
+this follow-up records later implementation scope without rewriting them.
+
 ## 2026-10-14 bounded fixed-GF(8) addendum
 
 The library now accepts every valid reduced class for one exact synthetic
@@ -87,9 +117,10 @@ criterion therefore does not certify injectivity on the full target group.
 The standalone `construct`/`verify` receipt labels this exact model as a
 library build that contains the fixed-fixture capability, but that invocation
 replays only the geometry certificate. It does not initialize or execute the
-486-class norm and is not a per-invocation transfer proof. The standalone CLI
-still exposes no transfer subcommand; the exhaustive norm evidence is the
-native Rust test receipt described below.
+486-class norm and is not a per-invocation transfer proof. At that addendum's
+source revision, the standalone CLI exposed no transfer subcommand; the
+exhaustive norm evidence was the native Rust test receipt described below.
+The 2026-11-18 follow-up above records the later CLI scope.
 
 None of the 165 catalog binary rows is over `GF(8)`, so their generated
 arbitrary-pushforward status remains `refuted` as an implementation claim.
@@ -606,9 +637,11 @@ be rendered with installed XeLaTeX using `--pdf-engine=xelatex`. Then run
 engine actually used. This changes rendering provenance, without changing the
 assessment cohort or the proof boundary.
 
-# Open obligations
+# Open obligations at the assessment date
 
-These obligations feed WS1 and WS2 of the proposed
+This list records the 2026-10-24 disposition; the 2026-11-18 follow-up above
+states which implementation gaps later narrowed. These obligations feed WS1
+and WS2 of the proposed
 [comprehensive elliptic-curve private-key recovery audit](../notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md).
 That program link does not change any status below and does not turn the cover
 assessment into a solver or advantage result.
@@ -626,7 +659,7 @@ assessment into a solver or advantage result.
 5. Replay map additivity and composition through an independent divisor-class
    implementation.
 6. Add coordinate-isomorphism commutation and proper-subfield descent controls.
-7. Publish and replay a standalone artifact that accepts all 15,791 current
+7. Publish and replay a standalone artifact that accepts all 15,791 pinned
    model forms.
 8. Refresh the legacy formula inventory without promoting modeled routes to
    certificates.

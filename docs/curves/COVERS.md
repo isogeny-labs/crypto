@@ -151,15 +151,20 @@ existence alone does not establish cheaper computation there.
 
 The separate generated
 [`cover-transfer-assessments.json`](cover-transfer-assessments.json) v2 ledger
-classifies transfer obligations for every current map and linked EC1
-representation. Its coverage counts are derived from exact registry and graph
-membership. The immutable October 13 report covers its dated 2,100-map,
-664-representation snapshot; it does not establish replay coverage for later
-catalog additions. The generated current-catalog
-classification does not alter this geometry catalog: it records bounded binary
-typed-transfer support,
-refutes capabilities absent from the current implementation, and leaves the
-odd-characteristic balanced-Jacobian maps and every solver-cost claim open.
+is a historical assessment bound to catalog commit
+`728304718cb0ab6df70da620a908a5f76f175293`: 15,791 maps and 979 linked EC1
+representations. It is not a classification of the live graph below, and later
+catalog additions inherit no transfer status from it. Current binary code has
+general arbitrary-class pushforward and a structured CLI. A separate GF(8)
+oracle now reimplements support factorization, residue fields, Frobenius trace,
+and the target group law for all 486 control classes; it still uses production
+source-Jacobian addition for its homomorphism loop, so an independent source
+group law and catalog-wide oracle remain open. Proof-grade catalog subgroup
+certificates also remain open.
+The bounded balanced backend handles monic split sextics only over checked odd
+prime fields of at most 64 bits; odd induced maps, extension fields, larger
+prime fields, solver evidence, and every computational-advantage claim remain
+open.
 
 The Rust tests enumerate all affine cover points on every nonsingular
 short Weierstrass model over F5, F7, F11 and F25 (`t^2 + 2`), on four
@@ -215,47 +220,24 @@ Pass `--links PATH` alongside custom registry/report paths. `--check` replays
 both the report and the graph. An unresolved source import is recorded in
 `standards/coverage.json` and is not evidence of cover nonexistence.
 
+## 2026-11-18 live catalog inventory
 
+The regenerated live graph binds all 22,417 registry models to 22,417 maps and
+22,415 distinct cover models. Its 1,090 EC1 representations remain exact
+identity links, not subgroup-transfer certificates.
 
+| Live profile | Maps | Linked EC1 representations |
+| --- | ---: | ---: |
+| Binary cubic | 174 | 150 |
+| Direct odd prime field | 20,808 | 909 |
+| Normalized odd prime field | 30 | 22 |
+| Odd extension field | 1,405 | 9 |
+| **Total** | **22,417** | **1,090** |
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-classifies transfer obligations for all 4,493 map rows (4,491 distinct cover
-models) and 1,004 linked EC1 representations. The population comprises 165
-binary maps and 4,328 odd-characteristic maps: 2,011 direct prime-field, 30
-normalized-target prime-field, and 2,287 extension-field maps. The EC1 links
-comprise 140 binary and 864 odd-characteristic representations. The
-[2026-10-22 catalog refresh](../../research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md)
-records the native replay and retains the earlier dated assessment report. That
-
-
-
-
-
-
-
-
+All graph `subgroup_transport` fields remain `not_tested` with null evidence.
+The historical [2026-10-22 catalog refresh](../../research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md)
+and the dated transfer assessment retain their original populations; neither
+is silently relabelled as live evidence. Geometry coverage, general binary
+map code, and bounded prime-field Jacobian arithmetic are separate facts. None
+establishes an index-calculus solver, key recovery, or a computational
+advantage.

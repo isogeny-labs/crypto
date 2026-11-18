@@ -2,36 +2,39 @@
 
 - **Status:** `open`
 - **Kind:** proof gap, implementation gap, and independent-verification gap
-- **Affected work:** all 664 EC1/map bindings in the [content-addressed cover graph](../docs/curves/cover-links.yaml), the [ICV1/EC1 registry](../docs/curves/registry.json), and the [catalog-wide transfer assessment](../docs/curves/cover-transfer-assessments.json)
+- **Affected work:** all 1,090 EC1/map bindings in the [content-addressed cover graph](../docs/curves/cover-links.yaml), the [ICV1/EC1 registry](../docs/curves/registry.json), and the dated [catalog transfer assessment](../docs/curves/cover-transfer-assessments.json)
 - **Next action owner:** curve identity and transfer certification workstream (unassigned)
-- **Last updated:** 2026-10-14
+- **Last updated:** 2026-11-18
 
 ## Problem
 
 We cannot promote catalog-wide subgroup preservation, image-order, or recovery
 claims because only the exact order-29 binary fixture currently has the full
-narrow certificate. The remaining 663 EC1/map bindings have exact numeric
+narrow certificate. The remaining 1,089 EC1/map bindings have exact numeric
 catalog tuples but lack proof-grade, map-bound evidence for the generator's
 exact source order, kernel intersection, image order, and recovery.
 
-All 664 declared subgroup orders are numerically coprime to their cover
-degrees: 530 degree-two bindings have odd declared order and 134 degree-three
+All 1,090 declared subgroup orders are numerically coprime to their cover
+degrees: 940 degree-two bindings have odd declared order and 150 degree-three
 bindings have order not divisible by three. That calculation supplies a
 necessary conditional input, not the missing exact-order or induced-map
-certificate. The catalog-wide typed checks now present for all 134 binary
+certificate. The catalog-wide typed checks now present for all 150 binary
 generators exercise the bounded generator path, but they do not turn
-the other 133 binary numeric order declarations into proof-grade exact-order
-certificates and do not provide an arbitrary-class recovery path.
+the other 149 binary numeric order declarations into proof-grade exact-order
+certificates. General binary arbitrary-class pushforward and the structured
+CLI now exist. A separate GF(8) map oracle covers all 486 control classes and
+236,196 ordered sums, but its source sums still come from the production
+Jacobian law and it is not a catalog-wide independent replay.
 
 ## Evidence and uncertainty
 
 - **Observed:** [`docs/curves/registry.json`](../docs/curves/registry.json)
-  contains 664 EC1 representations on 659 curve models; five models have two
-  distinct representations. [`cover-links.yaml`](../docs/curves/cover-links.yaml)
+  contains 1,090 EC1 representations on 1,082 curve models; seven models have
+  multiple representations. [`cover-links.yaml`](../docs/curves/cover-links.yaml)
   binds each representation to its exact CV1 map, but every generated
   `subgroup_transport` value is `not_tested`. The catalog-wide integer check
-  finds `gcd(2,r)=1` for all 530 degree-two bindings and `gcd(3,r)=1` for all
-  134 degree-three bindings. The existing detailed evidence supports only the
+  finds `gcd(2,r)=1` for all 940 degree-two bindings and `gcd(3,r)=1` for all
+  150 degree-three bindings. The existing detailed evidence supports only the
   order-29 record on its typed point-class domain.
 - **Derived or proved:** if a subgroup really has exact order `r`, checked
   homomorphisms satisfy `phi_* phi^* = [d]` on it, and `gcd(d,r)=1`, then
@@ -45,9 +48,11 @@ certificates and do not provide an arbitrary-class recovery path.
   arithmetic failure, is the known gap.
 - **Missing capability:** proof-grade primality/factor and exact generator
   order evidence, plus map-bound pullback image, kernel, image-order, and
-  recovery certificates for every EC1 representation. The 530 prime-family
-  bindings additionally depend on the balanced-Jacobian problem; arbitrary
-  binary-result recovery additionally depends on the general-norm problem.
+  recovery certificates for every EC1 representation. The 940 prime-family
+  bindings additionally depend on induced maps for the balanced Jacobian. The
+  current balanced arithmetic slice is limited to monic split sextics over
+  checked odd prime fields of at most 64 bits; it does not support extensions,
+  larger primes, or an induced cover map.
 - **What this evidence does not establish:** missing certificates do not show
   that a selected subgroup fails to transfer. Conversely, catalog labels,
   coprimality, a conditional group-theoretic lemma, or generated point-class
@@ -56,7 +61,7 @@ certificates and do not provide an arbitrary-class recovery path.
 
 ## What would unblock it
 
-- [ ] For each of the remaining 663 exact `(map_uid, EC1, curve_uid)` tuples,
+- [ ] For each of the remaining 1,089 exact `(map_uid, EC1, curve_uid)` tuples,
   issue a replayable source certificate: declared-field validation, generator
   membership and nonidentity, proof-grade factor/primality evidence for `r`,
   and exact-order checks sufficient for the actual order structure.
@@ -65,13 +70,13 @@ certificates and do not provide an arbitrary-class recovery path.
   curve, field, generator, and subgroup identities rather than to a bit size or
   model alias.
 - [ ] Check the composition and `d^-1 mod r` recovery identity on the public
-  supported domain, including infinity and ramified fibers; keep recovery from
-  arbitrary Jacobian output unknown until the relevant general norm exists.
+  supported domain, including infinity and ramified fibers; independently
+  replay the general binary norm before promoting arbitrary-output recovery.
 - [ ] Issue and replay the required `identity.certificate/v1` record, or attach
   a stronger independently checked formal proof, for every universal
   `phi_* phi^* = [d]` statement used by a subgroup certificate.
 - [ ] Add independent replays and negative controls for altered generators,
-  orders, fields, map UIDs, coordinate conversions, and the five models with
+  orders, fields, map UIDs, coordinate conversions, and the seven models with
   multiple EC1 representations. Extension-field coordinates must remain their
   exact coefficient arrays rather than being coerced to scalar strings.
 
@@ -83,9 +88,10 @@ comparison.
 ## Next discriminating step
 
 - **Action or proof obligation:** complete proof-grade source-order evidence
-  for the 133 binary EC1 records beyond the existing order-29 control, then
+  for the 149 binary EC1 records beyond the existing order-29 control, then
   combine it with the generated typed pullback/composition checks without
-  upgrading the arbitrary-norm claim.
+  treating the bounded GF(8) map oracle as an independent catalog-wide source
+  group implementation.
 - **Inputs and controls:** use every exact binary EC1 tuple from the graph;
   retain the order-29 fixture as a positive control and include a changed
   generator, changed `r`, divisible-by-three synthetic order, duplicate/missing
@@ -95,7 +101,7 @@ comparison.
   and retain the exact failing identity and reason rather than silently
   downgrading or skipping it.
 - **Outcomes and next actions:** complete binary certificates narrow the open
-  population to the 530 prime-family bindings; a failed exact-order proof
+  population to the 940 prime-family bindings; a failed exact-order proof
   leaves that tuple unknown or invalid with preserved evidence; a typed-map
   failure blocks its transfer claim; an infrastructure failure remains a
   tooling blocker. Prime-family work proceeds only after a compatible induced
@@ -124,6 +130,32 @@ receipt. Existing certificates must retain their exact identity scope. Merely
 copying the earlier profile counts or relabelling geometry as transfer evidence
 does not satisfy this obligation. The historical counts below remain their
 original dated observations.
+
+## 2026-11-18: live geometry and implementation boundary
+
+The regenerated live graph now has 22,417 maps, 22,415 distinct covers, and
+1,090 linked EC1 representations. It covers every live registry model. Its
+profiles are 174 binary maps with 150 EC1 links, 20,808 direct-prime maps with
+909 links, 30 normalized-prime maps with 22 links, and 1,405 odd-extension
+maps with 9 links. This exact geometry coverage does not change any graph
+`subgroup_transport` field from `not_tested`.
+
+The production binary implementation now accepts arbitrary valid reduced
+classes and exposes pushforward, pullback, composition, projector, and
+conditional subgroup-status operations through the structured CLI. Those are
+implementation and internal-replay facts; an independent divisor-map oracle
+now separately checks all 486 GF(8) control classes, but independent
+source-Jacobian addition, non-GF(8) catalog coverage, and proof-grade
+source-order certificates remain open. Prime-field balanced
+arithmetic now has a bounded split-sextic slice for checked primes of at most
+64 bits, but the degree-two induced maps, extension fields, and larger primes
+remain unsupported.
+
+The 15,791-map assessment at commit
+`728304718cb0ab6df70da620a908a5f76f175293` remains a dated cohort. Neither the
+new geometry rows nor the new implementation paths inherit or create a
+subgroup certificate, solver result, key recovery, or computational-advantage
+claim.
 
 ## Resolution and history
 
