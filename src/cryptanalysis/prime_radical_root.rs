@@ -164,6 +164,10 @@ pub(crate) trait Ring {
     fn sqr(&self, a: Self::E) -> Self::E {
         self.mul(a, a)
     }
+    // Override when a field admits a faster powering method.
+    fn pow(&self, a: Self::E, e: u128) -> Self::E where Self: Sized {
+        rpow(self, a, e)
+    }
     fn order(&self) -> u128; // |K^*|
     fn cand(&self, k: u64) -> Self::E; // k-th nonzero candidate (for non-cube search)
 }
@@ -231,6 +235,36 @@ impl Ring for Fq2 {
     }
     fn order(&self) -> u128 {
         (self.f.p as u128) * (self.f.p as u128) - 1
+    }
+    // x^p = conjugate(x) in F_{p^2}. Write e = lo + p*hi;
+    // simultaneous powering uses ~log2(p) Fp2 squares, not ~2*log2(p).
+    // When lo==hi, x^e = Norm(x)^lo lives entirely in Fp.
+    // Public-input, variable-time arithmetic only.
+    fn pow(&self, x: (u64, u64), e: u128) -> (u64, u64) {
+        let p = self.f.p as u128;
+        if e < p || e >= self.order() || x == (0, 0) {
+            return rpow(self, x, e);
+        }
+        let lo = (e % p) as u64;
+        let hi = (e / p) as u64;
+        let f = &self.f;
+        let norm = f.sub(f.sqr(x.0), f.mul(self.n, f.sqr(x.1)));
+        if lo == hi {
+            return (f.powm(norm, lo), 0);
+        }
+        let conjugate = (x.0, f.neg(x.1));
+        let mut acc = self.one();
+        let bits = u64::BITS - (lo | hi).leading_zeros();
+        for bit in (0..bits).rev() {
+            acc = self.sqr(acc);
+            match ((lo >> bit) & 1) | (((hi >> bit) & 1) << 1) {
+                1 => acc = self.mul(acc, x),
+                2 => acc = self.mul(acc, conjugate),
+                3 => acc = (f.mul(acc.0, norm), f.mul(acc.1, norm)),
+                _ => {}
+            }
+        }
+        acc
     }
     fn cand(&self, k: u64) -> (u64, u64) {
         (k % self.f.p, 1)
@@ -329,15 +363,15 @@ impl<R: Ring> Cube<R> {
         let mut k = 0u64;
         let g = loop {
             let g = r.cand(k);
-            if rpow(&r, g, n / 3) != r.one() {
+            if r.pow(g, n / 3) != r.one() {
                 break g;
             }
             k += 1;
         };
-        let c = rpow(&r, g, t); // generator of the 3-Sylow, order 3^s
+        let c = r.pow(g, t); // generator of the 3-Sylow, order 3^s
         let p3s = 3u128.pow(s);
-        let c_inv = if s >= 2 { rpow(&r, c, p3s - 1) } else { r.one() };
-        let w = rpow(&r, c, p3s / 3); // primitive cube root of unity
+        let c_inv = if s >= 2 { r.pow(c, p3s - 1) } else { r.one() };
+        let w = r.pow(c, p3s / 3); // primitive cube root of unity
         let e3 = if t % 3 == 1 {
             (2 * t + 1) / 3
         } else {
@@ -364,14 +398,14 @@ impl<R: Ring> Cube<R> {
             return Some(a);
         }
         if self.s == 0 {
-            return Some(rpow(r, a, self.e3));
+            return Some(r.pow(a, self.e3));
         }
         // N = t * 3^s. Reuse a^t for both the cube-residuosity
         // test (a^t)^(3^(s-1)) and the Sylow correction h.
         // Since 3*e3-1 is either t or 2*t, this removes one
         // full-length exponentiation from the AMM hot path.
         let t = self.n / self.p3s;
-        let g = rpow(r, a, t);
+        let g = r.pow(a, t);
         let mut residue = g;
         for _ in 1..self.s {
             residue = r.mul(residue, r.sqr(residue));
@@ -379,7 +413,7 @@ impl<R: Ring> Cube<R> {
         if residue != r.one() {
             return None;
         }
-        let x0 = rpow(r, a, self.e3); // x0^3 = a * h, h in the 3-Sylow
+        let x0 = r.pow(a, self.e3); // x0^3 = a * h, h in the 3-Sylow
         let h = if t % 3 == 1 { r.mul(g, g) } else { g };
         // For s=1, a cube has h=1 and x0 is already a root.
         if self.s == 1 {
@@ -909,6 +943,82 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn frobenius_fp2_power_matches_frozen_binary_and_cube_root() {
+        let mut seed = 0x52f1_911a_2026_1118u64;
+        for &p in &[5u64, 7, 11, 17, 97, 487, 17_497, 998_244_353,
+                    1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let q = &ctx.cube_q.r;
+            let n = q.order();
+            let mut t = n;
+            while t % 3 == 0 { t /= 3; }
+            let e3 = if t % 3 == 1 { (2 * t + 1) / 3 } else { (t + 1) / 3 };
+            let exp = [0, 1, p as u128 - 1, p as u128, p as u128 + 1,
+                       n / 3, t, e3, n - 1, n, u128::MAX];
+            for j in 0..128 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let a = if j == 0 { (0, 0) } else { (seed % p, (seed >> 7) % p) };
+                for &e in &exp {
+                    assert_eq!(q.pow(a, e), rpow(q, a, e),
+                               "Fp2 Frobenius p={p} a={a:?} e={e}");
+                }
+                if j < 24 {
+                    assert_eq!(ctx.cube_q.root(a), previous_amm_root(&ctx.cube_q, a),
+                               "AMM Fp2 p={p} a={a:?}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired native production-Rust Fp2 Frobenius exponentiation benchmark"]
+    fn bench_frobenius_fp2_power() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        let mut seed = 0x50ff_ee12_2026_1118u64;
+        for &p in &[487u64, 17_497, 998_244_353, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let q = &ctx.cube_q.r;
+            let n = q.order();
+            let mut t = n;
+            while t % 3 == 0 { t /= 3; }
+            let e3 = if t % 3 == 1 { (2 * t + 1) / 3 } else { (t + 1) / 3 };
+            let mut xs = Vec::with_capacity(512);
+            for _ in 0..512 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                xs.push((seed % p, (seed >> 11) % p));
+            }
+            for &(name, e) in &[("residuosity N/3", n / 3), ("AMM e3", e3), ("AMM t", t)] {
+                for &x in &xs { assert_eq!(rpow(q, x, e), q.pow(x, e)); }
+                let sample = |optimized: bool| {
+                    let start = Instant::now();
+                    let mut checksum = 0u64;
+                    for _ in 0..4 {
+                        for &x in &xs {
+                            let x = black_box(x);
+                            let y = if optimized { q.pow(x, e) } else { rpow(q, x, e) };
+                            checksum = checksum.wrapping_add(y.0 ^ y.1);
+                        }
+                    }
+                    black_box(checksum);
+                    start.elapsed().as_nanos() as f64 / (xs.len() * 4) as f64
+                };
+                let (mut b, mut a) = (Vec::new(), Vec::new());
+                for trial in 0..13 {
+                    if trial % 2 == 0 { b.push(sample(false)); a.push(sample(true)); }
+                    else { a.push(sample(true)); b.push(sample(false)); }
+                }
+                b.sort_by(f64::total_cmp);
+                a.sort_by(f64::total_cmp);
+                println!("Fp2 Frobenius p={p} {name}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                         b[6], a[6], b[6] / a[6]);
+            }
+        }
+    }
 
     // Frozen November 18 Tonelli path (before sharing the t/r exponent).
     // The production path must match the chosen root, not only the root set.
