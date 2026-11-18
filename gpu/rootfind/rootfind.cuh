@@ -467,6 +467,28 @@ RF_HD uint64_t rf_thread_count(uint32_t n_targets, uint32_t n_fb, int chunk) {
     return (uint64_t)n_targets * rf_n_chunks(n_fb, chunk);
 }
 
+/* Map linear tid to target and factor-base chunk.
+ * Most host batches contain fewer than 2^32 logical threads, so 32-bit
+ * division is sufficient and substantially cheaper on x86-64.  Keep a
+ * 64-bit fallback for large jobs (the product of target and chunk counts
+ * can exceed 2^32); CUDA retains its previous uniform mapping. */
+RF_HD void rf_thread_map(uint64_t tid, uint32_t n_targets, uint32_t chunk,
+                         uint32_t &target, uint32_t &i0) {
+#ifdef __CUDA_ARCH__
+    target = (uint32_t)(tid % (uint64_t)n_targets);
+    i0 = (uint32_t)(tid / (uint64_t)n_targets) * chunk;
+#else
+    if (tid <= 0xFFFFFFFFull) {
+        const uint32_t t = (uint32_t)tid;
+        target = t % n_targets;
+        i0 = (t / n_targets) * chunk;
+    } else {
+        target = (uint32_t)(tid % (uint64_t)n_targets);
+        i0 = (uint32_t)(tid / (uint64_t)n_targets) * chunk;
+    }
+#endif
+}
+
 /* ------------------------------------------------------------------ *
  * The per-thread oracle.  CHUNK must be a multiple of 8 and <= 64.
  * ------------------------------------------------------------------ */
@@ -506,8 +528,8 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
     typedef typename F::elt elt;
     const typename F::ctx &f = a.f;
     if (tid >= rf_thread_count(a.n_targets, a.n_fb, CHUNK)) return;
-    const uint32_t k = (uint32_t)(tid % (uint64_t)a.n_targets);
-    const uint32_t i0 = (uint32_t)(tid / (uint64_t)a.n_targets) * (uint32_t)CHUNK;
+    uint32_t k, i0;
+    rf_thread_map(tid, a.n_targets, (uint32_t)CHUNK, k, i0);
     const uint32_t cnt = (a.n_fb - i0 < (uint32_t)CHUNK) ? (a.n_fb - i0) : (uint32_t)CHUNK;
 
     RF_PROF_BEGIN(tid);
