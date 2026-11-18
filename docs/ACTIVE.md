@@ -32,6 +32,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 - [x] Add the pcc CI verdict key (ci-main) to pcc/keyring.json (claude, started 2026-11-18, branch claude/codebase-assessment-report-fp044d, PR #4634; the pcc gate fails until the owner sets PCC_KEYRING_SHA256, by design)
 
+- [ ] Correctness and validation assessment, second pass: re-check the 2026-11-15 repairs, diagnose main's red checks, review unreached code (claude, started 2026-11-18, branch claude/codebase-assessment-report-fp044d, PR #4634)
+
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
 - [x] Gröbner solver shootout on GF(2^n) Semaev systems: local diagnostic, inherited-f4 vs msolve vs CMS (claude, started 2026-11-16, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4543; CI blocked by AWS/S3 and main breakages)
