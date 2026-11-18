@@ -19,7 +19,7 @@ For an actual elliptic curve the remaining inputs have precise meanings:
 | Certificate premise | Required elliptic theorem | State in pinned Mathlib |
 |---|---|---|
 | `degree (f*g)=degree f*degree g` | multiplicativity of curve-map/function-field degree | proved for an already-supplied finite field tower; constructing the pullback tower from the elliptic maps remains open |
-| `degree [N]=N^2` | degree of scalar multiplication | exact displayed degrees `deg Phi_N=N^2`, `deg Psi_N^2=N^2-1` and the generic reduced rational-function extension-degree theorem are proved; division-polynomial coprimality and map identification remain open |
+| `degree [N]=N^2` | degree of scalar multiplication | exact displayed degrees `deg Phi_N=N^2`, `deg Psi_N^2=N^2-1` and the generic coprime-quotient extension-degree theorem are proved; division-polynomial coprimality and map identification remain open |
 | `degree(V-1)=degree(pi-1)` | `(V-1)^vee=pi-1` and equal degree of duals | unavailable |
 
 The pinned Mathlib audit found affine/projective elliptic points, generic finite
@@ -34,13 +34,13 @@ boundary: at `N=6`, unequal degrees 4 and 9 still multiply to `N^2=36`, so the
 dual/equal-degree premise cannot be dropped.
 
 The current Lean source SHA-256 is
-`5457017ccc888e680065724d039ee73a4ccef3c5020ed263f814a39c50220c65`.
-The pinned build succeeds, and the repository auditor reports 137 theorems,
+`0d71734e54c3e6b095756511e5608a40ebe2303169441e149000c8072e12de17`.
+The pinned build succeeds, and the repository auditor reports 139 theorems,
 zero failures and zero trusted native decisions.  This proves the implication
 from the geometric degree certificates; it does not construct those elliptic
 certificates and is not a subexponential ECDLP proof. [pcc:unverified]
 
-The nine degree-layer declarations are:
+The eleven degree-layer declarations are:
 
 - `finiteFieldTower_degree_mul`, Mathlib's finite-rank tower law in the
   orientation used by curve-map degrees;
@@ -51,6 +51,10 @@ The nine degree-layer declarations are:
 - `rationalFunctionCoordinateExtension_degree`, which exposes Mathlib's exact
   `[K(X):K(f)] = max(deg num(f),deg denom(f))` theorem for canonical reduced
   rational functions;
+- `reducedRationalQuotient_degrees`, which proves that a displayed coprime
+  quotient retains both polynomial degrees after canonical normalization;
+- `reducedRationalQuotient_extension_degree`, which composes the preceding
+  result with the exact rational-function extension-degree theorem;
 - `unequalCoordinateLineDegrees_control`, which proves that unequal projection
   degrees make the adjacent map degree nonidentifiable from a shared total;
 - `scalarMultiplicationXMap_exact_degrees`, which exposes the exact

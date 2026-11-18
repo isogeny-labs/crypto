@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-5457017ccc888e680065724d039ee73a4ccef3c5020ed263f814a39c50220c65  H116FiberTrace.lean
+0d71734e54c3e6b095756511e5608a40ebe2303169441e149000c8072e12de17  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  137 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  139 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -62,6 +62,8 @@ f61a96a76811c2cd4736b7515e2f2a4126a1b500e397894ff6c090dc4a8864c2  receipts/norm-
 369a478a267c3adc7bfe821025d5a5b31546d1f96e1f2e3071b2e45f7c3d8d51  receipts/scalar-degree-tower-audit.txt
 a9be1857e0b978b1b0a5cff9ca238ae04b13e02c00023384e481b1ec45d70eb2  receipts/function-field-sandwich-build.txt
 523f28dceb06d84847126a8066a7a15d6059bff9a215504fbc2c03a7ccf82b1b  receipts/function-field-sandwich-audit.txt
+9134d32b084b1163d4e4c54d4dcccc1c093f67da34cbd66a5c086914348d9f5b  receipts/no-cancellation-build.txt
+af1f55a38f86370e51a9e4038009738a845709279204f56dbc3e487737715f11  receipts/no-cancellation-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -276,6 +278,14 @@ function. A checked `4*3=2*6` control shows why equal projection degrees are
 necessary. Constructing the H116 field embeddings, proving that the displayed
 division polynomials are coprime, identifying their quotient with the curve
 map, and proving the dual-pair theorem remain open. [pcc:unverified]
+
+The 139-theorem checkpoint closes the generic no-cancellation bridge for a
+displayed rational quotient. Given `q != 0` and `IsCoprime p q`, Mathlib's
+canonical `RatFunc` normalization preserves the numerator and denominator
+degrees, so the coordinate extension degree is exactly
+`max(deg p,deg q)`. The proof uses the public gcd normalization and rational-
+function APIs; it does not assume that `Phi_n` and `Psi_n^2` satisfy the
+coprimality premise. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

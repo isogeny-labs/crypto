@@ -295,6 +295,13 @@ pullback fields and identify the quotient with the curve map. The
 [source-linked report](reports/search-20261118T1152Z/REPORT.md) contains the
 tower diagram, references, audit receipt and unequal-projection control.
 [pcc:unverified]
+The following Lean checkpoint closes the generic displayed-quotient gap:
+for nonzero `q` with `IsCoprime p q`, canonical `RatFunc` normalization keeps
+the degrees of both `p` and `q`, and the coordinate extension therefore has
+degree `max(deg p,deg q)`. The separately frozen
+[`H116-SCALAR-DIVPOLY-COPRIMALITY-001`](SCALAR_DIVPOLY_COPRIMALITY_PROTOCOL.md)
+panel targets the still-open premise `IsCoprime Phi_n Psi_n^2` with exact gcds
+and two negative controls. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

@@ -745,6 +745,60 @@ theorem rationalFunctionCoordinateExtension_degree
       max f.num.natDegree f.denom.natDegree := by
   exact RatFunc.finrank_eq_max_natDegree f
 
+/-- A displayed polynomial quotient that is already coprime retains the exact
+numerator and denominator degrees after Mathlib's canonical `RatFunc`
+normalization.  The normalization divides by the polynomial gcd and then
+multiplies both sides by a nonzero constant to make the denominator monic. -/
+theorem reducedRationalQuotient_degrees
+    {F : Type*} [Field F] (p q : Polynomial F)
+    (hq : q ≠ 0) (hcoprime : IsCoprime p q) :
+    let f : RatFunc F :=
+      algebraMap (Polynomial F) (RatFunc F) p /
+        algebraMap (Polynomial F) (RatFunc F) q
+    f.num.natDegree = p.natDegree ∧
+      f.denom.natDegree = q.natDegree := by
+  classical
+  let f : RatFunc F :=
+    algebraMap (Polynomial F) (RatFunc F) p /
+      algebraMap (Polynomial F) (RatFunc F) q
+  have hgcdUnit : IsUnit (GCDMonoid.gcd p q) :=
+    gcd_isUnit_iff_isRelPrime.mpr hcoprime.isRelPrime
+  have hgcd : GCDMonoid.gcd p q = 1 := by
+    rw [← normalize_gcd p q, normalize_eq_one]
+    exact hgcdUnit
+  have hlead : q.leadingCoeff ≠ 0 := Polynomial.leadingCoeff_ne_zero.mpr hq
+  change f.num.natDegree = p.natDegree ∧
+    f.denom.natDegree = q.natDegree
+  constructor
+  · dsimp only [f]
+    rw [RatFunc.num_div, hgcd]
+    simp only [EuclideanDomain.div_one]
+    exact Polynomial.natDegree_C_mul (inv_ne_zero hlead)
+  · dsimp only [f]
+    rw [RatFunc.denom_div p hq, hgcd]
+    simp only [EuclideanDomain.div_one]
+    exact Polynomial.natDegree_C_mul (inv_ne_zero hlead)
+
+/-- Combining coprime displayed polynomials with the canonical rational-
+function degree theorem gives the exact coordinate extension degree.  This is
+the no-cancellation bridge needed to instantiate the quadratic sandwich once a
+particular numerator and denominator are proved coprime. -/
+theorem reducedRationalQuotient_extension_degree
+    {F : Type*} [Field F] (p q : Polynomial F)
+    (hq : q ≠ 0) (hcoprime : IsCoprime p q) :
+    let f : RatFunc F :=
+      algebraMap (Polynomial F) (RatFunc F) p /
+        algebraMap (Polynomial F) (RatFunc F) q
+    Module.finrank (IntermediateField.adjoin F {f}) (RatFunc F) =
+      max p.natDegree q.natDegree := by
+  let f : RatFunc F :=
+    algebraMap (Polynomial F) (RatFunc F) p /
+      algebraMap (Polynomial F) (RatFunc F) q
+  have hdegree := reducedRationalQuotient_degrees p q hq hcoprime
+  change Module.finrank (IntermediateField.adjoin F {f}) (RatFunc F) =
+    max p.natDegree q.natDegree
+  rw [rationalFunctionCoordinateExtension_degree f, hdegree.1, hdegree.2]
+
 /-- Mutation control for the sandwich theorem: if the two line-to-curve
 degrees differ, equality of the total tower degrees does not identify the two
 adjacent map degrees. -/
@@ -2808,6 +2862,8 @@ theorem rationalMap_separation_strict_control :
 #print axioms finiteFieldTower_degree_eq_norm_of_paired
 #print axioms quadraticFunctionFieldSandwich_degree
 #print axioms rationalFunctionCoordinateExtension_degree
+#print axioms reducedRationalQuotient_degrees
+#print axioms reducedRationalQuotient_extension_degree
 #print axioms unequalCoordinateLineDegrees_control
 #print axioms scalarMultiplicationXMap_exact_degrees
 #print axioms scalarMultiplicationXMap_leadingCoefficients
