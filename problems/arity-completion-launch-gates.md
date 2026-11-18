@@ -238,3 +238,24 @@ been asked for an existing runner/profile location, not credential text.
 This addition does not change the older arity/dreg findings or assert anything
 about their current credentials. Recheck when this session receives a configured
 runner/profile or checkpoint transport. The shared obstruction remains open.
+
+## 2026-11-18: H115 Frobenius--Kummer moment measurement
+
+Crypto draft PR #4625 source revision `6d8def5473` and cryptanalysis draft PR
+#1739 revision `ed206d8d` publish the frozen H115 producer and independent
+verifier before measurement. Their branch-specific resume note fixes the exact
+protocol/curve/source hashes, USD 1.00 cap, 1,800-second deadline and zero
+scientific retries.
+
+In this managed workspace, `.resume/RESUME.md` passes its content check and the
+branch is present on the remote. Both `scripts/checkpoint.sh push` and
+`scripts/checkpoint.sh gate` exit 1 because no AWS profile, upload token or
+token file exists. No checkpoint, image, EKS Job or producer `--run` invocation
+was created. The scoped receipt is
+`research/h115_frobenius_kummer_resolvent_20261117/RUN_BLOCKED.md`.
+
+This is an access observation only. The next action is the unchanged frozen
+card `XP-20261118-h115-frobenius-kummer`: connect an authorized transport, pass
+the checkpoint gate, build the bound source into a digest-pinned image and run
+one exhaustive panel. Exact bytes must pass verifier normal mode and all eight
+one-at-a-time copied-packet mutations. No local scoring substitute is allowed.

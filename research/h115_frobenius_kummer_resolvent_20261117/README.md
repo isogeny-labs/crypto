@@ -48,6 +48,7 @@ Post-freeze proof artifacts:
 | `PRODUCER_SOURCE_GATE.md` | Strict non-scoring compile/selftest receipt | self-hash intentionally omitted |
 | `VERIFIER_BINDING.md` | Bound cryptanalysis PR #1739 revision and independent source hash | self-hash intentionally omitted |
 | `CHECKPOINT_RESUME.md` | Branch-specific checkpoint, EKS and verifier handoff | self-hash intentionally omitted |
+| `RUN_BLOCKED.md` | Exact checkpoint-transport failure and recovery condition | self-hash intentionally omitted |
 
 The first post-freeze native check is structural only:
 
