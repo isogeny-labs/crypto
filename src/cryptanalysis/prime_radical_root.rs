@@ -298,11 +298,21 @@ impl<R: Ring> Cube<R> {
         if self.s == 0 {
             return Some(rpow(r, a, self.e3));
         }
-        if rpow(r, a, self.n / 3) != r.one() {
+        // N = t * 3^s. Reuse a^t for both the cube-residuosity
+        // test (a^t)^(3^(s-1)) and the Sylow correction h.
+        // Since 3*e3-1 is either t or 2*t, this removes one
+        // full-length exponentiation from the AMM hot path.
+        let t = self.n / self.p3s;
+        let g = rpow(r, a, t);
+        let mut residue = g;
+        for _ in 1..self.s {
+            residue = r.mul(residue, r.mul(residue, residue));
+        }
+        if residue != r.one() {
             return None;
         }
         let x0 = rpow(r, a, self.e3); // x0^3 = a * h, h in the 3-Sylow
-        let h = rpow(r, a, 3 * self.e3 - 1);
+        let h = if t % 3 == 1 { r.mul(g, g) } else { g };
         let w2 = r.mul(self.w, self.w);
         let mut l: u128 = 0; // h = c^l, l found digit by digit
         for j in 0..self.s {
@@ -395,12 +405,19 @@ impl RadicalRootCtx {
             let r = f.powm(a, (p + 1) / 4);
             return if f.sqr(r) == a { Some(r) } else { None };
         }
-        if f.powm(a, (p - 1) / 2) != 1 {
+        // Euler's criterion from a^t2, reused by Tonelli-Shanks:
+        // a^((p-1)/2) = (a^t2)^(2^(s2-1)).
+        // Avoid a second full-length modular exponentiation.
+        let mut t = f.powm(a, self.t2);
+        let mut legendre = t;
+        for _ in 1..self.s2 {
+            legendre = f.sqr(legendre);
+        }
+        if legendre != 1 {
             return None;
         }
         let mut m = self.s2;
         let mut c = self.zc;
-        let mut t = f.powm(a, self.t2);
         let mut r = f.powm(a, self.t2.div_ceil(2));
         loop {
             if t == 1 {
@@ -415,7 +432,12 @@ impl RadicalRootCtx {
             if i == m {
                 return None;
             }
-            let b = f.powm(c, 1u64 << (m - i - 1));
+            // Power-of-two exponent: repeated squaring is cheaper
+            // than the generic binary-exponentiation loop.
+            let mut b = c;
+            for _ in 0..(m - i - 1) {
+                b = f.sqr(b);
+            }
             m = i;
             c = f.sqr(b);
             t = f.mul(t, c);
@@ -425,7 +447,10 @@ impl RadicalRootCtx {
     /// Distinct roots of monic y^2 + b y + c.
     pub fn quad_monic(&self, b: u64, c: u64) -> Vec<u64> {
         let f = &self.f;
-        let disc = f.sub(f.sqr(b), f.mul(4, c));
+        // Four times c needs only two reduced doublings, not a
+        // generic base-field multiply (wide remainder on most p).
+        let twice_c = f.add(c, c);
+        let disc = f.sub(f.sqr(b), f.add(twice_c, twice_c));
         match self.sqrt(disc) {
             None => vec![],
             Some(0) => vec![f.mul(f.neg(b), self.inv2)],
