@@ -1368,6 +1368,71 @@ fn try_finalise(
 
 // ── Semaev S₄ 3-decomposition relation search ────────────────────────
 
+/// **Find one 3-decomposition relation by pair-sum lookup.**
+///
+/// For every factor-base point `F_k`, both `R − F_k` and `R + F_k` are probed
+/// in the pair-sum table; a hit names the other two signed summands, so a
+/// trial costs `2·|FB|` point additions and table lookups instead of `|FB|²`
+/// quartic root finds (each of which runs Cantor–Zassenhaus).
+///
+/// A hit is only a candidate: the table shares x with `−S`, and the index pair
+/// it reports is re-checked geometrically by [`try_finalise_s4`], which
+/// verifies `εᵢFᵢ + εⱼFⱼ + εₖFₖ = R` before returning a relation.  A stale or
+/// sign-flipped hit therefore costs one verification and never a wrong row.
+pub fn find_one_relation_s4_table(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    factor_base: &[FactorBaseEntry],
+    table: &PairSumTable,
+    max_trials: usize,
+) -> Option<(Relation, usize)> {
+    use crate::utils::random::random_scalar;
+    let a_fe = curve.a_fe();
+    for trial in 1..=max_trials {
+        let a = random_scalar(&curve.n);
+        let b = random_scalar(&curve.n);
+        let r = relation_point(g, &a, q, &b, &a_fe);
+        if matches!(&r, Point::Infinity) {
+            continue;
+        }
+        for (k, fk) in factor_base.iter().enumerate() {
+            if matches!(&fk.point, Point::Infinity) {
+                continue;
+            }
+            let neg_k = fk.point.neg_vartime();
+            for probe in [
+                r.add_vartime(&neg_k, &a_fe),
+                r.add_vartime(&fk.point, &a_fe),
+            ] {
+                let Point::Affine { x, y } = probe else {
+                    continue;
+                };
+                count("group_additions", 1);
+                count("table_probes_uncharged", 1);
+                let Some((i, _, j, _)) = table.find(&x.value, &y.value) else {
+                    continue;
+                };
+                if let Some(rel) = try_finalise_s4(
+                    &r,
+                    i,
+                    &factor_base[i].point,
+                    j,
+                    &factor_base[j].point,
+                    k,
+                    &fk.point,
+                    curve,
+                    &a,
+                    &b,
+                ) {
+                    return Some((rel, trial));
+                }
+            }
+        }
+    }
+    None
+}
+
 /// **Find one 3-decomposition relation** by sampling random `(a, b)` and
 /// decomposing `R = aG + bQ` as a signed sum of *three* factor-base
 /// elements.  For each ordered pair `(F_i, F_j)` from the factor base,
@@ -2611,6 +2676,17 @@ pub fn ec_index_calculus_dlp_s4_staged(
     }
     let target = fb.len() + extra_relations;
 
+    // The pair-sum table replaces the |FB|^2 quartic solves of a trial with
+    // 2|FB| point additions and lookups.  It is built once per solve, and only
+    // when the factor base fits its index width (`IC_S4_TABLE=0` keeps the
+    // quartic sweep, e.g. for a controlled comparison).
+    let s4_table = if fb.len() <= PAIR_SUM_TABLE_MAX_FB
+        && std::env::var("IC_S4_TABLE").as_deref() != Ok("0")
+    {
+        Some(build_pair_sum_table(curve, &fb))
+    } else {
+        None
+    };
     let relations_started = Instant::now();
     let mut relations = Vec::with_capacity(target);
     let mut attempts_exhausted = 0usize;
@@ -2620,9 +2696,13 @@ pub fn ec_index_calculus_dlp_s4_staged(
         let mut failed_trials = 0usize;
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
-                if let Some(found) =
-                    find_one_relation_s4_counted(curve, g, q, &fb, max_trials_per_relation)
-                {
+                let attempt = match &s4_table {
+                    Some(t) => {
+                        find_one_relation_s4_table(curve, g, q, &fb, t, max_trials_per_relation)
+                    }
+                    None => find_one_relation_s4_counted(curve, g, q, &fb, max_trials_per_relation),
+                };
+                if let Some(found) = attempt {
                     break 'attempt Some(found);
                 }
                 attempts_exhausted += 1;
