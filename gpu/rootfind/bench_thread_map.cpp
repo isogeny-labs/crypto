@@ -78,10 +78,11 @@ int main(int argc,char**argv) {
         return 0;
     }
     if(argc!=1) return 2;
-    for (const auto &ids : {ids32,ids64}) {
+    for (int mode=0;mode<2;mode++) {
+        const std::vector<uint64_t> &ids=mode==0?ids32:ids64;
         const double a=bench(map_before,ids,n),b=bench(map_after,ids,n);
         std::printf("rootfind thread-map %s: old=%.3f ns new=%.3f ns speedup=%.3fx\n",
-                    (&ids==&ids32 ? "32" : "64"),a,b,a/b);
+                    mode==0?"32":"64",a,b,a/b);
     }
     return 0;
 }
