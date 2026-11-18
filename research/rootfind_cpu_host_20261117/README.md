@@ -814,3 +814,80 @@ perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses \\
 **Limits:** the host-only conversion benchmark does not establish an
 end-to-end rootfinder speedup.  The code remains in draft PR #4609
 until CUDA validation and complete oracle throughput measurements.
+
+
+## CPU medium-tail cutoff and thread mapping validation (2026-11-17 PT / 2026-11-18 UTC)
+
+Investigated CPU inversion-tail padding, per-thread target/chunk mapping,
+and Fp64 add/negate/reduce correction. The tail cutoff was newly changed
+in this pass; the thread-map fast path was already on the branch and
+independently reviewed. Branchless correction candidates for Fp64
+add/negate/reduce were rejected after local screening.
+
+### Retained CPU tail change
+
+The host rf_decompose_thread path previously used the active count only
+when cnt <= CHUNK/2. A 17-of-32 tail therefore did the full 32-entry
+prefix/unwind. Increasing the cutoff to 3*CHUNK/4 removes those
+padding Montgomery multiplications for 17..24 of 32 without changing
+CUDA or full/near-full CPU chunks. At 17/32, this avoids 45 modular
+multiplications per inversion core, retaining one modular inverse.
+
+bench_tail_threshold.cpp freezes the immediate preceding half-full
+cutoff as the baseline and compares it with the new 3/4 cutoff.
+It verifies bitwise equality and x * inv(x) == Montgomery one for
+all counts 1..32 and provides separate perf arms for 17,20,24,28,32
+active entries. bench_tail_core.cpp is aligned with the new cutoff
+but retains its older always-full baseline.
+
+Actual repository-header Ubuntu 24.04 CI, GCC -O2, nine-run wall-clock
+medians ([run 44231020733](https://github.com/isogeny-labs/crypto/actions/runs/44231020733)):
+
+| Filled | Previous half cutoff ns/batch | New 3/4 cutoff ns/batch | Ratio |
+|---|---:|---:|---:|
+| 16/32 | 271.907 | 273.650 | 0.994x control |
+| 17/32 | 395.711 | 282.007 | **1.403x** |
+| 20/32 | 395.653 | 309.202 | **1.280x** |
+| 24/32 | 389.129 | 333.187 | **1.168x** |
+| 28/32 | 388.590 | 388.715 | 1.000x control |
+| 32/32 | 389.500 | 398.648 | 0.977x control |
+
+Controls execute the same arithmetic and show measurement noise.
+Most oracle chunks are full, so these tail-only speedups cannot be
+extrapolated to end-to-end decomposition throughput.
+
+A faithful C++17 GCC -O2 local reproduction pinned to one x86_64 CPU
+used four independent processes, nine medians per arm, and
+2,048 32-element batches with four repeats. Software task-clock from
+perf_event_open(PERF_TYPE_SOFTWARE, PERF_COUNT_SW_TASK_CLOCK)
+agreed with steady-clock measurements. The four paired ratios were:
+
+- 17/32: 1.429 / 1.529 / 1.559 / 1.509x
+- 20/32: 1.366 / 1.325 / 1.288 / 1.356x
+- 24/32: 1.210 / 1.192 / 1.271 / 1.284x
+- full 32: 0.994 / 0.998 / 0.970 / 1.023x (unchanged control).
+
+This is **software task-clock**, not hardware CPU cycles or retired
+instructions. The local sandbox has no perf executable or PMU. CI
+installed perf 7.0.14 but hardware event access was blocked
+(perf_event_paranoid=4).
+
+### Existing 32-bit thread-map fast path
+
+The branch already implements guarded host-only 32-bit division in
+rf_thread_map for 32-bit logical thread IDs, retaining a 64-bit fallback
+and unchanged CUDA code. The actual-header CI verified both modes:
+32-bit map 2.445 -> 1.467 ns/map (**1.666x**) and 64-bit fallback
+2.445 -> 2.445 ns/map (1.000x). A separate small local reproduction
+was noisy (0.882..1.362x for 32-bit map across paired runs), so this
+is a CI microbenchmark observation, not a claimed oracle gain.
+
+### Outstanding validation
+
+The rootfinder job passed make test and benchmark correctness. A
+separate Workflow files parse check failed *before parsing* while
+recovering research/weak_curve_properties_lean_20261011/root_lib.stdout
+from an artifact store (no matching Git object, S3 not contacted);
+this is unrelated to arithmetic correctness but is a remaining check.
+CUDA correctness, hardware PMU, and fixed-target end-to-end oracle
+throughput must still be verified before merging.
