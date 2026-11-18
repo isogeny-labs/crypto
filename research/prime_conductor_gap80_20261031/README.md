@@ -217,3 +217,19 @@ producer interpretation, unsigned/unverified/not_covered. [pcc:unverified]
 The full target window, quotient/non-kernel images and paired endpoint
 measurements remain open. No elapsed advantage or peak-RSS change has been
 measured; the context adds live cache/scratch data during later tile builds.
+
+
+## Full-phase all-window audit, 18 November
+
+The [new source-model audit](memory-frontier-20261118/RESULTS.md) adds the
+mandatory simultaneous h/zeroth-giant-jet phase and derives all-window
+bounds. For the fixed 80-bit target, the minimum necessary single-rectangle
+slot model is 9665413335568 bytes. Under the example 128 GiB cap, every
+fitting tiling of these loops entails at least 21241297635754 coordinate
+contexts and 2473 rectangles. These are exact conditional model bounds,
+excluding other data and all timings; PCC-20261118-61e7ed remains an unsigned,
+unverified/not_covered producer statement. [pcc:unverified]
+
+No production evaluator source or original acceptance criterion changes.
+External-memory/different traversals are not ruled out. The complete target
+quotient, non-kernel images and paired endpoint measurements remain open.

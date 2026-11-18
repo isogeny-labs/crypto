@@ -4,6 +4,8 @@
 Sources (all committed, read at --ref unless noted):
   research/prime_conductor_gap80_20261031/published-lucas{,-9551}-20261118/summary.json
                                 fixed prime Frobenius conductor, not an evaluated crossing
+  research/prime_conductor_gap80_20261031/memory-frontier-20261118/summary.json
+                                exact necessary source-model bounds, not RSS or timings
   docs/ic/leaderboard.json        IC leaders per regime (S, ratio_rho, largest log2 r); history via git log
   docs/ic/progress-timeline.json  dated headline series (ec-cold etc.); points carry their own dates
   docs/perf/history.json          on branch origin/perf-history: chained Ir performance index per push
@@ -1144,9 +1146,40 @@ def fixed_lucas_conductor(ref, since):
                  source=f"{path}@{commit}")
 
 
+def conductor_memory_frontier(ref, since):
+    """Exact source-model bounds; neither RSS nor an evaluated crossing."""
+    path = "research/prime_conductor_gap80_20261031/memory-frontier-20261118/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        checks = data.get("native_integer_controls", {})
+        if (checks.get("optimizer_equals_exhaustive") is not True
+                or checks.get("all_bounds_hold") is not True
+                or data.get("recorded_schedule_qualification", {}).get("passed") is not True):
+            continue
+        cases = data.get("target_cases", [])
+        if not cases:
+            continue
+        case = cases[0]
+        if (case.get("schema") != "complete-memory-frontier/v1"
+                or case.get("ell") != "729845429276318409687041"
+                or case.get("cap_bytes") != "137438953472"):
+            continue
+        for suffix, field, unit in (
+            ("full_rectangle_min_slot_bytes", "all_window_single_rectangle_minimum_bytes", "bytes"),
+            ("contexts_min_under_example_cap", "all_window_contexts_minimum_under_cap", "count"),
+            ("rectangles_min_under_example_cap", "all_window_rectangles_minimum_under_cap", "count"),
+        ):
+            emit(f"conductor.pinned_evaluator.{suffix}", case.get(field),
+                 date=date, problem="isogeny-construction-source-model", unit=unit,
+                 better="neutral",
+                 label="Exact necessary source-model bound; not RSS/timing/crossing; PCC unverified",
+                 source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     fixed_lucas_conductor(a.ref, a.since)
+    conductor_memory_frontier(a.ref, a.since)
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
