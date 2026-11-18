@@ -201,12 +201,12 @@ fn run()->Value{
     let t0=Instant::now();let (a,oa)=direct(&pts,target);let ta=t0.elapsed().as_nanos();
     let t1=Instant::now();let (z,oz)=fourier(&pts,target);let tz=t1.elapsed().as_nanos();
     let t2=Instant::now();let (w,ow)=zeta_fourier(&pts,target);let tw_case=t2.elapsed().as_nanos();
-    ((a,oa,ta),(z,oz,tz),(w,ow,tw))
+    ((a,oa,ta),(z,oz,tz),(w,ow,tw_case))
    }else{
     let t0=Instant::now();let (w,ow)=zeta_fourier(&pts,target);let tw_case=t0.elapsed().as_nanos();
     let t1=Instant::now();let (z,oz)=fourier(&pts,target);let tz=t1.elapsed().as_nanos();
     let t2=Instant::now();let (a,oa)=direct(&pts,target);let ta=t2.elapsed().as_nanos();
-    ((a,oa,ta),(z,oz,tz),(w,ow,tw))
+    ((a,oa,ta),(z,oz,tz),(w,ow,tw_case))
    };
    assert_eq!(a,z,"prior 256 Fourier residues");
    assert_eq!(a,w,"new 256 zeta-Walsh residues");
