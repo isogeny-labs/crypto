@@ -41,7 +41,11 @@ const EXPECTED_DELIVERABLE_BINDINGS: [(&str, &str, Option<&str>); 19] = [
         "review_receipt",
         Some("research/cover_transfer_assessment_20261013/README.md"),
     ),
-    ("WS2-D1", "implementation", None),
+    (
+        "WS2-D1",
+        "implementation",
+        Some("src/prime_hyperelliptic/cover_transfer.rs"),
+    ),
     (
         "WS2-D2",
         "implementation",
@@ -52,7 +56,11 @@ const EXPECTED_DELIVERABLE_BINDINGS: [(&str, &str, Option<&str>); 19] = [
         "certificate_corpus",
         Some("problems/catalog-cover-subgroup-certificates-incomplete.md"),
     ),
-    ("WS2-D4", "independent_oracle", None),
+    (
+        "WS2-D4",
+        "independent_oracle",
+        Some("tests/binary_cover_transfer_oracle.rs"),
+    ),
     ("WS3-D1", "schema_and_ledger", None),
     ("WS3-D2", "semantic_verifier", None),
     (
