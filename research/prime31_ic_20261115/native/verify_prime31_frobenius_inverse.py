@@ -71,6 +71,82 @@ def check_quadratic(f,x):
     discriminant=(a2*a2-4*a1)%P
     assert pow(discriminant,(P-1)//2,P)==P-1
 
+
+def poly_trim(a):
+    a=list(a)
+    while a and not a[-1]:
+        a.pop()
+    return a
+
+def pseudo_rem(a, b):
+    # Independent fraction-free polynomial remainder over Fp.
+    a=poly_trim(a)
+    b=poly_trim(b)
+    assert b
+    while len(a)>=len(b):
+        lead_a, lead_b = a[-1], b[-1]
+        shift=len(a)-len(b)
+        a=[v*lead_b%P for v in a]
+        for j,c in enumerate(b):
+            a[shift+j]=(a[shift+j]-lead_a*c)%P
+        a=poly_trim(a)
+    return a
+
+def pseudo_linear_root(f, z):
+    a,b=poly_trim(f),poly_trim(z)
+    while b:
+        a,b=b,pseudo_rem(a,b)
+    assert len(a)==2 and a[1]
+    return -a[0]*pow(a[1],-1,P)%P
+
+def monic_rem(a, b):
+    assert b and b[-1]==1
+    a=poly_trim(a)
+    while len(a)>=len(b):
+        coeff=a[-1]
+        shift=len(a)-len(b)
+        for j,c in enumerate(b):
+            a[shift+j]=(a[shift+j]-coeff*c)%P
+        a=poly_trim(a)
+    return a
+
+def poly_mul_mod(a,b,f):
+    c=[0]*(len(a)+len(b)-1)
+    for i,v in enumerate(a):
+        for j,w in enumerate(b):
+            c[i+j]=(c[i+j]+v*w)%P
+    return monic_rem(c,f)
+
+def poly_pow_mod(a,n,f):
+    r=[1]
+    while n:
+        if n&1:
+            r=poly_mul_mod(r,a,f)
+        n//=2
+        if n:
+            a=poly_mul_mod(a,a,f)
+    return r
+
+def independent_fraction_free_inverse(q):
+    # Public Q only: no supplied source preimage or discrete-log scalar.
+    if q is None:
+        return None
+    X,Y=q
+    if not on_curve(q,DA,DB):
+        raise ValueError("invalid public destination")
+    f=cubic_coeff(X)
+    z=poly_pow_mod([0,1],P,f)
+    z += [0]*max(0,2-len(z))
+    z[1]=(z[1]-1)%P
+    x=pseudo_linear_root(f,z)
+    h=(x-U)%P
+    if not h:
+        raise ValueError("kernel pole")
+    den=(h*h*h-2*TAU*h-8*V)%P
+    if not den:
+        raise ValueError("zero derivative")
+    return (x, Y*(h*h*h)*pow(den,-1,P)%P)
+
 def check(path):
     with open(path,encoding="utf-8") as f:
         doc=json.load(f)
@@ -85,6 +161,9 @@ def check(path):
     assert doc["unique_linear_gcd"]==256
     assert doc["nontrivial_quadratic_irreducible"]==256
     assert doc["dual_agreement"]==256
+    assert doc["fraction_free_batch_matches"]==256
+    assert doc["fraction_free_batch_fp_inversions"]==2
+    assert doc["direct_inverse_fp_inversions"]==1024
     rows=doc["public_transcript"]
     assert len(rows)==256
     assert scalar(N,G,EA) is None and scalar(N,H,DA) is None
@@ -99,6 +178,7 @@ def check(path):
         assert q==expected_target and preimage==expected_source
         assert on_curve(q,DA,DB) and on_curve(preimage,EA,EB)
         assert velu(preimage)==q
+        assert independent_fraction_free_inverse(q)==preimage
         x,y=preimage
         X,Y=q
         f=cubic_coeff(X)
@@ -119,6 +199,8 @@ def check(path):
         "forward_velu_checks":len(rows),
         "exact_cubic_and_nonsquare_quadratic_checks":len(rows),
         "ordinate_inverse_checks":len(rows),
+        "independent_fraction_free_frobenius_gcd_checks":len(rows),
+        "batch_two_inverse_counter_checked":True,
         "no_new_nongeneric_relations":True,
         "pass":True
     },sort_keys=True))
