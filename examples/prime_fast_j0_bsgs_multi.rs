@@ -295,13 +295,7 @@ fn main() {
     for curve_idx in cs..cs + 2 {
         let (c, g, _n, lam) = find_j0_curve(bits, curve_idx);
         let m = ((mc * ((t_count as f64) * (c.n as f64) / 6.0).sqrt()).round() as usize).max(16);
-        // INST0 offsets the instance index (and so the planted targets), as in
-        // prime_fast_j0_rho_multi.
-        let inst0: u64 = std::env::var("INST0")
-            .ok()
-            .and_then(|v| v.parse().ok())
-            .unwrap_or(0);
-        for ins in inst0..inst0 + inst {
+        for ins in 0..inst {
             let mut rng = StdRng::seed_from_u64(0xC0DE ^ ins ^ c.n ^ t_count as u64);
             let ks: Vec<u64> = (0..t_count).map(|_| rng.gen_range(2..c.n)).collect();
             let qs: Vec<Pt> = ks.iter().map(|&k| c.mul(Some(g), k).unwrap()).collect();
