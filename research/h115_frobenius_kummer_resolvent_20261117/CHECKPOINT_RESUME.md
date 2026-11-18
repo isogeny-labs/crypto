@@ -11,7 +11,7 @@ curves, 15 generator rows and 366 targets, followed by an independently
 verified scalar-blind decoder. This is a bounded falsification experiment, not
 a generic or subexponential ECDLP claim.
 
-## Frozen mechanism and cost boundary
+## Lead / hypothesis
 
 For ordinary `E/F_p` with `r=#E(F_p)`, the exact identity
 `(V-1)(pi-1)=[r]` compresses the `r^2` division torsor to the `r`-element
@@ -21,7 +21,7 @@ permutations modulo two and three. The producer explicitly enumerates `r`
 fiber terms per target. A uniform `r^o(1)` moment shortcut remains an open
 requirement for any subexponential claim.
 
-## Exact source binding
+## Spec
 
 - study root: `research/h115_frobenius_kummer_resolvent_20261117/`
 - machine protocol SHA-256:
@@ -69,7 +69,7 @@ exists.
 
 None. No local or remote H115 scoring process has been started.
 
-## Stop conditions
+## Stop and success conditions
 
 Stop after the single exhaustive frozen run, on the first structural/digest/
 metadata mismatch, or at the budget/deadline. Incomplete or unverifiable output
