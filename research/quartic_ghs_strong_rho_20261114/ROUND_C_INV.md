@@ -70,9 +70,11 @@ a general cubic multiplication.
 4. Run one deterministic `q=223`, seed 1, target 0, `ic-repeat`, `strong-b8`
    code/count control from the exact baseline and candidate. Ignore timing and
    calibration fields. The target, answer, walk shape, group work, native
-   counts, all non-inversion field counts, and phase-local `fq_inv`/`f3_inv`
-   must be identical. For every phase, candidate `fq_mul` must equal baseline
-   `fq_mul - 4*f3_inv`.
+   counts, and phase-local `fq_inv`/`f3_inv` must be identical. For every
+   phase, candidate `fq_mul` must equal baseline `fq_mul - 4*f3_inv`, and
+   candidate `f3_mul` must equal baseline `f3_mul - f3_inv`. The `fq_add`
+   delta must equal the per-inverse kernel delta established by the local
+   control. No other count may change.
 
 These are local correctness/count tests, not benchmark or profile evidence.
 No q=4051 diagnostic, wall-time screen, profile, paid job, or complete grid is
@@ -90,7 +92,7 @@ requires a successful pushed checkpoint and gate under the repository rules.
 | No hidden cubic multiply | the same snapshots | direct `f3_mul = 0`; reference `f3_mul = 1` |
 | Exact planted-log behavior | standalone widths 1, 8, and 32 | each returns the planted scalar with `ok=true` |
 | Exact walk identity | paired `q=223` JSON after timing/calibration removal | target, answer, steps, DPs, restarts, look-ahead, cycles, group and native counts are identical |
-| Phase-local E2E count identity | paired setup/walk/verify field records | `fq_mul` delta is exactly `-4*f3_inv`; `fq_inv`, `f3_inv`, `f3_sq`, batch inversions and group additions are unchanged |
+| Phase-local E2E count identity | paired setup/walk/verify field records | `fq_mul` delta is `-4*f3_inv`, `f3_mul` delta is `-f3_inv`, and `fq_add` matches the kernel control; `fq_inv`, `f3_inv`, `f3_sq`, batch inversions and group additions are unchanged |
 | Evidence discipline | retained commands, outputs, hashes and failure log | no failure is discarded and no throughput/frontier claim is made |
 
 ## Stop and decision rules
