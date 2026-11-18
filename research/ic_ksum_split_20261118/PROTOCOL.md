@@ -123,3 +123,9 @@ in the prune study (the validator replays them by path). No push, no PR (the cal
 The first launch stopped at `run_all.sh`'s binary check, before any session: the check compared both lines of `BINARY.sha256`
 against the binary's hash. The check now reads the first line only (`head -1`). No session, spec, arm, test or prediction changed;
 `REGISTRATION.sha256` is re-written for `run_all.sh` and this file (`REGISTRATION.A1.sha256`).
+
+## Amendment A2 (2026-11-18, before any session produced data)
+
+The second launch held `/tmp/crypto-bench.lock` with an outer `flock`, and `ecbench run` takes the same lock itself, so every
+session refused to start (exit 2, no records; the partial `data/` and `sessions/` were deleted). `run_all.sh` now runs without the
+outer `flock` and passes `--wait` to `ecbench run`, which queues on the lock. Nothing else changed (`REGISTRATION.A2.sha256`).
