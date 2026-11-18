@@ -64,3 +64,40 @@ degree or degree of regularity grew sub-linearly or logarithmically in the
 instance size is what would signal an index-calculus advantage; the harness can
 now measure and report that slope. The fit functions are unit-tested
 (`growth::tests`) to recover known linear, power and exponential slopes exactly.
+
+## Variable effects and direct diffusion
+
+The companion figure colors each variable's effect on observed degree of
+regularity and the strength of its direct coupling to other variables.
+[Figure (SVG)](reports/run-20261118T0135Z/variable_effects.svg) ·
+[PDF report](reports/run-20261118T0135Z/report.pdf) ·
+[Measurements (CSV)](reports/run-20261118T0135Z/variable_effects.csv)
+
+Each regularity cell compares the original system with that same system plus
+one equation pinning a variable at its shared-root value of 1. The observed
+degree is the first degree with no standard monomials in the graded reverse
+lexicographic Gröbner staircase. Each diffusion cell counts the fraction of
+relations where changing the source coordinate from 1 to 2 changes the
+polynomial dependence on the destination coordinate, with the remaining
+coordinates symbolic. This measures direct coupling at the chosen anchor.
+
+For the first three dense quadrics, each pin changes the observed degree from
+4 to 1. For the larger prefixes the observed degree stays at 1. All the dense
+relations couple every pair, so this family gives identical scores for all
+three variables. The diagonal control distinguishes (x,y) from the already
+fixed (z) and has no cross-variable coupling. The chain control exhibits
+only the (x)–(y) and (y)–(z) links. [pcc:unverified]
+
+The inputs come from the original
+[fixture generator](https://github.com/isogeny-labs/crypto/blob/7db7d3d4e9381446796c38f91f13b666be5127d3/src/cryptanalysis/f4_fp.rs#L5876).
+Singular 4.4.1 replay checks the dense Hilbert counts against the
+[original Rust dataset](reports/run-20261117T1511Z/degree_fall_dataset.json).
+To reproduce the companion values and figures from this directory, run
+
+```sh
+cd reports/run-20261118T0135Z
+Singular -q --no-rc measure_variable_effects.sing > /tmp/variable_effects_replay.csv
+diff -u variable_effects.csv /tmp/variable_effects_replay.csv
+python3 plot_variable_effects.py
+typst compile report.typ
+```
