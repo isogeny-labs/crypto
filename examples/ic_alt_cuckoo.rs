@@ -150,7 +150,12 @@ struct Bloom {
 impl Bloom {
     fn build(keys: &[u32], bpk: f64, k: u32, seed: u64) -> Bloom {
         let m = (keys.len() as f64 * bpk).ceil() as usize;
-        let mut b = Bloom { seed, m, k, bits: vec![0; (m + 63) / 64] };
+        let mut b = Bloom {
+            seed,
+            m,
+            k,
+            bits: vec![0; (m + 63) / 64],
+        };
         for &x in keys {
             let h = hk(x, seed);
             let (h1, h2) = (h as u32 as u64, (h >> 32) | 1);
@@ -198,7 +203,6 @@ fn ns_per(t: Instant, n: usize) -> f64 {
     t.elapsed().as_nanos() as f64 / n as f64
 }
 
-
 // ---------- cuckoo filter / table: 4-slot buckets, partial-key cuckoo hashing ----------
 const BS: usize = 4;
 struct Cuckoo {
@@ -213,7 +217,16 @@ struct Cuckoo {
 }
 impl Cuckoo {
     fn new(nb: usize, f: u32, seed: u64) -> Cuckoo {
-        Cuckoo { seed, nb, f, fp: vec![0; nb * BS], val: vec![0; nb * BS], n: 0, rng: Rng(seed ^ 0xABCDEF), kicks_total: 0 }
+        Cuckoo {
+            seed,
+            nb,
+            f,
+            fp: vec![0; nb * BS],
+            val: vec![0; nb * BS],
+            n: 0,
+            rng: Rng(seed ^ 0xABCDEF),
+            kicks_total: 0,
+        }
     }
     #[inline]
     fn idx(&self, k: u32) -> (usize, u16) {
@@ -386,7 +399,17 @@ fn nbf(n: usize, load: f64) -> usize {
 }
 
 fn band(load: f64) -> usize {
-    if load < 0.5 { 0 } else if load < 0.8 { 1 } else if load < 0.9 { 2 } else if load < 0.95 { 3 } else { 4 }
+    if load < 0.5 {
+        0
+    } else if load < 0.8 {
+        1
+    } else if load < 0.9 {
+        2
+    } else if load < 0.95 {
+        3
+    } else {
+        4
+    }
 }
 const BANDS: [&str; 5] = ["<0.50", "0.50-0.80", "0.80-0.90", "0.90-0.95", ">=0.95"];
 
@@ -401,7 +424,8 @@ fn e1_fill(nb: usize, f: u32, seeds: usize, maxk: u32) {
         let cap = t.slots();
         let mut ctr = 0u64;
         loop {
-            let k = ((ctr.wrapping_mul(0x9E3779B1).wrapping_add(s as u64 * 12345)) & 0xFF_FFFF) as u32;
+            let k =
+                ((ctr.wrapping_mul(0x9E3779B1).wrapping_add(s as u64 * 12345)) & 0xFF_FFFF) as u32;
             let load = t.n as f64 / cap as f64;
             match t.insert(k, 0, maxk) {
                 Some(kk) => {
@@ -428,7 +452,13 @@ fn e1_fill(nb: usize, f: u32, seeds: usize, maxk: u32) {
     let mut line = String::from("   kick-outs/insert by load band:");
     for b in 0..5 {
         if bn[b] > 0 {
-            line += &format!(" [{}] mean={:.3} max={} (n={})", BANDS[b], bk[b] as f64 / bn[b] as f64, bmax[b], bn[b]);
+            line += &format!(
+                " [{}] mean={:.3} max={} (n={})",
+                BANDS[b],
+                bk[b] as f64 / bn[b] as f64,
+                bmax[b],
+                bn[b]
+            );
         }
     }
     println!("{line}");
@@ -436,9 +466,16 @@ fn e1_fill(nb: usize, f: u32, seeds: usize, maxk: u32) {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let nq: usize = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(8_000_000);
+    let nq: usize = args
+        .get(1)
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(8_000_000);
     let seeds: usize = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(200);
-    let c = Cv { p: 16777199, a: 16777196, b: 31 };
+    let c = Cv {
+        p: 16777199,
+        a: 16777196,
+        b: 31,
+    };
     assert_eq!(c.mul(5412647, 5412647), c.rhs(2));
     println!("generator G=(2,5412647) on curve p24 ok");
     let fsize = 128;
@@ -450,9 +487,17 @@ fn main() {
     let ntab = tab.len();
     let v = vbits(fsize);
     println!("pair table entries (multiset)={ntab}; value bits v={v}");
-    let exact: HashMap<u32, u32> = keys.iter().enumerate().map(|(i, &k)| (k, i as u32)).collect();
+    let exact: HashMap<u32, u32> = keys
+        .iter()
+        .enumerate()
+        .map(|(i, &k)| (k, i as u32))
+        .collect();
     let qs = qlist(&c, nq, 0xC0FFEE ^ c.p);
-    let neg: Vec<u32> = qs.iter().copied().filter(|q| !exact.contains_key(q)).collect();
+    let neg: Vec<u32> = qs
+        .iter()
+        .copied()
+        .filter(|q| !exact.contains_key(q))
+        .collect();
     println!("queries {nq} random on-curve x, non-members {}", neg.len());
 
     println!("\n== E1: load factor reached and kick-outs (random distinct keys) ==");
@@ -489,14 +534,22 @@ fn main() {
     }
 
     println!("\n== E3: filter / table comparison on the real key set (n={n}) ==");
-    println!("exact std HashMap<u32,u32>: est {} bytes = {:.2} bits/key (FPR 0)", hashmap_bytes(n), hashmap_bytes(n) as f64 * 8.0 / n as f64);
+    println!(
+        "exact std HashMap<u32,u32>: est {} bytes = {:.2} bits/key (FPR 0)",
+        hashmap_bytes(n),
+        hashmap_bytes(n) as f64 * 8.0 / n as f64
+    );
     {
         let t = Instant::now();
         let mut h = 0usize;
         for q in &qs {
             h += exact.contains_key(q) as usize;
         }
-        println!("  lookup {:.1} ns (hits {h}); packed-ideal bits/key = 24 + v = {}", ns_per(t, nq), 24 + v);
+        println!(
+            "  lookup {:.1} ns (hits {h}); packed-ideal bits/key = 24 + v = {}",
+            ns_per(t, nq),
+            24 + v
+        );
     }
     let mut cfg = vec![];
     for f in [8u32, 12, 16] {
@@ -604,14 +657,20 @@ fn main() {
                 lost += 1;
             }
         }
-        println!("surviving entries lost after deletions (false negatives): {lost}/{}", ntab - ek.len());
+        println!(
+            "surviving entries lost after deletions (false negatives): {lost}/{}",
+            ntab - ek.len()
+        );
         // reinsert new element keys
         let (fb2, _) = factor_base(&c, 130);
         let mut fbn = fb.clone();
         fbn[e] = fb2[128];
         let mut ad2 = 0u64;
         let nk = elem_keys(&c, &fbn, e, &mut ad2);
-        let okc = nk.iter().filter(|&&(k, v)| t.insert(k, v, 500).is_some()).count();
+        let okc = nk
+            .iter()
+            .filter(|&&(k, v)| t.insert(k, v, 500).is_some())
+            .count();
         println!("insert replacement element (x={}): {} keys, {ad2} adds, inserted {okc}/{}; load now {:.4}", fbn[e].0, nk.len(), nk.len(), t.n as f64 / t.slots() as f64);
         // false deletion: delete never-inserted keys (filter-only semantics, no value check)
         let mut tf = Cuckoo::new(nb, 12, 55);
@@ -645,44 +704,65 @@ fn main() {
         ("grow 32->, +1 elem / 100 trials", 32, 100, 0),
         ("grow 64->, +1 elem / 100 trials", 64, 100, 0),
         ("grow 64->, +1 elem / 500 trials", 64, 500, 0),
-        ("swap F=128: replace random elem / 2000 trials", 128, 0, 2000),
-        ("swap F=128: replace least-hit elem / 2000 trials", 128, 0, -2000i64 as usize),
+        (
+            "swap F=128: replace random elem / 2000 trials",
+            128,
+            0,
+            2000,
+        ),
+        (
+            "swap F=128: replace least-hit elem / 2000 trials",
+            128,
+            0,
+            -2000i64 as usize,
+        ),
     ];
     for &(name, f0, g, k) in &policies {
-        let (mut gae_fixed87, mut gae_prop, mut trials87, mut hitsum) = (vec![], vec![], vec![], 0usize);
+        let (mut gae_fixed87, mut gae_prop, mut trials87, mut hitsum) =
+            (vec![], vec![], vec![], 0usize);
         let mut fpcand = 0u64;
         let mut totswap = 0u64;
         let mut corr_num = (0.0f64, 0.0f64, 0.0f64, 0.0f64, 0.0f64, 0usize);
         for r in 0..reps {
             let mut fbc: Vec<(u64, u64)> = fbbig[..f0].to_vec();
             let mut next = f0.max(128); // next unused abscissa
-            if g == 0 && k == 0 { next = f0; }
+            if g == 0 && k == 0 {
+                next = f0;
+            }
             let mut adds: u64 = 0;
             let _ = &mut adds;
             let pack = |i: usize, j: usize, sg: u32| (((i * 512 + j) as u32) << 1) | sg;
             let mut t = Cuckoo::new(nbf(2 * 220 * 219 / 2 * 2, 0.85), 16, 99 + r as u64);
-            let add_pair = |t: &mut Cuckoo, fbc: &Vec<(u64, u64)>, i: usize, j: usize, adds: &mut u64| {
-                let (a, b) = if i < j { (i, j) } else { (j, i) };
-                let q = fbc[b];
-                let nq = (q.0, (c.p - q.1) % c.p);
-                for (sg, rr) in [c.add(fbc[a], q), c.add(fbc[a], nq)].into_iter().enumerate() {
-                    *adds += 1;
-                    if let Some((x, _)) = rr {
-                        assert!(t.insert(x as u32, pack(a, b, sg as u32), 500).is_some());
+            let add_pair =
+                |t: &mut Cuckoo, fbc: &Vec<(u64, u64)>, i: usize, j: usize, adds: &mut u64| {
+                    let (a, b) = if i < j { (i, j) } else { (j, i) };
+                    let q = fbc[b];
+                    let nq = (q.0, (c.p - q.1) % c.p);
+                    for (sg, rr) in [c.add(fbc[a], q), c.add(fbc[a], nq)]
+                        .into_iter()
+                        .enumerate()
+                    {
+                        *adds += 1;
+                        if let Some((x, _)) = rr {
+                            assert!(t.insert(x as u32, pack(a, b, sg as u32), 500).is_some());
+                        }
                     }
-                }
-            };
-            let del_pair = |t: &mut Cuckoo, fbc: &Vec<(u64, u64)>, i: usize, j: usize, adds: &mut u64| {
-                let (a, b) = if i < j { (i, j) } else { (j, i) };
-                let q = fbc[b];
-                let nq = (q.0, (c.p - q.1) % c.p);
-                for (sg, rr) in [c.add(fbc[a], q), c.add(fbc[a], nq)].into_iter().enumerate() {
-                    *adds += 1;
-                    if let Some((x, _)) = rr {
-                        assert!(t.delete_kv(x as u32, pack(a, b, sg as u32)));
+                };
+            let del_pair =
+                |t: &mut Cuckoo, fbc: &Vec<(u64, u64)>, i: usize, j: usize, adds: &mut u64| {
+                    let (a, b) = if i < j { (i, j) } else { (j, i) };
+                    let q = fbc[b];
+                    let nq = (q.0, (c.p - q.1) % c.p);
+                    for (sg, rr) in [c.add(fbc[a], q), c.add(fbc[a], nq)]
+                        .into_iter()
+                        .enumerate()
+                    {
+                        *adds += 1;
+                        if let Some((x, _)) = rr {
+                            assert!(t.delete_kv(x as u32, pack(a, b, sg as u32)));
+                        }
                     }
-                }
-            };
+                };
             let mut adds_setup: u64 = 0;
             for i in 0..fbc.len() {
                 for j in i + 1..fbc.len() {
@@ -715,13 +795,20 @@ fn main() {
                     let (a, b) = (ij / 512, ij % 512);
                     // verify by recomputing one add
                     let q = fbc[b];
-                    let q = if v & 1 == 1 { (q.0, (c.p - q.1) % c.p) } else { q };
+                    let q = if v & 1 == 1 {
+                        (q.0, (c.p - q.1) % c.p)
+                    } else {
+                        q
+                    };
                     swap_adds += 1; // verification adds counted as GAE below
                     if c.add(fbc[a], q).map(|r| r.0 as u32) == Some(cur_x) {
                         hits += 1;
                         elemhits[a] += 1;
                         elemhits[b] += 1;
-                        if trials <= tmax / 2 { elemhits_h1[a] += 1; elemhits_h1[b] += 1; }
+                        if trials <= tmax / 2 {
+                            elemhits_h1[a] += 1;
+                            elemhits_h1[b] += 1;
+                        }
                     } else {
                         fpcand += 1;
                     }
@@ -747,7 +834,15 @@ fn main() {
                         add_pair(&mut t, &fbc, j, e, &mut adds_setup);
                     }
                 }
-                if k != 0 && (trials % (if k > usize::MAX / 2 { (-(k as i64)) as usize } else { k }) == 0) {
+                if k != 0
+                    && (trials
+                        % (if k > usize::MAX / 2 {
+                            (-(k as i64)) as usize
+                        } else {
+                            k
+                        })
+                        == 0)
+                {
                     let least = k > usize::MAX / 2;
                     let e = if least {
                         (0..fbc.len()).min_by_key(|&i| elemhits[i]).unwrap()
@@ -777,19 +872,34 @@ fn main() {
                 for i in 0..fbc.len() {
                     let a = elemhits_h1[i] as f64;
                     let b = (elemhits[i] - elemhits_h1[i]) as f64;
-                    corr_num.0 += a; corr_num.1 += b; corr_num.2 += a * a; corr_num.3 += b * b; corr_num.4 += a * b; corr_num.5 += 1;
+                    corr_num.0 += a;
+                    corr_num.1 += b;
+                    corr_num.2 += a * a;
+                    corr_num.3 += b * b;
+                    corr_num.4 += a * b;
+                    corr_num.5 += 1;
                 }
             }
             let _ = totswap;
         }
-        let mean = |v: &Vec<f64>| if v.is_empty() { f64::NAN } else { v.iter().sum::<f64>() / v.len() as f64 };
+        let mean = |v: &Vec<f64>| {
+            if v.is_empty() {
+                f64::NAN
+            } else {
+                v.iter().sum::<f64>() / v.len() as f64
+            }
+        };
         let mut s = format!("{name:52}: reps {reps}; GAE-to-87-relations mean={:.0} (n={}) trials-to-87 mean={:.0}; GAE-to-0.68|F|-relations mean={:.0} (n={}); FP cands {}", mean(&gae_fixed87), gae_fixed87.len(), mean(&trials87), mean(&gae_prop), gae_prop.len(), fpcand);
         if corr_num.5 > 0 {
             let n_ = corr_num.5 as f64;
             let cov = corr_num.4 / n_ - (corr_num.0 / n_) * (corr_num.1 / n_);
             let va = corr_num.2 / n_ - (corr_num.0 / n_).powi(2);
             let vb = corr_num.3 / n_ - (corr_num.1 / n_).powi(2);
-            s += &format!("; split-half per-element hit correlation r={:.4} (n={})", cov / (va * vb).sqrt(), corr_num.5);
+            s += &format!(
+                "; split-half per-element hit correlation r={:.4} (n={})",
+                cov / (va * vb).sqrt(),
+                corr_num.5
+            );
         }
         println!("{s}");
         println!("    total hits over reps={hitsum}");

@@ -166,8 +166,18 @@ impl Xor {
         let n = keys.len();
         let seg = ((1.23 * n as f64) as usize + 32) / 3 + 1;
         let cap = 3 * seg;
-        let mask: u16 = if fbits >= 16 { 0xFFFF } else { (1u16 << fbits) - 1 };
-        let mut f = Xor { seed, seg, fp: vec![0; cap], mask, fbits };
+        let mask: u16 = if fbits >= 16 {
+            0xFFFF
+        } else {
+            (1u16 << fbits) - 1
+        };
+        let mut f = Xor {
+            seed,
+            seg,
+            fp: vec![0; cap],
+            mask,
+            fbits,
+        };
         let hs: Vec<u64> = keys.iter().map(|&k| hk(k, seed)).collect();
         let mut cnt = vec![0u32; cap];
         let mut xm = vec![0u64; cap];
@@ -235,8 +245,15 @@ impl Ribbon {
     fn build(keys: &[u32], rbits: u32, eps: f64, seed: u64) -> Option<Ribbon> {
         let n = keys.len();
         let m = ((n as f64 * (1.0 + eps)) as usize).max(W + 1);
-        let mask: u16 = if rbits >= 16 { 0xFFFF } else { (1u16 << rbits) - 1 };
-        let mut e: Vec<(usize, u64, u16)> = keys.iter().map(|&k| Ribbon::hash3(k, seed, m, mask)).collect();
+        let mask: u16 = if rbits >= 16 {
+            0xFFFF
+        } else {
+            (1u16 << rbits) - 1
+        };
+        let mut e: Vec<(usize, u64, u16)> = keys
+            .iter()
+            .map(|&k| Ribbon::hash3(k, seed, m, mask))
+            .collect();
         e.sort_unstable_by_key(|t| t.0);
         let mut cs = vec![0u64; m];
         let mut rs = vec![0u16; m];
@@ -273,7 +290,13 @@ impl Ribbon {
             }
             z[i] = v;
         }
-        Some(Ribbon { seed, m, z, mask, rbits })
+        Some(Ribbon {
+            seed,
+            m,
+            z,
+            mask,
+            rbits,
+        })
     }
     #[inline]
     fn contains(&self, k: u32) -> bool {
@@ -300,7 +323,12 @@ struct Bloom {
 impl Bloom {
     fn build(keys: &[u32], bpk: f64, k: u32, seed: u64) -> Bloom {
         let m = (keys.len() as f64 * bpk).ceil() as usize;
-        let mut b = Bloom { seed, m, k, bits: vec![0; (m + 63) / 64] };
+        let mut b = Bloom {
+            seed,
+            m,
+            k,
+            bits: vec![0; (m + 63) / 64],
+        };
         for &x in keys {
             let h = hk(x, seed);
             let (h1, h2) = (h as u32 as u64, (h >> 32) | 1);
@@ -349,17 +377,33 @@ fn ns_per(t: Instant, n: usize) -> f64 {
 }
 
 fn run(name: &str, c: Cv, fsize: usize, nq: usize, nbuilds: usize) {
-    println!("\n==================== {name}: p={} |F|={fsize} ====================", c.p);
+    println!(
+        "\n==================== {name}: p={} |F|={fsize} ====================",
+        c.p
+    );
     let t0 = Instant::now();
     let (fb, scanned) = factor_base(&c, fsize);
-    println!("factor base: {} abscissae from {} prime candidates scanned (largest x={})", fb.len(), scanned, fb.last().unwrap().0);
+    println!(
+        "factor base: {} abscissae from {} prime candidates scanned (largest x={})",
+        fb.len(),
+        scanned,
+        fb.last().unwrap().0
+    );
     let (keys, emitted, adds) = pair_keys(&c, &fb);
     println!(
         "pair keys: group adds={} emitted={} distinct x={} (dup/collisions={}) build_s={:.2}",
-        adds, emitted, keys.len(), emitted - keys.len(), t0.elapsed().as_secs_f64()
+        adds,
+        emitted,
+        keys.len(),
+        emitted - keys.len(),
+        t0.elapsed().as_secs_f64()
     );
     let n = keys.len();
-    let exact: HashMap<u32, u32> = keys.iter().enumerate().map(|(i, &k)| (k, i as u32)).collect();
+    let exact: HashMap<u32, u32> = keys
+        .iter()
+        .enumerate()
+        .map(|(i, &k)| (k, i as u32))
+        .collect();
     let qs = qlist(&c, nq, 0xC0FFEE ^ c.p);
     let hits = qs.iter().filter(|q| exact.contains_key(q)).count();
     let neg = nq - hits;
@@ -402,7 +446,10 @@ fn run(name: &str, c: Cv, fsize: usize, nq: usize, nbuilds: usize) {
             }
             tries_sum += t;
         }
-        println!("xor{fb_}: first-attempt success {ok}/{nbuilds}; mean attempts to success {:.3}", tries_sum as f64 / nbuilds as f64);
+        println!(
+            "xor{fb_}: first-attempt success {ok}/{nbuilds}; mean attempts to success {:.3}",
+            tries_sum as f64 / nbuilds as f64
+        );
     }
     for eps in [0.02f64, 0.05, 0.08, 0.10, 0.15] {
         let mut ok = 0;
@@ -411,7 +458,10 @@ fn run(name: &str, c: Cv, fsize: usize, nq: usize, nbuilds: usize) {
                 ok += 1;
             }
         }
-        println!("ribbon w=64 eps={eps:.2}: first-attempt success {ok}/{nbuilds}; mean attempts ~{:.3}", nbuilds as f64 / ok.max(1) as f64);
+        println!(
+            "ribbon w=64 eps={eps:.2}: first-attempt success {ok}/{nbuilds}; mean attempts ~{:.3}",
+            nbuilds as f64 / ok.max(1) as f64
+        );
     }
 
     // ---- FPR, probes, bits/key per structure ----
@@ -518,10 +568,21 @@ fn run(name: &str, c: Cv, fsize: usize, nq: usize, nbuilds: usize) {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let nq: usize = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(16_000_000);
+    let nq: usize = args
+        .get(1)
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(16_000_000);
     let nbuilds: usize = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(200);
-    let c24 = Cv { p: 16777199, a: 16777196, b: 31 };
-    let c28 = Cv { p: 268435399, a: 268435396, b: 3 };
+    let c24 = Cv {
+        p: 16777199,
+        a: 16777196,
+        b: 31,
+    };
+    let c28 = Cv {
+        p: 268435399,
+        a: 268435396,
+        b: 3,
+    };
     // on-curve sanity for generators
     assert_eq!(c24.mul(5412647, 5412647), c24.rhs(2));
     assert_eq!(c28.mul(1, 1), c28.rhs(1));

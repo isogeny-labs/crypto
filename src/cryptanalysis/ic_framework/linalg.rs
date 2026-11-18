@@ -1301,7 +1301,9 @@ pub fn matrix_by_name(
                 .with_match_gate(),
         )),
         "mixed-peel" => Ok(Box::new(super::linalg_mixed::MixedPeel::new(cols, modulus))),
-        "mixed-peel-lazy" => Ok(Box::new(super::linalg_mixed::MixedPeel::lazy(cols, modulus))),
+        "mixed-peel-lazy" => Ok(Box::new(super::linalg_mixed::MixedPeel::lazy(
+            cols, modulus,
+        ))),
         "mixed-peel+bloom" => Ok(Box::new(super::linalg_mixed::MixedPeel::with_bloom(
             cols, modulus, 10, 4,
         ))),

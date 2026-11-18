@@ -29,7 +29,11 @@ fn addmod(a: u64, b: u64) -> u64 {
     ((a as u128 + b as u128) % MODULUS as u128) as u64
 }
 fn submod(a: u64, b: u64) -> u64 {
-    if a >= b { a - b } else { a + MODULUS - b }
+    if a >= b {
+        a - b
+    } else {
+        a + MODULUS - b
+    }
 }
 fn invmod(a: u64) -> Option<u64> {
     if a == 0 {
@@ -59,7 +63,9 @@ struct Stream {
 impl Stream {
     fn new(seed: u64, fb: usize, m: usize) -> Self {
         let cols = fb + 1;
-        let mut rng = StdRng::seed_from_u64(0x1C_5EED ^ seed.wrapping_mul(0x9E37_79B9) ^ (fb as u64) << 40 ^ (m as u64) << 56);
+        let mut rng = StdRng::seed_from_u64(
+            0x1C_5EED ^ seed.wrapping_mul(0x9E37_79B9) ^ (fb as u64) << 40 ^ (m as u64) << 56,
+        );
         let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..MODULUS)).collect();
         Stream { rng, fb, m, x }
     }
@@ -71,7 +77,9 @@ impl Stream {
             mp.insert(c, v);
         }
         mp.insert(self.fb as u32, self.rng.gen_range(1..MODULUS));
-        let rhs = mp.iter().fold(0, |a, (&c, &p)| addmod(a, mulmod(p, self.x[c as usize])));
+        let rhs = mp
+            .iter()
+            .fold(0, |a, (&c, &p)| addmod(a, mulmod(p, self.x[c as usize])));
         (mp.into_iter().collect(), rhs)
     }
 }
@@ -224,7 +232,14 @@ fn nd_order(n: usize, adj: &[Vec<u32>], ops: &mut u64, stats: &mut (u64, u64)) -
     order
 }
 
-fn bfs_levels(start: u32, set: &[u32], adj: &[Vec<u32>], in_set: &[bool], dist: &mut [i32], ops: &mut u64) -> Vec<Vec<u32>> {
+fn bfs_levels(
+    start: u32,
+    set: &[u32],
+    adj: &[Vec<u32>],
+    in_set: &[bool],
+    dist: &mut [i32],
+    ops: &mut u64,
+) -> Vec<Vec<u32>> {
     for &v in set {
         dist[v as usize] = -1;
     }
@@ -249,7 +264,15 @@ fn bfs_levels(start: u32, set: &[u32], adj: &[Vec<u32>], in_set: &[bool], dist: 
     levels
 }
 
-fn nd_rec(set: &[u32], adj: &[Vec<u32>], in_set: &mut Vec<bool>, order: &mut Vec<u32>, ops: &mut u64, depth: u32, stats: &mut (u64, u64)) {
+fn nd_rec(
+    set: &[u32],
+    adj: &[Vec<u32>],
+    in_set: &mut Vec<bool>,
+    order: &mut Vec<u32>,
+    ops: &mut u64,
+    depth: u32,
+    stats: &mut (u64, u64),
+) {
     if set.is_empty() {
         return;
     }
@@ -282,29 +305,41 @@ fn nd_rec(set: &[u32], adj: &[Vec<u32>], in_set: &mut Vec<bool>, order: &mut Vec
         return;
     }
     let comp = &comps[0];
-    let finish_leaf = |comp: &Vec<u32>, in_set: &mut Vec<bool>, order: &mut Vec<u32>, ops: &mut u64| {
-        let mut v: Vec<(usize, u32)> = comp
-            .iter()
-            .map(|&x| {
-                *ops += adj[x as usize].len() as u64;
-                (adj[x as usize].iter().filter(|&&y| in_set[y as usize]).count(), x)
-            })
-            .collect();
-        v.sort();
-        for (_, x) in v {
-            order.push(x);
-        }
-        for &x in comp {
-            in_set[x as usize] = false;
-        }
-    };
+    let finish_leaf =
+        |comp: &Vec<u32>, in_set: &mut Vec<bool>, order: &mut Vec<u32>, ops: &mut u64| {
+            let mut v: Vec<(usize, u32)> = comp
+                .iter()
+                .map(|&x| {
+                    *ops += adj[x as usize].len() as u64;
+                    (
+                        adj[x as usize]
+                            .iter()
+                            .filter(|&&y| in_set[y as usize])
+                            .count(),
+                        x,
+                    )
+                })
+                .collect();
+            v.sort();
+            for (_, x) in v {
+                order.push(x);
+            }
+            for &x in comp {
+                in_set[x as usize] = false;
+            }
+        };
     if comp.len() <= LEAF {
         finish_leaf(comp, in_set, order, ops);
         return;
     }
     // pseudo-peripheral start: two sweeps
     let l0 = bfs_levels(comp[0], comp, adj, in_set, &mut dist, ops);
-    let far = *l0.last().unwrap().iter().min_by_key(|&&v| adj[v as usize].len()).unwrap();
+    let far = *l0
+        .last()
+        .unwrap()
+        .iter()
+        .min_by_key(|&&v| adj[v as usize].len())
+        .unwrap();
     let lv = bfs_levels(far, comp, adj, in_set, &mut dist, ops);
     let k = lv.len();
     if k < 3 {
@@ -344,9 +379,18 @@ fn nd_rec(set: &[u32], adj: &[Vec<u32>], in_set: &mut Vec<bool>, order: &mut Vec
 
 // ───────────────────────── solver ─────────────────────────
 
-fn solve(rows: &[Row], matched: &[usize], n: usize, kind: Kind, extra: &mut (u64, u64)) -> Result<(Vec<u64>, Rep), Rep> {
+fn solve(
+    rows: &[Row],
+    matched: &[usize],
+    n: usize,
+    kind: Kind,
+    extra: &mut (u64, u64),
+) -> Result<(Vec<u64>, Rep), Rep> {
     let mut rep = Rep::default();
-    let mut w: Vec<BTreeMap<u32, u64>> = matched.iter().map(|&r| rows[r].0.iter().copied().collect()).collect();
+    let mut w: Vec<BTreeMap<u32, u64>> = matched
+        .iter()
+        .map(|&r| rows[r].0.iter().copied().collect())
+        .collect();
     let mut rhs: Vec<u64> = matched.iter().map(|&r| rows[r].1).collect();
     let mut col_rows: Vec<Vec<u32>> = vec![Vec::new(); n];
     for (i, row) in w.iter().enumerate() {
@@ -362,7 +406,11 @@ fn solve(rows: &[Row], matched: &[usize], n: usize, kind: Kind, extra: &mut (u64
     let mut stack: Vec<(u32, u32)> = Vec::new();
     let mut frozen: Vec<Option<(BTreeMap<u32, u64>, u64)>> = vec![None; n];
 
-    let live_rows = |c: usize, col_rows: &Vec<Vec<u32>>, w: &Vec<BTreeMap<u32, u64>>, row_alive: &Vec<bool>| -> Vec<u32> {
+    let live_rows = |c: usize,
+                     col_rows: &Vec<Vec<u32>>,
+                     w: &Vec<BTreeMap<u32, u64>>,
+                     row_alive: &Vec<bool>|
+     -> Vec<u32> {
         let mut v: Vec<u32> = col_rows[c]
             .iter()
             .copied()
@@ -432,7 +480,11 @@ fn solve(rows: &[Row], matched: &[usize], n: usize, kind: Kind, extra: &mut (u64
     // static order for AMD / ND over the core column-interaction graph
     let mut static_order: Vec<usize> = Vec::new();
     if kind != Kind::Markowitz && !core.is_empty() {
-        let idx: BTreeMap<usize, u32> = core.iter().enumerate().map(|(k, &c)| (c, k as u32)).collect();
+        let idx: BTreeMap<usize, u32> = core
+            .iter()
+            .enumerate()
+            .map(|(k, &c)| (c, k as u32))
+            .collect();
         let mut sets: Vec<BTreeSet<u32>> = vec![BTreeSet::new(); core.len()];
         let mut ops = 0u64;
         for i in 0..n {
@@ -586,7 +638,12 @@ fn main() {
                     is_m[r] = true;
                 }
                 let conv: u64 = rows.iter().map(|r| r.0.len() as u64).sum();
-                let surplus: u64 = rows.iter().enumerate().filter(|(i, _)| !is_m[*i]).map(|(_, r)| r.0.len() as u64).sum();
+                let surplus: u64 = rows
+                    .iter()
+                    .enumerate()
+                    .filter(|(i, _)| !is_m[*i])
+                    .map(|(_, r)| r.0.len() as u64)
+                    .sum();
                 // library mixed-peel on the same rows (cross-check)
                 let mut lib = matrix_by_name("mixed-peel", cols, MODULUS).unwrap();
                 for (e, rhs) in &rows {
@@ -602,7 +659,11 @@ fn main() {
                 let lib_pin = lib.pinned(fb);
                 let lib_solve = lib_total - conv - gate.visits - surplus;
                 let wrap = conv + gate.visits + surplus; // non-solve part of mixed-peel row_ops
-                for (name, kind) in [("markowitz", Kind::Markowitz), ("amd", Kind::Amd), ("nd", Kind::Nd)] {
+                for (name, kind) in [
+                    ("markowitz", Kind::Markowitz),
+                    ("amd", Kind::Amd),
+                    ("nd", Kind::Nd),
+                ] {
                     let mut extra = (0u64, 0u64);
                     let t0 = std::time::Instant::now();
                     let res = solve(&rows, &matched, cols, kind, &mut extra);

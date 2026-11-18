@@ -57,7 +57,10 @@ fn stream(seed: u64, fb: usize, m: usize, len: usize) -> Stream {
                 row[rng.gen_range(0..fb)] = rng.gen_range(1..MODULUS);
             }
             row[fb] = rng.gen_range(1..MODULUS);
-            let rhs = row.iter().zip(&x).fold(0, |a, (&p, &q)| addmod(a, mulmod(p, q)));
+            let rhs = row
+                .iter()
+                .zip(&x)
+                .fold(0, |a, (&p, &q)| addmod(a, mulmod(p, q)));
             (row, rhs)
         })
         .collect();
@@ -66,7 +69,7 @@ fn stream(seed: u64, fb: usize, m: usize, len: usize) -> Stream {
 
 /// Incremental maximum matching (rows to columns) with exact probe counts.
 struct Matching {
-    adj: Vec<Vec<usize>>, // row -> columns
+    adj: Vec<Vec<usize>>,         // row -> columns
     mate_col: Vec<Option<usize>>, // column -> row
     mate_row: Vec<Option<usize>>,
     vis_col: Vec<bool>,
@@ -160,7 +163,12 @@ fn block_solve(
 
 /// Tarjan SCC over columns of the matched digraph of A; returns the SCC
 /// (columns) containing `t` and the number of rows matched into it.
-fn fine_block_of_target(rows: &[(Vec<u64>, u64)], n: usize, ncols: usize, t: usize) -> (usize, usize, usize, u64) {
+fn fine_block_of_target(
+    rows: &[(Vec<u64>, u64)],
+    n: usize,
+    ncols: usize,
+    t: usize,
+) -> (usize, usize, usize, u64) {
     let mut m = Matching::new(ncols);
     for r in 0..n {
         let cols: Vec<usize> = (0..ncols).filter(|&c| rows[r].0[c] != 0).collect();
@@ -234,7 +242,9 @@ fn fine_block_of_target(rows: &[(Vec<u64>, u64)], n: usize, ncols: usize, t: usi
     }
     let ct = comp[t];
     let cols_in = (0..ncols).filter(|&c| comp[c] == ct).count();
-    let rows_in = (0..n).filter(|&r| m.mate_row[r].map_or(false, |mc| comp[mc] == ct)).count();
+    let rows_in = (0..n)
+        .filter(|&r| m.mate_row[r].map_or(false, |mc| comp[mc] == ct))
+        .count();
     (cols_in, rows_in, matched_rows, m.probes + edges)
 }
 
@@ -251,7 +261,11 @@ fn main() {
                 let mut rec = serde_json::json!({"fb": fb, "m": m, "seed": seed});
 
                 // library arms, stream-example loop
-                for arm in ["incremental-gauss", "incremental-gauss-echelon", "mixed-peel"] {
+                for arm in [
+                    "incremental-gauss",
+                    "incremental-gauss-echelon",
+                    "mixed-peel",
+                ] {
                     let full_rank = is_deferred_sparse(arm);
                     let mut mat = matrix_by_name(arm, cols, MODULUS).unwrap();
                     let (mut read, mut ans) = (0usize, None);
@@ -288,11 +302,14 @@ fn main() {
                 let probes = mt.probes;
                 assert_eq!(cs.len() + 1, s.len(), "Hall violator |N|=|S|-1");
                 let lib_n = rec["incremental-gauss"]["rows_read"].as_u64().unwrap() as usize;
-                let lib_n_ech = rec["incremental-gauss-echelon"]["rows_read"].as_u64().unwrap() as usize;
+                let lib_n_ech = rec["incremental-gauss-echelon"]["rows_read"]
+                    .as_u64()
+                    .unwrap() as usize;
 
                 // block solves
                 let (a_ig, ops_ig) = block_solve("incremental-gauss", &rows, &s, &cs, fb, None);
-                let (a_ech, ops_ech) = block_solve("incremental-gauss-echelon", &rows, &s, &cs, fb, None);
+                let (a_ech, ops_ech) =
+                    block_solve("incremental-gauss-echelon", &rows, &s, &cs, fb, None);
 
                 // coarse DM of B at the pin prefix, from scratch: rows reachable
                 // from the unmatched row(s) by alternating paths

@@ -207,7 +207,9 @@ pub struct Bloom {
 impl Bloom {
     /// About `bits_per_key · expected` bits, rounded up to a power of two.
     pub fn new(expected: usize, bits_per_key: usize, k: u32) -> Self {
-        let n = (expected.max(1) * bits_per_key.max(1)).next_power_of_two().max(64);
+        let n = (expected.max(1) * bits_per_key.max(1))
+            .next_power_of_two()
+            .max(64);
         Self {
             bits: vec![0; n / 64],
             mask: n as u64 - 1,
@@ -405,9 +407,9 @@ impl MixedPeel {
                     }
                     st.row_ops += e.len() as u64;
                     st.arithmetic += e.len() as u64;
-                    let lhs = e
-                        .iter()
-                        .fold(0u64, |acc, &(c, v)| addmod(acc, mulmod(v, x[c as usize], m), m));
+                    let lhs = e.iter().fold(0u64, |acc, &(c, v)| {
+                        addmod(acc, mulmod(v, x[c as usize], m), m)
+                    });
                     if lhs != *rhs {
                         st.inconsistent = true;
                         return;
@@ -478,7 +480,11 @@ fn solve_square(
     // Live rows of a column (lazy: incidence lists keep stale entries).
     // Lists can hold a row twice (a cancelled entry refilled later), so
     // the live set is de-duplicated.
-    let live_rows = |c: usize, col_rows: &Vec<Vec<u32>>, w: &Vec<BTreeMap<u32, u64>>, row_alive: &Vec<bool>| -> Vec<u32> {
+    let live_rows = |c: usize,
+                     col_rows: &Vec<Vec<u32>>,
+                     w: &Vec<BTreeMap<u32, u64>>,
+                     row_alive: &Vec<bool>|
+     -> Vec<u32> {
         let mut v: Vec<u32> = col_rows[c]
             .iter()
             .copied()
@@ -691,7 +697,9 @@ fn solve_square_fast(
         v.dedup();
         v
     };
-    let mut row_q: Vec<u32> = (0..nr as u32).filter(|&i| w[i as usize].len() == 1).collect();
+    let mut row_q: Vec<u32> = (0..nr as u32)
+        .filter(|&i| w[i as usize].len() == 1)
+        .collect();
     let mut col_q: Vec<u32> = (0..n as u32).filter(|&c| col_w[c as usize] == 1).collect();
     book!(2 * n);
     loop {
@@ -908,9 +916,9 @@ impl RelationSolver for MixedPeel {
             return RowStatus::Inconsistent;
         }
         if let Some(x) = &st.solution {
-            let lhs = entries
-                .iter()
-                .fold(0u64, |acc, &(c, v)| addmod(acc, mulmod(v, x[c as usize], m), m));
+            let lhs = entries.iter().fold(0u64, |acc, &(c, v)| {
+                addmod(acc, mulmod(v, x[c as usize], m), m)
+            });
             st.row_ops += entries.len() as u64;
             if lhs == rhs {
                 st.dependent += 1;
@@ -932,10 +940,14 @@ impl RelationSolver for MixedPeel {
                 for i in same {
                     st.row_ops += entries.len() as u64;
                     let (e2, r2) = &st.rows[i];
-                    if e2.len() == entries.len() && e2.iter().zip(&entries).all(|(a, b)| a.0 == b.0) {
+                    if e2.len() == entries.len() && e2.iter().zip(&entries).all(|(a, b)| a.0 == b.0)
+                    {
                         // Proportional rows with proportional rhs.
                         let f = mulmod(entries[0].1, invmod(e2[0].1, m).unwrap_or(0), m);
-                        if e2.iter().zip(&entries).all(|(a, b)| mulmod(a.1, f, m) == b.1)
+                        if e2
+                            .iter()
+                            .zip(&entries)
+                            .all(|(a, b)| mulmod(a.1, f, m) == b.1)
                             && mulmod(*r2, f, m) == rhs
                         {
                             dup = true;
@@ -1193,7 +1205,10 @@ mod tests {
                     row[i] = addmod(row[i], si, m);
                     row[j] = addmod(row[j], sj, m);
                     row[fb] = r2.gen_range(1..m);
-                    let rhs = row.iter().zip(&x).fold(0u64, |a, (&p, &q)| addmod(a, mulmod(p, q, m), m));
+                    let rhs = row
+                        .iter()
+                        .zip(&x)
+                        .fold(0u64, |a, (&p, &q)| addmod(a, mulmod(p, q, m), m));
                     assert_ne!(s.add_row(row, rhs), RowStatus::Inconsistent);
                     if s.pinned(fb).is_some() && s.rank() == cols {
                         done = true;
@@ -1202,7 +1217,11 @@ mod tests {
                 }
                 assert!(done, "seed {seed} variant {variant}: not solved");
                 for c in 0..cols {
-                    assert_eq!(s.pinned(c), Some(x[c]), "seed {seed} variant {variant} col {c}");
+                    assert_eq!(
+                        s.pinned(c),
+                        Some(x[c]),
+                        "seed {seed} variant {variant} col {c}"
+                    );
                 }
             }
         }

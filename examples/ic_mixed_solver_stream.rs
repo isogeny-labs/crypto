@@ -47,7 +47,9 @@ fn addmod(a: u64, b: u64) -> u64 {
 
 fn stream(seed: u64, fb: usize, m: usize, len: usize) -> (Vec<u64>, Vec<(Vec<u64>, u64)>) {
     let cols = fb + 1;
-    let mut rng = StdRng::seed_from_u64(0x1C_5EED ^ seed.wrapping_mul(0x9E37_79B9) ^ (fb as u64) << 40 ^ (m as u64) << 56);
+    let mut rng = StdRng::seed_from_u64(
+        0x1C_5EED ^ seed.wrapping_mul(0x9E37_79B9) ^ (fb as u64) << 40 ^ (m as u64) << 56,
+    );
     let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..MODULUS)).collect();
     let rows = (0..len)
         .map(|_| {
@@ -56,7 +58,10 @@ fn stream(seed: u64, fb: usize, m: usize, len: usize) -> (Vec<u64>, Vec<(Vec<u64
                 row[rng.gen_range(0..fb)] = rng.gen_range(1..MODULUS);
             }
             row[fb] = rng.gen_range(1..MODULUS);
-            let rhs = row.iter().zip(&x).fold(0, |a, (&p, &q)| addmod(a, mulmod(p, q)));
+            let rhs = row
+                .iter()
+                .zip(&x)
+                .fold(0, |a, (&p, &q)| addmod(a, mulmod(p, q)));
             (row, rhs)
         })
         .collect();
@@ -65,7 +70,10 @@ fn stream(seed: u64, fb: usize, m: usize, len: usize) -> (Vec<u64>, Vec<(Vec<u64
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let out = args.get(1).cloned().unwrap_or_else(|| "stream.jsonl".into());
+    let out = args
+        .get(1)
+        .cloned()
+        .unwrap_or_else(|| "stream.jsonl".into());
     let seeds: u64 = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(16);
     let mut f = std::fs::File::create(&out).expect("create output");
     for &fb in &[32usize, 64, 128, 256, 512] {
