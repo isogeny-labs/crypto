@@ -151,4 +151,4 @@ ptxas-info: rootfind_cuda.cu $(HDRS)
 	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -Xptxas -v -c -o /dev/null rootfind_cuda.cu
 
 clean:
-	rm -f test_cpu bench bench_host_inv bench_host_inv256 bench_batch_core rootfind_serve rootfind_serve_cuda *.o *.a
+	rm -f test_cpu bench bench_host_inv bench_host_inv256 bench_batch_core bench_pair_sweep rootfind_serve rootfind_serve_cuda *.o *.a
