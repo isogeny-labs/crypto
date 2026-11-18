@@ -1,0 +1,8 @@
+Trigger UTC: 2026-11-18T05:39:40Z
+Purpose: periodic bounded Stage-21 Koblitz GF(2^23) two-summand relation-yield control
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json
+Deviation threshold: 20% (two sided)
+Output: results/hourly_log.csv
+On failure or threshold exceeded: create a GitHub issue with run details.
+Note: Experimental synthetic control, not ECC2K-130.
