@@ -245,6 +245,14 @@ as infrastructure-incomplete because the managed workspace lacked room for a
 second Mathlib cache; the pinned build and exact axiom audit both completed.
 [pcc:unverified]
 
+The separately frozen `H116-PREFIX-TRANSFER-001` boundary control provides the
+tightness check. Across 20 finite-field cases the local-parameter difference is
+first visible exactly one degree after the normalized inverse-square
+difference, and the boundary coefficient matches its independent closed form.
+The zero and shifted-degree controls pass in all cases. This is experimental
+support for the precision boundary, not an elliptic instance.
+[pcc:unverified]
+
 ## Inheritance table
 
 | Operation/law | Inheritance |

@@ -132,6 +132,13 @@ double-pole algebra. Proving that the actual elliptic endomorphism instantiates
 the monomial model, and transporting the regular unit factor in the elliptic
 x-coordinate through substitution, remain separate steps. [pcc:unverified]
 
+A frozen 20-case boundary panel over five primes and four cutoffs measures this
+loss directly. All local-parameter pairs first differ at `m+1`, all normalized
+inverse-square pairs first differ at `m`, and all boundary deltas equal
+`-2 c f(0)^-3`; zero-correction and one-degree-shift controls also pass. Thus
+the generic theorem's precision is tight on the panel and cannot be promoted
+to one more coefficient without additional structure. [pcc:unverified]
+
 The current dense implementation uses 64,426 additions, 67,584
 multiplications and 16 inversions for candidate construction at this fixed
 precision. These counts exclude internal verification, oracle and controls.

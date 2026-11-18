@@ -148,6 +148,15 @@ the remaining unit-series prefix. Thus the double-pole core of the x-coordinate
 bridge is checked. The actual formal-group identities and the regular elliptic
 x-coordinate unit-factor composition remain open. [pcc:unverified]
 
+The frozen [prefix-transfer boundary control](PREFIX_TRANSFER_EXPERIMENT.md)
+then tests that precision loss on 20 finite-field series cases. In every case a
+correction first visible at degree `m+1` in the local parameter is first visible
+at degree `m` after normalized inverse-square transfer, and the boundary
+coefficient matches `-2 c f(0)^-3`. Zero and one-degree-shifted controls pass in
+all 20 cases. This demonstrates that the proved one-degree loss is sharp; it
+does not fill the regular elliptic x-unit composition obligation.
+[pcc:unverified]
+
 The preregistered
 [out-of-sample formal-scalar panel](FORMAL_SCALAR_OOS_EXPERIMENT.md) kept the
 candidate source unchanged and sought a different-j curve model in each of five
