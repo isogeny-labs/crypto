@@ -7,6 +7,13 @@ existing IsoLab workflow, narrowed by a session policy to identity readback and
 IAM/budgets nor starts builds, publishes images, launches compute or contacts
 the private Kubernetes API. It creates no new identity or permission grant.
 
+The repository-generated artifact hydration step runs after checkout, before
+the budget session. It uses the existing artifact-store transport and its
+existing credentials to read checksum-bound inputs under the declared taskq
+path; the budget session is not granted S3 permissions. Hydration failure
+leaves the workflow failed and the final provenance receipt available. This
+step does not establish budget access or permission to launch compute.
+
 After this workflow has been reviewed and merged, the existing GitHub caller can
 dispatch it without needing direct AWS credentials:
 
