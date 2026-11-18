@@ -1707,6 +1707,8 @@ fn fast_inner(
             return None;
         }
         let di = fp.inv(den);
+        // the coordinate divisions: products the legacy formula never counted
+        c_outside(xn as u64);
         let mut sol = vec![0u64; n];
         for i in 0..xn {
             sol[i] = fp.mul(psi(&seqs[i]), di);

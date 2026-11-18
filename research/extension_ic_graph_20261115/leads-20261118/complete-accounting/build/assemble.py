@@ -82,7 +82,14 @@ open(f"{C}/zero_dim_la_orig.rs", "wb").write(orig)
 ops = open(f"{F}/prime_hyperelliptic/ops.rs").read()
 a = ops.index("/// Words a hash of a divisor absorbs")
 b = ops.index("/// Everything this thread has tallied, by phase.")
-open(f"{OUT}/src/prime_hyperelliptic/ops.rs", "w").write(ops[:a] + ops[b:])
+ops2 = ops[:a] + ops[b:]
+# lib-test builds: drop ops.rs's own test module (it needs the curve types)
+t = ops2.index("#[cfg(test)]")
+open(f"{OUT}/src/prime_hyperelliptic/ops.rs", "w").write(ops2[:t])
+# bitops.rs tests include the unit vectors by relative path
+os.makedirs(f"{OUT}/docs/units", exist_ok=True)
+for v in ["bitop-v1.vectors.json", "bitop-v2.vectors.json"]:
+    shutil.copyfile(f"/home/user/crypto/docs/units/{v}", f"{OUT}/docs/units/{v}")
 open(f"{OUT}/src/prime_hyperelliptic/mod.rs", "w").write("//! Shim: only ops.rs (divisor_hash_words removed).\npub mod ops;\n")
 
 fx = open(f"{F}/cryptanalysis/fx_hash.rs").read().split("\n")

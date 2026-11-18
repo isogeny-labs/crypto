@@ -119,6 +119,7 @@ impl Tower {
     pub fn sub2(&self, a: &E2, b: &E2) -> E2 {
         E2([subm(a.0[0], b.0[0], self.p), subm(a.0[1], b.0[1], self.p)])
     }
+    #[allow(dead_code)]
     pub fn neg2(&self, a: &E2) -> E2 {
         self.sub2(&E2::ZERO, a)
     }

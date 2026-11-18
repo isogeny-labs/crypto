@@ -16,6 +16,7 @@ impl Pt {
     pub const INF: Pt = Pt { x: E6::ZERO, y: E6::ZERO, inf: true };
 }
 
+#[allow(dead_code)]
 pub struct Curve<'a> {
     pub t: &'a Tower,
     pub alpha: E6,
