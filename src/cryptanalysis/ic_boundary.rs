@@ -22442,8 +22442,11 @@ mod ksum_wide_index_tests {
                 "{name} k = {k}"
             );
             assert_eq!(unsplit.split_pair_adds, 0);
+            // k = 3: the pair table costs what level 2 did (2·C(a − 1, 2)),
+            // so only k ≥ 4 saves adds.
             assert!(
-                split.build_ops.adds < unsplit.build_ops.adds,
+                split.build_ops.adds <= unsplit.build_ops.adds
+                    && (k == 3 || split.build_ops.adds < unsplit.build_ops.adds),
                 "{name} k = {k}"
             );
         };
