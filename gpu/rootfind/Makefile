@@ -59,7 +59,7 @@ RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
-.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep bench-chain256 bench-thread-map bench-from256 ptxas-info clean
+.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-tail-threshold bench-pair-sweep bench-chain256 bench-thread-map bench-from256 ptxas-info clean
 
 all: test
 
@@ -138,6 +138,13 @@ bench_tail_core: bench_tail_core.cpp fp64.cuh
 bench-tail-core: bench_tail_core
 	./bench_tail_core
 
+# Host tail threshold: prior <=16/32 vs proposed <=24/32.
+bench_tail_threshold: bench_tail_threshold.cpp fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_tail_threshold.cpp
+
+bench-tail-threshold: bench_tail_threshold
+	./bench_tail_threshold
+
 # Pair table and 2-sign rootfinder S3 sweep: frozen-before versus actual header.
 bench_pair_sweep: bench_pair_sweep.cpp rootfind.cuh fp64.cuh fp256x64.cuh rootfind_api.h
 	$(CXX) $(CXXFLAGS) -o $@ bench_pair_sweep.cpp
@@ -199,4 +206,4 @@ ptxas-info: rootfind_cuda.cu $(HDRS)
 	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -Xptxas -v -c -o /dev/null rootfind_cuda.cu
 
 clean:
-	rm -f test_cpu bench bench_host_inv bench_host_inv256 bench_batch_core bench_pair_sweep bench_chain256 bench_thread_map bench_from256 rootfind_serve rootfind_serve_cuda *.o *.a
+	rm -f test_cpu bench bench_tail_threshold bench_host_inv bench_host_inv256 bench_batch_core bench_pair_sweep bench_chain256 bench_thread_map bench_from256 rootfind_serve rootfind_serve_cuda *.o *.a
