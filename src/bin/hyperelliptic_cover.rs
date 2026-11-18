@@ -20,8 +20,10 @@ use crypto_lib::binary_ecc::{
     MumfordDivisor, OrdinaryBinaryCover, PullbackFiberKind, SubgroupTransferStatus,
 };
 use crypto_lib::prime_hyperelliptic::{
-    BalancedDivisorP, FpPoly, HyperellipticCurveP, MumfordDivisorP, PrimeEllipticPointP,
-    PrimeQuadraticCoverP, PrimeSubgroupTransferStatus, SplitHyperellipticCurveP,
+    prime_proof_evidence, prime_proof_status, BalancedDivisorP, BalancedHyperellipticError, FpPoly,
+    HyperellipticCurveP, MumfordDivisorP, PrimeEllipticPointP, PrimeProofStatus,
+    PrimeQuadraticCoverError, PrimeQuadraticCoverP, PrimeSubgroupTransferStatus,
+    SplitHyperellipticCurveP,
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -418,30 +420,45 @@ fn strict_model(value: &Value) -> Result<checker::Model, checker::ModelError> {
 fn proof_receipt(model: &checker::Model) -> Result<Value, String> {
     match &model.field {
         checker::Field::Prime(p) => {
-            let (jacobian_arithmetic, pullback, pushforward, composition, subgroup_transfer) = if p
-                .bits()
-                <= 64
-            {
-                (
+            let prime_status = prime_proof_status(p);
+            if prime_status == PrimeProofStatus::Composite {
+                return Err("prime modulus failed deterministic primality validation".into());
+            }
+            let proved_prime = matches!(
+                prime_status,
+                PrimeProofStatus::ProvedU64 | PrimeProofStatus::ProvedPsi13
+            );
+            let (jacobian_arithmetic, pullback, pushforward, composition, subgroup_transfer) =
+                if proved_prime && model.normalization.is_some() {
+                    (
+                        "implemented_checked_balanced_split_sextic_with_deterministic_prime_revalidation",
+                        "unsupported_normalized_target_transfer_backend",
+                        "unsupported_normalized_target_transfer_backend",
+                        "unsupported_normalized_target_transfer_backend",
+                        "unknown_until_normalized_target_transfer_is_implemented",
+                    )
+                } else if proved_prime {
+                    (
                         "implemented_checked_balanced_split_sextic_with_deterministic_prime_revalidation",
                         "implemented_for_rational_target_point_classes",
                         "implemented_for_every_canonical_balanced_genus_two_class",
                         "verified_pi_push_pi_pull_equals_multiplication_by_2_and_pi_pull_pi_push_equals_1_plus_deck",
                         "conditional_on_a_checked_annihilator_coprime_to_2_for_a_named_generated_subgroup; exact order and primality remain separate evidence",
                     )
-            } else {
-                (
-                    "unsupported_prime_exceeds_64_bit_balanced_backend",
-                    "unsupported_prime_exceeds_64_bit_balanced_backend",
-                    "unsupported_prime_exceeds_64_bit_balanced_backend",
-                    "unsupported_prime_exceeds_64_bit_balanced_backend",
-                    "unknown",
-                )
-            };
+                } else {
+                    (
+                        "unsupported_without_primality_certificate",
+                        "unsupported_without_primality_certificate",
+                        "unsupported_without_primality_certificate",
+                        "unsupported_without_primality_certificate",
+                        "unknown",
+                    )
+                };
             Ok(json!({
                 "construction": "explicit",
                 "field_of_definition": "same_as_target",
-                "field_validation": "fixed-base_probable_prime_screen",
+                "field_validation": if proved_prime {"deterministic_prime_proof"} else {"fixed_base_probable_prime_screen_only"},
+                "prime_proof": prime_proof_evidence(p),
                 "target_smoothness": "verified_by_discriminant",
                 "source_smoothness": "verified_by_squarefree_sextic",
                 "genus": "verified_genus_2",
@@ -816,20 +833,6 @@ fn model_split_sextic_arithmetic(
     certificate: &checker::Certificate,
     p: &BigUint,
 ) -> (Value, i32) {
-    if p.bits() > 64 {
-        return (
-            response(
-                "arithmetic",
-                "unsupported",
-                json!({
-                    "reason": "the explicit split-sextic cover is constructed and replayed, but balanced arithmetic has a deterministic prime-validation boundary of at most 64 bits",
-                    "construction_status": "explicit_verified",
-                    "arithmetic_status": "unsupported_prime_size",
-                }),
-            ),
-            2,
-        );
-    }
     let f = match prime_poly(&certificate.f, p, "constructed f") {
         Ok(f) => f,
         Err(reason) => {
@@ -845,6 +848,21 @@ fn model_split_sextic_arithmetic(
     };
     let curve = match SplitHyperellipticCurveP::try_new(p.clone(), f) {
         Ok(curve) => curve,
+        Err(BalancedHyperellipticError::UnsupportedPrimalityProofRange { .. }) => {
+            return (
+                response(
+                    "arithmetic",
+                    "unsupported",
+                    json!({
+                        "reason": "the explicit split-sextic cover is constructed and replayed, but balanced arithmetic requires a deterministic modulus proof",
+                        "construction_status": "explicit_verified",
+                        "arithmetic_status": "unsupported_without_primality_certificate",
+                        "prime_proof": prime_proof_evidence(p),
+                    }),
+                ),
+                2,
+            )
+        }
         Err(error) => {
             return (
                 response(
@@ -868,7 +886,8 @@ fn model_split_sextic_arithmetic(
             "infinity_labels": {"plus": "y/x^3=+1", "minus": "y/x^3=-1"},
             "infinity_polynomial_plus": encoded_prime_poly(curve.infinity_polynomial()),
             "representation": "canonical_balanced_(u,v,n_plus)",
-            "scope": "checked balanced Jacobian arithmetic; the transfer command separately exposes the direct-prime quadratic cover maps within the same at-most-64-bit boundary",
+            "prime_proof": prime_proof_evidence(p),
+            "scope": "checked balanced Jacobian arithmetic inside the strict deterministic primality-proof boundary; the transfer command separately exposes quadratic cover maps only for direct short-Weierstrass targets, not normalized targets",
         }),
     )
 }
@@ -1255,19 +1274,6 @@ fn split_sextic_odd_arithmetic(
             )
         }
     };
-    if p.bits() > 64 {
-        return (
-            response(
-                "arithmetic",
-                "unsupported",
-                json!({
-                    "reason": "split-sextic balanced arithmetic has a deterministic odd-prime validation boundary of at most 64 bits",
-                    "arithmetic_status": "unsupported_prime_size",
-                }),
-            ),
-            2,
-        );
-    }
     let f = match prime_poly(&supplied.f, &p, "f") {
         Ok(f) => f,
         Err(reason) => {
@@ -1277,8 +1283,22 @@ fn split_sextic_odd_arithmetic(
             )
         }
     };
-    let curve = match SplitHyperellipticCurveP::try_new(p, f) {
+    let curve = match SplitHyperellipticCurveP::try_new(p.clone(), f) {
         Ok(curve) => curve,
+        Err(BalancedHyperellipticError::UnsupportedPrimalityProofRange { .. }) => {
+            return (
+                response(
+                    "arithmetic",
+                    "unsupported",
+                    json!({
+                        "reason": "split-sextic balanced arithmetic requires a deterministic modulus proof",
+                        "arithmetic_status": "unsupported_without_primality_certificate",
+                        "prime_proof": prime_proof_evidence(&p),
+                    }),
+                ),
+                2,
+            )
+        }
         Err(error) => {
             return (
                 response(
@@ -1296,6 +1316,7 @@ fn split_sextic_odd_arithmetic(
         json!({
             "family": supplied.family,
             "field": {"characteristic": supplied.p, "representation": "prime_residue"},
+            "prime_proof": prime_proof_evidence(&p),
             "curve": supplied,
             "infinity_configuration": "two_rational_points",
             "infinity_labels": {"plus": "y/x^3=+1", "minus": "y/x^3=-1"},
@@ -1432,14 +1453,15 @@ fn prime_transfer(
     curve_construction: checker::Certificate,
     p: BigUint,
 ) -> (Value, i32) {
-    if p.bits() > 64 {
+    if model.normalization.is_some() {
         return (
             response(
                 "transfer",
                 "unsupported",
                 json!({
-                    "reason": "odd-prime induced maps require the deterministic at-most-64-bit balanced backend",
-                    "transfer_status": "unsupported_prime_size",
+                    "reason": "the cover geometry is verified after normalization to a short-Weierstrass model, but induced maps to the original Montgomery or Edwards target are not implemented",
+                    "construction_status": "explicit_verified",
+                    "transfer_status": "unsupported_normalized_target_transfer_backend",
                 }),
             ),
             2,
@@ -1489,6 +1511,21 @@ fn prime_transfer(
         shift.clone(),
     ) {
         Ok(cover) => cover,
+        Err(PrimeQuadraticCoverError::UnsupportedPrimalityProofRange { .. }) => {
+            return (
+                response(
+                    "transfer",
+                    "unsupported",
+                    json!({
+                        "reason": "odd-prime induced maps require a deterministic modulus proof",
+                        "construction_status": "explicit_verified",
+                        "transfer_status": "unsupported_without_primality_certificate",
+                        "prime_proof": prime_proof_evidence(&p),
+                    }),
+                ),
+                2,
+            )
+        }
         Err(error) => {
             return (
                 response(
@@ -1722,9 +1759,10 @@ fn prime_transfer(
                         "map_degree": 2,
                         "map": {"x": format!("u^2+0x{shift:x}"), "y": "v"},
                         "infinity": "two_base_field_rational_points_both_mapping_to_target_identity",
+                        "prime_proof": prime_proof_evidence(&p),
                     },
                     "result": result,
-                    "scope": "checked induced map over a direct odd prime of at most 64 bits; exact subgroup-order, extension-field, normalized-target, solver, and comparative-cost claims are outside this command",
+                    "scope": "checked induced map over a direct odd prime inside the strict deterministic primality-proof boundary; exact subgroup-order, extension-field, normalized-target, solver, and comparative-cost claims are outside this command",
                 }),
             ),
             0,
@@ -2074,60 +2112,6 @@ fn affine_certificate_point(point: &BinaryPoint) -> Result<Value, String> {
     }
 }
 
-fn proved_prime_below_miller_rabin_bound(n: &BigUint) -> bool {
-    // Sorenson--Webster (2015), psi_13: strong probable-prime tests to the
-    // first thirteen prime bases prove primality below this strict bound.
-    // We retain the repository's slightly stronger first sixteen prime bases
-    // through 53 so this producer can replay the proof without trusting
-    // `traits.json`.
-    let bound = BigUint::parse_bytes(b"3317044064679887385961981", 10)
-        .expect("static Miller-Rabin proof bound");
-    if n >= &bound || n < &BigUint::from(2u32) {
-        return false;
-    }
-    const BASES: [u32; 16] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53];
-    for base in BASES {
-        let base = BigUint::from(base);
-        if n == &base {
-            return true;
-        }
-        if (n % &base).is_zero() {
-            return false;
-        }
-    }
-
-    let one = BigUint::from(1u32);
-    let n_minus_one = n - &one;
-    let mut odd_part = n_minus_one.clone();
-    let mut twos = 0u32;
-    while !odd_part.bit(0) {
-        odd_part >>= 1usize;
-        twos += 1;
-    }
-    for base in BASES {
-        let base = BigUint::from(base);
-        if &base >= n {
-            continue;
-        }
-        let mut residue = base.modpow(&odd_part, n);
-        if residue == one || residue == n_minus_one {
-            continue;
-        }
-        let mut witness = true;
-        for _ in 1..twos {
-            residue = (&residue * &residue) % n;
-            if residue == n_minus_one {
-                witness = false;
-                break;
-            }
-        }
-        if witness {
-            return false;
-        }
-    }
-    true
-}
-
 fn unknown_exact_order_evidence() -> Value {
     json!({
         "annihilator_primality": {"status": "unknown", "evidence_ref": null},
@@ -2139,8 +2123,11 @@ fn exact_order_evidence(annihilator: &BigUint) -> Value {
     // A proved-prime annihilator, a checked nonidentity generator, and
     // [r]G=O establish ord(G)=r. This narrow statement does not assert the
     // ambient curve order.
-    if proved_prime_below_miller_rabin_bound(annihilator) {
-        let reference = "Sorenson-Webster-Theorem-1.1-psi13;strong-Miller-Rabin-first-16-prime-bases-through-53;exclusive-bound-3317044064679887385961981;src/bin/hyperelliptic_cover.rs#proved_prime_below_miller_rabin_bound_and_named_generator_checks";
+    if matches!(
+        prime_proof_status(annihilator),
+        PrimeProofStatus::ProvedU64 | PrimeProofStatus::ProvedPsi13
+    ) {
+        let reference = "Sorenson-Webster-Theorem-1.1-psi13;strong-Miller-Rabin-first-16-prime-bases-through-53;exclusive-bound-3317044064679887385961981;src/prime_hyperelliptic/primality.rs#prime_proof_status;named-generator-nonidentity-and-annihilation-checks";
         return json!({
             "annihilator_primality": {"status": "proved", "evidence_ref": reference},
             "generated_subgroup_cardinality": {"status": "proved", "evidence_ref": reference},
@@ -2865,6 +2852,17 @@ mod tests {
             "field": "fp-5",
             "a": "0",
             "b": "1",
+        })
+    }
+
+    fn prime_p73_model() -> Value {
+        json!({
+            "v": "1",
+            "form": "y^2=x^3+a*x+b",
+            "p": "5902977611310272157103",
+            "field": "fp-5902977611310272157103",
+            "a": "4168100599208664723916",
+            "b": "240650161999037164785",
         })
     }
 
@@ -3764,6 +3762,81 @@ mod tests {
     }
 
     #[test]
+    fn strict_psi13_wide_prime_reaches_arithmetic_and_transfer_but_fails_closed_above_bound() {
+        let model = prime_p73_model();
+        let (constructed, construct_code) = construct(model.clone());
+        assert_eq!(construct_code, 0, "{constructed}");
+        assert_eq!(
+            constructed["result"]["verification"]["prime_proof"]["status"],
+            "proved_psi13"
+        );
+        assert_eq!(
+            constructed["result"]["verification"]["jacobian_arithmetic"],
+            "implemented_checked_balanced_split_sextic_with_deterministic_prime_revalidation"
+        );
+
+        let arithmetic_request = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: Some(model.clone()),
+            odd_curve: None,
+            operation: ArithmeticOperation::Identity,
+            left: None,
+            right: None,
+            scalar: None,
+        };
+        let (arithmetic_answer, arithmetic_code) = arithmetic(arithmetic_request);
+        assert_eq!(arithmetic_code, 0, "{arithmetic_answer}");
+        assert_eq!(
+            arithmetic_answer["result"]["context"]["prime_proof"]["status"],
+            "proved_psi13"
+        );
+
+        let transfer_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model,
+            operation: TransferOperation::GeneratedSubgroupCertificate,
+            divisor: None,
+            point: Some(BinaryPointWire::Affine {
+                x: "1".into(),
+                y: "1565394211633018828840".into(),
+            }),
+            order: Some("5902977611275912361963".into()),
+        };
+        let (transfer_answer, transfer_code) = transfer(transfer_request);
+        assert_eq!(transfer_code, 0, "{transfer_answer}");
+        assert_eq!(
+            transfer_answer["result"]["context"]["prime_proof"]["status"],
+            "proved_psi13"
+        );
+        assert_eq!(
+            transfer_answer["result"]["result"]["checks"]["recovery_matches_generator"],
+            true
+        );
+
+        let unsupported_model = json!({
+            "v": "1", "form": "y^2=x^3+a*x+b",
+            "p": "3317044064679887385962123",
+            "field": "fp-3317044064679887385962123",
+            "a": "1", "b": "1",
+        });
+        let unsupported_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: unsupported_model,
+            operation: TransferOperation::SubgroupStatus,
+            divisor: None,
+            point: None,
+            order: Some("3".into()),
+        };
+        let (unsupported, unsupported_code) = transfer(unsupported_request);
+        assert_eq!(unsupported_code, 2, "{unsupported}");
+        assert_eq!(unsupported["status"], "unsupported");
+        assert_eq!(
+            unsupported["result"]["transfer_status"],
+            "unsupported_without_primality_certificate"
+        );
+    }
+
+    #[test]
     fn prime_cover_arithmetic_uses_balanced_split_sextic_backend() {
         let request = ArithmeticRequest {
             schema: ARITHMETIC_SCHEMA.into(),
@@ -3826,12 +3899,46 @@ mod tests {
             "v":"1", "form":"B*y^2=x^3+A*x^2+x", "p":"11",
             "field":"fp-11", "A":"3", "B":"1"
         });
-        let (answer, code) = construct(model);
+        let (answer, code) = construct(model.clone());
         assert_eq!(code, 0, "{answer}");
         assert_eq!(answer["status"], "ok");
         assert_eq!(
             answer["result"]["certificate"]["target_model_map"]["status"],
             "verified_algebraic_identity"
+        );
+        assert_eq!(
+            answer["result"]["verification"]["pullback"],
+            "unsupported_normalized_target_transfer_backend"
+        );
+        assert_eq!(
+            answer["result"]["verification"]["pushforward"],
+            "unsupported_normalized_target_transfer_backend"
+        );
+        assert_eq!(
+            answer["result"]["verification"]["composition"],
+            "unsupported_normalized_target_transfer_backend"
+        );
+
+        // (0,1) lies on the normalized short-Weierstrass curve but not on
+        // the original Montgomery target. It must never be accepted under
+        // an ambiguous coordinate interpretation.
+        let request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model,
+            operation: TransferOperation::Pullback,
+            divisor: None,
+            point: Some(BinaryPointWire::Affine {
+                x: "0".into(),
+                y: "1".into(),
+            }),
+            order: None,
+        };
+        let (unsupported, unsupported_code) = transfer(request);
+        assert_eq!(unsupported_code, 2, "{unsupported}");
+        assert_eq!(unsupported["status"], "unsupported");
+        assert_eq!(
+            unsupported["result"]["transfer_status"],
+            "unsupported_normalized_target_transfer_backend"
         );
     }
 

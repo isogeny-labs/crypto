@@ -131,6 +131,7 @@ jobs:
           cargo test --bin hyperelliptic-cover
           cargo test --bin curve-transfer-sweep
           cargo test --test binary_cover_transfer_oracle
+          cargo test --test binary_cover_transfer_f2_source_oracle
           cargo test --test prime_cover_transfer_oracle
           cargo run --bin hyperelliptic-cover -- transfer-catalog-verify \
             --input docs/curves/binary-subgroup-transfer-certificates.json \

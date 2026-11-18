@@ -47,13 +47,18 @@ index-calculus solver remains a separate deliverable.
 | Family | Target and source | Implemented maps and identities | Current boundary |
 |:--|:--|:--|:--|
 | Ordinary binary, degree 3 | An ordinary binary elliptic model over the declared binary field; the family-specific genus-three, one-infinity source | Point-class pullback, arbitrary reduced-class norm, `phi_* phi^*(G) = [3]G`, image endomorphism checks, and named-generator recovery | The checked `binary_cubic_pullback_v1` family only; a catalog row without a named EC1 generator has no subgroup record |
-| Direct odd prime, degree 2 | `E: y^2=x^3+Ax+B`; `C: v^2=F(u^2+c)` with balanced split-sextic classes | Point-class pullback, arbitrary balanced-class pushforward, deck action, `pi_* pi^*=[2]`, `pi^* pi_*=1+deck_*`, and named-generator recovery | Prime characteristic greater than 3, direct short-Weierstrass target, modulus at most 64 bits, and nonzero branch value `F(c)` |
+| Direct odd prime, degree 2 | `E: y^2=x^3+Ax+B`; `C: v^2=F(u^2+c)` with balanced split-sextic classes | Point-class pullback, arbitrary balanced-class pushforward, deck action, `pi_* pi^*=[2]`, `pi^* pi_*=1+deck_*`, and named-generator recovery | Prime characteristic greater than 3, direct short-Weierstrass target, nonzero `F(c)`, and a deterministic prime proof from either the complete `u64` test or the first sixteen prime bases under the strict exclusive `psi_13` bound |
 
 The odd implementation treats the two rational infinities explicitly through
 the balanced `(u,v,n_plus)` representation, and its deck involution swaps the
 two infinity branches.  The pushforward formula is expressed in base-field
 symmetric data; the small-field tests compare it with a separate pointwise
 calculation over a quadratic extension.
+
+The proof-range widening is deliberately a two-row live pilot. It admits the
+two catalog rows over `p=5902977611310272157103`; it is not a claim of general
+wide-prime support, and values outside the strict proof range remain
+unsupported without a separately verified primality certificate.
 
 These are one-map elementary families.  They do not constitute an executable
 implementation of every case of Xarles's theorem about two independent maps
@@ -141,9 +146,14 @@ caller-supplied, unverified attestations.
   contains the odd-prime induced maps, deck action, both composition checks,
   and the independent small-field oracle.
 
+- [`src/prime_hyperelliptic/primality.rs`](../../src/prime_hyperelliptic/primality.rs)
+  centralizes the complete `u64` and strict `psi_13` proof statuses, configured
+  bases, exclusive bound, composite witnesses, and fail-closed unsupported
+  result outside the proof range.
+
 - [`src/bin/hyperelliptic_cover.rs`](../../src/bin/hyperelliptic_cover.rs)
-  contains the standalone operations, binary catalog exporter, local bounded
-  primality proof, and exact byte-for-byte corpus verifier.
+  contains the standalone operations, binary catalog exporter, serialized
+  prime-proof receipt, and exact byte-for-byte corpus verifier.
 
 - [`tests/prime_cover_transfer_oracle.rs`](../../tests/prime_cover_transfer_oracle.rs)
   is a separately implemented producer-side Picard-class oracle. It
@@ -152,6 +162,12 @@ caller-supplied, unverified attestations.
   ordered sums and both transfer compositions without using production
   Cantor arithmetic to construct its group table. This code-path independence
   is not an independent review or a general proof.
+
+- [`tests/binary_cover_transfer_f2_source_oracle.rs`](../../tests/binary_cover_transfer_f2_source_oracle.rs)
+  constructs the 20 classes of one exact `F_2` source from principal divisors,
+  checks all 400 ordered sums and 8,000 associativity triples, implements both
+  divisor maps independently, and checks both composition identities before
+  differential comparison with production.
 
 - [`binary-subgroup-transfer-certificates.schema.json`](../../docs/curves/binary-subgroup-transfer-certificates.schema.json)
   is the fail-closed output contract and keeps exact-order evidence separate.
@@ -176,14 +192,25 @@ The implementation checkpoint supplied to this report records:
   unsupported tests passing; and
 - the catalog-wide test traversing 174 binary maps and accepting all 150 named
   records in the current fixture;
-- the complete isolated standalone suite passing 27 of 27 tests in 283.74
-  seconds, including a tampered graph that retained the registry digest; and
-- the new verifier pin/schema controls passing, the seven sweeper tests
-  passing, and the separately implemented `F_5` Picard oracle passing with
-  Clippy warnings denied; and
+- the current target-specific standalone suite passing 29 of 29 tests and the
+  current target-specific sweeper suite passing 9 of 9 tests; and
+- the new verifier pin/schema controls passing and the separately implemented
+  `F_5` Picard oracle passing with Clippy warnings denied; and
+- the exact `F_2` source-law oracle passing 1 of 1 in the repository-integrated
+  test target, with its focused strict Clippy check also passing in the
+  isolated exact-source harness; and
 - a generated 174-map, 150-subgroup corpus conforming to the Draft 2020-12
   output schema with no failed named-subgroup tuple, followed by an exact
   second arithmetic regeneration with literal hash and byte pins.
+
+The then-exact-head curve-cover dispatch `44358315354` passed deterministic
+assessment generation, both Draft 2020-12 schema checks, and the negative
+controls. Its only in-scope finding was a stale catalog-export producer digest,
+which was corrected in successor source. The certificate stage separately
+stopped on a historical transition-inventory pin expecting 977 EC1 records
+while current main has 979; this branch does not modify the registry. The Lean
+job stopped during external artifact hydration. Those two failures are retained
+as baseline/external gates, not reclassified as arithmetic results.
 
 The new Picard-class oracle closes only the symmetric `F_5` fixture
 `y^2=x^6+1`: it enumerates 36 classes, checks every ordered class sum, includes
@@ -192,6 +219,15 @@ checks both transfer compositions. Existing differential tests cover the
 generic `F_5` and shifted `F_7` fixtures, but those two fixtures do not yet
 have this separately implemented full source-group oracle. These are finite
 test domains, not a universal proof of the implementation.
+
+The separate binary `F_2` control uses
+`E: y^2+xy=x^3+1`, `H: v^2+u^2v=u^7+u`, and
+`phi(u,v)=(u^3,uv+1)`. It independently obtains 20 canonical source classes,
+checks every source sum and associativity triple, implements the target law and
+both divisor maps separately, and verifies both transfer compositions. This is
+partial exact evidence for one tiny fixture. It does not close the full
+486-class `GF(8)` source-law gate, whose current homomorphism loop still calls
+production source addition, and it is not a catalog-wide oracle.
 
 The earlier handoff incorrectly treated a 467,669-byte JSON file as subject to
 a 64 KiB storage rule.  The live repository policy does not classify `.json`
@@ -210,6 +246,17 @@ evidence, not an independent publication receipt. The recorded producer
 commit and compiler strings remain caller-supplied and are not execution
 attestations.
 
+Historical release dry-run `44357005322` built the GNU Rust package at
+superseded head `f3b030cf1f4d8c84c8986fb4495fc9bccf1941ff`. Job
+`134987912314` succeeded; artifact `14454770064` is 97,586,396 bytes and its
+GitHub artifact ZIP has SHA-256
+`0937c075e1afc1c821ff3997eebef905d167a72d6346d680721de86f3bb56eea`.
+The installed-layout staging and then-current corpus replay passed. This is
+historical package evidence only: the strict prime-proof, normalized fail-close,
+and independent `F_2` changes supersede that head. Independent download and
+extracted replay were blocked by an Azure Blob 403, so no current-head package
+or independent archive replay is claimed.
+
 The order audit also found a pre-existing deterministic Miller--Rabin boundary
 bug in the PCC checker and the retained quartic experiment: each used only the
 first twelve prime bases with the `psi_13` cutoff. Both now include base 41 and
@@ -224,35 +271,45 @@ revision `c01ba3960ada49d73e2c48acb0e175f9e77e1680` and corpus-containing
 revision `07f7d47bd8d58d5cb1065cc83e9f22fefd85e065`. Cross-repository parity,
 8 parity tests, 13 binary transfer tests, 5 balanced tests, 5 prime-transfer
 tests, strict focused Clippy, workflow wiring, YAML parsing, and prose lint
-pass locally. Final mirror CI and review remain open. Release publication and
-recovery of the separately missing admitted hydration artifact also remain
-open.
+pass locally. That receipt predates the strict primality helper and 73-bit
+pilot sources. A successor exact-source mirror/parity refresh, final mirror CI,
+and review remain open. Release publication and recovery of the separately
+missing admitted hydration artifact also remain open.
 
 # Structured unsupported cases and next work
 
 The standalone command returns structured unsupported results for odd
-extension-field targets, direct odd primes above the deterministic 64-bit
-arithmetic boundary, normalized Montgomery/Edwards target models, and source
-infinity configurations outside the balanced split-sextic implementation.
-The live odd-map census contains 20,537 direct short-Weierstrass maps with 673
-linked EC1 records inside the current 64-bit induced-map boundary.  Outside it
-are 271 wide-direct maps/236 EC1 records, 30 normalized maps/22 EC1 records,
-and 1,405 extension-field maps/9 EC1 records.  Wide direct primes therefore
-provide the highest next EC1 coverage with the smallest algebraic change; the
-rigorous pilot is the two 73-bit rows over
-`p=5902977611310272157103`, while larger rows retain explicit primality
-assumptions unless supplied with certificates.
+extension-field targets, direct odd primes without a deterministic proof,
+normalized Montgomery/Edwards target transfers, and source infinity
+configurations outside the balanced split-sextic implementation. An audit
+found that normalized geometry had previously allowed the direct transfer
+dispatcher to interpret supplied points as short-Weierstrass coordinates. For
+the Montgomery curve `y^2=x^3+3x^2+x` over `F_11`, `(0,1)` lies on its
+normalized short curve `Y^2=X^3+9X+1` but not on the original target. The
+standalone transfer path now returns
+`unsupported_normalized_target_transfer_backend` before parsing a point or
+divisor under the wrong coordinate model. Verified cover geometry and source
+balanced arithmetic remain separate capabilities.
+
+The live odd-map census contains 20,539 direct short-Weierstrass maps with 675
+linked EC1 records inside the current deterministic proof boundary, including
+exactly the two 73-bit pilot rows over `p=5902977611310272157103`. Outside it
+are 269 wide-direct maps/234 EC1 records, 30 normalized maps/22 EC1 records,
+and 1,405 extension-field maps/9 EC1 records. The two-row widening is therefore
+not general support for wide primes, normalized targets, or extensions.
 The next bounded engineering steps are:
 
-1. replay the tracked binary certificate corpus from the extracted release
-   archive and preserve its canonical bytes and source/input hashes;
-2. close required CI and review on the exact-source cryptanalysis mirror;
-3. extend the independent even-model divisor oracle to the generic `F_5` and
-   shifted `F_7` fixtures with mutation controls; and
-4. implement a certificate-aware 73-bit direct-prime pilot before general
-   wide-prime, Montgomery, Edwards, or extension-field promotion; and
-5. publish a packaged standalone binary only after the remaining CI,
-   review, and release checks pass.
+1. freeze the successor producer, regenerate and atomically rebind the tracked
+   corpus, then replay it from an extracted current-head release archive;
+2. refresh the cryptanalysis mirror against the exact strict-primality and
+   73-bit-pilot sources, then close required CI and review;
+3. extend independent source-law evidence to the full 486-class `GF(8)`
+   fixture and the generic `F_5` and shifted `F_7` even-model fixtures with
+   mutation controls;
+4. implement explicit normalized-coordinate adapters, including exceptional
+   projective points, before promoting Montgomery or Edwards transfer; and
+5. treat broader wide-prime and extension-field support as separate bounded
+   work, and publish a package only after its exact-head release gates pass.
 
 None of those steps is a substitute for the separate full Jacobian
 index-calculus acceptance requirements: actual Jacobian relations, checked

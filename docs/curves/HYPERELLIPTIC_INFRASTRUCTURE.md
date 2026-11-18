@@ -27,7 +27,7 @@ A local release build has the equivalent path:
 ./target/release/hyperelliptic-cover --help
 ```
 
-Users of a packaged artifact do not need `cargo run`. The six command shapes
+Users of a packaged artifact do not need `cargo run`. The seven command shapes
 are:
 
 ```text
@@ -40,6 +40,9 @@ are:
   --cover-graph cover-links.yaml --traits traits.json \
   --producer-commit COMMIT --rustc-version VERSION \
   [--output binary-transfer-certificates.json]
+./hyperelliptic-cover transfer-catalog-verify --input CORPUS.json \
+  --registry REGISTRY.json --cover-graph cover-links.yaml --traits traits.json \
+  [--output RESPONSE.json]
 ```
 
 The source capabilities documented here are active-branch work. The release
@@ -254,7 +257,7 @@ the first binary block is directly runnable JSON.
 | Member | Contract |
 |---|---|
 | `family` | Exact string `odd_prime_one_infinity_v1` |
-| `p` | Unsigned odd prime of at most 64 bits; primality is checked deterministically over the complete supported range |
+| `p` | Unsigned odd modulus; values at most 64 bits are checked deterministically, while wider one-infinity inputs retain the library's cached probable-prime screen and therefore carry a primality assumption |
 | `genus` | Positive integer |
 | `f` | Ascending coefficients of monic squarefree `f`, with exact degree `2g+1` |
 | `infinity` | Exact string `one_rational` |
@@ -314,7 +317,8 @@ Its complete successful response is:
 
 Passing a supported prime elliptic `model` to `arithmetic` reconstructs and
 replays its monic sextic cover, then initializes the distinct balanced
-two-infinity backend when the prime fits the deterministic 64-bit domain. It
+two-infinity backend when the prime is proved by either the complete `u64`
+test or the strict Sorenson--Webster `psi_13` bound. It
 never applies the odd-degree one-infinity representation to that cover.
 
 This complete model-derived F5 request returns the balanced identity for
@@ -362,22 +366,32 @@ The same balanced representation now supports the induced maps for a direct
 short-Weierstrass prime-field cover. The checked formulas implement pullback,
 arbitrary-class pushforward, the deck action, and both compositions
 `pi_* pi^*=[2]` and `pi^* pi_*=1+deck_*`. This map implementation has the same
-deterministically checked, at-most-64-bit prime-field boundary as balanced
-arithmetic. It does not extend the map support to normalized target models or
-extension fields.
+strict deterministic prime-proof boundary as balanced arithmetic: the
+complete `u64` witness set, plus the first sixteen prime bases through 53
+under the exclusive Sorenson--Webster bound
+`3317044064679887385961981`. It does not extend the map support to normalized target models or
+extension fields. A normalized target therefore returns
+`unsupported_normalized_target_transfer_backend` before parsing a point or
+divisor as short-Weierstrass coordinates; source-Jacobian arithmetic on the
+verified normalized cover remains a separate supported operation.
 
-Odd extension fields return structured `unsupported_extension_field`, and
-prime moduli larger than 64 bits return structured
-`unsupported_prime_size`. A supplied nonprime, nonsquarefree, nonmonic,
+Odd extension fields return structured `unsupported_extension_field`.
+All-passing prime moduli outside the strict proof bound return structured
+`unsupported_without_primality_certificate`; a Miller--Rabin witness remains
+an unconditional composite result at any size. A supplied nonprime, nonsquarefree, nonmonic,
 wrong-degree, or malformed balanced input is `invalid_input`, not an
 unsupported existence claim. A failed odd-map request is never a
 nonexistence result.
 
 ### Prime validation and diagnostic bounds
 
-`HyperellipticCurveP` and `SplitHyperellipticCurveP` accept only
-deterministically validated odd primes of at most 64 bits. This replaces the
-earlier probable-prime wording for these arithmetic implementations. The
+`SplitHyperellipticCurveP` accepts only deterministically proved odd primes:
+the complete word-sized test or strong Miller--Rabin to the first sixteen
+prime bases below the strict `psi_13` bound. Its response serializes the
+method, configured bases, and exclusive bound. The separate one-infinity
+`HyperellipticCurveP` still retains its pre-existing cached probable-prime
+screen for wider inputs, so callers must not cite that path as a primality
+proof. The
 optional quadratic-extension reference backend
 has the narrower `p <= 4096` boundary, matching the bounded quadratic point
 counter: `Fp2Ctx` rechecks that `p` is an odd prime, constructs and validates
@@ -394,7 +408,7 @@ algorithms:
 Requests outside a checked bound return a structured error where the API is
 fallible; convenience wrappers may panic and are not public-input entry
 points. These counting bounds do not restrict ordinary Jacobian arithmetic
-within its declared 64-bit prime-field contract.
+within its declared field-validation contract.
 
 ## Transfer boundary and evidence records
 
@@ -470,10 +484,12 @@ class. This complete request checks the target-side composition over F5:
 The result explicitly compares the pushforward with `[2]` of the input. The
 source-side composition takes a balanced `divisor` and compares the pullback
 of its image with the input plus its deck transform. Direct prime-field
-transfer rejects extension models and primes wider than 64 bits with a
-structured `unsupported` response. Geometry construction over an extension
+transfer rejects extension models and moduli outside the strict deterministic
+proof range with a structured `unsupported` response. Geometry construction over an extension
 field remains supported separately; transfer support is not inferred from
-that construction.
+that construction. Montgomery and Edwards geometry likewise remains explicit,
+but transfer rejects those normalized targets until their coordinate maps,
+including exceptional projective points, are implemented end to end.
 
 `pushforward_arbitrary_jacobian_class` handles every valid reduced class of
 support degree at most three on the supplied checked binary model. It factors
@@ -532,6 +548,16 @@ image sums. Its source additions still use the production Jacobian law, so it
 does not independently validate that group law or establish catalog-wide
 support.
 
+A separate exact `F_2` control uses
+`E: y^2+xy=x^3+1`, `H: v^2+u^2v=u^7+u`, and
+`phi(u,v)=(u^3,uv+1)`. It constructs the 20 source classes from principal
+divisors without production Jacobian addition, checks all 400 ordered sums,
+all 8,000 associativity triples, independently implemented pullback and
+pushforward, and both composition identities, and only then compares with
+production. This is independent source-law evidence for one tiny general-path
+fixture; it does not close the full 486-class `GF(8)` source-law gate or a
+catalog-wide oracle.
+
 The conforming machine-readable envelope is
 [`../../research/hyperelliptic_cover_infrastructure_20261006/evidence.json`](../../research/hyperelliptic_cover_infrastructure_20261006/evidence.json).
 Its F2^7 record binds all of the following:
@@ -573,9 +599,14 @@ those historical graph fields.
 
 Current binary source has checked one-infinity arithmetic and arbitrary-class
 degree-at-most-three transfer. The bounded direct odd-prime backend supplies
-balanced arithmetic and the induced degree-two maps for checked split sextics;
-normalized targets, extensions, and larger primes remain unsupported for
-those maps. Numeric exact-order evidence remains a separate per-record field.
+balanced arithmetic and the induced degree-two maps for checked split sextics.
+Its deterministic proof boundary covers 20,539 live direct-prime maps and 675
+linked EC1 records, including the two 73-bit rows at
+`p=5902977611310272157103`. The other 269 wide-direct maps and 234 bindings,
+normalized targets, and extensions remain unsupported for
+those maps. The widened live catalog support is therefore exactly a two-row
+pilot under the strict exclusive `psi_13` proof bound, not a general
+wide-prime claim. Numeric exact-order evidence remains a separate per-record field.
 The supplied traits file is recorded as advisory provenance and cannot
 promote that field. The exporter records non-`unknown` evidence only from its
 bounded deterministic small-prime check; the named-subgroup certificate
@@ -585,10 +616,11 @@ implementation-separated cardinality-486 certificate for the separate fixed
 F8 source fixture. The latter is not an EC1 subgroup-order certificate. All
 computational-advantage and end-to-end solver costs for both the 15,791-row
 historical assessment and the larger live graph remain unknown. The retained
-cryptanalysis parity receipt predates the general binary norm, so current
-mirror/integration evidence is also open. The assessment does not change the
-geometry semantics or browser status fields in `covers.json` and
-`cover-links.yaml`.
+cryptanalysis parity receipt mirrors the general binary norm and the prior
+prime arithmetic sources, but predates the strict primality helper and 73-bit
+pilot changes; a successor exact-source parity refresh remains open. The
+assessment does not change the geometry semantics or browser status fields in
+`covers.json` and `cover-links.yaml`.
 [pcc:unverified]
 
 Regenerate and check the assessment deterministically with:
@@ -665,7 +697,7 @@ The exported catalog identifies its wrapper with
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
 that order. At this revision that digest is
-`7b25f2e1c4830be8bec5d98f13a136df5722c916f2bb431ba3433d0910a6e9cc`.
+`190548a277d94beb7fc0a802e5755f8bb1f73dfa7f756ad7e3078cee3f6b2345`.
 Read the value from the exact export rather than copying a digest from an
 earlier revision. Changing any of the three producer inputs changes the
 provenance digest, so this literal must change with them. Both

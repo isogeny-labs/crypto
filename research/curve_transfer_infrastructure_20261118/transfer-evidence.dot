@@ -27,8 +27,7 @@ digraph transfer_evidence {
     style="rounded";
     bin_e [label="E / F(2^m)\nnamed point G"];
     bin_j [label="Jac(C), genus 3\none rational infinity"];
-    bin_e -> bin_j [label="pullback  phi*", color="#2563eb"];
-    bin_j -> bin_e [label="norm  phi_*", color="#2563eb"];
+    bin_e -> bin_j [dir=both, label="pullback phi* / norm phi_*", color="#2563eb"];
     bin_id [label="runtime witness\nphi_* phi*(G) = [3]G\narbitrary norm = typed image", fillcolor="#dbeafe"];
     bin_j -> bin_id [style=dashed, arrowhead=none];
     { rank=same; bin_e; bin_j; bin_id; }
@@ -38,10 +37,9 @@ digraph transfer_evidence {
     label="direct odd-prime family · degree 2";
     color="#86efac";
     style="rounded";
-    odd_e [label="E: y^2 = x^3 + Ax + B\np > 3, p fits 64 bits"];
+    odd_e [label="E: y^2 = x^3 + Ax + B\np > 3; proved in u64 or strict psi_13 range\ntwo live 73-bit pilot rows"];
     odd_j [label="Jac(C), genus 2\nbalanced split-sextic classes"];
-    odd_e -> odd_j [label="pullback  pi*", color="#16a34a"];
-    odd_j -> odd_e [label="pushforward  pi_*", color="#16a34a"];
+    odd_e -> odd_j [dir=both, label="pullback pi* / pushforward pi_*", color="#16a34a"];
     odd_id [label="runtime witnesses\npi_* pi* = [2]\npi* pi_* = 1 + deck_*", fillcolor="#dcfce7"];
     odd_j -> odd_id [style=dashed, arrowhead=none];
     { rank=same; odd_e; odd_j; odd_id; }
@@ -78,7 +76,7 @@ digraph transfer_evidence {
   { rank=same; exact; catalog; }
 
   boundary [
-    label="structured unsupported / open\nodd extensions and p > 64 bits\nnormalized odd targets and nonsplit infinity\ntheorem-complete Xarles families\nfull Jacobian index calculus",
+    label="structured unsupported / open\nodd extensions and primes without proof\nnormalized target transfer (fail-closed) and nonsplit infinity\ntheorem-complete Xarles families\nfull Jacobian index calculus",
     fillcolor="#fee2e2",
     color="#dc2626"
   ];

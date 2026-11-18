@@ -67,12 +67,19 @@ Every candidate retains:
 
 The current odd-characteristic cover has two rational points at infinity. The
 separate balanced backend handles monic split sextics over deterministically
-checked prime fields of at most 64 bits, but this sweeper does not replay that
-arithmetic. Direct short-Weierstrass induced maps in that same boundary are
-implemented by the library and reported as implemented-but-not-replayed by
-the sweep. Odd extension fields, normalized targets, and larger prime fields
-remain explicitly unsupported by the induced-map backend. A geometric cover
-candidate is not promoted to subgroup transfer or solver evidence.
+proved prime fields in the complete `u64` domain and below the strict
+Sorenson--Webster `psi_13` bound, but this sweeper does not replay group
+operations. For direct short-Weierstrass candidates in that boundary it now
+instantiates the runtime transfer object and compares its source sextic with
+the family certificate; arbitrary-class operations and composition identities
+remain implemented-but-not-replayed by the sweep. Odd extension fields,
+normalized targets, and primes without a deterministic proof remain explicitly
+unsupported by the induced-map backend. A geometric cover
+candidate is not promoted to subgroup transfer or solver evidence. For a
+normalized target, source balanced arithmetic may still be available, while
+pushforward and composition are recorded as
+`unsupported_normalized_target_transfer_backend` rather than being inferred
+from the normalized short-Weierstrass field alone.
 
 The command rejects a search whose parameter count exceeds `max_attempts`;
 it never returns a silently truncated prefix. Incompatible families and

@@ -164,13 +164,19 @@ generators into a hash-bound corpus while keeping annihilator checks distinct
 from exact-order evidence. A separate GF(8)
 oracle now reimplements support factorization, residue fields, Frobenius trace,
 and the target group law for all 486 control classes; it still uses production
-source-Jacobian addition for its homomorphism loop, so an independent source
-group law and catalog-wide independent oracle remain open.
+source-Jacobian addition for its homomorphism loop, so a full independent
+source law for those 486 classes and a catalog-wide independent oracle remain
+open. A separate `F_2` control constructs all 20 source classes independently
+from principal divisors, checks all 400 ordered sums and 8,000 associativity
+triples, and verifies the independently implemented maps and both composition
+identities before comparing with production. That exact tiny-field fixture is
+partial evidence; it does not close the 486-class `GF(8)` gate.
 The bounded balanced backend handles direct short-Weierstrass quadratic-cover
-maps over deterministically checked prime fields of at most 64 bits. It
+maps over deterministically proved prime fields in the complete `u64` domain
+and below the strict Sorenson--Webster `psi_13` bound. It
 implements arbitrary balanced-class pushforward, pullback, the deck action,
 and both degree-two composition identities. Normalized targets, extension
-fields, larger prime fields, solver evidence, and every
+fields, moduli without a deterministic proof, solver evidence, and every
 computational-advantage claim remain unsupported or unassessed as applicable.
 
 The Rust tests enumerate all affine cover points on every nonsingular
