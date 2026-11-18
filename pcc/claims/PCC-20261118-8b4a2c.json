@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T06:22:40Z",
+ "id": "PCC-20261118-8b4a2c",
+ "kind": "statement",
+ "producer": {
+  "commit": "1f7e1c6c7aa640c2590624607a7ed7078e8e4089",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/validation-summary.json",
+    "sha256": "f98dd53737ac3c8ff1ffab2930221599f070d0ad92bff5cf2645a9d352ead20d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/validation/after-fixtures.jsonl",
+    "sha256": "dfd44f832ae1b1d6f6e8696673f1a20ca32fdc06d351dae75696631c78a52bba"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/validation/blocked17.json",
+    "sha256": "52b82b85fb7f574f09abaa28929462d2cb58aae9adaa920d76bebf50fb8735dc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/validation/full64.json",
+    "sha256": "7f022991d8ea2713689c1fc3c031ce80ab01d70f6bbd8d1c7551d37abbd5db7d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/validation/small1.json",
+    "sha256": "6fad618a7b5718e9c73149b944166f5e8bd380864bf0a4f12458788471e4c7fb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/validation/empty-leftover.json",
+    "sha256": "286d444fc6bf48a292e80e2beb8d1c0f795cb0401a429428a2dc98cdba10e6da"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/validation/rejections/rejections.jsonl",
+    "sha256": "8b450057b4737815857aa0f99a0396ad03f4fb8cea0d3923dba6924b19952eb2"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/evaluator-20261118",
+ "statement": "Complete native evaluator development checks reproduce frozen fixture bytes, compare 84 supplied-case image evaluations against PARI over three fields, and reject eight additional invalid-input/limit controls. No new conductor-gap record or runtime measurement is produced."
+}
