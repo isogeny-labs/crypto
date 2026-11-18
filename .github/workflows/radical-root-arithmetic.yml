@@ -36,6 +36,8 @@ jobs:
             cube_root_exhaustive_fp_and_fp2_both_classes -- --nocapture
           cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
             amm_digit_loop_matches_previous_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            cardano_discriminant_reuse_matches_reference -- --nocapture
       - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
         shell: bash
         run: |
@@ -48,6 +50,8 @@ jobs:
               bench_radical_power_reuse -- --ignored --nocapture
             cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
               bench_amm_digit_loop -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_cardano_discriminant -- --ignored --nocapture
           } | tee "$RUNNER_TEMP/radical-power-reuse.txt"
           cat "$RUNNER_TEMP/radical-power-reuse.txt" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
