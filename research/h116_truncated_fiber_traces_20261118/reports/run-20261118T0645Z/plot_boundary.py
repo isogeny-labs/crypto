@@ -41,5 +41,7 @@ bottom.grid(axis="y", alpha=0.25)
 
 figure.tight_layout()
 figure.savefig(HERE / "boundary.svg")
-figure.savefig(HERE / "boundary.png", dpi=160)
+# The SVG is the resolution-independent archival figure. Keep the PNG below
+# the repository's 64 KiB inline-artifact threshold for PR rendering.
+figure.savefig(HERE / "boundary.png", dpi=80)
 

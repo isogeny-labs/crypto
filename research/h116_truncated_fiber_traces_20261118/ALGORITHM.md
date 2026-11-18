@@ -139,9 +139,15 @@ that parameter identity remains separate. The generic formal-group filtration
 is now proved against Mathlib's `FormalGroup`: `F(X,Y)-X` has a factor `Y`, so
 substituting an `X^m` correction cannot change coefficients below degree `m`.
 Composing this with the leading-`X` pole theorem proves the normalized
-double-pole/regular-unit prefix below degree `m-1`. The curve-specific
-`V+pi=[t]`, local Frobenius, sign and scaling identification is still the
-endpoint hypothesis. [pcc:unverified]
+double-pole/regular-unit prefix below degree `m-1`. Associativity now also
+proves the required subtraction orientation from
+`F(actual,omitted)=scalar` and a certified inverse. The inverse-order premise
+is derived from the omitted parameter's order in a commutative formal group.
+For the short-Weierstrass parameter, a stronger endpoint directly uses the
+explicit certificate `F(omitted,-omitted)=0`, eliminating the separately
+constructed inverse series. The curve-specific `V+pi=[t]`, exact local
+Frobenius order, elliptic negation, sign and scaling identifications are still
+the endpoint hypotheses. [pcc:unverified]
 
 A frozen 20-case boundary panel over five primes and four cutoffs measures this
 loss directly. All local-parameter pairs first differ at `m+1`, all normalized

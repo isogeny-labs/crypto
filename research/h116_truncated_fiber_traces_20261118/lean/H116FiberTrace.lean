@@ -695,6 +695,175 @@ theorem FormalGroup.filtered_pole_prefix
   exact PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv
     outer hparameter hactualUnit hscalarUnit houter
 
+/-- Associativity cancels a certified omitted parameter against a certified
+right inverse. This is the orientation needed to turn
+`F(actual, omitted) = scalar` into `actual = F(scalar, inverseCorrection)`
+without assuming an inverse-series API or copying a group law. -/
+theorem FormalGroup.right_cancel_with_inverse
+    {R : Type*} [CommRing R] (F : FormalGroup R)
+    {actual omitted scalar inverseCorrection : PowerSeries R}
+    (hactualZero : PowerSeries.constantCoeff actual = 0)
+    (homittedZero : PowerSeries.constantCoeff omitted = 0)
+    (hinverseZero : PowerSeries.constantCoeff inverseCorrection = 0)
+    (hsum : F.toPowerSeries.subst ![actual, omitted] = scalar)
+    (hinverse : F.toPowerSeries.subst ![omitted, inverseCorrection] = 0) :
+    F.toPowerSeries.subst ![scalar, inverseCorrection] = actual := by
+  have hactualSubst : PowerSeries.HasSubst actual :=
+    PowerSeries.HasSubst.of_constantCoeff_zero' hactualZero
+  have homittedSubst : PowerSeries.HasSubst omitted :=
+    PowerSeries.HasSubst.of_constantCoeff_zero' homittedZero
+  have hinverseSubst : PowerSeries.HasSubst inverseCorrection :=
+    PowerSeries.HasSubst.of_constantCoeff_zero' hinverseZero
+  calc
+    F.toPowerSeries.subst ![scalar, inverseCorrection] =
+        F.toPowerSeries.subst ![
+          F.toPowerSeries.subst ![actual, omitted], inverseCorrection] := by
+      rw [hsum]
+    _ = F.toPowerSeries.subst ![actual,
+          F.toPowerSeries.subst ![omitted, inverseCorrection]] :=
+      F.assoc' hactualSubst homittedSubst hinverseSubst
+    _ = F.toPowerSeries.subst ![actual, 0] := by rw [hinverse]
+    _ = actual := F.add_zero hactualSubst
+
+/-- The endomorphism-oriented H116 endpoint. A certified relation
+`F(actual, omitted) = scalar`, a certified right inverse of the omitted
+parameter, and an order-`n+1` factorization of that inverse imply the same
+order-`n` normalized pole prefix as a directly supplied correction. -/
+theorem FormalGroup.filtered_right_cancellation_pole_prefix
+    {R : Type*} [Field R] (F : FormalGroup R)
+    {outer actualParameter omittedParameter scalarParameter inverseCorrection
+      inverseTail actualUnit scalarUnit : PowerSeries R} {n : ℕ}
+    (hactualZero : PowerSeries.constantCoeff actualParameter = 0)
+    (homittedZero : PowerSeries.constantCoeff omittedParameter = 0)
+    (hscalarZero : PowerSeries.constantCoeff scalarParameter = 0)
+    (hinverseZero : PowerSeries.constantCoeff inverseCorrection = 0)
+    (hsum : F.toPowerSeries.subst ![actualParameter, omittedParameter] =
+      scalarParameter)
+    (hinverse : F.toPowerSeries.subst ![omittedParameter, inverseCorrection] = 0)
+    (hinverseOrder : inverseCorrection =
+      PowerSeries.X ^ (n + 1) * inverseTail)
+    (hactual : actualParameter = PowerSeries.X * actualUnit)
+    (hscalar : scalarParameter = PowerSeries.X * scalarUnit)
+    (hactualUnit : PowerSeries.constantCoeff actualUnit ≠ 0)
+    (hscalarUnit : PowerSeries.constantCoeff scalarUnit ≠ 0)
+    (houter : PowerSeries.constantCoeff outer ≠ 0) :
+    PowerSeriesPrefixEq n
+      (actualUnit⁻¹ ^ 2 *
+        (outer.subst (PowerSeries.X * actualUnit))⁻¹)
+      (scalarUnit⁻¹ ^ 2 *
+        (outer.subst (PowerSeries.X * scalarUnit))⁻¹) := by
+  have hcancel :
+      F.toPowerSeries.subst ![scalarParameter, inverseCorrection] =
+        actualParameter :=
+    FormalGroup.right_cancel_with_inverse F hactualZero homittedZero
+      hinverseZero hsum hinverse
+  apply FormalGroup.filtered_pole_prefix F hscalarZero hinverseZero
+    hinverseOrder
+  · rw [hcancel, hactual]
+  · exact hscalar
+  · exact hactualUnit
+  · exact hscalarUnit
+  · exact houter
+
+/-- In a commutative formal group, any certified zero-constant right inverse
+has at least the order of the omitted parameter. The factorization is derived
+from the group law; the inverse order is not an additional hypothesis. -/
+theorem FormalGroup.right_inverse_order
+    {R : Type*} [CommRing R] (F : FormalGroup R) [F.IsComm]
+    {omitted omittedTail inverseCorrection : PowerSeries R} {m : ℕ}
+    (homittedZero : PowerSeries.constantCoeff omitted = 0)
+    (hinverseZero : PowerSeries.constantCoeff inverseCorrection = 0)
+    (hinverse : F.toPowerSeries.subst ![omitted, inverseCorrection] = 0)
+    (homittedOrder : omitted = PowerSeries.X ^ m * omittedTail) :
+    ∃ inverseTail : PowerSeries R,
+      inverseCorrection = PowerSeries.X ^ m * inverseTail := by
+  have homittedSubst : PowerSeries.HasSubst omitted :=
+    PowerSeries.HasSubst.of_constantCoeff_zero' homittedZero
+  have hinverseSubst : PowerSeries.HasSubst inverseCorrection :=
+    PowerSeries.HasSubst.of_constantCoeff_zero' hinverseZero
+  have hinverseLeft :
+      F.toPowerSeries.subst ![inverseCorrection, omitted] = 0 := by
+    rw [F.comm' hinverseSubst homittedSubst]
+    exact hinverse
+  obtain ⟨q, hq⟩ :=
+    FormalGroup.add_correction_eq F hinverseZero homittedZero
+  have hzero : inverseCorrection + omitted * q = 0 := by
+    rw [← hq, hinverseLeft]
+  refine ⟨-(omittedTail * q), ?_⟩
+  calc
+    inverseCorrection = -(omitted * q) :=
+      eq_neg_of_add_eq_zero_left hzero
+    _ = -(PowerSeries.X ^ m * omittedTail * q) := by rw [homittedOrder]
+    _ = PowerSeries.X ^ m * (-(omittedTail * q)) := by ring
+
+/-- The commutative endpoint needs the order of the omitted Frobenius
+parameter, not a separate order assumption for its certified inverse. -/
+theorem FormalGroup.filtered_right_cancellation_pole_prefix_of_omitted_order
+    {R : Type*} [Field R] (F : FormalGroup R) [F.IsComm]
+    {outer actualParameter omittedParameter omittedTail scalarParameter
+      inverseCorrection actualUnit scalarUnit : PowerSeries R} {n : ℕ}
+    (hactualZero : PowerSeries.constantCoeff actualParameter = 0)
+    (homittedZero : PowerSeries.constantCoeff omittedParameter = 0)
+    (hscalarZero : PowerSeries.constantCoeff scalarParameter = 0)
+    (hinverseZero : PowerSeries.constantCoeff inverseCorrection = 0)
+    (hsum : F.toPowerSeries.subst ![actualParameter, omittedParameter] =
+      scalarParameter)
+    (hinverse : F.toPowerSeries.subst ![omittedParameter, inverseCorrection] = 0)
+    (homittedOrder : omittedParameter =
+      PowerSeries.X ^ (n + 1) * omittedTail)
+    (hactual : actualParameter = PowerSeries.X * actualUnit)
+    (hscalar : scalarParameter = PowerSeries.X * scalarUnit)
+    (hactualUnit : PowerSeries.constantCoeff actualUnit ≠ 0)
+    (hscalarUnit : PowerSeries.constantCoeff scalarUnit ≠ 0)
+    (houter : PowerSeries.constantCoeff outer ≠ 0) :
+    PowerSeriesPrefixEq n
+      (actualUnit⁻¹ ^ 2 *
+        (outer.subst (PowerSeries.X * actualUnit))⁻¹)
+      (scalarUnit⁻¹ ^ 2 *
+        (outer.subst (PowerSeries.X * scalarUnit))⁻¹) := by
+  obtain ⟨inverseTail, hinverseOrder⟩ :=
+    FormalGroup.right_inverse_order F homittedZero hinverseZero hinverse
+      homittedOrder
+  exact FormalGroup.filtered_right_cancellation_pole_prefix F
+    hactualZero homittedZero hscalarZero hinverseZero hsum hinverse
+    hinverseOrder hactual hscalar hactualUnit hscalarUnit houter
+
+/-- Short-Weierstrass negation can be exposed as the exact certificate
+`F(omitted, -omitted) = 0`. With that certificate, the endpoint uses the
+explicit correction `-omitted` and needs neither a separately constructed
+inverse series nor a separate inverse-order premise. -/
+theorem FormalGroup.filtered_right_negation_pole_prefix
+    {R : Type*} [Field R] (F : FormalGroup R)
+    {outer actualParameter omittedParameter omittedTail scalarParameter
+      actualUnit scalarUnit : PowerSeries R} {n : ℕ}
+    (hactualZero : PowerSeries.constantCoeff actualParameter = 0)
+    (homittedZero : PowerSeries.constantCoeff omittedParameter = 0)
+    (hscalarZero : PowerSeries.constantCoeff scalarParameter = 0)
+    (hsum : F.toPowerSeries.subst ![actualParameter, omittedParameter] =
+      scalarParameter)
+    (hneg : F.toPowerSeries.subst ![omittedParameter, -omittedParameter] = 0)
+    (homittedOrder : omittedParameter =
+      PowerSeries.X ^ (n + 1) * omittedTail)
+    (hactual : actualParameter = PowerSeries.X * actualUnit)
+    (hscalar : scalarParameter = PowerSeries.X * scalarUnit)
+    (hactualUnit : PowerSeries.constantCoeff actualUnit ≠ 0)
+    (hscalarUnit : PowerSeries.constantCoeff scalarUnit ≠ 0)
+    (houter : PowerSeries.constantCoeff outer ≠ 0) :
+    PowerSeriesPrefixEq n
+      (actualUnit⁻¹ ^ 2 *
+        (outer.subst (PowerSeries.X * actualUnit))⁻¹)
+      (scalarUnit⁻¹ ^ 2 *
+        (outer.subst (PowerSeries.X * scalarUnit))⁻¹) := by
+  have hnegZero : PowerSeries.constantCoeff (-omittedParameter) = 0 := by
+    simp [homittedZero]
+  have hnegOrder : -omittedParameter =
+      PowerSeries.X ^ (n + 1) * (-omittedTail) := by
+    rw [homittedOrder]
+    ring
+  exact FormalGroup.filtered_right_cancellation_pole_prefix F
+    hactualZero homittedZero hscalarZero hnegZero hsum hneg hnegOrder
+    hactual hscalar hactualUnit hscalarUnit houter
+
 /-- The regular unit in the short-Weierstrass local coordinate
 `x(z)=z⁻² q(z)⁻¹`. Clearing the curve equation gives this fixed-point identity. -/
 def WeierstrassCoordinateUnit
@@ -1718,6 +1887,11 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms FormalGroup.add_correction_eq
 #print axioms FormalGroup.filtered_correction_prefix
 #print axioms FormalGroup.filtered_pole_prefix
+#print axioms FormalGroup.right_cancel_with_inverse
+#print axioms FormalGroup.filtered_right_cancellation_pole_prefix
+#print axioms FormalGroup.right_inverse_order
+#print axioms FormalGroup.filtered_right_cancellation_pole_prefix_of_omitted_order
+#print axioms FormalGroup.filtered_right_negation_pole_prefix
 #print axioms WeierstrassCoordinateUnit.constantCoeff
 #print axioms WeierstrassCoordinateUnit.clearedCurveIdentity
 #print axioms WeierstrassCoordinateUnit.rescale

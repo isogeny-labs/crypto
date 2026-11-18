@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-40ab0cd58dac6de13f43ca0a12e87e1ca1371f5c1c4b11f7cba7d96001ac88aa  H116FiberTrace.lean
+24e5fba86085ca12e1eb09a44c28758f677d7370a0b6001118e770f931942a46  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  84 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  89 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -33,6 +33,8 @@ b9a7d56d16d41dc867cb768b114d87dd81b1cd3c745b2968adca395e95dca634  receipts/curve
 621d395aacdb96c526881fd73cab63ea937df6f7779cb10d69eca36669e8ac5f  receipts/curve-coordinate-audit.log
 43aa3a63525c4f4249a311b4ace2f04f1510ceb6d73f1666a60913ee6e2b6579  receipts/formal-group-build.log
 4f1d11d86bd8040b77073409c5d5e07f2f75bb18257ef6b9d5f0a5f31b9f4ac4  receipts/formal-group-audit.log
+cc9b391320d8c29caeb8afd595cd44c9f568c93144918196306f8a80da2c65a5  receipts/formal-cancellation-build.txt
+a9d0da69bd49c8badf0c10ff7c06611d430ec9516bbf6a43232d9ece1268f513  receipts/formal-cancellation-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -109,9 +111,18 @@ when `a*zNormalized=zScalar`. The 84-theorem checkpoint additionally imports
 Mathlib's actual `FormalGroup` and proves that `Y` divides `F(X,Y)-X`, that a
 substituted correction factors multiplicatively, and that an `X^m` correction
 preserves the formal parameter prefix below degree `m`. It composes this with
-the leading-`X` pole bridge at one degree less. Instantiating this generic
-result with the actual elliptic `V+pi=[t]`, local Frobenius, sign and scaling
-identifications remains open.
+the leading-`X` pole bridge at one degree less. The 89-theorem checkpoint adds
+the endomorphism-oriented cancellation step: associativity turns certified
+relations `F(actual,omitted)=scalar` and
+`F(omitted,inverseCorrection)=0` into
+`F(scalar,inverseCorrection)=actual`. For a commutative formal group it also
+proves that a certified inverse inherits an `X^m` factor from an omitted
+parameter with that factor, then composes this fact through the normalized pole
+prefix theorem. An explicit-negation endpoint avoids a separately constructed
+inverse series: it takes `F(omitted,-omitted)=0` as the visible certificate and
+derives the correction order directly. Instantiating this generic result with
+the actual elliptic `V+pi=[t]`, short-Weierstrass negation, the order-`p`
+Frobenius parameter, and sign/scaling identifications remains open.
 [pcc:unverified]
 
 The first integration build is retained at

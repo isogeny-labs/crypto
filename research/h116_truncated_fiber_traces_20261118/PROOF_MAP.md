@@ -177,7 +177,7 @@ local to H116 until the study demonstrates a reusable theorem boundary.
    successful probe uses the default limits.
 5. **Missing components only.** The H116-specific component is the arithmetic
    fact that a prime strictly above 19 is at least 23. The elliptic identities
-   `V+pi=[t]`, `pi(z)=z^p`, the formal-group subtraction law and the regular
+   `V+pi=[t]`, `pi(z)=z^p`, the elliptic negation certificate and the regular
    unit factor in the elliptic x-coordinate remain separate semantic
    obligations; this cutoff lemma must not claim them.
 6. **Inheritance table.** Monomial formation and coefficients come from
@@ -228,8 +228,9 @@ monotonicity lemma, so no limit was raised and no theorem was weakened.
    added.
 5. **Missing components only.** This now proves the double-pole and regular-unit
    substitution algebra. The curve-coordinate instance below identifies the
-   supplied series. Proving `V+pi=[t]`, local Frobenius and formal subtraction
-   still requires an instance.
+   supplied series. Proving `V+pi=[t]`, local Frobenius and the actual elliptic
+   negation certificate still requires an instance; the generic cancellation
+   orientation is discharged by the later formal-group gate.
 6. **Inheritance table.** Truncation, coefficient shifts and unit inverses are
    Mathlib operations; prefix arithmetic is the pre-existing H116 wrapper. The
    only new local laws reconstruct a prefix from coefficients, cancel `X`,
@@ -290,7 +291,7 @@ series. [pcc:unverified]
    `(a⁴A,a⁶B)` and the exact identity
    `qTarget(zNormalized)=qSource(zScalar)` whenever
    `a*zNormalized=zScalar`. The remaining endpoint must derive that parameter
-   equality from `V+pi=[t]`, `pi(z)=z^p` and formal subtraction.
+   equality from `V+pi=[t]`, `pi(z)=z^p` and the actual elliptic negation law.
 6. **Inheritance table.** Curve-unit arithmetic uses PowerSeries ring laws;
    rescaling uses `subst_comp_subst_apply`; prefix transfer reuses the prior
    H116 theorem. No isogeny semantics, decoder, complexity bound, limit
@@ -302,7 +303,7 @@ series. [pcc:unverified]
 | `(A,B,q) -> (a⁴A,a⁶B,q(aX))` | generic scaling law | H116 over Mathlib substitution | field and scale |
 | target/source substitution identity | generic assembly | H116 | zero-constant normalized parameter and `a*zNormalized=zScalar` |
 | normalized x-ratio prefix | curve-coordinate assembly | H116 | source/target coordinate units plus leading-parameter prefix |
-| derive normalized/scalar parameter identity | endpoint obligation | future formal-group owner | `V+pi=[t]`, local Frobenius and formal subtraction |
+| derive normalized/scalar parameter identity | endpoint obligation | future formal-group owner | `V+pi=[t]`, local Frobenius and elliptic negation; generic cancellation is proved below |
 
 `H116-CURVE-COORDINATE-001` is the finite instance control for this table. Its
 fixed-point producer and independent recurrence verifier agree through 24
@@ -324,30 +325,58 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
    `MvPowerSeries.subst_sub`, `subst_mul`, and `subst_X` transport the quotient
    through substitution. `PowerSeriesPrefixEq.add_X_pow_mul` and
    `leading_X_inv_sq_mul_subst_inv` supply the filtration and pole transfer.
+   For a commutative formal group, `FormalGroup.comm'` turns a certified right
+   inverse into the orientation required by the same correction factorization.
+   In the short-Weierstrass specialization, ordinary ring negation gives the
+   zero constant and order factorization of `-omitted` directly.
 3. **Object as an instance.** A zero-constant scalar parameter `s` and
    correction `c` are substituted into the actual Mathlib formal group as
    `F(s,c)`. If `c=X^m tail`, the resulting series is prefix-equal to `s`
    below degree `m`; after writing both parameters as `X` times units, an
-   order-`n+1` correction yields an order-`n` normalized pole prefix.
+   order-`n+1` correction yields an order-`n` normalized pole prefix. For the
+   actual endomorphism orientation, the cancellation bridge takes explicit
+   certificates `F(actual,omitted)=scalar` and
+   `F(omitted,inverseCorrection)=0`; associativity and the right identity give
+   `F(scalar,inverseCorrection)=actual`, after which the same filtered pole
+   theorem applies. Commutativity plus `omitted=X^m tail` then proves, rather
+   than assumes, `inverseCorrection=X^m inverseTail`. An alternative endpoint
+   uses the explicit correction `-omitted`; its only inverse premise is the
+   exact certificate `F(omitted,-omitted)=0`.
 4. **Assembly probe.** A temporary module importing `H116FiberTrace` and
    Mathlib's formal-group module checked all four declarations at default
    heartbeats. A first direct curve-coordinate wrapper timed out during
    elaboration; replacing it by the generic pole theorem made every component
-   explicit and passed without a limit override. The tracked module then built
-   at default limits.
+   explicit and passed without a limit override. A second temporary module
+   checked both the associativity-only right-cancellation lemma and its composed
+   pole-prefix endpoint at default limits. A third temporary module checked the
+   inverse-order transfer and the endpoint specialized to omitted-parameter
+   order at default limits. The tracked module then built at default limits and
+   the exact repository auditor reported `88 theorems, 0 failing, 0 trusted`.
+   A fourth temporary module checked the explicit-negation endpoint at default
+   limits; after integration the tracked module rebuilt at default limits and
+   the exact auditor reported `89 theorems, 0 failing, 0 trusted`.
 5. **Missing components only.** The generic laws no longer assume the desired
-   prefix. The remaining endpoint hypotheses are the actual elliptic
-   identification `V+pi=[t]` in the chosen formal parameter, the local
-   characteristic-`p` formula for `pi`, and the sign/target scaling that turns
+   prefix or the desired subtraction equality. The remaining endpoint
+   hypotheses are the actual elliptic identification `V+pi=[t]` in the chosen
+   formal parameter, the elliptic negation certificate
+   `F(piParameter,-piParameter)=0`, the characteristic-`p` formula giving that
+   parameter order `p`, and the sign/target scaling that turns
    it into the supplied `V-1` rational map. Parity then translates the
    `z^(p-1)` normalized boundary to `w^((p-1)/2)`; that translation is not
    asserted by the generic theorem.
 6. **Inheritance table.** The formal group, identity restriction and
    substitution algebra are inherited from Mathlib; finite prefix arithmetic
-   and the double-pole loss are inherited from earlier H116 theorems. The only
-   new generic lemma extracts the second-variable quotient from
-   `F(X,0)=X`. No curve equation, endomorphism relation, complexity bound,
-   trusted decision procedure or resource-limit override is introduced.
+   and the double-pole loss are inherited from earlier H116 theorems. The
+   filtration lemma extracts the second-variable quotient from `F(X,0)=X`.
+   The cancellation bridge uses only `FormalGroup.assoc'`, `add_zero`, and
+   zero-constant substitution witnesses; it does not construct an inverse or
+   import elliptic semantics. The inverse-order transfer additionally inherits
+   `FormalGroup.comm'` and ring factorization; it does not assume the inverse's
+   order. The explicit-negation endpoint uses only ring negation and avoids the
+   commutativity premise, but leaves the actual elliptic negation identity as a
+   visible certificate. No curve equation, endomorphism relation,
+   complexity bound, trusted decision procedure or resource-limit override is
+   introduced.
    [pcc:unverified]
 
 | Statement | Kind | Owner | Quantified structure | Hypotheses |
@@ -356,6 +385,11 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
 | `F(s,c)=s+cq` for some `q` | generic assembly | H116 | commutative ring formal group and univariate power series | zero constant coefficients |
 | order-`m` correction preserves the prefix below `m` | generic assembly | H116 | field formal group | `c=X^m tail` and zero constants |
 | order-`n+1` correction preserves normalized pole prefix below `n` | generic assembly | H116 | field formal group and regular outer unit | leading-`X` factorizations and unit constants |
+| `F(actual,omitted)=scalar` cancels against an explicit right inverse | generic assembly | H116 over Mathlib `FormalGroup` | commutative ring formal group | zero constants and `F(omitted,inverseCorrection)=0` |
+| cancellation plus order-`n+1` inverse preserves normalized pole prefix below `n` | generic endpoint composition | H116 | field formal group and regular outer unit | certified sum, certified inverse, inverse order, leading-`X` factorizations and unit constants |
+| a certified inverse has at least the omitted parameter's order | generic commutative-group assembly | H116 over Mathlib `FormalGroup` | commutative formal group over a commutative ring | zero constants, certified right inverse, omitted-parameter factorization |
+| cancellation plus order-`n+1` omitted parameter preserves normalized pole prefix below `n` | generic endpoint composition | H116 | commutative field formal group and regular outer unit | certified sum and inverse, omitted order, leading-`X` factorizations and unit constants |
+| explicit negation correction preserves normalized pole prefix below `n` | generic endpoint composition | H116 | field formal group and regular outer unit | certified sum, `F(omitted,-omitted)=0`, omitted order, leading-`X` factorizations and unit constants |
 | actual `V-1` normalized x-ratio prefix | endpoint obligation | future elliptic formal-group owner | ordinary elliptic curve over `F_p` | `V+pi=[t]`, local Frobenius, sign and scaling identifications |
 
 ## Inheritance table
@@ -368,7 +402,7 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
 | field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
 | isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; no Mathlib isogeny object was found, so a finite `N,D` certificate is the checked interface; producing it from the actual kernel and independently validating map semantics remain open |
 | formal-group filtration of an `X^m` correction | Mathlib `FormalGroup` plus `FormalGroup.filtered_correction_prefix` and `filtered_pole_prefix`; generic layer proved |
-| `V+pi=[t]` and the actual local `pi` series | elliptic formal-group instance; endpoint identification still pending |
+| `V+pi=[t]`, `F(pi,-pi)=0` in parameter coordinates, and the actual local `pi` series of order `p` | elliptic formal-group instance; endpoint identification still pending |
 | radix-six decoder | reuse H115 generic theorem after source import/binding |
 
 The assembly lookup found no ready-made `Derivation K (RatFunc K) (RatFunc K)`

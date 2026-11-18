@@ -156,8 +156,15 @@ identity derived from `V+pi=[t]` and local Frobenius. The generic filtration
 part of that obligation is now discharged against Mathlib's actual
 `FormalGroup`: Lean proves `Y | F(X,Y)-X`, proves that an `X^m` correction is
 invisible below degree `m`, and composes it with the existing one-degree pole
-loss. What remains is the actual elliptic Verschiebung/Frobenius, sign and
-target-scaling instance. [pcc:unverified]
+loss. The endomorphism orientation is now proved as well: from certified
+relations `F(actual,omitted)=scalar` and
+`F(omitted,inverseCorrection)=0`, associativity derives
+`F(scalar,inverseCorrection)=actual`. In a commutative formal group the inverse
+inherits the omitted parameter's `X^m` factor; alternatively, an explicit
+short-Weierstrass negation certificate `F(omitted,-omitted)=0` avoids a
+separately constructed inverse series. What remains is the actual elliptic
+`V+pi=[t]`, negation, order-`p` Frobenius, sign and target-scaling instance.
+[pcc:unverified]
 
 The frozen [prefix-transfer boundary control](PREFIX_TRANSFER_EXPERIMENT.md)
 then tests that precision loss on 20 finite-field series cases. In every case a
