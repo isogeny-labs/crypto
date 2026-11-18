@@ -69,6 +69,27 @@ c513a0d72a8eef3f294e0e10f9bf42ddaf83598485c5fb42e4dfb0c7576e2d3c  /tmp/h116_sele
 This v2 source and binary binding is committed and pushed before its first
 default invocation.
 
+Selector v2 completed in 0.003s user CPU and halted before printing because the
+frozen rule found only two of five required curves. Its captured stdout was the
+zero-byte file with SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+This is a structural feasibility failure; no fiber, moment, scalar or timing
+data was computed.
+
+`FEASIBILITY_PLAN.md` now freezes a four-rung maximum-extension-size ladder and
+requires the smallest rung yielding five curves. Selector v3 adds only the
+`--feasibility` reporting path for that ladder. Strict builds and self-tests
+passed. Pre-feasibility SHA-256 bindings are:
+
+```text
+9f3ef019c820826bf883ee7f7112d508998243c5ce655290603a1ef52636fa1c  h116_select.rs
+cf85d3aa832aed78aa7a446dcee443095e144a87cb29ab08aba4bf059ce8dd23  /tmp/h116_select.v3.debug
+8f6fc2ff6dd5ab732c04e7f82aa5c108e5e8bd6991cf32b4501ce830d9b5c06c  /tmp/h116_select.v3.opt
+```
+
+The plan, v3 source and binary binding are committed and pushed before the
+first `--feasibility` invocation.
+
 The selector source was committed and pushed before `/tmp/h116_select` was
 invoked without `--selftest`. The resulting `COHORT.json`, raw stdout hash,
 compiler version and source hash will be bound in a later receipt before any

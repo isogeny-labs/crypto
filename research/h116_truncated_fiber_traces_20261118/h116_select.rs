@@ -9,6 +9,7 @@ use std::fmt::Write as _;
 const MIN_P: u64 = 53;
 const MAX_P: u64 = 2_000;
 const MAX_EXTENSION_SIZE: u128 = 100_000_000;
+const FEASIBILITY_CAPS: [u128; 4] = [100_000_000, 10_000_000_000, 1_000_000_000_000, 100_000_000_000_000];
 const TARGET_CURVES: usize = 5;
 
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -62,11 +63,11 @@ fn torsion_degree(p: u64, r: u64) -> Option<u64> {
     (2_u64..=6).find(|&d| mod_pow(p, d, r) == 1)
 }
 
-fn bounded_pow(base: u64, exponent: u64) -> Option<u128> {
+fn bounded_pow(base: u64, exponent: u64, maximum: u128) -> Option<u128> {
     let mut value = 1_u128;
     for _ in 0..exponent {
         value = value.checked_mul(base as u128)?;
-        if value > MAX_EXTENSION_SIZE {
+        if value > maximum {
             return None;
         }
     }
@@ -117,7 +118,11 @@ fn hasse_bound(p: u64) -> u64 {
     bound
 }
 
-fn admissible_orders(p: u64, retained_orders: &BTreeSet<u64>) -> Vec<(u64, u64, u128)> {
+fn admissible_orders(
+    p: u64,
+    retained_orders: &BTreeSet<u64>,
+    maximum_extension_size: u128,
+) -> Vec<(u64, u64, u128)> {
     let bound = hasse_bound(p);
     let center = p + 1;
     let mut orders = Vec::new();
@@ -132,7 +137,7 @@ fn admissible_orders(p: u64, retained_orders: &BTreeSet<u64>) -> Vec<(u64, u64, 
         let Some(d) = torsion_degree(p, order) else {
             continue;
         };
-        let Some(extension_size) = bounded_pow(p, d) else {
+        let Some(extension_size) = bounded_pow(p, d, maximum_extension_size) else {
             continue;
         };
         orders.push((order, d, extension_size));
@@ -141,7 +146,7 @@ fn admissible_orders(p: u64, retained_orders: &BTreeSet<u64>) -> Vec<(u64, u64, 
     orders
 }
 
-fn select() -> (Vec<Curve>, u64, u64) {
+fn select(maximum_extension_size: u128) -> (Vec<Curve>, u64, u64) {
     let mut selected = Vec::new();
     let mut retained_orders = BTreeSet::new();
     let mut primes_scanned = 0_u64;
@@ -156,7 +161,7 @@ fn select() -> (Vec<Curve>, u64, u64) {
         // orders against every structural rule before point-counting models.
         // This is equivalent to the original exhaustive scan, while avoiding
         // all p^2 models at primes where no order can qualify.
-        let target_orders = admissible_orders(p, &retained_orders);
+        let target_orders = admissible_orders(p, &retained_orders, maximum_extension_size);
         if target_orders.is_empty() {
             continue;
         }
@@ -252,6 +257,44 @@ fn json(selected: &[Curve], primes_scanned: u64, models_scanned: u64) -> String 
     output
 }
 
+fn feasibility_json() -> String {
+    let mut output = String::new();
+    writeln!(&mut output, "{{").unwrap();
+    writeln!(&mut output, "  \"schema\": \"h116.cohort-feasibility/v1\",").unwrap();
+    writeln!(&mut output, "  \"target_curve_count\": {TARGET_CURVES},").unwrap();
+    writeln!(&mut output, "  \"trials\": [").unwrap();
+    for (trial_index, maximum) in FEASIBILITY_CAPS.iter().enumerate() {
+        let (selected, primes_scanned, models_scanned) = select(*maximum);
+        writeln!(&mut output, "    {{").unwrap();
+        writeln!(&mut output, "      \"maximum_extension_size\": {maximum},").unwrap();
+        writeln!(&mut output, "      \"selected_count\": {},", selected.len()).unwrap();
+        writeln!(&mut output, "      \"primes_scanned\": {primes_scanned},").unwrap();
+        writeln!(&mut output, "      \"models_scanned\": {models_scanned},").unwrap();
+        writeln!(&mut output, "      \"curves\": [").unwrap();
+        for (curve_index, curve) in selected.iter().enumerate() {
+            let comma = if curve_index + 1 == selected.len() { "" } else { "," };
+            writeln!(
+                &mut output,
+                "        {{\"p\":{},\"a\":{},\"b\":{},\"order\":{},\"torsion_degree\":{},\"extension_size\":{}}}{}",
+                curve.p,
+                curve.a,
+                curve.b,
+                curve.order,
+                curve.torsion_degree,
+                curve.extension_size,
+                comma
+            )
+            .unwrap();
+        }
+        writeln!(&mut output, "      ]").unwrap();
+        let comma = if trial_index + 1 == FEASIBILITY_CAPS.len() { "" } else { "," };
+        writeln!(&mut output, "    }}{comma}").unwrap();
+    }
+    writeln!(&mut output, "  ]").unwrap();
+    writeln!(&mut output, "}}").unwrap();
+    output
+}
+
 fn selftest() {
     assert!(is_prime(2));
     assert!(is_prime(61));
@@ -259,9 +302,9 @@ fn selftest() {
     assert!(!is_prime(91));
     assert_eq!(torsion_degree(11, 5), None);
     assert_eq!(torsion_degree(31, 37), Some(4));
-    assert_eq!(bounded_pow(31, 4), Some(923_521));
+    assert_eq!(bounded_pow(31, 4, MAX_EXTENSION_SIZE), Some(923_521));
     assert_eq!(hasse_bound(31), 11);
-    assert!(admissible_orders(31, &BTreeSet::new())
+    assert!(admissible_orders(31, &BTreeSet::new(), MAX_EXTENSION_SIZE)
         .iter()
         .any(|&(order, degree, extension_size)| {
             order == 37 && degree == 4 && extension_size == 923_521
@@ -274,11 +317,18 @@ fn selftest() {
 }
 
 fn main() {
-    if std::env::args().nth(1).as_deref() == Some("--selftest") {
-        selftest();
-        return;
+    match std::env::args().nth(1).as_deref() {
+        Some("--selftest") => {
+            selftest();
+            return;
+        }
+        Some("--feasibility") => {
+            print!("{}", feasibility_json());
+            return;
+        }
+        _ => {}
     }
-    let (selected, primes_scanned, models_scanned) = select();
+    let (selected, primes_scanned, models_scanned) = select(MAX_EXTENSION_SIZE);
     assert_eq!(
         selected.len(),
         TARGET_CURVES,
