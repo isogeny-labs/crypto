@@ -191,9 +191,6 @@ impl J {
             _ => panic!("not an object when reading {key}"),
         }
     }
-    fn has(&self, key: &str) -> bool {
-        matches!(self, J::Obj(v) if v.iter().any(|(a, _)| a == key))
-    }
     fn a(&self) -> &Vec<J> {
         match self {
             J::Arr(v) => v,
@@ -1008,6 +1005,9 @@ fn cmd_run50(args: &[String]) {
             let expect = if neg { (std::f64::consts::PI / 4.0).sqrt() } else { (std::f64::consts::PI / 2.0).sqrt() };
             let ratio = steps / (l as f64).sqrt();
             r.note(&format!("{mode}_walk_length"), format!("steps {steps}, steps/sqrt(L) {ratio:.4}, generic expectation {expect:.4} (ratio to expectation {:.3})", ratio / expect));
+            // model-based, indicative: this host's observed seconds per step times the generic expected walk
+            let ns = inner[mode] * 1e9 / steps;
+            r.note(&format!("{mode}_expected_wall_indicative"), format!("{ns:.1} ns/step observed; generic-expectation walk would take {:.1} s on this host (interpretation, not a measurement)", ns * expect * (l as f64).sqrt() / 1e9));
             let unc: Vec<String> = wn.k("known_uncounted").a().iter().map(|u| format!("{}={}", u.k("name").s(), if u.k("count").is_null() { "null".to_string() } else { u.k("count").u().to_string() })).collect();
             r.note(&format!("{mode}_known_uncounted"), unc.join(", "));
         }
