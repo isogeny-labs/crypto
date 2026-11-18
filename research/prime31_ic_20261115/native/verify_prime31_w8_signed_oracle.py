@@ -42,7 +42,9 @@ def signed_slots(b):
         plus=[scalar(w,p) for p in points]
         assert all(curve(q) and q is not None for q in plus)
         slots.append(plus+[neg(q) for q in plus])
-    xs=[q[0] for slot in slots for q in slot]
+    xs=[q[0] for slot in slots for q in slot[:b]]
+    # Plus and minus share an x by design; require disjoint abscissae
+    # only across the eight distinct positive weighted slot images.
     assert len(xs)==len(set(xs)), "weighted x root sets must be disjoint"
     return points,slots
 
