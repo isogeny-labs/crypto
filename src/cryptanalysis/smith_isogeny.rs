@@ -42,6 +42,12 @@ use super::smith_canonical::{
 };
 use super::smith_prop24::{deg, SplitMix64};
 
+/// The divisor-class Smith map (`Smith`, `Hyp`, `Mum`, `Pic`, `W1Bridge`, the
+/// T1-T6 engines), restored from before the 2026-11-16 sparse merge; used by
+/// [`super::smith_route_s`] and `examples/smith_isogeny.rs`.
+pub mod divisor_map;
+pub use divisor_map::*;
+
 /// Smith's isogeny on one curve, with everything needed to move classes.
 pub struct SmithIso {
     pub p: u64,
