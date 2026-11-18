@@ -58,7 +58,9 @@ jobs:
             /build.rs
             /crates/
             /compat/ct_dynamic_audit.rs
-            /research/full_volcano_graphwide_ic_20261017/execution/summarize.rs
+            /research/full_volcano_graphwide_ic_20261017/execution/
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct209_native_source_preflight.py
             /research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs
             /docs/ic/
             /docs/ecbench/
@@ -70,16 +72,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
-      - name: Fail fast if manifest-registered binary source is omitted
+      - name: Fail fast on missing manifest bins and literal include resources
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import tomllib
-          manifest = tomllib.loads(Path("Cargo.toml").read_text())
-          absent = [b["path"] for b in manifest.get("bin", []) if not Path(b["path"]).is_file()]
-          print(f"CT208 manifest source preflight: {len(manifest.get('bin', []))} registered binaries")
-          if absent:
-              raise SystemExit("sparse checkout omitted Cargo binary sources: " + ", ".join(absent))
-          PY
+          (cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204 && python3 -m unittest -v test_ct209_native_source_preflight.py)
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py .
       - name: Compile and actually execute all toy logs
         run: cargo test --locked --release --test prime_cover_toy_complete_dlp -- --nocapture
