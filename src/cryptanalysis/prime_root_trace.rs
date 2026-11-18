@@ -547,8 +547,21 @@ pub fn solve(
 
 // Independent verifier arithmetic. This never invokes Engine or solve and does
 // not search for roots: only modular powering, Euclidean identities, and products.
+#[inline]
 fn vmul(a: u64, b: u64, p: u64) -> u64 {
-    ((a as u128 * b as u128) % p as u128) as u64
+    // This verifier remains independent of the Engine's field arithmetic.
+    // The trace enforces canonical coefficients, but keep the wide fallback
+    // for standalone verifier helpers and malformed public inputs.
+    if p == MAX_PRIME && a < p && b < p {
+        let product = a as u128 * b as u128;
+        let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
+        let folded = (folded & MAX_PRIME) + (folded >> 61);
+        if folded >= p { folded - p } else { folded }
+    } else if p <= u32::MAX as u64 && a < p && b < p {
+        (a * b) % p
+    } else {
+        ((a as u128 * b as u128) % p as u128) as u64
+    }
 }
 fn vpow(mut a: u64, mut e: u64, p: u64) -> u64 {
     let mut r = 1;
@@ -568,7 +581,20 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         for (j, &y) in b.iter().enumerate() {
-            r[i + j] = ((r[i + j] as u128 + x as u128 * y as u128) % p as u128) as u64;
+            // Fused multiply-accumulate: no u128 division for canonical
+            // small fields or the 61-bit Mersenne prime.
+            r[i + j] = if p == MAX_PRIME {
+                let product = x as u128 * y as u128;
+                let folded = ((product as u64) & MAX_PRIME)
+                    + (product >> 61) as u64 + r[i + j];
+                let folded = (folded & MAX_PRIME) + (folded >> 61);
+                if folded >= p { folded - p } else { folded }
+            } else if p <= u32::MAX as u64 {
+                // (p-1)^2 + (p-1) < 2^64 when p <= 2^32-1.
+                (r[i + j] + x * y) % p
+            } else {
+                ((r[i + j] as u128 + x as u128 * y as u128) % p as u128) as u64
+            };
         }
     }
     trim(r)
@@ -585,8 +611,10 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
         let c = vmul(*r.last().unwrap(), inv, p);
         q[shift] = c;
         for (i, &x) in b.iter().enumerate() {
-            r[shift + i] =
-                ((r[shift + i] as u128 + p as u128 - vmul(c, x, p) as u128) % p as u128) as u64;
+            let product = vmul(c, x, p);
+            let old = r[shift + i];
+            r[shift + i] = if old >= product { old - product }
+                           else { old + p - product };
         }
         r = trim(r);
     }
@@ -696,8 +724,13 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("noncanonical field operation".into());
                 }
                 let expected = match op {
-                    FieldOp::Add => ((*a as u128 + *b as u128) % p as u128) as u64,
-                    FieldOp::Sub => ((*a as u128 + p as u128 - *b as u128) % p as u128) as u64,
+                    FieldOp::Add => {
+                        let sum = *a + *b; // canonical, p <= 2^61-1
+                        if sum >= p { sum - p } else { sum }
+                    }
+                    FieldOp::Sub => {
+                        if a >= b { *a - *b } else { *a + p - *b }
+                    },
                     FieldOp::Mul => vmul(*a, *b, p),
                     FieldOp::Square => {
                         if a != b {
@@ -862,7 +895,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 canonical(polynomial, p)?;
                 if polynomial.len() != 2
                     || *root >= p
-                    || !(vmul(polynomial[1], *root, p) + polynomial[0]).is_multiple_of(p)
+                    || { let sum = vmul(polynomial[1], *root, p) + polynomial[0]; sum != 0 && sum != p }
                 {
                     return Err("linear root identity failed".into());
                 }
