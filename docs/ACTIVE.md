@@ -15,6 +15,9 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Binary GF(2^n) Koblitz fall-degree sweep: d_F of the Weil-descent/Semaev system vs n, with/without Frobenius-orbit structure (preregister + small-n local data + pod plan) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
+- [ ] Diagnose the n=83 Frobenius-orbit IC zero-relations result: search-cap/tuning artifact vs fundamental (forensic on koblitz_n83_factor_base_sweep_20261008, read-only) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
+- [ ] Design an experiment that attacks the IC-vs-rho slope beta (factor-base structures that could change the exponent, not the constant) — preregistration only, no claim (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
 - [ ] hky2 engine, second speed pass: adaptive schedule and parallel sequential pass, equality-gated (claude, started 2026-11-17, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
 - [ ] hky2 pod runs, part 3: depth-14 degree-6 closure and (6,3) degree-8 closure, final write-up, pods and proxy hosts cleaned up (claude, started 2026-11-17, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
