@@ -1,0 +1,14 @@
+PRESET amendment 1 (2026-11-18), written after partial data, before the -l 1 ladder.   [pcc:unverified]
+The kill rule, arms, metrics, analysis and thresholds of PRESET.txt are unchanged.
+
+1. Instrument mode. From the first run, msolve was called with -g 2 (reduced DRL Groebner basis
+   only; no FGLM / rational parametrisation), not the default solve mode the preset names. This
+   holds for every arm alike. The decomposition answer (empty or not) is read from the GB ([1] or not).
+2. Linear algebra option. msolve -l 2 (its default, exact sparse) exits with SIGSEGV (rc 139,
+   0.01 s) on every Semaev system with p > 2^16 tried: all 9 calls of the m=3, 18-bit cell, and
+   by hand 18-bit p with L = 8, 16, 24, 32, 40 (no memory limit), while toy systems at p up to 2^31
+   run. -l 1 (exact sparse/dense) runs on the same 18-bit and a 20-bit input. The primary
+   instrument for all bits is therefore msolve -l 1 -g 2 -t 1 -v 2; the -l 2 ladder is rerun
+   nowhere and its data (m=3: 12-16 bits; m=4: 12-14 bits, one 16-bit cell interrupted) is kept in
+   runs/l2_crosscheck/ as an instrument cross-check only, not used for the verdict.
+3. Data seen before this amendment: the -l 2 rows listed in item 2.

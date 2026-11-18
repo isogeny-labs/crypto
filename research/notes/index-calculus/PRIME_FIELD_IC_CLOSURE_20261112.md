@@ -38,7 +38,7 @@ R5 adds three things:
    - **Limits:** the model leaves out F4. The checker found that F4 also solves at a much lower degree than XL on univariate bases, so the closures under Theorem B depend on the model as much as the PKM case does.
 2. **PKM chain at m ≥ 6: KILL at toy scale for m = 4–7** under the preset rule, with msolve's F4 on the raw Kummer chain at N ≤ 21.
    - The checker judged this verdict fragile. The m = 6 and m = 7 KILLs each rest on a slope measured over a single step, and that step is censored (m = 6) or comes from a small-base fallback (m = 7).
-   - It does not close PKM for m ≥ 8. If D rises one degree per t-step, then at m = 8 the w = 1 cost model gives exponent 0.43, below rho's 0.5.
+   - ~~It does not close PKM for m ≥ 8. If D rises one degree per t-step, then at m = 8 the w = 1 cost model gives exponent 0.43, below rho's 0.5.~~ **Withdrawn 2026-11-18:** the 0.43 figure used a wrong cost rule. The corrected rule (s < (m−1)/2) gives E = 0.621 at m = 8, w = 1, which is a KILL, not a figure below rho `[pcc:unverified]`. See Section 4.6.
 3. **Lifting (A8): ruled out asymptotically within a stated model.** The model has fixed r, fresh uniform masks and lifts over Q of polynomial size. The proof assumes no conjecture and uses only published theorems (Petsche 2006 Thm 2, Silverman 1990, Mazur). It is a paper proof and is not machine-checked.
    - It does not settle concrete sizes: r ≥ 7 is not excluded at 256 bits.
    - Silverman–Suzuki-type lifts with growing rank stay open.
@@ -246,7 +246,7 @@ The checker recomputed α*, σ and the implied exponents: all correct.
      - halving the slope puts m = 6 at 0.443 and m = 7 at 0.370, both below rho's 0.5, and the item reads INCONCLUSIVE.
 2. **Falsification check never exercised.** The preset's only route to SURVIVE was A m4 t4, and it was not run. The repo's committed P1 value for that cell (D = 7, flat) would still read KILL under the t = 2→4 slope (σ = 0.125).
 3. **m ≥ 8 is not closed.**
-   - If σ = 1/m, then w = 1 already beats rho at m = 8 (exponent 0.43).
+   - ~~If σ = 1/m, then w = 1 already beats rho at m = 8 (exponent 0.43).~~ Withdrawn 2026-11-18: under the corrected cost rule s < (m−1)/2, m = 8, w = 1 gives E = 0.621, a KILL `[pcc:unverified]` (Section 4.6).
    - Under w = 2, σ = 1/m falls below α*(m,2) from m = 14 on (0.0714 against 0.0774).
    - The report's "α*(m,2) ≤ 0.11 is below every measured slope" is therefore misleading.
 4. **Censored values.**
@@ -272,6 +272,18 @@ The checker recomputed α*, σ and the implied exponents: all correct.
 The owner decision of 2026-11-11 stopped measurement of the **first fall degree** and named the **last fall degree** as the live question. This lab measured the solving degree D, which is at least the last fall degree, so the decision does not cover it.
 
 The decisive PKM cells (m = 4 at N = 20; m = 2 at t = 13/14) are still pending with the owner and were not run. **The item is not closed by decision.**
+
+### 4.6 Round 7 (2026-11-18)
+
+Every result in this subsection is `[pcc:unverified]`; none has a pcc claim id yet.
+
+- **Cost rule correction** (`research/pkm_cost_rules_20261115/`): the m = 8, w = 1 exponent 0.43 quoted in Sections 1 and 4.3 is withdrawn. With the corrected rule s < (m−1)/2 the exponent is E = 0.621, a KILL `[pcc:unverified]`.
+- **PKM m = 8** (`research/pkm_m8_settle_20261115/`): D = 8 exact; KILL under both readings of the preset `[pcc:unverified]`.
+- **PKM m = 9:** KILL under reading B `[pcc:unverified]`.
+- **PKM m = 10:** inconclusive (runs stopped or out of memory; logs in the same directory) `[pcc:unverified]`.
+- **F4 degree lower bound:** D_PC ≥ D_ff is proved (paper proof, not machine-checked). The degree-only route to a cost bound is ruled out; the supporting evidence covers m = 2 and 3 only `[pcc:unverified]`.
+- **BKK route** (`research/prime_field_ic_closure_20261112/bkk_a9_msolve_20261118/`): killed `[pcc:unverified]`. Deviation: runs used a 4.5 GB memory cap instead of the frozen 6 GB, and the 18-bit dense cell is censored (see that directory's `DEVIATIONS.md`).
+- **Lifting heights** (`research/prime_field_ic_closure_20261112/finish/lifting/followup_20261118_lift_height/`): r = 7 and 8 empirically supported as ruled out; r = 9 is near-inconclusive, and its estimator changed after pass 1 (see `DEVIATIONS.txt`). Published Lang-type constants (10^11 to 10^14) are too weak to settle concrete sizes `[pcc:unverified]`.
 
 ---
 
