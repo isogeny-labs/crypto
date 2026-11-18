@@ -2318,8 +2318,8 @@ impl<G: CountedGroup> DecompositionOracle<G> for SubtractOracle {
 /// With `batch=1` (the default) the table's sums and the `m = 3` rows
 /// `R − P_i` come from [`CountedGroup::add_each_batched`] (on a prime curve
 /// one inversion a block, not one an addition): the same table, probes,
-/// relations and charged additions as `batch=0`, the serial path.  The
-/// `layout=lines` table is built serially either way.
+/// relations and charged additions as `batch=0`, the serial path, in
+/// either layout.
 pub struct MitmOracle {
     m: u32,
     lines: bool,
@@ -2393,7 +2393,11 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
             return Err("layout=lines requires negation_folded=1".into());
         }
         let table = if self.lines {
-            PairTable::build_negation_folded_lines(ctx.group, fb)
+            if self.batch {
+                PairTable::build_negation_folded_lines_batched(ctx.group, fb)
+            } else {
+                PairTable::build_negation_folded_lines(ctx.group, fb)
+            }
         } else if params.flag("negation_folded") {
             if self.batch {
                 PairTable::build_negation_folded_batched(ctx.group, fb)

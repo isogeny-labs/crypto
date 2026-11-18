@@ -8981,6 +8981,61 @@ impl PairTable {
         }
     }
 
+    /// [`Self::build_negation_folded_lines`] with each row's sums through
+    /// [`CountedGroup::add_each_batched`]: the same entries, witnesses and
+    /// charged additions as the serial lines build, and the same field
+    /// tally as [`Self::build_negation_folded_batched`].
+    pub fn build_negation_folded_lines_batched<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+    ) -> Self {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut lines = PairLineIndex::with_capacity(a * a + 1);
+        let mut attempts = 0u64;
+        let mut row_idx: Vec<usize> = Vec::new();
+        let mut row_pts: Vec<G::Elt> = Vec::new();
+        for ai in 0..a {
+            let i = groups[ai][0];
+            row_idx.clear();
+            row_pts.clear();
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    row_idx.push(j);
+                    row_pts.push(fb.points[j]);
+                }
+            }
+            g.add_each_batched(&mut ops, fb.points[i], &row_pts, false, &mut |_, off, s| {
+                if !g.is_identity(&s) {
+                    lines.insert_if_absent(g.key(&s) >> 1, i as u32, row_idx[off] as u32);
+                    attempts += 1;
+                }
+                false
+            });
+        }
+        Self {
+            kind: "negation_folded",
+            entries: lines.len as u64,
+            map: fast_map(0),
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: Some(lines),
+            dense: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+            filter_bit_sets: 0,
+        }
+    }
+
     /// [`Self::build_negation_folded`] with each row's sums through
     /// [`CountedGroup::add_each_batched`], as [`Self::build_batched`] is to
     /// [`Self::build`]: the same table and charged additions, the batched
