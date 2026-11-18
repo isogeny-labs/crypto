@@ -32,19 +32,21 @@ identification and duality as explicit caller obligations.  The scalar-two
 and scalar-three short-Weierstrass instances are now discharged separately by
 explicit Bezout certificates.  For generic scalar, no-cancellation is reduced
 exactly to the two adjacent EDS terms and the parity factor being coprime to
-the squared denominator.
+the squared denominator.  A second generic layer proves that absence of a
+common root is enough and that adjacent torsion orders intersect only at the
+zero point; the remaining bridge is exact division-polynomial root semantics.
 `degree_product_without_duality_control` checks the logical
 boundary: at `N=6`, unequal degrees 4 and 9 still multiply to `N^2=36`, so the
 dual/equal-degree premise cannot be dropped.
 
 The current Lean source SHA-256 is
-`087a923199f21152b06c96ed872d11b4668efa5824fc2aa47bace34ebdb60349`.
-The pinned build succeeds, and the repository auditor reports 153 theorems,
+`a020149d495ac2c26c2332d463c43a55817d5c4b6cf617f27d69a4d47cacd282`.
+The pinned build succeeds, and the repository auditor reports 157 theorems,
 zero failures and zero trusted native decisions.  This proves the implication
 from the geometric degree certificates; it does not construct those elliptic
 certificates and is not a subexponential ECDLP proof. [pcc:unverified]
 
-The twenty-one degree-layer theorem declarations are:
+The twenty-five degree-layer theorem declarations are:
 
 - `finiteFieldTower_degree_mul`, Mathlib's finite-rank tower law in the
   orientation used by curve-map degrees;
@@ -82,6 +84,14 @@ The twenty-one degree-layer theorem declarations are:
   obligations;
 - `divisionPolynomialCoprimality_missingFactor_control`, which proves that
   dropping one of those factor premises is unsound;
+- `polynomial_isCoprime_of_no_common_root`, which turns absence of shared
+  roots over an algebraically closed field into exact polynomial coprimality;
+- `adjacentIntegerTorsion_eq_zero`, which proves adjacent torsion orders have
+  only the zero group element in common;
+- `polynomial_isCoprime_of_adjacent_torsion_root_semantics`, which composes a
+  root-to-nonzero-torsion certificate with the preceding two laws;
+- `adjacentIntegerTorsion_zero_control`, which records why the nonzero point
+  clause cannot be omitted;
 - `unequalCoordinateLineDegrees_control`, which proves that unequal projection
   degrees make the adjacent map degree nonidentifiable from a shared total;
 - `scalarMultiplicationXMap_exact_degrees`, which exposes the exact

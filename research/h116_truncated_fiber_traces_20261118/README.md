@@ -319,7 +319,13 @@ three certificates suffice: `prePsi_(n+1)`, `prePsi_(n-1)`, and the parity
 factor must each be coprime to `PsiSq_n`.  An integer mutation shows that one
 certificate cannot simply be omitted.  The unresolved generic theorem is now
 this adjacent-EDS/parity coprimality package rather than an opaque rational-
-function cancellation claim. [pcc:unverified]
+function cancellation claim.  Lean also closes the next root-semantic layer:
+polynomials over an algebraically closed field with no common root are
+coprime, and a group element killed by `[n]` and `[n+1]` is zero.  Hence a
+common-root-to-nonzero-adjacent-torsion certificate would discharge each
+adjacent polynomial obligation.  The exact missing bridge is now to construct
+that nonzero elliptic point from Mathlib's division-polynomial roots; a zero-
+point control proves the nonzero clause is necessary. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

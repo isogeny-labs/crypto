@@ -893,6 +893,41 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | `IsCoprime (W.Phi n) (W.PsiSq n)` | exact division-polynomial reduction | H116 over Mathlib `Phi` | arbitrary Weierstrass curve over a commutative ring | adjacent and parity factors coprime to `PsiSq n` |
 | omitted first factor premise can fail | negative control | H116 integer arithmetic | fixed `x=0,m=2,a=2,b=c=1` | only the retained factors are coprime |
 
+## Adjacent-torsion root-semantics gate
+
+1. **Structure above.** Over an algebraically closed field, two polynomials
+   are coprime if they have no common root: a nonunit gcd would
+   have nonzero degree, hence a root, and that root propagates through both gcd
+   divisibilities.  In any additive group, simultaneous equations
+   `[n]P=0` and `[n+1]P=0` force `P=0` by subtraction.
+2. **Theorems used as stated.** `gcd_isUnit_iff`,
+   `Polynomial.isUnit_iff_degree_eq_zero`, `IsAlgClosed.exists_root`,
+   `Polynomial.IsRoot.dvd`, and integer scalar-addition laws supply the two
+   generic arguments.  No elliptic group law is copied.
+3. **Object as an instance.** A semantic wrapper accepts a certificate that
+   every common polynomial root produces a nonzero group element killed by
+   adjacent integers.  The group theorem makes that certificate contradictory,
+   and the root criterion returns polynomial coprimality.
+4. **Assembly probe.** The root criterion, adjacent-scalar group law, semantic
+   wrapper and zero-point control first elaborated in a temporary module.  The
+   tracked project then completed all 3,162 build jobs; the exact repository
+   auditor reports `157 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The wrapper does not yet construct an elliptic
+   point from a root of `prePsi n`, prove that it is nonzero, or prove that the
+   two roots encode `[n]P=[n+1]P=0`.  Those exact division-polynomial root
+   semantics are now the remaining geometric bridge. [pcc:unverified]
+6. **Inheritance table.** Algebraic-closure roots, polynomial gcds and integer
+   scalar laws are inherited from Mathlib.  H116 composes them and explicitly
+   exposes the root-to-torsion premise.  The zero group element satisfies both
+   adjacent equations and is the boundary control.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| no common root implies `IsCoprime p q` | generic algebraic law | H116 over Mathlib gcd/root APIs | algebraically closed field | no shared root |
+| adjacent integer torsion intersects trivially | generic group law | H116 over integer scalar addition | arbitrary additive group | `[n]P=0`, `[n+1]P=0` |
+| root-to-adjacent-torsion semantics implies coprimality | semantic assembly | H116 over the preceding laws | algebraically closed field plus additive group | each common root supplies a nonzero adjacent-torsion point |
+| zero point satisfies both equations | boundary control | H116 group simplification | arbitrary additive group | `P=0` |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-087a923199f21152b06c96ed872d11b4668efa5824fc2aa47bace34ebdb60349  H116FiberTrace.lean
+a020149d495ac2c26c2332d463c43a55817d5c4b6cf617f27d69a4d47cacd282  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  153 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  157 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -70,6 +70,8 @@ ea01d069a7682bd04bb64a5aa113cba204622e24b66ef16a0fd376403eb8f584  receipts/scala
 5731fc9c7bc418dc7f99cdd3b422f4618771e1843776691afc5736f5b66aaecc  receipts/scalar-three-coprimality-audit.txt
 912ad7b074051d0da17a004b556754ab5aeb2c4932d8aa788c23a3225afdf3f9  receipts/generic-coprimality-reduction-build.txt
 1932e63c3f78d6ed02cba849b8c5040c19c4fccee3c541e930c35b3848c8a664  receipts/generic-coprimality-reduction-audit.txt
+912ad7b074051d0da17a004b556754ab5aeb2c4932d8aa788c23a3225afdf3f9  receipts/adjacent-root-semantics-build.txt
+c2024fa98bfb039e1e161b9ee6128ef176a1c04af4c80e3bcaa9952c64f80356  receipts/adjacent-root-semantics-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -320,6 +322,15 @@ parity factor are each coprime to `PsiSq n`, then `Phi n` is coprime to
 three factor certificates compose.  An integer mutation proves that omitting
 one factor premise is unsound.  The adjacent-EDS and parity-factor premises
 are now the explicit remaining generic obligations. [pcc:unverified]
+
+The 157-theorem checkpoint proves the next semantic layer.  Over an
+algebraically closed field, no common polynomial root implies coprimality via
+the Euclidean gcd.  In any additive commutative group, a point killed by
+adjacent integer scalars is zero.  Therefore a certificate mapping every
+common root to a nonzero adjacent-torsion point implies polynomial
+coprimality.  A zero-point control proves the nonzero clause is essential.
+Constructing that point and proving the division-polynomial root semantics
+remain open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

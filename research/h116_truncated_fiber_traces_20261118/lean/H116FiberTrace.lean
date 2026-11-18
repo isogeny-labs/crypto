@@ -7,6 +7,7 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
 import Mathlib.FieldTheory.RatFunc.IntermediateField
 import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
 import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.RingTheory.FormalGroup.Basic
@@ -1140,6 +1141,60 @@ theorem divisionPolynomialCoprimality_missingFactor_control :
     IsCoprime (1 : ℤ) 2 ∧ IsCoprime (1 : ℤ) 2 ∧
       ¬IsCoprime ((0 : ℤ) * 2 - 2 * 1 * 1) 2 := by
   norm_num [IsCoprime]
+
+/-- Over an algebraically closed field, absence of a common root is an exact
+certificate that two polynomials are coprime. -/
+theorem polynomial_isCoprime_of_no_common_root
+    {F : Type*} [Field F] [IsAlgClosed F] {p q : Polynomial F}
+    (hroot : ∀ x : F, p.IsRoot x → q.IsRoot x → False) :
+    IsCoprime p q := by
+  classical
+  apply EuclideanDomain.gcd_isUnit_iff.mp
+  rw [Polynomial.isUnit_iff_degree_eq_zero]
+  by_contra hdegree
+  let x := Classical.choose
+    (IsAlgClosed.exists_root (EuclideanDomain.gcd p q) hdegree)
+  have hx := Classical.choose_spec
+    (IsAlgClosed.exists_root (EuclideanDomain.gcd p q) hdegree)
+  exact hroot x
+    (hx.dvd (EuclideanDomain.gcd_dvd_left p q))
+    (hx.dvd (EuclideanDomain.gcd_dvd_right p q))
+
+/-- A point killed by adjacent integer scalars is zero in any additive
+commutative group. -/
+theorem adjacentIntegerTorsion_eq_zero
+    {G : Type*} [AddCommGroup G] (n : ℤ) (P : G)
+    (hn : n • P = 0) (hnext : (n + 1) • P = 0) : P = 0 := by
+  calc
+    P = (n + 1) • P - n • P := by
+      rw [add_zsmul]
+      simp
+    _ = 0 := by rw [hnext, hn, sub_zero]
+
+/-- Root semantics bridge: if every common polynomial root produces a nonzero
+group element killed by adjacent integers, then the polynomials are coprime. -/
+theorem polynomial_isCoprime_of_adjacent_torsion_root_semantics
+    {F : Type*} [Field F] [IsAlgClosed F] {p q : Polynomial F}
+    {G : Type*} [AddCommGroup G] (n : ℤ)
+    (hsemantic : ∀ x : F, p.IsRoot x → q.IsRoot x →
+      ∃ P : G, P ≠ 0 ∧ n • P = 0 ∧ (n + 1) • P = 0) :
+    IsCoprime p q := by
+  apply polynomial_isCoprime_of_no_common_root
+  intro x hpx hqx
+  let witness := hsemantic x hpx hqx
+  let P := Classical.choose witness
+  have hspec := Classical.choose_spec witness
+  have hP := hspec.1
+  have hn := hspec.2.1
+  have hnext := hspec.2.2
+  exact hP (adjacentIntegerTorsion_eq_zero n P hn hnext)
+
+/-- Boundary control: the zero point always satisfies both adjacent torsion
+equations, so the nonzero clause in the root-semantics bridge is essential. -/
+theorem adjacentIntegerTorsion_zero_control
+    {G : Type*} [AddGroup G] (n : ℤ) :
+    n • (0 : G) = 0 ∧ (n + 1) • (0 : G) = 0 := by
+  simp
 
 /-- Specialize the Frobenius--Verschiebung ring calculation to additive
 endomorphisms of a point group. Integer scalars are central automatically, and
@@ -3165,6 +3220,10 @@ theorem rationalMap_separation_strict_control :
 #print axioms subMultiple_isCoprime_of_factors
 #print axioms divisionPolynomialPhi_isCoprime_of_factors
 #print axioms divisionPolynomialCoprimality_missingFactor_control
+#print axioms polynomial_isCoprime_of_no_common_root
+#print axioms adjacentIntegerTorsion_eq_zero
+#print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics
+#print axioms adjacentIntegerTorsion_zero_control
 #print axioms endomorphism_frobeniusVerschiebung_sum
 #print axioms endomorphism_injectivity_control
 #print axioms affineFrobeniusPointEnd_injective
