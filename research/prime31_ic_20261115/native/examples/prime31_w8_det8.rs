@@ -79,7 +79,8 @@ fn determinant9(pts:&[(u64,u64);8],r:(u64,u64))->(u64,FpCost) {
 fn admissible(pts:&[(u64,u64);8],r:Point)->bool {
     let Some(r)=r else {return false};
     let mut seen=HashSet::new();
-    for &q in pts.iter().chain(std::iter::once(&neg(r))) {
+    let nr=neg(r);
+    for &q in pts.iter().chain(std::iter::once(&nr)) {
         if q.0>=P||q.1>=P||!seen.insert(q) {return false}
     }
     true
@@ -87,7 +88,8 @@ fn admissible(pts:&[(u64,u64);8],r:Point)->bool {
 fn canonical_base(ar:&mut Arithmetic)->Vec<(u64,u64)> {
     let mut out=Vec::new();
     for x in 0..10_000 {
-        if let Some(y)=ar.sqrt(ar.rhs(PRIME31,x),P) {
+        let rhs=ar.rhs(PRIME31,x);
+        if let Some(y)=ar.sqrt(rhs,P) {
             if y!=0 {
                 let q=(x,y.min(P-y));
                 assert!(ar.on_curve(PRIME31,Some(q)));
@@ -106,7 +108,7 @@ fn weighted_slots(ar:&mut Arithmetic,base:&[(u64,u64)]) ->Vec<Vec<(u64,u64)>> {
             let p=ar.scalar(PRIME31,w,Some(q)).expect("nonidentity weighted point");
             assert!(xs.insert(p.0),"weighted slot abscissae must be disjoint");
             p
-        }).collect()
+        }).collect::<Vec<_>>()
     }).collect();
     assert_eq!(xs.len(),248);
     out
