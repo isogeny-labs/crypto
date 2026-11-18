@@ -681,6 +681,78 @@ fn pipeline_tuned_any(
     }
 }
 
+/// The one-multiply filter probe, 8 keys at a time with AVX-512: one
+/// `vpmullq` for the hashes, one gather for the words, a variable shift for
+/// the four bits, one compare for the verdicts. Survivors (about 3.4 %) go
+/// to the exact set. `block.len()` is a multiple of 8.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2,avx512f,avx512dq,avx512vl,bmi2")]
+unsafe fn probe_block_simd(
+    block: &[u64],
+    bloom: &WordBloom,
+    keys: &HashSet<u64, impl BuildHasher>,
+) -> u64 {
+    use std::arch::x86_64::*;
+    debug_assert!(bloom.cheap && block.len() % 8 == 0);
+    let c = _mm512_set1_epi64(0x9E37_79B9_7F4A_7C15u64 as i64);
+    let m63 = _mm512_set1_epi64(63);
+    let mask = _mm512_set1_epi64(bloom.mask as i64);
+    let one = _mm512_set1_epi64(1);
+    let base = bloom.words.as_ptr();
+    let mut found = 0;
+    for chunk in block.chunks_exact(8) {
+        let x = _mm512_loadu_si512(chunk.as_ptr() as *const _);
+        let h = _mm512_mullo_epi64(x, c);
+        let idx = _mm512_and_si512(_mm512_srli_epi64::<34>(h), mask);
+        let w = _mm512_i64gather_epi64::<8>(idx, base as *const _);
+        let b0 = _mm512_sllv_epi64(one, _mm512_and_si512(h, m63));
+        let b1 = _mm512_sllv_epi64(one, _mm512_and_si512(_mm512_srli_epi64::<6>(h), m63));
+        let b2 = _mm512_sllv_epi64(one, _mm512_and_si512(_mm512_srli_epi64::<12>(h), m63));
+        let b3 = _mm512_sllv_epi64(one, _mm512_and_si512(_mm512_srli_epi64::<18>(h), m63));
+        let bits = _mm512_or_si512(_mm512_or_si512(b0, b1), _mm512_or_si512(b2, b3));
+        let mut pass: u8 = _mm512_cmpeq_epi64_mask(_mm512_and_si512(w, bits), bits);
+        while pass != 0 {
+            let i = pass.trailing_zeros() as usize;
+            pass &= pass - 1;
+            let v = chunk[i];
+            if v != u64::MAX && keys.contains(&v) {
+                found += 1;
+            }
+        }
+    }
+    found
+}
+
+/// Fused 16-lane pipeline with the AVX-512 probe (one-multiply filter).
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2,avx512f,avx512dq,avx512vl,bmi2")]
+unsafe fn pipeline_simd_probe(
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+    bloom: &WordBloom,
+    keys: &HashSet<u64, impl BuildHasher>,
+) -> u64 {
+    const K: usize = 16;
+    let a = bx.len();
+    let mut pre = vec![0u32; a * K];
+    let mut buf = vec![0u64; 2 * K * BLK];
+    let mut found = 0;
+    for chunk in tm.chunks_exact(K) {
+        let xr: [u64; K] = std::array::from_fn(|l| chunk[l].0);
+        let yr: [u64; K] = std::array::from_fn(|l| chunk[l].1);
+        row_lanes_fused::<K, u32, _>(f, bx, by, &xr, &yr, &mut pre, &mut buf, |block| {
+            found += probe_block_simd(block, bloom, keys);
+        });
+    }
+    found
+}
+
+fn fast_keys_contains(keys: &HashSet<u64>, x: &u64) -> bool {
+    keys.contains(x)
+}
+
 fn best<F: FnMut() -> u64>(reps: usize, mut run: F) -> (f64, u64) {
     let mut t = f64::INFINITY;
     let mut out = 0;
@@ -980,11 +1052,40 @@ fn main() {
             pos
         });
         let cheap_fpr = (pos_c / probe_rounds as u64 - sample_hits) as f64 / sample.len() as f64;
+        // The AVX-512 probe alone, over the same sample (truncated to a
+        // multiple of 8), against the scalar one-multiply probe's hit count.
+        let simd_ok = have_avx512() && best_k == 16 && best_simd;
+        let sample8 = &sample[..sample.len() / 8 * 8];
+        let exact8 = sample8
+            .iter()
+            .filter(|x| **x != u64::MAX && fast_keys_contains(&keys, x))
+            .count() as u64;
+        let mut t_simd_filter = f64::NAN;
+        if simd_ok {
+            let fast_s: FastSet = keys.iter().copied().collect();
+            let (t, n) = best(reps, || {
+                let mut n = 0u64;
+                for _ in 0..probe_rounds {
+                    // SAFETY: simd_ok implies AVX-512 is present.
+                    n += unsafe {
+                        probe_block_simd(black_box(sample8), black_box(&bloom8c), &fast_s)
+                    };
+                }
+                n
+            });
+            assert_eq!(
+                n,
+                exact8 * probe_rounds as u64,
+                "the SIMD probe finds exactly the exact hits"
+            );
+            t_simd_filter = t;
+        }
 
         // Probe-side arms (16 lanes, 8-bit filter, mix-hash set), interleaved
         // round by round so drift on the shared host hits every arm alike.
         let mut tuned_best = vec![f64::INFINITY; TUNED_ARMS.len()];
         let mut t_cheap_pipe = f64::INFINITY;
+        let mut t_simd_pipe = f64::INFINITY;
         for _ in 0..reps {
             for (i, &arm) in TUNED_ARMS.iter().enumerate() {
                 let t0 = Instant::now();
@@ -1007,6 +1108,14 @@ fn main() {
             ));
             t_cheap_pipe = t_cheap_pipe.min(t0.elapsed().as_secs_f64());
             assert_eq!(n, hits_ref, "cheap-hash arm");
+            if simd_ok {
+                let t0 = Instant::now();
+                // SAFETY: simd_ok implies AVX-512 is present.
+                let n =
+                    black_box(unsafe { pipeline_simd_probe(&f, &bx, &by, &tm, &bloom8c, &fast) });
+                t_simd_pipe = t_simd_pipe.min(t0.elapsed().as_secs_f64());
+                assert_eq!(n, hits_ref, "SIMD-probe arm");
+            }
         }
         let mut tuned_ns = serde_json::Map::new();
         for (i, arm) in TUNED_ARMS.iter().enumerate() {
@@ -1024,6 +1133,31 @@ fn main() {
             TUNED_ARMS[tuned_i]
         };
         let thread_filter = if use_cheap { &bloom8c } else { &bloom8 };
+        let mut simd_threads_ns = serde_json::Map::new();
+        if simd_ok {
+            for &nt in &thread_set {
+                let per = (tm.len() / nt / 16) * 16;
+                let (t, found) = best(reps, || {
+                    std::thread::scope(|s| {
+                        let hs: Vec<_> = (0..nt)
+                            .map(|i| {
+                                let part = &tm[i * per..(i + 1) * per];
+                                let (f, bx, by, fast, bl) = (&f, &bx, &by, &fast, &bloom8c);
+                                // SAFETY: simd_ok implies AVX-512 is present.
+                                s.spawn(move || unsafe {
+                                    pipeline_simd_probe(f, bx, by, part, bl, fast)
+                                })
+                            })
+                            .collect();
+                        hs.into_iter().map(|h| h.join().unwrap()).sum::<u64>()
+                    })
+                });
+                if per * nt == tm.len() {
+                    assert_eq!(found, hits_ref);
+                }
+                simd_threads_ns.insert(nt.to_string(), json!(t * 1e9 / (per * nt * 2 * a) as f64));
+            }
+        }
         let mut tuned_threads_ns = serde_json::Map::new();
         if best_k == 16 {
             for &nt in &thread_set {
@@ -1121,6 +1255,9 @@ fn main() {
                 "cheap_hash_filter8_ns_per_probe": t_cheap_filter * 1e9 / probes,
                 "cheap_hash_filter8_false_positive_rate": cheap_fpr,
                 "cheap_hash_fused_ns_per_point": t_cheap_pipe * 1e9 / points,
+                "simd_probe_filter8_ns_per_probe": if simd_ok { json!(t_simd_filter * 1e9 / (probe_rounds * sample8.len()) as f64) } else { json!(null) },
+                "simd_probe_fused_ns_per_point": if simd_ok { json!(t_simd_pipe * 1e9 / points) } else { json!(null) },
+                "simd_probe_ns_per_point_by_threads": simd_threads_ns,
                 "probe_side_best_arm_ns_per_point_by_threads": tuned_threads_ns,
                 "lever4_ns_per_point_by_threads": threads_ns,
             })
