@@ -41,8 +41,9 @@ def audit(path: Path) -> dict:
     assert len(cells) == 4
     for cell in cells.values():
         assert set(cell) == set(ARMS), "incomplete matched cell"
-        assert len({r["workload"]["target"] for r in cell.values()}) == 1
-        assert len({r["factor_base"]["points_sha256"] for r in cell.values()}) == 1
+        assert len({tuple(r["workload"]["target"]) for r in cell.values()}) == 1
+        assert cell["rho-strong"]["factor_base"] is None
+        assert len({r["factor_base"]["points_sha256"] for name, r in cell.items() if name != "rho-strong"}) == 1
         assert cell["batch-m3"]["work"]["bitops"] == cell["batch-m3-aa"]["work"]["bitops"]
 
     arms = {}
