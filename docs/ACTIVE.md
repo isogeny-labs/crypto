@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Accelerate complete ordinary-isogeny point evaluation and qualify large-prime conductor crossing runs (Codex, started 2026-11-18, branch research/conductor-crossing-20261118)
+- [ ] Accelerate complete ordinary-isogeny point evaluation and qualify large-prime conductor crossing runs (Codex, started 2026-11-18, branch research/conductor-crossing-20261118, PR #4680; balanced supplied-case evaluator implemented and development checks recorded; large-case qualification open)
 
 - [ ] Certify prime31 exact geometric CM conductor via 3-division and tighten nonscalar endomorphism degree bound (automation, started 2026-11-18, branch automation/prime31-cm-conductor3-certificate-20261118)
 - [x] Publish prime-field coverage, Split4 and RR9 follow-up evidence (Codex, started 2026-11-17, branch research/prime-field-followup-20261117, PR #4624)
@@ -80,6 +80,8 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 - [ ] Autolab rounds 38 to 40 (claude, started 2026-11-17, branch ic-autolab-20261117b): round 39 ratchets `tw2l-x20-j16-n2` at k = 28 (0.944, counted GAE; wall time 1.236x slower; validator disposition validated for the counted claim); open: a second-host replay or human validation, a code-level lever beyond the K = 3 collision floor, and the `hashed-ecdl-tensor` standalone build failure (eight modules with no `mod` line in `lib.rs`)
 
 ## Blocked / questions for the owner
+
+- Conductor crossing, PR #4680: the original minimum 80-bit complete quotient/map and matched timings remain open. No compatible pinned FLINT/PARI cloud worker, live remaining budget/reservations or capacity readback is established in this runtime. The original target is retained; no cloud job or substitute benchmark was submitted.
 
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 
