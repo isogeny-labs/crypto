@@ -1,0 +1,46 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ksum_fast_ic library reference: ksum5 and rho-neg on the P32 holdout curve (same curve, targets, seeds as prime_ksum_vs_incumbent_20261029)",
+ "description": "Generic decomposition track (bounded by sqrt(r); cannot beat rho). Same curve, targets and measurement seed as the incumbent holdout session; k-sum base sizes frozen from prime_ksum_k5_20261028 and prime_ksum_table_20261028 train curves. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 20261018202
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261018211,
+  "target_kind": "public"
+ },
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261018221,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "ksum5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=19",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ]
+}
