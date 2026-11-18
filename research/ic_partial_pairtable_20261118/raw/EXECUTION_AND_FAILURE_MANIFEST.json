@@ -1,0 +1,34 @@
+{
+  "protocol": "EXP-IC-PARTIAL-TABLE-20261118-R2",
+  "first_attempt": {
+    "status": "failed_before_result",
+    "case_count_primary": 24,
+    "case_count_sensitivity": 8,
+    "cause": "A/A deterministic equality compared wall_ns fields; wall time is nondeterministic. All 32 runs aborted at A/A check.",
+    "raw_primary_before_repair_sha256": "731c0e32882d63335187098233e1aff99088d604a759a6806a699f3b35ed6961",
+    "raw_sensitivity_before_repair_sha256": "ded5c7cceaaa39360d7454aa19e885edc96d41da7f33cdde495a556dcb32ad37"
+  },
+  "repair": {
+    "change": "Compare the fixed scientific and counted-operation A/A fields, excluding wall timing; freeze seed/curve/fractions and H1 unchanged",
+    "new_seed_grid": false,
+    "raw_revision_log": "2026-11-18T19:53Z initial A/A assertion issue; retain failed JSON files"
+  },
+  "final_attempt": {
+    "status": "local_audit_passed",
+    "cases_primary": 24,
+    "cases_sensitivity": 8,
+    "arms_primary": 120,
+    "arms_sensitivity": 40,
+    "censored": 0,
+    "raw_primary_sha256": "457cbbfc8e8e0d506ad234501639defc4555936def82a65432585c677feda58b",
+    "raw_sensitivity_sha256": "1b63fb2b7d2b6e23f67e20344c029b64183157c6979b6bc2a1c5552ba8a20219",
+    "summary_sha256": "9052254da3300df779df5cc38950405b4ed8dc258f845e0a13e5fd9ccd8ab06e"
+  },
+  "source_sha256": {
+    "run": "0c4aa98b02f429dfde9669a0d1ad4b4744d550558a3e64f594eb1aaf3c153115",
+    "audit": "60dab4a399fe6ede96d433f2e3640f0cf295ffe0c7d66f0a40d5bc112e07fd77",
+    "summarize": "6f065f16f44412bd3bd7b83ada9f5f8b9597f6fa0e8abe3c8fdbac41104cbcb9"
+  },
+  "publication_limit": "Full exact 850K+157K raw witness JSON is preserved in conversation attached experiment archive but is not committed to this PR due to GitHub DNS; compact 32 seed paired costs are committed; independent CI replay pending.",
+  "standing": "[pcc:unverified]"
+}
