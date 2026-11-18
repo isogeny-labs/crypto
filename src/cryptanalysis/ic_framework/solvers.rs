@@ -99,7 +99,10 @@ use crate::cryptanalysis::koblitz_groebner::{
 use crate::cryptanalysis::m4gb_oracle::{
     run_m4gb, run_m4gb_persistent, select_binary, M4gbError, M4gbOptions, M4gbRun,
 };
-use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis};
+use crate::cryptanalysis::pq_f4_f2::{
+    groebner_basis_f4, groebner_basis_f4_skeleton, solutions_from_reduced_basis, F4Skeleton,
+    SKELETON_DEFAULT_CAP_BYTES,
+};
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,
     MASK_BITS,
@@ -186,7 +189,19 @@ fn verified(points: Vec<Mask>, system: &BooleanSystem, tests: &mut u64) -> Vec<M
 /// ([`crate::cryptanalysis::pq_f4_f2`]), with the field pairs a boolean
 /// basis needs and solutions read off the linear elements rather than
 /// enumerated.
-pub struct F4F2;
+///
+/// Holds an [`F4Skeleton`]: the symbolic preprocessing (divisor candidates
+/// and column maps) of the systems this instance has solved, reused on the
+/// later systems of the run (one oracle, one target).  The bases are those
+/// of the plain path.  Opt-in (`skeleton=1`): on 16 `S_3` descents over
+/// `F_{2^13}` it saved 7% of the divisor tests but added hash probes and
+/// matched a stored column map once in 11 replayed steps, a small net
+/// loss in `bitop/v1`, so the default stays the plain path (`skeleton=0`).
+/// `skeleton_mb` (default 256) caps the stored bytes.
+#[derive(Default)]
+pub struct F4F2 {
+    skeleton: std::sync::Mutex<Option<F4Skeleton>>,
+}
 
 impl SystemSolver for F4F2 {
     fn name(&self) -> &str {
@@ -194,8 +209,21 @@ impl SystemSolver for F4F2 {
     }
 
     fn describe(&self) -> String {
-        "F4 over F_2[v]/(v²−v): normal strategy, dense exact-LCM Gebauer–Möller selection on bounded domains, field pairs, bitmap/hash symbolic sets, Faugère–Lachartre reducer/free-column split with full-width fallback, tiled bit-packed elimination, reduced basis"
+        "F4 over F_2[v]/(v²−v): normal strategy, dense exact-LCM Gebauer–Möller selection on bounded domains, field pairs, bitmap/hash symbolic sets shared across the run's systems (skeleton), Faugère–Lachartre reducer/free-column split with full-width fallback, tiled bit-packed elimination, reduced basis"
             .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "skeleton",
+                "0 (default): the plain path; 1: reuse the symbolic preprocessing of earlier systems of the run (identical bases; a net loss on the F_2^13 descent test, see the test below)",
+            ),
+            (
+                "skeleton_mb",
+                "byte cap of the stored skeleton in MiB (default 256); past it new steps are not stored",
+            ),
+        ]
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
@@ -205,12 +233,36 @@ impl SystemSolver for F4F2 {
     fn solve(
         &self,
         system: &BooleanSystem,
-        _params: &Params,
+        params: &Params,
         budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
         let started = Instant::now();
         let tally_before = bitop_tally::snapshot();
-        let (gb, st) = groebner_basis_f4(system.equations.clone(), system.n_vars, budget);
+        let use_skeleton = params.u64_or("skeleton", 0).unwrap_or(0) != 0;
+        let cap_bytes = params
+            .u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)
+            .unwrap_or(SKELETON_DEFAULT_CAP_BYTES >> 20)
+            .saturating_mul(1 << 20);
+        // A solve that finds the skeleton in use by another thread runs the
+        // plain path: same basis, its own (plain) count.
+        let mut guard = if use_skeleton {
+            self.skeleton.try_lock().ok()
+        } else {
+            None
+        };
+        let (gb, st) = match guard.as_deref_mut() {
+            Some(slot) => {
+                let skeleton = slot.get_or_insert_with(|| F4Skeleton::with_cap(cap_bytes));
+                groebner_basis_f4_skeleton(
+                    system.equations.clone(),
+                    system.n_vars,
+                    budget,
+                    skeleton,
+                )
+            }
+            None => groebner_basis_f4(system.equations.clone(), system.n_vars, budget),
+        };
+        drop(guard);
         let mut tests = 0u64;
         let mut extra = BTreeMap::new();
         for (k, v) in [
@@ -258,6 +310,16 @@ impl SystemSolver for F4F2 {
             ("f4_wall_ns", st.wall_ns),
             ("pairs_left", st.pairs_left),
             ("oversize", st.oversize as u64),
+            ("skeleton_shape_rebuilds", st.skeleton_shape_rebuilds),
+            ("skeleton_steps_built", st.skeleton_steps_built),
+            ("skeleton_steps_replayed", st.skeleton_steps_replayed),
+            ("skeleton_candidate_hits", st.skeleton_candidate_hits),
+            ("skeleton_candidate_misses", st.skeleton_candidate_misses),
+            ("skeleton_candidate_tests", st.skeleton_candidate_tests),
+            ("skeleton_columns_reused", st.skeleton_columns_reused),
+            ("skeleton_columns_rebuilt", st.skeleton_columns_rebuilt),
+            ("skeleton_store_refused", st.skeleton_store_refused),
+            ("skeleton_bytes", st.skeleton_bytes),
         ] {
             extra.insert(k.to_string(), v);
         }
@@ -302,7 +364,8 @@ impl SystemSolver for F4F2 {
             peak_bytes: st
                 .peak_matrix_bytes
                 .saturating_add(st.peak_table_bytes)
-                .saturating_add(st.pair_dense_scratch_bytes_max),
+                .saturating_add(st.pair_dense_scratch_bytes_max)
+                .saturating_add(st.skeleton_bytes),
             degree_reached: Some(st.degree_reached),
             solving_degree: Some(st.solving_degree),
             timed_out: st.timed_out,
@@ -1677,6 +1740,12 @@ impl SystemSolver for XlF2 {
 /// a fail-fast invariant.
 pub fn validate_solver_params(name: &str, params: &Params) -> Result<(), String> {
     match name {
+        "f4-f2" => {
+            if params.u64_or("skeleton", 0)? > 1 {
+                return Err("skeleton must be 0 or 1".into());
+            }
+            params.u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)?;
+        }
         "sat-cdcl" => {
             sat_xor_encoding(params)?;
         }
@@ -2117,7 +2186,7 @@ impl SystemSolver for Exhaustive {
 /// Every solver the framework knows, by name.
 pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
     vec![
-        Box::new(F4F2),
+        Box::new(F4F2::default()),
         Box::new(BuchbergerF2),
         Box::new(M4gbF2),
         Box::new(M4gbF2Server),
@@ -2970,5 +3039,72 @@ mod tests {
             cost.ops >= sys.equations[0].terms.len() as u64 * (1 << 12),
             "every point tests the first equation"
         );
+    }
+
+    /// **`f4-f2` with its skeleton decides real descent systems exactly as
+    /// the plain path does.**  One solver instance solves a batch of
+    /// `S_3` descents of one cell (Koblitz curve over `F_{2^13}`, a
+    /// 6-dimensional subspace, 12 unknowns, random targets), as one
+    /// oracle does in one run; every verdict, solution set and structural
+    /// count equals that of `skeleton=0` on a fresh instance, the skeleton
+    /// is replayed, and its counters are reported.
+    #[test]
+    fn f4_f2_skeleton_matches_plain_on_descent_systems() {
+        use crate::cryptanalysis::ic_boundary::koblitz_instance;
+        use crate::cryptanalysis::pq_descent_symbolic::descend;
+        use rand::{Rng, SeedableRng};
+        let inst = koblitz_instance(0, 13).expect("Koblitz curve over F_2^13");
+        let basis: Vec<u64> = (0..6).map(|k| 1u64 << k).collect();
+        let mut rng = rand::rngs::StdRng::seed_from_u64(0x5ce1_17);
+        let with = F4F2::default();
+        let plain = F4F2::default();
+        let mut on = Params::default();
+        on.set("skeleton", "1");
+        let off = Params::default();
+        let keys = [
+            "steps",
+            "new_elements",
+            "reducer_rows",
+            "matrix_rows_sum",
+            "word_xors_performed",
+        ];
+        let mut sums: BTreeMap<String, (u64, u64)> = BTreeMap::new();
+        for k in 0..16 {
+            let x_r = rng.gen::<u64>() & inst.gf.mask;
+            let sys = descend(&inst.gf, inst.b, x_r, &basis, 2).unwrap();
+            let system = BooleanSystem {
+                equations: sys.equations.clone(),
+                n_vars: sys.n_vars,
+            };
+            let (va, ca) = with.solve(&system, &on, None);
+            let (vb, cb) = plain.solve(&system, &off, None);
+            assert_eq!(
+                format!("{va:?}"),
+                format!("{vb:?}"),
+                "system {k}: verdicts differ"
+            );
+            for key in keys {
+                assert_eq!(ca.extra[key], cb.extra[key], "system {k}: {key} differs");
+            }
+            assert_eq!(cb.extra["skeleton_steps_replayed"], 0);
+            for key in [
+                "divisor_tests",
+                "bitop_word_ops",
+                "bitop_hash_probes",
+                "skeleton_steps_built",
+                "skeleton_steps_replayed",
+                "skeleton_candidate_hits",
+                "skeleton_candidate_misses",
+                "skeleton_columns_reused",
+                "skeleton_columns_rebuilt",
+            ] {
+                let e = sums.entry(key.to_string()).or_default();
+                e.0 += ca.extra.get(key).copied().unwrap_or(0);
+                e.1 += cb.extra.get(key).copied().unwrap_or(0);
+            }
+        }
+        eprintln!("skeleton vs plain over 16 descent systems: {sums:?}");
+        assert!(sums["skeleton_steps_replayed"].0 > 0);
+        assert!(sums["divisor_tests"].0 < sums["divisor_tests"].1);
     }
 }

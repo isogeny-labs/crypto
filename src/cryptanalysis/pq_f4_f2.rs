@@ -226,6 +226,108 @@ pub struct F4Stats {
     pub early_stopped: bool,
     /// Variables no degree-1 element pinned when the run ended.
     pub free_at_stop: u64,
+    /// [`F4Skeleton`] counters (all zero without a skeleton).  `1` when
+    /// this call found the skeleton built for another shape and cleared it.
+    pub skeleton_shape_rebuilds: u64,
+    /// Steps whose key (degree and active leading monomials) was new to the
+    /// skeleton and was stored.
+    pub skeleton_steps_built: u64,
+    /// Steps whose key the skeleton already held (the stored divisor
+    /// candidates and columns were consulted).
+    pub skeleton_steps_replayed: u64,
+    /// Monomials whose reducer came from a stored candidate list.
+    pub skeleton_candidate_hits: u64,
+    /// Monomials looked up in a stored step and not found (scanned in full,
+    /// and stored).
+    pub skeleton_candidate_misses: u64,
+    /// Divisor tests made on stored candidate lists (part of
+    /// `divisor_tests`).
+    pub skeleton_candidate_tests: u64,
+    /// Steps whose stored column map matched the step's monomial set and
+    /// was used instead of a new sort and index.
+    pub skeleton_columns_reused: u64,
+    /// Steps of a stored key whose column map did not match (rebuilt).
+    pub skeleton_columns_rebuilt: u64,
+    /// Steps not stored because the skeleton was at its byte cap.
+    pub skeleton_store_refused: u64,
+    /// Bytes the skeleton holds after this call (charged as memory).
+    pub skeleton_bytes: u64,
+}
+
+/// **Symbolic preprocessing shared across the systems of one run**
+/// (`docs/ic/GROEBNER_PERF_LEVERS_20261111.md`, lever 2a).
+///
+/// The symbolic phase of an F4 step reads the basis only through two
+/// things: which active element's leading monomial divides each monomial
+/// met (the *divisor candidates*; the reducer is the shortest of them),
+/// and the sorted set of monomials the step's rows touch (the *columns*).
+/// The first is a function of the active leading monomials alone, so the
+/// systems of one cell, which mostly walk the same leading-monomial
+/// staircase with different tails, look the same monomials up against the
+/// same divisors again and again.  The skeleton stores, per step key
+/// `(degree, active leading monomials in basis order)`:
+///
+/// - for each monomial looked up, the positions of its divisors among the
+///   active elements, so a later step of the same key tests only those
+///   (the shortest-first, first-on-tie choice is remade on the current
+///   term counts, so the reducer is exactly the one a full scan picks);
+/// - the step's sorted column list and its index, reused only when the
+///   new step's monomial set equals it (verified: equal size and every
+///   stored monomial present), otherwise rebuilt and replaced.
+///
+/// Results are therefore identical with or without the skeleton.  What a
+/// replay still pays is charged where it happens: forming and comparing
+/// the key, a hash probe per lookup, the candidate tests, the column
+/// verification; misses pay the full scan plus the store.  The skeleton
+/// lives on one solver instance (one run, one target) and is never
+/// written to disk.
+#[derive(Default)]
+pub struct F4Skeleton {
+    shape: Option<(usize, u32)>,
+    steps: FxMap<(u32, Box<[Mask]>), SkeletonStep>,
+    bytes: u64,
+    cap_bytes: u64,
+}
+
+#[derive(Default)]
+struct SkeletonStep {
+    candidates: FxMap<Mask, Box<[u32]>>,
+    columns: Option<Columns>,
+}
+
+/// Default byte cap of an [`F4Skeleton`].
+pub const SKELETON_DEFAULT_CAP_BYTES: u64 = 256 << 20;
+
+impl F4Skeleton {
+    /// An empty skeleton that stops storing new steps past `cap_bytes`.
+    pub fn with_cap(cap_bytes: u64) -> Self {
+        Self {
+            cap_bytes,
+            ..Self::default()
+        }
+    }
+
+    /// Bytes held.
+    pub fn bytes(&self) -> u64 {
+        self.bytes
+    }
+
+    /// Steps held.
+    pub fn len(&self) -> usize {
+        self.steps.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.steps.is_empty()
+    }
+
+    fn columns_bytes(c: &Columns) -> u64 {
+        (c.monos.capacity() * std::mem::size_of::<Mask>()) as u64
+            + match &c.index {
+                ColumnIndex::Dense(at) => (at.capacity() * 4) as u64,
+                ColumnIndex::Hashed(map) => (map.capacity() * 24) as u64,
+            }
+    }
 }
 
 /// The largest matrix a step may build, in 64-bit words (1 GiB), unless
@@ -412,6 +514,13 @@ impl MonomialSeen {
         match self {
             Self::Bitmap { .. } => tally::word_ops(n),
             Self::Hashed(_) => tally::hash_probes(n),
+        }
+    }
+
+    fn len(&self) -> usize {
+        match self {
+            Self::Bitmap { values, .. } => values.len(),
+            Self::Hashed(set) => set.len(),
         }
     }
 
@@ -1991,6 +2100,29 @@ pub fn groebner_basis_f4(
     groebner_basis_f4_until(initial, n_vars, budget, None)
 }
 
+/// [`groebner_basis_f4`] reading and extending a [`F4Skeleton`] shared
+/// with the earlier systems of the run.  The basis and every decision are
+/// those of [`groebner_basis_f4`]; only the symbolic work differs, and the
+/// stats count what was done.
+pub fn groebner_basis_f4_skeleton(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+    skeleton: &mut F4Skeleton,
+) -> (Vec<F2BoolPoly>, F4Stats) {
+    let (basis, mut st) = groebner_basis_f4_inner(
+        initial,
+        n_vars,
+        budget,
+        None,
+        max_matrix_words(),
+        EARLY_GUARD,
+        Some(&mut *skeleton),
+    );
+    st.skeleton_bytes = skeleton.bytes;
+    (basis, st)
+}
+
 /// The variables the degree-1 elements of `polys` pin: one bit per
 /// distinct leading variable.  Under a degree ordering an element whose
 /// leading monomial is a variable is affine, so each such element fixes
@@ -2021,6 +2153,7 @@ pub fn groebner_basis_f4_until(
         max_free,
         max_matrix_words(),
         EARLY_GUARD,
+        None,
     )
 }
 
@@ -2076,6 +2209,7 @@ fn groebner_basis_f4_inner(
     max_free: Option<usize>,
     max_words: u64,
     guard: EarlyGuard,
+    mut skel: Option<&mut F4Skeleton>,
 ) -> (Vec<F2BoolPoly>, F4Stats) {
     static BATCH_INSERTS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let batch_inserts =
@@ -2121,6 +2255,18 @@ fn groebner_basis_f4_inner(
     }
     for p in &inputs {
         st.max_poly_degree = st.max_poly_degree.max(degree(p));
+    }
+    if let Some(k) = skel.as_deref_mut().filter(|_| !inputs.is_empty()) {
+        // the shape key: the unknowns and the inputs' largest degree (the
+        // degree scan is the one above), compared with the stored one
+        let shape = (n_vars, inputs.iter().map(degree).max().unwrap_or(0));
+        tally::word_ops(2);
+        if k.shape != Some(shape) {
+            st.skeleton_shape_rebuilds = u64::from(k.shape.is_some());
+            k.steps.clear();
+            k.bytes = 0;
+            k.shape = Some(shape);
+        }
     }
 
     // The initial echelon: distinct leading monomials to start from.
@@ -2349,6 +2495,42 @@ fn groebner_basis_f4_inner(
         active.clear();
         active.extend((0..s.polys.len()).filter(|&g| s.active[g]));
         tally::word_ops(s.polys.len() as u64);
+        // The skeleton's entry for this step: the key is formed (a word
+        // operation a leading monomial), hashed (one more each) and, on a
+        // hit, compared (one more each).
+        let mut skel_added = 0u64;
+        type StepRefs<'k> = (Option<&'k mut SkeletonStep>, Option<&'k mut u64>, bool);
+        let (mut entry, mut skel_bytes, recording): StepRefs<'_> = match skel.as_deref_mut() {
+            None => (None, None, false),
+            Some(k) => {
+                let F4Skeleton {
+                    steps,
+                    bytes,
+                    cap_bytes,
+                    ..
+                } = k;
+                let key: (u32, Box<[Mask]>) = (d, active.iter().map(|&g| s.lm[g]).collect());
+                tally::word_ops(2 * active.len() as u64 + 1);
+                tally::hash_probes(1);
+                let recording = *bytes < *cap_bytes;
+                if steps.contains_key(&key) {
+                    tally::word_ops(active.len() as u64 + 1);
+                    st.skeleton_steps_replayed += 1;
+                    (steps.get_mut(&key), Some(bytes), recording)
+                } else if recording {
+                    st.skeleton_steps_built += 1;
+                    tally::hash_probes(1);
+                    skel_added += 32 + 8 * active.len() as u64;
+                    (Some(steps.entry(key).or_default()), Some(bytes), true)
+                } else {
+                    st.skeleton_store_refused += 1;
+                    (None, None, false)
+                }
+            }
+        };
+        let replaying = entry
+            .as_deref()
+            .is_some_and(|e| !e.candidates.is_empty() || e.columns.is_some());
         let mut no_divisor = MonomialSeen::new(n_vars);
         // The first level: every monomial of the S-rows but the lcms.
         let s_terms: usize = half_rows
@@ -2406,10 +2588,8 @@ fn groebner_basis_f4_inner(
         // order of examination — a monomial's reducer depends only on the
         // monomial — and a large level's lookups, products and membership
         // tests are independent of one another, so they run in parallel.
-        let reducer_row = |m: Mask| {
-            s.reducer_among(m, &active)
-                .map(|g| s.polys[g].mul_mono(F2BoolMono::from_mask(m & !s.lm[g])))
-        };
+        let product_of =
+            |m: Mask, g: usize| s.polys[g].mul_mono(F2BoolMono::from_mask(m & !s.lm[g]));
         // the terms a reducer row carries, on average, to price a level
         let mean_terms = active
             .iter()
@@ -2419,17 +2599,77 @@ fn groebner_basis_f4_inner(
         tally::word_ops(active.len() as u64);
         let mut frontier = queue;
         while !frontier.is_empty() {
-            st.divisor_tests += (active.len() * frontier.len()) as u64;
             // (sizes first: asking rayon its thread count starts its pool)
             let parallel = frontier.len() >= PAR_REDUCERS
                 && frontier.len() * mean_terms >= PAR_PRODUCT_TERMS
                 && inner_build_parallel_enabled()
                 && rayon::current_num_threads() > 1;
-            let rows: Vec<Option<F2BoolPoly>> = if parallel {
-                frontier.par_iter().map(|&m| reducer_row(m)).collect()
-            } else {
-                frontier.iter().map(|&m| reducer_row(m)).collect()
+            // A monomial's reducer: from the stored divisor positions when
+            // the skeleton has them (only those tested), else by a scan of
+            // every active element (recording the divisors when storing).
+            // Either way the shortest divisor, the first on a tie, in basis
+            // order: the reducer [`State::reducer_among`] picks.
+            let candidates = entry.as_deref().map(|e| &e.candidates);
+            let lookup = |m: Mask| -> (Option<F2BoolPoly>, Option<Box<[u32]>>, bool) {
+                let shortest = |positions: &mut dyn Iterator<Item = usize>| {
+                    let mut best: Option<usize> = None;
+                    for p in positions {
+                        let g = active[p];
+                        if best.is_none_or(|b| s.polys[g].terms.len() < s.polys[b].terms.len()) {
+                            best = Some(g);
+                        }
+                    }
+                    best
+                };
+                if let Some(c) = candidates.and_then(|c| c.get(&m)) {
+                    let g = shortest(&mut c.iter().map(|&p| p as usize));
+                    (g.map(|g| product_of(m, g)), None, true)
+                } else if recording {
+                    let found: Box<[u32]> = (0..active.len())
+                        .filter(|&p| s.lm[active[p]] & !m == 0)
+                        .map(|p| p as u32)
+                        .collect();
+                    let g = shortest(&mut found.iter().map(|&p| p as usize));
+                    (g.map(|g| product_of(m, g)), Some(found), false)
+                } else {
+                    let g = s.reducer_among(m, &active);
+                    (g.map(|g| product_of(m, g)), None, false)
+                }
             };
+            let looked: Vec<(Option<F2BoolPoly>, Option<Box<[u32]>>, bool)> = if parallel {
+                frontier.par_iter().map(|&m| lookup(m)).collect()
+            } else {
+                frontier.iter().map(|&m| lookup(m)).collect()
+            };
+            let mut rows: Vec<Option<F2BoolPoly>> = Vec::with_capacity(looked.len());
+            let mut fresh_candidates: Vec<(Mask, Box<[u32]>)> = Vec::new();
+            for (&m, (row, found, hit)) in frontier.iter().zip(looked) {
+                if hit {
+                    let c = candidates.and_then(|c| c.get(&m)).map_or(0, |c| c.len());
+                    st.skeleton_candidate_hits += 1;
+                    st.skeleton_candidate_tests += c as u64;
+                    st.divisor_tests += c as u64;
+                    // the lookup
+                    tally::hash_probes(1);
+                } else {
+                    st.divisor_tests += active.len() as u64;
+                    if let Some(found) = found {
+                        if replaying {
+                            st.skeleton_candidate_misses += 1;
+                        }
+                        // the failed lookup (when there was a stored map to
+                        // look in), the store, and the positions copied
+                        tally::hash_probes(1 + u64::from(candidates.is_some()));
+                        tally::word_ops(found.len() as u64);
+                        skel_added += 24 + 4 * found.len() as u64;
+                        fresh_candidates.push((m, found));
+                    }
+                }
+                rows.push(row);
+            }
+            if let Some(e) = entry.as_deref_mut() {
+                e.candidates.extend(fresh_candidates);
+            }
             // a reducer leads with its monomial, already examined
             let unseen = |r: &F2BoolPoly| -> Vec<Mask> {
                 debug_assert!(r.lt().is_some_and(|t| examined.contains(&t.mask)));
@@ -2485,8 +2725,32 @@ fn groebner_basis_f4_inner(
         }
         st.reducer_rows += reducers.len() as u64;
 
+        if let Some(b) = skel_bytes.as_deref_mut() {
+            *b = b.saturating_add(std::mem::take(&mut skel_added));
+        }
         let n_rows = reducers.len() + half_rows.len() + field_rows.len();
-        let cols = Columns::from_monomials(examined.into_values());
+        // The column map: the stored one when the step's monomial set is
+        // exactly its set (equal size, every stored monomial examined:
+        // a membership test each), else a new sort and index.
+        let stored = entry.as_deref_mut().and_then(|e| e.columns.take());
+        let stored_bytes = stored.as_ref().map_or(0, F4Skeleton::columns_bytes);
+        let cols = match stored {
+            Some(c) => {
+                let same = c.monos.len() == examined.len() && {
+                    examined.charge(c.monos.len() as u64);
+                    c.monos.iter().all(|m| examined.contains(m))
+                };
+                tally::word_ops(1);
+                if same {
+                    st.skeleton_columns_reused += 1;
+                    c
+                } else {
+                    st.skeleton_columns_rebuilt += 1;
+                    Columns::from_monomials(examined.into_values())
+                }
+            }
+            None => Columns::from_monomials(examined.into_values()),
+        };
         let words = cols.words() as u64;
         if words * n_rows as u64 > max_words {
             st.oversize = true;
@@ -2544,6 +2808,17 @@ fn groebner_basis_f4_inner(
             .filter(|(lead, _)| no_divisor.contains(&cols.monos[*lead]))
             .map(|(_, r)| cols.unpack(r, n_vars))
             .collect();
+        // Keep the column map for the next system's step of this key (a
+        // move, no copy), and account the skeleton's growth.
+        let mut skel_removed = 0u64;
+        if let Some(e) = entry.as_deref_mut() {
+            skel_added += F4Skeleton::columns_bytes(&cols);
+            skel_removed = stored_bytes;
+            e.columns = Some(cols);
+        }
+        if let Some(b) = skel_bytes {
+            *b = b.saturating_add(skel_added).saturating_sub(skel_removed);
+        }
         tally::word_ops(fresh.len() as u64 + tally::sort_cost(fresh.len()));
         if fresh.iter().any(is_one) {
             return finish(one(), st);
@@ -3638,7 +3913,7 @@ mod tests {
         guard: EarlyGuard,
     ) -> (Vec<F2BoolPoly>, F4Stats, tally::Tally) {
         let before = tally::snapshot();
-        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard);
+        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, None);
         (gb, st, tally::snapshot().since(before))
     }
 
@@ -3727,6 +4002,152 @@ mod tests {
         assert!(st.timed_out && !st.oversize);
         assert_eq!(st.matrix_rows_max, 0, "no matrix of the step was built");
         assert!(st.pairs_left > 0);
+    }
+
+    /// Same-shape systems: one template support, each system keeping a
+    /// random subset of its terms (the target-dependent bits of a cell).
+    fn same_shape_batch(
+        n: usize,
+        m: usize,
+        count: usize,
+        keep: f64,
+        rng: &mut StdRng,
+    ) -> Vec<Vec<F2BoolPoly>> {
+        let template = random_quadratic(n, m, rng);
+        (0..count)
+            .map(|_| {
+                template
+                    .iter()
+                    .map(|p| {
+                        let kept: Vec<u64> = p
+                            .terms
+                            .iter()
+                            .map(|t| mask_low64(t.mask))
+                            .filter(|_| rng.gen_bool(keep))
+                            .collect();
+                        poly(&kept, n)
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+
+    fn assert_same_run(a: &(Vec<F2BoolPoly>, F4Stats), b: &(Vec<F2BoolPoly>, F4Stats), what: &str) {
+        assert_eq!(a.0, b.0, "{what}: bases differ");
+        let (x, y) = (&a.1, &b.1);
+        assert_eq!(
+            (
+                x.steps,
+                x.new_elements,
+                x.reducer_rows,
+                x.matrix_rows_sum,
+                x.matrix_cols_max,
+                x.word_xors,
+                x.solving_degree,
+                x.degree_reached,
+                x.pairs_reduced,
+                x.field_pairs_reduced,
+            ),
+            (
+                y.steps,
+                y.new_elements,
+                y.reducer_rows,
+                y.matrix_rows_sum,
+                y.matrix_cols_max,
+                y.word_xors,
+                y.solving_degree,
+                y.degree_reached,
+                y.pairs_reduced,
+                y.field_pairs_reduced,
+            ),
+            "{what}: the runs differ"
+        );
+    }
+
+    /// **The skeleton changes no basis and no decision.**  Over a batch of
+    /// random same-shape systems, with degenerate members (an inconsistent
+    /// one, a rank-one one, an all-zero one, a member of another shape
+    /// that forces a rebuild, and a different template that misses the
+    /// stored steps), the basis and every structural count of the skeleton
+    /// path equal the plain path's, the skeleton is replayed, and its
+    /// divisor tests are fewer.
+    #[test]
+    fn skeleton_matches_the_plain_path_on_same_shape_systems() {
+        let mut rng = StdRng::seed_from_u64(0x5ce1_2026_1118);
+        let n = 10;
+        let mut batch = same_shape_batch(n, 10, 24, 0.9, &mut rng);
+        // degenerate members, in the middle of the batch
+        let mut inconsistent = batch[0].clone();
+        inconsistent.push(poly(&[0], n));
+        batch.insert(5, inconsistent);
+        let rank_one = vec![batch[1][0].clone(); 10];
+        batch.insert(9, rank_one);
+        batch.insert(12, vec![F2BoolPoly::zero(n); 10]);
+        // another template of the same shape: every stored step misses
+        let other = same_shape_batch(n, 10, 3, 0.9, &mut rng);
+        batch.splice(14..14, other);
+        let mut skeleton = F4Skeleton::with_cap(SKELETON_DEFAULT_CAP_BYTES);
+        let (mut plain_tests, mut skel_tests) = (0u64, 0u64);
+        let mut total = F4Stats::default();
+        for (k, eqs) in batch.iter().enumerate() {
+            let plain = groebner_basis_f4(eqs.clone(), n, None);
+            let skel = groebner_basis_f4_skeleton(eqs.clone(), n, None, &mut skeleton);
+            assert_same_run(&plain, &skel, &format!("system {k}"));
+            plain_tests += plain.1.divisor_tests;
+            skel_tests += skel.1.divisor_tests;
+            let s = &skel.1;
+            total.skeleton_steps_built += s.skeleton_steps_built;
+            total.skeleton_steps_replayed += s.skeleton_steps_replayed;
+            total.skeleton_candidate_hits += s.skeleton_candidate_hits;
+            total.skeleton_candidate_misses += s.skeleton_candidate_misses;
+            total.skeleton_columns_reused += s.skeleton_columns_reused;
+            total.skeleton_columns_rebuilt += s.skeleton_columns_rebuilt;
+            total.skeleton_shape_rebuilds += s.skeleton_shape_rebuilds;
+        }
+        // a system of another shape (one more unknown) clears the skeleton
+        let wider = same_shape_batch(n + 1, 10, 1, 0.9, &mut rng).remove(0);
+        let plain = groebner_basis_f4(wider.clone(), n + 1, None);
+        let skel = groebner_basis_f4_skeleton(wider, n + 1, None, &mut skeleton);
+        assert_same_run(&plain, &skel, "wider system");
+        assert_eq!(skel.1.skeleton_shape_rebuilds, 1);
+        assert_eq!(skel.1.skeleton_steps_replayed, 0);
+        // and the first system again, after the rebuild, is still exact
+        let plain = groebner_basis_f4(batch[0].clone(), n, None);
+        let skel = groebner_basis_f4_skeleton(batch[0].clone(), n, None, &mut skeleton);
+        assert_same_run(&plain, &skel, "after rebuild");
+        eprintln!(
+            "skeleton: divisor tests {skel_tests} vs plain {plain_tests}; built {} replayed {} \
+             hits {} misses {} columns reused {} rebuilt {} shape rebuilds {}; bytes {}",
+            total.skeleton_steps_built,
+            total.skeleton_steps_replayed,
+            total.skeleton_candidate_hits,
+            total.skeleton_candidate_misses,
+            total.skeleton_columns_reused,
+            total.skeleton_columns_rebuilt,
+            total.skeleton_shape_rebuilds,
+            skeleton.bytes(),
+        );
+        assert!(total.skeleton_steps_replayed > 0);
+        assert!(total.skeleton_candidate_hits > 0);
+        assert!(total.skeleton_candidate_misses + total.skeleton_columns_rebuilt > 0);
+        assert!(skel_tests < plain_tests, "{skel_tests} >= {plain_tests}");
+    }
+
+    /// At a zero byte cap nothing is stored, and the run is the plain one.
+    #[test]
+    fn skeleton_at_zero_cap_stores_nothing() {
+        let mut rng = StdRng::seed_from_u64(0x5ce1_0);
+        let batch = same_shape_batch(8, 8, 4, 0.9, &mut rng);
+        let mut skeleton = F4Skeleton::with_cap(0);
+        for eqs in &batch {
+            let plain = groebner_basis_f4(eqs.clone(), 8, None);
+            let skel = groebner_basis_f4_skeleton(eqs.clone(), 8, None, &mut skeleton);
+            assert_same_run(&plain, &skel, "cap 0");
+            assert_eq!(skel.1.divisor_tests, plain.1.divisor_tests);
+            assert_eq!(skel.1.skeleton_steps_replayed, 0);
+        }
+        assert!(skeleton.is_empty());
+        assert_eq!(skeleton.bytes(), 0);
     }
 }
 
