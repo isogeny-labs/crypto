@@ -6,6 +6,7 @@
 #   make bench-sparse256  compare generic versus sparse-modulus P-256 REDC
 #   make bench-pair-sweep  test pair-table and S3 sweep savings
 #   make bench-carry256   compare host P-256 limb carry/borrow chains
+#   make bench-subneg256  compare host P-256 modular subtraction and negation
 #   make bench-host-inv256  P-256 sparse-exponent host inverse + batch benchmark
 #   make lib             librootfind_oracle.a, emulation backend only
 #                        (what gpu/rootfind/rs/build.rs builds for the gpu-rootfind cargo crate)
@@ -53,7 +54,7 @@ RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
-.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-pair-sweep ptxas-info clean
+.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-subneg256 bench-pair-sweep ptxas-info clean
 
 all: test
 
@@ -103,6 +104,13 @@ bench_carry256: bench_carry256.cpp fp256x64.cuh fp64.cuh
 
 bench-carry256: bench_carry256
 	./bench_carry256
+
+# Frozen previous P-256 modular subtract/negate versus the current header.
+bench_subneg256: bench_subneg256.cpp fp256x64.cuh fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_subneg256.cpp
+
+bench-subneg256: bench_subneg256
+	./bench_subneg256
 
 # Pair table and 2-sign rootfinder S3 sweep: frozen-before versus actual header.
 bench_pair_sweep: bench_pair_sweep.cpp rootfind.cuh fp64.cuh fp256x64.cuh rootfind_api.h
