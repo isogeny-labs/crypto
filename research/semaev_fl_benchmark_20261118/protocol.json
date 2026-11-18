@@ -1,0 +1,87 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "SEMAEV-FL-20261118",
+  "version": 1,
+  "created": "2026-11-18",
+  "repository": "isogeny-labs/crypto",
+  "study_dir": "research/semaev_fl_benchmark_20261118",
+  "question": "On fixed Boolean Weil restrictions of Semaev summation-polynomial systems, does the merged Faugere-Lachartre reducer/free-column split preserve the reduced basis and reduce exact elimination work and isolated wall time relative to the same binary's full-width cascade?",
+  "source": {
+    "candidate_pr": 4562,
+    "benchmark_pr": 4679,
+    "source_revision": "the immutable commit containing this protocol; resolved and hashed by the checkpoint receipt",
+    "toolchain": "Rust 1.99.1, release, x86_64-unknown-linux-musl for EKS",
+    "threads": 1
+  },
+  "arms": [
+    {
+      "id": "f4-full-width",
+      "role": "baseline",
+      "solver": "f4-f2-full-width",
+      "difference": "FL split forced off through a direct function parameter"
+    },
+    {
+      "id": "f4-fl",
+      "role": "candidate",
+      "solver": "f4-f2",
+      "difference": "FL split enabled when its frozen shape gate is satisfied"
+    },
+    {
+      "id": "f4-full-width-aa",
+      "role": "control_aa",
+      "same_instrument_as": "f4-full-width"
+    },
+    {
+      "id": "f4-fl-aa",
+      "role": "control_aa",
+      "same_instrument_as": "f4-fl"
+    }
+  ],
+  "workloads": {
+    "admitted_eks": "Koblitz K1 over F2^17, koblitz-orbit divisor=0;1, Semaev m=2, one frozen public target",
+    "diagnostic_only": [
+      "K1/F2^17 m=2: two planted and two natural targets, 16 Boolean variables",
+      "K0/F2^15 factor 1 m=3 interleaved: one planted and one natural target, 27 Boolean variables"
+    ]
+  },
+  "measurement": {
+    "eks_profile": "native L2",
+    "warmup_rounds": 1,
+    "measured_rounds": 8,
+    "order": "deterministic alternate",
+    "timeout_seconds_per_child": 40,
+    "threads": 1,
+    "retries": 0,
+    "interrupted_rows": "excluded; the interruption and charge are retained"
+  },
+  "outcomes": {
+    "primary": [
+      "solver logical word XORs",
+      "solver performed word XORs"
+    ],
+    "secondary": [
+      "solver wall_ns",
+      "whole-run wall_ns",
+      "peak bytes",
+      "FL matrices, reducer rows, pair rows and free columns"
+    ],
+    "correctness": [
+      "identical input SHA-256",
+      "identical reduced-basis SHA-256 in the fixed-system harness",
+      "identical verified ecbench recovery outcome"
+    ]
+  },
+  "decision_rules": {
+    "correctness_gate": "All paired outputs agree; any disagreement blocks every performance claim.",
+    "activation_gate": "Candidate fl_matrices > 0 and baseline fl_matrices = 0.",
+    "work_gate": "Report a work reduction only when every admitted pair is finite and the paired geometric-mean ratio is below 1.",
+    "timing_gate": "Report an isolated timing improvement only when at least five measured pairs survive, the 95% paired bootstrap interval is wholly below 1, and the effect exceeds both A/A noise intervals.",
+    "failure_rule": "Timeouts, oversize exits, verification failures and missing rows are reported and never retried or silently dropped."
+  },
+  "claim_boundary": "The fixed harness establishes only the Boolean Groebner stage. The ecbench panel gives one small end-to-end Koblitz context cell. Neither establishes asymptotic ECDLP complexity, a sub-rho attack, or scaling beyond the frozen cells.",
+  "external_reference": {
+    "status": "availability-gated",
+    "required_action": "Record msolve or M4GB version and binary SHA-256 if provisioned on the same host; otherwise report unavailable and do not substitute a native solver.",
+    "local_probe": "No msolve, M4GB or m4gb executable was present on PATH at freeze time."
+  }
+}
