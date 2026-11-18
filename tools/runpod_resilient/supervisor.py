@@ -7,7 +7,7 @@ environment).
 
 Resilience:
   * POST /run writes its argv to WORK/autorun.json. When a replacement pod boots on the same
-    volume and WORK/runs/COMPLETE does not exist, the supervisor starts that argv again at once,
+    volume and no file named COMPLETE exists anywhere under WORK/runs, the supervisor starts that argv again at once,
     so a job that resumes from its own output files continues without any client action.
   * WORK/boots.log gets one line per boot (time, pod id); WORK/heartbeat.json is rewritten every
     60 s, so the time a lost pod was last alive is known.
@@ -62,7 +62,8 @@ def heartbeat():
 with open(WORK / "boots.log", "a") as f:
     f.write(f"{now()} {POD}\n")
 auto = WORK / "autorun.json"
-if auto.exists() and not (WORK / "runs" / "COMPLETE").exists():
+runs = WORK / "runs"
+if auto.exists() and not (runs.exists() and any(runs.rglob("COMPLETE"))):
     start(json.loads(auto.read_text())["argv"])
 threading.Thread(target=heartbeat, daemon=True).start()
 

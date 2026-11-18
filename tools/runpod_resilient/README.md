@@ -8,7 +8,7 @@ directory makes a long job lose at most the work unit in flight.
 | Layer | Where | What it does |
 |---|---|---|
 | Durable state | RunPod network volume, mounted at `/workspace` | rows, progress, `autorun.json`, boots, heartbeat; outlives any pod |
-| Self-restart | `supervisor.py` on the pod | on boot, restarts the job recorded by the last `POST /run` unless `runs/COMPLETE` exists |
+| Self-restart | `supervisor.py` on the pod | on boot, restarts the job recorded by the last `POST /run` unless a `COMPLETE` file exists under `runs/` |
 | Resumable job | the job itself | skips finished units (e.g. `pkm_algebraic_oracle --out F --resume 1`, a `.done` marker per cell) |
 | Off-pod copy and replacement | `controller.py` on the client | mirrors changed files every 5 min; replaces a pod that is gone, exited or silent for 15 min; deletes the pod when `--done` matches |
 

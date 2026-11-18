@@ -13,7 +13,7 @@ client side (an agent session, a laptop) and loops:
 
 Every action is appended to --mirror/controller.events.jsonl. The pod's access token is
 generated here, kept in --token-file (mode 600) and never printed. The RunPod API key is not
-handled here: requests go to rest.runpod.io with a placeholder bearer that the agent proxy
+handled here: requests go to api.runpod.io (REST v2) with a placeholder bearer that the agent proxy
 replaces (set RUNPOD_API_KEY to send a real one).
 
   controller.py --volume VOL --name NAME --mirror DIR --token-file F --progress runs/x/progress.txt
@@ -32,7 +32,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-API = "https://rest.runpod.io/v1"
+API = "https://api.runpod.io/v2"  # REST v2 (rest.runpod.io/v1 is legacy)
 HERE = Path(__file__).resolve().parent
 
 
@@ -47,7 +47,10 @@ def api(method, path, body=None):
             raw = r.read()
             return r.status, json.loads(raw) if raw.strip() else None
     except urllib.error.HTTPError as e:
-        return e.code, None
+        try:
+            return e.code, json.loads(e.read())  # v2 errors are structured: {"status", "title", "detail", ...}
+        except Exception:  # noqa: BLE001
+            return e.code, None
     except Exception:  # noqa: BLE001  (network error: report as unknown)
         return 0, None
 
@@ -94,21 +97,25 @@ class Controller:
         tf.write_text(tok)
         tf.chmod(0o600)
         sup = base64.b64encode((HERE / "supervisor.py").read_bytes()).decode()
-        body = {"name": self.a.name, "computeType": "CPU", "cpuFlavorIds": self.a.cpu_flavors.split(","),
-                "vcpuCount": self.a.vcpu, "imageName": self.a.image, "containerDiskInGb": 20,
-                "ports": ["8888/http"], "dockerEntrypoint": ["python3", "-u", "-c"],
-                "dockerStartCmd": [f"import base64;exec(compile(base64.b64decode('{sup}'),'supervisor','exec'))"],
-                "env": {"MON_TOKEN": tok, "WORK_DIR": self.a.work_dir},
-                "networkVolumeId": self.a.volume, "volumeMountPath": "/workspace"}
-        code, r = api("POST", "/pods", body)
-        if code in (200, 201) and r and r.get("id"):
-            self.pod = r["id"]
-            self.last_ok = time.time()
-            self.log(event="created", pod=self.pod, cost_per_hr=r.get("costPerHr"),
-                     dc=(r.get("machine") or {}).get("dataCenterId"))
+        dc = (api("GET", f"/network-volumes/{self.a.volume}")[1] or {}).get("dataCenter")
+        for flavor in self.a.cpu_flavors.split(","):  # v2 takes one flavor per pod: try them in order
+            body = {"name": self.a.name, "image": self.a.image, "disk": 20, "ports": ["8888/http"],
+                    "entrypoint": ["python3", "-u", "-c"],
+                    "cmd": [f"import base64;exec(compile(base64.b64decode('{sup}'),'supervisor','exec'))"],
+                    "env": {"MON_TOKEN": tok, "WORK_DIR": self.a.work_dir},
+                    "cpu": {"id": flavor, "vcpuCount": self.a.vcpu},
+                    "dataCenterIds": [dc] if dc else [],
+                    "mounts": {"network": [{"volumeId": self.a.volume, "path": "/workspace"}]}}
+            code, r = api("POST", "/pods", body)
+            if code in (200, 201) and r and r.get("id"):
+                self.pod = r["id"]
+                self.last_ok = time.time()
+                self.log(event="created", pod=self.pod, flavor=flavor, cost_per_hr=r.get("cost"),
+                         dc=r.get("dataCenterId"))
+                break
+            self.log(event="create_failed", flavor=flavor, http=code, detail=(r or {}).get("detail"))
         else:
             self.pod = None
-            self.log(event="create_failed", http=code)
         self.save()
 
     def replace(self, why):
@@ -144,8 +151,8 @@ class Controller:
             self.create()
             return False
         code, r = api("GET", f"/pods/{self.pod}")
-        if code == 404 or (r and r.get("desiredStatus") in ("EXITED", "TERMINATED")):
-            self.replace(f"api http={code} status={(r or {}).get('desiredStatus')}")
+        if code == 404 or (r and r.get("status") in ("EXITED", "TERMINATED", "ERROR")):
+            self.replace(f"api http={code} status={(r or {}).get('status')}")
             return False
         try:
             health = json.loads(pod_get(self.url(), self.token(), "/health"))
