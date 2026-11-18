@@ -1,9 +1,10 @@
 # Results: genus 4 follow-up (54 targets at p = 16411, factor-base balance)
 
-Every number is `[pcc:unverified]`. The study was run once, on a local 4-core host, and no validator
-has replayed it yet. The protocol is `PROTOCOL.md`, frozen at ae36cdc6e4 before any data. Tables
-come from `analyze.py` (frozen) and `sensitivity.py` (**post hoc**, written after reading
-`analysis.json`).
+Every number is `[pcc:unverified]` in pcc terms. An independent validator replayed and recomputed it
+(`benchmarks/20261118-genus4-followup/validator-report.md`, disposition **validated**; findings
+F1–F7 are taken up below and in `ERRATA.md`). The study was run once, on a local 4-core host. The
+protocol is `PROTOCOL.md`, frozen at ae36cdc6e4 before any data. Tables come from `analyze.py`
+(frozen) and `sensitivity.py` (**post hoc**, written after reading `analysis.json`).
 
 ## Headline
 
@@ -36,11 +37,38 @@ Arm x is Ferrari plus SGE on the double-large-prime walk.
 - **At w = 0.1** arm x is 0.126× even the ideal negation bound.
 - **Arm w (no Ferrari, no SGE)** is 1.605 [1.407, 1.837] at w = 1, and 2.28× the ideal negation bound.
 
-The 9-target estimate (0.876) held up at 54 targets (0.874). I had expected it to regress toward
-1, because the 9-target rho mean was high. The IC cost is what explains it: arm x's mean cost is
-2.38e8 at w = 1, and the mean of `sqrt(pi r/2)` over the three curves is 2.72e8 (curve 2640 has
-h = 1 and r ≈ 7.3e16; the other two have h = 2 and r ≈ 3.6e16). The old ratio was not a product of an unlucky
-rho sample.
+### Per curve (validator finding F7, the most important reading)
+
+Arm x's cost barely depends on r (coefficient of variation 1.2% over the 108 keys), while rho scales
+as `sqrt(r)`. Arm x at w = 1, per curve:
+
+| curve | h | r | arm x / `sqrt(pi r/2)` | arm x / ideal negation `sqrt(pi r/4)` | arm x / measured Q (Q3) |
+|---|---|---|---|---|---|
+| 172 | 2 | 3.6e16 | 0.998 | 1.412 | 1.150 |
+| 180 | 2 | 3.6e16 | 0.998 | 1.412 | 0.907 |
+| 2640 | 1 | 7.3e16 | **0.707** | **1.000** | 0.685 |
+
+- **On the two cofactor-2 curves** arm x is at parity with plain rho's expectation.
+- **On the one prime-order Jacobian**, the cryptographically relevant case, it is 0.71× plain rho and
+  at parity with the ideal negation bound.
+- **What the pooled number rests on.** The pooled "below plain rho" rests on that one curve. Telling
+  whether arm x beats plain rho on prime-order Jacobians at this size needs more h = 1 curves; that is
+  the next study.
+- **Reading by key.** The median per-key x/Q is 0.935, the mean per-key ratio is 1.265, and arm x is
+  cheaper on 56 of 108 keys.
+
+### Why the 9-target estimate held (corrected)
+
+The 9-target estimate (0.876) held up at 54 targets (0.874). PROTOCOL P1 expected it to regress
+toward 1, on the stated ground that the 9-target rho mean was about 14% above `sqrt(pi r/2)`. That
+ground was wrong (validator F1): the 9-target rho mean is 1.0009× `sqrt(pi r/2)`. The 14% came from
+comparing it with the h = 2 curves' `sqrt(pi r/2)` alone. Nothing needed to regress.
+
+### Q4 caveat (validator F3)
+
+Q4 charges rho a partition hash and two coefficient additions per step, but does not charge arm x's
+identical per-step walk work. Charging it moves arm x's Q4 ratio from 0.2185 to 0.2197; no verdict
+changes.
 
 ## Part A: factor-base balance (p = 8209, arm x, 36 keys per cc)
 
@@ -79,7 +107,7 @@ primes capped at 1). PROTOCOL.md §1 gives the details.
 
 | # | prediction | outcome |
 |---|---|---|
-| P1 | x point in [0.90, 1.10], upper > 1 | **refuted** on the point (0.874). The upper bound is 0.9996 at the frozen seed and above 1 for 64% of seeds |
+| P1 | x point in [0.90, 1.10], upper > 1 | **refuted** on the point (0.874). The upper bound is 0.9996 at the frozen seed and above 1 for 64% of seeds (32/50). The stated reason was also wrong (F1) |
 | P2 | cc\* in [0.7, 1.4], x\* ≤ 0.85× x at p = 8209 | **refuted** (cc\* = 2.0) |
 | P3 | x\* below x at p = 16411 | not testable (x\* = x) |
 | P4 | every arm > 1.2× the ideal negation bound at w = 1 | holds (w 2.28, x 1.24) |
