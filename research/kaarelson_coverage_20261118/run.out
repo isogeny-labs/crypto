@@ -1,0 +1,9 @@
+# Kaarelson Theorem 3 coverage reproduction (m=2)
+# p | arm | a b | n | X | f/X mean | coverage mean (SD) [min,max] | cov(u=1) | E2/X^2 mean
+1009 | generic | a=1 b=14 | n=1013 | X=31 | f/X=0.997 | cov=0.3670 (SD 0.0985) [0.1027,0.6357] | u1=0.2744 | E2/X^2=3.866
+1009 | j0      | a=0 b=11 | n=967 | X=31 | f/X=0.967 | cov=0.3639 (SD 0.1088) [0.1117,0.6453] | u1=0.3144 | E2/X^2=3.652
+4099 | generic | a=1 b=34 | n=4049 | X=64 | f/X=0.988 | cov=0.3846 (SD 0.0762) [0.1600,0.6372] | u1=0.5508 | E2/X^2=3.891
+4099 | j0 | (no prime-order curve: no prime order among the a=0 sextic twists) | X=64
+10007 | generic | a=1 b=28 | n=9851 | X=100 | f/X=0.984 | cov=0.3851 (SD 0.0617) [0.1519,0.5975] | u1=0.3847 | E2/X^2=3.858
+10007 | j0 | (no prime-order curve: supersingular, order p+1 (p=2 mod 3)) | X=100
+# per-dilation rows -> per_dilation.csv
