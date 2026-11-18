@@ -1167,7 +1167,12 @@ pub fn selftest() {
         for k in [1u128, 2, 3, 17, 255, 65_537] {
             assert_eq!(ec.mul(&inst.g, k), inst.ec.mul(&inst.g, k));
         }
+        let before_table = f.counts();
         let table = ec.window2_table(&inst.g, &points[16]);
+        let table_counts = f.counts().since(before_table);
+        assert_eq!(table_counts.group_add, 13);
+        assert_eq!(table_counts.batch_inv, 3);
+        assert_eq!(table_counts.fq_inv, 3);
         let mut coeff_rng = Rng::new(0xB47C_2002);
         let mut coeffs = vec![(0, 0), (1, 0), (0, 1), (3, 3), (inst.ell - 1, 1)];
         coeffs.extend((0..64).map(|_| (coeff_rng.below(inst.ell), coeff_rng.below(inst.ell))));
@@ -1183,7 +1188,7 @@ pub fn selftest() {
             .collect();
         assert_eq!(got, expected);
         eprintln!(
-            "selftest: complete batches and width-2 simultaneous multiplication match frozen curve"
+            "selftest: complete batches and width-2 simultaneous multiplication match frozen curve; cold table={table_counts:?}"
         );
     }
     {
