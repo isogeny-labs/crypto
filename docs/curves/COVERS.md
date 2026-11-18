@@ -144,10 +144,13 @@ binary genus-three selection or its historical not-tested fields.
 
 These elementary same-field constructions establish existence. This geometry
 checker performs **no Weil descent to a smaller field**, no subgroup-map
-computation, and no relation-solving or discrete-log benchmark. Those fields
-remain `not_tested`/null. Existence carries no speedup or vulnerability label.
-The elliptic factor already accounts for part of the cover's Jacobian; its
-existence alone does not establish cheaper computation there.
+computation, and no relation-solving or discrete-log benchmark. Its graph
+fields therefore remain `not_tested`/null. Existence carries no speedup or
+vulnerability label. The elliptic factor already accounts for part of the
+cover's Jacobian; its existence alone does not establish cheaper computation
+there. The separate `hyperelliptic-cover transfer` command evaluates induced
+maps within narrower arithmetic boundaries; its results do not retroactively
+change the geometry checker's status fields.
 
 The separate generated
 [`cover-transfer-assessments.json`](cover-transfer-assessments.json) v2 ledger
@@ -155,16 +158,20 @@ is a historical assessment bound to catalog commit
 `728304718cb0ab6df70da620a908a5f76f175293`: 15,791 maps and 979 linked EC1
 representations. It is not a classification of the live graph below, and later
 catalog additions inherit no transfer status from it. Current binary code has
-general arbitrary-class pushforward and a structured CLI. A separate GF(8)
+general arbitrary-class pushforward and a structured CLI. Its separate
+`transfer-catalog-export` path replays all live binary map rows and named EC1
+generators into a hash-bound corpus while keeping annihilator checks distinct
+from exact-order evidence. A separate GF(8)
 oracle now reimplements support factorization, residue fields, Frobenius trace,
 and the target group law for all 486 control classes; it still uses production
 source-Jacobian addition for its homomorphism loop, so an independent source
-group law and catalog-wide oracle remain open. Proof-grade catalog subgroup
-certificates also remain open.
-The bounded balanced backend handles monic split sextics only over checked odd
-prime fields of at most 64 bits; odd induced maps, extension fields, larger
-prime fields, solver evidence, and every computational-advantage claim remain
-open.
+group law and catalog-wide independent oracle remain open.
+The bounded balanced backend handles direct short-Weierstrass quadratic-cover
+maps over deterministically checked prime fields of at most 64 bits. It
+implements arbitrary balanced-class pushforward, pullback, the deck action,
+and both degree-two composition identities. Normalized targets, extension
+fields, larger prime fields, solver evidence, and every
+computational-advantage claim remain unsupported or unassessed as applicable.
 
 The Rust tests enumerate all affine cover points on every nonsingular
 short Weierstrass model over F5, F7, F11 and F25 (`t^2 + 2`), on four
@@ -238,6 +245,8 @@ All graph `subgroup_transport` fields remain `not_tested` with null evidence.
 The historical [2026-10-22 catalog refresh](../../research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md)
 and the dated transfer assessment retain their original populations; neither
 is silently relabelled as live evidence. Geometry coverage, general binary
-map code, and bounded prime-field Jacobian arithmetic are separate facts. None
-establishes an index-calculus solver, key recovery, or a computational
-advantage.
+map code, named-generator replay, and bounded direct-prime induced maps are
+separate facts. The binary certificate exporter targets all 174 binary rows,
+including 150 EC1 bindings on 147 maps and 27 maps without a named subgroup;
+its records leave exact order as separate evidence. None establishes an
+index-calculus solver, key recovery, or a computational advantage.

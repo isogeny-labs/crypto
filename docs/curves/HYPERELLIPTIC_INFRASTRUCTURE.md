@@ -27,7 +27,7 @@ A local release build has the equivalent path:
 ./target/release/hyperelliptic-cover --help
 ```
 
-Users of a packaged artifact do not need `cargo run`. The five command shapes
+Users of a packaged artifact do not need `cargo run`. The six command shapes
 are:
 
 ```text
@@ -36,6 +36,10 @@ are:
 ./hyperelliptic-cover arithmetic --input OPERATION.json [--output RESPONSE.json]
 ./hyperelliptic-cover transfer --input TRANSFER.json [--output RESPONSE.json]
 ./hyperelliptic-cover catalog-export --registry REGISTRY.json [--output covers.json]
+./hyperelliptic-cover transfer-catalog-export --registry REGISTRY.json \
+  --cover-graph cover-links.yaml --traits traits.json \
+  --producer-commit COMMIT --rustc-version VERSION \
+  [--output binary-transfer-certificates.json]
 ```
 
 The source capabilities documented here are active-branch work. The release
@@ -60,8 +64,10 @@ required because the executable does not embed a registry. The repository's
 release workflow stages `docs/curves/registry.json`, `covers.json`, and
 `cover-links.yaml` beside the executables. Callers may use that exact bundled
 registry after a new package is published or supply another explicit path.
-All command inputs are capped at 32 MiB. A larger file or standard-input
-stream returns `invalid_input` rather than being partially parsed.
+Ordinary command, registry, and traits inputs are capped at 32 MiB; the live
+cover graph accepted by `transfer-catalog-export` is capped at 96 MiB. A
+larger file or standard-input stream returns `invalid_input` rather than being
+partially parsed.
 
 Command response status and process exit status are distinct and stable:
 
@@ -352,17 +358,20 @@ The canonical triple `(u,v,n_plus)` has `deg(u)<=2` and
 equality, negation, addition, and scalar multiplication. Reference enumeration
 is separately capped at `p<=31`; ordinary arithmetic is not an enumeration.
 
-This backend does not yet implement the degree-two induced pullback or
-pushforward. Odd extension fields return structured
-`unsupported_extension_field`, and prime moduli larger than 64 bits return
-structured `unsupported_prime_size`. A supplied nonprime, nonsquarefree,
-nonmonic, wrong-degree, or malformed balanced input is `invalid_input`, not an
-unsupported existence claim.
+The same balanced representation now supports the induced maps for a direct
+short-Weierstrass prime-field cover. The checked formulas implement pullback,
+arbitrary-class pushforward, the deck action, and both compositions
+`pi_* pi^*=[2]` and `pi^* pi_*=1+deck_*`. This map implementation has the same
+deterministically checked, at-most-64-bit prime-field boundary as balanced
+arithmetic. It does not extend the map support to normalized target models or
+extension fields.
 
-Calling `transfer` with a prime or odd-extension target returns status
-`unsupported` and `transfer_status=unsupported_infinity_configuration`; it
-does not reinterpret balanced classes as binary Mumford divisors. A failed
-odd-map request is not a nonexistence result.
+Odd extension fields return structured `unsupported_extension_field`, and
+prime moduli larger than 64 bits return structured
+`unsupported_prime_size`. A supplied nonprime, nonsquarefree, nonmonic,
+wrong-degree, or malformed balanced input is `invalid_input`, not an
+unsupported existence claim. A failed odd-map request is never a
+nonexistence result.
 
 ### Prime validation and diagnostic bounds
 
@@ -389,25 +398,31 @@ within its declared 64-bit prime-field contract.
 
 ## Transfer boundary and evidence records
 
-The binary library and structured `transfer` command support the checked
-degree-three family. Every request has exact schema
-`hyperelliptic-transfer-operation/v1`, an exact binary elliptic `model`, one
-operation, and only that operation's operands:
+The structured `transfer` command supports the checked binary degree-three
+family and the direct short-Weierstrass prime-field degree-two family. Every
+request has exact schema `hyperelliptic-transfer-operation/v1`, an exact
+elliptic `model`, one operation, and only that operation's operands:
 
-| Operation | Required operands | Result boundary |
-|---|---|---|
-| `pushforward` | `divisor` | Elliptic image of a valid reduced source class |
-| `pushforward_certificate` | `divisor` | Closed-point components, reconstructed support, and component-sum checks |
-| `image_endomorphism_certificate` | `divisor` | Checked image endomorphism and kernel relation fields |
-| `torsion_projector_certificate` | `divisor`, declared `order` | Conditional projector; exactness of `order` is not checked |
-| `pullback` | target `point` | Pullback of a rational elliptic point class |
-| `pull_push_composition_certificate` | target `point` | Typed `phi_* phi^*=[3]` witness |
-| `pullback_closed_point_certificate` | target `point` | Fiber and closed-point component witness |
-| `subgroup_status` | declared `order` | Conditional coprimality/kernel status; no order proof |
+| Operation | Required operands | Binary cubic | Direct odd-prime quadratic |
+|---|---|---|---|
+| `pushforward` | `divisor` | Elliptic image of any valid reduced one-infinity class | Elliptic image of any canonical balanced class |
+| `pushforward_certificate` | `divisor` | Closed-point components, reconstructed support, and component-sum checks | Same checked image as `pushforward`, with the symmetric base-field method identified |
+| `image_endomorphism_certificate` | `divisor` | Checked image endomorphism and kernel relation fields | Unsupported binary-only certificate shape |
+| `torsion_projector_certificate` | `divisor`, declared `order` | Conditional projector; exactness of `order` is not checked | Unsupported binary-only certificate shape |
+| `deck_transform` | `divisor` | Unsupported odd-prime-only operation | Checked `(u,v)->(-u,v)` action, including the infinity-branch swap |
+| `pullback` | target `point` | Pullback of a rational elliptic point class | Balanced pullback of a rational elliptic point class |
+| `pull_push_composition_certificate` | target `point` | Typed `phi_* phi^*=[3]` witness | Typed `pi_* pi^*=[2]` witness |
+| `push_pull_composition_certificate` | `divisor` | Unsupported odd-prime-only operation | Typed `pi^* pi_*=1+deck_*` witness |
+| `pullback_closed_point_certificate` | target `point` | Fiber and closed-point component witness | Unsupported binary-only certificate shape |
+| `generated_subgroup_certificate` | target `point`, declared `order` | Named-generator annihilation, pullback, norm, degree-three composition, and recovery checks | Named-generator annihilation, pullback, degree-two composition, and recovery checks |
+| `subgroup_status` | declared `order` | Conditional degree-three coprimality/kernel status | Conditional degree-two coprimality/kernel status |
 
-Unknown fields, missing operands, and irrelevant operands are rejected. Binary
-points use `{"kind":"infinity"}` or hexadecimal affine coordinates. Divisors
-use canonical one-infinity `(u,v)` pairs and must not include `n_plus`.
+Unknown fields, missing operands, and irrelevant operands are rejected. Target
+points use `{"kind":"infinity"}` or canonical affine coordinates. Binary
+coordinates are hexadecimal polynomial-basis bitsets; prime coordinates may
+be decimal or `0x` strings. Binary divisors use canonical one-infinity `(u,v)`
+pairs and must not include `n_plus`. Direct prime-cover divisors use canonical
+balanced `(u,v,n_plus)` triples.
 
 This complete non-F8 F2^7 request checks the ramified infinity composition:
 
@@ -431,6 +446,34 @@ The successful response binds the exact target model, reconstructed cover
 certificate, field degree, source genus, map degree, and formula
 `(x,y)=(u^3,u*v+d)`. The composition result contains both the formal
 pushforward and `[3]` input and requires `identity_holds=true`.
+
+For a direct odd-prime model, the command reconstructs and rechecks
+`v^2=F(u^2+c)` and the map `(x,y)=(u^2+c,v)` before evaluating a balanced
+class. This complete request checks the target-side composition over F5:
+
+```json
+{
+  "schema": "hyperelliptic-transfer-operation/v1",
+  "model": {
+    "v": "1",
+    "form": "y^2=x^3+a*x+b",
+    "p": "5",
+    "field": "fp-5",
+    "a": "0",
+    "b": "1"
+  },
+  "operation": "pull_push_composition_certificate",
+  "point": {"kind": "affine", "x": "0", "y": "1"}
+}
+```
+
+The result explicitly compares the pushforward with `[2]` of the input. The
+source-side composition takes a balanced `divisor` and compares the pullback
+of its image with the input plus its deck transform. Direct prime-field
+transfer rejects extension models and primes wider than 64 bits with a
+structured `unsupported` response. Geometry construction over an extension
+field remains supported separately; transfer support is not inferred from
+that construction.
 
 `pushforward_arbitrary_jacobian_class` handles every valid reduced class of
 support degree at most three on the supplied checked binary model. It factors
@@ -468,20 +511,26 @@ preservation. The adjacent 12-test suite includes the checked-in positive
 replay plus fail-closed mutations of claims, equations, counts, encodings,
 keys, and the certificate UID.
 
-The generic subgroup classifier proves only the conditional statement
-“pullback is injective if the supplied integer is independently known to be
-the exact subgroup order and is coprime to 3.” The CLI accepts a declared
-integer for `subgroup_status` and the projector operation, but reports
-`exact_order_verified_by_command=false`; it makes no unconditional subgroup
-claim. The F2^7 evidence fixture is stronger because the same native stack
-directly checks, independently of the catalog declaration, that the named
-generator is nonidentity and is killed by the prime 29, and therefore has
-exact order 29 before applying the degree-inverse argument. This is not an
-independent source-order implementation. A separate test-only GF(8) oracle
-reimplements support factorization, residue fields, Frobenius trace, and the
-target elliptic group law for all 486 classes and all 236,196 ordered image
-sums. Its source additions still use the production Jacobian law, so it does
-not independently validate that group law or establish catalog-wide support.
+The generic `subgroup_status` classifier remains conditional on an exact
+subgroup order and reports `exact_order_verified_by_command=false`. The more
+specific `generated_subgroup_certificate` checks a named nonidentity point
+`G`, a supplied annihilator `r`, `[r]G=O`, `[r]phi^*(G)=0`, the relevant
+pull-push identity, and recovery through the inverse map degree modulo `r`.
+When `gcd(r,degree)=1`, those checks prove injectivity on the named cyclic
+subgroup `<G>` even if `r` is only an annihilator rather than the exact order.
+They do not prove that `r` is prime or exact, do not describe other source
+Jacobian components, and do not establish a computational advantage.
+[pcc:unverified]
+
+The F2^7 evidence fixture additionally checks in the same native stack that
+the named generator is nonidentity and is killed by the prime 29, and
+therefore has exact order 29 before applying the degree-inverse argument. This
+is not an independent source-order implementation. A separate test-only GF(8)
+oracle reimplements support factorization, residue fields, Frobenius trace,
+and the target elliptic group law for all 486 classes and all 236,196 ordered
+image sums. Its source additions still use the production Jacobian law, so it
+does not independently validate that group law or establish catalog-wide
+support.
 
 The conforming machine-readable envelope is
 [`../../research/hyperelliptic_cover_infrastructure_20261006/evidence.json`](../../research/hyperelliptic_cover_infrastructure_20261006/evidence.json).
@@ -518,12 +567,20 @@ The 2026-11-18 live graph instead has 22,417 maps and 22,415 distinct covers:
 direct prime, 22 normalized prime, and 9 odd extension. Every live
 `subgroup_transport` field remains `not_tested` with null evidence. Geometry
 coverage and identity linkage do not promote a transfer or subgroup claim.
+The separate `transfer-catalog-export` command replays the 174 binary maps and
+their named EC1 generators into a new hash-bound corpus; it does not rewrite
+those historical graph fields.
 
 Current binary source has checked one-infinity arithmetic and arbitrary-class
-degree-at-most-three transfer. The bounded odd-prime balanced backend supplies
-arithmetic for checked split sextics, but not the induced degree-two maps;
-extensions and larger primes remain unsupported. Numeric exact-order evidence
-also remains open catalog-wide except for the order-29 overlay and the
+degree-at-most-three transfer. The bounded direct odd-prime backend supplies
+balanced arithmetic and the induced degree-two maps for checked split sextics;
+normalized targets, extensions, and larger primes remain unsupported for
+those maps. Numeric exact-order evidence remains a separate per-record field.
+The supplied traits file is recorded as advisory provenance and cannot
+promote that field. The exporter records non-`unknown` evidence only from its
+bounded deterministic small-prime check; the named-subgroup certificate
+itself never promotes an annihilator into an exact order. Earlier standalone
+evidence includes the order-29 overlay and the
 implementation-separated cardinality-486 certificate for the separate fixed
 F8 source fixture. The latter is not an EC1 subgroup-order certificate. All
 computational-advantage and end-to-end solver costs for both the 15,791-row
@@ -532,6 +589,7 @@ cryptanalysis parity receipt predates the general binary norm, so current
 mirror/integration evidence is also open. The assessment does not change the
 geometry semantics or browser status fields in `covers.json` and
 `cover-links.yaml`.
+[pcc:unverified]
 
 Regenerate and check the assessment deterministically with:
 
@@ -606,11 +664,44 @@ The exported catalog identifies its wrapper with
 `generated_by = "hyperelliptic-cover catalog-export"`. Its
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
-that order. For this revision the digest is
-`1b3b26cb6e3d38cc1366e5746e619c1ae415c2f8ff39b89e374c90cbaef361e2`.
-Read the value from the exact export rather than copying a digest
+that order. Read the value from the exact export rather than copying a digest
 from an earlier revision. Changing any of the three producer inputs changes
 the provenance digest. Both
 `hyperelliptic-cover catalog-export` and `curve_cover_check` require callers
 to supply a registry path; the release archive bundles one, but neither
 executable embeds it.
+
+### Binary named-subgroup certificate export
+
+The second exporter replays the exact live binary map rows and every linked
+EC1 generator rather than rebuilding geometry alone:
+
+```text
+./hyperelliptic-cover transfer-catalog-export \
+  --registry docs/curves/registry.json \
+  --cover-graph docs/curves/cover-links.yaml \
+  --traits docs/curves/traits.json \
+  --producer-commit 0123456789abcdef0123456789abcdef01234567 \
+  --rustc-version "rustc VERSION" \
+  --output binary-transfer-certificates.json
+```
+
+Use the actual forty-lowercase-hex revision containing the producer and its
+actual compiler version; the placeholders above are only command-shape
+examples. The output schema is
+[`binary-subgroup-transfer-certificates.schema.json`](binary-subgroup-transfer-certificates.schema.json),
+with the claim boundary and semantic replay obligations in
+[`BINARY_SUBGROUP_TRANSFER_CERTIFICATES.md`](BINARY_SUBGROUP_TRANSFER_CERTIFICATES.md).
+The producer binds the registry, graph, traits input, source digest, exact
+ICV1/EC1/HC1/CV1 identities, witnesses, and separate exact-order evidence.
+Schema validation does not establish hash preimages, cross-file completeness,
+or arithmetic correctness; replay and independent evidence gates remain
+required.
+
+For the 2026-11-18 graph, the expected bounded population is 174 binary map
+records, 147 maps with 150 named generator bindings, and 27 maps without a
+named subgroup input. A nonzero process exit accompanies any retained failed
+obligation. Successful named-generator records prove only the scoped
+injectivity result described above. They are not solver, timing, or
+computational-advantage records.
+[pcc:unverified]

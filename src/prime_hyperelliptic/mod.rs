@@ -48,6 +48,7 @@
 //!   `O(p^c)` for small `c`; appropriate for `p ≤ ~10^3`.
 
 pub mod balanced;
+pub mod cover_transfer;
 pub mod curve;
 pub mod fp2;
 pub mod fp_poly;
@@ -56,6 +57,10 @@ pub mod ops;
 pub use balanced::{
     BalancedDivisorP, BalancedHyperellipticError, SplitHyperellipticCurveP,
     MAX_BALANCED_ENUMERATION_PRIME,
+};
+pub use cover_transfer::{
+    PrimeEllipticPointP, PrimePullPushCertificate, PrimePushPullCertificate,
+    PrimeQuadraticCoverError, PrimeQuadraticCoverP, PrimeSubgroupTransferStatus,
 };
 pub use curve::{
     brute_force_jac_order, brute_force_jac_order_via_lpoly, count_points, count_points_fp2,

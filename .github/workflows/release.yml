@@ -282,6 +282,8 @@ jobs:
           cp docs/curves/registry.json docs/curves/covers.json docs/curves/cover-links.yaml \
              docs/curves/cover-links.schema.json docs/curves/COVERS.md docs/curves/ICV1.md \
              docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
+             docs/curves/BINARY_SUBGROUP_TRANSFER_CERTIFICATES.md \
+             docs/curves/binary-subgroup-transfer-certificates.schema.json \
              docs/curves/CURVE_TRANSFER_SWEEP.md \
              docs/curves/hyperelliptic-infrastructure.schema.json \
              docs/curves/cover-transfer-assessments.json \
@@ -309,6 +311,8 @@ jobs:
             cd "dist/$name"
             for required in \
               docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
+              docs/curves/BINARY_SUBGROUP_TRANSFER_CERTIFICATES.md \
+              docs/curves/binary-subgroup-transfer-certificates.schema.json \
               docs/curves/CURVE_TRANSFER_SWEEP.md \
               docs/curves/hyperelliptic-infrastructure.schema.json \
               docs/curves/cover-transfer-assessments.json \
@@ -368,6 +372,14 @@ jobs:
               '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"pull_push_composition_certificate","point":{"kind":"affine","x":"0x0","y":"0x1"}}' \
               | "./hyperelliptic-cover$ext" transfer --input - > transfer-smoke.json
             node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-smoke.json")); if(r.status!=="ok"||r.result.context.field_degree!==7||r.result.context.map_degree!==3||r.result.result.identity_holds!==true) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"generated_subgroup_certificate","point":{"kind":"affine","x":"0x26","y":"0x5"},"order":"29"}' \
+              | "./hyperelliptic-cover$ext" transfer --input - > binary-generated-subgroup-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("binary-generated-subgroup-smoke.json")); const q=r.result&&r.result.result; if(r.status!=="ok"||r.result.context.map_degree!==3||q.annihilator!=="29"||q.exact_order_or_primality_claimed!==false||Object.values(q.checks).some(v=>v!==true)) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"v":"1","form":"y^2=x^3+a*x+b","p":"5","field":"fp-5","a":"0","b":"1"},"operation":"pull_push_composition_certificate","point":{"kind":"affine","x":"0","y":"1"}}' \
+              | "./hyperelliptic-cover$ext" transfer --input - > odd-transfer-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("odd-transfer-smoke.json")); if(r.status!=="ok"||r.result.context.map_degree!==2||r.result.result.identity_holds!==true) process.exit(1);'
             if printf '%s\n' \
               '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"pushforward","divisor":{"u":[],"v":[]}}' \
               | "./hyperelliptic-cover$ext" transfer --input - > malformed-divisor-smoke.json; then
@@ -381,6 +393,7 @@ jobs:
                binary-transfer-sweep-smoke.json binary-transfer-sweep-verify-smoke.json \
                odd-transfer-sweep-request.json odd-transfer-sweep-smoke.json \
                odd-transfer-sweep-verify-smoke.json transfer-smoke.json \
+               binary-generated-subgroup-smoke.json odd-transfer-smoke.json \
                malformed-divisor-smoke.json
           )
           cd dist
@@ -1089,10 +1102,12 @@ jobs:
           and independently verifies the recorded one-eigenline map.
 
           The Rust archives also include the `docs/curves` catalog snapshot,
-          hyperelliptic command contract and transfer-assessment records, plus
-          non-authoritative `docs/ecdlp-audit` examples. Run `ecdlp-audit --help`
-          to inspect the audit CLI. Its packaged mock is not self-validating:
-          `verify-plan` requires the matching repository paths and Git objects.
+          hyperelliptic command and named-subgroup certificate contracts, and
+          transfer-assessment records, plus non-authoritative `docs/ecdlp-audit`
+          examples. These transfer records do not claim a solver or computational
+          advantage. Run `ecdlp-audit --help` to inspect the audit CLI. Its
+          packaged mock is not self-validating: `verify-plan` requires the
+          matching repository paths and Git objects.
 
           Run `isogeny-algos help` for the algorithm toolkit; every command prints one
           JSON record with its checks (USAGE.md in the archive).
