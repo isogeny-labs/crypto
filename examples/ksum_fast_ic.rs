@@ -1926,32 +1926,23 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
     assert_eq!(steps_w.len(), NW);
     let wc: Vec<u64> = steps_w.iter().map(|w| w.1).collect();
     let wd: Vec<u64> = steps_w.iter().map(|w| w.2).collect();
-    // Lane starts: R_0 = a0 G + Q (library), then lane l = R_0 + W_u + W_v
-    // for distinct pairs u < v, by two batched additions.
+    // Lane starts: R_0 = a0 G + Q (library), then lane l = R_0 + W_u + W_v + W_w
+    // for distinct triples u < v < w (4960 of them), by three batched additions.
     let a0 = 1 + seed % (r - 1);
     let a0g = g.mul(&mut ops, inst.gen, a0);
     let r0 = g.add(&mut ops, a0g, q);
-    let pairs: Vec<(usize, usize)> = (0..NW)
-        .flat_map(|u| (u + 1..NW).map(move |v| (u, v)))
+    let triples: Vec<[usize; 3]> = (0..NW)
+        .flat_map(|u| (u + 1..NW).flat_map(move |v| (v + 1..NW).map(move |w| [u, v, w])))
         .collect();
-    assert!(lanes <= pairs.len(), "at most {} lanes", pairs.len());
-    let off = (seed as usize) % pairs.len();
-    let lane_pair = |l: usize| pairs[(off + l * 7) % pairs.len()];
+    assert!(lanes <= triples.len(), "at most {} lanes", triples.len());
+    let off = (seed as usize) % triples.len();
+    let lane_triple = |l: usize| triples[(off + l * 7) % triples.len()];
     let mut x = vec![f.to(r0.x); lanes];
     let mut y = vec![f.to(r0.y); lanes];
     let mut la = vec![a0; lanes];
     let mut lb = vec![1u64; lanes];
-    for pass in 0..2 {
-        let idx: Vec<usize> = (0..lanes)
-            .map(|l| {
-                let (u, v) = lane_pair(l);
-                if pass == 0 {
-                    u
-                } else {
-                    v
-                }
-            })
-            .collect();
+    for pass in 0..3 {
+        let idx: Vec<usize> = (0..lanes).map(|l| lane_triple(l)[pass]).collect();
         batched_add(f, &mut x, &mut y, &idx, &wx, &wy);
         for l in 0..lanes {
             la[l] = addm(la[l], wc[idx[l]], r);
