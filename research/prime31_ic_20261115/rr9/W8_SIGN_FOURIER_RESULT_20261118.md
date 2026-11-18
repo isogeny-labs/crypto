@@ -1,0 +1,44 @@
+# Prime31 W8: all 256 signed RR9 predicates from one 70-minor tensor + Walsh transform
+
+**November 18, 2026** · existing [PR #4728](https://github.com/isogeny-labs/crypto/pull/4728) · [prospective native protocol](W8_SIGN_FOURIER_PROTOCOL_20261118.md) · [original-crate Rust example](../native/examples/prime31_w8_sign_fourier.rs) · [independent BigInt checker](../native/verify_prime31_w8_sign_fourier.py) · [source-specific workflow](../../../.github/workflows/prime31-w8-sign-fourier.yml).
+
+## Result and exact scope
+
+A classical **Cauchy–Binet/Laplace expansion** turns the target-conditioned 8×8 elliptic-curve Riemann–Roch determinant into a sum of **70 complementary four-row Vandermonde products**. Its dependence on eight independent **signs** is multilinear of Fourier degree **at most four**: of the 256 possible sign-monomial coefficients, only `sum_{k=0}^4 binom(8,k) = 163` can be nonzero. The 70 four-subset terms expand into 1,120 fixed sign-monomial contributions, followed by an 8-stage, 256-entry Walsh-Hadamard transform (1,024 butterflies). There are **zero finite-field inversions and zero EC group additions inside the fast finite-field sign evaluator**.
+
+The 8 input **x-coordinate indices are supplied**. This advances a deterministic algebraic *component*, not public-target index extraction, and cannot by itself beat 4+4 group enumeration. It is a standard multilinear expansion rather than a new cryptanalytic theorem. A valid relation output must still be checked against original elliptic-curve group addition and witness distinctness.
+
+## Identity
+
+Set `v(x)=(1,x,x²,x³)`, `a_i=x_i-r`, `b_i=ε_i y_i+s`, where `R=(r,s)` and `ε_i=±1`. The signed 8×8 determinant has rows `(a_i v(x_i), b_i v(x_i))`. For a four-subset S of indices 0,...,7 let `Δ(S)=∏_{i<j∈S}(x_j-x_i)`. Then
+
+`D(ε)=Σ_{|S|=4} (-1)^{Σ_{i∈S}i} Δ(S)Δ(Sᶜ) [∏_{i∈S}(x_i-r)] [∏_{j∈Sᶜ}(ε_j y_j+s)]`.
+
+This follows from Laplace expansion by the first four columns and the Vandermonde identity. Expanding the four `b` factors gives `D(ε)=Σ_{|T|≤4}c_T∏_{i∈T}ε_i`. Over any odd prime, Walsh evaluation of this coefficient vector recovers **each signed determinant residue exactly**, not merely its zero status. The mathematical cost is constant with respect to the number of sign choices because eight is fixed; it does **not** remove the exponentially many possible x-index tuples.
+
+## Original-curve verification panel
+
+Curve unchanged: `p=2147483647`, `a=847514846`, `b=2087444724`, `n=2147446831`, cofactor one, canonical first-31 base, weights 1/3/5/7/11/13/17/19. All **248 positive weighted x-coordinates** are distinct. Sixteen planted x-tuples with their actual public target and sixteen identically indexed target-plus-G negative controls, each tested under all 256 sign choices.
+
+An **independent local Python BigInt preflight** (not Rust or PCC) completed **8,192/8,192** exact residue comparisons of the new Fourier formula with direct 8×8 finite-field Gaussian determinants, and independently replayed **8,192/8,192** signed EC group identities. Of the 32 target panels, all 16 planted panels had **exactly one** valid signed mask and all 16 target-shifted panels had **zero**. This is a fixed positive-control/negative-control test; no unseen public target x-indices were recovered.
+
+Source-bound Rust CI is a separate gate. Operation counts and whole-panel AB/BA diagnostic elapsed time should be quoted **only after** its run and independent Python replay pass. Small component timings cannot be reported as ECDLP-solving speedups.
+
+## Previously searched avenues, to avoid duplication
+
+- [RR9 weighted resultant lane #4728](https://github.com/isogeny-labs/crypto/pull/4728): supplied seven-chart certificates and the 8×8 determinant; current Fourier arm extends the **sign-sweep evaluator** without duplicating root/resultant or witness truth tables.
+- [RR9/F4 #4692](https://github.com/isogeny-labs/crypto/pull/4692), [low-power strata #4717](https://github.com/isogeny-labs/crypto/pull/4717), [signed-pair projector #4720](https://github.com/isogeny-labs/crypto/pull/4720): reuse as public-only extraction infrastructure. No claim those lanes have solved 64 unseen B8 x-index tuples.
+- [M6 complete 1,024-target Rust #4714](https://github.com/isogeny-labs/crypto/pull/4714), [M6 formal-collision bound #4722](https://github.com/isogeny-labs/crypto/pull/4722): complete but generic 3+3 control, previously losing to optimized shared BSGS by 20.85–23.32×. Keep same target/runner and include failed trials in future whole solves.
+- [crypto-autoresearcher alternatives SA-04, SA-18](https://github.com/isogeny-labs/crypto-autoresearcher/blob/main/experiments/semaev-alternatives-20261105/SUMMARY.md): prior RR norm and determinant approaches failed registered gates; do not describe this as the first determinant attack.
+- [cryptanalysis](https://github.com/isogeny-labs/cryptanalysis): existing generic/prime-field arithmetic and binary SAT benchmark are reuse or instrumentation references, not proof of a Prime31 non-generic advantage.
+- [Amadori–Pintore–Sala 2018](https://doi.org/10.1016/j.ffa.2018.01.009), [Petit–Kosters–Messeng 2016](https://eprint.iacr.org/2016/475): established prime-field summation-polynomial index-calculus prior art. New [Bochum 2026 proposal](https://github.com/bochum-crypto/subexponential-ecdl) and [claimed end-to-end result #4698](https://github.com/isogeny-labs/crypto/pull/4698) require independent proof and complete benchmark audits. [#4746](https://github.com/isogeny-labs/crypto/pull/4746) retracted an earlier favorable 0.43 cost exponent in a separate PKM setting.
+
+Research-KB is unavailable in this connector runtime; this is a primary-GitHub and externally published sources review, not a complete novelty survey.
+
+## Prioritized next computational gates
+
+1. **Unknown-index selector/F4 extractor:** Build a genuinely public-residual-only Boolean/prime-field constraint for eight B8 slot indices, using the signed Fourier coefficients **symbolically** where cheaper than dense RR9; read no 4+4 grader table and no planted chart. Score against the sealed B8 panel of 46 natural positive/18 natural negative targets, log all timeouts and false witnesses, and compare candidate algebraic work against the baseline 1.009s generic 72-query grader only as a *component* diagnostic.
+2. **Explicit cost kill gate:** If the bounded B8 selector uses more field-ops/memory than the existing optimized generic mixed relation extractor at matched yielding rates, reject it before B31.
+3. **Complete path:** For any surviving extraction arm, B31 must produce rank 31 and recover 1,024 blinded unknown Prime31 logarithms in the original Rust pipeline, with cold/online setup, failed trials, elimination, and certification. Compare same-host against strongest mixed IC, shared BSGS and rho in both single-target and amortized regimes. Signed independent PCC is separately pending.
+
+**Evidence label:** original-curve BigInt preflight mathematically checked; native Rust source and CI committed; source-specific CI and independent signed PCC statuses are tracked separately. No cheaper complete solver claimed here.
