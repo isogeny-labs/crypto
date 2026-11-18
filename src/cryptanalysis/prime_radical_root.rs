@@ -107,17 +107,10 @@ impl Fp {
     pub fn sqr(&self, a: u64) -> u64 {
         self.mul(a, a)
     }
-    pub fn powm(&self, mut a: u64, mut e: u64) -> u64 {
-        let mut r = 1u64 % self.p;
-        a %= self.p;
-        while e > 0 {
-            if e & 1 == 1 {
-                r = self.mul(r, a);
-            }
-            a = self.sqr(a);
-            e >>= 1;
-        }
-        r
+    pub fn powm(&self, a: u64, e: u64) -> u64 {
+        // Share the adaptive exponentiation core with Fp2. Inputs here may
+        // be noncanonical, while the generic Ring path expects field values.
+        rpow(self, a % self.p, e as u128)
     }
     pub fn inv(&self, a: u64) -> u64 {
         // Extended Euclid replaces ~log(p) Fermat squarings/multiplies on
@@ -229,6 +222,41 @@ impl Ring for Fq2 {
     }
 }
 pub(crate) fn rpow<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
+    // Sliding window of up to four bits: 7 precomputed odd powers, fewer
+    // field multiplications for dense exponents in Fp and, especially, Fp2.
+    // Sparse or short exponents skip the table: AMM has many cheap 3^k
+    // exponents for which precomputation would be a regression.
+    let bits = u128::BITS - e.leading_zeros();
+    if bits >= 32 && e.count_ones() > (bits + 3) / 4 + 7 {
+        let a2 = r.sqr(a);
+        let mut odd = [r.one(); 8];
+        odd[0] = a;
+        for j in 1..8 {
+            odd[j] = r.mul(odd[j - 1], a2);
+        }
+        let mut acc = r.one();
+        let mut high = bits as i32 - 1;
+        while high >= 0 {
+            if ((e >> (high as u32)) & 1) == 0 {
+                acc = r.sqr(acc);
+                high -= 1;
+                continue;
+            }
+            let mut low = (high - 3).max(0);
+            while ((e >> (low as u32)) & 1) == 0 {
+                low += 1;
+            }
+            let width = (high - low + 1) as u32;
+            let digit = ((e >> (low as u32)) & ((1u128 << width) - 1)) as usize;
+            for _ in low..=high {
+                acc = r.sqr(acc);
+            }
+            acc = r.mul(acc, odd[(digit - 1) / 2]);
+            high = low - 1;
+        }
+        return acc;
+    }
+
     let mut acc = r.one();
     let mut b = a;
     while e > 0 {
@@ -533,10 +561,10 @@ impl RadicalRootCtx {
             Some(0) => vec![f.mul(f.neg(b), self.inv2)],
             Some(s) => {
                 let nb = f.neg(b);
-                vec![
-                    f.mul(f.add(nb, s), self.inv2),
-                    f.mul(f.sub(nb, s), self.inv2),
-                ]
+                // Root sum is -b: derive the second root with one subtraction
+                // rather than another modular multiplication by inv2.
+                let first = f.mul(f.add(nb, s), self.inv2);
+                vec![first, f.sub(nb, first)]
             }
         }
     }
@@ -772,6 +800,134 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+
+    // Freeze the original right-to-left binary exponentiation independently
+    // of the new shared Fp/Fp2 implementation.
+    fn frozen_binary_power<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
+        let (mut acc, mut b) = (r.one(), a);
+        while e > 0 {
+            if e & 1 != 0 {
+                acc = r.mul(acc, b);
+            }
+            e >>= 1;
+            if e != 0 {
+                b = r.sqr(b);
+            }
+        }
+        acc
+    }
+
+    #[test]
+    fn adaptive_window_power_and_quadratic_finish_match_frozen() {
+        let exponents = [
+            0u128, 1, 2, 3, 17, (1u128 << 32) - 1, 1u128 << 32,
+            (1u128 << 60) - 67, (1u128 << 61) - 3,
+            (1u128 << 120) - 827_365,
+            (1u128 << 121) + (1u128 << 63) + 1_234_567,
+            u128::MAX,
+        ];
+        let mut seed = 0x7732_b92c_51d8_073fu64;
+        for &p in &[5u64, 7, 97, 487, 65_537,
+                    998_244_353, 1_000_000_009, MAX_PRIME] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: 3 };
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            for _ in 0..128 {
+                let x = lcg(&mut seed) % p;
+                let y = lcg(&mut seed) % p;
+                for &e in &exponents {
+                    assert_eq!(rpow(&f, x, e), frozen_binary_power(&f, x, e),
+                               "Fp p={p} x={x} e={e}");
+                    assert_eq!(rpow(&q, (x, y), e),
+                               frozen_binary_power(&q, (x, y), e),
+                               "Fp2 p={p} x={x} y={y} e={e}");
+                    if e <= u64::MAX as u128 {
+                        assert_eq!(f.powm(x, e as u64),
+                                   frozen_binary_power(&f, x, e),
+                                   "powm p={p} e={e}");
+                    }
+                }
+                // Exact old formula output, not just an unordered root set.
+                let s = lcg(&mut seed) % p;
+                let nb = f.neg(x);
+                let want_first = f.mul(f.add(nb, s), ctx.inv2);
+                let want_second = f.mul(f.sub(nb, s), ctx.inv2);
+                assert_eq!(f.sub(nb, want_first), want_second, "quad p={p}");
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired actual-Rust microbenchmark, not an end-to-end rootfinding result"]
+    fn bench_adaptive_window_and_quad_finish() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn sample<T: Copy, F: Fn(T) -> u64>(xs: &[T], reps: usize, f: &F) -> f64 {
+            let start = Instant::now();
+            let mut checksum = 0u64;
+            for _ in 0..reps {
+                for &x in xs {
+                    checksum ^= black_box(f(black_box(x)));
+                }
+            }
+            black_box(checksum);
+            start.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+        fn paired<T: Copy, B: Fn(T) -> u64, A: Fn(T) -> u64>(
+            name: &str, xs: &[T], reps: usize, before: B, after: A
+        ) {
+            for &x in xs {
+                assert_eq!(before(x), after(x), "{name}: output mismatch");
+            }
+            let (mut b, mut a) = (Vec::new(), Vec::new());
+            for k in 0..13 {
+                if k % 2 == 0 {
+                    b.push(sample(xs, reps, &before));
+                    a.push(sample(xs, reps, &after));
+                } else {
+                    a.push(sample(xs, reps, &after));
+                    b.push(sample(xs, reps, &before));
+                }
+            }
+            b.sort_by(f64::total_cmp);
+            a.sort_by(f64::total_cmp);
+            println!("{name}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                     b[6], a[6], b[6] / a[6]);
+        }
+        let mut seed = 0x4a36_9f11_67b2_8201u64;
+        for &p in &[487u64, 998_244_353, 1_000_000_009, MAX_PRIME] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: 3 };
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let mut xs = Vec::new();
+            for _ in 0..1024 {
+                xs.push((lcg(&mut seed) % p, lcg(&mut seed) % p));
+            }
+            let e = (1u128 << 60) - 67; // deterministic dense exponent
+            let e2 = (1u128 << 120) - 827_365;
+            println!("p={p}, 13 AB/BA samples, 1024 public inputs");
+            paired("Fp powm dense-60", &xs, 2,
+                   |x| frozen_binary_power(&f, x.0, e),
+                   |x| f.powm(x.0, e as u64));
+            paired("Fp2 rpow dense-120", &xs, 1,
+                   |x| frozen_binary_power(&q, x, e2).0,
+                   |x| rpow(&q, x, e2).0);
+            paired("quadratic two-root finish", &xs, 24,
+                   |(b, s)| {
+                       let nb = f.neg(b);
+                       let a = f.mul(f.add(nb, s), ctx.inv2);
+                       let c = f.mul(f.sub(nb, s), ctx.inv2);
+                       a ^ c
+                   },
+                   |(b, s)| {
+                       let nb = f.neg(b);
+                       let a = f.mul(f.add(nb, s), ctx.inv2);
+                       let c = f.sub(nb, a);
+                       a ^ c
+                   });
+        }
+    }
 
     // Frozen unoptimized routines for independent bitwise before/after checks.
     fn old_sqrt(ctx: &RadicalRootCtx, a: u64) -> Option<u64> {
