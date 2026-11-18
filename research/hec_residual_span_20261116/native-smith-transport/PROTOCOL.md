@@ -1,0 +1,9 @@
+# Original Smith public class transport gate [pcc:unverified]
+
+Fixed source H/F61:y²=x⁷+x³+5x+1, original ell124459 and two public source/target fixtures from native-lazy-finisher. Source multiples1and17, sequential Rng seed2026111800 xor61 xor(3<<32); recreate D,T exactly. Both canonical models from native-smith-canonical/MODELS.json;no source/kernel substitution. Expected k is driver verification only, absent from transport.rs.
+
+Use DERIVATION.md's degree2point correspondence and public moving divisors. For each effective degree3 source support, check etaleness/units, exact scalar quartic and canonical quartic identities in the6dimensional image algebra, coordinate unit, rank6cubic evaluation and every kernel constraint. Reduce degree6image ideals with the unmodified repository Pic64 module copied with source provenance. Constructor independently checks smoothness.
+
+For each of4map/fixture pairs transport source/target twice using auxiliary search starts1and37, each512attempts. Require identical canonical class keys across choices;nonzero source image;ell times source image zero;original expected scalar times image source equals image target. Check zero,negation,doubling,2D+3D=5D and invalid Mumford rejection. Print original u/v, class keys, actual auxiliary choices/rejections and Pic counters/stats. Counters are descriptive and do not include every native transport operation;do not present them as complete stage cost or speed.
+
+One600CPU invocation after pushed Git freeze/source/input/binary hashes;overflow checks enabled. Preserve failures/no unchanged rerun. Hash all imported native arithmetic and all model source records. No quartic DLP solver invocation, no known-scalar shortcut within mapper, no claim of a universal512attempt moving lemma. This gate establishes bounded class transport if all checks pass;matched total cost and10xgenus2+goal remain open. NoS3polling/cloud/merge. Independent signed review remains open.
