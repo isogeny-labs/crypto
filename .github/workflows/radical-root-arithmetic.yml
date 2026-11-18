@@ -15,6 +15,44 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # The default crypto library is temporarily unbuildable due to unrelated
+  # F4/APS diagnostics. Compile the exact production source in a tiny,
+  # dependency-free test crate so field changes are still independently gated.
+  isolated-arithmetic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compile actual Rust module and check arithmetic
+        run: |
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            optimized_field_arithmetic_matches_wide_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            radical_power_reuse_matches_frozen_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            cube_root_exhaustive_fp_and_fp2_both_classes -- --nocapture
+      - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "perf_event_paranoid=$(cat /proc/sys/kernel/perf_event_paranoid)"
+            echo "rustc=$(rustc --version)"
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_radical_power_reuse -- --ignored --nocapture
+          } | tee "$RUNNER_TEMP/radical-power-reuse.txt"
+          cat "$RUNNER_TEMP/radical-power-reuse.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: radical-power-reuse-rust-bench
+          path: ${{ runner.temp }}/radical-power-reuse.txt
+          if-no-files-found: ignore
+
   radical:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
