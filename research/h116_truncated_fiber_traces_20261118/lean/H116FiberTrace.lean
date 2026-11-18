@@ -864,6 +864,34 @@ theorem FormalGroup.filtered_right_negation_pole_prefix
     hactualZero homittedZero hscalarZero hnegZero hsum hneg hnegOrder
     hactual hscalar hactualUnit hscalarUnit houter
 
+/-- The standard short-Weierstrass local parameter in affine coordinates. -/
+def shortWeierstrassLocalParameter (x y : K) : K :=
+  -x / y
+
+/-- Short-Weierstrass point negation `(x,y) ↦ (x,-y)` negates the local
+parameter exactly. -/
+theorem shortWeierstrassLocalParameter_neg (x y : K) :
+    shortWeierstrassLocalParameter x (-y) =
+      -shortWeierstrassLocalParameter x y := by
+  unfold shortWeierstrassLocalParameter
+  rw [div_neg]
+
+omit [Algebra K L] in
+/-- The short-Weierstrass local parameter commutes with every field ring
+homomorphism applied coordinatewise. -/
+theorem shortWeierstrassLocalParameter_map (f : K →+* L) (x y : K) :
+    shortWeierstrassLocalParameter (f x) (f y) =
+      f (shortWeierstrassLocalParameter x y) := by
+  simp [shortWeierstrassLocalParameter]
+
+/-- If a coordinate endomorphism is the `p`-power map, its action on the
+short-Weierstrass local parameter is exactly `z ↦ z^p`. -/
+theorem shortWeierstrassLocalParameter_frobenius
+    (phi : K →+* K) (p : ℕ) (hphi : ∀ a : K, phi a = a ^ p) (x y : K) :
+    shortWeierstrassLocalParameter (phi x) (phi y) =
+      shortWeierstrassLocalParameter x y ^ p := by
+  rw [shortWeierstrassLocalParameter_map, hphi]
+
 /-- The regular unit in the short-Weierstrass local coordinate
 `x(z)=z⁻² q(z)⁻¹`. Clearing the curve equation gives this fixed-point identity. -/
 def WeierstrassCoordinateUnit
@@ -1892,6 +1920,9 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms FormalGroup.right_inverse_order
 #print axioms FormalGroup.filtered_right_cancellation_pole_prefix_of_omitted_order
 #print axioms FormalGroup.filtered_right_negation_pole_prefix
+#print axioms shortWeierstrassLocalParameter_neg
+#print axioms shortWeierstrassLocalParameter_map
+#print axioms shortWeierstrassLocalParameter_frobenius
 #print axioms WeierstrassCoordinateUnit.constantCoeff
 #print axioms WeierstrassCoordinateUnit.clearedCurveIdentity
 #print axioms WeierstrassCoordinateUnit.rescale

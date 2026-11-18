@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-24e5fba86085ca12e1eb09a44c28758f677d7370a0b6001118e770f931942a46  H116FiberTrace.lean
+f5412131ae02d97145af84b4fbae4bf738702da100dd247d67365988ec38a5ae  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  89 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  93 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -33,8 +33,8 @@ b9a7d56d16d41dc867cb768b114d87dd81b1cd3c745b2968adca395e95dca634  receipts/curve
 621d395aacdb96c526881fd73cab63ea937df6f7779cb10d69eca36669e8ac5f  receipts/curve-coordinate-audit.log
 43aa3a63525c4f4249a311b4ace2f04f1510ceb6d73f1666a60913ee6e2b6579  receipts/formal-group-build.log
 4f1d11d86bd8040b77073409c5d5e07f2f75bb18257ef6b9d5f0a5f31b9f4ac4  receipts/formal-group-audit.log
-cc9b391320d8c29caeb8afd595cd44c9f568c93144918196306f8a80da2c65a5  receipts/formal-cancellation-build.txt
-a9d0da69bd49c8badf0c10ff7c06611d430ec9516bbf6a43232d9ece1268f513  receipts/formal-cancellation-audit.txt
+a41c1e29d67c2e6abad49ddc96df7a74570c696ad60e6e059ef0cb1aaa779d5f  receipts/formal-cancellation-build.txt
+77aab1910085575554977eef863455f5093a8491143dfce4f5af2f175eb5d6ee  receipts/formal-cancellation-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -111,7 +111,7 @@ when `a*zNormalized=zScalar`. The 84-theorem checkpoint additionally imports
 Mathlib's actual `FormalGroup` and proves that `Y` divides `F(X,Y)-X`, that a
 substituted correction factors multiplicatively, and that an `X^m` correction
 preserves the formal parameter prefix below degree `m`. It composes this with
-the leading-`X` pole bridge at one degree less. The 89-theorem checkpoint adds
+the leading-`X` pole bridge at one degree less. The 93-theorem checkpoint adds
 the endomorphism-oriented cancellation step: associativity turns certified
 relations `F(actual,omitted)=scalar` and
 `F(omitted,inverseCorrection)=0` into
@@ -122,7 +122,11 @@ prefix theorem. An explicit-negation endpoint avoids a separately constructed
 inverse series: it takes `F(omitted,-omitted)=0` as the visible certificate and
 derives the correction order directly. Instantiating this generic result with
 the actual elliptic `V+pi=[t]`, short-Weierstrass negation, the order-`p`
-Frobenius parameter, and sign/scaling identifications remains open.
+Frobenius parameter, and sign/scaling identifications remains open. The same
+checkpoint defines `z(x,y)=-x/y` and proves coordinatewise that negation sends
+`z` to `-z`, every field ring homomorphism commutes with `z`, and a supplied
+`p`-power coordinate endomorphism sends `z` exactly to `z^p`. This narrows but
+does not construct the missing formal-group/endomorphism instance.
 [pcc:unverified]
 
 The first integration build is retained at

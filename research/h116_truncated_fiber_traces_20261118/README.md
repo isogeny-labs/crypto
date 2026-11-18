@@ -164,6 +164,10 @@ inherits the omitted parameter's `X^m` factor; alternatively, an explicit
 short-Weierstrass negation certificate `F(omitted,-omitted)=0` avoids a
 separately constructed inverse series. What remains is the actual elliptic
 `V+pi=[t]`, negation, order-`p` Frobenius, sign and target-scaling instance.
+At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
+`(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
+coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from
+these coordinate identities to the actual formal group remains open.
 [pcc:unverified]
 
 The frozen [prefix-transfer boundary control](PREFIX_TRANSFER_EXPERIMENT.md)

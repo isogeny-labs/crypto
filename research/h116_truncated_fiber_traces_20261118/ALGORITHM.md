@@ -147,7 +147,11 @@ For the short-Weierstrass parameter, a stronger endpoint directly uses the
 explicit certificate `F(omitted,-omitted)=0`, eliminating the separately
 constructed inverse series. The curve-specific `V+pi=[t]`, exact local
 Frobenius order, elliptic negation, sign and scaling identifications are still
-the endpoint hypotheses. [pcc:unverified]
+the endpoint hypotheses. The coordinate formulas themselves are now formal:
+for `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
+the exact `z -> z^p` formula for a supplied coordinatewise `p`-power
+endomorphism. Connecting those formulas to the actual elliptic formal-group
+object and retained map remains the endpoint. [pcc:unverified]
 
 A frozen 20-case boundary panel over five primes and four cutoffs measures this
 loss directly. All local-parameter pairs first differ at `m+1`, all normalized

@@ -312,6 +312,40 @@ rejected in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` seals
 the polynomial rescaling step and points to the audited Lean source. The
 control supplies no replacement for the open endpoint row. [pcc:unverified]
 
+## Short-Weierstrass local-parameter instance gate
+
+1. **Structure above.** The local affine parameter is the field expression
+   `z(x,y)=-x/y`. Coordinate negation is `(x,y) -> (x,-y)`, and a coordinate
+   endomorphism is represented by a field ring homomorphism applied to both
+   coordinates. This gate does not construct the elliptic formal group.
+2. **Theorems used as stated.** Field `div_neg` proves
+   `z(x,-y)=-z(x,y)`. Ring-homomorphism preservation of negation and division
+   proves `z(phi(x),phi(y))=phi(z(x,y))`; a supplied power-map identity for
+   `phi` then gives the exact Frobenius parameter formula.
+3. **Object as an instance.** The implementation expression is exactly
+   `shortWeierstrassLocalParameter x y`. The negation and map theorems quantify
+   over arbitrary fields; the Frobenius wrapper quantifies over a ring
+   endomorphism `phi` and the explicit premise `phi(a)=a^p`.
+4. **Assembly probe.** A temporary module importing `H116FiberTrace` checked
+   the definition and all three wrappers at default limits. The tracked module
+   then rebuilt at default limits; the exact repository auditor reported
+   `93 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This proves the coordinate-level negation and
+   Frobenius formulas. It does not prove that the supplied rational map is
+   Verschiebung, construct its local formal-group law, or identify the
+   endomorphism relation `V+pi=[t]`.
+6. **Inheritance table.** Division, negation, powers and ring-homomorphism laws
+   are inherited from Mathlib field/ring instances. H116 adds only the named
+   local-parameter definition and compositions. No curve equation, copied
+   addition law, complexity claim, trusted decision procedure or resource
+   override is introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `z(x,-y)=-z(x,y)` | coordinate identity | H116 over field laws | arbitrary field | none |
+| `z(phi(x),phi(y))=phi(z(x,y))` | coordinate naturality | H116 over ring-hom laws | field ring homomorphism | none |
+| coordinate Frobenius sends `z` to `z^p` | instance wrapper | H116 | field endomorphism | supplied identity `phi(a)=a^p` |
+
 ## Mathlib formal-group filtration instance gate
 
 1. **Structure above.** The quantified object is Mathlib's
