@@ -35,3 +35,19 @@ Clang -O2 repeated the 13-pair tests and showed a positive median for each teste
 - Inspect real Rust CI logs, especially for Fp2 and big prime values.
 - Benchmark `Cube::new` to quantify the one-time precomputation cost, and compare full cubic/quartic throughput across factor-base inputs.
 - Profile hardware cycles/instructions on a permitted PMU-enabled machine.
+
+
+## Additional Cardano discriminant optimization
+
+In `RadicalRootCtx::cubic_depressed`, `m=-P/3` is needed after discriminant calculation. Reuse it: `D=(Q/2)^2-m^3` rather than calculating `P^3/27` separately. This eliminates two `Fp::mul` calls on the common cubic path, with no change in the mathematics. `cubic_monic` also changes `2*inv27` from a generic multiplication into one modular doubling.
+
+The arithmetic C++17 reproduction has **196,608** exact matching random pairs across six primes, with UBSan passing. For 13 AB/BA paired measurements, AMD EPYC 9V74, GCC -O2, the following are local **C++-mirror arithmetic** results (not compiled Rust):
+
+| p | before ns | after ns | wall speedup | software task-clock speedup |
+|---|---:|---:|---:|---:|
+| 487 | 17.520 | 15.127 | **1.158x** | 1.158x |
+| 17,497 | 17.352 | 14.747 | **1.177x** | 1.187x |
+| 1,000,000,009 | 17.695 | 15.214 | **1.163x** | 1.163x |
+| 2^61-1 | 13.637 | 9.238 | **1.476x** | 1.476x |
+
+Clang -O2 showed **1.103x–1.181x** across all six primes (the compiler-dependent P-256/Mersenne reduction results must not be generalized). The Rust CI `cardano_discriminant_reuse_matches_reference` compares 100,000 pairs over ten primes, and the ignored `bench_cardano_discriminant` performs a new actual-Rust paired comparison. No full cubic-root throughput speedup has been established.
