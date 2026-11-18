@@ -67,7 +67,7 @@ cargo +1.100.0 run  --release --locked --manifest-path research/prime31_ic_20261
 python3 research/prime31_ic_20261115/native/verify_prime31_m6_yield_ceiling.py prime31-m6-yield.json
 ```
 
-No Rust compiler or full repo checkout was present in the editing runtime. The separately coded local Python exact EC replay **passed** (both 29,791 sets, three base order checks, fractions and expected-query budgets). **Rust compilation and source-specific Actions remain unverified until the matching CI run completes; signed independent PCC remains pending.**
+No Rust compiler or full repo checkout was present in the editing runtime. **The source-specific GitHub Actions run [#44330826755](https://github.com/isogeny-labs/crypto/actions/runs/44330826755) PASSED** at pinned original Rust source `1df714645aa683cf975bc76fcacb9842cb4780fd` (PR candidate head `fb4bb0dd5682753278caebfb1a86800d5c1184bd`, Rust 1.100.0), including **40/40 original Rust library tests, 2/2 new exact ceiling tests, source-produced JSON**, and separately implemented Python BigInt original-curve replay of both 29,791-sum supports, three point-order controls, exact fractions and expected-call budgets. Raw [JSON artifact #14439481917](https://github.com/isogeny-labs/crypto/actions/runs/44330826755/artifacts/14439481917), GitHub-provided SHA256 ZIP digest `e03737964eeb396d22affdfd654ed814589d62ca0b6ddc5cf54d07bc91ade683` (not independently rehashed). This is **producer-side reproducibility**, not an independently signed scientific PCC; signed PCC and any non-generic solver speed comparison remain pending.
 
 ## Priority queue: one changed mechanism per experiment
 
