@@ -465,7 +465,6 @@ fn solve_square(
             col_rows[c as usize].push(i as u32);
         }
     }
-    let _ = nr;
     let nr = matched.len();
     let mut row_alive = vec![true; nr];
     let mut col_alive = vec![true; n];
