@@ -409,6 +409,72 @@ fn mitm_right(
     None
 }
 
+/// MitmTable is the left half of the meet-in-the-middle search: every partial
+/// sum A_1 + ... + A_h (h = m/2, A_i in F_i) mapped to the first pick list that
+/// reaches it. It depends only on the curve and the factor bases, not on the
+/// target, so a solver builds it once per factor-base draw and reuses it for
+/// every relation trial; building it costs about |F|^(m/2) point additions,
+/// charged once (to whatever opcount phase is current when `new` runs).
+#[derive(Debug, Clone)]
+pub struct MitmTable<'a> {
+    c: Curve,
+    fb: &'a FactorBases,
+    h: usize,
+    /// None when no relation can exist (m < 2 or some F_i is empty).
+    table: Option<HashMap<Point, Vec<u32>>>,
+}
+
+impl<'a> MitmTable<'a> {
+    /// new enumerates F_1 x ... x F_h into the partial-sum table. The
+    /// enumeration order is fixed, so the table (and with it every witness
+    /// `find` returns) is the same as the per-call table of the old path.
+    pub fn new(c: &Curve, fb: &'a FactorBases) -> MitmTable<'a> {
+        let m = fb.sets.len();
+        let h = m / 2;
+        let table = if m < 2 || fb.sets.iter().any(|s| s.is_empty()) {
+            None
+        } else {
+            let mut table: HashMap<Point, Vec<u32>> = HashMap::new();
+            let mut picks: Vec<u32> = Vec::with_capacity(h);
+            mitm_left(c, &fb.sets[..h], 0, INFINITY, &mut picks, &mut table);
+            Some(table)
+        };
+        MitmTable { c: *c, fb, h, table }
+    }
+
+    /// Number of distinct left partial sums stored (0 if no relation can exist).
+    pub fn len(&self) -> usize {
+        self.table.as_ref().map_or(0, |t| t.len())
+    }
+
+    /// Whether the table holds no partial sums.
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    /// find returns A_1 + ... + A_m = r with A_i in F_i, if one exists, by
+    /// enumerating the right half F_{h+1} x ... x F_m and looking up the
+    /// complement r - (A_{h+1} + ... + A_m) in the left table. It performs
+    /// about |F|^(m/2) point additions per call. The witness is not checked
+    /// here; callers verify membership and the sum.
+    pub fn find(&self, r: Point) -> Option<Vec<Point>> {
+        let table = self.table.as_ref()?;
+        let (c, fb, h) = (&self.c, self.fb, self.h);
+        let m = fb.sets.len();
+        let mut rpicks: Vec<u32> = Vec::with_capacity(m - h);
+        let (need, right) = mitm_right(c, &fb.sets[h..], 0, INFINITY, r, &mut rpicks, table)?;
+        let left = table.get(&need)?;
+        let mut pts: Vec<Point> = Vec::with_capacity(m);
+        for (i, &j) in left.iter().enumerate() {
+            pts.push(fb.sets[i][j as usize]);
+        }
+        for (i, &j) in right.iter().enumerate() {
+            pts.push(fb.sets[h + i][j as usize]);
+        }
+        Some(pts)
+    }
+}
+
 /// mitm_find_relation returns A_1 + ... + A_m = r with A_i in F_i, if one
 /// exists, by meeting in the middle: the first half of the factor bases is
 /// enumerated into a table keyed by its partial sum, then the second half is
@@ -416,27 +482,10 @@ fn mitm_right(
 /// |F|^(m/2) + |F|^(m/2) point additions instead of the product over all m
 /// sets, so it is the same relation network contracted from both ends. The
 /// witness is not checked here; callers verify membership and the sum.
+///
+/// This builds a fresh [`MitmTable`] on every call; callers that search many
+/// targets under one factor base should build the table once and call
+/// [`MitmTable::find`].
 pub fn mitm_find_relation(c: &Curve, fb: &FactorBases, r: Point) -> Option<Vec<Point>> {
-    let m = fb.sets.len();
-    if m < 2 {
-        return None;
-    }
-    if fb.sets.iter().any(|s| s.is_empty()) {
-        return None;
-    }
-    let h = m / 2;
-    let mut table: HashMap<Point, Vec<u32>> = HashMap::new();
-    let mut picks: Vec<u32> = Vec::with_capacity(h);
-    mitm_left(c, &fb.sets[..h], 0, INFINITY, &mut picks, &mut table);
-    let mut rpicks: Vec<u32> = Vec::with_capacity(m - h);
-    let (need, right) = mitm_right(c, &fb.sets[h..], 0, INFINITY, r, &mut rpicks, &table)?;
-    let left = table.get(&need)?.clone();
-    let mut pts: Vec<Point> = Vec::with_capacity(m);
-    for (i, &j) in left.iter().enumerate() {
-        pts.push(fb.sets[i][j as usize]);
-    }
-    for (i, &j) in right.iter().enumerate() {
-        pts.push(fb.sets[h + i][j as usize]);
-    }
-    Some(pts)
+    MitmTable::new(c, fb).find(r)
 }
