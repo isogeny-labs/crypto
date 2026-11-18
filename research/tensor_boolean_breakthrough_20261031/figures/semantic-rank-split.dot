@@ -1,0 +1,21 @@
+digraph semantic_rank_split {
+  graph [bgcolor="transparent", rankdir=TB, pad=0.18, nodesep=0.32, ranksep=0.42];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, color="#334155", fillcolor="#f8fafc", margin="0.12,0.08"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#475569", arrowsize=0.7];
+
+  source [label="Bochum hashed factor bases\nsource threshold", fillcolor="#dbeafe"];
+  relation [label="Semantic slot relation A_S\nrows/columns = partial tuples", fillcolor="#e0f2fe"];
+  count [label="rank_Q(A_S) ≤ D_S(R)\ncomplete decompositions", fillcolor="#dcfce7"];
+  mean [label="E_S[D_S(R)] < 2\nwhen r^(1/m) ≥ 10m, r ≥ 100", fillcolor="#dcfce7"];
+  obstruction [label="No all-seed or typical-seed\nexponential semantic-rank floor", fillcolor="#fee2e2", color="#b91c1c"];
+
+  btnir [label="Low-level BTNIR edge flattening\nrepresentation-specific", fillcolor="#fef3c7"];
+  open [label="Family rank + exact-linear-message\nbridge remains open", fillcolor="#fef3c7"];
+
+  source -> relation;
+  relation -> count;
+  count -> mean;
+  mean -> obstruction;
+  relation -> btnir [style=dashed, label="no rank-equivalence theorem"];
+  btnir -> open;
+}

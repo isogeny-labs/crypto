@@ -42,24 +42,24 @@ The null changes only the global wiring of interior ports while preserving the v
    The legacy raw-edge contractor is infeasible even on F5; minimal typed
    rewiring leaves conditioned ranks unchanged, while arbitrary rewiring still
    lacks an exact projected model counter. The full E1 protocol remains draft.
-5. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
-4. **Proved 2026-11-01:** a nonzero-minor certificate gives a rigorous finite rank lower bound and forces the dimension of every exact linear separator factorization; a uniform exponential family lemma would force exponential work in that architecture. See [`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md). The family lemma is open.
-5. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
-6. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
+5. **Kernel-checked 2026-11-01:** a nonzero-minor certificate gives a finite rank lower bound and forces the dimension of every exact linear separator factorization; a uniform exponential family lemma would force exponential work in that architecture. See [`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md).
+6. **Derived 2026-11-18:** the encoding-independent slot relation cannot satisfy that exponential rank hypothesis uniformly over all seeds or with nonnegligible probability under the source threshold: its rank is at most its decomposition count and the expected count is below two. An exceptional selected seed sequence is not excluded. The low-level BTNIR edge-flattening family remains separate and open. Claim records have unverified PCC standing. [pcc:unverified] See [`SEMANTIC_RANK_BOUND.md`](SEMANTIC_RANK_BOUND.md).
+7. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
+8. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
 The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore uses a hybrid semantic representation: predicates at or below 16 ports carry their complete truth table; larger production predicates carry a strict typed operation that is also their live evaluator. Tag, parameters, truth table or typed program, port order, interface and pins are bound into one SHA-256 identity. Untagged predicates are admitted only through an explicit bounded-truth-table policy for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
 
-This hybrid requirement is a pre-freeze clarification of the original tag-only draft. Tags make the IR interpretable but do not by themselves prove that an imported closure has the same semantics. An initial universal-table implementation was rejected by its own representative control: the tiny hash network contains a 132-port Fourier relation, so a 16-port cap cannot cover production. The typed program supplies exact, replayable semantics for those vertices without materializing a `2^132` table. No affected data preceded either correction.
+This hybrid requirement is a pre-freeze clarification of the original tag-only draft. Tags make the IR interpretable but do not by themselves establish that an imported closure has the same semantics. An initial universal-table implementation was rejected by its own representative control: the tiny hash network contains a 132-port Fourier relation, so a 16-port cap cannot cover production. The typed program supplies exact, replayable semantics for those vertices without materializing a `2^132` table. No affected data preceded either correction.
 
 ## Interpretation discipline
 
 - A low finite-size rank is a mechanism lead, not a subexponential ECDLP result.
 - A full-rank E1 result rejects this registered boundary-compression route on these cuts and sizes; it does not rule out every Boolean or algebraic representation.
 - An E1S win nominates a specific solver/encoding bundle. It does not establish that “SAT” in general is the mechanism, and an E1S loss does not negate a passing E1 rank result.
-- Local low rank in E2 does not advance unless a proved composition rule lowers a global message bound.
+- Local low rank in E2 does not advance unless a checked composition rule lowers a global message bound.
 - E3 search uses a frozen training panel and an untouched holdout panel. Search-time wins do not count.
 - E4 compares complete target-dependent work on identical semantic instances. Setup, precision growth, failed candidates, extraction, and verification remain charged.
-- E5 is the first stage allowed to use the phrase “relation-oracle improvement.” None of E0–E4 establishes an ECDLP speedup.
+- E5 is the first stage allowed to use the phrase “relation-oracle gain.” None of E0–E4 establishes an ECDLP pipeline gain.
 
 ## Requirement-to-evidence map
 
@@ -80,7 +80,8 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
 - [`experiment-matrix.json`](experiment-matrix.json) — machine-readable experiment cards and dependencies.
 - [`E0_IMPLEMENTATION.md`](E0_IMPLEMENTATION.md) — canonical-IR format, controls, evidence boundary, and open obligations.
 - [`E1_IMPLEMENTATION.md`](E1_IMPLEMENTATION.md) — exact boundary contraction/rank core, local controls and remaining generator gates.
-- [`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md) — proved finite separator bounds, conditional family/work theorem, certificate contract and proof map.
+- [`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md) — finite separator bounds, conditional family/work theorem, certificate contract and proof map.
+- [`SEMANTIC_RANK_BOUND.md`](SEMANTIC_RANK_BOUND.md) and `semantic-rank-20261118.pdf` — source-threshold semantic upper bound, matrix-scope split, Lean map and visual.
 - [`BOUNDS_REPORT.md`](BOUNDS_REPORT.md) and `bounds-20261101.pdf` — one-page visual bound/scope brief.
 - [`SEARCH_20261101.md`](SEARCH_20261101.md) — reconciliation of the requested separator, small-root and special-prime leads.
 - [`REPORT.md`](REPORT.md) — visual decision brief.

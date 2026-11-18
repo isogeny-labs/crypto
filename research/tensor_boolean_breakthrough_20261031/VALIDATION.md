@@ -306,7 +306,7 @@ The focused suite passed 4/4 tests. Its deterministic property control checks
 1,152 integer matrices of every shape from 1-by-1 through 6-by-6: exact rank
 agrees with independent rational Gaussian elimination and the rank-profile
 minor's independently recomputed determinant is nonzero. The equality-network
-test independently verifies its order-two certificate and rejects a changed
+test independently checks its order-two certificate and rejects a changed
 determinant. Cap and pin failures still fail closed.
 
 The complete standalone crate release suite passed 117 tests with zero
@@ -333,8 +333,8 @@ reproducibility sections. The page was rendered to PNG and visually inspected:
 the graph, formulas, caption and footer are legible and unclipped.
 
 ```text
-4ea554443bc4af3849668c68c6709c72d77d582ef420c7efafd6dd082e34f378  figures/rigorous-bound-chain.svg
-f361544edd9af0f184c0e9cc3758ff8a13ee62c438b5f6793e358e89de738ed7  bounds-20261101.pdf
+b441c7407f059ac6ead03992837c389bee3460d70ca2c74d678507e8d6aa8282  figures/rigorous-bound-chain.svg
+5e6776ef6ba6616c032285422478a6bb509ca9dbc5032c843201b696543320a5  bounds-20261101.pdf
 ```
 
 ### Repository and evidence boundary
@@ -377,3 +377,83 @@ missing `ic.prime_orbit_relations_v1`, and the residual test reports fused
 per-step cost `4.900233826968043`. These failures are retained as failures;
 the passing standalone and focused gates are not substituted for the required
 root result.
+
+## 2026-11-18 semantic relation-rank follow-up
+
+### Scope and source receipt
+
+This follow-up addresses the encoding-independent hashed factor-base slot
+relation from Bochum technical report v0.2, Definition 4, Lemmas 9--13,
+Theorem 4 and Remark 2. The pinned PDF has SHA-256
+`82e273629b437660607117d5e99f400141ed7aa78b25c6749b03651f42deaa11`.
+The repository research-KB wrapper was attempted first, but no KB executable
+is installed in this environment. The result therefore cites the pinned
+primary text and records the unavailable-KB receipt; it does not claim a KB
+update.
+
+### Lean and independent checker
+
+The pinned Lean 4.35.0 project was built after adding the semantic relation
+matrix, its decomposition set, and the rank/count obstruction:
+
+```text
+ELAN_HOME=/tmp/semantic-rank-elan \
+PATH=/tmp/semantic-rank-elan/bin:$PATH lake build
+```
+
+Result: exit 0, 1,891 jobs. The repository proof gate reported `PASS 14 thm 0
+trusted`. An explicit axiom audit of all five new declarations found only
+`propext`, `Classical.choice`, and `Quot.sound`. A focused scan found no
+`sorry`, `admit`, user `axiom`, or `native_decide` in
+`TensorBoundaryBounds.lean`. The independent fresh checker command
+`leanchecker --fresh TensorBoundaryBounds` exited 0.
+
+Two theorem claim records were locally checked through the PCC verifier:
+
+```text
+PCC-20261118-4717cb: pass (Lean proof gate)
+PCC-20261118-e6722e: pass (Lean proof gate)
+```
+
+Their signed PCC standing is still `unverified`; local kernel checks are not
+reported as signed verification. [pcc:unverified]
+
+### Rendered evidence
+
+Graphviz rendered the matrix-scope split and updated implication graph. Typst
+rendered `semantic-rank-20261118.pdf`; Pandoc with pdfLaTeX rerendered the
+one-page `bounds-20261101.pdf`. Text extraction recovered the stated
+inequalities and scope exclusions. Both PDFs and the updated implication graph
+were rendered to images and visually inspected; they are legible and
+unclipped.
+
+```text
+5fa58116aeb4b3efca8089ef411f560526cde5d7f3671af54dc449e25aec0d8d  semantic-rank-20261118.pdf
+5e6776ef6ba6616c032285422478a6bb509ca9dbc5032c843201b696543320a5  bounds-20261101.pdf
+b441c7407f059ac6ead03992837c389bee3460d70ca2c74d678507e8d6aa8282  figures/rigorous-bound-chain.svg
+```
+
+### Evidence boundary
+
+The checked finite theorem is `rank_Q(A_S) <= #decompositions`; the source
+threshold calculation gives expected rank below two in the specified regime.
+This excludes an all-seed or nonnegligible-probability exponential lower bound
+for a uniformly sampled source seed, but not an exceptional selected seed
+sequence. [pcc:unverified] No equivalence with the frozen low-level BTNIR edge matrix is
+assumed, and no conclusion is drawn for nonlinear, randomized, approximate,
+or separator-avoiding algorithms. No benchmark or performance result was
+generated.
+
+### Repository-wide gates in the replacement sparse checkout
+
+`benchrec.py gate` reported the pre-existing stale generated progress report;
+this research-only change did not regenerate or cite benchmark records. The
+required `cargo test --release --lib` was attempted with a temporary stable
+Rust 1.100.0 toolchain after materializing the root source and path
+dependencies. It failed during test compilation with 79 diagnostics: the
+sparse checkout omits many `include_str!`/`include_bytes!` fixtures, and the
+current branch also contains a duplicate test function named
+`the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e`. No diagnostic
+points to the changed Lean or report files. These failures remain failures;
+the focused proof gates above are not substituted for the repository-wide
+gate.

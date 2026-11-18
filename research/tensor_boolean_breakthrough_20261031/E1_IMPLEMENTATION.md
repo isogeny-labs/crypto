@@ -1,7 +1,7 @@
 # E1 exact boundary-census implementation receipt
 
 Date: 2026-11-01
-Status: exact census core implemented and locally verified; protocol remains draft
+Status: exact census core implemented and locally checked; protocol remains draft
 Affected E1 data: none
 
 > Follow-up: the initial receipt below is historical. Later on 2026-11-01 the
@@ -114,11 +114,16 @@ The complete crate and root-library gates are recorded separately in
 
 No production network, natural/null pair, rank ladder or wall time was
 measured. In particular, this receipt does not establish low boundary rank,
-full boundary rank, a solver improvement, a relation-oracle improvement or an
+full boundary rank, a solver gain, a relation-oracle gain or an
 asymptotic result.
 
-Even a full-rank certificate at one size is finite evidence. A uniform family
-minor/rank theorem is separately tracked in
+Even a full-rank certificate at one size is finite evidence. The natural
+encoding-independent slot relation cannot satisfy the once-proposed uniform
+exponential lower bound under the source threshold: its rank is at most its
+decomposition count, whose expectation is below two in the stated regime.
+[pcc:unverified] The derivation is in
+[`SEMANTIC_RANK_BOUND.md`](SEMANTIC_RANK_BOUND.md). What remains open is the
+representation-specific low-level BTNIR family theorem, separately tracked in
 [`problems/hashed-ecdl-boundary-rank-family-lower-bound.md`](../../problems/hashed-ecdl-boundary-rank-family-lower-bound.md).
 
 Before E1 freezes, the workstream still needs:
@@ -128,7 +133,7 @@ Before E1 freezes, the workstream still needs:
 - exact conditioned and unconditioned null selection;
 - fresh-process A/A and known-rank control records from the same runner;
 - disjoint preflight, final cap and ladder, power justification and hashes;
-- a committed source revision and verified Iso Lab execution image.
+- a committed source revision and validated Iso Lab execution image.
 
 ## 2026-11-01 follow-up boundary
 

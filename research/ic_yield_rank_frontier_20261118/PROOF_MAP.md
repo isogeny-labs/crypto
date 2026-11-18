@@ -47,7 +47,7 @@ an elliptic-curve yield law or a random-matrix rank law.
 3. **Object as an instance.** The zero matrix with `n = B + 1`, together with
    a coordinate vector `Pi.single j 1` in its right kernel.
 4. **Assembly probe.** Apply `exists_left_kernel` to the zero matrix for the
-   nonzero left-kernel vector.  Separately, direct simplification proves the
+   nonzero left-kernel vector.  Separately, direct simplification establishes the
    coordinate vector is a nonzero right-kernel vector.  Thus row surplus gives
    left-kernel existence but does not imply reusable right uniqueness.
 5. **Missing components only.** A predicate for the right kernel, an unused-
@@ -66,3 +66,63 @@ There are no new syntax types, no copied algebraic theorem, no raised limits,
 and no `native_decide`.  The countermodels refute implications between scopes;
 they do not refute a separately stated probabilistic law for a specified row
 ensemble or solver.
+
+## Hashed semantic relation rank
+
+1. **Structure above.** Mathlib finite matrices over a field, finite row and
+   column types, finite sets of matched tuples, and finite sums over a seed
+   space.  The group operation is represented only by a supplied predicate
+   `matches : Left → Right → Prop`; elliptic-curve arithmetic is not
+   redefined in Lean.
+2. **Theorem used as stated.** Mathlib
+   `Matrix.rank_le_card_of_support_subset` bounds matrix rank by any finite set
+   containing every nonzero row.  Standard `Fintype.card_le_of_injective` and
+   finite-sum monotonicity supply the injection and averaging steps.
+3. **Object as an instance.** The semantic relation matrix has entry one
+   exactly when a left partial tuple and right partial tuple form a full
+   decomposition.  Its finite set of matched left tuples is the row-support
+   container, and its finite set of matching pairs is the decomposition set.
+4. **Assembly probe.** Given a matched-left finset containing the row support
+   and an injection from matched left tuples into complete pairs, apply the
+   Mathlib rank theorem and card monotonicity to obtain
+   `rank A ≤ #(complete pairs)`.  Sum that pointwise inequality over seeds;
+   finite Markov counting gives
+   `K * #{S | K ≤ rank A_S} ≤ ∑_S #decompositions(S)`.  A uniform lower bound
+   then cannot exceed any supplied average decomposition bound.
+5. **Missing components only.** The semantic zero-one matrix definition; the
+   row-support containment proof; the witness-selection injection; the finite
+   Markov inequality; and the uniform-average endpoint.  The exact hash
+   expectation and real inequality below two remain the readable
+   specialization of Bochum Lemmas 9 and 13, not a reimplementation of its
+   probability model in Lean.
+6. **Inheritance table.** Matrix rank:
+   `Matrix.rank_le_card_of_support_subset`; nonzero-row container:
+   `Function.support`; complete-pair injection: witness choice plus
+   `Prod.fst`; cardinality: `Fintype.card_le_of_injective`; finite averaging:
+   `Finset.sum_le_sum`; arithmetic cancellation: `Nat.le_of_mul_le_mul_right`.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `decompositionRelationMatrix` | definition | `TensorBoundaryBounds` | finite row/column types over `ℚ` | decidable match predicate |
+| `decompositionRelationRankLeMatchedLeft` | endpoint | same | finite semantic relation matrix | none beyond decidability |
+| `matchedLeftCardLeDecompositions` | instance obligation | same | matched rows and complete pairs | finite types |
+| `decompositionRelationRankLeDecompositions` | endpoint | same | finite semantic relation matrix | finite types |
+| `highRankSeedCountBound` | law | same | finite seed-indexed rank/count functions | pointwise rank/count bound |
+| `uniformRankLeAverageSolutionBound` | endpoint | same | finite nonempty seed space | uniform rank floor and total-count bound |
+
+The proof chain is:
+
+```text
+rank(A_S)
+  ≤ # matched left tuples                         Mathlib row-support theorem
+  ≤ # complete decompositions                    witness-selection injection
+
+K · #{S : K ≤ rank(A_S)}
+  ≤ ∑_{S : K ≤ rank(A_S)} rank(A_S)              threshold definition
+  ≤ ∑_S #complete decompositions(S)               pointwise bound and inclusion
+```
+
+There is no composite unfolding, syntax type, raised limit or native
+evaluation in this extension.  The report specializes the last line with the
+source threshold; it does not promote the low-level BTNIR edge-flattening
+matrix to the semantic matrix.
