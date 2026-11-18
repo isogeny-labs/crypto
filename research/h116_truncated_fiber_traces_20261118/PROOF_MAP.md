@@ -9,20 +9,22 @@ This map is written before the first H116 Lean declaration.
    of roots and rational functions `N/D`. The elliptic endpoint additionally
    assumes an odd-degree separable isogeny coordinate map and its differential
    scalar `a`.
-2. **Theorem used as stated.** Planned Mathlib dependencies are polynomial
-   derivative-of-product, derivative of `X-C a`, finite-sum coefficient laws,
-   and field fraction cancellation. Exact declaration names and verification
-   status remain a pre-edit assembly-probe obligation because the research KB
-   theorem index was unavailable. No curve-specific group law will be
-   re-proved in the study. [pcc:unverified]
+2. **Theorem used as stated.** The exact Mathlib declarations are
+   `Polynomial.derivative'`, `Polynomial.derivative_prod_finset`,
+   `Derivation.leibniz`, `Derivation.leibniz_inv`,
+   `Derivation.leibniz_div`, `LaurentSeries.derivative_iterate_coeff`, and
+   `RatFunc.coe_coe`. No curve-specific group law is re-proved in the study.
 3. **Object as an instance.** `F_u=N-uD` is a polynomial; its root multiset is
    the coordinate image of the fiber. `R=N/D` is a rational function. The
    study endpoint instantiates generic polynomial identities with the isogeny
    coordinate data supplied as hypotheses.
-4. **Assembly probe.** Before the first proof edit, type-check a theorem whose
-   inputs are `N D`, two target coordinates, a factorization of each `F_u`, and
-   the nonzero denominators; its conclusion is the finite coefficient identity.
-   A second probe applies the residue identity given `F'_u(alpha)=D(alpha)R'(alpha)`.
+4. **Assembly probe.** Before the first proof edit, a Lean 4.34.1/Mathlib
+   `d13f23b7` probe typechecked generic product log-derivative, division,
+   denominator cancellation, root-product, abstract coefficient/power-sum and
+   residue-cancellation theorems. Probe source SHA-256 is
+   `254caca6449fa388ea5d58331087c8b3df9f400c256a746d91a24f1575630456`;
+   exit zero output SHA-256 is
+   `e9f3b1c2e61cd9f42e2c075ca74448cf6c796e0e950d2b36487f24e024e7f08c`.
 5. **Missing components only.** A finite reciprocal-series coefficient API may
    be missing. If so, define it generically for polynomials and prove its product
    and derivative laws once. The formal-group congruence for `V-1` is a separate
@@ -64,13 +66,19 @@ This map is written before the first H116 Lean declaration.
 
 | Operation/law | Inheritance |
 | --- | --- |
-| polynomial multiplication, derivative, evaluation | Mathlib instances; exact declarations lookup pending |
-| finite product derivative | Mathlib lemma; exact declaration lookup pending |
-| finite sums and coefficient extraction | Mathlib instances; reciprocal-at-infinity wrapper may be new |
+| polynomial multiplication, derivative, evaluation | Mathlib instances plus `Polynomial.derivative'` |
+| finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
+| finite sums and coefficient extraction | Mathlib finite sums; generic additive coefficient functional is new; concrete reciprocal-at-infinity instance remains open |
 | field division/cancellation | `Field K` laws |
 | isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; crypto-lean lookup pending |
 | `V+pi=[t]` and `pi(z)=z^p` | H115 algebra plus formal-group instance; lookup pending |
 | radix-six decoder | reuse H115 generic theorem after source import/binding |
+
+The assembly lookup found no ready-made `Derivation K (RatFunc K) (RatFunc K)`
+instance. The proof therefore states the exact algebraic laws over an arbitrary
+field equipped with a derivation, which is stronger at the identity layer, and
+keeps the rational-function/formal-group instantiation explicit. It does not
+claim that the missing Frobenius jet constructor exists or is fast.
 
 No `maxHeartbeats`, `maxRecDepth`, `native_decide`, copied curve group law or
 per-curve theorem is permitted.
