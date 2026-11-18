@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-8afac8222c1ea6656e6ff167ae2e7ae31885bf2bda11f268945a16035447833e  H116FiberTrace.lean
+d7c49775a2dc9b3aede6abc213b13d4446a3a8f272f019717b04cc398e4d1910  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  201 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  206 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -102,6 +102,9 @@ ac3832511710d08fdaec1912b38116d7702503b3dca339b58c64c250ab88f93d  receipts/secon
 b67421427618cb5c1774e9bbb66583a164d9dbf7c8772fc06c0ec4f44e46fb49  receipts/third-successor-scalar-nine-build.txt
 62633ade5c49413ba2bfa42efefb3a28112cea149c61137843762d298ee79964  receipts/third-successor-scalar-nine-full-build.txt
 7829dc01b1738d829455dd90dfb4bfdb17a6a5ed17c4eb21a4d29da8d948e3e6  receipts/third-successor-scalar-nine-audit.txt
+197a6a8a76d77f5ccde24f3e0ba9d160291191744b0d22cf247e0e32f3de4582  receipts/fourth-successor-scalar-ten-build.txt
+adb1b8bc7f8ffed0b98a5e6738517bc4aef4bf7a9de6d9aaa09fbfed61a36d7a  receipts/fourth-successor-scalar-ten-full-build.txt
+737be57e64a956b94ec6544a651b0ca1a8bf88f65c0c64865fe8cb5a6102f10f  receipts/fourth-successor-scalar-ten-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -457,6 +460,17 @@ outside characteristics two and three.  The singular `A=B=0` control over
 tuples in 13 small prime fields found no counterexample, but was not a frozen
 benchmark and is not used as proof.  Arbitrary recurrence closure remains
 open. [pcc:unverified]
+
+The 206-theorem checkpoint proves a fourth companion successor stencil under
+the same base invariant.  The decisive identity is
+`i=c^2*v-t*u*e`.  Factoring the third-successor certificate gives `v`
+coprime to `t` and `u`, and the original bootstrap gives `v` coprime to `e`.
+The exact short-curve instance proves `prePsi10` coprime to `prePsi11`,
+`Phi10` coprime to `PsiSq10`, and coordinate extension degree one hundred
+outside characteristics two and five.  The singular `A=B=0` control over
+`ZMod 11` is non-coprime.  The same motivational 249,580-tuple sweep found no
+counterexample, but is not used as proof.  Arbitrary recurrence closure
+remains open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

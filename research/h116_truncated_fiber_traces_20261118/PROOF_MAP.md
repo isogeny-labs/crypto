@@ -1168,6 +1168,42 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | scalar-nine coordinate extension degree is eighty-one | exact degree assembly | H116 | rational function field | same plus `3 != 0` |
 | singular scalar-nine pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
 
+## Fourth-successor stencil and scalar-ten gate
+
+1. **Structure above.** Retain `t,d,e,u,w,v` from the three preceding
+   stencils.  The next odd recurrence output
+   `i=e*c^3-b*d^3*s^2` has the alternate expression
+   `i=c^2*v-t*u*e`.  Factoring the proved third-successor certificate through
+   `g=a*w` and `v=w-t*u` yields `v` coprime to `t` and `u`; the original
+   bootstrap yields `v` coprime to `e`.  This would prove `v` coprime to `i`.
+   The outer factor `c` is handled independently by reducing `i` modulo `c`.
+2. **Theorems used as stated.** The candidate uses the generic bootstrap and
+   third-successor theorems plus Mathlib factor-extraction, product, power and
+   subtract-multiple laws.  No fixed-scalar resultant is allowed.
+3. **Object as an instance.** The exact EDS recurrence identifies
+   `c*v=prePsi10` and `i=prePsi11`, targeting scalar-ten no-cancellation and
+   coordinate extension degree one hundred outside characteristics two and
+   five.
+4. **Exploratory control.** The same 13-field, 249,580-tuple off-panel sweep
+   found zero simultaneous zeros of the proposed fourth-successor pair.  This
+   is motivation only, not a frozen benchmark or proof.
+5. **Assembly evidence.** Generic elaboration and exact EDS instantiation pass
+   in the tracked module. The pinned full build completed all 3,162 jobs, and
+   the exact repository auditor reports
+   `206 theorems, 0 failing, 0 trusted`. The singular `A=B=0` specialization
+   over `ZMod 11` is proved non-coprime by evaluation at zero.
+6. **Missing components only.** This is still a finite recurrence corridor;
+   an arbitrary recurrence-tree invariant and induction remain open.
+   [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| fourth-successor pair `c*v,i` is coprime | generic recurrence stencil | H116 | arbitrary commutative ring | same three premises as the two-factor bootstrap |
+| `prePsi10` is coprime to `prePsi11` | exact EDS instantiation | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi10` is coprime to `PsiSq10` | exact division-polynomial assembly | H116 | same | same |
+| scalar-ten coordinate extension degree is one hundred | exact degree assembly | H116 | rational function field | same plus `5 != 0` |
+| singular scalar-ten pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
+
 ## Scalar-six two-factor bootstrap gate
 
 1. **Structure above.** Instantiate the preceding generic gate with
