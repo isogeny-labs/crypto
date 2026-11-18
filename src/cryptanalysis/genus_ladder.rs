@@ -838,6 +838,81 @@ pub struct Instance {
     pub target: JDiv,
 }
 
+/// Rabin's irreducibility test for a monic `f` over `F_p` (coefficients lowest
+/// degree first, `f.len() - 1 = n ≥ 1`): `f` is irreducible iff
+/// `x^(p^n) ≡ x (mod f)` and `gcd(x^(p^(n/q)) − x, f) = 1` for every prime `q | n`.
+///
+/// Used to skip seeds in a prime-order search: for `y² = f(x)` with `deg f`
+/// odd, `#J(F_p)[2] = 2^(m−1)` where `m` is the number of irreducible factors
+/// of `f` over `F_p`, so a reducible `f` gives an even `#J` and cannot pass
+/// `--max-h 1`.  Not counted (search bookkeeping, not part of any measured arm).
+pub fn f_irreducible(p: u64, f: &[u64]) -> bool {
+    let n = f.len() - 1;
+    if n <= 1 {
+        return n == 1;
+    }
+    let mut nat = Nat::default();
+    let mulmod = |a: &[u64], b: &[u64], nat: &mut Nat| -> Vec<u64> {
+        let mut c = vec![0u64; a.len() + b.len()];
+        for (i, &x) in a.iter().enumerate() {
+            if x == 0 {
+                continue;
+            }
+            for (j, &y) in b.iter().enumerate() {
+                c[i + j] = (c[i + j] + x * y % p) % p;
+            }
+        }
+        vrem(p, &c, f, nat)
+    };
+    let powp = |a: &[u64], nat: &mut Nat| -> Vec<u64> {
+        // a^p mod f by square-and-multiply
+        let mut res = vec![1u64];
+        let mut base = a.to_vec();
+        let mut e = p;
+        while e > 0 {
+            if e & 1 == 1 {
+                res = mulmod(&res, &base, nat);
+            }
+            base = mulmod(&base, &base, nat);
+            e >>= 1;
+        }
+        res
+    };
+    let x = vec![0u64, 1];
+    let minus_x = |a: &[u64]| -> Vec<u64> {
+        let mut d = a.to_vec();
+        if d.len() < 2 {
+            d.resize(2, 0);
+        }
+        d[1] = (d[1] + p - 1) % p;
+        let mut d = d;
+        vtrim(&mut d);
+        d
+    };
+    let primes: Vec<usize> = (2..=n).filter(|&q| n % q == 0 && (2..q).all(|d| q % d != 0)).collect();
+    // frob[k] = x^(p^k) mod f, k = 0..=n
+    let mut frob = vec![x.clone()];
+    for k in 1..=n {
+        let next = powp(&frob[k - 1], &mut nat);
+        frob.push(next);
+    }
+    let fx = minus_x(&frob[n]);
+    if !fx.is_empty() {
+        return false;
+    }
+    for q in primes {
+        let d = minus_x(&frob[n / q]);
+        if d.is_empty() {
+            return false;
+        }
+        let g = vgcd_monic(p, f, &d, &mut nat);
+        if g.len() > 1 {
+            return false;
+        }
+    }
+    true
+}
+
 /// A random monic `f` of degree `2g + 1` from `(curve_seed, p, g)`.
 pub fn random_f(p: u64, genus: u32, curve_seed: u64) -> Vec<u64> {
     let mut st = curve_seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ p ^ (u64::from(genus) << 48);
@@ -2344,6 +2419,28 @@ mod tests {
     }
     use super::*;
     use crate::cryptanalysis::chained_transfer::hyper64::H64Curve;
+
+    /// For odd-degree `f`, a reducible `f` gives an even `#J` (2-torsion), so a
+    /// prime-order search may skip it; an irreducible `f` gives an odd `#J`.
+    #[test]
+    fn reducible_f_gives_even_jacobian_order() {
+        let (mut red, mut irr) = (0, 0);
+        for &(p, g) in &[(131u64, 3u32), (131, 4), (257, 4)] {
+            for cs in 1..120u64 {
+                let f = random_f(p, g, cs);
+                let Ok(curve) = JCurve::new(p, g, &f) else { continue };
+                let Ok(order) = curve.jacobian_order(cs) else { continue };
+                if f_irreducible(p, &f) {
+                    irr += 1;
+                    assert_eq!(order % 2, 1, "p={p} g={g} cs={cs}: irreducible f, even #J");
+                } else {
+                    red += 1;
+                    assert_eq!(order % 2, 0, "p={p} g={g} cs={cs}: reducible f, odd #J");
+                }
+            }
+        }
+        assert!(red > 50 && irr > 10, "red {red} irr {irr}");
+    }
 
     /// Every monic quartic with a non-zero square discriminant over small
     /// primes (both residue classes of p mod 3, with and without a

@@ -306,6 +306,12 @@ fn main() -> ExitCode {
                 }
                 continue;
             }
+            // Prime-order search: a reducible f has J[2](F_p) != 0, so #J is even
+            // and cannot pass --max-h 1; skip it before point counting.
+            if cfg.max_h == 1 && !gl::f_irreducible(p, &gl::random_f(p, g, cs)) {
+                *reasons.entry("f_reducible_even_order".into()).or_default() += 1;
+                continue;
+            }
             match gl::make_instance(p, g, cs, cs, cfg.max_h) {
                 Ok(inst) => {
                     admitted += 1;
