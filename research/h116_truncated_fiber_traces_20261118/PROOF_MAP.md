@@ -694,6 +694,47 @@ nonidentity points. This instantiates the paired-degree pattern only on the
 finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 [pcc:unverified]
 
+## Quadratic function-field sandwich instance gate
+
+1. **Structure above.** A dominant curve map induces two compatible finite
+   function-field towers over the pulled-back target x-line `B`. The source
+   tower is `B -> Xs -> E`, where `Xs` is the source x-line and `E` the source
+   curve field. The target tower is `B -> Xt -> E`, where `Xt` is the pulled-
+   back target curve field. The desired curve-map degree is `[E:Xt]`; the
+   rational coordinate degree is `[Xs:B]`.
+2. **Theorems used as stated.** `Module.finrank_mul_finrank` supplies
+   `[E:B]=[Xs:B][E:Xs]` and `[E:B]=[Xt:B][E:Xt]`. If both curve fields are
+   quadratic over their x-lines, then
+   `coordinateDegree * 2 = 2 * curveMapDegree`, and natural-number
+   cancellation gives equality. Mathlib's
+   `RatFunc.finrank_eq_max_natDegree` separately identifies
+   `[K(X):K(f)]` with the maximum degree of the canonical reduced numerator
+   and denominator of `f`.
+3. **Object as an instance.** The Lean statement quantifies over four fields
+   `B`, `Xs`, `Xt`, `E`, the two existing `IsScalarTower` instances, the two
+   quadratic-degree equalities and the coordinate extension degree. It does
+   not define a new curve, rational-map or function-field representation.
+4. **Assembly probe.** Build the generic theorem in the tracked H116 module at
+   default limits, then run the exact theorem/axiom auditor. No finite curve or
+   H116-specific coefficient is needed for elaboration.
+5. **Missing components only.** The theorem does not construct `B`, `Xs`,
+   `Xt`, or `E` from the retained rational formulas. The rational-function
+   wrapper closes `[K(X):K(f)] = max(deg num(f),deg denom(f))`, including
+   canonical cancellation, but does not prove that supplied polynomials such
+   as `Phi_n` and `Psi_n^2` are already coprime or identify their quotient with
+   the curve map. The quadratic field equalities, dominance, separability and
+   duality of `V-1` and `pi-1` are also caller obligations. [pcc:unverified]
+6. **Inheritance table.** Fields, algebras, scalar towers and `Module.finrank`
+   come from Mathlib. The only new endpoint is cancellation between the two
+   existing tower equalities. The mutation control uses unequal line degrees
+   to show that a shared total degree alone does not identify adjacent degrees.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `quadraticFunctionFieldSandwich_degree` | generic law | H116 over Mathlib field towers | four fields and two scalar towers | both line-to-curve degrees are two; supplied coordinate extension degree |
+| `rationalFunctionCoordinateExtension_degree` | inherited rational-function law | H116 wrapper over Mathlib `RatFunc.finrank_eq_max_natDegree` | one rational function over an arbitrary field | none; numerator and denominator are canonical reduced forms |
+| `unequalCoordinateLineDegrees_control` | boundary control | H116 arithmetic | natural numbers | concrete equality `4*3=2*6` with unequal adjacent degrees |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

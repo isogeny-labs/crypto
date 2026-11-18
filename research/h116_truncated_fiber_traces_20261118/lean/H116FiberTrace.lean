@@ -5,6 +5,7 @@ import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree
 import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
+import Mathlib.FieldTheory.RatFunc.IntermediateField
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
 import Mathlib.LinearAlgebra.Dimension.Free
@@ -701,6 +702,55 @@ theorem finiteFieldTower_degree_eq_norm_of_paired
   · by_contra hnot
     have hlt : Module.finrank F E < norm := Nat.lt_of_not_ge hnot
     nlinarith
+
+/-- Quadratic function-field sandwich.  Suppose the pulled-back target x-line
+is the common base `B`.  The source tower is `B -> Xs -> E`, while the target
+tower is `B -> Xt -> E`.  If both curve fields are quadratic over their
+x-lines, then the degree of the full curve-field pullback `E/Xt` equals the
+coordinate extension degree `Xs/B`.
+
+This theorem consumes already-constructed field embeddings.  In particular,
+it does not construct the function fields or prove that a rational coordinate
+formula induces the stated extension. -/
+theorem quadraticFunctionFieldSandwich_degree
+    {B Xs Xt E : Type*}
+    [Field B] [Field Xs] [Field Xt] [Field E]
+    [Algebra B Xs] [Algebra Xs E] [Algebra B E]
+    [Algebra B Xt] [Algebra Xt E]
+    [IsScalarTower B Xs E] [IsScalarTower B Xt E]
+    (coordinateDegree : ℕ)
+    (hsourceQuadratic : Module.finrank Xs E = 2)
+    (htargetQuadratic : Module.finrank B Xt = 2)
+    (hcoordinate : Module.finrank B Xs = coordinateDegree) :
+    Module.finrank Xt E = coordinateDegree := by
+  have hbalanced : coordinateDegree * 2 = 2 * Module.finrank Xt E := by
+    calc
+      coordinateDegree * 2 = Module.finrank B Xs * Module.finrank Xs E := by
+        rw [hcoordinate, hsourceQuadratic]
+      _ = Module.finrank B E :=
+        (finiteFieldTower_degree_mul (F := B) (E := Xs) (M := E)).symm
+      _ = Module.finrank B Xt * Module.finrank Xt E :=
+        finiteFieldTower_degree_mul (F := B) (E := Xt) (M := E)
+      _ = 2 * Module.finrank Xt E := by rw [htargetQuadratic]
+  omega
+
+/-- The rational-coordinate extension degree is exactly the maximum degree of
+the canonical reduced numerator and denominator.  This is the precise
+coordinate-line input consumed by `quadraticFunctionFieldSandwich_degree`.
+For a quotient supplied as two separate polynomials, proving that no common
+factor is cancelled remains a separate obligation. -/
+theorem rationalFunctionCoordinateExtension_degree
+    {F : Type*} [Field F] (f : RatFunc F) :
+    Module.finrank (IntermediateField.adjoin F {f}) (RatFunc F) =
+      max f.num.natDegree f.denom.natDegree := by
+  exact RatFunc.finrank_eq_max_natDegree f
+
+/-- Mutation control for the sandwich theorem: if the two line-to-curve
+degrees differ, equality of the total tower degrees does not identify the two
+adjacent map degrees. -/
+theorem unequalCoordinateLineDegrees_control :
+    (4 : ℕ) * 3 = 2 * 6 ∧ (4 : ℕ) ≠ 6 := by
+  norm_num
 
 /-- Exact numerator and denominator degrees for Mathlib's univariate
 division-polynomial x-map candidate `Φₙ/Ψₙ²`, provided the scalar is
@@ -2756,6 +2806,9 @@ theorem rationalMap_separation_strict_control :
 #print axioms degree_product_without_duality_control
 #print axioms finiteFieldTower_degree_mul
 #print axioms finiteFieldTower_degree_eq_norm_of_paired
+#print axioms quadraticFunctionFieldSandwich_degree
+#print axioms rationalFunctionCoordinateExtension_degree
+#print axioms unequalCoordinateLineDegrees_control
 #print axioms scalarMultiplicationXMap_exact_degrees
 #print axioms scalarMultiplicationXMap_leadingCoefficients
 #print axioms scalarMultiplicationXMap_denominator_degree_lt_of_char_dvd

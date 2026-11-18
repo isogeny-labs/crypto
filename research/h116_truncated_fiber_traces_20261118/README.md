@@ -284,6 +284,17 @@ multiplication on 5,058 affine points with zero failures, and measures the
 `120->110`. The concrete pullback tower, point-map identification,
 coordinate-to-scheme degree theorem, and duality remain open.
 [pcc:unverified]
+The next Lean checkpoint removes the abstract coordinate-degree assumption.
+For two compatible function-field towers above the pulled-back target x-line,
+quadratic source and target coordinate projections force the curve-map degree
+to equal the rational coordinate extension degree. Mathlib's exact reduced
+rational-function theorem then identifies that coordinate degree as
+`max(deg num(f),deg denom(f))`. The remaining scalar-specific steps are to
+prove that `Phi_n` and `Psi_n^2` do not cancel, construct the actual H116
+pullback fields and identify the quotient with the curve map. The
+[source-linked report](reports/search-20261118T1152Z/REPORT.md) contains the
+tower diagram, references, audit receipt and unequal-projection control.
+[pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

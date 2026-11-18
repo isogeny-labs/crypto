@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-aaf910ee4b5308db8cd07057658631bd0bb04a3390ff37f5030ab6832960ffa4  H116FiberTrace.lean
+5457017ccc888e680065724d039ee73a4ccef3c5020ed263f814a39c50220c65  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  134 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  137 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -60,6 +60,8 @@ f61a96a76811c2cd4736b7515e2f2a4126a1b500e397894ff6c090dc4a8864c2  receipts/norm-
 1e567fafe38bf9cdc1f29d0399a60b69f0272055ff039e49bb168e78d2689b2f  receipts/degree-certificate-audit.txt
 6f25eceebc85cce9cc43bcd1b0265beb8596c3a32043580266e51aa107b886df  receipts/scalar-degree-tower-build.txt
 369a478a267c3adc7bfe821025d5a5b31546d1f96e1f2e3071b2e45f7c3d8d51  receipts/scalar-degree-tower-audit.txt
+a9be1857e0b978b1b0a5cff9ca238ae04b13e02c00023384e481b1ec45d70eb2  receipts/function-field-sandwich-build.txt
+523f28dceb06d84847126a8066a7a15d6059bff9a215504fbc2c03a7ccf82b1b  receipts/function-field-sandwich-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -264,6 +266,16 @@ remaining bridge is geometric: construct the pullback tower, identify the
 division-polynomial quotient with scalar multiplication as a curve morphism,
 identify coordinate and morphism degrees, and prove the dual-pair theorem.
 [pcc:unverified]
+
+The 137-theorem checkpoint compares the two compatible field towers that sit
+above a pulled-back target x-line. If both curve fields are quadratic over
+their x-lines, the full curve-map degree equals the source coordinate-line
+degree. It also exposes Mathlib's exact theorem that
+`[K(X):K(f)] = max(deg num(f),deg denom(f))` for the canonical reduced rational
+function. A checked `4*3=2*6` control shows why equal projection degrees are
+necessary. Constructing the H116 field embeddings, proving that the displayed
+division polynomials are coprime, identifying their quotient with the curve
+map, and proving the dual-pair theorem remain open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

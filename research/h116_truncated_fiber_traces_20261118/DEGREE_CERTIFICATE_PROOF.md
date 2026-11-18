@@ -1,7 +1,7 @@
 # H116 paired-degree certificate proof
 
 Lean now isolates the exact geometric bridge from the already-proved ring
-factorization
+factorization. [pcc:unverified]
 
 ```text
 (V-1)(pi-1) = [p+1-t].
@@ -12,37 +12,47 @@ that `left*right=scalar`, `deg(scalar)=N^2`, and
 `deg(left)=deg(right)` imply `deg(left)=N`.
 `verschiebung_sub_one_degree_of_dual_certificate` composes this lemma with the
 existing norm factor and concludes `deg(V-1)=N`.
+[pcc:unverified]
 
 For an actual elliptic curve the remaining inputs have precise meanings:
 
 | Certificate premise | Required elliptic theorem | State in pinned Mathlib |
 |---|---|---|
 | `degree (f*g)=degree f*degree g` | multiplicativity of curve-map/function-field degree | proved for an already-supplied finite field tower; constructing the pullback tower from the elliptic maps remains open |
-| `degree [N]=N^2` | degree of scalar multiplication | exact coordinate degrees `deg Phi_N=N^2`, `deg Psi_N^2=N^2-1` proved when `N` is nonzero in the field; map and scheme-degree identification remain open |
+| `degree [N]=N^2` | degree of scalar multiplication | exact displayed degrees `deg Phi_N=N^2`, `deg Psi_N^2=N^2-1` and the generic reduced rational-function extension-degree theorem are proved; division-polynomial coprimality and map identification remain open |
 | `degree(V-1)=degree(pi-1)` | `(V-1)^vee=pi-1` and equal degree of duals | unavailable |
 
 The pinned Mathlib audit found affine/projective elliptic points, generic finite
-field-tower degree multiplication, and exact division-polynomial coordinate
-degrees, but no elliptic-isogeny type or dual-isogeny API. H116 now exposes the
-tower law and scalar coordinate degrees directly, while keeping the concrete
-pullback tower, scalar-map identification, coordinate-to-scheme degree bridge,
-and duality as explicit caller obligations. `degree_product_without_duality_control` checks the logical
+field-tower degree multiplication, exact reduced rational-function extension
+degree, and exact division-polynomial coordinate degrees, but no elliptic-
+isogeny type or dual-isogeny API. H116 now exposes the tower law, quadratic
+sandwich and rational-coordinate extension theorem directly, while keeping the
+concrete pullback tower, division-polynomial coprimality, scalar-map
+identification and duality as explicit caller obligations.
+`degree_product_without_duality_control` checks the logical
 boundary: at `N=6`, unequal degrees 4 and 9 still multiply to `N^2=36`, so the
 dual/equal-degree premise cannot be dropped.
 
 The current Lean source SHA-256 is
-`aaf910ee4b5308db8cd07057658631bd0bb04a3390ff37f5030ab6832960ffa4`.
-The pinned build succeeds, and the repository auditor reports 134 theorems,
+`5457017ccc888e680065724d039ee73a4ccef3c5020ed263f814a39c50220c65`.
+The pinned build succeeds, and the repository auditor reports 137 theorems,
 zero failures and zero trusted native decisions.  This proves the implication
 from the geometric degree certificates; it does not construct those elliptic
 certificates and is not a subexponential ECDLP proof. [pcc:unverified]
 
-The six added declarations are:
+The nine degree-layer declarations are:
 
 - `finiteFieldTower_degree_mul`, Mathlib's finite-rank tower law in the
   orientation used by curve-map degrees;
 - `finiteFieldTower_degree_eq_norm_of_paired`, which derives either adjacent
   degree from equal adjacent degrees and total degree `N^2`;
+- `quadraticFunctionFieldSandwich_degree`, which compares two compatible
+  towers with quadratic source and target coordinate projections;
+- `rationalFunctionCoordinateExtension_degree`, which exposes Mathlib's exact
+  `[K(X):K(f)] = max(deg num(f),deg denom(f))` theorem for canonical reduced
+  rational functions;
+- `unequalCoordinateLineDegrees_control`, which proves that unequal projection
+  degrees make the adjacent map degree nonidentifiable from a shared total;
 - `scalarMultiplicationXMap_exact_degrees`, which exposes the exact
   `(N^2,N^2-1)` degrees of `Phi_N/Psi_N^2` when `N` is nonzero in the
   coefficient field;
@@ -53,11 +63,13 @@ The six added declarations are:
   and `|N|>1`;
 - `scalarMultiplicationXMap_characteristic_control`, which proves that this
   nonvanishing premise fails for `[3]` over `ZMod 3`.
+[pcc:unverified]
 
 The frozen scalar division-polynomial experiment independently instantiates
 the coordinate layer on eight extension-field cells. Exact degrees
 `(49,48),(25,24),(196,195)` agree with all 5,058 affine point actions, while
 the characteristic controls collapse from expected denominator degrees
-`24,48,120` to `20,42,110`. This is evidence for the coordinate bridge,
-not a proof of the remaining scheme/function-field identification.
+`24,48,120` to `20,42,110`. This is evidence for the displayed scalar
+coordinate formulas, not a proof of their coprimality or identification with
+the remaining curve-map tower.
 [pcc:unverified]
