@@ -193,9 +193,10 @@ fn compute()->Result<Value,String> {
     let overlap=first_e2.intersection(&first_trans).count();
     let transcript=arr(&evidence,"target_replay_transcript")?;
     if transcript.len()!=1024 {return Err("not 1024 frozen Q".into());}
-    let publics:Vec<Point>=transcript.iter().map(|r|
-        r.get("public_target_q").ok_or("no public Q").and_then(|q| pair(q).map(Some)))
-        .collect::<Result<_,_>>()?;
+    let publics:Vec<Point>=transcript.iter().map(|r| {
+        let q=r.get("public_target_q").ok_or_else(||"no public Q".to_string())?;
+        pair(q).map(Some)
+    }).collect::<Result<_,_>>()?;
     let mut scalar_meter=Fm::default();
     let t_scalar=Instant::now();
     let single:Vec<Point>=publics.iter().map(|&q|forward(q,&mut scalar_meter))
