@@ -32,7 +32,9 @@ for cell in "${CELLS[@]}"; do
   [ -f "$rec" ] || { echo "skip $cell: no record"; continue; }
   name="$stem-D$D"
   t0=$(date +%s.%N)
-  "$BIN" --instance "$inst" --D "$D" --out "$OUT/$name.json" 2> "$OUT/$name.err" > /dev/null
+  # CKPT_ROOT set: checkpoint every CKPT_MIN minutes and resume after a restart (re-run the same command)
+  ck=(); [ -n "${CKPT_ROOT:-}" ] && ck=(--resume "$CKPT_ROOT/$name" --checkpoint-every "${CKPT_MIN:-10}")
+  "$BIN" --instance "$inst" --D "$D" "${ck[@]}" --out "$OUT/$name.json" 2>> "$OUT/$name.err" > /dev/null
   rc=$?
   t1=$(date +%s.%N)
   exp=$(jq -c '{columns, profile, contains_one}' "$rec")
