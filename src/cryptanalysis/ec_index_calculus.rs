@@ -382,7 +382,9 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
         return Vec::new();
     }
     // Monic copy for the polynomial arithmetic.
-    let lead_inv = f[deg].inv().expect("nonzero lead is invertible mod p");
+    let lead_inv = f[deg]
+        .inv_vartime()
+        .expect("nonzero lead is invertible mod p");
     let monic: Vec<FieldElement> = f.iter().map(|c| c.mul(&lead_inv)).collect();
 
     // X^p mod f(X) by repeated squaring.
@@ -415,14 +417,14 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
             let qb = h[1].clone();
             let qc = h[0].clone();
             if qa.is_zero() {
-                if let Some(inv) = qb.inv() {
+                if let Some(inv) = qb.inv_vartime() {
                     factors.push(vec![qc.neg().mul(&inv), qb]);
                 }
             } else {
                 let four = FieldElement::new(BigUint::from(4u32), p.clone());
                 let disc = qb.mul(&qb).sub(&four.mul(&qa).mul(&qc));
                 if let Some(root) = sqrt_mod_p(&disc.value, p) {
-                    let two_inv = qa.add(&qa).inv().expect("2a invertible");
+                    let two_inv = qa.add(&qa).inv_vartime().expect("2a invertible");
                     let s = FieldElement::new(root, p.clone());
                     let r1 = qb.neg().add(&s).mul(&two_inv);
                     let r2 = qb.neg().sub(&s).mul(&two_inv);
@@ -480,7 +482,7 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
     for lin in factors {
         if lin.len() == 2 && !lin[1].is_zero() {
             // root = −c0 / c1
-            if let Some(inv) = lin[1].inv() {
+            if let Some(inv) = lin[1].inv_vartime() {
                 roots.push(lin[0].neg().mul(&inv));
             }
         } else if lin.len() == 2 {
@@ -492,11 +494,20 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
 }
 
 /// Polynomial remainder `a mod modulus` over `F_p` (any nonzero lead).
+///
+/// A monic modulus — what every call in the root finder passes — needs no
+/// inversion at all, which matters: the reduction runs once per squaring
+/// in `X^p mod f` and in `(X + c)^((p−1)/2) mod f`.
 fn poly_rem(a: &[FieldElement], modulus: &[FieldElement], p: &BigUint) -> Vec<FieldElement> {
     let m_deg = modulus.len() - 1;
-    let lead_inv = match modulus[m_deg].inv() {
-        Some(v) => v,
-        None => return a.to_vec(),
+    let monic = modulus[m_deg].value.is_one();
+    let lead_inv = if monic {
+        None
+    } else {
+        match modulus[m_deg].inv_vartime() {
+            Some(v) => Some(v),
+            None => return a.to_vec(),
+        }
     };
     let mut r = a.to_vec();
     loop {
@@ -506,7 +517,10 @@ fn poly_rem(a: &[FieldElement], modulus: &[FieldElement], p: &BigUint) -> Vec<Fi
         if r.is_empty() || r.len() - 1 < m_deg {
             break;
         }
-        let factor = r[r.len() - 1].mul(&lead_inv);
+        let factor = match &lead_inv {
+            Some(inv) => r[r.len() - 1].mul(inv),
+            None => r[r.len() - 1].clone(),
+        };
         let shift = r.len() - 1 - m_deg;
         for (i, term) in modulus.iter().enumerate().take(m_deg) {
             r[shift + i] = r[shift + i].sub(&factor.mul(term));
@@ -610,7 +624,7 @@ fn poly_gcd(a: &[FieldElement], b: &[FieldElement], p: &BigUint) -> Vec<FieldEle
     if a.is_empty() {
         return vec![FieldElement::zero(p.clone())];
     }
-    if let Some(inv) = a[a.len() - 1].inv() {
+    if let Some(inv) = a[a.len() - 1].inv_vartime() {
         for coeff in a.iter_mut() {
             *coeff = coeff.mul(&inv);
         }
@@ -621,7 +635,7 @@ fn poly_gcd(a: &[FieldElement], b: &[FieldElement], p: &BigUint) -> Vec<FieldEle
 /// Exact quotient `a / b` for polynomials with `b | a`.
 fn poly_div_exact(a: &[FieldElement], b: &[FieldElement], p: &BigUint) -> Vec<FieldElement> {
     let b_deg = b.len() - 1;
-    let lead_inv = b[b_deg].inv().expect("divisor lead is invertible");
+    let lead_inv = b[b_deg].inv_vartime().expect("divisor lead is invertible");
     let mut r = a.to_vec();
     let mut quotient = vec![FieldElement::zero(p.clone()); a.len().saturating_sub(b_deg)];
     while r.len() > b_deg && !(r.len() == 1 && r[0].is_zero()) {
@@ -922,7 +936,7 @@ pub fn find_one_relation_counted(
                 if qb.is_zero() {
                     continue;
                 }
-                let inv = match qb.inv() {
+                let inv = match qb.inv_vartime() {
                     Some(v) => v,
                     None => continue,
                 };
@@ -947,7 +961,7 @@ pub fn find_one_relation_counted(
                 Some(v) => v,
                 None => continue,
             };
-            let two_qa_inv = match qa.add(&qa).inv() {
+            let two_qa_inv = match qa.add(&qa).inv_vartime() {
                 Some(v) => v,
                 None => continue,
             };
@@ -1102,6 +1116,136 @@ pub fn find_one_relation_s4_counted(
                         &b,
                     ) {
                         return Some((rel, trial));
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Solve `A·X² + B·X + C ≡ 0 (mod p)` over `F_p`, returning its
+/// `F_p`-rational roots (zero, one, or two of them).
+///
+/// Variable-time: the coefficients come from public factor-base data, and
+/// every inversion here is on a public value.  `A = 0` is handled as the
+/// linear case (the S₃ quadratic degenerates there when the two fixed
+/// abscissae coincide).
+fn quadratic_roots_fp(
+    qa: &FieldElement,
+    qb: &FieldElement,
+    qc: &FieldElement,
+    p: &BigUint,
+) -> Vec<FieldElement> {
+    if qa.is_zero() {
+        if qb.is_zero() {
+            return Vec::new();
+        }
+        return match qb.inv_vartime() {
+            Some(inv) => vec![qc.neg().mul(&inv)],
+            None => Vec::new(),
+        };
+    }
+    let four = FieldElement::new(BigUint::from(4u32), p.clone());
+    let disc = qb.mul(qb).sub(&four.mul(qa).mul(qc));
+    let Some(root) = sqrt_mod_p(&disc.value, p) else {
+        return Vec::new();
+    };
+    let two_a_inv = match qa.add(qa).inv_vartime() {
+        Some(v) => v,
+        None => return Vec::new(),
+    };
+    let s = FieldElement::new(root, p.clone());
+    let r1 = qb.neg().add(&s).mul(&two_a_inv);
+    let r2 = qb.neg().sub(&s).mul(&two_a_inv);
+    if r1.value == r2.value {
+        vec![r1]
+    } else {
+        vec![r1, r2]
+    }
+}
+
+/// **Find one 3-decomposition relation through an S₃-anchored sweep.**
+///
+/// This finds exactly the same relation family as
+/// [`find_one_relation_s4_counted`] — a signed triple of factor-base
+/// points summing to `R = aG + bQ` — but never evaluates the quartic
+/// `S₄` or runs Cantor–Zassenhaus over `F_p`.
+///
+/// Anchor a factor-base point `F_i` (both signs, since the base stores one
+/// representative per `±` pair), form `R′ = R ∓ F_i`, and decompose `R′`
+/// as a **two**-point sum: for every `x_j` in the base solve the quadratic
+/// `S₃(x_j, X, x_{R′}) = 0` and keep the roots that are factor-base
+/// abscissae.  `S₄(x_R, x_i, x_j, x_k) = 0` holds exactly when such a
+/// signed triple exists, so the yield per trial is the same `~ 2B³/p`
+/// relations as the quartic sweep (`B²/2` pairs × ≤4 roots × `B/p`), while
+/// each candidate costs one quadratic solve (a few multiplications, one
+/// square root) instead of a quartic plus a full `X^p mod f` and
+/// equal-degree splitting.  The equivalence is not heuristic: the census
+/// test `s3_anchor_sweep_matches_the_quartic_triple_census` checks both
+/// oracles against a brute-force sign census on the 16-bit rung.
+///
+/// Counted: returns the number of random `(a, b)` trials consumed.
+pub fn find_one_relation_s4_via_s3_counted(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    factor_base: &[FactorBaseEntry],
+    max_trials: usize,
+) -> Option<(Relation, usize)> {
+    use crate::utils::random::random_scalar;
+
+    let a_fe = curve.a_fe();
+    let b_fe = curve.fe(curve.b.clone());
+    let p = curve.p.clone();
+    let mut x_to_idx: std::collections::HashMap<BigUint, usize> = std::collections::HashMap::new();
+    for fb in factor_base {
+        if let Point::Affine { x, .. } = &fb.point {
+            x_to_idx.insert(x.value.clone(), fb.idx);
+        }
+    }
+    let negatives: Vec<Point> = factor_base.iter().map(|fb| fb.point.neg()).collect();
+
+    for trial in 1..=max_trials {
+        let a = random_scalar(&curve.n);
+        let b = random_scalar(&curve.n);
+        let ag = g.scalar_mul(&a, &a_fe);
+        let bq = q.scalar_mul(&b, &a_fe);
+        let r = ag.add(&bq, &a_fe);
+        if matches!(r, Point::Infinity) {
+            continue;
+        }
+        for (i, fb_i) in factor_base.iter().enumerate() {
+            // R − F_i and R + F_i: one representative covers both signs.
+            for r_prime in [r.add(&negatives[i], &a_fe), r.add(&fb_i.point, &a_fe)] {
+                let x_prime = match &r_prime {
+                    Point::Affine { x, .. } => x.clone(),
+                    Point::Infinity => continue,
+                };
+                for (j, fb_j) in factor_base.iter().enumerate() {
+                    let xj = match &fb_j.point {
+                        Point::Affine { x, .. } => x,
+                        Point::Infinity => continue,
+                    };
+                    let (qa, qb, qc) = semaev_s3_in_x3(xj, &x_prime, &a_fe, &b_fe);
+                    for xk in quadratic_roots_fp(&qa, &qb, &qc, &p) {
+                        let Some(&k) = x_to_idx.get(&xk.value) else {
+                            continue;
+                        };
+                        if let Some(rel) = try_finalise_s4(
+                            &r,
+                            i,
+                            &fb_i.point,
+                            j,
+                            &fb_j.point,
+                            k,
+                            &factor_base[k].point,
+                            curve,
+                            &a,
+                            &b,
+                        ) {
+                            return Some((rel, trial));
+                        }
                     }
                 }
             }
@@ -1673,6 +1817,67 @@ pub fn ec_index_calculus_dlp_s4_staged(
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
 ) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        find_one_relation_s4_counted,
+    )
+}
+
+/// Staged S₄ 3-decomposition driver on the S₃-anchored sweep
+/// ([`find_one_relation_s4_via_s3_counted`]).
+///
+/// Same relation family, same report shape and same final `[x]G = Q`
+/// check as [`ec_index_calculus_dlp_s4_staged`]; only the decomposition
+/// oracle differs.  Use it for the per-relation cost lever: the two
+/// drivers are interchangeable, so a paired run on one seed measures the
+/// oracle alone.
+pub fn ec_index_calculus_dlp_s4_s3_staged(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        find_one_relation_s4_via_s3_counted,
+    )
+}
+
+/// Shared body of the staged S₄ drivers.  `finder` supplies one relation
+/// (and its trial count) per call; everything else — factor base,
+/// relation target, linear algebra, `[x]G = Q` — is identical.
+#[allow(clippy::too_many_arguments)]
+fn ec_index_calculus_dlp_s4_staged_with(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    finder: fn(
+        &CurveParams,
+        &Point,
+        &Point,
+        &[FactorBaseEntry],
+        usize,
+    ) -> Option<(Relation, usize)>,
+) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
     let total_started = Instant::now();
 
@@ -1693,9 +1898,7 @@ pub fn ec_index_calculus_dlp_s4_staged(
         let mut failed_trials = 0usize;
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
-                if let Some(found) =
-                    find_one_relation_s4_counted(curve, g, q, &fb, max_trials_per_relation)
-                {
+                if let Some(found) = finder(curve, g, q, &fb, max_trials_per_relation) {
                     break 'attempt Some(found);
                 }
                 attempts_exhausted += 1;
@@ -1942,6 +2145,170 @@ mod tests {
         assert_eq!(s4_x, plain.expect("2-decomp solve also succeeds"));
         assert_eq!(report.relations_collected, 10 + extra_relations);
         assert!(report.trials_per_relation_median >= 1.0);
+    }
+
+    /// The S₃-anchored sweep and the quartic/CZ sweep must decide the
+    /// *same* S₄ triple family.  Checked against a brute-force sign census
+    /// on a 16-bit deployed-shape curve: every triple either oracle admits
+    /// re-adds to `R` under some sign pattern, and the two sets agree.
+    #[test]
+    fn s3_anchor_sweep_matches_the_quartic_triple_census() {
+        use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
+        use std::collections::BTreeSet;
+
+        let Some((_, curve)) = bench_curves_a_minus_3()
+            .into_iter()
+            .find(|(b, c)| *b == 16 && c.name.contains("p256"))
+        else {
+            panic!("16-bit a=-3 bench curve missing");
+        };
+        let a_fe = curve.a_fe();
+        let b_fe = curve.fe(curve.b.clone());
+        let fb = build_factor_base(&curve, 20);
+        assert_eq!(fb.len(), 20);
+
+        // A target that is *known* to have at least one triple.
+        let r = fb[0]
+            .point
+            .add(&fb[1].point, &a_fe)
+            .add(&fb[2].point, &a_fe);
+
+        let mut x_to_idx: std::collections::HashMap<BigUint, usize> =
+            std::collections::HashMap::new();
+        for f in &fb {
+            if let Point::Affine { x, .. } = &f.point {
+                x_to_idx.insert(x.value.clone(), f.idx);
+            }
+        }
+        let one = BigUint::one();
+        let finalises = |i: usize, j: usize, k: usize| {
+            try_finalise_s4(
+                &r,
+                i,
+                &fb[i].point,
+                j,
+                &fb[j].point,
+                k,
+                &fb[k].point,
+                &curve,
+                &one,
+                &one,
+            )
+            .is_some()
+        };
+
+        // Brute-force census: every triple with a sign pattern summing to R.
+        let mut census: BTreeSet<(usize, usize, usize)> = BTreeSet::new();
+        for i in 0..fb.len() {
+            for j in 0..fb.len() {
+                for k in 0..fb.len() {
+                    if finalises(i, j, k) {
+                        let mut t = [i, j, k];
+                        t.sort_unstable();
+                        census.insert((t[0], t[1], t[2]));
+                    }
+                }
+            }
+        }
+        assert!(
+            census.contains(&(0, 1, 2)),
+            "the planted triple must be in the census"
+        );
+
+        // Quartic + Cantor–Zassenhaus enumeration.
+        let xr = match &r {
+            Point::Affine { x, .. } => x.clone(),
+            Point::Infinity => unreachable!(),
+        };
+        let mut quartic: BTreeSet<(usize, usize, usize)> = BTreeSet::new();
+        for i in 0..fb.len() {
+            let xi = match &fb[i].point {
+                Point::Affine { x, .. } => x.clone(),
+                Point::Infinity => continue,
+            };
+            for j in (i + 1)..fb.len() {
+                let xj = match &fb[j].point {
+                    Point::Affine { x, .. } => x.clone(),
+                    Point::Infinity => continue,
+                };
+                let q = semaev_s4_in_x4(&xr, &xi, &xj, &a_fe, &b_fe);
+                for xk in find_roots_fp_fast(&q, &curve.p) {
+                    if let Some(&k) = x_to_idx.get(&xk.value) {
+                        if finalises(i, j, k) {
+                            let mut t = [i, j, k];
+                            t.sort_unstable();
+                            quartic.insert((t[0], t[1], t[2]));
+                        }
+                    }
+                }
+            }
+        }
+
+        // S₃-anchored enumeration (the production oracle).
+        let mut anchored: BTreeSet<(usize, usize, usize)> = BTreeSet::new();
+        for i in 0..fb.len() {
+            for r_prime in [r.add(&fb[i].point.neg(), &a_fe), r.add(&fb[i].point, &a_fe)] {
+                let x_prime = match &r_prime {
+                    Point::Affine { x, .. } => x.clone(),
+                    Point::Infinity => continue,
+                };
+                for j in 0..fb.len() {
+                    let xj = match &fb[j].point {
+                        Point::Affine { x, .. } => x,
+                        Point::Infinity => continue,
+                    };
+                    let (qa, qb, qc) = semaev_s3_in_x3(xj, &x_prime, &a_fe, &b_fe);
+                    for xk in quadratic_roots_fp(&qa, &qb, &qc, &curve.p) {
+                        if let Some(&k) = x_to_idx.get(&xk.value) {
+                            if finalises(i, j, k) {
+                                let mut t = [i, j, k];
+                                t.sort_unstable();
+                                anchored.insert((t[0], t[1], t[2]));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        assert_eq!(
+            anchored, census,
+            "S₃-anchored sweep must find exactly the sign-verified triples"
+        );
+        // The CZ path may miss a root it fails to split (documented), but
+        // every triple it does emit must be a real one, and it must find
+        // the planted triple.
+        assert!(
+            quartic.is_subset(&census),
+            "quartic sweep emitted a triple that does not re-add: {:?}",
+            quartic.difference(&census).collect::<Vec<_>>()
+        );
+        assert!(quartic.contains(&(0, 1, 2)));
+    }
+
+    /// The two staged drivers are drop-in equivalents: same recovered log,
+    /// same relation count, three-entry rows, and the anchored sweep never
+    /// costs more trials per relation than the quartic one on this fixture.
+    #[test]
+    fn s3_staged_driver_matches_the_quartic_driver() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
+        let extra_relations = 64;
+        let quartic =
+            ec_index_calculus_dlp_s4_staged(&curve, &g, &q, 10, extra_relations, 5000, 64)
+                .expect("quartic driver solves the tiny curve");
+        let anchored =
+            ec_index_calculus_dlp_s4_s3_staged(&curve, &g, &q, 10, extra_relations, 5000, 64)
+                .expect("anchored driver solves the tiny curve");
+        assert_eq!(quartic.0, anchored.0);
+        assert_eq!(g.scalar_mul(&anchored.0, &a_fe), q);
+        assert_eq!(
+            quartic.1.relations_collected,
+            anchored.1.relations_collected
+        );
+        assert!(anchored.1.trials_total >= anchored.1.relations_collected);
     }
 
     /// Staged twin recovers the same log as the plain driver on the tiny
