@@ -129,7 +129,11 @@ impl Bloom {
     fn new(keys: usize, key_bits: u32) -> Self {
         let words = (keys / 8).next_power_of_two().max(256);
         let wbits = words.trailing_zeros();
-        Self { words: vec![0; words], mask: words - 1, wshift: key_bits.saturating_sub(wbits) }
+        Self {
+            words: vec![0; words],
+            mask: words - 1,
+            wshift: key_bits.saturating_sub(wbits),
+        }
     }
     #[inline(always)]
     fn slot(&self, key: u64) -> (usize, u64) {
@@ -157,8 +161,18 @@ enum Source {
     Packed(Vec<u64>),
     /// Pair `t` of the last level is entry `e` (`off[e] <= t < off[e+1]`)
     /// plus base point `llast[e] + 1 + (t − off[e])`.
-    Implicit { off: Vec<u32>, llast: Vec<u32>, lpk: Vec<u64>, depth: u32 },
-    Last { pe: Vec<u64>, pk: Vec<u64>, lpk: Vec<u64>, depth: u32 },
+    Implicit {
+        off: Vec<u32>,
+        llast: Vec<u32>,
+        lpk: Vec<u64>,
+        depth: u32,
+    },
+    Last {
+        pe: Vec<u64>,
+        pk: Vec<u64>,
+        lpk: Vec<u64>,
+        depth: u32,
+    },
 }
 
 /// Keys bucketed by their top 16 bits (one counting pass and one
@@ -210,7 +224,16 @@ impl Table {
                 }
             }
         }
-        Self { keys, refs, dir, shift, len: total - collisions, collisions, bloom, src }
+        Self {
+            keys,
+            refs,
+            dir,
+            shift,
+            len: total - collisions,
+            collisions,
+            bloom,
+            src,
+        }
     }
     fn build(kv: Vec<(u32, u64)>, p: u64) -> Self {
         let n = kv.len();
@@ -228,7 +251,15 @@ impl Table {
         )
     }
     fn from_last(last: LastLevel, p: u64) -> Self {
-        let LastLevel { kp, km, pe, pk, lpk, n, depth } = last;
+        let LastLevel {
+            kp,
+            km,
+            pe,
+            pk,
+            lpk,
+            n,
+            depth,
+        } = last;
         let bits = 64 - (p - 1).leading_zeros();
         let shift = bits.saturating_sub(16);
         let nb = 1usize << 16;
@@ -288,7 +319,16 @@ impl Table {
             }
         }
         dir[nb] = total as u32;
-        Self { keys, refs, dir, shift, len: total, collisions: 0, bloom, src: Source::Last { pe, pk, lpk, depth } }
+        Self {
+            keys,
+            refs,
+            dir,
+            shift,
+            len: total,
+            collisions: 0,
+            bloom,
+            src: Source::Last { pe, pk, lpk, depth },
+        }
     }
     /// Duplicate keys (the build's collisions), counted on demand.
     fn count_collisions(&self) -> usize {
@@ -307,7 +347,12 @@ impl Table {
     fn resolve(&self, r: u32) -> u64 {
         match &self.src {
             Source::Packed(v) => v[r as usize],
-            Source::Implicit { off, llast, lpk, depth } => {
+            Source::Implicit {
+                off,
+                llast,
+                lpk,
+                depth,
+            } => {
                 let t = r / 2;
                 let e = off.partition_point(|&o| o <= t) - 1;
                 let k = llast[e] + 1 + (t - off[e]);
@@ -332,7 +377,10 @@ impl Table {
         let k = key as u32;
         let b = ((k >> self.shift) as usize).min(self.dir.len() - 2);
         let (lo, hi) = (self.dir[b] as usize, self.dir[b + 1] as usize);
-        self.keys[lo..hi].iter().position(|&q| q == k).map(|i| self.resolve(self.refs[lo + i]))
+        self.keys[lo..hi]
+            .iter()
+            .position(|&q| q == k)
+            .map(|i| self.resolve(self.refs[lo + i]))
     }
 }
 
@@ -379,8 +427,14 @@ struct Partial {
 /// inversions and exceptional (equal-abscissa) pairs skipped.
 fn build_ksum(f: &Mont, bx: &[u64], by: &[u64], m: u32) -> (Vec<(u32, u64)>, u64, u64) {
     let a = bx.len();
-    let mut level: Vec<Partial> =
-        (0..a).map(|i| Partial { x: bx[i], y: by[i], last: i, packed: pack_push(0, 0, i, false) }).collect();
+    let mut level: Vec<Partial> = (0..a)
+        .map(|i| Partial {
+            x: bx[i],
+            y: by[i],
+            last: i,
+            packed: pack_push(0, 0, i, false),
+        })
+        .collect();
     let mut invs = 0u64;
     let mut skipped = 0u64;
     let trace = std::env::var_os("KSUM_TRACE").is_some();
@@ -444,12 +498,22 @@ fn build_ksum(f: &Mont, bx: &[u64], by: &[u64], m: u32) -> (Vec<(u32, u64)>, u64
                     out.push((x3 as u32, packed));
                 } else {
                     let y3 = f.sub(f.mul(lam, f.sub(s.x, x3)), s.y);
-                    next_full.push(Partial { x: x3, y: y3, last: k, packed });
+                    next_full.push(Partial {
+                        x: x3,
+                        y: y3,
+                        last: k,
+                        packed,
+                    });
                 }
             }
         }
         if trace {
-            eprintln!("level {} pairs {} {:.3} ms", depth + 1, n, t_level.elapsed().as_secs_f64() * 1e3);
+            eprintln!(
+                "level {} pairs {} {:.3} ms",
+                depth + 1,
+                n,
+                t_level.elapsed().as_secs_f64() * 1e3
+            );
         }
         if last_level {
             return (out, invs, skipped);
@@ -532,7 +596,8 @@ impl SpinPool {
         self.tasks.store(tasks, Ordering::Release);
         self.next.store(0, Ordering::Release);
         self.done.store(0, Ordering::Release);
-        self.job.store(&holder as *const Job<'static> as *mut (), Ordering::Release);
+        self.job
+            .store(&holder as *const Job<'static> as *mut (), Ordering::Release);
         self.epoch.fetch_add(1, Ordering::AcqRel);
         self.work();
         while self.done.load(Ordering::Acquire) < tasks {
@@ -552,7 +617,9 @@ fn par_run<T: Send, F: FnOnce() -> T + Send>(jobs: Vec<F>) -> Vec<T> {
         *out[i].lock().unwrap() = Some(f());
     };
     POOL.get().expect("pool started").run(n, &job);
-    out.into_iter().map(|m| m.into_inner().unwrap().expect("ran")).collect()
+    out.into_iter()
+        .map(|m| m.into_inner().unwrap().expect("ran"))
+        .collect()
 }
 
 /// A raw pointer shared by threads that write disjoint indices.
@@ -618,7 +685,11 @@ fn last_level_par(
                     let mut zm = vec![0u8; CH / 8];
                     let (mut xp, mut xm) = (vec![0u64; CH], vec![0u64; CH]);
                     let (mut yp, mut ym) = (Vec::new(), Vec::new());
-                    let mut e = if len > 0 { off.partition_point(|&o| o as usize <= t0) - 1 } else { 0 };
+                    let mut e = if len > 0 {
+                        off.partition_point(|&o| o as usize <= t0) - 1
+                    } else {
+                        0
+                    };
                     let mut c0 = t0;
                     while c0 < t1 {
                         let cl = CH.min(t1 - c0);
@@ -638,7 +709,23 @@ fn last_level_par(
                         }
                         // SAFETY: callers use this only when AVX-512 was detected.
                         unsafe {
-                            avx::pair_add(f, lx, ly, bx, by, &pe[..clp], &pk[..clp], &mut dd[..clp], &mut pre[..clp], &mut zm[..clp / 8], &mut xp[..clp], &mut xm[..clp], &mut yp, &mut ym, false)
+                            avx::pair_add(
+                                f,
+                                lx,
+                                ly,
+                                bx,
+                                by,
+                                &pe[..clp],
+                                &pk[..clp],
+                                &mut dd[..clp],
+                                &mut pre[..clp],
+                                &mut zm[..clp / 8],
+                                &mut xp[..clp],
+                                &mut xm[..clp],
+                                &mut yp,
+                                &mut ym,
+                                false,
+                            )
                         };
                         invs += 1;
                         for i in 0..cl {
@@ -661,7 +748,10 @@ fn last_level_par(
         par_run(jobs)
     };
     if trace {
-        eprintln!("    phase 1 (keys) {:.3} ms", tr0.elapsed().as_secs_f64() * 1e3);
+        eprintln!(
+            "    phase 1 (keys) {:.3} ms",
+            tr0.elapsed().as_secs_f64() * 1e3
+        );
     }
     let (mut invs, mut skipped) = (0u64, 0u64);
     // Phase 2: offsets per (bucket, thread), then parallel scatter.
@@ -714,7 +804,10 @@ fn last_level_par(
     }
     drop(parts);
     if trace {
-        eprintln!("    phase 2 (scatter) {:.3} ms", tr0.elapsed().as_secs_f64() * 1e3);
+        eprintln!(
+            "    phase 2 (scatter) {:.3} ms",
+            tr0.elapsed().as_secs_f64() * 1e3
+        );
     }
     // Phase 3: contiguous bucket ranges per thread.
     let nb = 1usize << 16;
@@ -791,9 +884,26 @@ fn last_level_par(
     }
     dir[nb] = total as u32;
     if trace {
-        eprintln!("    phase 3 (buckets) {:.3} ms", tr0.elapsed().as_secs_f64() * 1e3);
+        eprintln!(
+            "    phase 3 (buckets) {:.3} ms",
+            tr0.elapsed().as_secs_f64() * 1e3
+        );
     }
-    let table = Table { keys, refs, dir, shift, len: total, collisions: 0, bloom, src: Source::Implicit { off, llast, lpk, depth } };
+    let table = Table {
+        keys,
+        refs,
+        dir,
+        shift,
+        len: total,
+        collisions: 0,
+        bloom,
+        src: Source::Implicit {
+            off,
+            llast,
+            lpk,
+            depth,
+        },
+    };
     (table, invs, skipped)
 }
 
@@ -808,7 +918,10 @@ struct Bloom2 {
 impl Bloom2 {
     fn new(keys: usize) -> Self {
         let words = (keys / 8).next_power_of_two().max(256);
-        Self { words: vec![0; words], mask: words - 1 }
+        Self {
+            words: vec![0; words],
+            mask: words - 1,
+        }
     }
     #[inline(always)]
     fn slot(&self, key: u64) -> (usize, u64) {
@@ -874,7 +987,11 @@ fn last_level_chunks<R: Send>(
                 let mut zm = vec![0u8; CH / 8];
                 let (mut xp, mut xm) = (vec![0u64; CH], vec![0u64; CH]);
                 let (mut yp, mut ym) = (Vec::new(), Vec::new());
-                let mut e = if t1 > t0 { off.partition_point(|&o| o as usize <= t0) - 1 } else { 0 };
+                let mut e = if t1 > t0 {
+                    off.partition_point(|&o| o as usize <= t0) - 1
+                } else {
+                    0
+                };
                 let mut c0 = t0;
                 while c0 < t1 {
                     let cl = CH.min(t1 - c0);
@@ -894,7 +1011,23 @@ fn last_level_chunks<R: Send>(
                     }
                     // SAFETY: callers use this only when AVX-512 was detected.
                     unsafe {
-                        avx::pair_add(f, &lv.lx, &lv.ly, bx, by, &pe[..clp], &pk[..clp], &mut dd[..clp], &mut pre[..clp], &mut zm[..clp / 8], &mut xp[..clp], &mut xm[..clp], &mut yp, &mut ym, false)
+                        avx::pair_add(
+                            f,
+                            &lv.lx,
+                            &lv.ly,
+                            bx,
+                            by,
+                            &pe[..clp],
+                            &pk[..clp],
+                            &mut dd[..clp],
+                            &mut pre[..clp],
+                            &mut zm[..clp / 8],
+                            &mut xp[..clp],
+                            &mut xm[..clp],
+                            &mut yp,
+                            &mut ym,
+                            false,
+                        )
                     };
                     visit(&mut acc, c0, &xp[..cl], &xm[..cl], &zm, cl);
                     c0 += cl;
@@ -909,7 +1042,14 @@ fn last_level_chunks<R: Send>(
 /// The two filters over every last-level key (per-thread filters, merged
 /// by OR). Returns them with the last level's pair offsets.
 #[cfg(target_arch = "x86_64")]
-fn filters_par(f: &Mont, lv: &Levels, bx: &[u64], by: &[u64], threads: usize, p: u64) -> (Bloom, Bloom2, Vec<u32>, usize, u64) {
+fn filters_par(
+    f: &Mont,
+    lv: &Levels,
+    bx: &[u64],
+    by: &[u64],
+    threads: usize,
+    p: u64,
+) -> (Bloom, Bloom2, Vec<u32>, usize, u64) {
     let a = bx.len();
     let ne = lv.lx.len();
     let mut off = vec![0u32; ne + 1];
@@ -956,8 +1096,20 @@ fn filters_par(f: &Mont, lv: &Levels, bx: &[u64], by: &[u64], threads: usize, p:
 /// The join: every last-level key against the candidates' abscissae;
 /// returns (candidate index, key reference `2t + sign`) for each match.
 #[cfg(target_arch = "x86_64")]
-fn join_par(f: &Mont, lv: &Levels, off: &[u32], bx: &[u64], by: &[u64], threads: usize, cands: &[Cand]) -> Vec<(usize, u32)> {
-    let mut set: Vec<(u32, u32)> = cands.iter().enumerate().map(|(i, c)| (c.x as u32, i as u32)).collect();
+fn join_par(
+    f: &Mont,
+    lv: &Levels,
+    off: &[u32],
+    bx: &[u64],
+    by: &[u64],
+    threads: usize,
+    cands: &[Cand],
+) -> Vec<(usize, u32)> {
+    let mut set: Vec<(u32, u32)> = cands
+        .iter()
+        .enumerate()
+        .map(|(i, c)| (c.x as u32, i as u32))
+        .collect();
     set.sort_unstable();
     let set = &set;
     // A 2^16-bit prefilter (8 KB, in L1) in front of the binary search.
@@ -1002,13 +1154,27 @@ fn join_par(f: &Mont, lv: &Levels, off: &[u32], bx: &[u64], by: &[u64], threads:
 /// SoA form, pairs padded to a multiple of the kernel group with a dummy
 /// pair whose outputs are dropped. Same table as `build_ksum`.
 #[cfg(target_arch = "x86_64")]
-fn build_ksum_avx(f: &Mont, bx: &[u64], by: &[u64], m: u32, threads: usize, p: u64) -> (Table, u64, u64) {
+fn build_ksum_avx(
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    m: u32,
+    threads: usize,
+    p: u64,
+) -> (Table, u64, u64) {
     let (lv, invs, skipped) = build_levels_avx(f, bx, by, m);
     let t_level = Instant::now();
     let n: usize = lv.llast.iter().map(|&l| bx.len() - 1 - l as usize).sum();
-    let (table, i2, s2) = last_level_par(f, &lv.lx, &lv.ly, lv.llast, lv.lpk, bx, by, lv.depth, threads, p);
+    let (table, i2, s2) = last_level_par(
+        f, &lv.lx, &lv.ly, lv.llast, lv.lpk, bx, by, lv.depth, threads, p,
+    );
     if std::env::var_os("KSUM_TRACE").is_some() {
-        eprintln!("avx level {} pairs {} {:.3} ms (with table)", lv.depth + 1, n, t_level.elapsed().as_secs_f64() * 1e3);
+        eprintln!(
+            "avx level {} pairs {} {:.3} ms (with table)",
+            lv.depth + 1,
+            n,
+            t_level.elapsed().as_secs_f64() * 1e3
+        );
     }
     (table, invs + i2, skipped + s2)
 }
@@ -1041,7 +1207,17 @@ fn build_levels_avx(f: &Mont, bx: &[u64], by: &[u64], m: u32) -> (Levels, u64, u
         let n: usize = llast.iter().map(|&l| a - 1 - l as usize).sum();
         if last_level {
             let _ = (n, t_level);
-            return (Levels { lx, ly, llast, lpk, depth }, invs, skipped);
+            return (
+                Levels {
+                    lx,
+                    ly,
+                    llast,
+                    lpk,
+                    depth,
+                },
+                invs,
+                skipped,
+            );
         }
         let padded = n.div_ceil(avx::GROUP) * avx::GROUP;
         let mut pe = vec![0u64; padded];
@@ -1056,7 +1232,11 @@ fn build_levels_avx(f: &Mont, bx: &[u64], by: &[u64], m: u32) -> (Levels, u64, u
         }
         // Pairs past `n` are padding (entry 0 again); their outputs are dropped.
         if trace {
-            eprintln!("  level {} pair lists {:.3} ms", depth + 1, t_level.elapsed().as_secs_f64() * 1e3);
+            eprintln!(
+                "  level {} pair lists {:.3} ms",
+                depth + 1,
+                t_level.elapsed().as_secs_f64() * 1e3
+            );
         }
         let mut dd = vec![0u64; padded];
         let mut pre = vec![0u64; padded];
@@ -1066,7 +1246,10 @@ fn build_levels_avx(f: &Mont, bx: &[u64], by: &[u64], m: u32) -> (Levels, u64, u
         let (mut yp, mut ym) = (vec![0u64; padded], vec![0u64; padded]);
         // SAFETY: callers use this only when AVX-512 was detected.
         unsafe {
-            avx::pair_add(f, &lx, &ly, bx, by, &pe, &pk, &mut dd, &mut pre, &mut zm, &mut xp, &mut xm, &mut yp, &mut ym, true)
+            avx::pair_add(
+                f, &lx, &ly, bx, by, &pe, &pk, &mut dd, &mut pre, &mut zm, &mut xp, &mut xm,
+                &mut yp, &mut ym, true,
+            )
         };
         invs += 1;
         let zero_at = |t: usize| zm[t / 8] >> (t % 8) & 1 == 1;
@@ -1094,7 +1277,12 @@ fn build_levels_avx(f: &Mont, bx: &[u64], by: &[u64], m: u32) -> (Levels, u64, u
             o += 2;
         }
         if trace {
-            eprintln!("avx level {} pairs {} {:.3} ms", depth + 1, n, t_level.elapsed().as_secs_f64() * 1e3);
+            eprintln!(
+                "avx level {} pairs {} {:.3} ms",
+                depth + 1,
+                n,
+                t_level.elapsed().as_secs_f64() * 1e3
+            );
         }
         lx = nx;
         ly = ny;
@@ -1150,15 +1338,23 @@ fn solve(rels: &[Rel], a: usize, r: u64) -> Option<u64> {
         .map(|rel| {
             let mut row = vec![0u64; a];
             for &(i, neg) in &rel.cols {
-                row[i] = if neg { subm(row[i], 1, r) } else { addm(row[i], 1, r) };
+                row[i] = if neg {
+                    subm(row[i], 1, r)
+                } else {
+                    addm(row[i], 1, r)
+                };
             }
             row
         })
         .collect();
-    let mut track: Vec<Vec<u64>> = (0..m).map(|i| (0..m).map(|j| u64::from(i == j)).collect()).collect();
+    let mut track: Vec<Vec<u64>> = (0..m)
+        .map(|i| (0..m).map(|j| u64::from(i == j)).collect())
+        .collect();
     let mut prow = 0;
     for col in 0..a {
-        let Some(piv) = (prow..m).find(|&i| mat[i][col] != 0) else { continue };
+        let Some(piv) = (prow..m).find(|&i| mat[i][col] != 0) else {
+            continue;
+        };
         mat.swap(prow, piv);
         track.swap(prow, piv);
         let inv = powm(mat[prow][col], r - 2, r);
@@ -1421,8 +1617,10 @@ mod avx {
         pre: &mut [u64],
         zmask: &mut [u8],
         exc: &mut Vec<usize>,
+        xs: &mut [u64],
     ) {
         debug_assert!(wx.len() == NW && x.len() % GROUP == 0);
+        debug_assert!(wd.iter().all(|&d| d == 1), "steps W_j = Q + c_j G");
         let c = C {
             p: _mm512_set1_epi64(f.p as i64),
             ninv: _mm512_set1_epi64(f.ninv as i64),
@@ -1482,20 +1680,41 @@ mod avx {
                 inv[v] = mmul(&c, inv[v], dv);
                 let xv = _mm512_loadu_si512(x.as_ptr().add(o) as *const _);
                 let yv = _mm512_loadu_si512(y.as_ptr().add(o) as *const _);
-                let xw = _mm512_i64gather_epi64::<8>(jj, wx.as_ptr() as *const _);
+                // x_W = d + x_R (d was stored by the forward pass; wrong
+                // only on masked lanes).
+                let xw = madd(&c, dv, xv);
                 let yw = _mm512_i64gather_epi64::<8>(jj, wy.as_ptr() as *const _);
                 let lam = mmul(&c, msub(&c, yw, yv), dinv);
                 let x3 = msub(&c, msub(&c, mmul(&c, lam, lam), xv), xw);
                 let y3 = msub(&c, mmul(&c, lam, msub(&c, xv, x3)), yv);
                 let keep = !zmask[o / 8];
-                _mm512_storeu_si512(x.as_mut_ptr().add(o) as *mut _, _mm512_mask_mov_epi64(xv, keep, x3));
-                _mm512_storeu_si512(y.as_mut_ptr().add(o) as *mut _, _mm512_mask_mov_epi64(yv, keep, y3));
+                // The sibling R − W_j from the same denominator: a second
+                // probe point for one more product and one square.
+                let lmi = mmul(&c, msub(&c, msub(&c, _mm512_setzero_si512(), yw), yv), dinv);
+                let x3m = msub(&c, msub(&c, mmul(&c, lmi, lmi), xv), xw);
+                _mm512_storeu_si512(
+                    xs.as_mut_ptr().add(o) as *mut _,
+                    _mm512_mask_mov_epi64(_mm512_set1_epi64(-1), keep, x3m),
+                );
+                _mm512_storeu_si512(
+                    x.as_mut_ptr().add(o) as *mut _,
+                    _mm512_mask_mov_epi64(xv, keep, x3),
+                );
+                _mm512_storeu_si512(
+                    y.as_mut_ptr().add(o) as *mut _,
+                    _mm512_mask_mov_epi64(yv, keep, y3),
+                );
                 let lav = _mm512_loadu_si512(la.as_ptr().add(o) as *const _);
                 let lbv = _mm512_loadu_si512(lb.as_ptr().add(o) as *const _);
                 let cw = _mm512_i64gather_epi64::<8>(jj, wc.as_ptr() as *const _);
-                let dw = _mm512_i64gather_epi64::<8>(jj, wd.as_ptr() as *const _);
-                _mm512_storeu_si512(la.as_mut_ptr().add(o) as *mut _, _mm512_mask_mov_epi64(lav, keep, addr(&c, lav, cw)));
-                _mm512_storeu_si512(lb.as_mut_ptr().add(o) as *mut _, _mm512_mask_mov_epi64(lbv, keep, addr(&c, lbv, dw)));
+                _mm512_storeu_si512(
+                    la.as_mut_ptr().add(o) as *mut _,
+                    _mm512_mask_mov_epi64(lav, keep, addr(&c, lav, cw)),
+                );
+                _mm512_storeu_si512(
+                    lb.as_mut_ptr().add(o) as *mut _,
+                    _mm512_mask_mov_epi64(lbv, keep, addr(&c, lbv, c.one64)),
+                );
             }
         }
         for (vi, &z) in zmask.iter().enumerate() {
@@ -1604,8 +1823,14 @@ mod avx {
                 let x3p = msub(&c, mmul(&c, lpl, lpl), base);
                 let x3m = msub(&c, mmul(&c, lmi, lmi), base);
                 let keep = !zmask[o / 8];
-                _mm512_storeu_si512(xp.as_mut_ptr().add(o) as *mut _, _mm512_maskz_mov_epi64(keep, x3p));
-                _mm512_storeu_si512(xm.as_mut_ptr().add(o) as *mut _, _mm512_maskz_mov_epi64(keep, x3m));
+                _mm512_storeu_si512(
+                    xp.as_mut_ptr().add(o) as *mut _,
+                    _mm512_maskz_mov_epi64(keep, x3p),
+                );
+                _mm512_storeu_si512(
+                    xm.as_mut_ptr().add(o) as *mut _,
+                    _mm512_maskz_mov_epi64(keep, x3m),
+                );
                 if want_y {
                     let y3p = msub(&c, mmul(&c, lpl, msub(&c, x1, x3p)), y1);
                     let y3m = msub(&c, mmul(&c, lmi, msub(&c, x1, x3m)), y1);
@@ -1616,11 +1841,16 @@ mod avx {
         }
     }
 
-
     /// Lanes whose abscissa passes the Bloom filter (the same slot function
     /// as `Bloom::slot`), 8 keys a step; `x.len()` a multiple of 8.
     #[target_feature(enable = "avx2,avx512f,avx512dq,avx512vl,bmi2")]
-    pub unsafe fn bloom_pass(words: &[u64], mask: usize, wshift: u32, x: &[u64], out: &mut Vec<usize>) {
+    pub unsafe fn bloom_pass(
+        words: &[u64],
+        mask: usize,
+        wshift: u32,
+        x: &[u64],
+        out: &mut Vec<usize>,
+    ) {
         let c = _mm512_set1_epi64(0x9E37_79B9_7F4A_7C15u64 as i64);
         let m63 = _mm512_set1_epi64(63);
         let wm = _mm512_set1_epi64(mask as i64);
@@ -1701,7 +1931,9 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
     let a0 = 1 + seed % (r - 1);
     let a0g = g.mul(&mut ops, inst.gen, a0);
     let r0 = g.add(&mut ops, a0g, q);
-    let pairs: Vec<(usize, usize)> = (0..NW).flat_map(|u| (u + 1..NW).map(move |v| (u, v))).collect();
+    let pairs: Vec<(usize, usize)> = (0..NW)
+        .flat_map(|u| (u + 1..NW).map(move |v| (u, v)))
+        .collect();
     assert!(lanes <= pairs.len(), "at most {} lanes", pairs.len());
     let off = (seed as usize) % pairs.len();
     let lane_pair = |l: usize| pairs[(off + l * 7) % pairs.len()];
@@ -1710,7 +1942,16 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
     let mut la = vec![a0; lanes];
     let mut lb = vec![1u64; lanes];
     for pass in 0..2 {
-        let idx: Vec<usize> = (0..lanes).map(|l| { let (u, v) = lane_pair(l); if pass == 0 { u } else { v } }).collect();
+        let idx: Vec<usize> = (0..lanes)
+            .map(|l| {
+                let (u, v) = lane_pair(l);
+                if pass == 0 {
+                    u
+                } else {
+                    v
+                }
+            })
+            .collect();
         batched_add(f, &mut x, &mut y, &idx, &wx, &wy);
         for l in 0..lanes {
             la[l] = addm(la[l], wc[idx[l]], r);
@@ -1729,6 +1970,12 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
     let mut j64 = vec![0u64; lanes];
     let mut zmask = vec![0u8; lanes / 8];
     let mut cand: Vec<usize> = Vec::with_capacity(lanes);
+    // Sibling probes: x(R − W_j) of every step, with the pre-step points
+    // kept for verifying a hit (KSUM_NOSIB disables them).
+    let sib = intr && std::env::var_os("KSUM_NOSIB").is_none();
+    let mut xs = vec![u64::MAX; lanes];
+    let (mut xprev, mut yprev) = (vec![0u64; lanes], vec![0u64; lanes]);
+    let mut found2: Vec<(usize, u64)> = Vec::new();
     let cap: u64 = if probe { u64::MAX } else { 300_000 };
     let mut zero = vec![false; lanes];
     let mut exc: Vec<usize> = Vec::new();
@@ -1745,7 +1992,12 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
                 };
                 for &l in &cand {
                     if b2.maybe(x[l]) {
-                        local.push(Cand { x: x[l], y: y[l], a: la[l], b: lb[l] });
+                        local.push(Cand {
+                            x: x[l],
+                            y: y[l],
+                            a: la[l],
+                            b: lb[l],
+                        });
                     }
                 }
                 st.steps += lanes as u64;
@@ -1762,7 +2014,15 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
                 if intr {
                     cand.clear();
                     // SAFETY: `intr` implies AVX-512 was detected.
-                    unsafe { avx::bloom_pass(&table.unwrap().bloom.words, table.unwrap().bloom.mask, table.unwrap().bloom.wshift, &x, &mut cand) };
+                    unsafe {
+                        avx::bloom_pass(
+                            &table.unwrap().bloom.words,
+                            table.unwrap().bloom.mask,
+                            table.unwrap().bloom.wshift,
+                            &x,
+                            &mut cand,
+                        )
+                    };
                     for &l in &cand {
                         if let Some(v) = table.unwrap().get_exact(x[l]) {
                             found.push((l, v));
@@ -1789,9 +2049,17 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
                 st.hits += 1;
                 let rp = PrimePoint::affine(f.from(x[l]), f.from(y[l]));
                 let cols = unpack(v, m);
-                let mut s = PrimePoint { x: 0, y: 0, infinity: true };
+                let mut s = PrimePoint {
+                    x: 0,
+                    y: 0,
+                    infinity: true,
+                };
                 for &(i, neg) in &cols {
-                    let pt = if neg { g.neg(inst.reps[i]) } else { inst.reps[i] };
+                    let pt = if neg {
+                        g.neg(inst.reps[i])
+                    } else {
+                        inst.reps[i]
+                    };
                     s = g.add(&mut ops, s, pt);
                 }
                 let (a, b) = if s == rp {
@@ -1804,7 +2072,8 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
                 };
                 st.verified += 1;
                 let mut guard = sink.lock().unwrap();
-                if guard.0.len() < need && guard.1.insert(v ^ a.rotate_left(17) ^ b.rotate_left(41)) {
+                if guard.0.len() < need && guard.1.insert(v ^ a.rotate_left(17) ^ b.rotate_left(41))
+                {
                     guard.0.push(Rel { cols, a, b });
                     if guard.0.len() >= need {
                         done.store(true, Ordering::Relaxed);
@@ -1812,20 +2081,33 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
                 }
             }
             exc.clear();
+            if sib {
+                xprev.copy_from_slice(&x);
+                yprev.copy_from_slice(&y);
+            }
             #[cfg(target_arch = "x86_64")]
             if intr {
                 // SAFETY: `intr` is set only when AVX-512 was detected.
                 unsafe {
-                    avx::step(f, &mut x, &mut y, &mut la, &mut lb, &wx, &wy, &wc, &wd, r, &mut j64, &mut dd, &mut pre, &mut zmask, &mut exc)
+                    avx::step(
+                        f, &mut x, &mut y, &mut la, &mut lb, &wx, &wy, &wc, &wd, r, &mut j64,
+                        &mut dd, &mut pre, &mut zmask, &mut exc, &mut xs,
+                    )
                 };
                 for &l in &exc {
                     j[l] = j64[l] as usize;
                 }
             } else {
-                step_any(simd, f, &mut x, &mut y, &mut la, &mut lb, &wx, &wy, &wc, &wd, r, &mut j, &mut dd, &mut pre, &mut zero, &mut exc);
+                step_any(
+                    simd, f, &mut x, &mut y, &mut la, &mut lb, &wx, &wy, &wc, &wd, r, &mut j,
+                    &mut dd, &mut pre, &mut zero, &mut exc,
+                );
             }
             #[cfg(not(target_arch = "x86_64"))]
-            step_any(simd, f, &mut x, &mut y, &mut la, &mut lb, &wx, &wy, &wc, &wd, r, &mut j, &mut dd, &mut pre, &mut zero, &mut exc);
+            step_any(
+                simd, f, &mut x, &mut y, &mut la, &mut lb, &wx, &wy, &wc, &wd, r, &mut j, &mut dd,
+                &mut pre, &mut zero, &mut exc,
+            );
             for &l in &exc {
                 // R = ±W_j: step with the library instead.
                 st.exceptional += 1;
@@ -1837,6 +2119,69 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
                 y[l] = f.to(np.y);
                 la[l] = addm(la[l], c, r);
                 lb[l] = addm(lb[l], dco, r);
+            }
+            #[cfg(target_arch = "x86_64")]
+            if sib && filt.is_none() && probe {
+                let tbl = table.unwrap();
+                cand.clear();
+                // SAFETY: `sib` implies AVX-512 was detected.
+                unsafe {
+                    avx::bloom_pass(
+                        &tbl.bloom.words,
+                        tbl.bloom.mask,
+                        tbl.bloom.wshift,
+                        &xs,
+                        &mut cand,
+                    )
+                };
+                for &l in &cand {
+                    if xs[l] != u64::MAX {
+                        if let Some(v) = tbl.get_exact(xs[l]) {
+                            found2.push((l, v));
+                        }
+                    }
+                }
+                st.steps += lanes as u64;
+                for (l, v) in found2.drain(..) {
+                    st.hits += 1;
+                    // R_prev − W_j, with (a, b) = (la − 2 c_j, lb − 2).
+                    let jj = j64[l] as usize;
+                    let rprev = PrimePoint::affine(f.from(xprev[l]), f.from(yprev[l]));
+                    let rp = g.add(&mut ops, rprev, g.neg(steps_w[jj].0));
+                    let (pa, pb) = (subm(la[l], addm(wc[jj], wc[jj], r), r), subm(lb[l], 2, r));
+                    let cols = unpack(v, m);
+                    let mut s5 = PrimePoint {
+                        x: 0,
+                        y: 0,
+                        infinity: true,
+                    };
+                    for &(i, neg) in &cols {
+                        let pt = if neg {
+                            g.neg(inst.reps[i])
+                        } else {
+                            inst.reps[i]
+                        };
+                        s5 = g.add(&mut ops, s5, pt);
+                    }
+                    let (a, b) = if s5 == rp {
+                        (pa, pb)
+                    } else if s5 == g.neg(rp) {
+                        (subm(0, pa, r), subm(0, pb, r))
+                    } else {
+                        st.rejected += 1;
+                        continue;
+                    };
+                    st.verified += 1;
+                    let mut guard = sink.lock().unwrap();
+                    if guard.0.len() < need
+                        && guard.1.insert(v ^ a.rotate_left(17) ^ b.rotate_left(41))
+                    {
+                        guard.0.push(Rel { cols, a, b });
+                        if guard.0.len() >= need {
+                            done.store(true, Ordering::Relaxed);
+                        }
+                    }
+                }
             }
         }
     }
@@ -1881,7 +2226,8 @@ fn solve_join<G: CountedGroup<Elt = PrimePoint> + Sync>(
     // Candidate budget from the filters' fill: a walk point is a table
     // hit with probability about E / (r / 2) and passes both filters
     // falsely with about (fill1 · fill2)^4.
-    let fill = |w: &[u64]| w.iter().map(|x| x.count_ones() as f64).sum::<f64>() / (64 * w.len()) as f64;
+    let fill =
+        |w: &[u64]| w.iter().map(|x| x.count_ones() as f64).sum::<f64>() / (64 * w.len()) as f64;
     let (f1, f2) = (fill(&b1.words), fill(&b2.words));
     let entries = 2 * n as u64 - 2 * sk2;
     let p_true = entries as f64 / (r as f64 / 2.0);
@@ -1905,9 +2251,24 @@ fn solve_join<G: CountedGroup<Elt = PrimePoint> + Sync>(
         let round: Vec<WalkStats> = {
             let jobs: Vec<_> = (0..threads)
                 .map(|th| {
-                    let (steps_w, done, sink, cands, b1, b2) = (&steps_w, &done, &sink, &cands, &b1, &b2);
+                    let (steps_w, done, sink, cands, b1, b2) =
+                        (&steps_w, &done, &sink, &cands, &b1, &b2);
                     let sd = rnd() ^ (th as u64) << 32;
-                    move || walk_thread(inst, None, m, q, steps_w, lanes, sd, done, sink, usize::MAX, Some((b1, b2, cands, cap)))
+                    move || {
+                        walk_thread(
+                            inst,
+                            None,
+                            m,
+                            q,
+                            steps_w,
+                            lanes,
+                            sd,
+                            done,
+                            sink,
+                            usize::MAX,
+                            Some((b1, b2, cands, cap)),
+                        )
+                    }
                 })
                 .collect();
             par_run(jobs)
@@ -1932,9 +2293,17 @@ fn solve_join<G: CountedGroup<Elt = PrimePoint> + Sync>(
             let v = pack_push(lv.lpk[e], lv.depth, k, rf & 1 == 1);
             let rp = PrimePoint::affine(f.from(c.x), f.from(c.y));
             let cols = unpack(v, m);
-            let mut sum = PrimePoint { x: 0, y: 0, infinity: true };
+            let mut sum = PrimePoint {
+                x: 0,
+                y: 0,
+                infinity: true,
+            };
             for &(i, neg) in &cols {
-                let pt = if neg { g.neg(inst.reps[i]) } else { inst.reps[i] };
+                let pt = if neg {
+                    g.neg(inst.reps[i])
+                } else {
+                    inst.reps[i]
+                };
                 sum = g.add(&mut ops, sum, pt);
             }
             let (ra, rb) = if sum == rp {
@@ -2020,7 +2389,13 @@ thread_local! {
 /// The r-adding walk's steps `W_j = Q + 2^j G` (`c_j = 2^j mod r`,
 /// `d_j = 1`): one doubling chain and 32 additions instead of 64 scalar
 /// multiplications; every step still has a known decomposition.
-fn make_steps<G: CountedGroup<Elt = PrimePoint>>(g: &G, ops: &mut GroupOps, gen: PrimePoint, q: PrimePoint, r: u64) -> Vec<(PrimePoint, u64, u64)> {
+fn make_steps<G: CountedGroup<Elt = PrimePoint>>(
+    g: &G,
+    ops: &mut GroupOps,
+    gen: PrimePoint,
+    q: PrimePoint,
+    r: u64,
+) -> Vec<(PrimePoint, u64, u64)> {
     let mut p = gen;
     let mut c = 1u64 % r;
     (0..NW)
@@ -2064,7 +2439,10 @@ fn main() {
         .filter(|l| !l.trim().is_empty())
         .map(|l| {
             let w: Vec<&str> = l.split_whitespace().collect();
-            (PrimePoint::affine(hexval(w[0]), hexval(w[1])), w.get(2).map(|s| s.parse().unwrap()))
+            (
+                PrimePoint::affine(hexval(w[0]), hexval(w[1])),
+                w.get(2).map(|s| s.parse().unwrap()),
+            )
         })
         .collect();
 
@@ -2085,7 +2463,9 @@ fn main() {
     };
     let mut ops = GroupOps::default();
     let (_, bparams) = Params::parse_spec(&format!("prime-abscissa:size={size}")).unwrap();
-    let fb = (PrimeAbscissaBase { instance: &inst0 }).build(&ctx, &bparams, &mut ops).expect("the base builds");
+    let fb = (PrimeAbscissaBase { instance: &inst0 })
+        .build(&ctx, &bparams, &mut ops)
+        .expect("the base builds");
     let reps_pts: Vec<PrimePoint> = fb
         .abscissa_list
         .iter()
@@ -2111,7 +2491,12 @@ fn main() {
         // (key, witness) multiset.
         let (mut s1, i1, k1) = build_ksum(&f, &inst.bx, &inst.by, m);
         let (t2, i2, k2) = build_ksum_avx(&f, &inst.bx, &inst.by, m, threads, g.p);
-        let mut s2: Vec<(u32, u64)> = t2.keys.iter().zip(&t2.refs).map(|(&k, &r)| (k, t2.resolve(r))).collect();
+        let mut s2: Vec<(u32, u64)> = t2
+            .keys
+            .iter()
+            .zip(&t2.refs)
+            .map(|(&k, &r)| (k, t2.resolve(r)))
+            .collect();
         s1.sort_unstable();
         s2.sort_unstable();
         eprintln!(
@@ -2132,12 +2517,17 @@ fn main() {
                     std::thread::sleep(std::time::Duration::from_millis(1));
                 }
                 let t = Instant::now();
-                let jobs: Vec<_> = (0..threads).map(|i| move || std::hint::black_box(i * 2)).collect();
+                let jobs: Vec<_> = (0..threads)
+                    .map(|i| move || std::hint::black_box(i * 2))
+                    .collect();
                 let v = par_run(jobs);
                 std::hint::black_box(v);
                 tot += t.elapsed().as_secs_f64();
             }
-            eprintln!("par_run x{threads}, pause {pause}: {:.1} us", tot * 1e6 / iters as f64);
+            eprintln!(
+                "par_run x{threads}, pause {pause}: {:.1} us",
+                tot * 1e6 / iters as f64
+            );
         }
         return;
     }
@@ -2148,7 +2538,7 @@ fn main() {
         let wx: Vec<u64> = (0..NW).map(|i| inst.bx[i % a]).collect();
         let wy: Vec<u64> = (0..NW).map(|i| inst.by[i % a]).collect();
         let wc = vec![1u64; NW];
-        let wd = vec![2u64; NW];
+        let wd = vec![1u64; NW];
         let start = g.add(&mut ops, inst.reps[0], inst.reps[1]);
         let mut cur = start;
         let mut x = vec![0u64; lanes];
@@ -2159,17 +2549,28 @@ fn main() {
             y[l] = f.to(cur.y);
         }
         let (mut la, mut lb) = (vec![0u64; lanes], vec![0u64; lanes]);
-        let (mut j, mut dd, mut pre, mut zero, mut exc) =
-            (vec![0usize; lanes], vec![0u64; lanes], vec![0u64; lanes], vec![false; lanes], Vec::new());
+        let (mut j, mut dd, mut pre, mut zero, mut exc) = (
+            vec![0usize; lanes],
+            vec![0u64; lanes],
+            vec![0u64; lanes],
+            vec![false; lanes],
+            Vec::new(),
+        );
         for simd in [false, use_simd()] {
             let t = Instant::now();
             let iters = 2000;
             for _ in 0..iters {
                 exc.clear();
-                step_any(simd, &f, &mut x, &mut y, &mut la, &mut lb, &wx, &wy, &wc, &wd, inst.r, &mut j, &mut dd, &mut pre, &mut zero, &mut exc);
+                step_any(
+                    simd, &f, &mut x, &mut y, &mut la, &mut lb, &wx, &wy, &wc, &wd, inst.r, &mut j,
+                    &mut dd, &mut pre, &mut zero, &mut exc,
+                );
             }
             let ns = t.elapsed().as_secs_f64() * 1e9 / (iters * lanes) as f64;
-            eprintln!("step kernel simd={simd}: {ns:.2} ns per lane-step (exc {})", exc.len());
+            eprintln!(
+                "step kernel simd={simd}: {ns:.2} ns per lane-step (exc {})",
+                exc.len()
+            );
         }
         #[cfg(target_arch = "x86_64")]
         if use_simd() {
@@ -2180,21 +2581,60 @@ fn main() {
             for _ in 0..iters {
                 exc.clear();
                 // SAFETY: AVX-512 detected.
-                unsafe { avx::step(&f, &mut x, &mut y, &mut la, &mut lb, &wx, &wy, &wc, &wd, inst.r, &mut j64, &mut dd, &mut pre, &mut zm, &mut exc) };
+                unsafe {
+                    avx::step(
+                        &f,
+                        &mut x,
+                        &mut y,
+                        &mut la,
+                        &mut lb,
+                        &wx,
+                        &wy,
+                        &wc,
+                        &wd,
+                        inst.r,
+                        &mut j64,
+                        &mut dd,
+                        &mut pre,
+                        &mut zm,
+                        &mut exc,
+                        &mut vec![0u64; lanes],
+                    )
+                };
             }
             let ns = t.elapsed().as_secs_f64() * 1e9 / (iters * lanes) as f64;
-            eprintln!("step kernel intrinsics: {ns:.2} ns per lane-step (exc {})", exc.len());
+            eprintln!(
+                "step kernel intrinsics: {ns:.2} ns per lane-step (exc {})",
+                exc.len()
+            );
         }
         return;
     }
-    eprintln!("curve {} p={} r={} base {} abscissae", inst0.name, g.p, inst.r, a);
+    eprintln!(
+        "curve {} p={} r={} base {} abscissae",
+        inst0.name, g.p, inst.r, a
+    );
 
     #[cfg(target_arch = "x86_64")]
     if mode == "join" {
         assert!(use_simd(), "join mode needs AVX-512");
         for rep in 0..reps {
             for (ti, &(q, known)) in targets.iter().enumerate() {
-                let row = solve_join(&inst, g, gen, q, known, m, lanes, threads, extra, ti, rep, bits, &inst0.name);
+                let row = solve_join(
+                    &inst,
+                    g,
+                    gen,
+                    q,
+                    known,
+                    m,
+                    lanes,
+                    threads,
+                    extra,
+                    ti,
+                    rep,
+                    bits,
+                    &inst0.name,
+                );
                 println!("{row}");
             }
         }
@@ -2204,7 +2644,8 @@ fn main() {
         // `--amortize 1`: one table per curve, reused by every target (a
         // multi-target run); reported separately, never as the per-solve
         // number, which charges the build to every solve as the pipeline does.
-        let avx_build = cfg!(target_arch = "x86_64") && use_simd() && std::env::var_os("KSUM_NOINTR").is_none();
+        let avx_build =
+            cfg!(target_arch = "x86_64") && use_simd() && std::env::var_os("KSUM_NOINTR").is_none();
         let shared: Option<(Table, f64)> = if amortize {
             let tb = Instant::now();
             #[cfg(target_arch = "x86_64")]
@@ -2212,7 +2653,10 @@ fn main() {
             #[cfg(not(target_arch = "x86_64"))]
             let t = Table::build(build_ksum(&inst.f, &inst.bx, &inst.by, m).0, g.p);
             let ms = tb.elapsed().as_secs_f64() * 1e3;
-            eprintln!("amortized table: {} entries in {:.3} ms (once per curve)", t.len, ms);
+            eprintln!(
+                "amortized table: {} entries in {:.3} ms (once per curve)",
+                t.len, ms
+            );
             Some((t, ms))
         } else {
             None
@@ -2226,7 +2670,8 @@ fn main() {
             } else if avx_build {
                 #[cfg(target_arch = "x86_64")]
                 {
-                    let (table, invs, skipped) = build_ksum_avx(&inst.f, &inst.bx, &inst.by, m, threads, g.p);
+                    let (table, invs, skipped) =
+                        build_ksum_avx(&inst.f, &inst.bx, &inst.by, m, threads, g.p);
                     owned = table;
                     (&owned, invs, skipped, 0.0)
                 }
@@ -2239,7 +2684,11 @@ fn main() {
                 (&owned, invs, skipped, t_sort.elapsed().as_secs_f64() * 1e3)
             };
             let raw = table.keys.len();
-            let collisions = if std::env::var_os("KSUM_COLLISIONS").is_some() { table.count_collisions() } else { 0 };
+            let collisions = if std::env::var_os("KSUM_COLLISIONS").is_some() {
+                table.count_collisions()
+            } else {
+                0
+            };
             let t_build = t0.elapsed().as_secs_f64();
             // Walk steps W_j = c_j G + d_j Q (charged too).
             let mut wops = GroupOps::default();
@@ -2264,9 +2713,24 @@ fn main() {
                 let round: Vec<WalkStats> = {
                     let jobs: Vec<_> = (0..threads)
                         .map(|th| {
-                            let (inst, table, steps_w, done, sink) = (&inst, table, &steps_w, &done, &sink);
+                            let (inst, table, steps_w, done, sink) =
+                                (&inst, table, &steps_w, &done, &sink);
                             let sd = rnd() ^ (th as u64) << 32;
-                            move || walk_thread(inst, Some(table), m, q, steps_w, lanes, sd, done, sink, need, None)
+                            move || {
+                                walk_thread(
+                                    inst,
+                                    Some(table),
+                                    m,
+                                    q,
+                                    steps_w,
+                                    lanes,
+                                    sd,
+                                    done,
+                                    sink,
+                                    need,
+                                    None,
+                                )
+                            }
                         })
                         .collect();
                     par_run(jobs)
