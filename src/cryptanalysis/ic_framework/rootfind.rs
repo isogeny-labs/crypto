@@ -32,8 +32,10 @@
 //!
 //! The binary group batches through [`FastCurve::add_many`]; the prime
 //! group uses the default one-inversion-an-addition path, so on a prime
-//! curve the two ids measure the same additions as `mitm` and `subtract`
-//! with the memoryless three-summand arm added.
+//! curve the two ids measure the same additions as `mitm:batch=0` and
+//! `subtract:batch=0` with the memoryless three-summand arm added (the
+//! default `mitm` and `subtract` share an inversion over a block,
+//! [`CountedGroup::add_each_batched`]).
 //!
 //! **`rootfind-mitm-prime-batch`** (prime curves): `rootfind-mitm` with each
 //! block's additions done by one shared inversion

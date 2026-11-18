@@ -30,8 +30,8 @@
 //!
 //! | name | summands | how |
 //! |:--|:--|:--|
-//! | `subtract` | 2 | test `R − P ∈ F` for every signed base point; no table |
-//! | `mitm` | 2 or 3 | a pair table probed once per target, or once per `R − P` |
+//! | `subtract` | 2 | test `R − P ∈ F` for every signed base point; no table; `batch=1` (default) one field inversion a block of candidates on a prime curve, `batch=0` one a candidate |
+//! | `mitm` | 2 or 3 | a pair table probed once per target, or once per `R − P`; `batch=1` (default) builds the table and the `R − P` rows with one field inversion a block on a prime curve, `batch=0` one an addition |
 //! | `mitm-prime-batch` | 2 | the same folded prime pair table, built with one batched inversion per abscissa row and x-only sums |
 //! | `mitm-prime-blocked` | 2 | the same table and sums again, inserted in cache-sized pieces (many small maps, each block grouped by map) |
 //! | `mitm-frobenius` | 2 or 3 | the same on a Frobenius-folded table (Koblitz) |
@@ -2196,10 +2196,49 @@ fn table_counted(mut counters: BTreeMap<String, u64>) -> BTreeMap<String, u64> {
     counters
 }
 
+/// The `batch` parameter of `subtract` and `mitm`: absent or `1` (the
+/// default) takes [`CountedGroup::add_each_batched`], one field inversion a
+/// block on a prime curve; `0` keeps the one-inversion-an-addition loop,
+/// for an A/A comparison.  The two give the same points, relations and
+/// charged additions; only the field tally differs.
+fn batch_param(params: &Params, oracle: &str) -> Result<bool, String> {
+    match params.get("batch") {
+        None | Some("1") => Ok(true),
+        Some("0") => Ok(false),
+        Some(v) => Err(format!("{oracle}: batch is 0 or 1, not `{v}`")),
+    }
+}
+
 /// Test `R − P ∈ F` for every signed base point: no table, `|F|` group
 /// operations a target, and the honest baseline every table oracle is
 /// an improvement on.
-pub struct SubtractOracle;
+///
+/// The candidates `R − P_i` come from [`CountedGroup::add_each_batched`]
+/// (`batch=1`, the default): on a prime curve one inversion a block of
+/// candidates instead of one a candidate, each finished only when it is
+/// tested, so the candidates, their order, the relations and the charged
+/// additions are the serial loop's (`batch=0`).
+pub struct SubtractOracle {
+    batch: bool,
+}
+
+/// The default `subtract` (`batch=1`), constructible by its bare name as
+/// when the oracle was a unit struct.
+#[allow(non_upper_case_globals)]
+pub const SubtractOracle: SubtractOracle = SubtractOracle { batch: true };
+
+impl SubtractOracle {
+    /// `subtract` with the batched (`true`) or serial (`false`) candidates.
+    pub fn with_batch(batch: bool) -> Self {
+        Self { batch }
+    }
+}
+
+impl Default for SubtractOracle {
+    fn default() -> Self {
+        Self::with_batch(true)
+    }
+}
 
 impl<G: CountedGroup> DecompositionOracle<G> for SubtractOracle {
     fn name(&self) -> &str {
@@ -2212,6 +2251,25 @@ impl<G: CountedGroup> DecompositionOracle<G> for SubtractOracle {
 
     fn describe(&self, _params: &Params) -> String {
         "for each signed base point P, test whether R − P is in the base".into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[(
+            "batch",
+            "1 (default): the candidates R − P with one field inversion a block (prime curves); \
+             0: one inversion a candidate; same relations and additions",
+        )]
+    }
+
+    fn prepare(
+        &mut self,
+        _ctx: &InstanceCtx<G>,
+        _fb: &FactorBase<G::Elt>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        self.batch = batch_param(params, "subtract")?;
+        Ok(())
     }
 
     fn setup_work_native(&self) -> BTreeMap<String, u64> {
@@ -2227,6 +2285,21 @@ impl<G: CountedGroup> DecompositionOracle<G> for SubtractOracle {
         counters: &mut OracleCounters,
         point: G::Elt,
     ) -> Option<Vec<usize>> {
+        if self.batch {
+            let g = ctx.group;
+            let mut hit = None;
+            g.add_each_batched(ops, point, &fb.points, true, &mut |_, i, rest| {
+                counters.lookups += 1;
+                match fb.index_of_key(g.key(&rest)) {
+                    Some(j) => {
+                        hit = Some(vec![i, j]);
+                        true
+                    }
+                    None => false,
+                }
+            });
+            return hit;
+        }
         for (i, p) in fb.points.iter().enumerate() {
             let rest = ctx.group.add(ops, point, ctx.group.neg(*p));
             counters.lookups += 1;
@@ -2241,9 +2314,16 @@ impl<G: CountedGroup> DecompositionOracle<G> for SubtractOracle {
 
 /// Meet in the middle over a pair table: memory for time, the lever
 /// that makes a two-summand search `O(1)` a target instead of `O(|F|)`.
+///
+/// With `batch=1` (the default) the table's sums and the `m = 3` rows
+/// `R − P_i` come from [`CountedGroup::add_each_batched`] (on a prime curve
+/// one inversion a block, not one an addition): the same table, probes,
+/// relations and charged additions as `batch=0`, the serial path, in
+/// either layout.
 pub struct MitmOracle {
     m: u32,
     lines: bool,
+    batch: bool,
     table: Option<PairTable>,
 }
 
@@ -2252,6 +2332,7 @@ impl MitmOracle {
         Self {
             m,
             lines: false,
+            batch: true,
             table: None,
         }
     }
@@ -2287,6 +2368,11 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
                 "layout",
                 "map (default) or lines (cache-line pair index and relation guard)",
             ),
+            (
+                "batch",
+                "1 (default): table sums and m = 3 rows with one field inversion a block \
+                 (prime curves); 0: one inversion an addition; same relations and additions",
+            ),
         ]
     }
 
@@ -2297,6 +2383,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<(), String> {
+        self.batch = batch_param(params, "mitm")?;
         self.lines = match params.get("layout") {
             None | Some("map") => false,
             Some("lines") => true,
@@ -2306,9 +2393,19 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
             return Err("layout=lines requires negation_folded=1".into());
         }
         let table = if self.lines {
-            PairTable::build_negation_folded_lines(ctx.group, fb)
+            if self.batch {
+                PairTable::build_negation_folded_lines_batched(ctx.group, fb)
+            } else {
+                PairTable::build_negation_folded_lines(ctx.group, fb)
+            }
         } else if params.flag("negation_folded") {
-            PairTable::build_negation_folded(ctx.group, fb)
+            if self.batch {
+                PairTable::build_negation_folded_batched(ctx.group, fb)
+            } else {
+                PairTable::build_negation_folded(ctx.group, fb)
+            }
+        } else if self.batch {
+            PairTable::build_batched(ctx.group, fb)
         } else {
             PairTable::build(ctx.group, fb)
         };
@@ -2336,6 +2433,24 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
         point: G::Elt,
     ) -> Option<Vec<usize>> {
         let table = self.table.as_ref()?;
+        if self.batch && self.m == 3 {
+            // `decompose_mitm`'s `m = 3` loop, its rows `R − P_i` batched.
+            let g = ctx.group;
+            let mut hit = None;
+            g.add_each_batched(ops, point, &fb.points, true, &mut |ops, i, s| {
+                if g.is_identity(&s) {
+                    return false;
+                }
+                match table.probe(g, fb, ops, &mut counters.lookups, s) {
+                    Some((j, k)) => {
+                        hit = Some(vec![i, j, k]);
+                        true
+                    }
+                    None => false,
+                }
+            });
+            return hit;
+        }
         decompose_mitm(ctx.group, fb, table, self.m, ops, counters, point)
     }
 
@@ -7864,6 +7979,95 @@ mod ksum_frobenius_tests {
                 let native = DecompositionOracle::<BinaryGroup>::setup_native(&oracle);
                 assert!(native["canonicalisations"] > 0 && native["frobenius_maps"] > 0);
             }
+        }
+    }
+}
+
+/// `subtract` and `mitm` with `batch=1` (the default, one field inversion a
+/// block) against `batch=0` (one an addition): the same relations in the
+/// same order, the same charged additions and lookups, fewer inversions.
+#[cfg(test)]
+mod batch_inversion_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::roster_prime_instance;
+    use rand::Rng;
+
+    fn run<O: DecompositionOracle<PrimeCurve>>(
+        mut oracle: O,
+        params: &Params,
+        batch: &str,
+    ) -> (Vec<Option<Vec<usize>>>, GroupOps, u64, usize) {
+        let inst = roster_prime_instance(16).unwrap();
+        let g = inst.generator_point();
+        let mut setup = GroupOps::default();
+        let q = inst.curve.mul(&mut setup, g, 30_011 % inst.r);
+        let ctx = InstanceCtx {
+            group: &inst.curve,
+            generator: g,
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        };
+        let mut fb_params = Params::default();
+        fb_params.set("size", "40");
+        let fb = PrimeAbscissaBase { instance: &inst }
+            .build(&ctx, &fb_params, &mut setup)
+            .unwrap();
+        let mut params = params.clone();
+        params.set("batch", batch);
+        let mut ops = GroupOps::default();
+        oracle.prepare(&ctx, &fb, &params, &mut ops).unwrap();
+        let mut counters = OracleCounters::default();
+        let mut rng = rand::rngs::StdRng::seed_from_u64(0xBA7C);
+        let mut out = Vec::new();
+        for _ in 0..3_000 {
+            let (a, b) = (rng.gen_range(0..inst.r), rng.gen_range(0..inst.r));
+            let mut t = GroupOps::default();
+            let ga = inst.curve.mul(&mut t, g, a);
+            let qb = inst.curve.mul(&mut t, q, b);
+            let target = inst.curve.add(&mut t, ga, qb);
+            out.push(oracle.decompose(&ctx, &fb, &mut ops, &mut counters, target));
+        }
+        let hits = out.iter().filter(|r| r.is_some()).count();
+        (out, ops, counters.lookups, hits)
+    }
+
+    fn assert_same(
+        name: &str,
+        serial: &(Vec<Option<Vec<usize>>>, GroupOps, u64, usize),
+        batched: &(Vec<Option<Vec<usize>>>, GroupOps, u64, usize),
+    ) {
+        assert!(serial.3 > 0, "{name}: the panel must find relations");
+        assert_eq!(serial.0, batched.0, "{name}: relations differ");
+        assert_eq!(
+            serial.1.adds, batched.1.adds,
+            "{name}: charged additions differ"
+        );
+        assert_eq!(serial.1.doubles, batched.1.doubles);
+        assert_eq!(serial.2, batched.2, "{name}: lookups differ");
+        assert!(
+            batched.1.field_ops.invs < serial.1.field_ops.invs,
+            "{name}: batching must cut inversions ({} vs {})",
+            batched.1.field_ops.invs,
+            serial.1.field_ops.invs
+        );
+    }
+
+    #[test]
+    fn batched_subtract_and_mitm_find_the_serial_relations() {
+        let none = Params::default();
+        let s0 = run(SubtractOracle::with_batch(false), &none, "0");
+        let s1 = run(SubtractOracle::default(), &none, "1");
+        assert_same("subtract", &s0, &s1);
+        let mut folded = Params::default();
+        folded.set("negation_folded", "1");
+        for (m, params) in [(2, &none), (2, &folded), (3, &none), (3, &folded)] {
+            let m0 = run(MitmOracle::new(m), params, "0");
+            let m1 = run(MitmOracle::new(m), params, "1");
+            assert_same(&format!("mitm m={m} {:?}", params.0), &m0, &m1);
         }
     }
 }

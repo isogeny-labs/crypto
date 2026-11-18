@@ -1473,6 +1473,25 @@ pub trait CountedGroup {
     fn supports_siblings(&self) -> bool {
         false
     }
+    /// `r + qs[i]` (or `r − qs[i]` when `negate`) for `i = 0, 1, …` in
+    /// order, each handed with the ledger to `visit` until `visit` returns
+    /// `true`; returns that `i`.  Every element handed over is charged one
+    /// addition and nothing after the stopping one is computed or charged.
+    /// The default is [`serial_add_each`]: one [`CountedGroup::add`] each,
+    /// exactly the serial loop.  A group may override it to share one field
+    /// inversion over a block (Montgomery's trick: the prime curve does);
+    /// it must hand over the same elements in the same order, charge the
+    /// same additions, and tally the field work it actually performs.
+    fn add_each_batched(
+        &self,
+        ops: &mut GroupOps,
+        r: Self::Elt,
+        qs: &[Self::Elt],
+        negate: bool,
+        visit: &mut dyn FnMut(&mut GroupOps, usize, Self::Elt) -> bool,
+    ) -> Option<usize> {
+        serial_add_each(self, ops, r, qs, negate, visit)
+    }
     /// The rational order-3 automorphism `ζ₃: (x, y) ↦ (ωx, y)` of a
     /// `j = 0` curve, acting on the order-`r` subgroup of `generator` as
     /// `[κ]`: `Some((p, ω, κ))`, or `None` when the group lacks it (the
@@ -1552,6 +1571,32 @@ pub trait CountedGroup {
         self.mul(ops, p, k)
     }
 }
+
+/// The serial form of [`CountedGroup::add_each_batched`]: `r ± qs[i]` by one
+/// [`CountedGroup::add`] each, in order, until `visit` returns `true`.
+pub fn serial_add_each<G: CountedGroup + ?Sized>(
+    g: &G,
+    ops: &mut GroupOps,
+    r: G::Elt,
+    qs: &[G::Elt],
+    negate: bool,
+    visit: &mut dyn FnMut(&mut GroupOps, usize, G::Elt) -> bool,
+) -> Option<usize> {
+    for (i, &q) in qs.iter().enumerate() {
+        let q = if negate { g.neg(q) } else { q };
+        let s = g.add(ops, r, q);
+        if visit(ops, i, s) {
+            return Some(i);
+        }
+    }
+    None
+}
+
+/// Elements a block of the prime curve's [`CountedGroup::add_each_batched`]:
+/// one inversion per block, so a hit wastes at most a block's share of
+/// the batched inversion (`3` multiplications an element), never an
+/// addition.
+const PRIME_ADD_EACH_BLOCK: usize = 128;
 
 fn mix(v: u64) -> u64 {
     let mut h = v ^ 0x2545_F491_4F6C_DD1D;
@@ -6267,6 +6312,101 @@ impl CountedGroup for PrimeCurve {
             PrimePoint::affine(p.x, if p.y == 0 { 0 } else { self.p - p.y })
         }
     }
+    /// Montgomery's trick over blocks of [`PRIME_ADD_EACH_BLOCK`]: the
+    /// denominators `x_r − x_q` of a block are inverted together (one
+    /// inversion and `3k + 1` multiplications for `k` denominators), then
+    /// each sum is finished only when it is handed over, so the additions
+    /// charged are the serial loop's, one each, and the points are the
+    /// serial group law's.  The inputs stay canonical: the batch inverts
+    /// the plain `d` as a Montgomery value, giving `d⁻¹R²`, so one
+    /// Montgomery product with the plain numerator is `λR`; one reduction
+    /// gives `λ`, and `λR·λ`, `λR·(x_r − x₃)` are plain again.  A finished
+    /// sum is tallied `2M + 1S` and one Montgomery reduction.  An
+    /// exceptional element (`∞`, or `x_q = x_r`: a doubling or the
+    /// identity) is added serially on the ledger, as the default would.
+    /// `r = ∞` or a `p` outside `prime_fast`'s range takes the default.
+    fn add_each_batched(
+        &self,
+        ops: &mut GroupOps,
+        r: PrimePoint,
+        qs: &[PrimePoint],
+        negate: bool,
+        visit: &mut dyn FnMut(&mut GroupOps, usize, PrimePoint) -> bool,
+    ) -> Option<usize> {
+        if r.infinity
+            || self.p < 5
+            || self.p & 1 == 0
+            || self.p >= (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS)
+        {
+            return serial_add_each(self, ops, r, qs, negate, visit);
+        }
+        #[derive(Default)]
+        struct Scratch {
+            field: Option<Fp64>,
+            dens: Vec<u64>,
+            inv: Vec<u64>,
+        }
+        thread_local! {
+            static SCRATCH: std::cell::RefCell<Scratch> =
+                std::cell::RefCell::new(Scratch::default());
+        }
+        // Taken, not borrowed, so that `visit` may itself batch.
+        let mut sc = SCRATCH.with(|c| std::mem::take(&mut *c.borrow_mut()));
+        let f = match sc.field {
+            Some(f) if f.p == self.p => f,
+            _ => {
+                let f = Fp64::new(self.p);
+                sc.field = Some(f);
+                f
+            }
+        };
+        let mut found = None;
+        let mut start = 0;
+        'blocks: while start < qs.len() {
+            let end = (start + PRIME_ADD_EACH_BLOCK).min(qs.len());
+            let block = &qs[start..end];
+            sc.dens.clear();
+            let mut ordinary = false;
+            for q in block {
+                if q.infinity || q.x == r.x {
+                    sc.dens.push(f.one);
+                } else {
+                    sc.dens.push(f.sub(r.x, q.x));
+                    ordinary = true;
+                }
+            }
+            if ordinary {
+                f.batch_inv(&mut sc.dens, &mut sc.inv);
+                ops.field_ops.invs += 1;
+                ops.field_ops.muls += 3 * block.len() as u64 + 1;
+            }
+            for (off, &q) in block.iter().enumerate() {
+                let s = if q.infinity || q.x == r.x {
+                    self.add(ops, r, if negate { self.neg(q) } else { q })
+                } else {
+                    // `r + q'` with `q' = (x_q, ±y_q)`:
+                    // `λ = (y_r − y_q')/(x_r − x_q)`.
+                    let yq = if negate { f.neg(q.y) } else { q.y };
+                    let lam_r = f.mul(f.sub(r.y, yq), sc.dens[off]);
+                    let lam = f.from_mont(lam_r);
+                    let x3 = f.sub(f.sub(f.mul(lam_r, lam), r.x), q.x);
+                    let y3 = f.sub(f.mul(lam_r, f.sub(r.x, x3)), r.y);
+                    ops.adds += 1;
+                    ops.field_ops.muls += 2;
+                    ops.field_ops.sqrs += 1;
+                    ops.montgomery_reductions += 1;
+                    PrimePoint::affine(x3, y3)
+                };
+                if visit(ops, start + off, s) {
+                    found = Some(start + off);
+                    break 'blocks;
+                }
+            }
+            start = end;
+        }
+        SCRATCH.with(|c| *c.borrow_mut() = sc);
+        found
+    }
     #[inline]
     fn select_elt(&self, first: bool, a: PrimePoint, b: PrimePoint) -> PrimePoint {
         PrimePoint {
@@ -8777,6 +8917,160 @@ impl PairTable {
                     attempts += 1;
                 }
             }
+        }
+        Self {
+            kind: "negation_folded",
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: None,
+            dense: None,
+            filter_bit_sets: 0,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+        }
+    }
+
+    /// [`Self::build`] with each row's sums through
+    /// [`CountedGroup::add_each_batched`]: on a prime curve one inversion a
+    /// block of the row (Montgomery's trick) instead of one a sum.  The same
+    /// sums in the same order, so the same keys, witnesses, entries, insert
+    /// attempts and charged additions; only the field tally differs, and it
+    /// books the batched work.  A group without a batched path builds
+    /// exactly [`Self::build`]'s table with the same tally.
+    pub fn build_batched<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        let start = Instant::now();
+        let n = fb.points.len();
+        let mut ops = GroupOps::default();
+        let mut map: FastMap<(u32, u32)> = fast_map(n * (n + 1) / 4 + 1);
+        let mut attempts = 0u64;
+        for i in 0..n {
+            g.add_each_batched(
+                &mut ops,
+                fb.points[i],
+                &fb.points[i..],
+                false,
+                &mut |_, off, s| {
+                    if !g.is_identity(&s) {
+                        map.entry(g.key(&s) >> 1)
+                            .or_insert((i as u32, (i + off) as u32));
+                        attempts += 1;
+                    }
+                    false
+                },
+            );
+        }
+        Self {
+            kind: "full",
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: None,
+            dense: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: 0,
+            filter_bit_sets: 0,
+        }
+    }
+
+    /// [`Self::build_negation_folded_lines`] with each row's sums through
+    /// [`CountedGroup::add_each_batched`]: the same entries, witnesses and
+    /// charged additions as the serial lines build, and the same field
+    /// tally as [`Self::build_negation_folded_batched`].
+    pub fn build_negation_folded_lines_batched<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+    ) -> Self {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut lines = PairLineIndex::with_capacity(a * a + 1);
+        let mut attempts = 0u64;
+        let mut row_idx: Vec<usize> = Vec::new();
+        let mut row_pts: Vec<G::Elt> = Vec::new();
+        for ai in 0..a {
+            let i = groups[ai][0];
+            row_idx.clear();
+            row_pts.clear();
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    row_idx.push(j);
+                    row_pts.push(fb.points[j]);
+                }
+            }
+            g.add_each_batched(&mut ops, fb.points[i], &row_pts, false, &mut |_, off, s| {
+                if !g.is_identity(&s) {
+                    lines.insert_if_absent(g.key(&s) >> 1, i as u32, row_idx[off] as u32);
+                    attempts += 1;
+                }
+                false
+            });
+        }
+        Self {
+            kind: "negation_folded",
+            entries: lines.len as u64,
+            map: fast_map(0),
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: Some(lines),
+            dense: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+            filter_bit_sets: 0,
+        }
+    }
+
+    /// [`Self::build_negation_folded`] with each row's sums through
+    /// [`CountedGroup::add_each_batched`], as [`Self::build_batched`] is to
+    /// [`Self::build`]: the same table and charged additions, the batched
+    /// field tally.
+    pub fn build_negation_folded_batched<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut map: FastMap<(u32, u32)> = fast_map(a * a + 1);
+        let mut attempts = 0u64;
+        let mut row_idx: Vec<usize> = Vec::new();
+        let mut row_pts: Vec<G::Elt> = Vec::new();
+        for ai in 0..a {
+            let i = groups[ai][0];
+            row_idx.clear();
+            row_pts.clear();
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    row_idx.push(j);
+                    row_pts.push(fb.points[j]);
+                }
+            }
+            g.add_each_batched(&mut ops, fb.points[i], &row_pts, false, &mut |_, off, s| {
+                if !g.is_identity(&s) {
+                    map.entry(g.key(&s) >> 1)
+                        .or_insert((i as u32, row_idx[off] as u32));
+                    attempts += 1;
+                }
+                false
+            });
         }
         Self {
             kind: "negation_folded",
