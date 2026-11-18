@@ -758,6 +758,20 @@ impl RadicalRootCtx {
         &self, b: u64, c: u64, d: u64, e: u64,
     ) -> (u64, u64, u64, u64) {
         let f = &self.f;
+        // Native Rust benchmarking on p=2^61-1 showed ~4% regression
+        // for the small-constant rewrite. Retain the former path there.
+        if f.p == MAX_PRIME {
+            let bb = f.mul(b, self.inv4);
+            let b2 = f.sqr(bb);
+            let pp = f.sub(c, f.mul(6, b2));
+            let b3 = f.mul(b2, bb);
+            let qq = f.add(f.sub(d, f.mul(f.mul(2, bb), c)), f.mul(8, b3));
+            let rr = f.sub(
+                f.add(f.sub(e, f.mul(bb, d)), f.mul(b2, c)),
+                f.mul(3, f.sqr(b2)),
+            );
+            return (bb, pp, qq, rr);
+        }
         let bb = f.mul(b, self.inv4);
         let b2 = f.sqr(bb);
         let twice_b2 = f.add(b2, b2);
