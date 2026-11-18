@@ -565,6 +565,29 @@ theorem leading_X_inv_sq_mul_subst_inv
 
 end PowerSeriesPrefixEq
 
+/-- In a possibly noncommutative endomorphism ring, the Frobenius
+characteristic equation and norm relation imply `V + pi = trace` once left
+composition by `pi` is cancellable and the scalar trace commutes with `pi`. -/
+theorem frobeniusVerschiebung_sum_of_characteristic
+    {R : Type*} [Ring R] {pi verschiebung trace cardinality : R}
+    (hpiCancel : ∀ a b : R, pi * a = pi * b → a = b)
+    (htraceComm : Commute pi trace)
+    (hnorm : pi * verschiebung = cardinality)
+    (hchar : pi ^ 2 - trace * pi + cardinality = 0) :
+    verschiebung + pi = trace := by
+  apply hpiCancel
+  rw [mul_add, hnorm]
+  calc
+    cardinality + pi * pi = pi ^ 2 + cardinality := by
+      rw [pow_two, add_comm]
+    _ = trace * pi := by
+      apply eq_of_sub_eq_zero
+      calc
+        pi ^ 2 + cardinality - trace * pi =
+            pi ^ 2 - trace * pi + cardinality := by abel
+        _ = 0 := hchar
+    _ = pi * trace := htraceComm.eq.symm
+
 /-- Every one-dimensional formal group law differs from its first input by a
 multiple of its second variable. This is the algebraic filtration statement
 behind the H116 Frobenius cutoff; it uses Mathlib's actual `FormalGroup`, not a
@@ -1911,6 +1934,7 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms PowerSeriesPrefixEq.subst
 #print axioms PowerSeriesPrefixEq.subst_inv
 #print axioms PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv
+#print axioms frobeniusVerschiebung_sum_of_characteristic
 #print axioms FormalGroup.secondVariable_dvd_sub_X
 #print axioms FormalGroup.add_correction_eq
 #print axioms FormalGroup.filtered_correction_prefix

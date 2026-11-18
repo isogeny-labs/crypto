@@ -162,8 +162,11 @@ relations `F(actual,omitted)=scalar` and
 `F(scalar,inverseCorrection)=actual`. In a commutative formal group the inverse
 inherits the omitted parameter's `X^m` factor; alternatively, an explicit
 short-Weierstrass negation certificate `F(omitted,-omitted)=0` avoids a
-separately constructed inverse series. What remains is the actual elliptic
-`V+pi=[t]`, negation, order-`p` Frobenius, sign and target-scaling instance.
+separately constructed inverse series. A new possibly noncommutative-ring
+theorem derives `V+pi=[t]` from the Frobenius characteristic polynomial,
+`pi*V=[p]`, left cancellation by `pi`, and centrality of `[t]`. Binding those
+four elliptic certificates, negation, order-`p` Frobenius, sign and target
+scaling remains open.
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

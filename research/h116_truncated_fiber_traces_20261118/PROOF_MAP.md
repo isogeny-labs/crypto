@@ -312,6 +312,41 @@ rejected in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` seals
 the polynomial rescaling step and points to the audited Lean source. The
 control supplies no replacement for the open endpoint row. [pcc:unverified]
 
+## Frobenius--Verschiebung characteristic-polynomial instance gate
+
+1. **Structure above.** The quantified object is an arbitrary possibly
+   noncommutative ring containing elements `pi`, `verschiebung`, `trace` and
+   `cardinality`. Only left cancellation by `pi` and centrality of `trace`
+   relative to `pi` are exposed; the theorem does not assume the whole
+   endomorphism ring is commutative.
+2. **Theorems used as stated.** Ring multiplication distributes over addition;
+   `Commute.eq` rewrites `trace*pi` as `pi*trace`; additive `abel` only
+   rearranges the characteristic-polynomial terms. No elliptic theorem is
+   re-proved inside this layer.
+3. **Object as an instance.** The characteristic equation is supplied exactly
+   as `pi^2-trace*pi+cardinality=0`, and the norm relation as
+   `pi*verschiebung=cardinality`. Left cancellation then derives
+   `verschiebung+pi=trace`.
+4. **Assembly probe.** A temporary module first checked the commutative-ring
+   specialization, then the stronger noncommutative statement with only the
+   explicit commute premise. Both pass at default limits. After integration,
+   the tracked module rebuilt at default limits and the exact auditor reported
+   `94 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The actual elliptic endomorphism ring must
+   still supply left cancellation of Frobenius, the norm relation, the
+   Frobenius characteristic polynomial and central scalar interpretation.
+   This gate derives the sum identity but does not construct those certificates.
+6. **Inheritance table.** All manipulation is inherited from Mathlib ring and
+   additive-group laws. H116 contributes only their exact composition into the
+   endomorphism identity needed by the local-parameter endpoint. No curve law,
+   isogeny implementation, runtime claim, trusted decision procedure or limit
+   override is introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `V+pi=trace` from characteristic and norm equations | abstract endomorphism algebra | H116 over Mathlib ring laws | possibly noncommutative ring | left cancellation by `pi`, `pi` commutes with `trace`, `pi*V=cardinality`, characteristic equation |
+| actual elliptic `V+pi=[t]` | endpoint instance | future elliptic formal-group owner | elliptic endomorphism ring | bind the four abstract premises to Frobenius, Verschiebung and scalar maps |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

@@ -145,9 +145,12 @@ proves the required subtraction orientation from
 is derived from the omitted parameter's order in a commutative formal group.
 For the short-Weierstrass parameter, a stronger endpoint directly uses the
 explicit certificate `F(omitted,-omitted)=0`, eliminating the separately
-constructed inverse series. The curve-specific `V+pi=[t]`, exact local
-Frobenius order, elliptic negation, sign and scaling identifications are still
-the endpoint hypotheses. The coordinate formulas themselves are now formal:
+constructed inverse series. An abstract possibly noncommutative-ring theorem
+now derives `V+pi=[t]` from the Frobenius characteristic polynomial,
+`pi*V=[p]`, left cancellation by `pi`, and centrality of `[t]`. Binding those
+four premises, exact local Frobenius order, elliptic negation, sign and scaling
+identifications to the curve is still the endpoint. The coordinate formulas
+themselves are now formal:
 for `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
 the exact `z -> z^p` formula for a supplied coordinatewise `p`-power
 endomorphism. Connecting those formulas to the actual elliptic formal-group
