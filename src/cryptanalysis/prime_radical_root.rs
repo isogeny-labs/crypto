@@ -366,6 +366,9 @@ pub(crate) struct Cube<R: Ring> {
     c: R::E,
     // c^{-1} in the 3-Sylow; computed once for rolling digit corrections.
     c_inv: R::E,
+    // Cached digit-correction factors: c^(-3^j) and c^(-2*3^j).
+    inverse_powers: Vec<R::E>,
+    inverse_squares: Vec<R::E>,
     pub w: R::E,
     p3s: u128,
 }
@@ -392,6 +395,8 @@ impl<R: Ring> Cube<R> {
                 e3,
                 c: one,
                 c_inv: one,
+                inverse_powers: vec![],
+                inverse_squares: vec![],
                 w: one,
                 p3s: 1,
             };
@@ -413,6 +418,22 @@ impl<R: Ring> Cube<R> {
         } else {
             (t + 1) / 3
         }; // 3*e3 = 1 mod t
+        // Precompute only the factors needed by digits 1..s-1.
+        // The s<=2 specialized paths do not need these arrays.
+        let mut inverse_powers = Vec::new();
+        let mut inverse_squares = Vec::new();
+        if s >= 3 {
+            inverse_powers.reserve((s - 1) as usize);
+            inverse_squares.reserve((s - 1) as usize);
+            let mut value = c_inv;
+            for j in 0..s - 1 {
+                inverse_powers.push(value);
+                inverse_squares.push(r.sqr(value));
+                if j + 2 < s {
+                    value = r.cube(value);
+                }
+            }
+        }
         Cube {
             r,
             n,
@@ -420,6 +441,8 @@ impl<R: Ring> Cube<R> {
             e3,
             c,
             c_inv,
+            inverse_powers,
+            inverse_squares,
             w,
             p3s,
         }
@@ -486,8 +509,6 @@ impl<R: Ring> Cube<R> {
         // The low 3-adic digit is guaranteed zero by the cube-residuosity
         // test above. Skip its s-1 repeated cubings and start at digit 1.
         // These are the states the original digit-0 loop left behind.
-        let mut previous_power = self.c_inv;      // c^-1
-        let mut inverse_power = r.cube(self.c_inv); // c^-3
         for j in 1..self.s {
             let mut z = r.mul(h, correction);
             // z = (h*c^{-l})^(3^(s-1-j)). Repeated cubing uses only
@@ -505,24 +526,22 @@ impl<R: Ring> Cube<R> {
                 return None;
             };
             if digit != 0 {
+                let k = (j - 1) as usize;
                 let factor = if digit == 1 {
-                    previous_power
+                    self.inverse_powers[k]
                 } else {
-                    r.mul(previous_power, previous_power)
+                    self.inverse_squares[k]
                 };
                 root_correction = r.mul(root_correction, factor);
                 if j + 1 < self.s {
+                    let k = j as usize;
                     let term = if digit == 1 {
-                        inverse_power
+                        self.inverse_powers[k]
                     } else {
-                        r.mul(inverse_power, inverse_power)
+                        self.inverse_squares[k]
                     };
                     correction = r.mul(correction, term);
                 }
-            }
-            previous_power = inverse_power;
-            if j + 1 < self.s {
-                inverse_power = r.cube(inverse_power);
             }
         }
         Some(r.mul(x0, root_correction))
@@ -1477,7 +1496,8 @@ mod tests {
     fn cube_before_frobenius(ctx: &RadicalRootCtx) -> Cube<Fq2BeforePower> {
         let c = &ctx.cube_q;
         Cube { r: Fq2BeforePower(c.r), n: c.n, s: c.s, e3: c.e3,
-               c: c.c, c_inv: c.c_inv, w: c.w, p3s: c.p3s }
+               c: c.c, c_inv: c.c_inv, inverse_powers: c.inverse_powers.clone(),
+               inverse_squares: c.inverse_squares.clone(), w: c.w, p3s: c.p3s }
     }
 
     #[test]
