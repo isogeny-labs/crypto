@@ -252,16 +252,24 @@ RF_HD U256x64 fp256_from_mont(const Fp256Ctx &f, const U256x64 &a) {
     return fp256_mul(f, a, one);
 }
 
-/* Invert a Montgomery residue with the fixed, public P-256 exponent p-2.
+/* Repeated squarings by a public constant; the compiler specializes
+ * the fixed calls in the host inversion chain. */
+RF_HD U256x64 fp256_sqr_n(const Fp256Ctx &f, U256x64 x, int n) {
+    for (int i = 0; i < n; ++i) x = fp256_sqr(f, x);
+    return x;
+}
+
+/* Invert a Montgomery residue using the fixed public exponent p-2.
+ * CUDA deliberately retains the original uniform exponentiation.
  *
- * The CUDA path preserves the original uniform 256-bit square-and-multiply
- * schedule until device throughput and register occupancy are measured.
- * On the host, the hexadecimal digits of p-2 belong to {0, 1, D, F}
- * (31 zeroes, 31 F's, one D and one 1). Precompute a^13 and a^15
- * with three squares and three multiplies, then use a radix-16 chain.
- * This eliminates roughly 93 multiplications relative to the original
- * 256-bit bitwise exponent. The exponent-dependent branches are public.
- * Specific to P-256: Fp256Ctx is only constructed by fp256_ctx_p256(). */
+ * Host: exploit p-2's 32-bit words
+ *   FFFFFFFF 00000001 00000000 00000000
+ *   00000000 FFFFFFFF FFFFFFFF FFFFFFFD.
+ * Build x32=a^(2^32-1) and b32=a^(2^32-3), then assemble the eight
+ * words by squaring and multiplying by the precomputed blocks.  This
+ * chain needs 255 squarings and 13 field multiplications, versus the
+ * previous radix-16 host chain's 255 squarings and 35 multiplications.
+ * The exponent is fixed/public, and inv(0) remains zero. */
 RF_BIG U256x64 fp256_inv(const Fp256Ctx &f, const U256x64 &a) {
 #ifdef __CUDA_ARCH__
     U256x64 e = f.p;
@@ -275,24 +283,20 @@ RF_BIG U256x64 fp256_inv(const Fp256Ctx &f, const U256x64 &a) {
     return acc;
 #else
     const U256x64 a2 = fp256_sqr(f, a);
-    const U256x64 a3 = fp256_mul(f, a2, a);
-    const U256x64 a12 = fp256_sqr(f, fp256_sqr(f, a3));
-    const U256x64 a13 = fp256_mul(f, a12, a);
-    const U256x64 a15 = fp256_mul(f, a12, a3);
-    U256x64 e = f.p;
-    e.v[0] -= 2; /* p[0] = 2^64 - 1, no borrow */
-    U256x64 acc = a15; /* leading hexadecimal digit of p-2 is F */
-    for (int i = 62; i >= 0; --i) {
-        acc = fp256_sqr(f, acc);
-        acc = fp256_sqr(f, acc);
-        acc = fp256_sqr(f, acc);
-        acc = fp256_sqr(f, acc);
-        const unsigned digit = (unsigned)((e.v[i >> 4] >> (4 * (i & 15))) & 15u);
-        if (digit == 15) acc = fp256_mul(f, acc, a15);
-        else if (digit == 13) acc = fp256_mul(f, acc, a13);
-        else if (digit == 1) acc = fp256_mul(f, acc, a);
-    }
-    return acc;
+    const U256x64 x2 = fp256_mul(f, a2, a);
+    const U256x64 x4 = fp256_mul(f, fp256_sqr_n(f, x2, 2), x2);
+    const U256x64 x8 = fp256_mul(f, fp256_sqr_n(f, x4, 4), x4);
+    const U256x64 x16 = fp256_mul(f, fp256_sqr_n(f, x8, 8), x8);
+    const U256x64 x24 = fp256_mul(f, fp256_sqr_n(f, x16, 8), x8);
+    const U256x64 x28 = fp256_mul(f, fp256_sqr_n(f, x24, 4), x4);
+    const U256x64 x30 = fp256_mul(f, fp256_sqr_n(f, x28, 2), x2);
+    const U256x64 b32 = fp256_mul(f, fp256_sqr_n(f, x30, 2), a);
+    const U256x64 x32 = fp256_mul(f, b32, a2);
+    U256x64 acc = fp256_mul(f, fp256_sqr_n(f, x32, 32), a);
+    acc = fp256_sqr_n(f, acc, 96);
+    acc = fp256_mul(f, fp256_sqr_n(f, acc, 32), x32);
+    acc = fp256_mul(f, fp256_sqr_n(f, acc, 32), x32);
+    return fp256_mul(f, fp256_sqr_n(f, acc, 32), b32);
 #endif
 }
 
