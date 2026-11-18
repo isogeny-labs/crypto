@@ -247,6 +247,30 @@ At the abstract endomorphism-ring layer, Lean also proves the exact factor
 identity `(V-1)(pi-1)=p+1-t`. Thus the algebraic norm calculation behind the
 predicted degree is closed; its scheme-theoretic degree/kernel interpretation
 is the remaining geometric step. [pcc:unverified]
+Lean now packages that geometric step as an exact paired-degree certificate:
+multiplicativity of degree, `deg[N]=N^2`, and equality of the degrees of
+`V-1` and `pi-1` imply `deg(V-1)=N`. A numeric mutation shows the equality
+premise is essential: unequal degrees 4 and 9 still have product `6^2`. The
+pinned Mathlib snapshot supplies no elliptic-isogeny, dual-isogeny, or morphism-
+degree API, so those three inputs remain explicit obligations rather than
+assumptions hidden in the conclusion. [pcc:unverified]
+The frozen `H116-KERNEL-X-ORBIT-001` experiment independently checks a finer
+consequence of the corrected eigenspace model. Across eight cells, every root
+of the three reconstructed denominators matches the union of the
+`lambda^d=+1` and `lambda^d=-1` eigenspaces modulo `P~-P`, including exact
+simple/double multiplicities and zero numerator cancellations. The two locked
+sign-sensitive cells contain five denominator roots that point enumeration
+cannot see: three at `p=5,d=3` and two at `p=7,d=2`. This repairs the retained
+v1 interpretation on the finite panel but does not prove generic cyclicity or
+scheme semantics. [pcc:unverified]
+The frozen `H116-DUAL-PAIR-COMPOSITION-001` experiment then reconstructs the
+other norm factor `pi-1` rather than assuming its kernel polynomial. Its three
+stable rational x-maps have the same respective degrees `(7,6)`, `(5,4)` and
+`(14,13)` as the recovered `V-1` maps. Direct group evaluation verifies
+`(V-1)((pi-1)P)=[N]P` on all 5,066 points with zero failures; omitting the
+right-factor subtraction and changing `[N]` to `[N+1]` reject in every cell.
+This is finite evidence for the paired-degree certificate, not a proof that
+the maps are scheme-theoretic dual isogenies. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

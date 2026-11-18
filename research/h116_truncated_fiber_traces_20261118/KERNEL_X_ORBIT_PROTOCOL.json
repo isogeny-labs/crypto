@@ -1,0 +1,81 @@
+{
+  "schema": "h116.kernel-x-orbit-protocol/v1",
+  "protocol_id": "H116-KERNEL-X-ORBIT-001",
+  "status": "frozen-before-producer-or-verifier-implementation-and-before-execution",
+  "question": "Do the reconstructed denominators expose the full Frobenius action on ker(V-1) modulo P~-P, including x-roots whose points are not rational over the sampled extension?",
+  "parent_protocol_id": "H116-POINTWISE-RATIONAL-RECONSTRUCTION-002",
+  "parent_result_sha256": "d1c26c6f0a29a933fb82b64fafbc5c20531fe59122c924613de4bc46f00cb9bc",
+  "cells": [
+    {"slug":"fp5-a2-b1-d2","p":5,"a":2,"b":1,"degree":2},
+    {"slug":"fp5-a2-b1-d3","p":5,"a":2,"b":1,"degree":3},
+    {"slug":"fp5-a2-b1-d4","p":5,"a":2,"b":1,"degree":4},
+    {"slug":"fp7-a1-b1-d2","p":7,"a":1,"b":1,"degree":2},
+    {"slug":"fp7-a1-b1-d3","p":7,"a":1,"b":1,"degree":3},
+    {"slug":"fp7-a1-b1-d4","p":7,"a":1,"b":1,"degree":4},
+    {"slug":"fp11-a1-b1-d2","p":11,"a":1,"b":1,"degree":2},
+    {"slug":"fp11-a1-b1-d3","p":11,"a":1,"b":1,"degree":3}
+  ],
+  "model": {
+    "kernel": "the frozen panel uses the cyclic order-N kernel of V-1 reconstructed in v2",
+    "frobenius_eigenvalue": "lambda=t-1 modulo N on ker(V-1)",
+    "point_visible_subgroup": "solutions of (lambda^d-1)P=0, of size g_plus=gcd(N,lambda^d-1)",
+    "x_root_union": "D(x(P))=0 is visible over F_(p^d) when lambda^d P=P or lambda^d P=-P because x(P)=x(-P)",
+    "g_minus": "gcd(N,lambda^d+1)",
+    "g_intersection": "gcd(N,lambda^d-1,lambda^d+1)",
+    "union_size": "g_plus+g_minus-g_intersection, including zero",
+    "order_two_indicator": "epsilon=1 when N is even and 0 otherwise for this cyclic panel",
+    "predicted_distinct_denominator_roots": "(union_size-1+epsilon)/2",
+    "predicted_simple_roots": "epsilon",
+    "predicted_double_roots": "predicted_distinct_denominator_roots-epsilon",
+    "predicted_weighted_root_multiplicity": "predicted_simple_roots+2*predicted_double_roots",
+    "plus_only_wrong_model": "floor(g_plus/2), equal to the x-values of actual kernel points rational over F_(p^d)"
+  },
+  "locked_predictions": [
+    {"slug":"fp5-a2-b1-d2","g_plus":1,"g_minus":1,"g_intersection":1,"roots":0,"simple":0,"double":0,"weighted":0,"plus_only":0},
+    {"slug":"fp5-a2-b1-d3","g_plus":1,"g_minus":7,"g_intersection":1,"roots":3,"simple":0,"double":3,"weighted":6,"plus_only":0},
+    {"slug":"fp5-a2-b1-d4","g_plus":1,"g_minus":1,"g_intersection":1,"roots":0,"simple":0,"double":0,"weighted":0,"plus_only":0},
+    {"slug":"fp7-a1-b1-d2","g_plus":1,"g_minus":5,"g_intersection":1,"roots":2,"simple":0,"double":2,"weighted":4,"plus_only":0},
+    {"slug":"fp7-a1-b1-d3","g_plus":1,"g_minus":1,"g_intersection":1,"roots":0,"simple":0,"double":0,"weighted":0,"plus_only":0},
+    {"slug":"fp7-a1-b1-d4","g_plus":5,"g_minus":1,"g_intersection":1,"roots":2,"simple":0,"double":2,"weighted":4,"plus_only":2},
+    {"slug":"fp11-a1-b1-d2","g_plus":2,"g_minus":2,"g_intersection":2,"roots":1,"simple":1,"double":0,"weighted":1,"plus_only":1},
+    {"slug":"fp11-a1-b1-d3","g_plus":14,"g_minus":2,"g_intersection":2,"roots":7,"simple":1,"double":6,"weighted":13,"plus_only":7}
+  ],
+  "producer": {
+    "path": "h116_kernel_x_orbit.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "source_hash": "c4ca6bb3bc3fa9b717862c1e73190c9525d65fc4682a0051e15d05b54187189d"
+  },
+  "independent_verifier": {
+    "path": "h116_kernel_x_orbit_verify.py",
+    "method": "separate Python extension-field implementation; recompute every denominator root, formal derivative, prediction, and mutation control",
+    "source_hash": "d7cd388324280b53c5daf0a20101f9a8ea99fdbd2712e9088ebcab7fd8a5008f"
+  },
+  "positive_checks": [
+    "the parent result hash and all parent rows match the frozen cells",
+    "the denominator coefficients are embedded base-field coefficients and have degree N-1",
+    "enumerating every x in F_(p^d) gives exactly the locked root, simple-root, double-root, and weighted-multiplicity counts",
+    "the gcd prediction is recomputed rather than copied from locked_predictions",
+    "every root has multiplicity one or two as classified by the formal derivative",
+    "the numerator is nonzero at every denominator root, including roots not represented by an F_(p^d)-rational curve point"
+  ],
+  "controls": [
+    "the plus-only model must undercount fp5-a2-b1-d3 and fp7-a1-b1-d2 and must match the other six cells",
+    "adding one to the denominator constant must destroy every original denominator root",
+    "replacing lambda^d+1 by lambda^d-1 in the union prediction must be detected by the two locked sign-sensitive cells",
+    "the retained v1 split-pole failure and v2 result remain byte-unchanged"
+  ],
+  "measurements": [
+    "g_plus, g_minus, g_intersection and union size",
+    "enumerated distinct, simple, double and weighted root counts",
+    "roots not visible as rational kernel points",
+    "numerator cancellations, mutation survivors, extension-field operations and elapsed nanoseconds"
+  ],
+  "acceptance": {
+    "primary": "all exact producer fields agree with independent replay and every positive check passes in all eight cells",
+    "controls": "both sign-sensitive cells reject the plus-only/wrong-sign model, the other six provide equality controls, and every mutation destroys all original roots",
+    "failure_policy": "retain every row and report any failed prediction or control without changing the frozen formulas, cells, or locked values"
+  },
+  "claim_boundary": "This experiment can validate the cyclic kernel x-orbit model for three toy curves and eight extensions. It does not prove cyclicity, the dual-isogeny identity, degree multiplicativity, deg(V-1)=N in general, a scheme-level morphism statement, an ECDLP algorithm, or any asymptotic speedup.",
+  "filed_before_code": true,
+  "filed_before_data": true
+}

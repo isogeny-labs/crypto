@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-a05e9234e616611fe955008ff6239cc70c32256049f122b25c83265379528628  H116FiberTrace.lean
+fe907f1887b4a963dcb1dafbcf3f93eac8037355c656189eacc5a227dcc2d3ca  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  125 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  128 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -56,6 +56,8 @@ b7efb787302ea2dfa9aa223d42ac1aec148da29a8a2c358b08a34b1b59c4dc5f  receipts/kerne
 64bc81bfa8577086492d0220e137ffb82dac8306a3b6df28300096475c456d9e  receipts/kernel-eigenspace-audit.txt
 f6b367568557629e55b46748360a01a251768e8c0d8ce4ed53953eb8e65a9e58  receipts/norm-factor-build.txt
 f61a96a76811c2cd4736b7515e2f2a4126a1b500e397894ff6c090dc4a8864c2  receipts/norm-factor-audit.txt
+543996048dcfc71e49530f69165e90f4a49322258d91b93101ced228ee8f0389  receipts/degree-certificate-build.txt
+1e567fafe38bf9cdc1f29d0399a60b69f0272055ff039e49bb168e78d2689b2f  receipts/degree-certificate-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -238,6 +240,16 @@ The 125-theorem checkpoint proves the exact noncommutative-ring factorization
 `V+pi=trace`. This is the algebraic norm identity behind the expected degree
 `#E(F_p)` of `V-1`; interpreting it as a degree and kernel-cardinality theorem
 still requires the missing elliptic morphism infrastructure. [pcc:unverified]
+
+The 128-theorem checkpoint isolates that remaining degree infrastructure as a
+proof-carrying interface.  A multiplicative degree, scalar-degree identity
+`deg [N]=N^2`, and equal degrees for the factor pair turn the proved norm
+factorization into `deg(V-1)=N`.  The composed theorem applies this directly to
+`(V-1)(pi-1)=[p+1-t]`.  A checked `N=6` control gives unequal factor degrees
+4 and 9 with product 36, proving that norm degree alone cannot replace the
+dual/equal-degree premise.  The pinned Mathlib snapshot has no elliptic-isogeny,
+dual-isogeny, or morphism-degree API, so instantiating the three geometric
+premises remains explicit and open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

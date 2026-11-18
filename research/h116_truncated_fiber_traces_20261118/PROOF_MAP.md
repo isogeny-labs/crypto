@@ -647,6 +647,36 @@ algebraic norm factor behind the observed degree `N`; only the elliptic
 morphism theorem translating that factor into degree and kernel cardinality is
 missing. [pcc:unverified]
 
+The 128-theorem checkpoint turns that last translation into an explicit
+certificate. For an abstract multiplicative degree, a factorization
+`left*right=scalar`, scalar degree `N^2`, and equality of the two factor degrees
+imply that each factor has degree `N`. Composing with the norm factor gives
+`deg(V-1)=N` from degree multiplicativity, `deg[N]=N^2`, and
+`deg(V-1)=deg(pi-1)`. The intended elliptic source of the last equality is
+duality, `(V-1)^vee=pi-1`. A checked `4*9=6^2` mutation proves that product
+degree alone cannot discharge it. The pinned Mathlib tree contains no elliptic-
+isogeny, dual-isogeny or morphism-degree object, so these three premises remain
+future instance obligations rather than hidden axioms. [pcc:unverified]
+
+The frozen kernel x-orbit experiment tests the denominator consequence that
+point enumeration misses. For cyclic `ker(V-1)`, a rational x-root occurs when
+`(t-1)^d P=+P` or `-P`, because `x(P)=x(-P)`. All eight cells match the locked
+union formula, exact simple/double multiplicities, zero numerator cancellation,
+and an independent replay. The plus-only model fails exactly its two frozen
+negative controls: it misses three roots at `p=5,d=3` and two at `p=7,d=2`.
+This repairs the finite denominator interpretation but does not prove the
+generic cyclic or scheme-theoretic premises. [pcc:unverified]
+
+The next frozen dual-pair experiment reconstructs `pi-1` from two disjoint
+pointwise interpolation windows. Its three base-field maps have the same exact
+degrees as the recovered `V-1` maps, all 2,505 regular evaluations and 29 poles
+match, and the complete point census verifies
+`(V-1)o(pi-1)=[N]` with zero failures on 5,066 points. Omitting the subtraction
+from `pi-1` fails 5,040 times; replacing `[N]` by `[N+1]` fails at all 5,058
+nonidentity points. This instantiates the paired-degree pattern only on the
+finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
+[pcc:unverified]
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression
@@ -769,7 +799,7 @@ missing. [pcc:unverified]
 | finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
 | finite sums and coefficient extraction | Mathlib finite sums plus existing H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
 | field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
-| isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; no Mathlib isogeny object was found, so a finite `N,D` certificate is the checked interface; producing it from the actual kernel and independently validating map semantics remain open |
+| isogeny homomorphism, dual and degree laws | hypothesis at study endpoint; no Mathlib elliptic-isogeny or morphism-degree object was found, so finite `N,D` and paired-degree certificates are the checked interfaces; constructing the actual map, proving degree multiplicativity, `deg[N]=N^2`, `(V-1)^vee=pi-1`, and the differential formula remain open |
 | formal-group filtration of an `X^m` correction | Mathlib `FormalGroup` plus `FormalGroup.filtered_correction_prefix` and `filtered_pole_prefix`; generic layer proved |
 | `V+pi=[t]`, `F(pi,-pi)=0` in parameter coordinates, and the actual local `pi` series of order `p` | elliptic formal-group instance; endpoint identification still pending |
 | radix-six decoder | reuse H115 generic theorem after source import/binding |

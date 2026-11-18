@@ -60,8 +60,8 @@ pi^d(P)=[(t-1)^d]P
 
 and proves equivalence of the Frobenius fixed-locus condition with that scalar
 condition on `ker(V-1)`. The current source SHA-256 is
-`a05e9234e616611fe955008ff6239cc70c32256049f122b25c83265379528628`;
-the exact audit reports 125 theorems, zero failures, and zero trusted native
+`fe907f1887b4a963dcb1dafbcf3f93eac8037355c656189eacc5a227dcc2d3ca`;
+the exact audit reports 128 theorems, zero failures, and zero trusted native
 decisions. Cyclicity then predicts visible kernel size
 `gcd(N,(t-1)^d-1)`, which matched all eight cells exactly. The cyclicity and
 cardinality step itself remains an empirical/model premise, not a new Lean

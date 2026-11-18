@@ -609,6 +609,60 @@ theorem verschiebung_sub_one_mul_frobenius_sub_one
     _ = cardinality - trace + 1 := by rw [hnorm, hsum]
     _ = cardinality + 1 - trace := by abel
 
+/-- A multiplicative degree whose two factors have equal degree turns a scalar
+norm factorization into the exact degree of either factor.  This is the
+arithmetic core of the elliptic argument: for actual isogenies, `hpaired` is
+supplied by duality, `hmul` by multiplicativity of isogeny degree, and
+`hscalar` by `deg [N] = N^2`. -/
+theorem degree_eq_norm_of_paired_factor
+    {M : Type*} [Mul M] (degree : M → ℕ) (left right scalar : M) (norm : ℕ)
+    (hfactor : left * right = scalar)
+    (hmul : ∀ f g : M, degree (f * g) = degree f * degree g)
+    (hscalar : degree scalar = norm * norm)
+    (hpaired : degree left = degree right) :
+    degree left = norm := by
+  have hsquare : degree left * degree left = norm * norm := by
+    calc
+      degree left * degree left = degree left * degree right := by rw [hpaired]
+      _ = degree (left * right) := (hmul left right).symm
+      _ = degree scalar := congrArg degree hfactor
+      _ = norm * norm := hscalar
+  apply le_antisymm
+  · by_contra hnot
+    have hlt : norm < degree left := Nat.lt_of_not_ge hnot
+    nlinarith
+  · by_contra hnot
+    have hlt : degree left < norm := Nat.lt_of_not_ge hnot
+    nlinarith
+
+/-- Exact certificate interface for the missing H116 geometric bridge.  The
+already-proved Frobenius--Verschiebung norm identity discharges the factor
+premise.  A caller representing genuine elliptic isogenies must still prove
+degree multiplicativity, scalar degree, and equality of the dual-pair degrees. -/
+theorem verschiebung_sub_one_degree_of_dual_certificate
+    {R : Type*} [Ring R]
+    (degree : R → ℕ) (verschiebung pi trace cardinality : R) (pointCount : ℕ)
+    (hnorm : verschiebung * pi = cardinality)
+    (hsum : verschiebung + pi = trace)
+    (hmul : ∀ f g : R, degree (f * g) = degree f * degree g)
+    (hscalar : degree (cardinality + 1 - trace) = pointCount * pointCount)
+    (hdualDegree : degree (verschiebung - 1) = degree (pi - 1)) :
+    degree (verschiebung - 1) = pointCount := by
+  apply degree_eq_norm_of_paired_factor degree
+      (verschiebung - 1) (pi - 1) (cardinality + 1 - trace) pointCount
+  · exact verschiebung_sub_one_mul_frobenius_sub_one
+      verschiebung pi trace cardinality hnorm hsum
+  · exact hmul
+  · exact hscalar
+  · exact hdualDegree
+
+/-- Mutation control: product degree `N^2` alone does not determine either
+factor degree.  At `N=6`, unequal candidate degrees `4` and `9` have the right
+product, so the dual/equal-degree premise above is logically necessary. -/
+theorem degree_product_without_duality_control :
+    (4 : ℕ) * 9 = 6 * 6 ∧ (4 : ℕ) ≠ 6 ∧ (9 : ℕ) ≠ 6 := by
+  norm_num
+
 /-- Specialize the Frobenius--Verschiebung ring calculation to additive
 endomorphisms of a point group. Integer scalars are central automatically, and
 pointwise injectivity of Frobenius supplies cancellation of left composition.
@@ -2609,6 +2663,9 @@ theorem rationalMap_separation_strict_control :
 #print axioms PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv
 #print axioms frobeniusVerschiebung_sum_of_characteristic
 #print axioms verschiebung_sub_one_mul_frobenius_sub_one
+#print axioms degree_eq_norm_of_paired_factor
+#print axioms verschiebung_sub_one_degree_of_dual_certificate
+#print axioms degree_product_without_duality_control
 #print axioms endomorphism_frobeniusVerschiebung_sum
 #print axioms endomorphism_injectivity_control
 #print axioms affineFrobeniusPointEnd_injective
