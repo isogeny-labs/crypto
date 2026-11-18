@@ -54,7 +54,11 @@ impl Fp {
         // Keep the former wide-modulus behavior for noncanonical callers.
         if a < self.p && b < self.p {
             let sum = a + b;
-            if sum >= self.p { sum - self.p } else { sum }
+            if sum >= self.p {
+                sum - self.p
+            } else {
+                sum
+            }
         } else {
             ((a as u128 + b as u128) % self.p as u128) as u64
         }
@@ -62,7 +66,11 @@ impl Fp {
     #[inline]
     pub fn sub(&self, a: u64, b: u64) -> u64 {
         if a < self.p && b < self.p {
-            if a >= b { a - b } else { a + self.p - b }
+            if a >= b {
+                a - b
+            } else {
+                a + self.p - b
+            }
         } else {
             ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64
         }
@@ -83,7 +91,11 @@ impl Fp {
             let product = a as u128 * b as u128;
             let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
             let folded = (folded & MAX_PRIME) + (folded >> 61);
-            if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
+            if folded >= MAX_PRIME {
+                folded - MAX_PRIME
+            } else {
+                folded
+            }
         } else {
             ((a as u128 * b as u128) % self.p as u128) as u64
         }
@@ -124,7 +136,11 @@ impl Fp {
             t0 = t1;
             t1 = t2;
         }
-        if t0 < 0 { (t0 + self.p as i64) as u64 } else { t0 as u64 }
+        if t0 < 0 {
+            (t0 + self.p as i64) as u64
+        } else {
+            t0 as u64
+        }
     }
 }
 
@@ -676,7 +692,9 @@ mod tests {
                 if i < 300 {
                     let inv = f.inv(a);
                     assert_eq!(inv, f.powm(a, p - 2), "inv p={p} a={a}");
-                    if a != 0 { assert_eq!(ref_mul(p, a, inv), 1); }
+                    if a != 0 {
+                        assert_eq!(ref_mul(p, a, inv), 1);
+                    }
                 }
                 let q = Fq2 { f, n: if i & 1 == 0 { 2 } else { 3 } };
                 let x = (a, b);
