@@ -9,7 +9,7 @@ were not run. These producer results are not independently admitted
 
 All four prospectively allowed subchanges landed:
 
-1. The batched look-ahead path now owns one reusable scratch object. Its
+1. The batched look-ahead path now owns one preallocated reusable scratch object. Its
    first partitions, chosen jumps, candidates, retry lists, batch-add active
    indices, denominators, prefix products, inverses, and outputs are cleared
    and refilled without discarding retained capacity. The public standalone
@@ -55,15 +55,17 @@ collected. No throughput claim follows from this result.
 - Baseline revision: `ad2a014c0022cf000845014499a9649b6c2cef2d`.
 - Baseline source SHA-256:
   `0bb8da07393873aa2b935403b86f5b7a0c24a52fff2d598a145a9fcca103229c`.
-- Candidate implementation commit: `3bb159455fd116507bfcaed0ae5167a226bfee16`.
+- Candidate implementation commits:
+  `3bb159455fd116507bfcaed0ae5167a226bfee16` and
+  `d4f7fa7f0a67706b6f283dbde002684e1a622049`.
 - Candidate source SHA-256:
-  `1eb6fef65e362c33fc05b83ee2958e7a6fdeab8b30f6381b6e73ea301b276735`.
+  `fd515a7f54ba92359fafdf065b5404682903922031f2de20b0b39e48b6cb4fc3`.
 - Baseline release binary SHA-256:
   `6174b4e04e473e06e6cd839e43b70b47df3a785d3a8c6f819e08405c4e7c9b9e`.
 - Candidate release binary SHA-256:
-  `62cd138a536248679885f4df80f87e723230d5d9fd7240993c4bfacea9c1de37`.
+  `95a4536538968107400bce7a57945650ae107d65354a32495630f06421ebbd86`.
 - Candidate debug binary SHA-256:
-  `23324e20a5416d2cb9b649e7ba3a170e3d86208904ca475e31858a0fd23f8c49`.
+  `58c9318ee32570556be620dbb00fb10bd9507c782c732689ba38de41260e82a6`.
 
 Both candidate binaries were built from the same source with
 `rustc --edition 2021 main.rs`, adding `-O` for the release control, and run
