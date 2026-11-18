@@ -95,7 +95,7 @@ table), so this is an improvement of the m = 3 rootfind-subtract arm only.
 
 ## Audit
 `ecbench verify --replay-all` re-executes every measured deterministic run of the main session and
-requires identical counts; its receipt is `verify.json` (see "Files").
+requires identical counts: 144 records, 144 verified, 144 replays reproduced, 0 problems (receipt `verify.json`, records.jsonl SHA-256 fdd267b6…c894).
 
 ## Files
 `PROTOCOL.md`, `specs/sweep.json`, `specs/replicate.json`, `analyze.py` → `results.json`,
