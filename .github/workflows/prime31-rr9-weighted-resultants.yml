@@ -1,0 +1,70 @@
+name: Prime31 RR9 weighted-slot resultant original-curve certificates
+
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-weighted-resultant-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_resultants.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_resultants.py
+      - research/prime31_ic_20261115/rr9/RR9_WEIGHTED_SLOT_RESULTANT_PROTOCOL_20261118.md
+      - .github/workflows/prime31-rr9-weighted-resultants.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_resultants.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_resultants.py
+      - .github/workflows/prime31-rr9-weighted-resultants.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  weighted-rr9-original-prime31:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout experiment source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout immutable original Prime31 Rust crate
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay ONLY new weighted RR9 example on original source
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_resultants.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_resultants.rs
+          test -f pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Reused native library tests
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Weighted-slot RR9 original-curve focused tests
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_weighted_resultants
+      - name: Emit all sixteen checked original-curve certificates
+        run: |
+          cargo +1.100.0 run --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_weighted_resultants > prime31-rr9-weighted-resultants.json
+          test -s prime31-rr9-weighted-resultants.json
+      - name: Independent Python BigInt source-exact replay
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_resultants.py \
+            prime31-rr9-weighted-resultants.json
+      - name: Archive exact original-curve certificate record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-eight-weighted-resultants
+          path: prime31-rr9-weighted-resultants.json
+          if-no-files-found: warn
+          retention-days: 30
