@@ -1,0 +1,45 @@
+{
+  "schema": "ghs-counterfree-evidence-v1",
+  "round_id": "ghs-strong-rho-r3-counterfree-arithmetic",
+  "source_git_revision": "885cbeaecefce6e44167fc03326f8cebd17ff803",
+  "baseline_git_revision": "ad2a014c0022cf000845014499a9649b6c2cef2d",
+  "toolchain": {
+    "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+    "llvm": "23.1.5",
+    "host": "x86_64-unknown-linux-gnu"
+  },
+  "build": {
+    "command": "rustc --edition 2021 -O research/quartic_ghs_strong_rho_20261114/main.rs -o ghs_strong_rho",
+    "main_rs_sha256": "f62697723e536bf796e89b74e08782dc7a25f68dd97d1143ed2fa5eedbd42df4",
+    "strong_rho_rs_sha256": "5ab4decc09347d820a9a97f47d616a295961bad066d45e51944ec1e3858c489f",
+    "artifact_sha256": "512b3a42ab3496e1e400e2174f31d9dee879791fa5022525d0def1b575b5ba3f"
+  },
+  "binary_authority": {
+    "artifact": "ghs_strong_rho",
+    "count_authoritative_selector": "strong-b<W>",
+    "count_authoritative_function": "strong_rho (COUNT=true)",
+    "m_eq_eligible": true,
+    "non_authoritative_selector": "fast-b<W>",
+    "non_authoritative_function": "strong_rho_uncounted (COUNT=false)",
+    "m_eq_eligible_for_non_authoritative_selector": false,
+    "fast_record_marker": "count_authoritative=false"
+  },
+  "scope": {
+    "removed_in_fast_mode": "FastF3 FieldCounts Cell read/modify/write hooks",
+    "retained_in_fast_mode": "NativeCounts walk diagnostics",
+    "shared_math_implementation": true,
+    "modeled_cost_guard": "analyze.py rejects count_authoritative=false"
+  },
+  "evidence": {
+    "paired_raw": "q223-paired.jsonl",
+    "selftest": "selftest.txt",
+    "optimized_ir_gate": "ir-gate.txt",
+    "validation": "validation.txt",
+    "whole_tree_test_status": "full-test-status.txt"
+  },
+  "claim_limits": [
+    "No wall-time or throughput result",
+    "No end-to-end frontier or leaderboard change",
+    "No M-eq estimate from fast-b<W> zero counters"
+  ]
+}

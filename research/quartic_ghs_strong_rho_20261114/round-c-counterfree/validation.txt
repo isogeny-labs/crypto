@@ -1,0 +1,23 @@
+Source revision: 885cbeaecefce6e44167fc03326f8cebd17ff803
+
+PASS: rustc --edition 2021 -O main.rs
+PASS: standalone deterministic selftest
+PASS: counted and COUNT=false field results match the frozen field control
+PASS: counted and COUNT=false curve points match the frozen curve control
+PASS: widths 1, 8 and 32 recover the same planted logs
+PASS: widths 1, 8 and 32 have identical steps, DPs, restarts, look-ahead,
+      cycles, cycle additions, setup NativeCounts and walk NativeCounts
+PASS: COUNT=false setup/walk/verify FieldCounts are all zero
+PASS: q=223 strong-b8 record matches retained Round B after excluding wall_s
+PASS: q=223 strong-b8 and fast-b8 records have identical mathematical and
+      native diagnostic fields after excluding arm, wall_s, field counts and
+      the fast-only authority marker
+PASS: fast-b8 emits count_authoritative=false
+PASS: analyzer unit suite (10 tests), including rejection of explicitly
+      non-authoritative rho field counts before modeled-cost parsing
+PASS: optimized-IR gate finds counter read/modify/write SSA markers in the
+      counted specialization and none in COUNT=false
+
+The q=223 command used GHS_CALIB_TRIPLES=1 and GHS_ISOLATION=development.
+Calibration and wall fields are retained raw but excluded from every equality
+gate. They are not performance evidence.

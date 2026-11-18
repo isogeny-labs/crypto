@@ -126,6 +126,18 @@ class AnalysisTests(unittest.TestCase):
         with self.assertRaisesRegex(A.Invalid, "band identity"):
             A.strong_components(row)
 
+    def test_non_authoritative_rho_counts_are_rejected(self) -> None:
+        with self.assertRaisesRegex(A.Invalid, "non-authoritative rho field counts"):
+            A.parse_rho_record(
+                {"rec": "rho", "arm": "fast-b8", "count_authoritative": False},
+                q=223,
+                seed=1,
+                target=17,
+                ell=101,
+                arm="fast-b8",
+                expected_index=0,
+            )
+
     def test_grid_and_repetitions_are_frozen(self) -> None:
         self.assertEqual(len(A.GRID), 11)
         self.assertEqual(A.GRID[-1], 4194271)
