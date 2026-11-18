@@ -17,6 +17,7 @@ sys.path.insert(0, str(REPO / "scripts"))
 
 import relations as R                                   # noqa: E402
 import run_four_point as F4                             # noqa: E402
+import verify_four_point_evidence as V4                 # noqa: E402
 from test_relations import small_curve, subgroup_generator   # noqa: E402
 
 
@@ -240,6 +241,16 @@ def test_budget_stops_the_sweep_and_marks_it_incomplete():
         E, reps, budget_seconds=1.0, chunk=2000, log=lambda *a: None)
     assert not complete
     assert consumed < len(reps) * (len(reps) - 1)
+
+
+def test_committed_four_point_evidence_has_three_way_parity():
+    receipt = V4.verify(HERE / "results")
+    assert receipt["status"] == "pass"
+    assert receipt["totals"] == {
+        "signed_pairs": 37_507_774,
+        "candidates_checked": 2_365,
+        "relations": 0,
+    }
 
 
 if __name__ == "__main__":
