@@ -1,12 +1,11 @@
 //! Standalone, structured interface to the repository's explicit
 //! hyperelliptic-cover certificates and checked Jacobian arithmetic.
 //!
-//! This is deliberately not a discrete-log solver.  The prime-field cover
-//! emitted by the constructor has two points at infinity, so the current
-//! one-infinity odd-characteristic Jacobian implementation is not silently
-//! applied to it.  Binary cover arithmetic is supported because that family
-//! has one rational point at infinity and a checked characteristic-two
-//! Mumford implementation.
+//! This is deliberately not a discrete-log solver.  Prime-field split sextic
+//! covers use a distinct checked balanced `(u,v,n_plus)` representation for
+//! their two rational infinity points; they are never reinterpreted as
+//! one-infinity Mumford pairs.  Binary covers use the separate checked
+//! characteristic-two one-infinity implementation.
 
 #[path = "curve_cover_check/checker.rs"]
 mod checker;
@@ -15,9 +14,12 @@ mod models;
 
 use clap::{Parser, Subcommand};
 use crypto_lib::binary_ecc::{
-    F2mElement, F2mPoly, HyperellipticCurve, MumfordDivisor, OrdinaryBinaryCover,
+    BinaryPoint, ClosedPointPushforwardCertificate, F2mElement, F2mPoly, HyperellipticCurve,
+    MumfordDivisor, OrdinaryBinaryCover, PullbackFiberKind, SubgroupTransferStatus,
 };
-use crypto_lib::prime_hyperelliptic::{FpPoly, HyperellipticCurveP, MumfordDivisorP};
+use crypto_lib::prime_hyperelliptic::{
+    BalancedDivisorP, FpPoly, HyperellipticCurveP, MumfordDivisorP, SplitHyperellipticCurveP,
+};
 use num_bigint::BigUint;
 use num_traits::Zero;
 use serde::{Deserialize, Serialize};
@@ -30,13 +32,14 @@ use std::{
 
 const RESPONSE_SCHEMA: &str = "hyperelliptic-infrastructure-command/v1";
 const ARITHMETIC_SCHEMA: &str = "hyperelliptic-jacobian-operation/v1";
+const TRANSFER_SCHEMA: &str = "hyperelliptic-transfer-operation/v1";
 const MAX_INPUT_BYTES: u64 = 32 * 1024 * 1024;
 
 #[derive(Parser)]
 #[command(
     name = "hyperelliptic-cover",
     about = "Construct and verify explicit H -> E covers and run checked Jacobian arithmetic",
-    long_about = "A bounded, certificate-oriented interface. It constructs the repository's fixed same-field cover families, replays their certificates, runs checked arithmetic where the infinity model is supported, and exports catalog evidence. It is not an index-calculus or key-recovery solver."
+    long_about = "A bounded, certificate-oriented interface. It constructs the repository's fixed same-field cover families, replays their certificates, runs checked arithmetic and induced transfer maps where the infinity model is supported, and exports catalog evidence. It is not an index-calculus or key-recovery solver."
 )]
 struct Args {
     #[command(subcommand)]
@@ -63,9 +66,18 @@ enum Command {
         #[arg(long)]
         output: Option<PathBuf>,
     },
-    /// Run checked arithmetic on supported binary-cover or odd-prime one-infinity Jacobians.
+    /// Run checked arithmetic on supported binary, odd-prime one-infinity, or split-sextic Jacobians.
     Arithmetic {
         /// Arithmetic request JSON, or `-` for stdin.
+        #[arg(long)]
+        input: PathBuf,
+        /// Response path; omit for stdout.
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
+    /// Evaluate and certify the induced maps for the checked binary cover family.
+    Transfer {
+        /// Transfer request JSON, or `-` for stdin.
         #[arg(long)]
         input: PathBuf,
         /// Response path; omit for stdout.
@@ -97,6 +109,52 @@ struct DivisorWire {
     u: Vec<String>,
     /// Coefficients in ascending powers, as canonical unsigned integers.
     v: Vec<String>,
+    /// Infinity-plus multiplicity for the distinct split-sextic balanced
+    /// representation.  It is required there and rejected for `(u,v)` models.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    n_plus: Option<u32>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
+enum BinaryPointWire {
+    Infinity,
+    /// Coordinates are hexadecimal strings, with an optional `0x` prefix.
+    Affine {
+        x: String,
+        y: String,
+    },
+}
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum TransferOperation {
+    Pushforward,
+    PushforwardCertificate,
+    ImageEndomorphismCertificate,
+    TorsionProjectorCertificate,
+    Pullback,
+    PullPushCompositionCertificate,
+    PullbackClosedPointCertificate,
+    SubgroupStatus,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct TransferRequest {
+    schema: String,
+    /// Exact binary elliptic model. The source and map are reconstructed and
+    /// rechecked; callers cannot supply an asserted source equation or map.
+    model: Value,
+    operation: TransferOperation,
+    #[serde(default)]
+    divisor: Option<DivisorWire>,
+    #[serde(default)]
+    point: Option<BinaryPointWire>,
+    /// Declared torsion/subgroup order. Exactness is an external premise and
+    /// is reported as such by the corresponding result.
+    #[serde(default)]
+    order: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize)]
@@ -118,8 +176,8 @@ struct ArithmeticRequest {
     /// verified fixed-family certificate, rather than accepted by assertion.
     #[serde(default)]
     model: Option<Value>,
-    /// A separate odd-characteristic, odd-degree one-infinity curve.  This is
-    /// intentionally not conflated with the even-sextic prime cover.
+    /// A separately typed odd-characteristic one-infinity or split-sextic
+    /// curve.  The family and infinity fields select the representation.
     #[serde(default)]
     odd_curve: Option<OddCurveWire>,
     operation: ArithmeticOperation,
@@ -131,7 +189,7 @@ struct ArithmeticRequest {
     scalar: Option<String>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct OddCurveWire {
     family: String,
@@ -225,37 +283,34 @@ fn strict_model(value: &Value) -> Result<checker::Model, checker::ModelError> {
     checker::model(value)
 }
 
-fn is_fixed_f8_arbitrary_pushforward_fixture(model: &checker::Model) -> bool {
-    matches!(
-        &model.field,
-        checker::Field::Binary(irreducible)
-            if irreducible.degree == 3
-                && irreducible.low_terms.as_slice() == [0u32, 1u32]
-                && model.a == BigUint::from(1u32)
-                && model.b == BigUint::from(3u32)
-    )
-}
-
 fn proof_receipt(model: &checker::Model) -> Result<Value, String> {
     match &model.field {
-        checker::Field::Prime(_) => Ok(json!({
-            "construction": "explicit",
-            "field_of_definition": "same_as_target",
-            "field_validation": "fixed-base_probable_prime_screen",
-            "target_smoothness": "verified_by_discriminant",
-            "source_smoothness": "verified_by_squarefree_sextic",
-            "genus": "verified_genus_2",
-            "defining_equation_identity": "verified_exact_polynomial_identity",
-            "degree": "verified_degree_2",
-            "separability": "verified_characteristic_not_2",
-            "infinity": "two_base_field_rational_points",
-            "jacobian_arithmetic": "unsupported_even_degree_two_infinity_model",
-            "pullback": "not_implemented_for_this_cover_family",
-            "pushforward": "not_implemented_for_this_cover_family",
-            "subgroup_transfer": "unknown",
-        })),
-        // The same sextic cover over `GF(p^k)`; the checker also proves the
-        // modulus irreducible over `GF(p)` by Rabin's test.
+        checker::Field::Prime(p) => {
+            let jacobian_arithmetic = if p.bits() <= 64 {
+                "implemented_checked_balanced_split_sextic_with_deterministic_prime_revalidation"
+            } else {
+                "unsupported_prime_exceeds_64_bit_balanced_backend"
+            };
+            Ok(json!({
+                "construction": "explicit",
+                "field_of_definition": "same_as_target",
+                "field_validation": "fixed-base_probable_prime_screen",
+                "target_smoothness": "verified_by_discriminant",
+                "source_smoothness": "verified_by_squarefree_sextic",
+                "genus": "verified_genus_2",
+                "defining_equation_identity": "verified_exact_polynomial_identity",
+                "degree": "verified_degree_2",
+                "separability": "verified_characteristic_not_2",
+                "infinity": "two_base_field_rational_points",
+                "jacobian_arithmetic": jacobian_arithmetic,
+                "jacobian_representation": "canonical_balanced_(u,v,n_plus)",
+                "pullback": "not_implemented_for_this_cover_family",
+                "pushforward": "not_implemented_for_this_cover_family",
+                "subgroup_transfer": "unknown",
+            }))
+        }
+        // The same sextic cover over `GF(p^k)`; the checker also applies
+        // Rabin's irreducibility test to the modulus over `GF(p)`.
         checker::Field::Extension { .. } => Ok(json!({
             "construction": "explicit",
             "field_of_definition": "same_as_target",
@@ -267,18 +322,12 @@ fn proof_receipt(model: &checker::Model) -> Result<Value, String> {
             "degree": "verified_degree_2",
             "separability": "verified_characteristic_not_2",
             "infinity": "two_base_field_rational_points",
-            "jacobian_arithmetic": "unsupported_even_degree_two_infinity_model",
+            "jacobian_arithmetic": "unsupported_extension_field_balanced_backend",
             "pullback": "not_implemented_for_this_cover_family",
             "pushforward": "not_implemented_for_this_cover_family",
             "subgroup_transfer": "unknown",
         })),
         checker::Field::Binary(irreducible) => {
-            let arbitrary_jacobian_pushforward = if is_fixed_f8_arbitrary_pushforward_fixture(model)
-            {
-                "implemented_in_library_only_for_exact_fixed_f8_fixture"
-            } else {
-                "unsupported"
-            };
             let cover = OrdinaryBinaryCover::new(
                 irreducible.degree,
                 irreducible.clone(),
@@ -308,10 +357,10 @@ fn proof_receipt(model: &checker::Model) -> Result<Value, String> {
                 },
                 "jacobian_arithmetic": "implemented_checked_one_infinity_model",
                 "pullback": "implemented_for_rational_target_point_classes",
-                "pushforward": "implemented_for_rational_source_point_divisors_and_typed_pullback_witnesses",
+                "pushforward": "implemented_for_valid_reduced_jacobian_classes_with_support_degree_at_most_3",
                 "composition": "verified_phi_push_phi_pull_equals_multiplication_by_3_on_typed_rational_point_class_domain",
-                "arbitrary_jacobian_pushforward": arbitrary_jacobian_pushforward,
-                "cli_transfer_subcommand": "not_exposed",
+                "arbitrary_jacobian_pushforward": "implemented_checked_closed_point_norm_for_valid_reduced_degree_at_most_3_classes_on_this_binary_model",
+                "cli_transfer_subcommand": "exposed_structured_binary_only",
                 "subgroup_transfer": "conditional_on_an_independently_verified_exact_subgroup_order_coprime_to_3; this command does not accept or verify an order",
             }))
         }
@@ -391,7 +440,6 @@ fn parse_number(text: &str) -> Result<BigUint, String> {
         .ok_or_else(|| format!("invalid unsigned integer: {text}"))
 }
 
-#[cfg(test)]
 fn parse_binary_field_element(text: &str) -> Result<BigUint, String> {
     if text.len() > 1300 {
         return Err("integer exceeds field-size limit".into());
@@ -414,6 +462,9 @@ fn divisor_from_wire(
     field: &checker::Field,
     curve: &HyperellipticCurve,
 ) -> Result<MumfordDivisor, String> {
+    if wire.n_plus.is_some() {
+        return Err("binary one-infinity divisors do not accept `n_plus`".into());
+    }
     let u = binary_poly(&wire.u, field, curve.m)?;
     let v = binary_poly(&wire.v, field, curve.m)?;
     MumfordDivisor::try_new(curve, u, v).map_err(|e| format!("{e:?}"))
@@ -430,7 +481,68 @@ fn divisor_to_wire(divisor: &MumfordDivisor) -> DivisorWire {
     DivisorWire {
         u: encoded_poly(&divisor.u),
         v: encoded_poly(&divisor.v),
+        n_plus: None,
     }
+}
+
+fn binary_point_from_wire(wire: &BinaryPointWire, m: u32) -> Result<BinaryPoint, String> {
+    match wire {
+        BinaryPointWire::Infinity => Ok(BinaryPoint::Infinity),
+        BinaryPointWire::Affine { x, y } => {
+            let x = parse_binary_field_element(x)?;
+            let y = parse_binary_field_element(y)?;
+            if x.bits() > m as u64 || y.bits() > m as u64 {
+                return Err("point coordinate is not canonical for the declared field".into());
+            }
+            Ok(BinaryPoint::Affine {
+                x: F2mElement::from_biguint(&x, m),
+                y: F2mElement::from_biguint(&y, m),
+            })
+        }
+    }
+}
+
+fn binary_point_to_json(point: &BinaryPoint) -> Value {
+    match point {
+        BinaryPoint::Infinity => json!({"kind": "infinity"}),
+        BinaryPoint::Affine { x, y } => json!({
+            "kind": "affine",
+            "x": format!("0x{:x}", x.to_biguint()),
+            "y": format!("0x{:x}", y.to_biguint()),
+        }),
+    }
+}
+
+fn fiber_kind_to_json(kind: &PullbackFiberKind) -> Value {
+    match kind {
+        PullbackFiberKind::InfinityRamified { ramification_index } => json!({
+            "kind": "infinity_ramified",
+            "ramification_index": ramification_index,
+        }),
+        PullbackFiberKind::ExceptionalTwoTorsionRamified { ramification_index } => json!({
+            "kind": "exceptional_two_torsion_ramified",
+            "ramification_index": ramification_index,
+        }),
+        PullbackFiberKind::GenericSeparable { geometric_degree } => json!({
+            "kind": "generic_separable",
+            "geometric_degree": geometric_degree,
+        }),
+    }
+}
+
+fn closed_point_component_to_json(component: &ClosedPointPushforwardCertificate) -> Value {
+    json!({
+        "support": encoded_poly(&component.support),
+        "residue_degree": component.degree,
+        "image": binary_point_to_json(&component.image),
+    })
+}
+
+fn closed_point_components_to_json(components: &[ClosedPointPushforwardCertificate]) -> Vec<Value> {
+    components
+        .iter()
+        .map(closed_point_component_to_json)
+        .collect()
 }
 
 fn required_divisor<'a>(
@@ -451,6 +563,43 @@ fn operation_name(operation: ArithmeticOperation) -> &'static str {
         ArithmeticOperation::Add => "add",
         ArithmeticOperation::ScalarMultiply => "scalar_multiply",
     }
+}
+
+fn validate_arithmetic_operands(request: &ArithmeticRequest) -> Result<(), String> {
+    let require = |present: bool, name: &str| {
+        present
+            .then_some(())
+            .ok_or_else(|| format!("operation requires `{name}`"))
+    };
+    let forbid = |present: bool, name: &str| {
+        (!present)
+            .then_some(())
+            .ok_or_else(|| format!("operation does not accept `{name}`"))
+    };
+
+    match request.operation {
+        ArithmeticOperation::Identity => {
+            forbid(request.left.is_some(), "left")?;
+            forbid(request.right.is_some(), "right")?;
+            forbid(request.scalar.is_some(), "scalar")?;
+        }
+        ArithmeticOperation::Validate | ArithmeticOperation::Negate => {
+            require(request.left.is_some(), "left")?;
+            forbid(request.right.is_some(), "right")?;
+            forbid(request.scalar.is_some(), "scalar")?;
+        }
+        ArithmeticOperation::Equal | ArithmeticOperation::Add => {
+            require(request.left.is_some(), "left")?;
+            require(request.right.is_some(), "right")?;
+            forbid(request.scalar.is_some(), "scalar")?;
+        }
+        ArithmeticOperation::ScalarMultiply => {
+            require(request.left.is_some(), "left")?;
+            require(request.scalar.is_some(), "scalar")?;
+            forbid(request.right.is_some(), "right")?;
+        }
+    }
+    Ok(())
 }
 
 fn arithmetic_result(
@@ -483,7 +632,70 @@ fn arithmetic_result(
     }
 }
 
-fn binary_arithmetic(request: &ArithmeticRequest, model_value: &Value) -> (Value, i32) {
+fn model_split_sextic_arithmetic(
+    request: &ArithmeticRequest,
+    model_value: &Value,
+    certificate: &checker::Certificate,
+    p: &BigUint,
+) -> (Value, i32) {
+    if p.bits() > 64 {
+        return (
+            response(
+                "arithmetic",
+                "unsupported",
+                json!({
+                    "reason": "the explicit split-sextic cover is constructed and replayed, but balanced arithmetic has a deterministic prime-validation boundary of at most 64 bits",
+                    "construction_status": "explicit_verified",
+                    "arithmetic_status": "unsupported_prime_size",
+                }),
+            ),
+            2,
+        );
+    }
+    let f = match prime_poly(&certificate.f, p, "constructed f") {
+        Ok(f) => f,
+        Err(reason) => {
+            return (
+                response(
+                    "arithmetic",
+                    "error",
+                    json!({"reason": format!("replayed construction could not be decoded for balanced arithmetic: {reason}")}),
+                ),
+                1,
+            )
+        }
+    };
+    let curve = match SplitHyperellipticCurveP::try_new(p.clone(), f) {
+        Ok(curve) => curve,
+        Err(error) => {
+            return (
+                response(
+                    "arithmetic",
+                    "error",
+                    json!({"reason": format!("replayed construction failed balanced initialization: {error}")}),
+                ),
+                1,
+            )
+        }
+    };
+    balanced_arithmetic_for_curve(
+        request,
+        &curve,
+        json!({
+            "family": "prime_quadratic_pullback_v1_split_sextic_balanced",
+            "target_model": model_value,
+            "curve_construction": certificate,
+            "field": {"characteristic": p.to_str_radix(10), "representation": "prime_residue"},
+            "infinity_configuration": "two_rational_points",
+            "infinity_labels": {"plus": "y/x^3=+1", "minus": "y/x^3=-1"},
+            "infinity_polynomial_plus": encoded_prime_poly(curve.infinity_polynomial()),
+            "representation": "canonical_balanced_(u,v,n_plus)",
+            "scope": "checked Jacobian arithmetic only; induced cover transfers are not implemented on this backend",
+        }),
+    )
+}
+
+fn model_arithmetic(request: &ArithmeticRequest, model_value: &Value) -> (Value, i32) {
     let model = match strict_model(model_value) {
         Ok(model) => model,
         Err(error) => return model_error("arithmetic", error),
@@ -502,27 +714,16 @@ fn binary_arithmetic(request: &ArithmeticRequest, model_value: &Value) -> (Value
                     "arithmetic",
                     "unsupported",
                     json!({
-                        "reason": "the explicit GF(p^k) cover is an even-degree sextic with two rational points at infinity; the checked odd-characteristic implementation currently supports only odd-degree one-infinity models over prime fields",
+                        "reason": "the explicit GF(p^k) cover is constructed and replayed, but the split-sextic balanced backend currently supports prime fields only",
                         "construction_status": "explicit_verified",
-                        "arithmetic_status": "unsupported_infinity_configuration",
+                        "arithmetic_status": "unsupported_extension_field",
                     }),
                 ),
                 2,
             )
         }
-        checker::Field::Prime(_) => {
-            return (
-                response(
-                    "arithmetic",
-                    "unsupported",
-                    json!({
-                        "reason": "the explicit prime cover is an even-degree sextic with two rational points at infinity; the checked odd-characteristic implementation currently supports only odd-degree one-infinity models",
-                        "construction_status": "explicit_verified",
-                        "arithmetic_status": "unsupported_infinity_configuration",
-                    }),
-                ),
-                2,
-            )
+        checker::Field::Prime(p) => {
+            return model_split_sextic_arithmetic(request, model_value, &certificate, p)
         }
         checker::Field::Binary(irr) => irr,
     };
@@ -635,6 +836,9 @@ fn prime_divisor_from_wire(
     wire: &DivisorWire,
     curve: &HyperellipticCurveP,
 ) -> Result<MumfordDivisorP, String> {
+    if wire.n_plus.is_some() {
+        return Err("odd one-infinity divisors do not accept `n_plus`".into());
+    }
     let u = prime_poly(&wire.u, &curve.p, "u")?;
     let v = prime_poly(&wire.v, &curve.p, "v")?;
     MumfordDivisorP::try_from_polynomials(curve, u, v).map_err(|e| format!("{e:?}"))
@@ -651,10 +855,34 @@ fn prime_divisor_to_wire(divisor: &MumfordDivisorP) -> DivisorWire {
     DivisorWire {
         u: encoded_prime_poly(&divisor.u),
         v: encoded_prime_poly(&divisor.v),
+        n_plus: None,
     }
 }
 
-fn odd_arithmetic(request: &ArithmeticRequest, supplied: &OddCurveWire) -> (Value, i32) {
+fn balanced_divisor_from_wire(
+    wire: &DivisorWire,
+    curve: &SplitHyperellipticCurveP,
+) -> Result<BalancedDivisorP, String> {
+    let n_plus = wire
+        .n_plus
+        .ok_or_else(|| "split-sextic balanced divisors require `n_plus`".to_string())?;
+    let u = prime_poly(&wire.u, &curve.p, "u")?;
+    let v = prime_poly(&wire.v, &curve.p, "v")?;
+    BalancedDivisorP::try_from_polynomials(curve, u, v, n_plus).map_err(|error| error.to_string())
+}
+
+fn balanced_divisor_to_wire(divisor: &BalancedDivisorP) -> DivisorWire {
+    DivisorWire {
+        u: encoded_prime_poly(&divisor.u),
+        v: encoded_prime_poly(&divisor.v),
+        n_plus: Some(divisor.n_plus),
+    }
+}
+
+fn one_infinity_odd_arithmetic(
+    request: &ArithmeticRequest,
+    supplied: &OddCurveWire,
+) -> (Value, i32) {
     if supplied.family != "odd_prime_one_infinity_v1" || supplied.infinity != "one_rational" {
         return (
             response(
@@ -766,6 +994,158 @@ fn odd_arithmetic(request: &ArithmeticRequest, supplied: &OddCurveWire) -> (Valu
     )
 }
 
+fn balanced_arithmetic_for_curve(
+    request: &ArithmeticRequest,
+    curve: &SplitHyperellipticCurveP,
+    context: Value,
+) -> (Value, i32) {
+    let parse = |wire: &Option<DivisorWire>, name: &str| -> Result<BalancedDivisorP, String> {
+        balanced_divisor_from_wire(required_divisor(wire, name)?, curve)
+    };
+    let computed: Result<Value, String> = match request.operation {
+        ArithmeticOperation::Identity => BalancedDivisorP::try_identity(curve)
+            .map(|divisor| json!({"divisor": balanced_divisor_to_wire(&divisor)}))
+            .map_err(|error| error.to_string()),
+        ArithmeticOperation::Validate => parse(&request.left, "left")
+            .map(|divisor| json!({"valid": true, "divisor": balanced_divisor_to_wire(&divisor)})),
+        ArithmeticOperation::Equal => (|| {
+            let left = parse(&request.left, "left")?;
+            let right = parse(&request.right, "right")?;
+            let equal = left
+                .checked_eq(&right, curve)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({"equal": equal}))
+        })(),
+        ArithmeticOperation::Negate => (|| {
+            let left = parse(&request.left, "left")?;
+            let result = left.checked_neg(curve).map_err(|error| error.to_string())?;
+            Ok(json!({"divisor": balanced_divisor_to_wire(&result)}))
+        })(),
+        ArithmeticOperation::Add => (|| {
+            let left = parse(&request.left, "left")?;
+            let right = parse(&request.right, "right")?;
+            let result = left
+                .checked_add(&right, curve)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({"divisor": balanced_divisor_to_wire(&result)}))
+        })(),
+        ArithmeticOperation::ScalarMultiply => (|| {
+            let left = parse(&request.left, "left")?;
+            let scalar = request
+                .scalar
+                .as_deref()
+                .ok_or_else(|| "operation requires `scalar`".to_string())
+                .and_then(parse_number)?;
+            let result = left
+                .checked_scalar_mul(&scalar, curve)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({
+                "divisor": balanced_divisor_to_wire(&result),
+                "scalar": format!("0x{scalar:x}"),
+            }))
+        })(),
+    };
+    arithmetic_result(request.operation, context, computed)
+}
+
+fn split_sextic_odd_arithmetic(
+    request: &ArithmeticRequest,
+    supplied: &OddCurveWire,
+) -> (Value, i32) {
+    if supplied.family != "odd_prime_split_sextic_balanced_v1"
+        || supplied.infinity != "two_rational"
+        || supplied.genus != 2
+    {
+        return (
+            response(
+                "arithmetic",
+                "unsupported",
+                json!({
+                    "reason": "balanced arithmetic requires family odd_prime_split_sextic_balanced_v1, infinity two_rational, and genus 2",
+                    "arithmetic_status": "unsupported_model",
+                }),
+            ),
+            2,
+        );
+    }
+    let p = match parse_number(&supplied.p) {
+        Ok(p) => p,
+        Err(reason) => {
+            return (
+                response("arithmetic", "invalid_input", json!({"reason": reason})),
+                3,
+            )
+        }
+    };
+    if p.bits() > 64 {
+        return (
+            response(
+                "arithmetic",
+                "unsupported",
+                json!({
+                    "reason": "split-sextic balanced arithmetic has a deterministic odd-prime validation boundary of at most 64 bits",
+                    "arithmetic_status": "unsupported_prime_size",
+                }),
+            ),
+            2,
+        );
+    }
+    let f = match prime_poly(&supplied.f, &p, "f") {
+        Ok(f) => f,
+        Err(reason) => {
+            return (
+                response("arithmetic", "invalid_input", json!({"reason": reason})),
+                3,
+            )
+        }
+    };
+    let curve = match SplitHyperellipticCurveP::try_new(p, f) {
+        Ok(curve) => curve,
+        Err(error) => {
+            return (
+                response(
+                    "arithmetic",
+                    "invalid_input",
+                    json!({"reason": error.to_string()}),
+                ),
+                3,
+            )
+        }
+    };
+    balanced_arithmetic_for_curve(
+        request,
+        &curve,
+        json!({
+            "family": supplied.family,
+            "field": {"characteristic": supplied.p, "representation": "prime_residue"},
+            "curve": supplied,
+            "infinity_configuration": "two_rational_points",
+            "infinity_labels": {"plus": "y/x^3=+1", "minus": "y/x^3=-1"},
+            "infinity_polynomial_plus": encoded_prime_poly(curve.infinity_polynomial()),
+            "representation": "canonical_balanced_(u,v,n_plus)",
+            "scope": "checked Jacobian arithmetic only; cover-transfer, subgroup, solver, and comparative-cost claims are outside this command",
+        }),
+    )
+}
+
+fn odd_arithmetic(request: &ArithmeticRequest, supplied: &OddCurveWire) -> (Value, i32) {
+    match supplied.family.as_str() {
+        "odd_prime_one_infinity_v1" => one_infinity_odd_arithmetic(request, supplied),
+        "odd_prime_split_sextic_balanced_v1" => split_sextic_odd_arithmetic(request, supplied),
+        _ => (
+            response(
+                "arithmetic",
+                "unsupported",
+                json!({
+                    "reason": "unsupported odd-characteristic arithmetic family",
+                    "arithmetic_status": "unsupported_model",
+                }),
+            ),
+            2,
+        ),
+    }
+}
+
 fn arithmetic(request: ArithmeticRequest) -> (Value, i32) {
     if request.schema != ARITHMETIC_SCHEMA {
         return (
@@ -777,14 +1157,342 @@ fn arithmetic(request: ArithmeticRequest) -> (Value, i32) {
             2,
         );
     }
+    if let Err(reason) = validate_arithmetic_operands(&request) {
+        return (
+            response(
+                "arithmetic",
+                "invalid_input",
+                json!({
+                    "operation": operation_name(request.operation),
+                    "reason": reason,
+                }),
+            ),
+            3,
+        );
+    }
     match (&request.model, &request.odd_curve) {
-        (Some(model), None) => binary_arithmetic(&request, model),
+        (Some(model), None) => model_arithmetic(&request, model),
         (None, Some(curve)) => odd_arithmetic(&request, curve),
         _ => (
             response(
                 "arithmetic",
                 "invalid_input",
                 json!({"reason": "supply exactly one of `model` or `odd_curve`"}),
+            ),
+            3,
+        ),
+    }
+}
+
+fn transfer_operation_name(operation: TransferOperation) -> &'static str {
+    match operation {
+        TransferOperation::Pushforward => "pushforward",
+        TransferOperation::PushforwardCertificate => "pushforward_certificate",
+        TransferOperation::ImageEndomorphismCertificate => "image_endomorphism_certificate",
+        TransferOperation::TorsionProjectorCertificate => "torsion_projector_certificate",
+        TransferOperation::Pullback => "pullback",
+        TransferOperation::PullPushCompositionCertificate => "pull_push_composition_certificate",
+        TransferOperation::PullbackClosedPointCertificate => "pullback_closed_point_certificate",
+        TransferOperation::SubgroupStatus => "subgroup_status",
+    }
+}
+
+fn validate_transfer_operands(request: &TransferRequest) -> Result<(), String> {
+    let require = |present: bool, name: &str| {
+        present
+            .then_some(())
+            .ok_or_else(|| format!("operation requires `{name}`"))
+    };
+    let forbid = |present: bool, name: &str| {
+        (!present)
+            .then_some(())
+            .ok_or_else(|| format!("operation does not accept `{name}`"))
+    };
+
+    match request.operation {
+        TransferOperation::Pushforward
+        | TransferOperation::PushforwardCertificate
+        | TransferOperation::ImageEndomorphismCertificate => {
+            require(request.divisor.is_some(), "divisor")?;
+            forbid(request.point.is_some(), "point")?;
+            forbid(request.order.is_some(), "order")?;
+        }
+        TransferOperation::TorsionProjectorCertificate => {
+            require(request.divisor.is_some(), "divisor")?;
+            require(request.order.is_some(), "order")?;
+            forbid(request.point.is_some(), "point")?;
+        }
+        TransferOperation::Pullback
+        | TransferOperation::PullPushCompositionCertificate
+        | TransferOperation::PullbackClosedPointCertificate => {
+            require(request.point.is_some(), "point")?;
+            forbid(request.divisor.is_some(), "divisor")?;
+            forbid(request.order.is_some(), "order")?;
+        }
+        TransferOperation::SubgroupStatus => {
+            require(request.order.is_some(), "order")?;
+            forbid(request.divisor.is_some(), "divisor")?;
+            forbid(request.point.is_some(), "point")?;
+        }
+    }
+    Ok(())
+}
+
+fn transfer(request: TransferRequest) -> (Value, i32) {
+    if request.schema != TRANSFER_SCHEMA {
+        return (
+            response(
+                "transfer",
+                "unsupported",
+                json!({"reason": "unsupported transfer request schema"}),
+            ),
+            2,
+        );
+    }
+    let model = match strict_model(&request.model) {
+        Ok(model) => model,
+        Err(error) => return model_error("transfer", error),
+    };
+    let irreducible = match &model.field {
+        checker::Field::Binary(irreducible) => irreducible,
+        checker::Field::Prime(_) | checker::Field::Extension { .. } => {
+            return (
+                response(
+                    "transfer",
+                    "unsupported",
+                    json!({
+                        "reason": "the supplied cover has an odd-characteristic two-infinity source; this command currently exposes induced maps only for the checked one-infinity binary family",
+                        "transfer_status": "unsupported_infinity_configuration",
+                    }),
+                ),
+                2,
+            )
+        }
+    };
+    let cover = match OrdinaryBinaryCover::new(
+        irreducible.degree,
+        irreducible.clone(),
+        F2mElement::from_biguint(&model.a, irreducible.degree),
+        F2mElement::from_biguint(&model.b, irreducible.degree),
+    ) {
+        Ok(cover) => cover,
+        Err(error) => {
+            return (
+                response(
+                    "transfer",
+                    "error",
+                    json!({"reason": format!("binary cover runtime validation failed: {error}")}),
+                ),
+                1,
+            )
+        }
+    };
+    if let Err(reason) = validate_transfer_operands(&request) {
+        return (
+            response(
+                "transfer",
+                "invalid_input",
+                json!({
+                    "operation": transfer_operation_name(request.operation),
+                    "reason": reason,
+                }),
+            ),
+            3,
+        );
+    }
+    let curve_construction = checker::construct(&model);
+    if let Err(reason) = checker::verify(&model, &curve_construction) {
+        return (
+            response(
+                "transfer",
+                "error",
+                json!({"reason": format!("constructed cover certificate failed replay: {reason}")}),
+            ),
+            1,
+        );
+    }
+
+    let divisor = || -> Result<MumfordDivisor, String> {
+        let wire = request
+            .divisor
+            .as_ref()
+            .ok_or_else(|| "operation requires `divisor`".to_string())?;
+        divisor_from_wire(wire, &model.field, cover.source_curve())
+    };
+    let point = || -> Result<BinaryPoint, String> {
+        let wire = request
+            .point
+            .as_ref()
+            .ok_or_else(|| "operation requires `point`".to_string())?;
+        binary_point_from_wire(wire, irreducible.degree)
+    };
+    let order = || -> Result<BigUint, String> {
+        request
+            .order
+            .as_deref()
+            .ok_or_else(|| "operation requires `order`".to_string())
+            .and_then(parse_number)
+    };
+
+    let computed: Result<Value, String> = match request.operation {
+        TransferOperation::Pushforward => (|| {
+            let divisor = divisor()?;
+            let image = cover
+                .pushforward_arbitrary_jacobian_class(&divisor)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({
+                "input": divisor_to_wire(&divisor),
+                "image": binary_point_to_json(&image),
+            }))
+        })(),
+        TransferOperation::PushforwardCertificate => (|| {
+            let divisor = divisor()?;
+            let certificate = cover
+                .jacobian_pushforward_certificate(&divisor)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({
+                "input": divisor_to_wire(&certificate.input),
+                "components": closed_point_components_to_json(&certificate.components),
+                "reconstructed_support": encoded_poly(&certificate.reconstructed_support),
+                "component_image_sum": binary_point_to_json(&certificate.component_image_sum),
+                "general_pushforward": binary_point_to_json(&certificate.general_pushforward),
+                "support_reconstruction_holds": certificate.support_reconstruction_holds,
+                "component_sum_holds": certificate.component_sum_holds,
+            }))
+        })(),
+        TransferOperation::ImageEndomorphismCertificate => (|| {
+            let divisor = divisor()?;
+            let certificate = cover
+                .image_endomorphism_certificate(&divisor)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({
+                "input": divisor_to_wire(&certificate.input),
+                "pushforward": binary_point_to_json(&certificate.pushforward),
+                "endomorphism": divisor_to_wire(&certificate.endomorphism),
+                "endomorphism_squared": divisor_to_wire(&certificate.endomorphism_squared),
+                "three_times_endomorphism": divisor_to_wire(&certificate.three_times_endomorphism),
+                "quadratic_identity_holds": certificate.quadratic_identity_holds,
+                "pushforward_kernel_member": certificate.pushforward_kernel_member,
+            }))
+        })(),
+        TransferOperation::TorsionProjectorCertificate => (|| {
+            let divisor = divisor()?;
+            let order = order()?;
+            let certificate = cover
+                .torsion_projector_certificate(&divisor, &order)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({
+                "order": certificate.order.to_str_radix(10),
+                "degree_inverse_mod_order": certificate.degree_inverse_mod_order.to_str_radix(10),
+                "input": divisor_to_wire(&certificate.input),
+                "normalized_projection": divisor_to_wire(&certificate.normalized_projection),
+                "complementary_component": divisor_to_wire(&certificate.complementary_component),
+                "projection_is_idempotent": certificate.projection_is_idempotent,
+                "projected_component_is_in_image": certificate.projected_component_is_in_image,
+                "complementary_component_is_in_pushforward_kernel": certificate.complementary_component_is_in_pushforward_kernel,
+                "input_is_in_image": certificate.input_is_in_image,
+                "input_is_in_pushforward_kernel": certificate.input_is_in_pushforward_kernel,
+                "decomposition_holds": certificate.decomposition_holds,
+                "exact_order_verified_by_command": false,
+            }))
+        })(),
+        TransferOperation::Pullback => (|| {
+            let point = point()?;
+            let pullback = cover
+                .pullback_point_class(&point)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({
+                "input": binary_point_to_json(&point),
+                "pullback": divisor_to_wire(&pullback),
+            }))
+        })(),
+        TransferOperation::PullPushCompositionCertificate => (|| {
+            let point = point()?;
+            let certificate = cover
+                .pull_push_composition_certificate(&point)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({
+                "input": binary_point_to_json(&certificate.input),
+                "pullback": divisor_to_wire(&certificate.pullback),
+                "fiber_kind": fiber_kind_to_json(&certificate.fiber_kind),
+                "formal_pushforward": binary_point_to_json(&certificate.formal_pushforward),
+                "three_times_input": binary_point_to_json(&certificate.three_times_input),
+                "identity_holds": certificate.identity_holds,
+            }))
+        })(),
+        TransferOperation::PullbackClosedPointCertificate => (|| {
+            let point = point()?;
+            let certificate = cover
+                .pullback_closed_point_certificate(&point)
+                .map_err(|error| error.to_string())?;
+            Ok(json!({
+                "input": binary_point_to_json(&certificate.input),
+                "pullback": divisor_to_wire(&certificate.pullback),
+                "fiber_kind": fiber_kind_to_json(&certificate.fiber_kind),
+                "components": closed_point_components_to_json(&certificate.components),
+                "reduced_support_degree": certificate.reduced_support_degree,
+                "component_image_sum": binary_point_to_json(&certificate.component_image_sum),
+                "three_times_input": binary_point_to_json(&certificate.three_times_input),
+                "every_component_is_degree_times_input": certificate.every_component_is_degree_times_input,
+                "total_matches_three_times_input": certificate.total_matches_three_times_input,
+            }))
+        })(),
+        TransferOperation::SubgroupStatus => (|| {
+            let order = order()?;
+            let status = cover
+                .subgroup_transfer_status(&order)
+                .map_err(|error| error.to_string())?;
+            Ok(match status {
+                SubgroupTransferStatus::InjectiveIfExactSubgroupOrder {
+                    order,
+                    degree_inverse_mod_order,
+                } => json!({
+                    "status": "injective_if_exact_subgroup_order",
+                    "order": order.to_str_radix(10),
+                    "degree_inverse_mod_order": degree_inverse_mod_order.to_str_radix(10),
+                    "exact_order_verified_by_command": false,
+                }),
+                SubgroupTransferStatus::KernelIntersectionUnresolved {
+                    order,
+                    common_factor,
+                } => json!({
+                    "status": "kernel_intersection_unresolved",
+                    "order": order.to_str_radix(10),
+                    "common_factor": common_factor,
+                    "exact_order_verified_by_command": false,
+                }),
+            })
+        })(),
+    };
+
+    let operation = transfer_operation_name(request.operation);
+    match computed {
+        Ok(result) => (
+            response(
+                "transfer",
+                "ok",
+                json!({
+                    "operation": operation,
+                    "context": {
+                        "family": "binary_cubic_pullback_v1",
+                        "target_model": request.model,
+                        "curve_construction": curve_construction,
+                        "field_degree": irreducible.degree,
+                        "source_genus": cover.certificate().source_genus,
+                        "map_degree": cover.certificate().map_degree,
+                        "map": {"x": "u^3", "y": "u*v+d", "d": format!("0x{:x}", cover.square_root_b().to_biguint())},
+                    },
+                    "result": result,
+                    "scope": "checked induced map only; exact subgroup-order, injectivity, solver, and comparative-cost claims are outside this command",
+                }),
+            ),
+            0,
+        ),
+        Err(reason) => (
+            response(
+                "transfer",
+                "invalid_input",
+                json!({"operation": operation, "reason": reason}),
             ),
             3,
         ),
@@ -833,6 +1541,23 @@ fn execute(command: Command) -> (Value, i32, Option<PathBuf>) {
                 }
                 Err(reason) => (
                     response("arithmetic", "invalid_input", json!({"reason": reason})),
+                    3,
+                    output,
+                ),
+            }
+        }
+        Command::Transfer { input, output } => {
+            let parsed = read_bytes(&input).and_then(|bytes| {
+                serde_json::from_slice::<TransferRequest>(&bytes)
+                    .map_err(|e| format!("parse transfer request: {e}"))
+            });
+            match parsed {
+                Ok(request) => {
+                    let (value, code) = transfer(request);
+                    (value, code, output)
+                }
+                Err(reason) => (
+                    response("transfer", "invalid_input", json!({"reason": reason})),
                     3,
                     output,
                 ),
@@ -891,9 +1616,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crypto_lib::binary_ecc::{
-        curve::scalar_mul as binary_scalar_mul, BinaryCurve, BinaryPoint, SubgroupTransferStatus,
-    };
+    use crypto_lib::binary_ecc::{curve::scalar_mul as binary_scalar_mul, BinaryCurve};
 
     const CURRENT_REGISTRY: &str = include_str!("../../docs/curves/registry.json");
     const CURRENT_COVER_GRAPH: &str = include_str!("../../docs/curves/cover-links.yaml");
@@ -933,32 +1656,32 @@ mod tests {
     }
 
     #[test]
-    fn exact_fixed_f8_receipt_marks_arbitrary_pushforward_as_library_only() {
+    fn exact_fixed_f8_receipt_marks_general_arbitrary_pushforward_and_cli() {
         let (answer, code) = construct(fixed_f8_arbitrary_pushforward_model());
         assert_eq!(code, 0, "{answer}");
         assert_eq!(answer["status"], "ok");
         assert_eq!(
             answer["result"]["verification"]["arbitrary_jacobian_pushforward"],
-            "implemented_in_library_only_for_exact_fixed_f8_fixture"
+            "implemented_checked_closed_point_norm_for_valid_reduced_degree_at_most_3_classes_on_this_binary_model"
         );
         assert_eq!(
             answer["result"]["verification"]["cli_transfer_subcommand"],
-            "not_exposed"
+            "exposed_structured_binary_only"
         );
     }
 
     #[test]
-    fn non_fixture_binary_receipt_keeps_arbitrary_pushforward_unsupported() {
+    fn non_fixture_binary_receipt_marks_general_arbitrary_pushforward_and_cli() {
         let (answer, code) = construct(binary_model());
         assert_eq!(code, 0, "{answer}");
         assert_eq!(answer["status"], "ok");
         assert_eq!(
             answer["result"]["verification"]["arbitrary_jacobian_pushforward"],
-            "unsupported"
+            "implemented_checked_closed_point_norm_for_valid_reduced_degree_at_most_3_classes_on_this_binary_model"
         );
         assert_eq!(
             answer["result"]["verification"]["cli_transfer_subcommand"],
-            "not_exposed"
+            "exposed_structured_binary_only"
         );
     }
 
@@ -986,6 +1709,132 @@ mod tests {
         let (answer, code) = construct(model);
         assert_eq!(code, 3);
         assert_eq!(answer["status"], "invalid_input");
+    }
+
+    #[test]
+    fn transfer_pushes_identity_on_non_fixture_binary_model() {
+        let request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: binary_model(),
+            operation: TransferOperation::PushforwardCertificate,
+            divisor: Some(DivisorWire {
+                u: vec!["0x1".into()],
+                v: vec![],
+                n_plus: None,
+            }),
+            point: None,
+            order: None,
+        };
+        let (answer, code) = transfer(request);
+        assert_eq!(code, 0, "{answer}");
+        assert_eq!(answer["status"], "ok");
+        assert_eq!(answer["result"]["context"]["target_model"], binary_model());
+        assert_eq!(
+            answer["result"]["context"]["curve_construction"]["construction"],
+            "binary_cubic_pullback_v1"
+        );
+        assert_eq!(
+            answer["result"]["result"]["general_pushforward"]["kind"],
+            "infinity"
+        );
+        assert_eq!(
+            answer["result"]["result"]["support_reconstruction_holds"],
+            true
+        );
+        assert_eq!(answer["result"]["result"]["component_sum_holds"], true);
+    }
+
+    #[test]
+    fn transfer_certifies_exceptional_pull_push_and_projector() {
+        let point = BinaryPointWire::Affine {
+            x: "0x0".into(),
+            y: "0x1".into(),
+        };
+        let composition_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: binary_model(),
+            operation: TransferOperation::PullPushCompositionCertificate,
+            divisor: None,
+            point: Some(point.clone()),
+            order: None,
+        };
+        let (composition, composition_code) = transfer(composition_request);
+        assert_eq!(composition_code, 0, "{composition}");
+        assert_eq!(composition["result"]["result"]["identity_holds"], true);
+
+        let projector_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: binary_model(),
+            operation: TransferOperation::TorsionProjectorCertificate,
+            divisor: Some(DivisorWire {
+                u: vec!["0x0".into(), "0x1".into()],
+                v: vec![],
+                n_plus: None,
+            }),
+            point: None,
+            order: Some("2".into()),
+        };
+        let (projector, projector_code) = transfer(projector_request);
+        assert_eq!(projector_code, 0, "{projector}");
+        assert_eq!(projector["result"]["result"]["decomposition_holds"], true);
+        assert_eq!(
+            projector["result"]["result"]["exact_order_verified_by_command"],
+            false
+        );
+    }
+
+    #[test]
+    fn transfer_rejects_malformed_divisor_and_wrong_schema() {
+        let malformed = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: binary_model(),
+            operation: TransferOperation::Pushforward,
+            divisor: Some(DivisorWire {
+                u: vec![],
+                v: vec![],
+                n_plus: None,
+            }),
+            point: None,
+            order: None,
+        };
+        let (answer, code) = transfer(malformed);
+        assert_eq!(code, 3, "{answer}");
+        assert_eq!(answer["status"], "invalid_input");
+
+        let wrong_schema = TransferRequest {
+            schema: "hyperelliptic-transfer-operation/v0".into(),
+            model: binary_model(),
+            operation: TransferOperation::SubgroupStatus,
+            divisor: None,
+            point: None,
+            order: Some("29".into()),
+        };
+        let (answer, code) = transfer(wrong_schema);
+        assert_eq!(code, 2, "{answer}");
+        assert_eq!(answer["status"], "unsupported");
+    }
+
+    #[test]
+    fn transfer_rejects_operands_irrelevant_to_the_selected_operation() {
+        let request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: binary_model(),
+            operation: TransferOperation::SubgroupStatus,
+            divisor: Some(DivisorWire {
+                u: vec!["0x1".into()],
+                v: vec![],
+                n_plus: None,
+            }),
+            point: None,
+            order: Some("29".into()),
+        };
+        let (answer, code) = transfer(request);
+        assert_eq!(code, 3, "{answer}");
+        assert_eq!(answer["status"], "invalid_input");
+        assert_eq!(
+            answer["result"]["reason"],
+            "operation does not accept `divisor`"
+        );
     }
 
     #[test]
@@ -1061,6 +1910,8 @@ mod tests {
             "binary generator controls must not be empty"
         );
         let mut checked = std::collections::BTreeSet::new();
+        let mut binary_maps_checked = 0usize;
+        let mut nonsplit_component_degrees = std::collections::BTreeSet::new();
         for row in curves {
             let model_value: Value =
                 serde_json::from_str(row["model_json"].as_str().expect("model_json"))
@@ -1082,6 +1933,51 @@ mod tests {
                 F2mElement::from_biguint(&model.b, irreducible.degree),
             )
             .expect("checked catalog cover");
+            binary_maps_checked += 1;
+            let row_slug = row["icv1_identity"]["slug"]
+                .as_str()
+                .expect("catalog ICV1 slug");
+
+            let identity = MumfordDivisor::identity(irreducible.degree);
+            assert_eq!(
+                cover
+                    .pushforward_arbitrary_jacobian_class(&identity)
+                    .expect("identity arbitrary norm"),
+                BinaryPoint::Infinity,
+                "{}: identity did not push to the target identity",
+                row_slug
+            );
+            let identity_certificate = cover
+                .jacobian_pushforward_certificate(&identity)
+                .expect("identity component certificate");
+            assert!(identity_certificate.components.is_empty());
+            assert!(identity_certificate.support_reconstruction_holds);
+            assert!(identity_certificate.component_sum_holds);
+
+            let exceptional = MumfordDivisor::try_new(
+                cover.source_curve(),
+                F2mPoly::x(irreducible.degree),
+                F2mPoly::zero(irreducible.degree),
+            )
+            .expect("exceptional source-point divisor");
+            let exceptional_image = cover
+                .pushforward_arbitrary_jacobian_class(&exceptional)
+                .expect("exceptional arbitrary norm");
+            assert_eq!(
+                exceptional_image,
+                BinaryPoint::Affine {
+                    x: F2mElement::zero(irreducible.degree),
+                    y: cover.square_root_b().clone(),
+                },
+                "{}: exceptional divisor norm changed",
+                row_slug
+            );
+            let exceptional_certificate = cover
+                .jacobian_pushforward_certificate(&exceptional)
+                .expect("exceptional component certificate");
+            assert!(exceptional_certificate.support_reconstruction_holds);
+            assert!(exceptional_certificate.component_sum_holds);
+            assert_eq!(exceptional_certificate.components.len(), 1);
 
             for representation in row["representations"]
                 .as_array()
@@ -1164,6 +2060,38 @@ mod tests {
                     composition.identity_holds,
                     "{ec1}: typed composition failed"
                 );
+                let arbitrary_pushforward = cover
+                    .pushforward_arbitrary_jacobian_class(&pullback)
+                    .expect("general arbitrary-class norm on catalog pullback");
+                assert_eq!(
+                    arbitrary_pushforward, composition.formal_pushforward,
+                    "{ec1}: arbitrary norm differs from typed formal pushforward"
+                );
+                let arbitrary_certificate = cover
+                    .jacobian_pushforward_certificate(&pullback)
+                    .expect("catalog arbitrary-class component certificate");
+                assert!(
+                    arbitrary_certificate.support_reconstruction_holds,
+                    "{ec1}: component support reconstruction failed"
+                );
+                assert!(
+                    arbitrary_certificate.component_sum_holds,
+                    "{ec1}: component image sum failed"
+                );
+                assert_eq!(
+                    arbitrary_certificate.general_pushforward, composition.formal_pushforward,
+                    "{ec1}: certified arbitrary norm differs from typed pushforward"
+                );
+                let closed_point_certificate = cover
+                    .pullback_closed_point_certificate(&point)
+                    .expect("catalog closed-point pullback certificate");
+                assert!(closed_point_certificate.every_component_is_degree_times_input);
+                assert!(closed_point_certificate.total_matches_three_times_input);
+                for component in &closed_point_certificate.components {
+                    if component.degree > 1 {
+                        nonsplit_component_degrees.insert(component.degree);
+                    }
+                }
                 let status = cover
                     .subgroup_transfer_status(&order)
                     .expect("conditional subgroup status");
@@ -1196,10 +2124,15 @@ mod tests {
             checked, expected,
             "complete binary registry/graph EC1 coverage"
         );
+        assert!(binary_maps_checked > 0, "no binary maps were replayed");
+        assert!(
+            !nonsplit_component_degrees.is_empty(),
+            "catalog generator replay did not exercise any nonsplit closed-point support"
+        );
     }
 
     #[test]
-    fn prime_cover_arithmetic_is_structured_unsupported() {
+    fn prime_cover_arithmetic_uses_balanced_split_sextic_backend() {
         let request = ArithmeticRequest {
             schema: ARITHMETIC_SCHEMA.into(),
             model: Some(json!({
@@ -1213,12 +2146,15 @@ mod tests {
             scalar: None,
         };
         let (answer, code) = arithmetic(request);
-        assert_eq!(code, 2);
-        assert_eq!(answer["status"], "unsupported");
+        assert_eq!(code, 0, "{answer}");
+        assert_eq!(answer["status"], "ok");
         assert_eq!(
-            answer["result"]["arithmetic_status"],
-            "unsupported_infinity_configuration"
+            answer["result"]["context"]["representation"],
+            "canonical_balanced_(u,v,n_plus)"
         );
+        assert_eq!(answer["result"]["result"]["divisor"]["u"], json!(["0x1"]));
+        assert_eq!(answer["result"]["result"]["divisor"]["v"], json!([]));
+        assert_eq!(answer["result"]["result"]["divisor"]["n_plus"], 1);
     }
 
     #[test]
@@ -1248,7 +2184,7 @@ mod tests {
         assert_eq!(answer["status"], "unsupported");
         assert_eq!(
             answer["result"]["arithmetic_status"],
-            "unsupported_infinity_configuration"
+            "unsupported_extension_field"
         );
     }
 
@@ -1277,6 +2213,7 @@ mod tests {
             left: Some(DivisorWire {
                 u: Vec::new(),
                 v: Vec::new(),
+                n_plus: None,
             }),
             right: None,
             scalar: None,
@@ -1284,6 +2221,53 @@ mod tests {
         let (answer, code) = arithmetic(request);
         assert_eq!(code, 3);
         assert_eq!(answer["status"], "invalid_input");
+    }
+
+    #[test]
+    fn arithmetic_rejects_operands_irrelevant_to_the_selected_operation() {
+        let identity_with_left = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: Some(binary_model()),
+            odd_curve: None,
+            operation: ArithmeticOperation::Identity,
+            left: Some(DivisorWire {
+                u: vec!["1".into()],
+                v: Vec::new(),
+                n_plus: None,
+            }),
+            right: None,
+            scalar: None,
+        };
+        let (identity, identity_code) = arithmetic(identity_with_left);
+        assert_eq!(identity_code, 3, "{identity}");
+        assert_eq!(
+            identity["result"]["reason"],
+            "operation does not accept `left`"
+        );
+
+        let add_with_scalar = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: Some(binary_model()),
+            odd_curve: None,
+            operation: ArithmeticOperation::Add,
+            left: Some(DivisorWire {
+                u: vec!["1".into()],
+                v: Vec::new(),
+                n_plus: None,
+            }),
+            right: Some(DivisorWire {
+                u: vec!["1".into()],
+                v: Vec::new(),
+                n_plus: None,
+            }),
+            scalar: Some("2".into()),
+        };
+        let (add, add_code) = arithmetic(add_with_scalar);
+        assert_eq!(add_code, 3, "{add}");
+        assert_eq!(
+            add["result"]["reason"],
+            "operation does not accept `scalar`"
+        );
     }
 
     #[test]
@@ -1307,6 +2291,7 @@ mod tests {
             left: Some(DivisorWire {
                 u: vec!["0".into(), "1".into()],
                 v: Vec::new(),
+                n_plus: None,
             }),
             right: None,
             scalar: None,
@@ -1317,6 +2302,135 @@ mod tests {
         assert!(answer["result"]["result"]["valid"]
             .as_bool()
             .expect("valid is a boolean"));
+    }
+
+    fn balanced_f5_curve() -> OddCurveWire {
+        OddCurveWire {
+            family: "odd_prime_split_sextic_balanced_v1".into(),
+            p: "5".into(),
+            genus: 2,
+            f: ["1", "0", "0", "0", "0", "0", "1"]
+                .into_iter()
+                .map(str::to_string)
+                .collect(),
+            infinity: "two_rational".into(),
+        }
+    }
+
+    fn balanced_infinity_divisor(n_plus: u32) -> DivisorWire {
+        DivisorWire {
+            u: vec!["1".into()],
+            v: Vec::new(),
+            n_plus: Some(n_plus),
+        }
+    }
+
+    fn balanced_x0_point_divisor(y: &str, n_plus: u32) -> DivisorWire {
+        DivisorWire {
+            u: vec!["0".into(), "1".into()],
+            v: vec![y.into()],
+            n_plus: Some(n_plus),
+        }
+    }
+
+    #[test]
+    fn balanced_f5_identity_negation_and_addition_are_exposed() {
+        let identity_request = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: None,
+            odd_curve: Some(balanced_f5_curve()),
+            operation: ArithmeticOperation::Identity,
+            left: None,
+            right: None,
+            scalar: None,
+        };
+        let (identity, identity_code) = arithmetic(identity_request);
+        assert_eq!(identity_code, 0, "{identity}");
+        assert_eq!(identity["result"]["result"]["divisor"]["n_plus"], 1);
+
+        let negate_request = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: None,
+            odd_curve: Some(balanced_f5_curve()),
+            operation: ArithmeticOperation::Negate,
+            left: Some(balanced_infinity_divisor(2)),
+            right: None,
+            scalar: None,
+        };
+        let (negated, negate_code) = arithmetic(negate_request);
+        assert_eq!(negate_code, 0, "{negated}");
+        assert_eq!(negated["result"]["result"]["divisor"]["n_plus"], 0);
+
+        let add_request = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: None,
+            odd_curve: Some(balanced_f5_curve()),
+            operation: ArithmeticOperation::Add,
+            left: Some(balanced_infinity_divisor(2)),
+            right: Some(balanced_infinity_divisor(0)),
+            scalar: None,
+        };
+        let (sum, add_code) = arithmetic(add_request);
+        assert_eq!(add_code, 0, "{sum}");
+        assert_eq!(sum["result"]["result"]["divisor"]["u"], json!(["0x1"]));
+        assert_eq!(sum["result"]["result"]["divisor"]["v"], json!([]));
+        assert_eq!(sum["result"]["result"]["divisor"]["n_plus"], 1);
+
+        // On y^2=x^6+1 over F5, (0,1) is rational.  Its balanced inverse
+        // has the same affine support, y-coordinate -1=4, and the other
+        // infinity counter.  This exercises shared support in the CLI path.
+        let shared_support_add = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: None,
+            odd_curve: Some(balanced_f5_curve()),
+            operation: ArithmeticOperation::Add,
+            left: Some(balanced_x0_point_divisor("1", 0)),
+            right: Some(balanced_x0_point_divisor("4", 1)),
+            scalar: None,
+        };
+        let (shared_sum, shared_code) = arithmetic(shared_support_add);
+        assert_eq!(shared_code, 0, "{shared_sum}");
+        assert_eq!(
+            shared_sum["result"]["result"]["divisor"],
+            json!({"u": ["0x1"], "v": [], "n_plus": 1})
+        );
+    }
+
+    #[test]
+    fn balanced_divisors_require_n_plus_and_binary_divisors_reject_it() {
+        let missing_balanced_counter = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: None,
+            odd_curve: Some(balanced_f5_curve()),
+            operation: ArithmeticOperation::Validate,
+            left: Some(DivisorWire {
+                u: vec!["1".into()],
+                v: Vec::new(),
+                n_plus: None,
+            }),
+            right: None,
+            scalar: None,
+        };
+        let (missing, missing_code) = arithmetic(missing_balanced_counter);
+        assert_eq!(missing_code, 3, "{missing}");
+        assert_eq!(missing["status"], "invalid_input");
+
+        let binary_with_balanced_counter = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: Some(binary_model()),
+            odd_curve: None,
+            operation: ArithmeticOperation::Validate,
+            left: Some(DivisorWire {
+                u: vec!["1".into()],
+                v: Vec::new(),
+                n_plus: Some(1),
+            }),
+            right: None,
+            scalar: None,
+        };
+        let (binary, binary_code) = arithmetic(binary_with_balanced_counter);
+        assert_eq!(binary_code, 3, "{binary}");
+        assert_eq!(binary["status"], "invalid_input");
     }
 
     #[test]
