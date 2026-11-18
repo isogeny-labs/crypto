@@ -293,7 +293,8 @@ impl FastF3 {
         [a[0], self.fm(a[1], self.w), self.fm(a[2], self.w2)]
     }
 
-    pub fn inv(&self, a: &K) -> K {
+    /// Frozen Round B inverse, retained as a deterministic comparison oracle.
+    fn inv_frobenius_reference(&self, a: &K) -> K {
         assert_ne!(*a, KZERO, "inverse of zero");
         self.bump(|c| {
             c.f3_inv += 1;
@@ -309,6 +310,32 @@ impl FastF3 {
         );
         let ni = inv_mod_u64(n, self.q);
         [self.fm(p[0], ni), self.fm(p[1], ni), self.fm(p[2], ni)]
+    }
+
+    pub fn inv(&self, a: &K) -> K {
+        assert_ne!(*a, KZERO, "inverse of zero");
+        self.bump(|c| {
+            c.f3_inv += 1;
+            c.fq_inv += 1;
+        });
+        // Direct adjugate in F_q[z]/(z^3-c).  This computes the same
+        // a^q*a^(q^2) coefficients as the frozen path without two Frobenius
+        // maps or a general cubic multiplication.
+        let adj0 = self.fs(
+            self.fm(a[0], a[0]),
+            self.fmul_small(self.fm(a[1], a[2]), self.c),
+        );
+        let adj1 = self.fs(
+            self.fmul_small(self.fm(a[2], a[2]), self.c),
+            self.fm(a[0], a[1]),
+        );
+        let adj2 = self.fs(self.fm(a[1], a[1]), self.fm(a[0], a[2]));
+        let n = self.fa(
+            self.fm(a[0], adj0),
+            self.fmul_small(self.fa(self.fm(a[1], adj2), self.fm(a[2], adj1)), self.c),
+        );
+        let ni = inv_mod_u64(n, self.q);
+        [self.fm(adj0, ni), self.fm(adj1, ni), self.fm(adj2, ni)]
     }
 
     fn batch_inv_into(&self, values: &[K], prefix: &mut Vec<K>, out: &mut Vec<K>) {
@@ -1035,6 +1062,49 @@ pub fn selftest() {
         }
     }
     eprintln!("selftest: masked and fallback partitions match modulo");
+    let check_inverses = |f: &FastF3, kf: &crate::common::Kf, seed: u64, label: &str| {
+        let mut rng = Rng::new(seed);
+        let mut direct_range = (u64::MAX, 0u64);
+        let mut reference_range = (u64::MAX, 0u64);
+        for _ in 0..200 {
+            let a = loop {
+                let a = kf.rand(&mut rng);
+                if a != KZERO {
+                    break a;
+                }
+            };
+            let before = f.counts();
+            let direct = f.inv(&a);
+            let direct_counts = f.counts().since(before);
+            let before = f.counts();
+            let reference = f.inv_frobenius_reference(&a);
+            let reference_counts = f.counts().since(before);
+
+            assert_eq!(direct, reference, "{label}: direct/reference for {a:?}");
+            assert_eq!(direct, kf.inv(&a), "{label}: frozen inverse for {a:?}");
+            assert_eq!(f.mul(&a, &direct), KONE, "{label}: identity for {a:?}");
+            assert_eq!(
+                direct_counts.fq_mul + 4,
+                reference_counts.fq_mul,
+                "{label}: fq_mul delta for {a:?}"
+            );
+            assert_eq!(direct_counts.fq_inv, 1, "{label}: direct fq_inv");
+            assert_eq!(reference_counts.fq_inv, 1, "{label}: reference fq_inv");
+            assert_eq!(direct_counts.f3_inv, 1, "{label}: direct f3_inv");
+            assert_eq!(reference_counts.f3_inv, 1, "{label}: reference f3_inv");
+            assert_eq!(direct_counts.f3_mul, 0, "{label}: direct f3_mul");
+            assert_eq!(reference_counts.f3_mul, 1, "{label}: reference f3_mul");
+
+            direct_range.0 = direct_range.0.min(direct_counts.fq_mul);
+            direct_range.1 = direct_range.1.max(direct_counts.fq_mul);
+            reference_range.0 = reference_range.0.min(reference_counts.fq_mul);
+            reference_range.1 = reference_range.1.max(reference_counts.fq_mul);
+        }
+        eprintln!(
+            "selftest: {label}: 200 inverses match; fq_mul direct={}..{}, reference={}..{}, delta=4 each",
+            direct_range.0, direct_range.1, reference_range.0, reference_range.1,
+        );
+    };
     {
         let inst = instance();
         let f = FastF3::from_instance(&inst);
@@ -1058,12 +1128,29 @@ pub fn selftest() {
             assert_eq!(sq_counts.f3_mul, 0);
             assert_eq!(mul_counts.f3_sq, 0);
             assert_eq!(mul_counts.f3_mul, 1);
-            if a != KZERO {
-                assert_eq!(f.inv(&a), inst.kf.inv(&a));
-                assert_eq!(f.mul(&a, &f.inv(&a)), KONE);
-            }
         }
+        check_inverses(&f, &inst.kf, 8, "small-c");
         eprintln!("selftest: fast field matches frozen field");
+    }
+    {
+        let q = 223;
+        let kf = crate::common::Kf {
+            fp: crate::common::Fp { q },
+            c: 18,
+            w: 39,
+            w2: 183,
+            size: (q as u128).pow(3),
+        };
+        let f = FastF3 {
+            q,
+            reciprocal: barrett_reciprocal(q),
+            setup_reciprocal_div: 1,
+            c: kf.c,
+            w: kf.w,
+            w2: kf.w2,
+            counts: Cell::new(FieldCounts::default()),
+        };
+        check_inverses(&f, &kf, 10, "fallback-c=18");
     }
     {
         let inst = instance();
