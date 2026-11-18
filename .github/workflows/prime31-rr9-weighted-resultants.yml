@@ -7,12 +7,14 @@ on:
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_resultants.rs
       - research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_resultants.py
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_four_prefix.py
       - research/prime31_ic_20261115/rr9/RR9_WEIGHTED_SLOT_RESULTANT_PROTOCOL_20261118.md
       - .github/workflows/prime31-rr9-weighted-resultants.yml
   pull_request:
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_resultants.rs
       - research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_resultants.py
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_four_prefix.py
       - .github/workflows/prime31-rr9-weighted-resultants.yml
   workflow_dispatch:
 
@@ -59,6 +61,10 @@ jobs:
       - name: Independent Python BigInt source-exact replay
         run: |
           python3 research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_resultants.py \
+            prime31-rr9-weighted-resultants.json
+      - name: Independent four-prefix BigInt interpolation and Jacobian replay
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_four_prefix.py \
             prime31-rr9-weighted-resultants.json
       - name: Archive exact original-curve certificate record
         if: always()
