@@ -62,3 +62,19 @@ The first integration checkout attempt exhausted the 32 GiB overlay; only
 reproducible Cargo `target/` directories were cleaned. Parallel scratch clones
 therefore run on `/dev/shm` and must push commits promptly because that storage
 is ephemeral. No source or research evidence was deleted.
+
+## Recorded outcome
+
+The reviewed composition is recorded in
+[`round-c-integration/RESULTS.md`](../quartic_ghs_strong_rho_20261114/round-c-integration/RESULTS.md).
+Five lanes were integrated, while retry compaction was retained as negative
+evidence and excluded from production source. On the exact public q=223
+control, the composed `strong-b8` arm preserved the archived 1,487-step
+trajectory and changed total counters from 149,558 to 110,435 `fq_mul` and
+from 2,619 to 782 `fq_inv` `[pcc:unverified]`.
+
+This outcome is a deterministic correctness and operation-count result, not a
+throughput measurement or leaderboard update. Checkpoint admission remained
+unavailable, so the isolated profile, A/A/ABAB diagnostic, and complete
+matched grid remain open `[pcc:unverified]`. The next reviewed hypotheses and
+their acceptance gates are in [`NEXT_LEADS.md`](NEXT_LEADS.md).
