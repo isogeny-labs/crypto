@@ -52,12 +52,13 @@ def aggregate(row: dict) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", type=Path)
+    parser.add_argument("input", type=Path, nargs="+")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--warmup-repeats", type=int, default=1)
     args = parser.parse_args()
 
-    raw = args.input.read_bytes()
+    input_blobs = [path.read_bytes() for path in args.input]
+    raw = b"\n".join(blob.rstrip(b"\n") for blob in input_blobs) + b"\n"
     rows = [aggregate(json.loads(line)) for line in raw.splitlines() if line.strip()]
     args.out.mkdir(parents=True, exist_ok=True)
     grouped: dict[tuple[str, int], dict[str, dict]] = defaultdict(dict)
@@ -80,6 +81,17 @@ def main() -> None:
             failures.append(f"{case} repeat {repeat}: FL activation gate failed")
         if repeat >= args.warmup_repeats:
             pairs.append((case, repeat, fl, baseline))
+
+    if failures:
+        failure_summary = {
+            "schema": "semaev.fl.analysis/v1",
+            "admission": "local diagnostic; not native-L2 EKS",
+            "correctness_gate": "fail",
+            "failures": failures,
+        }
+        (args.out / "summary.json").write_text(json.dumps(failure_summary, indent=2) + "\n")
+        print(json.dumps(failure_summary, indent=2))
+        raise SystemExit(2)
 
     cases = {}
     csv_rows = []
@@ -122,7 +134,11 @@ def main() -> None:
     summary = {
         "schema": "semaev.fl.analysis/v1",
         "admission": "local diagnostic; not native-L2 EKS",
-        "input": str(args.input),
+        "inputs": [str(path) for path in args.input],
+        "input_file_sha256": {
+            str(path): hashlib.sha256(blob).hexdigest()
+            for path, blob in zip(args.input, input_blobs)
+        },
         "input_sha256": hashlib.sha256(raw).hexdigest(),
         "warmup_repeats_excluded": args.warmup_repeats,
         "correctness_gate": "pass" if not failures else "fail",
