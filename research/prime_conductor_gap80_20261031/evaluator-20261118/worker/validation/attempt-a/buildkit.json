@@ -1,0 +1,47 @@
+{
+  "buildx.build.provenance": {
+    "builder": {
+      "id": ""
+    },
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/debian?digest=sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2\u0026platform=linux%2Famd64",
+        "digest": {
+          "sha256": "bdbc7bd16ad3813e63c7a852c374487925bd5dc79cc420383c2d9865ac51dbf7"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "args": {
+          "build-arg:HTTPS_PROXY": "http://172.31.7.61:8080",
+          "build-arg:HTTP_PROXY": "http://172.31.7.61:8080",
+          "build-arg:NO_PROXY": "localhost,127.0.0.1,::1",
+          "build-arg:SOURCE_REVISION": "3cedf8af6c75d735e8664b726718d8cfbac28a7d"
+        },
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "dockerfileVersion": "1.28.0",
+        "platform": "linux/amd64",
+        "targetPlatform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "default/default/yvn966q1kmiwtbwenbfsnhn9l",
+  "containerimage.config.digest": "sha256:c3d51aa3c65470f5da87bc68aa38b4513cafd4d4043cbcd18a0477a393945839",
+  "containerimage.digest": "sha256:c3d51aa3c65470f5da87bc68aa38b4513cafd4d4043cbcd18a0477a393945839",
+  "image.name": "docker.io/library/conductor-evaluator:3cedf8af6c75d735e8664b726718d8cfbac28a7d"
+}
