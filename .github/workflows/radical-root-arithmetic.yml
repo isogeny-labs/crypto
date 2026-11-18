@@ -53,6 +53,8 @@ jobs:
             monic_cubic_entry_point_matches_frozen_normalization -- --nocapture
           cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
             fused_tonelli_and_quartic_coefficients_match_frozen -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            frobenius_fp2_power_matches_frozen_binary_and_cube_root -- --nocapture
       - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
         shell: bash
         run: |
@@ -75,6 +77,8 @@ jobs:
               bench_quadratic_direct_discriminant -- --ignored --nocapture
             cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
               bench_fused_tonelli_and_quartic_coefficients -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_frobenius_fp2_power -- --ignored --nocapture
           } | tee "$RUNNER_TEMP/radical-power-reuse.txt"
           cat "$RUNNER_TEMP/radical-power-reuse.txt" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
