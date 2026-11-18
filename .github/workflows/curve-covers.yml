@@ -16,6 +16,7 @@ on:
       - 'src/bin/hyperelliptic_cover.rs'
       - 'src/bin/curve_transfer_sweep.rs'
       - 'tests/binary_cover_transfer_oracle.rs'
+      - 'tests/prime_cover_transfer_oracle.rs'
       - 'examples/cover_catalog_transition_audit.rs'
       - 'src/bin/ecdlp_audit.rs'
       - 'src/bin/ecdlp_audit/**'
@@ -130,6 +131,14 @@ jobs:
           cargo test --bin hyperelliptic-cover
           cargo test --bin curve-transfer-sweep
           cargo test --test binary_cover_transfer_oracle
+          cargo test --test prime_cover_transfer_oracle
+          cargo run --bin hyperelliptic-cover -- transfer-catalog-verify \
+            --input docs/curves/binary-subgroup-transfer-certificates.json \
+            --registry docs/curves/registry.json \
+            --cover-graph docs/curves/cover-links.yaml \
+            --traits docs/curves/traits.json \
+            --expected-sha256 93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8 \
+            --expected-bytes 498477
       - name: Replay the native audit plan and fixed-F8 order certificate
         run: |
           cargo test --bin ecdlp-audit
@@ -230,7 +239,9 @@ jobs:
           node --test scripts/test_cover_transfer_assessment.mjs
           node --test scripts/test_catalog_snapshot.mjs
       - name: Validate the assessment schema
-        run: python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
+        run: |
+          python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
+          python -m jsonschema -i docs/curves/binary-subgroup-transfer-certificates.json docs/curves/binary-subgroup-transfer-certificates.schema.json
       - name: Install native PDF metadata reader
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
       - name: Verify typed map, subgroup, and evidence bindings

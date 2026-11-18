@@ -54,12 +54,12 @@ const EXPECTED_DELIVERABLE_BINDINGS: [(&str, &str, Option<&str>); 19] = [
     (
         "WS2-D3",
         "certificate_corpus",
-        Some("problems/catalog-cover-subgroup-certificates-incomplete.md"),
+        Some("docs/curves/binary-subgroup-transfer-certificates.json"),
     ),
     (
         "WS2-D4",
         "independent_oracle",
-        Some("tests/binary_cover_transfer_oracle.rs"),
+        Some("tests/prime_cover_transfer_oracle.rs"),
     ),
     ("WS3-D1", "schema_and_ledger", None),
     ("WS3-D2", "semantic_verifier", None),

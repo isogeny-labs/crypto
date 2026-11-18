@@ -117,6 +117,8 @@ The current catalog test asserts the following bounded population:
 | Maps without a named subgroup binding | 27 | Map evidence is retained; subgroup transport is `not_applicable` |
 | Named subgroup records | 150 | Each is replayed independently |
 | Named records accepted by the current test fixture | 150 | Generated-subgroup checks returned no per-record failure in that fixture |
+| Exact named-generator orders proved locally | 102 | Deterministic Miller--Rabin below the `psi_13` bound, plus nonidentity and `[r]G=0` |
+| Annihilation-only records | 48 | Traits records a probable-prime result, but the local exporter deliberately leaves exact order unknown without a proof or replayable primality certificate |
 
 This is exhaustive only for the current declared binary family and catalog
 snapshot.  It is not a parameter-space proof and an empty search result would
@@ -124,11 +126,12 @@ not establish nonexistence.
 
 # Implementation and evidence sources
 
-The report is intended to land in the same commit as the cited implementation,
-so that commit is the repository-level source binding.  Exported catalog
-records additionally carry a source digest over the semantic sources, schema,
-and build pins.  Their producer-commit and compiler-version strings are
-explicitly marked as caller-supplied, unverified attestations.
+The corpus was produced from crypto revision
+`c01ba3960ada49d73e2c48acb0e175f9e77e1680`. Its length-framed semantic-source
+digest is `32ca4682a05dfe5a2dca7a6b1f50d2df7f5a589a6dbd68252516e7935af5da47`;
+the frame binds source paths and byte lengths as well as contents. The
+producer-commit and compiler-version strings remain explicitly marked as
+caller-supplied, unverified attestations.
 
 - [`src/binary_ecc/cover_transfer.rs`](../../src/binary_ecc/cover_transfer.rs)
   contains binary arithmetic, the arbitrary norm, and the generated-subgroup
@@ -139,7 +142,16 @@ explicitly marked as caller-supplied, unverified attestations.
   and the independent small-field oracle.
 
 - [`src/bin/hyperelliptic_cover.rs`](../../src/bin/hyperelliptic_cover.rs)
-  contains the standalone operations and binary catalog exporter.
+  contains the standalone operations, binary catalog exporter, local bounded
+  primality proof, and exact byte-for-byte corpus verifier.
+
+- [`tests/prime_cover_transfer_oracle.rs`](../../tests/prime_cover_transfer_oracle.rs)
+  is a separately implemented producer-side Picard-class oracle. It
+  enumerates the `F_5` split-sextic Picard group through Riemann--Roch
+  functions and exact prime-place multiplicities, then checks all 1,296
+  ordered sums and both transfer compositions without using production
+  Cantor arithmetic to construct its group table. This code-path independence
+  is not an independent review or a general proof.
 
 - [`binary-subgroup-transfer-certificates.schema.json`](../../docs/curves/binary-subgroup-transfer-certificates.schema.json)
   is the fail-closed output contract and keeps exact-order evidence separate.
@@ -163,26 +175,53 @@ The implementation checkpoint supplied to this report records:
 - the focused standalone odd-prime composition/recovery and structured
   unsupported tests passing; and
 - the catalog-wide test traversing 174 binary maps and accepting all 150 named
-  records in the current fixture.
+  records in the current fixture;
 - the complete isolated standalone suite passing 27 of 27 tests in 283.74
   seconds, including a tampered graph that retained the registry digest; and
+- the new verifier pin/schema controls passing, the seven sweeper tests
+  passing, and the separately implemented `F_5` Picard oracle passing with
+  Clippy warnings denied; and
 - a generated 174-map, 150-subgroup corpus conforming to the Draft 2020-12
-  output schema with no failed named-subgroup tuple.
+  output schema with no failed named-subgroup tuple, followed by an exact
+  second arithmetic regeneration with literal hash and byte pins.
 
-The odd-prime tests enumerate the balanced classes of the `F_5` fixture,
-exercise all ordered class sums there, cover shifted `F_7` nonsplit and
-repeated support, and compare production pushforward with the independent
-quadratic-extension oracle.  These are finite test domains, not a universal
-proof of the implementation.
+The new Picard-class oracle closes only the symmetric `F_5` fixture
+`y^2=x^6+1`: it enumerates 36 classes, checks every ordered class sum, includes
+an irreducible quadratic place and repeated/shared/conjugate support, and
+checks both transfer compositions. Existing differential tests cover the
+generic `F_5` and shifted `F_7` fixtures, but those two fixtures do not yet
+have this separately implemented full source-group oracle. These are finite
+test domains, not a universal proof of the implementation.
 
-The generated JSON is 467,669 bytes, so repository policy excludes it from a
-direct Git commit.  It remains a local replay result until publication through
-the content-addressed artifact store at a committed producer revision.
+The earlier handoff incorrectly treated a 467,669-byte JSON file as subject to
+a 64 KiB storage rule.  The live repository policy does not classify `.json`
+as a data extension and applies the generic automatic threshold only above
+1 MiB. The corpus is therefore eligible for a direct Git commit. This slice
+adds the 498,477-byte tracked corpus at
+[`binary-subgroup-transfer-certificates.json`](../../docs/curves/binary-subgroup-transfer-certificates.json),
+with SHA-256
+`93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8`.
+The installed-layout gate stages it with `traits.json`, supplies the literal
+hash and size, regenerates every record, and requires canonical byte equality.
+The local replay response was 1,682 bytes with SHA-256
+`e89298ebb5f2f693eb9d362c7a6ba33dd685048593380b0eaf5626754fb66f5d`;
+it reported all replay checks true. This response is same-implementation
+evidence, not an independent publication receipt. The recorded producer
+commit and compiler strings remain caller-supplied and are not execution
+attestations.
+
+The order audit also found a pre-existing deterministic Miller--Rabin boundary
+bug in the PCC checker and the retained quartic experiment: each used only the
+first twelve prime bases with the `psi_13` cutoff. Both now include base 41 and
+regress on `psi_12`; the PCC suite passes 35 of 35 tests. The focused quartic
+Rust test is committed, but local root-crate execution remains blocked by
+unrelated sparse-checkout fixtures and a pre-existing duplicate test symbol.
 Cryptanalysis draft revision
 `010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2` records local source parity
 against crypto implementation revision
-`6cb5ab1edb141b48b9a9767fc63fe95ba1aac217`; final mirror CI and review remain
-open.  Release publication and recovery of the separately missing admitted
+`6cb5ab1edb141b48b9a9767fc63fe95ba1aac217`; a mirror metadata refresh for
+the frozen corpus and producer revision, final mirror CI, and review remain
+open. Release publication and recovery of the separately missing admitted
 hydration artifact also remain open.
 
 # Structured unsupported cases and next work
@@ -191,15 +230,24 @@ The standalone command returns structured unsupported results for odd
 extension-field targets, direct odd primes above the deterministic 64-bit
 arithmetic boundary, normalized Montgomery/Edwards target models, and source
 infinity configurations outside the balanced split-sextic implementation.
+The live odd-map census contains 20,537 direct short-Weierstrass maps with 673
+linked EC1 records inside the current 64-bit induced-map boundary.  Outside it
+are 271 wide-direct maps/236 EC1 records, 30 normalized maps/22 EC1 records,
+and 1,405 extension-field maps/9 EC1 records.  Wide direct primes therefore
+provide the highest next EC1 coverage with the smallest algebraic change; the
+rigorous pilot is the two 73-bit rows over
+`p=5902977611310272157103`, while larger rows retain explicit primality
+assumptions unless supplied with certificates.
 The next bounded engineering steps are:
 
-1. regenerate the complete binary certificate corpus at the committed
-   producer revision, publish it through the artifact store, and replay its
-   hash from the packaged executable;
+1. replay the tracked binary certificate corpus from the extracted release
+   archive and preserve its canonical bytes and source/input hashes;
 2. close required CI and review on the exact-source cryptanalysis mirror;
-3. add independent full arithmetic replay for the balanced odd-prime source,
-   then extend one explicitly selected unsupported model family; and
-4. publish a packaged standalone binary only after the evidence-store, CI,
+3. extend the independent even-model divisor oracle to the generic `F_5` and
+   shifted `F_7` fixtures with mutation controls; and
+4. implement a certificate-aware 73-bit direct-prime pilot before general
+   wide-prime, Montgomery, Edwards, or extension-field promotion; and
+5. publish a packaged standalone binary only after the remaining CI,
    review, and release checks pass.
 
 None of those steps is a substitute for the separate full Jacobian

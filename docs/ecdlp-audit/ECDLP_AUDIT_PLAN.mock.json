@@ -1,7 +1,7 @@
 {
   "schema_version": "ecdlp-audit-plan/v1",
   "record_state": "mock_non_authoritative",
-  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:9f800c379fe152326869d3d35b6e2d17c244cac85bc9cd030f5636751c89db7e",
+  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:42cd72520ae321ee84f12b2697cf3bc666b2faba19c5ae8cfcb00d45b8ba8c85",
   "title": "Comprehensive elliptic-curve private-key recovery audit",
   "as_of": "2026-11-18",
   "authoritative": false,
@@ -206,12 +206,12 @@
         "WS1",
         "WS4"
       ],
-      "summary": "Retain the implemented general binary norm and declared-annihilator named-subgroup certificate, direct-prime degree-two transfer core, current draft cryptanalysis source-parity evidence, bounded independent GF(8) map oracle, balanced two-infinity arithmetic slice, and bounded transfer sweeper, while keeping final mirror CI/review, catalog-wide odd induced-map replay, a durable subgroup-certificate corpus, exact-order evidence, package publication, an independent source group law, and broader reference oracles as separate gated changes.",
+      "summary": "Retain the implemented general binary norm and declared-annihilator named-subgroup certificate, frozen 174-map/150-binding binary certificate corpus, direct-prime degree-two transfer core, exhaustive independent F5 Picard-class oracle, current draft cryptanalysis source-parity evidence, bounded independent GF(8) map oracle, balanced two-infinity arithmetic slice, and bounded transfer sweeper, while keeping final mirror CI/review, wide-prime and catalog-wide odd support, the remaining exact-order evidence, package replay, a fully independent binary source group law, and broader reference coverage as separate gated changes.",
       "deliverables": [
         {
           "id": "WS2-D1",
           "kind": "implementation",
-          "description": "Partial direct-prime degree-two transfer core for C: v^2=F(u^2+c) to a short-Weierstrass target over deterministically checked odd primes fitting 64 bits: balanced pullback, arbitrary balanced-class pushforward, deck action, both composition identities, and bounded independent Fp2 pointwise norm checks. Larger primes, normalized targets, extension fields, nonsplit infinity, catalog-wide replay, and an independent full source group law remain unsupported or unverified.",
+          "description": "Partial direct-prime degree-two transfer core for C: v^2=F(u^2+c) to a short-Weierstrass target over deterministically checked odd primes fitting 64 bits: balanced pullback, arbitrary balanced-class pushforward, deck action, both composition identities, and bounded independent Fp2 pointwise norm checks. An exhaustive independent F5 Picard-class oracle now checks all 36 classes, the complete 36-by-36 group table, exceptional cases, and both transfer compositions. Larger primes, normalized targets, extension fields, nonsplit infinity, and catalog-wide replay remain unsupported or unverified.",
           "path": "src/prime_hyperelliptic/cover_transfer.rs",
           "artifact_sha256": "97ffe80dd14332eb0a2854dfcafcf21d98964289366762e1f3bd8228b84d7dc3",
           "status": "partial",
@@ -233,9 +233,9 @@
         {
           "id": "WS2-D3",
           "kind": "certificate_corpus",
-          "description": "The durable deliverable remains the partial catalog certificate inventory and explicit record of missing exact subgroup/image obligations. A schema and generator exist, but the current 467,669-byte generated corpus is local and unpublished, so it is not cited as a durable corpus artifact and closes no gate.",
-          "path": "problems/catalog-cover-subgroup-certificates-incomplete.md",
-          "artifact_sha256": "752417ee88c25dc6a21466495b58ad74d33565556d648486f06027b389535dab",
+          "description": "Frozen 498,477-byte binary certificate corpus produced at crypto revision c01ba3960ada49d73e2c48acb0e175f9e77e1680 with recorded producer-source SHA-256 32ca4682a05dfe5a2dca7a6b1f50d2df7f5a589a6dbd68252516e7935af5da47. It retains all 174 map records and 150 named bindings with zero failed records; 102 bindings have proved exact-order evidence and 48 remain unknown. It certifies only the recorded binary named generated subgroups and explicitly supplies no solver or computational-advantage assessment.",
+          "path": "docs/curves/binary-subgroup-transfer-certificates.json",
+          "artifact_sha256": "93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8",
           "status": "partial",
           "acceptance_gate_ids": [
             "WS2-G3"
@@ -244,9 +244,9 @@
         {
           "id": "WS2-D4",
           "kind": "independent_oracle",
-          "description": "Bounded independent GF(8) support-factorization, residue-field, Frobenius-trace, and target-group oracle for all 486 control classes and 236,196 ordered image sums; source-Jacobian addition remains production-provided and the odd reference is separate.",
-          "path": "tests/binary_cover_transfer_oracle.rs",
-          "artifact_sha256": "b1bb442bbd5f43e4394c873e6f66c0f69f7c42bcf169cddc59a04aad8cdd2fd1",
+          "description": "Independent F5 Picard-class oracle for y^2=x^6+1 that constructs its own 36-class group law from projective functions, checks the complete 36-by-36 group table, exceptional/shared-support cases, target arithmetic, and both transfer compositions. The separate bounded GF(8) oracle still uses production source-Jacobian addition, so the combined cross-characteristic independence gate remains partial.",
+          "path": "tests/prime_cover_transfer_oracle.rs",
+          "artifact_sha256": "c8b54646b96d8bbf4d62495309925f2c6012df1dd00077fa84ecaf8c046d85fe",
           "status": "partial",
           "acceptance_gate_ids": [
             "WS2-G4"
@@ -259,7 +259,7 @@
           "required": true,
           "claim_status": "unknown",
           "scope": "Balanced two-infinity arithmetic and degree-two induced maps cover the exact 22,243-map, 940-representation odd population at the 2026-11-18 live registry snapshot: 20,808 direct-prime maps/909 representations, 30 normalized-prime maps/22 representations, and 1,405 extension maps/9 representations, with exact membership hashes, exhaustive supported small-field checks, exceptional-divisor tests, and an independent oracle.",
-          "rationale": "The balanced backend and direct-prime transfer core handle monic squarefree degree-six genus-two split models over deterministically checked odd primes fitting 64 bits, with direct short-Weierstrass degree-two maps, both composition identities, and bounded F5/F7 pointwise norm checks. They do not cover larger primes, extension fields, nonsplit infinity, normalized-model maps, the complete 22,243-row population, or an independent full source group law. The bounded candidate sweeper likewise does not close this gate.",
+          "rationale": "The balanced backend and direct-prime transfer core handle monic squarefree degree-six genus-two split models over deterministically checked odd primes fitting 64 bits, with direct short-Weierstrass degree-two maps and both composition identities. The independent F5 oracle exhausts all 36 classes and all 1,296 ordered sums for one split-sextic fixture, including exceptional cases and both transfer compositions. The implementation and oracle do not cover larger primes, extension fields, nonsplit infinity, normalized-model maps, or the complete 22,243-row population. The bounded candidate sweeper likewise does not close this gate.",
           "evidence_refs": [],
           "obligation_id": "balanced-two-infinity-jacobian"
         },
@@ -268,7 +268,7 @@
           "required": true,
           "claim_status": "unknown",
           "scope": "A catalog-general binary norm handles every valid reduced class for all 174 binary cubic map rows and 150 representations at the 2026-11-18 live registry snapshot, including shared, nonsplit, repeated, and exceptional support, verifies degree-three composition, exports exact EC1/ICV1/HC1/CV1 bindings and certificates, and has a current cryptanalysis mirror/integration receipt.",
-          "rationale": "The native implementation handles arbitrary valid reduced classes for checked binary cubic covers and certifies degree-three composition and projectors, including exhaustive GF(8) and exact n=83 checks. It also checks named-generator injectivity and degree-inverse recovery when a declared annihilator is coprime to three, without claiming that annihilator is the exact or prime order. A local generator exercised all 174 binary map records and 150 named bindings, but its 467,669-byte corpus is unpublished and is not durable evidence. Draft cryptanalysis revision 010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2 is parity-bound to crypto revision 6cb5ab1edb141b48b9a9767fc63fe95ba1aac217, but final mirror CI and review remain open. The bounded sweeper is not an enumeration of all transfers. The separate GF(8) oracle uses production source-Jacobian addition. Independent source-law, durable catalog-wide differential replay, package publication, and any solver advantage remain open.",
+          "rationale": "The native implementation handles arbitrary valid reduced classes for checked binary cubic covers and certifies degree-three composition and projectors, including exhaustive GF(8) and exact n=83 checks. It also checks named-generator injectivity and degree-inverse recovery when a declared annihilator is coprime to three, without claiming that every declared annihilator is the exact or prime order. The frozen corpus at SHA-256 93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8 retains all 174 maps and 150 named bindings with zero failures, 102 proved exact-order records, and 48 unknown records. Draft cryptanalysis revision 010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2 is parity-bound to crypto revision 6cb5ab1edb141b48b9a9767fc63fe95ba1aac217, but final mirror CI and review remain open. The bounded sweeper is not an enumeration of all transfers. The separate GF(8) oracle uses production source-Jacobian addition. Independent binary source-law replay, package replay, and any solver advantage remain open.",
           "evidence_refs": [],
           "obligation_id": "arbitrary-binary-jacobian-norm"
         },
@@ -277,7 +277,7 @@
           "required": true,
           "claim_status": "unknown",
           "scope": "All 1,090 exact EC1/curve/map bindings at the 2026-11-18 live snapshot have exact order, image, kernel-intersection, composition, and recovery evidence: 150 binary degree-three bindings and 940 odd degree-two bindings, with separate membership hashes.",
-          "rationale": "The binary named-generator checks establish injectivity and recovery only for the generated subgroup under a checked coprime declared annihilator; they do not prove that annihilator is the exact order or prime, and the generated corpus is not yet a durable artifact. The 940 odd bindings, exact image orders, kernel intersections, independent replay, and all-live membership seals remain open. Generator-level checks alone do not establish every required all-element or exact-order claim.",
+          "rationale": "The frozen binary corpus establishes injectivity and recovery for all 150 recorded named generated subgroups under checked coprime declared annihilators, with zero failed records. It records proved exact-order evidence for 102 bindings and explicitly leaves 48 unknown; those unknown orders, all 940 odd bindings, exact image orders, kernel intersections beyond the recorded claim scope, and independent all-live replay remain open. Generator-level evidence does not establish every required all-element or exact-order claim.",
           "evidence_refs": [],
           "obligation_id": "catalog-subgroup-certificates"
         },
@@ -286,7 +286,7 @@
           "required": true,
           "claim_status": "unknown",
           "scope": "A mathematically independent implementation or pinned CAS agrees on all 486 fixed-GF(8) classes and their transfer identities, plus an exhaustive balanced genus-two fixture over an odd prime at most 31, including exceptional and shared-support cases.",
-          "rationale": "A pinned bounded GF(8) map-value oracle receipt is attached, but its source additions use the production Jacobian law. The odd transfer module has independent Fp2 pointwise norm checks for bounded F5/F7 fixtures, not an independent full divisor-class group law or a separately pinned CAS replay. No qualifying independent source group law is attached, so this combined gate remains open.",
+          "rationale": "The independent F5 oracle constructs and exhaustively checks a complete 36-class Picard group law and both transfer compositions without production balanced arithmetic, reduction, scalar multiplication, or target group law. This satisfies the odd-fixture portion for one exact curve only. The bounded GF(8) map-value oracle still uses production source-Jacobian addition, so no qualifying independent binary source group law is attached and the combined gate remains open.",
           "evidence_refs": [],
           "obligation_id": "independent-divisor-class-oracle"
         }
@@ -962,32 +962,32 @@
       "workstream_id": "WS2",
       "status": "open",
       "required": true,
-      "description": "Complete and independently review the bounded monic squarefree degree-six prime-field balanced arithmetic and direct-prime induced-map slice across all 22,243 odd map rows and 940 representations at the 2026-11-18 live snapshot, including larger primes, extension fields, nonsplit infinity, and normalized target models.",
-      "exit_evidence": "Exact live membership hashes; exhaustive supported small-field and all-live-row fixtures; exceptional and shared-support cases; map identities; extension-field and infinity-configuration coverage; and independent oracle agreement."
+      "description": "Extend the independently checked F5 direct-prime slice across all 22,243 odd map rows and 940 representations at the 2026-11-18 live snapshot, including larger primes, extension fields, nonsplit infinity, and normalized target models.",
+      "exit_evidence": "Exact live membership hashes; exhaustive supported small-field and all-live-row fixtures beyond the pinned F5 control; exceptional and shared-support cases; map identities; extension-field and infinity-configuration coverage; and independent oracle agreement across every claimed family."
     },
     {
       "id": "arbitrary-binary-jacobian-norm",
       "workstream_id": "WS2",
       "status": "open",
       "required": true,
-      "description": "Independently verify the implemented arbitrary valid-class binary Jacobian pushforward and declared-annihilator named-subgroup certificate for all 174 binary cubic map rows and 150 representations at the 2026-11-18 live snapshot, publish durable exact catalog-style object/map/certificate bindings, and close CI/review on the current draft aburan28/cryptanalysis parity mirror.",
-      "exit_evidence": "Independent tiny-field oracle agreement; exact all-live-row field/model coverage and membership hash; shared/nonsplit/repeated support, homomorphism, composition, and recovery receipts; explicit separation of declared annihilation from exact order; EC1/ICV1/HC1/CV1 linkage; durable corpus identity; final CI and review for cryptanalysis revision 010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2 or its reviewed successor; and replay from the packaged executable."
+      "description": "Independently replay the frozen 174-map/150-binding binary corpus and arbitrary valid-class Jacobian pushforward with a non-production source group law, close CI/review on the current draft aburan28/cryptanalysis parity mirror, and replay the exact corpus from the packaged executable.",
+      "exit_evidence": "Independent binary source-law agreement; exact frozen-corpus and all-live-row membership replay; shared/nonsplit/repeated support, homomorphism, composition, and recovery receipts; explicit separation of declared annihilation from exact order; final CI and review for cryptanalysis revision 010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2 or its reviewed successor; and replay from the packaged executable."
     },
     {
       "id": "catalog-subgroup-certificates",
       "workstream_id": "WS2",
       "status": "open",
       "required": true,
-      "description": "Produce durable exact map-bound subgroup and image certificates for all 1,090 EC1/curve/map bindings at the 2026-11-18 live snapshot: 150 binary and 940 odd, with distinct membership hashes; the local unpublished binary corpus does not discharge this obligation.",
-      "exit_evidence": "All-live-binding order/factor, nonzero image, exact image order, kernel intersection, composition, and recovery certificates, plus explicit unsupported records where the hypotheses are unavailable."
+      "description": "Complete the frozen binary certificate slice by resolving its 48 unknown exact-order records, then produce exact map-bound subgroup and image certificates for all 940 odd bindings at the 2026-11-18 live snapshot with distinct membership hashes.",
+      "exit_evidence": "All-live-binding order/factor, nonzero image, exact image order, kernel intersection, composition, and recovery certificates; independent replay of the frozen 102-proved/48-unknown binary split; and explicit unsupported records where the hypotheses are unavailable."
     },
     {
       "id": "independent-divisor-class-oracle",
       "workstream_id": "WS2",
       "status": "open",
       "required": true,
-      "description": "Obtain a non-circular full divisor-class and transfer reference implementation for the fixed-GF(8) fixture and at least one exhaustive balanced odd-prime genus-two fixture with p at most 31; embedded pointwise norm checks do not discharge the full group-law obligation.",
-      "exit_evidence": "Pinned independent code/CAS revision and differential replay receipts covering all 486 fixed-F8 classes, transfer identities, and the stated odd fixture including exceptional cases."
+      "description": "Retain the exhaustive independent 36-class F5 Picard oracle and obtain a non-circular full divisor-class and transfer reference implementation for the fixed-GF(8) fixture; the existing binary oracle still delegates source additions to production arithmetic.",
+      "exit_evidence": "Pinned independent code/CAS revision and differential replay receipts covering all 486 fixed-F8 classes and transfer identities, together with replay of the exhaustive F5 group table and exceptional cases."
     },
     {
       "id": "authoritative-ledger-identity",

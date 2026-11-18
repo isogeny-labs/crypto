@@ -280,9 +280,11 @@ jobs:
           cp "target/${{ matrix.target }}/release/curve_standards$ext" "dist/$name/"
           mkdir -p "dist/$name/docs/curves"
           cp docs/curves/registry.json docs/curves/covers.json docs/curves/cover-links.yaml \
+             docs/curves/traits.json \
              docs/curves/cover-links.schema.json docs/curves/COVERS.md docs/curves/ICV1.md \
              docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
              docs/curves/BINARY_SUBGROUP_TRANSFER_CERTIFICATES.md \
+             docs/curves/binary-subgroup-transfer-certificates.json \
              docs/curves/binary-subgroup-transfer-certificates.schema.json \
              docs/curves/CURVE_TRANSFER_SWEEP.md \
              docs/curves/hyperelliptic-infrastructure.schema.json \
@@ -312,7 +314,9 @@ jobs:
             for required in \
               docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
               docs/curves/BINARY_SUBGROUP_TRANSFER_CERTIFICATES.md \
+              docs/curves/binary-subgroup-transfer-certificates.json \
               docs/curves/binary-subgroup-transfer-certificates.schema.json \
+              docs/curves/traits.json \
               docs/curves/CURVE_TRANSFER_SWEEP.md \
               docs/curves/hyperelliptic-infrastructure.schema.json \
               docs/curves/cover-transfer-assessments.json \
@@ -338,7 +342,16 @@ jobs:
               | "./hyperelliptic-cover$ext" arithmetic --input - > arithmetic-smoke.json
             "./hyperelliptic-cover$ext" catalog-export \
               --registry docs/curves/registry.json --output catalog-smoke.json
+            "./hyperelliptic-cover$ext" transfer-catalog-verify \
+              --input docs/curves/binary-subgroup-transfer-certificates.json \
+              --registry docs/curves/registry.json \
+              --cover-graph docs/curves/cover-links.yaml \
+              --traits docs/curves/traits.json \
+              --expected-sha256 93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8 \
+              --expected-bytes 498477 \
+              --output transfer-catalog-replay.json
             node -e 'const fs=require("fs"); for(const file of ["verified-smoke.json","arithmetic-smoke.json"]){const r=JSON.parse(fs.readFileSync(file)); if(r.status!=="ok") process.exit(1)} const c=JSON.parse(fs.readFileSync("catalog-smoke.json")); if(c.schema_version!=="curve-covers/v1") process.exit(1);'
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-catalog-replay.json")); if(r.schema_version!=="binary-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_complete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.corpus.sha256!=="93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8"||r.corpus.bytes!==498477||r.summary.failed_named_subgroup_records!==0) process.exit(1);'
             "./ecdlp-audit$ext" verify-fixed-f8-order \
               --input docs/curves/fixed-f8-genus3-order-certificate.json \
               --repo-root . \
@@ -394,7 +407,7 @@ jobs:
                odd-transfer-sweep-request.json odd-transfer-sweep-smoke.json \
                odd-transfer-sweep-verify-smoke.json transfer-smoke.json \
                binary-generated-subgroup-smoke.json odd-transfer-smoke.json \
-               malformed-divisor-smoke.json
+               malformed-divisor-smoke.json transfer-catalog-replay.json
           )
           cd dist
           if [ "${{ runner.os }}" = "Windows" ]; then

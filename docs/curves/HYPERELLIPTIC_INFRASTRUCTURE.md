@@ -724,6 +724,10 @@ caller-supplied metadata; a successful same-implementation replay is not an
 independent execution attestation or a claim of exact order where the record
 still says unknown.
 
+For the tracked 2026-11-18 corpus, `CORPUS_SHA256` is
+`93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8`
+and `CORPUS_BYTES` is `498477`.
+
 For the 2026-11-18 graph, the expected bounded population is 174 binary map
 records, 147 maps with 150 named generator bindings, and 27 maps without a
 named subgroup input. A nonzero process exit accompanies any retained failed
