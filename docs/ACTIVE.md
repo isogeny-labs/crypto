@@ -40,6 +40,10 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [x] k-sum table build with x-only siblings at the last level (P2 KSUM-SIB): paired benchmark on the Table B curves, plus the P1 x(iP) recurrence probe (claude, started 2026-11-18, branch aburan28/inspiring-dijkstra-ay05qi, PR #4649): done; record close blocked by main's malformed 20261117T0334Z-hec-multi-production-cold.json
 
+- [ ] Table B k-sum: profile the cost split of the pruned k-sum arm and land the next measured lever (claude, started 2026-11-18, branch claude/f4-f5-algorithm-speed-bvp7qd, PR #4651)
+
+- [ ] Koblitz K1 small rows (n23/n29/n37): next lever on the generator-orbit IC arm, gap reported against both rho strong and v5 (claude, started 2026-11-18, branch claude/f4-f5-algorithm-speed-bvp7qd, PR #4651)
+
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
 - [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
