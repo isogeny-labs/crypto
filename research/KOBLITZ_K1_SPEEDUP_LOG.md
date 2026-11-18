@@ -26,7 +26,7 @@ Two rho references appear below:
 |:--|:--|:--|:--|:--|
 | n23 | sp-c4-d5 + lean_layout + sib + walk_sib=8 + ladder_verify + orbit_key_reuse | 0.927 [0.847, 1.020] / 1.237 / 2.577 (band unresolved) | 0.236 / 0.325 / 0.788 | koblitz_k1_sibwalk_20261118 (validation pending) |
 | n29 | gen-c1 + lean_layout + sib | 0.875 [0.775, 0.969] / 1.048 / 1.878 | 0.070 / 0.090 / 0.229 | koblitz_lean_sib_confirm_20261118 (validated, VAL-20261118-9a42f2) |
-| n37 | sp-c8-d5 + lean_layout + sib | 1.236 / 1.517 / 2.771 | 0.667 / 0.795 / 1.289 | koblitz_lean_sib_confirm_20261118 (validated, VAL-20261118-9a42f2) |
+| n37 | sp-c8-d5 + lean_layout + sib + walk_sib=8 + ladder_verify + orbit_key_reuse | 0.900 [0.825, 0.983] / 1.225 / 2.673 (band unresolved) | 0.516 / 0.683 / 1.327 | koblitz_n37_sibwalk_k8_20261118 (validation pending) [pcc:unverified] |
 
 These arms are a Frobenius- and negation-folded baby-step giant-step under the IC pipeline.
 That makes them a generic base, so they claim at T0 only. Their asymptotic ceiling is about
@@ -43,3 +43,4 @@ That makes them a generic base, so they claim at T0 only. Their asymptotic ceili
 | 2026-11-18 | koblitz_n29_orbit_levers_20261118 | lean_layout + sib + tau_verify (n29) | 0.713 / 0.614 / 0.487 | validated, VAL-20261118-43658a; tau_verify is not an improvement (count relabel), so it is excluded |
 | 2026-11-18 | koblitz_lean_sib_confirm_20261118 | lean_layout + sib, tau off (n23, n29, n37) | n23 0.770 / 0.753 / 0.720; n29 0.814 / 0.639 / 0.432; n37 0.703 / 0.732 / 0.796 | validated, VAL-20261118-9a42f2: passed on all 3 curves (12/12 cells each). At w = 1 the band prices each removed hash or curve check like a full group add; measured wall time per replicate is 0.79–0.93 of the incumbent |
 | 2026-11-18 | koblitz_k1_sibwalk_20261118 | sibling giant-step walk (walk_sib) + reuse of formed points (ladder_verify, orbit_key_reuse); k, m from a pilot | n23 0.703 / 0.787 / 0.966; n29 0.873 / 0.915 / 1.013; n37 (k 8 -> 9) 0.785 / 0.874 / 1.050 | n23 passed [pcc:unverified], validation pending; n29 failed at w = 1 (as predicted: walk neutral at w = 1, nothing to reuse); n37 failed at w = 1 (pilot's k = 9; derived k = 8 counterfactual 0.736 / 0.817 / 0.977, unmeasured) |
+| 2026-11-18 | koblitz_n37_sibwalk_k8_20261118 | same levers as koblitz_k1_sibwalk_20261118 at the incumbent k = 8, walk_sib = 8 fixed before data (no pilot), n37 only, fresh seeds | n37 0.724 [0.705, 0.745] / 0.808 [0.794, 0.823] / 0.977 [0.976, 0.979] | passed [pcc:unverified] (pooled and all 3 replicates; max upper 0.981), validation pending; matches the count model; gap to rho-v5 1.243 / 1.517 / 2.735 -> 0.900 / 1.225 / 2.673 (band unresolved, not below rho) |

@@ -1,0 +1,144 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-18T19:32:49+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/koblitz_n37_sibwalk_k8_20261118/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T19:29:40+00:00",
+      "wall_s": 43.625
+    }
+  ],
+  "commit": "624775314b5ece8dcf4927024c96a11f2a0adbb7",
+  "commit_dirty": false,
+  "created_utc": "2026-11-18T19:29:35+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/koblitz_n37_sibwalk_k8_20261118"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v595-x86_64-with-glibc2.39"
+  },
+  "id": "20261118T1929Z-koblitz-n37-sibwalk-k8",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "sw_over_ls_n37_w0",
+      "note": "pcc:unverified; primary, K1 n37, k=8 m=8, pooled 3 sessions; passed",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.705,
+        0.745
+      ],
+      "unit": "ratio",
+      "value": 0.724
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "sw_over_ls_n37_w0.1",
+      "note": "pcc:unverified; primary, K1 n37, k=8 m=8, pooled 3 sessions; passed",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.794,
+        0.823
+      ],
+      "unit": "ratio",
+      "value": 0.808
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "sw_over_ls_n37_w1",
+      "note": "pcc:unverified; primary, K1 n37, k=8 m=8, pooled 3 sessions; passed (max replicate upper 0.981)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.976,
+        0.979
+      ],
+      "unit": "ratio",
+      "value": 0.977
+    },
+    {
+      "baseline": 0.264,
+      "better": "lower",
+      "n": 432,
+      "name": "sw_s_n37_w0.1",
+      "note": "pcc:unverified; pooled band S at w=0.1; baseline ls; reference rho-strong (v5 0.174)",
+      "reference": 0.312,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.213
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "sw_over_rho_v5_n37_w0",
+      "note": "pcc:unverified; gap, not a gate; w=0.1 1.225, w=1 2.673; band unresolved",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.825,
+        0.983
+      ],
+      "unit": "ratio",
+      "value": 0.9
+    }
+  ],
+  "problem": "ecdlp:koblitz_small_rows_ic_gen_orbit",
+  "raw": [
+    {
+      "bytes": 36515,
+      "path": "research/koblitz_n37_sibwalk_k8_20261118/results.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/28/28a114d7d0677e1fbc9986713ed8181aaa99ffd719dd799003bbd0b6f76d3269",
+      "sha256": "28a114d7d0677e1fbc9986713ed8181aaa99ffd719dd799003bbd0b6f76d3269",
+      "uploaded": false
+    },
+    {
+      "bytes": 31636,
+      "path": "research/koblitz_n37_sibwalk_k8_20261118/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/de/de605fa551f20e0aae026b89cb6b5b8f17051426155f83638c1f9168f0494544",
+      "sha256": "de605fa551f20e0aae026b89cb6b5b8f17051426155f83638c1f9168f0494544",
+      "uploaded": false
+    },
+    {
+      "bytes": 31295,
+      "path": "research/koblitz_n37_sibwalk_k8_20261118/tables/records-n37.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7e/7e466c2144d1078d41e015da0281b23a6521eee052c57045894f08226694e22c",
+      "sha256": "7e466c2144d1078d41e015da0281b23a6521eee052c57045894f08226694e22c",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/koblitz_n37_sibwalk_k8_20261118/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/koblitz_n37_sibwalk_k8_20261118/figures/fig1-phases-band.svg",
+      "research/koblitz_n37_sibwalk_k8_20261118/figures/fig2-ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "koblitz-n37-sibwalk-k8",
+  "status": "measured",
+  "summary": "K1 n37: sibling walk k=8 m=8 + ladder_verify + orbit_key_reuse vs ls: 0.724/0.808/0.977 pooled, passed in all replicates [pcc:unverified]; validation pending",
+  "validation": null
+}
