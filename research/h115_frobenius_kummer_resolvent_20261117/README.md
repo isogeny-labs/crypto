@@ -42,6 +42,10 @@ Post-freeze proof artifacts:
 | `lake-manifest.json` | Resolved dependency graph | `05bb6c0943a46ac7b9afe4831996b3fcd2091949c7c8b9c085b5ea269f818dfb` |
 | `LEAN_PROOF_GATE.md` | Strict compile receipt and remaining obligations | self-hash intentionally omitted |
 | `IMPLEMENTATION_CLARIFICATIONS.md` | Pre-measurement extension, identity-control, torsion and serialization conventions | self-hash intentionally omitted |
+| `h115_sha256.rs` | Native SHA-256 and deterministic seed/digest primitive | `4d508fe8fed91c71e0150446c53f024ff97fa8a9519d812a672ea59ef2329786` |
+| `h115_field.rs` | Native extension-field, curve, torsion and irreducibility layer | `577015b44fae9828b9bddf1b2afc0403e4f44d732b3a01325f42253f0982cc82` |
+| `h115_producer.rs` | Frozen producer, controls, exact scoring and scalar-blind decoder | `f0644129c8d7c0161cbddac3283f94453983d25b6f6cdeaf327b170c1fc579bd` |
+| `PRODUCER_SOURCE_GATE.md` | Strict non-scoring compile/selftest receipt | self-hash intentionally omitted |
 
 The first post-freeze native check is structural only:
 
