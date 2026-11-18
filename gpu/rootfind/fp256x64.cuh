@@ -247,9 +247,44 @@ RF_HD U256x64 fp256_sqr(const Fp256Ctx &f, const U256x64 &a) { return fp256_mul(
 
 RF_HD U256x64 fp256_to_mont(const Fp256Ctx &f, const U256x64 &a) { return fp256_mul(f, a, f.r2); }
 
+/* Conversion from Montgomery form only needs REDC(a), not the generic
+ * 4x4 schoolbook product a * {1,0,0,0} followed by REDC.  Keep the
+ * CUDA path unchanged pending GPU validation.  The host specialization
+ * uses exactly the sparse P-256 reduction rounds of fp256_mul. */
 RF_HD U256x64 fp256_from_mont(const Fp256Ctx &f, const U256x64 &a) {
+#ifdef __CUDA_ARCH__
     U256x64 one = {{1, 0, 0, 0}};
     return fp256_mul(f, a, one);
+#else
+    uint64_t t[9] = {
+        a.v[0], a.v[1], a.v[2], a.v[3], 0, 0, 0, 0, 0
+    };
+    for (int i = 0; i < 4; ++i) {
+        /* pinv=1, p[0]=2^64-1, p[2]=0 for P-256. */
+        const uint64_t m = t[i];
+        uint64_t carry = m, lo, hi;
+        t[i] = 0;
+        u64_mac(t[i + 1], m, 0x00000000ffffffffull, carry, lo, hi);
+        t[i + 1] = lo;
+        carry = hi;
+        const uint64_t sum = t[i + 2] + carry;
+        carry = sum < t[i + 2];
+        t[i + 2] = sum;
+        u64_mac(t[i + 3], m, 0xffffffff00000001ull, carry, lo, hi);
+        t[i + 3] = lo;
+        carry = hi;
+        for (int k = i + 4; k < 9; ++k) {
+            const uint64_t s = t[k] + carry;
+            carry = s < t[k];
+            t[k] = s;
+        }
+    }
+    U256x64 r, s;
+    for (int i = 0; i < 4; ++i) r.v[i] = t[i + 4];
+    const uint64_t bw = u256_sbb(s, r, f.p);
+    u256_cmov(r, s, (t[8] & 1) | (bw ^ 1));
+    return r;
+#endif
 }
 
 /* Repeated squarings by a public constant; the compiler specializes
