@@ -43,10 +43,7 @@ fn main() {
         .and_then(|a| a.parse().ok())
         .unwrap_or(20261006);
     let class_filter: Option<String> = arguments.get(3).cloned();
-    let oracle: String = arguments
-        .get(4)
-        .cloned()
-        .unwrap_or_else(|| "s3".into());
+    let oracle: String = arguments.get(4).cloned().unwrap_or_else(|| "s3".into());
     if oracle != "s3" && oracle != "quartic" {
         eprintln!("oracle must be `s3` or `quartic`, got {oracle:?}");
         std::process::exit(2);

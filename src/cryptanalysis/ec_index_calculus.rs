@@ -1870,7 +1870,13 @@ fn ec_index_calculus_dlp_s4_staged_with(
     extra_relations: usize,
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
-    finder: fn(&CurveParams, &Point, &Point, &[FactorBaseEntry], usize) -> Option<(Relation, usize)>,
+    finder: fn(
+        &CurveParams,
+        &Point,
+        &Point,
+        &[FactorBaseEntry],
+        usize,
+    ) -> Option<(Relation, usize)>,
 ) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
     let total_started = Instant::now();
@@ -2177,7 +2183,16 @@ mod tests {
         let one = BigUint::one();
         let finalises = |i: usize, j: usize, k: usize| {
             try_finalise_s4(
-                &r, i, &fb[i].point, j, &fb[j].point, k, &fb[k].point, &curve, &one, &one,
+                &r,
+                i,
+                &fb[i].point,
+                j,
+                &fb[j].point,
+                k,
+                &fb[k].point,
+                &curve,
+                &one,
+                &one,
             )
             .is_some()
         };
@@ -2281,8 +2296,9 @@ mod tests {
         let g = curve.generator();
         let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
         let extra_relations = 64;
-        let quartic = ec_index_calculus_dlp_s4_staged(&curve, &g, &q, 10, extra_relations, 5000, 64)
-            .expect("quartic driver solves the tiny curve");
+        let quartic =
+            ec_index_calculus_dlp_s4_staged(&curve, &g, &q, 10, extra_relations, 5000, 64)
+                .expect("quartic driver solves the tiny curve");
         let anchored =
             ec_index_calculus_dlp_s4_s3_staged(&curve, &g, &q, 10, extra_relations, 5000, 64)
                 .expect("anchored driver solves the tiny curve");
