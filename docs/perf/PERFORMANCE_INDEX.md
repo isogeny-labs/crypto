@@ -458,3 +458,18 @@ there is worth.
 | setting | result | decision |
 |:--|:--|:--|
 | `lto = "fat"`, `codegen-units = 1` (2026-09-26, crypto, bool_gb + gf2_la kernels, 3 paired rounds) | no kernel reliably faster; `gf2_la/rref_random_2048` 0.77× (slower); area indices 1.005× / 0.769×; build 3 min | rejected: the default profile stays |
+
+## Integrity checks for paired comparisons
+
+The comparison refuses empty, duplicate or mismatched selected kernel rosters
+and changed kernel areas before measured invocations. Select an explicitly
+matching workload on both sides rather than silently dropping missing kernels.
+Every kernel must have the same positive paired-round count across baseline
+and candidate, across kernels, and across A/A repeats when supplied. Recorded
+round IDs must be complete and in order. Timing/instruction values must be
+finite and positive with nonempty output fingerprints. Selected area weights
+must be finite, nonnegative, and have a positive sum. These checks prevent zip
+truncation and bootstrap truncation from changing the requested comparison.
+
+Run synthetic regression checks (no benchmark launches) with:
+`python3 -m unittest discover -s scripts/perf -p test_perfindex.py`.

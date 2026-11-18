@@ -1,0 +1,73 @@
+{
+  "schema": "two-candidate-inputs/v1",
+  "tiny_fields": [
+    {
+      "n": 2,
+      "modulus": 7,
+      "bases": [
+        [
+          2
+        ]
+      ]
+    },
+    {
+      "n": 3,
+      "modulus": 11,
+      "bases": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ]
+    },
+    {
+      "n": 4,
+      "modulus": 19,
+      "bases": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ]
+    }
+  ],
+  "tiny_target": "first lexicographic oncurve(z,y),A0/B1,zoutsideV; retainalladmittedh andallk",
+  "tiny_quadratics": "allRHS andalloriginalu",
+  "actual_fixture": "research/advance/instances/n83-d18-m5-T001-offset0.json",
+  "actual_h": "0x4208336d0d441df79c400",
+  "actual_k": [
+    0,
+    1
+  ],
+  "repetitions": 3,
+  "order": [
+    [
+      "gaussian",
+      "direct"
+    ],
+    [
+      "direct",
+      "gaussian"
+    ],
+    [
+      "gaussian",
+      "direct"
+    ]
+  ],
+  "raw_parameter_state_cap": 60000,
+  "predicate_cap": 200000,
+  "worker_seconds": 90,
+  "memory_mb": 4096,
+  "cores": 1,
+  "original_auxiliary_recovery": false,
+  "qualified_speedup": null,
+  "novelty_claim": false,
+  "known_affine_rank_one_overlap": true,
+  "new_source_coverage_claim": false
+}

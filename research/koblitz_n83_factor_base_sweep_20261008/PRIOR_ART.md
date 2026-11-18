@@ -24,6 +24,17 @@ The source-availability comparison in `SOLVER_GATES.md` describes the pinned pre
 | `RESEARCH_ECC2K130_IC_FEASIBILITY.md` and `docs/ic/PLAN_IC_ACCOUNTING_FIXES_20261007.md` | Higher-arity proposals, implicit-index limits and corrections to total-cost extrapolations | Keep counts, empirical fits, proposed arities and end-to-end evidence separate |
 | `docs/ic/boundary_targets.json` | Fail-closed evidence, distinct timing classes and promotion gates | No promotion from this construction panel or a compatibility count |
 
+A later separate `a=1` N83 stream reached a five-point Tier 1 cold holdout
+at commit `f3159b8c190f8ceefab53fe2b3e3559ee3f7f80b` in
+`research/n83_e2e_holdout_20261016/RESULT.md`. Its K1104 and K1120
+root-index arms completed construction, relation rank and public-target
+verification, with mean cold processes of 120.227 and 119.826 seconds.
+The 0.401-second paired difference did not pass its frozen selection rule.
+That curve has a 53-bit subgroup, different field polynomial and distinct
+public points; neither its relation rate nor its observed base ordering transfers
+to this study's `a=0`, 81-bit subgroup. It is useful prior art for cold
+phase accounting, exact candidate identity and a fail-closed holdout.
+
 ## Earlier N83 geometric-subspace comparator
 
 The repository also contains a directly relevant **different factor-base representation** that must be accounted for before extending the retained-orbit SAT search. `build_standard_subspace_factor_base` in `koblitz_index_calculus.rs` enumerates rational points whose *source* x-coordinate lies in a standard polynomial subspace. Its dimension-18 K0 instance has 261,447 geometric points, 261,444 nonidentity points after cofactor-four projection and 130,722 sign-folded columns. The exact five-summand chained-S3 system uses 90 source-coordinate bits, 339 Boolean variables and 332 equations; it does not need the retained-orbit bases' explicit 83-bit finite-coordinate domain clauses. These facts and the planted arithmetic check are retained in [the dimension-18 result](../f6_n83_fivesum_d18_20261005/RESULT.md). The source subspace is not Frobenius-invariant, so signing and cofactor projection do not turn its 130,722 columns into the K=2,048 retained base's 2,048 signed-Frobenius columns for free.

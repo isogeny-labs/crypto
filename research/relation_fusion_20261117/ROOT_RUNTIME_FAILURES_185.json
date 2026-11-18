@@ -1,0 +1,377 @@
+{
+  "standing": "unsigned diagnosis of every observed failure in partial165; no full-suite pass",
+  "observed_failures": [
+    {
+      "test": "binary_ecc::f2m::tests::flt_inverse_tally_includes_all_squarings",
+      "exit": "Some(101)",
+      "panic_location": "thread 'binary_ecc::f2m::tests::flt_inverse_tally_includes_all_squarings' (178787) panicked at src/binary_ecc/f2m.rs:1397:17:",
+      "stderr_sha256": "3d2685437bf8ecbd350ed6fffe60d995ee27887520dd268fef3ecfd83b95d435",
+      "stdout_sha256": "29b179dc5c13982cb9d9e721127af334b1190b98cbcfe36ecd46580706e343bc",
+      "stderr_excerpt": "\nthread 'binary_ecc::f2m::tests::flt_inverse_tally_includes_all_squarings' (178787) panicked at src/binary_ecc/f2m.rs:1397:17:\nassertion `left == right` failed\n  left: 11\n right: 7\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "binary_ecc::f2m::tests::operation_tally_counts_batched_squares_and_inversion_internals",
+      "exit": "Some(101)",
+      "panic_location": "thread 'binary_ecc::f2m::tests::operation_tally_counts_batched_squares_and_inversion_internals' (178790) panicked at src/binary_ecc/f2m.rs:1539:9:",
+      "stderr_sha256": "4f79e33505291ce3eeb9a1fd2a543e27d438d7888545866a567404ce7e4803bb",
+      "stdout_sha256": "8bce6e6aaaea64306e761e3a506e2b3f199a3ae778c93567cc24fe3819510710",
+      "stderr_excerpt": "\nthread 'binary_ecc::f2m::tests::operation_tally_counts_batched_squares_and_inversion_internals' (178790) panicked at src/binary_ecc/f2m.rs:1539:9:\nassertion `left == right` failed\n  left: Some(10)\n right: Some(5)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "binary_ecc::f2m::tests::square_k_times_tally_matches_repeated_squaring",
+      "exit": "Some(101)",
+      "panic_location": "thread 'binary_ecc::f2m::tests::square_k_times_tally_matches_repeated_squaring' (178793) panicked at src/binary_ecc/f2m.rs:1363:21:",
+      "stderr_sha256": "9db41897d698bb678934c4d6f4c13dda39d0011be1c23c934bf2953d18f76524",
+      "stdout_sha256": "ea477e98d0214915f334705ece6c64f7e73705e344d58d851b34b74da68c0d77",
+      "stderr_excerpt": "\nthread 'binary_ecc::f2m::tests::square_k_times_tally_matches_repeated_squaring' (178793) panicked at src/binary_ecc/f2m.rs:1363:21:\nassertion `left == right` failed: degree 8, k=1\n  left: {\"f2m8_square\": 2}\n right: {\"f2m8_square\": 1}\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::binary_semaev_chain_sat::provenance::initial::tests::actual_checked_chain_snapshot_and_mutations",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::binary_semaev_chain_sat::provenance::initial::tests::actual_checked_chain_snapshot_and_mutations' (178796) panicked at src/cryptanalysis/binary_semaev_chain_initial.rs:462:85:",
+      "stderr_sha256": "a42897e29663fe1fbf5063e83d4b0daaeffb84b698081f5d5b9121d3a20aa9d6",
+      "stdout_sha256": "1de7b3fd1ad64b27f65cbadff0f7623c507a6f4a728b19d5ee31cbf55c401a45",
+      "stderr_excerpt": "\nthread 'cryptanalysis::binary_semaev_chain_sat::provenance::initial::tests::actual_checked_chain_snapshot_and_mutations' (178796) panicked at src/cryptanalysis/binary_semaev_chain_initial.rs:462:85:\ncalled `Result::unwrap()` on an `Err` value: Clause\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::binary_semaev_chain_sat::provenance::initial::tests::actual_native_insertion_edge_cases_and_sparse_xor_masks",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::binary_semaev_chain_sat::provenance::initial::tests::actual_native_insertion_edge_cases_and_sparse_xor_masks' (178799) panicked at src/cryptanalysis/binary_semaev_chain_initial.rs:553:90:",
+      "stderr_sha256": "efb9d78dc5070ca9e905635e91771db88e16cdae3addfc397eaaabccdaaa8079",
+      "stdout_sha256": "ff426234a57142ecf2fb8312a111d8204b1ccbebbd4120a44c2dd5ef5f7c1030",
+      "stderr_excerpt": "\nthread 'cryptanalysis::binary_semaev_chain_sat::provenance::initial::tests::actual_native_insertion_edge_cases_and_sparse_xor_masks' (178799) panicked at src/cryptanalysis/binary_semaev_chain_initial.rs:553:90:\ncalled `Result::unwrap()` on an `Err` value: Clause\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar' (178802) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:",
+      "stderr_sha256": "ceb67ef3c306ea94c2e38da93a5e4f0919072a8868d28d4cf4416c772f5de0a9",
+      "stdout_sha256": "576f0faee9e6b69dddc0809087997113469fbab12f3b19f99232956b766ee87f",
+      "stderr_excerpt": "\nthread 'cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar' (178802) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:\ntracked gpu/certicom source must be materialized\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures' (178805) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:",
+      "stderr_sha256": "14647897561330f6b7c27f90d93aee3052a1d68e27637650ef8b2e5db556277d",
+      "stdout_sha256": "038a679416601ba6161f3f64d7259ad71eab0a8648dcf56fff0102de7ec2b30a",
+      "stderr_excerpt": "\nthread 'cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures' (178805) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:\ntracked gpu/certicom source must be materialized\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic' (178808) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:",
+      "stderr_sha256": "13e70282e3c9ca07c5a82c9e92f29872cb1661712c98793f6fcaa85fc5919a7b",
+      "stdout_sha256": "4fd68da39a23822b9e99cebeb1d72c66d8d1067aaab02e0947fa0707042283a9",
+      "stderr_excerpt": "\nthread 'cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic' (178808) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:\ntracked gpu/certicom source must be materialized\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver' (178811) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:",
+      "stderr_sha256": "7724b6b3ee8c774f494a0ae95fd96819b497c0a015e2e83885d8706e8e3483e4",
+      "stdout_sha256": "2af10cc784bfccb53b3deb1b86a4a0931a7271095896cadcd0a0b20f842f0882",
+      "stderr_excerpt": "\nthread 'cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver' (178811) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:\ntracked gpu/certicom source must be materialized\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed' (178814) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:",
+      "stderr_sha256": "7fd48397dc6c65409168c74f49f408a86e4b9d2d91bb1fa2681a296169838a0b",
+      "stdout_sha256": "e24a4e983275fb3efe9ea10a62b072c724edeebfdceaac2475a1bca3354a9648",
+      "stderr_excerpt": "\nthread 'cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed' (178814) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:\ntracked gpu/certicom source must be materialized\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::curve_traits::query::tests::committed_catalog_uses_current_schema_and_binds_its_inputs",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::curve_traits::query::tests::committed_catalog_uses_current_schema_and_binds_its_inputs' (178817) panicked at src/cryptanalysis/curve_traits/query.rs:194:9:",
+      "stderr_sha256": "da2a4b6da951060df3761c7069494a32a1e0f2bf55e1078fbff54f29a67d8328",
+      "stdout_sha256": "a913e8f2328c78a0eeba028bd91962066ccedc9f7dff6754da6c36f43c8001cb",
+      "stderr_excerpt": "\nthread 'cryptanalysis::curve_traits::query::tests::committed_catalog_uses_current_schema_and_binds_its_inputs' (178817) panicked at src/cryptanalysis/curve_traits/query.rs:194:9:\nassertion `left == right` failed\n  left: \"8620a2255c2e6620c18c7420b6518ab558ff0a4027c526f7315693573d26cee2\"\n right: \"1756da58b7c3a6f7dd26517b245fbcfddc29b725f64d6b35a29fd2a5c70d303b\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::curve_traits::tests::extension_registry_preserves_field_and_subgroup_records",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::curve_traits::tests::extension_registry_preserves_field_and_subgroup_records' (178820) panicked at src/cryptanalysis/curve_traits/mod.rs:2345:9:",
+      "stderr_sha256": "451674e1bfef559aab3b24286232894237eb63e79c23bbb3954fe6014b150203",
+      "stdout_sha256": "33bc78fc89019e63359b84746f202cac7e9e7dfbf770d54662f2395e7e8ea2e0",
+      "stderr_excerpt": "\nthread 'cryptanalysis::curve_traits::tests::extension_registry_preserves_field_and_subgroup_records' (178820) panicked at src/cryptanalysis/curve_traits/mod.rs:2345:9:\nassertion `left == right` failed\n  left: 1405\n right: 1343\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::band::tests::default_band_differs_from_the_committed_file_by_the_insert_term_only",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::band::tests::default_band_differs_from_the_committed_file_by_the_insert_term_only' (178823) panicked at src/cryptanalysis/ecbench/band.rs:1200:67:",
+      "stderr_sha256": "8e9e05f1a7d724ea2ccee3ce905a3d58ed4dfc5e2a37b809574ade324b6e67ad",
+      "stdout_sha256": "85c59a66695a6f5e9fc69e1b31c2c1ebe7dacd042dd01d91e2f75c5564374aeb",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::band::tests::default_band_differs_from_the_committed_file_by_the_insert_term_only' (178823) panicked at src/cryptanalysis/ecbench/band.rs:1200:67:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::band::tests::field_multiplication_lookalikes_are_classed_or_excluded",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::band::tests::field_multiplication_lookalikes_are_classed_or_excluded' (178826) panicked at src/cryptanalysis/ecbench/band.rs:1614:9:",
+      "stderr_sha256": "a53a592849ad914e0f6fdc0335ec2586dcd7e8248281152e642a9b0bea160dab",
+      "stdout_sha256": "f6b82b81e013b93ebd88457263d06fe1f44460639b8ac9a4a5b6431c315efaac",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::band::tests::field_multiplication_lookalikes_are_classed_or_excluded' (178826) panicked at src/cryptanalysis/ecbench/band.rs:1614:9:\ncounter names that look like field multiplications or squarings are in neither FIELD_ARITHMETIC_COUNTERS nor FIELD_ARITHMETIC_EXCLUSIONS: [\n    \"f4_field_muls_uncharged (first seen in /workspace/relation-fusion-live/src/cryptanalysis/twist_ic_pipeline.rs)\",\n    \"matrix_multiply_subtracts_uncharged (first seen in /workspace/relation-fusion-live/src/cryptanalysis/ecbench/orbit_ic.rs)\",\n]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::band::tests::pre_2026_11_08_pricing_reproduces_the_committed_targetwalk_band_file",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::band::tests::pre_2026_11_08_pricing_reproduces_the_committed_targetwalk_band_file' (178829) panicked at src/cryptanalysis/ecbench/band.rs:1200:67:",
+      "stderr_sha256": "418426b65442edfbb01256f7a7a4ce8e78457ddcde59dbd805f6daf88be998d9",
+      "stdout_sha256": "0a09080538efb37367eacd2825e8701b5f092004625da8a2ad24efff245c21b5",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::band::tests::pre_2026_11_08_pricing_reproduces_the_committed_targetwalk_band_file' (178829) panicked at src/cryptanalysis/ecbench/band.rs:1200:67:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::band::tests::pricing_table_work_charges_the_walk_arms_and_resolves_the_rho_rank",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::band::tests::pricing_table_work_charges_the_walk_arms_and_resolves_the_rho_rank' (178832) panicked at src/cryptanalysis/ecbench/band.rs:1200:67:",
+      "stderr_sha256": "2f2d6049684a8ad10917b5c43c745e77d9dcc58c9e89bec6146e3648dc66e91f",
+      "stdout_sha256": "4695d5965a11444d1914a782820e31e56ff6f06b81836c510b3fa28454771b09",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::band::tests::pricing_table_work_charges_the_walk_arms_and_resolves_the_rho_rank' (178832) panicked at src/cryptanalysis/ecbench/band.rs:1200:67:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::band::tests::records_without_w_cal_replay_unchanged_and_compare_is_additive",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::band::tests::records_without_w_cal_replay_unchanged_and_compare_is_additive' (178835) panicked at src/cryptanalysis/ecbench/band.rs:1656:42:",
+      "stderr_sha256": "ad14c8a337adf9f1ebba53ae5d54ec48ebf95bdc8f6279b6bce604dbfaf3ea8b",
+      "stdout_sha256": "e2988e5879a464434c4aa1a5b880199608168fcecf7f8f829573d5f2822155d1",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::band::tests::records_without_w_cal_replay_unchanged_and_compare_is_additive' (178835) panicked at src/cryptanalysis/ecbench/band.rs:1656:42:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ic_planner_validation_20261020/sessions/c24/session.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::band::tests::table_work_without_its_counted_marker_is_not_charged",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::band::tests::table_work_without_its_counted_marker_is_not_charged' (178838) panicked at src/cryptanalysis/ecbench/band.rs:1200:67:",
+      "stderr_sha256": "0453967336139716cc6b4839461bdbac745d8ab04e5290906c6d290a65739b52",
+      "stdout_sha256": "f7cd65b55834da3a1dc4d9e0222c06f1bfe361a04705fc7649c20d0c999bba94",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::band::tests::table_work_without_its_counted_marker_is_not_charged' (178838) panicked at src/cryptanalysis/ecbench/band.rs:1200:67:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::band::tests::without_w_cal_the_band_output_is_unchanged_on_committed_records",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::band::tests::without_w_cal_the_band_output_is_unchanged_on_committed_records' (178841) panicked at src/cryptanalysis/ecbench/band.rs:1490:67:",
+      "stderr_sha256": "996aae7537cbe991492be84330cd5f7a2b93ca1ae9705187bc1f90fbb567fa71",
+      "stdout_sha256": "11da4d8800e98ed6c56cb12d4a2039548c47fca35f0e5d815281526209593669",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::band::tests::without_w_cal_the_band_output_is_unchanged_on_committed_records' (178841) panicked at src/cryptanalysis/ecbench/band.rs:1490:67:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ic_planner_validation_20261020/sessions/c24/records.jsonl: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload' (178844) panicked at src/cryptanalysis/ecbench/bounds.rs:2746:10:",
+      "stderr_sha256": "9d23281ea46a5033148c3c106d37a41733f81913266f97cfb394bc630aadc6e3",
+      "stdout_sha256": "03e3a584cb57023d1d983f6a8f8d4bd9b0c4ca92844730fcde87a14d0a970b8d",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload' (178844) panicked at src/cryptanalysis/ecbench/bounds.rs:2746:10:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ecbench_all_candidates_20261003/audit-prime.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible' (178847) panicked at src/cryptanalysis/ecbench/bounds.rs:2704:10:",
+      "stderr_sha256": "b3beb9cd71ebd16993f7cafcca10916db5682bee51e522d37406886787db329e",
+      "stdout_sha256": "dc79bc9925789839f85be4a3c0d71ce03985fb03c24cb570efca8998ccc5dfef",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible' (178847) panicked at src/cryptanalysis/ecbench/bounds.rs:2704:10:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ecbench_all_candidates_20261003/audit-koblitz.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::a_weighted_version_2_fit_carries_the_same_pricing_band",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::bounds::tests::a_weighted_version_2_fit_carries_the_same_pricing_band' (178850) panicked at src/cryptanalysis/ecbench/bounds.rs:2802:14:",
+      "stderr_sha256": "cb9d1954f9b2a7a6c0680580ed018e59ed6e33c06f2a360997077e9087ed1ab5",
+      "stdout_sha256": "6a3e20aa4c31ba2851bca9db63249dbce2ad7960931eed954f67102b3b0d83d5",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::bounds::tests::a_weighted_version_2_fit_carries_the_same_pricing_band' (178850) panicked at src/cryptanalysis/ecbench/bounds.rs:2802:14:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ecbench_all_candidates_20261003/audit-prime.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples' (178853) panicked at src/cryptanalysis/ecbench/bounds.rs:2610:10:",
+      "stderr_sha256": "b1c75962052e51969309a0c138d0ce5d8b24442c2d838eae4621104b22200c00",
+      "stdout_sha256": "b9bc5ab7f3a1f4f8505499f3f1dc7202541a97b91a9db3da9d0a129f32914bea",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples' (178853) panicked at src/cryptanalysis/ecbench/bounds.rs:2610:10:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ecbench_all_candidates_20261003/audit-prime.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version' (178856) panicked at src/cryptanalysis/ecbench/bounds.rs:2818:38:",
+      "stderr_sha256": "f1f2c4b19822a68cc1bd5fdb8cd27d4b3443bf1cd818ff918fbcde03af9f4d5a",
+      "stdout_sha256": "a62ca0745f964e6f7fd7e12aaae01bd556c78c91629f028a4de74706603fb805",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version' (178856) panicked at src/cryptanalysis/ecbench/bounds.rs:2818:38:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/docs/bounds/records/challenge-prime-toy-reference-e1-bsgs-negation.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band' (178859) panicked at src/cryptanalysis/ecbench/bounds.rs:2774:10:",
+      "stderr_sha256": "d35acf34730021accfcf5bbcf5dcefc81d5bc1461ea2f6a300f3d70a6448567e",
+      "stdout_sha256": "9fd603c1988dbdd2c2b86ae48b48b71575c1812279aa3a9f9437044620f35f42",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band' (178859) panicked at src/cryptanalysis/ecbench/bounds.rs:2774:10:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ecbench_all_candidates_20261003/audit-prime.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::challenge::tests::a_procedure_2_verdict_carries_the_calibrated_block_only_with_w_cal",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::challenge::tests::a_procedure_2_verdict_carries_the_calibrated_block_only_with_w_cal' (178862) panicked at src/cryptanalysis/ecbench/challenge.rs:2324:14:",
+      "stderr_sha256": "d0f52452132a049d44797a58f9ac5c32bd3c1e5b428e0ccda80967b6a7a02d2b",
+      "stdout_sha256": "5fa49fb96b16b7014dd142f708011c062ee794bfd76c21ba48785471386317ac",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::challenge::tests::a_procedure_2_verdict_carries_the_calibrated_block_only_with_w_cal' (178862) panicked at src/cryptanalysis/ecbench/challenge.rs:2324:14:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/docs/bounds/challenges/prime-toy-reference.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::challenge::tests::an_invalid_w_cal_sidecar_leaves_a_procedure_1_verdict_unchanged",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::challenge::tests::an_invalid_w_cal_sidecar_leaves_a_procedure_1_verdict_unchanged' (178865) panicked at src/cryptanalysis/ecbench/challenge.rs:2324:14:",
+      "stderr_sha256": "9a74d0bc935134e390c3bc419b47ade9c1391ed46eb62673f472956efab0046e",
+      "stdout_sha256": "6b3d6a3f6f07ec5a16eff5b2737b24fbd4715e1337007264039d63142a32332e",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::challenge::tests::an_invalid_w_cal_sidecar_leaves_a_procedure_1_verdict_unchanged' (178865) panicked at src/cryptanalysis/ecbench/challenge.rs:2324:14:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/docs/bounds/challenges/prime-toy-reference.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::challenge::tests::the_committed_procedure_1_verdicts_re_derive_byte_for_byte",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::challenge::tests::the_committed_procedure_1_verdicts_re_derive_byte_for_byte' (178868) panicked at src/cryptanalysis/ecbench/challenge.rs:2410:22:",
+      "stderr_sha256": "ad424285e5f80ecdbfa8d2bd83f3c40b1fa402ec7e1cc06aba53b6f11891eba0",
+      "stdout_sha256": "426f116969a98c16bb6bbef59199240181fb1abc548b1dbf4eb6e2f9d9e0438a",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::challenge::tests::the_committed_procedure_1_verdicts_re_derive_byte_for_byte' (178868) panicked at src/cryptanalysis/ecbench/challenge.rs:2410:22:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/docs/bounds/challenges/prime-toy-reference.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2' (178871) panicked at src/cryptanalysis/ecbench/challenge.rs:2304:10:",
+      "stderr_sha256": "163510cb16353c24a12076217e47672f9f674f78b7625cdc58af1528f5047c01",
+      "stdout_sha256": "5514268bf4e0d99d8a0478d1c3c475382d1e6e81232d5b40fd74c84f2f10adab",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2' (178871) panicked at src/cryptanalysis/ecbench/challenge.rs:2304:10:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ecbench_bounds_challenges_20261006/verdict-prime-toy-reference-e1.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload' (178874) panicked at src/cryptanalysis/ecbench/claim.rs:2572:10:",
+      "stderr_sha256": "a6d2ce3b29ecf72567ba584fc1c2aa877c81aabf71aaaf1918beefb8f23b0f1a",
+      "stdout_sha256": "0e7a0eaa8ef984828088b5407216e54b8ee3952e94f61b2d975b0cc0541c43f7",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload' (178874) panicked at src/cryptanalysis/ecbench/claim.rs:2572:10:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup' (178877) panicked at src/cryptanalysis/ecbench/claim.rs:2572:10:",
+      "stderr_sha256": "01f4844ad41dca0be8bf31bb5fa269a5adf90c0d4f770f1a20ce183801a01e61",
+      "stdout_sha256": "645b0212dd39fc4cb6b96d069cb5174d47eeab995bcb0f173d14290130a8b2f9",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup' (178877) panicked at src/cryptanalysis/ecbench/claim.rs:2572:10:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::compare::tests::default_and_pre_2026_11_08_readings_differ_in_the_band_and_the_id_only",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::compare::tests::default_and_pre_2026_11_08_readings_differ_in_the_band_and_the_id_only' (178880) panicked at src/cryptanalysis/ecbench/compare.rs:2814:81:",
+      "stderr_sha256": "939ff33bb6ca31dcd89f3c02e80062d7a435789c0beeadc7c5aebca06411bd4b",
+      "stdout_sha256": "5d56458f5cf2cff24c03ce88089a670f603ea99a96879874b631e23f987f08a4",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::compare::tests::default_and_pre_2026_11_08_readings_differ_in_the_band_and_the_id_only' (178880) panicked at src/cryptanalysis/ecbench/compare.rs:2814:81:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/session.json: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::hashed_native::tests::native_selector_and_partial_recover_and_replay_deterministic_counts_with_exclusive_clocks",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::hashed_native::tests::native_selector_and_partial_recover_and_replay_deterministic_counts_with_exclusive_clocks' (178883) panicked at src/cryptanalysis/ecbench/hashed_native.rs:523:13:",
+      "stderr_sha256": "5923d4f2103565498ac80598f6693281f9e0786c708b3530b3f0a1b65b9101cb",
+      "stdout_sha256": "6f647e48c4de2a0f354606b3fe169b9ef2d2851824b01c54e43038d8b2c5f60f",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::hashed_native::tests::native_selector_and_partial_recover_and_replay_deterministic_counts_with_exclusive_clocks' (178883) panicked at src/cryptanalysis/ecbench/hashed_native.rs:523:13:\nassertion `left == right` failed\n  left: Null\n right: \"target_validation\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files' (178886) panicked at src/cryptanalysis/ecbench/koblitz_descent.rs:1043:74:",
+      "stderr_sha256": "e9801d6b329f5471223dc1a7a866b614c217322fee4ab03fef7a7fcfaa46581c",
+      "stdout_sha256": "64ab0bbb78fde7bc86b2a7c0caa70eaa57be35141b4387e3b085bbabbd66ae1b",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files' (178886) panicked at src/cryptanalysis/ecbench/koblitz_descent.rs:1043:74:\n/workspace/relation-fusion-live/research/ic_tool_program/rule/v8/runs/k0n41/T01.params.json: No such file or directory (os error 2)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::methods::registry_audit_tests::every_registered_method_is_run_skipped_or_exempt_and_its_phases_sum",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::methods::registry_audit_tests::every_registered_method_is_run_skipped_or_exempt_and_its_phases_sum' (178889) panicked at src/cryptanalysis/ecbench/registry_audit_tests.rs:704:5:",
+      "stderr_sha256": "71e0c0b7a3b658a8f21fe8a3461316eefb2d5cd067c4c02ca6b530777877c067",
+      "stdout_sha256": "f4fb08b1fc704f110ef74ad04a1c51c79dd87cf51d2427baac794e68059e8b85",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::methods::registry_audit_tests::every_registered_method_is_run_skipped_or_exempt_and_its_phases_sum' (178889) panicked at src/cryptanalysis/ecbench/registry_audit_tests.rs:704:5:\n\nhec.ic_fb_walk: registered but neither a case nor a skip (add it to CASES, or to SKIPS with a reason)\nhec.rho_full_width: registered but neither a case nor a skip (add it to CASES, or to SKIPS with a reason)\nic.hashed_native_v1: registered but neither a case nor a skip (add it to CASES, or to SKIPS with a reason)\n\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::optimization::tests::every_live_method_and_parameter_has_an_optimization_policy",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::optimization::tests::every_live_method_and_parameter_has_an_optimization_policy' (178897) panicked at src/cryptanalysis/ecbench/optimization.rs:1287:35:",
+      "stderr_sha256": "ec3dcd86b2dfae67915fbb247fc9a3e364b387908c43eae41c8761b1deb3683d",
+      "stdout_sha256": "262597547a522791127f5ef715c5edeaa003ca40dfb13b0edfc274bce47bb62d",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::optimization::tests::every_live_method_and_parameter_has_an_optimization_policy' (178897) panicked at src/cryptanalysis/ecbench/optimization.rs:1287:35:\ncalled `Result::unwrap()` on an `Err` value: \"optimization policy/registry mismatch; missing=[\\\"hec.ic_fb_walk\\\", \\\"hec.rho_full_width\\\", \\\"ic.hashed_native_v1\\\"], stale=[\\\"ic.curve25519_pair_v1\\\", \\\"rho.curve25519_bounded\\\"]\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::optimization::tests::koblitz_batch_tuning_keeps_seed_and_resource_cap_out_of_the_grid",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::optimization::tests::koblitz_batch_tuning_keeps_seed_and_resource_cap_out_of_the_grid' (178900) panicked at src/cryptanalysis/ecbench/optimization.rs:1314:35:",
+      "stderr_sha256": "9dd9ee8191507c9eddbfb3f66f8021eba8e9d282f32e0124ca388e185813b121",
+      "stdout_sha256": "5abd3186f4b13eb15dac4e2b619dbca5a64bc47729a61e3f355f88f2fad3f222",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::optimization::tests::koblitz_batch_tuning_keeps_seed_and_resource_cap_out_of_the_grid' (178900) panicked at src/cryptanalysis/ecbench/optimization.rs:1314:35:\ncalled `Result::unwrap()` on an `Err` value: \"optimization policy/registry mismatch; missing=[\\\"hec.ic_fb_walk\\\", \\\"hec.rho_full_width\\\", \\\"ic.hashed_native_v1\\\"], stale=[\\\"ic.curve25519_pair_v1\\\", \\\"rho.curve25519_bounded\\\"]\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::orbit_ic::tests::deterministic_pair_cap_preserves_incomplete_setup_work",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::orbit_ic::tests::deterministic_pair_cap_preserves_incomplete_setup_work' (178903) panicked at src/cryptanalysis/ecbench/orbit_ic.rs:523:10:",
+      "stderr_sha256": "48dbfe51eeca19cca67c1292e619a20018241aac103472a1fc2d9901aed40c62",
+      "stdout_sha256": "60cff93dd7fc0a9c06a57c38aebafbc1052550d180a73a18ca1b9cc6d0c3ab30",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::orbit_ic::tests::deterministic_pair_cap_preserves_incomplete_setup_work' (178903) panicked at src/cryptanalysis/ecbench/orbit_ic.rs:523:10:\ncalled `Result::unwrap()` on an `Err` value: \"unknown method `ic.orbit_rank_v1`; known: rho.three_leads_plain_v1, rho.three_leads_negation_v1, rho.three_leads_jacobian_v1, ic.three_leads_genus2_v2, ic.three_leads_genus2_v1, ic.three_leads_decomposition_v2, ic.three_leads_decomposition_v1, ic.prime_orbit_relations_v1, ic.aps_v3, ic.aps_v2, ic.aps_v1, ic.three_leads_genus2_pencil_symbolic_v3, ic.three_leads_genus2_pencil_symbolic_v2, ic.three_leads_genus2_choice2_v1, ic.three_leads_genus2_projective_chart_v1, ic.three_leads_genus2_target_rank_v1, rho.three_leads_plain_v1, rho.three_leads_negation_v1, rho.three_leads_jacobian_v1, ic.three_leads_genus2_v2, ic.three_leads_genus2_v1, ic.three_leads_decomposition_v2, ic.three_leads_decomposition_v1, rho.plus_model_v1, rho.best2_model_v1, rho.frozen_reference, rho.plain, rho.negation, rho.negation_strong, rho.multitarget_pooled, ic.residual_batch, ic.residual_batch_v2, rho.preprocessing, ic.k4_gaudry, rho.cubic, rho.quartic, rho.frobenius_orbit, rho.gls, rho.signed_frob"
+    },
+    {
+      "test": "cryptanalysis::ecbench::orbit_ic::tests::exact_and_quotient_collectors_recover_and_replay_same_points",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::orbit_ic::tests::exact_and_quotient_collectors_recover_and_replay_same_points' (178906) panicked at src/cryptanalysis/ecbench/orbit_ic.rs:523:10:",
+      "stderr_sha256": "8cd67ed5b4186558685751da63fb288cf7cb429749a058977413e8ecaf85d849",
+      "stdout_sha256": "d6370cea620228bd6acd23e376345bde7777b756b3a1a8127eb6792bd4f6119e",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::orbit_ic::tests::exact_and_quotient_collectors_recover_and_replay_same_points' (178906) panicked at src/cryptanalysis/ecbench/orbit_ic.rs:523:10:\ncalled `Result::unwrap()` on an `Err` value: \"unknown method `ic.orbit_rank_v1`; known: rho.three_leads_plain_v1, rho.three_leads_negation_v1, rho.three_leads_jacobian_v1, ic.three_leads_genus2_v2, ic.three_leads_genus2_v1, ic.three_leads_decomposition_v2, ic.three_leads_decomposition_v1, ic.prime_orbit_relations_v1, ic.aps_v3, ic.aps_v2, ic.aps_v1, ic.three_leads_genus2_pencil_symbolic_v3, ic.three_leads_genus2_pencil_symbolic_v2, ic.three_leads_genus2_choice2_v1, ic.three_leads_genus2_projective_chart_v1, ic.three_leads_genus2_target_rank_v1, rho.three_leads_plain_v1, rho.three_leads_negation_v1, rho.three_leads_jacobian_v1, ic.three_leads_genus2_v2, ic.three_leads_genus2_v1, ic.three_leads_decomposition_v2, ic.three_leads_decomposition_v1, rho.plus_model_v1, rho.best2_model_v1, rho.frozen_reference, rho.plain, rho.negation, rho.negation_strong, rho.multitarget_pooled, ic.residual_batch, ic.residual_batch_v2, rho.preprocessing, ic.k4_gaudry, rho.cubic, rho.quartic, rho.frobenius_orbit, rho.gls, rho.signe"
+    },
+    {
+      "test": "cryptanalysis::ecbench::orbit_ic::tests::exact_n83_witness_lifts_with_coefficients_past_u64",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::orbit_ic::tests::exact_n83_witness_lifts_with_coefficients_past_u64' (178909) panicked at src/cryptanalysis/ecbench/orbit_ic.rs:523:10:",
+      "stderr_sha256": "54b5d2b9bcba6b3a2de9adec2d90187098cd5a653615b9816e9ac854d3436764",
+      "stdout_sha256": "5edda0a4993ba276cbcc6366d13038f51baa138b04b49633246fd7283cbd2290",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::orbit_ic::tests::exact_n83_witness_lifts_with_coefficients_past_u64' (178909) panicked at src/cryptanalysis/ecbench/orbit_ic.rs:523:10:\ncalled `Result::unwrap()` on an `Err` value: \"unknown method `ic.orbit_rank_v1`; known: rho.three_leads_plain_v1, rho.three_leads_negation_v1, rho.three_leads_jacobian_v1, ic.three_leads_genus2_v2, ic.three_leads_genus2_v1, ic.three_leads_decomposition_v2, ic.three_leads_decomposition_v1, ic.prime_orbit_relations_v1, ic.aps_v3, ic.aps_v2, ic.aps_v1, ic.three_leads_genus2_pencil_symbolic_v3, ic.three_leads_genus2_pencil_symbolic_v2, ic.three_leads_genus2_choice2_v1, ic.three_leads_genus2_projective_chart_v1, ic.three_leads_genus2_target_rank_v1, rho.three_leads_plain_v1, rho.three_leads_negation_v1, rho.three_leads_jacobian_v1, ic.three_leads_genus2_v2, ic.three_leads_genus2_v1, ic.three_leads_decomposition_v2, ic.three_leads_decomposition_v1, rho.plus_model_v1, rho.best2_model_v1, rho.frozen_reference, rho.plain, rho.negation, rho.negation_strong, rho.multitarget_pooled, ic.residual_batch, ic.residual_batch_v2, rho.preprocessing, ic.k4_gaudry, rho.cubic, rho.quartic, rho.frobenius_orbit, rho.gls, rho.signed_frobeniu"
+    },
+    {
+      "test": "cryptanalysis::ecbench::orbit_ic::tests::same_collector_recovers_with_wide_field_and_scalar_types",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::orbit_ic::tests::same_collector_recovers_with_wide_field_and_scalar_types' (178912) panicked at src/cryptanalysis/ecbench/orbit_ic.rs:523:10:",
+      "stderr_sha256": "8367c22a3ca32109eee4671d896848843c1dc4162c4bd4e9e7dd6102950c5c00",
+      "stdout_sha256": "379cc871c6ef0a45844bd98be2a6c4cc77e93a1f3f040569decb0cd22bd95424",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::orbit_ic::tests::same_collector_recovers_with_wide_field_and_scalar_types' (178912) panicked at src/cryptanalysis/ecbench/orbit_ic.rs:523:10:\ncalled `Result::unwrap()` on an `Err` value: \"unknown method `ic.orbit_rank_v1`; known: rho.three_leads_plain_v1, rho.three_leads_negation_v1, rho.three_leads_jacobian_v1, ic.three_leads_genus2_v2, ic.three_leads_genus2_v1, ic.three_leads_decomposition_v2, ic.three_leads_decomposition_v1, ic.prime_orbit_relations_v1, ic.aps_v3, ic.aps_v2, ic.aps_v1, ic.three_leads_genus2_pencil_symbolic_v3, ic.three_leads_genus2_pencil_symbolic_v2, ic.three_leads_genus2_choice2_v1, ic.three_leads_genus2_projective_chart_v1, ic.three_leads_genus2_target_rank_v1, rho.three_leads_plain_v1, rho.three_leads_negation_v1, rho.three_leads_jacobian_v1, ic.three_leads_genus2_v2, ic.three_leads_genus2_v1, ic.three_leads_decomposition_v2, ic.three_leads_decomposition_v1, rho.plus_model_v1, rho.best2_model_v1, rho.frozen_reference, rho.plain, rho.negation, rho.negation_strong, rho.multitarget_pooled, ic.residual_batch, ic.residual_batch_v2, rho.preprocessing, ic.k4_gaudry, rho.cubic, rho.quartic, rho.frobenius_orbit, rho.gls, rho.signed_fr"
+    },
+    {
+      "test": "cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars' (178915) panicked at src/cryptanalysis/ecbench/runner.rs:2787:57:",
+      "stderr_sha256": "12d7ce9d02d783c46403880092ea8aa0bab8c0a06abd387c3ef5dadb19414e0b",
+      "stdout_sha256": "60a6cb389fc597bdf75c01b13090f5e48f5275af63819f6119b3b6c7cd27caea",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars' (178915) panicked at src/cryptanalysis/ecbench/runner.rs:2787:57:\ncalled `Result::unwrap()` on an `Err` value: \"No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure' (178918) panicked at src/cryptanalysis/ecbench/runner.rs:2828:57:",
+      "stderr_sha256": "cd2b86f4b50c46e5bad100bb80a4a978ae27511cb17e614416ddb620b1c3f469",
+      "stdout_sha256": "fc6e95eb504efdba4fa9ec021f603066e68648b88b38f84f8cb77d9b392ac230",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure' (178918) panicked at src/cryptanalysis/ecbench/runner.rs:2828:57:\ncalled `Result::unwrap()` on an `Err` value: \"No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::work::tests::committed_blocks_read_with_the_target_aware_split",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::work::tests::committed_blocks_read_with_the_target_aware_split' (178921) panicked at src/cryptanalysis/ecbench/work.rs:2593:78:",
+      "stderr_sha256": "6c3fdfdab65e5dfa421972f7321b0883a3c40d47c496e09a76c1b6f494539cd5",
+      "stdout_sha256": "eb26004d37aeacbeb1746e0c84cc045fa7e074b7b9550988f90adce949af6e15",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::work::tests::committed_blocks_read_with_the_target_aware_split' (178921) panicked at src/cryptanalysis/ecbench/work.rs:2593:78:\ncalled `Result::unwrap()` on an `Err` value: \"/workspace/relation-fusion-live/research/bitop_ladder_20261019/sessions/holdout-P24/records.jsonl: No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::workload::tests::registered_prime_curve_resolves_its_slug_and_ec1",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::workload::tests::registered_prime_curve_resolves_its_slug_and_ec1' (178924) panicked at src/cryptanalysis/ecbench/workload.rs:2573:9:",
+      "stderr_sha256": "c266945ca65b731b252409b571f5334d617e7e849f4b8a9f80018f15e68fef20",
+      "stdout_sha256": "b1733169b33fcf33275e7b6e8aa2137d3ecdcb37439d7f4bfbbf286854d28489",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::workload::tests::registered_prime_curve_resolves_its_slug_and_ec1' (178924) panicked at src/cryptanalysis/ecbench/workload.rs:2573:9:\nassertion failed: w.curve.registered\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "test": "cryptanalysis::ecbench::workload::tests::registry_entry_matches_the_full_parse",
+      "exit": "Some(101)",
+      "panic_location": "thread 'cryptanalysis::ecbench::workload::tests::registry_entry_matches_the_full_parse' (178927) panicked at src/cryptanalysis/ecbench/workload.rs:2458:63:",
+      "stderr_sha256": "dfe4c94f01e7e9c196c8e0f838e208c1ea06b38a56b0be3f24e0eabc2a972e35",
+      "stdout_sha256": "f4c043591d408f5f9743d1f4012c40a4ff7275ea46d2172d6118b2c60795ef60",
+      "stderr_excerpt": "\nthread 'cryptanalysis::ecbench::workload::tests::registry_entry_matches_the_full_parse' (178927) panicked at src/cryptanalysis/ecbench/workload.rs:2458:63:\nicv1-f2m7-t13-616700dd not found\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    }
+  ],
+  "raw_root": "/workspace/root-failure-rechecks-177",
+  "frozen_elf": "ROOT_UNIT_BUILD_OUTCOME_176.json",
+  "new_source_fix": "SOURCE_CHECKS_180.json",
+  "all_raw_stderr_retained": true
+}

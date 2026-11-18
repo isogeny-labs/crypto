@@ -1,0 +1,660 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "VIETA-SPEEDUP-FIBER-QUALIFICATION-20261117",
+  "version": 1,
+  "created": "2026-11-17",
+  "repository": "crypto",
+  "study_dir": "research/vieta_coset_rust_20261115/speedup-20261117",
+  "authors": [
+    "Codex"
+  ],
+  "question": "Actual tiny export and exact-set qualification of root-enabled candidate; no performance inference.",
+  "claims": [
+    {
+      "id": "C-output",
+      "class": "exact_computation",
+      "text": "Complete relation arrays match scalar oracle; AA counts equal and positive query counts double including fresh query table setup.",
+      "decided_by": [
+        "C-pipeline",
+        "C-positive"
+      ]
+    },
+    {
+      "id": "C-local-goal",
+      "class": "comparative",
+      "text": "Only descriptive local goal: complete cold reference/candidate >=2 for every retained pair and subgroup native median-bootstrap lower>=2, conditional on sampled targets and controls; no L2 or independently signed claim.",
+      "decided_by": [
+        "C-pipeline"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "newton",
+      "role": "baseline",
+      "description": "newton: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "fast",
+      "role": "baseline",
+      "description": "fast: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "fiber-half",
+      "role": "candidate",
+      "description": "fiber-half: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "fiber-half-aa",
+      "role": "control_negative",
+      "description": "fiber-half-aa: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "fiber-half-double",
+      "role": "control_positive",
+      "description": "fiber-half-double: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "lookup-fast",
+      "role": "reference",
+      "description": "lookup-fast: explicit opt-in candidate root flag; all arms freshly build complete certified base. Root shortcut only fiber arms, no change to reference GCD/roots.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/fiber/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "977f9a015e2c6327f6ef079278fe451176291e2559bab68274760994777b037a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "fiber-half-double",
+      "expected_detection": "Complete sets match; query primitive multiplication count exactly2x with independent root/table setup per query. Retained subgroup diagnostic query-time median double/single in[1.5,2.5]; otherwise local timing detection invalid.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "fiber-half-aa",
+      "null_population": {
+        "description": "Same algorithm/field/target/seed in fresh process; the same AA panel supplies nuisance null, not a separate independent sample.",
+        "generator": "New exec per arm, fixed source/config/target/budgets.",
+        "n": 6,
+        "why_n": "Engineering repeat panel only; same AA panel supplies nuisance null, no independent significance/power claim.",
+        "matched_on": [
+          "field",
+          "curve",
+          "representation",
+          "m",
+          "target",
+          "seed",
+          "binary",
+          "budgets"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "field_backend",
+        "levels": [
+          "legacy",
+          "shared"
+        ]
+      },
+      {
+        "name": "polynomial_product",
+        "levels": [
+          "karatsuba",
+          "ntt128"
+        ]
+      },
+      {
+        "name": "gcd",
+        "levels": [
+          "euclid",
+          "half"
+        ]
+      },
+      {
+        "name": "query_repetitions",
+        "levels": [
+          1,
+          2
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "vieta",
+          "lookup"
+        ]
+      },
+      {
+        "name": "small_root_backend",
+        "levels": [
+          "generic",
+          "closed_linear_quadratic"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "representation_field_and_m",
+        "treatment": "crossed",
+        "value": [
+          [
+            "word62",
+            "coset",
+            256
+          ],
+          [
+            "p224",
+            "coset",
+            128
+          ],
+          [
+            "p224",
+            "rational",
+            64
+          ]
+        ],
+        "how": "Keep configurations separate. Rational fixtures are Mobius conjugates of squaring, not auxiliary-isogeny search benchmarks. Word62 has no prime-order subgroup assertion; P224 standard curve."
+      },
+      {
+        "name": "target_population",
+        "treatment": "crossed",
+        "value": [
+          "seeded-random-abscissa",
+          "conditioned-sum"
+        ],
+        "how": "Alternating inputs, same exact target across all arms; identity separate."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One immutable native release binary, locked dependencies, one CPU.",
+        "how": "Source/build/binary/analysis hashes recorded before calls."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "value": "six-arm Williams order0,1,5,2,4,3 shifted across6retained inputs, warmup first positive first",
+        "how": "Exact frozen source schedule;6retained rounds balance arm positions,2warmups excluded. No resampling."
+      },
+      {
+        "name": "host_environment",
+        "treatment": "measured",
+        "how": "Unmodified isolated_bench CPU4; missing PSI/unmovable host threads mean below-L2 clocks."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded descriptive native analyzer",
+        "how": "Raw per-input values/ranges retained; no statistical significance test."
+      },
+      {
+        "name": "construction_backend",
+        "treatment": "fixed",
+        "value": "KaratsubaNewton construction in all arms; fiber uses NTT128 and exact small roots, including complete certificate/base work.",
+        "how": "All full descriptor, sibling-fiber certification, full point base and required lookup hash set are charged per one query. Query separately clears transform table cache; double control pays twice. Native field ctor primitive ops unpriced but full elapsed includes it."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-pipeline",
+        "arms": [
+          "newton",
+          "fiber-half"
+        ],
+        "design": "factorial",
+        "differs_in": [
+          "field_backend",
+          "polynomial_product",
+          "gcd",
+          "small_root_backend"
+        ]
+      },
+      {
+        "id": "C-shared-pipeline",
+        "arms": [
+          "fast",
+          "fiber-half"
+        ],
+        "design": "factorial",
+        "differs_in": [
+          "polynomial_product",
+          "gcd",
+          "small_root_backend"
+        ]
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "fiber-half",
+          "fiber-half-aa"
+        ],
+        "design": "aa",
+        "differs_in": []
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "fiber-half",
+          "fiber-half-double"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "query_repetitions"
+        ]
+      },
+      {
+        "id": "C-lookup",
+        "arms": [
+          "lookup-fast",
+          "fiber-half"
+        ],
+        "design": "absolute",
+        "differs_in": [
+          "method"
+        ],
+        "threshold": "Describe complete cold ratio only; no scalar DLP or fastest-external claim."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Exact config JSON seed, SplitMix draws as source. Indexed sums use offset96; root seed0x53555000+i, cert42/representative3. Prior-target manifest SHA256b5f6521381dafe0eb4c5f851df79f133d5495ae0ca92801ff488e8c2eef8dfb0. No collision resampling. All retained targets differ from current calibration and prior9c662 input manifest; warmups also checked."
+    },
+    "instance_sampling": {
+      "rule": "[('word62', 'coset', 256), ('p224', 'coset', 128), ('p224', 'rational', 64)];2retained+0warmups/config; alternating populations; conditioned pair index uses i+96, config seeds below. prior-targets.json rejects any saved prior target without resampling; failed input retained and run stops.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit unblinded deterministic descriptive analysis frozen before data; no inferential selection or posthoc dispatch.",
+      "unmasked_at": null
+    },
+    "arm_order_reason": "Six-arm Williams sequence, each arm each retained position once. Warmups first positive first. Deterministic source schedule frozen before targets."
+  },
+  "sample_size": {
+    "instances": 3,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": false,
+      "note": "Fixed engineering repeat,3retained targets per population/config. Not powered for inferential population claims. Conditional bootstrap4096 replicates and all observed values/ranges; no p-values, no pooling or posthoc selection. Calibration separate."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 30,
+      "per_sample_seconds": 100,
+      "threads": 1,
+      "estimated_total_seconds": 180,
+      "measured_on": "Prior immutable NTT calibration bounds baseline/runtime; new candidate may fail, all outcomes retained. Budget covers duplicated word size conservatively; no extension/retry."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "muls",
+        "name": "Query primitive field multiplications",
+        "unit": "field multiplications",
+        "kind": "counted",
+        "definition": "Existing evaluator query_work.muls includes inverse/sqrt internals. Shared backend constructor/precomputation timed inside cold but its primitive operations are unpriced; do not call fast cold counters complete.",
+        "source": "row.query_work.muls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "relations",
+        "name": "Complete ordered relations",
+        "unit": "point pairs",
+        "kind": "exact",
+        "definition": "Complete ordered pair array and SHA compared across all arms, then native BigUint scalar replay.",
+        "source": "row.relations and row.result_sha256",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "elapsed",
+        "name": "Local diagnostic cold/query elapsed intervals",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "Cold begins before field construction/precomputation, curve/input encoding, certified descriptor/full point base/index and query; query separate. Profiler disabled. Local belowL2 diagnostics only, no admitted speedup.",
+        "source": "row.cold_ns and row.query_ns",
+        "aggregation": "per_row",
+        "resolution": "monotonic Instant, actual host resolution recorded",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "adds",
+      "muls",
+      "inversions",
+      "square_roots",
+      "polynomial_products",
+      "polynomial_divisions",
+      "split_attempts",
+      "group_adds",
+      "membership_lookups",
+      "karatsuba_nodes",
+      "newton_divisions",
+      "half_gcd_nodes",
+      "half_gcd_batches",
+      "rational_map_steps",
+      "certified_fibers"
+    ],
+    "record": [
+      "source_revision",
+      "binary_sha256",
+      "rustc",
+      "cpu_model",
+      "kernel",
+      "SMT",
+      "NUMA",
+      "memory",
+      "PSI",
+      "affinity",
+      "co_tenants",
+      "interruptions",
+      "isolation",
+      "A/A",
+      "failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": [
+        4
+      ],
+      "max_memory_gib": 8,
+      "cloud_spend_usd": 0,
+      "git_only_checkpoint_authorized": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 180,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "3 configs*9arms*2inputs=54 calls, no retries. Per-stage60s/4e9muls, worker135s, configuration300s, outer900s. Shared field setup inside outer/worker cold interval."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Wrong complete set or first positive failure stops; preserve failed/missing cells. Ordinary budget failures retained; later arms continue."
+    }
+  ],
+  "decision_rule": {
+    "text": "Qualification: exact outputs/export only, no performance inference.",
+    "comparison_ids": [
+      "C-pipeline",
+      "C-shared-pipeline",
+      "C-positive",
+      "C-lookup"
+    ],
+    "statistic": "Native per-row counts and descriptive paired summaries; never pool fields/representations/populations or selection with primary.",
+    "interval": "Native4096 conditional median-bootstrap95 plus all observed values/ranges; n3 per subgroup, no population significance inference.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Reference/candidate query and complete cold ratios; AA count1x/double2x; no p-values or exponent claim.",
+    "verdict_vocabulary": [
+      "descriptive_only",
+      "local_goal_observed_unverified",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "fiber/analysis.rs",
+      "sha256": "4e91ff145fce60f9da889de9f36a8e317f235270dc7b1f068794460361639940"
+    },
+    "inputs": [
+      "runs/fiber-qualification/*/cell-*.json"
+    ],
+    "outputs": [
+      "evidence/fiber-qualification-summary.json",
+      "evidence/fiber-qualification-replay.json",
+      "export-fiber-qualification.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "Launch before source/binary/analysis/protocol Git publication",
+    "Change seeds/matrix/limits/analysis/repeats after affected calls",
+    "Pool populations/configurations/identities or calibration with main",
+    "Omit full construction or treat lookup setup as free",
+    "Promote diagnostic clocks to L2 or counters to wall speedup",
+    "Drop failures/timeouts/missing/warmups",
+    "Call Mobius-Kummer fixtures auxiliary-isogeny search costs",
+    "Self-sign general degree argument or claim complete formal tower instantiation",
+    "Paid/cloud experiments or local S3 operations"
+  ],
+  "literature": [
+    {
+      "ref": "FLINTv3.3.1 src/nmod_poly/hgcd.c and src/gr_poly/hgcd.c; src/cryptanalysis/isogeny_eval/poly.rs; ic_framework/prime_tower.rs",
+      "provenance": "retrieved",
+      "claim": "Standard recursive polynomial half reduction, counted multiplication and normalized Velu-map source assumptions. No novelty claim.",
+      "verified_by": "Producer primary/internal source read; KB MCP/wrapper unavailable."
+    },
+    {
+      "ref": "TRANSFORM_PLAN.md",
+      "provenance": "internal",
+      "claim": "Owner GS/CT schedule and FLINT primary docs; NTT-admissible primes only; exact root-order/naive product tests, no novelty claim."
+    },
+    {
+      "ref": "FIBER_PLAN.md",
+      "provenance": "internal",
+      "claim": "Exact quadratic formula, exhaustive finite-field root tests, unchanged full-splitting/pole/coprimality checks; general degree argument unverified."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "af1b1dfcf6f1a7cbd014ce19972c91ac3fec72473755dd4e213eaa66be7d8d8f",
+    "commit": "25801fa04bc647be4ae7fa457d8a7615be7dfa0d",
+    "frozen_at": "2026-11-17T08:28:45Z",
+    "filed_before_affected_data": true
+  },
+  "invalidation_rules": [
+    "Exact set mismatch invalidates instrument; all failures retained.",
+    "No profiler time or belowL2 clock promoted to admitted speedup.",
+    "Shared field constructor core counters incomplete; full cold timer includes it."
+  ],
+  "extensions": {
+    "panel": "fiber-qualification",
+    "matrix": [
+      [
+        "word62",
+        "coset",
+        256
+      ],
+      [
+        "p224",
+        "coset",
+        128
+      ],
+      [
+        "p224",
+        "rational",
+        64
+      ]
+    ],
+    "planned_calls": 36,
+    "fixed_candidate": "fiber-half",
+    "ntt_threshold": 128,
+    "ntt_max_length": 2097152,
+    "generator_candidates": [
+      2,
+      64
+    ],
+    "target_offset": 96,
+    "forbidden_targets": {
+      "path": "prior-targets.json",
+      "sha256": "b5f6521381dafe0eb4c5f851df79f133d5495ae0ca92801ff488e8c2eef8dfb0"
+    },
+    "all_arms_full_base_inside_cold": true,
+    "native_field_setup_primitives_unpriced": true,
+    "query_root_and_table_ops_counted": true,
+    "no_paid_cloud": true,
+    "no_local_s3": true,
+    "primary_timing_standing": "belowL2 diagnostic; goal not independently established"
+  }
+}

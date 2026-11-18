@@ -1,0 +1,20 @@
+proc require104(int ok,string tag){if(!ok){print("LEADING104_FATAL "+tag);exit;}}
+ring localFiber104=2,(l,y),dp;short=0;
+execute(read("input104.sing"));
+require104(f104==y^7+y^3 && G104==l^16+l^8+1,"R101_SOURCE_FIBER");
+ideal sourceIdeal104=f104,G104;ideal sourceGB104=std(sourceIdeal104);
+require104(vdim(sourceGB104)==112,"SOURCE_ORDER_DIMENSION112");
+require104(H104!=0 && reduce(H104,sourceGB104)==H104,"NONZERO_STANDARD_RESIDUE");
+require104(changed104!=H104 && reduce(changed104,sourceGB104)!=H104,"CHANGED_RESIDUE_REJECTED");
+poly q104=l^2+l+1;ideal qIdeal104=q104;qIdeal104=std(qIdeal104);
+poly y0Residue104=reduce(subst(H104,y,0),qIdeal104);
+poly y1Residue104=reduce(subst(H104,y,1),qIdeal104);
+require104(subst(y0Residue104,y,0)==y0Residue104 && subst(y1Residue104,y,0)==y1Residue104,"RESIDUES_UNIVARIATE");
+link output104="ASCII:w leading104.sing";open(output104);
+write(output104,"poly H104="+string(H104)+";");
+write(output104,"poly y0Residue104="+string(y0Residue104)+";");
+write(output104,"poly y1Residue104="+string(y1Residue104)+";");
+close(output104);
+print("LEADING104_RESULT terms=22 y0="+string(y0Residue104)+" y1="+string(y1Residue104));
+print("LEADING104_ALL_CHECKS_PASS");
+quit;

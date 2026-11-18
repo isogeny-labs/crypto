@@ -1,0 +1,111 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-n83-selector-export-20261019-free",
+  "experiment_id": "n83-selector-export-20261019",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "commit": "cbe8e44da5ac0a792922d746368882a3b8f40170",
+  "receipt": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free.receipt.json",
+  "binds": [
+    {
+      "path": "/home/ec2-user/scratch/n83-selector-export-20261019/runner-target/release/n83-sweep-runner",
+      "sha256": "27ef233dc65849292b9fe6f5dc35455bcf4317a55020dfa36118865caa24b753"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-selector-export-20261019/specs/free.json",
+      "sha256": "95a840e5ae3fa49451d5bf4e52a5e8cdfb2cad584e02fb51b62463b484ec110d"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-sat-boundary-20261019/worker-target/release/examples/koblitz_n83_free_selector_export_control",
+      "sha256": "9f8a1f05939d580e8cd2cbbb81f863d4e91c5f29f5d35ca61e60b065e9e03f13"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/bin/docker",
+      "sha256": "be7b67b49e885cf85867da63de8fae7021178b89e056c97dce34707657fd3d54"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-selector-export-20261019/PROTOCOL.md",
+      "sha256": "dac9db8b26db662747979533f55ea8297676447dcaea0fa374c9c60eef9019e5"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/examples/koblitz_n83_free_selector_export_control.rs",
+      "sha256": "29f4bb29eeb38ffd905e3c6041687f800d2a9c23e08d63b8eb70c5d80fb795fe"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/src/cryptanalysis/sat.rs",
+      "sha256": "0c6a1230df392a9810b253595a9be2124e34ebeca485f347d240ec34d7703ede"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/audit.json",
+      "sha256": "5a3ced0b5a37669bc4dbe994e6e674a694eaa2de10c0962b9e83d5f24825f548"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-sat-boundary-20261019/pinned.transport-corrected.assessment.json",
+      "sha256": "059024f7395e4cbee9954350c1d163ad0e3cd9646af7fe0391759d5e830db764"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/inputs/witness/domains.json",
+      "sha256": "63accc5b9dc9de6327c5b07e93b3e62717f8376a96c3f91f7bb70b77095f23bb"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/inputs/witness/fixture.json",
+      "sha256": "fc203db28eed0164e47b0c755c3d9a09f80df1acd5e4c7e09dfe172fa5f0a538"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures/probe-corpus.json",
+      "sha256": "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures/probe-validation.json",
+      "sha256": "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f"
+    }
+  ],
+  "must_not_exist": [
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free.stdout",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free.stderr",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free.receipt.json"
+  ],
+  "commands": [
+    {
+      "id": "free-selector-export",
+      "argv": [
+        "/home/ec2-user/scratch/n83-selector-export-20261019/runner-target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-selector-export-20261019/specs/free.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free"
+      ],
+      "timeout_seconds": 240,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free.stdout",
+      "stderr": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free.stderr",
+      "outputs": [
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free/audit.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free/config.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free/custody.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free/outer.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free/inspect-live.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free/inspect-final.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free/stderr.log",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free/stdout.log",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/free/spec.json"
+      ]
+    }
+  ],
+  "bus_address": "executor-mechanical-n83-selector-export",
+  "background": false,
+  "write_scope": [
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v5/"
+  ],
+  "stop_when": [
+    "Native card validation refuses execution.",
+    "A bound digest differs or the pinned commit differs from HEAD.",
+    "The command fails or exceeds its deadline.",
+    "A declared output is missing."
+  ],
+  "notes": "Separate post-solve export workload using bound prior pinned audit and transport-corrected assessment as gate. No other task builds or tests during observation. Preserve v4 stopped admission, original positive and failed transport records. Missing export, invalid replay or censoring leaves the positive gate unresolved. No retries or performance claims.",
+  "native_path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/bin:/home/ec2-user/.cargo/bin:/home/ec2-user/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+}

@@ -1,0 +1,39 @@
+{
+  "note": "Observed tool results before the managed workspace restart. Temporary process logs not already archived were lost during the restart; these are tool-result receipts, not reconstructed raw logs. Final release, Clippy and type-check logs were rerun and retained separately.",
+  "catalog_sha256": {
+    "traits": "2268c6d68074c363752479ed69b481438ea91388a7bdf4a380de59ed71cd02bb",
+    "jacobian": "dd4eff994178639a5cbda8131d5b2a6dd5aa19a766c1259e6606d1fb988b7c3b"
+  },
+  "checks": [
+    {
+      "command": "RAYON_NUM_THREADS=2 target/release/curve_traits check",
+      "exit_code": 0,
+      "observed_output": "docs/curves/traits.json is current\n"
+    },
+    {
+      "command": "RAYON_NUM_THREADS=2 target/release/jacobian_transfers check",
+      "exit_code": 0,
+      "observed_output": "docs/curves/jacobian-transfers.json is current\n"
+    },
+    {
+      "command": "RAYON_NUM_THREADS=2 target/release/curve_traits check --traits /tmp/regression-repair-traits-altered.json",
+      "validator_exit_code": 1,
+      "wrapper_exit_code": 0,
+      "observed_output": "/tmp/regression-repair-traits-altered.json is stale: run `cargo run --release --bin curve_traits -- build --budget 262144`\nexit status: 1; expected: 1\n"
+    },
+    {
+      "command": "RAYON_NUM_THREADS=2 target/release/jacobian_transfers check --report /tmp/regression-repair-jacobian-altered.json",
+      "validator_exit_code": 1,
+      "wrapper_exit_code": 0,
+      "observed_output": "/tmp/regression-repair-jacobian-altered.json is stale: run `cargo run --release --bin jacobian_transfers -- build --budget 200000`\nexit status: 1; expected: 1\n"
+    }
+  ],
+  "alterations": {
+    "traits": "First occurrence of \"conductor\": \"7\" changed to \"conductor\": \"11\" in a scratch copy, as in curve-traits.yml.",
+    "jacobian": "First occurrence of \"magic_number\": 5, changed to \"magic_number\": 6, in a scratch copy, as in jacobian-transfers.yml."
+  },
+  "incomplete_validation": {
+    "command": "cargo +1.98.0 test --locked --release --lib (first attempt)",
+    "status": "Interrupted by workspace restart; final outcome and exit status unavailable. No complete-suite pass is claimed for this attempt."
+  }
+}

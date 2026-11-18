@@ -1,0 +1,16 @@
+digraph G {
+ rankdir=LR; node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=11];
+ a[label="Actual numerator word
+q = pc + E"];
+ b[label="Drop E low bits
+quotient before final ring"];
+ c[label="Derived odd denominator
+p-step Newton word inverse"];
+ d[label="Final multiply
+creation word pc"];
+ e[label="Freeze integer coordinate
+high-zero pad to later P"];
+ f[label="Full extension / packet /
+weighted-mode interface OPEN",fillcolor="#fff2dc"];
+ a->b; b->d; c->d; d->e; e->f [style=dashed,label="needs binding"];
+}

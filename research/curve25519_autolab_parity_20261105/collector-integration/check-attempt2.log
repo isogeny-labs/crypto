@@ -1,0 +1,15 @@
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-curve25519-collector-20261105)
+error[E0603]: struct `MethodSpec` is private
+   --> src/bin/ic_autolab.rs:296:61
+    |
+296 |     use crypto_lib::cryptanalysis::ecbench::{methods, spec::MethodSpec, workload::CurveSpec};
+    |                                                             ^^^^^^^^^^ private struct
+    |
+note: the struct `MethodSpec` is defined here
+   --> src/cryptanalysis/ecbench/spec.rs:18:41
+    |
+ 18 |     applicable, decl, resolve, Applies, MethodSpec, ResolvedMethod,
+    |                                         ^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0603`.
+error: could not compile `crypto` (bin "ic_autolab") due to 1 previous error

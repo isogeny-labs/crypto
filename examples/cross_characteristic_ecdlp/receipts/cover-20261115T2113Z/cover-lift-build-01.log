@@ -1,0 +1,67 @@
+✖ [1870/1871] Building CoverIntegralLift (5.1s)
+trace: .> LEAN_PATH=/workspace/ecdlp-transfer/.lake/packages/Cli/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/batteries/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/Qq/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/aesop/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/plausible/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/mathlib/.lake/build/lib/lean:/workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.24.0/bin/lean /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/CoverIntegralLift.lean -o /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean/CoverIntegralLift.olean -i /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean/CoverIntegralLift.ilean -c /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/ir/CoverIntegralLift.c --setup /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/ir/CoverIntegralLift.setup.json --json
+error: CoverIntegralLift.lean:38:2: Type mismatch: After simplification, term
+  h
+ has type
+  1 + (Classical.choose exists_source_root + Classical.choose exists_source_root ^ 2) = 0
+but is expected to have type
+  zSource + (zSource ^ 2 + 1) = 0
+error: CoverIntegralLift.lean:66:6: Tactic `rewrite` failed: motive is not type correct:
+  fun _a => 2 + 65537 * toTarget (AdjoinRoot.root zPolynomial) = w
+Error: Application type mismatch: The argument
+  CrossCharacteristicTwo.instFactPrimeOfNatNat_crossCharacteristicTwo
+has type
+  Fact (Nat.Prime 2)
+but is expected to have type
+  Fact (Nat.Prime _a)
+in the application
+  @instFieldGaloisField _a ⋯
+
+Explanation: The rewrite tactic rewrites an expression 'e' using an equality 'a = b' by the following process. First, it looks for all 'a' in 'e'. Second, it tries to abstract these occurrences of 'a' to create a function 'm := fun _a => ...', called the *motive*, with the property that 'm a' is definitionally equal to 'e'. Third, we observe that 'congrArg' implies that 'm a = m b', which can be used with lemmas such as 'Eq.mpr' to change the goal. However, if 'e' depends on specific properties of 'a', then the motive 'm' might not typecheck.
+
+Possible solutions: use rewrite's 'occs' configuration option to limit which occurrences are rewritten, or use 'simp' or 'conv' mode, which have strategies for certain kinds of dependencies (these tactics can handle proofs and 'Decidable' instances whose types depend on the rewritten term, and 'simp' can apply user-defined '@[congr]' theorems as well).
+
+hp : 65537 = 1
+⊢ 2 + 65537 * toTarget (AdjoinRoot.root zPolynomial) = w
+error: CoverIntegralLift.lean:74:89: unsolved goals
+case a₂
+⊢ 4 = (algebraMap (ZMod 65537) SourceResidue) 4
+
+case a₃
+⊢ 4 = (algebraMap (ZMod 65537) SourceResidue) 4
+error: CoverIntegralLift.lean:78:80: unsolved goals
+case a₂.a
+⊢ ↑w ^ 2 - ↑w ^ 3 = ↑w
+
+case a₃.a
+⊢ ↑w ^ 2 - ↑w ^ 3 = ↑w
+warning: CoverIntegralLift.lean:80:30: This simp argument is unused:
+  CoverDecodeExample.target_parameters.1
+
+Hint: Omit it from the simp argument list.
+  simp [integralModel, WeierstrassCurve.map, parameter_target, CoverDecodeExample.curve,
+  ̲  ̲ ̲ ̲C̵o̵v̵e̵r̵D̵e̵c̵o̵d̵e̵E̵x̵a̵m̵p̵l̵e̵.̵t̵a̵r̵g̵e̵t̵_̵p̵a̵r̵a̵m̵e̵t̵e̵r̵s̵.̵1̵,̵CoverDecodeExample.target_parameters.2, CharTwo.neg_eq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: CoverIntegralLift.lean:81:44: This simp argument is unused:
+  CharTwo.neg_eq
+
+Hint: Omit it from the simp argument list.
+  simp [integralModel, WeierstrassCurve.map, parameter_target,
+  ̵  ̵ ̵ ̵CoverDecodeExample.curve,
+  ̲  ̲ ̲ ̲CoverDecodeExample.target_parameters.1,
+  ̵  ̵ ̵ ̵CoverDecodeExample.target_parameters.2,̵ ̵C̵h̵a̵r̵T̵w̵o̵.̵n̵e̵g̵_̵e̵q̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: CoverIntegralLift.lean:85:30: Application type mismatch: The argument
+  WeierstrassCurve.isUnit_Δ
+has type
+  ∀ (W : WeierstrassCurve ?m.21) [W.IsElliptic], IsUnit W.Δ
+but is expected to have type
+  IsUnit (CrossCharacteristicLarger.sourceCurve.map (algebraMap (ZMod 65537) SourceResidue)).Δ
+in the application
+  isUnit_iff_ne_zero.mp WeierstrassCurve.isUnit_Δ
+error: Lean exited with code 1
+Some required targets logged failures:
+- CoverIntegralLift
+error: build failed

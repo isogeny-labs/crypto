@@ -1,0 +1,14 @@
+{
+  "id": "whole-h-block-dual-next",
+  "executed": false,
+  "hypothesis": "One exact dual certificate can exclude a full h block at lower paid cost than its per-h constituents, while preserving positive h controls.",
+  "first_command": ["python", "-m", "research.outer_leads_20261109_v4.oracle", "whole-h-oracle-20261109-v4"],
+  "worker_seconds": 90,
+  "memory_limit_mb": 4096,
+  "cores": 1,
+  "block_widths": [1, 2, 4, 8, 16],
+  "limits": "Complete declared disjoint blocks only; exact modular/range certificate replay; no global empty-root flag; unknown on any cap.",
+  "promotion": "At least one independently closed width>=8 block, no positive-control rejection, and lower total pipeline cost including certificate search/checks than per-h processing.",
+  "next_if_refuted": "Retain exact monomial dependencies using Bernstein/parabola ranges before adding further local filters.",
+  "release_claim": false
+}

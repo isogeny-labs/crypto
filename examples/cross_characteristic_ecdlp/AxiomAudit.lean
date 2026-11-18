@@ -1,0 +1,70 @@
+import CrossCharacteristicExample
+import CrossCharacteristicTwo
+import CrossCharacteristicLarger
+import CoverDecodeExample
+import CoverIntegralLift
+
+#print axioms CrossCharacteristicExample.P_order
+#print axioms CrossCharacteristicExample.R_order
+#print axioms CrossCharacteristicExample.phi_challenge
+#print axioms CrossCharacteristicExample.subgroup_cases
+#print axioms CrossCharacteristicExample.transfer_dlog
+#print axioms CrossCharacteristicExample.example_dlog
+#print axioms CrossCharacteristicExample.target_scalar_mod
+#print axioms CrossCharacteristicExample.no_field_map
+
+#print axioms CrossCharacteristicTwo.R_double
+#print axioms CrossCharacteristicTwo.R_order
+#print axioms CrossCharacteristicTwo.phi_challenge
+#print axioms CrossCharacteristicTwo.transfer_dlog
+#print axioms CrossCharacteristicTwo.target_scalar_mod
+#print axioms CrossCharacteristicTwo.no_field_map
+#print axioms CrossCharacteristicTwo.F4_card
+#print axioms CrossCharacteristicTwo.F5_to_F4_dlog
+
+#print axioms CrossCharacteristicLarger.source_card
+#print axioms CrossCharacteristicLarger.target_card
+#print axioms CrossCharacteristicLarger.exists_omega
+#print axioms CrossCharacteristicLarger.omega_not_from_F2
+#print axioms CrossCharacteristicLarger.omega_relation
+#print axioms CrossCharacteristicLarger.P_order
+#print axioms CrossCharacteristicLarger.R_order
+#print axioms CrossCharacteristicLarger.phi_challenge
+#print axioms CrossCharacteristicLarger.transfer_dlog
+#print axioms CrossCharacteristicLarger.example_dlog
+#print axioms CrossCharacteristicLarger.source_scalar_mod
+#print axioms CrossCharacteristicLarger.target_scalar_mod
+
+#print axioms CoverDecodeExample.small_card
+#print axioms CoverDecodeExample.target_smaller
+#print axioms CoverDecodeExample.sourceCoverBasis
+#print axioms CoverDecodeExample.targetCoverBasis
+#print axioms CoverDecodeExample.source_cover_root
+#print axioms CoverDecodeExample.target_cover_root
+#print axioms CoverDecodeExample.source_cover_equation
+#print axioms CoverDecodeExample.target_cover_equation
+#print axioms CoverDecodeExample.source_family
+#print axioms CoverDecodeExample.target_family
+#print axioms CoverDecodeExample.R_order
+#print axioms CoverDecodeExample.S_order
+#print axioms CoverDecodeExample.phi_injective
+#print axioms CoverDecodeExample.example_dlog
+#print axioms CoverDecodeExample.scalar_mod
+#print axioms CoverDecodeExample.seven_row_table
+#print axioms CoverDecodeExample.universal_seven_identity
+#print axioms CoverDecodeExample.universal_tangent_identity
+#print axioms CoverDecodeExample.universal_source_substitution
+#print axioms CoverDecodeExample.universal_target_substitution
+
+#print axioms CoverIntegralLift.exists_source_root
+#print axioms CoverIntegralLift.source_root_relation
+#print axioms CoverIntegralLift.target_root_relation
+#print axioms CoverIntegralLift.zPolynomial_degree
+#print axioms CoverIntegralLift.integral_root_relation
+#print axioms CoverIntegralLift.parameter_source
+#print axioms CoverIntegralLift.parameter_target
+#print axioms CoverIntegralLift.source_model
+#print axioms CoverIntegralLift.target_model
+#print axioms CoverIntegralLift.source_discriminant
+#print axioms CoverIntegralLift.target_discriminant
+#print axioms CoverIntegralLift.concrete_good_specializations

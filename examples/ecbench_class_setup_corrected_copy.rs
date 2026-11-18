@@ -33,7 +33,7 @@ fn main() {
             let sum: f64 = rec.phases.iter().map(|p| p.gae).sum();
             if sum != t {
                 let floor = rec.cost.s.unwrap() / rec.boundaries.ratio_to_floor.unwrap();
-                let s = sum / (rec.workload.curve.r as f64).sqrt();
+                let s = sum / (rec.workload.curve.r.to_f64()).sqrt();
                 rec.cost.total_gae = Some(sum);
                 rec.cost.s = Some(s);
                 rec.boundaries.ratio_to_floor = Some(s / floor);

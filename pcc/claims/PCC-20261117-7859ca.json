@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T03:07:03Z",
+ "id": "PCC-20261117-7859ca",
+ "kind": "execution",
+ "producer": {
+  "commit": "effca7bbb646a3642e1c278247546646c83b4dbe",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-batched-kernel-20261117-45/summary.json",
+    "sha256": "00d02be4a16c682a18d19f5dec989c5775fb323bf3b07852d3bf4f3b72836a00"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-batched-kernel-20261117-45/deletion.json",
+    "sha256": "337af27663475df655530818c7ec844b29f679637909a7f6ac199677a62340eb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-batched-kernel-20261117-45/final-status.json",
+    "sha256": "344e8cdcb9c218710b4aedd77dcb5b50cbbb0eff07ca3951866481a0b275270b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-batched-kernel-20261117-45/local-originals.sha256",
+    "sha256": "89914946d3d5b2eea69ff4cad143308ab684e6ebe28c374ab0ffe5a9a33ccd76"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-batched-kernel-20261117-45/final-report-artifacts.sha256",
+    "sha256": "27ff745efe82f53fd088c8da168d30afd46370ca2c061e0a6aee1b9b4e1ea4ad"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/extension_ic_graph_20261115/runpod-batched-kernel-20261117-45",
+ "statement": "Runpod45 originals: eight kernels independently replay; every non-wall batch/scalar output equal, single batch elapsed below scalar but above RREF; originals collected before owned-pod deletion; UNVERIFIED producer evidence"
+}

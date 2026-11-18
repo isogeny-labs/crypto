@@ -1,0 +1,130 @@
+{
+  "schema": "diem-chart-source-plan/v1",
+  "created": "2026-11-14T00:16:28.492480+00:00",
+  "formal": {
+    "project": "research/diem_chart_audit_20261114/lean",
+    "theorem": "DiemChartAudit.actual_torus_chart_certificate",
+    "statement": "theorem actual_torus_chart_certificate : (Nat.card (Line (ZMod 2)) = 3 ∧ Nat.card (ZMod 2)ˣ = 1) ∧ (∀ f g : (ZMod 2)ˣ → Line (ZMod 2), ¬ (∀ p, (∃ u, f u = p) ∨ (∃ u, g u = p))) ∧ (∀ (n : ℕ), 0 < n → ∀ f : (Fin n → Fin 2 × (ZMod 2)ˣ) → (Fin n → Line (ZMod 2)), ¬ Function.Surjective f) ∧ (∀ (K : Type) [Field K], (∀ i : Fin 3, Function.Injective (threeChart i : Kˣ → Line K)) ∧ Function.Surjective (fun z : Fin 3 × Kˣ => threeChart z.1 z.2) ∧ (∀ (n : ℕ) (p : Fin n → Line K), ∃ i : Fin n → Fin 3, ∃ u : Fin n → Kˣ, ∀ j, threeChart (i j) (u j) = p j)) ∧ (∀ (K : Type) [Field K] [Finite K], (∃ f : Fin 2 × Kˣ → Line K, Function.Surjective f) ↔ 3 ≤ Nat.card K) ∧ (∀ (K : Type) [Field K] (a : K) (_ha0 : a ≠ 0) (ha1 : a ≠ 1), (∀ i : Fin 2, Function.Injective (twoChart a ha1 i)) ∧ (∀ (n : ℕ) (p : Fin n → Line K), ∃ i : Fin n → Fin 2, ∃ u : Fin n → Kˣ, ∀ j, twoChart a ha1 (i j) (u j) = p j)) ∧ (∀ (n m : ℕ) (f : Fin m × (Fin n → (ZMod 2)ˣ) → (Fin n → Line (ZMod 2))), Function.Surjective f → 3^n ≤ m) ∧ (∀ n : ℕ, Nat.card (Fin n → Fin 3) = 3^n ∧ 3^n ≤ 5*n.factorial) ∧ (∀ n d : ℕ, 0 < d → 3^n * (n.factorial*d^n) ≤ 5*(n.factorial*d^n)^2)",
+    "decl_sha256": "0d9ce0a7868c2c00d00015993a9a7ea808f8c2e0c6b006b2e32a973efd5e6feb",
+    "scope": "Literal Diem2011 Proposition2.5(b) proof-helper audit. Actual Mathlib projective line overF2 has3points, actual torus1; arbitrary two-map cover and all positive2^nproduct-chart covers directly disproved. Explicit three injective rational-point charts cover every field and every product arity; actual n-torus cover overF2 needsatleast3^ncharts. Every finite field admits two arbitrary rational-point cover maps iffcard>=3, with explicit injective formulas usinga!=0,1. Actual indexcard3^n,3^n<=5n!,3^nB<=5B² forB=n!d^n,d>0. Source proposition explicitly acceptsq2; laterCondition2.7notits hypothesis. Literal helper refuted only. Main geometric Bezout bound/main decomposition theorem/exact corpus node notrefuted; formal schemes/isomorphisms/Rojas execution/running-time/multiplicity geometry remainopen. No novelty/new native experiment/paid compute/upload.",
+    "sources": [
+      {
+        "path": "research/diem_chart_audit_20261114/lean/ChartCertificate.lean",
+        "bytes": 2219,
+        "sha256": "6ee49065fc75a510c3c3cd7e122034f439453569d74ece2674012e104163951e"
+      },
+      {
+        "path": "research/diem_chart_audit_20261114/lean/Charts.lean",
+        "bytes": 2878,
+        "sha256": "ccfa85f0421f4dfa72682989db12c427c282c69377716947bb4408ed06e22bde"
+      },
+      {
+        "path": "research/diem_chart_audit_20261114/lean/Obstruction.lean",
+        "bytes": 1897,
+        "sha256": "705083765f44f1b97e8677a2056c3b92506859eea2402d4001a97dd66ab3e03a"
+      },
+      {
+        "path": "research/diem_chart_audit_20261114/lean/Products.lean",
+        "bytes": 5476,
+        "sha256": "3fc8450d86195d4e5f0d36575ce1fe37aed3d786e1aee8acc5f5b10e17324f9a"
+      },
+      {
+        "path": "research/diem_chart_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3237,
+        "sha256": "de4451e299ee105dce9977dc3f51d8373e26b1329e5cb895567f940344d7d0fc"
+      },
+      {
+        "path": "research/diem_chart_audit_20261114/lean/lakefile.toml",
+        "bytes": 324,
+        "sha256": "a473118eb1c66d4f293bcd889f8fd81599ed766a0bdf7fd83575d58098b2edb7"
+      },
+      {
+        "path": "research/diem_chart_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ChartCertificate",
+    "Charts",
+    "Obstruction",
+    "Products"
+  ],
+  "artifacts": [
+    {
+      "path": "research/diem_chart_audit_20261114/evidence/attempts.tar.gz",
+      "bytes": 12149,
+      "sha256": "434922b3a490f0f0b7176ac2d0c689536ad60bb776678213388f54a9149ebf74"
+    },
+    {
+      "path": "research/diem_chart_audit_20261114/evidence/attempts.json",
+      "bytes": 9601,
+      "sha256": "b117a41933870bf369a136e45d55ed7eb0332e7fe0d9c26ab3ab3d998c3a58c6"
+    },
+    {
+      "path": "research/diem_chart_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 1208,
+      "sha256": "fc9f7b9cd13f5effa0a03095f10469772b0fc6120263bd4536fdf077c91fad97"
+    },
+    {
+      "path": "research/diem_chart_audit_20261114/evidence/gate.json",
+      "bytes": 1128,
+      "sha256": "89d53a944e9782b4b88f66e9379f6cef78c25316df6e95aad45ecf23bff3a489"
+    },
+    {
+      "path": "research/diem_chart_audit_20261114/evidence/source-review.json",
+      "bytes": 4982,
+      "sha256": "376c19c517e96af79eea0814e0c3e13f00aba72f0e8b271a81ee16cc2f3cc6a4"
+    },
+    {
+      "path": "research/diem_chart_audit_20261114/proof-map.json",
+      "bytes": 1370,
+      "sha256": "5fd6fa27d523daa5041a11b42f73d15f80f637b563020429cbcf0da5f3e86746"
+    },
+    {
+      "path": "research/diem_chart_audit_20261114/render_report.py",
+      "bytes": 6305,
+      "sha256": "c509eaac94c3343d1020f46464df4556f3a200ff98e567f77f0b6391504c5f20"
+    },
+    {
+      "path": "research/diem_chart_audit_20261114/reports/chart-repair.svg",
+      "bytes": 1204,
+      "sha256": "e52af25acde0f62738032a7e28e0493a32e679e8bdfce749bf0a40700fe2c999"
+    },
+    {
+      "path": "research/diem_chart_audit_20261114/reports/layout.json",
+      "bytes": 271,
+      "sha256": "120b7d77c53f45d7b84e6acb0bdfe058c57d71fd2f7bb7bf25911166095d1dd3"
+    },
+    {
+      "path": "research/diem_chart_audit_20261114/reports/report.pdf",
+      "bytes": 47209,
+      "sha256": "839f89a0badb2f100272025a8304d56dd459914a16439c7c29e77f95b0525513"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 31,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "literal_source_helper_refuted": true,
+    "exact_finite_field_qualification": true,
+    "actual_rational_point_repair": true,
+    "main_theorem_or_corpus_node_refuted": false,
+    "scheme_isomorphism_claimed": false,
+    "Rojas_runtime_theorem_claimed": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

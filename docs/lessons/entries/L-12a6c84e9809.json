@@ -1,0 +1,15 @@
+{
+  "action": "Use a separate-session bounded supervisor with persistent completion/status logs; preserve any supervision loss, unknown exits and missing isolation receipts without rerunning or inventing admitted clocks.",
+  "created": "2026-11-16T20:24:10Z",
+  "evidence": [
+    "research/vieta_coset_rust_20261115/next-20261116/run/preflight-supervision-loss.json",
+    "research/vieta_coset_rust_20261115/next-20261116/run/main-supervisor.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "controlled-experiment"
+  ],
+  "trigger": "A bounded local benchmark may outlive its tool connection or workspace reconnection",
+  "why": "Foreground calibration supervisors were lost while native children continued; the detached main supervisor retained its actual completion receipt after the launch tool session ended."
+}

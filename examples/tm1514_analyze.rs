@@ -292,7 +292,10 @@ fn load(dir: &Path, label: &'static str, devcheck: bool) -> Result<Replicate, St
                 "replicate {label}: curve {slug} is not one of the five"
             ));
         }
-        rep.r_of.insert(slug.clone(), r.workload.curve.r);
+        rep.r_of.insert(
+            slug.clone(),
+            r.workload.curve.r.checked_u128().expect("a u128 order"),
+        );
         *rep.status_counts
             .entry(format!("{}:{}", r.arm, r.outcome.status))
             .or_default() += 1;

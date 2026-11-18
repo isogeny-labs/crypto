@@ -1,0 +1,1000 @@
+{
+  "standing": "[pcc:unverified]",
+  "source_sha": "72f5c9557cf2d32256183fbda5e127d1714a8196",
+  "run_id": 43792410607,
+  "job_id": 133053626486,
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/43792410607",
+  "qualification": "completed same-source Rust GitHub Actions development release run (not isolated A/A, not independently signed)",
+  "proof_of_completeness": "all 60 tests (12 public Q x 5 T arms) independently replayed known scalars only after each algebraic solve",
+  "source_bound_bridge": {
+    "H_squarefree": true,
+    "base_size": 31,
+    "candidate_representation": "8 base-x leaves + 3 sum x, or 4 pair-sum x + implicit S5",
+    "caveat": "U=identity and repeated/canceling intermediates need explicit exceptional handling",
+    "checked_affine_signed_pair_roots": 961,
+    "cofactor": 1,
+    "curve_order": 2147446831,
+    "diagonal_linear_factors": 31,
+    "eight_leaf_quotient_dimension": "852891037441",
+    "elimination_variables_before": "48 tower + 3 sum x",
+    "field_prime": 2147483647,
+    "four_pair_coordinate_quotient_dimension": "852891037441",
+    "full_dickson_x": 64,
+    "pair_S3_quadratic_factors": 465,
+    "pair_support_K_degree": 961,
+    "pair_support_K_gcd_derivative_degree": 0,
+    "pair_support_quotient_is_reduced_over_Fp": true,
+    "rational_base_H_degree": 31,
+    "standing": "[pcc:unverified]",
+    "status": "preprocessing identity gate only: no m8 natural root, no completed IC call"
+  },
+  "original_sweep_stdout": {
+    "arms": [
+      {
+        "cases": 12,
+        "individual": [
+          {
+            "case": 0,
+            "cold_wall_ns": 337447614,
+            "expected_known_answer_verifier_only": 504113487,
+            "public_target": [
+              995016677,
+              752736292
+            ],
+            "recovered_log": 504113487,
+            "rounds": 2,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 730368
+          },
+          {
+            "case": 1,
+            "cold_wall_ns": 85567858,
+            "expected_known_answer_verifier_only": 1213895432,
+            "public_target": [
+              2042969722,
+              539832143
+            ],
+            "recovered_log": 1213895432,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 84480
+          },
+          {
+            "case": 2,
+            "cold_wall_ns": 316302338,
+            "expected_known_answer_verifier_only": 1503437256,
+            "public_target": [
+              125100676,
+              1701353652
+            ],
+            "recovered_log": 1503437256,
+            "rounds": 2,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 681216
+          },
+          {
+            "case": 3,
+            "cold_wall_ns": 196233820,
+            "expected_known_answer_verifier_only": 712986906,
+            "public_target": [
+              2022902848,
+              1774145501
+            ],
+            "recovered_log": 712986906,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 470784
+          },
+          {
+            "case": 4,
+            "cold_wall_ns": 546041251,
+            "expected_known_answer_verifier_only": 1803751110,
+            "public_target": [
+              1009440099,
+              1688789539
+            ],
+            "recovered_log": 1803751110,
+            "rounds": 3,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 1259520
+          },
+          {
+            "case": 5,
+            "cold_wall_ns": 405760514,
+            "expected_known_answer_verifier_only": 1301856749,
+            "public_target": [
+              1918045950,
+              506773218
+            ],
+            "recovered_log": 1301856749,
+            "rounds": 2,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 964608
+          },
+          {
+            "case": 6,
+            "cold_wall_ns": 148116799,
+            "expected_known_answer_verifier_only": 352316451,
+            "public_target": [
+              1543997873,
+              473461090
+            ],
+            "recovered_log": 352316451,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 302592
+          },
+          {
+            "case": 7,
+            "cold_wall_ns": 297867657,
+            "expected_known_answer_verifier_only": 531498008,
+            "public_target": [
+              142251308,
+              198121505
+            ],
+            "recovered_log": 531498008,
+            "rounds": 2,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 608256
+          },
+          {
+            "case": 8,
+            "cold_wall_ns": 230943551,
+            "expected_known_answer_verifier_only": 1918296127,
+            "public_target": [
+              1725841757,
+              459732445
+            ],
+            "recovered_log": 1918296127,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 583680
+          },
+          {
+            "case": 9,
+            "cold_wall_ns": 134509757,
+            "expected_known_answer_verifier_only": 1685945575,
+            "public_target": [
+              241072893,
+              641974407
+            ],
+            "recovered_log": 1685945575,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 241920
+          },
+          {
+            "case": 10,
+            "cold_wall_ns": 138146935,
+            "expected_known_answer_verifier_only": 528133461,
+            "public_target": [
+              186343923,
+              1478469610
+            ],
+            "recovered_log": 528133461,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 266496
+          },
+          {
+            "case": 11,
+            "cold_wall_ns": 193895366,
+            "expected_known_answer_verifier_only": 2108109880,
+            "public_target": [
+              828902702,
+              401334219
+            ],
+            "recovered_log": 2108109880,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 451584
+          }
+        ],
+        "max_rounds": 12,
+        "points_per_partition": 768,
+        "solved": 12,
+        "total_cold_wall_ns": "3030833460",
+        "total_pair_quadratics": 6645504,
+        "total_rounds": 18
+      },
+      {
+        "cases": 12,
+        "individual": [
+          {
+            "case": 0,
+            "cold_wall_ns": 253795372,
+            "expected_known_answer_verifier_only": 504113487,
+            "public_target": [
+              995016677,
+              752736292
+            ],
+            "recovered_log": 504113487,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 599040
+          },
+          {
+            "case": 1,
+            "cold_wall_ns": 103540279,
+            "expected_known_answer_verifier_only": 1213895432,
+            "public_target": [
+              2042969722,
+              539832143
+            ],
+            "recovered_log": 1213895432,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 76800
+          },
+          {
+            "case": 2,
+            "cold_wall_ns": 277129141,
+            "expected_known_answer_verifier_only": 1503437256,
+            "public_target": [
+              125100676,
+              1701353652
+            ],
+            "recovered_log": 1503437256,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 692224
+          },
+          {
+            "case": 3,
+            "cold_wall_ns": 279910692,
+            "expected_known_answer_verifier_only": 712986906,
+            "public_target": [
+              2022902848,
+              1774145501
+            ],
+            "recovered_log": 712986906,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 703488
+          },
+          {
+            "case": 4,
+            "cold_wall_ns": 250562779,
+            "expected_known_answer_verifier_only": 1803751110,
+            "public_target": [
+              1009440099,
+              1688789539
+            ],
+            "recovered_log": 1803751110,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 601088
+          },
+          {
+            "case": 5,
+            "cold_wall_ns": 256830346,
+            "expected_known_answer_verifier_only": 1301856749,
+            "public_target": [
+              1918045950,
+              506773218
+            ],
+            "recovered_log": 1301856749,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 619520
+          },
+          {
+            "case": 6,
+            "cold_wall_ns": 155682122,
+            "expected_known_answer_verifier_only": 352316451,
+            "public_target": [
+              1543997873,
+              473461090
+            ],
+            "recovered_log": 352316451,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 259072
+          },
+          {
+            "case": 7,
+            "cold_wall_ns": 158833844,
+            "expected_known_answer_verifier_only": 531498008,
+            "public_target": [
+              142251308,
+              198121505
+            ],
+            "recovered_log": 531498008,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 273408
+          },
+          {
+            "case": 8,
+            "cold_wall_ns": 225263182,
+            "expected_known_answer_verifier_only": 1918296127,
+            "public_target": [
+              1725841757,
+              459732445
+            ],
+            "recovered_log": 1918296127,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 503808
+          },
+          {
+            "case": 9,
+            "cold_wall_ns": 101185815,
+            "expected_known_answer_verifier_only": 1685945575,
+            "public_target": [
+              241072893,
+              641974407
+            ],
+            "recovered_log": 1685945575,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 66560
+          },
+          {
+            "case": 10,
+            "cold_wall_ns": 137594335,
+            "expected_known_answer_verifier_only": 528133461,
+            "public_target": [
+              186343923,
+              1478469610
+            ],
+            "recovered_log": 528133461,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 198656
+          },
+          {
+            "case": 11,
+            "cold_wall_ns": 114285213,
+            "expected_known_answer_verifier_only": 2108109880,
+            "public_target": [
+              828902702,
+              401334219
+            ],
+            "recovered_log": 2108109880,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 113664
+          }
+        ],
+        "max_rounds": 8,
+        "points_per_partition": 1024,
+        "solved": 12,
+        "total_cold_wall_ns": "2314613120",
+        "total_pair_quadratics": 4707328,
+        "total_rounds": 12
+      },
+      {
+        "cases": 12,
+        "individual": [
+          {
+            "case": 0,
+            "cold_wall_ns": 125530629,
+            "expected_known_answer_verifier_only": 504113487,
+            "public_target": [
+              995016677,
+              752736292
+            ],
+            "recovered_log": 504113487,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 10752
+          },
+          {
+            "case": 1,
+            "cold_wall_ns": 245167049,
+            "expected_known_answer_verifier_only": 1213895432,
+            "public_target": [
+              2042969722,
+              539832143
+            ],
+            "recovered_log": 1213895432,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 422400
+          },
+          {
+            "case": 2,
+            "cold_wall_ns": 153816671,
+            "expected_known_answer_verifier_only": 1503437256,
+            "public_target": [
+              125100676,
+              1701353652
+            ],
+            "recovered_log": 1503437256,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 105984
+          },
+          {
+            "case": 3,
+            "cold_wall_ns": 171373507,
+            "expected_known_answer_verifier_only": 712986906,
+            "public_target": [
+              2022902848,
+              1774145501
+            ],
+            "recovered_log": 712986906,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 172032
+          },
+          {
+            "case": 4,
+            "cold_wall_ns": 594969591,
+            "expected_known_answer_verifier_only": 1803751110,
+            "public_target": [
+              1009440099,
+              1688789539
+            ],
+            "recovered_log": 1803751110,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 1634304
+          },
+          {
+            "case": 5,
+            "cold_wall_ns": 162292400,
+            "expected_known_answer_verifier_only": 1301856749,
+            "public_target": [
+              1918045950,
+              506773218
+            ],
+            "recovered_log": 1301856749,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 138240
+          },
+          {
+            "case": 6,
+            "cold_wall_ns": 136032479,
+            "expected_known_answer_verifier_only": 352316451,
+            "public_target": [
+              1543997873,
+              473461090
+            ],
+            "recovered_log": 352316451,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 47616
+          },
+          {
+            "case": 7,
+            "cold_wall_ns": 192232698,
+            "expected_known_answer_verifier_only": 531498008,
+            "public_target": [
+              142251308,
+              198121505
+            ],
+            "recovered_log": 531498008,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 241152
+          },
+          {
+            "case": 8,
+            "cold_wall_ns": 263593108,
+            "expected_known_answer_verifier_only": 1918296127,
+            "public_target": [
+              1725841757,
+              459732445
+            ],
+            "recovered_log": 1918296127,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 482304
+          },
+          {
+            "case": 9,
+            "cold_wall_ns": 302840065,
+            "expected_known_answer_verifier_only": 1685945575,
+            "public_target": [
+              241072893,
+              641974407
+            ],
+            "recovered_log": 1685945575,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 622080
+          },
+          {
+            "case": 10,
+            "cold_wall_ns": 139461129,
+            "expected_known_answer_verifier_only": 528133461,
+            "public_target": [
+              186343923,
+              1478469610
+            ],
+            "recovered_log": 528133461,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 59904
+          },
+          {
+            "case": 11,
+            "cold_wall_ns": 246886478,
+            "expected_known_answer_verifier_only": 2108109880,
+            "public_target": [
+              828902702,
+              401334219
+            ],
+            "recovered_log": 2108109880,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 431616
+          }
+        ],
+        "max_rounds": 3,
+        "points_per_partition": 1536,
+        "solved": 12,
+        "total_cold_wall_ns": "2734195804",
+        "total_pair_quadratics": 4368384,
+        "total_rounds": 12
+      },
+      {
+        "cases": 12,
+        "individual": [
+          {
+            "case": 0,
+            "cold_wall_ns": 190167312,
+            "expected_known_answer_verifier_only": 504113487,
+            "public_target": [
+              995016677,
+              752736292
+            ],
+            "recovered_log": 504113487,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 90112
+          },
+          {
+            "case": 1,
+            "cold_wall_ns": 215952926,
+            "expected_known_answer_verifier_only": 1213895432,
+            "public_target": [
+              2042969722,
+              539832143
+            ],
+            "recovered_log": 1213895432,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 182272
+          },
+          {
+            "case": 2,
+            "cold_wall_ns": 174044813,
+            "expected_known_answer_verifier_only": 1503437256,
+            "public_target": [
+              125100676,
+              1701353652
+            ],
+            "recovered_log": 1503437256,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 34816
+          },
+          {
+            "case": 3,
+            "cold_wall_ns": 201986100,
+            "expected_known_answer_verifier_only": 712986906,
+            "public_target": [
+              2022902848,
+              1774145501
+            ],
+            "recovered_log": 712986906,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 106496
+          },
+          {
+            "case": 4,
+            "cold_wall_ns": 237787867,
+            "expected_known_answer_verifier_only": 1803751110,
+            "public_target": [
+              1009440099,
+              1688789539
+            ],
+            "recovered_log": 1803751110,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 260096
+          },
+          {
+            "case": 5,
+            "cold_wall_ns": 201547170,
+            "expected_known_answer_verifier_only": 1301856749,
+            "public_target": [
+              1918045950,
+              506773218
+            ],
+            "recovered_log": 1301856749,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 137216
+          },
+          {
+            "case": 6,
+            "cold_wall_ns": 181014610,
+            "expected_known_answer_verifier_only": 352316451,
+            "public_target": [
+              1543997873,
+              473461090
+            ],
+            "recovered_log": 352316451,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 63488
+          },
+          {
+            "case": 7,
+            "cold_wall_ns": 328649514,
+            "expected_known_answer_verifier_only": 531498008,
+            "public_target": [
+              142251308,
+              198121505
+            ],
+            "recovered_log": 531498008,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 587776
+          },
+          {
+            "case": 8,
+            "cold_wall_ns": 176865346,
+            "expected_known_answer_verifier_only": 1918296127,
+            "public_target": [
+              1725841757,
+              459732445
+            ],
+            "recovered_log": 1918296127,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 49152
+          },
+          {
+            "case": 9,
+            "cold_wall_ns": 170179438,
+            "expected_known_answer_verifier_only": 1685945575,
+            "public_target": [
+              241072893,
+              641974407
+            ],
+            "recovered_log": 1685945575,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 22528
+          },
+          {
+            "case": 10,
+            "cold_wall_ns": 235762728,
+            "expected_known_answer_verifier_only": 528133461,
+            "public_target": [
+              186343923,
+              1478469610
+            ],
+            "recovered_log": 528133461,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 258048
+          },
+          {
+            "case": 11,
+            "cold_wall_ns": 176097854,
+            "expected_known_answer_verifier_only": 2108109880,
+            "public_target": [
+              828902702,
+              401334219
+            ],
+            "recovered_log": 2108109880,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 47104
+          }
+        ],
+        "max_rounds": 3,
+        "points_per_partition": 2048,
+        "solved": 12,
+        "total_cold_wall_ns": "2490055678",
+        "total_pair_quadratics": 1839104,
+        "total_rounds": 12
+      },
+      {
+        "cases": 12,
+        "individual": [
+          {
+            "case": 0,
+            "cold_wall_ns": 330770182,
+            "expected_known_answer_verifier_only": 504113487,
+            "public_target": [
+              995016677,
+              752736292
+            ],
+            "recovered_log": 504113487,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 297984
+          },
+          {
+            "case": 1,
+            "cold_wall_ns": 257260784,
+            "expected_known_answer_verifier_only": 1213895432,
+            "public_target": [
+              2042969722,
+              539832143
+            ],
+            "recovered_log": 1213895432,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 43008
+          },
+          {
+            "case": 2,
+            "cold_wall_ns": 332529555,
+            "expected_known_answer_verifier_only": 1503437256,
+            "public_target": [
+              125100676,
+              1701353652
+            ],
+            "recovered_log": 1503437256,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 304128
+          },
+          {
+            "case": 3,
+            "cold_wall_ns": 255044900,
+            "expected_known_answer_verifier_only": 712986906,
+            "public_target": [
+              2022902848,
+              1774145501
+            ],
+            "recovered_log": 712986906,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 36864
+          },
+          {
+            "case": 4,
+            "cold_wall_ns": 330087828,
+            "expected_known_answer_verifier_only": 1803751110,
+            "public_target": [
+              1009440099,
+              1688789539
+            ],
+            "recovered_log": 1803751110,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 297984
+          },
+          {
+            "case": 5,
+            "cold_wall_ns": 246417601,
+            "expected_known_answer_verifier_only": 1301856749,
+            "public_target": [
+              1918045950,
+              506773218
+            ],
+            "recovered_log": 1301856749,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 3072
+          },
+          {
+            "case": 6,
+            "cold_wall_ns": 287760080,
+            "expected_known_answer_verifier_only": 352316451,
+            "public_target": [
+              1543997873,
+              473461090
+            ],
+            "recovered_log": 352316451,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 150528
+          },
+          {
+            "case": 7,
+            "cold_wall_ns": 284486561,
+            "expected_known_answer_verifier_only": 531498008,
+            "public_target": [
+              142251308,
+              198121505
+            ],
+            "recovered_log": 531498008,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 129024
+          },
+          {
+            "case": 8,
+            "cold_wall_ns": 256179836,
+            "expected_known_answer_verifier_only": 1918296127,
+            "public_target": [
+              1725841757,
+              459732445
+            ],
+            "recovered_log": 1918296127,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 36864
+          },
+          {
+            "case": 9,
+            "cold_wall_ns": 288062795,
+            "expected_known_answer_verifier_only": 1685945575,
+            "public_target": [
+              241072893,
+              641974407
+            ],
+            "recovered_log": 1685945575,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 150528
+          },
+          {
+            "case": 10,
+            "cold_wall_ns": 260086709,
+            "expected_known_answer_verifier_only": 528133461,
+            "public_target": [
+              186343923,
+              1478469610
+            ],
+            "recovered_log": 528133461,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 52224
+          },
+          {
+            "case": 11,
+            "cold_wall_ns": 293099825,
+            "expected_known_answer_verifier_only": 2108109880,
+            "public_target": [
+              828902702,
+              401334219
+            ],
+            "recovered_log": 2108109880,
+            "rounds": 1,
+            "solved": true,
+            "unresolved_within_cap": false,
+            "visited_pair_quadratics": 165888
+          }
+        ],
+        "max_rounds": 2,
+        "points_per_partition": 3072,
+        "solved": 12,
+        "total_cold_wall_ns": "3421786656",
+        "total_pair_quadratics": 1668096,
+        "total_rounds": 12
+      }
+    ],
+    "calibration": "one sequential Rust release CI development sweep; not an isolated A/A comparison",
+    "classification": "published APS-style index calculus; pair-root enumeration generic MITM-equivalent",
+    "curve_prime": 2147483647,
+    "group_order": 2147446831,
+    "no_known_scalar_supplied_to_algebraic_solver": true,
+    "reports_failures_and_misses": true,
+    "standing": "[pcc:unverified]",
+    "sweep": "12 identical independently generated caller-side held-out public Q per arm; fixed seed, varied T and bounded retries"
+  },
+  "analysis": {
+    "successes_per_arm": [
+      {
+        "T": 768,
+        "successes": 12,
+        "cases": 12,
+        "total_paid_ms": 3030.83346,
+        "total_pairs": 6645504,
+        "attempted_rounds": 18
+      },
+      {
+        "T": 1024,
+        "successes": 12,
+        "cases": 12,
+        "total_paid_ms": 2314.61312,
+        "total_pairs": 4707328,
+        "attempted_rounds": 12
+      },
+      {
+        "T": 1536,
+        "successes": 12,
+        "cases": 12,
+        "total_paid_ms": 2734.195804,
+        "total_pairs": 4368384,
+        "attempted_rounds": 12
+      },
+      {
+        "T": 2048,
+        "successes": 12,
+        "cases": 12,
+        "total_paid_ms": 2490.055678,
+        "total_pairs": 1839104,
+        "attempted_rounds": 12
+      },
+      {
+        "T": 3072,
+        "successes": 12,
+        "cases": 12,
+        "total_paid_ms": 3421.786656,
+        "total_pairs": 1668096,
+        "attempted_rounds": 12
+      }
+    ],
+    "T1024_vs_T1536_total_speedup": 1.1812755144151261,
+    "T1024_win_cases": 7,
+    "T1536_win_cases": 5,
+    "ratios_by_target": [
+      0.4946135463809797,
+      2.367842267452264,
+      0.5550360761230808,
+      0.6122435187291809,
+      2.3745330147379953,
+      0.6319050786934656,
+      0.8737835613520222,
+      1.2102754246758645,
+      1.1701561953430988,
+      2.9929102710691216,
+      1.0135673754301004,
+      2.1602661579674356
+    ],
+    "qualification_note": "single sequential size sweep, no A/A order randomization, no confidence interval or external IC frontier; pure source-level engineering comparison"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "fields": [
+    "P192",
+    "P224",
+    "P256",
+    "P384",
+    "P521"
+  ],
+  "bits": [
+    12,
+    16,
+    20
+  ],
+  "cold_bits": [
+    12,
+    20
+  ],
+  "repetitions": 3,
+  "methods": [
+    "factor",
+    "difference",
+    "portfolio"
+  ],
+  "thresholds_bits": {
+    "192": 16,
+    "224": 16,
+    "256": 16,
+    "384": 17,
+    "521": 18
+  },
+  "selection": "All fields and sizes retained; exposed C71 fixtures, not hard holdout. Dispatch thresholds frozen from previous C71 training observations, before C72 ladder.",
+  "worker_seconds": 90,
+  "child_seconds": 8,
+  "memory_mb": 4096,
+  "core": 0
+}

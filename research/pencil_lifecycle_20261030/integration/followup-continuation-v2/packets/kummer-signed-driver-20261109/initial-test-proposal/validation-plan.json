@@ -1,0 +1,58 @@
+{
+  "schema": "kummer-driver-prospective-validation/v1",
+  "status": "source_only_uncompiled",
+  "runtime_reservation_seconds": null,
+  "full_target_scope": 1260,
+  "qualification_fixed_target": {
+    "p": 739,
+    "r": 34147,
+    "target_index": 0,
+    "fixture_sha256": "607f7278c579d5b79c3c3a28d0067d5e4a9c6915800eb09bdfe30e9b3e8ef14f"
+  },
+  "native_target_runs": 11,
+  "native_target_runs_basis": "archived original + candidate disabled + observed +8 predeclared fault reruns",
+  "tests": [
+    "pruned::driver_controls::actual_driver_original_disabled_observed_and_fixed_faults",
+    "pruned::driver_controls::actual_forced_fallback_and_zero_vector_lift_are_recorded"
+  ],
+  "protocol_negative_tests": 4,
+  "fixed_fault_joints": [
+    "header",
+    "advance_begin",
+    "advance_end",
+    "lift_begin",
+    "lift_end",
+    "relation",
+    "duplicate",
+    "terminal"
+  ],
+  "trace_limits": {
+    "records": 1000000,
+    "bytes": 67108864
+  },
+  "fixture_staging": {
+    "research/kummer_theta_20261022/results/theta-models.jsonl": "fixture.theta as one JSONL line",
+    "research/kummer_coordinates_20261022/results/generic-models.jsonl": "fixture.model as one JSONL line",
+    "research/kummer_coordinates_20261022/results/target-gate-16.jsonl": "fixture.target as one JSONL line"
+  },
+  "environment": {
+    "KUMMER_TARGET_CAP": "1",
+    "KUMMER_START_INDEX": "0",
+    "KUMMER_VALIDATE_TRANSITIONS": "0",
+    "KUMMER_DRIVER_SOURCE_SHA256": "exact patched pruned source digest supplied at compile",
+    "KUMMER_DRIVER_REVISION": "published candidate revision supplied at compile",
+    "KUMMER_DRIVER_CONTROL_OUTPUT": "fresh exclusively created output path"
+  },
+  "staging_requirements": [
+    "Apply existing signed-event-adapter patch first, then this incremental candidate.patch in a fresh private staged tree.",
+    "Preserve native sources; stage archived original pruned source as pruned-original.rs.",
+    "Materialize existing pencil-symbolic-graph reporting dependency at unchanged relative path; bind any lockfile update before execution.",
+    "Run exact two native controls and four new protocol controls with --test-threads=1 under a finite coordinator envelope; no runtime authorized by this source packet."
+  ],
+  "coverage_limits": [
+    "Missing fixed-target duplicate or other required joint fails qualification; no seed search or extra target is implicit.",
+    "Forced zero-difference fallback and zero-vector lift are explicit actual native controls. Delta_zero, D_zero, degree-one ambiguity and restart projection failures are captured by the hook but not yet demonstrated by new fixed native fixtures.",
+    "Full1260 matched cohort and operation/timing comparison are not run or allocated.",
+    "Observer failure preserves an incomplete Trace prefix; qualification failures and worker-time costs remain recorded."
+  ]
+}

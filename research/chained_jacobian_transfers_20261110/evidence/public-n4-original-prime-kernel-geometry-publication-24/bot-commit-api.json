@@ -1,0 +1,77 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Action completed."
+    }
+  ],
+  "structuredContent": {
+    "commit": {
+      "sha": "06d030bb58f7eaf69e942708425a2a805cf84faf",
+      "message": "Move PR data files to the artifact store",
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/06d030bb58f7eaf69e942708425a2a805cf84faf",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/06d030bb58f7eaf69e942708425a2a805cf84faf",
+      "diff": "@@ -0,0 +1,11 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"original-full-geometry-all-three-whole-records.json.xz\": {\"sha256\": \"9d0e3b246f6b08769b1244b6b8b74db0b98a5fe8fab22a61393ce14b759e2ccb\", \"bytes\": 87720},\n+  \"original-full-geometry-native01-whole16.json\": {\"sha256\": \"c6e8a52abe646d19829b3f01599688f6df28dac02cb4b28f4db868d2355be620\", \"bytes\": 3173404},\n+  \"original-kernel-native01-whole311.json\": {\"sha256\": \"4d93828d197bf05bd12b0d80117396423c0999e3ed63b1e8e688fd816fdafb1f\", \"bytes\": 2486981},\n+  \"original-prime-native02-whole1077.json\": {\"sha256\": \"eccbf103edbc55cf96223850186362baeb2691fc9ae225e42dd396ed51921bef\", \"bytes\": 4238631},\n+  \"whole-closed-science-24.tar.xz.part-0000\": {\"sha256\": \"b86cdf08296b323f3f099254b4e84046dd7442cc47fe85c751cf62e0a43ffb87\", \"bytes\": 24881096},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"dbd579dc7a13d8c9781d9815f9afd139fff4a39251f8ecc9214397d33b5b2ebc\", \"bytes\": 653624}\n+ }\n+}\n@@ -0,0 +1,9 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/original-full-geometry-all-three-whole-records.json.xz\n+/original-full-geometry-native01-whole16.json\n+/original-kernel-native01-whole311.json\n+/original-prime-native02-whole1077.json\n+/whole-closed-science-24.tar.xz.part-0000\n+/whole-current-inputs.json.xz\n+# <<< artifacts\n\n\n\n\n\n",
+      "files": [
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/.artifacts.json",
+          "patch": "@@ -0,0 +1,11 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"original-full-geometry-all-three-whole-records.json.xz\": {\"sha256\": \"9d0e3b246f6b08769b1244b6b8b74db0b98a5fe8fab22a61393ce14b759e2ccb\", \"bytes\": 87720},\n+  \"original-full-geometry-native01-whole16.json\": {\"sha256\": \"c6e8a52abe646d19829b3f01599688f6df28dac02cb4b28f4db868d2355be620\", \"bytes\": 3173404},\n+  \"original-kernel-native01-whole311.json\": {\"sha256\": \"4d93828d197bf05bd12b0d80117396423c0999e3ed63b1e8e688fd816fdafb1f\", \"bytes\": 2486981},\n+  \"original-prime-native02-whole1077.json\": {\"sha256\": \"eccbf103edbc55cf96223850186362baeb2691fc9ae225e42dd396ed51921bef\", \"bytes\": 4238631},\n+  \"whole-closed-science-24.tar.xz.part-0000\": {\"sha256\": \"b86cdf08296b323f3f099254b4e84046dd7442cc47fe85c751cf62e0a43ffb87\", \"bytes\": 24881096},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"dbd579dc7a13d8c9781d9815f9afd139fff4a39251f8ecc9214397d33b5b2ebc\", \"bytes\": 653624}\n+ }\n+}"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/.gitignore",
+          "patch": "@@ -0,0 +1,9 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/original-full-geometry-all-three-whole-records.json.xz\n+/original-full-geometry-native01-whole16.json\n+/original-kernel-native01-whole311.json\n+/original-prime-native02-whole1077.json\n+/whole-closed-science-24.tar.xz.part-0000\n+/whole-current-inputs.json.xz\n+# <<< artifacts"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/original-full-geometry-all-three-whole-records.json.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/original-full-geometry-native01-whole16.json",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/original-kernel-native01-whole311.json",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/original-prime-native02-whole1077.json",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/whole-closed-science-24.tar.xz.part-0000",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/whole-current-inputs.json.xz",
+          "patch": null
+        }
+      ],
+      "repository_full_name": "isogeny-labs/crypto",
+      "comments": null,
+      "author": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "committer": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "created_at": "2026-11-15T07:58:20Z",
+      "git_author_email": null,
+      "display_url": "https://github.com/isogeny-labs/crypto/commit/06d030bb58f7eaf69e942708425a2a805cf84faf",
+      "display_title": "Move PR data files to the artifact store"
+    },
+    "url": "https://github.com/isogeny-labs/crypto/commit/06d030bb58f7eaf69e942708425a2a805cf84faf",
+    "title": "Move PR data files to the artifact store",
+    "diff": "@@ -0,0 +1,11 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"original-full-geometry-all-three-whole-records.json.xz\": {\"sha256\": \"9d0e3b246f6b08769b1244b6b8b74db0b98a5fe8fab22a61393ce14b759e2ccb\", \"bytes\": 87720},\n+  \"original-full-geometry-native01-whole16.json\": {\"sha256\": \"c6e8a52abe646d19829b3f01599688f6df28dac02cb4b28f4db868d2355be620\", \"bytes\": 3173404},\n+  \"original-kernel-native01-whole311.json\": {\"sha256\": \"4d93828d197bf05bd12b0d80117396423c0999e3ed63b1e8e688fd816fdafb1f\", \"bytes\": 2486981},\n+  \"original-prime-native02-whole1077.json\": {\"sha256\": \"eccbf103edbc55cf96223850186362baeb2691fc9ae225e42dd396ed51921bef\", \"bytes\": 4238631},\n+  \"whole-closed-science-24.tar.xz.part-0000\": {\"sha256\": \"b86cdf08296b323f3f099254b4e84046dd7442cc47fe85c751cf62e0a43ffb87\", \"bytes\": 24881096},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"dbd579dc7a13d8c9781d9815f9afd139fff4a39251f8ecc9214397d33b5b2ebc\", \"bytes\": 653624}\n+ }\n+}\n@@ -0,0 +1,9 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/original-full-geometry-all-three-whole-records.json.xz\n+/original-full-geometry-native01-whole16.json\n+/original-kernel-native01-whole311.json\n+/original-prime-native02-whole1077.json\n+/whole-closed-science-24.tar.xz.part-0000\n+/whole-current-inputs.json.xz\n+# <<< artifacts\n\n\n\n\n\n",
+    "display_url": "https://github.com/isogeny-labs/crypto/commit/06d030bb58f7eaf69e942708425a2a805cf84faf",
+    "display_title": "Move PR data files to the artifact store"
+  },
+  "isError": false
+}

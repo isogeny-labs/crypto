@@ -1,0 +1,94 @@
+import Std.Tactic
+import Init.GrindInstances.Ring.Fin
+
+/-! Arithmetic certificates for the exact original Kf::new(223) parameters
+and its Frobenius basis coefficients. No field/Jacobian construction,
+Rust powmod/compiler/counter correspondence or runtime cost is asserted. -/
+set_option autoImplicit false
+set_option maxRecDepth 8192
+namespace CubicConstructorFrobenius22301
+open Lean.Grind
+attribute [local instance] Semiring.natCast
+
+theorem constructor_guard : (223 : Nat)%12=7 ∧ (223-1)/3=74 := by decide
+
+theorem skipped_candidate_two : (2 : Nat)^74%223=1 := by decide
+
+theorem selected_candidate_three : (3 : Nat)^74%223=183 ∧ (183 : Nat)≠1 := by decide
+
+/-- Only223 base residues are reduced; no cubic coefficient population. -/
+theorem no_base_cubic_root_three : ∀ x : Fin 223, x^3≠(3 : Fin 223) := by decide
+
+theorem frobenius_coefficients :
+    (3 : Fin 223)^74=183 ∧ (183 : Fin 223)^2=39 ∧
+    (183 : Fin 223)^3=1 ∧ (39 : Fin 223)^3=1 ∧
+    (183 : Fin 223)≠1 ∧ (39 : Fin 223)≠1 := by decide
+
+theorem constructor_size : (223 : Nat)^3=11089567 := by decide
+
+/-- Power grouping uses only the ordinary semiring laws. -/
+theorem group_power {R : Type} [Semiring R] (z : R) (m n : Nat) :
+    z^(m*n)=(z^m)^n := by
+  induction n with
+  | zero => simp only [Nat.mul_zero,Semiring.pow_zero]
+  | succ n ih => rw [Nat.mul_succ,Semiring.pow_add,ih,Semiring.pow_succ]
+
+/-- The actual characteristic hypothesis transports the computed base residue. -/
+theorem coefficient_power {R : Type} [CommRing R] [IsCharP R 223] :
+    (3 : R)^74=183 := by
+  calc
+    (3 : R)^74 = (((3 : Nat)^74 : Nat) : R) := by
+      rw [Semiring.natCast_pow,Semiring.natCast_eq_ofNat]
+    _ = ((183 : Nat) : R) := IsCharP.natCast_ext 223 (by decide)
+    _ = 183 := Semiring.natCast_eq_ofNat 183
+
+/-- The relation z^3=3 gives the constructor's first Frobenius coefficient. -/
+theorem generator_frobenius {R : Type} [CommRing R] [IsCharP R 223]
+    (z : R) (hz : z^3=3) : z^223=183*z := by
+  change z^(3*74+1)=183*z
+  rw [Semiring.pow_succ,group_power,hz,coefficient_power]
+
+/-- The second basis coefficient is39 under the same explicit relation. -/
+theorem squared_generator_frobenius {R : Type} [CommRing R] [IsCharP R 223]
+    (z : R) (hz : z^3=3) : (z^2)^223=39*z^2 := by
+  rw [← group_power]
+  change z^(223*2)=39*z^2
+  rw [group_power,generator_frobenius z hz]
+  grind
+
+def basisFrob (x : Fin 223 × Fin 223 × Fin 223) : Fin 223 × Fin 223 × Fin 223 :=
+  (x.1,183*x.2.1,39*x.2.2)
+
+/-- A certificate for the concrete coefficient action, not a field construction. -/
+theorem basis_frobenius_three (a b c : Fin 223) :
+    basisFrob (basisFrob (basisFrob (a,b,c)))=(a,b,c) := by
+  apply Prod.ext
+  · rfl
+  · apply Prod.ext <;> simp only [basisFrob] <;> grind
+
+/-- Fixed vectors of the exact diagonal coefficient action are the base axis. -/
+theorem fixed_coefficient_subspace (a b c : Fin 223) :
+    basisFrob (a,b,c)=(a,b,c) ↔ b=0 ∧ c=0 := by
+  constructor
+  · intro h
+    have hb : (183 : Fin 223)*b=b := congrArg (fun x => x.2.1) h
+    have hc : (39 : Fin 223)*c=c := congrArg (fun x => x.2.2) h
+    constructor <;> grind
+  · rintro ⟨rfl,rfl⟩
+    apply Prod.ext
+    · rfl
+    · apply Prod.ext <;> simp only [basisFrob] <;> grind
+
+end CubicConstructorFrobenius22301
+#print axioms CubicConstructorFrobenius22301.constructor_guard
+#print axioms CubicConstructorFrobenius22301.skipped_candidate_two
+#print axioms CubicConstructorFrobenius22301.selected_candidate_three
+#print axioms CubicConstructorFrobenius22301.no_base_cubic_root_three
+#print axioms CubicConstructorFrobenius22301.frobenius_coefficients
+#print axioms CubicConstructorFrobenius22301.constructor_size
+#print axioms CubicConstructorFrobenius22301.group_power
+#print axioms CubicConstructorFrobenius22301.coefficient_power
+#print axioms CubicConstructorFrobenius22301.generator_frobenius
+#print axioms CubicConstructorFrobenius22301.squared_generator_frobenius
+#print axioms CubicConstructorFrobenius22301.basis_frobenius_three
+#print axioms CubicConstructorFrobenius22301.fixed_coefficient_subspace

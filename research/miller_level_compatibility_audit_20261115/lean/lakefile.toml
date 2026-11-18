@@ -1,0 +1,11 @@
+name = "miller_level_compatibility_audit"
+version = "0.1.0"
+defaultTargets = ["MillerLevelCompatibilityAudit"]
+
+[[require]]
+name = "binary_miller_audit"
+path = "../../binary_miller_audit_20261115/lean"
+
+[[lean_lib]]
+name = "MillerLevelCompatibilityAudit"
+roots = ["LevelFunctions", "LevelValues", "LevelControls", "LevelGeometry", "LevelNumerical", "LevelCertificate"]

@@ -1,0 +1,13 @@
+# Next: exact image cells for conditional factorization
+
+The measured second-Vieta guard nearly eliminates the cubic candidate stream, but it still pays for every outer fiber and prefix computation. To pursue50x, test an exact whole-cell representation rather than extrapolating rejection percentages to speed.
+
+For monic degree-m H overK,let A_H=K[X]/H,UsubsetVbinary source spaces,L_Uthe monic subspace polynomial,andW=L_U(V). Define B_H(Y)=det(YI-M_(L_U(X))),the characteristic polynomial of multiplication byL_U(X)onA_H. It hasdegree m,counting multiplicities. Then allroots ofHlieinV iff allroots ofB_HlieinW. Proof:over the algebraic closure the eigenvalues are L_U(alpha_i),with multiplicities fromH. The inverseimageL_U^{-1}(W)=VbecausekerL_U=UsubsetV. This retains nonreduced algebras,repeated roots,zero coefficients andnonrational candidate roots. Cayley-Hamilton gives H|B_H(L_U(X)).
+
+Equivalently,H is supportedinV iff there exists a monic degree-m B split entirely inW such thatH|B(L_U(X)). The forward choice isB_H. Conversely any such divisibility confines allHroots toL_U^{-1}(W)=V;B need not equalB_H for this existential support test. Retain alloriginal auxiliary/curve constraints separately.
+
+At d18,choose dimU14 for cubics:Wdimension4,size16,so there are exactlybinom(18,3)=816possible image-root multisets. For quintics choose dimU13:Wdimension5,size32,so binom(36,5)=376992image multisets. These are counts of image cells,not bounds on preimage search work. Each cell can have many original norms;no tractable search or collapse of the main2^73relaxation is proved. Do not assume independently random quotient equations or discard colliding images.
+
+Next90s/4GiB/core0experiment: implement a division-free characteristic-polynomial image for degree3and5,with frozen small fields,seeds andbudgets. Independently compare literal root-image multisets and repeated-root products;test all monic cubics overF8/F16 and a fixed bounded quintic corpus including nonsplit/zero/repeated cases. Verify the exact support equivalence and composition-divisibility contract. Then build only bounded actualGF83image-cell constraints and measure their exact affine/nonlinear residual ranks on the frozen norm family,before attempting cell search. Preserve unsolved preimage obligations and all exceptional/rank-minor-zero branches.
+
+For the current guard,retain allprefixes6/7/8and select future training variants only on charged complete-pipeline costs. Global20hard many-field genuineF4/F5/F6comparison andthe50xgoal remain unpassed. Primary novelty review against subspace-polynomial composition,finite-algebra characteristic polynomials andconditional factorization is required.

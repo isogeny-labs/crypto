@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T14:16:44Z",
+ "id": "PCC-20261112-243a61",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0796b36df6ee9712bfa335d81191abc26ed937ce",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "7d5f2d3b23fb6fe5c1507de9010352f2cc88215b9b68c96749985e59bff6cf93",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+   "theorem": "IsogenyCycles.noncentral_action_does_not_close_graph"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact CM polynomial/norm identities,complete finite16-vector monodromy and noncentral relative-sign graph obstruction,publicCRT and forcedprincipal diagonal degrees. Actual curves/CMendomorphism classification,quotientexistence,Galois/moduleidentifications,polarizationdescent,andglobalAV/Jacobiancatalog remain explicitwritten bridges. No native evaluation or signed scientific standing.",
+ "statement": "theorem noncentral_action_does_not_close_graph {E F : Type} (k : E \u2192 F) (T neg : F \u2192 F) (onto : \u2200 q, \u2203 p, k p=q) (notIdentity : \u2203 q, T q\u2260q) (notNegative : \u2203 q, T q\u2260neg q) : \u00ac ((\u2200 p, T (k p)=k p) \u2228 (\u2200 p, T (k p)=neg (k p)))"
+}

@@ -1,0 +1,1853 @@
+{
+  "tool": "koblitz_sixsum_extract_probe",
+  "version": 4,
+  "date_utc": "2026-10-18T08:50:11Z",
+  "args": {
+    "a": "0",
+    "cell_wall_s": "300",
+    "columns": "[10, 20]",
+    "early_abort": "true",
+    "kernels": "4sum,6sum_b2_s4_strided",
+    "max_s3": "400000000",
+    "max_s4": "50000000",
+    "max_targets": "4096",
+    "n": "[23, 31]",
+    "raw_x_cap": "100000000",
+    "relations": "32",
+    "seed": "20261012"
+  },
+  "note": "Public synthetic [a]G targets on registered Koblitz rungs; every relation re-added as a group equation (fast and general arithmetic) before it counts. Units: S3/S4 root solves, targets, wall. No key-recovery, sub-rho or deployed-curve claim.",
+  "rungs": [
+    {
+      "n": 23,
+      "a": 0,
+      "name": "icv1-f2m23-t5197-69e76b73",
+      "r": 2095853,
+      "cofactor": 4,
+      "group_order": 8383412,
+      "bases": [
+        {
+          "columns": 10,
+          "points": 460,
+          "table": {
+            "base_points": 460,
+            "columns": 10,
+            "orbit_representatives": 10,
+            "pair_adds": 2530,
+            "states": 2223,
+            "duplicate_keys": 297,
+            "canonicalisations": 2980,
+            "frobenius_maps": 10120,
+            "coefficient_checks": 460,
+            "wall_ns": 4190886
+          },
+          "base_wall_s": 0.000272846
+        },
+        {
+          "columns": 20,
+          "points": 920,
+          "table": {
+            "base_points": 920,
+            "columns": 20,
+            "orbit_representatives": 20,
+            "pair_adds": 9660,
+            "states": 8241,
+            "duplicate_keys": 1399,
+            "canonicalisations": 10560,
+            "frobenius_maps": 20240,
+            "coefficient_checks": 920,
+            "wall_ns": 10368775
+          },
+          "base_wall_s": 0.000421397
+        }
+      ]
+    },
+    {
+      "n": 31,
+      "a": 0,
+      "name": "icv1-f2m31-tm90707-c95f16f5",
+      "r": 1439393,
+      "cofactor": 1492,
+      "group_order": 2147574356,
+      "bases": [
+        {
+          "columns": 10,
+          "points": 620,
+          "table": {
+            "base_points": 620,
+            "columns": 10,
+            "orbit_representatives": 10,
+            "pair_adds": 3410,
+            "states": 2888,
+            "duplicate_keys": 512,
+            "canonicalisations": 4020,
+            "frobenius_maps": 18600,
+            "coefficient_checks": 620,
+            "wall_ns": 7340322
+          },
+          "base_wall_s": 0.000461575
+        },
+        {
+          "columns": 20,
+          "points": 1240,
+          "table": {
+            "base_points": 1240,
+            "columns": 20,
+            "orbit_representatives": 20,
+            "pair_adds": 13020,
+            "states": 9548,
+            "duplicate_keys": 3452,
+            "canonicalisations": 14240,
+            "frobenius_maps": 37200,
+            "coefficient_checks": 1240,
+            "wall_ns": 18768857
+          },
+          "base_wall_s": 0.000795622
+        }
+      ]
+    }
+  ],
+  "cells": [
+    {
+      "n": 23,
+      "a": 0,
+      "columns": 10,
+      "kernel": "4sum",
+      "arity": 4,
+      "r": 2095853,
+      "cofactor": 4,
+      "base_points": 460,
+      "table_states": 2223,
+      "abscissa_states": 51129,
+      "early_abort": true,
+      "counters": {
+        "targets": 32,
+        "s3_solves": 341,
+        "s4_solves": 0,
+        "s4_fallbacks": 0,
+        "outer_probes": 341,
+        "point_adds": 114,
+        "canonicalisations": 668,
+        "lookups": 668,
+        "candidate_hits": 32,
+        "lift_failures": 0,
+        "verified_relations": 32,
+        "verification_rejects": 0,
+        "verification_adds": 128,
+        "degenerate_skips": 0,
+        "complete_scans": 0,
+        "budget_stops": 0,
+        "wall_ns": 483824
+      },
+      "relations": 32,
+      "full_support_relations": 32,
+      "support_histogram": {
+        "4": 32
+      },
+      "s3_solves_per_relation": 10.65625,
+      "s4_solves_per_relation": 0.0,
+      "solves_per_relation": 10.65625,
+      "targets_per_relation": 1.0,
+      "wall_s_per_relation": 0.0000227496875,
+      "point_adds_per_relation": 3.5625,
+      "lookups_per_relation": 20.875,
+      "outer_probes_per_relation": 10.65625,
+      "structural_outer_probes_per_relation": 10.247868137456239,
+      "expected_relations_per_target": 890.1419453877093,
+      "structural_targets_per_relation": 1.0,
+      "scan_unit_solves": 51129.0,
+      "scan_unit_lambda": 890.1419453877093,
+      "structural_dense_solves_per_relation": 10.247868137456239,
+      "structural_sparse_solves_per_relation": 57.439153682090904,
+      "scan_unit_multiplicity": 6.0,
+      "structural_solves_per_relation": 9.571400169135448,
+      "models": {
+        "r_over_n2k2": 39.61914933837429,
+        "r_over_4n2k2": 9.904787334593573,
+        "model_45r_over_n4k4": 0.03370248998538456,
+        "structural_s3_solves_per_relation": 10.247868137456239,
+        "structural_s4_solves_per_relation": 5.123934068728119
+      },
+      "fit_c_solves": 0.26896715800201637,
+      "targets_over_model_45": 29.671398179590305,
+      "outer_probes_over_model_45": 316.1858368512592,
+      "scan_ends": {
+        "FirstHit": 32
+      },
+      "stop_reason": "relations",
+      "s4_mode": "resolvent",
+      "s4_pair_in_s3_wall": 1.9383044270589687,
+      "s4_pair_in_s3_ops": 2.7794153449293844,
+      "s3_equivalents_per_relation_wall": 10.65625,
+      "s3_equivalents_per_relation_ops": 10.65625,
+      "sample_relations": [
+        {
+          "indices": [
+            51,
+            54,
+            67,
+            134
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              1,
+              1443465
+            ],
+            [
+              2,
+              1595188
+            ]
+          ],
+          "target_x": 7249836,
+          "target_y": 4486629
+        },
+        {
+          "indices": [
+            143,
+            226,
+            392,
+            411
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              3,
+              93196
+            ],
+            [
+              4,
+              1595188
+            ],
+            [
+              8,
+              498595
+            ]
+          ],
+          "target_x": 7794618,
+          "target_y": 1734883
+        },
+        {
+          "indices": [
+            119,
+            293,
+            347,
+            428
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              2,
+              93104
+            ],
+            [
+              6,
+              1816285
+            ],
+            [
+              7,
+              2070
+            ],
+            [
+              9,
+              652368
+            ]
+          ],
+          "target_x": 1948908,
+          "target_y": 1430582
+        },
+        {
+          "indices": [
+            11,
+            159,
+            424,
+            442
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              0,
+              93200
+            ],
+            [
+              3,
+              1070685
+            ],
+            [
+              9,
+              4044
+            ]
+          ],
+          "target_x": 8199844,
+          "target_y": 4689016
+        }
+      ]
+    },
+    {
+      "n": 23,
+      "a": 0,
+      "columns": 10,
+      "kernel": "6sum_b2_s4_strided",
+      "arity": 6,
+      "r": 2095853,
+      "cofactor": 4,
+      "base_points": 460,
+      "table_states": 2223,
+      "abscissa_states": 51129,
+      "early_abort": true,
+      "counters": {
+        "targets": 32,
+        "s3_solves": 0,
+        "s4_solves": 175,
+        "s4_fallbacks": 0,
+        "outer_probes": 175,
+        "point_adds": 244,
+        "canonicalisations": 643,
+        "lookups": 643,
+        "candidate_hits": 32,
+        "lift_failures": 0,
+        "verified_relations": 32,
+        "verification_rejects": 0,
+        "verification_adds": 192,
+        "degenerate_skips": 0,
+        "complete_scans": 0,
+        "budget_stops": 0,
+        "wall_ns": 1769666
+      },
+      "relations": 32,
+      "full_support_relations": 31,
+      "support_histogram": {
+        "4": 1,
+        "6": 31
+      },
+      "s3_solves_per_relation": 0.0,
+      "s4_solves_per_relation": 5.46875,
+      "solves_per_relation": 5.46875,
+      "targets_per_relation": 1.0,
+      "wall_s_per_relation": 0.000061725875,
+      "point_adds_per_relation": 7.625,
+      "lookups_per_relation": 20.09375,
+      "outer_probes_per_relation": 5.46875,
+      "structural_outer_probes_per_relation": 5.123934068728119,
+      "expected_relations_per_target": 6278467.854801309,
+      "structural_targets_per_relation": 1.0,
+      "scan_unit_solves": 1307087320.5,
+      "scan_unit_lambda": 6278467.854801309,
+      "structural_dense_solves_per_relation": 5.123934068728119,
+      "structural_sparse_solves_per_relation": 208.18571516623055,
+      "scan_unit_multiplicity": 45.0,
+      "structural_solves_per_relation": 4.626349209541577,
+      "models": {
+        "r_over_n2k2": 39.61914933837429,
+        "r_over_4n2k2": 9.904787334593573,
+        "model_45r_over_n4k4": 0.03370248998538456,
+        "structural_s3_solves_per_relation": 10.247868137456239,
+        "structural_s4_solves_per_relation": 5.123934068728119
+      },
+      "fit_c_solves": 0.13803299897464183,
+      "targets_over_model_45": 29.671398179590305,
+      "outer_probes_over_model_45": 162.2654587946345,
+      "scan_ends": {
+        "FirstHit": 32
+      },
+      "stop_reason": "relations",
+      "s4_mode": "resolvent",
+      "s4_pair_in_s3_wall": 1.9383044270589687,
+      "s4_pair_in_s3_ops": 2.7794153449293844,
+      "s3_equivalents_per_relation_wall": 10.600102335478734,
+      "s3_equivalents_per_relation_ops": 15.199927667582571,
+      "sample_relations": [
+        {
+          "indices": [
+            4,
+            4,
+            210,
+            229,
+            321,
+            364
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              1909461
+            ],
+            [
+              4,
+              1001420
+            ],
+            [
+              6,
+              1094524
+            ],
+            [
+              7,
+              1595188
+            ]
+          ],
+          "target_x": 8066410,
+          "target_y": 5185169
+        },
+        {
+          "indices": [
+            14,
+            84,
+            182,
+            244,
+            247,
+            395
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              652368
+            ],
+            [
+              1,
+              1423425
+            ],
+            [
+              3,
+              1001329
+            ],
+            [
+              5,
+              372800
+            ],
+            [
+              8,
+              93104
+            ]
+          ],
+          "target_x": 3615648,
+          "target_y": 5688419
+        },
+        {
+          "indices": [
+            23,
+            23,
+            91,
+            195,
+            201,
+            343
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              2000679
+            ],
+            [
+              1,
+              1094524
+            ],
+            [
+              4,
+              1909485
+            ],
+            [
+              7,
+              1070685
+            ]
+          ],
+          "target_x": 7586854,
+          "target_y": 4002541
+        },
+        {
+          "indices": [
+            9,
+            9,
+            71,
+            188,
+            351,
+            453
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              1536685
+            ],
+            [
+              1,
+              2070
+            ],
+            [
+              4,
+              2002657
+            ],
+            [
+              7,
+              1998609
+            ],
+            [
+              9,
+              672428
+            ]
+          ],
+          "target_x": 7678808,
+          "target_y": 8321318
+        }
+      ]
+    },
+    {
+      "n": 23,
+      "a": 0,
+      "columns": 20,
+      "kernel": "4sum",
+      "arity": 4,
+      "r": 2095853,
+      "cofactor": 4,
+      "base_points": 920,
+      "table_states": 8241,
+      "abscissa_states": 189543,
+      "early_abort": true,
+      "counters": {
+        "targets": 32,
+        "s3_solves": 95,
+        "s4_solves": 0,
+        "s4_fallbacks": 0,
+        "outer_probes": 95,
+        "point_adds": 115,
+        "canonicalisations": 175,
+        "lookups": 175,
+        "candidate_hits": 32,
+        "lift_failures": 0,
+        "verified_relations": 32,
+        "verification_rejects": 0,
+        "verification_adds": 128,
+        "degenerate_skips": 0,
+        "complete_scans": 0,
+        "budget_stops": 0,
+        "wall_ns": 363472
+      },
+      "relations": 32,
+      "full_support_relations": 32,
+      "support_histogram": {
+        "4": 32
+      },
+      "s3_solves_per_relation": 2.96875,
+      "s4_solves_per_relation": 0.0,
+      "solves_per_relation": 2.96875,
+      "targets_per_relation": 1.0,
+      "wall_s_per_relation": 0.0000179480625,
+      "point_adds_per_relation": 3.59375,
+      "lookups_per_relation": 5.46875,
+      "outer_probes_per_relation": 2.96875,
+      "structural_outer_probes_per_relation": 2.764350305735374,
+      "expected_relations_per_target": 14242.271126203348,
+      "structural_targets_per_relation": 1.0,
+      "scan_unit_solves": 189543.0,
+      "scan_unit_lambda": 14242.271126203348,
+      "structural_dense_solves_per_relation": 2.764350305735374,
+      "structural_sparse_solves_per_relation": 13.308481373541136,
+      "scan_unit_multiplicity": 6.0,
+      "structural_solves_per_relation": 2.2180542726902197,
+      "models": {
+        "r_over_n2k2": 9.904787334593573,
+        "r_over_4n2k2": 2.4761968336483933,
+        "model_45r_over_n4k4": 0.002106405624086535,
+        "structural_s3_solves_per_relation": 2.764350305735374,
+        "structural_s4_solves_per_relation": 1.382175152867687
+      },
+      "fit_c_solves": 0.29972879777350797,
+      "targets_over_model_45": 474.7423708734449,
+      "outer_probes_over_model_45": 1409.3914135305395,
+      "scan_ends": {
+        "FirstHit": 32
+      },
+      "stop_reason": "relations",
+      "s4_mode": "resolvent",
+      "s4_pair_in_s3_wall": 1.9383044270589687,
+      "s4_pair_in_s3_ops": 2.7794153449293844,
+      "s3_equivalents_per_relation_wall": 2.96875,
+      "s3_equivalents_per_relation_ops": 2.96875,
+      "sample_relations": [
+        {
+          "indices": [
+            38,
+            188,
+            456,
+            479
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              0,
+              1423425
+            ],
+            [
+              4,
+              2002657
+            ],
+            [
+              9,
+              1595188
+            ],
+            [
+              10,
+              1584304
+            ]
+          ],
+          "target_x": 7215430,
+          "target_y": 7058116
+        },
+        {
+          "indices": [
+            68,
+            554,
+            798,
+            904
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              1,
+              47587
+            ],
+            [
+              12,
+              93194
+            ],
+            [
+              17,
+              279568
+            ],
+            [
+              19,
+              88964
+            ]
+          ],
+          "target_x": 8135540,
+          "target_y": 2870157
+        },
+        {
+          "indices": [
+            93,
+            313,
+            400,
+            720
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              2,
+              2095852
+            ],
+            [
+              6,
+              1634473
+            ],
+            [
+              8,
+              1812401
+            ],
+            [
+              15,
+              88964
+            ]
+          ],
+          "target_x": 5251394,
+          "target_y": 7634847
+        },
+        {
+          "indices": [
+            555,
+            779,
+            872,
+            896
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              12,
+              2002659
+            ],
+            [
+              16,
+              500665
+            ],
+            [
+              18,
+              1001329
+            ],
+            [
+              19,
+              47587
+            ]
+          ],
+          "target_x": 6594026,
+          "target_y": 5657453
+        }
+      ]
+    },
+    {
+      "n": 23,
+      "a": 0,
+      "columns": 20,
+      "kernel": "6sum_b2_s4_strided",
+      "arity": 6,
+      "r": 2095853,
+      "cofactor": 4,
+      "base_points": 920,
+      "table_states": 8241,
+      "abscissa_states": 189543,
+      "early_abort": true,
+      "counters": {
+        "targets": 32,
+        "s3_solves": 0,
+        "s4_solves": 57,
+        "s4_fallbacks": 0,
+        "outer_probes": 57,
+        "point_adds": 223,
+        "canonicalisations": 164,
+        "lookups": 164,
+        "candidate_hits": 32,
+        "lift_failures": 0,
+        "verified_relations": 32,
+        "verification_rejects": 0,
+        "verification_adds": 192,
+        "degenerate_skips": 0,
+        "complete_scans": 0,
+        "budget_stops": 0,
+        "wall_ns": 3734057
+      },
+      "relations": 32,
+      "full_support_relations": 31,
+      "support_histogram": {
+        "4": 1,
+        "6": 31
+      },
+      "s3_solves_per_relation": 0.0,
+      "s4_solves_per_relation": 1.78125,
+      "solves_per_relation": 1.78125,
+      "targets_per_relation": 1.0,
+      "wall_s_per_relation": 0.0001242474375,
+      "point_adds_per_relation": 6.96875,
+      "lookups_per_relation": 5.125,
+      "outer_probes_per_relation": 1.78125,
+      "structural_outer_probes_per_relation": 1.382175152867687,
+      "expected_relations_per_target": 401821942.7072838,
+      "structural_targets_per_relation": 1.0,
+      "scan_unit_solves": 17963274424.5,
+      "scan_unit_lambda": 401821942.7072838,
+      "structural_dense_solves_per_relation": 1.382175152867687,
+      "structural_sparse_solves_per_relation": 44.7045631790839,
+      "scan_unit_multiplicity": 45.0,
+      "structural_solves_per_relation": 0.993434737258035,
+      "models": {
+        "r_over_n2k2": 9.904787334593573,
+        "r_over_4n2k2": 2.4761968336483933,
+        "model_45r_over_n4k4": 0.002106405624086535,
+        "structural_s3_solves_per_relation": 2.764350305735374,
+        "structural_s4_solves_per_relation": 1.382175152867687
+      },
+      "fit_c_solves": 0.1798372786641048,
+      "targets_over_model_45": 474.7423708734449,
+      "outer_probes_over_model_45": 845.6348481183237,
+      "scan_ends": {
+        "FirstHit": 32
+      },
+      "stop_reason": "relations",
+      "s4_mode": "resolvent",
+      "s4_pair_in_s3_wall": 1.9383044270589687,
+      "s4_pair_in_s3_ops": 2.7794153449293844,
+      "s3_equivalents_per_relation_wall": 3.452604760698788,
+      "s3_equivalents_per_relation_ops": 4.9508335831554655,
+      "sample_relations": [
+        {
+          "indices": [
+            1,
+            1,
+            191,
+            317,
+            707,
+            878
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              2095851
+            ],
+            [
+              4,
+              93192
+            ],
+            [
+              6,
+              250332
+            ],
+            [
+              15,
+              1816285
+            ],
+            [
+              19,
+              2002657
+            ]
+          ],
+          "target_x": 6435232,
+          "target_y": 5980676
+        },
+        {
+          "indices": [
+            0,
+            0,
+            192,
+            441,
+            618,
+            748
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              2
+            ],
+            [
+              4,
+              279584
+            ],
+            [
+              9,
+              93104
+            ],
+            [
+              13,
+              1025168
+            ],
+            [
+              16,
+              1629885
+            ]
+          ],
+          "target_x": 5454160,
+          "target_y": 369522
+        },
+        {
+          "indices": [
+            133,
+            379,
+            409,
+            511,
+            627,
+            817
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              2,
+              250332
+            ],
+            [
+              8,
+              343532
+            ],
+            [
+              11,
+              93196
+            ],
+            [
+              13,
+              1998609
+            ],
+            [
+              17,
+              1990329
+            ]
+          ],
+          "target_x": 1010722,
+          "target_y": 2924911
+        },
+        {
+          "indices": [
+            1,
+            1,
+            12,
+            309,
+            379,
+            914
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              1629883
+            ],
+            [
+              6,
+              283452
+            ],
+            [
+              8,
+              93200
+            ],
+            [
+              19,
+              1845521
+            ]
+          ],
+          "target_x": 3981898,
+          "target_y": 7167201
+        }
+      ]
+    },
+    {
+      "n": 31,
+      "a": 0,
+      "columns": 10,
+      "kernel": "4sum",
+      "arity": 4,
+      "r": 1439393,
+      "cofactor": 1492,
+      "base_points": 620,
+      "table_states": 2888,
+      "abscissa_states": 89528,
+      "early_abort": true,
+      "counters": {
+        "targets": 32,
+        "s3_solves": 119,
+        "s4_solves": 0,
+        "s4_fallbacks": 0,
+        "outer_probes": 119,
+        "point_adds": 111,
+        "canonicalisations": 222,
+        "lookups": 222,
+        "candidate_hits": 32,
+        "lift_failures": 0,
+        "verified_relations": 32,
+        "verification_rejects": 0,
+        "verification_adds": 128,
+        "degenerate_skips": 0,
+        "complete_scans": 0,
+        "budget_stops": 0,
+        "wall_ns": 587733
+      },
+      "relations": 32,
+      "full_support_relations": 31,
+      "support_histogram": {
+        "2": 1,
+        "4": 31
+      },
+      "s3_solves_per_relation": 3.71875,
+      "s4_solves_per_relation": 0.0,
+      "solves_per_relation": 3.71875,
+      "targets_per_relation": 1.0,
+      "wall_s_per_relation": 0.00002663003125,
+      "point_adds_per_relation": 3.46875,
+      "lookups_per_relation": 6.9375,
+      "outer_probes_per_relation": 3.71875,
+      "structural_outer_probes_per_relation": 4.019393374139934,
+      "expected_relations_per_target": 4277.363212594939,
+      "structural_targets_per_relation": 1.0,
+      "scan_unit_solves": 89528.0,
+      "scan_unit_lambda": 4277.363212594939,
+      "structural_dense_solves_per_relation": 4.019393374139934,
+      "structural_sparse_solves_per_relation": 20.93065179416602,
+      "scan_unit_multiplicity": 6.0,
+      "structural_solves_per_relation": 3.488306044494324,
+      "models": {
+        "r_over_n2k2": 14.978074921956296,
+        "r_over_4n2k2": 3.744518730489074,
+        "model_45r_over_n4k4": 0.007013666716836975,
+        "structural_s3_solves_per_relation": 4.019393374139934,
+        "structural_s4_solves_per_relation": 2.009696687069967
+      },
+      "fit_c_solves": 0.24827956992982458,
+      "targets_over_model_45": 142.57877375316463,
+      "outer_probes_over_model_45": 530.214814894581,
+      "scan_ends": {
+        "FirstHit": 32
+      },
+      "stop_reason": "relations",
+      "s4_mode": "resolvent",
+      "s4_pair_in_s3_wall": 1.8751665955971615,
+      "s4_pair_in_s3_ops": 2.6586802648996968,
+      "s3_equivalents_per_relation_wall": 3.71875,
+      "s3_equivalents_per_relation_ops": 3.71875,
+      "sample_relations": [
+        {
+          "indices": [
+            64,
+            138,
+            583,
+            616
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              1,
+              45018
+            ],
+            [
+              2,
+              315136
+            ],
+            [
+              9,
+              237869
+            ]
+          ],
+          "target_x": 1409757364,
+          "target_y": 1430992332
+        },
+        {
+          "indices": [
+            311,
+            352,
+            517,
+            540
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              5,
+              1403767
+            ],
+            [
+              8,
+              661713
+            ]
+          ],
+          "target_x": 1570600086,
+          "target_y": 2037478549
+        },
+        {
+          "indices": [
+            27,
+            306,
+            496,
+            610
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              0,
+              44928
+            ],
+            [
+              4,
+              1090799
+            ],
+            [
+              8,
+              1
+            ],
+            [
+              9,
+              496198
+            ]
+          ],
+          "target_x": 900171354,
+          "target_y": 1521500067
+        },
+        {
+          "indices": [
+            125,
+            317,
+            341,
+            439
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              2,
+              1439392
+            ],
+            [
+              5,
+              1173014
+            ],
+            [
+              7,
+              45020
+            ]
+          ],
+          "target_x": 1110290328,
+          "target_y": 303031519
+        }
+      ]
+    },
+    {
+      "n": 31,
+      "a": 0,
+      "columns": 10,
+      "kernel": "6sum_b2_s4_strided",
+      "arity": 6,
+      "r": 1439393,
+      "cofactor": 1492,
+      "base_points": 620,
+      "table_states": 2888,
+      "abscissa_states": 89528,
+      "early_abort": true,
+      "counters": {
+        "targets": 32,
+        "s3_solves": 0,
+        "s4_solves": 68,
+        "s4_fallbacks": 0,
+        "outer_probes": 68,
+        "point_adds": 230,
+        "canonicalisations": 212,
+        "lookups": 212,
+        "candidate_hits": 32,
+        "lift_failures": 0,
+        "verified_relations": 32,
+        "verification_rejects": 0,
+        "verification_adds": 192,
+        "degenerate_skips": 0,
+        "complete_scans": 0,
+        "budget_stops": 0,
+        "wall_ns": 4485073
+      },
+      "relations": 32,
+      "full_support_relations": 32,
+      "support_histogram": {
+        "6": 32
+      },
+      "s3_solves_per_relation": 0.0,
+      "s4_solves_per_relation": 2.125,
+      "solves_per_relation": 2.125,
+      "targets_per_relation": 1.0,
+      "wall_s_per_relation": 0.0001485199375,
+      "point_adds_per_relation": 7.1875,
+      "lookups_per_relation": 6.625,
+      "outer_probes_per_relation": 2.125,
+      "structural_outer_probes_per_relation": 2.009696687069967,
+      "expected_relations_per_target": 54807280.63071648,
+      "structural_targets_per_relation": 1.0,
+      "scan_unit_solves": 4007631392.0,
+      "scan_unit_lambda": 54807280.63071648,
+      "structural_dense_solves_per_relation": 2.009696687069967,
+      "structural_sparse_solves_per_relation": 73.12224481639292,
+      "scan_unit_multiplicity": 45.0,
+      "structural_solves_per_relation": 1.6249387730387708,
+      "models": {
+        "r_over_n2k2": 14.978074921956296,
+        "r_over_4n2k2": 3.744518730489074,
+        "model_45r_over_n4k4": 0.007013666716836975,
+        "structural_s3_solves_per_relation": 4.019393374139934,
+        "structural_s4_solves_per_relation": 2.009696687069967
+      },
+      "fit_c_solves": 0.14187403995989975,
+      "targets_over_model_45": 142.57877375316463,
+      "outer_probes_over_model_45": 302.9798942254748,
+      "scan_ends": {
+        "FirstHit": 32
+      },
+      "stop_reason": "relations",
+      "s4_mode": "resolvent",
+      "s4_pair_in_s3_wall": 1.8751665955971615,
+      "s4_pair_in_s3_ops": 2.6586802648996968,
+      "s3_equivalents_per_relation_wall": 3.984729015643968,
+      "s3_equivalents_per_relation_ops": 5.649695562911855,
+      "sample_relations": [
+        {
+          "indices": [
+            154,
+            242,
+            267,
+            342,
+            454,
+            493
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              2,
+              311395
+            ],
+            [
+              3,
+              545400
+            ],
+            [
+              4,
+              765312
+            ],
+            [
+              5,
+              131683
+            ],
+            [
+              7,
+              843826
+            ]
+          ],
+          "target_x": 613461430,
+          "target_y": 1636316748
+        },
+        {
+          "indices": [
+            5,
+            5,
+            165,
+            336,
+            521,
+            596
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              90040
+            ],
+            [
+              2,
+              560660
+            ],
+            [
+              5,
+              1394465
+            ],
+            [
+              8,
+              586463
+            ],
+            [
+              9,
+              1017839
+            ]
+          ],
+          "target_x": 2130477966,
+          "target_y": 597554840
+        },
+        {
+          "indices": [
+            96,
+            98,
+            221,
+            358,
+            563,
+            612
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              1,
+              1176027
+            ],
+            [
+              3,
+              754473
+            ],
+            [
+              5,
+              211198
+            ],
+            [
+              9,
+              1386010
+            ]
+          ],
+          "target_x": 1188248634,
+          "target_y": 1189408255
+        },
+        {
+          "indices": [
+            149,
+            251,
+            255,
+            275,
+            360,
+            599
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              2,
+              586463
+            ],
+            [
+              4,
+              44926
+            ],
+            [
+              5,
+              520799
+            ],
+            [
+              9,
+              560660
+            ]
+          ],
+          "target_x": 2111212136,
+          "target_y": 1524745911
+        }
+      ]
+    },
+    {
+      "n": 31,
+      "a": 0,
+      "columns": 20,
+      "kernel": "4sum",
+      "arity": 4,
+      "r": 1439393,
+      "cofactor": 1492,
+      "base_points": 1240,
+      "table_states": 9548,
+      "abscissa_states": 295988,
+      "early_abort": true,
+      "counters": {
+        "targets": 32,
+        "s3_solves": 43,
+        "s4_solves": 0,
+        "s4_fallbacks": 0,
+        "outer_probes": 43,
+        "point_adds": 114,
+        "canonicalisations": 69,
+        "lookups": 69,
+        "candidate_hits": 32,
+        "lift_failures": 0,
+        "verified_relations": 32,
+        "verification_rejects": 0,
+        "verification_adds": 128,
+        "degenerate_skips": 0,
+        "complete_scans": 0,
+        "budget_stops": 0,
+        "wall_ns": 570986
+      },
+      "relations": 32,
+      "full_support_relations": 32,
+      "support_histogram": {
+        "4": 32
+      },
+      "s3_solves_per_relation": 1.34375,
+      "s4_solves_per_relation": 0.0,
+      "solves_per_relation": 1.34375,
+      "targets_per_relation": 1.0,
+      "wall_s_per_relation": 0.00002598578125,
+      "point_adds_per_relation": 3.5625,
+      "lookups_per_relation": 2.15625,
+      "outer_probes_per_relation": 1.34375,
+      "structural_outer_probes_per_relation": 1.2157528345743747,
+      "expected_relations_per_target": 68437.81140151902,
+      "structural_targets_per_relation": 1.0,
+      "scan_unit_solves": 295988.0,
+      "scan_unit_lambda": 68437.81140151902,
+      "structural_dense_solves_per_relation": 1.2157528345743747,
+      "structural_sparse_solves_per_relation": 4.3249191337148805,
+      "scan_unit_multiplicity": 6.0,
+      "structural_solves_per_relation": 0.7208181002101473,
+      "models": {
+        "r_over_n2k2": 3.744518730489074,
+        "r_over_4n2k2": 0.9361296826222685,
+        "model_45r_over_n4k4": 0.00043835416980231095,
+        "structural_s3_solves_per_relation": 1.2157528345743747,
+        "structural_s4_solves_per_relation": 0.6078764172871873
+      },
+      "fit_c_solves": 0.35885786578092294,
+      "targets_over_model_45": 2281.260380050634,
+      "outer_probes_over_model_45": 3065.443635693039,
+      "scan_ends": {
+        "FirstHit": 32
+      },
+      "stop_reason": "relations",
+      "s4_mode": "resolvent",
+      "s4_pair_in_s3_wall": 1.8751665955971615,
+      "s4_pair_in_s3_ops": 2.6586802648996968,
+      "s3_equivalents_per_relation_wall": 1.34375,
+      "s3_equivalents_per_relation_ops": 1.34375,
+      "sample_relations": [
+        {
+          "indices": [
+            115,
+            381,
+            682,
+            688
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              1,
+              943195
+            ],
+            [
+              6,
+              1304337
+            ],
+            [
+              11,
+              1394378
+            ]
+          ],
+          "target_x": 876350904,
+          "target_y": 40113242
+        },
+        {
+          "indices": [
+            0,
+            152,
+            702,
+            792
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              1217854
+            ],
+            [
+              11,
+              495232
+            ],
+            [
+              12,
+              211198
+            ]
+          ],
+          "target_x": 563909748,
+          "target_y": 1727506800
+        },
+        {
+          "indices": [
+            100,
+            251,
+            413,
+            804
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              1,
+              1017839
+            ],
+            [
+              4,
+              1394375
+            ],
+            [
+              6,
+              560660
+            ],
+            [
+              12,
+              697187
+            ]
+          ],
+          "target_x": 1811964880,
+          "target_y": 1028728514
+        },
+        {
+          "indices": [
+            55,
+            126,
+            806,
+            935
+          ],
+          "arity": 4,
+          "support": 4,
+          "row": [
+            [
+              0,
+              98403
+            ],
+            [
+              2,
+              45018
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              15,
+              45020
+            ]
+          ],
+          "target_x": 1341174552,
+          "target_y": 335588781
+        }
+      ]
+    },
+    {
+      "n": 31,
+      "a": 0,
+      "columns": 20,
+      "kernel": "6sum_b2_s4_strided",
+      "arity": 6,
+      "r": 1439393,
+      "cofactor": 1492,
+      "base_points": 1240,
+      "table_states": 9548,
+      "abscissa_states": 295988,
+      "early_abort": true,
+      "counters": {
+        "targets": 32,
+        "s3_solves": 0,
+        "s4_solves": 37,
+        "s4_fallbacks": 0,
+        "outer_probes": 37,
+        "point_adds": 221,
+        "canonicalisations": 78,
+        "lookups": 78,
+        "candidate_hits": 32,
+        "lift_failures": 0,
+        "verified_relations": 32,
+        "verification_rejects": 0,
+        "verification_adds": 192,
+        "degenerate_skips": 0,
+        "complete_scans": 0,
+        "budget_stops": 0,
+        "wall_ns": 12587795
+      },
+      "relations": 32,
+      "full_support_relations": 32,
+      "support_histogram": {
+        "6": 32
+      },
+      "s3_solves_per_relation": 0.0,
+      "s4_solves_per_relation": 1.15625,
+      "solves_per_relation": 1.15625,
+      "targets_per_relation": 1.0,
+      "wall_s_per_relation": 0.00040172853125,
+      "point_adds_per_relation": 6.90625,
+      "lookups_per_relation": 2.4375,
+      "outer_probes_per_relation": 1.15625,
+      "structural_outer_probes_per_relation": 0.6078764172871873,
+      "expected_relations_per_target": 3507665960.3658547,
+      "structural_targets_per_relation": 1.0,
+      "scan_unit_solves": 43804448072.0,
+      "scan_unit_lambda": 3507665960.3658547,
+      "structural_dense_solves_per_relation": 0.6078764172871873,
+      "structural_sparse_solves_per_relation": 12.488203998601717,
+      "scan_unit_multiplicity": 45.0,
+      "structural_solves_per_relation": 0.2775156444116133,
+      "models": {
+        "r_over_n2k2": 3.744518730489074,
+        "r_over_4n2k2": 0.9361296826222685,
+        "model_45r_over_n4k4": 0.00043835416980231095,
+        "structural_s3_solves_per_relation": 1.2157528345743747,
+        "structural_s4_solves_per_relation": 0.6078764172871873
+      },
+      "fit_c_solves": 0.30878467520684066,
+      "targets_over_model_45": 2281.260380050634,
+      "outer_probes_over_model_45": 2637.7073144335454,
+      "scan_ends": {
+        "FirstHit": 32
+      },
+      "stop_reason": "relations",
+      "s4_mode": "resolvent",
+      "s4_pair_in_s3_wall": 1.8751665955971615,
+      "s4_pair_in_s3_ops": 2.6586802648996968,
+      "s3_equivalents_per_relation_wall": 2.168161376159218,
+      "s3_equivalents_per_relation_ops": 3.0740990562902746,
+      "sample_relations": [
+        {
+          "indices": [
+            155,
+            181,
+            715,
+            840,
+            1035,
+            1042
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              2,
+              582598
+            ],
+            [
+              11,
+              1307710
+            ],
+            [
+              13,
+              684920
+            ],
+            [
+              16,
+              556424
+            ]
+          ],
+          "target_x": 1368586880,
+          "target_y": 1628194297
+        },
+        {
+          "indices": [
+            68,
+            241,
+            311,
+            653,
+            664,
+            870
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              1,
+              1394377
+            ],
+            [
+              3,
+              98403
+            ],
+            [
+              5,
+              1439392
+            ],
+            [
+              10,
+              1025262
+            ],
+            [
+              14,
+              45018
+            ]
+          ],
+          "target_x": 2138659036,
+          "target_y": 1232728658
+        },
+        {
+          "indices": [
+            0,
+            0,
+            201,
+            687,
+            1100,
+            1114
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              2
+            ],
+            [
+              3,
+              1124257
+            ],
+            [
+              11,
+              45020
+            ],
+            [
+              17,
+              1050885
+            ]
+          ],
+          "target_x": 1107320762,
+          "target_y": 1726416459
+        },
+        {
+          "indices": [
+            0,
+            0,
+            210,
+            522,
+            737,
+            1079
+          ],
+          "arity": 6,
+          "support": 6,
+          "row": [
+            [
+              0,
+              2
+            ],
+            [
+              3,
+              852930
+            ],
+            [
+              8,
+              1394465
+            ],
+            [
+              11,
+              98403
+            ],
+            [
+              17,
+              586463
+            ]
+          ],
+          "target_x": 1452892420,
+          "target_y": 348559189
+        }
+      ]
+    }
+  ],
+  "s4_mode": "resolvent",
+  "solver_costs": [
+    {
+      "n": 23,
+      "quartics": 3000,
+      "s3_pairs": 24000,
+      "weights_ns": {
+        "mul": 7.63904,
+        "sqr": 8.173655,
+        "inv": 195.39085,
+        "lin": 7.63904
+      },
+      "ops_s3_crate": {
+        "mul": 8,
+        "sqr": 25,
+        "inv": 1,
+        "half_trace": 0,
+        "trace": 0,
+        "sqrt": 0
+      },
+      "ops_s3_table": {
+        "mul": 8,
+        "sqr": 2,
+        "inv": 1,
+        "half_trace": 1,
+        "trace": 1,
+        "sqrt": 0
+      },
+      "ops_s4_build": {
+        "mul": 18,
+        "sqr": 5,
+        "inv": 0,
+        "half_trace": 0,
+        "trace": 0,
+        "sqrt": 0
+      },
+      "ops_roots_split": {
+        "mul": 970,
+        "sqr": 220,
+        "inv": 7,
+        "half_trace": 0,
+        "trace": 0,
+        "sqrt": 0
+      },
+      "ops_roots_resolvent": {
+        "mul": 52,
+        "sqr": 31,
+        "inv": 2,
+        "half_trace": 3,
+        "trace": 4,
+        "sqrt": 1
+      },
+      "ns_s3_crate": 395.02429166666667,
+      "ns_s3_table": 233.78770833333334,
+      "ns_s4_build": 43.103,
+      "ns_roots_split": 8789.461,
+      "ns_roots_resolvent": 722.5743333333334,
+      "priced_s3_crate": 460.844545,
+      "priced_s3_table": 288.12856,
+      "priced_s4_build": 178.370995,
+      "priced_roots_split": 10575.80885,
+      "priced_roots_resolvent": 1102.507405,
+      "split_in_s3_wall": 22.250431645395643,
+      "resolvent_in_s3_wall": 1.8291896184021594,
+      "split_in_s3_ops": 22.94875563732668,
+      "resolvent_in_s3_ops": 2.392362927937012,
+      "split_in_s3table_wall": 37.595907255603144,
+      "resolvent_in_s3table_wall": 3.0907285010172156,
+      "split_in_s3table_ops": 36.70517372522877,
+      "resolvent_in_s3table_ops": 3.826442630331405,
+      "resolvent_fallbacks": 0,
+      "solvers_disagree": 0
+    },
+    {
+      "n": 31,
+      "quartics": 3000,
+      "s3_pairs": 24000,
+      "weights_ns": {
+        "mul": 7.8947,
+        "sqr": 8.191725,
+        "inv": 256.3274,
+        "lin": 7.8947
+      },
+      "ops_s3_crate": {
+        "mul": 8,
+        "sqr": 33,
+        "inv": 1,
+        "half_trace": 0,
+        "trace": 0,
+        "sqrt": 0
+      },
+      "ops_s3_table": {
+        "mul": 8,
+        "sqr": 2,
+        "inv": 1,
+        "half_trace": 1,
+        "trace": 1,
+        "sqrt": 0
+      },
+      "ops_s4_build": {
+        "mul": 18,
+        "sqr": 5,
+        "inv": 0,
+        "half_trace": 0,
+        "trace": 0,
+        "sqrt": 0
+      },
+      "ops_roots_split": {
+        "mul": 1292,
+        "sqr": 299,
+        "inv": 7,
+        "half_trace": 0,
+        "trace": 0,
+        "sqrt": 0
+      },
+      "ops_roots_resolvent": {
+        "mul": 61,
+        "sqr": 40,
+        "inv": 2,
+        "half_trace": 3,
+        "trace": 4,
+        "sqrt": 1
+      },
+      "ns_s3_crate": 517.0017083333333,
+      "ns_s3_table": 291.26479166666667,
+      "ns_s4_build": 43.20333333333333,
+      "ns_roots_split": 11319.847333333333,
+      "ns_roots_resolvent": 926.261,
+      "priced_s3_crate": 589.811925,
+      "priced_s3_table": 351.65785,
+      "priced_s4_build": 183.063225,
+      "priced_roots_split": 14443.569974999999,
+      "priced_roots_resolvent": 1385.0581,
+      "split_in_s3_wall": 21.895183615205656,
+      "resolvent_in_s3_wall": 1.791601430072644,
+      "split_in_s3_ops": 24.488433283202944,
+      "resolvent_in_s3_ops": 2.348304673561831,
+      "split_in_s3table_wall": 38.864454809519685,
+      "resolvent_in_s3table_wall": 3.1801337700302774,
+      "split_in_s3table_ops": 41.07279270176963,
+      "resolvent_in_s3table_ops": 3.9386525851761873,
+      "resolvent_fallbacks": 0,
+      "solvers_disagree": 0
+    }
+  ],
+  "total_wall_s": 1.14025645
+}

@@ -1,0 +1,188 @@
+{
+  "time": "2026-11-17T02:34:55.969650+00:00",
+  "actual_final_head": "a60bc0186bf3e057473f7f5d1dd5307424391466",
+  "run": 43995846107,
+  "job": 133747593537,
+  "artifact": 14290136722,
+  "whole_provider_zip_bytes": 3675419,
+  "whole_provider_zip_sha256": "3d961e8ae7779970e370e2c26d961cbe2ca39652e8c0d14c86580abc83f9ff04",
+  "all_regular_members": 282,
+  "all_member_CRC_SHA_checks": true,
+  "all_native_phases": [
+    [
+      "frozen-archive-guard",
+      "0",
+      "expected0"
+    ],
+    [
+      "frozen-source-guard",
+      "0",
+      "expected0"
+    ],
+    [
+      "entire-producer-archive-extraction",
+      "0",
+      "expected0"
+    ],
+    [
+      "frozen-input-guard",
+      "0",
+      "expected0"
+    ],
+    [
+      "compiler-version",
+      "0",
+      "expected0"
+    ],
+    [
+      "cargo-version",
+      "0",
+      "expected0"
+    ],
+    [
+      "compile-only",
+      "0",
+      "expected0"
+    ],
+    [
+      "original-positive",
+      "0",
+      "expected0"
+    ],
+    [
+      "generate-forward-coordinate",
+      "0",
+      "expected0"
+    ],
+    [
+      "audit-forward-coordinate",
+      "1",
+      "expected1"
+    ],
+    [
+      "generate-drop-projective",
+      "0",
+      "expected0"
+    ],
+    [
+      "audit-drop-projective",
+      "1",
+      "expected1"
+    ],
+    [
+      "generate-duplicate-forward",
+      "0",
+      "expected0"
+    ],
+    [
+      "audit-duplicate-forward",
+      "1",
+      "expected1"
+    ],
+    [
+      "generate-sign-relation",
+      "0",
+      "expected0"
+    ],
+    [
+      "audit-sign-relation",
+      "1",
+      "expected1"
+    ],
+    [
+      "generate-summary-coefficient",
+      "0",
+      "expected0"
+    ],
+    [
+      "audit-summary-coefficient",
+      "1",
+      "expected1"
+    ],
+    [
+      "generate-lost-infinity",
+      "0",
+      "expected0"
+    ],
+    [
+      "audit-lost-infinity",
+      "1",
+      "expected1"
+    ],
+    [
+      "generate-timing-only",
+      "0",
+      "expected0"
+    ],
+    [
+      "audit-timing-only",
+      "0",
+      "expected0"
+    ],
+    [
+      "elapsed-only-output-equality",
+      "0",
+      "expected0"
+    ],
+    [
+      "strict-clippy",
+      "0",
+      "expected0"
+    ],
+    [
+      "format",
+      "0",
+      "expected0"
+    ],
+    [
+      "post-source-guard",
+      "0",
+      "expected0"
+    ],
+    [
+      "post-input-guard",
+      "0",
+      "expected0"
+    ],
+    [
+      "post-qualifier-guard",
+      "0",
+      "expected0"
+    ]
+  ],
+  "full_two_positive_outputs_equal_local_first_11": true,
+  "all_six_negative_controls": [
+    {
+      "control": "forward-coordinate",
+      "exit": 1,
+      "whole_rejection": "audit rejected: ordered event 204: observed \"trace_forward,source_Cpi1,A,1,6,A,1,24,A,1,6\"; expected \"trace_forward,source_Cpi1,A,1,6,A,1,23,A,1,6\"\n"
+    },
+    {
+      "control": "drop-projective",
+      "exit": 1,
+      "whole_rejection": "audit rejected: ordered event 101: observed \"trace_projective,source_Cpi1,2,1,87,87\"; expected \"trace_projective,source_Cpi1,1,1,24,24\"\n"
+    },
+    {
+      "control": "duplicate-forward",
+      "exit": 1,
+      "whole_rejection": "audit rejected: ordered event 203: observed \"trace_forward,source_Cpi1,A,0,31,I,1,-,A,0,31\"; expected \"trace_forward,source_Cpi1,A,0,70,I,100,-,A,0,70\"\n"
+    },
+    {
+      "control": "sign-relation",
+      "exit": 1,
+      "whole_rejection": "audit rejected: ordered event 4217: observed \"trace_sign,source_Cpi1,A,0,70,I,100,-,I,100,-\"; expected \"trace_sign,source_Cpi1,A,0,70,I,100,-,I,1,-\"\n"
+    },
+    {
+      "control": "summary-coefficient",
+      "exit": 1,
+      "whole_rejection": "audit rejected: ordered event 442: observed \"fixture=source_Cpi1; a=0; b=31; source_points=120; target_points=120; target_coefficients=[57, 0, 85, 0, 84, 0, 1]; projective_arguments=102; full_roundtrips=ok; lost_infinity_control=rejected\"; expected \"fixture=source_Cpi1; a=0; b=31; source_points=120; target_points=120; target_coefficients=[56, 0, 85, 0, 84, 0, 1]; projective_arguments=102; full_roundtrips=ok; lost_infinity_control=rejected\"\n"
+    },
+    {
+      "control": "lost-infinity",
+      "exit": 1,
+      "whole_rejection": "audit rejected: ordered event 202: observed \"trace_forward,source_Cpi1,A,1,6,A,1,23,A,1,6\"; expected \"trace_forward,source_Cpi1,A,0,31,I,1,-,A,0,31\"\n"
+    }
+  ],
+  "source12_absent_on_actual_final_head": true,
+  "scope": "Same-author frozen trace auditor replay on another host. No producer execution, signed verification, native12 CI or all-green merge inference."
+}

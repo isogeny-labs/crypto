@@ -1,0 +1,12 @@
+# 2026-11-17 prime31 RR9 seven-anchor falsifier (PR #4547)
+- Inspected current AGENTS.md, docs/ACTIVE.md, #4546 and parent RR9 PR chain; searched code and known negative lead maps; consulted institutional records for published Amadori–Pintore–Sala baseline. KB MCP/CLI not loaded; noted in report.
+- Created research/prime31-rr9-seven-anchor-20261117 stacked from #4546; registered ACTIVE and draft #4547 before code; froze protocol at commit 542978c9.
+- Derived exact divisor-class equivalence T=R−sum seven supplied signed leaves, and a low-degree B31 rational-list quadratic interpolation obstruction (all-pair vanishing forces a multiple of the curve equation Q_0). Neither constitutes non-generic extraction.
+- Reused native Rust original-curve group law, RR9 Hermite kernel, norm, polynomial division and sqrt. Implemented linear norm-root completion with multiplicity-aware *extra zero* jets to disambiguate x=r; added B8 all-256 signs, two exceptional fixtures, four off-base negatives, and 32+32 given-support B31 cases, each checked against separate original-curve group subtraction.
+- First source commit bf130931 contained a Rust return-type alias typo (Point is already Option<(u64,u64)>); immediately corrected without changing the gate in 2206f458. Exact-source Rust workflow #44074341581 is precursor and #44074481999 is corrected-head validation. Both were still running when this note was prepared; do not claim CI passed until observed.
+- No paid compute, no new complete unknown-target ECDLP, no merge/leaderboard change, no independent signed PCC.
+- Next: review CI, fix only errors without relaxing the correctness oracle; then attempt *public-only* RR9 coefficient-ideal F4/quotient on B8 before large B31 run.
+
+## Final source-specific verification (late addition)
+- Correction commit d91be2fc fixes only Rust E0499 mutable borrow and an unused variable; preserves all predeclared mathematical tests. [Pinned Rust 1.100 exact-source CI #44075156178](https://github.com/isogeny-labs/crypto/actions/runs/44075156178) completed **SUCCESS**, 40/40 library, 9/9 RR9 example tests (including full seven-anchor equivalence) and 64/64 positive plus 64/64 negative original-curve determinant controls.
+- Raw JSON artifact https://github.com/isogeny-labs/crypto/actions/runs/44075156178/artifacts/14324307382. This is test-level producer evidence, not independent signed PCC or a novel solver. Source-specific failures #44074341581 and #44074481999 were retained; the successful run is the final corrected Rust source. No new paid compute.

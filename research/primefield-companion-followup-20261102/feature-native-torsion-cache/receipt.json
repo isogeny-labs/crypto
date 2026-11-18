@@ -1,0 +1,97 @@
+{
+  "recorded_at": "2026-11-07T01:44:48.651968+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-torsion-cache/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-torsion-cache-20261107/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-cache-20261107/tests",
+        "tests::projected_split_windows",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "limits",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-cache-20261107/tests",
+        "tests::limits_and_rejection",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "factors",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-cache-20261107/tests",
+        "source::transport::factor_tests::omitted_direct_factors",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "closure",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-cache-20261107/tests",
+        "source::transport::seed_tests::closure_and_mutation",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "subgroup",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-cache-20261107/tests",
+        "tests::subgroup_acceptance_matches_phase_and_affine",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "cache",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-torsion-cache-20261107/tests",
+        "source::transport::cache_tests::one_engine_and_binding",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 22,
+  "binary_sha256": "ace2b10f230c0bc5f617f8d40b54c13d4555fc6552fdd5ce4d8522aac04ef064",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

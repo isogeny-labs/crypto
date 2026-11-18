@@ -1,0 +1,20 @@
+{
+  "schema": "primary_source_scope_review_v1",
+  "repo": "flintlib/flint",
+  "commit": "979b0d658ea1326099a08e392601a65c8863b5c0",
+  "source": "src/fq/frobenius.c",
+  "url": "https://github.com/flintlib/flint/blob/979b0d658ea1326099a08e392601a65c8863b5c0/src/fq/frobenius.c",
+  "findings": [
+    "The primary implementation explicitly handles the prime-subfield case by copying its coefficients; otherwise _fq_frobenius raises to p^e through _fq_pow.",
+    "The public routine reduces the exponent e modulo extension degree, handles zero and e=0 explicitly, and protects aliased input/output.",
+    "Frobenius and trace-based coordinate inversion are classical arithmetic primitives. The present structured map is not asserted novel or shown to be a guarded elliptic chart.",
+    "For the prime certificate route, prior pinned FLINT wrapper/is_reduced source review shows adaptive numerical LLL plus checks; exact rational5D cannot be called the fastest specialized reducer without a real matched comparison."
+  ],
+  "next_actions": [
+    "If exponentiation-based inversion loses on tiny complete-output panels, preregister a distinct linear-Frobenius/coordinate arm with charged field-basis setup, not a longer repeat of the same exponentiation.",
+    "Identify a real input chart with a proved invertible source-linear map, complete domain and exceptional-fiber contract before using the structured inverse in global solving.",
+    "Continue genuine all-roots F4/F5/F6 interfaces and actualGF(2^83)/binary/Koblitz scope independently."
+  ],
+  "novelty_established": false,
+  "gate_passed": false
+}

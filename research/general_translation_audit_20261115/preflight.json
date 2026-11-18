@@ -1,0 +1,114 @@
+{
+  "schema": "general-translation-preflight/v1",
+  "build_snapshots": 11,
+  "failed_states": [
+    "01",
+    "03",
+    "06",
+    "07"
+  ],
+  "successful_states": [
+    "02",
+    "04",
+    "05",
+    "08",
+    "09",
+    "10",
+    "11"
+  ],
+  "gate": {
+    "archive": "research/general_translation_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_general_translation_audit_20261115_lean/audit.log",
+        "bytes": 9672,
+        "sha256": "496f3db1b5a2580fa4cf915f8ed66e610a7898e4559ee9e7fc9f0025a78fd96b"
+      },
+      {
+        "member": "research_general_translation_audit_20261115_lean/build.log",
+        "bytes": 39988,
+        "sha256": "5af25a258f97c38bb5ce02ed9d239cee896868f5842062a51bd046acc7a93b0a"
+      },
+      {
+        "member": "research_general_translation_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_general_translation_audit_20261115_lean/source-build.log",
+        "bytes": 39988,
+        "sha256": "9415fb6f711afc4174b386bd76ef2e0f4824c59fde111ad97b66c8c6afb9f7f1"
+      },
+      {
+        "member": "research_general_translation_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 92,
+    "failing": 0,
+    "trusted_native": 0,
+    "new_modules": 12,
+    "new_concrete_modules": 12,
+    "credited_dependency_modules": 105,
+    "credited_prior_gates": [
+      78,
+      82,
+      536
+    ],
+    "new_source_warnings": 0,
+    "inherited_advisories": {
+      "build.log": [],
+      "source-build.log": [],
+      "audit.log": [
+        "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+      ]
+    }
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/general_translation_audit_20261115/evidence/attempts.tar.xz",
+    "files": 259,
+    "unique_objects": 91,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "credited_dependency_modules": 105,
+  "copied_modules": 0,
+  "all134predecessor_pins_checked_each_state_and_gate": true,
+  "new_modules": 12,
+  "new_concrete_modules": 12,
+  "exact_source_root_coverage_every_state_from01": true,
+  "actual_every_field_translation_transcendence_injection_action_derived": true,
+  "actual_arbitrary_field_extension_square": true,
+  "actual_rational_point_localization_residue_full_field_diagrams": true,
+  "actual_chosen_uniformizer_normalization_and_units_derive_finite_basechange": true,
+  "actual_all_field_all_point_valuation_order_residue": true,
+  "actual_regular_RingEquiv_inverse_and_regular_extension_injection": true,
+  "actual_rational_point_principal_divisor_negative_Q": true,
+  "actual_guarded_evaluation_and_support_iff": true,
+  "actual_F2_F3_nontrivial_translation_controls": true,
+  "actual_F5_source_formula_not_affine_counter": true,
+  "actual_F3_minus4_persists_all_translations": true,
+  "AC_required_for_translation_conclusions": false,
+  "supplied_transcendence_injection_inverse_local_invariance_or_ramification_premise": false,
+  "rational_point_divisors_claimed_geometric_degree_zero_over_nonclosed": false,
+  "general_geometric_divisor_Picard_Galois_descent": false,
+  "separate_Scheme_linebundle_comparison": false,
+  "canonical_pairing_comparison": false,
+  "qualified_source_refuted": false,
+  "full14complete": false,
+  "paid_compute_and_agent_upload": 0
+}

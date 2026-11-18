@@ -1,0 +1,14 @@
+error: method `large_terms` is never used
+   --> examples/../src/cryptanalysis/jv_quadratic_pair_relation.rs:169:12
+    |
+162 | impl Verified {
+    | ------------- method in this implementation
+...
+169 |     pub fn large_terms(&self) -> Vec<LargeTerm> {
+    |            ^^^^^^^^^^^
+    |
+    = note: `-D dead-code` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: aborting due to 1 previous error
+

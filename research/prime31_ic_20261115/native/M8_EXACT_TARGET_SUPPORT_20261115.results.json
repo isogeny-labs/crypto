@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-15",
+  "standing": "[pcc:unverified]",
+  "category": "exact group-theoretic support census; NOT non-generic index calculus oracle or solver",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "G": [
+      625037715,
+      2100627251
+    ]
+  },
+  "factor_base": {
+    "method": "p+1 Dickson depth-6",
+    "terminal": 933677148,
+    "actual_points": 31,
+    "seed": 3
+  },
+  "split": {
+    "left_index_count": 15,
+    "right_index_count": 16,
+    "points_per_side": 4,
+    "signs_per_side": 16,
+    "left_templates": 21840,
+    "right_templates": 29120,
+    "total_cross_sums": 635980800
+  },
+  "enumeration": {
+    "full_distinct_target_points": 552008270,
+    "unreachable_target_points": 1595438561,
+    "hit_probability_exact": "552008270/2147446831",
+    "raw_expected_witnesses_exact": "635980800/2147446831",
+    "conditional_template_multiplicity_exact": "635980800/552008270",
+    "prefix_100_left": {
+      "cross_sums": 2912000,
+      "distinct_target_points": 2911034
+    },
+    "chunk0": {
+      "first_left_index": 0,
+      "end_left_index_exclusive": 10000,
+      "cross_sums": 291200000,
+      "cumulative_distinct": 272953622,
+      "seconds_producer_only": 19.8544
+    },
+    "chunk1": {
+      "first_left_index": 10000,
+      "end_left_index_exclusive": 21840,
+      "cross_sums": 344780800,
+      "cumulative_distinct": 552008270,
+      "seconds_producer_only": 25.7378
+    },
+    "exceptional_identity_or_doubling": 0,
+    "bitmap_sha256": "36a63329b627e3b24ae34a5b475861ab4747c37b4c14abd113f627129036d6e5"
+  },
+  "producer_replay": {
+    "frozen_natural_positive_witnesses": 2,
+    "both_full_point_sums_verified": true,
+    "both_targets_in_support": true,
+    "uniform_target_sample_seed": "0xA614B5",
+    "sample_count": 500,
+    "sample_hits": 132,
+    "scope": "independent producer-operated Python curve arithmetic; not an independent PCC signature"
+  },
+  "rust_reproduction": {
+    "path": "research/prime31_ic_20261115/native/examples/prime31_m8_exact_support.rs",
+    "reuses": [
+      "Arithmetic",
+      "Base",
+      "PRIME31"
+    ],
+    "prefix_100_expected": 2911034,
+    "full_expected": 552008270,
+    "compile_status": "not executed in this environment",
+    "CI_status": "not confirmed",
+    "diagnostic_not_usable_as_index_calculus_oracle": true
+  },
+  "literature_and_prior": [
+    "Petit-Kosters-Messeng PKC 2016",
+    "Diem 2011",
+    "isogeny-labs/crypto#4077",
+    "isogeny-labs/crypto#4275",
+    "isogeny-labs/crypto#4228",
+    "isogeny-labs/crypto#3877",
+    "isogeny-labs/cryptanalysis#1536",
+    "isogeny-labs/crypto-autoresearcher#3305"
+  ],
+  "no_complete_solver_or_rho_advantage_established": true
+}

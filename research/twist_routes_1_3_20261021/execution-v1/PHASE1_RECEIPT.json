@@ -1,0 +1,70 @@
+{
+  "schema": "twist.exact-execution-receipt/v1",
+  "source_and_input_commit": "68376d22bac813c8f211ebacc2ac3359588b6814",
+  "binary_source_commit": "d86eb011034066532d3645369a783f44be158b1c",
+  "binary_sha256": "ba02d863c2b4c5085a98cf3b369a87ee1951e52e4d3d25924d5272a3952a804c",
+  "protocol": "research/twist_routes_1_3_20261021/EXECUTION_PROTOCOL_V1.md",
+  "input_sha256": {
+    "fixtures.json": "8d490a36d65ebf906b93e04eeeb21ac5802f2a9382ef03271a4648fd4b78a4ed",
+    "selected-covers.json": "22e00145ea5e014572c344f85f4f8b468ab1c84b41512b6264def2a5985a28b2"
+  },
+  "runs": [
+    {
+      "run_id": "trace-20261021T2256Z",
+      "command": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "trace",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/trace-20261021T2256Z"
+      ],
+      "exit_code": 0,
+      "logfile_creation_utc": "2026-10-21T22:55:51.006Z",
+      "output_sha256": {
+        "E01-fibers.json": "d4cb47bdaeff958b8eafdfe1a82b5e42dc118fcfce9ad28d6a553f6b3e002f55",
+        "E02-E04-bases.json": "c63ce957aeacf53b75f5948042923572c729392fa8c4e1788b01f68d0cfec76f",
+        "E03-rational-equivalence.json": "39519c80659d179898c4405756081c1008b7ddcad26dfc8016cee4a2cdd8684b",
+        "E04-norm-controls.json": "13eea42c74e23f0c761f460ed8d7a19b02964cb8b66b39b2eacd5e9b79dea4e2",
+        "E05-divisors.json": "1135fa193cf9bcd14d41d94db5c797dcf811de7f2dabac5e6304c2c4b37d6e6e",
+        "E06-census.json": "11628e5a32996009273ead672868cc93b3906528ba6b01169bcce5994a8fdc84",
+        "SUMMARY.json": "74d9db6fac2f8cd3b7ffe28bcb02751494c74fe39f9a0289f7f9f20e946d1d67"
+      }
+    },
+    {
+      "run_id": "geometry-20261021T2256Z",
+      "command": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "geometry",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/geometry-20261021T2256Z"
+      ],
+      "exit_code": 0,
+      "logfile_creation_utc": "2026-10-21T22:55:52.270Z",
+      "output_sha256": {
+        "E09-torsion.json": "6295b6df0ba15efb5e67502ba4dab3dd7e17967baf8b6c6f383b1835dda2afe2",
+        "E10-cover-search.json": "54bc50af7d5522e4f860c3b2b42d8cdd1623ffc7232a0e7cbbbb694d1028d82b",
+        "E11-gluing.json": "ce73e3e1f864aa773da7444e6c37166e02745806d1133abc3d3061b1c3f755c5",
+        "E12-selected-covers.json": "22e00145ea5e014572c344f85f4f8b468ab1c84b41512b6264def2a5985a28b2",
+        "E13-images.json": "d98764893829c7c792a3f018fc7457a75cd819d056be920fd4dc3ae6745c99a0",
+        "SUMMARY.json": "8e6d44e6a9a7fd20faf38678790e64ce4bf49d0fa64f6d918583ad896e981e30"
+      }
+    },
+    {
+      "run_id": "conditional-20261021T2256Z",
+      "command": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "conditional",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/conditional-20261021T2256Z"
+      ],
+      "exit_code": 0,
+      "logfile_creation_utc": "2026-10-21T22:55:53.506Z",
+      "output_sha256": {
+        "E16-applicability.json": "b62f4f69c3a6ac9bae93c1abe3197271857fb3b3b780242b63a1156ab55d48bc",
+        "E17-lifts.json": "2b108383b2e5c28b2dce40953bce8697260e2dd585500146c8f8e21ddfef9185",
+        "SUMMARY.json": "abeef3fcf8fe8bad05308c19456c1bc7989bb54b782f8474dc77fef2f027aeb6"
+      }
+    }
+  ],
+  "isolation": "L0 correctness diagnostics; no speed measurement",
+  "independent_host_replay": false
+}

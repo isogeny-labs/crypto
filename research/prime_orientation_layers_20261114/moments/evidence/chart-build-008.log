@@ -1,0 +1,12 @@
+../evidence/chart-draft-008.lean.txt:379:2: error: Type mismatch: After simplification, term
+  Content.mul (Content.C (right_integral a u r y)) Content.X
+ has type
+  Content 0 (C (rightFactor a u r y) * X)
+but is expected to have type
+  Content 0 (chartRight a u r y)
+../evidence/chart-draft-008.lean.txt:417:2: error: Type mismatch: After simplification, term
+  Content.mul (Content.C hc) (chart_left_integral a u x r)
+ has type
+  Content (jetWeight a u i M) (C (diagonalJet a u i M) * chartLeft a u x r)
+but is expected to have type
+  Content (jetWeight a u i M) (chartWeightedLeft a u i M x r)

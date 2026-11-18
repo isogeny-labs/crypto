@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T20:59:50Z",
+ "id": "PCC-20261115-357907",
+ "kind": "execution",
+ "producer": {
+  "commit": "c1e45afc6351ef2c689c03b0918bb4a7bdef8b44",
+  "model": "GPT-6",
+  "session": "codex-rust-relation-integration-20261115"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/integration-development/rust-post-call-02.json",
+    "sha256": "20fd05237027de8f5eef8cf2a3f8a83cd51c749b74e81142f193fcf669f034c0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115",
+ "statement": "Producer fixed-case diagnostic: the six-variable Rust API qualification hits the unchanged 50000-term provenance cap during input rewrite (input 6), with 20 polynomial terms, polynomial degree 9 and 55976 proof terms. The qualifier reports this as a budget failure, not a complete solve or a speed result. This motivates testing removal of unused provenance in the polynomial-only containment check; final original-input membership checks must remain."
+}

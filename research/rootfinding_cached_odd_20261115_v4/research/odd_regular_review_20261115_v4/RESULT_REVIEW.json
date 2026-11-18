@@ -1,0 +1,145 @@
+{
+  "schema": "recorded-result-review/v1",
+  "created_utc": "2026-11-15T04:17:41.936301+00:00",
+  "review_mode": "Independent coordinate-convolution replay of stored norm/factor/derivative/support/source-order certificates only; no candidate or dense-grid oracle search rerun.",
+  "raw_sha256": "642f3b9da55bc3c829064313b6a6c5a0b526647333e998d8a0a6f7ea75cfd3e2",
+  "raw_bytes": 6778,
+  "error": null,
+  "recorded_predicates": 451210,
+  "recorded_raw_states": 84873,
+  "recorded_norm_evaluations": 348,
+  "certificate_counts": {
+    "admitted_cells": 33,
+    "ramified_empty_cells": 12,
+    "candidate_certificates_replayed": 174,
+    "excluded_target_collision": 23
+  },
+  "positive_certificates": [
+    {
+      "q": 3,
+      "k": 0,
+      "source_orders": 5,
+      "target_disjoint": false
+    },
+    {
+      "q": 3,
+      "k": 0,
+      "source_orders": 5,
+      "target_disjoint": false
+    },
+    {
+      "q": 5,
+      "k": 2,
+      "source_orders": 10,
+      "target_disjoint": true
+    },
+    {
+      "q": 5,
+      "k": 1,
+      "source_orders": 10,
+      "target_disjoint": true
+    },
+    {
+      "q": 5,
+      "k": 1,
+      "source_orders": 5,
+      "target_disjoint": true
+    }
+  ],
+  "fields": [
+    {
+      "counts": {
+        "common_factor_assignments": 90,
+        "excluded_target_collision": 6,
+        "order": 3,
+        "positive_parameters": 2,
+        "ramified_cells": 3,
+        "raw_states": 270,
+        "regular_cells": 7
+      },
+      "missing_categories": [
+        "r1_nonzero"
+      ],
+      "available_categories": [
+        "a_equals_z",
+        "a_zero",
+        "delta_nonzero",
+        "delta_zero",
+        "r1_zero",
+        "ramified",
+        "regular"
+      ],
+      "selection_candidates": 54
+    },
+    {
+      "counts": {
+        "common_factor_assignments": 275,
+        "excluded_target_collision": 5,
+        "order": 5,
+        "positive_parameters": 3,
+        "ramified_cells": 7,
+        "raw_states": 1375,
+        "regular_cells": 4
+      },
+      "missing_categories": [],
+      "available_categories": [
+        "a_equals_z",
+        "a_zero",
+        "delta_nonzero",
+        "delta_zero",
+        "r1_nonzero",
+        "r1_zero",
+        "ramified",
+        "regular"
+      ],
+      "selection_candidates": 126
+    },
+    {
+      "counts": {
+        "common_factor_assignments": 567,
+        "excluded_target_collision": 9,
+        "order": 9,
+        "positive_parameters": 0,
+        "ramified_cells": 1,
+        "raw_states": 5103,
+        "regular_cells": 6
+      },
+      "missing_categories": [],
+      "available_categories": [
+        "a_equals_z",
+        "a_zero",
+        "delta_nonzero",
+        "delta_zero",
+        "r1_nonzero",
+        "r1_zero",
+        "ramified",
+        "regular"
+      ],
+      "selection_candidates": 2296
+    },
+    {
+      "counts": {
+        "common_factor_assignments": 3125,
+        "excluded_target_collision": 3,
+        "order": 25,
+        "positive_parameters": 0,
+        "ramified_cells": 1,
+        "raw_states": 78125,
+        "regular_cells": 4
+      },
+      "missing_categories": [],
+      "available_categories": [
+        "a_equals_z",
+        "a_zero",
+        "delta_nonzero",
+        "delta_zero",
+        "r1_nonzero",
+        "r1_zero",
+        "ramified",
+        "regular"
+      ],
+      "selection_candidates": 25326
+    }
+  ],
+  "interpretation": "Odd conditional regular norm controls passed. Positive GF3 cases overlap target/source domain; three GF5 positives are disjoint. GF9/GF25 lack positive coverage. GF3 r1_nonzero category absent in declared scan. Common-factor/original auxiliaries/global coverage UNKNOWN. No measured speedup, novelty or NIST hard-instance evidence."
+}

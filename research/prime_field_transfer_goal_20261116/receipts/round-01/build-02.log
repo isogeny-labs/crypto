@@ -1,0 +1,8 @@
+component_candidate.cpp: In member function ‘unsigned int FiniteCurve::count() const’:
+component_candidate.cpp:141:55: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+  141 |         unsigned total=1;for(std::int64_t x=0;x<p;++x)for(std::int64_t y=0;y<p;++y)
+      |                                                       ^~~
+component_candidate.cpp:142:49: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  142 |             total+=m(y*y+x*y-x*x*x+64*x-288)==0;return total;
+      |                                                 ^~~~~~
+cc1plus: all warnings being treated as errors

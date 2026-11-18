@@ -1,0 +1,18 @@
+[package]
+name = "relation-degree-trace"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.87"
+publish = false
+default-run = "relation-degree-trace"
+
+[workspace]
+
+[features]
+count-field-ops = ["certified-relations/count-field-ops"]
+
+[dependencies]
+certified-relations = { path = "../../crates/certified-relations" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+plotters = { version = "0.3.7", default-features = false, features = ["svg_backend", "line_series"] }

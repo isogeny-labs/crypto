@@ -1,0 +1,137 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Production binary subtraction frontier: prospective cold panel",
+  "description": "PROTOCOL.md; timing unrun; frozen source, budget/pool readback and L2 admission required. Same base for scalar, batch, lazy and negation-folded table arms.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 17
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202611153001,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_full"
+      }
+    },
+    {
+      "name": "scalar",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "subtract",
+          "max_trials": "1000000",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "full-batch32",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "subtract-binary-batch:m=2,block=32,lazy=0",
+          "max_trials": "1000000",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "lazy8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "subtract-binary-batch:m=2,block=8,lazy=1",
+          "max_trials": "1000000",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "lazy32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "subtract-binary-batch:m=2,block=32,lazy=1",
+          "max_trials": "1000000",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "lazy128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "subtract-binary-batch:m=2,block=128,lazy=1",
+          "max_trials": "1000000",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "cold-negfold-table",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "max_trials": "1000000",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "scalar-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "subtract",
+          "max_trials": "1000000",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "rho-strong-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_full"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611153002,
+    "isolation_required": "L2",
+    "timeout_seconds": 900
+  }
+}

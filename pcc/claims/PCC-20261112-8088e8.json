@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T01:04:42Z",
+ "id": "PCC-20261112-8088e8",
+ "kind": "theorem",
+ "producer": {
+  "commit": "1e4f8e795f770ea39320ab694623cafe8b7563ad",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "a1f4a149e3ecc5f567cadec1949fc68beccbf49dfe40a363e65c73d51cdba9f9",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/OddFieldDescent.lean",
+   "theorem": "OddFieldDescent.quadratic_twist_curve"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Formal conditional algebra only;actual finite fields,Galois action,Hom groups and geometric descent remain written bridges.",
+ "statement": "theorem quadratic_twist_curve {K : Type} [CommRing K] (a b s d x y : K) (hs : s^2=d) (hy : y^2=x^3+a*x+b) : (s^3*y)^2=(d*x)^3+(d^2*a)*(d*x)+d^3*b"
+}

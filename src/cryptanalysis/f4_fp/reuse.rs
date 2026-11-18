@@ -1,9 +1,15 @@
 //! Traces accelerate candidate basis construction. They never certify a basis.
-//! Every accepted replay checks input reductions and every Buchberger pair.
+//! Every accepted replay checks input reductions and certifies every pair.
+//! Exhaustive division is the default; the explicit pair-graph constructor
+//! uses Buchberger's product/chain criteria with prior-edge dependencies.
 //! Native traces are bounded in retained words, not transient matrix storage.
 
 use super::*;
 use std::collections::BTreeMap;
+
+#[path = "pair_certificate.rs"]
+mod pair_certificate;
+pub use pair_certificate::PairCertificateStats;
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
 pub struct TraceStats {
@@ -18,6 +24,8 @@ pub struct TraceStats {
     pub certification_term_steps: u64,
     pub retained_words: usize,
     pub storage_refusals: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pair_graph: Option<PairCertificateStats>,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -49,6 +57,14 @@ pub struct TracePool {
 }
 
 impl TracePool {
+    /// Certify the same basis obligations using an acyclic product/chain
+    /// dependency graph. The exhaustive constructor remains unchanged.
+    pub fn new_pair_graph(family: &str, capacity: usize, max_words: usize) -> Result<Self, String> {
+        let mut pool = Self::new(family, capacity, max_words)?;
+        pool.stats.pair_graph = Some(PairCertificateStats::default());
+        Ok(pool)
+    }
+
     pub fn new(family: &str, capacity: usize, max_words: usize) -> Result<Self, String> {
         if family.is_empty()
             || family.len() > 512
@@ -75,7 +91,7 @@ impl TracePool {
         self.stats.clone()
     }
 
-    pub(super) fn run(
+    pub(crate) fn run(
         &mut self,
         input: &[Poly],
         vars: usize,
@@ -107,7 +123,11 @@ impl TracePool {
             let before = self.stats.certification_multiplications;
             let accepted = !r.timed_out
                 && !r.trace_mismatch
-                && certify(input, &r.basis, p, opts, &mut self.stats);
+                && if self.stats.pair_graph.is_some() {
+                    pair_certificate::certify(input, &r.basis, p, opts, &mut self.stats)
+                } else {
+                    certify(input, &r.basis, p, opts, &mut self.stats)
+                };
             r.field_ops += self.stats.certification_multiplications - before;
             if expired(opts) {
                 r.timed_out = true;
@@ -216,7 +236,7 @@ fn reduces_to_zero(
     true
 }
 
-fn certify(
+pub(super) fn certify(
     input: &[Poly],
     basis: &[Poly],
     p: u64,
@@ -293,6 +313,24 @@ mod tests {
         assert!(r.complete);
         roots.sort();
         roots
+    }
+    #[test]
+    fn pair_graph_preserves_roots_and_rejects_a_damaged_replay() {
+        let mut graph = TracePool::new_pair_graph("aps:partitioned3", 4, 10000).unwrap();
+        let mut exhaustive = TracePool::new("aps:partitioned3", 4, 10000).unwrap();
+        assert_eq!(roots(&mut graph), roots(&mut exhaustive));
+        assert_eq!(roots(&mut graph), roots(&mut exhaustive));
+        assert!(graph.stats().accepted > 0);
+        for e in &mut graph.entries {
+            if let Some(m) = e.trace.input_lms.first_mut() {
+                if let Some(power) = m.first_mut() {
+                    *power += 1;
+                }
+            }
+        }
+        assert_eq!(roots(&mut graph), roots(&mut exhaustive));
+        assert!(graph.stats().rejected > 0 && graph.stats().fallbacks > 0);
+        assert!(exhaustive.stats().pair_graph.is_none());
     }
     #[test]
     fn accepted_replay_preserves_complete_roots_and_records_work() {

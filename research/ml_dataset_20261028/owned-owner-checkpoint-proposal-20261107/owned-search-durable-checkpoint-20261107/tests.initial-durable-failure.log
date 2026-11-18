@@ -1,0 +1,18 @@
+
+running 2 tests
+/home/ec2-user/ml-dataset-resume-20261029/owned-search-durable-checkpoint-20261107/fixtures/1235315-refusal
+test ml_dataset::solvers::koblitz::original::boolean::capture_encoding::durable_tests::real_payload_count_refusal_retains_first_chunk_and_stops_retry ... ok
+
+thread 'ml_dataset::solvers::koblitz::original::boolean::capture_encoding::durable_tests::durable_native_checkpoints_use_real_budget_emitter_and_fresh_readback' (1235316) panicked at /home/ec2-user/ml-dataset-resume-20261029/owned-search-durable-checkpoint-20261107/durable_tests.rs:24:99:
+assertion `left == right` failed
+  left: Err(StringCap)
+ right: Ok(())
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ml_dataset::solvers::koblitz::original::boolean::capture_encoding::durable_tests::durable_native_checkpoints_use_real_budget_emitter_and_fresh_readback ... FAILED
+
+failures:
+
+failures:
+    ml_dataset::solvers::koblitz::original::boolean::capture_encoding::durable_tests::durable_native_checkpoints_use_real_budget_emitter_and_fresh_readback
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 30 filtered out; finished in 0.49s

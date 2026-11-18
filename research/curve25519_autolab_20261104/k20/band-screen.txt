@@ -1,0 +1,1270 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm450-568a3277 | 17.00 | box-b10 | 24/24 | 4.467 | 4.845 | 8.248 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | box-b12 | 24/24 | 4.146 | 4.467 | 7.356 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | box-b20 | 24/24 | 3.180 | 3.258 | 3.958 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | box-b8 | 24/24 | 5.601 | 6.114 | 10.726 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | inc | 24/24 | 2.983 | 3.141 | 4.563 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | rho-neg | 24/24 | 1.482 | 1.587 | 2.533 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j16-x07-g | 24/24 | 3.061 | 3.123 | 3.683 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j16-x07-w | 24/24 | 5.214 | 5.323 | 6.301 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j16-x10-g | 24/24 | 2.905 | 2.950 | 3.353 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j16-x10-w | 24/24 | 5.037 | 5.110 | 5.774 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j4-x07-g | 24/24 | 2.839 | 2.884 | 3.293 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j4-x07-w | 24/24 | 5.038 | 5.125 | 5.908 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j4-x10-g | 24/24 | 2.936 | 2.973 | 3.300 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j4-x10-w | 24/24 | 5.104 | 5.166 | 5.724 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j6-x07-g | 24/24 | 2.839 | 2.891 | 3.358 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j6-x07-w | 24/24 | 4.930 | 5.010 | 5.726 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j6-x10-g | 24/24 | 2.643 | 2.682 | 3.028 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j6-x10-w | 24/24 | 4.831 | 4.902 | 5.545 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j8-x07-g | 24/24 | 2.843 | 2.899 | 3.404 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j8-x07-w | 24/24 | 4.973 | 5.068 | 5.924 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j8-x10-g | 24/24 | 2.944 | 2.997 | 3.477 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | ww-j8-x10-w | 24/24 | 4.918 | 4.977 | 5.511 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | box-b10 | 24/24 | 3.213 | 3.466 | 5.740 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | box-b12 | 24/24 | 3.252 | 3.484 | 5.570 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | box-b20 | 24/24 | 3.066 | 3.132 | 3.727 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | box-b8 | 24/24 | 4.524 | 4.929 | 8.568 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | inc | 24/24 | 2.838 | 2.981 | 4.270 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | rho-neg | 24/24 | 1.670 | 1.794 | 2.905 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j16-x07-g | 24/24 | 3.060 | 3.135 | 3.812 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j16-x07-w | 24/24 | 4.931 | 5.013 | 5.755 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j16-x10-g | 24/24 | 3.116 | 3.169 | 3.642 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j16-x10-w | 24/24 | 5.233 | 5.317 | 6.066 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j4-x07-g | 24/24 | 2.823 | 2.875 | 3.347 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j4-x07-w | 24/24 | 5.006 | 5.104 | 5.984 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j4-x10-g | 24/24 | 3.064 | 3.118 | 3.600 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j4-x10-w | 24/24 | 5.199 | 5.292 | 6.126 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j6-x07-g | 24/24 | 2.830 | 2.894 | 3.474 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j6-x07-w | 24/24 | 4.974 | 5.091 | 6.145 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j6-x10-g | 24/24 | 2.976 | 3.034 | 3.554 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j6-x10-w | 24/24 | 4.968 | 5.037 | 5.660 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j8-x07-g | 24/24 | 2.775 | 2.830 | 3.325 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j8-x07-w | 24/24 | 5.005 | 5.114 | 6.096 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j8-x10-g | 24/24 | 2.793 | 2.840 | 3.265 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | ww-j8-x10-w | 24/24 | 4.833 | 4.896 | 5.457 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | box-b10 | 24/24 | 2.827 | 3.040 | 4.956 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | box-b12 | 24/24 | 2.493 | 2.647 | 4.033 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | box-b20 | 24/24 | 3.195 | 3.275 | 3.987 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | box-b8 | 24/24 | 3.999 | 4.350 | 7.510 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | inc | 24/24 | 2.468 | 2.574 | 3.521 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | rho-neg | 24/24 | 1.612 | 1.729 | 2.783 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j16-x07-g | 24/24 | 3.079 | 3.148 | 3.766 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j16-x07-w | 24/24 | 5.317 | 5.451 | 6.661 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j16-x10-g | 24/24 | 3.187 | 3.240 | 3.712 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j16-x10-w | 24/24 | 5.309 | 5.395 | 6.165 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j4-x07-g | 24/24 | 2.866 | 2.913 | 3.333 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j4-x07-w | 24/24 | 5.014 | 5.093 | 5.802 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j4-x10-g | 24/24 | 3.172 | 3.220 | 3.652 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j4-x10-w | 24/24 | 5.351 | 5.438 | 6.224 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j6-x07-g | 24/24 | 2.567 | 2.621 | 3.104 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j6-x07-w | 24/24 | 4.697 | 4.785 | 5.575 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j6-x10-g | 24/24 | 2.692 | 2.743 | 3.203 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j6-x10-w | 24/24 | 4.864 | 4.954 | 5.769 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j8-x07-g | 24/24 | 2.862 | 2.916 | 3.405 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j8-x07-w | 24/24 | 5.142 | 5.252 | 6.247 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j8-x10-g | 24/24 | 2.986 | 3.045 | 3.580 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | ww-j8-x10-w | 24/24 | 5.028 | 5.113 | 5.881 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | box-b10 | 24/24 | 3.288 | 3.548 | 5.890 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | box-b12 | 24/24 | 2.835 | 3.024 | 4.728 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | box-b20 | 24/24 | 3.054 | 3.119 | 3.706 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | box-b8 | 24/24 | 4.522 | 4.927 | 8.565 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc | 24/24 | 2.447 | 2.551 | 3.488 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 24/24 | 1.515 | 1.624 | 2.602 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j16-x07-g | 24/24 | 2.876 | 2.931 | 3.430 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j16-x07-w | 24/24 | 5.040 | 5.137 | 6.010 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j16-x10-g | 24/24 | 2.945 | 2.994 | 3.435 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j16-x10-w | 24/24 | 4.994 | 5.060 | 5.649 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j4-x07-g | 24/24 | 3.030 | 3.083 | 3.564 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j4-x07-w | 24/24 | 5.341 | 5.465 | 6.578 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j4-x10-g | 24/24 | 2.901 | 2.950 | 3.393 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j4-x10-w | 24/24 | 4.912 | 4.970 | 5.499 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j6-x07-g | 24/24 | 2.677 | 2.713 | 3.043 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j6-x07-w | 24/24 | 4.962 | 5.050 | 5.843 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j6-x10-g | 24/24 | 2.575 | 2.617 | 2.997 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j6-x10-w | 24/24 | 4.763 | 4.843 | 5.558 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j8-x07-g | 24/24 | 2.639 | 2.692 | 3.165 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j8-x07-w | 24/24 | 4.740 | 4.820 | 5.541 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j8-x10-g | 24/24 | 2.727 | 2.778 | 3.238 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ww-j8-x10-w | 24/24 | 4.933 | 5.031 | 5.907 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | box-b10 | 24/24 | 2.786 | 2.993 | 4.859 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | box-b12 | 24/24 | 2.447 | 2.595 | 3.929 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | box-b20 | 24/24 | 3.080 | 3.146 | 3.739 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | box-b8 | 24/24 | 4.776 | 5.205 | 9.064 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | inc | 24/24 | 2.442 | 2.543 | 3.453 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | rho-neg | 24/24 | 1.490 | 1.595 | 2.543 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j16-x07-g | 24/24 | 2.851 | 2.897 | 3.307 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j16-x07-w | 24/24 | 5.129 | 5.232 | 6.157 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j16-x10-g | 24/24 | 2.920 | 2.966 | 3.375 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j16-x10-w | 24/24 | 5.247 | 5.356 | 6.342 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j4-x07-g | 24/24 | 2.853 | 2.906 | 3.387 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j4-x07-w | 24/24 | 4.966 | 5.050 | 5.805 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j4-x10-g | 24/24 | 2.810 | 2.849 | 3.196 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j4-x10-w | 24/24 | 5.023 | 5.099 | 5.781 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j6-x07-g | 24/24 | 2.782 | 2.836 | 3.329 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j6-x07-w | 24/24 | 4.841 | 4.919 | 5.615 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j6-x10-g | 24/24 | 2.499 | 2.535 | 2.855 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j6-x10-w | 24/24 | 4.860 | 4.960 | 5.855 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j8-x07-g | 24/24 | 2.834 | 2.898 | 3.478 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j8-x07-w | 24/24 | 4.903 | 5.002 | 5.895 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j8-x10-g | 24/24 | 2.884 | 2.925 | 3.288 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | ww-j8-x10-w | 24/24 | 5.054 | 5.123 | 5.740 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm450-568a3277 | box-b10 vs box-b12 | box-b12 < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs box-b20 | box-b20 < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs box-b8 | box-b10 < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs inc | inc < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs rho-neg | rho-neg < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j16-x07-g | ww-j16-x07-g < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j16-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j16-x10-g | ww-j16-x10-g < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j16-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j4-x07-g | ww-j4-x07-g < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j4-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j4-x10-g | ww-j4-x10-g < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j6-x07-g | ww-j6-x07-g < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j6-x10-g | ww-j6-x10-g < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j8-x07-g | ww-j8-x07-g < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j8-x10-g | ww-j8-x10-g < box-b10 |
+| icv1-fp20-tm450-568a3277 | box-b10 vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b12 vs box-b20 | box-b20 < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs box-b8 | box-b12 < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs inc | inc < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs rho-neg | rho-neg < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j16-x07-g | ww-j16-x07-g < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j16-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j16-x10-g | ww-j16-x10-g < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j16-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j4-x07-g | ww-j4-x07-g < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j4-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j4-x10-g | ww-j4-x10-g < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j6-x07-g | ww-j6-x07-g < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j6-x10-g | ww-j6-x10-g < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j8-x07-g | ww-j8-x07-g < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j8-x10-g | ww-j8-x10-g < box-b12 |
+| icv1-fp20-tm450-568a3277 | box-b12 vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b20 vs box-b8 | box-b20 < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs inc | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | box-b20 vs rho-neg | rho-neg < box-b20 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j16-x07-g | ww-j16-x07-g < box-b20 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j16-x07-w | box-b20 < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j16-x10-g | ww-j16-x10-g < box-b20 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j16-x10-w | box-b20 < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j4-x07-g | ww-j4-x07-g < box-b20 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j4-x07-w | box-b20 < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j4-x10-g | ww-j4-x10-g < box-b20 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j4-x10-w | box-b20 < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j6-x07-g | ww-j6-x07-g < box-b20 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j6-x07-w | box-b20 < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j6-x10-g | ww-j6-x10-g < box-b20 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j6-x10-w | box-b20 < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j8-x07-g | ww-j8-x07-g < box-b20 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j8-x07-w | box-b20 < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j8-x10-g | ww-j8-x10-g < box-b20 |
+| icv1-fp20-tm450-568a3277 | box-b20 vs ww-j8-x10-w | box-b20 < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | box-b8 vs inc | inc < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs rho-neg | rho-neg < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j16-x07-g | ww-j16-x07-g < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j16-x07-w | ww-j16-x07-w < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j16-x10-g | ww-j16-x10-g < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j16-x10-w | ww-j16-x10-w < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j4-x07-g | ww-j4-x07-g < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j4-x07-w | ww-j4-x07-w < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j4-x10-g | ww-j4-x10-g < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j4-x10-w | ww-j4-x10-w < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j6-x07-g | ww-j6-x07-g < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j6-x07-w | ww-j6-x07-w < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j6-x10-g | ww-j6-x10-g < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j6-x10-w | ww-j6-x10-w < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j8-x07-g | ww-j8-x07-g < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j8-x07-w | ww-j8-x07-w < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j8-x10-g | ww-j8-x10-g < box-b8 |
+| icv1-fp20-tm450-568a3277 | box-b8 vs ww-j8-x10-w | ww-j8-x10-w < box-b8 |
+| icv1-fp20-tm450-568a3277 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j16-x07-w | inc < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j16-x10-g | ww-j16-x10-g < inc |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j16-x10-w | inc < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j4-x07-g | ww-j4-x07-g < inc |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j4-x07-w | inc < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j4-x10-g | ww-j4-x10-g < inc |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j4-x10-w | inc < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j6-x07-g | ww-j6-x07-g < inc |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j6-x07-w | inc < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j6-x10-g | ww-j6-x10-g < inc |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j6-x10-w | inc < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j8-x07-g | ww-j8-x07-g < inc |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j8-x07-w | inc < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j8-x10-g | ww-j8-x10-g < inc |
+| icv1-fp20-tm450-568a3277 | inc vs ww-j8-x10-w | inc < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j16-x07-g | rho-neg < ww-j16-x07-g |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j16-x07-w | rho-neg < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j16-x10-g | rho-neg < ww-j16-x10-g |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j16-x10-w | rho-neg < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j4-x07-g | rho-neg < ww-j4-x07-g |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j4-x07-w | rho-neg < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j4-x10-g | rho-neg < ww-j4-x10-g |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j4-x10-w | rho-neg < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j6-x07-g | rho-neg < ww-j6-x07-g |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j6-x07-w | rho-neg < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j6-x10-g | rho-neg < ww-j6-x10-g |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j6-x10-w | rho-neg < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j8-x07-g | rho-neg < ww-j8-x07-g |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j8-x07-w | rho-neg < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j8-x10-g | rho-neg < ww-j8-x10-g |
+| icv1-fp20-tm450-568a3277 | rho-neg vs ww-j8-x10-w | rho-neg < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j16-x07-w | ww-j16-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j16-x10-g | ww-j16-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j16-x10-w | ww-j16-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j4-x07-w | ww-j16-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j4-x10-w | ww-j16-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j6-x07-w | ww-j16-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j6-x10-w | ww-j16-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j8-x07-w | ww-j16-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-g vs ww-j8-x10-w | ww-j16-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j16-x10-g | ww-j16-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j16-x10-w | ww-j16-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j4-x07-w | ww-j4-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j4-x10-w | ww-j4-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j16-x10-w | ww-j16-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j4-x07-w | ww-j16-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j4-x10-w | ww-j16-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j6-x07-g | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j6-x07-w | ww-j16-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j6-x10-w | ww-j16-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j8-x07-w | ww-j16-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j8-x10-g | ww-j16-x10-g < ww-j8-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-g vs ww-j8-x10-w | ww-j16-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j4-x07-w | ww-j16-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j16-x10-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j4-x07-w | ww-j4-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j4-x10-g | ww-j4-x07-g < ww-j4-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j4-x10-w | ww-j4-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j6-x07-g | ww-j4-x07-g < ww-j6-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j6-x07-w | ww-j4-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j6-x10-w | ww-j4-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j8-x07-g | ww-j4-x07-g < ww-j8-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j8-x07-w | ww-j4-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j8-x10-g | ww-j4-x07-g < ww-j8-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-g vs ww-j8-x10-w | ww-j4-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-g vs ww-j4-x10-w | ww-j4-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-g vs ww-j6-x07-g | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-g vs ww-j6-x07-w | ww-j4-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-g vs ww-j6-x10-w | ww-j4-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-g vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-g vs ww-j8-x07-w | ww-j4-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-g vs ww-j8-x10-g | ww-j4-x10-g < ww-j8-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-g vs ww-j8-x10-w | ww-j4-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-w vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j4-x10-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j4-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-g vs ww-j6-x07-w | ww-j6-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j6-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-g vs ww-j6-x10-w | ww-j6-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-g vs ww-j8-x07-g | ww-j6-x07-g < ww-j8-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-g vs ww-j8-x07-w | ww-j6-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-g vs ww-j8-x10-g | ww-j6-x07-g < ww-j8-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-g vs ww-j8-x10-w | ww-j6-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-w vs ww-j8-x07-w | ww-j6-x07-w < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j6-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x10-g vs ww-j6-x10-w | ww-j6-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x10-g vs ww-j8-x07-g | ww-j6-x10-g < ww-j8-x07-g |
+| icv1-fp20-tm450-568a3277 | ww-j6-x10-g vs ww-j8-x07-w | ww-j6-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x10-g vs ww-j8-x10-g | ww-j6-x10-g < ww-j8-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j6-x10-g vs ww-j8-x10-w | ww-j6-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x10-w vs ww-j8-x07-w | ww-j6-x10-w < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j6-x10-w vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | ww-j8-x07-g vs ww-j8-x07-w | ww-j8-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j8-x07-g vs ww-j8-x10-g | ww-j8-x07-g < ww-j8-x10-g |
+| icv1-fp20-tm450-568a3277 | ww-j8-x07-g vs ww-j8-x10-w | ww-j8-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm450-568a3277 | ww-j8-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j8-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j8-x07-w |
+| icv1-fp20-tm450-568a3277 | ww-j8-x10-g vs ww-j8-x10-w | ww-j8-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs box-b12 | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs box-b20 | box-b20 < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs box-b8 | box-b10 < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs inc | inc < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs rho-neg | rho-neg < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j16-x07-g | ww-j16-x07-g < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j16-x07-w | box-b10 < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j16-x10-g | ww-j16-x10-g < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j16-x10-w | box-b10 < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j4-x07-g | ww-j4-x07-g < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j4-x07-w | box-b10 < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j4-x10-g | ww-j4-x10-g < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j4-x10-w | box-b10 < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j6-x07-g | ww-j6-x07-g < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j6-x07-w | box-b10 < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j6-x10-g | ww-j6-x10-g < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j8-x07-g | ww-j8-x07-g < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j8-x07-w | box-b10 < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j8-x10-g | ww-j8-x10-g < box-b10 |
+| icv1-fp20-tm690-d5bed67c | box-b10 vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs box-b20 | box-b20 < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs box-b8 | box-b12 < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs inc | inc < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs rho-neg | rho-neg < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j16-x07-g | ww-j16-x07-g < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j16-x07-w | box-b12 < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j16-x10-g | ww-j16-x10-g < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j16-x10-w | box-b12 < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j4-x07-g | ww-j4-x07-g < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j4-x07-w | box-b12 < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j4-x10-g | ww-j4-x10-g < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j4-x10-w | box-b12 < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j6-x07-g | ww-j6-x07-g < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j6-x07-w | box-b12 < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j6-x10-g | ww-j6-x10-g < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j6-x10-w | box-b12 < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j8-x07-g | ww-j8-x07-g < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j8-x07-w | box-b12 < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j8-x10-g | ww-j8-x10-g < box-b12 |
+| icv1-fp20-tm690-d5bed67c | box-b12 vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs box-b8 | box-b20 < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs inc | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs rho-neg | rho-neg < box-b20 |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j16-x07-w | box-b20 < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j16-x10-w | box-b20 < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j4-x07-g | ww-j4-x07-g < box-b20 |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j4-x07-w | box-b20 < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j4-x10-g | ww-j4-x10-g < box-b20 |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j4-x10-w | box-b20 < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j6-x07-g | ww-j6-x07-g < box-b20 |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j6-x07-w | box-b20 < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j6-x10-g | ww-j6-x10-g < box-b20 |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j6-x10-w | box-b20 < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j8-x07-g | ww-j8-x07-g < box-b20 |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j8-x07-w | box-b20 < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j8-x10-g | ww-j8-x10-g < box-b20 |
+| icv1-fp20-tm690-d5bed67c | box-b20 vs ww-j8-x10-w | box-b20 < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs inc | inc < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs rho-neg | rho-neg < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j16-x07-g | ww-j16-x07-g < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j16-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j16-x10-g | ww-j16-x10-g < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j16-x10-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j4-x07-g | ww-j4-x07-g < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j4-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j4-x10-g | ww-j4-x10-g < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j6-x07-g | ww-j6-x07-g < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j6-x10-g | ww-j6-x10-g < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j8-x07-g | ww-j8-x07-g < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j8-x10-g | ww-j8-x10-g < box-b8 |
+| icv1-fp20-tm690-d5bed67c | box-b8 vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j16-x07-w | inc < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j16-x10-w | inc < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j4-x07-g | ww-j4-x07-g < inc |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j4-x07-w | inc < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j4-x10-w | inc < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j6-x07-g | ww-j6-x07-g < inc |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j6-x07-w | inc < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j6-x10-g | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j6-x10-w | inc < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j8-x07-g | ww-j8-x07-g < inc |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j8-x07-w | inc < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j8-x10-g | ww-j8-x10-g < inc |
+| icv1-fp20-tm690-d5bed67c | inc vs ww-j8-x10-w | inc < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j16-x07-g | rho-neg < ww-j16-x07-g |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j16-x07-w | rho-neg < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j16-x10-g | rho-neg < ww-j16-x10-g |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j16-x10-w | rho-neg < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j4-x07-g | rho-neg < ww-j4-x07-g |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j4-x07-w | rho-neg < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j4-x10-g | rho-neg < ww-j4-x10-g |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j4-x10-w | rho-neg < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j6-x07-g | rho-neg < ww-j6-x07-g |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j6-x07-w | rho-neg < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j6-x10-g | rho-neg < ww-j6-x10-g |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j6-x10-w | rho-neg < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j8-x07-g | rho-neg < ww-j8-x07-g |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j8-x07-w | rho-neg < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j8-x10-g | rho-neg < ww-j8-x10-g |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs ww-j8-x10-w | rho-neg < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j16-x07-w | ww-j16-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j16-x10-w | ww-j16-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j4-x07-w | ww-j16-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j4-x10-w | ww-j16-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j6-x07-w | ww-j16-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j6-x10-w | ww-j16-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j8-x07-w | ww-j16-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-g vs ww-j8-x10-w | ww-j16-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j16-x10-g | ww-j16-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j16-x10-w | ww-j16-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j4-x07-w | ww-j16-x07-w < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j4-x10-w | ww-j16-x07-w < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j6-x07-w | ww-j16-x07-w < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j8-x07-w | ww-j16-x07-w < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j16-x10-w | ww-j16-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j4-x07-w | ww-j16-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j4-x10-w | ww-j16-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j6-x07-w | ww-j16-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j6-x10-w | ww-j16-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j8-x07-w | ww-j16-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-g vs ww-j8-x10-w | ww-j16-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j4-x07-w | ww-j4-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j16-x10-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j4-x07-w | ww-j4-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j4-x10-g | ww-j4-x07-g < ww-j4-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j4-x10-w | ww-j4-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j6-x07-g | ww-j4-x07-g < ww-j6-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j6-x07-w | ww-j4-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j6-x10-g | ww-j4-x07-g < ww-j6-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j6-x10-w | ww-j4-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j8-x07-w | ww-j4-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-g vs ww-j8-x10-w | ww-j4-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j4-x10-w | ww-j4-x07-w < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-g vs ww-j4-x10-w | ww-j4-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-g vs ww-j6-x07-w | ww-j4-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-g vs ww-j6-x10-w | ww-j4-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-g vs ww-j8-x07-w | ww-j4-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-g vs ww-j8-x10-w | ww-j4-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-w vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j4-x10-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j4-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-g vs ww-j6-x07-w | ww-j6-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-g vs ww-j6-x10-g | ww-j6-x07-g < ww-j6-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-g vs ww-j6-x10-w | ww-j6-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-g vs ww-j8-x07-w | ww-j6-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x07-g |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-g vs ww-j8-x10-w | ww-j6-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j6-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x10-g vs ww-j6-x10-w | ww-j6-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x10-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x10-g vs ww-j8-x07-w | ww-j6-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x10-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x10-g |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x10-g vs ww-j8-x10-w | ww-j6-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x10-w vs ww-j8-x07-w | ww-j6-x10-w < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j6-x10-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j6-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j8-x07-g vs ww-j8-x07-w | ww-j8-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j8-x07-g vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | ww-j8-x07-g vs ww-j8-x10-w | ww-j8-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm690-d5bed67c | ww-j8-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j8-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j8-x07-w |
+| icv1-fp20-tm690-d5bed67c | ww-j8-x10-g vs ww-j8-x10-w | ww-j8-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs box-b12 | box-b12 < box-b10 |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs box-b20 | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs box-b8 | box-b10 < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs inc | inc < box-b10 |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs rho-neg | rho-neg < box-b10 |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j16-x07-w | box-b10 < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j16-x10-w | box-b10 < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j4-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j4-x07-w | box-b10 < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j4-x10-w | box-b10 < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j6-x07-g | ww-j6-x07-g < box-b10 |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j6-x07-w | box-b10 < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j6-x10-g | ww-j6-x10-g < box-b10 |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j6-x10-w | box-b10 < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j8-x07-w | box-b10 < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b10 vs ww-j8-x10-w | box-b10 < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs box-b20 | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs box-b8 | box-b12 < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs inc | inc < box-b12 |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs rho-neg | rho-neg < box-b12 |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j16-x07-w | box-b12 < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j16-x10-w | box-b12 < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j4-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j4-x07-w | box-b12 < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j4-x10-w | box-b12 < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j6-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j6-x07-w | box-b12 < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j6-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j6-x10-w | box-b12 < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j8-x07-w | box-b12 < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b12 vs ww-j8-x10-w | box-b12 < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs box-b8 | box-b20 < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs inc | inc < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs rho-neg | rho-neg < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j16-x07-g | ww-j16-x07-g < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j16-x07-w | box-b20 < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j16-x10-g | ww-j16-x10-g < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j16-x10-w | box-b20 < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j4-x07-g | ww-j4-x07-g < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j4-x07-w | box-b20 < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j4-x10-g | ww-j4-x10-g < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j4-x10-w | box-b20 < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j6-x07-g | ww-j6-x07-g < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j6-x07-w | box-b20 < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j6-x10-g | ww-j6-x10-g < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j6-x10-w | box-b20 < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j8-x07-g | ww-j8-x07-g < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j8-x07-w | box-b20 < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j8-x10-g | ww-j8-x10-g < box-b20 |
+| icv1-fp20-tm1146-4a57e423 | box-b20 vs ww-j8-x10-w | box-b20 < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs inc | inc < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs rho-neg | rho-neg < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j16-x07-g | ww-j16-x07-g < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j16-x07-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j16-x10-g | ww-j16-x10-g < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j16-x10-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j4-x07-g | ww-j4-x07-g < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j4-x07-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j4-x10-g | ww-j4-x10-g < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j6-x07-g | ww-j6-x07-g < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j6-x10-g | ww-j6-x10-g < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j8-x07-g | ww-j8-x07-g < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j8-x10-g | ww-j8-x10-g < box-b8 |
+| icv1-fp20-tm1146-4a57e423 | box-b8 vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j16-x07-g | inc < ww-j16-x07-g |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j16-x07-w | inc < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j16-x10-g | inc < ww-j16-x10-g |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j16-x10-w | inc < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j4-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j4-x07-w | inc < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j4-x10-g | inc < ww-j4-x10-g |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j4-x10-w | inc < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j6-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j6-x07-w | inc < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j6-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j6-x10-w | inc < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j8-x07-w | inc < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j8-x10-g | inc < ww-j8-x10-g |
+| icv1-fp20-tm1146-4a57e423 | inc vs ww-j8-x10-w | inc < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j16-x07-g | rho-neg < ww-j16-x07-g |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j16-x07-w | rho-neg < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j16-x10-g | rho-neg < ww-j16-x10-g |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j16-x10-w | rho-neg < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j4-x07-g | rho-neg < ww-j4-x07-g |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j4-x07-w | rho-neg < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j4-x10-g | rho-neg < ww-j4-x10-g |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j4-x10-w | rho-neg < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j6-x07-g | rho-neg < ww-j6-x07-g |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j6-x07-w | rho-neg < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j6-x10-g | rho-neg < ww-j6-x10-g |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j6-x10-w | rho-neg < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j8-x07-g | rho-neg < ww-j8-x07-g |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j8-x07-w | rho-neg < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j8-x10-g | rho-neg < ww-j8-x10-g |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs ww-j8-x10-w | rho-neg < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j16-x07-w | ww-j16-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j16-x10-w | ww-j16-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j4-x07-w | ww-j16-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j4-x10-w | ww-j16-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j6-x07-w | ww-j16-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j6-x10-w | ww-j16-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j8-x07-w | ww-j16-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-g vs ww-j8-x10-w | ww-j16-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j16-x10-g | ww-j16-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j16-x10-w | ww-j16-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j4-x07-w | ww-j4-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j16-x10-w | ww-j16-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j4-x07-w | ww-j16-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j4-x10-w | ww-j16-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j6-x07-w | ww-j16-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j6-x10-w | ww-j16-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j8-x07-w | ww-j16-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-g vs ww-j8-x10-w | ww-j16-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j4-x07-w | ww-j4-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j4-x10-w | ww-j16-x10-w < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j16-x10-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j4-x07-w | ww-j4-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j4-x10-g | ww-j4-x07-g < ww-j4-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j4-x10-w | ww-j4-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x07-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j6-x07-w | ww-j4-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x07-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j6-x10-w | ww-j4-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j8-x07-w | ww-j4-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j8-x10-g | ww-j4-x07-g < ww-j8-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-g vs ww-j8-x10-w | ww-j4-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j4-x10-w | ww-j4-x07-w < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j8-x07-w | ww-j4-x07-w < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x07-w vs ww-j8-x10-w | ww-j4-x07-w < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-g vs ww-j4-x10-w | ww-j4-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-g vs ww-j6-x07-w | ww-j4-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-g vs ww-j6-x10-w | ww-j4-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-g vs ww-j8-x07-w | ww-j4-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-g vs ww-j8-x10-w | ww-j4-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j4-x10-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j4-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-g vs ww-j6-x07-w | ww-j6-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-g vs ww-j6-x10-g | ww-j6-x07-g < ww-j6-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-g vs ww-j6-x10-w | ww-j6-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-g vs ww-j8-x07-g | ww-j6-x07-g < ww-j8-x07-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-g vs ww-j8-x07-w | ww-j6-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-g vs ww-j8-x10-g | ww-j6-x07-g < ww-j8-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-g vs ww-j8-x10-w | ww-j6-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-w vs ww-j6-x10-w | ww-j6-x07-w < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-w vs ww-j8-x07-w | ww-j6-x07-w < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x07-w vs ww-j8-x10-w | ww-j6-x07-w < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x10-g vs ww-j6-x10-w | ww-j6-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x10-g vs ww-j8-x07-g | ww-j6-x10-g < ww-j8-x07-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x10-g vs ww-j8-x07-w | ww-j6-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x10-g vs ww-j8-x10-g | ww-j6-x10-g < ww-j8-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x10-g vs ww-j8-x10-w | ww-j6-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x10-w vs ww-j8-x07-w | ww-j6-x10-w < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j6-x10-w vs ww-j8-x10-w | ww-j6-x10-w < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j8-x07-g vs ww-j8-x07-w | ww-j8-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j8-x07-g vs ww-j8-x10-g | ww-j8-x07-g < ww-j8-x10-g |
+| icv1-fp20-tm1146-4a57e423 | ww-j8-x07-g vs ww-j8-x10-w | ww-j8-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j8-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j8-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j8-x07-w |
+| icv1-fp20-tm1146-4a57e423 | ww-j8-x10-g vs ww-j8-x10-w | ww-j8-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs box-b12 | box-b12 < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs box-b20 | box-b20 < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs box-b8 | box-b10 < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs inc | inc < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs rho-neg | rho-neg < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j16-x07-g | ww-j16-x07-g < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j16-x07-w | box-b10 < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j16-x10-g | ww-j16-x10-g < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j16-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j4-x07-g | ww-j4-x07-g < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j4-x07-w | box-b10 < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j4-x10-g | ww-j4-x10-g < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j6-x07-g | ww-j6-x07-g < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j6-x10-g | ww-j6-x10-g < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j8-x07-g | ww-j8-x07-g < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j8-x10-g | ww-j8-x10-g < box-b10 |
+| icv1-fp20-tm1050-4295f05e | box-b10 vs ww-j8-x10-w | box-b10 < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs box-b20 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs box-b8 | box-b12 < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs inc | inc < box-b12 |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs rho-neg | rho-neg < box-b12 |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j16-x07-w | box-b12 < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j16-x10-w | box-b12 < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j4-x07-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j4-x07-w | box-b12 < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j4-x10-w | box-b12 < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j6-x07-g | ww-j6-x07-g < box-b12 |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j6-x07-w | box-b12 < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j6-x10-g | ww-j6-x10-g < box-b12 |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j6-x10-w | box-b12 < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j8-x07-g | ww-j8-x07-g < box-b12 |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j8-x07-w | box-b12 < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j8-x10-g | ww-j8-x10-g < box-b12 |
+| icv1-fp20-tm1050-4295f05e | box-b12 vs ww-j8-x10-w | box-b12 < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs box-b8 | box-b20 < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs inc | inc < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs rho-neg | rho-neg < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j16-x07-g | ww-j16-x07-g < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j16-x07-w | box-b20 < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j16-x10-g | ww-j16-x10-g < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j16-x10-w | box-b20 < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j4-x07-g | ww-j4-x07-g < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j4-x07-w | box-b20 < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j4-x10-g | ww-j4-x10-g < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j4-x10-w | box-b20 < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j6-x07-g | ww-j6-x07-g < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j6-x07-w | box-b20 < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j6-x10-g | ww-j6-x10-g < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j6-x10-w | box-b20 < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j8-x07-g | ww-j8-x07-g < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j8-x07-w | box-b20 < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j8-x10-g | ww-j8-x10-g < box-b20 |
+| icv1-fp20-tm1050-4295f05e | box-b20 vs ww-j8-x10-w | box-b20 < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs inc | inc < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs rho-neg | rho-neg < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j16-x07-g | ww-j16-x07-g < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j16-x07-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j16-x10-g | ww-j16-x10-g < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j16-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j4-x07-g | ww-j4-x07-g < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j4-x07-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j4-x10-g | ww-j4-x10-g < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j6-x07-g | ww-j6-x07-g < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j6-x10-g | ww-j6-x10-g < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j8-x07-g | ww-j8-x07-g < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j8-x10-g | ww-j8-x10-g < box-b8 |
+| icv1-fp20-tm1050-4295f05e | box-b8 vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j16-x07-w | inc < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j16-x10-w | inc < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j4-x07-g | inc < ww-j4-x07-g |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j4-x07-w | inc < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j4-x10-w | inc < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j6-x07-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j6-x07-w | inc < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j6-x10-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j6-x10-w | inc < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j8-x07-w | inc < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs ww-j8-x10-w | inc < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j16-x07-g | rho-neg < ww-j16-x07-g |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j16-x07-w | rho-neg < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j16-x10-g | rho-neg < ww-j16-x10-g |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j16-x10-w | rho-neg < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j4-x07-g | rho-neg < ww-j4-x07-g |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j4-x07-w | rho-neg < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j4-x10-g | rho-neg < ww-j4-x10-g |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j4-x10-w | rho-neg < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j6-x07-g | rho-neg < ww-j6-x07-g |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j6-x07-w | rho-neg < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j6-x10-g | rho-neg < ww-j6-x10-g |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j6-x10-w | rho-neg < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j8-x07-g | rho-neg < ww-j8-x07-g |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j8-x07-w | rho-neg < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j8-x10-g | rho-neg < ww-j8-x10-g |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs ww-j8-x10-w | rho-neg < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j16-x07-w | ww-j16-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j16-x10-g | ww-j16-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j16-x10-w | ww-j16-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j4-x07-g | ww-j16-x07-g < ww-j4-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j4-x07-w | ww-j16-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j4-x10-w | ww-j16-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j6-x07-w | ww-j16-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j6-x10-w | ww-j16-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j8-x07-w | ww-j16-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-g vs ww-j8-x10-w | ww-j16-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j16-x10-g | ww-j16-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j16-x10-w | ww-j16-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j4-x07-w | ww-j16-x07-w < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j4-x10-w | ww-j4-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j16-x10-w | ww-j16-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j4-x07-g | ww-j16-x10-g < ww-j4-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j4-x07-w | ww-j16-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j4-x10-w | ww-j16-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j6-x07-w | ww-j16-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j6-x10-w | ww-j16-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j8-x07-w | ww-j16-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-g vs ww-j8-x10-w | ww-j16-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j4-x07-w | ww-j16-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j4-x10-w | ww-j4-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j16-x10-w vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j4-x07-w | ww-j4-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j4-x10-g | ww-j4-x10-g < ww-j4-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j4-x10-w | ww-j4-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j6-x07-w | ww-j4-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j6-x10-w | ww-j4-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j8-x07-w | ww-j4-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-g vs ww-j8-x10-w | ww-j4-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j4-x10-w | ww-j4-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j4-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-g vs ww-j4-x10-w | ww-j4-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-g vs ww-j6-x07-w | ww-j4-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-g vs ww-j6-x10-w | ww-j4-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-g vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-g vs ww-j8-x07-w | ww-j4-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-g vs ww-j8-x10-w | ww-j4-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-w vs ww-j6-x07-w | ww-j4-x10-w < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-w vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j4-x10-w vs ww-j8-x10-w | ww-j4-x10-w < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-g vs ww-j6-x07-w | ww-j6-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j6-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-g vs ww-j6-x10-w | ww-j6-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-g vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-g vs ww-j8-x07-w | ww-j6-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-g vs ww-j8-x10-g | ww-j6-x07-g < ww-j8-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-g vs ww-j8-x10-w | ww-j6-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x07-w vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x10-g vs ww-j6-x10-w | ww-j6-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x10-g vs ww-j8-x07-g | ww-j6-x10-g < ww-j8-x07-g |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x10-g vs ww-j8-x07-w | ww-j6-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x10-g vs ww-j8-x10-g | ww-j6-x10-g < ww-j8-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x10-g vs ww-j8-x10-w | ww-j6-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x10-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j6-x10-w vs ww-j8-x10-w | ww-j6-x10-w < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j8-x07-g vs ww-j8-x07-w | ww-j8-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j8-x07-g vs ww-j8-x10-g | ww-j8-x07-g < ww-j8-x10-g |
+| icv1-fp20-tm1050-4295f05e | ww-j8-x07-g vs ww-j8-x10-w | ww-j8-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j8-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1050-4295f05e | ww-j8-x07-w vs ww-j8-x10-w | ww-j8-x07-w < ww-j8-x10-w |
+| icv1-fp20-tm1050-4295f05e | ww-j8-x10-g vs ww-j8-x10-w | ww-j8-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs box-b12 | box-b12 < box-b10 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs box-b20 | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs box-b8 | box-b10 < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs inc | inc < box-b10 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs rho-neg | rho-neg < box-b10 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j16-x07-w | box-b10 < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j16-x10-w | box-b10 < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j4-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j4-x07-w | box-b10 < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j4-x10-w | box-b10 < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j6-x07-g | ww-j6-x07-g < box-b10 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j6-x07-w | box-b10 < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j6-x10-g | ww-j6-x10-g < box-b10 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j6-x10-w | box-b10 < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j8-x07-w | box-b10 < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b10 vs ww-j8-x10-w | box-b10 < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs box-b20 | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs box-b8 | box-b12 < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs inc | inc < box-b12 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs rho-neg | rho-neg < box-b12 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j16-x07-w | box-b12 < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j16-x10-w | box-b12 < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j4-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j4-x07-w | box-b12 < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j4-x10-w | box-b12 < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j6-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j6-x07-w | box-b12 < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j6-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j6-x10-w | box-b12 < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j8-x07-w | box-b12 < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b12 vs ww-j8-x10-w | box-b12 < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs box-b8 | box-b20 < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs inc | inc < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs rho-neg | rho-neg < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j16-x07-g | ww-j16-x07-g < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j16-x07-w | box-b20 < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j16-x10-g | ww-j16-x10-g < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j16-x10-w | box-b20 < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j4-x07-g | ww-j4-x07-g < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j4-x07-w | box-b20 < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j4-x10-g | ww-j4-x10-g < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j4-x10-w | box-b20 < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j6-x07-g | ww-j6-x07-g < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j6-x07-w | box-b20 < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j6-x10-g | ww-j6-x10-g < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j6-x10-w | box-b20 < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j8-x07-g | ww-j8-x07-g < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j8-x07-w | box-b20 < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j8-x10-g | ww-j8-x10-g < box-b20 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b20 vs ww-j8-x10-w | box-b20 < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs inc | inc < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs rho-neg | rho-neg < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j16-x07-g | ww-j16-x07-g < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j16-x07-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j16-x10-g | ww-j16-x10-g < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j16-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j4-x07-g | ww-j4-x07-g < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j4-x07-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j4-x10-g | ww-j4-x10-g < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j6-x07-g | ww-j6-x07-g < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j6-x07-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j6-x10-g | ww-j6-x10-g < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j8-x07-g | ww-j8-x07-g < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j8-x10-g | ww-j8-x10-g < box-b8 |
+| icv1-fp20-tm1986-0aefc1a0 | box-b8 vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j16-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j16-x07-w | inc < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j16-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j16-x10-w | inc < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j4-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j4-x07-w | inc < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j4-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j4-x10-w | inc < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j6-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j6-x07-w | inc < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j6-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j6-x10-w | inc < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j8-x07-g | inc < ww-j8-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j8-x07-w | inc < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs ww-j8-x10-w | inc < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j16-x07-g | rho-neg < ww-j16-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j16-x07-w | rho-neg < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j16-x10-g | rho-neg < ww-j16-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j16-x10-w | rho-neg < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j4-x07-g | rho-neg < ww-j4-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j4-x07-w | rho-neg < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j4-x10-g | rho-neg < ww-j4-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j4-x10-w | rho-neg < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j6-x07-g | rho-neg < ww-j6-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j6-x07-w | rho-neg < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j6-x10-g | rho-neg < ww-j6-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j6-x10-w | rho-neg < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j8-x07-g | rho-neg < ww-j8-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j8-x07-w | rho-neg < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j8-x10-g | rho-neg < ww-j8-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs ww-j8-x10-w | rho-neg < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j16-x07-w | ww-j16-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j16-x10-g | ww-j16-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j16-x10-w | ww-j16-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j4-x07-g | ww-j16-x07-g < ww-j4-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j4-x07-w | ww-j16-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j4-x10-w | ww-j16-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j6-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j6-x07-w | ww-j16-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j6-x10-w | ww-j16-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j8-x07-w | ww-j16-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-g vs ww-j8-x10-w | ww-j16-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j16-x10-g | ww-j16-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j16-x10-w | ww-j16-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j4-x07-w | ww-j4-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j4-x10-w | ww-j4-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x07-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j16-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j16-x10-w | ww-j16-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j4-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j4-x07-w | ww-j16-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j4-x10-w | ww-j16-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j6-x07-w | ww-j16-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j6-x10-w | ww-j16-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j8-x07-w | ww-j16-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-g vs ww-j8-x10-w | ww-j16-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j4-x07-g | ww-j4-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j4-x07-w | ww-j4-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j4-x10-w | ww-j4-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j6-x10-w | ww-j6-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j8-x07-w | ww-j8-x07-w < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j16-x10-w vs ww-j8-x10-w | ww-j8-x10-w < ww-j16-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j4-x07-w | ww-j4-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j4-x10-g | ww-j4-x10-g < ww-j4-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j4-x10-w | ww-j4-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j6-x07-w | ww-j4-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j6-x10-w | ww-j4-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j8-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j8-x07-w | ww-j4-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-g vs ww-j8-x10-w | ww-j4-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j4-x10-g | ww-j4-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j4-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x07-w vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-g vs ww-j4-x10-w | ww-j4-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-g vs ww-j6-x07-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-g vs ww-j6-x07-w | ww-j4-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-g vs ww-j6-x10-w | ww-j4-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-g vs ww-j8-x07-g | ww-j4-x10-g < ww-j8-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-g vs ww-j8-x07-w | ww-j4-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-g vs ww-j8-x10-g | ww-j4-x10-g < ww-j8-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-g vs ww-j8-x10-w | ww-j4-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-w vs ww-j6-x07-g | ww-j6-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-w vs ww-j6-x07-w | ww-j6-x07-w < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-w vs ww-j6-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-w vs ww-j8-x07-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j4-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j4-x10-w vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-g vs ww-j6-x07-w | ww-j6-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-g vs ww-j6-x10-g | ww-j6-x10-g < ww-j6-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-g vs ww-j6-x10-w | ww-j6-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-g vs ww-j8-x07-g | ww-j6-x07-g < ww-j8-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-g vs ww-j8-x07-w | ww-j6-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-g vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-g vs ww-j8-x10-w | ww-j6-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-w vs ww-j6-x10-g | ww-j6-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-w vs ww-j6-x10-w | ww-j6-x07-w < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-w vs ww-j8-x07-w | ww-j6-x07-w < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x07-w vs ww-j8-x10-w | ww-j6-x07-w < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x10-g vs ww-j6-x10-w | ww-j6-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x10-g vs ww-j8-x07-g | ww-j6-x10-g < ww-j8-x07-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x10-g vs ww-j8-x07-w | ww-j6-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x10-g vs ww-j8-x10-g | ww-j6-x10-g < ww-j8-x10-g |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x10-g vs ww-j8-x10-w | ww-j6-x10-g < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x10-w vs ww-j8-x07-g | ww-j8-x07-g < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x10-w vs ww-j8-x07-w | ww-j6-x10-w < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x10-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j6-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j6-x10-w vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j8-x07-g vs ww-j8-x07-w | ww-j8-x07-g < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j8-x07-g vs ww-j8-x10-g | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j8-x07-g vs ww-j8-x10-w | ww-j8-x07-g < ww-j8-x10-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j8-x07-w vs ww-j8-x10-g | ww-j8-x10-g < ww-j8-x07-w |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j8-x07-w vs ww-j8-x10-w | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | ww-j8-x10-g vs ww-j8-x10-w | ww-j8-x10-g < ww-j8-x10-w |

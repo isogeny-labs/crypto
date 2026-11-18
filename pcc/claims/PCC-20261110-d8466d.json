@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-10T09:43:31Z",
+ "id": "PCC-20261110-d8466d",
+ "kind": "theorem",
+ "producer": {
+  "commit": "7fc27f7fa99ae2d7cf01861513da1557209afa23",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "f0aa6b108db9d64ea63ee9b18249d730432e87582be2d04ef2b522c809b89947",
+   "kind": "lean",
+   "project": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean",
+   "theorem": "SmartConcreteAudit.concrete_attack_certificate"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Concrete finite-ring program correctness and actual point relation for four fixed lifts; no genericp-adictransfer,wholecurvepointcount,nativeexecutionrefinement,securitycostorbenchmark claim.",
+ "statement": "Lean proves that each of four fixed public-input finite-ring Smart arithmetic attempts on the explicit160-bit fixture returns a scalar belowp satisfying the actual Mathlib relation dG=Q. It binds the public coordinates, exact prime order ofG, nonsingularity and binary schedule."
+}

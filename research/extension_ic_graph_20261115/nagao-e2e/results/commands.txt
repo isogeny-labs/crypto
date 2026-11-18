@@ -1,0 +1,17 @@
+Scientific source: 7802b7f864594d757f88991f7d70b77c38715ebe
+Input commit: c1b9bd4e87535974d554ab7f9a383ebb79b4ad56
+New paid resource allocations: none (existing authorized local CPU environment).
+
+Single finite measurement invocation:
+timeout 7200 /tmp/nagao-e2e-native-4/run /tmp/nagao-e2e-native-4/worker /workspace/nagao-e2e-runs/cold-20261117-01 /workspace/nagao-e2e/research/extension_ic_graph_20261115/nagao-e2e/public.json /workspace/nagao-e2e-runs/private-fixture.json 7802b7f864594d757f88991f7d70b77c38715ebe /workspace/nagao-e2e/tools/isolated_bench.py
+
+Each worker is timed by the maintained isolation wrapper with --cpus 0,
+unchanged thresholds, timeout300, RAYON_NUM_THREADS=1, OMP_NUM_THREADS=1.
+The native runner preserves exact argv, isolation receipts and all raw files.
+Runner exit0; no retry, lost arm, contended timing, or omitted outlier.
+
+Frozen native analysis, exit0:
+/tmp/nagao-e2e-native-4/analyze /workspace/nagao-e2e-runs/cold-20261117-01 /workspace/nagao-e2e-runs/summary.json
+
+Post-run source/binary guard: sha256sum -c /tmp/nagao-e2e-native-4/binaries.sha256
+All six binaries match. New analysis inputs are not supplied to a worker.

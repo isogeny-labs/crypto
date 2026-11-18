@@ -1,0 +1,15 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations isolate.cpp -o /tmp/cm-marked-scalar-build/isolate -pthread -lcrypto
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations -DCM_ISOLATION_SELFTEST isolate.cpp -o /tmp/cm-marked-scalar-build/isolate-selftest -pthread -lcrypto
+isolate.cpp: In function ‘int run(int, char**)’:
+isolate.cpp:45:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   45 |  if(argc!=7||std::string(argv[5])!="/bin/sleep"||(std::string(argv[6])!="1"&&std::string(argv[6])!="30"))throw std::runtime_error("selftest permits only fixed sleep commands");constexpr bool selftest=true;
+      |  ^~
+isolate.cpp:45:177: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   45 |  if(argc!=7||std::string(argv[5])!="/bin/sleep"||(std::string(argv[6])!="1"&&std::string(argv[6])!="30"))throw std::runtime_error("selftest permits only fixed sleep commands");constexpr bool selftest=true;
+      |                                                                                                                                                                                 ^~~~~~~~~
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations analysis.cpp -o /tmp/cm-marked-scalar-build/analysis -lcrypto
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

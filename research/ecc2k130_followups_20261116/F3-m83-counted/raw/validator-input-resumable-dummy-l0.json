@@ -1,0 +1,68 @@
+{
+  "schema": "isolab.eks.resumable/v1",
+  "run_name": "f3-k0n83-row-t0",
+  "deadline_unix_seconds": 1794800000,
+  "build": {
+    "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "source_revision": "0000000000000000000000000000000000000000",
+    "ecbench_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "spec": {
+    "schema": "ecbench.spec/v1",
+    "label": "F3 m=83 launch: E_0 over GF(2^83) (AGENTS.md 8a), complete IC vs matched rho",
+    "description": "research/ecc2k130_followups_20261116/F3-m83-counted/PROTOCOL.md (frozen). Counted units only (S = GAE/sqrt(r)); isolation L0 because counts, not times, decide. Public synthetic targets; no security claim.",
+    "workloads": {
+      "curves": [
+        {
+          "kind": "koblitz",
+          "a": 0,
+          "n": 83
+        }
+      ],
+      "targets_per_curve": 8,
+      "target_seed": 20261116301,
+      "target_kind": "public"
+    },
+    "arms": [
+      {
+        "name": "rho-strong",
+        "role": "reference",
+        "method": {
+          "id": "rho.signed_frobenius_strong"
+        }
+      },
+      {
+        "name": "ic-pipeline",
+        "role": "candidate",
+        "method": {
+          "id": "ic.pipeline",
+          "params": {
+            "factor_base": "compact-orbit-scan:columns=970249,raw_x_cap=100000000",
+            "linalg": "incremental-gauss",
+            "oracle": "mitm-frobenius-counted:m=2",
+            "targets": "walk"
+          }
+        }
+      },
+      {
+        "name": "rho-strong-aa",
+        "role": "control",
+        "method": {
+          "id": "rho.signed_frobenius_strong"
+        }
+      }
+    ],
+    "measurement": {
+      "rounds": 1,
+      "warmup": 0,
+      "order": "alternate",
+      "seed": 20261116302,
+      "isolation_required": "L0",
+      "timeout_seconds": 86400
+    }
+  },
+  "instance_type": "c8a.2xlarge",
+  "checkpoint_interval_seconds": 900,
+  "max_restores": 5
+}

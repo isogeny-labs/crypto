@@ -1,0 +1,206 @@
+{
+  "schema": "rowspace.quota-scope-erratum/v1",
+  "standing": "producer unsigned/unverified",
+  "entries_guard_scope": "PER RankCertificate; not global Audit or live-memory",
+  "work_and_write_meters": "shared across phases in generator/reader call",
+  "serialization": "producer32MiB guard; check API takes in-memory structs,not a transport admission API",
+  "native_entry_count_receipt": "quota-reader-v1/native-v1/counts.json",
+  "whole_Audit_case_counts": [
+    {
+      "counts": {
+        "image_terms": 1,
+        "rank_phases": {
+          "baseline": {
+            "entries": 0,
+            "origin_records": 0,
+            "terms": 0
+          },
+          "combined": {
+            "entries": 2,
+            "origin_records": 1,
+            "terms": 1
+          },
+          "projection": {
+            "entries": 4,
+            "origin_records": 3,
+            "terms": 1
+          }
+        },
+        "under_1million_entries": true,
+        "whole_Audit_represented_entries": 7
+      },
+      "id": "constant-conflict",
+      "input_bytes": 1174,
+      "input_sha256": "6ae1bccc78d22396c6d82c95618d92940ec5a88289a9acf5e8851ebb8d896424"
+    },
+    {
+      "counts": {
+        "image_terms": 0,
+        "rank_phases": {
+          "baseline": {
+            "entries": 3,
+            "origin_records": 1,
+            "terms": 2
+          },
+          "combined": {
+            "entries": 3,
+            "origin_records": 1,
+            "terms": 2
+          },
+          "projection": {
+            "entries": 2,
+            "origin_records": 1,
+            "terms": 1
+          }
+        },
+        "under_1million_entries": true,
+        "whole_Audit_represented_entries": 8
+      },
+      "id": "existing-input",
+      "input_bytes": 1500,
+      "input_sha256": "9d54de49b25328271d9f64595711eda5c96ac761fa6c3f85106767e8e3837ec9"
+    },
+    {
+      "counts": {
+        "image_terms": 2,
+        "rank_phases": {
+          "baseline": {
+            "entries": 0,
+            "origin_records": 0,
+            "terms": 0
+          },
+          "combined": {
+            "entries": 3,
+            "origin_records": 1,
+            "terms": 2
+          },
+          "projection": {
+            "entries": 4,
+            "origin_records": 3,
+            "terms": 1
+          }
+        },
+        "under_1million_entries": true,
+        "whole_Audit_represented_entries": 9
+      },
+      "id": "new-quadratic",
+      "input_bytes": 1478,
+      "input_sha256": "4358725e5317d691454461f2508f7239c0f249dd6056e15c18cb85b000878b12"
+    },
+    {
+      "counts": {
+        "image_terms": 0,
+        "rank_phases": {
+          "baseline": {
+            "entries": 1266,
+            "origin_records": 539,
+            "terms": 727
+          },
+          "combined": {
+            "entries": 1266,
+            "origin_records": 539,
+            "terms": 727
+          },
+          "projection": {
+            "entries": 3587,
+            "origin_records": 1015,
+            "terms": 2572
+          }
+        },
+        "under_1million_entries": true,
+        "whole_Audit_represented_entries": 6119
+      },
+      "id": "original-input204",
+      "input_bytes": 1111242,
+      "input_sha256": "e514c3af5f8fb68b598f2214fec65815fe985852e8aa9f47877d6a5219623e65"
+    },
+    {
+      "counts": {
+        "image_terms": 0,
+        "rank_phases": {
+          "baseline": {
+            "entries": 34,
+            "origin_records": 11,
+            "terms": 23
+          },
+          "combined": {
+            "entries": 34,
+            "origin_records": 11,
+            "terms": 23
+          },
+          "projection": {
+            "entries": 4895,
+            "origin_records": 1573,
+            "terms": 3322
+          }
+        },
+        "under_1million_entries": true,
+        "whole_Audit_represented_entries": 4963
+      },
+      "id": "original-raw12",
+      "input_bytes": 886902,
+      "input_sha256": "f2e368ba1ecb4e0492651313886653dab8cf06b29d439f41050c6cffd4f28b42"
+    },
+    {
+      "counts": {
+        "image_terms": 0,
+        "rank_phases": {
+          "baseline": {
+            "entries": 0,
+            "origin_records": 0,
+            "terms": 0
+          },
+          "combined": {
+            "entries": 0,
+            "origin_records": 0,
+            "terms": 0
+          },
+          "projection": {
+            "entries": 5,
+            "origin_records": 2,
+            "terms": 3
+          }
+        },
+        "under_1million_entries": true,
+        "whole_Audit_represented_entries": 5
+      },
+      "id": "private-auxiliary",
+      "input_bytes": 1058,
+      "input_sha256": "313737af1feff375f90ed8ff60632643c11cc394ef92ef720c1f4151f69348a0"
+    },
+    {
+      "counts": {
+        "image_terms": 0,
+        "rank_phases": {
+          "baseline": {
+            "entries": 0,
+            "origin_records": 0,
+            "terms": 0
+          },
+          "combined": {
+            "entries": 1,
+            "origin_records": 1,
+            "terms": 0
+          },
+          "projection": {
+            "entries": 4,
+            "origin_records": 3,
+            "terms": 1
+          }
+        },
+        "under_1million_entries": true,
+        "whole_Audit_represented_entries": 5
+      },
+      "id": "zero-image",
+      "input_bytes": 1010,
+      "input_sha256": "fd8ec8126b8be64dc588266abfef2c7a0393abae382682a56e23e318876f561d"
+    }
+  ],
+  "metadata_source3_and_old_input7_qualified_separately": true,
+  "old_rank_or_solver_reruns": 0,
+  "preparation_refusals": [
+    "Sparse native manifest read from exact HEAD Git blob",
+    "An initial byte-size bound failed: original-input204 JSON1111242bytes. Byte size is not entry count; no byte-bound erratum was published. A separate Rust reader counted actual records."
+  ],
+  "future_requirement": "New version must enforce any global represented-entry guard before allocation."
+}

@@ -1,0 +1,41 @@
+proc require87(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("relative-infinity50.sing"));
+setring relativeInfinity50;
+poly E87=relativeInfinityIdeal50[1];
+poly P87=relativeInfinityIdeal50[2];
+require87(E87==V^2+z^2*V+z+z^3,"REL87_SOURCE_BASE_MISMATCH");
+require87(lead(P87)==T^16,"REL87_SOURCE_UPPER_NOT_MONIC");
+poly h87=z+V;
+poly N87=V+z*V+z^2;
+poly g87=1+z+z^2+V;
+poly A87=T+(1+z)^2*g87;
+poly D87=z^2*g87;
+ideal sourceStd87=std(relativeInfinityIdeal50);
+poly remaining87=P87;
+poly pulled87=0;
+poly corruptionDifference87=0;
+int terms87=0;
+intvec exponent87;
+int tDegree87;int vDegree87;int zDegree87;
+poly term87;
+while(remaining87!=0){
+  exponent87=leadexp(remaining87);
+  tDegree87=exponent87[1];vDegree87=exponent87[2];zDegree87=exponent87[3];
+  require87(tDegree87<=16 && vDegree87<=1 && zDegree87+2*vDegree87<=64,"REL87_DENOMINATOR_BOUND");
+  term87=h87^(64-zDegree87-2*vDegree87)*N87^vDegree87*D87^(16-tDegree87);
+  pulled87=pulled87+term87*A87^tDegree87;
+  if(tDegree87>0){
+    require87(tDegree87==1 || tDegree87==4 || tDegree87==8 || tDegree87==16,"REL87_CORRUPT_EXPONENT_UNSUPPORTED");
+    corruptionDifference87=corruptionDifference87+term87*D87^tDegree87;
+  }
+  remaining87=remaining87-lead(remaining87);
+  terms87++;
+}
+print("REL87_STAGE terms="+string(terms87)+" pull_terms="+string(size(pulled87)));
+require87(reduce(pulled87,sourceStd87)==0,"REL87_PULLBACK_REMAINDER_NONZERO");
+matrix lift87=lift(relativeInfinityIdeal50,ideal(pulled87));
+require87(matrix(relativeInfinityIdeal50)*lift87==matrix(ideal(pulled87)),"REL87_PULLBACK_FULL_LIFT");
+require87(reduce(corruptionDifference87,sourceStd87)!=0,"REL87_CORRUPTED_LAMBDA_ACCEPTED");
+print("REL87_RESULT source_degree=16 denominator_h=64 denominator_D=16 full_ideal_lift=1 corrupted_shift_rejected=1");
+print("RELATIVE87_ALL_CHECKS_PASS");
+quit;

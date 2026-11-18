@@ -1,0 +1,35 @@
+{
+  "kind": "native correctness qualification",
+  "source_sha256": "9d605abf490bef1cbb583b237967cbdac44c6971027726ba32a45f49eb338000",
+  "json_parser_sha256": "44ddb75c26eeb0423d9a53df61272f1f752c0cbdf6fac7dc476c31dfc481d2d0",
+  "binary_sha256": "3d6a8d9aa86992934d439b3c4ed57a0dce15fc52eb04817c62addfa4a1d8e328",
+  "replay_sha256": "ac4259f740e23301a9ddac72a7b1dd395962987f208e9550528e285cb859be39",
+  "compiler": "c++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-5)",
+  "cases": 50,
+  "curves": [
+    "P-384",
+    "P-521"
+  ],
+  "windows": [
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "known_input_scalars": [
+    0,
+    1,
+    2,
+    17,
+    -1
+  ],
+  "full_map_polynomial_identities": true,
+  "closed_dual_point_checks": true,
+  "negative_scalar_control_rejected": true,
+  "openssl_public_reference_checked": true,
+  "timing_performed": false,
+  "cloud_submissions": 0,
+  "claim": "demonstrated_on_cases; no native speedup claim",
+  "initial_build": "native-v1 succeeded with misleading-indentation warnings; native-v2 removes warnings and rejects empty JSON tokens"
+}

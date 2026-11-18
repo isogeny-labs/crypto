@@ -1,0 +1,17 @@
+[package]
+name = "vieta-speed-lab"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+vieta-coset-lab = { path = "../../native" }
+num-bigint = "0.4"
+num-traits = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[lints.clippy]
+type_complexity = "allow"
+too_many_arguments = "allow"

@@ -1,0 +1,19 @@
+S4Degree.lean:153:4: error: Type mismatch: After simplification, term
+  congrArg (⇑C) (of_decide_eq_true (id (Eq.refl true)))
+ has type
+  @Eq (ZMod 5)[X] (C 81) 1
+but is expected to have type
+  @Eq (ZMod 5)[X] 81 1
+S4Degree.lean:156:9: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ↑540
+in the target expression
+  1 + X * 540 + X ^ 2 * 1350 + X ^ 3 * 1500 + X ^ 4 * 625 = 1
+
+hz : ∀ (n : ℕ), ↑n = 0 → ↑n = 0
+ho : 81 = 1
+⊢ 1 + X * 540 + X ^ 2 * 1350 + X ^ 3 * 1500 + X ^ 4 * 625 = 1
+'S4DegreeAudit.quartic_coeff_four' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.quartic_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.curveLast_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.fullySymbolicLast_natDegree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.actual_specialization_degree_zero' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

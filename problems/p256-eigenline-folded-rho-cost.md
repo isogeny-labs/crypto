@@ -31,6 +31,10 @@ remains open. This is a specific constant-factor case related to
   [pcc:unverified]
 - Missing: optimized destination arithmetic; matched transport/setup/folding/solve/
   recovery/verification costs; strongest available source control and replay.
+- New component: [minimal transport](../research/p256_genus_dlp_20261115/minimal_transport/REPORT.md)
+  compiles the fixed-order integer norm floor and coefficient bound. Its
+  norm-minimal map implementation is source-only/unqualified; full geometry
+  and runtime advantage are not inferred. [pcc:unverified]
 - No timing, speedup or global nonexistence claim follows from these checks.
 
 ## What would unblock it
@@ -58,7 +62,8 @@ fixtures for complete solves, with source negation, destination generic and
 folded controls. Freeze the workload and finite budget before any benchmark;
 use RunPod as explicitly selected by the user. The documented proxy API route
 returned HTTP401; authenticated RunPod access is pending. A source-frozen replay
-payload exists; no pod or timed comparison is running.
+payload exists; no pod or timed comparison is running. The new candidate also
+needs the mandatory S3 resume-checkpoint upload route, currently missing.
 [pcc:unverified]
 
 If costs exceed the threshold, close that implementation and examine another
@@ -75,3 +80,10 @@ No benchmark is running, and a PR merge does not resolve this cost problem.
 2026-11-15 continuation: bounded folded solver and producer controls implemented,
 PCC-20261115-30dcbf. RunPod replay package prepared; authenticated API access and
 the subsequent admitted complete-cost comparison remain open. [pcc:unverified]
+
+2026-11-15 minimal-transport continuation: integer-basis norm floor and
+conditional128-bit coefficient bound are kernel-checked, PCC-20261115-9ff011
+unsigned. Shared generic laws merged in crypto-lean PR12. The separate native
+candidate compiles but has no executed qualification cases; checkpoint and
+RunPod access remain required. This does not resolve the complete-cost problem.
+[pcc:unverified]

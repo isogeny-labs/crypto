@@ -1,0 +1,83 @@
+--- signed-producer-build-plan-20261109/durable-worker.py
++++ signed-kummer-combined-runner-20261110/durable-worker.py
+@@ -3,10 +3,11 @@
+ from pathlib import Path
+ P=Path(__file__).resolve().parent
+ from durable_io import atomic_json, flush_logs, load_admission, durable_limits
++from panel_acceptance import one_test,verify_driver,verify_probe,NEGATIVES
+ F=load_admission(P)
+ W=Path(F['workspace']); OUT=Path(F['durable_run'])/'worker'; SOURCE=W/'source'; STAGE=W/'cache'
+ START=time.monotonic(); END=float(os.environ['PENCIL_CHECK_END_MONOTONIC']); ACTIVE=None; INTERRUPTED=False;OWNED_OUTPUT=False;PERMIT_REQUIRED=False;PHASE_END=END-600;BUILD_END=END-600
+-R={'status':'failed','commands':[],'errors':[],'invocation_id':os.environ.get('INVOCATION_ID'),'source_scope':'fixed28 signed producer cases and7Kummer label cases; exact root-library qualification'}
++R={'status':'failed','commands':[],'errors':[],'invocation_id':os.environ.get('INVOCATION_ID'),'source_scope':'fixed28 signed +7 Labels; at most11 full739 driver calls,2 forced native probes,4 adapter negatives'}
+ resource.setrlimit(resource.RLIMIT_AS,(16*1024**3,16*1024**3))
+ def checkpoint(phase):
+  R['phase']=phase;R['elapsed_seconds']=time.monotonic()-START
+@@ -136,6 +137,28 @@
+    assert stat.S_ISREG(f.lstat().st_mode) and f.stat().st_size==expected[name]['bytes']
+    assert H(f)==expected[name]['sha256'],name;actual.add(name)
+  assert actual==set(expected),'private source membership'
++def verify_driver_source():
++ rows=json.loads((W/'driver-source-manifest.json').read_text());root=W/'driver-source';actual=set()
++ for base,dirs,names in os.walk(root,followlinks=False,onerror=traversal_error):
++  guard()
++  for n in dirs:assert stat.S_ISDIR((Path(base)/n).lstat().st_mode)
++  for n in names:
++   path=Path(base)/n;rel=str(path.relative_to(root));assert rel in rows
++   assert stat.S_ISREG(path.lstat().st_mode) and path.stat().st_size==rows[rel]['bytes']
++   assert H(path)==rows[rel]['sha256'];actual.add(rel)
++ assert actual==set(rows)
++def select_binary(output,target_name,target_kind,source_path):
++ binaries=[];finished=[]
++ for line in output.splitlines():
++  try:entry=json.loads(line)
++  except json.JSONDecodeError:continue
++  if entry.get('reason')=='build-finished':finished.append(entry.get('success'))
++  t=entry.get('target',{})
++  if entry.get('reason')=='compiler-artifact' and t.get('name')==target_name and target_kind in t.get('kind',[]) and t.get('src_path')==str(source_path) and entry.get('profile',{}).get('test') and entry.get('executable'):binaries.append(entry['executable'])
++ assert finished==[True] and len(set(binaries))==1,'exact build artifact'
++ path=Path(binaries[0]);assert path.is_absolute() and path.is_relative_to(STAGE/'target') and stat.S_ISREG(path.lstat().st_mode)
++ return {'path':str(path),'sha256':H(path)}
++
+ def json_rows(output):
+  rows=[]
+  for line in output.splitlines():
+@@ -180,6 +203,17 @@
+  assert len(set(binaries))==1,'exactly one root library test executable required'
+  binary=Path(binaries[0]);assert binary.is_absolute() and binary.is_relative_to(STAGE/'target') and stat.S_ISREG(binary.lstat().st_mode)
+  R['test_binary']={'path':str(binary),'sha256':H(binary)};guard()
++ command('stage-driver',['/usr/bin/python3','-B',str(P/'stage_driver.py')],cwd=P)
++ verify_driver_source()
++ driver_root=W/'driver-source';driver_spec=json.loads((P/'driver-inputs.json').read_text())
++ driver_crate=driver_root/driver_spec['crate'];driver_manifest=driver_crate/'Cargo.toml'
++ driver_source=driver_crate/'src/pruned.rs'
++ ENV.update(KUMMER_TARGET_CAP='1',KUMMER_START_INDEX='0',KUMMER_VALIDATE_TRANSITIONS='0',KUMMER_DRIVER_SOURCE_SHA256=H(driver_source),KUMMER_DRIVER_REVISION=F['published_source_revision'],KUMMER_DRIVER_CONTROL_OUTPUT=str(OUT/'driver-panel'))
++ driver_output=command('compile-driver',[cargo,'test','--manifest-path',str(driver_manifest),'--release','--bin','equivalence','--locked','--offline','--no-run','--message-format=json'],cwd=driver_root)
++ driver_binary=select_binary(driver_output,'equivalence','bin',driver_crate/'src/check.rs');R['driver_binary']=driver_binary
++ adapter_output=command('compile-adapter',[cargo,'test','--manifest-path',str(driver_manifest),'-p','pencil-symbolic-graph','--features','pencil-symbolic-graph/reporting','--release','--lib','--locked','--offline','--no-run','--message-format=json'],cwd=driver_root)
++ adapter_binary=select_binary(adapter_output,'pencil_symbolic_graph','lib',driver_root/'research/pencil_large_prime_20261029/src/lib.rs');R['adapter_binary']=adapter_binary
++ verify_driver_source()
+  R['build_phase_finished_monotonic']=time.monotonic()
+  END=min(END,time.monotonic()+600);PHASE_END=END-40
+  R['execution_end_monotonic']=END;R['execution_deadline_monotonic']=PHASE_END;checkpoint('execution-phase-start')
+@@ -201,6 +235,20 @@
+    cases=[x for x in rows if isinstance(x.get('case'),str)]
+    assert [x['case'] for x in cases]==names and all(x.get('pass') is True for x in cases),'exact7label rows'
+    R['kummer_cases']=cases
++ for index,name in enumerate(['pruned::driver_controls::actual_driver_original_disabled_observed_and_fixed_faults','pruned::driver_controls::actual_forced_fallback_and_zero_vector_lift_are_recorded']):
++  assert H(Path(driver_binary['path']))==driver_binary['sha256']
++  output=command('driver-exact-'+str(index),[driver_binary['path'],name,'--exact','--test-threads=1','--nocapture'],cwd=driver_root);one_test(output)
++  fixture=json.loads((driver_crate/'fixture.json').read_text())
++  R['driver_summary' if index==0 else 'native_probe_summary']=verify_driver(OUT/'driver-panel',fixture) if index==0 else verify_probe(OUT/'driver-panel')
++ R['adapter_negatives']=[]
++ for index,suffix in enumerate(NEGATIVES):
++  assert H(Path(adapter_binary['path']))==adapter_binary['sha256']
++  name='relation_stream::kummer_driver_protocol_controls::'+suffix
++  output=command('adapter-negative-'+str(index),[adapter_binary['path'],name,'--exact','--test-threads=1','--nocapture'],cwd=driver_root);one_test(output)
++  R['adapter_negatives'].append({'name':name,'passed':True})
++ assert len(R['adapter_negatives'])==4
++ assert H(Path(driver_binary['path']))==driver_binary['sha256'] and H(Path(adapter_binary['path']))==adapter_binary['sha256']
++ verify_driver_source()
+  assert H(binary)==R['test_binary']['sha256'],'binary changed after tests'
+  verify_private_source()
+  manifest=Path(F['immutable_manifest']['path']);assert H(manifest)==F['immutable_manifest']['sha256'];inputs=json.loads(manifest.read_text());verify(inputs['immutable'])

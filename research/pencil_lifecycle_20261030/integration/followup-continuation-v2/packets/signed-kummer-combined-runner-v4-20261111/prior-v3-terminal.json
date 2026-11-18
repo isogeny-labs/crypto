@@ -1,0 +1,46 @@
+{
+  "schema": "pencil.combined-v3-terminal-binding/v1",
+  "source_publication_commit": "a70570a105f9c555b1efb62bccf7c8d1b7f1309e",
+  "admission_sha256": "2ef4a223a05e645ea18130c163ac4aa4befdb006eac6400f2f2379f1aacf8769",
+  "status": "failed_before_materialization",
+  "cause": "The target-size monitor traversed cache/target before the materializer created it, re-raised FileNotFoundError, and killed the child.",
+  "observed": {
+    "materialize_elapsed_seconds": 0.11502473399741575,
+    "materialize_reaped_exit_code": -9,
+    "compile_started": false,
+    "tests_started": false,
+    "caller_elapsed_seconds": 1.8139372029691003,
+    "charged_seconds": 2400
+  },
+  "receipts": {
+    "completion": {
+      "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v3-20261111/completion.json",
+      "sha256": "2b0dbf2d4c64da3efda5ebde054001d0701d8ed84b63dcf5173c8002e0a1c120",
+      "bytes": 292
+    },
+    "terminal_output_manifest": {
+      "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v3-20261111/terminal-output-manifest.json",
+      "sha256": "f2c9880809481fe1caa349b3d9ae329bd7b2535ed2286122dd2bc5cf3acc9a93",
+      "bytes": 1423
+    },
+    "worker": {
+      "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v3-20261111/worker/worker-receipt.json",
+      "sha256": "264c0faf9bb054545257a5c73de885550873d1dcd1f621eed633e91b1592a9bb",
+      "bytes": 2393
+    },
+    "supervisor": {
+      "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v3-20261111/supervisor/launch-receipt.json",
+      "sha256": "17137d923df4fc106ab82d446fb0e0a84207a5d9d6179724e854b6616f80d6a4",
+      "bytes": 15834
+    },
+    "caller": {
+      "path": "/var/tmp/pencil-combined-v3-caller-20261111/caller-result.json",
+      "sha256": "2e453e02ec4fede7f69053d22b95a4485cdd62a1aa4de309ea14ae3dfa5da1ab",
+      "bytes": 197
+    }
+  },
+  "all_owned_processes_terminal": true,
+  "cgroup_empty": true,
+  "automatic_retry": false,
+  "v4_execution_admitted": false
+}

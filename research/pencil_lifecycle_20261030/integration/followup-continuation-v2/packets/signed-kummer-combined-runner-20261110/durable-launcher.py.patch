@@ -1,0 +1,10 @@
+--- signed-producer-build-plan-20261109/durable-launcher.py
++++ signed-kummer-combined-runner-20261110/durable-launcher.py
+@@ -16,6 +16,7 @@
+ 
+ P=Path(__file__).resolve().parent;F=load_admission(P);START=time.monotonic()
+ UTC=datetime.datetime.now(datetime.timezone.utc); DEADLINE=parse_rfc3339(F['absolute_deadline']); END=START+min(2400,(DEADLINE-UTC).total_seconds())
++assert (DEADLINE-UTC).total_seconds()>2400, 'full attempt deadline allowance required'
+ W=Path(F['workspace']);D=Path(F['durable_run']);OUT=D/'supervisor';UNIT=F['unit'];R={'status':'failed','unit':UNIT,'errors':[],'unit_launch_attempted':False,'observations':[]};INTERRUPTED=False;CLEANING=False;OWNED_OUTPUT=False
+ def checkpoint(phase):
+  R['phase']=phase;R['elapsed_seconds']=time.monotonic()-START

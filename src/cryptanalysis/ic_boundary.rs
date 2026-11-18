@@ -7386,6 +7386,83 @@ pub fn prime_factor_base(inst: &PrimeInstance, size: usize) -> FactorBase<PrimeP
     fb
 }
 
+/// The cofactor-cleared base: `[h]P` for the points `P` above the
+/// smallest abscissae, until `size` distinct abscissae of `[h]P` are
+/// collected, each with its negative, one column per abscissa.
+///
+/// Every base point then lies in the order-`r` subgroup that the targets
+/// live in.  A pair sum of base points then always lands there, so a
+/// meet-in-the-middle table over this base hits a target `h` times as often
+/// as one over the raw small-abscissa base, at the same size
+/// (`research/isogeny_conductor_gap_round5_20261012/`, E7a).  The `[h]`
+/// multiplications are charged to `ops`.  With `h = 1` it is
+/// [`prime_factor_base`] with the same points.
+pub fn prime_factor_base_cleared(
+    inst: &PrimeInstance,
+    size: usize,
+    ops: &mut GroupOps,
+) -> FactorBase<PrimePoint> {
+    let start = Instant::now();
+    let curve = &inst.curve;
+    let h = inst.cofactor;
+    let mut fb = FactorBase::empty(format!("[{h}]·(smallest abscissae), {size} columns"));
+    let mut x = 1u64;
+    let mut scanned = 0u64;
+    let mut sqrts = 0u64;
+    let mut cleared = 0u64;
+    while fb.abscissae < size && x < curve.p {
+        scanned += 1;
+        let rhs = curve.rhs(x);
+        if curve.legendre(rhs) >= 0 {
+            sqrts += 1;
+            if let Some(y) = curve.sqrt(rhs) {
+                let raw = PrimePoint::affine(x, y);
+                let p = if h == 1 {
+                    raw
+                } else {
+                    cleared += 1;
+                    curve.mul(ops, raw, h)
+                };
+                if !p.infinity && !fb.x_index.contains_key(&p.x) {
+                    let y = if p.y == 0 { 0 } else { p.y.min(curve.p - p.y) };
+                    let p = PrimePoint::affine(p.x, y);
+                    let q = curve.neg(p);
+                    let col = fb.abscissae;
+                    let i = fb.points.len();
+                    fb.points.push(p);
+                    fb.col_of.push(col);
+                    fb.coef_of.push(1);
+                    if q != p {
+                        fb.points.push(q);
+                        fb.col_of.push(col);
+                        fb.coef_of.push(inst.r - 1);
+                        fb.neg_index.push(i + 1);
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(p.x, vec![i, i + 1]);
+                    } else {
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(p.x, vec![i]);
+                    }
+                    fb.abscissae += 1;
+                }
+            }
+        }
+        x += 1;
+    }
+    fb.columns = fb.abscissae;
+    for (i, p) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(p), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+    fb.cost.count("abscissae_scanned", scanned);
+    fb.cost.count("legendre_symbols", scanned);
+    fb.cost.count("sqrt_solves", sqrts);
+    fb.cost.count("cofactor_clearings", cleared);
+    fb
+}
+
 /// Coverage control: scan canonical abscissae in a fixed nonzero stride
 /// modulo p.  This changes the base while retaining the same column count
 /// and the same exact point-lift, setup and table accounting as the ordinary
@@ -8561,6 +8638,9 @@ pub struct PairTable {
     /// Opt-in cache-line representation.  All other representations are
     /// empty when this is present.
     lines: Option<PairLineIndex>,
+    /// Opt-in direct index for binary keys `x + 1`. A zero word is absent;
+    /// the high word stores `i + 1`, the low word `j`.
+    dense: Option<Vec<u64>>,
     /// `full` (every `i ≤ j`) or `negation_folded` (one pair per orbit
     /// under negation).
     pub kind: &'static str,
@@ -8577,6 +8657,16 @@ pub struct PairTable {
     pub filter_bit_sets: u64,
 }
 
+/// Native work omitted by the order-two first-row shortcut. The skipped
+/// witnesses are the negative twins of the retained first witnesses, not
+/// unexamined keys; the caller seeds their one homogeneous torsion row.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct BinaryTorsionBatchStats {
+    pub skipped_twin_collisions: u64,
+    pub inversion_lanes: u64,
+    pub inversion_batches: u64,
+}
+
 impl PairTable {
     /// The build's work beside its group operations, for `bitop/v1`
     /// (`ecbench::work`): one hash insert per attempt.
@@ -8590,6 +8680,10 @@ impl PairTable {
         }
         if self.filter_bit_sets > 0 {
             out.insert("table_filter_bit_sets".to_string(), self.filter_bit_sets);
+        }
+        if let Some(dense) = &self.dense {
+            out.insert("table_dense_zero_words".to_string(), dense.len() as u64);
+            out.insert("table_dense_witness_writes".to_string(), self.entries);
         }
         out
     }
@@ -8618,6 +8712,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8665,12 +8760,283 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             filter_bit_sets: 0,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
             index_lookups: a as u64,
         }
+    }
+
+    /// The binary negation-folded table in the scalar builder's exact pair
+    /// order. Each abscissa row shares one inversion across its ordinary
+    /// additions; exceptional doublings may need their own inversion.
+    /// The table needs only the final abscissa of each sum, so ordinates are
+    /// left unfinished. First-witness insertion and the abstract addition
+    /// charge are unchanged.
+    pub fn build_negation_folded_binary_batch(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+    ) -> Self {
+        Self::build_negation_folded_binary_batch_inner(g, fb, false, false).0
+    }
+
+    /// Build the identical first-witness table while retaining every later
+    /// pair with the same sum abscissa. The four indices are current pair,
+    /// then first pair. A caller must resolve the sign and verify the full
+    /// group equation before using a collision as a relation.
+    pub fn build_negation_folded_binary_batch_with_collisions(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+    ) -> (Self, Vec<[usize; 4]>) {
+        let (table, collisions, _) =
+            Self::build_negation_folded_binary_batch_inner(g, fb, true, false);
+        (table, collisions)
+    }
+
+    /// The batch table with its order-two row built from abscissa inverses.
+    /// On `b = 1`, `T = (0, 1)` and `x(T + P) = 1/x(P)`. The two signed points
+    /// above each later abscissa have the same sum key, so only the first is
+    /// inserted. Every later row retains the ordinary builder's order.
+    pub fn build_negation_folded_binary_batch_torsion_with_collisions(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+    ) -> Result<(Self, Vec<[usize; 4]>, BinaryTorsionBatchStats), String> {
+        if g.0.b != 1 || fb.abscissa_list.first() != Some(&0) {
+            return Err("torsion batch requires b=1 and a zero first abscissa".into());
+        }
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        if groups[0].as_slice() != [0]
+            || fb.points.first() != Some(&FastPoint::affine(0, 1))
+            || fb.neg_index.first() != Some(&0)
+        {
+            return Err("torsion batch requires the first point to be T=(0,1)".into());
+        }
+        for group in groups.iter().skip(1) {
+            if group.len() != 2 {
+                return Err("torsion batch requires complete signed pairs".into());
+            }
+            let (j, nj) = (group[0], group[1]);
+            if fb.points[j].infinity
+                || fb.points[j].x == 0
+                || fb.points[j].x != fb.points[nj].x
+                || fb.neg_index.get(j) != Some(&nj)
+                || fb.neg_index.get(nj) != Some(&j)
+                || g.neg(fb.points[j]) != fb.points[nj]
+            {
+                return Err("torsion batch has an invalid signed pair".into());
+            }
+        }
+        Ok(Self::build_negation_folded_binary_batch_inner(
+            g, fb, true, true,
+        ))
+    }
+
+    /// Convert the torsion-harvest binary table to direct abscissa lookup.
+    /// The builder has already fixed the first witness and collision stream;
+    /// this changes only storage and probe lookup. It deliberately keeps the
+    /// hash build cost and charges the conversion to `build_wall_ns`.
+    pub fn into_binary_dense(mut self, n: u32) -> Result<Self, String> {
+        if self.kind != "negation_folded_binary_batch_torsion" {
+            return Err("dense conversion requires the binary torsion-harvest table".into());
+        }
+        if !(1..=23).contains(&n) {
+            return Err(format!(
+                "dense binary pair table requires n=1..=23, got {n}"
+            ));
+        }
+        let len = (1usize << n) + 1;
+        let bytes = len * std::mem::size_of::<u64>();
+        if bytes > 128 * 1024 * 1024 {
+            return Err("dense binary pair table exceeds 128 MiB".into());
+        }
+        let started = Instant::now();
+        let mut dense = vec![0u64; len];
+        let map = std::mem::replace(&mut self.map, fast_map(0));
+        for (key, (i, j)) in map {
+            let at = usize::try_from(key).map_err(|_| "dense binary key is too wide")?;
+            if at == 0 || at >= len || i == u32::MAX {
+                return Err("dense binary table has an invalid key or witness".into());
+            }
+            let witness = ((u64::from(i) + 1) << 32) | u64::from(j);
+            if dense[at] != 0 {
+                return Err("dense binary table has a duplicate first key".into());
+            }
+            dense[at] = witness;
+        }
+        self.dense = Some(dense);
+        self.kind = "negation_folded_binary_batch_torsion_dense";
+        self.build_wall_ns = self
+            .build_wall_ns
+            .saturating_add(started.elapsed().as_nanos() as u64);
+        Ok(self)
+    }
+
+    pub fn dense_bytes(&self) -> Option<u64> {
+        self.dense
+            .as_ref()
+            .map(|dense| (dense.len() * std::mem::size_of::<u64>()) as u64)
+    }
+
+    fn build_negation_folded_binary_batch_inner(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+        collect_collisions: bool,
+        torsion_row: bool,
+    ) -> (Self, Vec<[usize; 4]>, BinaryTorsionBatchStats) {
+        let start = Instant::now();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut map: FastMap<(u32, u32)> = fast_map(a * a + 1);
+        let mut ops = GroupOps::default();
+        let mut attempts = 0u64;
+        let mut collisions = Vec::new();
+        let mut torsion_stats = BinaryTorsionBatchStats::default();
+        let mut scratch = BatchScratch::default();
+        let mut indices = Vec::new();
+        let mut addends = Vec::new();
+        let mut sums = Vec::new();
+        let mut lambdas = Vec::new();
+        #[cfg(target_arch = "x86_64")]
+        let (mut pair_x, mut pair_ya, mut pair_yb, mut x3) =
+            (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        for ai in 0..a {
+            let i = groups[ai][0];
+            if torsion_row && ai == 0 {
+                let mut inverses: Vec<u64> = groups
+                    .iter()
+                    .skip(1)
+                    .map(|group| fb.points[group[0]].x)
+                    .collect();
+                let mut inverse_scratch = Vec::new();
+                g.0.field.batch_inv(&mut inverses, &mut inverse_scratch);
+                for (group, &inverse) in groups.iter().skip(1).zip(&inverses) {
+                    map.entry(inverse + 1)
+                        .or_insert((i as u32, group[0] as u32));
+                    attempts += 1;
+                }
+                torsion_stats.skipped_twin_collisions = inverses.len() as u64;
+                torsion_stats.inversion_lanes = inverses.len() as u64;
+                torsion_stats.inversion_batches = u64::from(!inverses.is_empty());
+                continue;
+            }
+            indices.clear();
+            addends.clear();
+            sums.clear();
+            lambdas.clear();
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    indices.push(j);
+                    addends.push(fb.points[j]);
+                }
+            }
+            ops.adds += addends.len() as u64;
+            // The same-abscissa group is exceptional for every row. Leaving
+            // it in the batch makes the SIMD kernel decline the entire row.
+            // Keep its first-witness order, then batch the ordinary sums.
+            let diagonal_len = groups[ai].len();
+            for &q in &addends[..diagonal_len] {
+                sums.push(g.0.add(fb.points[i], q));
+                lambdas.push(FastCurve::LAZY_DONE);
+            }
+            let off_diagonal = &addends[diagonal_len..];
+            if !off_diagonal.is_empty() {
+                #[cfg(target_arch = "x86_64")]
+                let paired = {
+                    pair_x.clear();
+                    pair_ya.clear();
+                    pair_yb.clear();
+                    x3.clear();
+                    let complete_pairs = off_diagonal.len().is_multiple_of(2)
+                        && off_diagonal.chunks_exact(2).all(|pair| {
+                            !pair[0].infinity && !pair[1].infinity && pair[0].x == pair[1].x
+                        });
+                    if complete_pairs {
+                        for pair in off_diagonal.chunks_exact(2) {
+                            pair_x.push(pair[0].x);
+                            pair_ya.push(pair[0].y);
+                            pair_yb.push(pair[1].y);
+                        }
+                        if g.0.add_many_lazy_soa_paired(
+                            fb.points[i],
+                            &pair_x,
+                            &pair_ya,
+                            &pair_yb,
+                            &mut x3,
+                            &mut lambdas,
+                            &mut scratch,
+                            off_diagonal.len() as u64,
+                        ) {
+                            sums.extend(x3.iter().copied().map(|x| FastPoint::affine(x, 0)));
+                            true
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    }
+                };
+                #[cfg(not(target_arch = "x86_64"))]
+                let paired = false;
+                if !paired {
+                    g.0.add_many_lazy_paired_x(
+                        fb.points[i],
+                        off_diagonal,
+                        &mut sums,
+                        &mut lambdas,
+                        &mut scratch,
+                    );
+                }
+            }
+            debug_assert_eq!(sums.len(), indices.len());
+            debug_assert_eq!(lambdas.len(), indices.len());
+            for (&j, s) in indices.iter().zip(sums.iter()) {
+                if s.infinity {
+                    continue;
+                }
+                match map.entry(s.x + 1) {
+                    std::collections::hash_map::Entry::Vacant(slot) => {
+                        slot.insert((i as u32, j as u32));
+                    }
+                    std::collections::hash_map::Entry::Occupied(slot) => {
+                        if collect_collisions {
+                            let &(fi, fj) = slot.get();
+                            collisions.push([i, j, fi as usize, fj as usize]);
+                        }
+                    }
+                }
+                attempts += 1;
+            }
+        }
+        let table = Self {
+            kind: if torsion_row {
+                "negation_folded_binary_batch_torsion"
+            } else {
+                "negation_folded_binary_batch"
+            },
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: None,
+            dense: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+            filter_bit_sets: 0,
+        };
+        (table, collisions, torsion_stats)
     }
 
     /// The same negation-folded table and emission order as
@@ -8708,6 +9074,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: Some(lines),
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8741,6 +9108,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             filter_bit_sets: 0,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
@@ -8773,6 +9141,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: Some(lines),
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8837,6 +9206,7 @@ impl PairTable {
                 part_shift: 0,
                 packed: Some(packed),
                 lines: None,
+                dense: None,
                 build_ops: ops,
                 build_wall_ns: start.elapsed().as_nanos() as u64,
                 insert_attempts,
@@ -8914,6 +9284,7 @@ impl PairTable {
             part_shift,
             packed: None,
             lines: None,
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8924,7 +9295,14 @@ impl PairTable {
 
     /// The witness stored under a key, in whichever layout the table has.
     fn get(&self, key: u64) -> Option<(u32, u32)> {
-        if let Some(lines) = &self.lines {
+        if let Some(dense) = &self.dense {
+            let witness = *dense.get(usize::try_from(key).ok()?)?;
+            if witness == 0 {
+                None
+            } else {
+                Some(((witness >> 32) as u32 - 1, witness as u32))
+            }
+        } else if let Some(lines) = &self.lines {
             lines.get(key)
         } else if let Some(packed) = &self.packed {
             packed.get(key)
@@ -8963,7 +9341,11 @@ impl PairTable {
     /// `build_negation_folded`); `None` for the blocked, packed and line
     /// layouts.  `rootfind-subtract-gpu` (`m = 3`) probes this set on the device.
     pub(crate) fn map_abscissae(&self) -> Option<Vec<u64>> {
-        if !self.parts.is_empty() || self.packed.is_some() || self.lines.is_some() {
+        if !self.parts.is_empty()
+            || self.packed.is_some()
+            || self.lines.is_some()
+            || self.dense.is_some()
+        {
             return None;
         }
         Some(self.map.keys().map(|k| k - 1).collect())
@@ -8979,6 +9361,33 @@ impl PairTable {
     ) -> Option<(usize, usize)> {
         *lookups += 1;
         let (i, j) = self.get(g.key(&target) >> 1)?;
+        let (i, j) = (i as usize, j as usize);
+        let s = g.add(ops, fb.points[i], fb.points[j]);
+        if s == target {
+            Some((i, j))
+        } else if s == g.neg(target) {
+            Some((fb.neg_index[i], fb.neg_index[j]))
+        } else {
+            None
+        }
+    }
+
+    /// Probe a binary sum returned by [`FastCurve::add_many_lazy`]. Its
+    /// abscissa is final; its ordinate is completed only after the key hits.
+    /// The lookup, re-addition and sign resolution are those of [`Self::probe`].
+    pub fn probe_binary_lazy(
+        &self,
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        lookups: &mut u64,
+        minuend: FastPoint,
+        rest: FastPoint,
+        lambda: u64,
+    ) -> Option<(usize, usize)> {
+        *lookups += 1;
+        let (i, j) = self.get(rest.pack() >> 1)?;
+        let target = g.0.finish_lazy(minuend, rest, lambda);
         let (i, j) = (i as usize, j as usize);
         let s = g.add(ops, fb.points[i], fb.points[j]);
         if s == target {
@@ -9059,6 +9468,9 @@ pub struct KSumTable {
     /// Each is a candidate relation among the base logs that the table
     /// found for free; [`KSumTable::free_rows`] verifies them.
     pub keep_collisions: bool,
+    /// Skip partial sums that cannot be completed to `k` summands
+    /// ([`KSumTable::build_negation_folded_opts`]).
+    pub prune: bool,
     pub collisions: Vec<(u64, u64)>,
 }
 
@@ -9080,6 +9492,21 @@ impl KSumTable {
         fb: &FactorBase<G::Elt>,
         k: u32,
         keep_collisions: bool,
+    ) -> Result<Self, String> {
+        Self::build_negation_folded_opts(g, fb, k, keep_collisions, false)
+    }
+
+    /// The same table; with `prune`, a partial sum of `d + 1` summands is
+    /// formed only when at least `k - d - 1` abscissae remain after its
+    /// last one, so no add is spent on a partial that can never reach `k`
+    /// summands.  The kept sums, their keys and the inserts are identical
+    /// either way; only the dead-end adds of the lower levels go.
+    pub fn build_negation_folded_opts<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
     ) -> Result<Self, String> {
         if !(3..=KSUM_MAX_K).contains(&k) {
             return Err(format!(
@@ -9124,6 +9551,7 @@ impl KSumTable {
             insert_attempts: 0,
             index_lookups: a,
             keep_collisions: false,
+            prune,
             collisions: Vec::new(),
         };
         t.keep_collisions = keep_collisions;
@@ -9146,7 +9574,14 @@ impl KSumTable {
         idx: &mut [u32; KSUM_MAX_K as usize],
     ) {
         let last = depth + 1 == self.k as usize;
-        for (ai, group) in groups.iter().enumerate().skip(from) {
+        // With `prune`, stop where fewer than `k - depth - 1` abscissae
+        // would remain for the deeper levels.
+        let end = if self.prune {
+            groups.len().saturating_sub(self.k as usize - depth - 1)
+        } else {
+            groups.len()
+        };
+        for (ai, group) in groups.iter().enumerate().take(end).skip(from) {
             let signs: &[usize] = if depth == 0 { &group[..1] } else { group };
             for &j in signs {
                 let s = match partial {
@@ -18637,6 +19072,186 @@ mod tests {
     }
 
     #[test]
+    fn binary_batch_table_matches_scalar_table_and_witnesses() {
+        for (a, n, dimension) in [(0, 13, 5), (1, 17, 6)] {
+            let inst = koblitz_instance(a, n).expect("Koblitz fixture");
+            let basis: Vec<u64> = (0..dimension).map(|i| 1u64 << i).collect();
+            let fb = binary_subspace_factor_base(&inst, &basis);
+            let g = BinaryGroup(&inst.fast);
+            let scalar = PairTable::build_negation_folded(&g, &fb);
+            let batch = PairTable::build_negation_folded_binary_batch(&g, &fb);
+            assert_eq!(batch.map, scalar.map, "first witness at n={n}");
+            assert_eq!(batch.entries, scalar.entries);
+            assert_eq!(batch.insert_attempts, scalar.insert_attempts);
+            assert_eq!(batch.index_lookups, scalar.index_lookups);
+            assert_eq!(batch.build_ops, scalar.build_ops);
+            let mut scalar_ops = GroupOps::default();
+            let mut batch_ops = GroupOps::default();
+            let mut scalar_ctr = OracleCounters::default();
+            let mut batch_ctr = OracleCounters::default();
+            for k in 1..=200 {
+                let target = g.mul(&mut scalar_ops, inst.generator, k);
+                for m in [2, 3] {
+                    let lhs = decompose_mitm(
+                        &g,
+                        &fb,
+                        &scalar,
+                        m,
+                        &mut scalar_ops,
+                        &mut scalar_ctr,
+                        target,
+                    );
+                    let rhs =
+                        decompose_mitm(&g, &fb, &batch, m, &mut batch_ops, &mut batch_ctr, target);
+                    assert_eq!(rhs, lhs, "decomposition at n={n}, k={k}, m={m}");
+                }
+            }
+            assert_eq!(batch_ctr.lookups, scalar_ctr.lookups);
+        }
+    }
+
+    #[test]
+    fn binary_torsion_batch_preserves_every_first_witness() {
+        use crate::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+
+        for (n, dimension, skipped) in [(13, 5, 16), (19, 7, 69), (23, 8, 137)] {
+            let inst = koblitz_instance(0, n).unwrap();
+            let frob =
+                build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), dimension)
+                    .unwrap();
+            let fb = koblitz_factor_base(
+                &inst,
+                &frob,
+                ColumnFold::SignedFrobeniusOrbit,
+                format!("d={dimension}"),
+            )
+            .unwrap();
+            let group = BinaryGroup(&inst.fast);
+            let scalar = PairTable::build_negation_folded(&group, &fb);
+            let (batch, old_collisions) =
+                PairTable::build_negation_folded_binary_batch_with_collisions(&group, &fb);
+            let (torsion, collisions, stats) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            assert_eq!(scalar.map, batch.map, "scalar/batch at n={n}");
+            assert_eq!(torsion.map, batch.map, "every first witness at n={n}");
+            for &key in batch.map.keys() {
+                assert_eq!(torsion.get(key), batch.get(key), "probe key {key} at n={n}");
+            }
+            assert_eq!(stats.skipped_twin_collisions, skipped);
+            assert_eq!(stats.inversion_lanes, skipped);
+            assert_eq!(stats.inversion_batches, 1);
+            assert_eq!(old_collisions.len(), collisions.len() + skipped as usize);
+            assert_eq!(torsion.insert_attempts + skipped, batch.insert_attempts);
+            assert_eq!(
+                torsion.build_ops.adds + fb.points.len() as u64,
+                batch.build_ops.adds
+            );
+
+            let mut corrupt = fb.clone();
+            corrupt.neg_index[1] = 0;
+            assert!(
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                    &group, &corrupt,
+                )
+                .is_err()
+            );
+            let mut unsupported = inst.fast.clone();
+            unsupported.b = 2;
+            assert!(
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                    &BinaryGroup(&unsupported),
+                    &fb,
+                )
+                .is_err()
+            );
+        }
+    }
+
+    #[test]
+    fn binary_dense_probe_preserves_torsion_first_witness_and_sign() {
+        use crate::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+
+        for (n, dimension) in [(13, 5), (19, 7), (23, 8)] {
+            let inst = koblitz_instance(0, n).unwrap();
+            let frob =
+                build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), dimension)
+                    .unwrap();
+            let fb = koblitz_factor_base(
+                &inst,
+                &frob,
+                ColumnFold::SignedFrobeniusOrbit,
+                format!("d={dimension}"),
+            )
+            .unwrap();
+            let group = BinaryGroup(&inst.fast);
+            let (hash, hash_collisions, _) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            let (candidate, dense_collisions, _) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            let dense = candidate.into_binary_dense(n).unwrap();
+            assert_eq!(hash_collisions, dense_collisions);
+            assert_eq!(dense.entries, hash.entries);
+            assert_eq!(dense.insert_attempts, hash.insert_attempts);
+            assert_eq!(dense.build_ops, hash.build_ops);
+            assert_eq!(dense.dense_bytes(), Some(((1u64 << n) + 1) * 8));
+            let work = dense.work_counters();
+            assert_eq!(work.get("table_dense_zero_words"), Some(&((1u64 << n) + 1)));
+            assert_eq!(work.get("table_dense_witness_writes"), Some(&dense.entries));
+            for (&key, &witness) in &hash.map {
+                assert_eq!(dense.get(key), Some(witness), "n={n} key={key}");
+            }
+            for key in [0, 1, 2, 3, 1u64 << n, (1u64 << n) + 1] {
+                assert_eq!(dense.get(key), hash.get(key), "n={n} key={key}");
+            }
+            if n == 13 {
+                for key in 0..=(1u64 << n) {
+                    assert_eq!(dense.get(key), hash.get(key), "all n=13 keys: {key}");
+                }
+            }
+            let mut keys: Vec<_> = hash.map.keys().copied().collect();
+            keys.sort_unstable();
+            for key in keys.into_iter().step_by(if n == 13 { 1 } else { 37 }) {
+                let (i, j) = hash.get(key).unwrap();
+                let target = group.add(
+                    &mut GroupOps::default(),
+                    fb.points[i as usize],
+                    fb.points[j as usize],
+                );
+                for point in [target, group.neg(target)] {
+                    let mut h_ops = GroupOps::default();
+                    let mut d_ops = GroupOps::default();
+                    let mut h_lookups = 0;
+                    let mut d_lookups = 0;
+                    assert_eq!(
+                        dense.probe(&group, &fb, &mut d_ops, &mut d_lookups, point),
+                        hash.probe(&group, &fb, &mut h_ops, &mut h_lookups, point),
+                        "n={n} key={key}"
+                    );
+                    assert_eq!(d_ops, h_ops);
+                    assert_eq!(d_lookups, h_lookups);
+                }
+            }
+            assert!(PairTable::build_negation_folded(&group, &fb)
+                .into_binary_dense(n)
+                .is_err());
+            if n == 13 {
+                assert!(
+                    PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                        &group, &fb
+                    )
+                    .unwrap()
+                    .0
+                    .into_binary_dense(24)
+                    .is_err()
+                );
+            }
+        }
+    }
+
+    #[test]
     fn prime_blocked_table_matches_batch_table_across_blocks_and_parts() {
         let inst = prime_instance_for(20, 59297);
         // 600 abscissae: about 360,000 sums, so more than one block and
@@ -21640,6 +22255,36 @@ mod ksum_wide_index_tests {
             assert!(k * ksum_index_bits(k) <= 64, "k = {k}");
         }
         assert_eq!(KSUM_MAX_K, 9);
+    }
+
+    /// `prune` builds the same table (keys, entries, inserts) and spends
+    /// only the adds of partial sums that can still reach k summands:
+    /// `Σ_{j=2..k} 2^(j-1)·C(a-(k-j), j)` against `Σ 2^(j-1)·C(a, j)`.
+    #[test]
+    fn pruned_build_is_the_same_table_with_fewer_adds() {
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        let choose = |n: u64, j: u64| (0..j).fold(1u64, |c, i| c * (n - i) / (i + 1));
+        for (k, a) in [(3u32, 14usize), (4, 12), (5, 11), (6, 12), (7, 11)] {
+            let fb = prime_factor_base(&inst, a);
+            let full = KSumTable::build_negation_folded_opts(g, &fb, k, true, false).unwrap();
+            let pr = KSumTable::build_negation_folded_opts(g, &fb, k, true, true).unwrap();
+            assert_eq!(full.map, pr.map, "k = {k}");
+            assert_eq!(full.collisions, pr.collisions, "k = {k}");
+            assert_eq!(full.insert_attempts, pr.insert_attempts, "k = {k}");
+            assert_eq!(full.entries, pr.entries, "k = {k}");
+            let a = a as u64;
+            let k = u64::from(k);
+            let want_full: u64 = (2..=k).map(|j| (1u64 << (j - 1)) * choose(a, j)).sum();
+            let want_pr: u64 = (2..=k)
+                .map(|j| (1u64 << (j - 1)) * choose(a - (k - j), j))
+                .sum();
+            // Identities are skipped before their subtree, so the counts
+            // can fall a little short of the formula, never above it.
+            assert!(full.build_ops.adds <= want_full && full.build_ops.adds + 64 >= want_full);
+            assert!(pr.build_ops.adds <= want_pr && pr.build_ops.adds + 64 >= want_pr);
+            assert!(pr.build_ops.adds < full.build_ops.adds, "k = {k}");
+        }
     }
 
     fn is_sum_of_base<G: CountedGroup>(

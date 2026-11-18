@@ -1,0 +1,19 @@
+digraph interpolation {
+ graph [rankdir=TB,bgcolor="white",pad="0.22",nodesep="0.3",ranksep="0.35",fontname="DejaVu Sans"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf3f8",color="#9aa8b8",fontname="DejaVu Sans",fontsize=11,margin="0.15,0.10"];
+ edge [color="#64748b",arrowsize=0.65];
+ input [label="t colored lists, b records per color\nActual polynomial evaluations; clean x for separation",fillcolor="#dcecf7"];
+ literal [label="Explicit state family\nOne bounded kernel K_D per prefix"];
+ witness [label="Inherited nodal witness (h_D,0)\nrecovers the selected support"];
+ count [label="Exactly b^t distinct kernel sets\nwhen t <= u-degree cap",fillcolor="#fbeed7"];
+ symbolic [label="Symbolic membership\nt products of b evaluation forms"];
+ choice [label="Product zero iff a record is chosen\nExact union of the same kernels",fillcolor="#e0f0e5"];
+ extract [label="OPEN: find a nonzero pair\nwith capped cost / useful yield",fillcolor="#fff0d6"];
+ scope [label="Full-level entry count is checked.\nSelective search and extraction costs stay open.",shape=plaintext,fillcolor="white",fontsize=10];
+ input -> literal; literal -> witness; witness -> count;
+ input -> symbolic; symbolic -> choice; choice -> extract [style=dashed];
+ count -> scope [style=invis]; extract -> scope [style=invis];
+ {rank=same; literal; symbolic;}
+ {rank=same; witness; choice;}
+ {rank=same; count; extract;}
+}

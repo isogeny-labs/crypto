@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m21-t2591-de54d72e | 20.00 | ksum4 | 432/432 | 6.727 | 7.570 | 15.158 | — |
+| icv1-f2m21-t2591-de54d72e | 20.00 | ksum4-p | 432/432 | 6.554 | 7.397 | 14.984 | — |
+| icv1-f2m21-t2591-de54d72e | 20.00 | ksum5 | 432/432 | 7.007 | 7.733 | 14.266 | — |
+| icv1-f2m21-t2591-de54d72e | 20.00 | ksum5-p | 432/432 | 6.337 | 7.063 | 13.596 | — |
+| icv1-f2m21-t2591-de54d72e | 20.00 | rho-neg | 432/432 | 1.261 | 1.371 | 2.359 | — |
+| icv1-f2m21-t2591-de54d72e | 20.00 | rho-neg-aa | 432/432 | 1.261 | 1.371 | 2.359 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m21-t2591-de54d72e | ksum4 vs ksum4-p | ksum4-p < ksum4 |
+| icv1-f2m21-t2591-de54d72e | ksum4 vs ksum5 | unresolved inside the band |
+| icv1-f2m21-t2591-de54d72e | ksum4 vs ksum5-p | ksum5-p < ksum4 |
+| icv1-f2m21-t2591-de54d72e | ksum4 vs rho-neg | rho-neg < ksum4 |
+| icv1-f2m21-t2591-de54d72e | ksum4 vs rho-neg-aa | rho-neg-aa < ksum4 |
+| icv1-f2m21-t2591-de54d72e | ksum4-p vs ksum5 | unresolved inside the band |
+| icv1-f2m21-t2591-de54d72e | ksum4-p vs ksum5-p | ksum5-p < ksum4-p |
+| icv1-f2m21-t2591-de54d72e | ksum4-p vs rho-neg | rho-neg < ksum4-p |
+| icv1-f2m21-t2591-de54d72e | ksum4-p vs rho-neg-aa | rho-neg-aa < ksum4-p |
+| icv1-f2m21-t2591-de54d72e | ksum5 vs ksum5-p | ksum5-p < ksum5 |
+| icv1-f2m21-t2591-de54d72e | ksum5 vs rho-neg | rho-neg < ksum5 |
+| icv1-f2m21-t2591-de54d72e | ksum5 vs rho-neg-aa | rho-neg-aa < ksum5 |
+| icv1-f2m21-t2591-de54d72e | ksum5-p vs rho-neg | rho-neg < ksum5-p |
+| icv1-f2m21-t2591-de54d72e | ksum5-p vs rho-neg-aa | rho-neg-aa < ksum5-p |
+| icv1-f2m21-t2591-de54d72e | rho-neg vs rho-neg-aa | unresolved inside the band |

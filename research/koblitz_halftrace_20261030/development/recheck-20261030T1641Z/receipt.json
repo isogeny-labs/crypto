@@ -1,0 +1,29 @@
+{
+  "schema": "crypto.native-halftrace-development-recheck/v1",
+  "checked_at": "2026-10-30T16:46:05Z",
+  "source_commit": "4790f74f1145f1c9172604cbb208fbe1c5179b01",
+  "merged_upstream": "53f4b531f28a0716d05f3fd73fcb531fcc1c8446",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--locked",
+    "cached_"
+  ],
+  "exit_code": 101,
+  "outcome": "build_failure",
+  "error_file": "src/cryptanalysis/binary_semaev_chain_sat.rs",
+  "error": "Unclosed delimiter in chain_s3_max_variables at line 27.",
+  "error_file_matches_upstream": true,
+  "prior_methods_parser_error_fixed_upstream": true,
+  "cache_implementation_preserved": true,
+  "ordered_lift_recheck": "not_attempted_after_compile_failure",
+  "e2e_recheck": "not_attempted_after_compile_failure",
+  "checkpoint_access": "No local token/AWS CLI or ready cloud identity; Actions secret metadata lookup remains HTTP 403. No observed cause change.",
+  "checkpoint_retried": false,
+  "scientific_jobs_submitted": 0,
+  "scientific_measurements": 0,
+  "performance_review_p1": "unresolved",
+  "auto_merge": "paused"
+}

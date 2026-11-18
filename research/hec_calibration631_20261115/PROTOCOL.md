@@ -1,0 +1,11 @@
+# Bounded-degree F631 calibration candidates with fresh anchors
+
+Input freshF631source/kernels/normalization and kernel0HC/QF from precedingstudies, not F127anchors/images/matrix/logs. Sixfixedpairs from first4admissibleanchors among first32canonicaldegreeoneplaces: nonzero y, no kernelu pole, distinctx. Lexicographicpairs01,02,03,12,13,23, allrun once andretained. Selectfirstsupportedcaseforlateralignment; do notchoosebasedonfuturefitperformance.
+
+Generalize existingdegree18restrictionwithactualanchorcoordinates andF631univariatearithmetic/Frobenius/rootfactoring. Require Adegree<=15,B<=11,rawnominatornormdegree<=30,exactdegree12anchorfactorremoval,normdegree<=18. Enumeratefiberrootsbyfactorization,checkdirectscalarrestriction and COMPLETEFpzero-setindependentcontrol,withallunsupportedchart exclusions retained. No cyclicD1calibrationsearch.
+
+For eachzero,degree4jet/Hessianchorddecode usingactualQF,negativeclassreversesorderedpair,local2torsionclearingasverifiedbefore. Use multiplier4on sourceclass AND targetdifference to clear source/targetcofactor4and2torsiontranslation. The oldmultiplier2is insufficientasageneralF631cofactorclear. Nonzero4-clearedsource/targetclasses must bekilledby59296481. Serializecalibrationbase/sourcepairforreplay.
+
+This gate producescalibrationCANDIDATES. It doesNOTverifyglobaltransfer, basisalignment, originalD1/BimagesorDLP. Bothclasses lyinginprimegroupsdoesnotproveacorrectcorrespondence; the nextfit/heldoutgateisrequired. Hessianerasurecardinalityisrecordedforactualrationalhitcount; partialchordsallowedbypriorverifiedrule.
+
+Eachcasewrite-oncechilddirectory/stdout/stderr/status. Emptyregisteredfiber orno_supported_calibration with exit101 is UNSUPPORTEDandcontinue; anyotherfailurestops. Allsixoutcomesretained,includingunsupportedones. Source/lock/actualinput/binaryhashcommitandS3checkpoint/gate BEFOREcohort. No rerun, extraanchorpairs orretune withoutamendment. IndependentFpcontrolisverificationworktobechargedlater. No timing,exponent,novelty,10xorgenus2/4claim; fullobjectiveopen.

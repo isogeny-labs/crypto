@@ -1,0 +1,1171 @@
+{
+  "amendments": [
+    {
+      "id": "prime-generating-set-repair-v2",
+      "filed": "2026-11-01",
+      "filed_before_affected_data": true,
+      "reason": "Draft filed after version1 failure and before any version2 data. Repair traced traversal by preserving incoming constraints in explicit generating_set for admission, branch selection and child specialization; retain raw native report and native-only algebraic target provenance. Separately fix exact-label failure receipt matching. This is one new software-version validation, not retry or replacement of version1.",
+      "changes": [
+        "Exact repaired source, retained binary, explicit-toolchain driver and actual successful dataset/library/build/preflight evidence are bound. Freeze and one version2 execution remain pending; original version1 failure is preserved.",
+        "Versioned exact-label failure summarizer driver; original failed export and derived reconciliation both retained.",
+        "Unchanged46 cases, seed42, all limits, controls, nonempty causal/algebraic acceptance, schedule and one-attempt-per-version stopping."
+      ],
+      "supersedes_fields": [
+        "arms[*].instrument.commit",
+        "arms[*].instrument.binary_sha256",
+        "analysis_plan.script",
+        "extensions.software_binding",
+        "study_dir",
+        "freeze"
+      ]
+    }
+  ],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": false,
+    "inputs": [
+      "commands/*/receipt.json",
+      "plan.json",
+      "run/**",
+      "export/**",
+      "report/**",
+      "policy/**",
+      "policy-analysis.json",
+      "execution-failed.json",
+      "failure-flow.json"
+    ],
+    "outputs": [
+      "analysis.json",
+      "inventory.json",
+      "experiment.export.json",
+      "policy-analysis.json",
+      "failure.experiment.export.json",
+      "failure-export-validation.json"
+    ],
+    "script": {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/cli46-prime-repair-binding-plan/driver.explicit-toolchain.py",
+      "sha256": "7ae67ceb2d2738968d23065e842a68d18d2fefb7d32912738a775d099a6f9438"
+    }
+  },
+  "arms": [
+    {
+      "description": "Existing generation: source configuration, terminal outcome and artifact custody contract.",
+      "id": "producer-source",
+      "instrument": {
+        "binary_sha256": "ad581a04b0e201acbb1d388a02cef9075a431c5cdaaa76cee235c1cbf3c5a499",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "crypto",
+            "--locked",
+            "--offline"
+          ]
+        ],
+        "commit": "0324692bc77758a5b69b4b972504b8cf2e00e957",
+        "env": {
+          "LANG": "C",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release",
+          "toolchain": "1.98"
+        },
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "native_cases": 4,
+        "policy_panels": [
+          {
+            "cells": 6,
+            "families": [
+              "koblitz",
+              "binary",
+              "prime"
+            ],
+            "id": "legacy",
+            "m": 2,
+            "n": 7,
+            "policies": null,
+            "solvers": [
+              "enumerate"
+            ]
+          },
+          {
+            "cells": 24,
+            "families": [
+              "koblitz",
+              "binary",
+              "prime"
+            ],
+            "id": "policies",
+            "m": 2,
+            "n": 7,
+            "policies": [
+              {
+                "kind": "legacy"
+              },
+              {
+                "candidate_limit": 128,
+                "kind": "sampled_x_projected_control"
+              },
+              {
+                "basis": [
+                  1,
+                  2,
+                  4
+                ],
+                "candidate_limit": 128,
+                "kind": "binary_subspace_intersection"
+              },
+              {
+                "basis": [
+                  1,
+                  2,
+                  4
+                ],
+                "candidate_limit": 128,
+                "kind": "binary_frobenius_union_intersection"
+              }
+            ],
+            "solvers": [
+              "enumerate"
+            ]
+          },
+          {
+            "cells": 8,
+            "families": [
+              "prime"
+            ],
+            "id": "domains",
+            "m": 2,
+            "n": 7,
+            "policies": [
+              {
+                "kind": "legacy"
+              },
+              {
+                "candidate_limit": 128,
+                "kind": "sampled_x_projected_control"
+              }
+            ],
+            "solvers": [
+              "pkm",
+              "double-large-prime"
+            ]
+          },
+          {
+            "cells": 4,
+            "families": [
+              "prime"
+            ],
+            "id": "causal",
+            "m": 3,
+            "n": 7,
+            "policies": [
+              {
+                "kind": "legacy"
+              },
+              {
+                "candidate_limit": 128,
+                "kind": "sampled_x_projected_control"
+              }
+            ],
+            "solvers": [
+              "f4"
+            ]
+          }
+        ]
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Existing central verify, plus policy local restore/reverify: source-bound replay contract.",
+      "id": "verifier-replay",
+      "instrument": {
+        "binary_sha256": "ad581a04b0e201acbb1d388a02cef9075a431c5cdaaa76cee235c1cbf3c5a499",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "crypto",
+            "--locked",
+            "--offline"
+          ]
+        ],
+        "commit": "0324692bc77758a5b69b4b972504b8cf2e00e957",
+        "env": {
+          "LANG": "C",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release",
+          "toolchain": "1.98"
+        },
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "native_cases": 4,
+        "policy_panels": [
+          {
+            "cells": 6,
+            "families": [
+              "koblitz",
+              "binary",
+              "prime"
+            ],
+            "id": "legacy",
+            "m": 2,
+            "n": 7,
+            "policies": null,
+            "solvers": [
+              "enumerate"
+            ]
+          },
+          {
+            "cells": 24,
+            "families": [
+              "koblitz",
+              "binary",
+              "prime"
+            ],
+            "id": "policies",
+            "m": 2,
+            "n": 7,
+            "policies": [
+              {
+                "kind": "legacy"
+              },
+              {
+                "candidate_limit": 128,
+                "kind": "sampled_x_projected_control"
+              },
+              {
+                "basis": [
+                  1,
+                  2,
+                  4
+                ],
+                "candidate_limit": 128,
+                "kind": "binary_subspace_intersection"
+              },
+              {
+                "basis": [
+                  1,
+                  2,
+                  4
+                ],
+                "candidate_limit": 128,
+                "kind": "binary_frobenius_union_intersection"
+              }
+            ],
+            "solvers": [
+              "enumerate"
+            ]
+          },
+          {
+            "cells": 8,
+            "families": [
+              "prime"
+            ],
+            "id": "domains",
+            "m": 2,
+            "n": 7,
+            "policies": [
+              {
+                "kind": "legacy"
+              },
+              {
+                "candidate_limit": 128,
+                "kind": "sampled_x_projected_control"
+              }
+            ],
+            "solvers": [
+              "pkm",
+              "double-large-prime"
+            ]
+          },
+          {
+            "cells": 4,
+            "families": [
+              "prime"
+            ],
+            "id": "causal",
+            "m": 3,
+            "n": 7,
+            "policies": [
+              {
+                "kind": "legacy"
+              },
+              {
+                "candidate_limit": 128,
+                "kind": "sampled_x_projected_control"
+              }
+            ],
+            "solvers": [
+              "f4"
+            ]
+          }
+        ]
+      },
+      "role": "candidate"
+    }
+  ],
+  "authors": [
+    "Codex; user-authorized dataset implementation software validation"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "absolute-source",
+        "absolute-replay"
+      ],
+      "id": "C1",
+      "text": "For exactly these four cells, real CLI Generate selects koblitz-m3-native-v1, preserves original launch/capture and unique stored-root custody, completes the registered native profile, and dataset verify accepts supervisor-sealed manifests."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "absolute-source",
+        "absolute-replay"
+      ],
+      "id": "C2",
+      "text": "This same local run passes status/export/report checks with four source provenance/index rows and retained restricted Koblitz artifacts; exported static features exclude forbidden private/proof/outcome fields. Unique feature rows may be fewer than four because solvers share public inputs."
+    },
+    {
+      "class": "out_of_scope",
+      "decided_by": [],
+      "id": "C3",
+      "text": "No general first/last fall-degree theorem, scaling law, comparative performance, complete instruction count, scientific corpus production, S3/cloud-verified cell, general causal representation, or complete corpus-axis coverage is established by these finite local software fixtures."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "absolute-source",
+        "absolute-replay"
+      ],
+      "id": "C4",
+      "text": "For the exact42 additional frozen cells, policy/version/cell mapping, public and restricted export, local content-addressed publication/restore, and source recipe identities are checked; all4 binary-policy-on-prime cells are explicit unsupported records. Wrong-recipe verify/restore controls reject before activation. Causal coverage requires nonempty prefix and algebraic rows, not merely empty successful exports."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "absolute-source",
+        "absolute-replay"
+      ],
+      "id": "C5",
+      "text": "Each of the unchanged four native Koblitz cells exports nonempty independently replayed signed-group prefix rows joined to its authenticated restricted source, with absent legacy policy identity and no restricted labels or seed fields in public rows."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "Exact software conjunction; no clock or comparative/statistical claim. Repeats would exceed the one-attempt frozen schedule.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "No separate scientific control arm in this finite functional conjunction. All original positive and negative software assertions remain mandatory and retained in extensions.functional_controls.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": "Genuine successful policy replay and local restore; explicit legacy reproduces existing domains; both alternative solver domains and nonempty verified prime causal/algebraic rows must be retained. Empty channels fail this positive detector without replacement sampling.",
+      "not_applicable_reason": "No separate scientific control arm in this finite functional conjunction. All original positive and negative software assertions remain mandatory and retained in extensions.functional_controls.",
+      "present": false
+    }
+  },
+  "created": "2026-11-01",
+  "decision_rule": {
+    "comparison_ids": [
+      "absolute-source",
+      "absolute-replay"
+    ],
+    "effect_size_measure": "Not applicable; no effect-size or performance claim",
+    "interval": "Not applicable to an exact finite software contract",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact conjunction, with planned/attempted/completed/failed/interrupted/unattempted counts",
+    "text": "PASS only if original native4 and additional policy42 cell contracts, all positive/negative controls and every custody gate pass. Otherwise retain FAIL/INTERRUPTED/NOT_EXECUTED, with exact completed/unattempted counts. No rerun, seed selection or alternate fixture after a missing channel.",
+    "threshold": "4 native and42 policy cells; explicit unsupported4;42 successful local restores;2 expected recipe refusals; nonempty causal and algebraic public channels; no restricted leakage.",
+    "verdict_vocabulary": [
+      "PASS",
+      "FAIL",
+      "INTERRUPTED",
+      "NOT_EXECUTED"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "application_managed"
+    },
+    "measurement_class": "throughput",
+    "placement": {
+      "cloud_launch": false,
+      "filesystem_parent": "/var/tmp",
+      "fresh_nonexisting_fixture_required": true,
+      "local_file_backend_publication": true,
+      "remote_publish": false
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 1800
+  },
+  "extensions": {
+    "artifact_policy": "Preserve genuine raw source and command receipts; keep adversarial test copies separately labelled. All remote paths are owned local file:// fixtures. S3 persistence of evidence is a separate authorized checkpoint, never implied by local restore.",
+    "binding_state": "UNBOUND_AMENDMENT_DRAFT_NO_EXECUTION",
+    "cell_mapping": [
+      {
+        "arm": "f4",
+        "index": 0,
+        "instance": 0,
+        "twist": false
+      },
+      {
+        "arm": "f5",
+        "index": 1,
+        "instance": 0,
+        "twist": false
+      },
+      {
+        "arm": "f4",
+        "index": 2,
+        "instance": 1,
+        "twist": true
+      },
+      {
+        "arm": "f5",
+        "index": 3,
+        "instance": 1,
+        "twist": true
+      }
+    ],
+    "complete_corpus_scope_preserved": true,
+    "failure_export": {
+      "diagnostic_command": "check-failure-export --fixture PATH in pinned offline jsonschema environment",
+      "scope": "Terminal authenticated attempts only in canonical rows; full46 planned cases, raw costs/caps and unresolved cleanup in bound failure-flow.json. Official shortfall findings retained, never called accepted.",
+      "unattempted_measurements": "none"
+    },
+    "functional_controls": {
+      "aa": {
+        "comparison": null,
+        "not_applicable_reason": "Exact software conjunction; no clock or comparative/statistical claim. Repeats would exceed the one-attempt frozen schedule.",
+        "present": false
+      },
+      "negative": {
+        "arm": "factor-policy",
+        "not_applicable_reason": null,
+        "null_population": "Adversarial copy of one genuine produced cell with a mathematically valid alternate-recipe factor base for the identical public problem; all content digests/manifest/publication bindings rebuilt under explicitly labelled local test custody.",
+        "present": true
+      },
+      "positive": {
+        "arm": "factor-policy",
+        "expected_detection": "Genuine successful policy replay and local restore; explicit legacy reproduces existing domains; both alternative solver domains and nonempty verified prime causal/algebraic rows must be retained. Empty channels fail this positive detector without replacement sampling.",
+        "not_applicable_reason": null,
+        "present": true
+      }
+    },
+    "local_software_cells": 46,
+    "native_causal_coverage": "Each original native cell must have at least one verified_group_step prefix record; same workload and seeds, no added case or resampling.",
+    "negative_controls": [
+      "policy-wrong-recipe-verify",
+      "policy-wrong-recipe-restore"
+    ],
+    "original_total_budget_usd": 200,
+    "phase_observations": {
+      "additional_solver_runs": 0,
+      "cost_duplication": false,
+      "planned_dataset_cells": 46,
+      "planned_validation_observations": 92,
+      "producer-source": "Existing generation source/terminal/custody",
+      "verifier-replay": "Existing central verify plus policy restore/reverify"
+    },
+    "policy_panels": [
+      {
+        "cells": 6,
+        "families": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "id": "legacy",
+        "m": 2,
+        "n": 7,
+        "policies": null,
+        "solvers": [
+          "enumerate"
+        ]
+      },
+      {
+        "cells": 24,
+        "families": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "id": "policies",
+        "m": 2,
+        "n": 7,
+        "policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "candidate_limit": 128,
+            "kind": "sampled_x_projected_control"
+          },
+          {
+            "basis": [
+              1,
+              2,
+              4
+            ],
+            "candidate_limit": 128,
+            "kind": "binary_subspace_intersection"
+          },
+          {
+            "basis": [
+              1,
+              2,
+              4
+            ],
+            "candidate_limit": 128,
+            "kind": "binary_frobenius_union_intersection"
+          }
+        ],
+        "solvers": [
+          "enumerate"
+        ]
+      },
+      {
+        "cells": 8,
+        "families": [
+          "prime"
+        ],
+        "id": "domains",
+        "m": 2,
+        "n": 7,
+        "policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "candidate_limit": 128,
+            "kind": "sampled_x_projected_control"
+          }
+        ],
+        "solvers": [
+          "pkm",
+          "double-large-prime"
+        ]
+      },
+      {
+        "cells": 4,
+        "families": [
+          "prime"
+        ],
+        "id": "causal",
+        "m": 3,
+        "n": 7,
+        "policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "candidate_limit": 128,
+            "kind": "sampled_x_projected_control"
+          }
+        ],
+        "solvers": [
+          "f4"
+        ]
+      }
+    ],
+    "preflight_runtime_scope": "No runtime measured for this draft. estimated_total_seconds is the conservative total driver ceiling, not a performance estimate; fixed/per-sample costs remain unknown.",
+    "reference_and_baseline_not_applicable_reason": "No algorithm comparison: both solver routes are assessed independently against exact requirements. No reference/baseline results are invented.",
+    "required_pre_freeze_bindings": [
+      "arms[*].instrument.commit",
+      "arms[*].instrument.binary_sha256",
+      "analysis_plan.script.sha256",
+      "extensions.software_binding.source_commit",
+      "extensions.software_binding.binary_path",
+      "extensions.software_binding.binary_sha256",
+      "extensions.software_binding.driver_sha256",
+      "extensions.software_binding.analysis_sha256"
+    ],
+    "scientific_corpus_rows": 0,
+    "software_binding": {
+      "analysis_path": "/home/ec2-user/ml-dataset-resume-20261029/cli46-prime-repair-binding-plan/driver.explicit-toolchain.py",
+      "analysis_sha256": "7ae67ceb2d2738968d23065e842a68d18d2fefb7d32912738a775d099a6f9438",
+      "binary_path": "/home/ec2-user/ml-dataset-resume-20261029/cli-build-032469-v2/crypto",
+      "binary_sha256": "ad581a04b0e201acbb1d388a02cef9075a431c5cdaaa76cee235c1cbf3c5a499",
+      "checker_commit": "37e193bf8b3e673e0942709794f44d28e6ab66fb",
+      "checker_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+      "driver_path": "/home/ec2-user/ml-dataset-resume-20261029/cli46-prime-repair-binding-plan/driver.explicit-toolchain.py",
+      "driver_sha256": "7ae67ceb2d2738968d23065e842a68d18d2fefb7d32912738a775d099a6f9438",
+      "source_commit": "0324692bc77758a5b69b4b972504b8cf2e00e957",
+      "validator_argv_prefix": [
+        "/home/ec2-user/.local/bin/uv",
+        "run",
+        "--offline",
+        "--no-project",
+        "--with",
+        "jsonschema==4.26.0",
+        "python"
+      ],
+      "source_path": "/home/ec2-user/crypto-ml-prime-preservation-20261101"
+    },
+    "verified_cloud_cells": 0,
+    "repair_amendment": {
+      "prior_attempt_file": "prior-attempt.json",
+      "prior_attempt_sha256": "cd495dc24af38fd215c338da16474750567188fc4a4c45bc70b11b08ea0c56de",
+      "source_patch_sha256": "7a80c924d48f923f90c0d782ad41dfe1ccc9157ca77b3755d25bb9e595af5cff",
+      "source_commit_pending": false,
+      "source_patch_is_not_compiled_source_identity": true,
+      "prior_failure_remains_reported": true,
+      "no_new_budget": true,
+      "new_generation_attempts_in_this_draft": 0,
+      "requires_before_execution": [
+        "reviewed repaired-source commit",
+        "focused and required full-source tests at exact commit",
+        "release CLI and embedded provenance at exact commit",
+        "reviewed source snapshot and actual terminal gate receipts",
+        "new retained binary checksum",
+        "final reviewed immutable driver and bound protocol",
+        "official validate and freeze then separate protocol commit before first draw",
+        "fresh nonexisting destination; original run never overwritten",
+        "existing budget/deadline authorization reconciled; no automatic extension"
+      ],
+      "expected_gates_sha256": "4f74c1219ae0f50451f5e4d76bbfe70f8c47c452277d363995f684f8ce698a5c",
+      "prior_attempt_source_path": "/home/ec2-user/ml-dataset-resume-20261029/cli46-prime-repair-amendment-draft/prior-attempt.json"
+    }
+  },
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "inadmissible": [
+    "Generating or building while unrelated source validation is active or without source/binary/gate reconciliation.",
+    "Freezing a template containing unresolved hashes, mutable source/binary/analysis paths, or fabricated software gate receipts.",
+    "Reusing interrupted output, renewing original deadlines, rerunning Generate, adding cells, or changing seed/resources after outcomes.",
+    "Calling the hidden worker directly in place of actual Generate supervisor coverage.",
+    "Treating scientific_corpus_rows or verified_cloud_cells as positive; both remain0 for this local software smoke.",
+    "Interpreting runtime, PMU, modeled ledgers or native counters as comparative or complete instruction evidence.",
+    "Publishing remote datasets, changing cloud permissions, or treating checkpoint archives as scientific dataset uploads."
+  ],
+  "invalidation_rules": [
+    "Source/binary mismatch, dirty embedded provenance, stale validation gates, missing original binding, wrong adapter, missing/duplicate canonical artifacts, failed replay, expired/interrupted worker, or missing command receipt invalidates all-success.",
+    "Failure and timeout rows are retained and charged as attempts; no exclusion creates success. Unattempted remaining cells are explicitly reported.",
+    "Unavailable or multiplexed counters are preserved under actual scope; they cannot be promoted to complete hardware instruction measurements."
+  ],
+  "literature": [
+    {
+      "claim": "Inspected current dataset CLI routes, frozen exact axes, custody/export gates and limitations.",
+      "provenance": "internal",
+      "ref": "koblitz-subprocess-cli-smoke-plan.md",
+      "verified_by": "Read for protocol drafting; source-specific implementation must be rechecked at instantiation."
+    },
+    {
+      "claim": "Canonical protocol fields and semantic validation rules.",
+      "provenance": "internal",
+      "ref": "crypto-autoresearcher@37e193bf8b3e673e0942709794f44d28e6ab66fb:docs/experiment-protocol.md and schemas/experiment-protocol.v1.json",
+      "verified_by": "Pinned extracted checker/schema/docs read; SOURCE.json supplies hashes."
+    }
+  ],
+  "measurement": {
+    "clock": "none",
+    "counters": [],
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before",
+      "binary_sha256_after",
+      "command_argv",
+      "command_exit",
+      "attempt_binding",
+      "original_execution_context",
+      "host_descriptors",
+      "actual_telemetry_scope",
+      "artifact_sha256"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "cell_contract_pass is1 only for the arm-specific source production/custody contract or central replay/restore contract on its exact existing case. Each phase has its own evidence; counters belong only to producer-source. Whole-pass requires both phases and all inline assertions.92 observations are not92 datasets.",
+        "id": "cell_contract_pass",
+        "kind": "exact",
+        "name": "native CLI cell contract",
+        "resolution": "one exact boolean",
+        "source": "analysis.json cells; sealed cell manifests, result.json, worker-process.json, execution-context.json, native and parent artifacts, command verification receipts",
+        "uncertainty": "none_exact",
+        "unit": "boolean 0 or 1"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Exact conjunction of original native pipeline and policy plan/preflight/generate/verify/status/export/report/local publish/restore plus negative controls and nonempty specified channels; never a comparative cost metric.",
+        "id": "pipeline_contract_pass",
+        "kind": "exact",
+        "name": "global CLI custody/export contract",
+        "resolution": "one exact boolean",
+        "source": "analysis.json; commands/*/receipt.json; plan/preflight/status/export/report outputs and inventory.json",
+        "uncertainty": "none_exact",
+        "unit": "boolean 0 or 1"
+      }
+    ]
+  },
+  "protocol_id": "koblitz-native-and-factor-policy-cli-functional-validation-prime-repair-v2",
+  "question": "Do the unchanged native four-cell CLI gate and the additional frozen finite policy construction, admission, replay, local restore and export controls all pass?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Reproduce exact CLI index mapping; no timing/performance conclusion is drawn from order.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact machine assertions need explicit solver/twist and path identities; no subjective ranking or statistical selection.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "The native4 and policy42 are the complete finite software schedule, seed42, both actual twists, no resampling. These do not replace the full scientific corpus axes. Policy comparisons are identity checks on matched public problems, not outcome-rate comparisons."
+    },
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "nonce": null,
+      "note": "crypto DatasetPlan::cell and curves::generate use frozen seed42 and one curve/generator/key per twist; no protocol-hash-derived replacement seeds.",
+      "seeds": [
+        42
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "Finite four-cell pass/fail custody table; no statistical or performance plot"
+    ],
+    "report_dir": "report",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 46,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "min_attainable_two_sided_p": null,
+      "note": "Two existing functional execution phases over the identical46 case IDs, one observation per phase:92 validation observations,46 dataset cells, zero additional solver generations. No comparative or statistical inference.",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 1800,
+      "fixed_seconds": null,
+      "measured_on": null,
+      "per_sample_seconds": null,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Fixed46 genuine cells, one generation attempt each, native4 first then the four policy panels in declared order;42 local restore attempts and2 adversarial verify/restore refusals. Stop at first unexpected failure; never resample."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Stop immediately on unexpected nonzero command or failed prerequisite/assertion. Only the2 named negative commands may terminate nonzero, with exact recipe-refusal text and settled cleanup. Preserve all partial and unattempted flow."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Unchanged total driver1800s shared across native and policy stages, original60s/cell,256MiB memory and128MiB trace; no deadline renewal. This ceiling may leave unattempted cells and cannot be presented as completion. Local file backend only; no cloud/S3 spend; overall200USD cap unchanged."
+    }
+  ],
+  "study_dir": "/var/tmp/ml-dataset-cli46-032469-v2-20261101",
+  "variable_ledger": {
+    "aa_not_applicable": "Exact software conjunction; no clock or comparative/statistical claim. Repeats would exceed the one-attempt frozen schedule.",
+    "comparisons": [
+      {
+        "arms": [
+          "producer-source"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "absolute-source",
+        "reason": "Existing source production contract on the fixed46 cells. No comparison between phases.",
+        "threshold": "Every source contract and mandatory inline assertion passes."
+      },
+      {
+        "arms": [
+          "verifier-replay"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "absolute-replay",
+        "reason": "Existing central replay/restore contract on the same46 cells. No new solver generation.",
+        "threshold": "Every existing replay contract and mandatory inline assertion passes."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "One immutable retained clean build; verify its embedded provenance and SHA-256 before/after each command; no shared target executable after prepare.",
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": {
+          "source_commit": "0324692bc77758a5b69b4b972504b8cf2e00e957",
+          "binary_sha256": "ad581a04b0e201acbb1d388a02cef9075a431c5cdaaa76cee235c1cbf3c5a499"
+        }
+      },
+      {
+        "how": "Same pinned script analyze mode reads saved evidence only; instantiate hash before official freeze.",
+        "name": "analysis",
+        "treatment": "fixed",
+        "value": {
+          "path": "/home/ec2-user/ml-dataset-resume-20261029/cli46-prime-repair-binding-plan/driver.explicit-toolchain.py",
+          "sha256": "7ae67ceb2d2738968d23065e842a68d18d2fefb7d32912738a775d099a6f9438"
+        }
+      },
+      {
+        "how": "Exact per-panel solver assignment; not an implicit solver cross-product or cost comparison.",
+        "name": "solver",
+        "treatment": "crossed",
+        "value": [
+          "f4",
+          "f5",
+          "enumerate",
+          "pkm",
+          "double-large-prime"
+        ]
+      },
+      {
+        "how": "Both actual curve models retained; compare actual manifest configurations to frozen mapping.",
+        "name": "actual_twist",
+        "treatment": "crossed",
+        "value": [
+          false,
+          true
+        ]
+      },
+      {
+        "how": "Exact fixed axes within each named panel; native gate unchanged. No inter-panel performance inference.",
+        "name": "input_axes",
+        "treatment": "fixed",
+        "value": {
+          "native_gate": {
+            "curve_seeds": 1,
+            "degree_bound": 3,
+            "factor_base_size": 4,
+            "family": "koblitz",
+            "generators": 1,
+            "keys": 1,
+            "m": 3,
+            "n": 23,
+            "seed": 42
+          },
+          "policy_panels": [
+            {
+              "cells": 6,
+              "families": [
+                "koblitz",
+                "binary",
+                "prime"
+              ],
+              "id": "legacy",
+              "m": 2,
+              "n": 7,
+              "policies": null,
+              "solvers": [
+                "enumerate"
+              ]
+            },
+            {
+              "cells": 24,
+              "families": [
+                "koblitz",
+                "binary",
+                "prime"
+              ],
+              "id": "policies",
+              "m": 2,
+              "n": 7,
+              "policies": [
+                {
+                  "kind": "legacy"
+                },
+                {
+                  "candidate_limit": 128,
+                  "kind": "sampled_x_projected_control"
+                },
+                {
+                  "basis": [
+                    1,
+                    2,
+                    4
+                  ],
+                  "candidate_limit": 128,
+                  "kind": "binary_subspace_intersection"
+                },
+                {
+                  "basis": [
+                    1,
+                    2,
+                    4
+                  ],
+                  "candidate_limit": 128,
+                  "kind": "binary_frobenius_union_intersection"
+                }
+              ],
+              "solvers": [
+                "enumerate"
+              ]
+            },
+            {
+              "cells": 8,
+              "families": [
+                "prime"
+              ],
+              "id": "domains",
+              "m": 2,
+              "n": 7,
+              "policies": [
+                {
+                  "kind": "legacy"
+                },
+                {
+                  "candidate_limit": 128,
+                  "kind": "sampled_x_projected_control"
+                }
+              ],
+              "solvers": [
+                "pkm",
+                "double-large-prime"
+              ]
+            },
+            {
+              "cells": 4,
+              "families": [
+                "prime"
+              ],
+              "id": "causal",
+              "m": 3,
+              "n": 7,
+              "policies": [
+                {
+                  "kind": "legacy"
+                },
+                {
+                  "candidate_limit": 128,
+                  "kind": "sampled_x_projected_control"
+                }
+              ],
+              "solvers": [
+                "f4"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "how": "Supervisor creates immutable attempt/execution contexts; native/checking work shares the original budget; no renewed deadline at replay.",
+        "name": "original_resources",
+        "treatment": "fixed",
+        "value": {
+          "memory_mib": 256,
+          "seconds_per_case": 60,
+          "threads": 1,
+          "trace_mib": 128,
+          "work_limit": 16384
+        }
+      },
+      {
+        "how": "Retain actual host/process/telemetry descriptors. No timing, operation-cost, or retired-instruction comparison; no host isolation assertion.",
+        "name": "host_and_environment",
+        "treatment": "measured",
+        "value": "cpu, kernel, hypervisor, co-tenants, memory pressure, filesystem, isolation, actual PMU availability"
+      },
+      {
+        "how": "No allocation-layout or RSS cost claim. Preserve existing telemetry semantics and missing values.",
+        "name": "allocation_layout",
+        "treatment": "measured",
+        "value": "actual RSS and process limits when reported"
+      },
+      {
+        "how": "One deterministic attempt per exact cell. No warming, interleaved repetition, or retries.",
+        "name": "order_and_warmup",
+        "treatment": "fixed",
+        "value": "Original native4, then legacy6, policies24, domains8, causal4, then adversarial refusals; zero warmups. Local restore follows each panel."
+      },
+      {
+        "how": "No blinding needed for exact functional checks; all outcomes including failures remain visible and retained.",
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "deterministic frozen artifact assertions"
+      },
+      {
+        "how": "Stop and preserve partial evidence on interruption; no resume/replacement generator or new seed.",
+        "name": "preemption_and_interruptions",
+        "treatment": "measured",
+        "value": "actual interruption/exit receipts"
+      },
+      {
+        "how": "Exact policy recipes and finite panel mapping frozen before data; no alternate seed or post-hoc candidate_limit changes.",
+        "name": "policy_panels",
+        "treatment": "fixed",
+        "value": [
+          {
+            "cells": 6,
+            "families": [
+              "koblitz",
+              "binary",
+              "prime"
+            ],
+            "id": "legacy",
+            "m": 2,
+            "n": 7,
+            "policies": null,
+            "solvers": [
+              "enumerate"
+            ]
+          },
+          {
+            "cells": 24,
+            "families": [
+              "koblitz",
+              "binary",
+              "prime"
+            ],
+            "id": "policies",
+            "m": 2,
+            "n": 7,
+            "policies": [
+              {
+                "kind": "legacy"
+              },
+              {
+                "candidate_limit": 128,
+                "kind": "sampled_x_projected_control"
+              },
+              {
+                "basis": [
+                  1,
+                  2,
+                  4
+                ],
+                "candidate_limit": 128,
+                "kind": "binary_subspace_intersection"
+              },
+              {
+                "basis": [
+                  1,
+                  2,
+                  4
+                ],
+                "candidate_limit": 128,
+                "kind": "binary_frobenius_union_intersection"
+              }
+            ],
+            "solvers": [
+              "enumerate"
+            ]
+          },
+          {
+            "cells": 8,
+            "families": [
+              "prime"
+            ],
+            "id": "domains",
+            "m": 2,
+            "n": 7,
+            "policies": [
+              {
+                "kind": "legacy"
+              },
+              {
+                "candidate_limit": 128,
+                "kind": "sampled_x_projected_control"
+              }
+            ],
+            "solvers": [
+              "pkm",
+              "double-large-prime"
+            ]
+          },
+          {
+            "cells": 4,
+            "families": [
+              "prime"
+            ],
+            "id": "causal",
+            "m": 3,
+            "n": 7,
+            "policies": [
+              {
+                "kind": "legacy"
+              },
+              {
+                "candidate_limit": 128,
+                "kind": "sampled_x_projected_control"
+              }
+            ],
+            "solvers": [
+              "f4"
+            ]
+          }
+        ]
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "f4",
+          "f5",
+          "enumerate",
+          "pkm",
+          "double-large-prime"
+        ],
+        "name": "solver"
+      },
+      {
+        "levels": [
+          false,
+          true
+        ],
+        "name": "actual_twist"
+      }
+    ]
+  },
+  "version": 2
+}

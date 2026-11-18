@@ -1,0 +1,22 @@
+{
+ "created_at": "2026-11-06T23:05:13Z",
+ "id": "PCC-20261106-a4c043",
+ "kind": "statement",
+ "producer": {
+  "commit": "2990a3778ab780eed93787ae1cbf39293546b601",
+  "model": "",
+  "session": "conjugate-radix-followup-20261106"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/lead_followup_20261106/validation/device-fixtures-restored.txt",
+    "sha256": "8a9826ef3718136011c25e315f028df7427cf895901c03adc65efaa7de714071"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "validation/development-environment",
+ "statement": "The six existing certicom device-emulator tests pass after restoring tracked gpu/certicom sources excluded by sparse checkout. The wider library suite is still incomplete; no overall library pass is asserted."
+}

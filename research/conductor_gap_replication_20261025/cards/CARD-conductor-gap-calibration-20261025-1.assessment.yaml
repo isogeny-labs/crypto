@@ -1,0 +1,27 @@
+card_id: CARD-conductor-gap-calibration-20261025-1
+relay_verbatim: true
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.receipt.json records
+  all eight card argv in order at commit 45def5ca7a5546113bc2fb47b44c43138323ac1d; each exited 0, succeeded without
+  timeout, and ran once.
+- All twelve declared output digests and all sixteen stdout/stderr digests match research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.receipt.json;
+  no declared output changed after execution.
+- sessions/pilot-a-c2.audit.json and pilot-a-c5.audit.json each contain 48 verified records and 48 reproduced replays;
+  sessions/pilot-b-c0.audit.json and pilot-b-c2.audit.json each contain 16 verified records and 16 reproduced replays.
+  All four audits have ok=true and no problems.
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.receipt.json dirty_before/dirty_after
+  records no new writes outside research/conductor_gap_replication_20261025/. Later main-session diagnostics, rendering
+  source and protocol/native guard edits are separate actions identified in the assessment dispatch.
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.executor.txt equals
+  the actual run stdout byte-for-byte when receipt outputs use the original order declared in the card, including
+  the final print newline. tools/task_card.py writes receipts with sort_keys=True but brief emits dictionary insertion
+  order; its read-back check_relay therefore falsely reports four missing session.json lines after sorting those
+  output keys.
+- 'The prescribed check-relay CLI was attempted and refused post-execution lint: AMENDMENTS.md was subsequently
+  amended by the main session, and the CLI treats the four now-existing --out audit files as unbound input files.
+  The unchanged tool check_relay/assessment_facts functions and independent digest/argv checks were inspected directly;
+  the card, tool and evidence were not altered.'
+interpretation: not_assessed

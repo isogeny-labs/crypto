@@ -1,0 +1,42 @@
+{
+  "tests_passed": 7,
+  "tests_failed": 0,
+  "actual_bridge_compiled": true,
+  "authentic_owner_capture_encoder_compiled_together": false,
+  "fixture_boundaries": [
+    "Budget",
+    "CaptureEmitter",
+    "encoder"
+  ],
+  "commands": [
+    "timeout 120 rustc +1.98 --edition=2021 --test bridge_harness.rs -o bridge-tests",
+    "timeout 30 ./bridge-tests --test-threads=1"
+  ],
+  "artifacts": [
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/owned-search-capture-publication-20261107/owned_search_capture_publication.rs",
+      "bytes": 8048,
+      "sha256": "d52c03a7f77b369cef4dfd9715d83c030fcc434176401b0cacb7b62eae95ce89"
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/owned-search-capture-publication-20261107/bridge_harness.rs",
+      "bytes": 7485,
+      "sha256": "7a139b2c594558e982d14baba1029f3cb4258bbf40aac03ba853fb3d332d1e97"
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/owned-search-capture-publication-20261107/bridge-tests",
+      "bytes": 7240024,
+      "sha256": "41fc8d2f0e3060099505ef23a0067a2da1adff1319e1874a7e26e5cab995ef63"
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/owned-search-capture-publication-20261107/compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/ec2-user/ml-dataset-resume-20261029/owned-search-capture-publication-20261107/tests.log",
+      "bytes": 960,
+      "sha256": "827611f6395c614acb891fdb429ef0de5670b1497859c72d40d9df9b18b1d27b"
+    }
+  ]
+}

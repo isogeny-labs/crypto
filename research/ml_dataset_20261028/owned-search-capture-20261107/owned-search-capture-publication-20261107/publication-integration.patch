@@ -1,0 +1,45 @@
+--- a/src/ml_dataset/original_boolean_search.rs
++++ b/src/ml_dataset/original_boolean_search.rs
+@@ -3,6 +3,7 @@
+ use provenance::boolean_equations as equations;
+ use provenance::{checked_model, signed_lift, Admission, CheckedMap, Error, Quote};
+ use std::mem::size_of;
++#[path="owned_search_capture_publication.rs"] pub(in crate::ml_dataset::solvers) mod publication;
+ #[path="capture_projection.rs"] pub(in crate::ml_dataset::solvers) mod capture_projection;
+ #[path="original_boolean_search_policy.rs"] mod policy;
+ pub(in crate::ml_dataset::solvers) use policy::ProposedPolicy;
+@@ -51,7 +52,7 @@
+ #[derive(Clone,Copy)]
+ pub(in crate::ml_dataset::solvers) struct Caps{pub expansion:equations::Limits,pub continuation:ContinuationLimits}
+ #[derive(Clone,Copy,Debug)]
+-pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure)}
++pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+ /// Each record belongs to one exact retained partition and model. Returned
+ /// callback values are diagnostics until callback_result is successful.
+ pub(in crate::ml_dataset::solvers) struct LiftRecord {
+@@ -83,6 +84,7 @@
+     normalization_generator:usize,normalization_term:usize,normalization_sort:usize,
+     continuation:Option<continuation::Attempt>,coverage:Option<continuation::CoverageAudit>,
+     exclusion_audit:Option<exclusions::Audit>,
++    publication:publication::Publication,
+     original_deadline:Instant,failure:Option<Failure>,
+     lift_records:Vec<LiftRecord>,accepted_record:Option<usize>,
+ }
+@@ -243,6 +245,8 @@
+         let status=expanded.status();self.expansion=Some(expanded);
+         if let Err(f)=status{self.fail(Failure::Expansion(f),Stop::NativeFailure);return}
+         if let Err(s)=self.normalize(){self.fail(Failure::Admission(s),s);return}
++        // Persist authenticated equations before Matrix work can exhaust supply.
++        if self.checkpoint_capture().is_err(){return}
+         if let Err(s)=self.original.budget.finish_native(Instant::now()){self.fail(Failure::Admission(s),s);return}
+         let phase=match self.original.budget.begin_native(true,Instant::now()){Ok(v)=>v,Err(s)=>{self.fail(Failure::Admission(s),s);return}};
+         caps.continuation.work=caps.continuation.work.min(phase.work);caps.continuation.bytes=caps.continuation.bytes.min(phase.bytes);
+@@ -270,7 +274,7 @@
+         let mut out=OwnedAttempt{
+             original:OriginalParts{public_sha256:original.public_sha256,factor_sha256:original.factor_base_sha256,budget,binding,launch_sha256,math,checked,unchecked:retained_unchecked,pattern,map_bytes:retained_bytes,map_ack,publication_attempted,map_published,capture_limits,boolean_attempted},
+             sink,diagnostic,expansion:None,normalized:Vec::new(),normalization_generator:0,normalization_term:0,normalization_sort:0,
+-            continuation:None,coverage:None,exclusion_audit:None,original_deadline,failure:None,
++            continuation:None,coverage:None,exclusion_audit:None,publication:publication::Publication::default(),original_deadline,failure:None,
+             lift_records:Vec::new(),accepted_record:None,
+         };
+         let caps=match admission{Ok(c)=>c,Err(s)=>{out.fail(Failure::Admission(s),s);return out}};

@@ -1,0 +1,19 @@
+digraph admission {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.4", ranksep="0.55", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, margin="0.16,0.12", color="#334155", fillcolor="#F8FAFC"];
+  edge [color="#64748B", arrowsize=0.7, penwidth=1.3];
+
+  source [label="Merged source\na91b8b66d0f1\nfull Linux validation", fillcolor="#E0F2FE"];
+  first [label="Attempt 1: account 104186811093\ndry run: permitted\nreal launch: Blocked", fillcolor="#FEE2E2", color="#B91C1C"];
+  second [label="Attempt 2: account 590183823895\ndry run: permitted\nreal launch: Blocked", fillcolor="#FEE2E2", color="#B91C1C"];
+  inventory [label="After attempt 2\n0 matching instances\n0 matching Spot requests", fillcolor="#FEF3C7"];
+  library [label="Full library suite\nnot started on Linux", fillcolor="#E5E7EB", color="#94A3B8"];
+  ic [label="N83 total IC runtime\nnot measured", fillcolor="#E5E7EB", color="#94A3B8"];
+
+  source -> first;
+  source -> second;
+  second -> inventory;
+  first -> library [style=dashed, color="#94A3B8"];
+  second -> library [style=dashed, color="#94A3B8", label="stopped"];
+  library -> ic [style=dashed, color="#94A3B8"];
+}

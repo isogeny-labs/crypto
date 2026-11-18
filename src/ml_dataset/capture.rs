@@ -245,6 +245,16 @@ pub struct EventRecord {
     pub event: Value,
 }
 
+/// Snapshot of an installed durable head, minted without rehashing its bytes.
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub(super) struct CommittedEventPosition {
+    pub binding_sha256: String,
+    pub event_count: u64,
+    pub byte_end: u64,
+    pub last_event_sha256: String,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct CommittedHead {
@@ -333,8 +343,18 @@ impl Write for LimitedBytes {
 /// Closed kinds for typed solver events. Payload commits remain emitter-owned.
 #[derive(Clone, Copy, Debug, Serialize)]
 pub enum TypedEventKind {
+    #[serde(rename = "binary_sat_search")]
+    BinarySatSearch,
+    #[serde(rename = "binary_sat_initial")]
+    BinarySatInitial,
+    #[serde(rename = "binary_m3_native")]
+    OrdinaryBinaryM3Native,
     #[serde(rename = "wide_prime_dynamic")]
     WidePrimeDynamic,
+    #[serde(rename = "koblitz_m3")]
+    KoblitzM3,
+    #[serde(rename = "koblitz_m3_native")]
+    KoblitzM3Native,
 }
 
 /// Reusable requested storage; the caller must debit its own ledger once.
@@ -344,6 +364,22 @@ pub struct TypedEventBuffer {
     limit: usize,
 }
 impl TypedEventBuffer {
+    /// Current encoded buffer length. Only a successful event_typed return
+    /// establishes acknowledgement; this accessor alone does not.
+    pub(super) fn encoded_len(&self) -> usize {
+        self.bytes.len()
+    }
+
+    /// Move already allocated encoded bytes to a failure owner. This does not
+    /// establish publication or acknowledge any event.
+    pub(super) fn clear_encoded(&mut self) {
+        self.bytes.clear();
+    }
+
+    pub(super) fn take_encoded(&mut self) -> Vec<u8> {
+        std::mem::take(&mut self.bytes)
+    }
+
     pub fn requested_bytes(event_cap: u64) -> Result<u64, CaptureError> {
         if !(512..=MAX_EVENT).contains(&event_cap) {
             return Err(CaptureError::LimitReached(CaptureStop::EventLimit));
@@ -427,6 +463,24 @@ struct TypedEventRecord<'a, T: Serialize + ?Sized> {
     sequence: u64,
     previous_event_sha256: &'a str,
     event: TypedSolverEvent<'a, T>,
+}
+
+#[cfg(test)]
+pub(super) fn maximum_sequence_typed_wire<T: Serialize + ?Sized>(
+    kind: TypedEventKind,
+    payload: &T,
+) -> Vec<u8> {
+    let digest = "f".repeat(64);
+    let record = TypedEventRecord {
+        schema: EVENT_SCHEMA,
+        binding_sha256: &digest,
+        sequence: u64::MAX,
+        previous_event_sha256: &digest,
+        event: TypedSolverEvent { kind, payload },
+    };
+    let mut bytes = serde_json::to_vec(&record).unwrap();
+    bytes.push(b'\n');
+    bytes
 }
 
 // Dedicated bounded first-witness publication; not a dispatched solver profile.
@@ -645,8 +699,7 @@ fn witness_hash_work(n: usize) -> Result<u64, WitnessError> {
 /// hold this within its original allowance while continuing other work.
 pub(super) fn witness_confirmation_work(n: usize) -> Result<u64, WitnessError> {
     witness_hash_work(n)?
-        .checked_mul(2)
-        .and_then(|x| x.checked_add((n as u64).checked_mul(16)?))
+        .checked_add((n as u64).checked_mul(32).ok_or(WitnessError::Work)?)
         .and_then(|x| x.checked_add(8192))
         .ok_or(WitnessError::Work)
 }
@@ -810,6 +863,38 @@ fn witness_file_check(
     }
     Ok(())
 }
+/// The supplied bytes were already hashed against the committed identity.
+/// Exact comparison binds the file to those bytes without hashing it again.
+/// Reuses the admitted I/O buffer; read and comparison each retain their
+/// existing conservative 16-per-byte tariff.
+fn witness_file_matches(
+    path: &Path,
+    expected: &[u8],
+    scratch: &mut Vec<u8>,
+    ticket: &mut WitnessTicket<'_>,
+) -> Result<(), WitnessError> {
+    ticket.check()?;
+    witness_regular(path)?;
+    let mut file = File::open(path)?;
+    if file.metadata()?.len() != expected.len() as u64 {
+        return Err(WitnessError::Integrity);
+    }
+    scratch.resize(4096, 0);
+    for chunk in expected.chunks(4096) {
+        ticket.check()?;
+        ticket.spend(32 * chunk.len() as u64)?;
+        file.read_exact(&mut scratch[..chunk.len()])?;
+        if &scratch[..chunk.len()] != chunk {
+            return Err(WitnessError::Integrity);
+        }
+    }
+    let mut extra = [0u8; 1];
+    if file.read(&mut extra)? != 0 {
+        return Err(WitnessError::Integrity);
+    }
+    ticket.check()?;
+    Ok(())
+}
 fn witness_write(
     file: &mut File,
     bytes: &[u8],
@@ -822,6 +907,28 @@ fn witness_write(
     Ok(())
 }
 impl CaptureEmitter {
+    /// Read-only directory ownership check; never creates or substitutes a sink.
+    pub(super) fn verify_directory(&self, expected: &Path) -> Result<(), String> {
+        if self.directory != storage::root_dir(expected, false)? {
+            return Err("capture sink differs from original live directory".into());
+        }
+        Ok(())
+    }
+
+    /// Actual acknowledged stream head for worker-only adapter admission.
+    pub(super) fn committed_event_position(&self) -> CommittedEventPosition {
+        CommittedEventPosition {
+            binding_sha256: self.head.binding_sha256.clone(),
+            event_count: self.head.event_count,
+            byte_end: self.head.byte_end,
+            last_event_sha256: self.head.last_event_sha256.clone(),
+        }
+    }
+
+    pub(super) fn committed_event_count(&self) -> u64 {
+        self.head.event_count
+    }
+
     /// Prepare under the caller's remaining shared byte/checking pools, before native.
     #[allow(dead_code)]
     pub(super) fn prepare_witness(
@@ -1004,13 +1111,13 @@ impl CaptureEmitter {
                     return Err(WitnessError::Identity);
                 }
             }
-            let cost = witness_hash_work(bytes.len())?
-                .checked_add(16 * bytes.len() as u64)
+            let cost = (bytes.len() as u64)
+                .checked_mul(32)
                 .and_then(|n| n.checked_add(4096))
                 .ok_or(WitnessError::Work)?;
             let mut t = budget.reserve(cost, 0)?;
             t.spend(4096)?;
-            witness_file_check(&w.paths[1], &digest, bytes.len() as u64, &mut w.io, &mut t)?;
+            witness_file_matches(&w.paths[1], bytes, &mut w.io, &mut t)?;
             self.witness = WitnessIdentity {
                 committed: true,
                 digest,
@@ -1221,6 +1328,52 @@ pub struct CaptureEmitter {
 }
 
 impl CaptureEmitter {
+    /// Read-only runtime admission. The caller must separately authenticate
+    /// execution parameters against the original run; this binds the live sink.
+    pub(super) fn verify_attempt_limits(
+        &self,
+        binding: &AttemptBinding,
+        limits: &CaptureLimits,
+    ) -> Result<(), String> {
+        binding.validate()?;
+        self.verify_digest_limits(binding.digest()?.as_bytes(), limits)
+    }
+
+    /// Compare a previously admitted original binding digest without encoding
+    /// and hashing the unchanged binding again for every bounded event.
+    pub(super) fn verify_digest_limits(
+        &self,
+        binding_digest: &[u8],
+        limits: &CaptureLimits,
+    ) -> Result<(), String> {
+        limits.validate()?;
+        if self.failed || self.head.stop.is_some() {
+            return Err("capture sink already refused further work".into());
+        }
+        if binding_digest.len() != 64
+            || self.head.binding_sha256.as_bytes() != binding_digest
+            || &self.limits != limits
+        {
+            return Err("capture sink differs from original execution attempt or limits".into());
+        }
+        Ok(())
+    }
+
+    /// Bind an adapter's shared counter to the actual committed stream before
+    /// it records an anticipated capture sequence.
+    pub(super) fn verify_digest_limits_at_count(
+        &self,
+        binding_digest: &[u8],
+        limits: &CaptureLimits,
+        event_count: u64,
+    ) -> Result<(), String> {
+        self.verify_digest_limits(binding_digest, limits)?;
+        if self.head.event_count != event_count {
+            return Err("capture counter differs from original adapter counter".into());
+        }
+        Ok(())
+    }
+
     pub fn create(
         directory: &Path,
         binding: AttemptBinding,
@@ -1410,10 +1563,63 @@ impl CaptureEmitter {
         payload: &T,
         buffer: &mut TypedEventBuffer,
     ) -> Result<(), CaptureError> {
+        self.event_typed_precommit(kind, payload, buffer, &mut |_| Ok(()))
+    }
+
+    /// Inspect/reuse the complete internal encoding before durable publication.
+    /// Callback refusal leaves the head unchanged and does not poison the sink:
+    /// no capture I/O has happened. Encoded bytes alone are not an acknowledgement.
+    pub(super) fn event_typed_precommit<T: Serialize + ?Sized>(
+        &mut self,
+        kind: TypedEventKind,
+        payload: &T,
+        buffer: &mut TypedEventBuffer,
+        before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
+    ) -> Result<(), CaptureError> {
+        self.event_typed_precommit_with_limit(kind, payload, buffer, usize::MAX, before_commit)
+    }
+
+    /// Enforce a caller's smaller per-event encoding ceiling in both passes.
+    /// This changes no storage allocation or committed capture allowance. A
+    /// refused encoding cannot invoke the precommit callback or mutate the head.
+    pub(super) fn event_typed_precommit_with_limit<T: Serialize + ?Sized>(
+        &mut self,
+        kind: TypedEventKind,
+        payload: &T,
+        buffer: &mut TypedEventBuffer,
+        event_cap: usize,
+        before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
+    ) -> Result<(), CaptureError> {
+        self.event_typed_admit_encoding_with_limit(
+            kind,
+            payload,
+            buffer,
+            event_cap,
+            &mut |_| Ok(()),
+            before_commit,
+        )
+    }
+
+    /// Admit the second pass after counting, before writing encoded bytes.
+    pub(super) fn event_typed_admit_encoding_with_limit<T: Serialize + ?Sized>(
+        &mut self,
+        kind: TypedEventKind,
+        payload: &T,
+        buffer: &mut TypedEventBuffer,
+        event_cap: usize,
+        before_encoding: &mut impl FnMut(usize) -> Result<(), CaptureError>,
+        before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
+    ) -> Result<(), CaptureError> {
         self.ready()?;
         buffer.bytes.clear();
         let result = (|| {
-            let limit = buffer.limit.min(self.limits.max_event_bytes as usize);
+            let limit = buffer
+                .limit
+                .min(self.limits.max_event_bytes as usize)
+                .min(event_cap);
+            if limit == 0 {
+                return Err(CaptureError::LimitReached(CaptureStop::EventLimit));
+            }
             let record = TypedEventRecord {
                 schema: EVENT_SCHEMA,
                 binding_sha256: &self.head.binding_sha256,
@@ -1432,6 +1638,7 @@ impl CaptureEmitter {
             serde_json::to_writer(&mut counted, &record).map_err(typed_encoding_error)?;
             let expected = counted.len + 1;
             self.check_reservation(expected, self.head.payload_count, self.head.payload_bytes)?;
+            before_encoding(expected)?;
             let mut writer = AdmittedEventBytes {
                 bytes: &mut buffer.bytes,
                 limit: limit - 1,
@@ -1449,6 +1656,67 @@ impl CaptureEmitter {
         if let Err(error) = result {
             return Err(self.reject(error));
         }
+        before_commit(&buffer.bytes)?;
+        self.commit_event(
+            &buffer.bytes,
+            self.head.payload_count,
+            self.head.payload_bytes,
+        )
+    }
+
+    /// One serialization for the private, original-budget-admitted native view.
+    /// The exact length is independently calculated from its closed Rust schema.
+    pub(super) fn event_koblitz_native_precommit(
+        &mut self,
+        payload: &super::solvers::AdmittedKoblitzNative<'_>,
+        buffer: &mut TypedEventBuffer,
+        before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
+    ) -> Result<(), CaptureError> {
+        self.ready()?;
+        buffer.bytes.clear();
+        let result = (|| {
+            let expected = payload.expected_wire_bytes();
+            let sequence = self
+                .head
+                .event_count
+                .checked_add(1)
+                .ok_or_else(|| CaptureError::Integrity("event sequence overflow".into()))?;
+            if sequence != payload.capture_sequence() {
+                return Err(CaptureError::Integrity(
+                    "admitted native capture sequence differs from head".into(),
+                ));
+            }
+            if expected == 0 || expected > buffer.limit.min(self.limits.max_event_bytes as usize) {
+                return Err(CaptureError::LimitReached(CaptureStop::EventLimit));
+            }
+            let record = TypedEventRecord {
+                schema: EVENT_SCHEMA,
+                binding_sha256: &self.head.binding_sha256,
+                sequence,
+                previous_event_sha256: &self.head.last_event_sha256,
+                event: TypedSolverEvent {
+                    kind: TypedEventKind::KoblitzM3Native,
+                    payload,
+                },
+            };
+            self.check_reservation(expected, self.head.payload_count, self.head.payload_bytes)?;
+            let mut writer = AdmittedEventBytes {
+                bytes: &mut buffer.bytes,
+                limit: expected - 1,
+            };
+            serde_json::to_writer(&mut writer, &record).map_err(typed_encoding_error)?;
+            if writer.bytes.len() != expected - 1 {
+                return Err(CaptureError::Integrity(
+                    "native encoding differs from exact admission".into(),
+                ));
+            }
+            writer.bytes.push(b'\n');
+            Ok(())
+        })();
+        if let Err(error) = result {
+            return Err(self.reject(error));
+        }
+        before_commit(&buffer.bytes)?;
         self.commit_event(
             &buffer.bytes,
             self.head.payload_count,
@@ -1755,6 +2023,143 @@ pub(super) fn verify_live_committed_prefix(
     binding: &AttemptBinding,
     limits: &CaptureLimits,
 ) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_visit(cell_dir, binding, limits, &mut |_| Ok(()))
+}
+
+/// Visit checked records while authenticating the entire committed prefix.
+/// Callback observations remain provisional until this function returns Some;
+/// later chain, watermark or payload failures invalidate every observation.
+pub(super) fn verify_live_committed_prefix_visit(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    visit: &mut impl FnMut(&[u8]) -> Result<(), String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_visit_bound(cell_dir, binding, limits, None, &mut |phase, line| {
+        if phase == RecordPhase::Authenticated {
+            visit(line)
+        } else {
+            Ok(())
+        }
+    })
+}
+
+/// Read-only replay pinned to the caller's already admitted exact head.
+/// Check before any stream read/record parse, so a larger substituted head
+/// cannot consume work or allocations outside that caller's admitted prefix.
+pub(super) fn verify_live_committed_prefix_visit_at_head(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: &CommittedHead,
+    visit: &mut impl FnMut(&[u8]) -> Result<(), String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_visit_bound(
+        cell_dir,
+        binding,
+        limits,
+        Some(expected),
+        &mut |phase, line| {
+            if phase == RecordPhase::Authenticated {
+                visit(line)
+            } else {
+                Ok(())
+            }
+        },
+    )
+}
+/// BeforeRecordDecode occurs after exact head and record-size checks, before
+/// any EventRecord allocation. No observation is accepted until full traversal.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(super) enum RecordPhase {
+    BeforeRecordDecode,
+    Authenticated,
+}
+pub(super) fn verify_live_committed_prefix_visit_at_head_preflight(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: &CommittedHead,
+    visit: &mut impl FnMut(RecordPhase, &[u8]) -> Result<(), String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_visit_bound(cell_dir, binding, limits, Some(expected), visit)
+}
+/// Optional owner-aware read callbacks. The head callback must authenticate its
+/// raw file; payload callbacks must verify exact bytes and SHA256. The traversal
+/// still enforces the admitted head and actual contiguous endpoint independently.
+pub(super) enum OwnedReplayRequest<'a> {
+    Head(&'a Path),
+    Record(RecordPhase, &'a [u8]),
+    Payload(&'a Path, &'a Artifact),
+}
+pub(super) struct VerifiedReplayPayload {
+    path: String,
+    sha256: String,
+    bytes: u64,
+}
+pub(super) enum OwnedReplayReply {
+    Head(CommittedHead),
+    Payload(VerifiedReplayPayload),
+    Done,
+}
+pub(super) fn verify_replay_payload_bytes(
+    artifact: &Artifact,
+    raw: &[u8],
+) -> Result<VerifiedReplayPayload, String> {
+    if raw.len() as u64 != artifact.bytes || super::digest(raw) != artifact.sha256 {
+        return Err("bounded payload verification mismatch".into());
+    }
+    Ok(VerifiedReplayPayload {
+        path: artifact.path.clone(),
+        sha256: artifact.sha256.clone(),
+        bytes: artifact.bytes,
+    })
+}
+pub(super) fn verify_live_committed_prefix_owned(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: &CommittedHead,
+    request: &mut impl FnMut(OwnedReplayRequest<'_>) -> Result<OwnedReplayReply, String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_owned_inner(cell_dir, binding, limits, Some(expected), request)
+}
+fn verify_live_committed_prefix_visit_bound(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: Option<&CommittedHead>,
+    visit: &mut impl FnMut(RecordPhase, &[u8]) -> Result<(), String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_owned_inner(cell_dir, binding, limits, expected, &mut |request| {
+        match request {
+            OwnedReplayRequest::Head(root) => Ok(OwnedReplayReply::Head(read_json(
+                root,
+                "committed.json",
+                limits.metadata_reserve_bytes,
+            )?)),
+            OwnedReplayRequest::Record(phase, line) => {
+                visit(phase, line)?;
+                Ok(OwnedReplayReply::Done)
+            }
+            OwnedReplayRequest::Payload(root, artifact) => {
+                storage::verify_manifest(root, std::slice::from_ref(artifact))?;
+                Ok(OwnedReplayReply::Payload(VerifiedReplayPayload {
+                    path: artifact.path.clone(),
+                    sha256: artifact.sha256.clone(),
+                    bytes: artifact.bytes,
+                }))
+            }
+        }
+    })
+}
+fn verify_live_committed_prefix_owned_inner(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: Option<&CommittedHead>,
+    request: &mut impl FnMut(OwnedReplayRequest<'_>) -> Result<OwnedReplayReply, String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
     binding.validate()?;
     limits.validate()?;
     let cell = storage::root_dir(cell_dir, false)?;
@@ -1769,7 +2174,13 @@ pub(super) fn verify_live_committed_prefix(
     if !head_path.exists() {
         return Ok(None);
     }
-    let head: CommittedHead = read_json(&live, "committed.json", limits.metadata_reserve_bytes)?;
+    let head = match request(OwnedReplayRequest::Head(&live))? {
+        OwnedReplayReply::Head(head) => head,
+        _ => return Err("owned head callback omitted head".into()),
+    };
+    if expected.is_some_and(|admitted| admitted != &head) {
+        return Err("capture head differs from admitted replay endpoint".into());
+    }
     let mut cursor = CaptureCursor::initial(binding)?;
     validate_head(&head, binding, &cursor)?;
     if head.byte_end > limits.max_stream_bytes
@@ -1799,12 +2210,30 @@ pub(super) fn verify_live_committed_prefix(
         if cursor.event_count >= head.event_count || line.len() as u64 > limits.max_event_bytes {
             return Err("committed event exceeds configured record bounds".into());
         }
+        if !matches!(
+            request(OwnedReplayRequest::Record(
+                RecordPhase::BeforeRecordDecode,
+                &line,
+            ))?,
+            OwnedReplayReply::Done
+        ) {
+            return Err("unexpected head from record callback".into());
+        }
         let (hash, payload) = check_record(
             &line,
             &binding_sha,
             cursor.event_count + 1,
             &cursor.last_event_sha256,
         )?;
+        if !matches!(
+            request(OwnedReplayRequest::Record(
+                RecordPhase::Authenticated,
+                &line,
+            ))?,
+            OwnedReplayReply::Done
+        ) {
+            return Err("unexpected head from record callback".into());
+        }
         cursor.event_count += 1;
         cursor.byte_end += line.len() as u64;
         cursor.last_event_sha256 = hash;
@@ -1836,7 +2265,16 @@ pub(super) fn verify_live_committed_prefix(
         return Err("verified prefix does not match committed watermark".into());
     }
     for (_, payload) in payloads.values() {
-        storage::verify_manifest(&live, std::slice::from_ref(payload))?;
+        match request(OwnedReplayRequest::Payload(&live, payload))? {
+            OwnedReplayReply::Payload(verified)
+                if verified.path == payload.path
+                    && verified.sha256 == payload.sha256
+                    && verified.bytes == payload.bytes =>
+            {
+                ()
+            }
+            _ => return Err("missing or mismatched bounded payload proof".into()),
+        }
     }
     Ok(Some(VerifiedLivePrefix {
         payloads: payloads.into_values().collect(),
@@ -2167,6 +2605,129 @@ pub fn verify_captured_delta(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn real_head_preparse_refusal_prevents_authenticated_visit_and_retains_raw() {
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        emitter.event(&json!({"kind":"probe","value":1})).unwrap();
+        let head = emitter.head.clone();
+        let mut raw = Vec::new();
+        let mut authenticated = 0;
+        let failed = verify_live_committed_prefix_visit_at_head_preflight(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &head,
+            &mut |phase, line| {
+                if phase == RecordPhase::BeforeRecordDecode {
+                    raw.extend_from_slice(line);
+                    return Err("fixture preparse admission refused".into());
+                }
+                authenticated += 1;
+                Ok(())
+            },
+        );
+        assert!(matches!(failed, Err(ref e) if e == "fixture preparse admission refused"));
+        assert!(!raw.is_empty());
+        assert_eq!(authenticated, 0);
+        let mut phases = Vec::new();
+        verify_live_committed_prefix_visit_at_head_preflight(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &head,
+            &mut |phase, _| {
+                phases.push(phase);
+                Ok(())
+            },
+        )
+        .unwrap()
+        .unwrap();
+        assert!(phases == [RecordPhase::BeforeRecordDecode, RecordPhase::Authenticated]);
+    }
+    #[test]
+    fn replay_head_is_bound_before_any_substituted_prefix_visit() {
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        emitter.event(&json!({"kind":"probe","value":1})).unwrap();
+        let a = emitter.head.clone();
+        let mut visited = 0;
+        verify_live_committed_prefix_visit_at_head(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &a,
+            &mut |_| {
+                visited += 1;
+                Ok(())
+            },
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(visited, 1);
+        for field in 0..5 {
+            let mut other = a.clone();
+            match field {
+                0 => other.byte_end += 1,
+                1 => other.event_count += 1,
+                2 => other.last_event_sha256 = "9".repeat(64),
+                3 => other.payload_count += 1,
+                _ => other.payload_bytes += 1,
+            }
+            let mut calls = 0;
+            let result = verify_live_committed_prefix_visit_at_head(
+                &f.cell(),
+                &binding(),
+                &limits(),
+                &other,
+                &mut |_| {
+                    calls += 1;
+                    Ok(())
+                },
+            );
+            assert!(result.is_err());
+            assert_eq!(calls, 0);
+        }
+        emitter.event(&json!({"kind":"probe","value":2})).unwrap();
+        let mut calls = 0;
+        // B is now on disk. A callback which restores A must never be reached.
+        let result = verify_live_committed_prefix_visit_at_head(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &a,
+            &mut |_| {
+                calls += 1;
+                fs::write(
+                    f.live().join("committed.json"),
+                    serde_json::to_vec(&a).unwrap(),
+                )
+                .map_err(|e| e.to_string())?;
+                Ok(())
+            },
+        );
+        assert!(result.is_err());
+        assert_eq!(calls, 0);
+        fs::write(
+            f.live().join("committed.json"),
+            serde_json::to_vec(&a).unwrap(),
+        )
+        .unwrap();
+        let mut restored = 0;
+        verify_live_committed_prefix_visit_at_head(
+            &f.cell(),
+            &binding(),
+            &limits(),
+            &a,
+            &mut |_| {
+                restored += 1;
+                Ok(())
+            },
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(restored, 1);
+    }
 
     struct Fixture(PathBuf);
     impl Fixture {
@@ -2226,6 +2787,148 @@ mod tests {
 
     fn typed_buffer(cap: u64) -> TypedEventBuffer {
         TypedEventBuffer::try_new(cap, TypedEventBuffer::requested_bytes(cap).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn second_encoding_pass_is_admitted_before_any_bytes_or_commit() {
+        for allow in [false, true] {
+            let fixture = Fixture::new();
+            let mut emitter = fixture.emitter();
+            let mut buffer = typed_buffer(1024);
+            let before = emitter.committed_event_position();
+            let previous = std::fs::read(fixture.live().join("events.jsonl")).unwrap();
+            let expected = std::cell::Cell::new(0usize);
+            let mut commits = 0;
+            let payload = serde_json::json!({"bounded":"escaping \" and newline\n"});
+            let result = emitter.event_typed_admit_encoding_with_limit(
+                TypedEventKind::OrdinaryBinaryM3Native,
+                &payload,
+                &mut buffer,
+                1024,
+                &mut |n| {
+                    assert_eq!(expected.get(), 0);
+                    assert!(n > 0 && n <= 1024);
+                    expected.set(n);
+                    if allow {
+                        Ok(())
+                    } else {
+                        Err(CaptureError::Integrity(
+                            "refused exact encoding allowance".into(),
+                        ))
+                    }
+                },
+                &mut |wire| {
+                    commits += 1;
+                    assert_eq!(wire.len(), expected.get());
+                    Ok(())
+                },
+            );
+            assert!(expected.get() > 0, "count pass must reach admission");
+            assert_eq!(result.is_ok(), allow);
+            assert_eq!(commits, usize::from(allow));
+            if allow {
+                assert_eq!(buffer.encoded_len(), expected.get());
+                assert_eq!(emitter.committed_event_count(), before.event_count + 1);
+            } else {
+                assert_eq!(buffer.encoded_len(), 0);
+                assert_eq!(emitter.committed_event_position(), before);
+                assert_eq!(
+                    std::fs::read(fixture.live().join("events.jsonl")).unwrap(),
+                    previous
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn cleared_current_encoding_does_not_relabel_previous_ack_on_ready_refusal() {
+        let fixture = Fixture::new();
+        let mut emitter = fixture.emitter();
+        let mut buffer = typed_buffer(1024);
+        let payload = serde_json::json!({"bounded":12345});
+        emitter
+            .event_typed(
+                TypedEventKind::OrdinaryBinaryM3Native,
+                &payload,
+                &mut buffer,
+            )
+            .unwrap();
+        assert!(buffer.encoded_len() > 0);
+        let previous = std::fs::read(fixture.live().join("events.jsonl")).unwrap();
+        let count = emitter.committed_event_count();
+        let position = emitter.committed_event_position();
+        assert_eq!(position.byte_end, previous.len() as u64);
+        assert_eq!(
+            position.last_event_sha256,
+            crate::ml_dataset::digest(&previous)
+        );
+        emitter.failed = true;
+        buffer.clear_encoded();
+        let mut called = false;
+        assert!(emitter
+            .event_typed_precommit_with_limit(
+                TypedEventKind::OrdinaryBinaryM3Native,
+                &payload,
+                &mut buffer,
+                1024,
+                &mut |_| {
+                    called = true;
+                    Ok(())
+                }
+            )
+            .is_err());
+        assert!(!called);
+        assert!(buffer.take_encoded().is_empty());
+        assert_eq!(emitter.committed_event_count(), count);
+        assert_eq!(emitter.committed_event_position(), position);
+        assert_eq!(
+            std::fs::read(fixture.live().join("events.jsonl")).unwrap(),
+            previous
+        );
+    }
+
+    #[test]
+    fn typed_per_event_ceiling_refuses_before_callback_and_commit() {
+        let payload = serde_json::json!({"bounded": 12345});
+        let first = Fixture::new();
+        let mut emitter = first.emitter();
+        let mut buffer = typed_buffer(1024);
+        emitter
+            .event_typed_precommit_with_limit(
+                TypedEventKind::KoblitzM3Native,
+                &payload,
+                &mut buffer,
+                1024,
+                &mut |_| Ok(()),
+            )
+            .unwrap();
+        let exact = buffer.encoded_len();
+        assert!(exact < 1024);
+        for cap in [0, exact - 1, exact] {
+            let fixture = Fixture::new();
+            let mut emitter = fixture.emitter();
+            let mut buffer = typed_buffer(1024);
+            let mut called = false;
+            let result = emitter.event_typed_precommit_with_limit(
+                TypedEventKind::KoblitzM3Native,
+                &payload,
+                &mut buffer,
+                cap,
+                &mut |_| {
+                    called = true;
+                    Ok(())
+                },
+            );
+            assert_eq!(result.is_ok(), cap == exact);
+            assert_eq!(called, cap == exact);
+            assert_eq!(emitter.committed_event_count(), u64::from(cap == exact));
+            assert_eq!(
+                std::fs::read(fixture.live().join("events.jsonl"))
+                    .unwrap()
+                    .len(),
+                if cap == exact { exact } else { 0 }
+            );
+        }
     }
 
     #[test]
@@ -2527,6 +3230,8 @@ mod tests {
             "filed_before_affected_data":true,"frozen_at":"2026-10-29T00:00:00Z"});
         let protocol_bytes = serde_json::to_vec(&protocol).unwrap();
         let plan = super::super::DatasetPlan {
+            channels: None,
+            factor_base_policies: vec![],
             schema: "crypto.ml-dataset.plan/v1".into(),
             field_sizes: vec![23],
             arities: vec![2],
@@ -2628,6 +3333,60 @@ mod tests {
                 .unwrap()
                 .ends_with(b"{torn")
         );
+    }
+
+    #[test]
+    fn owned_prefix_requires_exact_payload_proof_and_admitted_head() {
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        let payload =
+            ArtifactPayload::json("basis.json", "exposed-basis", &json!({"rows":[1,2]})).unwrap();
+        emitter.payload(&payload).unwrap();
+        let head: CommittedHead =
+            read_json(&f.live(), "committed.json", limits().metadata_reserve_bytes).unwrap();
+        for mode in 0..5 {
+            let mut payload_visits = 0;
+            let result = verify_live_committed_prefix_owned(
+                &f.cell(),
+                &binding(),
+                &limits(),
+                &head,
+                &mut |request| {
+                    match request {
+                        OwnedReplayRequest::Head(_) => {
+                            let mut observed = head.clone();
+                            if mode == 4 {
+                                observed.byte_end += 1;
+                            }
+                            Ok(OwnedReplayReply::Head(observed))
+                        }
+                        OwnedReplayRequest::Record(_, _) => Ok(OwnedReplayReply::Done),
+                        OwnedReplayRequest::Payload(root, artifact) => {
+                            payload_visits += 1;
+                            if mode == 1 {
+                                return Ok(OwnedReplayReply::Done);
+                            }
+                            let mut raw = fs::read(root.join(&artifact.path)).unwrap();
+                            if mode == 2 {
+                                raw[0] ^= 1;
+                            }
+                            let mut proof = verify_replay_payload_bytes(artifact, &raw)?;
+                            // A proof for another descriptor must not authorize this one.
+                            if mode == 3 {
+                                proof.path.push_str(".other");
+                            }
+                            Ok(OwnedReplayReply::Payload(proof))
+                        }
+                    }
+                },
+            );
+            if mode == 0 {
+                assert_eq!(result.unwrap().unwrap().payloads.len(), 1);
+            } else {
+                assert!(result.is_err(), "mode {mode} must reject");
+            }
+            assert_eq!(payload_visits, if mode == 4 { 0 } else { 1 });
+        }
     }
 
     #[test]
@@ -3197,6 +3956,52 @@ mod tests {
         }
     }
     #[test]
+    fn witness_confirmation_compares_full_bytes_across_io_boundaries() {
+        for length in [624usize, 4102] {
+            for mutation in [
+                None,
+                Some(0usize),
+                Some(length - 1),
+                Some(4096.min(length - 1)),
+                Some(length),
+                Some(length + 1),
+            ] {
+                let f = Fixture::new();
+                let mut e = f.emitter();
+                let mut b = witness_budget();
+                let mut w = e.prepare_witness(&mut b).unwrap();
+                let mut global = 0;
+                // Valid JSON bytes exercise custody only, not witness mathematics.
+                let bytes = format!("\"{}\"", "x".repeat(length - 2)).into_bytes();
+                e.publish_first_witness(&bytes, &mut w, &mut b, &mut global)
+                    .unwrap();
+                let head = fs::read(f.live().join("committed.json")).unwrap();
+                if let Some(index) = mutation {
+                    let mut changed = bytes.clone();
+                    if index < length {
+                        changed[index] ^= 1;
+                    } else if index == length {
+                        changed.pop();
+                    } else {
+                        changed.push(b' ');
+                    }
+                    fs::write(f.live().join(WITNESS_PATH), changed).unwrap();
+                }
+                let quoted = witness_confirmation_work(bytes.len()).unwrap();
+                b.set_exclusive_supply(quoted, 0).unwrap();
+                let result = e.publish_first_witness(&bytes, &mut w, &mut b, &mut global);
+                if mutation.is_some() {
+                    assert_eq!(result.unwrap_err(), WitnessError::Integrity);
+                    assert!(e.failed);
+                } else {
+                    assert_eq!(result.unwrap().commit, WitnessCommit::AlreadyCommitted);
+                }
+                assert_eq!(global, 1);
+                assert_eq!(fs::read(f.live().join("committed.json")).unwrap(), head);
+            }
+        }
+    }
+    #[test]
     fn witness_failure_prefixes_are_unacknowledged_and_restore_excludes_orphans() {
         for fault in [1, 2] {
             let f = Fixture::new();
@@ -3571,4 +4376,25 @@ mod tests {
         assert!(!g.live().join("payloads/pdp-witness.json").exists());
         assert_eq!(emitter.head.payload_count, 0);
     }
+}
+
+#[cfg(test)]
+pub(super) fn native_single_pass_reference_wire<T: serde::Serialize + ?Sized>(
+    sequence: u64,
+    payload: &T,
+) -> Vec<u8> {
+    let digest = "f".repeat(64);
+    let record = TypedEventRecord {
+        schema: EVENT_SCHEMA,
+        binding_sha256: &digest,
+        sequence,
+        previous_event_sha256: &digest,
+        event: TypedSolverEvent {
+            kind: TypedEventKind::KoblitzM3Native,
+            payload,
+        },
+    };
+    let mut bytes = serde_json::to_vec(&record).unwrap();
+    bytes.push(b'\n');
+    bytes
 }

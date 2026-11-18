@@ -1,0 +1,46 @@
+{
+  "schema": "pencil.production-build-source-check/v1",
+  "task": "T-2179",
+  "recorded_utc": "2026-11-11T02:55:03.020587+00:00",
+  "parent_manifest_sha256": "7d41b20ea9fb755c659f5775c96b9911c8995592bc5a29f6bdb71b14e81a7628",
+  "source_archive_sha256": "3f1c7e0647242589507e6afa82d2125ba66325891157f1ee4230143842a76464",
+  "source_manifest_sha256": "4210f7425d1042296f17a635a523f3bd3cd11ade343f6af46700ab813b4ceb0a",
+  "source_files": 4500,
+  "archive_members": 106,
+  "source_inputs_unchanged": true,
+  "mode_inventory_sha256": "c432da2dff731eaf5cd58593ef3267500c64bc13e53f25e57f22184b990bf241",
+  "production_binaries": {
+    "ecbench": "src/bin/ecbench.rs",
+    "ecbench_retained_attempt_export_v4": "src/bin/ecbench_retained_attempt_export_v4.rs"
+  },
+  "compiler_command": [
+    "cargo",
+    "build",
+    "--release",
+    "--locked",
+    "--offline",
+    "--bin",
+    "ecbench",
+    "--bin",
+    "ecbench_retained_attempt_export_v4",
+    "--message-format=json"
+  ],
+  "native_programs_invoked": false,
+  "python_check": "ast.parse only",
+  "fresh_workspace_and_output_absent": true,
+  "prerequisite_controls": 11,
+  "admission_released": false,
+  "current_accounting_unset": true,
+  "runtime_execution": false,
+  "changes": [
+    "freshruntimeidentities",
+    "twobinCargo buildcommand and Cargoartifactselection",
+    "prerequisiteactualqualificationreceipts",
+    "postbuildELF custody and buildinforeceipt withoutbinaryexecution"
+  ],
+  "pending": [
+    "independentsource review",
+    "actualpassed qualification receipts",
+    "currentledger/livelease/publication/finalrelease"
+  ]
+}

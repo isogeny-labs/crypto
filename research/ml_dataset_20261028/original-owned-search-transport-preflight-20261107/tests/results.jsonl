@@ -1,0 +1,10 @@
+{"case":"valid_relocated_fixture","passed":true,"exit_code":0}
+{"case":"stale_bound_source","passed":true,"expected_rejection_stage":"source_bindings","exit_code":1}
+{"case":"tampered_patch_without_rehash","passed":true,"expected_rejection_stage":"proposal_files","exit_code":1}
+{"case":"rehashed_wrong_patch_destination","passed":true,"expected_rejection_stage":"worker_patch_paths","exit_code":1}
+{"case":"rehashed_destination_content_mismatch","passed":true,"expected_rejection_stage":"patched_worker_equivalence","exit_code":1}
+{"case":"rehashed_donor_body_change","passed":true,"expected_rejection_stage":"donor_equivalence","exit_code":1}
+{"case":"rehashed_stale_registration_context","passed":true,"expected_rejection_stage":"registration_patch_apply","exit_code":1}
+{"case":"bound_symlink","passed":true,"expected_rejection_stage":"source_bindings","exit_code":1}
+{"case":"bound_size_mismatch","passed":true,"expected_rejection_stage":"source_bindings","exit_code":1}
+{"case":"existing_output_refused_receipt_unchanged","passed":true}

@@ -1,0 +1,1 @@
+One bounded combined v8 invocation. Published source, independent monitor review, additive provenance erratum, exact current accounting and live owner are pinned. No automatic retry. Existing 1800/600-second phase limits and noon UTC deadline remain. [pcc:unverified]

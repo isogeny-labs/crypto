@@ -1,0 +1,33 @@
+{
+  "schema": "galois-character-pairing-report-correction/v1",
+  "at": "2026-11-15T01:10:02.142962+00:00",
+  "claim": "PCC-20261115-4711ad",
+  "correction": "The final06 build and gate PASS retain two unused-section-variable advisories. Prior advisory-free wording in README/preflight/report/living maps/session log/PR was incorrect. No proof or declaration changed.",
+  "actual_advisories": [
+    {
+      "source": "GaloisCharacters.lean",
+      "line": 109,
+      "declaration": "GaloisCharacterPairingAudit.galoisCharacterEquiv_value",
+      "unused": [
+        "TopologicalSpace M",
+        "DiscreteTopology M"
+      ]
+    },
+    {
+      "source": "CharTwoGaloisControl.lean",
+      "line": 54,
+      "declaration": "GaloisCharacterPairingAudit.two_characters_trivial",
+      "unused": [
+        "Fintype K"
+      ]
+    }
+  ],
+  "preserved_evidence": "Frozen attempts.tar.xz and gate.tar.gz already retain complete build06/gate logs containing both warnings.",
+  "gate_declarations": 73,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "local_replay": "pass",
+  "signed_standing": "unverified",
+  "issued_proofs_and_artifacts_unchanged": true,
+  "metadata_outside_frozen_pinsets": true
+}

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T08:00:31Z",
+ "id": "PCC-20261116-739945",
+ "kind": "theorem",
+ "producer": {
+  "commit": "2d54889ac1032d59fe8b5410ad26ff705cec5bd7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "431fb00ce3665d7c1a2fb748272f73adecfa8ef7b0333f654b053adc6e49c015",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+   "theorem": "CubicNormDescent.norm_of_constant_square"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact stated generic CommRing or canonical Fin223 arithmetic; original natural/modular square model only. Field/Jacobian/geometry/native word execution/cost correspondence separate. Immutable source, original dual-gate15/0 data pcc/claims/PCC-20261116-26ec43.json; unsigned until original standing.",
+ "statement": "theorem norm_of_constant_square {R : Type} [CommRing R] (d a b c D : R) (h0 : square0 d a b c = D) (h1 : square1 d a b c = 0) (h2 : square2 a b c = 0) : (norm d a b c)^2 = D^3"
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "profile/v1",
+  "kind": "probe",
+  "host": {
+    "hostname": "35a4e2c25725",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "cpu_features": [
+      "adx",
+      "aes",
+      "avx2",
+      "avx512f",
+      "avx512ifma",
+      "bmi2",
+      "gfni",
+      "pclmulqdq",
+      "popcnt",
+      "sha_ni",
+      "vpclmulqdq"
+    ],
+    "kernel": "6.18.55",
+    "arch": "x86_64",
+    "logical_cpus": 5,
+    "mem_kib": 18440112,
+    "event_sources": [
+      "breakpoint",
+      "msr",
+      "software"
+    ],
+    "hardware_pmu": false,
+    "perf_event_paranoid": "2",
+    "kptr_restrict": "0",
+    "gpus": []
+  },
+  "tools": {
+    "valgrind": {
+      "path": "/workspace/.cas/valgrind/usr/bin/valgrind",
+      "version": "valgrind-3.24.0"
+    }
+  },
+  "capabilities": {
+    "cpu_sampling_software": null,
+    "cpu_hardware_counters": null,
+    "cpu_sampling": "none",
+    "callgrind": true,
+    "topdown": false,
+    "gpu_present": false,
+    "ncu": false,
+    "nsys": false,
+    "nvcc": false,
+    "nvidia_profiling_admin_only": null,
+    "ncu_control_kernel": null,
+    "inferno_flamegraph": false
+  }
+}

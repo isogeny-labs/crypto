@@ -1,0 +1,1765 @@
+{
+  "accounting_diagnostic_only": true,
+  "allows_new_frozen_comparison": false,
+  "attempted_executions": 2,
+  "comparative_eligibility": false,
+  "completed_executions": 2,
+  "full_recovery_validation_passed": true,
+  "global_problems": [],
+  "in_flight_without_completion": null,
+  "observed_process_exit": 0,
+  "outcomes": [
+    {
+      "arm": "ic_a",
+      "child_exit": 0,
+      "completed": true,
+      "component_accounting": {
+        "complete": false,
+        "component_totals": {
+          "filter": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "mapping": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "original_solve": {
+            "diagnostic_priced_bitops": "358540916026",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8651238,
+              "modr_inv": 1041,
+              "modr_mul": 8652797,
+              "rng_words": 570,
+              "word_op": 17580259
+            }
+          },
+          "output": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "projected_solve": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "replay": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        },
+        "diagnostic_component_bitops": "358540916026",
+        "known_uncounted": "native bookkeeping remains incomplete",
+        "observed_component_primitives": {
+          "field_add": 0,
+          "field_inv": 0,
+          "field_mul": 0,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 8651238,
+          "modr_inv": 1041,
+          "modr_mul": 8652797,
+          "rng_words": 570,
+          "word_op": 17580259
+        },
+        "projection_calls": [],
+        "schema": "cover.graph.checked-subtotals/v1",
+        "solve_calls": [
+          {
+            "attempt": 1,
+            "columns": 520,
+            "complete": false,
+            "diagnostic_priced_bitops": "358540916026",
+            "kind": "original",
+            "known_uncounted": "solver native bookkeeping remains incomplete",
+            "marker": "counted:cover_solve_subtotals",
+            "nonzeros": 4676,
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8651238,
+              "modr_inv": 1041,
+              "modr_mul": 8652797,
+              "rng_words": 570,
+              "word_op": 17580259
+            },
+            "returned_solution": true,
+            "rows": 520,
+            "schema": "cover.sieve.solve-work/v1"
+          }
+        ],
+        "unallocated_linear_algebra": {
+          "diagnostic_priced_bitops": "10402880",
+          "primitives": {
+            "field_add": 0,
+            "field_inv": 0,
+            "field_mul": 0,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 162545
+          }
+        }
+      },
+      "endpoint_valid": true,
+      "nontrivial_graph_without_fallback": false,
+      "p": 1009,
+      "progress_path": "/workspace/ic-local-runs/local-cover-uniform-draws-validation-20261116-27/progress-p1009-s281-validation-0-ic_a.stderr",
+      "recorded_outer_wall_ns": 30707448586,
+      "recovered_scalar": 119700578327681984,
+      "seed": 281,
+      "work": {
+        "base": 519,
+        "base_muls": 532400,
+        "base_steps": 79524813,
+        "bits": 57.87226275634125,
+        "bs": 297300,
+        "c_add_e": 331.0,
+        "c_add_j": 2122.0,
+        "c_rel": 2372234.36121673,
+        "correct": false,
+        "descent_c_cov": 916676.7595108696,
+        "descent_digest": 14018017261607818173,
+        "descent_f4_muls": 2097836646,
+        "descent_f4_native_ops": 133387935,
+        "descent_hilbert": 0,
+        "descent_hilbert_applied": 0,
+        "descent_hilbert_fallbacks": 0,
+        "descent_incomplete": 0,
+        "descent_lin_fallback": 1,
+        "descent_lin_muls": 587832874,
+        "descent_muls": 2704952566,
+        "descent_over_rho": 0.015910658585499005,
+        "descent_post_muls": 4989740,
+        "descent_rejected": 0,
+        "descent_replayed": 0,
+        "descent_residuals": 2944,
+        "descent_stopped": 2944,
+        "descent_stream_muls": 6247158,
+        "descent_successes": 2,
+        "descent_tests_per_success": 1472.0,
+        "descent_timed_out": 0,
+        "descent_trace_mismatches": 0,
+        "descent_verify_muls": 9028,
+        "descent_weil_muls": 8037120,
+        "duplicates": 0,
+        "enum_adds": 82643750,
+        "enum_lookups": 79066810,
+        "enum_muls": 734375389,
+        "estimate_by_m": [
+          [
+            9,
+            1273.8637512400794
+          ],
+          [
+            10,
+            128660.23887524802
+          ],
+          [
+            11,
+            11789968.015693191
+          ],
+          [
+            12,
+            992322307.9875104
+          ],
+          [
+            13,
+            76943220688.365
+          ]
+        ],
+        "exhausted": false,
+        "expected_rels_per_line": 0.002780533509700177,
+        "extract_muls": 3623557,
+        "false_hits": 0,
+        "filtered_out": 8,
+        "hits": 526,
+        "inc_hinted_bs": 297005,
+        "l": 263807420003882441,
+        "la_attempts": 1,
+        "la_muls": 138428112,
+        "la_ops": 8651757,
+        "la_ops_last": 8651757,
+        "la_over_rho": 0.0008142406844213836,
+        "lin_mode": "fast",
+        "lines": 153227,
+        "m_final": 9,
+        "m_rule": 9,
+        "margin": 1.25,
+        "p": 1009,
+        "per_m": [
+          [
+            9,
+            297300,
+            153227,
+            526,
+            526
+          ]
+        ],
+        "rate_ratio": 1.2345887411399563,
+        "relation_muls": 1247795274,
+        "relation_over_rho": 0.007348271408762403,
+        "relations": 526,
+        "relations_available": 2830.808336089065,
+        "rels_failed_verify": 0,
+        "rels_per_line": 0.0034328153654382063,
+        "rels_verified": 526,
+        "rho": [],
+        "rho_s_mean": 1.0,
+        "rho_s_sd": 0.0,
+        "roots": 158735428,
+        "row_weight": 9.0,
+        "s": 0.024073170678682792,
+        "s_over_rho": 0.024073170678682792,
+        "s_plus": 0.040415519287990045,
+        "s_plus_over_rho": 0.040415519287990045,
+        "seed": 281,
+        "setup_muls": 943404,
+        "shared_bs": 24174,
+        "sieve_adds": 2379659485,
+        "sieve_lookups": 158735428,
+        "sieve_muls": 506616848,
+        "sieve_shared_reads": 78238212,
+        "sieve_steps": 154606043,
+        "solved": true,
+        "table_muls": 28023,
+        "total_muls": 4092651756,
+        "total_plus": 6870995441,
+        "trace": false,
+        "unknowns": 520,
+        "verify_muls": 3151457,
+        "wall_ms": 30696.899269,
+        "work_native": [
+          {
+            "attempt": 1,
+            "columns": 520,
+            "complete": false,
+            "kind": "original",
+            "known_uncounted": "solver native bookkeeping remains incomplete",
+            "marker": "counted:cover_solve_subtotals",
+            "nonzeros": 4676,
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8651238,
+              "modr_inv": 1041,
+              "modr_mul": 8652797,
+              "rng_words": 570,
+              "word_op": 17580259
+            },
+            "returned_solution": true,
+            "rows": 520,
+            "schema": "cover.sieve.solve-work/v1"
+          }
+        ]
+      },
+      "work_native": {
+        "comparison_eligible": false,
+        "complete": false,
+        "counted_items": [
+          "counted:modular_la_native_scans",
+          "counted:cover_residual_scalar_additions",
+          "counted:selected_modular_uniform_draws"
+        ],
+        "diagnostic_priced_bitops": "5195553785652",
+        "excluded": "public domain validation; instance construction; control, allocation and memory under bitop/v1",
+        "foreign_hook_calls": 0,
+        "known_uncounted": [
+          {
+            "count": null,
+            "name": "graph_maps_sets_normalization_scheduling_and_replay_bookkeeping",
+            "status": "coverage_or_emission_pending"
+          },
+          {
+            "count": null,
+            "name": "cover_scalar_rng_and_native_bookkeeping_audit",
+            "status": "coverage_or_emission_pending"
+          },
+          {
+            "count": null,
+            "name": "rng_internal_work",
+            "status": "coverage_or_emission_pending"
+          }
+        ],
+        "observed_primitives": {
+          "field_add": 5394059466,
+          "field_inv": 9421383,
+          "field_mul": 3230110149,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 171500557,
+          "legendre": 0,
+          "modr_add": 8657126,
+          "modr_inv": 1041,
+          "modr_mul": 8652797,
+          "rng_words": 2618,
+          "word_op": 2070542730
+        },
+        "operand_rechecks": "included where inseparable from existing hooks",
+        "other_modulus_ops": 0,
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "unattributed",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "transport",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "548759940",
+            "phase": "model",
+            "primitives": {
+              "field_add": 344488,
+              "field_inv": 1555,
+              "field_mul": 406450,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "685221008",
+            "phase": "factor_base",
+            "primitives": {
+              "field_add": 231180,
+              "field_inv": 0,
+              "field_mul": 532400,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 519,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 2044,
+              "word_op": 4607
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "1886268683460",
+            "phase": "relations",
+            "primitives": {
+              "field_add": 3279469961,
+              "field_inv": 8103068,
+              "field_mul": 1111273391,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 6312,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 1125048255
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "2949415504888",
+            "phase": "descent",
+            "primitives": {
+              "field_add": 2113956637,
+              "field_inv": 1316602,
+              "field_mul": 2117835753,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 171493726,
+              "legendre": 0,
+              "modr_add": 5888,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 4,
+              "word_op": 927747064
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "358551318906",
+            "phase": "linear_algebra",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8651238,
+              "modr_inv": 1041,
+              "modr_mul": 8652797,
+              "rng_words": 570,
+              "word_op": 17742804
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "84297450",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 57200,
+              "field_inv": 158,
+              "field_mul": 62155,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        ],
+        "pricing": "executed modular hooks and observed native events",
+        "schema": "cover.graph.accounting-diagnostic/v1",
+        "total_bitops": null,
+        "uniform_sampling": {
+          "complete": false,
+          "phases": [
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "unattributed"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "walk"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "transport"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "model"
+            },
+            {
+              "events": {
+                "calls": 2016,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "50224384",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 2016,
+                  "integer_mul64": 2044
+                },
+                "raw_draws": 2044,
+                "rejections": 28,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 2016,
+                  "integer_shl64": 2016,
+                  "integer_sub64": 4032
+                }
+              },
+              "phase": "factor_base"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "relations"
+            },
+            {
+              "events": {
+                "calls": 4,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "98304",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 4,
+                  "integer_mul64": 4
+                },
+                "raw_draws": 4,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 4,
+                  "integer_shl64": 4,
+                  "integer_sub64": 8
+                }
+              },
+              "phase": "descent"
+            },
+            {
+              "events": {
+                "calls": 520,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "13992320",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 520,
+                  "integer_mul64": 570
+                },
+                "raw_draws": 570,
+                "rejections": 50,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 520,
+                  "integer_shl64": 520,
+                  "integer_sub64": 1040
+                }
+              },
+              "phase": "linear_algebra"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "verification"
+            }
+          ],
+          "schema": "cover.uniform-sampling-diagnostic/v1",
+          "scope": "selected Fq-coordinate, Wiedemann-vector and initial cover-label samplers; generator and other paths remain incomplete",
+          "total": {
+            "calls": 2540,
+            "complete": false,
+            "generator_internal_work": "not counted; other sampling paths still require coverage",
+            "known_native_priced_bitops": "64315008",
+            "other_modulus_calls": 0,
+            "priced_native": {
+              "integer_add64": 2540,
+              "integer_mul64": 2618
+            },
+            "raw_draws": 2618,
+            "rejections": 78,
+            "schema": "modular-uniform-events/v1",
+            "unpriced_native": {
+              "integer_clz64": 2540,
+              "integer_shl64": 2540,
+              "integer_sub64": 5080
+            }
+          }
+        },
+        "unit": "bitop/v1",
+        "widths": {
+          "field_bits": 10,
+          "r_bits": 58
+        }
+      }
+    },
+    {
+      "arm": "graph_a",
+      "child_exit": 0,
+      "completed": true,
+      "component_accounting": {
+        "complete": false,
+        "component_totals": {
+          "filter": {
+            "diagnostic_priced_bitops": "819366220",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8760,
+              "modr_inv": 1110,
+              "modr_mul": 17354,
+              "rng_words": 0,
+              "word_op": 189223
+            }
+          },
+          "mapping": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "original_solve": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "output": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "projected_solve": {
+            "diagnostic_priced_bitops": "677603257878",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 16354709,
+              "modr_inv": 781,
+              "modr_mul": 16355878,
+              "rng_words": 431,
+              "word_op": 32867063
+            }
+          },
+          "replay": {
+            "diagnostic_priced_bitops": "892622576",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 21394,
+              "modr_inv": 0,
+              "modr_mul": 21162,
+              "rng_words": 0,
+              "word_op": 289714
+            }
+          }
+        },
+        "diagnostic_component_bitops": "679315246674",
+        "known_uncounted": "native bookkeeping remains incomplete",
+        "observed_component_primitives": {
+          "field_add": 0,
+          "field_inv": 0,
+          "field_mul": 0,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 16384863,
+          "modr_inv": 1891,
+          "modr_mul": 16394394,
+          "rng_words": 431,
+          "word_op": 33346000
+        },
+        "projection_calls": [
+          {
+            "accepted": true,
+            "call_index": 1,
+            "candidate_nonzeros": 13317,
+            "candidate_rows": 390,
+            "complete": false,
+            "input_nonzeros": 4676,
+            "input_rows": 520,
+            "known_uncounted": "graph native bookkeeping remains incomplete",
+            "marker": "counted:graph_projection_subtotals",
+            "schema": "cover.graph.projection-work/v1",
+            "stages": [
+              {
+                "diagnostic_priced_bitops": "0",
+                "primitives": {
+                  "field_add": 0,
+                  "field_inv": 0,
+                  "field_mul": 0,
+                  "field_sqr": 0,
+                  "field_sqrt": 0,
+                  "hash_probe": 0,
+                  "legendre": 0,
+                  "modr_add": 0,
+                  "modr_inv": 0,
+                  "modr_mul": 0,
+                  "rng_words": 0,
+                  "word_op": 0
+                },
+                "stage": "mapping"
+              },
+              {
+                "diagnostic_priced_bitops": "819366220",
+                "primitives": {
+                  "field_add": 0,
+                  "field_inv": 0,
+                  "field_mul": 0,
+                  "field_sqr": 0,
+                  "field_sqrt": 0,
+                  "hash_probe": 0,
+                  "legendre": 0,
+                  "modr_add": 8760,
+                  "modr_inv": 1110,
+                  "modr_mul": 17354,
+                  "rng_words": 0,
+                  "word_op": 189223
+                },
+                "stage": "filter"
+              },
+              {
+                "diagnostic_priced_bitops": "892622576",
+                "primitives": {
+                  "field_add": 0,
+                  "field_inv": 0,
+                  "field_mul": 0,
+                  "field_sqr": 0,
+                  "field_sqrt": 0,
+                  "hash_probe": 0,
+                  "legendre": 0,
+                  "modr_add": 21394,
+                  "modr_inv": 0,
+                  "modr_mul": 21162,
+                  "rng_words": 0,
+                  "word_op": 289714
+                },
+                "stage": "replay"
+              },
+              {
+                "diagnostic_priced_bitops": "0",
+                "primitives": {
+                  "field_add": 0,
+                  "field_inv": 0,
+                  "field_mul": 0,
+                  "field_sqr": 0,
+                  "field_sqrt": 0,
+                  "hash_probe": 0,
+                  "legendre": 0,
+                  "modr_add": 0,
+                  "modr_inv": 0,
+                  "modr_mul": 0,
+                  "rng_words": 0,
+                  "word_op": 0
+                },
+                "stage": "output"
+              }
+            ]
+          }
+        ],
+        "schema": "cover.graph.checked-subtotals/v1",
+        "solve_calls": [
+          {
+            "attempt": 1,
+            "columns": 390,
+            "complete": false,
+            "diagnostic_priced_bitops": "677603257878",
+            "kind": "projected",
+            "known_uncounted": "solver native bookkeeping remains incomplete",
+            "marker": "counted:cover_solve_subtotals",
+            "nonzeros": 13317,
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 16354709,
+              "modr_inv": 781,
+              "modr_mul": 16355878,
+              "rng_words": 431,
+              "word_op": 32867063
+            },
+            "returned_solution": true,
+            "rows": 390,
+            "schema": "cover.sieve.solve-work/v1"
+          }
+        ],
+        "unallocated_linear_algebra": {
+          "diagnostic_priced_bitops": "10402880",
+          "primitives": {
+            "field_add": 0,
+            "field_inv": 0,
+            "field_mul": 0,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 162545
+          }
+        }
+      },
+      "endpoint_valid": true,
+      "nontrivial_graph_without_fallback": true,
+      "p": 1009,
+      "progress_path": "/workspace/ic-local-runs/local-cover-uniform-draws-validation-20261116-27/progress-p1009-s281-validation-0-graph_a.stderr",
+      "recorded_outer_wall_ns": 29286309450,
+      "recovered_scalar": 119700578327681984,
+      "seed": 281,
+      "work": {
+        "base": 519,
+        "base_muls": 532400,
+        "base_steps": 79524813,
+        "bits": 57.87226275634125,
+        "bs": 297300,
+        "c_add_e": 331.0,
+        "c_add_j": 2122.0,
+        "c_rel": 2372234.36121673,
+        "correct": false,
+        "descent_c_cov": 916676.7595108696,
+        "descent_digest": 14018017261607818173,
+        "descent_f4_muls": 2097836646,
+        "descent_f4_native_ops": 133387935,
+        "descent_hilbert": 0,
+        "descent_hilbert_applied": 0,
+        "descent_hilbert_fallbacks": 0,
+        "descent_incomplete": 0,
+        "descent_lin_fallback": 1,
+        "descent_lin_muls": 587832874,
+        "descent_muls": 2704952566,
+        "descent_over_rho": 0.015910658585499005,
+        "descent_post_muls": 4989740,
+        "descent_rejected": 0,
+        "descent_replayed": 0,
+        "descent_residuals": 2944,
+        "descent_stopped": 2944,
+        "descent_stream_muls": 6247158,
+        "descent_successes": 2,
+        "descent_tests_per_success": 1472.0,
+        "descent_timed_out": 0,
+        "descent_trace_mismatches": 0,
+        "descent_verify_muls": 9028,
+        "descent_weil_muls": 8037120,
+        "duplicates": 0,
+        "enum_adds": 82643750,
+        "enum_lookups": 79066810,
+        "enum_muls": 734375389,
+        "estimate_by_m": [
+          [
+            9,
+            1273.8637512400794
+          ],
+          [
+            10,
+            128660.23887524802
+          ],
+          [
+            11,
+            11789968.015693191
+          ],
+          [
+            12,
+            992322307.9875104
+          ],
+          [
+            13,
+            76943220688.365
+          ]
+        ],
+        "exhausted": false,
+        "expected_rels_per_line": 0.002780533509700177,
+        "extract_muls": 3623557,
+        "false_hits": 0,
+        "filtered_out": 8,
+        "graph_filter": {
+          "calls": 1,
+          "counter_scope": "complete wall includes graph mapping/filter/replay/drop; legacy la_ops/la_muls/total_muls omit graph modular and native work",
+          "fallback_solves": 0,
+          "filter_call_wall_ns": 6744248,
+          "input_digest": "da048c730cb84caf06935d9914ad2203d8c4ae5af403b7361a44602cfeea0190",
+          "input_rows": 520,
+          "last_report": {
+            "complete_relations": 390,
+            "core_large_vertices": 129,
+            "core_relations": 491,
+            "cycles_closed": 362,
+            "duplicate_relations": 0,
+            "input_large_vertices": 130,
+            "input_relations": 520,
+            "merges": 1110,
+            "peeled_relations": 1,
+            "pivots": 129,
+            "rejected_fill": 0
+          },
+          "output_rows": 390,
+          "projected": 1,
+          "refusals": 0,
+          "replayed_rows": 390,
+          "work_native": [
+            {
+              "accepted": true,
+              "call_index": 1,
+              "candidate_nonzeros": 13317,
+              "candidate_rows": 390,
+              "complete": false,
+              "input_nonzeros": 4676,
+              "input_rows": 520,
+              "known_uncounted": "graph native bookkeeping remains incomplete",
+              "marker": "counted:graph_projection_subtotals",
+              "schema": "cover.graph.projection-work/v1",
+              "stages": [
+                {
+                  "primitives": {
+                    "field_add": 0,
+                    "field_inv": 0,
+                    "field_mul": 0,
+                    "field_sqr": 0,
+                    "field_sqrt": 0,
+                    "hash_probe": 0,
+                    "legendre": 0,
+                    "modr_add": 0,
+                    "modr_inv": 0,
+                    "modr_mul": 0,
+                    "rng_words": 0,
+                    "word_op": 0
+                  },
+                  "stage": "mapping"
+                },
+                {
+                  "primitives": {
+                    "field_add": 0,
+                    "field_inv": 0,
+                    "field_mul": 0,
+                    "field_sqr": 0,
+                    "field_sqrt": 0,
+                    "hash_probe": 0,
+                    "legendre": 0,
+                    "modr_add": 8760,
+                    "modr_inv": 1110,
+                    "modr_mul": 17354,
+                    "rng_words": 0,
+                    "word_op": 189223
+                  },
+                  "stage": "filter"
+                },
+                {
+                  "primitives": {
+                    "field_add": 0,
+                    "field_inv": 0,
+                    "field_mul": 0,
+                    "field_sqr": 0,
+                    "field_sqrt": 0,
+                    "hash_probe": 0,
+                    "legendre": 0,
+                    "modr_add": 21394,
+                    "modr_inv": 0,
+                    "modr_mul": 21162,
+                    "rng_words": 0,
+                    "word_op": 289714
+                  },
+                  "stage": "replay"
+                },
+                {
+                  "primitives": {
+                    "field_add": 0,
+                    "field_inv": 0,
+                    "field_mul": 0,
+                    "field_sqr": 0,
+                    "field_sqrt": 0,
+                    "hash_probe": 0,
+                    "legendre": 0,
+                    "modr_add": 0,
+                    "modr_inv": 0,
+                    "modr_mul": 0,
+                    "rng_words": 0,
+                    "word_op": 0
+                  },
+                  "stage": "output"
+                }
+              ]
+            }
+          ]
+        },
+        "hits": 526,
+        "inc_hinted_bs": 297005,
+        "l": 263807420003882441,
+        "la_attempts": 1,
+        "la_muls": 261681568,
+        "la_ops": 16355098,
+        "la_ops_last": 16355098,
+        "la_over_rho": 0.00153922332646407,
+        "lin_mode": "fast",
+        "lines": 153227,
+        "m_final": 9,
+        "m_rule": 9,
+        "margin": 1.25,
+        "p": 1009,
+        "per_m": [
+          [
+            9,
+            297300,
+            153227,
+            526,
+            526
+          ]
+        ],
+        "rate_ratio": 1.2345887411399563,
+        "relation_muls": 1247795274,
+        "relation_over_rho": 0.007348271408762403,
+        "relations": 526,
+        "relations_available": 2830.808336089065,
+        "rels_failed_verify": 0,
+        "rels_per_line": 0.0034328153654382063,
+        "rels_verified": 526,
+        "rho": [],
+        "rho_s_mean": 1.0,
+        "rho_s_sd": 0.0,
+        "roots": 158735428,
+        "row_weight": 9.0,
+        "s": 0.024798153320725477,
+        "s_over_rho": 0.024798153320725477,
+        "s_plus": 0.041140501930032734,
+        "s_plus_over_rho": 0.041140501930032734,
+        "seed": 281,
+        "setup_muls": 943404,
+        "shared_bs": 24174,
+        "sieve_adds": 2379659485,
+        "sieve_lookups": 158735428,
+        "sieve_muls": 506616848,
+        "sieve_shared_reads": 78238212,
+        "sieve_steps": 154606043,
+        "solved": true,
+        "table_muls": 28023,
+        "total_muls": 4215905212,
+        "total_plus": 6994248897,
+        "trace": false,
+        "unknowns": 520,
+        "verify_muls": 3151457,
+        "wall_ms": 29276.3512,
+        "work_native": [
+          {
+            "attempt": 1,
+            "columns": 390,
+            "complete": false,
+            "kind": "projected",
+            "known_uncounted": "solver native bookkeeping remains incomplete",
+            "marker": "counted:cover_solve_subtotals",
+            "nonzeros": 13317,
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 16354709,
+              "modr_inv": 781,
+              "modr_mul": 16355878,
+              "rng_words": 431,
+              "word_op": 32867063
+            },
+            "returned_solution": true,
+            "rows": 390,
+            "schema": "cover.sieve.solve-work/v1"
+          }
+        ]
+      },
+      "work_native": {
+        "comparison_eligible": false,
+        "complete": false,
+        "counted_items": [
+          "counted:modular_la_native_scans",
+          "counted:cover_residual_scalar_additions",
+          "counted:selected_modular_uniform_draws"
+        ],
+        "diagnostic_priced_bitops": "5516328116300",
+        "excluded": "public domain validation; instance construction; control, allocation and memory under bitop/v1",
+        "foreign_hook_calls": 0,
+        "known_uncounted": [
+          {
+            "count": null,
+            "name": "graph_maps_sets_normalization_scheduling_and_replay_bookkeeping",
+            "status": "coverage_or_emission_pending"
+          },
+          {
+            "count": null,
+            "name": "cover_scalar_rng_and_native_bookkeeping_audit",
+            "status": "coverage_or_emission_pending"
+          },
+          {
+            "count": null,
+            "name": "rng_internal_work",
+            "status": "coverage_or_emission_pending"
+          }
+        ],
+        "observed_primitives": {
+          "field_add": 5394059466,
+          "field_inv": 9421383,
+          "field_mul": 3230110149,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 171500557,
+          "legendre": 0,
+          "modr_add": 16390751,
+          "modr_inv": 1891,
+          "modr_mul": 16394394,
+          "rng_words": 2479,
+          "word_op": 2086308471
+        },
+        "operand_rechecks": "included where inseparable from existing hooks",
+        "other_modulus_ops": 0,
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "unattributed",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "transport",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "548759940",
+            "phase": "model",
+            "primitives": {
+              "field_add": 344488,
+              "field_inv": 1555,
+              "field_mul": 406450,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "685221008",
+            "phase": "factor_base",
+            "primitives": {
+              "field_add": 231180,
+              "field_inv": 0,
+              "field_mul": 532400,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 519,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 2044,
+              "word_op": 4607
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "1886268683460",
+            "phase": "relations",
+            "primitives": {
+              "field_add": 3279469961,
+              "field_inv": 8103068,
+              "field_mul": 1111273391,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 6312,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 1125048255
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "2949415504888",
+            "phase": "descent",
+            "primitives": {
+              "field_add": 2113956637,
+              "field_inv": 1316602,
+              "field_mul": 2117835753,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 171493726,
+              "legendre": 0,
+              "modr_add": 5888,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 4,
+              "word_op": 927747064
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "679325649554",
+            "phase": "linear_algebra",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 16384863,
+              "modr_inv": 1891,
+              "modr_mul": 16394394,
+              "rng_words": 431,
+              "word_op": 33508545
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "84297450",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 57200,
+              "field_inv": 158,
+              "field_mul": 62155,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        ],
+        "pricing": "executed modular hooks and observed native events",
+        "schema": "cover.graph.accounting-diagnostic/v1",
+        "total_bitops": null,
+        "uniform_sampling": {
+          "complete": false,
+          "phases": [
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "unattributed"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "walk"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "transport"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "model"
+            },
+            {
+              "events": {
+                "calls": 2016,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "50224384",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 2016,
+                  "integer_mul64": 2044
+                },
+                "raw_draws": 2044,
+                "rejections": 28,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 2016,
+                  "integer_shl64": 2016,
+                  "integer_sub64": 4032
+                }
+              },
+              "phase": "factor_base"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "relations"
+            },
+            {
+              "events": {
+                "calls": 4,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "98304",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 4,
+                  "integer_mul64": 4
+                },
+                "raw_draws": 4,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 4,
+                  "integer_shl64": 4,
+                  "integer_sub64": 8
+                }
+              },
+              "phase": "descent"
+            },
+            {
+              "events": {
+                "calls": 390,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "10579136",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 390,
+                  "integer_mul64": 431
+                },
+                "raw_draws": 431,
+                "rejections": 41,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 390,
+                  "integer_shl64": 390,
+                  "integer_sub64": 780
+                }
+              },
+              "phase": "linear_algebra"
+            },
+            {
+              "events": {
+                "calls": 0,
+                "complete": false,
+                "generator_internal_work": "not counted; other sampling paths still require coverage",
+                "known_native_priced_bitops": "0",
+                "other_modulus_calls": 0,
+                "priced_native": {
+                  "integer_add64": 0,
+                  "integer_mul64": 0
+                },
+                "raw_draws": 0,
+                "rejections": 0,
+                "schema": "modular-uniform-events/v1",
+                "unpriced_native": {
+                  "integer_clz64": 0,
+                  "integer_shl64": 0,
+                  "integer_sub64": 0
+                }
+              },
+              "phase": "verification"
+            }
+          ],
+          "schema": "cover.uniform-sampling-diagnostic/v1",
+          "scope": "selected Fq-coordinate, Wiedemann-vector and initial cover-label samplers; generator and other paths remain incomplete",
+          "total": {
+            "calls": 2410,
+            "complete": false,
+            "generator_internal_work": "not counted; other sampling paths still require coverage",
+            "known_native_priced_bitops": "60901824",
+            "other_modulus_calls": 0,
+            "priced_native": {
+              "integer_add64": 2410,
+              "integer_mul64": 2479
+            },
+            "raw_draws": 2479,
+            "rejections": 69,
+            "schema": "modular-uniform-events/v1",
+            "unpriced_native": {
+              "integer_clz64": 2410,
+              "integer_shl64": 2410,
+              "integer_sub64": 4820
+            }
+          }
+        },
+        "unit": "bitop/v1",
+        "widths": {
+          "field_bits": 10,
+          "r_bits": 58
+        }
+      }
+    }
+  ],
+  "planned_executions": 2,
+  "projection_and_solve_accounting_checked": true,
+  "raw_executions": 2,
+  "rho_parity": false,
+  "schema": "cover.sieve.validation-summary/v1",
+  "scope": "two public-input endpoint checks; no AA or comparative timing inference; all recorded wall is spent-work diagnostic",
+  "source_revision": "15121ac779cef32bc173916e74ce26e2a3976f09",
+  "unattempted_executions": 0
+}
