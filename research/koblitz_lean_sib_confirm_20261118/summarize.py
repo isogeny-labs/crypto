@@ -15,7 +15,7 @@ def norm(c):
 S = {"ratios": {}, "phases": R["phases"], "native": R["native"], "wall": R["wall"], "sessions": R["sessions"], "status": R["status"],
      "identity": R["identity"], "same_walk": R["same_walk"], "band_S": {}, "band_ranks": {}, "decision": {}}
 for key, c in R["compare"].items():
-    n, scope, pair, w = key.split("|"); w = w[2:]
+    n, scope, pair, w = key.split("|"); w = w[2:]; n = n[1:]  # "n23" -> "23" (post-freeze key fix, disclosed)
     S["ratios"].setdefault(n, {}).setdefault(scope, {}).setdefault(pair, {})[w] = norm(c)
 for name, b in R["band"].items():
     S["band_S"][name] = {row["arm"]: dict(zip(W, row["mean_s"])) for row in b["rows"]}
