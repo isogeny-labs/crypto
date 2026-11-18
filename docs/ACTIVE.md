@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [x] Speed up ECDLP index calculus: binary x-only sibling pairs (`BinaryGroup::sibling_pair`) and necklace-reduced `ksum-frobenius` with Montgomery leaf batches, target-free setup collision harvesting, and scale-free `scale=X` sizing — up to 11.84x counted speedup across the §5a band (14.75x wall) on 44.3-bit `icv1-f2m53-tm56619371-dac20a85` and 6.09x (7.14x wall) on 39-bit `icv1-f2m41-tm2308219-7f48b14a` (`research/koblitz_frob_ksum_sib_20261118`, Cursor, completed 2026-11-18, branch cursor/ecdlp-ic-speedup-809a, PR #4762) [pcc:unverified]
+
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)

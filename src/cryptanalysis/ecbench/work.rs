@@ -384,6 +384,7 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         | "aux_orders_undetermined"
         | "aux_two_sylow_rejected"
         | "pair_table_representatives"
+        | "ksum_table_representatives"
         | "pair_table_kind"
         | "pair_table_points"
         | "scan_window_len"
@@ -430,7 +431,10 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         | "legacy_as_solves_uncharged"
         | "factor_point_inserts_uncharged" => Shape,
         // Proxies whose work is listed as uncounted (insert attempts).
-        "pair_table_entries" | "aux_bsgs_table_entries" => Shape,
+        "pair_table_entries" | "ksum_table_entries" | "aux_bsgs_table_entries" => Shape,
+        // Outcomes of collision verification (whose group additions and
+        // modular combinations are counted in their phase).
+        "free_collisions_checked" | "free_rows_emitted" => Shape,
         // Memory, reported beside the unit.
         "lane_state_bytes_floor" | "factor_base_vec_bytes_floor_uncharged" => Shape,
         // The solver is priced from the record's solver block.
