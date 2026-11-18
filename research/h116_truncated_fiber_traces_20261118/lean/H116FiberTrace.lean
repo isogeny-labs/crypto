@@ -361,6 +361,34 @@ theorem NormalizedIsogenyFirstOrderEquation.to_secondOrder
   simp only [map_ofNat, map_mul] at hcompact ⊢
   linear_combination hcompact
 
+/-- The degree-two and degree-three coefficients of transformed equation (14)
+force the two initial Bostan jet coefficients. These are therefore consequences
+of the first-order geometric interface, not independent data. -/
+theorem NormalizedIsogenyFirstOrderEquation.base_coefficients
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (hfirst : NormalizedIsogenyFirstOrderEquation
+      sourceA sourceB targetA targetB h)
+    (h5 : (5 : K) ≠ 0) (h7 : (7 : K) ≠ 0) :
+    h 1 = (sourceA - targetA) / 5 ∧
+      h 2 = (sourceB - targetB) / 7 := by
+  constructor
+  · have hc := congrArg (PowerSeries.coeff 2) hfirst
+    simp [normalizedMapAtInfinitySeries, fiberDenominatorSeries, pow_succ,
+      PowerSeries.coeff_mul, PowerSeries.coeff_derivative,
+      PowerSeries.coeff_X] at hc
+    simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+    norm_num [Finset.sum_range_succ] at hc
+    apply (eq_div_iff h5).2
+    linear_combination -hc
+  · have hc := congrArg (PowerSeries.coeff 3) hfirst
+    simp [normalizedMapAtInfinitySeries, fiberDenominatorSeries, pow_succ,
+      PowerSeries.coeff_mul, PowerSeries.coeff_derivative,
+      PowerSeries.coeff_X] at hc
+    simp_rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
+    norm_num [Finset.sum_range_succ] at hc
+    apply (eq_div_iff h7).2
+    linear_combination -hc
+
 /-- For prime characteristic `p > 19`, every denominator occurring while the
 H116 producer constructs `h₁,…,h₇` from Bostan et al. recurrence (16) is
 nonzero in `ZMod p`. The denominators above `19` are handled by their displayed
@@ -531,6 +559,25 @@ theorem BostanJetRecurrence.of_normalizedSecondOrderEquation
   · exact normalizedODE_step6 sourceA sourceB targetA h hode hd.1 hd.2
   · exact normalizedODE_step7 sourceA sourceB targetA h hode hd.1 hd.2
 
+/-- Transformed equation (14) alone implies the finite recurrence whenever the
+displayed small denominators are nonzero. The initial coefficients and the
+second-order equation are both derived internally. -/
+theorem BostanJetRecurrence.of_normalizedFirstOrderEquation
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (hfirst : NormalizedIsogenyFirstOrderEquation
+      sourceA sourceB targetA targetB h)
+    (h5 : (5 : K) ≠ 0) (h7 : (7 : K) ≠ 0)
+    (hden : ∀ k, 3 ≤ k → k ≤ 7 →
+      ((((k - 2) * (2 * k + 3) : ℕ) : K) ≠ 0) ∧
+        (((2 * k + 3 : ℕ) : K) ≠ 0)) :
+    BostanJetRecurrence sourceA sourceB targetA targetB h := by
+  rcases NormalizedIsogenyFirstOrderEquation.base_coefficients
+    sourceA sourceB targetA targetB h hfirst h5 h7 with ⟨hbase1, hbase2⟩
+  exact BostanJetRecurrence.of_normalizedSecondOrderEquation
+    sourceA sourceB targetA targetB h hbase1 hbase2
+      (NormalizedIsogenyFirstOrderEquation.to_secondOrder
+        sourceA sourceB targetA targetB h hfirst) hden
+
 /-- Prime-field specialization with every recurrence denominator discharged by
 `p > 19`. -/
 theorem BostanJetRecurrence.of_normalizedSecondOrderEquation_zmod
@@ -542,6 +589,19 @@ theorem BostanJetRecurrence.of_normalizedSecondOrderEquation_zmod
     BostanJetRecurrence sourceA sourceB targetA targetB h := by
   exact BostanJetRecurrence.of_normalizedSecondOrderEquation
     sourceA sourceB targetA targetB h hbase1 hbase2 hode
+      (fun k hk3 hk7 ↦ bostanStepDenominatorsNonzero hp hk3 hk7)
+
+/-- In prime characteristic `p>19`, transformed equation (14) by itself forces
+the exact recurrence used by the H116 producer. -/
+theorem BostanJetRecurrence.of_normalizedFirstOrderEquation_zmod
+    {p : ℕ} [Fact p.Prime] (hp : 19 < p)
+    (sourceA sourceB targetA targetB : ZMod p) (h : ℕ → ZMod p)
+    (hfirst : NormalizedIsogenyFirstOrderEquation
+      sourceA sourceB targetA targetB h) :
+    BostanJetRecurrence sourceA sourceB targetA targetB h := by
+  rcases bostanDenominatorsNonzero hp with ⟨h5, h7, _⟩
+  exact BostanJetRecurrence.of_normalizedFirstOrderEquation
+    sourceA sourceB targetA targetB h hfirst h5 h7
       (fun k hk3 hk7 ↦ bostanStepDenominatorsNonzero hp hk3 hk7)
 
 /-- The seven coefficients satisfying the H116 recurrence are unique. -/
@@ -621,8 +681,11 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms bostanDenominatorsNonzero
 #print axioms bostanStepDenominatorsNonzero
 #print axioms NormalizedIsogenyFirstOrderEquation.to_secondOrder
+#print axioms NormalizedIsogenyFirstOrderEquation.base_coefficients
 #print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation
 #print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation_zmod
+#print axioms BostanJetRecurrence.of_normalizedFirstOrderEquation
+#print axioms BostanJetRecurrence.of_normalizedFirstOrderEquation_zmod
 #print axioms BostanJetRecurrence.unique
 #print axioms fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 

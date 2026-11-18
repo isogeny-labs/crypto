@@ -39,11 +39,14 @@ This map is written before the first H116 Lean declaration.
    under explicit constant-coefficient and nonzero-derivative hypotheses. The
    transformed equation (14) is formalized as a PowerSeries identity and is
    proved to imply the transformed equation (15); its cancelled factor is
-   nonzero because its constant coefficient is one. The remaining geometric
-   bridge constructs the actual normalized isogeny at-infinity series and
-   proves that it satisfies transformed equation (14). The formal-group
-   congruence for `V-1` is a separate endpoint premise unless an existing
-   verified elliptic formal-group theorem is located.
+   nonzero because its constant coefficient is one. The first identity's
+   degree-two and degree-three coefficients are proved to force the two initial
+   recurrence coefficients, so for prime `p>19` that identity alone implies the
+   full finite recurrence. The remaining geometric bridge constructs the actual
+   normalized isogeny at-infinity series and proves that it satisfies
+   transformed equation (14). The formal-group congruence for `V-1` is a
+   separate endpoint premise unless an existing verified elliptic formal-group
+   theorem is located.
    [pcc:unverified]
 6. **Inheritance table.** Below. A blank or `lookup pending` entry blocks the
    first Lean edit.
@@ -83,6 +86,7 @@ This map is written before the first H116 Lean declaration.
 | finite Bostan recurrence determines `h₁,...,h₇` and `F_U` through degree eight | instance law | H116 Lean module | field, source/target coefficients, two coefficient functions | both functions satisfy `BostanJetRecurrence` |
 | normalized rational-map curve equation implies equation (15) | generic law | H116 Lean module | differential field, coordinate `x`, map `R`, curve coefficients | coefficients constant under the derivation, `D x=1`, `D R≠0`, equation (14) |
 | transformed equation (14) implies transformed equation (15) | instance law | H116 Lean module | field, source/target coefficients, normalized PowerSeries | `NormalizedIsogenyFirstOrderEquation`; the normalized series definition proves the cancelled factor nonzero |
+| transformed equation (14) forces the initial coefficients and finite recurrence | instance law | H116 Lean module | field or `ZMod p`, source/target coefficients, normalized PowerSeries | nonzero 5, 7 and recurrence denominators; prime specialization uses `p>19` |
 | transformed normalized-isogeny equation implies the finite recurrence | instance law | H116 Lean module | field or `ZMod p`, source/target coefficients, coefficient function | PowerSeries equation (15), initial `h₁,h₂`; generic denominator premises or prime `p>19` |
 | `Y_j` fiber identity | endpoint | H116 | isogeny coordinate data | normalized differential formula, non-2-torsion target |
 | Frobenius low-jet specialization | instance obligation or explicit premise | crypto-lean candidate | elliptic formal group | ordinary `E/F_p`, `V+pi=[t]` |

@@ -6,23 +6,23 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-c42ec0c4fda6f69a23b6dcc62e342d363289c850663e2153a5996930e5d22609  H116FiberTrace.lean
+2ee3b8292ddfb9d6217c1f1905884a33618552d9f7bd1ac309530814e80c8865  H116FiberTrace.lean
 ```
 
 The repository proof gate built both the default target and the explicitly
 tracked source, then transitively audited all theorem declarations:
 
 ```text
-PASS  32 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS  35 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
 
 ```text
-a215abe5811ff67e2241059445c918e4fa1a1728771b6b45d404bcb14a3c435b  receipts/audit.log
-526edc8cddb8f0df6fac0c4477364f6bb6a933232bad92e1013f13274082ec89  receipts/build.log
+8f2cb91239545043c068321eb647f6a3fa7bb1454a790c04159e9c26aec10f9c  receipts/audit.log
+1628728cf2a1a40e707e79dbc83656061e87861685df4b9058a9b12c1b6b3cb1  receipts/build.log
 29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483  receipts/cache.log
-4270e5cf3f389cef9136b9b900ab22cfbfafc53879c670a5ac425f044f16e095  receipts/source-build.log
+e61cc471b66de7953befd50eb7054f4b72b988303270642fd69b45f120c3ab44  receipts/source-build.log
 c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/status.txt
 6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
 ```
@@ -52,10 +52,13 @@ differentiating equation (14) and cancelling an explicitly nonzero map
 derivative gives equation (15). It encodes transformed equation (14) as a
 PowerSeries identity and proves that it implies the already formalized
 transformed equation (15), with nonzeroness of the cancelled factor proved from
-its constant coefficient. It does not yet construct the actual normalized
-isogeny at-infinity series, prove that series satisfies transformed equation
-(14), or construct the `V-1` formal jet, a scalar predicate or an ECDLP
-decoder. [pcc:unverified]
+its constant coefficient. It proves that the degree-two and degree-three
+coefficients of transformed equation (14) force the two initial jet identities,
+then packages the chain showing that this one first-order identity implies the
+complete recurrence for prime `p>19`. It does not yet construct the actual
+normalized isogeny at-infinity series, prove that series satisfies transformed
+equation (14), or construct the `V-1` formal jet, a scalar predicate or an
+ECDLP decoder. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

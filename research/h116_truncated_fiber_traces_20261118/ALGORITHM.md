@@ -49,9 +49,12 @@ Lean also proves the preceding differential-algebra step: differentiating
 gives equation (15). `NormalizedIsogenyFirstOrderEquation` is equation (14)
 after the same at-infinity substitution, and Lean proves that it implies
 `NormalizedIsogenySecondOrderEquation`; the factor cancelled in this
-PowerSeries proof has constant coefficient one. The remaining geometric bridge
-must construct the actual normalized isogeny at-infinity series and prove that
-it satisfies `NormalizedIsogenyFirstOrderEquation`. [pcc:unverified]
+PowerSeries proof has constant coefficient one. Its degree-two and degree-three
+coefficients also force `h1=(A-Atilde)/5` and `h2=(B-Btilde)/7`. Consequently,
+for prime `p>19`, `NormalizedIsogenyFirstOrderEquation` alone implies the full
+frozen recurrence. The remaining geometric bridge must construct the actual
+normalized isogeny at-infinity series and prove that it satisfies this one
+first-order identity. [pcc:unverified]
 
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 

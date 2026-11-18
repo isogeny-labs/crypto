@@ -91,10 +91,13 @@ rational-map curve equation and cancels its explicitly nonzero derivative to
 obtain equation (15). The transformed equation (14) is also formalized as
 `NormalizedIsogenyFirstOrderEquation`, and Lean proves it implies the existing
 second-order PowerSeries equation. Its cancelled factor is automatically
-nonzero because its constant coefficient is one. What remains is to construct
-the actual normalized isogeny at-infinity series and prove that it satisfies
-this first-order PowerSeries equation; no theorem here constructs that map.
-[pcc:unverified]
+nonzero because its constant coefficient is one. The same first-order identity
+forces the two initial coefficients `h₁=(A-Atilde)/5` and
+`h₂=(B-Btilde)/7`. Thus, in prime characteristic `p>19`, it now implies the
+complete frozen recurrence without extra coefficient hypotheses. What remains
+is to construct the actual normalized isogeny at-infinity series and prove that
+it satisfies this first-order PowerSeries equation; no theorem here constructs
+that map. [pcc:unverified]
 
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
