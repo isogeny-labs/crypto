@@ -1,0 +1,20 @@
+{
+  "schema": "h116.quotient-digit-oos-launch/v1",
+  "protocol_id": "H116-QUOTIENT-DIGIT-OOS-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in QUOTIENT_DIGIT_OOS_SOURCE_GATE.md",
+  "backend": "local h114 workspace, ordinary non-resumable commands",
+  "resources": {"cpu": 1, "memory_gib": 2, "timeout_minutes": 20},
+  "retries": 0,
+  "compiler": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "commands": {
+    "producer_build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_quotient_digit_oos_producer.rs", "-o", "/tmp/h116_quotient_digit_oos_producer"],
+    "scorer_build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_quotient_digit_oos_scorer.rs", "-o", "/tmp/h116_quotient_digit_oos_scorer"],
+    "producer_selftest": ["/tmp/h116_quotient_digit_oos_producer", "--selftest"],
+    "scorer_selftest": ["/tmp/h116_quotient_digit_oos_scorer", "--selftest"],
+    "produce": ["/tmp/h116_quotient_digit_oos_producer", "--generate", "QUOTIENT_DIGIT_OOS_MOMENTS.tsv", "QUOTIENT_DIGIT_OOS_LABELS.tsv"],
+    "score": ["/tmp/h116_quotient_digit_oos_scorer", "--score", "QUOTIENT_DIGIT_OOS_MOMENTS.tsv", "QUOTIENT_DIGIT_OOS_LABELS.tsv", "QUOTIENT_DIGIT_OOS_RESULT.json"]
+  },
+  "outputs": ["QUOTIENT_DIGIT_OOS_MOMENTS.tsv", "QUOTIENT_DIGIT_OOS_LABELS.tsv", "QUOTIENT_DIGIT_OOS_RESULT.json", "QUOTIENT_DIGIT_OOS_RUN.txt", "QUOTIENT_DIGIT_OOS_SHA256SUMS"],
+  "acceptance": "retain all data; infrastructure success requires exact gated sources, both selftests, 4560 targets, 9120 model records, zero repeat and invariant mismatches, 4485 scored targets in fifteen rows, and 4096 completed unchanged-rule shuffles",
+  "measurement_scope": "unchanged-rule five-curve OOS association and exactness test only; no direct-fiber validation, generic decoder, ECDLP, timing, or speedup claim"
+}
