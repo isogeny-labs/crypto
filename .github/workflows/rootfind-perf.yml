@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and verify shared rootfinder headers
         run: |
-          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-pair-sweep
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep
 
       - name: Record before and after perf counters when accessible
         shell: bash
@@ -109,6 +109,11 @@ jobs:
           for arm in before after; do
             perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/sub64-${arm}.txt" \
               -- taskset -c "$cpu" gpu/rootfind/bench_sub64 "--perf-$arm"
+          done
+          # Short-tail batch inversion, comparing 8-of-32 against full chunks.
+          for arm in tail8-before tail8-after full32-before full32-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/tail-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_tail_core "--perf-$arm"
           done
           # Pair-table and two-sign S3 sweep, frozen baseline vs actual header.
           for arm in pair-before pair-after sweep-before sweep-after; do
