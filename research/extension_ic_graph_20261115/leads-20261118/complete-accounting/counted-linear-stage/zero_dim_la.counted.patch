@@ -1,0 +1,567 @@
+--- a/src/cryptanalysis/zero_dim_la.rs	2026-11-18 17:18:51.833673681 +0000
++++ b/src/cryptanalysis/zero_dim_la.rs	2026-11-18 17:22:17.737185778 +0000
+@@ -88,6 +88,172 @@
+     }
+ }
+ 
++// ── Native operation counts of this stage (complete-accounting patch) ────
++//
++// Before this patch the stage's own `F_p` arithmetic (the `Fp` struct and the
++// lazy u128/u64-lane kernels) emitted no `jv_bitops` hooks: only `inv_mod`
++// and the `PolyRing` root splitting were hooked. The legacy `FastStats`
++// counters count multiplications only, by formula at each call site.
++//
++// Counting rules (the existing `bitop/v1` conventions, no new unit):
++// * `mul` — one `Fp::mul` (a product reduced mod `p`);
++// * `add` — one `Fp::add`/`Fp::sub`, an inline negation `p − c`, or the
++//   doubling of a lazy lane in `square_into`;
++// * `mac` — one lazily accumulated product (dot products, `axpy`, the inline
++//   lazy loops): charged as one `field_mul` and one `field_add`, F4's
++//   multiply-subtract convention (`jv_bitops::row_ops`). The once-per-output
++//   reduction of a lazy sum is part of its products and is not charged again;
++// * `word` — one 64-bit compare/scan step on the stage's data (staircase and
++//   normal-form divisibility tests, non-zero scans, sort/dedup compares);
++// * `probe` — one `FxMap` insert or lookup keyed by one packed monomial word
++//   (`hash_probe` plus one `word_op`, `jv_bitops::probes(n, 1)`);
++// * `rng` — one `StdRng` draw made by the stage (`rng_words`; a lower bound:
++//   `gen_range` rejection draws are not visible here).
++// Inversions are not counted here: `inv_mod` already emits `field_inv`.
++// Allocation, copies, loop control and the `Instant` timers stay excluded.
++//
++// The bookkeeping counters below are not charged; they let the conservation
++// test reconcile these operation counts with the legacy `FastStats::muls`:
++// `mul_outside_legacy` (products the legacy formula never counted),
++// `legacy_overcount` (legacy multiplications that are not executed: one per
++// root in the read-out's `Q` chain) and `ring_muls` (the hooked `PolyRing`
++// products that the legacy counter includes).
++
++/// Operation counts of the linear stage on this thread (cumulative; take
++/// differences of [`lin_ops_snapshot`]).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
++pub struct LinOps {
++    pub mul: u64,
++    pub add: u64,
++    pub mac: u64,
++    pub word: u64,
++    pub probe: u64,
++    pub rng: u64,
++    pub mul_outside_legacy: u64,
++    pub legacy_overcount: u64,
++    pub ring_muls: u64,
++}
++
++impl LinOps {
++    pub fn since(&self, b: &LinOps) -> LinOps {
++        LinOps {
++            mul: self.mul - b.mul,
++            add: self.add - b.add,
++            mac: self.mac - b.mac,
++            word: self.word - b.word,
++            probe: self.probe - b.probe,
++            rng: self.rng - b.rng,
++            mul_outside_legacy: self.mul_outside_legacy - b.mul_outside_legacy,
++            legacy_overcount: self.legacy_overcount - b.legacy_overcount,
++            ring_muls: self.ring_muls - b.ring_muls,
++        }
++    }
++    pub fn add_assign(&mut self, o: &LinOps) {
++        self.mul += o.mul;
++        self.add += o.add;
++        self.mac += o.mac;
++        self.word += o.word;
++        self.probe += o.probe;
++        self.rng += o.rng;
++        self.mul_outside_legacy += o.mul_outside_legacy;
++        self.legacy_overcount += o.legacy_overcount;
++        self.ring_muls += o.ring_muls;
++    }
++    /// `field_mul` this patch charges.
++    pub fn field_mul(&self) -> u64 {
++        self.mul + self.mac
++    }
++    /// `field_add` this patch charges.
++    pub fn field_add(&self) -> u64 {
++        self.add + self.mac
++    }
++    /// `word_op` this patch charges (scans, the probes' key words, draws).
++    pub fn word_op(&self) -> u64 {
++        self.word + self.probe + self.rng
++    }
++}
++
++thread_local! {
++    static LIN: std::cell::Cell<LinOps> = const {
++        std::cell::Cell::new(LinOps {
++            mul: 0, add: 0, mac: 0, word: 0, probe: 0, rng: 0,
++            mul_outside_legacy: 0, legacy_overcount: 0, ring_muls: 0,
++        })
++    };
++}
++
++/// This thread's cumulative linear-stage operation counts.
++pub fn lin_ops_snapshot() -> LinOps {
++    LIN.with(|c| c.get())
++}
++
++#[inline(always)]
++fn lin(f: impl FnOnce(&mut LinOps)) {
++    LIN.with(|c| {
++        let mut v = c.get();
++        f(&mut v);
++        c.set(v);
++    });
++}
++#[inline(always)]
++fn c_mul(n: u64) {
++    lin(|v| v.mul += n);
++}
++#[inline(always)]
++fn c_add(n: u64) {
++    lin(|v| v.add += n);
++}
++#[inline(always)]
++fn c_mac(n: u64) {
++    lin(|v| v.mac += n);
++}
++#[inline(always)]
++fn c_word(n: u64) {
++    lin(|v| v.word += n);
++}
++#[inline(always)]
++fn c_probe(n: u64) {
++    lin(|v| v.probe += n);
++}
++#[inline(always)]
++fn c_rng(n: u64) {
++    lin(|v| v.rng += n);
++}
++#[inline(always)]
++fn c_outside(n: u64) {
++    lin(|v| v.mul_outside_legacy += n);
++}
++
++/// Emit a stage's counts through the existing `jv_bitops` hooks (charged to
++/// the caller's current phase, only while counting is on).
++fn charge_lin(d: &LinOps) {
++    use super::jv_bitops::{charge, probes, rng_words, words, Kind};
++    charge(Kind::FieldMul, d.field_mul());
++    charge(Kind::FieldAdd, d.field_add());
++    words(d.word);
++    probes(d.probe, 1);
++    rng_words(d.rng);
++}
++
++/// `f4_fp::eval` (the candidate check) with its operations counted: per term,
++/// for each variable of exponent `k > 0`, the square-and-multiply `powmod`
++/// (`bits(k)` squarings and `popcount(k)` products) and one product; one
++/// addition per term. The value is `f4_fp::eval`'s own.
++fn eval_counted(f: &Poly, x: &[u64], p: u64) -> u64 {
++    let mut m = 0u64;
++    for (e, _) in f {
++        for &k in e.iter() {
++            if k > 0 {
++                m += (32 - k.leading_zeros()) as u64 + k.count_ones() as u64 + 1;
++            }
++        }
++    }
++    c_mul(m);
++    c_outside(m);
++    c_add(f.len() as u64);
++    f4_fp::eval(f, x, p)
++}
++
+ /// `F_p` with lazy `u128` reduction.
+ #[derive(Clone, Copy)]
+ struct Fp {
+@@ -141,21 +307,24 @@
+             let hi = self.bred((x >> 64) as u64);
+             let lo = self.bred(x as u64);
+             // hi·r64 < p² < 2^64
+-            self.add(self.bred(hi * self.r64), lo)
++            self.add_raw(self.bred(hi * self.r64), lo)
+         } else {
+             (x % self.p as u128) as u64
+         }
+     }
+     #[inline(always)]
+     fn mul(&self, a: u64, b: u64) -> u64 {
++        c_mul(1);
+         if self.small && a < self.p && b < self.p {
+             self.bred(a * b)
+         } else {
+             self.red(a as u128 * b as u128)
+         }
+     }
++    /// The final addition of a reduction: part of the reduced products,
++    /// not charged.
+     #[inline(always)]
+-    fn add(&self, a: u64, b: u64) -> u64 {
++    fn add_raw(&self, a: u64, b: u64) -> u64 {
+         let s = a + b;
+         if s >= self.p {
+             s - self.p
+@@ -164,7 +333,13 @@
+         }
+     }
+     #[inline(always)]
++    fn add(&self, a: u64, b: u64) -> u64 {
++        c_add(1);
++        self.add_raw(a, b)
++    }
++    #[inline(always)]
+     fn sub(&self, a: u64, b: u64) -> u64 {
++        c_add(1);
+         if a >= b {
+             a - b
+         } else {
+@@ -470,11 +645,19 @@
+     #[inline(always)]
+     fn red_lohi(&self, lo: u64, hi: u64) -> u64 {
+         let h = self.bred(self.bred(hi) * self.r32);
+-        self.add(h, self.bred(lo))
++        self.add_raw(h, self.bred(lo))
+     }
+-    /// `Σ a_i b_i mod p`, `a, b` reduced, fewer than 2^32 terms.
++    /// `Σ a_i b_i mod p`, `a, b` reduced, fewer than 2^32 terms; counts
++    /// `a.len()` lazy products.
+     #[inline]
+     fn dot(&self, a: &[u32], b: &[u32]) -> u64 {
++        c_mac(a.len() as u64);
++        self.dot_nc(a, b)
++    }
++    /// [`Fp::dot`] without counting, for pool threads (their thread-local
++    /// counts would never reach the caller; the caller charges instead).
++    #[inline]
++    fn dot_nc(&self, a: &[u32], b: &[u32]) -> u64 {
+         #[cfg(target_arch = "x86_64")]
+         let (l, h) = match simd_level() {
+             2 => unsafe { dot_avx512(a, b) },
+@@ -488,6 +671,7 @@
+     /// Four dot products `r_k · w mod p`.
+     #[inline]
+     fn dot4(&self, r: [&[u32]; 4], w: &[u32]) -> [u64; 4] {
++        c_mac(r.iter().map(|x| x.len().min(w.len()) as u64).sum());
+         #[cfg(target_arch = "x86_64")]
+         let v = match simd_level() {
+             2 => unsafe { dot4_avx512(r, w) },
+@@ -513,6 +697,7 @@
+     /// `(lo, hi) += c · row`, lane-wise.
+     #[inline]
+     fn axpy(&self, lo: &mut [u64], hi: &mut [u64], c: u32, row: &[u32]) {
++        c_mac(row.len() as u64);
+         #[cfg(target_arch = "x86_64")]
+         match simd_level() {
+             2 => {
+@@ -629,6 +814,8 @@
+                 hi += pr >> 32;
+             }
+             *muls += i.min(d) as u64;
++            c_mac(i.min(d) as u64);
++            c_add(1);
+             inv[i] = (fp.p - fp.red_lohi(lo, hi)) % fp.p;
+         }
+         ModF {
+@@ -720,10 +907,10 @@
+         out: &mut Vec<Vec<u32>>,
+         limit: usize,
+     ) -> bool {
+-        if lms
+-            .iter()
+-            .any(|l| l.iter().zip(mono.iter()).all(|(a, b)| a <= b))
+-        {
++        if lms.iter().any(|l| {
++            c_word(1);
++            l.iter().zip(mono.iter()).all(|(a, b)| a <= b)
++        }) {
+             return true;
+         }
+         if k == cap.len() {
+@@ -781,13 +968,18 @@
+     /// `NF(m)`, or `None` when no basis element reduces `m` (not a Gröbner
+     /// basis of a zero-dimensional ideal).
+     fn nf(&mut self, m: u64) -> Option<Nf> {
++        c_probe(1);
+         if let Some(&k) = self.index.get(&m) {
+             return Some(Nf::Unit(k));
+         }
++        c_probe(1);
+         if let Some(&r) = self.memo.get(&m) {
+             return Some(Nf::Row(r));
+         }
+-        let gi = self.bas.iter().position(|(lm, _)| self.divides(*lm, m))?;
++        let gi = self.bas.iter().position(|(lm, _)| {
++            c_word(1);
++            self.divides(*lm, m)
++        })?;
+         let cof = m - self.bas[gi].0;
+         let tail_len = self.bas[gi].1.len();
+         // the tail's normal forms first (recursion), then one lazy pass
+@@ -795,6 +987,7 @@
+         for t in 0..tail_len {
+             let (tm, c) = self.bas[gi].1[t];
+             let sub = self.nf(tm + cof)?;
++            c_add(1);
+             parts.push((self.f.p - c, sub));
+         }
+         let delta = self.delta;
+@@ -817,6 +1010,7 @@
+                     *a += c * x as u128;
+                 }
+                 self.muls += delta as u64;
++                c_mac(delta as u64);
+             }
+             if rows.len() > f.chunk {
+                 for (o, a) in out.iter_mut().zip(acc.iter_mut()) {
+@@ -837,6 +1031,7 @@
+         }
+         let id = self.rows.len();
+         self.rows.push(out);
++        c_probe(1);
+         self.memo.insert(m, id);
+         Some(Nf::Row(id))
+     }
+@@ -998,8 +1193,10 @@
+     for i in 0..len {
+         // a lane is below 2^32·n, so doubling it stays far from 2^64
+         let (mut l, mut h) = (2 * lo[i], 2 * hi[i]);
++        c_add(1);
+         if i % 2 == 0 {
+             kcount(1);
++            c_mac(1);
+             let pr = a[i / 2] as u64 * a[i / 2] as u64;
+             l += pr & LO;
+             h += pr >> 32;
+@@ -1173,6 +1370,7 @@
+     if d <= 2 {
+         let r = ring.roots(&UPoly(f.to_vec()), rng);
+         *muls += ring.muls.get();
++        lin(|v| v.ring_muls += ring.muls.get());
+         return r;
+     }
+     let mf = ModF::new(fp, f, muls);
+@@ -1189,6 +1387,7 @@
+     // g has small degree (the number of roots): split it with the ring
+     let r = ring.roots(&UPoly(g), rng);
+     *muls += ring.muls.get();
++    lin(|v| v.ring_muls += ring.muls.get());
+     r
+ }
+ 
+@@ -1214,6 +1413,7 @@
+     }
+     if let Some(&l) = a.last() {
+         let li = fp.inv(l);
++        c_outside(a.len() as u64);
+         for c in a.iter_mut() {
+             *c = fp.mul(*c, li);
+         }
+@@ -1232,7 +1432,9 @@
+     st: &mut FastStats,
+ ) -> Option<Vec<Vec<u64>>> {
+     let t0 = Instant::now();
++    let before = lin_ops_snapshot();
+     let out = fast_inner(basis, input, n, p, rng, st);
++    charge_lin(&lin_ops_snapshot().since(&before));
+     st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
+     out
+ }
+@@ -1250,6 +1452,7 @@
+         return None;
+     }
+     let fp = Fp::new(p);
++    c_rng(1);
+     let mut lrng = StdRng::seed_from_u64(rng.gen());
+     let t = Instant::now();
+     let lms: Vec<Vec<u32>> = basis.iter().map(|g| g[0].0.clone()).collect();
+@@ -1281,6 +1484,7 @@
+         .enumerate()
+         .map(|(i, m)| (pack(m), i))
+         .collect();
++    c_probe(delta as u64);
+     let mut tab = NfTable {
+         f: fp,
+         delta,
+@@ -1295,7 +1499,10 @@
+                     pack(&g[0].0),
+                     g[1..]
+                         .iter()
+-                        .map(|(e, c)| (pack(e), fp.mul(*c, lc_inv)))
++                        .map(|(e, c)| {
++                            c_outside(1);
++                            (pack(e), fp.mul(*c, lc_inv))
++                        })
+                         .collect(),
+                 )
+             })
+@@ -1323,12 +1530,14 @@
+             Some(Nf::Row(r)) => {
+                 let row = &tab.rows[r];
+                 let nz = row.iter().filter(|&&c| c != 0).count();
++                c_word(delta as u64);
+                 st.dense_cols += 1;
+                 st.nnz += nz;
+                 if 4 * nz > delta {
+                     dense_pos.push(j);
+                     dmat.extend(row.iter().map(|&c| c as u32));
+                 } else {
++                    c_word(delta as u64);
+                     sparse_cols.push((
+                         j,
+                         row.iter()
+@@ -1353,6 +1562,7 @@
+             Some(Nf::Unit(k)) => vec![(k, 1u64)],
+             Some(Nf::Row(r)) => tab.rows[r]
+                 .iter()
++                .inspect(|_| c_word(1))
+                 .enumerate()
+                 .filter(|(_, &c)| c != 0)
+                 .map(|(k, &c)| (k, c))
+@@ -1372,6 +1582,7 @@
+         st.functionals_tried += 1;
+         let t = Instant::now();
+         let mut w: Vec<u32> = (0..delta).map(|_| lrng.gen_range(0..p) as u32).collect();
++        c_rng(delta as u64);
+         let mut y = vec![0u32; delta];
+         let pool = krylov_pool();
+         let mut dvals = vec![0u32; dense_pos.len()];
+@@ -1386,6 +1597,7 @@
+                         acc += c as u128 * w[k] as u128;
+                     }
+                     st.krylov_muls += v.len() as u64;
++                    c_mac(v.len() as u64);
+                     fp.red(acc)
+                 };
+                 s.push(x);
+@@ -1407,9 +1619,10 @@
+                             .enumerate()
+                             .with_min_len(4)
+                             .for_each(|(c, v)| {
+-                                *v = fp.dot(&dmat[c * delta..(c + 1) * delta], wr) as u32;
++                                *v = fp.dot_nc(&dmat[c * delta..(c + 1) * delta], wr) as u32;
+                             })
+                     });
++                    c_mac((dense_pos.len() * delta) as u64);
+                     for (&pos, &v) in dense_pos.iter().zip(&dvals) {
+                         y[pos] = v;
+                     }
+@@ -1438,6 +1651,7 @@
+                     lo += pr & LO;
+                     hi += pr >> 32;
+                 }
++                c_mac(nz.len() as u64);
+                 y[*pos] = fp.red_lohi(lo, hi) as u32;
+             }
+             st.krylov_muls += (dense_pos.len() * delta
+@@ -1471,7 +1685,10 @@
+             q[j] = fp.add(fpoly[j + 1], fp.mul(xi, q[j + 1]));
+         }
+         st.readout_muls += delta as u64;
++        // the chain above executes δ − 1 products; the legacy line counts δ
++        lin(|v| v.legacy_overcount += 1);
+         let psi = |a: &[u64]| -> u64 {
++            c_mac(delta as u64);
+             let mut res = 0u64;
+             for (ach, qch) in a[..delta].chunks(fp.chunk).zip(q.chunks(fp.chunk)) {
+                 let mut acc = 0u128;
+@@ -1484,6 +1701,8 @@
+         };
+         let den = psi(&seqs[xn]);
+         if den == 0 {
++            // legacy never counts this ψ (it returns before its line)
++            c_outside(delta as u64);
+             st.gave_up = Some("multiple point");
+             return None;
+         }
+@@ -1494,13 +1713,14 @@
+         }
+         sol[xn] = xi;
+         st.readout_muls += (n * delta) as u64;
+-        if !input.iter().all(|f| f4_fp::eval(f, &sol, p) == 0) {
++        if !input.iter().all(|f| eval_counted(f, &sol, p) == 0) {
+             st.gave_up = Some("candidate fails the input");
+             return None;
+         }
+         sols.push(sol);
+     }
+     st.readout_ms = t.elapsed().as_secs_f64() * 1e3;
++    c_word(super::jv_bitops::sort_cost(sols.len()) + sols.len().saturating_sub(1) as u64);
+     sols.sort();
+     sols.dedup();
+     Some(sols)
+@@ -1715,4 +1935,76 @@
+             assert_eq!(got, want, "p = {p}");
+         }
+     }
++
++    // ── complete-accounting patch: hand controls of the operation counts ──
++
++    #[test]
++    fn counted_bm_hand_control() {
++        // s = (1, 2) over F_101: generator x − 2 = 99 + x. By hand: 4 Fp::mul
++        // (two discrepancy scalings, two update products), 3 add/sub (two
++        // updates, one discrepancy sum), 1 lazy product, 1 hooked inversion;
++        // the legacy formula counts 5 = 1 lazy + 4 products.
++        let f = Fp::new(101);
++        let mut legacy = 0;
++        let b = lin_ops_snapshot();
++        let g = berlekamp_massey(&f, &[1, 2], &mut legacy);
++        let d = lin_ops_snapshot().since(&b);
++        assert_eq!(g, vec![99, 1]);
++        assert_eq!((d.mul, d.add, d.mac, legacy), (4, 3, 1, 5));
++        assert_eq!(legacy, d.mac + d.mul);
++    }
++
++    #[test]
++    fn counted_kernels_charge_their_lengths() {
++        let f = Fp::new(1009);
++        let a: Vec<u32> = (1..=7).collect();
++        let b0 = lin_ops_snapshot();
++        assert_eq!(f.dot(&a, &a), (1..=7u64).map(|x| x * x).sum::<u64>() % 1009);
++        let r: Vec<u32> = (0..9).collect();
++        let _ = f.dot4([&r, &r, &r, &r], &r);
++        let (mut lo, mut hi) = (vec![0u64; 5], vec![0u64; 5]);
++        f.axpy(&mut lo, &mut hi, 3, &r[..5]);
++        let d = lin_ops_snapshot().since(&b0);
++        assert_eq!((d.mac, d.mul, d.add), (7 + 36 + 5, 0, 0));
++        // reductions are not charged; mul/add/sub are, one each
++        let b1 = lin_ops_snapshot();
++        let _ = f.red(123_456_789);
++        let _ = f.red_lohi(5, 7);
++        let _ = f.dot_nc(&a, &a);
++        assert_eq!(lin_ops_snapshot().since(&b1), LinOps::default());
++        let _ = f.mul(5, 6);
++        let _ = f.add(5, 6);
++        let _ = f.sub(5, 6);
++        let d = lin_ops_snapshot().since(&b1);
++        assert_eq!((d.mul, d.add, d.mac), (1, 2, 0));
++    }
++
++    #[test]
++    fn counted_products_reconcile_with_the_legacy_formula() {
++        // every legacy-counted product of pmul / ModF / the powering is one
++        // counted lazy product (Karatsuba adds are extra adds, never products)
++        let mut rng = StdRng::seed_from_u64(23);
++        for &p in &[1009u64, 65_521] {
++            let fp = Fp::new(p);
++            for &n in &[3usize, 33, 64, 65, 100] {
++                let a: Vec<u32> = (0..n).map(|_| rng.gen_range(0..p) as u32).collect();
++                let b: Vec<u32> = (0..n).map(|_| rng.gen_range(0..p) as u32).collect();
++                let (mut m, s) = (0u64, lin_ops_snapshot());
++                let _ = pmul(&fp, &a, &b, &mut m);
++                let d = lin_ops_snapshot().since(&s);
++                assert_eq!((m, d.mul), (d.mac, 0), "pmul p={p} n={n}");
++                assert_eq!(d.add > 0, n > KARATSUBA_MIN);
++            }
++            for &d in &[3usize, 10, 64] {
++                let mut f: Vec<u64> = (0..d).map(|_| rng.gen_range(0..p)).collect();
++                f.push(1);
++                let (mut m, s) = (0u64, lin_ops_snapshot());
++                let mf = ModF::new(&fp, &f, &mut m);
++                let _ = x_pow_p(&fp, &mf, &mut m);
++                let o = lin_ops_snapshot().since(&s);
++                // times_x: one Fp::mul and one sub per legacy product
++                assert_eq!(m, o.mac + o.mul, "powering p={p} d={d}");
++            }
++        }
++    }
+ }

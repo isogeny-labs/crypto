@@ -1,0 +1,27 @@
+[package]
+name = "crypto_lib"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "linear_stage_recount"
+path = "LANE/linear_stage_recount.rs"
+
+[[test]]
+name = "conservation"
+path = "LANE/conservation_test.rs"
+
+[dependencies]
+rand = { version = "0.8", features = ["small_rng"] }
+rayon = "1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+
+[profile.release]
+debug = 0
+incremental = false
