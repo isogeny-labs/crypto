@@ -530,3 +530,11 @@ exact rule, while 2,828/4,096 shuffled family maxima are at least as large
 this bounded parity family.  The next lead changes from anchor translates to
 fixed small division-polynomial characters evaluated at the target.
 [pcc:unverified]
+
+The frozen [division-polynomial character test](DIVPOLY_CHARACTER_PARITY_EXPERIMENT.md)
+then checks 184 products from `Legendre(psi_m(Q))`, `m=2..9`.  All 12,160
+multiplication-coordinate identities pass.  The selected `psi_4 psi_9` rule
+scores 812/1,520, but 2,284/4,096 shuffled family maxima are at least as large
+(`p=0.557725`), and no rule is exact.  The next lead leaves quadratic
+characters for a selected `[2]`-division torsor Frobenius cocycle with an
+explicit cohomological constancy control. [pcc:unverified]
