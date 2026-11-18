@@ -39,7 +39,7 @@ After committing the new protocol, an independent Python implementation executed
 
 B8 observed yield of **46/64 = 71.875%** is a panel diagnostic, not a statistical confidence claim for the entire group. In particular, *planted* B4 targets are highly multiply represented while **all 64 natural targets had no witness**: planted-chart positives cannot stand in for natural relation-yield evidence. B8's 18/64 misses must not be silently converted to hits by root/resultant or parity assumptions.
 
-The new source-specific Rust runner measures actual field/group operations and timing of building the generic 4+4 oracle; the experiment is intentionally an oracle for grading, not an allowed component of a competitive RR9 extractor. The independent checker re-derives all half supports, all 64 public target points (from the frozen PRNG), exact counts for the first 16, all eight planted target counts, and their emitted witness group replay per B. It will reject mutated witnesses and counts. A full 64-count transcript must be read from the Rust JSON artifact when CI finishes. Until that workflow reports success, its metrics and compiled Rust result are **not** verified.
+The new source-specific Rust runner measures actual field/group operations and timing of building the generic 4+4 oracle; the experiment is intentionally an oracle for grading, not an allowed component of a competitive RR9 extractor. The independent checker re-derives all half supports, all 64 public target points (from the frozen PRNG), exact counts for the first 16, all eight planted target counts, and their emitted witness group replay per B. It will reject mutated witnesses and counts. The full 64-count transcript is archived in the passing GitHub Actions run linked below. The source-specific native Rust and independent Python gates have now passed, but independent signed PCC remains outstanding.
 
 ## Leads audited and ranked actions
 
@@ -56,3 +56,22 @@ Primary prior art checked: [Amadori–Pintore–Sala (2018)](https://doi.org/10.
 The candidate must take **unseen public residuals** and produce valid eight-slot signed relations without the grader's 4+4 tables, fixture scalars, or planted chart coefficients. B31 must attain rank 31 and solve **1,024 blinded ECDLP targets** through the unchanged native Rust pipeline. On the same machine and identical targets, include setup, unsuccessful target-conditioned solves, F4/rootfinding, relation learning, sparse/dense LA, final extraction and verification, plus observed memory, against best mixed-IC, cold/cached shared BSGS and optimized rho. Report both single-target and amortized 1,024-target costs. Exact-source and signed-independent validation are distinct gates.
 
 **Standing result:** mathematically exact B4/B8 truth labels and a reproducible new native-Rust grading experiment are checked in. No lower complete ECDLP solving cost is claimed.
+
+
+## Exact-source native Rust result — passing CI
+
+**[GitHub Actions run #44360013960 — SUCCESS](https://github.com/isogeny-labs/crypto/actions/runs/44360013960)** on November 18, 2026, with immutable original Prime31 Rust source `1df714645aa683cf975bc76fcacb9842cb4780fd` and toolchain 1.100.0. Reused library **40/40**, new B4/B8 tests **2/2**, both production-like generic grading panels and independent Python BigInt group replay all passed. The prior first attempt compiled the Rust experiments but had a checker-only error: incorrectly comparing all positive *and negative* copies as distinct abscissae; fixed to compare positive weighted root representatives across different slots. This change did not alter the Rust results.
+
+**[Raw full original-curve JSON artifact](https://github.com/isogeny-labs/crypto/actions/runs/44360013960/artifacts/14453639586)**. Extracted JSON SHA-256 `4aa9eefbd450e37cea9b3c260c161f64345cec2a1685c3a67377d0fffeafba3a`. No planted scalar reaches the query interface. The artifact's Rust panel exactly matches all independently computed Python multiplicity sequences (64/64 per B); the separately committed Python CI checker recomputes the first 16 and all eight planted per B and all 64 public points. No independent signed PCC exists.
+
+| Complete **generic grader** control (not competitive solver) | B4 W8 | B8 W8 |
+|---|---:|---:|
+| Original-curve EC additions, setup plus 72 queries and verification | 307,534 | **4,862,189** |
+| Field inversions, same scope | 306,820 | **4,860,813** |
+| Field multiplications, same scope | 19,638,728 | **311,094,625** |
+| Measured setup wall time (single GitHub-hosted execution) | 3.098 ms | 43.194 ms |
+| Measured 72-query panel wall time | 58.662 ms | **1,009.373 ms** |
+| Natural successful residuals | 0/64 | **46/64** |
+| Natural signed multiplicity total | 0 | **115** |
+
+These timings are single-run *reference-oracle diagnostics* with unbatched affine inversions, not candidate non-generic extraction costs and not matched complete solver benchmarks. Their practical value is to furnish immutable labels with correct multiplicities; any proposed RR9/F4 extractor should match the 64-target B8 truth panel **without reading or building the above 4+4 point tables** and with separately charged algebraic runtime.
