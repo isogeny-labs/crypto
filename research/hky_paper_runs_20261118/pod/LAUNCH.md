@@ -68,3 +68,7 @@ the run; a failed checkpoint is recorded and the closure continues (450d5b295b).
   and k=16 gives (0,0,2,162,5079,92323,770594), equal entry by entry.
 - 19:5x UTC: pods `g9w09ju7t3idas` (J3) and `u2h6guqi1vozbx` (J4s) terminated (GET 404). The J3 basis was not
   kept (a k=15 lift needs about 540 GB, beyond these pods). Spend: J3 about 13.7 h, J4s about 4.3 h.
+- 20:02 UTC: **J2 done** (k=14, D=6, unit p=163841): 499,178 columns, profile [0,0,2,154,4451,73587,448922],
+  1 not in V_6, rank 448,922 (parts 224,688 + 224,234 in 249,824 / 249,354 columns, as J1 and the paper);
+  closedness check closed, 0 non-zero over 4,120,873 products; wall 49,797 s (slow, loaded host);
+  peak RSS 74.0 GB; basis sha256 3d1f2996... The Rust lift started on the pod at 20:02.
