@@ -25,3 +25,20 @@ timestamp_utc,source_sha,curve_n,curve_a,factor_base_hash,natural_trials,natural
 2026-11-18T01:26:02.381319+00:00,b05b8de72a53806b6b0f77381cdd3e602073ca70,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,13.472952,12.098313656,0.63671875,regression,relations_per_sec: 8.89409471 -> 12.0983137 (+36.0% vs baseline),AMD EPYC 9V45 96-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44215000731,
 2026-11-18T02:28:48.224769+00:00,bec149dd1e47f39bd6fe2a8b9e669595548ace4e,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,18.123186,8.994003733,0.63671875,success,,INTEL(R) XEON(R) PLATINUM 8573C,https://github.com/isogeny-labs/crypto/actions/runs/44222692789,
 2026-11-18T03:27:46.657041+00:00,6c3b83c9aea26df578f43a20c19db1c3614b8db6,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,19.730465,8.261335954,0.63671875,success,,AMD EPYC 7763 64-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44229711406,
+2026-11-18T04:42:49.718339+00:00,373129f92d7f28ffe4de328f62a761b6ad1680b8,23,0,,,,,,,,,,,failed,"run failed: RuntimeError: Cargo build rc=101: [94m|[0m                               [1m[33m^^^^^^^^^^^^^^^^^^^[0m [1m[33mno value can reach this[0m
+    [1m[94m|[0m
+    [1m[94m= [0m[1mnote[0m: `#[warn(unreachable_patterns)]` (part of `#[warn(unused)]`) on by default
+
+[1m[33mwarning[0m[1m: unreachable pattern[0m
+   [1m[94m--> [0msrc/cryptanalysis/aps_single_relation/replay.rs:217:31
+    [1m[94m|[0m
+[1m[94m205[0m [1m[94m|[0m     #[serde(default, rename = ""last_fall_degree"")]
+    [1m[94m|[0m                               [1m[94m------------------[0m [1m[94mmatches all the relevant values[0m
+[1m[94m...[0m
+[1m[94m217[0m [1m[94m|[0m     #[serde(default, rename = ""last_fall_degree"")]
+    [1m[94m|[0m                               [1m[33m^^^^^^^^^^^^^^^^^^[0m [1m[33mno value can reach this[0m
+
+[1m[33mwarning[0m[1m: unreachable pattern[0m
+   [1m[94m--> [0msrc/cryptanalysis/aps_single_relation/replay.rs:219:31
+    [1m[94m|[0m
+",AMD EPYC 9V74 80-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44236802556,"Cargo build rc=101: [94m|[0m                               [1m[33m^^^^^^^^^^^^^^^^^^^[0m [1m[33mno value can reach this[0m     [1m[94m|[0m     [1m[94m= [0m[1mnote[0m: `#[warn(unreachable_patterns)]` (part of `#[warn(unused)]`) on by default  [1m[33mwarning[0m[1m: unreachable pattern[0m    [1m[94m--> [0msrc/cryptanalysis/aps_single_relation/replay.rs:217:31     [1m[94m|[0m [1m[94m205[0m [1m[94m|[0m     #[serde(default, rename = ""last_fall_degree"")]     [1m[94m|"
