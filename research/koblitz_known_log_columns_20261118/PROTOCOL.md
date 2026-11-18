@@ -83,3 +83,29 @@ cluster bootstrap 95%.
 
 No below-rho claim, no exponent claim, no change to the leaderboard's rho reference. The lever is a generic-group
 (BSGS-type) change to the IC arm's base and is reported as such.
+
+## Addendum A1: spread known-log seeds (written 2026-11-18T06:27:06Z, after the frozen sessions and before any A1 data)
+
+Seen before writing this addendum: all frozen-session results (n23 primary kl-c3/gen-c4 1.11 [0.87, 1.42] at w = 0, null;
+n37 primary kl-c7/gen-c8 0.49 [0.39, 0.62] at w = 0, an improvement at all three weights; n29 kl-c2 1.70x, worse) and the
+diagnosis: the progression seeds [1]G..[k]G give fewer distinct pair sums (n23 c4: 260 table entries against 356 for the
+scanned base) and their sums cluster along the stride-G target walk (1051 trials for one relation against 282 per relation
+on the incumbent). Lever A1: `multiple_doublings=d` makes the known seeds `[2^(d(j-1))]G` (d doublings each, no addition).
+A sizing pilot (12 targets, 1 round, seeds 20261118499/599, binary below, scratchpad, not evidence) gave mean GAE: n23 gen-c4
+1505, kl-c4 1568, sp-c4-d2 1461, sp-c4-d3 876, sp-c4-d5 932, sp-c3-d3 1598, sp-c5-d3 986; n37 gen-c8 10288, kl-c8 6278,
+sp-c8-d3 5118, sp-c7-d3 5683, sp-c6-d3 9898; n29 gen-c1 110, sp-c2-d3 158 (so n29 is not in A1: the lever stays inert there).
+
+Binary: `klc-ecbench-a1`, built from the working tree that commit (next) records, sha256
+`58cfff9049e0399045e8b0b0d723b8b2faac379a848c0ed4ffd4e1ca87007f26`. Specs `a1/make_specs.py` -> `a1/specs/n{23,37}.json`
+(48 new public targets, seeds 20261118411 / 20261118413, 3 rounds, 1 warm-up); run `a1/run.sh`; analysis `a1/analyze.py`.
+
+Arms per curve (c0 = 4 at n23, 8 at n37): rho-strong, rho-v5, gen-c<c0> (validated incumbent), gen-c<c0>-aa, kl-c<c0>
+(A0 progression, the off-state of `multiple_doublings`), **sp-c<c0>-d5 (primary)**, sp-c<c0>-d3, sp-c<c0+1>-d5.
+
+- **A1-P1 (primary):** sp-c<c0>-d5 / gen-c<c0> at n23 and n37, the section 3 decision rule (95% upper end below 1 at
+  w = 0, 0.1 and 1; an upper end in [0.90, 1) is "not resolved under multiplicity").
+- **A1-P2 (ratchet):** sp-c<c0>-d5 / kl-c<c0>, same rule; the A0 kl arm is the off-state, so this isolates the spread seeds.
+- **A1-P3 (gap):** sp arms / rho-strong and / rho-v5 at the three weights.
+- Descriptive: d = 3, c0 + 1, table entries and trials per relation.
+- Predicted from the pilot: n23 ~0.6x gen-c4, n37 ~0.5x gen-c8 (pilot: 12 targets, noisy). A1 is the thread's second attempt
+  on these curves (A0 primary at n23 failed).
