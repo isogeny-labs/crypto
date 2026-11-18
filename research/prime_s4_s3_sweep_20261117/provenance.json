@@ -1,0 +1,58 @@
+{
+  "measured_utc_day": "2026-11-18",
+  "source_commit": "2c54c9b3d33499b7c71dee5bfdfe74006f832b44",
+  "source_note": "measurements were taken from this commit; research/ and the ledger edits are uncommitted at report time",
+  "executable_sha256": {
+    "a3_s4_ladder": "3f14da0f1f33f7a4a82421a4a1aeb6d33accca731e85f2e1b436a5ca0072df6b",
+    "a3_stage_ladder": "cc268de34f2d9c280a3a587f156ac14e14a12ec1b746a52a4df70f79f4cc0b32",
+    "find_a3_bench_curves": "c7dc48b76a5945c1fbc611b8df0666a98b9c84de6bcb4f7c77ee8ba253c727e0"
+  },
+  "host_id": {
+    "node": "Mac.attlocal.net",
+    "machine": "arm64",
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "cpus": 14,
+    "load_average_at_report": [
+      8.16748046875,
+      9.408203125,
+      7.998046875
+    ]
+  },
+  "resource_caps": {
+    "rungs": "run one at a time (serial shell queue)",
+    "threads": "single-threaded example (no rayon in the ladder examples)",
+    "wall_cap_per_rung": "none; the 20-bit quartic cell was abandoned after 54 min by hand (see progress.txt)",
+    "memory": "not capped; peak RSS not recorded"
+  },
+  "fixtures": {
+    "policy": "bench_curves_a_minus_3 rungs; each run prints curve name, p, n, fb=120 and the public target q",
+    "rungs": [
+      "a3-bench-16bit-p256class",
+      "a3-bench-20bit-p256class",
+      "a3-bench-20bit-cryptoproclass",
+      "a3-bench-24bit-p256class",
+      "a3-bench-24bit-cryptoproclass",
+      "a3-bench-28bit-p256class",
+      "a3-bench-28bit-cryptoproclass"
+    ]
+  },
+  "seeds": [
+    20261005,
+    20261006,
+    20261007
+  ],
+  "data_files": {
+    "ladder.jsonl": "cdec17d5ef2b94fbf92006dc1e463b48e0b7496e319e4da373faadc9fea1d78b",
+    "two_decomp.jsonl": "5c1a15dab780aa0e47861ebb1ec299e2718164c3e760edf9aded9a250ccd1b34",
+    "control_before.jsonl": "df3c8f01b945ad95fa479f6c6cbe0fcc22ca6c1742e3266d2bfb76b165f3baed",
+    "progress.txt": "cf1c945379fd728a845f6aa3088c2dc0bbe82595b336681289ee5bb5a4f52179",
+    "REPORT.md": "5d2f43b89c13f33df7adefa9004065da4f049754f31a7887d8873b4cf7de3f6d"
+  },
+  "claim_boundary_non_claims": [
+    "public synthetic known-answer fixtures only",
+    "no deployed-curve or key-recovery claim",
+    "no vs_rho claim and no asymptotic claim",
+    "wall times are exploratory: shared host, load average 6-24 on 14 cores",
+    "the 20-bit quartic cell has no surviving record and is not used"
+  ]
+}

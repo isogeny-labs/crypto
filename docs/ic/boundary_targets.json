@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "title": "Index-calculus boundary ledger",
-  "updated": "2026-10-12",
+  "updated": "2026-11-18",
   "claim_hygiene": "Public synthetic / known-answer fixtures only. Primary vs_rho claims use exactly one unseen target paired on the identical public point and resource envelope. Headline time is verified online wall after reusable IC preparation; exclude process launch, input loading, target generation, and target-independent setup. Multi-target averages, batch throughput, and shared-table amortization are secondary only and require a separate declared question after the primary one-target result. Never combine best component costs from different runs into a synthetic win. A new CPU wall-time speedup requires a qualifying host-isolation receipt; rows without one remain exploratory. Raw IC probes and rho walk steps use different units. An equal-budget precomputed-rho or multi-target study is secondary and cannot replace the one-target rho pair.",
-  "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gröbner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
+  "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gr\u00f6bner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
   "stages": [
     "factor_base",
     "decomposition",
@@ -217,7 +217,7 @@
     "Pass the row acceptance_gates.",
     "PR updates current, appends history, sets next_target, links evidence.",
     "vs_rho and end_to_end_dlp past prior size require independent recomputation.",
-    "Incomplete measurement_schema fields fail closed — no row promotion."
+    "Incomplete measurement_schema fields fail closed \u2014 no row promotion."
   ],
   "agent_priorities": [
     {
@@ -259,7 +259,7 @@
   ],
   "regimes": {
     "binary": {
-      "label": "Binary fields (Weil–Semaev / non-Koblitz)",
+      "label": "Binary fields (Weil\u2013Semaev / non-Koblitz)",
       "best_stack": [
         "semaev_decomp",
         "semaev_sat",
@@ -303,7 +303,7 @@
         "decomposition": {
           "status": "record",
           "current": {
-            "summary": "Sub-2^(2l) MITM oracle ladder through l=12 (2026-10-16) on the non-Koblitz curve y^2+xy=x^3+z*x^2+1: l=8 (94x-277x), l=9 (2,473.9x), l=10 (4,244.2x), l=11 (928.0x, 8,068 vs 2,098,176), l=12 (2,187.2x, 16,092 vs 8,390,656 — the largest rung pairs-and-solve was historically usable at); 0 disagreements vs pairs-and-solve on all 320 targets, all witnesses group-verified; tables 1 MiB..259 MB charged to the factor-base stage; FFD unmeasured with reason",
+            "summary": "Sub-2^(2l) MITM oracle ladder through l=12 (2026-10-16) on the non-Koblitz curve y^2+xy=x^3+z*x^2+1: l=8 (94x-277x), l=9 (2,473.9x), l=10 (4,244.2x), l=11 (928.0x, 8,068 vs 2,098,176), l=12 (2,187.2x, 16,092 vs 8,390,656 \u2014 the largest rung pairs-and-solve was historically usable at); 0 disagreements vs pairs-and-solve on all 320 targets, all witnesses group-verified; tables 1 MiB..259 MB charged to the factor-base stage; FFD unmeasured with reason",
             "metrics": {
               "oracle_class": "mitm_pair_table",
               "construction_method": "group-law meet-in-the-middle over subspace factor-base points",
@@ -1013,7 +1013,7 @@
                     }
                   ]
                 },
-                "f4_splits": "flat across 39→46 unknowns (scaling note)",
+                "f4_splits": "flat across 39\u219246 unknowns (scaling note)",
                 "oracle_classes": [
                   "enumerate",
                   "groebner",
@@ -1182,7 +1182,7 @@
                 "ic_degree_doc_max": 23
               },
               "recorded": "2026-09-12-pre-shared-log-record",
-              "summary": "Known-answer recovery on toys n≈7–13; ic runner degrees <=23 with caps"
+              "summary": "Known-answer recovery on toys n\u22487\u201313; ic runner degrees <=23 with caps"
             }
           ]
         },
@@ -1339,7 +1339,7 @@
               "multi-target, projected-rho, and precomputed-rho results remain separately labeled secondary studies"
             ],
             "historical_secondary_note": "Parallel guided rank changes reusable preparation. Host load cannot be assumed to affect both arms equally.",
-            "projection_class_research_target": "Extend the a=1 arm past n=83: n=97 a=0 (r ~ 2^95, cofactor 4) needs a rho projection-class rung (online rho ~ 2^44 steps is not wall-runnable); n=107/109/113 a=1 (r ~ 2^107-2^112, cofactor 2) and n=127 a=1 (r ~ 2^115, cofactor 7114) are the u128-ceiling rungs, also projection-class. ECC2K-130 itself (n=131 a=0, r ~ 2^129.6) additionally needs u256 field words, an implicit S3 index, and 130-bit sparse LA; 4-sum total-work parity with rho is not reachable there (see RESEARCH_ECC2K130_IC_FEASIBILITY.md) — the 5-sum relation shape is the top unexplored lever."
+            "projection_class_research_target": "Extend the a=1 arm past n=83: n=97 a=0 (r ~ 2^95, cofactor 4) needs a rho projection-class rung (online rho ~ 2^44 steps is not wall-runnable); n=107/109/113 a=1 (r ~ 2^107-2^112, cofactor 2) and n=127 a=1 (r ~ 2^115, cofactor 7114) are the u128-ceiling rungs, also projection-class. ECC2K-130 itself (n=131 a=0, r ~ 2^129.6) additionally needs u256 field words, an implicit S3 index, and 130-bit sparse LA; 4-sum total-work parity with rho is not reachable there (see RESEARCH_ECC2K130_IC_FEASIBILITY.md) \u2014 the 5-sum relation shape is the top unexplored lever."
           },
           "evidence": [
             "experiments/koblitz-single-target-n83-20261006/claim_report_vs_rho.json",
@@ -2155,7 +2155,8 @@
         "generic_ic_bench_bits": 12,
         "j0_ic_bench_bits": 14,
         "module_doc_sub_bits": 40,
-        "dense_3sum_nonscaling_wall_bits": 80
+        "dense_3sum_nonscaling_wall_bits": 80,
+        "a3_s4_3decomp_ladder_bits": 28
       },
       "records": {
         "factor_base": {
@@ -2190,48 +2191,284 @@
         "decomposition": {
           "status": "record",
           "current": {
-            "summary": "First Semaev-S4 3-decomposition relation family past toy sizes on the deployed a=-3 curve shape (P-256 class, 16-bit prime p=65519): relations decompose R = aG + bQ into three factor-base points via the S4 quartic + Cantor-Zassenhaus root finding (find_roots_fp_fast); measured trials/relation = 1.0 (every trial yields a relation; ~13 expected hits/trial at fb=120), 128 relations, staged timers, known-answer verified and rho-agreeing. Per-relation wall 3.3 s is dominated by the B^2/2 quartic sweep at fixed B=120, so 2-decomposition remains faster per relation at these sizes; the confirmed p/B^3 3-decomposition density is the input for the larger-B design where 3-decomposition is the asymptotic lever.",
+            "summary": "Same S4 three-summand family on the a=-3 deployed shape (P-256 and GOST CryptoPro-B classes, generic j, no CM), now decided by an **S3-anchored pair sweep** instead of the S4 quartic + Cantor-Zassenhaus: for each factor-base anchor F_i and both signs form R' = R -+ F_i, then two-decompose R' by solving the quadratic S3(x_j, X, x_R') = 0 for every x_j in the base -- one quadratic and one square root per candidate instead of a quartic plus a full X^p mod f and equal-degree splitting. The family is not approximated: s3_anchor_sweep_matches_the_quartic_triple_census checks both oracles against a brute-force sign census on the 16-bit rung (anchored set equals the census exactly; the CZ set is a subset that contains the planted triple), and every row is re-added in the group before use. Ladder at 16/20/24/28 bits with fb=120: median trials/relation 1.0 (16), 1.0 (20), 6.0 (24), 72.5 (28); median per-relation wall 0.145 ms (16), 3.791 ms (20), 113.956 ms (24), 1994.122 ms (28). The 28-bit rungs (p=268435399 p256 class, p=268435361 CryptoPro-B class) are the first of this family past 24 bits. A paired single-seed 16-bit run measured 291.532 s for the quartic/CZ oracle and 0.0185 s for the anchored sweep on the same 128 relations. At 28 bits the anchored 3-decomposition (245-390 s) is within about 2x of the current-tree 2-decomposition driver on the same fixtures (121-167 s for 128 rows), which needs one fewer column per row. FFD inapplicable with reason (direct univariate root finding; no GB/SAT system). Constant factor only: the anchored sweep still costs ~p*c per relation-search pass, so this does not move the vs_rho frontier.",
             "metrics": {
-              "n_or_bits": 16,
+              "n_or_bits": 28,
               "m_summands": 3,
               "system_degree": 4,
               "unknowns": 120,
-              "eq_var_ratio": "not applicable: direct univariate root finding per (x_i, x_j) pair",
+              "factor_base_size": 120,
+              "eq_var_ratio": "not applicable: direct univariate quadratic (S3) solve per anchored pair; no multivariate system",
               "ffd": {
                 "status": "inapplicable",
-                "reason": "direct univariate quartic root finding (Cantor-Zassenhaus); no Boolean/Gröbner system solved"
+                "reason": "direct univariate quadratic root finding on the S3/anchored sweep; no Boolean/Groebner system solved"
               },
-              "oracle_class": "quartic_root_find_cantor_zassenhaus",
-              "median_ms_per_target": 3320.0,
-              "median_ms_per_target_note": "relations stage wall / relations collected at fb=120, 16 bits",
-              "largest_solvable": "16-bit a=-3 (P-256 shape) known-answer DLP via S4 3-decomposition",
-              "trials_per_relation": {
-                "median": 1.0,
-                "max": 1,
-                "min": 1
+              "oracle_class": "s3_anchor_pair_sweep",
+              "ladder_bits": [
+                16,
+                20,
+                24,
+                28
+              ],
+              "median_ms_per_target": 1994.122,
+              "median_ms_per_target_note": "relations stage wall / relations collected at the 28-bit p256 rung (median over 3 seeds)",
+              "by_bits": {
+                "16bit_p256": {
+                  "seeds": [
+                    20261005,
+                    20261006,
+                    20261007
+                  ],
+                  "ic_wall_ms": [
+                    18.5,
+                    17.4,
+                    36.3
+                  ],
+                  "median_ic_wall_ms": 18.5,
+                  "median_ms_per_relation": 0.145,
+                  "median_trials_per_relation": 1.0,
+                  "relations_collected": 128,
+                  "all_verified": true
+                },
+                "20bit_cryptopro": {
+                  "seeds": [
+                    20261005,
+                    20261006,
+                    20261007
+                  ],
+                  "ic_wall_ms": [
+                    513.0,
+                    771.0,
+                    581.0
+                  ],
+                  "median_ic_wall_ms": 581.0,
+                  "median_ms_per_relation": 4.539,
+                  "median_trials_per_relation": 1.0,
+                  "relations_collected": 128,
+                  "all_verified": true
+                },
+                "20bit_p256": {
+                  "seeds": [
+                    20261005,
+                    20261006,
+                    20261007
+                  ],
+                  "ic_wall_ms": [
+                    419.8,
+                    485.3,
+                    604.5
+                  ],
+                  "median_ic_wall_ms": 485.3,
+                  "median_ms_per_relation": 3.791,
+                  "median_trials_per_relation": 1.0,
+                  "relations_collected": 128,
+                  "all_verified": true
+                },
+                "24bit_cryptopro": {
+                  "seeds": [
+                    20261005,
+                    20261006,
+                    20261007
+                  ],
+                  "ic_wall_ms": [
+                    20307.2,
+                    17483.0,
+                    20719.4
+                  ],
+                  "median_ic_wall_ms": 20307.2,
+                  "median_ms_per_relation": 158.65,
+                  "median_trials_per_relation": 5.0,
+                  "relations_collected": 128,
+                  "all_verified": true
+                },
+                "24bit_p256": {
+                  "seeds": [
+                    20261005,
+                    20261006,
+                    20261007
+                  ],
+                  "ic_wall_ms": [
+                    15139.8,
+                    14586.3,
+                    14166.4
+                  ],
+                  "median_ic_wall_ms": 14586.3,
+                  "median_ms_per_relation": 113.956,
+                  "median_trials_per_relation": 6.0,
+                  "relations_collected": 128,
+                  "all_verified": true
+                },
+                "28bit_cryptopro": {
+                  "seeds": [
+                    20261005,
+                    20261006,
+                    20261007
+                  ],
+                  "ic_wall_ms": [
+                    362489.2,
+                    350894.3,
+                    389750.0
+                  ],
+                  "median_ic_wall_ms": 362489.2,
+                  "median_ms_per_relation": 2831.947,
+                  "median_trials_per_relation": 87.5,
+                  "relations_collected": 128,
+                  "all_verified": true
+                },
+                "28bit_p256": {
+                  "seeds": [
+                    20261005,
+                    20261006,
+                    20261007
+                  ],
+                  "ic_wall_ms": [
+                    244813.6,
+                    255247.6,
+                    302009.4
+                  ],
+                  "median_ic_wall_ms": 255247.6,
+                  "median_ms_per_relation": 1994.122,
+                  "median_trials_per_relation": 72.5,
+                  "relations_collected": 128,
+                  "all_verified": true
+                }
               },
               "relations_collected": 128,
+              "seeds": [
+                20261005,
+                20261006,
+                20261007
+              ],
               "all_group_verified": true,
-              "rho_agreement_control": true
+              "rho_agreement_control": true,
+              "largest_solvable": "28-bit a=-3 (P-256 and CryptoPro-B class) known-answer DLP via S4 3-decomposition, S3-anchored sweep",
+              "paired_oracle_16bit": {
+                "bits": 16,
+                "seed": 20261006,
+                "curve": "a3-bench-16bit-p256class",
+                "quartic_cz_wall_s": 291.532,
+                "anchored_wall_s": 0.0185,
+                "relations": 128,
+                "ratio": 15723.1
+              },
+              "relation_search_control": {
+                "note": "same fixtures and seeds, current tree, 2-decomposition (S3) driver -- one column fewer per row",
+                "by_bits": {
+                  "16bit_p256": {
+                    "seeds": [
+                      20261005
+                    ],
+                    "ic_wall_ms": [
+                      21.3
+                    ],
+                    "median_ms_per_relation": 0.166,
+                    "median_trials_per_relation": 2.0,
+                    "all_verified": true
+                  },
+                  "20bit_cryptopro": {
+                    "seeds": [
+                      20261006
+                    ],
+                    "ic_wall_ms": [
+                      423.2
+                    ],
+                    "median_ms_per_relation": 3.306,
+                    "median_trials_per_relation": 24.0,
+                    "all_verified": true
+                  },
+                  "20bit_p256": {
+                    "seeds": [
+                      20261005
+                    ],
+                    "ic_wall_ms": [
+                      331.5
+                    ],
+                    "median_ms_per_relation": 2.59,
+                    "median_trials_per_relation": 19.5,
+                    "all_verified": true
+                  },
+                  "24bit_cryptopro": {
+                    "seeds": [
+                      20261006
+                    ],
+                    "ic_wall_ms": [
+                      9615.8
+                    ],
+                    "median_ms_per_relation": 75.123,
+                    "median_trials_per_relation": 360.0,
+                    "all_verified": true
+                  },
+                  "24bit_p256": {
+                    "seeds": [
+                      20261005
+                    ],
+                    "ic_wall_ms": [
+                      8282.3
+                    ],
+                    "median_ms_per_relation": 64.706,
+                    "median_trials_per_relation": 530.0,
+                    "all_verified": true
+                  },
+                  "28bit_cryptopro": {
+                    "seeds": [
+                      20261005
+                    ],
+                    "ic_wall_ms": [
+                      166549.3
+                    ],
+                    "median_ms_per_relation": 1301.166,
+                    "median_trials_per_relation": 7530.5,
+                    "all_verified": true
+                  },
+                  "28bit_p256": {
+                    "seeds": [
+                      20261005,
+                      20261006
+                    ],
+                    "ic_wall_ms": [
+                      121429.8,
+                      125972.2
+                    ],
+                    "median_ms_per_relation": 966.414,
+                    "median_trials_per_relation": 6396.5,
+                    "all_verified": true
+                  }
+                }
+              },
+              "inv_vartime_control": {
+                "note": "HEAD~1 vs current tree, same host and seed; the only changed hot-path code is the inversion routine in the root finder and quadratic solve",
+                "two_decomp_16bit_wall_s_before": 0.0332,
+                "two_decomp_16bit_wall_s_after": 0.0213,
+                "two_decomp_20bit_wall_s_before": 0.5505,
+                "two_decomp_20bit_wall_s_after": 0.3315,
+                "quartic_16bit_wall_s_before": [
+                  82.676
+                ]
+              },
+              "stale_previous_rows": "the 2026-10-05 a=-3 ladder rows (20-bit 18.7-37.2 s, 24-bit 272-513 s) are reproduced on this tree at 0.33-0.55 s and 8.3-9.6 s; those records are stale, not a regression of this change"
             },
-            "verdict": "A3_S4_3DECOMP_FAMILY_16BIT_QUARTIC_CZ_ORACLE"
+            "verdict": "A3_S4_3DECOMP_28BIT_S3_ANCHORED_SWEEP"
           },
           "next_target": {
-            "summary": "Cut the S4 per-relation cost at fixed yield (the B^2/2 quartic sweep dominates: batch the pair sweep, share X^p mod f across quartics per trial, or vectorize the CZ root finding) and extend the family to >=20 bits; alternatively pair the 3-decomposition density with a larger factor base where the p/B^3 trials-per-relation scaling beats 2-decomposition total cost.",
+            "summary": "Extend the anchored sweep to 32 bits under the same policy, and cut the per-candidate cost further (u64 inner loop for p < 2^63, batch inversion of the 2B anchor slopes) so a larger factor base is affordable: the density p/B^3 is still the lever, and the open measurement is the B at which 3-decomposition total wall meets 2-decomposition total wall.",
             "acceptance_gates": [
               "relations group-verified and rho agreement control on the identical public point",
               "trials-per-relation and per-relation wall recorded per bitlength",
               "ffd status explicit (inapplicable + reason for direct root finding)",
-              "no claim that 3-decomposition beats 2-decomposition at the measured sizes unless the wall shows it"
+              "no claim that 3-decomposition beats 2-decomposition on wall unless a paired same-host run shows it"
             ]
           },
           "evidence": [
-            "research/sat_factor_base_review_20260908/autolab/runs_manual/prime_a3_s4_ladder_20261006/claim_draft_a3_s4_ladder.json",
-            "examples/a3_s4_ladder.rs"
+            "research/prime_s4_s3_sweep_20261117/REPORT.md",
+            "research/prime_s4_s3_sweep_20261117/ladder.jsonl",
+            "research/prime_s4_s3_sweep_20261117/two_decomp.jsonl",
+            "examples/a3_s4_ladder.rs",
+            "examples/find_a3_bench_curves.rs",
+            "src/cryptanalysis/ec_index_calculus.rs"
           ],
           "history": [
             {
-              "summary": "S3 2-decomp through bench sizes; S4/Gröbner not a scaling win; FFD not published on 2-decomp frontier",
+              "summary": "S3 2-decomp through bench sizes; S4/Gr\u00f6bner not a scaling win; FFD not published on 2-decomp frontier",
               "metrics": {
                 "summation": "S3",
                 "summands": 2,
@@ -2245,6 +2482,33 @@
                 ]
               },
               "recorded": "2026-10-05-pre-s4-family"
+            },
+            {
+              "summary": "First Semaev-S4 3-decomposition relation family past toy sizes on the deployed a=-3 curve shape (P-256 class, 16-bit prime p=65519): relations decompose R = aG + bQ into three factor-base points via the S4 quartic + Cantor-Zassenhaus root finding (find_roots_fp_fast); measured trials/relation = 1.0 (every trial yields a relation; ~13 expected hits/trial at fb=120), 128 relations, staged timers, known-answer verified and rho-agreeing. Per-relation wall 3.3 s is dominated by the B^2/2 quartic sweep at fixed B=120, so 2-decomposition remains faster per relation at these sizes; the confirmed p/B^3 3-decomposition density is the input for the larger-B design where 3-decomposition is the asymptotic lever.",
+              "metrics": {
+                "n_or_bits": 16,
+                "m_summands": 3,
+                "system_degree": 4,
+                "unknowns": 120,
+                "eq_var_ratio": "not applicable: direct univariate root finding per (x_i, x_j) pair",
+                "ffd": {
+                  "status": "inapplicable",
+                  "reason": "direct univariate quartic root finding (Cantor-Zassenhaus); no Boolean/Gr\u00f6bner system solved"
+                },
+                "oracle_class": "quartic_root_find_cantor_zassenhaus",
+                "median_ms_per_target": 3320.0,
+                "median_ms_per_target_note": "relations stage wall / relations collected at fb=120, 16 bits",
+                "largest_solvable": "16-bit a=-3 (P-256 shape) known-answer DLP via S4 3-decomposition",
+                "trials_per_relation": {
+                  "median": 1.0,
+                  "max": 1,
+                  "min": 1
+                },
+                "relations_collected": 128,
+                "all_group_verified": true,
+                "rho_agreement_control": true
+              },
+              "recorded": "2026-10-06-s4-quartic-16bit"
             }
           ]
         },
@@ -2277,6 +2541,23 @@
                 "natural_public_synthetic": 8,
                 "planted_sat": 0,
                 "proven_unsat": 0
+              },
+              "a3_s4_3decomp_median_trials_per_relation": {
+                "16bit_p256": 1.0,
+                "20bit_cryptopro": 1.0,
+                "20bit_p256": 1.0,
+                "24bit_cryptopro": 5.0,
+                "24bit_p256": 6.0,
+                "28bit_cryptopro": 87.5,
+                "28bit_p256": 72.5
+              },
+              "a3_s4_3decomp_policy": {
+                "fb_size": 120,
+                "extra_relations": 8,
+                "max_trials_per_relation": 1000000,
+                "max_relation_attempts": 64,
+                "oracle": "s3_anchor_pair_sweep",
+                "note": "trials are random (a,b) draws, so a rung whose first draw already decomposes reads 1.0 (censored below); 3 seeds per size at 20/24/28 bits, 3 at 16"
               }
             }
           },
@@ -2361,17 +2642,37 @@
                   505.5
                 ],
                 "all_verified_and_agree_rho": true
+              },
+              "a3_s4_3decomp_ladder": {
+                "bits": [
+                  16,
+                  20,
+                  24,
+                  28
+                ],
+                "policy": "fb=120, +8 extra, 128 rows, 3 seeds per size, both a=-3 classes",
+                "median_ms_per_relation_by_bits": {
+                  "16bit_p256": 0.145,
+                  "20bit_cryptopro": 4.539,
+                  "20bit_p256": 3.791,
+                  "24bit_cryptopro": 158.65,
+                  "24bit_p256": 113.956,
+                  "28bit_cryptopro": 2831.947,
+                  "28bit_p256": 1994.122
+                },
+                "all_verified_and_agree_rho": true,
+                "note": "first rung of the S4 3-decomposition family past 24 bits; see the decomposition row"
               }
             },
             "verdict": "PRIME_J0_20BIT_STAGED_KNOWN_ANSWER_PLUS_FIRST_A3_LADDER"
           },
           "next_target": {
-            "summary": "Extend the j=0 staged ladder to >=24 bits and the a=-3 ladder to 28-32 bits with the same split timers and rho agreement control; measure where 2-decomposition relation yield (trials/relation ~ x16 per +4 bits) forces 3-decomposition (S4) relation search",
+            "summary": "Extend the anchored S4 3-decomposition ladder to 32 bits and the j=0 staged ladder past 20 bits; at 28 bits IC wall (245-390 s) is still >=4.7e2 times the paired rho wall (rho is a single run per row, 102-823 ms), so the gap to measure next is 32 bits, not a crossover",
             "acceptance_gates": [
               "[d]G = Q verified in-process and by sidecar",
               "split stage timers present (factor_base -> relations -> LA -> verify)",
               "rho agreement control on the identical public point",
-              "independent replay on a second host or >=3 seeds for any size past 20 bits"
+              ">=3 seeds for any size past 20 bits"
             ]
           },
           "evidence": [
@@ -2480,7 +2781,7 @@
       "title": "Index-calculus boundary ledger",
       "updated": "2026-09-22",
       "claim_hygiene": "Public synthetic / known-answer fixtures only. Never combine best component costs from different runs into a synthetic vs_rho win.",
-      "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gröbner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
+      "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gr\u00f6bner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
       "stages": [
         "factor_base",
         "decomposition",
@@ -2659,7 +2960,7 @@
         "Pass the row acceptance_gates.",
         "PR updates current, appends history, sets next_target, links evidence.",
         "vs_rho and end_to_end_dlp past prior size require independent recomputation.",
-        "Incomplete measurement_schema fields fail closed — no row promotion."
+        "Incomplete measurement_schema fields fail closed \u2014 no row promotion."
       ],
       "agent_priorities": [
         {
@@ -2720,7 +3021,7 @@
       ],
       "regimes": {
         "binary": {
-          "label": "Binary fields (Weil–Semaev / non-Koblitz)",
+          "label": "Binary fields (Weil\u2013Semaev / non-Koblitz)",
           "best_stack": [
             "semaev_decomp",
             "semaev_sat",
@@ -8485,7 +8786,7 @@
                       }
                     ]
                   },
-                  "f4_splits": "flat across 39→46 unknowns (scaling note)",
+                  "f4_splits": "flat across 39\u219246 unknowns (scaling note)",
                   "oracle_classes": [
                     "enumerate",
                     "groebner",
@@ -9508,7 +9809,7 @@
                     "demo_n_max": 13,
                     "ic_degree_doc_max": 23
                   },
-                  "summary": "Known-answer recovery on toys n≈7–13; ic runner degrees <=23 with caps"
+                  "summary": "Known-answer recovery on toys n\u22487\u201313; ic runner degrees <=23 with caps"
                 },
                 {
                   "metrics": {
@@ -14575,7 +14876,7 @@
             "decomposition": {
               "status": "record",
               "current": {
-                "summary": "S3 2-decomp through bench sizes; S4/Gröbner not a scaling win; FFD not published on 2-decomp frontier",
+                "summary": "S3 2-decomp through bench sizes; S4/Gr\u00f6bner not a scaling win; FFD not published on 2-decomp frontier",
                 "metrics": {
                   "summation": "S3",
                   "summands": 2,
