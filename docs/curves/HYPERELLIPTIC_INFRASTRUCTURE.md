@@ -606,7 +606,9 @@ The exported catalog identifies its wrapper with
 `generated_by = "hyperelliptic-cover catalog-export"`. Its
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
-that order. Read the value from the exact export rather than copying a digest
+that order. For this revision the digest is
+`1b3b26cb6e3d38cc1366e5746e619c1ae415c2f8ff39b89e374c90cbaef361e2`.
+Read the value from the exact export rather than copying a digest
 from an earlier revision. Changing any of the three producer inputs changes
 the provenance digest. Both
 `hyperelliptic-cover catalog-export` and `curve_cover_check` require callers

@@ -14,6 +14,8 @@ on:
       - 'src/bin/curve_cover_check.rs'
       - 'src/bin/curve_cover_check/**'
       - 'src/bin/hyperelliptic_cover.rs'
+      - 'src/bin/curve_transfer_sweep.rs'
+      - 'tests/binary_cover_transfer_oracle.rs'
       - 'examples/cover_catalog_transition_audit.rs'
       - 'src/bin/ecdlp_audit.rs'
       - 'src/bin/ecdlp_audit/**'
@@ -126,6 +128,8 @@ jobs:
           cargo test --lib hyperelliptic
           cargo test --lib binary_ecc::cover_transfer::tests
           cargo test --bin hyperelliptic-cover
+          cargo test --bin curve-transfer-sweep
+          cargo test --test binary_cover_transfer_oracle
       - name: Replay the native audit plan and fixed-F8 order certificate
         run: |
           cargo test --bin ecdlp-audit

@@ -238,7 +238,7 @@ jobs:
           cargo build --locked --release
           --bin crypto --bin ic --bin ecbench --bin curve_cover_check
           --bin curve_standards --bin hyperelliptic-cover --bin ecdlp-audit
-          --bin factor-base-sweep
+          --bin factor-base-sweep --bin curve-transfer-sweep
           --target ${{ matrix.target }}
       - name: Smoke-test the binaries
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -248,7 +248,7 @@ jobs:
         run: |
           ext=""
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
-          for bin in crypto curve_cover_check curve_standards hyperelliptic-cover ecdlp-audit factor-base-sweep; do
+          for bin in crypto curve_cover_check curve_standards hyperelliptic-cover ecdlp-audit factor-base-sweep curve-transfer-sweep; do
             "./target/${{ matrix.target }}/release/$bin$ext" --help > /dev/null
           done
           "./target/${{ matrix.target }}/release/ic$ext" --help > /dev/null
@@ -282,6 +282,7 @@ jobs:
           cp docs/curves/registry.json docs/curves/covers.json docs/curves/cover-links.yaml \
              docs/curves/cover-links.schema.json docs/curves/COVERS.md docs/curves/ICV1.md \
              docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
+             docs/curves/CURVE_TRANSFER_SWEEP.md \
              docs/curves/hyperelliptic-infrastructure.schema.json \
              docs/curves/cover-transfer-assessments.json \
              docs/curves/cover-transfer-assessment.schema.json \
@@ -292,7 +293,7 @@ jobs:
           # verification checkout. The mock binds repository source/report
           # paths and pinned Git objects that are intentionally not staged.
           cp -R docs/ecdlp-audit "dist/$name/docs/"
-          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit factor-base-sweep; do
+          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit factor-base-sweep curve-transfer-sweep; do
             cp "target/${{ matrix.target }}/release/$bin$ext" "dist/$name/"
           done
           # `[ -f ] && cp` leaves the loop's exit status at 1 when the last
@@ -308,6 +309,7 @@ jobs:
             cd "dist/$name"
             for required in \
               docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
+              docs/curves/CURVE_TRANSFER_SWEEP.md \
               docs/curves/hyperelliptic-infrastructure.schema.json \
               docs/curves/cover-transfer-assessments.json \
               docs/curves/cover-transfer-assessment.schema.json \
@@ -315,6 +317,7 @@ jobs:
               test -f "$required"
             done
             "./hyperelliptic-cover$ext" --help > /dev/null
+            "./curve-transfer-sweep$ext" --help > /dev/null
             "./ecdlp-audit$ext" --help > /dev/null
             "./curve_cover_check$ext" \
               --registry docs/curves/registry.json \
@@ -337,9 +340,48 @@ jobs:
               --repo-root . \
               > fixed-f8-order-smoke.json
             node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("fixed-f8-order-smoke.json")); if(r.status!=="verified"||r.jacobian_order_over_f8!==486) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"curve-transfer-sweep-request/v1","selector":{"kind":"model","value":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"}},"families":["binary_cubic_pullback_v1"],"bounds":{"prime_shift_start":0,"prime_shift_end":0,"max_attempts":1,"max_field_bits":7,"max_genus":3,"max_degree":3}}' \
+              > binary-transfer-sweep-request.json
+            "./curve-transfer-sweep$ext" sweep \
+              --request binary-transfer-sweep-request.json \
+              --registry docs/curves/registry.json \
+              --output binary-transfer-sweep-smoke.json
+            "./curve-transfer-sweep$ext" verify \
+              --input binary-transfer-sweep-smoke.json \
+              --registry docs/curves/registry.json \
+              --output binary-transfer-sweep-verify-smoke.json
+            node -e 'const fs=require("fs"); const s=JSON.parse(fs.readFileSync("binary-transfer-sweep-smoke.json")); const v=JSON.parse(fs.readFileSync("binary-transfer-sweep-verify-smoke.json")); if(s.record_state!=="bounded_search_result"||s.summary.parameter_points_attempted!==1||s.summary.verified_candidates!==1||v.status!=="verified"||v.candidate_count!==1) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"curve-transfer-sweep-request/v1","selector":{"kind":"model","value":{"v":"1","form":"y^2=x^3+a*x+b","p":"5","field":"fp-5","a":"1","b":"1"}},"families":["prime_quadratic_pullback_v1"],"bounds":{"prime_shift_start":0,"prime_shift_end":3,"max_attempts":4,"max_field_bits":5,"max_genus":2,"max_degree":2}}' \
+              > odd-transfer-sweep-request.json
+            "./curve-transfer-sweep$ext" sweep \
+              --request odd-transfer-sweep-request.json \
+              --registry docs/curves/registry.json \
+              --output odd-transfer-sweep-smoke.json
+            "./curve-transfer-sweep$ext" verify \
+              --input odd-transfer-sweep-smoke.json \
+              --registry docs/curves/registry.json \
+              --output odd-transfer-sweep-verify-smoke.json
+            node -e 'const fs=require("fs"); const s=JSON.parse(fs.readFileSync("odd-transfer-sweep-smoke.json")); const v=JSON.parse(fs.readFileSync("odd-transfer-sweep-verify-smoke.json")); if(s.record_state!=="bounded_search_result"||s.summary.parameter_points_attempted!==4||s.summary.verified_candidates!==4||v.status!=="verified"||v.candidate_count!==4) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"pull_push_composition_certificate","point":{"kind":"affine","x":"0x0","y":"0x1"}}' \
+              | "./hyperelliptic-cover$ext" transfer --input - > transfer-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-smoke.json")); if(r.status!=="ok"||r.result.context.field_degree!==7||r.result.context.map_degree!==3||r.result.result.identity_holds!==true) process.exit(1);'
+            if printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"pushforward","divisor":{"u":[],"v":[]}}' \
+              | "./hyperelliptic-cover$ext" transfer --input - > malformed-divisor-smoke.json; then
+              echo 'malformed divisor unexpectedly accepted' >&2
+              exit 1
+            fi
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("malformed-divisor-smoke.json")); if(r.status!=="invalid_input"||r.command!=="transfer") process.exit(1);'
             rm construct-smoke.json verify-smoke.json verified-smoke.json \
                arithmetic-smoke.json catalog-smoke.json fixed-f8-order-smoke.json \
-               curve-cover-check-smoke.json
+               curve-cover-check-smoke.json binary-transfer-sweep-request.json \
+               binary-transfer-sweep-smoke.json binary-transfer-sweep-verify-smoke.json \
+               odd-transfer-sweep-request.json odd-transfer-sweep-smoke.json \
+               odd-transfer-sweep-verify-smoke.json transfer-smoke.json \
+               malformed-divisor-smoke.json
           )
           cd dist
           if [ "${{ runner.os }}" = "Windows" ]; then
@@ -1016,7 +1058,7 @@ jobs:
 
           | Artifact | Contents |
           | --- | --- |
-          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `ecdlp-audit`, `factor-base-sweep` — glibc |
+          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `curve-transfer-sweep`, `ecdlp-audit`, `factor-base-sweep` — glibc |
           | `isogeny-*-x86_64-unknown-linux-gnu.tar.gz` | dedicated `isogeny` executable, README, BUILD.json — glibc |
           | `isogeny-*-x86_64-unknown-linux-musl.tar.gz` | dedicated tool — static |
           | `isogeny-algos-*-x86_64-unknown-linux-gnu.tar.gz` | `isogeny-algos` (point counting, isogenies, Vélu/√élu, chains, BMSS, duals, CSIDH, paths, KLPT, Richelot, Φ_ℓ), USAGE.md, BUILD.json — glibc |
@@ -1038,6 +1080,9 @@ jobs:
           Put the extracted `factor-base-sweep` executable on PATH and launch
           `factor-base-sweep run --out runs/bases`. No Rust toolchain or source
           checkout is needed to run the installed native CLI.
+
+          Run `curve-transfer-sweep --help` for finite, replayable enumeration
+          of the explicitly implemented curve-cover families.
 
           Run `isogeny --help` after extracting the dedicated tool archive.
           `isogeny search --curve p224 --ell 1471 --out p224-1471` constructs
