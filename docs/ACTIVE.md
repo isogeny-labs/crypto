@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [ ] Freeze and validate the separate exact GitHub-runner norm-branch protocol and workflow; dispatch only after merge in a fresh result PR (Codex, started 2026-11-18, branch codex/norm-branch-runner-freeze-20261118, PR pending)
+
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
@@ -30,7 +32,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [x] Split the index-calculus yield/rank frontier into attackable obligations and evidence-linked targets (Codex, completed 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4685)
 
-- [ ] Preregister and execute the exact GitHub-runner norm-branch fallback after EKS admission failure (Codex, started 2026-11-17, branch codex/norm-branch-github-fallback-20261117, PR #4686)
+- [x] Track the separate exact GitHub-runner norm-branch fallback after EKS admission failure (Codex, started 2026-11-17, branch codex/norm-branch-github-fallback-20261117, PR #4686; implementation moved to a fresh branch after automatic merge)
 
 - [x] Add the fail-closed pre-launch checkpoint for the frozen norm-branch tensor census (Codex, started 2026-11-17, branch codex/norm-branch-census-run-20261117, PR #4570)
 - [ ] Certify prime31 exact geometric CM conductor via 3-division and tighten nonscalar endomorphism degree bound (automation, started 2026-11-18, branch automation/prime31-cm-conductor3-certificate-20261118)
