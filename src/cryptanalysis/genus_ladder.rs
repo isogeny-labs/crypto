@@ -885,11 +885,12 @@ pub fn f_irreducible(p: u64, f: &[u64]) -> bool {
             d.resize(2, 0);
         }
         d[1] = (d[1] + p - 1) % p;
-        let mut d = d;
         vtrim(&mut d);
         d
     };
-    let primes: Vec<usize> = (2..=n).filter(|&q| n % q == 0 && (2..q).all(|d| q % d != 0)).collect();
+    let primes: Vec<usize> = (2..=n)
+        .filter(|&q| n.is_multiple_of(q) && (2..q).all(|d| !q.is_multiple_of(d)))
+        .collect();
     // frob[k] = x^(p^k) mod f, k = 0..=n
     let mut frob = vec![x.clone()];
     for k in 1..=n {
@@ -2428,8 +2429,12 @@ mod tests {
         for &(p, g) in &[(131u64, 3u32), (131, 4), (257, 4)] {
             for cs in 1..120u64 {
                 let f = random_f(p, g, cs);
-                let Ok(curve) = JCurve::new(p, g, &f) else { continue };
-                let Ok(order) = curve.jacobian_order(cs) else { continue };
+                let Ok(curve) = JCurve::new(p, g, &f) else {
+                    continue;
+                };
+                let Ok(order) = curve.jacobian_order(cs) else {
+                    continue;
+                };
                 if f_irreducible(p, &f) {
                     irr += 1;
                     assert_eq!(order % 2, 1, "p={p} g={g} cs={cs}: irreducible f, even #J");
