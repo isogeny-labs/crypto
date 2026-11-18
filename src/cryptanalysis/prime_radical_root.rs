@@ -160,6 +160,30 @@ impl Fp {
             t0 as u64
         }
     }
+    /// First quadratic non-residue, preserving the old increasing-candidate order.
+    /// Quadratic reciprocity gives (2|p) from p mod 8, (3|p) from p mod 12,
+    /// and (5|p) from p mod 5. If 2 and 3 are both squares, so is 6.
+    /// This avoids repeated Euler powers during per-prime setup, and only
+    /// falls back to the original search when the first non-residue is >= 7.
+    #[inline]
+    fn first_quadratic_nonresidue(&self) -> u64 {
+        let p = self.p;
+        if p % 8 == 3 || p % 8 == 5 {
+            return 2;
+        }
+        if p % 12 == 5 || p % 12 == 7 {
+            return 3;
+        }
+        if p % 5 == 2 || p % 5 == 3 {
+            return 5;
+        }
+        let mut z = 7u64;
+        while self.powm(z, (p - 1) / 2) == 1 {
+            z += 1;
+        }
+        z
+    }
+
     /// Small public modular inverse constants used by each radical context.
     /// Algebraic congruences replace several extended-Euclid divisions.
     #[inline]
@@ -723,13 +747,7 @@ impl RadicalRootCtx {
             return Err("radical root finder needs a prime 5 <= p <= 2^61-1".into());
         }
         let f = Fp::new(p);
-        let n = {
-            let mut z = 2u64;
-            while f.powm(z, (p - 1) / 2) == 1 {
-                z += 1;
-            }
-            z
-        };
+        let n = f.first_quadratic_nonresidue();
         let (mut t2, mut s2) = (p - 1, 0u32);
         while t2 & 1 == 0 {
             t2 >>= 1;
@@ -1313,6 +1331,66 @@ mod tests {
         fn cand(&self, k: u64) -> Self::E { self.0.cand(k) }
     }
 
+
+    #[test]
+    fn round22_nonresidue_reciprocity_preserves_first_candidate() {
+        // Exact first non-residue, not merely any non-residue: the Fp2
+        // representation and deterministic AMM generator must not change.
+        for p in (5..20_000u64).filter(|&p| is_prime_u64(p)).chain(
+            [487u64, 1459, 17497, 998244353, 1000000007,
+             1000000009, MAX_PRIME]
+        ) {
+            let f = Fp::new(p);
+            let mut expected = 2u64;
+            while f.powm(expected, (p - 1) / 2) == 1 {
+                expected += 1;
+            }
+            assert_eq!(f.first_quadratic_nonresidue(), expected, "p={p}");
+        }
+    }
+
+    #[test]
+    #[ignore = "paired production-Rust root context nonresidue selection timing"]
+    fn bench_round22_nonresidue_selection() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn old(f: &Fp) -> u64 {
+            let mut z = 2;
+            while f.powm(z, (f.p - 1) / 2) == 1 { z += 1; }
+            z
+        }
+        fn sample(p: u64, fast: bool) -> f64 {
+            let start = Instant::now();
+            let mut check = 0u64;
+            for _ in 0..5000 {
+                let f = Fp::new(black_box(p));
+                check ^= if fast {
+                    f.first_quadratic_nonresidue()
+                } else {
+                    old(&f)
+                };
+                black_box(check);
+            }
+            black_box(check);
+            start.elapsed().as_nanos() as f64 / 5000.0
+        }
+        for p in [487, 17497, 1000000009, MAX_PRIME] {
+            let (mut before, mut after) = (Vec::new(), Vec::new());
+            for i in 0..13 {
+                if i % 2 == 0 {
+                    before.push(sample(p, false));
+                    after.push(sample(p, true));
+                } else {
+                    after.push(sample(p, true));
+                    before.push(sample(p, false));
+                }
+            }
+            before.sort_by(f64::total_cmp);
+            after.sort_by(f64::total_cmp);
+            println!("round22 selector p={p}: {:.3} -> {:.3} ns ({:.3}x)",
+                     before[6], after[6], before[6] / after[6]);
+        }
+    }
 
     #[test]
     fn round21_small_inverses_and_cached_sylow_are_exact() {
