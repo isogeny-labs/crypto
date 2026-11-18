@@ -444,3 +444,12 @@ versus 47/258 for one shuffled-label control, but unequal tie coverage,
 best-of-32 selection and a single shuffle leave that gap uncalibrated. A
 prospective max-statistic permutation control is the next evidence gate; no
 digit oracle or ECDLP claim follows. [pcc:unverified]
+
+That prospective
+[max-statistic calibration](QUOTIENT_DIGIT_CALIBRATION_EXPERIMENT.md) includes
+all 32 unequal-coverage rules in each of 4,096 row-preserving label
+permutations. The selected `IX1-argmin` statistic has standardized root
+4.320948; six null maxima meet or exceed it, for plus-one empirical
+`p=0.00170857`. This admits one unchanged out-of-sample association test. The
+rule remains highly inexact (57/204 covered targets, with 54 abstentions), so
+the calibration is not a digit oracle or an ECDLP result. [pcc:unverified]
