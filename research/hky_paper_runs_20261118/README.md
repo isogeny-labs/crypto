@@ -72,7 +72,40 @@ Files:
 
 ## 3. Gate: recorded closures reproduced exactly
 
-GATE_TABLE
+<!-- GATE:begin -->
+Expected = `lfd-summation-systems/experiments/ic-bounds-k14/runs/<cell>.json` (`columns`, `profile` = dim(V_D ∩ M_≤w) for
+w = 0..D, `contains_one`); got = this engine's `--instance` record; `match` requires all three equal and the closure
+closed. Rows with binary `d31a012b` are `bin/pilot_gate`; `52b47153` is the provisional pod binary (same sources,
+commit-stamped), whose muladds equal the gate binary's on every shared cell. Scripts: `gate/run_gate.sh`,
+`gate/table.sh`; records under `gate/raw*/`.
+
+| cell (instance : D) | columns | expected profile | got profile | 1 ∈ V_D exp / got | match | muladds | wall (s, shared 4 vCPU) | binary |
+|:--|--:|:--|:--|:-:|:-:|--:|--:|:--|
+| unit-p65537-a1-s10-k10 : 5 | 21700 | 0,0,2,138,3163,18569 | 0,0,2,138,3163,18569 | false / false | **true** | 16024605579 | 43 | d31a012b |
+| unit-p65537-a1-s10-k11 : 5 | 35443 | 0,0,2,142,3441,25033 | 0,0,2,142,3441,25033 | false / false | **true** | 16340811395 | 40 | d31a012b |
+| unit-p65537-a1-s10-k12 : 5 | 55455 | 0,0,2,146,3727,32057 | 0,0,2,146,3727,32057 | false / false | **true** | 17441038634 | 45 | d31a012b |
+| unit-p65537-a1-s10-k10 : 6 | 60460 | 1,21,211,1351,6196,21700,60460 | 1,21,211,1351,6196,21700,60460 | true / true | **true** | 43706615635 | 106 | d31a012b |
+| unit-p65537-a1-s10-k13 : 5 | 83682 | 0,0,2,150,4021,39657 | 0,0,2,150,4021,39657 | false / false | **true** | 17993100441 | 55 | d31a012b |
+| unit-p163841-a3-s21-k13 : 5 | 83682 | 0,0,2,150,4021,39657 | 0,0,2,150,4021,39657 | false / false | **true** | 17993415519 | 56 | d31a012b |
+| unit-p65537-a1-s10-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299157464 | 61 | d31a012b |
+| unit-p163841-a3-s21-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299505466 | 53 | d31a012b |
+| unit-p65537-a1-s10-k11 : 6 | 110056 | 1,23,254,1794,9109,35443,110056 | 1,23,254,1794,9109,35443,110056 | true / true | **true** | 321522714727 | 1188 | d31a012b |
+| unit-p65537-a1-s10-k15 : 5 | 174437 | 0,0,2,158,4633,56649 | 0,0,2,158,4633,56649 | false / false | **true** | 19233087929 | 72 | d31a012b |
+| unit-p65537-a1-s10-k10 : 5 | 21700 | 0,0,2,138,3163,18569 | 0,0,2,138,3163,18569 | false / false | **true** | 16024605579 | 27 | 52b47153 |
+| unit-p65537-a1-s10-k10 : 6 | 60460 | 1,21,211,1351,6196,21700,60460 | 1,21,211,1351,6196,21700,60460 | true / true | **true** | 43706615635 | 93 | 52b47153 |
+| unit-p65537-a1-s10-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299157464 | 48 | 52b47153 |
+| unit-p163841-a3-s21-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299505466 | 49 | 52b47153 |
+| unit-p163841-a3-s21-k13 : 5 | 83682 | 0,0,2,150,4021,39657 | 0,0,2,150,4021,39657 | false / false | **true** | 17993415519 | 41 | 52b47153 |
+
+The profile definition is the same on both sides: the records' `profile` ends at `rank` and is cumulative by degree, as
+the engine's `dims` (pivot degrees, cumulative). **Every row matches exactly, no discrepancy.**
+
+Not run locally (do not fit on this shared 4-vCPU box): unit-p65537 k = 13, D = 6 and unit-p163841 k = 13, D = 6 (1 enters
+at full rank 313,912; hky2 needed 2.39e13 muladds on the pod; from the k = 10 → 11 → 12 D = 6 muladd growth here, ≈ 18 h
+each at the effective rate of this box), and k = 14, D = 6 (the pod jobs J1/J2). A container restart killed the first
+k = 12, D = 6 attempt; it was re-run with `CKPT_ROOT` (checkpoint every 10 min), stopped once by SIGTERM at batch 2129 and
+resumed from that checkpoint — so this row also exercises resume in a real run.
+<!-- GATE:end -->
 
 ## 4. Negative controls
 
