@@ -55,3 +55,15 @@ The committed current Fourier kernel executes **70 × (12 Vandermonde + 4 left-f
 | B31 | 852,891,037,441 | 4,776,189,809,669,600 |
 
 For B4, the product is exactly **367,001,600** Fp multiplications. (The Walsh adds and signed-witness extraction are additional.) These are *counts for the specified naive enumeration*, **not unconditional lower bounds** for F4, tensor contraction, reuse across tuples, or every possible algebraic extractor. They demonstrate why the Fourier component cannot progress to B31 merely by looping over the 31^8 possible x choices. Public-target x-index recovery is the decisive missing algorithm.
+
+
+## Native Rust measured result — source-bound CI PASS
+
+At 2026-11-18T19:38Z, **[exact-source GitHub Actions #44381852137](https://github.com/isogeny-labs/crypto/actions/runs/44381852137)** passed using pinned Rust 1.100.0 and pinned existing original Prime31 Arithmetic at `1df714645aa683cf975bc76fcacb9842cb4780fd`, with only the new example overlaid.
+
+- All **40/40** original Rust library regression tests passed; the new 8,192-predicate signed Fourier Rust test passed **1/1**.
+- The stand-alone independent Python BigInt verifier recalculated **8,192/8,192** complete determinant residual / group-relation truth decisions, all 16 planted signed positives and all 16 shifted negative arms, their checksums and supplied-curve identities. The frozen cases have exactly one sign mask on each planted target, zero on the target-shifted negative.
+- **Measured native counted Fp multiplications, whole 32-target panel, all 256 signs per target**: direct per-mask 8x8 Gaussian evaluation **6,159,408** versus Fourier **179,200**; **34.37170× fewer**. Native counted inversions: direct **65,520** versus Fourier **zero**. The counts exclude curve/fixture generation and original-curve correctness verification equally on both arms. This is **only** cost of the algebraic signed-**given-x** determinant component.
+- Raw JSON evidence: **[artifact #14464093350](https://github.com/isogeny-labs/crypto/actions/runs/44381852137/artifacts/14464093350)**, ZIP digest `sha256:9f500f2dc788c5759da9ab6579b1dbcecff88914265f7ee23ab5f1b93718cdd7`. The first native CI attempt [#44381033092](https://github.com/isogeny-labs/crypto/actions/runs/44381033092) caught a Rust E0499 nested mutable borrow; the expression was evaluated in two statements and the next exact-source run **passed**. No arithmetic changes from the preflight.
+
+**Evidence status:** source-specific producer CI + separately authored Python BigInt replay passed. No independent signed PCC, no measured unknown-index extractor, no complete ECDLP benchmark or claim of beating BSGS/rho. The 34.37× is not a solver speedup and must not be extrapolated across all `B^8` index tuples.
