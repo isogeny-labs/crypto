@@ -3050,3 +3050,238 @@ mod tests {
     }
 
 }
+
+#[cfg(test)]
+impl RadicalRootCtx {
+    fn quartic_before_sparse(
+        &self,
+        a: u64,
+        b: u64,
+        c: u64,
+        d: u64,
+        e: u64,
+    ) -> Result<(Vec<u64>, bool), String> {
+        let f = &self.f;
+        // monic
+        let (b1, c1, d1, e1) = if a == 1 {
+            (b, c, d, e)
+        } else {
+            let ia = f.inv(a);
+            (f.mul(b, ia), f.mul(c, ia), f.mul(d, ia), f.mul(e, ia))
+        };
+        // x = y - B, B = b1/4
+        let (bb, pp, qq, rr) = self.quartic_depressed_coeffs(b1, c1, d1, e1);
+        let mut ys: Vec<u64> = vec![];
+        let mut fallback = false;
+        if qq == 0 {
+            for z in self.quad_monic(pp, rr) {
+                match self.sqrt(z) {
+                    None => {}
+                    Some(0) => ys.push(0),
+                    Some(s) => {
+                        ys.push(s);
+                        ys.push(f.neg(s));
+                    }
+                }
+            }
+        } else {
+            // resolvent in z = (r1+r2)^2:  z^3 + 2P z^2 + (P^2 - 4R) z - Q^2 = 0
+            let (z2, z1, z0) = self.quartic_resolvent_coeffs(pp, qq, rr);
+            let zs = self.cubic_monic(z2, z1, z0);
+            if zs.is_empty() {
+                // Frobenius type (1,3): no rational pairing; the unique root needs F_{p^3} radicals.
+                // Use the distinct-degree (CZ) path on the depressed quartic - NOT radical.
+                fallback = true;
+                ys = frobenius_roots(f.p, &[rr, qq, pp, 0, 1])?;
+            } else {
+                for &z in &zs {
+                    if let Some(al) = self.sqrt(z) {
+                        // quartic = (y^2 + al y + be)(y^2 - al y + ga)
+                        let qa = f.mul(qq, f.inv(al));
+                        let s = f.add(pp, z);
+                        let be = f.half(f.sub(s, qa));
+                        let ga = f.half(f.add(s, qa));
+                        ys.extend(self.quad_monic(al, be));
+                        ys.extend(self.quad_monic(f.neg(al), ga));
+                        break;
+                    }
+                }
+            }
+        }
+        let mut xs: Vec<u64> = ys.into_iter().map(|y| f.sub(y, bb)).collect();
+        xs.sort_unstable();
+        xs.dedup();
+        Ok((xs, fallback))
+    }
+}
+
+#[cfg(test)]
+mod sparse_round18_tests {
+    use super::*;
+
+    fn before_s1<R: Ring>(c: &Cube<R>, a: R::E) -> Option<R::E> {
+        assert_eq!(c.s, 1);
+        if a == c.r.zero() { return Some(a); }
+        // The previous path computed a^t and performed membership first.
+        let t = c.n / c.p3s;
+        if c.r.pow(a, t) != c.r.one() { return None; }
+        Some(c.r.pow(a, c.e3))
+    }
+    fn before_quad_monic(ctx: &RadicalRootCtx, b: u64, c: u64) -> Vec<u64> {
+        let f = &ctx.f;
+        let twice_c = f.add(c,c);
+        let disc = f.sub(f.sqr(b),f.add(twice_c,twice_c));
+        match ctx.sqrt(disc) {
+            None => vec![],
+            Some(0) => vec![f.half(f.neg(b))],
+            Some(s) => {
+                let nb=f.neg(b);
+                let first=f.half(f.add(nb,s));
+                let second=if f.p>u32::MAX as u64 {
+                    f.sub(nb,first)
+                } else { f.half(f.sub(nb,s)) };
+                vec![first,second]
+            }
+        }
+    }
+    fn before_quad(ctx: &RadicalRootCtx, a: u64, b: u64, c: u64) -> Vec<u64> {
+        let f=&ctx.f;
+        if a == 1 { let mut r=before_quad_monic(ctx,b,c);r.sort_unstable();r.dedup();return r; }
+        let ac=f.mul(a,c);let t=f.add(ac,ac);
+        let d=f.sub(f.sqr(b),f.add(t,t));
+        let Some(s)=ctx.sqrt(d) else {return vec![]};
+        let inv=f.inv(f.add(a,a));
+        let nb=f.neg(b);
+        let x=f.mul(f.add(nb,s),inv);
+        let mut out=if s==0 {vec![x]} else {vec![x,f.mul(f.sub(nb,s),inv)]};
+        out.sort_unstable();out.dedup();out
+    }
+    fn sort(mut v:Vec<u64>)->Vec<u64>{v.sort_unstable();v.dedup();v}
+    fn next(seed:&mut u64)->u64{
+        *seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        *seed
+    }
+    #[test]
+    fn s1_and_sparse_quadratic_quartic_match_previous() {
+        let mut seed=0x6d16_f124_2026_1118u64;
+        for p in [5u64,7,11,13,31,97,163,487,998_244_353] {
+            let ctx=RadicalRootCtx::new(p).unwrap();
+            if ctx.cube_p.s==1 {
+                for _ in 0..384 {
+                    let x=next(&mut seed)%p;
+                    assert_eq!(ctx.cube_p.root(x),before_s1(&ctx.cube_p,x),"Fp p={p}");
+                    let y=ctx.f.mul(x,ctx.f.sqr(x));
+                    assert_eq!(ctx.cube_p.root(y),before_s1(&ctx.cube_p,y),"Fp cube p={p}");
+                }
+            }
+            if ctx.cube_q.s==1 {
+                for _ in 0..384 {
+                    let x=(next(&mut seed)%p,next(&mut seed)%p);
+                    let y=ctx.cube_q.r.cube(x);
+                    assert_eq!(ctx.cube_q.root(x),before_s1(&ctx.cube_q,x),"Fp2 p={p}");
+                    assert_eq!(ctx.cube_q.root(y),before_s1(&ctx.cube_q,y),"Fp2 cube p={p}");
+                }
+            }
+        }
+        for p in [5u64,7,11,17,97,487,998_244_353,1_000_000_007,MAX_PRIME] {
+            let ctx=RadicalRootCtx::new(p).unwrap();
+            let f=&ctx.f;
+            for _ in 0..128 {
+                let a=1+(next(&mut seed)%(p-1));
+                let b=next(&mut seed)%p;
+                let mut x=ctx.quad_monic(b,0);
+                assert_eq!(sort(x.clone()),sort(before_quad_monic(&ctx,b,0)),"monic p={p}");
+                for root in x.drain(..) {
+                    assert_eq!(f.mul(root,f.add(root,b)),0,"bad monic root p={p}");
+                }
+                let mut y=ctx.quad_roots(a,b,0);
+                assert_eq!(y,before_quad(&ctx,a,b,0),"nonmonic p={p}");
+                for root in y.drain(..) {
+                    assert_eq!(f.mul(root,f.add(f.mul(a,root),b)),0,"bad quadratic root p={p}");
+                }
+                // Construct x*(x-r1)*(x-r2)*(x-r3), then scale by a.
+                let r1=next(&mut seed)%p;
+                let r2=next(&mut seed)%p;
+                let r3=next(&mut seed)%p;
+                let sum=f.add(f.add(r1,r2),r3);
+                let pairs=f.add(f.add(f.mul(r1,r2),f.mul(r1,r3)),f.mul(r2,r3));
+                let product=f.mul(f.mul(r1,r2),r3);
+                let bb=f.mul(a,f.neg(sum));
+                let cc=f.mul(a,pairs);
+                let dd=f.mul(a,f.neg(product));
+                let (actual,unused)=ctx.quartic(a,bb,cc,dd,0).unwrap();
+                let (previous,_)=ctx.quartic_before_sparse(a,bb,cc,dd,0).unwrap();
+                let expected=sort(vec![0,r1,r2,r3]);
+                assert_eq!(actual,expected,"quartic p={p}");
+                assert_eq!(actual,previous,"quartic old/new p={p}");
+                assert!(!unused);
+            }
+        }
+    }
+
+    #[test]
+    #[ignore]
+    fn bench_s1_and_sparse_roots_actual_rust() {
+        fn sample<T: Copy,F:Fn(T)->u64>(xs:&[T],reps:usize,f:&F)->f64 {
+            let mut hash=0u64;
+            let start=std::time::Instant::now();
+            for _ in 0..reps {for &x in xs {
+                hash=hash.wrapping_add(std::hint::black_box(f(std::hint::black_box(x))));
+            }}
+            std::hint::black_box(hash);
+            start.elapsed().as_nanos() as f64 / (xs.len()*reps) as f64
+        }
+        fn paired<T:Copy,F:Fn(T)->u64,G:Fn(T)->u64>(
+            label:&str,xs:&[T],reps:usize,before:F,after:G
+        ) {
+            let mut a=Vec::new();let mut b=Vec::new();
+            for j in 0..13 {
+                if j%2==0 {a.push(sample(xs,reps,&before));b.push(sample(xs,reps,&after))}
+                else {b.push(sample(xs,reps,&after));a.push(sample(xs,reps,&before))}
+            }
+            a.sort_by(f64::total_cmp);b.sort_by(f64::total_cmp);
+            println!("{label} before={:.3}ns after={:.3}ns speedup={:.3}x",
+                     a[6],b[6],a[6]/b[6]);
+        }
+        let mut seed=0x515a_8818_2026_1118u64;
+        let ctx=RadicalRootCtx::new(998_244_353).unwrap();
+        assert_eq!(ctx.cube_q.s,1);
+        let mut cubes=Vec::new();let mut mixed=Vec::new();
+        for _ in 0..256 {
+            let x=(next(&mut seed)%ctx.f.p,next(&mut seed)%ctx.f.p);
+            mixed.push(x);cubes.push(ctx.cube_q.r.cube(x));
+        }
+        for (name,xs) in [("cubes",cubes),("mixed",mixed)] {
+            paired(&format!("Fp2 s1 {name} p=998244353"),&xs,12,
+                |x|{let y=before_s1(&ctx.cube_q,x);y.map(|v|v.0^v.1).unwrap_or(u64::MAX)},
+                |x|{let y=ctx.cube_q.root(x);y.map(|v|v.0^v.1).unwrap_or(u64::MAX)});
+        }
+        let ctx=RadicalRootCtx::new(1_000_000_007).unwrap();
+        let mut monic=Vec::new();let mut general=Vec::new();
+        for _ in 0..512 {
+            let a=2+(next(&mut seed)%(ctx.f.p-2));
+            let b=1+(next(&mut seed)%(ctx.f.p-1));
+            monic.push(b);general.push((a,b));
+        }
+        paired("monic quadratic c=0 p=1000000007",&monic,32,
+            |b| before_quad_monic(&ctx,b,0).iter().fold(0,|h,&v|h^v),
+            |b| ctx.quad_monic(b,0).iter().fold(0,|h,&v|h^v));
+        paired("general quadratic c=0 p=1000000007",&general,32,
+            |(a,b)| before_quad(&ctx,a,b,0).iter().fold(0,|h,&v|h^v),
+            |(a,b)| ctx.quad_roots(a,b,0).iter().fold(0,|h,&v|h^v));
+        let ctx=RadicalRootCtx::new(487).unwrap();
+        let f=&ctx.f;let mut quartics=Vec::new();
+        for _ in 0..128 {
+            let a=1+next(&mut seed)%(f.p-1);
+            let x=next(&mut seed)%f.p;let y=next(&mut seed)%f.p;
+            let z=next(&mut seed)%f.p;
+            let b=f.mul(a,f.neg(f.add(f.add(x,y),z)));
+            let c=f.mul(a,f.add(f.add(f.mul(x,y),f.mul(x,z)),f.mul(y,z)));
+            let d=f.mul(a,f.neg(f.mul(f.mul(x,y),z)));
+            quartics.push((a,b,c,d));
+        }
+        paired("quartic constant=0 p=487",&quartics,6,
+            |(a,b,c,d)|ctx.quartic_before_sparse(a,b,c,d,0).unwrap().0.into_iter().fold(0,|h,v|h^v),
+            |(a,b,c,d)|ctx.quartic(a,b,c,d,0).unwrap().0.into_iter().fold(0,|h,v|h^v));
+    }
+}
