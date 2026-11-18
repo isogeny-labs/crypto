@@ -160,6 +160,14 @@ all 20 cases. This demonstrates that the proved one-degree loss is sharp; it
 does not identify the regular outer unit with an elliptic coordinate series.
 [pcc:unverified]
 
+The frozen [regular-unit substitution control](REGULAR_SUBSTITUTION_EXPERIMENT.md)
+adds a nonconstant outer unit. Across the same 20 prime/cutoff cells,
+substitution and its inverse first differ at `m+1`, the full normalized pole
+coordinate first differs at `m`, and all three closed-form boundary deltas
+match. Zero-correction, constant-outer and nonunit-outer controls all pass.
+This tests the generic composition theorem, not its elliptic instantiation.
+[pcc:unverified]
+
 The preregistered
 [out-of-sample formal-scalar panel](FORMAL_SCALAR_OOS_EXPERIMENT.md) kept the
 candidate source unchanged and sought a different-j curve model in each of five

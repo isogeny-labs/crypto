@@ -142,6 +142,13 @@ inverse-square pairs first differ at `m`, and all boundary deltas equal
 the generic theorem's precision is tight on the panel and cannot be promoted
 to one more coefficient without additional structure. [pcc:unverified]
 
+A second frozen 20-case panel composes the perturbed parameters with a
+nonconstant regular outer unit. Substitution and inverse substitution first
+differ at `m+1`; the complete normalized pole coordinate first differs at `m`.
+All 60 independently predicted boundary coefficients and all 20 control
+triplets pass. Thus the generic regular factor does not consume an additional
+coefficient on this panel. [pcc:unverified]
+
 The current dense implementation uses 64,426 additions, 67,584
 multiplications and 16 inversions for candidate construction at this fixed
 precision. These counts exclude internal verification, oracle and controls.

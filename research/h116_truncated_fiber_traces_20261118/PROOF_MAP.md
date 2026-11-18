@@ -260,6 +260,13 @@ The zero and shifted-degree controls pass in all cases. This is experimental
 support for the precision boundary, not an elliptic instance.
 [pcc:unverified]
 
+`H116-REGULAR-SUBSTITUTION-001` separately tests the new regular-unit assembly.
+All 20 substitution and inverse-substitution differences occur at degree
+`m+1`; all complete normalized pole-coordinate differences occur at degree
+`m`; and all three independent boundary formulas plus the frozen control
+triplets pass. This still supplies no elliptic identification of the outer
+series. [pcc:unverified]
+
 ## Inheritance table
 
 | Operation/law | Inheritance |
