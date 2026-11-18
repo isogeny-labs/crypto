@@ -937,6 +937,28 @@ mod tests {
         }
     }
 
+    #[test]
+    fn monic_cubic_entry_point_matches_frozen_normalization() {
+        let mut seed = 0x48fb_1298_2394_86ffu64;
+        for &p in &[5u64, 7, 11, 13, 97, 487, 65_537, 1_000_000_009] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            for _ in 0..64 {
+                let c0 = lcg(&mut seed) % p;
+                let c1 = lcg(&mut seed) % p;
+                let c2 = lcg(&mut seed) % p;
+                let inverse = f.inv(1);
+                let mut frozen = ctx.cubic_monic(
+                    f.mul(c2, inverse), f.mul(c1, inverse), f.mul(c0, inverse)
+                );
+                frozen.sort_unstable();
+                frozen.dedup();
+                let got = ctx.roots(&[c0, c1, c2, 1]).unwrap().roots;
+                assert_eq!(got, frozen, "p={p} coefficients={c0},{c1},{c2}");
+            }
+        }
+    }
+
     // Freeze the original right-to-left binary exponentiation independently
     // of the new shared Fp/Fp2 implementation.
     fn frozen_binary_power<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
@@ -1048,6 +1070,15 @@ mod tests {
             paired("Fp2 rpow dense-120", &xs, 1,
                    |x| frozen_binary_power(&q, x, e2).0,
                    |x| rpow(&q, x, e2).0);
+            // Realistic AMM cube-root exponent (not synthetic all-ones).
+            let mut t3 = (p as u128) * (p as u128) - 1;
+            while t3 % 3 == 0 {
+                t3 /= 3;
+            }
+            let e3 = if t3 % 3 == 1 { (2 * t3 + 1) / 3 } else { (t3 + 1) / 3 };
+            paired("Fp2 rpow actual-AMM-e3", &xs, 1,
+                   |x| frozen_binary_power(&q, x, e3).0,
+                   |x| rpow(&q, x, e3).0);
             paired("quadratic two-root finish", &xs, 24,
                    |(b, s)| {
                        let nb = f.neg(b);
