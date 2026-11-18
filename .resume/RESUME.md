@@ -8,7 +8,7 @@ research/ic_ksum_sibling_20261118/PROTOCOL.md (frozen in b01bb12ed0 with code); 
 P1 result: killed (kernel 0 on 5 curves, controls OK) — scratchpad p1run/p1_out.txt; to be copied into the study dir.
 
 ## State
-ecbench building; record ksum-sibling-p2 opened; run not started.
+Run complete: 0.825-0.863x at w=0, 0.857-0.887x at w=0.1, 1.000 at w=1; P1 killed. Record cannot close (main's malformed hec-multi-production-cold record breaks the progress build). PR #4649.
 
 ## Next
 Run run.sh under benchrec run; summarise vs PROTOCOL predictions; README + graph + PDF; close record; PR; report.
