@@ -192,6 +192,10 @@ pub struct Fast2Stats {
     pub verify_products: u64,
     pub verify_nonzero: u64,
     pub verify_s: f64,
+    /// Bytes of the stored rows at the end (8 per sparse term, 4 per dense
+    /// word), and of the sweep's accumulators.
+    pub final_row_bytes: u64,
+    pub sweep_bytes: u64,
     pub dense_rows: u64,
     pub sparse_rows: u64,
     pub stored_words: u64,
@@ -1653,6 +1657,15 @@ pub fn closure_fast2(
         stats.verify_s = tv.elapsed().as_secs_f64();
     }
     stats.part_rank = ech.iter().map(|e| e.rows.len() as u64).collect();
+    stats.final_row_bytes = ech
+        .iter()
+        .flat_map(|e| &e.rows)
+        .map(|r| match r {
+            RowS::Sparse(v) => 8 * v.len() as u64,
+            RowS::Dense { v, .. } => 4 * v.len() as u64,
+        })
+        .sum();
+    stats.sweep_bytes = 8 * sweep_buf.len() as u64;
     let entries: u64 = ech
         .iter()
         .flat_map(|e| &e.rows)

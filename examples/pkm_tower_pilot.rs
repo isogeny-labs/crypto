@@ -2162,7 +2162,7 @@ fn measure_hky(
                     "interreductions": st.interreductions,
                     "interreduce_muladds": st.interreduce_muladds,
                     "second_muladds": st.second_muladds, "products": st.products,
-                    "zero": st.zero, "reducers": st.reducers, "core_muladds": st.core_muladds, "zero_muladds": st.zero_muladds, "swept_batches": st.swept_batches, "verify_products": st.verify_products, "verify_nonzero": st.verify_nonzero, "verify_s": st.verify_s,
+                    "zero": st.zero, "reducers": st.reducers, "core_muladds": st.core_muladds, "zero_muladds": st.zero_muladds, "swept_batches": st.swept_batches, "verify_products": st.verify_products, "verify_nonzero": st.verify_nonzero, "verify_s": st.verify_s, "final_row_bytes": st.final_row_bytes, "sweep_bytes": st.sweep_bytes,
                     "dense_rows": st.dense_rows, "sparse_rows": st.sparse_rows,
                     "stored_words": st.stored_words, "peak_words": st.peak_words,
                     "threads": st.threads, "simd": st.simd,
