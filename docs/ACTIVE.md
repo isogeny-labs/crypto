@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [x] Restore maintained compiler targets, replay accounting and CI tooling (Codex, started 2026-11-17, branch fix/maintained-semantic-ci-latest-20261117, PR #4621; local checks passed, CI/merge blocked by artifact-store outage and inherited metadata failures).
+- [ ] Restore maintained compiler targets, replay accounting and CI tooling (Codex, started 2026-11-17, branch fix/maintained-semantic-ci-latest-20261117, PR #4621; local checks passed, CI/merge blocked by artifact-store outage and inherited metadata failures).
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
