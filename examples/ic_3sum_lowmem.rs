@@ -320,7 +320,7 @@ impl StreamOracle {
         let mut d = Vec::with_capacity(b);
         let mut scratch = Vec::with_capacity(b);
         let mut hits: Vec<(u32, u32, u32, u32, u32)> = Vec::new(); // (t, i2, j, k_raw)
-        let mut probe = |xc: u64, j: u32, k_raw: u32, this: &Self, hits: &mut Vec<(u32, u32, u32, u32, u32)>| {
+        let probe = |xc: u64, j: u32, k_raw: u32, this: &Self, hits: &mut Vec<(u32, u32, u32, u32, u32)>| {
             let bk = (xc >> this.shift) as usize;
             if bk + 1 >= this.starts.len() {
                 return;
@@ -597,7 +597,7 @@ fn main() {
                         }
                     }
                     rows_total = rt; rows3 = r3; mem_struct = so.mem_bytes();
-                    extra_j = json!({"chunk":a.chunk,"pair_sums":so.pair_sums,"probe_hits":so.probes_hit,"chunks":(a.n + a.chunk - 1)/a.chunk});
+                    extra_j = json!({"chunk":a.chunk,"pair_sums":so.pair_sums,"probe_hits":so.probes_hit,"chunks":a.n.div_ceil(a.chunk)});
                 }
                 "nested" => {
                     build_s = 0.0;
@@ -644,7 +644,7 @@ fn main() {
             let log = solve_relations(&fc, b, &rels);
             let la_s = t.elapsed().as_secs_f64();
             println!("{}", json!({"mode":"solve","bits":a.bits,"p":fc.f.p,"B":b,"chunk":a.chunk,"needed":needed,
-                "targets":targets,"chunks":(targets as usize + a.chunk -1)/a.chunk,"collect_s":collect_s,"la_s":la_s,
+                "targets":targets,"chunks":(targets as usize).div_ceil(a.chunk),"collect_s":collect_s,"la_s":la_s,
                 "total_s":collect_s+la_s,"log_ok":log==Some(k),"struct_bytes":so.mem_bytes(),
                 "rss_base_kb":base_rss,"vmhwm_kb":vmhwm_kb()}));
             assert_eq!(log, Some(k));
