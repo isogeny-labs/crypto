@@ -249,3 +249,41 @@ The fixed-arity paper bound `p^(2/m+o(1))` would make the family premise true
 for every fixed simulator degree by choosing `m` after the requested rational
 rate.  That specialization is not claimed as Lean-verified until the
 paper-to-machine cost bridge is supplied.
+
+## First-moment coverage repair
+
+1. **Structure above.** A finite seed space, a natural-valued factor-base size
+   on each seed, a positive scale `X`, finite sums and filtered cardinalities.
+   A seed is called large when `X <= 2 * value(seed)`.
+2. **Theorem used as stated.** `Finset.sum_filter_add_sum_filter_not` partitions
+   the total by the large-value predicate; `Finset.sum_le_sum` and natural
+   multiplication monotonicity bound the two parts. No character sum or
+   elliptic-curve fact is re-proved in this generic lemma.
+3. **Object as an instance.** Seeds are nonzero dilation parameters and
+   `value(u)` is the signed factor-base cardinality. The paper-level character
+   sum supplies `3 X #Seed <= 4 sum value`; the elementary bound is
+   `value(u) <= 2X`.
+4. **Assembly probe.** Split the doubled total sum into large and small seeds.
+   Each large summand is at most `4X`; each small summand is at most `X` by the
+   definition of the filter. Compare this upper bound with four times the
+   supplied first-moment lower bound and cancel positive `X` to get
+   `#Seed <= 6 #large`.
+5. **Missing components only.** The generic finite first-moment lemma and the
+   finite intersection lemma that removes a bad set of size at most `1/12`.
+   The character-sum estimate that instantiates the total lower bound and the
+   energy Markov bound remain paper-to-instance obligations.
+6. **Inheritance table.** Population split:
+   `Finset.sum_filter_add_sum_filter_not`; large-part cardinality:
+   `Finset.sum_const`; pointwise bounds: supplied upper bound and filter
+   membership; cancellation: `Nat.le_of_mul_le_mul_left` with `X > 0`.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `firstMomentForcesLargeValueSeeds` | law | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | finite seed-indexed natural values | positive scale, pointwise `2X` upper bound, scaled `3/4` mean lower bound |
+| `oneSixthEventSurvivesOneTwelfthBadSet` | law | same; upstream candidate for `crypto-lean` | finite seed space and two event finsets | event size at least `1/6`, bad-set size at most `1/12` |
+
+The exact checked conclusions are `card Seed <= 6 * card {seed | X <= 2 *
+value seed}` and, after removing a bad set of cardinality at most `1/12`,
+`card Seed <= 12 * card(good)`. Thus the corrected first-moment and energy
+events intersect with finite uniform probability at least `1/12` once their
+source estimates are supplied.

@@ -134,11 +134,28 @@ The proof that follows needs only that its coordinates are algebraic over
 `F_p`, which still contradicts the coordinate `s t_i` being transcendental.
 The coverage argument should be published with that corrected statement.
 
+The finite arithmetic of the first-moment repair is now kernel-checked.
+`firstMomentForcesLargeValueSeeds` turns the scaled inequalities
+
+```text
+value(u) <= 2X,
+3X #seeds <= 4 sum_u value(u)
+```
+
+into `#seeds <= 6 #{u : X <= 2 value(u)}`. The theorem
+`oneSixthEventSurvivesOneTwelfthBadSet` then removes an energy-bad event of
+size at most `1/12` and leaves at least `1/12` of all seeds. Claims
+`PCC-20261118-07b50f` and `PCC-20261118-aee405` pass their local Lean
+verifiers and retain unverified signed standing. The character-sum estimate
+and the energy Markov bound that instantiate these generic hypotheses remain
+paper-to-curve obligations. [pcc:unverified]
+
 Before the ECDLP specialization is promoted from unverified paper deduction,
 the remaining independent obligations are:
 
-1. formalize or independently reconstruct the corrected coverage theorem and
-   all constants used by the capped relation collector;
+1. formalize or independently reconstruct the curve-specific character-sum
+   and energy estimates that instantiate the checked finite coverage lemmas,
+   together with all constants used by the capped relation collector;
 2. bind the factor-base labels returned by the Lean oracle to the rows used by
    the arbitrary-group relation lattice;
 3. verify the planted-diagonal independence and simultaneous invertibility

@@ -349,4 +349,70 @@ theorem geometricSchedulerTailBound
   simpa [div_eq_mul_inv] using
     (hasSum_geometric_of_lt_one ratioNonnegative ratioLtOne).mul_left scale
 
+/-! ## First-moment coverage repair
+
+The following finite counting lemmas isolate the arithmetic in the corrected
+fixed-arity coverage argument.  The curve-specific character sum and energy
+estimates are deliberately hypotheses of the eventual specialization, not
+claims of this module.
+-/
+
+/-- If a nonnegative finite population is pointwise at most `2X` and has mean
+at least `3X/4`, at least one sixth of its seeds have value at least `X/2`.
+The division-free conclusion is exact for a uniform finite seed space. -/
+theorem firstMomentForcesLargeValueSeeds
+    {Seed : Type*} [Fintype Seed]
+    (value : Seed → ℕ) (X : ℕ) (XPositive : 0 < X)
+    (upper : ∀ seed, value seed ≤ 2 * X)
+    (totalLower : 3 * X * Fintype.card Seed ≤ 4 * ∑ seed, value seed) :
+    Fintype.card Seed ≤
+      6 * (Finset.univ.filter fun seed => X ≤ 2 * value seed).card := by
+  classical
+  let high := Finset.univ.filter fun seed => X ≤ 2 * value seed
+  let low := Finset.univ.filter fun seed => ¬ X ≤ 2 * value seed
+  have highBound : 2 * ∑ seed ∈ high, value seed ≤ 4 * X * high.card := by
+    rw [Finset.mul_sum]
+    calc
+      (∑ seed ∈ high, 2 * value seed) ≤ ∑ _seed ∈ high, 4 * X := by
+        exact Finset.sum_le_sum fun seed _ => by nlinarith [upper seed]
+      _ = 4 * X * high.card := by simp [Nat.mul_comm]
+  have lowBound : 2 * ∑ seed ∈ low, value seed ≤ X * low.card := by
+    rw [Finset.mul_sum]
+    calc
+      (∑ seed ∈ low, 2 * value seed) ≤ ∑ _seed ∈ low, X := by
+        exact Finset.sum_le_sum fun seed hseed => by
+          have : ¬ X ≤ 2 * value seed := (Finset.mem_filter.mp hseed).2
+          omega
+      _ = X * low.card := by simp [Nat.mul_comm]
+  have sumSplit : (∑ seed, value seed) =
+      (∑ seed ∈ high, value seed) + ∑ seed ∈ low, value seed := by
+    simpa [high, low] using
+      (Finset.sum_filter_add_sum_filter_not Finset.univ
+        (fun seed => X ≤ 2 * value seed) value).symm
+  have cardSplit : high.card + low.card = Fintype.card Seed := by
+    simpa [high, low] using
+      Finset.card_filter_add_card_filter_not
+        (s := Finset.univ) (fun seed => X ≤ 2 * value seed)
+  have totalUpper : 4 * ∑ seed, value seed ≤
+      2 * (4 * X * high.card + X * low.card) := by
+    rw [sumSplit]
+    nlinarith
+  have scaled : X * Fintype.card Seed ≤ X * (6 * high.card) := by
+    nlinarith
+  exact Nat.le_of_mul_le_mul_left scaled XPositive
+
+/-- An event of finite uniform probability at least `1/6` still has probability
+at least `1/12` after removing any bad event of probability at most `1/12`. -/
+theorem oneSixthEventSurvivesOneTwelfthBadSet
+    {Seed : Type*} [Fintype Seed] [DecidableEq Seed]
+    (large bad : Finset Seed)
+    (largeLower : Fintype.card Seed ≤ 6 * large.card)
+    (badUpper : 12 * bad.card ≤ Fintype.card Seed) :
+    Fintype.card Seed ≤ 12 * (large \ bad).card := by
+  have split : large.card = (large \ bad).card + (large ∩ bad).card :=
+    (Finset.card_sdiff_add_card_inter large bad).symm
+  have interLe : (large ∩ bad).card ≤ bad.card :=
+    Finset.card_le_card Finset.inter_subset_right
+  omega
+
 end TensorBoundaryBounds

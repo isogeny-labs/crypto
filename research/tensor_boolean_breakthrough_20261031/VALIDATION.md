@@ -540,3 +540,23 @@ PCC-20261118-ed2042  exact geometric scheduler-tail sum
 [pcc:unverified] Two earlier append-only claim attempts omitted the required
 declaration hashes (`PCC-20261118-d64e6f` and `PCC-20261118-5c631f`); their
 local verifiers fail closed and they are not cited as evidence.
+
+## 2026-11-18 corrected finite coverage follow-up
+
+The first-moment and event-intersection assembly probe type-checked before the
+module edit. The final pinned project build completed successfully with 2,153
+jobs, and the repository proof gate reported:
+
+```text
+PASS 24 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+Both new theorems have the standard axiom set `[propext, Classical.choice,
+Quot.sound]`. The independent command
+`lake env leanchecker --fresh TensorBoundaryBounds` exited 0. Claims
+`PCC-20261118-07b50f` and `PCC-20261118-aee405` pass their local Lean
+verifiers and retain unverified signed standing. [pcc:unverified]
+
+The checked scope is finite counting only. The character-sum estimate and
+energy Markov bound needed for the elliptic dilation family remain external
+instance obligations.
