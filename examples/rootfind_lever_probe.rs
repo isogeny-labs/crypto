@@ -63,9 +63,12 @@ impl Mont {
     /// nonzero.
     #[inline(always)]
     fn mul(&self, a: u64, b: u64) -> u64 {
-        let t = a * b;
-        let m = (t & 0xFFFF_FFFF) * self.ninv & 0xFFFF_FFFF;
-        let u = (t >> 32) + ((m * self.p) >> 32) + u64::from(t & 0xFFFF_FFFF != 0);
+        // Masking tells the compiler every factor fits 32 bits, so a vector
+        // build can use the 32x32->64 lane multiply.
+        const LO: u64 = 0xFFFF_FFFF;
+        let t = (a & LO) * (b & LO);
+        let m = ((t & LO) * (self.ninv & LO)) & LO;
+        let u = (t >> 32) + ((m * (self.p & LO)) >> 32) + u64::from(t & LO != 0);
         if u >= self.p {
             u - self.p
         } else {
@@ -241,6 +244,7 @@ fn row_lanes<const K: usize>(
 }
 
 /// Arithmetic over all targets with `K` lanes; returns an xor sink.
+#[inline(always)]
 fn sweep_lanes<const K: usize>(f: &Mont, bx: &[u64], by: &[u64], tm: &[(u64, u64)]) -> u64 {
     let a = bx.len();
     let mut pre = vec![0u64; a * K];
@@ -256,6 +260,7 @@ fn sweep_lanes<const K: usize>(f: &Mont, bx: &[u64], by: &[u64], tm: &[(u64, u64
 }
 
 /// The full pipeline with `K` lanes: arithmetic, filter, exact check.
+#[inline(always)]
 fn pipeline<const K: usize>(
     f: &Mont,
     bx: &[u64],
@@ -281,6 +286,81 @@ fn pipeline<const K: usize>(
     found
 }
 
+macro_rules! lanes_dispatch {
+    ($k:expr, $fn:ident, $($arg:expr),*) => {
+        match $k {
+            1 => $fn::<1>($($arg),*),
+            2 => $fn::<2>($($arg),*),
+            4 => $fn::<4>($($arg),*),
+            8 => $fn::<8>($($arg),*),
+            16 => $fn::<16>($($arg),*),
+            _ => panic!("lanes must be 1, 2, 4, 8 or 16"),
+        }
+    };
+}
+
+/// The same kernels compiled for AVX-512 (runtime-detected), so the lane
+/// loops can use 8 x 64-bit vectors without rebuilding the library.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2,avx512f,avx512dq,avx512vl,bmi2")]
+unsafe fn sweep_lanes_v<const K: usize>(f: &Mont, bx: &[u64], by: &[u64], tm: &[(u64, u64)]) -> u64 {
+    sweep_lanes::<K>(f, bx, by, tm)
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2,avx512f,avx512dq,avx512vl,bmi2")]
+unsafe fn pipeline_v<const K: usize>(
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+    bloom: &WordBloom,
+    keys: &HashSet<u64>,
+) -> u64 {
+    pipeline::<K>(f, bx, by, tm, bloom, keys)
+}
+
+fn have_avx512() -> bool {
+    #[cfg(target_arch = "x86_64")]
+    {
+        is_x86_feature_detected!("avx512f") && is_x86_feature_detected!("avx512dq") && is_x86_feature_detected!("avx512vl")
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        false
+    }
+}
+
+/// Lane sweep, scalar-target or AVX-512 build.
+fn sweep_any(k: usize, simd: bool, f: &Mont, bx: &[u64], by: &[u64], tm: &[(u64, u64)]) -> u64 {
+    if simd {
+        // SAFETY: only called when have_avx512() is true.
+        unsafe { lanes_dispatch!(k, sweep_lanes_v, f, bx, by, tm) }
+    } else {
+        lanes_dispatch!(k, sweep_lanes, f, bx, by, tm)
+    }
+}
+
+/// Full pipeline, scalar-target or AVX-512 build.
+#[allow(clippy::too_many_arguments)]
+fn pipeline_any(
+    k: usize,
+    simd: bool,
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+    bloom: &WordBloom,
+    keys: &HashSet<u64>,
+) -> u64 {
+    if simd {
+        // SAFETY: only called when have_avx512() is true.
+        unsafe { lanes_dispatch!(k, pipeline_v, f, bx, by, tm, bloom, keys) }
+    } else {
+        lanes_dispatch!(k, pipeline, f, bx, by, tm, bloom, keys)
+    }
+}
+
 fn best<F: FnMut() -> u64>(reps: usize, mut run: F) -> (f64, u64) {
     let mut t = f64::INFINITY;
     let mut out = 0;
@@ -294,19 +374,6 @@ fn best<F: FnMut() -> u64>(reps: usize, mut run: F) -> (f64, u64) {
 
 fn list(s: &str) -> Vec<usize> {
     s.split(',').filter_map(|x| x.parse().ok()).collect()
-}
-
-macro_rules! lanes_dispatch {
-    ($k:expr, $fn:ident, $($arg:expr),*) => {
-        match $k {
-            1 => $fn::<1>($($arg),*),
-            2 => $fn::<2>($($arg),*),
-            4 => $fn::<4>($($arg),*),
-            8 => $fn::<8>($($arg),*),
-            16 => $fn::<16>($($arg),*),
-            _ => panic!("lanes must be 1, 2, 4, 8 or 16"),
-        }
-    };
 }
 
 fn main() {
@@ -449,14 +516,29 @@ fn main() {
             s
         });
         let mut lanes_ns = serde_json::Map::new();
+        let mut lanes_simd_ns = serde_json::Map::new();
         let mut best_k = 1;
+        let mut best_simd = false;
         let mut best_t = f64::INFINITY;
-        for &k in &lane_set {
-            let (t, _) = best(reps, || lanes_dispatch!(k, sweep_lanes, &f, &bx, &by, &tm));
-            lanes_ns.insert(k.to_string(), json!(t * 1e9 / points));
-            if t < best_t {
-                best_t = t;
-                best_k = k;
+        let simd_modes: &[bool] = if have_avx512() { &[false, true] } else { &[false] };
+        let mut simd_mismatch = 0u64;
+        for &simd in simd_modes {
+            for &k in &lane_set {
+                if simd {
+                    // The AVX-512 build must agree with the scalar build bit for bit.
+                    let check = &tm[..(n_check.max(k) / k) * k];
+                    let a_ = sweep_any(k, false, &f, &bx, &by, check);
+                    let b_ = sweep_any(k, true, &f, &bx, &by, check);
+                    simd_mismatch += u64::from(a_ != b_);
+                }
+                let (t, _) = best(reps, || sweep_any(k, simd, &f, &bx, &by, &tm));
+                let m = if simd { &mut lanes_simd_ns } else { &mut lanes_ns };
+                m.insert(k.to_string(), json!(t * 1e9 / points));
+                if t < best_t {
+                    best_t = t;
+                    best_k = k;
+                    best_simd = simd;
+                }
             }
         }
 
@@ -517,9 +599,9 @@ fn main() {
 
         // Full pipeline, one thread, best lanes, 16-bit and 8-bit filters.
         let (t_full16, found16) =
-            best(reps, || lanes_dispatch!(best_k, pipeline, &f, &bx, &by, &tm, &bloom16, &keys));
+            best(reps, || pipeline_any(best_k, best_simd, &f, &bx, &by, &tm, &bloom16, &keys));
         let (t_full8, found8) =
-            best(reps, || lanes_dispatch!(best_k, pipeline, &f, &bx, &by, &tm, &bloom8, &keys));
+            best(reps, || pipeline_any(best_k, best_simd, &f, &bx, &by, &tm, &bloom8, &keys));
         assert_eq!(found16, hits_ref);
         assert_eq!(found8, hits_ref);
         let (pick, pick_name) = if t_full8 <= t_full16 {
@@ -538,7 +620,7 @@ fn main() {
                         .map(|i| {
                             let part = &tm[i * per..(i + 1) * per];
                             let (f, bx, by, keys) = (&f, &bx, &by, &keys);
-                            s.spawn(move || lanes_dispatch!(best_k, pipeline, f, bx, by, part, pick, keys))
+                            s.spawn(move || pipeline_any(best_k, best_simd, f, bx, by, part, pick, keys))
                         })
                         .collect();
                     hs.into_iter().map(|h| h.join().unwrap()).sum::<u64>()
@@ -568,6 +650,9 @@ fn main() {
                 "lever2_ns_per_point_scalar": t_scalar * 1e9 / points,
                 "lever2_ns_per_point_by_lanes": lanes_ns,
                 "best_lanes": best_k,
+                "best_is_avx512": best_simd,
+                "avx512_vs_scalar_build_mismatches": simd_mismatch,
+                "lever2_avx512_ns_per_point_by_lanes": lanes_simd_ns,
                 "lever3_filters": filters,
                 "lever3_exact_hashset_ns_per_probe": t_exact * 1e9 / probes,
                 "pipeline_ns_per_point_filter16": t_full16 * 1e9 / points,
