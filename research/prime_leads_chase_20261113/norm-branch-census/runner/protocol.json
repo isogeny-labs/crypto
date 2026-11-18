@@ -1,0 +1,176 @@
+{
+  "schema": "experiment.runner-protocol/v1",
+  "protocol_id": "EXP-NORM-BRANCH-CENSUS-GHA-20261118-v1",
+  "version": 1,
+  "created": "2026-11-18",
+  "repository": "isogeny-labs/crypto",
+  "study_dir": "research/prime_leads_chase_20261113/norm-branch-census",
+  "question": "Does the frozen source-bound signed norm-branch coefficient tensor exhibit the preregistered growing held-out flattening-rank defect when executed exactly on a GitHub-hosted x86-64 runner?",
+  "standing": {
+    "measurement_class": "exact_non_timing",
+    "heldout_artifact_seen_before_freeze": false,
+    "eks_v1_status": "INCOMPLETE_EXECUTION",
+    "eks_v1_substituted": false,
+    "sat_stage_included": false
+  },
+  "parent": {
+    "protocol_id": "EXP-NORM-BRANCH-CENSUS-20261113-v1",
+    "path": "research/prime_leads_chase_20261113/norm-branch-census/protocol.json",
+    "sha256": "8c3a7e5cbf0647e077c8fd5b1a1b8f19c82f31adab1e4b63eb3ffddd9ed8c0d6",
+    "artifact_protocol_sha256": "8c3a7e5cbf0647e077c8fd5b1a1b8f19c82f31adab1e4b63eb3ffddd9ed8c0d6",
+    "inherit_unchanged": [
+      "question",
+      "claims",
+      "hypotheses",
+      "arms",
+      "controls",
+      "variable_ledger",
+      "randomization",
+      "sample_size",
+      "metrics",
+      "decision_rule",
+      "analysis_plan",
+      "inadmissible"
+    ],
+    "execution_fields_replaced": [
+      "backend",
+      "placement",
+      "checkpoint",
+      "transport",
+      "build_identity",
+      "execution_stopping_rules",
+      "backend_specific_invalidation_rules"
+    ]
+  },
+  "source": {
+    "workflow": ".github/workflows/norm-branch-exact-runner.yml",
+    "closure_manifest": "research/prime_leads_chase_20261113/norm-branch-census/runner/SOURCE_CLOSURE.sha256",
+    "revision_rule": "input source_revision is 40 lowercase hex and equals github.sha and checked-out HEAD",
+    "toolchain": "Rust 1.99.1",
+    "target": "x86_64-unknown-linux-musl",
+    "rustflags": "-C target-cpu=x86-64",
+    "cargo_build_jobs": 2,
+    "locked": true,
+    "static_binaries_required": true
+  },
+  "execution": {
+    "backend": "github-actions-hosted-x86_64",
+    "runner_label": "ubuntu-24.04",
+    "workflow_ref": "refs/heads/main",
+    "producer_threads": 1,
+    "checker_invocations": 2,
+    "memory_kib": 4194304,
+    "deadline_seconds": 1800,
+    "termination_grace_seconds": 10,
+    "output_cap_bytes": 67108864,
+    "network": "build may fetch locked crates; producer and checker receive no AWS credentials and runner wrapper performs no network operation",
+    "checkpoint": {
+      "required_before_scientific_invocation": true,
+      "mechanism": "scripts/checkpoint.sh gate via GitHub OIDC",
+      "receipt": "norm-branch-checkpoint.txt"
+    },
+    "attempts": {
+      "original": 1,
+      "maximum_total": 2,
+      "retry_condition": "definite GitHub infrastructure failure only",
+      "scientific_retry": false
+    },
+    "budget_usd": 2.0,
+    "paid_self_hosted_runner_allowed": false,
+    "timing_is_scientific_endpoint": false
+  },
+  "invocation": {
+    "producer": [
+      "produce",
+      "artifact.json",
+      "SOURCE_REVISION",
+      "PARENT_PROTOCOL_SHA256"
+    ],
+    "checker": [
+      "check",
+      "artifact.json",
+      "checker.json"
+    ],
+    "checker_replay": [
+      "check",
+      "artifact.json",
+      "checker-replay.json"
+    ],
+    "create_new_output": true,
+    "expected_cells": 40,
+    "checker_receipts_byte_identical": true,
+    "checker_stdout_byte_identical": true
+  },
+  "validation": {
+    "artifact_schema": "norm.branch-census/v1",
+    "checker_schema": "norm.branch-census-check/v1",
+    "execution_schema": "experiment.export/v1",
+    "hash": "sha256",
+    "verdict_vocabulary": [
+      "ADVANCE_B2",
+      "KILL_MEASURED_FAMILY",
+      "INCONCLUSIVE",
+      "INCOMPLETE_EXECUTION"
+    ],
+    "required_passes": [
+      "source closure",
+      "parent protocol digest",
+      "runner protocol digest",
+      "transport-only wrapper and create-new controls",
+      "locked unit and mutation tests",
+      "static x86-64 binary checks",
+      "S3 checkpoint gate",
+      "artifact schema and 40-cell family",
+      "independent checker",
+      "deterministic checker replay",
+      "producer-checker verdict equality",
+      "output cap",
+      "payload SHA256SUMS"
+    ]
+  },
+  "stopping_rules": [
+    "Stop before scientific execution on source, closure, protocol, build, checkpoint, budget, or workflow-ref mismatch.",
+    "Stop at 1800 seconds, 4194304 KiB virtual memory, or 67108864 output bytes and retain the incomplete attempt.",
+    "Run exactly one producer and two checker invocations in one accepted attempt.",
+    "Do not run SAT B2 unless the checker-clean parent verdict is ADVANCE_B2."
+  ],
+  "reporting": {
+    "retain_failed_attempts": true,
+    "required_raw_files": [
+      "artifact.json",
+      "checker.json",
+      "checker-replay.json",
+      "producer.stdout",
+      "producer.stderr",
+      "checker.stdout",
+      "checker.stderr",
+      "checker-replay.stdout",
+      "checker-replay.stderr",
+      "execution.json",
+      "job-exit.json",
+      "SHA256SUMS",
+      "build-info.json",
+      "parent-protocol.json",
+      "runner-protocol.json",
+      "binaries.sha256"
+    ],
+    "result_outputs": [
+      "source-linked Markdown",
+      "SVG",
+      "PDF"
+    ],
+    "end_to_end_cost_claim_requires": [
+      "setup",
+      "relation collection",
+      "linear algebra",
+      "target recovery"
+    ]
+  },
+  "freeze": {
+    "status": "frozen_before_artifact_invocation",
+    "digest_file": "research/prime_leads_chase_20261113/norm-branch-census/runner/PROTOCOL.sha256",
+    "frozen_at": "2026-11-18T06:45:00Z",
+    "filed_before_affected_data": true,
+    "protocol_sha256": null
+  }
+}
