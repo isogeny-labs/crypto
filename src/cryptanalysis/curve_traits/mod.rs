@@ -2342,7 +2342,9 @@ mod tests {
             .iter()
             .filter(|curve| matches!(&curve.model, Model::Extension { .. }))
             .collect();
-        assert_eq!(extensions.len(), 1343);
+        // The current registry includes 62 additional extension-field rows.
+        // Every row still undergoes the field and subgroup checks below.
+        assert_eq!(extensions.len(), 1405);
         for curve in extensions {
             let Model::Extension {
                 p,

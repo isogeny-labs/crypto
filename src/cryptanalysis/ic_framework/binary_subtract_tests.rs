@@ -345,7 +345,23 @@ fn openssl_independent_binary_group_control_matches_first_witnesses() {
     .expect("OpenSSL control source must be present");
     let binary =
         std::env::temp_dir().join(format!("binary-subtract-openssl-{}", std::process::id()));
-    let build = Command::new("c++")
+    let mut compiler = Command::new("c++");
+    // Installed OpenSSL may live outside system include/library search paths.
+    // pkg-config adds dependency flags; the original system-library route
+    // remains available when no pkg-config metadata is installed.
+    if let Ok(flags) = Command::new("pkg-config")
+        .args(["--cflags", "--libs", "openssl"])
+        .output()
+    {
+        if flags.status.success() {
+            compiler.args(
+                std::str::from_utf8(&flags.stdout)
+                    .expect("OpenSSL flags must be UTF-8")
+                    .split_whitespace(),
+            );
+        }
+    }
+    let build = compiler
         .args(["-std=c++17", "-O2", "-Wall", "-Wextra", "-Werror"])
         .arg(directory.join("openssl_control.cpp"))
         .arg("-lcrypto")
