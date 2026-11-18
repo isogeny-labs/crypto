@@ -49,7 +49,7 @@ with huge pages, and rho unchanged.
 - IC: `ic5b <inst> T 43 0.85 4 1.2 flatf 128 bi pf,rel` with `MTF_HP` ∈ {0, 1}: `ic:rel:hp0`, `ic:rel:hp1`.
 - Rho: `rhodpb` at L ∈ {64, 128} lanes × κ ∈ {0, 0.25} × offset ∈ {−1, 0, 1}, each with `MTF_HP` ∈ {0, 1} (24 keys).
   64 and 128 lanes were best in 20 of 24 configurations of the relation-phase round.
-- Best rho is the minimum over all 24 rho keys, so rho takes whichever paging is faster for it.
+- Best rho is the minimum over all 24 rho keys, so rho takes whichever paging gives it the lower time.
 
 ## Configurations and order
 
