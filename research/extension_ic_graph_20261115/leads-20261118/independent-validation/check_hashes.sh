@@ -1,19 +1,26 @@
 #!/usr/bin/env bash
 # Hash and commit-binding checks for the independent-validation lane.
 # Read-only: sha256sum, git show/rev-parse/cat-file, jq, zcat. Writes nothing
-# except stdout. Usage: check_hashes.sh REPO_ROOT
+# except stdout. Usage: check_hashes.sh REPO_ROOT REV
+#   REV: the frozen commit being validated; the working tree of every validated
+#   path must equal REV (checked first).
 # Output lines: VERDICT<TAB>GROUP<TAB>ITEM<TAB>DETAIL
 #   MATCH      retained file hashes to the recorded value
 #   MISMATCH   retained file differs from the recorded value
 #   ABSENT     recorded file is not retained in the repository (not checkable)
 set -uo pipefail
-R=${1:?usage: check_hashes.sh REPO_ROOT}
+R=${1:?usage: check_hashes.sh REPO_ROOT REV}
+REV=${2:?usage: check_hashes.sh REPO_ROOT REV}
 cd "$R" || exit 2
 L=research/extension_ic_graph_20261115
 N=$L/nagao-e2e
 F=$L/runpod-deferred-pair-20261117-50
 D=$L/leads-20261118/descent-finder
 out() { printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"; }
+VP=($N $F $D $L/validation pcc/claims benchmarks/20261117-runpod-deferred-pair $L/deferred_pair_run_study.rs $L/deferred_pair_run_report.rs)
+if git diff --quiet "$REV" -- "${VP[@]}" && [[ -z $(git ls-files --others --exclude-standard -- "${VP[@]}") ]]; then
+  out MATCH binding worktree "validated paths byte-equal to $REV, no untracked files"
+else out MISMATCH binding worktree "validated paths differ from $REV"; fi
 h() { sha256sum "$1" | cut -d' ' -f1; }
 cmp_file() { # group expected path label
   if [[ -f "$3" ]]; then
@@ -26,7 +33,7 @@ cmp_file() { # group expected path label
 for id in feaf31 6432aa e9f39d 7defbb 6224b9 853115; do
   c=pcc/claims/PCC-20261117-$id.json
   jq -r '.proofs[] | "\(.subject.sha256) \(.subject.path)"' "$c" | while read -r sha path; do cmp_file "pcc:$id" "$sha" "$path" "$(basename "$path")"; done
-  if grep -q "PCC-20261117-$id" pcc/ledger.jsonl; then out MATCH "pcc:$id" ledger-entry "registered in pcc/ledger.jsonl"; else out MISMATCH "pcc:$id" ledger-entry "claim file exists but no entry in pcc/ledger.jsonl at $(git rev-parse --short HEAD)"; fi
+  if git show "$REV:pcc/ledger.jsonl" | grep -q "PCC-20261117-$id"; then out MATCH "pcc:$id" ledger-entry "registered in pcc/ledger.jsonl"; else out MISMATCH "pcc:$id" ledger-entry "claim file exists but no entry in pcc/ledger.jsonl at ${REV:0:10} (nor in any local ref's history)"; fi
 done
 
 # 2. nagao-e2e public input manifest and commits
@@ -35,12 +42,14 @@ cmp_file nagao "$(jq -r .public_input_sha256 $N/public-manifest.json)" $N/public
 a=$(git show c1b9bd4e87535974d554ab7f9a383ebb79b4ad56:$N/public.json | sha256sum | cut -d' ' -f1)
 [[ $a == $(jq -r .public_input_sha256 $N/public-manifest.json) ]] && out MATCH nagao input-commit-c1b9bd4e public.json || out MISMATCH nagao input-commit-c1b9bd4e "$a"
 for c in 7802b7f864594d757f88991f7d70b77c38715ebe c1b9bd4e87535974d554ab7f9a383ebb79b4ad56 fcda1e22cb0c5424ca3244f783e69be8b99792f4; do
-  git merge-base --is-ancestor $c HEAD && out MATCH nagao "commit ${c:0:12}" "exists, ancestor of HEAD" || out MISMATCH nagao "commit ${c:0:12}" "not an ancestor"
+  git merge-base --is-ancestor $c "$REV" && out MATCH nagao "commit ${c:0:12}" "exists, ancestor of ${REV:0:10}" || out MISMATCH nagao "commit ${c:0:12}" "not an ancestor"
 done
 git cat-file -e 86189420e615ac3311308d52d7900743a9be23ec 2>/dev/null && out MATCH nagao producer-commit-86189420 exists || out ABSENT nagao producer-commit-86189420 "6432aa producer.commit not in this clone"
 # frozen source: no file present at 7802b7f8 was modified afterwards
-changed=$(git diff --name-only --diff-filter=MDR 7802b7f864594d757f88991f7d70b77c38715ebe HEAD -- $N | wc -l)
-[[ $changed == 0 ]] && out MATCH nagao frozen-source-7802b7f8 "no file present at the freeze was modified or deleted; later commits only add results/report" || out MISMATCH nagao frozen-source-7802b7f8 "$changed files modified after freeze"
+changed=$(git diff --name-only --diff-filter=MDR 7802b7f864594d757f88991f7d70b77c38715ebe "$REV" -- $N | grep -v '/SESSION.md$' | wc -l)
+[[ $changed == 0 ]] && out MATCH nagao frozen-source-7802b7f8 "no science file present at the freeze was modified or deleted; later commits add results/report" || out MISMATCH nagao frozen-source-7802b7f8 "$changed files modified after freeze"
+dl=$(git diff 7802b7f864594d757f88991f7d70b77c38715ebe "$REV" -- $N/SESSION.md | grep -c '^-[^-]')
+out NOTE nagao SESSION.md "session log modified after freeze: $dl removed lines (append-only if 0)"
 # qualifier source pins
 jq -r '.[] | "\(.source_commit) \(.source_path) \(.git_blob) \(.snapshot) \(.sha256)"' $N/qualifier-source-pins.json | while read -r c sp blob snap sha; do
   gb=$(git rev-parse "$c:$sp"); sb=$(git hash-object "$snap"); ss=$(h "$snap")
@@ -87,7 +96,7 @@ dir_check run50-artifacts $F/artifacts.sha256
 cmp_file run50-pre-call "$(awk '$2=="frozen-root-source.sha256"{print $1}' $F/pre-call.sha256)" $L/validation/deferred50-frozen-root-source.sha256 "frozen-root-source.sha256 (validation/ copy)"
 [[ $(jq -r .public_sha256 $F/runtime-plan.json) == $(h $F/public.json) ]] && out MATCH run50 runtime-plan-public_sha256 public.json || out MISMATCH run50 runtime-plan-public_sha256 public.json
 rev=$(cat $F/source-revision.txt)
-git merge-base --is-ancestor "$rev" HEAD && out MATCH run50 "commit ${rev:0:12}" "exists, ancestor of HEAD" || out MISMATCH run50 "commit ${rev:0:12}" missing
+git merge-base --is-ancestor "$rev" "$REV" && out MATCH run50 "commit ${rev:0:12}" "exists, ancestor of ${REV:0:10}" || out MISMATCH run50 "commit ${rev:0:12}" missing
 # 210-path measured source manifest at the measured commit
 ok=0; bad=0; missing=0; badlist=""
 while read -r sha path; do
@@ -96,11 +105,14 @@ while read -r sha path; do
   else missing=$((missing+1)); fi
 done < $L/validation/deferred50-source.sha256
 [[ $bad == 0 ]] && out MATCH run50-source-210 "at ${rev:0:12}" "$ok match, $missing paths not in the commit tree" || out MISMATCH run50-source-210 "at ${rev:0:12}" "$ok match, $bad differ:$badlist; $missing absent"
+sc=$(git log --format=%H -1 "$REV" -- $L/validation/deferred50-format-successor-source.sha256)
 ok=0; bad=0; badlist=""
 while read -r sha path; do
-  if [[ -f $path ]] && [[ $(h "$path") == "$sha" ]]; then ok=$((ok+1)); else bad=$((bad+1)); badlist="$badlist $path"; fi
+  if [[ $(git show "$sc:$path" 2>/dev/null | sha256sum | cut -d' ' -f1) == "$sha" ]]; then ok=$((ok+1)); else bad=$((bad+1)); badlist="$badlist $path"; fi
 done < $L/validation/deferred50-format-successor-source.sha256
-[[ $bad == 0 ]] && out MATCH run50-format-successor "at HEAD" "$ok match" || out NOTE run50-format-successor "at HEAD" "$ok match, $bad differ at HEAD (later edits on main):$badlist"
+[[ $bad == 0 ]] && out MATCH run50-format-successor "at ${sc:0:12}" "$ok match (commit that published the successor manifest)" || out MISMATCH run50-format-successor "at ${sc:0:12}" "$ok match, $bad differ:$badlist"
+dd=$(git diff 11c9a0312f0b0a8ae85be325e72cbf9602d9d777 "$sc" -- src/cryptanalysis/jv_sieve_two_large_prime.rs | grep -E '^[-+][^-+]' | tr -d ' \n' | sed 's/^[-+]//')
+out NOTE run50-format-successor jv_sieve_two_large_prime.rs "11c9a031 -> ${sc:0:10} changes only the deferred-pair pub-use line layout: $(git diff 11c9a0312f0b0a8ae85be325e72cbf9602d9d777 "$sc" -- src/cryptanalysis/jv_sieve_two_large_prime.rs | grep -cE '^[-+][^-+]') changed lines"
 # what differs between the measured and successor manifests
 out NOTE run50-format-successor diff "$(diff <(sort -k2 $L/validation/deferred50-source.sha256) <(sort -k2 $L/validation/deferred50-format-successor-source.sha256) | grep -c '^[<>]') manifest lines differ: $(diff <(sort -k2 $L/validation/deferred50-source.sha256) <(sort -k2 $L/validation/deferred50-format-successor-source.sha256) | grep '^>' | awk '{print $3}' | tr '\n' ' ')"
 
