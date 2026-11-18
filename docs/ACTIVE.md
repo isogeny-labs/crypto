@@ -15,6 +15,9 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Encoding-vs-intrinsic control: random factor base given a low-degree (tower-shaped / multilinear-bit) encoding, plus subgroup-perturbation dose-response, vs the structured tower (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
+- [ ] Binary Koblitz fall-degree ladder to d_F >= 5 (POD_PLAN P1/P2 + calibrated A/A) on RunPod (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
+- [ ] n=83 m=6 decomposition probe: expected-hit arithmetic first, E-model validation at small n, pod only if informative (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
 - [ ] Prime-field random vs structured factor-base baseline: controlled d_F comparison (tower vs randbase, matched size), isolating the degree-floor confound (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
 - [ ] Binary GF(2^n) Koblitz fall-degree sweep: d_F of the Weil-descent/Semaev system vs n, with/without Frobenius-orbit structure (preregister + small-n local data + pod plan) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
 - [ ] Diagnose the n=83 Frobenius-orbit IC zero-relations result: search-cap/tuning artifact vs fundamental (forensic on koblitz_n83_factor_base_sweep_20261008, read-only) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
