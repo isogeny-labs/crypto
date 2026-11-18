@@ -129,3 +129,16 @@ against the binary's hash. The check now reads the first line only (`head -1`). 
 The second launch held `/tmp/crypto-bench.lock` with an outer `flock`, and `ecbench run` takes the same lock itself, so every
 session refused to start (exit 2, no records; the partial `data/` and `sessions/` were deleted). `run_all.sh` now runs without the
 outer `flock` and passes `--wait` to `ecbench run`, which queues on the lock. Nothing else changed (`REGISTRATION.A2.sha256`).
+
+## Amendment A3 (2026-11-18, binary replaced; no cost data read)
+
+The third launch ran all 24 sessions with binary `5fea35b0…`: every **binary-curve** k-sum arm (incumbent included) ended
+`error: oracle ksum does not run on a binary curve` (5 rows x 8 arms x 576 runs), because the merge 833a35d21e dropped the
+`ksum` and `ksum-frobenius` arms from the binary `ic.pipeline` oracle match (present at 3a9e85e644, where the prune study's binary
+was built). Commit e93c3cb2da restores the two lines verbatim. Only the status counts of that launch were read
+(`launch-a2-binary-oracle-missing/status-counts.json`, `runlog.tsv`, `verify.txt`); its sessions were deleted unread and the
+study is re-run in full. **New binary:** `cargo build --release --locked --bin ecbench` in a clean worktree of e93c3cb2da (which
+also contains the committed f4_fp.rs merge fix 1b9590d88e, so `f4_fp_mergefix.diff` is no longer applied), sha256
+`808511395723f84505d4fe8edaf32e66e8d8bff34cdad57777360c5999ffe161` (`BINARY.sha256`). Commits between fc0babc73e and e93c3cb2da touch
+`f4_fp.rs`, `compact-orbit-scan` (Koblitz base) and this study only: no code path of these arms. Specs, arms, seeds, tests and
+predictions unchanged (`REGISTRATION.A3.sha256`).
