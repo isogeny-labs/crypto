@@ -141,8 +141,12 @@ asymptotic advantage. [pcc:unverified]
 Lean now proves the associated precision cutoff: for prime `p>19`, a normalized
 monomial correction `X^(p-1)` vanishes below degree 22, so it cannot affect the
 eleven even z-degrees corresponding to coefficients `w^0,...,w^10`. The theorem
-does not identify the actual elliptic Frobenius term with that monomial; the
-formal-group and pole-order bridge remains open. [pcc:unverified]
+does not identify the actual elliptic Frobenius term with that monomial. A
+subsequent generic proof cancels a shared leading local parameter `X` with one
+degree of precision loss and shows that inversion and inverse-square preserve
+the remaining unit-series prefix. Thus the double-pole core of the x-coordinate
+bridge is checked. The actual formal-group identities and the regular elliptic
+x-coordinate unit-factor composition remain open. [pcc:unverified]
 
 The preregistered
 [out-of-sample formal-scalar panel](FORMAL_SCALAR_OOS_EXPERIMENT.md) kept the

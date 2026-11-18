@@ -431,6 +431,29 @@ theorem coeff_eq (hfg : PowerSeriesPrefixEq n f g) {i : ℕ} (hi : i < n) :
     _ = PowerSeries.coeff i (PowerSeries.trunc n g) := by rw [hfg]
     _ = PowerSeries.coeff i g := PowerSeries.coeff_coe_trunc_of_lt hi
 
+/-- Coefficientwise equality below the cutoff reconstructs prefix equality. -/
+theorem of_coeff_eq
+    (hcoeff : ∀ i, i < n → PowerSeries.coeff i f = PowerSeries.coeff i g) :
+    PowerSeriesPrefixEq n f g := by
+  unfold PowerSeriesPrefixEq
+  ext i
+  simp only [PowerSeries.coeff_trunc]
+  split_ifs with hi
+  · exact hcoeff i hi
+  · rfl
+
+/-- Cancelling a shared leading local parameter consumes exactly one degree of
+prefix precision. Unlike `cancel_left`, this applies to the nonunit `X`. -/
+theorem cancel_X
+    (hfg : PowerSeriesPrefixEq (n + 1)
+      (PowerSeries.X * f) (PowerSeries.X * g)) :
+    PowerSeriesPrefixEq n f g := by
+  apply of_coeff_eq
+  intro i hi
+  have hc := coeff_eq hfg (i := i + 1) (by omega)
+  rw [← pow_one (PowerSeries.X : PowerSeries R)] at hc
+  simpa only [PowerSeries.coeff_X_pow_mul] using hc
+
 /-- A power-series unit can be cancelled without losing prefix precision. -/
 theorem cancel_left (D : PowerSeries R)
     (hD : PowerSeries.constantCoeff D ≠ 0)
@@ -439,12 +462,52 @@ theorem cancel_left (D : PowerSeries R)
   have hi := mul (refl (D⁻¹)) hfg
   simpa only [← mul_assoc, PowerSeries.inv_mul_cancel D hD, one_mul] using hi
 
+/-- Inversion of unit power series preserves every established prefix. -/
+theorem inv (hfg : PowerSeriesPrefixEq n f g)
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0) :
+    PowerSeriesPrefixEq n f⁻¹ g⁻¹ := by
+  have hcross := mul (mul (refl (f⁻¹)) hfg) (refl (g⁻¹))
+  have hreverse : PowerSeriesPrefixEq n g⁻¹ f⁻¹ := by
+    simpa only [← mul_assoc, PowerSeries.inv_mul_cancel f hf, one_mul,
+      mul_assoc, PowerSeries.mul_inv_cancel g hg, mul_one] using hcross
+  exact symm hreverse
+
+/-- The inverse square used by a double-pole coordinate preserves a unit-series
+prefix. -/
+theorem inv_sq (hfg : PowerSeriesPrefixEq n f g)
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0) :
+    PowerSeriesPrefixEq n (f⁻¹ ^ 2) (g⁻¹ ^ 2) :=
+  pow (inv hfg hf hg) 2
+
 /-- A monomial contributes nothing below its own degree. This is the exact
 Mathlib truncation theorem, packaged in the prefix relation used by H116. -/
 theorem X_pow_eq_zero (m : ℕ) :
     PowerSeriesPrefixEq m ((PowerSeries.X : PowerSeries R) ^ m) 0 := by
   unfold PowerSeriesPrefixEq
   simpa using PowerSeries.trunc_X_pow_self_mul m (1 : PowerSeries R)
+
+/-- Adding a correction of order at least `m` does not change the prefix below
+degree `m`. -/
+theorem add_X_pow_mul (f correction : PowerSeries R) (m : ℕ) :
+    PowerSeriesPrefixEq m
+      (f + PowerSeries.X ^ m * correction) f := by
+  simpa using add (refl f)
+    (mul (X_pow_eq_zero m) (refl correction))
+
+/-- Generic double-pole core of the pole-transfer bridge. Agreement of two
+local parameters through degree `n` after a shared leading `X` yields agreement
+of their normalized inverse-square terms through degree `n-1`. The regular
+unit factor in the elliptic x-coordinate remains a separate composition
+obligation. -/
+theorem leading_X_inv_sq
+    (hfg : PowerSeriesPrefixEq (n + 1)
+      (PowerSeries.X * f) (PowerSeries.X * g))
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0) :
+    PowerSeriesPrefixEq n (f⁻¹ ^ 2) (g⁻¹ ^ 2) :=
+  inv_sq (cancel_X hfg) hf hg
 
 end PowerSeriesPrefixEq
 
@@ -1293,8 +1356,14 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms NormalizedRationalMapSeriesCertificate.to_firstOrder
 #print axioms NormalizedRationalMapPolynomialCertificate.to_firstOrder
 #print axioms PowerSeriesPrefixEq.derivative
+#print axioms PowerSeriesPrefixEq.of_coeff_eq
+#print axioms PowerSeriesPrefixEq.cancel_X
 #print axioms PowerSeriesPrefixEq.cancel_left
+#print axioms PowerSeriesPrefixEq.inv
+#print axioms PowerSeriesPrefixEq.inv_sq
 #print axioms PowerSeriesPrefixEq.X_pow_eq_zero
+#print axioms PowerSeriesPrefixEq.add_X_pow_mul
+#print axioms PowerSeriesPrefixEq.leading_X_inv_sq
 #print axioms prime_ge_twentyThree
 #print axioms frobeniusNormalizedCorrection_invisible
 #print axioms frobeniusNormalizedCorrection_even_coeff_zero

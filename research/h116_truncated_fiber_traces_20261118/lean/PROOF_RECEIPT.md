@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-decee05b15443105a82e29bbb684ae458583a34ea14944a84fb85a6ce24e3763  H116FiberTrace.lean
+d569fc07a9f5244f9b4f3238a70f92530ca75733a9940cd8039a27d5c2d2f623  H116FiberTrace.lean
 ```
 
-The repository proof gate built both the default target and the explicitly
-tracked source, then transitively audited all theorem declarations:
+The pinned toolchain built the explicitly tracked source, then the repository's
+`AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS  64 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  70 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -25,7 +25,17 @@ f1b4db9afa0d4c3ffeec03cdf730348f7ed2e69bc11f7357cb7abf1cdd4f8fdc  receipts/audit
 84e0cf16eb81ad2cf8a5dce3dfa08b1e35977e0d56207f1d82ac5e3c80b05025  receipts/source-build.log
 c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/status.txt
 6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
+8e6e042fd064c36089b12d0eb28fa670d0fecdb7b8b40a4064767b147ea9ad4f  receipts/prefix-transfer-build.log
+d42999adfc5a4d88469b491c5ae9f72d329172b50d322d8c69b45c9e5f4a77cc  receipts/prefix-transfer-audit.log
 ```
+
+The earlier repository-wide gate receipts above cover the first 64 theorems.
+For this 70-theorem checkpoint its mandatory cache-fetch preflight could not
+complete because the managed 32-GiB workspace had insufficient free space;
+the incomplete task-owned cache was deleted. The same pinned `lake build`
+completed, and the gate's exact `AuditAxioms.lean` auditor passed directly over
+the resulting module. This is recorded as `PASS_DIRECT`, not silently reported
+as a successful cache preflight. [pcc:unverified]
 
 Every theorem reports only `propext`, `Classical.choice`, and `Quot.sound`.
 There is no `sorry`, custom axiom, `native_decide`, trusted declaration, raised
@@ -76,8 +86,12 @@ The formal-scalar follow-up also packages Mathlib's monomial truncation theorem
 in `PowerSeriesPrefixEq` and proves that, for every prime `p>19`, a normalized
 `X^(p-1)` correction vanishes below degree 22 and at the eleven even degrees
 used by the frozen x-map prefix. This is a precision theorem only. The actual
-elliptic identities `V+pi=[t]`, `pi(z)=z^p`, formal subtraction, and
-x-coordinate pole-order transfer remain open endpoint obligations.
+elliptic identities `V+pi=[t]`, `pi(z)=z^p`, and formal subtraction remain open
+endpoint obligations. The follow-up now proves the generic double-pole core:
+coefficientwise reconstruction, cancellation of a shared nonunit leading `X`
+with exactly one degree of precision loss, unit-series inversion, inverse-square
+preservation, and invisibility of an `X^m` multiple. The regular elliptic
+x-coordinate unit factor and its substitution/composition law remain open.
 [pcc:unverified]
 
 The first integration build is retained at

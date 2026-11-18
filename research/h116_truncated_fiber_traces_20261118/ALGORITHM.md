@@ -124,9 +124,13 @@ The proposed reason the omitted Frobenius term is invisible is local: in
 the normalized leading parameter, and the x-coordinate pole converts that to
 the first possible `w^((p-1)/2)` difference. Synthetic p=23 and p=19 controls
 place the first differences at coefficients 11 and 9 respectively. Lean proves
-the monomial truncation at `z`-degree 22 for prime `p>19`; proving that the
-actual elliptic endomorphism instantiates this monomial model remains a separate
-step. [pcc:unverified]
+the monomial truncation at `z`-degree 22 for prime `p>19`. It now also proves
+the generic one-degree-loss step: equality of `X*f` and `X*g` through one extra
+degree implies equality of `f⁻¹²` and `g⁻¹²` through the requested degree when
+both unit factors have nonzero constant coefficient. This discharges the pure
+double-pole algebra. Proving that the actual elliptic endomorphism instantiates
+the monomial model, and transporting the regular unit factor in the elliptic
+x-coordinate through substitution, remain separate steps. [pcc:unverified]
 
 The current dense implementation uses 64,426 additions, 67,584
 multiplications and 16 inversions for candidate construction at this fixed
