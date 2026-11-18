@@ -490,3 +490,14 @@ The first integration build is retained at
 the statement's unqualified antidiagonal elaborate to a different declaration.
 The corrected theorem uses the definitionally equivalent range sum that the
 native loop evaluates; no hypothesis or conclusion was weakened.
+
+The 215-theorem checkpoint derives the discovery-selected quotient channel
+exactly.  Lean proves that the first reciprocal coefficients are `1,u`, that
+the second logarithmic-derivative coefficient is `2*h1-u^2`, and that relative
+subtraction with a shared jet is `u^2-u0^2`; an unequal-`h1` mutation retains
+the exact correction.  It also proves the natural base-six scalar identity,
+its additive-group subtraction form, and strict decrease of `k/6` for `k>=6`.
+The pinned 3,164-job build passes.  The exact auditor reports 215 theorems,
+zero failures and zero trusted/native decisions.  This identifies the OOS
+association as a scaled x-coordinate sixth-power ordering bias, not an exact
+digit oracle or subexponential ECDLP algorithm. [pcc:unverified]

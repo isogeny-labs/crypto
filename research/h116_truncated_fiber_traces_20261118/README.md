@@ -463,3 +463,12 @@ replicates reaches its standardized excess, for plus-one p=0.000244. The
 association is heterogeneous—p=431 is below baseline—and the rule remains far
 from exact. This is a replicated ordering bias, not an iterable digit oracle
 or a subexponential ECDLP algorithm. [pcc:unverified]
+
+The audited [selected-channel derivation](QUOTIENT_DIGIT_CHANNEL_PROOF.md)
+then proves the rule's exact closed form: the shared higher jet cancels and
+`X1=u^2-u0^2`, so `IX1` is a public constant times
+`(x^2-x0^2)^6`. Lean also proves the base-six quotient group identity and
+strict scalar decrease. The 215-theorem audit has zero failures and zero
+trusted/native decisions. This explains how an exact rule would recurse, but
+also shows that the measured association is a cheap x-coordinate ordering
+heuristic rather than a hidden high-moment decoder. [pcc:unverified]

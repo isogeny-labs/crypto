@@ -304,6 +304,83 @@ theorem fiberDenominatorReciprocalRecurrence
   exact powerSeriesReciprocalRecurrence (fiberDenominatorSeries u h) g
     (fiberDenominatorSeries_coeff_zero u h) hfg n
 
+/-- The first two reciprocal coefficients used by the native producer depend
+only on the target coordinate `u`; every higher shared-jet coefficient is
+irrelevant at this order. -/
+theorem fiberDenominatorReciprocal_coeff_zero_one
+    (u : K) (h : ℕ → K) (g : PowerSeries K)
+    (hfg : fiberDenominatorSeries u h * g = 1) :
+    PowerSeries.coeff 0 g = 1 ∧ PowerSeries.coeff 1 g = u := by
+  have hzero := congrArg (PowerSeries.coeff 0) hfg
+  have hg0 : PowerSeries.coeff 0 g = 1 := by
+    simpa [PowerSeries.coeff_mul] using hzero
+  refine ⟨hg0, ?_⟩
+  have hone := fiberDenominatorReciprocalRecurrence u h g hfg 0
+  simpa [hg0] using hone
+
+/-- The selected second logarithmic-derivative coefficient has the closed
+form `2*h₁-u²`. -/
+theorem fiberLogDerivative_coeff_one
+    (u : K) (h : ℕ → K) (g : PowerSeries K)
+    (hfg : fiberDenominatorSeries u h * g = 1) :
+    PowerSeries.coeff 1
+        (PowerSeries.derivative (fiberDenominatorSeries u h) * g) =
+      2 * h 1 - u ^ 2 := by
+  rcases fiberDenominatorReciprocal_coeff_zero_one u h g hfg with ⟨hg0, hg1⟩
+  rw [PowerSeries.coeff_one_mul]
+  simp only [← PowerSeries.coeff_zero_eq_constantCoeff, hg0, hg1,
+    fiberDenominatorSeries_derivative_coeff_zero,
+    fiberDenominatorSeries_derivative_coeff_succ]
+  ring
+
+/-- In the relative selected channel, the shared `h₁` term cancels exactly.
+This proves that the observed `IX1` ordering rule reduces to a scaled
+x-coordinate square difference and does not use the higher H116 jet. -/
+theorem fiberRelativeLogDerivative_coeff_one
+    (u u₀ : K) (h : ℕ → K) (g g₀ : PowerSeries K)
+    (hfg : fiberDenominatorSeries u h * g = 1)
+    (hfg₀ : fiberDenominatorSeries u₀ h * g₀ = 1) :
+    PowerSeries.coeff 1
+        (PowerSeries.derivative (fiberDenominatorSeries u₀ h) * g₀ -
+          PowerSeries.derivative (fiberDenominatorSeries u h) * g) =
+      u ^ 2 - u₀ ^ 2 := by
+  rw [map_sub, fiberLogDerivative_coeff_one u₀ h g₀ hfg₀,
+    fiberLogDerivative_coeff_one u h g hfg]
+  ring
+
+/-- The correction left when two first shared-jet coefficients differ.  This
+is a mutation control for the shared-jet premise above. -/
+theorem fiberRelativeLogDerivative_coeff_one_unshared
+    (u u₀ h₁ h₁₀ : K) :
+    (2 * h₁₀ - u₀ ^ 2) - (2 * h₁ - u ^ 2) =
+      (u ^ 2 - u₀ ^ 2) + 2 * (h₁₀ - h₁) := by
+  ring
+
+/-- Euclidean base-six decomposition transported through natural scalar
+multiplication. This is the unconditional group identity behind the public
+quotient-digit construction. -/
+theorem quotientDigit_nsmul_identity
+    {G : Type*} [AddCommMonoid G] (P : G) (k : ℕ) :
+    k • P = 6 • ((k / 6) • P) + (k % 6) • P := by
+  calc
+    k • P = (6 * (k / 6) + k % 6) • P := by congr 1; omega
+    _ = (6 * (k / 6)) • P + (k % 6) • P := by rw [add_nsmul]
+    _ = 6 • ((k / 6) • P) + (k % 6) • P := by
+      rw [mul_nsmul, nsmul_left_comm]
+
+/-- Subtracting the true base-six digit leaves exactly six times the quotient
+point. -/
+theorem quotientDigit_sub_identity
+    {G : Type*} [AddCommGroup G] (P : G) (k : ℕ) :
+    (k • P) - (k % 6) • P = 6 • ((k / 6) • P) := by
+  rw [quotientDigit_nsmul_identity]
+  abel
+
+/-- Each non-base-case quotient step strictly decreases the canonical natural
+scalar, so an exact digit oracle would terminate. -/
+theorem quotientDigit_strict_decrease (k : ℕ) (hk : 6 ≤ k) : k / 6 < k := by
+  omega
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -4655,6 +4732,13 @@ theorem rationalMap_separation_strict_control :
 #print axioms fiberDenominatorSeries_derivative_coeff_zero
 #print axioms fiberDenominatorSeries_derivative_coeff_succ
 #print axioms fiberDenominatorReciprocalRecurrence
+#print axioms fiberDenominatorReciprocal_coeff_zero_one
+#print axioms fiberLogDerivative_coeff_one
+#print axioms fiberRelativeLogDerivative_coeff_one
+#print axioms fiberRelativeLogDerivative_coeff_one_unshared
+#print axioms quotientDigit_nsmul_identity
+#print axioms quotientDigit_sub_identity
+#print axioms quotientDigit_strict_decrease
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero
