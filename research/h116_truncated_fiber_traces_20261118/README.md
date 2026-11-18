@@ -72,6 +72,13 @@ eleven denominators used to construct `h₁,...,h₇` are nonzero in
 frozen prime-field cohort; it does not prove recurrence (16) itself.
 [pcc:unverified]
 
+The exact finite recurrence is now encoded as `BostanJetRecurrence`. Lean
+proves that its seven output coefficients are unique and that any two solutions
+induce identical `F_U` coefficients through degree eight. The remaining bridge
+is no longer ambiguity about the native formula: it is the geometric statement
+that the actual normalized isogeny Laurent jet satisfies this recurrence.
+[pcc:unverified]
+
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
 `(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying

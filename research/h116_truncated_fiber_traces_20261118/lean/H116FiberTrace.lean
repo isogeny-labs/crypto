@@ -240,6 +240,19 @@ theorem fiberDenominatorSeries_sub
   · simp
   · simp
 
+/-- Exact finite Bostan recurrence instantiated by the H116 native producer. -/
+def BostanJetRecurrence (sourceA sourceB targetA targetB : K) (h : ℕ → K) : Prop :=
+  h 1 = (sourceA - targetA) / 5 ∧
+  h 2 = (sourceB - targetB) / 7 ∧
+  ∀ k, 3 ≤ k → k ≤ 7 →
+    h k =
+      3 * (∑ i ∈ Finset.Icc 1 (k - 2), h i * h (k - 1 - i)) /
+          (((k - 2) * (2 * k + 3) : ℕ) : K) -
+        (((2 * k - 3 : ℕ) : K) * sourceA * h (k - 2)) /
+          ((2 * k + 3 : ℕ) : K) -
+        (2 * ((k - 3 : ℕ) : K) * sourceB * h (k - 3)) /
+          ((2 * k + 3 : ℕ) : K)
+
 /-- For prime characteristic `p > 19`, every denominator occurring while the
 H116 producer constructs `h₁,…,h₇` from Bostan et al. recurrence (16) is
 nonzero in `ZMod p`. The denominators above `19` are handled by their displayed
@@ -277,6 +290,69 @@ theorem bostanDenominatorsNonzero {p : ℕ} [Fact p.Prime] (hp : 19 < p) :
     exact mul_ne_zero h5 h17
   exact ⟨h5, h7, h9, h11, h13, h15, h17, h22, h39, h60, h85⟩
 
+/-- The two denominators in every indexed recurrence step are nonzero under
+the frozen prime-characteristic condition. -/
+theorem bostanStepDenominatorsNonzero {p k : ℕ} [Fact p.Prime]
+    (hp : 19 < p) (hk3 : 3 ≤ k) (hk7 : k ≤ 7) :
+    ((((k - 2) * (2 * k + 3) : ℕ) : ZMod p) ≠ 0) ∧
+      (((2 * k + 3 : ℕ) : ZMod p) ≠ 0) := by
+  rcases bostanDenominatorsNonzero hp with
+    ⟨_, _, h9, h11, h13, h15, h17, h22, h39, h60, h85⟩
+  interval_cases k <;> norm_num at hk3 hk7 ⊢
+  all_goals aesop
+
+/-- The seven coefficients satisfying the H116 recurrence are unique. -/
+theorem BostanJetRecurrence.unique
+    {sourceA sourceB targetA targetB : K} {h g : ℕ → K}
+    (hh : BostanJetRecurrence sourceA sourceB targetA targetB h)
+    (hg : BostanJetRecurrence sourceA sourceB targetA targetB g) :
+    ∀ k, 1 ≤ k → k ≤ 7 → h k = g k := by
+  rcases hh with ⟨hh1, hh2, hhstep⟩
+  rcases hg with ⟨hg1, hg2, hgstep⟩
+  intro k
+  induction k using Nat.strong_induction_on with
+  | h k ih =>
+      intro hk1 hk7
+      by_cases hk_one : k = 1
+      · simpa [hk_one] using hh1.trans hg1.symm
+      by_cases hk_two : k = 2
+      · simpa [hk_two] using hh2.trans hg2.symm
+      have hk3 : 3 ≤ k := by omega
+      rw [hhstep k hk3 hk7, hgstep k hk3 hk7]
+      have hsum :
+          (∑ i ∈ Finset.Icc 1 (k - 2), h i * h (k - 1 - i)) =
+            ∑ i ∈ Finset.Icc 1 (k - 2), g i * g (k - 1 - i) := by
+        apply Finset.sum_congr rfl
+        intro i hi
+        have hi_bounds := Finset.mem_Icc.mp hi
+        have hi_pos : 1 ≤ i := hi_bounds.1
+        have hi_lt : i < k := by omega
+        have hki_pos : 1 ≤ k - 1 - i := by omega
+        have hki_lt : k - 1 - i < k := by omega
+        rw [ih i hi_lt hi_pos (by omega),
+          ih (k - 1 - i) hki_lt hki_pos (by omega)]
+      rw [hsum, ih (k - 2) (by omega) (by omega) (by omega)]
+      by_cases hk_three : k = 3
+      · subst k
+        norm_num
+      · rw [ih (k - 3) (by omega) (by omega) (by omega)]
+
+/-- Any two solutions of the finite recurrence induce identical `F_U`
+coefficients through the producer's truncation degree eight. -/
+theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
+    {sourceA sourceB targetA targetB : K} {h g : ℕ → K}
+    (hh : BostanJetRecurrence sourceA sourceB targetA targetB h)
+    (hg : BostanJetRecurrence sourceA sourceB targetA targetB g)
+    (u : K) (n : ℕ) (hn : n ≤ 8) :
+    PowerSeries.coeff n (fiberDenominatorSeries u h) =
+      PowerSeries.coeff n (fiberDenominatorSeries u g) := by
+  rcases n with _ | _ | n
+  · simp
+  · simp
+  · rw [fiberDenominatorSeries_coeff_succ_succ,
+      fiberDenominatorSeries_coeff_succ_succ]
+    exact BostanJetRecurrence.unique hh hg (n + 1) (by omega) (by omega)
+
 #print axioms logDeriv_mul
 #print axioms logDeriv_finset
 #print axioms logDeriv_div
@@ -298,5 +374,8 @@ theorem bostanDenominatorsNonzero {p : ℕ} [Fact p.Prime] (hp : 19 < p) :
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero
+#print axioms bostanStepDenominatorsNonzero
+#print axioms BostanJetRecurrence.unique
+#print axioms fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 
 end H116FiberTrace

@@ -26,6 +26,13 @@ is `5,7,9,11,13,15,17,22,39,60,85`; the Lean theorem
 `bostanDenominatorsNonzero` proves the four values above `19` by factoring them
 into residues below `p`. [pcc:unverified]
 
+`BostanJetRecurrence` is the Lean statement of this exact finite recurrence.
+`BostanJetRecurrence.unique` proves that any two solutions agree on
+`h1,...,h7`, and `fiberDenominatorSeries_coeff_eq_of_bostanRecurrence` carries
+that uniqueness into every `F_U` coefficient through degree eight. This is a
+uniqueness/interface result; the geometric proof that the normalized isogeny
+jet satisfies the recurrence remains open. [pcc:unverified]
+
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 
 ```text

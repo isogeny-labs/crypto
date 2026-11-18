@@ -6,23 +6,23 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-a4c591ac9b14aca92333a9ee3997f395b4143ea516a150356cb4c85bd87e761b  H116FiberTrace.lean
+e2d60b4de7719f2309df671eb71d9ad27d17358cfd1d3e00aa75e805e6d6cbad  H116FiberTrace.lean
 ```
 
 The repository proof gate built both the default target and the explicitly
 tracked source, then transitively audited all theorem declarations:
 
 ```text
-PASS  23 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS  26 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
 
 ```text
-0bfd78052f7bf52e6036debc3b9f619d186e2dffcc8d391a761dd4d848399557  receipts/audit.log
-d25fb9fe1faf9f4932211766885c8d45a500bf703a6d5daabea05e956211b382  receipts/build.log
+3315564a25a534f38f9ac556762ed717806b31ba7f0d39f776150a8e15ca2eac  receipts/audit.log
+79fccc1cda04dc7b127aaeec4b2dca8dc11e97f0a7a84954b017f87d3f87fee7  receipts/build.log
 29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483  receipts/cache.log
-013228d1692f28a6242123afb418a1c6a25db91583b3701335d1ce8ba28ea843  receipts/source-build.log
+465749ce8d9a1f4e3481eb51856902450e66aa5c8e6794bf1f9e2603102882d8  receipts/source-build.log
 c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/status.txt
 6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
 ```
@@ -42,9 +42,12 @@ coefficients, and discharges the unit premise of its reciprocal recurrence.
 It proves that the target contributes exactly the linear term `-Uw` and that
 two target denominators with the same jet differ in only that coefficient. It
 also proves that every denominator used by the native `h₁,...,h₇` Bostan
-recurrence is nonzero in `ZMod p` when `p` is prime and `p>19`. It does not yet
-identify the formal normalized-map series with the actual isogeny at `w=1/x`,
-prove the Bostan recurrence or construct the `V-1` formal jet, a
+recurrence is nonzero in `ZMod p` when `p` is prime and `p>19`. It also encodes
+the exact finite recurrence, proves its seven coefficients unique, and proves
+that any two solutions induce identical `F_U` coefficients through degree
+eight. It does not yet identify the formal normalized-map series with the
+actual isogeny at `w=1/x`, prove that the geometric jet satisfies the encoded
+recurrence or construct the `V-1` formal jet, a
 scalar predicate or an ECDLP decoder. [pcc:unverified]
 
 The first integration build is retained at
