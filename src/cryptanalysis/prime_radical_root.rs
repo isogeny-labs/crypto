@@ -528,7 +528,15 @@ impl RadicalRootCtx {
         // Euler's criterion from a^t2, reused by Tonelli-Shanks:
         // a^((p-1)/2) = (a^t2)^(2^(s2-1)).
         // Avoid a second full-length modular exponentiation.
-        let mut t = f.powm(a, self.t2);
+        // t2 is odd. Let h=a^((t2-1)/2): h^2*a=a^t2 and h*a=a^((t2+1)/2).
+        // This shares one exponentiation between Tonelli's t and r states.
+        // For t2=1, avoid powering and multiplication entirely.
+        let (mut t, half_power) = if self.t2 == 1 {
+            (a, 1)
+        } else {
+            let h = f.powm(a, (self.t2 - 1) / 2);
+            (f.mul(f.sqr(h), a), h)
+        };
         let mut legendre = t;
         for _ in 1..self.s2 {
             legendre = f.sqr(legendre);
@@ -538,7 +546,7 @@ impl RadicalRootCtx {
         }
         let mut m = self.s2;
         let mut c = self.zc;
-        let mut r = f.powm(a, self.t2.div_ceil(2));
+        let mut r = if self.t2 == 1 { a } else { f.mul(half_power, a) };
         loop {
             if t == 1 {
                 return Some(r);
@@ -730,6 +738,39 @@ impl RadicalRootCtx {
             .map(|t| f.sub(t, sh))
             .collect()
     }
+    // Quartic translation x=y-b/4. For canonical residues, modular doubling
+    // avoids five general multiplications by the small constants 2,3,6,8.
+    #[inline]
+    fn quartic_depressed_coeffs(
+        &self, b: u64, c: u64, d: u64, e: u64,
+    ) -> (u64, u64, u64, u64) {
+        let f = &self.f;
+        let bb = f.mul(b, self.inv4);
+        let b2 = f.sqr(bb);
+        let twice_b2 = f.add(b2, b2);
+        let six_b2 = f.add(twice_b2, f.add(twice_b2, twice_b2));
+        let pp = f.sub(c, six_b2);
+        let b3 = f.mul(b2, bb);
+        let twice_b3 = f.add(b3, b3);
+        let four_b3 = f.add(twice_b3, twice_b3);
+        let eight_b3 = f.add(four_b3, four_b3);
+        let qq = f.add(f.sub(d, f.mul(bb, f.add(c, c))), eight_b3);
+        let b4 = f.sqr(b2);
+        let three_b4 = f.add(f.add(b4, b4), b4);
+        let rr = f.sub(
+            f.add(f.sub(e, f.mul(bb, d)), f.mul(b2, c)),
+            three_b4,
+        );
+        (bb, pp, qq, rr)
+    }
+
+    #[inline]
+    fn quartic_resolvent_coeffs(&self, pp: u64, qq: u64, rr: u64) -> (u64, u64, u64) {
+        let f = &self.f;
+        let twice_rr = f.add(rr, rr);
+        (f.add(pp, pp), f.sub(f.sqr(pp), f.add(twice_rr, twice_rr)), f.neg(f.sqr(qq)))
+    }
+
     /// Distinct F_p roots of a x^4 + b x^3 + c x^2 + d x + e (a != 0). Returns (sorted roots, used_fallback).
     pub(crate) fn quartic(
         &self,
@@ -748,15 +789,7 @@ impl RadicalRootCtx {
             (f.mul(b, ia), f.mul(c, ia), f.mul(d, ia), f.mul(e, ia))
         };
         // x = y - B, B = b1/4
-        let bb = f.mul(b1, self.inv4);
-        let b2 = f.sqr(bb);
-        let pp = f.sub(c1, f.mul(6, b2));
-        let b3 = f.mul(b2, bb);
-        let qq = f.add(f.sub(d1, f.mul(f.mul(2, bb), c1)), f.mul(8, b3));
-        let rr = f.sub(
-            f.add(f.sub(e1, f.mul(bb, d1)), f.mul(b2, c1)),
-            f.mul(3, f.sqr(b2)),
-        );
+        let (bb, pp, qq, rr) = self.quartic_depressed_coeffs(b1, c1, d1, e1);
         let mut ys: Vec<u64> = vec![];
         let mut fallback = false;
         if qq == 0 {
@@ -772,11 +805,8 @@ impl RadicalRootCtx {
             }
         } else {
             // resolvent in z = (r1+r2)^2:  z^3 + 2P z^2 + (P^2 - 4R) z - Q^2 = 0
-            let zs = self.cubic_monic(
-                f.mul(2, pp),
-                f.sub(f.sqr(pp), f.mul(4, rr)),
-                f.neg(f.sqr(qq)),
-            );
+            let (z2, z1, z0) = self.quartic_resolvent_coeffs(pp, qq, rr);
+            let zs = self.cubic_monic(z2, z1, z0);
             if zs.is_empty() {
                 // Frobenius type (1,3): no rational pairing; the unique root needs F_{p^3} radicals.
                 // Use the distinct-degree (CZ) path on the depressed quartic - NOT radical.
