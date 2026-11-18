@@ -202,7 +202,7 @@ epoch coordinates (`raw/ab_dense/`): row bytes 81 vs 86 MB (t = 10), 282 vs 283 
 
 **GATE PASS** (`raw/gate-opt.log`, records gzipped in `raw/gate-opt/`). The gate binary was `bin/pilot_gate`
 (commit `0ed3cc1a59`); the frozen binary differs from it only by two byte counters (`final_row_bytes`,
-`sweep_bytes`) — REGATE_PLACEHOLDER
+`sweep_bytes`); the gate was therefore **re-run on the frozen binary** `bin/pilot_opt2` (`raw/gate-opt2.log`, reference records reused): **GATE PASS** again, every set EQUAL, faults 1–5 detected (60 / 40 / 40 / 40 / 38), closedness check 314 closures, 708,997 reductions, 0 non-zero.
 
 No-1 proxies: every A/B run above has identical `dims` (and counters) across arms; the t = 14 c = 5 profile equals the
 pod's hky2 record `[0,0,2,154,4323,47849]`. Unit tests (`harness/unit`, `cargo test --release`): 18 pass, including
