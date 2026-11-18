@@ -25,6 +25,13 @@ pinned source. The [post-call manifest](post-call-manifest.sha256) binds the
 actual evaluator/planner sources and development binaries; it is not a pre-call
 experiment checkpoint.
 
+That evaluator pin is the pre-batch source in commit
+`da97e613a2d4574f7fc3c5f53a7f961905544bb0`, preserved separately in
+[the later study's baseline copy](../batch-walk-20261118/baseline/complete_pipeline.cpp).
+The optional projective-walk follow-up changes the working source; it does not
+rewrite these earlier hashes or make these counts a model of its added batch
+temporaries. The planner here remains a model of the recorded traversal.
+
 | Same 80-bit target | Default window | Explicit zero-leftover window |
 |---|---:|---:|
 | Baby count | 427154957034 | 414464344064 |
