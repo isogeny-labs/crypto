@@ -1575,6 +1575,141 @@ theorem shortWeierstrassScalarFive_singular_control :
     WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂, WeierstrassCurve.b₄,
     WeierstrassCurve.b₆, WeierstrassCurve.b₈] at heval
 
+/-- The first two-factor recurrence bootstrap: `prePsi6=Psi3*t`, while an
+alternate exact expression for `prePsi7` is a multiple of `t` minus
+`prePsi4^4`. -/
+theorem shortWeierstrass_prePsiSixSeven_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.preΨ' 6) (W.preΨ' 7) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  let t : Polynomial F := W.preΨ' 5 - W.preΨ₄ ^ 2
+  have h34 : IsCoprime W.Ψ₃ W.preΨ₄ :=
+    shortWeierstrass_prePsiThreeFour_isCoprime A B hdisc h2
+  have h45 : IsCoprime W.preΨ₄ (W.preΨ' 5) :=
+    shortWeierstrass_prePsiFourFive_isCoprime A B hdisc h2
+  have h3two : IsCoprime W.Ψ₃ W.Ψ₂Sq :=
+    shortWeierstrassPsiThree_PsiTwoSq_isCoprime A B hdisc h2
+  have h5 : W.preΨ' 5 = W.preΨ₄ * W.Ψ₂Sq ^ 2 - W.Ψ₃ ^ 3 := by
+    rw [show 5 = 2 * (0 + 2) + 1 by norm_num, WeierstrassCurve.preΨ'_odd]
+    simp
+  have h6 : W.preΨ' 6 = W.Ψ₃ * t := by
+    rw [show 6 = 2 * (0 + 3) by norm_num, WeierstrassCurve.preΨ'_even]
+    simp [t]
+    ring
+  have h7 : W.preΨ' 7 =
+      W.preΨ' 5 * W.Ψ₃ ^ 3 - W.preΨ₄ ^ 3 * W.Ψ₂Sq ^ 2 := by
+    rw [show 7 = 2 * (1 + 2) + 1 by norm_num, WeierstrassCurve.preΨ'_odd]
+    norm_num
+  have h7alt : W.preΨ' 7 =
+      (W.Ψ₃ ^ 3 - W.preΨ₄ ^ 2) * t - W.preΨ₄ ^ 4 := by
+    rw [h7]
+    dsimp [t]
+    rw [h5]
+    ring
+  have h7three : IsCoprime (W.preΨ' 7) W.Ψ₃ := by
+    rw [h7, show W.preΨ' 5 * W.Ψ₃ ^ 3 -
+        W.preΨ₄ ^ 3 * W.Ψ₂Sq ^ 2 =
+      (W.preΨ' 5 * W.Ψ₃ ^ 2) * W.Ψ₃ -
+        W.preΨ₄ ^ 3 * W.Ψ₂Sq ^ 2 by ring,
+      IsCoprime.mul_sub_right_left_iff]
+    exact h34.symm.pow_left.mul_left (h3two.symm.pow_left)
+  have h4t : IsCoprime W.preΨ₄ t := by
+    apply IsCoprime.symm
+    dsimp [t]
+    rw [show W.preΨ' 5 - W.preΨ₄ ^ 2 =
+      W.preΨ' 5 - W.preΨ₄ * W.preΨ₄ by ring,
+      IsCoprime.sub_mul_left_left_iff]
+    exact h45.symm
+  have h7t : IsCoprime (W.preΨ' 7) t := by
+    rw [h7alt, IsCoprime.mul_sub_right_left_iff]
+    exact h4t.pow_left
+  dsimp only
+  rw [h6]
+  exact h7three.symm.mul_left h7t.symm
+
+/-- Scalar six has no numerator/denominator cancellation on every nonsingular
+short curve outside characteristic two. -/
+theorem shortWeierstrassScalarSix_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.Φ 6) (W.ΨSq 6) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have h56 : IsCoprime (W.preΨ' 5) (W.preΨ' 6) :=
+    shortWeierstrass_prePsiFiveSix_isCoprime A B hdisc h2
+  have h67 : IsCoprime (W.preΨ' 6) (W.preΨ' 7) :=
+    shortWeierstrass_prePsiSixSeven_isCoprime A B hdisc h2
+  have h5two : IsCoprime (W.preΨ' 5) W.Ψ₂Sq :=
+    shortWeierstrass_prePsi_odd_isCoprime_PsiTwoSq A B hdisc h2 5 (by decide)
+  have h7two : IsCoprime (W.preΨ' 7) W.Ψ₂Sq :=
+    shortWeierstrass_prePsi_odd_isCoprime_PsiTwoSq A B hdisc h2 7 (by decide)
+  have hden6 : W.ΨSq (6 : ℤ) = W.preΨ' 6 ^ 2 * W.Ψ₂Sq := by
+    rw [show (6 : ℤ) = ((6 : ℕ) : ℤ) by norm_num,
+      WeierstrassCurve.ΨSq_ofNat]
+    norm_num
+  have hplus : IsCoprime (W.preΨ (7 : ℕ)) (W.ΨSq (6 : ℕ)) := by
+    rw [WeierstrassCurve.preΨ_ofNat]
+    change IsCoprime (W.preΨ' 7) (W.ΨSq (6 : ℤ))
+    rw [hden6]
+    exact h67.symm.pow_right.mul_right h7two
+  have hminus : IsCoprime (W.preΨ (5 : ℕ)) (W.ΨSq (6 : ℕ)) := by
+    rw [WeierstrassCurve.preΨ_ofNat]
+    change IsCoprime (W.preΨ' 5) (W.ΨSq (6 : ℤ))
+    rw [hden6]
+    exact h56.pow_right.mul_right h5two
+  convert
+    (shortWeierstrassPhi_isCoprime_of_adjacent A B hdisc h2 6 hplus hminus) using 1
+
+/-- The reduced scalar-six x-coordinate quotient has coordinate extension
+degree exactly thirty-six outside characteristics two and three. -/
+theorem shortWeierstrassScalarSix_extension_degree
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) (h3 : (3 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    let xMap : RatFunc F :=
+      algebraMap (Polynomial F) (RatFunc F) (W.Φ 6) /
+        algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 6)
+    Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 36 := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  let xMap : RatFunc F :=
+    algebraMap (Polynomial F) (RatFunc F) (W.Φ 6) /
+      algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 6)
+  have h6z : ((6 : ℤ) : F) ≠ 0 := by
+    norm_num
+    rw [show (6 : F) = 2 * 3 by norm_num]
+    exact mul_ne_zero h2 h3
+  have hcoprime : IsCoprime (W.Φ 6) (W.ΨSq 6) :=
+    shortWeierstrassScalarSix_isCoprime A B hdisc h2
+  have hdenom : W.ΨSq 6 ≠ 0 := W.ΨSq_ne_zero h6z
+  have hextension := reducedRationalQuotient_extension_degree
+    (W.Φ 6) (W.ΨSq 6) hdenom hcoprime
+  have hdegrees := scalarMultiplicationXMap_exact_degrees W 6 h6z
+  change Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 36
+  rw [hextension]
+  norm_num at hdegrees ⊢
+  omega
+
+/-- Singular scalar-six control: at `A=B=0`, numerator and denominator both
+vanish at zero and hence are not coprime. -/
+theorem shortWeierstrassScalarSix_singular_control :
+    let W : WeierstrassCurve (ZMod 7) := WeierstrassCurve.mk 0 0 0 0 0
+    ¬IsCoprime (W.Φ 6) (W.ΨSq 6) := by
+  let _ : Fact (Nat.Prime 7) := Fact.mk (by norm_num)
+  let W : WeierstrassCurve (ZMod 7) := WeierstrassCurve.mk 0 0 0 0 0
+  dsimp only
+  intro h
+  have heval := h.map (Polynomial.evalRingHom (0 : ZMod 7))
+  norm_num [WeierstrassCurve.Φ, WeierstrassCurve.ΨSq,
+    WeierstrassCurve.preΨ, preNormEDS, preNormEDS',
+    WeierstrassCurve.Ψ₃, WeierstrassCurve.preΨ₄,
+    WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂, WeierstrassCurve.b₄,
+    WeierstrassCurve.b₆, WeierstrassCurve.b₈] at heval
+
 /-- Over an algebraically closed field, absence of a common root is an exact
 certificate that two polynomials are coprime. -/
 theorem polynomial_isCoprime_of_no_common_root
@@ -3760,6 +3895,10 @@ theorem rationalMap_separation_strict_control :
 #print axioms shortWeierstrassScalarFive_isCoprime
 #print axioms shortWeierstrassScalarFive_extension_degree
 #print axioms shortWeierstrassScalarFive_singular_control
+#print axioms shortWeierstrass_prePsiSixSeven_isCoprime
+#print axioms shortWeierstrassScalarSix_isCoprime
+#print axioms shortWeierstrassScalarSix_extension_degree
+#print axioms shortWeierstrassScalarSix_singular_control
 #print axioms polynomial_isCoprime_of_no_common_root
 #print axioms adjacentIntegerTorsion_eq_zero
 #print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics

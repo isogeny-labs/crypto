@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-0415c992d6330ba52fe82b896c9dd86e265abadff32fa9a04fb83810333c09dc  H116FiberTrace.lean
+cfb04cab53080f20398ca34c74dee29c66c63a45521d9b53db6ad1d28013ac06  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  180 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  184 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -87,6 +87,9 @@ fc6bd72d5b93ee2d369243a94342a924ab1a640e60b08f6b5c0006037822a3c1  receipts/scala
 3aede61bd0d0a8e98614966570d22e58e3145afafbee48099d9ebf57b2621564  receipts/scalar-five-bootstrap-build.txt
 7e627e64916a948ec3a65944f76b62e333d95f03b8a7e2c653cf3765a71fd3f6  receipts/scalar-five-bootstrap-full-build.txt
 883eaa9ccd73b5cedd8a50fa4200a8fe2fafc6981fb0e495552983861db6ec38  receipts/scalar-five-bootstrap-audit.txt
+7f9ddfb534f85f11e68a751767bc5e3a5f8dd410d24404b248183a3048b3725a  receipts/scalar-six-bootstrap-build.txt
+04b9838bc270b57f7cc9cebdcef7f50dba2783257cfea30e217d750e8a185d8e  receipts/scalar-six-bootstrap-full-build.txt
+4d709be2432832e9635842df1f72edee24f07792482475f54a6e5b02bf9b4a1a  receipts/scalar-six-bootstrap-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -394,6 +397,15 @@ Coprimality itself requires only the prior nonsingularity and characteristic-
 two hypotheses, separating cancellation from inseparable degree collapse. A
 singular `A=B=0` control over `ZMod 7` is proved non-coprime. Arbitrary
 adjacent-EDS coprimality remains open. [pcc:unverified]
+
+The 184-theorem checkpoint reaches scalar six through a new two-factor
+bootstrap. With `t=prePsi5-prePsi4^2`, Lean proves `prePsi6=Psi3*t` and rewrites
+`prePsi7` as `(Psi3^3-prePsi4^2)*t-prePsi4^4`; prior pair and parity
+certificates then prove the adjacent pair coprime. This assembles
+`IsCoprime (Phi 6) (PsiSq 6)` and coordinate extension degree thirty-six
+outside characteristics two and three. The singular `A=B=0` control over
+`ZMod 7` is non-coprime. The factorization is a candidate invariant for an
+arbitrary-index proof, which remains open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

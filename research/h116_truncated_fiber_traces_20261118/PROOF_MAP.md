@@ -1022,6 +1022,45 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | scalar-five coordinate extension degree is twenty-five | exact degree assembly | H116 | rational function field | same plus `5 != 0` |
 | singular scalar-five pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 7` | none |
 
+## Scalar-six two-factor bootstrap gate
+
+1. **Structure above.** Set `t=prePsi5-prePsi4^2`. The even recurrence gives
+   `prePsi6=Psi3*t`.  The next odd recurrence initially gives
+   `prePsi7=prePsi5*Psi3^3-prePsi4^3*Psi2Sq^2`; using the scalar-five
+   identity, H116 rewrites this exactly as
+   `(Psi3^3-prePsi4^2)*t-prePsi4^4`.  Thus coprimality with `prePsi6` splits
+   into coprimality with `Psi3` and with `t`, both reducible to earlier pair
+   and parity certificates.
+2. **Theorems used as stated.** Mathlib's `prePsi'_even` and `prePsi'_odd`
+   supply the two recurrences. The scalar-four/five adjacent pairs and
+   `Psi3,Psi2Sq` base certificate discharge the factor goals through
+   `IsCoprime.mul_left_iff`, power laws and subtract-multiple equivalences.
+   The two-adjacent-factor assembly proves scalar-six no-cancellation; the
+   exact quotient-degree theorem gives degree thirty-six when `6 != 0`.
+3. **Object as an instance.** On every nonsingular short curve outside
+   characteristic two, `Phi6` and `PsiSq6` are coprime. Outside characteristic
+   three as well, the coordinate extension degree is thirty-six.
+4. **Assembly probe.** The two-factor adjacent proof, scalar-six assembly,
+   degree endpoint and singular control first elaborated in a temporary
+   importing module. The tracked project then completed all 3,162 build jobs;
+   the exact repository auditor reports
+   `184 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This reaches scalar six and exposes a
+   two-factor recurrence invariant candidate. It does not yet package that
+   invariant for arbitrary indices or imply an ECDLP runtime bound.
+   [pcc:unverified]
+6. **Inheritance table.** EDS identities, coprimality laws and degree formulas
+   are inherited. H116 supplies the exact alternate factorization and
+   composition. The singular `A=B=0` scalar-six pair over `ZMod 7` is proved
+   non-coprime by evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `prePsi6` is coprime to `prePsi7` | two-factor recurrence bootstrap | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi6` is coprime to `PsiSq6` | exact division-polynomial assembly | H116 | same | same |
+| scalar-six coordinate extension degree is thirty-six | exact degree assembly | H116 | rational function field | same plus `3 != 0` |
+| singular scalar-six pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 7` | none |
+
 ## Adjacent-torsion root-semantics gate
 
 1. **Structure above.** Over an algebraically closed field, two polynomials
