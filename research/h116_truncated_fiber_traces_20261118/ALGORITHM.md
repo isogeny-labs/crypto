@@ -20,8 +20,11 @@ hk = 3/((k-2)(2k+3)) sum_(i=1)^(k-2) hi h_(k-1-i)
      - 2(k-3)/(2k+3) B h_(k-3).
 ```
 
-For `J=8`, only `h1,...,h7` are constructed. The frozen `p>19` rule makes all
-displayed denominators units.
+For `J=8`, only `h1,...,h7` are constructed. When `p` is prime, the frozen
+`p>19` rule makes all displayed denominators units. The exact denominator set
+is `5,7,9,11,13,15,17,22,39,60,85`; the Lean theorem
+`bostanDenominatorsNonzero` proves the four values above `19` by factoring them
+into residues below `p`. [pcc:unverified]
 
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 

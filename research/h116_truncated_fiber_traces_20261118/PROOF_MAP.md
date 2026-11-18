@@ -29,9 +29,11 @@ This map is written before the first H116 Lean declaration.
    derivative-times-reciprocal coefficient convolution and the exact formal
    series `F_U(w)=1-Uw+h₁w²+...` are now defined and proved at coefficient
    level. The formal normalized-map series is now proved to share every
-   coefficient except the target-dependent linear term. The remaining
-   geometric bridge identifies it at `w=1/x` with the actual isogeny Laurent
-   expansion and proves the `h_i` recurrence. The
+   coefficient except the target-dependent linear term. For prime `p>19`, all
+   denominators used by the native `h₁,...,h₇` recurrence are now proved
+   nonzero in `ZMod p`. The remaining geometric bridge identifies the series at
+   `w=1/x` with the actual isogeny Laurent expansion and proves the `h_i`
+   recurrence. The
    formal-group congruence for `V-1` is a separate endpoint premise unless an
    existing verified elliptic formal-group theorem is located. [pcc:unverified]
 6. **Inheritance table.** Below. A blank or `lookup pending` entry blocks the
@@ -68,6 +70,7 @@ This map is written before the first H116 Lean declaration.
 | concrete `F_U` coefficient and derivative formulas | instance law | H116 Lean module | field, `U`, coefficient function `h` | none |
 | concrete `F_U` reciprocal recurrence | instance law | H116 Lean module | field, `U`, `h`, reciprocal series | product equals one |
 | target/reference denominators share the same higher jet | instance law | H116 Lean module | field, `U`, `U0`, coefficient function `h` | none |
+| native Bostan denominators are nonzero | instance law | H116 Lean module | `ZMod p` | `p` prime and `p>19` |
 | `Y_j` fiber identity | endpoint | H116 | isogeny coordinate data | normalized differential formula, non-2-torsion target |
 | Frobenius low-jet specialization | instance obligation or explicit premise | crypto-lean candidate | elliptic formal group | ordinary `E/F_p`, `V+pi=[t]` |
 | conditional decoder cost | endpoint | H116/H115 theorem reuse | cyclic prime-order group | exact public digit predicate and `r^o(1)` evaluator |
@@ -79,7 +82,7 @@ This map is written before the first H116 Lean declaration.
 | polynomial multiplication, derivative, evaluation | Mathlib instances plus `Polynomial.derivative'` |
 | finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
 | finite sums and coefficient extraction | Mathlib finite sums plus proved H116 power-series reciprocal/convolution and concrete `F_U` coefficient lemmas; reciprocal-at-infinity isogeny substitution remains open |
-| field division/cancellation | `Field K` laws |
+| field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
 | isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; crypto-lean lookup pending |
 | `V+pi=[t]` and `pi(z)=z^p` | H115 algebra plus formal-group instance; lookup pending |
 | radix-six decoder | reuse H115 generic theorem after source import/binding |

@@ -1,7 +1,9 @@
 import Mathlib.Algebra.Polynomial.Derivation
+import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
 import Mathlib.RingTheory.LaurentSeries
 import Mathlib.RingTheory.PowerSeries.Derivative
+import Mathlib.Tactic
 
 /-!
 # H116 generic fiber-trace identity layer
@@ -238,6 +240,43 @@ theorem fiberDenominatorSeries_sub
   · simp
   · simp
 
+/-- For prime characteristic `p > 19`, every denominator occurring while the
+H116 producer constructs `h₁,…,h₇` from Bostan et al. recurrence (16) is
+nonzero in `ZMod p`. The denominators above `19` are handled by their displayed
+factorizations, so the theorem does not incorrectly infer that they are `< p`. -/
+theorem bostanDenominatorsNonzero {p : ℕ} [Fact p.Prime] (hp : 19 < p) :
+    (5 : ZMod p) ≠ 0 ∧ (7 : ZMod p) ≠ 0 ∧ (9 : ZMod p) ≠ 0 ∧
+    (11 : ZMod p) ≠ 0 ∧ (13 : ZMod p) ≠ 0 ∧ (15 : ZMod p) ≠ 0 ∧
+    (17 : ZMod p) ≠ 0 ∧ (22 : ZMod p) ≠ 0 ∧ (39 : ZMod p) ≠ 0 ∧
+    (60 : ZMod p) ≠ 0 ∧ (85 : ZMod p) ≠ 0 := by
+  have cast_ne (m : ℕ) (hm : 0 < m) (hmp : m < p) : (m : ZMod p) ≠ 0 := by
+    intro hzero
+    have hdvd : p ∣ m := (ZMod.natCast_eq_zero_iff m p).mp hzero
+    exact (Nat.not_dvd_of_pos_of_lt hm hmp) hdvd
+  have h2 : (2 : ZMod p) ≠ 0 := cast_ne 2 (by omega) (by omega)
+  have h3 : (3 : ZMod p) ≠ 0 := cast_ne 3 (by omega) (by omega)
+  have h4 : (4 : ZMod p) ≠ 0 := cast_ne 4 (by omega) (by omega)
+  have h5 : (5 : ZMod p) ≠ 0 := cast_ne 5 (by omega) (by omega)
+  have h7 : (7 : ZMod p) ≠ 0 := cast_ne 7 (by omega) (by omega)
+  have h9 : (9 : ZMod p) ≠ 0 := cast_ne 9 (by omega) (by omega)
+  have h11 : (11 : ZMod p) ≠ 0 := cast_ne 11 (by omega) (by omega)
+  have h13 : (13 : ZMod p) ≠ 0 := cast_ne 13 (by omega) (by omega)
+  have h15 : (15 : ZMod p) ≠ 0 := cast_ne 15 (by omega) (by omega)
+  have h17 : (17 : ZMod p) ≠ 0 := cast_ne 17 (by omega) (by omega)
+  have h22 : (22 : ZMod p) ≠ 0 := by
+    rw [show (22 : ZMod p) = (2 : ZMod p) * 11 by norm_num]
+    exact mul_ne_zero h2 h11
+  have h39 : (39 : ZMod p) ≠ 0 := by
+    rw [show (39 : ZMod p) = (3 : ZMod p) * 13 by norm_num]
+    exact mul_ne_zero h3 h13
+  have h60 : (60 : ZMod p) ≠ 0 := by
+    rw [show (60 : ZMod p) = (4 : ZMod p) * 15 by norm_num]
+    exact mul_ne_zero h4 h15
+  have h85 : (85 : ZMod p) ≠ 0 := by
+    rw [show (85 : ZMod p) = (5 : ZMod p) * 17 by norm_num]
+    exact mul_ne_zero h5 h17
+  exact ⟨h5, h7, h9, h11, h13, h15, h17, h22, h39, h60, h85⟩
+
 #print axioms logDeriv_mul
 #print axioms logDeriv_finset
 #print axioms logDeriv_div
@@ -258,5 +297,6 @@ theorem fiberDenominatorSeries_sub
 #print axioms fiberDenominatorReciprocalRecurrence
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
+#print axioms bostanDenominatorsNonzero
 
 end H116FiberTrace

@@ -6,23 +6,23 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-33f9a101d9f37029a75a9d1b20246edb600da77984d7a92483ee58d9563d72af  H116FiberTrace.lean
+a4c591ac9b14aca92333a9ee3997f395b4143ea516a150356cb4c85bd87e761b  H116FiberTrace.lean
 ```
 
 The repository proof gate built both the default target and the explicitly
 tracked source, then transitively audited all theorem declarations:
 
 ```text
-PASS  22 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS  23 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
 
 ```text
-1aaf722f999fe2bad162b85d17a6d935121fd54c85501dcb08e1661a2f338486  receipts/audit.log
-1f7fde824c91c432644358b5e5778a745d0ca89549dc92bf0f7c4e707c6a1709  receipts/build.log
+0bfd78052f7bf52e6036debc3b9f619d186e2dffcc8d391a761dd4d848399557  receipts/audit.log
+d25fb9fe1faf9f4932211766885c8d45a500bf703a6d5daabea05e956211b382  receipts/build.log
 29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483  receipts/cache.log
-daf71336554dbace91c37d94cb5de6409fae04a367127d20303a98217950960b  receipts/source-build.log
+013228d1692f28a6242123afb418a1c6a25db91583b3701335d1ce8ba28ea843  receipts/source-build.log
 c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/status.txt
 6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
 ```
@@ -41,8 +41,10 @@ defines the exact concrete series
 coefficients, and discharges the unit premise of its reciprocal recurrence.
 It proves that the target contributes exactly the linear term `-Uw` and that
 two target denominators with the same jet differ in only that coefficient. It
-does not yet identify the formal normalized-map series with the actual isogeny
-at `w=1/x`, prove the Bostan recurrence or construct the `V-1` formal jet, a
+also proves that every denominator used by the native `h₁,...,h₇` Bostan
+recurrence is nonzero in `ZMod p` when `p` is prime and `p>19`. It does not yet
+identify the formal normalized-map series with the actual isogeny at `w=1/x`,
+prove the Bostan recurrence or construct the `V-1` formal jet, a
 scalar predicate or an ECDLP decoder. [pcc:unverified]
 
 The first integration build is retained at

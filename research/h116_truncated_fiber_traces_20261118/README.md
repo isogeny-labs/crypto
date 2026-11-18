@@ -66,6 +66,12 @@ native eight-coefficient loop. The `w=1/x` isogeny substitution and the
 Bostan/`V-1` jet constructor remain explicit open obligations.
 [pcc:unverified]
 
+For prime `p>19`, the Lean theorem `bostanDenominatorsNonzero` proves that all
+eleven denominators used to construct `h₁,...,h₇` are nonzero in
+`ZMod p`. This discharges the characteristic-range side condition for the
+frozen prime-field cohort; it does not prove recurrence (16) itself.
+[pcc:unverified]
+
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
 `(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying
