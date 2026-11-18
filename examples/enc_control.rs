@@ -548,6 +548,26 @@ fn arm_set(arm: &str, k: usize, r: usize, curve: &Curve, rng: &mut StdRng) -> (V
             }
             (f, json!({"replaced_positions": replaced}))
         }
+        "cosetunion" => {
+            // Exploratory (post-hoc) degree dial: the union of 2^j random
+            // cosets of the subgroup of order 2^{k−j}, j = r. Its closing
+            // relation is a polynomial in u_{k−j}..u_{k−1} only, of degree ≤ j.
+            let j = r;
+            assert!(j <= k, "j ≤ k");
+            let sub = subgroup(k - j, p);
+            let mut reps: Vec<u64> = Vec::new();
+            let mut keys: Vec<u64> = Vec::new();
+            while reps.len() < 1 << j {
+                let g = rng.gen_range(2..p);
+                let key = powm(g, 1u64 << (k - j), p);
+                if !keys.contains(&key) {
+                    keys.push(key);
+                    reps.push(g);
+                }
+            }
+            let f = reps.iter().flat_map(|&g| sub.iter().map(move |&z| mulm(g, z, p))).collect();
+            (f, json!({"j": j, "coset_keys": keys.len()}))
+        }
         _ => panic!("unknown arm {arm}"),
     }
 }
@@ -805,11 +825,19 @@ fn main() {
     let closing = closing_coeffs(&f, p);
     let closing_nonzero = closing.iter().filter(|&&c| c != 0).count();
     let closing_const = closing_nonzero <= 1 && closing.iter().skip(1).all(|&c| c == 0);
+    // Degree of the closing relation's right side in u-monomials (popcount).
+    let closing_degree = closing
+        .iter()
+        .enumerate()
+        .filter(|(_, &c)| c != 0)
+        .map(|(n, _)| n.count_ones())
+        .max()
+        .unwrap_or(0);
     let head = json!({
         "schema": "enc_control.row/v1", "p": p, "curve": {"a": curve.a, "b": curve.b},
         "arm": a.arm, "encoding": enc.name(), "k": k, "size": 1usize << k, "r": a.r, "draw": a.draw,
         "seed": a.seed, "set": set_info, "closing_terms_nonzero": closing_nonzero,
-        "closing_is_constant": closing_const,
+        "closing_is_constant": closing_const, "closing_degree": closing_degree,
         "abscissae_in_F": f.iter().filter(|&&x| curve.is_abscissa(x)).count(),
     });
     let mut out: Box<dyn Write> = match &a.out {
@@ -947,6 +975,26 @@ mod tests {
                 let v = verify(enc, &f, k, P, Duration::from_secs(30));
                 assert_eq!(v["encoding_exact"], json!(true), "{v}");
                 assert_eq!(v["negative_control_detected"], json!(true), "{v}");
+            }
+        }
+    }
+
+    #[test]
+    fn coset_union_closing_degree_at_most_j() {
+        let mut rng = StdRng::seed_from_u64(11);
+        let curve = Curve::random(P, &mut rng);
+        for k in 2..7 {
+            for j in 0..=k {
+                let (f, _) = arm_set("cosetunion", k, j, &curve, &mut rng);
+                let mut s = f.clone();
+                s.sort_unstable();
+                s.dedup();
+                assert_eq!(s.len(), 1 << k);
+                let r = closing_coeffs(&f, P);
+                let deg = r.iter().enumerate().filter(|(_, &c)| c != 0).map(|(n, _)| n.count_ones()).max().unwrap_or(0);
+                assert!(deg as usize <= j, "k={k} j={j} deg={deg}");
+                // only u_{k−j}..u_{k−1} occur
+                assert!(r.iter().enumerate().all(|(n, &c)| c == 0 || n % (1 << (k - j)) == 0));
             }
         }
     }
