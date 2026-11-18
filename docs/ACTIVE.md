@@ -73,6 +73,8 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Repair main's compile and clippy 1.98 breakage (all targets) so PRs can pass `check` and `clippy (crypto)`; with the GPU rootfind/echelon/cost-leads work in the same lane PR (claude, started 2026-11-18, branch claude/index-calculus-gpu-optimization-otouqv, PR #4650)
 
+- [ ] Run the preregistered prime medium-tier rho calibration (research/prime_medium_tier_calibration_20261115) on isolab-eks: ecbench rho.negation/rho.negation_v2/rho.plain/bsgs.negation(_v2) + A/A at log2 r 31.9-47.6; audit, fit bounds, update frontier (claude, started 2026-11-18, branch claude/prime-medium-rho-calib-run-20261118)
+
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
 - [x] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562; merged)
