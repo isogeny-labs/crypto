@@ -199,4 +199,102 @@ theorem uniformRankLeAverageSolutionBound
   rw [hcard] at hhigh
   exact Nat.le_of_mul_le_mul_right (hhigh.trans totalBound) Fintype.card_pos
 
+/-! ## No-subexponential-work goal
+
+The solver predicate below is a parameter on purpose.  This file does not
+define a machine model or assert that any work function solves ECDLP.  It
+separates the asymptotic implication from that missing correctness-and-cost
+bridge.
+-/
+
+/-- Operational binary-work definition of subexponential growth.  For every
+positive rational rate `a / b`, the `b`-th power of the work is eventually
+strictly below `2^(a*n)`. -/
+def IsSubexponentialBinaryWork (work : ℕ → ℕ) : Prop :=
+  ∀ a b : ℕ, 0 < a → 0 < b →
+    ∃ N : ℕ, ∀ n : ℕ, N ≤ n → work n ^ b < 2 ^ (a * n)
+
+/-- A positive rational-rate exponential lower bound on binary work. -/
+def HasPositiveExponentialLowerBound (work : ℕ → ℕ) : Prop :=
+  ∃ a b : ℕ, 0 < a ∧ 0 < b ∧
+    ∃ N : ℕ, ∀ n : ℕ, N ≤ n → 2 ^ (a * n) ≤ work n ^ b
+
+/-- The requested goal, parameterized by the predicate specifying which work
+functions belong to correct ECDLP solvers. -/
+def NoSubexponentialECDLPGoal (SolvesECDLP : (ℕ → ℕ) → Prop) : Prop :=
+  ∀ work, SolvesECDLP work → ¬ IsSubexponentialBinaryWork work
+
+/-- Constant work satisfies the operational subexponential definition. -/
+theorem constantOneWorkIsSubexponential :
+    IsSubexponentialBinaryWork (fun _ => 1) := by
+  intro a b ha _hb
+  refine ⟨1, fun n hn => ?_⟩
+  simp only [one_pow]
+  apply Nat.one_lt_two_pow
+  exact Nat.mul_ne_zero ha.ne' (Nat.ne_of_gt (lt_of_lt_of_le Nat.zero_lt_one hn))
+
+/-- A positive exponential lower bound and subexponential work are
+incompatible. -/
+theorem exponentialLowerBoundNotSubexponential
+    {work : ℕ → ℕ} (lower : HasPositiveExponentialLowerBound work) :
+    ¬ IsSubexponentialBinaryWork work := by
+  rintro subexponential
+  rcases lower with ⟨a, b, ha, hb, lowerStart, lowerBound⟩
+  rcases subexponential a b ha hb with ⟨subStart, subBound⟩
+  let n := max lowerStart subStart
+  exact Nat.not_lt_of_ge (lowerBound n (le_max_left _ _))
+    (subBound n (le_max_right _ _))
+
+/-- A pointwise binary-work floor with a positive integer slope supplies the
+positive rational-rate exponential lower bound used by the asymptotic goal. -/
+theorem positiveLinearWorkLowerBoundHasPositiveExponentialLowerBound
+    (work : ℕ → ℕ) (slope : ℕ) (slopePositive : 0 < slope)
+    (lower : ∀ n, 2 ^ (slope * n) ≤ work n) :
+    HasPositiveExponentialLowerBound work := by
+  refine ⟨slope, 1, slopePositive, Nat.zero_lt_one, 0, fun n _ => ?_⟩
+  simpa using lower n
+
+/-- The registered exact-linear-message chain excludes subexponential work
+for the named backend once its family rank exponent has positive slope. -/
+theorem linearRankBridgeNotSubexponential
+    (rank message work exponent : ℕ → ℕ) (slope : ℕ)
+    (slopePositive : 0 < slope)
+    (certifiedRank : ∀ n, 2 ^ exponent n ≤ rank n)
+    (separatorBound : ∀ n, rank n ≤ message n)
+    (messageWork : ∀ n, message n ≤ work n)
+    (linearExponent : ∀ n, slope * n ≤ exponent n) :
+    ¬ IsSubexponentialBinaryWork work := by
+  apply exponentialLowerBoundNotSubexponential
+  apply positiveLinearWorkLowerBoundHasPositiveExponentialLowerBound work slope slopePositive
+  exact linearExponentForcesExponentialWork rank message work exponent slope certifiedRank
+    separatorBound messageWork linearExponent
+
+/-- An ECDLP-wide solver-to-exponential-work bridge would establish the
+requested no-subexponential goal. -/
+theorem noSubexponentialECDLPGoalOfExponentialLowerBound
+    {SolvesECDLP : (ℕ → ℕ) → Prop}
+    (bridge : ∀ work, SolvesECDLP work → HasPositiveExponentialLowerBound work) :
+    NoSubexponentialECDLPGoal SolvesECDLP := by
+  intro work solves
+  exact exponentialLowerBoundNotSubexponential (bridge work solves)
+
+/-- The semantic rank/count premises alone do not establish the requested
+no-subexponential-ECDLP goal.  The one-seed zero-rank model satisfies those
+premises, while a predicate accepting constant-one work supplies a formal
+countermodel.  This does not assert that constant-one work solves real ECDLP;
+it exposes the missing solver-to-rank/work bridge. -/
+theorem semanticRankPremisesDoNotEstablishNoSubexponentialECDLPGoal :
+    ¬ (∀ (SolvesECDLP : (ℕ → ℕ) → Prop)
+        (rankCount solutionCount : PUnit → ℕ),
+      (∀ seed, rankCount seed ≤ solutionCount seed) →
+      (∑ seed, solutionCount seed) ≤ 2 * Fintype.card PUnit →
+      NoSubexponentialECDLPGoal SolvesECDLP) := by
+  intro claimedImplication
+  let oneWork : ℕ → ℕ := fun _ => 1
+  let solvesOne : (ℕ → ℕ) → Prop := fun work => work = oneWork
+  have rulesOut := claimedImplication solvesOne (fun _ => 0) (fun _ => 0)
+    (by intro seed; exact le_rfl) (by simp)
+  have solves : solvesOne oneWork := rfl
+  exact (rulesOut oneWork solves) constantOneWorkIsSubexponential
+
 end TensorBoundaryBounds

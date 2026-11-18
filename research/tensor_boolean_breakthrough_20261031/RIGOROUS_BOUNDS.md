@@ -35,6 +35,13 @@ linear separator message smaller than the complete smaller-side table.
 This is a rigorous lower bound for one precisely named architecture. It is not
 a lower bound for arbitrary ECDLP algorithms.
 
+Lean additionally formalizes the universal goal as a predicate parameterized
+by which work functions belong to correct ECDLP solvers.  A theorem checks
+that an exponential work lower bound for every such solver would establish
+the goal.  A separate countermodel shows that the semantic rank/count premises
+alone cannot establish it. [pcc:unverified] See
+[`NO_SUBEXPONENTIAL_ECDLP_GOAL.md`](NO_SUBEXPONENTIAL_ECDLP_GOAL.md).
+
 ## Family and work corollary
 
 For a family indexed by `n`, suppose all three explicit hypotheses hold:

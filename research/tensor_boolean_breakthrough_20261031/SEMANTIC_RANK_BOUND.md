@@ -117,6 +117,11 @@ an exact linear message across that exact cut.  It would not become a semantic
 lower bound for nonlinear, randomized, approximate, separator-avoiding, or
 different exact decomposition algorithms without another theorem.
 
+The Lean countermodel in
+[`NO_SUBEXPONENTIAL_ECDLP_GOAL.md`](NO_SUBEXPONENTIAL_ECDLP_GOAL.md) makes this
+logical boundary explicit: these semantic rank/count premises do not imply a
+universal no-subexponential-ECDLP conclusion. [pcc:unverified]
+
 ![Semantic rank obstruction and separate BTNIR obligation](figures/semantic-rank-split.svg)
 
 ## Lean instance and proof map

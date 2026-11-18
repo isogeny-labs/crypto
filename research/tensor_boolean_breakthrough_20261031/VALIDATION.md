@@ -457,3 +457,51 @@ current branch also contains a duplicate test function named
 points to the changed Lean or report files. These failures remain failures;
 the focused proof gates above are not substituted for the repository-wide
 gate.
+
+## 2026-11-18 no-subexponential-ECDLP goal follow-up
+
+### Requested scope and formal boundary
+
+The request was to disprove subexponential ECDLP through a Lean goal.  The
+implemented goal takes `SolvesECDLP : (Nat -> Nat) -> Prop` as a parameter and
+defines subexponential binary work by eventual domination at every positive
+rational exponential rate.  Lean checks the sufficient implication from an
+ECDLP-wide positive exponential work floor, and checks the registered
+rank/message/work endpoint for a named exact-linear backend.  It also supplies
+a countermodel showing that the semantic rank/count premises alone cannot
+establish the universal goal. [pcc:unverified]
+
+This does not define a complete real-ECDLP machine semantics or establish the
+universal lower bound.  That broader requested conclusion remains open; the
+missing hypothesis is a theorem giving every correct admitted ECDLP solver a
+positive exponential work floor.
+
+### Kernel checks
+
+The final pinned project build completed successfully with 1,891 jobs.  The
+repository proof gate reported:
+
+```text
+PASS 20 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+The focused hole scan found no `sorry`, `admit`, user `axiom`, or
+`native_decide`.  Explicit axiom output for the six new theorems contains only
+`propext`, with `Classical.choice` and `Quot.sound` additionally present in the
+finite `PUnit` countermodel through standard finite-sum infrastructure.  The
+independent command `lake env leanchecker --fresh TensorBoundaryBounds`
+exited 0.
+
+Three theorem claims pass the local PCC Lean verifier and retain unverified
+signed standing:
+
+```text
+PCC-20261118-63eb26  sufficient ECDLP-wide exponential-work bridge
+PCC-20261118-ed3d35  registered linear-rank architecture endpoint
+PCC-20261118-06e657  semantic-premise countermodel
+```
+
+[pcc:unverified]
+
+No performance run, ECDLP solve, benchmark record, progress point, or
+leaderboard change was produced.

@@ -56,6 +56,9 @@ rank at every tested size, cannot supply the universal quantifier.
 - **What this evidence does not establish:** It does not refute nonlinear,
   approximate, randomized, differently encoded, or separator-avoiding
   algorithms. It does not disprove subexponential prime-field ECDLP in general.
+  A Lean countermodel now formally shows that the semantic rank/count premises
+  alone cannot imply that universal goal; see
+  [`NO_SUBEXPONENTIAL_ECDLP_GOAL.md`](../research/tensor_boolean_breakthrough_20261031/NO_SUBEXPONENTIAL_ECDLP_GOAL.md).
 
 ## What would unblock it
 
@@ -72,6 +75,10 @@ rank at every tested size, cannot supply the universal quantifier.
 - [ ] For the targeted implementation, prove that every exact computation in
   scope induces the stated linear factorization and charges at least one work
   unit per message coordinate.
+- [ ] To reach a universal no-subexponential-ECDLP conclusion, define the
+  admitted algorithm and cost model and establish a positive exponential work
+  lower bound for every correct solver. The existing Lean bridge makes this
+  missing hypothesis explicit; current rank premises do not supply it.
 
 These conditions are sufficient only for an exponential lower bound on the
 named exact linear-message architecture. They are not sufficient for a lower

@@ -126,3 +126,64 @@ There is no composite unfolding, syntax type, raised limit or native
 evaluation in this extension.  The report specializes the last line with the
 source threshold; it does not promote the low-level BTNIR edge-flattening
 matrix to the semantic matrix.
+
+## No-subexponential-work goal
+
+1. **Structure above.** Natural-valued work functions indexed by bit size,
+   predicates selecting work functions admitted as correct for a problem, and eventual
+   inequalities.  The study uses an explicit binary-work predicate: after
+   raising work to any positive denominator `b`, it is eventually strictly
+   below `2^(a*n)` for every positive numerator `a`.  This is an operational
+   rational-rate definition; no claim of equivalence with every machine model
+   is made.
+2. **Theorem used as stated.** Standard natural-number power laws and order
+   transitivity.  `Nat.one_lt_pow` supplies the constant-work instance.  The
+   earlier `uniformRankLeAverageSolutionBound` is not reused as a work theorem:
+   it has no solver or cost hypothesis.
+3. **Object as an instance.** Constant-one work is the explicit
+   subexponential instance.  On the one-element seed space, zero rank and zero
+   solution count satisfy the semantic premises.  A solver predicate accepting
+   exactly constant-one work supplies the logical countermodel.
+4. **Assembly probe.** Define the two work predicates, check constant-one work,
+   establish that a positive exponential lower bound contradicts the operational
+   subexponential predicate, and instantiate the semantic premises at `PUnit`.
+   The resulting model refutes the implication from semantic rank/count
+   premises alone to a no-subexponential-solver conclusion.
+5. **Missing components only.** The operational binary-work predicate; the
+   positive exponential lower-bound predicate; the no-subexponential goal
+   parameterized by a solver-correctness predicate; constant-one membership;
+   conversion of an existing positive linear-exponent work floor into the
+   asymptotic predicate; the generic bridge from exponential lower bounds; and
+   the `PUnit` countermodel.  A real ECDLP algorithm semantics and a theorem
+   mapping every correct solver to the low-level rank/message lower bound
+   remain absent.
+6. **Inheritance table.** Eventuality: explicit `∃ N, ∀ n >= N`; powers and
+   multiplication: `Nat`; constant-work bound: `Nat.one_lt_pow`; contradiction:
+   `lt_of_lt_of_le`; finite semantic premises: the existing natural-valued
+   rank/count interface; seed space: standard `PUnit` instances.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `IsSubexponentialBinaryWork` | definition | `TensorBoundaryBounds` | `ℕ → ℕ` work function | explicit rational-rate criterion |
+| `HasPositiveExponentialLowerBound` | definition | same | `ℕ → ℕ` work function | eventual positive rational-rate floor |
+| `NoSubexponentialECDLPGoal` | definition | same | ECDLP-solver predicate on work functions | solver semantics deliberately supplied as a parameter |
+| `constantOneWorkIsSubexponential` | instance obligation | same | constant-one work | none |
+| `exponentialLowerBoundNotSubexponential` | law | same; upstream candidate for `crypto-lean` | arbitrary work function | positive exponential lower bound |
+| `positiveLinearWorkLowerBoundHasPositiveExponentialLowerBound` | law | same; upstream candidate for `crypto-lean` | arbitrary work function | positive integer slope and pointwise work floor |
+| `linearRankBridgeNotSubexponential` | endpoint | same | registered rank/message/work chain | family rank, separator, work-charge and positive-slope hypotheses |
+| `noSubexponentialECDLPGoalOfExponentialLowerBound` | endpoint | same | arbitrary ECDLP-solver predicate | every accepted solver has an exponential floor |
+| `semanticRankPremisesDoNotEstablishNoSubexponentialECDLPGoal` | endpoint/countermodel | same | one-element seed space and arbitrary ECDLP-solver predicate | semantic rank/count premises only |
+
+The intended implication boundary is:
+
+```text
+every correct solver has a positive exponential work lower bound
+  => no correct solver has subexponential binary work
+
+semantic rank <= solution count and average solution count <= 2
+  -/-> no correct solver has subexponential binary work
+```
+
+The first arrow needs an ECDLP-wide solver-to-work bridge.  The second arrow is
+refuted by the explicit countermodel; it is not a proof that a real
+subexponential ECDLP solver exists.
