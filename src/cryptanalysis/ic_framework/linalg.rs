@@ -1583,7 +1583,10 @@ mod tests {
                     .collect();
                 sparse.push_entries(&entries, &BigUint::from(*rhs));
             }
-            for core in [SparseCoreSolver::BlockWiedemann, SparseCoreSolver::BlockLanczos] {
+            for core in [
+                SparseCoreSolver::BlockWiedemann,
+                SparseCoreSolver::BlockLanczos,
+            ] {
                 for filter in [FilterOptions::cado(), FilterOptions::default()] {
                     let opts = SparseSolveOptions {
                         filter,

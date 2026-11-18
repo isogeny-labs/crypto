@@ -439,7 +439,12 @@ impl<'a> MitmTable<'a> {
             mitm_left(c, &fb.sets[..h], 0, INFINITY, &mut picks, &mut table);
             Some(table)
         };
-        MitmTable { c: *c, fb, h, table }
+        MitmTable {
+            c: *c,
+            fb,
+            h,
+            table,
+        }
     }
 
     /// Number of distinct left partial sums stored (0 if no relation can exist).

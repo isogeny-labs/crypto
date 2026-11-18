@@ -216,7 +216,10 @@ fn solver_mitm_results_are_unchanged_by_table_reuse() {
     // (bits, m, tally) -> (xi, relations, attempts, restarts, N, old
     // relation_search.adds of the per-call path, which rebuilt the table on
     // every attempt).
-    let pins: [((usize, usize, bool), (u64, usize, usize, usize, usize, Option<u64>)); 6] = [
+    let pins: [(
+        (usize, usize, bool),
+        (u64, usize, usize, usize, usize, Option<u64>),
+    ); 6] = [
         ((10, 2, false), (448, 351, 368, 0, 91, None)),
         ((10, 3, false), (666, 146, 160, 0, 39, None)),
         ((10, 2, true), (448, 92, 95, 0, 91, Some(1691))),
@@ -243,7 +246,13 @@ fn solver_mitm_results_are_unchanged_by_table_reuse() {
         let t = ecdl_tensor_ic::opcount::take();
         assert_eq!(got, xi);
         assert_eq!(
-            (got, st.relations, st.attempts, st.restarts, st.factor_base_size),
+            (
+                got,
+                st.relations,
+                st.attempts,
+                st.restarts,
+                st.factor_base_size
+            ),
             (xi_pin, rels, attempts, restarts, n),
             "b={bits} m={m} tally={tally}"
         );

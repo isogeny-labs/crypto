@@ -2839,7 +2839,8 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         // A retry keeps the reduced echelon form of the earlier relations and
         // reduces only the new ones against it (same reduced form, so the same
         // solution and `determined` flags as eliminating every row again).
-        let (mut matrix, mut rhs) = build(&relations[echelon.as_ref().map_or(0, |_| eliminated_rows)..]);
+        let (mut matrix, mut rhs) =
+            build(&relations[echelon.as_ref().map_or(0, |_| eliminated_rows)..]);
 
         let la_started = Instant::now();
         // The elimination charges its modular operations to the `bitop/v1` tally; the
@@ -2860,9 +2861,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
             gaussian_eliminate_mod_n_particular_pivots(&mut matrix, &mut rhs, &curve.n).map(
                 |(sol, pivots)| {
                     if !sol.determined[m] {
-                        echelon = Some(EchelonState::from_reduced(
-                            &matrix, &rhs, pivots, &curve.n,
-                        ));
+                        echelon = Some(EchelonState::from_reduced(&matrix, &rhs, pivots, &curve.n));
                     }
                     sol
                 },
@@ -3663,16 +3662,20 @@ mod tests {
                     // so ranks lag the row count.
                     if r % 4 == 3 {
                         let f = BigUint::from(next() % 7 + 1);
-                        row = rows[r - 2].iter().map(|v: &BigUint| (v * &f) % &n).collect();
+                        row = rows[r - 2]
+                            .iter()
+                            .map(|v: &BigUint| (v * &f) % &n)
+                            .collect();
                     } else {
                         for _ in 0..3 {
                             let c = (next() % cols as u64) as usize;
                             row[c] = BigUint::from(next()) % &n;
                         }
                     }
-                    let b = row.iter().zip(&y).fold(BigUint::zero(), |acc, (a, x)| {
-                        (acc + a * x) % &n
-                    });
+                    let b = row
+                        .iter()
+                        .zip(&y)
+                        .fold(BigUint::zero(), |acc, (a, x)| (acc + a * x) % &n);
                     rows.push(row);
                     rhs.push(b);
                 }

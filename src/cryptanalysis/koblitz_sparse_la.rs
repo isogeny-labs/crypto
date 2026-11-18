@@ -3589,10 +3589,7 @@ pub fn solve_sparse_system_seeds<W: ModWord>(
             // The filter ran once, for the first solve.
             report.row_ops = 0;
         }
-        let opts = SparseSolveOptions {
-            seed,
-            ..*opts
-        };
+        let opts = SparseSolveOptions { seed, ..*opts };
         let solved = solve_filtered_core(rows, columns, modulus, &opts, &filtered, report);
         let more = matches!(solved.0, SparseSolveOutcome::Solved(_));
         out.push(solved);
