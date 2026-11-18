@@ -89,7 +89,16 @@ RF_HD uint64_t fp64_add(const Fp64Ctx &f, uint64_t a, uint64_t b) {
 }
 
 RF_HD uint64_t fp64_sub(const Fp64Ctx &f, uint64_t a, uint64_t b) {
+#ifdef __CUDA_ARCH__
     return a >= b ? a - b : a + f.p - b;
+#else
+    /* Host: branchless correction avoids unpredictable a>=b branches
+     * in the two-sign rootfinder sweep.  a,b are canonical [0,p)
+     * and unsigned wrap is intentional when a<b.  Device unchanged. */
+    const uint64_t d = a - b;
+    const uint64_t mask = (uint64_t)0 - (uint64_t)(a < b);
+    return d + (f.p & mask);
+#endif
 }
 
 RF_HD uint64_t fp64_neg(const Fp64Ctx &f, uint64_t a) { return a == 0 ? 0 : f.p - a; }
