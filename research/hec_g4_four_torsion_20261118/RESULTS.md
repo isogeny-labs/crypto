@@ -1,0 +1,31 @@
+# Original genus-four Mumford halves qualified [pcc:unverified]
+
+Freezeee3413caafc pushed before sole execution. INPUT hashespass; overflowchecks enabled; exit0. Exactoriginalp31curve andbranchlabels are unchanged. FIELD-COPY-CHECK verifies priorfieldarithmeticprefix byte-identical after removingvisibilityexports. No solver/timing experiment orunchangedrerun.
+
+## Complete half coverage and checks
+
+ConstructedF31⁸ withirreduciblemodulus z8+6z6+5z4+30z2+17. Thefirstnonsquareshiftc=1; alpha=z²-1 embeds thequalifiedF31⁴ branchfield. Alloriginalroot/product/embeddingchecks pass.
+
+For EACHofthe9finiteWeierstrasspoints, all256signchoices give256distinctMumfordhalves. Everyoneofthe2304classespasses:
+
+- monicdegree4U,degV<4,U|(F-V²),andnoWeierstrasssupport;
+- the exactprincipalidentity F-(V+e1U)²=(X-a)U²;
+- independentgeneralCantordoubling2H=Wi;
+- 4H=0 andHnonzero;
+- changedVconstantnegativecontrol(rejectedinall2304cases).
+
+Negationofeachselectedhalfbelongs toitscorresponding256set. Allsignmasks/digests/principal/doublingstatusare inCONTROL; deduplicationusedexactMumfordpairs, notdigests. HALVES.jsonretainstheninemask0halvesandfourkernelhalveswithfullcoordinates. Hash/deterministicrecipebindsall2304records; othercoordinatesarereconstructiblefromsource/roots/signmasks.
+
+Thefourkernel0liftsdoubletofixedbasis1,10,20,160. TheirZ/4spangives256distinctvalidclasses anddoublinggivesexactlytheoriginal16elementkernel. Thisisnotanisotropycertificate:4Weilpairingswerenotcomputed. No compatiblethetastructureorquotientthetasclaimed.
+
+## Exact signed four-torsion field, with sign-quotient caveat
+
+Allninechosenhalveshave minimalpointfielddegree8, checkedbycoefficientFrobeniusatd=1,2,4,8. ThepreviousfullJ[4]upperboundwas8. Sinceatleastonepointrequiresdegree8, thefullMumford4torsionpointfield is EXACTLYF31⁸. MorestronglyeveryhalfofagivenWi hasdegree8: anytwohalvesdifferbya2torsionpoint,all2torsionbeingdefinedoverF31⁴. IfonehalfwereF31⁴-rational,addingthatrationaldifferencewouldmakeourselectedhalfrationalthere,contrarytothecheck. Thusall2304halvesrequiredegree8asSIGNEDpoints.
+
+Thisdoesnotlowerboundthefieldneededbyeveryrepresentation. ForWi0theprintedUhas onlyevenpowersofz andVonlyoddpowers. SinceF31⁸/F31⁴sendssqrt(alpha+1)=zto-z, itsFrobeniusfixesUandnegatesV: thehalf'sKummerclassisdefinedoverF31⁴eventhoughthesignedpointisnot. A theta/sign-quotientmethodmayexploitthis; no blanketfieldcostclaimis made.
+
+## Next construction
+
+Computea4Weilpairingwithsoundcommon-infinity/localnormalizationhandling,checkagainstanindependentmoved-divisorevaluationandknown2torsionpairing, thenadjusthalvesby2torsiontoanisotropic4liftandcompleteasymplecticbasis. OnlythenconstructcoherentMumford-to-thetacoordinates/affineliftsfortheknownSQISignHDevenquotientformula. QuotientSchottky,curve reconstruction/descent,originaltargettransportandcompletecostremainopen.
+
+Thisqualifiesaclassicaltorsionconstructionneededbythegeometricroute. Itdoesnotestablishthe10xobjectiveornewmathematicalpriority. BothprincipalidentityandgeneralCantorcontrolsharethequalifiedfieldimplementation; independentmathematicalreviewremainsopen. Gitcustody/noS3/cloud/merge.
