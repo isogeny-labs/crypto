@@ -45,7 +45,20 @@ def run(path):
         g = tuple(c["g"])
         ok = is_prime(p) and p%3==1 and is_prime(n) and (g[1]**2-g[0]**3-b)%p==0 and mul(g,n) is None
         if "k" in c and isinstance(c["k"], list):
-            items = list(zip(c["q"], c["k"], c["sym_rec"], c["base_rec"] or [None]*len(c["k"])))
+            T = len(c["k"])
+            sr, br = c.get("sym_rec"), c.get("base_rec")
+            ok &= isinstance(c.get("q"), list) and len(c["q"]) == T
+            ok &= isinstance(sr, list) and len(sr) == T and all(x is not None for x in sr)
+            if "base_ok" in r or br is not None:
+                ok &= isinstance(br, list) and len(br) == T and all(x is not None for x in br)
+            for x in (sr or []) + (br or []):
+                ok &= x is None or 0 <= x < n  # reduced scalars only
+            for key in ("sym4_ok", "sym_ok", "base_ok"):
+                if key in r and isinstance(r[key], int):
+                    ok &= r[key] == T  # counter must match verified count
+            if not ok:
+                bad += 1; continue
+            items = list(zip(c["q"], c["k"], sr, br or [None]*T))
         else:
             if c.get("sym_rec") is None or c.get("plain3_rec") is None:
                 ok = False  # a failed solve must not pass silently
