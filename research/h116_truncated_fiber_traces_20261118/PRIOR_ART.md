@@ -53,6 +53,41 @@ not a novelty claim. The identities themselves are elementary consequences to
 prove and test [pcc:unverified]; the ECDLP-relevant question is whether a fixed public predicate
 of the resulting moments returns scalar digits on held-out curves.
 
+## Division-polynomial resultant and EDS-ECDLP overlap update
+
+Harry Schmidt, *Resultants and discriminants of multiplication polynomials
+for elliptic curves*, Journal of Number Theory 149 (2015), 70--91,
+DOI [10.1016/j.jnt.2014.10.007](https://doi.org/10.1016/j.jnt.2014.10.007),
+proves for the standard short-Weierstrass multiplication polynomials
+`A_n,B_n` the exact formula
+
+```text
+Res(A_n,B_n) = (16*Delta)^(n^2*(n^2-1)/6),
+Delta = -(4*a^3+27*b^2).
+```
+
+The displayed Mathlib quotient `Phi_n/PsiSq_n` is intended to be the same
+standard x-coordinate multiplication map. Consequently, once convention
+alignment is proved, Schmidt's formula gives arbitrary-scalar coprimality
+directly on every nonsingular short curve outside characteristic two. The
+H116 scalar-two-through-ten stencils remain useful checked local identities
+and Lean regression certificates, but their arbitrary-index mathematical
+endpoint is prior art rather than a novelty candidate. Exact convention
+alignment and a Lean proof/import of the universal resultant formula remain
+open. [pcc:unverified]
+
+Rachel Shipsey and Christine Swart, *Elliptic divisibility sequences and the
+elliptic curve discrete logarithm problem*, IACR ePrint
+[2008/444](https://eprint.iacr.org/2008/444), already turn EDS symmetry into a
+finite-field DLP for the weak family `#E(F_q)=q-1`. Their Section 4 computes
+the required division-polynomial values in logarithmically many field
+operations and Section 5 explains the failure of the direct `q-3` extension
+and the obstacle to randomizing the construction for broader MOV cases.
+H116 therefore must not claim EDS evaluation or the `q-1` reduction as new.
+Its retained question is whether the `V-1` low fiber traces yield a public
+scalar predicate on generic prime-field curves where that symmetry reduction
+does not apply. [pcc:unverified]
+
 ## Fixed-prefix certificate follow-up
 
 Before formalizing the low-jet certificate, the shared KB wrapper was queried

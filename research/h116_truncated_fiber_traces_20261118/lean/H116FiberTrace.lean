@@ -12,6 +12,7 @@ import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
 import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.RingTheory.FormalGroup.Basic
 import Mathlib.RingTheory.LaurentSeries
+import Mathlib.RingTheory.Polynomial.Resultant.Basic
 import Mathlib.RingTheory.PowerSeries.Derivative
 import Mathlib.RingTheory.PowerSeries.Substitution
 import Mathlib.Tactic
@@ -2471,6 +2472,67 @@ theorem shortWeierstrassScalarTen_singular_control :
     WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂, WeierstrassCurve.b₄,
     WeierstrassCurve.b₆, WeierstrassCurve.b₈] at heval
 
+/-- Schmidt's universal multiplication-polynomial resultant formula, once
+aligned with Mathlib's exact `Φ,ΨSq` conventions, implies scalar
+numerator/denominator coprimality for every natural index. -/
+theorem shortWeierstrassScalar_isCoprime_of_resultantFormula
+    {F : Type*} [Field F] (A B : F) (n : ℕ)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0)
+    (hresultant :
+      let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+      Polynomial.resultant (W.Φ (n : ℤ)) (W.ΨSq (n : ℤ)) =
+        ((-16 : F) * (4 * A ^ 3 + 27 * B ^ 2)) ^
+          (n ^ 2 * (n ^ 2 - 1) / 6)) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.Φ (n : ℤ)) (W.ΨSq (n : ℤ)) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have h16 : (-16 : F) ≠ 0 := by
+    rw [show (-16 : F) = -(2 ^ 4) by norm_num]
+    exact neg_ne_zero.mpr (pow_ne_zero 4 h2)
+  have hbase : (-16 : F) * (4 * A ^ 3 + 27 * B ^ 2) ≠ 0 :=
+    mul_ne_zero h16 hdisc
+  have hresultantNe :
+      Polynomial.resultant (W.Φ (n : ℤ)) (W.ΨSq (n : ℤ)) ≠ 0 := by
+    rw [hresultant]
+    exact pow_ne_zero _ hbase
+  have hmonic : (W.Φ (n : ℤ)).Monic := W.leadingCoeff_Φ (n : ℤ)
+  rw [← Polynomial.isUnit_resultant_iff_isCoprime hmonic]
+  exact isUnit_iff_ne_zero.mpr hresultantNe
+
+/-- Under the same source-linked resultant certificate, the reduced scalar
+x-coordinate quotient has exact coordinate extension degree `n²`. -/
+theorem shortWeierstrassScalar_extension_degree_of_resultantFormula
+    {F : Type*} [Field F] (A B : F) (n : ℕ)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0)
+    (hn : (((n : ℕ) : ℤ) : F) ≠ 0)
+    (hresultant :
+      let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+      Polynomial.resultant (W.Φ (n : ℤ)) (W.ΨSq (n : ℤ)) =
+        ((-16 : F) * (4 * A ^ 3 + 27 * B ^ 2)) ^
+          (n ^ 2 * (n ^ 2 - 1) / 6)) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    let xMap : RatFunc F :=
+      algebraMap (Polynomial F) (RatFunc F) (W.Φ (n : ℤ)) /
+        algebraMap (Polynomial F) (RatFunc F) (W.ΨSq (n : ℤ))
+    Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = n ^ 2 := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  let xMap : RatFunc F :=
+    algebraMap (Polynomial F) (RatFunc F) (W.Φ (n : ℤ)) /
+      algebraMap (Polynomial F) (RatFunc F) (W.ΨSq (n : ℤ))
+  have hcoprime : IsCoprime (W.Φ (n : ℤ)) (W.ΨSq (n : ℤ)) :=
+    shortWeierstrassScalar_isCoprime_of_resultantFormula
+      A B n hdisc h2 hresultant
+  have hdenom : W.ΨSq (n : ℤ) ≠ 0 := W.ΨSq_ne_zero hn
+  have hextension := reducedRationalQuotient_extension_degree
+    (W.Φ (n : ℤ)) (W.ΨSq (n : ℤ)) hdenom hcoprime
+  have hdegrees := scalarMultiplicationXMap_exact_degrees W (n : ℤ) hn
+  change Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = n ^ 2
+  rw [hextension]
+  norm_num at hdegrees ⊢
+  omega
+
 /-- Over an algebraically closed field, absence of a common root is an exact
 certificate that two polynomials are coprime. -/
 theorem polynomial_isCoprime_of_no_common_root
@@ -4682,6 +4744,8 @@ theorem rationalMap_separation_strict_control :
 #print axioms shortWeierstrassScalarTen_isCoprime
 #print axioms shortWeierstrassScalarTen_extension_degree
 #print axioms shortWeierstrassScalarTen_singular_control
+#print axioms shortWeierstrassScalar_isCoprime_of_resultantFormula
+#print axioms shortWeierstrassScalar_extension_degree_of_resultantFormula
 #print axioms polynomial_isCoprime_of_no_common_root
 #print axioms adjacentIntegerTorsion_eq_zero
 #print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics

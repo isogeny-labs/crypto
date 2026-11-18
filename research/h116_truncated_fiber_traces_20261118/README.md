@@ -326,6 +326,14 @@ common-root-to-nonzero-adjacent-torsion certificate would discharge each
 adjacent polynomial obligation.  The exact missing bridge is now to construct
 that nonzero elliptic point from Mathlib's division-polynomial roots; a zero-
 point control proves the nonzero clause is necessary. [pcc:unverified]
+The source-linked [universal resultant bridge](UNIVERSAL_RESULTANT_BRIDGE.md)
+now records that Schmidt's published multiplication-polynomial formula, once
+aligned with the pinned Mathlib `Phi,PsiSq` conventions, implies arbitrary-
+scalar coprimality and exact coordinate extension degree `n^2`.  Lean proves
+that implication with the formula kept as an explicit premise.  This removes
+the mathematical novelty claim from the fixed-scalar corridor; convention
+alignment, the H116 map semantics and the scalar predicate remain open.
+[pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

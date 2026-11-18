@@ -1204,6 +1204,39 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | scalar-ten coordinate extension degree is one hundred | exact degree assembly | H116 | rational function field | same plus `5 != 0` |
 | singular scalar-ten pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
 
+## Universal multiplication-resultant bridge
+
+1. **Structure above.** Schmidt's exact standard-multiplication-polynomial
+   formula is
+   `Res(A_n,B_n)=(-16*(4*A^3+27*B^2))^(n^2*(n^2-1)/6)`. In a field, the
+   right side is nonzero on a nonsingular short curve. Since Mathlib's
+   `Phi_n` is monic, a unit resultant is equivalent to coprimality.
+2. **Theorems used as stated.** H116 uses Mathlib's `leadingCoeff_Phi`,
+   `Polynomial.isUnit_resultant_iff_isCoprime`, exact division-polynomial
+   degree theorems, and the already proved reduced-rational-quotient extension
+   theorem. Schmidt owns the universal resultant identity; H116 does not
+   relabel it as novel.
+3. **Object as an instance.** The Lean interface quantifies over arbitrary
+   natural `n`, assumes the exact resultant identity for pinned Mathlib
+   `Phi_n,PsiSq_n`, and derives both coprimality and exact coordinate extension
+   degree `n^2` when `n` is nonzero in the field.
+4. **Assembly evidence.** The temporary importing module and tracked source
+   pass. The pinned full build completed all 3,164 jobs, and the exact
+   repository auditor reports `208 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The exact convention-alignment proof between
+   Schmidt's standard multiplication polynomials and the pinned Mathlib
+   definitions remains open. This bridge gives no H116 scheme-map identity,
+   digit predicate, decoder, or ECDLP runtime. [pcc:unverified]
+6. **Control.** The existing singular `A=B=0` fixed-scalar theorems demonstrate
+   why the nonzero-discriminant premise cannot be dropped; the exact formula's
+   right side then vanishes for every positive exponent.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| resultant formula implies `Phi_n,PsiSq_n` coprime | source-linked bridge | Schmidt formula + H116 assembly | arbitrary field and natural scalar | nonsingular short curve, exact formula |
+| coordinate extension degree is `n^2` | exact degree assembly | H116 | rational function field | same plus scalar nonzero in field |
+| exact formula in pinned Mathlib conventions | open convention alignment | Schmidt/H116 | universal short curve | characteristic and normalization audit pending |
+
 ## Scalar-six two-factor bootstrap gate
 
 1. **Structure above.** Instantiate the preceding generic gate with

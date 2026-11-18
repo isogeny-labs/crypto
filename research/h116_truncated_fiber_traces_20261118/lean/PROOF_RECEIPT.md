@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-d7c49775a2dc9b3aede6abc213b13d4446a3a8f272f019717b04cc398e4d1910  H116FiberTrace.lean
+35981c80d170cf7edd2e4d865ec58b4dedc700049d516ff4d0e8d8ab2105f2ac  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  206 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  208 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -105,6 +105,9 @@ b67421427618cb5c1774e9bbb66583a164d9dbf7c8772fc06c0ec4f44e46fb49  receipts/third
 197a6a8a76d77f5ccde24f3e0ba9d160291191744b0d22cf247e0e32f3de4582  receipts/fourth-successor-scalar-ten-build.txt
 adb1b8bc7f8ffed0b98a5e6738517bc4aef4bf7a9de6d9aaa09fbfed61a36d7a  receipts/fourth-successor-scalar-ten-full-build.txt
 737be57e64a956b94ec6544a651b0ca1a8bf88f65c0c64865fe8cb5a6102f10f  receipts/fourth-successor-scalar-ten-audit.txt
+4dc704395d7e60183108909d5da55306c0c5e8764cc95b732305353ba6f1c545  receipts/universal-resultant-bridge-build.txt
+a04f47643f15f3f7a638952de8247f3557459ff90f164607f69112c5624cdf01  receipts/universal-resultant-bridge-full-build.txt
+c9f870c9861c119d13611b98799f546192717f3f52c71190c251be4b4306213a  receipts/universal-resultant-bridge-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -471,6 +474,16 @@ outside characteristics two and five.  The singular `A=B=0` control over
 `ZMod 11` is non-coprime.  The same motivational 249,580-tuple sweep found no
 counterexample, but is not used as proof.  Arbitrary recurrence closure
 remains open. [pcc:unverified]
+
+The 208-theorem checkpoint records the source-linked universal resultant
+bridge.  Given Schmidt's exact formula in the pinned Mathlib convention, Lean
+proves the resultant is a unit on every nonsingular short curve outside
+characteristic two, hence `Phi_n` and `PsiSq_n` are coprime for arbitrary
+natural `n`.  When `n` is nonzero in the field, the existing exact-degree and
+reduced-quotient theorems then give coordinate extension degree `n^2`.
+Convention alignment with Schmidt's standard `A_n,B_n` remains an explicit
+premise.  This result supplies no H116 map semantics, digit predicate, decoder
+or ECDLP runtime. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made
