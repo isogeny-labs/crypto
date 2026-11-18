@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Color variable effects on regularity and diffusion in the degree-fall toy report (Codex, started 2026-11-18, branch codex/degree-fall-variable-colors-20261118)
+- [ ] Color variable effects on regularity and diffusion in the degree-fall toy report (Codex, started 2026-11-18, branch codex/degree-fall-variable-colors-20261118, PR #4639)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
