@@ -133,3 +133,21 @@ matched endpoint ECDLP measurements satisfy the requested crossing category.
 A global largest-known claim additionally needs a source-based record
 comparison. The existing source/kernel and local correctness checks remain
 valid components; this protocol does not promote or replace them.
+
+
+## 18 November paired planner checkpoint
+
+`paired_curves_v1` now implements the versioned endpoint-order and shared
+algorithm-seed law in the actual ecbench planner. Corrected-source focused
+integration and CLI compatibility checks pass; the full frozen two-field
+panel plans 192 workloads/4032 executions without running a performance
+session. The packet and exact acceptance/results are in
+[paired-schedule-20261118](paired-schedule-20261118/README.md).
+PCC-20261118-219d4a is an unsigned producer statement, unverified/not_covered.
+[pcc:unverified]
+
+Endpoint-statistics joining, measured scalar multiplication, wall-reference
+admission, wide-field IC and live cloud/S3 access remain separate gates.
+The minimum 80-bit quotient/non-kernel images are still required before the
+original conductor-crossing experiment can be measured. Existing timing
+criteria and accounting boundaries are unchanged.

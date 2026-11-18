@@ -53,4 +53,70 @@ map packets and prior source/binary receipts; ecbench-extend and
 ecbench-measure skills. KB unavailable, wrapper exits 127. This introduces
 no cryptographic algorithm or novelty claim. Scalar timing, registration,
 strongest wall reference, wide-field IC, large target construction and live
-cloud/S3 admission remain separate obligations. No result is established yet.
+cloud/S3 admission remain separate obligations. The completed qualification is recorded below.
+
+
+## Corrected-source qualification
+
+The corrected v4 source passes eleven focused integration tests, root-library
+clippy and focused-test clippy with warnings denied. The actual CLI's legacy
+output is byte-identical to preserved v2, and its paired/full plans are
+byte-identical to v3. The CLI qualifies 12 workloads/252 planned executions;
+the full panel retains 192 workloads/4032 planned executions, including 32
+public target indices per model. Four negative admissions reject with the
+expected reasons. No measured session ran. [pcc:unverified]
+
+PCC-20261118-219d4a binds the final summary, actual test stdout, CLI outputs
+and current source/executable manifests. It remains an unsigned producer
+statement, unverified and not_covered. Earlier v3 subjects and claims retain
+their bytes. The independent native seed fixture supplies 680 reference
+vectors; the actual events look up the applicable vectors. This does not
+claim every fixture row is exercised. [pcc:unverified]
+
+| Requirement | Current evidence |
+|---|---|
+| Shared scalar/seed identities and reversed endpoint/arm order | Implemented; focused tests and actual CLI codec qualification pass |
+| Legacy plan compatibility | Exact v2/v4 byte comparison passes |
+| Several fields, dozens of points, repeated rounds | Full native plan checks two fields, six models and 32 indices; no timing session |
+| Full legacy root unit suite | Separately recorded pre-existing duplicate-test build failure |
+| Endpoint statistics and scalar timing | Not implemented/executed by this component |
+| Wide-field index calculus | Explicit admission rejection; no adapter |
+| Minimum 80-bit conductor crossing | Quotient, map and non-kernel images still missing |
+| Cloud/session admission and S3 publication | Existing blockers retained; PR stays draft |
+
+The full panel uses the previously evaluated degree-2 and degree-5 controls,
+not the original prime-degree kernel. Equal subgroup order is not a map or
+conductor certificate. Same RNG seeds need not produce identical walks.
+Reversal balances the orientation of each listed pair; it does not cycle
+all three models through every position or establish joint orthogonality.
+
+### Evidence and reproduction
+
+- [Final summary](final-summary.json), [test stdout](proof/v4-tests.stdout),
+  [CLI summary](proof/v4-cli-summary.json), [report PDF](reports/report.pdf).
+- `source-v2` preserves the planner before this feature; `source-v3`
+  preserves the successful earlier planner/tests before the parity lint fix.
+  Current v4 source uses the standard integer parity method.
+- The first focused build's nested legacy reexport warning and v3's failed
+  root parity lint are preserved with successful corrected outcomes.
+- Build/test/CLI pre-call SHA manifests distinguish each source and binary.
+  Old manifests referring to overwritten source paths resolve through their
+  explicitly preserved version overlays. Release target-v2/v3/v4 directories
+  remain separate outside Git.
+- `runs.tar.xz` retains the raw development tree, including failed builds and
+  qualifiers. Named PCC subjects remain loose and unchanged.
+
+From the repository root, use Rust 1.100.0 and the retained dependency lock:
+
+```sh
+cargo test --release --manifest-path research/prime_conductor_gap80_20261031/paired-schedule-20261118/Cargo.toml --locked --offline --lib
+cargo clippy --release --lib --locked --offline -- -D warnings
+cargo clippy --release --manifest-path research/prime_conductor_gap80_20261031/paired-schedule-20261118/Cargo.toml --locked --offline --tests -- -D warnings
+```
+
+The frozen qualifiers require a fresh output directory and the separately
+built native executable. `qualify-frozen.sh` checks the exact test list;
+`qualify-cli-frozen.sh` invokes only native `ecbench plan`, using Python only
+for serialized metadata validation against the native C++ seed fixture.
+A test's duration is not an ECDLP measurement. All workloads are unregistered.
+[pcc:unverified]
