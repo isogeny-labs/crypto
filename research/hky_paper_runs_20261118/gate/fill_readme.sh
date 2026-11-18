@@ -1,12 +1,12 @@
 #!/bin/bash
 # Regenerates README.md §3 between the GATE markers from the rows.jsonl files.
 cd "$(dirname "$0")/.."
-T=$(./gate/table.sh gate/raw/rows.jsonl gate/raw-frozen/rows.jsonl)
+T=$(./gate/table.sh gate/raw/rows.jsonl gate/raw-frozen/rows.jsonl gate/raw-merged/rows.jsonl $(ls gate/raw-merged/k13/*.row.jsonl 2>/dev/null))
 BODY="<!-- GATE:begin -->
 Expected = \`lfd-summation-systems/experiments/ic-bounds-k14/runs/<cell>.json\` (\`columns\`, \`profile\` = dim(V_D ∩ M_≤w) for
 w = 0..D, \`contains_one\`); got = this engine's \`--instance\` record; \`match\` requires all three equal and the closure
-closed. Rows with binary \`d31a012b\` are \`bin/pilot_gate\`; \`52b47153\` is the provisional pod binary (same sources,
-commit-stamped), whose muladds equal the gate binary's on every shared cell. Scripts: \`gate/run_gate.sh\`,
+closed. Binaries: \`d31a012b\` = \`bin/pilot_gate\` (pre-merge engine); \`52b47153\` = the first provisional pod binary (same sources,
+commit-stamped); **\`0dfbffad\` = the merged engine (wt/engine-opt c51685b6a9 merged at 9fb60e9c13), the pod binary**. Muladds are equal across all three binaries on every shared cell (the optimizer changes no counter). Scripts: \`gate/run_gate.sh\`,
 \`gate/table.sh\`; records under \`gate/raw*/\`.
 
 $T

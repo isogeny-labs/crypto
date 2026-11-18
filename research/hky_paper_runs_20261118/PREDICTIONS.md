@@ -61,3 +61,24 @@ How the centrals are formed:
 
 These are the numbers to score the runs against: a run outside its band is a finding to explain
 (schedule, host, or a wrong extrapolation exponent), not a failure of the instrument.
+
+## Revision for the merged engine (written 2026-11-18, still before any pod run)
+
+The pod binary is now the merged engine (`wt/engine-opt` c51685b6a9 merged at 9fb60e9c13, sha256
+`0dfbffad…`). Its counters are identical to the gate binary's on every gate cell (same muladds), so
+the closures and the scaling exponents above are unchanged; only the constant moves. The optimizer
+round measured 1.35–1.7× faster no-1 closures (given). Local evidence (measured, 4 vCPU, now lightly
+loaded, load ≈ 3.5): k = 11, D = 6 111 s and 1.41 GB, k = 12, D = 6 587 s and 5.04 GB (2.1e12
+muladds, ≈ 3.6e9 muladds/s on 4 vCPU).
+
+| job | wall: central [band] | peak RSS | basis | checkpoint |
+|:--|:--|:--|:--|:--|
+| J1, J2 (k = 14) | **12,000 s (3.3 h)** [7,000 – 24,000 s] | 31 GB [23 – 45] | ≈ 50 GB | ≈ 30 GB |
+| J3 (k = 15) | **70,000 s (19 h)** [33,000 – 170,000 s] | 75 GB [50 – 110] | ≈ 120 GB | ≈ 75 GB |
+| J4 (k = 16) | **370,000 s (4.3 d)** [170,000 – 950,000 s] | 170 GB [110 – 260] | ≈ 270 GB | ≈ 170 GB |
+
+Checkpoint size is revised up: at k = 12, D = 6 one checkpoint passed 3.4 GB (it filled this
+machine's disk, `README.md` §3) while the closure's peak RSS was 5.0 GB, so a checkpoint is up to
+≈ 1 × RSS, and while one is written the previous one is still on disk (2 × RSS). Disk needs: J1/J2
+≥ 150 GB, J3 ≥ 350 GB, J4 ≥ 700 GB with the export (or `EXPORT=0`). `--hky3-verify-closed on`
+(optional, re-checks closedness at the end) doubles peak memory: fits J1–J3 on a 256 GB host, not J4.

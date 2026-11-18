@@ -5,7 +5,8 @@
 #
 # Environment (defaults): BIN=/workspace/bin/pkm_tower_pilot, SHA_FILE=<this dir>/BINARY.sha256,
 # OUT_ROOT=/workspace/out, CKPT_MIN=30, MEM_SOFT_PCT=85 (SIGTERM: checkpoint + clean censored exit),
-# MEM_HARD_PCT=97 (SIGKILL), SAMPLE_S=60, EXPORT=1, MEM_LIMIT_KB (test override of the detected limit).
+# MEM_HARD_PCT=97 (SIGKILL), SAMPLE_S=60, EXPORT=1, VERIFY=0 (1: engine re-checks closedness at the end,
+# doubling peak memory: J1-J3 on 256 GB, not J4), MEM_LIMIT_KB (test override of the detected limit).
 #
 # Writes /workspace/out/<job>/: record.json (the engine's record), job.json (this script's record:
 # host facts, status, peak RSS, wall, rc), basis.bin + basis.bin.json (hky.basis/v1 and sidecar),
@@ -67,6 +68,7 @@ else
   args+=(--checkpoint-dir "$CK")
 fi
 [ "$EXPORT" = 1 ] && args+=(--export-basis "$OUT/basis.bin")
+[ "${VERIFY:-0}" = 1 ] && args+=(--hky3-verify-closed on)   # doubles peak memory
 t0=$(date +%s)
 "$BIN" "${args[@]}" > "$OUT/record.stdout" 2>> "$OUT/engine.err" &
 pid=$!

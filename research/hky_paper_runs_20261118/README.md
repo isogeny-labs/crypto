@@ -75,8 +75,8 @@ Files:
 <!-- GATE:begin -->
 Expected = `lfd-summation-systems/experiments/ic-bounds-k14/runs/<cell>.json` (`columns`, `profile` = dim(V_D ∩ M_≤w) for
 w = 0..D, `contains_one`); got = this engine's `--instance` record; `match` requires all three equal and the closure
-closed. Rows with binary `d31a012b` are `bin/pilot_gate`; `52b47153` is the provisional pod binary (same sources,
-commit-stamped), whose muladds equal the gate binary's on every shared cell. Scripts: `gate/run_gate.sh`,
+closed. Binaries: `d31a012b` = `bin/pilot_gate` (pre-merge engine); `52b47153` = the first provisional pod binary (same sources,
+commit-stamped); **`0dfbffad` = the merged engine (wt/engine-opt c51685b6a9 merged at 9fb60e9c13), the pod binary**. Muladds are equal across all three binaries on every shared cell (the optimizer changes no counter). Scripts: `gate/run_gate.sh`,
 `gate/table.sh`; records under `gate/raw*/`.
 
 | cell (instance : D) | columns | expected profile | got profile | 1 ∈ V_D exp / got | match | muladds | wall (s, shared 4 vCPU) | binary |
@@ -96,6 +96,17 @@ commit-stamped), whose muladds equal the gate binary's on every shared cell. Scr
 | unit-p65537-a1-s10-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299157464 | 48 | 52b47153 |
 | unit-p163841-a3-s21-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299505466 | 49 | 52b47153 |
 | unit-p163841-a3-s21-k13 : 5 | 83682 | 0,0,2,150,4021,39657 | 0,0,2,150,4021,39657 | false / false | **true** | 17993415519 | 41 | 52b47153 |
+| unit-p65537-a1-s10-k10 : 5 | 21700 | 0,0,2,138,3163,18569 | 0,0,2,138,3163,18569 | false / false | **true** | 16024605579 | 5 | 0dfbffad |
+| unit-p65537-a1-s10-k11 : 5 | 35443 | 0,0,2,142,3441,25033 | 0,0,2,142,3441,25033 | false / false | **true** | 16340811395 | 6 | 0dfbffad |
+| unit-p65537-a1-s10-k12 : 5 | 55455 | 0,0,2,146,3727,32057 | 0,0,2,146,3727,32057 | false / false | **true** | 17441038634 | 8 | 0dfbffad |
+| unit-p65537-a1-s10-k10 : 6 | 60460 | 1,21,211,1351,6196,21700,60460 | 1,21,211,1351,6196,21700,60460 | true / true | **true** | 43706615635 | 16 | 0dfbffad |
+| unit-p65537-a1-s10-k13 : 5 | 83682 | 0,0,2,150,4021,39657 | 0,0,2,150,4021,39657 | false / false | **true** | 17993100441 | 9 | 0dfbffad |
+| unit-p163841-a3-s21-k13 : 5 | 83682 | 0,0,2,150,4021,39657 | 0,0,2,150,4021,39657 | false / false | **true** | 17993415519 | 10 | 0dfbffad |
+| unit-p65537-a1-s10-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299157464 | 11 | 0dfbffad |
+| unit-p163841-a3-s21-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299505466 | 9 | 0dfbffad |
+| unit-p65537-a1-s10-k15 : 5 | 174437 | 0,0,2,158,4633,56649 | 0,0,2,158,4633,56649 | false / false | **true** | 19233087929 | 9 | 0dfbffad |
+| unit-p65537-a1-s10-k11 : 6 | 110056 | 1,23,254,1794,9109,35443,110056 | 1,23,254,1794,9109,35443,110056 | true / true | **true** | 321522714727 | 110 | 0dfbffad |
+| unit-p65537-a1-s10-k12 : 6 | 190051 | 1,25,301,2325,12951,55455,190051 | 1,25,301,2325,12951,55455,190051 | true / true | **true** | 2104737035939 | 586 | 0dfbffad |
 
 The profile definition is the same on both sides: the records' `profile` ends at `rank` and is cumulative by degree, as
 the engine's `dims` (pivot degrees, cumulative). **Every row matches exactly, no discrepancy.**
@@ -199,19 +210,20 @@ the next batch boundary and exit with a closure censored `"signal"` (exit code 3
 
 Measured (`gate/ckpt-k10D5*.log`, unit-p65537 k = 10, D = 5, 522 batches, 16 interreductions): an uninterrupted run against runs killed with **SIGKILL** and resumed, at three points — batch 150, batch 300 (`ckpt-k10D5-mid`), and after 22 s of wall at batch 475 = 30 % of the muladds, past several interreductions (`ckpt-k10D5-t22`) — and runs stopped with **SIGTERM** (clean checkpoint, exit 3) at batches 145, 308, 488 and resumed. Every resumed run: same columns, profile, contains_one, **muladds (16,024,605,579), rows_reduced (31,631)**, and the exported basis is **byte-identical** (content SHA-256 5fa47095…, file SHA-256 16108d90…). Checkpoint size at batch 488: 83.7 MB, written in 0.4 s.
 
-## 8. Frozen binary and pod jobs (PROVISIONAL)
+## 8. Frozen binary and pod jobs
 
 The owner's optimizer pass (`wt/engine-opt`) will replace the engine; **the final pod binary is built
-after that merge and must pass this gate again** (`gate/run_gate.sh <new binary> <dir>` must give
-`match: true` on every row, then `pod/BINARY.sha256` is replaced). The binary below is the gate
-binary of this report.
+after that merge and must pass this gate again** — **done**: the merge is 9fb60e9c13 and its binary passed the full gate (`gate/run_gate.sh <new binary> <dir>` gave
+`match: true` on every row; `pod/BINARY.sha256` now names it). The binaries below are the gate
+binaries of this report.
 
 | binary | SHA-256 | built from | use |
 |:--|:--|:--|:--|
 | `bin/pilot_gate` | d31a012b5e5d938b1b7ccb80b227ea6cf4322375b6a1170f1a587482204137bc | source of e4d5a6ec08 (stamp says 50262dc257: built before that commit, same pilot sources) | the gate rows of §3 |
-| `bin/pkm_tower_pilot` (**provisional pod binary**, `pod/BINARY.sha256`) | 52b47153eb732c85c17a693c8f85bd481e66b5fce90b752ab7d51217c7048d04 | e295580642 (stamped) | pods, re-gated on a subset (§3) |
+| `bin/pkm_tower_pilot` first provisional build (pre-merge) | 52b47153eb732c85c17a693c8f85bd481e66b5fce90b752ab7d51217c7048d04 | e295580642 (stamped) | re-gated on a subset (§3); superseded |
+| `bin/pkm_tower_pilot` = `bin/pkm_tower_pilot_merged` (**pod binary**, `pod/BINARY.sha256`) | 0dfbffadf7bf4c18762cc53b2aac28f51e3e6de7bfb183bbd34511d011903c08 | 9fb60e9c13 = merge of wt/engine-opt c51685b6a9 (stamped) | the full gate (§3), checkpoint test (§7), pods |
 
-Both: `cargo build --release`, no target-cpu flags, runtime SIMD (avx512/avx2/portable), dynamically linked against libgcc_s/libm/libc only, max GLIBC_2.34.
+All: `cargo build --release`, no target-cpu flags, runtime SIMD (avx512/avx2/portable), dynamically linked against libgcc_s/libm/libc only, max GLIBC_2.34.
 
 Pod scripts (`pod/`, bash + coreutils only): `run_job.sh <job> <instance> <D>` verifies the binary's
 SHA-256 against `pod/BINARY.sha256`, logs host facts (CPU model, nproc, MemTotal, cgroup limit, disk,
@@ -235,8 +247,8 @@ SHA-256), and skip-if-done (`gate/raw/podscript-guard-test/`).
 
 Pod layout: `/workspace/bin/pkm_tower_pilot` (the frozen binary), `/workspace/instances/*.json` (the
 paper's files for J1–J3, `instances/unit-p786433-a1-s10-k16.json` for J4), this `pod/` directory.
-Predicted wall/memory/disk with bands: `PREDICTIONS.md` (J1/J2 ≈ 5 h, 31 GB; J3 ≈ 29 h, 75 GB;
-J4 ≈ 6.5 d, 170 GB, on 32 vCPU).
+Predicted wall/memory/disk with bands: `PREDICTIONS.md` (merged engine: J1/J2 ≈ 3.3 h, 31 GB; J3 ≈ 19 h, 75 GB;
+J4 ≈ 4.3 d, 170 GB, on 32 vCPU; see the revision section).
 
 ## 9. Notes and limits
 
