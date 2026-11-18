@@ -169,37 +169,54 @@ def perform():
             image=n.norm_point((x,y))
             assert n.ecmul(logs[solver.index[x]],G)==image
 
-        # Public challenge; the scalar below is used only for fixture setup
-        # and final verification, never to build matrix/target relation.
+        # The solver accepts only the public point. Known scalars below are
+        # test fixtures and are never passed into recover_public_target.
+        def recover_public_target(target):
+            jt=c.image(target)
+            candidate_count=0
+            target_adds=0
+            for label,points,d0 in registered_offsets:
+                start=c.cantor(d0,jt)
+                target_adds+=1
+                for a,sk in enumerate(j):
+                    v=c.cantor(start,sk)
+                    target_adds+=1
+                    candidate_count+=1
+                    support=n.split_support(v)
+                    if support is None:
+                        continue
+                    recovered=((solver.known_sum(support,logs)-solver.known_sum(points,logs)-3*a)*pow(3,-1,R))%R
+                    assert n.ecmul(recovered,G)==target, "incorrect scalar"
+                    return recovered, candidate_count, target_adds, label, a
+            raise AssertionError("target has no smooth relation among registered offsets")
+
         fixture_scalar=37
         target=n.ecmul(fixture_scalar,G)
-        jt=c.image(target)
-        candidate_count=0
-        target_adds=0
-        found=False
-        for label,points,d0 in registered_offsets:
-            start=c.cantor(d0,jt)
-            target_adds+=1
-            for a,sk in enumerate(j):
-                v=c.cantor(start,sk)
-                target_adds+=1
-                candidate_count+=1
-                support=n.split_support(v)
-                if support is None:
-                    continue
-                recovered=((solver.known_sum(support,logs)-solver.known_sum(points,logs)-3*a)*pow(3,-1,R))%R
-                assert n.ecmul(recovered,G)==target and recovered==fixture_scalar
-                target_output={'target':list(target),
-                    'recovered_scalar':recovered,
-                    'target_offset_stage':label,
-                    'target_candidate_trials':candidate_count,
-                    'target_jacobian_additions':target_adds,
-                    'target_walk_a':a}
-                found=True
-                break
-            if found:
-                break
-        assert found, "target has no smooth relation among registered offsets"
+        recovered, candidate_count, target_adds, stage, a = recover_public_target(target)
+        assert recovered==fixture_scalar
+        target_output={'target':list(target),
+            'recovered_scalar':recovered,
+            'target_offset_stage':stage,
+            'target_candidate_trials':candidate_count,
+            'target_jacobian_additions':target_adds,
+            'target_walk_a':a}
+
+        # Reuse the same frozen relation matrix on every group element, but
+        # never treat this amortized verification as cold single-target cost.
+        all_target_cands=0
+        all_target_jac_adds=0
+        max_target_cands=0
+        for known_scalar in range(R):
+            public_q=n.ecmul(known_scalar,G)
+            ans, tries, adds, _, _ = recover_public_target(public_q)
+            assert ans==known_scalar
+            all_target_cands+=tries
+            all_target_jac_adds+=adds
+            max_target_cands=max(max_target_cands,tries)
+        target_output['all_source_group_logs_verified']=R
+        target_output['all_target_candidate_trials']=all_target_cands
+        target_output['all_target_jacobian_additions']=all_target_jac_adds
+        target_output['max_target_candidate_trials']=max_target_cands
 
     return {
       'schema':'ct218-f101-norm-projected-full-ic-v1',
@@ -233,6 +250,8 @@ if __name__=='__main__':
     result=perform()
     if args.self_test:
         assert result['matrix_rank']>30
+        if result['target_result']:
+            assert result['target_result']['all_source_group_logs_verified']==R
         print('CT218_SELFTEST',result['matrix_rank'],'/',result['full_factor_base_columns'],
               'smooth',result['smooth_relations'],'target',bool(result['target_result']))
     else:
