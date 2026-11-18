@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and verify shared rootfinder headers
         run: |
-          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep bench-chain256 bench-mulneg64
 
       - name: Record before and after perf counters when accessible
         shell: bash
@@ -125,6 +125,16 @@ jobs:
                      pair16-before pair16-after pair1-before pair1-after; do
             perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/batch-${arm}.txt" \
               -- taskset -c "$cpu" gpu/rootfind/bench_batch_core "--perf-$arm"
+          done
+          # Fixed P-256 inverse chain vs the immediately preceding radix16 chain.
+          for arm in before after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/chain256-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_chain256 "--perf-$arm"
+          done
+          # Wide Fp64 Montgomery multiply and masked modular negation.
+          for arm in mul-before mul-after neg-before neg-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/mulneg64-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_mulneg64 "--perf-$arm"
           done
           echo "Hardware PMU measurements saved as the rootfind-perf artifact." >> "$GITHUB_STEP_SUMMARY"
 
