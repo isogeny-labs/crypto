@@ -453,3 +453,13 @@ permutations. The selected `IX1-argmin` statistic has standardized root
 `p=0.00170857`. This admits one unchanged out-of-sample association test. The
 rule remains highly inexact (57/204 covered targets, with 54 abstentions), so
 the calibration is not a digit oracle or an ECDLP result. [pcc:unverified]
+
+The unchanged
+[five-curve OOS test](QUOTIENT_DIGIT_OOS_EXPERIMENT.md) then generated 9,120
+coordinate-model records and scored 4,485 nontrivial quotient targets. All
+repeat and invariant gates pass. `IX1-argmin` covers 4,328 targets and is
+correct on 845 (19.52% versus 16.67%); no one of 4,096 row-preserving null
+replicates reaches its standardized excess, for plus-one p=0.000244. The
+association is heterogeneous—p=431 is below baseline—and the rule remains far
+from exact. This is a replicated ordering bias, not an iterable digit oracle
+or a subexponential ECDLP algorithm. [pcc:unverified]
