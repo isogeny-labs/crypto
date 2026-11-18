@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2250Z-mt-lanes-2p32-2p36",
+  "latest_record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 10,
     "invalid": 4,
-    "measured": 202,
+    "measured": 203,
     "open": 1
   },
   "repo": "crypto",
@@ -15419,6 +15419,474 @@
         }
       ],
       "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9345,
+      "latest": 0.9345,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p32_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8985,
+            0.9834
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9345
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9842,
+      "latest": 0.9842,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p32_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8254,
+            1.1757
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9842
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0048,
+      "latest": 1.0048,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p32_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9421,
+            1.0511
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.0048
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8732,
+      "latest": 0.8732,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p36_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6874,
+            1.0428
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.8732
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.944,
+      "latest": 0.944,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p36_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8586,
+            1.0143
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.944
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9471,
+      "latest": 0.9471,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p36_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9051,
+            1.0038
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9471
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8876,
+      "latest": 0.8876,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p32_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7824,
+            0.9351
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.8876
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9755,
+      "latest": 0.9755,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p32_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8945,
+            1.0621
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9755
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.97,
+      "latest": 0.97,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p32_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9278,
+            1.1461
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.97
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.1334,
+      "latest": 1.1334,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p36_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9889,
+            1.1817
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.1334
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2184,
+      "latest": 1.2184,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p36_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0516,
+            1.347
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.2184
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0585,
+      "latest": 1.0585,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p36_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9947,
+            1.315
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.0585
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.889,
+      "latest": 0.889,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p32_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.833,
+            0.9345
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.889
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9996,
+      "latest": 0.9996,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p32_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.833,
+            1.1497
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9996
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0552,
+      "latest": 1.0552,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p32_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9427,
+            1.1869
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.0552
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8356,
+      "latest": 0.8356,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p36_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.722,
+            0.9728
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.8356
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0218,
+      "latest": 1.0218,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p36_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.84,
+            1.106
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.0218
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9379,
+      "latest": 0.9379,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p36_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8076,
+            1.0521
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9379
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
       "unit": "ratio"
     },
     {
