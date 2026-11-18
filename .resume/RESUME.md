@@ -25,11 +25,13 @@ unavailable. Checkpoint push/gate exited 1 because no upload transport exists,
 so no profile, isolated timing, or frontier run was started. The standalone
 source check passes. The required full release library test reaches unrelated
 base compilation failures after sparse dependencies are materialized; retained
-in `round-b/full-test-status.txt`.
+in `round-b/full-test-status.txt`. Ready PR #4687 is open with merge-method
+auto-merge enabled; the first ecbench scope check failed while hydrating
+unrelated historical artifacts from its cache.
 
 ## Next steps
-1. Commit and push the implementation, raw correctness/count evidence, report,
-   and session-log entry; open a ready PR and enable auto-merge.
+1. Follow PR #4687 under the repository check-in cadence; address only
+   attributable review or CI failures.
 2. When checkpoint transport exists, rerun `scripts/checkpoint.sh push` and
    `gate`, then profile baseline/candidate with `tools/profile.sh`.
 3. Run the frozen A/A and five-pair ABAB local diagnostic, followed by the
