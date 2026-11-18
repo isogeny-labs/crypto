@@ -3341,3 +3341,125 @@ mod sparse_round18_tests {
             |(a,b,c,d,e)| ctx.quartic(a,b,c,d,e).unwrap().0.into_iter().fold(0,|h,v|h^v));
     }
 }
+
+#[cfg(test)]
+impl RadicalRootCtx {
+    fn roots_before_stack(&self, f: &[u64]) -> Result<RadicalRoots, String> {
+        let fp = &self.f;
+        let mut c: Vec<u64> = f.iter().map(|&x| x % fp.p).collect();
+        while c.last() == Some(&0) {
+            c.pop();
+        }
+        let ok = |roots: Vec<u64>| {
+            Ok(RadicalRoots {
+                roots,
+                frobenius_fallback: false,
+            })
+        };
+        match c.len() {
+            0 => Err("zero polynomial".into()),
+            1 => ok(vec![]),
+            2 => {
+                // x + c0 and a*x have roots without an inversion.
+                let root = if c[0] == 0 { 0 }
+                    else if c[1] == 1 { fp.neg(c[0]) }
+                    else { fp.mul(fp.neg(c[0]), fp.inv(c[1])) };
+                ok(vec![root])
+            },
+            3 => ok(self.quad_roots(c[2], c[1], c[0])),
+            4 => {
+                // Monic cubics are common in normalized rootfinding.
+                // Avoid one inversion and three modular products.
+                let mut v = if c[3] == 1 {
+                    self.cubic_monic(c[2], c[1], c[0])
+                } else {
+                    let ia = fp.inv(c[3]);
+                    self.cubic_monic(fp.mul(c[2], ia), fp.mul(c[1], ia), fp.mul(c[0], ia))
+                };
+                v.sort_unstable();
+                v.dedup();
+                ok(v)
+            }
+            5 => {
+                let (roots, fb) = self.quartic(c[4], c[3], c[2], c[1], c[0])?;
+                Ok(RadicalRoots {
+                    roots,
+                    frobenius_fallback: fb,
+                })
+            }
+            _ => Err("radical root finder supports degree <= 4".into()),
+        }
+    }
+}
+
+#[cfg(test)]
+mod stack_normalization_round18_tests {
+    use super::*;
+    fn next(seed: &mut u64) -> u64 {
+        *seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+        *seed
+    }
+    #[test]
+    fn stack_coefficient_buffer_preserves_padding_and_modular_zeroes() {
+        let mut seed=0x71ab_a1e8_cda1_2026u64;
+        for p in [5u64,7,11,17,97,487,1_000_000_007,MAX_PRIME] {
+            let ctx=RadicalRootCtx::new(p).unwrap();
+            // Sparse, dense and oversized polynomials, including arbitrary
+            // numbers of trailing coefficients congruent to zero mod p.
+            for degree in 0..=7 {
+                for k in 0..96 {
+                    let mut poly=Vec::new();
+                    for j in 0..=degree {
+                        let v=next(&mut seed)%p;
+                        let x=if j==degree && degree<=4 && k%3==0 {1}
+                              else if k%7==0 {v+p} else {v};
+                        poly.push(x);
+                    }
+                    if degree<=4 && k%3==1 {for _ in 0..7{poly.push(p)}}
+                    if degree<=4 && k%3==2 {for _ in 0..7{poly.push(0)}}
+                    // Avoid expensive generic quartic fallback in this
+                    // normalization test, independently tested above.
+                    if degree==4 && p>487 {continue;}
+                    assert_eq!(ctx.roots_before_stack(&poly),ctx.roots(&poly),
+                               "p={p} degree={degree} k={k} f={poly:?}");
+                }
+            }
+        }
+    }
+    #[test]
+    #[ignore]
+    fn bench_stack_coefficient_buffer_actual_rust() {
+        fn sample<T:Copy,F:Fn(T)->u64>(xs:&[T],reps:usize,f:&F)->f64 {
+            let start=std::time::Instant::now();let mut digest=0u64;
+            for _ in 0..reps {
+                for &x in xs {
+                    digest=digest.wrapping_add(std::hint::black_box(f(std::hint::black_box(x))));
+                }
+            }
+            std::hint::black_box(digest);
+            start.elapsed().as_nanos() as f64/(reps*xs.len()) as f64
+        }
+        fn paired<T:Copy,F:Fn(T)->u64,G:Fn(T)->u64>(name:&str,xs:&[T],reps:usize,old:F,new:G) {
+            let mut a=Vec::new();let mut b=Vec::new();
+            for j in 0..13 {
+                if j%2==0 {a.push(sample(xs,reps,&old));b.push(sample(xs,reps,&new))}
+                else {b.push(sample(xs,reps,&new));a.push(sample(xs,reps,&old))}
+            }
+            a.sort_by(f64::total_cmp);b.sort_by(f64::total_cmp);
+            println!("{name}: before={:.3}ns after={:.3}ns speedup={:.3}x",a[6],b[6],a[6]/b[6]);
+        }
+        let ctx=RadicalRootCtx::new(1_000_000_007).unwrap();
+        let mut seed=0x9a82_3bed_2026_1118;
+        let mut linear=Vec::new();let mut padded=Vec::new();
+        for _ in 0..512 {
+            let a=next(&mut seed)%ctx.f.p;
+            linear.push([a,1]);padded.push([a,1,0,0,0]);
+        }
+        paired("linear input (2 coefficients) p=1000000007",&linear,64,
+            |x|ctx.roots_before_stack(&x).unwrap().roots.iter().fold(0u64,|h,&v|h^v),
+            |x|ctx.roots(&x).unwrap().roots.iter().fold(0u64,|h,&v|h^v));
+        paired("linear input (5 coefficients, padded) p=1000000007",&padded,64,
+            |x|ctx.roots_before_stack(&x).unwrap().roots.iter().fold(0u64,|h,&v|h^v),
+            |x|ctx.roots(&x).unwrap().roots.iter().fold(0u64,|h,&v|h^v));
+    }
+}
