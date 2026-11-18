@@ -1,7 +1,0 @@
-$ jq normalize (select instance/rho; delete source_revision/wall_s)
-$ diff -u q223-baseline-normalized.jsonl q223-candidate-normalized.jsonl
-normalized_diff_exit=0
-$ jq width summary from q223-candidate.jsonl
-strong-b4	2481	155	0	92	1	5	175852	2867	703	4814	9707
-strong-b8	1487	76	0	53	2	10	149558	2619	231	4011	5049
-strong-b16	1008	57	0	34	0	0	151572	2954	89	4005	3189

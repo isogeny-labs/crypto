@@ -10,9 +10,11 @@ execution-admission gap is tracked in
 [the problem record](../../problems/ghs-strong-rho-measurement-admission.md).
 [Round C](ROUND_C.md) replaces run-time base-field remainder division with
 fixed-modulus reciprocal reduction and separately re-screens batch widths 4,
-8, and 16. Its [partial result](round-c/RESULTS.md) passes producer-side
-correctness/count identity on `q=223`, while checkpoint refusal leaves profile,
-throughput, and a primary-width selection unmeasured `[pcc:unverified]`.
+8, and 16. Its [partial result](round-c-reduce-retune/RESULTS.md) passes
+producer-side correctness and pre-existing-counter identity on `q=223` while
+reporting one cold reciprocal setup division; checkpoint refusal leaves
+profile, throughput, and a primary-width selection unmeasured
+`[pcc:unverified]`.
 
 This study reopens the restricted `E0/F_{q^3}` plane-quartic program for one
 specific obligation: compare its end-to-end index-calculus result with a rho
@@ -45,7 +47,8 @@ is made [pcc:unverified].
   count-identity gates plus a prospective b4/b8/b16 development screen;
   [`ROUND_C_DEVIATION.md`](ROUND_C_DEVIATION.md) corrects the initially
   unrecorded reciprocal setup division;
-  [`round-c/RESULTS.md`](round-c/RESULTS.md) retains its producer controls and
+  [`round-c-reduce-retune/RESULTS.md`](round-c-reduce-retune/RESULTS.md)
+  retains its producer controls and
   the performance-admission blocker.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
   source-hash-pinned Round A measurement code. The current `strong_rho.rs` is

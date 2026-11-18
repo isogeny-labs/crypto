@@ -11,10 +11,12 @@ independently admitted `[pcc:unverified]`.
 `FastF3` now precomputes `floor(2^64/q)` once and reduces each canonical
 `a*b < q^2 < 2^62` with a high product and at most one subtraction. The hot
 `fm` path no longer executes a run-time remainder by `q`, and it still bumps
-`fq_mul` once per call `[pcc:unverified]`.
+`fq_mul` once per call. Constructing the reciprocal executes one separately
+reported, unpriced cold `u128` division per strong-rho invocation
+`[pcc:unverified]`.
 
 The candidate source SHA-256 is
-`77ec7654292f107b041adc34d2b7e016d453311c5c3c602c6fe64423d45e32fc`.
+`c124200cb829676654495e3dd4ae1ca3f02a16d52d07a62403f820159cbfe11b`.
 It is layered on the Round B five-product cubic square; no walk, partition,
 cycle, distinguished-point, or accounting rule changed.
 
@@ -33,14 +35,22 @@ and planted-log recovery at widths 1, 4, 8, 16, and 32
 
 Source-bound baseline and candidate binaries then ran the public synthetic
 `q=223`, seed 1, target 0, `ic-repeat` cell at widths 4, 8, and 16. After
-removing only calibration, `wall_s`, and the deliberately different source
-binding, the normalized instance/rho files are byte-identical: both have
-SHA-256
+removing calibration, `wall_s`, and the deliberately different source
+binding, the normalized records differ exactly at `setup.reciprocal_div`: the
+pre-reciprocal baseline is 0 and the candidate is 1 in each same-width pair.
+The exact difference is retained in
+[`expected-setup-diff.txt`](expected-setup-diff.txt) `[pcc:unverified]`.
+
+The first producer report failed to account for that setup division and its
+broader total-work identity wording is withdrawn. The fail-closed correction
+is frozen in [`../ROUND_C_DEVIATION.md`](../ROUND_C_DEVIATION.md). Counter-
+identity views that remove only this declared diagnostic are byte-identical,
+both with SHA-256
 `2f28d058b934027b2d4a849d51e4c8be1a919957ba50d962dc57fa15f9f9af0e`
-`[pcc:unverified]`. Therefore each same-width pair has the same recovered
-scalar, steps, distinguished points, restarts, look-ahead behavior, cycles,
-group counts, every field count, and every native count in this cell. The raw
-and normalized records remain beside this report.
+`[pcc:unverified]`. Thus each same-width pair has the same recovered scalar,
+steps, distinguished points, restarts, look-ahead behavior, cycles, group
+counts, every pre-existing field count, and every pre-existing native count in
+this cell. This does not establish total-work or throughput identity.
 
 ## Prospective width sensitivity
 
@@ -48,11 +58,11 @@ The following values describe the candidate's single deterministic `q=223`
 cell. They are count/correctness sensitivity, not a throughput ranking or a
 new primary-width selection `[pcc:unverified]`.
 
-| arm | steps | DPs | look-ahead | cycles | cycle adds | total `fq_mul` | total `fq_inv` | batch invocations | group adds | band ops |
-|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| strong-b4 | 2,481 | 155 | 92 | 1 | 5 | 175,852 | 2,867 | 703 | 4,814 | 9,707 |
-| strong-b8 | 1,487 | 76 | 53 | 2 | 10 | 149,558 | 2,619 | 231 | 4,011 | 5,049 |
-| strong-b16 | 1,008 | 57 | 34 | 0 | 0 | 151,572 | 2,954 | 89 | 4,005 | 3,189 |
+| arm | reciprocal div | steps | DPs | look-ahead | cycles | cycle adds | total `fq_mul` | total `fq_inv` | batch invocations | group adds | band ops |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| strong-b4 | 1 | 2,481 | 155 | 92 | 1 | 5 | 175,852 | 2,867 | 703 | 4,814 | 9,707 |
+| strong-b8 | 1 | 1,487 | 76 | 53 | 2 | 10 | 149,558 | 2,619 | 231 | 4,011 | 5,049 |
+| strong-b16 | 1 | 1,008 | 57 | 34 | 0 | 0 | 151,572 | 2,954 | 89 | 4,005 | 3,189 |
 
 All three arms recovered scalar 1,765,657 with zero restarts. Differences
 between widths arise from their distinct deterministic batching schedules;
@@ -70,9 +80,10 @@ with `TMPDIR` on `/dev/shm`, exposing the clean transport refusal retained in
 Per the frozen stop rule, no profile, A/A control, interleaved A/B timing,
 standard-isolation run, or full Round A grid was started. Raw development
 `wall_s` and one-triple calibration fields are retained for audit but excluded
-from the normalized comparison and from every conclusion. Reciprocal-reduction
-throughput, the optimal batch width, and any frontier or leaderboard change
-remain unmeasured `[pcc:unverified]`.
+from every conclusion. The cold `setup.reciprocal_div=1` diagnostic is retained
+but is neither `FieldCounts` nor `band_ops`. Reciprocal-reduction throughput,
+the optimal batch width, and any frontier or leaderboard change remain
+unmeasured `[pcc:unverified]`.
 
 ## Provenance and test status
 
@@ -81,12 +92,14 @@ remain unmeasured `[pcc:unverified]`.
   `0bb8da07393873aa2b935403b86f5b7a0c24a52fff2d598a145a9fcca103229c`.
 - Protocol freeze commit:
   `a62240111e15ce310e37f3f2d754493c3d642062`.
+- Fail-closed setup-accounting correction commit:
+  `70ddb4b294c92acc377eabefead5b9d3c87fe5c2`.
 - Shared `main.rs` SHA-256:
-  `b2244ffece12855622a88f9a2af4926b1fac6113b9519fdf11e2bc7449fa27c8`.
+  `6dca150d4903a8ee685372fc0e8c550554e81575b22da8e96be81d0fc892825d`.
 - Baseline binary SHA-256:
   `636df5139d45efc3b2d9a284a49cdd24540befe05ef75bc19943b5db36539a89`.
 - Candidate binary SHA-256:
-  `4327d6ebac858b43870a75aee742b2fa4c5167caf00df2fc7fe0e7b53218b228`.
+  `c83c1d906ca2fe34ddbe6dfc58f904abafb90c1c35f0e7c77f54bfad90a19e1b`.
 - Compiler: `rustc 1.100.0 (0ef1bc386 2026-11-09)`, LLVM 23.1.5,
   `x86_64-unknown-linux-gnu`; host details are in [`metadata.txt`](metadata.txt).
 

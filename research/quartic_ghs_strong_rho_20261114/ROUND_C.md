@@ -69,6 +69,12 @@ The reducer is admissible only if all of these deterministic checks pass:
    field count, and every native count. In particular, `fm` must still bump
    `fq_mul` exactly once.
 
+Post-freeze correction: integration review identified one reciprocal-constructor
+division outside those pre-existing counters. The original identity requirement
+above is retained as historical text; [`ROUND_C_DEVIATION.md`](ROUND_C_DEVIATION.md)
+supersedes its normalized-record expectation with one explicit
+`setup.reciprocal_div` difference and otherwise exact counter identity.
+
 Stop on any residue mismatch, wrong logarithm, divergent walk, changed count,
 panic, missing record, or source/hash ambiguity. A failed arm is retained; it
 is not repaired by relaxing the comparison.
@@ -101,7 +107,8 @@ gates admit them.
 
 Exact commands, revision and source/binary hashes, compiler and host metadata,
 stdout, stderr, exit status, and normalized comparisons are retained under
-`round-c/`. Profiling may explain the reducer's instruction mix but does not
+`round-c-reduce-retune/` (administratively relocated after the original freeze
+to avoid an evidence-namespace collision). Profiling may explain the reducer's instruction mix but does not
 establish speed. No wall-time or throughput comparison is reported from this
 development cell.
 

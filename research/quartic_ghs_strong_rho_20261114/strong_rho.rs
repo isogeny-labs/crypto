@@ -108,7 +108,7 @@ fn barrett_reduce_product(q: u64, reciprocal: u64, x: u64) -> u64 {
 pub struct FastF3 {
     q: u64,
     reciprocal: u64,
-    reducer_setup_divisions: u64,
+    setup_reciprocal_div: u64,
     c: u64,
     w: u64,
     w2: u64,
@@ -122,7 +122,7 @@ impl FastF3 {
             reciprocal: barrett_reciprocal(inst.q),
             // Cold, unpriced diagnostic: constructing the fixed-modulus
             // reducer evaluates one u128 division to obtain floor(2^64/q).
-            reducer_setup_divisions: 1,
+            setup_reciprocal_div: 1,
             c: inst.kf.c,
             w: inst.kf.w,
             w2: inst.kf.w2,
@@ -475,7 +475,7 @@ pub struct StrongOut {
     pub lookahead: u64,
     pub cycles: u64,
     pub cycle_adds: u64,
-    pub reducer_setup_divisions: u64,
+    pub setup_reciprocal_div: u64,
     pub setup_field: FieldCounts,
     pub walk_field: FieldCounts,
     pub verify_field: FieldCounts,
@@ -858,7 +858,7 @@ pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> Stro
         lookahead,
         cycles,
         cycle_adds,
-        reducer_setup_divisions: f.reducer_setup_divisions,
+        setup_reciprocal_div: f.setup_reciprocal_div,
         setup_field,
         walk_field: walk_field_end.since(setup_field),
         verify_field: verify_end.since(walk_field_end),
@@ -1001,7 +1001,7 @@ pub fn selftest() {
                 out.found, out.steps
             );
             assert_eq!(out.found, Some(k));
-            assert_eq!(out.reducer_setup_divisions, 1);
+            assert_eq!(out.setup_reciprocal_div, 1);
             if width > 1 {
                 assert!(out.walk_field.fq_inv < out.steps);
             }
