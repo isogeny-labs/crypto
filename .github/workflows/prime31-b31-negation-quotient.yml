@@ -1,0 +1,64 @@
+name: Prime31 B31 signed negation quotient paired complement exact Rust
+on:
+  push:
+    branches: [automation/prime31-b31-negation-quotient-20261118]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - 'research/prime31_ic_20261115/native/B31_NEGATION_QUOTIENT_PROTOCOL_20261118.md'
+      - '.github/workflows/prime31-b31-negation-quotient.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - '.github/workflows/prime31-b31-negation-quotient.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prime31-negation-quotient:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout candidate source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout original pinned crate
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay candidate original Rust example
+        run: cp research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Pinned arithmetic library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Frozen 256-Q matched original vs paired Rust complements
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle actual_prime31_firstx_b31_paired_256q_component -- --nocapture --test-threads=1 2>&1 | tee prime31-paired-component.log
+      - name: Source-specific success gates
+        run: |
+          grep -Fq 'test result: ok. 1 passed;' prime31-paired-component.log
+          grep -Fq 'B31_NEGATION_QUOTIENT_COMPONENT_JSON=' prime31-paired-component.log
+          grep -Fq '\"first_shift_hits\":244' prime31-paired-component.log
+          grep -Fq '\"exhaustive_negatives\":12' prime31-paired-component.log
+          grep -Fq '\"canonical_representatives_including_identity\":309443' prime31-paired-component.log
+      - name: Archive exact-source Rust result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-negation-quotient-raw
+          path: prime31-paired-component.log
+          retention-days: 30
+          if-no-files-found: warn
