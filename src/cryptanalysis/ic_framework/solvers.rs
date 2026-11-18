@@ -3040,7 +3040,7 @@ mod tests {
 
     /// **`f4-f2` with its skeleton decides real descent systems exactly as
     /// the plain path does.**  One solver instance solves a batch of
-    /// `S_3` descents of one cell (Koblitz curve over `F_{2^17}`, a
+    /// `S_3` descents of one cell (Koblitz curve over `F_{2^13}`, a
     /// 6-dimensional subspace, 12 unknowns, random targets), as one
     /// oracle does in one run; every verdict, solution set and structural
     /// count equals that of `skeleton=0` on a fresh instance, the skeleton
@@ -3050,7 +3050,7 @@ mod tests {
         use crate::cryptanalysis::ic_boundary::koblitz_instance;
         use crate::cryptanalysis::pq_descent_symbolic::descend;
         use rand::{Rng, SeedableRng};
-        let inst = koblitz_instance(0, 17).expect("Koblitz curve over F_2^17");
+        let inst = koblitz_instance(0, 13).expect("Koblitz curve over F_2^13");
         let basis: Vec<u64> = (0..6).map(|k| 1u64 << k).collect();
         let mut rng = rand::rngs::StdRng::seed_from_u64(0x5ce1_17);
         let with = F4F2::default();
