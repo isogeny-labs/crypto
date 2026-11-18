@@ -3,6 +3,7 @@
 #   make test            CPU verification of the shared headers (no GPU, no nvcc)
 #   make bench-host-inv  public-input host Fp64 inversion + batch benchmark
 #   make bench-mul256   compare old versus native-128 host P-256 MAC
+#   make bench-from256  compare generic vs direct REDC P-256 from_mont
 #   make bench-sparse256  compare generic versus sparse-modulus P-256 REDC
 #   make bench-pair-sweep  test pair-table and S3 sweep savings
 #   make bench-carry256   compare host P-256 limb carry/borrow chains
@@ -58,7 +59,7 @@ RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
-.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep bench-chain256 bench-thread-map ptxas-info clean
+.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep bench-chain256 bench-thread-map bench-from256 ptxas-info clean
 
 all: test
 
@@ -87,6 +88,13 @@ bench_batch_core: bench_batch_core.cpp fp64.cuh
 
 bench-batch-core: bench_batch_core
 	./bench_batch_core
+
+# Skip the generic multiply-by-one in host P-256 Montgomery conversion.
+bench_from256: bench_from256.cpp fp256x64.cuh fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_from256.cpp
+
+bench-from256: bench_from256
+	./bench_from256
 
 # Compare original versus native-128 host P-256 Montgomery MAC.
 bench_mul256: bench_mul256.cpp fp256x64.cuh fp64.cuh
@@ -191,4 +199,4 @@ ptxas-info: rootfind_cuda.cu $(HDRS)
 	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -Xptxas -v -c -o /dev/null rootfind_cuda.cu
 
 clean:
-	rm -f test_cpu bench bench_host_inv bench_host_inv256 bench_batch_core bench_pair_sweep bench_chain256 bench_thread_map rootfind_serve rootfind_serve_cuda *.o *.a
+	rm -f test_cpu bench bench_host_inv bench_host_inv256 bench_batch_core bench_pair_sweep bench_chain256 bench_thread_map bench_from256 rootfind_serve rootfind_serve_cuda *.o *.a
