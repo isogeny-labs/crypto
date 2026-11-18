@@ -62,6 +62,18 @@ The reduction is only useful if the four leaves can be selected efficiently from
 
 The prior [matched complete 1,024-target frontier in #4714](https://github.com/isogeny-labs/crypto/pull/4714) recorded a historical best shared BSGS time of approximately **144.049 ms**, not measured again here. Across 1,024 targets, this is about **140.67 microseconds/target**. A brute-force B31 four-prefix loop would require, on average, fewer than **0.00952 ns for each signed prefix** *including all algebraic solving* to fit that historical batch budget. This is an arithmetic budget, **not** a machine-calibrated lower bound and does not exclude a nonenumerative prefix solver.
 
+The same accounting gives an explicit **prefix-depth tradeoff** for any variant fixing `k` signed leaves by exhaustive search, using `(2B)^k` branches and `7-k` remaining chart coefficients. This is a work-budget diagnostic; **no candidate complete solve was timed**:
+
+| Fixed leaves `k` | Remaining chart variables | Signed B31 branches per public target | Maximum average time per branch to match historical 1024-target shared BSGS |
+|---:|---:|---:|---:|
+| 0 | 7 | 1 | 140,673 ns |
+| 1 | 6 | 62 | 2,269 ns |
+| 2 | 5 | 3,844 | 36.60 ns |
+| 3 | 4 | 238,328 | 0.590 ns |
+| 4 | 3 | 14,776,336 | 0.00952 ns |
+
+The interpretation is narrow: a **fully enumerative** 4-prefix F4 hybrid is not a credible path to beating the cached BSGS control at B31. A genuine algebraic solver that avoids most prefixes is outside these branch counts and remains worth testing. Prefix-depth `k=1` is less severe but retains six high-degree variables; no savings are established.
+
 This rules out interpreting the reduction by itself, or the prior supplied-x zeta/Walsh microkernel, as evidence of a competitive complete ECDLP algorithm. It does not rule out deeper syzygies or a polynomial-time public-prefix selector.
 
 ## Prior-work audit and specific next experiments
