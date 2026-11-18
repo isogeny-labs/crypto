@@ -434,3 +434,13 @@ the best target score is 65/288, below the fixed shuffled-label control's
 69/288. This rejects that exact six-bin decoder, not every relational or
 multi-channel observable, and supplies no ECDLP or runtime theorem.
 [pcc:unverified]
+
+The separately frozen
+[quotient-digit experiment](QUOTIENT_DIGIT_EXPERIMENT.md) tests a recursive
+public reduction: for each base-six digit candidate it evaluates moments on
+`[6^-1](Q-[d]P)` and selects a unique channel extremum. None of the 32 fixed
+argmin/argmax rules is exact on either curve. The best target score is 57/258
+versus 47/258 for one shuffled-label control, but unequal tie coverage,
+best-of-32 selection and a single shuffle leave that gap uncalibrated. A
+prospective max-statistic permutation control is the next evidence gate; no
+digit oracle or ECDLP claim follows. [pcc:unverified]
