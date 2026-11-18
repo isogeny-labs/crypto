@@ -542,3 +542,66 @@ for arm in pair-before pair-after sweep-before sweep-after; do
         -- gpu/rootfind/bench_pair_sweep "--perf-$arm"
 done
 ```
+
+
+## Follow-up: P-256 subtract/negate and Fp64 branchless subtract (2026-11-17)
+
+This run adds three host-only arithmetic improvements, preserving all device
+branches. These are modular field primitives used by the rootfinder rather than
+new algebraic rootfinding algorithms:
+
+1. `fp256_sub` uses a masked modulus and a single carry-add in place of
+   constructing both full-width candidates and selecting one.
+2. `fp256_neg` computes `p-a` and masks out zero, avoiding a general
+   modular subtraction. The inputs are canonical residues in `[0,p)`.
+3. `fp64_sub` calculates the unsigned difference, then adds
+   `p & -(a<b)`; this removes a mispredictable conditional correction.
+   The documented domain `p < 2^63` makes the correction well defined.
+
+### Local before/after observations
+
+On a pinned CPU 0 in a Linux 6.18.57 virtual machine presenting an Intel
+Xeon Platinum 8573C, GCC 14.2 `-O2 -std=c++17`, the local faithful standalone
+mirror used `perf_event_open(PERF_TYPE_SOFTWARE,
+PERF_COUNT_SW_TASK_CLOCK)`, resetting/reading the counter for each arm.
+This is a **software task-clock**, not `perf stat` hardware cycles or
+retired instructions. Randomized 32,768 P-256 pairs plus zero/boundary cases
+had identical outputs for both algorithms. The 65,536 Fp64 pairs
+(`p=2^61-1`) had identical outputs across the same compared arms.
+
+Across **8 separate process executions** with 9 repetitions per P-256 arm
+and **6 separate process executions** with 9 repetitions per Fp64 arm,
+the paired **median** speedups were:
+
+| Host primitive | Local old median task ns/op | New median task ns/op | Median of paired speedups | Range across processes |
+|---|---:|---:|---:|---:|
+| P-256 modular subtract | 12.443 | 9.608 | **1.279x** | 1.048–1.800x |
+| P-256 modular negate | 11.884 | 7.684 | **1.548x** | 1.235–1.877x |
+| Fp64 modular subtract | 11.186 | 2.414 | **4.675x** | 3.786–5.600x |
+
+Sub-nanosecond timing changes on such short operations are noisy. Differences
+between separate-process speedup medians and ratios of independent medians
+are expected. These measurements used locally reconstructed source code,
+**not a cloned repository header**, because this sandbox cannot resolve
+`github.com`. The checked-in `bench_subneg256.cpp` and `bench_sub64.cpp`
+compile the actual header and freeze the previous code paths; CI is
+configured to run them with full correctness checks. The GitHub runner may
+deny hardware PMU events even when `perf` installs successfully.
+
+Also screened an Fp64 masked modular add, a masked Fp64 negate, and a
+P-256 masked modular add. Those changes were **not retained** due to
+mixed compiler results, noise or regression. The P-256 add rewrite
+showed a median paired task-clock speedup of 0.952x (slower) across the
+same 8 executions. An `_addcarry_u64` variant of the P-256 subtraction
+was also benchmarked, but the portable masked addition was favored for
+cross-compiler consistency.
+
+Repository verification command (CI):
+```sh
+make -C gpu/rootfind test bench-subneg256 bench-sub64
+```
+
+The corresponding `rootfind-perf.yml` job separates these four P-256
+and two Fp64 before/after arms under `perf stat -r 5` when PMU access
+is available. The operations still need end-to-end `rf64_decompose` and
+`rf256_decompose` measurements before claiming any oracle speedup.
