@@ -472,3 +472,14 @@ strict scalar decrease. The 215-theorem audit has zero failures and zero
 trusted/native decisions. This explains how an exact rule would recurse, but
 also shows that the measured association is a cheap x-coordinate ordering
 heuristic rather than a hidden high-moment decoder. [pcc:unverified]
+
+The frozen [rank and search-cost experiment](QUOTIENT_DIGIT_RANK_EXPERIMENT.md)
+then measures the true digit's full position rather than only argmin success.
+The rank histogram is `870,727,738,763,729,658`; its mean reciprocal rank
+beats every one of 4,096 row-preserving shuffles. Recursive complete-path
+survival, however, is only 355/4,485 at width one and still only 3,437/4,485
+at width five. Every curve requires width six somewhere, and width six has
+search exponent `log_6(6)=1`. The signal is therefore useful only as a finite
+search ordering here. The next candidate changes the radix and measures
+whether correct ranks compress with growing arity; no exact or subexponential
+ECDLP follows. [pcc:unverified]
