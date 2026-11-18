@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-c7e24fef4e4b1a4d53194dd1b1a55af9185505d8b3820dcd25901f3ae38c1360  H116FiberTrace.lean
+63ba08391dcf0de78d97df5b173d400c85f212cbd4f615f74d25573c6bde5588  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  119 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  121 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -48,6 +48,10 @@ d394c8993e2163bbf80c4cdb313da455d456402cdee0eb4d62edbf559431157d  receipts/point
 8c9eb79f902c872b7860f8089d6bc5b280bfce3151aa6428e346df874a04b6a0  receipts/generator-certificate-audit.txt
 4165925670b0621960cfbf9f0361276bf60b7b3c134653a847aeb2377ca9f2fb  receipts/periodic-fixed-loci-build.txt
 b04c0644adf3fbb0fe15e4cbe36456b2bec88be2f226f29e2c6376066161068a  receipts/periodic-fixed-loci-audit.txt
+76d2694729ae99d4f3877d3ae8ead42973d6dd1c4d7879aa34a86354e3583a72  receipts/rational-separation-build.txt
+b469ffae036437ff01c0318340771c04e62b1fded7b7eb2775d16631f71cbcc3  receipts/rational-separation-audit.txt
+91f194daf08ff0c6c4d6455a9d30c86ee468a35b172bdc17a29fc0f43eeed1a7  receipts/rational-separation-first-build-failure.txt
+673b57e3ca150bf88154f6193e14278944aae9de240501e4ae32d5036c665744  receipts/rational-separation-second-build-failure.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -206,6 +210,16 @@ fixes only zero at period one, where the identity mutation is invisible, while
 period two exposes it at one. This reduction does not prove the characteristic
 identity on the finite fixed loci, identify rational/scheme morphisms, or
 imply an ECDLP speedup. [pcc:unverified]
+
+The 121-theorem checkpoint adds a finite rational-map separation interface.
+Two supplied numerator/denominator pairs have equal cross products when they
+agree on a finite set where both denominators are nonzero and the set size is
+strictly greater than both cross-product degrees.  A `ZMod 3` control proves
+the strict inequality is necessary: `X^3-X` is nonzero, has degree equal to
+the field cardinality, and vanishes everywhere.  The interface does not
+construct the H116 rational map, bound its cross-product degree, or audit its
+poles; those remain explicit hypotheses, so no algorithmic or asymptotic
+conclusion follows. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

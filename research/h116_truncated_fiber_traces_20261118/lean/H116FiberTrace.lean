@@ -1,4 +1,5 @@
 import Mathlib.Algebra.Polynomial.Derivation
+import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Algebra.Group.Hom.End
 import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 import Mathlib.Data.ZMod.Basic
@@ -2467,6 +2468,41 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
       fiberDenominatorSeries_coeff_succ_succ]
     exact BostanJetRecurrence.unique hh hg (n + 1) (by omega) (by omega)
 
+/-- A finite set of regular evaluations separates two supplied rational maps
+once the cardinality of the set is strictly larger than both cross-product
+degrees.  This is a certificate interface: callers must still supply the
+numerators, denominators, denominator nonvanishing, and degree bound. -/
+theorem rationalMap_eq_of_eval_finset
+    {F : Type*} [Field F]
+    (num₁ den₁ num₂ den₂ : Polynomial F) (samples : Finset F)
+    (hden : ∀ x ∈ samples, den₁.eval x ≠ 0 ∧ den₂.eval x ≠ 0)
+    (heval : ∀ x ∈ samples,
+      num₁.eval x / den₁.eval x = num₂.eval x / den₂.eval x)
+    (hdegree : max (num₁ * den₂).natDegree (num₂ * den₁).natDegree < samples.card) :
+    num₁ * den₂ = num₂ * den₁ := by
+  apply Polynomial.eq_of_natDegree_lt_card_of_eval_eq' _ _ samples
+  · intro x hx
+    rw [Polynomial.eval_mul, Polynomial.eval_mul]
+    exact (div_eq_div_iff (hden x hx).1 (hden x hx).2).mp (heval x hx)
+  · exact hdegree
+
+/-- The strict degree bound in `rationalMap_eq_of_eval_finset` cannot in
+general be relaxed to a non-strict one: `X^3-X` is a nonzero polynomial of
+degree `#(ZMod 3)` that vanishes on the whole field. -/
+theorem rationalMap_separation_strict_control :
+    let f : Polynomial (ZMod 3) := Polynomial.X ^ 3 - Polynomial.X
+    (∀ x : ZMod 3, f.eval x = 0) ∧
+      f ≠ 0 ∧ f.natDegree = Fintype.card (ZMod 3) := by
+  dsimp
+  constructor
+  · intro x
+    simp [ZMod.pow_card]
+  constructor
+  · intro h
+    have := congrArg (fun f : Polynomial (ZMod 3) => f.coeff 1) h
+    norm_num at this
+  · norm_num [Polynomial.natDegree_sub_eq_left_of_natDegree_lt]
+
 #print axioms logDeriv_mul
 #print axioms logDeriv_finset
 #print axioms logDeriv_div
@@ -2567,5 +2603,7 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms BostanJetRecurrence.of_normalizedRationalMapJetCertificate_zmod
 #print axioms BostanJetRecurrence.unique
 #print axioms fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
+#print axioms rationalMap_eq_of_eval_finset
+#print axioms rationalMap_separation_strict_control
 
 end H116FiberTrace
