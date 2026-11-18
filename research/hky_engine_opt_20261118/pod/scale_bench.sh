@@ -8,8 +8,8 @@
 #   OLD_BIN  frozen base pilot (pkm_tower_pilot of the base commit, sha256 in ../README.md)
 #   NEW_BIN  frozen optimised pilot (this round)
 # environment (defaults in brackets):
-#   LADDER_CELL  cell run at every thread count                    ["11 6 planted"]
-#   MAIN_CELL    the 5-15 min cell, run at the large thread counts  ["12 6 planted"]
+#   LADDER_CELL  cell run at every thread count                    ["10 6 planted"]
+#   MAIN_CELL    the 5-15 min cell, run at the large thread counts  ["12 6 random"]
 #   LADDER_THREADS ["1 2 4 8 16 32", plus 64 if nproc >= 64]
 #   MAIN_THREADS   ["16 32", plus 64 if nproc >= 64]
 #   REPS [1]   CAP_S (per run, timeout) [3600]   OLD_FLAGS [""]   NEW_FLAGS [""]
@@ -17,6 +17,11 @@
 # A cell is "T C KIND": m = 2, Kummer tower, p = 2013265921, the pilot's draw 0; KIND = planted (the
 # consistent system: 1 is in no closure, the closure runs to the end) or random (the study draw).
 # Only the closure c = C is computed (--hky-cmin C --hky-cmax C).
+# Default cells: the ladder is planted t = 10 c = 6 (60,460 columns, no 1, rank n - 2: a full closure; 3.64e11
+# muladds, 228 s base / 134 s new on 4 shared vCPU, so ~8 and ~4 min at one thread on a pod); the main cell is the
+# study draw t = 12 c = 6 (190,051 columns; 1 enters only as the last pivot, so ~all of the full closure is built;
+# ~2..4e12 muladds, an estimated 5..15 min at 32 threads). Planted t = 11 and 12 c = 6 were not chosen: the planted
+# work grew x72 from t = 9 to t = 10, so they would take hours. Estimated total with the defaults: ~1 h.
 #
 # Order: for each rep, ladder then main; thread counts ascending; the two arms alternate and their
 # order flips every rep and every thread count (ABBA), so drift in the host's load hits both arms.
@@ -27,8 +32,8 @@ set -u
 OLD=${1:?OLD_BIN}; NEW=${2:?NEW_BIN}; OUT=${3:-scale_out_$(date -u +%Y%m%dT%H%M%SZ)}
 NPROC=$(nproc)
 extra=""; [ "$NPROC" -ge 64 ] && extra=" 64"
-LADDER_CELL=${LADDER_CELL:-"11 6 planted"}
-MAIN_CELL=${MAIN_CELL:-"12 6 planted"}
+LADDER_CELL=${LADDER_CELL:-"10 6 planted"}
+MAIN_CELL=${MAIN_CELL:-"12 6 random"}
 LADDER_THREADS=${LADDER_THREADS:-"1 2 4 8 16 32$extra"}
 MAIN_THREADS=${MAIN_THREADS:-"16 32$extra"}
 REPS=${REPS:-1}; CAP_S=${CAP_S:-3600}
