@@ -1023,8 +1023,8 @@ const NO_ROW: u32 = u32::MAX;
 /// One pivot row of [`IncrementalEchelon`]: the pivot is 1 and every
 /// column left of it is 0, so only the non-zeros to its right are kept.
 struct EchelonRow {
-    cols: Vec<u32>,
-    vals: Vec<u64>,
+    /// `(column, value)` pairs, interleaved so one pass streams one array.
+    ents: Box<[(u32, u64)]>,
     rhs: u64,
 }
 
@@ -1090,12 +1090,19 @@ impl RelationSolver for IncrementalEchelon {
         let m = self.modulus;
         debug_assert_eq!(row.len(), self.cols);
         let mut new_pivot = None;
-        for j in 0..self.cols {
-            self.entries_scanned += 1;
+        // One scan entry per column visited, zeros included; counted in
+        // bulk (`j - from + 1` per non-zero found) instead of per entry.
+        let mut j = 0;
+        while j < self.cols {
+            // Skip zeros; the skipped entries and the one found are scanned.
+            let Some(off) = row[j..].iter().position(|&v| v != 0) else {
+                self.entries_scanned += (self.cols - j) as u64;
+                break;
+            };
+            let from = j;
+            j += off;
+            self.entries_scanned += (j - from + 1) as u64;
             let f = row[j];
-            if f == 0 {
-                continue;
-            }
             let i = self.row_of_pivot[j];
             if i == NO_ROW {
                 new_pivot = Some(j);
@@ -1104,12 +1111,13 @@ impl RelationSolver for IncrementalEchelon {
             let p = &self.rows[i as usize];
             let fm = FixedMul::new(f, m);
             row[j] = 0;
-            for (&c, &v) in p.cols.iter().zip(&p.vals) {
+            for &(c, v) in p.ents.iter() {
                 let c = c as usize;
                 row[c] = fm.sub_from(row[c], v, m);
             }
             rhs = fm.sub_from(rhs, p.rhs, m);
-            self.row_ops += p.cols.len() as u64 + 2;
+            self.row_ops += p.ents.len() as u64 + 2;
+            j += 1;
         }
         let Some(pc) = new_pivot else {
             if rhs == 0 {
@@ -1122,18 +1130,20 @@ impl RelationSolver for IncrementalEchelon {
         self.entries_scanned += (self.cols - pc - 1) as u64;
         self.pivot_inversions += 1;
         let inv = FixedMul::new(invmod(row[pc], m).expect("prime modulus"), m);
-        let mut cols = Vec::new();
-        let mut vals = Vec::new();
+        let nnz = row[pc + 1..].iter().filter(|&&v| v != 0).count();
+        let mut ents = Vec::with_capacity(nnz);
         for (c, &v) in row.iter().enumerate().skip(pc + 1) {
             if v != 0 {
-                cols.push(c as u32);
-                vals.push(inv.mul(v, m));
+                ents.push((c as u32, inv.mul(v, m)));
             }
         }
-        self.row_ops += cols.len() as u64 + 2;
+        self.row_ops += ents.len() as u64 + 2;
         rhs = inv.mul(rhs, m);
         self.row_of_pivot[pc] = self.rows.len() as u32;
-        self.rows.push(EchelonRow { cols, vals, rhs });
+        self.rows.push(EchelonRow {
+            ents: ents.into_boxed_slice(),
+            rhs,
+        });
         RowStatus::Independent
     }
 
@@ -1146,7 +1156,7 @@ impl RelationSolver for IncrementalEchelon {
             return None;
         }
         let p = &self.rows[i as usize];
-        p.cols.is_empty().then_some(p.rhs)
+        p.ents.is_empty().then_some(p.rhs)
     }
 
     fn rank(&self) -> usize {
@@ -1671,6 +1681,110 @@ mod tests {
         }
         assert_eq!(systems, 1200);
         assert!(pinned_systems > 400, "{pinned_systems} pinned");
+    }
+
+    /// Reference copy of the pre-optimisation `IncrementalEchelon::add_row`
+    /// (per-entry scan counting, split column/value vectors): every native
+    /// counter, the status and the pins of the production kernel must equal it.
+    struct RefEchelon {
+        m: u64,
+        cols: usize,
+        rows: Vec<(Vec<u32>, Vec<u64>, u64)>,
+        pivot: Vec<Option<usize>>,
+        row_ops: u64,
+        scanned: u64,
+        inversions: u64,
+    }
+
+    impl RefEchelon {
+        fn add(&mut self, mut row: Vec<u64>, mut rhs: u64) -> RowStatus {
+            let m = self.m;
+            let mut np = None;
+            for j in 0..self.cols {
+                self.scanned += 1;
+                let f = row[j];
+                if f == 0 {
+                    continue;
+                }
+                let Some(i) = self.pivot[j] else {
+                    np = Some(j);
+                    break;
+                };
+                row[j] = 0;
+                let (pc, pv, pr) = self.rows[i].clone();
+                for (&c, &v) in pc.iter().zip(&pv) {
+                    let c = c as usize;
+                    row[c] = submod(row[c], mulmod(f, v, m), m);
+                }
+                rhs = submod(rhs, mulmod(f, pr, m), m);
+                self.row_ops += pc.len() as u64 + 2;
+            }
+            let Some(pc) = np else {
+                return if rhs == 0 {
+                    RowStatus::Dependent
+                } else {
+                    RowStatus::Inconsistent
+                };
+            };
+            self.scanned += (self.cols - pc - 1) as u64;
+            self.inversions += 1;
+            let inv = invmod(row[pc], m).unwrap();
+            let (mut cs, mut vs) = (vec![], vec![]);
+            for (c, &v) in row.iter().enumerate().skip(pc + 1) {
+                if v != 0 {
+                    cs.push(c as u32);
+                    vs.push(mulmod(inv, v, m));
+                }
+            }
+            self.row_ops += cs.len() as u64 + 2;
+            rhs = mulmod(inv, rhs, m);
+            self.pivot[pc] = Some(self.rows.len());
+            self.rows.push((cs, vs, rhs));
+            RowStatus::Independent
+        }
+    }
+
+    /// The native counters (`row_ops`, `entries_scanned`, `pivot_inversions`),
+    /// statuses and pins of `IncrementalEchelon` equal the reference
+    /// implementation's, row for row, so a counting change fails here.
+    #[test]
+    fn echelon_counters_equal_reference_kernel() {
+        for (seed, &modulus) in [101u64, 1_000_003, 4_294_967_291, (1u64 << 61) - 1]
+            .iter()
+            .enumerate()
+        {
+            for cols in [5usize, 17, 41, 90] {
+                let mut rng = StdRng::seed_from_u64(0xc0de ^ (seed * 1000 + cols) as u64);
+                let mut a = IncrementalEchelon::new(cols, modulus);
+                let mut r = RefEchelon {
+                    m: modulus,
+                    cols,
+                    rows: vec![],
+                    pivot: vec![None; cols],
+                    row_ops: 0,
+                    scanned: 0,
+                    inversions: 0,
+                };
+                for step in 0..5 * cols {
+                    let mut row = vec![0u64; cols];
+                    for _ in 0..rng.gen_range(1..=4) {
+                        row[rng.gen_range(0..cols)] = rng.gen_range(1..modulus);
+                    }
+                    let rhs = rng.gen_range(0..modulus);
+                    let sa = RelationSolver::add_row(&mut a, row.clone(), rhs);
+                    let sr = r.add(row, rhs);
+                    assert_eq!(sa, sr, "m {modulus} cols {cols} step {step}");
+                    assert_eq!(a.row_ops, r.row_ops);
+                    assert_eq!(a.entries_scanned, r.scanned);
+                    assert_eq!(a.pivot_inversions, r.inversions);
+                    for c in 0..cols {
+                        let want =
+                            r.pivot[c].and_then(|i| r.rows[i].0.is_empty().then_some(r.rows[i].2));
+                        assert_eq!(RelationSolver::pinned(&a, c), want);
+                    }
+                }
+            }
+        }
     }
 
     #[test]
