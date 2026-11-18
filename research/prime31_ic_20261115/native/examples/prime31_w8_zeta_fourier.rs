@@ -218,7 +218,7 @@ fn run()->Value{
    cd.mul+=oa.mul;cd.inv+=oa.inv;cd.add+=oa.add;
    cf.mul+=oz.mul;cf.inv+=oz.inv;cf.add+=oz.add;
    cw.mul+=ow.mul;cw.inv+=ow.inv;cw.add+=ow.add;
-   td+=ta;tf+=tz;tw+=tw_case;nz+zeros.len()as u64;
+   td+=ta;tf+=tz;tw+=tw_case;nz+=zeros.len()as u64;
    rows.push(json!({
     "fixture":t,"arm":arm,"points":pts,"target":target,
     "planted_sign_mask":if arm=="planted"{Some(sign)}else{None},
