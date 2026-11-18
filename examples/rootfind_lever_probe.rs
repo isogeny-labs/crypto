@@ -27,10 +27,13 @@
 //!     rootfind_lever_probe [--bits 32] [--sizes 256,1024] [--targets 4096]
 
 use std::collections::HashSet;
+use std::hash::{BuildHasher, BuildHasherDefault, Hasher};
 use std::hint::black_box;
 use std::time::Instant;
 
-use crypto_lib::cryptanalysis::ic_boundary::{prime_instance_for, CountedGroup, GroupOps, PrimePoint};
+use crypto_lib::cryptanalysis::ic_boundary::{
+    prime_instance_for, CountedGroup, GroupOps, PrimePoint,
+};
 use crypto_lib::cryptanalysis::ic_framework::plugins::PrimeAbscissaBase;
 use crypto_lib::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
 use serde_json::json;
@@ -303,7 +306,12 @@ macro_rules! lanes_dispatch {
 /// loops can use 8 x 64-bit vectors without rebuilding the library.
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "avx2,avx512f,avx512dq,avx512vl,bmi2")]
-unsafe fn sweep_lanes_v<const K: usize>(f: &Mont, bx: &[u64], by: &[u64], tm: &[(u64, u64)]) -> u64 {
+unsafe fn sweep_lanes_v<const K: usize>(
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+) -> u64 {
     sweep_lanes::<K>(f, bx, by, tm)
 }
 
@@ -323,7 +331,9 @@ unsafe fn pipeline_v<const K: usize>(
 fn have_avx512() -> bool {
     #[cfg(target_arch = "x86_64")]
     {
-        is_x86_feature_detected!("avx512f") && is_x86_feature_detected!("avx512dq") && is_x86_feature_detected!("avx512vl")
+        is_x86_feature_detected!("avx512f")
+            && is_x86_feature_detected!("avx512dq")
+            && is_x86_feature_detected!("avx512vl")
     }
     #[cfg(not(target_arch = "x86_64"))]
     {
@@ -358,6 +368,170 @@ fn pipeline_any(
         unsafe { lanes_dispatch!(k, pipeline_v, f, bx, by, tm, bloom, keys) }
     } else {
         lanes_dispatch!(k, pipeline, f, bx, by, tm, bloom, keys)
+    }
+}
+
+/// A multiply-mix hasher for `u64` keys (the default SipHash costs ~20 ns a
+/// probe of a 1M-key set here).
+#[derive(Default)]
+struct MixHasher(u64);
+
+impl Hasher for MixHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.0 = (self.0 ^ u64::from(b)).wrapping_mul(0x100_0000_01B3);
+        }
+    }
+    fn write_u64(&mut self, x: u64) {
+        let h = (x ^ (x >> 29)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        self.0 = h ^ (h >> 32);
+    }
+}
+
+type FastSet = HashSet<u64, BuildHasherDefault<MixHasher>>;
+
+/// Abscissae a probe block holds per lane: the block is flushed to the
+/// filter while it is still in L1.
+const BLK: usize = 32;
+
+/// `row_lanes` with the filter fused into the backward pass: every `BLK`
+/// abscissae a lane, the block (`2 K BLK` values, L1-resident) goes to
+/// `sink` instead of a `2 A K` row buffer that competes with the filter for L2.
+#[inline(always)]
+#[allow(clippy::too_many_arguments)]
+fn row_lanes_fused<const K: usize, F: FnMut(&[u64])>(
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    xr: &[u64; K],
+    yr: &[u64; K],
+    pre: &mut [u64],
+    buf: &mut [u64],
+    mut sink: F,
+) {
+    let a = bx.len();
+    let one = f.to(1);
+    let mut acc = [one; K];
+    for k in 0..a {
+        let b = bx[k];
+        let p = &mut pre[k * K..k * K + K];
+        for l in 0..K {
+            let d = f.sub(xr[l], b);
+            p[l] = acc[l];
+            acc[l] = f.mul(acc[l], if d == 0 { one } else { d });
+        }
+    }
+    let mut lpre = [0u64; K];
+    let mut all = one;
+    for l in 0..K {
+        lpre[l] = all;
+        all = f.mul(all, acc[l]);
+    }
+    let mut ai = f.inv(all);
+    let mut inv = [0u64; K];
+    for l in (0..K).rev() {
+        inv[l] = f.mul(ai, lpre[l]);
+        ai = f.mul(ai, acc[l]);
+    }
+    let mut n = 0;
+    for k in (0..a).rev() {
+        let (b, c) = (bx[k], by[k]);
+        let p = &pre[k * K..k * K + K];
+        let mut om = [0u64; K];
+        let mut op = [0u64; K];
+        for l in 0..K {
+            let d = f.sub(xr[l], b);
+            let zero = d == 0;
+            let dinv = f.mul(inv[l], p[l]);
+            inv[l] = f.mul(inv[l], if zero { one } else { d });
+            let base = f.add(xr[l], b);
+            let lm = f.mul(f.add(yr[l], c), dinv);
+            let lp = f.mul(f.sub(yr[l], c), dinv);
+            let xm = f.sub(f.mul(lm, lm), base);
+            let xp = f.sub(f.mul(lp, lp), base);
+            om[l] = if zero { u64::MAX } else { xm };
+            op[l] = if zero { u64::MAX } else { xp };
+        }
+        let blk = &mut buf[n..n + 2 * K];
+        blk[..K].copy_from_slice(&om);
+        blk[K..].copy_from_slice(&op);
+        n += 2 * K;
+        if n == buf.len() {
+            sink(&buf[..n]);
+            n = 0;
+        }
+    }
+    if n > 0 {
+        sink(&buf[..n]);
+    }
+}
+
+/// Fused pipeline: arithmetic with the probe of each L1 block, exact check
+/// on filter positives (`bloom = None`: every value goes to the exact set).
+#[inline(always)]
+fn pipeline_fused<const K: usize>(
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+    bloom: Option<&WordBloom>,
+    keys: &HashSet<u64, impl BuildHasher>,
+) -> u64 {
+    let a = bx.len();
+    let mut pre = vec![0u64; a * K];
+    let mut buf = vec![0u64; 2 * K * BLK];
+    let mut found = 0;
+    for chunk in tm.chunks_exact(K) {
+        let xr: [u64; K] = std::array::from_fn(|l| chunk[l].0);
+        let yr: [u64; K] = std::array::from_fn(|l| chunk[l].1);
+        row_lanes_fused::<K, _>(f, bx, by, &xr, &yr, &mut pre, &mut buf, |blk| {
+            for &x in blk {
+                let pass = match bloom {
+                    Some(b) => b.maybe(x),
+                    None => true,
+                };
+                if pass && x != u64::MAX && keys.contains(&x) {
+                    found += 1;
+                }
+            }
+        });
+    }
+    found
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2,avx512f,avx512dq,avx512vl,bmi2")]
+unsafe fn pipeline_fused_v<const K: usize>(
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+    bloom: Option<&WordBloom>,
+    keys: &HashSet<u64, impl BuildHasher>,
+) -> u64 {
+    pipeline_fused::<K>(f, bx, by, tm, bloom, keys)
+}
+
+/// Fused pipeline, scalar-target or AVX-512 build.
+#[allow(clippy::too_many_arguments)]
+fn pipeline_fused_any(
+    k: usize,
+    simd: bool,
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+    bloom: Option<&WordBloom>,
+    keys: &HashSet<u64, impl BuildHasher>,
+) -> u64 {
+    if simd {
+        // SAFETY: only called when have_avx512() is true.
+        unsafe { lanes_dispatch!(k, pipeline_fused_v, f, bx, by, tm, bloom, keys) }
+    } else {
+        lanes_dispatch!(k, pipeline_fused, f, bx, by, tm, bloom, keys)
     }
 }
 
@@ -412,7 +586,11 @@ fn main() {
             state ^= state << 13;
             state ^= state >> 7;
             state ^= state << 17;
-            g.mul(&mut scratch, inst.generator_point(), 1 + state % (inst.r - 1))
+            g.mul(
+                &mut scratch,
+                inst.generator_point(),
+                1 + state % (inst.r - 1),
+            )
         })
         .collect();
     let tm: Vec<(u64, u64)> = targets.iter().map(|t| (f.to(t.x), f.to(t.y))).collect();
@@ -502,7 +680,10 @@ fn main() {
         let mut hits_ref = 0u64;
         for &(xr, yr) in &tm {
             row_scalar(&f, &bx, &by, xr, yr, &mut pre, &mut xs);
-            hits_ref += xs.iter().filter(|x| **x != u64::MAX && keys.contains(x)).count() as u64;
+            hits_ref += xs
+                .iter()
+                .filter(|x| **x != u64::MAX && keys.contains(x))
+                .count() as u64;
         }
         let points = (n_targets * 2 * a) as f64;
 
@@ -520,7 +701,11 @@ fn main() {
         let mut best_k = 1;
         let mut best_simd = false;
         let mut best_t = f64::INFINITY;
-        let simd_modes: &[bool] = if have_avx512() { &[false, true] } else { &[false] };
+        let simd_modes: &[bool] = if have_avx512() {
+            &[false, true]
+        } else {
+            &[false]
+        };
         let mut simd_mismatch = 0u64;
         for &simd in simd_modes {
             for &k in &lane_set {
@@ -532,7 +717,11 @@ fn main() {
                     simd_mismatch += u64::from(a_ != b_);
                 }
                 let (t, _) = best(reps, || sweep_any(k, simd, &f, &bx, &by, &tm));
-                let m = if simd { &mut lanes_simd_ns } else { &mut lanes_ns };
+                let m = if simd {
+                    &mut lanes_simd_ns
+                } else {
+                    &mut lanes_ns
+                };
                 m.insert(k.to_string(), json!(t * 1e9 / points));
                 if t < best_t {
                     best_t = t;
@@ -568,7 +757,10 @@ fn main() {
                 pos
             });
             let pos_per_round = pos / probe_rounds as u64;
-            assert!(pos_per_round >= sample_hits, "a Bloom filter has no false negatives");
+            assert!(
+                pos_per_round >= sample_hits,
+                "a Bloom filter has no false negatives"
+            );
             let fpr = (pos_per_round - sample_hits) as f64 / sample.len() as f64;
             filters.push(json!({
                 "bits_per_key": bpk,
@@ -598,10 +790,12 @@ fn main() {
         let bloom8 = chosen.unwrap();
 
         // Full pipeline, one thread, best lanes, 16-bit and 8-bit filters.
-        let (t_full16, found16) =
-            best(reps, || pipeline_any(best_k, best_simd, &f, &bx, &by, &tm, &bloom16, &keys));
-        let (t_full8, found8) =
-            best(reps, || pipeline_any(best_k, best_simd, &f, &bx, &by, &tm, &bloom8, &keys));
+        let (t_full16, found16) = best(reps, || {
+            pipeline_any(best_k, best_simd, &f, &bx, &by, &tm, &bloom16, &keys)
+        });
+        let (t_full8, found8) = best(reps, || {
+            pipeline_any(best_k, best_simd, &f, &bx, &by, &tm, &bloom8, &keys)
+        });
         assert_eq!(found16, hits_ref);
         assert_eq!(found8, hits_ref);
         let (pick, pick_name) = if t_full8 <= t_full16 {
@@ -609,6 +803,24 @@ fn main() {
         } else {
             (&bloom16, 16)
         };
+
+        // Fusion and a cheaper exact set, one change at a time (8-bit filter).
+        let fast: FastSet = keys.iter().copied().collect();
+        let (t_fused_std, n1) = best(reps, || {
+            pipeline_fused_any(best_k, best_simd, &f, &bx, &by, &tm, Some(&bloom8), &keys)
+        });
+        let (t_fused_fast, n2) = best(reps, || {
+            pipeline_fused_any(best_k, best_simd, &f, &bx, &by, &tm, Some(&bloom8), &fast)
+        });
+        let (t_fused_fast16, n3) = best(reps, || {
+            pipeline_fused_any(best_k, best_simd, &f, &bx, &by, &tm, Some(&bloom16), &fast)
+        });
+        let (t_fused_nofilter, n4) = best(reps, || {
+            pipeline_fused_any(best_k, best_simd, &f, &bx, &by, &tm, None, &fast)
+        });
+        for n in [n1, n2, n3, n4] {
+            assert_eq!(n, hits_ref);
+        }
 
         // Lever 4: threads over targets.
         let mut threads_ns = serde_json::Map::new();
@@ -619,8 +831,19 @@ fn main() {
                     let hs: Vec<_> = (0..nt)
                         .map(|i| {
                             let part = &tm[i * per..(i + 1) * per];
-                            let (f, bx, by, keys) = (&f, &bx, &by, &keys);
-                            s.spawn(move || pipeline_any(best_k, best_simd, f, bx, by, part, pick, keys))
+                            let (f, bx, by, fast) = (&f, &bx, &by, &fast);
+                            s.spawn(move || {
+                                pipeline_fused_any(
+                                    best_k,
+                                    best_simd,
+                                    f,
+                                    bx,
+                                    by,
+                                    part,
+                                    Some(pick),
+                                    fast,
+                                )
+                            })
                         })
                         .collect();
                     hs.into_iter().map(|h| h.join().unwrap()).sum::<u64>()
@@ -658,6 +881,11 @@ fn main() {
                 "pipeline_ns_per_point_filter16": t_full16 * 1e9 / points,
                 "pipeline_ns_per_point_filter8": t_full8 * 1e9 / points,
                 "lever4_filter_bits": pick_name,
+                "lever4_kernel": "fused, mix-hash exact set",
+                "fused_ns_per_point_filter8_std_set": t_fused_std * 1e9 / points,
+                "fused_ns_per_point_filter8_mix_set": t_fused_fast * 1e9 / points,
+                "fused_ns_per_point_filter16_mix_set": t_fused_fast16 * 1e9 / points,
+                "fused_ns_per_point_no_filter_mix_set": t_fused_nofilter * 1e9 / points,
                 "lever4_ns_per_point_by_threads": threads_ns,
             })
         );
