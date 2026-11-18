@@ -425,6 +425,9 @@ pub struct SolverStats {
     /// Times a row had to choose a new pivot, the only work the
     /// incremental matrix does beyond a popcount per row.
     pub xor_repivots: u64,
+    /// Satisfied, fully assigned rows skipped by the opt-in cache
+    /// ([`Solver::set_xor_decided_cache`]).
+    pub xor_decided_skips: u64,
     pub learnt_clauses: u64,
 
     // ── work counters ───────────────────────────────────────────────
@@ -477,6 +480,49 @@ pub struct SolverStats {
     /// Tseitin definitions, parity expansion or rows, blocking clauses.
     /// Written by the encoders (`semaev_sat`).
     pub encode_word_ops: u64,
+}
+
+impl SolverStats {
+    /// Counters accumulated since `earlier`, a copy of the same solver's
+    /// `stats` taken before: every counter is the difference, except
+    /// `max_level`, which is not additive and is the later value.  For
+    /// per-call counters around [`Solver::solve_with_assumptions`].
+    pub fn since(&self, earlier: &SolverStats) -> SolverStats {
+        let d = |a: u64, b: u64| a.saturating_sub(b);
+        SolverStats {
+            arena_reclamations: d(self.arena_reclamations, earlier.arena_reclamations),
+            arena_reclaimed_words: d(self.arena_reclaimed_words, earlier.arena_reclaimed_words),
+            decisions: d(self.decisions, earlier.decisions),
+            conflicts: d(self.conflicts, earlier.conflicts),
+            restarts: d(self.restarts, earlier.restarts),
+            propagations: d(self.propagations, earlier.propagations),
+            xor_passes: d(self.xor_passes, earlier.xor_passes),
+            xor_propagations: d(self.xor_propagations, earlier.xor_propagations),
+            xor_conflicts: d(self.xor_conflicts, earlier.xor_conflicts),
+            xor_repivots: d(self.xor_repivots, earlier.xor_repivots),
+            xor_decided_skips: d(self.xor_decided_skips, earlier.xor_decided_skips),
+            learnt_clauses: d(self.learnt_clauses, earlier.learnt_clauses),
+            xor_row_ops: d(self.xor_row_ops, earlier.xor_row_ops),
+            xor_row_scans: d(self.xor_row_scans, earlier.xor_row_scans),
+            xor_word_updates: d(self.xor_word_updates, earlier.xor_word_updates),
+            xor_support_visits: d(self.xor_support_visits, earlier.xor_support_visits),
+            xor_reason_lits: d(self.xor_reason_lits, earlier.xor_reason_lits),
+            clause_visits: d(self.clause_visits, earlier.clause_visits),
+            clause_lit_visits: d(self.clause_lit_visits, earlier.clause_lit_visits),
+            analyze_lit_visits: d(self.analyze_lit_visits, earlier.analyze_lit_visits),
+            learnt_lits_raw: d(self.learnt_lits_raw, earlier.learnt_lits_raw),
+            learnt_lits_kept: d(self.learnt_lits_kept, earlier.learnt_lits_kept),
+            ns_propagate_clauses: d(self.ns_propagate_clauses, earlier.ns_propagate_clauses),
+            ns_propagate_xors: d(self.ns_propagate_xors, earlier.ns_propagate_xors),
+            ns_analyze: d(self.ns_analyze, earlier.ns_analyze),
+            ns_minimize: d(self.ns_minimize, earlier.ns_minimize),
+            ns_reduce_db: d(self.ns_reduce_db, earlier.ns_reduce_db),
+            conflict_level_sum: d(self.conflict_level_sum, earlier.conflict_level_sum),
+            max_level: self.max_level,
+            word_ops: d(self.word_ops, earlier.word_ops),
+            encode_word_ops: d(self.encode_word_ops, earlier.encode_word_ops),
+        }
+    }
 }
 
 /// Max-heap of variables by VSIDS activity, with position tracking so a
@@ -802,6 +848,11 @@ pub struct Solver {
     /// `pivot[i]` is row `i`'s basic variable; `None` once the row has
     /// no unassigned variable left.
     pivot: Vec<Option<u32>>,
+    /// Opt-in ([`Self::set_xor_decided_cache`]): `xor_decided[i]` marks a
+    /// fully assigned, satisfied row that later assignments cannot change.
+    /// Backjumping and every matrix mutation invalidate it.
+    cache_decided_xors: bool,
+    xor_decided: Vec<bool>,
     /// Scratch copy of the row being pivoted on, reused across passes.
     xor_src: Vec<u64>,
     /// `analyze` scratch: which variables have been resolved on.  Only
@@ -836,6 +887,8 @@ pub struct Solver {
     pub max_learnts: usize,
     /// Counters for the current solve.
     pub stats: SolverStats,
+    /// Decisions on assumption literals, cumulative over calls.
+    assumption_decisions: u64,
 }
 
 /// One parity constraint: `⊕_{v ∈ mask} x_v = rhs`, with `mask` a
@@ -945,6 +998,8 @@ impl Solver {
             xor_support_src: Vec::new(),
             xor_support_merge: Vec::new(),
             pivot: Vec::new(),
+            cache_decided_xors: false,
+            xor_decided: Vec::new(),
             xor_src: Vec::new(),
             seen: vec![false; n],
             seen_stack: Vec::new(),
@@ -956,6 +1011,7 @@ impl Solver {
             detached: Vec::new(),
             reclaim_detached_clauses: true,
             max_learnts: 0,
+            assumption_decisions: 0,
             // Initialising the tables: the two literal-indexed ones
             // (`values`, `watches`), eight per-variable ones and the two
             // bitsets, one unit per slot.  The heap charges its own two.
@@ -1922,6 +1978,10 @@ impl Solver {
             if self.event_failure.is_some() {
                 return XorStep::Fixpoint;
             }
+            if self.cache_decided_xors && self.xor_decided[i] {
+                self.stats.xor_decided_skips += 1;
+                continue;
+            }
             let intact = match self.pivot[i] {
                 Some(p) => self.var_value(p as usize).is_none(),
                 None => false,
@@ -1962,6 +2022,12 @@ impl Solver {
                         }
                         return XorStep::Conflict;
                     }
+                    if self.cache_decided_xors {
+                        // All row variables are assigned and its residual is
+                        // false. Further assignments cannot change this row.
+                        // Backjump and every matrix mutation invalidate it.
+                        self.xor_decided[i] = true;
+                    }
                 }
                 Some(p) => {
                     self.pivot[i] = Some(p);
@@ -1995,6 +2061,9 @@ impl Solver {
                             continue;
                         }
                         row_ops += 1;
+                        if self.cache_decided_xors {
+                            self.xor_decided[j] = false;
+                        }
                         matrix_rhs[j] ^= src_rhs;
                         let target = &mut matrix[j * words..(j + 1) * words];
                         if self.indexed_xors {
@@ -2188,6 +2257,10 @@ impl Solver {
             if !self.native_charge(NativeOperation::XorPivot, 16) {
                 return XorStep::Refused;
             }
+            if self.cache_decided_xors && self.xor_decided[i] {
+                self.stats.xor_decided_skips += 1;
+                continue;
+            }
             let intact = match self.pivot[i] {
                 Some(p) => self.var_value(p as usize).is_none(),
                 None => false,
@@ -2272,6 +2345,12 @@ impl Solver {
                         }
                         return XorStep::Conflict;
                     }
+                    if self.cache_decided_xors {
+                        // All row variables are assigned and its residual is
+                        // false. Further assignments cannot change this row.
+                        // Backjump and every matrix mutation invalidate it.
+                        self.xor_decided[i] = true;
+                    }
                 }
                 Some(p) => {
                     self.pivot[i] = Some(p);
@@ -2344,6 +2423,9 @@ impl Solver {
                             break;
                         }
                         row_ops += 1;
+                        if self.cache_decided_xors {
+                            self.xor_decided[j] = false;
+                        }
                         if self.native_admission.is_some() {
                             self.native_partial_xor = Some((i, j, 0, true));
                         }
@@ -2670,12 +2752,28 @@ impl Solver {
         } else {
             self.pivot.resize(self.matrix_rhs.len(), None);
         }
+        self.xor_decided.clear();
+        if self.cache_decided_xors {
+            self.xor_decided.resize(self.matrix_rhs.len(), false);
+        }
         if self.observing() {
             if !self.native_event_payload(0, 0) {
                 return;
             }
             self.emit(SolverEvent::XorMatrixReset);
         }
+    }
+
+    /// Skip rechecking satisfied, fully assigned XOR rows until an
+    /// unassignment or matrix mutation. Disabled by default. Changing the
+    /// setting invalidates every cached row, including during incremental use.
+    pub fn set_xor_decided_cache(&mut self, enabled: bool) {
+        self.cache_decided_xors = enabled;
+        self.xor_decided.clear();
+        if enabled {
+            self.xor_decided.resize(self.matrix_rhs.len(), false);
+        }
+        self.xor_epoch = u64::MAX;
     }
 
     /// Select the dense reference or exact nonzero-word engine. Resetting the
@@ -2691,6 +2789,7 @@ impl Solver {
         self.matrix.clear();
         self.matrix_rhs.clear();
         self.matrix_support.clear();
+        self.xor_decided.clear();
     }
 
     fn unit_parity(
@@ -3450,6 +3549,8 @@ impl Solver {
         // Each unassignment: the two literal slots, the bitset word and
         // the level; the heap re-insertion charges itself.
         self.stats.word_ops += 3 * (self.trail.len() - target) as u64 + 1;
+        // Unassignment can falsify a cached "decided and satisfied" row.
+        self.xor_decided.fill(false);
         while self.trail.len() > target {
             if !self.native_charge(NativeOperation::Backjump, 0) {
                 return;
@@ -3925,6 +4026,62 @@ impl Solver {
         result
     }
 
+    /// **Solve under assumptions** (MiniSat semantics).
+    ///
+    /// Each literal of `assumptions` (1-indexed, signed as in
+    /// [`Self::add_clause`]) is decided before any free decision, in
+    /// order, at a decision level of its own; an assumption already
+    /// implied true by earlier ones (or by level-0 facts) is skipped
+    /// rather than given an empty level.  Returns:
+    ///
+    /// * `Sat`: [`Self::model`] satisfies every clause, XOR row and
+    ///   assumption;
+    /// * `Unsat`: no model extends the assumptions.  The solver is *not*
+    ///   made permanently unsat (unless the formula itself is, i.e. a
+    ///   conflict at level 0), and may be called again with other
+    ///   assumptions;
+    /// * `Unknown`: [`Self::conflict_budget`] or [`Self::deadline`] hit.
+    ///   Both are cumulative over calls, as for [`Self::solve`]:
+    ///   `conflict_budget` is compared with [`Self::conflicts`].
+    ///
+    /// Learnt clauses are derived from the formula alone (assumptions
+    /// are decisions, never premises), so they stay valid and are kept
+    /// across calls.  The XOR matrix needs nothing extra: backjumping
+    /// below the assumption levels only unassigns variables, and every
+    /// call starts with a backjump to level 0.  [`Self::stats`] keeps
+    /// accumulating; take a copy before the call and use
+    /// [`SolverStats::since`] for per-call counters.  Assumption
+    /// decisions are counted in `stats.decisions` and also in
+    /// [`Self::assumption_decisions`].
+    ///
+    /// With an empty slice the answer and the counters of a first call are
+    /// those of [`Self::solve`]; it differs in two incremental details:
+    /// each call forces one Gauss-Jordan pass at level 0, and a level-0
+    /// conflict (the formula itself unsat) is remembered, so later calls
+    /// return `Unsat` at once.  (`solve()` re-run after a level-0 parity
+    /// conflict skips that pass and can meet the conflict above level 0
+    /// with a reason of level-0 literals only; the tests here found that
+    /// on repeated calls, and this entry point avoids it.)
+    pub fn solve_with_assumptions(&mut self, assumptions: &[Lit]) -> SolveResult {
+        for &a in assumptions {
+            assert!(
+                a != 0 && var_of(a) < self.n_vars,
+                "assumption literal {a} out of range"
+            );
+        }
+        let mut no_theory = |_: &[Option<bool>]| None;
+        let result = self.solve_entry(&[], &mut no_theory, assumptions, true);
+        self.progress_phase(SolverProgressPhase::Complete);
+        result
+    }
+
+    /// Cumulative decisions made on assumption literals by
+    /// [`Self::solve_with_assumptions`] (also included in
+    /// `stats.decisions`).
+    pub fn assumption_decisions(&self) -> u64 {
+        self.assumption_decisions
+    }
+
     /// Solve while allowing a theory callback to install globally valid lazy
     /// clauses whenever every `trigger_var` is assigned.
     ///
@@ -3943,6 +4100,22 @@ impl Solver {
         &mut self,
         trigger_vars: &[u32],
         theory: &mut F,
+    ) -> SolveResult
+    where
+        F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
+    {
+        self.solve_entry(trigger_vars, theory, &[], false)
+    }
+
+    /// Shared entry of [`Self::solve_with_lazy_clauses`] and
+    /// [`Self::solve_with_assumptions`]: native admission, observer
+    /// begin/end events and the phase trace around the search.
+    fn solve_entry<F>(
+        &mut self,
+        trigger_vars: &[u32],
+        theory: &mut F,
+        assumptions: &[Lit],
+        incremental: bool,
     ) -> SolveResult
     where
         F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
@@ -3969,7 +4142,7 @@ impl Solver {
             if self.event_failure.is_some() || self.native_failure.is_some() {
                 return SolveResult::Unknown;
             }
-            let result = self.solve_with_lazy_clauses_inner(trigger_vars, theory, trace);
+            let result = self.solve_with_lazy_clauses_inner(trigger_vars, theory, trace, assumptions, incremental);
             if self.event_failure.is_some() || self.native_failure.is_some() {
                 return SolveResult::Unknown;
             }
@@ -4206,6 +4379,8 @@ impl Solver {
         trigger_vars: &[u32],
         theory: &mut F,
         trace: Option<std::time::Instant>,
+        assumptions: &[Lit],
+        incremental: bool,
     ) -> SolveResult
     where
         F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
@@ -4218,6 +4393,14 @@ impl Solver {
         // from that trail answered wrongly; restart from level zero
         // instead, keeping learnt clauses.
         self.backjump(0);
+        if incremental {
+            // `solve_with_assumptions`: force a Gauss-Jordan pass at level
+            // 0.  A previous call that ended on a level-0 parity conflict
+            // leaves `epoch == xor_epoch`, so the pass would be skipped and
+            // the conflict resurface above level 0 with a reason made of
+            // level-0 literals only, which `analyze` cannot handle.
+            self.xor_epoch = u64::MAX;
+        }
         // Initial propagation at level 0 catches trivial UNSAT from
         // unit clauses.
         self.trace_solve_phase(trace, "initial_propagation_begin", None);
@@ -4234,6 +4417,10 @@ impl Solver {
                     reason,
                     literals,
                 });
+            }
+            if incremental {
+                // A level-0 conflict refutes the formula itself; keep it.
+                self.is_unsat = true;
             }
             return SolveResult::Unsat;
         }
@@ -4320,6 +4507,9 @@ impl Solver {
                     return SolveResult::Unknown;
                 }
                 if self.trail_lim.is_empty() {
+                    if incremental {
+                        self.is_unsat = true;
+                    }
                     return SolveResult::Unsat;
                 }
                 self.progress_phase(SolverProgressPhase::ConflictAnalysis);
@@ -4522,6 +4712,65 @@ impl Solver {
                                     pending_conflict = conflict;
                                 }
                             }
+                        }
+                        continue;
+                    }
+                }
+                // Assumptions first, in order, each unassigned one at its
+                // own decision level (MiniSat).  One already true needs no
+                // level (MiniSat would open an empty one); one already
+                // false means no model extends the assumptions.  Empty for
+                // `solve()`, which this block then leaves untouched.
+                if !assumptions.is_empty() {
+                    let mut next_assumption = None;
+                    for &a in assumptions {
+                        match self.lit_value(a) {
+                            Some(true) => continue,
+                            Some(false) => return SolveResult::Unsat,
+                            None => {
+                                next_assumption = Some(a);
+                                break;
+                            }
+                        }
+                    }
+                    if let Some(lit) = next_assumption {
+                        // Charged exactly like a free decision below.
+                        let needed = self.trail_lim.len() + 1;
+                        if !native_reserve(
+                            &mut self.trail_lim,
+                            needed,
+                            &mut self.native_admission,
+                            &mut self.native_failure,
+                            self.deadline,
+                            NativeOperation::LevelGrowth,
+                        ) {
+                            return SolveResult::Unknown;
+                        }
+                        self.stats.decisions += 1;
+                        self.stats.word_ops += 2;
+                        self.assumption_decisions += 1;
+                        self.trail_lim.push(self.trail.len());
+                        if self.observing() {
+                            if !self.native_event_payload(0, 0) {
+                                return SolveResult::Unknown;
+                            }
+                            let v = var_of(lit) as usize;
+                            self.emit(SolverEvent::Decision {
+                                literal: lit,
+                                level: self.trail_lim.len(),
+                                trail_index: self.trail.len(),
+                                activity_bits: self.activity[v].to_bits(),
+                                priority: self.branch_priority[v],
+                            });
+                        }
+                        if self.event_failure.is_some() || self.native_failure.is_some() {
+                            return SolveResult::Unknown;
+                        }
+                        self.assign(lit, Reason::Decision);
+                        if let Some(progress) = &self.progress {
+                            progress
+                                .decisions
+                                .store(self.stats.decisions, Ordering::Relaxed);
                         }
                         continue;
                     }
@@ -7294,6 +7543,237 @@ mod tests {
         assert!(z.add_clause(vec![-1, 3]) && z.add_clause(vec![1]));
         assert_eq!(z.solve(), SolveResult::Sat);
         assert!(z.model()[0] && z.model()[2]);
+    }
+
+    // ── solve_with_assumptions ──────────────────────────────────────
+
+    struct AssumpInstance {
+        n: u32,
+        clauses: Vec<Vec<Lit>>,
+        xors: Vec<(Vec<u32>, bool)>,
+    }
+
+    fn assump_rng(seed: u64) -> impl FnMut() -> u64 {
+        let mut state = seed | 1;
+        move || {
+            state ^= state >> 12;
+            state ^= state << 25;
+            state ^= state >> 27;
+            state.wrapping_mul(0x2545_F491_4F6C_DD1D)
+        }
+    }
+
+    /// Random mixed CNF + XOR instance on `4 ..= 30` variables, density
+    /// spread so that both SAT and UNSAT instances (and assumption sets)
+    /// occur often.
+    fn assump_instance(next: &mut dyn FnMut() -> u64) -> AssumpInstance {
+        let n = 4 + (next() % 27) as u32;
+        let n_clauses = (n as u64 * (1 + next() % 40) / 10) as usize;
+        let mut clauses = Vec::new();
+        for _ in 0..n_clauses {
+            let k = 2 + (next() % 3) as usize;
+            let c: Vec<Lit> = (0..k)
+                .map(|_| {
+                    let v = 1 + (next() % n as u64) as Lit;
+                    if next() & 1 == 1 {
+                        -v
+                    } else {
+                        v
+                    }
+                })
+                .collect();
+            clauses.push(c);
+        }
+        let n_xors = (next() % (n as u64 / 2 + 2)) as usize;
+        let mut xors = Vec::new();
+        for _ in 0..n_xors {
+            let k = 1 + (next() % 6) as usize;
+            let vars: Vec<u32> = (0..k).map(|_| 1 + (next() % n as u64) as u32).collect();
+            xors.push((vars, next() & 1 == 1));
+        }
+        AssumpInstance { n, clauses, xors }
+    }
+
+    fn assump_build(inst: &AssumpInstance, units: &[Lit]) -> (Solver, bool) {
+        let mut s = Solver::new(inst.n);
+        let mut ok = true;
+        for c in &inst.clauses {
+            ok &= s.add_clause(c.clone());
+        }
+        for (vars, rhs) in &inst.xors {
+            ok &= s.add_xor(vars, *rhs);
+        }
+        for &u in units {
+            ok &= s.add_clause(vec![u]);
+        }
+        (s, ok)
+    }
+
+    fn assump_set(n: u32, next: &mut dyn FnMut() -> u64) -> Vec<Lit> {
+        let k = (next() % (n as u64).min(10) + 1) as usize;
+        (0..k)
+            .map(|_| {
+                let v = 1 + (next() % n as u64) as Lit;
+                if next() & 1 == 1 {
+                    -v
+                } else {
+                    v
+                }
+            })
+            .collect()
+    }
+
+    fn assump_model_ok(inst: &AssumpInstance, s: &Solver, assumptions: &[Lit]) -> bool {
+        let m = s.model();
+        let lit_true = |l: Lit| m[(l.unsigned_abs() - 1) as usize] == (l > 0);
+        inst.clauses.iter().all(|c| c.iter().any(|&l| lit_true(l)))
+            && inst.xors.iter().all(|(vars, rhs)| {
+                vars.iter().filter(|&&v| m[(v - 1) as usize]).count() % 2 == usize::from(*rhs)
+            })
+            && assumptions.iter().all(|&l| lit_true(l))
+    }
+
+    /// Truth by a fresh solver with the assumptions as unit clauses.
+    fn assump_reference(inst: &AssumpInstance, assumptions: &[Lit]) -> SolveResult {
+        let (mut fresh, ok) = assump_build(inst, assumptions);
+        if !ok {
+            return SolveResult::Unsat;
+        }
+        let r = fresh.solve();
+        if r == SolveResult::Sat {
+            assert!(assump_model_ok(inst, &fresh, assumptions), "reference model");
+        }
+        r
+    }
+
+    #[test]
+    fn assumptions_agree_with_unit_clauses_on_random_cnf_xor() {
+        let mut next = assump_rng(0x9E37_79B9_7F4A_7C15);
+        let (mut n_sat, mut n_unsat, mut n_calls) = (0u64, 0u64, 0u64);
+        for trial in 0..600 {
+            let inst = assump_instance(&mut next);
+            let (mut s, ok) = assump_build(&inst, &[]);
+            let base = if ok { s.solve() } else { SolveResult::Unsat };
+            assert_eq!(base, assump_reference(&inst, &[]), "trial {trial}: base");
+            if !ok {
+                continue;
+            }
+            // A fresh assumption solver per set, then the same one again
+            // with a few more sets (a light incrementality check).
+            for rep in 0..4 {
+                let a = assump_set(inst.n, &mut next);
+                let want = assump_reference(&inst, &a);
+                let (mut fresh_a, ok_a) = assump_build(&inst, &[]);
+                assert!(ok_a);
+                for solver in [&mut fresh_a, &mut s] {
+                    let before = solver.stats;
+                    let got = solver.solve_with_assumptions(&a);
+                    n_calls += 1;
+                    assert_eq!(got, want, "trial {trial} rep {rep}: assumptions {a:?}");
+                    if got == SolveResult::Sat {
+                        assert!(assump_model_ok(&inst, solver, &a), "trial {trial}: model");
+                        n_sat += 1;
+                    } else {
+                        n_unsat += 1;
+                    }
+                    let d = solver.stats.since(&before);
+                    assert_eq!(d.conflicts + before.conflicts, solver.stats.conflicts);
+                }
+            }
+            // Still answers the unassumed question.
+            assert_eq!(s.solve(), base, "trial {trial}: solve() after assumptions");
+            assert_eq!(s.solve_with_assumptions(&[]), base, "trial {trial}: empty set");
+        }
+        assert!(n_sat > 200 && n_unsat > 200, "sat {n_sat} unsat {n_unsat} of {n_calls}");
+    }
+
+    #[test]
+    fn assumptions_are_incremental_over_many_sets() {
+        let mut next = assump_rng(0xD1B5_4A32_D192_ED03);
+        let mut sequences = 0;
+        let mut attempts = 0;
+        while sequences < 20 {
+            attempts += 1;
+            assert!(attempts < 10_000);
+            let inst = assump_instance(&mut next);
+            let (mut s, ok) = assump_build(&inst, &[]);
+            if !ok || s.solve() != SolveResult::Sat || inst.n < 12 {
+                continue;
+            }
+            sequences += 1;
+            let (mut n_sat, mut n_unsat) = (0, 0);
+            for i in 0..80 {
+                let a = assump_set(inst.n, &mut next);
+                let want = assump_reference(&inst, &a);
+                let got = s.solve_with_assumptions(&a);
+                assert_eq!(got, want, "seq {sequences} call {i}: {a:?}");
+                if got == SolveResult::Sat {
+                    assert!(assump_model_ok(&inst, &s, &a));
+                    n_sat += 1;
+                } else {
+                    n_unsat += 1;
+                }
+                if i % 10 == 9 {
+                    assert_eq!(s.solve(), SolveResult::Sat, "formula stays SAT");
+                    assert!(assump_model_ok(&inst, &s, &[]));
+                }
+            }
+            assert!(n_sat + n_unsat == 80);
+        }
+    }
+
+    #[test]
+    fn assumptions_full_enumeration_matches_brute_force() {
+        // Every assignment of the first k variables as assumptions, on one
+        // solver per instance, against exhaustive search (n <= 14).
+        let mut next = assump_rng(0x0123_4567_89AB_CDEF);
+        for trial in 0..60 {
+            let mut inst = assump_instance(&mut next);
+            while inst.n > 14 {
+                inst = assump_instance(&mut next);
+            }
+            let (mut s, ok) = assump_build(&inst, &[]);
+            if !ok {
+                continue;
+            }
+            let n = inst.n;
+            let k = 1 + (next() % 5) as u32;
+            let k = k.min(n);
+            for branch in 0..(1u32 << k) {
+                let a: Vec<Lit> = (0..k)
+                    .map(|j| if branch >> j & 1 == 1 { (j + 1) as Lit } else { -((j + 1) as Lit) })
+                    .collect();
+                let brute = (0..(1u32 << n)).any(|x| {
+                    (0..k).all(|j| (x >> j & 1) == (branch >> j & 1))
+                        && inst.clauses.iter().all(|c| {
+                            c.iter().any(|&l| (x >> (l.unsigned_abs() - 1) & 1 == 1) == (l > 0))
+                        })
+                        && inst.xors.iter().all(|(vars, rhs)| {
+                            vars.iter().filter(|&&v| x >> (v - 1) & 1 == 1).count() % 2
+                                == usize::from(*rhs)
+                        })
+                });
+                let got = s.solve_with_assumptions(&a);
+                assert_eq!(got == SolveResult::Sat, brute, "trial {trial} branch {branch}");
+                assert_ne!(got, SolveResult::Unknown);
+                if got == SolveResult::Sat {
+                    assert!(assump_model_ok(&inst, &s, &a));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn assumptions_under_conflict_budget_report_unknown_then_resume() {
+        // Pigeonhole 6→5 is UNSAT; with a tiny budget the call stops, and
+        // a later call with the budget lifted still answers correctly.
+        let mut s = observer_pigeonhole(6, 5);
+        s.conflict_budget = 5;
+        assert_eq!(s.solve_with_assumptions(&[1]), SolveResult::Unknown);
+        s.conflict_budget = u64::MAX;
+        assert_eq!(s.solve_with_assumptions(&[1]), SolveResult::Unsat);
+        assert_eq!(s.solve_with_assumptions(&[-1, 2]), SolveResult::Unsat);
+        assert_eq!(s.solve(), SolveResult::Unsat);
     }
 }
 

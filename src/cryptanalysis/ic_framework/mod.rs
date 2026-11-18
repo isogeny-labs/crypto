@@ -75,6 +75,7 @@ pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
 pub mod recursive_adapter;
+pub mod registry;
 pub mod residual;
 pub mod rootfind;
 pub mod rootfind_gpu;
@@ -98,7 +99,10 @@ use crate::cryptanalysis::ic_boundary::{
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
 use linalg::matrix_by_name;
-use stages::{DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SystemShape, Targets};
+use stages::{
+    DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, PipelineStages,
+    RelationSolverFactory, SystemShape, Targets,
+};
 
 /// One configuration: a choice at each stage, with its parameters.
 #[derive(Clone, Debug, Default, Serialize)]
@@ -433,6 +437,40 @@ pub fn run_pipeline_with_progress<G: CountedGroup>(
         calib,
         rho_s,
         Some(progress),
+        None,
+    )
+    .map(|(report, _)| report)
+}
+
+/// Run with application-supplied factor-base, decomposition and matrix stages.
+/// The optional observer sees the actual queries and borrowed witnesses. The
+/// matrix's completion/verification contract is independent of `spec.linalg`;
+/// reports use the injected factory's name. No registry or CLI changes needed.
+/// `expected` is optional: with `None`, the recovered logarithm is verified
+/// solely by its group equation, so consumers need not know it beforehand.
+///
+/// These are variable-time research APIs for public fixtures, not secret-key
+/// arithmetic. Plug-ins run in process as trusted code; this is not a sandbox.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_with_stages<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    stages: PipelineStages<'_, G>,
+    expected: Option<u64>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+    progress: Option<&mut dyn FnMut(PipelineEvent<'_, G::Elt>)>,
+) -> Result<RunReport, String> {
+    run_pipeline_inner(
+        ctx,
+        spec,
+        stages.factor_base,
+        stages.oracle,
+        expected,
+        calib,
+        rho_s,
+        progress,
+        Some(stages.matrix),
     )
     .map(|(report, _)| report)
 }
@@ -478,6 +516,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         calib,
         rho_s,
         None,
+        None,
     )
 }
 
@@ -492,7 +531,7 @@ pub fn run_pipeline_public<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<RunReport, String> {
-    run_pipeline_inner(ctx, spec, base_builder, oracle, None, calib, rho_s, None)
+    run_pipeline_inner(ctx, spec, base_builder, oracle, None, calib, rho_s, None, None)
         .map(|(report, _)| report)
 }
 
@@ -506,6 +545,7 @@ fn run_pipeline_inner<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
     mut progress: Option<&mut dyn FnMut(PipelineEvent<'_, G::Elt>)>,
+    matrix_factory: Option<&dyn RelationSolverFactory>,
 ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     let started = Instant::now();
 
@@ -594,36 +634,58 @@ fn run_pipeline_inner<G: CountedGroup>(
     // so a framework row is comparable with a ledger row rather than
     // merely similar to it.
     let known = fb.known_logs.is_some();
+    // A known-log base is read directly. Otherwise an injected factory
+    // owns the matrix contract, and the built-in name is the fallback.
     let linalg_name = {
         let prior = linalg_name;
         if known {
             "known-logs"
+        } else if let Some(factory) = matrix_factory {
+            factory.name()
         } else {
             prior
         }
     };
+    if !known && matrix_factory.is_some() && audit_enabled {
+        return Err("rank audit requires a built-in incremental Gaussian solver, not an injected matrix factory".into());
+    }
     // The loop's unknowns are the logs of `[h]P_v` (its rows read
     // `Σ c·x − h·b·d = h·a`), so on a cofactor-`h` curve a known column
     // log `s` enters as `h·s`; at `h = 1` this is the identity.
-    let mut plain = Some(match &fb.known_logs {
-        Some(logs) => {
-            let h = ctx.cofactor % ctx.r;
-            let scaled = logs
-                .iter()
-                .map(|&s| ((s as u128 * h as u128) % ctx.r as u128) as u64)
-                .collect();
-            Box::new(KnownLogSolver::new(scaled, ctx.r)) as Box<dyn RelationSolver>
-        }
-        None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?,
-    });
+    // The audit wraps only a built-in matrix (an injected factory is refused
+    // above when the audit is on), so it is built before any factory matrix.
     let mut audited = if audit_enabled && !known {
         Some(useful_rank::AuditedMatrix::new(
             ctx,
             &fb,
-            plain.take().unwrap(),
+            matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?,
         )?)
     } else {
         None
+    };
+    let mut plain: Option<Box<dyn RelationSolver + '_>> = if audited.is_some() {
+        None
+    } else {
+        Some(match &fb.known_logs {
+            Some(logs) => {
+                let h = ctx.cofactor % ctx.r;
+                let scaled = logs
+                    .iter()
+                    .map(|&s| ((s as u128 * h as u128) % ctx.r as u128) as u64)
+                    .collect();
+                Box::new(KnownLogSolver::new(scaled, ctx.r))
+            }
+            None => match matrix_factory {
+                Some(factory) => {
+                    let columns = fb
+                        .columns
+                        .checked_add(1)
+                        .ok_or("factor-base column count overflow")?;
+                    factory.create(columns, ctx.r)?
+                }
+                None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?,
+            },
+        })
     };
     let matrix: &mut dyn RelationSolver = if let Some(m) = &mut audited {
         m
@@ -729,10 +791,16 @@ fn run_pipeline_inner<G: CountedGroup>(
         return Err("walk-prime-serial/batch requires a prime curve with p < 2^62".into());
     }
     measurement::begin_online(measurement::Phase::TargetQuery);
-    let checked_full_rank = linalg_name == "incremental-gauss-full-rank-checked";
+    let injected = matrix_factory.filter(|_| !known);
+    let checked_full_rank = match injected {
+        Some(factory) => factory.verify_base_columns(),
+        None => linalg_name == "incremental-gauss-full-rank-checked",
+    };
     // `sparse-cado` is a batch solver that answers only at full column
     // rank, so it runs under the full-rank rule.
-    let completion = if linalg_name == "incremental-gauss-full-rank"
+    let completion = if let Some(factory) = injected {
+        factory.completion_rule()
+    } else if linalg_name == "incremental-gauss-full-rank"
         || checked_full_rank
         || linalg::is_deferred_sparse(linalg_name)
     {
@@ -740,6 +808,9 @@ fn run_pipeline_inner<G: CountedGroup>(
     } else {
         CompletionRule::TargetPinned
     };
+    if checked_full_rank && injected.is_some() && completion != CompletionRule::FullRank {
+        return Err("base-column verification requires full-rank completion".into());
+    }
     let mut outcome: PipelineOutcome = if matches!(
         spec.targets,
         Targets::Residual
@@ -1039,6 +1110,11 @@ fn run_pipeline_inner<G: CountedGroup>(
     let total_gae = fb_phase.gae + prep_cost.gae + rel.gae + la.gae + ver.gae;
     let sqrt_r = (ctx.r as f64).sqrt();
     let s = total_gae / sqrt_r;
+    let mut effective_spec = spec.clone();
+    if matrix_factory.is_some() && !known {
+        effective_spec.linalg = linalg_name.to_string();
+    }
+    let label = effective_spec.label();
 
     Ok((
         RunReport {
@@ -1046,8 +1122,8 @@ fn run_pipeline_inner<G: CountedGroup>(
             log2_r: (ctx.r as f64).log2(),
             r: ctx.r,
             group_order: ctx.group_order,
-            spec: spec.clone(),
-            label: spec.label(),
+            spec: effective_spec,
+            label,
             factor_base: FactorBaseReport {
                 name: base_builder.name().to_string(),
                 description: base_builder.describe(&spec.factor_base_params),
