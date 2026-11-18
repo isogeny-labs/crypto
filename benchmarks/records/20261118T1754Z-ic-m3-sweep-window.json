@@ -1,7 +1,25 @@
 {
   "branch": "claude/index-calculus-gpu-optimization-otouqv",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_m3_sweep_window_20261118/specs/sweep.json",
+        "--out",
+        "/tmp/claude-0/-home-user/648c3177-6621-55ff-b9d8-09ead07ab678/scratchpad/sweep/session",
+        "--cpus",
+        "none",
+        "--allow-busy"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T17:54:30+00:00",
+      "wall_s": 1329.101
+    }
+  ],
   "commit": "75b978e17312c4ed2d84a2de2687787d6e4686f6",
   "commit_dirty": false,
   "created_utc": "2026-11-18T17:54:06+00:00",

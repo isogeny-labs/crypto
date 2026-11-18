@@ -37,11 +37,11 @@ for gi, (bits, a) in enumerate(groups):
     cls = COL[gi % 4]
     cells = {c["f"]: c for c in C if (c["bits"], c["a"]) == (bits, a)}
     pts = [(xs[f], Y(cells[f]["ratio_to_f1"])) for f in FS if f in cells]
-    o.append(f'<polyline class="{cls}" fill="none" stroke-width="2" points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}"/>')
+    o.append(f'<polyline class="{cls}" style="fill:none" stroke-width="2" points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}"/>')
     for x, y in pts:
         o.append(f'<circle class="{cls}" cx="{x:.1f}" cy="{y:.1f}" r="3.5"/>')
     pr = [(xs[1], Y(1.0))] + [(xs[f], Y(cells[f]["predicted_ratio"])) for f in FS[1:] if f in cells and cells[f]["predicted_ratio"]]
-    o.append(f'<polyline class="{cls}" fill="none" stroke-width="1.5" stroke-dasharray="5 4" '
+    o.append(f'<polyline class="{cls}" style="fill:none" stroke-width="1.5" stroke-dasharray="5 4" '
              f'points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pr)}"/>')
     ly = T + 20 + 40 * gi
     o.append(f'<line class="{cls}" x1="{W - R + 20}" x2="{W - R + 44}" y1="{ly}" y2="{ly}" stroke-width="2"/>')
