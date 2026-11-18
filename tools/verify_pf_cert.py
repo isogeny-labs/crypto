@@ -47,7 +47,7 @@ def run(path):
         if "k" in c and isinstance(c["k"], list):
             items = list(zip(c["q"], c["k"], c["sym_rec"], c["base_rec"] or [None]*len(c["k"])))
         else:
-            if c.get("sym_rec") is None:
+            if c.get("sym_rec") is None or c.get("plain3_rec") is None:
                 ok = False  # a failed solve must not pass silently
             items = [(c["q"], c["k"], c.get("sym_rec"), c.get("plain3_rec"))]
         for q, k, *recs in items:
