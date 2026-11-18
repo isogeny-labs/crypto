@@ -477,7 +477,7 @@ fn load_rung(dir: &Path) -> Result<Rung, String> {
             continue;
         }
         *verified.entry(r.arm.clone()).or_insert(0u64) += 1;
-        let r_sub = r.workload.curve.r as f64;
+        let r_sub = r.workload.curve.r.to_f64();
         let s = r.cost.s.ok_or("verified run without S")?;
         let total = r.cost.total_gae.ok_or("verified run without total")?;
         let row = Row {
@@ -499,7 +499,7 @@ fn load_rung(dir: &Path) -> Result<Rung, String> {
             .push(row);
     }
     let f = first.ok_or("session has no measured records")?;
-    let r_sub = f.workload.curve.r as f64;
+    let r_sub = f.workload.curve.r.to_f64();
     let n = f.workload.curve.field_degree.ok_or("not a binary curve")?;
     let mut parity = Parity::default();
     let mut groups: BTreeMap<(String, u32), BTreeMap<String, &Record>> = BTreeMap::new();
@@ -1501,7 +1501,7 @@ fn validate(
         for r in recs.iter().filter(|r| r.counts()) {
             let slug = &r.workload.curve.slug;
             let ratios = pinned_ratios(slug);
-            let r_sub = r.workload.curve.r as f64;
+            let r_sub = r.workload.curve.r.to_f64();
             let total = recompute_total(r, &ratios)?;
             let recorded = r.cost.total_gae.ok_or("no total")?;
             records_checked += 1;
