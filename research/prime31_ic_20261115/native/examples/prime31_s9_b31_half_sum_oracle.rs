@@ -782,6 +782,7 @@ mod batch_complement_tests {
 mod complete_b31_1024_tests {
     use super::*;
     use super::batch_complement_tests::{recover_batched, BatchStats};
+    use super::b31_negation_quotient_tests::{prepare, recover_paired, Rep, PairStats};
 
     const RELATION_SEED: u64 = 0x4241_5345_3331_5f31;
     const CORPUS_SEED: u64 = 0x4d49_5834_5033_3131;
@@ -925,6 +926,31 @@ mod complete_b31_1024_tests {
             assert_eq!(probes, half.ordered.len(), "negative exhaustive lookup");
         }
         None
+    }
+
+
+    // Selects the previously verified 512-way complement or the new exact
+    // negation-paired variant; all public shifts and failures are charged.
+    fn public_relation_choice(
+        ar: &mut Arithmetic, half: &FourSet, pts: &[Point], q: Point,
+        batch: &mut BatchStats, reps: Option<&[Rep]>, pair_batch: &mut PairStats,
+        attempts: &mut usize, negatives: &mut usize
+    ) -> Option<(Word8,u64)> {
+        if let Some(reps) = reps {
+            for shift in 0..=MAX_PUBLIC_SHIFT {
+                let moved = ar.scalar(PRIME31, shift, Some(PRIME31.g));
+                let residual = ar.add(PRIME31, q, moved);
+                *attempts += 1;
+                let (witness, probes) =
+                    recover_paired(ar, half, reps, pts, residual, pair_batch);
+                if let Some(word) = witness { return Some((word, shift)); }
+                *negatives += 1;
+                assert_eq!(probes, reps.len(), "paired negative must be exhaustive");
+            }
+            None
+        } else {
+            public_relation(ar, half, pts, q, batch, attempts, negatives)
+        }
     }
 
     #[test]
@@ -1348,7 +1374,14 @@ mod complete_b31_1024_tests {
         const QCOUNT: usize = 256;
         let mut panels = Vec::new();
 
-        let arms: [&str;2] = if std::env::var("PRIME31_B31_BASECHOICE_REVERSE").ok().as_deref() == Some("1") {
+        let paired_compare = std::env::var("PRIME31_B31_NEGATION_COMPARE")
+            .ok().as_deref() == Some("1");
+        let reversed = std::env::var("PRIME31_B31_BASECHOICE_REVERSE")
+            .ok().as_deref() == Some("1");
+        let arms: [&str;2] = if paired_compare {
+            if reversed { ["first_x31_paired", "first_x31"] }
+            else { ["first_x31", "first_x31_paired"] }
+        } else if reversed {
             ["first_x31", "dickson31"]
         } else {
             ["dickson31", "first_x31"]
@@ -1372,6 +1405,9 @@ mod complete_b31_1024_tests {
             }
             let pts = tokens(&ar, &base);
             let half = FourSet::build(&mut ar, &pts);
+            let representatives = if base_kind == "first_x31_paired" {
+                Some(prepare(&half))
+            } else { None };
             let setup_ns = setup_start.elapsed().as_nanos();
             let n4 = signature_count(active, 4);
             let n8 = signature_count(active, 8);
@@ -1380,6 +1416,10 @@ mod complete_b31_1024_tests {
             if base_kind == "dickson31" {
                 assert_eq!(half.index.len(), 618_885);
                 assert_eq!(n8, 5_654_193_417);
+            }
+
+            if base_kind == "first_x31_paired" {
+                assert_eq!(representatives.as_ref().unwrap().len(),309_443);
             }
 
             // Generate exactly the same 256 public Q as the 1024-Q control
@@ -1398,6 +1438,7 @@ mod complete_b31_1024_tests {
             let corpus_generation_ns_excluded = corpus_start.elapsed().as_nanos();
 
             let mut batch = BatchStats::default();
+            let mut paired_batch = PairStats::default();
             let mut rank = ModRank::default();
             let mut rows = Vec::<Row>::new();
             let mut relation_seed = RELATION_SEED;
@@ -1412,8 +1453,8 @@ mod complete_b31_1024_tests {
                 source_count += 1;
                 let a = 1 + splitmix64(&mut relation_seed) % (PRIME31.n - 1);
                 let q = ar.scalar(PRIME31,a,Some(PRIME31.g));
-                if let Some((w,shift)) = public_relation(
-                    &mut ar,&half,&pts,q,&mut batch,&mut source_attempts,&mut source_negatives
+                if let Some((w,shift)) = public_relation_choice(
+                    &mut ar,&half,&pts,q,&mut batch,representatives.as_deref(),&mut paired_batch,&mut source_attempts,&mut source_negatives
                 ) {
                     let row = signed_row(w,nadd(a,shift));
                     for &coeff in &row[active..DIM] {
@@ -1457,8 +1498,8 @@ mod complete_b31_1024_tests {
             for _ in 0..16 {
                 let a = 1 + splitmix64(&mut relation_seed) % (PRIME31.n - 1);
                 let q = ar.scalar(PRIME31,a,Some(PRIME31.g));
-                if let Some((w,shift)) = public_relation(
-                    &mut ar,&half,&pts,q,&mut batch,&mut source_attempts,&mut source_negatives
+                if let Some((w,shift)) = public_relation_choice(
+                    &mut ar,&half,&pts,q,&mut batch,representatives.as_deref(),&mut paired_batch,&mut source_attempts,&mut source_negatives
                 ) {
                     let row = signed_row(w,nadd(a,shift));
                     assert_eq!(evaluate_row(&row,&logs),row[DIM]);
@@ -1479,8 +1520,8 @@ mod complete_b31_1024_tests {
                 let old_attempts = target_attempts;
                 let old_negatives = target_negatives;
                 let (recovered,witness,shift) =
-                    if let Some((w,shift))=public_relation(
-                        &mut ar,&half,&pts,q,&mut batch,&mut target_attempts,&mut target_negatives
+                    if let Some((w,shift))=public_relation_choice(
+                        &mut ar,&half,&pts,q,&mut batch,representatives.as_deref(),&mut paired_batch,&mut target_attempts,&mut target_negatives
                     ) {
                         let mut rlog = 0u64;
                         for token in w {
@@ -1561,12 +1602,18 @@ mod complete_b31_1024_tests {
                 "full_panel_native_fp_mults":ar.counts.fp_multiplications,
                 "full_panel_native_fp_inversions":ar.counts.fp_inversions,
                 "full_panel_native_group_additions":ar.counts.group_additions,
-                "batched_complement_operation_counters":format!("{batch:?}")
+                "batched_complement_operation_counters":format!("{batch:?}"),
+                "negation_quotient_representatives":representatives.as_ref().map(|r|r.len()),
+                "negation_paired_batch_counters":format!("{paired_batch:?}"),
+                "paired_candidate":base_kind=="first_x31_paired"
             }));
         }
 
-        println!("PRIME31_B31_FIRSTX_DICKSON_COMPLETE_JSON={}", json!({
-            "schema":"prime31.actual_b31_basechoice_256q_complete.v1",
+        let prefix = if paired_compare { "PRIME31_B31_NEGATION_COMPLETE_JSON" }
+                     else { "PRIME31_B31_FIRSTX_DICKSON_COMPLETE_JSON" };
+        println!("{prefix}={}", json!({
+            "schema":if paired_compare { "prime31.b31.negation_complete_256q.v1" }
+                     else { "prime31.actual_b31_basechoice_256q_complete.v1" },
             "panel_order": arms,
             "validation":"source-specific producer Rust [pcc:unverified]",
             "field_p":PRIME31.p,"subgroup_n":PRIME31.n,
