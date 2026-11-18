@@ -90,3 +90,82 @@ solver time across p=1e9+7, p=2^61-1, quadratic/cubic/quartic classes
 No ECDLP speedup or GPU improvement is claimed.
 
 This PR remains draft until the actual Rust tests and benchmark gate pass.
+
+
+## Follow-up: AMM and Tonelli exponent reuse (2026-11-18 UTC)
+
+Three additional call-site optimizations are committed to the same source module:
+
+1. \`Cube::root\` (AMM for \`Fp\` and \`Fp2\`): compute \`g=a^t\`
+   once for \`|K*|=t*3^s\`, reuse its \`3^(s-1)\`-th power for
+   cube-residuosity testing, and use \`g\` or \`g^2\` as the Sylow
+   correction. This replaces two long exponentiations by one plus
+   a short sequence of cubings; a separate exponentiation for \`x0\`
+   is still required. Correctness uses the identity
+   \`3*e3-1 = t\` (t mod 3 = 2) or \`2t\` (t mod 3 = 1).
+2. \`RadicalRootCtx::sqrt\` (Tonelli-Shanks for p = 1 mod 4):
+   derive Euler's criterion from the already-needed \`a^t2\` by
+   \`s2-1\` squarings; replace \`c^(2^k)\` with k explicit squarings.
+   The p=3 mod 4 branch is unchanged.
+3. \`quad_monic\`: replace the generic \`4*c\` multiplication with
+   two modular doublings. Values are reduced by the existing guarded
+   \`Fp::add\` so noncanonical coefficients also retain semantics.
+
+### Local counter measurements (independent C++ arithmetic mirror)
+
+The test harness uses **the same algorithms** before and after but
+**is not the compiled Rust repository**. It is pinned to AMD EPYC 9V74
+CPU 0, GCC/Clang -O2, 4,096 deterministic operands per square/cube
+test (and 8,192 pairs for quadratic discriminants), thirteen paired
+alternating trials, reported as independent medians. Root inputs
+include actual square/cube residues and nonresidues. For AMM the
+mixed corpus includes early noncube rejection, so a speedup for
+that arm should not be confused with the pure-cube workload.
+
+\`perf_event_open(PERF_TYPE_SOFTWARE, PERF_COUNT_SW_TASK_CLOCK)\` worked;
+the hardware cycles counter returned **ENOENT** (no exposed PMU).
+The \`perf\` command itself could not be installed in this sandbox
+because its package repositories are unreachable. The table below
+is therefore **software task-clock CPU time**, not hardware cycles.
+
+| Kernel and prime | GCC old ns/op | GCC new ns/op | GCC speedup | Clang speedup |
+|---|---:|---:|---:|---:|
+| Tonelli sqrt (squares), p=1,000,000,009 | 432.92 | 291.17 | **1.487x** | 1.552x |
+| Tonelli sqrt (squares), p=998,244,353 | 946.79 | 864.79 | **1.095x** | 1.142x |
+| Tonelli sqrt (squares), p=2,013,265,921 | 1203.29 | 1110.43 | **1.084x** | 1.108x |
+| AMM cube (cubes), p=1,000,000,009 | 474.78 | 322.99 | **1.470x** | 1.454x |
+| AMM cube (mixed), p=1,000,000,009 | 258.97 | 213.70 | **1.212x** | 1.228x |
+| AMM cube (cubes), p=2,013,265,921 | 409.67 | 293.10 | **1.398x** | 1.440x |
+| AMM cube (mixed), p=2,013,265,921 | 222.07 | 182.65 | **1.216x** | 1.209x |
+| Quadratic discriminant, p=1,000,000,009 | 7.800 | 4.637 | **1.682x** | 1.604x |
+| Quadratic discriminant, p=998,244,353 | 7.301 | 4.597 | **1.588x** | 1.610x |
+
+All **51,000** before/after square/cube outputs matched across
+17 prime moduli, including high 2-adicity (p=998244353 and
+p=2013265921), high 3-adicity (p=487, v3(p-1)=5), zero,
+and the 2^61-1 boundary. Discriminants matched exactly for
+8,192 operand pairs per measured prime.
+
+### Actual Rust and CI status
+
+To avoid accepting C++ mirror results as Rust results, the PR includes
+\`radical_power_reuse_matches_frozen_reference\`, a frozen before/after
+test for Fp, Fp2 and Tonelli, plus an **ignored paired Rust benchmark**
+(\`bench_radical_power_reuse\`) against the actual module.
+A dependency-free isolated test crate imports the **actual production
+Rust source by path**, stubbing only unrelated prime-root trace and
+primality APIs. The targeted arithmetic and AMM tests do not call
+the stubs. The standard full-lib CI remains necessary for complete
+polynomial-root and Frobenius fallback validation.
+
+At the time this section was authored, the full-lib CI could not compile
+because of unrelated F4/APS duplicate definitions and missing
+Hilbert-diagnostic interfaces, before any radical correctness tests
+could execute. The separate isolated test gate was added to provide
+direct source-level validation despite that blocker; do not merge
+until it passes. A separate workflow-parse check was also blocked by
+an unrelated unavailable artifact
+\`research/weak_curve_properties_lean_20261011/root_lib.stdout\`.
+
+Neither the above task-clock speedups nor the new unit timings
+establish an end-to-end rootfinder, GPU, or ECDLP improvement.
