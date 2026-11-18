@@ -556,14 +556,14 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
     }
     RF_PROF_STEP(0);
     /* Montgomery's trick: prefix products, one inversion, unwind.
-     * CHUNK >= 8. Host tail chunks that are <= half full omit padding
-     * multiplies entirely. Full/near-full chunks retain the original
-     * fixed length (fewer loop-control penalties); CUDA is unchanged
+     * CHUNK >= 8. Host tails at most three-quarters full omit
+     * padding multiplications (17..24 of 32 benefit too). Near-full
+     * chunks retain the fixed length; CUDA is unchanged
      * for uniform unrolling and warp scheduling.  cnt >= 1 for valid tid. */
 #ifdef __CUDA_ARCH__
     const int inv_len = CHUNK;
 #else
-    const int inv_len = cnt <= (uint32_t)(CHUNK / 2) ? (int)cnt : CHUNK;
+    const int inv_len = cnt <= (uint32_t)((3 * CHUNK) / 4) ? (int)cnt : CHUNK;
 #endif
     elt acc = d[0];
 #pragma unroll
