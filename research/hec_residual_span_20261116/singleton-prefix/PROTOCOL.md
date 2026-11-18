@@ -1,0 +1,11 @@
+# Optimistic singleton producer prefix cost gate
+
+Prospective [pcc:unverified]. Replay each original12 target through the first determining ANCHOR from frozen singleton-rank/SUMMARY.tsv. Caps are supplied offline from prior evidence: this is an optimistic implementation-prefix rejection bound, NOT a public online stopping algorithm or complete solver. No cost credited for stopping, LP elimination or certificate; prefix itself must leave room for them.
+
+Charge valid source/target checks, source binding sC=D, rationalrotation setup, add_place anchor steps, five source-phase evaluations, one batch inverse per anchor, bothsigned slopes, parameter dedup, truncatedquadratic extraction, every split/nonsplit oracle and acceptedordinate reconstruction. Setup selecting the same public source/model and expected rows is outside, which makes this optimistic. Retain identical query/row order. Exact prior accepted row tape through cap must match despite batched inverses/add_place optimization. Diagnostic exact full principal/native identities outside counts, all multiplicities retained.
+
+Two repeats pertarget (24calls), exact16vectors/REDCidentity and row equality. Compare basefield prefixP to complete raw retained_arm0,retained_arm1,derived_candidate_total from core-step-cover/CONTROL.tsv rep0, samep/sm/case. BASELINES.tsv contains exactraw integers, not roundedratio inversion. Report each separately, no percell baseline algorithm selection. Test10P>B; iftrue, retaining this EXACTprefix and addingnonnegativebasework cannot reach10x in thisbasefield primitive. No universal lowerbound, wall/mixedmodulus/externalfastest/coldsolver claim. A changed query order/algorithm may change the bound. Boundary-onlycaps not rowleveloptimum.
+
+Native shared author/library, not independentvalidation. Prior singleton rank coverage remains; no newgenus3/4coverage from thisgate. Sources singleton-rank/RESULTS and allraw, online-lp/RESULTS, affine-lp/RESULTS, orbit-pair-prefix/RESULTS; exactlocal knownLP mechanism, no new literature/novelty claim.
+
+Freeze source/native/import/prior/raw/caps/baselines/protocol/binary hashes and pushGit before one120CPU invocation; raw/exit/hash retained, no rerun/S3/cloud/merge.
