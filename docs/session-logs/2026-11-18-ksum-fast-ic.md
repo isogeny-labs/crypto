@@ -52,3 +52,37 @@
 - The container moved to a different host mid-task; all numbers here are
   from the 2.10 GHz host, baseline re-measured.
 - Disk ran low; deleted stale test binaries in `target/release/deps`.
+
+## 23:55Z: round 2, a sibling probe per walk step
+
+### What was done
+- In `avx::step`, each step now also yields `x(R − W_j)` from the same
+  denominator: one more product and one square. Its logarithm
+  `(la − 2c_j, lb − 2)` is checked against the kept pre-step point. `x_W`
+  is rebuilt from the stored denominator, and the `lb` gather became the
+  constant d = 1. Lane starts now come from step triples, allowing up to
+  4960 lanes. Dead table code was removed and the build is warning-free.
+- Ran round 2: library A, then six fast configurations on 48 targets × 2,
+  then library B. Results are in `research/ksum_fast_ic_20261118/round2/`;
+  RESULTS.md and report.pdf are regenerated.
+
+### Results (`[pcc:unverified]`, all 96 solves checked in every configuration, 0 rejected)
+- Library: 94.9 / 94.8 ms a solve.
+- Round-1 kernel reproduced: 49.7x (round 1: 50.8x).
+- Sibling, A = 16, 256 lanes, 4 threads: 60.4x [58.5, 62.4], 1.57 ms.
+- Sibling, 1 thread: 25.7x.
+- Table once per curve: 168x.
+
+### Decisions made
+- Kept 256 lanes and 4 vectors: 480 lanes and 8 vectors were slower in
+  the 96-solve rounds.
+- Rejected 24-solve sweeps as noise: the host moves by about 25 %.
+
+### Open threads
+- Extra fixed offsets `R ± T_i` per step: about 3.5 products a probe.
+- Build fixed overhead: about 0.6 ms at A = 16.
+- Wider fields; isolated replay; S3 upload of the raw records.
+
+### Errors
+- The container restarted mid-task; a cold `git status` took several
+  minutes.

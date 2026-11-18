@@ -102,6 +102,45 @@ How to read the rows:
   a solve; it has not been re-implemented on this arithmetic, so no
   wall-time comparison with rho is made.
 
+## Round 2: a sibling probe per walk step (post hoc, after round 1)
+
+The walk step computes `R + W_j` through `λ = (y_W − y_R)/(x_W − x_R)`.
+`R − W_j` uses the same denominator, so one more product (its slope) and
+one square (its abscissa) give a second probe point. Its logarithm is
+known: `(a − c_j, b − 1)`, with `(a, b)` taken before the step. A hit on
+it is re-added from the kept pre-step point and verified like any other.
+The same change drops two gathers: `x_W` is rebuilt from the stored
+denominator, and `b` advances by the constant `d_j = 1` of the steps
+`W_j = Q + 2^j G`. The kernel is otherwise unchanged; `KSUM_NOSIB=1`
+switches the sibling off.
+
+Data: `round2/raw/`, 48 targets × 2 rounds per configuration, run as
+library A, fast, library B (94.9 and 94.8 ms, pooled 94.8 ms); commit in
+`round2/source-commit.txt`. Every solve was checked (96/96 in every
+configuration) and no hit was rejected.
+
+| Configuration | Median a solve | Build | Walk | vs library [95 % bootstrap] |
+|---|---|---|---|---|
+| round-1 kernel (no sibling), A = 17, 256 lanes, 4 threads | 1.91 ms | 0.77 ms | 1.05 ms | 49.7x [48.0, 51.3] |
+| sibling, A = 16, 256 lanes, 4 threads | **1.57 ms** | 0.62 ms | 0.87 ms | **60.4x** [58.5, 62.4] |
+| sibling, A = 16, 480 lanes, 4 threads | 1.78 ms | 0.72 ms | 1.04 ms | 53.2x [51.0, 54.8] |
+| sibling, A = 17, 480 lanes, 4 threads | 1.79 ms | 0.84 ms | 0.85 ms | 53.1x [48.3, 55.0] |
+| sibling, A = 16, 480 lanes, 1 thread | 3.69 ms | 1.05 ms | 2.55 ms | **25.7x** [23.9, 26.7] |
+| sibling, table once per curve, A = 21, 480 lanes, 4 threads | 0.56 ms | (once) | 0.45 ms | 168x [164, 172] |
+
+How to read the rows:
+- **Reproduction.** The round-1 kernel reproduces its round-1 result:
+  49.7x here against 50.8x then, on the same host type. The ratios are
+  therefore stable to a few per cent between sessions.
+- **Best per-solve configuration:** the sibling probe at A = 16 with 256
+  lanes on 4 threads, **60.4x** (1.57 ms). On one thread, the like-for-like
+  setting, it is **25.7x**, up from 21x.
+- **What did not help.** More lanes (480) were slower than 256 in this
+  round. A 24-solve sweep had suggested the opposite, but this shared host
+  moves by about 25 % between sweeps, so only the 96-solve rounds are used.
+  A kernel with 8 vectors (64 chains) was also slower than 4 (9.4 against
+  8.1 ns a lane-step).
+
 ## Where the time goes, and what did not work
 
 - **Walk.** About 7 ns a lane-step on one core with the intrinsics kernel.
@@ -135,7 +174,8 @@ How to read the rows:
 ## Files
 
 - `analyze.py` builds `summary.json`, `speedup.svg`, `speedup.png` and
-  `report.pdf` from `raw/*.csv`; `render.js` renders them.
+  `report.pdf` from `raw/*.csv` and `round2/raw/*.csv` (`round2/summary.json`,
+  `round2/speedup.*`); `render.js` renders them.
 - `raw/fast-*.csv`: one row per solve and configuration.
 - `raw/library-lib{A,B}.csv`: one row per ecbench record.
 - `raw/lib{A,B}/`: session, spec and host metadata.

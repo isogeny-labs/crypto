@@ -167,12 +167,6 @@ enum Source {
         lpk: Vec<u64>,
         depth: u32,
     },
-    Last {
-        pe: Vec<u64>,
-        pk: Vec<u64>,
-        lpk: Vec<u64>,
-        depth: u32,
-    },
 }
 
 /// Keys bucketed by their top 16 bits (one counting pass and one
@@ -250,86 +244,6 @@ impl Table {
             Source::Packed(vals),
         )
     }
-    fn from_last(last: LastLevel, p: u64) -> Self {
-        let LastLevel {
-            kp,
-            km,
-            pe,
-            pk,
-            lpk,
-            n,
-            depth,
-        } = last;
-        let bits = 64 - (p - 1).leading_zeros();
-        let shift = bits.saturating_sub(16);
-        let nb = 1usize << 16;
-        let b16 = |k: u32| ((k >> shift) as usize).min(nb - 1);
-        // Pass 1: Bloom filter and top-8-bit counts; scatter by the top 8
-        // bits (256 output streams stay in cache).
-        let mut bloom = Bloom::new(2 * n, bits);
-        let mut c8 = [0usize; 257];
-        for t in 0..n {
-            if kp[t] != u32::MAX {
-                for k in [kp[t], km[t]] {
-                    c8[(b16(k) >> 8) + 1] += 1;
-                    bloom.insert(u64::from(k));
-                }
-            }
-        }
-        for i in 0..256 {
-            c8[i + 1] += c8[i];
-        }
-        let total = c8[256];
-        let mut f8 = c8;
-        let mut tk = vec![0u32; total];
-        let mut tr = vec![0u32; total];
-        for t in 0..n {
-            if kp[t] != u32::MAX {
-                for (k, r) in [(kp[t], 2 * t as u32), (km[t], 2 * t as u32 + 1)] {
-                    let b = b16(k) >> 8;
-                    tk[f8[b]] = k;
-                    tr[f8[b]] = r;
-                    f8[b] += 1;
-                }
-            }
-        }
-        // Pass 2: inside each top bucket (L1-sized), scatter by the next 8
-        // bits into the final arrays; insert order is kept.
-        let mut dir = vec![0u32; nb + 1];
-        let mut keys = vec![0u32; total];
-        let mut refs = vec![0u32; total];
-        for hb in 0..256 {
-            let (lo, hi) = (c8[hb], c8[hb + 1]);
-            let mut cnt = [0usize; 257];
-            for &k in &tk[lo..hi] {
-                cnt[(b16(k) & 255) + 1] += 1;
-            }
-            for i in 0..256 {
-                cnt[i + 1] += cnt[i];
-            }
-            for i in 0..256 {
-                dir[hb * 256 + i] = (lo + cnt[i]) as u32;
-            }
-            let mut fl = cnt;
-            for i in lo..hi {
-                let b = b16(tk[i]) & 255;
-                keys[lo + fl[b]] = tk[i];
-                refs[lo + fl[b]] = tr[i];
-                fl[b] += 1;
-            }
-        }
-        dir[nb] = total as u32;
-        Self {
-            keys,
-            refs,
-            dir,
-            shift,
-            len: total,
-            collisions: 0,
-            bloom,
-            src: Source::Last { pe, pk, lpk, depth },
-        }
-    }
     /// Duplicate keys (the build's collisions), counted on demand.
     fn count_collisions(&self) -> usize {
         let mut c = 0;
@@ -358,10 +272,6 @@ impl Table {
                 let k = llast[e] + 1 + (t - off[e]);
                 pack_push(lpk[e], *depth, k as usize, r & 1 == 1)
             }
-            Source::Last { pe, pk, lpk, depth } => {
-                let t = (r / 2) as usize;
-                pack_push(lpk[pe[t] as usize], *depth, pk[t] as usize, r & 1 == 1)
-            }
         }
     }
     #[inline(always)]
@@ -385,18 +295,6 @@ impl Table {
 }
 
 /// The last build level in SoA form (`n` live-or-flagged pairs).
-/// Keys `x(S ± P_k)` as `u32` (`u32::MAX`: an exceptional pair, absent);
-/// key `2t + sign` belongs to pair `t = (pe[t], pk[t])`.
-struct LastLevel {
-    kp: Vec<u32>,
-    km: Vec<u32>,
-    pe: Vec<u64>,
-    pk: Vec<u64>,
-    lpk: Vec<u64>,
-    n: usize,
-    depth: u32,
-}
-
 /// Packed signed index tuple: per summand 10 bits of index and 1 sign bit.
 const IDX_BITS: u32 = 11;
 
@@ -2675,11 +2573,14 @@ fn main() {
                 (&owned, invs, skipped, t_sort.elapsed().as_secs_f64() * 1e3)
             };
             let raw = table.keys.len();
-            let collisions = if std::env::var_os("KSUM_COLLISIONS").is_some() {
-                table.count_collisions()
-            } else {
-                0
-            };
+            let collisions =
+                table
+                    .collisions
+                    .max(if std::env::var_os("KSUM_COLLISIONS").is_some() {
+                        table.count_collisions()
+                    } else {
+                        0
+                    });
             let t_build = t0.elapsed().as_secs_f64();
             // Walk steps W_j = c_j G + d_j Q (charged too).
             let mut wops = GroupOps::default();
