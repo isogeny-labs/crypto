@@ -423,3 +423,14 @@ The independent verifier source is now bound in
 `INDEPENDENT_VERIFIER_GATE.md`. Its target-admission run has not started
 because the mandatory cryptanalysis checkpoint upload credential is absent;
 this blocks the producer run rather than weakening the gate. [pcc:unverified]
+
+The excluded-fixture
+[invariant-moment predicate experiment](INVARIANT_MOMENT_PREDICATE_EXPERIMENT.md)
+then tested one bounded public-digit candidate without touching the frozen OOS
+cohort. Across 576 model-target records, jet/direct/repeat identities and all
+native/isomorphic-model invariants agree. None of the 11,520 preregistered
+single-channel predicates is exact on either curve or the combined six rows;
+the best target score is 65/288, below the fixed shuffled-label control's
+69/288. This rejects that exact six-bin decoder, not every relational or
+multi-channel observable, and supplies no ECDLP or runtime theorem.
+[pcc:unverified]
