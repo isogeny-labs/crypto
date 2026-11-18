@@ -531,8 +531,18 @@ pub fn run_pipeline_public<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<RunReport, String> {
-    run_pipeline_inner(ctx, spec, base_builder, oracle, None, calib, rho_s, None, None)
-        .map(|(report, _)| report)
+    run_pipeline_inner(
+        ctx,
+        spec,
+        base_builder,
+        oracle,
+        None,
+        calib,
+        rho_s,
+        None,
+        None,
+    )
+    .map(|(report, _)| report)
 }
 
 #[allow(clippy::too_many_arguments, clippy::type_complexity)]

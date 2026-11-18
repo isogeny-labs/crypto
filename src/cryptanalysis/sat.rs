@@ -4142,7 +4142,13 @@ impl Solver {
             if self.event_failure.is_some() || self.native_failure.is_some() {
                 return SolveResult::Unknown;
             }
-            let result = self.solve_with_lazy_clauses_inner(trigger_vars, theory, trace, assumptions, incremental);
+            let result = self.solve_with_lazy_clauses_inner(
+                trigger_vars,
+                theory,
+                trace,
+                assumptions,
+                incremental,
+            );
             if self.event_failure.is_some() || self.native_failure.is_some() {
                 return SolveResult::Unknown;
             }
@@ -7641,7 +7647,10 @@ mod tests {
         }
         let r = fresh.solve();
         if r == SolveResult::Sat {
-            assert!(assump_model_ok(inst, &fresh, assumptions), "reference model");
+            assert!(
+                assump_model_ok(inst, &fresh, assumptions),
+                "reference model"
+            );
         }
         r
     }
@@ -7682,9 +7691,16 @@ mod tests {
             }
             // Still answers the unassumed question.
             assert_eq!(s.solve(), base, "trial {trial}: solve() after assumptions");
-            assert_eq!(s.solve_with_assumptions(&[]), base, "trial {trial}: empty set");
+            assert_eq!(
+                s.solve_with_assumptions(&[]),
+                base,
+                "trial {trial}: empty set"
+            );
         }
-        assert!(n_sat > 200 && n_unsat > 200, "sat {n_sat} unsat {n_unsat} of {n_calls}");
+        assert!(
+            n_sat > 200 && n_unsat > 200,
+            "sat {n_sat} unsat {n_unsat} of {n_calls}"
+        );
     }
 
     #[test]
@@ -7741,12 +7757,19 @@ mod tests {
             let k = k.min(n);
             for branch in 0..(1u32 << k) {
                 let a: Vec<Lit> = (0..k)
-                    .map(|j| if branch >> j & 1 == 1 { (j + 1) as Lit } else { -((j + 1) as Lit) })
+                    .map(|j| {
+                        if branch >> j & 1 == 1 {
+                            (j + 1) as Lit
+                        } else {
+                            -((j + 1) as Lit)
+                        }
+                    })
                     .collect();
                 let brute = (0..(1u32 << n)).any(|x| {
                     (0..k).all(|j| (x >> j & 1) == (branch >> j & 1))
                         && inst.clauses.iter().all(|c| {
-                            c.iter().any(|&l| (x >> (l.unsigned_abs() - 1) & 1 == 1) == (l > 0))
+                            c.iter()
+                                .any(|&l| (x >> (l.unsigned_abs() - 1) & 1 == 1) == (l > 0))
                         })
                         && inst.xors.iter().all(|(vars, rhs)| {
                             vars.iter().filter(|&&v| x >> (v - 1) & 1 == 1).count() % 2
@@ -7754,7 +7777,11 @@ mod tests {
                         })
                 });
                 let got = s.solve_with_assumptions(&a);
-                assert_eq!(got == SolveResult::Sat, brute, "trial {trial} branch {branch}");
+                assert_eq!(
+                    got == SolveResult::Sat,
+                    brute,
+                    "trial {trial} branch {branch}"
+                );
                 assert_ne!(got, SolveResult::Unknown);
                 if got == SolveResult::Sat {
                     assert!(assump_model_ok(&inst, &s, &a));
