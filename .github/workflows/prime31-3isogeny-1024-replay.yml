@@ -9,6 +9,7 @@ on:
   pull_request:
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_isogeny_1024_certificate_replay.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_isogeny_1024.py'
       - '.github/workflows/prime31-3isogeny-1024-replay.yml'
   workflow_dispatch:
 permissions:
@@ -25,6 +26,7 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             research/prime31_ic_20261115/native/examples/prime31_isogeny_1024_certificate_replay.rs
+            research/prime31_ic_20261115/native/verify_prime31_isogeny_1024.py
             research/prime31_ic_20261115/native/DICKSON31_COMPLETE_RANK_1024_RAW_20261117.json
           sparse-checkout-cone-mode: false
       - name: Fetch pinned original Rust arithmetic and algebraic engine
@@ -54,6 +56,11 @@ jobs:
         run: |
           set -euo pipefail
           cargo +1.100.0 run --release --locked --example prime31_isogeny_1024_certificate_replay --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml | tee prime31-isogeny-1024-replay.json
+      - name: Independent Python 1024-target E and Eprime replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/prime31_ic_20261115/native/verify_prime31_isogeny_1024.py research/prime31_ic_20261115/native/DICKSON31_COMPLETE_RANK_1024_RAW_20261117.json prime31-isogeny-1024-replay.json | tee prime31-isogeny-1024-independent.json
       - name: Preserve exact-source counters and validation readback
         if: always()
         uses: actions/upload-artifact@v4
