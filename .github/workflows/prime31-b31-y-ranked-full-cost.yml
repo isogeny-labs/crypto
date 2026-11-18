@@ -5,10 +5,12 @@ on:
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
       - 'research/prime31_ic_20261115/native/B31_Y_RANKED_COMPLETE_PROTOCOL_20261118.md'
+      - 'research/prime31_ic_20261115/native/verify_b31_y_ranked.py'
       - '.github/workflows/prime31-b31-y-ranked-full-cost.yml'
   pull_request:
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - 'research/prime31_ic_20261115/native/verify_b31_y_ranked.py'
       - '.github/workflows/prime31-b31-y-ranked-full-cost.yml'
   workflow_dispatch:
 permissions:
@@ -25,6 +27,7 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs
+            research/prime31_ic_20261115/native/verify_b31_y_ranked.py
           sparse-checkout-cone-mode: false
       - name: Checkout pinned original Rust arithmetic
         uses: actions/checkout@v4
@@ -57,6 +60,11 @@ jobs:
         run: |
           set -o pipefail
           cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle actual_prime31_b31_firstx_vs_dickson_256q_complete_cost -- --nocapture --test-threads=1 2>&1 | tee prime31-y-ranked-ba.log
+      - name: Independent Python BigInt replay of every recovered logarithm and signed relation
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 research/prime31_ic_20261115/native/verify_b31_y_ranked.py prime31-y-ranked-ab.log prime31-y-ranked-ba.log 2>&1 | tee prime31-y-ranked-independent-replay.log
       - name: Check full-solver and corpus gates
         run: |
           grep -Fq 'test result: ok. 1 passed;' prime31-y-ranked-ab.log
@@ -68,6 +76,9 @@ jobs:
           grep -Fq '"unknown_logs_recovered":256' prime31-y-ranked-ab.log
           grep -Fq '"rank":31' prime31-y-ranked-ba.log
           grep -Fq '"same_public_target_count":256' prime31-y-ranked-ba.log
+          grep -Fq '"independent_bigint_arithmetic":true' prime31-y-ranked-independent-replay.log
+          grep -Fq '"signed_witnesses":1024' prime31-y-ranked-independent-replay.log
+          grep -Fq '"target_logs":1024' prime31-y-ranked-independent-replay.log
       - name: Archive raw Rust corpus, rows and wall times
         if: always()
         uses: actions/upload-artifact@v4
@@ -76,5 +87,6 @@ jobs:
           path: |
             prime31-y-ranked-ab.log
             prime31-y-ranked-ba.log
+            prime31-y-ranked-independent-replay.log
           retention-days: 30
           if-no-files-found: warn
