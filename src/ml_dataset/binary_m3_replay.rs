@@ -2,7 +2,7 @@
 use super::*;
 use crate::ml_dataset::types::{Artifact, CaseConfig, CaseData};
 use serde_json::Value;
-#[path="binary_m3_boolean_replay.rs"]
+#[path = "binary_m3_boolean_replay.rs"]
 mod boolean_replay;
 pub(in crate::ml_dataset) use boolean_replay::Projection as BooleanProjection;
 
@@ -40,7 +40,9 @@ impl OriginalAdmission for ReplayAdmission {
         Ok(())
     }
     fn check_deadline(&mut self) -> Result<(), Failure> {
-        if Instant::now() >= self.deadline { return Err(Failure::Admission); }
+        if Instant::now() >= self.deadline {
+            return Err(Failure::Admission);
+        }
         Ok(())
     }
 }
@@ -126,7 +128,7 @@ fn exact_index_endpoint(
             }
 }
 
-fn root<'a>(artifacts: &'a [Artifact], slot: Slot) -> Result<Option<&'a Artifact>, String> {
+fn root(artifacts: &[Artifact], slot: Slot) -> Result<Option<&Artifact>, String> {
     let (path, role, _encoding) = slot.identity();
     let selected: Vec<_> = artifacts
         .iter()
@@ -162,34 +164,54 @@ fn validate_reserved_artifacts(artifacts: &[Artifact]) -> Result<(), String> {
         root(artifacts, slot)?;
     }
     for artifact in artifacts {
-        let path = artifact.path.strip_prefix("live/payloads/").unwrap_or(&artifact.path);
-        if (path.starts_with("binary-m3-") || path.starts_with("partial-binary-m3-")
+        let path = artifact
+            .path
+            .strip_prefix("live/payloads/")
+            .unwrap_or(&artifact.path);
+        if (path.starts_with("binary-m3-")
+            || path.starts_with("partial-binary-m3-")
             || artifact.role.starts_with("restricted-binary-m3-"))
-            && !Slot::ALL.iter().chain(OPTIONAL_BOOLEAN_SLOTS.iter()).any(|s| {
-                let (p,r,e)=s.identity(); path==p && artifact.role==r && artifact.encoding==e
-            })
-            && !(artifact.role=="unregistered-partial-artifact" && artifact.encoding=="native") {
+            && !Slot::ALL
+                .iter()
+                .chain(OPTIONAL_BOOLEAN_SLOTS.iter())
+                .any(|s| {
+                    let (p, r, e) = s.identity();
+                    path == p && artifact.role == r && artifact.encoding == e
+                })
+            && !(artifact.role == "unregistered-partial-artifact" && artifact.encoding == "native")
+        {
             return Err("unknown or relabeled reserved ordinary artifact".into());
         }
     }
     for slot in OPTIONAL_BOOLEAN_SLOTS {
-        let original=root(artifacts,slot)?;
-        let (path,role,encoding)=slot.identity();
-        let mut captured:Option<&Artifact>=None;
+        let original = root(artifacts, slot)?;
+        let (path, role, encoding) = slot.identity();
+        let mut captured: Option<&Artifact> = None;
         for artifact in artifacts {
-            let Some(normalized)=artifact.path.strip_prefix("live/payloads/") else {continue};
-            if normalized!=path && artifact.role!=role {continue;}
+            let Some(normalized) = artifact.path.strip_prefix("live/payloads/") else {
+                continue;
+            };
+            if normalized != path && artifact.role != role {
+                continue;
+            }
             // Raw collector custody remains unknown, just as for root(...).
-            if normalized==path && artifact.role=="unregistered-partial-artifact"
-                && artifact.encoding=="native" {continue;}
-            if normalized!=path || artifact.role!=role || artifact.encoding!=encoding
-                || captured.is_some() {
+            if normalized == path
+                && artifact.role == "unregistered-partial-artifact"
+                && artifact.encoding == "native"
+            {
+                continue;
+            }
+            if normalized != path
+                || artifact.role != role
+                || artifact.encoding != encoding
+                || captured.is_some()
+            {
                 return Err("optional Boolean captured identity/uniqueness mismatch".into());
             }
-            if original.is_some_and(|a|a.sha256!=artifact.sha256 || a.bytes!=artifact.bytes) {
+            if original.is_some_and(|a| a.sha256 != artifact.sha256 || a.bytes != artifact.bytes) {
                 return Err("optional Boolean root/captured content mismatch".into());
             }
-            captured=Some(artifact);
+            captured = Some(artifact);
         }
     }
     Ok(())
@@ -213,7 +235,7 @@ pub(in crate::ml_dataset::solvers) fn verify(
     outcome: &Value,
     artifacts: &[Artifact],
 ) -> Result<Option<Value>, String> {
-    verify_with_projection(dir,config,outcome,artifacts,None)
+    verify_with_projection(dir, config, outcome, artifacts, None)
 }
 
 pub(in crate::ml_dataset::solvers) fn verify_with_projection(
@@ -221,7 +243,7 @@ pub(in crate::ml_dataset::solvers) fn verify_with_projection(
     config: &CaseConfig,
     outcome: &Value,
     artifacts: &[Artifact],
-    mut projection:Option<&mut Option<BooleanProjection>>,
+    mut projection: Option<&mut Option<BooleanProjection>>,
 ) -> Result<Option<Value>, String> {
     let reserved_source = is_source(outcome, artifacts);
     let expected_route = config.family == "binary"
@@ -330,10 +352,18 @@ pub(in crate::ml_dataset::solvers) fn verify_with_projection(
     let math = solvers::binary_m3_original::authenticate(Profile::OrdinaryBinary, config, &case)?;
     validate_reserved_artifacts(artifacts)?;
     let mut admission = ReplayAdmission {
-        deadline: Instant::now() + std::time::Duration::from_secs(30), work: 0, bytes: 0 };
+        deadline: Instant::now() + std::time::Duration::from_secs(30),
+        work: 0,
+        bytes: 0,
+    };
     if projection.is_some() {
         // Prepay the bounded terminal unknown record before any optional refusal.
-        admission.reserve(Quote{work:32_768,bytes:16_384}).map_err(|_|"Boolean projection terminal admission")?;
+        admission
+            .reserve(Quote {
+                work: 32_768,
+                bytes: 16_384,
+            })
+            .map_err(|_| "Boolean projection terminal admission")?;
     }
     let admitted_prefix = capture::verify_live_committed_prefix(dir, &binding, &capture_limits)?;
     let captured_input = admitted_prefix.as_ref().and_then(|p| {
@@ -976,12 +1006,25 @@ pub(in crate::ml_dataset::solvers) fn verify_with_projection(
             return Err(format!("ordinary unsupported outcome claim {key}"));
         }
     }
-    let boolean = boolean_replay::verify_optional(dir, artifacts, &binding, limits,
-        &capture_limits, &config_bytes, &public_bytes, &factor_bytes,
-        input_bytes.as_deref(), result.as_ref(), &mut admission, projection.as_deref_mut())?;
-    if let Some(slot)=projection { if slot.is_none() && !matches!(boolean,boolean_replay::Assessment::Absent) {
-        *slot=Some(BooleanProjection::restricted(&boolean,admission.deadline)?);
-    }}
+    let boolean = boolean_replay::verify_optional(
+        dir,
+        artifacts,
+        &binding,
+        limits,
+        &capture_limits,
+        &config_bytes,
+        &public_bytes,
+        &factor_bytes,
+        input_bytes.as_deref(),
+        result.as_ref(),
+        &mut admission,
+        projection.as_deref_mut(),
+    )?;
+    if let Some(slot) = projection {
+        if slot.is_none() && !matches!(boolean, boolean_replay::Assessment::Absent) {
+            *slot = Some(BooleanProjection::restricted(&boolean, admission.deadline)?);
+        }
+    }
     Ok(Some(
         serde_json::json!({"scope":"ordinary-original-bound-native-and-signed-replay",
         "boolean_identity_replay":boolean,
@@ -1080,8 +1123,8 @@ fn check_matrix_events(
         let ordered = match next {
             1 => phase == 0,
             2 => matches!(phase, 1 | 2),
-            3 => matches!(phase, 1 | 2 | 3),
-            4 => matches!(phase, 1 | 2 | 3),
+            3 => matches!(phase, 1..=3),
+            4 => matches!(phase, 1..=3),
             5..=7 => phase + 1 == next,
             _ => false,
         };
@@ -1334,54 +1377,84 @@ mod exact_index_endpoint_tests {
 #[cfg(test)]
 mod optional_boolean_identity_tests {
     use super::*;
-    fn artifact(slot:Slot, live:bool)->Artifact {
-        let (path,role,encoding)=slot.identity();
-        Artifact {path:if live {format!("live/payloads/{path}")}else{path.into()},
-            role:role.into(),encoding:encoding.into(),sha256:"a".repeat(64),bytes:123}
+    fn artifact(slot: Slot, live: bool) -> Artifact {
+        let (path, role, encoding) = slot.identity();
+        Artifact {
+            path: if live {
+                format!("live/payloads/{path}")
+            } else {
+                path.into()
+            },
+            role: role.into(),
+            encoding: encoding.into(),
+            sha256: "a".repeat(64),
+            bytes: 123,
+        }
     }
     #[test]
     fn exact_optional_roots_and_normalized_payloads_are_custody_only() {
         assert!(validate_reserved_artifacts(&[]).is_ok());
         for slot in OPTIONAL_BOOLEAN_SLOTS {
-            let root_artifact=artifact(slot,false);
-            let captured=artifact(slot,true);
+            let root_artifact = artifact(slot, false);
+            let captured = artifact(slot, true);
             assert!(validate_reserved_artifacts(std::slice::from_ref(&root_artifact)).is_ok());
             assert!(validate_reserved_artifacts(std::slice::from_ref(&captured)).is_ok());
-            assert!(validate_reserved_artifacts(&[root_artifact.clone(),captured.clone()]).is_ok());
-            assert!(validate_reserved_artifacts(&[root_artifact.clone(),root_artifact.clone()]).is_err());
-            assert!(validate_reserved_artifacts(&[captured.clone(),captured.clone()]).is_err());
-            let mut changed=captured;
-            changed.sha256="b".repeat(64);
-            assert!(validate_reserved_artifacts(&[root_artifact.clone(),changed.clone()]).is_err());
-            changed.sha256=root_artifact.sha256.clone();changed.bytes+=1;
-            assert!(validate_reserved_artifacts(&[root_artifact,changed]).is_err());
+            assert!(
+                validate_reserved_artifacts(&[root_artifact.clone(), captured.clone()]).is_ok()
+            );
+            assert!(
+                validate_reserved_artifacts(&[root_artifact.clone(), root_artifact.clone()])
+                    .is_err()
+            );
+            assert!(validate_reserved_artifacts(&[captured.clone(), captured.clone()]).is_err());
+            let mut changed = captured;
+            changed.sha256 = "b".repeat(64);
+            assert!(
+                validate_reserved_artifacts(&[root_artifact.clone(), changed.clone()]).is_err()
+            );
+            changed.sha256 = root_artifact.sha256.clone();
+            changed.bytes += 1;
+            assert!(validate_reserved_artifacts(&[root_artifact, changed]).is_err());
         }
     }
     #[test]
     fn optional_unknown_relabel_and_encoding_mutations_refuse() {
         for slot in OPTIONAL_BOOLEAN_SLOTS {
-            for live in [false,true] {
+            for live in [false, true] {
                 for mutation in 0..4 {
-                    let mut bad=artifact(slot,live);
+                    let mut bad = artifact(slot, live);
                     match mutation {
-                        0=>bad.role.push_str("-foreign"),
-                        1=>bad.encoding="jsonl".into(),
-                        2=>bad.path=if live {"live/payloads/binary-m3-forged.json".into()}else{"binary-m3-forged.json".into()},
-                        _=>{bad.path="binary-m3-unknown.json".into();bad.role="restricted-binary-m3-unknown/v1".into();},
+                        0 => bad.role.push_str("-foreign"),
+                        1 => bad.encoding = "jsonl".into(),
+                        2 => {
+                            bad.path = if live {
+                                "live/payloads/binary-m3-forged.json".into()
+                            } else {
+                                "binary-m3-forged.json".into()
+                            }
+                        }
+                        _ => {
+                            bad.path = "binary-m3-unknown.json".into();
+                            bad.role = "restricted-binary-m3-unknown/v1".into();
+                        }
                     }
                     assert!(validate_reserved_artifacts(&[bad]).is_err());
                 }
-                let mut raw=artifact(slot,live);
-                raw.role="unregistered-partial-artifact".into();raw.encoding="native".into();
+                let mut raw = artifact(slot, live);
+                raw.role = "unregistered-partial-artifact".into();
+                raw.encoding = "native".into();
                 assert!(validate_reserved_artifacts(std::slice::from_ref(&raw)).is_ok());
                 // Raw residual custody is never selected as an admitted root.
-                assert!(root(&[raw],slot).unwrap().is_none());
+                assert!(root(&[raw], slot).unwrap().is_none());
             }
         }
     }
 }
 
 #[cfg(test)]
-pub(super) fn test_boolean_successful_interval(before: &Value, after: &Value) -> Result<(), String> {
-    boolean_replay::test_successful_interval(before,after)
+pub(super) fn test_boolean_successful_interval(
+    before: &Value,
+    after: &Value,
+) -> Result<(), String> {
+    boolean_replay::test_successful_interval(before, after)
 }

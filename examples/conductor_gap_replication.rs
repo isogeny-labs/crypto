@@ -659,6 +659,7 @@ fn check_cm_bases(out: &Path) {
             r: u(c, "r"),
             cofactor: 1,
             generator: (u(c, "gx"), u(c, "gy")),
+            representation: None,
         };
         let ctx = InstanceCtx {
             group: &inst.curve,

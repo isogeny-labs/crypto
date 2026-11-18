@@ -1,5 +1,9 @@
 //! Mandatory producer-ledger boundary after mathematical initial marking.
 use super::*;
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "sat_producer_ledger.rs"]
 pub(super) mod ledger;
 pub(in crate::ml_dataset::solvers) struct WithLedger<'a> {
@@ -12,6 +16,10 @@ pub(in crate::ml_dataset::solvers) struct Failed<'a> {
     pub stop: Stop,
 }
 /// Consumes the actual native owner. No new Budget, deadline or sink is created.
+#[allow(
+    clippy::result_large_err,
+    reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+)]
 pub(in crate::ml_dataset::solvers) fn finish<'a>(
     stage: NativeInitial<'a>,
 ) -> Result<WithLedger<'a>, Failed<'a>> {
@@ -78,8 +86,8 @@ impl WithLedger<'_> {
             super::super::super::Phase::Complete => ledger::Phase::Complete,
         };
         // A successful initial checkpoint cannot conceal an earlier stop.
-        if b.stopped.is_some() {
-            return Err(b.stopped.unwrap());
+        if let Some(stop) = b.stopped {
+            return Err(stop);
         }
         self.pending = Some(ledger::Checkpoint {
             schema: ledger::SCHEMA.into(),
