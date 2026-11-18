@@ -236,3 +236,6 @@ quotient, non-kernel images and paired endpoint measurements remain open.
 
 
 The [endpoint record join](endpoint-join-20261118/RESULTS.md) now preserves original endpoint workload/record identities, missing/failure/warmup rows and raw numeric tokens. Native codec controls and frozen two-field plan selections are qualified; statistical and wall admission, actual measured sessions and the original explicit prime-conductor crossing remain open. [pcc:unverified]
+
+
+The [retained-fixture conductor audit](fixture-conductor-audit-20261118/README.md) now classifies four existing explicit maps using actual geometric endomorphism orders. In particular, degree10009 joins conductor-three curves; it is horizontal. The actual202bit-field degree2 control joins conductor one to two. Direct native PARI sums verify the original input/image/scalar panels. This adds no80bit crossing or timing session and leaves prior generic null fields unchanged. [pcc:unverified]
