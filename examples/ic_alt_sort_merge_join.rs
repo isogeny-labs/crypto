@@ -83,7 +83,7 @@ fn is_prime(n: u64) -> bool {
     }
     let mut d = 2;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             return false;
         }
         d += 1;
@@ -322,7 +322,7 @@ fn radix_sort(v: &mut Vec<u64>, tmp: &mut Vec<u64>, c: &mut Cnt) {
         }
         std::mem::swap(v, tmp);
         c.words += 5 * n as u64 + 256;
-        c.lines += 3 * ((n as u64 * 8 + 63) / 64); // hist read, scatter read, scatter write (est.)
+        c.lines += 3 * (n as u64 * 8).div_ceil(64); // hist read, scatter read, scatter write (est.)
     }
 }
 
@@ -418,7 +418,7 @@ fn batch_arm(t: &Table, n: usize, seed: u64, kq: u64, bs: usize, gallop: bool) -
                 }
             }
         }
-        c.lines += (m as u64 * 8 + 63) / 64; // batch array read in merge
+        c.lines += (m as u64 * 8).div_ceil(64); // batch array read in merge
         tl += l0.elapsed().as_secs_f64();
         done += m;
     }
