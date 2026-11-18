@@ -1012,10 +1012,18 @@ fn main() {
         for (i, arm) in TUNED_ARMS.iter().enumerate() {
             tuned_ns.insert(arm.0.to_string(), json!(tuned_best[i] * 1e9 / points));
         }
-        // Lever 4 again on the best probe-side arm.
-        let best_arm = TUNED_ARMS[(0..TUNED_ARMS.len())
+        // Lever 4 again on the fastest probe-side configuration: the best
+        // tuned arm, or the plain fused arm with the one-multiply filter.
+        let tuned_i = (0..TUNED_ARMS.len())
             .min_by(|&x, &y| tuned_best[x].total_cmp(&tuned_best[y]))
-            .unwrap()];
+            .unwrap();
+        let use_cheap = t_cheap_pipe < tuned_best[tuned_i];
+        let best_arm = if use_cheap {
+            TUNED_ARMS[0]
+        } else {
+            TUNED_ARMS[tuned_i]
+        };
+        let thread_filter = if use_cheap { &bloom8c } else { &bloom8 };
         let mut tuned_threads_ns = serde_json::Map::new();
         if best_k == 16 {
             for &nt in &thread_set {
@@ -1025,7 +1033,7 @@ fn main() {
                         let hs: Vec<_> = (0..nt)
                             .map(|i| {
                                 let part = &tm[i * per..(i + 1) * per];
-                                let (f, bx, by, fast, bl) = (&f, &bx, &by, &fast, &bloom8);
+                                let (f, bx, by, fast, bl) = (&f, &bx, &by, &fast, thread_filter);
                                 s.spawn(move || {
                                     pipeline_tuned_any(
                                         best_arm, best_simd, f, bx, by, part, bl, fast,
@@ -1109,6 +1117,7 @@ fn main() {
                 "fused_ns_per_point_no_filter_mix_set": t_fused_nofilter * 1e9 / points,
                 "probe_side_ns_per_point_by_arm": tuned_ns,
                 "probe_side_best_arm": best_arm.0,
+                "probe_side_threads_use_cheap_hash": use_cheap,
                 "cheap_hash_filter8_ns_per_probe": t_cheap_filter * 1e9 / probes,
                 "cheap_hash_filter8_false_positive_rate": cheap_fpr,
                 "cheap_hash_fused_ns_per_point": t_cheap_pipe * 1e9 / points,
