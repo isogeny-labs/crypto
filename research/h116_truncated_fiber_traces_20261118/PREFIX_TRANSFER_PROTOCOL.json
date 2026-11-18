@@ -1,0 +1,25 @@
+{
+  "schema": "h116.prefix-transfer-protocol/v1",
+  "protocol_id": "H116-PREFIX-TRANSFER-001",
+  "frozen_before_execution": true,
+  "primes": [23, 31, 43, 211, 587],
+  "cutoffs": [1, 2, 10, 22],
+  "base_unit": "f_0=2; f_i=i^2+3i+2 mod p for i>0",
+  "correction": "c=(5m+7) mod p at degree m",
+  "prediction": {
+    "case_count": 20,
+    "local_parameter_first_difference": "m+1",
+    "normalized_inverse_square_first_difference": "m",
+    "normalized_inverse_square_boundary_delta": "-2*c*f_0^-3 mod p",
+    "zero_correction_equal": true,
+    "shifted_correction_local_first_difference": "m+2",
+    "shifted_correction_inverse_square_first_difference": "m+1"
+  },
+  "invalidation": [
+    "any listed correction is zero",
+    "any lower coefficient differs",
+    "any boundary coefficient disagrees with the closed-form prediction",
+    "either negative control fails"
+  ],
+  "replacement_cases": 0
+}
