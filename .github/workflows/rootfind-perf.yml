@@ -1,0 +1,158 @@
+name: Rootfinder host perf validation
+
+# Install the perf CLI in a fresh Linux runner, then benchmark the actual
+# headers. GitHub-hosted VMs may lack hardware PMU access; in that case
+# compilation and correctness still run, while counters are explicitly skipped.
+on:
+  pull_request:
+    paths:
+      - 'gpu/rootfind/**'
+      - '.github/workflows/rootfind-perf.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  host-perf:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            gpu/rootfind
+
+      - name: Install Linux perf
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends linux-tools-common linux-tools-generic
+          kernel_tools="linux-tools-$(uname -r)"
+          if apt-cache show "$kernel_tools" >/dev/null 2>&1; then
+            sudo apt-get install -y --no-install-recommends "$kernel_tools"
+          fi
+          # Ubuntu's wrapper may not find tools matching the hosted VM kernel.
+          if ! perf --version >/dev/null 2>&1; then
+            perf_bin=$(find /usr/lib/linux-tools -type f -name perf -executable | sort -V | tail -n 1)
+            test -n "$perf_bin"
+            sudo ln -s "$perf_bin" /usr/local/bin/perf
+          fi
+          command -v perf
+          perf --version
+          echo "Kernel: $(uname -r)"
+          echo "perf_event_paranoid: $(cat /proc/sys/kernel/perf_event_paranoid)"
+          echo "Installed perf: $(perf --version)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build and verify shared rootfinder headers
+        run: |
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-tail-threshold bench-pair-sweep bench-chain256 bench-thread-map bench-from256
+
+      - name: Record before and after perf counters when accessible
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/rootfind-perf"
+          events=cycles,instructions,branches,branch-misses,cache-misses
+          if ! perf stat -e "$events" -- true > "$RUNNER_TEMP/rootfind-perf/pmu-probe.txt" 2>&1; then
+            {
+              echo "## PMU unavailable"
+              echo "perf is installed, and correctness passed, but this runner does"
+              echo "not expose hardware PMU events. Run this job on a self-hosted"
+              echo "PMU-enabled runner for cycle and instruction counters."
+              echo
+              echo 'Probe output:'
+              echo '~~~'
+              cat "$RUNNER_TEMP/rootfind-perf/pmu-probe.txt"
+              echo '~~~'
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # taskset must use an allowed CPU in a restricted cpuset.
+          cpu=$(awk '/Cpus_allowed_list:/{split($2, a, /[,-]/);print a[1]}' /proc/self/status)
+          : "${cpu:=0}"
+          for bin in bench_host_inv bench_host_inv256; do
+            for arm in inv-before inv-after batch32-before batch32-after; do
+              name="${bin}-${arm}"
+              perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/${name}.txt" \
+                -- taskset -c "$cpu" "gpu/rootfind/$bin" "--perf-$arm"
+              cat "$RUNNER_TEMP/rootfind-perf/${name}.txt"
+            done
+          done
+          # P-256 MAC arms isolate the native 128-bit change from older chain
+          # and batch inversion changes.
+          for arm in before after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/mul256-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_mul256 "--perf-$arm"
+          done
+          # Montgomery-to-canonical conversion without generic multiply-by-one.
+          for arm in before after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/from256-${arm}.txt" \\
+              -- taskset -c "$cpu" gpu/rootfind/bench_from256 "--perf-$arm"
+          done
+          # Sparse P-256 modulus arm, compared against the immediately
+          # preceding native-u128 MAC algorithm (not the older MAC baseline).
+          for arm in before after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/sparse256-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_sparse256 "--perf-$arm"
+          done
+          # Isolated 256-bit host carry/borrow chains. They use the same
+          # deterministic operand corpus for before and after.
+          for arm in adc-before adc-after sbb-before sbb-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/carry256-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_carry256 "--perf-$arm"
+          done
+          # Isolated P-256 modular subtraction and negation, both host-only.
+          for arm in sub-before sub-after neg-before neg-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/subneg256-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_subneg256 "--perf-$arm"
+          done
+          # Branchy-vs-branchless host Fp64 modular subtraction.
+          for arm in before after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/sub64-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_sub64 "--perf-$arm"
+          done
+          # Short-tail batch inversion, comparing 8-of-32 against full chunks.
+          for arm in tail8-before tail8-after full32-before full32-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/tail-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_tail_core "--perf-$arm"
+          done
+          # Incremental 16->24/32 CPU host tail cutoff, with full controls.
+          for arm in tail17-before tail17-after tail20-before tail20-after \
+                     tail24-before tail24-after tail28-before tail28-after \
+                     full32-before full32-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/tail-threshold-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_tail_threshold "--perf-$arm"
+          done
+          # Pair-table and two-sign S3 sweep, frozen baseline vs actual header.
+          for arm in pair-before pair-after sweep-before sweep-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/pairsweep-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_pair_sweep "--perf-$arm"
+          done
+          # Inversion-core arms are in addition to the field-inversion arms.
+          for arm in oracle16-before oracle16-after oracle32-before oracle32-after \
+                     pair16-before pair16-after pair1-before pair1-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/batch-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_batch_core "--perf-$arm"
+          done
+          # Fixed P-256 inverse chain vs the immediately preceding radix16 chain.
+          for arm in before after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/chain256-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_chain256 "--perf-$arm"
+          done
+          # Guarded host 32-bit thread mapping and unchanged 64-bit fallback.
+          for arm in map32-before map32-after map64-before map64-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/map-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_thread_map "--perf-$arm"
+          done
+          echo "Hardware PMU measurements saved as the rootfind-perf artifact." >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-perf
+          path: ${{ runner.temp }}/rootfind-perf/
+          if-no-files-found: ignore

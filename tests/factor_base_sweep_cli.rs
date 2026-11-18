@@ -1,12 +1,14 @@
 //! Public-fixture integration checks for the actual supervisor/worker CLI.
 use serde_json::{json, Value};
+#[cfg(target_os = "linux")]
+use std::time::{Duration, Instant};
 use std::{
     fs,
     path::{Path, PathBuf},
     process::{Command, Output},
     sync::atomic::{AtomicU64, Ordering},
-    time::{Duration, Instant},
 };
+
 static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Temp(PathBuf);
 impl Temp {
@@ -34,6 +36,7 @@ fn call(args: &[&str]) -> Output {
 fn value(path: &Path) -> Value {
     serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
 }
+#[cfg(target_os = "linux")]
 fn complete_event_recorded(path: &Path, expected: &str) -> bool {
     fs::read_to_string(path)
         .map(|contents| {

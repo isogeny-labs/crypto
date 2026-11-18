@@ -2,7 +2,7 @@
  "$schema": "http://json-schema.org/draft-07/schema#",
  "$id": "optlevel.record/v1",
  "title": "Optimization-level record",
- "description": "How close one implementation runs to the measured ceiling of its machine. Not a speed claim, benchmark row or leaderboard entry. Definitions: docs/OPTIMIZATION_LEVEL.md. Checked by tools/optlevel/score.py validate() (a draft-07 subset: type, required, properties, enum, const, items, minimum, maximum) plus enforce_tier().",
+ "description": "How close one implementation runs to the measured ceiling of its machine. Not a speed claim, benchmark row or leaderboard entry. Definitions: docs/OPTIMIZATION_LEVEL.md. Checked by `optlevel validate` (tools/optlevel/src/score.rs validate(), a draft-07 subset: type, required, properties, enum, const, items, minimum, maximum) plus enforce_tier().",
  "type": "object",
  "required": [
   "schema",
