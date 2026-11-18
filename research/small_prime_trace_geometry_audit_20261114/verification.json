@@ -1,0 +1,74 @@
+{
+  "schema": "small-prime-trace-geometry-verification/v1",
+  "source_commit": "801e8fb9bffbe10852f5525ef2724b84e836cadf",
+  "claim_id": "PCC-20261114-6fec58",
+  "declaration_sha256": "5dd2bfab4c198ae74c973e7ecc7475ea3968776fcbd35839b4cf0f0793457e89",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 87,
+  "gate_declarations": 44,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 83,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-6fec58",
+    "claim_sha256": "48f823738afeae3cbb6a8d2b51d9f252f80d87513568f8a646269951c6bd47c7",
+    "commit": "801e8fb9bffbe10852f5525ef2724b84e836cadf",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/small_prime_trace_geometry_audit_20261114/lean (SmallPrimeTraceCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T06:12:46Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-6fec58",
+    "claim_sha256": "48f823738afeae3cbb6a8d2b51d9f252f80d87513568f8a646269951c6bd47c7",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47307,
+    "sha256": "c1ed80a119faef15e79cde79476321e5482e22be96c90094aa41232736f5464a",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 44,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_complete_F2_F3_model_census_proved": true,
+    "actual_source_trace_geometry_Hasse_classification_bounded_proved": true,
+    "all_count_divisor_bounds_including_composite": true,
+    "all_divisors_realized_as_cyclic_points_claimed": false,
+    "explicit_actual_control_points_proved": true,
+    "general_Hasse_Endrank_fielddegree_proved": false,
+    "qualified_source_refuted": false,
+    "full_paper_read": false,
+    "full_book_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

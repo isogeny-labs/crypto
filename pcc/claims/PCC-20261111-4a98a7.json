@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-11T22:29:49Z",
+ "id": "PCC-20261111-4a98a7",
+ "kind": "statement",
+ "producer": {
+  "commit": "882b6446d358b316bf670f49f52a6ba06fe76edd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/successor-and-flat-complete-02.txt",
+    "sha256": "b1b2f4979d0b5f5c1c397c11eb831d88222f3e55dec33c19358527136092739e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/psi-kernel-flat-replay-source-02.rs",
+    "sha256": "9b472e4c917f06daeea826b43c9037d1c22de2cca7b1de02e40e050ae0e50998"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/successor-preflight/fixtures/explicit-psi-kernel-07.tsv",
+    "sha256": "1c86cf06a14e822512525ecf13398be7cfacd9cc0acbdb5c0c70c2f13f8ee893"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Existing flatFpR/poly-engine replay02 passes all49 frozen actualPsiKernel TSV rows: semantic T/S basis identities,canonical coefficient/shape/actualT0 curve validity,49 distinct rows and entire Frobenius5/6 permutation,fixed counts Frob degrees1/2/3/6=[1,7,1,49]. It imports neither producer tower/closed-map nor elliptic generator. Scope is independent field/polynomial divisor validity and Frobenius,not independent Jacobian addition or kernel membership. Complete standalone process also passes original elliptic7 reference and successor preflight,3 tests. Unsigned evidence; no signed verdict or timing claim."
+}

@@ -1,0 +1,744 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "bk-basefield-preflight-20261112-export",
+  "created": "2026-11-13T00:11:23Z",
+  "protocol": {
+    "path": "protocol-preflight.json",
+    "sha256": "dad642117df8905e37d3a9767b4b4ba6fb9d83d54296d21da259e6dcaaae1c2b",
+    "protocol_id": "bk-basefield-preflight-20261112",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "Codex",
+    "session": "fourteen-target-20261113",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "49c8a1f26d284869fc21092c0e3bd04b3a8c6518",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "evidence/build-provenance.json",
+    "sha256": "53cd4dd8acc0e09ebde1bc45a3335e9d6917528e86e8bd09f2b9b1865ecabfd1",
+    "class_id": "local-shared-bk-boundary",
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "controls",
+      "role": "control_positive",
+      "binary_sha256": "a2ee50e92372d19e918b5fb035e99f83ebfd392b95391eea1b6f5c3cfc46fddb",
+      "commit": "b978fdd6c24e91b63fdcb05ffd75779b5c7294c5"
+    },
+    {
+      "id": "negative",
+      "role": "control_negative",
+      "binary_sha256": "a2ee50e92372d19e918b5fb035e99f83ebfd392b95391eea1b6f5c3cfc46fddb",
+      "commit": "b978fdd6c24e91b63fdcb05ffd75779b5c7294c5"
+    },
+    {
+      "id": "reference",
+      "role": "reference",
+      "binary_sha256": "a2ee50e92372d19e918b5fb035e99f83ebfd392b95391eea1b6f5c3cfc46fddb",
+      "commit": "b978fdd6c24e91b63fdcb05ffd75779b5c7294c5"
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "binary_sha256": "a2ee50e92372d19e918b5fb035e99f83ebfd392b95391eea1b6f5c3cfc46fddb",
+      "commit": "b978fdd6c24e91b63fdcb05ffd75779b5c7294c5"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "preflight-controls",
+      "arm": "controls",
+      "instance_id": "bk-basefield-preflight-batch",
+      "seed": "No randomness; full lexicographic population",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "population_complete": 1,
+          "known_fixtures": 4,
+          "known_pass": 1,
+          "corrupt_oracle_detected": 1,
+          "correct": 9,
+          "corrupt": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact counts only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native C++ group arithmetic, polynomial oracles and independent native SQLite analysis; unsigned producer evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/preflight/controls.argv.nul",
+          "sha256": "2c597f5cfabf1de8f1a23822fabaf7625b85a74af9a3555d6a5b299e5f1e3fcd",
+          "bytes": 52,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/controls.end",
+          "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/controls.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/controls.jsonl",
+          "sha256": "3f47291d59c61b72b99e8480e90ba1a0f343ca85459bdb902e0006de9b312a2e",
+          "bytes": 1646,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/controls.start",
+          "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/controls.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T00:11:23Z",
+      "finished_at": "2026-11-13T00:11:23Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/preflight/controls"
+    },
+    {
+      "run_id": "preflight-negative",
+      "arm": "negative",
+      "instance_id": "bk-basefield-preflight-batch",
+      "seed": "No randomness; full lexicographic population",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "population_complete": 1,
+          "known_fixtures": 4,
+          "known_pass": 1,
+          "corrupt_oracle_detected": 1,
+          "correct": 9,
+          "corrupt": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact counts only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native C++ group arithmetic, polynomial oracles and independent native SQLite analysis; unsigned producer evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/preflight/negative.argv.nul",
+          "sha256": "2c597f5cfabf1de8f1a23822fabaf7625b85a74af9a3555d6a5b299e5f1e3fcd",
+          "bytes": 52,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/negative.end",
+          "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/negative.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/negative.jsonl",
+          "sha256": "3f47291d59c61b72b99e8480e90ba1a0f343ca85459bdb902e0006de9b312a2e",
+          "bytes": 1646,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/negative.start",
+          "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/negative.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T00:11:23Z",
+      "finished_at": "2026-11-13T00:11:23Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/preflight/negative"
+    },
+    {
+      "run_id": "preflight-reference",
+      "arm": "reference",
+      "instance_id": "bk-basefield-preflight-batch",
+      "seed": "No randomness; full lexicographic population",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "population_complete": 1,
+          "p": 0,
+          "models": 506,
+          "representatives": 262,
+          "prime_cases": 688,
+          "prime_to_p": 602,
+          "characteristic_cases": 86,
+          "qualified": 212,
+          "qualified_mismatches": 0,
+          "omitted_condition_failures": 331,
+          "omitted_r2_failures": 122,
+          "necessity_mismatches": 0,
+          "ss_models": 104,
+          "ss_prime_cases": 129,
+          "ss_equal_two_failures": 89,
+          "ss_prime_bound_failures": 0,
+          "ss_divisor_bound_failures": 0,
+          "root2_checks": 84,
+          "root3_checks": 84,
+          "order_checks": 1624,
+          "point_rows": 1624,
+          "max_ss_prime_degree": 6,
+          "max_ss_divisor_degree": 6
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact counts only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native C++ group arithmetic, polynomial oracles and independent native SQLite analysis; unsigned producer evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/preflight/reference.argv.nul",
+          "sha256": "5c1ea5a2c41a5e626c713fb30a6ee20e13e3e7bcc96eed6dec7915c2c1196ba3",
+          "bytes": 52,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/reference.end",
+          "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/reference.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/reference.jsonl",
+          "sha256": "051c849a2cd902f826c07902e61249acf575d0f925b26d588ab2bd64cf3bf32a",
+          "bytes": 106231,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/reference.start",
+          "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/reference.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T00:11:23Z",
+      "finished_at": "2026-11-13T00:11:23Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/preflight/reference"
+    },
+    {
+      "run_id": "preflight-aa",
+      "arm": "aa",
+      "instance_id": "bk-basefield-preflight-batch",
+      "seed": "No randomness; full lexicographic population",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "population_complete": 1,
+          "p": 0,
+          "models": 506,
+          "representatives": 262,
+          "prime_cases": 688,
+          "prime_to_p": 602,
+          "characteristic_cases": 86,
+          "qualified": 212,
+          "qualified_mismatches": 0,
+          "omitted_condition_failures": 331,
+          "omitted_r2_failures": 122,
+          "necessity_mismatches": 0,
+          "ss_models": 104,
+          "ss_prime_cases": 129,
+          "ss_equal_two_failures": 89,
+          "ss_prime_bound_failures": 0,
+          "ss_divisor_bound_failures": 0,
+          "root2_checks": 84,
+          "root3_checks": 84,
+          "order_checks": 1624,
+          "point_rows": 1624,
+          "max_ss_prime_degree": 6,
+          "max_ss_divisor_degree": 6
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; exact counts only."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native C++ group arithmetic, polynomial oracles and independent native SQLite analysis; unsigned producer evidence."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/preflight/aa.argv.nul",
+          "sha256": "5c1ea5a2c41a5e626c713fb30a6ee20e13e3e7bcc96eed6dec7915c2c1196ba3",
+          "bytes": 52,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/aa.end",
+          "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/aa.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/aa.jsonl",
+          "sha256": "051c849a2cd902f826c07902e61249acf575d0f925b26d588ab2bd64cf3bf32a",
+          "bytes": 106231,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/aa.start",
+          "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/preflight/aa.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-13T00:11:23Z",
+      "finished_at": "2026-11-13T00:11:23Z",
+      "worker": "same local shared host",
+      "backend_ref": "runs/preflight/aa"
+    }
+  ],
+  "flow": {
+    "planned": 4,
+    "attempted": 4,
+    "completed": 4,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "runs/preflight/aa.argv.nul",
+      "sha256": "5c1ea5a2c41a5e626c713fb30a6ee20e13e3e7bcc96eed6dec7915c2c1196ba3",
+      "bytes": 52,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/aa.end",
+      "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/aa.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/aa.jsonl",
+      "sha256": "051c849a2cd902f826c07902e61249acf575d0f925b26d588ab2bd64cf3bf32a",
+      "bytes": 106231,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/aa.start",
+      "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/aa.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/analysis.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/controls.argv.nul",
+      "sha256": "2c597f5cfabf1de8f1a23822fabaf7625b85a74af9a3555d6a5b299e5f1e3fcd",
+      "bytes": 52,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/controls.end",
+      "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/controls.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/controls.jsonl",
+      "sha256": "3f47291d59c61b72b99e8480e90ba1a0f343ca85459bdb902e0006de9b312a2e",
+      "bytes": 1646,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/controls.start",
+      "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/controls.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/negative.argv.nul",
+      "sha256": "2c597f5cfabf1de8f1a23822fabaf7625b85a74af9a3555d6a5b299e5f1e3fcd",
+      "bytes": 52,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/negative.end",
+      "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/negative.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/negative.jsonl",
+      "sha256": "3f47291d59c61b72b99e8480e90ba1a0f343ca85459bdb902e0006de9b312a2e",
+      "bytes": 1646,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/negative.start",
+      "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/negative.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/reference.argv.nul",
+      "sha256": "5c1ea5a2c41a5e626c713fb30a6ee20e13e3e7bcc96eed6dec7915c2c1196ba3",
+      "bytes": 52,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/reference.end",
+      "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/reference.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/reference.jsonl",
+      "sha256": "051c849a2cd902f826c07902e61249acf575d0f925b26d588ab2bd64cf3bf32a",
+      "bytes": 106231,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/reference.start",
+      "sha256": "1991b77a68767a543ae437047c86a273fdf2f81cec79810d57ed06e4a63523cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "runs/preflight/reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "analysis/preflight/analysis.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "analysis/preflight/analysis.jsonl",
+      "sha256": "3fd1285fe1dba9030cd9754785a9120f66374fc0443504e81a7d72060459a739",
+      "bytes": 3813,
+      "kind": "raw"
+    },
+    {
+      "path": "analysis/preflight/analysis.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "analysis/preflight/negative.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "analysis/preflight/negative.jsonl",
+      "sha256": "0deddf62a3dabe2e619e727dc47591c187c20ce87d42bdc16388a290856af159",
+      "bytes": 69,
+      "kind": "raw"
+    },
+    {
+      "path": "analysis/preflight/negative.stderr",
+      "sha256": "976b6b2c7c458257d530908111b167cb8464b5d9de4eda26febd3aa24e1e481d",
+      "bytes": 30,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs.sha256",
+      "sha256": "81d437c99703e455105c9cdc038afe1b39ddb92199816c9ae8dd8cfde420fb9f",
+      "bytes": 1324,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/build-provenance.json",
+      "sha256": "53cd4dd8acc0e09ebde1bc45a3335e9d6917528e86e8bd09f2b9b1865ecabfd1",
+      "bytes": 2563,
+      "kind": "raw"
+    },
+    {
+      "path": "native/census.cpp",
+      "sha256": "b626a730a62f00d45ae2d84e35b14b185c6a44073b74130103db92ad062d0479",
+      "bytes": 10413,
+      "kind": "raw"
+    },
+    {
+      "path": "native/analyze.cpp",
+      "sha256": "e0a40dff0b7115696e51ae2a19471911573840cb0755254b99752e7f6a76854b",
+      "bytes": 2642,
+      "kind": "raw"
+    },
+    {
+      "path": "native/queries.sql",
+      "sha256": "a0183c170c6410bfd6889723735ca6f99f2203e2b4973ad4886a7192499cd8e8",
+      "bytes": 10953,
+      "kind": "raw"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "0004909299245209a67d57609aa9d919ee5142725fd525d95a1f007e7a913947",
+      "bytes": 1668,
+      "kind": "raw"
+    },
+    {
+      "path": "analyze.sh",
+      "sha256": "d6f557569f9ded4720352aa2e5e1045a77ecf3c35b29117e312fa29df0a30fb0",
+      "bytes": 1081,
+      "kind": "raw"
+    },
+    {
+      "path": "metadata.py",
+      "sha256": "9d493ef54ef717e884579a53d348e44a1105b725d91f6b758cb879bb4bcbce8c",
+      "bytes": 6242,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "analyze.sh",
+      "sha256": "d6f557569f9ded4720352aa2e5e1045a77ecf3c35b29117e312fa29df0a30fb0",
+      "bytes": 1081,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "analysis/preflight/analysis.exit",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2,
+        "kind": "summary"
+      },
+      {
+        "path": "analysis/preflight/analysis.jsonl",
+        "sha256": "3fd1285fe1dba9030cd9754785a9120f66374fc0443504e81a7d72060459a739",
+        "bytes": 3813,
+        "kind": "summary"
+      },
+      {
+        "path": "analysis/preflight/analysis.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "kind": "summary"
+      },
+      {
+        "path": "analysis/preflight/negative.exit",
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "bytes": 2,
+        "kind": "summary"
+      },
+      {
+        "path": "analysis/preflight/negative.jsonl",
+        "sha256": "0deddf62a3dabe2e619e727dc47591c187c20ce87d42bdc16388a290856af159",
+        "bytes": 69,
+        "kind": "summary"
+      },
+      {
+        "path": "analysis/preflight/negative.stderr",
+        "sha256": "976b6b2c7c458257d530908111b167cb8464b5d9de4eda26febd3aa24e1e481d",
+        "bytes": 30,
+        "kind": "summary"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Exact basefield k1 boundary census only. All scientific clocks invalid. No extension-field allk or independent-host/compiled-refinement assertion."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

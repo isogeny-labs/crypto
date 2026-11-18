@@ -1,0 +1,73 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T21:56:24Z",
+ "id": "PCC-20261111-a97f41",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e174f85d6bb7ba2745e895d243f464715c997b6d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "01722e6b0bf58a6f6a0a53f7cd0babb8a34b053313c2f824c7b984a5939721cc",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ClosedFibres.lean",
+   "theorem": "ClosedFibres.quadratic_remainder"
+  },
+  {
+   "decl_sha256": "c86677820c310596ce8cc7e6c0275d67fcd85096596503507a5320b23ff52cb4",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ClosedFibres.lean",
+   "theorem": "ClosedFibres.quadratic_resultant_identity"
+  },
+  {
+   "decl_sha256": "ed1a7d1f2118404b32eb5c75e244499a0e698f3441f562b0477556abeb247d37",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ClosedFibres.lean",
+   "theorem": "ClosedFibres.recovered_linear_coordinate"
+  },
+  {
+   "decl_sha256": "228e8b55f987f44b9b34fc2beec9c26dc7c5b1fb223ec72a616e0d5ea107a645",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ClosedFibres.lean",
+   "theorem": "ClosedFibres.recovered_quadratic_coordinate"
+  },
+  {
+   "decl_sha256": "f57fd63067f11fbde0f94f9606cfa42a8e7241a057413a7115c98473360f781b",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ClosedFibres.lean",
+   "theorem": "ClosedFibres.repeated_support_resultant"
+  },
+  {
+   "decl_sha256": "04bf7237b1f8a3d0239618c34cbfb219cf2073133fe9b2cd4c114dbe0f70279d",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ClosedFibres.lean",
+   "theorem": "ClosedFibres.cleared_ordinate_recovery"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/closed-fibres-lean-01.txt",
+    "sha256": "50cb337c40e11e4506eda0b4bc8bccc520dc366cc85490e5bf0e95b8d9b8fc2a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/closed-fibres-lean-01-build.txt",
+    "sha256": "2437abfbd4fbd9c9847f60bf23aec36c5090a85a9f4228fb532aa77357224778"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/closed-fibres-lean-01-audit.txt",
+    "sha256": "c3e0de9080ca12322fb5cbc7e0ff2fb85b14c1b10adeb082d91350a979421b5e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Six faithful cleared algebra identities for the proposed closed quadratic-source Richelot chart: quadratic remainder, resultant norm identity, linear and quadratic source-coordinate recovery with explicit inverse, repeated-support resultant retaining multiplicity, and cleared ordinate recovery. Gate01 reports6/zero trusted native on Lean4.35.0. Actual finite fields, coordinate-ring isomorphism, scheme multiplicities, correspondence/Picard pushforward and balanced reduction remain written bridges. Partial formalization and unsigned standing."
+}

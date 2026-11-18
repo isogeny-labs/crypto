@@ -1,0 +1,10 @@
+{
+ "frozen_before_run": "2026-11-15",
+ "tuning": "CSKIP=150, 30 bits, T=512, 2 curves x 4 instances (8 rows/cell), sym B in {160,220,300} at baseline c=0.5; baseline c in {0.5,0.65,0.8,1.0,1.2} with sym B=220; rows committed in tune_multi30/ in the same commit as this file, before any holdout row exists. Mean ms: sym B160/220/300 = 166.6/110.9/107.2; base c0.5/0.65/0.8/1.0/1.2 = 180.8/135.5/131.6/140.8/149.1.",
+ "frozen_parameters": {"30": {"B": 300, "baseline_c": 0.8}},
+ "holdout_command": "CSKIP=900 prime_fast_j0_multi out.jsonl 30 300 512 4 40 0.8",
+ "holdout": "CSKIP=900 (fresh curves, not used in tuning), 2 curves x 4 instances, T=512, wall clock, one host, no isolation",
+ "prediction": "pooled sum(base_total_ms)/sum(sym_total_ms) >= 1.15 with tuned baseline c=0.8 and tuned B=300; all targets solved and certificate-checked",
+ "abandon_rule": "pooled ratio < 1.05 or any failed verification => the claim that symmetric multi-target IC beats a tuned ic_multi_solve_ex at 30 bits is withdrawn",
+ "known_limits": "B grid edge at 300 (optimum may be higher); tuning on same twist group per size; no isolation; no A/A; no 5a band; BSGS faster than both arms"
+}

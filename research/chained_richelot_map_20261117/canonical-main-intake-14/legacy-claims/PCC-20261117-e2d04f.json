@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T06:40:12Z",
+ "id": "PCC-20261117-e2d04f",
+ "kind": "statement",
+ "producer": {
+  "commit": "77d9ad43f2a0706b5c76eaf997262f52e1ca380b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/infrastructure-first-storage-preflight-03/ACTUAL_SAFE_UPSTREAM_CACHE_EVICTION.json",
+    "sha256": "a74f1c72071a88fd2ba7436bab53dc951bc9618f3c41153f61b62dedba6862de"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/infrastructure-first-storage-preflight-03/PROSPECTIVE_UNCHANGED_CALLER_ATTEMPT_B.json",
+    "sha256": "e4433e2132b2b55eeaf285b8928bd487d18c4ab9a7524e3d14ec5a65bb8e4cf9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Only newly fetched own promisor cache396 from immutable public originc5cbb67 was evicted after whole-pack validation, full OID inventory/hash preservation, no-open-writer check, and29 full frozen source/PCC subject reads with the pack isolated. This reclaims8442655B and leaves8884224B RAM available. Original/shared/frozen objects, c438 pack, old failed1.8MB cache and all scientific sources/outputs remain. Prospective attemptB uses the identical public77d source/caller,8MiB/3MiB floors,120s and fixed population/sign; first failed storage setup9eccf0 stays retained. No arithmetic outcome is yet claimed."
+}

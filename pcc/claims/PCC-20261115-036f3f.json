@@ -1,0 +1,65 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-15T22:43:51Z",
+ "id": "PCC-20261115-036f3f",
+ "kind": "statement",
+ "producer": {
+  "commit": "b8cd452f3f52d8ad32aa77813f44a6b385567033",
+  "model": "claude-opus-5-5",
+  "session": "session_01TCbLH6jxWA7Yo11oJpoLxe"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md",
+    "sha256": "a77cbf9dd226845f1b8eed591ddd6fe0136f2d03b41cbd2f62247d376dfb55a6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/PROOF.md",
+    "sha256": "bd19b3a61b382181c5dedab2c5fa410efdca49d2324ad4f53e6ffddb78fc96ed"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/lean/ICCounting/ICCounting.lean",
+    "sha256": "b9f7c49e3f0a897b1db6f6ecbb226ae3201dc8b93f63df66492f209653787178"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/lean/ICCounting/check.log",
+    "sha256": "5537de6c60df853260a3c815b8eacc817b54d2155548ae2454db10ddfe080db1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/out/L4_summary.json",
+    "sha256": "5cde34695f6da1def47c5b79728c7f25885fc858a1e34a25e722b0d3f23f20ee"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/out/G_summary.json",
+    "sha256": "8ce655b12d612424f19894ab0fb32ded7b1cb154dbb068f244eacc3d2832bb09"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/out/G_det_summary.json",
+    "sha256": "2de68203bce864c8ff6969e605129ee85e277e225d6f0ed7572de40b33d3e817"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Paper proof only: research/prime_field_ic_closure_20261112/finish/theorem/PROOF.md, checked by one adversarial checker ('sound with gaps'; reading in research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md section 3.3). Gaps: the univariate case assumes Delta_R is the same for every target (at most about 2^m special x(R) break this); literal XL on the graph presentation has a gap (not an H-basis). Model-relative: the checker's msolve F4 runs solve univariate bases at degree d+2 (m=2) and d+8 (m=3) against XL's 2d+2 and 3d+9, so the closures hold within XL only and no F4 lower bound is known. Lean covers K1 (k1_root_bound, |B| <= 2 deg f) and the degree-needed lemmas for literal XL; Lemma 4, Lemma 6 and Theorem B are not formalised. Lemma 4 matched the literal Macaulay matrix on 80/80 re-run toy rows.",
+ "statement": "Theorem B (prime-field index calculus, same restricted XL/Macaulay model as Theorem A): for a factor base with no auxiliary variables, cut out by one univariate polynomial f(x) of degree d (|B| <= 2d), XL at any degree has expected cost E[cost] >= n*C(m+d-Delta, m)/C(2d+m-1, m), which tends to 2^-m * n: exponent 1, against Pollard rho's 1/2. This closes, inside the model only, the fixed-degree root base (A5), the APS vanishing-polynomial base (A6-APS) and parametrised rational-map bases (A4). For the image of a rational map of degree e (graph presentation), the bound holds for XL^J only through a checker-supplied repair that is not in PROOF.md, with constant (2(e+1))^-m * n, so exponent 1 only when e = n^o(1); it is vacuous for composed or iterated maps (e = 2^k, a PKM chain written without auxiliary variables) and for power-map / mu_n bases of large e."
+}

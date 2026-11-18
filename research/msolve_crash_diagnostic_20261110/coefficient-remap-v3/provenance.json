@@ -1,0 +1,41 @@
+{
+  "schema": "msolve-crash-diagnostic-provenance/v1",
+  "created": "2026-11-10",
+  "source_tarball_sha256": "30e3712eab4077438e2b3228d5958adb7e8488e523244a02320f80bd8c412c89",
+  "all_tarball_src_files_byte_equal": true,
+  "source_commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+  "original_binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+  "build_recipe_sha256": "bb9e522a23601a728cb45a1ae63e5828766e4b525e00c104879bec72c8b26b2a",
+  "prior_provenance": {
+    "path": "../../solver_multiplicity_audit_20261109/provenance.json",
+    "sha256": "d741580690ca661dcc4d639c8657e7a28b69ff8b0f7994936f052a7c7c6de6a1"
+  },
+  "host": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "hostname": "762f5fc120c9",
+    "isolation": "none"
+  },
+  "GCC": "14; exact --version recorded separately",
+  "KB": "Unavailable, wrapper127; pinned upstream source and existing evidence fallback.",
+  "scope": "Explicitly patched diagnostic source variants only; originalsource preserved; earlier signedshift remains unrepaired. No wholeCrefinement.",
+  "instrumentation": "address only, no undefined sanitizer; previous signedshift unmodified",
+  "variants": {
+    "logged": {
+      "patch_sha256": "c1f9e3578e9a5aec8b1863918d6a18c79c3650ab9d51cc58b5c5f50f63a2280c",
+      "binary_sha256": "87d9417042fa3d5628cdf07c3a03f9a99cafe73c26eda70cb7bcd288a938650e",
+      "modified_source_sha256": "de95043e9b49ea97b8c1bc333bc49949dc00e0861d24889628f58bbc397cd8d3",
+      "changed_files": [
+        "neogb/la_ff_32.c"
+      ]
+    },
+    "corrected": {
+      "patch_sha256": "64b77ab2e688c1a70e01928bcab2a0cf0f854b09dacae10bd9cf2d7757951068",
+      "binary_sha256": "685e63a614c20e68647a58e523f08759e60cca51798790b1f2e01b13c0f27e9a",
+      "modified_source_sha256": "405e71a97cf75b51c6bf8e152398f6faa284a5abe55111b933ebcfd24b7e9ac3",
+      "changed_files": [
+        "neogb/la_ff_32.c"
+      ]
+    }
+  },
+  "variant_semantic_difference": "One basis-to-matrix lookup in17bit knownpivotbranch; logging/buildflagsotherwiseidentical."
+}

@@ -1,0 +1,258 @@
+{
+  "standing": "[pcc:unverified]",
+  "source": "producer-local independent C++ diagnostic, NOT Rust-native execution",
+  "date": "2026-11-15",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "g": [
+      625037715,
+      2100627251
+    ],
+    "cofactor": 1
+  },
+  "public_target": [
+    1547953785,
+    1667575595
+  ],
+  "known_answer_verifier_only": 661068045,
+  "oracle": "generic disjoint 4+4 EC-group MITM, not algebraic F4",
+  "rng_seed": "0x4d384e4154555241",
+  "depth": 6,
+  "B": 31,
+  "terminal": 933677148,
+  "left_templates": 21840,
+  "left_unique": 21840,
+  "right_templates": 29120,
+  "queries": 124,
+  "positive_queries": 26,
+  "raw_rows": 32,
+  "rank": 32,
+  "dependent_rows": 0,
+  "setup_group_additions": 203840,
+  "group_additions": 3826072,
+  "cplusplus_producer_wall_seconds": 1.48,
+  "cplusplus_producer_peak_rss_kib": 3524,
+  "recovered_scalar": 661068045,
+  "all_basis_verified": true,
+  "witnesses": [
+    [
+      806206853,
+      542783019,
+      18903234,
+      258036944
+    ],
+    [
+      806206853,
+      542783019,
+      37012034,
+      107578577
+    ],
+    [
+      221449980,
+      77514319,
+      204251718,
+      124347663
+    ],
+    [
+      242047672,
+      939300000,
+      137929089,
+      23688532
+    ],
+    [
+      15113640,
+      1531774004,
+      70021441,
+      23946576
+    ],
+    [
+      164147157,
+      1857861851,
+      70553792,
+      174941457
+    ],
+    [
+      1564962116,
+      1949278425,
+      255103234,
+      22897679
+    ],
+    [
+      1564962116,
+      1949278425,
+      87327170,
+      258577941
+    ],
+    [
+      594486174,
+      1529954272,
+      52723970,
+      108647633
+    ],
+    [
+      613026941,
+      1992274126,
+      171229889,
+      158958671
+    ],
+    [
+      322847889,
+      454402250,
+      220758273,
+      225551697
+    ],
+    [
+      1394378266,
+      800484937,
+      121147521,
+      24208463
+    ],
+    [
+      1394378266,
+      800484937,
+      120893894,
+      241788239
+    ],
+    [
+      408958896,
+      1346354251,
+      19947584,
+      140866769
+    ],
+    [
+      2074951976,
+      5589342,
+      221536320,
+      142194066
+    ],
+    [
+      416061052,
+      32378712,
+      137671233,
+      108098896
+    ],
+    [
+      1218653292,
+      1007215579,
+      68694145,
+      140871126
+    ],
+    [
+      2046300717,
+      160617459,
+      154186312,
+      258569551
+    ],
+    [
+      2046300717,
+      160617459,
+      171458689,
+      91604624
+    ],
+    [
+      697139654,
+      1737865247,
+      154443969,
+      24740943
+    ],
+    [
+      957010057,
+      1494956774,
+      37270083,
+      175486353
+    ],
+    [
+      2132310682,
+      1772561089,
+      154440002,
+      40207698
+    ],
+    [
+      1267976796,
+      184406153,
+      70566593,
+      158946383
+    ],
+    [
+      1267976796,
+      184406153,
+      53256642,
+      175490447
+    ],
+    [
+      346111024,
+      1707599950,
+      238071872,
+      140866770
+    ],
+    [
+      218104795,
+      449600308,
+      19702275,
+      175490383
+    ],
+    [
+      218104795,
+      449600308,
+      171221249,
+      192259412
+    ],
+    [
+      1138977354,
+      1129165938,
+      36204672,
+      259618127
+    ],
+    [
+      1109018874,
+      1974429431,
+      119296193,
+      75068626
+    ],
+    [
+      2088644794,
+      138720163,
+      85737600,
+      91866450
+    ],
+    [
+      416077789,
+      779372790,
+      205042182,
+      140858577
+    ],
+    [
+      283485076,
+      1813901800,
+      53518790,
+      242067031
+    ]
+  ],
+  "limitations": [
+    "raw timings local and uncontrolled; do not compare against other-host Rust/rho",
+    "C++ diagnostic and separate Python replay are both producer-operated and unsignatured",
+    "Rust-native example checked in but not compiled or executed at exact head",
+    "generic MITM relation oracle; not subgeneric or cheaper complete prime-field ECDLP",
+    "cost accounting omits factor-base construction and symbolics; wall not comparable",
+    "original group_additions=3,826,072 excludes final 1,431 basis/target replay additions; inclusive total=3,827,503",
+    "3,774,896 reported inversion calls include 32 scalar-order row inversions and do not include final group replay inversions"
+  ],
+  "independent_python_producer_replay": {
+    "verified_public_equations": 32,
+    "rank": 32,
+    "verified_basis_logs": 31,
+    "verified_target": true
+  },
+  "group_additions_excludes_final_replay": true,
+  "mask_group_additions": 11352,
+  "group_lookup_additions": 3610880,
+  "final_basis_and_target_verification_additions": 1431,
+  "complete_group_additions_including_final_replay": 3827503,
+  "inversion_counter_includes_scalar_modular_rank_inversions": true,
+  "field_inversions_before_final_replay": 3774864,
+  "modular_rank_inversions_before_final_replay": 32,
+  "total_modular_inversions_before_final_replay": 3774896
+}

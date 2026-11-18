@@ -1,0 +1,14 @@
+{
+  "action": "Check target subgroup/order and actual zero-coset equality; include a nonzero auxiliary projection-kernel residue as a negative control.",
+  "created": "2026-11-16T07:27:17Z",
+  "evidence": [
+    "research/nist_cover_three_tests_20261116/evidence/e2e-v2.tar.gz"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecdlp-surfaces"
+  ],
+  "trigger": "A transferred-target solver treats zero projection as the zero quotient target",
+  "why": "V3 valid-target cases passed but omitted this domain error; V4 rejects the residue and preserves all valid public witnesses."
+}

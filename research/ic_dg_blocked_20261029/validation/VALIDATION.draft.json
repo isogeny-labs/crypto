@@ -1,0 +1,95 @@
+{
+ "schema": "validation-gate/v1",
+ "rows": [
+  "icv1-fp28-t9805-a382b8a8",
+  "icv1-fp28-tm3463-6d2f5699"
+ ],
+ "replay_certificate": {
+  "path": "validation/replay-certificate.json",
+  "sha256": "d75487e83f030e56db03e3a6b9d2ff0f304b305f9ee7e811ac15686608370669"
+ },
+ "validator_report": {
+  "path": "validation/validator-report.json",
+  "sha256": "9e5e1d341b3a4115287cf888f198d5a77852ccbf934fb54078d45751c7a6bd9e"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md section 2 counted session, arm rho-neg: rho.negation in job ic-dgb-rho-p28-20261029, on the same two curves, the same 24 public targets per curve, the same rounds and algorithm seeds as dg and dgb (the counted session's dg and dgb records equal the wall session's in answers, GAE, unpriced counts, per-phase counts and seeds, record by record)",
+  "unit": "ecbench.gae / sqrt(r) (S), cold, whole pipeline; unpriced native operations priced at w GAE each (AGENTS.md section 5a): IC sqrt solves, lookups, row ops, Legendre symbols, target-guard probes; rho canonicalisations",
+  "binary_or_process": "ecbench sha256 88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c (isolab image cf0dcc8b, source be2969ce); rho and IC arms in one counted session; replayed by the same binary on another host",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "Both 28-bit curves are prime-order curves over prime fields (p and r prime, r = p + 1 - t, cofactor 1) with j not 0 or 1728 (j recomputed from a, b solved on G and the targets, equal to the ICV1 j), so Aut(E) = {+1, -1}: negation is the only automorphism fold, there is no subfield Frobenius fold over F_p, and the Frobenius discriminants (squarefree parts -69430827 and -598737787) give no small-norm endomorphism. Records show automorphisms_used 2.",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band_row": "ic = dgb (candidate, N_inc 407) mean S over its 288 measured counted runs (identical to dg), rho = rho-neg mean S over the same 288 (target, round) pairs; per-curve values in gae_band_by_row",
+  "gae_band": {
+   "0": {
+    "ic": 21.050512493167396,
+    "rho": 0.9661128713444103
+   },
+   "0.1": {
+    "ic": 21.890718233999447,
+    "rho": 1.0597532106349294
+   },
+   "1": {
+    "ic": 29.452569901487898,
+    "rho": 1.9025162642496
+   }
+  },
+  "gae_band_by_row": {
+   "icv1-fp28-t9805-a382b8a8": {
+    "0": {
+     "ic": 20.759459910723034,
+     "rho": 0.9618909983843204
+    },
+    "0.1": {
+     "ic": 21.622943704497153,
+     "rho": 1.0552339907917283
+    },
+    "1": {
+     "ic": 29.394297848464205,
+     "rho": 1.8953209224584002
+    }
+   },
+   "icv1-fp28-tm3463-6d2f5699": {
+    "0": {
+     "ic": 21.341565075611758,
+     "rho": 0.9703347443045005
+    },
+    "0.1": {
+     "ic": 22.15849276350174,
+     "rho": 1.0642724304781304
+    },
+    "1": {
+     "ic": 29.510841954511584,
+     "rho": 1.9097116060408001
+    }
+   }
+  },
+  "order_holds_across_band": true,
+  "order_note": "rho-neg < dgb (= dg) at w = 0, 0.1 and 1 on both curves; distance remaining dgb/rho-neg 21.79, 20.66, 15.48 (pooled). The improvement this file admits is wall-clock (ns per charged GAE), not a counted ranking: counted S of dgb and dg are identical."
+ },
+ "verdict": "passed",
+ "size_verdict": {
+  "P24": "fail",
+  "P28": "pass_with_caveats",
+  "P32": "fail"
+ },
+ "caveats": [
+  "28 bits: wall-clock improvement of the packed-table oracle at N_inc 407: corrected dgb/dg ns per GAE 0.929953 [0.926605, 0.933313] (288 L2 pairs, both A/A admitted). It is a component speed-up of the oracle (whole-solve wall per charged GAE), outside tables A-C; counted S is identical record by record, so no counted ranking and no distance to rho changes (dg/rho-neg = dgb/rho-neg = 21.79, 20.66, 15.48 at w = 0, 0.1, 1).",
+  "Per-curve corrected ratios at 28 bits differ beyond their intervals: icv1-fp28-t9805-a382b8a8 0.9379 [0.9333, 0.9425], icv1-fp28-tm3463-6d2f5699 0.9212 [0.9168, 0.9257]. Both are below 1; the size of the gain depends on the curve.",
+  "Target-clustered intervals (48 targets) are a little wider than the pair interval and stay below 1: linearised joint [0.92610, 0.93382], independent combination [0.92597, 0.93396], stratified bootstrap [0.92703, 0.93276].",
+  "ns per GAE is an upper bound per operation for both arms alike (unpriced native work: sqrt solves, lookups, row ops, Legendre symbols, target-guard probes). Measured on EKS c8a.2xlarge (AMD EPYC 9R45) only; wall time is not replayable, counted scalars are (6,912 of 6,912 replays identical on an Intel host).",
+  "Packed layout only (RULING-P2 A1): p <= 2^32-1 and at most 2^16 signed points. The small-maps branch of the same oracle string is untested.",
+  "The pre-registered prediction (corrected 0.77-0.84 at 28 bits) was missed: the set-up fell to 0.565 of the scalar build (predicted 0.25-0.5) and target PDP rose from 1062.3 to 1427.6 ms (+34%), consistent with a slower probe on the packed table, as the section 7 model-risk bullet allowed. The prediction decides nothing.",
+  "24 and 32 bits are undecidable under the frozen rule (section 6.1 fails); their descriptive corrected ratios (0.9075, 0.8975) are reported but are not results."
+ ],
+ "promotion_blockers": [
+  "Section 10 outputs missing at bf899979a6: no README.md with the position table and the section 6.2 position-control figures, no figure and no PDF (research-visuals) under research/ic_dg_blocked_20261029/. They must be committed before the leaderboard or benchmarks/ change. (An untracked README.md and figures/ appeared in the working tree after the snapshot push; they are uncommitted and were not reviewed.)",
+  "The launch/ folders (requests, launcher receipts, logs) are untracked at bf899979a6; commit them in the Coordinator's snapshot (they are byte-equal to the S3 launcher receipts this validation used) or cite the S3 receipts.",
+  "The evidence review must record which leaderboard section receives the 28-bit row (pair_table_component, or a new oracle-named component section if that section holds set-up figures only), per PROTOCOL section 10."
+ ],
+ "promotion_note": "Evidence admissibility only for the two 28-bit rows. 24 and 32 bits are undecidable and get no row. Promotion and placement are the Coordinator's decision.",
+ "draft_note": "Draft written by the validator outside the repository. Place it as research/ic_dg_blocked_20261029/VALIDATION.json with the validator files under research/ic_dg_blocked_20261029/validation/ (replay-certificate.json, validator-report.json and the rest); the two pinned sha256 values hold only if those files are copied byte for byte."
+}

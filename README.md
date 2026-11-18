@@ -1,5 +1,7 @@
 # crypto — Comprehensive Educational Cryptography Library
 
+[OpenResearch setup and agent integration](docs/openresearch.md).
+
 A from-scratch implementation of the major cryptographic algorithm families in Rust,
 plus a substantial **cryptanalysis suite** for studying how those algorithms break.
 Every algorithm is documented with the underlying mathematics, making this a study

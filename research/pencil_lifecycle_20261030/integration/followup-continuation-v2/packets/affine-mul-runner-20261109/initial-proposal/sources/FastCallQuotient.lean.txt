@@ -1,0 +1,55 @@
+import FastCallInputs
+set_option autoImplicit false
+namespace FastCalls
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest FastPrelude FastPayload
+
+def scaled (p : UInt64) (w : Inputs) (q : List UInt64) : List UInt64 :=
+ PegcdWord.scale p (inverseLead p w) q
+
+theorem scaled_exists (p : UInt64) (w : Inputs) (f : List UInt64) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) (hfc : Canon p f)
+ (hfd : (wordsPoly p f).natDegree=5)
+ (ha : FastCRT.support (w.qa.toNat : ZMod p.toNat) w.ra.toNat ∣
+ wordsPoly p f-(FastCRT.delta (w.sa.toNat : ZMod p.toNat) w.ta.toNat)^2)
+ (hbv : FastCRT.support (w.qb.toNat : ZMod p.toNat) w.rb.toNat ∣
+ wordsPoly p f-(FastCRT.delta (w.sb.toNat : ZMod p.toNat) w.tb.toNat)^2) :
+ ∃ q, FallbackWord.exactDiv p (ResidualWord.residual p f (v p w)) (u p w)=some q ∧
+ Canon p q ∧ Normal q ∧ Canon p (scaled p w q) ∧ Normal (scaled p w q) ∧
+ (wordsPoly p (scaled p w q)).Monic ∧ (wordsPoly p (scaled p w q)).natDegree=2 ∧
+ wordsPoly p (scaled p w q) ∣ wordsPoly p f-(wordsPoly p (v p w))^2 := by
+ obtain ⟨huc,hun,hvc,hud,hvd⟩ := prepared_decode p w hp hb hw hn hs
+ obtain ⟨Q,hQ,hQd,hQm⟩ := source_payload_quotient p w hp hb hw hn hs (wordsPoly p f) hfd ha hbv
+ have hua := (FastCRT.support_shape (w.qa.toNat : ZMod p.toNat) w.ra.toNat).2.ne_zero
+ have hub := (FastCRT.support_shape (w.qb.toNat : ZMod p.toNat) w.rb.toNat).2.ne_zero
+ have hu0 : wordsPoly p (u p w)≠0 := by rw [hud];exact mul_ne_zero hua hub
+ have hres := ResidualWord.residual_correct p f (v p w) (by omega) hb hfc hvc
+ have hdiv : wordsPoly p (u p w) ∣ wordsPoly p (ResidualWord.residual p f (v p w)) := by
+  rw [hres.2,hud,hvd]
+  exact ⟨Q,hQ⟩
+ obtain ⟨q,hq,hqc,hqn,hdec⟩ := FallbackWord.exact_total_normal p _ _ (by omega) hb hres.1 huc hun hu0 hdiv
+ have he : wordsPoly p q=Q := by
+  apply mul_right_cancel₀ hu0
+  calc
+   wordsPoly p q*wordsPoly p (u p w)=wordsPoly p f-(decodedV p w)^2 := by rw [←hdec,hres.2,hvd]
+   _=Q*wordsPoly p (u p w) := by rw [hQ,hud];ring
+ have hi := inverse_lead_decode p w hp hb hw hn hs
+ have hscale := PegcdWord.scale_correct p (inverseLead p w) q (by omega) hb hi.1 hqc
+ change Canon p (scaled p w q) ∧ Normal (scaled p w q) ∧
+  wordsPoly p (scaled p w q)=C ((inverseLead p w).toNat : ZMod p.toNat)*wordsPoly p q at hscale
+ have hsm : (wordsPoly p (scaled p w q)).Monic := by rw [hscale.2.2,he];exact hQm
+ obtain ⟨hnf,hsf,_⟩ := guarded_batch_from_inputs p w hp hb hw hn hs
+ have hi0 : ((inverseLead p w).toNat : ZMod p.toNat)≠0 := by
+  rw [hi.2]
+  exact neg_ne_zero.mpr (pow_ne_zero 2 (div_ne_zero hnf hsf))
+ have hsd : (wordsPoly p (scaled p w q)).natDegree=2 := by
+  rw [hscale.2.2,natDegree_C_mul_of_isUnit (isUnit_iff_ne_zero.mpr hi0),he,hQd]
+ have hsv : wordsPoly p (scaled p w q) ∣ wordsPoly p f-(wordsPoly p (v p w))^2 := by
+  refine ⟨C (((inverseLead p w).toNat : ZMod p.toNat)⁻¹)*wordsPoly p (u p w),?_⟩
+  rw [←hres.2,hdec,hscale.2.2]
+  calc
+   _=(C ((inverseLead p w).toNat : ZMod p.toNat)*C (((inverseLead p w).toNat : ZMod p.toNat)⁻¹))*
+      (wordsPoly p q*wordsPoly p (u p w)) := by rw [←map_mul,mul_inv_cancel₀ hi0,map_one,one_mul]
+   _=_ := by ring
+ exact ⟨q,hq,hqc,hqn,hscale.1,hscale.2.1,hsm,hsd,hsv⟩
+end FastCalls

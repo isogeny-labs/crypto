@@ -1,0 +1,9 @@
+TwistShiftOverlap.lean:21:7: error(lean.unknownIdentifier): Unknown constant `Fintype.card`
+TwistShiftOverlap.lean:23:6: error(lean.unknownIdentifier): Unknown constant `Finset.mul_sum`
+TwistShiftOverlap.lean:21:51: error: unsolved goals
+ι : Type u_1
+inst✝ : Fintype ι
+χ : ι → ℤ
+σ : Equiv.Perm ι
+hχ : ∀ (i : ι), χ i = 1 ∨ χ i = -1
+⊢ (4 * ∑ i, if χ i = -1 ∧ χ (σ i) = 1 then 1 else 0) = sorry - ∑ i, χ i * χ (σ i)

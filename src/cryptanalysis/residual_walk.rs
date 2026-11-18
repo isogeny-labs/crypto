@@ -1010,6 +1010,11 @@ impl RelationSystem {
         self.pivots.len()
     }
 
+    /// The normalized rows are read-only; callers may derive a checked kernel.
+    pub(crate) fn pivot_rows(&self) -> &[(usize, Vec<u64>, u64)] {
+        &self.pivots
+    }
+
     /// Multiplications modulo `n` performed by `insert` so far.
     pub fn ops(&self) -> u64 {
         self.ops

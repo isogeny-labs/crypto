@@ -1,0 +1,11 @@
+name = "rho_nonzero_support_audit"
+version = "0.1.0"
+defaultTargets = ["RhoNonzeroSupportAudit"]
+
+[[require]]
+name = "rho_twochoice_collision_audit"
+path = "../../rho_twochoice_collision_audit_20261115/lean"
+
+[[lean_lib]]
+name = "RhoNonzeroSupportAudit"
+roots = ["ConditionedMean", "NonzeroLaw", "NonzeroBounds", "NonzeroCertificate"]

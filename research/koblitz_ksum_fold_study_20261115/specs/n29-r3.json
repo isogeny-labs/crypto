@@ -1,0 +1,146 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Frobenius-folded k-sum vs lazy orbit-member IC: Koblitz a=1 n=29 replicate 3",
+ "description": "Frozen in research/koblitz_ksum_fold_study_20261115/PROTOCOL.md before its data. Same factor base and targets strategy per method as stated there; engineering comparison, no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 29
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115203,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-strong-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "lazy-c1",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000",
+     "oracle": "mitm-frobenius-lazy-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "lazy-c2",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=100000000",
+     "oracle": "mitm-frobenius-lazy-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k1-l10",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=10",
+     "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold",
+     "max_trials": "20000000",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "kf3-c1g-sr",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "kf3-c1g-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "1000000000",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "rho-strong-full",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong_full"
+   }
+  },
+  {
+   "name": "lazy-c1-full",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline_full",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000",
+     "oracle": "mitm-frobenius-lazy-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "kf3-c1g-sr-full",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline_full",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261116203,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

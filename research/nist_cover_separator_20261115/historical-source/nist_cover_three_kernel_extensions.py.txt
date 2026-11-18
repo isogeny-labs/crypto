@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+"""Exact minimal fields of definition for isotropic 3-isogeny kernels."""
+import concurrent.futures
+import json
+import math
+from pathlib import Path
+import time
+import numpy as np
+from nist_three_isotropic_local_catalog import PAIRS,planes,stable,isotropic_counts
+
+ROOT=Path(__file__).parent
+GRASS=None
+FIXED=[1,2,3,4,5,6,8,10,12]
+
+
+def job(path):
+    global GRASS
+    if GRASS is None:GRASS=planes(3)
+    z=json.loads(path.read_text());f=z['family'];c=z['candidate'];d=z['cover_parameter_d']
+    dest=ROOT/'nist_cover_three_kernel_extensions';dest.mkdir(exist_ok=True);outfile=dest/path.name
+    if outfile.exists():return json.loads(outfile.read_text())
+    try:
+        mat=json.loads((ROOT/'nist_cover_prym_three_local_matrix'/path.name).read_text());ell=json.loads(Path(z['elliptic_module_file']).read_text())
+        full=json.loads((ROOT/'nist_cover_prym_three_local'/path.name).read_text())
+        N=math.lcm(full['Prym_full_three_torsion_field_degree'],ell['full_three_torsion_field_degree'])
+        A=np.zeros((6,6),dtype=np.int16);A[:2,:2]=np.array(ell['Frobenius_matrix_mod3'],dtype=np.int16);A[2:,2:]=np.array(mat['Prym_Frobenius_matrix_mod3'],dtype=np.int16)
+        scale=ell['canonical_Weil_matrix_mod3'][0][1];J=np.array(z['Prym_pairing']['canonical_Prym_Weil_matrix_mod3'],dtype=np.int16)*scale%3
+        fs=np.array([[J[i,j] for i,j in PAIRS]],dtype=np.int16);B,piv=GRASS
+        needed=sorted(set(FIXED)|{m for m in range(1,N+1) if N%m==0});by={};powers={1:A}
+        def power(n):
+            R=np.eye(6,dtype=np.int16);P=A.copy()
+            while n:
+                if n&1:R=(R@P)%3
+                P=(P@P)%3;n//=2
+            return R
+        for m in needed:
+            AM=power(m);BS=stable(B,piv,AM);by[str(m)]=int(isotropic_counts(BS,fs)[0])
+        assert by['1']==z['rational_maximal_isotropic_three_kernel_count'] and by[str(N)]==1120
+        minimum=min(m for m in needed if by[str(m)]>0)
+        result={'family':f,'candidate':c,'cover_parameter_d':d,'complete':True,
+                'full_three_torsion_field_degree':N,'minimal_extension_for_maximal_isotropic_three_kernel':minimum,
+                'maximal_isotropic_three_kernel_counts_by_extension':by}
+    except Exception as e:result={'family':f,'candidate':c,'cover_parameter_d':d,'complete':False,'error':repr(e)}
+    outfile.write_text(json.dumps(result,indent=2)+'\n');return result
+
+
+def main():
+    seen=set();results=[];source=ROOT/'nist_cover_three_exact_subgroups';start=time.monotonic()
+    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as pool:
+        while len(seen)<306:
+            paths=[p for p in source.glob('*.json') if p.name not in seen and json.loads(p.read_text()).get('complete')]
+            if not paths:
+                if time.monotonic()-start>900:break
+                time.sleep(5);continue
+            for path,z in zip(paths,pool.map(job,paths)):
+                seen.add(path.name);results.append(z)
+                print('EXTENSIONS',len(results),306,z['family'],z['candidate'],z['cover_parameter_d'],z['complete'],z.get('minimal_extension_for_maximal_isotropic_three_kernel'),z.get('error'),flush=True)
+                (ROOT/'nist_cover_three_kernel_extensions_grid.json').write_text(json.dumps({'scope':'The common d=0..15 grid plus P384/P521 d=1.',
+                    'method':'Use the actual Weil forms and Frobenius matrices. Enumerate all rational maximal isotropic subgroups over each divisor of the complete torsion field degree, plus a fixed list of small extensions. The minimal field degree must divide the Frobenius order.',
+                    'limits':'A rational polarized kernel does not certify a non-hyperelliptic Jacobian quotient over the same field.',
+                    'expected_count':306,'completed_count':len(results),'rows':results},indent=2)+'\n')
+
+
+if __name__=='__main__':main()

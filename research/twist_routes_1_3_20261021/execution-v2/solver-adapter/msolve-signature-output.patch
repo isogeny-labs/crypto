@@ -1,0 +1,16 @@
+--- a/src/msolve/msolve.c
++++ b/src/msolve/msolve.c
+@@ -3625,4 +3625,13 @@
+                 exit(1);
+             }
++            /* Local output adapter: expose the computed signature basis before
++             * the upstream signature export stub exits. No GB or field logic
++             * is changed. Independent certificates must check completeness. */
++            if (print_gb > 0) {
++                print_ff_basis_data(files->out_file, "a", bs, bht,
++                        st, gens, print_gb);
++                get_and_print_final_statistics(stderr, st, bs);
++                return 0;
++            }
+             int64_t nb  = export_results_from_gba(bld, blen, bexp,
+                     bcf, &malloc, &bs, &bht, &st);

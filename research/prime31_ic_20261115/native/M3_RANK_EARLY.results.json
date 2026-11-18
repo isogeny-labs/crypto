@@ -1,0 +1,77 @@
+{
+  "standing": "[pcc:unverified]",
+  "date_utc": "2026-11-15",
+  "method": "Rust-source reproduction pending; independent producer-local C++ triple enumeration plus NumPy modular rank and Python EC replays",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "order": 2147446831,
+    "cofactor": 1,
+    "generator": [
+      625037715,
+      2100627251
+    ]
+  },
+  "fixture": {
+    "domain_separator": "isogeny-prime31-m3-natural-target-v1",
+    "sha256": "bec50c69779d74f094ca48199f339ea1c5c1e07cc7c6c1a888f46c944192638c",
+    "q": [
+      1547953785,
+      1667575595
+    ],
+    "verifier_scalar_not_input": 661068045
+  },
+  "base": {
+    "depth": 9,
+    "terminal": 375193997,
+    "liftable_points": 256
+  },
+  "m3_exhaustive": {
+    "signed_distinct_index_templates": 22108160,
+    "distinct_group_points": 21992660,
+    "collision_rows": 115500,
+    "coverage_probability_exact": "21992660/2147446831",
+    "homogeneous_rank_by_first_5000_rows": 255,
+    "first_full_rank_at_collision": 3765,
+    "first_full_rank_at_template": 4051363
+  },
+  "rank_first_early_stop": {
+    "enumerated_signed_triple_templates": 4051363,
+    "unique_support": 4047598,
+    "collision_rows": 3765,
+    "rank": 255,
+    "kernel_dimension": 1,
+    "anchor": {
+      "seed": "0x6d3300",
+      "trials": 573,
+      "a": 2054123301,
+      "triple_code": 314883599
+    },
+    "target": {
+      "seed": "0x6d3301",
+      "trials": 372,
+      "a": 806600916,
+      "b": 1448900068,
+      "triple_code": 999637505
+    },
+    "recovered_scalar": 661068045,
+    "all_256_basis_logs_group_verified": true,
+    "target_group_verified": true,
+    "producer_group_additions_excluding_base_and_verification": 2094275,
+    "construction_additions_excluding_base": 2033796
+  },
+  "full_bank_control": {
+    "anchor_trials": 429,
+    "target_trials": 212,
+    "producer_group_additions_excluding_base_and_verification": 11158521
+  },
+  "relative_reduction_in_partial_group_additions": 5.328106862756801,
+  "limitations": [
+    "producer-only: local C++ comparator and independent Python algebra, not Rust exact-head execution or PCC signature",
+    "generic enumerative triple relation oracle, not algebraic F4 and not a cryptographic-size speedup",
+    "group-add counts omit base build, rank scalar arithmetic, 256 independent point-log replays, memory, source/toolchain cost, and comparable optimized rho benchmarking",
+    "single held-out public known-answer target, not a statistically powered panel",
+    "reuse actual Rust Base, Arithmetic, and curve certificate in checked-in example; the large example has not been compiled in this environment"
+  ]
+}

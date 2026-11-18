@@ -1,0 +1,94 @@
+{
+  "status": "relation",
+  "witness": [
+    {
+      "pool": 0,
+      "index": 8,
+      "sign": -1
+    },
+    {
+      "pool": 1,
+      "index": 2,
+      "sign": 1
+    },
+    {
+      "pool": 2,
+      "index": 5,
+      "sign": 1
+    }
+  ],
+  "recovery": {
+    "A": 16284,
+    "B": 2638,
+    "k": 1436
+  },
+  "root_candidates": 1,
+  "gcd_evaluations": 16,
+  "uninformative_matches_skipped": 0,
+  "group_counters": {
+    "group_addition_calls": 38,
+    "field_inversions": 35
+  },
+  "arm": "split_compose",
+  "gcd_degree": 1,
+  "gcd_coefficients": [
+    8051,
+    1
+  ],
+  "phase_cpu_seconds": {
+    "preprocessing": 2.7664661654140343e-07,
+    "modular_composition_incidence": 4.869666165413558e-05,
+    "incidence_gcd": 0.0,
+    "witness_and_scalar_recovery": 1.2562142857142788e-05
+  },
+  "solver_core_bracket_cpu_seconds": 0.0,
+  "solver_total_wall_seconds": 0.0005939840375093693,
+  "counters": {
+    "interpolation_scalar_inversions": 16,
+    "denominator_scalar_inversions": 16,
+    "quotient_multiplications": 80,
+    "polynomial_product_coefficient_pairs": 17168,
+    "native_modular_compositions": 32
+  },
+  "dimensions": {
+    "quotient_dimension": 16,
+    "first_pool_iterations": 16,
+    "largest_stored_univariate_degree": 16,
+    "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+  },
+  "peak_process_rss_kib": 25856,
+  "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+  "schema": "incidence-compose-result/v1",
+  "fixture_id": "b016_c0_natural_s0",
+  "B": 16,
+  "kind": "natural",
+  "fixture_sha256": "363245825c8d62a99bd95db3b872a0032508452a36b7f3b16fd7e5cb58a4ec9b",
+  "fixture_generation": {
+    "accepted": 48,
+    "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+    "counters": {
+      "affine_additions": 689,
+      "affine_doublings": 1358,
+      "field_inversions": 2047,
+      "field_multiplications": 4094,
+      "field_squarings": 3405,
+      "group_add_calls": 2143,
+      "scalar_bits": 1358,
+      "scalar_multiplications": 96
+    },
+    "cpu_seconds": 0.0036216650000000516,
+    "draws": 48,
+    "rejected": {},
+    "secret_used_for_pool_generation": false,
+    "wall_seconds": 0.0036231119993317407
+  },
+  "solver_total_cpu_seconds": 0.0006056605413533833,
+  "batch_cpu_seconds": 0.08055285199999998,
+  "batch_wall_seconds": 0.08045152500017139,
+  "timing_repetitions": 133,
+  "cpu_affinity": [
+    1
+  ],
+  "flint_version": "0.9.0",
+  "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary."
+}

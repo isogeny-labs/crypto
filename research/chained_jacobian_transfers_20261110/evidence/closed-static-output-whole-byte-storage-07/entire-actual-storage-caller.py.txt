@@ -1,0 +1,38 @@
+"""Whole-byte storage only; no scientific/native program execution."""
+from pathlib import Path
+from datetime import datetime,timezone
+import filecmp,hashlib,json,os,shutil,stat,subprocess
+h=Path('/workspace/scratch/ct479-closed-static-output-sharing-review');rows=json.loads((h/'ENTIRE_BEFORE_EXACT_CLOSED_STATIC_OUTPUTS.json').read_text());src,dst=[Path(x['path'])for x in rows]
+q=subprocess.run(['ps','-eo','pid=,ppid=,stat=,etimes=,comm='],capture_output=True,check=True,text=True)
+selected=[]
+for line in q.stdout.splitlines():
+ cols=line.split()
+ if cols[-1] in ['cargo','rustc','rust-analyzer','ld','cc','clang','gcc']:selected.append(dict(pid=int(cols[0]),ppid=int(cols[1]),state=cols[2],elapsed=int(cols[3]),command=cols[4]))
+assert all('Z'in x['state']for x in selected)
+assert Path('/workspace/scratch/ct53-prime-tests-01/tests.exit').read_text().strip()=='0'
+assert Path('/workspace/scratch/ct53-prime-tests-01/guard.exit').read_text().strip()=='0'
+assert Path('/workspace/scratch/ct53-prime-tests-01/finish.txt').read_text().strip()=='2026-11-13T00:19:02Z'
+assert filecmp.cmp(src,dst,shallow=False)
+for p,x in zip([src,dst],rows):
+ s=p.lstat();assert stat.S_ISREG(s.st_mode)and s.st_dev==x['dev']and s.st_ino==x['ino']and s.st_nlink==x['nlink']and s.st_size==x['bytes']and stat.S_IMODE(s.st_mode)==x['mode']
+before=os.statvfs('/workspace').f_bavail*os.statvfs('/workspace').f_frsize
+tmp=dst.parent/'.ct480-exact-whole-closed-library-sharing';assert not tmp.exists();os.link(src,tmp);os.replace(tmp,dst)
+assert filecmp.cmp(src,dst,shallow=False)
+after=[]
+for p in [src,dst]:
+ s=p.lstat()
+ with p.open('rb')as f:sha=hashlib.file_digest(f,'sha256').hexdigest()
+ assert stat.S_ISREG(s.st_mode)and s.st_size==49789168 and stat.S_IMODE(s.st_mode)==384 and sha==rows[0]['sha256']
+ after.append(dict(path=str(p),bytes=s.st_size,mode=stat.S_IMODE(s.st_mode),dev=s.st_dev,ino=s.st_ino,nlink=s.st_nlink,mtime_ns=s.st_mtime_ns,sha256=sha))
+assert after[0]['ino']==after[1]['ino'];available=os.statvfs('/workspace').f_bavail*os.statvfs('/workspace').f_frsize
+receipt=dict(time=datetime.now(timezone.utc).isoformat(),before=rows,after=after,before_available=before,after_available=available,actual_available_delta=available-before,original_unique_destination_aliases=1,full_byte_compare_before_after=True,all_paths_remain_complete_regular_with_original_bytes_and_modes=True,source_alias_original_mtime_unchanged=True,destination_mtime='adopts existing canonical inode mtime, full original value retained above',initial_preflight='Assertion1 before mutation: counted compiler names without state; all seven matches are PID1-parent zombies, exact state table below, no live compiler',compiler_state_rows=selected,closed_destination='original tests0/guard0/194 checked with no changes, finish2026-11-13T00:19:02Z',execution='no native/build invocation; closed historical static output only, no active cache or cold qualification',private_full_process_table='retained600 in scratch, not published',scope='one exact whole49,789,168B closed library, no archive/raw partial/Git object/policy/validator deletion or scientific result')
+(h/'ACTUAL_WHOLE_CLOSED_OUTPUT_SHARING.json').write_text(json.dumps(receipt,indent=2)+'\n');os.chmod(h/'entire-current-process-table.txt',0o600)
+r=Path('/workspace/crypto');g=r/'research/chained_jacobian_transfers_20261110/evidence/closed-static-output-whole-byte-storage-07';g.mkdir()
+for n in ['ENTIRE_BEFORE_EXACT_CLOSED_STATIC_OUTPUTS.json','ACTUAL_WHOLE_CLOSED_OUTPUT_SHARING.json']:shutil.copyfile(h/n,g/n)
+shutil.copyfile(__file__,g/'entire-actual-storage-caller.py.txt')
+args=['python3','tools/pcc/pcc.py','claim','new','--kind','statement','--claim-type','data','--statement','One exact whole49,789,168B closed historical static-test library15e4ed73 in ct53 now shares the existing complete canonical ct90 inode after full-byte compare/SHA/size/mode/device/before-nlink1 checks. Original tests0/guard0/194 checked/finishNov13 retained. First preflight counted compiler names and stopped1 before mutation; all seven are actual Z-state PID1-parent zombies, no live compiler. Every original source/destination path remains complete regular with exact bytes/mode; all twenty canonical aliases remain, destination mtime adopts canonical and full original mtime retained. Exact actual available-space delta in receipt, no assumed gain or raw/archive/partial/Git-object deletion or artifact/verifier/gate change. No native execution/cold-cache qualification/performance result; original full scientific/admission/paid STOP unchanged.']
+for f in sorted(g.iterdir()):args+=['--proof','attestation:'+str(f.relative_to(r))]
+c=subprocess.check_output(args,cwd=r,text=True).strip();e=f'''\n---\n\n{datetime.now(timezone.utc).isoformat()}\n# Retain whole closed static output through exact inode sharing\n\n## What was done\n{c}: whole49,789,168B closed ct53 library shares existing ct90 bytes after full compare/SHA/mode/device/nlink1 checks and original tests0/guard0/finishNov13. All paths regular/whole and canonical20 aliases retained. Actual available delta{available-before}B; complete before/after/mtime provenance retained. No live compiler/native invocation. [pcc:unverified]\n\n## Decisions made\nReserve actual recovered capacity for current complete CI archives without deleting original raw/partial/Git objects or using selected members. Closed-output storage gives no cold qualification or performance result. [pcc:unverified]\n\n## Open threads\nRoot currentCI/full11 replay17:50 and Consumer own wholeCI18:15; complete norm04 tag/integration and next actual field/Jacobian obligations. [pcc:unverified]\n\n## Errors\nInitial metadata preflight1 counted seven compiler-name zombies; exact Z-state rows retained and predicate corrected to live processes. No mutation occurred before that stop, no source/gate change. All earlier ENOSPC/partial/cache-index failures remain. [pcc:unverified]\n'''
+for f in[r/'docs/session-logs/2026-11-16.md',r/'.resume/RESUME.md']:
+ with f.open('a')as out:out.write(e)
+print(c,'available_delta',available-before,'now',available,flush=True)

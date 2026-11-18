@@ -1,0 +1,5 @@
+# Fixed startup-amortization calibration
+
+Adding delta to every source offset and replacing T by T-delta leaves each original source x=beta_i+T unchanged. The new upper bound is reduced by delta, so the allowed source coordinates remain canonical. Old complete roots are retained exactly when T>=delta. For all declared delta<=624, both frozen base roots exceed delta; no original upper-bound-excluded root can enter because that bound shifts equally. Thus expected roots shift in T only, with auxiliaries unchanged. A binomial coefficient expansion independently checks R_new(T)=R_old(T+delta).
+
+Compact declarative inputs plus a frozen generator define all explicit instances. Their canonical JSON hashes are computed before execution and verified by each child, so no unseen input selection is made during comparison. A/B run identical reference code with all generation, verification, startup and serialization charged. Pair spread is abs(A-B)/median(A,B); every size and failing pair remains. A stable multi-query batch is not a hard single instance, exclusive isolation or optimized-code speed evidence.

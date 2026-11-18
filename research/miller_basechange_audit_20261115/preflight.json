@@ -1,0 +1,100 @@
+{
+  "schema": "actual-miller-basechange-preflight/v1",
+  "build_snapshots": 10,
+  "failed_build_states": [
+    "01",
+    "03",
+    "04",
+    "07"
+  ],
+  "successful_builds": [
+    "02",
+    "05",
+    "06",
+    "08",
+    "09",
+    "10"
+  ],
+  "final_build": "10/project logs no warnings/errors; one inherited frozen-auditor String.mk deprecation",
+  "gate": {
+    "archive": "research/miller_basechange_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_miller_basechange_audit_20261115_lean/audit.log",
+        "bytes": 45729,
+        "sha256": "101bf371dddb9aba6f6b88bcdf4231faf4d2c848c7e8567d770fa5f434e8e49f"
+      },
+      {
+        "member": "research_miller_basechange_audit_20261115_lean/build.log",
+        "bytes": 20769,
+        "sha256": "201bea6d593cf61383f55ce4f4be322451910721ff57e2a46a6107ae85de3052"
+      },
+      {
+        "member": "research_miller_basechange_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_miller_basechange_audit_20261115_lean/source-build.log",
+        "bytes": 20769,
+        "sha256": "df8d44fb858932250b0eaf4ecb5058369fa3fa44f3a3431ea4663c56a6e4822c"
+      },
+      {
+        "member": "research_miller_basechange_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 471,
+    "failing": 0,
+    "trusted_native": 0,
+    "inherited_audit_tool_deprecation_warnings": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ]
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "retained_negative_native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 0,
+    "summary": true,
+    "truncated_prefixes": 1,
+    "unresolved": 0
+  },
+  "retained_initial_gate": 471,
+  "archive": {
+    "archive": "research/miller_basechange_audit_20261115/evidence/attempts.tar.xz",
+    "files": 153,
+    "unique_objects": 73,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "exact_reused_modules": 58,
+  "new_modules": 9,
+  "actual_full_function_field_embedding": true,
+  "actual_norm_infinity_normalization_compatibility": true,
+  "actual_point_step_alln_miller_compatibility": true,
+  "proper_geometric_miller_predicate_uniqueness": true,
+  "chosen_addition_all_basefields": true,
+  "actual_F3_alln_weak_counterfeit_family": true,
+  "actual_mapped_ratio_geometric_divisor_nonzero": true,
+  "qualified_source_definition_exercise_survive": true,
+  "full_finitepoint_divisor_basechange_or_scheme_descent": false,
+  "full_canonical_pairing_or_original14_completion": false,
+  "independent_implementation_or_physicalhost_validation": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "paid_compute_and_agent_upload": 0
+}

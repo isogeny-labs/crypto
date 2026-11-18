@@ -1,0 +1,13 @@
+[package]
+name="hec-profile-strata"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="profile-strata"
+path="main.rs"
+[[bin]]
+name="profile-row-verify"
+path="row_verify.rs"

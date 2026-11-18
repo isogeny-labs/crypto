@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T08:35:25Z",
+ "id": "PCC-20261116-94569a",
+ "kind": "statement",
+ "producer": {
+  "commit": "dfe88f759a52d3e84f44783f94dee62ac47b3e03",
+  "model": "",
+  "session": "prime-field-transfer-goal-round-06"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-06/post-setup-06-u3.json",
+    "sha256": "815d8248a18bfacbc5578f8d7eb5314f1086d48955e340ba88f2cd81b511bc1d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-06/post-setup-06-u5.json",
+    "sha256": "c0d077fa034779f64d17bd67c4330b00e85c8d3dd103e51ea25d4b6b2d53b23e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-06/post-qualify-06-u3-all.json",
+    "sha256": "b66542d0e79e7229ae992aa07fd3d0811eb25d15664cc3c080c20ea4ce10815e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_field_transfer_goal_20261116/round-06",
+ "statement": "The frozen classical modular-kernel constructor produces byte-identical u3 and u5 model files compared with round04, and its complete u3 qualification JSONL is byte-identical to round04. All three calls exit0; global exact divisions and a good-prime coprimality check precede model acceptance. This is producer-only correctness evidence, no performance, novel map or independent execution claim."
+}

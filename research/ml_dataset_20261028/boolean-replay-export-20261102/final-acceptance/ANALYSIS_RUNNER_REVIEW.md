@@ -1,0 +1,7 @@
+# Analyzer invocation receipt review
+
+Reviewed exact runner SHA256 5a85084962e2a819f2d04de0445639e653cd32e6130d500945f8d1a3cfa83c25 against frozen V6 analyzer and exporter receipt contract. No blocking source defect identified for the stated one-shot read-only analysis path. Not executed.
+
+It requires a finished settled driver, exact analyzer hash, absence of prior analysis/output/log/start/receipt files, then creates an exclusive start record before subprocess launch. The exact pinned interpreter path and argv match the exporter contract. stdout/stderr are exclusive files; subprocess.run timeout kills and waits for its direct child. The pinned analyzer does not spawn children. Finally records exit or exception, finish time, any actual analysis hash, both available logs and after-checks of script/readiness/terminal identities. A nonzero analyzer exit remains nonzero; there is no fallback, retry or generation command. Interrupted/timeout analysis with no complete output remains retained evidence and cannot satisfy the exporter's completed analysis prerequisite.
+
+The analyzer itself writes analysis.json exclusively and exits0 for PASS or1 for FAIL. Root runner retains either result rather than converting failure to success. The upcoming exporter V2 will require exact stdout/stderr paths, interpreter, before/after identity checks and no exception for a usable completed analysis receipt; partial invocation custody remains separate. No production edits, analyzer invocation or native execution were performed.

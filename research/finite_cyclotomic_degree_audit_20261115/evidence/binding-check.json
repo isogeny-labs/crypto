@@ -1,0 +1,36 @@
+{
+  "schema": "native-finite-cyclotomic-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "finite-cyclotomic-degree",
+      "expected_decl_sha256": "f288e1fae592ab4d95cb11362fa1784f7a077a5ba6ee54060279e215ce8c5742",
+      "full_characters": 861,
+      "full_decl_sha256": "f288e1fae592ab4d95cb11362fa1784f7a077a5ba6ee54060279e215ce8c5742",
+      "full_normalized_signature": "theorem finite_cyclotomic_degree_certificate : (∀ (K : Type) [Field K] [Fintype K] (r : ℕ) [NeZero (r : K)], Module.finrank K (rootsField K r) = orderOf (Fintype.card K : ZMod r) ∧ (∀ (n : ℕ), Module.finrank K (rootsField K r) ∣ n ↔ r ∣ Fintype.card K ^ n - 1) ∧ (∀ (L : IntermediateField K (Closure K)) [Finite L], (rootsField K r ≤ L ↔ r ∣ Nat.card L - 1) ∧ ((∀ x : Closure K, x ^ r = 1 → x ∈ L) ↔ r ∣ Fintype.card K ^ Module.finrank K L - 1))) ∧ (∀ (K : Type) [Field K], Module.finrank K (rootsField K 1) = 1 ∧ Module.finrank K (rootsField K 2) = 1) ∧ (∀ (K : Type) [Field K] [Fintype K] (p : ℕ) [Fact p.Prime] [CharP K p], Module.finrank K (rootsField K p) = 1 ∧ orderOf (Fintype.card K : ZMod p) = 0 ∧ Module.finrank K (rootsField K p) ≠ orderOf (Fintype.card K : ZMod p) ∧ rootsField K p ≤ (⊥ : IntermediateField K (Closure K)) ∧ ¬ p ∣ Fintype.card K - 1)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "finite_cyclotomic_degree_certificate",
+        "end_byte": 1298,
+        "file": "/workspace/scratch/finite-cyclotomic-binding-input01/CyclotomicCertificate.lean",
+        "qualified_decl_id": "FiniteCyclotomicDegreeAudit.finite_cyclotomic_degree_certificate",
+        "signature": "theorem finite_cyclotomic_degree_certificate :\n    (∀ (K : Type) [Field K] [Fintype K] (r : ℕ) [NeZero (r : K)],\n      Module.finrank K (rootsField K r) = orderOf (Fintype.card K : ZMod r) ∧\n      (∀ (n : ℕ), Module.finrank K (rootsField K r) ∣ n ↔\n        r ∣ Fintype.card K ^ n - 1) ∧\n      (∀ (L : IntermediateField K (Closure K)) [Finite L],\n        (rootsField K r ≤ L ↔ r ∣ Nat.card L - 1) ∧\n        ((∀ x : Closure K, x ^ r = 1 → x ∈ L) ↔\n          r ∣ Fintype.card K ^ Module.finrank K L - 1))) ∧\n    (∀ (K : Type) [Field K],\n      Module.finrank K (rootsField K 1) = 1 ∧ Module.finrank K (rootsField K 2) = 1) ∧\n    (∀ (K : Type) [Field K] [Fintype K] (p : ℕ) [Fact p.Prime] [CharP K p],\n      Module.finrank K (rootsField K p) = 1 ∧\n      orderOf (Fintype.card K : ZMod p) = 0 ∧\n      Module.finrank K (rootsField K p) ≠ orderOf (Fintype.card K : ZMod p) ∧\n      rootsField K p ≤ (⊥ : IntermediateField K (Closure K)) ∧\n      ¬ p ∣ Fintype.card K - 1)",
+        "start_byte": 270
+      },
+      "recorded_statement": "theorem finite_cyclotomic_degree_certificate : (∀ (K : Type) [Field K] [Fintype K] (r : ℕ) [NeZero (r : K)], Module.finrank K (rootsField K r) = orderOf (Fintype.card K : ZMod r) ∧ (∀ (n : ℕ), Module.finrank K (rootsField K r) ∣ n ↔ r ∣ Fintype.card K ^ n - 1) ∧ (∀ (L : IntermediateField K (Closure K)) [Finite L], (rootsField K r ≤ L ↔ r ∣ Nat.card L - 1) ∧ ((∀ x : Closure K, x ^ r = 1 → x ∈ L) ↔ r ∣ Fintype.card K ^ Module.finrank K L - 1))) ∧ (∀ (K : Type) [Field K], Module.finrank K (rootsField K 1) = 1 ∧ Module.finrank K (rootsField K 2) = 1) ∧ (∀ (K : Type) [Field K] [Fintype K] (p : ℕ) [Fact p.Prime] [CharP K p], Module.finrank K (rootsField K p) = 1 ∧ orderOf (Fintype.card K : ZMod p) = 0 ∧ Module.finrank K (rootsField K p) ≠ orderOf (Fintype.card K : ZMod p) ∧ rootsField K p ≤ (⊥ : IntermediateField K (Closure K)) ∧ ¬ p ∣ Fintype.card K - 1)",
+      "recorded_text_sha256": "f288e1fae592ab4d95cb11362fa1784f7a077a5ba6ee54060279e215ce8c5742",
+      "source_plan": "research/finite_cyclotomic_degree_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "FiniteCyclotomicDegreeAudit.finite_cyclotomic_degree_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

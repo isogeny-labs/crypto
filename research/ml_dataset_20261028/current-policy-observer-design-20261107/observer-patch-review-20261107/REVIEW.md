@@ -1,0 +1,5 @@
+# Independent review of authentic-publication observer proposal
+
+Reviewed patch packet MANIFEST SHA-256 69274213c0ffd4d3ab2587d7c94448e328046a9afd46a4a72c88ee24844e3fd7. No blocking source defect found. Chunk observation follows actual installed/exact acknowledgement checks; complete observation follows encoder/ack/byte checks and retains an original-budget postcheck. The observer receives immutable borrowed receipts and numeric metadata; thread-local replacement refusal and non-Send guard are coherent. No obvious visibility/path/borrow compilation hazard was found.
+
+The patch remains unapplied, uncompiled and unexecuted. Callback I/O/allocation/parking must be separately bounded and recorded. Notifications are not authentication tokens or admitted supervisor outcomes. Actual durable artifacts, original-cell admission, production sealing, watchdog cleanup, qualified checkpoint/tail cut and mathematical replay remain required. Snapshot completion does not prove nonempty checked rows. The current production source is unchanged.

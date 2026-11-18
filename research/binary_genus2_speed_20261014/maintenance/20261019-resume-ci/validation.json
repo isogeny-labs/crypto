@@ -1,0 +1,177 @@
+{
+  "schema": "binary-genus2.ci-maintenance/v1",
+  "inspected_head": "a320d9dc3100ec553ccda0fc43e2de7f863380af",
+  "inspected_base": "c6d64436a33359320ad9d5b42c4acebee2968b9a",
+  "worker_paused_with_checkpoints": {
+    "pid": 641,
+    "status": "paused_with_checkpoints",
+    "timestamp_unix": 1792381831
+  },
+  "changes": [
+    "Add tools/volcano-cli and isogeny_algos to native checkout and trigger paths.",
+    "Regenerate the standalone lockfile with cargo update --package crypto; 17 packages added, existing registry selections retained.",
+    "Document the actual interruption/resume and inherited merge gates."
+  ],
+  "checks": [
+    {
+      "command": "cargo metadata --locked --offline --format-version 1 (with volcano-cli absent)",
+      "exit_code": 101,
+      "result": "Reproduced the missing volcano-cli dependency; see missing-checkout.log."
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/binary-genus2-cover/Cargo.toml --package binary-genus2-cover -- --check",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo metadata --locked --offline --filter-platform x86_64-unknown-linux-gnu --manifest-path tools/binary-genus2-cover/Cargo.toml --format-version 1",
+      "exit_code": 0,
+      "result": "All six local package manifests are included by the patched native checkout."
+    },
+    {
+      "command": "Strict YAML duplicate-key and workflow/dependency-closure validation",
+      "exit_code": 0,
+      "result": {
+        "strict_yaml_duplicate_key_check": "passed",
+        "platform": "x86_64-unknown-linux-gnu",
+        "locked_dependency_resolution": "passed",
+        "local_path_dependencies": [
+          {
+            "package": "binary-genus2-cover",
+            "manifest": "tools/binary-genus2-cover/Cargo.toml",
+            "included_by_checkout": true
+          },
+          {
+            "package": "crypto",
+            "manifest": "Cargo.toml",
+            "included_by_checkout": true
+          },
+          {
+            "package": "ecdlp-surfaces",
+            "manifest": "tools/ecdlp-surfaces/Cargo.toml",
+            "included_by_checkout": true
+          },
+          {
+            "package": "isogeny_algos",
+            "manifest": "isogeny_algos/Cargo.toml",
+            "included_by_checkout": true
+          },
+          {
+            "package": "surface-evidence",
+            "manifest": "docs/ecdlp-surfaces/certificates/Cargo.toml",
+            "included_by_checkout": true
+          },
+          {
+            "package": "volcano-cli",
+            "manifest": "tools/volcano-cli/Cargo.toml",
+            "included_by_checkout": true
+          }
+        ],
+        "native_and_lean_timeouts_unchanged": true,
+        "native_validation_command_unchanged": true
+      }
+    },
+    {
+      "command": "bash tools/binary-genus2-cover/check.sh",
+      "exit_code": 101,
+      "result": "Stops while compiling unchanged shared crypto library: 25 compiler errors; native tests, Clippy and CLI replay were not reached."
+    },
+    {
+      "command": "cargo test --release --locked --lib -- --test-threads=1",
+      "exit_code": 101,
+      "result": "45 shared library-test compiler errors; no unit tests executed."
+    },
+    {
+      "command": "conductor check --summary ... --scope ...",
+      "exit_code": 127,
+      "result": "Executable unavailable; scope was stated before edits."
+    }
+  ],
+  "inherited_base_proof": [
+    {
+      "path": "Cargo.lock",
+      "base": "d9fdedcd2b059498e8e1b8f7ee9f9a451793bb05",
+      "head": "d9fdedcd2b059498e8e1b8f7ee9f9a451793bb05",
+      "identical": true
+    },
+    {
+      "path": "Cargo.toml",
+      "base": "c9ddd0fe8c2d14eb2ac16f6f8c7c6e3abbc77383",
+      "head": "c9ddd0fe8c2d14eb2ac16f6f8c7c6e3abbc77383",
+      "identical": true
+    },
+    {
+      "path": "docs",
+      "base": "aea9a02f3f08f32f6cea2c533579622085d0f540",
+      "head": "bacedee793d7835d91598bc4f94892070e6a19b4",
+      "identical": false
+    },
+    {
+      "path": "isogeny_algos",
+      "base": "b4b4f554b787743cc34db403cf27d5d4f3f415e9",
+      "head": "b4b4f554b787743cc34db403cf27d5d4f3f415e9",
+      "identical": true
+    },
+    {
+      "path": "src",
+      "base": "401b7bf9620d4bb39757d06d5d00254a37093ae7",
+      "head": "401b7bf9620d4bb39757d06d5d00254a37093ae7",
+      "identical": true
+    },
+    {
+      "path": "tests",
+      "base": "f085622d00c2315e5a1f463a6218e258eb1838e1",
+      "head": "f085622d00c2315e5a1f463a6218e258eb1838e1",
+      "identical": true
+    }
+  ],
+  "shared_workflow_files_match_base": true,
+  "ci_scope_script_matches_base": true,
+  "lean_auditor_matches_base": true,
+  "old_historical_whole_library_results_not_relabelled_as_current": true,
+  "environment_diagnostics": [
+    "A full source archive exceeded a 1,500,000,000-byte bound; its incomplete download was not treated as a complete checkout.",
+    "The selected validation source was restored from cached objects, verified complete archive entries and exact public raw files. All 1,263 selected Git blob identities were checked.",
+    "An unfiltered all-platform metadata request hit a 403 No approved upstream IPv4 address for a WASI crate; no proxy or policy bypass was attempted. Locked Linux metadata passed.",
+    "Initial --no-deps metadata did not reproduce the checkout failure; the dependency-resolving invocation did, after the registry cache was available."
+  ],
+  "measurement_status": "No new solve, performance run, priced cost, admitted speedup, ecbench audit or arithmetic/solver source change. The campaign binary is unchanged.",
+  "new_head_ci": "Must be checked on the actual publication commit; these local diagnostics do not make CI green.",
+  "publication_checks": {
+    "selected_source_files_checked": 1262,
+    "unexpected_source_changes": [],
+    "all_original_locked_package_versions_retained": true,
+    "added_locked_packages": [
+      "ahash 0.8.12",
+      "block-buffer 0.10.4",
+      "cpufeatures 0.2.17",
+      "crypto-common 0.1.7",
+      "digest 0.10.7",
+      "fallible-iterator 0.3.0",
+      "fallible-streaming-iterator 0.1.9",
+      "generic-array 0.14.7",
+      "hashbrown 0.14.5",
+      "hashlink 0.9.1",
+      "isogeny_algos 0.1.0",
+      "libsqlite3-sys 0.30.1",
+      "rusqlite 0.32.1",
+      "sha2 0.10.9",
+      "typenum 1.20.1",
+      "version_check 0.9.5",
+      "volcano-cli 0.1.0"
+    ],
+    "authored_text_whitespace_and_json": "passed",
+    "frozen_paths_absent_from_publication": true
+  },
+  "documentation_checks": {
+    "relative_markdown_links_checked": 38,
+    "missing_links": [],
+    "json_documents_parse": true,
+    "new_files_avoid_frozen_paths": true
+  },
+  "operational_receipt_projection": {
+    "recovered_scalar_fields_omitted": 3,
+    "both_group_verification_outcomes_retained": true,
+    "full_local_and_frozen_receipts_unchanged": true,
+    "json_and_text_checks": "passed"
+  }
+}

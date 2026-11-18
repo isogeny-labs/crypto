@@ -1,0 +1,145 @@
+{
+  "schema": "hashed-native-ecbench.launch-plan/v1",
+  "repository": "isogeny-labs/crypto",
+  "driver_pr": 2984,
+  "library_followup_pr": "https://github.com/isogeny-labs/cryptanalysis/pull/1397",
+  "source_revision_policy": "The exact published frozen head containing this plan; no mutable branch image or unrelated fixture.",
+  "spec_path": "research/hashed_ecdl_ecbench_20261030/spec.json",
+  "protocol_path": "research/hashed_ecdl_ecbench_20261030/protocol.json",
+  "planned_executions": 1728,
+  "resources": {
+    "instance_type": "c8a.2xlarge",
+    "spot": true,
+    "pod_cpu": 4,
+    "pod_memory_gib": 4,
+    "concurrency": 1,
+    "original_measurement_deadline_seconds": 1800,
+    "child_timeout_seconds": 30
+  },
+  "cost": {
+    "currency": "USD",
+    "maximum_total_cloud_cost": 10,
+    "maximum_build_invocations": 2,
+    "maximum_measurement_attempts": 1,
+    "automatic_retries": 0,
+    "restores": 0,
+    "current_account_headroom": null,
+    "current_lane_headroom": null,
+    "current_charged_and_reserved_costs": null,
+    "telemetry_time": null,
+    "unknown_policy": "STOP before cloud build or experiment; do not infer headroom from old delayed billing snapshots."
+  },
+  "steps": [
+    {
+      "id": "publish",
+      "command": [
+        "python3",
+        "taskq/deploy/eks-karpenter/check-experiment-git",
+        "--repository",
+        "isogeny-labs/crypto",
+        "--path",
+        "research/hashed_ecdl_ecbench_20261030/protocol.json",
+        "--path",
+        "research/hashed_ecdl_ecbench_20261030/spec.json",
+        "--path",
+        "research/hashed_ecdl_ecbench_20261030/resume-20261104/launch-plan.json",
+        "--path",
+        "src/cryptanalysis/ecbench/hashed_native.rs",
+        "--path",
+        "taskq/deploy/eks-karpenter/checkpoint-source",
+        "--path",
+        ".github/workflows/isolab-experiment.yml",
+        "--path",
+        "research/hashed_ecdl_ecbench_20261030/frozen-input-files.v3.sha256",
+        "--path",
+        "research/hashed_ecdl_ecbench_20261030/resume-20261104/current-source.sha256",
+        "--path",
+        ".github/workflows/isolab-source-checkpoint.yml",
+        "--path",
+        "Cargo.toml",
+        "--path",
+        "Cargo.lock",
+        "--path",
+        "src/cryptanalysis/ecbench/optimization.rs"
+      ],
+      "requires": "Before the literal publication command, run sha256sum -c on the v3 input manifest and current-source manifest. Then require clean exact listed inputs/index and an immutable GitHub publication receipt; retain its SHA. The authenticated workflow checks out the exact immutable revision into a fresh tree."
+    },
+    {
+      "id": "budget",
+      "requires": "Current authorized account and lane headroom with charged/reserved costs, timestamp and current price/budget envelope; this information is unavailable and has been requested by connection/runner name. Unknown is not approval."
+    },
+    {
+      "id": "source_checkpoint",
+      "command_template": [
+        "gh",
+        "workflow",
+        "run",
+        "isolab-source-checkpoint.yml",
+        "--repo",
+        "isogeny-labs/crypto",
+        "--ref",
+        "main",
+        "-f",
+        "source_revision=EXACT_FROZEN_SHA",
+        "-f",
+        "spec_path=research/hashed_ecdl_ecbench_20261030/spec.json",
+        "-f",
+        "protocol_path=research/hashed_ecdl_ecbench_20261030/protocol.json"
+      ],
+      "requires": "Publication and current budget/headroom gates pass before paid storage/transfer. Trusted workflow on main; existing temporary identity; actual source/spec/protocol/archive upload/readback hashes. Templates are not an executed command receipt."
+    },
+    {
+      "id": "image",
+      "command_template": [
+        "gh",
+        "workflow",
+        "run",
+        "isolab-experiment.yml",
+        "--repo",
+        "isogeny-labs/crypto",
+        "--ref",
+        "main",
+        "-f",
+        "source_revision=EXACT_FROZEN_SHA",
+        "-f",
+        "publish_only=true",
+        "-f",
+        "spec_path=research/hashed_ecdl_ecbench_20261030/spec.json"
+      ],
+      "requires": "Publication, checkpoint/readback and budget gates pass; retain actual workflow/build/binary/OCI identities and all costs. No scientific submission in publish-only mode."
+    },
+    {
+      "id": "measurement",
+      "command_template": [
+        "gh",
+        "workflow",
+        "run",
+        "isolab-experiment.yml",
+        "--repo",
+        "isogeny-labs/crypto",
+        "--ref",
+        "main",
+        "-f",
+        "source_revision=EXACT_FROZEN_SHA",
+        "-f",
+        "publish_only=false",
+        "-f",
+        "spec_path=research/hashed_ecdl_ecbench_20261030/spec.json",
+        "-f",
+        "instance_type=c8a.2xlarge",
+        "-f",
+        "seconds=1800",
+        "-f",
+        "size_sweep=false",
+        "-f",
+        "resumable=false"
+      ],
+      "requires": "All prior gates and current budget headroom still pass; the maintained path rebuilds/publishes and must admit that final exact image before submitting the one native L2 job. Retain original IDs, no duplicate after ambiguity."
+    },
+    {
+      "id": "retain_and_report",
+      "requires": "Keep every failed/exhausted/interrupted outcome and raw S3 object, native L2/replay/A/A/hash admissions and missing counters. Write bench.record/v1 plus canonical export/progress/PCC records. No complete comparison from incomplete arms, no execution-verification claim without signed standing."
+    }
+  ],
+  "input_manifest": "research/hashed_ecdl_ecbench_20261030/frozen-input-files.v3.sha256"
+}

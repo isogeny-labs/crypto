@@ -1,0 +1,168 @@
+[
+  {
+    "id": "source-guards-20261116-v93",
+    "hypothesis": "Disjoint low-source-bit guards remove unit-monomial blindness while preserving every source-pair root;test shallow-guard pruning before globaluse",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.source_guards_20261116_v93.worker",
+      "source-guards-20261116-v93",
+      "raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance/GATE.md",
+      "performance_gate.py",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/separator_images_20261116_v91/kernel.py",
+      "research/linearized_bridge_20261116_v90c/subspace.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/source_guards_20261116_v93/common.py",
+      "research/source_guards_20261116_v93/worker.py",
+      "research/source_guards_20261116_v93/kernel.py",
+      "research/source_guards_20261116_v93/PROOF_AND_REVIEW.md"
+    ],
+    "input_paths": [
+      "research/source_guards_20261116_v93/DATA.json"
+    ],
+    "artifact_paths": [
+      "research/source_guards_20261116_v93/raw.json"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+      "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/source_guards_20261116_v93/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/source_guards_20261116_v93/worker.py": "257073c6836592428ca8b461d0262c578ec826bce81ff90e6fbc053f6d6374e2",
+      "research/source_guards_20261116_v93/kernel.py": "d0b80165f7fc734a3d4f9e20bef81203d990c34f25e077a3ae7cf341ce90829c",
+      "research/source_guards_20261116_v93/PROOF_AND_REVIEW.md": "0007fc335f7381a27bb18c00309ac13729642c22a0b5a326c22145da72f09f83",
+      "research/source_guards_20261116_v93/DATA.json": "0daa3e9839e1bf8ac070c65ea5ab4a0eb7c748f53a2ec87dfd95c3bb95d33f20"
+    }
+  },
+  {
+    "id": "symmetric-pair-oracles-20261116-v93b",
+    "hypothesis": "Exact symmetric coefficient fibers plus constrained quadratic support recover every source pair;compare genuine F4/F5 on identical original bits",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.symmetric_pair_20261116_v93b.oracles",
+      "symmetric-pair-oracles-20261116-v93b",
+      "oracles_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance/GATE.md",
+      "performance_gate.py",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/separator_images_20261116_v91/kernel.py",
+      "research/disjoint_separator_20261116_v92/kernel.py",
+      "research/linearized_bridge_20261116_v90c/subspace.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/source_guards_20261116_v93/kernel.py",
+      "research/symmetric_pair_20261116_v93b/cold.py",
+      "research/symmetric_pair_20261116_v93b/common.py",
+      "research/symmetric_pair_20261116_v93b/child.py",
+      "research/symmetric_pair_20261116_v93b/oracles.py",
+      "research/symmetric_pair_20261116_v93b/kernel.py",
+      "research/symmetric_pair_20261116_v93b/PROOF_AND_REVIEW.md"
+    ],
+    "input_paths": [
+      "research/symmetric_pair_20261116_v93b/DATA.json"
+    ],
+    "artifact_paths": [
+      "research/symmetric_pair_20261116_v93b/oracles_raw.json"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+      "research/disjoint_separator_20261116_v92/kernel.py": "ae46a6cf9b68c59740b9470c7f417eafb313b2733ae2758e5a7653f2bab4b0d9",
+      "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/source_guards_20261116_v93/kernel.py": "d0b80165f7fc734a3d4f9e20bef81203d990c34f25e077a3ae7cf341ce90829c",
+      "research/symmetric_pair_20261116_v93b/cold.py": "25a846a6ca4517f3f85aaf9570126f8db02437cf69e2dddf6ca326d82c87fe39",
+      "research/symmetric_pair_20261116_v93b/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/symmetric_pair_20261116_v93b/child.py": "abde0214a1099925f1a94ffba30b340c937b1956bdf93c5e5f6644244f875f92",
+      "research/symmetric_pair_20261116_v93b/oracles.py": "240102ba7da9eebaa1546cd7b1ea2ca1f4d2f3e0804e68a611650c03f53004ee",
+      "research/symmetric_pair_20261116_v93b/kernel.py": "7cda1a93a40c6bce29135ba24b9af48d5db5c7c556b550af04b8380c83332aac",
+      "research/symmetric_pair_20261116_v93b/PROOF_AND_REVIEW.md": "29964f63e6bc4a2b08c7c57b58da3cad32d305e95164bdfb5d99ca8d970a9903",
+      "research/symmetric_pair_20261116_v93b/DATA.json": "0cc0e7c0a7c9a653d4ddfdb3213866587bdecb5d4b194522555f23e9dd4b17d6"
+    }
+  },
+  {
+    "id": "symmetric-pair-cold-20261116-v93b",
+    "hypothesis": "Exact symmetric coefficient fibers plus constrained quadratic support recover every source pair;compare genuine F4/F5 on identical original bits",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.symmetric_pair_20261116_v93b.cold",
+      "symmetric-pair-cold-20261116-v93b",
+      "cold_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance/GATE.md",
+      "performance_gate.py",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/separator_images_20261116_v91/kernel.py",
+      "research/disjoint_separator_20261116_v92/kernel.py",
+      "research/linearized_bridge_20261116_v90c/subspace.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/source_guards_20261116_v93/kernel.py",
+      "research/symmetric_pair_20261116_v93b/cold.py",
+      "research/symmetric_pair_20261116_v93b/common.py",
+      "research/symmetric_pair_20261116_v93b/child.py",
+      "research/symmetric_pair_20261116_v93b/oracles.py",
+      "research/symmetric_pair_20261116_v93b/kernel.py",
+      "research/symmetric_pair_20261116_v93b/PROOF_AND_REVIEW.md",
+      "vendor/chain_native_v90/main.rs",
+      "vendor/chain_native_v90/chain-native-baseline"
+    ],
+    "input_paths": [
+      "research/symmetric_pair_20261116_v93b/DATA.json"
+    ],
+    "artifact_paths": [
+      "research/symmetric_pair_20261116_v93b/cold_raw.json"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [
+      "symmetric-pair-oracles-20261116-v93b"
+    ],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+      "research/disjoint_separator_20261116_v92/kernel.py": "ae46a6cf9b68c59740b9470c7f417eafb313b2733ae2758e5a7653f2bab4b0d9",
+      "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/source_guards_20261116_v93/kernel.py": "d0b80165f7fc734a3d4f9e20bef81203d990c34f25e077a3ae7cf341ce90829c",
+      "research/symmetric_pair_20261116_v93b/cold.py": "25a846a6ca4517f3f85aaf9570126f8db02437cf69e2dddf6ca326d82c87fe39",
+      "research/symmetric_pair_20261116_v93b/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/symmetric_pair_20261116_v93b/child.py": "abde0214a1099925f1a94ffba30b340c937b1956bdf93c5e5f6644244f875f92",
+      "research/symmetric_pair_20261116_v93b/oracles.py": "240102ba7da9eebaa1546cd7b1ea2ca1f4d2f3e0804e68a611650c03f53004ee",
+      "research/symmetric_pair_20261116_v93b/kernel.py": "7cda1a93a40c6bce29135ba24b9af48d5db5c7c556b550af04b8380c83332aac",
+      "research/symmetric_pair_20261116_v93b/PROOF_AND_REVIEW.md": "29964f63e6bc4a2b08c7c57b58da3cad32d305e95164bdfb5d99ca8d970a9903",
+      "vendor/chain_native_v90/main.rs": "635c288e48e66def6effa550b59a57172756bb2cf8c5543245833f5b297db007",
+      "vendor/chain_native_v90/chain-native-baseline": "9eaa4b09d120e1f51b6bb5ccb542d04963dc57d218ddbb7e9be9412e00b31725",
+      "research/symmetric_pair_20261116_v93b/DATA.json": "0cc0e7c0a7c9a653d4ddfdb3213866587bdecb5d4b194522555f23e9dd4b17d6"
+    }
+  }
+]

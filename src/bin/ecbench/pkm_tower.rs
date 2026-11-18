@@ -493,6 +493,7 @@ impl<'i> PkmTowerOracle<'i> {
             solving_degree: Some(rep.solving_degree_max),
             timed_out: stopped,
             extra,
+            ..Default::default()
         };
         self.totals.absorb(&shape, Some(&cost), stopped);
         self.shape = Some(shape);

@@ -1,0 +1,122 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "extended residual-sweep study, 38-bit prime curve",
+ "description": "lead ICP-residual-partial-relations, exhaustive: sizes, variants, base shapes, generic comparators",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 173769846863,
+    "a": 85291828412,
+    "b": 46923216470,
+    "group_order": 173769935293,
+    "r": 173769935293,
+    "gx": 81616313740,
+    "gy": 135345947663
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261002
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-lanes16",
+   "role": "candidate",
+   "method": {
+    "id": "rho.negation_lanes",
+    "params": {
+     "lanes": "16"
+    }
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "candidate",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  },
+  {
+   "name": "kangaroo",
+   "role": "candidate",
+   "method": {
+    "id": "kangaroo.vow"
+   }
+  },
+  {
+   "name": "sweep-b2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b2-dp4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2",
+     "oracle": "residual-sweep:m=2,dp=4",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b2-dp6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2",
+     "oracle": "residual-sweep:m=2,dp=6",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-dp4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "residual-sweep:m=2,dp=4",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-dp6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "residual-sweep:m=2,dp=6",
+     "targets": "walk"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 1,
+  "isolation_required": "L2",
+  "timeout_seconds": 3600
+ }
+}

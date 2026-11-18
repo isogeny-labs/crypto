@@ -56,7 +56,7 @@ Source: `depth.py`, with output in `raw/*.jsonl` and the table in `table.md` / `
 **Frozen predictions** (`PREDICTIONS.md`, committed before the t ≥ 8 runs, sha256 `cadbf70b…`):
 - P1 (`G_t(4) = 11` at t = 8, 9, 10): **held at t = 8 and 9.** t = 10 was not run (see deviations).
 - P2 (`r* = 16` at m = 2, t = 8, c = 5): **held.**
-- P3 (`G_10(5) = 19`): **not run** (see deviations).
+- P3 (`G_10(5) = 19`): **not run here**. The Rust closure in `../depth_rust/` ran it: **held** (2/2 draws). P4 (`G_11(5) = G_12(5) = 19`, frozen after P3) also **held**. See `../depth_rust/RESULTS.md`.
 
 **Deviations.** At t = 10 an m = 2 grid has `K² ≈ 10⁶` points. At p = 40961 a random target then has a grid zero almost surely, and N1's generator found no inconsistent draw in an hour. Lab A's closure is exact only for p < 2^16, so t = 10 needs a different closure (a larger prime and exact integer linear algebra, or the Rust engine instrumented to report rounds).
 
@@ -66,7 +66,7 @@ Source: `depth.py`, with output in `raw/*.jsonl` and the table in `table.md` / `
 
 By the depth lemma, Conjecture D gives `d_F ≥ min{c : B(c) ≥ 2t}`, a lower bound that grows with t.
 - If `B(4) = 11` and `B(5) = 19` (the growth-law fit), the bound has slope about 1/4, the same as the fitted `d_F = 4 + ⌊(t−2)/4⌋`.
-- Measured so far: only `B(4) ≥ 11`, flat over four values of t.
+- Measured so far: `B(4) = 11` (flat for t = 6…12) and `B(5) = 19` (flat for t = 10…12), both from the Rust closure. The increment is 8 per degree.
 - A proof would have to show that the closure's frontier rises at most a bounded number of tower levels per degree. That fits KM-ART-DEGEN: `d_F` depends on carry transport, not on the wrap.
 
 This reformulates the open item in DERIVED.md ("no growing lower bound on `d_F`"). It does not resolve it.

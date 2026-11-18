@@ -1,0 +1,11 @@
+digraph Reduction {
+  graph [rankdir=LR, bgcolor="white", fontname="DejaVu Sans", label="Actual P-256 field — small m2 controls; unsigned evidence", labelloc=t];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fc", color="#33537a", fontname="DejaVu Sans", fontsize=11];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#33537a"];
+  original [label="Original systems\nall addition charts"];
+  exact [label="Unit affine pivots\ncoefficient identities\nreconstruction"];
+  residual [label="Depth1/m2 variables\n13 → 1   13 → 2\n17 → 4   17 → 4"];
+  cas [label="Magma GF(p) solve\nraw / reduced sets match\n2 tuples at depth1\n1 tuple at depth2", fillcolor="#eaf5ee"];
+  replay [label="GMP + OpenSSL replay\ncomplete reference counts\nregularity / time gain: open", fillcolor="#fff4df"];
+  original -> exact -> residual -> cas -> replay;
+}

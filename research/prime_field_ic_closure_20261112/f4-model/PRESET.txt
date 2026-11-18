@@ -1,0 +1,21 @@
+f4-model preset, written 2026-11-15 after the smoke test (5 cells) and BEFORE the sweep results were read.  [pcc:unverified]
+
+Question: do Theorem B (exponent 1, no-aux / graph bases) and the closures resting on it (A5, A6-APS,
+parametrised A4) survive when the solver is F4 (msolve) instead of XL, and how large is the XL-vs-F4
+degree gap?  Theorem A is solver-independent by statement (attempt cost >= 1) and is argued on paper.
+
+Per route (family, m), using cells with msolve status ok, both seeds, all primes pooled:
+  size parameter s = d (uni, interval) or d_T (graph*) or 2^s (bits; exponent read per 2^s)
+  cost proxies per attempt: sum_rows (all F4 matrix rows built), rows_reduced (msolve count),
+                            sum_nnz (sum rows*cols*density), ms_time
+  k_proxy = least-squares slope of log(median cost over seeds) on log(s), over the LARGEST 4 sizes reached
+  k = MIN over the proxies (most favourable to index calculus)
+
+Cost model carried to the exponent (Theorem B / master-inequality form, h >= c|B| relations, |B| ~ s):
+  total ~ |B| * (n / |B|^m) * |B|^k ;  optimum at |B| = n^{1/m} when k < m-1
+  e_F4 = 1 if k >= m-1, else max((1+k)/m, 2/m)
+Verdict per route:
+  Theorem B exponent-1 claim TRANSFERS (empirically) if k >= m-1-0.1
+  closure vs rho SURVIVES if e_F4 >= 0.55, INCONCLUSIVE if 0.45 <= e_F4 < 0.55, FAILS if e_F4 < 0.45
+Degree gap reported per cell: D_XL - D_F4 and D_F4 - d, D_ff - d (no-aux families).
+No data is excluded except non-ok msolve runs, which are listed.

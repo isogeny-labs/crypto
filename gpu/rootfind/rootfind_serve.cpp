@@ -5,6 +5,7 @@
  *   rootfind_serve --daemon SOCKET    the same protocol on a Unix socket, one connection
  *                                     at a time, one CUDA context for all of them
  *   rootfind_serve --info             print the backend and exit
+ *   rootfind_serve --bench-pairs      CUDA: time and compare the pair-table key kernels
  *
  * One process holds one rf64_session (rootfind_api.h): the factor base and
  * its lookup table are set up once, on the device for the CUDA build
@@ -167,8 +168,25 @@ int main(int argc, char **argv) {
         return 0;
     }
     if (argc > 2 && std::strcmp(argv[1], "--daemon") == 0) return daemon_main(argv[2]);
+    if (argc > 1 && std::strcmp(argv[1], "--bench-pairs") == 0) {
+        /* p: the 40-bit curve's field; n: base sizes of the measured runs */
+        const uint64_t p = 1099511627689ull;
+        int bad = 0;
+        for (uint32_t n : {1024u, 2048u, 4096u}) {
+            double tc = 0, tr = 0;
+            uint64_t mm = 0;
+            if (rf_pairs_bench(p, n, 20261115ull + n, &tc, &tr, &mm) != 0) {
+                std::printf("bench-pairs: n=%u failed (no CUDA backend?)\n", n);
+                return 1;
+            }
+            std::printf("bench-pairs: n=%u keys=%llu per-cell %.4f s batched-runs %.4f s (%.1fx) mismatches %llu\n", n,
+                        (unsigned long long)n * (n + 1), tc, tr, tr > 0 ? tc / tr : 0.0, (unsigned long long)mm);
+            bad |= mm != 0;
+        }
+        return bad;
+    }
     if (argc < 2 || std::strcmp(argv[1], "--serve-bin") != 0) {
-        std::fprintf(stderr, "usage: %s --serve-bin | --daemon SOCKET | --info\n", argv[0]);
+        std::fprintf(stderr, "usage: %s --serve-bin | --daemon SOCKET | --info | --bench-pairs\n", argv[0]);
         return 2;
     }
     serve(stdin, stdout);

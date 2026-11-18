@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T23:58:03Z",
+ "id": "PCC-20261115-95e243",
+ "kind": "statement",
+ "producer": {
+  "commit": "43bb330419a234fbf2010fd4b31970e95b59c238",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/control-v1/native-controls.log",
+    "sha256": "fea0564568a3aeea426e2d3d3fdf67ef9f8065356387ab69c99f1861746c5a99"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/control-v1/pre-call.json",
+    "sha256": "f91dd921e33b67240e06b05a39bcb5c514261ae21fc088e24b7de7935295a7ce"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/control-v1/calibration.json",
+    "sha256": "a892a24627d8fcfb34decc52aecba9c00152db57d09c83f365a8cf8dba2b3d4b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/control-v1/moment-identity.json",
+    "sha256": "b06db697b9852e4d59e4680a921f53d93b647c5691ecbecfde834ea1ac446ec4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/control-v1/source-v1.tar.gz",
+    "sha256": "6df8db2ace32681f07e2d8bfd001ee1ca7a518a85d8ab9fdb9165b827ed28e02"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Producer native arithmetic controls for an optional birthday-energy diagnostic: four unit and two identity integration tests pass, with exact finite binomial enumeration, heavy-atom collision-moment checks and malformed-frame controls. The fixed 8192-block endpoint binomial tails at probabilities 1/32 and 1/17 both meet the exact integer threshold numerator*2^20 <= denominator. The actual-instance plan records 268951465398242860562463204936310 samples per block and 2203250404542405513727698574838251520 total ceiling. No base sampling or solver was run. The algebra-only identity certificate IDC1hf141ff81c695aa6e does not certify probability assumptions, a torus energy theorem or an attack exponent. Current diagnostic RAM is quadratic in the factor-base size; it is not selected as a necessary stage of a linear-memory attack."
+}

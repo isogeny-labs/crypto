@@ -1,0 +1,130 @@
+name: Prime31 exact-source WZ rho frontier (APS versus look-ahead/Brent)
+
+on:
+  push:
+    branches: [research/prime31-wz-rho-frontier-20261116, research/prime31-wz-rho-ci-repair-20261116, research/prime31-wz-pinned-metrics-20261116]
+    paths:
+      - examples/prime31_wz_rho_frontier.rs
+      - research/prime31_ic_20261115/native/WZ_FRONTIER_PROTOCOL_20261116.md
+      - .github/workflows/prime31-wz-rho-frontier.yml
+  pull_request:
+    paths:
+      - examples/prime31_wz_rho_frontier.rs
+      - research/prime31_ic_20261115/native/WZ_FRONTIER_PROTOCOL_20261116.md
+      - .github/workflows/prime31-wz-rho-frontier.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wz-complete-cold:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      RAYON_NUM_THREADS: '1'
+      CARGO_BUILD_JOBS: '2'
+    steps:
+      - name: Check out proposed exact WZ runner
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # The 2026-11-16 repo main no longer resolved the native APS manifest
+      # through contents API. Use the immutable ALREADY-MERGED #4454 baseline.
+      - name: Check out immutable existing Rust APS source
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+
+      - name: Install pinned Rust 1.100
+        run: rustup toolchain install 1.100.0 --profile minimal
+
+      - name: Copy new runner into complete immutable Rust source tree
+        run: |
+          cp examples/prime31_wz_rho_frontier.rs aps-pinned/examples/prime31_wz_rho_frontier.rs
+          test -f aps-pinned/crates/ecdl-tensor-ic/Cargo.toml
+          test -f aps-pinned/crates/hashed-ecdl-tensor/Cargo.toml
+          # The immutable merged baseline contains actual metrics.rs, but
+          # hashed-ecdl-tensor's lib.rs omitted its module declaration.
+          # Expose the original metrics implementation; do not stub checks.
+          test -f aps-pinned/crates/hashed-ecdl-tensor/src/metrics.rs
+          if ! grep -q '^pub mod metrics;' aps-pinned/crates/hashed-ecdl-tensor/src/lib.rs; then
+            sed -i '/^pub mod joint;/a pub mod metrics;' aps-pinned/crates/hashed-ecdl-tensor/src/lib.rs
+          fi
+          grep -q '^pub mod metrics;' aps-pinned/crates/hashed-ecdl-tensor/src/lib.rs
+          # Exact-source compile repair: pinned ecbench workload has an
+          # accidental duplicated match arm. Require that exact text;
+          # do not modify arithmetic, WZ trajectories or APS source.
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("aps-pinned/src/cryptanalysis/ecbench/workload.rs")
+          s = path.read_text()
+          extra = "                Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) => {" + chr(10)
+          assert s.count(extra) == 1, "immutable workload changed: refuse repair"
+          s = s.replace(extra, "", 1)
+          assert ("                Instance::Wide(_)" + chr(10) + "                | Instance::Fp4(_)") in s
+          path.write_text(s)
+          print("Removed 1 duplicate ecbench branch; existing Rust APS/WZ code intact")
+          # The immutable pinned checkout has a preexisting, unrelated
+          # missing close-brace in a Koblitz test (CI #43987323713).
+          # Repair only that exact syntax defect; refuse any source drift.
+          bench = Path("aps-pinned/src/cryptanalysis/koblitz_bench.rs")
+          b = bench.read_text()
+          needle = ('        assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");\n'
+                    '    /// The Artin')
+          replacement = ('        assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");\n'
+                         '    }\n\n'
+                         '    /// The Artin')
+          assert b.count(needle) == 1, "immutable Koblitz test source changed: refuse repair"
+          b = b.replace(needle, replacement, 1)
+          assert b.count(replacement) == 1
+          bench.write_text(b)
+          print("Closed 1 preexisting unrelated Koblitz test fn; APS and WZ code intact")
+          PY
+
+      - name: Test pinned repository WZ runner and existing native Rust solver
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/Cargo.toml --example prime31_wz_rho_frontier
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
+
+      - name: Existing APS complete cold 24-Q six-arm fixture (immutable source)
+        run: |
+          cargo +1.100.0 run --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --aps-composed-win4-publicy-24q > prime31-aps-wz-24q-input.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('prime31-aps-wz-24q-input.json'))
+          assert d['cases_count']==24 and d['all_144_complete']
+          assert len(d['cases'])==24
+          print('Source-specific APS 144/144 PASS', d['fully_cold_ns'])
+          PY
+
+      - name: Existing tuned Wiener-Zuccherato rho and Brent 24-Q cold comparison
+        run: |
+          cargo +1.100.0 run --locked --release --manifest-path aps-pinned/Cargo.toml --example prime31_wz_rho_frontier -- prime31-aps-wz-24q-input.json > prime31-wz-frontier-24q.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('prime31-wz-frontier-24q.json'))
+          assert d['APS_input_cases']==24 and len(d['cases'])==24
+          assert all(x>0 for x in d['WZ_complete_calls'])
+          assert d['WZ_complete_calls']==[24,24,24], 'WZ cap: preserve artifact, report INCOMPLETE rather than winner'
+          print('WZ complete:',d['WZ_complete_calls'])
+          print('WZ cold nanoseconds:',d['WZ_total_cold_ns'])
+          print('APS same-runner cold nanoseconds:',d['APS_composed_total_cold_ns'])
+          print('WZ per-target wins:',d['WZ_paired_wins_over_APS'])
+          print('Aggregate WZ/APS (producer sequential only):',d['WZ_over_APS_aggregate_ratio'])
+          print('WZ v2 A/A drift:',d['WZ_AA_aggregate_drift'])
+          PY
+
+      - name: Preserve raw complete and capped attempts and all APS controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-wz-frontier-source-exact-24q
+          path: |
+            prime31-aps-wz-24q-input.json
+            prime31-wz-frontier-24q.json
+          if-no-files-found: warn

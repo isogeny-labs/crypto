@@ -1,0 +1,1172 @@
+{
+  "standing": "[pcc:unverified]",
+  "source_sha": "baba1a495bcbe5807a98098ff0dcf65133459dde",
+  "run_id": 43793061150,
+  "job_id": 133055634090,
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/43793061150",
+  "evidence_scope": "source-bound successful GitHub Actions Rust release run, producer development; not independently PCC verified",
+  "same_host_same_public_Q": true,
+  "all_72_scalar_replays_match_caller": true,
+  "analysis": {
+    "cases": 24,
+    "t1024_successes": 24,
+    "t1536_successes": 24,
+    "t1536_aa_successes": 24,
+    "cold_total_ms": {
+      "T1024": 5175.151537,
+      "T1536": 3920.746671,
+      "T1536_repeat": 3913.221295
+    },
+    "T1536_speedup_over_T1024": 1.3199402999633383,
+    "T1024_faster_individual_Q": 9,
+    "T1536_faster_individual_Q": 15,
+    "AA_total_ratio": 0.9980806268215027,
+    "interpretation": "Fresh-order-balanced confirmation reverses the exploratory 12-case T1024 aggregate advantage; incumbent T1536 wins full aggregate and 15/24 per-target. A/A totals close; source-specific one-run result, no isolation or independent PCC."
+  },
+  "original_rust_stdout": {
+    "cases": 24,
+    "cases_detail": [
+      {
+        "caller_known_answer_verifier_only": 1912014311,
+        "case": 0,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 272384,
+            "arm": "A1024",
+            "cold_wall_ns": 132652727,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1912014311,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 362496,
+            "arm": "B1536",
+            "cold_wall_ns": 191651057,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1912014311,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 362496,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 189006255,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1912014311,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          1106528335,
+          1125883760
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 227280666,
+        "case": 1,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 59904,
+            "arm": "B1536",
+            "cold_wall_ns": 113726555,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 227280666,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 59904,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 113741216,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 227280666,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 245760,
+            "arm": "A1024",
+            "cold_wall_ns": 125725621,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 227280666,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          1392070196,
+          30635279
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 1935858866,
+        "case": 2,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 114688,
+            "arm": "A1024",
+            "cold_wall_ns": 94803096,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1935858866,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 148992,
+            "arm": "B1536",
+            "cold_wall_ns": 135767313,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1935858866,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 148992,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 136002912,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1935858866,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          1227143739,
+          340022541
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 420851493,
+        "case": 3,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 113664,
+            "arm": "B1536",
+            "cold_wall_ns": 127006546,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 420851493,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 113664,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 126973387,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 420851493,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 491520,
+            "arm": "A1024",
+            "cold_wall_ns": 185319502,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 420851493,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          859924482,
+          668619041
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 1121168965,
+        "case": 4,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 149504,
+            "arm": "A1024",
+            "cold_wall_ns": 102385952,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1121168965,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 606720,
+            "arm": "B1536",
+            "cold_wall_ns": 250885887,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1121168965,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 606720,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 249042560,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1121168965,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          616495692,
+          1836507465
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 706794569,
+        "case": 5,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 211968,
+            "arm": "B1536",
+            "cold_wall_ns": 151646769,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 706794569,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 211968,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 152076565,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 706794569,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 193536,
+            "arm": "A1024",
+            "cold_wall_ns": 112992108,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 706794569,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          269990655,
+          361620931
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 1027087110,
+        "case": 6,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 47104,
+            "arm": "A1024",
+            "cold_wall_ns": 77634283,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1027087110,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 274944,
+            "arm": "B1536",
+            "cold_wall_ns": 166622569,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1027087110,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 274944,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 166878688,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1027087110,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          2053901631,
+          349963622
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 210299031,
+        "case": 7,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 340992,
+            "arm": "B1536",
+            "cold_wall_ns": 183621220,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 210299031,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 340992,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 183551287,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 210299031,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 844800,
+            "arm": "A1024",
+            "cold_wall_ns": 270904134,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 210299031,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          188688810,
+          406913397
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 848151842,
+        "case": 8,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 237568,
+            "arm": "A1024",
+            "cold_wall_ns": 123679134,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 848151842,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 10752,
+            "arm": "B1536",
+            "cold_wall_ns": 101459251,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 848151842,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 10752,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 101418010,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 848151842,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          856359261,
+          537480794
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 648521937,
+        "case": 9,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 172032,
+            "arm": "B1536",
+            "cold_wall_ns": 141661420,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 648521937,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 172032,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 141712527,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 648521937,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 659456,
+            "arm": "A1024",
+            "cold_wall_ns": 225872488,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 648521937,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          856983977,
+          1236507226
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 1562903778,
+        "case": 10,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 634880,
+            "arm": "A1024",
+            "cold_wall_ns": 220151297,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1562903778,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 27648,
+            "arm": "B1536",
+            "cold_wall_ns": 105950748,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1562903778,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 27648,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 105775059,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1562903778,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          1009054982,
+          1426880855
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 519155046,
+        "case": 11,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 138240,
+            "arm": "B1536",
+            "cold_wall_ns": 133302949,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 519155046,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 138240,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 133354345,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 519155046,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 567296,
+            "arm": "A1024",
+            "cold_wall_ns": 203609933,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 519155046,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          1015217406,
+          949860087
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 1871490087,
+        "case": 12,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 539648,
+            "arm": "A1024",
+            "cold_wall_ns": 197230358,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1871490087,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 49152,
+            "arm": "B1536",
+            "cold_wall_ns": 111289237,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1871490087,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 49152,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 113981449,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1871490087,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          259426787,
+          531966413
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 2133827787,
+        "case": 13,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 552960,
+            "arm": "B1536",
+            "cold_wall_ns": 241890373,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 2133827787,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 552960,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 237064636,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 2133827787,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 264192,
+            "arm": "A1024",
+            "cold_wall_ns": 130081625,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 2133827787,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          219648167,
+          1025183460
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 677886244,
+        "case": 14,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 1393664,
+            "arm": "A1024",
+            "cold_wall_ns": 469797865,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 677886244,
+            "rounds": 2,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 307200,
+            "arm": "B1536",
+            "cold_wall_ns": 175568286,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 677886244,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 307200,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 175713561,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 677886244,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          902345204,
+          455192537
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 571301725,
+        "case": 15,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 167424,
+            "arm": "B1536",
+            "cold_wall_ns": 140874339,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 571301725,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 167424,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 140389052,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 571301725,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 1303552,
+            "arm": "A1024",
+            "cold_wall_ns": 448107492,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 571301725,
+            "rounds": 2,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          711476818,
+          1848840483
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 931500751,
+        "case": 16,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 185344,
+            "arm": "A1024",
+            "cold_wall_ns": 110984008,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 931500751,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 998400,
+            "arm": "B1536",
+            "cold_wall_ns": 347606049,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 931500751,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 998400,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 347911892,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 931500751,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          2017460204,
+          832095639
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 554091051,
+        "case": 17,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 486912,
+            "arm": "B1536",
+            "cold_wall_ns": 221083188,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 554091051,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 486912,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 219104400,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 554091051,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 623616,
+            "arm": "A1024",
+            "cold_wall_ns": 217601617,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 554091051,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          2013747029,
+          1519636632
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 1457850528,
+        "case": 18,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 396288,
+            "arm": "A1024",
+            "cold_wall_ns": 162266140,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1457850528,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 30720,
+            "arm": "B1536",
+            "cold_wall_ns": 106455640,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1457850528,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 30720,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 106447218,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1457850528,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          1583181939,
+          202049686
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 227149814,
+        "case": 19,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 468480,
+            "arm": "B1536",
+            "cold_wall_ns": 215569382,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 227149814,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 468480,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 216458988,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 227149814,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 1188864,
+            "arm": "A1024",
+            "cold_wall_ns": 420240844,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 227149814,
+            "rounds": 2,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          2083494068,
+          2063182097
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 1510662618,
+        "case": 20,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 551936,
+            "arm": "A1024",
+            "cold_wall_ns": 199874027,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1510662618,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 218112,
+            "arm": "B1536",
+            "cold_wall_ns": 153415760,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1510662618,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 218112,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 153065552,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1510662618,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          2040331966,
+          1678226843
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 1323043106,
+        "case": 21,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 148992,
+            "arm": "B1536",
+            "cold_wall_ns": 136321655,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1323043106,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 148992,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 135825672,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1323043106,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 346112,
+            "arm": "A1024",
+            "cold_wall_ns": 150277287,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1323043106,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          716635607,
+          1917614279
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 239660025,
+        "case": 22,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 2120704,
+            "arm": "A1024",
+            "cold_wall_ns": 712423666,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 239660025,
+            "rounds": 3,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 112128,
+            "arm": "B1536",
+            "cold_wall_ns": 126672026,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 239660025,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 112128,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 127123424,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 239660025,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          846051888,
+          1341346738
+        ]
+      },
+      {
+        "caller_known_answer_verifier_only": 1413183190,
+        "case": 23,
+        "execution_order": "alternates A-B-B and B-B-A",
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 168960,
+            "arm": "B1536",
+            "cold_wall_ns": 140698452,
+            "complete_scalar_recovered": true,
+            "execution_order": 0,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1413183190,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 168960,
+            "arm": "B1536_repeat",
+            "cold_wall_ns": 140602640,
+            "complete_scalar_recovered": true,
+            "execution_order": 1,
+            "maximum_rounds": 3,
+            "points_per_partition": 1536,
+            "recovered_log": 1413183190,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          },
+          {
+            "algebraic_pair_quadratics": 60416,
+            "arm": "A1024",
+            "cold_wall_ns": 80536333,
+            "complete_scalar_recovered": true,
+            "execution_order": 2,
+            "maximum_rounds": 8,
+            "points_per_partition": 1024,
+            "recovered_log": 1413183190,
+            "rounds": 1,
+            "unresolved_within_cap": false
+          }
+        ],
+        "public_target": [
+          953466812,
+          284342183
+        ]
+      }
+    ],
+    "classification": "published IC; finite S3 list enumeration generic MITM-equivalent",
+    "cold_total_1024_ns": "5175151537",
+    "cold_total_1536_ns": "3920746671",
+    "cold_total_1536_repeat_ns": "3913221295",
+    "curve_prime": 2147483647,
+    "group_order": 2147446831,
+    "known_scalar_never_enters_solver": true,
+    "result_scope": "one runner, alternating order and A/A timing diagnostic; not isolated or external IC-frontier benchmark",
+    "scope": "fresh 24 public Q, complete Rust APS one-relation same-source paired development confirmation",
+    "standing": "[pcc:unverified]",
+    "successes_1024": 24,
+    "successes_1536": 24,
+    "successes_1536_repeat": 24
+  }
+}

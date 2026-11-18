@@ -1,0 +1,3 @@
+# Exact byte transport repair, fresh immutable input variant
+
+The firstC99oracle rejected two recoveredrawJSONfiles becauseapply_patchadded oneLF to files thatoriginallyhadno terminalnewline. It stoppedbeforeall toy/count work; itsrawdata,source,input andpending dependent planarepreserved. Newv99b copiesallscientificsourcebytesunchanged andremovesexactlythatoneLF onlywhenGitblobSHAprovestheresultmatchesthepinnedoriginal. Everyotherbyteisunchanged. Newreceiptpaths/source/inputhashesandIDsarefrozen. This isaconcreterepairedinput-integrityassumption,notanidenticalfailedretry. LargeJSONintegersremaintheiroriginaldecimalTEXT and areparsedbyPythononly. No originalrawpublicfileorpriorattempt ismodified.

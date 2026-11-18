@@ -1,0 +1,34 @@
+name: Native hyperelliptic IC
+on:
+  pull_request:
+    paths:
+      - 'crates/hec-native-ic/**'
+      - 'research/hec_relation_math_20261114/**'
+      - 'research/hec_table_oracle_20261114/**'
+      - 'research/hec_anchor_relations_20261114/**'
+      - '.github/workflows/hec-native-ic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hec-native-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            crates/hec-native-ic
+            research/hec_relation_math_20261114
+            research/hec_table_oracle_20261114
+            research/hec_anchor_relations_20261114
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt --manifest-path crates/hec-native-ic/Cargo.toml -- --check
+      - run: cargo test --manifest-path crates/hec-native-ic/Cargo.toml
+      - run: cargo test --release --manifest-path crates/hec-native-ic/Cargo.toml
+      - run: cargo test --release --manifest-path crates/hec-native-ic/Cargo.toml --example principal_relations --example table_oracle --example anchor_relations --example heldout
+      - run: cargo build --release --examples --manifest-path crates/hec-native-ic/Cargo.toml
+      - name: Held-out receipt controls (includes expected identity rejection)
+        run: crates/hec-native-ic/target/release/examples/heldout --runner-self-test "$RUNNER_TEMP/hec-heldout-receipts"

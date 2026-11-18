@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:25:56Z",
+ "id": "PCC-20261116-29bf25",
+ "kind": "statement",
+ "producer": {
+  "commit": "e398666199bdf5f1987ee7f5b7f796cb85a29092",
+  "model": "",
+  "session": "prime-field-transfer-goal-round-04"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/post-qualify-02-u5-public-0.json",
+    "sha256": "2080212ab0dc099faa4a3b24c8455ccb6cc95e5ac747ca750c196a013518a1a7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/post-qualify-02-u5-public-1.json",
+    "sha256": "d41afb7038b3386bee1ea0cc61e38756b6cc6ee093f93e7aea8b668398a77f51"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/post-qualify-02-u5-public-2.json",
+    "sha256": "d504b3d3f2fa2c2e525c367a3733ed77c432f177a90cb56ba7c79c29e56b54d5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/post-qualify-02-u5-public-3.json",
+    "sha256": "23a1e8470603cac524388046fbdf4e982971f8e0432320d783f591b8d04ea9f6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_field_transfer_goal_20261116/round-04",
+ "statement": "Round04 qualifier02 completes all four declared hash-derived public u5 input calls at source F1531/order61 and target F61. At each tested precision4,8,16,32 it accepts one of four inputs; three remain unrecognized. All declared controls reject; accepted target decoding/source OpenSSL checks pass. This is incomplete coverage and producer-only development evidence."
+}

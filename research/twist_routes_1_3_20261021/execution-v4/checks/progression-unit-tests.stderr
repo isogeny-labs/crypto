@@ -1,0 +1,23 @@
+   Compiling twist-route-experiments v0.1.0 (/workspace/crypto-twist-runs/research/twist_routes_1_3_20261021/runner)
+warning: unused import: `PathBuf`
+  --> src/bin/twist-progression.rs:11:18
+   |
+11 |     path::{Path, PathBuf},
+   |                  ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+error[E0282]: type annotations needed for `&mut _`
+   --> src/bin/twist-progression.rs:427:46
+    |
+427 | ...                   .and_modify(|old| *old = (*old).min(mask))
+    |                                    ^^^         ------ type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type, where the type for type parameter `V` is specified
+    |
+427 |                                 .and_modify(|old: &mut V| *old = (*old).min(mask))
+    |                                                 ++++++++
+
+For more information about this error, try `rustc --explain E0282`.
+warning: `twist-route-experiments` (bin "twist-progression" test) generated 1 warning
+error: could not compile `twist-route-experiments` (bin "twist-progression" test) due to 1 previous error; 1 warning emitted

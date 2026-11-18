@@ -1,0 +1,36 @@
+{
+  "schema": "native-miller-infinity-chart-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "miller-infinity-chart-certificate",
+      "expected_decl_sha256": "0bae769dea940a972891b819c4a49162b9aa2189ca7156fc5fa387f267ec81f5",
+      "full_characters": 1033,
+      "full_decl_sha256": "0bae769dea940a972891b819c4a49162b9aa2189ca7156fc5fa387f267ec81f5",
+      "full_normalized_signature": "theorem miller_infinity_chart_certificate : ∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K), Function.Surjective (originEval W) ∧ originIdeal W = Ideal.span {tCoord W, zCoord W} ∧ IsDiscreteValuationRing (ChartLocalRing W) ∧ IsLocalRing.maximalIdeal (ChartLocalRing W) = Ideal.span {localT W} ∧ IsFractionRing (ChartLocalRing W) W.FunctionField ∧ Function.Bijective (localToValRing W) ∧ (∀ a : ChartLocalRing W, (chartLocalEquiv W a : W.FunctionField) = localToField W a) ∧ chartAdicValuation W = functionValuation W ∧ (∀ a : ChartLocalRing W, chartResidueEquiv W (IsLocalRing.residue (ChartLocalRing W) a) = localOriginEval W a) ∧ (∀ x y slope : K, -WithZero.log (chartAdicValuation W (lineFunction W x y slope)) = (-3 : ℤ) ∧ -WithZero.log (chartAdicValuation W (verticalFunction W x)) = (-2 : ℤ) ∧ chartAdicValuation W (parameter W ^ 3 * lineFunction W x y slope - 1) < 1 ∧ chartAdicValuation W (parameter W ^ 2 * verticalFunction W x - 1) < 1 ∧ chartAdicValuation W ((xFunction W)⁻¹ ^ 3 * lineFunction W x y slope - 1) = 1)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "miller_infinity_chart_certificate",
+        "end_byte": 1566,
+        "file": "/workspace/scratch/miller-chart-binding-input01/ChartCertificate.lean",
+        "qualified_decl_id": "MillerInfinityChartAudit.miller_infinity_chart_certificate",
+        "signature": "theorem miller_infinity_chart_certificate :\n    ∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K),\n    Function.Surjective (originEval W) ∧\n    originIdeal W = Ideal.span {tCoord W, zCoord W} ∧\n    IsDiscreteValuationRing (ChartLocalRing W) ∧\n    IsLocalRing.maximalIdeal (ChartLocalRing W) = Ideal.span {localT W} ∧\n    IsFractionRing (ChartLocalRing W) W.FunctionField ∧\n    Function.Bijective (localToValRing W) ∧\n    (∀ a : ChartLocalRing W, (chartLocalEquiv W a : W.FunctionField) = localToField W a) ∧\n    chartAdicValuation W = functionValuation W ∧\n    (∀ a : ChartLocalRing W,\n      chartResidueEquiv W (IsLocalRing.residue (ChartLocalRing W) a) = localOriginEval W a) ∧\n    (∀ x y slope : K,\n      -WithZero.log (chartAdicValuation W (lineFunction W x y slope)) = (-3 : ℤ) ∧\n      -WithZero.log (chartAdicValuation W (verticalFunction W x)) = (-2 : ℤ) ∧\n      chartAdicValuation W (parameter W ^ 3 * lineFunction W x y slope - 1) < 1 ∧\n      chartAdicValuation W (parameter W ^ 2 * verticalFunction W x - 1) < 1 ∧\n      chartAdicValuation W ((xFunction W)⁻¹ ^ 3 * lineFunction W x y slope - 1) = 1)",
+        "start_byte": 412
+      },
+      "recorded_statement": "theorem miller_infinity_chart_certificate : ∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K), Function.Surjective (originEval W) ∧ originIdeal W = Ideal.span {tCoord W, zCoord W} ∧ IsDiscreteValuationRing (ChartLocalRing W) ∧ IsLocalRing.maximalIdeal (ChartLocalRing W) = Ideal.span {localT W} ∧ IsFractionRing (ChartLocalRing W) W.FunctionField ∧ Function.Bijective (localToValRing W) ∧ (∀ a : ChartLocalRing W, (chartLocalEquiv W a : W.FunctionField) = localToField W a) ∧ chartAdicValuation W = functionValuation W ∧ (∀ a : ChartLocalRing W, chartResidueEquiv W (IsLocalRing.residue (ChartLocalRing W) a) = localOriginEval W a) ∧ (∀ x y slope : K, -WithZero.log (chartAdicValuation W (lineFunction W x y slope)) = (-3 : ℤ) ∧ -WithZero.log (chartAdicValuation W (verticalFunction W x)) = (-2 : ℤ) ∧ chartAdicValuation W (parameter W ^ 3 * lineFunction W x y slope - 1) < 1 ∧ chartAdicValuation W (parameter W ^ 2 * verticalFunction W x - 1) < 1 ∧ chartAdicValuation W ((xFunction W)⁻¹ ^ 3 * lineFunction W x y slope - 1) = 1)",
+      "recorded_text_sha256": "0bae769dea940a972891b819c4a49162b9aa2189ca7156fc5fa387f267ec81f5",
+      "source_plan": "research/miller_infinity_chart_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "MillerInfinityChartAudit.miller_infinity_chart_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

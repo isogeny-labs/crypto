@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T10:44:42Z",
+ "id": "PCC-20261114-9fb7c1",
+ "kind": "theorem",
+ "producer": {
+  "commit": "8455c485411b19c3b6a99cfc6c95f32276867b9b",
+  "model": "",
+  "session": "orientation-jet-successor-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "85bf54f42283d04dae8b9970593d6e839b11f0fe67945767bf5b65d181211fcc",
+   "kind": "lean",
+   "project": "research/prime_orientation_layers_20261114/successor/lean",
+   "theorem": "OrientationRefinement.actual_precision_factorization"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual same orientation-completed first jet and derived scalar only. Precision upper construction uses2^v labels; necessary lowest-layer factor count2^u applies to this exact rational approximation problem, not all higher jets, all completions or ECDLP. Exact hypotheses retained. Standard determinant/rank/valuation arithmetic reused without priority claim. All unsigned, pinned gate/fresh pending at record creation. Protected concurrent canonical ledger history remains unreconciled; old sources/evidence/claims unchanged.",
+ "statement": "Exact source-bound declaration OrientationRefinement.actual_precision_factorization: theorem actual_precision_factorization (a u v i : \u2115) (hv : v \u2264 a) (m : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 v) (hm : \u2200 j < u, 0 < m j) (x y : Ports a) : VBound ((v:\u2124)-u+1) (normalizedCrossing a u i m x y-(leftFactor a v*precisionRight a u v i hv m) x y)"
+}

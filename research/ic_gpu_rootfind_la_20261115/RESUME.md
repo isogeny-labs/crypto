@@ -15,14 +15,16 @@ rounds; CPU and GPU arms x gauss/echelon; GPU echelon A/A at 4096; rho and rho A
 launched by run_pod.sh under benchrec run.
 
 ## State
-2026-11-15: protocol and specs frozen; pod not yet launched.
+2026-11-15 19:39Z: done; pod deleted. 168/168 verified+replayed, 84 identity checks equal. GPU m=3 solve
+with echelon 0.18-0.20x gauss at |F_x|=4096 (0.28-0.31 s), 0.41-0.58x at 2048; 29-90x one CPU thread.
+REPORT.md; records r2 (censored, launch failures) and r3 (measured).
 
 ## Runs in flight
-None yet (pod icgpu-rla; cleanup: research/ic_gpu_measure_20261112/rp_gpu.sh delete icgpu-rla).
+None.
 
 ## Stop and success conditions
 Any S/relation/logarithm mismatch or failed replay voids that comparison. Wall L0, A/A floor. Cap
 ~1.5 GPU-hours, $4. S3: same waiver as earlier rounds (session AWS keys rejected).
 
 ## Next steps
-Commit+push protocol -> record init -> ecbench release build -> run_pod.sh -> analyze -> report -> PR.
+Validator check; set-up at 4096 and the relation phase are the next bounds.

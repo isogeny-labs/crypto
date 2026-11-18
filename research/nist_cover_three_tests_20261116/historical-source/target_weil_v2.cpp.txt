@@ -1,0 +1,131 @@
+// Exact target conic/divisor/Weil layer for the frozen differential contract.
+#include "quartic_descent_arithmetic.hpp"
+using TP=Poly<T24>;
+using Conic=std::array<T24,6>; // 1,x,y,x^2,xy,y^2
+using TVector=std::vector<T24>;
+using TSpace=std::vector<TVector>;
+TP tpower(TP a,int n){TP r{T24(1)};for(int j=0;j<n;++j)r=r*a;return r;}
+TSpace kernel_matrix(TSpace a,int width){
+    int rank=0;std::vector<int> pivots;
+    for(int col=0;col<width;++col){int row=rank;while(row<int(a.size())&&a[row][col]==T24(0))++row;if(row==int(a.size()))continue;
+        std::swap(a[row],a[rank]);T24 inv=a[rank][col].inv();for(auto& v:a[rank])v=v*inv;
+        for(int i=0;i<int(a.size());++i)if(i!=rank){T24 c=a[i][col];if(c!=T24(0))for(int j=0;j<width;++j)a[i][j]=a[i][j]-c*a[rank][j];}
+        pivots.push_back(col);++rank;
+    }
+    TSpace out;for(int j=0;j<width;++j)if(std::find(pivots.begin(),pivots.end(),j)==pivots.end()){
+        TVector v(size_t(width),T24(0));v[j]=T24(1);for(int i=0;i<rank;++i)v[pivots[i]]=-a[i][j];out.push_back(v);
+    }return out;
+}
+template<class T> Poly<T> conic_value(const Conic& q,const Poly<T>& x,const Poly<T>& y){
+    return Poly<T>{T(q[0])}+x.scale(T(q[1]))+y.scale(T(q[2]))+(x*x).scale(T(q[3]))+(x*y).scale(T(q[4]))+(y*y).scale(T(q[5]));
+}
+struct FiniteDivisor {TP u,v;};
+struct TargetWeil {
+    Form f;
+    std::map<int,Line> lines;
+    Line infinity1,infinity2;
+    int intersections=0,contact_checks=0;
+    std::vector<Conic> conic_witnesses;
+    std::map<int,FiniteDivisor> contacts;
+    explicit TargetWeil(const std::string& root){
+        f=read_form(read_json(root+"/evidence/riemann-v1/result.json").at("quartic"));
+        for(auto& row:read_json(root+"/evidence/descent-v1/result.json").at("labelled_bitangents").arr)lines.emplace(row.at("label").integer(),read_line(row.at("line")));
+        require(lines.size()==28&&normalize_line(lines.at(52))==Line{T24(0),T24(0),T24(1)},"fixed labelled infinity bitangent");
+        std::vector<T24> coeff(5);for(auto& [e,v]:f.c)if(e[2]==0)coeff[e[1]]=coeff[e[1]]+v;
+        TP restriction(coeff);require(restriction.degree()==4,"infinity contact chart");
+        T24 b=restriction.at(3)/(T24(2)*restriction.at(4)),c=(restriction.at(2)/restriction.at(4)-b*b)/T24(2);
+        TP quadratic{c,b,T24(1)};require(restriction==(quadratic*quadratic).scale(restriction.at(4)),"infinity bitangent square");
+        T24 disc=sqrt24(b*b-T24(4)*c);require(disc!=T24(0),"distinct infinity contacts");
+        infinity1={T24(1),(-b+disc)/T24(2),T24(0)};infinity2={T24(1),(-b-disc)/T24(2),T24(0)};
+        require(f.eval(infinity1)==T24(0)&&f.eval(infinity2)==T24(0),"infinity contacts on curve");
+    }
+    TP equation(const TP& x,const TP& y,const TP& u)const{
+        TP out;for(auto& [e,c]:f.c)out=(out+(tpower(x,e[0])*tpower(y,e[1])).scale(c))%u;return out;
+    }
+    void check(const FiniteDivisor& d,int degree)const{
+        require(d.u.degree()==degree&&d.u.c.back()==T24(1)&&d.v.degree()<degree,"finite target divisor shape");
+        TP derivative;std::vector<T24> dc;for(int i=1;i<=degree;++i)dc.push_back(d.u.at(i)*T24(i));derivative=TP(dc);
+        auto[g,s,t]=xgcd(d.u,derivative);require(g.degree()==0,"squarefree target support");
+        require(equation(TP{T24(0),T24(1)},d.v,d.u).degree()<0,"finite target divisor curve equation");
+    }
+    FiniteDivisor contact(int label){
+        auto hit=contacts.find(label);if(hit!=contacts.end())return hit->second;
+        const auto& l=lines.at(label);require(l[1]!=T24(0),"finite bitangent y-chart");
+        TP x{T24(0),T24(1)},v{-l[2]/l[1],-l[0]/l[1]},restriction;
+        for(auto& [e,c]:f.c)restriction=restriction+(tpower(x,e[0])*tpower(v,e[1])).scale(c);
+        require(restriction.degree()==4,"finite contact restriction degree");T24 lc=restriction.at(4),b=restriction.at(3)/(T24(2)*lc),c=(restriction.at(2)/lc-b*b)/T24(2);
+        TP u{c,b,T24(1)};require(restriction==(u*u).scale(lc),"finite bitangent contact factorization");
+        FiniteDivisor d{u,v%u};check(d,2);contacts.emplace(label,d);++contact_checks;return d;
+    }
+    TVector infinity_constraint(const Line& p)const{return {T24(0),T24(0),T24(0),p[0]*p[0],p[0]*p[1],p[1]*p[1]};}
+    TSpace conditions(const std::vector<FiniteDivisor>& finite,const std::vector<Line>& infinity)const{
+        TSpace out;for(auto& d:finite){std::array<TP,6> mon{TP{T24(1)},TP{T24(0),T24(1)},d.v,TP{T24(0),T24(0),T24(1)},(TP{T24(0),T24(1)}*d.v)%d.u,(d.v*d.v)%d.u};
+            for(int j=0;j<d.u.degree();++j){TVector row;for(auto& m:mon)row.push_back((m%d.u).at(j));out.push_back(row);}
+        }
+        for(auto& p:infinity)out.push_back(infinity_constraint(p));
+        return out;
+    }
+    Conic unique_conic(const std::vector<FiniteDivisor>& finite,const std::vector<Line>& infinity){
+        auto kernel=kernel_matrix(conditions(finite,infinity),6);require(kernel.size()==1,"unique residual conic");Conic q;std::copy(kernel[0].begin(),kernel[0].end(),q.begin());conic_witnesses.push_back(q);return q;
+    }
+    FiniteDivisor residual(const Conic& q,const std::vector<FiniteDivisor>& finite,const std::vector<Line>& infinity){
+        require(q[5]!=T24(0),"conic elimination y-leading unit");TP B{q[2],q[4]},C{q[0],q[1],q[3]},N,L,p0{T24(1)},p1;
+        std::array<TP,5> ys;
+        for(auto& [e,c]:f.c){auto v=ys[e[1]].c;if(v.size()<=size_t(e[0]))v.resize(size_t(e[0]+1));v[e[0]]=v[e[0]]+c;ys[e[1]]=TP(v);}
+        for(int j=0;j<=4;++j){N=N+ys[j]*p0;L=L+ys[j]*p1;TP next0=-(C*p1).scale(q[5].inv()),next1=p0-(B*p1).scale(q[5].inv());p0=next0;p1=next1;}
+        TP result=(N*N).scale(q[5])-B*L*N+C*L*L,known{T24(1)};
+        for(auto& d:finite){require((conic_value(q,TP{T24(0),T24(1)},d.v)%d.u).degree()<0,"known conic finite support");known=known*d.u;}
+        for(auto& p:infinity){T24 value;auto row=infinity_constraint(p);for(int j=0;j<6;++j)value=value+q[j]*row[j];require(value==T24(0),"known conic infinity support");}
+        require(result.degree()==known.degree()+3,"exact conic residual degree");TP u=result.exact(known).monic();
+        auto[g,s,t]=xgcd(L,u);require(g.degree()==0,"residual y recovery unit");TP v=(-N*s)%u;
+        FiniteDivisor d{u,v};check(d,3);require((conic_value(q,TP{T24(0),T24(1)},v)%u).degree()<0,"residual conic equation");
+        require(result.monic()==known*u,"full conic intersection factorization");++intersections;return d;
+    }
+    FiniteDivisor translate(const FiniteDivisor& e,int odd_label,bool has_infinity1=false){
+        auto a=contact(odd_label);std::vector<FiniteDivisor> finite{e,a};std::vector<Line> inf;if(has_infinity1)inf.push_back(infinity1);
+        auto q=unique_conic(finite,inf);auto r=residual(q,finite,inf);
+        auto q2=unique_conic({r},{infinity1,infinity2});return residual(q2,{r},{infinity1,infinity2});
+    }
+    FiniteDivisor translate_code(const FiniteDivisor& e,int code){
+        if(code==0)return e;
+        if(theta_parity(code^52))return translate(e,code^52);
+        for(int a=0;a<64;++a)if(a!=52&&theta_parity(a)&&theta_parity(a^code)&&(a^code)!=52)return translate(translate(e,a),a^code);
+        throw std::runtime_error("two-bitangent representation bound");
+    }
+    std::array<Conic,3> weil_basis(int odd_label){
+        auto a=contact(odd_label);auto basis=kernel_matrix(conditions({a},{infinity2}),6);require(basis.size()==3,"target Weil RR dimension3");std::array<Conic,3> out{};
+        for(int i=0;i<3;++i)std::copy(basis[i].begin(),basis[i].end(),out[i].begin());
+        return out;
+    }
+    T24 raw(int odd_label,const FiniteDivisor& e){
+        check(e,3);const auto& l=lines.at(odd_label);TP x{T24(0),T24(1)},ell=TP{l[2]}+x.scale(l[0])+e.v.scale(l[1]);
+        T24 norm=determinant3(multiplication3(e.u,ell));require(norm!=T24(0)&&e.v.at(2)!=T24(0),"target Weil regular denominator");
+        auto basis=weil_basis(odd_label);Matrix3<T24> m{};
+        for(int j=0;j<3;++j){TP value=conic_value(basis[j],x,e.v)%e.u;for(int i=0;i<3;++i)m[i][j]=value.at(i);}
+        T24 d=determinant3(m);return d*d/(e.v.at(2)*e.v.at(2)*norm);
+    }
+};
+void emit_finite(const FiniteDivisor& d){std::cout<<"{\"U\":";emit_t24_polynomial(d.u);std::cout<<",\"V\":";emit_t24_polynomial(d.v);std::cout<<'}';}
+int source_code(int index){return ((index&7)<<3)|(index>>3);}
+T24 at_torsion(const std::vector<T24>& w,int s,int b){require(w[b]!=T24(0),"target normalization even base");return T24(d2(source_code(b),source_code(s)))*w[b^s]/w[b];}
+
+int main(int argc,char** argv){try{
+    require(argc==2,"usage: target_weil study-directory");std::string root=argv[1];initialize_cover(read_json(root+"/inputs/p192-d7-prym.json"));Level2Input input;TargetWeil target(root);
+    std::vector<T24> w;for(auto& a:read_json(root+"/evidence/quotient-theta2-v1/result.json").at("theta_squares").arr)w.push_back(read_t24(a));require(w.size()==64,"theta normalization vector");
+    // E1 represents infinity1+L38; add18xor52=38 to its initial code18.
+    auto e0=target.translate(target.contact(38),18,true);target.check(e0,3);
+    auto eb=target.translate_code(e0,61);std::array<int,4> labels{63,38,41,13};std::vector<T24> scales;std::vector<int> heldout;int checks=0;
+    for(int s:labels){int a=s^52;require(theta_parity(a),"fixed odd translate label");require(target.raw(a,e0)==T24(0),"target odd theta zero at canonical origin");
+        T24 raw=target.raw(a,eb),expected=at_torsion(w,s,61);require(raw!=T24(0)&&expected!=T24(0),"nonzero target normalization value");T24 c=expected/raw;scales.push_back(c);
+        auto eb_s=target.translate_code(eb,s);require(c*c*raw*target.raw(a,eb_s)==T24(d2(source_code(s),source_code(s))),"normalized target Weil diagonal cocycle");++checks;
+        int b=0;for(;b<64;++b)if(b!=0&&b!=61&&!theta_parity(b)&&!theta_parity(b^s))break;require(b<64,"heldout parity class bound");heldout.push_back(b);
+        auto eh=target.translate_code(e0,b);require(c*target.raw(a,eh)==at_torsion(w,s,b),"normalized target Weil heldout value");++checks;
+        std::cerr<<"target Weil label "<<s<<" normalization and heldout passed\n";
+    }
+    rejects([&]{auto bad=target.contact(38);bad.v=bad.v+TP{T24(1)};target.check(bad,2);},"changed target contact divisor");
+    rejects([&]{require(scales[0]*target.raw(labels[0]^52,eb)+T24(1)==at_torsion(w,labels[0],61),"changed target Weil value");},"changed target Weil value");
+    std::cout<<"{\"scope\":\"P192-kernel1-target-Weil-functions\",\"contact_divisors\":"<<target.contact_checks<<",\"exact_conic_intersections\":"<<target.intersections<<",\"normalization_checks\":"<<checks<<",\"rejected_controls\":2,\"Serre_twist_checked\":false,\"divisor_map_constructed\":false,\"standing\":\"producer-unverified\",\"canonical_origin_divisor\":";emit_finite(e0);std::cout<<",\"normalization_divisor_B61\":";emit_finite(eb);std::cout<<",\"odd_labels\":[63,38,41,13],\"heldout_labels\":[";
+    for(size_t i=0;i<heldout.size();++i)std::cout<<(i?",":"")<<heldout[i];
+    std::cout<<"],\"scales\":[";for(size_t i=0;i<scales.size();++i){if(i)std::cout<<',';emit_t24(scales[i]);}
+    std::cout<<"],\"conic_witnesses\":[";for(size_t i=0;i<target.conic_witnesses.size();++i){if(i)std::cout<<',';std::cout<<'[';for(int j=0;j<6;++j){if(j)std::cout<<',';emit_t24(target.conic_witnesses[i][j]);}std::cout<<']';}std::cout<<"]}\n";
+}catch(const std::exception& e){std::cerr<<"REJECT "<<e.what()<<'\n';return 1;}}

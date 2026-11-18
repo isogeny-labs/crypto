@@ -1734,7 +1734,7 @@ fn assemble(
     });
     let matches_target = audit_verification.map(|(matches, _)| matches);
     // A public target has no planted answer: [k]G = Q decides alone.
-    let matches_planted = w.planted.and_then(|p| recovered.map(|k| k == p.into()));
+    let matches_planted = w.planted.and_then(|p| recovered.map(|k| k == p));
     let status = if reaped.spawn_error.is_some() {
         "spawn_error"
     } else if reaped.interrupted {
@@ -1752,7 +1752,7 @@ fn assemble(
     } else {
         "exhausted"
     };
-    let sqrt_r = (w.curve.r as f64).sqrt();
+    let sqrt_r = (w.curve.r.to_f64()).sqrt();
     let floor = floor_s(w.curve.automorphisms_available);
     let s = report.as_ref().map(|r| r.total_gae / sqrt_r);
     let placement = reaped

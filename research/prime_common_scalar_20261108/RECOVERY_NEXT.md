@@ -165,3 +165,17 @@ Continue from replay/ACCUMULATOR_NEXT.md: canonical scaled-ring extraction,
 actual odd-part coefficients, native construction/state/recomputation bounds,
 coordinate lattice, then the full mode/bit-cost recurrence. A future empirical
 accumulator arm needs its own prospective amendment and resource envelope.
+
+## Nov9 actual all-substitution finite units
+
+The rational denominator and earlier scalar normalizer are now actual units
+at every interpolation value in every commutative coefficient target where2
+is nilpotent. The finite normalized-entry comparison has one common unit
+and preserves every scalar divisibility threshold; this is not a minimal
+mode-factorization or total runtime theorem. See the chart-units report
+[pcc:unverified].
+
+Next decisive algorithm obligation: construct the actual mode/entry recursion
+and charge all enumeration/child construction/bit arithmetic; connect network
+size s to prime-field ECDLP input bits n. The desired existence/nonexistence
+proof is not obtained from these supporting components or their tests.

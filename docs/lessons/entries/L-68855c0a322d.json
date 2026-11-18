@@ -1,0 +1,14 @@
+{
+  "action": "Copy the final payload into its repository-relative evidence path before claim creation; reject absolute scratch proof paths even if claim-new accepts them",
+  "created": "2026-11-17T15:53:43Z",
+  "evidence": [
+    "research/p256_aux_smooth_20261114/goal_dreg_half_20261117/evidence/errors/absolute-pin-rejection.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "path:tools/pcc"
+  ],
+  "trigger": "Creating a PCC artifact claim from a development output",
+  "why": "An absolute path was accepted during claim creation but correctly rejected as escaping the repository. Immutable failed record was retained and replaced with a portable claim."
+}

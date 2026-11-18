@@ -1,0 +1,12 @@
+{
+  "schema": "n83.prebuild-cost-figure/v1",
+  "unit": "seconds",
+  "one_time_prebuilt": {"census": 27.913872792, "export": 39.372869997, "generic_replay": 20.702345662},
+  "mean_query_worker_wall": {
+    "m2": {"prebuilt": 9.848484294333335, "on_demand": 35.13056563888889},
+    "m3": {"prebuilt": 8.828437684555554, "on_demand": 34.601494107}
+  },
+  "derived_cold_m2": {"q1_prebuilt": 97.837572745, "q1_on_demand": 35.130565639, "q8_prebuilt": 166.776962806, "q8_on_demand": 281.044525111},
+  "derived_cold_m3": {"q1_prebuilt": 96.817526135, "q1_on_demand": 34.601494107, "q8_prebuilt": 158.616589927, "q8_on_demand": 276.811952856},
+  "limits": "Shared-host L0; distinct native exporter and worker revisions; finite query event; remote storage, rank, LA, target solve, and matched rho unmeasured"
+}

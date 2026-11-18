@@ -1,0 +1,7 @@
+# Complete conditional chart contract
+
+Scan every nonzero x in the low-18-bit subspace. Zero is omitted only after the pinned common-X and historical cubic certificate excludes supported zero-source norms in this exact k=0 family. For each x, column elimination computes the complete kernel and particular parameter of H_t(x)=0; homogeneous dependencies are retained. Enumerate every compatible residual fiber only when nullity is at most eight and total candidates at most8192. A cap/deadline makes the norm count incomplete, never UNSAT.
+
+Rebuild every emitted parameter into H, recheck its root equation and merge duplicate parameters. The pinned squarefree/nonzero certificates make L_V mod H=0 exact. Each supported result receives complete subspace factorization, multiplicity verification and product reconstruction. A complete scan returns every supported norm parameter at this single h,k=0; other h,k and original intermediate-coordinate equations remain open.
+
+Native GF83 multiplication is checked against independent portable multiplication. Python row elimination rechecks 65 regularly spaced root cells; native column elimination retains every free direction. Compilation, input setup, filtering, extraction and serialization count toward the worker lifetime. Limits: compile15s, native subprocess60s/internal55s, parent serialization78s/finalstdout84s, supervisor90s,4GiB,onecore. Parent/native peak RSS are separate. This is an exact bounded diagnostic, not a qualified benchmark.

@@ -1,0 +1,29 @@
+--- frozen_signed_kernel
++++ square_candidate
+@@ -1,3 +1,4 @@
++from .square import square_mod
+ from research.prime_orbit_roots_20261116_v71.solver import power as generic_power,gcd
+ from research.image_cells_20261115_v67.algebra import rem,pmul,trim,evaluate
+ COUNTS={k:0 for k in ['squarings','multiplications','chain_calls','signed_calls','inverse_calls','nonunit_fallbacks','fallback_calls']}
+@@ -9,10 +10,10 @@
+  a=rem(a,H,f);r=a;length=1
+  for bit in bin(k)[3:]:
+   t=r
+-  for _ in range(length):t=rem(pmul(t,t,f),H,f);COUNTS['squarings']+=1
++  for _ in range(length):t=square_mod(t,H,f);COUNTS['squarings']+=1
+   r=rem(pmul(r,t,f),H,f);COUNTS['multiplications']+=1;length*=2
+   if bit=='1':
+-   r=rem(pmul(r,r,f),H,f);COUNTS['squarings']+=1;r=rem(pmul(r,a,f),H,f);COUNTS['multiplications']+=1;length+=1
++   r=square_mod(r,H,f);COUNTS['squarings']+=1;r=rem(pmul(r,a,f),H,f);COUNTS['multiplications']+=1;length+=1
+  assert length==k
+  return r
+ 
+@@ -58,7 +59,7 @@
+    else:dest=rem(pmul(dest,v,f),H,f);COUNTS['multiplications']+=1
+    if sign==1:num=dest
+    else:den=dest
+-  if i<top:v=rem(pmul(v,v,f),H,f);COUNTS['squarings']+=1
++  if i<top:v=square_mod(v,H,f);COUNTS['squarings']+=1
+  if den!=[1]:
+   iv=inverse(den,H,f)
+   if iv is None:COUNTS['nonunit_fallbacks']+=1;COUNTS['fallback_calls']+=1;return generic_power(a,n,H,f)

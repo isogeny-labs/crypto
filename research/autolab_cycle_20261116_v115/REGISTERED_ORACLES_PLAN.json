@@ -1,0 +1,66 @@
+{
+  "id": "prefix-translation-oracles-20261116-v115",
+  "hypothesis": "A common-leading-bit translation imposes at least4additional exact raw-degree equations on the w=1chart, preserving all true prefix roots.",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-m",
+    "research.prefix_translation_20261116_v115.oracles",
+    "prefix-translation-oracles-20261116-v115",
+    "oracles_raw"
+  ],
+  "source_paths": [
+    "lab/runner.py",
+    "performance_gate.py",
+    "performance/GATE.md",
+    "research/residue_quotient_20261116_v99b/kernel.py",
+    "research/guarded_local_search_20261116_v101/kernel.py",
+    "research/local_split_circuit_20261116_v100/kernel.py",
+    "research/local_nilpotency_20261116_v100/kernel.py",
+    "research/odd_cached_quadratic_20261116_v94b/kernel.py",
+    "research/twist_auxiliary_20261116_v86/algebra.py",
+    "research/frontier_certificate_20261116_v111b/kernel.py",
+    "research/autolab_cycle_20261116_v112/GLOBAL_NAME_PREFLIGHT.py",
+    "research/prefix_translation_20261116_v115/common.py",
+    "research/prefix_translation_20261116_v115/profile.py",
+    "research/prefix_translation_20261116_v115/oracles.py",
+    "research/prefix_translation_20261116_v115/kernel.py",
+    "research/prefix_translation_20261116_v115/PROOF_AND_REVIEW.md"
+  ],
+  "input_paths": [
+    "research/prefix_translation_20261116_v115/DATA.json",
+    "research/autolab_cycle_20261116_v115/PREFLIGHT.json",
+    "research/chart_compiler_20261116_v112/DATA.json",
+    "research/frontier_certificate_20261116_v111b/charts.json",
+    "research/residue_quotient_20261116_v99b/snapshot/MATRIX.txt"
+  ],
+  "expected_sha256": {
+    "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+    "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+    "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+    "research/residue_quotient_20261116_v99b/kernel.py": "79794f7b079b9a1dc2c2816b6768ba27ac5b623111f3907e76eefa843c0a21ba",
+    "research/guarded_local_search_20261116_v101/kernel.py": "9546a800164b1ab2239dfd97e49367f869238f6b09172299e2a9fe495d913c5b",
+    "research/local_split_circuit_20261116_v100/kernel.py": "330d76c79b25c2e4b20a4435ae4c0777d31e3cc6d0a48ff369edf69217d6b71a",
+    "research/local_nilpotency_20261116_v100/kernel.py": "ea351575818b4acd0b2ad91abdb66f1ac00de7d685b71276aef32590bee7177b",
+    "research/odd_cached_quadratic_20261116_v94b/kernel.py": "8557d67949924122999dbc08b0dc98a5923b73afe7125392aec3479ebdacd3d1",
+    "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+    "research/frontier_certificate_20261116_v111b/kernel.py": "cc3715106bd474bfd147831eba4a391243f4dc2dd14140e6774c60c93b4d5feb",
+    "research/autolab_cycle_20261116_v112/GLOBAL_NAME_PREFLIGHT.py": "3c3da31c7d01cc63561d6f6bd9cd82214235ed6415aff1e04eadf016ed169e2b",
+    "research/prefix_translation_20261116_v115/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+    "research/prefix_translation_20261116_v115/profile.py": "cfd10d431577655a0c427ec10d92a0efa5fd0d9e7628c2e98f2e2d0a25c41266",
+    "research/prefix_translation_20261116_v115/oracles.py": "e54af8ab595569f01bb601a0a5d3f5d41cee82d2f12ba0406af14937e8a49cb8",
+    "research/prefix_translation_20261116_v115/kernel.py": "e2f0be3dec4b45c6be086da4eaee49af6af665558291db2db5af3ca71b2c876a",
+    "research/prefix_translation_20261116_v115/PROOF_AND_REVIEW.md": "019432a7586149e3dcd1a7bcffcd0e7d920788b39f8c3471100d87d4549ec30d",
+    "research/prefix_translation_20261116_v115/DATA.json": "000013057865a9fb2e5b5dff248de3070453d123ead1a6b1b12d135b63ce3f14",
+    "research/autolab_cycle_20261116_v115/PREFLIGHT.json": "043482092e2038ca67b8f2939b8f37a22e2651493b71eee12d99de1e31c41fce",
+    "research/chart_compiler_20261116_v112/DATA.json": "5cb0e7d938cbe3e1471e3b15b2d0416afe6af7149ac6ea83f6e5cc058a15bc91",
+    "research/frontier_certificate_20261116_v111b/charts.json": "78cfaf809c85ec0ab2c0cc36e9e32bab7d84143a3e006572601b320acb985b47",
+    "research/residue_quotient_20261116_v99b/snapshot/MATRIX.txt": "d8a7a989e27b727e5560b609111b18baff88e22d53bcaceb13efd2882d21d2b8"
+  },
+  "timeout_seconds": 90,
+  "memory_limit_mb": 4096,
+  "cpu": 0,
+  "depends_on": [],
+  "artifact_paths": [
+    "research/prefix_translation_20261116_v115/oracles_raw.json"
+  ]
+}

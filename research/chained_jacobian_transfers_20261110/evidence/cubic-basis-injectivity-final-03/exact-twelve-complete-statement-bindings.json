@@ -1,0 +1,122 @@
+[
+  {
+    "theorem": "CubicBasisInjectivity22303.coefficient_embedding_injective",
+    "claim": "pcc/claims/PCC-20261116-dbd721.json",
+    "normalized_statement": "theorem coefficient_embedding_injective {R : Type} [CommRing R] [IsCharP R 223] : Function.Injective (embed : Fin 223 \u2192 R)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.coefficient_embedding_injective",
+      "decl_sha256": "fc8ed7fe4aca9e9291dc7869e81e8970dc271e02460d576dd9f2c049a36a847e"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.coefficient_embedding_add",
+    "claim": "pcc/claims/PCC-20261116-ac06d3.json",
+    "normalized_statement": "theorem coefficient_embedding_add {R : Type} [CommRing R] [IsCharP R 223] (a b : Fin 223) : (embed (a+b) : R)=embed a+embed b",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.coefficient_embedding_add",
+      "decl_sha256": "f9f464ea956c283dac48e1c082a81ac7719566ff4b615f80c638f7ec2db68418"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.coefficient_embedding_mul",
+    "claim": "pcc/claims/PCC-20261116-da7ef4.json",
+    "normalized_statement": "theorem coefficient_embedding_mul {R : Type} [CommRing R] [IsCharP R 223] (a b : Fin 223) : (embed (a*b) : R)=embed a*embed b",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.coefficient_embedding_mul",
+      "decl_sha256": "d04a5319194b15d505a284f5271b6ea19eedbe993e24abf891a8acee40080499"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.coefficient_embedding_pow",
+    "claim": "pcc/claims/PCC-20261116-a30e60.json",
+    "normalized_statement": "theorem coefficient_embedding_pow {R : Type} [CommRing R] [IsCharP R 223] (a : Fin 223) (n : Nat) : (embed (a^n) : R)=(embed a)^n",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.coefficient_embedding_pow",
+      "decl_sha256": "6458cd1e29268db193a6d76411fbc5031092ef31fb8828d16e291d1bd1d56b22"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.coefficient_embedding_fixed",
+    "claim": "pcc/claims/PCC-20261116-02d8f1.json",
+    "normalized_statement": "theorem coefficient_embedding_fixed {R : Type} [CommRing R] [IsCharP R 223] (a : Fin 223) : (embed a : R)^223=embed a",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.coefficient_embedding_fixed",
+      "decl_sha256": "ea5d02493097ca46a09f313f797375146b2969665f688d758645b56ef2cb6d5d"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.coefficient_embedding_constants",
+    "claim": "pcc/claims/PCC-20261116-7d9c90.json",
+    "normalized_statement": "theorem coefficient_embedding_constants {R : Type} [CommRing R] : (embed (183 : Fin 223) : R)=183 \u2227 (embed (39 : Fin 223) : R)=39",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.coefficient_embedding_constants",
+      "decl_sha256": "817eb258f3b54029b3aa6eceadfb96f19b1ce5fbc2e5578b28198bfafc0900bf"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.three_coefficient_separation",
+    "claim": "pcc/claims/PCC-20261116-74d5d0.json",
+    "normalized_statement": "theorem three_coefficient_separation {R : Type} [CommRing R] [IsCharP R 223] (a b c d e f : R) (h0 : a+b+c=d+e+f) (h1 : a+183*b+39*c=d+183*e+39*f) (h2 : a+39*b+183*c=d+39*e+183*f) : a=d \u2227 b=e \u2227 c=f",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.three_coefficient_separation",
+      "decl_sha256": "52d0bfb03418b22886e6f91e2edb5d7ac68fce8599a6079b989132fa51fafed1"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.cubic_generator_cancel",
+    "claim": "pcc/claims/PCC-20261116-1991d0.json",
+    "normalized_statement": "theorem cubic_generator_cancel {R : Type} [CommRing R] [IsCharP R 223] (z u v : R) (hz : z^3=3) (h : u*z=v*z) : u=v",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.cubic_generator_cancel",
+      "decl_sha256": "b52672fca22833caa426595a01cd2981d8fe43092d0d639e87ad3f0461ff7371"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.cubic_squared_generator_cancel",
+    "claim": "pcc/claims/PCC-20261116-7ec033.json",
+    "normalized_statement": "theorem cubic_squared_generator_cancel {R : Type} [CommRing R] [IsCharP R 223] (z u v : R) (hz : z^3=3) (h : u*z^2=v*z^2) : u=v",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.cubic_squared_generator_cancel",
+      "decl_sha256": "86e58140dd391530aa39986f6734c0ec69ce5726140fffeb2f215446f3acc075"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.encode_injective",
+    "claim": "pcc/claims/PCC-20261116-b73b20.json",
+    "normalized_statement": "theorem encode_injective {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) : Function.Injective (encode z)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.encode_injective",
+      "decl_sha256": "03af906a7a5fc799c1c6e58895cce2679bbc34d98a63be347e1947258dba4f0e"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.fixed_expression_without_injectivity",
+    "claim": "pcc/claims/PCC-20261116-1b1e8b.json",
+    "normalized_statement": "theorem fixed_expression_without_injectivity {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (a b c : Fin 223) : (encode z (a,b,c))^223=encode z (a,b,c) \u2194 b=0 \u2227 c=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.fixed_expression_without_injectivity",
+      "decl_sha256": "397ed1a28b97228807cf4d513654e40bc9eca538b37ab996c694cf5b76379e3d"
+    }
+  },
+  {
+    "theorem": "CubicBasisInjectivity22303.zero_generator_not_injective",
+    "claim": "pcc/claims/PCC-20261116-ec3f56.json",
+    "normalized_statement": "theorem zero_generator_not_injective : \u00ac Function.Injective (encode (0 : Fin 223))",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+      "theorem": "CubicBasisInjectivity22303.zero_generator_not_injective",
+      "decl_sha256": "4564ec8582af832fca517d12eb7060defa911ed97603618c6190341e6a5282c8"
+    }
+  }
+]

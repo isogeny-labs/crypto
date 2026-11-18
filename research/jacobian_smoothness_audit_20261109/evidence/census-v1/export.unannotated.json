@@ -1,0 +1,262 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "AUDIT-MUMFORD-CENSUS-v1",
+  "created": "2026-11-09T22:58:44Z",
+  "protocol": {
+    "path": "../../native-census-v1/protocol-census-v1.json",
+    "sha256": "a7bc5ba9f6af90f196155a4ff30093f4bd47701568c4c58cfc01b3bfc42828dc",
+    "protocol_id": "AUDIT-MUMFORD-CENSUS-20261109-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": null,
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": null,
+    "dirty": null
+  },
+  "backend": "manual",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "field3",
+      "role": "baseline",
+      "binary_sha256": null,
+      "commit": null
+    },
+    {
+      "id": "field5",
+      "role": "candidate",
+      "binary_sha256": null,
+      "commit": null
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "census-v1-p3-r0",
+      "arm": "field3",
+      "instance_id": "0",
+      "seed": 202611093001,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "control_pairs": 8,
+          "control_smooth": 7,
+          "proper_nontrivial_unequal": 321,
+          "checked_additions": 31560,
+          "associativity_checks": 595488
+        },
+        "wall_seconds": 3.64,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "census-v1-p5-r0",
+      "arm": "field5",
+      "instance_id": "0",
+      "seed": 202611095001,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "control_pairs": 16,
+          "control_smooth": 16,
+          "proper_nontrivial_unequal": 11005,
+          "checked_additions": 2707800,
+          "associativity_checks": 111960960
+        },
+        "wall_seconds": 447.76,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "census-v1-p3-r1",
+      "arm": "field3",
+      "instance_id": "0",
+      "seed": 202611093002,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "control_pairs": 8,
+          "control_smooth": 7,
+          "proper_nontrivial_unequal": 321,
+          "checked_additions": 31560,
+          "associativity_checks": 595488
+        },
+        "wall_seconds": 5.2,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "census-v1-p5-r1",
+      "arm": "field5",
+      "instance_id": "0",
+      "seed": 202611095002,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "control_pairs": 16,
+          "control_smooth": 16,
+          "proper_nontrivial_unequal": 11005,
+          "checked_additions": 2707800,
+          "associativity_checks": 111960960
+        },
+        "wall_seconds": 561.64,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 4,
+    "attempted": 4,
+    "completed": 4,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "rows.jsonl",
+      "sha256": "c4ca9e56a10aa86e2e77c78f2aa80fc83f6a8ff98dfede91fead877e25d2355f",
+      "bytes": 2577,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": null,
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [],
+  "reviews_dir": "reviews"
+}

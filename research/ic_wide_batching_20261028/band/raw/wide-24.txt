@@ -1,0 +1,41 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1809-c1393549 | 23.81 | batch-1024 | 36/36 | 39.513 | 40.452 | 48.905 | — |
+| icv1-fp24-tm1809-c1393549 | 23.81 | batch-16 | 36/36 | 22.071 | 22.983 | 31.183 | — |
+| icv1-fp24-tm1809-c1393549 | 23.81 | batch-256 | 36/36 | 25.766 | 26.582 | 33.930 | — |
+| icv1-fp24-tm1809-c1393549 | 23.81 | batch-64 | 36/36 | 22.748 | 23.625 | 31.514 | — |
+| icv1-fp24-tm1809-c1393549 | 23.81 | fast | 36/36 | 21.956 | 22.892 | 31.308 | — |
+| icv1-fp24-tm1809-c1393549 | 23.81 | rho-neg | 36/36 | 1.027 | 1.120 | 1.957 | — |
+| icv1-fp24-tm1809-c1393549 | 23.81 | serial-1024 | 36/36 | 39.513 | 40.452 | 48.905 | — |
+| icv1-fp24-tm1809-c1393549 | 23.81 | walk | 36/36 | 21.956 | 22.892 | 31.308 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1809-c1393549 | batch-1024 vs batch-16 | batch-16 < batch-1024 |
+| icv1-fp24-tm1809-c1393549 | batch-1024 vs batch-256 | batch-256 < batch-1024 |
+| icv1-fp24-tm1809-c1393549 | batch-1024 vs batch-64 | batch-64 < batch-1024 |
+| icv1-fp24-tm1809-c1393549 | batch-1024 vs fast | fast < batch-1024 |
+| icv1-fp24-tm1809-c1393549 | batch-1024 vs rho-neg | rho-neg < batch-1024 |
+| icv1-fp24-tm1809-c1393549 | batch-1024 vs serial-1024 | unresolved inside the band |
+| icv1-fp24-tm1809-c1393549 | batch-1024 vs walk | walk < batch-1024 |
+| icv1-fp24-tm1809-c1393549 | batch-16 vs batch-256 | batch-16 < batch-256 |
+| icv1-fp24-tm1809-c1393549 | batch-16 vs batch-64 | batch-16 < batch-64 |
+| icv1-fp24-tm1809-c1393549 | batch-16 vs fast | unresolved inside the band |
+| icv1-fp24-tm1809-c1393549 | batch-16 vs rho-neg | rho-neg < batch-16 |
+| icv1-fp24-tm1809-c1393549 | batch-16 vs serial-1024 | batch-16 < serial-1024 |
+| icv1-fp24-tm1809-c1393549 | batch-16 vs walk | unresolved inside the band |
+| icv1-fp24-tm1809-c1393549 | batch-256 vs batch-64 | batch-64 < batch-256 |
+| icv1-fp24-tm1809-c1393549 | batch-256 vs fast | fast < batch-256 |
+| icv1-fp24-tm1809-c1393549 | batch-256 vs rho-neg | rho-neg < batch-256 |
+| icv1-fp24-tm1809-c1393549 | batch-256 vs serial-1024 | batch-256 < serial-1024 |
+| icv1-fp24-tm1809-c1393549 | batch-256 vs walk | walk < batch-256 |
+| icv1-fp24-tm1809-c1393549 | batch-64 vs fast | fast < batch-64 |
+| icv1-fp24-tm1809-c1393549 | batch-64 vs rho-neg | rho-neg < batch-64 |
+| icv1-fp24-tm1809-c1393549 | batch-64 vs serial-1024 | batch-64 < serial-1024 |
+| icv1-fp24-tm1809-c1393549 | batch-64 vs walk | walk < batch-64 |
+| icv1-fp24-tm1809-c1393549 | fast vs rho-neg | rho-neg < fast |
+| icv1-fp24-tm1809-c1393549 | fast vs serial-1024 | fast < serial-1024 |
+| icv1-fp24-tm1809-c1393549 | fast vs walk | unresolved inside the band |
+| icv1-fp24-tm1809-c1393549 | rho-neg vs serial-1024 | rho-neg < serial-1024 |
+| icv1-fp24-tm1809-c1393549 | rho-neg vs walk | rho-neg < walk |
+| icv1-fp24-tm1809-c1393549 | serial-1024 vs walk | walk < serial-1024 |

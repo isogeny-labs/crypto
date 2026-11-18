@@ -316,6 +316,59 @@ validator corrected one derived figure, \texttt{inc-w0}/\texttt{inc-rec}
 at 32 bits, from $0.88$ to $0.874$. The study remains one host at L0 with
 no external ECDLP tool, so its unit is the counted one only.
 
+\paragraph{$k=6,7$ and the walk table at 36 and 40 bits.} A ladder panel of
+15 November (\art{research/ic_ladder_wwalk_ksum_20261115/REPORT.md};
+protocol frozen before data with one amendment for CPU pinning, one RunPod
+pod, every session \texttt{verify --replay-all} clean, no second-host replay
+and no \texttt{VALIDATION.json}, \texttt{[pcc:unverified]}) ran the
+negation-folded $k$-sum table at $k=6$ and 7 and the Curve25519 autolab's
+walk table \texttt{wwalk} with two seed abscissae ($C=2$, recipe frozen
+from \S\ref{sec:c25519}, never tuned on these curves) on the ladder curves of
+Table~\ref{tab:pg-ksum}'s first study, 48 runs per arm and size
+(Table~\ref{tab:pg-ladder}). The $k=6$ and $k=7$ tables are below $k=5$ at
+every weight at both sizes, every interval's upper end below 1; $k=7$ is not
+separable from $k=6$, and a modelled $k=8$ does not beat $k=7$ by more than
+3\% at 36 bits. At 40 bits $k=6$ moves the $k$-sum distance to
+\texttt{rho-neg} from $7.94\times$ to about $6.9\times$ at $w=0$. The walk
+table is $1.660$ and $1.685\times$ \texttt{rho-neg} at $w=0$, below its
+registered band $[1.75,2.15]$ in point estimate with overlapping intervals;
+its $S$ of $1.83$ and $1.82$ sits near the protocol's Poisson floor
+$1.662\sqrt r$ for three unknown columns. The 44- and 48-bit sessions were
+refused at plan time because the walk table packs coefficients in 32 bits.
+Controls: both A/A ratios are exactly 1, the floor audits pass, and the
+positive control on the autolab's $k=32$ curve gives $S(w=0)=1.861$ against
+a registered $1.842\pm10\%$; there is no $C=0$ arm. No kill rule fired.
+These are unvalidated distances remaining; the producer's reading of
+$k=6$ as a 13\% constant improvement of the $k$-sum row needs the gate's
+replay certificate, validator report and \texttt{VALIDATION.json} first.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+Ratio, $w=0$ [95\% CI] & 36 bits & 40 bits & 40 bits, $w=1$ \\
+\midrule
+\texttt{wwalk-c2} / \texttt{rho-neg} & $1.660$ $[1.358,2.082]$ & $1.685$ $[1.386,2.093]$ & $1.822$ $[1.486,2.273]$ \\
+\texttt{wwalk-c2} / \texttt{ksum5-sel} & $0.240$ $[0.214,0.268]$ & $0.212$ $[0.194,0.231]$ & $0.183$ $[0.166,0.202]$ \\
+\texttt{ksum6} / \texttt{ksum5} & $0.930$ $[0.884,0.979]$ & $0.868$ $[0.829,0.911]$ & $0.843$ $[0.797,0.894]$ \\
+\texttt{ksum7} / \texttt{ksum5} & $0.941$ $[0.899,0.985]$ & $0.856$ $[0.820,0.893]$ & $0.787$ $[0.746,0.830]$ \\
+\texttt{ksum7} / \texttt{ksum6} & $1.012$ $[0.967,1.059]$ & $0.986$ $[0.941,1.032]$ & $0.933$ $[0.879,0.988]$ \\
+\texttt{ksum5} / \texttt{rho-neg} & $6.91$ & $7.94$ & $9.93$ \\
+\texttt{wwalk-c1} / \texttt{rho-neg} & $1.39$ & $1.31$ & $1.31$ \\
+\addlinespace
+$S$: \texttt{rho-neg}, \texttt{wwalk-c2}, \texttt{ksum6} & 1.10, 1.83, 7.08 & 1.08, 1.82, 7.46 & 2.16, 3.94, 18.11 \\
+\bottomrule
+\end{tabular}
+\caption[]{Ladder panel on the 36- and 40-bit prime ladder curves, 48 runs
+per arm, paired ratios of total counted cost with 4{,}000 bootstrap
+resamples. \texttt{wwalk-c1} is the one-seed control at the
+baby-step giant-step boundary. Producer-reported, no validation gate,
+\texttt{[pcc:unverified]}. Sources:
+\art{research/ic_ladder_wwalk_ksum_20261115/REPORT.md},
+\art{research/ic_ladder_wwalk_ksum_20261115/results/analysis/results.md}.}
+\label{tab:pg-ladder}
+\end{table}
+
 \paragraph{The precomputation regime.} The $k=4$ table is built before any
 target arrives, which invites two accounting questions
 (\art{research/prime_precompute_regime_20261028/}; class: control and
@@ -393,7 +446,9 @@ Six studies of 11 and 12 November measured a multi-target index calculus
 against multi-target rho and baby-step giant-step on $T$ targets of one
 curve. They use a separate counted field layer
 (\texttt{examples/mt\_fieldops.rs}), not ecbench, so their rows are outside
-Tables~A--C. Inversions, multiplications and squarings are counted, and
+Tables~A--C. The 15 November scale and batched-inversion runs are in
+Table~\ref{tab:in-mt}; the gap to multi-target rho grows with the group
+there. Inversions, multiplications and squarings are counted, and
 the cost per target is
 \[
   \Bigl[\frac{c_I I+M+S}{c_I+3}+h\,(H+L+N)\Bigr]\Big/T,
@@ -961,6 +1016,27 @@ W3 was dearer at every weight on every held-out curve at 36.6--47.2 bits
 ($1.06$--$1.17\times$ at $w=1$). \texttt{ic plan --native-weight} now keeps
 the counted optimum at every weight.
 
+\paragraph{Two-point extractors.} A native Rust module of 15 November
+implements a non-interpolating Vieta extractor for two-point decompositions
+over a smooth coset base, beside batched and scalar target subtraction and
+meet-in-the-middle three-term arms
+(\art{research/vieta_coset_rust_20261115/README.md}; statement
+\texttt{PCC-20261115-0b04ff}, unverified). Its checks establish output
+agreement only: exhaustive rational targets on three small curves, P-224
+known answers, and coset sizes $m=4096$ on a 62-bit prime and $m=1024$ on
+P-224. The schoolbook \texttt{u128}/\texttt{BigUint} backends are a counted
+reference, not the library's optimised arithmetic. No performance run has
+launched, the scale protocol (four fields, coset sizes 32--8192) is a draft,
+and the source states that the $m=2^d$ lift does not bound the elimination
+degree by two. The binary-field companion
+(\art{research/orientation_baseline_20261115/README.md},
+\texttt{PCC-20261115-c73d58}, unverified) fixes target subtraction with one
+shared inversion per target as the native two-point baseline: at base size
+64 over eight targets it makes 512 group-addition calls against 32{,}768 for
+pair enumeration, with 7 inversion calls against 438 for unbatched
+subtraction and identical outputs. These are operation counts on tiny
+fixtures; its timing driver has not run.
+
 \section{Structured bases in measurement}\label{sec:pg-structured}
 
 The conservation results of Chapter~\ref{ch:cover}
@@ -1193,6 +1269,55 @@ different treatment, and its sorting applies beyond the tower:
   add little.
 \end{itemize}
 
+\paragraph{Pricing the symmetric oracle.} The symmetric $m=4$ rows above
+time F4 on a system whose input $\Sem5(e;x_R)$ is built per target by grid
+evaluation, interpolation and an $e$-rewrite, and that build was not counted.
+A frozen study of 15 November (\art{research/pkm_priced_20261115/REPORT.md};
+protocol committed before data, one RunPod CPU pod after two failed builds,
+Stage~0 only, \texttt{[pcc:unverified]}) counted it and added a per-curve
+parametric $\Sem5(e;x_R)$ of degree at most 8 in $x_R$, evaluated by Horner's
+rule (Table~\ref{tab:pa-pkm-priced}). At $N=12$ the grid build is
+$7.362\times$ the F4 stage, against a registered prediction of 1.7--2.3, so
+the leaderboard's component ratio for the symmetric entry excludes the larger
+of its two per-target stages. The parametric form costs 3{,}960 mulmods per
+target ($0.99\%$ of F4 at $N=12$), agrees with the grid build on 12{,}375 of
+12{,}375 coefficients at each $N$, and its one-off precompute of
+$2.632\cdot10^7$ mulmods breaks even after about 9 targets. At $N=16$ F4
+dominates the build by about $3{,}600\times$. The derived priced cost per
+matched \texttt{rho-neg} at $w=0.1$, amortised over 100 solves, is
+$2.13\cdot10^7$ at $N=12$ and about $1.0\cdot10^9$ at $N=16$ with the
+parametric build. The $N=12$ value is 20--100$\times$ above the registered
+$2\cdot10^5$--$10^6$; the curve's derived yield is $3.06\cdot10^{-4}$
+against the lead's $7.13\cdot10^{-4}$ (6 of the 8 points of $V$ lift), and
+the source leaves the remaining factor unexplained. No kill rule fired.
+These are distances remaining, derived from measured per-target costs and a
+derived yield; a cold pipeline with measured yield (Stage~1) is required
+before any row exists.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Quantity ($p=786433$, 24 targets per $N$) & $N=12$ & $N=16$ \\
+\midrule
+subgroup order $r$; liftable points of $V$ & 19; 6 of 8 & 89; 8 of 16 \\
+F4 stage, field operations per target & 400{,}958 & $1.0790\cdot10^{10}$ \\
+grid-built $\Sem5$, mulmod per target & 2{,}951{,}786 & 2{,}951{,}787 \\
+grid build / F4 & $7.362$ & $2.74\cdot10^{-4}$ \\
+parametric $\Sem5$, mulmod per target & 3{,}960 & 3{,}960 \\
+priced $S$/\texttt{rho-neg}, F4 only ($w=0.1$, derived) & $2.10\cdot10^7$ & $1.00\cdot10^9$ \\
+priced $S$/\texttt{rho-neg}, grid build + F4 & $1.76\cdot10^8$ & $1.00\cdot10^9$ \\
+priced $S$/\texttt{rho-neg}, parametric build + F4 & $2.13\cdot10^7$ & $1.00\cdot10^9$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The symmetric $m=4$ Kummer oracle with its per-target $\Sem5$
+build counted. F4 ran on 8 ($N=12$) and 4 ($N=16$) of the 24 targets. The
+priced ratios are derived, amortised over 100 solves, from a derived yield;
+there is no measured pipeline. Producer-reported, \texttt{[pcc:unverified]}.
+Source: \art{research/pkm_priced_20261115/REPORT.md}.}
+\label{tab:pa-pkm-priced}
+\end{table}
+
 \paragraph{Degree alone is not a cost certificate.} The weak-assumption
 reanalysis (\art{research/ic_weak_assumptions_20261102/}) extracted the
 committed PKM $m=4$ random-target rows at $N=8,12,16$. Their F4 solving
@@ -1278,13 +1403,20 @@ the density of the $\mu_k$ chain. There is no rho row; the distance is
 stated against $\mu_k$.
 
 \paragraph{The $t=14$ cell.} The decisive cell of the prime fall-degree
-study (Kummer, $m=2$, $p=2013265921$, $t=14$) is half done
-(\art{research/prime_fall_degree_t14_20261101/}). At cap 5 neither random
-draw refutes and neither is decomposable, so $d_F\ge6$. The cap-6 cells
-need a 112\,GiB, 86{,}400\,s native job; no route in the lab carried such a
-job on 1 November, and the cells are owed. The owner approved a command
-route for non-ecbench jobs (\texttt{D-ROUTE}) that an administrator has to
-implement.
+study (Kummer, $m=2$, $p=2013265921$, $t=14$) was half done on 1 November
+(\art{research/prime_fall_degree_t14_20261101/}): at cap 5 neither random
+draw refutes and neither is decomposable, so $d_F\ge6$, and the cap-6 cells
+needed a 112\,GiB native job that no lab route carried. Reserved RunPod
+pods ran them on 15 November
+(\art{research/prime_fall_degree_20261027/reports/growth-law-20261115/README.md};
+\texttt{[pcc:unverified]}, no pcc claim). Cap 5 and cap 6 both complete
+without refuting on both draws, so $d_F\ge7$ at $t=14$. The registered
+C-step law $d_F=4+\lfloor(t-2)/4\rfloor$ predicts 7 there, and ``flat at 6''
+is ruled out. Whether the value is exactly 7 is decided by the cap-7 runs,
+relaunched under Amendment~30
+(\art{research/prime_fall_degree_20261027/PREREGISTRATION.md}); a refutation
+at cap 7 gives $d_F=7$, and a completion without $1$ gives $d_F\ge8$ and
+refutes C-step. No cap-7 row had landed by the evening of 15 November.
 
 \paragraph{The slope that parity needs.} A desk study of 10--12 November
 (\art{research/prime_ic_leads_20261110/README.md}; derivations plus
@@ -1396,6 +1528,17 @@ computations, first in Python and so not admitted, were reproduced value
 for value by a native Rust port on 15 November. No lower bound on $d_F$ that
 grows with $t$ is proved.
 
+A first RunPod attempt at $W=1$, $t=12$ hit its 3\,h timeout inside the
+degree-6 closure and, because the pilot wrote rows only at exit, left no new
+value; the recorded value stays $d_F\ge6$. The engine now writes each
+closure $V_{F,c}$ as soon as it is computed (\texttt{fall\_degrees\_with},
+\texttt{--hky-progress}), and a plan frozen before any row
+(\art{research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md})
+reruns three cells, 24\,h each, with registered predictions $d_F=6$ at
+$(W,t)=(1,12)$, $d_F=7$ at $(3,13)$ and $d_F=7$ at $(2,14)$. A cell holds
+only if both draws hold, and one failing draw falsifies Conjecture~G there.
+The run was in flight with no result on 15 November.
+
 \paragraph{Certified degrees to $m=8$.} Lab L1 of the five-lead chase of 13
 November (\art{research/prime_leads_chase_20261113/README.md}; protocol
 hashed before runs, \texttt{[pcc:unverified]}) certified the
@@ -1457,25 +1600,85 @@ degree $d_{\rm NS}\ge2t+6$ (D10), measured $d_{\rm NS}$ meets both within their
 classes, and the measured $d_F$ stays near 5; and a 2-isogeny (V\'elu) tower
 reads $d_F=5$ at $t=4$--9, at its generator-weight floor, beside a Kummer
 chain that reproduces its law on the same engine. Neither bound reaches
-$d_F$ from below. Stage~B of the fall-degree study, the $m=3$--6 cells, has
-no admitted row: two Spot attempts were lost, an EKS unit-job route stopped
-at its pool check, and an amendment of 14 November moved it to one reserved
-RunPod pod with every rule unchanged
-(\art{research/prime_fall_degree_20261027/PREREGISTRATION.md}, Amendments~15
-and~16).
+$d_F$ from below.
+
+\paragraph{Stage~B and the $m=4$ cells.} Stage~B of the fall-degree study,
+the $m=3$--6 ladders, had no admitted row in the morning of 15 November. It
+ran that day on reserved 16-vCPU RunPod pods under Amendments~16--21 and~30
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_B.md},
+\art{research/pkm_falldegree_unblock_20261107/reports/m4-rp-20261115/RESULTS_M4_RP.md};
+exact HKY closure with F4 cross-checks, $p=2013265921$, two random draws
+per cell, every value \texttt{[pcc:unverified]}).
+Table~\ref{tab:pa-dfm} collects the last fall degrees. The first fall degree
+is 4 on every Kummer cell with $t\ge2$ at every $m=2$--6; it is a theorem
+(D3) at $m=2$ and measured only for $m\ge3$. Where both exist, $d_F$ equals
+the F4 solving degree $D$ (22 stage~A and 41 stage~B draws), so the growth is
+in the closure, not in how F4 runs, and $D-\mathrm{ffd}$ grows on the $m=2$,
+3 and 5 ladders. At $m=4$ the degree-7 closure at $t=5$ completes without
+$1$ on both draws (356{,}960 columns, $3.41\cdot10^6$ entries, under a minute,
+against an Amendment-30 sizing of 40--160\,GB), so $d_F(N{=}20)\ge8$ against
+$d_F(N{=}16)=7$, which the registered Amendment~8 rule reads as ``rise''. The
+shape-matched null equals the Kummer ladder on every completed cell ($m=3$
+at $t=2$--5, $m=4$ at $t=4$). A second session ran the same registered cells
+on other pods: all 144 stage~B systems agree field by field, multiply-add
+counts included, and the $t=13$ draw-0 cap-6 cell agrees in degree, column
+count (177{,}063) and multiply-adds
+(\art{research/pkm_falldegree_unblock_20261107/results/REPLICATION_20261115/README.md}).
+No slope for $m\ge3$ is established: those ladders end censored after 2--4
+points.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rccccccccc@{}}
+\toprule
+$m$ & $t=1$ & 2 & 3 & 4 & 5 & 6 & 7--9 & 10--13 & 14 \\
+\midrule
+2 & 3 & 4 & 4 & 4 & 4 & 5 & 5 & 6 & $\ge7$ \\
+3 & & 5 & 6 & 6 & 7 & $\ge7$ & & & \\
+4 & & 6 & 7 & 7 & $\ge8$ & $\ge7$ & & & \\
+5 & & 6 & 8 & $\ge8$ & $\ge7$ & & & & \\
+6 & & 7 & & & & & & & \\
+\bottomrule
+\end{tabular}
+\caption[]{Last fall degree $d_F$ of the Kummer tower over
+$p=2013265921$, lower median of two random draws; $\ge$ marks a closure
+complete to that degree minus one without reaching $1$. The $m=4$, $t=5$
+and $t=6$ entries are from the Amendment-30 runs of 15 November. This is a
+different system from Table~\ref{tab:pa-dmt} (no auxiliary unknowns, another
+prime). Degrees only, no cost. \texttt{[pcc:unverified]}. Sources:
+\art{research/prime_fall_degree_20261027/reports/growth-law-20261115/data.json},
+\art{research/pkm_falldegree_unblock_20261107/reports/m4-rp-20261115/RESULTS_M4_RP.md}.}
+\label{tab:pa-dfm}
+\end{table}
+
+\paragraph{The isogeny tower at $P_1$.} The 2-isogeny arm at the second
+prime $P_1$ (\art{research/pkm_falldegree_unblock_20261107/results/ISO/SCORE/READING.md};
+all gates passed, 14 of 14 auxiliary curves recounted independently, 28 of
+28 draws certified inconsistent) reads median $d_F$ $3,5,5,5,5,5,5,5,5$ at
+$t=1$--9, exactly 6 at $t=10$--12 and $\ge6$ at 13 and 14. The registered
+prediction ``flat at 5 at $t=9$--13'' is refuted. The isogeny ladder leaves 5
+at the same $t$ as the Kummer ladder, is one degree higher at $t=2$--5 and
+equal from $t=6$ on, so on this measure the V\'elu maps give no solving-degree
+advantage over squaring. A null arm that keeps the V\'elu tower and replaces
+$\Sem3$ by random coefficients on the same support, on the same auxiliary
+curves, gives the same median at every $t=1$--13
+(\art{research/pkm_falldegree_unblock_20261107/results/ISO/iso-null/READING.md}):
+P-ISO-N reads ``shape-driven''. These are solving degrees, not costs, and
+\texttt{[pcc:unverified]}.
 
 \paragraph{Open.} Lead~1 of the tower, whether $D$ stays bounded as $N$
 grows, is open in every presentation tried: plain, torus, Dickson,
-symmetric, radix-graded and P-224-shaped. In each family $D$ either grows
-with $N$ or is pinned by the input degree, and the shape-matched null
-matches. The atlas lead \texttt{LEAD-ICP-pkm-tower-algebraic-oracle} is
-\texttt{open\_blocked} on memory: the cells that would discriminate
-($m=3$, $N=21$ in the symmetric tower; $t=14$ at cap 6) need hosts the
-programme did not have. The owner decided on 14 November that $t=14$ and
-further $t=13$ draws run on non-Spot capacity
-(\art{research/ic_lead_queue_20261114/README.md}); none had run by 15
-November. At $m=8$ the projected gain does not survive a whole-solve floor
-in its own cost model, and what is left is a sparse-solver measurement. Chapter~\ref{ch:falldegree} gives the proved part.
+symmetric, radix-graded, P-224-shaped and 2-isogeny. In each family $D$
+either grows with $N$ or is pinned by the input degree, and the
+shape-matched null matches. The atlas lead
+\texttt{LEAD-ICP-pkm-tower-algebraic-oracle} is \texttt{open\_blocked} on
+memory for the symmetric cell $m=3$, $N=21$. Amendment~8 closes the lane
+(the tower base judged by the HKY last fall degree) if C-step holds at
+$t=12$--14 and $m=4$ reads rise; C-step holds at $t=12$ and 13, $m=4$ reads
+rise, and $t=14$ waits on its cap-7 cell. At $m=8$ the projected gain does
+not survive a whole-solve floor in its own cost model, and what is left is
+a sparse-solver measurement. Chapter~\ref{ch:falldegree} gives the proved
+part.
 
 \section{Partitioned summation polynomials}\label{sec:pa-aps}
 
@@ -1781,6 +1984,85 @@ form $x_i=N(u_i)$, 22 variables, 23 equations and input degree at most 4,
 against 18, 19 and 12 for the direct form, and checks every equation by
 exact substitution; Lean proves the lift and projection inverse to each
 other. No solver was run on either form.
+
+\paragraph{Algebraic norm oracles on fixed fixtures.} Seven native C++
+components of 15 November replaced the coefficient census of the arity-three
+solver by algebraic solving of the shared norm and remainder system and
+carried it to cold recovery (Table~\ref{tab:pa-norm-oracles}). Every one is a
+deterministic software control on a curve over $\FF_{17}$ or $\FF_{19}$,
+with a protocol committed before its calls, an OpenSSL replayer that
+includes no candidate source, 20\,s and 2\,GiB backend caps that were never
+raised, and \texttt{[pcc:unverified]} standing with no signed verdict. None
+measures time, yield or an exponent, and none has a rho row. The shared
+prototype (\art{research/shared_norm_algebraic_20261115/README.md}, statement
+\texttt{PCC-20261115-be28ec}) builds the system with every coefficient
+unknown, monic $A$ of degree $h$, $C$ of degree at most $h-2$ and monic $U$ of
+degree $m=2h-1$, with $A^2-fC^2=(X-x_R)U$ and the quotient--remainder layers
+$V_{j-1}^2=Q_jU+V_j$, $V_t=c$; it calls msolve and extracts every rational
+model by joint eigenspaces of the multiplication matrices, since no
+$\FF_{17}$-valued linear form separates the 28 rational solutions of the
+retained $m=3$, $t=4$ system. The core variant
+(\art{research/norm_core_elimination_20261115/README.md}) substitutes the
+target equation, the monic division by $X-x_R$ and the public prefix of the
+tower before the backend sees the system, leaving 15, 18 and 22 variables at
+arities 3, 5 and 7 against 24, 42 and 60, all of degree at most 3. A
+polynomial-calculus closure with a per-basis derivation certificate checked
+by a separate executable (\art{research/norm_pc_closure_20261115/README.md})
+completes the natural norm system at degree 4 and reaches unknown at
+degrees 5 and 6. An auxiliary-curve tower of three checked V\'elu steps
+gives an eight-abscissa base over $\FF_{19}$, where neither $p-1$ nor $p+1$
+is divisible by 8, and recovers a logarithm cold
+(\art{research/projective_aux_norm_20261115/README.md},
+\texttt{PCC-20261115-1f50be}); a later component generates that auxiliary
+setup by rational point halving
+(\art{research/auxiliary_halving_setup_20261115/README.md},
+\texttt{PCC-20261115-3ff0b8}) and states a conditional bound of expected
+$O(d^2t\operatorname{poly}(\log p))$ setup work for $d=2^t\ge8$,
+$p\ge256d^4$ (\texttt{PCC-20261115-4b68b3}). A multiprecision version of the
+halving setup builds; its numerical qualification waits on checkpoint upload
+access (\art{research/big_prime_halving_20261115/README.md},
+\texttt{PCC-20261115-261591}). A critical-pair schedule with chain filtering
+leaves all twelve auxiliary cases unknown at its storage limits
+(\art{research/critical_pair_norm_20261115/README.md},
+\texttt{PCC-20261115-555122}, \texttt{-c012b0}). The dense arity-5 and
+arity-7 controls stayed unknown in every presentation; for $m=5$, $t=4$ the
+backend's exit 139 was traced to repeated allocation failure under the
+2\,GiB address limit, which is not a mathematical refutation.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}p{0.30\linewidth}p{0.64\linewidth}@{}}
+\toprule
+Component & Fixed-fixture outcome (producer-local) \\
+\midrule
+shared norm, $\FF_{17}$, $m=3$ & 90 complete model sets (400 models) equal to OpenSSL enumeration; cold recovery of all 18 nonzero targets, 72 relations, 18 kernels \\
+same, $m=5,7$, $t=4$ & backend cap, unknown (88 and 56 reference models exist) \\
+core elimination & same 90 sets and 18 recoveries with 15/18/22 variables; $m=5$, $t=3$: 2 models, quotient dimension 8 \\
+PC closure with certificates & natural norm complete at degree 4 (one point); degree 5 exit 137, degree 6 step cap; cold $Q=(0,6)$: scalar 7, 9 queries, 4 relations \\
+auxiliary tower, $\FF_{19}$ & $y^2=x^3+2$, $P=(4,3)$, $Q=(18,1)$: scalar 11; 13 attempts, 12 solver calls, 4 relations, 1 kernel \\
+generated halving setup & same answer after 70 setup trials and 8 solver calls; 14{,}754 doubling fibres at $p\le19$ match OpenSSL \\
+critical-pair schedule & round 1: 8 empty ideals certified, 4 positive cases unknown; round 2: 12 of 12 unknown \\
+\bottomrule
+\end{tabular}
+\caption[]{Algebraic shared-norm oracles of 15 November. Deterministic
+development controls, not performance, yield or scaling measurements;
+\texttt{[pcc:unverified]}. Sources: the seven \texttt{research/*\_20261115/}
+directories cited in the text.}
+\label{tab:pa-norm-oracles}
+\end{table}
+
+The same day's cover review (\art{research/critical_pair_norm_20261115/COVER-REVIEW.md};
+hand derivation, \texttt{PCC-20261115-c4aaf8}, unverified) builds an
+explicit family $C:Y^{2u}=f(X^v+s)$ with $u$ the least power of two at
+least $\lceil\log_2p\rceil$ and $v=u+1$, of genus $3u^2+u/2-1$ and degree
+$u(u+1)$ over $E$, which meets the geometric and growth hypotheses of
+Enge, Gaudry and Thom\'e's $L(1/3)$ theorem, and bounds that algorithm's full
+projected factor base below by $p/(4\delta)$ columns, $\delta=u(u+1)$. That
+is a cost obstruction for the explicit full base only; smaller implicit
+bases remain open. The subexponential criterion of the parent study is not
+met by any of these components: the growing-family degree bound, the useful
+yield with every failed attempt charged, and arbitrary-prime arithmetic stay
+open.
 
 \section{SAT, SMT and CDCL(T)}\label{sec:pa-sat}
 
@@ -2093,6 +2375,13 @@ parent session read the preprint's multiplication construction, the
 point-addition encodings, the hash coverage and the complete-cost analysis,
 and found no transfer gap. The review itself says these are scoped proof
 readings, not certification of either manuscript or of any implementation.
+A source-refinement audit of 5 November (\texttt{PCC-20261105-c0901e},
+unverified statement) states the contract between the tuple driver and a
+child packet: $q\le E\le R$ for driver-generated packets under its listed
+preconditions, with $q$ positive incoming records, $E$ the total incoming
+degree and $R$ the selected rows. It is a review argument with no Lean build
+or Rust refinement proof
+(\art{research/hashed_ecdl_tuple_invariant_20261105/README.md}).
 Implementation checks are all small:
 \begin{itemize}
 \item the native tensor crate passes 34 release correctness tests,
@@ -2629,6 +2918,34 @@ provenance and class-group statistics, and none bears on ECDLP hardness.
   $P-M_j$ in the \texttt{gpu/nist} small-batch kernel stays disabled after an
   audit; the estimates are historical diagnostics, not measured solve costs
   (\art{research/nist_best2_small_batch_20261027/}).
+\item \emph{The split-prime deficit.} A user-supplied report found fewer
+  odd primes $\ell$ with $t^2-4p$ a nonzero square modulo $\ell$ than a
+  uniform Frobenius model expects over ten
+  published prime-order curves (P-192 to P-521, the X9.62 \texttt{prime192}
+  and \texttt{prime239} curves). A native recount
+  (\art{research/split_prime_ecdlp_20261107/README.md}; boundary study, no
+  $S$, \texttt{[pcc:unverified]}) reproduces every split count and $z$ the
+  report prints; the pooled $z$ at $\ell\le691$ is $-3.13$ (124 odd
+  primes). A size-matched conditional null of 10 November, 10{,}000
+  replicates, gives $P(z_{691}\le-3.13)=0.0030$ and
+  $P(\max\text{ over the twelve cutoffs}\ge3.13)=0.0165$: suggestive at the
+  chosen cutoff, not established at the 1\% level once the cutoff scan is
+  charged, and not disproven. The study's theorem (proof sketch) states that
+  for every prime $\ell\ne n$, $p$, an $\FF_p$-rational $\ell$-power isogeny
+  restricts to an isomorphism on $E(\FF_p)$ and every endomorphism acts on it
+  as a computable scalar, so the pattern cannot feed an algorithm below the
+  generic bound. A correction of 15 November states that the exclusion
+  $\ell\ne n$ is needed for the isomorphism item, whose hypothesis fails at
+  $\ell=n$; the two rational $n$-isogenies $\pi-1$ and $\bar\pi-1$ still act
+  as the scalars 0 and $p-1$ by the endomorphism item. The theorem's first
+  two items are formalised as abstract finite-group statements in Lean,
+  without isogenies or Lenstra's identification. A cross-trace negative
+  control over 4{,}000 random prime-order curves found no effect at or above
+  its 1\% detection floor at $2^{24}$ and $2^{28}$; the $2^{32}$ arm was not
+  run, so the seed is bounded, not closed, for the coordinate track. The
+  canonical $p$-adic lift remains an uncovered presentation, but it is not
+  computable at cryptographic size (degree $2p+2$ or class number about
+  $2^{95}$).
 \end{itemize}
 
 \section{What the three chapters settle}\label{sec:pt-summary}
@@ -2639,7 +2956,9 @@ the residual collectors at $1.3$--$1.7\times$ rho ($w=0$; $1.54$--$1.64$ in
 the cells with a validator report), a constant at rho's exponent with no
 growth over 36--42 bits; the $k$-sum tables are
 $5.4$--$11.0\times$ rho and above baby-step giant-step, gate-validated at
-20--32 bits since 12 November. In the many-target regime the multi-target
+20--32 bits since 12 November. An unvalidated ladder panel puts $k=6$ at
+$0.868\times$ $k=5$ at 40 bits and the two-seed walk table at
+$1.66$--$1.69\times$ rho at 36--40 bits (\S\ref{sec:pg-ksum}). In the many-target regime the multi-target
 index calculus is unranked against multi-target rho across the band and
 1.11--1.47$\times$ BSGS (\S\ref{sec:pg-multitarget}). On the E-222 and
 M-221 analogues the distance to matched rho grows from $15.9$--$76.1$ at
@@ -2679,7 +2998,12 @@ The chapters state these corrections and withdrawals:
   superseded by $D=2^{16}$ at toy primes, and the ring-form statement is
   scoped by \texttt{CORR-20261102-7e3a91} (\S\ref{sec:pt-gfp5});
 \item the symmetric-tower rows are instrument diagnostics, not natural
-  prime-order benchmarks (\S\ref{sec:pa-pkm});
+  prime-order benchmarks, and the symmetric $m=4$ component ratio excludes a
+  per-target $\Sem5$ build that costs $7.362\times$ its F4 stage at $N=12$
+  (\S\ref{sec:pa-pkm});
+\item the statement that stage~B of the fall-degree study has no admitted
+  row is superseded by the RunPod rows of 15 November
+  (Table~\ref{tab:pa-dfm});
 \item the Cheon/rho ratios on P-224's shape are withdrawn
   (\S\ref{sec:pt-standard});
 \item the 11 November reading that the multi-target \texttt{ic4} is
@@ -2695,7 +3019,7 @@ The chapters state these corrections and withdrawals:
   untuned rho at small size is withdrawn (\S\ref{sec:pt-e222}).
 \end{itemize}
 The open items are the discriminating Kummer cells ($m=3$, $N=21$
-symmetric; $t=14$ at cap 6), a sparse Kummer relation finder at $m\ge8$ with
+symmetric; $t=14$ at cap 7, with $d_F\ge7$ already recorded at cap 6), a sparse Kummer relation finder at $m\ge8$ with
 the whole-call floor charged, lifting with growing rank, the algebraic
 reference arm, a counted cost
 for the tensor route, the $\FF_p$ CDCL(T) propagator, the APS complete-cost

@@ -1,0 +1,11 @@
+name = "elliptic_norm_transport_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticNormTransportAudit"]
+
+[[require]]
+name = "elliptic_field_norm_audit"
+path = "../../elliptic_field_norm_audit_20261116/lean"
+
+[[lean_lib]]
+name = "EllipticNormTransportAudit"
+roots = ["TransportImports", "NormTransport", "NormInfinity", "NormLocal", "NormGlobal", "NormTransportControls", "NormTransportCertificate"]

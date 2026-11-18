@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/ec2-user/ml-dataset-resume-20261029/cohort-index-20261107-v3/cohort_index.py", line 167, in <module>
+    if __name__=='__main__':main()
+  File "/home/ec2-user/ml-dataset-resume-20261029/cohort-index-20261107-v3/cohort_index.py", line 165, in main
+    result=build(parse(args.inventory.read_bytes()))
+  File "/home/ec2-user/ml-dataset-resume-20261029/cohort-index-20261107-v3/cohort_index.py", line 159, in build
+    exports.append(verify_export(e,splits))
+  File "/home/ec2-user/ml-dataset-resume-20261029/cohort-index-20261107-v3/cohort_index.py", line 136, in verify_export
+    require((r.get('split_component'),r.get('split'))==(target.get('split_component'),target.get('split')),'channel target split mismatch')
+  File "/home/ec2-user/ml-dataset-resume-20261029/cohort-index-20261107-v3/cohort_index.py", line 6, in require
+    if not ok: raise ValueError(message)
+ValueError: channel target split mismatch

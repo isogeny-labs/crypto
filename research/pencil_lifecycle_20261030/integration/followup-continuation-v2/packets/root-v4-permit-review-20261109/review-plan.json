@@ -1,0 +1,44 @@
+{
+  "schema": "prospective-source-review-plan/v1",
+  "reviewer": "renew_materializer",
+  "author_of_v4": false,
+  "ancestor_familiarity": "Authored v3 ancestor and cache/parser fixes; not blind to architecture. V4 implementation has not yet been inspected.",
+  "prior": "A single stale permit read can race an atomic refresh; one immediate fresh read may address this without changing the lease window. Identity/custody errors must remain terminal.",
+  "joints": [
+    {
+      "joint": "worker retry",
+      "owner": "renew_materializer",
+      "attack": "First read expired then identity changed: retry must not accept changed invocation or lease. Only an expired valid first read permits one immediate second read."
+    },
+    {
+      "joint": "freshness",
+      "owner": "renew_materializer",
+      "attack": "Read starts before expiry but finishes after expiry; final wall time must reject without widening10seconds or15second lease boundary."
+    },
+    {
+      "joint": "parent renewal ordering",
+      "owner": "renew_materializer",
+      "attack": "Metadata flush blocks longer than permit; parent must mint only after exact owner verification and before metadata, never during CLEANING/terminal or missing/dead owner."
+    },
+    {
+      "joint": "qualification",
+      "owner": "renew_materializer",
+      "attack": "Mocked successful function must not bypass actual source parser/permit paths; assert identity mismatch and double-expired rejection, anomaly retention, no extra read on fresh permits."
+    },
+    {
+      "joint": "cache lineage",
+      "owner": "renew_materializer",
+      "attack": "V3 compile changed mutable cache; v4 must bind a fresh full snapshot and retain prior cache/failedattempt instead of reusing initial cache unchecked."
+    }
+  ],
+  "protected_limits": {
+    "permit_seconds": 10,
+    "lease_safety_seconds": 15,
+    "validation_seconds": 1800,
+    "cpu": 2,
+    "memory_bytes": 17179869184,
+    "swap_bytes": 0
+  },
+  "execution_permitted": false,
+  "review_output": "Source/protocol findings with exact hashes; any qualification result remains prospective until root releases it."
+}

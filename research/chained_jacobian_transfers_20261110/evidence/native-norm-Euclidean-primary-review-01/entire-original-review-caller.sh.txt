@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -u
+out=/workspace/scratch/ct546-native-norm-word-primary-review
+cd /workspace/crypto || exit 1
+phase() {
+ local label=$1 code
+ shift
+ "$@" > "$out/$label.stdout.txt" 2> "$out/$label.stderr.txt"
+ code=$?
+ printf '%s\n' "$code" > "$out/$label.exit"
+ printf '%s %s\n' "$label" "$code"
+}
+phase KB-status scripts/research-kb status
+phase KB-exact scripts/research-kb search 'q223 raw norm extended Euclidean signed inverse word refinement' --top-k 8
+phase KB-negative scripts/research-kb search 'signed division truncation modular inverse overflow cofactor wrong powmod substitution' --top-k 8
+phase KB-adjacent scripts/research-kb search 'Euclidean algorithm Int64 loop finite certificate quotient remainder inverse' --top-k 8
+phase KB-theorems scripts/research-kb theorems CubicFiniteNorm22308.derived_norm_unit
+phase conductor conductor check --summary 'Preserve actual signed Euclidean Fp.inv and literal raw norm at223 with overflow and termination certificates, not powmod substitution' --scope path:research/chained_jacobian_transfers_20261110
+sha256sum research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/entire-original-common.rs.txt research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/src/lib.rs research/chained_jacobian_transfers_20261110/lean/CubicCofactorWordBridge22307.lean research/chained_jacobian_transfers_20261110/lean/CubicFiniteNorm22308.lean > "$out/exact-primary-inputs.sha256"

@@ -1,0 +1,7 @@
+# Fully verified cold four-chart comparison
+
+Both scanner arms solve the same fixed-h,k=0 norm family at the four first Gray h values of the pinned centroid cover. Each call freshly constructs its field/context/fiber/input, pays scanner setup and full lifetime/output, independently verifies all65checkpoint affine systems with portable-arithmetic row elimination, reconstructs every candidate and checks its literal root, tests exact multiplicity-safe native support, and completely factors/reconstructs each positive supported norm. Verification is moved, never omitted. Both use the same frozen validator library. Parameter and positive-norm ordering is canonicalized.
+
+Correctness preflight must match complete candidate sets and supported norms on all four charts before the separately frozen timing run. No chart is selected by timing. This is an exposed training diagnostic, not a release holdout. The cold worker pays Python startup/imports and serialization, alternates arm order for three repetitions, retains stdout/stderr/status and reports per-process RSS. Sum of per-process peaks is explicitly a conservative upper bound, not an exact simultaneous tree peak. Builds remain offline with source/binary/library hashes pinned; earlier build costs are retained.
+
+Each child batch contains four complete charts, which reduces relative host timing noise. Child25s,parent pre-serialization78s/final84s,supervisor90s,4GiB,onecore. A timeout/incomplete chart invalidates the comparison. No specialized conditional ratio is a qualified F4/F5/F6 full-solver gain.

@@ -1,0 +1,36 @@
+{
+  "schema": "native-degree-two-collision-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "degree-two-collision",
+      "expected_decl_sha256": "4c1acf0fd9722f21066a7ce0cb3de28321e7e626a7fbb2eaa2efafd2c441c000",
+      "full_characters": 1347,
+      "full_decl_sha256": "4c1acf0fd9722f21066a7ce0cb3de28321e7e626a7fbb2eaa2efafd2c441c000",
+      "full_normalized_signature": "theorem degree_two_collision_certificate : (∀ (I : Type*) [Fintype I] [DecidableEq I] (p : I → ℝ), (∑ i, p i) = 1 → labelCoefficient p = 1 - secondMoment p - (secondMoment p)^2 + fourthMoment p) ∧ (Nat.Prime 7 ∧ Fintype.card Hash = 128 ∧ Fintype.card Sample = 6272 ∧ DegreeTwoGeneric goodIncrements ∧ (oneSamples goodIncrements).card = 448 ∧ (twoSamples goodIncrements).card = 336 ∧ (∀ z : Sample, sampleLaw z = (∏ _ : G, (2 : ENNReal)⁻¹) * (7 : ENNReal)⁻¹ * (7 : ENNReal)⁻¹) ∧ sampleLaw.toOuterMeasure (oneSamples goodIncrements : Set Sample) = (1 : ENNReal) / 14 ∧ sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) = (3 : ENNReal) / 56 ∧ labelCoefficient uniformLabel = 3 / 8 ∧ sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) = ENNReal.ofReal (labelCoefficient uniformLabel) / 7 ∧ sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) ≠ sampleLaw.toOuterMeasure (oneSamples goodIncrements : Set Sample)) ∧ (Function.Injective badIncrements ∧ (∀ i, badIncrements i ≠ 0) ∧ ¬DegreeTwoGeneric badIncrements ∧ (twoSamples badIncrements).card = 112 ∧ sampleLaw.toOuterMeasure (twoSamples badIncrements : Set Sample) = (1 : ENNReal) / 56 ∧ (¬∀ g : Label → G, Function.Injective g → (∀ i, g i ≠ 0) → sampleLaw.toOuterMeasure (twoSamples g : Set Sample) = ENNReal.ofReal (labelCoefficient uniformLabel) / 7))",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "degree_two_collision_certificate",
+        "end_byte": 3046,
+        "file": "/workspace/scratch/two-step-input02/TwoStepCertificate.lean",
+        "qualified_decl_id": "TwoStepCollisionAudit.degree_two_collision_certificate",
+        "signature": "theorem degree_two_collision_certificate :\n    (∀ (I : Type*) [Fintype I] [DecidableEq I] (p : I → ℝ), (∑ i, p i) = 1 →\n      labelCoefficient p = 1 - secondMoment p - (secondMoment p)^2 + fourthMoment p) ∧\n    (Nat.Prime 7 ∧ Fintype.card Hash = 128 ∧ Fintype.card Sample = 6272 ∧\n      DegreeTwoGeneric goodIncrements ∧\n      (oneSamples goodIncrements).card = 448 ∧\n      (twoSamples goodIncrements).card = 336 ∧\n      (∀ z : Sample, sampleLaw z =\n        (∏ _ : G, (2 : ENNReal)⁻¹) * (7 : ENNReal)⁻¹ * (7 : ENNReal)⁻¹) ∧\n      sampleLaw.toOuterMeasure (oneSamples goodIncrements : Set Sample) = (1 : ENNReal) / 14 ∧\n      sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) = (3 : ENNReal) / 56 ∧\n      labelCoefficient uniformLabel = 3 / 8 ∧\n      sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) =\n        ENNReal.ofReal (labelCoefficient uniformLabel) / 7 ∧\n      sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) ≠\n        sampleLaw.toOuterMeasure (oneSamples goodIncrements : Set Sample)) ∧\n    (Function.Injective badIncrements ∧ (∀ i, badIncrements i ≠ 0) ∧\n      ¬DegreeTwoGeneric badIncrements ∧ (twoSamples badIncrements).card = 112 ∧\n      sampleLaw.toOuterMeasure (twoSamples badIncrements : Set Sample) = (1 : ENNReal) / 56 ∧\n      (¬∀ g : Label → G, Function.Injective g → (∀ i, g i ≠ 0) →\n        sampleLaw.toOuterMeasure (twoSamples g : Set Sample) =\n          ENNReal.ofReal (labelCoefficient uniformLabel) / 7))",
+        "start_byte": 1488
+      },
+      "recorded_statement": "theorem degree_two_collision_certificate : (∀ (I : Type*) [Fintype I] [DecidableEq I] (p : I → ℝ), (∑ i, p i) = 1 → labelCoefficient p = 1 - secondMoment p - (secondMoment p)^2 + fourthMoment p) ∧ (Nat.Prime 7 ∧ Fintype.card Hash = 128 ∧ Fintype.card Sample = 6272 ∧ DegreeTwoGeneric goodIncrements ∧ (oneSamples goodIncrements).card = 448 ∧ (twoSamples goodIncrements).card = 336 ∧ (∀ z : Sample, sampleLaw z = (∏ _ : G, (2 : ENNReal)⁻¹) * (7 : ENNReal)⁻¹ * (7 : ENNReal)⁻¹) ∧ sampleLaw.toOuterMeasure (oneSamples goodIncrements : Set Sample) = (1 : ENNReal) / 14 ∧ sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) = (3 : ENNReal) / 56 ∧ labelCoefficient uniformLabel = 3 / 8 ∧ sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) = ENNReal.ofReal (labelCoefficient uniformLabel) / 7 ∧ sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) ≠ sampleLaw.toOuterMeasure (oneSamples goodIncrements : Set Sample)) ∧ (Function.Injective badIncrements ∧ (∀ i, badIncrements i ≠ 0) ∧ ¬DegreeTwoGeneric badIncrements ∧ (twoSamples badIncrements).card = 112 ∧ sampleLaw.toOuterMeasure (twoSamples badIncrements : Set Sample) = (1 : ENNReal) / 56 ∧ (¬∀ g : Label → G, Function.Injective g → (∀ i, g i ≠ 0) → sampleLaw.toOuterMeasure (twoSamples g : Set Sample) = ENNReal.ofReal (labelCoefficient uniformLabel) / 7))",
+      "recorded_text_sha256": "4c1acf0fd9722f21066a7ce0cb3de28321e7e626a7fbb2eaa2efafd2c441c000",
+      "source_plan": "research/two_step_collision_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "TwoStepCollisionAudit.degree_two_collision_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native source-processing check; entire generic label coefficient/actual sample law/counts/rates/source matching/genericity-deletion certificate. Not proved by mathematical certificate."
+}

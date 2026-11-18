@@ -1,0 +1,137 @@
+{
+  "card_changed": false,
+  "card_id": "CARD-n83-native-phase-20261019-v2-controls",
+  "card_path": "/home/ec2-user/scratch/n83-native-phase-20261019/v2/cards/controls.json",
+  "card_sha256": "c73a8ec8cd6ffca7558546aa3ccb588451bf50b538ccc1e77e570b164868878a",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-docker-sweep-20261018/integration-target/release/deps/crypto_lib-565bcb20cb4d5bb4",
+        "cryptanalysis::koblitz_index_calculus::tests::chained_s3_frobenius_domain_lifts_and_rejects_incomplete_orbits",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.580988619,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "traced-small-field-positive-controls",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.580988619,
+      "stderr_sha256": "81ae75889cf7473036838c41cfef30a6fe7edaa12e3f861e533d46d56f43365a",
+      "stderr_tail": [
+        "{\"data\":{\"call\":1,\"conflict_budget\":500000,\"identity_mask\":0},\"elapsed_ms\":0.564698,\"phase\":\"solver_enter\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"conflicts\":360,\"identity_mask\":0,\"outcome\":\"Sat\"},\"elapsed_ms\":30.105929,\"phase\":\"solver_return\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"points\":28,\"summands\":6,\"target\":[\"40\",\"19\"]},\"elapsed_ms\":0.002253,\"phase\":\"closure_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"domain_clauses\":612,\"representatives\":2},\"elapsed_ms\":0.057333999999999996,\"phase\":\"closure_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{},\"elapsed_ms\":0.086726,\"phase\":\"index_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"identity_mask\":0},\"elapsed_ms\":0.103053,\"phase\":\"encoding_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"identity_mask\":0,\"variables\":952},\"elapsed_ms\":0.37523599999999996,\"phase\":\"circuit_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"clauses\":2824,\"domain_clauses\":612,\"identity_mask\":0,\"variables\":1282},\"elapsed_ms\":0.570968,\"phase\":\"domain_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"call\":1,\"conflict_budget\":500000,\"identity_mask\":0},\"elapsed_ms\":0.6017979999999999,\"phase\":\"solver_enter\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"conflicts\":517,\"identity_mask\":0,\"outcome\":\"Sat\"},\"elapsed_ms\":59.579734,\"phase\":\"solver_return\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"points\":28,\"summands\":6,\"target\":[\"40\",\"19\"]},\"elapsed_ms\":0.002632,\"phase\":\"closure_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"domain_clauses\":612,\"representatives\":2},\"elapsed_ms\":0.062518,\"phase\":\"closure_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{},\"elapsed_ms\":0.092185,\"phase\":\"index_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"identity_mask\":0},\"elapsed_ms\":0.108999,\"phase\":\"encoding_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"identity_mask\":0,\"variables\":952},\"elapsed_ms\":0.396408,\"phase\":\"circuit_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"clauses\":2843,\"domain_clauses\":612,\"identity_mask\":0,\"variables\":1288},\"elapsed_ms\":0.600401,\"phase\":\"domain_complete\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"call\":1,\"conflict_budget\":500000,\"identity_mask\":0},\"elapsed_ms\":0.632363,\"phase\":\"solver_enter\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"conflicts\":6227,\"identity_mask\":0,\"outcome\":\"Sat\"},\"elapsed_ms\":433.053837,\"phase\":\"solver_return\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"points\":28,\"summands\":5,\"target\":null},\"elapsed_ms\":0.002304,\"phase\":\"closure_begin\",\"schema\":\"n83.chain-phase/v1\"}",
+        "{\"data\":{\"points\":28,\"summands\":5,\"target\":null},\"elapsed_ms\":0.000319,\"phase\":\"closure_begin\",\"schema\":\"n83.chain-phase/v1\"}"
+      ],
+      "stdout_sha256": "1518332cef5baa0eabc1ccaebc0ece875af73fbc733ec8bb238e8ae136e9ec39",
+      "stdout_tail": [
+        "",
+        "running 1 test",
+        "test cryptanalysis::koblitz_index_calculus::tests::chained_s3_frobenius_domain_lifts_and_rejects_incomplete_orbits ... ok",
+        "",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4514 filtered out; finished in 0.57s",
+        ""
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-native-phase-20261019/runner-v2-target/release/n83-sweep-runner",
+        "check-positive-trace",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-test.stderr"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.02528209,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "check-positive-trace",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.02528209,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "cc0e8e375a228c51abf19e01a279c24a3eff24f81ffd4a1d9ccc88088d4d2638",
+      "stdout_tail": [
+        "{\"sat_returns\":4,\"scope\":\"existing original-group assertion test; no natural yield claim\",\"segments\":6,\"status\":\"PASS_TRACED_SMALL_FIELD_POSITIVE_BRANCHES\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-native-phase-20261019/runner-v2-target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-native-phase-20261019/v2/specs/witness.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.821294416,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "n83-selector-witness-control",
+      "index": 3,
+      "outputs": {
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/audit.json": "62d9fb7c56f13e68ef64bc926c982fefd694ac9a0f8dcf50dcd8d64f2174f156",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/config.json": "243e3d657a2d361be9d5092b96a2d00e48cb28f42f95b3fc90c27ecbb32b6033",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/inspect-final.json": "db5dd92af6d4a6783a66ebf2d3a2520ef636bb56d032ca0fd161b44a9dad89ee",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/inspect-live.json": "c0b6c3251c2e3aada6adf3d4ae4289dedc667934cd25febd9b5d9c773255cb07",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/outer.json": "a0b5756a7f6a4ff0b9c13e5aceab9a5defc9c77cf52cb36a64e78b6c90a395e5"
+      },
+      "seconds": 1.821294416,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d1e014e26ec6ee58ef6d60103261fdd8995c5a0970c33abb43d967ab8e708d37",
+      "stdout_tail": [
+        "{\"control\":{\"before_fixed_units\":{\"clauses\":714072,\"domain_clauses\":465738,\"variables\":101636,\"xors\":4980},\"clauses\":720049,\"conflict_cap\":5000,\"conflicts\":0,\"control_variant\":\"fixed_coordinates_representatives_and_phases\",\"elapsed_wall_ms_L0\":941.354839,\"fixed_x_blocks\":8,\"fixture_blake3\":\"7e257cf3f278051094e27bd6df30ac8e78a0f55739b11f8b6837f23e5637703d\",\"fixture_sha256\":\"fc203db28eed0164e47b0c755c3d9a09f80df1acd5e4c7e09dfe172fa5f0a538\",\"identity_mask\":0,\"input_blake3\":\"22eb1821dd401063417260041017c43cd416a8f4fc1abea2e9946507029c6d4a\",\"model_verified\":true,\"natural_relations\":null,\"schema\":\"n83.fixed-witness-sat-control/v1\",\"scope\":\"known_answer_encoding_control_only\",\"selected_best_total_runtime\":null,\"selector_assignments\":[{\"domain_size\":1182,\"index\":401,\"phase\":0,\"phase_first_wire\":87190,\"representative\":\"3190528981678629953846779\",\"selector_first_wire\":84744},{\"domain_size\":1182,\"index\":780,\"phase\":0,\"phase_first_wire\":90805,\"representative\":\"6322576162995772655031682\",\"selector_first_wire\":88359},{\"domain_size\":1182,\"index\":1059,\"phase\":0,\"phase_first_wire\":94420,\"representative\":\"8674926856113960796960747\",\"selector_first_wire\":91974},{\"domain_size\":866,\"index\":193,\"phase\":0,\"phase_first_wire\":97403,\"representative\":\"2356799046069879186945790\",\"selector_first_wire\":95589},{\"domain_size\":866,\"index\":62,\"phase\":0,\"phase_first_wire\":100386,\"representative\":\"668067089966811331796550\",\"selector_first_wire\":98572}],\"status\":\"SAT_verified_witness_x\",\"total_index_calculus_runtime_ms\":null,\"variables\":101636,\"xors\":4980},\"natural_relations\":null,\"outer_wall_ms\":1582.2609590000002,\"schema\":\"n83.native-audit/v1\",\"selected_best_total_runtime\":null,\"status\":\"PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 3,
+  "commit": "c259497ec9cf1fde358ffc91eabe8c2cff242f95",
+  "dirty_after": "",
+  "dirty_before": "",
+  "native_executor": "n83-sweep-runner strict frozen-command subset/v1",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

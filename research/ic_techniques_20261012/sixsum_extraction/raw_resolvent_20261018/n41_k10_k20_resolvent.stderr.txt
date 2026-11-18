@@ -1,0 +1,9 @@
+# kernel B quartic root finder: resolvent
+# icv1-f2m41-tm2308219-7f48b14a r = 549756390943 (39.0 bits), cofactor 4
+# n=41 solver cost: S3 373 ns (table 187), s4_in_x4 32 ns, roots split 10151 ns (27.2 S3), resolvent 649 ns (1.74 S3); ops/solve split FieldOps { mul: 1710, sqr: 395, inv: 7, half_trace: 0, trace: 0, sqrt: 0 } resolvent FieldOps { mul: 70, sqr: 49, inv: 2, half_trace: 3, trace: 4, sqrt: 1 }; disagree 0
+# n = 41, K = 10: 820 points, 4070 table states (166870 abscissa states), build 0.01 s
+# n=41 K=10 4sum                   rel= 32 targets= 1025 S3=  166881879 S4=         0 S3/rel=     5.215e6 S4/rel=   0.000e0 outer/rel=   5.215e6 tgt/rel=  32.031 wall/rel=  2.373e0 (75.9s, relations)
+# n=41 K=10 6sum_b2_s4_strided     rel= 32 targets=   32 S3=          0 S4=  11871640 S3/rel=     0.000e0 S4/rel=   3.710e5 outer/rel=   3.710e5 tgt/rel=   1.000 wall/rel= 3.498e-1 (11.2s, relations)
+# n = 41, K = 20: 1640 points, 16340 table states (669940 abscissa states), build 0.03 s
+# n=41 K=20 4sum                   rel= 32 targets=   72 S3=   32301874 S4=         0 S3/rel=     1.009e6 S4/rel=   0.000e0 outer/rel=   1.009e6 tgt/rel=   2.250 wall/rel= 4.749e-1 (15.2s, relations)
+# n=41 K=20 6sum_b2_s4_strided     rel= 32 targets=   32 S3=          0 S4=   4227906 S3/rel=     0.000e0 S4/rel=   1.321e5 outer/rel=   1.321e5 tgt/rel=   1.000 wall/rel= 1.279e-1 (4.1s, relations)

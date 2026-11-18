@@ -1,0 +1,33 @@
+{
+  "at": "2026-11-16T12:16:20.760Z",
+  "head": "8f8b95d5106200914421ae266d91fe2a2e758a47",
+  "checks": [
+    {
+      "name": "size-01",
+      "command": [
+        "bash",
+        "scripts/check-large-files.sh",
+        "origin/main",
+        "HEAD"
+      ],
+      "exit": 0,
+      "signal": null,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/publication-round06-01/size-01.log"
+    },
+    {
+      "name": "artifacts-01",
+      "command": [
+        "timeout",
+        "60s",
+        "python3",
+        "tools/artifacts/artifacts.py",
+        "check",
+        "origin/main",
+        "HEAD"
+      ],
+      "exit": 1,
+      "signal": null,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/publication-round06-01/artifacts-01.log"
+    }
+  ]
+}

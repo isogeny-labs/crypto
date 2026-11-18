@@ -1,0 +1,13 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/ChainTransport.lean:25:20: error: typeclass instance problem is stuck
+  HSMul Int (?m.15 a) ?m.13
+
+Note: Lean will not try to resolve this typeclass instance problem because the second type argument to `HSMul` contains metavariables. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+'ChainTransport.chain_kills_two_torsion' does not depend on any axioms
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/ChainTransport.lean:81:14: error(lean.unknownIdentifier): Unknown constant `ChainTransport.transported_square`
+'ChainTransport.composite_norm28' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ChainTransport.half_input_order12317' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ChainTransport.full_source_reverse28' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ChainTransport.target_coordinate4' depends on axioms: [propext, Classical.choice, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0

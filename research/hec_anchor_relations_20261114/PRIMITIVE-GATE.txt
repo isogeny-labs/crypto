@@ -1,0 +1,40 @@
+
+running 7 tests
+test tests::all_zero_degenerate_control ... ok
+test tests::branch_anchor_control ... ok
+test tests::curve_norms_and_jacobian_relations ... g=2 p=101 d=1 cases=32 multi_nullity=0 zero=0 nonprimitive=0 degree_drop=0 nonsplit=15 group=17 branch_roots=0
+g=2 p=101 d=2 cases=128 multi_nullity=0 zero=0 nonprimitive=8 degree_drop=0 nonsplit=66 group=54 branch_roots=0
+g=2 p=101 d=3 cases=512 multi_nullity=0 zero=0 nonprimitive=56 degree_drop=6 nonsplit=182 group=274 branch_roots=5
+g=2 p=127 d=1 cases=32 multi_nullity=0 zero=0 nonprimitive=0 degree_drop=0 nonsplit=16 group=16 branch_roots=0
+g=2 p=127 d=2 cases=128 multi_nullity=0 zero=0 nonprimitive=8 degree_drop=0 nonsplit=82 group=38 branch_roots=2
+g=2 p=127 d=3 cases=512 multi_nullity=0 zero=0 nonprimitive=34 degree_drop=1 nonsplit=299 group=179 branch_roots=2
+g=3 p=101 d=1 cases=64 multi_nullity=0 zero=0 nonprimitive=0 degree_drop=0 nonsplit=56 group=8 branch_roots=0
+g=3 p=101 d=2 cases=256 multi_nullity=0 zero=0 nonprimitive=16 degree_drop=2 nonsplit=209 group=31 branch_roots=0
+g=3 p=101 d=3 cases=1024 multi_nullity=0 zero=0 nonprimitive=90 degree_drop=10 nonsplit=810 group=124 branch_roots=0
+g=3 p=127 d=1 cases=64 multi_nullity=0 zero=0 nonprimitive=0 degree_drop=0 nonsplit=62 group=2 branch_roots=0
+g=3 p=127 d=2 cases=256 multi_nullity=0 zero=0 nonprimitive=14 degree_drop=3 nonsplit=210 group=32 branch_roots=0
+g=3 p=127 d=3 cases=1024 multi_nullity=0 zero=0 nonprimitive=52 degree_drop=11 nonsplit=844 group=128 branch_roots=0
+g=4 p=101 d=1 cases=128 multi_nullity=0 zero=0 nonprimitive=0 degree_drop=1 nonsplit=120 group=8 branch_roots=0
+g=4 p=101 d=2 cases=512 multi_nullity=0 zero=0 nonprimitive=44 degree_drop=6 nonsplit=447 group=21 branch_roots=0
+g=4 p=101 d=3 cases=2048 multi_nullity=0 zero=0 nonprimitive=212 degree_drop=23 nonsplit=1747 group=89 branch_roots=0
+g=4 p=127 d=1 cases=128 multi_nullity=0 zero=0 nonprimitive=0 degree_drop=1 nonsplit=124 group=4 branch_roots=0
+g=4 p=127 d=2 cases=512 multi_nullity=0 zero=0 nonprimitive=20 degree_drop=2 nonsplit=474 group=18 branch_roots=0
+g=4 p=127 d=3 cases=2048 multi_nullity=0 zero=0 nonprimitive=140 degree_drop=15 nonsplit=1843 group=65 branch_roots=0
+ok
+test tests::duplicate_x_rejected - should panic ... 
+thread 'tests::duplicate_x_rejected' (2435370) panicked at research/hec_anchor_relations_20261114/rational.rs:75:21:
+assertion `left != right` failed: duplicate abscissa
+  left: 1
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+ok
+test tests::exhaustive_arbitrary_interpolation ... arbitrary_interpolation_cases=2401
+ok
+test tests::normalized_curve_relations ... primitive g=2 cases=1344 common=106 split_group_checks=684 recovered_common_split=106 removed_anchor_occurrences=114
+primitive g=3 cases=2688 common=172 split_group_checks=397 recovered_common_split=72 removed_anchor_occurrences=176
+primitive g=4 cases=5376 common=416 split_group_checks=289 recovered_common_split=84 removed_anchor_occurrences=428
+ok
+test tests::vertical_and_repeated_factor_controls ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

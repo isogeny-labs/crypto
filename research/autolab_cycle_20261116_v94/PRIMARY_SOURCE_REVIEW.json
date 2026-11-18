@@ -1,0 +1,9 @@
+{
+  "repository": "isogeny-labs/crypto",
+  "commit": "19e593346050aad6859352ee449d2b848d4ae3ea",
+  "path": "src/cryptanalysis/ec_index_calculus.rs",
+  "git_blob_sha": "4841f6eabc01b790e46d573b2e216543a8c42a8f",
+  "encoding": "utf-8",
+  "excerpt": "//! **Elliptic-curve index calculus** via Semaev summation polynomials —\n//!    `R = ε_i Pᵢ + ε_j P_j`, with the help of **Semaev's 3rd summation\n//!    polynomial** `S₃` (closed form for short-Weierstrass curves).\n//! - To beat rho you would need to use higher-degree Semaev polynomials\n//! For `E: y² = x³ + ax + b` over a field `K`, Semaev's `nᵗʰ` summation\n//! There is a closed form for `S₃`:\n//! S₃(X₁, X₂, X₃) = (X₁ − X₂)² · X₃²\n//! `S₃` is symmetric in `X₁, X₂, X₃` (verify by expanding), quadratic\n//! and `S_{n−m+1}(X_{m+1}, …, X_n, X)`.  We implement only `S₃` here,\n//! - **I. Semaev**, *Summation polynomials and the discrete logarithm\n// ── Semaev's 3rd summation polynomial ───────────────────────────────────\n/// **Evaluate** `S₃(x₁, x₂, x₃)` on the curve `E: y² = x³ + ax + b`.\n/// Returns `0 ∈ F_p` iff there exist `y₁, y₂, y₃ ∈ F_p` (or a quadratic\npub fn semaev_s3(",
+  "finding": "Primary repository already implements odd-characteristic S3, quadratic in each variable, and cites Semaev 2004/031. Binary symmetric substitution, Gaussian elimination, Tonelli-Shanks and Montgomery batching are established. This cycle makes no novelty claim; a literature novelty search of the combined future solver remains open."
+}

@@ -1,0 +1,16 @@
+{
+  "action": "Include an explicit nonempty known-answer relation and assert the expected set, alongside empty controls; exhaustive equality over empty outputs is not a nonempty positive control.",
+  "created": "2026-11-16T20:24:10Z",
+  "evidence": [
+    "research/vieta_coset_rust_20261115/native/tests/velu_positive.rs",
+    "research/vieta_coset_rust_20261115/next-20261116/evidence/post-run-positive-tests.log"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "controlled-experiment",
+    "validator"
+  ],
+  "trigger": "A solver equality test constructs a factor base that may be empty",
+  "why": "The first Velu terminal6 fixture had an empty base on the target curve; terminal12 and post-run finite two-torsion fixtures supply explicit nonempty distinct/diagonal relations."
+}

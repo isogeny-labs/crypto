@@ -1,0 +1,24 @@
+[
+  {
+    "id": "C129-correction-cone-ANF-oracles",
+    "status": "prepared_static_only",
+    "budget": "90s4GiBCPU0",
+    "protocol": "exhaust small circuits,AND/XOR/NOT,forced degree/monomial/storage/work caps,immutability;exact Boolean-ring evaluation"
+  },
+  {
+    "id": "C129-correction-cone-ANF-profile",
+    "status": "depends_on_oracle",
+    "caps": {
+      "degree": 8,
+      "monomials_per_node": 50000,
+      "stored_monomials": 1000000,
+      "charged_work": 2000000
+    },
+    "protocol": "only first1/2/4/8basis cones;retain all outcomes;low-degree labels require completed exact expansion;caps mean unknown"
+  },
+  {
+    "id": "original-broadfields-matched-baselines",
+    "status": "active_independent",
+    "required": "allsource/U/ghost/outerroots;GF2^83,binary/Koblitz,odd extensions,NIST5;20hardcompletedmatchedF4/F5/F6;3coldrepeats,RSS,isolation"
+  }
+]

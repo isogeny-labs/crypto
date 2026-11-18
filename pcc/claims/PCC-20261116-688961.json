@@ -1,0 +1,86 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T04:34:31Z",
+ "id": "PCC-20261116-688961",
+ "kind": "statement",
+ "producer": {
+  "commit": "c39eca1cc28f804a903931341356844cc1273220",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/native-v1/pre-call.json",
+    "sha256": "67eb765590053dc6a266e1fb27b5e22faa323a6428152109f203a1ae53d71c9f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/native-v1/controls.json",
+    "sha256": "3c85f7f0d4aad564eac27e1c23a46e6d32466e7f0a7fecdb34e1972828528494"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/native-v1/toy-acceptance.bin",
+    "sha256": "fb3811f547fa31553a5af0b831af8935a5f593efcb59fe5c3715bec7f3ceecff"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/native-v1/first-point-witness.json",
+    "sha256": "d94ca33ad5bee47832f71f801df56d4b69cdd76d9910860d3da15db28abb608a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/native-v1/membership-system.json.gz",
+    "sha256": "e38153ec968bbf6901e4c9fd1ba33b35b5c730eccf2a61d52e93e00c4d5ac181"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/native-v1/point-system.json.gz",
+    "sha256": "dbb5735fa6e3d48e0c65245c9248c02892ac5fda7be8f2f0c21830fd48af6b04"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/SOURCES.sha256",
+    "sha256": "e0bb3a857191cdccaed43b0e10a3aedae83b1bd38d51cc1cae2a5984c891e75b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/source-v1-post-checks.tar.xz",
+    "sha256": "add87c708ff67f5b1223c3d570743f5741c00469510ef0a4894c60cb97e5d756"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/development/rust-test-02.log",
+    "sha256": "b8b07b93d81a0de9d82180b7e3b8020d3d20f0256798b1a050c6aa0d09cfc250"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/membership-circuit-v1/development/clippy-02.log",
+    "sha256": "7cda7a34e6802cb71363a8780187bb3ab73b2bb630baf17c9a81446e2f9cdaf1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/curve25519_torus_native_20261115/membership-circuit-v1",
+ "statement": "Fixed native Rust controls for the lifted quadratic many-coset interface: all6962 Fp59 candidate/selector cases agree with six directly enumerated members; eighteen signed actual-field inputs satisfy the point system and match existing native eightfold multiplication; all159 single-variable mutations plus listed malformed inputs are rejected. Membership140vars/142eqs/423terms and point159vars/161eqs/483terms have max degree two. These are software controls, not a formally verified compiler, solver-cost bound or independently signed execution."
+}

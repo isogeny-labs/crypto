@@ -1,0 +1,81 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-15T22:50:07+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/ic_gpu_rootfind_setup_20261115/run_pod.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T22:25:58+00:00",
+      "wall_s": 1331.483
+    }
+  ],
+  "commit": "0c8c4311854fc8411bfcb102c3ff3408c208cdee",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T22:25:47+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/ic_gpu_rootfind_setup_20261115"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T2225Z-ic-gpu-rootfind-setup",
+  "metrics": [
+    {
+      "baseline": 0.0047,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_pair_keys_kernel_s_n4096",
+      "note": "device pair-table key kernel, batched runs of 16 vs per-cell (baseline), n=4096, A100, same process, 0 mismatching keys; 5.7x",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.0008
+    },
+    {
+      "baseline": 0.121,
+      "better": "lower",
+      "n": 6,
+      "name": "ic_rf3_gpup_setup_s_r39_f4096",
+      "note": "GPU m=3 oracle set-up median, log2 r=39.3, |F_x|=4096, vs round 5 (cross-session baseline, indicative); prediction <= 0.06 failed; the 67 MB build-index copy to the host is 47 ms of it",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.109
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 120837,
+      "path": "research/ic_gpu_rootfind_setup_20261115/raw/out_rsu.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/29/2967f6cc2d8eee1b18f8c61b7118ec72a639d2214ed6070f49fa2726006ce142",
+      "sha256": "2967f6cc2d8eee1b18f8c61b7118ec72a639d2214ed6070f49fa2726006ce142",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_rootfind_setup_20261115/REPORT.md",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_rootfind_setup_20261115/fig_stages.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-rootfind-setup",
+  "status": "measured",
+  "summary": "Round 6: device pair-table key kernel with batched inversions (runs of 16): 5.7x the per-cell kernel at n=4096 with 0 mismatching keys; 120/120 verified and replayed, 36 identity checks equal. GPU m=3 set-up at 4096 0.109-0.116 s vs round 5's 0.121 s (prediction <= half failed): the stage timings put 47 ms in copying the 67 MB build-index map to the host. Launched through benchrec run.",
+  "validation": null
+}

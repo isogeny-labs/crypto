@@ -1,0 +1,10 @@
+ellorder(E,z,{o}): order of the point z on the elliptic curve E over a number 
+field or a finite field, 0 if nontorsion. The parameter o, if present, 
+represents a nonzero multiple of the order of z.
+
+ellcard(E,{p}): given an elliptic curve E defined over a finite field Fq, 
+return the order of the group E(Fq); for other fields of definition K, p must 
+define a finite residue field, (p prime for K = Qp or Q; p a maximal ideal for 
+K a number field), return the order of the (nonsingular) reduction of E.
+
+5

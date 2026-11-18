@@ -1,0 +1,232 @@
+{
+  "schema": "crypto.native-halftrace-hosted-validation-progress/v1",
+  "observed_on": "2026-11-08",
+  "check_window": "23:24-23:25 UTC",
+  "run_id": 42529489383,
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/42529489383",
+  "run_attempt": 1,
+  "workflow_run_head": "cda1e5810f41550a2b929cbdb6fe4ff242865617",
+  "workflow_status": "in_progress",
+  "workflow_conclusion": null,
+  "full_library_job": {
+    "id": 128880307287,
+    "name": "Native full library (manual)",
+    "status": "in_progress",
+    "conclusion": null,
+    "host_interface_preflight_step": "success",
+    "immutable_source_checkout_step": "success",
+    "source_toolchain_binding_step": "success",
+    "complete_release_test_binary_build_step": "success",
+    "complete_library_parent_step": "in_progress",
+    "parent_exit_code": null,
+    "parent_summary": null,
+    "log_writer_exit_code": null,
+    "host_source_binary_log_artifacts": "not_yet_published"
+  },
+  "separate_compile_job": {
+    "id": 128880359995,
+    "status": "completed",
+    "conclusion": "success",
+    "checks": [
+      "cargo check --workspace --all-targets",
+      "cargo check --lib --tests --features wide-vars",
+      "cargo test --manifest-path crates/crypto-analysis-core/Cargo.toml --lib"
+    ]
+  },
+  "artifact_list_at_inspection": [],
+  "new_dispatch": false,
+  "automatic_retries": 0,
+  "local_suite_restarted": false,
+  "scientific_measurement": false,
+  "scientific_jobs": 0,
+  "performance_result": null,
+  "performance_p1": "unresolved",
+  "jobs_snapshot": [
+    {
+      "id": 128880307278,
+      "name": "scope",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42529489383,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run node .github/scripts/ci-scope.mjs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        }
+      ]
+    },
+    {
+      "id": 128880307287,
+      "name": "Native full library (manual)",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_id": 42529489383,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Admit the source and required Linux interfaces",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Check out the immutable source and tracked test fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Bind the checkout and toolchain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Build the complete release library test executable",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Run every non-ignored library test and retain the parent status",
+          "status": "in_progress",
+          "conclusion": null,
+          "number": 6
+        },
+        {
+          "name": "Retain checksums and post-run source state",
+          "status": "pending",
+          "conclusion": null,
+          "number": 7
+        },
+        {
+          "name": "Upload development receipts and complete logs",
+          "status": "pending",
+          "conclusion": null,
+          "number": 8
+        },
+        {
+          "name": "Post Check out the immutable source and tracked test fixtures",
+          "status": "pending",
+          "conclusion": null,
+          "number": 16
+        }
+      ]
+    },
+    {
+      "id": 128880359995,
+      "name": "check",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42529489383,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Require successful scope classification",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 2
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Materialize compile-time inputs without research archives",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run dtolnay/rust-toolchain@stable",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Run Swatinem/rust-cache@v2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Run RUSTFLAGS=-Awarnings cargo check --workspace --all-targets",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Run RUSTFLAGS=-Awarnings cargo check --lib --tests --features wide-vars",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Run cargo test --manifest-path crates/crypto-analysis-core/Cargo.toml --lib",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run Swatinem/rust-cache@v2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19
+        }
+      ]
+    }
+  ]
+}

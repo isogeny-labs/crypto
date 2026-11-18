@@ -1,0 +1,83 @@
+name: Prime31 public RR9 B8 Macaulay degree-six control (Rust 1.100)
+on:
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay_d6.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_PUBLIC_MACAULAY_D6_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-public-macaulay-d6.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  degree-six-public-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact PR source (candidate files only)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs
+            research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay_d6.rs
+          sparse-checkout-cone-mode: false
+      - name: Reuse immutable original native prime31 library
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Pin Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only original Macaulay example plus prospective degree6 wrapper
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay_d6.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Original arithmetic and degree-six Rust exact-source tests
+        run: |
+          cargo +1.100.0 test --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          timeout -k 10 300 cargo +1.100.0 test --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_public_macaulay_d6
+          cargo +1.100.0 build --release --locked --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_public_macaulay_d6
+      - name: Capture raw preregistered public-only degree-six panel
+        run: |
+          timeout -k 10 300 bash -c '
+            ulimit -v 1048576
+            exec "$1"
+          ' _ prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_public_macaulay_d6 > prime31-rr9-public-macaulay-d6.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path("prime31-rr9-public-macaulay-d6.json").read_text())
+          assert j["schema"]=="prime31.rr9.public-macaulay-d6.v1"
+          assert (j["p"],j["n"])==(2147483647,2147446831)
+          assert j["base_x"]==[0,1,2,3,5,6,8,9]
+          assert j["degree"]==6 and j["test_oracle_frozen_sign_supports"]==256
+          assert j["positive"]["residual"]==[1911579686,548820096]
+          assert j["positive"]["macaulay"]["unit_certificate"] is False
+          assert len(j["negatives"])==2
+          assert [n["residual"] for n in j["negatives"]]==[[625037715,2100627251],[1923055775,307731458]]
+          for row in [j["positive"]]+j["negatives"]:
+              m=row["macaulay"]
+              assert m["columns"]==1716 and m["rows_generated"]==2640
+              assert m["rank"]<=1716
+              if m["unit_certificate"]:
+                  assert m["replay"]["identity_replayed"] is True
+          assert j["complete_unknown_ecdlp_solves"]==0 and j["pcc"]=="unverified"
+          print("frozen degree-6 public RR9 panel captured; no solver performance claim")
+          PY
+      - name: Retain raw degree-six candidate / replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-public-macaulay-d6
+          path: prime31-rr9-public-macaulay-d6.json
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,0 +1,53 @@
+{
+  "schema": "trace-zero-lead-cards/v1",
+  "date": "2026-11-09",
+  "scope": "E0 over odd-degree binary fields; ECC2K-130 uses degree131",
+  "standing": "local producer evidence, unverified",
+  "cards": [
+    {
+      "id": "TZL-01",
+      "title": "Existentially eliminate full-point witnesses on a certified finite domain",
+      "atlas_leads": ["LEAD-ICB-decomposition-encoding-and-sat"],
+      "status": "implemented_and_locally_checked",
+      "mechanism": "Validate every supplied base point in T_n, retain exactly its allowed x codes, omit redundant ordinate membership witnesses, and lift/replay actual supplied points.",
+      "evidence": "models.json circuits; seven native checks, including sign-restricted bases and n83/131 singleton controls",
+      "next_action": "Run explicit/certified encodings on the same non-singleton bases, unseen known-answer targets, all identity patterns, seeds and cumulative budgets; account for base admission and successful original-group replay.",
+      "discriminates": "Lower complete successful work supports this encoding specialization; larger search or more UNKNOWN outcomes despite fewer variables rejects the assumed propagation benefit on those workloads.",
+      "limitations": "Only finite validated domains; no generic algebraic subspace certificate, asymptotic improvement or measured timing. Existing explicit mode remains default."
+    },
+    {
+      "id": "TZL-02",
+      "title": "Restrict the second trace bit before ordinate elimination",
+      "atlas_leads": ["LEAD-ICB-decomposition-encoding-and-sat", "LEAD-ICB-factor-base-subspace-choice"],
+      "status": "implemented_and_locally_checked",
+      "mechanism": "Compute q|V and its polar rank on the existing trace-zero x subspace. If q|V is linear, eliminate y0 without cubic terms. The retained ECC2K-130 d16 polynomial window has q|V=0.",
+      "evidence": "models.json subspaces; exact n3/5/7 restricted point checks and actual n83/131 profiles",
+      "next_action": "Compare actual restricted raw/compact/factored relation systems on a fixed base and target set; measure solving degree and successful work, not just single-point counts.",
+      "discriminates": "A lower matched solving degree or successful-work cost supports the representation. A degree/cost increase despite q simplification limits its utility without invalidating the point-model identity.",
+      "limitations": "Does not change allowed points, relation yield or kernel cardinality. General restricted q need not be linear; n83,d64 is a retained counter-control."
+    },
+    {
+      "id": "TZL-03",
+      "title": "Complete quadratic full-point relation chains on linear-q windows",
+      "atlas_leads": ["LEAD-ICB-decomposition-encoding-and-sat", "LEAD-ICB-prime-degree-algebraic-decomposition"],
+      "status": "proposed_not_implemented",
+      "mechanism": "Use the quadratic restricted full-point model and lifted slope/point-addition equations instead of eliminating y into a cubic S3 chain. Include generic addition, doubling, opposite points and identity branches completely.",
+      "evidence": "TZL-02 supplies the quadratic summand models only; no complete relation encoding or performance result yet",
+      "next_action": "Construct a branch-complete Boolean relation builder with explicit nonzero guards and all identity cases; exhaustively compare with group enumeration at n5/7 before matched solver checks.",
+      "discriminates": "Exact lifts plus lower measured solving degree may offset extra variables. Any missing branch or false refutation rejects the construction; more total successful work rejects the proposed tradeoff on tested instances.",
+      "limitations": "More point/slope variables than unlifted x-only S3; S3 itself also has a quadratic lifting and the native AND/XOR circuit already uses it. Compare that baseline too. Quadratic input degree does not imply quadratic solving degree. No arbitrary-algebra geometric chart is claimed."
+    },
+    {
+      "id": "TZL-04",
+      "title": "Rank-aware presentation choice at fixed factor base",
+      "atlas_leads": ["LEAD-ICB-decomposition-encoding-and-sat"],
+      "status": "proposed_not_implemented",
+      "mechanism": "Use actual q polar rank, product-span dimension and term/auxiliary counts to choose among raw, compact and factored presentations without changing V or the base.",
+      "evidence": "n131,d16 compact remains quadratic; n83,d64 compact is cubic with10646 AND auxiliaries versus7328 in raw/factored",
+      "next_action": "Freeze a train/held-out protocol over fixed subspaces and targets, compare the selector with every fixed presentation and a charged portfolio. Count construction, rejected attempts and replay.",
+      "discriminates": "Held-out successful-work savings support a selector; rank-only prediction failures or selection overhead exceeding gains reject that selector, not every encoding.",
+      "limitations": "Profile is not a solver-cost theorem. Subspace search and basis changes are different experiments requiring matched-size/null controls."
+    }
+  ],
+  "atlas_follow_up": "Attach this study as evidence to the existing cited families in the next cross-repository atlas review; no sibling ledger status or atlas disposition was changed."
+}

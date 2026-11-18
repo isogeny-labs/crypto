@@ -1,0 +1,36 @@
+{
+  "schema": "native-galois-pairing-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "galois-character-pairing",
+      "expected_decl_sha256": "117deabc6ffa81828e499acbcc42d2c0a96947d2d3e5605128590db25ba4aee7",
+      "full_characters": 1184,
+      "full_decl_sha256": "117deabc6ffa81828e499acbcc42d2c0a96947d2d3e5605128590db25ba4aee7",
+      "full_normalized_signature": "theorem galois_character_pairing_certificate : (∀ (K : Type) [Field K] [Fintype K] (M : Type) [CommGroup M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] [TopologicalSpace (MulAut M)] [DiscreteTopology (MulAut M)] (ρ : Gamma K →ₜ* MulAut M) (hM : ∀ m : M, m ^ (Fintype.card K - 1) = 1), Nonempty (galoisCharacters K M ρ ≃* (CocycleClasses K M ρ →* Kˣ)) ∧ Nonempty (CocycleClasses K M ρ ≃* (galoisCharacters K M ρ →* Kˣ)) ∧ (∀ (χ : galoisCharacters K M ρ) (c : Cocycles K M ρ), baseUnitMap K (pairing K M ρ hM χ (QuotientGroup.mk c)) = χ.val (c.val (frobenius K))) ∧ (∀ χ ψ c, pairing K M ρ hM (χ * ψ) c = pairing K M ρ hM χ c * pairing K M ρ hM ψ c) ∧ (∀ χ c d, pairing K M ρ hM χ (c * d) = pairing K M ρ hM χ c * pairing K M ρ hM χ d) ∧ (∀ χ, (∀ c, pairing K M ρ hM χ c = 1) → χ = 1) ∧ (∀ c, (∀ χ, pairing K M ρ hM χ c = 1) → c = 1) ∧ Nat.card (galoisCharacters K M ρ) = Nat.card (CocycleClasses K M ρ)) ∧ (∀ (K : Type) [Field K] [Fintype K] [CharP K 2], (∀ χ : TwoCharacters K, χ = 1) ∧ missingTwoClass K ≠ 1 ∧ (¬ ∃ e : TwoCharacters K →* (TwoClasses K →* Kˣ), ∀ c : TwoClasses K, (∀ χ : TwoCharacters K, e χ c = 1) → c = 1) ∧ ¬ ∀ m : TwoTarget, m ^ (Fintype.card K - 1) = 1)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "galois_character_pairing_certificate",
+        "end_byte": 2096,
+        "file": "/workspace/scratch/galois-character-binding-input01/GaloisPairingCertificate.lean",
+        "qualified_decl_id": "GaloisCharacterPairingAudit.galois_character_pairing_certificate",
+        "signature": "theorem galois_character_pairing_certificate :\n    (∀ (K : Type) [Field K] [Fintype K]\n      (M : Type) [CommGroup M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]\n      [TopologicalSpace (MulAut M)] [DiscreteTopology (MulAut M)]\n      (ρ : Gamma K →ₜ* MulAut M)\n      (hM : ∀ m : M, m ^ (Fintype.card K - 1) = 1),\n      Nonempty (galoisCharacters K M ρ ≃* (CocycleClasses K M ρ →* Kˣ)) ∧\n      Nonempty (CocycleClasses K M ρ ≃* (galoisCharacters K M ρ →* Kˣ)) ∧\n      (∀ (χ : galoisCharacters K M ρ) (c : Cocycles K M ρ),\n        baseUnitMap K (pairing K M ρ hM χ (QuotientGroup.mk c)) =\n          χ.val (c.val (frobenius K))) ∧\n      (∀ χ ψ c, pairing K M ρ hM (χ * ψ) c =\n        pairing K M ρ hM χ c * pairing K M ρ hM ψ c) ∧\n      (∀ χ c d, pairing K M ρ hM χ (c * d) =\n        pairing K M ρ hM χ c * pairing K M ρ hM χ d) ∧\n      (∀ χ, (∀ c, pairing K M ρ hM χ c = 1) → χ = 1) ∧\n      (∀ c, (∀ χ, pairing K M ρ hM χ c = 1) → c = 1) ∧\n      Nat.card (galoisCharacters K M ρ) = Nat.card (CocycleClasses K M ρ)) ∧\n    (∀ (K : Type) [Field K] [Fintype K] [CharP K 2],\n      (∀ χ : TwoCharacters K, χ = 1) ∧\n      missingTwoClass K ≠ 1 ∧\n      (¬ ∃ e : TwoCharacters K →* (TwoClasses K →* Kˣ),\n        ∀ c : TwoClasses K, (∀ χ : TwoCharacters K, e χ c = 1) → c = 1) ∧\n      ¬ ∀ m : TwoTarget, m ^ (Fintype.card K - 1) = 1)",
+        "start_byte": 645
+      },
+      "recorded_statement": "theorem galois_character_pairing_certificate : (∀ (K : Type) [Field K] [Fintype K] (M : Type) [CommGroup M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] [TopologicalSpace (MulAut M)] [DiscreteTopology (MulAut M)] (ρ : Gamma K →ₜ* MulAut M) (hM : ∀ m : M, m ^ (Fintype.card K - 1) = 1), Nonempty (galoisCharacters K M ρ ≃* (CocycleClasses K M ρ →* Kˣ)) ∧ Nonempty (CocycleClasses K M ρ ≃* (galoisCharacters K M ρ →* Kˣ)) ∧ (∀ (χ : galoisCharacters K M ρ) (c : Cocycles K M ρ), baseUnitMap K (pairing K M ρ hM χ (QuotientGroup.mk c)) = χ.val (c.val (frobenius K))) ∧ (∀ χ ψ c, pairing K M ρ hM (χ * ψ) c = pairing K M ρ hM χ c * pairing K M ρ hM ψ c) ∧ (∀ χ c d, pairing K M ρ hM χ (c * d) = pairing K M ρ hM χ c * pairing K M ρ hM χ d) ∧ (∀ χ, (∀ c, pairing K M ρ hM χ c = 1) → χ = 1) ∧ (∀ c, (∀ χ, pairing K M ρ hM χ c = 1) → c = 1) ∧ Nat.card (galoisCharacters K M ρ) = Nat.card (CocycleClasses K M ρ)) ∧ (∀ (K : Type) [Field K] [Fintype K] [CharP K 2], (∀ χ : TwoCharacters K, χ = 1) ∧ missingTwoClass K ≠ 1 ∧ (¬ ∃ e : TwoCharacters K →* (TwoClasses K →* Kˣ), ∀ c : TwoClasses K, (∀ χ : TwoCharacters K, e χ c = 1) → c = 1) ∧ ¬ ∀ m : TwoTarget, m ^ (Fintype.card K - 1) = 1)",
+      "recorded_text_sha256": "117deabc6ffa81828e499acbcc42d2c0a96947d2d3e5605128590db25ba4aee7",
+      "source_plan": "research/galois_character_pairing_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "GaloisCharacterPairingAudit.galois_character_pairing_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned procedural source processing, not kernel parser/hash/physical-host refinement."
+}

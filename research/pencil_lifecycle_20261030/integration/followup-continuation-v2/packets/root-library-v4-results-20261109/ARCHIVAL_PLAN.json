@@ -1,0 +1,30 @@
+{
+  "schema": "native-archival-review-plan/v1",
+  "status": "awaiting_terminal",
+  "source_publication": null,
+  "admission_sha256": null,
+  "native": "/home/ec2-user/pencil-validation-receipts/root-library-v4-20261109",
+  "caller": "/home/ec2-user/pencil-validation-receipts/root-library-v4-20261109-control",
+  "rerun": false,
+  "live_outputs_archived": false,
+  "checks": [
+    "Wait for native terminal, owned cleanup, final seal and parent no-further-writes confirmation",
+    "Verify exact source/admission/publication bindings and native cgroup controls",
+    "Verify compiler command exit, build artifact/test inventory, each of four required exact control names and full-suite outcome from raw output",
+    "Preserve any missing command, test, ignored case, failure, timeout or incomplete stage; no inference from compile-only success",
+    "Verify terminal-output-manifest bytes/SHA and log-prefix custody; distinguish payload status from seal status",
+    "Join worker/supervisor/permit/owner/terminal invocation and cleanup receipts",
+    "Record nested compiler/control/suite/worker/caller times without summing overlapping durations; retain full1800second charge",
+    "Archive immutable native and caller files, content-address externally and verify full remote download",
+    "Produce neutral PDF/SVG/CSV/JSON with source/test scope and raw hashes"
+  ],
+  "planned_exact_controls": [
+    "cryptanalysis::ecbench::three_leads::pencil::tests::actual_some_none_known_answer_and_diagnostic_ledger",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_fake_dispatch_and_shared_meter",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_panic_clears_ownership",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::audited_digest_covers_work_and_failures_but_excludes_observations"
+  ],
+  "claim_scope": "Root default-feature library validation in the pinned private candidate workspace; no cohort or performance conclusion.",
+  "expected_invocation": "a80ba03158b54687892e12b9e78f7c70",
+  "source_packet": "root-library-validation-v4-20261109"
+}

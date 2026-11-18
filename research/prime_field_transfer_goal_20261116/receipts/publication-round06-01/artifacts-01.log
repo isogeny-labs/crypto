@@ -1,0 +1,11 @@
+     1,269,318  benchmarks/progress/progress.json
+        90,077  benchmarks/progress/progress.pdf
+    88,298,805  docs/browser/data.json
+    25,018,150  docs/curves/covers.json
+    22,416,763  docs/curves/registry.json
+    10,295,183  docs/ic/leaderboard.json
+       768,970  pcc/ledger.jsonl
+
+7 data file(s) belong in the store, not Git. Move them with
+  python3 tools/artifacts/artifacts.py push <file-or-dir>...
+and commit the .artifacts.json / .gitignore it writes (docs/artifacts.md).

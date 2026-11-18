@@ -1,0 +1,19 @@
+{
+  "schema": "extension-correlation-input-rule/v1",
+  "command": ["python", "-m", "research.extension_correlations_20261112_v1.worker", "extension-correlations-20261112-v1"],
+  "fields": [{"p":3,"modulus":[1,0,1]},{"p":5,"modulus":[2,0,1]}],
+  "basis": ["1","theta"],
+  "domain_rule": "canonical labels [0,1,p]",
+  "features": ["x^2","xy","y^2","x","y"],
+  "coefficient_rule": "a_i=(2i+1)mod(p^2), b_i=(3i+2)mod(p^2), labels in fixed polynomial basis",
+  "targets": "all q^2 target pairs; 81+625=706 total",
+  "functionals": [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1],[1,1,0,0],[0,1,1,0],[0,0,1,1],[1,0,0,1]],
+  "source_pairs_per_field": 9,
+  "training_only": true,
+  "repetitions": 3,
+  "alternating_order": [["indexed","filtered"],["filtered","indexed"],["indexed","filtered"]],
+  "caps": {"predicate_checks":200000,"worker_seconds":90,"memory_mb":4096,"cores":1},
+  "artifact": "research/extension_correlations_20261112_v1/raw-profile.json.gz",
+  "elliptic_chart_coverage": false,
+  "qualified_speedup_claim": false
+}

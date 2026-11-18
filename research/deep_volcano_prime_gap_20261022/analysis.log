@@ -1,0 +1,11 @@
+bsgs-neg: S over 760 runs
+rho-neg: S over 4560 runs
+rho-neg-aa: S over 1520 runs
+        bsgs-neg               S: floor/crater 1.0000 90% [1.0000, 1.0000] p=1.0000 equiv=true | horizontal tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+         rho-neg               S: floor/crater 1.0500 90% [0.8894, 1.2649] p=0.6542 equiv=false | horizontal tau 0.0618 (null p95 0.0912) p=0.6407 maxz p=0.9820 | model tau 0.0616 (null p95 0.0775) p=0.3813 maxz p=0.8941
+      rho-neg-aa               S: floor/crater 1.0547 90% [0.8152, 1.4174] p=0.7830 equiv=false | horizontal tau 0.1745 (null p95 0.2378) p=0.8331 maxz p=0.8146 | model tau 0.0000 (null p95 0.0000) p=1.0000 maxz p=1.0000
+        bsgs-neg gap class 1/0: 1.0000 90% [1.0000, 1.0000] 95% [1.0000, 1.0000] p=1.0000 equiv=true
+         rho-neg gap class 1/0: 0.9958 90% [0.9714, 1.0205] 95% [0.9663, 1.0257] p=0.7826 equiv=true
+      rho-neg-aa gap class 1/0: 1.0002 90% [0.9592, 1.0441] 95% [0.9525, 1.0526] p=0.9911 equiv=true
+bsgs exactness: {"arm":"bsgs-neg","exact":true,"max_distinct_cost_per_target":1,"paired_targets":4}
+pair: {"a":"rho-neg","b":"rho-neg-aa","ci95":[0.9441920323767676,1.0164222489766683],"classes":2,"excludes_1":false,"matched_workloads":1520,"metric":"S","ratio":0.9801908594225061}

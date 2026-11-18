@@ -1,0 +1,11 @@
+digraph chain {
+  rankdir=LR; node [shape=box, fontname="Helvetica", fontsize=11, style=rounded];
+  edge [fontname="Helvetica", fontsize=9];
+  E   [label="E(F_p)\ny²=x³-3x+b\nprime order r"];
+  JH  [label="J_H(F_p)\nH_γ: v²=u·[(u²+γ)³+a u²(u²+γ)+b u³]\ngenus 3 hyperelliptic"];
+  PIC [label="Pic⁰(C)\nC: explicit plane quartic\n(same field F_p)"];
+  E  -> JH  [label=" φ*  (deg-2 cover pullback,\n injective on <P>)"];
+  JH -> PIC [label=" Ψ  (Smith trigonal,\n kernel S exp 2, coprime r)"];
+  label="E ⟶ J_H ⟶ Pic⁰(C): planted log k recovered on C by BSGS   (run 20261116T1637Z)";
+  labelloc=b; fontsize=9;
+}

@@ -1,0 +1,441 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "AUDIT-STOLL-WITNESSES-20261109-v1",
+  "version": 1,
+  "created": "2026-11-09",
+  "repository": "crypto",
+  "study_dir": "research/jacobian_smoothness_audit_20261109/stoll-witness-v1",
+  "authors": [
+    "Codex audit producer"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "parent_population_protocol": "a7bc5ba9f6af90f196155a4ff30093f4bd47701568c4c58cfc01b3bfc42828dc",
+    "raw_reference_path": "research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/census-v1-p3-r0/raw.jsonl",
+    "raw_reference_sha256": "cf8ec5cfcabb091625e87e73bca3a8aa51585a52716db464ffbfeca0ebb40231",
+    "reference_manifest": "../evidence/census-v1/raw-manifest.json",
+    "reference_cpp_sha256": "f761f1252d9a64efce50c6768f019e1af74b639bd75fd2ba7abb802447f91ce1",
+    "formal_definition": "../lean/MumfordStollGeneral.lean",
+    "formal_definition_sha256": "18251bbe5736ac0e5759b9127799ac726f58e299ddd59d0af82cb3c7e3fb4775"
+  },
+  "question": "Can the source-frozen generator supply exact common-divisor/Bezout/composition/reduction witnesses for the25known cycle pairs and all100pairs of the fixed complete Stoll model, matching the existing C++checked table, for subsequent Lean kernel proofs?",
+  "claims": [
+    {
+      "id": "C-candidate-witnesses",
+      "text": "Generate exactly25/100candidate polynomial witnesses with explicit normalization/remainder data; every native polynomial assertion and existing C++checked result agrees. These outputs are not Lean proofs.",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-control"
+      ]
+    },
+    {
+      "id": "C-full-theorem",
+      "text": "Full100Leanrun existence, deterministic full ambient group, exact subgroup inequality and geometric identification require separate formal proofs. No native runtime or signed/independent-host claim.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "cycle",
+      "role": "control_positive",
+      "description": "All25ordered pairs on the known five-cycle.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3dd8d410e688515805aa27216aee5372359da62a",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/jacobian_smoothness_audit_20261109/stoll-witness-v1/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "69cb98ed2ebaaef80d37fe6fb91ef77f6f431e969b044d457bcf408aa2b7c787",
+        "flags": {
+          "mode": "cycle",
+          "curve": "fixedF3x5+1,source-known model1",
+          "raw_reference_sha256": "cf8ec5cfcabb091625e87e73bca3a8aa51585a52716db464ffbfeca0ebb40231",
+          "formal_definition_sha256": "18251bbe5736ac0e5759b9127799ac726f58e299ddd59d0af82cb3c7e3fb4775",
+          "launcher": "Bashbuiltin time-paroundtimeout120s; elapsed diagnostic only.",
+          "output": "fresh write-once artifacts/v1-cycle or artifacts/v1-full; no kernel proof assertion",
+          "source_pin_note": "Source commit filled after source/plan commit, before freeze and curve calls."
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "p": 3,
+        "mode": "fixture",
+        "polynomial": "X^5-X",
+        "all_addition_pairs": true,
+        "all_group_axioms": true,
+        "all_cyclic_subgroups": true
+      }
+    },
+    {
+      "id": "full",
+      "role": "candidate",
+      "description": "All100ordered pairs on the complete10pairmodel.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3dd8d410e688515805aa27216aee5372359da62a",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/jacobian_smoothness_audit_20261109/stoll-witness-v1/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "69cb98ed2ebaaef80d37fe6fb91ef77f6f431e969b044d457bcf408aa2b7c787",
+        "flags": {
+          "mode": "full",
+          "curve": "fixedF3x5+1,source-known model1",
+          "raw_reference_sha256": "cf8ec5cfcabb091625e87e73bca3a8aa51585a52716db464ffbfeca0ebb40231",
+          "formal_definition_sha256": "18251bbe5736ac0e5759b9127799ac726f58e299ddd59d0af82cb3c7e3fb4775",
+          "launcher": "Bashbuiltin time-paroundtimeout120s; elapsed diagnostic only.",
+          "output": "fresh write-once artifacts/v1-cycle or artifacts/v1-full; no kernel proof assertion",
+          "source_pin_note": "Source commit filled after source/plan commit, before freeze and curve calls."
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "p": 5,
+        "mode": "fixture",
+        "polynomial": "X^5-X",
+        "all_addition_pairs": true,
+        "all_group_axioms": true,
+        "all_cyclic_subgroups": true
+      },
+      "same_instrument_as": "cycle"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact deterministic candidate generation, no noise/variance/performance or statistical comparison."
+    },
+    "positive": {
+      "present": true,
+      "arm": "cycle",
+      "expected_detection": "Exactly25rows and25matches against existing independently C++checked table, on the known Lean25step cycle; every polynomial certificate equation asserted before output.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Exact proof-witness generation, no statistical null or typicalness assertion. Bad arithmetic/table mismatch invalidates the cell; only Lean kernel checks can turn candidates into a theorem."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "ordered_pair_domain",
+        "levels": [
+          "knowncycle5",
+          "complete10"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One exact pinned Rustgenerator/unchanged MITbackend, one thread; source/binary same in both arms."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "how": "Fixed source-known StollF3curve; complete bounded model already classified by Lean. Domains cycle5/full10 declared before calls; neither sampling nor discovery."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing local host, metadata retained; L0timing scientifically invalid."
+      },
+      {
+        "name": "layout",
+        "treatment": "measured",
+        "how": "Fresh process and directory per arm; no layout claim."
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Known cycle control first, then complete100; no speed comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Source-frozen exact generator; no output selection, manual witness replacement or optional stopping. Subsequent Leanproof construction/checking is reported separately."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-control",
+        "arms": [
+          "cycle",
+          "full"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Exactly25/100witness rows/table matches, all native polynomial assertions pass. Any source/table/arithmetic failure invalidates cell and stops remaining execution."
+      }
+    ],
+    "aa_not_applicable": "Known exact deterministic counts; no inferential noise floor.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Known exact cycle positive control first; no speed/statistical comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        202611092901,
+        202611092902
+      ],
+      "nonce": null,
+      "note": "Metadata-only seeds chosen before data; enumeration and arithmetic use no randomness."
+    },
+    "instance_sampling": {
+      "rule": "One fixed source-known model1overF3; complete ordered pairs on the declared5/10actual points.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact known-input proof candidates; arithmetic field/model visible. No statistical effect ranking; kernel proof is separate.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Complete deterministic controls, no sampling/rank-test hypothesis. Alpha is a required schema field, not a p-value criterion."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 120,
+      "measured_on": "No timing on this generator yet. Prior completeF3population pipeline had diagnostic3.64sfor243models, including the Stollcontrol. Conservative scheduling allowance60sper arm/120stotal, hardcap120spercell/240smaximum; estimates are not generator measurements. Subsequent Leanproof checking has a separate proof-resource budget and is outside these native cells."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "witness_rows",
+        "name": "Candidate witness rows",
+        "unit": "rows",
+        "kind": "exact",
+        "definition": "Every declared ordered pair emits one candidate common-divisor/Bezout/composition/reduction witness.",
+        "source": "finish.json witness_rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "independent_table_entries_matched",
+        "name": "Existing checked table entries matched",
+        "unit": "rows",
+        "kind": "exact",
+        "definition": "Each output agrees with the old C++checked complete-model table and the upstream checked_add; same host, no signed standing.",
+        "source": "finish.json independent_table_entries_matched",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "high_reductions",
+        "name": "One-step reduction rows",
+        "unit": "rows",
+        "kind": "counted",
+        "definition": "Number of intermediate Uwithdegree>2.",
+        "source": "finish.json high_reductions",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "nontrivial_normalization_units",
+        "name": "Nontrivial normalization units",
+        "unit": "rows",
+        "kind": "counted",
+        "definition": "Record non-one normalization units in high branch; no expected lower bound and no inferential comparison.",
+        "source": "finish.json nontrivial_normalization_units",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "witness_rows",
+      "independent_table_entries_matched",
+      "high_reductions",
+      "nontrivial_normalization_units"
+    ],
+    "record": [
+      "cpu",
+      "host",
+      "threads",
+      "binary_sha256",
+      "source_commit_checked",
+      "observed_worktree_commit",
+      "protocol_sha256",
+      "isolation",
+      "wall_valid"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "instance_type": "existing managed environment; user-approved zero-paid-compute backend",
+      "cpus": 1,
+      "spot": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly one cycle cell, then one full cell, with120scap each/240stotalmaximum, no warmups/retries. Subsequent Leancompilation is separate proof verification, not a native cell.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any failed source/input/binary pin, reference-table mismatch, polynomial assertion, error, timeout or missing footer invalidates execution and stops remaining cells. Preserve all partial outputs; source repair requires new dated version before affected reruns.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "No incomplete/failed native cell is a mathematical negative. Preserve all data and failure rows.",
+    "Candidate Leanfragments are not proofs; no unsupported kernel/geometry/group/performance claim.",
+    "L0elapsed intervals are diagnostic only."
+  ],
+  "decision_rule": {
+    "text": "Support only candidate generation at exact25/100scope when all frozen controls/assertions/table matches and complete outputs pass; kernel theorem checking is a separate necessary obligation.",
+    "comparison_ids": [
+      "C-control"
+    ],
+    "threshold": "Rows/table matches exactly25/25and100/100, exit0/complete footer, no native assertion failure.",
+    "statistic": "Exact integers and cross-products on complete finite sets.",
+    "interval": "None: exact complete controls, no sampling.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact count discrepancies and subgroup cross-product differences, not an inferential effect size.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/main.rs",
+      "sha256": "b800fd4cb7ac72afa9132c63dbc7a1f5f565557f3205dfda47a1879c43384c24"
+    },
+    "inputs": [
+      "artifacts/v1-cycle/witnesses.json",
+      "artifacts/v1-full/witnesses.json",
+      "research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/census-v1-p3-r0/raw.jsonl"
+    ],
+    "outputs": [
+      "artifacts/v1-cycle/bezout-choices.lean.part",
+      "artifacts/v1-cycle/witness-refinements.txt",
+      "artifacts/v1-full/bezout-choices.lean.part",
+      "artifacts/v1-full/witness-refinements.txt"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Witness/table/reduction counts with candidate-only status; separate Leanproof dependency diagram."
+    ],
+    "report_dir": "../reports/stoll-witness-v1"
+  },
+  "inadmissible": [
+    "Any curve invocation before committed source and canonical frozen protocol.",
+    "Changing code, fields, controls, counts, seeds or exclusion rules after data without a dated new protocol version.",
+    "Treating same-host two-language agreement as independent-machine or signed verification.",
+    "Treating finite exact fixtures as large-prime/typical/asymptotic evidence or as completion of the fourteen-item request.",
+    "Promoting diagnostic wall intervals as performance measurements."
+  ],
+  "literature": [
+    {
+      "ref": "../stoll-sources.json",
+      "provenance": "internal",
+      "claim": "Source-known Stollx5+1/F3cycle and complete10/8actual pair model, with primary Stoll2014Theorem4.18/Example4.19read scopes and separate geometric bridge.",
+      "verified_by": "Lean348gate and local packetd8b77bpass; signed standing unverified."
+    },
+    {
+      "ref": "../lean/MumfordStollGeneral.lean",
+      "provenance": "internal",
+      "claim": "Fixed Bezout choices give a unique full polynomial run output with normalization unit and final remainder; existence/all100group match still pending.",
+      "verified_by": "Whole project352gate passes0failures/0trusted-native; standard foundations only."
+    },
+    {
+      "ref": "../evidence/census-v1/export.json",
+      "provenance": "internal",
+      "claim": "Existing fixed reference model1table is included in the complete two-language F3population and exact deterministic repeats.",
+      "verified_by": "Canonical export/file check0findings, six deterministic files repeat; raw measurement37f91cremains unsigned/not_covered for independent replay/recompute."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "cd194533e8d3d6766e15cbb0de25ecbb8a9f5f505d02dcfa65f86aaa5060de46",
+    "commit": "3dd8d410e688515805aa27216aee5372359da62a",
+    "frozen_at": "2026-11-09T23:31:57Z",
+    "filed_before_affected_data": true
+  }
+}

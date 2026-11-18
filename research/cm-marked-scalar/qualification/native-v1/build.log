@@ -1,0 +1,20 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations native.cpp -o /tmp/cm-marked-scalar-build/native -lcrypto
+In file included from native.cpp:1:
+json.hpp: In member function ‘std::string JsonParser::string()’:
+json.hpp:23:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   23 |     if(take()!='"')throw std::runtime_error("JSON string"); std::string v;
+      |     ^~
+json.hpp:23:61: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   23 |     if(take()!='"')throw std::runtime_error("JSON string"); std::string v;
+      |                                                             ^~~
+In file included from native.cpp:1:
+json.hpp: In member function ‘Json JsonParser::parse(unsigned int)’:
+json.hpp:31:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   31 |     if(depth>128)throw std::runtime_error("JSON depth");space();if(i==s.size())throw std::runtime_error("empty JSON");Json j;char c=s[i];
+      |     ^~
+json.hpp:31:57: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   31 |     if(depth>128)throw std::runtime_error("JSON depth");space();if(i==s.size())throw std::runtime_error("empty JSON");Json j;char c=s[i];
+      |                                                         ^~~~~
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

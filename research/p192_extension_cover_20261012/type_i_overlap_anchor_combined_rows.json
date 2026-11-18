@@ -1,0 +1,69 @@
+{
+  "candidate_id": null,
+  "input_sha256": {
+    "type_i_cross_endpoint_query_triples.json": "7719e3b9dfea51bab26ee877df24abc75a82ca813385424ed8804cf8b542a9a5",
+    "type_i_known_scalar_query_cross_fan.json": "f0f873eaa300796d27589d18601094e0b0c73c4f678573131d1d9197c5a53980",
+    "type_i_known_scalar_query_transfer.json": "0a32ec012896a7e58ab5840da8d107a1b5fff49c3ede6966055563a77b084bae",
+    "type_i_overlap_anchor_relation_fan.json": "00f026dcd2d4cc752d4962ebedf321cee99880e9e283e85bc9e03b917e9460a5",
+    "type_i_quotient_base_probe.json": "f7de9791a007214b8506bf054ed24d55a803c4d1c8da50815aee04c5410339c7"
+  },
+  "policies": {
+    "overlap_anchors_32_endpoints": {
+      "active_columns": 2252,
+      "columns_with_degree_at_least_eight": 4,
+      "combined_rank": 330,
+      "cross_cubic_rows": 22,
+      "distinct_bundle_column_incidences": 2508,
+      "endpointwise_rank": 310,
+      "endpointwise_rows": 722,
+      "max_selected_bundle_degree": 9,
+      "necessary_max_degree_for_closure_at_frozen_rank": 8,
+      "per_anchor": {
+        "0": {
+          "bundle_support_columns": 193,
+          "endpointwise_rows": 61,
+          "new_endpoints": 8,
+          "rank_with_baseline": 207
+        },
+        "3": {
+          "bundle_support_columns": 220,
+          "endpointwise_rows": 88,
+          "new_endpoints": 8,
+          "rank_with_baseline": 212
+        },
+        "6": {
+          "bundle_support_columns": 264,
+          "endpointwise_rows": 112,
+          "new_endpoints": 8,
+          "rank_with_baseline": 219
+        },
+        "9": {
+          "bundle_support_columns": 243,
+          "endpointwise_rows": 91,
+          "new_endpoints": 8,
+          "rank_with_baseline": 215
+        }
+      },
+      "receipt_sha256": "00f026dcd2d4cc752d4962ebedf321cee99880e9e283e85bc9e03b917e9460a5",
+      "selected_bundle_count": 418,
+      "selected_bundle_degree_histogram": {
+        "1": 2030,
+        "2": 209,
+        "3": 9,
+        "8": 3,
+        "9": 1
+      },
+      "selected_support_columns": 2252,
+      "shared_new_columns_by_anchor_pair": {
+        "0,3": 0,
+        "0,6": 0,
+        "0,9": 1,
+        "3,6": 1,
+        "3,9": 1,
+        "6,9": 0
+      }
+    }
+  },
+  "source_sha256": "9c5339905997da5573e5a8f9e87f2c01cd7d899040e6bb02483413175bfb9598",
+  "status": "verified_overlap_anchor_combined_rows"
+}

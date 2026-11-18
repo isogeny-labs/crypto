@@ -1,0 +1,5 @@
+# Anchored-descent42 rejected counter capture
+
+Three native Runpod workers returned normally; the copied checker refused every arm because foreign-thread work was lost from the owner tally. This failed measurement remains in the research record, with no cost admission or leaderboard promotion. The successor changes only execution ownership and repeats the same public input/stream with the rejection gate intact. Failure/custody claimPCC-20261117-73eded is UNVERIFIED. [pcc:unverified]
+
+[Original failure packet](../../research/extension_ic_graph_20261115/runpod-anchored-descent-20261116-42/README.md) · [One-page report](report.pdf) · [Native descriptive metadata](failure-summary.json). The actual finalPDF/150dpiPNG was inspected; all artifact copies are hash-bound. Large original raw files/archive stay untruncated in the packet's recorded local custody. Collection precedes DELETE204/GET404; all owned paid pods are deleted. No old counter is repriced. S3publication is unavailable under the previously recorded backend/access condition; no upload is claimed. [pcc:unverified]

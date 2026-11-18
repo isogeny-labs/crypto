@@ -1,0 +1,7 @@
+# Secondary changed diagnostic: a fixed eight-pivot cover
+
+UNEXECUTED alternative to the primary five-dimensional width-aware proposal. Recorded single-pivot4D masks exclude u=3 only in the four fields whose planted u differs, so locality is directly observed. A bounded diagnostic can preregister all pivots0..7 for every fixed width8 block, union all individually checked lifted certificates, and solve every unexcluded u. Each certificate remains sound independently of which pivot generated it; unioning exclusions cannot remove a true root when every constituent range is valid. No assumption says a pivot must exclude an empty fiber.
+
+There are at most40pivot reductions across five blocks,640candidate vectors (40*16), and5120candidate/u checks (640*8) PER arm; three repetitions charge all reductions, replays, survivor solves, independent full-root verification and serialization. Retain all pivots and all fields; do not select a favorable subset after timings. This is a changed finite-coverage assumption, not more time on one seed. At larger block widthH+1 the naive discovery count grows linearly and complete replay quadratically; this cannot remove the global p-element h bottleneck or establish scalable 8x performance.
+
+The same independent tiny original-root oracle, centering/membership/pool corruptions, cap/late UNKNOWN behavior and unchanged complete conditional output are required. Compare total paid cost with7D and all-h in a NEW registered experiment only. Novelty, original-global completeness and qualified genuine F4/F5/F6 gain remain unproven.

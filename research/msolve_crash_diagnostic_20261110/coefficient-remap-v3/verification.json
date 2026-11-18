@@ -1,0 +1,47 @@
+{
+  "schema": "msolve-remap-local-status/v1",
+  "source_commit": "bf2ce5da19b2ec06ff0285584e8a25da3a975fde",
+  "claim": "PCC-20261110-4867bb",
+  "actual_verdict": {
+    "claim_id": "PCC-20261110-4867bb",
+    "claim_sha256": "f548ca455d4c67219dd229f80b83091b35c9b6fb77b22b82e2dbc071f02b5b33",
+    "commit": "bf2ce5da19b2ec06ff0285584e8a25da3a975fde",
+    "proofs": [
+      {
+        "kind": "attestation",
+        "notes": [
+          "artifact: unsigned; independence needs a keyring signature"
+        ],
+        "reasons": [],
+        "verdict": "not_covered"
+      }
+    ],
+    "reasons": [
+      "claim kind measurement is not covered: recompute; replay"
+    ],
+    "schema": "pcc.verdict/v1",
+    "verdict": "not_covered",
+    "verified_at": "2026-11-10T17:45:33Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-4867bb",
+    "claim_sha256": "f548ca455d4c67219dd229f80b83091b35c9b6fb77b22b82e2dbc071f02b5b33",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "export_check": "evidence/export-check.log",
+  "raw_archive": {
+    "path": "evidence/runs.tar.gz",
+    "roundtrip_equal": true,
+    "files": 28
+  },
+  "report": {
+    "path": "reports/proof-20261110/report.pdf",
+    "bytes": 50611,
+    "sha256": "d3eb2058d1fb85f3efdb24f4fe2d6a94442b4f719c653e9484cf31cdb1680553",
+    "pages": 2,
+    "all_pages_visually_inspected": true
+  },
+  "paid_compute": 0
+}

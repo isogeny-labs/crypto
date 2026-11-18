@@ -206,6 +206,8 @@ enum ImportWhat {
     CianiQuartics,
     /// Curves written by ecdb/sage/generate.sage (JSONL files or directories of them), re-verified.
     Generated { paths: Vec<String> },
+    /// Versioned curve sweeps, feature definitions and model-ready dataset recipes.
+    Research,
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
     LmfdbAvFq {
         path: PathBuf,
@@ -311,6 +313,7 @@ async fn main() -> Result<()> {
                 ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
                 ImportWhat::ClassGroups => import::run(&ctx, Selection::ClassGroups, None).await?,
                 ImportWhat::CianiQuartics => import::run(&ctx, Selection::CianiQuartics, None).await?,
+                ImportWhat::Research => import::run(&ctx, Selection::Research, None).await?,
                 ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };

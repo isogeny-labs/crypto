@@ -1,0 +1,103 @@
+"""Layout of recorded observations only; no research arithmetic or rerun."""
+from pathlib import Path
+import json,subprocess,hashlib
+import typst
+
+s=Path('/workspace/crypto-chained-balanced-main/research/chained_richelot_joint_chart_20261117')
+data=json.loads((s/'evidence/first-arithmetic-unit-03/ACTUAL_FIRST_JOINT_CHART_SCOPE.json').read_text())
+o=s/'report-first-arithmetic-04';o.mkdir()
+rows=data['all8_model_observations']
+md='''# Joint Richelot model charts: first arithmetic unit
+
+All eight fixed CT49 nondegenerate source/target pairs admit a common rational
+nonbranch chart in this unit. Complete808-candidate traces are retained; exact
+source factors, transformed roots, Frobenius, determinant, Wronskian and monic
+target coefficients pass, together with inverse model substitution. All48
+factor reorderings and32 legitimate sign choices pass; all4 degenerate and24
+other semantic controls are detected. Claim42a9c2 is unsigned. [pcc:unverified]
+
+| Pair | Eligible a | Selected a | b | c | Delta prime | bc | Constructor scale |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+'''
+for row in rows:md+='| '+' | '.join(str(row[k]) for k in ['name','eligible_points','a','b','c','Delta_prime','bc','constructor_scale'])+' |\n'
+md+='''
+The recorded monic coefficient vectors and all six cubic-field branch roots
+are in [the literal output CSV](../evidence/first-arithmetic-unit-03/recorded-monic-models-and-roots-13.csv).
+These are actual CT49 correctness fixtures. The constructor scale is its least
+nonzero square root; it need not equal the recorded bc sign. Both are retained
+for the later evaluator's orientation check. [pcc:unverified]
+
+For w=1/(x-a), F=w^6 f(a+1/w)/b^2 and G=w^6 H(a+1/w)/c^2 are monic.
+Writing alpha_i=q_i(a), S=product(alpha_i)=b^2/lambda, the binary coefficient
+matrix has determinant-1, so Delta prime=-Delta/S. The Wronskian contributes
+-w^2/(alpha_j alpha_k); the new raw Richelot target is exactly (bc)^2 G.
+This is the written coefficient argument ee5c8b, with finite checks42a9c2;
+it is not a new Lean construction or executed divisor correspondence.
+[pcc:unverified]
+
+Public source4df62c68/Rustf5dfad0a precedes compilation and the first arithmetic
+test. Rust1.99.1, offline locked guarded vendor sources, one compiler worker,
+120s caps and a separately copied555 qualifier were used. One new test passes;
+12 unchanged backend tests were compiled and explicitly filtered. All13 phases,
+strict Clippy/fmt and source/dependency/qualifier guards exit0. Complete75635B
+stdout and the601280B/195-member declared archive remain; every archived byte
+and mode was compared. Disposable build cache was excluded prospectively and
+inventoried. No runtime ratio is inferred. [pcc:unverified]
+
+Initial storage preflight6df51e and namespace compiler errord3ae2a are retained
+in full declared packets. Neither ran arithmetic. The versioned C source fixes
+only the wrapper alias and is frozen after this first arithmetic success.
+Next is the existing generic operational Richelot/closed-fibre evaluator on
+these monic models, with explicit dual[2] and scalar-relation checks.
+[pcc:unverified]
+
+Primary sources: full CT49/CT50 notes and ConsumerE079 nonsplit.rs/map.rs in
+primary-inputs; Galbraith corrected [ch8](https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch8.pdf)
+and [ch10](https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch10.pdf).
+The arithmetic backend is reused and the transform oracle has the same author;
+the result is not a signed independent-verifier verdict. [pcc:unverified]
+'''
+(o/'NATIVE_UNIT_13.md').write_text(md)
+dot='''digraph chart {
+rankdir=TB;bgcolor="transparent";nodesep=0.6;ranksep=0.5;
+node[shape=box,style="rounded,filled",fillcolor="#edf2f8",fontname="DejaVu Sans",fontsize=11,color="#284b63"];
+edge[fontname="DejaVu Sans",fontsize=9,color="#284b63"];
+{rank=same; C[label="C: y² = f(x)"]; D[label="D: Y² = H(X)"];}
+{rank=same; F[label="Monic F(w)\nnormalized source factors"]; G[label="Monic G(w)\nrecorded target model"];}
+C->D[style=dashed,color="#747d87",label="Classical correspondence\ndivisor execution next"];
+C->F[label="w=1/(x−a)\nz=yw³/b"];
+D->G[label="w=1/(X−a)\nv=Yw³/c"];
+F->G[label="Full bracket coefficients checked\nR_new / (bc)² = G"];
+}
+'''
+(o/'joint-chart.dot').write_text(dot)
+subprocess.run(['dot','-Tsvg',str(o/'joint-chart.dot'),'-o',str(o/'joint-chart.svg')],check=True)
+cells=[]
+for row in rows:
+    for val in [row['name'].replace('_','/'),row['eligible_points'],row['a'],row['b'],row['c'],row['Delta_prime'],str(row['bc'])+' / '+str(row['constructor_scale'])]:cells.append('['+str(val)+']')
+text='''#set page(paper: "a4", margin: 14mm)
+#set text(font: "DejaVu Sans", size: 9.2pt)
+#set par(justify: true)
+#set heading(numbering: none)
+#align(center)[#text(size: 17pt, weight: "bold")[Joint Richelot model charts over F101]#linebreak()
+First frozen arithmetic unit · 17 November 2026]
+#block(fill: rgb("edf2f8"), inset: 7pt)[All eight CT49 pairs admit a common rational nonbranch chart. Exact factor/target coefficient checks pass. Claim42a9c2 remains unsigned. [pcc:unverified]]
+== Recorded joint charts
+#set text(size: 8.4pt)
+#table(columns:(1.2fr,0.7fr,0.3fr,0.3fr,0.3fr,0.5fr,1.1fr),inset:3pt,
+[Pair],[Eligible a],[a],[b],[c],[Δ′],[bc / constructor],
+'''+',\n'.join(cells)+''')
+#set text(size: 9.2pt)
+All101 candidate shifts per pair were recorded before the least eligible a was selected. Full monic coefficient vectors and six transformed branch roots remain in the output CSV. The constructor's least square root and bc can have different signs; both are retained for the evaluator. [pcc:unverified]
+#align(center)[#image("joint-chart.svg",width:96%)]
+== Exact scale argument
+For w=1/(x−a), F=w⁶f(a+1/w)/b² and G=w⁶H(a+1/w)/c² are monic. Let S=∏qᵢ(a)=b²/λ. The binary coefficient matrix has determinant−1 and each row is divided by qᵢ(a), giving Δ′=−Δ/S. The three transformed Wronskians yield R\_new=b²w⁶H(a+1/w)=(bc)²G. Written argumentee5c8b and finite checks42a9c2 remain unsigned. [pcc:unverified]
+== Coverage and custody
+All808 candidates,48 valid factor reorderings and32 legitimate sign choices are retained. Four zero-determinant matchings and24 wrong-lambda/sign/factor controls are detected. Frobenius, six roots, inverse models and every source/target coefficient pass. [pcc:unverified]
+Rust1.99.1/offline guarded vendor/j1/120s; a separate555 qualifier ran one new test, with12 inherited tests compiled and filtered. All13 phases, Clippy/fmt and source/dependency/qualifier guards exit0. Complete75635B stdout and195-member601280B declared archive are retained; disposable build cache was excluded prospectively. Both pre-arithmetic infrastructure failures remain. No arithmetic rerun. [pcc:unverified]
+== Next technical step and sources
+Execute the existing generic Richelot divisor/closed-fibre evaluator with these models, then test dual[2] and prime-order scalar relations. This unit checks the factor/model bridge. Primary sources: CT49/CT50 and ConsumerE079 nonsplit/map; Galbraith corrected8.3 and10.4. Backend reuse and a same-author transform oracle do not supply signed independent verification. [pcc:unverified]
+'''
+(o/'report.typ').write_text(text);(o/'.gitattributes').write_text('REPORT.pdf binary\n')
+typst.compile(str(o/'report.typ'),output=str(o/'REPORT.pdf'),root=str(o))
+pdf=(o/'REPORT.pdf').read_bytes();print('PDF bytes',len(pdf),'sha256',hashlib.sha256(pdf).hexdigest())

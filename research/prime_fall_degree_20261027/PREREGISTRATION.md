@@ -986,3 +986,37 @@ After all 11 Amendment 28 pods were lost (most likely a RunPod balance stop; `re
   kept. A loss then costs at most 15 minutes of rows. Fetched rows are committed at each check-in (Amendment 24).
 - **Relaunch** (decision 18; Amendment 22 §7): attempt 2 of `iso-null`, `pfd-x-t14-k0-c6` and `pfd-x-t14-k1-c6`, with exactly
   the Amendment 28 stages, limits and pins.
+
+## Amendment 30 (2026-11-15; a launch batch on reserved RunPod pods, with the owner's balance confirmation; before any row of these jobs)
+
+Every number is `[pcc:unverified]`.
+
+- **Owner instruction (2026-11-15, ~19:40Z, session 01TCbLH6osebpnEbutNogBzD):** "Launch". The owner had been asked to confirm
+  the RunPod balance for exactly this batch, so this is the per-batch confirmation of decision 18 (Amendment 29).
+- **Jobs.** Each is the registered stage, run verbatim by `entry_r2.sh` on the binaries admitted by Amendment 17.
+
+  | job | what | stage | pod | per-job cap |
+  |:--|:--|:--|:--|:--|
+  | `pfd-x-t14-k0-c7-rp2`, `pfd-x-t14-k1-c7-rp2` | `m = 2`, `t = 14`, cap 7 (Amendment 7 B) | `cap:14:K:7:12800000000` | 16 vCPU / 128 GB | US$40 |
+  | `pfd-m4-t5-k0-c7-rp`, `pfd-m4-t5-k1-c7-rp` | `m = 4`, `t = 5`, `c = 7` | `m4:5:K:7:30064771072:4000000` | 32 vCPU / 256 GB | US$100 (owner-approved, 2026-11-15) |
+  | `pfd-m4-t6-k0-c6-rp`, `pfd-m4-t6-k1-c6-rp` | `m = 4`, `t = 6`, `c = 6` | `m4:6:K:6:13958643712:4000000` | 16 vCPU / 128 GB | US$40 |
+
+  - **Cap 7.** This is attempt 2. Attempt 1 (pods `mn2he0hsnc4uqo`, `aarqk8kswd3zry`) was lost with no rows in the
+    2026-11-15 balance stop.
+    - Cap 6 on both draws completed without refuting (`results/RPX/*-m112-rp`), so cap 7 is the Amendment 7 B next step.
+    - Amendment 14's order holds: 56Gi first; `oversize` or a memory kill gives an `-m112` run with `--max-dense
+      27900000000` on a 256 GB pod.
+  - **`m = 4`, `t = 5`, `c = 7`.** This changes a limit, as R3 §3 required. `max_entries = 30064771072` is CAPACITY_R2 §1's
+    formula for a 232Gi request on a 256 GB pod.
+    - Sizing basis (measured): `t = 4`, `c = 7` reached 1.33·10⁹ entries at 91,276 columns. The `t = 5`, `c = 6` closure
+      is complete at 129,040 columns and 182,700 entries.
+    - Estimate (derived, extrapolated): 5·10⁹ to 2·10¹⁰ entries, about 40–160 GB.
+    - A closure stopped by the limit reads *undecided*, never *flat* (Amendment 8).
+  - **`m = 4`, `t = 6`, `c = 6`.** Registered limits. The `c = 6` levels at `t = 4, 5` were small (128k and 183k entries).
+- **Fetch cadence.** Results are fetched every 15 minutes while a job runs (Amendment 29), so a balance stop loses at most
+  15 minutes of rows.
+- **Cost.** Worst case for the batch, if every job ran to its cap: US$80 + US$200 + US$80. The study ceiling stays US$500
+  (Amendment 20), checked against actual spend at each check-in.
+- **Coordination.** These are the same cells as Amendment 28 items 1 and 2. They run here, once. Session
+  01TCbLH9vZ4sepWADHKijoFX is told before launch, so that it does not launch them too.
+- No hypothesis, §6 rule, reading, seed or budget changes. The Amendment 8 readings apply to the `t = 5`, `c = 7` rows.

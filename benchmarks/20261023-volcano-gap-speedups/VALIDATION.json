@@ -1,0 +1,37 @@
+{
+  "schema": "validation-gate/v1",
+  "note": "rho-against-rho speed measurement (no index calculus). The gae_band slots are filled as follows: \"ic\" carries the candidate rho.negation_lanes (32 lockstep lanes) and \"rho\" the reference rho.negation, both in session ECBS1h45f937d2f95a. Values are mean S at w GAE per unpriced canonicalisation (mean over the 48 curves of rho-lanes/band.json, 12 runs each). The order (serial cheaper in counted cost) holds across the band; the lanes arm is faster only in wall time (median ratio 0.419), which the gate does not rank.",
+  "replay_certificate": {
+    "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/validation/replay-certificate.json",
+    "sha256": "a2ccdf32ba916186278f50ebbce714640b99ac1055d17bab36f346ff9c4284fd"
+  },
+  "validator_report": {
+    "path": "../../research/deep_volcano_prime_gap_20261022/speedups-20261023/validation/validator-report.json",
+    "sha256": "c468826a60100815bb6f911442080c622394940fe7595c0f2ee657dd5b6cffdb"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "speedups-20261023/README.md section 3: ecbench rho.negation (the matched reference for A = 2; D0 = -11 gives Aut = +-1 on every curve) against rho.negation_lanes, paired in one session on 48 curve models x 4 targets x 3 rounds",
+    "unit": "counted group operations (ecbench GAE; S = GAE/sqrt(r))",
+    "binary_or_process": "ecbench, session ECBS1h45f937d2f95a (both arms interleaved in one binary)",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 0.9538025695307266,
+        "rho": 0.9303300895824473
+      },
+      "0.1": {
+        "ic": 1.04915069450823,
+        "rho": 1.0233321233845596
+      },
+      "1": {
+        "ic": 1.9072838193057635,
+        "rho": 1.860350427603571
+      }
+    },
+    "order_holds_across_band": true
+  }
+}

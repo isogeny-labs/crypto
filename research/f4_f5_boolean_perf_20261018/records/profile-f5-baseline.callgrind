@@ -1,0 +1,31 @@
+# callgrind format
+version: 1
+creator: callgrind-3.19.0
+pid: 22
+cmd:  /tmp/boolean-perf-baseline --arm matrix-f5 --profile 1
+part: 2
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 183292156 - 183292158
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 18446744073103480448
+
+
+ob=(1) /tmp/boolean-perf-baseline
+fl=(1) ???
+fn=(610) f4_f5_boolean_perf::profile_stop
+0 10
+
+fn=(2) f4_f5_boolean_perf::main
+cfn=(610)
+calls=0 0 
+0 10
+
+totals: 10

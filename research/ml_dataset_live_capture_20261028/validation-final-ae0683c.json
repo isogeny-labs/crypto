@@ -1,0 +1,73 @@
+{
+  "schema": "crypto.ml-dataset.software-validation/v1",
+  "recorded_utc": "2026-10-28T11:16:38Z",
+  "kind": "software-validation-only",
+  "source_commit": "ae0683c2edeee9066d696af9d0ca3e41ad9c4a24",
+  "source_was_clean_before_build": true,
+  "rust_toolchain": "1.98.0",
+  "crypto_binary_sha256": "f91def741dcddc6c5a39609c4b916d0210c8b30342c20e4552a9b145f474a82a",
+  "checks": {
+    "release_build": "passed",
+    "dataset_library": {
+      "passed": 116,
+      "failed": 0,
+      "ignored": 1
+    },
+    "store_library": {
+      "passed": 46,
+      "failed": 0
+    },
+    "dataset_cli": {
+      "passed": 7,
+      "failed": 0
+    },
+    "store_cli": {
+      "passed": 5,
+      "failed": 0
+    },
+    "strict_clippy_release": "passed",
+    "scoped_rustfmt": "passed; installed stable formatter, Rust1.98 compiler",
+    "dataset_and_generate_help": "passed"
+  },
+  "full_library": {
+    "source_commit": "c87174cddc02a47da0fdac7312e955db599bd1b2",
+    "first_run": {
+      "passed": 5121,
+      "failed": 1,
+      "ignored": 123
+    },
+    "failure": "Existing WDSAT empty-child test exceeded its 2000ms timeout on a shared host",
+    "isolated_same_binary_rerun": "passed in 0.06s",
+    "full_retry": "The c871 retry completed5119passed/3failed/123ignored; all3ENOENT self-relaunch failures passed individually on the fixed final-source binary",
+    "changes_since_test_source": "CLI tests and documents, plus snapshot predecessor match rewritten as a guarded match for Clippy; current focused tests cover that final source",
+    "final_run": {
+      "source_commit": "ae0683c2edeee9066d696af9d0ca3e41ad9c4a24",
+      "passed": 5122,
+      "failed": 0,
+      "ignored": 123,
+      "duration_seconds": 1346.07,
+      "binary_sha256": "a8aa98c49fdac3d42a24e0a0ddfb38b413ababda23744897b6249289d34823b6",
+      "stable_binary_copy": true,
+      "rayon_threads": 16,
+      "test_threads": 1
+    }
+  },
+  "claims": {
+    "complete_full_suite_pass": true,
+    "actual_cloud_dataset_worker_verified": false,
+    "s3_dataset_roundtrip_verified": false,
+    "solver_memory_recovery_verified": false,
+    "scientific_result": false,
+    "corpus_complete": false,
+    "accountwide_dollar_budget_enforced": false
+  },
+  "scope": "Partial artifact capture and restore, cumulative per-command S3 admission, native CLI process fixtures. No crypto experiment is launched by these tests.",
+  "limitations": [
+    "CLI fixtures use a local directory remote and reject any accidental AWS command",
+    "Worker S3 grant is awaiting human approval",
+    "Independent durable mounted quota authority has not been deployed",
+    "USD100-200 total through tomorrow, ceiling200, remains the campaign budget; counters do not constitute actual billing",
+    "Inherited producer fixes at0f55 remain unlanded and must be reconciled with PR2756 before a main merge"
+  ],
+  "prior_software_archive": "s3://setec-astronomy-artifacts/ml-dataset/20261028/software/live-artifacts/c484c30d6dae5ce391321deaf29c77c8d3743a9779ebc1664a4063ed60d05b30/validation.tar.gz"
+}

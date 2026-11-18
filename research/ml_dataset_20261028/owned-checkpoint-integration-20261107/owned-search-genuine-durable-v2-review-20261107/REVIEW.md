@@ -1,0 +1,13 @@
+# Genuine durable composition v2 review
+
+Independent read-only review, 2026-11-07. This separate supplement preserves frozen v1 and its review. No remaining blocking issue identified at the controlled software-fixture scope. Final fixture is1256420;1255627 was an earlier same-result attempt.
+
+The v1 readback admission limitation is corrected: before dropping the emitter and before fresh verification/filesystem reads/concatenation, the fixture derives its quote from retained head.byte_end4258, known payload bytes30893 and8records. It reserves2380736work and1578600bytes on the same real Budget. Fresh capture limits are tightened to those sizes/counts; concatenated snapshot length is checked and the same original deadline is checked before decoder/descent/semantic replay. Independent arithmetic recomputation matches both quotes. No ledger/deadline reset was introduced.
+
+Only durable_tests.rs and harness.rs differ among Rust files from the reviewed v1 packet; production provenance, arithmetic, capture, storage, publication and Budget files remain unchanged. Actual supplied-Original map construction/import/expansion feeds actual first-node callback and actual durable publication, then decoder/descent/semantic verification again reports12committed rows. Final Budget remains Matrix, stoppedNone,8464835checking work,23047139adapter bytes and198772trace bytes within original ceilings. These are modeled reservations, not execution counts or resident-memory measurements.
+
+Fresh reviewer artifact checks on1256420 verify all8event sequence positions, predecessor hashes after the first event, all payload hashes/sizes, terminal event hash, and4258byte event stream against head.byte_end. Payload total is30893bytes. No mathematical test rerun was performed by reviewer; the saved run asserts successful descent and12row replay.
+
+Remaining scope is explicit: fixture normalization uses stdsort with supplied cursor; batch_rows128 differs from production policy1. Map role is fixture full JSON, original-cell/source identities are synthetic, and actual full OriginalOwner/production policy/central admission is not exercised. fs::read after capture verification remains ordinary fixture I/O, not a production reader hardened against concurrent file growth or replacement. The readback call does not add an explicit expected-retained-head equality gate; this is a controlled immutable local fixture, not adversarial revalidation evidence. None of these limitations erase the genuine arithmetic-to-durable-replay result at its stated scope.
+
+No new execution/build, cloud operation, repository edit or source change occurred during this review.
