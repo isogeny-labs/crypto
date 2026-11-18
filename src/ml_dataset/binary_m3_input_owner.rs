@@ -2,7 +2,7 @@
 use super::*;
 use sha2::Digest;
 
-pub(super) struct InputBytes {
+pub(in crate::ml_dataset::solvers) struct InputBytes {
     bytes: Vec<u8>,
     identity: Option<Identity>,
 }

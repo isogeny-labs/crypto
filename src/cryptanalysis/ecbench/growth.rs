@@ -200,7 +200,7 @@ mod tests {
     }
 
     /// Records a growth dataset for the research-visuals growth figure: the
-    /// measured degree of regularity and solving degree of the regular sequence
+    /// computed staircase extinction and solving degree of the regular sequence
     /// {x_i^2 - 1 : i < n} over F_101, swept over n = 2..6 variables, with the
     /// growth-rate fits of each metric against n. No-op unless
     /// `ECBENCH_GROWTH_OUT` names an output path. The engine measures the
@@ -215,7 +215,7 @@ mod tests {
         let mut rows = Vec::new();
         for n in 2..=6usize {
             // x_i^2 - 1 for each i: a regular sequence of n quadrics in n vars,
-            // whose degree of regularity is n + 1.
+            // whose computed staircase expires in degree n + 1.
             let input: Vec<Poly> = (0..n)
                 .map(|i| {
                     let mut sq = vec![0u32; n];
@@ -224,11 +224,11 @@ mod tests {
                 })
                 .collect();
             let mut opts = F4Options::new(Ordering::Grevlex, n as u32 + 3);
-            opts.record_degree_falls = true;
+            opts.record_hilbert_diagnostics = true;
             let r = f4_fp::f4(&input, n, p, &opts);
-            rows.push((n, r.degree_of_regularity_observed, r.solving_degree));
+            rows.push((n, r.staircase_extinction_degree, r.solving_degree));
         }
-        let dreg_pts: Vec<(f64, f64)> = rows
+        let extinction_pts: Vec<(f64, f64)> = rows
             .iter()
             .filter_map(|(n, d, _)| d.map(|d| (*n as f64, f64::from(d))))
             .collect();
@@ -237,17 +237,17 @@ mod tests {
             .map(|(n, _, s)| (*n as f64, f64::from(*s)))
             .collect();
         let dataset = serde_json::json!({
-            "schema": "ecbench.growth-dataset/v1",
+            "schema": "ecbench.growth-dataset/v2",
             "field": p,
             "family": "regular sequence {x_i^2 - 1}, n = 2..6 variables over F_101",
             "metric_x": "n_vars",
             "points": rows.iter().map(|(n, d, s)| serde_json::json!({
                 "n_vars": n,
-                "degree_of_regularity_observed": d,
+                "staircase_extinction_degree": d,
                 "solving_degree": s,
             })).collect::<Vec<_>>(),
             "fits": {
-                "degree_of_regularity_vs_n": fit_all(&dreg_pts),
+                "staircase_extinction_vs_n": fit_all(&extinction_pts),
                 "solving_degree_vs_n": fit_all(&sdeg_pts),
             },
         });

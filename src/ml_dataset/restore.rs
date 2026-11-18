@@ -299,7 +299,28 @@ fn activate(source: &Path, destination: &Path) -> Result<(), String> {
     storage::sync_directory(source.parent().ok_or("staging cell has no parent")?)
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(target_os = "macos")]
+fn activate(source: &Path, destination: &Path) -> Result<(), String> {
+    use std::os::unix::ffi::OsStrExt;
+    let source_c =
+        std::ffi::CString::new(source.as_os_str().as_bytes()).map_err(|e| e.to_string())?;
+    let destination_c =
+        std::ffi::CString::new(destination.as_os_str().as_bytes()).map_err(|e| e.to_string())?;
+    // Darwin's exclusive atomic rename preserves the same no-replacement
+    // boundary as Linux renameat2(RENAME_NOREPLACE), including directories.
+    let result =
+        unsafe { libc::renamex_np(source_c.as_ptr(), destination_c.as_ptr(), libc::RENAME_EXCL) };
+    if result != 0 {
+        return Err(format!(
+            "activate restored cell without replacement: {}",
+            std::io::Error::last_os_error()
+        ));
+    }
+    storage::sync_directory(destination.parent().ok_or("cell has no parent")?)?;
+    storage::sync_directory(source.parent().ok_or("staging cell has no parent")?)
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]
 fn activate(_source: &Path, _destination: &Path) -> Result<(), String> {
     Err(
         "atomic dataset restore activation currently requires Linux renameat2(RENAME_NOREPLACE)"
@@ -684,6 +705,36 @@ mod tests {
             fs::write(&receipt_path, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
             (receipt_path, receipt)
         }
+    }
+
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[test]
+    fn activation_never_replaces_even_an_empty_destination() {
+        let root = std::env::temp_dir().join(format!(
+            "restore-exclusive-{}-{}",
+            std::process::id(),
+            crate::ml_dataset::unix_nanos().unwrap()
+        ));
+        fs::create_dir(&root).unwrap();
+        let source = root.join("source");
+        let destination = root.join("destination");
+        fs::create_dir(&source).unwrap();
+        fs::write(source.join("retained"), b"original retained bytes").unwrap();
+        fs::create_dir(&destination).unwrap();
+        assert!(activate(&source, &destination).is_err());
+        assert!(source.is_dir() && destination.is_dir());
+        assert_eq!(
+            fs::read(source.join("retained")).unwrap(),
+            b"original retained bytes"
+        );
+        fs::remove_dir(&destination).unwrap();
+        activate(&source, &destination).unwrap();
+        assert!(!source.exists());
+        assert_eq!(
+            fs::read(destination.join("retained")).unwrap(),
+            b"original retained bytes"
+        );
+        fs::remove_dir_all(root).unwrap();
     }
 
     impl Drop for Fixture {
