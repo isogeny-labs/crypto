@@ -74,7 +74,7 @@ jobs:
           set -euo pipefail
           MANIFEST=native-pinned/research/prime31_ic_20261115/native/Cargo.toml
           # Ensure both examples are built before timing either order.
-          cargo +1.100.0 build --locked --release --examples --manifest-path "$MANIFEST"
+          cargo +1.100.0 build --locked --release --example prime31_weighted_m6_complete --example prime31_weighted_m6_batch --manifest-path "$MANIFEST"
           for arm in prime31_weighted_m6_complete prime31_weighted_m6_batch prime31_weighted_m6_batch prime31_weighted_m6_complete; do
             case "$arm" in
               prime31_weighted_m6_complete) label=scalar ;;
