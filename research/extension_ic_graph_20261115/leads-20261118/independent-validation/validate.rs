@@ -8,7 +8,7 @@
 //!
 //! Subcommands (every key read is required; a missing key aborts):
 //!   ec PUBLIC_JSON SCALAR...        elliptic relation Q = [d]G, ord G = L
-//!   nagao SUMMARY_JSON              recompute nagao-e2e statistics from rows
+//!   nagao SUMMARY_JSON FLOW_JSON    recompute nagao-e2e statistics from rows
 //!   run50 RUN50_DIR                 reprice run50 phases, recompute deltas
 //!   descent RUN50_DIR DF_DIR        recompute descent-finder breakdown/compare
 //!   rows SUMMARY_JSON < ROWS.jsonl  aggregate traced per-residual rows
@@ -736,7 +736,7 @@ fn cmd_nagao(args: &[String]) {
     r.check("all_valid_and_isolation_admitted", all_valid, String::new());
     r.check("ic_residuals_1506_rho_null", residuals_ok, String::new());
     r.check("single_recorded_scalar", scalars.len() == 1, format!("{:?}", scalars));
-    let outer = 1311.20168185f64;
+    let outer = load(&args[1]).k("outer_seconds").f();
     r.note("sum_of_24_walls_vs_runner_outer", format!("{total_wall:.3} s of 24 walls; results/flow.json outer_seconds {outer}; slack {:.3} s", outer - total_wall));
     for (rd, arms) in &order {
         r.note(&format!("measurement_round_{rd}_order"), arms.join(","));
@@ -803,8 +803,8 @@ fn cmd_nagao(args: &[String]) {
         let exact = exact_boot(&ratios);
         let nn = exact.len();
         // percentile rule of the producer's analyzer applied to the exact distribution
-        let elo = exact[(0.025 * nn as f64).floor() as usize - 1 + 1 - 1];
-        let ehi = exact[(0.975 * nn as f64).floor() as usize - 1];
+        let elo = exact[((0.025 * nn as f64).ceil() as usize) - 1];
+        let ehi = exact[((0.975 * nn as f64).ceil() as usize) - 1];
         let (lo_lt, lo_le) = rank_of(&exact, blo);
         let (hi_lt, hi_le) = rank_of(&exact, bhi);
         r.check(
