@@ -506,15 +506,17 @@ Pair-table and two-sign x3 outputs agreed. Linux's
 `perf_event_open(PERF_TYPE_SOFTWARE, PERF_COUNT_SW_TASK_CLOCK)`
 **was available locally**, and was read with explicit
 `PERF_EVENT_IOC_RESET/ENABLE/DISABLE` around each timed arm.
-The two runs below report nine-plus-run medians, in nanoseconds of
-process CPU task-clock per operation:
+These two independently executed trials report medians of 13
+alternated before/after samples per arm, in nanoseconds of process
+CPU task-clock per operation. Per-operation denominators count all
+104 pair-table calls in each repetition (the number varies by row):
 
 | Local perf task-clock | Before (ns/op) | After (ns/op) | Speedup |
 |---|---:|---:|---:|
-| Pair-table run, run A | 468.460 | 447.343 | **1.047x** |
-| Pair-table run, run B | 515.511 | 495.590 | **1.040x** |
-| 2-sign x3, run A | 7.743 | 7.386 | **1.048x** |
-| 2-sign x3, run B | 7.659 | 7.080 | **1.082x** |
+| Pair-table run, run A | 373.691 | 356.885 | **1.047x** |
+| Pair-table run, run B | 361.579 | 342.341 | **1.056x** |
+| 2-sign x3, run A | 7.600 | 7.127 | **1.066x** |
+| 2-sign x3, run B | 7.758 | 7.242 | **1.071x** |
 
 The local mirror includes inversion and the same Fp64 operations but
 is **not a checkout of the repository header**, so the actual-header
