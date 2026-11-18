@@ -19,7 +19,7 @@ These toy parameters exercise arithmetic and recovery only; the tiny subgroup is
 
 ## Committed test and exact expected counters
 
-File: [`tests/prime_cover_toy_complete_dlp.rs`](../../../../tests/prime_cover_toy_complete_dlp.rs).
+File: [`tests/prime_cover_toy_complete_dlp.rs`](../../../tests/prime_cover_toy_complete_dlp.rs).
 
 For all 43 public targets `Q=[k]G`, including infinity, the test obtains `k` from **only** `G,Q,43` inside each solver. It asserts target reconstruction, source-Jacobian reconstruction, the norm result `pi_*pi^*(Q)=[2]Q`, and cross-arm agreement. For every target the generator and target are re-pulled, so there is no shared precomputed Jacobian generator across test targets.
 
