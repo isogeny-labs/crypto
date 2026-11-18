@@ -22,3 +22,22 @@ in the current commit's full Git history, blob
 1,798,468 bytes.
 
 These are retained historical inputs, not newly generated measurements.
+
+## Shallow CI checkouts (2026-11-18)
+
+CI checkouts are shallow (`fetch-depth: 1` or `2`), so the full-history
+search in `pull` cannot see the commits that moved files into the store,
+and every S3-free pull in `curve-names`, `claim-corpus` and
+`validation-gate` failed with "no Git-history object matches manifest
+SHA-256". Of the 782 store entries those workflows pull, 623 (615 distinct
+digests) were committed to Git before they were moved; each is mapped here
+to the historical blob that holds its exact bytes, found at the moving
+commit's parent (or at the commit that added its manifest). Every blob was
+checked for the manifest's byte count and SHA-256 before it was listed, and
+`pull` checks them again on every read. A partial clone
+(`filter: blob:none`) fetches the blobs from its promisor remote on demand.
+No manifest digest was changed.
+
+The other 159 entries, all pulled by `validation-gate`, were never committed
+to Git: their manifests were added in the same commit as the rest of their
+run, without the file. They still need their original store.
