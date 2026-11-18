@@ -541,10 +541,7 @@ pub fn closure_fast2(
     let mut rank_at_ir = 0usize;
     stats.setup_s = started.elapsed().as_secs_f64();
     let dense = (opts.dense_num, opts.dense_den);
-    'outer: loop {
-        let Some(b) = queue.iter().position(|q| !q.is_empty()) else {
-            break;
-        };
+    'outer: while let Some(b) = queue.iter().position(|q| !q.is_empty()) {
         if started.elapsed() > limits.budget {
             let entries: u64 = ech
                 .iter()
