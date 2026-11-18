@@ -33,7 +33,16 @@ Source-specific GitHub Actions #44267027887 passed **40/40 pinned Rust release l
 
 At #44267027887, original then candidate: 1.958401 ms versus 1.731094 ms. Candidate then original: 1.739230 ms versus 1.915181 ms. At previous #44266787518 the first candidate invocation had an inconsistent cold 2.892690 ms versus 1.957223 ms; reversed order was 1.680293 versus 1.885181 ms. Therefore single-pair timing is sensitive to warmup/host variance; **do not cherry-pick a wall-time advantage**.
 
-A 12-pair alternating-order same-host diagnostic was subsequently added. Its initial source-specific run #44267163834 failed *at compile time* due to a `serde_json::json!` macro recursion limit from the expanded transcript; no scientific outcome was emitted. A crate recursion-limit fix was committed and the final 12-pair exact-source run is pending. The earlier verified mathematical/counter result is unaffected.
+A 12-pair alternating-order fixed-corpus diagnostic was subsequently added and **passed** on exact-source [GitHub Actions #44267376366](https://github.com/isogeny-labs/crypto/actions/runs/44267376366). Every repetition checked all 256 recovered public preimages and reproduced the exact multiplication/inversion counters. The median of 12 sequential same-host repetitions was:
+
+| Matched 256-target stage | Median elapsed | First/last across 12 |
+|---|---:|---:|
+| Pointwise Euclidean Frobenius gcd | **1.809338 ms** | 1.803112–1.852948 ms |
+| Fraction-free batched pseudo-gcd | **1.479713 ms** | 1.472264–1.494544 ms |
+
+**Observed stage advantage: 1.22276× (18.22% lower median duration).** The complete per-repetition timing arrays are emitted in the exact-source workflow log and retained raw artifact. The pairs alternate original→batch and batch→original; all 12 repeated candidate timings were lower than the corresponding original pointwise times. This is an L0 same-runner component timing, not isolated HPC/L2 or complete prime-field ECDLP timing; it has no credible asymptotic extrapolation.
+
+Initial repeated-timing run #44267163834 failed *only at compile time* because of the expanded `serde_json::json!` recursion limit, before scientific execution. Commit `b7833bd5` fixed that compiler limit. Run #44267376366 passed 40/40 pinned Rust release library tests, 2/2 focused example tests, and a **separately authored Python BigInt replay** including independently recomputed polynomial pseudo-gcd roots for all 256 public points, 256 Vélu checks, and 512 caller-only scalar equalities. This is not an independently signed PCC.
 
 ## Prior-lead audit
 
@@ -60,3 +69,9 @@ Related literature: Amadori–Pintore–Sala (2018), DOI https://doi.org/10.1016
 5. **Native E' factor base (secondary):** compare native first-x31 E' versus transported source base with exact coverage/rank; do not infer improvement from isogeny itself.
 
 No paid EKS compute was launched. All work here was in the existing Rust and GitHub Actions development gate. Avoid claiming a faster complete solver until one of the nonenumerative relation branches passes items 1–4.
+
+## Frozen trace and scope
+
+- Source-specific passing [Actions run #44267376366](https://github.com/isogeny-labs/crypto/actions/runs/44267376366) (12 matched alternating pairs), and earlier independent [Actions run #44267027887](https://github.com/isogeny-labs/crypto/actions/runs/44267027887).
+- The exact public-target transcript and independent replay are uploaded as workflow artifacts `prime31-frobenius-inverse-exact`; the same JSON is regenerated from source rather than hand-constructed. Candidate is on crypto PR #4701, with all changes additive to the previous exact inverse.
+- Pre-registered [protocol](PRIME31_FROBENIUS_PSEUDOGCD_BATCH_PROTOCOL_20261118.md). Numerical speedup refers **only** to 256 batched public isogeny inverses, not relation finding, matrix solution or unknown logarithms.
