@@ -1,0 +1,71 @@
+name: Prime31 B27 B29 B31 256Q charged complete Rust sensitivity
+on:
+  push:
+    branches: [automation/prime31-b27-b29-complete-sensitivity-20261117]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - 'research/prime31_ic_20261115/native/B27_B29_B31_FULL_COST_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-b27-b29-b31-full-cost.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - '.github/workflows/prime31-b27-b29-b31-full-cost.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prime31-bsize-full-cost:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout candidate exact Rust example
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout pinned original Rust native crate and arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust compiler
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay candidate only, preserving pinned original arithmetic
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Native Rust 40-test library regression
+        run: cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Source-specific actual-curve B27/B29/B31 full rank and 256Q blinded solves
+        shell: bash
+        run: |
+          set -o pipefail
+          timeout -k 10 1200 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle actual_prime31_b27_b29_b31_256q_complete_cost -- --nocapture --test-threads=1 2>&1 | tee prime31-b27-b29-b31-full-cost.log
+      - name: Frozen correctness and interpretation gates
+        if: success()
+        shell: bash
+        run: |
+          grep -Fq 'test result: ok. 1 passed;' prime31-b27-b29-b31-full-cost.log
+          grep -Fq 'PRIME31_B27_B29_B31_COMPLETE_JSON=' prime31-b27-b29-b31-full-cost.log
+          grep -Fq '"same_public_target_count":256' prime31-b27-b29-b31-full-cost.log
+          grep -Fq '"true_sign_independent_algebraic_extraction":false' prime31-b27-b29-b31-full-cost.log
+          grep -Fq '"base_size":27' prime31-b27-b29-b31-full-cost.log
+          grep -Fq '"base_size":29' prime31-b27-b29-b31-full-cost.log
+          grep -Fq '"base_size":31' prime31-b27-b29-b31-full-cost.log
+      - name: Archive original Rust complete raw source-specific JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-b27-b29-b31-full-cost-raw
+          path: prime31-b27-b29-b31-full-cost.log
+          retention-days: 30
+          if-no-files-found: warn

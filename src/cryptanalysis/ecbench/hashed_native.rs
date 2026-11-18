@@ -498,12 +498,12 @@ mod tests {
     fn instance() -> PrimeInstance {
         PrimeInstance {
             name: "public-known-answer".into(),
+            representation: None,
             curve: PrimeCurve { p: 5, a: 2, b: 1 },
             group_order: 7,
             r: 7,
             cofactor: 1,
             generator: (0, 1),
-            representation: None,
         }
     }
     fn stable(report: &SolveReport) -> serde_json::Value {

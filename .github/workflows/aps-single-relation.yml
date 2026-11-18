@@ -52,7 +52,10 @@ jobs:
     name: rust (${{ matrix.lane }})
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 25
+    # A cold release build of the lib-test target exceeds 25 min on a
+    # 2-core runner, and a timed-out job never saves its cache, so every
+    # run would stay cold. Same tests; only the compile budget changes.
+    timeout-minutes: 50
     strategy:
       fail-fast: false
       matrix:
