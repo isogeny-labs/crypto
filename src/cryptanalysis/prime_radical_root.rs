@@ -216,10 +216,6 @@ impl Fq2 {
             _ => f.mul(self.n, x),
         }
     }
-    #[inline]
-    fn norm(&self, x: (u64, u64)) -> u64 {
-        self.f.sub(self.f.sqr(x.0), self.mul_nonresidue(self.f.sqr(x.1)))
-    }
 }
 impl Ring for Fq2 {
     type E = (u64, u64);
@@ -288,7 +284,7 @@ impl Ring for Fq2 {
         let lo = (e % p) as u64;
         let hi = (e / p) as u64;
         let f = &self.f;
-        let norm = self.norm(x);
+        let norm = f.sub(f.sqr(x.0), f.mul(self.n, f.sqr(x.1)));
         if lo == hi {
             return (f.powm(norm, lo), 0);
         }
@@ -800,7 +796,7 @@ impl RadicalRootCtx {
                     Some(u) => u,
                 };
                 // 1/u = conj(u)/N(u)
-                let nrm = self.cube_q.r.norm(u);
+                let nrm = f.sub(f.sqr(u.0), f.mul(self.n, f.sqr(u.1)));
                 let ni = f.inv(nrm);
                 let uinv = (f.mul(u.0, ni), f.mul(f.neg(u.1), ni));
                 let v = (f.mul(m, uinv.0), f.mul(m, uinv.1));
@@ -1071,8 +1067,6 @@ mod tests {
                 let b = state % p;
                 let x = (a,b);
                 assert_eq!(q.cube(x), q.mul(x, q.sqr(x)), "cube p={p}");
-                let old_norm = ctx.f.sub(ctx.f.sqr(a), ctx.f.mul(ctx.n, ctx.f.sqr(b)));
-                assert_eq!(q.norm(x), old_norm, "norm p={p}");
             }
         }
         for p in [13u64, 29, 101, 1_000_037, 536_870_909,
@@ -1159,9 +1153,6 @@ mod tests {
             paired(&format!("p={p} seven fp2 cubes"), &xs, 25,
                    |mut x| { for _ in 0..7 { x=q.mul(x,q.sqr(x)); } x.0 ^ x.1 },
                    |mut x| { for _ in 0..7 { x=q.cube(x); } x.0 ^ x.1 });
-            paired(&format!("p={p} fp2 norm"), &xs, 120,
-                   |x| q.f.sub(q.f.sqr(x.0), q.f.mul(q.n, q.f.sqr(x.1))),
-                   |x| q.norm(x));
         }
         // Complete Fp2 AMM root extraction, old generic cubing vs new formula.
         for p in [487u64, 17_497, 1_000_000_009] {
