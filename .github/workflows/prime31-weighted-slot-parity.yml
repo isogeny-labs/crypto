@@ -26,6 +26,7 @@ jobs:
           sparse-checkout: |
             research/prime31_ic_20261115/native/examples/prime31_weighted_slot_parity.rs
             research/prime31_ic_20261115/native/verify_prime31_weighted_slot_parity.py
+            research/prime31_ic_20261115/native/PRIME31_WEIGHTED_SLOT_PARITY_WITNESSES_20261118.json
             research/prime31_ic_20261115/native/PRIME31_WEIGHTED_SLOT_PARITY_PROTOCOL_20261118.md
           sparse-checkout-cone-mode: false
       - name: Checkout pinned original Prime31 Rust arithmetic
@@ -82,7 +83,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 research/prime31_ic_20261115/native/verify_prime31_weighted_slot_parity.py prime31-weighted-slot-parity.json | tee prime31-weighted-slot-parity-independent.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_weighted_slot_parity.py prime31-weighted-slot-parity.json research/prime31_ic_20261115/native/PRIME31_WEIGHTED_SLOT_PARITY_WITNESSES_20261118.json | tee prime31-weighted-slot-parity-independent.json
       - name: Retain complete original-curve parity evidence
         if: always()
         uses: actions/upload-artifact@v4
