@@ -787,7 +787,8 @@ fn berlekamp_massey<S: RhoScalar>(s: &[S], m: S, ops: &mut u64) -> Vec<S> {
 /// a solution is accepted only when a second solve under an independent
 /// seed returns the same vector: for a rank-deficient system the two
 /// differ by a random kernel element except with probability about
-/// `1/r`.  Both solves are charged.  Until then [`RelationSolver::rank`]
+/// `1/r`.  Both solves are charged; the filter, which does not depend
+/// on the seed, runs once for the pair.  Until then [`RelationSolver::rank`]
 /// reports `min(rows, cols − 1)`, a placeholder rather than a rank (the
 /// method tracks none); at acceptance it is `cols` and the rows beyond
 /// it are counted as dependent.
@@ -888,28 +889,33 @@ impl SparseCado {
             return;
         }
         st.next_attempt = rows + (self.cols / 32).max(1);
-        let solve = |seed: u64, st: &mut SparseCadoState| {
-            let opts = SparseSolveOptions {
-                filter: self.filter,
-                solver: self.core,
-                seed,
-                ..SparseSolveOptions::default()
-            };
-            st.attempts += 1;
-            let (outcome, report) = st.rows.solve(self.cols, &opts);
-            st.row_ops += report.row_ops;
-            outcome
+        let opts = SparseSolveOptions {
+            filter: self.filter,
+            solver: self.core,
+            seed: 0x5350_4152_5345_4341,
+            ..SparseSolveOptions::default()
         };
-        let first = match solve(0x5350_4152_5345_4341, st) {
-            SparseSolveOutcome::Solved(x) => x,
-            SparseSolveOutcome::Undetermined => return,
-            SparseSolveOutcome::Inconsistent => {
+        // Both solves see the same rows, and the filter does not depend on
+        // the seed: it runs once, and the second solve (only tried when the
+        // first returns a solution) reuses its core under its own seed.
+        let solves = st.rows.solve_seeds(
+            self.cols,
+            &opts,
+            &[opts.seed, 0x4345_5254_4946_5932 ^ rows as u64],
+        );
+        st.attempts += solves.len() as u64;
+        st.row_ops += solves.iter().map(|(_, r)| r.row_ops).sum::<u64>();
+        let mut outcomes = solves.into_iter().map(|(o, _)| o);
+        let first = match outcomes.next() {
+            Some(SparseSolveOutcome::Solved(x)) => x,
+            Some(SparseSolveOutcome::Inconsistent) => {
                 st.inconsistent = true;
                 return;
             }
+            _ => return,
         };
-        let second = match solve(0x4345_5254_4946_5932 ^ rows as u64, st) {
-            SparseSolveOutcome::Solved(x) => x,
+        let second = match outcomes.next() {
+            Some(SparseSolveOutcome::Solved(x)) => x,
             _ => return,
         };
         if first != second {
@@ -1548,6 +1554,73 @@ mod tests {
                 );
             }
         }
+    }
+
+    /// The paired solve the deferred solvers confirm with filters once:
+    /// each outcome is exactly what an independent `solve` under that
+    /// seed returns, the first report is identical, and the second
+    /// charges the independent solve's work less the filter's.  Checked
+    /// on full-rank systems and on rank-deficient ones (rows short of
+    /// some columns' worth of information), with each core.
+    #[test]
+    fn paired_sparse_solve_reuses_the_filter_only() {
+        let modulus = 1_000_003u64;
+        let cols = 60usize;
+        let mut paired_seen = 0;
+        for trial in 0..6u64 {
+            let mut rng = StdRng::seed_from_u64(0x5EED_0000 + trial);
+            let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
+            // Odd trials leave the system a little short of full rank.
+            let count = if trial % 2 == 0 { 2 * cols } else { cols + 2 };
+            let rows = planted_rows(&mut rng, cols, count, modulus, &x);
+            let mut sparse = SparseRows::for_modulus(&BigUint::from(modulus)).unwrap();
+            for (row, rhs) in &rows {
+                let entries: Vec<(u32, BigUint)> = row
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(c, &v)| (c as u32, BigUint::from(v)))
+                    .collect();
+                sparse.push_entries(&entries, &BigUint::from(*rhs));
+            }
+            for core in [SparseCoreSolver::BlockWiedemann, SparseCoreSolver::BlockLanczos] {
+                for filter in [FilterOptions::cado(), FilterOptions::default()] {
+                    let opts = SparseSolveOptions {
+                        filter,
+                        solver: core,
+                        seed: 0x5350_4152_5345_4341,
+                        ..SparseSolveOptions::default()
+                    };
+                    let seeds = [opts.seed, 0x4345_5254_4946_5932 ^ trial];
+                    let paired = sparse.solve_seeds(cols, &opts, &seeds);
+                    let first = sparse.solve(cols, &opts);
+                    assert_eq!(paired[0], first, "trial {trial} {core:?}");
+                    let solved = matches!(first.0, SparseSolveOutcome::Solved(_));
+                    assert_eq!(paired.len(), if solved { 2 } else { 1 });
+                    if !solved {
+                        continue;
+                    }
+                    paired_seen += 1;
+                    let second = sparse.solve(
+                        cols,
+                        &SparseSolveOptions {
+                            seed: seeds[1],
+                            ..opts
+                        },
+                    );
+                    assert_eq!(paired[1].0, second.0, "trial {trial} {core:?}");
+                    assert_eq!(
+                        paired[1].1.row_ops + first.1.filter.row_ops,
+                        second.1.row_ops,
+                        "trial {trial} {core:?}: only the filter is saved"
+                    );
+                    let mut rest = paired[1].1.clone();
+                    rest.row_ops = second.1.row_ops;
+                    assert_eq!(rest, second.1, "trial {trial} {core:?}");
+                }
+            }
+        }
+        assert!(paired_seen > 0, "no paired solve was exercised");
     }
 
     /// Above 64 bits the pipeline's `u64` moduli cannot go, but the
