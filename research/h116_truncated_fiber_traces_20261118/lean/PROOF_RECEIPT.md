@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-42b403444a6de1465f0436489d76de54def3b6c6ba74bf0234b729a1ebd7c79a  H116FiberTrace.lean
+3c9d1cb6d2a80e9427340ead3a5aab9421270eb3c3a8ec6b9edbe74f97dda434  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  219 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  224 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -110,6 +110,8 @@ a04f47643f15f3f7a638952de8247f3557459ff90f164607f69112c5624cdf01  receipts/unive
 c9f870c9861c119d13611b98799f546192717f3f52c71190c251be4b4306213a  receipts/universal-resultant-bridge-audit.txt
 ef592d2dd12b3d0310ff9033bb2993d5878ac904ee662c8382ecd68b964512f6  receipts/kummer-parity-obstruction-build.txt
 11c05abc769c4c504f62feba348545ac6860ef49b1815922ab5882e1d38bc147  receipts/kummer-parity-obstruction-audit.txt
+328a4a8605bdcfad301e811912c4edaef1cc91602cf9d128b2e282398ecd0dd8  receipts/division-torsor-cocycle-build.txt
+5627e74bd114ce1566597d258e9039a7f36965c25daf49aaa15b116fa315a572  receipts/division-torsor-cocycle-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.

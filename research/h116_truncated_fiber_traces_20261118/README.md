@@ -538,3 +538,13 @@ scores 812/1,520, but 2,284/4,096 shuffled family maxima are at least as large
 (`p=0.557725`), and no rule is exact.  The next lead leaves quadratic
 characters for a selected `[2]`-division torsor Frobenius cocycle with an
 explicit cohomological constancy control. [pcc:unverified]
+
+The frozen [division-torsor test](DIVISION_TORSOR_FROBENIUS_EXPERIMENT.md)
+passes 7,600 algebraic checks and its planted scorer, but every degree-three
+splitting-field selector chooses the rational half.  Its cocycle is zero, the
+retained constant map scores exactly 760/1,520, and family-wise `p=1`.  The
+[Lean proof](DIVISION_TORSOR_FROBENIUS_PROOF.md) proves that fixed translation
+leaves the full cocycle multiset unchanged and that selecting the fixed point
+forces zero; the 224-theorem audit has no failures or trusted decisions.  The
+next lead tests the first p-adic carry of a canonical lift, with anomalous
+Smart quotient as a positive control. [pcc:unverified]

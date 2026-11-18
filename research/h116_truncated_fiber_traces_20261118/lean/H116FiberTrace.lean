@@ -4754,6 +4754,50 @@ theorem rationalMap_separation_strict_control :
     norm_num at this
   · norm_num [Polynomial.natDegree_sub_eq_left_of_natDegree_lt]
 
+/-- Translating an `n`-torsion point by one supplied division point remains
+in the same multiplication fiber. -/
+theorem divisionFiber_of_torsionTranslate
+    {G : Type*} [AddCommGroup G] (n : ℕ) {Q R T : G}
+    (hR : n • R = Q) (hT : n • T = 0) :
+    n • (R + T) = Q := by
+  rw [nsmul_add, hR, hT, add_zero]
+
+/-- The difference of two points in one multiplication fiber is torsion. -/
+theorem divisionFiber_difference_is_torsion
+    {G : Type*} [AddCommGroup G] (n : ℕ) {Q R S : G}
+    (hR : n • R = Q) (hS : n • S = Q) :
+    n • (S - R) = 0 := by
+  rw [nsmul_sub, hS, hR, sub_self]
+
+/-- Translation by a Frobenius-fixed point leaves the additive connecting
+cocycle `sigma(S)-S` unchanged. -/
+theorem frobeniusCocycle_fixedTranslate
+    {G : Type*} [AddCommGroup G] (sigma : G →+ G) {R : G}
+    (hR : sigma R = R) (T : G) :
+    sigma (R + T) - (R + T) = sigma T - T := by
+  rw [map_add, hR]
+  abel
+
+/-- The complete cocycle multiset on a translated torsion multiset is
+independent of the fixed translate, including all multiplicities. -/
+theorem frobeniusCocycle_multiset_translate
+    {G : Type*} [AddCommGroup G] (sigma : G →+ G)
+    (torsion : Multiset G) {R : G} (hR : sigma R = R) :
+    torsion.map (fun T => sigma (R + T) - (R + T)) =
+      torsion.map (fun T => sigma T - T) := by
+  have hfun : (fun T : G => sigma (R + T) - (R + T)) =
+      (fun T : G => sigma T - T) := by
+    funext T
+    exact frobeniusCocycle_fixedTranslate sigma hR T
+  rw [hfun]
+
+/-- Selecting the fixed rational division point itself makes its Frobenius
+cocycle identically zero. -/
+theorem fixedPoint_frobeniusCocycle_zero
+    {G : Type*} [AddCommGroup G] (sigma : G →+ G) {R : G}
+    (hR : sigma R = R) : sigma R - R = 0 := by
+  exact sub_eq_zero.mpr hR
+
 #print axioms logDeriv_mul
 #print axioms logDeriv_finset
 #print axioms logDeriv_div
@@ -4950,5 +4994,10 @@ theorem rationalMap_separation_strict_control :
 #print axioms fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms rationalMap_eq_of_eval_finset
 #print axioms rationalMap_separation_strict_control
+#print axioms divisionFiber_of_torsionTranslate
+#print axioms divisionFiber_difference_is_torsion
+#print axioms frobeniusCocycle_fixedTranslate
+#print axioms frobeniusCocycle_multiset_translate
+#print axioms fixedPoint_frobeniusCocycle_zero
 
 end H116FiberTrace
