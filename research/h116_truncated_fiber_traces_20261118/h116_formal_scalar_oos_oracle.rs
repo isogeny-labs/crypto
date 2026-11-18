@@ -611,7 +611,7 @@ fn run_cell(spec: CurveSpec) -> Result<String, String> {
 
     Ok(format!(
         concat!(
-            "{{\"slug\":\"{}\",\"p\":{},\"r\":{},\"trace\":{},",
+            "{{\"slug\":\"{}\",\"status\":\"pass\",\"p\":{},\"r\":{},\"trace\":{},",
             "\"extension_degree\":{},\"admitted_a\":{},\"admitted_b\":{},",
             "\"admitted_j\":{},\"source_a\":{},\"source_b\":{},",
             "\"source_j\":{},\"models_examined\":{},\"states_examined\":{},",
@@ -652,12 +652,41 @@ fn run_cell(spec: CurveSpec) -> Result<String, String> {
 }
 
 fn run() -> Result<(), String> {
-    let mut cells = Vec::new();
-    for spec in PANEL {
-        cells.push(run_cell(spec)?);
+    // The v1 source already exhausted the first frozen selector cell and
+    // retained its failure before this continuation source was written. Do not
+    // rerun or replace it; attempt each remaining frozen cell exactly once.
+    let mut cells = vec![format!(
+        concat!(
+            "{{\"slug\":\"{}\",\"status\":\"failure\",",
+            "\"stage\":\"selection\",\"models_examined\":11449,",
+            "\"map_constructed\":false,",
+            "\"error\":\"selection_failure for {}\",",
+            "\"disposition\":\"retained-no-replacement-no-rerun\"}}"
+        ),
+        PANEL[0].slug, PANEL[0].slug
+    )];
+    for spec in PANEL.into_iter().skip(1) {
+        match run_cell(spec) {
+            Ok(cell) => cells.push(cell),
+            Err(error) => {
+                let stage = if error.starts_with("selection_failure") {
+                    "selection"
+                } else {
+                    "oracle"
+                };
+                cells.push(format!(
+                    concat!(
+                        "{{\"slug\":\"{}\",\"status\":\"failure\",",
+                        "\"stage\":\"{}\",\"error\":\"{}\",",
+                        "\"disposition\":\"retained-no-replacement\"}}"
+                    ),
+                    spec.slug, stage, error
+                ));
+            }
+        }
     }
     println!(
-        "{{\"schema\":\"h116.formal-scalar-oos-oracle/v1\",\"protocol_id\":\"H116-FORMAL-SCALAR-OOS-001\",\"cells\":[{}]}}",
+        "{{\"schema\":\"h116.formal-scalar-oos-oracle/v1\",\"protocol_id\":\"H116-FORMAL-SCALAR-OOS-001\",\"first_cell_retained_from_v1\":true,\"cells\":[{}]}}",
         cells.join(",")
     );
     Ok(())
