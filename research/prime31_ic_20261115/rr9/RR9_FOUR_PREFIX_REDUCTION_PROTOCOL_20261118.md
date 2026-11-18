@@ -32,7 +32,7 @@ Degree-three Lagrange interpolation makes (A) **affine-linear in just three unkn
 
 ## Complexity falsifier and follow-on gate
 
-Even a successful 4-to-3 reduction will require ((2B)^4) **signed prefix choices** unless a separate nonenumerative prefix solver is found: (8^4=4096) at B4, (16^4=65536) at B8 and (62^4=14776336) at B31. The reduction alone is not sufficient to beat the ~144ms historical 1024-target shared BSGS result: at B31, an all-prefix search would have only ~9.7ns **per branch across the entire 1024-target batch**, before F4 or verification. That is a budget implication, not a measured minimum.
+Even a successful 4-to-3 reduction will require ((2B)^4) **signed prefix choices** unless a separate nonenumerative prefix solver is found: (8^4=4096) at B4, (16^4=65536) at B8 and (62^4=14776336) at B31. The reduction alone is not sufficient to beat the ~144ms historical 1024-target shared BSGS result: at B31, a full all-prefix search on **every one of 1,024 public targets** would have a budget of only about **0.00952 ns per signed branch** (144.049 ms / (1024 × 62^4)) before F4 or verification. Even if the 144.049 ms were spent on *only one* target, the budget would be about 9.75 ns per signed branch. That is a budget implication, not a measured minimum.
 
 If the 16 fixture tests succeed, next implement **public-only** unknown-prefix selection plus a factored/saturated three-variable solve on the frozen B8 46-hit/18-miss natural corpus. Compare directly with the seven-variable RR9 solver; count all failed branches, F4 ops and memory, then B31 rank31 / 1024 blinded verified ECDLP targets and cold/cached optimized mixed-IC/BSGS/rho baselines. **No unknown public logarithm is supplied to an extractor and no generic 4+4 sum table is allowed in the candidate.**
 
@@ -45,3 +45,5 @@ If the 16 fixture tests succeed, next implement **public-only** unknown-prefix s
 - Shared research-KB MCP and EKS runner are not available in this execution; current GitHub PRs and primary paper records were consulted. No expensive compute authorized.
 
 **Prospective decision:** accept only a correct algebraic preprocessing component; advancement to B8/B31 requires natural public unknown-index extraction and full costs. Signed PCC independent verification remains a separate gate.
+
+**2026-11-18 arithmetic correction, before native evaluation:** the initial protocol divided the 1,024-target cached BSGS time by 62^4 only. The corrected per-branch budget divides by 1,024 × 62^4; this is a transparent protocol amendment, not a post-outcome selection.
