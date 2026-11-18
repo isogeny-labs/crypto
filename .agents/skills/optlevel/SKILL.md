@@ -1,11 +1,11 @@
 ---
 name: optlevel
-description: Measure how well optimized an implementation is on its machine, with `tools/optlevel/optlevel.py`. Calibrates the host's roofline (peak rate per operation class for integer, modular, XOR/popcount and float multiply-add work, memory bandwidth and latency, per core and all cores), measures a kernel's own counted operations per second (under `perf stat` when a hardware PMU exists, otherwise wall time and counters only), and writes an `optlevel.record/v1` with attainment against the roofline, parallel efficiency, an A/A noise floor, a confidence tier (T-pmu, T-timing, T-gpu-ncu, T-gpu-timing), a named limiting factor and a roofline SVG. Use when asked "how optimized is this kernel", "how much headroom is left on this machine", "is it compute or memory bound", or before deciding whether a rho walk, relation-collection loop, linear-algebra phase, closure engine or CUDA kernel is worth tuning. An optimization level is not a speed claim, not a comparison between algorithms and not a benchmark or leaderboard row.
+description: Measure how well optimized an implementation is on its machine, with the Rust tool in `tools/optlevel/` (`tools/optlevel/run.sh`). Calibrates the host's roofline (peak rate per operation class for integer, modular, XOR/popcount and float multiply-add work, memory bandwidth and latency, per core and all cores), measures a kernel's own counted operations per second (under `perf stat` when a hardware PMU exists, otherwise wall time and counters only), and writes an `optlevel.record/v1` with attainment against the roofline, parallel efficiency, an A/A noise floor, a confidence tier (T-pmu, T-timing, T-gpu-ncu, T-gpu-timing), a named limiting factor and a roofline SVG. Use when asked "how optimized is this kernel", "how much headroom is left on this machine", "is it compute or memory bound", or before deciding whether a rho walk, relation-collection loop, linear-algebra phase, closure engine or CUDA kernel is worth tuning. An optimization level is not a speed claim, not a comparison between algorithms and not a benchmark or leaderboard row.
 ---
 
 # Optimization level of a kernel
 
-`tools/optlevel/optlevel.py` answers one question: of what this machine can do
+`tools/optlevel/run.sh` (a Rust binary, built on first use) answers one question: of what this machine can do
 for the operations this kernel counts, how much does the kernel achieve, and
 what holds it back? Definitions, formulas and failure modes:
 [`docs/OPTIMIZATION_LEVEL.md`](../../../docs/OPTIMIZATION_LEVEL.md). Read its
@@ -36,20 +36,37 @@ A/A apply here too.
 
 ## 1. Probe and calibrate
 
+The tool is a Rust crate (`tools/optlevel/`, binary `optlevel`); none of it is
+Python. `tools/optlevel/run.sh` builds it with `cargo build --release` when the
+binary is missing or older than its sources, then runs it. On a host without
+cargo, copy the binary there and call it directly (or set `OPTLEVEL_BIN`): one
+x86-64 binary is correct on any x86-64 host, because the calibration kernels
+select their instruction set at run time.
+
 ```sh
-python3 tools/optlevel/optlevel.py probe
-python3 tools/optlevel/optlevel.py calibrate --out research/<study>/optlevel/calibration.json
+tools/optlevel/run.sh probe
+tools/optlevel/run.sh calibrate --out research/<study>/optlevel/calibration.json
 ```
 
 - `cpu_tier: "T-timing"` means no hardware PMU (most cloud VMs, Claude Code's
   containers). Records then carry rates, attainment, scaling and static
   vector share. **IPC, miss rates, top-down and measured memory traffic are
   null; do not estimate them.**
-- Calibration takes two to five minutes, uses every allowed CPU and several
-  GiB of memory, and compiles `tools/optlevel/kernels/optk.c` three times
-  (native, 512-bit preferred, vectorization disabled). Run nothing else
-  meanwhile. Flags `CONTENDED` or `CLOCK_UNSTABLE` in its output mean the
+- Calibration takes two to five minutes and uses every usable CPU and several
+  GiB of memory. Its kernels are inside the binary (`src/kernels.rs`: 512-bit,
+  256-bit and vectorization-free variants, chosen at run time). On a CPU
+  family not calibrated before, add `--c-kernels` once: it also builds the C
+  reference kernels (`kernels/optk.c`) with the system compiler and takes the
+  best of both, so a ceiling can only rise. Run nothing else meanwhile. Flags `CONTENDED` or `CLOCK_UNSTABLE` in its output mean the
   all-core ceilings are unreliable: recalibrate on a quiet host.
+- `probe` prints `host.usable_cpus` and why: the affinity mask cut to the
+  cgroup CPU quota (v2 `cpu.max`, v1 `cpu.cfs_quota_us`). In a container
+  allotted 6 vCPUs on a 48-core host it says 6, and the scale points follow.
+  If the allotment shows in neither interface, set `OPTLEVEL_CPUS=N`.
+- A calibration taken before 2026-11-17 used the C kernels, which read the
+  clock after every pass; its in-cache SIMD ceilings are low by 1.4 to 1.8
+  times (`research/optlevel_rs_20261117/README.md`). Recalibrate rather than
+  compare attainments across that date.
 - Calibrate and measure in the same session, on the same host, under the
   same CPU and NUMA binding. A record scored against another host's
   calibration is flagged `CALIBRATION_HOST_MISMATCH`.
@@ -73,7 +90,8 @@ bound, and the registry entry must say so. Classes: `muladd_u32`,
 `popcnt_u64`, `fma_f64`, `ptr_hop`. There is no carry-less-multiply class yet.
 
 Never edit a sibling repository to add a counter. Wrap it from your own
-directory, as `research/optlevel_20261117/real_kernel/closure_wrapper.py`
+directory, as `research/optlevel_20261117/real_kernel/closure_wrapper.py` (a wrapper in
+the language of the kernel it wraps, there a Python closure; wrap native code natively)
 does, and say what the wrapper does not count.
 
 `tools/optlevel/registry.json` lists the hot kernels of crypto, cryptanalysis
@@ -83,7 +101,7 @@ not. Add an entry when you measure a new kernel.
 ## 3. Measure
 
 ```sh
-python3 tools/optlevel/optlevel.py measure --label "<what>" --repeat 5 \
+tools/optlevel/run.sh measure --label "<what>" --repeat 5 \
   --scale env:RAYON_NUM_THREADS:1,4 --out research/<study>/optlevel/<slug>.measurement.json \
   -- target/release/examples/<bench> <args>
 ```
@@ -107,15 +125,15 @@ python3 tools/optlevel/optlevel.py measure --label "<what>" --repeat 5 \
 ## 4. Score and plot
 
 ```sh
-python3 tools/optlevel/optlevel.py score --calibration CAL.json --measurement M.json --out R.json \
+tools/optlevel/run.sh score --calibration CAL.json --measurement M.json --out R.json \
   [--topdown topdown.json] [--vector-share 0.8] [--best-known-ops N --best-known-source "..."]
-python3 tools/optlevel/optlevel.py plot --calibration CAL.json --out roofline.svg R.json [R2.json ...]
-python3 tools/optlevel/optlevel.py validate R.json
+tools/optlevel/run.sh plot --calibration CAL.json --out roofline.svg R.json [R2.json ...]
+tools/optlevel/run.sh validate R.json
 ```
 
 - `--topdown` takes `topdown.json` from `tools/profile.sh topdown` (T-pmu).
 - `--vector-share` takes the value printed by
-  `optlevel.py vector-share BINARY SYMBOL...` (static, from `objdump`).
+  `optlevel vector-share BINARY SYMBOL...` (static, from `objdump`).
 - Render a PNG beside the SVG from the same file, at 150 dpi.
 
 ## 5. Read the record
@@ -150,13 +168,23 @@ Things that are not defects of the code:
 ## 6. GPU
 
 ```sh
-python3 tools/optlevel/optlevel.py gpu probe
-python3 tools/optlevel/optlevel.py gpu calibrate --out CAL-gpu.json
-python3 tools/optlevel/optlevel.py gpu measure --op-class muladd_u64 --ops-regex '...' --out M.json -- ./bench
-python3 tools/optlevel/optlevel.py score --calibration CAL-gpu.json --measurement M.json --out R.json \
+tools/optlevel/run.sh gpu probe
+tools/optlevel/run.sh gpu calibrate --out CAL-gpu.json
+tools/optlevel/run.sh gpu measure --op-class muladd_u64 --ops-regex '...' --out M.json -- ./bench
+tools/optlevel/run.sh score --calibration CAL-gpu.json --measurement M.json --out R.json \
   --ncu <profile dir>/kernels.json --nsys <profile dir>/summary.json
 ```
 
+- `gpu probe` says up front what is missing: helper programs
+  `tools/profile.sh` needs (`gawk`, `jq`; without them its `ncu` and `nsys`
+  subcommands exit 2), and whether `ncu` can read the counters. On
+  `ERR_NVGPUCTRPERM` it reports "counters withheld by the driver" and tier
+  `T-gpu-timing`: nothing inside a container changes that, so do not spend
+  time on `ncu` there. `--no-ncu-check` skips the `ncu` run.
+- A memory-bound GPU kernel is scored like a CPU one: print `bytes_declared`
+  in the `optlevel.ops/v1` line or pass `--bytes-per-op`. The class `triad`
+  (one multiply-add per element, streamed) is in every new GPU calibration;
+  `gpu_calib.cu` run with one class name or `triad` is the matching control.
 - Every `gpu` subcommand exits 3 on a host where `nvidia-smi` lists no GPU.
   GPU work runs on a GPU host through the lab's runner (AGENTS.md §9, §9a),
   never by launching instances by hand.
@@ -164,9 +192,10 @@ python3 tools/optlevel/optlevel.py score --calibration CAL-gpu.json --measuremen
   trace only. With it, `T-gpu-ncu`: SM and memory throughput, occupancy and
   warp stall reasons from `tools/profile.sh ncu`, and the host idle share from
   `tools/profile.sh nsys`.
-- `kernels/gpu_calib.cu` had not been compiled or run when it was written
-  (2026-11-17). Its first run is its validation: compare each class with
-  `ncu`'s speed-of-light figure before trusting a record.
+- `kernels/gpu_calib.cu` first ran on 2026-11-17 on a rented GPU whose driver
+  withheld the counters (`research/hky_pod_runs_20261117/`), so its ceilings
+  are still unchecked against `ncu`'s speed-of-light figure; calibrations
+  carry `GPU_CEILING_UNVALIDATED_BY_AUTHOR` until that comparison exists.
 - For the ECC2K-130 walk use `ecc2k130/roofline.py` and the sibling
   repository's `gpueff`: they model the pipes that bound that kernel.
 
@@ -179,16 +208,21 @@ python3 tools/optlevel/optlevel.py score --calibration CAL-gpu.json --measuremen
 - Cite an attainment as an unverified assertion (`[pcc:unverified]`) unless a
   pcc claim covers it.
 - An attainment does not go into `benchmarks/README.md` or the leaderboard.
-  If a study opens its own `bench.record/v1`, `optlevel.py benchrec R.json`
+  If a study opens its own `bench.record/v1`, `optlevel benchrec R.json`
   prints the values in benchrec's units with `--reference-kind none`.
 
 ## 8. Validate on a new host class
 
 ```sh
-python3 tools/optlevel/optlevel.py controls --out research/<study>/optlevel/controls
+tools/optlevel/run.sh controls --out research/<study>/optlevel/controls [--c-kernels]
+cargo test --release --manifest-path tools/optlevel/Cargo.toml    # 64 tests; no PMU, GPU or compiler needed
 ```
 
-Expected, from `research/optlevel_20261117/`: the vectorized in-cache control
+`optlevel summary R.json` prints one JSON line per record (tier, attainment,
+grade, limiting factor, flags) for job logs.
+
+Expected, from `research/optlevel_20261117/` and
+`research/optlevel_rs_20261117/`: the vectorized in-cache control
 near 1.0, the same loop with vectorization disabled near the class's
 scalar/SIMD ratio, the Horner chain far below, the streaming control near 1.0
 on the memory roof, the pointer chase a few percent with latency attainment

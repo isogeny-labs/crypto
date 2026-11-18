@@ -1,0 +1,9 @@
+# Subgroup calibration without searching for a discrete logarithm
+
+The 32 rational curve points embed distinctly into the rational Jacobian by P↦[P-P0]: equality of two classes for distinct points would give a degree-one map to the projective line. The rational isogeny preserves group order. The existing original generator has prime order ℓ=239753. By the genus-four Weil bound, #J≤(1+√31)^8<7^8<32ℓ<ℓ². Thus the unique ℓ-Sylow has order ℓ and the kernel of projection to it has fewer than 32 elements. The 32 classes cannot all project to zero. This argument also works if group order is not otherwise computed.
+
+Determine the order exactly: count the original hyperelliptic points at degree two over F31[i]/(i²+1). With first trace zero and third trace -360 from the frozen twist test, Newton identities give a2=-trace2/2 and a3=120 for det(1-T Frob). The reciprocal coefficients fix all terms except a4, bounded by 70·31². This interval has width less than ℓ, so divisibility of #J by ℓ fixes a4 uniquely.
+
+Compute the kernel of all 80 rational plane-divisor differences mod ℓ. Require rank 30. Constants and any nonconstant kernel vector span this two-dimensional space. True logarithms of the projected [P-P0] satisfy the relations and are nonconstant by the cardinality argument. Normalize the vector to zero at the first point and one at the first entry different from it. This proves that H=c[Pj-P0] is a generator of exact order ℓ and c[Pi-P0]=v_i H for each entry, where c=#J/ℓ. Check every row after normalization. Record the log of c[K-6P0] using a canonical plane section. These are logarithms relative to H on the quotient curve. Connecting H to the original subgroup generator still requires transport.
+
+Freeze before one bounded invocation; verify remote revision and hashes, retain failures. No timing comparison or original target inputs in this experiment.
