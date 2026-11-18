@@ -22,7 +22,7 @@ host: x86_64-unknown-linux-gnu
 LLVM version: 23.1.5
 ```
 
-Pre-selection SHA-256 bindings:
+Initial pre-selection SHA-256 bindings:
 
 ```text
 1528e504a9dd0a0d688041c4efcde8209617d8fab6710be99bd718532768afcf  h116_select.rs
@@ -42,6 +42,32 @@ a4ef1507157f55ba8e8f1ee01089f87f08b66b13553fcce4ef1e8d0d9034748e  /tmp/h116_sele
 This amended binary binding is committed and pushed before its first default
 invocation. Optimization changes implementation speed, not the frozen selector
 rule or ordering.
+
+The optimized exhaustive invocation was terminated after exactly 2m56.339s of
+wall time and 2m56.186s of user CPU. Its captured stdout remained zero bytes,
+with the empty-file SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+It therefore disclosed no selected curve or partial row.
+
+Before another invocation, selector v2 applies the Hasse bound first: it
+enumerates the possible group orders in the public Hasse interval, applies the
+frozen primality, distinctness, torsion-degree and extension-size conditions,
+and point-counts models only if at least one order remains. Models are still
+visited in `(a,b)` order and qualifying orders are still sorted before global
+selection. This is an implementation optimization of the same selection
+function, not a cohort-rule change.
+
+Selector v2 strict builds and self-tests passed. Its pre-selection SHA-256
+bindings are:
+
+```text
+e54c745d3ead1184818fe792ca346d06f32d2d0c6b83ef2f6d63543117dae7f4  h116_select.rs
+dded0b7bdb374b3d1b7c668604713c0c2e05f1b879e9e304c8540e8e9c89c0f3  /tmp/h116_select.v2.debug
+c513a0d72a8eef3f294e0e10f9bf42ddaf83598485c5fb42e4dfb0c7576e2d3c  /tmp/h116_select.v2.opt
+```
+
+This v2 source and binary binding is committed and pushed before its first
+default invocation.
 
 The selector source was committed and pushed before `/tmp/h116_select` was
 invoked without `--selftest`. The resulting `COHORT.json`, raw stdout hash,

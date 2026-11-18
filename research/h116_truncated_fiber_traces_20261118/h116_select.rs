@@ -108,6 +108,39 @@ fn excluded_h115(p: u64, a: u64, b: u64) -> bool {
     )
 }
 
+fn hasse_bound(p: u64) -> u64 {
+    let four_p = 4_u64 * p;
+    let mut bound = 0_u64;
+    while (bound + 1) <= four_p / (bound + 1) {
+        bound += 1;
+    }
+    bound
+}
+
+fn admissible_orders(p: u64, retained_orders: &BTreeSet<u64>) -> Vec<(u64, u64, u128)> {
+    let bound = hasse_bound(p);
+    let center = p + 1;
+    let mut orders = Vec::new();
+    for order in center.saturating_sub(bound)..=center + bound {
+        if retained_orders.contains(&order) || !is_prime(order) {
+            continue;
+        }
+        let trace = center as i128 - order as i128;
+        if trace * trace > 4_i128 * p as i128 {
+            continue;
+        }
+        let Some(d) = torsion_degree(p, order) else {
+            continue;
+        };
+        let Some(extension_size) = bounded_pow(p, d) else {
+            continue;
+        };
+        orders.push((order, d, extension_size));
+    }
+    orders.sort_unstable();
+    orders
+}
+
 fn select() -> (Vec<Curve>, u64, u64) {
     let mut selected = Vec::new();
     let mut retained_orders = BTreeSet::new();
@@ -119,24 +152,32 @@ fn select() -> (Vec<Curve>, u64, u64) {
             continue;
         }
         primes_scanned += 1;
+        // A curve order lies in the Hasse interval. Screen the finite list of
+        // orders against every structural rule before point-counting models.
+        // This is equivalent to the original exhaustive scan, while avoiding
+        // all p^2 models at primes where no order can qualify.
+        let target_orders = admissible_orders(p, &retained_orders);
+        if target_orders.is_empty() {
+            continue;
+        }
         let roots = square_root_counts(p);
         let mut at_p = Vec::new();
-        for a in 0..p {
+        'models: for a in 0..p {
             for b in 0..p {
                 models_scanned += 1;
                 if excluded_h115(p, a, b) || !nonsingular(p, a, b) {
                     continue;
                 }
                 let order = point_count(p, a, b, &roots);
-                if !is_prime(order) {
+                let Some(&(_, d, extension_size)) = target_orders
+                    .iter()
+                    .find(|&&(target_order, _, _)| target_order == order)
+                else {
+                    continue;
+                };
+                if at_p.iter().any(|curve: &Curve| curve.order == order) {
                     continue;
                 }
-                let Some(d) = torsion_degree(p, order) else {
-                    continue;
-                };
-                let Some(extension_size) = bounded_pow(p, d) else {
-                    continue;
-                };
                 at_p.push(Curve {
                     p,
                     order,
@@ -146,6 +187,9 @@ fn select() -> (Vec<Curve>, u64, u64) {
                     trace: p as i64 + 1 - order as i64,
                     extension_size,
                 });
+                if at_p.len() == target_orders.len() {
+                    break 'models;
+                }
             }
         }
         at_p.sort_by_key(|curve| {
@@ -216,6 +260,12 @@ fn selftest() {
     assert_eq!(torsion_degree(11, 5), None);
     assert_eq!(torsion_degree(31, 37), Some(4));
     assert_eq!(bounded_pow(31, 4), Some(923_521));
+    assert_eq!(hasse_bound(31), 11);
+    assert!(admissible_orders(31, &BTreeSet::new())
+        .iter()
+        .any(|&(order, degree, extension_size)| {
+            order == 37 && degree == 4 && extension_size == 923_521
+        }));
     let roots = square_root_counts(31);
     assert_eq!(point_count(31, 1, 19, &roots), 37);
     assert!(nonsingular(31, 1, 19));
