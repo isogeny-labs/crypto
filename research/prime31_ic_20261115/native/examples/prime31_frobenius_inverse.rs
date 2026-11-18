@@ -411,6 +411,51 @@ fn panel() -> serde_json::Value {
     assert_eq!(dual_ba_meter.multiplications, dual_meter.multiplications);
     assert_eq!(dual_ba_meter.inversions, dual_meter.inversions);
 
+
+    // Fixed-corpus repeated alternating-order L0 diagnostic. Both algorithms
+    // run on identical public points; all outputs and operation counters are
+    // checked on each pass. These medians are NOT complete ECDLP costs.
+    let mut repeated_direct_ns = Vec::new();
+    let mut repeated_batch_ns = Vec::new();
+    for pass in 0..12 {
+        let run_direct = || {
+            let mut meter = FieldMeter::default();
+            let start = Instant::now();
+            let result: Vec<Point> = targets.iter()
+                .map(|&q| invert_public(q, &mut meter).expect("repeat point inverse"))
+                .collect();
+            let elapsed = start.elapsed().as_nanos();
+            assert_eq!(result, source_points);
+            assert_eq!(meter.inversions, direct_meter.inversions);
+            assert_eq!(meter.multiplications, direct_meter.multiplications);
+            elapsed
+        };
+        let run_batch = || {
+            let mut meter = FieldMeter::default();
+            let start = Instant::now();
+            let result = invert_public_pseudo_batch(&targets, &mut meter)
+                .expect("repeat fraction-free batch inverse");
+            let elapsed = start.elapsed().as_nanos();
+            assert_eq!(result, source_points);
+            assert_eq!(meter.inversions, batch_meter.inversions);
+            assert_eq!(meter.multiplications, batch_meter.multiplications);
+            elapsed
+        };
+        if pass % 2 == 0 {
+            repeated_direct_ns.push(run_direct());
+            repeated_batch_ns.push(run_batch());
+        } else {
+            repeated_batch_ns.push(run_batch());
+            repeated_direct_ns.push(run_direct());
+        }
+    }
+    let median = |xs: &[u128]| {
+        let mut sorted = xs.to_vec();
+        sorted.sort_unstable();
+        (sorted[5] + sorted[6]) / 2
+    };
+    let repeat_direct_median = median(&repeated_direct_ns);
+    let repeat_batch_median = median(&repeated_batch_ns);
     let mut certificate = FieldMeter::default();
     for (index, (&q, &source)) in targets.iter().zip(source_points.iter()).enumerate() {
         assert!(ar.on_curve(PRIME31, source), "inverse outside source curve");
@@ -466,6 +511,11 @@ fn panel() -> serde_json::Value {
         "fraction_free_batch_fp_inversions":batch_meter.inversions,
         "fraction_free_batch_stage_ns_diagnostic":batch_ns.to_string(),
         "fraction_free_batch_stage_ba_ns_diagnostic":batch_ba_ns.to_string(),
+        "repeat_pairs":12,
+        "repeat_direct_median_ns_diagnostic":repeat_direct_median.to_string(),
+        "repeat_batch_median_ns_diagnostic":repeat_batch_median.to_string(),
+        "repeat_direct_ns_diagnostic":repeated_direct_ns.iter().map(u128::to_string).collect::<Vec<_>>(),
+        "repeat_batch_ns_diagnostic":repeated_batch_ns.iter().map(u128::to_string).collect::<Vec<_>>(),
         "direct_inverse_fp_inversions":direct_fp_inversions,
         "dual_setup_fp_multiplications":setup_meter.multiplications,
         "dual_setup_fp_inversions":setup_meter.inversions,
