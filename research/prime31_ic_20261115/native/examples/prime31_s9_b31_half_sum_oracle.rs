@@ -64,6 +64,17 @@ fn first_rational_points(ar: &mut Arithmetic, base: usize) -> Vec<(u64, u64)> {
     panic!("not enough rational x values");
 }
 
+// Deterministic x/y-coordinate hybrid: rank by canonical y among the first
+// 256 rational-x lifts, with every selection operation charged as setup.
+// This is only a factor-base control, not a non-generic relation extractor.
+fn low_y_among_first_256_x(ar: &mut Arithmetic, count: usize) -> Vec<(u64,u64)> {
+    assert!(count > 0 && count <= 256);
+    let mut sample = first_rational_points(ar, 256);
+    sample.sort_unstable_by_key(|&(x,y)| (y,x));
+    sample.truncate(count);
+    sample
+}
+
 // Token 2i denotes P_i; token 2i+1 denotes -P_i.
 fn tokens(ar: &Arithmetic, xs: &[(u64, u64)]) -> Vec<Point> {
     let mut out = Vec::with_capacity(2 * xs.len());
@@ -1376,9 +1387,15 @@ mod complete_b31_1024_tests {
 
         let paired_compare = std::env::var("PRIME31_B31_NEGATION_COMPARE")
             .ok().as_deref() == Some("1");
+        let y_compare = std::env::var("PRIME31_B31_Y_RANKED_COMPARE")
+            .ok().as_deref() == Some("1");
+        assert!(!(paired_compare && y_compare), "choose one comparison mode");
         let reversed = std::env::var("PRIME31_B31_BASECHOICE_REVERSE")
             .ok().as_deref() == Some("1");
-        let arms: [&str;2] = if paired_compare {
+        let arms: [&str;2] = if y_compare {
+            if reversed { ["y_ranked31_paired", "first_x31_paired"] }
+            else { ["first_x31_paired", "y_ranked31_paired"] }
+        } else if paired_compare {
             if reversed { ["first_x31_paired", "first_x31"] }
             else { ["first_x31", "first_x31_paired"] }
         } else if reversed {
@@ -1394,6 +1411,8 @@ mod complete_b31_1024_tests {
             let base = if base_kind == "dickson31" {
                 Base::build(PRIME31, 6, &mut ar)
                     .expect("unchanged depth-six Dickson base").points
+            } else if base_kind == "y_ranked31_paired" {
+                low_y_among_first_256_x(&mut ar, active)
             } else {
                 first_rational_points(&mut ar, active)
             };
@@ -1405,7 +1424,7 @@ mod complete_b31_1024_tests {
             }
             let pts = tokens(&ar, &base);
             let half = FourSet::build(&mut ar, &pts);
-            let representatives = if base_kind == "first_x31_paired" {
+            let representatives = if base_kind.ends_with("_paired") {
                 Some(prepare(&half))
             } else { None };
             let setup_ns = setup_start.elapsed().as_nanos();
@@ -1556,8 +1575,10 @@ mod complete_b31_1024_tests {
             }
             let target_ns = target_start.elapsed().as_nanos();
             assert_eq!(transcript.len(),QCOUNT);
-            assert_eq!(first_shift[0], if base_kind == "dickson31" {237} else {244},
-                "same first-256 frozen corpus as matched B31 coverage control #4626");
+            if base_kind != "y_ranked31_paired" {
+                assert_eq!(first_shift[0], if base_kind == "dickson31" {237} else {244},
+                    "same first-256 frozen corpus as matched B31 coverage control #4626");
+            }
             let target_fp_mults =
                 ar.counts.fp_multiplications-before_targets.fp_multiplications;
             let target_native_adds =
@@ -1605,14 +1626,16 @@ mod complete_b31_1024_tests {
                 "batched_complement_operation_counters":format!("{batch:?}"),
                 "negation_quotient_representatives":representatives.as_ref().map(|r|r.len()),
                 "negation_paired_batch_counters":format!("{paired_batch:?}"),
-                "paired_candidate":base_kind=="first_x31_paired"
+                "paired_candidate":base_kind.ends_with("_paired")
             }));
         }
 
-        let prefix = if paired_compare { "PRIME31_B31_NEGATION_COMPLETE_JSON" }
+        let prefix = if y_compare { "PRIME31_B31_Y_RANKED_COMPLETE_JSON" }
+                     else if paired_compare { "PRIME31_B31_NEGATION_COMPLETE_JSON" }
                      else { "PRIME31_B31_FIRSTX_DICKSON_COMPLETE_JSON" };
         println!("{prefix}={}", json!({
-            "schema":if paired_compare { "prime31.b31.negation_complete_256q.v1" }
+            "schema":if y_compare { "prime31.b31.y_ranked_complete_256q.v1" }
+                     else if paired_compare { "prime31.b31.negation_complete_256q.v1" }
                      else { "prime31.actual_b31_basechoice_256q_complete.v1" },
             "panel_order": arms,
             "validation":"source-specific producer Rust [pcc:unverified]",
