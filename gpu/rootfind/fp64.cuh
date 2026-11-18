@@ -78,7 +78,19 @@ RF_HD uint64_t fp64_reduce(const Fp64Ctx &f, uint64_t hi, uint64_t lo) {
 }
 
 RF_HD uint64_t fp64_mul(const Fp64Ctx &f, uint64_t a, uint64_t b) {
+#ifdef __CUDA_ARCH__
     return fp64_reduce(f, rf_mulhi64(a, b), a * b);
+#else
+    /* Host: add the full 128-bit product and Montgomery correction in a
+     * single wide expression.  For p < 2^63 and canonical operands,
+     * t + m*p fits in 128 bits.  This lets x86-64 compilers combine
+     * carry propagation rather than synthesizing the hi + mulhi + flag
+     * sequence of the device-oriented reduction. */
+    const unsigned __int128 t = (unsigned __int128)a * b;
+    const uint64_t m = (uint64_t)t * f.n_inv;
+    const uint64_t u = (uint64_t)((t + (unsigned __int128)m * f.p) >> 64);
+    return u >= f.p ? u - f.p : u;
+#endif
 }
 
 RF_HD uint64_t fp64_sqr(const Fp64Ctx &f, uint64_t a) { return fp64_mul(f, a, a); }
@@ -101,7 +113,15 @@ RF_HD uint64_t fp64_sub(const Fp64Ctx &f, uint64_t a, uint64_t b) {
 #endif
 }
 
-RF_HD uint64_t fp64_neg(const Fp64Ctx &f, uint64_t a) { return a == 0 ? 0 : f.p - a; }
+RF_HD uint64_t fp64_neg(const Fp64Ctx &f, uint64_t a) {
+#ifdef __CUDA_ARCH__
+    return a == 0 ? 0 : f.p - a;
+#else
+    /* Canonical a: p-a is the negative except for zero.  Branchless
+     * zero masking avoids an unpredictable conditional on public data. */
+    return (f.p - a) & ((uint64_t)0 - (uint64_t)(a != 0));
+#endif
+}
 
 /* canonical -> Montgomery (input must already be < p) */
 RF_HD uint64_t fp64_to_mont(const Fp64Ctx &f, uint64_t a) { return fp64_mul(f, a, f.r2); }
