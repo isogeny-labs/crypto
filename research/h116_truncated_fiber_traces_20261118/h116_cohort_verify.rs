@@ -189,8 +189,12 @@ fn expected_cohort() -> (Vec<Curve>, u64, u64) {
 
 fn parse_integer(line: &str, key: &str) -> i128 {
     let needle = format!("\"{key}\":");
-    let start = line.find(&needle).unwrap_or_else(|| panic!("missing field {key}")) + needle.len();
+    let mut start =
+        line.find(&needle).unwrap_or_else(|| panic!("missing field {key}")) + needle.len();
     let bytes = line.as_bytes();
+    while bytes.get(start).is_some_and(u8::is_ascii_whitespace) {
+        start += 1;
+    }
     let mut end = start;
     if bytes.get(end) == Some(&b'-') {
         end += 1;
@@ -234,6 +238,7 @@ fn selftest() {
     assert_eq!(bounded_power(107, 3), Some(1_225_043));
     assert!(nonsingular(107, 1, 25));
     assert_eq!(point_count_legendre(107, 1, 25), 127);
+    assert_eq!(parse_top_level("  \"primes_scanned\": 92,\n", "primes_scanned"), 92);
     println!("h116 independent cohort verifier selftest: pass");
 }
 
