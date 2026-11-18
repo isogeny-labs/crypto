@@ -26,9 +26,9 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
   - [x] Component breakdown of where the time goes (addition kernels, probe, table build)
   - [ ] Roofline and cycle counts: not possible here (no hardware PMU); needs the lab's isolated runner
   - [x] Plan: ranked levers with predicted factors and the cheapest falsifying test each (`PLAN.md`); lever 1 prototyped and measured
-- [ ] Root-finding 50x on the frozen prime-field workload: land lever 1 with witness recovery and ledger parity, then measure interleaving, L2-resident filtering and threads (Codex, started 2026-11-18, branch codex/rootfind-50x-prime-20261118, PR #4669)
+- [ ] Root-finding 50x on the frozen prime-field workload: land lever 1 with witness recovery and ledger parity, then measure interleaving, L2-resident filtering and threads (Codex, started 2026-11-18, branch codex/rootfind-50x-prime-20261118, PR #4669 merged; Lean follow-up PR #4696)
   - [x] Add a native independent recomputation of the frozen raw rows, exact 50x thresholds and arithmetic erratum (`research/rootfind_baseline_100x_20261117/{VALIDATION,ERRATA}.md`)
-  - [x] Prove soundness and completeness of an abstract finite-domain decomposition-to-SAT encoding in Lean, without real-curve attack integration (`papers/rootfinding-decomposition/lean/PointDecompositionSAT.lean`)
+  - [x] Prove soundness and completeness of an abstract finite-domain decomposition-to-SAT encoding in Lean, without real-curve attack integration (`papers/rootfinding-decomposition/lean/PointDecompositionSAT.lean`, PR #4696)
 - [ ] Repair the 28 examples/tests/bins on main broken by lossy merges (syntax, struct drift, lost library APIs) (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw; in progress)
 - [x] Fix the `wide-vars` build (u64 vs `Mask` in f4_trace, pq_f4_f2, koblitz_groebner) and clear `clippy-maintained.sh` -D warnings (claude, 2026-11-17, branch claude/wide-vars-clippy-cleanup, PR #4607, stacked on #4589; done, awaiting review)
 - [x] Clean up main CI breakages and add an ecbench CI check (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4569 merged; ecbench-smoke check passing; remaining main blockers need the owner: AWS key, pcc claim_type, hec-multi record, rho currency)
