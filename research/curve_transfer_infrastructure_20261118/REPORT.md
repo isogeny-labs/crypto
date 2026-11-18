@@ -217,12 +217,16 @@ regress on `psi_12`; the PCC suite passes 35 of 35 tests. The focused quartic
 Rust test is committed, but local root-crate execution remains blocked by
 unrelated sparse-checkout fixtures and a pre-existing duplicate test symbol.
 Cryptanalysis draft revision
-`010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2` records local source parity
-against crypto implementation revision
-`6cb5ab1edb141b48b9a9767fc63fe95ba1aac217`; a mirror metadata refresh for
-the frozen corpus and producer revision, final mirror CI, and review remain
-open. Release publication and recovery of the separately missing admitted
-hydration artifact also remain open.
+`cd509d3b6a8b9599f8b975dc8692d772264e5ce4` records local source parity
+against crypto arithmetic revision
+`6cb5ab1edb141b48b9a9767fc63fe95ba1aac217` and separately binds producer
+revision `c01ba3960ada49d73e2c48acb0e175f9e77e1680` and corpus-containing
+revision `07f7d47bd8d58d5cb1065cc83e9f22fefd85e065`. Cross-repository parity,
+8 parity tests, 13 binary transfer tests, 5 balanced tests, 5 prime-transfer
+tests, strict focused Clippy, workflow wiring, YAML parsing, and prose lint
+pass locally. Final mirror CI and review remain open. Release publication and
+recovery of the separately missing admitted hydration artifact also remain
+open.
 
 # Structured unsupported cases and next work
 

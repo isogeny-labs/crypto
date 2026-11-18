@@ -1,7 +1,7 @@
 {
   "schema_version": "ecdlp-audit-plan/v1",
   "record_state": "mock_non_authoritative",
-  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:42cd72520ae321ee84f12b2697cf3bc666b2faba19c5ae8cfcb00d45b8ba8c85",
+  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:1330c6896d99e56b972a422e864d95b8b3af11f98361c8395a530e818b3f1236",
   "title": "Comprehensive elliptic-curve private-key recovery audit",
   "as_of": "2026-11-18",
   "authoritative": false,
@@ -222,7 +222,7 @@
         {
           "id": "WS2-D2",
           "kind": "implementation",
-          "description": "Implemented arbitrary-class binary Jacobian pushforward/norm and elliptic-image projector for checked cubic covers, including nonsplit support, plus a named-generator certificate that proves injectivity and degree-inverse recovery only from a checked declared annihilator coprime to degree three. The implementation makes no exact-order or primality claim. Draft cryptanalysis revision 010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2 records source parity with crypto revision 6cb5ab1edb141b48b9a9767fc63fe95ba1aac217; final mirror CI/review, durable catalog-wide replay, independent source-group arithmetic, and package replay remain gated.",
+          "description": "Implemented arbitrary-class binary Jacobian pushforward/norm and elliptic-image projector for checked cubic covers, including nonsplit support, plus a named-generator certificate that proves injectivity and degree-inverse recovery only from a checked declared annihilator coprime to degree three. The implementation makes no exact-order or primality claim. Draft cryptanalysis revision cd509d3b6a8b9599f8b975dc8692d772264e5ce4 records source parity with crypto revision 6cb5ab1edb141b48b9a9767fc63fe95ba1aac217 and separately pins the corpus producer/containing revisions; final mirror CI/review, independent source-group arithmetic, and package replay remain gated.",
           "path": "src/binary_ecc/cover_transfer.rs",
           "artifact_sha256": "e1336ef5e5fb6ab32d58be956e72a8732adc43aca30d46a4f8ce45b03cdcdad5",
           "status": "partial",
@@ -268,7 +268,7 @@
           "required": true,
           "claim_status": "unknown",
           "scope": "A catalog-general binary norm handles every valid reduced class for all 174 binary cubic map rows and 150 representations at the 2026-11-18 live registry snapshot, including shared, nonsplit, repeated, and exceptional support, verifies degree-three composition, exports exact EC1/ICV1/HC1/CV1 bindings and certificates, and has a current cryptanalysis mirror/integration receipt.",
-          "rationale": "The native implementation handles arbitrary valid reduced classes for checked binary cubic covers and certifies degree-three composition and projectors, including exhaustive GF(8) and exact n=83 checks. It also checks named-generator injectivity and degree-inverse recovery when a declared annihilator is coprime to three, without claiming that every declared annihilator is the exact or prime order. The frozen corpus at SHA-256 93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8 retains all 174 maps and 150 named bindings with zero failures, 102 proved exact-order records, and 48 unknown records. Draft cryptanalysis revision 010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2 is parity-bound to crypto revision 6cb5ab1edb141b48b9a9767fc63fe95ba1aac217, but final mirror CI and review remain open. The bounded sweeper is not an enumeration of all transfers. The separate GF(8) oracle uses production source-Jacobian addition. Independent binary source-law replay, package replay, and any solver advantage remain open.",
+          "rationale": "The native implementation handles arbitrary valid reduced classes for checked binary cubic covers and certifies degree-three composition and projectors, including exhaustive GF(8) and exact n=83 checks. It also checks named-generator injectivity and degree-inverse recovery when a declared annihilator is coprime to three, without claiming that every declared annihilator is the exact or prime order. The frozen corpus at SHA-256 93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8 retains all 174 maps and 150 named bindings with zero failures, 102 proved exact-order records, and 48 unknown records. Draft cryptanalysis revision cd509d3b6a8b9599f8b975dc8692d772264e5ce4 is parity-bound to crypto revision 6cb5ab1edb141b48b9a9767fc63fe95ba1aac217 and records the crypto-owned producer/corpus revisions; focused parity and arithmetic tests pass, but final mirror CI and review remain open. The bounded sweeper is not an enumeration of all transfers. The separate GF(8) oracle uses production source-Jacobian addition. Independent binary source-law replay, package replay, and any solver advantage remain open.",
           "evidence_refs": [],
           "obligation_id": "arbitrary-binary-jacobian-norm"
         },
@@ -971,7 +971,7 @@
       "status": "open",
       "required": true,
       "description": "Independently replay the frozen 174-map/150-binding binary corpus and arbitrary valid-class Jacobian pushforward with a non-production source group law, close CI/review on the current draft aburan28/cryptanalysis parity mirror, and replay the exact corpus from the packaged executable.",
-      "exit_evidence": "Independent binary source-law agreement; exact frozen-corpus and all-live-row membership replay; shared/nonsplit/repeated support, homomorphism, composition, and recovery receipts; explicit separation of declared annihilation from exact order; final CI and review for cryptanalysis revision 010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2 or its reviewed successor; and replay from the packaged executable."
+      "exit_evidence": "Independent binary source-law agreement; exact frozen-corpus and all-live-row membership replay; shared/nonsplit/repeated support, homomorphism, composition, and recovery receipts; explicit separation of declared annihilation from exact order; final CI and review for cryptanalysis revision cd509d3b6a8b9599f8b975dc8692d772264e5ce4 or its reviewed successor; and replay from the packaged executable."
     },
     {
       "id": "catalog-subgroup-certificates",
