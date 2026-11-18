@@ -580,7 +580,11 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
+        // Sparse root polynomials often have zero middle coefficients.
+        // Multiplying those coefficients cannot change the accumulator.
+        if x == 0 { continue; }
         for (j, &y) in b.iter().enumerate() {
+            if y == 0 { continue; }
             // Fused multiply-accumulate: no u128 division for canonical
             // small fields or the 61-bit Mersenne prime.
             r[i + j] = if p == MAX_PRIME {
@@ -633,6 +637,27 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     if a.len() < b.len() {
         return Ok((vec![], a.to_vec()));
     }
+    // A monic constant divisor leaves the dividend unchanged. Preserve
+    // canonical quotient trimming even if a standalone caller supplies
+    // trailing zero coefficients.
+    if b.len() == 1 && b[0] == 1 {
+        return Ok((trim(a.to_vec()), vec![]));
+    }
+    // Synthetic division by x + c needs only one running remainder and
+    // one quotient allocation, rather than a mutable dividend and a
+    // trim pass on every quotient digit.
+    if b.len() == 2 && b[1] == 1 {
+        let mut q = vec![0; a.len() - 1];
+        let mut carry = *a.last().unwrap();
+        for i in (1..a.len()).rev() {
+            q[i - 1] = carry;
+            let product = vmul(carry, b[0], p);
+            let value = a[i - 1];
+            carry = if value >= product { value - product }
+                    else { value + p - product };
+        }
+        return Ok((trim(q), if carry == 0 { vec![] } else { vec![carry] }));
+    }
     let mut r = a.to_vec();
     let mut q = vec![0; a.len() - b.len() + 1];
     // GCD factors, X^p mod f divisors and root certificates are commonly
@@ -663,7 +688,9 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
             let shift = r.len() - b.len();
             let c = vmul(*r.last().unwrap(), inv, p);
             q[shift] = c;
-            for (i, &x) in b.iter().enumerate() {
+            // c*lead cancels the top term exactly, even for nonmonic b.
+            r.pop();
+            for (i, &x) in b[..b.len() - 1].iter().enumerate() {
                 let product = vmul(c, x, p);
                 let old = r[shift + i];
                 r[shift + i] = if old >= product { old - product }
