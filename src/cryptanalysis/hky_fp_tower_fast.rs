@@ -370,7 +370,21 @@ unsafe fn axpy_avx512(acc: &mut [u64], row: &[u32], f: u64, p2: u64) {
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub(super) enum Simd {
     Portable,
+    #[cfg_attr(
+        not(target_arch = "x86_64"),
+        allow(
+            dead_code,
+            reason = "Preserves the explicit x86 backend vocabulary on other architectures."
+        )
+    )]
     Avx2,
+    #[cfg_attr(
+        not(target_arch = "x86_64"),
+        allow(
+            dead_code,
+            reason = "Preserves the explicit x86 backend vocabulary on other architectures."
+        )
+    )]
     Avx512,
 }
 

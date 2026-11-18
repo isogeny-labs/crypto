@@ -1,5 +1,5 @@
 //! Private identity derivation after original cell admission, not a cell loader.
-use super::{VerifiedWorkerOriginal, DecodeBudget, Stop};
+use super::{VerifiedWorkerOriginal, DecodeBudget};
 use crate::ml_dataset::{capture::AttemptBinding,execution::LaunchContext};
 use serde::Serialize;
 use sha2::{Digest,Sha256};
