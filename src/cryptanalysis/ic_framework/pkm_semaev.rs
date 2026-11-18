@@ -12,6 +12,10 @@
 //!
 //! - `mode=chain` (default, `m = 3`): `S₃(x_1, x_2, u_1)`, …,
 //!   `S₃(u_{m−2}, x_m, x_R)` with free unknowns `u_k`.
+//! - `mode=projective` (`m = 3`): the same split with a homogeneous
+//!   intermediate `(X:Z)`, a Boolean chart selector, and `(1:0)` for the
+//!   identity branch.  Both adjacent `S₃` equations are bihomogenised;
+//!   no division by `Z` is performed.
 //! - `mode=full` (`m = 2`, or `m = 3` on request): `S_{m+1}` itself; `S₄` is the resultant
 //!   `Res_U(S₃(x_1, x_2, U), S₃(x_3, x_R, U))` by the two-quadratic formula.
 //! - `engine=exhaustive` replaces F4 by the grid reference of the note's
@@ -164,6 +168,25 @@ fn s3_in_u(x1: &Pol, x2: &Pol, a: u64, b: u64, p: u64) -> [Pol; 3] {
 fn s3(x1: &Pol, x2: &Pol, x3: &Pol, a: u64, b: u64, p: u64) -> Pol {
     let [al, be, ga] = s3_in_u(x1, x2, a, b, p);
     al.mul(x3, p).mul(x3, p).add(&be.mul(x3, p), p).add(&ga, p)
+}
+
+/// `S₃(N₁/D₁, N₂/D₂, N₃/D₃)` with all three squared
+/// denominators cleared.  This is the bihomogeneous projective closure of
+/// `S₃`; in particular `(N₃:D₃) = (1:0)` is the identity chart used by
+/// the split-chain oracle.
+fn s3_frac(
+    x1: (&Pol, &Pol),
+    x2: (&Pol, &Pol),
+    (n3, d3): (&Pol, &Pol),
+    a: u64,
+    b: u64,
+    p: u64,
+) -> Pol {
+    let [al, be, ga] = s3_in_u_frac(x1, x2, a, b, p);
+    al.mul(n3, p)
+        .mul(n3, p)
+        .add(&be.mul(n3, p).mul(d3, p), p)
+        .add(&ga.mul(d3, p).mul(d3, p), p)
 }
 
 /// `S₄(x1, x2, x3, x4) = Res_U(S₃(x1, x2, U), S₃(x3, x4, U))`, by
@@ -701,6 +724,7 @@ pub fn t0_factor_base(
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PkmMode {
     Chain,
+    Projective,
     Full,
 }
 
@@ -1048,14 +1072,20 @@ impl PkmSemaevOracle {
         Some(serde_json::json!({"schema":"pkm-prepared-system/v1",
             "modulus":prep.ring.p.to_string(),"m":self.m,"t":self.t,"g":self.g.to_string(),
             "mode":format!("{:?}",self.mode),"tower_variables":prep.ring.n_tower(),
-            "free_variables":prep.ring.n_free,"variable_order":"tower blocks by summand, then chain auxiliaries",
+            "free_variables":prep.ring.n_free,"variable_order":if self.mode==PkmMode::Projective {
+                "tower blocks by summand, then projective Z selectors, then projective X auxiliaries"
+            } else {"tower blocks by summand, then chain auxiliaries"},
             "summand_map":"x_i = g * y_(i,0)",
             "square_rule_convention":"y_j^2 = a*y_j*y_next + b*y_next + c*y_j + d",
             "square_rules":prep.ring.rules.iter().map(|r|serde_json::json!({"next":r.next,
                 "a":r.a.to_string(),"b":r.b.to_string(),"c":r.c.to_string(),"d":r.d.to_string()})).collect::<Vec<_>>(),
             "equations_by_target_x_power":prep.eqs.iter().map(|parts|parts.iter().map(Self::polynomial_artifact).collect::<Vec<_>>()).collect::<Vec<_>>(),
             "grid_x":prep.v.iter().map(ToString::to_string).collect::<Vec<_>>(),"original_equation_degrees":prep.degrees,
-            "original_equation_recipe":if self.mode==PkmMode::Chain{"chained S3 with affine intermediate x coordinates"}else{"S_(m+1), m=2 S3 or m=3 S4 resultant"},
+            "original_equation_recipe":match self.mode {
+                PkmMode::Chain=>"chained S3 with affine intermediate x coordinates",
+                PkmMode::Projective=>"bihomogeneous chained S3 with normalized projective intermediates and explicit identity charts",
+                PkmMode::Full=>"S_(m+1), m=2 S3 or m=3 S4 resultant",
+            },
             "trace_gaps":["private internal row/pivot operations and pair rejection witnesses"]}))
     }
 
@@ -1068,8 +1098,13 @@ impl PkmSemaevOracle {
             None if self.m >= 3 => PkmMode::Chain,
             None => PkmMode::Full,
             Some("chain") => PkmMode::Chain,
+            Some("projective") => PkmMode::Projective,
             Some("full") => PkmMode::Full,
-            Some(o) => return Err(format!("pkm-semaev: mode is chain or full, not {o}")),
+            Some(o) => {
+                return Err(format!(
+                    "pkm-semaev: mode is chain, projective or full, not {o}"
+                ))
+            }
         };
         self.engine = match params.get("engine") {
             None | Some("f4") => PkmEngine::F4,
@@ -1127,13 +1162,21 @@ impl PkmSemaevOracle {
         if !(2..=3).contains(&self.m) {
             return Err(format!("pkm-semaev: m is 2 or 3, not {}", self.m));
         }
+        if self.mode == PkmMode::Projective && self.m != 3 {
+            return Err("pkm-semaev: projective mode currently needs m=3".into());
+        }
         if self.mode == PkmMode::Chain && self.m < 3 {
             self.mode = PkmMode::Full; // m = 2: S₃ alone, no free unknown
         }
-        if self.t == 0 || (self.m * self.t) as usize > 64 {
+        let selectors = if self.mode == PkmMode::Projective {
+            self.m as usize - 2
+        } else {
+            0
+        };
+        if self.t == 0 || (self.m * self.t) as usize + selectors > 64 {
             return Err(format!(
-                "pkm-semaev: m·t = {} tower variables; the engine takes 1 to 64",
-                self.m * self.t
+                "pkm-semaev: {} tower variables including projective selectors; the engine takes 1 to 64",
+                (self.m * self.t) as usize + selectors
             ));
         }
         Ok(())
@@ -1331,7 +1374,13 @@ impl PkmSemaevOracle {
         let p = curve.p;
         let (a, b) = self.s3_coefficients(curve);
         let (m, t) = (self.m as usize, self.t as usize);
-        let n_t = m * t;
+        let n_membership = m * t;
+        let n_selectors = if self.mode == PkmMode::Projective {
+            m - 2
+        } else {
+            0
+        };
+        let n_t = n_membership + n_selectors;
         // Isogeny guessing: the group (sub-tower) summand 1 is restricted to.
         let iso_group: Option<(u64, Vec<u64>)> = match (&self.membership, fixed) {
             (Membership::Isogeny { .. }, Some(a)) => {
@@ -1339,7 +1388,7 @@ impl PkmSemaevOracle {
             }
             _ => None,
         };
-        let n_free_base = if self.mode == PkmMode::Chain {
+        let n_free_base = if matches!(self.mode, PkmMode::Chain | PkmMode::Projective) {
             m - 2
         } else {
             0
@@ -1434,6 +1483,24 @@ impl PkmSemaevOracle {
                     p,
                 )],
                 (PkmMode::Full, _) => unreachable!("checked in read_params"),
+                (PkmMode::Projective, 3) => {
+                    let z = Pol::var(n, n_membership);
+                    let u = Pol::var(n, n_t);
+                    let one = Pol::constant(n, 1, p);
+                    vec![
+                        s3_frac(
+                            (&fr[0].0, &fr[0].1),
+                            (&fr[1].0, &fr[1].1),
+                            (&u, &z),
+                            a,
+                            b,
+                            p,
+                        ),
+                        s3_frac((&u, &z), (&fr[2].0, &fr[2].1), (&xr_f.0, &xr_f.1), a, b, p),
+                        one.sub(&z, p).mul(&u.sub(&one, p), p),
+                    ]
+                }
+                (PkmMode::Projective, _) => unreachable!("checked in read_params"),
                 (PkmMode::Chain, _) => {
                     let u = |k: usize| Pol::var(n, n_t + k);
                     let mut eqs = vec![quad(tri(&fr[0], &fr[1]), &u(0))];
@@ -1449,6 +1516,17 @@ impl PkmSemaevOracle {
                 (PkmMode::Full, 2) => vec![s3(&x(0), &x(1), &xr, a, b, p)],
                 (PkmMode::Full, 3) => vec![s4(&x(0), &x(1), &x(2), &xr, a, b, p)],
                 (PkmMode::Full, _) => unreachable!("checked in read_params"),
+                (PkmMode::Projective, 3) => {
+                    let z = Pol::var(n, n_membership);
+                    let u = Pol::var(n, n_t);
+                    let one = Pol::constant(n, 1, p);
+                    vec![
+                        s3_frac((&x(0), &one), (&x(1), &one), (&u, &z), a, b, p),
+                        s3_frac((&u, &z), (&x(2), &one), (&xr, &one), a, b, p),
+                        one.sub(&z, p).mul(&u.sub(&one, p), p),
+                    ]
+                }
+                (PkmMode::Projective, _) => unreachable!("checked in read_params"),
                 (PkmMode::Chain, _) => {
                     let u = |k: usize| Pol::var(n, n_t + k);
                     let mut eqs = vec![s3(&x(0), &x(1), &u(0), a, b, p)];
@@ -1522,6 +1600,20 @@ impl PkmSemaevOracle {
                         c: 0,
                         d: 0,
                     }
+                });
+            }
+        }
+        if self.mode == PkmMode::Projective {
+            for _ in 0..n_selectors {
+                // z² = z selects the affine chart z=1 or the normalized
+                // identity chart (x:z)=(1:0).  The normalization polynomial
+                // itself is included in `raw` above.
+                rules.push(SquareRule {
+                    next: None,
+                    a: 0,
+                    b: 0,
+                    c: 1,
+                    d: 0,
                 });
             }
         }
@@ -1872,7 +1964,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             ("m", "summands, 2 or 3"),
             (
                 "mode",
-                "chain (default for m ≥ 3: S₃ links with free u) or full (S_(m+1))",
+                "chain (default for m ≥ 3: affine S₃ links), projective (m=3: homogeneous link with identity chart), or full (S_(m+1))",
             ),
             (
                 "engine",
@@ -2554,7 +2646,12 @@ mod tests {
         let fb = base(&inst, 3);
         assert!(fb.columns >= 3, "the t = 3 tower carries points");
         let mut rng = StdRng::seed_from_u64(7);
-        for spec in ["m=3", "m=3,mode=full", "m=3,engine=exhaustive"] {
+        for spec in [
+            "m=3",
+            "m=3,mode=projective",
+            "m=3,mode=full",
+            "m=3,engine=exhaustive",
+        ] {
             let mut o = oracle(&inst, &fb, 3, 3, spec);
             for _ in 0..6 {
                 let idx: Vec<usize> = (0..3).map(|_| rng.gen_range(0..fb.points.len())).collect();
@@ -2589,6 +2686,7 @@ mod tests {
         let decomposable = decomposable_points(curve, &fb, 3, &mut GroupOps::default());
         let mut rng = StdRng::seed_from_u64(11);
         let mut f4 = oracle(&inst, &fb, 3, 3, "m=3,crosscheck=1");
+        let mut projective = oracle(&inst, &fb, 3, 3, "m=3,mode=projective,crosscheck=1");
         let mut full = oracle(&inst, &fb, 3, 3, "m=3,mode=full");
         let mut grid = oracle(&inst, &fb, 3, 3, "m=3,engine=exhaustive");
         let g = inst.generator_point();
@@ -2615,8 +2713,14 @@ mod tests {
                 )
                 .is_some()
             };
-            let (a, b, c) = (run(&mut f4), run(&mut full), run(&mut grid));
+            let (a, p, b, c) = (
+                run(&mut f4),
+                run(&mut projective),
+                run(&mut full),
+                run(&mut grid),
+            );
             assert_eq!(a, c, "chain F4 against the grid, target {k}");
+            assert_eq!(p, c, "projective F4 against the grid, target {k}");
             assert_eq!(b, c, "full F4 against the grid, target {k}");
             assert_eq!(c, decomposable.contains(&curve.key(&target)), "target {k}");
             hits += usize::from(c);
@@ -2628,6 +2732,55 @@ mod tests {
             0
         );
         assert!(n["pkm_system_fp_mults_uncharged"] > 0);
+    }
+
+    /// The normalized projective closure retains the intermediate identity:
+    /// `S₃(x(P),x(-P),(1:0)) = 0` and
+    /// `S₃((1:0),x(Q),x(Q)) = 0`.  Its normalization rejects `(0:0)`.
+    #[test]
+    fn projective_chain_keeps_identity_and_rejects_zero_coordinates() {
+        let inst = instance();
+        let curve = &inst.curve;
+        let p = curve.p;
+        let fb = base(&inst, 3);
+        assert!(fb.points.len() >= 4);
+        let g = fb.points[0];
+        let q = fb
+            .points
+            .iter()
+            .copied()
+            .find(|pt| pt.x != g.x)
+            .expect("two factor-base abscissae");
+        assert!(!q.infinity);
+
+        let n = 1;
+        let one = Pol::constant(n, 1, p);
+        let zero = Pol::constant(n, 0, p);
+        let xp = Pol::constant(n, g.x, p);
+        let xq = Pol::constant(n, q.x, p);
+        let first = s3_frac((&xp, &one), (&xp, &one), (&one, &zero), curve.a, curve.b, p);
+        let second = s3_frac((&one, &zero), (&xq, &one), (&xq, &one), curve.a, curve.b, p);
+        assert!(
+            first.terms.is_empty(),
+            "inverse pair reaches the identity chart"
+        );
+        assert!(second.terms.is_empty(), "identity plus Q reaches Q");
+
+        let invalid = one.sub(&zero, p).mul(&zero.sub(&one, p), p);
+        assert!(!invalid.terms.is_empty(), "normalization excludes (0:0)");
+
+        let mut projective = oracle(&inst, &fb, 3, 3, "m=3,mode=projective");
+        let mut ops = GroupOps::default();
+        let got = projective
+            .decompose(
+                &ctx(&inst),
+                &fb,
+                &mut ops,
+                &mut OracleCounters::default(),
+                q,
+            )
+            .expect("the projective oracle returns an exact decomposition when one exists");
+        assert_eq!(sum(curve, &fb, &got), q);
     }
 
     /// F4 on a membership form against the grid and the exact set of

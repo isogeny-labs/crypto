@@ -2040,6 +2040,8 @@ fn f4cost_m(
     let started = std::time::Instant::now();
     let mut st = seed;
     let (mut done, mut hits, mut verified, mut exact) = (0u64, 0u64, 0u64, 0u64);
+    let trace_targets = std::env::var("F4COST_TARGET_TRACE").as_deref() == Ok("1");
+    let mut target_trace = Vec::new();
     for _ in 0..targets {
         if started.elapsed().as_secs() >= cap_s {
             break;
@@ -2053,13 +2055,18 @@ fn f4cost_m(
         if target.infinity {
             continue;
         }
+        let solver_before = trace_targets.then(|| oracle.solver_totals().unwrap_or_default());
+        let native_before = trace_targets.then(|| oracle.relation_counters());
         let mut ctr = OracleCounters::default();
+        let (mut hit_this, mut exact_this, mut verified_this) = (false, false, false);
         if let Some(idx) = oracle.decompose(&ctx, &fb, &mut ops, &mut ctr, target) {
             hits += 1;
+            hit_this = true;
             let s = idx.iter().fold(inst.curve.identity(), |acc, &i| {
                 inst.curve.add(&mut GroupOps::default(), acc, fb.points[i])
             });
-            exact += u64::from(s == target);
+            exact_this = s == target;
+            exact += u64::from(exact_this);
             // The pipeline writes rows over [h]P, so a lift R + K (K in E[h])
             // is accepted when the projected sums agree; without lifts the
             // sum must be R itself.
@@ -2072,7 +2079,37 @@ fn f4cost_m(
             };
             if ok {
                 verified += 1;
+                verified_this = true;
             }
+        }
+        if let (Some(before), Some(native_before)) = (solver_before, native_before) {
+            let after = oracle.solver_totals().unwrap_or_default();
+            let native_after = oracle.relation_counters();
+            let native_delta: std::collections::BTreeMap<String, u64> = native_after
+                .iter()
+                .filter_map(|(key, &value)| {
+                    let prior = native_before.get(key).copied().unwrap_or(0);
+                    (value != prior).then(|| (key.clone(), value - prior))
+                })
+                .collect();
+            target_trace.push(json!({
+                "target_index": done,
+                "scalar": a,
+                "target_x": target.x,
+                "target_y": target.y,
+                "f4_calls": after.calls - before.calls,
+                "f4_muladds": after.ops - before.ops,
+                "f4_wall_ns": after.wall_ns - before.wall_ns,
+                "budget_exceeded": after.budget_exceeded - before.budget_exceeded,
+                "hit": hit_this,
+                "exact": exact_this,
+                "verified": verified_this,
+                "group_adds": ops.adds,
+                "group_doubles": ops.doubles,
+                "lift_failures": ctr.lift_failures,
+                "unliftable_systems": ctr.unliftable_systems,
+                "native": native_delta,
+            }));
         }
         done += 1;
     }
@@ -2214,6 +2251,9 @@ fn f4cost_m(
     out["planted_hits"] = json!(p_hits);
     out["planted_exact"] = json!(p_exact);
     out["planted_muladds"] = json!(p_ops);
+    if trace_targets {
+        out["target_trace"] = json!(target_trace);
+    }
     out
 }
 
