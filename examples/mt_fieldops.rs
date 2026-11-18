@@ -353,6 +353,44 @@ enum Tab<V: Copy> {
     },
 }
 const FLAT_EMPTY: u32 = u32::MAX;
+extern "C" {
+    fn madvise(addr: *mut std::ffi::c_void, len: usize, advice: i32) -> i32;
+}
+/// Environment `MTF_HP=1` (research/mt_ic_hp_20261118): every flat table's arrays, for every arm (IC and rho
+/// alike), ask for transparent huge pages with madvise(MADV_HUGEPAGE) before first touch. On a host whose THP mode
+/// is "madvise" this replaces 4 KB pages by 2 MB pages; nothing else changes.
+fn hp_on() -> bool {
+    static HP: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *HP.get_or_init(|| std::env::var("MTF_HP").map(|v| v == "1").unwrap_or(false))
+}
+fn hp_advise<T>(v: &Vec<T>) {
+    let bytes = v.capacity() * std::mem::size_of::<T>();
+    if !hp_on() || bytes < (4 << 20) {
+        return;
+    }
+    let p = v.as_ptr() as usize;
+    let a = (p + (2 << 20) - 1) & !((2 << 20) - 1);
+    let end = (p + bytes) & !((2 << 20) - 1);
+    if end > a {
+        // SAFETY: [a, end) lies inside the vector's own allocation; MADV_HUGEPAGE (14) only changes paging policy.
+        unsafe {
+            madvise(a as *mut std::ffi::c_void, end - a, 14);
+        }
+    }
+}
+/// `vec![x; n]` whose pages are advised before they are first written.
+fn hp_vec<T: Clone>(n: usize, x: T) -> Vec<T> {
+    let mut v = Vec::with_capacity(n);
+    hp_advise(&v);
+    v.resize(n, x);
+    v
+}
+/// `Vec::with_capacity(n)`, advised before first touch.
+fn hp_cap<T>(n: usize) -> Vec<T> {
+    let v = Vec::with_capacity(n);
+    hp_advise(&v);
+    v
+}
 /// A flat-table key: the x coordinate, narrowed to u32 when p < 2^32. `EMPTY` is never a valid x.
 trait FKey: Copy + Eq {
     const EMPTY: Self;
@@ -398,7 +436,7 @@ fn flat_insert<K: FKey, V>(
     if 2 * ents.len() >= slots.len() {
         let size = 2 * slots.len();
         let nshift = 64 - size.trailing_zeros();
-        let mut ns = vec![(K::EMPTY, 0u32); size];
+        let mut ns = hp_vec(size, (K::EMPTY, 0u32));
         for &(k, v) in slots.iter() {
             if k != K::EMPTY {
                 let mut j = flat_home(k.wide(), nshift);
@@ -520,15 +558,15 @@ impl<V: Copy> Tab<V> {
             let (mask, shift) = (size - 1, 64 - size.trailing_zeros());
             if p <= FLAT_EMPTY as u64 {
                 Tab::Flat {
-                    slots: vec![(FLAT_EMPTY, 0); size],
-                    ents: Vec::with_capacity(cap),
+                    slots: hp_vec(size, (FLAT_EMPTY, 0)),
+                    ents: hp_cap(cap),
                     mask,
                     shift,
                 }
             } else {
                 Tab::FlatW {
-                    slots: vec![(u64::MAX, 0); size],
-                    ents: Vec::with_capacity(cap),
+                    slots: hp_vec(size, (u64::MAX, 0)),
+                    ents: hp_cap(cap),
                     mask,
                     shift,
                 }
@@ -544,9 +582,9 @@ impl<V: Copy> Tab<V> {
         }
         let size = (2 * cap.max(1)).next_power_of_two();
         Tab::FlatF {
-            slots: vec![(0, FLAT_EMPTY); size],
-            xs: Vec::with_capacity(cap),
-            ents: Vec::with_capacity(cap),
+            slots: hp_vec(size, (0, FLAT_EMPTY)),
+            xs: hp_cap(cap),
+            ents: hp_cap(cap),
             mask: size - 1,
             shift: 64 - size.trailing_zeros(),
         }
@@ -557,9 +595,9 @@ impl<V: Copy> Tab<V> {
     fn new_fp_dense(cap: usize, _p: u64) -> Tab<V> {
         let size = (cap.max(1) * 5).div_ceil(3).next_power_of_two();
         Tab::FlatF {
-            slots: vec![(0, FLAT_EMPTY); size],
-            xs: Vec::with_capacity(cap),
-            ents: Vec::with_capacity(cap),
+            slots: hp_vec(size, (0, FLAT_EMPTY)),
+            xs: hp_cap(cap),
+            ents: hp_cap(cap),
             mask: size - 1,
             shift: 64 - size.trailing_zeros(),
         }

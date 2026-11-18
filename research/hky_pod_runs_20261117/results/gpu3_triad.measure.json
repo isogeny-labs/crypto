@@ -1,0 +1,192 @@
+{
+ "command": [
+  "/workspace/gpu_one",
+  "triad"
+ ],
+ "conditions": {
+  "other_cpu_cores": {
+   "max": 5.669011569749612,
+   "median": 5.062732616967556,
+   "min": 4.7205571884992485,
+   "n": 10
+  }
+ },
+ "created_utc": "2026-11-17T16:28:44Z",
+ "declared_bytes_per_op": 24.0,
+ "flags": [],
+ "gpu": {
+  "host_cpu_utilisation": {
+   "max": 1.0102854292560048,
+   "median": 0.9927071757774406,
+   "min": 0.9785022927279443,
+   "n": 10
+  },
+  "nvidia_smi": {
+   "note": "nvidia-smi utilisation is the share of samples with a kernel resident; it is not SM activity",
+   "power_w": {
+    "max": 43.84,
+    "median": 42.83,
+    "min": 30.45,
+    "n": 38
+   },
+   "samples": 38,
+   "temperature_c": {
+    "max": 55.0,
+    "median": 54.0,
+    "min": 52.0,
+    "n": 38
+   },
+   "throttled_sample_share": 0.0,
+   "utilization_gpu_pct": {
+    "max": 100.0,
+    "median": 64.5,
+    "min": 0.0,
+    "n": 38
+   },
+   "utilization_memory_pct": {
+    "max": 100.0,
+    "median": 75.0,
+    "min": 0.0,
+    "n": 38
+   }
+  }
+ },
+ "host": {
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47
+  ],
+  "arch": "x86_64",
+  "caches_bytes": {
+   "L1d": 32768,
+   "L1i": 32768,
+   "L2": 524288,
+   "L3": 33554432
+  },
+  "cgroup_cpu_max": null,
+  "cpu_model": "AMD EPYC 7443 24-Core Processor",
+  "cpufreq_boost": "1",
+  "cpufreq_governor": "schedutil",
+  "event_sources": [
+   "breakpoint",
+   "cpu",
+   "ibs_fetch",
+   "ibs_op",
+   "kprobe",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "fingerprint": "d82e16df00ed495d",
+  "gpus": [
+   "NVIDIA RTX 2000 Ada Generation, 16380 MiB, 595.112.07, 8.9"
+  ],
+  "hypervisor": false,
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "bmi2",
+   "fma",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "kernel": "6.8.0-138-generic",
+  "logical_cpus": 48,
+  "mem_total_bytes": 270090555392,
+  "numa_nodes": 1,
+  "perf_event_paranoid": "4",
+  "smt_active": "1",
+  "thread_siblings_cpu0": "0,24",
+  "turbo_disabled": null
+ },
+ "label": "gpu-triad",
+ "noise_floor": {
+  "aa_ratio_deviation": 9.291688783830132e-05,
+  "pairs": 5,
+  "rel_range": 0.0002919858044662223,
+  "sufficient": true,
+  "value": 0.0002919858044662223
+ },
+ "op_class": "fma_f64",
+ "ops_source": "optlevel.ops/v1 line",
+ "points": {
+  "1": {
+   "mode": "device",
+   "ops": {
+    "max": 4362076160.0,
+    "median": 4362076160.0,
+    "min": 4362076160.0,
+    "n": 10
+   },
+   "ops_per_s": {
+    "max": 8683531489.110586,
+    "median": 8682130131.109825,
+    "min": 8680996430.359774,
+    "n": 10
+   },
+   "threads": 1,
+   "wall_s": {
+    "max": 0.7737185590012814,
+    "median": 0.739384953998524,
+    "min": 0.7239092599993455,
+    "n": 10
+   }
+  }
+ },
+ "repeats": 5,
+ "schema": "optlevel.measurement/v1",
+ "startup_share": null,
+ "tier": "T-gpu-timing",
+ "tool_version": "1.0.0"
+}

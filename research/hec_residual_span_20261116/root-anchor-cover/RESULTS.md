@@ -1,0 +1,9 @@
+# Exact degree/root geometry in emitted-anchor cover
+
+[pcc:unverified] Freeze a21453fe317 pushed before once-only execution; input hashes pass,exit0. All24completecalls/12originaltargets pass packetgeometry/order/root/branch/scalar comparison, everyproducer/construction/control16vector replay against emitted-anchor-cover-v2, exactrepeats/REDCidentity. Bothverifiers reject216commonmutations each; newverifierrejects96anchor mutations. Synthetic rootlemma positive/fournegative includingfalseoverlap and repeatedrootfallback controls pass.
+
+Fastpath requires three distinctsupport abscissas outsideu and correctw values; acceptedcurve membership follows validatedreps/rotation andmandatoryphase-membership forallsupports. Anchorvalidity followsinductivelycheckedemittedcertificates. Repeated/overlap cases retainexactprincipalpolynomialproduct.3fallbackrows observed (2atp101sm17case0,1atp251sm17case0), allcosts charged. No relationdiscard/assumptionofgenericity.
+
+Completebasefieldwork0.6-6.0percent fewer versus preceding emitted-anchorpipeline, subgroupunchanged. P601totals13812->13218,8442->7936,19052->18304,16316->15612 (sm1case0,sm1case1,sm17case0,sm17case1),3.9-6.0percent fewer. Correspondingverifier3194->2600,2422->1916,4782->4034,4528->3824. Allproducer/certificate/rootproof costs unchangedandfullycharged. Fullpermoduluscounts/ratios inraw/summary; map/vector/encodingcostsunpriced, no wall/externalfastest claim.
+
+P601candidate/retainedarm0base0.948,0.553,1.200,0.997. Mixedcomparison andregistered10xgatefails; neither verifiercomponentimprovement nor accumulatedengineering work establishesrequested mathematicalbreakthrough. Next needs changedcollection/setup/relations, not merely more subgroupelimination. Existingresidualspan/ranknegative screens andbranchproofcostcontrols remainapplicable. Genus3/4 fullcoverage andindependent signedreview/publicationartifacts pending. Gitcustody,noS3/cloud/retry; originalgenus2+10xgoalactive.

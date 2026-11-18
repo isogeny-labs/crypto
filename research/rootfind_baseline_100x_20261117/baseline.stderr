@@ -1,0 +1,11 @@
+
+thread 'main' (6577) panicked at src/cryptanalysis/ic_boundary.rs:6724:5:
+assertion failed: (8..=32).contains(&bits)
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::panicking::panic
+   3: crypto_lib::cryptanalysis::ic_boundary::find_prime_order_curve
+   4: crypto_lib::cryptanalysis::ic_boundary::prime_instance_for
+   5: rootfind_baseline::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

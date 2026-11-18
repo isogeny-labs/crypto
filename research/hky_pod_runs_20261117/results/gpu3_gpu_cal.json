@@ -1,0 +1,212 @@
+{
+ "build": {
+  "compiler": "/usr/local/cuda/bin/nvcc",
+  "flags": [
+   "-O3",
+   "-std=c++17"
+  ],
+  "source_sha256": "aafb949d165483d1fe86f8baaea56a4a0d302068735e1a6230074cc6da78b04a"
+ },
+ "ceiling_rule": "max over repeats of the device rate with every SM occupied; threads '1' means one whole device",
+ "compute": {
+  "fma_f64": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "a <- a*s + b in binary64 (one fused multiply-add; float-encoded modular arithmetic)",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 92802576606.50272,
+     "median": 92254737192.34203,
+     "min": 92254285208.05281,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  },
+  "muladd_u32": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "a <- a*m + c on 32-bit words (wrapping)",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 3156787592353.846,
+     "median": 3156671548913.5127,
+     "min": 3155805758705.7373,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  },
+  "muladd_u64": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "a <- a*m + c on 64-bit words (wrapping)",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 639205656565.9791,
+     "median": 639189440411.2756,
+     "min": 638989646358.1951,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  },
+  "popcnt_u64": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "popcount(a and b) on 64-bit words",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 414578941666.4768,
+     "median": 414506041819.7645,
+     "min": 412132661694.3159,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  },
+  "xor_u64": {
+   "best_variant": "gpu_calib.cu",
+   "definition": "a <- a xor b on 64-bit words (one F_2 row-add word)",
+   "scalar_ops_per_s": null,
+   "simd_ops_per_s": null,
+   "total_ops_per_s": {
+    "1": {
+     "max": 1444417207777.8828,
+     "median": 1442666499344.1716,
+     "min": 1432897335594.957,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {}
+  }
+ },
+ "conditions": null,
+ "created_utc": "2026-11-17T16:27:14Z",
+ "device": "gpu",
+ "flags": [
+  "GPU_CEILING_UNVALIDATED_BY_AUTHOR"
+ ],
+ "host": {
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47
+  ],
+  "arch": "x86_64",
+  "caches_bytes": {
+   "L1d": 32768,
+   "L1i": 32768,
+   "L2": 524288,
+   "L3": 33554432
+  },
+  "cgroup_cpu_max": null,
+  "cpu_model": "AMD EPYC 7443 24-Core Processor",
+  "cpufreq_boost": "1",
+  "cpufreq_governor": "schedutil",
+  "event_sources": [
+   "breakpoint",
+   "cpu",
+   "ibs_fetch",
+   "ibs_op",
+   "kprobe",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "fingerprint": "d82e16df00ed495d",
+  "gpus": [
+   "NVIDIA RTX 2000 Ada Generation, 16380 MiB, 595.112.07, 8.9"
+  ],
+  "hypervisor": false,
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "bmi2",
+   "fma",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "kernel": "6.8.0-138-generic",
+  "logical_cpus": 48,
+  "mem_total_bytes": 270090555392,
+  "numa_nodes": 1,
+  "perf_event_paranoid": "4",
+  "smt_active": "1",
+  "thread_siblings_cpu0": "0,24",
+  "turbo_disabled": null
+ },
+ "memory": {
+  "bandwidth_bytes_per_s": {
+   "1": {
+    "max": 208397706941.45795,
+    "median": 208378073964.80374,
+    "min": 208365154911.85587,
+    "n": 3
+   }
+  },
+  "bytes_convention": "device triad, 24 bytes per element",
+  "latency_ns": null
+ },
+ "schema": "optlevel.calibration/v1",
+ "tool_version": "1.0.0"
+}

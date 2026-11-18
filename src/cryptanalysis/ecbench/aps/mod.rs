@@ -902,26 +902,9 @@ pub fn solve(
     let mut root_muls = 0;
     let mut missing_roots = 0;
     let mut missing_reports = 0;
-    // Measured degree-fall observables, folded over the attempts' F4 solves:
-    // first fall is the earliest degree the realized Hilbert function drops
-    // below the semi-regular expectation, last fall the latest, and the
-    // observed degree of regularity the largest any solve reached. Diagnostic
-    // only: never priced into S, never a stopping rule.
-    let mut first_fall: Option<u32> = None;
-    let mut last_fall: Option<u32> = None;
-    let mut dreg_observed: Option<u32> = None;
     for row in &attempts {
         if let Some(a) = &row.algebra {
             f4_muls += a.f4_field_multiplications;
-            if let Some(d) = a.first_fall_degree {
-                first_fall = Some(first_fall.map_or(d, |c| c.min(d)));
-            }
-            if let Some(d) = a.last_fall_degree {
-                last_fall = Some(last_fall.map_or(d, |c| c.max(d)));
-            }
-            if let Some(d) = a.degree_of_regularity_observed {
-                dreg_observed = Some(dreg_observed.map_or(d, |c| c.max(d)));
-            }
             if let Some(r) = &a.roots {
                 root_muls += r.root_field_multiplications;
             } else {
@@ -947,17 +930,6 @@ pub fn solve(
         "aps_legacy_root_count_unknown_attempts".into(),
         missing_roots,
     );
-    // Measured degree-fall observables (present only when an F4 solve recorded
-    // them; a degree of 0 is a real value, absence means "not measured").
-    if let Some(d) = first_fall {
-        counters.insert("aps_first_fall_degree".into(), u64::from(d));
-    }
-    if let Some(d) = last_fall {
-        counters.insert("aps_last_fall_degree".into(), u64::from(d));
-    }
-    if let Some(d) = dreg_observed {
-        counters.insert("aps_degree_of_regularity_observed".into(), u64::from(d));
-    }
     if v2 {
         let work = core::core_work();
         counters.insert("aps_core_scalar_mults_uncharged".into(), work.scalar_mults);

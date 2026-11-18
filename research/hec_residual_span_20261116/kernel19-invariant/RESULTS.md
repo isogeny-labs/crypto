@@ -1,0 +1,7 @@
+# All four complex quotient candidates distinguished
+
+[pcc:unverified]. Freezefe767fa8aec; all input hashes passed; sole invocation exit0. Source and q0..q3 pass256/512bit period symmetry/positivity,10nonzero even theta/6odd containingzero, chi10 denominator exclusion, finiteness, cross-precision overlap and exact serialized-ball reload. Source psi4/psi6/chi12 containzero consistently with its order-five symmetry. All10 pairs are certified distinct by at least one disjoint weight-zero-function interval; thus all six quotient pairs are distinguished. This strengthens preceding orbit enumeration to distinguish the complex polarized candidates, conditional on the source CM-module interpretation. No finite-field identification follows automatically.
+
+Functions are psi4^5/chi10², psi6^5/chi10³, chi12^5/chi10^6 in FLINT3.6 conventions. Exact balls are authoritative; human decimal displays use arb_printn. No claim of standard Igusa normalization or complete separating coordinates. Repeated precisions and same-process reload are internal consistency/serialization checks, not independent review.
+
+Exact algebraic values, denominator/height bounds, F251 reduction, curve equations and isogeny maps remain unconstructed. All scientific raw values and failures from preceding gates retained. Before further CM reconstruction, quantify the maximum smoothness-only improvement on the original full-factor-base target subgroup; its baseline density may already make that mechanism insufficient for10x.

@@ -4557,6 +4557,7 @@ mod wide {
     }
 
     #[inline(always)]
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn root_from_tables(
         primary: &RootTable128,
         overflow: Option<&RootTable128>,
@@ -4575,6 +4576,7 @@ mod wide {
 
     impl Index128 {
         #[inline(always)]
+        #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
         fn get_root(&self, key: u128, basis: &NormalBasis128) -> Option<u64> {
             root_from_tables(
                 &self.table,
@@ -4799,6 +4801,46 @@ mod wide {
         columns: usize,
     }
 
+    /// How the index build runs.  `serial()` is the original loop (the
+    /// control); the other settings change only how the same states and the
+    /// same table are produced, never their content or order.
+    #[derive(Clone, Copy, Debug)]
+    struct IndexBuildOpts {
+        /// `KIC_INDEX_THREADS=N` (N > 1): states and canonical keys are
+        /// computed in parallel; the table is filled serially, in order.
+        threads: usize,
+        /// `KIC_INDEX_BATCH_INV=1`: one shared inversion per chunk of
+        /// `INDEX_BATCH` root solves (Montgomery's trick) instead of one each.
+        batch_inv: bool,
+    }
+
+    /// Root solves per shared inversion in the batched build.
+    const INDEX_BATCH: usize = 256;
+
+    impl IndexBuildOpts {
+        fn serial() -> Self {
+            Self {
+                threads: 1,
+                batch_inv: false,
+            }
+        }
+
+        fn from_env() -> Self {
+            Self {
+                threads: std::env::var("KIC_INDEX_THREADS")
+                    .ok()
+                    .and_then(|value| value.trim().parse::<usize>().ok())
+                    .filter(|&threads| threads > 0)
+                    .unwrap_or(1),
+                batch_inv: std::env::var("KIC_INDEX_BATCH_INV").as_deref() == Ok("1"),
+            }
+        }
+
+        fn is_serial(self) -> bool {
+            self.threads <= 1 && !self.batch_inv
+        }
+    }
+
     fn indexed5_fixed31_capacity_ok(max_states: usize) -> bool {
         max_states < (1usize << 30)
             && max_states
@@ -4823,7 +4865,8 @@ mod wide {
         let indexed5_load75 = std::env::var("KIC_INDEXED5_LOAD75").as_deref() == Ok("1");
         let indexed5_load80 = std::env::var("KIC_INDEXED5_LOAD80").as_deref() == Ok("1");
         let batch_roots = std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1");
-        build_index128_with_symmetry(
+        let opts = IndexBuildOpts::from_env();
+        let index = build_index128_impl(
             gf,
             basis,
             solver,
@@ -4832,7 +4875,32 @@ mod wide {
             indexed5_load75,
             indexed5_load80,
             batch_roots,
-        )
+            opts,
+        );
+        if !opts.is_serial() && std::env::var("KIC_VERIFY_INDEX").as_deref() == Ok("1") {
+            let started = Instant::now();
+            let reference = build_index128_impl(
+                gf,
+                basis,
+                solver,
+                reps,
+                symmetric_states,
+                indexed5_load75,
+                indexed5_load80,
+                batch_roots,
+                IndexBuildOpts::serial(),
+            );
+            match index_difference(&index, &reference) {
+                None => eprintln!(
+                    "VERIFY_INDEX identical states={} table_entries={} serial_rebuild_s={:.3}",
+                    index.states.len(),
+                    index.table.len,
+                    started.elapsed().as_secs_f64()
+                ),
+                Some(difference) => panic!("VERIFY_INDEX mismatch: {difference}"),
+            }
+        }
+        index
     }
 
     fn indexed5_load80_request(states: usize) -> usize {
@@ -4967,6 +5035,7 @@ mod wide {
     }
 
     #[cfg(test)]
+    #[allow(clippy::too_many_arguments)]
     fn build_index128_with_symmetry(
         gf: &Gf2_128,
         basis: &NormalBasis128,
@@ -4977,6 +5046,33 @@ mod wide {
         indexed5_load80: bool,
         batch_roots: bool,
     ) -> Index128 {
+        build_index128_impl(
+            gf,
+            basis,
+            solver,
+            reps,
+            symmetric_states,
+            indexed5_load75,
+            indexed5_load80,
+            batch_roots,
+            IndexBuildOpts::serial(),
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn build_index128_impl(
+        gf: &Gf2_128,
+        basis: &NormalBasis128,
+        solver: &S3Solver128,
+        reps: &[u128],
+        symmetric_states: bool,
+        indexed5_load75: bool,
+        indexed5_load80: bool,
+        batch_roots: bool,
+        opts: IndexBuildOpts,
+    ) -> Index128 {
+        let timing = std::env::var("KIC_INDEX_TIMING").as_deref() == Ok("1");
+        let index_started = Instant::now();
         assert!(
             !(indexed5_load75 && indexed5_load80),
             "indexed five-byte load75 and load80 requests are mutually exclusive"
@@ -5310,6 +5406,11 @@ mod wide {
         let mut core_state_insertions = 0usize;
         let mut overflow_state_insertions = 0usize;
         let mut states_wide = Vec::new();
+        let blocked_states = !opts.is_serial()
+            && !(packed_state83 || packed_state26 || root_only83 || root_only21 || root_only11);
+        if blocked_states {
+            states_wide = build_states_blocked(gf, basis, solver, &shifted, symmetric_states, opts);
+        }
         let mut root_batch = RootBatch128::with_capacity(n);
         let mut root_inputs = Vec::with_capacity(n);
         let root_threads: usize = match std::env::var("KIC_INDEX_ROOT_THREADS") {
@@ -5326,7 +5427,7 @@ mod wide {
             Err(std::env::VarError::NotPresent) => 1,
             Err(error) => panic!("invalid KIC_INDEX_ROOT_THREADS: {error}"),
         };
-        for left in 0..reps.len() {
+        for left in 0..if blocked_states { 0 } else { reps.len() } {
             let right_start = if symmetric_states { left } else { 0 };
             // Compute each left row concurrently, then insert states and exact
             // root keys in the original right/relative order.  The latter
@@ -6987,6 +7088,8 @@ mod wide {
                     &reps,
                     symmetric,
                     false,
+                    false,
+                    false,
                     IndexBuildOpts::serial(),
                 );
                 assert!(reference.states.len() > 100);
@@ -6997,6 +7100,8 @@ mod wide {
                         &solver,
                         &reps,
                         symmetric,
+                        false,
+                        false,
                         false,
                         IndexBuildOpts { threads, batch_inv },
                     );
@@ -7113,6 +7218,8 @@ mod wide {
                 &basis,
                 &solver,
                 &reps,
+                false,
+                false,
                 false,
                 false,
                 IndexBuildOpts::serial(),

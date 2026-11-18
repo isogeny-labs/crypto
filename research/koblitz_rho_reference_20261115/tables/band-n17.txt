@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m17-tm101-00378d4e | 16.00 | gen-c1 | 144/144 | 1.608 | 2.008 | 5.607 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-neg | 144/144 | 1.838 | 1.961 | 3.074 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-strong | 144/144 | 3.964 | 4.091 | 5.239 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-strong-aa | 144/144 | 3.964 | 4.091 | 5.239 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-strong-v2 | 144/144 | 0.847 | 0.906 | 1.432 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-v5 | 144/144 | 0.368 | 0.403 | 0.716 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-v5-aa | 144/144 | 0.368 | 0.403 | 0.716 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m17-tm101-00378d4e | gen-c1 vs rho-neg | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | gen-c1 vs rho-strong | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | gen-c1 vs rho-strong-aa | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | gen-c1 vs rho-strong-v2 | rho-strong-v2 < gen-c1 |
+| icv1-f2m17-tm101-00378d4e | gen-c1 vs rho-v5 | rho-v5 < gen-c1 |
+| icv1-f2m17-tm101-00378d4e | gen-c1 vs rho-v5-aa | rho-v5-aa < gen-c1 |
+| icv1-f2m17-tm101-00378d4e | rho-neg vs rho-strong | rho-neg < rho-strong |
+| icv1-f2m17-tm101-00378d4e | rho-neg vs rho-strong-aa | rho-neg < rho-strong-aa |
+| icv1-f2m17-tm101-00378d4e | rho-neg vs rho-strong-v2 | rho-strong-v2 < rho-neg |
+| icv1-f2m17-tm101-00378d4e | rho-neg vs rho-v5 | rho-v5 < rho-neg |
+| icv1-f2m17-tm101-00378d4e | rho-neg vs rho-v5-aa | rho-v5-aa < rho-neg |
+| icv1-f2m17-tm101-00378d4e | rho-strong vs rho-strong-aa | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | rho-strong vs rho-strong-v2 | rho-strong-v2 < rho-strong |
+| icv1-f2m17-tm101-00378d4e | rho-strong vs rho-v5 | rho-v5 < rho-strong |
+| icv1-f2m17-tm101-00378d4e | rho-strong vs rho-v5-aa | rho-v5-aa < rho-strong |
+| icv1-f2m17-tm101-00378d4e | rho-strong-aa vs rho-strong-v2 | rho-strong-v2 < rho-strong-aa |
+| icv1-f2m17-tm101-00378d4e | rho-strong-aa vs rho-v5 | rho-v5 < rho-strong-aa |
+| icv1-f2m17-tm101-00378d4e | rho-strong-aa vs rho-v5-aa | rho-v5-aa < rho-strong-aa |
+| icv1-f2m17-tm101-00378d4e | rho-strong-v2 vs rho-v5 | rho-v5 < rho-strong-v2 |
+| icv1-f2m17-tm101-00378d4e | rho-strong-v2 vs rho-v5-aa | rho-v5-aa < rho-strong-v2 |
+| icv1-f2m17-tm101-00378d4e | rho-v5 vs rho-v5-aa | unresolved inside the band |
