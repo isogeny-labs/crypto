@@ -21,5 +21,18 @@ the filenames pointing to the amended rule/cohort. It retains the selector
 order, five-curve count, arms, controls, hypotheses, metrics, stopping rules,
 invalidation rules and decision rule.
 
-The current protocol is a schema-valid draft. A later pre-data commit will bind
-its draft revision and canonical SHA-256 before `COHORT_V2.json` is emitted.
+The schema-valid v2 draft was committed as:
+
+```text
+189053138811e03e2fae58cb1d8ad414c89b0cab
+```
+
+Canonical SHA-256 is sorted compact JSON with the entire `freeze` block
+removed:
+
+```text
+42b510bd0f67d23ad49e5827d947510de5e1c68bf82d29c78fa35e4861fe4bf3
+```
+
+Protocol v2 was frozen at `2026-11-18T01:19:53Z`, before `COHORT_V2.json` or
+any candidate/reference moment was emitted.
