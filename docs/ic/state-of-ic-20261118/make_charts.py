@@ -18,7 +18,7 @@ for reg in cols:
 ax.axhline(1,color='k',lw=0.8,ls='--'); ax.text(9.5,1.08,'parity with matched rho (1.0x)',fontsize=7)
 ax.set_yscale('log'); ax.set_xlabel('log2 r (subgroup order)'); ax.set_ylabel('best IC cost / matched rho (log)')
 ax.set_ylim(0.8,60); ax.legend(fontsize=7,frameon=False,loc='upper left'); ax.set_title('Leaderboard tables A-C: distance to rho by size',fontsize=10)
-fig.tight_layout(); fig.savefig(out+'fig1_board.png',dpi=200); fig.savefig(out+'fig1_board.svg')
+fig.tight_layout(); fig.savefig(out+'fig1_board.svg')
 json.dump(rows,open(out+'fig1_board_data.json','w'),indent=1)
 # timeline
 pts=[p for p in d['progress']['points'] if p.get('value') and p['value']<200]
@@ -29,5 +29,5 @@ for p in pts:
   ax.plot(dt,p['value'],'o',color=c,ms=5)
 ax.axhline(1,color='k',lw=0.8,ls='--'); ax.set_yscale('log'); ax.set_ylabel('IC / rho (log; <1 = IC cheaper)')
 ax.set_title('Cold one-target headline points by landing date (mixed units; grey = unmatched rho)',fontsize=9)
-fig.autofmt_xdate(); fig.tight_layout(); fig.savefig(out+'fig2_timeline.png',dpi=200)
+fig.autofmt_xdate(); fig.tight_layout(); fig.savefig(out+'fig2_timeline.svg')
 print(len(rows),len(pts))
