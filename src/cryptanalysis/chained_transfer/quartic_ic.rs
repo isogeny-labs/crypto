@@ -1732,6 +1732,38 @@ pub fn row_sum_is_zero(ec: &EcU64, cols: &[(u64, u64)], row: &[(u32, u64)], r: u
     acc.is_none()
 }
 
+/// Individual logarithm of `t` from factor-base logs `x` (A1: the shifts
+/// `T + [h]G` are counted group operations).  Returns the candidate
+/// `(log, h, column)` and the last shifted point.
+#[allow(clippy::too_many_arguments)]
+fn find_target(
+    fb: &FactorBase,
+    ec: &EcU64,
+    g: EcPt,
+    tpt: EcPt,
+    x: &[u64],
+    r: u64,
+    max_shifts: u64,
+    o: &mut Ops,
+    grp: &mut GroupTally,
+) -> (Option<(u64, u64, Option<u32>)>, EcPt) {
+    let mut shifted = tpt;
+    for h in 0..max_shifts.min(r) {
+        if shifted.is_none() {
+            o.add_r += 1;
+            return (Some((subm(0, h % r, r), h, None)), shifted);
+        }
+        if let Some((c, neg)) = fb.fold(shifted, o) {
+            let xc = x[c as usize];
+            o.add_r += 1 + u64::from(neg);
+            let lc = if neg { subm(0, xc, r) } else { xc };
+            return (Some((subm(lc, h % r, r), h, Some(c))), shifted);
+        }
+        shifted = ec.add(shifted, g, grp);
+    }
+    (None, shifted)
+}
+
 fn run_arm(inst: &Inst, kind: ArmKind, prm: RunParams) -> RunOut {
     let t0 = Instant::now();
     let (p, r) = (inst.p, inst.r);
@@ -1818,6 +1850,9 @@ fn run_arm(inst: &Inst, kind: ArmKind, prm: RunParams) -> RunOut {
     let mut seen: HashSet<Line> = HashSet::new();
     let npts = fb.affine.len();
     let mut logs: Option<Vec<u64>> = None;
+    let tpt: EcPt = Some(inst.t);
+    let mut cand: Option<(u64, u64, Option<u32>)> = None;
+    let mut shifted: EcPt = tpt;
     loop {
         let rel_rows = rows.len() - 1;
         if covered == n && rel_rows >= target {
@@ -1827,9 +1862,37 @@ fn run_arm(inst: &Inst, kind: ArmKind, prm: RunParams) -> RunOut {
             out.core_cols = la.core_cols;
             out.peeled = la.peeled;
             if let Some(x) = la.x {
-                out.rows_used = rel_rows;
-                logs = Some(x);
-                break;
+                // Amendment 2 (choice 4): the counted acceptance test.  The
+                // target log is computed from this solve and `[t]G == T` is
+                // checked with a counted scalar multiplication (phase log).
+                // A rank-deficient core can pass the residual with a
+                // kernel-shifted solution; a wrong target log is then a
+                // failed attempt and the A7 retry rule applies.
+                let (c, sh) = find_target(
+                    &fb,
+                    &ec,
+                    g,
+                    Some(inst.t),
+                    &x,
+                    r,
+                    prm.max_shifts,
+                    &mut ops[3],
+                    &mut grp[3],
+                );
+                let accepted = match c {
+                    None => true,
+                    Some((t, _, _)) => ec.mul(g, t, &mut grp[3]) == Some(inst.t),
+                };
+                if accepted {
+                    out.rows_used = rel_rows;
+                    cand = c;
+                    shifted = sh;
+                    logs = Some(x);
+                    break;
+                }
+                out.attempt_failures.push("wrong_log");
+                target = rel_rows + n.div_ceil(10);
+                continue;
             }
             out.attempt_failures.push(la.failure.unwrap_or("unknown"));
             target = rel_rows + n.div_ceil(10);
@@ -1959,26 +2022,8 @@ fn run_arm(inst: &Inst, kind: ArmKind, prm: RunParams) -> RunOut {
         }
         return fail(out, why, ops, grp, t0);
     };
-    // ── individual logarithm (A1: shifts are group operations) ──
-    let tpt: EcPt = Some(inst.t);
-    let mut shifted = tpt;
-    let mut cand = None;
-    for h in 0..prm.max_shifts.min(r) {
-        let o = &mut ops[3];
-        if shifted.is_none() {
-            o.add_r += 1;
-            cand = Some((subm(0, h % r, r), h, None));
-            break;
-        }
-        if let Some((c, neg)) = fb.fold(shifted, o) {
-            let xc = x[c as usize];
-            o.add_r += 1 + u64::from(neg);
-            let lc = if neg { subm(0, xc, r) } else { xc };
-            cand = Some((subm(lc, h % r, r), h, Some(c)));
-            break;
-        }
-        shifted = ec.add(shifted, g, &mut grp[3]);
-    }
+    // The individual logarithm was computed, counted and accepted inside
+    // the collection loop (Amendment 2, choice 4).
     // ── verification-only work (A6) ──
     if prm.replay_logs {
         for (c, &xc) in x.iter().enumerate() {
@@ -2003,7 +2048,10 @@ fn run_arm(inst: &Inst, kind: ArmKind, prm: RunParams) -> RunOut {
                 })
             });
             if !out.certified {
-                out.failure = Some("uncertified".into());
+                // The counted acceptance test passed inside the loop
+                // (Amendment 2, B4), so a failed independent check is an
+                // instrument defect, not an uncertified run.
+                out.failure = Some("check_mismatch".into());
             }
         }
         None => out.failure = Some("target_shifts_exhausted".into()),
@@ -2563,6 +2611,62 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn wrong_log_is_rejected_by_the_counted_acceptance_test() {
+        // Amendment 2, choice 4: a solution that passes the residual but
+        // gives a wrong target log must fail the counted acceptance test
+        // (and so count as a failed attempt), and the test must be charged.
+        let inst = inst_229(0);
+        let mut prm = RunParams::new(ic_seed(ArmKind::Q, 0, 0));
+        prm.keep_system = true;
+        let clean = solve_quartic_ic(&inst, prm);
+        assert!(clean.certified, "{:?}", clean.failure);
+        let mut o = Ops::default();
+        let cover = QuarticCover::new(inst.p, inst.a, inst.b, &mut o).unwrap();
+        let fb = FactorBase::build(&cover, &mut o);
+        let ec = EcU64::new(inst.p, inst.a, inst.b).unwrap();
+        let g: EcPt = Some(inst.g);
+        let x = clean.system.unwrap().logs.unwrap();
+        let mut o3 = Ops::default();
+        let mut g3 = GroupTally::default();
+        let (c, _) = find_target(
+            &fb,
+            &ec,
+            g,
+            Some(inst.t),
+            &x,
+            inst.r,
+            MAX_SHIFTS,
+            &mut o3,
+            &mut g3,
+        );
+        let (t, _, col) = c.expect("target found");
+        let before = g3;
+        assert_eq!(ec.mul(g, t, &mut g3), Some(inst.t));
+        assert_ne!(
+            format!("{before:?}"),
+            format!("{g3:?}"),
+            "acceptance test not charged"
+        );
+        // shift the log of the target's column: the candidate must be rejected
+        let col = col.expect("target folds onto a column") as usize;
+        let mut bad = x.clone();
+        bad[col] = (bad[col] + 1) % inst.r;
+        let (c2, _) = find_target(
+            &fb,
+            &ec,
+            g,
+            Some(inst.t),
+            &bad,
+            inst.r,
+            MAX_SHIFTS,
+            &mut o3,
+            &mut g3,
+        );
+        let (t2, _, _) = c2.expect("target found");
+        assert_ne!(ec.mul(g, t2, &mut g3), Some(inst.t));
     }
 
     #[test]
