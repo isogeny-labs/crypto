@@ -234,7 +234,29 @@ impl FastF3 {
     #[inline(always)]
     pub fn sq(&self, a: &K) -> K {
         self.bump(|c| c.f3_sq += 1);
-        self.mul_raw(a, a)
+        // Five-product cubic squaring for z^3 = c.  With
+        //
+        //   d1 = 2*a0*a1, d3 = 2*a1*a2,
+        //   d2 = a1^2 + 2*a0*a2,
+        //
+        // compute d2 from (a0+a1+a2)^2, avoiding separate products for
+        // a1^2 and a0*a2.  This saves one priced F_q multiplication versus
+        // the six-product generic Karatsuba path while preserving the same
+        // two small-constant reductions.
+        let m0 = self.fm(a[0], a[0]);
+        let m2 = self.fm(a[2], a[2]);
+        let m01 = self.fm(a[0], a[1]);
+        let m12 = self.fm(a[1], a[2]);
+        let sum = self.fa(self.fa(a[0], a[1]), a[2]);
+        let ms = self.fm(sum, sum);
+        let d1 = self.fa(m01, m01);
+        let d3 = self.fa(m12, m12);
+        let d2 = self.fs(self.fs(self.fs(self.fs(ms, m0), m2), d1), d3);
+        [
+            self.fa(m0, self.fmul_small(d3, self.c)),
+            self.fa(d1, self.fmul_small(m2, self.c)),
+            d2,
+        ]
     }
 
     fn frob(&self, a: &K) -> K {
@@ -829,7 +851,19 @@ pub fn selftest() {
             assert_eq!(f.add(&a, &b), inst.kf.add(&a, &b));
             assert_eq!(f.sub(&a, &b), inst.kf.sub(&a, &b));
             assert_eq!(f.mul(&a, &b), inst.kf.mul(&a, &b));
-            assert_eq!(f.sq(&a), inst.kf.mul(&a, &a));
+            let before_sq = f.counts();
+            let sq = f.sq(&a);
+            let sq_counts = f.counts().since(before_sq);
+            let before_mul = f.counts();
+            let generic_sq = f.mul(&a, &a);
+            let mul_counts = f.counts().since(before_mul);
+            assert_eq!(sq, generic_sq);
+            assert_eq!(sq, inst.kf.mul(&a, &a));
+            assert_eq!(sq_counts.fq_mul + 1, mul_counts.fq_mul);
+            assert_eq!(sq_counts.f3_sq, 1);
+            assert_eq!(sq_counts.f3_mul, 0);
+            assert_eq!(mul_counts.f3_sq, 0);
+            assert_eq!(mul_counts.f3_mul, 1);
             if a != KZERO {
                 assert_eq!(f.inv(&a), inst.kf.inv(&a));
                 assert_eq!(f.mul(&a, &f.inv(&a)), KONE);
