@@ -77,7 +77,14 @@ were not in PLAN.md, so treat them as post hoc:
 | + lever 3: 8-bit filter | 7.84 [6.60, 8.69] | 14.0x | 4.5x |
 | + fused L1 probe blocks (post hoc) | 6.65 [5.33, 7.77] | 16.5x | 5.2x |
 | + mix-hash exact set (post hoc) | 6.18 [5.12, 7.11] | 17.8x | 5.6x |
-| + lever 4: 4 threads | **1.685** [1.61, 3.57] | **65x** | **20.7x** |
+| + lever 4: 4 threads | 1.685 [1.61, 3.57] | 65x | 20.7x |
+| round 3: one-multiply filter hash, 1 thread (post hoc) | 5.18 [4.46, 5.36] | 21.2x | 6.7x |
+| round 3: + 4 threads | **1.365** [1.15, 2.04] | **80.5x** | **25.5x** |
+
+The two round-3 rows come from a later build (`probe-side/`, commit
+`31bfc33071`) on the same host and in the same session. In that build, the
+same fused kernel with the old hash ran at 6.96 [5.53, 7.25] ns on one
+thread.
 
 At A = 256 (`stack-256.svg`) the same stack runs from 97.0 ns (default) and
 18.8 ns (`rootfind-subtract`) down to 1.156 [1.10, 1.81] ns/point on 4
@@ -93,11 +100,14 @@ by about 1.7x, for the reason in the next section.
 At A = 1024 on one thread, the arithmetic takes 1.89 ns of the 6.18 ns
 point. Probing the 1 MiB filter on its own costs 2.29 ns, and the exact
 check on 3.4 % false positives costs about 0.3 ns. That leaves roughly
-1.7 ns unexplained inside the pipeline. The likely cause is L2 pressure:
-the 16-lane `pre` array is 128 KiB and shares the core's 2 MiB with the
-filter, and this host has no PMU to confirm it. **The probe, not the
-arithmetic, is now the bound**, so further vector work on the arithmetic
-cannot pay much.
+1.7 ns unexplained inside the pipeline. After round 1 I suspected L2
+pressure (the 16-lane `pre` array is 128 KiB and shares the core's 2 MiB
+with the filter). Rounds 2–3, below, mostly refute that: prefetch slows the
+pipeline, and halving `pre` gains only 0.4 ns. A cheaper hash gains 1.6 ns,
+so the probe is bound by its instruction count. **The probe, not the
+arithmetic, is the bound**, so further vector work on the arithmetic cannot
+pay much. This host has no PMU, so these are inferences from controlled
+arms, not counter readings.
 
 ## Not settled
 
@@ -113,12 +123,37 @@ cannot pay much.
   [1.61, 3.57]). The medians are stable, but the ratios should be replayed
   on an isolated runner before anyone cites them.
 
+## Rounds 2–3: the probe side (post hoc, after round 1)
+
+Round 1 left the one-thread pipeline at 6.2 ns against component costs of
+1.9 + 2.3 ns. I tested three hypotheses for the gap, one change at a time.
+The arms were interleaved within each repetition, with 10 runs each
+(`probe-side/round2-runs.jsonl`, commit `fbe3f39088`; thread sweep in
+`round3-runs.jsonl`, commit `31bfc33071`).
+
+| Arm, A = 1024, one thread | ns per point | Reading |
+|---|---|---|
+| fused (round-1 kernel) | 6.71 [6.25, 7.01] | reference |
+| + software prefetch of each block's filter words | 6.85 [6.45, 7.07] | **slower**: latency was not the bound |
+| + 32-bit prefix array (halves the 128 KiB `pre`) | 6.29 [5.98, 6.58] | small; L2 pressure is minor |
+| prefetch + 32-bit + 128-abscissa blocks | 6.72 [6.36, 7.09] | no gain |
+| prefetch + 32-bit + 8-abscissa blocks | 6.34 [6.05, 6.64] | no gain over 32-bit alone |
+| fused + **one-multiply filter hash** | **5.09** [4.84, 5.25] | **1.32x**: the probe was instruction-bound |
+
+The one-multiply hash takes the slot and four bits from a single
+odd-constant product of the key. The keys are uniform field elements
+already, so the second mixing multiply and the loop over bit positions
+were wasted work. Measured alone, the filter probe falls from 2.32 to
+1.71 ns, with the same false-positive rate (3.4 %). With it, 4 threads
+reach 1.365 ns/point at A = 1024. At A = 256 the gain is on one thread only
+(4.36 to 3.72 ns): 4 threads stay at 1.18 ns, against 1.16 ns in round 1.
+
 ## Next levers (in order)
 
-1. **Probe-side.** Software prefetch or a batched, range-grouped probe so
-   the filter's L2 misses overlap, plus a shrunken `pre` array (block the
-   forward pass). Target: the pipeline toward its 1.9 + 2.3 ns component
-   floor, about 4.5 ns on one thread and about 1.2 ns on 4.
+1. **Vectorize the probe.** Rounds 2–3 show the probe is bound by
+   instructions, not by memory latency. Computing slots for 8 or 16 keys
+   with AVX-512 and fetching the words with a gather is the next step.
+   Prefetch is ruled out.
 2. **Explicit-intrinsics lane kernel**, for robustness and for 52-bit IFMA.
 3. **Land the kernel as an oracle id** with witness recovery and the ledger
    parity test (PLAN.md order of work, step 1). That parity test is what lets
@@ -130,8 +165,10 @@ cannot pay much.
   summary.
 - `floor-thishost.jsonl`, `baseline-thishost.jsonl`: lever 1 and the library
   arms on the same host.
-- `exploratory/`: the first five runs, made while arms were being added
-  (scalar-target build, then AVX-512, then fused). They are kept for the
-  record but are not part of the summary.
-- `stack.svg`, `stack-256.svg`, `lanes.svg`, the PNG renders and
-  `report.pdf`: built by `make_report.py` from the rows above.
+- `exploratory/`: the single runs made while arms were being added (runs 1
+  to 7). They are kept for the record but are not part of any summary.
+- `probe-side/`: rounds 2 and 3, with their binary hashes, source commits
+  and host notes.
+- `stack.svg`, `stack-256.svg`, `lanes.svg`, `probe-side.svg`, the PNG
+  renders and `report.pdf`: built by `make_report.py` (with `render.js`)
+  from the rows above.

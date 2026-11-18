@@ -64,3 +64,39 @@
   target (449 MB).
 - Python Playwright is absent, so the renders used the Node package
   (`render.js`).
+
+## 09:35Z: probe-side rounds 2–3
+
+### What was done
+- Added probe-side arms to `examples/rootfind_lever_probe.rs`, interleaved
+  round by round:
+  - software prefetch of each block's filter words;
+  - a 32-bit prefix array;
+  - block sizes 8, 32 and 128;
+  - a one-multiply filter slot function.
+- Ran 10 runs of round 2 (commit `fbe3f39088`) and 10 runs of round 3
+  (`31bfc33071`, thread sweep on the fastest configuration). Data is in
+  `research/rootfind_levers_20261118/probe-side/`; RESULTS.md, the graphs
+  (new `probe-side.svg`) and report.pdf are regenerated.
+
+### Results (`[pcc:unverified]`, A = 1024, medians of 10)
+- Prefetch: 6.85 against 6.71 ns, slower.
+- 32-bit `pre`: 6.29 ns, minor.
+- One-multiply hash: 5.09 ns, 1.32x. The filter alone goes from 2.32 to
+  1.71 ns per probe at the same 3.4 % false-positive rate.
+- With the one-multiply hash, 4 threads reach 1.365 ns/point: 80.5x
+  `rootfind-mitm` and 25.5x `rootfind-subtract`, both on the same host.
+- At A = 256 the gain is on one thread only (4.36 to 3.72 ns); 4 threads
+  stay at 1.18 ns.
+
+### Decisions made
+- Rewrote the round-1 "L2 pressure" explanation in RESULTS.md: the controls
+  refute it, and the probe is instruction-bound.
+
+### Open threads
+- Vectorize the slot computation and use a gather (AVX-512) for the probe.
+- The explicit-intrinsics arithmetic kernel.
+- The oracle id with witness recovery and the parity test.
+
+### Errors
+- None.

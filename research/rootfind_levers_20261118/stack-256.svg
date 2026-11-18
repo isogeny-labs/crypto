@@ -1,25 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="320" font-family="Helvetica,Arial,sans-serif" font-size="12">
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="380" font-family="Helvetica,Arial,sans-serif" font-size="12">
 <rect width="100%" height="100%" fill="#ffffff"/>
 <text x="380.0" y="20" text-anchor="middle" font-size="14" font-weight="bold">Same stack at A = 256</text>
-<line x1="300.0" y1="34" x2="300.0" y2="286" stroke="#e3e3e3"/>
-<text x="300.0" y="300" text-anchor="middle" fill="#555">0.5</text>
-<line x1="342.8" y1="34" x2="342.8" y2="286" stroke="#e3e3e3"/>
-<text x="342.8" y="300" text-anchor="middle" fill="#555">1</text>
-<line x1="385.6" y1="34" x2="385.6" y2="286" stroke="#e3e3e3"/>
-<text x="385.6" y="300" text-anchor="middle" fill="#555">2</text>
-<line x1="442.2" y1="34" x2="442.2" y2="286" stroke="#e3e3e3"/>
-<text x="442.2" y="300" text-anchor="middle" fill="#555">5</text>
-<line x1="485.0" y1="34" x2="485.0" y2="286" stroke="#e3e3e3"/>
-<text x="485.0" y="300" text-anchor="middle" fill="#555">10</text>
-<line x1="527.8" y1="34" x2="527.8" y2="286" stroke="#e3e3e3"/>
-<text x="527.8" y="300" text-anchor="middle" fill="#555">20</text>
-<line x1="584.4" y1="34" x2="584.4" y2="286" stroke="#e3e3e3"/>
-<text x="584.4" y="300" text-anchor="middle" fill="#555">50</text>
-<line x1="627.2" y1="34" x2="627.2" y2="286" stroke="#e3e3e3"/>
-<text x="627.2" y="300" text-anchor="middle" fill="#555">100</text>
-<line x1="670.0" y1="34" x2="670.0" y2="286" stroke="#e3e3e3"/>
-<text x="670.0" y="300" text-anchor="middle" fill="#555">200</text>
-<text x="485.0" y="315" text-anchor="middle" fill="#333">ns per signed point (log scale; whiskers: min–max)</text>
+<line x1="300.0" y1="34" x2="300.0" y2="346" stroke="#e3e3e3"/>
+<text x="300.0" y="360" text-anchor="middle" fill="#555">0.5</text>
+<line x1="342.8" y1="34" x2="342.8" y2="346" stroke="#e3e3e3"/>
+<text x="342.8" y="360" text-anchor="middle" fill="#555">1</text>
+<line x1="385.6" y1="34" x2="385.6" y2="346" stroke="#e3e3e3"/>
+<text x="385.6" y="360" text-anchor="middle" fill="#555">2</text>
+<line x1="442.2" y1="34" x2="442.2" y2="346" stroke="#e3e3e3"/>
+<text x="442.2" y="360" text-anchor="middle" fill="#555">5</text>
+<line x1="485.0" y1="34" x2="485.0" y2="346" stroke="#e3e3e3"/>
+<text x="485.0" y="360" text-anchor="middle" fill="#555">10</text>
+<line x1="527.8" y1="34" x2="527.8" y2="346" stroke="#e3e3e3"/>
+<text x="527.8" y="360" text-anchor="middle" fill="#555">20</text>
+<line x1="584.4" y1="34" x2="584.4" y2="346" stroke="#e3e3e3"/>
+<text x="584.4" y="360" text-anchor="middle" fill="#555">50</text>
+<line x1="627.2" y1="34" x2="627.2" y2="346" stroke="#e3e3e3"/>
+<text x="627.2" y="360" text-anchor="middle" fill="#555">100</text>
+<line x1="670.0" y1="34" x2="670.0" y2="346" stroke="#e3e3e3"/>
+<text x="670.0" y="360" text-anchor="middle" fill="#555">200</text>
+<text x="485.0" y="375" text-anchor="middle" fill="#333">ns per signed point (log scale; whiskers: min–max)</text>
 <text x="292" y="55" text-anchor="end">rootfind-mitm (default oracle)</text>
 <rect x="300.0" y="44" width="325.3" height="16" fill="#9aa5b1"/>
 <text x="631.3" y="56" fill="#111">97.02 (1.0x)</text>
@@ -50,4 +50,12 @@
 <rect x="300.0" y="254" width="51.8" height="16" fill="#2f6db5"/>
 <line x1="348.8" y1="262" x2="379.3" y2="262" stroke="#111"/>
 <text x="385.3" y="266" fill="#111">1.16 (83.9x)</text>
+<text x="292" y="295" text-anchor="end">round 3: one-multiply filter hash, 1 thread</text>
+<rect x="300.0" y="284" width="123.9" height="16" fill="#2f6db5"/>
+<line x1="420.9" y1="292" x2="426.4" y2="292" stroke="#111"/>
+<text x="432.4" y="296" fill="#111">3.72 (26.1x)</text>
+<text x="292" y="325" text-anchor="end">round 3: + 4 threads</text>
+<rect x="300.0" y="314" width="53.2" height="16" fill="#2f6db5"/>
+<line x1="341.2" y1="322" x2="367.1" y2="322" stroke="#111"/>
+<text x="373.1" y="326" fill="#111">1.18 (82.0x)</text>
 </svg>

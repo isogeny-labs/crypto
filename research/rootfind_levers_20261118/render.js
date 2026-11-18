@@ -4,7 +4,7 @@ const fs = require('fs'); const path = require('path');
   const d = process.argv[2];
   const b = await chromium.launch();
   const pg = await b.newPage({ deviceScaleFactor: 1 });
-  for (const n of ['stack', 'stack-256', 'lanes']) {
+  for (const n of ['stack', 'stack-256', 'lanes', 'probe-side']) {
     await pg.setContent(fs.readFileSync(path.join(d, n + '.svg'), 'utf8'));
     await pg.locator('svg').screenshot({ path: path.join(d, n + '.png') });
   }

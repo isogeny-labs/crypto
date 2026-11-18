@@ -88,7 +88,11 @@ shared host, 10 runs, library arms re-measured on the same host):
 - Stack at A = 1024 on that host: 1.685 ns/point, which is 65x the default
   `rootfind-mitm` (109.9 ns) and 20.7x `rootfind-subtract` (34.9 ns). The
   prediction was about 1 ns.
-- The probe is now the bound (arithmetic is 1.9 of 6.2 ns on one thread), so
-  the next lever is probe-side: prefetch or range-batched probes and a
-  smaller working set. After that comes an explicit-intrinsics kernel and
-  step 1 of the order of work (oracle id, witness recovery, parity test).
+- The probe is now the bound (arithmetic is 1.9 of 6.2 ns on one thread).
+  Probe-side rounds 2–3 found that prefetch is slower and a 32-bit prefix
+  array is minor, but a one-multiply filter hash gives 1.32x. The stack is
+  now 1.365 ns/point on 4 threads: 80.5x `rootfind-mitm` and 25.5x
+  `rootfind-subtract`. The probe is instruction-bound, so the next lever is
+  an AVX-512 slot computation with a gather. After that come the
+  explicit-intrinsics kernel and step 1 of the order of work (oracle id,
+  witness recovery, parity test).

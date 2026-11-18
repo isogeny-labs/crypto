@@ -24,6 +24,8 @@ def med(vals):
 
 
 probe = rows("runs.jsonl")
+round2 = rows("probe-side/round2-runs.jsonl")
+round3 = rows("probe-side/round3-runs.jsonl")
 floor = rows("floor-thishost.jsonl")
 base = [r for r in rows("baseline-thishost.jsonl") if "arm" in r]
 
@@ -42,6 +44,11 @@ def stack(a):
         ("+ fused L1 probe blocks", med([r["fused_ns_per_point_filter8_std_set"] for r in p]), "post hoc arm"),
         ("+ mix-hash exact set", med([r["fused_ns_per_point_filter8_mix_set"] for r in p]), "post hoc arm"),
         ("+ lever 4: 4 threads", med([r["lever4_ns_per_point_by_threads"]["4"] for r in p]), f"fused, {pick}-bit filter"),
+    ]
+    r3 = [r for r in round3 if r["abscissae"] == a]
+    out += [
+        ("round 3: one-multiply filter hash, 1 thread", med([r["cheap_hash_fused_ns_per_point"] for r in r3]), "post hoc arm"),
+        ("round 3: + 4 threads", med([r["probe_side_best_arm_ns_per_point_by_threads"]["4"] for r in r3]), ""),
     ]
     return out
 
@@ -114,6 +121,15 @@ def lanes_svg(a, width=760):
     return "\n".join(s)
 
 
+def probe_side_svg(a):
+    r2 = [r for r in round2 if r["abscissae"] == a]
+    data = []
+    for k in r2[0]["probe_side_ns_per_point_by_arm"]:
+        data.append((k, med([r["probe_side_ns_per_point_by_arm"][k] for r in r2]), ""))
+    data.append(("fused + one-multiply hash", med([r["cheap_hash_fused_ns_per_point"] for r in r2]), ""))
+    return bar_svg(f"Probe-side arms, one thread, A = {a} (round 2, {len(r2)} runs, interleaved)", data, data[0][1][0])
+
+
 def main():
     st1024 = stack(1024)
     st256 = stack(256)
@@ -123,12 +139,14 @@ def main():
     (D / "stack.svg").write_text(svg_stack)
     (D / "stack-256.svg").write_text(svg_stack256)
     (D / "lanes.svg").write_text(svg_lanes)
+    svg_probe = probe_side_svg(1024)
+    (D / "probe-side.svg").write_text(svg_probe)
     md = (D / "RESULTS.md").read_text()
     body = md_to_html(md)
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>Root-finding levers 2-4</title>
 <style>body{{font-family:Helvetica,Arial,sans-serif;max-width:820px;margin:24px auto;font-size:12px;line-height:1.45}}
 table{{border-collapse:collapse;margin:8px 0}}td,th{{border:1px solid #bbb;padding:3px 6px}}code{{font-size:11px}}h1{{font-size:20px}}h2{{font-size:16px;margin-top:22px}}</style></head>
-<body>{body}<h2>Figures</h2>{svg_stack}<br/>{svg_stack256}<br/>{svg_lanes}</body></html>"""
+<body>{body}<h2>Figures</h2>{svg_stack}<br/>{svg_stack256}<br/>{svg_lanes}<br/>{svg_probe}</body></html>"""
     (D / "report.html").write_text(page)
     try:
         from playwright.sync_api import sync_playwright
@@ -146,7 +164,7 @@ table{{border-collapse:collapse;margin:8px 0}}td,th{{border:1px solid #bbb;paddi
     with sync_playwright() as pw:
         b = pw.chromium.launch()
         pg = b.new_page(device_scale_factor=1)
-        for name in ("stack", "stack-256", "lanes"):
+        for name in ("stack", "stack-256", "lanes", "probe-side"):
             pg.set_content((D / f"{name}.svg").read_text())
             pg.locator("svg").screenshot(path=str(D / f"{name}.png"))
         pg.goto((D / "report.html").as_uri())
