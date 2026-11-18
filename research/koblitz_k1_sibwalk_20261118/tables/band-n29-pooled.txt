@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | ls | 432/432 | 0.349 | 0.451 | 1.370 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | ls-aa | 432/432 | 0.349 | 0.451 | 1.370 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | ls-off | 432/432 | 0.349 | 0.451 | 1.370 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-strong | 432/432 | 4.535 | 4.646 | 5.646 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-v5 | 432/432 | 0.345 | 0.375 | 0.641 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | sw | 432/432 | 0.304 | 0.413 | 1.388 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m29-tm40309-30c52b96 | ls vs ls-aa | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | ls vs ls-off | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | ls vs rho-strong | ls < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | ls vs rho-v5 | rho-v5 < ls |
+| icv1-f2m29-tm40309-30c52b96 | ls vs sw | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | ls-aa vs ls-off | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | ls-aa vs rho-strong | ls-aa < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | ls-aa vs rho-v5 | rho-v5 < ls-aa |
+| icv1-f2m29-tm40309-30c52b96 | ls-aa vs sw | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | ls-off vs rho-strong | ls-off < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | ls-off vs rho-v5 | rho-v5 < ls-off |
+| icv1-f2m29-tm40309-30c52b96 | ls-off vs sw | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | rho-strong vs rho-v5 | rho-v5 < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | rho-strong vs sw | sw < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | rho-v5 vs sw | unresolved inside the band |
