@@ -34,7 +34,7 @@ const EXPECTED_PDF_PATH: &str =
     "research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.pdf";
 const EXPECTED_DIAGRAM_PATH: &str = "docs/ecdlp-audit/program-dependencies.svg";
 const EXPECTED_VALIDATOR_PATH: &str = "src/bin/ecdlp_audit.rs";
-const EXPECTED_DELIVERABLE_BINDINGS: [(&str, &str, Option<&str>); 19] = [
+const EXPECTED_DELIVERABLE_BINDINGS: [(&str, &str, Option<&str>); 20] = [
     ("WS1-D1", "artifact_replay", None),
     (
         "WS1-D2",
@@ -60,6 +60,11 @@ const EXPECTED_DELIVERABLE_BINDINGS: [(&str, &str, Option<&str>); 19] = [
         "WS2-D4",
         "independent_oracle",
         Some("tests/prime_cover_transfer_oracle.rs"),
+    ),
+    (
+        "WS2-D5",
+        "independent_oracle",
+        Some("tests/binary_cover_transfer_f2_source_oracle.rs"),
     ),
     ("WS3-D1", "schema_and_ledger", None),
     ("WS3-D2", "semantic_verifier", None),

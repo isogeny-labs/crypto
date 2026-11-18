@@ -61,10 +61,10 @@ only about the named generated subgroup, not the ambient curve order.
 The repository-tracked corpus is
 `docs/curves/binary-subgroup-transfer-certificates.json`: 498,477 bytes,
 SHA-256
-`93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8`.
+`15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948`.
 It records producer revision
-`c01ba3960ada49d73e2c48acb0e175f9e77e1680`, length-framed source digest
-`32ca4682a05dfe5a2dca7a6b1f50d2df7f5a589a6dbd68252516e7935af5da47`,
+`153ac585d3b1ece0ebb0d49312b13267f651c94b`, length-framed source digest
+`7cc3fedfaef46a6588c0f31e304be07f6948f62628baf087b9b8b89f178ec9ad`,
 174 maps, 150 supported named-subgroup records, 102 locally proved exact
 generated orders, 48 unknown exact orders, and zero failed records. The
 producer revision and compiler string inside the JSON are caller-supplied;

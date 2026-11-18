@@ -759,13 +759,18 @@ independent execution attestation or a claim of exact order where the record
 still says unknown.
 
 For the tracked 2026-11-18 corpus, `CORPUS_SHA256` is
-`93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8`
-and `CORPUS_BYTES` is `498477`.
+`15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948`
+and `CORPUS_BYTES` is `498477`. It was regenerated from producer revision
+`153ac585d3b1ece0ebb0d49312b13267f651c94b` with length-framed producer-source
+digest
+`7cc3fedfaef46a6588c0f31e304be07f6948f62628baf087b9b8b89f178ec9ad`.
 
 For the 2026-11-18 graph, the expected bounded population is 174 binary map
 records, 147 maps with 150 named generator bindings, and 27 maps without a
-named subgroup input. A nonzero process exit accompanies any retained failed
-obligation. Successful named-generator records prove only the scoped
-injectivity result described above. They are not solver, timing, or
+named subgroup input. Of the 150 bindings, 102 have locally proved exact
+generated order and 48 deliberately retain unknown exact order; none failed
+the recorded transfer obligations. A nonzero process exit accompanies any
+retained failed obligation. Successful named-generator records prove only the
+scoped injectivity result described above. They are not solver, timing, or
 computational-advantage records.
 [pcc:unverified]

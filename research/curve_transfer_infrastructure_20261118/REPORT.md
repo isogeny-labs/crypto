@@ -132,8 +132,8 @@ not establish nonexistence.
 # Implementation and evidence sources
 
 The corpus was produced from crypto revision
-`c01ba3960ada49d73e2c48acb0e175f9e77e1680`. Its length-framed semantic-source
-digest is `32ca4682a05dfe5a2dca7a6b1f50d2df7f5a589a6dbd68252516e7935af5da47`;
+`153ac585d3b1ece0ebb0d49312b13267f651c94b`. Its length-framed semantic-source
+digest is `7cc3fedfaef46a6588c0f31e304be07f6948f62628baf087b9b8b89f178ec9ad`;
 the frame binds source paths and byte lengths as well as contents. The
 producer-commit and compiler-version strings remain explicitly marked as
 caller-supplied, unverified attestations.
@@ -232,23 +232,32 @@ production source addition, and it is not a catalog-wide oracle.
 The earlier handoff incorrectly treated a 467,669-byte JSON file as subject to
 a 64 KiB storage rule.  The live repository policy does not classify `.json`
 as a data extension and applies the generic automatic threshold only above
-1 MiB. The corpus is therefore eligible for a direct Git commit. This slice
-adds the 498,477-byte tracked corpus at
-[`binary-subgroup-transfer-certificates.json`](../../docs/curves/binary-subgroup-transfer-certificates.json),
-with SHA-256
-`93150649c0754adb1ca50d74fa4419df9a77c98b156e75e33084a9f31f656ce8`.
+1 MiB. The corpus is therefore eligible for a direct Git commit. The successor
+498,477-byte tracked corpus is at
+[`binary-subgroup-transfer-certificates.json`](../../docs/curves/binary-subgroup-transfer-certificates.json).
+Its SHA-256 is
+
+`15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948`.
+
 The installed-layout gate stages it with `traits.json`, supplies the literal
 hash and size, regenerates every record, and requires canonical byte equality.
-The local replay response was 1,682 bytes with SHA-256
-`e89298ebb5f2f693eb9d362c7a6ba33dd685048593380b0eaf5626754fb66f5d`;
-it reported all replay checks true. This response is same-implementation
-evidence, not an independent publication receipt. The recorded producer
-commit and compiler strings remain caller-supplied and are not execution
-attestations.
+The exact second arithmetic replay supplied that literal hash and byte count,
+regenerated all 174 maps and 150 named bindings, and returned
+`verified_complete` with canonical-byte equality and every replay check true.
+Its response was 1,682 bytes with SHA-256
+`4429680320a1e113b8af55daf8dd1055d0870ff3f6b152a42787b998f785230b`.
+The corpus retains 102 locally proved exact named-generator orders, 48
+annihilation-only records explicitly marked unknown, and zero failed named
+records. This response is same-implementation evidence, not an independent
+publication receipt. The recorded producer commit and compiler strings remain
+caller-supplied and are not execution attestations.
 
-Historical release dry-run `44357005322` built the GNU Rust package at
-superseded head `f3b030cf1f4d8c84c8986fb4495fc9bccf1941ff`. Job
-`134987912314` succeeded; artifact `14454770064` is 97,586,396 bytes and its
+Historical release dry-run `44357005322` built the GNU Rust package at the
+superseded head
+
+`f3b030cf1f4d8c84c8986fb4495fc9bccf1941ff`.
+
+Job `134987912314` succeeded; artifact `14454770064` is 97,586,396 bytes and its
 GitHub artifact ZIP has SHA-256
 `0937c075e1afc1c821ff3997eebef905d167a72d6346d680721de86f3bb56eea`.
 The installed-layout staging and then-current corpus replay passed. This is
@@ -299,8 +308,8 @@ and 1,405 extension-field maps/9 EC1 records. The two-row widening is therefore
 not general support for wide primes, normalized targets, or extensions.
 The next bounded engineering steps are:
 
-1. freeze the successor producer, regenerate and atomically rebind the tracked
-   corpus, then replay it from an extracted current-head release archive;
+1. commit the atomically rebound successor corpus, then replay it from an
+   extracted current-head release archive;
 2. refresh the cryptanalysis mirror against the exact strict-primality and
    73-bit-pilot sources, then close required CI and review;
 3. extend independent source-law evidence to the full 486-class `GF(8)`
