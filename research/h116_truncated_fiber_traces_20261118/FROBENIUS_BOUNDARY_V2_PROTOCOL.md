@@ -10,3 +10,4 @@ The only permitted producer correction is the sign documented in
 `+A^2D^4`, not `-A^2D^4`. The v2 producer is a separate source file and writes a
 separate result. Any other construction, prediction or fixture change
 invalidates v2. [pcc:unverified]
+

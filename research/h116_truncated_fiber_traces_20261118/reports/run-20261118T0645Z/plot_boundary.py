@@ -42,3 +42,4 @@ bottom.grid(axis="y", alpha=0.25)
 figure.tight_layout()
 figure.savefig(HERE / "boundary.svg")
 figure.savefig(HERE / "boundary.png", dpi=160)
+

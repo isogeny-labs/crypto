@@ -330,3 +330,4 @@ fn main() {
         counter.inversions,
     );
 }
+

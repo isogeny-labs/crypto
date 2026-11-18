@@ -15,3 +15,4 @@ Both sources compile with the pinned workspace Rust toolchain, optimization and
 warnings denied. The retained degree-37 map coefficients are copied exactly
 from `MAP_CERTIFICATE_CONTROL.json`; the producer and verifier reconstruct the
 degree-36 scalar map by different formulas. [pcc:unverified]
+

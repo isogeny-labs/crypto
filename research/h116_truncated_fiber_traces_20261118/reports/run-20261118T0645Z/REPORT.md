@@ -69,3 +69,4 @@ instance. [pcc:unverified]
 - Mathlib revision `d13f23b723b8a846827a245b89c10fc7d3f11612`.
 - Study prior-art receipt `../../PRIOR_ART.md` and proof map
   `../../PROOF_MAP.md`.
+

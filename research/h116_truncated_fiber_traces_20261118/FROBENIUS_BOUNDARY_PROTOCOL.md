@@ -24,3 +24,4 @@ normalization, use the wrong target coefficients, and mutate reversed numerator
 coefficient 15. No fixture, precision or prediction may be replaced after
 execution. Exact field-operation diagnostics are retained without timing or
 scaling interpretation. [pcc:unverified]
+
