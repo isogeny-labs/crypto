@@ -4,6 +4,7 @@
 //! This is a reusable algebraic transfer component, NOT an ECDLP break.
 //! Protocol: PRIME31_FROBENIUS_CUBIC_INVERSE_PROTOCOL_20261118.md
 //! [pcc:unverified]
+#![recursion_limit = "256"]
 use prime31_algebraic_ic::{check_curve, Arithmetic, Curve, Point, PRIME31};
 use serde_json::json;
 use std::time::Instant;
