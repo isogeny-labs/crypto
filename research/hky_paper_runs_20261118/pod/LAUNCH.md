@@ -20,3 +20,17 @@ J3 70,000 s (33k-170k), 75 GB; J4 370,000 s (170k-950k), 170 GB. Expected for J1
 0,0,2,154,4451,73587,448922 with 1 not in V_6; lift: 1 in V_7, dim V_7 1,683,218, dim F 50,256.
 Note: J4 checkpoints (about 1x RSS, two kept while writing) may exceed the 320 GB disk cap late in
 the run; a failed checkpoint is recorded and the closure continues (450d5b295b).
+
+## 2026-11-18 updates
+
+- 06:3x UTC: J4 terminated on owner instruction ("J4 needs to be optimized before we spend 400"); spend under US$0.50.
+- 07:16 UTC: hky-j3's container restarted on the host side (RSS was 36 GB of 250 GB); job j3 died with no exit code.
+  Found at the 08:41 check; relaunched 08:42 as job `j3r`, resumed from the 30-min checkpoint (rank 526,992,
+  sha256 5a657b70...). Lost about 35 min of compute plus 1.5 h idle.
+- 08:20 and 09:45 UTC: J1 and J2 finished their closures (last checkpoints at rank 447,644 / 447,570) and
+  entered the `--hky3-verify-closed` pass (RSS 38 -> 74 GB).
+- 09:46 UTC: **the in-pod lifetime cap does not work.** `pod.py`'s `( sleep N; kill -TERM 1 )` signals PID 1,
+  which ignores SIGTERM in these containers. Found while extending the J1/J2 caps: killing the sleep made the
+  watchdog fire, and a replacement watchdog misread host uptime and fired too; neither stopped the pod or the
+  job. The same holds for every earlier pod launched by this `pod.py`. Spend is bounded only by explicit
+  termination; hard-stop reminders are scheduled (J1/J2 at 24 h, J3 at 216,000 s, bl-ladder at 104 h).
