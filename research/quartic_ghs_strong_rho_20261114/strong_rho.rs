@@ -416,6 +416,9 @@ impl<'a> FastEc<'a> {
 pub struct StrongOpts {
     pub batch: usize,
     pub r: usize,
+    /// Candidates computed per lane in the first batch.  Round A uses one;
+    /// two is the explicit Round C speculative-retry control.
+    pub retry_prefetch: usize,
     pub dp_bits: u32,
     pub snapshot_period: u64,
     pub max_steps: u64,
@@ -428,6 +431,7 @@ impl StrongOpts {
         Self {
             batch,
             r: 32,
+            retry_prefetch: 1,
             dp_bits,
             snapshot_period: 128,
             max_steps: 60 * (inst.ell as f64).sqrt() as u64 + 200_000,
@@ -552,6 +556,7 @@ fn batched_lookahead_step(
     jumps: &[EP],
     walkers: &[Walker],
     first: Vec<usize>,
+    retry_prefetch: usize,
     native: &mut NativeCounts,
 ) -> (Vec<EP>, Vec<usize>, u64) {
     let r = jumps.len();
@@ -559,7 +564,74 @@ fn batched_lookahead_step(
     let mut next = vec![EP::Inf; walkers.len()];
     let mut pending: Vec<usize> = (0..walkers.len()).collect();
     let mut lookahead = 0u64;
-    for attempt in 0..r {
+
+    // A retry is data-dependent: its lane is known only after the first
+    // candidate has been normalised and hashed.  The Round C control computes
+    // the first two candidates speculatively in one larger Montgomery batch.
+    // It then inspects them in the same attempt-major, lane-index order as the
+    // baseline.  Every speculative group/field operation remains counted;
+    // hashes and look-ahead tests are charged only when the sequential rule
+    // actually reaches that candidate.
+    let mut first_fallback_attempt = 0usize;
+    if retry_prefetch == 2 && r > 1 {
+        let mut points = Vec::with_capacity(2 * walkers.len());
+        let mut addends = Vec::with_capacity(2 * walkers.len());
+        for (i, walker) in walkers.iter().enumerate() {
+            points.push(walker.p);
+            addends.push(jumps[chosen[i]]);
+        }
+        for (i, walker) in walkers.iter().enumerate() {
+            points.push(walker.p);
+            addends.push(jumps[(chosen[i] + 1) % r]);
+        }
+        let candidates = ec.batch_add(&points, &addends);
+
+        let mut retry = Vec::new();
+        for i in 0..walkers.len() {
+            let candidate = candidates[i];
+            native.lookahead_tests += 1;
+            let same_partition = match candidate {
+                EP::Inf => false,
+                EP::A(x, _) => {
+                    native.hashes += 1;
+                    (hx(&x) % r as u64) as usize == chosen[i]
+                }
+            };
+            if same_partition {
+                chosen[i] = (chosen[i] + 1) % r;
+                lookahead += 1;
+                retry.push(i);
+            } else {
+                next[i] = candidate;
+            }
+        }
+
+        pending.clear();
+        for i in retry {
+            let candidate = candidates[walkers.len() + i];
+            native.lookahead_tests += 1;
+            let same_partition = match candidate {
+                EP::Inf => false,
+                EP::A(x, _) => {
+                    native.hashes += 1;
+                    (hx(&x) % r as u64) as usize == chosen[i]
+                }
+            };
+            if same_partition && 2 < r {
+                chosen[i] = (chosen[i] + 1) % r;
+                lookahead += 1;
+                pending.push(i);
+            } else {
+                next[i] = candidate;
+            }
+        }
+        if pending.is_empty() {
+            return (next, chosen, lookahead);
+        }
+        first_fallback_attempt = 2;
+    }
+
+    for attempt in first_fallback_attempt..r {
         let points: Vec<_> = pending.iter().map(|&i| walkers[i].p).collect();
         let addends: Vec<_> = pending.iter().map(|&i| jumps[chosen[i]]).collect();
         let candidates = ec.batch_add(&points, &addends);
@@ -670,7 +742,13 @@ fn collision_scalar(
 }
 
 pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> StrongOut {
-    assert!(opts.batch > 0 && opts.r > 0 && opts.dp_bits < 63 && opts.snapshot_period > 0);
+    assert!(
+        opts.batch > 0
+            && opts.r > 0
+            && matches!(opts.retry_prefetch, 1 | 2)
+            && opts.dp_bits < 63
+            && opts.snapshot_period > 0
+    );
     let start = Instant::now();
     let n = inst.ell;
     let f = FastF3::from_instance(inst);
@@ -711,7 +789,8 @@ pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> Stro
                 (hx(&x) % opts.r as u64) as usize
             })
             .collect();
-        let (next, js, extra) = batched_lookahead_step(&ec, &mp, &walkers, first, &mut native);
+        let (next, js, extra) =
+            batched_lookahead_step(&ec, &mp, &walkers, first, opts.retry_prefetch, &mut native);
         lookahead += extra;
 
         for i in 0..walkers.len() {
@@ -913,6 +992,97 @@ pub fn selftest() {
             assert_eq!(ec.mul(&inst.g, k), inst.ec.mul(&inst.g, k));
         }
         eprintln!("selftest: fast and batched curve addition match frozen curve");
+    }
+    {
+        let inst = instance();
+        let f = FastF3::from_instance(&inst);
+        let ec = FastEc::from_instance(&f, &inst);
+        let jumps: Vec<_> = (0..32)
+            .map(|j| inst.ec.mul(&inst.g, (3 * j + 17) as u128))
+            .collect();
+
+        // Find a real partition-selected point that reaches the third
+        // candidate.  This forces the retry2 path through its sequential
+        // fallback instead of testing only the one-retry case.
+        let mut deep = None;
+        for k in 1..=32_768u128 {
+            let p = inst.ec.mul(&inst.g, k);
+            let mut canon_counts = NativeCounts::default();
+            let (p, _, _) = canon(&f, p, 0, 0, inst.ell, &mut canon_counts);
+            let EP::A(x, _) = p else { continue };
+            let j = (hx(&x) % jumps.len() as u64) as usize;
+            let walker = Walker {
+                p,
+                a: 0,
+                b: 0,
+                tail: 0,
+                local: 0,
+                snapshot: None,
+            };
+            let mut native = NativeCounts::default();
+            let (_, _, extra) =
+                batched_lookahead_step(&ec, &jumps, &[walker], vec![j], 1, &mut native);
+            if extra >= 2 {
+                deep = Some((p, j));
+                break;
+            }
+        }
+        let (deep_p, deep_j) = deep.expect("a point with at least two look-ahead retries");
+
+        let mut walkers = Vec::new();
+        let mut first = Vec::new();
+        for lane in 0..8u128 {
+            let p = if lane == 0 {
+                deep_p
+            } else {
+                let raw = inst.ec.mul(&inst.g, 41 + 13 * lane);
+                let mut canon_counts = NativeCounts::default();
+                canon(&f, raw, 0, 0, inst.ell, &mut canon_counts).0
+            };
+            let EP::A(x, _) = p else { unreachable!() };
+            first.push(if lane == 0 {
+                deep_j
+            } else {
+                (hx(&x) % jumps.len() as u64) as usize
+            });
+            walkers.push(Walker {
+                p,
+                a: lane as u64,
+                b: 2 * lane as u64,
+                tail: 0,
+                local: 0,
+                snapshot: None,
+            });
+        }
+
+        let mut baseline_native = NativeCounts::default();
+        let before = f.counts();
+        let baseline = batched_lookahead_step(
+            &ec,
+            &jumps,
+            &walkers,
+            first.clone(),
+            1,
+            &mut baseline_native,
+        );
+        let baseline_field = f.counts().since(before);
+
+        let mut retry2_native = NativeCounts::default();
+        let before = f.counts();
+        let retry2 = batched_lookahead_step(&ec, &jumps, &walkers, first, 2, &mut retry2_native);
+        let retry2_field = f.counts().since(before);
+
+        assert_eq!(retry2, baseline);
+        assert_eq!(retry2_native, baseline_native);
+        assert!(retry2_field.batch_inv < baseline_field.batch_inv);
+        assert!(retry2_field.group_add > baseline_field.group_add);
+        eprintln!(
+            "selftest: retry2 preserves lane choices through a two-retry fallback (batch inversions {} -> {}, group additions {} -> {})",
+            baseline_field.batch_inv,
+            retry2_field.batch_inv,
+            baseline_field.group_add,
+            retry2_field.group_add,
+        );
     }
     {
         let inst = instance();

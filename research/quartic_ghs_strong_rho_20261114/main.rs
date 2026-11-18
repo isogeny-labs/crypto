@@ -190,17 +190,17 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 );
                 continue;
             }
-            let width: usize = arm
+            let (base_arm, retry_prefetch) = arm
+                .strip_suffix("-retry2")
+                .map_or((arm, 1usize), |base| (base, 2usize));
+            let width: usize = base_arm
                 .strip_prefix("strong-b")
                 .unwrap_or_else(|| panic!("unknown arm {arm}"))
                 .parse()
                 .expect("batch width");
-            let out = strong_rho(
-                &inst,
-                k,
-                seed * 1000 + i as u64,
-                StrongOpts::for_instance(&inst, width),
-            );
+            let mut opts = StrongOpts::for_instance(&inst, width);
+            opts.retry_prefetch = retry_prefetch;
+            let out = strong_rho(&inst, k, seed * 1000 + i as u64, opts);
             println!(
                 "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
                 arm,
@@ -232,7 +232,7 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
 
 fn usage() -> ! {
     eprintln!(
-        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,...>"
+        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,strong-b8-retry2,...>"
     );
     std::process::exit(2)
 }

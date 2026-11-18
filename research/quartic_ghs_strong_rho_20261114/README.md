@@ -36,6 +36,11 @@ is made [pcc:unverified].
 - [`ROUND_B.md`](ROUND_B.md) freezes the five-product squaring lead;
   [`round-b/RESULTS.md`](round-b/RESULTS.md) retains its partial
   correctness/count result and checkpoint blocker.
+- [`ROUND_C_RETRY.md`](ROUND_C_RETRY.md) freezes the exact retry-batching
+  screen; [`round-c-retry/RESULTS.md`](round-c-retry/RESULTS.md) records the
+  preserved trajectory, 43 fewer batch inversions, and the larger speculative
+  field-operation count. The development-only `-retry2` arm is not the
+  default and supplies no timing or frontier result `[pcc:unverified]`.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
   source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
   the prospective Round B candidate; Round A remains bound by the source hash
