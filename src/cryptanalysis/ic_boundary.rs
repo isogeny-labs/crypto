@@ -7332,6 +7332,13 @@ pub struct FactorBase<E> {
     /// every other base).  Memory only: no consumer reads it unless asked
     /// (`mitm-frobenius-layout-counted` `ladder_verify=1`).
     pub generator_ladder: Vec<E>,
+    /// `true` when a signed-layout base did not form its negatives
+    /// (`compact-orbit-scan` `lazy_neg=1`, Koblitz K1 set-up lever,
+    /// 2026-11-18): every odd slot `points[2i + 1]` holds the identity, and
+    /// a reader forms `−points[2i]` when it needs it and counts that
+    /// negation ([`FrobeniusPairTable`] is the only reader that accepts
+    /// such a base).  `false` for every other base.
+    pub negations_deferred: bool,
 }
 
 /// Charge the indexes a base builder derives (`ecbench::work`,
@@ -7375,6 +7382,7 @@ impl<E: Copy> FactorBase<E> {
             frobenius_orbit_layout: None,
             known_logs: None,
             generator_ladder: Vec::new(),
+            negations_deferred: false,
         }
     }
 
@@ -13166,6 +13174,18 @@ pub struct FrobeniusPairTable {
     /// one group addition plus one unit of `sibling_second_points` (the
     /// convention of the `wwalk`/`ksum` siblings).
     pub sib_second_points: u64,
+    /// Same-orbit pairs or halves the build did not form because a `Z[τ]`
+    /// identity names their key as one it inserts anyway (`orbit_ids`,
+    /// [`Self::build_layout_plan`]); each also skips its canonicalisation
+    /// and insert.  Zero without the plan.
+    pub identity_skips: u64,
+    /// `true` when the base left its negatives unformed
+    /// ([`FactorBase::negations_deferred`]): a hit reads `−P` as the
+    /// negation of its stored partner and counts it.
+    neg_deferred: bool,
+    /// Deferred negatives the build itself formed (its non-sibling
+    /// fallback); zero on every base that stores them.
+    pub build_point_negations: u64,
 }
 
 impl FrobeniusPairTable {
@@ -13222,7 +13242,39 @@ impl FrobeniusPairTable {
         fb: &FactorBase<FastPoint>,
         sib: bool,
     ) -> Option<Self> {
+        Self::build_layout_plan(inst, fb, sib, None)
+    }
+
+    /// [`build_layout_with`](Self::build_layout_with); with `ids = Some(μ)`
+    /// (needs `sib`; `μ` the Frobenius trace, `τ² − μτ + 2 = 0`; Koblitz
+    /// K1 set-up lever, 2026-11-18) the build skips, in every orbit, the
+    /// same-orbit pairs whose key it inserts anyway, by three identities
+    /// of `Z[τ]` that hold for every point `P` (`μ² = 1`):
+    ///
+    /// * `2 = μτ(1 − μτ)`: `P + P` is a Frobenius image of `P − μσ(P)`
+    ///   (rotation 1), so the doubling `P + P` is not formed;
+    /// * `1 + τ² = −(1 − μτ)`: `P + σ²(P)` names the same key, so the
+    ///   plus half of rotation 2 is not formed;
+    /// * `1 + μτ³ = −(1 + μτ)`: `P + μσ³(P)` repeats `P + μσ(P)`, so that
+    ///   half of rotation 3 is not formed.
+    ///
+    /// A pair formed without one half costs its inversion and slope as
+    /// before and is charged one group addition, with no
+    /// `sibling_second_points`.  The table keeps every key (the map's key
+    /// set and size are those of the build without the plan); only the
+    /// first stored pair of the `2P` key changes, from `(P, P)` to
+    /// `(P, −μσ(P))`, which sums to the same point.  `None` with the plan
+    /// at `n < 7` (rotation 3 must lie in the formed half) or `μ ∉ {±1}`.
+    pub fn build_layout_plan(
+        inst: &BinaryInstance,
+        fb: &FactorBase<FastPoint>,
+        sib: bool,
+        ids: Option<i64>,
+    ) -> Option<Self> {
         let start = Instant::now();
+        if ids.is_some() && (!sib || inst.n < 7 || !matches!(ids, Some(1) | Some(-1))) {
+            return None;
+        }
         let n = inst.n as usize;
         let f = fb.points.len();
         if fb.frobenius_orbit_layout != Some(inst.n)
@@ -13239,7 +13291,10 @@ impl FrobeniusPairTable {
         let mut canons = 0u64;
         let mut map: FastMap<(u32, u32)> = fast_map(f * f / (4 * n) + 1);
         let mut sib_second = 0u64;
+        let mut skips = 0u64;
         let field = &inst.fast.field;
+        let deferred = fb.negations_deferred;
+        let mut point_negations = 0u64;
         for o in 0..orbits {
             let rep = 2 * o * n;
             let p = fb.points[rep];
@@ -13247,7 +13302,20 @@ impl FrobeniusPairTable {
             // orbit, both signs, then every later orbit.
             let mut js = (rep..rep + n + 1).chain(rep + 2 * n..f).peekable();
             while let Some(j) = js.next() {
-                let x = fb.points[j];
+                if ids.is_some() && j == rep {
+                    // `P + P`: its key is that of `P − μσ(P)`, formed at
+                    // rotation 1 (`2 = μτ(1 − μτ)`).
+                    skips += 1;
+                    continue;
+                }
+                // A deferred negative is formed from its partner here
+                // (only the non-sibling fallback reads an odd slot).
+                let x = if deferred && j % 2 == 1 {
+                    point_negations += 1;
+                    inst.fast.neg(fb.points[j - 1])
+                } else {
+                    fb.points[j]
+                };
                 // The sibling form: `x` at an even index (its negative
                 // next), a finite pair with distinct abscissae.
                 let sibling = sib
@@ -13258,16 +13326,36 @@ impl FrobeniusPairTable {
                     && p.x != x.x;
                 let keys: [(Option<u64>, usize); 2] = if sibling {
                     js.next();
+                    // The plan's skipped half (rotation 2: plus; rotation
+                    // 3: the sign μ); neither off the plan.
+                    let rot = (j - rep) / 2;
+                    let (skip_plus, skip_minus) = match ids {
+                        Some(mu) if j < rep + 2 * n => {
+                            (rot == 2 || (rot == 3 && mu == 1), rot == 3 && mu == -1)
+                        }
+                        _ => (false, false),
+                    };
                     ops.adds += 1;
-                    sib_second += 1;
                     let inv = field.inv(p.x ^ x.x);
                     let lp = field.mul(p.y ^ x.y, inv);
-                    let lm = lp ^ field.mul(x.x, inv);
                     let base = p.x ^ x.x ^ inst.fast.a;
-                    [
-                        (Some(field.sqr(lp) ^ lp ^ base), j),
-                        (Some(field.sqr(lm) ^ lm ^ base), j + 1),
-                    ]
+                    if skip_plus {
+                        // One half: the inversion and slopes of an
+                        // addition, charged as the one addition above.
+                        skips += 1;
+                        let lm = lp ^ field.mul(x.x, inv);
+                        [(None, j), (Some(field.sqr(lm) ^ lm ^ base), j + 1)]
+                    } else if skip_minus {
+                        skips += 1;
+                        [(Some(field.sqr(lp) ^ lp ^ base), j), (None, j + 1)]
+                    } else {
+                        sib_second += 1;
+                        let lm = lp ^ field.mul(x.x, inv);
+                        [
+                            (Some(field.sqr(lp) ^ lp ^ base), j),
+                            (Some(field.sqr(lm) ^ lm ^ base), j + 1),
+                        ]
+                    }
                 } else if sib && j == rep + 1 {
                     // `P + (−P)`: the identity, known from the layout.
                     [(None, j), (None, j)]
@@ -13307,6 +13395,9 @@ impl FrobeniusPairTable {
             orbit_canonicalisations: 0,
             sib,
             sib_second_points: sib_second,
+            identity_skips: skips,
+            neg_deferred: deferred,
+            build_point_negations: point_negations,
         })
     }
 
@@ -13338,6 +13429,11 @@ impl FrobeniusPairTable {
         keep: impl Fn(usize, usize) -> bool,
         lazy: bool,
     ) -> Option<Self> {
+        if fb.negations_deferred {
+            // Reads every stored point; only the layout build forms a
+            // deferred negative.
+            return None;
+        }
         let start = Instant::now();
         let g = BinaryGroup(&inst.fast);
         let n = inst.n as usize;
@@ -13420,6 +13516,9 @@ impl FrobeniusPairTable {
             orbit_canonicalisations: orbit_canons,
             sib: false,
             sib_second_points: 0,
+            identity_skips: 0,
+            neg_deferred: false,
+            build_point_negations: 0,
         })
     }
 
@@ -13499,7 +13598,11 @@ impl FrobeniusPairTable {
                 self.member_of[j * n as usize + t] as usize,
             )
         };
-        let s = g.add(ops, fb.points[i2], fb.points[j2]);
+        let s = g.add(
+            ops,
+            self.read_point(g, fb, ctr, i2),
+            self.read_point(g, fb, ctr, j2),
+        );
         if s == target {
             Some((i2, j2))
         } else if s == g.neg(target) {
@@ -13507,6 +13610,23 @@ impl FrobeniusPairTable {
         } else {
             ctr.frobfold_mismatches += 1;
             None
+        }
+    }
+
+    /// `fb.points[i]`, or, for an odd slot of a base that deferred its
+    /// negatives, the negation of its stored partner, counted in `ctr`.
+    fn read_point(
+        &self,
+        g: &BinaryGroup,
+        fb: &FactorBase<FastPoint>,
+        ctr: &mut OracleCounters,
+        i: usize,
+    ) -> FastPoint {
+        if self.neg_deferred && i % 2 == 1 {
+            ctr.point_negations += 1;
+            g.neg(fb.points[i - 1])
+        } else {
+            fb.points[i]
         }
     }
 
@@ -13667,6 +13787,11 @@ pub struct OracleCounters {
     /// Folded-table hits whose recovered pair summed to neither `±R`;
     /// a rotation-direction bug would show here, so it must stay zero.
     pub frobfold_mismatches: u64,
+    /// Negatives a reader formed from their partner because the base did
+    /// not store them ([`FactorBase::negations_deferred`]); reported as
+    /// `point_negations_uncharged` (priced like the base's own negations),
+    /// absent while zero.
+    pub point_negations: u64,
 }
 
 /// Resolve the signs of a witness of abscissae: which points above them
@@ -15352,6 +15477,9 @@ fn collect_and_solve_relations_scaled_touching<
     rel.count("frobfold_mismatches", ctr.frobfold_mismatches);
     if ctr.frobenius_maps > 0 {
         rel.count("frobenius_maps", ctr.frobenius_maps);
+    }
+    if ctr.point_negations > 0 {
+        rel.count("point_negations_uncharged", ctr.point_negations);
     }
     rel.count("direct_relations_skipped", direct_skipped);
     if sw_m > 0 {

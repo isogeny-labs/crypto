@@ -3427,6 +3427,272 @@ mod tests {
         }
     }
 
+    /// The Koblitz K1 set-up levers (2026-11-18): `lazy_neg=1` (the base
+    /// does not form its negatives) and `orbit_ids=1` (the sibling table
+    /// build skips the same-orbit pairs three `Z[τ]` identities name as
+    /// repeats).  Off (absent or 0) is the incumbent bit for bit; on, the
+    /// table has the same keys and answers every probe alike, the counts
+    /// move by exactly `k·n` negations and, per orbit, one addition, two
+    /// `sibling_second_points`, three canonicalisations and three inserts,
+    /// and the pipeline tries the same targets and recovers the same log.
+    #[test]
+    fn k1_lazy_negatives_and_orbit_identities_keep_the_solve() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{
+            koblitz_instance, BinaryGroup, CountedGroup, FrobeniusPairTable, OracleCounters,
+        };
+        use crate::cryptanalysis::koblitz_fast::FastPoint;
+
+        for (a, n, k, d, planted_seed) in [
+            (1u8, 23u32, 4u64, 5u64, 4_242u64),
+            (1, 29, 1, 0, 40_009),
+            (0, 37, 8, 5, 777),
+        ] {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let mu: i64 = if a == 1 { 1 } else { -1 };
+            assert_eq!(inst.koblitz.as_ref().unwrap().trace, mu);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let fbspec = if k == 1 {
+                "columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=1".to_string()
+            } else {
+                format!("columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k},multiple_doublings={d},lean_layout=1,orbit_key_reuse=1")
+            };
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let build = |extra: &str| {
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}{extra}")).unwrap();
+                let mut ops = GroupOps::default();
+                base.build(&ctx, &params, &mut ops).map(|fb| (fb, ops))
+            };
+            // The base: off is the incumbent; on keeps every slot, column,
+            // coefficient and negation map, stores the identity in each odd
+            // slot, and drops exactly the k·n negations.
+            let (b0, o0) = build("").unwrap();
+            let (bz, oz) = build(",lazy_neg=0").unwrap();
+            let (b1, o1) = build(",lazy_neg=1").unwrap();
+            assert_eq!(b0.points, bz.points);
+            assert_eq!(b0.cost.native, bz.cost.native);
+            assert!(!b0.negations_deferred && !bz.negations_deferred && b1.negations_deferred);
+            assert_eq!(b0.points.len(), b1.points.len());
+            for (i, (p, q)) in b0.points.iter().zip(&b1.points).enumerate() {
+                if i % 2 == 0 {
+                    assert_eq!(p, q);
+                } else {
+                    assert_eq!(*q, FastPoint::INFINITY);
+                    assert_eq!(*p, group.neg(b0.points[i - 1]));
+                }
+            }
+            assert_eq!(b0.col_of, b1.col_of);
+            assert_eq!(b0.coef_of, b1.coef_of);
+            assert_eq!(b0.neg_index, b1.neg_index);
+            assert_eq!(b0.generator_ladder, b1.generator_ladder);
+            assert_eq!((o0.adds, o0.doubles), (oz.adds, oz.doubles));
+            assert_eq!((o0.adds, o0.doubles), (o1.adds, o1.doubles));
+            assert_eq!(b0.cost.get("point_negations_uncharged"), k * n as u64);
+            assert_eq!(b1.cost.get("point_negations_uncharged"), 0);
+            for (name, v) in &b0.cost.native {
+                if name != "point_negations_uncharged" {
+                    assert_eq!(b1.cost.native.get(name), Some(v), "{name}");
+                }
+            }
+            assert!(build(",lean_layout=0,lazy_neg=1").is_err());
+            assert!(build(",lazy_neg=2").is_err());
+            // Tables that read every stored point refuse such a base.
+            assert!(FrobeniusPairTable::build(&inst, &b1).is_none());
+            assert!(FrobeniusPairTable::build_lazy(&inst, &b1).is_none());
+
+            // The table: the plan keeps every key (same entries, same
+            // answer to every probe) and drops exactly its work.
+            let t0 = FrobeniusPairTable::build_layout_with(&inst, &b0, true).unwrap();
+            let tz = FrobeniusPairTable::build_layout_plan(&inst, &b0, true, None).unwrap();
+            assert_eq!(
+                (
+                    t0.entries,
+                    t0.build_ops.adds,
+                    t0.sib_second_points,
+                    t0.build_canonicalisations
+                ),
+                (
+                    tz.entries,
+                    tz.build_ops.adds,
+                    tz.sib_second_points,
+                    tz.build_canonicalisations
+                )
+            );
+            assert_eq!(tz.identity_skips, 0);
+            let tn = FrobeniusPairTable::build_layout_plan(&inst, &b1, true, None).unwrap();
+            let t1 = FrobeniusPairTable::build_layout_plan(&inst, &b1, true, Some(mu)).unwrap();
+            let tb = FrobeniusPairTable::build_layout_plan(&inst, &b0, true, Some(mu)).unwrap();
+            assert!(FrobeniusPairTable::build_layout_plan(&inst, &b0, false, Some(mu)).is_none());
+            assert!(FrobeniusPairTable::build_layout_plan(&inst, &b0, true, Some(2)).is_none());
+            for t in [&tn, &t1, &tb] {
+                assert_eq!(t.entries, t0.entries);
+                assert_eq!(t.build_point_negations, 0);
+            }
+            assert_eq!(tn.build_ops.adds, t0.build_ops.adds);
+            assert_eq!(tn.build_canonicalisations, t0.build_canonicalisations);
+            for t in [&t1, &tb] {
+                assert_eq!(t.identity_skips, 3 * k);
+                assert_eq!(t.build_ops.adds + k, t0.build_ops.adds);
+                assert_eq!(t.build_ops.doubles, t0.build_ops.doubles);
+                assert_eq!(t.sib_second_points + 2 * k, t0.sib_second_points);
+                assert_eq!(
+                    t.build_canonicalisations + 3 * k,
+                    t0.build_canonicalisations
+                );
+                assert_eq!(t.insert_attempts + 3 * k, t0.insert_attempts);
+            }
+            let mut walk = ctx.target;
+            let mut hits = 0;
+            let mut negs = 0;
+            for _ in 0..4_000 {
+                let mut c0 = OracleCounters::default();
+                let r0 = t0.probe(&group, &b0, &mut GroupOps::default(), &mut c0, walk);
+                for (t, fb) in [(&tn, &b1), (&t1, &b1), (&tb, &b0)] {
+                    let mut c = OracleCounters::default();
+                    let r = t.probe(&group, fb, &mut GroupOps::default(), &mut c, walk);
+                    assert_eq!(r.is_some(), r0.is_some());
+                    assert_eq!(c.frobfold_mismatches, 0);
+                    assert_eq!((c.canonicalisations, c.lookups), (1, 1));
+                    if let Some((i, j)) = r {
+                        // Named by the full base: the pair sums to the walk point.
+                        let s = group.add(&mut GroupOps::default(), b0.points[i], b0.points[j]);
+                        assert_eq!(s, walk);
+                        if fb.negations_deferred {
+                            negs += c.point_negations;
+                        } else {
+                            assert_eq!(c.point_negations, 0);
+                        }
+                    }
+                }
+                if r0.is_some() {
+                    hits += 1;
+                }
+                walk = group.add(&mut GroupOps::default(), walk, inst.generator);
+            }
+            assert!(hits > 0, "n{n}: the probe test saw no hit");
+            assert!(negs <= 4 * hits);
+
+            // End to end, against the current best arm of the curve.
+            let run = |fbp: &[(&str, &str)], op: &[(&str, &str)], seed: u64| {
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}")).unwrap();
+                pspec.factor_base_params = params;
+                for (key, v) in fbp {
+                    pspec.factor_base_params.set(key, *v);
+                }
+                pspec.oracle_params.set("m", "2");
+                pspec.oracle_params.set("sib", "1");
+                if k > 1 {
+                    pspec.oracle_params.set("walk_sib", "8");
+                    pspec.oracle_params.set("ladder_verify", "1");
+                }
+                for (key, v) in op {
+                    pspec.oracle_params.set(key, *v);
+                }
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+            };
+            fn no_wall(v: &mut serde_json::Value) {
+                match v {
+                    serde_json::Value::Object(m) => {
+                        m.remove("wall_ns");
+                        m.values_mut().for_each(no_wall);
+                    }
+                    serde_json::Value::Array(a) => a.iter_mut().for_each(no_wall),
+                    _ => {}
+                }
+            }
+            let strip = |r: &RunReport| {
+                let mut v = serde_json::to_value((
+                    &r.factor_base,
+                    &r.decomposition,
+                    &r.linear_algebra,
+                    &r.verify,
+                    r.recovered,
+                    r.verified,
+                    r.total_gae,
+                ))
+                .unwrap();
+                no_wall(&mut v);
+                v
+            };
+            for seed in [3u64, 11] {
+                let inc = run(&[], &[], seed).expect("incumbent");
+                let off = run(&[("lazy_neg", "0")], &[("orbit_ids", "0")], seed).expect("off");
+                assert_eq!(strip(&inc), strip(&off), "n{n}: off is the incumbent");
+                assert!(inc.verified && inc.recovered == Some(planted));
+                let on = run(&[("lazy_neg", "1")], &[("orbit_ids", "1")], seed).expect("on");
+                assert!(on.verified && on.recovered == Some(planted), "n{n}");
+                assert_eq!(
+                    on.decomposition.targets_tried,
+                    inc.decomposition.targets_tried
+                );
+                assert_eq!(
+                    on.decomposition.relations_found,
+                    inc.decomposition.relations_found
+                );
+                assert_eq!(
+                    on.decomposition.cost.group_ops,
+                    inc.decomposition.cost.group_ops
+                );
+                assert_eq!(on.verify.group_ops, inc.verify.group_ops);
+                assert_eq!(on.linear_algebra.rows, inc.linear_algebra.rows);
+                let (s0, s1) = (&inc.decomposition.setup, &on.decomposition.setup);
+                assert_eq!(s1.group_ops.adds + k, s0.group_ops.adds);
+                assert_eq!(
+                    s1.get("canonicalisations") + 3 * k,
+                    s0.get("canonicalisations")
+                );
+                assert_eq!(s1.get("pair_table_entries"), s0.get("pair_table_entries"));
+                assert_eq!(s1.get("orbit_identity_skips"), 3 * k);
+                assert_eq!(on.factor_base.cost.get("point_negations_uncharged"), 0);
+                assert_eq!(
+                    inc.factor_base.cost.get("point_negations_uncharged"),
+                    k * n as u64
+                );
+                assert!(on.decomposition.cost.get("point_negations_uncharged") <= 2);
+                assert_eq!(inc.decomposition.cost.get("point_negations_uncharged"), 0);
+                // Each lever alone is accepted too.
+                assert!(run(&[("lazy_neg", "1")], &[], seed).unwrap().verified);
+                assert!(run(&[], &[("orbit_ids", "1")], seed).unwrap().verified);
+            }
+            // Refusals: a deferred base with tau_verify or m = 3, and the
+            // plan without sib.
+            assert!(run(
+                &[("lazy_neg", "1")],
+                &[("tau_verify", "1"), ("ladder_verify", "0")],
+                3
+            )
+            .is_err());
+            assert!(run(
+                &[],
+                &[("orbit_ids", "1"), ("sib", "0"), ("walk_sib", "0")],
+                3
+            )
+            .is_err());
+        }
+    }
+
     /// The Koblitz K1 speed-up levers (2026-11-18): `walk_sib=m` (the
     /// stride-generator progression formed by sibling pairs with x-only
     /// probes), `ladder_verify=1` (the recovery check reads the base's

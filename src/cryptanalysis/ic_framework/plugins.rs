@@ -1134,6 +1134,31 @@ fn lean_layout(params: &Params) -> Result<bool, String> {
     }
 }
 
+/// `lazy_neg` of `compact-orbit-scan` (Koblitz K1 set-up lever,
+/// 2026-11-18): absent or 0 is the incumbent build, bit for bit.  With 1
+/// (needs `lean_layout=1`, so the base is read only by the orbit-layout
+/// pair table) the builder does not form the negative `−σ^t(S)` of each
+/// orbit member: the slot keeps its index, column and coefficient but
+/// holds the identity ([`FactorBase::negations_deferred`]).  The sibling
+/// table build never reads a negative (it forms `P − X` from `X`), and a
+/// probe hit that names one forms it from its partner and counts that
+/// negation in the relation phase.
+fn lazy_neg(params: &Params) -> Result<bool, String> {
+    match params.get("lazy_neg") {
+        None => Ok(false),
+        Some(_) => match params.u64("lazy_neg")? {
+            0 => Ok(false),
+            1 => {
+                if !lean_layout(params)? {
+                    return Err("lazy_neg needs lean_layout=1".into());
+                }
+                Ok(true)
+            }
+            v => Err(format!("lazy_neg must be 0 or 1, not {v}")),
+        },
+    }
+}
+
 /// `orbit_key_reuse` of `compact-orbit-scan` (Koblitz K1 speed-up,
 /// 2026-11-18): absent or 0 is the incumbent build, bit for bit.  With 1
 /// (needs `generator_orbit=1`) a known seed's orbit key, which only detects
@@ -1216,6 +1241,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
                 "orbit_key_reuse",
                 "1 (needs generator_orbit=1): each known seed's orbit key (it only refuses a repeated column) is the least abscissa of the orbit members already formed by the counted Frobenius maps, not n-1 more squarings of the seed's abscissa; same keys, refusals and points. 0 or absent: the incumbent build",
             ),
+            (
+                "lazy_neg",
+                "1 (needs lean_layout=1; Koblitz K1 set-up lever, 2026-11-18): the negatives -sigma^t(S) are not formed; their slots keep index, column and coefficient but hold the identity, the sibling pair table never reads them, and a probe hit that names one forms it from its partner and counts the negation (point_negations_uncharged, relation phase). 0 or absent: the incumbent build",
+            ),
         ]
     }
 
@@ -1281,6 +1310,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         let doublings = multiple_doublings(params)?;
         let lean = lean_layout(params)?;
         let key_reuse = orbit_key_reuse(params)?;
+        let defer_neg = lazy_neg(params)?;
         // `[2^i]G` as the doubling path forms it (kept, not recomputed).
         let mut ladder: Vec<FastPoint> = Vec::new();
         if from_generator && !multipliers.is_empty() {
@@ -1383,7 +1413,12 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
                     points.push(member);
                     col_of.push(column);
                     coef_of.push(coefficient);
-                    points.push(g.neg(member));
+                    // `lazy_neg`: the slot of `−member`, not formed.
+                    points.push(if defer_neg {
+                        FastPoint::INFINITY
+                    } else {
+                        g.neg(member)
+                    });
                     col_of.push(column);
                     coef_of.push((ctx.r - coefficient) % ctx.r);
                     member = inst.fast.frobenius_k(member, 1);
@@ -1577,6 +1612,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         // order, so the layout holds for them too.
         fb.frobenius_orbit_layout = Some(inst.n);
         fb.generator_ladder = ladder;
+        fb.negations_deferred = defer_neg;
         // `from_column_map`'s inserts, lookups and negations are in this
         // builder's `hash_probes_uncharged` and `point_negations_uncharged`
         // below; only its abscissa sort is new.
@@ -1611,9 +1647,15 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         let indexed = if lean { 0 } else { fb.points.len() as u64 };
         fb.cost
             .count("hash_probes_uncharged", projected + indexed * 3);
+        // `lazy_neg` (lean, so no scan and no index) forms none.
+        let orbit_negations = if defer_neg {
+            0
+        } else {
+            columns as u64 * inst.n as u64
+        };
         fb.cost.count(
             "point_negations_uncharged",
-            lifts / 2 + columns as u64 * inst.n as u64 + indexed,
+            lifts / 2 + orbit_negations + indexed,
         );
         fb.cost.count("factor_point_inserts_uncharged", indexed);
         fb.cost.count(
@@ -4306,6 +4348,31 @@ pub struct FrobeniusMitmOracle<'i> {
     ladder: Option<Vec<FastPoint>>,
 }
 
+/// `orbit_ids` of the layout oracle (Koblitz K1 set-up lever, 2026-11-18):
+/// `Some(μ)`, the curve's Frobenius trace, when the sibling build should
+/// skip the same-orbit pairs a `Z[τ]` identity names as repeats
+/// ([`FrobeniusPairTable::build_layout_plan`]); absent or 0 is the
+/// incumbent build, bit for bit.
+fn orbit_ids(params: &Params, inst: &BinaryInstance) -> Result<Option<i64>, String> {
+    if !layout_flag(params, "orbit_ids")? {
+        return Ok(None);
+    }
+    if !layout_flag(params, "sib")? {
+        return Err("orbit_ids needs sib=1".into());
+    }
+    if inst.n < 7 {
+        return Err("orbit_ids needs n >= 7".into());
+    }
+    let kc = inst
+        .koblitz
+        .as_ref()
+        .ok_or("orbit_ids needs a Koblitz curve")?;
+    if kc.trace != 1 && kc.trace != -1 {
+        return Err("orbit_ids needs a Frobenius trace of +-1".into());
+    }
+    Ok(Some(kc.trace))
+}
+
 /// `walk_sib` of the layout oracle: absent or 0 is the incumbent walk.
 fn walk_sib(params: &Params) -> Result<u32, String> {
     match params.get("walk_sib") {
@@ -4441,6 +4508,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
                 "1 (needs a base with a stored doubling chain, compact-orbit-scan with multiple_doublings): the recovery check forms [d]G from the chain [2^i]G the base formed and charged on its way to its seeds (ladder_mul: popcount(d)-1 additions, doublings only above the chain), not by re-doubling G. 0 or absent: double-and-add",
             ),
             (
+                "orbit_ids",
+                "1 (needs sib=1, n >= 7; Koblitz K1 set-up lever, 2026-11-18): in each orbit, skip the same-orbit pairs whose key the build inserts anyway, by identities of Z[tau] valid for every point (mu the trace): P + P (2 = mu*tau*(1 - mu*tau), the key of P - mu*sigma(P)), the plus half of rotation 2 (1 + tau^2 = -(1 - mu*tau)) and the sign-mu half of rotation 3 (1 + mu*tau^3 = -(1 + mu*tau)); a pair formed without one half is charged one addition and no sibling_second_points, each skip also saves its canonicalisation and insert; the same table keys and probes (the key of 2P is stored as (P, -mu*sigma(P))). 0 or absent: the incumbent build",
+            ),
+            (
                 "large_primes",
                 "0 (default), 1 or 2 residual points outside the base a partial relation may carry; needs m=3",
             ),
@@ -4497,6 +4568,17 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
         if fb.index_elided() && !self.layout_members {
             return Err("a base without its index needs mitm-frobenius-layout-counted".into());
         }
+        // A base without its negatives (`lazy_neg`) is read only by the
+        // two-summand layout probe, which forms a negative when it needs it.
+        if fb.negations_deferred && (!self.layout_members || self.m != 2 || tau_verify) {
+            return Err(
+                "a base without its negatives (lazy_neg) needs mitm-frobenius-layout-counted with m=2 and no tau_verify".into(),
+            );
+        }
+        let ids = orbit_ids(params, self.instance)?;
+        if ids.is_some() && !self.layout_members {
+            return Err("orbit_ids needs mitm-frobenius-layout-counted".into());
+        }
         self.walk_sib = walk_sib(params)?;
         if self.walk_sib > 0 && (!self.layout_members || self.m != 2) {
             return Err("walk_sib needs mitm-frobenius-layout-counted with m=2".into());
@@ -4542,7 +4624,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
             });
         }
         let table = if self.layout_members {
-            FrobeniusPairTable::build_layout_with(self.instance, fb, sib)
+            FrobeniusPairTable::build_layout_plan(self.instance, fb, sib, ids)
         } else if self.lazy_members {
             FrobeniusPairTable::build_lazy(self.instance, fb)
         } else {
@@ -4586,6 +4668,16 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
                 counts.insert("lookups".into(), table.build_lookups);
                 counts.insert("pair_table_entries".into(), table.entries);
                 counts.insert("pair_table_representatives".into(), table.representatives);
+                // Zero-free: absent off the `orbit_ids` / `lazy_neg` levers.
+                if table.identity_skips > 0 {
+                    counts.insert("orbit_identity_skips".into(), table.identity_skips);
+                }
+                if table.build_point_negations > 0 {
+                    counts.insert(
+                        "point_negations_uncharged".into(),
+                        table.build_point_negations,
+                    );
+                }
             }
         }
         counts
