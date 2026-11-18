@@ -806,6 +806,134 @@ mod tests {
         Some(r.mul(x0, y_inv))
     }
 
+
+    // Frozen November 17 AMM implementation, after the a^t reuse but
+    // before rolling digits. This is the exact baseline for this change.
+    fn previous_amm_root<R: Ring>(ctx: &Cube<R>, a: R::E) -> Option<R::E> {
+        let r = &ctx.r;
+        if a == r.zero() { return Some(a); }
+        if ctx.s == 0 { return Some(rpow(r, a, ctx.e3)); }
+        let t = ctx.n / ctx.p3s;
+        let g = rpow(r, a, t);
+        let mut residue = g;
+        for _ in 1..ctx.s {
+            residue = r.mul(residue, r.mul(residue, residue));
+        }
+        if residue != r.one() { return None; }
+        let x0 = rpow(r, a, ctx.e3);
+        let h = if t % 3 == 1 { r.mul(g, g) } else { g };
+        let w2 = r.mul(ctx.w, ctx.w);
+        let mut l = 0u128;
+        for j in 0..ctx.s {
+            let corr = rpow(r, ctx.c, (ctx.p3s - l) % ctx.p3s);
+            let x = r.mul(h, corr);
+            let z = rpow(r, x, 3u128.pow(ctx.s - 1 - j));
+            let d = if z == r.one() { 0 }
+                else if z == ctx.w { 1 }
+                else if z == w2 { 2 }
+                else { return None };
+            l += d * 3u128.pow(j);
+        }
+        if !l.is_multiple_of(3) { return None; }
+        let y_inv = rpow(r, ctx.c, (ctx.p3s - l / 3) % ctx.p3s);
+        Some(r.mul(x0, y_inv))
+    }
+
+    #[test]
+    fn amm_digit_loop_matches_previous_reference() {
+        // Cover s=0,1,2 and large s=3..7 on Fp, plus Fp2 and non-cubes.
+        let mut seed = 0x1234_4321_9e37_2026u64;
+        for &p in &[5u64, 7, 13, 19, 37, 73, 109, 163, 487,
+                    1459, 17_497, 998_244_353, 1_000_000_009,
+                    2_013_265_921, MAX_PRIME] {
+            let f = Fp::new(p);
+            let k = Cube::new(f);
+            for _ in 0..512 {
+                seed = seed.wrapping_add(0x9e37_79b9_7f4a_7c15);
+                let mut z = seed;
+                z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+                z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+                let a = (z ^ (z >> 31)) % p;
+                assert_eq!(k.root(a), previous_amm_root(&k, a),
+                           "Fp p={p} s={} a={a}", k.s);
+            }
+            if p <= 1459 {
+                let ctx = RadicalRootCtx::new(p).unwrap();
+                for _ in 0..192 {
+                    seed = seed.wrapping_mul(6364136223846793005)
+                               .wrapping_add(1442695040888963407);
+                    let a = seed % p;
+                    seed = seed.wrapping_mul(6364136223846793005)
+                               .wrapping_add(1442695040888963407);
+                    let b = seed % p;
+                    assert_eq!(ctx.cube_q.root((a, b)),
+                               previous_amm_root(&ctx.cube_q, (a, b)),
+                               "Fp2 p={p} a={a} b={b}");
+                }
+            }
+        }
+    }
+
+    // Runs on the exact production Rust implementation. Use the ignored
+    // benchmark separately from correctness (it is noisy on shared CI).
+    #[test]
+    #[ignore = "manual paired before/after AMM timing"]
+    fn bench_amm_digit_loop() {
+        use std::hint::black_box;
+        use std::time::Instant;
+
+        fn time<R: Ring>(
+            ctx: &Cube<R>, xs: &[R::E], reps: usize,
+            root: fn(&Cube<R>, R::E) -> Option<R::E>,
+        ) -> f64 {
+            let mut hits = 0usize;
+            let start = Instant::now();
+            for _ in 0..reps {
+                for &x in xs {
+                    if black_box(root(ctx, black_box(x))).is_some() {
+                        hits += 1;
+                    }
+                }
+            }
+            black_box(hits);
+            start.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+
+        let mut seed = 0x5377_19d0_1234_1234u64;
+        for &p in &[163u64, 487, 1459, 17_497, 1_000_000_009, MAX_PRIME] {
+            let f = Fp::new(p);
+            let k = Cube::new(f);
+            let mut cubes = Vec::with_capacity(2048);
+            let mut mixed = Vec::with_capacity(2048);
+            for _ in 0..2048 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let a = 1 + seed % (p - 1);
+                cubes.push(f.mul(f.sqr(a), a));
+                mixed.push(a);
+            }
+            for (label, xs) in [("cubes", &cubes), ("mixed", &mixed)] {
+                for &x in xs {
+                    assert_eq!(previous_amm_root(&k, x), k.root(x));
+                }
+                let (mut before, mut after) = (Vec::new(), Vec::new());
+                for trial in 0..13 {
+                    if trial % 2 == 0 {
+                        before.push(time(&k, xs, 2, previous_amm_root::<Fp>));
+                        after.push(time(&k, xs, 2, Cube::<Fp>::root));
+                    } else {
+                        after.push(time(&k, xs, 2, Cube::<Fp>::root));
+                        before.push(time(&k, xs, 2, previous_amm_root::<Fp>));
+                    }
+                }
+                before.sort_by(f64::total_cmp);
+                after.sort_by(f64::total_cmp);
+                println!("AMM digits p={p} s={} {label}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                         k.s, before[6], after[6], before[6] / after[6]);
+            }
+        }
+    }
+
     #[test]
     fn radical_power_reuse_matches_frozen_reference() {
         // Include high 2-adicity, high 3-adicity (487-1 = 2*3^5),
