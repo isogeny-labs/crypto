@@ -349,8 +349,8 @@ jobs:
               --registry docs/curves/registry.json \
               --cover-graph docs/curves/cover-links.yaml \
               --traits docs/curves/traits.json \
-              --expected-sha256 15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948 \
-              --expected-bytes 498477 \
+              --expected-sha256 8c61e842945bf1e9ad8dd3adf326c6c11e55bb97018659b2abf40a5b15256941 \
+              --expected-bytes 500925 \
               --output transfer-catalog-replay.json; then
               :
             else
@@ -371,7 +371,7 @@ jobs:
               exit "$verify_code"
             fi
             node -e 'const fs=require("fs"); for(const file of ["verified-smoke.json","arithmetic-smoke.json"]){const r=JSON.parse(fs.readFileSync(file)); if(r.status!=="ok") process.exit(1)} const c=JSON.parse(fs.readFileSync("catalog-smoke.json")); if(c.schema_version!=="curve-covers/v1") process.exit(1);'
-            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-catalog-replay.json")); if(r.schema_version!=="binary-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_complete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.corpus.sha256!=="15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948"||r.corpus.bytes!==498477||r.summary.failed_named_subgroup_records!==0) process.exit(1);'
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-catalog-replay.json")); if(r.schema_version!=="binary-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_complete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.corpus.sha256!=="8c61e842945bf1e9ad8dd3adf326c6c11e55bb97018659b2abf40a5b15256941"||r.corpus.bytes!==500925||r.summary.failed_named_subgroup_records!==0) process.exit(1);'
             "./ecdlp-audit$ext" verify-fixed-f8-order \
               --input docs/curves/fixed-f8-genus3-order-certificate.json \
               --repo-root . \

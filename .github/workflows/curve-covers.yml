@@ -138,8 +138,8 @@ jobs:
             --registry docs/curves/registry.json \
             --cover-graph docs/curves/cover-links.yaml \
             --traits docs/curves/traits.json \
-            --expected-sha256 15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948 \
-            --expected-bytes 498477
+            --expected-sha256 8c61e842945bf1e9ad8dd3adf326c6c11e55bb97018659b2abf40a5b15256941 \
+            --expected-bytes 500925
       - name: Replay the native audit plan and fixed-F8 order certificate
         run: |
           cargo test --bin ecdlp-audit

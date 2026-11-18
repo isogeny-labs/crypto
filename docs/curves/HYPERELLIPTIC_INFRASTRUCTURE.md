@@ -618,9 +618,11 @@ computational-advantage and end-to-end solver costs for both the 15,791-row
 historical assessment and the larger live graph remain unknown. Cryptanalysis
 successor `f24ebf0f59e6f55ae8ce5a651d3c25ee4dc42512` mirrors the exact
 strict-primality, balanced-arithmetic, and transfer sources from crypto
-producer `153ac585d3b1ece0ebb0d49312b13267f651c94b` and binds the
-corpus-containing crypto revision
-`bb87d501aa763e7243f845d4f07c8a31b88435f1`. Local mirror validation passed
+producer `153ac585d3b1ece0ebb0d49312b13267f651c94b`. Its earlier receipt for the
+corpus-containing crypto revision `bb87d501aa763e7243f845d4f07c8a31b88435f1`
+is superseded by the clean corpus regeneration from producer
+`f402ccd4c657735e290f3a0a95b3a53024cba2cf`; the mirrored library source bytes
+did not change. Local mirror validation passed
 10 of 10 manifest-parity records, 1 of 1 primality test, 5 of 5 balanced
 tests, 6 of 6 transfer tests including the strict live 73-bit pilot, and 8 of
 8 parity tests; strict library Clippy and targeted `rustfmt` also passed. The
@@ -707,7 +709,7 @@ The exported catalog identifies its wrapper with
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
 that order. At this revision that digest is
-`190548a277d94beb7fc0a802e5755f8bb1f73dfa7f756ad7e3078cee3f6b2345`.
+`aae753f89f09b6157b0f3070858b3bc9c15b3ae48361076bcf52db3aa1c491b1`.
 Read the value from the exact export rather than copying a digest from an
 earlier revision. Changing any of the three producer inputs changes the
 provenance digest, so this literal must change with them. Both
@@ -769,11 +771,13 @@ independent execution attestation or a claim of exact order where the record
 still says unknown.
 
 For the tracked 2026-11-18 corpus, `CORPUS_SHA256` is
-`15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948`
-and `CORPUS_BYTES` is `498477`. It was regenerated from producer revision
-`153ac585d3b1ece0ebb0d49312b13267f651c94b` with length-framed producer-source
+`8c61e842945bf1e9ad8dd3adf326c6c11e55bb97018659b2abf40a5b15256941`
+and `CORPUS_BYTES` is `500925`. It was regenerated from producer revision
+`f402ccd4c657735e290f3a0a95b3a53024cba2cf` with length-framed producer-source
 digest
-`7cc3fedfaef46a6588c0f31e304be07f6948f62628baf087b9b8b89f178ec9ad`.
+`04fc744060ec7a4c1ced6c36f9190422d886c593d29e4bd263f223db77f36c65`.
+That source frame includes the binary-module re-exports and the deterministic
+primality implementation and word-sized helper used by exact-order evidence.
 
 For the 2026-11-18 graph, the expected bounded population is 174 binary map
 records, 147 maps with 150 named generator bindings, and 27 maps without a

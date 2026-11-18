@@ -132,11 +132,13 @@ not establish nonexistence.
 # Implementation and evidence sources
 
 The corpus was produced from crypto revision
-`153ac585d3b1ece0ebb0d49312b13267f651c94b`. Its length-framed semantic-source
-digest is `7cc3fedfaef46a6588c0f31e304be07f6948f62628baf087b9b8b89f178ec9ad`;
-the frame binds source paths and byte lengths as well as contents. The
-producer-commit and compiler-version strings remain explicitly marked as
-caller-supplied, unverified attestations.
+`f402ccd4c657735e290f3a0a95b3a53024cba2cf`. Its length-framed semantic-source
+digest is `04fc744060ec7a4c1ced6c36f9190422d886c593d29e4bd263f223db77f36c65`;
+the frame binds source paths and byte lengths as well as contents. It now
+explicitly includes the binary module routing, the deterministic primality
+implementation, and its word-sized helper. The producer-commit and
+compiler-version strings remain explicitly marked as caller-supplied,
+unverified attestations.
 
 - [`src/binary_ecc/cover_transfer.rs`](../../src/binary_ecc/cover_transfer.rs)
   contains binary arithmetic, the arbitrary norm, and the generated-subgroup
@@ -232,15 +234,14 @@ production source addition, and it is not a catalog-wide oracle.
 The earlier handoff incorrectly treated a 467,669-byte JSON file as subject to
 a 64 KiB storage rule.  The live repository policy does not classify `.json`
 as a data extension and applies the generic automatic threshold only above
-1 MiB. The corpus is therefore eligible for a direct Git commit. The successor
-498,477-byte tracked corpus is at
+1 MiB. The corpus is therefore eligible for a direct Git commit. The corrected
+500,925-byte tracked corpus is at
 [`binary-subgroup-transfer-certificates.json`](../../docs/curves/binary-subgroup-transfer-certificates.json).
-It is present in crypto revision
-`bb87d501aa763e7243f845d4f07c8a31b88435f1`; its exact producer remains
-`153ac585d3b1ece0ebb0d49312b13267f651c94b`.
+Its exact producer is
+`f402ccd4c657735e290f3a0a95b3a53024cba2cf`.
 Its SHA-256 is
 
-`15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948`.
+`8c61e842945bf1e9ad8dd3adf326c6c11e55bb97018659b2abf40a5b15256941`.
 
 The installed-layout gate stages it with `traits.json`, supplies the literal
 hash and size, regenerates every record, and requires canonical byte equality.
@@ -248,7 +249,7 @@ The exact second arithmetic replay supplied that literal hash and byte count,
 regenerated all 174 maps and 150 named bindings, and returned
 `verified_complete` with canonical-byte equality and every replay check true.
 Its response was 1,682 bytes with SHA-256
-`4429680320a1e113b8af55daf8dd1055d0870ff3f6b152a42787b998f785230b`.
+`8569b72b154c254421d93fb4751eb621040ed7c5a9380e2001c487ebba9a0a22`.
 The corpus retains 102 locally proved exact named-generator orders, 48
 annihilation-only records explicitly marked unknown, and zero failed named
 records. This response is same-implementation evidence, not an independent
@@ -282,9 +283,12 @@ The predecessor cryptanalysis draft
 `07f7d47bd8d58d5cb1065cc83e9f22fefd85e065` are retained as historical
 records. Cryptanalysis successor
 `f24ebf0f59e6f55ae8ce5a651d3c25ee4dc42512` is the exact-source mirror of
-crypto producer `153ac585d3b1ece0ebb0d49312b13267f651c94b` and binds the
-corpus-containing crypto revision
-`bb87d501aa763e7243f845d4f07c8a31b88435f1`. The pinned SHA-256 digests are:
+the library implementation at crypto revision
+`153ac585d3b1ece0ebb0d49312b13267f651c94b`. Its earlier receipt for the
+corpus-containing revision `bb87d501aa763e7243f845d4f07c8a31b88435f1`
+is superseded by the clean corpus regeneration from producer
+`f402ccd4c657735e290f3a0a95b3a53024cba2cf`; the pinned library-source SHA-256
+digests remain:
 
 - primality source:
 

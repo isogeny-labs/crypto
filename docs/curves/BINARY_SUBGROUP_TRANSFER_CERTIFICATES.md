@@ -59,16 +59,18 @@ only about the named generated subgroup, not the ambient curve order.
 ## Tracked 2026-11-18 snapshot
 
 The repository-tracked corpus is
-`docs/curves/binary-subgroup-transfer-certificates.json`: 498,477 bytes,
+`docs/curves/binary-subgroup-transfer-certificates.json`: 500,925 bytes,
 SHA-256
-`15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948`.
+`8c61e842945bf1e9ad8dd3adf326c6c11e55bb97018659b2abf40a5b15256941`.
 It records producer revision
-`153ac585d3b1ece0ebb0d49312b13267f651c94b`, length-framed source digest
-`7cc3fedfaef46a6588c0f31e304be07f6948f62628baf087b9b8b89f178ec9ad`,
+`f402ccd4c657735e290f3a0a95b3a53024cba2cf`, length-framed source digest
+`04fc744060ec7a4c1ced6c36f9190422d886c593d29e4bd263f223db77f36c65`,
 174 maps, 150 supported named-subgroup records, 102 locally proved exact
 generated orders, 48 unknown exact orders, and zero failed records. The
 producer revision and compiler string inside the JSON are caller-supplied;
-the source digest and exact regeneration are the executable bindings.
+the source digest binds the binary module routing and deterministic primality
+implementation used by exact-order evidence. Exact regeneration is the
+executable binding.
 [pcc:unverified]
 
 ## Required bindings and checks
