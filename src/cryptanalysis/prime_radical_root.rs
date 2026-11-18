@@ -1262,6 +1262,22 @@ mod tests {
         acc
     }
 
+    #[derive(Clone, Copy)]
+    struct Fq2BeforeSparsePow(Fq2);
+    impl Ring for Fq2BeforeSparsePow {
+        type E = (u64, u64);
+        fn zero(&self) -> Self::E { self.0.zero() }
+        fn one(&self) -> Self::E { self.0.one() }
+        fn mul(&self, x: Self::E, y: Self::E) -> Self::E { self.0.mul(x, y) }
+        fn sqr(&self, x: Self::E) -> Self::E { self.0.sqr(x) }
+        fn cube(&self, x: Self::E) -> Self::E { self.0.cube(x) }
+        fn pow(&self, x: Self::E, e: u128) -> Self::E {
+            fp2_pow_before_sparse(&self.0, x, e)
+        }
+        fn order(&self) -> u128 { self.0.order() }
+        fn cand(&self, k: u64) -> Self::E { self.0.cand(k) }
+    }
+
     #[test]
     fn round20_sparse_fp2_and_depressed_quartic_match_reference() {
         let mut seed = 0x741b_20a6_5c43_2026u64;
@@ -1375,6 +1391,23 @@ mod tests {
                 paired(&format!("p={p} Fp2 {label} AMM_e3"), xs, 10,
                        |x| { let y=fp2_pow_before_sparse(q,x,e3); y.0 ^ y.1 },
                        |x| { let y=q.pow(x,e3); y.0 ^ y.1 });
+            }
+            // Full AMM root extraction is the relevant generic-input negative
+            // control: the sparse-power branches should not materially harm
+            // dense algebraic radicals.
+            let frozen_cube = Cube::new(Fq2BeforeSparsePow(*q));
+            let mixed = &general[..256];
+            let cubes: Vec<_> = mixed.iter().map(|&x| q.cube(x)).collect();
+            for (label, xs) in [("mixed", mixed), ("cubes", cubes.as_slice())] {
+                paired(&format!("p={p} full Fp2 AMM {label}"), xs, 4,
+                       |x| {
+                           let y=frozen_cube.root(x).unwrap_or((u64::MAX,u64::MAX));
+                           y.0 ^ y.1
+                       },
+                       |x| {
+                           let y=ctx.cube_q.root(x).unwrap_or((u64::MAX,u64::MAX));
+                           y.0 ^ y.1
+                       });
             }
             paired(&format!("p={p} already-depressed quartic coefficients"), &depressed, 50,
                    |(b,c,d,e)| {
