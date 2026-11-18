@@ -485,6 +485,17 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         // `known_uncounted` named; the `counted:<item>` marker beside them
         // takes the item off that list for the record that carries it.
         c if c.starts_with("counted:") => Shape,
+        // `bitop_tally::Tally::add_work_native`: what a base builder or an
+        // oracle's set-up tallied, one primitive each (`WORK_NATIVE_KEYS`).
+        "tally_word_ops" => Prims(&[(WordOp, 1)]),
+        "tally_hash_probes" => HASH,
+        "tally_field_adds" => Prims(&[(FieldAdd, 1)]),
+        "tally_field_muls" => Prims(&[(FieldMul, 1)]),
+        "tally_field_sqrs" => Prims(&[(FieldSqr, 1)]),
+        "tally_field_invs" => Prims(&[(FieldInv, 1)]),
+        // `tallied:<native>`: a marker, no work of its own; `price` skips
+        // that phase's `<native>`, whose work the `tally_*` keys carry.
+        c if c.starts_with(crate::cryptanalysis::bitop_tally::TALLIED_PREFIX) => Shape,
         // Dense and sparse Gauss: one matrix entry read or compared (a
         // pivot-column read, a zero skipped in a pivot row, the leftmost
         // search, the non-zero collection, `pinned`'s scan; for the sparse
@@ -1160,7 +1171,17 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
                 p.scalar_mults as u128 * 3 * widths.r_bits as u128 / 2;
         }
         if ic {
-            for (name, &count) in p.native.iter().chain(p.work_native.iter()) {
+            // A native counter this phase marks `tallied:<native>` is
+            // carried by its `tally_*` keys; pricing both would count the
+            // work twice (`bitop_tally::TALLIED_PREFIX`).
+            let tallied = |name: &str| {
+                p.work_native.contains_key(&format!(
+                    "{}{name}",
+                    crate::cryptanalysis::bitop_tally::TALLIED_PREFIX
+                ))
+            };
+            let natives = p.native.iter().filter(|(name, _)| !tallied(name));
+            for (name, &count) in natives.chain(p.work_native.iter()) {
                 if count == 0 {
                     continue;
                 }

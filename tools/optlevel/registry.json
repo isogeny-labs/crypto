@@ -19,7 +19,7 @@
     "kind": "emitted",
     "what": "RhoResult.steps (walk steps) plus look_ahead_adds, table_adds, restart_adds; a step is one affine addition with a batched-inversion share, not one modmuladd"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --op-class modmuladd_p62 --ops-regex '\"field_mults\":(\\d+)' --scale env:RAYON_NUM_THREADS:1,4 --out R.json -- target/release/examples/prime_fast_rho_multi <args>",
+   "measure": "tools/optlevel/run.sh measure --op-class modmuladd_p62 --ops-regex '\"field_mults\":(\\d+)' --scale env:RAYON_NUM_THREADS:1,4 --out R.json -- target/release/examples/prime_fast_rho_multi <args>",
    "status": "needs build",
    "note": "Counts walk steps, not field multiplications. Either convert with the documented multiplications per step and say so, or add a field-multiplication counter; until then an attainment against modmuladd_p62 is a lower bound by the per-step multiplication count."
   },
@@ -33,7 +33,7 @@
     "kind": "emitted",
     "what": "walk_steps, group_additions, scalar_multiplications in the fixture's JSON; no count of GF(2^m) word operations or carry-less multiplies"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex '\"walk_steps\":(\\d+)' --op-class xor_u64 --out R.json -- env RAYON_NUM_THREADS=1 target/release/examples/koblitz_rho_fixture 53 0 signed_frobenius 4 strong",
+   "measure": "tools/optlevel/run.sh measure --ops-regex '\"walk_steps\":(\\d+)' --op-class xor_u64 --out R.json -- env RAYON_NUM_THREADS=1 target/release/examples/koblitz_rho_fixture 53 0 signed_frobenius 4 strong",
    "status": "needs build",
    "note": "Binary-field arithmetic is carry-less multiplication (PCLMULQDQ), for which v1 has no operation class. Finding: add a clmul_u64 class and a per-step clmul count before scoring this kernel."
   },
@@ -61,7 +61,7 @@
     "kind": "emitted",
     "what": "base_muls, descent_muls and their sub-counters, adds, base_steps"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'base_muls[\"=: ]+(\\d+)' ...",
+   "measure": "tools/optlevel/run.sh measure --ops-regex 'base_muls[\"=: ]+(\\d+)' ...",
    "status": "needs build",
    "note": ""
   },
@@ -89,7 +89,7 @@
     "kind": "emitted",
     "what": "field_multiplications, field_ops, root_field_multiplications per run"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'field_multiplications[\"=: ]+(\\d+)' --op-class modmuladd_p31 -- target/release/examples/f4_fp_bench <args>",
+   "measure": "tools/optlevel/run.sh measure --ops-regex 'field_multiplications[\"=: ]+(\\d+)' --op-class modmuladd_p31 -- target/release/examples/f4_fp_bench <args>",
    "status": "needs build",
    "note": "Check the prime width of the run against the class (p31 or p62)."
   },
@@ -103,7 +103,7 @@
     "kind": "emitted",
     "what": "muladds (row-reduction multiply-adds)"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'muladds[\"=: ]+(\\d+)' ...",
+   "measure": "tools/optlevel/run.sh measure --ops-regex 'muladds[\"=: ]+(\\d+)' ...",
    "status": "needs build",
    "note": ""
   },
@@ -117,7 +117,7 @@
     "kind": "emitted",
     "what": "Closure.muladds (the unit f4_fp_tower reports) and rows_reduced; also returned on censored runs"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'muladds[\"=: ]+(\\d+)' --op-class modmuladd_p31 -- target/release/examples/hky_grid <args>",
+   "measure": "tools/optlevel/run.sh measure --ops-regex 'muladds[\"=: ]+(\\d+)' --op-class modmuladd_p31 -- target/release/examples/hky_grid <args>",
    "status": "needs build",
    "note": "Sparse row reduction: declare the traffic from the echelon's entry count, or measure it on a PMU host; in-cache only for small closures."
   },
@@ -131,7 +131,7 @@
     "kind": "emitted",
     "what": "word_ops (64-bit word xors) and pivots"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'word_ops[\"=: ]+(\\d+)' --op-class xor_u64 -- target/release/examples/f4_f2_bench <args>",
+   "measure": "tools/optlevel/run.sh measure --ops-regex 'word_ops[\"=: ]+(\\d+)' --op-class xor_u64 -- target/release/examples/f4_f2_bench <args>",
    "status": "needs build",
    "note": "The cleanest CPU case: the counter is exactly the class."
   },
@@ -201,7 +201,7 @@
     "kind": "emitted",
     "what": "krylov_muls, bm_muls, nf_muls, readout_muls, roots_muls"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'krylov_muls[\"=: ]+(\\d+)' ...",
+   "measure": "tools/optlevel/run.sh measure --ops-regex 'krylov_muls[\"=: ]+(\\d+)' ...",
    "status": "needs build",
    "note": ""
   },
@@ -313,7 +313,7 @@
     "kind": "emitted",
     "what": "group_ops and iterations per solve, printed by ca_perfbench"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex ... -- build/ca_perfbench <case>",
+   "measure": "tools/optlevel/run.sh measure --ops-regex ... -- build/ca_perfbench <case>",
    "status": "needs build",
    "note": "A group operation is several mulmods; same caveat as crypto.rho.prime_fast. Existing benchmarks: benchmarks/20261103-rho-zp-step, 20261101-rho-ec-step (cycles per step under perf)."
   },
@@ -369,7 +369,7 @@
     "kind": "derivable",
     "what": "none in the engine; r*s*n per product follows from the shapes (research/optlevel_20261117/real_kernel/closure_wrapper.py counts it from outside)"
    },
-   "measure": "python3 tools/optlevel/optlevel.py measure --scale env:OPENBLAS_NUM_THREADS:1,4 --out M.json -- python3 research/optlevel_20261117/real_kernel/closure_wrapper.py /home/user/lfd-summation-systems OUT -- cell --m 4 --k 2 --primes 7681 --seeds 1",
+   "measure": "tools/optlevel/run.sh measure --scale env:OPENBLAS_NUM_THREADS:1,4 --out M.json -- python3 research/optlevel_20261117/real_kernel/closure_wrapper.py /home/user/lfd-summation-systems OUT -- cell --m 4 --k 2 --primes 7681 --seeds 1",
    "status": "measured here",
    "note": "Finding: the engine reports seconds and batches but no operation count. The compiled echelon (csd/_elim.c) does count row operations and returns them; the callers drop the value."
   },

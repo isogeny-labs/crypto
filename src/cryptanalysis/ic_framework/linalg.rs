@@ -57,7 +57,7 @@ use std::cell::RefCell;
 
 use num_bigint::BigUint;
 
-use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+use crate::cryptanalysis::koblitz_strong_rho::{NarrowRhoScalar, RhoScalar};
 use crate::cryptanalysis::prime_fast::MulModN;
 
 use crate::cryptanalysis::ic_boundary::{
@@ -430,7 +430,7 @@ impl RelationSolver for StructuredGauss {
 /// column rank, where the echelon matrices pin the target as soon as it
 /// lies in the row space, so it can take a few more relations; the
 /// sessions report both.
-pub struct Wiedemann<S: RhoScalar = u64> {
+pub struct Wiedemann<S: NarrowRhoScalar = u64> {
     modulus: S,
     cols: usize,
     rows: Vec<Vec<(usize, S)>>,
@@ -467,7 +467,7 @@ impl<S> Default for WiedemannState<S> {
     }
 }
 
-impl<S: RhoScalar> Wiedemann<S> {
+impl<S: NarrowRhoScalar> Wiedemann<S> {
     pub fn new(cols: usize, modulus: S) -> Self {
         Self {
             modulus,
@@ -814,6 +814,10 @@ struct SparseCadoState {
     row_ops: u64,
     dependent: u64,
     attempts: u64,
+    /// `+match` arms: the structural-rank gate (`linalg_mixed::MatchGate`);
+    /// a solve is tried only once it reports full structural rank.
+    gate: Option<super::linalg_mixed::MatchGate>,
+    gate_visits: u64,
 }
 
 impl SparseCado {
@@ -855,8 +859,19 @@ impl SparseCado {
                 row_ops: 0,
                 dependent: 0,
                 attempts: 0,
+                gate: None,
+                gate_visits: 0,
             }),
         }
+    }
+
+    /// The same solver behind the structural-rank gate: no solve is tried
+    /// while the maximum row–column matching is below `cols` (such a solve
+    /// cannot succeed).  The gate's edge visits are charged in `row_ops`.
+    pub fn with_match_gate(mut self) -> Self {
+        let cols = self.cols;
+        self.state.get_mut().gate = Some(super::linalg_mixed::MatchGate::new(cols));
+        self
     }
 
     /// Solves tried so far.
@@ -867,6 +882,9 @@ impl SparseCado {
     fn try_solve(&self, st: &mut SparseCadoState) {
         let rows = st.rows.len();
         if st.solution.is_some() || st.uncovered > 0 || rows < st.next_attempt {
+            return;
+        }
+        if st.gate.as_ref().is_some_and(|g| g.size() < self.cols) {
             return;
         }
         st.next_attempt = rows + (self.cols / 32).max(1);
@@ -951,6 +969,14 @@ impl RelationSolver for SparseCado {
                 st.uncovered -= 1;
             }
         }
+        if let Some(gate) = st.gate.as_mut() {
+            let cols: Vec<u32> = entries.iter().map(|(c, _)| *c).collect();
+            let before = gate.visits;
+            gate.add_row(&cols);
+            let v = gate.visits - before;
+            st.gate_visits += v;
+            st.row_ops += v;
+        }
         st.rows.push_entries(&entries, &BigUint::from(rhs % m));
         RowStatus::Independent
     }
@@ -976,6 +1002,18 @@ impl RelationSolver for SparseCado {
 
     fn work(&self) -> (u64, &'static str) {
         (self.state.borrow().row_ops, "row_ops")
+    }
+
+    fn work_counters(&self) -> std::collections::BTreeMap<String, u64> {
+        let st = self.state.borrow();
+        let mut out = std::collections::BTreeMap::new();
+        // Only the gated arms emit counters, so every existing arm's
+        // records are byte-identical to before.
+        if st.gate.is_some() {
+            out.insert("sparse_solve_attempts".into(), st.attempts);
+            out.insert("sparse_gate_visits".into(), st.gate_visits);
+        }
+        out
     }
 }
 
@@ -1184,6 +1222,26 @@ pub const MATRIX_NAMES: &[(&str, &str)] = &[
         "lanczos",
         "no filter then block Lanczos, re-solved as relations arrive; full-rank completion, answer certified by two independently seeded solves; row_ops as sparse-cado",
     ),
+    (
+        "filter+wiedemann+match",
+        "filter+wiedemann behind the structural-rank gate: no solve until the incremental maximum row-column matching covers every column; gate edge visits charged in row_ops",
+    ),
+    (
+        "filter+lanczos+match",
+        "filter+lanczos behind the structural-rank gate; gate edge visits charged in row_ops",
+    ),
+    (
+        "mixed-peel",
+        "structural-rank gate, then the matched square system: two-sided peeling, Markowitz elimination of the 2-core, back-substitution; rank certified by non-zero pivots (one solve), surplus rows checked; full-rank completion; row_ops as sparse-cado plus gate visits and peeling weight updates",
+    ),
+    (
+        "mixed-peel-lazy",
+        "mixed-peel with the gate built only after every column is covered, worklist peeling and a bucket-queue Markowitz pivot; every queue, weight and incidence operation charged in row_ops",
+    ),
+    (
+        "mixed-peel+bloom",
+        "mixed-peel with a Bloom duplicate screen (10 bits a row, 4 probes) in front of an exact check on arriving rows; hash evaluations and probes charged in row_ops",
+    ),
 ];
 
 /// The deferred sparse solvers answer only at full column rank, so the
@@ -1191,7 +1249,16 @@ pub const MATRIX_NAMES: &[(&str, &str)] = &[
 pub fn is_deferred_sparse(name: &str) -> bool {
     matches!(
         name,
-        "sparse-cado" | "filter+wiedemann" | "filter+lanczos" | "wiedemann" | "lanczos"
+        "sparse-cado"
+            | "filter+wiedemann"
+            | "filter+lanczos"
+            | "wiedemann"
+            | "lanczos"
+            | "filter+wiedemann+match"
+            | "filter+lanczos+match"
+            | "mixed-peel"
+            | "mixed-peel-lazy"
+            | "mixed-peel+bloom"
     )
 }
 
@@ -1227,6 +1294,18 @@ pub fn matrix_by_name(
             modulus,
             SparseCoreSolver::BlockLanczos,
             false,
+        ))),
+        "filter+wiedemann+match" => Ok(Box::new(SparseCado::new(cols, modulus).with_match_gate())),
+        "filter+lanczos+match" => Ok(Box::new(
+            SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, true)
+                .with_match_gate(),
+        )),
+        "mixed-peel" => Ok(Box::new(super::linalg_mixed::MixedPeel::new(cols, modulus))),
+        "mixed-peel-lazy" => Ok(Box::new(super::linalg_mixed::MixedPeel::lazy(
+            cols, modulus,
+        ))),
+        "mixed-peel+bloom" => Ok(Box::new(super::linalg_mixed::MixedPeel::with_bloom(
+            cols, modulus, 10, 4,
         ))),
         other => Err(format!(
             "unknown relation matrix `{other}`; known: {}",
@@ -1605,7 +1684,16 @@ mod tests {
                 is_deferred_sparse(name),
                 matches!(
                     *name,
-                    "sparse-cado" | "filter+wiedemann" | "filter+lanczos" | "wiedemann" | "lanczos"
+                    "sparse-cado"
+                        | "filter+wiedemann"
+                        | "filter+lanczos"
+                        | "wiedemann"
+                        | "lanczos"
+                        | "filter+wiedemann+match"
+                        | "filter+lanczos+match"
+                        | "mixed-peel"
+                        | "mixed-peel-lazy"
+                        | "mixed-peel+bloom"
                 )
             );
         }

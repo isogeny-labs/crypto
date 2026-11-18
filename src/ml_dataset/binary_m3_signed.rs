@@ -195,6 +195,34 @@ impl RegisteredMatrixInput<'_> {
     }
 }
 
+impl OrdinarySignedOwned<'_> {
+    pub(super) fn facts(&self) -> (bool, bool, bool) {
+        let domain = self.signed.as_ref().is_some_and(|s| {
+            s.complete && s.acknowledged.len() == 192 && s.unacknowledged.is_none()
+        });
+        let witness = self.publisher.receipt.is_some();
+        (domain, witness, self.witness.transferred)
+    }
+    pub(super) fn move_residuals(mut self, custody: &mut solvers::WorkerResidualCustody) {
+        if self.witness.bytes.is_empty() {
+            if let Some(encoding) = self.publisher.encoding.as_mut() {
+                self.witness.bytes = std::mem::take(&mut encoding.bytes);
+            }
+        }
+        retained_storage::move_slot_residual(self.group, custody);
+        retained_storage::move_slot_residual(self.witness, custody);
+    }
+}
+impl OrdinarySignedOwned<'_> {
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
+    pub(super) fn roots_complete(&self) -> bool {
+        self.group.transferred && (self.publisher.receipt.is_none() || self.witness.transferred)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -289,29 +317,5 @@ mod tests {
             rejected.stop,
             Some(before.first_stop.unwrap_or(Stop::Phase))
         );
-    }
-}
-
-impl OrdinarySignedOwned<'_> {
-    pub(super) fn facts(&self) -> (bool, bool, bool) {
-        let domain = self.signed.as_ref().is_some_and(|s| {
-            s.complete && s.acknowledged.len() == 192 && s.unacknowledged.is_none()
-        });
-        let witness = self.publisher.receipt.is_some();
-        (domain, witness, self.witness.transferred)
-    }
-    pub(super) fn move_residuals(mut self, custody: &mut solvers::WorkerResidualCustody) {
-        if self.witness.bytes.is_empty() {
-            if let Some(encoding) = self.publisher.encoding.as_mut() {
-                self.witness.bytes = std::mem::take(&mut encoding.bytes);
-            }
-        }
-        retained_storage::move_slot_residual(self.group, custody);
-        retained_storage::move_slot_residual(self.witness, custody);
-    }
-}
-impl OrdinarySignedOwned<'_> {
-    pub(super) fn roots_complete(&self) -> bool {
-        self.group.transferred && (self.publisher.receipt.is_none() || self.witness.transferred)
     }
 }

@@ -19,6 +19,7 @@
 //! branches in increasing `b`), solved
 //!   * `warm`: one solver per (draw, k), branches as assumption sets, learnt clauses kept;
 //!   * `cold`: a fresh solver per branch, the `k` bits as unit clauses.
+//!
 //! The deadline `--budget-s` covers all branches of one (draw, k, mode); branches left
 //! when it expires are `undecided`.  Every SAT model is decoded and checked by group
 //! arithmetic; the expected verdict of every branch is computed from the ground truth
@@ -39,6 +40,7 @@
 //!   * `cold`: a fresh solver per target on the panel's constant-target system;
 //!   * `cold_sym`: a fresh solver per target on the symbolic system (warm's encoding),
 //!     the `2m` target bits as unit clauses.
+//!
 //! Summary ratios `ratio_<a>_over_<b>_{conflicts,decisions,wall}` for cold/warm,
 //! cold_sym/warm (incrementality alone) and cold/cold_sym (encoding size alone).
 //! `--budget-s` is per target per mode.  `wall_s` is loading the solver (cold, cold_sym) plus the
@@ -133,9 +135,16 @@ struct Draw {
 }
 
 /// A planted target over `span`: three distinct base abscissas, a random sign each.
-fn planted_target(curve: &BinaryCurve, base: &[BinaryPoint], rng: &mut StdRng) -> Option<BinaryPoint> {
+fn planted_target(
+    curve: &BinaryCurve,
+    base: &[BinaryPoint],
+    rng: &mut StdRng,
+) -> Option<BinaryPoint> {
     let m = curve.m;
-    let mut xs: Vec<u64> = base.iter().filter_map(|p| pt_words(p).map(|w| w.0)).collect();
+    let mut xs: Vec<u64> = base
+        .iter()
+        .filter_map(|p| pt_words(p).map(|w| w.0))
+        .collect();
     xs.sort_unstable();
     xs.dedup();
     if xs.len() < 3 {
@@ -204,7 +213,11 @@ fn draw_instance(curve: &BinaryCurve, ell: usize, rng: &mut StdRng, planted: boo
 }
 
 /// (ordered total, ordered with pairwise distinct abscissas, factor-base size).
-fn count_truth(curve: &BinaryCurve, base: &[BinaryPoint], target: &BinaryPoint) -> (u64, u64, usize) {
+fn count_truth(
+    curve: &BinaryCurve,
+    base: &[BinaryPoint],
+    target: &BinaryPoint,
+) -> (u64, u64, usize) {
     let have: HashSet<(u64, u64)> = base.iter().filter_map(pt_words).collect();
     let (mut total, mut distinct) = (0u64, 0u64);
     for p in base {
@@ -227,7 +240,11 @@ fn count_truth(curve: &BinaryCurve, base: &[BinaryPoint], target: &BinaryPoint) 
 
 /// The abscissa triples `(x_0, x_1, x_2)` of the ordered triples of `base` summing to
 /// `target` (the ground truth behind `count_truth`, kept as triples).
-fn truth_triples(curve: &BinaryCurve, base: &[BinaryPoint], target: &BinaryPoint) -> HashSet<(u64, u64, u64)> {
+fn truth_triples(
+    curve: &BinaryCurve,
+    base: &[BinaryPoint],
+    target: &BinaryPoint,
+) -> HashSet<(u64, u64, u64)> {
     let have: HashSet<(u64, u64)> = base.iter().filter_map(pt_words).collect();
     let mut out = HashSet::new();
     for p in base {
@@ -255,7 +272,10 @@ fn build_norm(
     let ell = basis.len();
     let mu = m as usize;
     let n_vars = 3 * ell + 2 * mu;
-    assert!(n_vars <= MASK_BITS, "n_vars {n_vars} > MASK_BITS {MASK_BITS}");
+    assert!(
+        n_vars <= MASK_BITS,
+        "n_vars {n_vars} > MASK_BITS {MASK_BITS}"
+    );
     let irr = &curve.irreducible;
     let BinaryPoint::Affine { x: xr, y: yr } = target else {
         panic!("target at infinity");
@@ -291,12 +311,19 @@ fn build_norm(
 
 /// The norm system with the target symbolic: `x_R` at bits `3ℓ + 2m ..`, `y_R` at
 /// `3ℓ + 3m ..` (`3ℓ + 4m` bits).  Same construction order as [`build_norm`].
-fn build_norm_symbolic(curve: &BinaryCurve, st: &FieldStructure, basis: &[F2mElement]) -> (Vec<F2BoolPoly>, usize) {
+fn build_norm_symbolic(
+    curve: &BinaryCurve,
+    st: &FieldStructure,
+    basis: &[F2mElement],
+) -> (Vec<F2BoolPoly>, usize) {
     let m = curve.m;
     let ell = basis.len();
     let mu = m as usize;
     let n_vars = 3 * ell + 4 * mu;
-    assert!(n_vars <= MASK_BITS, "n_vars {n_vars} > MASK_BITS {MASK_BITS}");
+    assert!(
+        n_vars <= MASK_BITS,
+        "n_vars {n_vars} > MASK_BITS {MASK_BITS}"
+    );
     let xs: Vec<SymElement> = (0..3)
         .map(|i| SymElement::from_subspace_vars(basis, i * ell, m, n_vars))
         .collect();
@@ -307,7 +334,10 @@ fn build_norm_symbolic(curve: &BinaryCurve, st: &FieldStructure, basis: &[F2mEle
     let mut polys: Vec<F2BoolPoly> = Vec::new();
     // c = x_R² + a x_R + b (x_R + y_R): x_R² is linear (Frobenius), a x_R and
     // b (x_R + y_R) are of Boolean degree 2.
-    let c = xr.square(st).add(&a.mul(&xr, st)).add(&b.mul(&xr.add(&yr), st));
+    let c = xr
+        .square(st)
+        .add(&a.mul(&xr, st))
+        .add(&b.mul(&xr.add(&yr), st));
     let u = xs[0].add(&xs[1]);
     let v = xs[0].mul(&xs[1], st);
     let w = xs[2].add(&xr);
@@ -328,7 +358,12 @@ fn build_norm_symbolic(curve: &BinaryCurve, st: &FieldStructure, basis: &[F2mEle
 }
 
 /// The panel's norm decoder: some choice of signs over `x_0, x_1, x_2` sums to `R`.
-fn decode_ok(curve: &BinaryCurve, basis: &[F2mElement], target: &BinaryPoint, bits: &[bool]) -> bool {
+fn decode_ok(
+    curve: &BinaryCurve,
+    basis: &[F2mElement],
+    target: &BinaryPoint,
+    bits: &[bool],
+) -> bool {
     let m = curve.m;
     let ell = basis.len();
     let xs: Vec<u64> = (0..3)
@@ -473,7 +508,10 @@ impl Args {
     where
         T::Err: std::fmt::Debug,
     {
-        self.get(name).unwrap_or_else(|| d.to_string()).parse().expect(name)
+        self.get(name)
+            .unwrap_or_else(|| d.to_string())
+            .parse()
+            .expect(name)
     }
     fn list(&self, name: &str, d: &str) -> Vec<String> {
         self.get(name)
@@ -501,7 +539,11 @@ fn all_draws(cell: &Cell, planted: u32, unplanted: u32) -> Vec<(u32, bool, Draw)
     (0..planted + unplanted)
         .map(|d| {
             let is_planted = d < planted;
-            (d, is_planted, draw_instance(&cell.curve, cell.ell, &mut rng, is_planted))
+            (
+                d,
+                is_planted,
+                draw_instance(&cell.curve, cell.ell, &mut rng, is_planted),
+            )
         })
         .collect()
 }
@@ -580,7 +622,11 @@ fn run_branches(
         models_verified: 0,
         models_failed: 0,
     };
-    let mut warm = if mode == "warm" { Some(load(enc)) } else { None };
+    let mut warm = if mode == "warm" {
+        Some(load(enc))
+    } else {
+        None
+    };
     for br in 0..n_branches {
         let assumptions: Vec<Lit> = (0..k).map(|j| lit(j, br >> j & 1 == 1)).collect();
         let res = if Instant::now() >= deadline {
@@ -600,7 +646,9 @@ fn run_branches(
                 r.assumption_decisions += s.assumption_decisions() - ad0;
                 if res == SolveResult::Sat {
                     let model = s.model();
-                    let ok_a = assumptions.iter().all(|&l| model[(l.unsigned_abs() - 1) as usize] == (l > 0));
+                    let ok_a = assumptions
+                        .iter()
+                        .all(|&l| model[(l.unsigned_abs() - 1) as usize] == (l > 0));
                     if ok_a && verify(&model[..n_vars]) {
                         r.models_verified += 1;
                     } else {
@@ -624,7 +672,9 @@ fn run_branches(
                 r.propagations += s.stats.propagations;
                 if res == SolveResult::Sat {
                     let model = s.model();
-                    let ok_a = assumptions.iter().all(|&l| model[(l.unsigned_abs() - 1) as usize] == (l > 0));
+                    let ok_a = assumptions
+                        .iter()
+                        .all(|&l| model[(l.unsigned_abs() - 1) as usize] == (l > 0));
                     if ok_a && verify(&model[..n_vars]) {
                         r.models_verified += 1;
                     } else {
@@ -681,7 +731,9 @@ fn cmd_guess(args: &Args, cell: &Cell, out: &mut std::fs::File) {
             .iter()
             .map(|&(x0, x1, x2)| {
                 let ell = cell.ell;
-                (coords_of(&dr.span, x0) | coords_of(&dr.span, x1) << ell | coords_of(&dr.span, x2) << (2 * ell)) as u64
+                (coords_of(&dr.span, x0)
+                    | coords_of(&dr.span, x1) << ell
+                    | coords_of(&dr.span, x2) << (2 * ell)) as u64
             })
             .collect();
         let (polys, n_vars) = build_norm(&cell.curve, &cell.st, &dr.basis, &dr.target);
@@ -708,7 +760,13 @@ fn cmd_guess(args: &Args, cell: &Cell, out: &mut std::fs::File) {
         for k in 0..=k_top {
             let mask = (1u64 << k) - 1;
             let expected: Vec<u8> = (0..1u64 << k)
-                .map(|br| if packed.iter().any(|&p| p & mask == br) { b's' } else { b'u' })
+                .map(|br| {
+                    if packed.iter().any(|&p| p & mask == br) {
+                        b's'
+                    } else {
+                        b'u'
+                    }
+                })
                 .collect();
             let exp_sat = expected.iter().filter(|&&c| c == b's').count();
             let exp_first = expected.iter().position(|&c| c == b's');
@@ -738,7 +796,8 @@ fn cmd_guess(args: &Args, cell: &Cell, out: &mut std::fs::File) {
                     "verdict_mismatches": mismatches,
                     "branch_verdicts": String::from_utf8(r.verdicts.clone()).unwrap(),
                 });
-                line["truth_ordered_total_incl_2torsion"] = head["truth_ordered_total_incl_2torsion"].clone();
+                line["truth_ordered_total_incl_2torsion"] =
+                    head["truth_ordered_total_incl_2torsion"].clone();
                 writeln!(out, "{line}").expect("write");
                 out.flush().expect("flush");
                 println!(
@@ -873,7 +932,10 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
             "draw m={m} l={ell} d={d} planted={is_planted} basis={} target={} nv_sym={n_sym} deg_sym={} tseitin_sym={} subst_check ordered={ok_ordered}/{n_check} multiset={ok_multiset}/{n_check}",
             head["basis"], head["target"], degree(&sym), enc_sym.n_tseitin
         );
-        assert_eq!(ok_multiset, n_check, "symbolic builder disagrees with the constant-target system");
+        assert_eq!(
+            ok_multiset, n_check,
+            "symbolic builder disagrees with the constant-target system"
+        );
 
         // Targets over this V.
         let base = factor_base(&cell.curve, &dr.span);
@@ -882,7 +944,10 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
         let mut rng = StdRng::seed_from_u64(cell.cell_seed ^ 0x7A52_6574 ^ (u64::from(d) << 16));
         // A V with fewer than three abscissas of curve points admits no planted target;
         // its targets are then all uniform (`planted_possible: false` in the summary).
-        let mut xs_on: Vec<u64> = base.iter().filter_map(|p| pt_words(p).map(|w| w.0)).collect();
+        let mut xs_on: Vec<u64> = base
+            .iter()
+            .filter_map(|p| pt_words(p).map(|w| w.0))
+            .collect();
         xs_on.sort_unstable();
         xs_on.dedup();
         let planted_possible = xs_on.len() >= 3;
@@ -922,7 +987,8 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
                 "truth_ordered_distinct_incl_2torsion": distinct0,
                 "time_budget_s": budget.as_secs_f64(),
             });
-            let mut progress = format!("target m={m} l={ell} d={d} t={ti} planted={pl} truth0={total0}");
+            let mut progress =
+                format!("target m={m} l={ell} d={d} t={ti} planted={pl} truth0={total0}");
             for mode in &modes {
                 let t0 = Instant::now();
                 let mut build_s = 0.0f64;
@@ -953,7 +1019,9 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
                         let dd = s.stats.since(&before);
                         let mv = (res == SolveResult::Sat).then(|| {
                             let model = s.model();
-                            assumptions.iter().all(|&l| model[(l.unsigned_abs() - 1) as usize] == (l > 0))
+                            assumptions
+                                .iter()
+                                .all(|&l| model[(l.unsigned_abs() - 1) as usize] == (l > 0))
                                 && verify(&model[..n_sym])
                         });
                         TargetRun {
@@ -989,7 +1057,9 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
                     let wall = t0.elapsed().as_secs_f64();
                     let mv = (res == SolveResult::Sat).then(|| {
                         let model = s.model();
-                        units.iter().all(|&l| model[(l.unsigned_abs() - 1) as usize] == (l > 0))
+                        units
+                            .iter()
+                            .all(|&l| model[(l.unsigned_abs() - 1) as usize] == (l > 0))
                             && verify(&model[..n_sym])
                     });
                     TargetRun {
@@ -1026,7 +1096,8 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
                         model_verified: mv,
                     }
                 };
-                let mismatch = r.status != SolveResult::Unknown && ((r.status == SolveResult::Sat) != (total0 > 0));
+                let mismatch = r.status != SolveResult::Unknown
+                    && ((r.status == SolveResult::Sat) != (total0 > 0));
                 let mut j = target_json(&r);
                 j["matches_truth"] = json!(r.status != SolveResult::Unknown && !mismatch);
                 if mode == "cold" {
@@ -1044,7 +1115,10 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
                 e[5] += (r.model_verified == Some(false)) as u8 as f64;
                 progress.push_str(&format!(
                     " {mode}:{} confl={} wall={:.3} ver={:?}",
-                    status(r.status), r.conflicts, r.wall, r.model_verified
+                    status(r.status),
+                    r.conflicts,
+                    r.wall,
+                    r.model_verified
                 ));
             }
             writeln!(out, "{line}").expect("write");
@@ -1087,7 +1161,7 @@ fn main() {
     let ell: usize = args
         .get("--ell")
         .map(|s| s.parse().expect("--ell"))
-        .unwrap_or(((m + 2) / 3) as usize);
+        .unwrap_or(m.div_ceil(3) as usize);
     let seed: u64 = args.num("--seed", "20261115");
     let (curve, curve_source) = make_curve(m);
     let st = FieldStructure::new(m, &curve.irreducible);

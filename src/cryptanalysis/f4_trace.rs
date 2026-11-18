@@ -82,7 +82,7 @@ use super::{
     all_variable_mask, charge_word_ops, macaulay_columns, matrix_f4_f2_counted, max_f4_rows,
     monomials_up_to_mask, pack_rows, poly_from_column_order, row_monos, rref_f2_counted,
 };
-use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crate::cryptanalysis::pq_groebner_f2::{F2BoolPoly, Mask};
 
 /// One degree step of the recorded run: the products whose multiplier has
 /// degree `multiplier_degree`.
@@ -94,7 +94,7 @@ pub struct F4TraceStep {
     /// The products that were independent of everything before them:
     /// `(input index, multiplier monomial mask)`.  The other `rows -
     /// survivors.len()` reduced to zero.
-    pub survivors: Vec<(u32, u64)>,
+    pub survivors: Vec<(u32, Mask)>,
 }
 
 /// What a recorded run says about a system shape; independent of coefficients.
@@ -136,7 +136,7 @@ impl F4Trace {
                 .find(|s| s.multiplier_degree == o.multiplier_degree)
             {
                 Some(s) => {
-                    let have: HashSet<(u32, u64)> = s.survivors.iter().copied().collect();
+                    let have: HashSet<(u32, Mask)> = s.survivors.iter().copied().collect();
                     s.survivors
                         .extend(o.survivors.iter().filter(|x| !have.contains(x)));
                     s.rows = s.rows.max(o.rows);
@@ -165,7 +165,7 @@ impl F4Trace {
     }
 }
 
-fn leading_histogram(masks: impl Iterator<Item = u64>, degree: u32) -> Vec<usize> {
+fn leading_histogram(masks: impl Iterator<Item = Mask>, degree: u32) -> Vec<usize> {
     let mut h = vec![0usize; degree as usize + 1];
     for m in masks {
         h[(m.count_ones() as usize).min(degree as usize)] += 1;
@@ -183,10 +183,10 @@ fn poly_degree(p: &F2BoolPoly) -> u32 {
 
 /// The product `mult · p` as ascending monomial masks, odd multiplicities
 /// kept (the Boolean ring: colliding terms cancel).
-fn product_row(p: &F2BoolPoly, mult: u64) -> Vec<u64> {
-    let mut all: Vec<u64> = p.terms.iter().map(|t| t.mask | mult).collect();
+fn product_row(p: &F2BoolPoly, mult: Mask) -> Vec<Mask> {
+    let mut all: Vec<Mask> = p.terms.iter().map(|t| t.mask | mult).collect();
     all.sort_unstable();
-    let mut out: Vec<u64> = Vec::with_capacity(all.len());
+    let mut out: Vec<Mask> = Vec::with_capacity(all.len());
     let mut i = 0;
     while i < all.len() {
         let mut j = i;
@@ -207,8 +207,8 @@ fn degree_major_rows(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    mut keep: impl FnMut(u32, u64) -> bool,
-) -> Option<Vec<(u32, u64, u32, Vec<u64>)>> {
+    mut keep: impl FnMut(u32, Mask) -> bool,
+) -> Option<Vec<(u32, Mask, u32, Vec<Mask>)>> {
     let mask = all_variable_mask(n_vars);
     let max_gap = polys
         .iter()
@@ -284,7 +284,7 @@ pub fn matrix_f4_f2_record_counted(
         None if polys.iter().all(|p| poly_degree(p) > degree) => Vec::new(),
         None => return None,
     };
-    let monos: Vec<Vec<u64>> = rows.iter().map(|r| r.3.clone()).collect();
+    let monos: Vec<Vec<Mask>> = rows.iter().map(|r| r.3.clone()).collect();
     let cols = macaulay_columns(&monos)?;
     let words = cols.len().div_ceil(64);
     let matrix = pack_rows(&monos, &cols);
@@ -408,7 +408,7 @@ pub fn matrix_f4_f2_replay_checked(
     if trace.steps.is_empty() {
         return Ok((Vec::new(), 0));
     }
-    let mut monos: Vec<Vec<u64>> = Vec::with_capacity(trace.total_survivors());
+    let mut monos: Vec<Vec<Mask>> = Vec::with_capacity(trace.total_survivors());
     for step in &trace.steps {
         for &(i, t) in &step.survivors {
             let row = product_row(polys.get(i as usize).ok_or((R::Shape, 0))?, t);
@@ -470,12 +470,12 @@ fn audit_dropped(
     n_vars: usize,
     degree: u32,
     trace: &F4Trace,
-    cols: &[u64],
+    cols: &[Mask],
     basis: &[Vec<u64>],
     k: usize,
     ops: &mut u64,
 ) -> bool {
-    let kept: HashSet<(u32, u64)> = trace
+    let kept: HashSet<(u32, Mask)> = trace
         .steps
         .iter()
         .flat_map(|s| s.survivors.iter().copied())
@@ -487,7 +487,7 @@ fn audit_dropped(
     let mut state =
         0x9e37_79b9_7f4a_7c15u64 ^ (dropped.len() as u64).wrapping_mul(0xff51_afd7_ed55_8ccd);
     let keep_bits = if k == 64 { u64::MAX } else { (1u64 << k) - 1 };
-    let mut acc: HashMap<u64, u64> = HashMap::new();
+    let mut acc: HashMap<Mask, u64> = HashMap::new();
     for r in &dropped {
         state ^= state << 13;
         state ^= state >> 7;
@@ -497,7 +497,7 @@ fn audit_dropped(
             *acc.entry(m).or_insert(0) ^= tag;
         }
     }
-    let index: HashMap<u64, usize> = cols.iter().enumerate().map(|(c, &m)| (m, c)).collect();
+    let index: HashMap<Mask, usize> = cols.iter().enumerate().map(|(c, &m)| (m, c)).collect();
     let words = cols.len().div_ceil(64);
     let mut vecs = vec![vec![0u64; words]; k];
     for (m, bits) in acc {
@@ -538,6 +538,25 @@ fn audit_dropped(
 
 #[cfg(test)]
 mod tests {
+    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
+
+    #[cfg(feature = "wide-vars")]
+    #[test]
+    fn wide_trace_products_keep_high_monomial_coordinates() {
+        use crate::cryptanalysis::pq_groebner_f2::{bit, F2BoolMono};
+        let polynomial = F2BoolPoly::from_monos(
+            vec![F2BoolMono::from_mask(bit(80)), F2BoolMono::from_mask(1)],
+            96,
+        );
+        let mut wanted = vec![bit(80) | bit(90), 1 | bit(90)];
+        wanted.sort_unstable();
+        assert_eq!(product_row(&polynomial, bit(90)), wanted);
+        let (_, trace) = matrix_f4_f2_record(std::slice::from_ref(&polynomial), 96, 1).unwrap();
+        let replayed =
+            matrix_f4_f2_replay(std::slice::from_ref(&polynomial), 96, 1, &trace).unwrap();
+        assert_eq!(key(&replayed), key(&[polynomial]));
+    }
+
     use super::*;
     use crate::binary_ecc::F2mElement;
     use crate::cryptanalysis::koblitz_bench::ladder_sample;
@@ -549,8 +568,8 @@ mod tests {
     use rand::rngs::StdRng;
     use rand::SeedableRng;
 
-    fn key(rows: &[F2BoolPoly]) -> Vec<Vec<u64>> {
-        let mut k: Vec<Vec<u64>> = rows
+    fn key(rows: &[F2BoolPoly]) -> Vec<Vec<Mask>> {
+        let mut k: Vec<Vec<Mask>> = rows
             .iter()
             .map(|p| p.terms.iter().map(|t| t.mask).collect())
             .collect();
@@ -580,7 +599,7 @@ mod tests {
                         let t = monos
                             .iter()
                             .filter(|_| next() & 1 == 1)
-                            .map(|&m| F2BoolMono::from_mask(m))
+                            .map(|&m| F2BoolMono::from_mask(mask_from64(m)))
                             .collect();
                         F2BoolPoly::from_monos(t, nv)
                     })
@@ -675,7 +694,7 @@ mod tests {
                             if t.mask >> var & 1 == 0 {
                                 Some(*t)
                             } else if value {
-                                Some(F2BoolMono::from_mask(t.mask & !(1u64 << var)))
+                                Some(F2BoolMono::from_mask(t.mask & !(mask_from64(1) << var)))
                             } else {
                                 None
                             }

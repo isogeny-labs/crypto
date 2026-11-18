@@ -36,6 +36,8 @@ pub mod storage;
 pub mod telemetry;
 
 pub mod types;
+#[cfg(target_os = "macos")]
+mod worker_process_macos;
 
 use budget::{
     BudgetScope, BudgetSession, CampaignLedger, CampaignPolicy, GrantRequest, LaunchBinding,
@@ -147,6 +149,13 @@ pub enum DatasetCommand {
         #[command(flatten)]
         budget: BudgetArgs,
     },
+    /// Restore retained partial artifacts without resuming a solver.
+    RestorePartial(live::RestorePartialArgs),
+    #[command(hide = true)]
+    SnapshotWorker {
+        #[arg(long)]
+        request: PathBuf,
+    },
     /// Show actual method support and instrumentation limits.
     Capabilities,
     /// Produce strict public features and separate restricted labels from replayed cells.
@@ -168,14 +177,6 @@ pub enum DatasetCommand {
         budget: BudgetArgs,
     },
     /// Preserve an interrupted attempt after proving no matching worker remains.
-    /// Restore a checked partial artifact snapshot; never restarts a solver.
-    RestorePartial(live::RestorePartialArgs),
-    /// Bounded internal uploader used by the supervised capture protocol.
-    #[command(hide = true)]
-    SnapshotWorker {
-        #[arg(long)]
-        request: PathBuf,
-    },
     Reconcile {
         #[arg(long)]
         out: PathBuf,
@@ -1279,6 +1280,8 @@ fn run_dispatch(args: &DatasetArgs) -> Result<(), String> {
                 finalize_budget(out, context.as_ref(), Some(&remote), true),
             )?;
         }
+        DatasetCommand::RestorePartial(args) => println!("{}", live::restore_partial(args)?),
+        DatasetCommand::SnapshotWorker { request } => live::snapshot_worker(request)?,
         DatasetCommand::Capabilities => println!("{}", solvers::capabilities()),
         DatasetCommand::Export { out, destination } => {
             println!("{}", export::export(out, destination)?)
@@ -1296,8 +1299,6 @@ fn run_dispatch(args: &DatasetArgs) -> Result<(), String> {
             let finalized = finalize_budget(out, context.as_ref(), None, false);
             println!("{}", combine_finalization(result, finalized)?);
         }
-        DatasetCommand::RestorePartial(args) => println!("{}", live::restore_partial(args)?),
-        DatasetCommand::SnapshotWorker { request } => live::snapshot_worker(request)?,
         DatasetCommand::Reconcile { out, cell, reason } => reconcile(out, *cell, reason)?,
     }
     Ok(())
@@ -1829,6 +1830,7 @@ fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
                 "capture-limits.json" => ("partial-capture-limits", "json"),
                 execution::PATH => (execution::ROLE, "json"),
                 "stdout.log" | "stderr.log" => ("process-log", "utf8"),
+                "publication-failure.json" => ("local-publication-failure", "json"),
                 _ => ("unregistered-partial-artifact", "native"),
             }
         };
@@ -1955,6 +1957,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "limits":live::capture_limits(a.trace_mib)?,
             "snapshot_limits":snapshot::SnapshotLimits::default(),
             "solver_state_restorable":false,
+            "budget_policy_sha256":context.as_ref().map(|c| c.session().grant().policy_sha256.clone()),
         });
     }
     let result = (|| {
@@ -2039,6 +2042,16 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 "partial-capture-limits",
                 &capture::capture_limits(a.trace_mib)?,
             )?;
+            // Commit the original partial-capture context before the worker's
+            // launch clock begins, using this cell's existing owner admission.
+            let mut live_capture = if a.publish {
+                let mut capture =
+                    live::LiveSupervisor::new_with_budget(&out, &dir, a, context.as_ref())?;
+                capture.flush(snapshot::AttemptStatus::Running, None, None)?;
+                Some(capture)
+            } else {
+                None
+            };
             let stdout = OpenOptions::new()
                 .write(true)
                 .create_new(true)
@@ -2130,14 +2143,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "worker_pid":child.pid(),"supervisor_pid":std::process::id(),
             "output":dir,"process_group":child.pid()}),
             )?;
-            let mut live_capture = if a.publish {
-                let mut capture =
-                    live::LiveSupervisor::new_with_budget(&out, &dir, a, context.as_ref())?;
-                capture.flush(snapshot::AttemptStatus::Running, None, None)?;
-                Some(capture)
-            } else {
-                None
-            };
+
             #[cfg(target_os = "linux")]
             let (collector, attach_status, attach_error) = match Collector::attach(child.pid()) {
                 Ok(collector) => (Some(collector), "observed", None),
@@ -2210,6 +2216,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 }
                 std::thread::sleep(Duration::from_millis(100));
             };
+            let worker_elapsed = start.elapsed();
             #[cfg(target_os = "linux")]
             let counter_status = {
                 let cgroup_diagnostic = match cgroup_start {
@@ -2309,6 +2316,45 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             if final_bytes > a.trace_mib.saturating_mul(1024 * 1024) {
                 stop_reason = Some("trace_budget_exhausted");
             }
+            if let Some(error) = publication_failure {
+                storage::write_json(
+                    &dir,
+                    "publication-failure.json",
+                    "local-publication-failure",
+                    &json!({
+                        "schema":"crypto.ml-dataset.publication-failure/v1", "reason":error,
+                        "worker_exit_code":exit.code(), "worker_elapsed_ms_diagnostic":worker_elapsed.as_secs_f64()*1000.0,
+                        "remote_terminal_observation_verified":false,
+                        "local_artifacts_retained":true,"wave_stopped":true,
+                    }),
+                )?;
+                return Err(format!(
+                    "partial publication failed; worker stopped and local artifacts retained: {error}"
+                ));
+            }
+            if let Some(capture) = live_capture.as_mut() {
+                if capture.capture_stopped()? {
+                    stop_reason = Some("capture_budget_exhausted");
+                }
+                let status = if stop_reason.is_some() || !exit.success() {
+                    snapshot::AttemptStatus::Interrupted
+                } else {
+                    snapshot::AttemptStatus::Exited
+                };
+                if let Err(error) = capture.flush(status, exit.code(), stop_reason) {
+                    storage::write_json(
+                        &dir,
+                        "publication-failure.json",
+                        "local-publication-failure",
+                        &json!({
+                            "schema":"crypto.ml-dataset.publication-failure/v1","reason":error,
+                            "worker_exit_code":exit.code(),"remote_terminal_observation_verified":false,
+                            "local_artifacts_retained":true,"wave_stopped":true,
+                        }),
+                    )?;
+                    return Err(error);
+                }
+            }
             let mut outcome: Value = if dir.join("result.json").exists() {
                 read_json(&dir.join("result.json"))?
             } else {
@@ -2325,7 +2371,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             #[cfg(not(target_os = "linux"))]
             let instruction_counter_status =
                 "whole_worker_not_counted; see phase telemetry for available hardware counts";
-            outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
+            outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":worker_elapsed.as_secs_f64()*1000.0,
             "clock_valid_for_comparison":false,"retired_instructions":null,
             "instruction_counter_status":instruction_counter_status,"memory_limit_bytes":memory,
             "worker_output_bytes_before_seal":final_bytes,"output_budget_bytes":a.trace_mib.saturating_mul(1024*1024),
@@ -2359,6 +2405,14 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "worker_output_bytes_before_seal":final_bytes,"sealed_manifest_bytes":manifest_bytes,
             "publication_metadata_bytes":publication_bytes})
             );
+            if matches!(
+                stop_reason,
+                Some("capture_budget_exhausted" | "snapshot_chain_limit")
+            ) {
+                return Err(
+                    "capture stopped; retained the acknowledged prefix and stopped the wave".into(),
+                );
+            }
         }
         println!("{}", verify_run(&out, true)?);
         Ok(())
@@ -2698,13 +2752,12 @@ fn process_entry<T>(pid: u32, result: std::io::Result<T>) -> Result<Option<T>, S
     }
 }
 
-#[cfg(target_os = "linux")]
-fn assert_no_workers(root: &Path) -> Result<(), String> {
-    let root = checked_directory(root, false)?;
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+fn assert_no_retained_worker_groups(root: &Path) -> Result<(), String> {
     // A worker's external descendants may outlive a supervisor killed before
     // its guard runs. Refuse reconciliation while any recorded process group
     // remains, even if its original worker command has disappeared.
-    for dir in cell_directories(&root)? {
+    for dir in cell_directories(root)? {
         let identity = dir.join("worker-process.json");
         if !identity.exists() || dir.join("manifest.json").exists() {
             continue;
@@ -2721,6 +2774,13 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
             ));
         }
     }
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+fn assert_no_workers(root: &Path) -> Result<(), String> {
+    let root = checked_directory(root, false)?;
+    assert_no_retained_worker_groups(&root)?;
     'processes: for entry in
         fs::read_dir("/proc").map_err(|e| format!("cannot inspect live workers: {e}"))?
     {
@@ -2785,7 +2845,14 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(target_os = "macos")]
+fn assert_no_workers(root: &Path) -> Result<(), String> {
+    let root = checked_directory(root, false)?;
+    assert_no_retained_worker_groups(&root)?;
+    worker_process_macos::assert_no_workers(&root)
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]
 fn assert_no_workers(_root: &Path) -> Result<(), String> {
     Err("safe worker reconciliation currently requires Linux /proc".into())
 }
@@ -3276,14 +3343,12 @@ fn verify_cell_with_replay_session(
         .as_ref()
         .is_some_and(|c| c.affine_boolean_row.is_some())
         && !affine_present
-    {
-        if manifest.outcome["strategy"] != "original-affine-unit-row-unsupported"
+        && (manifest.outcome["strategy"] != "original-affine-unit-row-unsupported"
             || manifest.outcome["status"] != "unsupported"
             || manifest.outcome["solver_completed"] != false
-            || manifest.outcome["full_span_search"] != false
-        {
-            return Err("unsupported affine request carries an execution claim".into());
-        }
+            || manifest.outcome["full_span_search"] != false)
+    {
+        return Err("unsupported affine request carries an execution claim".into());
     }
 
     if affine_present {
@@ -3616,12 +3681,14 @@ fn verify_cell_with_replay_session(
             }
             if artifact.role == "large-prime-elimination-transcript" {
                 let transcript: Value = read_json(&dir.join(&artifact.path))?;
-                let requested_work =
-                    if transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1" {
-                        transcript["requested_work"].as_u64()
-                    } else {
-                        transcript["requested_work_limit"].as_u64()
-                    };
+                let requested_work = if transcript["schema"]
+                    == "ml-ecdlp-generic-large-prime-transcript/v1"
+                    || transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v2"
+                {
+                    transcript["requested_work"].as_u64()
+                } else {
+                    transcript["requested_work_limit"].as_u64()
+                };
                 if requested_work != Some(manifest.config.work_limit) {
                     return Err("relation transcript work limit differs from frozen cell".into());
                 }
@@ -4847,6 +4914,156 @@ mod tests {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }
+    }
+
+    #[test]
+    fn legacy_plan_wire_bytes_omit_unselected_axes() {
+        let legacy = plan();
+        let value = serde_json::to_value(&legacy).unwrap();
+        assert!(value.get("channels").is_none());
+        assert!(value.get("factor_base_policies").is_none());
+        let restored: DatasetPlan = serde_json::from_value(value).unwrap();
+        restored.validate().unwrap();
+        assert_eq!(
+            restored.binding_sha256().unwrap(),
+            legacy.binding_sha256().unwrap()
+        );
+        for index in [0, legacy.cell_count().unwrap() - 1] {
+            assert_eq!(restored.cell(index).unwrap(), legacy.cell(index).unwrap());
+        }
+    }
+
+    #[test]
+    fn policy_axis_binds_every_cell_and_rejects_ambiguous_plans() {
+        let legacy = plan();
+        let mut policies = legacy.clone();
+        policies.schema = "crypto.ml-dataset.plan/v2".into();
+        policies.factor_base_policies = vec![
+            FactorBasePolicy::Legacy {},
+            FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 64,
+            },
+        ];
+        policies.validate().unwrap();
+        assert_eq!(
+            policies.cell_count().unwrap(),
+            2 * legacy.cell_count().unwrap()
+        );
+        assert_ne!(
+            policies.binding_sha256().unwrap(),
+            legacy.binding_sha256().unwrap()
+        );
+        let solvers = legacy.solvers.len() as u64;
+        for index in 0..legacy.cell_count().unwrap() {
+            let original = legacy.cell(index).unwrap();
+            for (axis, policy) in policies.factor_base_policies.iter().enumerate() {
+                let expanded_index =
+                    (index / solvers * 2 + axis as u64) * solvers + index % solvers;
+                let mut cell = policies.cell(expanded_index).unwrap();
+                assert_eq!(cell.factor_base_policy.take().as_ref(), Some(policy));
+                assert_eq!(cell, original);
+            }
+        }
+        policies.schema = NATURAL_PLAN_SCHEMA.into();
+        assert!(policies.validate().is_err());
+        policies.schema = PLANTED_PLAN_SCHEMA.into();
+        assert!(policies.validate().is_err());
+        policies.schema = "crypto.ml-dataset.plan/v2".into();
+        policies.factor_base_policies[1] = policies.factor_base_policies[0].clone();
+        assert!(policies.validate().unwrap_err().contains("duplicate"));
+    }
+
+    #[test]
+    fn explicit_empty_policy_axis_and_null_channels_are_rejected() {
+        for (field, value) in [
+            ("factor_base_policies", json!([])),
+            ("channels", Value::Null),
+        ] {
+            let mut encoded = serde_json::to_value(plan()).unwrap();
+            encoded[field] = value;
+            assert!(serde_json::from_value::<DatasetPlan>(encoded).is_err());
+        }
+    }
+
+    #[test]
+    fn planted_plan_binds_population_without_changing_natural_plan_bytes() {
+        let natural = plan();
+        assert_eq!(natural.schema, NATURAL_PLAN_SCHEMA);
+        natural.validate().unwrap();
+        let natural_bytes = serde_json::to_vec(&natural).unwrap();
+        assert!(std::str::from_utf8(&natural_bytes)
+            .unwrap()
+            .contains("plan/v1"));
+        let mut planted = natural.clone();
+        planted.schema = PLANTED_PLAN_SCHEMA.into();
+        planted.validate().unwrap();
+        assert_eq!(planted.cell(0).unwrap(), natural.cell(0).unwrap());
+        assert_ne!(
+            planted.binding_sha256().unwrap(),
+            natural.binding_sha256().unwrap()
+        );
+    }
+
+    #[test]
+    fn planted_plan_rejects_natural_only_factor_base_replay_paths() {
+        let mut planted = plan();
+        planted.schema = PLANTED_PLAN_SCHEMA.into();
+        planted.solvers = vec!["double-large-prime".into()];
+        assert!(planted
+            .validate()
+            .unwrap_err()
+            .contains("restricted factor-base replay"));
+
+        planted.solvers = vec!["f4".into()];
+        planted.families = vec!["prime".into()];
+        planted.field_sizes = vec![47];
+        assert!(planted.validate().unwrap_err().contains("wide-prime F4"));
+
+        planted.field_sizes = vec![23];
+        planted.validate().unwrap();
+        planted.schema = NATURAL_PLAN_SCHEMA.into();
+        planted.field_sizes = vec![47];
+        planted.validate().unwrap();
+    }
+
+    #[test]
+    fn planted_worker_keeps_construction_private_and_replays_it() {
+        let fixture = TempRun::new();
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.schema = PLANTED_PLAN_SCHEMA.into();
+        plan.factor_base_size = 4;
+        plan.solvers = vec!["enumerate".into()];
+        plan.work_limit = 20_000;
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        let dir = fixture.0.join("cells/000000000000");
+        fs::create_dir_all(&dir).unwrap();
+        let config = plan.cell(0).unwrap();
+        // `bound` wrote the original natural plan. This test constructs a
+        // different planted run, so replace only its test-local root binding.
+        fs::remove_file(fixture.0.join("plan.json")).unwrap();
+        fs::remove_file(fixture.0.join("run.json")).unwrap();
+        for root in [&fixture.0, &dir] {
+            storage::write_json(root, "plan.json", "plan", &plan).unwrap();
+            storage::write_json(root, "run.json", "run", &binding).unwrap();
+            storage::write_bytes(root, "protocol.json", "protocol", "json", &protocol).unwrap();
+        }
+        storage::write_json(&dir, "config.json", "config", &config).unwrap();
+        worker(&config, &dir).unwrap();
+        let public: Value = read_json(&dir.join("public.json")).unwrap();
+        let witness: Value = read_json(&dir.join("witness.json")).unwrap();
+        let base: Value = read_json(&dir.join("factor-base.json")).unwrap();
+        assert!(public.get("population").is_none());
+        assert!(public.get("construction_trace").is_none());
+        assert_eq!(base["rule"], "planted-known-log-subgroup/v1");
+        let case = types::CaseData {
+            public_instance: public,
+            private_witness: witness.clone(),
+            factor_base: base,
+        };
+        curves::verify_planted(&config, &case).unwrap();
+        let mut wrong = case;
+        wrong.private_witness["planted_construction"]["base_logs"][0] = json!("0");
+        assert!(curves::verify_planted(&config, &wrong).is_err());
     }
 
     #[test]
@@ -7701,87 +7918,6 @@ mod tests {
     }
 
     #[test]
-    fn planted_plan_binds_population_without_changing_natural_plan_bytes() {
-        let natural = plan();
-        assert_eq!(natural.schema, NATURAL_PLAN_SCHEMA);
-        natural.validate().unwrap();
-        let natural_bytes = serde_json::to_vec(&natural).unwrap();
-        assert!(std::str::from_utf8(&natural_bytes)
-            .unwrap()
-            .contains("plan/v1"));
-        let mut planted = natural.clone();
-        planted.schema = PLANTED_PLAN_SCHEMA.into();
-        planted.validate().unwrap();
-        assert_eq!(planted.cell(0).unwrap(), natural.cell(0).unwrap());
-        assert_ne!(
-            planted.binding_sha256().unwrap(),
-            natural.binding_sha256().unwrap()
-        );
-    }
-
-    #[test]
-    fn planted_plan_rejects_natural_only_factor_base_replay_paths() {
-        let mut planted = plan();
-        planted.schema = PLANTED_PLAN_SCHEMA.into();
-        planted.solvers = vec!["double-large-prime".into()];
-        assert!(planted
-            .validate()
-            .unwrap_err()
-            .contains("restricted factor-base replay"));
-
-        planted.solvers = vec!["f4".into()];
-        planted.families = vec!["prime".into()];
-        planted.field_sizes = vec![47];
-        assert!(planted.validate().unwrap_err().contains("wide-prime F4"));
-
-        planted.field_sizes = vec![23];
-        planted.validate().unwrap();
-        planted.schema = NATURAL_PLAN_SCHEMA.into();
-        planted.field_sizes = vec![47];
-        planted.validate().unwrap();
-    }
-
-    #[test]
-    fn planted_worker_keeps_construction_private_and_replays_it() {
-        let fixture = TempRun::new();
-        let (mut plan, mut binding, protocol) = fixture.bound();
-        plan.schema = PLANTED_PLAN_SCHEMA.into();
-        plan.factor_base_size = 4;
-        plan.solvers = vec!["enumerate".into()];
-        plan.work_limit = 20_000;
-        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
-        let dir = fixture.0.join("cells/000000000000");
-        fs::create_dir_all(&dir).unwrap();
-        let config = plan.cell(0).unwrap();
-        // `bound` wrote the original natural plan. This test constructs a
-        // different planted run, so replace only its test-local root binding.
-        fs::remove_file(fixture.0.join("plan.json")).unwrap();
-        fs::remove_file(fixture.0.join("run.json")).unwrap();
-        for root in [&fixture.0, &dir] {
-            storage::write_json(root, "plan.json", "plan", &plan).unwrap();
-            storage::write_json(root, "run.json", "run", &binding).unwrap();
-            storage::write_bytes(root, "protocol.json", "protocol", "json", &protocol).unwrap();
-        }
-        storage::write_json(&dir, "config.json", "config", &config).unwrap();
-        worker(&config, &dir).unwrap();
-        let public: Value = read_json(&dir.join("public.json")).unwrap();
-        let witness: Value = read_json(&dir.join("witness.json")).unwrap();
-        let base: Value = read_json(&dir.join("factor-base.json")).unwrap();
-        assert!(public.get("population").is_none());
-        assert!(public.get("construction_trace").is_none());
-        assert_eq!(base["rule"], "planted-known-log-subgroup/v1");
-        let case = types::CaseData {
-            public_instance: public,
-            private_witness: witness.clone(),
-            factor_base: base,
-        };
-        curves::verify_planted(&config, &case).unwrap();
-        let mut wrong = case;
-        wrong.private_witness["planted_construction"]["base_logs"][0] = json!("0");
-        assert!(curves::verify_planted(&config, &wrong).is_err());
-    }
-
-    #[test]
     fn prime_root_m2_rejects_injected_affine_infinity_label() {
         let certificate = json!({"found_pdp":false,"censored":true,
             "queries":[],"charged_work":0,"root_queries_completed":false,
@@ -8319,6 +8455,7 @@ use telemetry::pmu_containment;
 #[cfg(target_os = "linux")]
 use telemetry::whole_worker::{Collector, GatedWorker};
 
+#[cfg(test)]
 const NATURAL_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/v1";
 
 const PLANTED_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/planted-pdp-v1";

@@ -2,6 +2,8 @@
 //! Frozen boundary: research/rootfind_pair_index_timing_20261116/PROTOCOL.md
 //! and AMENDMENT-1.md. Curve arithmetic is outside timed intervals.
 
+// The frozen research module exposes accessors this timing test does not call.
+#[allow(dead_code)]
 #[path = "../research/rootfind_inline_page_index_20261116/inline_page_index.rs"]
 mod inline_page_index;
 #[path = "../research/rootfind_paged_pair_index_20261116/paged_index.rs"]
@@ -400,4 +402,15 @@ fn fixed_koblitz_pair_index_build_probe_timing() {
             }
         }
     }
+}
+
+#[test]
+fn inline_backing_counts_reserved_directory_and_spill_storage() {
+    let index = InlinePagePairIndex::new(13, 3).unwrap();
+    assert_eq!(index.directory_words(), (1 << (13 - 4)) + 1);
+    assert!(index.spill_capacity() >= 3);
+    assert_eq!(
+        index.requested_backing_bytes(),
+        index.directory_words() * 4 + index.spill_capacity() * 16 * 4
+    );
 }

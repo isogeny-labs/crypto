@@ -12,6 +12,9 @@ Kernel registry across the three repositories:
 [`tools/optlevel/registry.json`](../tools/optlevel/registry.json).
 Validation on a host without a PMU or GPU:
 [`research/optlevel_20261117/`](../research/optlevel_20261117/README.md).
+The port from Python to Rust, with the kernel A/B and the equivalence runs:
+[`research/optlevel_rs_20261117/`](../research/optlevel_rs_20261117/README.md).
+Tests: `cargo test --release --manifest-path tools/optlevel/Cargo.toml`.
 
 ## 0. What it is not
 
@@ -60,17 +63,47 @@ medians rather than its maxima.
 
 ## 2. Machine ceiling (calibration)
 
-`optlevel.py calibrate` writes `optlevel.calibration/v1`, keyed by a host
+`optlevel calibrate` writes `optlevel.calibration/v1`, keyed by a host
 fingerprint (CPU model, flag set, logical CPU count, cache sizes, memory,
-hypervisor bit). The ceilings are measured by `tools/optlevel/kernels/optk.c`,
-compiled at first use with the system compiler; the compiler version, the
-flags of each build and the binary hashes are in the calibration.
+hypervisor bit). The tool is a Rust crate, `tools/optlevel/`
+(`tools/optlevel/run.sh` builds it on first use and runs it); nothing in it is
+Python. The ceilings are measured by the kernels in
+`tools/optlevel/src/kernels.rs`, which are part of the `optlevel` binary and
+run as `optlevel kernel NAME --isa I`. The calibration records the hash of the
+kernel source and of the binary.
 
-**Builds.** `native` (`-O3 -march=native -ffp-contract=fast`), `w512`
-(the same plus `-mprefer-vector-width=512`) and `scalar` (the same plus
-`-fno-tree-vectorize -fno-tree-slp-vectorize`). A class's ceiling is the best
-of the builds. The scalar and best-vector rates are both kept, so "the SIMD
-ceiling is `h` times the scalar one" is a measured statement.
+**Builds.** One binary carries every variant and picks at run time, so a
+binary built on one x86-64 machine calibrates another correctly: `avx512`
+(512-bit loops, AVX-512 F/DQ/BW/VL/VPOPCNTDQ), `avx2` (256-bit loops) and
+`scalar` (the same scalar instruction set, with vectorization blocked by an
+empty assembly barrier on each element). A host without AVX2 gets `base` and
+`scalar` from the target's baseline. A class's ceiling is the best of the
+builds. The scalar and best-vector rates are both kept, so "the SIMD ceiling
+is `h` times the scalar one" is a measured statement.
+
+`calibrate --c-kernels` adds three C builds of the reference kernels the Rust
+ones were ported from (`kernels/optk.c`, compiled with the system compiler as
+`c-native`, `c-w512` and `c-scalar`) to the best-of. Use it once on a CPU
+family nobody has calibrated before: a ceiling can only rise by it. On the
+validation host the Rust kernels are above the C ones in seven of the nine
+classes and level with them, inside the run-to-run spread, in `fma_f64` and
+`modmuladd_p62` (`research/optlevel_rs_20261117/README.md`). The C kernels read the clock
+after every pass over their 8–16 KiB arrays; the Rust kernels read it about
+every 50 µs, which alone raises the in-cache SIMD ceilings by 1.4 to 1.9
+times on that host (`modmuladd_p31` gains 1.07 from the timer and 1.7 from
+better generated code). Calibrations taken before 2026-11-17 used the C
+kernels, so their ceilings for those classes are low by 1.4 to 1.8 times and
+attainments scored against them are high by the same factor.
+
+**CPUs.** The scale points and the "all cores" ceiling use the CPUs this
+process can really run on at once: the affinity mask, cut to the cgroup CPU
+quota (cgroup v2 `cpu.max`, cgroup v1 `cpu.cfs_quota_us / cpu.cfs_period_us`,
+at the process's cgroup and its ancestors; the tightest one, rounded down, at
+least 1). `host` records all of them: `logical_cpus` (the machine),
+`affinity_cpus`, `cpu_quota_cores` with `cpu_quota_source`, and `usable_cpus`
+with its basis. A container that hides its allotment from both interfaces can
+declare it with `OPTLEVEL_CPUS=N`. A `measure --scale` point above
+`usable_cpus` is flagged `SCALE_EXCEEDS_USABLE_CPUS`.
 
 **Operation classes** (each kernel runs over arrays of 8–16 KiB, inside L1):
 
@@ -111,9 +144,23 @@ A ceiling is only as good as its microbenchmark. That is why the tool never
 clamps: an attainment above `1 + 0.02 + noise floor` raises
 `CEILING_EXCEEDED` and the record has no grade.
 
-**GPU.** `optlevel.py gpu calibrate` builds `kernels/gpu_calib.cu` with `nvcc`
-and measures, with every SM occupied, the device rate of `muladd_u32`,
-`muladd_u64`, `xor_u64`, `popcnt_u64`, `fma_f64` and a device-memory triad. The
+**GPU.** `optlevel gpu calibrate` builds `kernels/gpu_calib.cu` with `nvcc`
+at first use (the source is inside the binary) and measures, with every SM
+occupied, the device rate of `muladd_u32`, `muladd_u64`, `xor_u64`,
+`popcnt_u64`, `fma_f64` and a device-memory triad. The triad gives the device
+bandwidth and also a `triad` operation class for memory-bound kernels: its
+compute roof is the `fma_f64` ceiling (one multiply-add per element) and its
+memory roof is bandwidth over the 24 bytes per element the kernel declares.
+`gpu measure` takes a kernel's declared bytes from its `optlevel.ops/v1`
+lines, as `measure` does on CPU, and `--bytes-per-op` overrides them; a class
+named `triad` scored against an older calibration without that class uses the
+`fma_f64` ceiling and is flagged `CEILING_CLASS_ALIAS_FMA_F64`.
+`kernels/gpu_calib.cu` takes one optional argument, a class name or `triad`,
+to run that class alone as a control. `optlevel gpu probe` lists the devices
+and tools, names the helper programs `tools/profile.sh` needs and does not
+find (`gawk`, `jq`), and runs the control kernel once under `ncu`: when the
+driver answers `ERR_NVGPUCTRPERM` it reports "counters withheld by the
+driver" and the tier `T-gpu-timing`. The
 calibration has one scale point, `"1"`, meaning one whole device. These
 ceilings are cross-checked, not replaced, by `ncu`'s
 `sm__throughput.avg.pct_of_peak_sustained_elapsed` (section 5). Per-pipe
@@ -177,7 +224,7 @@ None of these enters the score. They explain it.
 | `ipc`, `cycles_per_op`, `instructions_per_op`, `branch_miss_rate` | T-pmu | user-space `perf stat` counters of the single-thread runs, per counted operation |
 | `llc_misses_per_op`, `l1d_misses_per_op`, `dtlb_misses_per_op` | T-pmu | second event group, on the alternate runs, so no group is multiplexed |
 | `topdown` | T-pmu | level 1 (frontend bound, bad speculation, backend bound, retiring) and level 2 memory against core bound, ingested from `tools/profile.sh topdown` (`score --topdown topdown.json`) |
-| `vector_share_static` | any | share of instructions in named symbols that use packed-vector registers, from `objdump` (`optlevel.py vector-share`). Static: instructions in the text, not instructions executed |
+| `vector_share_static` | any | share of instructions in named symbols that use packed-vector registers, from `objdump` (`optlevel vector-share`). Static: instructions in the text, not instructions executed |
 | `vector_share_sampled` | T-pmu | share of `perf record` samples on packed-vector instructions (specified; not implemented in v1) |
 | `scalar_ceiling_ratio`, `simd_headroom` | any | `R(1) ÷` the class's scalar ceiling, and the class's vector ÷ scalar ceiling |
 | `latency_attainment` | any | `R(1) × latency`: about 1 means one dependent miss outstanding at a time; reported only when the memory roof binds |
@@ -263,10 +310,10 @@ larger of their noise floors is not a difference.
 | `T-pmu` | hardware PMU readable (`perf stat -e cycles:u` counts) | everything in sections 4 and 5 |
 | `T-timing` | no PMU | wall time and operation counters only: rates, attainment against declared or unknown traffic, scaling, static vector share. **IPC, miss rates, top-down and measured traffic are null**, with the reason under `diagnosis.unavailable` |
 | `T-gpu-ncu` | GPU with Nsight Compute counters | rates, `nvidia-smi` trace, `ncu` and `nsys` components |
-| `T-gpu-timing` | GPU without counter access | rates and `nvidia-smi` trace only |
+| `T-gpu-timing` | GPU without counter access (no `ncu`, or `ERR_NVGPUCTRPERM`: counters withheld by the driver) | rates and `nvidia-smi` trace only |
 
-`score.enforce_tier` rejects a record whose components exceed its tier, and
-`optlevel.py validate` runs it. The PMU test is the one `tools/perf_ipc.sh`
+`score::enforce_tier` (`src/score.rs`) rejects a record whose components exceed its tier, and
+`optlevel validate` runs it. The PMU test is the one `tools/perf_ipc.sh`
 uses; the tool never derives cycles from wall time and a nominal clock.
 
 ## 9. Relation to the existing tools
@@ -278,7 +325,7 @@ uses; the tool never derives cycles from wall time and a nominal clock.
 | `hwcost` (`docs/hwcost/README.md`) | a *predictive* roofline: time and dollars from operation counts and a fitted profile | Opposite direction. hwcost predicts a time from counts; optlevel divides a measured rate by a ceiling. Their calibrations overlap (per-operation cycles, bandwidth per cache level, scaling). A `hwcost.hardware.v1` profile could supply optlevel's ceilings; that adapter is not written |
 | `ecc2k130/roofline.py`, `ROOFLINE.md` | per-pipe SASS demand of one CUDA kernel against measured lane rates | Finer than an operation class. For the ECC2K-130 walk that analysis is the authority; an optlevel GPU record of it is coarser |
 | `cryptanalysis/gpueff` | roofline efficiency and a 0–100 composite from DCGM and Prometheus metrics, N roofs from a demand profile | Same idea, fleet-side, for long-running GPU work. optlevel takes its N-roof reading (the lowest roof binds; the next roof is `next_roof_ratio`). One difference is deliberate: gpueff's composite weights SM activity, occupancy and clock beside the roofline efficiency that already contains them as factors; optlevel keeps such components out of the score |
-| `tools/benchrec.py` | `bench.record/v1`, raw data in S3, the progress report | An optlevel record is not a benchmark record. `optlevel.py benchrec R.json` prints its values in benchrec's vocabulary (`ops_per_s`, `ratio`, `ipc`) with `--reference-kind none`, for a study that wants them in a record it opens itself. Attainment is `better: neutral`: it is not a series to maximise against a rho reference |
+| `tools/benchrec.py` | `bench.record/v1`, raw data in S3, the progress report | An optlevel record is not a benchmark record. `optlevel benchrec R.json` prints its values in benchrec's vocabulary (`ops_per_s`, `ratio`, `ipc`) with `--reference-kind none`, for a study that wants them in a record it opens itself. Attainment is `better: neutral`: it is not a series to maximise against a rho reference |
 | AGENTS.md §5a | prices unpriced native work at 0, 0.1 and 1 GAE per operation | §5a prices *work* across methods. An attainment prices nothing. It can tell you that a counter §5a prices is executed at 5% of the machine, which is a reason to tune it, not a reason to reprice it |
 | AGENTS.md §10 | isolation, A/A, interleaving, identical outputs | Section 7 follows it. optlevel records contention instead of refusing to run; a `CONTENDED` record is exploratory |
 
@@ -293,6 +340,7 @@ uses; the tool never derives cycles from wall time and a nominal clock.
 | NUMA | node count recorded; `NUMA_MULTI_NODE` flag | pin with `numactl` and calibrate under the same binding |
 | thermal | `thermal_throttle` counts before and after; `THERMAL_THROTTLE`; GPU: throttle-reason share, `GPU_THROTTLED` | rerun |
 | virtual machine | `hypervisor` CPU flag; `VIRTUALIZED` | caches and bandwidth are shared with unseen tenants; the reported LLC may be the host's |
+| container allotted fewer CPUs than it can see | cgroup v2 `cpu.max` and v1 quota read beside the affinity mask; `host.usable_cpus` with its basis; `SCALE_EXCEEDS_USABLE_CPUS` | scale points and "all cores" follow the allotment; `OPTLEVEL_CPUS=N` when no interface shows it |
 | container hiding the PMU | the `perf_ipc.sh` probe; tier falls to `T-timing` with the reason | PMU components are null, never estimated |
 | counter multiplexing | `perf` running share under 100%: `MULTIPLEXED`, events listed | drop the multiplexed components |
 | kernel too short | timed region under 0.5 s: `TOO_SHORT` | no grade |
@@ -306,10 +354,13 @@ uses; the tool never derives cycles from wall time and a nominal clock.
 
 Not implemented in v1, and therefore not validated anywhere: IMC traffic,
 sampled vector share, cache-level bandwidths, a `hwcost` profile adapter,
-`isolated_bench` integration. The PMU and GPU paths are implemented and
-unit-tested on synthetic tool output but have not run on a host that has a PMU
-or a GPU; `research/optlevel_20261117/README.md` gives the commands that
-validate them.
+`isolated_bench` integration. The PMU path is implemented and tested on
+synthetic `perf` output but has not run on a host that has a PMU;
+`research/optlevel_20261117/README.md` gives the commands that validate it.
+The GPU path ran once, in its first (Python) version, on a rented GPU whose
+driver withheld the counters (`research/hky_pod_runs_20261117/`); the Rust
+port of it is tested against stub `nvidia-smi`, `nvcc` and `ncu` programs
+and against those committed files, and has not itself run on a GPU.
 
 ## 11. Reading a record
 

@@ -534,10 +534,10 @@ pub struct ChainedS3Encoding {
     orbit_choice_wires: Vec<FrobeniusOrbitChoiceWires>,
     first_pair_exchangeable: bool,
     first_pair_ordered: bool,
-    all_summands_exchangeable: bool,
-    all_summands_ordered: bool,
     adjacent_domains_equal: Vec<bool>,
     adjacent_ordered: Vec<bool>,
+    all_summands_exchangeable: bool,
+    all_summands_ordered: bool,
     full_trace_zero: Option<(TraceZeroVariety, Vec<Vec<u32>>)>,
     intermediate_trace_enforced: bool,
     kummer_trace_zero: Option<(TraceZeroVariety, Vec<Vec<u32>>)>,
@@ -861,10 +861,10 @@ impl ChainedS3Encoding {
             orbit_choice_wires: Vec::new(),
             first_pair_exchangeable: false,
             first_pair_ordered: false,
-            all_summands_exchangeable: false,
-            all_summands_ordered: false,
             adjacent_domains_equal: vec![false; m - 1],
             adjacent_ordered: vec![false; m - 1],
+            all_summands_exchangeable: false,
+            all_summands_ordered: false,
             full_trace_zero: None,
             intermediate_trace_enforced: false,
             kummer_trace_zero: None,
@@ -1390,6 +1390,8 @@ impl ChainedS3Encoding {
             );
             self.adjacent_ordered[*edge] = true;
         }
+        self.first_pair_ordered = self.adjacent_ordered[0];
+        self.all_summands_ordered = self.adjacent_ordered.iter().all(|ordered| *ordered);
         Ok(edges.len())
     }
 
@@ -1733,6 +1735,207 @@ pub(crate) fn add_coordinate_domain(
         prefix.pop();
     }
     visit(solver, block, codes, bit, &mut Vec::new());
+}
+
+impl Circuit {
+    fn new_checked(
+        irr: &IrreduciblePoly,
+        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
+    ) -> Result<Self, ChainBuildError> {
+        let n = irr.degree as usize;
+        let reductions: Vec<_> = (0..2 * n - 1)
+            .map(|degree| {
+                check()?;
+                Ok(reduced_monomial(degree, irr))
+            })
+            .collect::<Result<_, ChainBuildError>>()?;
+        let mut square_inputs = vec![Vec::new(); n];
+        for bit in 0..n {
+            check()?;
+            for &output in &reductions[2 * bit] {
+                square_inputs[output].push(bit);
+            }
+        }
+        Ok(Self {
+            n,
+            product_kernel: ChainProductKernel::Schoolbook,
+            fold_constants: false,
+            known: Vec::new(),
+            next: 1,
+            reductions,
+            square_inputs,
+            ands: Vec::new(),
+            xors: Vec::new(),
+            units: Vec::new(),
+            impossible: false,
+        })
+    }
+
+    fn product_checked(
+        &mut self,
+        left: &[u32],
+        right: &[u32],
+        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
+    ) -> Result<Vec<u32>, ChainBuildError> {
+        let mut rows = vec![Vec::new(); self.n];
+        for (i, &a) in left.iter().enumerate() {
+            check()?;
+            for (j, &b) in right.iter().enumerate() {
+                let gate = self.wire();
+                self.ands.push((gate, a, b));
+                for &output in &self.reductions[i + j] {
+                    rows[output].push(gate);
+                }
+            }
+        }
+        let output = self.block();
+        for (bit, mut row) in rows.into_iter().enumerate() {
+            row.push(output[bit]);
+            self.xors.push((row, false));
+        }
+        Ok(output)
+    }
+
+    fn s3_checked(
+        &mut self,
+        x: &[u32],
+        y: &[u32],
+        z: &[u32],
+        b: &F2mElement,
+        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
+    ) -> Result<(), ChainBuildError> {
+        let sum = self.block();
+        for bit in 0..self.n {
+            self.xors.push((vec![sum[bit], x[bit], y[bit]], false));
+        }
+        let xy = self.product_checked(x, y, check)?;
+        let sum_z = self.product_checked(&sum, z, check)?;
+        let xyz = self.product_checked(&xy, z, check)?;
+        let b_bits = b.to_biguint();
+        for output in 0..self.n {
+            check()?;
+            let mut row = vec![xyz[output]];
+            for &input in &self.square_inputs[output] {
+                row.extend([xy[input], sum_z[input]]);
+            }
+            self.xors.push((row, b_bits.bit(output as u64)));
+        }
+        Ok(())
+    }
+}
+
+fn prepare_circuit_checked(
+    m: usize,
+    irr: &IrreduciblePoly,
+    b: &F2mElement,
+    target_x: Option<&F2mElement>,
+    identity_mask: u32,
+    max_variables: u32,
+    check: &mut impl FnMut() -> Result<(), ChainBuildError>,
+) -> Result<(Circuit, Vec<Vec<u32>>, usize), ChainBuildError> {
+    let n = irr.degree;
+    let Some(required) = chain_s3_max_variables(n, m) else {
+        return Err(ChainBuildError::Unsupported);
+    };
+    if max_variables == 0 || required > u64::from(max_variables) {
+        return Err(ChainBuildError::VariableCap {
+            required,
+            maximum: max_variables,
+        });
+    }
+    if b.m_value() != n
+        || target_x.is_some_and(|x| x.m_value() != n)
+        || identity_mask >= (1u32 << (m - 2))
+        || !irr.low_terms.contains(&0)
+        || irr.low_terms.iter().any(|&term| term >= n)
+        || {
+            let mut terms = irr.low_terms.clone();
+            terms.sort_unstable();
+            terms.dedup();
+            terms.len() != irr.low_terms.len()
+        }
+    {
+        return Err(ChainBuildError::Unsupported);
+    }
+    let mut circuit = Circuit::new_checked(irr, check)?;
+    let blocks: Vec<Vec<u32>> = (0..2 * m - 1).map(|_| circuit.block()).collect();
+    let target = &blocks[2 * m - 2];
+    let target_bits = target_x.map(F2mElement::to_biguint);
+    for (bit, &wire) in target.iter().enumerate() {
+        circuit.units.push((
+            wire,
+            target_bits.as_ref().is_some_and(|x| x.bit(bit as u64)),
+        ));
+    }
+
+    let mut n_s3_nodes = 0;
+    let mut previous = &blocks[0];
+    for step in 1..m {
+        check()?;
+        let output = if step == m - 1 {
+            target
+        } else {
+            &blocks[m + step - 1]
+        };
+        let previous_infinity = step > 1 && (identity_mask & (1 << (step - 2))) != 0;
+        let output_infinity = if step == m - 1 {
+            target_x.is_none()
+        } else {
+            (identity_mask & (1 << (step - 1))) != 0
+        };
+        if step < m - 1 && output_infinity {
+            for &wire in output {
+                circuit.units.push((wire, false));
+            }
+        }
+        match (previous_infinity, output_infinity) {
+            (true, true) => circuit.impossible = true, // O + affine != O
+            (true, false) => circuit.equal(&blocks[step], output),
+            (false, true) => circuit.equal(previous, &blocks[step]),
+            (false, false) => {
+                circuit.s3_checked(previous, &blocks[step], output, b, check)?;
+                n_s3_nodes += 1;
+            }
+        }
+        previous = output;
+    }
+    Ok((circuit, blocks, n_s3_nodes))
+}
+
+fn visit_coordinate_domain_checked(
+    emit: &mut impl FnMut(Vec<Lit>),
+    check: &mut impl FnMut() -> Result<(), ChainBuildError>,
+    block: &[u32],
+    codes: &[BigUint],
+    bit: usize,
+) -> Result<(), ChainBuildError> {
+    fn visit(
+        emit: &mut impl FnMut(Vec<Lit>),
+        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
+        block: &[u32],
+        codes: &[BigUint],
+        bit: usize,
+        prefix: &mut Vec<Lit>,
+    ) -> Result<(), ChainBuildError> {
+        check()?;
+        if codes.is_empty() {
+            emit(prefix.clone());
+            return Ok(());
+        }
+        if bit == 0 {
+            return Ok(());
+        }
+        let position = bit - 1;
+        let split = codes.partition_point(|code| !code.bit(position as u64));
+        let wire = block[position] as Lit;
+        prefix.push(wire);
+        visit(emit, check, block, &codes[..split], position, prefix)?;
+        *prefix.last_mut().expect("pushed") = -wire;
+        visit(emit, check, block, &codes[split..], position, prefix)?;
+        prefix.pop();
+        Ok(())
+    }
+    visit(emit, check, block, codes, bit, &mut Vec::new())
 }
 
 #[cfg(test)]
@@ -2710,205 +2913,4 @@ mod tests {
             Err(ChainBuildError::Unsupported)
         );
     }
-}
-
-impl Circuit {
-    fn new_checked(
-        irr: &IrreduciblePoly,
-        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-    ) -> Result<Self, ChainBuildError> {
-        let n = irr.degree as usize;
-        let reductions: Vec<_> = (0..2 * n - 1)
-            .map(|degree| {
-                check()?;
-                Ok(reduced_monomial(degree, irr))
-            })
-            .collect::<Result<_, ChainBuildError>>()?;
-        let mut square_inputs = vec![Vec::new(); n];
-        for bit in 0..n {
-            check()?;
-            for &output in &reductions[2 * bit] {
-                square_inputs[output].push(bit);
-            }
-        }
-        Ok(Self {
-            n,
-            product_kernel: ChainProductKernel::Schoolbook,
-            fold_constants: false,
-            known: Vec::new(),
-            next: 1,
-            reductions,
-            square_inputs,
-            ands: Vec::new(),
-            xors: Vec::new(),
-            units: Vec::new(),
-            impossible: false,
-        })
-    }
-
-    fn product_checked(
-        &mut self,
-        left: &[u32],
-        right: &[u32],
-        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-    ) -> Result<Vec<u32>, ChainBuildError> {
-        let mut rows = vec![Vec::new(); self.n];
-        for (i, &a) in left.iter().enumerate() {
-            check()?;
-            for (j, &b) in right.iter().enumerate() {
-                let gate = self.wire();
-                self.ands.push((gate, a, b));
-                for &output in &self.reductions[i + j] {
-                    rows[output].push(gate);
-                }
-            }
-        }
-        let output = self.block();
-        for (bit, mut row) in rows.into_iter().enumerate() {
-            row.push(output[bit]);
-            self.xors.push((row, false));
-        }
-        Ok(output)
-    }
-
-    fn s3_checked(
-        &mut self,
-        x: &[u32],
-        y: &[u32],
-        z: &[u32],
-        b: &F2mElement,
-        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-    ) -> Result<(), ChainBuildError> {
-        let sum = self.block();
-        for bit in 0..self.n {
-            self.xors.push((vec![sum[bit], x[bit], y[bit]], false));
-        }
-        let xy = self.product_checked(x, y, check)?;
-        let sum_z = self.product_checked(&sum, z, check)?;
-        let xyz = self.product_checked(&xy, z, check)?;
-        let b_bits = b.to_biguint();
-        for output in 0..self.n {
-            check()?;
-            let mut row = vec![xyz[output]];
-            for &input in &self.square_inputs[output] {
-                row.extend([xy[input], sum_z[input]]);
-            }
-            self.xors.push((row, b_bits.bit(output as u64)));
-        }
-        Ok(())
-    }
-}
-
-fn prepare_circuit_checked(
-    m: usize,
-    irr: &IrreduciblePoly,
-    b: &F2mElement,
-    target_x: Option<&F2mElement>,
-    identity_mask: u32,
-    max_variables: u32,
-    check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-) -> Result<(Circuit, Vec<Vec<u32>>, usize), ChainBuildError> {
-    let n = irr.degree;
-    let Some(required) = chain_s3_max_variables(n, m) else {
-        return Err(ChainBuildError::Unsupported);
-    };
-    if max_variables == 0 || required > u64::from(max_variables) {
-        return Err(ChainBuildError::VariableCap {
-            required,
-            maximum: max_variables,
-        });
-    }
-    if b.m_value() != n
-        || target_x.is_some_and(|x| x.m_value() != n)
-        || identity_mask >= (1u32 << (m - 2))
-        || !irr.low_terms.contains(&0)
-        || irr.low_terms.iter().any(|&term| term >= n)
-        || {
-            let mut terms = irr.low_terms.clone();
-            terms.sort_unstable();
-            terms.dedup();
-            terms.len() != irr.low_terms.len()
-        }
-    {
-        return Err(ChainBuildError::Unsupported);
-    }
-    let mut circuit = Circuit::new_checked(irr, check)?;
-    let blocks: Vec<Vec<u32>> = (0..2 * m - 1).map(|_| circuit.block()).collect();
-    let target = &blocks[2 * m - 2];
-    let target_bits = target_x.map(F2mElement::to_biguint);
-    for (bit, &wire) in target.iter().enumerate() {
-        circuit.units.push((
-            wire,
-            target_bits.as_ref().is_some_and(|x| x.bit(bit as u64)),
-        ));
-    }
-
-    let mut n_s3_nodes = 0;
-    let mut previous = &blocks[0];
-    for step in 1..m {
-        check()?;
-        let output = if step == m - 1 {
-            target
-        } else {
-            &blocks[m + step - 1]
-        };
-        let previous_infinity = step > 1 && (identity_mask & (1 << (step - 2))) != 0;
-        let output_infinity = if step == m - 1 {
-            target_x.is_none()
-        } else {
-            (identity_mask & (1 << (step - 1))) != 0
-        };
-        if step < m - 1 && output_infinity {
-            for &wire in output {
-                circuit.units.push((wire, false));
-            }
-        }
-        match (previous_infinity, output_infinity) {
-            (true, true) => circuit.impossible = true, // O + affine != O
-            (true, false) => circuit.equal(&blocks[step], output),
-            (false, true) => circuit.equal(previous, &blocks[step]),
-            (false, false) => {
-                circuit.s3_checked(previous, &blocks[step], output, b, check)?;
-                n_s3_nodes += 1;
-            }
-        }
-        previous = output;
-    }
-    Ok((circuit, blocks, n_s3_nodes))
-}
-
-fn visit_coordinate_domain_checked(
-    emit: &mut impl FnMut(Vec<Lit>),
-    check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-    block: &[u32],
-    codes: &[BigUint],
-    bit: usize,
-) -> Result<(), ChainBuildError> {
-    fn visit(
-        emit: &mut impl FnMut(Vec<Lit>),
-        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-        block: &[u32],
-        codes: &[BigUint],
-        bit: usize,
-        prefix: &mut Vec<Lit>,
-    ) -> Result<(), ChainBuildError> {
-        check()?;
-        if codes.is_empty() {
-            emit(prefix.clone());
-            return Ok(());
-        }
-        if bit == 0 {
-            return Ok(());
-        }
-        let position = bit - 1;
-        let split = codes.partition_point(|code| !code.bit(position as u64));
-        let wire = block[position] as Lit;
-        prefix.push(wire);
-        visit(emit, check, block, &codes[..split], position, prefix)?;
-        *prefix.last_mut().expect("pushed") = -wire;
-        visit(emit, check, block, &codes[split..], position, prefix)?;
-        prefix.pop();
-        Ok(())
-    }
-    visit(emit, check, block, codes, bit, &mut Vec::new())
 }
