@@ -15,6 +15,8 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Compare Dickson31 with first-rational-x B31 on the same prime31 256 blinded logs; full Rust rank, retries and charged costs (automation, started 2026-11-17, branch automation/prime31-b31-firstx-complete-frontier-20261117)
+
 - [x] Prime31 same-256-Q complete Rust B27/B29/B31 arity, rank and full-cost sensitivity; test candidate extractor trade-off (automation, started 2026-11-17, branch automation/prime31-b27-b29-complete-sensitivity-20261117, PR #4629)
 
 - [x] Audit actual prime31 B31 eight-leaf coverage against matched random and first-x bases; reuse original Rust 4A oracle and pre-registered 256-Q corpus (automation, started 2026-11-17, branch automation/prime31-b31-coverage-null-control-20261117, PR #4626)
