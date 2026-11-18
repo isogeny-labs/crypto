@@ -627,7 +627,9 @@ impl RadicalRootCtx {
         let c2sq = f.sqr(c2);
         let pp = f.sub(c1, f.mul(c2sq, self.inv3));
         // q = 2 c2^3/27 - c1 c2/3 + c0
-        let t1 = f.mul(f.mul(c2sq, c2), f.mul(2, self.inv27));
+        // 2/27 is a fixed coefficient: one modular doubling instead of
+        // a generic (u128 remainder) field multiplication.
+        let t1 = f.mul(f.mul(c2sq, c2), f.add(self.inv27, self.inv27));
         let t2 = f.mul(f.mul(c1, c2), self.inv3);
         let q = f.add(f.sub(t1, t2), c0);
         let sh = f.mul(c2, self.inv3);
