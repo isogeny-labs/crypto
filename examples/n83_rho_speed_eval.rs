@@ -245,8 +245,11 @@ impl RhoScalar for ExactScalar {
     fn to_f64(self) -> f64 {
         self.0 as f64
     }
-    fn to_u128(self) -> u128 {
-        u128::from(self.0)
+    fn to_biguint(self) -> BigUint {
+        BigUint::from(self.0)
+    }
+    fn checked_u128(self) -> Option<u128> {
+        Some(u128::from(self.0))
     }
     fn bit_len(self) -> u32 {
         64 - self.0.leading_zeros()
@@ -490,7 +493,7 @@ fn evaluate_scalar<S: RhoScalar>(
     let validation_started = Instant::now();
     let recovered = outcome.as_ref().map(|value| value.scalar);
     let replay_verified =
-        recovered.is_some_and(|d| curve.mul(curve.generator(), &BigUint::from(d.to_u128())) == q);
+        recovered.is_some_and(|d| curve.mul(curve.generator(), &d.to_biguint()) == q);
     let validation_ns = validation_started.elapsed().as_nanos();
     let online_ns = online_started.elapsed().as_nanos();
     let phase_sum_ns = query_ns + walk_ns + validation_ns;
@@ -842,7 +845,8 @@ mod tests {
         for a in [0, 1, LEGACY_R, u64::MAX] {
             let s = ExactScalar::from_biguint(&BigUint::from(a)).unwrap();
             assert_eq!(s.0, a);
-            assert_eq!(s.to_u128(), u128::from(a));
+            assert_eq!(s.checked_u128(), Some(u128::from(a)));
+            assert_eq!(s.to_biguint(), BigUint::from(a));
             assert_eq!(s.to_string(), a.to_string());
             assert_eq!(s.bit_len(), <u64 as RhoScalar>::bit_len(a));
             for bit in 0..64 {
