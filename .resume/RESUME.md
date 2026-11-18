@@ -1,3 +1,82 @@
+# Resume: crypto @ codex/ghs-rho-opt-20261118
+
+## Goal
+Optimize the matched strong-rho comparator for the restricted GHS-weak
+`E0/F_{q^3}` frontier while preserving the frozen Round A record, then open a
+ready PR with correctness, count, profile, and local timing evidence.
+
+## Lead / hypothesis
+`strong_rho.rs::sq` currently calls the six-product generic cubic multiply.
+The prospective Round B protocol derives a five-product cubic square. It
+should preserve the exact walk and remove one priced `F_q` multiplication per
+`F_{q^3}` square; it cannot alone move the E2E leaderboard.
+
+## Spec
+`research/quartic_ghs_strong_rho_20261114/ROUND_B.md`; baseline revision
+`9ec88b7637aac4ce816739155f12f518b393da37`; public diagnostic `q=4051`, seed
+1, target 0, `ic-repeat`, `strong-b8`, calibration triples 3, one thread.
+
+## State
+Round B was frozen at `90c3faf97b`. The five-product square and its count
+assertions are implemented. Standalone self-test and the deterministic q=223
+producer control pass; raw records show the same walk and exactly 5,500 fewer
+`fq_mul`, one per `f3_sq`. Research-KB and Conductor executables are
+unavailable. Checkpoint push/gate exited 1 because no upload transport exists,
+so no profile, isolated timing, or frontier run was started. The standalone
+source check passes. The required full release library test reaches unrelated
+base compilation failures after sparse dependencies are materialized; retained
+in `round-b/full-test-status.txt`. Ready PR #4687 is open with merge-method
+auto-merge enabled; the first ecbench scope check failed while hydrating
+unrelated historical artifacts from its cache.
+
+## Next steps
+1. Follow PR #4687 under the repository check-in cadence; address only
+   attributable review or CI failures.
+2. When checkpoint transport exists, rerun `scripts/checkpoint.sh push` and
+   `gate`, then profile baseline/candidate with `tools/profile.sh`.
+3. Run the frozen A/A and five-pair ABAB local diagnostic, followed by the
+   separately admitted complete grid before any frontier update.
+
+## Runs in flight
+None.
+
+## Stop and success conditions
+Stop on checkpoint refusal before any experiment, a wrong square or DLP,
+walk/count divergence outside the frozen formula, or missing raw output.
+Success for this round is exact correctness plus one fewer `fq_mul` per
+`f3_sq`; local wall time remains diagnostic. The leaderboard changes only
+after a complete isolated, validated, source-bound grid.
+
+---
+
+# Resume: crypto @ claude/peaceful-babbage-wddn3o (genus 2-16 IC speed-up)
+
+## Goal
+Measured index-calculus speed-ups for genus 2-16 curves (hyperelliptic first,
+then non-hyperelliptic small-e models). Plan: research/ic_genus2_16_speedup_20261117/PLAN.md.
+
+## Lead / hypothesis
+The 1/g! split probability of a degree-1 base dominates from genus ~8. A base
+with degree-2 places (arm D) or degree-2 large primes (arm E) should cut trials
+by orders of magnitude at g >= 8, at an LA price (D: base ~p^2/4).
+
+## Spec
+Instrument: genus_ladder from fffa1b1243 + P1/instrument.patch (MAX_GENUS 16,
+REL_FB 16, F_{p^k} point counts, arms D/E). Binary /home/user/bin/genus_ladder_g16
+(build in sparse worktree /home/user/crypto-c0b657b; ~8 min). Cell runner P1/run_cell.sh.
+
+## State
+P0 and P1 done (P1/RESULTS.md); P2 lever F negative (P2/RESULTS_F.md); crossover
+p*(g) measured/extrapolated (P2/RESULTS_crossover.md). Binaries g16d (P1) and g16e
+(adds arm F) in /home/user/bin; source patches in P1/instrument.patch and P2_instrument.patch.
+PR #4598 open, subscribed.
+
+## Next steps
+P3 non-hyperelliptic small-e models (PLAN.md); optional degree-3 base for g >= 10;
+more p at g=8 to measure its decay. Keep cells short; use run_curve.sh for big p.
+
+---
+
 # Resume: crypto @ codex/retained-chain-ic-20261109
 
 ## Goal

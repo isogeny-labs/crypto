@@ -12,6 +12,8 @@ text is `PROTOCOL.md` (original sections plus "Amendment 1") and `NOTE.md`.
 | first freeze (commit `f619a7a76b`) | `PROTOCOL.md` | `fa7edef8adbcd383d06285b37651556456f20424754c887a1b0a4e4fb6fb898b` |
 | Amendment 1 (2026-11-15, before any code or data) | `PROTOCOL.md` | `e48aa56c70d807b5766ff044ed9f473256afbd4e61d00d15b06ea1afe8022650` |
 | Amendment 1 | `NOTE.md` (newly covered, R16; unchanged) | `e97a070eff8f1f23523384dacfe4bd9d57b81ff6a79b52d49274329bc3252af6` |
+| Amendment 2 (2026-11-18, before any data) | `PROTOCOL.md` | `0914c507ea3e7d113d89f5bc7c02bb6cd2473a4454346b2b2cf454a4049a9add` |
+| Amendment 2 | `NOTE.md` (unchanged) | `e97a070eff8f1f23523384dacfe4bd9d57b81ff6a79b52d49274329bc3252af6` |
 
 Check: `cd research/chained_transfer_next_20261115 && sha256sum -c frozen.sha256`.
 
@@ -166,7 +168,15 @@ is `[pcc:unverified]`.
   times, scratchpad output) ran every control: dense cross-check, 32-column
   BSGS, tamper, determinism. Its numbers are not data and are not quoted.
 
-### Choices where the protocol is open (the frozen text is not edited)
+### Choices where the protocol was open (frozen by Amendment 2, 2026-11-18)
+
+Amendment 2 adopts items 1 to 3 and 5 to 8 as B1 to B3 and B5 to B8. It
+replaces item 4 with B4: a solve that passes its residual is accepted only if
+the counted `[t]G == T` check passes; otherwise the attempt is `wrong_log` and
+A7 retries. A disagreement between the counted and the independent check is
+`check_mismatch` and stops the run. Code: `find_target` and the acceptance
+test in `run_arm` (`quartic_ic.rs`), the stop in the binary; test
+`wrong_log_is_rejected_by_the_counted_acceptance_test`. The original list:
 
 1. Tamper control (A9 iii): a change in a row that peeling removes is always
    consistent (the peeled column absorbs it), so neither the residual nor

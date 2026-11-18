@@ -1,0 +1,57 @@
+{
+  "schema": "crypto.smith-compile-source-mapping/v1",
+  "scientific_measurement": false,
+  "rustfmt_version": "rustfmt 1.8.0",
+  "transforms": [
+    "crate::cryptanalysis:: to crate::smith_protocol:: (only the original sibling-module references)",
+    "test fixture embeds ../../research/ to ../../../research/",
+    "rustfmt edition 2021; skip_children=true; identical formatter for both sides"
+  ],
+  "bindings": [
+    {
+      "source": "src/cryptanalysis/smith_isogeny.rs",
+      "revision": "c4f8915aa2c32d7f7fc127abbc1b628ab20c5612",
+      "source_sha256": "21ffd4fa48cb77d74b845b8b45cb353769c6bb15b32c86547b91fa6b9f18ea1d",
+      "maintained_path": "examples/maintained/smith_protocol_20261018/smith_isogeny.rs",
+      "maintained_sha256": "6b596f8eb0ccdd5c5a7100ecad72caaf56b9e983418921dbfae3851ce42a0587",
+      "changes": "Original complete protocol source with sibling-module namespaces and test-fixture embed paths relocated, then current rustfmt formatting. Canonical formatting of the explicitly mapped original equals the maintained bytes exactly.",
+      "mapped_original_equals_maintained": true
+    },
+    {
+      "source": "src/cryptanalysis/smith_route_s.rs",
+      "revision": "c4f8915aa2c32d7f7fc127abbc1b628ab20c5612",
+      "source_sha256": "1a9ab1cbcf050e8c0e1747beb4c7fed47869ba34af49c59c8504000d20a9bb94",
+      "maintained_path": "examples/maintained/smith_protocol_20261018/smith_route_s.rs",
+      "maintained_sha256": "1a9ab1cbcf050e8c0e1747beb4c7fed47869ba34af49c59c8504000d20a9bb94",
+      "changes": "Original complete protocol source with sibling-module namespaces and test-fixture embed paths relocated, then current rustfmt formatting. Canonical formatting of the explicitly mapped original equals the maintained bytes exactly.",
+      "mapped_original_equals_maintained": true
+    },
+    {
+      "source": "src/cryptanalysis/smith_prop24.rs",
+      "revision": "c4f8915aa2c32d7f7fc127abbc1b628ab20c5612",
+      "source_sha256": "8cab9b40c6fb40e055802381b1ce017560ac76b96b6413b5a0e61aedc7752713",
+      "maintained_path": "examples/maintained/smith_protocol_20261018/smith_prop24.rs",
+      "maintained_sha256": "9a8b3042d46ea4d4a8972161f7a6cd9203c2bca4f9cd5a6fdb1857a865d322cb",
+      "changes": "Original complete protocol source with sibling-module namespaces and test-fixture embed paths relocated, then current rustfmt formatting. Canonical formatting of the explicitly mapped original equals the maintained bytes exactly.",
+      "mapped_original_equals_maintained": true
+    },
+    {
+      "source": "src/cryptanalysis/smith_kernel_coverage.rs",
+      "revision": "c4f8915aa2c32d7f7fc127abbc1b628ab20c5612",
+      "source_sha256": "20532f46ac68eb89643318a3ab66a39e64d5cfcc86b64eb36eab4b125fb86c0d",
+      "maintained_path": "examples/maintained/smith_protocol_20261018/smith_kernel_coverage.rs",
+      "maintained_sha256": "20532f46ac68eb89643318a3ab66a39e64d5cfcc86b64eb36eab4b125fb86c0d",
+      "changes": "Original complete protocol source with sibling-module namespaces and test-fixture embed paths relocated, then current rustfmt formatting. Canonical formatting of the explicitly mapped original equals the maintained bytes exactly.",
+      "mapped_original_equals_maintained": true
+    },
+    {
+      "source": "src/cryptanalysis/plane_quartic_pic.rs",
+      "revision": "c4f8915aa2c32d7f7fc127abbc1b628ab20c5612",
+      "source_sha256": "3bf45c3a116d3c870e5b19742ce151179e654e6c173db0d65b7b7dfee954588a",
+      "maintained_path": "examples/maintained/smith_protocol_20261018/plane_quartic_pic.rs",
+      "maintained_sha256": "43cdd12878b7117b7944d69cef5263c2161fc782f460d1970c20a4eba8867f2d",
+      "changes": "Original complete protocol source with sibling-module namespaces and test-fixture embed paths relocated, then current rustfmt formatting. Canonical formatting of the explicitly mapped original equals the maintained bytes exactly.",
+      "mapped_original_equals_maintained": true
+    }
+  ]
+}

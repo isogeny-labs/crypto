@@ -1,0 +1,83 @@
+generator G=(2,5412647) on curve p24 ok
+factor base |F|=128 (scanned 279 primes, max x=1801); pair keys: adds=16256 emitted=16256 distinct=16232 dup=24
+pair table entries (multiset)=16256; value bits v=15
+queries 8000000 random on-curve x, non-members 7984442
+
+== E1: load factor reached and kick-outs (random distinct keys) ==
+fill-to-failure nb=4096 (16384 slots) f=8 maxkicks=500 seeds=200: load at first failure mean=0.9673 min=0.9598 median=0.9671 max=0.9749
+   kick-outs/insert by load band: [<0.50] mean=0.005 max=6 (n=1638400) [0.50-0.80] mean=0.277 max=32 (n=983200) [0.80-0.90] mean=2.264 max=80 (n=327600) [0.90-0.95] mean=11.109 max=337 (n=163800) [>=0.95] mean=50.912 max=500 (n=56557)
+fill-to-failure nb=4096 (16384 slots) f=12 maxkicks=500 seeds=200: load at first failure mean=0.9681 min=0.9610 median=0.9683 max=0.9742
+   kick-outs/insert by load band: [<0.50] mean=0.004 max=6 (n=1638400) [0.50-0.80] mean=0.275 max=24 (n=983200) [0.80-0.90] mean=2.240 max=84 (n=327600) [0.90-0.95] mean=10.958 max=363 (n=163800) [>=0.95] mean=51.473 max=500 (n=59315)
+fill-to-failure nb=4096 (16384 slots) f=16 maxkicks=500 seeds=200: load at first failure mean=0.9686 min=0.9577 median=0.9691 max=0.9760
+   kick-outs/insert by load band: [<0.50] mean=0.004 max=5 (n=1638400) [0.50-0.80] mean=0.274 max=25 (n=983200) [0.80-0.90] mean=2.226 max=100 (n=327600) [0.90-0.95] mean=10.836 max=300 (n=163800) [>=0.95] mean=51.618 max=500 (n=60746)
+fill-to-failure nb=4096 (16384 slots) f=12 maxkicks=100 seeds=200: load at first failure mean=0.9391 min=0.9092 median=0.9402 max=0.9531
+   kick-outs/insert by load band: [<0.50] mean=0.004 max=6 (n=1638400) [0.50-0.80] mean=0.275 max=24 (n=983200) [0.80-0.90] mean=2.240 max=84 (n=327600) [0.90-0.95] mean=8.764 max=100 (n=127942) [>=0.95] mean=18.669 max=97 (n=154)
+fill-to-failure nb=4096 (16384 slots) f=12 maxkicks=2000 seeds=200: load at first failure mean=0.9761 min=0.9710 median=0.9760 max=0.9801
+   kick-outs/insert by load band: [<0.50] mean=0.004 max=6 (n=1638400) [0.50-0.80] mean=0.275 max=24 (n=983200) [0.80-0.90] mean=2.240 max=84 (n=327600) [0.90-0.95] mean=10.958 max=363 (n=163800) [>=0.95] mean=109.682 max=2000 (n=85428)
+fill-to-failure nb=65536 (262144 slots) f=12 maxkicks=500 seeds=50: load at first failure mean=0.9632 min=0.9585 median=0.9635 max=0.9665
+   kick-outs/insert by load band: [<0.50] mean=0.004 max=6 (n=6553600) [0.50-0.80] mean=0.274 max=28 (n=3932200) [0.80-0.90] mean=2.240 max=124 (n=1310700) [0.90-0.95] mean=10.866 max=316 (n=655350) [>=0.95] mean=40.260 max=497 (n=173556)
+fill-to-failure nb=512 (2048 slots) f=12 maxkicks=500 seeds=200: load at first failure mean=0.9727 min=0.9570 median=0.9727 max=0.9854
+   kick-outs/insert by load band: [<0.50] mean=0.004 max=4 (n=204800) [0.50-0.80] mean=0.275 max=22 (n=123000) [0.80-0.90] mean=2.255 max=74 (n=41000) [0.90-0.95] mean=11.169 max=428 (n=20400) [>=0.95] mean=62.718 max=500 (n=9210)
+
+== E1b: build the actual 16232 pair keys (f=12), success rate vs target load, 200 hash seeds ==
+target load 0.80: nb=5073 actual load=0.7999 success 200/200; kick-outs/insert=0.106
+target load 0.85: nb=4775 actual load=0.8498 success 200/200; kick-outs/insert=0.182
+target load 0.90: nb=4509 actual load=0.9000 success 200/200; kick-outs/insert=0.343
+target load 0.92: nb=4411 actual load=0.9200 success 200/200; kick-outs/insert=0.470
+target load 0.94: nb=4318 actual load=0.9398 success 200/200; kick-outs/insert=0.696
+target load 0.95: nb=4272 actual load=0.9499 success 200/200; kick-outs/insert=0.898
+target load 0.96: nb=4228 actual load=0.9598 success 199/200; kick-outs/insert=1.229
+target load 0.97: nb=4184 actual load=0.9699 success 45/200; kick-outs/insert=1.766
+target load 0.98: nb=4141 actual load=0.9800 success 0/200; kick-outs/insert=1.816
+
+== E3: filter / table comparison on the real key set (n=16232) ==
+exact std HashMap<u32,u32>: est 294928 bytes = 145.36 bits/key (FPR 0)
+  lookup 9.5 ns (hits 15558); packed-ideal bits/key = 24 + v = 39
+cuckoo f= 8 nb= 8116 load=0.5000 (attempts 1): filter bits/key=16.00, table bits/key=46.00 (f+v=23); FPR=1.5487e-2 (theory 1.5594e-2, FP 123654); neg: 1.992 buckets 7.94 cmps 12.5 ns; pos: 1.041 buckets 2.06 cmps; kicks/insert=0.004
+cuckoo f= 8 nb= 4509 load=0.9000 (attempts 1): filter bits/key=8.89, table bits/key=25.56 (f+v=23); FPR=2.7826e-2 (theory 2.7894e-2, FP 222178); neg: 1.986 buckets 7.90 cmps 13.9 ns; pos: 1.322 buckets 3.67 cmps; kicks/insert=0.334
+cuckoo f= 8 nb= 4272 load=0.9499 (attempts 1): filter bits/key=8.42, table bits/key=24.21 (f+v=23); FPR=2.9309e-2 (theory 2.9418e-2, FP 234018); neg: 1.985 buckets 7.90 cmps 13.3 ns; pos: 1.419 buckets 4.11 cmps; kicks/insert=0.901
+    Bloom k=5: bits/key=7.21 FPR=3.1605e-2 reads/neg=1.94 17.5 ns   [cuckoo/Bloom bits ratio 1.168]
+cuckoo f=12 nb= 8116 load=0.5000 (attempts 1): filter bits/key=24.00, table bits/key=54.00 (f+v=27); FPR=9.9180e-4 (theory 9.7644e-4, FP 7919); neg: 2.000 buckets 8.00 cmps 17.2 ns; pos: 1.041 buckets 2.06 cmps; kicks/insert=0.004
+cuckoo f=12 nb= 4509 load=0.9000 (attempts 1): filter bits/key=13.33, table bits/key=30.00 (f+v=27); FPR=1.7509e-3 (theory 1.7569e-3, FP 13980); neg: 1.999 buckets 7.99 cmps 13.1 ns; pos: 1.330 buckets 3.71 cmps; kicks/insert=0.341
+cuckoo f=12 nb= 4272 load=0.9499 (attempts 1): filter bits/key=12.63, table bits/key=28.42 (f+v=27); FPR=1.8556e-3 (theory 1.8542e-3, FP 14816); neg: 1.999 buckets 7.99 cmps 12.3 ns; pos: 1.430 buckets 4.16 cmps; kicks/insert=0.852
+    Bloom k=9: bits/key=12.98 FPR=1.9631e-3 reads/neg=2.00 16.1 ns   [cuckoo/Bloom bits ratio 0.973]
+cuckoo f=16 nb= 8116 load=0.5000 (attempts 1): filter bits/key=32.00, table bits/key=62.00 (f+v=31); FPR=5.9866e-5 (theory 6.1035e-5, FP 478); neg: 2.000 buckets 8.00 cmps 12.8 ns; pos: 1.041 buckets 2.06 cmps; kicks/insert=0.005
+cuckoo f=16 nb= 4509 load=0.9000 (attempts 1): filter bits/key=17.78, table bits/key=34.45 (f+v=31); FPR=1.2111e-4 (theory 1.0986e-4, FP 967); neg: 2.000 buckets 8.00 cmps 12.3 ns; pos: 1.324 buckets 3.68 cmps; kicks/insert=0.342
+cuckoo f=16 nb= 4272 load=0.9499 (attempts 1): filter bits/key=16.84, table bits/key=32.63 (f+v=31); FPR=1.1810e-4 (theory 1.1595e-4, FP 943); neg: 2.000 buckets 8.00 cmps 12.5 ns; pos: 1.433 buckets 4.18 cmps; kicks/insert=0.889
+    Bloom k=13: bits/key=18.76 FPR=1.2850e-4 reads/neg=2.00 16.4 ns   [cuckoo/Bloom bits ratio 0.898]
+
+-- exact quotient cuckoo (key = bucket+stored remainder, FPR=0 by construction), 24-bit domain --
+  nb=2^12: load=0.991 (infeasible: above ~0.95-0.96 b=4 limit); stored remainder bits=12 => table bits/key=27.25 (+v=15) vs packed-exact 39
+  nb=2^13: load=0.495 (feasible); stored remainder bits=11 => table bits/key=52.49 (+v=15) vs packed-exact 39
+
+== E4: deletion (f=16 table, load~0.90, 16256 entries with values) ==
+evict element #17 (x=167): recomputed 254 keys with 254 group adds; deleted 254/254; entries 16256->16002
+surviving entries lost after deletions (false negatives): 0/16002
+insert replacement element (x=1847): 254 keys, 254 adds, inserted 254/254; load now 0.8999
+filter-only f=12: deleting 2000000 NEVER-inserted keys removed 2868 entries (rate 1.434e-3, theory ~1.758e-3); entries 16256->13388; members now false-negative: 2860/16232
+
+== E5: dynamic factor base: hits per trial and GAE to R relations (random on-curve R, cuckoo table f=16) ==
+static F=64                                         : reps 20; GAE-to-87-relations mean=201016 (n=20) trials-to-87 mean=187896; GAE-to-0.68|F|-relations mean=97493 (n=20); FP cands 20; split-half per-element hit correlation r=-0.0156 (n=1280)
+    total hits over reps=1740
+static F=96                                         : reps 20; GAE-to-87-relations mean=89959 (n=20) trials-to-87 mean=77060; GAE-to-0.68|F|-relations mean=70646 (n=20); FP cands 16; split-half per-element hit correlation r=NaN (n=1920)
+    total hits over reps=1740
+static F=128                                        : reps 20; GAE-to-87-relations mean=63209 (n=20) trials-to-87 mean=44723; GAE-to-0.68|F|-relations mean=63946 (n=20); FP cands 154; split-half per-element hit correlation r=-0.0158 (n=2560)
+    total hits over reps=15374
+static F=160                                        : reps 20; GAE-to-87-relations mean=55770 (n=20) trials-to-87 mean=28860; GAE-to-0.68|F|-relations mean=63687 (n=20); FP cands 22; split-half per-element hit correlation r=NaN (n=3200)
+    total hits over reps=2180
+static F=192                                        : reps 20; GAE-to-87-relations mean=57751 (n=20) trials-to-87 mean=20032; GAE-to-0.68|F|-relations mean=68410 (n=20); FP cands 24; split-half per-element hit correlation r=NaN (n=3840)
+    total hits over reps=2620
+grow 32->, +1 elem / 100 trials                     : reps 20; GAE-to-87-relations mean=69785 (n=20) trials-to-87 mean=28531; GAE-to-0.68|F|-relations mean=80500 (n=20); FP cands 29
+    total hits over reps=2720
+grow 64->, +1 elem / 100 trials                     : reps 20; GAE-to-87-relations mean=66563 (n=20) trials-to-87 mean=25456; GAE-to-0.68|F|-relations mean=77214 (n=20); FP cands 27
+    total hits over reps=2720
+grow 64->, +1 elem / 500 trials                     : reps 20; GAE-to-87-relations mean=83043 (n=20) trials-to-87 mean=52323; GAE-to-0.68|F|-relations mean=100922 (n=20); FP cands 22
+    total hits over reps=2570
+swap F=128: replace random elem / 2000 trials       : reps 20; GAE-to-87-relations mean=74610 (n=20) trials-to-87 mean=44890; GAE-to-0.68|F|-relations mean=75387 (n=20); FP cands 19
+    total hits over reps=1760
+swap F=128: replace least-hit elem / 2000 trials    : reps 20; GAE-to-87-relations mean=74649 (n=20) trials-to-87 mean=44999; GAE-to-0.68|F|-relations mean=75639 (n=20); FP cands 16
+    total hits over reps=1760
+
+real	0m11.174s
+user	0m11.064s
+sys	0m0.016s

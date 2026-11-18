@@ -1,0 +1,3 @@
+The recovered linear forms a,b,c,d have rows (10,28,10,30), (28,1,16,30), (0,0,9,8), (0,0,6,11) on the canonical coordinates. They satisfy Q=ab+cd. On Q the column direction of the matrix with rows (a,c),(-d,b) is [a:-d] or [c:b]; its row direction is [a:c] or [-d:b]. Choose any nonzero column or row. Both maps and the inverse basis are defined over F31.
+
+All 30,784 ambient rational projective points passed the inverse and polynomial identity checks. Each pair of rational ruling parameters had exactly one rational quadric point above it, giving the full 32 by 32 grid. Each quadric ruling line has 32 rational points; its intersection with the canonical curve has geometric degree three. The rational splitting patterns of those intersections await the curve equation.

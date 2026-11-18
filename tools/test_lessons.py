@@ -77,6 +77,24 @@ class LessonsTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("does not match id", out)
 
+    def test_base_change_only_repairs(self):
+        lid = self.add()
+        path = self.d / f"{lid}.json"
+        original = path.read_bytes()
+        body = json.loads(original)
+        body["action"] = "something else"
+        edited = json.dumps(body).encode()
+        name = path.name
+        # a valid entry on the base stays immutable, whatever the change
+        self.assertFalse(lessons.is_repair(name, original, edited))
+        self.assertFalse(lessons.is_repair(name, original, original + b"\n"))
+        # an entry corrupted on the base may be restored to content matching its id
+        self.assertTrue(lessons.is_repair(name, edited, original))
+        # but not replaced by other content that still fails its id
+        body["action"] = "a third text"
+        self.assertFalse(lessons.is_repair(name, edited, json.dumps(body).encode()))
+        self.assertFalse(lessons.is_repair(name, b"not json", b"[]"))
+
     def test_outcome_stats(self):
         lid = self.add()
         for i, result in enumerate(("success", "success", "fail")):
