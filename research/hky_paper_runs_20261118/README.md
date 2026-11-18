@@ -193,8 +193,9 @@ solutions enumerated over H × H: 0 ✓ ⇒ unit ideal (Lemma `lem:unit`). The s
 | 8 | 4 / 5 | LFD 5 | (0,0,2,119,1061) / full 6885 | no / yes | ok / ok |
 | 9 | 4 / 5 | LFD 5 | (0,0,2,123,1301) / full 12616 | no / yes | ok / ok |
 | 10 | 5 / 6 | LFD 6 | (0,0,2,138,3163,18569) / full 60460 | no / yes | ok annihilator / ok |
+| 11 | 5 / 6 | LFD 6 | (0,0,2,142,3441,25033) / full 110056 | no / yes | ok annihilator / ok (merged engine, `gate/unitness_786433_merged.log`) |
 
-1 enters exactly at ⌊(k+14)/4⌋ at every k = 4..10 on the new prime (measured, `gate/unitness_786433.log`), and the closures without 1 have the same profiles as the paper's p = 65537 instance (k = 10, D = 5: (0,0,2,138,3163,18569)), as expected for this generic invariant. This is the evidence that the recipe gives unit ideals on p = 786433 before it is trusted at k = 16 (where the lemma is the proof).
+1 enters exactly at ⌊(k+14)/4⌋ at every k = 4..11 on the new prime (k = 10 also re-run on the merged engine: same basis SHA-256 ad097a63…) (measured, `gate/unitness_786433.log`), and the closures without 1 have the same profiles as the paper's p = 65537 instance (k = 10, D = 5: (0,0,2,138,3163,18569)), as expected for this generic invariant. This is the evidence that the recipe gives unit ideals on p = 786433 before it is trusted at k = 16 (where the lemma is the proof).
 
 ## 7. Checkpoint/resume
 
