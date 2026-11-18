@@ -2826,13 +2826,14 @@ fn freeze_batch_targets(prior_path: &str, public_path: &str, checker_path: &str)
     }
     let public = json!({"schema":"isogeny_dual_batch_public/v1",
         "prior_public_sha256":sha256_hex(&prior_bytes),
-        "selection_seed":seed,"p":211,"r":229,"cofactor":195,
+        "p":211,"r":229,"cofactor":195,
         "generator":generator,"mapped_generator":mapped_generator,
         "targets":targets});
     let public_bytes = format!("{}\n", serde_json::to_string_pretty(&public).unwrap());
     fs::write(public_path, &public_bytes).unwrap();
     let checker = json!({"schema":"isogeny_dual_batch_checker/v1",
-        "public_sha256":sha256_hex(public_bytes.as_bytes()),"scalars":scalars});
+        "public_sha256":sha256_hex(public_bytes.as_bytes()),
+        "selection_seed":seed,"scalars":scalars});
     fs::write(
         checker_path,
         format!("{}\n", serde_json::to_string_pretty(&checker).unwrap()),

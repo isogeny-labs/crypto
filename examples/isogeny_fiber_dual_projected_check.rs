@@ -665,6 +665,8 @@ fn check_batch(
     let destination_relation = arm == "destination-direct";
     assert_eq!(public["schema"], "isogeny_dual_batch_public/v1");
     assert_eq!(checker["schema"], "isogeny_dual_batch_checker/v1");
+    assert!(public.get("selection_seed").is_none());
+    assert_eq!(checker["selection_seed"], 0x2026_1118_0064u64);
     assert_eq!(checker["public_sha256"], sha256_hex(&public_bytes));
     assert_eq!(public["prior_public_sha256"], sha256_hex(&prior_bytes));
     assert_eq!(public["targets"].as_array().unwrap().len(), 64);
