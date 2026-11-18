@@ -324,6 +324,17 @@ struct BatchAddScratch {
     inv: Vec<K>,
 }
 
+impl BatchAddScratch {
+    fn with_capacity(capacity: usize) -> Self {
+        Self {
+            active: Vec::with_capacity(capacity),
+            den: Vec::with_capacity(capacity),
+            prefix: Vec::with_capacity(capacity),
+            inv: Vec::with_capacity(capacity),
+        }
+    }
+}
+
 pub struct FastEc<'a> {
     f: &'a FastF3,
     a2: K,
@@ -436,7 +447,7 @@ impl<'a> FastEc<'a> {
 
     pub fn batch_add(&self, points: &[EP], jumps: &[EP]) -> Vec<EP> {
         let mut out = Vec::with_capacity(points.len());
-        let mut scratch = BatchAddScratch::default();
+        let mut scratch = BatchAddScratch::with_capacity(points.len());
         self.batch_add_into(points, jumps, &mut out, &mut scratch);
         out
     }
@@ -597,6 +608,23 @@ struct StepScratch {
     addends: Vec<EP>,
     candidates: Vec<EP>,
     batch_add: BatchAddScratch,
+}
+
+impl StepScratch {
+    fn with_capacity(capacity: usize) -> Self {
+        Self {
+            first: Vec::with_capacity(capacity),
+            chosen: Vec::with_capacity(capacity),
+            next: Vec::with_capacity(capacity),
+            next_hash: Vec::with_capacity(capacity),
+            pending: Vec::with_capacity(capacity),
+            retry: Vec::with_capacity(capacity),
+            points: Vec::with_capacity(capacity),
+            addends: Vec::with_capacity(capacity),
+            candidates: Vec::with_capacity(capacity),
+            batch_add: BatchAddScratch::with_capacity(capacity),
+        }
+    }
 }
 
 /// One quotient-walk step for every lane, with the frozen rho-neg look-ahead
@@ -778,7 +806,7 @@ pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> Stro
     let mask = (1u64 << opts.dp_bits) - 1;
     let tail_cap = 20u64 << opts.dp_bits;
     let mut table: HashMap<K, (K, u64, u64)> = HashMap::with_capacity(128);
-    let mut scratch = StepScratch::default();
+    let mut scratch = StepScratch::with_capacity(opts.batch);
     let (mut steps, mut restarts, mut lookahead, mut cycles, mut cycle_adds) =
         (0u64, 0u64, 0u64, 0u64, 0u64);
     let mut found = None;
