@@ -120,3 +120,10 @@ cannot be met).
 - Binary reused rather than rebuilt: the study changes no code, and the validated binary avoids the stale-`target/` hazard.
 - Raw sessions stay in the scratchpad as gzip archives pinned by sha256 (disk limit); verify reports are summarised in
   `data/`.
+
+## Amendment A1 (2026-11-18, after data; I/O only)
+
+`analysis/evaluate.py` read the single-session comparison schema (`ecbench.comparison/v2`, field `ops`) and stopped on the
+first pooled comparison, which `ecbench compare` writes as `ecbench.pooled_comparison/v1` (top-level `ratio_b_over_a`,
+`ci95`, `ci95_bootstrap`, `pairs`, `admissible`). The fix reads both schemas; the test, thresholds, arms and sessions are
+unchanged. The incumbent/rho mean-S printout fields were dropped (not part of any test). Ratios were first read on that rerun.

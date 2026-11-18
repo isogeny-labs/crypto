@@ -152,12 +152,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261118T0510Z-koblitz-known-log-columns",
+  "latest_record": "20261118T0806Z-ksum-retune-tableb",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 30 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 17,
     "invalid": 8,
-    "measured": 288,
+    "measured": 290,
     "open": 13
   },
   "repo": "crypto",
@@ -16356,6 +16356,318 @@
       ],
       "problem": "ic:ksum_prune_tableb",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9325,
+      "latest": 0.9325,
+      "latest_derived": {},
+      "metric": "pilot_rule_r0_b24_k6n9_over_k5n9_w0",
+      "points": [
+        {
+          "commit": "c3a74728459f",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 64,
+          "record": "20261118T0759Z-ksum-retune-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8743,
+            0.9946
+          ],
+          "summary": "[pcc:unverified] Sizing pilot (not data) for the k-sum (k, N) rule on Table B (8 rows, 92 arms, 64 targets, 1 round, fresh seeds): model optimum = empirical best on 6/8 rows; R0 helps B24 only (0.932 [0.874, 0.995] w=0), P24 1.016, B27 1.061 at w=1 -> revision R1 (w=0.1 objective). Raw pilot-sessions.tar.gz (scratchpad, sha256 a2ba7a4a...). No S3.",
+          "value": 0.9325
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.061,
+      "latest": 1.061,
+      "latest_derived": {},
+      "metric": "pilot_rule_r0_b27_k7n10_over_k5n12_w1",
+      "points": [
+        {
+          "commit": "c3a74728459f",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 64,
+          "record": "20261118T0759Z-ksum-retune-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.126
+          ],
+          "summary": "[pcc:unverified] Sizing pilot (not data) for the k-sum (k, N) rule on Table B (8 rows, 92 arms, 64 targets, 1 round, fresh seeds): model optimum = empirical best on 6/8 rows; R0 helps B24 only (0.932 [0.874, 0.995] w=0), P24 1.016, B27 1.061 at w=1 -> revision R1 (w=0.1 objective). Raw pilot-sessions.tar.gz (scratchpad, sha256 a2ba7a4a...). No S3.",
+          "value": 1.061
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.016,
+      "latest": 1.016,
+      "latest_derived": {},
+      "metric": "pilot_rule_r0_p24_k6n10_over_k5n11_w0",
+      "points": [
+        {
+          "commit": "c3a74728459f",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 64,
+          "record": "20261118T0759Z-ksum-retune-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.968,
+            1.066
+          ],
+          "summary": "[pcc:unverified] Sizing pilot (not data) for the k-sum (k, N) rule on Table B (8 rows, 92 arms, 64 targets, 1 round, fresh seeds): model optimum = empirical best on 6/8 rows; R0 helps B24 only (0.932 [0.874, 0.995] w=0), P24 1.016, B27 1.061 at w=1 -> revision R1 (w=0.1 objective). Raw pilot-sessions.tar.gz (scratchpad, sha256 a2ba7a4a...). No S3.",
+          "value": 1.016
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0237,
+      "latest": 1.0237,
+      "latest_derived": {},
+      "metric": "ratio_retuned_over_incumbent_w0_b18",
+      "points": [
+        {
+          "commit": "fdc66e8622ae",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 432,
+          "record": "20261118T0806Z-ksum-retune-tableb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0029,
+            1.0449
+          ],
+          "summary": "[pcc:unverified] Null: an r-only (k, N) sizing rule (R1) for the k-sum -psr arm holds on no Table B row under the registered all-weights per-replicate test. B24 k6N9/k5N9 0.9685 [0.942, 0.995; boot up 1.003] w=0, 0.956 w=0.1, 0.912 w=1 (r2 = 1.000 at w=0); P24 1.002; B18 1.024 w=0 / 0.991 w=1; other 5 rows unchanged. Gap to rho-neg unchanged at 2.78-4.97 (w=0). Local L0, no S3 (deviation).",
+          "value": 1.0237
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9685,
+      "latest": 0.9685,
+      "latest_derived": {},
+      "metric": "ratio_retuned_over_incumbent_w0_b24",
+      "points": [
+        {
+          "commit": "fdc66e8622ae",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 432,
+          "record": "20261118T0806Z-ksum-retune-tableb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9424,
+            0.9954
+          ],
+          "summary": "[pcc:unverified] Null: an r-only (k, N) sizing rule (R1) for the k-sum -psr arm holds on no Table B row under the registered all-weights per-replicate test. B24 k6N9/k5N9 0.9685 [0.942, 0.995; boot up 1.003] w=0, 0.956 w=0.1, 0.912 w=1 (r2 = 1.000 at w=0); P24 1.002; B18 1.024 w=0 / 0.991 w=1; other 5 rows unchanged. Gap to rho-neg unchanged at 2.78-4.97 (w=0). Local L0, no S3 (deviation).",
+          "value": 0.9685
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.002,
+      "latest": 1.002,
+      "latest_derived": {},
+      "metric": "ratio_retuned_over_incumbent_w0_p24",
+      "points": [
+        {
+          "commit": "fdc66e8622ae",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 432,
+          "record": "20261118T0806Z-ksum-retune-tableb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9772,
+            1.0274
+          ],
+          "summary": "[pcc:unverified] Null: an r-only (k, N) sizing rule (R1) for the k-sum -psr arm holds on no Table B row under the registered all-weights per-replicate test. B24 k6N9/k5N9 0.9685 [0.942, 0.995; boot up 1.003] w=0, 0.956 w=0.1, 0.912 w=1 (r2 = 1.000 at w=0); P24 1.002; B18 1.024 w=0 / 0.991 w=1; other 5 rows unchanged. Gap to rho-neg unchanged at 2.78-4.97 (w=0). Local L0, no S3 (deviation).",
+          "value": 1.002
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0169,
+      "latest": 1.0169,
+      "latest_derived": {},
+      "metric": "ratio_retuned_over_incumbent_w0p1_b18",
+      "points": [
+        {
+          "commit": "fdc66e8622ae",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 432,
+          "record": "20261118T0806Z-ksum-retune-tableb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.995,
+            1.0392
+          ],
+          "summary": "[pcc:unverified] Null: an r-only (k, N) sizing rule (R1) for the k-sum -psr arm holds on no Table B row under the registered all-weights per-replicate test. B24 k6N9/k5N9 0.9685 [0.942, 0.995; boot up 1.003] w=0, 0.956 w=0.1, 0.912 w=1 (r2 = 1.000 at w=0); P24 1.002; B18 1.024 w=0 / 0.991 w=1; other 5 rows unchanged. Gap to rho-neg unchanged at 2.78-4.97 (w=0). Local L0, no S3 (deviation).",
+          "value": 1.0169
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9556,
+      "latest": 0.9556,
+      "latest_derived": {},
+      "metric": "ratio_retuned_over_incumbent_w0p1_b24",
+      "points": [
+        {
+          "commit": "fdc66e8622ae",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 432,
+          "record": "20261118T0806Z-ksum-retune-tableb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.929,
+            0.9831
+          ],
+          "summary": "[pcc:unverified] Null: an r-only (k, N) sizing rule (R1) for the k-sum -psr arm holds on no Table B row under the registered all-weights per-replicate test. B24 k6N9/k5N9 0.9685 [0.942, 0.995; boot up 1.003] w=0, 0.956 w=0.1, 0.912 w=1 (r2 = 1.000 at w=0); P24 1.002; B18 1.024 w=0 / 0.991 w=1; other 5 rows unchanged. Gap to rho-neg unchanged at 2.78-4.97 (w=0). Local L0, no S3 (deviation).",
+          "value": 0.9556
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0022,
+      "latest": 1.0022,
+      "latest_derived": {},
+      "metric": "ratio_retuned_over_incumbent_w0p1_p24",
+      "points": [
+        {
+          "commit": "fdc66e8622ae",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 432,
+          "record": "20261118T0806Z-ksum-retune-tableb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9763,
+            1.0287
+          ],
+          "summary": "[pcc:unverified] Null: an r-only (k, N) sizing rule (R1) for the k-sum -psr arm holds on no Table B row under the registered all-weights per-replicate test. B24 k6N9/k5N9 0.9685 [0.942, 0.995; boot up 1.003] w=0, 0.956 w=0.1, 0.912 w=1 (r2 = 1.000 at w=0); P24 1.002; B18 1.024 w=0 / 0.991 w=1; other 5 rows unchanged. Gap to rho-neg unchanged at 2.78-4.97 (w=0). Local L0, no S3 (deviation).",
+          "value": 1.0022
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9912,
+      "latest": 0.9912,
+      "latest_derived": {},
+      "metric": "ratio_retuned_over_incumbent_w1_b18",
+      "points": [
+        {
+          "commit": "fdc66e8622ae",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 432,
+          "record": "20261118T0806Z-ksum-retune-tableb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9654,
+            1.0176
+          ],
+          "summary": "[pcc:unverified] Null: an r-only (k, N) sizing rule (R1) for the k-sum -psr arm holds on no Table B row under the registered all-weights per-replicate test. B24 k6N9/k5N9 0.9685 [0.942, 0.995; boot up 1.003] w=0, 0.956 w=0.1, 0.912 w=1 (r2 = 1.000 at w=0); P24 1.002; B18 1.024 w=0 / 0.991 w=1; other 5 rows unchanged. Gap to rho-neg unchanged at 2.78-4.97 (w=0). Local L0, no S3 (deviation).",
+          "value": 0.9912
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9117,
+      "latest": 0.9117,
+      "latest_derived": {},
+      "metric": "ratio_retuned_over_incumbent_w1_b24",
+      "points": [
+        {
+          "commit": "fdc66e8622ae",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 432,
+          "record": "20261118T0806Z-ksum-retune-tableb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8833,
+            0.941
+          ],
+          "summary": "[pcc:unverified] Null: an r-only (k, N) sizing rule (R1) for the k-sum -psr arm holds on no Table B row under the registered all-weights per-replicate test. B24 k6N9/k5N9 0.9685 [0.942, 0.995; boot up 1.003] w=0, 0.956 w=0.1, 0.912 w=1 (r2 = 1.000 at w=0); P24 1.002; B18 1.024 w=0 / 0.991 w=1; other 5 rows unchanged. Gap to rho-neg unchanged at 2.78-4.97 (w=0). Local L0, no S3 (deviation).",
+          "value": 0.9117
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0029,
+      "latest": 1.0029,
+      "latest_derived": {},
+      "metric": "ratio_retuned_over_incumbent_w1_p24",
+      "points": [
+        {
+          "commit": "fdc66e8622ae",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 432,
+          "record": "20261118T0806Z-ksum-retune-tableb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9731,
+            1.0335
+          ],
+          "summary": "[pcc:unverified] Null: an r-only (k, N) sizing rule (R1) for the k-sum -psr arm holds on no Table B row under the registered all-weights per-replicate test. B24 k6N9/k5N9 0.9685 [0.942, 0.995; boot up 1.003] w=0, 0.956 w=0.1, 0.912 w=1 (r2 = 1.000 at w=0); P24 1.002; B18 1.024 w=0 / 0.991 w=1; other 5 rows unchanged. Gap to rho-neg unchanged at 2.78-4.97 (w=0). Local L0, no S3 (deviation).",
+          "value": 1.0029
+        }
+      ],
+      "problem": "ic:ksum_retune_tableb",
+      "unit": "ratio"
     },
     {
       "better": "lower",

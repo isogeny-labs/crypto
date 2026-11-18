@@ -9,10 +9,13 @@ ROWS = ["P24", "B18", "B24"]; WS = ["0", "0.1", "1"]
 def cmp(dirs, a, b, w):
     args = [B, "compare"] + sum([["--dir", d] for d in dirs], []) + ["--a", a, "--b", b, "--weight", w, "--resamples", "4000", "--seed", "20261118", "--json"]
     j = json.loads(subprocess.run(args, capture_output=True, text=True, check=True).stdout)
-    o = j["ops"]; c = j["curves"][0]
-    return {"ratio": o["ratio_b_over_a"], "ci95": o["ci95"], "ci95_bootstrap": c.get("ci95_bootstrap"), "pairs": o["pairs"],
-            "upper": max(o["ci95"][1], (c.get("ci95_bootstrap") or [0, 0])[1]), "lower": min(o["ci95"][0], (c.get("ci95_bootstrap") or [9, 9])[0]),
-            "admissible": o.get("status") == "ok", "s_a": j["a"]["mean_s"], "s_b": j["b"]["mean_s"]}
+    if "ops" in j:  # one session: ecbench.comparison/v2
+        o = j["ops"]; c = j["curves"][0]
+        ratio, ci, boot, pairs, ok = o["ratio_b_over_a"], o["ci95"], c.get("ci95_bootstrap"), o["pairs"], o.get("status") == "ok"
+    else:  # several sessions: ecbench.pooled_comparison/v1 (amendment A1: I/O only)
+        ratio, ci, boot, pairs, ok = j["ratio_b_over_a"], j["ci95"], j.get("ci95_bootstrap"), j["pairs"], bool(j.get("admissible"))
+    return {"ratio": ratio, "ci95": ci, "ci95_bootstrap": boot, "pairs": pairs,
+            "upper": max(ci[1], (boot or [0, 0])[1]), "lower": min(ci[0], (boot or [9, 9])[0]), "admissible": ok}
 
 
 res = {"rows": {}}
