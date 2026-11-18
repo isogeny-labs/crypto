@@ -234,6 +234,15 @@ affine x-values across the same eight cells, with per-cell raw capacities from
 16 to 1,236, and independently reconstructs the nonzero degree-|S| polynomial
 that vanishes on every sample. This measures capacity only; the actual H116
 map, poles and degree certificate remain open. [pcc:unverified]
+The first attempt to instantiate that bridge retained a useful failure: it
+mistook `ker(V-1)` for `E(F_p)`. Lean now proves the corrected kernel
+eigenrelation `pi(P)=[t-1]P` for every `V`-fixed point and its iterated
+fixed-locus form. The frozen v2 joint reconstruction then recovers three full
+base-field rational x-maps of degrees `(7,6)`, `(5,4)` and `(14,13)` from two
+independent interpolation windows. All eight extension cells agree within
+their base-curve family, all 2,524 regular evaluations match, and the predicted
+visible-kernel sizes match. Generic degree, cyclicity, scheme semantics and
+local-series transport remain open. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

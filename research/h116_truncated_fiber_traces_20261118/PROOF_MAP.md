@@ -627,6 +627,20 @@ numerators, denominators, pole set and cross-product degree remain open
 certificate inputs; no morphism or speedup follows from capacity alone.
 [pcc:unverified]
 
+The subsequent split-pole reconstruction deliberately failed: it had
+incorrectly identified `ker(V-1)` with `E(F_p)=ker(pi-1)`. The failure exposed
+the right eigenspace. On a point fixed by `V`, the sum identity forces
+`pi(P)=[t-1]P`; Lean proves this, proves its `n`-fold iteration, and proves that
+Frobenius fixed-locus membership on `ker(V-1)` is exactly the scalar fixed
+condition. The corrected frozen v2 experiment jointly solves for numerator
+and denominator without requiring split roots. Both `2N`-sample windows have
+full rank in all eight cells and recover identical degree-`(N,N-1)` base-field
+maps. The maps are stable across extension degrees and have zero mismatches on
+2,524 regular x-values. The cyclic-kernel prediction
+`gcd(N,(t-1)^d-1)` matches every observed kernel, but cyclicity and the generic
+degree/cardinality statement remain open elliptic obligations.
+[pcc:unverified]
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

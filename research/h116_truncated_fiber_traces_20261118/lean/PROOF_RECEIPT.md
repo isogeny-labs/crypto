@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-63ba08391dcf0de78d97df5b173d400c85f212cbd4f615f74d25573c6bde5588  H116FiberTrace.lean
+0399fa0d64f2d6915c67fc5530fa085eb249dc770a3942f0738ab1683b53a71e  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  121 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  124 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -52,6 +52,8 @@ b04c0644adf3fbb0fe15e4cbe36456b2bec88be2f226f29e2c6376066161068a  receipts/perio
 b469ffae036437ff01c0318340771c04e62b1fded7b7eb2775d16631f71cbcc3  receipts/rational-separation-audit.txt
 91f194daf08ff0c6c4d6455a9d30c86ee468a35b172bdc17a29fc0f43eeed1a7  receipts/rational-separation-first-build-failure.txt
 673b57e3ca150bf88154f6193e14278944aae9de240501e4ae32d5036c665744  receipts/rational-separation-second-build-failure.txt
+b7efb787302ea2dfa9aa223d42ac1aec148da29a8a2c358b08a34b1b59c4dc5f  receipts/kernel-eigenspace-build.txt
+64bc81bfa8577086492d0220e137ffb82dac8306a3b6df28300096475c456d9e  receipts/kernel-eigenspace-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -220,6 +222,14 @@ the field cardinality, and vanishes everywhere.  The interface does not
 construct the H116 rational map, bound its cross-product degree, or audit its
 poles; those remain explicit hypotheses, so no algorithmic or asymptotic
 conclusion follows. [pcc:unverified]
+
+The 124-theorem checkpoint formalizes the kernel-eigenspace mechanism exposed
+by the retained reconstruction failure.  From `V+pi=[trace]`, every point fixed
+by `V` satisfies `pi(P)=[trace-1]P`; iteration gives
+`pi^n(P)=[(trace-1)^n]P`, so the degree-`n` Frobenius fixed-locus condition on
+`ker(V-1)` is exactly the corresponding scalar condition.  This proves the
+eigenvalue reduction but not the cyclic-kernel cardinality formula used as a
+finite-panel prediction. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

@@ -868,6 +868,53 @@ theorem endomorphism_sub_one_eq_trace_sub_one_sub
   rw [hV, Int.cast_sub, Int.cast_one]
   abel
 
+/-- On a point fixed by Verschiebung, the sum identity `V+pi=[trace]`
+specializes Frobenius to the scalar eigenvalue `trace-1`.  This is the kernel
+eigenspace mechanism exposed by the retained rational-reconstruction v1
+failure. -/
+theorem endomorphism_frobenius_eigen_on_verschiebung_fixed
+    {G : Type*} [AddCommGroup G]
+    (verschiebung pi : AddMonoid.End G) (trace : ℤ)
+    (hsum : verschiebung + pi = (trace : AddMonoid.End G))
+    (point : G) (hfixed : verschiebung point = point) :
+    pi point = (trace - 1) • point := by
+  have hpoint := DFunLike.congr_fun hsum point
+  change verschiebung point + pi point = trace • point at hpoint
+  rw [hfixed] at hpoint
+  have hpi : pi point = trace • point - point :=
+    eq_sub_of_add_eq (by simpa [add_comm] using hpoint)
+  rw [hpi]
+  simpa only [one_zsmul, sub_eq_add_neg] using
+    (sub_zsmul point trace 1).symm
+
+/-- Iterating an additive-endomorphism eigenrelation raises its integer
+eigenvalue to the same natural power. -/
+theorem endomorphism_iterate_eigen
+    {G : Type*} [AddCommGroup G]
+    (pi : AddMonoid.End G) (eigenvalue : ℤ) (point : G)
+    (heigen : pi point = eigenvalue • point) :
+    ∀ n : ℕ, (pi ^ n) point = (eigenvalue ^ n) • point := by
+  intro n
+  induction n with
+  | zero => simp
+  | succ n ih =>
+      rw [pow_succ]
+      change (pi ^ n) (pi point) = _
+      rw [heigen, map_zsmul, ih, pow_succ]
+      simp [mul_comm, mul_smul]
+
+/-- Consequently, on `ker(V-1)`, membership in a degree-`n` Frobenius fixed
+locus is exactly the scalar condition `[(trace-1)^n]P=P`. -/
+theorem endomorphism_frobenius_fixedLocus_iff_scalar_on_verschiebung_fixed
+    {G : Type*} [AddCommGroup G]
+    (verschiebung pi : AddMonoid.End G) (trace : ℤ)
+    (hsum : verschiebung + pi = (trace : AddMonoid.End G))
+    (point : G) (hfixed : verschiebung point = point) (n : ℕ) :
+    (pi ^ n) point = point ↔ ((trace - 1) ^ n) • point = point := by
+  rw [endomorphism_iterate_eigen pi (trace - 1) point
+    (endomorphism_frobenius_eigen_on_verschiebung_fixed
+      verschiebung pi trace hsum point hfixed)]
+
 /-- An additive endomorphism that vanishes on a set of additive generators
 vanishes everywhere. This is the proof-carrying interface used to compress a
 finite point-group characteristic check. -/
@@ -2556,6 +2603,9 @@ theorem rationalMap_separation_strict_control :
 #print axioms zmodAffineFrobenius_mul_verschiebung
 #print axioms zmodAffineVerschiebung_sum_of_characteristic
 #print axioms endomorphism_sub_one_eq_trace_sub_one_sub
+#print axioms endomorphism_frobenius_eigen_on_verschiebung_fixed
+#print axioms endomorphism_iterate_eigen
+#print axioms endomorphism_frobenius_fixedLocus_iff_scalar_on_verschiebung_fixed
 #print axioms zmodAffineVerschiebung_sub_one_eq
 #print axioms zmodAffineVerschiebung_sub_one_localParameter
 #print axioms endomorphism_eq_zero_of_eq_zero_on_generators
