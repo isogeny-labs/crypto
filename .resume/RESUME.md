@@ -17,20 +17,20 @@ should preserve the exact walk and remove one priced `F_q` multiplication per
 1, target 0, `ic-repeat`, `strong-b8`, calibration triples 3, one thread.
 
 ## State
-Fresh branch `codex/ghs-rho-opt-20261118` at the baseline revision. Literature
-and source audit complete; research-KB and Conductor executables unavailable.
-Round B is frozen before candidate implementation or measurement. No run has
-started and no result or frontier claim exists.
+Round B was frozen at `90c3faf97b`. The five-product square and its count
+assertions are implemented. Standalone self-test and the deterministic q=223
+producer control pass; raw records show the same walk and exactly 5,500 fewer
+`fq_mul`, one per `f3_sq`. Research-KB and Conductor executables are
+unavailable. Checkpoint push/gate exited 1 because no upload transport exists,
+so no profile, isolated timing, or frontier run was started.
 
 ## Next steps
-1. Commit and push this protocol/handoff, then run `scripts/checkpoint.sh push`
-   and `scripts/checkpoint.sh gate`.
-2. Probe/profile the baseline with `tools/profile.sh`, retaining unsupported
-   output if applicable.
-3. Implement and test the five-product square, compare exact counts and
-   identity, then run the frozen A/A and ABAB local diagnostic.
-4. Archive the evidence, update the report/session log, run scoped and full
-   required tests, push, open a ready PR, and enable auto-merge.
+1. Commit and push the implementation, raw correctness/count evidence, report,
+   and session-log entry; open a ready PR and enable auto-merge.
+2. When checkpoint transport exists, rerun `scripts/checkpoint.sh push` and
+   `gate`, then profile baseline/candidate with `tools/profile.sh`.
+3. Run the frozen A/A and five-pair ABAB local diagnostic, followed by the
+   separately admitted complete grid before any frontier update.
 
 ## Runs in flight
 None.
