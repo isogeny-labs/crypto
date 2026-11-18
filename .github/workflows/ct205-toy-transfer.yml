@@ -42,6 +42,7 @@ jobs:
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct218_full_norm_ic.py
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct218_f101_full_norm_ic.json
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct219_anchor_free_cold_cost.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct220_split_prime_order_obstruction.py
       - name: Recount quotient curves, Jacobian and sextic-twist obstruction
         run: |
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
@@ -60,6 +61,9 @@ jobs:
           cat /tmp/ct218.json
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct219_anchor_free_cold_cost.py --self-test
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct219_anchor_free_cold_cost.py --paired
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct220_split_prime_order_obstruction.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct220_split_prime_order_obstruction.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct220_split_prime_order_obstruction.py
 
   native-toy-dlp:
     runs-on: ubuntu-latest
