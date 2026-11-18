@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/ct205-toy-transfer.yml'
       - 'tests/prime_cover_toy_complete_dlp.rs'
+      - 'tests/prime_cover_toy_cold_cost.rs'
       - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
       - 'src/prime_hyperelliptic/**'
       - 'Cargo.toml'
@@ -54,6 +55,7 @@ jobs:
             !/*/
             /src/
             /tests/prime_cover_toy_complete_dlp.rs
+            /tests/prime_cover_toy_cold_cost.rs
             /.cargo/
             /build.rs
             /crates/
@@ -79,5 +81,7 @@ jobs:
         run: |
           (cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204 && python3 -m unittest -v test_ct209_native_source_preflight.py)
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py .
-      - name: Compile and actually execute all toy logs
-        run: cargo test --locked --release --test prime_cover_toy_complete_dlp -- --nocapture
+      - name: Compile and execute all toy logs plus paired fresh-state cost probe
+        run: |
+          cargo test --locked --release --test prime_cover_toy_complete_dlp -- --nocapture
+          cargo test --locked --release --test prime_cover_toy_cold_cost -- --nocapture
