@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T20:28:13Z",
+ "id": "PCC-20261118-79dc2c",
+ "kind": "statement",
+ "producer": {
+  "commit": "41a9134f54e4819f0cdbee617f44bc79fb9c8b9d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/metric-committed-qualification.json",
+    "sha256": "2d0de108470b0e1e5efffc84e600afdb8745d42e8f31e1df72d101168a99e715"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/integration/full-export.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/integration/full-export.stderr",
+    "sha256": "093f4606519a6b0b56b57d1a4f5a9c9dabae37a920c6ebae7c07f513dd85687a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/integration/full-export-partial.jsonl",
+    "sha256": "90578cd5174b23f7426994c149c2b4cc067adb29548019adf8f7005ec5af39d5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/integration/artifact-head.stdout",
+    "sha256": "de4c57363b3eb305d9d45331605688071192d22336046520121475abc0b284e8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/integration/artifact-head.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/memory-frontier-20261118",
+ "statement": "Scoped committed-state export emits the three neutral source-model rows from 41a9134f54e4 with exact recorded values and no RSS/timing/crossing assertion. Full export exits1 on unchanged legacy timeline JSON line565 column6; retained partial stdout is incomplete. The committed-head store check flags only the earlier wide-harness archive. Audit evidence publication does not establish a completed target isogeny or paired endpoint measurements."
+}

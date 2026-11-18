@@ -133,3 +133,19 @@ from conductor-bit and measured-crossing series. Prior immutable graphs are
 unchanged because their narrower source/phase scope remains valid. No
 benchmark/leaderboard frontier moves. Primary source locations and unavailable
 KB/Lean status are in the scope/derivation records.
+
+
+## Committed exporter and publication check
+
+The scoped committed-state exporter emits all three neutral rows from
+41a9134f54e4 with their exact native values and explicit scope labels. The
+full command exits 1 on unchanged docs/ic/progress-timeline.json (line 565,
+column 6); its partial stdout is not a completed export. The timeline blob
+matches the parent commit. Development/committed metric checks do not claim
+a passing full exporter. [pcc:unverified]
+
+The committed-head store check flags only the earlier 318420-byte wide-harness
+archive. This audit's 2984-byte deterministic archive, required SVG/PDF and
+named evidence satisfy their configured thresholds. No signed store retry,
+new upload or live experiment has been attempted. PR remains draft.
+[pcc:unverified]
