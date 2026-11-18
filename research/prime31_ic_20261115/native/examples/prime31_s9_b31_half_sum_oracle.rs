@@ -2000,7 +2000,7 @@ mod b31_negation_quotient_tests {
         assert_eq!(exhaustive_negatives, 12);
 
         // Identity and same-x/tangent/add-inverse branches must use original EC.
-        let rp = reps.iter().find_map(|r| r.point).expect("nonzero 4A point");
+        let rp = reps.iter().map(|r| r.point).find(|p| p.is_some()).expect("nonzero 4A point");
         let cases = [None, rp, ar.neg(PRIME31, rp), Some(PRIME31.g)];
         let mut corner_verified = 0;
         for &r in &cases {
