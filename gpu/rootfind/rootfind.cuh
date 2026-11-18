@@ -277,12 +277,16 @@ RF_HD void rf_pair_run(const Fp64Ctx &f, uint64_t a_m, const uint64_t *x, const 
             keys[b + 1] = RF_PAIR_EMPTY; /* P - P */
             continue;
         }
-        const uint64_t x2 = x[bi];
-        for (int sg = 0; sg < 2; sg++) {
-            const uint64_t y2 = sg ? F::sub(f, 0, y[bi]) : y[bi];
-            const uint64_t lam = F::mul(f, F::sub(f, y2, y1), d[k]);
-            keys[b + sg] = F::sub(f, F::sub(f, F::sqr(f, lam), x1), x2);
-        }
+        /* The negative-sign slope is -(y2+y1)/d, whose square is
+         * identical to +(y2+y1)^2/d^2. Avoid neg(y2) and share x1+x2
+         * across both signs. This saves a negation and one modular
+         * reduction per non-diagonal pair without changing its keys. */
+        const uint64_t x2 = x[bi], y2 = y[bi];
+        const uint64_t xsum = F::add(f, x1, x2);
+        const uint64_t lam0 = F::mul(f, F::sub(f, y2, y1), d[k]);
+        const uint64_t lam1 = F::mul(f, F::add(f, y2, y1), d[k]);
+        keys[b] = F::sub(f, F::sqr(f, lam0), xsum);
+        keys[b + 1] = F::sub(f, F::sqr(f, lam1), xsum);
     }
 }
 
@@ -564,11 +568,14 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
         const elt inv = d[w];
         const elt lam_m = F::mul(f, F::add(f, yr, yi), inv);   /* eps = +1: R - F_i */
         const elt lam_p = F::mul(f, F::sub(f, yr, yi), inv);   /* eps = -1: R + F_i */
+        /* x3 = lam^2 - (xr+xi), for both signs: one shared modular
+         * addition replaces two independent pairs of subtractions. */
+        const elt xsum = F::add(f, xr, xi);
 #if RF_PROBE_PAIR
         /* both lookups start before either is walked (begin2); the walks
          * below then run eps = +1 first, as in the unpaired loop */
-        const elt x3_m = F::sub(f, F::sub(f, F::sqr(f, lam_m), xr), xi);
-        const elt x3_p = F::sub(f, F::sub(f, F::sqr(f, lam_p), xr), xi);
+        const elt x3_m = F::sub(f, F::sqr(f, lam_m), xsum);
+        const elt x3_p = F::sub(f, F::sqr(f, lam_p), xsum);
         uint32_t pos_m, pos_p;
         {
             RF_PROF_PROBE_START();
@@ -586,7 +593,7 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
             RF_PROF_PROBE_START();
             uint32_t pos = s == 0 ? pos_m : pos_p;
 #else
-            const elt x3 = F::sub(f, F::sub(f, F::sqr(f, lam), xr), xi);
+            const elt x3 = F::sub(f, F::sqr(f, lam), xsum);
             const uint64_t key = F::key(f, x3);
             RF_PROF_PROBE_START();
             uint32_t pos = table.begin(key);
