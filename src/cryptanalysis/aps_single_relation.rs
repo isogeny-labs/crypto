@@ -563,8 +563,11 @@ pub struct AlgebraReport {
     /// standard monomials than the semi-regular expectation (first fall), the
     /// largest (last fall), and the first degree the quotient vanishes
     /// (observed degree of regularity). `None` when no solve recorded them.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub first_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub last_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub degree_of_regularity_observed: Option<u32>,
     /// Absent for the legacy scan: its root-stage work is not instrumented.
     pub roots: Option<RootDiagnostics>,

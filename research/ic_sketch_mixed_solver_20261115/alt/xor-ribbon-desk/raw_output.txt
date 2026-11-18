@@ -1,0 +1,99 @@
+# N83 XOR/ribbon desk model  [pcc:unverified]  rows read: 100
+
+## 1. Measured index layouts versus the retrieval-structure bound
+
+bits/entry = table_bytes*8/root_table_entries (measured allocation). payload = bits
+a slot carries (root4: 32 = 31-bit state id + selector; root11: 40 = 5-byte slot).
+floor(f)=f bits/entry (any retrieval structure); xor=1.23 f; ribbon=1.005f..1.10f.
+
+| layout | K | entries | table GiB | bits/entry | payload | load-overhead x | xor 1.23 | ribbon 1.005 | ribbon 1.10 |
+|---|---|---|---|---|---|---|---|---|---|
+| root11 | 3300 | 903852075 | 5.000 | 47.52 | 40 | 1.188 | 49.2 | 40.2 | 44.0 |
+| root11 | 3350 | 931448963 | 5.000 | 46.11 | 40 | 1.153 | 49.2 | 40.2 | 44.0 |
+| root11 | 3450 | 987887478 | 5.000 | 43.48 | 40 | 1.087 | 49.2 | 40.2 | 44.0 |
+| root11 | 3500 | 1016729255 | 5.000 | 42.24 | 40 | 1.056 | 49.2 | 40.2 | 44.0 |
+| root11 | 3550 | 1045986026 | 5.000 | 41.06 | 40 | 1.027 | 49.2 | 40.2 | 44.0 |
+| root4 | 3300 | 903852075 | 8.000 | 76.03 | 32 | 2.376 | 39.4 | 32.2 | 35.2 |
+| root4 | 3350 | 931448963 | 8.000 | 73.78 | 32 | 2.306 | 39.4 | 32.2 | 35.2 |
+| root4 | 3425 | 973622246 | 8.000 | 70.58 | 32 | 2.206 | 39.4 | 32.2 | 35.2 |
+| root4 | 3500 | 1016729255 | 8.000 | 67.59 | 32 | 2.112 | 39.4 | 32.2 | 35.2 |
+| root4 | 3550 | 1045986026 | 8.000 | 65.70 | 32 | 2.053 | 39.4 | 32.2 | 35.2 |
+| root4 | 3596 | 1073268803 | 8.000 | 64.03 | 32 | 2.001 | 39.4 | 32.2 | 35.2 |
+
+## 2. Memory model: peak_rss = 11*S + table + bloom + residual
+
+- root11: residual (peak - states - table - bloom) over 51 rows: min 0.438, median 0.456, max 1.527 GB
+- root4: residual (peak - states - table - bloom) over 32 rows: min 0.286, median 0.481, max 0.499 GB
+- constant used for modelled layouts: max root4 residual 0.499 GB (root11 max 1.527 GB comes from rows with no Bloom allocation field, not used)
+- entries per state (median over rows): 1.999953
+- rss_guard_bytes values in rows: [15032385536, 15569256448, 16374562816]
+- guards used: 15.25 GiB (frontier-run guard) and 14.00 GiB (root11 guard)
+
+## 3. K versus cost, from the repository's own rows
+
+- probes/target ~ K^b: n=100 rows, b=-1.985, R^2=0.965, residual sd=0.025 (ln units)
+- fit probes at K3300/K3596: 57115 / 48160
+- anchor (same-host six-arm frontier run, K3596 root4): online 25.951 ms, setup 615.9 s, rank 47.4 s, peak RSS 14.791 GiB
+- rank time ~ K^1.56 (3 K points, frontier run); setup scaled linearly in S(K) (K1107 row is sub-linear: model is pessimistic for setup)
+- ms per probe at anchor: 0.5547 us
+- matched same-point rho (wall clock): geometric mean 2334.964 ms (16 pts, cold_base_confirm); mean 1908.419 ms (5 pts, tier1_combined)
+
+## 4. Largest K inside the same RSS guard (modelled; memory only)
+
+check: model on measured K3596 root4: pred 14.963 GiB vs measured 14.791 GiB
+
+| scenario | Kmax @15.25 GiB | S(Kmax) | Kmax @14 GiB | vs base K@15.25 |
+|---|---|---|---|---|
+| base root4 (measured layout) | 3596 | 536647262 | 3266 | +0 |
+| xor 1.23, f=id+sel, Bloom kept | 4167 | 720603477 | 3974 | +571 |
+| xor 1.23, f=id+sel+8 fp, no Bloom | 4078 | 690150525 | 3902 | +482 |
+| ribbon 1.10, f=id+sel, Bloom kept | 4274 | 758085791 | 4075 | +678 |
+| ribbon 1.10, f=id+sel+8 fp, no Bloom | 4196 | 730668362 | 4014 | +600 |
+| ribbon 1.05, f=id+sel, Bloom kept | 4317 | 773416452 | 4116 | +721 |
+| ribbon 1.05, f=id+sel+8 fp, no Bloom | 4244 | 747480866 | 4060 | +648 |
+| ribbon 1.005, f=id+sel, Bloom kept | 4356 | 787453722 | 4154 | +760 |
+| ribbon 1.005, f=id+sel+8 fp, no Bloom | 4288 | 763060320 | 4103 | +692 |
+
+bytes at K3596 (GB): states 5.90, root4 table 8.59, Bloom 1.07, resid 0.50; ribbon 1.05 f=32 table would be 4.51; xor 1.23: 5.28
+
+## 5. Predicted online / cold cost at Kmax (model: repo K-law, same-host anchor)
+
+online(K) = 25.951 ms * probes_fit(K)/probes_fit(3596) * kappa; kappa = per-probe cost multiplier
+(kappa=1 optimistic: a ribbon/xor probe costs what a Bloom+table probe cost; kappa 1.5/2 pessimistic).
+cold = setup + rank + online; rho = 2334.964 ms (16-pt geometric mean). N* = setup+rank over (rho-online)
+
+| scenario | K | probes | online ms k=1 | k=1.5 | k=2 | setup s | cold s | cold/rho | N* targets to beat rho |
+|---|---|---|---|---|---|---|---|---|---|
+| MEASURED K3596 root4 (anchor, fit-normalised) | 3596 | 48160 | 25.95 | 38.93 | 51.90 | 616 | 663 | 284x | 287 |
+| xor 1.23, f=id+sel, Bloom kept | 4167 | 35943 | 19.37 | 29.05 | 38.74 | 827 | 887 | 380x | 383 |
+| ribbon 1.05, f=id+sel, Bloom kept | 4317 | 33506 | 18.06 | 27.08 | 36.11 | 888 | 951 | 407x | 410 |
+| ribbon 1.005, f=id+sel+8 fp, no Bloom | 4288 | 33958 | 18.30 | 27.45 | 36.60 | 876 | 938 | 402x | 405 |
+| xor 1.23, f=id+sel+8 fp, no Bloom | 4078 | 37517 | 20.22 | 30.32 | 40.43 | 792 | 850 | 364x | 367 |
+
+measured anchor cold = 615.9 + 47.4 + 0.0260 = 663.3 s; cold/rho(geo) = 284x; cold/rho(mean5) = 348x
+measured online gap: rho/IC = 90.0x (geo) at K3596
+
+setup-exponent sensitivity (setup ~ S^0.8 instead of S^1) for the ribbon 1.005 + 8 fp row:
+  K=4288 setup 816 s, cold 879 s, cold/rho 376x
+
+## 6. False-positive verification cost
+
+baseline Bloom K3596: 8589934592 bits; k=3; FPR inserting all roots (n=entries): 0.0305; one key per state (n=states): 0.0050
+- Bloom k=3 (n=entries)    FPR 0.03055 -> 1471 false positives per target; upper bound if each costs a full probe (0.555 us): 0.816 ms = 3.14% of 25.95 ms online
+- Bloom k=3 (n=states)     FPR 0.00499 -> 240 false positives per target; upper bound if each costs a full probe (0.555 us): 0.133 ms = 0.51% of 25.95 ms online
+- xor8 (2^-8)              FPR 0.00391 -> 188 false positives per target; upper bound if each costs a full probe (0.555 us): 0.104 ms = 0.40% of 25.95 ms online
+- fp r=8 in ribbon (2^-8)  FPR 0.00391 -> 188 false positives per target; upper bound if each costs a full probe (0.555 us): 0.104 ms = 0.40% of 25.95 ms online
+- fp r=12                  FPR 0.00024 -> 12 false positives per target; upper bound if each costs a full probe (0.555 us): 0.007 ms = 0.03% of 25.95 ms online
+- with NO prefilter and no fingerprint (retrieval value only): every probe verifies: 48160 state reads/target
+  at 0.1 us per DRAM-missing state read (assumed) = 4.82 ms = 18.6% of anchor online; at the anchor probe cost it is the whole online cost
+
+## 7. Construction memory (not in the RSS model above)
+
+K=3596: key-hash buffer 8 B x entries = 8.59 GB; ribbon banded rows 12 B x rows(1.05 n) = 13.52 GB; xor peel (8 B key + 1 B count)x1.23n = 11.88 GB
+K=4317: key-hash buffer 8 B x entries = 12.37 GB; ribbon banded rows 12 B x rows(1.05 n) = 19.49 GB; xor peel (8 B key + 1 B count)x1.23n = 17.12 GB
+If built unsharded these exceed the final table; sharded/streamed builds are unmeasured here.
+
+## 8. Which lever is this
+
+Counted S (group operations): a larger K needs 166K usable base points (more group operations to generate),
+so this lever does not reduce counted GAE at w=0; it moves only memory and native lookups (w>0). [pcc:unverified]

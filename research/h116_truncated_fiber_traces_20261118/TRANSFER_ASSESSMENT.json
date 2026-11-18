@@ -1,0 +1,108 @@
+{
+  "format": "correspondence-assessment-draft-v1",
+  "assessment_state": "draft",
+  "authority": "companion artifact; not a ledger record or certificate",
+  "source": {
+    "object_uid": "ordinary-E-over-Fp-prime-order-r",
+    "representation_uid": "affine-short-weierstrass-target-Q",
+    "equations": "y^2=x^3+a*x+b",
+    "field": "F_p",
+    "dimension": 1,
+    "subgroup_order": "r=p+1-t prime"
+  },
+  "destination": {
+    "object_uid": "phi-fiber-coordinate-algebra",
+    "representation_uid": "F_u=N-uD and truncated Laurent jet of R=N/D",
+    "equations": "(V-1)(C)=Q",
+    "field": "splitting field for direct control; F_p for candidate jet",
+    "dimension": 0,
+    "ambient_group_order": "r fiber points counted with multiplicity"
+  },
+  "transformation": {
+    "kind": "elliptic-isogeny-fiber-to-quotient-algebra-trace",
+    "family": "phi=V-1 with logarithmic-derivative and residue observables",
+    "degree": "r",
+    "field_of_definition": "F_p",
+    "formulas": "README.md frozen algebraic target",
+    "exceptional_cases": ["a=t-1=0", "2-torsion target", "nonunit recurrence denominator", "inseparable or non-squarefree fiber polynomial"],
+    "normalization": "compose with the u=a coordinate scaling before applying the normalized-isogeny recurrence"
+  },
+  "obligations": {
+    "existence": {"state":"supported","evidence":["H115 factorization and prime-order fixtures", "COHORT_V2_GATE.md independent structural verification"],"scope":"ordinary non-anomalous toy curves"},
+    "explicit_construction": {"state":"unknown","evidence":["JET_CERTIFICATE_EXPERIMENT.md proves fixed-size verification only"],"scope":"construct the correct eleven-coefficient N,D jet without dense degree-r map"},
+    "map_correctness": {"state":"unknown","evidence":[],"scope":"all frozen targets and coordinate isomorphisms"},
+    "subgroup_preservation": {"state":"supported","evidence":["same Q and full fiber of V-1; no destination DLP transfer"],"scope":"prime-order source subgroup"},
+    "computational_advantage": {"state":"unknown","evidence":[],"scope":"cold and online candidate versus direct enumeration"},
+    "scaling_support": {"state":"unknown","evidence":[],"scope":"five deterministic toy sizes only; asymptotic argument separate"}
+  },
+  "preservation_certificate": {
+    "identity": "every reported moment recomputes from all C with (V-1)C=Q",
+    "kernel_intersection": "not_applicable: destination is a fiber trace, not an injective group transfer",
+    "recovery_map": "candidate moments feed the separately frozen radix-six predicate/decoder",
+    "scalar_multiplier": null,
+    "proof_artifact": "PROOF_MAP.md and lean/H116FiberTrace.lean; a full finite certificate and an eleven-coefficient quotient/ten-coefficient curve-identity certificate each imply the recurrence. MAP_CERTIFICATE_EXPERIMENT.md and JET_CERTIFICATE_EXPERIMENT.md record independently replayed excluded-fixture controls"
+  },
+  "mechanism": {
+    "proposed_benefit": "replace r explicit extension-field summands by a fixed-length base-field Laurent calculation",
+    "prediction": "all 16 candidate moments equal direct enumeration on every in-domain target",
+    "falsification_condition": "one independently reproduced mismatch, silent out-of-domain acceptance, or total construction cost requiring degree-r data",
+    "assumptions": ["p>2J+3 for recurrence v1", "non-anomalous a=t-1", "correct normalized coordinate scaling"]
+  },
+  "cost_comparison": {
+    "workload": "all frozen targets; one batch per curve and generator label",
+    "baseline": "explicit H construction and r-term fiber enumeration",
+    "units": "base/extension field operations, bytes, cold ns and online ns",
+    "construction": "measured separately",
+    "transfer": "candidate recurrence and residue extraction",
+    "destination": "648 frozen predicate evaluations",
+    "recovery": "conditional radix-six decoder only if one predicate is exact",
+    "verification": "independent replay of coordinates, moments, scores and scalar equation",
+    "failed_attempts_and_duplicates": "all retained",
+    "memory_and_data": "peak RSS and packet bytes",
+    "setup_reuse": "cold total and exact target count stated; no reuse across curves",
+    "uncertainty": "five EKS measured rounds plus interleaved A/A",
+    "evidence_label": "unmeasured"
+  },
+  "controls": [
+    "identical direct-enumeration A/A arm",
+    "planted separable polynomial with analytically known moments",
+    "p<=2J+3 recurrence rejection fixtures",
+    "lambda=2 coordinate isomorphisms",
+    "shuffled scalar labels and seeded non-eigen lines",
+    "forbidden scalar-label oracle"
+  ],
+  "protocol": {
+    "parameter_scope": "COHORT_RULE_V2.json; original COHORT_RULE.json retained as infeasible at n=5",
+    "sample_selection": "deterministic structural rule frozen before selection",
+    "stopping_rules": "protocol.json",
+    "invalidation_rules": "protocol.json",
+    "hardware_manifest": "EKS L2 receipt",
+    "execution_route": "isolab EKS Spot"
+  },
+  "exploration_boundary": {
+    "families": ["V-1 on ordinary prime-field curves", "J=8 moments", "Bostan recurrence in its unit-denominator range"],
+    "parameters": "53<=p<=2000, d<=6, p^d<=1e10 for the direct control; cap chosen by the precommitted feasibility ladder before affected data",
+    "completed_scope": null,
+    "completeness_claim": "none"
+  },
+  "composition": {
+    "edge_ids": ["Q-to-fiber", "fiber-to-relative-trace", "trace-to-digit-predicate", "digit-to-decoder"],
+    "junction_compatibility": "unknown until independent packet replay",
+    "weakest_open_obligation": "one fixed exact public digit predicate with complete cost"
+  },
+  "sources": [
+    "https://arxiv.org/abs/cs/0609020",
+    "https://arxiv.org/abs/2003.10118",
+    "crypto:problems/split-prime-pattern-scalar-only.md"
+  ],
+  "open_obligations": [
+    "prove trace and residue identities",
+    "construct the correct eleven reversed numerator/denominator coefficients without first constructing the dense degree-r map, and prove that this prefix represents the intended kernel quotient; the fixed certificate already implies the complete recurrence for frozen prime p>19",
+    "construct and validate candidate source",
+    "bind independent verifier before scoring",
+    "measure through EKS and test the fixed predicate family",
+    "prove complete decoder complexity only under an exact predicate premise"
+  ],
+  "recommended_next_action": "freeze protocol, select cohort, then implement producer without reading scalar labels",
+  "official_status_change": "none"
+}

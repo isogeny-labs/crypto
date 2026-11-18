@@ -42,6 +42,10 @@ pub struct Limits {
 }
 impl Limits {
     /// Frozen proposed software limits; no exponential-in-N allocation.
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub const fn software() -> Self {
         Self {
             variables: 4096,
@@ -108,7 +112,15 @@ pub struct Audit {
     pub result: Result<Degrees, Failure>,
     pub charges: Charges,
     /// Always false. Arithmetic equality is not original-system admission.
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub source_authenticated: bool,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub native_operation_witness: bool,
 }
 struct Meter {
@@ -692,7 +704,7 @@ mod tests {
                 target.sort();
                 assert!(check(&wire(
                     2,
-                    &[generator.clone()],
+                    std::slice::from_ref(&generator),
                     &target,
                     &[(0, multiplier.clone())]
                 ))
@@ -707,7 +719,7 @@ mod tests {
                 assert_eq!(
                     check(&wire(
                         2,
-                        &[generator.clone()],
+                        std::slice::from_ref(&generator),
                         &mutated,
                         &[(0, multiplier.clone())]
                     ))

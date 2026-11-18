@@ -1,7 +1,9 @@
-// gpu_calib: device ceilings for tools/optlevel (optlevel.py gpu calibrate).
+// gpu_calib: device ceilings for tools/optlevel (`optlevel gpu calibrate`, which builds this file with nvcc at first use).
 //
-// STATUS: written on a host with no GPU and no nvcc.  It has NOT been
-// compiled or run.  Its first run on a GPU host is its validation: compare
+// STATUS: written on a host with no GPU and no nvcc.  First compiled and run
+// on 2026-11-17 on a rented RTX 2000 Ada (research/hky_pod_runs_20261117): the
+// host re-checks passed, but the driver withheld the performance counters
+// (ERR_NVGPUCTRPERM), so the ncu cross-check below has NOT been done.  Compare
 // each class with `ncu` (sm__throughput for the arithmetic streams,
 // dram__throughput for the triad) and with ecc2k130/benchmarks/roofline/pipes.cu
 // before trusting a record scored against it.  The calibration it produces
