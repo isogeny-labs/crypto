@@ -1,0 +1,9 @@
+# Original-model Kummer pair admission gate [pcc:unverified]
+
+Before measurement freeze and push DERIVATION/source/protocol/import/binary hashes under Git custody while S3 unavailable. One600CPUprocess, overflow checks enabled; preserve failures/no unchanged rerun. No Kummer circuit, DLP solver, timing or speed experiment in this gate.
+
+Algebra controls over F17: exhaust17^4coefficient quadruples and require paired determinant=2(bc-ad) with rank equivalence. Check every a,b with b!=0 for known source shiftQ=D. Test512seeded augmented row pairs (Rng2026112600) for invertible sum/difference and rank preservation. Verify global whole-row negation dependent and reject changing only the decomposition sign with the explicit17example.
+
+Original-model controls: all11initial models/ell values from INSTANCES.tsv, no source substitution. Recompute squarefree factor degrees by native Frobenius/gcd and compare the frozen native-two-kernel census. Enumerate all2^(2g)branch-module classes and require fixed count2^(r-1), including split/five-cycle genus2controls. Independently check ell prime, source nonzero andell*source=0. Compute integer Hasse upper boundU=(ceil(sqrt p)+1)^(2g), require2^(2g)*ell>U. Retain torsion dimensions, rational-point count and bound data. Require genus2original fast-split admission failure on all6actual models; other genera's torsion counts do not certify a fast arithmetic model.
+
+Gate evidence supports the specific full2torsion shortcut exclusion and abstract pair information identities. It does not implement generic Kummer arithmetic, prove an isogeny impossibility beyond the stated divisibility condition, assert novel formulas, show10xgain or resolve genus3/4circuits. Signed recovery/pair extraction/cost obligations remain in DERIVATION.md. Full10xgenus2+goal active; independent review open. NoS3polling/cloud/merge.

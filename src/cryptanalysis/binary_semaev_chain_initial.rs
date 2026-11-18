@@ -173,10 +173,10 @@ fn replay_insertion(
             SolverEvent::Snapshot { trail_limits, .. } => trail_limits.len(),
             SolverEvent::Clause { literals, .. } => literals.len(),
             SolverEvent::XorConstraint { mask, .. } => mask.len(),
-            SolverEvent::Assignment { reason, .. } => match reason {
-                SolverEventReason::Xor { explanation } => explanation.len(),
-                _ => 0,
-            },
+            SolverEvent::Assignment {
+                reason: SolverEventReason::Xor { explanation },
+                ..
+            } => explanation.len(),
             _ => 0,
         } as u64;
         observed_words = add(observed_words, len)?;

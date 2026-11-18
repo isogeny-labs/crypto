@@ -1,0 +1,24 @@
+{
+  "schema": "h116.curve-coordinate-protocol/v1",
+  "protocol_id": "H116-CURVE-COORDINATE-001",
+  "frozen_before_execution": true,
+  "precision": 24,
+  "fixtures": [
+    {"slug": "fp31-r37", "p": 31, "a": 1, "b": 19, "trace": -5},
+    {"slug": "fp211-r197", "p": 211, "a": 2, "b": 24, "trace": 15},
+    {"slug": "fp241-r257", "p": 241, "a": 2, "b": 4, "trace": -15},
+    {"slug": "fp431-r397", "p": 431, "a": 1, "b": 225, "trace": 35},
+    {"slug": "fp587-r547", "p": 587, "a": 1, "b": 342, "trace": 41}
+  ],
+  "scale": "trace-1 mod p",
+  "normalized_parameter": "z + sum_{i=2}^{23}(i^2+3i+1)z^i mod p",
+  "prediction": {
+    "curve_identity_cells": 5,
+    "rescale_matches": 5,
+    "double_substitution_matches": 5,
+    "normalized_ratio_matches": 5,
+    "wrong_scaling_rejected": 5,
+    "wrong_parameter_rejected": 5
+  },
+  "replacement_cells": 0
+}

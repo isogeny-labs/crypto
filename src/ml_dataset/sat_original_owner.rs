@@ -276,6 +276,10 @@ fn decode_into(
 impl<'a> OriginalOwner<'a> {
     /// Original attempt and sink joins precede construction. Reuses the admitted
     /// absolute deadline; no Instant::now()+10 seconds or per-pattern reset.
+    #[allow(
+        clippy::result_large_err,
+        reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+    )]
     pub(super) fn admit(
         original: &'a VerifiedWorkerOriginal<'a>,
         case: &crate::ml_dataset::types::CaseData,
@@ -501,6 +505,10 @@ impl<'a> OriginalOwner<'a> {
 
     /// This seal authenticates insertion only. It intentionally provides no
     /// durable acknowledgement and authorizes no search or public export.
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn verify_snapshot<'s>(
         &'s mut self,
         events: &'s [crate::cryptanalysis::sat::SolverEvent],
@@ -971,7 +979,7 @@ pub(in crate::ml_dataset::solvers) mod worker;
 #[path = "original_boolean_rows.rs"]
 pub(in crate::ml_dataset::solvers) mod boolean_rows;
 
-#[path="original_boolean_search.rs"]
+#[path = "original_boolean_search.rs"]
 pub(in crate::ml_dataset::solvers) mod boolean_search;
 
 #[path = "affine_row_central.rs"]
@@ -982,8 +990,8 @@ pub(in crate::ml_dataset::solvers) mod affine_rows;
 #[path = "affine_boolean_row_worker.rs"]
 pub(in crate::ml_dataset::solvers) mod affine_worker;
 
-#[path="sat_search_worker.rs"]
+#[path = "sat_search_worker.rs"]
 pub(in crate::ml_dataset::solvers) mod search_worker;
 
-#[path="owned_boolean_search_worker.rs"]
+#[path = "owned_boolean_search_worker.rs"]
 pub(in crate::ml_dataset::solvers) mod owned_search_worker;

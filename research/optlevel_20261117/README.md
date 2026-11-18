@@ -4,6 +4,35 @@ Tool: [`tools/optlevel/`](../../tools/optlevel/optlevel.py). Definition:
 [`docs/OPTIMIZATION_LEVEL.md`](../../docs/OPTIMIZATION_LEVEL.md). Skill:
 [`.claude/skills/optlevel/SKILL.md`](../../.claude/skills/optlevel/SKILL.md).
 
+> **Note, 2026-11-17 (later the same day): the tool is now Rust.** The text
+> below is unchanged and describes the runs as they were made, with the tool's
+> first version, `tools/optlevel/optlevel.py` (Python around C kernels). That
+> file, `score.py`, `plot.py` and `test_optlevel.py` were then replaced by the
+> Rust crate in `tools/optlevel/` and deleted; they are in this repository's
+> history at commit `833a35d21e`. What changes for a reader of this page:
+>
+> - **Commands.** `python3 tools/optlevel/optlevel.py X` is now
+>   `tools/optlevel/run.sh X` (same subcommands and flags), and
+>   `python3 tools/optlevel/test_optlevel.py` is
+>   `cargo test --release --manifest-path tools/optlevel/Cargo.toml`.
+> - **The files here still hold.** The Rust tool validates every record in
+>   this directory, and re-scoring each committed measurement against its
+>   committed calibration reproduces the committed record exactly, the two
+>   roofline SVGs and the two `controls.md` tables byte for byte
+>   (`tools/optlevel/tests/golden.rs`). Do not run `controls --rescore` into
+>   these directories: it would rewrite the records with the new tool version.
+> - **The ceilings in section 2 are low for the in-cache SIMD classes.** The C
+>   kernels read the clock after every pass over an 8–16 KiB array. The Rust
+>   kernels read it about every 50 µs and reach higher rates on the same host,
+>   so the attainments in section 3 for `modmuladd_p31` are measured against a
+>   ceiling that a better kernel exceeds. The controls still separate the way
+>   section 3 says; the absolute attainments of in-cache SIMD kernels do not
+>   carry over to calibrations taken with the Rust kernels. Numbers:
+>   [`research/optlevel_rs_20261117/README.md`](../optlevel_rs_20261117/README.md).
+> - **Sections 5 and 6** ("not validated", "commands"): the GPU path has since
+>   run once on a rented GPU (`research/hky_pod_runs_20261117/`), in the Python
+>   version; the PMU path has still not run anywhere.
+
 Every number here is a producer measurement on one shared cloud VM, tier
 `T-timing`, and is an unverified assertion `[pcc:unverified]`. Nothing here is
 a speed claim, a benchmark row or a leaderboard row. No `bench.record/v1` was

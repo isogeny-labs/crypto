@@ -10,10 +10,10 @@ and every edge says how one claim depends on or limits another.
 
 ## Current snapshot
 
-- 525 claim nodes (15 refuted; 29 with a Lean record, 20 kernel-checked)
-- 888 typed dependency edges
-- 229 source records (83 primary texts read and hashed)
-- 51 prioritized research targets
+- 643 claim nodes (33 refuted; 45 kernel-checked, 6 native-exact)
+- 1,059 typed dependency edges
+- 243 source records (83 primary texts read and hashed)
+- 66 prioritized research targets
 - 717 labeled results and 375 numbered sections in the Galbraith book inventory
 
 Run `node validate.mjs` for the authoritative assembled counts; generated counts are in
@@ -30,6 +30,12 @@ Run `node validate.mjs` for the authoritative assembled counts; generated counts
   formalization state, repository citations, taint) and the Nagao Lemma 4 audit
 - [`ATTACK_GRAPH.md`](ATTACK_GRAPH.md), [`attack-graph.svg`](attack-graph.svg): every
   unestablished claim ranked by what rests on it, with the action that would settle it
+- [`FOUNDATIONAL_ATTACK_QUEUE.md`](FOUNDATIONAL_ATTACK_QUEUE.md): the six immediate
+  index-calculus/xedni lanes, each reduced to a finite certificate or immutable
+  population, symmetric outcomes and a canonical research-target ID
+- [`YIELD_RANK_FRONTIER_20261118.md`](YIELD_RANK_FRONTIER_20261118.md): the two
+  highest-impact index-calculus heuristics split into target-distribution,
+  solver-visibility, censoring, support, terminal-rank and kernel-mode attacks
 - [`WEAKNESS_TRIAGE.md`](WEAKNESS_TRIAGE.md) ([PDF](WEAKNESS_TRIAGE.pdf)): where the
   structure itself is weak (status inflation, unwired dependences, obstructed pillars,
   reading-dependent refutations) and the recommended order of attack;

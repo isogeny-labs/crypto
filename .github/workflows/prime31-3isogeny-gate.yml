@@ -1,0 +1,64 @@
+name: Prime31 rational 3-isogeny exact Rust gate
+on:
+  push:
+    branches: [automation/prime31-3isogeny-maxorder-20261118]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_velu_3isogeny_gate.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_velu.py'
+      - '.github/workflows/prime31-3isogeny-gate.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_velu_3isogeny_gate.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_velu.py'
+      - '.github/workflows/prime31-3isogeny-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-prime31-3-isogeny:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout new gate and independent checker
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_velu_3isogeny_gate.rs
+            research/prime31_ic_20261115/native/verify_prime31_velu.py
+          sparse-checkout-cone-mode: false
+      - name: Checkout original exact prime31 Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay candidate only; original elliptic arithmetic unchanged
+        run: cp research/prime31_ic_20261115/native/examples/prime31_velu_3isogeny_gate.rs native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Original 40 regression tests
+        run: cargo +1.100.0 test --locked --release --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: New dual isogeny tests
+        run: cargo +1.100.0 test --locked --release --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_velu_3isogeny_gate
+      - name: Produce exact invariant readout and independent Python field replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_velu_3isogeny_gate | tee prime31-3isogeny.jsonl
+          python3 research/prime31_ic_20261115/native/verify_prime31_velu.py prime31-3isogeny.jsonl | tee independent-replay.json
+      - name: Retain exact-source and verifier output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-3isogeny-rust-python-exact
+          path: |
+            prime31-3isogeny.jsonl
+            independent-replay.json
+          retention-days: 30
+          if-no-files-found: warn

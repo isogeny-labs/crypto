@@ -1,0 +1,69 @@
+name: Prime31 Dickson31 adaptive 8A holdout (Rust 1.100)
+
+on:
+  push:
+    branches: [automation/prime31-dickson31-adaptive-holdout-20261117]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - 'research/prime31_ic_20261115/native/DICKSON31_ADAPTIVE_HOLDOUT_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-dickson31-adaptive-holdout.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - 'research/prime31_ic_20261115/native/DICKSON31_ADAPTIVE_HOLDOUT_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-dickson31-adaptive-holdout.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  holdout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact proposed test source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout immutable native Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay exact proposed test into original Rust example
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Run original native library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Run prospective 96-Q holdout and two known misses
+        shell: bash
+        run: |
+          set -o pipefail
+          timeout -k 10 600 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle adaptive_dickson_b31_blinded_holdout -- --nocapture 2>&1 | tee prime31-dickson31-adaptive-holdout.log
+      - name: Check captured complete transcript and explicit provenance
+        if: success()
+        shell: bash
+        run: |
+          grep -Fq 'DICKSON31_ADAPTIVE_HOLDOUT_JSON=' prime31-dickson31-adaptive-holdout.log
+          grep -Fq 'test result: ok. 1 passed;' prime31-dickson31-adaptive-holdout.log
+          grep -Fq '"complete_unknown_ecdlp_logs":0' prime31-dickson31-adaptive-holdout.log
+      - name: Archive complete raw test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-dickson31-adaptive-holdout-raw
+          path: prime31-dickson31-adaptive-holdout.log
+          if-no-files-found: warn
+          retention-days: 30

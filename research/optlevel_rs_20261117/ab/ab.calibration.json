@@ -1,0 +1,905 @@
+{
+ "build": {
+  "c": {
+   "builds": {
+    "c-native": {
+     "flags": [
+      "-O3",
+      "-march=native",
+      "-ffp-contract=fast"
+     ],
+     "path": "/home/user/crypto-wt/optlevel-rs/research/optlevel_rs_20261117/equiv/cache/optk-0197263ab0b6-native",
+     "sha256": "b2c79847c8b80043282068c4c1077170933c4c4475a29afd0c1f07a41ef6d3be"
+    },
+    "c-scalar": {
+     "flags": [
+      "-O3",
+      "-march=native",
+      "-ffp-contract=fast",
+      "-fno-tree-vectorize",
+      "-fno-tree-slp-vectorize"
+     ],
+     "path": "/home/user/crypto-wt/optlevel-rs/research/optlevel_rs_20261117/equiv/cache/optk-0197263ab0b6-scalar",
+     "sha256": "97324297d9c461403c8ffbaa9422c156d20c873acd71f7d131ffcbdd59799ae0"
+    },
+    "c-w512": {
+     "flags": [
+      "-O3",
+      "-march=native",
+      "-ffp-contract=fast",
+      "-mprefer-vector-width=512"
+     ],
+     "path": "/home/user/crypto-wt/optlevel-rs/research/optlevel_rs_20261117/equiv/cache/optk-0197263ab0b6-w512",
+     "sha256": "9d4b4ec305ddaecb781f0ff920bd7b633bad511305af081b152dc5db79311ad9"
+    }
+   },
+   "compiler": "/usr/bin/cc",
+   "compiler_version": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+   "source_sha256": "6a59435b7350336543a649683ab5d689ebd5fc520153413268e9411b15fe8939"
+  },
+  "exe": "/home/user/crypto-wt/optlevel-rs/tools/optlevel/target/release/optlevel",
+  "exe_sha256": "4fe440ae8dab694d4268c9e06fa22362829c3d940a2ef57f24822a0b0c54e945",
+  "isas": [
+   "avx512",
+   "avx2",
+   "scalar"
+  ],
+  "kernels": "rust (tools/optlevel/src/kernels.rs, inside the optlevel binary; one variant per isa, selected at run time)",
+  "source_sha256": "cb601352c65a8d0c79f77c8cd9653480a23c394e42e4083bd3a05edf9b6cfde4"
+ },
+ "ceiling_rule": "max over repeats and over builds of the summed rate of k pinned copies; the median is kept as the low end",
+ "clock_hz_effective": {
+  "max": 2877212359.1084347,
+  "median": 2763805342.768115,
+  "min": 2602541995.399618,
+  "n": 7
+ },
+ "compute": {
+  "fma_f64": {
+   "best_variant": "fma_f64_reg@c-native",
+   "definition": "a <- a*s + b in binary64 (one fused multiply-add; float-encoded modular arithmetic)",
+   "scalar_ops_per_s": 2797817825.7911196,
+   "simd_ops_per_s": 42980815047.35632,
+   "total_ops_per_s": {
+    "1": {
+     "max": 42980815047.35632,
+     "median": 42078005017.59904,
+     "min": 40164721846.052414,
+     "n": 7
+    },
+    "2": {
+     "max": 83142755207.95523,
+     "median": 81067391949.32512,
+     "min": 80184636714.40068,
+     "n": 7
+    },
+    "4": {
+     "max": 165500574261.1239,
+     "median": 163526106620.5899,
+     "min": 134047915061.57816,
+     "n": 7
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "fma_f64@avx2": {
+     "max": 11965919632.951185,
+     "median": 10624272624.007753,
+     "min": 9703076500.088272,
+     "n": 7
+    },
+    "fma_f64@avx512": {
+     "max": 18953125056.195663,
+     "median": 18586670172.232243,
+     "min": 14858218965.873154,
+     "n": 7
+    },
+    "fma_f64@c-native": {
+     "max": 7375163030.780077,
+     "median": 6770412631.393039,
+     "min": 3809531812.061865,
+     "n": 7
+    },
+    "fma_f64@c-scalar": {
+     "max": 2584479952.845342,
+     "median": 2508231263.030864,
+     "min": 1913369769.5929518,
+     "n": 7
+    },
+    "fma_f64@c-w512": {
+     "max": 11133108201.569813,
+     "median": 10809763299.511835,
+     "min": 9953110921.929665,
+     "n": 7
+    },
+    "fma_f64@scalar": {
+     "max": 2797817825.7911196,
+     "median": 2652026318.9423714,
+     "min": 1654785684.6274698,
+     "n": 7
+    },
+    "fma_f64_reg@avx2": {
+     "max": 23505569136.274906,
+     "median": 22974352681.872543,
+     "min": 21222518730.49541,
+     "n": 7
+    },
+    "fma_f64_reg@avx512": {
+     "max": 42665558212.626656,
+     "median": 41339105998.14759,
+     "min": 37914512213.695366,
+     "n": 7
+    },
+    "fma_f64_reg@c-native": {
+     "max": 42980815047.35632,
+     "median": 42078005017.59904,
+     "min": 40164721846.052414,
+     "n": 7
+    },
+    "fma_f64_reg@c-w512": {
+     "max": 42280535065.38739,
+     "median": 41339325770.94072,
+     "min": 39699456016.50899,
+     "n": 7
+    }
+   }
+  },
+  "modmuladd_p31": {
+   "best_variant": "modmuladd_p31@avx2",
+   "definition": "a <- a + m*b mod p, p < 2^31 (Montgomery, 32x32->64 multiplies)",
+   "scalar_ops_per_s": 697527940.6169374,
+   "simd_ops_per_s": 3835431673.890231,
+   "total_ops_per_s": {
+    "1": {
+     "max": 3835431673.890231,
+     "median": 3734910622.307516,
+     "min": 3572595681.874327,
+     "n": 7
+    },
+    "2": {
+     "max": 7478795984.722183,
+     "median": 7319039670.26775,
+     "min": 6961343229.7303705,
+     "n": 7
+    },
+    "4": {
+     "max": 15153444425.088383,
+     "median": 14662313590.788452,
+     "min": 13045297439.468761,
+     "n": 7
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "modmuladd_p31@avx2": {
+     "max": 3835431673.890231,
+     "median": 3734910622.307516,
+     "min": 3572595681.874327,
+     "n": 7
+    },
+    "modmuladd_p31@avx512": {
+     "max": 3357873335.077598,
+     "median": 3237987253.4863405,
+     "min": 3019722756.2265196,
+     "n": 7
+    },
+    "modmuladd_p31@c-native": {
+     "max": 1750267647.3563626,
+     "median": 1645864461.6621296,
+     "min": 1544144220.029695,
+     "n": 7
+    },
+    "modmuladd_p31@c-scalar": {
+     "max": 679517247.1192907,
+     "median": 665796448.6594659,
+     "min": 575588055.4379874,
+     "n": 7
+    },
+    "modmuladd_p31@c-w512": {
+     "max": 2106659404.8962715,
+     "median": 2046353088.5026238,
+     "min": 1745767479.824135,
+     "n": 7
+    },
+    "modmuladd_p31@scalar": {
+     "max": 697527940.6169374,
+     "median": 680303658.1962122,
+     "min": 520164535.95954174,
+     "n": 7
+    }
+   }
+  },
+  "modmuladd_p62": {
+   "best_variant": "modmuladd_p62@c-native",
+   "definition": "a <- a + m*b mod p, p < 2^62 (Montgomery, 64x64->128 multiplies)",
+   "scalar_ops_per_s": 689037798.1809907,
+   "simd_ops_per_s": 694888766.3675921,
+   "total_ops_per_s": {
+    "1": {
+     "max": 694888766.3675921,
+     "median": 655352867.5019951,
+     "min": 564004653.6592984,
+     "n": 7
+    },
+    "2": {
+     "max": 1366093066.6056018,
+     "median": 1342832667.8947225,
+     "min": 1188319135.572538,
+     "n": 7
+    },
+    "4": {
+     "max": 2725438971.1658454,
+     "median": 2681070918.203516,
+     "min": 2514473491.213567,
+     "n": 7
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "modmuladd_p62@avx2": {
+     "max": 391819497.4256465,
+     "median": 379114430.87657195,
+     "min": 362073303.2118107,
+     "n": 7
+    },
+    "modmuladd_p62@avx512": {
+     "max": 393299449.7066064,
+     "median": 380777304.14639646,
+     "min": 367635604.04776084,
+     "n": 7
+    },
+    "modmuladd_p62@c-native": {
+     "max": 694888766.3675921,
+     "median": 655352867.5019951,
+     "min": 564004653.6592984,
+     "n": 7
+    },
+    "modmuladd_p62@c-scalar": {
+     "max": 689037798.1809907,
+     "median": 637652259.8361471,
+     "min": 462429908.5856625,
+     "n": 7
+    },
+    "modmuladd_p62@c-w512": {
+     "max": 684947428.6116874,
+     "median": 619307095.3144333,
+     "min": 597048725.100446,
+     "n": 7
+    },
+    "modmuladd_p62@scalar": {
+     "max": 684853777.1494743,
+     "median": 627588314.8940815,
+     "min": 495114518.29589194,
+     "n": 7
+    }
+   }
+  },
+  "muladd_u32": {
+   "best_variant": "muladd_u32@avx512",
+   "definition": "a <- a*m + c on 32-bit words (wrapping)",
+   "scalar_ops_per_s": 2745193604.009443,
+   "simd_ops_per_s": 26209382412.03696,
+   "total_ops_per_s": {
+    "1": {
+     "max": 26209382412.03696,
+     "median": 25454920778.634556,
+     "min": 22489620286.072353,
+     "n": 7
+    },
+    "2": {
+     "max": 51684963160.93762,
+     "median": 50591885905.55069,
+     "min": 43139399214.69596,
+     "n": 7
+    },
+    "4": {
+     "max": 98177970006.66144,
+     "median": 88837783098.47392,
+     "min": 65865166445.905975,
+     "n": 7
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "muladd_u32@avx2": {
+     "max": 15520797137.112392,
+     "median": 15259860548.557928,
+     "min": 11293226780.803186,
+     "n": 7
+    },
+    "muladd_u32@avx512": {
+     "max": 26209382412.03696,
+     "median": 25454920778.634556,
+     "min": 22489620286.072353,
+     "n": 7
+    },
+    "muladd_u32@c-native": {
+     "max": 11452216690.57472,
+     "median": 10693166075.760094,
+     "min": 7229151737.780962,
+     "n": 7
+    },
+    "muladd_u32@c-scalar": {
+     "max": 2667787873.3729396,
+     "median": 2494345294.3461704,
+     "min": 1240969329.5567355,
+     "n": 7
+    },
+    "muladd_u32@c-w512": {
+     "max": 17463305520.35103,
+     "median": 16371455702.47004,
+     "min": 13357593926.381962,
+     "n": 7
+    },
+    "muladd_u32@scalar": {
+     "max": 2745193604.009443,
+     "median": 2406903606.5607343,
+     "min": 1674806016.6000898,
+     "n": 7
+    }
+   }
+  },
+  "muladd_u64": {
+   "best_variant": "muladd_u64@avx512",
+   "definition": "a <- a*m + c on 64-bit words (wrapping)",
+   "scalar_ops_per_s": 2786032494.453196,
+   "simd_ops_per_s": 10272830478.581364,
+   "total_ops_per_s": {
+    "1": {
+     "max": 10272830478.581364,
+     "median": 10023265078.759726,
+     "min": 8208964052.852566,
+     "n": 7
+    },
+    "2": {
+     "max": 19473306664.356552,
+     "median": 18462204156.712574,
+     "min": 14028935844.913471,
+     "n": 7
+    },
+    "4": {
+     "max": 40218555113.60923,
+     "median": 36777330209.05998,
+     "min": 29767302380.821266,
+     "n": 7
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "muladd_u64@avx2": {
+     "max": 3838087862.935041,
+     "median": 3695923182.545323,
+     "min": 3536948438.9466352,
+     "n": 7
+    },
+    "muladd_u64@avx512": {
+     "max": 10272830478.581364,
+     "median": 10023265078.759726,
+     "min": 8208964052.852566,
+     "n": 7
+    },
+    "muladd_u64@c-native": {
+     "max": 4643110932.508226,
+     "median": 4372310516.788303,
+     "min": 3742930678.4575615,
+     "n": 7
+    },
+    "muladd_u64@c-scalar": {
+     "max": 2606631248.3121467,
+     "median": 2534292978.6536803,
+     "min": 1475703446.9906209,
+     "n": 7
+    },
+    "muladd_u64@c-w512": {
+     "max": 7469337489.127878,
+     "median": 7182994366.296986,
+     "min": 6677099557.391778,
+     "n": 7
+    },
+    "muladd_u64@scalar": {
+     "max": 2786032494.453196,
+     "median": 2650104648.592256,
+     "min": 1582244241.3205776,
+     "n": 7
+    }
+   }
+  },
+  "mulwide_u64": {
+   "best_variant": "mulwide_u64@scalar",
+   "definition": "a <- hi64(a*m) + c: one 64x64->128 multiply per operation",
+   "scalar_ops_per_s": 1883662062.528141,
+   "simd_ops_per_s": 1782341838.2467673,
+   "total_ops_per_s": {
+    "1": {
+     "max": 1883662062.528141,
+     "median": 1834944406.9433367,
+     "min": 985115565.019545,
+     "n": 7
+    },
+    "2": {
+     "max": 3792936486.6558776,
+     "median": 3624417594.662881,
+     "min": 3216662775.2336874,
+     "n": 7
+    },
+    "4": {
+     "max": 7368518908.076478,
+     "median": 6503334497.305123,
+     "min": 5529509482.797411,
+     "n": 7
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "mulwide_u64@avx2": {
+     "max": 1296328181.8415596,
+     "median": 1274746895.5964413,
+     "min": 1196855290.0411596,
+     "n": 7
+    },
+    "mulwide_u64@avx512": {
+     "max": 1001200825.8283595,
+     "median": 972792083.0440265,
+     "min": 921533698.7221559,
+     "n": 7
+    },
+    "mulwide_u64@c-native": {
+     "max": 1721532512.7219222,
+     "median": 1669457864.3514047,
+     "min": 1624111153.2633169,
+     "n": 7
+    },
+    "mulwide_u64@c-scalar": {
+     "max": 1788133817.8553798,
+     "median": 1749919493.37627,
+     "min": 1435420475.9593227,
+     "n": 7
+    },
+    "mulwide_u64@c-w512": {
+     "max": 1782341838.2467673,
+     "median": 1678416890.5709739,
+     "min": 1394047429.7225313,
+     "n": 7
+    },
+    "mulwide_u64@scalar": {
+     "max": 1883662062.528141,
+     "median": 1834944406.9433367,
+     "min": 985115565.019545,
+     "n": 7
+    }
+   }
+  },
+  "popcnt_u64": {
+   "best_variant": "popcnt_u64@avx512",
+   "definition": "popcount(a and b) on 64-bit words",
+   "scalar_ops_per_s": 2278117167.89552,
+   "simd_ops_per_s": 12923601124.28907,
+   "total_ops_per_s": {
+    "1": {
+     "max": 12923601124.28907,
+     "median": 12262447582.34623,
+     "min": 11235999109.531736,
+     "n": 7
+    },
+    "2": {
+     "max": 24763115520.506416,
+     "median": 24381284790.499634,
+     "min": 21688777443.15217,
+     "n": 7
+    },
+    "4": {
+     "max": 49608861622.428276,
+     "median": 47131776827.393036,
+     "min": 43599861225.673164,
+     "n": 7
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "popcnt_u64@avx2": {
+     "max": 3666060654.80471,
+     "median": 3461692408.070918,
+     "min": 2562660437.453785,
+     "n": 7
+    },
+    "popcnt_u64@avx512": {
+     "max": 12923601124.28907,
+     "median": 12262447582.34623,
+     "min": 11235999109.531736,
+     "n": 7
+    },
+    "popcnt_u64@c-native": {
+     "max": 6513792968.436796,
+     "median": 6386440026.034124,
+     "min": 5391949931.52534,
+     "n": 7
+    },
+    "popcnt_u64@c-scalar": {
+     "max": 2278117167.89552,
+     "median": 2037683317.7012315,
+     "min": 1738845962.0027418,
+     "n": 7
+    },
+    "popcnt_u64@c-w512": {
+     "max": 8821584714.383423,
+     "median": 8740351888.058071,
+     "min": 6251849551.2104435,
+     "n": 7
+    },
+    "popcnt_u64@scalar": {
+     "max": 1870281847.699253,
+     "median": 1785238920.2656174,
+     "min": 1486647006.4469218,
+     "n": 7
+    }
+   }
+  },
+  "ptr_hop": {
+   "best_variant": "chase@avx512",
+   "definition": "one dependent pointer dereference",
+   "scalar_ops_per_s": 567975628.0714543,
+   "simd_ops_per_s": 571967094.4212713,
+   "total_ops_per_s": {
+    "1": {
+     "max": 571967094.4212713,
+     "median": 561250315.9685342,
+     "min": 537840510.7384512,
+     "n": 7
+    },
+    "2": {
+     "max": 1143470933.252459,
+     "median": 1064277153.7726836,
+     "min": 916209604.5423393,
+     "n": 7
+    },
+    "4": {
+     "max": 2279446946.756002,
+     "median": 2259004588.735018,
+     "min": 2180987211.774684,
+     "n": 7
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "chase@avx2": {
+     "max": 570382101.229619,
+     "median": 556948505.7776672,
+     "min": 479199494.4481382,
+     "n": 7
+    },
+    "chase@avx512": {
+     "max": 571967094.4212713,
+     "median": 561250315.9685342,
+     "min": 537840510.7384512,
+     "n": 7
+    },
+    "chase@c-native": {
+     "max": 532020543.1192955,
+     "median": 523158345.943261,
+     "min": 465605828.9955263,
+     "n": 7
+    },
+    "chase@c-scalar": {
+     "max": 542994550.7055675,
+     "median": 523068740.8314497,
+     "min": 502397841.1752763,
+     "n": 7
+    },
+    "chase@c-w512": {
+     "max": 535877315.99049234,
+     "median": 520535556.72034,
+     "min": 513629560.2010291,
+     "n": 7
+    },
+    "chase@scalar": {
+     "max": 567975628.0714543,
+     "median": 555293383.012107,
+     "min": 445508262.75424886,
+     "n": 7
+    }
+   }
+  },
+  "xor_u64": {
+   "best_variant": "xor_u64@avx512",
+   "definition": "a <- a xor b on 64-bit words (one F_2 row-add word)",
+   "scalar_ops_per_s": 2877604665.3264866,
+   "simd_ops_per_s": 17594586910.065395,
+   "total_ops_per_s": {
+    "1": {
+     "max": 17594586910.065395,
+     "median": 16709366562.807892,
+     "min": 15260948471.731007,
+     "n": 7
+    },
+    "2": {
+     "max": 34379531875.2491,
+     "median": 30799324973.239258,
+     "min": 23417568794.44946,
+     "n": 7
+    },
+    "4": {
+     "max": 67412299897.14291,
+     "median": 62311032209.58598,
+     "min": 51064063666.55243,
+     "n": 7
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "xor_u64@avx2": {
+     "max": 10750300983.18825,
+     "median": 10195138000.154037,
+     "min": 9438810989.072655,
+     "n": 7
+    },
+    "xor_u64@avx512": {
+     "max": 17594586910.065395,
+     "median": 16709366562.807892,
+     "min": 15260948471.731007,
+     "n": 7
+    },
+    "xor_u64@c-native": {
+     "max": 7894051704.721269,
+     "median": 7350898583.153616,
+     "min": 6210175843.613914,
+     "n": 7
+    },
+    "xor_u64@c-scalar": {
+     "max": 2585824926.6039267,
+     "median": 2177810752.270137,
+     "min": 1625801998.201223,
+     "n": 7
+    },
+    "xor_u64@c-w512": {
+     "max": 9694797924.978792,
+     "median": 9433761072.763418,
+     "min": 7876904881.23095,
+     "n": 7
+    },
+    "xor_u64@scalar": {
+     "max": 2877604665.3264866,
+     "median": 2610290941.2882853,
+     "min": 1633212919.8080454,
+     "n": 7
+    }
+   }
+  }
+ },
+ "conditions": {
+  "loadavg_1m_after": 2.24,
+  "loadavg_1m_before": 1.58,
+  "other_cpu_cores": 0.04940003166564876,
+  "psi_cpu_some_avg10_before": 0.0,
+  "steal_cores": 0.014269093551032744,
+  "thermal_throttle_events": null
+ },
+ "created_utc": "2026-11-17T20:23:21Z",
+ "device": "cpu",
+ "flags": [
+  "VIRTUALIZED",
+  "CLOCK_UNSTABLE"
+ ],
+ "host": {
+  "affinity_cpus": 4,
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "arch": "x86_64",
+  "caches_bytes": {
+   "L1d": 49152,
+   "L1i": 32768,
+   "L2": 2097152,
+   "L3": 272629760
+  },
+  "cgroup_cpu_max": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cpu_quota_cores": null,
+  "cpu_quota_source": null,
+  "cpufreq_boost": null,
+  "cpufreq_governor": null,
+  "event_sources": [
+   "breakpoint",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "fingerprint": "44113cdb2d87e834",
+  "hypervisor": true,
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "avx512_vpopcntdq",
+   "avx512bw",
+   "avx512dq",
+   "avx512f",
+   "avx512ifma",
+   "avx512vl",
+   "bmi2",
+   "fma",
+   "gfni",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "kernel": "6.18.44-fc-v553",
+  "logical_cpus": 4,
+  "mem_total_bytes": 16869134336,
+  "numa_nodes": 1,
+  "perf_event_paranoid": "2",
+  "smt_active": "0",
+  "thread_siblings_cpu0": "0",
+  "turbo_disabled": null,
+  "usable_cpus": 4,
+  "usable_cpus_basis": "affinity mask (4 CPUs)"
+ },
+ "memory": {
+  "bandwidth_bytes_per_s": {
+   "1": {
+    "kernel": "xor_u64@c-native",
+    "max": 19552983158.77742,
+    "median": 19211078143.06205,
+    "min": 18427610374.87957,
+    "n": 7
+   },
+   "2": {
+    "kernel": "xor_u64",
+    "max": 38614443056.833206,
+    "median": 38105183346.69672,
+    "min": 37190447985.10042,
+    "n": 7
+   },
+   "4": {
+    "kernel": "xor_u64",
+    "max": 75168638531.69635,
+    "median": 74059498629.53534,
+    "min": 61419435490.67768,
+    "n": 7
+   }
+  },
+  "bandwidth_variants": {
+   "1": {
+    "popcnt_u64": {
+     "max": 14523583976.691689,
+     "median": 13837232113.07201,
+     "min": 12206597400.300657,
+     "n": 7
+    },
+    "popcnt_u64@c-native": {
+     "max": 13521495278.291145,
+     "median": 13239165369.543829,
+     "min": 12652090086.00505,
+     "n": 7
+    },
+    "triad": {
+     "max": 17424732508.328686,
+     "median": 16884457066.240995,
+     "min": 15867523140.877724,
+     "n": 7
+    },
+    "triad@c-native": {
+     "max": 17145582195.042772,
+     "median": 17020240640.670525,
+     "min": 15855563634.43632,
+     "n": 7
+    },
+    "xor_u64": {
+     "max": 19020286133.96781,
+     "median": 18639252752.53723,
+     "min": 18146460160.295315,
+     "n": 7
+    },
+    "xor_u64@c-native": {
+     "max": 19552983158.77742,
+     "median": 19211078143.06205,
+     "min": 18427610374.87957,
+     "n": 7
+    }
+   },
+   "2": {
+    "popcnt_u64": {
+     "max": 28380428376.58862,
+     "median": 25297320613.30058,
+     "min": 24885369193.290558,
+     "n": 7
+    },
+    "popcnt_u64@c-native": {
+     "max": 25523806202.216106,
+     "median": 24888543901.58429,
+     "min": 22278860559.89541,
+     "n": 7
+    },
+    "triad": {
+     "max": 34323316757.992775,
+     "median": 33232709080.631645,
+     "min": 31977078195.92212,
+     "n": 7
+    },
+    "triad@c-native": {
+     "max": 33297097769.1595,
+     "median": 32567303228.725994,
+     "min": 28816769669.607635,
+     "n": 7
+    },
+    "xor_u64": {
+     "max": 38614443056.833206,
+     "median": 38105183346.69672,
+     "min": 37190447985.10042,
+     "n": 7
+    },
+    "xor_u64@c-native": {
+     "max": 38316158896.06065,
+     "median": 37046673955.14987,
+     "min": 30549443659.493946,
+     "n": 7
+    }
+   },
+   "4": {
+    "popcnt_u64": {
+     "max": 55607766409.5061,
+     "median": 52052926399.20953,
+     "min": 50816128759.466446,
+     "n": 7
+    },
+    "popcnt_u64@c-native": {
+     "max": 50540408925.55464,
+     "median": 44216641566.062546,
+     "min": 36618525438.618744,
+     "n": 7
+    },
+    "triad": {
+     "max": 66610222049.01125,
+     "median": 64739814842.64484,
+     "min": 61672550919.04982,
+     "n": 7
+    },
+    "triad@c-native": {
+     "max": 63927508264.7679,
+     "median": 63064977019.03632,
+     "min": 59743150421.35703,
+     "n": 7
+    },
+    "xor_u64": {
+     "max": 75168638531.69635,
+     "median": 74059498629.53534,
+     "min": 61419435490.67768,
+     "n": 7
+    },
+    "xor_u64@c-native": {
+     "max": 73427370543.5159,
+     "median": 72691249335.79962,
+     "min": 55374946102.7571,
+     "n": 7
+    }
+   }
+  },
+  "bytes_convention": "bytes moved over arrays above the LLC: loads + stores + write-allocate reads (triad 32 B/element, xor 24, popcount 16); the ceiling is the best of the three",
+  "latency_definition": "ns per dependent load over a random cycle of 64-byte nodes the size of one triad array",
+  "latency_ns": {
+   "max": 180.8545209835737,
+   "median": 167.27362561348156,
+   "min": 159.76688138521635,
+   "n": 7
+  },
+  "llc_bytes": 272629760,
+  "triad_array_bytes": 408944640
+ },
+ "schema": "optlevel.calibration/v1",
+ "settings": {
+  "c_kernels": true,
+  "repeats": 7,
+  "scale_points": [
+   1,
+   2,
+   4
+  ],
+  "seconds_per_kernel": 0.3
+ },
+ "tool_version": "2.0.0"
+}

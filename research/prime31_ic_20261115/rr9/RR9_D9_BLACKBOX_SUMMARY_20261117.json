@@ -1,0 +1,90 @@
+{
+  "schema": "prime31.rr9.d9-blackbox-bezout-summary.v1",
+  "experiment_date": "2026-11-17",
+  "original_curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "G": [
+      625037715,
+      2100627251
+    ]
+  },
+  "original_factor_base_x": [
+    0,
+    1,
+    2,
+    3,
+    5,
+    6,
+    8,
+    9
+  ],
+  "public_quadrics": 8,
+  "unknown_coefficients": 7,
+  "degree": 9,
+  "matrix": {
+    "rows": 27456,
+    "columns": 11440,
+    "nonzeros": 240240
+  },
+  "method": "Rust matrix-free Wiedemann via M^T D M + Berlekamp-Massey, explicit inverse polynomial, degree-nine unit identity",
+  "source_pinned_workflow": "https://github.com/isogeny-labs/crypto/actions/runs/44157634359",
+  "source_commit": "d24470f207ffc31af9d07527d669dc4ec8291819",
+  "raw_artifact": "https://github.com/isogeny-labs/crypto/actions/runs/44157634359/artifacts/14360619996",
+  "raw_zip_sha256": "1bcb1c9653f59b6c40aa31f2c511b208ab74808a4f87a33bb158acb00ade563f",
+  "negatives": [
+    {
+      "r": [
+        625037715,
+        2100627251
+      ],
+      "bm_degree": 11440,
+      "bm_terminal": 804920363,
+      "rank_gate": true,
+      "unit_replay": true,
+      "nonzero_witness_terms": 27456,
+      "wall_ms": 27141.51549
+    },
+    {
+      "r": [
+        1923055775,
+        307731458
+      ],
+      "bm_degree": 11440,
+      "bm_terminal": 948224476,
+      "rank_gate": true,
+      "unit_replay": true,
+      "nonzero_witness_terms": 27456,
+      "wall_ms": 27190.023585
+    }
+  ],
+  "both_independent_modular_identity_checks": {
+    "constant_one": 2,
+    "nonconstant_zero": 2,
+    "verification": "separate direct polynomial coefficient arithmetic from downloaded artifact, checked outside producer Rust"
+  },
+  "fully_charge_all_attempts": true,
+  "actual_complete_unknown_target_ecdlp_solves": 0,
+  "speedup_claim": false,
+  "genuine_nongeneric_positive_extraction": false,
+  "independent_signed_pcc": "pending",
+  "note": "Producer-side experiment on original ordinary cofactor-one prime31. Full 27,456-term unit coefficient vectors are stored in the pinned original GitHub Actions artifact, not this concise index.",
+  "final_source_pinned_workflow": "https://github.com/isogeny-labs/crypto/actions/runs/44158533716",
+  "final_source_commit": "ba2e13949049645b5afdda8bad4040459b62f5b0",
+  "final_artifact": "https://github.com/isogeny-labs/crypto/actions/runs/44158533716/artifacts/14362741314",
+  "final_zip_sha256": "ab97aed77cac07396519d2b2cd644c634dd5afbedc1017f76e304ba7c18322fd",
+  "final_archive_files": [
+    "prime31-rr9-d9-neg0.json",
+    "prime31-rr9-d9-neg1.json",
+    "prime31-rr9-d9-replay0.json",
+    "prime31-rr9-d9-replay1.json"
+  ],
+  "final_verified_independent_rust_replays": 2,
+  "final_run_wall_ms": [
+    27119.025339,
+    27110.464295
+  ]
+}

@@ -64,3 +64,105 @@ degree or degree of regularity grew sub-linearly or logarithmically in the
 instance size is what would signal an index-calculus advantage; the harness can
 now measure and report that slope. The fit functions are unit-tested
 (`growth::tests`) to recover known linear, power and exponential slopes exactly.
+
+## Variable effects and direct diffusion
+
+The companion figure colors each variable's effect on observed degree of
+regularity and the strength of its direct coupling to other variables.
+[Figure (SVG)](reports/run-20261118T0135Z/variable_effects.svg) ·
+[PDF report](reports/run-20261118T0135Z/report.pdf) ·
+[Measurements (CSV)](reports/run-20261118T0135Z/variable_effects.csv)
+
+Each regularity cell compares the original system with that same system plus
+one equation pinning a variable at its shared-root value of 1. The observed
+degree is the first degree with no standard monomials in the graded reverse
+lexicographic Gröbner staircase. Each diffusion cell counts the fraction of
+relations where changing the source coordinate from 1 to 2 changes the
+polynomial dependence on the destination coordinate, with the remaining
+coordinates symbolic. This measures direct coupling at the chosen anchor.
+
+For the first three dense quadrics, each pin changes the observed degree from
+4 to 1. For the larger prefixes the observed degree stays at 1. All the dense
+relations couple every pair, so this family gives identical scores for all
+three variables. The diagonal control distinguishes (x,y) from the already
+fixed (z) and has no cross-variable coupling. The chain control exhibits
+only the (x)–(y) and (y)–(z) links. [pcc:unverified]
+
+The inputs come from the original
+[fixture generator](https://github.com/isogeny-labs/crypto/blob/7db7d3d4e9381446796c38f91f13b666be5127d3/src/cryptanalysis/f4_fp.rs#L5876).
+Singular 4.4.1 replay checks the dense Hilbert counts against the
+[original Rust dataset](reports/run-20261117T1511Z/degree_fall_dataset.json).
+To reproduce the companion values and figures from this directory, run
+
+```sh
+cd reports/run-20261118T0135Z
+Singular -q --no-rc measure_variable_effects.sing > /tmp/variable_effects_replay.csv
+diff -u variable_effects.csv /tmp/variable_effects_replay.csv
+python3 plot_variable_effects.py
+typst compile report.typ
+```
+
+## Candidate bases across the toy flow
+
+The follow-up holds the base size fixed and compares three candidate sets
+through membership, a sum filter, and a mixed-relation check. It reports
+coverage across the full target grid and colors regularity, pin effects, and
+direct diffusion at one target shared by all three bases.
+[Run and replay](reports/run-20261118T0159Z/RUN.md) ·
+[Figure](reports/run-20261118T0159Z/base_flow.svg) ·
+[PDF](reports/run-20261118T0159Z/report.pdf)
+
+## Method for tracking variable effects
+
+Use the [direct coupling and regularity trace](#variable-effects-and-direct-diffusion)
+alongside the [conditional survivor trace](reports/run-20261118T0409Z/RUN.md).
+Direct coupling follows input equation structure. Conditional support
+shows how the feasible values change as filters accumulate.
+
+1. Fix the target, candidate universe, stage order, and base sizes for
+   each matched comparison. Vary the base or filter being tested and
+   record the choice in the run protocol.
+2. Choose each source variable in turn. Apply each pin common to all
+   bases being compared, and retain the unpinned result at every stage.
+   Report the shared values used for the probes.
+3. At each stage record the total ordered tuples, the feasible values
+   of each other coordinate, and the feasible pairs of those coordinates.
+   Report both the actual supports and the retained counts against the
+   same-stage unpinned denominator. Record a dead end when a pin has zero
+   survivors from a nonempty stage. A stage with an empty baseline has
+   no retention fraction.
+4. Compare stages with the same pin to locate where the restriction
+   appears. Compare bases at the same stage, target, and pin to see
+   which values or pairs differ. Use the direct trace to identify
+   equation-level coupling and the observed degree to track the
+   separate regularity effect.
+
+The membership stage in the toy fixture is a control. A pin reduces the
+number of triples while retaining the full support of the remaining
+variables. The centered base at the sum stage shows why joint support
+matters. For `x=2`, both remaining coordinates retain all four of
+their individual values, while the number of jointly feasible pairs
+drops from ten to four. [pcc:unverified]
+[Heatmap](reports/run-20261118T0409Z/survivor_retention.svg) ·
+[PDF](reports/run-20261118T0409Z/report.pdf) ·
+[Summary](reports/run-20261118T0409Z/survivor_summary.csv) ·
+[Exact supports](reports/run-20261118T0409Z/survivor_support.csv)
+
+## An exact regularity rule from survivor groups
+
+At the mixed stage of the toy flow, group survivors by (y) and count
+distinct (x)-values in each group. There are at most two groups because
+eliminating (z) gives (y(t-y)=s). The observed degree is the size of
+the larger group, plus one when the two nonempty groups are equal.
+This explains why the consecutive base at (t=3) gives degrees 4 and 3
+for two targets that each have five survivors. The group sizes are
+(4+1) and (3+2), respectively. [pcc:unverified]
+
+For this configuration, add group sizes to the survivor analysis beside
+the existing total and pair support. The interpolation proof applies
+when the points occupy one or two parallel fibers after eliminating the
+linear constraint. For three or more fibers, the controls show that
+occupancies alone can miss the degree. Use the evaluation rank or
+the Gröbner calculation in that case.
+[Proof, controls, and replay](reports/run-20261118T0459Z/RUN.md) ·
+[Figure](reports/run-20261118T0459Z/fiber_regularity.svg)

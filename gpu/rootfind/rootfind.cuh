@@ -236,21 +236,28 @@ RF_HD void rf_pair_run(const Fp64Ctx &f, uint64_t a_m, const uint64_t *x, const 
     const uint64_t x1 = x[ai], y1 = y[ai];
     uint64_t d[RF_PAIR_CHUNK], pre[RF_PAIR_CHUNK];
     uint32_t bad = 0;
-    uint64_t acc = F::one(f);
-    for (uint32_t k = 0; k < m; k++) {
+    /* m >= 1.  Seed the prefix with d[0], not 1*d[0], and avoid the
+     * unused final unwind multiplication: two field muls saved per run. */
+    uint64_t d0 = (b0 == ai) ? F::add(f, y1, y1) : F::sub(f, x[b0], x1);
+    if (d0 == 0) { bad |= 1u; d0 = F::one(f); }
+    d[0] = pre[0] = d0;
+    uint64_t acc = d0;
+    for (uint32_t k = 1; k < m; k++) {
         const uint32_t bi = b0 + k;
-        uint64_t dk = (bi == ai) ? F::add(f, y1, y1) : F::sub(f, x[bi], x1);
+        /* b0 >= ai and k >= 1, so this is never the doubling case. */
+        uint64_t dk = F::sub(f, x[bi], x1);
         if (dk == 0) { bad |= 1u << k; dk = F::one(f); }
         d[k] = dk;
         acc = F::mul(f, acc, dk);
         pre[k] = acc;
     }
     uint64_t inv = F::inv(f, acc);
-    for (uint32_t k = m; k-- > 0;) {
-        const uint64_t ik = k ? F::mul(f, inv, pre[k - 1]) : inv;
-        inv = F::mul(f, inv, d[k]);
-        d[k] = ik;
+    for (uint32_t k = m; k-- > 1;) {
+        const uint64_t dk = d[k];
+        d[k] = F::mul(f, inv, pre[k - 1]);
+        inv = F::mul(f, inv, dk);
     }
+    d[0] = inv;
     const uint64_t base = rf_pair_offset(ai, n);
     for (uint32_t k = 0; k < m; k++) {
         const uint32_t bi = b0 + k;
@@ -270,12 +277,16 @@ RF_HD void rf_pair_run(const Fp64Ctx &f, uint64_t a_m, const uint64_t *x, const 
             keys[b + 1] = RF_PAIR_EMPTY; /* P - P */
             continue;
         }
-        const uint64_t x2 = x[bi];
-        for (int sg = 0; sg < 2; sg++) {
-            const uint64_t y2 = sg ? F::sub(f, 0, y[bi]) : y[bi];
-            const uint64_t lam = F::mul(f, F::sub(f, y2, y1), d[k]);
-            keys[b + sg] = F::sub(f, F::sub(f, F::sqr(f, lam), x1), x2);
-        }
+        /* The negative-sign slope is -(y2+y1)/d, whose square is
+         * identical to +(y2+y1)^2/d^2. Avoid neg(y2) and share x1+x2
+         * across both signs. This saves a negation and one modular
+         * reduction per non-diagonal pair without changing its keys. */
+        const uint64_t x2 = x[bi], y2 = y[bi];
+        const uint64_t xsum = F::add(f, x1, x2);
+        const uint64_t lam0 = F::mul(f, F::sub(f, y2, y1), d[k]);
+        const uint64_t lam1 = F::mul(f, F::add(f, y2, y1), d[k]);
+        keys[b] = F::sub(f, F::sqr(f, lam0), xsum);
+        keys[b + 1] = F::sub(f, F::sqr(f, lam1), xsum);
     }
 }
 
@@ -456,6 +467,28 @@ RF_HD uint64_t rf_thread_count(uint32_t n_targets, uint32_t n_fb, int chunk) {
     return (uint64_t)n_targets * rf_n_chunks(n_fb, chunk);
 }
 
+/* Map linear tid to target and factor-base chunk.
+ * Most host batches contain fewer than 2^32 logical threads, so 32-bit
+ * division is sufficient and substantially cheaper on x86-64.  Keep a
+ * 64-bit fallback for large jobs (the product of target and chunk counts
+ * can exceed 2^32); CUDA retains its previous uniform mapping. */
+RF_HD void rf_thread_map(uint64_t tid, uint32_t n_targets, uint32_t chunk,
+                         uint32_t &target, uint32_t &i0) {
+#ifdef __CUDA_ARCH__
+    target = (uint32_t)(tid % (uint64_t)n_targets);
+    i0 = (uint32_t)(tid / (uint64_t)n_targets) * chunk;
+#else
+    if (tid <= 0xFFFFFFFFull) {
+        const uint32_t t = (uint32_t)tid;
+        target = t % n_targets;
+        i0 = (t / n_targets) * chunk;
+    } else {
+        target = (uint32_t)(tid % (uint64_t)n_targets);
+        i0 = (uint32_t)(tid / (uint64_t)n_targets) * chunk;
+    }
+#endif
+}
+
 /* ------------------------------------------------------------------ *
  * The per-thread oracle.  CHUNK must be a multiple of 8 and <= 64.
  * ------------------------------------------------------------------ */
@@ -495,8 +528,8 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
     typedef typename F::elt elt;
     const typename F::ctx &f = a.f;
     if (tid >= rf_thread_count(a.n_targets, a.n_fb, CHUNK)) return;
-    const uint32_t k = (uint32_t)(tid % (uint64_t)a.n_targets);
-    const uint32_t i0 = (uint32_t)(tid / (uint64_t)a.n_targets) * (uint32_t)CHUNK;
+    uint32_t k, i0;
+    rf_thread_map(tid, a.n_targets, (uint32_t)CHUNK, k, i0);
     const uint32_t cnt = (a.n_fb - i0 < (uint32_t)CHUNK) ? (a.n_fb - i0) : (uint32_t)CHUNK;
 
     RF_PROF_BEGIN(tid);
@@ -522,10 +555,23 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
         }
     }
     RF_PROF_STEP(0);
-    /* Montgomery's trick: prefix products, one inversion, unwind. */
-    elt acc = one;
+    /* Montgomery's trick: prefix products, one inversion, unwind.
+     * CHUNK >= 8. For host tails, use the actual active length until the
+     * final element: this skips 3*(CHUNK-cnt) padded multiplications.
+     * The full chunk is identical. CUDA keeps its fixed length for
+     * uniform unrolling, register usage and warp scheduling.
+     * cnt >= 1 for every valid tid. */
+#ifdef __CUDA_ARCH__
+    const int inv_len = CHUNK;
+#else
+    /* Only change the tested CHUNK=32 case. Other chunk sizes retain
+     * the previous 3/4 cutoff until independently benchmarked. */
+    const int cutoff = CHUNK == 32 ? 27 : (3 * CHUNK) / 4;
+    const int inv_len = cnt <= (uint32_t)cutoff ? (int)cnt : CHUNK;
+#endif
+    elt acc = d[0];
 #pragma unroll
-    for (int w = 0; w < CHUNK; w++) {
+    for (int w = 1; w < inv_len; w++) {
         pre[w] = acc;
         acc = F::mul(f, acc, d[w]);
     }
@@ -533,11 +579,12 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
     elt inv_acc = F::inv(f, acc);
     RF_PROF_STEP(2);
 #pragma unroll
-    for (int w = CHUNK - 1; w >= 0; w--) {
+    for (int w = inv_len - 1; w > 0; w--) {
         elt dw = d[w];
         d[w] = F::mul(f, inv_acc, pre[w]);
         inv_acc = F::mul(f, inv_acc, dw);
     }
+    d[0] = inv_acc;
     RF_PROF_STEP(3);
 
     /* The sweep.  Factor-base loads are warp-uniform (every lane holds
@@ -554,11 +601,14 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
         const elt inv = d[w];
         const elt lam_m = F::mul(f, F::add(f, yr, yi), inv);   /* eps = +1: R - F_i */
         const elt lam_p = F::mul(f, F::sub(f, yr, yi), inv);   /* eps = -1: R + F_i */
+        /* x3 = lam^2 - (xr+xi), for both signs: one shared modular
+         * addition replaces two independent pairs of subtractions. */
+        const elt xsum = F::add(f, xr, xi);
 #if RF_PROBE_PAIR
         /* both lookups start before either is walked (begin2); the walks
          * below then run eps = +1 first, as in the unpaired loop */
-        const elt x3_m = F::sub(f, F::sub(f, F::sqr(f, lam_m), xr), xi);
-        const elt x3_p = F::sub(f, F::sub(f, F::sqr(f, lam_p), xr), xi);
+        const elt x3_m = F::sub(f, F::sqr(f, lam_m), xsum);
+        const elt x3_p = F::sub(f, F::sqr(f, lam_p), xsum);
         uint32_t pos_m, pos_p;
         {
             RF_PROF_PROBE_START();
@@ -576,7 +626,7 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
             RF_PROF_PROBE_START();
             uint32_t pos = s == 0 ? pos_m : pos_p;
 #else
-            const elt x3 = F::sub(f, F::sub(f, F::sqr(f, lam), xr), xi);
+            const elt x3 = F::sub(f, F::sqr(f, lam), xsum);
             const uint64_t key = F::key(f, x3);
             RF_PROF_PROBE_START();
             uint32_t pos = table.begin(key);
