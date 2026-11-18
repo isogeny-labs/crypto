@@ -336,6 +336,31 @@ pub trait DecompositionOracle<G: CountedGroup> {
         None
     }
 
+    /// `m > 0` when the oracle asks for the `StrideGeneratorSib { m }`
+    /// giant-step walk in place of `targets=stride-generator` (sibling
+    /// pairs `C ± [i]G` from one inversion, the minus side an abscissa
+    /// only, see `TargetSource::StrideGeneratorSib`); it must then answer
+    /// [`probe_x`](Self::probe_x).  `0` (the default) keeps every
+    /// recorded run's walk.
+    fn walk_siblings(&self) -> u32 {
+        0
+    }
+
+    /// Whether a target known only by its abscissa `x` (a binary curve's
+    /// field element as a word) can decompose: `Some(false)` is a counted
+    /// miss, `Some(true)` a counted hit that the pipeline confirms by
+    /// forming the point and calling [`decompose`](Self::decompose);
+    /// `None` (the default) when the oracle has no such probe.
+    fn probe_x(
+        &mut self,
+        _ctx: &InstanceCtx<G>,
+        _fb: &FactorBase<G::Elt>,
+        _counters: &mut OracleCounters,
+        _x: u64,
+    ) -> Option<bool> {
+        None
+    }
+
     /// The stored signed Frobenius orbit of `G` (already paid for by the
     /// base) that the recovery check `[d]G` may read through the τ-adic
     /// expansion of `d` ([`tau_orbit_mul`]) instead of a double-and-add,

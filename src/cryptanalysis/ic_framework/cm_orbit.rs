@@ -353,6 +353,7 @@ impl FactorBaseBuilder<PrimeCurve> for CmOrbitBase<'_> {
             affine_subspace: None,
             frobenius_orbit_layout: None,
             known_logs: None,
+            generator_ladder: Vec::new(),
         };
         let mut seen = HashSet::new();
         let mut x = 1;

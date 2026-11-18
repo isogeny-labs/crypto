@@ -1525,6 +1525,19 @@ pub trait CountedGroup {
     ) -> Option<Self::Elt> {
         None
     }
+    /// A binary curve's sibling pair from ONE inversion `1/(x_P + x_J)`:
+    /// the full point `P + J` (its slope `λ₊`, square and `y`, exactly as
+    /// [`CountedGroup::add`] forms it) and the abscissa of `P − J`
+    /// (`λ₋ = λ₊ + x_J/(x_P + x_J)`, one multiplication and one squaring
+    /// more).  Nothing is charged here: the caller charges the pair as ONE
+    /// group addition plus one `sibling_second_points` (the convention of
+    /// the `wwalk` / `ksum` siblings and the layout pair table).  `None`
+    /// when the group has none (the default), or `P` or `J` is not finite,
+    /// or they share an abscissa (`J = ±P`): the caller then forms both
+    /// signs with full additions.  Used by the `walk_sib` giant-step walk.
+    fn x_sibling_pair(&self, _p: Self::Elt, _j: Self::Elt) -> Option<(Self::Elt, u64)> {
+        None
+    }
     /// `[k]P` by double-and-add, counted exactly.
     fn mul(&self, ops: &mut GroupOps, p: Self::Elt, k: u64) -> Self::Elt {
         ops.scalar_mults += 1;
@@ -7041,6 +7054,19 @@ impl CountedGroup for BinaryGroup<'_> {
     fn key(&self, p: &FastPoint) -> u64 {
         p.pack()
     }
+    fn x_sibling_pair(&self, p: FastPoint, j: FastPoint) -> Option<(FastPoint, u64)> {
+        if p.infinity || j.infinity || p.x == j.x {
+            return None;
+        }
+        let f = &self.0.field;
+        let inv = f.inv(p.x ^ j.x);
+        let lp = f.mul(p.y ^ j.y, inv);
+        let lm = lp ^ f.mul(j.x, inv);
+        let base = p.x ^ j.x ^ self.0.a;
+        let x_plus = f.sqr(lp) ^ lp ^ base;
+        let y_plus = f.mul(lp, p.x ^ x_plus) ^ x_plus ^ p.y;
+        Some((FastPoint::affine(x_plus, y_plus), f.sqr(lm) ^ lm ^ base))
+    }
 }
 
 /// Trial-division factorisation of a word.
@@ -7300,6 +7326,12 @@ pub struct FactorBase<E> {
     /// `known-log` base.  Present, the pipeline skips linear algebra, since
     /// one verified relation names the target's logarithm directly.
     pub known_logs: Option<Vec<u64>>,
+    /// The doubling chain `[2^i]G`, `i = 0..=L`, that a builder formed
+    /// (and charged) on its way to its known seeds, kept rather than
+    /// dropped (`compact-orbit-scan` with `multiple_doublings`; empty for
+    /// every other base).  Memory only: no consumer reads it unless asked
+    /// (`mitm-frobenius-layout-counted` `ladder_verify=1`).
+    pub generator_ladder: Vec<E>,
 }
 
 /// Charge the indexes a base builder derives (`ecbench::work`,
@@ -7342,6 +7374,7 @@ impl<E: Copy> FactorBase<E> {
             affine_subspace: None,
             frobenius_orbit_layout: None,
             known_logs: None,
+            generator_ladder: Vec::new(),
         }
     }
 
@@ -13477,6 +13510,19 @@ impl FrobeniusPairTable {
         }
     }
 
+    /// Whether an abscissa's signed Frobenius orbit is a key of the table:
+    /// the first half of [`probe`](Self::probe) (one canonicalisation, one
+    /// lookup, both counted), for a target known by its abscissa only (the
+    /// `walk_sib` giant-step walk).  A `true` says some `⟨σ, −1⟩`-image of
+    /// a stored pair has this abscissa; the caller forms the point and
+    /// probes it in full to name the pair and its sign.
+    pub fn probe_x(&self, ctr: &mut OracleCounters, x: u64) -> bool {
+        ctr.canonicalisations += 1;
+        let (key, _t_r) = self.canon.canon_with_shift(x);
+        ctr.lookups += 1;
+        self.map.contains_key(&key)
+    }
+
     /// The base index of `σ^t(P_idx)` for a lazy table: `t` Frobenius
     /// maps and one index lookup, both charged to `ctr` (the eager table
     /// charged one map and one lookup per step of `t` at build).
@@ -14023,6 +14069,21 @@ pub enum TargetSource {
     /// only after `r` steps, so the progression is unguarded and stops
     /// there instead: a guard probe a target could only ever miss.
     StrideGenerator,
+    /// `StrideGenerator`'s progression `R = Q + [k]G`, `k = 0, 1, …`, the
+    /// same targets in the same order, formed in blocks of `2m + 1` around
+    /// a centre `C = Q + [k_c]G` (`k_c = m + 1, 3m + 2, …`, one addition of
+    /// `[2m + 1]G` each): `C ± [i]G` for `i = 1..m` come as sibling pairs
+    /// from ONE inversion each (`CountedGroup::x_sibling_pair`), `C + [i]G`
+    /// full and `C − [i]G` as an abscissa only.  An abscissa is probed by
+    /// the oracle's x-only probe (`DecompositionOracle::probe_x`: one
+    /// canonicalisation and one lookup, counted); on a hit its point is
+    /// formed by one counted addition and decomposed as usual.  A pair is
+    /// charged one group addition plus one `sibling_second_points` (priced
+    /// at `w` by the band), the set-up `[2]G..[m]G, [m + 1]G, [2m + 1]G`
+    /// is `m + 1` counted operations, and a block's pairs are formed when
+    /// its first target is tried, so a hit early in a block has formed
+    /// (and paid for) the rest of the block.  Oracle `walk_sib=m`.
+    StrideGeneratorSib { m: u32 },
     /// `StrideRenew` with the guard moved after the decomposition: only
     /// a target that yields a relation is probed and remembered.  The
     /// guard exists so that no decomposed target is decomposed again
@@ -14058,6 +14119,7 @@ impl TargetSource {
             TargetSource::Stride => "stride",
             TargetSource::StrideRenew => "stride_renew",
             TargetSource::StrideGenerator => "stride_generator",
+            TargetSource::StrideGeneratorSib { .. } => "stride_generator_sib",
             TargetSource::StrideRenewDeferredGuard => "stride_renew_deferred_guard",
             TargetSource::StrideRenewJoint => "stride_renew_joint",
         }
@@ -14441,7 +14503,7 @@ pub fn collect_and_solve_relations_touching_ladder<G: CountedGroup, L: RelationS
     };
     collect_and_solve_relations_touching_check(
         g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
-        oracle, touch, line_guard, check,
+        oracle, touch, line_guard, check, None,
     )
 }
 
@@ -14480,6 +14542,7 @@ pub fn collect_and_solve_relations_touching_check<G: CountedGroup, L: RelationSo
     touch: impl Fn(&G::Elt),
     line_guard: bool,
     verify_ladder: RecoveryCheck<'_, G::Elt>,
+    xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool>,
 ) -> PipelineOutcome {
     let capacity = if targets.is_guarded() { 1 << 12 } else { 0 };
     if line_guard {
@@ -14501,6 +14564,7 @@ pub fn collect_and_solve_relations_touching_check<G: CountedGroup, L: RelationSo
             touch,
             GuardLineSet::with_capacity(capacity),
             verify_ladder,
+            xprobe,
         )
     } else {
         collect_and_solve_relations_scaled_touching(
@@ -14521,6 +14585,7 @@ pub fn collect_and_solve_relations_touching_check<G: CountedGroup, L: RelationSo
             touch,
             fast_map(capacity),
             verify_ladder,
+            xprobe,
         )
     }
 }
@@ -14564,6 +14629,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         |_| {},
         fast_map(if targets.is_guarded() { 1 << 12 } else { 0 }),
         RecoveryCheck::DoubleAndAdd,
+        None,
     )
 }
 
@@ -14590,6 +14656,7 @@ fn collect_and_solve_relations_scaled_touching<
     touch: impl Fn(&G::Elt),
     mut seen: R,
     verify_ladder: RecoveryCheck<'_, G::Elt>,
+    mut xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool>,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
     let mut rel = PhaseCost::default();
@@ -14777,6 +14844,28 @@ fn collect_and_solve_relations_scaled_touching<
             }
         }
     }
+    // `StrideGeneratorSib`: the multiples `[1]G..[m]G`, the step
+    // `[2m + 1]G`, the block centre `C = Q + [k_c]G` and the full points
+    // `C + [i]G` its pairs formed; `sw_next` is the next `k` to try.
+    let sw_m = match targets {
+        TargetSource::StrideGeneratorSib { m } => {
+            assert!(m >= 1, "walk_sib needs m >= 1");
+            assert!(
+                xprobe.is_some(),
+                "the sibling walk needs the oracle's x-only probe"
+            );
+            m as u64
+        }
+        _ => 0,
+    };
+    let mut sw_mults: Vec<G::Elt> = Vec::new();
+    let mut sw_step = g.identity();
+    let mut sw_centre = g.identity();
+    let mut sw_kc = 0u64;
+    let mut sw_plus: Vec<G::Elt> = vec![g.identity(); sw_m as usize + 1];
+    let mut sw_next = 0u64;
+    let (mut sw_second, mut sw_pairs, mut sw_lifts, mut sw_full_pairs, mut sw_xprobes) =
+        (0u64, 0u64, 0u64, 0u64, 0u64);
 
     while trials < max_trials {
         if lane_config.is_some() && lane_queue.is_empty() {
@@ -15010,6 +15099,85 @@ fn collect_and_solve_relations_scaled_touching<
                 }
                 (walk_point, wa, wb, None)
             }
+            TargetSource::StrideGeneratorSib { .. } => {
+                let m = sw_m;
+                let k = sw_next;
+                if k >= r {
+                    // k = r: back at Q, as `StrideGenerator` stops.
+                    break;
+                }
+                sw_next += 1;
+                wa = k;
+                wb = 1;
+                let point = if k == 0 {
+                    // R₀ = Q: a = 0, b = 1, no group work.
+                    stride_restarts += 1;
+                    target
+                } else {
+                    if k == 1 {
+                        // Set-up: [1]G..[m]G, [m + 1]G, [2m + 1]G (m + 1
+                        // operations), and the first centre Q + [m + 1]G.
+                        sw_mults.push(generator);
+                        let mut last = generator;
+                        for i in 2..=m {
+                            last = if i == 2 {
+                                g.double(&mut rel.group_ops, generator)
+                            } else {
+                                g.add(&mut rel.group_ops, last, generator)
+                            };
+                            sw_mults.push(last);
+                        }
+                        let m1 = if m == 1 {
+                            g.double(&mut rel.group_ops, generator)
+                        } else {
+                            g.add(&mut rel.group_ops, last, generator)
+                        };
+                        sw_step = g.add(&mut rel.group_ops, m1, last);
+                        sw_centre = g.add(&mut rel.group_ops, target, m1);
+                        sw_kc = m + 1;
+                    } else if k == sw_kc + m + 1 {
+                        sw_centre = g.add(&mut rel.group_ops, sw_centre, sw_step);
+                        sw_kc += 2 * m + 1;
+                    }
+                    if k < sw_kc {
+                        // C − [i]G: form the pair i now (C + [i]G is kept).
+                        let i = (sw_kc - k) as usize;
+                        let j = sw_mults[i - 1];
+                        match g.x_sibling_pair(sw_centre, j) {
+                            Some((plus, minus_x)) => {
+                                rel.group_ops.adds += 1;
+                                sw_second += 1;
+                                sw_pairs += 1;
+                                sw_plus[i] = plus;
+                                sw_xprobes += 1;
+                                let probe = xprobe.as_mut().expect("checked above");
+                                if !probe(&mut ctr, minus_x) {
+                                    trials += 1;
+                                    continue;
+                                }
+                                // A hit: the point itself, one addition.
+                                sw_lifts += 1;
+                                g.add(&mut rel.group_ops, sw_centre, g.neg(j))
+                            }
+                            None => {
+                                // C = ±[i]G or C = O: both signs in full.
+                                sw_full_pairs += 1;
+                                sw_plus[i] = g.add(&mut rel.group_ops, sw_centre, j);
+                                g.add(&mut rel.group_ops, sw_centre, g.neg(j))
+                            }
+                        }
+                    } else if k == sw_kc {
+                        sw_centre
+                    } else {
+                        sw_plus[(k - sw_kc) as usize]
+                    }
+                };
+                if g.is_identity(&point) {
+                    direct_skipped += 1;
+                    continue;
+                }
+                (point, wa, wb, None)
+            }
             TargetSource::WalkPrimeLanes { .. } => {
                 let (lane, point, a, b) = lane_queue.pop_front().expect("nonempty lane round");
                 (point, a, b, Some(lane))
@@ -15186,6 +15354,16 @@ fn collect_and_solve_relations_scaled_touching<
         rel.count("frobenius_maps", ctr.frobenius_maps);
     }
     rel.count("direct_relations_skipped", direct_skipped);
+    if sw_m > 0 {
+        // The sibling walk's own counts (zero-free: absent off the walk).
+        rel.count("walk_sibling_m", sw_m);
+        rel.count("walk_sibling_pairs", sw_pairs);
+        rel.count("walk_sibling_full_pairs", sw_full_pairs);
+        rel.count("walk_sibling_lifts", sw_lifts);
+        rel.count("walk_x_only_probes", sw_xprobes);
+        rel.work("sibling_second_points", sw_second);
+        rel.work("counted:sibling_second_points", 1);
+    }
     rel.count("repeated_targets_skipped", repeats_skipped);
     rel.count("target_guard_probes", guard_probes);
     if striding {

@@ -1134,6 +1134,30 @@ fn lean_layout(params: &Params) -> Result<bool, String> {
     }
 }
 
+/// `orbit_key_reuse` of `compact-orbit-scan` (Koblitz K1 speed-up,
+/// 2026-11-18): absent or 0 is the incumbent build, bit for bit.  With 1
+/// (needs `generator_orbit=1`) a known seed's orbit key, which only detects
+/// a column that repeats an earlier one, is the least abscissa of the orbit
+/// members the builder forms anyway (each `σ(P) = (x², y²)` is one counted
+/// Frobenius map), not `n − 1` field squarings of the seed's abscissa that
+/// recompute exactly those abscissae.  The same keys, the same refusal of a
+/// repeated column, the same points; the squarings are gone.
+fn orbit_key_reuse(params: &Params) -> Result<bool, String> {
+    match params.get("orbit_key_reuse") {
+        None => Ok(false),
+        Some(_) => match params.u64("orbit_key_reuse")? {
+            0 => Ok(false),
+            1 => {
+                if !generator_orbit(params)? {
+                    return Err("orbit_key_reuse needs generator_orbit=1".into());
+                }
+                Ok(true)
+            }
+            v => Err(format!("orbit_key_reuse must be 0 or 1, not {v}")),
+        },
+    }
+}
+
 /// The log of the `j`-th known seed (1-based) over `G`.
 fn generator_multiple_log(j: u64, doublings: Option<u32>) -> u128 {
     match doublings {
@@ -1187,6 +1211,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
             ),            (
                 "lean_layout",
                 "1 (needs generator_orbit=1 and generator_multiples = columns): the same points, columns, coefficients and negation map without the work no orbit-layout consumer reads (the base's hash index, the on-curve check of each Frobenius image, the single column's orbit key); usable only by mitm-frobenius-layout-counted. 0 or absent: the incumbent build",
+            ),
+            (
+                "orbit_key_reuse",
+                "1 (needs generator_orbit=1): each known seed's orbit key (it only refuses a repeated column) is the least abscissa of the orbit members already formed by the counted Frobenius maps, not n-1 more squarings of the seed's abscissa; same keys, refusals and points. 0 or absent: the incumbent build",
             ),
         ]
     }
@@ -1252,6 +1280,9 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         let multiples = generator_multiples(params)?;
         let doublings = multiple_doublings(params)?;
         let lean = lean_layout(params)?;
+        let key_reuse = orbit_key_reuse(params)?;
+        // `[2^i]G` as the doubling path forms it (kept, not recomputed).
+        let mut ladder: Vec<FastPoint> = Vec::new();
         if from_generator && !multipliers.is_empty() {
             return Err("generator_orbit=1 does not combine with norm > 0".into());
         }
@@ -1297,10 +1328,14 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
             // With `generator_multiples = k`, columns 1..k repeat this for
             // [j]G (one doubling, then one addition each), log h*j.
             let mut seed = ctx.generator;
+            if doublings.is_some() {
+                ladder.push(seed);
+            }
             for j in 1..=multiples {
                 if let (Some(d), true) = (doublings, j > 1) {
                     for _ in 0..d {
                         seed = g.double(ops, seed);
+                        ladder.push(seed);
                     }
                 } else if j == 2 {
                     seed = g.double(ops, seed);
@@ -1320,6 +1355,8 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
                 if lean && multiples == 1 {
                     // One column: there is no earlier orbit to repeat.
                     seen.insert(seed.x);
+                } else if key_reuse {
+                    // Keyed below, from the orbit members once formed.
                 } else {
                     let mut x = seed.x;
                     let mut key = x;
@@ -1355,6 +1392,22 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
                 }
                 if member != seed || coefficient != 1 {
                     return Err("the generator's Frobenius orbit is not closed".into());
+                }
+                if key_reuse && !(lean && multiples == 1) {
+                    // The least abscissa over σ^t(seed), t < n: the key the
+                    // squarings would give, read off the formed members.
+                    let first = points.len() - 2 * inst.n as usize;
+                    let key = points[first..]
+                        .iter()
+                        .step_by(2)
+                        .map(|p| p.x)
+                        .min()
+                        .expect("an orbit has n >= 1 members");
+                    if !seen.insert(key) {
+                        return Err(format!(
+                            "the orbit of [{j}]G repeats an earlier column; use fewer generator_multiples"
+                        ));
+                    }
                 }
             }
         }
@@ -1523,6 +1576,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         // t = 0..n; multiplier orbits share a column but follow the same
         // order, so the layout holds for them too.
         fb.frobenius_orbit_layout = Some(inst.n);
+        fb.generator_ladder = ladder;
         // `from_column_map`'s inserts, lookups and negations are in this
         // builder's `hash_probes_uncharged` and `point_negations_uncharged`
         // below; only its abscissa sort is new.
@@ -4244,6 +4298,23 @@ pub struct FrobeniusMitmOracle<'i> {
     /// `tau_verify=1` (layout table only): the recovery check reads the
     /// base's stored orbit of `G` through the τ-adic NAF of `d`.
     tau_check: Option<TauOrbitCheck<FastPoint>>,
+    /// `walk_sib=m` (layout table, m = 2): the `StrideGeneratorSib { m }`
+    /// giant-step walk with x-only probes; 0 is the incumbent walk.
+    walk_sib: u32,
+    /// `ladder_verify=1`: the base's stored doubling chain `[2^i]G`,
+    /// read by the recovery check (`ladder_mul`) instead of re-doubling.
+    ladder: Option<Vec<FastPoint>>,
+}
+
+/// `walk_sib` of the layout oracle: absent or 0 is the incumbent walk.
+fn walk_sib(params: &Params) -> Result<u32, String> {
+    match params.get("walk_sib") {
+        None => Ok(0),
+        Some(_) => match params.u64("walk_sib")? {
+            v @ 0..=64 => Ok(v as u32),
+            v => Err(format!("walk_sib must be 0..=64, not {v}")),
+        },
+    }
 }
 
 /// A 0/1 flag of the layout oracle; absent is 0.
@@ -4269,6 +4340,8 @@ impl<'i> FrobeniusMitmOracle<'i> {
             lazy_members: false,
             layout_members: false,
             tau_check: None,
+            walk_sib: 0,
+            ladder: None,
         }
     }
 
@@ -4282,6 +4355,8 @@ impl<'i> FrobeniusMitmOracle<'i> {
             lazy_members: false,
             layout_members: false,
             tau_check: None,
+            walk_sib: 0,
+            ladder: None,
         }
     }
 
@@ -4358,6 +4433,14 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
                 "1 (layout table only; column 0 must be the generator's orbit, generator_orbit=1): the recovery check forms [d]G as the tau-adic NAF of d summed over the stored signed orbit of G (one addition per non-zero digit, tau^n = 1), with its recoding steps reported as tau_naf_recode_steps_uncharged. 0 or absent: double-and-add",
             ),
             (
+                "walk_sib",
+                "m >= 1 (layout table, m=2, targets=stride-generator; Koblitz K1 speed-up, 2026-11-18): the same targets Q + [k]G in the same order, formed in blocks of 2m+1 around a centre C (one addition of [2m+1]G a block): C + [i]G and the abscissa of C - [i]G from ONE inversion each (charged one addition plus one sibling_second_points), the abscissa probed by one canonicalisation and one lookup and, on a hit, its point formed by one more addition and probed in full; set-up [2]G..[m+1]G and [2m+1]G, m+1 operations. 0 or absent: the incumbent walk",
+            ),
+            (
+                "ladder_verify",
+                "1 (needs a base with a stored doubling chain, compact-orbit-scan with multiple_doublings): the recovery check forms [d]G from the chain [2^i]G the base formed and charged on its way to its seeds (ladder_mul: popcount(d)-1 additions, doublings only above the chain), not by re-doubling G. 0 or absent: double-and-add",
+            ),
+            (
                 "large_primes",
                 "0 (default), 1 or 2 residual points outside the base a partial relation may carry; needs m=3",
             ),
@@ -4413,6 +4496,28 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
         }
         if fb.index_elided() && !self.layout_members {
             return Err("a base without its index needs mitm-frobenius-layout-counted".into());
+        }
+        self.walk_sib = walk_sib(params)?;
+        if self.walk_sib > 0 && (!self.layout_members || self.m != 2) {
+            return Err("walk_sib needs mitm-frobenius-layout-counted with m=2".into());
+        }
+        self.ladder = None;
+        if layout_flag(params, "ladder_verify")? {
+            if !self.layout_members {
+                return Err("ladder_verify needs mitm-frobenius-layout-counted".into());
+            }
+            if tau_verify {
+                return Err(
+                    "ladder_verify and tau_verify are two recovery checks; pick one".into(),
+                );
+            }
+            if fb.generator_ladder.len() < 2 || fb.generator_ladder[0] != ctx.generator {
+                return Err(
+                    "ladder_verify needs a base that stored its doubling chain from G (compact-orbit-scan multiple_doublings)"
+                        .into(),
+                );
+            }
+            self.ladder = Some(fb.generator_ladder.clone());
         }
         self.tau_check = None;
         if tau_verify {
@@ -4488,6 +4593,28 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
 
     fn recovery_tau_orbit(&self) -> Option<TauOrbitCheck<FastPoint>> {
         self.tau_check.clone()
+    }
+
+    fn recovery_ladder(&self) -> Option<Vec<FastPoint>> {
+        self.ladder.clone()
+    }
+
+    fn walk_siblings(&self) -> u32 {
+        self.walk_sib
+    }
+
+    fn probe_x(
+        &mut self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        _fb: &FactorBase<FastPoint>,
+        counters: &mut OracleCounters,
+        x: u64,
+    ) -> Option<bool> {
+        if self.walk_sib == 0 || self.large.is_some() {
+            return None;
+        }
+        let table = self.table.as_ref()?;
+        Some(table.probe_x(counters, x))
     }
 
     fn decompose(
