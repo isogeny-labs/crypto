@@ -54,6 +54,11 @@ the frozen cohort requires `p > 2J+3` with `J=8`. The exact general small-
 characteristic formal-group construction is an open successor, not silently
 substituted into this run. [pcc:unverified]
 
+The implemented normalization and exact truncated formulas are recorded in
+`ALGORITHM.md`. In particular, the recurrence target x-coordinate is
+`U=(t-1)^2u`, not raw `u`; this scaling is required to make the isogeny
+normalized before applying the Bostan recurrence.
+
 ## Cost boundary
 
 The candidate target for fixed `J` is `O(M(J) log p)` base-field operations,
