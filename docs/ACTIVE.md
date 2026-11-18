@@ -15,7 +15,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 
-- [ ] Improve the exact Semaev projection/index-calculus lane toward cold one-target rho parity, with complete counted costs and verified recovery (Codex, started 2026-11-18, branch codex/semaev-rho-parity-20261118)
+- [ ] Improve the exact Semaev projection/index-calculus lane toward cold one-target rho parity, with complete counted costs and verified recovery (Codex, started 2026-11-18, branch codex/semaev-rho-parity-20261118, PR #4682)
 
 - [ ] Certify prime31 exact geometric CM conductor via 3-division and tighten nonscalar endomorphism degree bound (automation, started 2026-11-18, branch automation/prime31-cm-conductor3-certificate-20261118)
 - [x] Publish prime-field coverage, Split4 and RR9 follow-up evidence (Codex, started 2026-11-17, branch research/prime-field-followup-20261117, PR #4624)
