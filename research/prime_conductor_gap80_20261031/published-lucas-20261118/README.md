@@ -141,3 +141,21 @@ with manifest paths resolved from the repository root, preserves the pinned
 sources/executables. An initial check from attempt-a used the wrong working
 directory and failed to resolve relative paths; the root check passes without
 changing a subject. No retries or performance measurements were performed.
+
+## Publication and exporter checks
+
+The fixed-case files satisfy the existing storage size/suffix policy.
+The committed-head branch check still fails on the unchanged 318420-byte
+wide-harness runs.tar.xz archive, which requires the inaccessible S3 store;
+the PR remains draft. No new bucket request or unchanged workflow retry was
+made for this fixture. The original archive and all proof subjects retain
+their exact hashes. [pcc:unverified]
+
+The committed-state exporter emits
+`conductor.fixed_lucas.n7351.prime_bits=3673` with an explicit
+"no evaluated crossing; PCC unverified" label. Its scoped positive and
+missing-source controls pass. The full exporter command exits 1 on an
+unchanged malformed docs/ic/progress-timeline.json, line 565 column 6.
+That legacy JSON is byte-identical to this commit's parent. Retained
+metrics-full-partial.jsonl is incomplete output, not a successful full
+export; metrics-qualification.json records the scoped result. [pcc:unverified]

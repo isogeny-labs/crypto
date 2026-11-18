@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/workspace/crypto/tools/progress_metrics.py", line 1195, in <module>
+    main()
+  File "/workspace/crypto/tools/progress_metrics.py", line 1149, in main
+    timeline(a.ref)
+  File "/workspace/crypto/tools/progress_metrics.py", line 195, in timeline
+    d = json.loads(txt)
+        ^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/decoder.py", line 338, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/decoder.py", line 354, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 565 column 6 (char 44178)
