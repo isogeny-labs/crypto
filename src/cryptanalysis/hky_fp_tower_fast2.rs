@@ -96,13 +96,33 @@ pub struct Fast2Options {
     /// Test hook of the equality gate's negative controls (see v1); 0 in
     /// every measurement. 1: products by variable 0 are not formed.
     /// 2: the delayed reduction subtracts `p² − 1`. 3: the interreduction
-    /// drops the last term of every row it rewrites.
+    /// drops the last term of every row it rewrites. 4: a new epoch drops
+    /// the last term of every row with two or more tail terms. 5: the sweep
+    /// skips its first tile of every part.
     pub fault: u8,
+    /// After a closure without 1, check that it is closed
+    /// ([`verify_closed`]): every generator and every variable times every
+    /// final basis row of degree below `c` reduces to zero. Costs about one
+    /// more closure and a second copy of the echelon.
+    pub verify_closed: bool,
     /// Queue priority: products of a source row with `nnz` terms and leading
     /// degree `d` wait in bucket `1 + ⌊log₂ nnz⌋ + deg_weight · d`; the lowest
     /// bucket is served first, last in first out. 0 is v1's sparsest-first;
     /// 64 or more is lowest degree first, sparsest first among equals.
     pub deg_weight: usize,
+    /// Store row tails in the coordinates of the columns that were not
+    /// pivots at the last interreduction (an "epoch") and reduce in an
+    /// accumulator of that size ([`Echelon`]). Off: one epoch, every
+    /// column, which is v2 as it was. Same reductions either way.
+    pub np_epochs: bool,
+    /// Phase 0 of a batch at once, by tiles of epoch columns, when its
+    /// work is at least `sweep_ratio` multiply-adds per accumulator entry
+    /// and the accumulators take at most `sweep_max_words` words
+    /// ([`reduce_products`]). Same reductions either way.
+    pub sweep: bool,
+    pub sweep_ratio: u64,
+    pub sweep_tile_bytes: usize,
+    pub sweep_max_words: usize,
     /// Append one JSON line per batch and per interreduction to this file.
     pub trace: Option<String>,
 }
@@ -123,7 +143,13 @@ impl Default for Fast2Options {
             dense_num: 1,
             dense_den: 3,
             fault: 0,
+            verify_closed: false,
             deg_weight: 1,
+            np_epochs: true,
+            sweep: true,
+            sweep_ratio: 4,
+            sweep_tile_bytes: 1 << 20,
+            sweep_max_words: 1 << 28,
             trace: None,
         }
     }
@@ -155,6 +181,17 @@ pub struct Fast2Stats {
     pub products: u64,
     pub zero: u64,
     pub reducers: u64,
+    /// Multiply-adds against the rows of the epoch's pivots (phase 0 of the
+    /// reduction), and those spent on products that reduced to zero.
+    pub core_muladds: u64,
+    pub zero_muladds: u64,
+    /// Batches whose phase 0 ran as a sweep.
+    pub swept_batches: u64,
+    /// [`Fast2Options::verify_closed`]: reductions checked, how many were
+    /// not zero (0 = closed), seconds.
+    pub verify_products: u64,
+    pub verify_nonzero: u64,
+    pub verify_s: f64,
     pub dense_rows: u64,
     pub sparse_rows: u64,
     pub stored_words: u64,
@@ -164,9 +201,36 @@ pub struct Fast2Stats {
     pub simd: &'static str,
 }
 
+/// The echelon of one part.
+///
+/// **Stored rows are in epoch coordinates** (`research/hky_engine_opt_20261118/`):
+/// a row's leading column is a column of the part, but its tail is written
+/// in the coordinates of `np_cols`, the columns that were not pivots at the
+/// last interreduction (the "epoch"; before the first interreduction every
+/// column). Right after an interreduction every stored row has no pivot
+/// column in its tail, so a tail lives in the non-pivot columns; a row
+/// inserted later is reduced against every pivot, so its tail does too.
+/// Hence every tail can be written in `np_cols` coordinates, and reducing a
+/// product works in an accumulator of `np_cols.len()` entries (the columns
+/// not yet solved, `n − rank` late in a closure) instead of `n`.
+/// [`Echelon::row_full`] gives a row back in the part's columns.
+///
+/// - `RowS::Sparse(v)`: `v[0] = (lead, 1)` with `lead` a column of the part;
+///   `v[1..]` are `(j, x)` with `j` an index into `np_cols`, ascending.
+/// - `RowS::Dense { lead, v, nnz }`: `v[0] = 1`; `v[1 + i]` is the
+///   coefficient of `np_cols[s + i]`, `s = np_start(lead)` (the first epoch
+///   column after `lead`), up to the last epoch column.
+///
+/// Checkpoint state: `pivot`, `rows` and `np_cols` (`of_col` is derived:
+/// [`Echelon::with_epoch`]).
 struct Echelon {
     pivot: Vec<u32>,
     rows: Vec<RowS>,
+    /// The non-pivot columns of the epoch, ascending.
+    np_cols: Vec<u32>,
+    /// Column of the part → its index in `np_cols`, or `NONE` (a pivot
+    /// column of the epoch). Derived from `np_cols`.
+    of_col: Vec<u32>,
 }
 
 struct Scratch {
@@ -174,6 +238,7 @@ struct Scratch {
     bm: Vec<u64>,
 }
 
+#[derive(Clone, Copy)]
 struct Ctx {
     p: u64,
     p2: u64,
@@ -187,32 +252,323 @@ struct Ctx {
 struct Red {
     ops: u64,
     nred: u32,
+    /// Of `ops`, those of phase 0 (rows of the epoch's pivots).
+    ops0: u64,
 }
 
 impl Echelon {
-    /// Eliminates every pivot column from `r` (sorted by column, values
-    /// below `p`), following the cascade. The result is not normalised.
-    /// A pivot row only touches columns after its own.
-    fn eliminate(&self, cx: &Ctx, r: &[(u32, u32)], s: &mut Scratch, out: &mut Row) -> Red {
-        let (p, p2, bm_) = (cx.p, cx.p2, cx.barrett_m);
-        let n = self.pivot.len();
-        let mut red = Red::default();
-        let (Some(&(first, _)), Some(&(last, _))) = (r.first(), r.last()) else {
-            return red;
-        };
-        let acc = &mut s.acc[..n];
-        let bm = &mut s.bm;
-        let first = first as usize;
-        let mut last = last as usize;
-        let span = n - first;
-        let mut ci = first;
-        // Phase A: follow the bitmap while the reduction is sparse.
-        let budget = (span / 4) as u64;
-        if cx.bitmap && r.len() * 8 < span {
-            for &(col, c) in r {
-                acc[col as usize] = u64::from(c);
-                bm[col as usize >> 6] |= 1u64 << (col & 63);
+    /// An empty echelon of `n` columns (the identity epoch).
+    fn new(n: usize) -> Self {
+        Self::with_epoch(vec![NONE; n], Vec::new(), (0..n as u32).collect())
+    }
+
+    /// An echelon from its checkpointed parts (`of_col` rebuilt).
+    fn with_epoch(pivot: Vec<u32>, rows: Vec<RowS>, np_cols: Vec<u32>) -> Self {
+        let mut of_col = vec![NONE; pivot.len()];
+        for (j, &c) in np_cols.iter().enumerate() {
+            of_col[c as usize] = j as u32;
+        }
+        Echelon {
+            pivot,
+            rows,
+            np_cols,
+            of_col,
+        }
+    }
+
+    /// Index in `np_cols` of the first epoch column after column `lead`.
+    #[inline]
+    fn np_start(&self, lead: u32) -> usize {
+        self.np_cols.partition_point(|&c| c <= lead)
+    }
+
+    /// The tail of a stored row (after its leading column), in the part's
+    /// columns, ascending.
+    fn tail_full(&self, row: &RowS) -> Row {
+        match row {
+            RowS::Sparse(r) => r[1..]
+                .iter()
+                .map(|&(j, x)| (self.np_cols[j as usize], x))
+                .collect(),
+            RowS::Dense { lead, v, nnz } => {
+                let s = self.np_start(*lead);
+                let mut t = Vec::with_capacity(*nnz as usize);
+                for (i, &x) in v[1..].iter().enumerate() {
+                    if x != 0 {
+                        t.push((self.np_cols[s + i], x));
+                    }
+                }
+                t
             }
+        }
+    }
+
+    /// Stored row `ri` in the part's columns (monic, ascending).
+    fn row_full(&self, ri: usize) -> Row {
+        let row = &self.rows[ri];
+        let mut out = Vec::with_capacity(row.nnz());
+        out.push((lead_of(row), 1));
+        out.extend(self.tail_full(row));
+        out
+    }
+
+    /// A monic row in the part's columns whose tail has no pivot column of
+    /// the epoch, as a sparse stored row.
+    fn to_epoch(&self, r: &[(u32, u32)]) -> RowS {
+        let mut v: Row = Vec::with_capacity(r.len());
+        v.push(r[0]);
+        for &(c, x) in &r[1..] {
+            let j = self.of_col[c as usize];
+            assert!(j != NONE, "hky_fp_tower_fast2: a tail meets a pivot of the epoch");
+            v.push((j, x));
+        }
+        RowS::Sparse(v)
+    }
+
+    /// Storage form of a sparse stored row (dense when
+    /// `nnz · den > span · num`, `span` the epoch columns from the lead on).
+    fn densify(&self, row: RowS, num: usize, den: usize) -> RowS {
+        let RowS::Sparse(r) = row else {
+            return row;
+        };
+        let lead = r[0].0;
+        let s = self.np_start(lead);
+        let m = self.np_cols.len();
+        let span = 1 + m - s;
+        if r.len() * den > span * num {
+            let mut v = vec![0u32; span];
+            v[0] = 1;
+            for &(j, x) in &r[1..] {
+                v[1 + j as usize - s] = x;
+            }
+            RowS::Dense {
+                lead,
+                v,
+                nnz: r.len() as u32,
+            }
+        } else {
+            let mut r = r;
+            r.shrink_to_fit();
+            RowS::Sparse(r)
+        }
+    }
+
+    /// Starts a new epoch: the epoch columns that have become pivots are
+    /// dropped and every row's tail is rewritten in the new coordinates.
+    /// Every tail must be free of pivot columns (true right after an
+    /// interreduction); otherwise this panics.
+    fn new_epoch(&mut self, num: usize, den: usize, fault: u8) {
+        let pivot = &self.pivot;
+        let old: &[u32] = &self.np_cols;
+        let mut remap = vec![NONE; old.len()];
+        let mut np_new: Vec<u32> = Vec::with_capacity(old.len());
+        for (j, &c) in old.iter().enumerate() {
+            if pivot[c as usize] == NONE {
+                remap[j] = np_new.len() as u32;
+                np_new.push(c);
+            }
+        }
+        let m_new = np_new.len();
+        let start_new = |lead: u32| np_new.partition_point(|&c| c <= lead);
+        let start_old = |lead: u32| old.partition_point(|&c| c <= lead);
+        let rows = std::mem::take(&mut self.rows);
+        let rows: Vec<RowS> = rows
+            .into_par_iter()
+            .with_min_len(64)
+            .map(|row| {
+                let lead = lead_of(&row);
+                let mut t: Row = Vec::with_capacity(row.nnz());
+                t.push((lead, 1));
+                let mut put = |j: usize, x: u32| {
+                    let nj = remap[j];
+                    assert!(nj != NONE, "hky_fp_tower_fast2: new epoch: a tail meets a pivot");
+                    t.push((nj, x));
+                };
+                match &row {
+                    RowS::Sparse(r) => {
+                        for &(j, x) in &r[1..] {
+                            put(j as usize, x);
+                        }
+                    }
+                    RowS::Dense { v, .. } => {
+                        let s = start_old(lead);
+                        for (i, &x) in v[1..].iter().enumerate() {
+                            if x != 0 {
+                                put(s + i, x);
+                            }
+                        }
+                    }
+                }
+                drop(row);
+                if fault == 4 && t.len() > 2 {
+                    t.pop();
+                }
+                let s = start_new(lead);
+                let span = 1 + m_new - s;
+                if t.len() * den > span * num {
+                    let mut v = vec![0u32; span];
+                    v[0] = 1;
+                    for &(j, x) in &t[1..] {
+                        v[1 + j as usize - s] = x;
+                    }
+                    RowS::Dense {
+                        lead,
+                        v,
+                        nnz: t.len() as u32,
+                    }
+                } else {
+                    t.shrink_to_fit();
+                    RowS::Sparse(t)
+                }
+            })
+            .collect();
+        self.rows = rows;
+        self.np_cols = np_new;
+        self.of_col.iter_mut().for_each(|x| *x = NONE);
+        for (j, &c) in self.np_cols.iter().enumerate() {
+            self.of_col[c as usize] = j as u32;
+        }
+    }
+
+    /// `acc[tail] += f · tail` of a stored row, in epoch coordinates.
+    /// Returns the last index touched; marks the bitmap when `mark`.
+    #[inline]
+    fn apply(&self, cx: &Ctx, row: &RowS, f: u64, acc: &mut [u64], bm: &mut [u64], mark: bool) -> usize {
+        let p2 = cx.p2;
+        match row {
+            RowS::Sparse(r) => {
+                if mark {
+                    for &(j, x) in &r[1..] {
+                        let i = j as usize;
+                        let t = acc[i] + f * u64::from(x);
+                        acc[i] = t.min(t.wrapping_sub(p2));
+                        bm[i >> 6] |= 1u64 << (j & 63);
+                    }
+                } else {
+                    for &(j, x) in &r[1..] {
+                        let i = j as usize;
+                        let t = acc[i] + f * u64::from(x);
+                        acc[i] = t.min(t.wrapping_sub(p2));
+                    }
+                }
+                if r.len() > 1 {
+                    r[r.len() - 1].0 as usize
+                } else {
+                    0
+                }
+            }
+            RowS::Dense { lead, v, .. } => {
+                let s = self.np_start(*lead);
+                if v.len() > 1 {
+                    axpy_dense(cx.simd, &mut acc[s..s + v.len() - 1], &v[1..], f, p2);
+                    s + v.len() - 2
+                } else {
+                    0
+                }
+            }
+        }
+    }
+
+    /// Eliminates every pivot column from `r` (the part's columns, ascending,
+    /// values below `p`), following the cascade, and appends the remaining
+    /// terms (the part's columns, ascending, not normalised) to `out`.
+    ///
+    /// Phase 0: a term of `r` at a pivot column of the epoch is final (no
+    /// stored tail has such a column), so its row is subtracted at once; the
+    /// other terms go to the accumulator. Then the cascade over the
+    /// accumulator in epoch coordinates, against the rows inserted since the
+    /// epoch (their leads are epoch columns), as v2: a bitmap while sparse,
+    /// then a scan. The result is the unique vector of `r + span(rows)` that
+    /// is zero at every pivot column, as before; the rows subtracted and
+    /// their factors are the same, so the multiply-adds are counted alike.
+    fn eliminate(&self, cx: &Ctx, r: &[(u32, u32)], s: &mut Scratch, out: &mut Row) -> Red {
+        let (p, bm_) = (cx.p, cx.barrett_m);
+        let m = self.np_cols.len();
+        let mut red = Red::default();
+        if r.is_empty() {
+            return red;
+        }
+        let acc = &mut s.acc[..m];
+        let bm = &mut s.bm;
+        // first epoch index touched, and the shape of phase 0
+        let mut first = usize::MAX;
+        let mut last = 0usize;
+        let mut core = false;
+        for &(col, _) in r {
+            let j = self.of_col[col as usize];
+            if j != NONE {
+                first = first.min(j as usize);
+                last = last.max(j as usize);
+            } else {
+                core = true;
+                let piv = self.pivot[col as usize];
+                assert!(piv != NONE, "hky_fp_tower_fast2: a column is neither in the epoch nor a pivot");
+                match &self.rows[piv as usize] {
+                    RowS::Sparse(rr) => {
+                        if rr.len() > 1 {
+                            first = first.min(rr[1].0 as usize);
+                        }
+                    }
+                    RowS::Dense { v, .. } => {
+                        if v.len() > 1 {
+                            first = first.min(self.np_start(col));
+                        }
+                    }
+                }
+            }
+        }
+        if first == usize::MAX {
+            // only pivot columns whose rows have no tail: r reduces to 0
+            for &(col, x) in r {
+                let v = u64::from(x) % p;
+                if v != 0 {
+                    let piv = self.pivot[col as usize];
+                    red.nred += 1;
+                    red.ops += self.rows[piv as usize].nnz() as u64;
+                    red.ops0 += self.rows[piv as usize].nnz() as u64;
+                }
+            }
+            return red;
+        }
+        let span = m - first;
+        let budget = (span / 4) as u64;
+        let mut marking = cx.bitmap && r.len() * 8 < span;
+        let marked = marking;
+        for &(col, x) in r {
+            let j = self.of_col[col as usize];
+            if j != NONE {
+                acc[j as usize] = u64::from(x);
+                if marking {
+                    bm[j as usize >> 6] |= 1u64 << (j & 63);
+                }
+            }
+        }
+        if core {
+            for &(col, x) in r {
+                if self.of_col[col as usize] != NONE {
+                    continue;
+                }
+                let v = u64::from(x) % p;
+                if v == 0 {
+                    continue;
+                }
+                let row = &self.rows[self.pivot[col as usize] as usize];
+                red.nred += 1;
+                red.ops += row.nnz() as u64;
+                red.ops0 += row.nnz() as u64;
+                if matches!(row, RowS::Dense { .. }) {
+                    marking = false;
+                }
+                let l = self.apply(cx, row, p - v, acc, bm, marking);
+                last = last.max(l);
+                if marking && red.ops > budget {
+                    marking = false;
+                }
+            }
+        }
+        let mut ci = first;
+        if marking {
+            // Phase A: follow the bitmap while the reduction is sparse.
             let mut w = ci >> 6;
             let mut switched = false;
             'a: loop {
@@ -235,33 +591,20 @@ impl Echelon {
                 if v == 0 {
                     continue;
                 }
-                let piv = self.pivot[ci];
+                let col = self.np_cols[ci];
+                let piv = self.pivot[col as usize];
                 if piv == NONE {
-                    out.push((ci as u32, v as u32));
+                    out.push((col, v as u32));
                     continue;
                 }
-                let f = p - v;
+                let row = &self.rows[piv as usize];
                 red.nred += 1;
-                match &self.rows[piv as usize] {
-                    RowS::Sparse(row) => {
-                        red.ops += row.len() as u64;
-                        for &(c2, x) in &row[1..] {
-                            let i = c2 as usize;
-                            let t = acc[i] + f * u64::from(x);
-                            acc[i] = t.min(t.wrapping_sub(p2));
-                            bm[i >> 6] |= 1u64 << (c2 & 63);
-                        }
-                        last = last.max(row[row.len() - 1].0 as usize);
-                        if red.ops > budget {
-                            switched = true;
-                        }
-                    }
-                    RowS::Dense { v: dv, nnz, .. } => {
-                        red.ops += u64::from(*nnz);
-                        axpy_dense(cx.simd, &mut acc[ci + 1..], &dv[1..], f, p2);
-                        last = n - 1;
-                        switched = true;
-                    }
+                red.ops += row.nnz() as u64;
+                let dense = matches!(row, RowS::Dense { .. });
+                let l = self.apply(cx, row, p - v, acc, bm, !dense);
+                last = last.max(l);
+                if dense || red.ops > budget {
+                    switched = true;
                 }
                 if switched {
                     for x in &mut bm[w..=last >> 6] {
@@ -274,12 +617,22 @@ impl Echelon {
             if !switched {
                 return red;
             }
-        } else {
-            for &(col, c) in r {
-                acc[col as usize] = u64::from(c);
+        } else if marked {
+            // phase 0 stopped marking: clear what it marked
+            for x in &mut bm[first >> 6..=last >> 6] {
+                *x = 0;
             }
         }
-        // Phase B: v1's scan.
+        // Phase B: the scan.
+        self.scan(cx, acc, ci, last, &mut red, out);
+        red
+    }
+
+    /// The cascade by a scan of `acc[ci..=last]` (epoch coordinates), against
+    /// the rows of the pivots inserted since the epoch; leaves `acc` zero
+    /// there and appends the other terms (the part's columns) to `out`.
+    fn scan(&self, cx: &Ctx, acc: &mut [u64], mut ci: usize, mut last: usize, red: &mut Red, out: &mut Row) {
+        let (p, bm_) = (cx.p, cx.barrett_m);
         while ci <= last {
             let raw = acc[ci];
             if raw == 0 {
@@ -292,36 +645,24 @@ impl Echelon {
                 ci += 1;
                 continue;
             }
-            let piv = self.pivot[ci];
+            let col = self.np_cols[ci];
+            let piv = self.pivot[col as usize];
             if piv == NONE {
-                out.push((ci as u32, v as u32));
+                out.push((col, v as u32));
                 ci += 1;
                 continue;
             }
-            let f = p - v;
+            let row = &self.rows[piv as usize];
             red.nred += 1;
-            match &self.rows[piv as usize] {
-                RowS::Sparse(row) => {
-                    red.ops += row.len() as u64;
-                    for &(c2, x) in &row[1..] {
-                        let i = c2 as usize;
-                        let t = acc[i] + f * u64::from(x);
-                        acc[i] = t.min(t.wrapping_sub(p2));
-                    }
-                    last = last.max(row[row.len() - 1].0 as usize);
-                }
-                RowS::Dense { v: dv, nnz, .. } => {
-                    red.ops += u64::from(*nnz);
-                    axpy_dense(cx.simd, &mut acc[ci + 1..], &dv[1..], f, p2);
-                    last = n - 1;
-                }
-            }
+            red.ops += row.nnz() as u64;
+            let l = self.apply(cx, row, p - v, acc, &mut [], false);
+            last = last.max(l);
             ci += 1;
         }
-        red
     }
 
-    /// A row reduced against the echelon and made monic (empty if zero).
+    /// A row reduced against the echelon and made monic (empty if zero),
+    /// in the part's columns.
     fn reduce(&self, cx: &Ctx, r: &[(u32, u32)], s: &mut Scratch) -> (Row, Red) {
         let mut out = Vec::new();
         let mut red = self.eliminate(cx, r, s, &mut out);
@@ -332,29 +673,25 @@ impl Echelon {
     /// Whether a stored row has a pivot column after its leading one.
     fn tail_meets_pivot(&self, row: &RowS) -> bool {
         match row {
-            RowS::Sparse(r) => r[1..].iter().any(|&(c, _)| self.pivot[c as usize] != NONE),
-            RowS::Dense { lead, v, .. } => v[1..]
+            RowS::Sparse(r) => r[1..]
                 .iter()
-                .zip(&self.pivot[*lead as usize + 1..])
-                .any(|(&x, &pv)| x != 0 && pv != NONE),
+                .any(|&(j, _)| self.pivot[self.np_cols[j as usize] as usize] != NONE),
+            RowS::Dense { lead, v, .. } => {
+                let s = self.np_start(*lead);
+                v[1..]
+                    .iter()
+                    .zip(&self.np_cols[s..])
+                    .any(|(&x, &c)| x != 0 && self.pivot[c as usize] != NONE)
+            }
         }
     }
 
-    /// A monic stored row with every pivot column of its tail eliminated.
+    /// A monic stored row with every pivot column of its tail eliminated,
+    /// in the part's columns.
     fn reduce_tail(&self, cx: &Ctx, row: &RowS, s: &mut Scratch) -> (Row, Red) {
-        let mut tail: Row = Vec::with_capacity(row.nnz());
-        let mut lead = 0u32;
-        let mut first = true;
-        row.for_each(|c, x| {
-            if first {
-                lead = c;
-                first = false;
-            } else {
-                tail.push((c, x));
-            }
-        });
+        let tail = self.tail_full(row);
         let mut out: Row = Vec::with_capacity(row.nnz());
-        out.push((lead, 1));
+        out.push((lead_of(row), 1));
         let red = self.eliminate(cx, &tail, s, &mut out);
         (out, red)
     }
@@ -364,26 +701,6 @@ fn lead_of(row: &RowS) -> u32 {
     match row {
         RowS::Sparse(r) => r[0].0,
         RowS::Dense { lead, .. } => *lead,
-    }
-}
-
-fn store(r: Row, n: usize, num: usize, den: usize) -> RowS {
-    let lead = r[0].0;
-    let span = n - lead as usize;
-    if r.len() * den > span * num {
-        let mut v = vec![0u32; span];
-        for &(col, x) in &r {
-            v[(col - lead) as usize] = x;
-        }
-        RowS::Dense {
-            lead,
-            v,
-            nnz: r.len() as u32,
-        }
-    } else {
-        let mut r = r;
-        r.shrink_to_fit();
-        RowS::Sparse(r)
     }
 }
 
@@ -403,6 +720,11 @@ struct ItemOut {
     src_age: u64,
     src_nnz: u64,
     max_task: u64,
+    /// Phase-0 multiply-adds; multiply-adds of products that reduced to 0.
+    ops0: u64,
+    zero_ops: u64,
+    /// Tracing only: the epoch pivot rows the products need (part << 32 | row).
+    core: Vec<u64>,
 }
 
 struct Pool(Vec<Mutex<Scratch>>);
@@ -426,6 +748,349 @@ impl Pool {
         let mut g = self.0[i].lock().unwrap_or_else(|e| e.into_inner());
         f(&mut g)
     }
+}
+
+
+/// A raw pointer that parallel sections share; every use writes a range no
+/// other task writes (see [`reduce_products`]).
+#[derive(Clone, Copy)]
+struct SharedMut(*mut u64);
+// SAFETY: the tasks that receive a copy write disjoint index ranges.
+unsafe impl Send for SharedMut {}
+unsafe impl Sync for SharedMut {}
+impl SharedMut {
+    #[inline(always)]
+    fn ptr(self) -> *mut u64 {
+        self.0
+    }
+}
+
+/// What phase 0 of one product needs, found without touching memory.
+#[derive(Clone, Default)]
+struct Plan {
+    /// First and last epoch index the reduction writes (`first == usize::MAX`:
+    /// none).
+    first: usize,
+    last: usize,
+    /// Rows of the epoch's pivots to subtract, with their factors.
+    core: Vec<(u32, u64)>,
+    ops0: u64,
+}
+
+/// The rows `prods` (each in its part's columns) reduced against `ech`, as
+/// [`Echelon::reduce`] reduces them one by one, with the same result and the
+/// same counts. When the epoch has pivots and the work against their rows is
+/// large ([`Fast2Options::sweep_ratio`]), phase 0 is done for the whole
+/// batch at once, by tiles of epoch columns: each tile (one task, its own
+/// columns of every product's accumulator) reads each needed row once and
+/// subtracts it from every product that needs it, so a stored row is read
+/// once per batch instead of once per product. The cascade then runs per
+/// product. Otherwise every product is reduced alone.
+fn reduce_products(
+    ech: &[Echelon],
+    cx: &Ctx,
+    prods: &[(u8, Row)],
+    pool: &Pool,
+    sweep: &mut Vec<u64>,
+    opts: &Fast2Options,
+) -> (Vec<(Row, Red)>, bool) {
+    let alone = || -> Vec<(Row, Red)> {
+        prods
+            .par_iter()
+            .with_max_len(1)
+            .map(|(q, r)| pool.with(|s| ech[*q as usize].reduce(cx, r, s)))
+            .collect()
+    };
+    let n_parts = ech.len();
+    let epochs = ech.iter().all(|e| e.np_cols.len() < e.pivot.len());
+    if !opts.sweep || prods.is_empty() || !epochs {
+        return (alone(), false);
+    }
+    let p = cx.p;
+    // Phase 0, planned: which epoch-pivot rows each product needs.
+    let plans: Vec<Plan> = prods
+        .par_iter()
+        .map(|(q, r)| {
+            let e = &ech[*q as usize];
+            let mut pl = Plan {
+                first: usize::MAX,
+                ..Plan::default()
+            };
+            for &(col, x) in r {
+                let j = e.of_col[col as usize];
+                if j != NONE {
+                    pl.first = pl.first.min(j as usize);
+                    pl.last = pl.last.max(j as usize);
+                    continue;
+                }
+                let v = u64::from(x) % p;
+                if v == 0 {
+                    continue;
+                }
+                let piv = e.pivot[col as usize];
+                assert!(piv != NONE, "hky_fp_tower_fast2: a column is neither in the epoch nor a pivot");
+                let row = &e.rows[piv as usize];
+                pl.ops0 += row.nnz() as u64;
+                pl.core.push((piv, p - v));
+                match row {
+                    RowS::Sparse(rr) if rr.len() > 1 => {
+                        pl.first = pl.first.min(rr[1].0 as usize);
+                        pl.last = pl.last.max(rr[rr.len() - 1].0 as usize);
+                    }
+                    RowS::Dense { v, .. } if v.len() > 1 => {
+                        pl.first = pl.first.min(e.np_start(col));
+                        pl.last = e.np_cols.len() - 1;
+                    }
+                    _ => {}
+                }
+            }
+            pl
+        })
+        .collect();
+    // Is the batch worth it: phase-0 work against the accumulators' size.
+    let mut off = Vec::with_capacity(prods.len());
+    let mut total = 0usize;
+    let mut work = 0u64;
+    for ((q, _), pl) in prods.iter().zip(&plans) {
+        off.push(total);
+        total += ech[*q as usize].np_cols.len();
+        work += pl.ops0;
+    }
+    if work < opts.sweep_ratio * total as u64 || total > opts.sweep_max_words {
+        return (alone(), false);
+    }
+    if sweep.len() < total {
+        sweep.resize(total, 0);
+    }
+    let base = SharedMut(sweep.as_mut_ptr());
+    // The rows' own epoch terms (each product writes its own range).
+    prods.par_iter().zip(&off).for_each(|((q, r), &o)| {
+        let e = &ech[*q as usize];
+        let base = base;
+        for &(col, x) in r {
+            let j = e.of_col[col as usize];
+            if j != NONE {
+                // SAFETY: [o, o + m_q) belongs to this product alone.
+                unsafe { *base.ptr().add(o + j as usize) = u64::from(x) };
+            }
+        }
+    });
+    // Runs: every (row, product, factor) of a part, by row.
+    let mut runs: Vec<Vec<(u32, u32, u64)>> = vec![Vec::new(); n_parts];
+    for (k, ((q, _), pl)) in prods.iter().zip(&plans).enumerate() {
+        for &(row, f) in &pl.core {
+            runs[*q as usize].push((row, k as u32, f));
+        }
+    }
+    for r in runs.iter_mut() {
+        r.par_sort_unstable_by_key(|&(row, k, _)| (row, k));
+    }
+    // Per needed row: its users (a range of `runs`) and the epoch indices
+    // its tail covers, so a tile skips the rows that miss it cheaply.
+    let meta: Vec<Vec<(u32, u32, u32, u32, u32)>> = runs
+        .iter()
+        .zip(ech)
+        .map(|(rs, e)| {
+            let mut starts: Vec<u32> = Vec::new();
+            for i in 0..rs.len() {
+                if i == 0 || rs[i].0 != rs[i - 1].0 {
+                    starts.push(i as u32);
+                }
+            }
+            starts.push(rs.len() as u32);
+            starts
+                .par_windows(2)
+                .filter_map(|w| {
+                    let row = rs[w[0] as usize].0;
+                    let (a, b) = match &e.rows[row as usize] {
+                        RowS::Sparse(rr) if rr.len() > 1 => (rr[1].0, rr[rr.len() - 1].0),
+                        RowS::Dense { lead, v, .. } if v.len() > 1 => {
+                            (e.np_start(*lead) as u32, (e.np_cols.len() - 1) as u32)
+                        }
+                        _ => return None,
+                    };
+                    Some((row, w[0], w[1], a, b))
+                })
+                .collect()
+        })
+        .collect();
+    // Tiles of epoch columns: one task each, across both parts.
+    let nprod_q: Vec<usize> = (0..n_parts)
+        .map(|q| prods.iter().filter(|(pq, _)| *pq as usize == q).count().max(1))
+        .collect();
+    let mut tiles: Vec<(usize, usize, usize)> = Vec::new();
+    for (q, e) in ech.iter().enumerate() {
+        if runs[q].is_empty() {
+            continue;
+        }
+        let m = e.np_cols.len();
+        let w = (opts.sweep_tile_bytes / (8 * nprod_q[q]))
+            .min(m.div_ceil(4 * rayon::current_num_threads()))
+            .clamp(64, m.max(64));
+        let mut j0 = 0;
+        while j0 < m {
+            let j1 = (j0 + w).min(m);
+            tiles.push((q, j0, j1));
+            j0 = j1;
+        }
+    }
+    let p2 = cx.p2;
+    tiles.par_iter().with_max_len(1).for_each(|&(q, j0, j1)| {
+        if opts.fault == 5 && j0 == 0 {
+            return;
+        }
+        let e = &ech[q];
+        let base = base;
+        let rs = &runs[q];
+        for &(row_i, i0, i1, a, b) in &meta[q] {
+            if (a as usize) >= j1 || (b as usize) < j0 {
+                continue;
+            }
+            let users = &rs[i0 as usize..i1 as usize];
+            match &e.rows[row_i as usize] {
+                RowS::Sparse(rr) => {
+                    let tail = &rr[1..];
+                    if tail.is_empty() || (tail[0].0 as usize) >= j1 || (tail[tail.len() - 1].0 as usize) < j0 {
+                        continue;
+                    }
+                    let lo = tail.partition_point(|t| (t.0 as usize) < j0);
+                    let hi = tail.partition_point(|t| (t.0 as usize) < j1);
+                    let seg = &tail[lo..hi];
+                    for &(_, k, f) in users {
+                        let o = off[k as usize];
+                        for &(j, x) in seg {
+                            // SAFETY: column j of product k is in this tile,
+                            // which only this task writes.
+                            unsafe {
+                                let a = base.ptr().add(o + j as usize);
+                                let t = *a + f * u64::from(x);
+                                *a = t.min(t.wrapping_sub(p2));
+                            }
+                        }
+                    }
+                }
+                RowS::Dense { lead, v, .. } => {
+                    if v.len() <= 1 {
+                        continue;
+                    }
+                    let s = e.np_start(*lead);
+                    let a = s.max(j0);
+                    let b = j1; // the dense tail runs to the last epoch column
+                    if a >= b {
+                        continue;
+                    }
+                    let src = &v[1 + a - s..1 + b - s];
+                    for &(_, k, f) in users {
+                        let o = off[k as usize];
+                        // SAFETY: as above; the slice is this tile's columns
+                        // of product k.
+                        let dst = unsafe { std::slice::from_raw_parts_mut(base.ptr().add(o + a), b - a) };
+                        axpy_dense(cx.simd, dst, src, f, p2);
+                    }
+                }
+            }
+        }
+    });
+    // The cascade, per product, in its own accumulator range.
+    let done: Vec<(Row, Red)> = prods
+        .par_iter()
+        .with_max_len(1)
+        .zip(plans.par_iter())
+        .zip(off.par_iter())
+        .map(|(((q, _), pl), &o)| {
+            let e = &ech[*q as usize];
+            let m = e.np_cols.len();
+            let mut red = Red {
+                ops: pl.ops0,
+                nred: pl.core.len() as u32,
+                ops0: pl.ops0,
+            };
+            let mut out: Row = Vec::new();
+            if pl.first != usize::MAX {
+                // SAFETY: [o, o + m) belongs to this product alone.
+                let acc = unsafe { std::slice::from_raw_parts_mut(base.ptr().add(o), m) };
+                e.scan(cx, acc, pl.first, pl.last, &mut red, &mut out);
+            }
+            red.ops += normalise(&mut out, p);
+            (out, red)
+        })
+        .collect();
+    (done, true)
+}
+
+
+/// The closedness check of [`Fast2Options::verify_closed`]. `W` is the span
+/// of the final echelon (part by part). Every generator of degree at most
+/// `c` and every product `x_v · g`, for **every** variable `v` (not only one
+/// of each pair the symmetry swaps) and every final basis row `g` whose
+/// leading column has degree below `c`, is reduced against `W` and must be
+/// zero. The rows of degree below `c` span `W ∩ R_{<c}` (the columns are
+/// sorted by degree, highest first), so this is the definition of closed.
+/// The echelon is first copied into the part's own columns (one epoch of
+/// every column), so the check uses neither the epoch coordinates nor the
+/// sweep of the run it checks. Returns (reductions, how many were not 0).
+fn verify_closed(
+    space: &Space,
+    ech: &[Echelon],
+    cx: &Ctx,
+    c: u32,
+    nv: usize,
+    gens: &[(u8, Row)],
+    pool: &Pool,
+) -> (u64, u64) {
+    let full: Vec<Echelon> = ech
+        .iter()
+        .map(|e| {
+            let rows: Vec<RowS> = (0..e.rows.len())
+                .into_par_iter()
+                .map(|ri| RowS::Sparse(e.row_full(ri)))
+                .collect();
+            let mut f = Echelon::new(e.pivot.len());
+            f.pivot = e.pivot.clone();
+            f.rows = rows;
+            f
+        })
+        .collect();
+    let cx = Ctx {
+        bitmap: false,
+        ..*cx
+    };
+    let check = |q: u8, r: &Row| -> u64 {
+        let (red, _) = pool.with(|s| full[q as usize].reduce(&cx, r, s));
+        u64::from(!red.is_empty())
+    };
+    let mut done = gens.len() as u64;
+    let mut bad: u64 = gens.iter().map(|(q, r)| check(*q, r)).sum();
+    let jobs: Vec<(u8, u32)> = full
+        .iter()
+        .enumerate()
+        .flat_map(|(q, e)| {
+            (0..e.rows.len() as u32)
+                .filter(move |&ri| u32::from(space.parts[q].deg[lead_of(&e.rows[ri as usize]) as usize]) < c)
+                .map(move |ri| (q as u8, ri))
+        })
+        .collect();
+    let (n, b) = jobs
+        .par_iter()
+        .with_max_len(1)
+        .map(|&(q, ri)| {
+            let src = &full[q as usize].rows[ri as usize];
+            let (mut n, mut b) = (0u64, 0u64);
+            let mut formed: Vec<(u8, Row)> = Vec::new();
+            for v in 0..nv {
+                formed.clear();
+                space.multiply(q as usize, src, v, &mut formed);
+                for (q2, r) in &formed {
+                    n += 1;
+                    b += check(*q2, r);
+                }
+            }
+            (n, b)
+        })
+        .reduce(|| (0, 0), |a, b| (a.0 + b.0, a.1 + b.1));
+    done += n;
+    bad += b;
+    (done, bad)
 }
 
 /// `V_{F,c}` with the instrument of `opts`.
@@ -504,10 +1169,7 @@ pub fn closure_fast2(
     let mut ech: Vec<Echelon> = space
         .parts
         .iter()
-        .map(|q| Echelon {
-            pivot: vec![NONE; q.keys.len()],
-            rows: Vec::new(),
-        })
+        .map(|q| Echelon::new(q.keys.len()))
         .collect();
     let n_buckets: usize = 66 + opts.deg_weight * (c as usize + 1);
     let bucket_of = |nnz: usize, d: u32| {
@@ -523,6 +1185,7 @@ pub fn closure_fast2(
         }
     }
     let pool = Pool::new(max_n);
+    let mut sweep_buf: Vec<u64> = Vec::new();
     let mut trace = opts.trace.as_ref().map(|path| {
         std::io::BufWriter::new(
             std::fs::OpenOptions::new()
@@ -560,7 +1223,7 @@ pub fn closure_fast2(
         stats.batches += 1;
         let t0 = Instant::now();
         let ech_ref = &ech;
-        let outs: Vec<ItemOut> = batch
+        let formed_items: Vec<(ItemOut, Vec<(u8, Row)>)> = batch
             .par_iter()
             .with_max_len(1)
             .map(|item| {
@@ -574,6 +1237,9 @@ pub fn closure_fast2(
                     src_age: 0,
                     src_nnz: 0,
                     max_task: 0,
+                    ops0: 0,
+                    zero_ops: 0,
+                    core: Vec::new(),
                 };
                 let mut formed: Vec<(u8, Row)> = Vec::new();
                 match item {
@@ -581,7 +1247,9 @@ pub fn closure_fast2(
                     Item::Prod { part, row, var } => {
                         let e = &ech_ref[*part as usize];
                         let src = &e.rows[*row as usize];
-                        o.ops += space.multiply(*part as usize, src, *var as usize, &mut formed);
+                        // products are formed in the part's columns
+                        let full = RowS::Sparse(e.row_full(*row as usize));
+                        o.ops += space.multiply(*part as usize, &full, *var as usize, &mut formed);
                         if tracing {
                             o.src_deg = space.parts[*part as usize].deg[lead_of(src) as usize];
                             o.src_age = (e.rows.len() - *row as usize) as u64;
@@ -590,23 +1258,42 @@ pub fn closure_fast2(
                     }
                 }
                 o.formed = formed.len() as u32;
-                // The projections of one product (two when the variable is
-                // swapped by the symmetry) are separate tasks.
-                let red1 =
-                    |(q, r): &(u8, Row)| pool.with(|s| ech_ref[*q as usize].reduce(&cx, r, s));
-                let done: Vec<(Row, Red)> = if formed.len() == 2 {
-                    let (a, b) = rayon::join(|| red1(&formed[0]), || red1(&formed[1]));
-                    vec![a, b]
-                } else {
-                    formed.iter().map(red1).collect()
-                };
-                for ((q, r), (red, rd)) in formed.iter().zip(done) {
+                if tracing {
+                    for (q, r) in &formed {
+                        let e = &ech_ref[*q as usize];
+                        for &(col, _) in r {
+                            if e.of_col[col as usize] == NONE {
+                                o.core.push(u64::from(*q) << 32 | u64::from(e.pivot[col as usize]));
+                            }
+                        }
+                    }
+                }
+                (o, formed)
+            })
+            .collect();
+        // Reduce every product of the batch (alone, or by the sweep).
+        let mut prods: Vec<(u8, Row)> = Vec::new();
+        let mut items: Vec<ItemOut> = Vec::with_capacity(formed_items.len());
+        for (o, formed) in formed_items {
+            prods.extend(formed);
+            items.push(o);
+        }
+        let (done, swept) = reduce_products(&ech, &cx, &prods, &pool, &mut sweep_buf, opts);
+        stats.swept_batches += u64::from(swept);
+        let mut done = done.into_iter().zip(prods);
+        let outs: Vec<ItemOut> = items
+            .into_iter()
+            .map(|mut o| {
+                for ((red, rd), (q, r)) in done.by_ref().take(o.formed as usize) {
                     o.prod_nnz += r.len() as u64;
                     o.ops += rd.ops;
                     o.max_task = o.max_task.max(rd.ops);
                     o.nred += u64::from(rd.nred);
-                    if !red.is_empty() {
-                        o.cands.push((*q, red));
+                    o.ops0 += rd.ops0;
+                    if red.is_empty() {
+                        o.zero_ops += rd.ops;
+                    } else {
+                        o.cands.push((q, red));
                     }
                 }
                 o
@@ -624,9 +1311,29 @@ pub fn closure_fast2(
         let mut b_nnz = 0u64;
         let mut b_age = 0u64;
         let mut b_src = 0u64;
+        let mut b_ops0 = 0u64;
+        let mut b_zero_ops = 0u64;
+        // tracing: epoch pivot rows needed, summed and distinct, per batch and per 8 items
+        let (mut core_sum, mut core_union, mut core_union8) = (0u64, 0u64, 0u64);
+        if tracing {
+            let mut all: Vec<u64> = Vec::new();
+            for blk in outs.chunks(8) {
+                let mut v: Vec<u64> = blk.iter().flat_map(|o| o.core.iter().copied()).collect();
+                core_sum += v.len() as u64;
+                all.extend_from_slice(&v);
+                v.sort_unstable();
+                v.dedup();
+                core_union8 += v.len() as u64;
+            }
+            all.sort_unstable();
+            all.dedup();
+            core_union = all.len() as u64;
+        }
         let mut b_deg = [0u32; 16];
         let mut cands: Vec<(u8, Row)> = Vec::new();
         for o in outs {
+            b_ops0 += o.ops0;
+            b_zero_ops += o.zero_ops;
             b_ops += o.ops;
             b_max = b_max.max(o.max_task);
             b_nred += o.nred;
@@ -640,6 +1347,8 @@ pub fn closure_fast2(
         stats.muladds += b_ops;
         stats.products += b_formed;
         stats.reducers += b_nred;
+        stats.core_muladds += b_ops0;
+        stats.zero_muladds += b_zero_ops;
         let b_cands = cands.len() as u64;
         stats.zero += b_formed - b_cands;
         // Second pass: reduce the survivors against each other and insert.
@@ -660,7 +1369,8 @@ pub fn closure_fast2(
                     if e.pivot[lead] == NONE {
                         e.pivot[lead] = e.rows.len() as u32;
                         winners.push((q, e.rows.len() as u32));
-                        e.rows.push(RowS::Sparse(r));
+                        let row = e.to_epoch(&r);
+                        e.rows.push(row);
                     } else {
                         losers.push((q, r));
                     }
@@ -698,7 +1408,8 @@ pub fn closure_fast2(
                 for (&(q, ri), w) in winners.iter().zip(wn) {
                     if let Some((r, rd)) = w {
                         second_ops += rd.ops;
-                        ech[q as usize].rows[ri as usize] = RowS::Sparse(r);
+                        let e = &mut ech[q as usize];
+                        e.rows[ri as usize] = e.to_epoch(&r);
                     }
                     inserted.push((q, ri));
                 }
@@ -729,23 +1440,32 @@ pub fn closure_fast2(
                 let e = &mut ech[qi];
                 e.pivot[r[0].0 as usize] = e.rows.len() as u32;
                 inserted.push((q, e.rows.len() as u32));
-                e.rows.push(RowS::Sparse(r));
+                let row = e.to_epoch(&r);
+                e.rows.push(row);
                 fresh[qi] = true;
             }
             serial += ts.elapsed().as_secs_f64();
         }
         // Finalise the inserted rows: storage form, queue, counts.
         let ts = Instant::now();
-        for &(q, ri) in &inserted {
+        // storage forms in parallel (a dense form is as long as the epoch)
+        let taken: Vec<RowS> = inserted
+            .iter()
+            .map(|&(q, ri)| std::mem::replace(&mut ech[q as usize].rows[ri as usize], RowS::Sparse(Vec::new())))
+            .collect();
+        let ech_ref = &ech;
+        let forms: Vec<RowS> = taken
+            .into_par_iter()
+            .zip(inserted.par_iter())
+            .with_max_len(16)
+            .map(|(row, &(q, _))| {
+                assert!(matches!(row, RowS::Sparse(_)), "rows are inserted sparse");
+                ech_ref[q as usize].densify(row, dense.0, dense.1)
+            })
+            .collect();
+        for (&(q, ri), stored) in inserted.iter().zip(forms) {
             let qi = q as usize;
-            let n_q = ech[qi].pivot.len();
-            let RowS::Sparse(r) =
-                std::mem::replace(&mut ech[qi].rows[ri as usize], RowS::Sparse(Vec::new()))
-            else {
-                unreachable!("rows are inserted sparse");
-            };
-            let lead = r[0].0;
-            let stored = store(r, n_q, dense.0, dense.1);
+            let lead = lead_of(&stored);
             match stored {
                 RowS::Dense { .. } => stats.dense_rows += 1,
                 RowS::Sparse(_) => stats.sparse_rows += 1,
@@ -784,7 +1504,7 @@ pub fn closure_fast2(
         if let Some(f) = trace.as_mut() {
             let _ = writeln!(
                 f,
-                "{{\"ev\":\"batch\",\"c\":{c},\"i\":{},\"bucket\":{b},\"items\":{take},\"formed\":{b_formed},\"prod_nnz\":{b_nnz},\"src_nnz\":{b_src},\"zero\":{},\"cands\":{b_cands},\"pivots\":{},\"rounds\":{rounds},\"ops\":{b_ops},\"max_ops\":{b_max},\"ops2\":{second_ops},\"nred\":{b_nred},\"age\":{b_age},\"deg\":{:?},\"rank\":{rank},\"words\":{},\"par_s\":{par_dt:.6},\"sec_s\":{:.6},\"serial_s\":{serial:.6}}}",
+                "{{\"ev\":\"batch\",\"c\":{c},\"i\":{},\"bucket\":{b},\"items\":{take},\"formed\":{b_formed},\"prod_nnz\":{b_nnz},\"src_nnz\":{b_src},\"zero\":{},\"cands\":{b_cands},\"pivots\":{},\"rounds\":{rounds},\"ops\":{b_ops},\"ops0\":{b_ops0},\"zero_ops\":{b_zero_ops},\"core_sum\":{core_sum},\"core_union\":{core_union},\"core_union8\":{core_union8},\"max_ops\":{b_max},\"ops2\":{second_ops},\"nred\":{b_nred},\"age\":{b_age},\"deg\":{:?},\"rank\":{rank},\"words\":{},\"par_s\":{par_dt:.6},\"sec_s\":{:.6},\"serial_s\":{serial:.6}}}",
                 stats.batches,
                 b_formed - b_cands,
                 inserted.len(),
@@ -819,7 +1539,6 @@ pub fn closure_fast2(
             let mut words = 0u64;
             let (mut n_dense, mut n_sparse) = (0u64, 0u64);
             for e in ech.iter_mut() {
-                let n_q = e.pivot.len();
                 let mut order: Vec<u32> = (0..e.rows.len() as u32).collect();
                 order.sort_unstable_by_key(|&i| std::cmp::Reverse(lead_of(&e.rows[i as usize])));
                 for chunk in order.chunks(opts.interreduce_block.max(1)) {
@@ -834,7 +1553,7 @@ pub fn closure_fast2(
                                 if opts.fault == 3 && r.len() > 1 {
                                     r.pop();
                                 }
-                                (store(r, n_q, dense.0, dense.1), rd)
+                                (e_ref.densify(e_ref.to_epoch(&r), dense.0, dense.1), rd)
                             })
                         })
                         .collect();
@@ -845,6 +1564,9 @@ pub fn closure_fast2(
                             e.rows[ri as usize] = row;
                         }
                     }
+                }
+                if opts.np_epochs {
+                    e.new_epoch(dense.0, dense.1, opts.fault);
                 }
                 for r in &e.rows {
                     words += r.words() as u64;
@@ -884,16 +1606,51 @@ pub fn closure_fast2(
             let dt = ti.elapsed().as_secs_f64();
             stats.interreduce_s += dt;
             if let Some(f) = trace.as_mut() {
+                // Shape of the (now fully reduced) echelon: per part, columns,
+                // rank, stored terms, and the non-pivot columns after each
+                // row's leading column (the most terms a reduced row can have).
+                let shape: Vec<String> = ech
+                    .iter()
+                    .map(|e| {
+                        let n_q = e.pivot.len();
+                        let mut np_after = vec![0u32; n_q + 1];
+                        for i in (0..n_q).rev() {
+                            np_after[i] = np_after[i + 1] + u32::from(e.pivot[i] == NONE);
+                        }
+                        let nnz: u64 = e.rows.iter().map(|r| r.nnz() as u64).sum();
+                        let room: u64 = e
+                            .rows
+                            .iter()
+                            .map(|r| u64::from(np_after[lead_of(r) as usize + 1]) + 1)
+                            .sum();
+                        format!("[{n_q},{},{nnz},{room}]", e.rows.len())
+                    })
+                    .collect();
                 let _ = writeln!(
                     f,
-                    "{{\"ev\":\"interreduce\",\"c\":{c},\"i\":{},\"rank\":{rank},\"changed\":{changed},\"ops\":{ir_ops},\"words_before\":{before},\"words_after\":{words},\"s\":{dt:.6}}}",
-                    stats.batches
+                    "{{\"ev\":\"interreduce\",\"c\":{c},\"i\":{},\"rank\":{rank},\"changed\":{changed},\"ops\":{ir_ops},\"words_before\":{before},\"words_after\":{words},\"s\":{dt:.6},\"shape\":[{}]}}",
+                    stats.batches,
+                    shape.join(",")
                 );
             }
         }
     }
     if let Some(f) = trace.as_mut() {
         let _ = f.flush();
+    }
+    if opts.verify_closed && !contains_one {
+        let tv = Instant::now();
+        let gen_rows: Vec<(u8, Row)> = live
+            .iter()
+            .zip(&signs)
+            .filter(|(g, _)| HkyRing::degree(g) <= c)
+            .map(|(g, &sign)| space.gen_row(g, sign))
+            .filter(|(_, r)| !r.is_empty())
+            .collect();
+        let (n, bad) = verify_closed(&space, &ech, &cx, c, nv, &gen_rows, &pool);
+        stats.verify_products = n;
+        stats.verify_nonzero = bad;
+        stats.verify_s = tv.elapsed().as_secs_f64();
     }
     stats.part_rank = ech.iter().map(|e| e.rows.len() as u64).collect();
     let entries: u64 = ech
@@ -1124,7 +1881,13 @@ mod tests {
                                     dense_num: 1,
                                     dense_den: 8,
                                     fault: 0,
+                                    verify_closed: false,
                                     deg_weight: [0, 1, 64][(bmin + block) % 3],
+                                    np_epochs: (bmin + bmax + usize::from(bitmap)) % 2 == 0,
+                                    sweep: rebucket,
+                                    sweep_ratio: [0, 1, 4][(bmin + block) % 3],
+                                    sweep_tile_bytes: [64, 4096, 1 << 20][block % 3],
+                                    sweep_max_words: 1 << 28,
                                     trace: None,
                                 };
                                 out.push((format!("{o:?}"), o));
@@ -1214,7 +1977,7 @@ mod tests {
         let (ring, gens) = consistent(t);
         let limits = HkyLimits::default();
         let a = fall_degrees(&ring, &gens, 1, 5, &limits);
-        for fault in [1u8, 2, 3] {
+        for fault in [1u8, 2, 3, 4, 5] {
             for sym in [false, true] {
                 let o = Fast2Options {
                     fault,
@@ -1225,6 +1988,7 @@ mod tests {
                     },
                     interreduce: 0.05,
                     interreduce_min: 1,
+                    sweep_ratio: 0,
                     ..Fast2Options::default()
                 };
                 let b = fall_degrees_fast2(&ring, &gens, 1, 5, &limits, &o);
@@ -1256,5 +2020,138 @@ mod tests {
         assert_eq!(a.muladds, b.muladds);
         assert_eq!(a.rows_reduced, b.rows_reduced);
         assert_eq!(a.entries, b.entries);
+    }
+}
+
+#[cfg(test)]
+mod opt_tests {
+    //! `research/hky_engine_opt_20261118/`: the epoch coordinates and the
+    //! sweep do the same reductions as v2, and the closedness check.
+    use super::*;
+    use crate::cryptanalysis::f4_fp_tower::SquareRule;
+    use crate::cryptanalysis::hky_fp_tower_fast::swap_first_two_blocks;
+
+    const P: u64 = 2013265921;
+
+    fn kummer(t: usize, top: u64) -> HkyRing {
+        let mut rules = Vec::new();
+        for b in 0..2 {
+            for j in 0..t {
+                let last = j + 1 == t;
+                rules.push(SquareRule {
+                    next: (!last).then_some((b * t + j + 1) as u8),
+                    a: 0,
+                    b: u64::from(!last),
+                    c: 0,
+                    d: if last { top } else { 0 },
+                });
+            }
+        }
+        HkyRing::new(P, rules, 0)
+    }
+
+    /// A symmetric generator with the root `(y0, P - y0)` planted when
+    /// `planted` (then 1 is in no closure).
+    fn system(t: usize, planted: bool) -> (HkyRing, Vec<NfPoly>) {
+        let y0 = 123_456_789u64;
+        let mut top = y0;
+        for _ in 0..t {
+            top = top * top % P;
+        }
+        let ring = kummer(t, if planted { top } else { 3 });
+        let n = ring.n_vars();
+        let e = |pairs: &[(usize, u32)]| {
+            let mut v = vec![0u32; n];
+            for &(i, x) in pairs {
+                v[i] = x;
+            }
+            v
+        };
+        let mut terms = vec![
+            (e(&[(0, 1), (t, 1)]), 19u64),
+            (e(&[(0, 1), (1, 1), (t, 1), (t + 1, 1)]), 7),
+            (e(&[(0, 1), (1, 1)]), 5),
+            (e(&[(t, 1), (t + 1, 1)]), 5),
+            (e(&[(1, 1)]), 11),
+            (e(&[(t + 1, 1)]), 11),
+        ];
+        let g = ring.from_raw(&terms);
+        if planted {
+            let mut point = Vec::new();
+            for start in [y0, P - y0] {
+                let mut y = start;
+                for _ in 0..t {
+                    point.push(y);
+                    y = y * y % P;
+                }
+            }
+            terms.push((vec![0u32; n], P - ring.eval(&g, &point)));
+        } else {
+            terms.push((vec![0u32; n], 29));
+        }
+        let g = ring.from_raw(&terms);
+        (ring, vec![g])
+    }
+
+    fn opts(np: bool, sweep: bool, sym: Option<Vec<usize>>) -> Fast2Options {
+        Fast2Options {
+            symmetry: sym,
+            interreduce: 0.1,
+            interreduce_min: 8,
+            np_epochs: np,
+            sweep,
+            sweep_ratio: 0,
+            sweep_tile_bytes: 64,
+            ..Fast2Options::default()
+        }
+    }
+
+    #[test]
+    fn epochs_and_sweep_do_the_same_reductions() {
+        let mut exercised = (false, false);
+        let limits = HkyLimits::default();
+        for planted in [false, true] {
+            for t in [3usize, 4] {
+                let (ring, gens) = system(t, planted);
+                for sym in [None, swap_first_two_blocks(t, 2)] {
+                    for c in 3..=5 {
+                        let (a, sa) = closure_fast2(&ring, &gens, c, &limits, &opts(false, false, sym.clone()));
+                        for (np, sw) in [(true, false), (true, true), (false, true)] {
+                            let (b, sb) = closure_fast2(&ring, &gens, c, &limits, &opts(np, sw, sym.clone()));
+                            let tag = format!("planted {planted} t {t} c {c} np {np} sweep {sw}");
+                            assert_eq!(a.dims, b.dims, "{tag}");
+                            assert_eq!(a.contains_one, b.contains_one, "{tag}");
+                            assert_eq!(a.muladds, b.muladds, "{tag}");
+                            assert_eq!(a.rows_reduced, b.rows_reduced, "{tag}");
+                            assert_eq!(a.entries, b.entries, "{tag}");
+                            assert_eq!(sa.zero, sb.zero, "{tag}");
+                            assert_eq!(sa.reducers, sb.reducers, "{tag}");
+                            exercised.0 |= sb.core_muladds > 0;
+                            exercised.1 |= sb.swept_batches > 0;
+                        }
+                    }
+                }
+            }
+        }
+        assert!(exercised.0 && exercised.1, "phase 0 and the sweep must both run");
+    }
+
+    #[test]
+    fn the_closedness_check_passes_and_sees_a_fault() {
+        let limits = HkyLimits::default();
+        let t = 4;
+        let (ring, gens) = system(t, true);
+        for sym in [None, swap_first_two_blocks(t, 2)] {
+            let mut o = opts(true, true, sym.clone());
+            o.verify_closed = true;
+            let (cl, st) = closure_fast2(&ring, &gens, 5, &limits, &o);
+            assert!(!cl.contains_one);
+            assert!(st.verify_products > 0);
+            assert_eq!(st.verify_nonzero, 0, "a correct closure is closed");
+            o.fault = 1;
+            let (cl, st) = closure_fast2(&ring, &gens, 5, &limits, &o);
+            assert!(!cl.contains_one);
+            assert!(st.verify_nonzero > 0, "products by variable 0 left out: not closed");
+        }
     }
 }
