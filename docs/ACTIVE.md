@@ -36,6 +36,8 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [x] Track conditional survivors and variable effects in the degree-fall toy report (Codex, started 2026-11-18, branch codex/degree-fall-variable-colors-20261118, PR #4639)
 
+- [ ] LEAD-ICE-hybrid-guess-determine-l7: stretch cell E8 (3, 22, 8), k* under R1 and its nested extension, k = 0 baseline, fresh draws, on a RunPod CPU pod (claude, started 2026-11-18, branch claude/ic-lead-hybrid-gd-l7)
+
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
 - [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
