@@ -85,3 +85,20 @@ This rules out interpreting the reduction by itself, or the prior supplied-x zet
 This lane was compared against existing [#4539 RR9 chart](https://github.com/isogeny-labs/crypto/pull/4539), [#4547 seven-known-leaf generic-equivalence obstruction](https://github.com/isogeny-labs/crypto/pull/4547), [#4692 unknown-chart F4](https://github.com/isogeny-labs/crypto/pull/4692), [#4720 algebraic signed pair](https://github.com/isogeny-labs/crypto/pull/4720), [#4717 low-power multiplicity](https://github.com/isogeny-labs/crypto/pull/4717), [#4728 supplied-x kernels](https://github.com/isogeny-labs/crypto/pull/4728), and [#4746 corrected PKM exponent](https://github.com/isogeny-labs/crypto/pull/4746). Repo code searches additionally checked `crypto-autoresearcher` and `cryptanalysis` for the same four-prefix interpolation mechanism. Published references: Petit–Kosters–Messeng, PKC 2016 (DOI 10.1007/978-3-662-49387-8_1), Amadori–Pintore–Sala, FFA 2018 (DOI 10.1016/j.ffa.2018.01.009). Shared KB MCP/wrapper is not accessible here; no exhaustive novelty claim.
 
 **Research status:** mathematically explicit preprocessing and directly executable Rust/independent Python checks are checked in, but this test does **not** discover an unknown four-prefix, compute full unknown-chart solutions, or show a cheaper complete prime-field solver. Signed PCC validation remains pending.
+
+
+## Native pinned original-curve CI verdict — PASS (2026-11-18, 21:38 UTC)
+
+**[Exact-source workflow #44402976602](https://github.com/isogeny-labs/crypto/actions/runs/44402976602)** completed **SUCCESS** at source commit `81aa80b6ad977faeee679c9cdfb3d3120fb0c5b2`, using the pinned original arithmetic `1df714645aa683cf975bc76fcacb9842cb4780fd` under Rust 1.100.0 and an ubuntu-24.04 GitHub-hosted runner. Its job steps passed:
+
+- Original native library **40/40** tests.
+- Native example **3/3** tests (including the exact original-curve four-prefix affine elimination, 4×3 local-rank and fail-closed negative/exception tests).
+- Source-specific production of the original 16 certificates.
+- Existing separately authored Python BigInt replay: original curve, 248 distinct weighted x, 16 RR9 charts, 128 signed root memberships, 16 altered-chart negatives and Hall-overlap false-positive guard.
+- New independent Python BigInt **symmetric finite-difference** replay: **16/16** exact chart reconstructions, **16/16** local rank-three Jacobians and **16/16** altered-v0 negatives.
+
+[Raw original-curve JSON artifact #14473102558](https://github.com/isogeny-labs/crypto/actions/runs/44402976602/artifacts/14473102558) contains 16 certificates and immutable source-specific run provenance. This is an independently implemented arithmetic replay on producer CI, **not an independently signed PCC verdict**; all claims remain **[pcc:unverified]**.
+
+**Failed predecessor retained:** [workflow #44402155613](https://github.com/isogeny-labs/crypto/actions/runs/44402155613) had passed Rust 40+3 tests, but a Python verifier loop shadowed the polynomial function `value()` with an integer, causing `TypeError: 'int' object is not callable`. Commit `81aa80b6` renamed the loop binding; the successful rerun above proves the correction. The native algebraic tests and chart fixtures were not changed by this fix.
+
+**Measured scope:** these results validate the conditional algebraic reduction, not a measured improvement in an F4 solver or an end-to-end ECDLP attack. Unknown-index extraction, rank-31 relation learning on natural public residuals, 1,024 blinded logarithm recovery and same-runner full-cost comparisons remain unfinished.
