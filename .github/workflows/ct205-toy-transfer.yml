@@ -35,10 +35,16 @@ jobs:
           sparse-checkout: |
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct206_sextic_obstruction.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_genus4_coset_screen.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_f101_coset_screen.json
       - name: Recount quotient curves, Jacobian and sextic-twist obstruction
         run: |
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct206_sextic_obstruction.py
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_genus4_coset_screen.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_genus4_coset_screen.py > /tmp/ct216_f101_coset_screen.json
+          cmp /tmp/ct216_f101_coset_screen.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_f101_coset_screen.json
+          sha256sum /tmp/ct216_f101_coset_screen.json
 
   native-toy-dlp:
     runs-on: ubuntu-latest
