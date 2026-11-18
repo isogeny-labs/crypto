@@ -2398,6 +2398,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
             ("m", "summands, 3 to 9 (the packed index is 12 bits for m <= 5, 64/m bits above: bases of up to 1023, 511, 255, 127 points for m = 6..9)"),
             ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
             ("prune", "1: skip the adds of partial sums that cannot be completed to m summands; same table, fewer build adds (default 0)"),
+            ("sib", "1 (prime curves): the last level forms both signs x(S + P), x(S - P) of a base pair from ONE inversion; same table, keys and witnesses. Charged as ONE group addition plus one unit of the native counter sibling_second_points (sqr + 2 add), the walk's convention, so the band prices the second point at w (default 0)"),
         ]
     }
 
@@ -2410,12 +2411,13 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     ) -> Result<(), String> {
         self.free = params.flag("free");
         self.free_pending = self.free;
-        let table = KSumTable::build_negation_folded_opts(
+        let table = KSumTable::build_negation_folded_full(
             ctx.group,
             fb,
             self.k,
             self.free,
             params.flag("prune"),
+            params.flag("sib"),
         )?;
         // The table's construction is part of the pipeline's cost.
         ops.merge(table.build_ops);

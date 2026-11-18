@@ -4,6 +4,8 @@ pub use crypto_lib::cryptanalysis;
 #[allow(dead_code)]
 #[path = "../src/cryptanalysis/jv_deferred_pair_graph.rs"]
 mod deferred_pair_graph;
+// shared source file; this example does not call every entry point
+#[allow(dead_code)]
 #[path = "../src/cryptanalysis/jv_extension_deferred_pair_dlp.rs"]
 mod extension_deferred_pair_dlp;
 #[path = "../src/cryptanalysis/jv_extension_quadratic_pair_dlp.rs"]
