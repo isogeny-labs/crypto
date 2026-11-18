@@ -149,3 +149,10 @@ pushed, which are this directory at commit `833a35d21e`.
 
 - Depth 14 c = 6 still running (7 h 02 min, peak RSS 22.8 GB, barely growing — deep in the dense elimination).
   Within the 4-13.5 h estimate. Only pod left.
+
+## 02:11 UTC (2026-11-18) — depth 14 DONE, cleanup
+
+- t = 14, m = 2, c = 6: finished 01:45:30 UTC, 28,747 s, peak RSS 23.1 GB. 1 does NOT enter; dim 448,922 of
+  499,178. Matches the CuPy GPU engine exactly (independent cross-engine confirmation of the depth-14 value).
+- Last pod `gz5n46wfmmg86r` terminated (GET 404). All batch pods down. Pod proxy hosts removed from the
+  environment allowlist.

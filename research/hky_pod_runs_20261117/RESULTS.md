@@ -14,7 +14,7 @@ gives "at least c + 1". Records: `results/`. Hosts were shared and loaded; times
 Draw 0 repeats the container run (4 vCPU: 11,775 s, 2.422e13 muladds): same dims, same answer. The muladd counts
 differ by 1.1 %, so the schedule depends on the thread count. Both targets give last fall degree 6 at depth 13.
 
-Depth 14 (target 0, c <= 6) started 17:46 UTC: c = 5 closed without 1, dimension 47,849 of 122,438 (3.5 s); c = 6 (499,178 columns) running.
+Depth 14 (target 0, c <= 6) DONE: c = 5 no 1 (dim 47,849 of 122,438); c = 6 **no 1, dim 448,922 of 499,178**, 28,747 s (~8 h), peak RSS 23.1 GB. This **independently reproduces the lfd-summation-systems CuPy GPU engine** (expected: no 1, dim 448,922) on a completely different engine (Rust sparse hky2). So d_F(t=14) > 6; with the independent degree-lift (1 in V_7) the last fall degree at depth 14 is 7 — consistent with the conjecture LFD(k)=floor((k+14)/4).
 
 ## m-sweep (two targets per cell unless stated)
 
