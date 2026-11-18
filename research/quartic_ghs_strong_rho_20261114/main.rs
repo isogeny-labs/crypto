@@ -202,7 +202,7 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 StrongOpts::for_instance(&inst, width),
             );
             println!(
-                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
+                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"setup.reciprocal_div\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
                 arm,
                 width,
                 q,
@@ -219,6 +219,7 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 out.lookahead,
                 out.cycles,
                 out.cycle_adds,
+                out.setup_reciprocal_div,
                 out.wall_s,
                 flat_field("setup", out.setup_field),
                 flat_field("walk", out.walk_field),
