@@ -249,6 +249,10 @@ pub struct Lift<'a> {
     pub falls_new_per_round: Vec<u64>,
     pub peak_follower_bytes: usize,
     pub c_reg_in_follower: u64,
+    pub t_fol: f64,
+    pub t_ins: f64,
+    pub t_prod: f64,
+    pub t_falls: f64,
 }
 
 impl<'a> Lift<'a> {
@@ -307,6 +311,10 @@ impl<'a> Lift<'a> {
             falls_new_per_round: vec![],
             peak_follower_bytes: 0,
             c_reg_in_follower: 0,
+            t_fol: 0.0,
+            t_ins: 0.0,
+            t_prod: 0.0,
+            t_falls: 0.0,
         }
     }
 
@@ -341,6 +349,12 @@ impl<'a> Lift<'a> {
 
     /// R_s: row f = rho(red(e_{u_s f})) on the live columns
     fn follower(&mut self, key: u32) {
+        let t = Instant::now();
+        self.follower_inner(key);
+        self.t_fol += t.elapsed().as_secs_f64();
+    }
+
+    fn follower_inner(&mut self, key: u32) {
         self.tick += 1;
         let tick = self.tick;
         if self.fols.contains_key(&key) {
@@ -445,6 +459,13 @@ impl<'a> Lift<'a> {
 
     /// Y = B[xs] @ R_s (+ eterms) on the live columns
     fn products(&mut self, s: u32, xs: &[u32], eterms: Option<&[Tgt]>) -> Vec<u32> {
+        let t = Instant::now();
+        let r = self.products_inner(s, xs, eterms);
+        self.t_prod += t.elapsed().as_secs_f64();
+        r
+    }
+
+    fn products_inner(&mut self, s: u32, xs: &[u32], eterms: Option<&[Tgt]>) -> Vec<u32> {
         let nl = self.k.live.len();
         let nf = self.vd.nf();
         let n = xs.len();
@@ -479,8 +500,11 @@ impl<'a> Lift<'a> {
     }
 
     fn insert(&mut self, cands: Vec<Vec<u32>>) -> usize {
+        let t = Instant::now();
         self.c_candidates += cands.len() as u64;
-        self.k.insert(&self.fp, cands)
+        let r = self.k.insert(&self.fp, cands);
+        self.t_ins += t.elapsed().as_secs_f64();
+        r
     }
 
     /// one fall round: shift every pending fall row (its current state) by every u; returns #taken
@@ -534,7 +558,9 @@ impl<'a> Lift<'a> {
         if self.opts.test_no_fall_shifts {
             return;
         }
+        let t = Instant::now();
         while self.fall_round() > 0 {}
+        self.t_falls += t.elapsed().as_secs_f64();
     }
 
     pub fn run(&mut self) {
@@ -855,6 +881,8 @@ impl<'a> Lift<'a> {
                 "fall_rows": self.c_fall_rows, "candidates": self.c_candidates,
                 "follower_builds": self.c_follower_builds, "follower_evictions": self.c_follower_evictions,
                 "follower_sync_madds": self.c_sync_madds,
+                "seconds_followers": self.t_fol, "seconds_products_incl_followers": self.t_prod,
+                "seconds_K_insert": self.t_ins, "seconds_fall_phase": self.t_falls,
                 "madds_total": madds(),
             },
             "memory_bytes": {

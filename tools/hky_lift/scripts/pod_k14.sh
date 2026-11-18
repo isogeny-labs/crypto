@@ -16,7 +16,8 @@ sha256sum "$BIN" "$BASIS" "$REC" | tee "$OUT/$name.inputs.sha256"
 nproc > "$OUT/$name.nproc"; free -g > "$OUT/$name.free"
 # --cache-gb: follower cache (one follower <= #N x dim T x 4 bytes, about 12 GB at k = 14);
 # memory floor without it: B (rank x #N x 4 = 90 GB) + K (<= dim T^2 x 4 = 15 GB) + one batch.
-/usr/bin/time -v "$BIN" lift --basis "$BASIS" --expect "$REC" --out "$OUT/$name.rust.json" \
+TIMER=""; [ -x /usr/bin/time ] && TIMER="/usr/bin/time -v"
+$TIMER "$BIN" lift --basis "$BASIS" --expect "$REC" --out "$OUT/$name.rust.json" \
    --cache-gb "${CACHE_GB:-120}" --batch-tops "${BATCH_TOPS:-8192}" "$@" \
    > "$OUT/$name.stdout" 2> "$OUT/$name.time"
 rc=$?

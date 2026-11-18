@@ -291,6 +291,10 @@ fn main() {
             std::process::exit(if v["all_equal"].as_bool().unwrap() { 0 } else { 3 });
         }
         "corrupt" => corrupt(&a),
+        "bench" => {
+            let v = bench_gemm(a.num("n").unwrap_or(2048), a.num("m").unwrap_or(3000), a.num("c").unwrap_or(4000));
+            println!("{v}");
+        }
         x => die(&format!("unknown subcommand {x}")),
     }
 }
@@ -348,7 +352,27 @@ fn validate(a: &Args) -> i32 {
         e.column_order = 1;
         (e, l1)
     };
-    write_hky_basis(&path, &ech, json!({"instance": {"prime": p, "a": ca, "b": cb, "target": [cx], "k": k}})).unwrap();
+    // with --vd-basis F the lift reads F (e.g. the engine's export) instead of our own export, and
+    // the stored space is compared with our direct closure V_D (canonical hash in F's column order)
+    let ext = a.get("vd-basis").map(|s| s.to_string());
+    let mut vd_cmp = Value::Null;
+    let path = match &ext {
+        None => {
+            write_hky_basis(&path, &ech, json!({"instance": {"prime": p, "a": ca, "b": cb, "target": [cx], "k": k}})).unwrap();
+            path
+        }
+        Some(f) => {
+            let (e2, info) = read_hky_basis(f).unwrap_or_else(|x| die(&x));
+            let r2 = Rref::from_echelon(&fp, &e2);
+            let ours = Rref::from_echelon(&fp, &ech);
+            vd_cmp = json!({"file": f, "file_sha256": info.file_sha256, "column_order": e2.column_order,
+                "same_order_as_ours": e2.column_order == ech.column_order,
+                "rank_file": r2.rank(), "rank_ours": ours.rank(),
+                "sha_file": r2.sha(&e2.lay), "sha_ours": ours.sha(&ech.lay),
+                "equal": e2.column_order == ech.column_order && r2.sha(&e2.lay) == ours.sha(&ech.lay)});
+            f.clone()
+        }
+    };
     let mut la = Args { kv: a.kv.clone(), flags: a.flags.clone() };
     la.kv.remove("a");
     let t1 = Instant::now();
@@ -400,6 +424,9 @@ fn validate(a: &Args) -> i32 {
         ("low_basis_sha256", json!(direct_sha), lrec["low_basis_sha256"].clone()),
     ];
     let mut ok = true;
+    if !vd_cmp.is_null() {
+        ok &= vd_cmp["equal"].as_bool().unwrap_or(false);
+    }
     let mut rows = vec![];
     for (n, e, gv) in checks.iter() {
         let same = e == gv;
@@ -430,7 +457,7 @@ fn validate(a: &Args) -> i32 {
     }
     let rec = json!({
         "case": tag, "k": k, "D": d, "p": p, "order": order, "scramble": scr,
-        "dim_VD": vd.rref.rank(), "direct_VD1_closed": v1.closed,
+        "dim_VD": vd.rref.rank(), "direct_VD1_closed": v1.closed, "vd_basis_vs_our_closure": vd_cmp,
         "all_equal": ok, "checks": rows,
         "lift": {"dim_T": lrec["dim_T"], "dim_K": lrec["dim_K"], "special_tops": lrec["special_tops"],
                  "regular_tops": lrec["regular_tops"], "falls": lrec["falls"], "rounds": lrec["rounds"],
@@ -440,8 +467,10 @@ fn validate(a: &Args) -> i32 {
         "maxrss_mb": maxrss_mb(), "threads": rayon::current_num_threads(),
     });
     println!("{}", serde_json::to_string(&rec).unwrap());
-    let _ = std::fs::remove_file(&path);
-    let _ = std::fs::remove_file(format!("{path}.json"));
+    if ext.is_none() {
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{path}.json"));
+    }
     if ok {
         0
     } else {
@@ -516,4 +545,16 @@ fn corrupt(a: &Args) {
     }
     std::fs::write(format!("{outp}.json"), serde_json::to_string_pretty(&s2).unwrap()).unwrap();
     println!("{}", json!({"mode": mode, "note": note, "file_sha256": sha}));
+}
+
+/// gemm rate on this host: hky_lift-bench N M C
+pub fn bench_gemm(n: usize, m: usize, c: usize) -> Value {
+    let fp = Fp::new(65537);
+    let a: Vec<u32> = (0..n * m).map(|i| (i as u64 * 2654435761 % 65537) as u32).collect();
+    let b: Vec<u32> = (0..m * c).map(|i| (i as u64 * 40503 % 65537) as u32).collect();
+    let mut o = vec![0u32; n * c];
+    let t = Instant::now();
+    hky_lift::field::gemm(&fp, &mut o, &a, &b, n, m, c, false);
+    let s = t.elapsed().as_secs_f64();
+    json!({"n": n, "m": m, "c": c, "seconds": s, "gmadds_per_s": (n * m * c) as f64 / s / 1e9, "threads": rayon::current_num_threads()})
 }

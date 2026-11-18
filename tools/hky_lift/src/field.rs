@@ -92,7 +92,9 @@ impl Fp {
     }
 }
 
-const CB: usize = 2048;
+const CB: usize = 512;
+
+static SIMPLE: std::sync::LazyLock<bool> = std::sync::LazyLock::new(|| std::env::var("HKY_LIFT_MICRO_KERNEL").is_err());
 
 /// out (n x c) <- out - A (n x m) @ B (m x c)   if `sub`, else out + A @ B.  All mod p.
 /// Row-parallel (rayon), column-blocked, zero entries of A skipped.
@@ -160,62 +162,158 @@ pub fn gemm(fp: &Fp, out: &mut [u32], a: &[u32], b: &[u32], n: usize, m: usize, 
         MADDS.fetch_add(total, Ordering::Relaxed);
         return;
     }
+    // row tiles of RT rows share every streamed block of B (RT-fold less B traffic); column blocks of
+    // TB keep the RT x TB u64 accumulators in L1/L2
+    const RT: usize = 8;
+    const TB: usize = 512;
     let total: u64 = out
-        .par_chunks_mut(c)
-        .zip(a.par_chunks(m))
-        .map_init(
-            || vec![0u64; CB.min(c)],
-            |acc, (orow, arow)| {
-                let nnz: Vec<(usize, u64)> = arow
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, &x)| x != 0)
-                    .map(|(l, &x)| (l, x as u64))
-                    .collect();
-                if nnz.is_empty() {
-                    return 0u64;
+        .par_chunks_mut(RT * c)
+        .zip(a.par_chunks(RT * m))
+        .map(|(otile, atile)| {
+            let r = otile.len() / c;
+            let mut acc = vec![0u64; RT * TB];
+            let mut work = 0u64;
+            // inner indices where at least one row of the tile is nonzero
+            let ls: Vec<usize> = (0..m).filter(|&l| (0..r).any(|i| atile[i * m + l] != 0)).collect();
+            for i in 0..r {
+                work += atile[i * m..(i + 1) * m].iter().filter(|&&x| x != 0).count() as u64 * c as u64;
+            }
+            if ls.is_empty() {
+                return 0u64;
+            }
+            let mut j0 = 0;
+            while j0 < c {
+                let j1 = (j0 + TB).min(c);
+                let w = j1 - j0;
+                for v in acc[..r * TB].iter_mut() {
+                    *v = 0;
                 }
-                let mut j0 = 0;
-                while j0 < c {
-                    let j1 = (j0 + CB).min(c);
-                    let w = j1 - j0;
-                    let acc = &mut acc[..w];
-                    for v in acc.iter_mut() {
-                        *v = 0;
-                    }
-                    let mut cnt = 0u64;
-                    for &(l, x) in &nnz {
-                        let brow = &b[l * c + j0..l * c + j1];
-                        for (s, &y) in acc.iter_mut().zip(brow) {
-                            *s += x * y as u64;
-                        }
-                        cnt += 1;
-                        if cnt >= lim {
-                            for s in acc.iter_mut() {
-                                *s %= p;
-                            }
-                            cnt = 0;
-                        }
-                    }
-                    let o = &mut orow[j0..j1];
+                tile_kernel(&mut acc, atile, m, r, &ls, b, c, j0, w, p, lim);
+                for i in 0..r {
+                    let o = &mut otile[i * c + j0..i * c + j1];
+                    let ac = &acc[i * TB..i * TB + w];
                     if sub {
-                        for (y, s) in o.iter_mut().zip(acc.iter()) {
-                            let r = *s % p;
-                            *y = ((*y as u64 + p - r) % p) as u32;
+                        for (y, s) in o.iter_mut().zip(ac) {
+                            let rr = *s % p;
+                            *y = ((*y as u64 + p - rr) % p) as u32;
                         }
                     } else {
-                        for (y, s) in o.iter_mut().zip(acc.iter()) {
-                            let r = *s % p;
-                            *y = ((*y as u64 + r) % p) as u32;
+                        for (y, s) in o.iter_mut().zip(ac) {
+                            let rr = *s % p;
+                            *y = ((*y as u64 + rr) % p) as u32;
                         }
                     }
-                    j0 = j1;
                 }
-                nnz.len() as u64 * c as u64
-            },
-        )
+                j0 = j1;
+            }
+            work
+        })
         .sum();
     MADDS.fetch_add(total, Ordering::Relaxed);
+}
+
+#[inline(always)]
+#[allow(clippy::too_many_arguments)]
+fn tile_body(acc: &mut [u64], atile: &[u32], m: usize, r: usize, ls: &[usize], b: &[u32], c: usize, j0: usize, w: usize, p: u64, lim: u64) {
+    const TB: usize = 512;
+    if (ls.len() as u64) < lim && !*SIMPLE {
+        // register-blocked micro-kernel: 4 rows x 8 columns of u64 accumulators stay in registers
+        // across an inner block of LB indices; no reduction is needed (fewer than lim products)
+        const LB: usize = 256;
+        let w8 = w / 8 * 8;
+        for l0 in (0..ls.len()).step_by(LB) {
+            let lb = &ls[l0..(l0 + LB).min(ls.len())];
+            let mut i0 = 0;
+            while i0 < r {
+                let q = (r - i0).min(4);
+                let mut av = [[0u32; LB]; 4];
+                for qq in 0..q {
+                    for (t, &l) in lb.iter().enumerate() {
+                        av[qq][t] = atile[(i0 + qq) * m + l];
+                    }
+                }
+                let mut jj = 0;
+                while jj < w8 {
+                    let mut s = [[0u64; 8]; 4];
+                    for qq in 0..4 {
+                        if qq < q {
+                            s[qq].copy_from_slice(&acc[(i0 + qq) * TB + jj..(i0 + qq) * TB + jj + 8]);
+                        }
+                    }
+                    for (t, &l) in lb.iter().enumerate() {
+                        let o = l * c + j0 + jj;
+                        let bs: &[u32; 8] = b[o..o + 8].try_into().unwrap();
+                        let bb: [u32; 8] = *bs;
+                        for qq in 0..4 {
+                            let x = av[qq][t];
+                            for u in 0..8 {
+                                s[qq][u] += x as u64 * bb[u] as u64;
+                            }
+                        }
+                    }
+                    for qq in 0..q {
+                        acc[(i0 + qq) * TB + jj..(i0 + qq) * TB + jj + 8].copy_from_slice(&s[qq]);
+                    }
+                    jj += 8;
+                }
+                // remaining columns
+                for qq in 0..q {
+                    for (t, &l) in lb.iter().enumerate() {
+                        let x = av[qq][t];
+                        if x == 0 {
+                            continue;
+                        }
+                        for u in w8..w {
+                            acc[(i0 + qq) * TB + u] += x as u64 * b[l * c + j0 + u] as u64;
+                        }
+                    }
+                }
+                i0 += 4;
+            }
+        }
+        return;
+    }
+    let mut cnt = 0u64;
+    for &l in ls {
+        let brow = &b[l * c + j0..l * c + j0 + w];
+        for i in 0..r {
+            let x = atile[i * m + l];
+            if x == 0 {
+                continue;
+            }
+            let ac = &mut acc[i * TB..i * TB + w];
+            for (s, &y) in ac.iter_mut().zip(brow) {
+                *s += x as u64 * y as u64;
+            }
+        }
+        cnt += 1;
+        if cnt >= lim {
+            for s in acc[..r * TB].iter_mut() {
+                *s %= p;
+            }
+            cnt = 0;
+        }
+    }
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+#[allow(clippy::too_many_arguments)]
+unsafe fn tile_avx2(acc: &mut [u64], atile: &[u32], m: usize, r: usize, ls: &[usize], b: &[u32], c: usize, j0: usize, w: usize, p: u64, lim: u64) {
+    tile_body(acc, atile, m, r, ls, b, c, j0, w, p, lim)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn tile_kernel(acc: &mut [u64], atile: &[u32], m: usize, r: usize, ls: &[usize], b: &[u32], c: usize, j0: usize, w: usize, p: u64, lim: u64) {
+    #[cfg(target_arch = "x86_64")]
+    {
+        if std::is_x86_feature_detected!("avx2") {
+            // SAFETY: the CPU supports AVX2 (checked at run time)
+            unsafe { tile_avx2(acc, atile, m, r, ls, b, c, j0, w, p, lim) };
+            return;
+        }
+    }
+    tile_body(acc, atile, m, r, ls, b, c, j0, w, p, lim)
 }
 
 /// Gauss-Jordan: reduced row echelon form of the row space of `cands` (each of length c).
