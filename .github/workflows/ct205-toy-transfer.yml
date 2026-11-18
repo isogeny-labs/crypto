@@ -10,6 +10,13 @@ on:
       - 'src/prime_hyperelliptic/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - '.github/workflows/ct205-toy-transfer.yml'
+      - 'tests/prime_cover_toy_cold_cost.rs'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
   workflow_dispatch:
 
 permissions:
@@ -65,6 +72,8 @@ jobs:
             /research/full_volcano_graphwide_ic_20261017/execution/
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct209_native_source_preflight.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct214_cost_log_validator.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct214_cost_log_validator.py
             /research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs
             /research/n83_jacobian_projector_20261031/
             /docs/ic/
@@ -83,5 +92,8 @@ jobs:
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py .
       - name: Compile and execute all toy logs plus paired fresh-state cost probe
         run: |
+          set -euo pipefail
+          python3 -m unittest -v research.chained_jacobian_transfers_20261110.toy_dlp_ct204.test_ct214_cost_log_validator
           cargo test --locked --release --test prime_cover_toy_complete_dlp -- --nocapture
-          cargo test --locked --release --test prime_cover_toy_cold_cost -- --nocapture
+          cargo test --locked --release --test prime_cover_toy_cold_cost -- --nocapture 2>&1 | tee /tmp/ct214-native.log
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct214_cost_log_validator.py /tmp/ct214-native.log

@@ -140,6 +140,14 @@ fn paired_43_distinct_public_targets_no_complete_cost_claim() {
             let public_check = fixture.checked_target_scalar_mul(&g, &big(*known_answer_for_validation)).unwrap();
             assert_eq!(&public_check, q);
             assert_eq!(e.baby_entries, j.baby_entries);
+            // One raw paired record per public target, before aggregate statistics.
+            // Timing is diagnostic only; target k is a public known-answer fixture.
+            let order = if (i + round) % 2 == 0 { "EJ" } else { "JE" };
+            eprintln!(
+                "CT214_PAIR_JSON {{\"round\":{},\"offset\":{},\"target_index\":{},\"arm_order\":\"{}\",\"direct_ns\":{},\"jacobian_ns\":{},\"direct_additions\":{},\"jacobian_additions\":{},\"direct_baby_entries\":{},\"jacobian_baby_entries\":{}}}",
+                round, offset, i, order, e.elapsed_ns, j.elapsed_ns,
+                e.additions, j.additions, e.baby_entries, j.baby_entries
+            );
             e_add += e.additions;
             jac_add += j.additions;
             e_times.push(e.elapsed_ns);
