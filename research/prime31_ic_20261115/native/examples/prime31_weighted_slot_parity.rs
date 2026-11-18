@@ -170,7 +170,7 @@ fn validate_exhaustive_b2(ar: &mut Arithmetic, base: &[Point]) {
     let right = half(ar, &translated, 4);
     let actual = cross_support(ar, &left, &right);
     let expected: HashSet<_> = two.iter()
-        .map(|&p| ar.add(PRIME31, ar.scalar(PRIME31, 8, p), offset_sum))
+        .map(|&p| { let eight_p = ar.scalar(PRIME31, 8, p); ar.add(PRIME31, eight_p, offset_sum) })
         .collect();
     assert_eq!(actual, expected);
 }
