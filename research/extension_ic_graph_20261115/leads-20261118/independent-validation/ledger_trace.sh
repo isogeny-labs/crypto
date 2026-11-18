@@ -8,7 +8,7 @@ echo "validated rev $REV"
 for id in feaf31 6432aa e9f39d 7defbb 6224b9 853115 0ecee3; do
   c=PCC-20261117-$id
   in_rev=$(git show "$REV:pcc/ledger.jsonl" | grep -c "\"$c\"")
-  added=$(git log --format=%h --reverse -S "\"$c\"" "$REV" -- pcc/ledger.jsonl | head -1)
+  added=$(git log --full-history --format=%h --reverse -S "\"$c\"" "$REV" -- pcc/ledger.jsonl | head -1)
   echo "$c: entries at ${REV:0:10} = $in_rev; first ledger commit adding it = ${added:-none}"
 done
 # The two merges that resolved pcc/ledger.jsonl to main's side
@@ -21,11 +21,8 @@ for m in bdd757487a 96e50a56d3; do
   echo "  ledger lines: first parent $(git show $m^1:pcc/ledger.jsonl | wc -l), second parent $(git show $m^2:pcc/ledger.jsonl | wc -l), merge $(git show $m:pcc/ledger.jsonl | wc -l)"
 done
 # Repository-wide: claim files without a ledger entry at REV
-git show "$REV:pcc/ledger.jsonl" > /tmp/ledger_trace.$$
-total=0; orphan=0
-for f in $(git ls-tree --name-only "$REV" pcc/claims/); do
-  id=$(basename "$f" .json); total=$((total+1))
-  grep -q "\"$id\"" /tmp/ledger_trace.$$ || orphan=$((orphan+1))
-done
-rm -f /tmp/ledger_trace.$$
+files=$(git ls-tree --name-only "$REV" pcc/claims/ | sed 's#.*/##; s#\.json$##' | sort -u)
+registered=$(git show "$REV:pcc/ledger.jsonl" | grep -o '"claim_id": *"PCC-[0-9A-Za-z-]*"' | sed 's/.*"\(PCC-[^"]*\)"/\1/' | sort -u)
+total=$(echo "$files" | wc -l)
+orphan=$(comm -23 <(echo "$files") <(echo "$registered") | wc -l)
 echo "claim files at ${REV:0:10}: $total; without a ledger entry: $orphan; ledger entries: $(git show "$REV:pcc/ledger.jsonl" | wc -l)"
