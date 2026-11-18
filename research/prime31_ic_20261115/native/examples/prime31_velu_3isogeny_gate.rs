@@ -41,7 +41,10 @@ fn add(x: u64, y: u64) -> u64 { (x + y) % P }
 fn sub(x: u64, y: u64) -> u64 { (x + P - y) % P }
 
 fn rhs(c: Curve, x: u64, f: &mut FieldMeter) -> u64 {
-    add(add(f.mul(f.mul(x, x), x), f.mul(c.a, x)), c.b)
+    let x_squared=f.mul(x,x);
+    let x_cubed=f.mul(x_squared,x);
+    let ax=f.mul(c.a,x);
+    add(add(x_cubed,ax),c.b)
 }
 fn psi3(c: Curve, x: u64, f: &mut FieldMeter) -> u64 {
     let x2 = f.mul(x, x);
@@ -62,7 +65,9 @@ fn kernel(c: Curve, x: u64, f: &mut FieldMeter) -> Result<Kernel, String> {
     if f.pow(v, (P-1)/2) != P-1 {
         return Err("kernel x must have a non-square nonzero ordinate square".to_string());
     }
-    let t = add(f.mul(3, f.mul(x, x)), c.a);
+    let x_squared=f.mul(x,x);
+    let triple=f.mul(3,x_squared);
+    let t=add(triple,c.a);
     Ok(Kernel { x, t, v })
 }
 
