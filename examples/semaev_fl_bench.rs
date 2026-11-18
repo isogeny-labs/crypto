@@ -11,10 +11,11 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
     build_decomposition_system, permute_poly, FieldStructure,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
-    build_frobenius_factor_base, KoblitzCurve,
+    build_frobenius_factor_base, build_standard_subspace_factor_base,
 };
 use crypto_lib::cryptanalysis::pq_f4_f2::{groebner_basis_f4, groebner_basis_f4_full_width};
 use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_low64, F2BoolPoly};
+use crypto_lib::cryptanalysis::semaev_field_profile::canonical_semaev_groebner_profile;
 use num_bigint::BigUint;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde_json::json;
@@ -22,11 +23,33 @@ use sha2::{Digest, Sha256};
 use std::time::Instant;
 
 #[derive(Clone, Copy)]
+enum FactorBase {
+    Frobenius { factor_index: usize },
+    StandardSubspace { dimension: u32 },
+}
+
+impl FactorBase {
+    fn label(self) -> String {
+        match self {
+            Self::Frobenius { factor_index } => format!("frobenius-factor-{factor_index}"),
+            Self::StandardSubspace { dimension } => {
+                format!("standard-polynomial-subspace-l{dimension}")
+            }
+        }
+    }
+
+    fn factor_index(self) -> Option<usize> {
+        match self {
+            Self::Frobenius { factor_index } => Some(factor_index),
+            Self::StandardSubspace { .. } => None,
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
 struct Case {
     name: &'static str,
-    a: u8,
-    n: u32,
-    factor_index: usize,
+    factor_base: FactorBase,
     m: usize,
     planted: usize,
     random: u32,
@@ -37,9 +60,7 @@ struct Case {
 const CASES: &[Case] = &[
     Case {
         name: "k1_n17_m2",
-        a: 1,
-        n: 17,
-        factor_index: 0,
+        factor_base: FactorBase::Frobenius { factor_index: 0 },
         m: 2,
         planted: 2,
         random: 2,
@@ -47,14 +68,12 @@ const CASES: &[Case] = &[
         interleave: false,
     },
     Case {
-        name: "k0_n15_f1_m3",
-        a: 0,
-        n: 15,
-        factor_index: 1,
+        name: "k1_n17_l5_m3",
+        factor_base: FactorBase::StandardSubspace { dimension: 5 },
         m: 3,
         planted: 1,
         random: 1,
-        seed: 15,
+        seed: 1703,
         interleave: true,
     },
 ];
@@ -64,11 +83,21 @@ fn target_scalar(i: u32) -> BigUint {
 }
 
 fn systems(case: Case) -> Vec<Vec<F2BoolPoly>> {
-    let curve = KoblitzCurve::new(case.a, case.n).expect("Koblitz curve exists");
-    let factor_base =
-        build_frobenius_factor_base(&curve, case.factor_index).expect("factor base exists");
+    let profile = canonical_semaev_groebner_profile();
+    let curve = profile
+        .canonical_curve()
+        .expect("canonical K1-17 curve exists");
+    let factor_base = match case.factor_base {
+        FactorBase::Frobenius { factor_index } => {
+            build_frobenius_factor_base(&curve, factor_index).expect("factor base exists")
+        }
+        FactorBase::StandardSubspace { dimension } => {
+            build_standard_subspace_factor_base(&curve, dimension)
+                .expect("standard-subspace factor base exists")
+        }
+    };
     assert!(factor_base.m_can_decompose(&curve, case.m));
-    let structure = FieldStructure::new(case.n, &curve.curve.irreducible);
+    let structure = FieldStructure::new(profile.field.degree, &curve.curve.irreducible);
     let mut rng = StdRng::seed_from_u64(case.seed);
     let mut targets = Vec::new();
     while targets.len() < case.planted {
@@ -100,7 +129,7 @@ fn systems(case: Case) -> Vec<Vec<F2BoolPoly>> {
             )
             .expect("system fits the Boolean mask");
             if case.interleave && case.m >= 3 {
-                let permutation = system.interleaved_order(case.n);
+                let permutation = system.interleaved_order(profile.field.degree);
                 system
                     .equations
                     .iter()
@@ -155,6 +184,7 @@ fn main() {
         .find(|case| case.name == case_name)
         .unwrap_or_else(|| panic!("unknown --case {case_name}"));
     let systems = systems(case);
+    let profile = canonical_semaev_groebner_profile();
     let input_sha256 = hash_polys(&systems);
     let n_vars = systems
         .first()
@@ -194,9 +224,14 @@ fn main() {
                     "arm": selected_arm,
                     "repeat": repeat,
                     "order_index": order_index,
-                    "curve_a": case.a,
-                    "field_degree": case.n,
-                    "factor_index": case.factor_index,
+                    "field_profile": profile.id,
+                    "field_uid": profile.field.field_uid,
+                    "field_degree": profile.field.degree,
+                    "field_modulus": profile.field.modulus_hex,
+                    "curve": profile.curve.icv1_slug,
+                    "curve_a": profile.curve.a,
+                    "factor_base": case.factor_base.label(),
+                    "factor_index": case.factor_base.factor_index(),
                     "summands": case.m,
                     "interleaved": case.interleave,
                     "systems": systems.len(),

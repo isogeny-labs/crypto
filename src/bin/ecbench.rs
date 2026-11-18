@@ -1683,7 +1683,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             doc,
         } => {
             let text = read(&path)?;
-            let p = spec::plan(spec::Spec::from_json(&text)?)?;
+            let p = spec::plan_for_new_run(spec::Spec::from_json(&text)?)?;
             for w in &p.warnings {
                 eprintln!("ecbench: warning: {w}");
             }
@@ -2418,7 +2418,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             timeout_seconds,
         } => {
             let text = read(&path)?;
-            let p = spec::plan(spec::Spec::from_json(&text)?)?;
+            let p = spec::plan_for_new_run(spec::Spec::from_json(&text)?)?;
             let delivery = match (binary, git_url, commit) {
                 (Some(b), None, None) => isolab::Delivery::Binary { path: b },
                 (None, Some(url), Some(commit)) => isolab::Delivery::Source { url, commit },
@@ -2723,7 +2723,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         )
                     }
                 };
-                let p = spec::plan(s.clone())?;
+                let p = spec::plan_for_new_run(s.clone())?;
                 let text = serde_json::to_string_pretty(&s).map_err(|e| e.to_string())? + "\n";
                 write_or_print(out.as_deref(), &text)?;
                 eprintln!(

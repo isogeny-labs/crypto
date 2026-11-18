@@ -1,0 +1,94 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Canonical-field Boolean F4 Faugere-Lachartre split on K1/F2^17 Semaev m=2",
+  "description": "Unmeasured canonical-field successor to the frozen matched comparison. Every new binary Groebner/Semaev run is pinned to semaev-groebner-f2m17-v1. Duplicate full-width and FL arms measure A/A noise. Rho is contextual only and is not a Groebner comparator.",
+  "field_profile": "semaev-groebner-f2m17-v1",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 17
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 202611180117,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-strong-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "f4-full-width",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2-full-width",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "f4-fl",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "f4-full-width-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2-full-width",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "f4-fl-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2",
+          "max_trials": "20000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 8,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611180217,
+    "isolation_required": "L2",
+    "timeout_seconds": 40
+  }
+}
