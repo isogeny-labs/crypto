@@ -129,6 +129,26 @@ def perform():
     assert all(j[k] == c.image(ecmul(k,G)) for k in range(R))
     assert c.cantor(j[-1], c.image(G)) == c.IDENTITY
 
+    # The degree-3 norm/pullback identity gives a *global split projector*
+    # on J(C)(F101): beta*alpha=[3], and 3 is invertible on E(F101)
+    # because its order is 109. No guessed #J cofactor is required.
+    inv_degree = pow(3, -1, R)
+    projector_coset_checks = 0
+    nonzero_complements = 0
+    for _,pts in offsets:
+        d0 = c.sums(pts)
+        delta = ecsum(map(norm_point, pts))
+        projected_point = ecmul(inv_degree, delta)
+        projected_div = c.image(projected_point)
+        complement = c.cantor(d0, c.neg(projected_div))
+        nonzero_complements += int(complement != c.IDENTITY)
+        assert c.cantor(complement, projected_div) == d0
+        for k,img in enumerate(j):
+            # Full equality of divisors, not only equal norms.
+            projected_coset = c.image(c.ecadd(projected_point, ecmul(k,G)))
+            assert c.cantor(complement, projected_coset) == c.cantor(d0,img)
+            projector_coset_checks += 1
+
     witnesses = []
     omitted_offset_detected = 0
     for name, pts in offsets:
@@ -210,6 +230,8 @@ def perform():
         'pcc':'unverified',
         'field':P, 'source_order':R,
         'norm_pullback_multiplier':3,
+        'projector_coset_identities_verified':projector_coset_checks,
+        'nonzero_kernel_complements_in_offsets':nonzero_complements,
         'offset_cosets':len(offsets),
         'squarefree_split_witnesses':len(witnesses),
         'offset_omission_detected':omitted_offset_detected,
@@ -238,6 +260,7 @@ if __name__=='__main__':
     if args.self_test:
         assert result['toy_recovered_scalar'] == 37
         assert result['relation_nullity'] > 0
+        assert result['projector_coset_identities_verified'] == 16*R
         assert result['toy_factor_norm_bsgs_ec_additions'] >= result['toy_direct_bsgs_ec_additions']
         print('CT217_SELFTEST_PASS',result['squarefree_split_witnesses'],
               'norm witnesses, rank',result['relation_row_rank_mod_109'])
