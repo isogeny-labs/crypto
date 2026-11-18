@@ -26,7 +26,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Complete the next curve-transfer infrastructure slice: catalog-general norm replay, independent divisor-map oracle, odd two-infinity support, cryptanalysis mirror, standalone packaging, and CI evidence (Codex, started 2026-11-18, branch codex/curve-transfer-next-phase-20261118, PR #4683)
 
-- [x] Formalize or refute the ready yield/rank frontier obligations: population contract, solver visibility, and kernel-mode scope (Codex, completed 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4685)
+- [x] Formalize or refute the ready yield/rank frontier obligations: population contract, solver visibility, and kernel-mode scope (Codex, completed 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4704; follows merged #4685)
 
 - [x] Split the index-calculus yield/rank frontier into attackable obligations and evidence-linked targets (Codex, completed 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4685)
 
