@@ -61,6 +61,8 @@ jobs:
             actual_fp2_amm_cube_roots_match_pre_frobenius -- --nocapture
           cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
             fp2_cube_norm_and_mod8_sqrt_match_previous_algorithm -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            skip_zeroth_amm_digit_preserves_roots_fp_and_fp2 -- --nocapture
       - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
         shell: bash
         run: |
@@ -91,6 +93,8 @@ jobs:
               bench_fp2_amm_cube_root_before_after_frobenius -- --ignored --nocapture
             cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
               bench_fp2_cubing_and_mod8_sqrt_actual_rust -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_skip_zeroth_amm_digit_actual_rust -- --ignored --nocapture
           } | tee "$RUNNER_TEMP/radical-power-reuse.txt"
           cat "$RUNNER_TEMP/radical-power-reuse.txt" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
