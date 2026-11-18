@@ -191,8 +191,6 @@ those conditions or complete either scientific panel.
 
 
 
-negative controls (chain-s3 4/4 proved_unsat on each of icv1-f2m23-t5197-69e76b73, icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5,
-icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a; chain-s3-orbit 4/4 incomplete at its conflict budget); the three
 
 ## Update 2026-11-08: Koblitz part resolved, prime tower open
 
@@ -233,8 +231,107 @@ carrying `gaudry_cubic_graph_compare`. The maintained GitHub fixture image's
 The frozen limit is USD 5, four CPUs, 8 GiB, 900 seconds and zero automatic
 retries. Local unit checks are not the requested EKS comparison. The user has
 been asked for an existing runner/profile location, not credential text.
-[pcc:unverified]
 
 This addition does not change the older arity/dreg findings or assert anything
 about their current credentials. Recheck when this session receives a configured
 runner/profile or checkpoint transport. The shared obstruction remains open.
+
+## 2026-11-18: H115 Frobenius--Kummer moment measurement
+
+Crypto draft PR #4625 source revision `6d8def5473` and cryptanalysis draft PR
+#1739 revision `ed206d8d` publish the frozen H115 producer and independent
+verifier before measurement. Their branch-specific resume note fixes the exact
+protocol/curve/source hashes, USD 1.00 cap, 1,800-second deadline and zero
+scientific retries.
+
+In this managed workspace, `.resume/RESUME.md` passes its content check and the
+branch is present on the remote. Both `scripts/checkpoint.sh push` and
+`scripts/checkpoint.sh gate` exit 1 because no AWS profile, upload token or
+token file exists. No checkpoint, image, EKS Job or producer `--run` invocation
+was created. The scoped receipt is
+`research/h115_frobenius_kummer_resolvent_20261117/RUN_BLOCKED.md`.
+
+This is an access observation only. The next action is the unchanged frozen
+card `XP-20261118-h115-frobenius-kummer`: connect an authorized transport, pass
+the checkpoint gate, build the bound source into a digest-pinned image and run
+one exhaustive panel. Exact bytes must pass verifier normal mode and all eight
+one-at-a-time copied-packet mutations. No local scoring substitute is allowed.
+
+  execution); `research/h114_multiradix_carry_cohomology_20261117/` (one
+  checkpoint-gated exhaustive H114 multiradix carry/cohomology run)
+- **Last updated:** 2026-11-17
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 2026-11-17: H114 multiradix carry/cohomology measurement
+
+Crypto draft PR #4622 at revision
+`4ceb5c032917a5f72a15046eee5aa4aad327a93c` and cryptanalysis draft PR
+#1736 at revision `f18430232e2814922d95f67e97abdda5d6ff44f6` publish the
+frozen H114 producer and source-independent verifier before measurement. The
+complete resume note names the exact protocol/curve/source hashes, commands,
+controls, USD 1.00 cap, 1,800-second deadline and zero scientific retries.
+
+Observed in this managed workspace: `aws` is absent; neither
+`CHECKPOINT_UPLOAD_TOKEN` nor
+`/home/agent/.config/checkpoint/upload-token` exists. Both
+`scripts/checkpoint.sh push` and `scripts/checkpoint.sh gate` exit 1 with:
+
+```text
+checkpoint: no way to upload: no AWS profile 'ecc-challenges-new', no CHECKPOINT_UPLOAD_TOKEN, no /home/agent/.config/checkpoint/upload-token
+checkpoint: cannot upload, so nothing was checkpointed
+```
+
+The scoped receipt is
+`research/h114_multiradix_carry_cohomology_20261117/RUN_BLOCKED.md`. No
+candidate-scoring mode, EKS build or EKS Job was invoked. This is an access
+observation only; it supplies no evidence for or against the candidate.
+
+The next discriminating action remains the unchanged frozen run: bind an
+authorized upload transport, make `scripts/checkpoint.sh gate` pass, build the
+producer revision into a digest-pinned Isolab image, confirm the frozen budget,
+then launch exactly one exhaustive run and verify its exact bytes plus all five
+tamper classes. A local scoring substitute is not accepted by the protocol.

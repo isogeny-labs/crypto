@@ -244,6 +244,13 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
     "solver_F_p_multiplications_(grid)_uncharged",
     "solver_F_p_multiply-adds_(elimination_only)_uncharged",
     "solver_F_p_multiply-adds_(tower_F4_elimination)_uncharged",
+    // F4 report.field_ops counts F_p multiplications, including elimination.
+    "f4_field_muls_uncharged",
+    // One mod-r multiplication in each nonzero RREF multiply-subtract;
+    // This calibration is a multiplication reading, not a complete arithmetic count.
+    "matrix_multiply_subtracts_uncharged",
+    "linalg_muls_uncharged",
+    "scalar_modular_muls_uncharged",
 ];
 
 /// Counters whose name looks like a multiplication or squaring but that are
@@ -253,6 +260,7 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
 pub const FIELD_ARITHMETIC_EXCLUSIONS: &[(&str, &str)] = &[
     ("aps_core_scalar_mults_uncharged", "scalar multiplication of a curve point: a group operation"),
     ("aps_core_square_roots_uncharged", "a square root, not a multiplication: left to the band"),
+    ("factor_base_sqrt_calls_uncharged", "a square-root call, not a single multiplication: left to the band"),
     ("sqrt_mod_p_calls_uncharged", "a square root, not a multiplication: left to the band"),
     ("sqrt_solves_uncharged", "a square root, not a multiplication: left to the band"),
     ("fp2_mul_uncharged", "a multiplication in F_{p^2}, an extension field, not the base field"),

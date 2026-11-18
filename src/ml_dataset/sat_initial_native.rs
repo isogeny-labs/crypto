@@ -2,6 +2,10 @@
 //! deliberately exposes no solve method: search-prefix admission comes next.
 #[path = "sat_initial_checkpoint.rs"]
 pub(in crate::ml_dataset::solvers) mod checkpoint;
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "sat_initial_packed.rs"]
 mod packed;
 use super::*;
@@ -102,6 +106,10 @@ fn quote(
 
 /// All original evidence remains owned across native or capture failure.
 struct Evidence<'a> {
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     original: Option<&'a VerifiedWorkerOriginal<'a>>,
     original_hashes: ([u8; 32], [u8; 32]),
     binding: [u8; 32],
@@ -116,8 +124,20 @@ struct Evidence<'a> {
     map_published: bool,
 }
 struct BatchAck {
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     valid: bool,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     first: usize,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     last: usize,
     position: capture::CommittedEventPosition,
 }
@@ -417,6 +437,10 @@ impl CaptureState {
 }
 
 impl<'a> NativeInitial<'a> {
+    #[allow(
+        clippy::result_large_err,
+        reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+    )]
     pub(super) fn prepare(
         mut owner: OriginalOwner<'a>,
         sink: capture::CaptureEmitter,
@@ -665,6 +689,45 @@ fn seal_initial(
         return Err(Stop::Observer);
     }
     Ok(())
+}
+
+impl NativeInitial<'_> {
+    /// Move every owned native/evidence buffer. No clone, allocation, new budget,
+    /// observer or sink. Fixed original hashes survive the ended borrowed token.
+    pub(super) fn detach(self) -> NativeInitial<'static> {
+        let Evidence {
+            original: _,
+            original_hashes,
+            binding,
+            launch_sha256,
+            math,
+            checked,
+            unchecked,
+            pattern,
+            map_bytes,
+            map_ack,
+            publication_attempted,
+            map_published,
+        } = self.evidence;
+        NativeInitial {
+            evidence: Evidence {
+                original: None,
+                original_hashes,
+                binding,
+                launch_sha256,
+                math,
+                checked,
+                unchecked,
+                pattern,
+                map_bytes,
+                map_ack,
+                publication_attempted,
+                map_published,
+            },
+            shared: self.shared,
+            solver: self.solver,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -1052,7 +1115,7 @@ mod tests {
         // Exercise the real capture serializer at its maximum sequence. These
         // are serialization extrema, not claimed valid native solver states.
         let digest = "f".repeat(64);
-        let events = vec![
+        let events = [
             SolverEvent::Snapshot {
                 version: u32::MAX,
                 variables: u32::MAX,
@@ -1261,44 +1324,5 @@ mod tests {
         assert!(state.seal_ack.is_none());
         assert!(!state.events.is_empty());
         assert_eq!(solver.stats.decisions, 0);
-    }
-}
-
-impl NativeInitial<'_> {
-    /// Move every owned native/evidence buffer. No clone, allocation, new budget,
-    /// observer or sink. Fixed original hashes survive the ended borrowed token.
-    pub(super) fn detach(self) -> NativeInitial<'static> {
-        let Evidence {
-            original: _,
-            original_hashes,
-            binding,
-            launch_sha256,
-            math,
-            checked,
-            unchecked,
-            pattern,
-            map_bytes,
-            map_ack,
-            publication_attempted,
-            map_published,
-        } = self.evidence;
-        NativeInitial {
-            evidence: Evidence {
-                original: None,
-                original_hashes,
-                binding,
-                launch_sha256,
-                math,
-                checked,
-                unchecked,
-                pattern,
-                map_bytes,
-                map_ack,
-                publication_attempted,
-                map_published,
-            },
-            shared: self.shared,
-            solver: self.solver,
-        }
     }
 }

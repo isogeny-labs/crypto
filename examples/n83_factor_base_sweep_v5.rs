@@ -383,6 +383,7 @@ fn saved_path(root: &Path) -> PathBuf {
 
 /// Decode only against the pinned parent files and the saved, exact v5 design.
 /// The exporter uses this entry point before routing a retained-base cell.
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 pub(crate) fn verified_case(root: &Path, ordinal: u64) -> Result<Value> {
     let parents = load_parents(root)?;
     let design = design(&parents)?;

@@ -1,0 +1,73 @@
+optlevel: muladd_u32     peak 2.663e+10 ops/s/core (muladd_u32@avx512); all 4 cores 9.409e+10
+optlevel: muladd_u64     peak 9.740e+09 ops/s/core (muladd_u64@avx512); all 4 cores 3.621e+10
+optlevel: mulwide_u64    peak 1.892e+09 ops/s/core (mulwide_u64@scalar); all 4 cores 7.022e+09
+optlevel: modmuladd_p31  peak 3.697e+09 ops/s/core (modmuladd_p31@avx2); all 4 cores 1.409e+10
+optlevel: modmuladd_p62  peak 6.636e+08 ops/s/core (modmuladd_p62@scalar); all 4 cores 2.338e+09
+optlevel: xor_u64        peak 1.669e+10 ops/s/core (xor_u64@avx512); all 4 cores 6.367e+10
+optlevel: popcnt_u64     peak 1.308e+10 ops/s/core (popcnt_u64@avx512); all 4 cores 5.084e+10
+optlevel: fma_f64        peak 4.241e+10 ops/s/core (fma_f64_reg@avx512); all 4 cores 1.675e+11
+optlevel: ptr_hop        peak 5.902e+08 ops/s/core (chase@avx512); all 4 cores 2.254e+09
+optlevel: bandwidth 1 core(s): 19.29 GB/s (xor_u64; triad 17.31, xor_u64 19.29, popcnt_u64 15.17)
+optlevel: bandwidth 2 core(s): 38.40 GB/s (xor_u64; triad 34.57, xor_u64 38.40, popcnt_u64 28.48)
+optlevel: bandwidth 4 core(s): 75.29 GB/s (xor_u64; triad 65.38, xor_u64 75.29, popcnt_u64 55.07)
+optlevel: wrote research/optlevel_rs_20261117/controls/calibration.json (host 44113cdb2d87e834, 4 usable CPUs: affinity mask (4 CPUs), flags VIRTUALIZED)
+optlevel: T-timing modmuladd_p31 single 3.396e+09 ops/s [3.154e+09, 3.828e+09] noise 0.198 flags VIRTUALIZED, OPS_VARY -> research/optlevel_rs_20261117/controls/positive-simd-incache.measurement.json
+positive-simd-incache  [T-timing]  class modmuladd_p31
+  attainment single 0.918 [0.853, 1.057]  of 3.697e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.989 [0.883, 1.033]  of 1.409e+10 ops/s (compute roof, 4 thread(s))
+  parallel   raw 1.027, roofline-normalised 1.077 at 4 threads
+  grade      A (score 0.953, scope single+parallel)
+  limiting   none above threshold: near the roofline; what remains is the algorithmic axis  [roofline]
+  noise      A/A 0.198 over 5 pairs
+  flags      CALIBRATION_VIRTUALIZED, OPS_VARY, VIRTUALIZED
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing modmuladd_p31 single 6.274e+08 ops/s [5.819e+08, 6.765e+08] noise 0.151 flags VIRTUALIZED, OPS_VARY -> research/optlevel_rs_20261117/controls/scalar-incache.measurement.json
+scalar-incache  [T-timing]  class modmuladd_p31
+  attainment single 0.170 [0.157, 0.187]  of 3.697e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.177 [0.141, 0.182]  of 1.409e+10 ops/s (compute roof, 4 thread(s))
+  parallel   raw 0.996, roofline-normalised 1.045 at 4 threads
+  grade      D (score 0.173, scope single+parallel)
+  limiting   core bound / not vectorized (static vector share 0.00 in the named symbols; the class's SIMD ceiling is 5.7x its scalar ceiling)  [timing + static disassembly]
+  noise      A/A 0.151 over 5 pairs
+  flags      CALIBRATION_VIRTUALIZED, OPS_VARY, VIRTUALIZED
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing modmuladd_p31 single 1.521e+08 ops/s [1.509e+08, 1.546e+08] noise 0.024 flags VIRTUALIZED, OPS_VARY -> research/optlevel_rs_20261117/controls/serial-dependency.measurement.json
+serial-dependency  [T-timing]  class modmuladd_p31
+  attainment single 0.041 [0.041, 0.043]  of 3.697e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.043 [0.042, 0.044]  of 1.409e+10 ops/s (compute roof, 4 thread(s))
+  parallel   raw 0.994, roofline-normalised 1.044 at 4 threads
+  grade      E (score 0.042, scope single+parallel)
+  limiting   core bound / not vectorized (static vector share 0.00 in the named symbols; the class's SIMD ceiling is 5.7x its scalar ceiling)  [timing + static disassembly]
+  noise      A/A 0.024 over 5 pairs
+  flags      CALIBRATION_VIRTUALIZED, OPS_VARY, VIRTUALIZED
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing fma_f64 single 8.055e+08 ops/s [7.060e+08, 8.175e+08] noise 0.138 flags VIRTUALIZED, OPS_VARY -> research/optlevel_rs_20261117/controls/stream-daxpy.measurement.json
+stream-daxpy  [T-timing]  class fma_f64
+  attainment single 1.002 [0.878, 1.028]  of 8.037e+08 ops/s (memory roof, 1 thread(s))
+  attainment full   0.974 [0.960, 1.010]  of 3.137e+09 ops/s (memory roof, 4 thread(s))
+  parallel   raw 0.949, roofline-normalised 0.972 at 4 threads
+  grade      A (score 0.988, scope single+parallel)
+  limiting   at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, fewer bytes per operation) or a different algorithm helps  [roofline]
+  noise      A/A 0.138 over 5 pairs
+  flags      CALIBRATION_VIRTUALIZED, OPS_VARY, VIRTUALIZED
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing ptr_hop single 6.343e+06 ops/s [6.117e+06, 6.643e+06] noise 0.083 flags VIRTUALIZED, OPS_VARY -> research/optlevel_rs_20261117/controls/pointer-chase.measurement.json
+pointer-chase  [T-timing]  class ptr_hop
+  attainment single 0.021 [0.020, 0.022]  of 3.014e+08 ops/s (memory roof, 1 thread(s))
+  attainment full   0.022 [0.022, 0.023]  of 1.176e+09 ops/s (memory roof, 4 thread(s))
+  parallel   raw 1.025, roofline-normalised 1.050 at 4 threads
+  grade      E (score 0.022, scope single+parallel)
+  limiting   memory latency bound: the rate matches one outstanding dependent miss at a time (latency attainment 1.00); far below the bandwidth roof  [roofline + latency calibration]
+  noise      A/A 0.083 over 5 pairs
+  flags      CALIBRATION_VIRTUALIZED, OPS_VARY, VIRTUALIZED
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing modmuladd_p31 single 3.626e+09 ops/s [3.475e+09, 3.852e+09] noise 0.104 flags VIRTUALIZED, OPS_VARY -> research/optlevel_rs_20261117/controls/aa-repeat.measurement.json
+aa-repeat  [T-timing]  class modmuladd_p31
+  attainment single 0.981 [0.940, 1.063]  of 3.697e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   1.014 [0.978, 1.063]  of 1.409e+10 ops/s (compute roof, 4 thread(s))
+  parallel   raw 0.985, roofline-normalised 1.034 at 4 threads
+  grade      A (score 0.997, scope single+parallel)
+  limiting   none above threshold: near the roofline; what remains is the algorithmic axis  [roofline]
+  noise      A/A 0.104 over 5 pairs
+  flags      CALIBRATION_VIRTUALIZED, OPS_VARY, VIRTUALIZED
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
