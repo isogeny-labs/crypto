@@ -1348,7 +1348,12 @@ mod complete_b31_1024_tests {
         const QCOUNT: usize = 256;
         let mut panels = Vec::new();
 
-        for &base_kind in &["dickson31", "first_x31"] {
+        let arms: [&str;2] = if std::env::var("PRIME31_B31_BASECHOICE_REVERSE").ok().as_deref() == Some("1") {
+            ["first_x31", "dickson31"]
+        } else {
+            ["dickson31", "first_x31"]
+        };
+        for &base_kind in &arms {
             let active = 31usize;
             let setup_start = Instant::now();
             let mut ar = Arithmetic::default();
@@ -1562,6 +1567,7 @@ mod complete_b31_1024_tests {
 
         println!("PRIME31_B31_FIRSTX_DICKSON_COMPLETE_JSON={}", json!({
             "schema":"prime31.actual_b31_basechoice_256q_complete.v1",
+            "panel_order": arms,
             "validation":"source-specific producer Rust [pcc:unverified]",
             "field_p":PRIME31.p,"subgroup_n":PRIME31.n,
             "same_public_256_target_corpus_seed":format!("{CORPUS_SEED:#018x}"),
