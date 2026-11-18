@@ -586,3 +586,153 @@ fn s3_separator_matches_all_eight_coordinate_brute_force_including_diagonals() {
         }
     }
 }
+
+/// Every `(x_1..x_m, w_2..w_{m-1})` with sources in `d` and auxiliaries
+/// anywhere in the field, by exhaustive search over the auxiliaries.
+fn chain_brute_force(
+    chain: &solver::S3Chain,
+    q: usize,
+    d: &[N],
+    m: usize,
+    target: &N,
+) -> Vec<Vec<N>> {
+    let mut out = Vec::new();
+    let tuples = d.len().pow(m as u32);
+    for mut code in 0..tuples {
+        let mut x = Vec::new();
+        for _ in 0..m {
+            x.push(d[code % d.len()].clone());
+            code /= d.len();
+        }
+        // Depth-first over w_2..w_{m-1}.
+        let mut stack: Vec<Vec<N>> = vec![vec![]];
+        while let Some(ws) = stack.pop() {
+            let i = ws.len() + 1; // `ws` holds w_2..w_i
+            let w_i = if i == 1 {
+                x[0].clone()
+            } else {
+                ws[i - 2].clone()
+            };
+            if i == m - 1 {
+                if chain.evaluate(&w_i, &x[m - 1], target).is_zero() {
+                    let mut row = x.clone();
+                    row.extend(ws.iter().cloned());
+                    out.push(row);
+                }
+                continue;
+            }
+            for next in domain(q) {
+                if chain.evaluate(&w_i, &x[i], &next).is_zero() {
+                    let mut ws2 = ws.clone();
+                    ws2.push(next);
+                    stack.push(ws2);
+                }
+            }
+        }
+    }
+    out.sort();
+    out
+}
+
+#[test]
+fn s3_chain_matches_brute_force_for_every_split() {
+    let limits = Limits {
+        max_solutions: 1_000_000,
+        max_trials: 100_000,
+        max_work: 10_000_000,
+        max_table: 1_000_000,
+        ..Default::default()
+    };
+    let cases = [
+        (p(7), [N::zero(), N::one(), N::one()], false),
+        (p(11), [N::zero(), N::one(), N::from(3u8)], false),
+        (p(13), [N::one(), N::from(3u8), N::from(5u8)], false),
+        (binary(3, 0b1011), [N::zero(), N::zero(), N::one()], true),
+        (
+            binary(4, 0b10011),
+            [N::zero(), N::zero(), N::from(3u8)],
+            true,
+        ),
+    ];
+    for (f, curve, is_binary) in cases {
+        let q = f.order.to_u64_digits()[0] as usize;
+        let d: Vec<N> = (1..4u8).map(N::from).collect();
+        for m in 2..=4 {
+            for left_k in 1..m {
+                let mut chain = solver::S3Chain::new(
+                    f.clone(),
+                    d.clone(),
+                    curve.clone(),
+                    is_binary,
+                    m,
+                    left_k,
+                    &limits,
+                )
+                .unwrap();
+                for target in domain(q) {
+                    let expected = chain_brute_force(&chain, q, &d, m, &target);
+                    let got = chain.solve(&target).unwrap();
+                    assert_eq!(
+                        got.count,
+                        Some(expected.len() as u64),
+                        "q={q} m={m} k={left_k} target={target}"
+                    );
+                    assert_eq!(got.solutions, expected, "q={q} m={m} k={left_k}");
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn s3_chain_with_five_summands_reproduces_the_separator() {
+    let limits = Limits {
+        max_solutions: 100_000,
+        max_trials: 100_000,
+        ..Default::default()
+    };
+    for (f, curve, is_binary) in [
+        (p(5), [N::zero(), N::one(), N::one()], false),
+        (binary(2, 7), [N::zero(), N::zero(), N::one()], true),
+    ] {
+        let q = f.order.to_u64_digits()[0] as usize;
+        let d = domain(2);
+        let mut separator =
+            solver::Separator::new(&f, d.clone(), &json!({"a4":1,"a6":1,"b":1}), &limits).unwrap();
+        let mut chain =
+            solver::S3Chain::new(f.clone(), d.clone(), curve, is_binary, 5, 3, &limits).unwrap();
+        for target in domain(q) {
+            let a = separator.solve(&target).unwrap();
+            let b = chain.solve(&target).unwrap();
+            assert_eq!(a.count, b.count);
+            assert_eq!(a.solutions, b.solutions);
+        }
+    }
+}
+
+#[test]
+fn s3_chain_refuses_bad_splits_and_singular_curves() {
+    let limits = Limits::default();
+    let d: Vec<N> = vec![N::one()];
+    let curve = [N::zero(), N::one(), N::one()];
+    assert!(solver::S3Chain::new(p(7), d.clone(), curve.clone(), false, 1, 1, &limits).is_err());
+    assert!(solver::S3Chain::new(p(7), d.clone(), curve.clone(), false, 3, 3, &limits).is_err());
+    assert!(solver::S3Chain::new(p(7), d.clone(), curve.clone(), true, 3, 1, &limits).is_err());
+    // y^2 = x^3 is singular.
+    let cusp = [N::zero(), N::zero(), N::zero()];
+    assert!(solver::S3Chain::new(p(7), d.clone(), cusp, false, 2, 1, &limits).is_err());
+    let tight = Limits {
+        max_table: 1,
+        ..Default::default()
+    };
+    assert!(solver::S3Chain::new(
+        p(7),
+        vec![N::one(), N::from(2u8)],
+        curve,
+        false,
+        3,
+        2,
+        &tight
+    )
+    .is_err());
+}

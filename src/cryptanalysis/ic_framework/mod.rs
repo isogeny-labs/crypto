@@ -67,6 +67,7 @@ pub mod binary_subtract;
 pub mod cm_orbit;
 pub mod explicit_base;
 pub mod fiber;
+pub mod genroot;
 pub mod hashed;
 pub mod large_prime;
 pub mod linalg;
@@ -971,6 +972,13 @@ fn run_pipeline_inner<G: CountedGroup>(
         } else {
             "hashed-affine setup has uncalibrated hashed_tensor_steps and omitted tensor-curve certification work"
         });
+    }
+    if oracle.name() == "genroot" {
+        unpriced_work.push(
+            "genroot charges each S3 fiber as two group additions; the root-finding inside a fiber \
+             (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted \
+             but not priced",
+        );
     }
     if oracle.name() == "hashed-tensor" && !tensor_steps_pinned {
         unpriced_work.push(

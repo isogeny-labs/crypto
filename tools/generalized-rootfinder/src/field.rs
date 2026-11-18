@@ -5,6 +5,18 @@ use num_traits::{One, ToPrimitive, Zero};
 use serde_json::Value;
 pub type N = BigUint;
 pub type Result<T> = std::result::Result<T, String>;
+
+thread_local! {
+    static MULS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+    static INVS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// Field multiplications and inversions performed on this thread so far,
+/// `(muls, invs)`.  Multiplications include those inside a prime-field
+/// inversion by exponentiation.  Callers price work by differences.
+pub fn op_tally() -> (u64, u64) {
+    (MULS.with(|c| c.get()), INVS.with(|c| c.get()))
+}
 pub fn number(v: &Value) -> Result<N> {
     if let Some(n) = v.as_u64() {
         return Ok(n.into());
@@ -328,6 +340,7 @@ impl Field {
         self.add(a, &self.neg(b))
     }
     pub fn mul(&self, a: &N, b: &N) -> N {
+        MULS.with(|c| c.set(c.get() + 1));
         if self.degree == 1 {
             return (a * b) % &self.p;
         }
@@ -376,6 +389,7 @@ impl Field {
     }
     pub fn inv(&self, a: &N) -> N {
         assert!(!a.is_zero());
+        INVS.with(|c| c.set(c.get() + 1));
         if self.degree > 1 && self.p == N::from(2u8) {
             let (mut u, mut v, mut g, mut h) =
                 (a.clone(), self.binary_mask.clone(), N::one(), N::zero());
