@@ -11204,7 +11204,7 @@ mod tests {
         let mut satisfiable = 0usize;
         for trial in 0..80 {
             let n_vars = 6 + (trial % 5);
-            let planted = next() & ((1u64 << n_vars) - 1);
+            let planted = mask_from64(next() & ((1u64 << n_vars) - 1));
             let m = 4 + (trial % 4);
             // Random generators of degree up to 3, each shifted by its
             // value at the planted point so the system is satisfiable.
@@ -11214,9 +11214,9 @@ mod tests {
                     let mut monos: Vec<F2BoolMono> = (0..terms)
                         .map(|_| {
                             let d = (next() % 4) as u32;
-                            let mut mask = 0u64;
+                            let mut mask: Mask = 0;
                             for _ in 0..d {
-                                mask |= 1u64 << (next() % n_vars as u64);
+                                mask |= bit((next() % n_vars as u64) as u32);
                             }
                             F2BoolMono::from_mask(mask)
                         })
@@ -11229,7 +11229,8 @@ mod tests {
                 })
                 .filter(|p| !p.is_zero())
                 .collect();
-            let brute: Vec<u64> = (0..(1u64 << n_vars))
+            let brute: Vec<Mask> = (0..(1u64 << n_vars))
+                .map(mask_from64)
                 .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
                 .collect();
             assert!(brute.contains(&planted), "trial {trial}: fixture unsound");
@@ -11332,8 +11333,9 @@ mod tests {
                 .filter(|p| !p.is_zero())
                 .collect();
             // Roots are the truth, whichever engine found them.
-            let brute: Vec<u64> = (0..(1u64 << n_vars))
-                .filter(|pt| system.iter().all(|e| e.eval(mask_from64(*pt)) == 0))
+            let brute: Vec<Mask> = (0..(1u64 << n_vars))
+                .map(mask_from64)
+                .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
                 .collect();
             for split_rule in [SplitRule::LowestFree, SplitRule::HighestFree] {
                 let reference = SolveOptions {
@@ -11371,8 +11373,7 @@ mod tests {
                         "trial {trial} {split_rule:?} {policy:?}: the splitting tree differs"
                     );
                     assert_eq!(
-                        masks_low64(&got),
-                        brute,
+                        got, brute,
                         "trial {trial} {split_rule:?} {policy:?}: roots are not the variety"
                     );
                 }
@@ -13723,6 +13724,7 @@ mod eliminated_s4_tests {
     use crate::cryptanalysis::binary_semaev::binary_semaev_s4;
     use crate::cryptanalysis::koblitz_bench::random_subspace_basis;
     use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
     use rand::rngs::StdRng;
     use rand::SeedableRng;
 
@@ -13772,11 +13774,9 @@ mod eliminated_s4_tests {
                 })
                 .collect();
             let want = word(&binary_semaev_s4(&pt[0], &pt[1], &pt[2], &pt[3], &b, &irr));
-            let got = sys
-                .equations
-                .iter()
-                .enumerate()
-                .fold(0u64, |acc, (j, p)| acc | (p.eval(a) as u64) << j);
+            let got = sys.equations.iter().enumerate().fold(0u64, |acc, (j, p)| {
+                acc | (p.eval(mask_from64(a)) as u64) << j
+            });
             assert_eq!(got, want, "n={n} ell={ell} twists={twists:?} a={a:#x}");
             zeros += (want == 0) as usize;
         }
@@ -13801,6 +13801,7 @@ mod target_free_tests {
     use super::*;
     use crate::cryptanalysis::koblitz_bench::{random_subspace_basis, S3LinkRoots};
     use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
     use rand::rngs::StdRng;
     use rand::SeedableRng;
 
@@ -13851,7 +13852,7 @@ mod target_free_tests {
         }
         let mut got = std::collections::BTreeSet::new();
         for a in 0..1u64 << sys.n_vars {
-            if sys.equations.iter().all(|p| p.eval(a) == 0) {
+            if sys.equations.iter().all(|p| p.eval(mask_from64(a)) == 0) {
                 got.insert(a);
             }
         }
