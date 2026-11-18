@@ -1,0 +1,51 @@
+name: Radical prime-field rootfinder correctness and timing
+
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - '.github/workflows/radical-root-arithmetic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: radical-root-arithmetic-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  radical:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CARGO_INCREMENTAL: 0
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Check exact field arithmetic against wide reference
+        run: cargo test --release --lib optimized_field_arithmetic_matches_wide_reference -- --nocapture
+      - name: Check actual cubic and quartic outputs against reference
+        run: cargo test --release --lib matches_prime_root_trace_on_random_large_instances -- --nocapture
+      - name: Check cube-root algorithms over Fp and Fp2
+        run: cargo test --release --lib cube_root_exhaustive_fp_and_fp2_both_classes -- --nocapture
+      - name: Run paired before/after benchmark against actual Rust code
+        run: |
+          set -o pipefail
+          echo "runner=$(uname -a)" | tee "$RUNNER_TEMP/radical-root-results.txt"
+          echo "perf_event_paranoid=$(cat /proc/sys/kernel/perf_event_paranoid)" | tee -a "$RUNNER_TEMP/radical-root-results.txt"
+          cargo test --release --lib bench_radical_field_actual_rust -- --ignored --nocapture \
+            | tee -a "$RUNNER_TEMP/radical-root-results.txt"
+          cat "$RUNNER_TEMP/radical-root-results.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: radical-root-arithmetic-timing
+          path: ${{ runner.temp }}/radical-root-results.txt
+          if-no-files-found: ignore
