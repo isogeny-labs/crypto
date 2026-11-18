@@ -62,6 +62,31 @@ implementation work is an even-degree balanced-divisor IC engine or a
 different transfer family with supported odd-degree destination. Do not
 write a duplicate IC engine before reviewing PR #4676's existing collector.
 
+## General parity obstruction for this odd-prime-order cover family
+
+There is a short obstruction independent of the p=31 numerical example.
+Let `p>3`, `b≠0`, and `E_b:y²=x³+b` have **odd full group
+order** over Fp. Let `C_b:v²=u⁶+b`, with the natural degree-two
+quotient to E_b. A rational Weierstrass point of C_b would have
+`u₀⁶+b=0`; then `(u₀²,0)` is an Fp-rational point of order 2 on
+E_b, contradicting odd order. The two infinity points of the even-degree
+sextic are unramified, so they are not Weierstrass points. An
+Fp-isomorphism to an odd-degree hyperelliptic model requires a rational
+Weierstrass point. Therefore **no such odd-degree model exists over
+Fp when the entire source elliptic group has odd order**.
+
+This argument does **not** exclude using a large odd prime-order
+subgroup of an *even*-order E_b; the total-group parity condition is
+essential. The independent F31 program additionally checks every
+nonzero b in F31, finding 20 odd-order cases and no forbidden rational
+branch point. It is a finite consistency check, not the proof.
+
+The resulting implementation boundary is concrete: to test CT204's
+prime-order F31 instance with the previously implemented odd-degree
+IC in crypto #4676, one must implement balanced even-degree Jacobian
+relation handling (or choose a different family); a coordinate
+reparametrization of C cannot bridge the gap.
+
 ## Reproduction
 
 ```sh
