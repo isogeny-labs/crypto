@@ -3532,7 +3532,27 @@ pub fn solve_sparse_system<W: ModWord>(
     modulus: W::Modulus,
     opts: &SparseSolveOptions,
 ) -> (SparseSolveOutcome<W>, SparseSolveReport) {
-    let m = &modulus;
+    solve_sparse_system_seeds(rows, columns, modulus, opts, &[opts.seed])
+        .pop()
+        .expect("one seed gives one solve")
+}
+
+/// [`solve_sparse_system`] under each of `seeds` in turn (each in place
+/// of `opts.seed`), stopping after the first solve that does not return
+/// [`SparseSolveOutcome::Solved`].  Entry `i` is exactly what
+/// `solve_sparse_system` returns under `seeds[i]`, except for
+/// `row_ops`: the coverage check and the filter do not depend on the
+/// seed, so they run once and are charged to the first solve only; a
+/// later report carries the same `filter` report but charges only its
+/// own core solve, reconstruction and checks.  For callers that confirm
+/// a solution with an independently seeded second solve.
+pub fn solve_sparse_system_seeds<W: ModWord>(
+    rows: &[SparseRow<W>],
+    columns: usize,
+    modulus: W::Modulus,
+    opts: &SparseSolveOptions,
+    seeds: &[u64],
+) -> Vec<(SparseSolveOutcome<W>, SparseSolveReport)> {
     let mut report = SparseSolveReport {
         solver: opts.solver,
         spmv: opts.spmv,
@@ -3549,19 +3569,53 @@ pub fn solve_sparse_system<W: ModWord>(
         report.filter.rows_in = rows.len();
         report.filter.columns_in = columns;
         report.filter.uncovered_columns = covered.iter().filter(|&&c| !c).count();
-        return (SparseSolveOutcome::Undetermined, report);
+        return vec![(SparseSolveOutcome::Undetermined, report)];
     }
     let filtered = match filter_relations(rows.to_vec(), columns, modulus, &opts.filter) {
         Ok(f) => f,
-        Err(Inconsistent) => return (SparseSolveOutcome::Inconsistent, report),
+        Err(Inconsistent) => return vec![(SparseSolveOutcome::Inconsistent, report)],
     };
     report.filter = filtered.report.clone();
     report.row_ops = filtered.report.row_ops;
     let core_cols = filtered.core_columns.len();
     if filtered.core_rows.len() < core_cols {
-        return (SparseSolveOutcome::Undetermined, report);
+        return vec![(SparseSolveOutcome::Undetermined, report)];
     }
     report.core_dimension = core_cols;
+    let mut out = Vec::with_capacity(seeds.len());
+    for (i, &seed) in seeds.iter().enumerate() {
+        let mut report = report.clone();
+        if i > 0 {
+            // The filter ran once, for the first solve.
+            report.row_ops = 0;
+        }
+        let opts = SparseSolveOptions {
+            seed,
+            ..*opts
+        };
+        let solved = solve_filtered_core(rows, columns, modulus, &opts, &filtered, report);
+        let more = matches!(solved.0, SparseSolveOutcome::Solved(_));
+        out.push(solved);
+        if !more {
+            break;
+        }
+    }
+    out
+}
+
+/// The seed-dependent part of [`solve_sparse_system`]: the Krylov solve
+/// of the filtered core, reconstruction and the final check, charged to
+/// `report` (which already carries the filter's figures).
+fn solve_filtered_core<W: ModWord>(
+    rows: &[SparseRow<W>],
+    columns: usize,
+    modulus: W::Modulus,
+    opts: &SparseSolveOptions,
+    filtered: &FilteredSystem<W>,
+    mut report: SparseSolveReport,
+) -> (SparseSolveOutcome<W>, SparseSolveReport) {
+    let m = &modulus;
+    let core_cols = filtered.core_columns.len();
 
     // Solve the core.
     let mut core_solution: Option<Vec<W>> = None;
@@ -3816,16 +3870,33 @@ impl SparseRows {
         columns: usize,
         opts: &SparseSolveOptions,
     ) -> (SparseSolveOutcome<BigUint>, SparseSolveReport) {
+        self.solve_seeds(columns, opts, &[opts.seed])
+            .pop()
+            .expect("one seed gives one solve")
+    }
+
+    /// [`solve_sparse_system_seeds`] in the active width: one filter,
+    /// then a solve per seed until one is not `Solved`.
+    pub fn solve_seeds(
+        &self,
+        columns: usize,
+        opts: &SparseSolveOptions,
+        seeds: &[u64],
+    ) -> Vec<(SparseSolveOutcome<BigUint>, SparseSolveReport)> {
         with_rows!(self, |modulus, rows| {
-            let (outcome, report) = solve_sparse_system(rows, columns, *modulus, opts);
-            let outcome = match outcome {
-                SparseSolveOutcome::Solved(x) => {
-                    SparseSolveOutcome::Solved(x.into_iter().map(ModWord::to_biguint).collect())
-                }
-                SparseSolveOutcome::Undetermined => SparseSolveOutcome::Undetermined,
-                SparseSolveOutcome::Inconsistent => SparseSolveOutcome::Inconsistent,
-            };
-            (outcome, report)
+            solve_sparse_system_seeds(rows, columns, *modulus, opts, seeds)
+                .into_iter()
+                .map(|(outcome, report)| {
+                    let outcome = match outcome {
+                        SparseSolveOutcome::Solved(x) => SparseSolveOutcome::Solved(
+                            x.into_iter().map(ModWord::to_biguint).collect(),
+                        ),
+                        SparseSolveOutcome::Undetermined => SparseSolveOutcome::Undetermined,
+                        SparseSolveOutcome::Inconsistent => SparseSolveOutcome::Inconsistent,
+                    };
+                    (outcome, report)
+                })
+                .collect()
         })
     }
 }

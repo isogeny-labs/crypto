@@ -1538,18 +1538,41 @@ pub fn gaussian_eliminate_mod_n_particular(
     rhs: &mut [BigUint],
     n: &BigUint,
 ) -> Option<ModNSolution> {
-    let m = matrix.first().map(|r| r.len()).unwrap_or(0);
-    let n64 = n
-        .to_u64_digits()
+    gaussian_eliminate_mod_n_particular_pivots(matrix, rhs, n).map(|(sol, _)| sol)
+}
+
+/// The word-sized modulus of `n`, when the `u64` elimination path applies.
+fn word_modulus(n: &BigUint) -> Option<u64> {
+    n.to_u64_digits()
         .first()
         .copied()
-        .filter(|&v| n.bits() <= 64 && v > 1);
-    // Both paths leave `matrix`/`rhs` in reduced row-echelon form with
-    // pivot rows 0..rank, and return the pivot row of each column.
-    let pivot_rows = match n64 {
-        Some(n64) => gaussian_eliminate_mod_u64(matrix, rhs, n64)?,
-        None => gaussian_eliminate_mod_biguint(matrix, rhs, n)?,
-    };
+        .filter(|&v| n.bits() <= 64 && v > 1)
+}
+
+/// Gauss–Jordan on whichever path fits `n`.  Both paths leave
+/// `matrix`/`rhs` in reduced row-echelon form with pivot rows
+/// `0..rank`, and return the pivot row of each column (`usize::MAX`
+/// for a free column); `None` on a non-invertible pivot.
+fn gaussian_eliminate_mod_dispatch(
+    matrix: &mut [Vec<BigUint>],
+    rhs: &mut [BigUint],
+    n: &BigUint,
+) -> Option<Vec<usize>> {
+    match word_modulus(n) {
+        Some(n64) => gaussian_eliminate_mod_u64(matrix, rhs, n64),
+        None => gaussian_eliminate_mod_biguint(matrix, rhs, n),
+    }
+}
+
+/// [`gaussian_eliminate_mod_n_particular`], also returning the pivot
+/// row of each column, so a caller can keep the echelon form.
+fn gaussian_eliminate_mod_n_particular_pivots(
+    matrix: &mut [Vec<BigUint>],
+    rhs: &mut [BigUint],
+    n: &BigUint,
+) -> Option<(ModNSolution, Vec<usize>)> {
+    let m = matrix.first().map(|r| r.len()).unwrap_or(0);
+    let pivot_rows = gaussian_eliminate_mod_dispatch(matrix, rhs, n)?;
     let rank = pivot_rows.iter().filter(|&&r| r != usize::MAX).count();
     // Counted for the `bitop/v1` head-to-head: one word op per zero test
     // and per determined-flag compare below.
@@ -1571,11 +1594,14 @@ pub fn gaussian_eliminate_mod_n_particular(
         bitop_ops::word_op(free.len() as u64);
         determined[c] = free.iter().all(|&f| matrix[pr][f].is_zero());
     }
-    Some(ModNSolution {
-        values,
-        determined,
-        rank,
-    })
+    Some((
+        ModNSolution {
+            values,
+            determined,
+            rank,
+        },
+        pivot_rows,
+    ))
 }
 
 /// The arbitrary-precision path of [`gaussian_eliminate_mod_n`].
@@ -1772,6 +1798,279 @@ fn inv_mod_u64(a: u64, n: u64) -> Option<u64> {
         return None;
     }
     Some(old_s.rem_euclid(n as i128) as u64)
+}
+
+// ── Incremental elimination across rank-deficient retries ───────────────
+
+/// Arithmetic mod `n` for [`Echelon`], in the word the elimination path
+/// for `n` uses.
+trait EchelonField {
+    type E: Clone;
+    fn from_big(&self, v: &BigUint) -> Self::E;
+    fn to_big(&self, v: &Self::E) -> BigUint;
+    fn is_zero(v: &Self::E) -> bool;
+    /// `t − f·p mod n`.
+    fn sub_mul(&self, t: &Self::E, f: &Self::E, p: &Self::E) -> Self::E;
+}
+
+/// A modulus of at most 64 bits, as [`gaussian_eliminate_mod_u64`] uses.
+struct WordField(u64);
+
+impl EchelonField for WordField {
+    type E = u64;
+    fn from_big(&self, v: &BigUint) -> u64 {
+        (v % self.0).to_u64_digits().first().copied().unwrap_or(0)
+    }
+    fn to_big(&self, v: &u64) -> BigUint {
+        BigUint::from(*v)
+    }
+    fn is_zero(v: &u64) -> bool {
+        *v == 0
+    }
+    fn sub_mul(&self, t: &u64, f: &u64, p: &u64) -> u64 {
+        let n = self.0 as u128;
+        ((*t as u128 + (n - *f as u128) * *p as u128) % n) as u64
+    }
+}
+
+/// Any modulus, as [`gaussian_eliminate_mod_biguint`] uses.
+struct BigField(BigUint);
+
+impl EchelonField for BigField {
+    type E = BigUint;
+    fn from_big(&self, v: &BigUint) -> BigUint {
+        v % &self.0
+    }
+    fn to_big(&self, v: &BigUint) -> BigUint {
+        v.clone()
+    }
+    fn is_zero(v: &BigUint) -> bool {
+        v.is_zero()
+    }
+    fn sub_mul(&self, t: &BigUint, f: &BigUint, p: &BigUint) -> BigUint {
+        let n = &self.0;
+        (t + n - (f * p) % n) % n
+    }
+}
+
+/// The reduced row-echelon form of a consistent system
+/// `M · y ≡ rhs (mod n)`: its pivot rows only (every other row reduced
+/// to `0 = 0`), each normalised and zero in every other pivot column.
+struct Echelon<F: EchelonField> {
+    field: F,
+    /// Number of unknowns.
+    m: usize,
+    rows: Vec<Vec<F::E>>,
+    rhs: Vec<F::E>,
+    /// `pivot_row[c]`: index into `rows` of column `c`'s pivot, or
+    /// `usize::MAX` for a free column.
+    pivot_row: Vec<usize>,
+}
+
+/// What [`EchelonState::extend`] found.
+enum EchelonExtend {
+    /// The rows so far are consistent; the solution of all of them.
+    Solved(ModNSolution),
+    /// Some new row contradicts the system.
+    Inconsistent,
+    /// A pivot was not invertible (composite `n` only); the state is
+    /// unusable and the caller eliminates from scratch.
+    NonInvertible,
+}
+
+impl<F: EchelonField> Echelon<F> {
+    fn from_reduced(
+        field: F,
+        matrix: &[Vec<BigUint>],
+        rhs: &[BigUint],
+        pivot_row: Vec<usize>,
+    ) -> Self {
+        let rank = pivot_row.iter().filter(|&&r| r != usize::MAX).count();
+        let rows = matrix[..rank]
+            .iter()
+            .map(|r| r.iter().map(|v| field.from_big(v)).collect())
+            .collect();
+        let rhs = rhs[..rank].iter().map(|v| field.from_big(v)).collect();
+        Self {
+            field,
+            m: pivot_row.len(),
+            rows,
+            rhs,
+            pivot_row,
+        }
+    }
+
+    /// Adds rows to the system: reduces each against the existing
+    /// pivots, runs Gauss–Jordan on the reduced block alone, then clears
+    /// the block's new pivot columns from the existing pivot rows.  The
+    /// result is the reduced row-echelon form of all rows so far, which
+    /// is unique for prime `n`, so the solution and `determined` flags
+    /// equal those of a full elimination of every row.  Charges its
+    /// modular operations to `bitop/v1` as the full elimination does.
+    fn extend(
+        &mut self,
+        matrix: Vec<Vec<BigUint>>,
+        rhs: Vec<BigUint>,
+        n: &BigUint,
+    ) -> EchelonExtend {
+        let m = self.m;
+        let field = &self.field;
+        let old_pivots: Vec<(usize, usize)> = (0..m)
+            .filter(|&c| self.pivot_row[c] != usize::MAX)
+            .map(|c| (c, self.pivot_row[c]))
+            .collect();
+        // 1. Reduce each new row against the existing pivot rows.  A
+        //    pivot row is zero left of its pivot, so each sweep starts
+        //    at the pivot column.
+        let mut block: Vec<Vec<F::E>> = Vec::with_capacity(matrix.len());
+        let mut block_rhs: Vec<F::E> = Vec::with_capacity(matrix.len());
+        for (row, b) in matrix.iter().zip(&rhs) {
+            let mut row: Vec<F::E> = row.iter().map(|v| field.from_big(v)).collect();
+            let mut b = field.from_big(b);
+            for &(c, pr) in &old_pivots {
+                bitop_ops::word_op(1);
+                if F::is_zero(&row[c]) {
+                    continue;
+                }
+                bitop_ops::modr_mul((m - c) as u64 + 1);
+                bitop_ops::modr_add((m - c) as u64 + 1);
+                let f = row[c].clone();
+                let p = &self.rows[pr];
+                for k in c..m {
+                    row[k] = field.sub_mul(&row[k], &f, &p[k]);
+                }
+                b = field.sub_mul(&b, &f, &self.rhs[pr]);
+            }
+            block.push(row);
+            block_rhs.push(b);
+        }
+        if block.is_empty() {
+            return EchelonExtend::Solved(self.solution());
+        }
+        // 2. Gauss–Jordan on the block: it is zero in every old pivot
+        //    column, so its pivots are new columns.
+        let mut bm: Vec<Vec<BigUint>> = block
+            .iter()
+            .map(|r| r.iter().map(|v| field.to_big(v)).collect())
+            .collect();
+        let mut bb: Vec<BigUint> = block_rhs.iter().map(|v| field.to_big(v)).collect();
+        let Some(block_pivots) = gaussian_eliminate_mod_dispatch(&mut bm, &mut bb, n) else {
+            return EchelonExtend::NonInvertible;
+        };
+        let block_rank = block_pivots.iter().filter(|&&r| r != usize::MAX).count();
+        bitop_ops::word_op((bb.len() - block_rank) as u64);
+        if bb.iter().skip(block_rank).any(|v| !(v % n).is_zero()) {
+            return EchelonExtend::Inconsistent;
+        }
+        let new_rows: Vec<Vec<F::E>> = bm[..block_rank]
+            .iter()
+            .map(|r| r.iter().map(|v| field.from_big(v)).collect())
+            .collect();
+        let new_rhs: Vec<F::E> = bb[..block_rank].iter().map(|v| field.from_big(v)).collect();
+        // 3. Clear each new pivot column from the old pivot rows.  A new
+        //    pivot row is zero left of its pivot, in every old pivot
+        //    column and in every other new pivot column, so the old rows
+        //    stay reduced.
+        let new_pivots: Vec<(usize, usize)> = (0..m)
+            .filter(|&c| block_pivots[c] != usize::MAX)
+            .map(|c| (c, block_pivots[c]))
+            .collect();
+        for &(c, br) in &new_pivots {
+            let p = &new_rows[br];
+            for (row, b) in self.rows.iter_mut().zip(self.rhs.iter_mut()) {
+                bitop_ops::word_op(1);
+                if F::is_zero(&row[c]) {
+                    continue;
+                }
+                bitop_ops::modr_mul((m - c) as u64 + 1);
+                bitop_ops::modr_add((m - c) as u64 + 1);
+                let f = row[c].clone();
+                for k in c..m {
+                    row[k] = field.sub_mul(&row[k], &f, &p[k]);
+                }
+                *b = field.sub_mul(b, &f, &new_rhs[br]);
+            }
+        }
+        let base = self.rows.len();
+        for &(c, br) in &new_pivots {
+            self.pivot_row[c] = base + br;
+        }
+        self.rows.extend(new_rows);
+        self.rhs.extend(new_rhs);
+        EchelonExtend::Solved(self.solution())
+    }
+
+    /// As [`gaussian_eliminate_mod_n_particular_pivots`] reads its
+    /// solution off the reduced form, with the same word-op charge.
+    fn solution(&self) -> ModNSolution {
+        let m = self.m;
+        let free: Vec<usize> = (0..m)
+            .filter(|&c| self.pivot_row[c] == usize::MAX)
+            .collect();
+        let mut values = vec![BigUint::zero(); m];
+        let mut determined = vec![false; m];
+        for c in 0..m {
+            let pr = self.pivot_row[c];
+            if pr == usize::MAX {
+                continue;
+            }
+            values[c] = self.field.to_big(&self.rhs[pr]);
+            bitop_ops::word_op(free.len() as u64);
+            determined[c] = free.iter().all(|&f| F::is_zero(&self.rows[pr][f]));
+        }
+        ModNSolution {
+            values,
+            determined,
+            rank: self.rows.len(),
+        }
+    }
+}
+
+/// [`Echelon`] in the word [`gaussian_eliminate_mod_n_particular`]
+/// would use for `n`.  Kept across the rank-deficient retries of the
+/// staged solver, so each retry reduces only the new relations instead
+/// of eliminating the whole rebuilt matrix again.
+enum EchelonState {
+    Word(Echelon<WordField>),
+    Big(Echelon<BigField>),
+}
+
+impl EchelonState {
+    /// From a matrix and right-hand side left in reduced form by
+    /// [`gaussian_eliminate_mod_n_particular_pivots`], with its pivots.
+    fn from_reduced(
+        matrix: &[Vec<BigUint>],
+        rhs: &[BigUint],
+        pivot_row: Vec<usize>,
+        n: &BigUint,
+    ) -> Self {
+        match word_modulus(n) {
+            Some(n64) => Self::Word(Echelon::from_reduced(
+                WordField(n64),
+                matrix,
+                rhs,
+                pivot_row,
+            )),
+            None => Self::Big(Echelon::from_reduced(
+                BigField(n.clone()),
+                matrix,
+                rhs,
+                pivot_row,
+            )),
+        }
+    }
+
+    fn extend(
+        &mut self,
+        matrix: Vec<Vec<BigUint>>,
+        rhs: Vec<BigUint>,
+        n: &BigUint,
+    ) -> EchelonExtend {
+        match self {
+            Self::Word(e) => e.extend(matrix, rhs, n),
+            Self::Big(e) => e.extend(matrix, rhs, n),
+        }
+    }
 }
 
 // ── End-to-end ECDLP solver via index calculus ─────────────────────────
@@ -2417,6 +2716,10 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let mut trials_total = 0usize;
     let mut retries = 0usize;
     let mut relations_ms;
+    // Reduced echelon form kept across rank-deficient retries, and how many
+    // relations it covers.
+    let mut echelon: Option<EchelonState> = None;
+    let mut eliminated_rows = 0usize;
     let (m, solution, linear_algebra_ms) = loop {
         while relations.len() < target {
             let mut failed_trials = 0usize;
@@ -2480,26 +2783,57 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         // Row r:   Σ entries[j].value y_j  − coef_b · x  ≡ coef_a (mod n)
         // i.e.    entries  ‖ −coef_b   ·   (y, x)  =  coef_a.
         let m = fb.len();
-        let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(relations.len());
-        let mut rhs: Vec<BigUint> = Vec::with_capacity(relations.len());
-        for rel in &relations {
-            let mut row = vec![BigUint::zero(); m + 1];
-            for &(j, mult) in &rel.entries {
-                let val = signed_mod(mult, &curve.n);
-                row[j] = (&row[j] + &val) % &curve.n;
+        let build = |rels: &[Relation]| {
+            let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(rels.len());
+            let mut rhs: Vec<BigUint> = Vec::with_capacity(rels.len());
+            for rel in rels {
+                let mut row = vec![BigUint::zero(); m + 1];
+                for &(j, mult) in &rel.entries {
+                    let val = signed_mod(mult, &curve.n);
+                    row[j] = (&row[j] + &val) % &curve.n;
+                }
+                // last column: −coef_b
+                let neg_b = (&curve.n - &(&rel.coef_b % &curve.n)) % &curve.n;
+                row[m] = neg_b;
+                matrix.push(row);
+                rhs.push(rel.coef_a.clone() % &curve.n);
             }
-            // last column: −coef_b
-            let neg_b = (&curve.n - &(&rel.coef_b % &curve.n)) % &curve.n;
-            row[m] = neg_b;
-            matrix.push(row);
-            rhs.push(rel.coef_a.clone() % &curve.n);
-        }
+            (matrix, rhs)
+        };
+
+        // A retry keeps the reduced echelon form of the earlier relations and
+        // reduces only the new ones against it (same reduced form, so the same
+        // solution and `determined` flags as eliminating every row again).
+        let (mut matrix, mut rhs) = build(&relations[echelon.as_ref().map_or(0, |_| eliminated_rows)..]);
 
         let la_started = Instant::now();
         // The elimination charges its modular operations to the `bitop/v1` tally; the
         // difference across the call is what this solve spent (summed over every retry).
         let tally_before = bitop_ops::snapshot();
-        let eliminated = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, &curve.n);
+        let eliminated: Option<ModNSolution> = 'solve: {
+            if let Some(state) = echelon.as_mut() {
+                match state.extend(matrix, rhs, &curve.n) {
+                    EchelonExtend::Solved(sol) => break 'solve Some(sol),
+                    EchelonExtend::Inconsistent => break 'solve None,
+                    // Composite modulus only: eliminate every row again, as before.
+                    EchelonExtend::NonInvertible => {
+                        echelon = None;
+                        (matrix, rhs) = build(&relations);
+                    }
+                }
+            }
+            gaussian_eliminate_mod_n_particular_pivots(&mut matrix, &mut rhs, &curve.n).map(
+                |(sol, pivots)| {
+                    if !sol.determined[m] {
+                        echelon = Some(EchelonState::from_reduced(
+                            &matrix, &rhs, pivots, &curve.n,
+                        ));
+                    }
+                    sol
+                },
+            )
+        };
+        eliminated_rows = relations.len();
         let spent = bitop_ops::snapshot().since(&tally_before).total();
         count(
             "elimination_modular_multiplications_uncharged",
@@ -3209,6 +3543,150 @@ mod tests {
                 .scalar_mul(&walk.a, &a_fe)
                 .add(&q.scalar_mul(&walk.b, &a_fe), &a_fe);
             assert_eq!(walk.r, on_curve, "walk lost r = aG + bQ");
+        }
+    }
+
+    /// Feeds `rows` to an [`EchelonState`] two at a time after the first
+    /// `start`, checking after every step that the incremental solution
+    /// equals a full elimination of every row so far, and that the
+    /// incremental `bitop/v1` charge (first elimination plus each
+    /// extension) is at most the summed charge of re-eliminating.
+    fn check_incremental_matches_full(
+        rows: &[Vec<BigUint>],
+        rhs: &[BigUint],
+        start: usize,
+        n: &BigUint,
+    ) -> usize {
+        let full = |k: usize| {
+            let (mut mm, mut rr) = (rows[..k].to_vec(), rhs[..k].to_vec());
+            let before = bitop_ops::snapshot();
+            let out = gaussian_eliminate_mod_n_particular_pivots(&mut mm, &mut rr, n);
+            let spent = bitop_ops::snapshot().since(&before).total();
+            (out, mm, rr, spent)
+        };
+        let (first, mm, rr, spent) = full(start);
+        let (sol, pivots) = first.expect("consistent start");
+        let mut state = EchelonState::from_reduced(&mm, &rr, pivots, n);
+        let mut last = sol;
+        let (mut inc_mul, mut full_mul) = (
+            spent.get(bitop_ops::Kind::ModrMul),
+            spent.get(bitop_ops::Kind::ModrMul),
+        );
+        let mut steps = 0;
+        let mut k = start;
+        while k < rows.len() {
+            let k2 = (k + 2).min(rows.len());
+            let before = bitop_ops::snapshot();
+            let got = state.extend(rows[k..k2].to_vec(), rhs[k..k2].to_vec(), n);
+            inc_mul += bitop_ops::snapshot()
+                .since(&before)
+                .total()
+                .get(bitop_ops::Kind::ModrMul);
+            let (want, _, _, spent) = full(k2);
+            full_mul += spent.get(bitop_ops::Kind::ModrMul);
+            match (got, want) {
+                (EchelonExtend::Solved(g), Some((w, _))) => {
+                    assert_eq!(g, w, "n = {n}, rows = {k2}");
+                    last = g;
+                }
+                (EchelonExtend::Inconsistent, None) => return steps,
+                _ => panic!("n = {n}, rows = {k2}: incremental and full disagree"),
+            }
+            k = k2;
+            steps += 1;
+        }
+        assert!(last.rank <= rows[0].len());
+        assert!(
+            inc_mul <= full_mul,
+            "n = {n}: incremental {inc_mul} > full {full_mul} multiplications"
+        );
+        steps
+    }
+
+    /// Retries that extend the kept echelon form give exactly the
+    /// solution, `determined` flags and rank of eliminating every row
+    /// again, on random consistent rank-deficient systems over both
+    /// elimination paths, and detect a contradicting new row.
+    #[test]
+    fn incremental_echelon_matches_full_elimination() {
+        let mut s = 0x2545_F491_4F6C_DD1Du64;
+        let mut next = move || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            s
+        };
+        for n in both_path_moduli() {
+            for trial in 0..12 {
+                let cols = 6 + trial % 5;
+                let y: Vec<BigUint> = (0..cols).map(|_| BigUint::from(next()) % &n).collect();
+                let mut rows: Vec<Vec<BigUint>> = Vec::new();
+                let mut rhs = Vec::new();
+                for r in 0..cols + 6 {
+                    let mut row = vec![BigUint::zero(); cols];
+                    // Sparse rows; every fourth repeats an earlier one scaled,
+                    // so ranks lag the row count.
+                    if r % 4 == 3 {
+                        let f = BigUint::from(next() % 7 + 1);
+                        row = rows[r - 2].iter().map(|v: &BigUint| (v * &f) % &n).collect();
+                    } else {
+                        for _ in 0..3 {
+                            let c = (next() % cols as u64) as usize;
+                            row[c] = BigUint::from(next()) % &n;
+                        }
+                    }
+                    let b = row.iter().zip(&y).fold(BigUint::zero(), |acc, (a, x)| {
+                        (acc + a * x) % &n
+                    });
+                    rows.push(row);
+                    rhs.push(b);
+                }
+                let steps = check_incremental_matches_full(&rows, &rhs, cols / 2, &n);
+                assert!(steps > 0);
+                // A contradicting row: a copy of row 0 with a shifted rhs.
+                let mut bad_rows = rows[..cols].to_vec();
+                let mut bad_rhs = rhs[..cols].to_vec();
+                bad_rows.push(rows[0].clone());
+                bad_rhs.push((&rhs[0] + 1u32) % &n);
+                check_incremental_matches_full(&bad_rows, &bad_rhs, cols - 1, &n);
+            }
+        }
+    }
+
+    /// The same, on the staged solver's own systems: real relations of
+    /// the tiny curve, the matrix built as the staged loop builds it.
+    #[test]
+    fn incremental_echelon_matches_full_on_curve_relations() {
+        use rand::SeedableRng;
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = Point::Affine {
+            x: FieldElement::new(curve.gx.clone(), curve.p.clone()),
+            y: FieldElement::new(curve.gy.clone(), curve.p.clone()),
+        };
+        let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
+        for fb_size in [6usize, 12] {
+            let fb = build_factor_base(&curve, fb_size);
+            let table = build_pair_sum_table(&curve, &fb);
+            let mut rng = rand::rngs::StdRng::seed_from_u64(31 + fb_size as u64);
+            let m = fb.len();
+            let mut rows = Vec::new();
+            let mut rhs = Vec::new();
+            for _ in 0..m + 8 {
+                let (rel, _) =
+                    find_one_relation_table_with_rng(&curve, &g, &q, &table, 100_000, &mut rng)
+                        .expect("table relation");
+                let mut row = vec![BigUint::zero(); m + 1];
+                for &(j, mult) in &rel.entries {
+                    let val = signed_mod(mult, &curve.n);
+                    row[j] = (&row[j] + &val) % &curve.n;
+                }
+                row[m] = (&curve.n - &(&rel.coef_b % &curve.n)) % &curve.n;
+                rows.push(row);
+                rhs.push(rel.coef_a.clone() % &curve.n);
+            }
+            let steps = check_incremental_matches_full(&rows, &rhs, m / 2, &curve.n);
+            assert!(steps > 0);
         }
     }
 
