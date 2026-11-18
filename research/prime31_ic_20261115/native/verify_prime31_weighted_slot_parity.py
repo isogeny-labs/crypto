@@ -183,7 +183,7 @@ def main(path):
         frozen_checked = 0
         assert frozen["target_points"] == [list(q) for q in residuals]
         assert frozen["p"] == P and frozen["n"] == N
-        assert frozen["weights"] == list(WEIGHTS) and frozen["seed"] == SEED
+        assert frozen["weights"] == list(WEIGHTS) and int(frozen["seed_hex"], 16) == SEED
         assert len(frozen["experiments"]) == 3
         for row, selected in zip(d["experimental_panels"], frozen["experiments"]):
             assert selected["B"] == row["b"]
