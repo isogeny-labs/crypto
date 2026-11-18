@@ -62,7 +62,8 @@ use crate::cryptanalysis::ic_boundary::{
     binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
     prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
     CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, KSumTable, OracleCounters, PairTable,
-    PrimeCurve, PrimeInstance, PrimePoint, Relation, TargetWalk, WSumTable, WalkOpts, WalkTable,
+    PrimeCurve, PrimeInstance, PrimePoint, Relation, TargetWalk, TauOrbitCheck, WSumTable,
+    WalkOpts, WalkTable,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::{with_cached_point_lifts, FastPoint};
@@ -1099,6 +1100,40 @@ fn multiple_doublings(params: &Params) -> Result<Option<u32>, String> {
     }
 }
 
+/// `lean_layout` of `compact-orbit-scan` (n29 generator-orbit lever,
+/// 2026-11-18): absent or 0 is the incumbent build, bit for bit.  With 1
+/// (needs `generator_orbit=1` and `generator_multiples = columns`, so every
+/// column is a known seed's orbit and nothing is scanned) the base keeps
+/// the same points, columns, coefficients and negation map, but skips the
+/// work no orbit-layout consumer reads: the hash index of
+/// `FactorBase::from_column_map` (its inserts, probes and negative-key
+/// negations), the on-curve check of every Frobenius image (the seed is
+/// still checked; an image of an on-curve point under the Frobenius is on
+/// the curve), and, with a single column, the orbit's minimum key (it only
+/// detects a repeated column).  The base is then usable only by
+/// `mitm-frobenius-layout-counted`, which names its points by index.
+fn lean_layout(params: &Params) -> Result<bool, String> {
+    match params.get("lean_layout") {
+        None => Ok(false),
+        Some(_) => match params.u64("lean_layout")? {
+            0 => Ok(false),
+            1 => {
+                if !generator_orbit(params)? {
+                    return Err("lean_layout needs generator_orbit=1".into());
+                }
+                if generator_multiples(params)? != params.u64("columns")? {
+                    return Err(
+                        "lean_layout needs every column known-log (generator_multiples = columns)"
+                            .into(),
+                    );
+                }
+                Ok(true)
+            }
+            v => Err(format!("lean_layout must be 0 or 1, not {v}")),
+        },
+    }
+}
+
 /// The log of the `j`-th known seed (1-based) over `G`.
 fn generator_multiple_log(j: u64, doublings: Option<u32>) -> u128 {
     match doublings {
@@ -1149,6 +1184,9 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
             (
                 "generator_multiples",
                 "k (needs generator_orbit=1, k <= columns; absent or 1: only G): columns 0..k are the signed Frobenius orbits of [1]G, ..., [k]G, built by one doubling and k-2 additions, every logarithm known (h*j), so the relation search needs k rows fewer; at k = columns the base is all known-log and one relation pins the target. A multiple whose orbit repeats an earlier column is an error",
+            ),            (
+                "lean_layout",
+                "1 (needs generator_orbit=1 and generator_multiples = columns): the same points, columns, coefficients and negation map without the work no orbit-layout consumer reads (the base's hash index, the on-curve check of each Frobenius image, the single column's orbit key); usable only by mitm-frobenius-layout-counted. 0 or absent: the incumbent build",
             ),
         ]
     }
@@ -1213,6 +1251,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         let from_generator = generator_orbit(params)?;
         let multiples = generator_multiples(params)?;
         let doublings = multiple_doublings(params)?;
+        let lean = lean_layout(params)?;
         if from_generator && !multipliers.is_empty() {
             return Err("generator_orbit=1 does not combine with norm > 0".into());
         }
@@ -1278,24 +1317,31 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
                 if !inst.fast.is_on_curve(seed) {
                     return Err("the generator is off curve".into());
                 }
-                let mut x = seed.x;
-                let mut key = x;
-                for _ in 1..inst.n {
-                    x = inst.gf.sqr(x);
-                    key = key.min(x);
-                    key_squares += 1;
-                }
-                if !seen.insert(key) {
-                    return Err(format!(
-                        "the orbit of [{j}]G repeats an earlier column; use fewer generator_multiples"
-                    ));
+                if lean && multiples == 1 {
+                    // One column: there is no earlier orbit to repeat.
+                    seen.insert(seed.x);
+                } else {
+                    let mut x = seed.x;
+                    let mut key = x;
+                    for _ in 1..inst.n {
+                        x = inst.gf.sqr(x);
+                        key = key.min(x);
+                        key_squares += 1;
+                    }
+                    if !seen.insert(key) {
+                        return Err(format!(
+                            "the orbit of [{j}]G repeats an earlier column; use fewer generator_multiples"
+                        ));
+                    }
                 }
                 let mut member = seed;
                 let mut coefficient = 1u64;
                 for _ in 0..inst.n {
-                    equation_checks += 1;
-                    if !inst.fast.is_on_curve(member) {
-                        return Err("a Frobenius image of the generator is off curve".into());
+                    if !lean {
+                        equation_checks += 1;
+                        if !inst.fast.is_on_curve(member) {
+                            return Err("a Frobenius image of the generator is off curve".into());
+                        }
                     }
                     points.push(member);
                     col_of.push(column);
@@ -1444,28 +1490,35 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
                 seen.len()
             ));
         }
-        let mut fb = FactorBase::from_column_map(
-            if from_generator && multiples > 1 {
-                format!(
+        let description = if from_generator && multiples > 1 {
+            format!(
                     "the signed Frobenius orbits of [1]G..[{multiples}]G and the first {} projected orbits, raw x <= {raw_x_cap}",
                     columns as u64 - multiples
                 )
-            } else if from_generator {
-                format!(
+        } else if from_generator {
+            format!(
                     "the generator's signed Frobenius orbit and the first {} projected orbits, raw x <= {raw_x_cap}",
                     columns - 1
                 )
-            } else {
-                format!("first {columns} projected signed Frobenius orbits, raw x <= {raw_x_cap}")
-            },
-            points,
-            col_of,
-            coef_of,
-            columns,
-            |p| p.pack(),
-            |p| inst.fast.neg(*p).pack(),
-            |p| p.x,
-        )?;
+        } else {
+            format!("first {columns} projected signed Frobenius orbits, raw x <= {raw_x_cap}")
+        };
+        let mut fb = if lean {
+            // Pushed as (σ^t(S), −σ^t(S)) pairs above: the layout is the
+            // negation map, and no index is derived.
+            FactorBase::from_signed_layout(description, points, col_of, coef_of, columns)?
+        } else {
+            FactorBase::from_column_map(
+                description,
+                points,
+                col_of,
+                coef_of,
+                columns,
+                |p| p.pack(),
+                |p| inst.fast.neg(*p).pack(),
+                |p| p.x,
+            )?
+        };
         // Each orbit was pushed seed-first as (σ^t(S), −σ^t(S)) for
         // t = 0..n; multiplier orbits share a column but follow the same
         // order, so the layout holds for them too.
@@ -1499,16 +1552,16 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         if multiples > 1 {
             fb.cost.count("generator_multiple_columns", multiples);
         }
-        fb.cost.count(
-            "hash_probes_uncharged",
-            projected + fb.points.len() as u64 * 3,
-        );
+        // `lean_layout` derives no index: no insert, probe or negative-key
+        // negation (the orbit loop's own negations stay).
+        let indexed = if lean { 0 } else { fb.points.len() as u64 };
+        fb.cost
+            .count("hash_probes_uncharged", projected + indexed * 3);
         fb.cost.count(
             "point_negations_uncharged",
-            lifts / 2 + columns as u64 * inst.n as u64 + fb.points.len() as u64,
+            lifts / 2 + columns as u64 * inst.n as u64 + indexed,
         );
-        fb.cost
-            .count("factor_point_inserts_uncharged", fb.points.len() as u64);
+        fb.cost.count("factor_point_inserts_uncharged", indexed);
         fb.cost.count(
             "factor_base_vec_bytes_floor_uncharged",
             (fb.points.len() * std::mem::size_of::<FastPoint>()
@@ -4188,6 +4241,21 @@ pub struct FrobeniusMitmOracle<'i> {
     count_setup: bool,
     lazy_members: bool,
     layout_members: bool,
+    /// `tau_verify=1` (layout table only): the recovery check reads the
+    /// base's stored orbit of `G` through the τ-adic NAF of `d`.
+    tau_check: Option<TauOrbitCheck<FastPoint>>,
+}
+
+/// A 0/1 flag of the layout oracle; absent is 0.
+fn layout_flag(params: &Params, name: &str) -> Result<bool, String> {
+    match params.get(name) {
+        None => Ok(false),
+        Some(_) => match params.u64(name)? {
+            0 => Ok(false),
+            1 => Ok(true),
+            v => Err(format!("{name} must be 0 or 1, not {v}")),
+        },
+    }
 }
 
 impl<'i> FrobeniusMitmOracle<'i> {
@@ -4200,6 +4268,7 @@ impl<'i> FrobeniusMitmOracle<'i> {
             count_setup: false,
             lazy_members: false,
             layout_members: false,
+            tau_check: None,
         }
     }
 
@@ -4212,6 +4281,7 @@ impl<'i> FrobeniusMitmOracle<'i> {
             count_setup: true,
             lazy_members: false,
             layout_members: false,
+            tau_check: None,
         }
     }
 
@@ -4280,6 +4350,14 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
         &[
             ("m", "summands, 2 or 3"),
             (
+                "sib",
+                "1 (layout table only): form each signed pair P + X, P - X from one inversion (x-only siblings; charged one addition plus one sibling_second_points) and skip P + (-P); the same entries and probes. 0 or absent: the incumbent build",
+            ),
+            (
+                "tau_verify",
+                "1 (layout table only; column 0 must be the generator's orbit, generator_orbit=1): the recovery check forms [d]G as the tau-adic NAF of d summed over the stored signed orbit of G (one addition per non-zero digit, tau^n = 1), with its recoding steps reported as tau_naf_recode_steps_uncharged. 0 or absent: double-and-add",
+            ),
+            (
                 "large_primes",
                 "0 (default), 1 or 2 residual points outside the base a partial relation may carry; needs m=3",
             ),
@@ -4328,8 +4406,38 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
                     .into(),
             );
         }
+        let sib = layout_flag(params, "sib")?;
+        let tau_verify = layout_flag(params, "tau_verify")?;
+        if (sib || tau_verify) && !self.layout_members {
+            return Err("sib and tau_verify need mitm-frobenius-layout-counted".into());
+        }
+        if fb.index_elided() && !self.layout_members {
+            return Err("a base without its index needs mitm-frobenius-layout-counted".into());
+        }
+        self.tau_check = None;
+        if tau_verify {
+            let n = self.instance.n as usize;
+            let kc = self
+                .instance
+                .koblitz
+                .as_ref()
+                .ok_or("tau_verify needs a Koblitz curve")?;
+            // Column 0 must be G's own orbit, laid out as
+            // (τ^t(G), −τ^t(G)) for t < n (`generator_orbit=1`).
+            if fb.points.len() < 2 * n || fb.points[0] != ctx.generator {
+                return Err(
+                    "tau_verify needs column 0 to be the generator's orbit (generator_orbit=1)"
+                        .into(),
+                );
+            }
+            self.tau_check = Some(TauOrbitCheck {
+                orbit: (0..n).map(|t| fb.points[2 * t]).collect(),
+                neg: (0..n).map(|t| fb.points[2 * t + 1]).collect(),
+                mu: kc.trace,
+            });
+        }
         let table = if self.layout_members {
-            FrobeniusPairTable::build_layout(self.instance, fb)
+            FrobeniusPairTable::build_layout_with(self.instance, fb, sib)
         } else if self.lazy_members {
             FrobeniusPairTable::build_lazy(self.instance, fb)
         } else {
@@ -4376,6 +4484,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
             }
         }
         counts
+    }
+
+    fn recovery_tau_orbit(&self) -> Option<TauOrbitCheck<FastPoint>> {
+        self.tau_check.clone()
     }
 
     fn decompose(

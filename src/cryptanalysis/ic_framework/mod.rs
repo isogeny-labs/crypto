@@ -93,9 +93,9 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations_touching_ladder, price_phase, Calibration, CompletionRule,
-    CountedGroup, FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, Relation,
-    RelationSolver, RestartPool, TargetSource,
+    collect_and_solve_relations_touching_check, price_phase, Calibration, CompletionRule,
+    CountedGroup, FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RecoveryCheck,
+    Relation, RelationSolver, RestartPool, TargetSource,
 };
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
@@ -574,6 +574,14 @@ fn run_pipeline_inner<G: CountedGroup>(
     }
     let fb_started = Instant::now();
     let fb = base_builder.build(ctx, &spec.factor_base_params, &mut fb_ops)?;
+    // A base without its hash index (`lean_layout`) can be read only by the
+    // oracle that names base points by orbit-layout index.
+    if fb.index_elided() && oracle.name() != "mitm-frobenius-layout-counted" {
+        return Err(format!(
+            "a base without its index (lean_layout) needs mitm-frobenius-layout-counted, not {}",
+            oracle.name()
+        ));
+    }
     let archive_import = base_builder.name() == "archive";
     if archive_import
         && matches!(oracle.name(), "mitm-frobenius" | "mitm-frobenius-counted")
@@ -871,9 +879,15 @@ fn run_pipeline_inner<G: CountedGroup>(
         // rows through the same call.
         let line_guard = oracle.line_guard();
         let recovery_ladder = oracle.recovery_ladder();
+        let recovery_tau = oracle.recovery_tau_orbit();
+        let recovery_check = match (&recovery_ladder, &recovery_tau) {
+            (Some(ladder), _) if !ladder.is_empty() => RecoveryCheck::Ladder(ladder),
+            (_, Some(tau)) => RecoveryCheck::TauOrbit(tau),
+            _ => RecoveryCheck::DoubleAndAdd,
+        };
         let oracle_cell = std::cell::RefCell::new(&mut *oracle);
         let mut trial = 0u64;
-        collect_and_solve_relations_touching_ladder(
+        collect_and_solve_relations_touching_check(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -904,7 +918,7 @@ fn run_pipeline_inner<G: CountedGroup>(
             },
             |point| oracle_cell.borrow().touch(ctx, point),
             line_guard,
-            recovery_ladder.as_deref(),
+            recovery_check,
         )
     };
     for (name, value) in oracle.relation_counters() {
@@ -3135,6 +3149,258 @@ mod tests {
                 assert!(rep.verified, "n{n} seed {seed}");
                 assert_eq!(rep.recovered, Some(planted), "n{n} seed {seed}");
                 assert_eq!(rep.decomposition.relations_found, 1, "n{n} seed {seed}");
+            }
+        }
+    }
+
+    /// The n29 generator-orbit levers (2026-11-18): `lean_layout` (base
+    /// without its index), `sib` (sibling pair-table build) and `tau_verify`
+    /// (τ-adic recovery check over the stored orbit).  Each one absent or 0
+    /// is the incumbent bit for bit; on, the base, the table's probes, the
+    /// walk and the recovered log are unchanged and only work goes.
+    #[test]
+    fn generator_orbit_lean_sib_tau_levers_keep_the_solve_and_remove_work() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{
+            koblitz_instance, tau_naf, tau_orbit_mul, BinaryGroup, CountedGroup,
+            FrobeniusPairTable, OracleCounters, TauOrbitCheck,
+        };
+
+        // τ-NAF: the digits evaluate to d in Z[τ] (τ² = μτ − 2), no two
+        // adjacent non-zero.
+        for mu in [1i64, -1] {
+            for d in (0u64..2_000).chain([65_535, 1 << 20, 536_911_222, u64::from(u32::MAX)]) {
+                let digits = tau_naf(d, mu);
+                let (mut v0, mut v1, mut p0, mut p1) = (0i128, 0i128, 1i128, 0i128);
+                for (i, &u) in digits.iter().enumerate() {
+                    v0 += u as i128 * p0;
+                    v1 += u as i128 * p1;
+                    (p0, p1) = (-2 * p1, p0 + mu as i128 * p1);
+                    if i > 0 {
+                        assert!(u == 0 || digits[i - 1] == 0, "d {d}: adjacent digits");
+                    }
+                }
+                assert_eq!((v0, v1), (d as i128, 0), "d {d} mu {mu}");
+            }
+        }
+
+        for (a, n, planted_seed) in [(1u8, 29u32, 40_009u64), (1, 23, 4_242), (0, 37, 777)] {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let build = |spec: &str| {
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{spec}")).unwrap();
+                let mut ops = GroupOps::default();
+                let fb = base.build(&ctx, &params, &mut ops).unwrap();
+                (fb, ops)
+            };
+            let plain = "columns=1,raw_x_cap=100000000,generator_orbit=1";
+            let (p0, o0) = build(plain);
+            let (z, oz) = build(&format!("{plain},lean_layout=0"));
+            assert_eq!(p0.points, z.points);
+            assert_eq!(p0.cost.native, z.cost.native);
+            assert_eq!(p0.cost.work_native, z.cost.work_native);
+            assert_eq!((o0.adds, o0.doubles), (oz.adds, oz.doubles));
+            let (l, ol) = build(&format!("{plain},lean_layout=1"));
+            assert_eq!(p0.points, l.points);
+            assert_eq!(p0.col_of, l.col_of);
+            assert_eq!(p0.coef_of, l.coef_of);
+            assert_eq!(p0.neg_index, l.neg_index);
+            assert_eq!(p0.frobenius_orbit_layout, l.frobenius_orbit_layout);
+            assert_eq!(
+                (o0.adds, o0.doubles, o0.scalar_mults),
+                (ol.adds, ol.doubles, ol.scalar_mults)
+            );
+            assert!(l.index_elided() && !p0.index_elided());
+            assert_eq!(l.cost.get("hash_probes_uncharged"), 0);
+            assert_eq!(l.cost.get("factor_point_inserts_uncharged"), 0);
+            assert_eq!(l.cost.get("curve_equation_checks_uncharged"), 1);
+            assert_eq!(l.cost.get("min_key_field_squares_uncharged"), 0);
+            assert_eq!(l.cost.get("point_negations_uncharged"), n as u64);
+            assert_eq!(l.cost.get("frobenius_maps"), p0.cost.get("frobenius_maps"));
+            assert_eq!(p0.cost.get("hash_probes_uncharged"), 6 * n as u64);
+            for bad in [
+                "columns=1,raw_x_cap=100000000,lean_layout=1",
+                "columns=2,raw_x_cap=100000000,generator_orbit=1,lean_layout=1",
+                "columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=2",
+            ] {
+                let (_, params) = Params::parse_spec(&format!("compact-orbit-scan:{bad}")).unwrap();
+                assert!(
+                    base.build(&ctx, &params, &mut GroupOps::default()).is_err(),
+                    "{bad}"
+                );
+            }
+
+            // The sibling table: the same probes, an addition fewer per
+            // sibling pair and none for P + (−P).  Also on a two-column
+            // all-known base, whose cross-orbit pairs are siblings too.
+            let (k2, _) = build("columns=2,raw_x_cap=100000000,generator_orbit=1,generator_multiples=2,lean_layout=1");
+            for fb in [&l, &k2] {
+                let t0 = FrobeniusPairTable::build_layout(&inst, fb).unwrap();
+                let t1 = FrobeniusPairTable::build_layout_with(&inst, fb, true).unwrap();
+                assert_eq!(t0.entries, t1.entries);
+                assert_eq!(t0.build_canonicalisations, t1.build_canonicalisations);
+                assert_eq!(t0.insert_attempts, t1.insert_attempts);
+                assert!(t1.sib_second_points > 0 && t0.sib_second_points == 0);
+                let orbits = (fb.points.len() / (2 * n as usize)) as u64;
+                assert_eq!(
+                    t1.build_ops.adds + t1.sib_second_points + orbits,
+                    t0.build_ops.adds
+                );
+                assert_eq!(
+                    t1.work_counters().get("sibling_second_points"),
+                    Some(&t1.sib_second_points)
+                );
+                assert!(!t0
+                    .work_counters()
+                    .contains_key("counted:sibling_second_points"));
+                let mut walk = ctx.target;
+                for _ in 0..3_000 {
+                    let (mut a0, mut a1) = (GroupOps::default(), GroupOps::default());
+                    let (mut c0, mut c1) = (OracleCounters::default(), OracleCounters::default());
+                    assert_eq!(
+                        t0.probe(&group, fb, &mut a0, &mut c0, walk),
+                        t1.probe(&group, fb, &mut a1, &mut c1, walk)
+                    );
+                    walk = group.add(&mut GroupOps::default(), walk, inst.generator);
+                }
+            }
+
+            // τ-adic check: the stored orbit gives [d]G, with fewer
+            // operations than double-and-add.
+            let tau = TauOrbitCheck {
+                orbit: (0..n as usize).map(|t| l.points[2 * t]).collect(),
+                neg: (0..n as usize).map(|t| l.points[2 * t + 1]).collect(),
+                mu: if a == 1 { 1 } else { -1 },
+            };
+            let (mut ops_tau, mut ops_dbl) = (GroupOps::default(), GroupOps::default());
+            for d in (0..inst.r)
+                .step_by((inst.r / 997).max(1) as usize)
+                .chain([inst.r - 1])
+            {
+                let (p, steps) = tau_orbit_mul(&group, &mut ops_tau, &tau, d);
+                assert_eq!(p, group.mul(&mut ops_dbl, inst.generator, d), "n{n} d {d}");
+                assert_eq!(steps, tau_naf(d, tau.mu).len() as u64);
+            }
+            assert!(
+                ops_tau.gae() < ops_dbl.gae(),
+                "n{n}: {} vs {}",
+                ops_tau.gae(),
+                ops_dbl.gae()
+            );
+
+            // End to end: the incumbent, its explicit off state, and all
+            // three levers on recover the same log on the same walk.
+            let run = |fbp: &[(&str, &str)], op: &[(&str, &str)], seed: u64| {
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                pspec.factor_base_params.set("columns", "1");
+                pspec.factor_base_params.set("raw_x_cap", "100000000");
+                pspec.factor_base_params.set("generator_orbit", "1");
+                for (k, v) in fbp {
+                    pspec.factor_base_params.set(k, *v);
+                }
+                pspec.oracle_params.set("m", "2");
+                for (k, v) in op {
+                    pspec.oracle_params.set(k, *v);
+                }
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+            };
+            for seed in [3u64, 11] {
+                let inc = run(&[], &[], seed).expect("incumbent");
+                let off = run(
+                    &[("lean_layout", "0")],
+                    &[("sib", "0"), ("tau_verify", "0")],
+                    seed,
+                )
+                .expect("off");
+                // Everything but the wall clock.
+                fn no_wall(v: &mut serde_json::Value) {
+                    match v {
+                        serde_json::Value::Object(m) => {
+                            m.remove("wall_ns");
+                            m.values_mut().for_each(no_wall);
+                        }
+                        serde_json::Value::Array(a) => a.iter_mut().for_each(no_wall),
+                        _ => {}
+                    }
+                }
+                let (mut di, mut doff) = (
+                    serde_json::to_value(&inc.decomposition).unwrap(),
+                    serde_json::to_value(&off.decomposition).unwrap(),
+                );
+                no_wall(&mut di);
+                no_wall(&mut doff);
+                assert_eq!(di, doff);
+                assert_eq!(inc.total_gae, off.total_gae);
+                let on = run(
+                    &[("lean_layout", "1")],
+                    &[("sib", "1"), ("tau_verify", "1")],
+                    seed,
+                )
+                .expect("on");
+                assert!(inc.verified && on.verified, "n{n} seed {seed}");
+                assert_eq!(on.recovered, Some(planted));
+                assert_eq!(
+                    on.decomposition.targets_tried,
+                    inc.decomposition.targets_tried
+                );
+                assert!(
+                    on.total_gae < inc.total_gae,
+                    "n{n}: {} vs {}",
+                    on.total_gae,
+                    inc.total_gae
+                );
+                assert!(on.verify.get("tau_naf_recode_steps_uncharged") > 0);
+                assert_eq!(on.verify.group_ops.doubles, 0);
+                // The lean base refuses every other oracle.
+                let mut other = FrobeniusMitmOracle::new_counted(2, &inst);
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 1_000,
+                    seed,
+                    ..Default::default()
+                };
+                for (k, v) in [
+                    ("columns", "1"),
+                    ("raw_x_cap", "100000000"),
+                    ("generator_orbit", "1"),
+                    ("lean_layout", "1"),
+                ] {
+                    pspec.factor_base_params.set(k, v);
+                }
+                pspec.oracle_params.set("m", "2");
+                assert!(run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut other,
+                    planted,
+                    &Calibration::default(),
+                    None
+                )
+                .is_err());
             }
         }
     }

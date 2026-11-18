@@ -43,6 +43,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::cryptanalysis::ic_boundary::{
     CompletionRule, CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
+    TauOrbitCheck,
 };
 use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 
@@ -332,6 +333,18 @@ pub trait DecompositionOracle<G: CountedGroup> {
     /// double-and-add, charged to the same verification ops.  `None` (the
     /// default) keeps every recorded run's check.
     fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        None
+    }
+
+    /// The stored signed Frobenius orbit of `G` (already paid for by the
+    /// base) that the recovery check `[d]G` may read through the τ-adic
+    /// expansion of `d` ([`tau_orbit_mul`]) instead of a double-and-add,
+    /// charged to the same verification ops.  `None` (the default) keeps
+    /// every recorded run's check; consulted only when
+    /// [`recovery_ladder`](Self::recovery_ladder) is `None`.
+    ///
+    /// [`tau_orbit_mul`]: crate::cryptanalysis::ic_boundary::tau_orbit_mul
+    fn recovery_tau_orbit(&self) -> Option<TauOrbitCheck<G::Elt>> {
         None
     }
 

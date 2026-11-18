@@ -3212,6 +3212,81 @@ struct RhoSetup<G: CountedGroup> {
     verify_ladder: Vec<G::Elt>,
 }
 
+/// The stored signed Frobenius orbit of the generator on a Koblitz curve,
+/// for the τ-adic recovery check (n29 generator-orbit lever, 2026-11-18).
+///
+/// `orbit[t] = τ^t(G)` and `neg[t] = −τ^t(G)` for `t < n`, `n` the field
+/// degree, so `τ^n(G) = G` and a τ-adic digit at position `i` reads entry
+/// `i mod n`.  `mu = ±1` is the Frobenius trace of the curve over `F_2`
+/// (`μ = (−1)^{1−a}`), for which `τ² − μτ + 2 = 0` holds on every point.
+/// No logarithm, eigenvalue or group order enters the check: it is an
+/// identity of the endomorphism ring `Z[τ]` evaluated on stored points.
+#[derive(Clone, Debug)]
+pub struct TauOrbitCheck<E> {
+    pub orbit: Vec<E>,
+    pub neg: Vec<E>,
+    pub mu: i64,
+}
+
+/// The τ-adic non-adjacent form of the integer `d` (Solinas 2000,
+/// Algorithm 1): digits `u_i ∈ {−1, 0, 1}`, no two adjacent non-zero, with
+/// `Σ u_i τ^i = d` in `Z[τ]`, `τ² = μτ − 2`.  Its length is about
+/// `log₂(d²) + 1` (the norm of `d` is `d²`), a third of the digits
+/// non-zero.  One loop step per digit.
+pub fn tau_naf(d: u64, mu: i64) -> Vec<i8> {
+    assert!(mu == 1 || mu == -1, "mu must be +-1");
+    let (mut r0, mut r1) = (d as i128, 0i128);
+    let mut out = Vec::new();
+    while r0 != 0 || r1 != 0 {
+        let u = if r0 & 1 != 0 {
+            let u = 2 - (r0 - 2 * r1).rem_euclid(4);
+            r0 -= u;
+            u
+        } else {
+            0
+        };
+        out.push(u as i8);
+        // (r0 + r1 τ)/τ = r1 + μ r0/2 − (r0/2) τ, since 1/τ = (μ − τ)/2.
+        let half = r0 / 2;
+        let next0 = r1 + mu as i128 * half;
+        r1 = -half;
+        r0 = next0;
+    }
+    out
+}
+
+/// `[d]G` as `Σ u_i τ^i(G)` over the τ-adic NAF of `d` ([`tau_naf`]), read
+/// from the stored orbit: one counted addition per non-zero digit after the
+/// first, no doubling and no Frobenius map.  Counted as one scalar
+/// multiplication, like [`ladder_mul`].  Also returns the recoding's loop
+/// steps (the digits), which the caller reports as native work.
+pub fn tau_orbit_mul<G: CountedGroup>(
+    g: &G,
+    ops: &mut GroupOps,
+    check: &TauOrbitCheck<G::Elt>,
+    d: u64,
+) -> (G::Elt, u64) {
+    ops.scalar_mults += 1;
+    let n = check.orbit.len();
+    let digits = tau_naf(d, check.mu);
+    let mut acc: Option<G::Elt> = None;
+    for (i, &u) in digits.iter().enumerate() {
+        if u == 0 {
+            continue;
+        }
+        let p = if u > 0 {
+            check.orbit[i % n]
+        } else {
+            check.neg[i % n]
+        };
+        acc = Some(match acc {
+            None => p,
+            Some(a) => g.add(ops, a, p),
+        });
+    }
+    (acc.unwrap_or_else(|| g.identity()), digits.len() as u64)
+}
+
 /// `[d]G` from a ladder `[2^i]G`, `i < L`, as a counted operation sequence:
 /// one addition per set bit below `L` (the first is free), and for the
 /// bits at and above `L` one doubling of the top rung, a double-and-add of
@@ -7333,6 +7408,54 @@ impl<E: Copy> FactorBase<E> {
         fb.coef_of = coef_of;
         fb.columns = columns;
         Ok(fb)
+    }
+
+    /// A base laid out in signed pairs, `points[2i + 1] = −points[2i]`,
+    /// with no derived hash index (`lean_layout` of `compact-orbit-scan`,
+    /// 2026-11-18): `neg_index[i] = i ^ 1` by the layout, and
+    /// `point_index`, `x_index` and `abscissa_list` stay empty, so the
+    /// build spends no hash insert, probe or negation on them.  Only a
+    /// consumer that names base points by index (the orbit-layout pair
+    /// table) may read such a base ([`FactorBase::index_elided`]).  The
+    /// caller vouches for the pairing; lengths and columns are checked.
+    pub fn from_signed_layout(
+        description: String,
+        points: Vec<E>,
+        col_of: Vec<usize>,
+        coef_of: Vec<u64>,
+        columns: usize,
+    ) -> Result<Self, String> {
+        if points.len() != col_of.len() || points.len() != coef_of.len() {
+            return Err(format!(
+                "column map lengths disagree: {} points, {} columns, {} coefficients",
+                points.len(),
+                col_of.len(),
+                coef_of.len()
+            ));
+        }
+        if points.is_empty() || !points.len().is_multiple_of(2) {
+            return Err("a signed layout needs a non-empty, even number of points".into());
+        }
+        if let Some(&c) = col_of.iter().find(|&&c| c >= columns) {
+            return Err(format!(
+                "column {c} is outside the {columns} declared columns"
+            ));
+        }
+        let mut fb = FactorBase::empty(description);
+        fb.neg_index = (0..points.len()).map(|i| i ^ 1).collect();
+        fb.abscissae = points.len() / 2;
+        fb.points = points;
+        fb.col_of = col_of;
+        fb.coef_of = coef_of;
+        fb.columns = columns;
+        Ok(fb)
+    }
+
+    /// `true` for a base built without its hash index
+    /// ([`FactorBase::from_signed_layout`]): `point_index` is empty while
+    /// the base holds points, so lookups by key would find nothing.
+    pub fn index_elided(&self) -> bool {
+        self.point_index.is_empty() && !self.points.is_empty()
     }
 }
 
@@ -13003,6 +13126,13 @@ pub struct FrobeniusPairTable {
     pub insert_attempts: u64,
     /// The orbit-index pass's canonicalisations, one per base point.
     pub orbit_canonicalisations: u64,
+    /// `true` when the layout build formed the signed pairs `P ± X` as
+    /// x-only siblings from one inversion ([`Self::build_layout_with`]).
+    pub sib: bool,
+    /// Pairs whose second sign was formed that way: each pair is charged
+    /// one group addition plus one unit of `sibling_second_points` (the
+    /// convention of the `wwalk`/`ksum` siblings).
+    pub sib_second_points: u64,
 }
 
 impl FrobeniusPairTable {
@@ -13040,6 +13170,25 @@ impl FrobeniusPairTable {
     /// in which the eager build first meets them.  `None` without the
     /// layout, at even `n`, or where [`build`](Self::build) gives `None`.
     pub fn build_layout(inst: &BinaryInstance, fb: &FactorBase<FastPoint>) -> Option<Self> {
+        Self::build_layout_with(inst, fb, false)
+    }
+
+    /// [`build_layout`](Self::build_layout); with `sib` (n29 generator-orbit
+    /// lever, 2026-11-18) the build forms each signed pair `P + X`, `P − X`
+    /// (`X` and `−X` sit side by side in the layout) from ONE inversion
+    /// `1/(x_P + x_X)`: the table only keys abscissae, and on a binary curve
+    /// `−X = (x_X, x_X + y_X)` changes the slope by `x_X/(x_P + x_X)`, so
+    /// the second abscissa costs one multiplication and one squaring more.
+    /// Each such pair is charged one group addition plus one
+    /// `sibling_second_points`; and the pair `P + (−P)`, the identity by
+    /// the layout, is not formed at all.  Keys, shifts, entries, their
+    /// insert order and every probe are those of `build_layout`; with
+    /// `sib = false` this is `build_layout` bit for bit.
+    pub fn build_layout_with(
+        inst: &BinaryInstance,
+        fb: &FactorBase<FastPoint>,
+        sib: bool,
+    ) -> Option<Self> {
         let start = Instant::now();
         let n = inst.n as usize;
         let f = fb.points.len();
@@ -13056,19 +13205,53 @@ impl FrobeniusPairTable {
         let mut ops = GroupOps::default();
         let mut canons = 0u64;
         let mut map: FastMap<(u32, u32)> = fast_map(f * f / (4 * n) + 1);
+        let mut sib_second = 0u64;
+        let field = &inst.fast.field;
         for o in 0..orbits {
             let rep = 2 * o * n;
+            let p = fb.points[rep];
             // Rotations k = 0..=(n−1)/2 of the representative's own
             // orbit, both signs, then every later orbit.
-            for j in (rep..rep + n + 1).chain(rep + 2 * n..f) {
-                let u = g.add(&mut ops, fb.points[rep], fb.points[j]);
-                if g.is_identity(&u) {
-                    continue;
+            let mut js = (rep..rep + n + 1).chain(rep + 2 * n..f).peekable();
+            while let Some(j) = js.next() {
+                let x = fb.points[j];
+                // The sibling form: `x` at an even index (its negative
+                // next), a finite pair with distinct abscissae.
+                let sibling = sib
+                    && j % 2 == 0
+                    && js.peek() == Some(&(j + 1))
+                    && !p.infinity
+                    && !x.infinity
+                    && p.x != x.x;
+                let keys: [(Option<u64>, usize); 2] = if sibling {
+                    js.next();
+                    ops.adds += 1;
+                    sib_second += 1;
+                    let inv = field.inv(p.x ^ x.x);
+                    let lp = field.mul(p.y ^ x.y, inv);
+                    let lm = lp ^ field.mul(x.x, inv);
+                    let base = p.x ^ x.x ^ inst.fast.a;
+                    [
+                        (Some(field.sqr(lp) ^ lp ^ base), j),
+                        (Some(field.sqr(lm) ^ lm ^ base), j + 1),
+                    ]
+                } else if sib && j == rep + 1 {
+                    // `P + (−P)`: the identity, known from the layout.
+                    [(None, j), (None, j)]
+                } else {
+                    let u = g.add(&mut ops, p, x);
+                    [
+                        (if g.is_identity(&u) { None } else { Some(u.x) }, j),
+                        (None, j),
+                    ]
+                };
+                for (ux, jj) in keys {
+                    let Some(ux) = ux else { continue };
+                    canons += 1;
+                    let (key, t_u) = canon.canon_with_shift(ux);
+                    map.entry(key)
+                        .or_insert((rep as u32, (jj as u32) | (t_u << FROB_INDEX_BITS)));
                 }
-                canons += 1;
-                let (key, t_u) = canon.canon_with_shift(u.x);
-                map.entry(key)
-                    .or_insert((rep as u32, (j as u32) | (t_u << FROB_INDEX_BITS)));
             }
         }
         Some(Self {
@@ -13089,6 +13272,8 @@ impl FrobeniusPairTable {
             // pass: the inserts tried are the pair inserts alone.
             insert_attempts: canons,
             orbit_canonicalisations: 0,
+            sib,
+            sib_second_points: sib_second,
         })
     }
 
@@ -13200,6 +13385,8 @@ impl FrobeniusPairTable {
             build_lookups: lookups,
             insert_attempts: attempts,
             orbit_canonicalisations: orbit_canons,
+            sib: false,
+            sib_second_points: 0,
         })
     }
 
@@ -13218,6 +13405,12 @@ impl FrobeniusPairTable {
             if v > 0 {
                 out.insert(name.to_string(), v);
             }
+        }
+        if self.sib {
+            // Priced by the band where the marker is present (`band.rs`,
+            // `SIBLING_WORK_COUNTERS`), as for the `wwalk`/`ksum` siblings.
+            out.insert("counted:sibling_second_points".to_string(), 1);
+            out.insert("sibling_second_points".to_string(), self.sib_second_points);
         }
         out
     }
@@ -14242,6 +14435,52 @@ pub fn collect_and_solve_relations_touching_ladder<G: CountedGroup, L: RelationS
     line_guard: bool,
     verify_ladder: Option<&[G::Elt]>,
 ) -> PipelineOutcome {
+    let check = match verify_ladder {
+        Some(ladder) if !ladder.is_empty() => RecoveryCheck::Ladder(ladder),
+        _ => RecoveryCheck::DoubleAndAdd,
+    };
+    collect_and_solve_relations_touching_check(
+        g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
+        oracle, touch, line_guard, check,
+    )
+}
+
+/// How the relation loop's recovery check forms `[d]G` before comparing it
+/// with the target.  Every variant is a counted group-operation sequence
+/// charged to the verify phase, and every one computes `[d]G` itself.
+#[derive(Clone, Copy, Debug)]
+pub enum RecoveryCheck<'a, E> {
+    /// Double-and-add from `G` (every recorded run before the ladder).
+    DoubleAndAdd,
+    /// A stored ladder `[2^i]G` ([`ladder_mul`]).
+    Ladder(&'a [E]),
+    /// The τ-adic expansion of `d` over the stored signed Frobenius orbit
+    /// of `G` ([`tau_orbit_mul`]); Koblitz curves only.
+    TauOrbit(&'a TauOrbitCheck<E>),
+}
+
+/// [`collect_and_solve_relations_touching_ladder`] with the recovery check
+/// named by [`RecoveryCheck`]; `DoubleAndAdd` and `Ladder` are that
+/// function's two cases, bit for bit.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_touching_check<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    line_guard: bool,
+    verify_ladder: RecoveryCheck<'_, G::Elt>,
+) -> PipelineOutcome {
     let capacity = if targets.is_guarded() { 1 << 12 } else { 0 };
     if line_guard {
         collect_and_solve_relations_scaled_touching(
@@ -14324,7 +14563,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         oracle,
         |_| {},
         fast_map(if targets.is_guarded() { 1 << 12 } else { 0 }),
-        None,
+        RecoveryCheck::DoubleAndAdd,
     )
 }
 
@@ -14350,7 +14589,7 @@ fn collect_and_solve_relations_scaled_touching<
     mut oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
     touch: impl Fn(&G::Elt),
     mut seen: R,
-    verify_ladder: Option<&[G::Elt]>,
+    verify_ladder: RecoveryCheck<'_, G::Elt>,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
     let mut rel = PhaseCost::default();
@@ -14903,8 +15142,13 @@ fn collect_and_solve_relations_scaled_touching<
                 measurement::mark(measurement::Phase::RecoveryCheck);
                 let v_start = Instant::now();
                 let check = match verify_ladder {
-                    Some(ladder) if !ladder.is_empty() => {
+                    RecoveryCheck::Ladder(ladder) if !ladder.is_empty() => {
                         ladder_mul(g, &mut ver.group_ops, ladder, d)
+                    }
+                    RecoveryCheck::TauOrbit(tau) => {
+                        let (point, steps) = tau_orbit_mul(g, &mut ver.group_ops, tau, d);
+                        ver.count("tau_naf_recode_steps_uncharged", steps);
+                        point
                     }
                     _ => g.mul(&mut ver.group_ops, generator, d),
                 };
