@@ -194,6 +194,10 @@ impl Fp64 {
         if k == 0 {
             return;
         }
+        static INTERLEAVE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+        if k >= 32 && *INTERLEAVE.get_or_init(|| std::env::var_os("NOINTERLEAVE").is_none()) {
+            return self.batch_inv_x4(xs, scratch);
+        }
         scratch.clear();
         scratch.reserve(k);
         let mut acc = self.one;
@@ -206,6 +210,61 @@ impl Fp64 {
             let xi = xs[i];
             xs[i] = self.mul(inv_acc, scratch[i]);
             inv_acc = self.mul(inv_acc, xi);
+        }
+    }
+
+    /// Montgomery's trick over four interleaved chains: the prefix-product
+    /// and back-substitution chains are latency-bound, so four independent
+    /// chains keep the multiplier busy. One inversion, same exact results.
+    fn batch_inv_x4(&self, xs: &mut [u64], scratch: &mut Vec<u64>) {
+        let k = xs.len();
+        scratch.clear();
+        scratch.resize(k, 0);
+        let base = k / 4;
+        let rem = k % 4;
+        let mut start = [0usize; 4];
+        let mut s = 0usize;
+        for (c, st) in start.iter_mut().enumerate() {
+            *st = s;
+            s += base + usize::from(c < rem);
+        }
+        let mut acc = [self.one; 4];
+        for t in 0..base {
+            for c in 0..4 {
+                let i = start[c] + t;
+                scratch[i] = acc[c];
+                acc[c] = self.mul(acc[c], xs[i]);
+            }
+        }
+        for c in 0..rem {
+            let i = start[c] + base;
+            scratch[i] = acc[c];
+            acc[c] = self.mul(acc[c], xs[i]);
+        }
+        let p01 = self.mul(acc[0], acc[1]);
+        let p012 = self.mul(p01, acc[2]);
+        let p0123 = self.mul(p012, acc[3]);
+        let mut inv = self.inv(p0123);
+        let i3 = self.mul(inv, p012);
+        inv = self.mul(inv, acc[3]);
+        let i2 = self.mul(inv, p01);
+        inv = self.mul(inv, acc[2]);
+        let i1 = self.mul(inv, acc[0]);
+        let i0 = self.mul(inv, acc[1]);
+        let mut ia = [i0, i1, i2, i3];
+        for c in 0..rem {
+            let i = start[c] + base;
+            let xi = xs[i];
+            xs[i] = self.mul(ia[c], scratch[i]);
+            ia[c] = self.mul(ia[c], xi);
+        }
+        for t in (0..base).rev() {
+            for c in 0..4 {
+                let i = start[c] + t;
+                let xi = xs[i];
+                xs[i] = self.mul(ia[c], scratch[i]);
+                ia[c] = self.mul(ia[c], xi);
+            }
         }
     }
 
@@ -3411,6 +3470,25 @@ mod mulmod_n_tests {
                     ((a as u128 * b as u128) % m as u128) as u64,
                     "mul {a} {b} mod {m}"
                 );
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod batch_inv_x4_tests {
+    use super::*;
+
+    #[test]
+    fn interleaved_batch_inverse_matches_scalar() {
+        let f = Fp64::new(4_294_967_291); // largest prime below 2^32
+        for k in [31usize, 32, 33, 34, 35, 36, 100, 257] {
+            let xs: Vec<u64> = (0..k).map(|i| f.to_mont(3 + 7 * i as u64)).collect();
+            let mut a = xs.clone();
+            let mut sc = Vec::new();
+            f.batch_inv(&mut a, &mut sc);
+            for (x, y) in xs.iter().zip(&a) {
+                assert_eq!(f.mul(*x, *y), f.one, "k={k}");
             }
         }
     }

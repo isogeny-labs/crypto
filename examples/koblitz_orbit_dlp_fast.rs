@@ -4557,6 +4557,7 @@ mod wide {
     }
 
     #[inline(always)]
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn root_from_tables(
         primary: &RootTable128,
         overflow: Option<&RootTable128>,
@@ -4575,6 +4576,7 @@ mod wide {
 
     impl Index128 {
         #[inline(always)]
+        #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
         fn get_root(&self, key: u128, basis: &NormalBasis128) -> Option<u64> {
             root_from_tables(
                 &self.table,
