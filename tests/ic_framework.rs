@@ -57,8 +57,6 @@ fn verbose_run_traces_trials_and_preserves_report_and_json_output() {
     ];
     let (ok, expected) = command(&args);
     assert!(ok, "{expected}");
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
-        .arg("-vvv")
     let output = Command::new(ic_binary())
         .arg("-v")
         .args(args)
