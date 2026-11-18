@@ -140,6 +140,7 @@ pub mod coordinate_quotients;
 pub mod coordinate_search;
 pub mod cover_catalog;
 pub mod crossbred;
+pub mod curve25519_ic;
 pub mod curve25519_wide;
 pub mod curve_catalog;
 pub mod curve_construction;
