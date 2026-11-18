@@ -2445,12 +2445,29 @@
                   82.676
                 ]
               },
-              "stale_previous_rows": "the 2026-10-05 a=-3 ladder rows (20-bit 18.7-37.2 s, 24-bit 272-513 s) are reproduced on this tree at 0.33-0.55 s and 8.3-9.6 s; those records are stale, not a regression of this change"
+              "stale_previous_rows": "the 2026-10-05 a=-3 ladder rows (20-bit 18.7-37.2 s, 24-bit 272-513 s) are reproduced on this tree at 0.33-0.55 s and 8.3-9.6 s; those records are stale, not a regression of this change",
+              "factor_base_sweep": {
+                "note": "same oracle, seed 20261005, P-256 class; total wall is ~p*c for every B (no crossover with 2-decomposition)",
+                "bits_28": {
+                  "B=256": "385.3 s / 264 rows",
+                  "B=512": "215.3 s / 520 rows",
+                  "B=1024": "102.2 s / 1032 rows"
+                },
+                "bits_24": {
+                  "B=256": "20.6 s / 264 rows",
+                  "B=512": "11.0 s / 520 rows"
+                },
+                "bits_16": {
+                  "B=128": "0.02 s / 136 rows",
+                  "B=512": "0.04 s / 520 rows"
+                },
+                "evidence": "research/prime_ic_la_scaling_20261118/REPORT.md"
+              }
             },
             "verdict": "A3_S4_3DECOMP_28BIT_S3_ANCHORED_SWEEP"
           },
           "next_target": {
-            "summary": "Extend the anchored sweep to 32 bits under the same policy, and cut the per-candidate cost further (u64 inner loop for p < 2^63, batch inversion of the 2B anchor slopes) so a larger factor base is affordable: the density p/B^3 is still the lever, and the open measurement is the B at which 3-decomposition total wall meets 2-decomposition total wall.",
+            "summary": "Extend the anchored sweep to 32 bits under the same policy, and cut the per-candidate cost further (u64 inner loop for p < 2^63, batch inversion of the 2B anchor slopes). The larger-B question is answered (research/prime_ic_la_scaling_20261118): relation collection totals ~p*c at every B in 128..1024 with the sparse F_n LA engine, so B trades relation cost against LA and preprocessing and does not create a 3-decomposition crossover; the remaining exponent question is the algebraic (FFD) route, not B.",
             "acceptance_gates": [
               "relations group-verified and rho agreement control on the identical public point",
               "trials-per-relation and per-relation wall recorded per bitlength",
@@ -2576,24 +2593,55 @@
           "history": []
         },
         "rank": {
-          "status": "open",
+          "status": "record",
           "current": {
-            "summary": "Dense GE mod n on toy matrices",
+            "summary": "Sparse Markowitz Gauss-Jordan over F_n on the a=-3 IC relation matrix (2026-11-18): 136x129 to 1032x1025, 2.7-12x faster than the dense engine with 13-68x fewer touched entries and fill-in within ~5x of the input. At 1032x1025 (28-bit curve, fb=1024) sparse LA is 17.60 ms vs 57.85 ms dense and nnz_peak 21,379 vs 1,057,800. Every solve is verified end to end by [x]G = Q, and the sparse engine is checked against the dense one on the same relation set (rank, determined flags, values) and on planted-solution systems including a rank-deficient cell. Rank is computed once after collection, not recomputed per relation.",
             "metrics": {
-              "sparse_or_dense": "dense",
-              "matrix_dims": null,
-              "la_cost_ms": null
-            }
+              "n_or_bits": 28,
+              "orbit_columns_K": 1024,
+              "orbit_count_note": "K = |F|; no orbit reduction applies on a generic-j a=-3 curve",
+              "relations_collected": 1032,
+              "relations_needed": 1024,
+              "surplus": 8,
+              "matrix_dims": {"rows": 1032, "cols": 1025},
+              "sparse_or_dense": "sparse (with a paired dense reference run)",
+              "rank_accumulation": "solved once after collection; terminal rank 907-925 over 1025 columns (the target column is determined, the system is under-determined in the factor-base columns); not recomputed per relation",
+              "la_wall_ms": 17.6,
+              "la_wall_ms_dense_reference": 57.85,
+              "la_charged_ms": null,
+              "engine": "sparse_markowitz_gauss_jordan_mod_n",
+              "nnz_in": 4125,
+              "nnz_peak": 21379,
+              "muladds": 25416,
+              "by_bits": {
+                "16bit_b512": {"dims": [520, 513], "sparse_ms": 0.68, "dense_ms": 5.99, "nnz_peak": 2058},
+                "24bit_b512": {"dims": [520, 513], "sparse_ms": 3.65, "dense_ms": 44.09, "nnz_peak": 4121},
+                "28bit_b1024": {"dims": [1032, 1025], "sparse_ms": 17.6, "dense_ms": 57.85, "nnz_peak": 21379}
+              },
+              "correctness": "engine agreement on the same relation set and on planted-solution systems (12x8, 20x12, 10x12 rank-deficient, 40x40); every recorded solve recovers the known-answer scalar"
+            },
+            "verdict": "PRIME_SPARSE_LA_RECORD_1032x1025"
           },
           "next_target": {
-            "summary": "Sparse LA for >=256 FB columns on a 16-bit instance; publish dims and LA cost",
+            "summary": "Recompute rank after every relation on the frozen 16-bit instance and publish the accumulation curve (the remaining gate of this row), then re-run the sparse engine on the orbit-reduced j=0 base where K < |F| divides the matrix by the automorphism orbit size",
             "acceptance_gates": [
+              "rank recomputed after each relation, terminal rank = required",
               "correct vs dense GE on a subsample",
-              "matrix_dims and la cost logged"
+              "matrix_dims, nnz and la cost logged per accumulation step"
             ]
           },
-          "evidence": [],
-          "history": []
+          "evidence": [
+            "research/prime_ic_la_scaling_20261118/REPORT.md",
+            "research/prime_ic_la_scaling_20261118/sweep.jsonl",
+            "src/cryptanalysis/ec_index_calculus.rs"
+          ],
+          "history": [
+            {
+              "summary": "Dense GE mod n on toy matrices; dims unpublished as a frontier",
+              "metrics": {"sparse_or_dense": "dense", "matrix_dims": null, "la_cost_ms": null},
+              "recorded": "pre-2026-11-18"
+            }
+          ]
         },
         "end_to_end_dlp": {
           "status": "record",

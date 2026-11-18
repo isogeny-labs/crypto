@@ -1396,6 +1396,231 @@ pub fn gaussian_eliminate_mod_n_particular(
     })
 }
 
+// ── Sparse relation-matrix linear algebra mod n ────────────────────────
+
+/// Which relation-matrix engine a staged driver runs.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LaEngine {
+    /// Dense Gauss–Jordan over `F_n`: the reference path, `O(rows·cols²)`.
+    Dense,
+    /// Sparse Markowitz-ordered Gauss–Jordan over `F_n`.
+    Sparse,
+}
+
+impl LaEngine {
+    pub fn name(self) -> &'static str {
+        match self {
+            LaEngine::Dense => "dense_gauss_jordan_mod_n",
+            LaEngine::Sparse => "sparse_markowitz_gauss_jordan_mod_n",
+        }
+    }
+}
+
+/// Shape and counted work of one relation-matrix solve.
+///
+/// `nnz_in` is the number of nonzero entries of the relation matrix as
+/// collected (`≈ (m+2)·relations` for an m-summand IC row), `nnz_peak` the
+/// largest nonzero count any intermediate matrix reached (fill-in), and
+/// `muladds` the number of modular multiply-adds the elimination performed.
+#[derive(Debug, Clone, Default, serde::Serialize)]
+pub struct LaStats {
+    pub engine: String,
+    pub rows: usize,
+    pub cols: usize,
+    pub nnz_in: usize,
+    pub nnz_peak: usize,
+    pub rank: usize,
+    pub muladds: u64,
+}
+
+/// A sparse row: `column → coefficient mod n`, no zero entries.
+pub type SparseRow = std::collections::BTreeMap<usize, BigUint>;
+
+/// Build a sparse row from `(column, coefficient)` pairs reduced mod `n`.
+pub fn sparse_row_from_entries(entries: &[(usize, BigUint)], n: &BigUint) -> SparseRow {
+    let mut row = SparseRow::new();
+    for (col, value) in entries {
+        let v = value % n;
+        if v.is_zero() {
+            continue;
+        }
+        let slot = row.entry(*col).or_insert_with(BigUint::zero);
+        *slot = (&*slot + &v) % n;
+        if slot.is_zero() {
+            row.remove(col);
+        }
+    }
+    row
+}
+
+/// Sparse Gauss–Jordan elimination of `M · y ≡ rhs (mod n)` with Markowitz
+/// pivot ordering, tolerating free unknowns.
+///
+/// Pivot selection is the standard sparsity heuristic: take the row with the
+/// fewest entries, and inside it the column with the fewest entries, so the
+/// elimination creates as little fill-in as possible.  The result is the same
+/// solution and the same `determined` flags as
+/// [`gaussian_eliminate_mod_n_particular`] — free unknowns are set to zero —
+/// but the cost tracks the nonzero count instead of `rows·cols²`.
+///
+/// Returns `None` when the system is inconsistent.  `rows` and `rhs` are
+/// consumed (the caller has no further use for the relation matrix).
+pub fn sparse_gaussian_eliminate_mod_n(
+    mut rows: Vec<SparseRow>,
+    mut rhs: Vec<BigUint>,
+    n: &BigUint,
+    cols: usize,
+) -> Option<(ModNSolution, LaStats)> {
+    use std::collections::BTreeSet;
+
+    let n_rows = rows.len();
+    let nnz_in: usize = rows.iter().map(|r| r.len()).sum();
+    let mut stats = LaStats {
+        engine: LaEngine::Sparse.name().into(),
+        rows: n_rows,
+        cols,
+        nnz_in,
+        nnz_peak: nnz_in,
+        rank: 0,
+        muladds: 0,
+    };
+    for v in rhs.iter_mut() {
+        *v %= n;
+    }
+
+    // Column → rows containing it, kept current so pivot selection and
+    // elimination touch only the affected rows.
+    let mut col_rows: Vec<BTreeSet<usize>> = vec![BTreeSet::new(); cols];
+    for (r, row) in rows.iter().enumerate() {
+        for &c in row.keys() {
+            col_rows[c].insert(r);
+        }
+    }
+
+    let mut pivot_of_col: Vec<usize> = vec![usize::MAX; cols];
+    let mut is_pivot_row = vec![false; n_rows];
+    let mut live: BTreeSet<usize> = (0..n_rows).collect();
+
+    loop {
+        // Markowitz: the live row with the fewest entries, breaking ties by
+        // index; inside it, the column with the fewest entries.
+        let mut best: Option<(usize, usize, usize)> = None; // (row_deg, row, col)
+        for &r in &live {
+            let deg = rows[r].len();
+            if deg == 0 {
+                continue;
+            }
+            if best.map_or(true, |(d, _, _)| deg < d) {
+                let mut pick: Option<(usize, usize)> = None;
+                for &c in rows[r].keys() {
+                    let cdeg = col_rows[c].len();
+                    if pick.map_or(true, |(d2, _)| cdeg < d2) {
+                        pick = Some((cdeg, c));
+                    }
+                }
+                let (cdeg, c) = pick?;
+                let _ = cdeg;
+                best = Some((deg, r, c));
+            }
+        }
+        let Some((_, r, c)) = best else { break };
+        live.remove(&r);
+        is_pivot_row[r] = true;
+
+        // Normalise the pivot row so the pivot coefficient is one.
+        let lead = rows[r][&c].clone();
+        let lead_inv = mod_inverse(&lead, n)?;
+        {
+            let row = rows[r].clone();
+            for (col, value) in row {
+                let v = (value * &lead_inv) % n;
+                if v.is_zero() {
+                    rows[r].remove(&col);
+                    col_rows[col].remove(&r);
+                } else {
+                    rows[r].insert(col, v);
+                }
+            }
+            rhs[r] = (&rhs[r] * &lead_inv) % n;
+        }
+        pivot_of_col[c] = r;
+
+        // Eliminate the pivot column from every other row that carries it.
+        let targets: Vec<usize> = col_rows[c].iter().copied().filter(|&o| o != r).collect();
+        let pivot_row = rows[r].clone();
+        let pivot_rhs = rhs[r].clone();
+        for o in targets {
+            let factor = match rows[o].get(&c) {
+                Some(v) if !v.is_zero() => v.clone(),
+                _ => continue,
+            };
+            stats.muladds += pivot_row.len() as u64;
+            for (col, value) in &pivot_row {
+                if *col == c {
+                    continue;
+                }
+                let prod = (&factor * value) % n;
+                let existing = rows[o].get(col).cloned();
+                let new = match &existing {
+                    Some(cur) => (cur + n - prod) % n,
+                    None => (n - prod) % n,
+                };
+                if new.is_zero() {
+                    if existing.is_some() {
+                        rows[o].remove(col);
+                        col_rows[*col].remove(&o);
+                    }
+                } else {
+                    // Fill-in: a column row `o` did not carry must be
+                    // registered so a later pivot on it reaches this row.
+                    if existing.is_none() {
+                        col_rows[*col].insert(o);
+                    }
+                    rows[o].insert(*col, new);
+                }
+            }
+            rows[o].remove(&c);
+            col_rows[c].remove(&o);
+            let prod = (&factor * &pivot_rhs) % n;
+            rhs[o] = (&rhs[o] + n - prod) % n;
+        }
+        stats.nnz_peak = stats
+            .nnz_peak
+            .max(rows.iter().map(|x| x.len()).sum::<usize>());
+    }
+
+    // Rows that are now empty with a nonzero right-hand side are `0 = c`.
+    for r in 0..n_rows {
+        if rows[r].is_empty() && !rhs[r].is_zero() {
+            return None;
+        }
+    }
+
+    let pivot_cols: Vec<usize> = (0..cols)
+        .filter(|&c| pivot_of_col[c] != usize::MAX)
+        .collect();
+    stats.rank = pivot_cols.len();
+    let free: Vec<usize> = (0..cols)
+        .filter(|&c| pivot_of_col[c] == usize::MAX)
+        .collect();
+    let mut values = vec![BigUint::zero(); cols];
+    let mut determined = vec![false; cols];
+    for &c in &pivot_cols {
+        let r = pivot_of_col[c];
+        values[c] = rhs[r].clone();
+        determined[c] = free.iter().all(|&f| !rows[r].contains_key(&f));
+    }
+    let _ = is_pivot_row;
+    Some((
+        ModNSolution {
+            values,
+            determined,
+            rank: stats.rank,
+        },
+        stats,
+    ))
+}
+
 /// The arbitrary-precision path of [`gaussian_eliminate_mod_n`].
 fn gaussian_eliminate_mod_biguint(
     matrix: &mut [Vec<BigUint>],
@@ -1665,6 +1890,78 @@ fn signed_mod(v: i64, n: &BigUint) -> BigUint {
     }
 }
 
+/// Assemble the relation matrix `[ M | −b ] · (y, x) = a` and solve it.
+///
+/// Row `r` of the system produced by a relation `R_r = a_r·G + b_r·Q =
+/// Σ ε_{r,j} F_j` is `Σ ε_{r,j} y_j − b_r·x ≡ a_r (mod n)`, so the matrix has
+/// one column per factor-base point plus the target column.  `Dense` builds
+/// the full `rows × cols` matrix; `Sparse` keeps only the nonzero entries
+/// (an m-summand row has at most `m + 2` of them).
+///
+/// Both engines return the same solution and the same `determined` flags;
+/// the returned [`LaStats`] records which one ran, the input nonzero count
+/// (a property of the relation set, so equal for both) and the peak nonzero
+/// count (fill-in for the sparse engine, `rows·cols` for dense).
+fn solve_relation_matrix(
+    relations: &[Relation],
+    cols: usize,
+    n: &BigUint,
+    engine: LaEngine,
+) -> Option<(ModNSolution, LaStats)> {
+    let rows = relations.len();
+    match engine {
+        LaEngine::Dense => {
+            let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(rows);
+            let mut rhs: Vec<BigUint> = Vec::with_capacity(rows);
+            let mut nnz_in = 0usize;
+            for rel in relations {
+                let mut row = vec![BigUint::zero(); cols];
+                for &(j, mult) in &rel.entries {
+                    let val = signed_mod(mult, n);
+                    if !val.is_zero() {
+                        nnz_in += 1;
+                    }
+                    row[j] = (&row[j] + &val) % n;
+                }
+                let neg_b = (n - &(&rel.coef_b % n)) % n;
+                if !neg_b.is_zero() {
+                    nnz_in += 1;
+                }
+                row[cols - 1] = (&row[cols - 1] + &neg_b) % n;
+                matrix.push(row);
+                rhs.push(rel.coef_a.clone() % n);
+            }
+            let solution = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, n)?;
+            let stats = LaStats {
+                engine: engine.name().into(),
+                rows,
+                cols,
+                nnz_in,
+                nnz_peak: rows * cols,
+                rank: solution.rank,
+                muladds: 0,
+            };
+            Some((solution, stats))
+        }
+        LaEngine::Sparse => {
+            let mut sparse_rows: Vec<SparseRow> = Vec::with_capacity(rows);
+            let mut rhs: Vec<BigUint> = Vec::with_capacity(rows);
+            for rel in relations {
+                let mut entries: Vec<(usize, BigUint)> = rel
+                    .entries
+                    .iter()
+                    .map(|&(j, mult)| (j, signed_mod(mult, n)))
+                    .collect();
+                let neg_b = (n - &(&rel.coef_b % n)) % n;
+                entries.push((cols - 1, neg_b));
+                sparse_rows.push(sparse_row_from_entries(&entries, n));
+                rhs.push(rel.coef_a.clone() % n);
+            }
+            sparse_gaussian_eliminate_mod_n(sparse_rows, rhs, n, cols)
+        }
+    }
+}
+
 // ── Staged (split-timer) end-to-end driver ───────────────────────────
 
 /// Split-stage timing report for the generic prime-field IC pipeline.
@@ -1686,6 +1983,9 @@ pub struct EcIcStageReport {
     pub trials_per_relation_min: usize,
     pub trials_per_relation_median: f64,
     pub trials_per_relation_max: usize,
+    /// Shape and counted work of the relation-matrix solve, when the
+    /// driver reports it (the S4 staged drivers do).
+    pub la: Option<LaStats>,
 }
 
 /// Staged twin of [`ec_index_calculus_dlp`]: same mathematics and row
@@ -1801,6 +2101,7 @@ pub fn ec_index_calculus_dlp_staged(
         trials_per_relation_min: sorted_trials.first().copied().unwrap_or(0),
         trials_per_relation_median: median,
         trials_per_relation_max: sorted_trials.last().copied().unwrap_or(0),
+        la: None,
     };
     Some((x, report))
 }
@@ -1826,6 +2127,38 @@ pub fn ec_index_calculus_dlp_s4_staged(
         max_trials_per_relation,
         max_relation_attempts,
         find_one_relation_s4_counted,
+        LaEngine::Dense,
+    )
+}
+
+/// Staged S₄ 3-decomposition driver with an explicit linear-algebra engine.
+///
+/// The relation family, row policy and verification are those of
+/// [`ec_index_calculus_dlp_s4_staged`]; `la_engine` picks between dense
+/// Gauss–Jordan and the sparse Markowitz elimination, which decide the same
+/// system and return the same scalar.  The report carries the matrix shape,
+/// nonzero counts and rank of whichever engine ran.
+#[allow(clippy::too_many_arguments)]
+pub fn ec_index_calculus_dlp_s4_staged_with_la(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    la_engine: LaEngine,
+) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        find_one_relation_s4_counted,
+        la_engine,
     )
 }
 
@@ -1855,6 +2188,32 @@ pub fn ec_index_calculus_dlp_s4_s3_staged(
         max_trials_per_relation,
         max_relation_attempts,
         find_one_relation_s4_via_s3_counted,
+        LaEngine::Dense,
+    )
+}
+
+/// Anchored-sweep staged driver with an explicit linear-algebra engine.
+#[allow(clippy::too_many_arguments)]
+pub fn ec_index_calculus_dlp_s4_s3_staged_with_la(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    la_engine: LaEngine,
+) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        find_one_relation_s4_via_s3_counted,
+        la_engine,
     )
 }
 
@@ -1877,6 +2236,7 @@ fn ec_index_calculus_dlp_s4_staged_with(
         &[FactorBaseEntry],
         usize,
     ) -> Option<(Relation, usize)>,
+    la_engine: LaEngine,
 ) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
     let total_started = Instant::now();
@@ -1914,22 +2274,8 @@ fn ec_index_calculus_dlp_s4_staged_with(
     let relations_ms = relations_started.elapsed().as_secs_f64() * 1e3;
 
     let m = fb.len();
-    let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(relations.len());
-    let mut rhs: Vec<BigUint> = Vec::with_capacity(relations.len());
-    for rel in &relations {
-        let mut row = vec![BigUint::zero(); m + 1];
-        for &(j, mult) in &rel.entries {
-            let val = signed_mod(mult, &curve.n);
-            row[j] = (&row[j] + &val) % &curve.n;
-        }
-        let neg_b = (&curve.n - &(&rel.coef_b % &curve.n)) % &curve.n;
-        row[m] = neg_b;
-        matrix.push(row);
-        rhs.push(rel.coef_a.clone() % &curve.n);
-    }
-
     let la_started = Instant::now();
-    let solution = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, &curve.n)?;
+    let (solution, la_stats) = solve_relation_matrix(&relations, m + 1, &curve.n, la_engine)?;
     if !solution.determined[m] {
         return None;
     }
@@ -1968,6 +2314,7 @@ fn ec_index_calculus_dlp_s4_staged_with(
         trials_per_relation_min: sorted_trials.first().copied().unwrap_or(0),
         trials_per_relation_median: median,
         trials_per_relation_max: sorted_trials.last().copied().unwrap_or(0),
+        la: Some(la_stats),
     };
     Some((x, report))
 }
@@ -2309,6 +2656,225 @@ mod tests {
             anchored.1.relations_collected
         );
         assert!(anchored.1.trials_total >= anchored.1.relations_collected);
+    }
+
+    /// Sparse and dense elimination decide the same system: same rank, same
+    /// determined columns, same value wherever the column is determined.
+    /// Covers full-rank, surplus and rank-deficient (free column) systems.
+    #[test]
+    fn sparse_and_dense_la_agree_on_random_systems() {
+        let n = BigUint::from(1_000_003u32);
+        let mut state = 0x2545_F491_4F6C_DD1Du64;
+        let mut next = |bound: u64| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state % bound
+        };
+        for &(rows, cols) in &[(12usize, 8usize), (20, 12), (10, 12), (40, 40)] {
+            let mut dense: Vec<Vec<BigUint>> = Vec::new();
+            let mut sparse: Vec<SparseRow> = Vec::new();
+            let mut rhs: Vec<BigUint> = Vec::new();
+            // A planted solution; rhs = A·x_true keeps the system consistent
+            // even when the row set is rank deficient.
+            let x_true: Vec<BigUint> = (0..cols).map(|_| BigUint::from(next(997))).collect();
+            for _ in 0..rows {
+                let mut entries: Vec<(usize, BigUint)> = Vec::new();
+                let deg = 1 + next(3) as usize;
+                for _ in 0..deg {
+                    entries.push((next(cols as u64) as usize, BigUint::from(1 + next(996))));
+                }
+                let row = sparse_row_from_entries(&entries, &n);
+                let mut acc = BigUint::zero();
+                for (c, v) in &row {
+                    acc = (&acc + v * &x_true[*c]) % &n;
+                }
+                rhs.push(acc);
+                sparse.push(row);
+                let mut dense_row = vec![BigUint::zero(); cols];
+                for (c, v) in sparse.last().unwrap() {
+                    dense_row[*c] = v.clone();
+                }
+                dense.push(dense_row);
+            }
+            let mut dense_rhs = rhs.clone();
+            let dense_sol = gaussian_eliminate_mod_n_particular(&mut dense, &mut dense_rhs, &n)
+                .expect("consistent");
+            let (sparse_sol, stats) =
+                sparse_gaussian_eliminate_mod_n(sparse.clone(), rhs.clone(), &n, cols)
+                    .expect("consistent");
+            assert_eq!(
+                dense_sol.rank, sparse_sol.rank,
+                "rank mismatch on {rows}x{cols}"
+            );
+            assert_eq!(stats.rank, sparse_sol.rank);
+            assert_eq!(stats.rows, rows);
+            assert_eq!(stats.cols, cols);
+            assert!(
+                stats.nnz_in < rows * cols,
+                "sparse input should be sparse: {} of {}",
+                stats.nnz_in,
+                rows * cols
+            );
+            for c in 0..cols {
+                assert_eq!(
+                    dense_sol.determined[c], sparse_sol.determined[c],
+                    "determined flag differs at column {c} on {rows}x{cols}"
+                );
+                if dense_sol.determined[c] {
+                    assert_eq!(
+                        sparse_sol.values[c], x_true[c],
+                        "sparse value is not the planted one at {c} on {rows}x{cols}"
+                    );
+                    assert_eq!(
+                        dense_sol.values[c], x_true[c],
+                        "dense value is not the planted one at {c} on {rows}x{cols}"
+                    );
+                }
+            }
+            // An inconsistent system must be rejected by both.
+            let mut bad_rhs = rhs.clone();
+            bad_rhs[0] = (&bad_rhs[0] + BigUint::one()) % &n;
+            let mut dense2: Vec<Vec<BigUint>> = sparse
+                .iter()
+                .map(|row| {
+                    let mut v = vec![BigUint::zero(); cols];
+                    for (c, x) in row {
+                        v[*c] = x.clone();
+                    }
+                    v
+                })
+                .collect();
+            let mut dense2_rhs = bad_rhs.clone();
+            let dense_bad = gaussian_eliminate_mod_n_particular(&mut dense2, &mut dense2_rhs, &n);
+            let sparse_bad = sparse_gaussian_eliminate_mod_n(sparse.clone(), bad_rhs, &n, cols);
+            // The engines must agree on acceptance, whatever the perturbed
+            // system turns out to be; when the surplus rows are independent
+            // it is genuinely inconsistent and both must reject it.
+            assert_eq!(
+                dense_bad.is_some(),
+                sparse_bad.is_some(),
+                "engines disagree on consistency ({rows}x{cols})"
+            );
+        }
+    }
+
+    /// Both engines, on the *same* relations: identical rank, flags, values
+    /// and input nonzero count; the sparse engine keeps the input sparse.
+    #[test]
+    fn la_engines_agree_on_the_same_relation_set() {
+        let n = BigUint::from(65_447u32);
+        let mut state = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = |bound: u64| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state % bound
+        };
+        let cols = 12usize;
+        let x_true: Vec<BigUint> = (0..cols).map(|_| BigUint::from(next(65_000))).collect();
+        let mut relations: Vec<Relation> = Vec::new();
+        for _ in 0..40 {
+            // Three factor-base columns and the target column, as a 3-summand
+            // IC row has.
+            let mut entries: Vec<(usize, i64)> = Vec::new();
+            for _ in 0..3 {
+                let idx = next((cols - 1) as u64) as usize;
+                entries.push((idx, if next(2) == 0 { 1 } else { -1 }));
+            }
+            entries.sort_unstable();
+            let mut merged: Vec<(usize, i64)> = Vec::new();
+            for (idx, sign) in entries {
+                if let Some(last) = merged.last_mut() {
+                    if last.0 == idx {
+                        last.1 += sign;
+                        continue;
+                    }
+                }
+                merged.push((idx, sign));
+            }
+            merged.retain(|(_, s)| *s != 0);
+            // Choose a and b so the row is consistent with x_true.
+            let mut acc = BigUint::zero();
+            for &(j, s) in &merged {
+                let term = &x_true[j] * BigUint::from(s.unsigned_abs());
+                acc = if s > 0 {
+                    (&acc + &term) % &n
+                } else {
+                    (&acc + &n - (&term % &n)) % &n
+                };
+            }
+            let b = BigUint::from(next(65_000));
+            let target = &x_true[cols - 1];
+            let rhs = (&acc + &n - (&b * target) % &n) % &n;
+            relations.push(Relation {
+                coef_a: rhs,
+                coef_b: b,
+                entries: merged,
+            });
+        }
+        let (dense_sol, dense_stats) =
+            solve_relation_matrix(&relations, cols, &n, LaEngine::Dense).expect("dense solves");
+        let (sparse_sol, sparse_stats) =
+            solve_relation_matrix(&relations, cols, &n, LaEngine::Sparse).expect("sparse solves");
+        assert_eq!(dense_stats.nnz_in, sparse_stats.nnz_in);
+        assert_eq!(dense_stats.rank, sparse_stats.rank);
+        assert_eq!(dense_stats.rows, sparse_stats.rows);
+        assert_eq!(dense_stats.cols, sparse_stats.cols);
+        assert!(sparse_stats.nnz_peak <= dense_stats.nnz_peak);
+        for c in 0..cols {
+            assert_eq!(dense_sol.determined[c], sparse_sol.determined[c]);
+            if dense_sol.determined[c] {
+                assert_eq!(dense_sol.values[c], sparse_sol.values[c]);
+                assert_eq!(dense_sol.values[c], x_true[c]);
+            }
+        }
+    }
+
+    /// The sparse engine recovers the same scalar as the dense one end to end.
+    #[test]
+    fn sparse_la_recovers_the_same_log_as_dense() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
+        let extra = 64;
+        let dense = ec_index_calculus_dlp_s4_s3_staged_with_la(
+            &curve,
+            &g,
+            &q,
+            10,
+            extra,
+            5000,
+            64,
+            LaEngine::Dense,
+        )
+        .expect("dense driver solves the tiny curve");
+        let sparse = ec_index_calculus_dlp_s4_s3_staged_with_la(
+            &curve,
+            &g,
+            &q,
+            10,
+            extra,
+            5000,
+            64,
+            LaEngine::Sparse,
+        )
+        .expect("sparse driver solves the tiny curve");
+        assert_eq!(dense.0, sparse.0);
+        assert_eq!(g.scalar_mul(&sparse.0, &a_fe), q);
+        let la = sparse.1.la.expect("the S4 driver reports LA stats");
+        assert_eq!(la.engine, "sparse_markowitz_gauss_jordan_mod_n");
+        assert_eq!(la.rows, sparse.1.relations_collected);
+        assert_eq!(la.cols, 11);
+        assert_eq!(la.rank, 11);
+        assert!(la.nnz_in < la.rows * la.cols);
+        let dense_la = dense.1.la.expect("dense LA stats");
+        assert_eq!(dense_la.engine, "dense_gauss_jordan_mod_n");
+        assert_eq!(dense_la.rank, la.rank);
+        assert!(dense_la.nnz_in < dense_la.rows * dense_la.cols);
+        // Fill-in on this relation set is far below the dense footprint.
+        assert!(la.nnz_peak < la.rows * la.cols);
     }
 
     /// Staged twin recovers the same log as the plain driver on the tiny

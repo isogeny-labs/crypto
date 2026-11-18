@@ -7,6 +7,8 @@
 //! cargo run --release --example a3_s4_ladder -- 24 20261005
 //! # oracle: `s3` (default, S₃-anchored pair sweep) or `quartic`
 //! cargo run --release --example a3_s4_ladder -- 20 20261005 p256 quartic
+//! # factor-base size and linear-algebra engine (`dense` default, `sparse`)
+//! cargo run --release --example a3_s4_ladder -- 16 20261005 p256 s3 512 sparse
 //! ```
 //!
 //! Both oracles decide the *same* S₄ relation family; they differ only in
@@ -24,7 +26,8 @@
 //! so FFD is inapplicable — recorded per the decomposition schema).
 
 use crypto_lib::cryptanalysis::ec_index_calculus::{
-    ec_index_calculus_dlp_s4_s3_staged, ec_index_calculus_dlp_s4_staged, pollard_rho_ecdlp,
+    ec_index_calculus_dlp_s4_s3_staged_with_la, ec_index_calculus_dlp_s4_staged_with_la,
+    pollard_rho_ecdlp, LaEngine,
 };
 use crypto_lib::cryptanalysis::research_bench::bench_curves_a_minus_3;
 use crypto_lib::cryptanalysis::residual_walk::is_prime_u64;
@@ -48,6 +51,16 @@ fn main() {
         eprintln!("oracle must be `s3` or `quartic`, got {oracle:?}");
         std::process::exit(2);
     }
+    let fb_size: usize = arguments.get(5).and_then(|a| a.parse().ok()).unwrap_or(120);
+    let la: String = arguments.get(6).cloned().unwrap_or_else(|| "dense".into());
+    let la_engine = match la.as_str() {
+        "dense" => LaEngine::Dense,
+        "sparse" => LaEngine::Sparse,
+        other => {
+            eprintln!("la must be `dense` or `sparse`, got {other:?}");
+            std::process::exit(2);
+        }
+    };
 
     let Some((_, curve)) = bench_curves_a_minus_3()
         .into_iter()
@@ -91,20 +104,19 @@ fn main() {
         _ => std::process::exit(2),
     };
 
-    let fb_size = 120;
     let extra = 8;
     let max_trials = 1_000_000;
     let max_relation_attempts = 64;
     let rho_steps = (1usize << ((bits / 2) + 8)).min(5_000_000);
 
     println!(
-        "curve={} p_bits≈{bits} n={} fb={fb_size} oracle={oracle} s4-trials={max_trials} attempts={max_relation_attempts} seed={target_seed}",
+        "curve={} p_bits≈{bits} n={} fb={fb_size} oracle={oracle} la={la} s4-trials={max_trials} attempts={max_relation_attempts} seed={target_seed}",
         curve.name, curve.n
     );
 
     let t0 = Instant::now();
     let staged = if oracle == "quartic" {
-        ec_index_calculus_dlp_s4_staged(
+        ec_index_calculus_dlp_s4_staged_with_la(
             &curve,
             &g,
             &q,
@@ -112,9 +124,10 @@ fn main() {
             extra,
             max_trials,
             max_relation_attempts,
+            la_engine,
         )
     } else {
-        ec_index_calculus_dlp_s4_s3_staged(
+        ec_index_calculus_dlp_s4_s3_staged_with_la(
             &curve,
             &g,
             &q,
@@ -122,6 +135,7 @@ fn main() {
             extra,
             max_trials,
             max_relation_attempts,
+            la_engine,
         )
     };
     let ic_ms = t0.elapsed().as_secs_f64() * 1e3;
@@ -176,6 +190,7 @@ fn main() {
             "public_target_q": [q_x.to_string(), q_y.to_string()],
             "target_generation_ms_excluded": target_generation_ms,
             "fb_size": fb_size,
+            "la_engine": la_engine.name(),
             "extra_relations": extra,
             "max_trials_per_relation": max_trials,
             "max_relation_attempts": max_relation_attempts,
