@@ -27,7 +27,8 @@ fn inv(a: u64) -> u64 { assert_ne!(a, 0); pow(a, P - 2) }
 fn base(ar: &mut Arithmetic) -> Vec<(u64, u64)> {
     let mut out = Vec::new();
     for x in 0..10_000u64 {
-        if let Some(y) = ar.sqrt(ar.rhs(PRIME31, x), P) {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, P) {
             if y != 0 {
                 let pt = (x, y.min(P - y));
                 assert!(ar.on_curve(PRIME31, Some(pt)));
