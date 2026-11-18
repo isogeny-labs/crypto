@@ -4,3 +4,10 @@ What was done: reviewedKNRRfinitecharSchottky,evenisogenyparitygap,HPSreconstruc
 Decisions made: kernelstabilitynotpointfield; sourceSchottkyispositivecontrolonly. Rationalp31quotientthetasstillmissing; p61rationalkernelzero retained. T-7117scope, Gitprefreeze.
 Open threads: runonce; inspectkernelpointfields/sourceSchottky/tracelemma; findcompatibleevenisogenyformula beforequotientclassification.
 Errors: compileambiguousemptyVecfixedbeforefreeze;unusedpahelperwarning. SomeprimaryPDFfetchesfailed;char/premisegapsretained.No scientificexecutionyet. Userno-subagentpreferenceoverridesskilldefaultdelegation.
+
+## Source controls and actual kernel point fields qualified
+
+What was done: pushedfreeze9f1071ae7d4; hashespass/exit0.256coordinateFrobeniuschecks,176kernelpointrecords,2816compositionidentities pass. Kernel0pointfieldF31²; other10F31⁴. SourceThomae126nonzeropartitions each andaffinecovariancepass;378invalidtuplemutationsnonzero. Exactp31points1/3=32/30152,traces0/-360; p61points1=73,trace-11.
+Decisions made: oddtracepluspriorFp-simplicity excludesgeometricpolarizationdecompositionforbothisogenyclasses. QuotientSchottkygeometricJacobiantestnowhasindecomposabilitypremise, butquotientthetasnotcomputed. Smallerpointfieldkernel0isprospectivefirstconstruction,all11retained. Noquotient/descent/speedclaim.
+Open threads: compatibleeven-degree thetaformula/sourcelevelstructure, quotientSchottkyforeachkernel, rationalcurve/transport/fullcost. Full10xgoalactive/unachieved, independentmathreviewopen.
+Errors: bookkeepingregexinitiallyexcludednumeralkeys(trace3); correctedbeforeJSONwrite. No scientificfailure/rerun. Primaryfinitechar/parity/genericreconstructionlimits recorded. NoS3/cloud/merge.
