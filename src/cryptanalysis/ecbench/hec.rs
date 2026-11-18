@@ -527,6 +527,18 @@ mod tests {
     }
 
     #[test]
+    fn legacy_hec_factor_base_dump_refuses_without_panicking() {
+        let spec =
+            crate::cryptanalysis::ecbench::workload::CurveSpec::HecThread { p: 41, genus: 2 };
+        let error = crate::cryptanalysis::ecbench::methods::dump_factor_base(
+            &spec,
+            "prime-abscissa:size=4",
+        )
+        .expect_err("legacy HEC has no factor-base dump plug-in");
+        assert!(error.contains("hyperelliptic Jacobian"));
+    }
+
+    #[test]
     fn the_thread_target_law_reproduces_the_studys_k() {
         use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
         let spec = CurveSpec::HecThread { p: 41, genus: 2 };

@@ -404,6 +404,10 @@ pub fn run_extension_deferred_pair_dlp_on(
 }
 /// Same collection and protected affine solve, with an audited five-variable
 /// Nagao backend. Every residual attempt is retained, including empty/capped.
+#[allow(
+    dead_code,
+    reason = "Retained public backend is used by sibling comparison binaries; this example includes the shared source directly"
+)]
 pub fn run_extension_unit_deferred_pair_dlp_on(
     spec: &Spec,
     seed: u64,
@@ -426,11 +430,19 @@ pub fn run_extension_unit_deferred_pair_dlp_on(
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum DescentBackend {
     Original,
+    #[allow(
+        dead_code,
+        reason = "Retained backend selected by the sibling adapted comparison entry point"
+    )]
     AdaptedSix,
     UnitFive,
 }
 
 /// Matched root-materialization adapter control, retaining six coordinates.
+#[allow(
+    dead_code,
+    reason = "Retained public backend is used by sibling comparison binaries; this example includes the shared source directly"
+)]
 pub fn run_extension_adapted_deferred_pair_dlp_on(
     spec: &Spec,
     seed: u64,
