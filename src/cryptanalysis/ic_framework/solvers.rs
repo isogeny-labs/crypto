@@ -193,8 +193,11 @@ fn verified(points: Vec<Mask>, system: &BooleanSystem, tests: &mut u64) -> Vec<M
 /// Holds an [`F4Skeleton`]: the symbolic preprocessing (divisor candidates
 /// and column maps) of the systems this instance has solved, reused on the
 /// later systems of the run (one oracle, one target).  The bases are those
-/// of the plain path; `skeleton=0` selects the plain path for an A/A
-/// comparison, and `skeleton_mb` (default 256) caps the stored bytes.
+/// of the plain path.  Opt-in (`skeleton=1`): on 16 `S_3` descents over
+/// `F_{2^13}` it saved 7% of the divisor tests but added hash probes and
+/// matched a stored column map once in 11 replayed steps, a small net
+/// loss in `bitop/v1`, so the default stays the plain path (`skeleton=0`).
+/// `skeleton_mb` (default 256) caps the stored bytes.
 #[derive(Default)]
 pub struct F4F2 {
     skeleton: std::sync::Mutex<Option<F4Skeleton>>,
@@ -214,7 +217,7 @@ impl SystemSolver for F4F2 {
         &[
             (
                 "skeleton",
-                "1 (default): reuse the symbolic preprocessing of earlier systems of the run (identical bases); 0: the plain path",
+                "0 (default): the plain path; 1: reuse the symbolic preprocessing of earlier systems of the run (identical bases; a net loss on the F_2^13 descent test, see the test below)",
             ),
             (
                 "skeleton_mb",
@@ -235,7 +238,7 @@ impl SystemSolver for F4F2 {
     ) -> (SolverVerdict, SolverCost) {
         let started = Instant::now();
         let tally_before = bitop_tally::snapshot();
-        let use_skeleton = params.u64_or("skeleton", 1).unwrap_or(1) != 0;
+        let use_skeleton = params.u64_or("skeleton", 0).unwrap_or(0) != 0;
         let cap_bytes = params
             .u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)
             .unwrap_or(SKELETON_DEFAULT_CAP_BYTES >> 20)
@@ -1738,7 +1741,7 @@ impl SystemSolver for XlF2 {
 pub fn validate_solver_params(name: &str, params: &Params) -> Result<(), String> {
     match name {
         "f4-f2" => {
-            if params.u64_or("skeleton", 1)? > 1 {
+            if params.u64_or("skeleton", 0)? > 1 {
                 return Err("skeleton must be 0 or 1".into());
             }
             params.u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)?;
@@ -3055,9 +3058,9 @@ mod tests {
         let mut rng = rand::rngs::StdRng::seed_from_u64(0x5ce1_17);
         let with = F4F2::default();
         let plain = F4F2::default();
-        let on = Params::default();
-        let mut off = Params::default();
-        off.set("skeleton", "0");
+        let mut on = Params::default();
+        on.set("skeleton", "1");
+        let off = Params::default();
         let keys = [
             "steps",
             "new_elements",
