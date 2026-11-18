@@ -38,7 +38,7 @@
          if out.len() == 31 { break; }
      }
      assert_eq!(out.len(), 31);
-     assert_eq!(&out.iter().take(8).map(|q| q.0).collect::<Vec<_>>(), &[0,1,2,3,5,6,8,9]);
+     assert_eq!(out.iter().take(8).map(|q| q.0).collect::<Vec<_>>(), vec![0,1,2,3,5,6,8,9]);
      out
  }
 
