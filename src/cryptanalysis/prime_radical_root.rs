@@ -536,9 +536,13 @@ impl RadicalRootCtx {
         // For t2=1, avoid powering and multiplication entirely.
         let (mut t, half_power) = if self.t2 == 1 {
             (a, 1)
-        } else {
+        } else if self.t2 >= 1_024 {
             let h = f.powm(a, (self.t2 - 1) / 2);
             (f.mul(f.sqr(h), a), h)
+        } else {
+            // Small exponents can be cheaper as two binary powers;
+            // the fused path showed compiler-dependent regressions here.
+            (f.powm(a, self.t2), 0)
         };
         let mut legendre = t;
         for _ in 1..self.s2 {
@@ -549,7 +553,13 @@ impl RadicalRootCtx {
         }
         let mut m = self.s2;
         let mut c = self.zc;
-        let mut r = if self.t2 == 1 { a } else { f.mul(half_power, a) };
+        let mut r = if self.t2 == 1 {
+            a
+        } else if self.t2 >= 1_024 {
+            f.mul(half_power, a)
+        } else {
+            f.powm(a, self.t2.div_ceil(2))
+        };
         loop {
             if t == 1 {
                 return Some(r);
