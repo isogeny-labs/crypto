@@ -1,6 +1,7 @@
 import Mathlib.Algebra.Polynomial.Derivation
 import Mathlib.FieldTheory.RatFunc.Basic
 import Mathlib.RingTheory.LaurentSeries
+import Mathlib.RingTheory.PowerSeries.Derivative
 
 /-!
 # H116 generic fiber-trace identity layer
@@ -107,6 +108,51 @@ theorem polynomialProductDerivative {ι : Type*} [DecidableEq ι]
       ∑ a ∈ s, (∏ b ∈ s.erase a, f b) * Polynomial.derivative (f a) :=
   Polynomial.derivative_prod_finset
 
+/-- The coefficient formula implemented by H116's truncated logarithmic
+derivative: multiply the formal derivative by a reciprocal series and take the
+`n`th coefficient. -/
+theorem powerSeriesDerivativeMulCoeff (f g : PowerSeries K) (n : ℕ) :
+    PowerSeries.coeff n (PowerSeries.derivative f * g) =
+      ∑ i ∈ Finset.range (n + 1),
+        (PowerSeries.coeff (i + 1) f * (i + 1)) *
+          PowerSeries.coeff (n - i) g := by
+  rw [PowerSeries.coeff_mul]
+  rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ
+    (fun i j => PowerSeries.coeff i (PowerSeries.derivative f) * PowerSeries.coeff j g) n]
+  apply Finset.sum_congr rfl
+  intro i hi
+  rw [PowerSeries.coeff_derivative]
+
+/-- If `g` is a reciprocal power series for a unit-constant series `f`, its
+next coefficient is exactly the finite recurrence used by the native producer. -/
+theorem powerSeriesReciprocalRecurrence (f g : PowerSeries K)
+    (h0 : PowerSeries.coeff 0 f = 1) (hfg : f * g = 1) (n : ℕ) :
+    PowerSeries.coeff (n + 1) g =
+      -∑ i ∈ Finset.range (n + 1),
+        PowerSeries.coeff (i + 1) f * PowerSeries.coeff (n - i) g := by
+  have hcoeff := congrArg (PowerSeries.coeff (n + 1)) hfg
+  rw [PowerSeries.coeff_mul] at hcoeff
+  rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ
+    (fun i j => PowerSeries.coeff i f * PowerSeries.coeff j g) (n + 1),
+    Finset.sum_range_succ'] at hcoeff
+  simp only [PowerSeries.coeff_one, h0, one_mul, Nat.add_sub_add_right] at hcoeff
+  simp at hcoeff
+  exact eq_neg_of_add_eq_zero_right hcoeff
+
+/-- Subtracting two logarithmic-derivative coefficient convolutions gives the
+relative X-coordinate formula used by the candidate. -/
+theorem relativePowerSeriesDerivativeMulCoeff
+    (fu gu fv gv : PowerSeries K) (n : ℕ) :
+    PowerSeries.coeff n
+        (PowerSeries.derivative fu * gu - PowerSeries.derivative fv * gv) =
+      (∑ i ∈ Finset.range (n + 1),
+          (PowerSeries.coeff (i + 1) fu * (i + 1)) *
+            PowerSeries.coeff (n - i) gu) -
+        ∑ i ∈ Finset.range (n + 1),
+          (PowerSeries.coeff (i + 1) fv * (i + 1)) *
+            PowerSeries.coeff (n - i) gv := by
+  rw [map_sub, powerSeriesDerivativeMulCoeff, powerSeriesDerivativeMulCoeff]
+
 #print axioms logDeriv_mul
 #print axioms logDeriv_finset
 #print axioms logDeriv_div
@@ -116,5 +162,8 @@ theorem polynomialProductDerivative {ι : Type*} [DecidableEq ι]
 #print axioms relativeCoeffCancellation
 #print axioms residueCancelDenominator
 #print axioms polynomialProductDerivative
+#print axioms powerSeriesDerivativeMulCoeff
+#print axioms powerSeriesReciprocalRecurrence
+#print axioms relativePowerSeriesDerivativeMulCoeff
 
 end H116FiberTrace

@@ -25,11 +25,12 @@ This map is written before the first H116 Lean declaration.
    `254caca6449fa388ea5d58331087c8b3df9f400c256a746d91a24f1575630456`;
    exit zero output SHA-256 is
    `e9f3b1c2e61cd9f42e2c075ca74448cf6c796e0e950d2b36487f24e024e7f08c`.
-5. **Missing components only.** A finite reciprocal-series coefficient API may
-   be missing. If so, define it generically for polynomials and prove its product
-   and derivative laws once. The formal-group congruence for `V-1` is a separate
-   endpoint premise unless an existing verified elliptic formal-group theorem is
-   located. [pcc:unverified]
+5. **Missing components only.** The generic finite reciprocal recurrence and
+   derivative-times-reciprocal coefficient convolution are now proved for
+   power series. The remaining concrete bridge identifies `w=1/x`, the
+   polynomial `F_U`, and the first eight coefficients with those series. The
+   formal-group congruence for `V-1` is a separate endpoint premise unless an
+   existing verified elliptic formal-group theorem is located. [pcc:unverified]
 6. **Inheritance table.** Below. A blank or `lookup pending` entry blocks the
    first Lean edit.
 
@@ -58,6 +59,9 @@ This map is written before the first H116 Lean declaration.
 | product log-derivative coefficient equals root power sum | generic law | Mathlib or reusable study module | field, polynomial, finite multiset | factored polynomial, nonzero leading coefficient |
 | relative fiber power-sum identity | endpoint | H116 | `N,D,u,u0` | two factorizations, `R=N/D` |
 | residue coefficient equals reciprocal derivative sum | generic law | reusable study module | field, separable polynomial | simple roots |
+| reciprocal-series coefficient recurrence | generic law | H116 Lean module | field, two power series | unit constant coefficient, product equals one |
+| derivative-times-reciprocal coefficient convolution | generic law | H116 Lean module | field, two power series | none |
+| relative derivative convolution | generic law | H116 Lean module | field, four power series | none |
 | `Y_j` fiber identity | endpoint | H116 | isogeny coordinate data | normalized differential formula, non-2-torsion target |
 | Frobenius low-jet specialization | instance obligation or explicit premise | crypto-lean candidate | elliptic formal group | ordinary `E/F_p`, `V+pi=[t]` |
 | conditional decoder cost | endpoint | H116/H115 theorem reuse | cyclic prime-order group | exact public digit predicate and `r^o(1)` evaluator |
@@ -68,7 +72,7 @@ This map is written before the first H116 Lean declaration.
 | --- | --- |
 | polynomial multiplication, derivative, evaluation | Mathlib instances plus `Polynomial.derivative'` |
 | finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
-| finite sums and coefficient extraction | Mathlib finite sums; generic additive coefficient functional is new; concrete reciprocal-at-infinity instance remains open |
+| finite sums and coefficient extraction | Mathlib finite sums plus proved H116 power-series reciprocal/convolution lemmas; concrete reciprocal-at-infinity substitution remains open |
 | field division/cancellation | `Field K` laws |
 | isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; crypto-lean lookup pending |
 | `V+pi=[t]` and `pi(z)=z^p` | H115 algebra plus formal-group instance; lookup pending |

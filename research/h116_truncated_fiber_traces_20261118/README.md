@@ -59,6 +59,11 @@ The implemented normalization and exact truncated formulas are recorded in
 `U=(t-1)^2u`, not raw `u`; this scaling is required to make the isogeny
 normalized before applying the Bostan recurrence.
 
+The Lean layer now also proves the exact unit-constant reciprocal recurrence
+and the finite derivative-convolution used by the native eight-coefficient
+loop. The concrete `w=1/x`/isogeny substitution and the Bostan/`V-1` jet
+constructor remain explicit open obligations. [pcc:unverified]
+
 Target generation and moment production are process-separated. The target
 preparer applies the frozen per-curve seeds and emits (1) coordinates plus an
 opaque SHA-256 digest and (2) a separate scalar-label map. The moment producer

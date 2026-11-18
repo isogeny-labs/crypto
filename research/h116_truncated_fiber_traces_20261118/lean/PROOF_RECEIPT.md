@@ -6,24 +6,25 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-9544320fb1f4b8d53aa2013eb7feb1c0503c3ef9e6cc33cf1d008c4181339a90  H116FiberTrace.lean
+6ab56f49479260a48799990f0478483ed6312348c2c1b55cd00d65ac325485b5  H116FiberTrace.lean
 ```
 
 The repository proof gate built both the default target and the explicitly
 tracked source, then transitively audited all theorem declarations:
 
 ```text
-PASS  9 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS  12 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
 
 ```text
-7f163677f2ec320b6801597ed9f3dc31f1acfb62089eec00116b492715914a25  receipts/audit.log
-424fab7b57eef10ca2e7f0d89f412708ad00bce4cf045f906493cfaf619a4b71  receipts/build.log
+b553d5826ec5a10ed60209c0492e6276f4e35ce6ccc971a3afafbff99b76081b  receipts/audit.log
+eb43e3ba1cf5dae887d7db7e317b73b24d7de1e9dd9708d11d9b68fc6699836b  receipts/build.log
 29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483  receipts/cache.log
-5ae0c3215cad558dac1cea3d739a54a1fcea0582a30e4ead224d811eecd96ffc  receipts/source-build.log
+be7629fbc2bc524f3056204d685049579f3f025cc83964bef82addc234d3551c  receipts/source-build.log
 c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/status.txt
+6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
 ```
 
 Every theorem reports only `propext`, `Classical.choice`, and `Quot.sound`.
@@ -32,6 +33,15 @@ limit or curve-specific group-law copy.
 
 Scope: the artifact proves the generic product logarithmic derivative,
 finite-root reciprocal sum, abstract coefficient-to-power-sum implication,
-relative denominator cancellation and simple-root residue cancellation. It
-does not construct the Laurent-at-infinity coefficient instance, the
-`V-1` formal jet, a scalar predicate or an ECDLP decoder. [pcc:unverified]
+relative denominator cancellation, simple-root residue cancellation, the
+exact unit-constant reciprocal-series recurrence, the derivative-times-
+reciprocal coefficient convolution and its relative subtraction form. It does
+not yet identify the concrete `w=1/x` series with the isogeny fiber, prove the
+Bostan recurrence or construct the `V-1` formal jet, a scalar predicate or an
+ECDLP decoder. [pcc:unverified]
+
+The first integration build is retained at
+`receipts/concrete-first-build-failure.log`. A broader imported namespace made
+the statement's unqualified antidiagonal elaborate to a different declaration.
+The corrected theorem uses the definitionally equivalent range sum that the
+native loop evaluates; no hypothesis or conclusion was weakened.
