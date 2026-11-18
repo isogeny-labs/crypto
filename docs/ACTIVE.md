@@ -17,7 +17,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 - [ ] Table B k-sum: profile the cost split of the pruned k-sum arm and land the next measured lever (claude, started 2026-11-18, branch claude/f4-f5-algorithm-speed-bvp7qd, PR #4651)
 
-- [ ] Koblitz K1 small rows (n23/n29/n37): next lever on the generator-orbit IC arm, gap reported against both rho strong and v5 (claude, started 2026-11-18, branch claude/f4-f5-algorithm-speed-bvp7qd, PR #4651)
+- [ ] Koblitz K1 small rows (n23/n29/n37): next lever on the generator-orbit IC arm, gap reported against both rho strong and v5 (claude, started 2026-11-18, branch claude/f4-f5-algorithm-speed-bvp7qd, PR #4651); measured: known-log seed columns (generator_multiples + multiple_doublings) 0.59x gen-c4 at n23, 0.38x gen-c8 at n37 (w=0), n29 inert; awaiting independent validation (research/koblitz_known_log_columns_20261118) [pcc:unverified]
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 

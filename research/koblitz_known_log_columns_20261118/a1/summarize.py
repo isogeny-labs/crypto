@@ -2,7 +2,8 @@
 """Reduces results.json (written by the frozen analyze.py) to summary.json: ratios with 95% intervals per weight, mean S per arm, phase split.
 Recorded ecbench outputs only; no new statistics."""
 import json, os
-HERE = os.path.dirname(os.path.abspath(__file__))  # works in a1/ too; import gzip; _p = os.path.join(HERE, "results.json"); R = json.load(open(_p) if os.path.exists(_p) else gzip.open(_p + ".gz", "rt"))
+HERE = os.path.dirname(os.path.abspath(__file__))  # works in a1/ too
+import gzip; _p = os.path.join(HERE, "results.json"); R = json.load(open(_p) if os.path.exists(_p) else gzip.open(_p + ".gz", "rt"))
 W = ["0", "0.1", "1"]
 S = {"ratios": {}, "mean_S": {}, "phases": R["phases"], "sessions": R["sessions"]}
 for key, c in R["compare"].items():
