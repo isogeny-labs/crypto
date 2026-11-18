@@ -2,6 +2,8 @@
 """Progress-metrics exporter for the `crypto` repo (Rust ECDLP / index-calculus lab).
 
 Sources (all committed, read at --ref unless noted):
+  research/prime_conductor_gap80_20261031/published-lucas-20261118/summary.json
+                                fixed prime Frobenius conductor, not an evaluated crossing
   docs/ic/leaderboard.json        IC leaders per regime (S, ratio_rho, largest log2 r); history via git log
   docs/ic/progress-timeline.json  dated headline series (ec-cold etc.); points carry their own dates
   docs/perf/history.json          on branch origin/perf-history: chained Ir performance index per push
@@ -1121,8 +1123,27 @@ def relation_fusion_root_dag(ref, since):
                      source=f"{path}@{commit}")
 
 
+def fixed_lucas_conductor(ref, since):
+    """Track a recorded conductor prime separately from evaluated crossings."""
+    path = "research/prime_conductor_gap80_20261031/published-lucas-20261118/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if (data.get("schema") != "fixed-lucas-qualification/v1"
+                or data.get("fixed_published_index") != 7351
+                or data.get("certificate_generated") is not True
+                or data.get("certificate_replayed") is not True
+                or data.get("changed_subject_reject") is not True):
+            continue
+        emit("conductor.fixed_lucas.n7351.prime_bits", data.get("conductor_bits"),
+             date=date, problem="ordinary-prime-conductor-crossing", unit="bits",
+             better="higher",
+             label="Fixed Frobenius conductor prime; no evaluated crossing; PCC unverified",
+             source=f"{path}@{commit}")
+
+
 def main():
     a = args()
+    fixed_lucas_conductor(a.ref, a.since)
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)

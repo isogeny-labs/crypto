@@ -1,5 +1,12 @@
 # Native log-norm optimization and 80-bit candidate evidence
 
+The [18 November fixed published Lucas reconstruction](published-lucas-20261118/README.md)
+checks a 3673-bit prime Frobenius conductor at extension degree 7351,
+with a complete PARI ECPP certificate and fresh-process replay. The source
+endomorphism conductor remains 1; no lower curve or explicit isogeny is
+supplied by this arithmetic check. The original 80-bit construction and
+endpoint measurements remain open. [pcc:unverified]
+
 The [18 November complete-evaluator continuation](evaluator-20261118/README.md)
 adds balanced baby products, block reuse, additive kernel walks and a guarded
 supplied-case interface. Its independent-PARI development controls and raw
