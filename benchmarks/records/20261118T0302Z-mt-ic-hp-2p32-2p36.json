@@ -29,9 +29,212 @@
     "platform": "Linux-6.18.44-fc-v595-x86_64-with-glibc2.39"
   },
   "id": "20261118T0302Z-mt-ic-hp-2p32-2p36",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_4k_2p32_t1024",
+      "note": "IC with huge pages / IC on 4 KB pages, identical counted operations; median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8132,
+        1.0185
+      ],
+      "unit": "ratio",
+      "value": 0.8968
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_best_rho_2p32_t1024",
+      "note": "IC (huge pages) / best rhodpb (lanes 64-128, either paging, 24 keys); median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7876,
+        0.8831
+      ],
+      "unit": "ratio",
+      "value": 0.8369
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_4k_2p32_t4096",
+      "note": "IC with huge pages / IC on 4 KB pages, identical counted operations; median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8361,
+        0.9445
+      ],
+      "unit": "ratio",
+      "value": 0.9074
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_best_rho_2p32_t4096",
+      "note": "IC (huge pages) / best rhodpb (lanes 64-128, either paging, 24 keys); median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8189,
+        1.0836
+      ],
+      "unit": "ratio",
+      "value": 0.8681
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_4k_2p32_t16384",
+      "note": "IC with huge pages / IC on 4 KB pages, identical counted operations; median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8156,
+        0.9567
+      ],
+      "unit": "ratio",
+      "value": 0.8989
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_best_rho_2p32_t16384",
+      "note": "IC (huge pages) / best rhodpb (lanes 64-128, either paging, 24 keys); median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8056,
+        0.9286
+      ],
+      "unit": "ratio",
+      "value": 0.8772
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_4k_2p36_t1024",
+      "note": "IC with huge pages / IC on 4 KB pages, identical counted operations; median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9062,
+        1.0751
+      ],
+      "unit": "ratio",
+      "value": 0.9867
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_best_rho_2p36_t1024",
+      "note": "IC (huge pages) / best rhodpb (lanes 64-128, either paging, 24 keys); median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0187,
+        1.0841
+      ],
+      "unit": "ratio",
+      "value": 1.0425
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_4k_2p36_t4096",
+      "note": "IC with huge pages / IC on 4 KB pages, identical counted operations; median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8791,
+        0.9411
+      ],
+      "unit": "ratio",
+      "value": 0.8981
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_best_rho_2p36_t4096",
+      "note": "IC (huge pages) / best rhodpb (lanes 64-128, either paging, 24 keys); median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9842,
+        1.0585
+      ],
+      "unit": "ratio",
+      "value": 0.9988
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_4k_2p36_t16384",
+      "note": "IC with huge pages / IC on 4 KB pages, identical counted operations; median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.816,
+        0.8501
+      ],
+      "unit": "ratio",
+      "value": 0.834
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_hugepage_over_best_rho_2p36_t16384",
+      "note": "IC (huge pages) / best rhodpb (lanes 64-128, either paging, 24 keys); median of 4 instances x 3 repeats; local Xeon, THP madvise [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9631,
+        1.0117
+      ],
+      "unit": "ratio",
+      "value": 0.9877
+    }
+  ],
   "problem": "mt:ic-hugepages",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 1411532,
+      "path": "research/mt_ic_hp_20261118/results/main/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ce/cee9eeebbbc34a60a012e718c8bedca1993eb2c0afc492d399a48957f6146f7f",
+      "sha256": "cee9eeebbbc34a60a012e718c8bedca1993eb2c0afc492d399a48957f6146f7f",
+      "uploaded": false
+    },
+    {
+      "bytes": 7089,
+      "path": "research/mt_ic_hp_20261118/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/75/756e8883c4c2f2ed85ca69b9f0612f466a37f367fafb2d2ab37a45c82f439ec6",
+      "sha256": "756e8883c4c2f2ed85ca69b9f0612f466a37f367fafb2d2ab37a45c82f439ec6",
+      "uploaded": false
+    },
+    {
+      "bytes": 1098,
+      "path": "research/mt_ic_hp_20261118/check.out",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3d/3d2e897146fceab4628782a92a57609fd81c2f42b3a1c435479ba702c3982b3e",
+      "sha256": "3d2e897146fceab4628782a92a57609fd81c2f42b3a1c435479ba702c3982b3e",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,

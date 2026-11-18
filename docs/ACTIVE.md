@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Cut the multi-target IC's table cache/TLB misses at 2^36 (huge pages for every arm's tables, measured against tuned rho) (claude, started 2026-11-18, branch aburan28/youthful-hopper-hfrwkd, PR #4638)
+- [ ] Cut the multi-target IC's table cache/TLB misses at 2^36 (huge pages for every arm's tables, measured against tuned rho) (claude, started 2026-11-18, branch aburan28/youthful-hopper-hfrwkd, PR #4638): measured 2026-11-18, IC 0.83x at 2^36 T=16384 and level with rho (0.99x); bench record awaits main's malformed hec-multi-production-cold record being repaired, CI awaits the artifact-store credentials and main's f4_fp.rs compile fix
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
