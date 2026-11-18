@@ -89,3 +89,70 @@ Checks and predictions written before the sweep's new cells:
 - `msweep-m9` (`kb81a8op5pd0ah`) terminated (GET 404) after target 1 closed D = 8 without 1; its D = 9 closure was not waited for.
 - Depth 13 finished (both targets, exit 0); depth 14 started 17:46 UTC on the same pod.
 - Still running: `hky2-cpu-t14` (depth 14) and `msweep-a` (`sweep6`, (6,3) D = 8, 18,000 s budget).
+
+## 18:42 UTC
+
+- PR #4585 merged at 17:57. Both remaining runs still going: depth 14 c = 6 (56 min in, peak RSS 12.4 GB);
+  (6,3) D = 8 (74 min in, RSS 73.7 GB, host load average 78 to 218).
+
+## 19:29 UTC
+
+- Depth 14 c = 6: 1 h 43 min in, peak RSS 14.8 GB. (6,3) D = 8: 2 h 01 min in, peak RSS 90.4 GB. No new closure line.
+
+## 20:21 UTC
+
+- Depth 14 c = 6: 2 h 34 min in, peak RSS 19.8 GB. (6,3) D = 8: 2 h 52 min in, peak RSS 109.4 GB, host load average 126 to 195. No new closure line.
+## Note, 2026-11-17 (later the same day): the Python glue was removed
+
+Nothing above is rewritten; the hashes in the table are those of the files as
+pushed, which are this directory at commit `833a35d21e`.
+
+- `tools/optlevel` is now a Rust crate. The job scripts call a prebuilt binary
+  pushed as `/workspace/in/optlevel` (`cargo build --release --manifest-path
+  tools/optlevel/Cargo.toml`; one x86-64 binary runs on any pod, because its
+  calibration kernels select their instruction set at run time) instead of
+  `python3 tools/optlevel/optlevel.py`. `optlevel.tar.gz` is still needed by the
+  GPU jobs for `tools/profile.sh` and `kernels/gpu_calib.cu`.
+- The inline `python3` JSON summaries in `msweep_job.sh`, `cpu_job.sh`,
+  `gpu_job2.sh` and `gpu_job3.sh` are now `jq` filters or `optlevel summary`.
+  The pods need `jq` (`cpu_job.sh` installs it with its other packages).
+- `job.py` (SHA-256 `82899a74…`, five lines: run one shell script and pass its
+  exit code through) is deleted from the tree. It existed only because the
+  control server inside `pod.py` accepts jobs whose first word is `python3`.
+  Until `pod.py` is replaced, the same launch is
+  `pod.py run NAME JOB -- python3 -c 'import os,sys; os.execv("/bin/bash", ["bash", "/workspace/code/" + sys.argv[1], *sys.argv[2:]])' cpu_job.sh`:
+  that one `exec` is the only Python left in a job, and it is `pod.py`'s
+  requirement, not the job's.
+- `pod.py` is unchanged apart from a note on its second line: it is a copy of
+  the lfd-summation-systems launcher and is to be replaced, not extended.
+- No pod was started, changed or contacted for this edit. The edited scripts
+  were checked with `bash -n` and their `jq` filters against the committed
+  result files (`results/b_m7-T2.jsonl` reproduces the summary lines in
+  `results/b_msweep.log`); they have not run on a pod.
+
+## 21:18 UTC
+
+- Depth 14 c = 6: 3 h 31 min in, peak RSS 21.2 GB. (6,3) D = 8: 3 h 50 min of its 5 h budget. No new closure line.
+
+## 22:35 UTC
+
+- (6,3) D = 8 on `msweep-a`: censored by `max_entries` (1.4e10) after 14,465 s; the closure did not decide. (6,3)
+  stays "at least 8". Pod `o3cc7qp0n24apx` terminated (GET 404).
+- Depth 14 c = 6 still running (4 h 49 min, peak RSS 22.0 GB). Only pod `gz5n46wfmmg86r` left from this batch.
+
+## 23:36 UTC
+
+- Depth 14 c = 6 still running (5 h 50 min, peak RSS 22.4 GB). Only pod left. Within the pre-run estimate
+  (4 to 13.5 h on 16 cores; this host is 32 shared vCPU under heavy neighbour load).
+
+## 00:48 UTC (2026-11-18)
+
+- Depth 14 c = 6 still running (7 h 02 min, peak RSS 22.8 GB, barely growing — deep in the dense elimination).
+  Within the 4-13.5 h estimate. Only pod left.
+
+## 02:11 UTC (2026-11-18) — depth 14 DONE, cleanup
+
+- t = 14, m = 2, c = 6: finished 01:45:30 UTC, 28,747 s, peak RSS 23.1 GB. 1 does NOT enter; dim 448,922 of
+  499,178. Matches the CuPy GPU engine exactly (independent cross-engine confirmation of the depth-14 value).
+- Last pod `gz5n46wfmmg86r` terminated (GET 404). All batch pods down. Pod proxy hosts removed from the
+  environment allowlist.
