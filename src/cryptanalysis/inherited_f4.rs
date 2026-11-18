@@ -2018,6 +2018,7 @@ fn xor_words_simd(dst: &mut [u64], src: &[u64]) {
     xor_words(dst, src)
 }
 
+#[cfg(target_arch = "x86_64")]
 #[inline(always)]
 fn xor_words_plain(dst: &mut [u64], src: &[u64]) {
     for (d, &s) in dst.iter_mut().zip(src) {

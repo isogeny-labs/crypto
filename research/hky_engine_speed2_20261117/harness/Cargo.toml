@@ -1,0 +1,41 @@
+# Standalone build of the HKY closure engines and the PKM tower pilot.
+#
+# The root crate does not compile as a whole (see ../README.md and pin.sh), so this crate
+# of the root crate do not parse; see ../README.md, "Build"), so this crate
+# compiles only the modules the pilot needs, by path, from the repository's
+# own sources. Nothing here is a copy except the stubs under src/.
+[package]
+name = "hky-speed-harness"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[lib]
+name = "crypto_lib"
+path = "src/lib.rs"
+
+[dependencies]
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+num-integer = "0.1"
+rand = { version = "0.8", features = ["small_rng"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+rayon = "1.10"
+libc = "0.2"
+certified-relations = { path = "../../../crates/certified-relations" }
+relation-replay-checker = { path = "../../../crates/relation-replay-checker" }
+
+[[example]]
+name = "pkm_tower_pilot"
+path = "../../../examples/pkm_tower_pilot.rs"
+
+[[example]]
+name = "hky_fp_tower_check"
+path = "../../../examples/hky_fp_tower_check.rs"
+
+[[example]]
+name = "hky_engine_equality"
+path = "../../../examples/hky_engine_equality.rs"
