@@ -66,6 +66,11 @@ native eight-coefficient loop. The `w=1/x` isogeny substitution and the
 Bostan/`V-1` jet constructor remain explicit open obligations.
 [pcc:unverified]
 
+At the formal-series level, the target/reference denominators are now proved
+to share every coefficient except `-Uw`: their difference is exactly
+`(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying
+that jet with the actual isogeny is still open. [pcc:unverified]
+
 Target generation and moment production are process-separated. The target
 preparer applies the frozen per-curve seeds and emits (1) coordinates plus an
 opaque SHA-256 digest and (2) a separate scalar-label map. The moment producer

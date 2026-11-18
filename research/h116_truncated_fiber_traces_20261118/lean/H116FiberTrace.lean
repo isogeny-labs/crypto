@@ -206,6 +206,38 @@ theorem fiberDenominatorReciprocalRecurrence
   exact powerSeriesReciprocalRecurrence (fiberDenominatorSeries u h) g
     (fiberDenominatorSeries_coeff_zero u h) hfg n
 
+/-- The shared normalized at-infinity series before subtracting the target
+coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
+`w=1/x`. -/
+def normalizedMapAtInfinitySeries (h : ℕ → K) : PowerSeries K :=
+  fiberDenominatorSeries 0 h
+
+/-- Formal-series form of `(S(x)-U)/x`: the target contributes only the
+linear term `-U w`; every higher coefficient is shared. -/
+theorem fiberDenominatorSeries_eq_normalizedMap_sub_linear
+    (u : K) (h : ℕ → K) :
+    fiberDenominatorSeries u h =
+      normalizedMapAtInfinitySeries h - PowerSeries.C u * PowerSeries.X := by
+  ext n
+  rcases n with _ | _ | n
+  · simp [fiberDenominatorSeries, normalizedMapAtInfinitySeries]
+  · simp [fiberDenominatorSeries, normalizedMapAtInfinitySeries]
+  · simp [fiberDenominatorSeries, normalizedMapAtInfinitySeries]
+
+/-- Two target denominators with the same normalized map differ in exactly one
+coefficient. This is the concrete shared-jet fact used for relative X traces. -/
+theorem fiberDenominatorSeries_sub
+    (u v : K) (h : ℕ → K) :
+    fiberDenominatorSeries u h - fiberDenominatorSeries v h =
+      PowerSeries.C (v - u) * PowerSeries.X := by
+  rw [fiberDenominatorSeries_eq_normalizedMap_sub_linear,
+    fiberDenominatorSeries_eq_normalizedMap_sub_linear]
+  ext n
+  rcases n with _ | _ | n
+  · simp
+  · simp
+  · simp
+
 #print axioms logDeriv_mul
 #print axioms logDeriv_finset
 #print axioms logDeriv_div
@@ -224,5 +256,7 @@ theorem fiberDenominatorReciprocalRecurrence
 #print axioms fiberDenominatorSeries_derivative_coeff_zero
 #print axioms fiberDenominatorSeries_derivative_coeff_succ
 #print axioms fiberDenominatorReciprocalRecurrence
+#print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
+#print axioms fiberDenominatorSeries_sub
 
 end H116FiberTrace

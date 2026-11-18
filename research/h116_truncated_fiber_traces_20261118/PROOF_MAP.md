@@ -28,8 +28,10 @@ This map is written before the first H116 Lean declaration.
 5. **Missing components only.** The generic finite reciprocal recurrence,
    derivative-times-reciprocal coefficient convolution and the exact formal
    series `F_U(w)=1-Uw+h₁w²+...` are now defined and proved at coefficient
-   level. The remaining concrete bridge identifies `w=1/x` and the isogeny
-   Laurent expansion with `F_U`, and proves the `h_i` recurrence. The
+   level. The formal normalized-map series is now proved to share every
+   coefficient except the target-dependent linear term. The remaining
+   geometric bridge identifies it at `w=1/x` with the actual isogeny Laurent
+   expansion and proves the `h_i` recurrence. The
    formal-group congruence for `V-1` is a separate endpoint premise unless an
    existing verified elliptic formal-group theorem is located. [pcc:unverified]
 6. **Inheritance table.** Below. A blank or `lookup pending` entry blocks the
@@ -65,6 +67,7 @@ This map is written before the first H116 Lean declaration.
 | relative derivative convolution | generic law | H116 Lean module | field, four power series | none |
 | concrete `F_U` coefficient and derivative formulas | instance law | H116 Lean module | field, `U`, coefficient function `h` | none |
 | concrete `F_U` reciprocal recurrence | instance law | H116 Lean module | field, `U`, `h`, reciprocal series | product equals one |
+| target/reference denominators share the same higher jet | instance law | H116 Lean module | field, `U`, `U0`, coefficient function `h` | none |
 | `Y_j` fiber identity | endpoint | H116 | isogeny coordinate data | normalized differential formula, non-2-torsion target |
 | Frobenius low-jet specialization | instance obligation or explicit premise | crypto-lean candidate | elliptic formal group | ordinary `E/F_p`, `V+pi=[t]` |
 | conditional decoder cost | endpoint | H116/H115 theorem reuse | cyclic prime-order group | exact public digit predicate and `r^o(1)` evaluator |
