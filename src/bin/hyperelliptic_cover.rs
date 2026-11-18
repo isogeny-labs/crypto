@@ -315,6 +315,8 @@ fn framed_source_digest(sources: &[(&str, &str)]) -> String {
 }
 
 fn transfer_catalog_producer_source_digest() -> String {
+    // Bind every local semantic input used by the catalog, including the
+    // primality gate behind exact-order evidence and its word-sized backend.
     framed_source_digest(&[
         (
             "src/bin/curve_cover_check/checker.rs",
@@ -349,6 +351,10 @@ fn transfer_catalog_producer_source_digest() -> String {
             include_str!("../binary_ecc/hyperelliptic.rs"),
         ),
         (
+            "src/binary_ecc/mod.rs",
+            include_str!("../binary_ecc/mod.rs"),
+        ),
+        (
             "src/binary_ecc/operation_tally.rs",
             include_str!("../binary_ecc/operation_tally.rs"),
         ),
@@ -363,6 +369,18 @@ fn transfer_catalog_producer_source_digest() -> String {
         (
             "src/cryptanalysis/group_op_count.rs",
             include_str!("../cryptanalysis/group_op_count.rs"),
+        ),
+        (
+            "src/prime_hyperelliptic/fp2.rs",
+            include_str!("../prime_hyperelliptic/fp2.rs"),
+        ),
+        (
+            "src/prime_hyperelliptic/mod.rs",
+            include_str!("../prime_hyperelliptic/mod.rs"),
+        ),
+        (
+            "src/prime_hyperelliptic/primality.rs",
+            include_str!("../prime_hyperelliptic/primality.rs"),
         ),
         ("src/hash/sha256.rs", include_str!("../hash/sha256.rs")),
         ("src/utils/mod.rs", include_str!("../utils/mod.rs")),
@@ -2961,6 +2979,10 @@ mod tests {
                 include_str!("../binary_ecc/hyperelliptic.rs"),
             ),
             (
+                "src/binary_ecc/mod.rs",
+                include_str!("../binary_ecc/mod.rs"),
+            ),
+            (
                 "src/binary_ecc/operation_tally.rs",
                 include_str!("../binary_ecc/operation_tally.rs"),
             ),
@@ -2975,6 +2997,18 @@ mod tests {
             (
                 "src/cryptanalysis/group_op_count.rs",
                 include_str!("../cryptanalysis/group_op_count.rs"),
+            ),
+            (
+                "src/prime_hyperelliptic/fp2.rs",
+                include_str!("../prime_hyperelliptic/fp2.rs"),
+            ),
+            (
+                "src/prime_hyperelliptic/mod.rs",
+                include_str!("../prime_hyperelliptic/mod.rs"),
+            ),
+            (
+                "src/prime_hyperelliptic/primality.rs",
+                include_str!("../prime_hyperelliptic/primality.rs"),
             ),
             ("src/hash/sha256.rs", include_str!("../hash/sha256.rs")),
             ("src/utils/mod.rs", include_str!("../utils/mod.rs")),
