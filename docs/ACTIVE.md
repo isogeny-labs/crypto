@@ -15,7 +15,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 
-- [ ] Prove a novel exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, started 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
+- [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
 
 - [ ] Certify prime31 exact geometric CM conductor via 3-division and tighten nonscalar endomorphism degree bound (automation, started 2026-11-18, branch automation/prime31-cm-conductor3-certificate-20261118)
 - [x] Publish prime-field coverage, Split4 and RR9 follow-up evidence (Codex, started 2026-11-17, branch research/prime-field-followup-20261117, PR #4624)
@@ -82,7 +82,6 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Blocked / questions for the owner
 
-- The novel decomposition oracle in PR #4668 has short-box branches and exact counters at sparse and nearly fixed raw product outputs. The remaining proof needs uniform signed search across arbitrary slot imbalances or joint counting through the carry and modular-quotient constraints with both operands masked.
 
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 
