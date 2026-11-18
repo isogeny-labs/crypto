@@ -1,0 +1,10 @@
+[package]
+name="hec-native-smith-canonical"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="native-smith-canonical"
+path="../main.rs"
