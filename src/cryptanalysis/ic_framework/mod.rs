@@ -3113,12 +3113,12 @@ mod tests {
                     seed,
                     ..Default::default()
                 };
-                pspec.factor_base_params.set("columns", &k.to_string());
+                pspec.factor_base_params.set("columns", k.to_string());
                 pspec.factor_base_params.set("raw_x_cap", "100000000");
                 pspec.factor_base_params.set("generator_orbit", "1");
                 pspec
                     .factor_base_params
-                    .set("generator_multiples", &k.to_string());
+                    .set("generator_multiples", k.to_string());
                 pspec.oracle_params.set("m", "2");
                 let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
                 let rep = run_pipeline(
