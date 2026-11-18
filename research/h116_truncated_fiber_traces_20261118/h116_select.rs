@@ -8,7 +8,7 @@ use std::fmt::Write as _;
 
 const MIN_P: u64 = 53;
 const MAX_P: u64 = 2_000;
-const MAX_EXTENSION_SIZE: u128 = 100_000_000;
+const MAX_EXTENSION_SIZE: u128 = 10_000_000_000;
 const FEASIBILITY_CAPS: [u128; 4] = [100_000_000, 10_000_000_000, 1_000_000_000_000, 100_000_000_000_000];
 const TARGET_CURVES: usize = 5;
 
@@ -220,10 +220,10 @@ fn select(maximum_extension_size: u128) -> (Vec<Curve>, u64, u64) {
 fn json(selected: &[Curve], primes_scanned: u64, models_scanned: u64) -> String {
     let mut output = String::new();
     writeln!(&mut output, "{{").unwrap();
-    writeln!(&mut output, "  \"schema\": \"h116.cohort/v1\",").unwrap();
+    writeln!(&mut output, "  \"schema\": \"h116.cohort/v2\",").unwrap();
     writeln!(
         &mut output,
-        "  \"rule\": \"COHORT_RULE.json at protocol freeze e1638152e26e31c5274828b9ed268d55c1cf2a7a489d0c98e43f69823539803b\","
+        "  \"rule\": \"COHORT_RULE_V2.json at protocol freeze 42b510bd0f67d23ad49e5827d947510de5e1c68bf82d29c78fa35e4861fe4bf3\","
     )
     .unwrap();
     writeln!(&mut output, "  \"primes_scanned\": {primes_scanned},").unwrap();

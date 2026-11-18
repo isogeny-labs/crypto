@@ -90,6 +90,20 @@ cf85d3aa832aed78aa7a446dcee443095e144a87cb29ab08aba4bf059ce8dd23  /tmp/h116_sele
 The plan, v3 source and binary binding are committed and pushed before the
 first `--feasibility` invocation.
 
+After protocol v2 froze the selected `10^10` cap, selector v4 changed its
+default cap and cohort schema/rule binding to that frozen version. It did not
+change selection logic. Strict builds and self-tests passed. Pre-cohort
+SHA-256 bindings are:
+
+```text
+53723d4949acb89c03a8e679d0c26b5d1e6f4605aaa421bc3d166d9ac54c5a21  h116_select.rs
+68915d3d5361be2d010601073f556971f5eed8529e56e3ac14050d6972a45bb5  /tmp/h116_select.v4.debug
+e03d5edc9efa3a4b862b3ec7611a998f109bbf297b1197191d36d2fb1a182abf  /tmp/h116_select.v4.opt
+```
+
+The v4 source/binary binding is committed and pushed before its first default
+invocation.
+
 The selector source was committed and pushed before `/tmp/h116_select` was
 invoked without `--selftest`. The resulting `COHORT.json`, raw stdout hash,
 compiler version and source hash will be bound in a later receipt before any
