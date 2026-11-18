@@ -1328,6 +1328,126 @@ theorem shortWeierstrassPsiThree_PsiTwoSq_singular_control :
     WeierstrassCurve.b₂, WeierstrassCurve.b₄, WeierstrassCurve.b₆,
     WeierstrassCurve.b₈] at heval
 
+/-- The scalar-three no-cancellation certificate forces the first nontrivial
+adjacent auxiliary division-polynomial pair to be coprime. -/
+theorem shortWeierstrass_prePsiThreeFour_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime W.Ψ₃ W.preΨ₄ := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have hscalar3 : IsCoprime (W.Φ 3) (W.ΨSq 3) :=
+    shortWeierstrassScalarThree_isCoprime A B hdisc h2
+  have hsquare : W.ΨSq 3 = W.Ψ₃ * W.Ψ₃ := by
+    rw [WeierstrassCurve.ΨSq_three, pow_two]
+  rw [hsquare] at hscalar3
+  have hphi3 : IsCoprime (W.Φ 3) W.Ψ₃ :=
+    hscalar3.of_mul_right_left
+  rw [WeierstrassCurve.Φ_three] at hphi3
+  have hprod : IsCoprime (W.preΨ₄ * W.Ψ₂Sq) W.Ψ₃ := by
+    rw [show X * W.Ψ₃ ^ 2 - W.preΨ₄ * W.Ψ₂Sq =
+      (X * W.Ψ₃) * W.Ψ₃ - W.preΨ₄ * W.Ψ₂Sq by ring] at hphi3
+    exact IsCoprime.mul_sub_right_left_iff.mp hphi3
+  exact hprod.of_mul_left_left.symm
+
+/-- The odd EDS recurrence bootstraps the next adjacent pair from
+`Psi3` coprime to `prePsi4`. -/
+theorem shortWeierstrass_prePsiFourFive_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime W.preΨ₄ (W.preΨ' 5) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have h34 : IsCoprime W.Ψ₃ W.preΨ₄ :=
+    shortWeierstrass_prePsiThreeFour_isCoprime A B hdisc h2
+  have h5 : W.preΨ' 5 = W.preΨ₄ * W.Ψ₂Sq ^ 2 - W.Ψ₃ ^ 3 := by
+    rw [show 5 = 2 * (0 + 2) + 1 by norm_num, WeierstrassCurve.preΨ'_odd]
+    simp
+  dsimp only
+  rw [h5]
+  apply IsCoprime.symm
+  rw [show W.preΨ₄ * W.Ψ₂Sq ^ 2 - W.Ψ₃ ^ 3 =
+    (W.Ψ₂Sq ^ 2) * W.preΨ₄ - W.Ψ₃ ^ 3 by ring,
+    IsCoprime.mul_sub_right_left_iff]
+  exact h34.pow_left
+
+/-- Scalar four has no numerator/denominator cancellation on every
+nonsingular short curve outside characteristic two. -/
+theorem shortWeierstrassScalarFour_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.Φ 4) (W.ΨSq 4) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have h34 : IsCoprime W.Ψ₃ W.preΨ₄ :=
+    shortWeierstrass_prePsiThreeFour_isCoprime A B hdisc h2
+  have h45 : IsCoprime W.preΨ₄ (W.preΨ' 5) :=
+    shortWeierstrass_prePsiFourFive_isCoprime A B hdisc h2
+  have h3two : IsCoprime W.Ψ₃ W.Ψ₂Sq :=
+    shortWeierstrassPsiThree_PsiTwoSq_isCoprime A B hdisc h2
+  have h5two : IsCoprime (W.preΨ' 5) W.Ψ₂Sq :=
+    shortWeierstrass_prePsi_odd_isCoprime_PsiTwoSq A B hdisc h2 5 (by decide)
+  have hplus : IsCoprime (W.preΨ (5 : ℕ)) (W.ΨSq (4 : ℕ)) := by
+    rw [WeierstrassCurve.preΨ_ofNat]
+    change IsCoprime (W.preΨ' 5) (W.ΨSq (4 : ℤ))
+    rw [WeierstrassCurve.ΨSq_four]
+    exact h45.symm.pow_right.mul_right h5two
+  have hminus : IsCoprime (W.preΨ (3 : ℕ)) (W.ΨSq (4 : ℕ)) := by
+    rw [WeierstrassCurve.preΨ_ofNat, WeierstrassCurve.preΨ'_three]
+    change IsCoprime W.Ψ₃ (W.ΨSq (4 : ℤ))
+    rw [WeierstrassCurve.ΨSq_four]
+    exact h34.pow_right.mul_right h3two
+  convert
+    (shortWeierstrassPhi_isCoprime_of_adjacent A B hdisc h2 4 hplus hminus) using 1
+
+/-- The reduced scalar-four x-coordinate quotient has coordinate extension
+degree exactly sixteen outside characteristic two. -/
+theorem shortWeierstrassScalarFour_extension_degree
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    let xMap : RatFunc F :=
+      algebraMap (Polynomial F) (RatFunc F) (W.Φ 4) /
+        algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 4)
+    Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 16 := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  let xMap : RatFunc F :=
+    algebraMap (Polynomial F) (RatFunc F) (W.Φ 4) /
+      algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 4)
+  have h4z : ((4 : ℤ) : F) ≠ 0 := by
+    norm_num
+    rw [show (4 : F) = 2 * 2 by norm_num]
+    exact mul_ne_zero h2 h2
+  have hcoprime : IsCoprime (W.Φ 4) (W.ΨSq 4) :=
+    shortWeierstrassScalarFour_isCoprime A B hdisc h2
+  have hdenom : W.ΨSq 4 ≠ 0 := W.ΨSq_ne_zero h4z
+  have hextension := reducedRationalQuotient_extension_degree
+    (W.Φ 4) (W.ΨSq 4) hdenom hcoprime
+  have hdegrees := scalarMultiplicationXMap_exact_degrees W 4 h4z
+  change Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 16
+  rw [hextension]
+  norm_num at hdegrees ⊢
+  omega
+
+/-- Singular scalar-four control: at `A=B=0`, numerator and denominator both
+vanish at zero and hence are not coprime. -/
+theorem shortWeierstrassScalarFour_singular_control :
+    let W : WeierstrassCurve (ZMod 5) := WeierstrassCurve.mk 0 0 0 0 0
+    ¬IsCoprime (W.Φ 4) (W.ΨSq 4) := by
+  let _ : Fact (Nat.Prime 5) := Fact.mk (by norm_num)
+  let W : WeierstrassCurve (ZMod 5) := WeierstrassCurve.mk 0 0 0 0 0
+  dsimp only
+  intro h
+  have heval := h.map (Polynomial.evalRingHom (0 : ZMod 5))
+  norm_num [WeierstrassCurve.Φ_four, WeierstrassCurve.ΨSq_four,
+    WeierstrassCurve.Ψ₃, WeierstrassCurve.preΨ₄,
+    WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂, WeierstrassCurve.b₄,
+    WeierstrassCurve.b₆, WeierstrassCurve.b₈] at heval
+
 /-- Over an algebraically closed field, absence of a common root is an exact
 certificate that two polynomials are coprime. -/
 theorem polynomial_isCoprime_of_no_common_root
@@ -3503,6 +3623,11 @@ theorem rationalMap_separation_strict_control :
 #print axioms shortWeierstrass_parityFactor_isCoprime
 #print axioms shortWeierstrassPhi_isCoprime_of_adjacent
 #print axioms shortWeierstrassPsiThree_PsiTwoSq_singular_control
+#print axioms shortWeierstrass_prePsiThreeFour_isCoprime
+#print axioms shortWeierstrass_prePsiFourFive_isCoprime
+#print axioms shortWeierstrassScalarFour_isCoprime
+#print axioms shortWeierstrassScalarFour_extension_degree
+#print axioms shortWeierstrassScalarFour_singular_control
 #print axioms polynomial_isCoprime_of_no_common_root
 #print axioms adjacentIntegerTorsion_eq_zero
 #print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics

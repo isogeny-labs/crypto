@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-dd03887630a75e45d7543fbf5ac8632b054b6fe3fb97dbafe2dce68559e4edc7  H116FiberTrace.lean
+b93966fc75b926a94d1fe2ba245bfa674bbd020fc9a8d2b6f04669b92cfefc20  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  170 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  175 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -81,6 +81,9 @@ e94fe66e359305ddbae083f9d86559ad5984ca577e5ccede00fc8cbfaaf36fc6  receipts/algeb
 f5beab595d8df926ce8d0c4cd16d80c35c58d22fd24cb2f618f89f4ec3db9603  receipts/odd-eds-parity-build.txt
 3b6b4e6857cbaf5bf4d464ab4bb7bb49ba43f7f52ce33f18bdcbeadc1e40f74c  receipts/odd-eds-parity-full-build.txt
 11a8caa16d979f24c3d3019e5b2fd9c44453505557e266bbce39aaef46f6097d  receipts/odd-eds-parity-audit.txt
+ee6ea7e75626e2699c5ee765246480ec2ec6183de2604b89bdf1a65318c85b34  receipts/scalar-four-bootstrap-build.txt
+fc6bd72d5b93ee2d369243a94342a924ab1a640e60b08f6b5c0006037822a3c1  receipts/scalar-four-bootstrap-full-build.txt
+2d0c1fa8ac87304c62c9473c57727eaba88342d2e89c3834e6a0b20883e2f1a6  receipts/scalar-four-bootstrap-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -370,6 +373,15 @@ adjacent EDS factors for every natural scalar.  The singular `A=B=0` pair over
 `ZMod 5` is proved non-coprime by evaluation at zero.  Adjacent-factor
 coprimality remains the sole generic no-cancellation obligation in this
 specialization. [pcc:unverified]
+
+The 175-theorem checkpoint bootstraps exact scalar-four no-cancellation from
+the earlier scalar-three theorem and Mathlib's EDS recurrence.  It proves
+`Psi3` coprime to `prePsi4`, then `prePsi4` coprime to `prePsi5`, assembles
+`IsCoprime (Phi 4) (PsiSq 4)`, and derives coordinate extension degree
+sixteen.  This avoids a separate high-degree resultant certificate.  The
+singular `A=B=0` scalar-four pair over `ZMod 5` is proved non-coprime by
+evaluation at zero.  Arbitrary adjacent-EDS coprimality remains open.
+[pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

@@ -937,6 +937,49 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | `Phi n` coprimality reduces to two adjacent factors | semantic assembly | H116 over generic reduction | same short curve | the two adjacent `prePsi` certificates |
 | singular base pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 5` | none |
 
+## Scalar-four recurrence bootstrap gate
+
+1. **Structure above.** The audited scalar-three no-cancellation theorem gives
+   `IsCoprime Phi3 (Psi3^2)`. Since
+   `Phi3=X*Psi3^2-prePsi4*Psi2Sq`, removing the denominator multiple and then
+   a product factor proves `Psi3` coprime to `prePsi4`.  Mathlib's next odd
+   recurrence is `prePsi5=prePsi4*Psi2Sq^2-Psi3^3`; removing the
+   `prePsi4` multiple proves the next adjacent pair.  The parity theorem then
+   supplies the remaining `Psi2Sq` factors in `PsiSq4`.
+2. **Theorems used as stated.** `WeierstrassCurve.Phi_three`,
+   `PsiSq_three`, `prePsi'_odd`, and `PsiSq_four` are used exactly as stated.
+   `IsCoprime.of_mul_right_left`, `of_mul_left_left`, `pow_left`,
+   `pow_right`, `mul_right`, and the subtract-multiple equivalence perform the
+   algebraic extraction. The preceding two-adjacent-factor theorem assembles
+   `Phi4,PsiSq4` coprimality; the reduced rational quotient and exact
+   division-polynomial degree theorems give extension degree sixteen.
+3. **Object as an instance.** On every nonsingular short curve outside
+   characteristic two, the construction proves both adjacent pairs, exact
+   scalar-four numerator/denominator coprimality, and
+   `[F(X):F(Phi4/PsiSq4)]=16`.
+4. **Assembly probe.** Both adjacent-pair derivations, scalar-four assembly,
+   degree endpoint and singular control first elaborated in a temporary
+   importing module. The tracked project then completed all 3,162 build jobs;
+   the exact repository auditor reports
+   `175 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This advances the exact no-cancellation
+   endpoint from scalars two and three to scalar four by recurrence. It does
+   not yet prove adjacent EDS coprimality for arbitrary `n` or an ECDLP
+   runtime bound. [pcc:unverified]
+6. **Inheritance table.** All recurrence identities, division-polynomial
+   formulas, degree results and coprimality transformations are inherited from
+   Mathlib or earlier audited H116 theorems.  H116 supplies their bootstrap
+   composition.  The singular `A=B=0` scalar-four pair over `ZMod 5` is proved
+   non-coprime by evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `Psi3` is coprime to `prePsi4` | recurrence extraction | H116 over scalar-three certificate | short curve over a field | discriminant nonzero, `2 != 0` |
+| `prePsi4` is coprime to `prePsi5` | recurrence bootstrap | H116 over Mathlib odd EDS recurrence | same | same |
+| `Phi4` is coprime to `PsiSq4` | exact division-polynomial assembly | H116 | same | same |
+| scalar-four coordinate extension degree is sixteen | exact degree assembly | H116 | rational function field | same |
+| singular scalar-four pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 5` | none |
+
 ## Adjacent-torsion root-semantics gate
 
 1. **Structure above.** Over an algebraically closed field, two polynomials
