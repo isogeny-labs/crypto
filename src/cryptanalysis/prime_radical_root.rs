@@ -804,8 +804,14 @@ impl RadicalRootCtx {
             2 => ok(vec![fp.mul(fp.neg(c[0]), fp.inv(c[1]))]),
             3 => ok(self.quad_roots(c[2], c[1], c[0])),
             4 => {
-                let ia = fp.inv(c[3]);
-                let mut v = self.cubic_monic(fp.mul(c[2], ia), fp.mul(c[1], ia), fp.mul(c[0], ia));
+                // Monic cubics are common in normalized rootfinding.
+                // Avoid one inversion and three modular products.
+                let mut v = if c[3] == 1 {
+                    self.cubic_monic(c[2], c[1], c[0])
+                } else {
+                    let ia = fp.inv(c[3]);
+                    self.cubic_monic(fp.mul(c[2], ia), fp.mul(c[1], ia), fp.mul(c[0], ia))
+                };
                 v.sort_unstable();
                 v.dedup();
                 ok(v)
