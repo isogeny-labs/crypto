@@ -525,6 +525,9 @@ impl RadicalRootCtx {
             let r = f.powm(a, (p + 1) / 4);
             return if f.sqr(r) == a { Some(r) } else { None };
         }
+        // The t2=1 shortcut must retain powm's canonical reduction even
+        // when a caller passes an unreduced public element.
+        let a = if self.t2 == 1 && a >= p { a % p } else { a };
         // Euler's criterion from a^t2, reused by Tonelli-Shanks:
         // a^((p-1)/2) = (a^t2)^(2^(s2-1)).
         // Avoid a second full-length modular exponentiation.
