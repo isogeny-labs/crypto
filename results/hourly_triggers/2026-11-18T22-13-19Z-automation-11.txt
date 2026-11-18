@@ -1,0 +1,7 @@
+Relation-yield monitor trigger
+UTC: 2026-11-18T22:13:19Z
+Workflow: .github/workflows/hourly-relation-finding.yml
+Target: frozen Koblitz GF(2^23), a=0, m=2; 256 natural / 64 planted-SAT / 64 proven-UNSAT trials
+Run: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json, threshold 20%
+Output: results/hourly_log.csv
