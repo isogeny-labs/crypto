@@ -2,7 +2,7 @@
 # Run the 24 registered sessions one at a time (L0, --cpus none), then verify each with --replay-all. cwd = repo root.
 # usage: flock /tmp/crypto-bench.lock bash research/ic_ksum_split_20261118/run_all.sh <ecbench binary>
 set -u; R=research/ic_ksum_split_20261118; BIN=${1:?ecbench binary}; export RAYON_NUM_THREADS=1
-want=$(cut -d' ' -f1 $R/BINARY.sha256); have=$(sha256sum "$BIN" | cut -d' ' -f1)
+want=$(head -1 $R/BINARY.sha256 | cut -d' ' -f1); have=$(sha256sum "$BIN" | cut -d' ' -f1)
 [ "$want" = "$have" ] || { echo "binary sha256 $have is not the registered $want" >&2; exit 2; }
 mkdir -p $R/sessions $R/data; : > $R/data/runlog.tsv
 for rep in 1 2 3; do for b in P20 P22 P24 B15 B18 B21 B24 B27; do

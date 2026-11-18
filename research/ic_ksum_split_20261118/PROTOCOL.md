@@ -117,3 +117,9 @@ Study directory with README.md, summary.json, results.md, graph (SVG + PNG), rep
 and a `benchmarks/README.md` row; `benchmarks/records/` record (`tools/benchrec.py`) and regenerated `benchmarks/progress/`; on a win
 a validator report, `VALIDATION.json` and a component section in `scripts/build_ic_leaderboard.py`. Session directories committed as
 in the prune study (the validator replays them by path). No push, no PR (the caller pushes).
+
+## Amendment A1 (2026-11-18, before any session ran)
+
+The first launch stopped at `run_all.sh`'s binary check, before any session: the check compared both lines of `BINARY.sha256`
+against the binary's hash. The check now reads the first line only (`head -1`). No session, spec, arm, test or prediction changed;
+`REGISTRATION.sha256` is re-written for `run_all.sh` and this file (`REGISTRATION.A1.sha256`).
