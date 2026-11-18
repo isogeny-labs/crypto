@@ -28,7 +28,7 @@ PILOT_M = (1, 2, 4, 8)
 PILOT_SEED = {23: 20261118471, 29: 20261118472, 37: 20261118473}
 # Confirmatory rule (k, m) per curve: filled from the pilot by the selection rule in PROTOCOL.md section 0 before
 # registration; None until then.
-RULE = None
+RULE = {23: (4, 8), 29: (1, 1), 37: (9, 8)}  # pilot/selection.json (pilot_select.py, 2026-11-18)
 CONF_SEED = {23: 20261118481, 29: 20261118484, 37: 20261118487}
 def main(which):
     if which == "pilot":
