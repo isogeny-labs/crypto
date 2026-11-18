@@ -1021,6 +1021,28 @@ fn generator_orbit(params: &Params) -> Result<bool, String> {
     }
 }
 
+/// `generator_multiples` of `compact-orbit-scan` (Koblitz small-row lever,
+/// 2026-11-18): with `generator_orbit=1`, columns `0..k` are the signed
+/// Frobenius orbits of `[1]G, …, [k]G`, every one of known logarithm. Absent
+/// or 1 is the plain generator-orbit base (one known column).
+fn generator_multiples(params: &Params) -> Result<u64, String> {
+    match params.get("generator_multiples") {
+        None => Ok(1),
+        Some(_) => match params.u64("generator_multiples")? {
+            0 => Err("generator_multiples must be at least 1".into()),
+            k => {
+                if !generator_orbit(params)? {
+                    return Err("generator_multiples needs generator_orbit=1".into());
+                }
+                if k > params.u64("columns")? {
+                    return Err("generator_multiples cannot exceed columns".into());
+                }
+                Ok(k)
+            }
+        },
+    }
+}
+
 /// The archived compact-orbit producer's public, deterministic raw-x scan.
 /// All group work is charged to `ops`; native field and container work is
 /// retained on the base as priced counters or explicit lower-bound gaps.
@@ -1056,6 +1078,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
                 "generator_orbit",
                 "1: column 0 is the signed Frobenius orbit of the generator G itself, whose logarithm is known (no lift, cofactor projection, order or eigenvalue check: the instance's lambda is used as the signed-Frobenius rho uses it), so the relation search needs one row fewer; the other columns come from the raw-x scan. 0 or absent: every column from the scan",
             ),
+            (
+                "generator_multiples",
+                "k (needs generator_orbit=1, k <= columns; absent or 1: only G): columns 0..k are the signed Frobenius orbits of [1]G, ..., [k]G, built by one doubling and k-2 additions, every logarithm known (h*j), so the relation search needs k rows fewer; at k = columns the base is all known-log and one relation pins the target. A multiple whose orbit repeats an earlier column is an error",
+            ),
         ]
     }
 
@@ -1066,7 +1092,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
     ) -> Result<Vec<(usize, u64)>, String> {
         // x = h·log_G(seed) with seed = G (see collect_and_solve_relations).
         Ok(if generator_orbit(params)? {
-            vec![(0, ctx.cofactor % ctx.r)]
+            let h = (ctx.cofactor % ctx.r) as u128;
+            (1..=generator_multiples(params)?)
+                .map(|j| ((j - 1) as usize, ((h * j as u128) % ctx.r as u128) as u64))
+                .collect()
         } else {
             Vec::new()
         })
@@ -1110,6 +1139,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         }
         let mut multiplier_points = 0u64;
         let from_generator = generator_orbit(params)?;
+        let multiples = generator_multiples(params)?;
         if from_generator && !multipliers.is_empty() {
             return Err("generator_orbit=1 does not combine with norm > 0".into());
         }
@@ -1152,41 +1182,57 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
             // Its coefficients use the instance's lambda unchecked, as the
             // signed-Frobenius rho does; a wrong lambda would fail the final
             // [d]G = Q verification that every arm pays, not return a wrong d.
-            let seed = ctx.generator;
-            if g.is_identity(&seed) || seed.x <= 1 {
-                return Err("generator_orbit=1 needs a generator with x > 1".into());
-            }
-            equation_checks += 1;
-            if !inst.fast.is_on_curve(seed) {
-                return Err("the generator is off curve".into());
-            }
-            let mut x = seed.x;
-            let mut key = x;
-            for _ in 1..inst.n {
-                x = inst.gf.sqr(x);
-                key = key.min(x);
-                key_squares += 1;
-            }
-            seen.insert(key);
-            let mut member = seed;
-            let mut coefficient = 1u64;
-            for _ in 0..inst.n {
-                equation_checks += 1;
-                if !inst.fast.is_on_curve(member) {
-                    return Err("a Frobenius image of the generator is off curve".into());
+            // With `generator_multiples = k`, columns 1..k repeat this for
+            // [j]G (one doubling, then one addition each), log h*j.
+            let mut seed = ctx.generator;
+            for j in 1..=multiples {
+                if j == 2 {
+                    seed = g.double(ops, seed);
+                } else if j > 2 {
+                    seed = g.add(ops, seed, ctx.generator);
                 }
-                points.push(member);
-                col_of.push(0);
-                coef_of.push(coefficient);
-                points.push(g.neg(member));
-                col_of.push(0);
-                coef_of.push((ctx.r - coefficient) % ctx.r);
-                member = inst.fast.frobenius_k(member, 1);
-                frobenius_maps += 1;
-                coefficient = ((coefficient as u128 * lambda as u128) % ctx.r as u128) as u64;
-            }
-            if member != seed || coefficient != 1 {
-                return Err("the generator's Frobenius orbit is not closed".into());
+                let column = (j - 1) as usize;
+                if g.is_identity(&seed) || seed.x <= 1 {
+                    return Err(format!(
+                        "generator_orbit=1 needs [{j}]G with x > 1 (generator_multiples)"
+                    ));
+                }
+                equation_checks += 1;
+                if !inst.fast.is_on_curve(seed) {
+                    return Err("the generator is off curve".into());
+                }
+                let mut x = seed.x;
+                let mut key = x;
+                for _ in 1..inst.n {
+                    x = inst.gf.sqr(x);
+                    key = key.min(x);
+                    key_squares += 1;
+                }
+                if !seen.insert(key) {
+                    return Err(format!(
+                        "the orbit of [{j}]G repeats an earlier column; use fewer generator_multiples"
+                    ));
+                }
+                let mut member = seed;
+                let mut coefficient = 1u64;
+                for _ in 0..inst.n {
+                    equation_checks += 1;
+                    if !inst.fast.is_on_curve(member) {
+                        return Err("a Frobenius image of the generator is off curve".into());
+                    }
+                    points.push(member);
+                    col_of.push(column);
+                    coef_of.push(coefficient);
+                    points.push(g.neg(member));
+                    col_of.push(column);
+                    coef_of.push((ctx.r - coefficient) % ctx.r);
+                    member = inst.fast.frobenius_k(member, 1);
+                    frobenius_maps += 1;
+                    coefficient = ((coefficient as u128 * lambda as u128) % ctx.r as u128) as u64;
+                }
+                if member != seed || coefficient != 1 {
+                    return Err("the generator's Frobenius orbit is not closed".into());
+                }
             }
         }
         for raw_x in 1..=max_x {
@@ -1322,7 +1368,12 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
             ));
         }
         let mut fb = FactorBase::from_column_map(
-            if from_generator {
+            if from_generator && multiples > 1 {
+                format!(
+                    "the signed Frobenius orbits of [1]G..[{multiples}]G and the first {} projected orbits, raw x <= {raw_x_cap}",
+                    columns as u64 - multiples
+                )
+            } else if from_generator {
                 format!(
                     "the generator's signed Frobenius orbit and the first {} projected orbits, raw x <= {raw_x_cap}",
                     columns - 1
@@ -1367,6 +1418,9 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         // evidence built from them) stay exactly what they were.
         if !multipliers.is_empty() {
             fb.cost.count("multiplier_points", multiplier_points);
+        }
+        if multiples > 1 {
+            fb.cost.count("generator_multiple_columns", multiples);
         }
         fb.cost.count(
             "hash_probes_uncharged",

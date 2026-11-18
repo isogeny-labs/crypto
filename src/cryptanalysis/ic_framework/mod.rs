@@ -2752,6 +2752,124 @@ mod tests {
         }
     }
 
+    /// `generator_multiples` (Koblitz small-row lever, 2026-11-18): absent
+    /// or 1 builds the generator-orbit base unchanged (same points, counters
+    /// and known logs); k > 1 seeds columns 0..k with the orbits of
+    /// [1]G..[k]G (one doubling, k - 2 additions, no scalar multiplication),
+    /// every column log known, so an all-known base pins the target with one
+    /// relation and recovers the planted logarithm.
+    #[test]
+    fn generator_multiples_seed_known_log_columns_and_default_is_unchanged() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{koblitz_instance, BinaryGroup, CountedGroup};
+
+        for (a, n, planted_seed, k) in [(1u8, 23u32, 4_242u64, 3u64), (1, 29, 40_009, 2)] {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let build = |spec: &str| {
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{spec}")).unwrap();
+                let mut ops = GroupOps::default();
+                let fb = base.build(&ctx, &params, &mut ops).unwrap();
+                let logs = base.known_column_logs(&ctx, &params).unwrap();
+                (fb, ops, logs)
+            };
+            // Default unchanged: generator_multiples=1 is the plain base.
+            let plain_spec = "columns=2,raw_x_cap=100000000,generator_orbit=1";
+            let (p0, o0, l0) = build(plain_spec);
+            let (p1, o1, l1) = build(&format!("{plain_spec},generator_multiples=1"));
+            assert_eq!(p0.points, p1.points);
+            assert_eq!(p0.coef_of, p1.coef_of);
+            assert_eq!(p0.cost.native, p1.cost.native);
+            assert_eq!(
+                (o0.adds, o0.doubles, o0.scalar_mults),
+                (o1.adds, o1.doubles, o1.scalar_mults)
+            );
+            assert_eq!(l0, l1);
+            assert_eq!(p0.cost.get("generator_multiple_columns"), 0);
+
+            // k known columns: [j]G seeds column j - 1 with log h*j.
+            let spec = format!(
+                "columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k}"
+            );
+            let (fb, ops, logs) = build(&spec);
+            assert_eq!(fb.columns, k as usize);
+            assert_eq!(fb.frobenius_orbit_layout, Some(n));
+            assert_eq!(ops.scalar_mults, 0);
+            assert_eq!((ops.doubles, ops.adds), (1, k - 2));
+            assert_eq!(fb.cost.get("cofactor_projected_points"), 0);
+            assert_eq!(fb.cost.get("generator_multiple_columns"), k);
+            let h = inst.cofactor % inst.r;
+            assert_eq!(
+                logs,
+                (1..=k)
+                    .map(|j| (
+                        (j - 1) as usize,
+                        (h as u128 * j as u128 % inst.r as u128) as u64
+                    ))
+                    .collect::<Vec<_>>()
+            );
+            let mut check = GroupOps::default();
+            for (i, p) in fb.points.iter().enumerate() {
+                let x = logs[fb.col_of[i]].1;
+                let e = ((fb.coef_of[i] as u128 * x as u128) % inst.r as u128) as u64;
+                assert_eq!(
+                    group.mul(&mut check, inst.generator, e),
+                    group.mul(&mut check, *p, inst.cofactor),
+                    "{spec}: member {i} has the wrong coefficient"
+                );
+            }
+            for bad in [
+                format!("columns={k},raw_x_cap=100000000,generator_multiples={k}"),
+                format!("columns=1,raw_x_cap=100000000,generator_orbit=1,generator_multiples={k}"),
+                "columns=1,raw_x_cap=100000000,generator_orbit=1,generator_multiples=0".into(),
+            ] {
+                let (_, params) = Params::parse_spec(&format!("compact-orbit-scan:{bad}")).unwrap();
+                assert!(
+                    base.build(&ctx, &params, &mut GroupOps::default()).is_err(),
+                    "{bad}"
+                );
+            }
+
+            // End to end: one relation pins the target on the all-known base.
+            for seed in [3u64, 11, 29] {
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                pspec.factor_base_params.set("columns", &k.to_string());
+                pspec.factor_base_params.set("raw_x_cap", "100000000");
+                pspec.factor_base_params.set("generator_orbit", "1");
+                pspec
+                    .factor_base_params
+                    .set("generator_multiples", &k.to_string());
+                pspec.oracle_params.set("m", "2");
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                let rep = run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .expect("the configuration should run");
+                assert!(rep.verified, "n{n} seed {seed}");
+                assert_eq!(rep.recovered, Some(planted), "n{n} seed {seed}");
+                assert_eq!(rep.decomposition.relations_found, 1, "n{n} seed {seed}");
+            }
+        }
+    }
+
     #[test]
     fn layout_table_returns_the_lazy_pairs_with_no_maps_and_half_the_same_orbit_sums() {
         use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
