@@ -599,6 +599,28 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     trim(r)
 }
+// Squaring uses symmetry to avoid multiplying the same off-diagonal
+// coefficient pair twice. Both inputs and the result are canonical mod p.
+#[inline]
+fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
+    if a.len() <= 2 {
+        return vproduct(a, a, p);
+    }
+    let mut result = vec![0; 2 * a.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        let diagonal = vmul(x, x, p);
+        let sum = result[2 * i] + diagonal;
+        result[2 * i] = if sum >= p { sum - p } else { sum };
+        for (j, &y) in a.iter().enumerate().skip(i + 1) {
+            let cross = vmul(x, y, p);
+            let twice = cross + cross;
+            let twice = if twice >= p { twice - p } else { twice };
+            let sum = result[i + j] + twice;
+            result[i + j] = if sum >= p { sum - p } else { sum };
+        }
+    }
+    trim(result)
+}
 fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     if b.is_empty() {
         return Err("division by zero polynomial".into());
@@ -613,18 +635,39 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     // GCD factors, X^p mod f divisors and root certificates are commonly
     // monic. Avoid a full exponentiation to invert their leading 1.
     let lead = *b.last().unwrap();
-    let inv = if lead == 1 { 1 } else { vpow(lead, p - 2, p) };
-    while !r.is_empty() && r.len() >= b.len() {
-        let shift = r.len() - b.len();
-        let c = vmul(*r.last().unwrap(), inv, p);
-        q[shift] = c;
-        for (i, &x) in b.iter().enumerate() {
-            let product = vmul(c, x, p);
-            let old = r[shift + i];
-            r[shift + i] = if old >= product { old - product }
-                           else { old + p - product };
+    if lead == 1 {
+        // Synthetic division by a monic polynomial. The leading term
+        // cancels exactly, so neither its multiplication nor subtraction
+        // needs to be performed.
+        while !r.is_empty() && r.len() >= b.len() {
+            let shift = r.len() - b.len();
+            let c = *r.last().unwrap();
+            q[shift] = c;
+            r.pop();
+            for (i, &x) in b[..b.len() - 1].iter().enumerate() {
+                let product = vmul(c, x, p);
+                let old = r[shift + i];
+                r[shift + i] = if old >= product { old - product }
+                               else { old + p - product };
+            }
+            r = trim(r);
         }
-        r = trim(r);
+    } else {
+        // Preserve the nonmonic route, including its original reduction
+        // order, rather than adding a branch to each inner iteration.
+        let inv = vpow(lead, p - 2, p);
+        while !r.is_empty() && r.len() >= b.len() {
+            let shift = r.len() - b.len();
+            let c = vmul(*r.last().unwrap(), inv, p);
+            q[shift] = c;
+            for (i, &x) in b.iter().enumerate() {
+                let product = vmul(c, x, p);
+                let old = r[shift + i];
+                r[shift + i] = if old >= product { old - product }
+                               else { old + p - product };
+            }
+            r = trim(r);
+        }
     }
     Ok((trim(q), r))
 }
@@ -640,7 +683,7 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
         // Skipping the last modular square saves a polynomial product
         // and a polynomial division in the verifier's independent replay.
         if e != 0 {
-            b = vdiv(&vproduct(&b, &b, p), m, p)?.1;
+            b = vdiv(&vsquare(&b, p), m, p)?.1;
         }
     }
     Ok(r)
