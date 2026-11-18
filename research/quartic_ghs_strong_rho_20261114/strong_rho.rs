@@ -105,7 +105,7 @@ fn barrett_reduce_product(q: u64, reciprocal: u64, x: u64) -> u64 {
     }
 }
 
-pub struct FastF3 {
+pub struct FastF3<const COUNT: bool = true> {
     q: u64,
     reciprocal: u64,
     setup_reciprocal_div: u64,
@@ -115,7 +115,7 @@ pub struct FastF3 {
     counts: Cell<FieldCounts>,
 }
 
-impl FastF3 {
+impl<const COUNT: bool> FastF3<COUNT> {
     pub fn from_instance(inst: &Inst) -> Self {
         Self {
             q: inst.q,
@@ -134,10 +134,13 @@ impl FastF3 {
         self.counts.get()
     }
 
+    #[inline(always)]
     fn bump(&self, f: impl FnOnce(&mut FieldCounts)) {
-        let mut c = self.counts.get();
-        f(&mut c);
-        self.counts.set(c);
+        if COUNT {
+            let mut c = self.counts.get();
+            f(&mut c);
+            self.counts.set(c);
+        }
     }
 
     #[inline(always)]
@@ -392,14 +395,14 @@ impl BatchAddScratch {
     }
 }
 
-pub struct FastEc<'a> {
-    f: &'a FastF3,
+pub struct FastEc<'a, const COUNT: bool = true> {
+    f: &'a FastF3<COUNT>,
     a2: K,
     a4: K,
 }
 
-impl<'a> FastEc<'a> {
-    pub fn from_instance(f: &'a FastF3, inst: &Inst) -> Self {
+impl<'a, const COUNT: bool> FastEc<'a, COUNT> {
+    pub fn from_instance(f: &'a FastF3<COUNT>, inst: &Inst) -> Self {
         Self {
             f,
             a2: inst.ec.a2,
@@ -745,7 +748,14 @@ fn partition_index(h: u64, r: usize) -> usize {
     }
 }
 
-fn canon(f: &FastF3, p: EP, a: u64, b: u64, n: u64, c: &mut NativeCounts) -> (EP, u64, u64) {
+fn canon<const COUNT: bool>(
+    f: &FastF3<COUNT>,
+    p: EP,
+    a: u64,
+    b: u64,
+    n: u64,
+    c: &mut NativeCounts,
+) -> (EP, u64, u64) {
     c.canonicalisations += 1;
     let EP::A(x, y) = p else { return (p, a, b) };
     let first = if y[0] != 0 {
@@ -766,9 +776,9 @@ fn canon(f: &FastF3, p: EP, a: u64, b: u64, n: u64, c: &mut NativeCounts) -> (EP
     }
 }
 
-fn new_walker(
-    ec: &FastEc<'_>,
-    f: &FastF3,
+fn new_walker<const COUNT: bool>(
+    ec: &FastEc<'_, COUNT>,
+    f: &FastF3<COUNT>,
     g: &EP,
     q: &EP,
     n: u64,
@@ -834,9 +844,9 @@ struct InitialState {
 
 /// Build the jump table and initial walkers. The candidate keeps the exact
 /// baseline RNG stream and coefficients; only point construction changes.
-fn initial_state(
-    ec: &FastEc<'_>,
-    f: &FastF3,
+fn initial_state<const COUNT: bool>(
+    ec: &FastEc<'_, COUNT>,
+    f: &FastF3<COUNT>,
     g: &EP,
     q: &EP,
     n: u64,
@@ -892,8 +902,8 @@ fn initial_state(
 /// rule applied in batches. If jump j would land in partition j again, retry
 /// from the original point with j+1. This removes the dominant fruitless
 /// two-cycle without giving up a shared inversion on the common first try.
-fn batched_lookahead_step(
-    ec: &FastEc<'_>,
+fn batched_lookahead_step<const COUNT: bool>(
+    ec: &FastEc<'_, COUNT>,
     jumps: &[EP],
     walkers: &[Walker],
     native: &mut NativeCounts,
@@ -968,9 +978,9 @@ fn point_key(p: &EP) -> [u64; 6] {
 /// Scalar version used only to traverse a detected fruitless cycle. Returning
 /// to the cycle's canonical minimum before doubling makes escape independent
 /// of a lane's snapshot phase, so merged walks remain coalesced.
-fn single_lookahead_step(
-    ec: &FastEc<'_>,
-    f: &FastF3,
+fn single_lookahead_step<const COUNT: bool>(
+    ec: &FastEc<'_, COUNT>,
+    f: &FastF3<COUNT>,
     jumps: &[EP],
     ma: &[u64],
     mb: &[u64],
@@ -1038,11 +1048,16 @@ fn collision_scalar(
     Some(smul(num, di, n, c))
 }
 
-pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> StrongOut {
+fn strong_rho_impl<const COUNT: bool>(
+    inst: &Inst,
+    k_true: u64,
+    seed: u64,
+    opts: StrongOpts,
+) -> StrongOut {
     assert!(opts.batch > 0 && opts.r > 0 && opts.dp_bits < 63 && opts.snapshot_period > 0);
     let start = Instant::now();
     let n = inst.ell;
-    let f = FastF3::from_instance(inst);
+    let f = FastF3::<COUNT>::from_instance(inst);
     let ec = FastEc::from_instance(&f, inst);
     let mut native = NativeCounts::default();
     let mut rng = Rng::new(seed ^ 0x4E45_47);
@@ -1217,6 +1232,18 @@ pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> Stro
     }
 }
 
+/// Exactly counted reference path. Its field-operation totals remain the
+/// authoritative input to modeled-cost comparisons.
+pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> StrongOut {
+    strong_rho_impl::<true>(inst, k_true, seed, opts)
+}
+
+/// Production arithmetic path with field-operation counter updates removed at
+/// monomorphization time. Its zero field totals are intentionally non-authoritative.
+pub fn strong_rho_uncounted(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> StrongOut {
+    strong_rho_impl::<false>(inst, k_true, seed, opts)
+}
+
 /// Deterministic development controls.  Kept outside Rust's test harness so
 /// the frozen standalone N4 module is compiled exactly as it is in its driver
 /// (its own `cfg(test)` suite depends on Cargo-only test dependencies).
@@ -1312,14 +1339,18 @@ pub fn selftest() {
     };
     {
         let inst = instance();
-        let f = FastF3::from_instance(&inst);
+        let f = FastF3::<true>::from_instance(&inst);
+        let uncounted = FastF3::<false>::from_instance(&inst);
         let mut rng = Rng::new(7);
         for _ in 0..200 {
             let a = inst.kf.rand(&mut rng);
             let b = inst.kf.rand(&mut rng);
             assert_eq!(f.add(&a, &b), inst.kf.add(&a, &b));
+            assert_eq!(uncounted.add(&a, &b), inst.kf.add(&a, &b));
             assert_eq!(f.sub(&a, &b), inst.kf.sub(&a, &b));
+            assert_eq!(uncounted.sub(&a, &b), inst.kf.sub(&a, &b));
             assert_eq!(f.mul(&a, &b), inst.kf.mul(&a, &b));
+            assert_eq!(uncounted.mul(&a, &b), inst.kf.mul(&a, &b));
             let before_sq = f.counts();
             let sq = f.sq(&a);
             let sq_counts = f.counts().since(before_sq);
@@ -1333,7 +1364,15 @@ pub fn selftest() {
             assert_eq!(sq_counts.f3_mul, 0);
             assert_eq!(mul_counts.f3_sq, 0);
             assert_eq!(mul_counts.f3_mul, 1);
+            assert_eq!(uncounted.sq(&a), sq);
+            if a != KZERO {
+                assert_eq!(f.inv(&a), inst.kf.inv(&a));
+                assert_eq!(f.mul(&a, &f.inv(&a)), KONE);
+                assert_eq!(uncounted.inv(&a), inst.kf.inv(&a));
+                assert_eq!(uncounted.mul(&a, &uncounted.inv(&a)), KONE);
+            }
         }
+        assert_eq!(uncounted.counts(), FieldCounts::default());
         check_inverses(&f, &inst.kf, 8, "small-c");
         eprintln!("selftest: fast field matches frozen field");
     }
@@ -1359,7 +1398,8 @@ pub fn selftest() {
     }
     {
         let inst = instance();
-        let f = FastF3::from_instance(&inst);
+        let f = FastF3::<true>::from_instance(&inst);
+        let uncounted = FastF3::<false>::from_instance(&inst);
         let mut rng = Rng::new(9);
         let values: Vec<_> = (0..37)
             .map(|_| loop {
@@ -1370,22 +1410,28 @@ pub fn selftest() {
             })
             .collect();
         let got = f.batch_inv(&values);
+        let got_uncounted = uncounted.batch_inv(&values);
+        assert_eq!(got_uncounted, got);
         for (x, xi) in values.iter().zip(got.iter()) {
             assert_eq!(f.mul(x, xi), KONE);
             assert_eq!(*xi, inst.kf.inv(x));
         }
+        assert_eq!(uncounted.counts(), FieldCounts::default());
         eprintln!("selftest: batch inverse matches pointwise inversion");
     }
     {
         let inst = instance();
-        let f = FastF3::from_instance(&inst);
+        let f = FastF3::<true>::from_instance(&inst);
         let ec = FastEc::from_instance(&f, &inst);
+        let uncounted = FastF3::<false>::from_instance(&inst);
+        let ec_uncounted = FastEc::from_instance(&uncounted, &inst);
         let points: Vec<_> = (1..=40).map(|k| inst.ec.mul(&inst.g, k)).collect();
         let jumps: Vec<_> = (0..40)
             .map(|k| inst.ec.mul(&inst.g, (3 * k + 17) as u128))
             .collect();
         for (p, q) in points.iter().zip(jumps.iter()) {
             assert_eq!(ec.add(p, q), inst.ec.add(p, q));
+            assert_eq!(ec_uncounted.add(p, q), inst.ec.add(p, q));
         }
         let expected: Vec<_> = points
             .iter()
@@ -1430,8 +1476,13 @@ pub fn selftest() {
                 .map(|(p, q)| inst.ec.add(p, q))
                 .collect::<Vec<_>>()
         );
+        assert_eq!(
+            ec_uncounted.batch_add(&points, &jumps),
+            ec.batch_add(&points, &jumps)
+        );
         for k in [1u128, 2, 3, 17, 255, 65_537] {
             assert_eq!(ec.mul(&inst.g, k), inst.ec.mul(&inst.g, k));
+            assert_eq!(ec_uncounted.mul(&inst.g, k), inst.ec.mul(&inst.g, k));
         }
         let before_table = f.counts();
         let table = ec.window2_table(&inst.g, &points[16]);
@@ -1453,6 +1504,13 @@ pub fn selftest() {
             })
             .collect();
         assert_eq!(got, expected);
+        let table_uncounted = ec_uncounted.window2_table(&inst.g, &points[16]);
+        assert_eq!(table_uncounted, table);
+        assert_eq!(
+            ec_uncounted.batch_window2_mul(&table_uncounted, &coeffs),
+            expected
+        );
+        assert_eq!(uncounted.counts(), FieldCounts::default());
         eprintln!(
             "selftest: complete batches and width-2 simultaneous multiplication match frozen curve; cold table={table_counts:?}"
         );
@@ -1460,9 +1518,9 @@ pub fn selftest() {
     {
         let inst = instance();
         let target = inst.ec.mul(&inst.g, 119);
-        let f_legacy = FastF3::from_instance(&inst);
+        let f_legacy = FastF3::<true>::from_instance(&inst);
         let ec_legacy = FastEc::from_instance(&f_legacy, &inst);
-        let f_batch = FastF3::from_instance(&inst);
+        let f_batch = FastF3::<true>::from_instance(&inst);
         let ec_batch = FastEc::from_instance(&f_batch, &inst);
         let mut rng_legacy = Rng::new(0x51A7_E001);
         let mut rng_batch = Rng::new(0x51A7_E001);
@@ -1530,6 +1588,12 @@ pub fn selftest() {
                 100 + i as u64,
                 StrongOpts::for_instance(&inst, width),
             );
+            let uncounted = strong_rho_uncounted(
+                &inst,
+                k,
+                100 + i as u64,
+                StrongOpts::for_instance(&inst, width),
+            );
             assert!(
                 out.ok,
                 "width={width} found={:?} steps={}",
@@ -1538,11 +1602,27 @@ pub fn selftest() {
             assert_eq!(out.found, Some(k));
             assert_selftest_oracle(width, &out);
             assert_eq!(out.setup_reciprocal_div, 1);
+            assert_eq!(uncounted.setup_reciprocal_div, 1);
+            assert_eq!(uncounted.ok, out.ok);
+            assert_eq!(uncounted.found, out.found);
+            assert_eq!(uncounted.steps, out.steps);
+            assert_eq!(uncounted.dps, out.dps);
+            assert_eq!(uncounted.restarts, out.restarts);
+            assert_eq!(uncounted.lookahead, out.lookahead);
+            assert_eq!(uncounted.cycles, out.cycles);
+            assert_eq!(uncounted.cycle_adds, out.cycle_adds);
+            assert_eq!(uncounted.setup_native, out.setup_native);
+            assert_eq!(uncounted.walk_native, out.walk_native);
+            assert_eq!(uncounted.setup_field, FieldCounts::default());
+            assert_eq!(uncounted.walk_field, FieldCounts::default());
+            assert_eq!(uncounted.verify_field, FieldCounts::default());
             if width > 1 {
                 assert!(out.walk_field.fq_inv < out.steps);
             }
         }
-        eprintln!("selftest: planted logs recovered at widths 1, 4, 8, 16, and 32");
+        eprintln!(
+            "selftest: counted and counter-free planted logs match at widths 1, 4, 8, 16, and 32"
+        );
     }
     {
         let inst = instance();

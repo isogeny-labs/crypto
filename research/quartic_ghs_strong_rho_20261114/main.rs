@@ -48,7 +48,50 @@ mod strong_rho;
 
 use common::*;
 use ghs::*;
-use strong_rho::{strong_rho, FieldCounts, NativeCounts, StrongOpts};
+use strong_rho::{strong_rho, strong_rho_uncounted, FieldCounts, NativeCounts, StrongOpts};
+
+#[derive(Clone, Copy)]
+enum CountMode {
+    Counted,
+    FieldCounterFree,
+}
+
+#[derive(Clone, Copy)]
+enum SetupMode {
+    BatchedJumps,
+    Legacy,
+}
+
+#[derive(Clone, Copy)]
+struct ArmMode {
+    width: usize,
+    count_mode: CountMode,
+    setup_mode: SetupMode,
+}
+
+fn parse_strong_arm(arm: &str) -> ArmMode {
+    let (rest, count_mode) = if let Some(rest) = arm.strip_prefix("strong-b") {
+        (rest, CountMode::Counted)
+    } else if let Some(rest) = arm.strip_prefix("fast-b") {
+        (rest, CountMode::FieldCounterFree)
+    } else {
+        panic!("unknown arm {arm}")
+    };
+    let (width_text, setup_mode) = if let Some(width) = rest.strip_suffix("-legacy-setup") {
+        (width, SetupMode::Legacy)
+    } else {
+        (rest, SetupMode::BatchedJumps)
+    };
+    let width: usize = width_text
+        .parse()
+        .unwrap_or_else(|_| panic!("invalid batch width in arm {arm}"));
+    assert!(width > 0, "batch width must be positive in arm {arm}");
+    ArmMode {
+        width,
+        count_mode,
+        setup_mode,
+    }
+}
 
 fn median(v: &mut [f64]) -> f64 {
     v.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -190,27 +233,26 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 );
                 continue;
             }
-            let setup_control = arm.ends_with("-legacy-setup");
-            let width_text = arm
-                .strip_prefix("strong-b")
-                .unwrap_or_else(|| panic!("unknown arm {arm}"));
-            let width: usize = width_text
-                .strip_suffix("-legacy-setup")
-                .unwrap_or(width_text)
-                .parse()
-                .expect("batch width");
-            let mut opts = StrongOpts::for_instance(&inst, width);
+            let mode = parse_strong_arm(arm);
+            let count_authoritative = matches!(mode.count_mode, CountMode::Counted);
+            let setup_control = matches!(mode.setup_mode, SetupMode::Legacy);
+            let mut opts = StrongOpts::for_instance(&inst, mode.width);
             opts.batch_setup = !setup_control;
-            let out = strong_rho(&inst, k, seed * 1000 + i as u64, opts);
+            let out = if count_authoritative {
+                strong_rho(&inst, k, seed * 1000 + i as u64, opts)
+            } else {
+                strong_rho_uncounted(&inst, k, seed * 1000 + i as u64, opts)
+            };
             println!(
-                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"setup_mode\":\"{}\",\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"setup.reciprocal_div\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
+                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"setup_mode\":\"{}\",\"count_authoritative\":{},\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"setup.reciprocal_div\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
                 arm,
-                width,
+                mode.width,
                 if setup_control {
                     "legacy"
                 } else {
                     "batched-window2-jumps"
                 },
+                count_authoritative,
                 q,
                 seed,
                 i,
@@ -239,7 +281,7 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
 
 fn usage() -> ! {
     eprintln!(
-        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,strong-b1-legacy-setup,...>"
+        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,fast-b1,strong-b1-legacy-setup,fast-b1-legacy-setup,...>"
     );
     std::process::exit(2)
 }
