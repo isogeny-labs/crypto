@@ -37,7 +37,7 @@ Replay with Python stdlib only:
     python3 research/genus2_companion_torsion_sieve_20261118/run.py > /tmp/genus2-sieve.json
     python3 -m py_compile research/genus2_companion_torsion_sieve_20261118/run.py
 
-Code compiled and three exact cases ran locally. The run was not cryptographically preregistered before it executed; results need independent replay before marking independently verified.
+Code compiled and three exact cases ran locally. Regression replay: cd research/genus2_companion_torsion_sieve_20261118 && python3 test_run.py. It passed the three frozen outcome vectors, 1,536 independently drawn group-law associativity triples across E1/E2, and inverse checks. The run was not cryptographically preregistered before it executed; results need independent replay before marking independently verified.
 
 ## Primary literature and known results
 
