@@ -214,7 +214,7 @@ fn trim(mut v: Vec<u64>) -> Vec<u64> {
 /// the trace engine. Keep the general u128 fallback so event values remain
 /// identical even for noncanonical internal callers.
 #[inline]
-fn field_value(op: FieldOp, a: u64, b: u64, p: u64) -> u64 {
+fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
     match op {
         FieldOp::Add => {
             if a < p && b < p {
@@ -287,7 +287,7 @@ impl Engine<'_> {
         if self.report.counters.field_work() >= self.report.limits.field_work {
             return Err(RootStop::WorkLimit);
         }
-        let value = field_value(op.clone(), a, b, self.report.p);
+        let value = field_value(&op, a, b, self.report.p);
         self.event(RootEvent::Field { op, a, b, value })?;
         Ok(value)
     }
@@ -977,11 +977,11 @@ mod tests {
                         FieldOp::Mul | FieldOp::Square =>
                             ((a as u128 * b as u128) % p as u128) as u64,
                     };
-                    assert_eq!(field_value(op.clone(), a, b, p), reference,
+                    assert_eq!(field_value(&op, a, b, p), reference,
                                "p={p} a={a} b={b} op={op:?}");
                     if a < p - 2 && b < p - 2 {
                         assert_eq!(
-                            field_value(op, a + p, b, p),
+                            field_value(&op, a + p, b, p),
                             match op {
                                 FieldOp::Add => ((a as u128 + p as u128 + b as u128) % p as u128) as u64,
                                 FieldOp::Sub => ((a as u128 + p as u128 + p as u128 - b as u128) % p as u128) as u64,
@@ -1000,7 +1000,7 @@ mod tests {
     fn bench_round22_trace_field_arithmetic() {
         use std::hint::black_box;
         use std::time::Instant;
-        fn old(op: FieldOp, a: u64, b: u64, p: u64) -> u64 {
+        fn old(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
             match op {
                 FieldOp::Add => ((a as u128 + b as u128) % p as u128) as u64,
                 FieldOp::Sub => ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
@@ -1008,16 +1008,16 @@ mod tests {
                     ((a as u128 * b as u128) % p as u128) as u64,
             }
         }
-        fn sample(xs: &[(u64,u64)], op: FieldOp, p: u64, fast: bool) -> f64 {
+        fn sample(xs: &[(u64,u64)], op: &FieldOp, p: u64, fast: bool) -> f64 {
             let start = Instant::now();
             let mut checksum = 0u64;
             for _ in 0..32 {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(op.clone(), a, b, p)
+                        field_value(&op, a, b, p)
                     } else {
-                        old(op.clone(), a, b, p)
+                        old(op, a, b, p)
                     };
                 }
             }
@@ -1038,11 +1038,11 @@ mod tests {
                 let (mut before, mut after) = (Vec::new(), Vec::new());
                 for i in 0..13 {
                     if i % 2 == 0 {
-                        before.push(sample(&xs, op.clone(), p, false));
-                        after.push(sample(&xs, op.clone(), p, true));
+                        before.push(sample(&xs, &op, p, false));
+                        after.push(sample(&xs, &op, p, true));
                     } else {
-                        after.push(sample(&xs, op.clone(), p, true));
-                        before.push(sample(&xs, op.clone(), p, false));
+                        after.push(sample(&xs, &op, p, true));
+                        before.push(sample(&xs, &op, p, false));
                     }
                 }
                 before.sort_by(f64::total_cmp);
@@ -1052,7 +1052,6 @@ mod tests {
             }
         }
     }
-    use super::*;
     fn limits() -> RootLimits {
         RootLimits {
             field_work: MAX_WORK,
