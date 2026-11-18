@@ -521,3 +521,12 @@ scores 792/1,498 with no exact rule, but 3,726/4,096 shuffled family maxima are
 at least as large (p=0.90969). Thus escaping the x-only obstruction is
 necessary but not sufficient. A more structured nonsymmetric lead must change
 the divisor, not merely the coordinate sign. [pcc:unverified]
+
+The frozen [Miller-divisor follow-up](MILLER_KUMMER_PARITY_EXPERIMENT.md)
+tests 184 products of quadratic characters of tangent-line/vertical-line
+doubling quotients.  Its selected three-anchor rule scores 788/1,480 with no
+exact rule, while 2,828/4,096 shuffled family maxima are at least as large
+(`p=0.690505`).  The group-law divisor structure therefore does not rescue
+this bounded parity family.  The next lead changes from anchor translates to
+fixed small division-polynomial characters evaluated at the target.
+[pcc:unverified]
