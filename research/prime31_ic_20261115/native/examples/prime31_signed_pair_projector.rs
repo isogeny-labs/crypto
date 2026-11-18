@@ -86,14 +86,21 @@
          let y2 = fp.mul(y,y);
          let d = fp.mul(4,y2);
          let x2 = fp.mul(x,x);
-         let tangent = fp.add(fp.mul(3,x2), PRIME31.a);
-         let n = fp.sub(fp.mul(tangent,tangent), fp.mul(fp.mul(2,x),d));
+         let three_x2 = fp.mul(3,x2);
+         let tangent = fp.add(three_x2, PRIME31.a);
+         let square = fp.mul(tangent,tangent);
+         let two_x = fp.mul(2,x);
+         let correction = fp.mul(two_x,d);
+         let n = fp.sub(square,correction);
          (n,d)
      } else {
          let dx = fp.sub(u,x);
          let d = fp.mul(dx,dx);
          let sumy = fp.add(v,y);
-         let n = fp.sub(fp.mul(sumy,sumy),fp.mul(fp.add(u,x),d));
+         let square = fp.mul(sumy,sumy);
+         let coefficient = fp.add(u,x);
+         let correction = fp.mul(coefficient,d);
+         let n = fp.sub(square,correction);
          (n,d)
      };
      homogeneous(h,n,d,fp)
@@ -101,7 +108,8 @@
 
  fn witness_from_difference(q: Point, i: usize, base: &[(u64,u64)], ar: &mut Arithmetic) -> Option<Witness> {
      let point = Some(base[i]);
-     let diff = ar.add(PRIME31, q, ar.neg(PRIME31, point));
+     let minus_point = ar.neg(PRIME31, point);
+     let diff = ar.add(PRIME31, q, minus_point);
      for (j,&candidate) in base.iter().enumerate() {
          if diff == Some(candidate) { return Some(Witness{i,j,sign:1}); }
          if diff == ar.neg(PRIME31,Some(candidate)) {
@@ -130,7 +138,8 @@
  fn group_control(q: Point, base: &[(u64,u64)], ar: &mut Arithmetic) -> Option<Witness> {
      if q.is_none() { return Some(Witness{i:0,j:0,sign:-1}); }
      for i in 0..base.len() {
-         if let Some(d) = ar.add(PRIME31,q,ar.neg(PRIME31,Some(base[i]))) {
+         let minus_point = ar.neg(PRIME31,Some(base[i]));
+         if let Some(d) = ar.add(PRIME31,q,minus_point) {
              if let Some(j) = base.iter().position(|pt| pt.0 == d.0) {
                  if d == base[j] { return Some(Witness{i,j,sign:1}); }
                  if d == ar.neg(PRIME31,Some(base[j])) {
@@ -155,7 +164,8 @@
      for i in 0..k {
          for j in 0..k {
              qs.push(ar.add(PRIME31,Some(base[i]),Some(base[j])));
-             qs.push(ar.add(PRIME31,Some(base[i]),ar.neg(PRIME31,Some(base[j]))));
+             let minus_j = ar.neg(PRIME31,Some(base[j]));
+             qs.push(ar.add(PRIME31,Some(base[i]),minus_j));
          }
      }
      qs.push(None);
@@ -218,7 +228,8 @@
              if let Some(qp)=q {
                  for (i,&p) in base.iter().enumerate() {
                      let algebraic = screen_one(qp,p,&h,&mut FieldCounts::default());
-                     let diff = checker.add(PRIME31,q,checker.neg(PRIME31,Some(p)));
+                     let minus_point = checker.neg(PRIME31,Some(p));
+                     let diff = checker.add(PRIME31,q,minus_point);
                      let direct = diff.is_some_and(|d|base.iter().any(|r|r.0==d.0));
                      assert_eq!(algebraic,direct,"pointwise x-projection mismatch at B={b}, i={i}, Q={q:?}");
                  }
@@ -265,7 +276,11 @@
          let q=(x,(P-y)%P);
          let dx=0u64;
          let d=fp.mul(dx,dx);
-         let n=fp.sub(fp.mul(fp.add(q.1,y),fp.add(q.1,y)), fp.mul(fp.add(x,x),d));
+         let y_sum=fp.add(q.1,y);
+         let square=fp.mul(y_sum,y_sum);
+         let x_sum=fp.add(x,x);
+         let correction=fp.mul(x_sum,d);
+         let n=fp.sub(square,correction);
          assert_eq!((n,d),(0,0));
          // Unguarded homogeneous evaluation is zero, regardless of support.
          let mut raw=FieldCounts::default();
@@ -273,7 +288,9 @@
          let mut v=*h.last().unwrap();
          for &c in h[..h.len()-1].iter().rev() {
              power_d=raw.mul(power_d,d);
-             v=raw.add(raw.mul(v,n),raw.mul(c,power_d));
+             let up=raw.mul(v,n);
+             let term=raw.mul(c,power_d);
+             v=raw.add(up,term);
          }
          assert_eq!(v,0);
          assert!(!screen_one(q,base[0],&h,&mut fp));
