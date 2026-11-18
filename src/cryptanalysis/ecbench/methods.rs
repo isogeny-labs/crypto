@@ -887,6 +887,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: &[],
         },
         MethodDecl {
+            id: "bsgs.prime_mont4_v1",
+            family: "bsgs",
+            summary: "four-limb prime curves with u64-order subgroup: textbook BSGS with exact full-point B-tree keys; field/group operations counted, tree allocation/comparisons unpriced",
+            entry: "ecbench::prime_mont4::bsgs",
+            applies: Applies::Any,
+            params: &[],
+        },
+        MethodDecl {
             id: "bsgs.interleaved",
             family: "bsgs",
             summary: "Pollard's interleaved baby and giant steps, two tables; mean (4/3)√r",
@@ -3437,6 +3445,16 @@ fn parse_hex(s: &str) -> Result<u64, String> {
 /// non-prime instance. An arm that cannot run is a spec error, not a session of `error`
 /// records that `compare` then reports as incomplete.
 pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
+    if matches!(inst, Instance::PrimeMont4(_)) {
+        return if matches!(m.id.as_str(), "rho.negation" | "bsgs.prime_mont4_v1") {
+            Ok(())
+        } else {
+            Err(format!("{} has no prime_mont4 adapter; supported methods are rho.negation and bsgs.prime_mont4_v1", m.id))
+        };
+    }
+    if m.id == "bsgs.prime_mont4_v1" {
+        return Err("bsgs.prime_mont4_v1 requires prime_mont4_explicit".into());
+    }
     if matches!(inst, Instance::Curve25519(_)) {
         if m.id == "rho.curve25519_bounded" {
             curve25519_cap(m)?;
@@ -3959,6 +3977,9 @@ pub fn solve_measured(
     seed: u64,
     oracle: Option<&dyn StaticDhOracle>,
 ) -> Result<SolveReport, String> {
+    if matches!(inst, Instance::PrimeMont4(_)) || m.id == "bsgs.prime_mont4_v1" {
+        applicable(m, inst, curve)?;
+    }
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
     three_leads_applicable(m, inst, curve)?;
@@ -3998,7 +4019,18 @@ pub fn solve_measured(
     // The phase clock: the methods open and close the online window, the
     // session turns it into exclusive phase times.
     let session = measurement::Session::begin().ok();
-    let mut rep = if let Instance::Curve25519(wi) = inst {
+    let mut rep = if let Instance::PrimeMont4(wi) = inst {
+        let target = wi.decode(target)?;
+        if m.id == "rho.negation" {
+            solve_generic(m, wi.as_ref(), wi.generator, target, wi.r, seed)?
+        } else {
+            let start = Instant::now();
+            measurement::begin_online(Phase::RhoSolve);
+            let outcome = super::prime_mont4::bsgs(wi, target);
+            let field_ops = field_ops_of(wi.as_ref(), &[outcome.setup, outcome.search]);
+            generic_report(outcome, start.elapsed().as_nanos() as u64, 1, field_ops)
+        }
+    } else if let Instance::Curve25519(wi) = inst {
         match m.id.as_str() {
             "ic.curve25519_pair_v1" => solve_curve25519_pair(m, wi, curve, target, seed)?,
             "rho.curve25519_bounded" => solve_curve25519_bounded(m, wi, target, seed)?,
@@ -4681,6 +4713,7 @@ fn solve_inner(
             solve_generic(m, &i.curve, i.generator, target, one_word(i.r)?, seed)
         }
         (Instance::Curve25519(_), _)
+        | (Instance::PrimeMont4(_), _)
         | (Instance::Wide(_), _)
         | (Instance::Big(_), _)
         | (Instance::Fp4(_), _)
@@ -9123,6 +9156,9 @@ pub fn dump_factor_base(
     if let Instance::Curve25519(_) = &inst {
         return Err("no full-width Curve25519 factor-base plug-in is registered".into());
     }
+    if let Instance::PrimeMont4(_) = &inst {
+        return Err("no prime_mont4 factor-base or index-calculus adapter is registered".into());
+    }
     if let Instance::Wide(_) | Instance::Big(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
     }
@@ -9265,6 +9301,7 @@ pub fn dump_factor_base(
             })
         }
         Instance::Curve25519(_)
+        | Instance::PrimeMont4(_)
         | Instance::Wide(_)
         | Instance::Big(_)
         | Instance::Fp4(_)
@@ -9283,6 +9320,68 @@ pub fn dump_factor_base(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn prime_mont4_dispatch_and_refusals() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+        let spec = CurveSpec::PrimeMont4Explicit {
+            p: "223".into(),
+            a: "74".into(),
+            b: "122".into(),
+            group_order: "205".into(),
+            r: 41,
+            gx: "119".into(),
+            gy: "198".into(),
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        for id in ["rho.negation", "bsgs.prime_mont4_v1"] {
+            let method = resolve(&MethodSpec {
+                id: id.into(),
+                params: BTreeMap::new(),
+            })
+            .unwrap();
+            applicable(&method, &inst, &facts).unwrap();
+            for index in 0..8 {
+                let workload =
+                    Workload::on(&spec, &inst, 20261118, index, TargetKind::PlantedShared).unwrap();
+                let first = solve(&method, &inst, &facts, &workload.target, 17).unwrap();
+                let replay = solve(&method, &inst, &facts, &workload.target, 17).unwrap();
+                assert_eq!(first.recovered, workload.planted);
+                assert_eq!(first.recovered, replay.recovered);
+                assert_eq!(first.counters, replay.counters);
+                assert_eq!(first.total_gae, replay.total_gae);
+                assert!(first.field_ops.is_some());
+            }
+        }
+        let method = resolve(&MethodSpec {
+            id: "bsgs.textbook".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert!(applicable(&method, &inst, &facts)
+            .unwrap_err()
+            .contains("no prime_mont4 adapter"));
+        assert!(dump_factor_base(&spec, "prime-abscissa:size=8")
+            .unwrap_err()
+            .contains("no prime_mont4"));
+        let narrow = CurveSpec::PrimeExplicit {
+            p: 223,
+            a: 74,
+            b: 122,
+            group_order: 205,
+            r: 41,
+            gx: 119,
+            gy: 198,
+        };
+        let narrow_inst = narrow.build().unwrap();
+        let exact = resolve(&MethodSpec {
+            id: "bsgs.prime_mont4_v1".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert!(applicable(&exact, &narrow_inst, &narrow_inst.facts(&narrow)).is_err());
+    }
 
     #[test]
     fn solve_report_preserves_full_width_recovery_and_legacy_encoding() {

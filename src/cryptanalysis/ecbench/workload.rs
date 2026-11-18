@@ -105,6 +105,19 @@ pub enum CurveSpec {
         gx: u64,
         gy: u64,
     },
+    /// Exact four-limb prime-field inputs for u64-order generic methods.
+    /// Field primality and the supplied group order need external certificates;
+    /// construction checks canonical coordinates, nonsingularity, Hasse
+    /// eligibility and the prime-order generator. Decimal strings are exact.
+    PrimeMont4Explicit {
+        p: String,
+        a: String,
+        b: String,
+        group_order: String,
+        r: u64,
+        gx: String,
+        gy: String,
+    },
     /// An EFD model/chart: the engine builds the short-Weierstrass curve
     /// through the EFD bridge and decodes the generator in `chart`.
     Efd {
@@ -317,7 +330,21 @@ impl CurveSpec {
     }
     /// Build the instance, or say why it cannot be built.
     pub fn build(&self) -> Result<Instance, String> {
+        if let Self::PrimeMont4Explicit {
+            p,
+            a,
+            b,
+            group_order,
+            r,
+            gx,
+            gy,
+        } = self
+        {
+            return super::prime_mont4::PrimeMont4::build([p, a, b, group_order, gx, gy], *r)
+                .map(|curve| Instance::PrimeMont4(Box::new(curve)));
+        }
         match *self {
+            Self::PrimeMont4Explicit { .. } => unreachable!("handled above"),
             CurveSpec::Curve25519 => {
                 let curve = Curve25519Wide::new();
                 let mut scratch = GroupOps::default();
@@ -706,6 +733,23 @@ impl CurveSpec {
     /// measured child rebuilds instead of repeating a search.
     pub fn explicit(inst: &Instance) -> Option<CurveSpec> {
         match inst {
+            Instance::PrimeMont4(curve) => {
+                let generator = curve.encode(curve.generator)?;
+                let decode = |s: &str| {
+                    num_bigint::BigUint::parse_bytes(s[2..].as_bytes(), 16)
+                        .unwrap()
+                        .to_string()
+                };
+                Some(Self::PrimeMont4Explicit {
+                    p: curve.p.to_string(),
+                    a: curve.a.to_string(),
+                    b: curve.b.to_string(),
+                    group_order: curve.group_order.to_string(),
+                    r: curve.r,
+                    gx: decode(&generator[0]),
+                    gy: decode(&generator[1]),
+                })
+            }
             Instance::Curve25519(_) => Some(CurveSpec::Curve25519),
             Instance::Prime(i) => Some(CurveSpec::PrimeExplicit {
                 p: i.curve.p,
@@ -834,6 +878,9 @@ impl CurveSpec {
             | CurveSpec::PrimePublicFixture { p, a, b, .. } => {
                 format!("PrimeCurve {{ p: {p}, a: {a}, b: {b} }} (explicit)")
             }
+            Self::PrimeMont4Explicit { ref p, ref a, ref b, .. } => {
+                format!("PrimeMont4 {{ p: {p}, a: {a}, b: {b} }} (explicit)")
+            }
             CurveSpec::BinaryExplicit {
                 n, modulus, a, b, ..
             } => format!("binary_explicit_instance({n}, 0x{modulus:x}, 0x{a:x}, 0x{b:x}, ...)"),
@@ -902,6 +949,7 @@ impl CurveSpec {
 
 /// A built curve instance.
 pub enum Instance {
+    PrimeMont4(Box<super::prime_mont4::PrimeMont4>),
     Curve25519(Box<Curve25519Wide>),
     ThreeLeads(Box<crate::cryptanalysis::three_leads::StudyInstance>),
     Prime(PrimeInstance),
@@ -1262,6 +1310,7 @@ impl Instance {
             }
             Instance::ThreeLeads(i) => u128::from(i.r),
             Instance::Prime(i) => u128::from(i.r),
+            Instance::PrimeMont4(i) => u128::from(i.r),
             Instance::Binary(i) => u128::from(i.r),
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
@@ -1277,6 +1326,39 @@ impl Instance {
     }
 
     pub fn facts(&self, spec: &CurveSpec) -> CurveFacts {
+        if let Instance::PrimeMont4(curve) = self {
+            let generator = curve
+                .encode(curve.generator)
+                .expect("finite checked generator");
+            let decode = |s: &str| num_bigint::BigUint::parse_bytes(s[2..].as_bytes(), 16).unwrap();
+            let entry = registry_entry(&curve.id.slug);
+            let rep = entry.as_ref().and_then(|entry| {
+                matching_representation(
+                    entry,
+                    &curve.r.into(),
+                    &decode(&generator[0]),
+                    &decode(&generator[1]),
+                )
+            });
+            return CurveFacts {
+                slug: curve.id.slug.clone(),
+                icv1: curve.id.icv1.clone(),
+                family: "prime".into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(curve.p.bits() as u32),
+                group_order: ExactScalar::from_biguint(&curve.group_order)
+                    .expect("Hasse order fits 256 bits"),
+                r: curve.r.into(),
+                cofactor: ExactScalar::from_biguint(&(&curve.group_order / curve.r))
+                    .expect("cofactor fits"),
+                generator,
+                automorphisms_available: 2,
+                registered: entry.is_some(),
+                ec1: rep.as_ref().map(|p| p.0.clone()),
+                curve_uid: rep.map(|p| p.1),
+            };
+        }
         if let Instance::Curve25519(curve) = self {
             let order = &curve.r * curve.cofactor;
             let id = crate::cryptanalysis::curve_id::prime(
@@ -1557,6 +1639,7 @@ impl Instance {
             | Instance::Hec(_)
             | Instance::Hyper(_)
             | Instance::Curve25519(_)
+            | Instance::PrimeMont4(_)
             | Instance::Big(_) => {
                 unreachable!("returned above")
             }
@@ -1677,6 +1760,10 @@ impl Instance {
     /// double-and-add on a ledger nobody reads.  Used to build the
     /// target and, separately, to verify an answer.
     pub fn mul_generator_hex(&self, k: u128) -> Option<[String; 2]> {
+        if let Instance::PrimeMont4(curve) = self {
+            let k = (k % u128::from(curve.r)) as u64;
+            return curve.encode(curve.mul(&mut GroupOps::default(), curve.generator, k));
+        }
         if let Instance::Curve25519(curve) = self {
             return super::curve25519_workload::mul_generator(curve, k.into());
         }
@@ -1763,6 +1850,7 @@ impl Instance {
             }
             Instance::Wide(_)
             | Instance::Curve25519(_)
+            | Instance::PrimeMont4(_)
             | Instance::Big(_)
             | Instance::Fp4(_)
             | Instance::ThreeLeads(_)
@@ -1821,6 +1909,9 @@ impl Instance {
         {
             // Planted targets only on E(F_{p^4}), the tower, the three-leads
             // study and the hyperelliptic Jacobians: no public-target law yet.
+            return None;
+        }
+        if matches!(self, Instance::PrimeMont4(_)) {
             return None;
         }
         if let Instance::Big(i) = self {
@@ -1903,6 +1994,7 @@ impl Instance {
                 }
                 Instance::Wide(_)
                 | Instance::Curve25519(_)
+                | Instance::PrimeMont4(_)
                 | Instance::Big(_)
                 | Instance::Fp4(_)
                 | Instance::ThreeLeads(_)
@@ -2216,6 +2308,9 @@ impl Workload {
         index: u64,
         kind: TargetKind,
     ) -> Result<Workload, String> {
+        if matches!(inst, Instance::PrimeMont4(_)) && kind == TargetKind::Public {
+            return Err("prime_mont4 currently supports planted and planted_shared targets; no public-target law is implemented".into());
+        }
         let curve = inst.facts(spec);
         if curve.r < ExactScalar::from(5u64) {
             return Err(format!(
@@ -2402,6 +2497,58 @@ impl Workload {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn prime_mont4_exact_workloads_and_method_guards() {
+        use super::*;
+        let cases: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../research/prime_conductor_gap80_20261031/wide-harness-20261118/source-vectors.json"
+        )).unwrap();
+        for case in cases.as_array().unwrap() {
+            let text = |name: &str| case[name].as_str().unwrap().to_string();
+            let spec = CurveSpec::PrimeMont4Explicit {
+                p: text("p"),
+                a: text("a"),
+                b: text("b"),
+                group_order: text("group_order"),
+                r: text("r").parse().unwrap(),
+                gx: case["generator"][0].as_str().unwrap().into(),
+                gy: case["generator"][1].as_str().unwrap().into(),
+            };
+            let inst = spec.build().unwrap();
+            assert_eq!(CurveSpec::explicit(&inst), Some(spec.clone()));
+            let facts = inst.facts(&spec);
+            assert_eq!(
+                facts.group_order.to_biguint().to_string(),
+                text("group_order")
+            );
+            for (index, row) in case["targets"].as_array().unwrap().iter().enumerate() {
+                let workload = Workload::on(
+                    &spec,
+                    &inst,
+                    20261118,
+                    index as u64,
+                    TargetKind::PlantedShared,
+                )
+                .unwrap();
+                assert_eq!(workload.target_law, SHARED_TARGET_LAW);
+                assert_eq!(
+                    workload.planted.unwrap().to_biguint().to_string(),
+                    row["scalar"].as_str().unwrap()
+                );
+                for (value, expected) in
+                    workload.target.iter().zip(row["point"].as_array().unwrap())
+                {
+                    assert_eq!(
+                        num_bigint::BigUint::parse_bytes(&value.as_bytes()[2..], 16)
+                            .unwrap()
+                            .to_string(),
+                        expected.as_str().unwrap()
+                    );
+                }
+            }
+            assert!(Workload::on(&spec, &inst, 20261118, 0, TargetKind::Public).is_err());
+        }
+    }
     use super::*;
 
     #[test]
