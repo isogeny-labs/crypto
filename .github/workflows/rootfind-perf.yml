@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and verify shared rootfinder headers
         run: |
-          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep bench-chain256 bench-mulneg64
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep bench-chain256 bench-mulneg64 bench-thread-map
 
       - name: Record before and after perf counters when accessible
         shell: bash
@@ -135,6 +135,11 @@ jobs:
           for arm in mul-before mul-after neg-before neg-after; do
             perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/mulneg64-${arm}.txt" \
               -- taskset -c "$cpu" gpu/rootfind/bench_mulneg64 "--perf-$arm"
+          done
+          # Guarded host 32-bit thread mapping and unchanged 64-bit fallback.
+          for arm in map32-before map32-after map64-before map64-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/map-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_thread_map "--perf-$arm"
           done
           echo "Hardware PMU measurements saved as the rootfind-perf artifact." >> "$GITHUB_STEP_SUMMARY"
 
