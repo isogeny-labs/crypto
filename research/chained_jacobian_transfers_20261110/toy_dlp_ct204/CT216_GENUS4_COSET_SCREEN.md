@@ -6,7 +6,7 @@
 
 CT215's measured generic genus-2 transferred BSGS was 61.73× slower than direct elliptic BSGS over F31. The next unblocked question is whether the already implemented **genus-4 Jacobian index-calculus** instrumentation can be applied to an elliptic pullback without accidentally counting zero relations.
 
-This is **not a new cubic cover**. The existing [cubic norm and closed-point report](../CUBIC_NORM_20261111.md) and [130-witness independent Rust replay](../../../..//examples/chained_cubic_norm_reference.rs) already use the exact F101 genus-4/genus-13 model; [P-256 genus covers](../../../p256_genus_dlp_20261115/REPORT.md) already give the analogous P-256 genus-4 construction. The [genus ladder implementation](../../../..//src/cryptanalysis/genus_ladder.rs) supplies full-base/double-large-prime IC and matched rho on random *ambient* near-prime Jacobians. Its `run_ic_ext` explicitly filters `cur.deg as usize != g` before attempting smoothness. These are different problem populations; a positive control on one does not imply success on the other. The shared research-KB MCP/wrapper was unavailable in this connector runtime; the cited primary repository sources were read. No novelty is claimed for these geometric facts.
+This is **not a new cubic cover**. The existing [cubic norm and closed-point report](../CUBIC_NORM_20261111.md) and [130-witness independent Rust replay](../../../examples/chained_cubic_norm_reference.rs) already use the exact F101 genus-4/genus-13 model; [P-256 genus covers](../../p256_genus_dlp_20261115/REPORT.md) already give the analogous P-256 genus-4 construction. The [genus ladder implementation](../../../src/cryptanalysis/genus_ladder.rs) supplies full-base/double-large-prime IC and matched rho on random *ambient* near-prime Jacobians. Its `run_ic_ext` explicitly filters `cur.deg as usize != g` before attempting smoothness. These are different problem populations; a positive control on one does not imply success on the other. The shared research-KB MCP/wrapper was unavailable in this connector runtime; the cited primary repository sources were read. No novelty is claimed for these geometric facts.
 
 Use
 
@@ -49,7 +49,7 @@ sha256sum /tmp/ct216-screen.json
 # 5e2a5a2c3e70bba201b16d4526d2f0f5b5f8e003e0c2ed3a2a294a3aee9e2939
 ```
 
-The bounded [CT205 workflow](../../../../.github/workflows/ct205-toy-transfer.yml) now independently repeats these commands on a GitHub-hosted `independent-field-oracle` job, alongside the existing F31 oracle. The **new exact-head remote CI result was not observed at document creation**. The Python implementation is an independent arithmetic check of the earlier Rust geometry, but it is *producer-written*, not a separately signed PCC or independent full-solve implementation.
+The bounded [CT205 workflow](../../../.github/workflows/ct205-toy-transfer.yml) now independently repeats these commands on a GitHub-hosted `independent-field-oracle` job, alongside the existing F31 oracle. The **new exact-head remote CI result was not observed at document creation**. The Python implementation is an independent arithmetic check of the earlier Rust geometry, but it is *producer-written*, not a separately signed PCC or independent full-solve implementation.
 
 ## Next implementation gate: offset relation math before another benchmark
 
