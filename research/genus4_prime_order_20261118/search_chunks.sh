@@ -5,7 +5,7 @@ cd "$(git rev-parse --show-toplevel)"
 d=research/genus4_prime_order_20261118
 B=/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/bin/genus_ladder.po
 P=$1; LO=$2; HI=$3; RES=$4
-seeds=$(python3 -c "print(' '.join(str(x) for x in range($LO, $HI + 1) if '$RES' == 'all' or x % 4 == int('$RES'))")
+seeds=$(python3 -c "print(' '.join(str(x) for x in range($LO, $HI + 1) if '$RES' == 'all' or x % 4 == int('$RES')))")
 read -ra S <<< "$seeds"
 for w in 0 1 2 3; do
   (
