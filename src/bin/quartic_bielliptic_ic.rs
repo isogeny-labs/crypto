@@ -523,6 +523,15 @@ fn run_prime(a: &Args, i: usize, p_req: u64, stage: u8, t_all: Instant) -> Resul
         }
     }
     controls.insert("dense_cross_check".into(), json!(dense));
+    // Amendment 2, B4: the counted and the independent check must agree.
+    for r_ in q_runs.iter().chain(&d_runs) {
+        if r_.failure.as_deref() == Some("check_mismatch") {
+            return Err(Stop(format!(
+                "p={p} {} seed {}: counted and independent [t]G == T checks disagree",
+                r_.arm, r_.seed
+            )));
+        }
+    }
     let mut bsgs = vec![];
     for r_ in q_runs.iter().chain(&d_runs) {
         if r_.seed != ic_seed(ArmKind::Q, 0, 0) && r_.seed != ic_seed(ArmKind::D, 0, 0) {

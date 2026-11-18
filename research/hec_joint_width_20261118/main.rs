@@ -1,0 +1,172 @@
+use hec_native_ic::{
+    counted,
+    instance::pick_instance,
+    jac::{Curve, Div},
+    rng::Rng,
+};
+use std::{hint::black_box, time::Instant};
+const L: u64 = 239753;
+#[path = "../hec_carried_pencil_20261118/buckets.rs"]
+mod buckets;
+#[path = "../hec_carried_pencil_20261118/carried.rs"]
+mod carried;
+
+#[path = "../hec_single_place_substitution_20261118/dag.rs"]
+mod dag;
+#[path = "solver.rs"]
+mod delayed;
+#[path = "../hec_lifted_checks_20261118/powers.rs"]
+mod powers;
+#[path = "../hec_lifted_checks_20261118/lift.rs"]
+mod lift;
+#[path = "../hec_residual_span_20261116/native-lazy-finisher/finish.rs"]
+mod finish;
+#[path = "../hec_residual_span_20261116/native-pencil-images/images.rs"]
+mod images;
+#[path = "../hec_residual_span_20261116/native-lazy-finisher/linear.rs"]
+mod linear;
+#[path = "../hec_residual_span_20261116/native-lazy-finisher/pencil.rs"]
+mod pencil;
+#[path = "../hec_place_pencil_20261118/place.rs"]
+mod place;
+#[path = "../hec_residual_span_20261116/native-prepared-solvers/prepared.rs"]
+mod prepared;
+#[path = "../hec_residual_span_20261116/native-lazy-finisher/public.rs"]
+mod public;
+#[path = "../hec_slope_recurrence_20261118/slopes.rs"]
+mod slopes;
+#[path = "../hec_residual_span_20261116/native-lazy-finisher/small.rs"]
+mod small;
+#[path = "../hec_carried_pencil_20261118/solver.rs"]
+mod solver;
+#[path = "../hec_residual_span_20261116/native-prepared-solvers/table_oracle.rs"]
+mod table_oracle;
+#[path = "../hec_residual_span_20261116/native-prepared-solvers/tail.rs"]
+mod tail;
+#[path = "../hec_residual_span_20261116/native-deferred-membership/validate.rs"]
+mod validate;
+#[path = "../hec_wide_sieve_20261118/wide.rs"]
+mod wide;
+fn main() {
+    let fixtures = include_str!("../hec_residual_span_20261116/native-pencil-3lp/INSTANCES.tsv");
+    for line in fixtures.lines().skip(1) {
+        let cols: Vec<_> = line.split('\t').collect();
+        let g = cols[0].parse::<usize>().unwrap();
+        let p = cols[1].parse::<u64>().unwrap();
+        let ell = cols[3].parse().unwrap();
+        counted::disable();
+        let inst = pick_instance(p, g).unwrap();
+        assert_eq!((inst.c, inst.ell), (cols[2].parse().unwrap(), ell));
+        let c = &inst.curve;
+        let mut rng = Rng::new(2026120409 ^ p ^ ((g as u64) << 32));
+        for case in 0..4 {
+            let d = c.mul(&inst.d1, 1 + rng.below(ell - 1));
+            let truth = 1 + rng.below(ell - 1);
+            let target = c.mul(&d, truth);
+            let seed = 2026112200 ^ p ^ ((g as u64) << 32) ^ case as u64;
+            let run = |arm: usize, audit: bool| {
+                let powers = if arm >= 1 {
+                    let table = powers::Powers::checked(c,&d,&target,ell,3,audit).unwrap();
+                    if audit {
+                        assert_eq!(lift::add(c,&d,&c.neg(&d)),c.zero());
+                        assert_eq!(lift::double(c,&c.zero()),c.zero());
+                        assert_eq!(lift::add(c,&d,&d),c.add(&d,&d));
+                        assert!(validate::eligible(c,&d,&target,ell));
+                        assert!(powers::Powers::checked(c,&c.zero(),&target,ell,3,audit).is_none());
+                        assert!(powers::Powers::checked(c,&d,&target,ell*2,3,audit).is_none());
+                        assert!(powers::Powers::checked(c,&d,&target,3,3,audit).is_none());
+                        for n in [0,1,ell/2,ell-1,truth,(truth+1)%ell] {
+                            assert_eq!(table.product(c,n,true),c.mul(&d,n));
+                        }
+                        assert_ne!(table.product(c,(truth+1)%ell,true),target);
+                    }
+                    Some(table)
+                } else {
+                    assert!(validate::eligible(c,&d,&target,ell));
+                    None
+                };
+
+                let prep = prepared::prepare(c, audit);
+                if arm == 0 {
+                    let r = pencil::solve(
+                        c,
+                        &d,
+                        &target,
+                        ell,
+                        512,
+                        audit,
+                        &prep,
+                        pencil::Options {
+                            normalize: true,
+                            finish: false,
+                            seed,
+                        },
+                    );
+                    (r.k, r.anchors, 0, r.accepted, 0, 0, 0)
+                } else {
+                    let r = delayed::solve(
+                        c,
+                        &d,
+                        &target,
+                        ell,
+                        512,
+                        audit,
+                        &prep,
+                        powers.as_ref(), true,
+                        delayed::Options {
+                            normalize: true,
+                            finish: false,
+                            seed,
+                            certificate: false,
+                            rolling: true,
+                            carry: true,
+                            indexed: true,
+                            mode: if g == 3 { 1 } else { 3 },
+                            eager: false,
+                            scale: arm,
+                            substitute: true,
+                            fused: true,
+                        },
+                    );
+                    (r.k, r.anchors, r.small, r.accepted,r.unready,r.pivots,r.direct)
+                }
+            };
+            let audited: Vec<_> = (0..5).map(|arm| run(arm, true)).collect();
+
+
+            for arm in 0..5 {
+                counted::reset();
+                let result = run(arm, false);
+                let counters = counted::snapshot();
+                counted::disable();
+                assert_eq!(result, audited[arm]);
+                if let Some(k) = result.0 {
+                    assert_eq!(c.mul(&d, k), target);
+                    assert_eq!(k, truth);
+                }
+                let mut red = [0; 2];
+                for (m, v) in counters {
+                    let i = if m == p {
+                        0
+                    } else {
+                        assert_eq!(m, ell);
+                        1
+                    };
+                    red[i] = v[8];
+                    println!("COUNT g={g} p={p} case={case} arm={arm} modulus={m} vector={v:?}");
+                }
+                println!("CELL g={g} p={p} case={case} arm={arm} solved={} anchors={} small={} accepted={} unready={} joins={} direct={} base={} subgroup={}",result.0.is_some(),result.1,result.2,result.3,result.4,result.5,result.6,red[0],red[1]);
+            }
+            for rep in 0..10 {
+                for h in 0..5 {
+                    let arm = (h + rep + case) % 5;
+                    let start = Instant::now();
+                    let r = std::hint::black_box(run(arm, false));
+                    let ns = start.elapsed().as_nanos();
+                    assert_eq!(r, audited[arm]);
+                    println!("WALL g={g} p={p} case={case} rep={rep} arm={arm} ns={ns}");
+                }
+            }
+        }
+    }
+}

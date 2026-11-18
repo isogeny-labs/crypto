@@ -381,30 +381,10 @@ fn main() {
         .unwrap_or(0);
     for curve_idx in cs..cs + 2 {
         let (c, g, _n, lam) = find_j0_curve(bits, curve_idx);
-        // DP=<k> fixes the distinguished-point bits. DPRULE=ks picks them from the
-        // per-target work: 2^dp ~ sqrt(2 n T / 6) / (T * 2^DPDIV), so the walk to a
-        // DP stays a small fraction of what one more log costs. Default: the
-        // original formula, which grows with T.
-        let legacy = ((bits / 2).saturating_sub(10)
+        let dp_bits = ((bits / 2).saturating_sub(10)
             + (usize::BITS - 1 - t_count.max(1).leading_zeros()) / 2)
             .max(2);
-        let dp_bits: u32 = if let Some(k) = std::env::var("DP").ok().and_then(|v| v.parse().ok()) {
-            k
-        } else if std::env::var("DPRULE").map(|v| v == "ks").unwrap_or(false) {
-            let div: f64 = std::env::var("DPDIV")
-                .ok()
-                .and_then(|v| v.parse().ok())
-                .unwrap_or(3.0);
-            let w = (2.0 * (c.n as f64) / 6.0 * t_count as f64).sqrt();
-            ((w / t_count as f64).log2() - div).round().max(2.0) as u32
-        } else {
-            legacy
-        };
-        let inst0: u64 = std::env::var("INST0")
-            .ok()
-            .and_then(|v| v.parse().ok())
-            .unwrap_or(0);
-        for ins in inst0..inst0 + inst {
+        for ins in 0..inst {
             let mut rng = StdRng::seed_from_u64(0xC0DE ^ ins ^ c.n ^ t_count as u64);
             let ks: Vec<u64> = (0..t_count).map(|_| rng.gen_range(2..c.n)).collect();
             let qs: Vec<Pt> = ks.iter().map(|&k| c.mul(Some(g), k).unwrap()).collect();
