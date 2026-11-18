@@ -15,6 +15,9 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Paper runs: hky engine loads the paper's exact unit instances (gate vs recorded profiles), basis export, checkpoint/resume; second-engine depth-14 V6 on unit p65537 and p163841 (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
+- [ ] Paper runs: depth-15 V6 on unit p65537 (+ Rust degree lift for the exact value) and depth-16 on a new unit instance (prime with 2^17 | p-1) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
+- [ ] Rust port of the degree lift (LIFT.md), validated vs direct closures and the recorded k=14 lift records (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
 - [ ] Encoding-vs-intrinsic control: random factor base given a low-degree (tower-shaped / multilinear-bit) encoding, plus subgroup-perturbation dose-response, vs the structured tower (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
 - [ ] Binary Koblitz fall-degree ladder to d_F >= 5 (POD_PLAN P1/P2 + calibrated A/A) on RunPod (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
 - [ ] n=83 m=6 decomposition probe: expected-hit arithmetic first, E-model validation at small n, pod only if informative (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
