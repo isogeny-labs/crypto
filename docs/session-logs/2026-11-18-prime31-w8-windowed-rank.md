@@ -27,3 +27,27 @@
 
 - Assumption that all alternative windows have exactly 64,737 right sums was removed from Rust assertion before native checks; the count belongs to a measured original control, not a general theorem. Local Python pilot happened to find 64,737 each.
 - GitHub-hosted CI reported Rust E0499 in `ar.add(PRIME31,q,ar.scalar(...))`; fixed with a separate mutable call. Previous failure retained in run history; local Python pilot cannot replace native CI.
+
+## 2026-11-18T22:38Z — successful pinned native 1,024-target result
+
+### What was done (commands, files, features)
+
+- After the original Rust E0499 repair at `ffb5d899`, checked source-specific GitHub Actions [#44412897116](https://github.com/isogeny-labs/crypto/actions/runs/44412897116) and [#44412887094](https://github.com/isogeny-labs/crypto/actions/runs/44412887094): both **success**. Original 40/40 library tests, 2/2 focused Rust tests, actual 31/31 rank and 1,024/1,024 unknown public-log recoveries, and separately authored BigInt verifier PASS.
+- Downloaded raw artifact [#14478900939](https://github.com/isogeny-labs/crypto/actions/runs/44412897116/artifacts/14478900939), checked ZIP SHA256 `cd76ee0008805d1f53ce057aa7d225866d52f2dba9393ed2df9ed1869fb30db8`, parsed exact JSON: training 8+8+10+11=**37 natural** queries and 31 independent relations; 1,312 shifted target queries (288 misses) to solve 1024 targets, full count **44,516,323 EC additions** (560,630 setup, 1,036,373 training, 42,919,320 online).
+- Charged full original-Rust source-specific time: **14,098.140071 ms** including setup 182.507865ms, training/replay 326.206728ms, online 13,589.425478ms. Total field costs: **2,848,160,879 multiplications, 44,500,854 inversions**. All producer data are `[pcc:unverified]`; independent signed PCC not yet available.
+- Committed durable `W8_WINDOWED_B8_RANK_SUMMARY_20261118.json` and appended source-specific CI verdict and failure disclosure to scientific report.
+
+### Decisions made (and why)
+
+- Full 31-log / 1024-target Rust pipeline **works** using four small B8 windows and reuses the original 2^31-1 curve. Four-window architecture supports pursuing only degree≤16 per-slot resultants versus degree≤62 at B31.
+- This implementation uses explicit **generic 4+4 EC group-sum tables**. No non-generic public-only RR9 coefficient extractor was implemented or timed. The 14.10s cold batch is slower, not faster, than historical shared-BSGS 144.049ms result (different runner, so numerical comparison is indicative only). Do not call it a cheaper prime-field attack.
+- The raw full transcript is in GitHub Actions with 30-day retention (expires 2026-12-18), while frozen summary/protocol/source/validator persist in PR. Preserve raw artifact before expiry if institutional record demands it.
+
+### Open threads (unfinished, pick up next time)
+
+- Existing RR9 public-only algebraic lane #4692: substitute real B8 RR9/F4 unknown-coordinate selection with zero generic enumeration, independently grade unseen public positive/negative residuals, then feed unchanged four-window rank31 + 1024-log Rust pipeline and measure complete costs vs optimized mixed IC, shared BSGS and negation-map rho.
+- Signed PCC independent validation of current structural control remains open. Do not merge this draft PR until non-generic gate or permitted scope change.
+
+### Errors (what went wrong, how it was handled)
+
+- Initial source-bound Rust E0499 failed in run #44412198556; corrected in `ffb5d899` and verified in two succeeding source-bound complete workflows.
