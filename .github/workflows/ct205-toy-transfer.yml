@@ -93,7 +93,7 @@ jobs:
       - name: Compile and execute all toy logs plus paired fresh-state cost probe
         run: |
           set -euo pipefail
-          python3 -m unittest -v research.chained_jacobian_transfers_20261110.toy_dlp_ct204.test_ct214_cost_log_validator
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct214_cost_log_validator.py -v
           cargo test --locked --release --test prime_cover_toy_complete_dlp -- --nocapture
           cargo test --locked --release --test prime_cover_toy_cold_cost -- --nocapture 2>&1 | tee /tmp/ct214-native.log
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct214_cost_log_validator.py /tmp/ct214-native.log

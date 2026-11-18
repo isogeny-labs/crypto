@@ -15,7 +15,7 @@ The CT213 Rust integration test additionally emits 301 \`CT214_PAIR_JSON\` recor
 \`ct214_cost_log_validator.py\` rejects missing, duplicate, moved or reordered roster entries; wrong per-target additions, invalid timing, mismatched aggregate sums, medians or ratio; and fabricated memory or PCC standing. Seven stdlib adversarial controls provide a precompilation smoke gate. Reproduce with:
 
 \`\`\`sh
-python3 -m unittest -v research.chained_jacobian_transfers_20261110.toy_dlp_ct204.test_ct214_cost_log_validator
+python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct214_cost_log_validator.py -v
 cargo test --locked --release --test prime_cover_toy_cold_cost -- --nocapture 2>&1 | tee ct214-native.log
 python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct214_cost_log_validator.py ct214-native.log
 \`\`\`
