@@ -111,7 +111,6 @@ while read -r sha path; do
   if [[ $(git show "$sc:$path" 2>/dev/null | sha256sum | cut -d' ' -f1) == "$sha" ]]; then ok=$((ok+1)); else bad=$((bad+1)); badlist="$badlist $path"; fi
 done < $L/validation/deferred50-format-successor-source.sha256
 [[ $bad == 0 ]] && out MATCH run50-format-successor "at ${sc:0:12}" "$ok match (commit that published the successor manifest)" || out MISMATCH run50-format-successor "at ${sc:0:12}" "$ok match, $bad differ:$badlist"
-dd=$(git diff 11c9a0312f0b0a8ae85be325e72cbf9602d9d777 "$sc" -- src/cryptanalysis/jv_sieve_two_large_prime.rs | grep -E '^[-+][^-+]' | tr -d ' \n' | sed 's/^[-+]//')
 out NOTE run50-format-successor jv_sieve_two_large_prime.rs "11c9a031 -> ${sc:0:10} changes only the deferred-pair pub-use line layout: $(git diff 11c9a0312f0b0a8ae85be325e72cbf9602d9d777 "$sc" -- src/cryptanalysis/jv_sieve_two_large_prime.rs | grep -cE '^[-+][^-+]') changed lines"
 # what differs between the measured and successor manifests
 out NOTE run50-format-successor diff "$(diff <(sort -k2 $L/validation/deferred50-source.sha256) <(sort -k2 $L/validation/deferred50-format-successor-source.sha256) | grep -c '^[<>]') manifest lines differ: $(diff <(sort -k2 $L/validation/deferred50-source.sha256) <(sort -k2 $L/validation/deferred50-format-successor-source.sha256) | grep '^>' | awk '{print $3}' | tr '\n' ' ')"
