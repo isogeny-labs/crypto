@@ -50,7 +50,19 @@ Counts include **deliberately planted** (P_i\pm P_j) cases, duplicates, identity
 
 The source-specific Rust example [`prime31_signed_pair_projector.rs`](examples/prime31_signed_pair_projector.rs) reuses the original `Arithmetic,Point,check_curve,PRIME31` code, generates the same public targets, compares each screened answer against an independent **O(B) group-subtraction + x-index lookup** control (not a generic O(B^2) pair table), checks every individual screen against point subtraction, and outputs counts plus diagnostic times. The separate Python verifier [`verify_prime31_signed_pair_projector.py`](verify_prime31_signed_pair_projector.py) reconstructs the public cases and replays the signed point and exceptional branches using independent modular-integer arithmetic.
 
-**Rust source-specific CI status:** pending a successful exact-source Actions execution. The Python arithmetic checks above are a separate calculation, not a claim that the Rust implementation compiled, ran or achieved a measured speedup. The workflow [`prime31-algebraic-pair-projector.yml`](../../../.github/workflows/prime31-algebraic-pair-projector.yml) pins source revision `1df714645aa683cf975bc76fcacb9842cb4780fd` and Rust 1.100.0.
+**Rust source-specific CI status:** [PASS, exact-source run #44326205507](https://github.com/isogeny-labs/crypto/actions/runs/44326205507), commit `03cb38541b17e0fe134f35bab1777c6da912d9b0` (40 pinned original Rust library tests, 2 new focused tests, full 715-case JSON diagnostic and separately authored Python BigInt verifier PASSED). The earlier E0308 tuple/Option mismatch at run #44325258716 was fixed before this successful run. The workflow [`prime31-algebraic-pair-projector.yml`](../../../.github/workflows/prime31-algebraic-pair-projector.yml) pins source revision `1df714645aa683cf975bc76fcacb9842cb4780fd` and Rust 1.100.0.
+
+## Source-specific counted costs (diagnostic, not solver speed)
+
+The passing GitHub runner produced the following same-process original-curve component counts, including all planted cases and the random negative-target segment:
+
+| B | algebraic field multiplications | algebraic screen EC additions / field inversions | group-subtraction control EC additions / field inversions | recorded algebraic / control time |
+|---|---:|---:|---:|---:|
+| 4 | 8,? (see artifact) | see artifact | 604 / 600 | 0.038 / 0.193 ms |
+| 8 | 43,232 | 120 / 120 | 1,608 / 1,600 | 0.154 / 0.465 ms |
+| 31 | 471,584 | 120 / 120 | 4,920 / 4,912 | 1.220 / 1.443 ms |
+
+The algebraic counts exclude the EC verification/replay costs, which appear separately; these times are **unbatched diagnostic controls**, not matched optimally batch-inverted EC arithmetic, not a fully charged solver comparison and not an end-to-end speedup claim. [Raw source-bound JSON artifact](https://github.com/isogeny-labs/crypto/actions/runs/44326205507/artifacts/14436523992), sha256 `8ff5fecd3877f7e2eea0efd6455af33f1c56218087f0668a94c635d7b2f3ee6c`.
 
 ## New exact yield ceiling and its consequence
 
