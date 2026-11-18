@@ -106,6 +106,12 @@ fn run() -> Result<(), String> {
         negation: true,
         seed,
         max_steps,
+        // The legacy walk this reference adapter was frozen against: the
+        // documented off/zero values of the later opt-in refinements.
+        look_ahead: false,
+        cycle_window: 0,
+        coeff_bits: 0,
+        stride_starts: false,
     };
     let answer = rho_parallel(&curve, generator, target, &cfg);
     let verified = answer

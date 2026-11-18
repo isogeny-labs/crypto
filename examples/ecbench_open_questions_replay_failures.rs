@@ -111,6 +111,10 @@ fn main() -> Result<(), String> {
             let ex = &p.executions[r.seq as usize];
             let w = &p.workloads[ex.workload];
             let input = ChildInput {
+                // A plain replay: no diagnostic context or lifecycle transport
+                // (both are skipped when absent, so the input bytes are unchanged).
+                diagnostics: None,
+                diagnostic_lifecycle: None,
                 schema: CHILD_INPUT_SCHEMA.into(),
                 curve: CurveSpec::explicit(p.instance(ex.workload))
                     .unwrap_or_else(|| w.curve_spec.clone()),

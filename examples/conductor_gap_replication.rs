@@ -659,6 +659,8 @@ fn check_cm_bases(out: &Path) {
             r: u(c, "r"),
             cofactor: 1,
             generator: (u(c, "gx"), u(c, "gy")),
+            // A plain short-Weierstrass control curve: no EFD model/chart.
+            representation: None,
         };
         let ctx = InstanceCtx {
             group: &inst.curve,

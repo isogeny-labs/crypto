@@ -12840,6 +12840,16 @@ pub enum KoblitzIcEvent {
         first_trial: usize,
         trials: usize,
     },
+    /// Emitted before decomposition when native chain-S3 tracing is enabled.
+    /// Coordinates and coefficients are decimal strings for direct replay.
+    RelationQueryStarted {
+        trial: usize,
+        coefficient_a: String,
+        coefficient_b: String,
+        target_x: String,
+        target_y: String,
+        target_infinity: bool,
+    },
     /// Exact completion record for one generated relation candidate.
     RelationAttemptFinished {
         trial: usize,
@@ -13236,6 +13246,35 @@ fn koblitz_index_calculus_dlp_observed(
             .collect();
         report.trials += attempts.len();
         report.relation_batches += 1;
+        if matches!(
+            opts.strategy,
+            DecompositionStrategy::ChainedS3
+                | DecompositionStrategy::ChainedS3Karatsuba
+                | DecompositionStrategy::ChainedS3ShallowKaratsuba
+                | DecompositionStrategy::ChainedS3FrobeniusOrbit
+                | DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
+                | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
+                | DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba
+        ) {
+            for (offset, (a, b, target)) in attempts.iter().enumerate() {
+                let (target_x, target_y, target_infinity) = match target {
+                    BinaryPoint::Affine { x, y } => (
+                        x.to_biguint().to_string(),
+                        y.to_biguint().to_string(),
+                        false,
+                    ),
+                    BinaryPoint::Infinity => ("0".into(), "0".into(), true),
+                };
+                progress(KoblitzIcEvent::RelationQueryStarted {
+                    trial: report.trials - attempts.len() + offset + 1,
+                    coefficient_a: a.to_string(),
+                    coefficient_b: b.to_string(),
+                    target_x,
+                    target_y,
+                    target_infinity,
+                });
+            }
+        }
 
         let evaluate = |(_, _, target): &(BigUint, BigUint, BinaryPoint)| {
             if *target == BinaryPoint::Infinity {

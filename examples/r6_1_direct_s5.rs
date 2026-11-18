@@ -1189,6 +1189,7 @@ impl FixedBase {
             point_index: self.fb.point_index.clone(),
             cost: self.fb.cost.clone(),
             subspace_basis: self.fb.subspace_basis.clone(),
+            affine_subspace: self.fb.affine_subspace.clone(),
             known_logs: self.fb.known_logs.clone(),
             frobenius_orbit_layout: self.fb.frobenius_orbit_layout,
         }
@@ -1310,8 +1311,14 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S5Oracle<'_> {
             peak_bytes: 0,
             degree_reached: None,
             solving_degree: None,
+            // Degree-fall diagnostics: this direct S5 engine reports no
+            // Hilbert series or degree history, like `degree_reached` above.
+            first_fall_degree: None,
+            last_fall_degree: None,
+            degree_of_regularity_observed: None,
             timed_out: call.outcome == "budget",
             extra: BTreeMap::new(),
+            degree_trace: Vec::new(),
         };
         self.totals
             .absorb(&self.shape, Some(&cost), call.outcome == "budget");

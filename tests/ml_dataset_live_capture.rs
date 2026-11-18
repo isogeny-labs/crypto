@@ -145,6 +145,7 @@ impl Fixture {
         });
         write_json(&cell.join("protocol.json"), &protocol);
         let plan = DatasetPlan {
+            channels: None,
             schema: "crypto.ml-dataset.plan/v1".into(),
             field_sizes: vec![23],
             arities: vec![2],
@@ -720,7 +721,10 @@ fn cli_s3_without_complete_budget_arguments_rejects_before_aws_process() {
         .arg("s3://setec-astronomy-artifacts/synthetic-cli-fixture")
         .arg("--budget-policy")
         .arg(fixture.root.join("absent-policy.json"));
-    failure(&fixture.run(command), "provide all of --budget-policy");
+    failure(
+        &fixture.run(command),
+        "budget-policy, budget-grant, budget-owner and budget-state must be supplied together",
+    );
     assert!(!destination.exists());
     fixture.assert_no_aws();
 }
