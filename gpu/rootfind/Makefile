@@ -8,6 +8,7 @@
 #   make bench-carry256   compare host P-256 limb carry/borrow chains
 #   make bench-subneg256  compare host P-256 modular subtraction and negation
 #   make bench-sub64     compare Fp64 host modular subtraction
+#   make bench-tail-core  compare padded vs short-tail Fp64 batch inversion
 #   make bench-host-inv256  P-256 sparse-exponent host inverse + batch benchmark
 #   make lib             librootfind_oracle.a, emulation backend only
 #                        (what gpu/rootfind/rs/build.rs builds for the gpu-rootfind cargo crate)
@@ -55,7 +56,7 @@ RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
-.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-pair-sweep ptxas-info clean
+.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep ptxas-info clean
 
 all: test
 
@@ -119,6 +120,13 @@ bench_sub64: bench_sub64.cpp fp64.cuh
 
 bench-sub64: bench_sub64
 	./bench_sub64
+
+# Short-tail CPU inversion avoids multiplications by padded Montgomery one.
+bench_tail_core: bench_tail_core.cpp fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_tail_core.cpp
+
+bench-tail-core: bench_tail_core
+	./bench_tail_core
 
 # Pair table and 2-sign rootfinder S3 sweep: frozen-before versus actual header.
 bench_pair_sweep: bench_pair_sweep.cpp rootfind.cuh fp64.cuh fp256x64.cuh rootfind_api.h
