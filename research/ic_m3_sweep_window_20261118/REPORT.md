@@ -44,11 +44,12 @@ f = 1 arm's, and S over the matched `rho.negation` (distance remaining, not a ga
 
 - Every candidate arm's S is below its f = 1 arm's on every (workload, round) pair (24 of 24 per
   fraction). The measured ratios are within 0.015 of the frozen predictions in all 16 cells.
-- Rows at the stop are 0.918–0.937 a (falsifier 1.05 a): the window does not skew the matrix.
+- Rows at the stop are 0.905–0.937 a per record (per-cell maxima 0.918–0.937 a; falsifier 1.05 a): the
+  window does not skew the matrix.
 - Relations per trial match 1 − exp(−μ(1 − (1 − f)³)), μ fitted on the f = 1 arm, within 1.8% in every
   cell (prediction 4, 5% tolerance).
-- Trials and batched inversions rise with the window (4.7–5.6x at 1/16), as pre-registered; they are
-  unpriced at w = 0 and priced in the band below.
+- Trials and batched inversions rise with the window: 4.7–5.6x at 1/16, more than the "about 4x"
+  pre-registered in prediction 5. They are unpriced at w = 0 and priced in the band below.
 
 ## §5a band (`ecbench band`, default pricing of table work)
 S over the f = 1 arm at w = 0, 0.1, 1, and S / rho at the same weights:
@@ -66,10 +67,33 @@ S over the f = 1 arm at w = 0, 0.1, 1, and S / rho at the same weights:
 
 The full band (all fractions, both pricings) is in `band.json` and `band_no_table.json`. In every cell,
 each f < 1 arm is below its f = 1 arm at all three weights, with and without table-work pricing, so the
-order holds across the band. At w = 1 the gain at |F_x| = 4096 is diluted (0.653 at 37.4 bits against
-0.554 at w = 0; the skeptic estimated about 0.67), because the pair table's inserts and the linear
-algebra are untouched. At w = 1 on the 37.4-bit curve, |F_x| = 2048 at 1/16 (119x rho) is below
+order holds across the band; the size of the gain does not. At w = 1 the gain at |F_x| = 4096 on the
+37.4-bit curve is diluted (0.653 at 1/16 against 0.554 at w = 0; the skeptic estimated about 0.67),
+because the pair table's inserts and the linear algebra are untouched. That dilution held only in this
+cell: at 39.3 bits and at |F_x| = 2048 the w = 1 ratio stays near the w = 0 one (for example 0.484
+against 0.435 at 39.3 bits, |F_x| = 4096, 1/8). At w = 1 on the 37.4-bit curve, |F_x| = 2048 at 1/16 (119x rho) is below
 |F_x| = 4096 at 1/16 (144x): the base-size optimum depends on the weight, which Lead 2 has to test.
+
+## Unpriced work per arm (§5a)
+S is a lower bound on every arm (`cost.lower_bound: true`); every unpriced counter is counted (no arm
+has an uncounted one). Mean counts per record, from the validator's recomputation:
+- `rho-neg` and `rho-neg-aa`: `canonicalisations_uncharged` 424,267 (37.4 bits) and 935,230 (39.3 bits).
+- IC arms: `inversions`, `legendre_symbols`, `lookups`, `row_ops`, `sqrt_solves`, `target_guard_probes`
+  (`cost.unpriced`), plus the counted `table_insert_attempts` the band prices by default: 4,194,304 at
+  |F_x| = 2048 and 16,777,216 at 4096. Example, 37.4 bits, |F_x| = 4096: f = 1 has inversions 9,321,
+  lookups 52.5 M and row_ops 48.6 M; f = 1/16 has inversions 44,003, lookups 21.5 M and row_ops 45.6 M.
+  `inversions` and `target_guard_probes` rise in proportion to trials, `lookups` falls with the window,
+  `legendre_symbols` and `sqrt_solves` are factor-base constants (4,108 and 2,048 at 37.4 bits,
+  |F_x| = 2048).
+Per-arm totals at each weight are in `band.json`.
+
+## Class and cost chain (§3 / §3a)
+Class: engineering. S falls by a constant factor; the floor and the exponent do not move.
+- C(rf3-f1) = Σ phases (unpriced work as listed above);
+- → replace the oracle's per-trial sweep of all k abscissae by a rotating window of ceil(k/N);
+- measured at the ratios above, ordered across the band;
+- = C(rf3-f1/N);
+- same targets, curves, success probability (all verified) and unit.
 
 ## Replication and deviation
 `specs/sweep.json` froze seed 20261182, not rf3la's 20261128 (recorded in PROTOCOL.md before the
@@ -91,8 +115,10 @@ replication command entry was lost. The control was rerun alone under `benchrec 
 - A failed verification: no (144/144 and 60/60).
 
 ## Reading
-A rotating sweep window lowers the counted cost of m = 3 rootfind-subtract by 1.8x to 2.8x at the
-same recovered logarithm, on both curves and at both base sizes, across the §5a band. It is a
+A rotating sweep window lowers the counted cost of m = 3 rootfind-subtract at the same recovered
+logarithm, on both curves and at both base sizes, with the order holding across the §5a band. The
+size of the gain depends on the fraction and the weight: at 1/16 it is 1.81–2.78x at w = 0, 1.73–2.77x
+at w = 0.1 and 1.53–2.74x at w = 1; at 1/2 it is 1.40–1.75x at w = 0. It is a
 constant-factor change to this oracle, not to the exponent. The distance to rho remains large: the
 lowest arm here is 91x rho at w = 0 (37.4 bits, |F_x| = 4096, 1/16) and 107x at 39.3 bits; at w = 1,
 119x and 129x. This oracle is not the program's best index-calculus baseline (`ic plan`'s m = 2 pair
@@ -106,6 +132,14 @@ requires identical counts: 144 records, 144 verified, 144 replays reproduced, 0 
 `PROTOCOL.md`, `specs/sweep.json`, `specs/replicate.json`, `analyze.py` → `results.json`,
 `make_figure.py` → `fig_sweep.svg`, `band.json`, `band_no_table.json`, `replicate_check.py` →
 `replicate_check.txt`, `raw/session.tgz` and `raw/replicate.tgz` with SHA-256 files, `verify.json`.
+
+## Validation
+Validator review `VALIDATION_REVIEW.md` (at 7fc37ffed7): disposition `validated`, with findings F1–F11.
+F1–F6 are corrected in this file (listed in `ERRATA.md`). F7: the benchmark record stays open because
+`benchrec close` is blocked repo-wide by an unrelated malformed record on main, and the raw archives
+could not be pushed to the artifact store (S3 answers 403 from this container), so they remain in Git
+as in the earlier rounds. No VALIDATION.json is written and no leaderboard or `benchmarks/README.md`
+row is added: the gate's replay certificate and validator-report files are not produced here.
 
 ## Not in scope
 The GPU oracle (refuses `sweep`), wall time, and the base-size grid (Lead 2). No leaderboard or

@@ -1,0 +1,14 @@
+{
+  "action": "resolve include_bytes!, include_str! and #[path] targets transitively from src, crates and path dependencies before building",
+  "created": "2026-11-18T19:21:11Z",
+  "evidence": [
+    "research/ic_m3_sweep_window_20261118/VALIDATION_REVIEW.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "building a binary from git archive of a commit for an independent replay",
+  "why": "the archive of src alone does not build; 3,986 files (190 MB) were needed at 7fc37ffed7"
+}
