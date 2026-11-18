@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] State-of-index-calculus report across crypto and cryptanalysis: code inventory, supported groups, limitations, improvement plan, as a PDF (claude, started 2026-11-18, branch aburan28/vigilant-wright-xm1vt6)
+- [x] State-of-index-calculus report across crypto and cryptanalysis: code inventory, supported groups, limitations, improvement plan, as a PDF (claude, started 2026-11-18, branch aburan28/vigilant-wright-xm1vt6)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
