@@ -160,6 +160,24 @@ impl Fp {
             t0 as u64
         }
     }
+    /// Small public modular inverse constants used by each radical context.
+    /// Algebraic congruences replace several extended-Euclid divisions.
+    #[inline]
+    fn small_inverses(&self, n: u64) -> (u64, u64, u64, u64, u64) {
+        let p = self.p;
+        let i2 = (p + 1) / 2;
+        let i3 = if p % 3 == 1 { (2 * p + 1) / 3 } else { (p + 1) / 3 };
+        let i4 = if p % 4 == 1 { (3 * p + 1) / 4 } else { (p + 1) / 4 };
+        let i27 = self.mul(self.sqr(i3), i3);
+        let in_ = match n {
+            2 => i2,
+            3 => i3,
+            4 => i4,
+            _ => self.inv(n),
+        };
+        (i2, i3, i4, i27, in_)
+    }
+
 }
 
 // ---------- generic finite-field ring for the AMM cube root ----------
@@ -715,19 +733,9 @@ impl RadicalRootCtx {
         let cube_p = Cube::new(f);
         let cube_q = Cube::new(Fq2 { f, n });
         let w2 = cube_q.w;
-        // Constant inverses via congruences: eliminate three extended-Euclid
-        // calls, and a fourth when the first nonresidue is 2 or 3.
-        // At p<=2^61-1, even 3*p+1 fits in u64.
-        let i2 = (p + 1) / 2;
-        let i3 = if p % 3 == 1 { (2 * p + 1) / 3 } else { (p + 1) / 3 };
-        let i4 = if p % 4 == 1 { (3 * p + 1) / 4 } else { (p + 1) / 4 };
-        let i27 = f.mul(f.sqr(i3), i3);
-        let in_ = match n {
-            2 => i2,
-            3 => i3,
-            4 => i4,
-            _ => f.inv(n),
-        };
+        // Inverses 2,3,4,27,n are fixed per prime and only require
+        // two products plus, at most, one Euclidean inversion.
+        let (i2, i3, i4, i27, in_) = f.small_inverses(n);
         Ok(RadicalRootCtx {
             f,
             inv2: i2,
@@ -1297,6 +1305,85 @@ mod tests {
         }
         fn order(&self) -> u128 { self.0.order() }
         fn cand(&self, k: u64) -> Self::E { self.0.cand(k) }
+    }
+
+
+    #[test]
+    fn round21_small_inverses_and_cached_sylow_are_exact() {
+        // Includes p=5 where 27 reduces modulo p, p=2^61-1,
+        // and fields with s=v3(|K*|) in 0..7.
+        for p in [5, 7, 11, 17, 31, 97, 163, 487, 1459, 17497,
+                  998244353, 1000000007, 1000000009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = &ctx.f;
+            let before = (f.inv(2), f.inv(3), f.inv(4 % p),
+                          f.inv(27 % p), f.inv(ctx.n));
+            assert_eq!(f.small_inverses(ctx.n), before, "p={p}");
+            assert_eq!((ctx.inv2, ctx.inv3, ctx.inv4, ctx.inv27, ctx.inv_n),
+                       before, "ctx p={p}");
+            for cube in [&ctx.cube_p] {
+                let expected_w2 = if cube.s >= 2 { cube.r.sqr(cube.w) } else { cube.r.one() };
+                assert_eq!(cube.w_squared, expected_w2, "Fp p={p}");
+                let expected_inv2 = if cube.s == 2 { cube.r.sqr(cube.c_inv) } else { cube.r.one() };
+                assert_eq!(cube.c_inv_squared, expected_inv2, "Fp p={p}");
+            }
+            let q = &ctx.cube_q;
+            assert_eq!(q.w_squared, if q.s >= 2 { q.r.sqr(q.w) } else { q.r.one() }, "Fp2 p={p}");
+            assert_eq!(q.c_inv_squared, if q.s == 2 { q.r.sqr(q.c_inv) } else { q.r.one() }, "Fp2 p={p}");
+            for x in 0..p.min(128) {
+                let a = f.mul(x, f.sqr(x));
+                assert_eq!(ctx.cube_p.root(a), ctx.cube_p.root_before_skip_digit(a), "p={p} a={a}");
+            }
+        }
+    }
+
+    #[test]
+    #[ignore]
+    fn bench_round21_small_inverse_constants_actual_rust() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn frozen(f: &Fp, n: u64) -> (u64,u64,u64,u64,u64) {
+            (f.inv(2), f.inv(3), f.inv(4 % f.p), f.inv(27 % f.p), f.inv(n))
+        }
+        fn sample<F: Fn(&Fp, u64) -> (u64,u64,u64,u64,u64)>(
+            p: u64, ns: &[u64], reps: usize, op: F,
+        ) -> f64 {
+            let f = Fp::new(p);
+            let mut checksum = 0u64;
+            let start = Instant::now();
+            for _ in 0..reps {
+                for &n in ns {
+                    let x = black_box(op(black_box(&f), black_box(n)));
+                    checksum ^= x.0 ^ x.1 ^ x.2 ^ x.3 ^ x.4;
+                    black_box(checksum);
+                }
+            }
+            black_box(checksum);
+            start.elapsed().as_nanos() as f64 / (reps * ns.len()) as f64
+        }
+        for p in [17, 487, 17497, 1000000009, MAX_PRIME] {
+            let ns: Vec<u64> = [2, 3, 5, 7, 11, 13, 17, 19, 23]
+                .into_iter().filter(|n| n % p != 0).collect();
+            let mut before = Vec::new();
+            let mut after = Vec::new();
+            for trial in 0..13 {
+                let b;
+                let a;
+                if trial % 2 == 0 {
+                    b = sample(p, &ns, 8000, frozen);
+                    a = sample(p, &ns, 8000, Fp::small_inverses);
+                } else {
+                    a = sample(p, &ns, 8000, Fp::small_inverses);
+                    b = sample(p, &ns, 8000, frozen);
+                }
+                before.push(b);
+                after.push(a);
+            }
+            before.sort_by(|a,b| a.total_cmp(b));
+            after.sort_by(|a,b| a.total_cmp(b));
+            println!("round21 actual Rust constant inverses p={p}: {:.3} -> {:.3} ns ({:.3}x)",
+                before[6], after[6], before[6]/after[6]);
+        }
     }
 
     #[test]
