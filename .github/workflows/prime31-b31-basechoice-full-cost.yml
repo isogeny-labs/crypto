@@ -50,6 +50,13 @@ jobs:
         run: |
           set -o pipefail
           timeout -k 10 1200 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle actual_prime31_b31_firstx_vs_dickson_256q_complete_cost -- --nocapture --test-threads=1 2>&1 | tee prime31-b31-basechoice-full-cost.log
+      - name: Exact source reversed arm-order full 256 unknown logs
+        shell: bash
+        env:
+          PRIME31_B31_BASECHOICE_REVERSE: '1'
+        run: |
+          set -o pipefail
+          timeout -k 10 1200 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle actual_prime31_b31_firstx_vs_dickson_256q_complete_cost -- --nocapture --test-threads=1 2>&1 | tee prime31-b31-basechoice-reversed.log
       - name: Frozen success gates
         if: success()
         shell: bash
@@ -60,11 +67,16 @@ jobs:
           grep -Fq '"true_sign_independent_algebraic_extraction":false' prime31-b31-basechoice-full-cost.log
           grep -Fq '"base_kind":"dickson31"' prime31-b31-basechoice-full-cost.log
           grep -Fq '"base_kind":"first_x31"' prime31-b31-basechoice-full-cost.log
+          grep -Fq 'PRIME31_B31_FIRSTX_DICKSON_COMPLETE_JSON=' prime31-b31-basechoice-reversed.log
+          grep -Fq '"panel_order":["first_x31","dickson31"]' prime31-b31-basechoice-reversed.log
+          grep -Fq 'test result: ok. 1 passed;' prime31-b31-basechoice-reversed.log
       - name: Archive raw native Rust JSON
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: prime31-b31-basechoice-full-cost-raw
-          path: prime31-b31-basechoice-full-cost.log
+          path: |
+            prime31-b31-basechoice-full-cost.log
+            prime31-b31-basechoice-reversed.log
           retention-days: 30
           if-no-files-found: warn
