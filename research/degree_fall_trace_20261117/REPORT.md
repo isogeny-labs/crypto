@@ -101,3 +101,13 @@ diff -u variable_effects.csv /tmp/variable_effects_replay.csv
 python3 plot_variable_effects.py
 typst compile report.typ
 ```
+
+## Candidate bases across the toy flow
+
+The follow-up holds the base size fixed and compares three candidate sets
+through membership, a sum filter, and a mixed-relation check. It reports
+coverage across the full target grid and colors regularity, pin effects, and
+direct diffusion at one target shared by all three bases.
+[Run and replay](reports/run-20261118T0159Z/RUN.md) ·
+[Figure](reports/run-20261118T0159Z/base_flow.svg) ·
+[PDF](reports/run-20261118T0159Z/report.pdf)
