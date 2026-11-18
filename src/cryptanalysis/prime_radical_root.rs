@@ -571,11 +571,36 @@ impl RadicalRootCtx {
     /// General quadratic a x^2 + b x + c (a != 0), sorted distinct roots.
     pub fn quad_roots(&self, a: u64, b: u64, c: u64) -> Vec<u64> {
         let f = &self.f;
-        let ia = f.inv(a);
-        let mut v = self.quad_monic(f.mul(b, ia), f.mul(c, ia));
-        v.sort_unstable();
-        v.dedup();
-        v
+        // Preserve support for noncanonical public coefficients.
+        let a = if a < f.p { a } else { a % f.p };
+        let b = if b < f.p { b } else { b % f.p };
+        let c = if c < f.p { c } else { c % f.p };
+        if a == 1 {
+            let mut roots = self.quad_monic(b, c);
+            roots.sort_unstable();
+            roots.dedup();
+            return roots;
+        }
+        // Test b^2-4ac before inverting 2a. For a nonresidue
+        // discriminant, skip the expensive modular inversion entirely.
+        let ac = f.mul(a, c);
+        let twice_ac = f.add(ac, ac);
+        let disc = f.sub(f.sqr(b), f.add(twice_ac, twice_ac));
+        let s = match self.sqrt(disc) {
+            Some(s) => s,
+            None => return vec![],
+        };
+        let inv_2a = f.inv(f.add(a, a));
+        let nb = f.neg(b);
+        let first = f.mul(f.add(nb, s), inv_2a);
+        let mut roots = if s == 0 {
+            vec![first]
+        } else {
+            vec![first, f.mul(f.sub(nb, s), inv_2a)]
+        };
+        roots.sort_unstable();
+        roots.dedup();
+        roots
     }
     /// F_p-roots of the depressed cubic t^3 + P t + Q = 0 (Cardano; F_{p^2} when D is a non-residue).
     pub fn cubic_depressed(&self, pp: u64, q: u64) -> Vec<u64> {
@@ -801,6 +826,110 @@ impl RadicalRootCtx {
 mod tests {
     use super::*;
 
+
+    #[test]
+    fn quadratic_direct_discriminant_matches_frozen_normalized_formula() {
+        let mut seed = 0xd341_78a5_96a2_dbc0u64;
+        for &p in &[5u64, 7, 11, 13, 17, 19,
+                    487, 1_000_000_007, 2_147_483_647, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            let count = if p <= 19 { p.pow(3) as usize } else { 4096 };
+            for i in 0..count {
+                let (a, b, c) = if p <= 19 {
+                    let a = (i as u64 % (p - 1)) + 1;
+                    let b = (i as u64 / (p - 1)) % p;
+                    let c = (i as u64 / (p * (p - 1))) % p;
+                    (a, b, c)
+                } else {
+                    (1 + lcg(&mut seed) % (p - 1),
+                     lcg(&mut seed) % p, lcg(&mut seed) % p)
+                };
+                let inv = f.inv(a);
+                let mut frozen = ctx.quad_monic(f.mul(b, inv), f.mul(c, inv));
+                frozen.sort_unstable();
+                frozen.dedup();
+                let direct = ctx.quad_roots(a, b, c);
+                assert_eq!(direct, frozen, "p={p} a={a} b={b} c={c}");
+            }
+            // Noncanonical public coefficients follow the prior normalized
+            // equation semantics, not the fast-path canonical assumption.
+            assert_eq!(ctx.quad_roots(p + 1, p + 2, p + 3),
+                       ctx.quad_roots(1, 2, 3));
+        }
+    }
+
+    #[test]
+    #[ignore = "paired actual-Rust quadratic root timing"]
+    fn bench_quadratic_direct_discriminant() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        let mut seed = 0x37d8_6d12_b731_01fau64;
+        for &p in &[487u64, 1_000_000_007, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            // All primes p=3 mod 4. A fixed nonsquare yields no roots;
+            // two random linear factors yield roots. These are disjoint.
+            let nr = (2..p).find(|&v| f.powm(v, (p - 1) / 2) == p - 1).unwrap();
+            for yes in [false, true] {
+                let mut cases = Vec::new();
+                for _ in 0..1024 {
+                    let a = 1 + lcg(&mut seed) % (p - 1);
+                    let b;
+                    let c;
+                    if yes {
+                        let u = lcg(&mut seed) % p;
+                        let v = lcg(&mut seed) % p;
+                        b = f.neg(f.mul(a, f.add(u, v)));
+                        c = f.mul(a, f.mul(u, v));
+                    } else {
+                        b = lcg(&mut seed) % p;
+                        c = f.mul(f.sub(f.sqr(b), nr), f.inv(f.mul(4, a)));
+                    }
+                    cases.push((a, b, c));
+                }
+                let old = |(a, b, c): (u64, u64, u64)| {
+                    let ia = f.inv(a);
+                    let mut r = ctx.quad_monic(f.mul(b, ia), f.mul(c, ia));
+                    r.sort_unstable();
+                    r.dedup();
+                    r
+                };
+                let new = |(a, b, c)| ctx.quad_roots(a, b, c);
+                for &x in &cases {
+                    assert_eq!(old(x), new(x));
+                }
+                let mut b = Vec::new();
+                let mut a = Vec::new();
+                let sample = |opt: bool| -> f64 {
+                    let start = Instant::now();
+                    let mut checksum = 0u64;
+                    for _ in 0..3 {
+                        for &x in &cases {
+                            let v = if opt { new(black_box(x)) } else { old(black_box(x)) };
+                            checksum = checksum.wrapping_add(v.iter().copied().sum::<u64>());
+                        }
+                    }
+                    black_box(checksum);
+                    start.elapsed().as_nanos() as f64 / (cases.len() * 3) as f64
+                };
+                for k in 0..13 {
+                    if k % 2 == 0 {
+                        b.push(sample(false));
+                        a.push(sample(true));
+                    } else {
+                        a.push(sample(true));
+                        b.push(sample(false));
+                    }
+                }
+                b.sort_by(f64::total_cmp);
+                a.sort_by(f64::total_cmp);
+                println!("quadratic p={p} {}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                         if yes { "two-roots" } else { "no-roots" },
+                         b[6], a[6], b[6] / a[6]);
+            }
+        }
+    }
 
     // Freeze the original right-to-left binary exponentiation independently
     // of the new shared Fp/Fp2 implementation.
