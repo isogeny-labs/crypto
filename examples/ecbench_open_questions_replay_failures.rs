@@ -111,6 +111,8 @@ fn main() -> Result<(), String> {
             let ex = &p.executions[r.seq as usize];
             let w = &p.workloads[ex.workload];
             let input = ChildInput {
+                diagnostics: None,
+                diagnostic_lifecycle: None,
                 schema: CHILD_INPUT_SCHEMA.into(),
                 curve: CurveSpec::explicit(p.instance(ex.workload))
                     .unwrap_or_else(|| w.curve_spec.clone()),

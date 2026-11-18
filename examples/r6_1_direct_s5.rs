@@ -1310,8 +1310,12 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S5Oracle<'_> {
             peak_bytes: 0,
             degree_reached: None,
             solving_degree: None,
+            first_fall_degree: None,
+            last_fall_degree: None,
+            degree_of_regularity_observed: None,
             timed_out: call.outcome == "budget",
             extra: BTreeMap::new(),
+            degree_trace: Vec::new(),
         };
         self.totals
             .absorb(&self.shape, Some(&cost), call.outcome == "budget");

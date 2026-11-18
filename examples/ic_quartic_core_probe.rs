@@ -25,7 +25,7 @@ fn main() {
             for j in 0..64u16 {
                 if u32::from(i) < a.f.q && u32::from(j) < a.f.q {
                     assert_eq!(
-                        u32::from(a.f.mul_nc(i, j)),
+                        a.f.mul_nc(u32::from(i), u32::from(j)),
                         b.f.mul_nc(u32::from(i), u32::from(j))
                     );
                 }

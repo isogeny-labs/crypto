@@ -19,7 +19,7 @@ use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
 use crypto_lib::cryptanalysis::koblitz_strong_rho::{
-    RawPointG, RhoField, RhoScalar, StrongRhoCharges, StrongRhoG, StrongRhoParams,
+    NarrowRhoScalar, RawPointG, RhoField, RhoScalar, StrongRhoCharges, StrongRhoG, StrongRhoParams,
 };
 use crypto_lib::cryptanalysis::semaev_decomp::Gf2_128;
 use num_bigint::BigUint;
@@ -231,6 +231,12 @@ impl ExactMulCtx {
     }
 }
 
+impl NarrowRhoScalar for ExactScalar {
+    fn to_u128(self) -> u128 {
+        u128::from(self.0)
+    }
+}
+
 impl RhoScalar for ExactScalar {
     type MulCtx = ExactMulCtx;
     fn zero() -> Self {
@@ -245,8 +251,11 @@ impl RhoScalar for ExactScalar {
     fn to_f64(self) -> f64 {
         self.0 as f64
     }
-    fn to_u128(self) -> u128 {
-        u128::from(self.0)
+    fn to_biguint(self) -> BigUint {
+        BigUint::from(self.0)
+    }
+    fn checked_u128(self) -> Option<u128> {
+        Some(u128::from(self.0))
     }
     fn bit_len(self) -> u32 {
         64 - self.0.leading_zeros()
@@ -490,7 +499,7 @@ fn evaluate_scalar<S: RhoScalar>(
     let validation_started = Instant::now();
     let recovered = outcome.as_ref().map(|value| value.scalar);
     let replay_verified =
-        recovered.is_some_and(|d| curve.mul(curve.generator(), &BigUint::from(d.to_u128())) == q);
+        recovered.is_some_and(|d| curve.mul(curve.generator(), &d.to_biguint()) == q);
     let validation_ns = validation_started.elapsed().as_nanos();
     let online_ns = online_started.elapsed().as_nanos();
     let phase_sum_ns = query_ns + walk_ns + validation_ns;
