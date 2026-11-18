@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="320" font-family="Helvetica,Arial,sans-serif" font-size="12">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="380.0" y="20" text-anchor="middle" font-size="14" font-weight="bold">Same stack at A = 256</text>
+<line x1="300.0" y1="34" x2="300.0" y2="286" stroke="#e3e3e3"/>
+<text x="300.0" y="300" text-anchor="middle" fill="#555">0.5</text>
+<line x1="342.8" y1="34" x2="342.8" y2="286" stroke="#e3e3e3"/>
+<text x="342.8" y="300" text-anchor="middle" fill="#555">1</text>
+<line x1="385.6" y1="34" x2="385.6" y2="286" stroke="#e3e3e3"/>
+<text x="385.6" y="300" text-anchor="middle" fill="#555">2</text>
+<line x1="442.2" y1="34" x2="442.2" y2="286" stroke="#e3e3e3"/>
+<text x="442.2" y="300" text-anchor="middle" fill="#555">5</text>
+<line x1="485.0" y1="34" x2="485.0" y2="286" stroke="#e3e3e3"/>
+<text x="485.0" y="300" text-anchor="middle" fill="#555">10</text>
+<line x1="527.8" y1="34" x2="527.8" y2="286" stroke="#e3e3e3"/>
+<text x="527.8" y="300" text-anchor="middle" fill="#555">20</text>
+<line x1="584.4" y1="34" x2="584.4" y2="286" stroke="#e3e3e3"/>
+<text x="584.4" y="300" text-anchor="middle" fill="#555">50</text>
+<line x1="627.2" y1="34" x2="627.2" y2="286" stroke="#e3e3e3"/>
+<text x="627.2" y="300" text-anchor="middle" fill="#555">100</text>
+<line x1="670.0" y1="34" x2="670.0" y2="286" stroke="#e3e3e3"/>
+<text x="670.0" y="300" text-anchor="middle" fill="#555">200</text>
+<text x="485.0" y="315" text-anchor="middle" fill="#333">ns per signed point (log scale; whiskers: min–max)</text>
+<text x="292" y="55" text-anchor="end">rootfind-mitm (default oracle)</text>
+<rect x="300.0" y="44" width="325.3" height="16" fill="#9aa5b1"/>
+<text x="631.3" y="56" fill="#111">97.02 (1.0x)</text>
+<text x="292" y="85" text-anchor="end">rootfind-subtract (best existing arm)</text>
+<rect x="300.0" y="74" width="223.8" height="16" fill="#9aa5b1"/>
+<text x="529.8" y="86" fill="#111">18.76 (5.2x)</text>
+<text x="292" y="115" text-anchor="end">lever 1: shared denominators, 16-bit filter</text>
+<rect x="300.0" y="104" width="174.3" height="16" fill="#2f6db5"/>
+<line x1="470.9" y1="112" x2="475.1" y2="112" stroke="#111"/>
+<text x="481.1" y="116" fill="#111">8.41 (11.5x)</text>
+<text x="292" y="145" text-anchor="end">+ lever 2: 16 targets lockstep, AVX-512</text>
+<rect x="300.0" y="134" width="134.0" height="16" fill="#2f6db5"/>
+<line x1="428.5" y1="142" x2="436.6" y2="142" stroke="#111"/>
+<text x="442.6" y="146" fill="#111">4.38 (22.2x)</text>
+<text x="292" y="175" text-anchor="end">+ lever 3: 8-bit filter (1 MiB at A=1024)</text>
+<rect x="300.0" y="164" width="139.4" height="16" fill="#2f6db5"/>
+<line x1="434.3" y1="172" x2="441.6" y2="172" stroke="#111"/>
+<text x="447.6" y="176" fill="#111">4.78 (20.3x)</text>
+<text x="292" y="205" text-anchor="end">+ fused L1 probe blocks</text>
+<rect x="300.0" y="194" width="135.3" height="16" fill="#2f6db5"/>
+<line x1="430.1" y1="202" x2="438.5" y2="202" stroke="#111"/>
+<text x="444.5" y="206" fill="#111">4.47 (21.7x)</text>
+<text x="292" y="235" text-anchor="end">+ mix-hash exact set</text>
+<rect x="300.0" y="224" width="133.4" height="16" fill="#2f6db5"/>
+<line x1="427.6" y1="232" x2="435.6" y2="232" stroke="#111"/>
+<text x="441.6" y="236" fill="#111">4.34 (22.4x)</text>
+<text x="292" y="265" text-anchor="end">+ lever 4: 4 threads</text>
+<rect x="300.0" y="254" width="51.8" height="16" fill="#2f6db5"/>
+<line x1="348.8" y1="262" x2="379.3" y2="262" stroke="#111"/>
+<text x="385.3" y="266" fill="#111">1.16 (83.9x)</text>
+</svg>
