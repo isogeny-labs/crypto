@@ -2495,6 +2495,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
             ("prune", "1: skip the adds of partial sums that cannot be completed to m summands; same table, fewer build adds (default 0)"),
             ("split", "1: form the last two summands of every sum from a precomputed pair-sum table (two adds per abscissa pair) instead of building the (m-1)-summand partial sums; same table, fewer build adds; not with sib=1 (default 0)"),
             ("sib", "1 (prime curves; not with split=1): the last level forms both signs x(S + P), x(S - P) of a base pair from ONE inversion; same table, keys and witnesses. Charged as ONE group addition plus one unit of the native counter sibling_second_points (sqr + 2 add), the walk's convention, so the band prices the second point at w (default 0)"),
+            ("prefix", "1: also key the partial sums of fewer than m summands the build forms anyway (base points, lower-level partials, pair sums), under keys no m-sum took; no added group operation, one counted insert attempt each (default 0)"),
         ]
     }
 
@@ -2507,7 +2508,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     ) -> Result<(), String> {
         self.free = params.flag("free");
         self.free_pending = self.free;
-        let table = KSumTable::build_negation_folded_all(
+        let table = KSumTable::build_negation_folded_prefix(
             ctx.group,
             fb,
             self.k,
@@ -2515,6 +2516,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
             params.flag("prune"),
             params.flag("split"),
             params.flag("sib"),
+            params.flag("prefix"),
         )?;
         // The table's construction is part of the pipeline's cost.
         ops.merge(table.build_ops);
@@ -2579,6 +2581,9 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
         if self.free {
             m.insert("free_collisions_checked".to_string(), self.free_checked);
             m.insert("free_rows_emitted".to_string(), self.free_emitted);
+        }
+        if let Some(table) = self.table.as_ref().filter(|t| t.prefix) {
+            m.insert("ksum_prefix_entries".to_string(), table.prefix_entries);
         }
         m
     }
@@ -2680,6 +2685,162 @@ mod ksum_split_tests {
             );
             assert_eq!((ss.doubles, ss.scalar_mults), (su.doubles, su.scalar_mults));
             assert!(on.total_gae < plain.total_gae);
+        }
+    }
+
+    fn ksum_run(
+        k: u32,
+        size: &str,
+        targets: Targets,
+        prefix: &str,
+        seed: u64,
+    ) -> (crate::cryptanalysis::ic_framework::RunReport, u64) {
+        let inst = roster_prime_instance(20).unwrap();
+        let g = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let planted = (300_011 + 7919 * seed) % inst.r;
+        let q = CountedGroup::mul(&inst.curve, &mut ops, g, planted);
+        let ctx = InstanceCtx {
+            group: &inst.curve,
+            generator: g,
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        };
+        let base = PrimeAbscissaBase { instance: &inst };
+        let mut spec = PipelineSpec {
+            factor_base: "prime-abscissa".into(),
+            oracle: "ksum".into(),
+            targets,
+            max_trials: 50_000_000,
+            seed,
+            ..Default::default()
+        };
+        spec.factor_base_params.set("size", size);
+        spec.oracle_params.set("prune", "1");
+        spec.oracle_params.set("split", "1");
+        if !prefix.is_empty() {
+            spec.oracle_params.set("prefix", prefix);
+        }
+        let mut oracle = KSumOracle::new(k);
+        let report = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut oracle,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .expect("the configuration should run");
+        (report, planted)
+    }
+
+    /// `prefix=0` (or absent) is the build without it, run for run;
+    /// `prefix=1` adds no set-up group operation, keys more sums and
+    /// still recovers the planted log, with relations of fewer summands
+    /// accepted by the elimination.
+    #[test]
+    fn prefix_off_is_identical_and_on_adds_no_setup_operation() {
+        for (k, size) in [(4u32, "12"), (5, "10")] {
+            for seed in [11u64, 12, 13] {
+                let (plain, planted) = ksum_run(k, size, Targets::StrideRenew, "", seed);
+                let (off, _) = ksum_run(k, size, Targets::StrideRenew, "0", seed);
+                let (on, _) = ksum_run(k, size, Targets::StrideRenew, "1", seed);
+                for r in [&plain, &off, &on] {
+                    assert!(r.verified, "k = {k}");
+                    assert_eq!(r.recovered, Some(planted));
+                }
+                assert_eq!(plain.total_gae, off.total_gae);
+                assert_eq!(
+                    plain.decomposition.targets_tried,
+                    off.decomposition.targets_tried
+                );
+                assert_eq!(
+                    plain.decomposition.cost.native,
+                    off.decomposition.cost.native
+                );
+                assert_eq!(
+                    plain.decomposition.setup.native,
+                    off.decomposition.setup.native
+                );
+                assert_eq!(
+                    plain.decomposition.setup.work_native,
+                    off.decomposition.setup.work_native
+                );
+                assert!(!plain
+                    .decomposition
+                    .cost
+                    .native
+                    .contains_key("ksum_prefix_entries"));
+                assert_eq!(
+                    plain.decomposition.setup.group_ops, on.decomposition.setup.group_ops,
+                    "k = {k}: prefix adds no group operation"
+                );
+                let ins = |r: &crate::cryptanalysis::ic_framework::RunReport| {
+                    r.decomposition.setup.work_native["table_insert_attempts"]
+                };
+                let extra = on.decomposition.cost.native["ksum_prefix_entries"];
+                assert!(extra > 0);
+                assert!(ins(&on) >= ins(&plain) + extra, "k = {k}");
+            }
+        }
+    }
+
+    /// `stride-renew-joint` presents exactly the targets of `stride-renew`
+    /// (same trials, relations, rank, answer and every relation-phase
+    /// counter) and spends fewer counted additions plus doublings on the
+    /// set-up's three `[a]G + [b]Q`, with three scalar multiplications
+    /// recorded instead of six.
+    #[test]
+    fn stride_renew_joint_is_stride_renew_with_a_cheaper_setup() {
+        for (k, size) in [(4u32, "12"), (5, "10")] {
+            for seed in [11u64, 12, 13] {
+                for prefix in ["", "1"] {
+                    let (sep, planted) = ksum_run(k, size, Targets::StrideRenew, prefix, seed);
+                    let (joint, _) = ksum_run(k, size, Targets::StrideRenewJoint, prefix, seed);
+                    for r in [&sep, &joint] {
+                        assert!(r.verified);
+                        assert_eq!(r.recovered, Some(planted));
+                    }
+                    assert_eq!(
+                        sep.decomposition.targets_tried,
+                        joint.decomposition.targets_tried
+                    );
+                    assert_eq!(
+                        sep.decomposition.relations_found,
+                        joint.decomposition.relations_found
+                    );
+                    assert_eq!(
+                        sep.decomposition.cost.native,
+                        joint.decomposition.cost.native
+                    );
+                    assert_eq!(
+                        sep.decomposition.cost.work_native,
+                        joint.decomposition.cost.work_native
+                    );
+                    assert_eq!(sep.linear_algebra.rank, joint.linear_algebra.rank);
+                    assert_eq!(
+                        sep.decomposition.setup.group_ops,
+                        joint.decomposition.setup.group_ops
+                    );
+                    assert_eq!(
+                        sep.decomposition.setup.native,
+                        joint.decomposition.setup.native
+                    );
+                    let (a, b) = (
+                        sep.decomposition.cost.group_ops,
+                        joint.decomposition.cost.group_ops,
+                    );
+                    assert_eq!(a.scalar_mults, 2 * b.scalar_mults, "k = {k} seed = {seed}");
+                    assert!(b.scalar_mults >= 3, "k = {k} seed = {seed}");
+                    assert!(b.gae() < a.gae(), "k = {k} seed = {seed}");
+                    assert!(joint.total_gae < sep.total_gae);
+                }
+            }
         }
     }
 }

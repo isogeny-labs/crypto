@@ -9511,6 +9511,13 @@ pub struct KSumTable {
     /// unit of the native counter `sibling_second_points` (`work.rs`), the
     /// walk's convention, so its `bitop/v1` price equals its field work.
     pub sib_second_points: u64,
+    /// Also key the partial sums of fewer than `k` summands that the
+    /// build forms anyway ([`KSumTable::build_negation_folded_prefix`]).
+    pub prefix: bool,
+    /// Partial sums waiting for the prefix pass: `(key, packed)`.
+    prefix_pending: Vec<(u64, u64)>,
+    /// Prefix entries kept (keys no `k`-sum took); inside `entries`.
+    pub prefix_entries: u64,
 }
 
 impl KSumTable {
@@ -9614,6 +9621,29 @@ impl KSumTable {
         split: bool,
         sib: bool,
     ) -> Result<Self, String> {
+        Self::build_negation_folded_prefix(g, fb, k, keep_collisions, prune, split, sib, false)
+    }
+
+    /// [`Self::build_negation_folded_all`] with `prefix`: every partial
+    /// sum of `j < k` summands that the build forms anyway (a base point,
+    /// each lower level's partial sums, and with `split` each computed
+    /// pair sum) is also keyed, after the `k`-sums and only under a key no
+    /// `k`-sum took, so the `k`-sum entries, their keys and collisions are
+    /// those of the build without it.  No group operation is added; each
+    /// prefix insert is one more counted insert attempt.  A target equal
+    /// to `±` such a sum then decomposes into `j` summands (the unused
+    /// packed slots hold the index `2^bits − 1`, which no base point has).
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_negation_folded_prefix<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
+        split: bool,
+        sib: bool,
+        prefix: bool,
+    ) -> Result<Self, String> {
         if split && sib {
             return Err("ksum split=1 and sib=1 cannot be combined: split never forms the (m-1)-summand partial sums that sib pairs".into());
         }
@@ -9669,6 +9699,9 @@ impl KSumTable {
             collisions: Vec::new(),
             sib,
             sib_second_points: 0,
+            prefix,
+            prefix_pending: Vec::new(),
+            prefix_entries: 0,
         };
         t.keep_collisions = keep_collisions;
         let pairs = if split {
@@ -9678,6 +9711,15 @@ impl KSumTable {
         };
         let mut idx = [u32::MAX; KSUM_MAX_K as usize];
         t.extend(g, fb, &groups, 0, 0, None, pairs.as_deref(), &mut idx);
+        if prefix {
+            for (key, packed) in std::mem::take(&mut t.prefix_pending) {
+                if let std::collections::hash_map::Entry::Vacant(v) = t.map.entry(key) {
+                    v.insert(packed);
+                    t.prefix_entries += 1;
+                }
+                t.insert_attempts += 1;
+            }
+        }
         t.entries = t.map.len() as u64;
         t.build_wall_ns = start.elapsed().as_nanos() as u64;
         Ok(t)
@@ -9706,6 +9748,7 @@ impl KSumTable {
                     let s = g.add(&mut self.build_ops, fb.points[j], fb.points[l]);
                     self.split_pair_adds += 1;
                     pairs[j * n + l] = Some(s);
+                    self.note_prefix(g, &s, &[j as u32, l as u32]);
                     let (nj, nl) = (fb.neg_index[j], fb.neg_index[l]);
                     if nj != j && ga.contains(&nj) && gb.contains(&nl) {
                         pairs[nj * n + nl] = Some(g.neg(s));
@@ -9719,6 +9762,7 @@ impl KSumTable {
                             let s = g.add(&mut self.build_ops, fb.points[j], fb.points[l]);
                             self.split_pair_adds += 1;
                             pairs[j * n + l] = Some(s);
+                            self.note_prefix(g, &s, &[j as u32, l as u32]);
                         }
                     }
                 }
@@ -9790,6 +9834,21 @@ impl KSumTable {
         self.insert_attempts += 1;
     }
 
+    /// With `prefix`, keep a partial sum of `summands.len() < k` base
+    /// points for the prefix pass; the unused slots get the index
+    /// `2^bits − 1`.
+    fn note_prefix<G: CountedGroup>(&mut self, g: &G, s: &G::Elt, summands: &[u32]) {
+        if !self.prefix || g.is_identity(s) {
+            return;
+        }
+        let bits = self.bits;
+        let empty = (1u64 << bits) - 1;
+        let packed = (0..self.k as usize).rev().fold(0u64, |w, d| {
+            (w << bits) | summands.get(d).map_or(empty, |&i| u64::from(i))
+        });
+        self.prefix_pending.push((g.key(s) >> 1, packed));
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn extend<G: CountedGroup>(
         &mut self,
@@ -9851,6 +9910,10 @@ impl KSumTable {
                 if last {
                     self.insert_last(g.key(&s) >> 1, idx);
                 } else {
+                    if self.prefix {
+                        let summands = idx[..=depth].to_vec();
+                        self.note_prefix(g, &s, &summands);
+                    }
                     self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), pairs, idx);
                 }
             }
@@ -9878,7 +9941,10 @@ impl KSumTable {
     fn unpack(&self, packed: u64) -> Vec<usize> {
         let mask = (1u64 << self.bits) - 1;
         (0..self.k)
-            .map(|d| ((packed >> (d * self.bits)) & mask) as usize)
+            .map(|d| (packed >> (d * self.bits)) & mask)
+            // A prefix entry's unused slots (never a base index).
+            .take_while(|&i| i != mask)
+            .map(|i| i as usize)
             .collect()
     }
 
@@ -13774,6 +13840,16 @@ pub enum TargetSource {
     /// probe per trial, now one per decomposing trial, and one oracle
     /// lookup per non-decomposing repeat, which the eager guard skipped.
     StrideRenewDeferredGuard,
+    /// `StrideRenew` with each of its three `[a]G + [b]Q` (the stride, the
+    /// renewal step, the start) formed by one joint double-and-add
+    /// (Shamir's trick, `joint_mul`) over `G + Q`, which is added once at
+    /// set-up, instead of two double-and-adds and an addition.  The
+    /// coefficients are drawn from the same stream in the same order and
+    /// the points are equal, so the targets, rows and answer are those of
+    /// `StrideRenew`; only the set-up's additions and doublings fall
+    /// (about `log₂ r` doublings and a quarter of the additions a
+    /// multiplication pair), every one of them still counted.
+    StrideRenewJoint,
 }
 
 impl TargetSource {
@@ -13790,6 +13866,7 @@ impl TargetSource {
             TargetSource::StrideRenew => "stride_renew",
             TargetSource::StrideGenerator => "stride_generator",
             TargetSource::StrideRenewDeferredGuard => "stride_renew_deferred_guard",
+            TargetSource::StrideRenewJoint => "stride_renew_joint",
         }
     }
     pub fn is_walk(&self) -> bool {
@@ -13805,7 +13882,9 @@ impl TargetSource {
     pub fn renews_stride(&self) -> bool {
         matches!(
             self,
-            TargetSource::StrideRenew | TargetSource::StrideRenewDeferredGuard
+            TargetSource::StrideRenew
+                | TargetSource::StrideRenewDeferredGuard
+                | TargetSource::StrideRenewJoint
         )
     }
     /// **Whether a target the run has already decomposed is skipped.**
@@ -13830,6 +13909,7 @@ impl TargetSource {
                 | TargetSource::Stride
                 | TargetSource::StrideRenew
                 | TargetSource::StrideRenewDeferredGuard
+                | TargetSource::StrideRenewJoint
         )
     }
 }
@@ -14398,19 +14478,24 @@ fn collect_and_solve_relations_scaled_touching<
     let (mut stride, mut stride_steps, mut stride_restarts, mut stride_renewals) =
         ((g.identity(), 0u64, 0u64), 0u64, 0u64, 0u64);
     let mut renew_by = (g.identity(), 0u64, 0u64);
+    // `StrideRenewJoint`: `G + Q` once, then every `[a]G + [b]Q` of the
+    // set-up is one joint double-and-add over it (same draws, same points).
+    let joint_gq = (targets == TargetSource::StrideRenewJoint)
+        .then(|| g.add(&mut rel.group_ops, generator, target));
+    let draw_one = |rng: &mut StdRng, ops: &mut GroupOps, scale: &mut Option<&mut CoeffScale>| {
+        match joint_gq {
+            Some(gq) => {
+                let a = scale_coeff(scale, rng.gen_range(1..r), r);
+                let b = rng.gen_range(1..r);
+                (joint_mul(g, ops, generator, target, gq, a, b), a, b)
+            }
+            None => draw_jumps(g, generator, target, r, rng, ops, 1, scale)[0],
+        }
+    };
     if striding {
         // A stride at the identity would present one point forever.
         while g.is_identity(&stride.0) {
-            stride = draw_jumps(
-                g,
-                generator,
-                target,
-                r,
-                &mut rng,
-                &mut rel.group_ops,
-                1,
-                &mut scale,
-            )[0];
+            stride = draw_one(&mut rng, &mut rel.group_ops, &mut scale);
             rng_draws += 2;
         }
     }
@@ -14420,16 +14505,7 @@ fn collect_and_solve_relations_scaled_touching<
     }
     if targets.renews_stride() {
         while g.is_identity(&renew_by.0) {
-            renew_by = draw_jumps(
-                g,
-                generator,
-                target,
-                r,
-                &mut rng,
-                &mut rel.group_ops,
-                1,
-                &mut scale,
-            )[0];
+            renew_by = draw_one(&mut rng, &mut rel.group_ops, &mut scale);
             rng_draws += 2;
         }
     }
@@ -14639,14 +14715,20 @@ fn collect_and_solve_relations_scaled_touching<
             }
             TargetSource::Stride
             | TargetSource::StrideRenew
-            | TargetSource::StrideRenewDeferredGuard => {
+            | TargetSource::StrideRenewDeferredGuard
+            | TargetSource::StrideRenewJoint => {
                 if walk_fresh {
                     rng_draws += 2;
                     wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                     wb = rng.gen_range(1..r);
-                    let ag = g.mul(&mut rel.group_ops, generator, wa);
-                    let bq = g.mul(&mut rel.group_ops, target, wb);
-                    walk_point = g.add(&mut rel.group_ops, ag, bq);
+                    walk_point = match joint_gq {
+                        Some(gq) => joint_mul(g, &mut rel.group_ops, generator, target, gq, wa, wb),
+                        None => {
+                            let ag = g.mul(&mut rel.group_ops, generator, wa);
+                            let bq = g.mul(&mut rel.group_ops, target, wb);
+                            g.add(&mut rel.group_ops, ag, bq)
+                        }
+                    };
                     walk_fresh = false;
                     stride_restarts += 1;
                 } else {
@@ -22633,6 +22715,79 @@ mod ksum_wide_index_tests {
             // `split` never forms the partials `sib` pairs: an explicit error.
             let both = KSumTable::build_negation_folded_all(g, &fb, k, true, true, true, true);
             assert!(both.is_err(), "k = {k}");
+        }
+    }
+
+    /// `prefix` keeps every `k`-sum entry of the build without it (same
+    /// key, same packed summands, same collisions, same group operations)
+    /// and adds entries for the partial sums of fewer than `k` summands
+    /// the build formed anyway, each a correct decomposition: a probe of
+    /// such a sum answers with fewer than `k` summands adding to it.
+    #[test]
+    fn prefix_build_keeps_the_ksum_table_and_adds_shorter_sums() {
+        fn check<G: CountedGroup>(name: &str, g: &G, fb: &FactorBase<G::Elt>, k: u32, split: bool) {
+            let base =
+                KSumTable::build_negation_folded_prefix(g, fb, k, true, true, split, false, false)
+                    .unwrap();
+            let off = KSumTable::build_negation_folded_split(g, fb, k, true, true, split).unwrap();
+            let on =
+                KSumTable::build_negation_folded_prefix(g, fb, k, true, true, split, false, true)
+                    .unwrap();
+            assert_eq!(base.map, off.map, "{name} k = {k}");
+            assert_eq!(base.insert_attempts, off.insert_attempts);
+            assert_eq!(base.prefix_entries, 0);
+            assert_eq!(
+                on.build_ops, base.build_ops,
+                "{name} k = {k}: no added operation"
+            );
+            assert_eq!(on.collisions, base.collisions, "{name} k = {k}");
+            for (key, packed) in &base.map {
+                assert_eq!(on.map.get(key), Some(packed), "{name} k = {k}");
+            }
+            assert_eq!(on.entries, base.entries + on.prefix_entries);
+            assert!(on.prefix_entries > 0, "{name} k = {k}");
+            assert!(on.insert_attempts >= base.insert_attempts + on.prefix_entries);
+            let mut ops = GroupOps::default();
+            let mut lookups = 0;
+            let mut shorter = 0;
+            for (key, packed) in &on.map {
+                let summands = on.unpack(*packed);
+                if base.map.contains_key(key) {
+                    assert_eq!(summands.len(), k as usize);
+                    continue;
+                }
+                assert!(
+                    !summands.is_empty() && summands.len() < k as usize,
+                    "{name}"
+                );
+                let mut s = fb.points[summands[0]];
+                for &i in &summands[1..] {
+                    s = g.add(&mut ops, s, fb.points[i]);
+                }
+                assert_eq!(g.key(&s) >> 1, *key, "{name} k = {k}");
+                for t in [s, g.neg(s)] {
+                    let got = on
+                        .probe(g, fb, &mut ops, &mut lookups, t)
+                        .expect("prefix hit");
+                    assert_eq!(got.len(), summands.len());
+                    assert!(is_sum_of_base(g, fb, &got, t), "{name} k = {k}");
+                }
+                shorter += 1;
+            }
+            assert_eq!(shorter, on.prefix_entries, "{name} k = {k}");
+        }
+        let inst = prime_instance_for(24, 5);
+        for (k, a) in [(3u32, 14usize), (4, 12), (5, 11), (6, 12)] {
+            let fb = prime_factor_base(&inst, a);
+            for split in [false, true] {
+                check("prime", &inst.curve, &fb, k, split);
+            }
+        }
+        let bin = random_binary_instance(17, 3, 4).expect("binary instance");
+        let bg = BinaryGroup(&bin.fast);
+        let fb = binary_subspace_factor_base(&bin, &[1, 2, 4, 8, 16]);
+        for k in [3u32, 4, 5] {
+            check("binary", &bg, &fb, k, true);
         }
     }
 
