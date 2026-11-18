@@ -1,0 +1,25 @@
+--- frozen_reference
++++ candidate
+@@ -1,6 +1,6 @@
+ from research.image_cells_20261115_v67.algebra import pmul,rem,trim,evaluate
+ from research.translation_orbits_20261115_v69.algebra import orbit_polynomial,literal_s3,quad_coeffs
+-from .field import Prime
++from research.prime_orbit_roots_20261116_v71.field import Prime
+ 
+ def monic(a,f):
+  a=trim(a)
+@@ -18,13 +18,7 @@
+   a=trim(a)
+  assert not a
+  return trim(out)
+-def power(a,n,H,f):
+- result=[1];a=rem(a,H,f)
+- while n:
+-  if n&1:result=rem(pmul(result,a,f),H,f)
+-  n>>=1
+-  if n:a=rem(pmul(a,a,f),H,f)
+- return result
++from .kernel import power
+ 
+ def field_roots(R,f,max_attempts=96):
+  q=power([0,1],f.p,R,f)

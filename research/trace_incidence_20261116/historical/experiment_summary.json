@@ -1,0 +1,1085 @@
+{
+  "schema": "integrated-ecdlp-experiment/v1",
+  "result": "Measured divisor-translation improvement; no faster complete prime-field ECDLP algorithm established. Implicit incidence variants lose to the strong native pair control.",
+  "timing_scope": "Complete fresh-state algorithm calls, with public pool generation added per attempt. Library/process startup retained in raw panels separately. Pinned CPUs on a shared host, one native thread; exploratory timings.",
+  "memory_scope": "Absolute fresh-process peaks include runtime/backend; these are not incremental algorithm allocation. Quotient memory uses the separate fresh VmHWM audit, not the record-retaining timing driver. Pair C++ uses O(B) auxiliary storage; no B^2 pair table.",
+  "pool_design": "60 natural fixtures: three curves and four fixed public seeds at each B, r approximately 8 B^3. Planted and negative-alias controls are excluded from performance statistics.",
+  "retry_scope": "Fixed seed order 0..3 per curve, stopping at first informative relation; preceding misses charged. Four misses are censored, not a completed solve or proof of failure.",
+  "seeded_retry_counts": {
+    "cpp-pairs": {
+      "solved": 14,
+      "right_censored": 1
+    },
+    "quotient-target-scan": {
+      "solved": 14,
+      "right_censored": 1
+    },
+    "incidence-horner": {
+      "solved": 14,
+      "right_censored": 1
+    },
+    "incidence-blocked": {
+      "solved": 14,
+      "right_censored": 1
+    }
+  },
+  "complexity_target": "For B=Theta(r^(1/3)), a complete O(B^(3/2-epsilon) polylog(r)) algorithm would beat rho. Neither candidate supplies that bound; no exponent fitted to toy timings.",
+  "structured_scope": "Random labelled pools and structured PKM/isogeny factor bases remain separate. No free-label construction assumed.",
+  "source_sha256": {
+    "incidence/benchmark_results.json": "673446cffe380d2d0c81e89875749b222ffff50e3f1c85bb4e47162386f9051a",
+    "incidence/benchmark_summary.json": "a14cdf40a9395a281884a8cbff733a07f455349ad4b4b7f6151b7c29f5307d7f",
+    "repo_controls/pair_benchmark.json": "d886be38f20420d9fdc485ee2f509a141a67b5fe597d998f2d4111a1cd25b55d",
+    "prime_fixtures/manifest.json": "2375991a6231f5209b8fb25e25ca1dc0f48e5e0ee38f06c99243c97e1622e812",
+    "independent_pool_audit.json": "1d66e65363f9aaae1ffe9ae08a57dd1e74ae80b75946428cbab991c8eefb825a",
+    "cross_check_results.json": "669c2b64458991e092d715f513cc279575cf4d07e57a6b1bdf91d4d79fd98fa6",
+    "repo_controls/incidence_parity_and_memory.json": "c669b708bc0c427d050a5c1dc6c3124a81e8d206e409689831c818a8151d4034"
+  },
+  "summary": [
+    {
+      "algorithm": "cpp-pairs",
+      "B": 8,
+      "natural_attempts": 12,
+      "hits": 4,
+      "misses": 8,
+      "median_oracle_ms": 0.006089095444016545,
+      "median_pool_generation_ms": 1.611317000000001,
+      "median_pool_plus_oracle_ms": 1.6181995083505083,
+      "max_absolute_process_rss_kib": 1800
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 16,
+      "natural_attempts": 12,
+      "hits": 7,
+      "misses": 5,
+      "median_oracle_ms": 0.01546480523367117,
+      "median_pool_generation_ms": 3.771988000000004,
+      "median_pool_plus_oracle_ms": 3.7873311947968222,
+      "max_absolute_process_rss_kib": 1804
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 32,
+      "natural_attempts": 12,
+      "hits": 4,
+      "misses": 8,
+      "median_oracle_ms": 0.04694774506880051,
+      "median_pool_generation_ms": 9.258747000000067,
+      "median_pool_plus_oracle_ms": 9.305718921795318,
+      "max_absolute_process_rss_kib": 1812
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 64,
+      "natural_attempts": 12,
+      "hits": 6,
+      "misses": 6,
+      "median_oracle_ms": 0.16667930886428395,
+      "median_pool_generation_ms": 21.548441000000196,
+      "median_pool_plus_oracle_ms": 21.704154272936286,
+      "max_absolute_process_rss_kib": 1824
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 128,
+      "natural_attempts": 12,
+      "hits": 7,
+      "misses": 5,
+      "median_oracle_ms": 0.7215509474992233,
+      "median_pool_generation_ms": 52.46919549999984,
+      "median_pool_plus_oracle_ms": 52.72014392069877,
+      "max_absolute_process_rss_kib": 1852
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 8,
+      "natural_attempts": 12,
+      "hits": 4,
+      "misses": 8,
+      "median_oracle_ms": 0.31316928532625404,
+      "median_pool_generation_ms": 1.611317000000001,
+      "median_pool_plus_oracle_ms": 1.9069975591389545,
+      "max_absolute_process_rss_kib": 24300
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 16,
+      "natural_attempts": 12,
+      "hits": 7,
+      "misses": 5,
+      "median_oracle_ms": 0.9751860657512325,
+      "median_pool_generation_ms": 3.771988000000004,
+      "median_pool_plus_oracle_ms": 4.602298461021501,
+      "max_absolute_process_rss_kib": 24532
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 32,
+      "natural_attempts": 12,
+      "hits": 4,
+      "misses": 8,
+      "median_oracle_ms": 5.616386233333336,
+      "median_pool_generation_ms": 9.258747000000067,
+      "median_pool_plus_oracle_ms": 14.500060733333342,
+      "max_absolute_process_rss_kib": 24676
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 64,
+      "natural_attempts": 12,
+      "hits": 6,
+      "misses": 6,
+      "median_oracle_ms": 37.08520800000059,
+      "median_pool_generation_ms": 21.548441000000196,
+      "median_pool_plus_oracle_ms": 58.66428900000065,
+      "max_absolute_process_rss_kib": 24828
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 128,
+      "natural_attempts": 12,
+      "hits": 7,
+      "misses": 5,
+      "median_oracle_ms": 404.3642814999995,
+      "median_pool_generation_ms": 52.46919549999984,
+      "median_pool_plus_oracle_ms": 455.9511789999997,
+      "max_absolute_process_rss_kib": 24956
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 8,
+      "natural_attempts": 12,
+      "hits": 4,
+      "misses": 8,
+      "median_oracle_ms": 0.3866099297426607,
+      "median_pool_generation_ms": 1.611317000000001,
+      "median_pool_plus_oracle_ms": 1.9977747006936342,
+      "max_absolute_process_rss_kib": 26468
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 16,
+      "natural_attempts": 12,
+      "hits": 7,
+      "misses": 5,
+      "median_oracle_ms": 1.3614418559322032,
+      "median_pool_generation_ms": 3.771988000000004,
+      "median_pool_plus_oracle_ms": 5.108313567796688,
+      "max_absolute_process_rss_kib": 26400
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 32,
+      "natural_attempts": 12,
+      "hits": 4,
+      "misses": 8,
+      "median_oracle_ms": 6.282660692307692,
+      "median_pool_generation_ms": 9.258747000000067,
+      "median_pool_plus_oracle_ms": 15.648197882575776,
+      "max_absolute_process_rss_kib": 26376
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 64,
+      "natural_attempts": 12,
+      "hits": 6,
+      "misses": 6,
+      "median_oracle_ms": 41.96335041666667,
+      "median_pool_generation_ms": 21.548441000000196,
+      "median_pool_plus_oracle_ms": 63.294341916666845,
+      "max_absolute_process_rss_kib": 26540
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 128,
+      "natural_attempts": 12,
+      "hits": 7,
+      "misses": 5,
+      "median_oracle_ms": 428.24012899999997,
+      "median_pool_generation_ms": 52.46919549999984,
+      "median_pool_plus_oracle_ms": 480.80911750000024,
+      "max_absolute_process_rss_kib": 26608
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 8,
+      "natural_attempts": 12,
+      "hits": 4,
+      "misses": 8,
+      "median_oracle_ms": 0.7229822906135717,
+      "median_pool_generation_ms": 1.611317000000001,
+      "median_pool_plus_oracle_ms": 2.3676116587561333,
+      "max_absolute_process_rss_kib": 26416
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 16,
+      "natural_attempts": 12,
+      "hits": 7,
+      "misses": 5,
+      "median_oracle_ms": 2.8289653448275858,
+      "median_pool_generation_ms": 3.771988000000004,
+      "median_pool_plus_oracle_ms": 6.569592172413812,
+      "max_absolute_process_rss_kib": 26636
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 32,
+      "natural_attempts": 12,
+      "hits": 4,
+      "misses": 8,
+      "median_oracle_ms": 11.491719000000002,
+      "median_pool_generation_ms": 9.258747000000067,
+      "median_pool_plus_oracle_ms": 20.704057285714292,
+      "max_absolute_process_rss_kib": 26612
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 64,
+      "natural_attempts": 12,
+      "hits": 6,
+      "misses": 6,
+      "median_oracle_ms": 59.497465250000005,
+      "median_pool_generation_ms": 21.548441000000196,
+      "median_pool_plus_oracle_ms": 81.23229124999999,
+      "max_absolute_process_rss_kib": 26756
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 128,
+      "natural_attempts": 12,
+      "hits": 7,
+      "misses": 5,
+      "median_oracle_ms": 353.280375,
+      "median_pool_generation_ms": 52.46919549999984,
+      "median_pool_plus_oracle_ms": 408.22848100000004,
+      "max_absolute_process_rss_kib": 27064
+    }
+  ],
+  "complete_seeded_retries": [
+    {
+      "algorithm": "cpp-pairs",
+      "B": 8,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b008_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 7.713728941413126e-06,
+      "pool_generation_cpu_seconds": 0.0015111489999999894,
+      "total_cpu_seconds": 0.0015188627289414026
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 8,
+      "curve": 1,
+      "status": "right-censored-after-four-pools",
+      "charged_fixture_ids": [
+        "b008_c1_natural_s0",
+        "b008_c1_natural_s1",
+        "b008_c1_natural_s2",
+        "b008_c1_natural_s3"
+      ],
+      "pools_charged": 4,
+      "oracle_cpu_seconds": 2.4529175314017787e-05,
+      "pool_generation_cpu_seconds": 0.006748568999999982,
+      "total_cpu_seconds": 0.006773098175314
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 8,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b008_c2_natural_s0",
+        "b008_c2_natural_s1",
+        "b008_c2_natural_s2"
+      ],
+      "pools_charged": 3,
+      "oracle_cpu_seconds": 1.840535647132422e-05,
+      "pool_generation_cpu_seconds": 0.004246041000000034,
+      "total_cpu_seconds": 0.0042644463564713575
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 16,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 1.5412341278681223e-05,
+      "pool_generation_cpu_seconds": 0.0036216650000000516,
+      "total_cpu_seconds": 0.003637077341278733
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 16,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c1_natural_s0",
+        "b016_c1_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 3.1858941809688227e-05,
+      "pool_generation_cpu_seconds": 0.007472851999999808,
+      "total_cpu_seconds": 0.007504710941809496
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 16,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 1.3298774740810556e-05,
+      "pool_generation_cpu_seconds": 0.003697837000000037,
+      "total_cpu_seconds": 0.003711135774740848
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 32,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 1.9962832338578404e-05,
+      "pool_generation_cpu_seconds": 0.00892008600000005,
+      "total_cpu_seconds": 0.008940048832338628
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 32,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c1_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 4.539880597014925e-05,
+      "pool_generation_cpu_seconds": 0.009473024999999913,
+      "total_cpu_seconds": 0.009518423805970061
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 32,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 4.5625156445556946e-05,
+      "pool_generation_cpu_seconds": 0.011822526,
+      "total_cpu_seconds": 0.011868151156445557
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 64,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 7.324148296593185e-05,
+      "pool_generation_cpu_seconds": 0.021264905,
+      "total_cpu_seconds": 0.021338146482965933
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 64,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c1_natural_s0",
+        "b064_c1_natural_s1",
+        "b064_c1_natural_s2"
+      ],
+      "pools_charged": 3,
+      "oracle_cpu_seconds": 0.000489239441746598,
+      "pool_generation_cpu_seconds": 0.06477861200000024,
+      "total_cpu_seconds": 0.06526785144174684
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 64,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.00011965148861646234,
+      "pool_generation_cpu_seconds": 0.0216401209999999,
+      "total_cpu_seconds": 0.021759772488616363
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 128,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c0_natural_s0",
+        "b128_c0_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.0012608201368523948,
+      "pool_generation_cpu_seconds": 0.10498264599999985,
+      "total_cpu_seconds": 0.10624346613685223
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 128,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c1_natural_s0",
+        "b128_c1_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.0013516780733748121,
+      "pool_generation_cpu_seconds": 0.10700303,
+      "total_cpu_seconds": 0.1083547080733748
+    },
+    {
+      "algorithm": "cpp-pairs",
+      "B": 128,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c2_natural_s0",
+        "b128_c2_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.0013050096450617284,
+      "pool_generation_cpu_seconds": 0.10551381299999951,
+      "total_cpu_seconds": 0.10681882264506123
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 8,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b008_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0003909638146341463,
+      "pool_generation_cpu_seconds": 0.0015111489999999894,
+      "total_cpu_seconds": 0.0019021128146341358
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 8,
+      "curve": 1,
+      "status": "right-censored-after-four-pools",
+      "charged_fixture_ids": [
+        "b008_c1_natural_s0",
+        "b008_c1_natural_s1",
+        "b008_c1_natural_s2",
+        "b008_c1_natural_s3"
+      ],
+      "pools_charged": 4,
+      "oracle_cpu_seconds": 0.0012938835074627801,
+      "pool_generation_cpu_seconds": 0.006748568999999982,
+      "total_cpu_seconds": 0.008042452507462761
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 8,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b008_c2_natural_s0",
+        "b008_c2_natural_s1",
+        "b008_c2_natural_s2"
+      ],
+      "pools_charged": 3,
+      "oracle_cpu_seconds": 0.0007552478325193793,
+      "pool_generation_cpu_seconds": 0.004246041000000034,
+      "total_cpu_seconds": 0.005001288832519413
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 16,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0004885177195121937,
+      "pool_generation_cpu_seconds": 0.0036216650000000516,
+      "total_cpu_seconds": 0.004110182719512245
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 16,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c1_natural_s0",
+        "b016_c1_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.002062618052640021,
+      "pool_generation_cpu_seconds": 0.007472851999999808,
+      "total_cpu_seconds": 0.009535470052639827
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 16,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0010877979594594578,
+      "pool_generation_cpu_seconds": 0.003697837000000037,
+      "total_cpu_seconds": 0.004785634959459495
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 32,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.004580453888888848,
+      "pool_generation_cpu_seconds": 0.00892008600000005,
+      "total_cpu_seconds": 0.013500539888888897
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 32,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c1_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.00404796576190473,
+      "pool_generation_cpu_seconds": 0.009473024999999913,
+      "total_cpu_seconds": 0.013520990761904644
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 32,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0010535379605263067,
+      "pool_generation_cpu_seconds": 0.011822526,
+      "total_cpu_seconds": 0.012876063960526306
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 64,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.03475172599999965,
+      "pool_generation_cpu_seconds": 0.021264905,
+      "total_cpu_seconds": 0.05601663099999965
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 64,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c1_natural_s0",
+        "b064_c1_natural_s1",
+        "b064_c1_natural_s2"
+      ],
+      "pools_charged": 3,
+      "oracle_cpu_seconds": 0.11538219966666752,
+      "pool_generation_cpu_seconds": 0.06477861200000024,
+      "total_cpu_seconds": 0.18016081166666775
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 64,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0350480046666668,
+      "pool_generation_cpu_seconds": 0.0216401209999999,
+      "total_cpu_seconds": 0.0566881256666667
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 128,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c0_natural_s0",
+        "b128_c0_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.5704890959999993,
+      "pool_generation_cpu_seconds": 0.10498264599999985,
+      "total_cpu_seconds": 0.6754717419999992
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 128,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c1_natural_s0",
+        "b128_c1_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.6442688839999988,
+      "pool_generation_cpu_seconds": 0.10700303,
+      "total_cpu_seconds": 0.7512719139999988
+    },
+    {
+      "algorithm": "quotient-target-scan",
+      "B": 128,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c2_natural_s0",
+        "b128_c2_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.7516180309999996,
+      "pool_generation_cpu_seconds": 0.10551381299999951,
+      "total_cpu_seconds": 0.8571318439999991
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 8,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b008_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0004242420740740741,
+      "pool_generation_cpu_seconds": 0.0015111489999999894,
+      "total_cpu_seconds": 0.0019353910740740636
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 8,
+      "curve": 1,
+      "status": "right-censored-after-four-pools",
+      "charged_fixture_ids": [
+        "b008_c1_natural_s0",
+        "b008_c1_natural_s1",
+        "b008_c1_natural_s2",
+        "b008_c1_natural_s3"
+      ],
+      "pools_charged": 4,
+      "oracle_cpu_seconds": 0.001534944730578457,
+      "pool_generation_cpu_seconds": 0.006748568999999982,
+      "total_cpu_seconds": 0.008283513730578439
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 8,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b008_c2_natural_s0",
+        "b008_c2_natural_s1",
+        "b008_c2_natural_s2"
+      ],
+      "pools_charged": 3,
+      "oracle_cpu_seconds": 0.0011535046871153777,
+      "pool_generation_cpu_seconds": 0.004246041000000034,
+      "total_cpu_seconds": 0.005399545687115411
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 16,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0014109785789473686,
+      "pool_generation_cpu_seconds": 0.0036216650000000516,
+      "total_cpu_seconds": 0.00503264357894742
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 16,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c1_natural_s0",
+        "b016_c1_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.0026303815456989246,
+      "pool_generation_cpu_seconds": 0.007472851999999808,
+      "total_cpu_seconds": 0.010103233545698732
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 16,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0013594808983050848,
+      "pool_generation_cpu_seconds": 0.003697837000000037,
+      "total_cpu_seconds": 0.005057317898305122
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 32,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.006463982769230769,
+      "pool_generation_cpu_seconds": 0.00892008600000005,
+      "total_cpu_seconds": 0.015384068769230819
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 32,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c1_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0063308501538461535,
+      "pool_generation_cpu_seconds": 0.009473024999999913,
+      "total_cpu_seconds": 0.015803875153846066
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 32,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.00623447123076923,
+      "pool_generation_cpu_seconds": 0.011822526,
+      "total_cpu_seconds": 0.01805699723076923
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 64,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.039941394666666664,
+      "pool_generation_cpu_seconds": 0.021264905,
+      "total_cpu_seconds": 0.061206299666666665
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 64,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c1_natural_s0",
+        "b064_c1_natural_s1",
+        "b064_c1_natural_s2"
+      ],
+      "pools_charged": 3,
+      "oracle_cpu_seconds": 0.12507736916666667,
+      "pool_generation_cpu_seconds": 0.06477861200000024,
+      "total_cpu_seconds": 0.1898559811666669
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 64,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.03996339399999999,
+      "pool_generation_cpu_seconds": 0.0216401209999999,
+      "total_cpu_seconds": 0.061603514999999893
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 128,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c0_natural_s0",
+        "b128_c0_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.894020907,
+      "pool_generation_cpu_seconds": 0.10498264599999985,
+      "total_cpu_seconds": 0.9990035529999999
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 128,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c1_natural_s0",
+        "b128_c1_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.857689311,
+      "pool_generation_cpu_seconds": 0.10700303,
+      "total_cpu_seconds": 0.964692341
+    },
+    {
+      "algorithm": "incidence-horner",
+      "B": 128,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c2_natural_s0",
+        "b128_c2_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.8878770739999999,
+      "pool_generation_cpu_seconds": 0.10551381299999951,
+      "total_cpu_seconds": 0.9933908869999994
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 8,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b008_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0008570687021276596,
+      "pool_generation_cpu_seconds": 0.0015111489999999894,
+      "total_cpu_seconds": 0.002368217702127649
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 8,
+      "curve": 1,
+      "status": "right-censored-after-four-pools",
+      "charged_fixture_ids": [
+        "b008_c1_natural_s0",
+        "b008_c1_natural_s1",
+        "b008_c1_natural_s2",
+        "b008_c1_natural_s3"
+      ],
+      "pools_charged": 4,
+      "oracle_cpu_seconds": 0.002743959933582101,
+      "pool_generation_cpu_seconds": 0.006748568999999982,
+      "total_cpu_seconds": 0.009492528933582083
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 8,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b008_c2_natural_s0",
+        "b008_c2_natural_s1",
+        "b008_c2_natural_s2"
+      ],
+      "pools_charged": 3,
+      "oracle_cpu_seconds": 0.0021148613241791783,
+      "pool_generation_cpu_seconds": 0.004246041000000034,
+      "total_cpu_seconds": 0.006360902324179212
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 16,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0028319853448275857,
+      "pool_generation_cpu_seconds": 0.0036216650000000516,
+      "total_cpu_seconds": 0.006453650344827637
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 16,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c1_natural_s0",
+        "b016_c1_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.005539000844827586,
+      "pool_generation_cpu_seconds": 0.007472851999999808,
+      "total_cpu_seconds": 0.013011852844827395
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 16,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b016_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.002745768966666667,
+      "pool_generation_cpu_seconds": 0.003697837000000037,
+      "total_cpu_seconds": 0.006443605966666704
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 32,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.012182920857142858,
+      "pool_generation_cpu_seconds": 0.00892008600000005,
+      "total_cpu_seconds": 0.021103006857142906
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 32,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c1_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.011844512428571426,
+      "pool_generation_cpu_seconds": 0.009473024999999913,
+      "total_cpu_seconds": 0.02131753742857134
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 32,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b032_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.012554537857142858,
+      "pool_generation_cpu_seconds": 0.011822526,
+      "total_cpu_seconds": 0.024377063857142858
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 64,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c0_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.0581622545,
+      "pool_generation_cpu_seconds": 0.021264905,
+      "total_cpu_seconds": 0.07942715950000001
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 64,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c1_natural_s0",
+        "b064_c1_natural_s1",
+        "b064_c1_natural_s2"
+      ],
+      "pools_charged": 3,
+      "oracle_cpu_seconds": 0.1744560335,
+      "pool_generation_cpu_seconds": 0.06477861200000024,
+      "total_cpu_seconds": 0.23923464550000023
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 64,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b064_c2_natural_s0"
+      ],
+      "pools_charged": 1,
+      "oracle_cpu_seconds": 0.063368703,
+      "pool_generation_cpu_seconds": 0.0216401209999999,
+      "total_cpu_seconds": 0.0850088239999999
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 128,
+      "curve": 0,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c0_natural_s0",
+        "b128_c0_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.725506681,
+      "pool_generation_cpu_seconds": 0.10498264599999985,
+      "total_cpu_seconds": 0.8304893269999999
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 128,
+      "curve": 1,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c1_natural_s0",
+        "b128_c1_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.7023810429999999,
+      "pool_generation_cpu_seconds": 0.10700303,
+      "total_cpu_seconds": 0.8093840729999999
+    },
+    {
+      "algorithm": "incidence-blocked",
+      "B": 128,
+      "curve": 2,
+      "status": "solved",
+      "charged_fixture_ids": [
+        "b128_c2_natural_s0",
+        "b128_c2_natural_s1"
+      ],
+      "pools_charged": 2,
+      "oracle_cpu_seconds": 0.7060639209999999,
+      "pool_generation_cpu_seconds": 0.10551381299999951,
+      "total_cpu_seconds": 0.8115777339999994
+    }
+  ]
+}

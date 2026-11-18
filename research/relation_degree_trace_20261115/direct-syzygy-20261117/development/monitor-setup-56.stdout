@@ -1,0 +1,53 @@
+usage: isolated_bench.py [-h] {run,reserve,busy} ...
+
+Run a benchmark on a reserved, pinned CPU and record what else was running.
+
+Wall time is only evidence when the run had the core to itself.  Pinning the
+benchmark (``taskset``) is not enough on its own: it keeps the benchmark on one
+core but does not keep anything else off that core, and it does nothing about
+builds or other jobs on the neighbouring cores that share the cache and the
+memory bus.  This tool does all three, and records the evidence:
+
+1. **One benchmark at a time.**  It takes an exclusive ``flock`` on
+   ``--lock`` (default ``/tmp/crypto-bench.lock``).  Heavy non-benchmark work
+   (``cargo build``, test suites, audit cells) should run through
+   ``isolated_bench.py busy -- CMD``, which takes the same lock, so a build
+   cannot start in the middle of a timed stage.
+2. **A quiet machine before starting.**  It samples every other process's CPU
+   use for ``--settle`` seconds and refuses to start if they use more than
+   ``--max-other-cpu`` CPUs' worth between them, or if the 10-second CPU or
+   memory pressure (PSI) is above ``--max-psi``.
+3. **A reserved core.**  It moves every other thread it is allowed to move off
+   the benchmark CPUs (``--cpus``), pins the benchmark there, and restores the
+   other threads' affinity afterwards.  On a host with SMT it refuses a CPU
+   whose sibling is not reserved too.  A process started while a run had
+   moved its parent off those CPUs inherits the narrowed mask, and no restore
+   reaches it; so when this process's own mask lacks the CPUs asked for, it
+   widens the mask to them where the system allows, and the record says so
+   (``affinity_widened_from``).
+4. **A record of the conditions.**  Per run: wall time, user and system CPU,
+   voluntary and involuntary context switches, page faults, load average and
+   PSI before and after, and the CPU time every other process used while the
+   benchmark ran.  A run where other processes used more than
+   ``--max-other-cpu`` is marked ``contended``.
+
+What it cannot do: it cannot see or stop other tenants of a virtual machine's
+host, and it cannot fix the CPU frequency.  That residual noise is what an A/A
+run measures, and the A/A spread is reported beside every A/B difference
+(AGENTS.md section 10).
+
+Usage::
+
+    tools/isolated_bench.py run --cpus 3 --out rec.jsonl -- ./worker < job.json
+    tools/isolated_bench.py reserve --cpus 3 --out cond.json -- python3 tournament.py run ... --cpu 3
+    tools/isolated_bench.py busy -- cargo build --release
+
+``run`` pins the command itself.  ``reserve`` is for a harness that pins its
+own children (the tournament evaluator): it takes the lock, reserves the CPUs
+and monitors the machine for the whole command, but leaves pinning to it.
+
+positional arguments:
+  {run,reserve,busy}
+
+options:
+  -h, --help          show this help message and exit

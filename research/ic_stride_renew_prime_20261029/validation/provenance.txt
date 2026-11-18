@@ -1,0 +1,115 @@
+# provenance checks, validator, 2026-10-29T05:19:27Z, worktree /tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/wt-stride
+## snapshot
+HEAD 0e7243aa6cbeae8f0f5a85e618929928d2aa1fd3 branch claude/ic-stride-renew-prime-20261029
+protocol freeze commit 4d4593aabda667a681fab4a67e351dc5bcb7c1f4: XP-20261029: freeze the stride-renew vs walk prime-field IC protocol (20-32 bits)
+git diff --stat 4d4593aa HEAD -- backlog/XP-20261029-stride-renew-prime (empty = unchanged):
+(end)
+git status --short backlog/XP-20261029-stride-renew-prime (empty = clean):
+(end)
+evidence dir research/ic_stride_renew_prime_20261029 at 2026-10-29T05:20:10Z: not in any commit (HEAD 0e7243aa6c); staged in the index by another session during validation (git status:  218 A;); validation/ is validator output. Validation is bound to the S3 originals and the hashes below, not to the working tree.
+PROTOCOL.md sha256 7a8d0c01220a77eeebd241bbbff7b9838e3ba869cd20507d51ae576f0b8fcf90 blob@4d4593aa 2c6f7f358b9382596a1127764b79bc054d808cc4 worktree-blob 2c6f7f358b9382596a1127764b79bc054d808cc4
+spec-P20.json sha256 ddc070f22c05d161fc65dda728eee36a4d27e764cce301f5b7950c3015af6f67 blob@4d4593aa d5ef4cda306e8d7d723cc3380587bd3e13c71898 worktree-blob d5ef4cda306e8d7d723cc3380587bd3e13c71898
+spec-P28.json sha256 2544a24e0563218e473f57ab13985077cf0f93f1b202c3ab0869bf98c261ecc8 blob@4d4593aa 0869544fb8c8a434c536ca812cf3024181ca837f worktree-blob 0869544fb8c8a434c536ca812cf3024181ca837f
+## specs and requests (JSON equality with the frozen spec)
+P20 input-spec==frozen True session/spec==frozen True request.job.spec==frozen True validated-request.job.spec==frozen True provenance 4d4593aabda667a681fab4a67e351dc5bcb7c1f4
+P20 request.json sha256 934c04297e1f46b3bc737be234d9c3070071cc8b62252f0a99cfd214103e2f36 (card-01/03 pin) validated-request sha256 eede7fd0adec6f088a8916518f3f54b3a03d289e5756e39d1bbbecff82330e33 result.request_sha256 eede7fd0adec6f088a8916518f3f54b3a03d289e5756e39d1bbbecff82330e33
+P20 input-spec bytes differ from frozen file (compact vs indented JSON); content equal
+P28 input-spec==frozen True session/spec==frozen True request.job.spec==frozen True validated-request.job.spec==frozen True provenance 4d4593aabda667a681fab4a67e351dc5bcb7c1f4
+P28 request.json sha256 3d7602bf2472691b915b4776a0b5cf5f07fd01a4ce5b205a98399e354a4aa98a (card-01/03 pin) validated-request sha256 68ef06f281c4f34e8672424a3b5ea8259e758c2c7cb3802936a8950b8648682a result.request_sha256 68ef06f281c4f34e8672424a3b5ea8259e758c2c7cb3802936a8950b8648682a
+P28 input-spec bytes differ from frozen file (compact vs indented JSON); content equal
+  - REQUEST_P20 934c04297e1f46b3bc737be234d9c3070071cc8b62252f0a99cfd214103e2f36
+  - REQUEST_P28 3d7602bf2472691b915b4776a0b5cf5f07fd01a4ce5b205a98399e354a4aa98a
+  - b=20: job_name ic-srenew-p20-20261029; REQUEST_P20 = /tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/stride/request-P20.json; RECEIPTS_P20 = /tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/stride/receipts-P20 (must not exist before launch); LOG_P20 = /tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/stride/launch-P20.log (outside RECEIPTS; must not exist before launch)
+  - b=28: job_name ic-srenew-p28-20261029; REQUEST_P28 = /tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/stride/request-P28.json; RECEIPTS_P28 = /tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/stride/receipts-P28 (must not exist before launch); LOG_P28 = /tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/stride/launch-P28.log (outside RECEIPTS; must not exist before launch)
+## S3 originals vs local eks-results (aws s3 cp - | sha256sum, every file listed in SHA256SUMS + SHA256SUMS itself)
+P20 s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/
+376189e669869181d8aa5b1d563cdc70d1020178b9cb60898c10a9123d973535  audit.json
+0ca052aab4a979bfbd62cf73807b03449983d20b2561475332a2ab245704637e  audit.stderr
+376189e669869181d8aa5b1d563cdc70d1020178b9cb60898c10a9123d973535  audit.stdout
+ae47d7ce558199fd6bc4126701a9b12d10588559524b80e21f2ee3301dfe5299  binary.sha256
+49ac9a0bfc0fbe064e3c793393adf599dea344d9e7350b4d2c1a7d086bb16138  build-info.json
+202e4db3b5eb4daaeca44995479e0627b6d54883ae551cc4e543ac0456fdbab3  control-comparison.json
+fb600e6aae2c490100428e26a0a6b594bc7fc6c541deb04fea1dfe58a1713381  input-spec.json
+357d2b3185ce58133ac08cedc2264c98418be85983b6134c72b7323d58bda561  job-exit.json
+f7fb8b9a4c805f3b63c11bc7c7ae0eef856704cfe47c9296abeca2afbd1b10f7  l2-gate.json
+30df1c1f7bf44772072ff5e7a75679a863a3e65f2cf0d6d81b36b5f2662f4afc  pod-cpuset.txt
+833109cae1b895b934b83ff365e286ca235f192988edf11b6a647f64f7a23a83  process-status.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  run-summary.json
+1a04a2f5b06e56a3c619e06d66deb729cb822c47fbc287b34372763dade6e1f0  run.stderr
+f6431b69a8d0946cd75e3388ff4d23c5b625ded3a445157e3c7cc5eff358d666  runner-identity.json
+366b8c17895afc1a186dbc716471c256cf737f8f9aed0d5b4cbe4bbf75538cd4  session/host.json
+a8b8b2eaabed21fa18073e894222109ac80c122918c207ca15cc236856e7f98d  session/plan.json
+038119b6f7d5ec9f2c2539607b0929c3a9ed44be1e7de21ccff93b0a4a8aaee3  session/records.jsonl
+85bb2819521e5f824668b048c9d63445409b64f24c5a98e722989c31bac35461  session/session.json
+fb600e6aae2c490100428e26a0a6b594bc7fc6c541deb04fea1dfe58a1713381  session/spec.json
+2a4214e8a2b13c0eda588588652a98f188f7f5138d0401cd79bd268953c1d0db  SHA256SUMS
+P28 s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/
+7e9a2025f7da615ea36ac4bf3c6b9e2b4046160a36c971e1a16e8ebf407c0606  audit.json
+3022acc9a259340523209081c747217bf2548183605fa1bc0aad06efea079037  audit.stderr
+7e9a2025f7da615ea36ac4bf3c6b9e2b4046160a36c971e1a16e8ebf407c0606  audit.stdout
+ae47d7ce558199fd6bc4126701a9b12d10588559524b80e21f2ee3301dfe5299  binary.sha256
+49ac9a0bfc0fbe064e3c793393adf599dea344d9e7350b4d2c1a7d086bb16138  build-info.json
+9f457b27a0e9a8cb369fe90a3675c766703a9589d339f591925763d51f939954  control-comparison.json
+1de7903569c9e2b8ee7b18e9135f2eff765bb09cca5dbfab1f1fcda4f4a583bc  input-spec.json
+e098db2278151af35422ea31547c294ac623a5017607887b77130484d143bb18  job-exit.json
+f7fb8b9a4c805f3b63c11bc7c7ae0eef856704cfe47c9296abeca2afbd1b10f7  l2-gate.json
+30df1c1f7bf44772072ff5e7a75679a863a3e65f2cf0d6d81b36b5f2662f4afc  pod-cpuset.txt
+9ce99c6eea668ef06633eeb8819009e69db70042b2dc2acf131cbb8f692a2751  process-status.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  run-summary.json
+0377374c491a6fdc44a85da85bfe2773ce03f5a82f35796206a251bb747a5e47  run.stderr
+f4984cf38369bb00a2fef98e6c84acddb0f5b1079e86619f86c2c5d68896dbff  runner-identity.json
+b236ff8ca2bce302df09e37b3e8d29e7e8ba75e15cd9633219b82b3207b8c3c0  session/host.json
+5dfab30de305ffab6db2b5265f35bb3d2a85fa7a353dc632d07baf934f022055  session/plan.json
+090a879120bf5cf1831c874f59d5a733ba8e04c9885c77ce87c8db0237599e3f  session/records.jsonl
+b9a513f56159ab98e88fa24275c8708133de38a04cb49a69c88826de1c486109  session/session.json
+1de7903569c9e2b8ee7b18e9135f2eff765bb09cca5dbfab1f1fcda4f4a583bc  session/spec.json
+9c8ad72ebc1dfa049d91412db5bb8065fcec6553bfe6eccc0ce95ed7be29cf52  SHA256SUMS
+P20 diff S3 hashes vs local SHA256SUMS: identical; local sha256sum -c failures: 0; local SHA256SUMS sha256 2a4214e8a2b13c0eda588588652a98f188f7f5138d0401cd79bd268953c1d0db
+P28 diff S3 hashes vs local SHA256SUMS: identical; local sha256sum -c failures: 0; local SHA256SUMS sha256 9c8ad72ebc1dfa049d91412db5bb8065fcec6553bfe6eccc0ce95ed7be29cf52
+S3 prefixes hold exactly one pod output per job (one pod uid + one launcher receipt dir each): see aws s3 ls in the validator transcript
+## binaries
+P20 measuring binary 583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9 build-info {"source_repository":"https://github.com/aburan28/crypto","source_revision":"cb2ec6873f30b683f7885b53c410d69965f02c20","ecbench_sha256":"583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9","built_at":"2026-10-19T17:55:04Z","architecture":"linux/amd64"} session.binary_sha256 583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9 git_commit null git_dirty null
+P28 measuring binary 583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9 build-info {"source_repository":"https://github.com/aburan28/crypto","source_revision":"cb2ec6873f30b683f7885b53c410d69965f02c20","ecbench_sha256":"583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9","built_at":"2026-10-19T17:55:04Z","architecture":"linux/amd64"} session.binary_sha256 583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9 git_commit null git_dirty null
+local replay/compare binary bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9  /tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/bin/ecbench-bf5eec6d
+## worker audit and L2 gate
+P20 audit.stderr: audit OK: 1680 records, 1680 verified, 1440 replays reproduced, 0 problems
+P20 l2-gate: {"required":"L2","executions":1680,"invalid_outcomes":[],"below_l2":[],"grades":[{"level":"L2","count":1680}],"accepted":true}
+P20 job-exit: {"exit_code":0,"job_name":"ic-srenew-p20-20261029","pod_uid":"8d5ba87a-31b6-46fb-9d07-14bee7f6c08b","node_name":"ip-10-84-190-170.us-east-2.compute.internal"}
+P28 audit.stderr: audit OK: 1680 records, 1680 verified, 1440 replays reproduced, 0 problems
+P28 l2-gate: {"required":"L2","executions":1680,"invalid_outcomes":[],"below_l2":[],"grades":[{"level":"L2","count":1680}],"accepted":true}
+P28 job-exit: {"exit_code":0,"job_name":"ic-srenew-p28-20261029","pod_uid":"e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4","node_name":"ip-10-84-189-249.us-east-2.compute.internal"}
+## ecbench compare / band re-run with the local binary, byte-compared with analysis/
+P20 compare-walk__srenew-w0.json 030db944c7aa87b5 IDENTICAL
+P20 compare-walk__srenew-w0.1.json 6445f036034528e7 IDENTICAL
+P20 compare-walk__srenew-w1.json 98eb5525a0cd1de8 IDENTICAL
+P20 compare-walk__walk-aa-w0.json fae1f3f6618971bc IDENTICAL
+P20 compare-walk__walk-aa-w0.1.json 9d82c3414f7477e8 IDENTICAL
+P20 compare-walk__walk-aa-w1.json a418b4ef6e33a4b5 IDENTICAL
+P20 compare-rho-neg__walk-w0.json 39c7772e631af589 IDENTICAL
+P20 compare-rho-neg__walk-w0.1.json 65ab973504da5acd IDENTICAL
+P20 compare-rho-neg__walk-w1.json ff82d05200254432 IDENTICAL
+P20 compare-rho-neg__srenew-w0.json 09ec608cc9de2817 IDENTICAL
+P20 compare-rho-neg__srenew-w0.1.json c5eaadc0309832bb IDENTICAL
+P20 compare-rho-neg__srenew-w1.json 3e8c50f4cec1bbac IDENTICAL
+P20 compare-rho-neg__rho-neg-aa-w0.json ebfe7c53aecabf5b IDENTICAL
+P20 compare-rho-neg__rho-neg-aa-w0.1.json ab59c73f79efd500 IDENTICAL
+P20 compare-rho-neg__rho-neg-aa-w1.json b021ca47de6d1717 IDENTICAL
+P20 band.md b5eae0ce2ffd5093 IDENTICAL
+P28 compare-walk__srenew-w0.json e133577bce2f3170 IDENTICAL
+P28 compare-walk__srenew-w0.1.json bb7aa9fe337b7fba IDENTICAL
+P28 compare-walk__srenew-w1.json c1570d37e353d57b IDENTICAL
+P28 compare-walk__walk-aa-w0.json e7be85916a40cf0c IDENTICAL
+P28 compare-walk__walk-aa-w0.1.json 5f18f926e347a554 IDENTICAL
+P28 compare-walk__walk-aa-w1.json 8d2375562bf7392c IDENTICAL
+P28 compare-rho-neg__walk-w0.json 7b66644894450ff9 IDENTICAL
+P28 compare-rho-neg__walk-w0.1.json 2bb22cddf0a23d33 IDENTICAL
+P28 compare-rho-neg__walk-w1.json 55a75365334b52e4 IDENTICAL
+P28 compare-rho-neg__srenew-w0.json 229548be2da4b578 IDENTICAL
+P28 compare-rho-neg__srenew-w0.1.json cd10073906d3cc5f IDENTICAL
+P28 compare-rho-neg__srenew-w1.json cb0f4b36024ec5cf IDENTICAL
+P28 compare-rho-neg__rho-neg-aa-w0.json 580696b815633d79 IDENTICAL
+P28 compare-rho-neg__rho-neg-aa-w0.1.json d45362e99f821c2b IDENTICAL
+P28 compare-rho-neg__rho-neg-aa-w1.json 862aef5d1157315b IDENTICAL
+P28 band.md 4d30aa7e574f9685 IDENTICAL
+commands: <bin> compare --dir P<b>/eks-results/session --a A --b B --weight W --json ; <bin> band --dir P<b>/eks-results/session --ranks
+note: P28/analysis/err is an empty producer file (0 bytes)

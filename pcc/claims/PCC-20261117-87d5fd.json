@@ -1,0 +1,79 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T06:40:34Z",
+ "id": "PCC-20261117-87d5fd",
+ "kind": "statement",
+ "producer": {
+  "commit": "4e9c502fb5c8f2bd0cb71aa3a8420ffeb1d3db8d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-relation-e2e.sh",
+    "sha256": "129f39943c7796a7d4cefb935f44cc9ff171a3565070a19bff9a22a00d747dc9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-e2e-v1/relations/result.json",
+    "sha256": "674aa5a52bc6917e5786b5076150db5e6003478dac66450bf52d4fcb521546aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-e2e-v1/relations/checker-result.json",
+    "sha256": "de90e500d07f479b15433c269dad8c789490201b2b159910adb48fb403ad5bfe"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-e2e-v1/transfer/result.json",
+    "sha256": "e2b08116be17e5d9ff773a757047d2f0ffae8720ae3386e83fd2b42d9a6895e8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-e2e-v1/transfer/checker-result.json",
+    "sha256": "eb3d59e6ad8f7e2d68c32aed33653e53f1debf9d25f2efd3a3377f08f744d788"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-e2e-v1/relations/pre-call-manifest.sha256",
+    "sha256": "c52054c1b1576b5ee8d234bd9b1aeced2cfd4bc61a540a22707ecf7f59f1bb6c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/relation-e2e-v1/transfer/pre-call-manifest.sha256",
+    "sha256": "c37e35e8841faabb79ead6829928a325054a59edc1af2f35f5ac882c76068391"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "pcc/claims/PCC-20261117-36d3c9.json",
+    "sha256": "e986847cb3e19acb5cf04155dd1f9a950e3f2085b714aa0c0d834c55f8fc247f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "pcc/claims/PCC-20261117-12c12a.json",
+    "sha256": "9d1e84b2dee46addc4988bbcee4bb01f2a091d9e6b1e1e9838abefbbb2638f3f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "nist-cover-relation-pipeline",
+ "statement": "Single-entrypoint relation-e2e-v1 integrates the frozen relation pipeline and fresh six-input complete transfer with fresh directories and input handoff. All four native workers exit0. The relation and fresh-transfer arithmetic sources are unchanged from the preceding standalone claims; exact fixed counts and accepted corruption controls repeat. This is integration qualification and local diagnostic accounting, not new independent relation rank, signed verification or admitted EKS performance."
+}

@@ -1,0 +1,8 @@
+{
+  "url": "https://github.com/Z3Prover/z3/blob/z3-4.15.4/src/sat/sat_cut_simplifier.cpp",
+  "tag": "z3-4.15.4",
+  "excerpt": "/*++\n  Copyright (c) 2020 Microsoft Corporation\n\n  Module Name:\n\n   sat_cut_simplifier.cpp\n\n  Abstract:\n   \n    extract AIG definitions from clauses\n    Perform cut-set enumeration to identify equivalences.\n\n  Author:\n\n    Nikolaj Bjorner 2020-01-02\n\n  --*/\n\n#include \"sat/sat_cut_simplifier.h\"\n#include \"sat/sat_xor_finder.h\"\n#include \"sat/sat_lut_finder.h\"\n#",
+  "observed": "The native cut simplifier extracts AIG definitions and uses cut enumeration to identify equivalences;it includes XOR/LUT finder components.",
+  "boundary": "Native cut/AIG/XOR machinery is established Z3implementation,not a novel rootfinding algorithm. Local native shared library and Python binding bytes are separately pinned in REGISTERED_PLAN.json.",
+  "novelty_state": "The specific mathematical coefficient-family elimination is distinct and has no completed novelty or qualified performance claim."
+}

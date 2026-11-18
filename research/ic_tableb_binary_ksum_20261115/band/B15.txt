@@ -1,0 +1,52 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m15-t131-ed7256f0 | 13.99 | bsgs-neg | 432/432 | 1.042 | 1.142 | 2.038 | — |
+| icv1-f2m15-t131-ed7256f0 | 13.99 | inc-n15 | 432/432 | 12.284 | 13.234 | 21.787 | — |
+| icv1-f2m15-t131-ed7256f0 | 13.99 | inc-n18 | 432/432 | 11.840 | 12.748 | 20.918 | — |
+| icv1-f2m15-t131-ed7256f0 | 13.99 | inc-n21 | 432/432 | 12.072 | 13.004 | 21.399 | — |
+| icv1-f2m15-t131-ed7256f0 | 13.99 | inc-tb | 432/432 | 16.268 | 17.706 | 30.650 | — |
+| icv1-f2m15-t131-ed7256f0 | 13.99 | ksum4 | 432/432 | 11.194 | 11.891 | 18.169 | — |
+| icv1-f2m15-t131-ed7256f0 | 13.99 | ksum5 | 432/432 | 13.469 | 14.186 | 20.640 | — |
+| icv1-f2m15-t131-ed7256f0 | 13.99 | rho-neg | 432/432 | 1.966 | 2.106 | 3.365 | — |
+| icv1-f2m15-t131-ed7256f0 | 13.99 | rho-neg-aa | 432/432 | 1.966 | 2.106 | 3.365 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m15-t131-ed7256f0 | bsgs-neg vs inc-n15 | bsgs-neg < inc-n15 |
+| icv1-f2m15-t131-ed7256f0 | bsgs-neg vs inc-n18 | bsgs-neg < inc-n18 |
+| icv1-f2m15-t131-ed7256f0 | bsgs-neg vs inc-n21 | bsgs-neg < inc-n21 |
+| icv1-f2m15-t131-ed7256f0 | bsgs-neg vs inc-tb | bsgs-neg < inc-tb |
+| icv1-f2m15-t131-ed7256f0 | bsgs-neg vs ksum4 | bsgs-neg < ksum4 |
+| icv1-f2m15-t131-ed7256f0 | bsgs-neg vs ksum5 | bsgs-neg < ksum5 |
+| icv1-f2m15-t131-ed7256f0 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-f2m15-t131-ed7256f0 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-f2m15-t131-ed7256f0 | inc-n15 vs inc-n18 | inc-n18 < inc-n15 |
+| icv1-f2m15-t131-ed7256f0 | inc-n15 vs inc-n21 | inc-n21 < inc-n15 |
+| icv1-f2m15-t131-ed7256f0 | inc-n15 vs inc-tb | inc-n15 < inc-tb |
+| icv1-f2m15-t131-ed7256f0 | inc-n15 vs ksum4 | ksum4 < inc-n15 |
+| icv1-f2m15-t131-ed7256f0 | inc-n15 vs ksum5 | unresolved inside the band |
+| icv1-f2m15-t131-ed7256f0 | inc-n15 vs rho-neg | rho-neg < inc-n15 |
+| icv1-f2m15-t131-ed7256f0 | inc-n15 vs rho-neg-aa | rho-neg-aa < inc-n15 |
+| icv1-f2m15-t131-ed7256f0 | inc-n18 vs inc-n21 | inc-n18 < inc-n21 |
+| icv1-f2m15-t131-ed7256f0 | inc-n18 vs inc-tb | inc-n18 < inc-tb |
+| icv1-f2m15-t131-ed7256f0 | inc-n18 vs ksum4 | ksum4 < inc-n18 |
+| icv1-f2m15-t131-ed7256f0 | inc-n18 vs ksum5 | unresolved inside the band |
+| icv1-f2m15-t131-ed7256f0 | inc-n18 vs rho-neg | rho-neg < inc-n18 |
+| icv1-f2m15-t131-ed7256f0 | inc-n18 vs rho-neg-aa | rho-neg-aa < inc-n18 |
+| icv1-f2m15-t131-ed7256f0 | inc-n21 vs inc-tb | inc-n21 < inc-tb |
+| icv1-f2m15-t131-ed7256f0 | inc-n21 vs ksum4 | ksum4 < inc-n21 |
+| icv1-f2m15-t131-ed7256f0 | inc-n21 vs ksum5 | unresolved inside the band |
+| icv1-f2m15-t131-ed7256f0 | inc-n21 vs rho-neg | rho-neg < inc-n21 |
+| icv1-f2m15-t131-ed7256f0 | inc-n21 vs rho-neg-aa | rho-neg-aa < inc-n21 |
+| icv1-f2m15-t131-ed7256f0 | inc-tb vs ksum4 | ksum4 < inc-tb |
+| icv1-f2m15-t131-ed7256f0 | inc-tb vs ksum5 | ksum5 < inc-tb |
+| icv1-f2m15-t131-ed7256f0 | inc-tb vs rho-neg | rho-neg < inc-tb |
+| icv1-f2m15-t131-ed7256f0 | inc-tb vs rho-neg-aa | rho-neg-aa < inc-tb |
+| icv1-f2m15-t131-ed7256f0 | ksum4 vs ksum5 | ksum4 < ksum5 |
+| icv1-f2m15-t131-ed7256f0 | ksum4 vs rho-neg | rho-neg < ksum4 |
+| icv1-f2m15-t131-ed7256f0 | ksum4 vs rho-neg-aa | rho-neg-aa < ksum4 |
+| icv1-f2m15-t131-ed7256f0 | ksum5 vs rho-neg | rho-neg < ksum5 |
+| icv1-f2m15-t131-ed7256f0 | ksum5 vs rho-neg-aa | rho-neg-aa < ksum5 |
+| icv1-f2m15-t131-ed7256f0 | rho-neg vs rho-neg-aa | unresolved inside the band |

@@ -1,0 +1,83 @@
+{
+  "schema": "prime-trace-weak-preflight/v1",
+  "build_snapshots": 13,
+  "failed_build_states": [
+    "prime-trace-weak-build01.exit",
+    "prime-trace-weak-build03.exit",
+    "prime-trace-weak-build04.exit",
+    "prime-trace-weak-build06.exit",
+    "prime-trace-weak-build08.exit",
+    "prime-trace-weak-build09.exit",
+    "prime-trace-weak-build11.exit",
+    "prime-trace-weak-build12.exit"
+  ],
+  "successful_builds": [
+    "02",
+    "05",
+    "07",
+    "10",
+    "13"
+  ],
+  "final_build": "13, full log no advisories/errors",
+  "gate": {
+    "archive": "research/prime_trace_weak_bound_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_prime_trace_weak_bound_audit_20261115_lean/audit.log",
+        "bytes": 5736,
+        "sha256": "edb9cec700b8cfdaab4e5be275482d782979b5ca90e1a37b8560ec76dfdd0423"
+      },
+      {
+        "member": "research_prime_trace_weak_bound_audit_20261115_lean/build.log",
+        "bytes": 3032,
+        "sha256": "024fb616f1bfcc9ce5867e488cccb075dbf909e9deb2ad9d270067a654bdef58"
+      },
+      {
+        "member": "research_prime_trace_weak_bound_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_prime_trace_weak_bound_audit_20261115_lean/source-build.log",
+        "bytes": 3032,
+        "sha256": "5be82c2135a25948b5c32c711c4a39f9dd453a10cb503c9e0353c4977cb40a80"
+      },
+      {
+        "member": "research_prime_trace_weak_bound_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 56,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/prime_trace_weak_bound_audit_20261115/evidence/attempts.tar.xz",
+    "files": 140,
+    "unique_objects": 56,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "source_primefield_clause_proved": true,
+  "actual_cyclotomic_adjoin_degree_proved": true,
+  "explicit_Hasse_or_trace_zero_premise": false,
+  "alternate_geometric_SS_comparison_proved": false,
+  "general_nonprime_at_most6_proved": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "paid_compute_and_agent_upload": 0
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "native-negation-pullback-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "negation-pullback-certificate",
+      "expected_decl_sha256": "aeb39697095990a68ba9433163f8b7fa516850bef89f64e69f2b1a4ecac6ed1e",
+      "full_characters": 1280,
+      "full_decl_sha256": "aeb39697095990a68ba9433163f8b7fa516850bef89f64e69f2b1a4ecac6ed1e",
+      "full_normalized_signature": "theorem negation_pullback_certificate : (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K), Function.Involutive (coordinateNeg W) ∧ Function.Involutive (fieldNeg W)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (x y : K) (h : W.Nonsingular x y) (f : W.FunctionField), finiteAdic W h (fieldNeg W f) = finiteAdic W ((W.nonsingular_neg x y).mpr h) f) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (P : W.Point), pointOrder W (fieldNeg W f) P = pointOrder W f (-P)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (hf : f ≠ 0), functionDivisor W (fieldNeg W f) (field_neg_nonzero W hf) = divisorNeg W (functionDivisor W f hf)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (a : W.CoordinateRing), polynomialFunction W (Algebra.norm K[X] a) = algebraMap W.CoordinateRing W.FunctionField a * fieldNeg W (algebraMap W.CoordinateRing W.FunctionField a)) ∧ controlFunction ≠ 0 ∧ pointOrder controlCurve controlFunction controlPoint = 3 ∧ pointOrder controlCurve controlFunction (-controlPoint) = 0 ∧ pointOrder controlCurve controlFunction controlPoint ≠ pointOrder controlCurve controlFunction (-controlPoint) ∧ pointOrder controlCurve (fieldNeg controlCurve controlFunction) controlPoint = 0",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "negation_pullback_certificate",
+        "end_byte": 1783,
+        "file": "/workspace/scratch/negation-binding-input01/NegationCertificate.lean",
+        "qualified_decl_id": "NegationPullbackAudit.negation_pullback_certificate",
+        "signature": "theorem negation_pullback_certificate :\n    (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K),\n      Function.Involutive (coordinateNeg W) ∧ Function.Involutive (fieldNeg W)) ∧\n    (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (x y : K)\n      (h : W.Nonsingular x y) (f : W.FunctionField),\n      finiteAdic W h (fieldNeg W f) = finiteAdic W ((W.nonsingular_neg x y).mpr h) f) ∧\n    (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (P : W.Point),\n      pointOrder W (fieldNeg W f) P = pointOrder W f (-P)) ∧\n    (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (hf : f ≠ 0),\n      functionDivisor W (fieldNeg W f) (field_neg_nonzero W hf) =\n        divisorNeg W (functionDivisor W f hf)) ∧\n    (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (a : W.CoordinateRing),\n      polynomialFunction W (Algebra.norm K[X] a) =\n        algebraMap W.CoordinateRing W.FunctionField a *\n          fieldNeg W (algebraMap W.CoordinateRing W.FunctionField a)) ∧\n    controlFunction ≠ 0 ∧ pointOrder controlCurve controlFunction controlPoint = 3 ∧\n    pointOrder controlCurve controlFunction (-controlPoint) = 0 ∧\n    pointOrder controlCurve controlFunction controlPoint ≠\n      pointOrder controlCurve controlFunction (-controlPoint) ∧\n    pointOrder controlCurve (fieldNeg controlCurve controlFunction) controlPoint = 0",
+        "start_byte": 363
+      },
+      "recorded_statement": "theorem negation_pullback_certificate : (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K), Function.Involutive (coordinateNeg W) ∧ Function.Involutive (fieldNeg W)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (x y : K) (h : W.Nonsingular x y) (f : W.FunctionField), finiteAdic W h (fieldNeg W f) = finiteAdic W ((W.nonsingular_neg x y).mpr h) f) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (P : W.Point), pointOrder W (fieldNeg W f) P = pointOrder W f (-P)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (hf : f ≠ 0), functionDivisor W (fieldNeg W f) (field_neg_nonzero W hf) = divisorNeg W (functionDivisor W f hf)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (a : W.CoordinateRing), polynomialFunction W (Algebra.norm K[X] a) = algebraMap W.CoordinateRing W.FunctionField a * fieldNeg W (algebraMap W.CoordinateRing W.FunctionField a)) ∧ controlFunction ≠ 0 ∧ pointOrder controlCurve controlFunction controlPoint = 3 ∧ pointOrder controlCurve controlFunction (-controlPoint) = 0 ∧ pointOrder controlCurve controlFunction controlPoint ≠ pointOrder controlCurve controlFunction (-controlPoint) ∧ pointOrder controlCurve (fieldNeg controlCurve controlFunction) controlPoint = 0",
+      "recorded_text_sha256": "aeb39697095990a68ba9433163f8b7fa516850bef89f64e69f2b1a4ecac6ed1e",
+      "source_plan": "research/negation_pullback_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "NegationPullbackAudit.negation_pullback_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

@@ -1,0 +1,11 @@
+name = "jv_scheme_stalk_audit"
+version = "0.1.0"
+defaultTargets = ["JVSchemeStalkAudit"]
+
+[[require]]
+name = "jv_local_multiplicity_audit"
+path = "../../jv_local_multiplicity_audit_20261115/lean"
+
+[[lean_lib]]
+name = "JVSchemeStalkAudit"
+roots = ["JVSchemeImports", "JVSchemeStalk", "JVSchemeCharts", "JVSchemeCertificate"]

@@ -1,0 +1,11 @@
+name = "random_support_average_audit"
+version = "0.1.0"
+defaultTargets = ["RandomSupportAverageAudit"]
+
+[[require]]
+name = "support_gaussian_audit"
+path = "../../support_gaussian_audit_20261114/lean"
+
+[[lean_lib]]
+name = "RandomSupportAverageAudit"
+roots = ["FieldGaussian", "SupportAverages", "FiniteAverage", "AsymptoticMixing", "ZeroWeightControl", "AverageCertificate"]

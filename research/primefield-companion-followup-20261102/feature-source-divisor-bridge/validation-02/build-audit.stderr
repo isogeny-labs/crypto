@@ -1,0 +1,82 @@
+warning: methods `power` and `pole_weight` are never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/bridge.rs:8:5
+   |
+ 4 | impl M {
+   | ------ methods in this implementation
+...
+ 8 |  fn power(&self,k:i128)->Self {Self::default().times(self,k)}
+   |     ^^^^^
+...
+13 |  fn pole_weight(&self)->i128 {self.exponents.iter().map(|(&n,&e)|e*(n as i128)*(n as i128)).sum()}
+   |     ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `mul` is never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/bridge.rs:30:4
+   |
+30 | fn mul(a:u64,b:u64,p:u64)->u64 {((a as u128*b as u128)%p as u128)as u64}
+   |    ^^^
+
+warning: function `pow` is never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/bridge.rs:31:4
+   |
+31 | fn pow(mut a:u64,mut n:u64,p:u64)->u64 {let mut v=1;while n>0{if n&1==1{v=mul(v,a,p)}a=mul(a,a,p);n>>=1;}v}
+   |    ^^^
+
+warning: function `evaluate` is never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/bridge.rs:32:4
+   |
+32 | fn evaluate(m:&M,p:u64,a:u64,b:u64,point:[u64;2],q:u64)->u64{
+   |    ^^^^^^^^
+
+warning: struct `F` is never constructed
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/../feature-native-value-division/lib.rs:6:8
+  |
+6 | struct F {v:u64,p:u64}
+  |        ^
+
+warning: associated items `c`, `sq`, `cube`, and `inv` are never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/../feature-native-value-division/lib.rs:8:5
+   |
+ 7 | impl F {
+   | ------ associated items in this implementation
+ 8 |  fn c(v:u64,p:u64)->Self{Self{v:v%p,p}}
+   |     ^
+ 9 |  fn sq(self)->Self{self*self}
+   |     ^^
+10 |  fn cube(self)->Self{self.sq()*self}
+   |     ^^^^
+11 |  fn inv(self)->Option<Self>{
+   |     ^^^
+
+warning: enum `Error` is never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/../feature-native-value-division/lib.rs:21:10
+   |
+21 | pub enum Error{Domain,Point,Singular,ZeroY,Nonunit}
+   |          ^^^^^
+
+warning: struct `ValueDivision` is never constructed
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/../feature-native-value-division/lib.rs:24:12
+   |
+24 | pub struct ValueDivision{inverse_two_y:F,cache:BTreeMap<u64,F>}
+   |            ^^^^^^^^^^^^^
+
+warning: associated items `new`, `field_value`, `value`, and `retained_indices` are never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/../feature-native-value-division/lib.rs:26:9
+   |
+25 | impl ValueDivision{
+   | ------------------ associated items in this implementation
+26 |  pub fn new(p:u64,a:u64,b:u64,x:u64,y:u64)->Result<Self,Error>{
+   |         ^^^
+...
+39 |  fn field_value(&mut self,n:u64)->F{
+   |     ^^^^^^^^^^^
+...
+51 |  pub fn value(&mut self,n:u64)->u64{self.field_value(n).v}
+   |         ^^^^^
+52 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: 9 warnings emitted
+

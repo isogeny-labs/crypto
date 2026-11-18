@@ -1,0 +1,235 @@
+#!/usr/bin/env python3
+import datetime, hashlib, json, math, os, re, resource, shutil, signal, stat, subprocess, sys, time, traceback
+from pathlib import Path
+from concurrent_tree import scan_regular_tree
+from concurrent_traversal_control import run_control
+P=Path(__file__).resolve().parent
+from durable_io import atomic_json, flush_logs, load_admission, durable_limits
+F=load_admission(P)
+W=Path(F['workspace']); OUT=Path(F['durable_run'])/'worker'; SOURCE=W/'source'; STAGE=W/'cache'
+START=time.monotonic(); END=float(os.environ['PENCIL_CHECK_END_MONOTONIC']); ACTIVE=None; INTERRUPTED=False;OWNED_OUTPUT=False;PERMIT_REQUIRED=False;PHASE_END=END-600;BUILD_END=END-600
+R={'status':'failed','commands':[],'errors':[],'invocation_id':os.environ.get('INVOCATION_ID'),'source_scope':'two production binaries from exact qualified source; binaries not invoked'}
+resource.setrlimit(resource.RLIMIT_AS,(16*1024**3,16*1024**3))
+def checkpoint(phase):
+ R['phase']=phase;R['elapsed_seconds']=time.monotonic()-START
+ if OWNED_OUTPUT:
+  atomic_json(OUT/'worker-receipt.json',R);flush_logs(OUT)
+def interrupted(sig,frame):
+ global INTERRUPTED
+ INTERRUPTED=True
+ raise RuntimeError('signal '+str(sig))
+for sig in (signal.SIGTERM,signal.SIGINT):signal.signal(sig,interrupted)
+def retain_permit_anomaly(snapshots, error=None):
+ row={'snapshots':snapshots}
+ if error is not None:row['error']=repr(error)
+ R.setdefault('permit_anomalies',[]).append(row)
+ R['permit_anomalies']=R['permit_anomalies'][-32:]
+def read_permit_snapshot():
+ meta={'read_start_unix':time.time(),'read_start_monotonic':time.monotonic()}
+ try:
+  with (Path(F['durable_run'])/'supervisor-permit.json').open('rb') as stream:raw=stream.read(4097)
+  meta.update(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
+  assert len(raw)<=4096,'supervisor permit size'
+  permit=json.loads(raw)
+  meta['value']=permit
+  assert isinstance(permit,dict),'supervisor permit object'
+  assert permit['invocation_id']==R['invocation_id'] and permit['lease']==F['lease'],'supervisor permit identity'
+  expiry=permit['expires_unix']
+  assert isinstance(expiry,(int,float)) and not isinstance(expiry,bool) and math.isfinite(expiry),'supervisor permit expiry format'
+  meta.update(read_end_unix=time.time(),read_end_monotonic=time.monotonic())
+  return permit,meta
+ except BaseException as error:
+  meta.update(read_end_unix=time.time(),read_end_monotonic=time.monotonic())
+  retain_permit_anomaly([meta],error)
+  raise
+def check_permit():
+ first,one=read_permit_snapshot()
+ if time.time()<first['expires_unix']:return
+ # No grace period: only a newly read, identity-matched, unexpired permit can pass.
+ retry_start=time.monotonic()
+ try:
+  second,two=read_permit_snapshot()
+  assert time.monotonic()-retry_start<=0.25,'supervisor permit reread bound'
+  assert not INTERRUPTED and time.monotonic()<END-40,'supervisor permit deadline/signal'
+  assert time.time()<second['expires_unix'],'supervisor permit expired'
+ except BaseException as error:
+  retain_permit_anomaly([one]+([two] if 'two' in locals() else []),error)
+  raise
+ retain_permit_anomaly([one,two])
+def guard():
+ if PERMIT_REQUIRED:check_permit()
+ if OWNED_OUTPUT:durable_limits(Path(F['durable_run']),F['limits'])
+ if INTERRUPTED or time.monotonic()>=min(END-40,PHASE_END):raise RuntimeError('phase/work deadline/signal')
+ if datetime.datetime.now(datetime.timezone.utc)>=datetime.datetime.fromisoformat(F['absolute_deadline'].replace('Z','+00:00')):raise RuntimeError('absolute deadline')
+ if shutil.disk_usage(W).free<6*1024**3:raise RuntimeError('free disk below6GiB')
+def H(path):
+ guard(); h=hashlib.sha256()
+ with path.open('rb') as s:
+  for b in iter(lambda:s.read(4*1024**2),b''):guard();h.update(b)
+ return h.hexdigest()
+def verify(rows):
+ for path,row in rows.items():
+  f=Path(path)
+  if 'resolved' in row:assert str(f.resolve())==row['resolved'],path
+  else:assert stat.S_ISREG(f.lstat().st_mode),path
+  assert H(f)==row['sha256'],path
+def traversal_error(error):
+ raise error
+
+def retain_transient_scan_events(row,scope,scan):
+ count=len(scan['transient_missing'])
+ if count:
+  row['transient_missing_events']=row.get('transient_missing_events',0)+count
+  samples=row.setdefault('transient_missing_samples',[])
+  samples.extend({'scope':scope,'path':path} for path in scan['transient_missing'][:max(0,32-len(samples))])
+
+ENV={'PATH':F['toolchain']+'/bin:/usr/bin:/bin','LANG':'C.UTF-8','LC_ALL':'C.UTF-8','CARGO_HOME':str(STAGE/'cargo-home'),'CARGO_TARGET_DIR':str(STAGE/'target'),'CARGO_BUILD_JOBS':'1','RUSTC':F['toolchain']+'/bin/rustc','TMPDIR':str(STAGE/'tmp'),'RUST_TEST_THREADS':'1','RUST_BACKTRACE':'0','SIGNED_BUILD_END_MONOTONIC':str(BUILD_END),'QUAL_SOURCE_REVISION':'f3c1b8cc7663ca7d15374ae5e9a16c86839c9d18','QUAL_SOURCE_SHA256':F['source_manifest_sha256']}
+def command(label,argv,cwd=None):
+ global ACTIVE
+ guard(); row={'label':label,'argv':argv}; R['commands'].append(row); start=time.monotonic()
+ stdout=OUT/(label+'.stdout');stderr=OUT/(label+'.stderr');checkpoint('before-'+label)
+ with stdout.open('xb') as o,stderr.open('xb') as e:
+  mask=signal.pthread_sigmask(signal.SIG_BLOCK,{signal.SIGTERM,signal.SIGINT})
+  try:ACTIVE=subprocess.Popen(argv,cwd=SOURCE if cwd is None else cwd,env=ENV,stdout=o,stderr=e,start_new_session=True)
+  finally:signal.pthread_sigmask(signal.SIG_SETMASK,mask)
+  row['pid']=ACTIVE.pid;row['pgid']=ACTIVE.pid;last=0;durable_last=0;checkpoint('running-'+label)
+  try:
+   while ACTIVE.poll() is None:
+    guard()
+    if time.monotonic()-durable_last>5:
+     durable_last=time.monotonic();checkpoint('running-'+label)
+    if time.monotonic()-last>1:
+     last=time.monotonic(); total=0;target=STAGE/'target'
+     try:target_mode=target.lstat().st_mode
+     except FileNotFoundError:
+      assert label=='materialize','target absent after materialization';target_mode=None
+     if target_mode is not None:
+      assert stat.S_ISDIR(target_mode),str(target)
+      target_scan=scan_regular_tree(target,mutable_missing_roots=(target,))
+      total=target_scan['total_bytes'];retain_transient_scan_events(row,'target',target_scan)
+     row['peak_observed_target_bytes']=max(row.get('peak_observed_target_bytes',0),total)
+     assert total<=6*1024**3,'6GiB target threshold'
+     workspace_result=scan_regular_tree(W,mutable_missing_roots=(target,STAGE/'tmp'))
+     workspace_bytes=workspace_result['total_bytes'];retain_transient_scan_events(row,'workspace',workspace_result)
+     assert workspace_bytes<=8*1024**3,'private workspace8GiB ceiling'
+     logbytes=sum(f.stat().st_size for f in OUT.glob('*.std*'))
+     row['peak_observed_log_bytes']=max(row.get('peak_observed_log_bytes',0),logbytes)
+     assert logbytes<=256*1024**2,'256MiB log threshold'
+    time.sleep(.1)
+   row['exit_code']=ACTIVE.returncode
+  finally:
+   if ACTIVE.poll() is None:os.killpg(ACTIVE.pid,signal.SIGKILL)
+   row['reaped_exit_code']=ACTIVE.wait(timeout=3);row['reaped']=True
+   # Kill remaining children even after leader exit; unit containment remains final authority.
+   try:os.killpg(ACTIVE.pid,signal.SIGKILL)
+   except ProcessLookupError:pass
+   ACTIVE=None;row['elapsed_seconds']=time.monotonic()-start;checkpoint('finished-'+label)
+ assert row['exit_code']==0,label+' failed'
+ guard();row['stdout_sha256']=H(stdout);row['stderr_sha256']=H(stderr)
+ return stdout.read_text(errors='replace')
+
+def verify_private_source():
+ expected=json.loads((P/'expected-source-manifest.json').read_text());actual=set()
+ if 'generated_root_lock' in R:expected['Cargo.lock']={'sha256':R['generated_root_lock']['sha256'],'bytes':R['generated_root_lock']['bytes']}
+ for base,dirs,names in os.walk(SOURCE,followlinks=False,onerror=traversal_error):
+  guard()
+  for n in dirs:assert stat.S_ISDIR((Path(base)/n).lstat().st_mode)
+  for n in names:
+   f=Path(base)/n;name=str(f.relative_to(SOURCE));assert name in expected,name
+   assert stat.S_ISREG(f.lstat().st_mode) and f.stat().st_size==expected[name]['bytes']
+   assert H(f)==expected[name]['sha256'],name;actual.add(name)
+ assert actual==set(expected),'private source membership'
+def json_rows(output):
+ rows=[]
+ for line in output.splitlines():
+  if '{' not in line:continue
+  try:row=json.loads(line[line.index('{'):])
+  except json.JSONDecodeError:continue
+  if isinstance(row,dict):rows.append(row)
+ return rows
+try:
+ OUT.mkdir(mode=0o700,exist_ok=False);OWNED_OUTPUT=True;checkpoint('worker-start')
+ assert os.getuid()==F['uid'] and os.getgid()==F['gid']
+ assert R['invocation_id'] and re.fullmatch('[a-f0-9]{32}',R['invocation_id'])
+ cgline=Path('/proc/self/cgroup').read_text().strip();assert cgline.startswith('0::/') and '\n' not in cgline
+ cg=Path('/sys/fs/cgroup')/cgline[3:].lstrip('/');assert cg.name==F['unit']
+ controls={n:(cg/n).read_text().strip() for n in ['cpu.max','memory.max','memory.swap.max','pids.max']}
+ quota,period=controls['cpu.max'].split();assert quota!='max' and int(quota)<=2*int(period)
+ assert controls['memory.max']==str(16*1024**3) and controls['memory.swap.max']=='0' and controls['pids.max']=='512'
+ R['cgroup']={'path':str(cg),'inode':cg.stat().st_ino,'controls':controls}
+ assert not SOURCE.exists() and not STAGE.exists(),'fresh source/cache required'
+ checkpoint('waiting-for-supervisor-permit');wait_end=min(END-40,time.monotonic()+10)
+ while True:
+  try:check_permit();break
+  except (FileNotFoundError,AssertionError):
+   if time.monotonic()>=wait_end:raise RuntimeError('supervisor ownership permit not received')
+   time.sleep(.1)
+ PERMIT_REQUIRED=True;checkpoint('containment-and-permit-verified')
+ R['build_deadline_monotonic']=BUILD_END
+ for name,h in F['packet_files'].items():assert H(P/name)==h,name
+ control_root=W/'concurrent-tree-control'
+ checkpoint('before-concurrent-traversal-control');control_start=time.monotonic()
+ control_result=run_control(control_root)
+ control_elapsed=time.monotonic()-control_start
+ assert control_elapsed<=30 and control_result['status']=='passed' and control_result['fail_closed_count']==5
+ assert all(control_result['positive_controls'].values())
+ assert all(row['rejected'] is True for row in control_result['negative_controls'])
+ shutil.rmtree(control_root)
+ assert {entry.name for entry in W.iterdir()}=={'workspace-owner.json'}
+ R['concurrent_traversal_control']=control_result
+ R['concurrent_traversal_control']['elapsed_seconds']=control_elapsed
+ checkpoint('concurrent-traversal-control-passed');guard()
+ command('materialize',['/usr/bin/python3','-B',str(P/'materialize.py')],cwd=P)
+ materialized=json.loads((W/'materialization.json').read_text());assert materialized['status']=='passed' and materialized['build_end_monotonic']==BUILD_END
+ assert materialized['cache_mode_inventory_sha256']==H(P/'cache-mode-inventory.json') and materialized['cache_modes_verified']==2165 and materialized['cache_executable_modes_verified']==82
+ R['materialization_receipt_sha256']=H(W/'materialization.json');verify_private_source();R['pre_inputs_verified']=True
+ cargo=F['toolchain']+'/bin/cargo'
+ command('generate-root-lock',[cargo,'generate-lockfile','--offline'])
+ lock=SOURCE/'Cargo.lock';R['generated_root_lock']={'sha256':H(lock),'bytes':lock.stat().st_size};atomic_json(OUT/'generated-root-lock.json',R['generated_root_lock'])
+ shutil.copyfile(lock,OUT/'Cargo.lock')
+ verify_private_source()
+ output=command('compile',[cargo,'build','--release','--locked','--offline','--bin','ecbench','--bin','ecbench_retained_attempt_export_v4','--message-format=json'])
+ binaries={};finished=[]
+ for line in output.splitlines():
+  try:entry=json.loads(line)
+  except json.JSONDecodeError:continue
+  if entry.get('reason')=='build-finished':finished.append(entry.get('success'))
+  target=entry.get('target',{});name=target.get('name')
+  if entry.get('reason')=='compiler-artifact' and name in F['production_binaries'] and target.get('kind')==['bin'] and entry.get('executable'):
+   assert target.get('src_path')==str(SOURCE/F['production_binaries'][name]),'production source path'
+   assert entry.get('profile',{}).get('test') is False,'test executable is not production binary'
+   assert name not in binaries,'duplicate production executable artifact'
+   binaries[name]=entry['executable']
+ assert finished==[True],'one successful Cargo build-finished required'
+ assert set(binaries)==set(F['production_binaries']),'both exact production executables required'
+ R['build_phase_finished_monotonic']=time.monotonic()
+ END=min(END,time.monotonic()+600);PHASE_END=END-40
+ R['receipt_end_monotonic']=END;R['receipt_deadline_monotonic']=PHASE_END;checkpoint('receipt-phase-start')
+ R['production_binaries']={}
+ for name,path in binaries.items():
+  binary=Path(path);st=binary.lstat()
+  assert binary.is_absolute() and binary.is_relative_to(STAGE/'target') and stat.S_ISREG(st.st_mode)
+  assert stat.S_IMODE(st.st_mode)&0o111,'production executable lacks executable mode'
+  with binary.open('rb') as stream:
+   assert stream.read(4)==b'\x7fELF','production executable is not ELF';os.fsync(stream.fileno())
+  R['production_binaries'][name]={'path':str(binary),'sha256':H(binary),'bytes':st.st_size,'mode':stat.S_IMODE(st.st_mode),'source_path':F['production_binaries'][name]}
+ R['source_manifest_sha256']=F['source_manifest_sha256'];R['published_source_revision']=F['published_source_revision']
+ R['qualification_receipts']={name:F['release_receipts'][name] for name in ['exporter_qualification','exporter_materialization','combined_qualification']}
+ R['production_binaries_invoked']=False
+ atomic_json(OUT/'production-build-info.json',{'schema':'pencil.production-build-info/v1','source_revision':F['published_source_revision'],'source_manifest_sha256':F['source_manifest_sha256'],'generated_root_lock':R['generated_root_lock'],'binaries':R['production_binaries'],'qualification_receipts':R['qualification_receipts'],'binaries_invoked':False})
+ for name,row in R['production_binaries'].items():assert H(Path(row['path']))==row['sha256'],'production binary changed'
+ verify_private_source()
+ manifest=Path(F['immutable_manifest']['path']);assert H(manifest)==F['immutable_manifest']['sha256'];inputs=json.loads(manifest.read_text());verify(inputs['immutable'])
+ config_key=F['donor_workspace']+'/cache-stage-v2/cargo-home/config.toml';assert H(STAGE/'cargo-home/config.toml')==inputs['immutable'][config_key]['sha256']
+ R['post_inputs_verified']=True;guard();R['status']='passed'
+except BaseException as e:R['errors'].append({'repr':repr(e),'traceback':traceback.format_exc()})
+finally:
+ if ACTIVE is not None:
+  try:os.killpg(ACTIVE.pid,signal.SIGKILL);ACTIVE.wait(timeout=3)
+  except BaseException as e:R['errors'].append({'cleanup':repr(e)})
+  R['status']='failed'
+ R['elapsed_seconds']=time.monotonic()-START
+ if INTERRUPTED or time.monotonic()>=END-20 or R['errors']:R['status']='failed'
+ if OWNED_OUTPUT:checkpoint('terminal')
+print(json.dumps({'status':R['status'],'elapsed_seconds':R['elapsed_seconds']}))
+raise SystemExit(0 if R['status']=='passed' and not INTERRUPTED and time.monotonic()<END-20 else 1)

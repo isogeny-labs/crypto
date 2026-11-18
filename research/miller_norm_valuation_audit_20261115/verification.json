@@ -1,0 +1,79 @@
+{
+  "schema": "miller-norm-valuation-verification/v1",
+  "source_commit": "305b210b7ea664cf5a7fb7ae7bbb7a36ed1a7142",
+  "claim_id": "PCC-20261115-c0e6db",
+  "declaration_sha256": "9e902bb2a63699a532e54ad1d475b5c8e1fb224ab597a92cc49f98ee0ca43dc9",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 10,
+  "gate_declarations": 57,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 151,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-c0e6db",
+    "claim_sha256": "239bcce35942e207baa5c73439aa0e886fa3618e0b9e3ca7853168a297688005",
+    "commit": "305b210b7ea664cf5a7fb7ae7bbb7a36ed1a7142",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/miller_norm_valuation_audit_20261115/lean (ValuationCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T04:43:54Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-c0e6db",
+    "claim_sha256": "239bcce35942e207baa5c73439aa0e886fa3618e0b9e3ca7853168a297688005",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46894,
+    "sha256": "d42717835f458283f7d4dbc5f07301345c9df3477bb1842bf3cc3deaa393a8fd",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 57,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "no_prior_customproof_modules_imported": true,
+    "independent_implementation_or_physicalhost_validation": false,
+    "actual_norm_degree_valuation": true,
+    "actual_DVR_and_uniformizer_and_maximalIdeal": true,
+    "actual_residue_normalization": true,
+    "actual_wrong_parameter_countercontrol": true,
+    "canonical_projective_infinity_localRing_identification": false,
+    "canonical_principal_divisor_or_pairing_identification": false,
+    "full14_completion": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

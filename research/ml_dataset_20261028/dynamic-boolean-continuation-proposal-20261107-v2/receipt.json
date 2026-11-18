@@ -1,0 +1,21 @@
+{
+  "schema": "dynamic-boolean-continuation-validation/v2",
+  "compiled": true,
+  "compile_command": "timeout 180 rustc +1.98 --edition=2021 --test harness.rs -o tests > compile.log 2>&1",
+  "run_command": "timeout 60 ./tests --test-threads=1 > tests.log 2>&1",
+  "tests_passed": 26,
+  "tests_failed": 0,
+  "continuation_tests": 10,
+  "donor_tests": 16,
+  "production_compiled": false,
+  "scientific_trials": 0,
+  "source": {
+    "sha256": "924c74f1f30fd9e6905d6cbf0effe2e4a7a9befe0d963d4bd6a56725356cd878",
+    "bytes": 13879
+  },
+  "binary": {
+    "sha256": "47330e8577d1b2e841e58430adb1c7a1b37b4c2ff3d45b36c45f0fcca063ed78",
+    "bytes": 8157432
+  },
+  "observed_at": "2026-11-07T01:49:35.041518+00:00"
+}

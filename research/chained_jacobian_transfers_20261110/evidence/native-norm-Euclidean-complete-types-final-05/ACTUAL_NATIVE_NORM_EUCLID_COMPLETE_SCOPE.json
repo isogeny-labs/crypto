@@ -1,0 +1,35 @@
+{
+  "time": "2026-11-16T20:48:45.061224+00:00",
+  "source_sha256": "745d57b0a41459bd19de5c4b2932a10cee7470da87725bc76c26eaa94e98d06b",
+  "entire_accepted64_prefix_sha256": "9850306ebbe0ef7e0032baca8064280eb56a13e353fbc820bd4b73997f0b7521",
+  "both_original_gates": "66 audited/0 failing/0 trusted each",
+  "new_named": 19,
+  "new_generated": [
+    "CubicNativeNormEuclid22309.EuclidState.mk.inj",
+    "CubicNativeNormEuclid22309.EuclidState.mk.injEq",
+    "CubicNativeNormEuclid22309.EuclidState.mk.sizeOf_spec",
+    "CubicNativeNormEuclid22309.rawNormBlock.eq_1",
+    "CubicNativeNormEuclid22309.resultWord.eq_1"
+  ],
+  "complete_bindings": 17,
+  "reused_initial_complete_bindings": 3,
+  "original_let_type_limitations": [
+    {
+      "theorem": "CubicNativeNormEuclid22309.cofactor_norm_decode",
+      "actual_original_extractor_type": "theorem cofactor_norm_decode (a b c : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) : let p",
+      "limit": "stops at let p := in type, not a complete statement binding"
+    },
+    {
+      "theorem": "CubicNativeNormEuclid22309.cofactor_norm_exact_value",
+      "actual_original_extractor_type": "theorem cofactor_norm_exact_value (a b c : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) : let p",
+      "limit": "stops at let p := in type, not a complete statement binding"
+    }
+  ],
+  "resources": "j1/120s/default memory/default tactic limits",
+  "warnings": "four inherited deprecated-if warnings per build, original auditor warning retained, no source/gate edits",
+  "raw_norm": "literal t0/t3 order; no-overflow/canonical/raw expression and exact raw cofactor norm value",
+  "Euclid": "actual t/nt/r/nr/truncating quotient/negative normalization, loop16 exhaustionNone. Only223 base inputs derive all nonzero success/terminalnr0/gcd1/canonical inverse and all visited intermediate signed64 safety",
+  "controls": "zero/fuelNone, inverse2 negative-111 normalized112, inverse222=222, noncanonical norm overflow",
+  "limitations": "source-level arithmetic only; no Rust compiler/complete08+09 composition/cubic field/Jacobian/counter/runtime/execution/full original population/benchmark/paid/signed result",
+  "negative_history": "first cast rejection9e7844; accepted64 binding closure576848 detects original let extractor truncation before finalclaim. Three complete records reused; two original proved types remain unbound, complete corollaries append with no hypothesis/statement weakening or verifier/gate change"
+}

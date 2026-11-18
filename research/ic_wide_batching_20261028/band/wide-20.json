@@ -1,0 +1,300 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "log2_r": 19.8889141474421,
+      "arm": "batch-1024",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        76.01783158002489,
+        76.5539824804401,
+        81.37934058417707
+      ],
+      "charged_sum": 2696484.0,
+      "native_sum": 190182,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "log2_r": 19.8889141474421,
+      "arm": "batch-16",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        21.288558498772172,
+        21.918054155597808,
+        27.583515067028642
+      ],
+      "charged_sum": 755142.0,
+      "native_sum": 223293,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "log2_r": 19.8889141474421,
+      "arm": "batch-256",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        33.77207705019467,
+        34.263099055058014,
+        38.68229709882811
+      ],
+      "charged_sum": 1197954.0,
+      "native_sum": 174174,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "log2_r": 19.8889141474421,
+      "arm": "batch-64",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        23.324771559692252,
+        23.83746998121591,
+        28.451755774928856
+      ],
+      "charged_sum": 827370.0,
+      "native_sum": 181863,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "log2_r": 19.8889141474421,
+      "arm": "fast",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        20.169554718699327,
+        20.7345201144566,
+        25.819208676272126
+      ],
+      "charged_sum": 715449.0,
+      "native_sum": 200403,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "log2_r": 19.8889141474421,
+      "arm": "rho-neg",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        1.1378638694807626,
+        1.2346338887657258,
+        2.1055640623303895
+      ],
+      "charged_sum": 40362.0,
+      "native_sum": 34326,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "log2_r": 19.8889141474421,
+      "arm": "serial-1024",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        76.01783158002489,
+        76.5539824804401,
+        81.37934058417707
+      ],
+      "charged_sum": 2696484.0,
+      "native_sum": 190182,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "log2_r": 19.8889141474421,
+      "arm": "walk",
+      "runs": 36,
+      "verified": 36,
+      "mean_s": [
+        20.169554718699327,
+        20.7345201144566,
+        25.819208676272126
+      ],
+      "charged_sum": 715449.0,
+      "native_sum": 200403,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-1024",
+      "b": "batch-16",
+      "verdict": "batch-16 < batch-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-1024",
+      "b": "batch-256",
+      "verdict": "batch-256 < batch-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-1024",
+      "b": "batch-64",
+      "verdict": "batch-64 < batch-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-1024",
+      "b": "fast",
+      "verdict": "fast < batch-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-1024",
+      "b": "rho-neg",
+      "verdict": "rho-neg < batch-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-1024",
+      "b": "serial-1024",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-1024",
+      "b": "walk",
+      "verdict": "walk < batch-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-16",
+      "b": "batch-256",
+      "verdict": "batch-16 < batch-256"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-16",
+      "b": "batch-64",
+      "verdict": "batch-16 < batch-64"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-16",
+      "b": "fast",
+      "verdict": "fast < batch-16"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-16",
+      "b": "rho-neg",
+      "verdict": "rho-neg < batch-16"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-16",
+      "b": "serial-1024",
+      "verdict": "batch-16 < serial-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-16",
+      "b": "walk",
+      "verdict": "walk < batch-16"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-256",
+      "b": "batch-64",
+      "verdict": "batch-64 < batch-256"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-256",
+      "b": "fast",
+      "verdict": "fast < batch-256"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-256",
+      "b": "rho-neg",
+      "verdict": "rho-neg < batch-256"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-256",
+      "b": "serial-1024",
+      "verdict": "batch-256 < serial-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-256",
+      "b": "walk",
+      "verdict": "walk < batch-256"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-64",
+      "b": "fast",
+      "verdict": "fast < batch-64"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-64",
+      "b": "rho-neg",
+      "verdict": "rho-neg < batch-64"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-64",
+      "b": "serial-1024",
+      "verdict": "batch-64 < serial-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "batch-64",
+      "b": "walk",
+      "verdict": "walk < batch-64"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "fast",
+      "b": "rho-neg",
+      "verdict": "rho-neg < fast"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "fast",
+      "b": "serial-1024",
+      "verdict": "fast < serial-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "fast",
+      "b": "walk",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "rho-neg",
+      "b": "serial-1024",
+      "verdict": "rho-neg < serial-1024"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "rho-neg",
+      "b": "walk",
+      "verdict": "rho-neg < walk"
+    },
+    {
+      "curve": "icv1-fp20-t535-c83443b0",
+      "a": "serial-1024",
+      "b": "walk",
+      "verdict": "walk < serial-1024"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:19:04Z",
+ "id": "PCC-20261116-3d4c82",
+ "kind": "statement",
+ "producer": {
+  "commit": "926f7788069664844864128425b96cebe4674af1",
+  "model": "",
+  "session": "codex-20261116-nist-quotient-geometry"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/riemann_quartic.cpp",
+    "sha256": "8715ba938c634b81e9099f511ac477a4590a43802b9d4e47b8346022cf4485ba"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/RIEMANN_PROTOCOL.md",
+    "sha256": "2fa669d552597550c566799a2b5df008d9a6ea63c0f7298dd6b02f813e6f20e3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/riemann-v1/result.json",
+    "sha256": "ee24635cbb6a240b1a6926fb2e3d766f938f8d91c4d5bc01b03defdaad558a13"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/riemann-v1/pre-call-manifest.sha256",
+    "sha256": "7715783e488a422eb012be9d8bde46081265ea7d7bfc640012cec2d193a3ee89"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Native Riemann reconstruction from the actual P192 d7 kernel1 quotient theta-square vector produces an explicit homogeneous quartic over the declared Fp24 tower. All seven advertised bitangent restrictions are exact squares; the degree7 homogeneous Jacobian-ideal matrix has rank36, supporting geometric smoothness. Singular-form and corrupted-bitangent controls reject. Normalized coefficients are not all in Fp. Unsigned candidate reconstruction only: same-field descent, quotient identification and divisor map are not established."
+}

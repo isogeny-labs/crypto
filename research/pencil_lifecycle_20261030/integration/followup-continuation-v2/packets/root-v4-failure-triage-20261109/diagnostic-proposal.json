@@ -1,0 +1,149 @@
+{
+  "status": "not_admitted",
+  "purpose": "only if terminal suite lacks panic detail: capture exact18 existing failures from existing hashed binary without compilation or fixture edits",
+  "total_worker_seconds": 60,
+  "cpu": 1,
+  "memory_gib": 2,
+  "attempts": 1,
+  "deadline": "2026-11-10T05:11:39Z",
+  "commands": [
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::band::tests::memory_size_counters_are_listed_but_not_priced",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "PINNED_EXISTING_TEST_BINARY",
+      "cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ]
+  ],
+  "per_command_seconds": 2,
+  "commands_budget_seconds": 36,
+  "remaining_seconds_for_custody_cleanup": 24,
+  "preconditions": [
+    "root full-suite native terminal and owned cgroup cleanup",
+    "if final panic detail already resolves all causes, do not execute this proposal",
+    "exact binary hash and source/c5178 custody",
+    "all listed runtime prerequisites still absent: reject if environment changed",
+    "CERTICOM_TEST_BACKEND and CERTICOM_TEST_WORKER unset",
+    "prospective independent review, published commands and root release"
+  ],
+  "acceptance": "Record each exit/panic and distinguish missing-path panic from different failure. Expected nonzero exits are diagnostic findings, never passing tests. No repair or data generation under this attempt."
+}

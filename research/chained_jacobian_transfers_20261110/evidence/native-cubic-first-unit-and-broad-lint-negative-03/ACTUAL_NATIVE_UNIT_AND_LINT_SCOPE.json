@@ -1,0 +1,29 @@
+{
+  "time": "2026-11-16T19:12:22.262194+00:00",
+  "unit_exit": 0,
+  "all_frozen_rows": 15,
+  "tests": "3 passed/0 failed/0 ignored/0 measured/0 filtered",
+  "declared_original_counters": [
+    23,
+    1,
+    8
+  ],
+  "declared_candidate_counters": [
+    16,
+    1,
+    3
+  ],
+  "scope": "declared MUL/INV/ADD units, not instruction/runtime/full ECDLP costs",
+  "complete_bundle": {
+    "path": "entire-native-unit-and-Clippy-run-tree.tar.xz",
+    "bytes": 381024,
+    "sha256": "9fee6a6c6cd3e00fdc332fa86399f97461c4d47e6ec159abc479fbcd1d2a0aa5",
+    "contents": "entire first unit run tree plus subsequent broad format/Clippy logs and final shared target tree; added debug lint outputs, no claim of pre-lint compiler-cache snapshot"
+  },
+  "broad_format": 1,
+  "broad_strict_Clippy": 101,
+  "reason": "broad invocations include immutable original baseline source, Rng::next/manual_is_multiple_of style diagnostics; candidate has not completed strict Clippy yet",
+  "decision": "retain broad failures and frozen original bytes, check explicitly new package format/strict no-deps Clippy under documented new-code protocol scope, do not call broad checks green",
+  "formal_program": "generic ring cofactor proof existing60bdae, faithful word/compiler/inversion guarantees remain partial",
+  "benchmark": "not run; paid/admission/full original population unchanged"
+}

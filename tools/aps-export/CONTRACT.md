@@ -34,3 +34,19 @@ The public producer bridge exercises the same reader files against actual
 `methods::solve` output. The standalone package tests cover source-file and
 CLI reconstruction and deliberate corruptions. Development assertions do not
 acquire execution standing merely because a reader agrees [pcc:unverified].
+
+For v3 the reader additionally checks explicit unequal profiles, chart and
+guessed-coordinate cell geometry, retained points/labels, cumulative draw
+totals and complete-old-region authorization. `retained_full` never subtracts
+an old region. Trace histories must join across attempts and their call/work
+totals match the emitted diagnostics. The numerical truth of diagnostic
+counters is still not execution-attested.
+
+Optional inclusive Ir packets bind every raw profile part to an unprofiled
+record, separately sealed trajectory-matching replay and separate scalar
+check. A frozen protocol can require those packets; missing packets and
+recordless failures remain represented and prevent qualification. See
+[ACCOUNTING.md](../../research/aps_cost_leads_20261106/ACCOUNTING.md) for
+the exact interval, cumulative input caps, missing/restore rules and excluded
+work. The reader does not launch a profiler, invent GAE prices or validate
+actual thread coverage, wall isolation or experiment design.

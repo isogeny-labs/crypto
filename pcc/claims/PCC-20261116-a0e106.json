@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:39:37Z",
+ "id": "PCC-20261116-a0e106",
+ "kind": "measurement",
+ "producer": {
+  "commit": "67330ab4ea94c229ca6c1811cdf10ca26e5bdc47",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/rust-consumer-development/checker-tests-02.log",
+    "sha256": "01b6cc4b942954c7ac13a8ebddcd6536b7d579b3b8cd172a2f6ce30885768359"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/rust-consumer-development/checker-clippy-02.log",
+    "sha256": "777cc5502aa3dc1559348d6382328b9bc32a8cc692884ffa0c5cc1ff05055913"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/rust-consumer-development/native-default-03.log",
+    "sha256": "d7692e86acffe179866c46ae251c7183ecdee7ec09a03b56a8df942e31cd8d99"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/rust-consumer-development/native-scale-03.log",
+    "sha256": "bbdbce60c3607c6d2496b8e3d0f7239fa413c10e481c4806ec56efaf451bf8be"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/rust-consumer-development/native-counter-03.log",
+    "sha256": "e7bd824d571145743a130b5e609ab3deb4628f5f77edaf719c7bdaa565c0cd7d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/rust-consumer-development/native-clippy-03.log",
+    "sha256": "9a19e8fbd236556e574fdd20b24f4ca3580901494662c1837eefb1310d0deeec"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/rust-consumer-development/pre-corpus-03.json",
+    "sha256": "366d3ca59901b23113b20a6229912c1a875a3c2087dce86e74b1ead9c358b439"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Separate checker corrected-source c6593691b passes four unit tests/clippy; native product source67330ab4e passes43 default,44 scale,45 counter tests/clippy, and corpus qualifier clippy/build. Read-only executables pinned before captured-corpus calls; no speed result."
+}

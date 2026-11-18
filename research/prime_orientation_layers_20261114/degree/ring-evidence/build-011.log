@@ -1,0 +1,112 @@
+'OrientationModeProfile.actual_weighted_left_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.actual_right_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.weight_fiber_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.negative_pole_polynomial_width' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationAbsolutePrecision.creation_index_covers' depends on axioms: [propext, Quot.sound]
+'OrientationAbsolutePrecision.actual_absolute_polynomial_precision' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationAbsolutePrecision.actual_absolute_rational_precision' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationAbsolutePrecision.actual_absolute_rational_profile' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCoefficientReduction.reduce_zero_of_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.integral_den_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.reduce_compatible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.reduce_finite_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.actual_integral_polynomial_product' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+../ring-evidence/draft-011.lean.txt:443:2: error: Type mismatch
+  map_liftPoly (A x y) (hA x y)
+has type
+  Polynomial.map integralRationals.subtype (liftPoly (A x y) ⋯) = A x y
+but is expected to have type
+  (mapPolys integralRationals.subtype (liftMatrix A hA) x y).coeff n✝ = (A x y).coeff n✝
+../ring-evidence/draft-011.lean.txt:449:2: error: 'change' tactic failed, pattern
+  Polynomial.map f (∑ j, A x j * B j y) = ∑ j, Polynomial.map f (A x j) * Polynomial.map f (B j y)
+is not definitionally equal to target
+  (mapPolys f (A * B) x y).coeff n✝ = ((mapPolys f A * mapPolys f B) x y).coeff n✝
+../ring-evidence/draft-011.lean.txt:459:8: error: Function expected at
+  Polynomial.map_sub f
+but this term has type
+  Polynomial.map f (?m.52 - ?m.53) = Polynomial.map f ?m.52 - Polynomial.map f ?m.53
+
+Note: Expected a function because this term is being applied to the argument
+  _
+../ring-evidence/draft-011.lean.txt:473:4: error: Tactic `apply` failed: could not unify the conclusion of `map_zero_of_content`
+  Polynomial.map (reduceTo ?p ?R) ?P = 0
+with the goal
+  (mapPolys (reduceTo p R) E x y).coeff n✝ = (0 x y).coeff n✝
+
+Note: The full type of `map_zero_of_content` is
+  ∀ (p : ℕ) (R : Type ?u.145) [inst : CommRing R] [inst_1 : CharP R (2 ^ p)] (P : (↥integralRationals)[X]),
+    (∀ (n : ℕ), VBound ↑p ↑(P.coeff n)) → Polynomial.map (reduceTo p R) P = 0
+
+p : ℕ
+R : Type u_1
+inst✝² : CommRing R
+inst✝¹ : CharP R (2 ^ p)
+I : Type u_2
+J : Type u_3
+K : Type u_4
+inst✝ : Fintype K
+W : Matrix I J ℚ[X]
+A : Matrix I K ℚ[X]
+B : Matrix K J ℚ[X]
+hW : ∀ (x : I) (y : J), Content 0 (W x y)
+hA : ∀ (x : I) (y : K), Content 0 (A x y)
+hB : ∀ (x : K) (y : J), Content 0 (B x y)
+herr : ∀ (x : I) (y : J), Content (↑p) ((W - A * B) x y)
+E : Matrix I J (↥integralRationals)[X] := liftMatrix W hW - liftMatrix A hA * liftMatrix B hB
+he : mapPolys integralRationals.subtype E = W - A * B
+x : I
+y : J
+n✝ : ℕ
+⊢ (mapPolys (reduceTo p R) E x y).coeff n✝ = (0 x y).coeff n✝
+../ring-evidence/draft-011.lean.txt:503:44: error: Function expected at
+  nodeCrossingPolynomial
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `nodeCrossingPolynomial` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../ring-evidence/draft-011.lean.txt:507:11: error: Function expected at
+  nodeCrossingPolynomial
+but this term has type
+  x✝
+
+Note: Expected a function because this term is being applied to the argument
+  a
+../ring-evidence/draft-011.lean.txt:506:90: error: unsolved goals
+x✝ : Sort u_2
+nodeCrossingPolynomial : x✝
+a u i p : ℕ
+t : ℤ
+m : ℕ → ℕ
+ht : ↑t ∈ grid a
+ht0 : t ≠ 0
+hi : padicValInt 2 t = i
+hiu : i < u
+hu : u ≤ a
+hG : 0 ≤ schedule u i m
+R : Type u_1
+inst✝¹ : CommRing R
+inst✝ : CharP R (2 ^ p)
+⊢ ∃ LW LA LB,
+    mapPolys integralRationals.subtype LW = sorry ∧
+      mapPolys integralRationals.subtype LA = absoluteLeft a u i p m ∧
+        mapPolys integralRationals.subtype LB = absoluteRight a u i p t m ∧
+          mapPolys (reduceTo p R) LW = mapPolys (reduceTo p R) LA * mapPolys (reduceTo p R) LB
+'OrientationCoefficientReduction.integral_matrix_product' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'OrientationCoefficientReduction.actual_reduced_absolute_factors' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

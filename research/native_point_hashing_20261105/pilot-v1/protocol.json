@@ -1,0 +1,744 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "XP-20261105-native-point-tables-pilot-v1",
+  "version": 1,
+  "created": "2026-11-05",
+  "repository": "crypto",
+  "study_dir": "research/native_point_hashing_20261105/pilot-v1",
+  "authors": [
+    "Codex native ECC development lane"
+  ],
+  "links": {
+    "backlog_card": "backlog/XP-20261105-native-point-hashing/card.json",
+    "prs": [
+      "https://github.com/isogeny-labs/crypto/pull/2984"
+    ],
+    "input_recipe": "pilot-plan.json",
+    "readiness": "Draft only: native L2/image/export/masking, complete inventory, external comparisons, power/runtime calibration, current budget and authenticated checkpoint admission remain pending.",
+    "input_recipe_sha256": "b879734d0a51e140df59753d9179790fbbd71cce60c832dd054f03fd711ece09"
+  },
+  "question": "Across the fixed 12/16-bit two-point inputs, how do preparation reuse and exact point indexes change deterministic native diagnostics and eventual admitted cold costs?",
+  "claims": [
+    {
+      "id": "C-answers",
+      "text": "Attempted witnesses and complete-negative answers match the separately implemented word-field replay; resource limits remain unknown.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-counts",
+      "text": "Report paired diagnostic count ratios on the fixed base seeds, without promoting an unpriced count change into a runtime conclusion.",
+      "class": "comparative",
+      "decided_by": [
+        "C-preparation",
+        "C-membership",
+        "C-table",
+        "C-fingerprint"
+      ],
+      "if_supported": "descriptive pilot component counts only; no inferential promotion",
+      "if_not_supported": "retain nulls/regressions and workload coverage"
+    },
+    {
+      "id": "C-runtime",
+      "text": "Runtime gains, strongest-external leadership, ECDLP scaling and Certicom recovery are outside this unadmitted draft.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-reuse",
+      "statement": "Prepared domains can avoid repeated selector root extraction when bases serve multiple relation queries.",
+      "mechanism": "Complete common column preparation already produces the points; the prepared arm reuses them in selector order.",
+      "predictions": [
+        {
+          "id": "P-roots",
+          "metric": "root_requests",
+          "direction": "lower",
+          "minimum_effect": "No numeric gain is promised; inspect all paired prefix ratios with preparation included.",
+          "provenance": {
+            "written_at": "2026-11-05",
+            "first_recorded_in": "backlog/XP-20261105-native-point-hashing/README.md",
+            "data_seen": [
+              {
+                "path": "../qualification.json",
+                "measured": "Only fixed F17 development controls; no 12/16-bit oracle counts or clocks observed."
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "current",
+      "role": "baseline",
+      "description": "current native two-slot batch; common complete matrix indexes retained",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "native_point_hash_study"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release",
+          "lockfile": "Cargo.lock"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "current",
+        "derive_last": true,
+        "smallest_first": true,
+        "cache_entries": 4096
+      }
+    },
+    {
+      "id": "current_aa",
+      "role": "control_aa",
+      "description": "current_aa native two-slot batch; common complete matrix indexes retained",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "native_point_hash_study"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release",
+          "lockfile": "Cargo.lock"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "current_aa",
+        "derive_last": true,
+        "smallest_first": true,
+        "cache_entries": 4096
+      },
+      "same_instrument_as": "current"
+    },
+    {
+      "id": "prepared",
+      "role": "candidate",
+      "description": "prepared native two-slot batch; common complete matrix indexes retained",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "native_point_hash_study"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release",
+          "lockfile": "Cargo.lock"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "prepared",
+        "derive_last": true,
+        "smallest_first": true,
+        "cache_entries": 4096
+      },
+      "same_instrument_as": "current"
+    },
+    {
+      "id": "ordered",
+      "role": "candidate",
+      "description": "ordered native two-slot batch; common complete matrix indexes retained",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "native_point_hash_study"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release",
+          "lockfile": "Cargo.lock"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "ordered",
+        "derive_last": true,
+        "smallest_first": true,
+        "cache_entries": 4096
+      },
+      "same_instrument_as": "current"
+    },
+    {
+      "id": "hashed",
+      "role": "candidate",
+      "description": "hashed native two-slot batch; common complete matrix indexes retained",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "native_point_hash_study"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release",
+          "lockfile": "Cargo.lock"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "hashed",
+        "derive_last": true,
+        "smallest_first": true,
+        "cache_entries": 4096
+      },
+      "same_instrument_as": "current"
+    },
+    {
+      "id": "fingerprint",
+      "role": "candidate",
+      "description": "fingerprint native two-slot batch; common complete matrix indexes retained",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "native_point_hash_study"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release",
+          "lockfile": "Cargo.lock"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "fingerprint",
+        "derive_last": true,
+        "smallest_first": true,
+        "cache_entries": 4096
+      },
+      "same_instrument_as": "current"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every context has a separate counts-only control batch through all six arms, with the first available pair sum planted by word arithmetic. Empty bases retain a negative-only control and are never resampled. These are per-context controls rather than a separate treatment arm."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "The same per-context batch includes the first generator-walk point missing from the complete word-arithmetic pair sumset. Full-sumset contexts retain their positive-only control; do not invent an impossible negative or resample. Every ordinary negative answer also receives complete word replay."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "lookup_policy",
+        "levels": [
+          "current",
+          "current_aa",
+          "prepared",
+          "ordered",
+          "hashed",
+          "fingerprint"
+        ]
+      },
+      {
+        "name": "prepared_domain_and_decode_reuse",
+        "levels": [
+          "per_query",
+          "prepared_complete_selectors"
+        ]
+      },
+      {
+        "name": "complete_membership_fact_reuse",
+        "levels": [
+          "arithmetic_predicate",
+          "prevalidated_exact_index"
+        ]
+      },
+      {
+        "name": "ordered_versus_hash_data_structure",
+        "levels": [
+          "ordered_full_keys",
+          "hashed_full_keys"
+        ]
+      },
+      {
+        "name": "full_key_versus_fingerprint_buckets",
+        "levels": [
+          "full_key_table",
+          "fingerprint_with_full_equality"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One release binary/lockfile; commit and OCI identity pending",
+        "how": "Exact image/binary/source binding is mandatory before launch."
+      },
+      {
+        "name": "curve_threshold",
+        "treatment": "crossed",
+        "value": "12/16 bits x thresholds 32/128",
+        "how": "The fixed registered roster and complete grid; report each cell."
+      },
+      {
+        "name": "bases_and_queries",
+        "treatment": "fixed",
+        "value": "8 seeds per cell, 256 uniform public subgroup query points",
+        "how": "Compact recipe plus hashes; identical across arms. Hash parameters are supplied component inputs; their sampling is not method cost."
+      },
+      {
+        "name": "base_seed",
+        "treatment": "randomized",
+        "value": "Explicit seeds 0 through 7",
+        "how": "SHA256 domain-separated base/query laws; seeds fixed before data."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "CPU/kernel/SMT/NUMA/frequency/isolation/steal/PSI/run CPU",
+        "how": "Native L2 adapter still pending; no timing comparison without it."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "measured",
+        "value": "Fresh process per batch; allocator/ASLR/page state",
+        "how": "Retain all preparation and complete indexes; full allocation inventory pending."
+      },
+      {
+        "name": "warmup_order",
+        "treatment": "randomized",
+        "value": "2 warmups and 8 measured rounds",
+        "how": "Seeded Fisher-Yates context/arm order, paired full reversal."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "One solver thread inside the fixed 4-vCPU worker allocation."
+      },
+      {
+        "name": "interruption",
+        "treatment": "measured",
+        "value": "Original absolute deadline, no retries or restores",
+        "how": "Every failure and in-flight start remains in the append-only ledger."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Pre-data code; prototype unmasked",
+        "how": "Masking/export integration and independent audit are pending; no promotion allowed."
+      },
+      {
+        "name": "fresh_process_and_order",
+        "treatment": "randomized",
+        "value": "Separate child per arm-batch; seeded reverse-paired order",
+        "how": "The baseline and A/A alias differ only in independent process/order nuisance draws, never in the algorithm or query inputs."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-preparation",
+        "arms": [
+          "current",
+          "prepared"
+        ],
+        "differs_in": [
+          "prepared_domain_and_decode_reuse"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-membership",
+        "arms": [
+          "prepared",
+          "ordered"
+        ],
+        "differs_in": [
+          "complete_membership_fact_reuse"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-table",
+        "arms": [
+          "ordered",
+          "hashed"
+        ],
+        "differs_in": [
+          "ordered_versus_hash_data_structure"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-fingerprint",
+        "arms": [
+          "hashed",
+          "fingerprint"
+        ],
+        "differs_in": [
+          "full_key_versus_fingerprint_buckets"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "current",
+          "current_aa"
+        ],
+        "differs_in": [
+          "fresh_process_and_order"
+        ],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "randomized",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "nonce": null,
+      "note": "native-point-hash-pilot/v1 SHA256 rejection law; order_seed=0x706f696e74686173. Context and arm blocks reverse on the second round of each pair."
+    },
+    "instance_sampling": {
+      "rule": "Registered prime roster, full 2x2x8 context grid; SHA256-rejection uniform subgroup query points and separate base RNG. No scalar labels enter child input.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Prototype counts-only analysis is unmasked. Canonical masked export/analysis is an explicit unresolved admission dependency; no winner or statistical promotion.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 32,
+    "replicates": 8,
+    "warmups": 2,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 300,
+      "correction": "other",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": false,
+      "note": "Exploratory count ratios: 5 candidate/current contrasts x 4 cells x 5 prefixes x 3 diagnostic metrics. No error-controlled test or promotion. Eight independent base-seed clusters per cell; repetitions/queries are not independent sample units. Test-specific power is unqualified and must be set for fresh-target confirmation."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "root_requests",
+        "name": "Square-root requests",
+        "unit": "native diagnostic events",
+        "kind": "counted",
+        "definition": "Cumulative complete native preparation, query attempts and original arithmetic witness replay through the selected prefix. Not a calibrated arithmetic price.",
+        "source": "record.prefixes[].root_requests",
+        "aggregation": "paired_ratio",
+        "resolution": "1 event",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "curve_additions",
+        "name": "Native curve-addition calls",
+        "unit": "native diagnostic events",
+        "kind": "counted",
+        "definition": "Cumulative complete native preparation, query attempts and original arithmetic witness replay through the selected prefix. Not a calibrated arithmetic price.",
+        "source": "record.prefixes[].curve_additions",
+        "aggregation": "paired_ratio",
+        "resolution": "1 event",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "meter_steps",
+        "name": "Meter-step attempts",
+        "unit": "native diagnostic events",
+        "kind": "counted",
+        "definition": "Cumulative complete native preparation, query attempts and original arithmetic witness replay through the selected prefix. Not a calibrated arithmetic price.",
+        "source": "record.prefixes[].meter_steps",
+        "aggregation": "paired_ratio",
+        "resolution": "1 event",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "native_cold_ns",
+        "name": "Unadmitted native cold interval",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "From before curve/base/index preparation through native query and arithmetic witness replay. Excludes parse/serialization and separate word audit. No timing analysis until current native L2/host/resource admission exists.",
+        "source": "record.prefixes[].cold_ns",
+        "aggregation": "paired_ratio",
+        "resolution": "host monotonic clock; qualification pending",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 2,
+    "order": "randomized",
+    "clock": "counted",
+    "counters": [
+      "meter_steps",
+      "curve_additions",
+      "root_requests"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "OCI_digest",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "run_cpu",
+      "threads",
+      "rusage",
+      "peak_RSS",
+      "original_deadline",
+      "all_input_and_output_hashes"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "cpus": 4,
+      "memory_gib": 4,
+      "disk_gib": 10,
+      "concurrency": 1,
+      "image": "unadmitted",
+      "account_headroom": null,
+      "lane_headroom": null,
+      "whole_job_usd_cap": null
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly 192 per-context planted/negative controls + 64 forced-hash-collision controls + 192 counted diagnostic batches + 384 warmup + 1536 measured = 2368 planned child attempts. Controls/counts precede timing.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop at the first child/replay/resource/timeout failure, preserving the durable start/finish ledger and all remaining unattempted rows. Never retry or extend the original absolute deadline.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "No build or study unless current account/lane charged-plus-reserved headroom, exact-source S3 checkpoint/readback and authenticated native image/L2 admission pass.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Mismatched input/schedule/artifact identity; duplicate or out-of-order ledger events.",
+    "Incorrect witness/absence or a resource limit labelled absent.",
+    "Timing below required native L2, missing host/resource inventory or any resumed interval.",
+    "Any missing/failed row prevents a complete-case count contrast; retain full flow instead."
+  ],
+  "decision_rule": {
+    "text": "Report deterministic paired diagnostic ratios by size/threshold/prefix, with independent base-seed clusters and descriptive pointwise intervals. Do not declare a winner, infer equivalence, promote a runtime gain or claim fastest implementation. Timing comparisons are refused by the prototype analyzer.",
+    "comparison_ids": [
+      "C-preparation",
+      "C-membership",
+      "C-table",
+      "C-fingerprint"
+    ],
+    "threshold": null,
+    "statistic": "Ratio of totals across one counted record per independent base-seed context; candidate/current; root/add/meter prefixes.",
+    "interval": "Existing ecbench.stats linearised_ratio, log-scale Student-t pointwise 95% interval over 8 independent base seeds; no query/timing-repeat pseudoreplication.",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Unpriced diagnostic count ratios only; no error-controlled multiple-comparison decision.",
+    "verdict_vocabulary": [
+      "descriptive_pilot_only",
+      "incomplete_attempt_flow",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../../../examples/native_point_hash_study/pilot.rs",
+      "sha256": "629e171cbf675f01ec992c186f8590e91e22c55690e0c86366fdbd05377419be"
+    },
+    "inputs": [
+      "pilot-plan.json",
+      "RUN/run.json",
+      "RUN/events.jsonl",
+      "RUN/<ordinal>/input.json",
+      "RUN/<ordinal>/record.json"
+    ],
+    "outputs": [
+      "native-point-hash.pilot-analysis/v1 with full flow and count contrasts"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "S per arm per workload with the A/A interval"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Changing grid, query law, seeds, accounting or stopping after seeing native study data.",
+    "Reading development F17 controls or unpriced count ratios as runtime gains.",
+    "Using pointwise pilot intervals as multiplicity-corrected evidence or proof of equivalence.",
+    "Substituting an unrelated ECBench fixture or local timings for an admitted native study.",
+    "Treating a null freeze, unknown budget, a source label or a producer boolean as execution admission.",
+    "Dropping failures, duplicate/in-flight attempts, empty bases or full-sumset control exceptions."
+  ],
+  "literature": [
+    {
+      "ref": "https://cacr.uwaterloo.ca/hac/about/chap3.pdf",
+      "provenance": "retrieved",
+      "claim": "Algorithm 3.56 charges table construction and matching; do not credit a quadratic baseline the native selector already avoids.",
+      "verified_by": "Primary source read during the recorded design."
+    },
+    {
+      "ref": "https://www.scs.carleton.ca/~paulv/papers/JoC97.pdf",
+      "provenance": "retrieved",
+      "claim": "Distinguished-point/label handling motivates preserving full points and coefficient identity; this pilot does not evaluate distributed rho.",
+      "verified_by": "Primary source read during the recorded design."
+    },
+    {
+      "ref": "src/cryptanalysis/ecbench/stats.rs",
+      "provenance": "internal",
+      "claim": "Reuse existing linearised cluster ratio and Student-t log interval, with one independent base seed per cluster.",
+      "verified_by": "Native source reviewed during this continuation."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

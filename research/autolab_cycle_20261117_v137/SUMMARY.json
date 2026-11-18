@@ -1,0 +1,80 @@
+{
+  "scientific": {
+    "out": {
+      "matrix_rhs_oracles": 4096,
+      "complement_inverse_checks": 768,
+      "tiny_families": [
+        {
+          "all_assignments": 32,
+          "exact_zero_correction_assignments": 6,
+          "exact_supported_component_tuples": 1,
+          "supported_tuple_sha256": "9d9d8487c99a7ee164f53fea5053b6b17f43f1c0782dbb951253303074cc900c"
+        },
+        {
+          "all_assignments": 32,
+          "exact_zero_correction_assignments": 6,
+          "exact_supported_component_tuples": 1,
+          "supported_tuple_sha256": "9d9d8487c99a7ee164f53fea5053b6b17f43f1c0782dbb951253303074cc900c"
+        },
+        {
+          "all_assignments": 32,
+          "exact_zero_correction_assignments": 4,
+          "exact_supported_component_tuples": 1,
+          "supported_tuple_sha256": "9d9d8487c99a7ee164f53fea5053b6b17f43f1c0782dbb951253303074cc900c"
+        },
+        {
+          "all_assignments": 32,
+          "exact_zero_correction_assignments": 6,
+          "exact_supported_component_tuples": 1,
+          "supported_tuple_sha256": "9d9d8487c99a7ee164f53fea5053b6b17f43f1c0782dbb951253303074cc900c"
+        }
+      ],
+      "root_bag_oracle_size": 200,
+      "original_complete": false,
+      "total_seconds": 4.907524462993024,
+      "actual": {
+        "complete": true,
+        "ell": 17,
+        "precisions": [
+          18,
+          19,
+          20
+        ],
+        "kernel_hex": [
+          "0x203fc8e0758104c",
+          "0x10003f9d8cf98562",
+          "0x25bc29bd1e36b336"
+        ],
+        "early_rank": 8,
+        "states": 256,
+        "conditional_parameter_upper_bound": 2017612633061982208,
+        "finite_difference_checks": 64,
+        "rank_distribution": {
+          "2": 144,
+          "3": 96,
+          "1": 16
+        },
+        "pivot_distribution": {
+          "[1, 2]": 48,
+          "[0, 1]": 48,
+          "[0, 1, 2]": 96,
+          "[0, 2]": 48,
+          "[2]": 8,
+          "[1]": 8
+        },
+        "development_parameter_bound": 2305843009213693952,
+        "development_target_met": true,
+        "matrix_table_sha256": "0a75c2aad7604cd0561e6d0a4a67411bb7f19f861a79b3bc16ed7833f8f8c198"
+      }
+    },
+    "error": null
+  },
+  "supervisor": {
+    "status": "ok",
+    "wall_seconds": 4.962134917004732,
+    "peak_process_rss_kib": 797772
+  },
+  "scientific_workers": 1,
+  "qualified_speedup": null,
+  "goal_complete": false
+}

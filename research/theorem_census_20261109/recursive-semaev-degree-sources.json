@@ -1,0 +1,103 @@
+{
+  "schema": "theorem-source-audit/v1",
+  "created": "2026-11-09T18:52:34.310Z",
+  "scope": "Actual recursive canonical polynomial family, independent inputs via bundled polynomial rings; last-input degree2^(m-2) for every aritym>=3, successor leading coefficient and actual S4 bridge. Other positions/symmetry/geometric recursion/irreducibility excluded.",
+  "sources": [
+    {
+      "id": "Semaev2015",
+      "url": "https://arxiv.org/pdf/1504.01175",
+      "version": "arXiv1504.01175v1",
+      "pdf_sha256": "4db8433bdd7a32fab22bdc53dc9455bf08c7a3d9fe4af9022b135e951ee8bf6c",
+      "text_sha256": "0aaa6355cf0227bde141eb541301a5c5055f9127b769adbb1a9e6eb37ba93e15",
+      "read_scope": "Section2 pp2-3: actual general model/algebraic-closure definition, resultant recursion and generic individual-variable degree2^(m-2). This does not assert preservation of degree under arbitrary specialization. PDF page3visually inspected to verify exponent m-2 and algebraic-closure bars."
+    },
+    {
+      "id": "Kosters-Yeo2015",
+      "url": "https://arxiv.org/pdf/1503.08001",
+      "version": "arXiv1503.08001v3",
+      "pdf_sha256": "b5ea5e4c5de7dcacf579e283168d9463b2b6977b031002ddee134a3a0d7868eb",
+      "text_sha256": "49a35941e7f8b2a7d33c7d4a387a967354c48a16b172f66d443e72ee57e85345",
+      "read_scope": "Section2 p3 general b-invariant formula/first resultant definition and Proposition2.1; retained PDF page previously visually checked."
+    },
+    {
+      "id": "Semaev2004",
+      "url": "https://eprint.iacr.org/2004/031.pdf",
+      "status": "still_unread",
+      "observed": "Original2004 remains unread: ePrint403, CiteSeer403 and cited RHUL institutional copy404. Related2015texts do not replace original source reading."
+    },
+    {
+      "id": "Mathlib",
+      "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+      "paths": [
+        "Mathlib/LinearAlgebra/Matrix/Polynomial.lean",
+        "Mathlib/Algebra/Polynomial/BigOperators.lean",
+        "Mathlib/Algebra/Polynomial/Coeff.lean",
+        "Mathlib/RingTheory/Polynomial/Resultant/Basic.lean",
+        "Mathlib/Algebra/MvPolynomial/CommRing.lean",
+        "Mathlib/Algebra/Category/Ring/Basic.lean"
+      ],
+      "read_scope": "Determinant coefficient and degree expansion; product bounds with individual degrees; coeff_mul_add_eq_of_natDegree_le; actual fixed-degree Sylvester/resultant and resultant_X_sub_C_pow_right; faithful multivariate coefficient ring and evaluation homomorphisms. CommRingCat bundles the carrier with its actual ring structure so recursion introduces true independent polynomial variables, without a circular Semiring instance."
+    }
+  ],
+  "formal": {
+    "lean": "leanprover/lean4:v4.35.0",
+    "source": "research/theorem_census_20261109/lean/RecursiveSemaevDegree.lean",
+    "source_sha256": "cea5acca394aa203c125416ce1d69247079749e48de38ce4d67faaf7a5ae9edf",
+    "binding": "RecursiveSemaevDegreeAudit.recursive_semaev_degree_audit_certificate",
+    "decl_sha256": "659172d7e674fc1681e87c55c4796f0db871784169e700f4d8369b9cf3506ea1",
+    "semantics": "InputRing0=K[x1][x2], successor=actual polynomial ring over predecessor. Base actual S3 quadratic; each successor actual fixed-size Sylvester resultantStep, with coefficient embeddings from K. An explicit equality identifies arity4with the previously checked canonical S4. No abstract degree recurrence is a hypothesis.",
+    "scope": "Every arity last input only; does not prove symmetry/every input, all-m zero-sum equivalence or irreducibility.",
+    "dependencies": [
+      {
+        "path": "research/theorem_census_20261109/lean/ResultantDegreeStep.lean",
+        "sha256": "3a360ba0006ff7112f6c54cd389dcf8719d0c59c0cc816be4075e9a4970231f6"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/S4Degree.lean",
+        "sha256": "b26b20cddee5ec12369b5b3447c6d3b352f878a1f9201219090271ed201f2c20"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/GeneralS4.lean",
+        "sha256": "1d73c0555b406b7c54796796f11f4ca720708060b2d5dba4de95c9d455bc378b"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/GeneralS3.lean",
+        "sha256": "13ffefd385f4e20e60df00483802c80c00cc21c9f25caf41987d41845d375633"
+      }
+    ],
+    "gate": {
+      "path": "evidence/recursive-semaev-degree-gate.log",
+      "declarations": 308,
+      "failing": 0,
+      "trusted_native": 0,
+      "tracked_modules_include": "RecursiveSemaevDegree",
+      "binding_present": true
+    }
+  },
+  "identity_plan": {
+    "status": "Planned; source/plan commit before issue; actual receipt retained separately.",
+    "source": "research/theorem_census_20261109/identity/src/bin/recursive_semaev_degree.rs",
+    "source_sha256": "518ccfcce32ee3913827556eb67f30cd21dd42b4a0154e052b09632e9dac3225",
+    "variables": 10,
+    "degree_bound": 18,
+    "seed_hex": "0x202611091850",
+    "points": 32,
+    "extra_seed_hex": "0x5e4ae084",
+    "extra_points": 11,
+    "scope": "Only fixedD8scalar monic-square resultant Res_(8,2)(sum a_i X^i,(X-z)^2)=(sum a_i z^i)^2, actual10x10determinant AST. No native all-arity coefficient/degree conclusion.",
+    "checker_sources": [
+      {
+        "path": "src/cryptanalysis/identity_certificate.rs",
+        "sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270"
+      },
+      {
+        "path": "src/hash/sha256.rs",
+        "sha256": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+      }
+    ]
+  },
+  "kb": "Unavailable: no kb_status/search_knowledge tools; scripts/research-kb status reports no executable. Narrow repository and primary-source fallback; no novelty claim.",
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}

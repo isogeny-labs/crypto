@@ -1,0 +1,48 @@
+{
+  "schema": "vieta-postmerge-checks/v1",
+  "base": "222394077d1700e5e3124a385673bad4143875ef",
+  "records": [
+    {
+      "record": "benchmarks/records/20261115T2104Z-vieta-coset-local-scale.json",
+      "errors": [],
+      "remote_s3_checked": false
+    },
+    {
+      "record": "benchmarks/records/20261115T2147Z-vieta-three-fixture-repair.json",
+      "errors": [],
+      "remote_s3_checked": false
+    }
+  ],
+  "claims": [
+    {
+      "id": "PCC-20261115-6a8b11",
+      "unchanged_file_sha256": "c68d9381d8a356431f6117bc0c7cda328b90a4b79eb2c224828490cd6198c9dd",
+      "pinned_proof_hashes_match": true,
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261115-74f8a5",
+      "unchanged_file_sha256": "3db5ba6d6f187a9ede18bd6ab8dcd8f2adb85c496f1679fe37d8312966eeea20",
+      "pinned_proof_hashes_match": true,
+      "standing": "unverified"
+    }
+  ],
+  "native_tests": {
+    "unit_groups": 5,
+    "cli_tests": 3,
+    "exit": 0
+  },
+  "native_fmt_exit": 0,
+  "native_clippy_exit": 0,
+  "lessons": {
+    "entries": 170,
+    "errors": 0
+  },
+  "ledger": {
+    "entries": 1190,
+    "prefix_base": "origin/main",
+    "errors": 0
+  },
+  "benchmark_progress": "official regeneration and --check passed",
+  "scope": "Producer local checks; not a full-root-suite pass, independent signature, S3 availability claim or new performance experiment. [pcc:unverified]"
+}

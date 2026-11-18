@@ -1,0 +1,112 @@
+module
+public import Mathlib
+public section
+
+namespace OrientationAnchor
+open Polynomial Finset
+
+/-- The actual signed displacement of a pair of nonnegative indices. -/
+def delta (x y : ℕ) : ℚ := (y : ℚ) - x
+
+/-- Public anchors are selected by equality of the actual index bits. -/
+def mask (u x y : ℕ) : Finset ℕ :=
+  (range u).filter fun j => x.testBit j = y.testBit j
+
+/-- A displacement of exactly one anchor flips its bit, including carries. -/
+theorem anchor_flips (x y j : ℕ) (h : delta x y = (2 : ℚ)^j) :
+    x.testBit j ≠ y.testBit j := by
+  have heq : y = 2^j+x := by
+    have hc : (y : ℚ) = ((2^j+x : ℕ) : ℚ) := by
+      simp only [Nat.cast_add, Nat.cast_pow, Nat.cast_ofNat]
+      dsimp [delta] at h
+      linarith
+    exact_mod_cast hc
+  rw [heq, Nat.testBit_two_pow_add_eq]
+  cases x.testBit j <;> decide
+
+/-- Every denominator selected by the new guard is nonzero. -/
+theorem denominator_ne_zero (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    (2 : ℚ)^j - delta x y ≠ 0 := by
+  have hb : x.testBit j = y.testBit j := (mem_filter.mp hj).2
+  intro hz
+  exact anchor_flips x y j (by linarith) hb
+
+/-- The actual rational polynomial correction factor. -/
+def factor (d : ℚ) (j : ℕ) : ℚ[X] :=
+  (C ((2 : ℚ)^j) - X) * C (((2 : ℚ)^j-d)⁻¹)
+
+/-- The full masked anchor product; the multiplicities are public. -/
+def correction (u x y : ℕ) (m : ℕ → ℕ) : ℚ[X] :=
+  ∏ j ∈ mask u x y, (factor (delta x y) j)^m j
+
+/-- Every selected factor is exactly one at the displaced source node. -/
+theorem factor_at_delta (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    (factor (delta x y) j).eval (delta x y) = 1 := by
+  simp [factor, mul_inv_cancel₀ (denominator_ne_zero u x y j hj)]
+
+/-- The product preserves its own source value, without a supplied witness. -/
+theorem correction_at_delta (u x y : ℕ) (m : ℕ → ℕ) :
+    (correction u x y m).eval (delta x y) = 1 := by
+  simp only [correction, eval_prod, eval_pow]
+  apply prod_eq_one
+  intro j hj
+  simp [factor_at_delta u x y j hj]
+
+/-- The computed monic quotient, not an existential completion coefficient. -/
+def quotient (u x y : ℕ) (m : ℕ → ℕ) : ℚ[X] :=
+  (correction u x y m - 1) /ₘ (X-C (delta x y))
+
+/-- Exact computed division has zero remainder. -/
+theorem quotient_identity (u x y : ℕ) (m : ℕ → ℕ) :
+    (X-C (delta x y))*quotient u x y m = correction u x y m-1 := by
+  have h := modByMonic_add_div (correction u x y m-1) (X-C (delta x y))
+  simpa [quotient, modByMonic_X_sub_C_eq_C_eval, correction_at_delta] using h
+
+/-- Nodal polynomial for an actual finite rational source set. -/
+def nodal (S : Finset ℚ) : ℚ[X] := ∏ t ∈ S, (X-C t)
+
+/-- Cauchy numerator with its displaced factor removed explicitly. -/
+def puncture (S : Finset ℚ) (d : ℚ) : ℚ[X] := ∏ t ∈ S.erase d, (X-C t)
+
+/-- The chosen scalar is the derivative of the actual nodal polynomial at zero. -/
+def normalizer (S : Finset ℚ) : ℚ := (nodal S).derivative.eval 0
+
+def base (S : Finset ℚ) (d : ℚ) : ℚ[X] :=
+  C ((normalizer S)⁻¹) * puncture S d
+
+def completed (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ) : ℚ[X] :=
+  base S (delta x y) * correction u x y m
+
+def completion (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ) : ℚ[X] :=
+  C ((normalizer S)⁻¹) * quotient u x y m
+
+/-- The source polynomial is the actual puncture times the removed factor. -/
+theorem nodal_puncture (S : Finset ℚ) (d : ℚ) (hd : d ∈ S) :
+    puncture S d * (X-C d) = nodal S := by
+  exact Finset.prod_erase_mul (fun t => (X-C t : ℚ[X])) hd
+
+/-- Exact completion identity in the original W+C H model. -/
+theorem completed_identity (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ)
+    (hd : delta x y ∈ S) :
+    completed S u x y m - base S (delta x y) =
+      nodal S * completion S u x y m := by
+  have hq := quotient_identity u x y m
+  have hc := nodal_puncture S (delta x y) hd
+  dsimp [completed, base, completion]
+  rw [← hc]
+  calc
+    _ = C ((normalizer S)⁻¹) * puncture S (delta x y) *
+        (correction u x y m - 1) := by ring
+    _ = _ := by rw [← hq]; ring
+
+/-- Every original source value is preserved, not only the displaced node. -/
+theorem completed_at_node (S : Finset ℚ) (u x y : ℕ) (m : ℕ → ℕ)
+    (hd : delta x y ∈ S) (t : ℚ) (ht : t ∈ S) :
+    (completed S u x y m).eval t = (base S (delta x y)).eval t := by
+  have hz : (nodal S).eval t = 0 := by
+    simp only [nodal, eval_prod]
+    exact prod_eq_zero ht (by simp)
+  have h := congrArg (Polynomial.eval t) (completed_identity S u x y m hd)
+  simpa only [eval_sub, eval_mul, hz, zero_mul, sub_eq_zero] using h
+
+end OrientationAnchor

@@ -1,0 +1,374 @@
+{
+  "schema": "actual-function-divisor-source-plan/v1",
+  "created": "2026-11-15T07:19:54.211369+00:00",
+  "formal": {
+    "project": "research/function_divisor_finiteness_audit_20261115/lean",
+    "theorem": "FunctionDivisorFinitenessAudit.function_divisor_finiteness_certificate",
+    "statement": "theorem function_divisor_finiteness_certificate : (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (hf : f ≠ 0), (Function.support (pointOrder W f)).Finite ∧ (∀ R : W.Point, functionDivisor W f hf R = pointOrder W f R) ∧ functionDivisor W f hf ∈ principalPointDivisors W) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0), functionDivisor W (f * g) (mul_ne_zero hf hg) = functionDivisor W f hf + functionDivisor W g hg ∧ functionDivisor W (f / g) (div_ne_zero hf hg) = functionDivisor W f hf - functionDivisor W g hg) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (n : ℕ), functionDivisor W (millerFunction W P n) (miller_function_nonzero W P n) = millerDivisor W P n) ∧ rationalCurve.Δ ≠ 0 ∧ rationalFunction ≠ 0 ∧ (∀ c : F3, rationalFunction ≠ constantHom rationalCurve c) ∧ functionDivisor rationalCurve rationalFunction rational_function_nonzero = 0 ∧ InfinityMonic rationalCurve rationalFunction",
+    "decl_sha256": "f4c0c971036efced202ba6da453857cdaaaa70f6e116619f5839ce5d10ad1b1b",
+    "scope": "Actual every-nonzero-function divisor finiteness and additive principal point-divisor homomorphism for every field/general Weierstrass model, derived rather than assumed. Actual coordinate-ring evaluation zero implies root of its actual algebra norm polynomial; actual norm nonzero, polynomial-root set finite and monic quadratic yfibers finite. Actual point coordinate injection/finite unions/images/preimages derive finite affine zero sets. Actual nonvanishing evaluation gives a unit in the actual derived local DVR and actual official adic value1. Every actual FunctionField fraction therefore has all nonzero actual normalized point orders in finite numerator zeros/denominator zeros/infinity. General finite-support Finsupp principal point divisors, product/quotient rules, actual rational-function-unit-group additive homomorphism/principal subgroup range and compatibility with actual all-n Miller functions proved. Actual F3 curve y²=x³+x+1 has nonzero discriminant; actual rational function (X²+1)/(X²+X+2) nonzero/nonconstant by injective actual polynomial-function map and coefficient comparison. It has zero actual local order at every F3-rational nonsingular point including infinity, zero rational-point divisor and actual leading-residue-one normalization. This refutes zero-rational-point-divisor implies constant after deleting geometric-point scope; the source uses bar-k geometric points and is not refuted. Thirty-nine modules include33exactcredited cores+6new; defaults/standardfoundations. Over arbitraryK actual nonsingularKpoint divisors; ifKalgclosed and W elliptic all geometricpoints. Source qualified Theorem7.7.1 survives. General geometric degreezero, globalconstantkernel/uniqueness, algebraicclosurebasechange, MathlibScheme.localRing/Divisor APIinterop, translation/reciprocity/isogeny/Lang/Cartier/Jacobian/canonicalWeil-Tate/MOVFR/full14 remainopen. Samehost/prover/Mathlib, nativeheaderproceduralonly/notcompiler-parser-physicalhostrefinement. No novelty/canonicalpromotion/signedstandingclaim.",
+    "sources": [
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/AllMiller.lean",
+        "bytes": 3541,
+        "sha256": "957b06f548600a2befac32f94513ff5bc5782fbcea21d73079d65ef385c446ae"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/ChartAdicValuation.lean",
+        "bytes": 3767,
+        "sha256": "b8f6b793ef7d2a3805885417979e737e93265d56a02a03bf402979ac17d32078"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/ChartAlgebra.lean",
+        "bytes": 5144,
+        "sha256": "211969ef3498e5d786030a97b8783bd07a9b9d5434f2238114cf1b448c3f737a"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/ChartCertificate.lean",
+        "bytes": 2296,
+        "sha256": "b191e8c77a5364b9bf9d06c7216ba954c38493ff60470390451b5cc9289f85bd"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/ChartFractionField.lean",
+        "bytes": 5097,
+        "sha256": "3c0f5414072a7da74490335bff5f7224d833fdcc36c2c4c6be7f137d7c71dea7"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/ChartLocalization.lean",
+        "bytes": 4824,
+        "sha256": "6fd5bf89c3d69e4ca7d8c9bb3fbdc9a617c8a9151283890be0cbff26506d5112"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/DVRIdentification.lean",
+        "bytes": 3372,
+        "sha256": "964e3c213cdd1296bb3fffc2229ca2d4ed96f5dfce9c8b79f9cf2e55693ad0fc"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/FiniteControls.lean",
+        "bytes": 4550,
+        "sha256": "6d89f39552273975fcb78c48e379a5d545a92809fd9f3adadaae75f141e57056"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/FiniteDVR.lean",
+        "bytes": 6827,
+        "sha256": "4b1ca398165e92d3562300d43f03f946c56d5d681b5a245c86c8733f7465caa1"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/FiniteFractionField.lean",
+        "bytes": 3133,
+        "sha256": "b5c768debd68ab967466a30e623d4d8ab720b1d9e4482100c2598ed2b746ff20"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/FinitePointCertificate.lean",
+        "bytes": 3225,
+        "sha256": "e1982dcd3f71270e748979792f672bd3748bfec428af31c553423bd298fbed2b"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/FiniteValuation.lean",
+        "bytes": 4354,
+        "sha256": "7afdecddd0bde0b2aecaa9ae632a09fb4602dc2d8d07c5af5062e0c06a50b0eb"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/FiniteZeros.lean",
+        "bytes": 3615,
+        "sha256": "87c1352f6a533b766cce10ca68f9e092547980451931e34946531dd6fe44f494"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/FunctionDivisor.lean",
+        "bytes": 5039,
+        "sha256": "70866614e80ecc49200bc15a09f5b8d8ca30bf76c708d07246c07d5f970751d3"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/FunctionDivisorCertificate.lean",
+        "bytes": 2288,
+        "sha256": "713fa781862832962c898c6db56238c349efe184422ab03c77c45b6ac4914285"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2953,
+        "sha256": "d993b8a271d0b45b877f0f0c03ae970934500a70981549df266473b43d83d366"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/InfinityMonic.lean",
+        "bytes": 6901,
+        "sha256": "522fc47b03d83b14d6ee0e649b6a61db0de3391ad5ea5ce01c2b3510060f3075"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/LineEvaluation.lean",
+        "bytes": 2628,
+        "sha256": "59405f70efc92e408edb087790965f3dc7d8559dd3b55fe0deb122e859de49ef"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/LineIdeals.lean",
+        "bytes": 5086,
+        "sha256": "f14f02c6998c132789cb332a5879cb57bb0ed6f17c1664bfd5fbabf98678d097"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/LineMultiplicity.lean",
+        "bytes": 5708,
+        "sha256": "f63e57417708ec7f8d809b169567a332365b4e8f00db30483d1ff8662442aca2"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/LocalComparison.lean",
+        "bytes": 3873,
+        "sha256": "cb0cedd56066bd863244da6aca7c0b921b0ff8bebd286b257db98aadd7aa5075"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/LocalOrderAlgebra.lean",
+        "bytes": 4627,
+        "sha256": "208e6317562c3428e3c4ecf87ee2c818e49ca601e58529ed0bc92b37bad601da"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/LocalOriginEvaluation.lean",
+        "bytes": 2050,
+        "sha256": "3692803fda5ecbb3185199a0b9e045ffb42ea6ce62e2ffc04122b3bc71d939c7"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/MillerStep.lean",
+        "bytes": 3712,
+        "sha256": "af03145385dd37fe065e7f532e26f256b010b49f2a8b5c839045987f87e897b3"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/NormEvaluation.lean",
+        "bytes": 3070,
+        "sha256": "97a31eb12e47c3ca706def9b3d77947e792d18efb54a53f5272ee7805b9c2eed"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/OriginEvaluation.lean",
+        "bytes": 5686,
+        "sha256": "5f183c7d2306ea8a6f4874e4e226ae6c47f8919399a8f7bd8a439f630941adb0"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/PointDivisor.lean",
+        "bytes": 6952,
+        "sha256": "1c501f52d0a66d4c8118c3555f279b2599a121806af2c44518db608bd0086986"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/PointLocalization.lean",
+        "bytes": 4265,
+        "sha256": "9bf6c929fb31a34187a82ed3d3ddb7d9d3fba5f7f1b6b332fa43d578ccfb6594"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/PolynomialValues.lean",
+        "bytes": 1292,
+        "sha256": "36b18679067f57503a2f3c37eca56d39397c467423fc7d30563c40167943fdf4"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/RationalControls.lean",
+        "bytes": 7157,
+        "sha256": "68b65085186d1011aff59d16671e9725b447c0aafa84a1214f464002804f653d"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/RecursionCertificate.lean",
+        "bytes": 2595,
+        "sha256": "88f37e0bfa19bd6cf009bf8340eae0e82ef79b55478c79e9c7e1f22a4c1cd49f"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/RecursionControls.lean",
+        "bytes": 2016,
+        "sha256": "089da7719c94e96d224c501a97a78dd0f677f1a60b5e75e4ebf3dd77256208dd"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/lakefile.toml",
+        "bytes": 1076,
+        "sha256": "f60d37667db51497c41cbc198784c128b43a9235dc074d53b1a4dad18d766645"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/function_divisor_finiteness_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "AllMiller",
+    "ChartAdicValuation",
+    "ChartAlgebra",
+    "ChartCertificate",
+    "ChartFractionField",
+    "ChartLocalization",
+    "DVRIdentification",
+    "DiscreteValuation",
+    "FieldValuation",
+    "FiniteControls",
+    "FiniteDVR",
+    "FiniteFractionField",
+    "FinitePointCertificate",
+    "FiniteValuation",
+    "FiniteZeros",
+    "FunctionDivisor",
+    "FunctionDivisorCertificate",
+    "GuardControls",
+    "InfinityMonic",
+    "LineEvaluation",
+    "LineIdeals",
+    "LineMultiplicity",
+    "LocalComparison",
+    "LocalOrderAlgebra",
+    "LocalOriginEvaluation",
+    "MillerFunctions",
+    "MillerStep",
+    "NormDegree",
+    "NormEvaluation",
+    "Normalization",
+    "OriginEvaluation",
+    "PointDivisor",
+    "PointLocalization",
+    "PolynomialValues",
+    "RationalControls",
+    "RecursionCertificate",
+    "RecursionControls",
+    "ResidueNormalization",
+    "ValuationCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 36076,
+      "sha256": "a67f3c55bbd03ef2fd3f2804e67deb531fc88982c1f6be4f1586a620330a2cda"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "d7fcbf132fae4f9623aaa756ceddf2669018c2c7ce371fd1236ce303a0c158b6"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/evidence/attempts.json",
+      "bytes": 237,
+      "sha256": "4512f14d759d714b8f4a9791cb8aec4b4279298a1b7c833a18fd2c935412ddf3"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 4862,
+      "sha256": "04c0eba72a52042fa5e67e3588c5073e936493ca55ab8e2c4cce9758b62bd50e"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/evidence/gate.json",
+      "bytes": 1482,
+      "sha256": "76e385589766afbc7d95f19763c6fe8bc6c4533d652691963f134ccab6424e65"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/evidence/source-review.json",
+      "bytes": 9972,
+      "sha256": "4844a6c26dbe94d99e9db90ba33f397c9a51bd77ac0f5fc5a821fe9fc7b5a8fc"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/evidence/binding-check.json",
+      "bytes": 4833,
+      "sha256": "588092b1c09d6f9d7c984fab4e08de326ec78d882ac9d604a8489a98ca332c2d"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/proof-map.json",
+      "bytes": 8688,
+      "sha256": "31414fda34705495c9fed8516198ff267d9e47ec4cbd79b32a93b8e2093e4e46"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/render_report.py",
+      "bytes": 7235,
+      "sha256": "21bfdf469c1a1614f5975c9357f2cf413b5e4012ed4560089f2ca8776bb91ace"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/export_binding_input.py",
+      "bytes": 1788,
+      "sha256": "71ab11c016e9378dc4d94d2aaf6a74ab76e513b0eb9ce11514846c2446f05069"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/reports/function-divisor.svg",
+      "bytes": 1437,
+      "sha256": "9e319360b20ddd13b1810f5e0f484f46911ca29d68816494435a9e885a01c7bc"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/reports/layout.json",
+      "bytes": 264,
+      "sha256": "4f77149f617bec0675a01694fc131d4ce010763c8f1a59995cdd343735d8c139"
+    },
+    {
+      "path": "research/function_divisor_finiteness_audit_20261115/reports/report.pdf",
+      "bytes": 46987,
+      "sha256": "47bce0510c48584468bfe53ba65ce2cbfd63fd74aacc950a9ec6dd1dc811b00f"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 334,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 33,
+    "new_modules": 6,
+    "actual_every_nonzero_function_finiteness": true,
+    "actual_divisor_homomorphism_and_principal_subgroup": true,
+    "actual_miller_compatibility": true,
+    "actual_nonconstant_normalized_F3_zero_rational_point_divisor_counter": true,
+    "arbitrary_field_scope": "ActualnonsingularKpoints; ellipticmodeloveralgclosedK includesallgeometricpoints. F3counterdeliberatelyrational-only.",
+    "geometric_degree_zero_or_constant_kernel": false,
+    "chosen_function_uniqueness_or_binary_refinement": false,
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "algebraic_closure_basechange_or_canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

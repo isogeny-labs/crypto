@@ -1,0 +1,718 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "VIETA-TRANSFORM-SELECTION-20261117",
+  "version": 1,
+  "created": "2026-11-17",
+  "repository": "crypto",
+  "study_dir": "research/vieta_coset_rust_20261115/speedup-20261117",
+  "authors": [
+    "Codex"
+  ],
+  "question": "Separate prospective calibration of NTT products and half-GCD with full cold costs; candidate fixed as NTT-half before this data, no primary confirmation.",
+  "claims": [
+    {
+      "id": "C-output",
+      "class": "exact_computation",
+      "text": "Complete relation sets match scalar oracle; AA query counts1x, full fresh-stage double query counts2x.",
+      "decided_by": [
+        "C-ntt",
+        "C-positive"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "newton",
+      "role": "baseline",
+      "description": "newton: explicit field/NTT/GCD choice. All arms build full certified base; lookup adds hash set. NTT caches cleared for each Arithmetic stage, root/table work charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/transform/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "half",
+      "role": "baseline",
+      "description": "half: explicit field/NTT/GCD choice. All arms build full certified base; lookup adds hash set. NTT caches cleared for each Arithmetic stage, root/table work charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/transform/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "fast",
+      "role": "baseline",
+      "description": "fast: explicit field/NTT/GCD choice. All arms build full certified base; lookup adds hash set. NTT caches cleared for each Arithmetic stage, root/table work charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/transform/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "fast-half",
+      "role": "baseline",
+      "description": "fast-half: explicit field/NTT/GCD choice. All arms build full certified base; lookup adds hash set. NTT caches cleared for each Arithmetic stage, root/table work charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/transform/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "ntt",
+      "role": "candidate",
+      "description": "ntt: explicit field/NTT/GCD choice. All arms build full certified base; lookup adds hash set. NTT caches cleared for each Arithmetic stage, root/table work charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/transform/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "ntt-half",
+      "role": "candidate",
+      "description": "ntt-half: explicit field/NTT/GCD choice. All arms build full certified base; lookup adds hash set. NTT caches cleared for each Arithmetic stage, root/table work charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/transform/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "ntt-half-aa",
+      "role": "control_negative",
+      "description": "ntt-half-aa: explicit field/NTT/GCD choice. All arms build full certified base; lookup adds hash set. NTT caches cleared for each Arithmetic stage, root/table work charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/transform/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "ntt-half-double",
+      "role": "control_positive",
+      "description": "ntt-half-double: explicit field/NTT/GCD choice. All arms build full certified base; lookup adds hash set. NTT caches cleared for each Arithmetic stage, root/table work charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/transform/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    },
+    {
+      "id": "lookup-fast",
+      "role": "reference",
+      "description": "lookup-fast: explicit field/NTT/GCD choice. All arms build full certified base; lookup adds hash set. NTT caches cleared for each Arithmetic stage, root/table work charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speedup-20261117/transform/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "698b7c98d7acb939c8d7b68c40793354526965b3e90bc57b9b8829c7832179ee",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "school"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "ntt-half-double",
+      "expected_detection": "Complete-set match; query_work.muls exactly2x NTT-half, including fresh root/table setup per query; construction fixed. Clock control descriptive only.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "ntt-half-aa",
+      "null_population": {
+        "description": "Same algorithm/field/target/seed in fresh process; the same AA panel supplies nuisance null, not a separate independent sample.",
+        "generator": "New exec per arm, fixed source/config/target/budgets.",
+        "n": 6,
+        "why_n": "Qualification or separate calibration only; no population significance or winner inference.",
+        "matched_on": [
+          "field",
+          "curve",
+          "representation",
+          "m",
+          "target",
+          "seed",
+          "binary",
+          "budgets"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "field_backend",
+        "levels": [
+          "legacy",
+          "shared"
+        ]
+      },
+      {
+        "name": "polynomial_product",
+        "levels": [
+          "karatsuba",
+          "ntt128"
+        ]
+      },
+      {
+        "name": "gcd",
+        "levels": [
+          "euclid",
+          "half"
+        ]
+      },
+      {
+        "name": "query_repetitions",
+        "levels": [
+          1,
+          2
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "vieta",
+          "lookup"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "representation_field_and_m",
+        "treatment": "crossed",
+        "value": [
+          [
+            "word62",
+            "coset",
+            16384
+          ],
+          [
+            "p224",
+            "coset",
+            2048
+          ],
+          [
+            "p224",
+            "rational",
+            512
+          ]
+        ],
+        "how": "Keep configurations separate. Rational fixtures are Mobius conjugates of squaring, not auxiliary-isogeny search benchmarks. Word62 has no prime-order subgroup assertion; P224 standard curve."
+      },
+      {
+        "name": "target_population",
+        "treatment": "crossed",
+        "value": [
+          "seeded-random-abscissa",
+          "conditioned-sum"
+        ],
+        "how": "Alternating inputs, same exact target across all arms; identity separate."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One immutable native release binary, locked dependencies, one CPU.",
+        "how": "Source/build/binary/analysis hashes recorded before calls."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "fixed",
+        "value": "cyclic9 by input, first positive first",
+        "how": "Only qualification/calibration; no primary order or significance claim."
+      },
+      {
+        "name": "host_environment",
+        "treatment": "measured",
+        "how": "Unmodified isolated_bench CPU4; missing PSI/unmovable host threads mean below-L2 clocks."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded descriptive native analyzer",
+        "how": "Raw per-input values/ranges retained; no statistical significance test."
+      },
+      {
+        "name": "construction_backend",
+        "treatment": "fixed",
+        "value": "KaratsubaNewton for all construction; NTT flag also applies to eligible construction products.",
+        "how": "Every arm builds full certified descriptor and full point base inside cold. Lookup additionally builds HashSet. Every NTT Arithmetic stage clears its per-field table cache; query repetitions each pay root/table setup."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-pipeline",
+        "arms": [
+          "newton",
+          "ntt-half"
+        ],
+        "design": "factorial",
+        "differs_in": [
+          "field_backend",
+          "polynomial_product",
+          "gcd"
+        ]
+      },
+      {
+        "id": "C-ntt",
+        "arms": [
+          "fast-half",
+          "ntt-half"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "polynomial_product"
+        ]
+      },
+      {
+        "id": "C-gcd",
+        "arms": [
+          "ntt",
+          "ntt-half"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "gcd"
+        ]
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "ntt-half",
+          "ntt-half-aa"
+        ],
+        "design": "aa",
+        "differs_in": []
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "ntt-half",
+          "ntt-half-double"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "query_repetitions"
+        ]
+      },
+      {
+        "id": "C-lookup",
+        "arms": [
+          "lookup-fast",
+          "ntt-half"
+        ],
+        "design": "absolute",
+        "differs_in": [
+          "method"
+        ],
+        "threshold": "Describe complete cold ratio without DLP or fastest claim."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Exact config JSON seed; source SplitMix draws alternate random-abscissa/canonical sqrt and indexed sums. Root splitting0x53555000+input index; certification42/representative3. Config IDs literal strings0..N-1. Written before calls; no seed relabeling."
+    },
+    "instance_sampling": {
+      "rule": "[('word62', 'coset', 16384), ('p224', 'coset', 2048), ('p224', 'rational', 512)]; two retained independent deterministic targets/config, alternating random abscissa and conditioned sum, zero warmups. Calibration only, separate from future primary.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit unblinded deterministic descriptive analysis frozen before data; no inferential selection or posthoc dispatch.",
+      "unmasked_at": null
+    },
+    "arm_order_reason": "Separate calibration cyclic order; no primary inference."
+  },
+  "sample_size": {
+    "instances": 3,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": false,
+      "note": "Fixed two-input qualification/calibration only, one per population; no significance/power claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 90,
+      "threads": 1,
+      "estimated_total_seconds": 540,
+      "measured_on": "Conservative per-input planning cap from prior legacy observations; no new calibration result yet."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "muls",
+        "name": "Query primitive field multiplications",
+        "unit": "field multiplications",
+        "kind": "counted",
+        "definition": "Existing evaluator query_work.muls includes inverse/sqrt internals. Shared backend constructor/precomputation timed inside cold but its primitive operations are unpriced; do not call fast cold counters complete.",
+        "source": "row.query_work.muls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "relations",
+        "name": "Complete ordered relations",
+        "unit": "point pairs",
+        "kind": "exact",
+        "definition": "Complete ordered pair array and SHA compared across all arms, then native BigUint scalar replay.",
+        "source": "row.relations and row.result_sha256",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "elapsed",
+        "name": "Local diagnostic cold/query elapsed intervals",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "Cold begins before field construction/precomputation, curve/input encoding, certified descriptor/full point base/index and query; query separate. Profiler disabled. Local belowL2 diagnostics only, no admitted speedup.",
+        "source": "row.cold_ns and row.query_ns",
+        "aggregation": "per_row",
+        "resolution": "monotonic Instant, actual host resolution recorded",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "adds",
+      "muls",
+      "inversions",
+      "square_roots",
+      "polynomial_products",
+      "polynomial_divisions",
+      "split_attempts",
+      "group_adds",
+      "membership_lookups",
+      "karatsuba_nodes",
+      "newton_divisions",
+      "half_gcd_nodes",
+      "half_gcd_batches",
+      "rational_map_steps",
+      "certified_fibers"
+    ],
+    "record": [
+      "source_revision",
+      "binary_sha256",
+      "rustc",
+      "cpu_model",
+      "kernel",
+      "SMT",
+      "NUMA",
+      "memory",
+      "PSI",
+      "affinity",
+      "co_tenants",
+      "interruptions",
+      "isolation",
+      "A/A",
+      "failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": [
+        4
+      ],
+      "max_memory_gib": 8,
+      "cloud_spend_usd": 0,
+      "git_only_checkpoint_authorized": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "3 configs*9arms*2inputs=54 calls, no retries. Per-stage60s/4e9muls, worker135s, configuration300s, outer900s. Shared field setup inside outer/worker cold interval."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Wrong complete set or first positive failure stops; preserve failed/missing cells. Ordinary budget failures retained; later arms continue."
+    }
+  ],
+  "decision_rule": {
+    "text": "Qualification/calibration only. Future primary candidate already fixed NTT-half; no posthoc fastest-arm selection. Record all failures, descriptive subgroup native summaries, never pool populations.",
+    "comparison_ids": [
+      "C-pipeline",
+      "C-ntt",
+      "C-gcd",
+      "C-positive",
+      "C-lookup"
+    ],
+    "statistic": "Native per-row counts and descriptive paired summaries; never pool fields/representations/populations or selection with primary.",
+    "interval": "Observed range, not a confidence interval.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Reference/candidate query and complete cold ratios; AA count1x/double2x; no p-values or exponent claim.",
+    "verdict_vocabulary": [
+      "descriptive_only",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "transform/src/analysis.rs",
+      "sha256": "23ba4102130f4de29a9880b0920ff5217179db897447e332aab74fa6df29f5c1"
+    },
+    "inputs": [
+      "runs/transform-selection/*/cell-*.json"
+    ],
+    "outputs": [
+      "evidence/transform-selection-summary.json",
+      "evidence/transform-selection-replay.json",
+      "export-transform-selection.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "Launch before source/binary/analysis/protocol Git publication",
+    "Change seeds/matrix/limits/analysis/repeats after affected calls",
+    "Pool populations/configurations/identities or calibration with main",
+    "Omit full construction or treat lookup setup as free",
+    "Promote diagnostic clocks to L2 or counters to wall speedup",
+    "Drop failures/timeouts/missing/warmups",
+    "Call Mobius-Kummer fixtures auxiliary-isogeny search costs",
+    "Self-sign general degree argument or claim complete formal tower instantiation",
+    "Paid/cloud experiments or local S3 operations"
+  ],
+  "literature": [
+    {
+      "ref": "FLINTv3.3.1 src/nmod_poly/hgcd.c and src/gr_poly/hgcd.c; src/cryptanalysis/isogeny_eval/poly.rs; ic_framework/prime_tower.rs",
+      "provenance": "retrieved",
+      "claim": "Standard recursive polynomial half reduction, counted multiplication and normalized Velu-map source assumptions. No novelty claim.",
+      "verified_by": "Producer primary/internal source read; KB MCP/wrapper unavailable."
+    },
+    {
+      "ref": "TRANSFORM_PLAN.md",
+      "provenance": "internal",
+      "claim": "Owner GS/CT schedule and FLINT primary docs; NTT-admissible primes only; exact root-order/naive product tests, no novelty claim."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "2498ba5ff8c4dac45cd4d9d33a70ad715ed6b18a89764dbe1fd635663191aa97",
+    "commit": "a7453ed465085a869df789c6697820759cc59c7e",
+    "frozen_at": "2026-11-17T08:15:51Z",
+    "filed_before_affected_data": true
+  },
+  "invalidation_rules": [
+    "Exact set mismatch invalidates instrument; all failures retained.",
+    "No profiler time or belowL2 clock promoted to admitted speedup.",
+    "Shared field constructor core counters incomplete; full cold timer includes it."
+  ],
+  "extensions": {
+    "panel": "transform-selection",
+    "matrix": [
+      [
+        "word62",
+        "coset",
+        16384
+      ],
+      [
+        "p224",
+        "coset",
+        2048
+      ],
+      [
+        "p224",
+        "rational",
+        512
+      ]
+    ],
+    "planned_calls": 54,
+    "ntt_threshold": 128,
+    "ntt_max_length": 2097152,
+    "generator_candidates": [
+      2,
+      64
+    ],
+    "candidate_fixed_before_calibration": "ntt-half",
+    "native_field_setup_inside_cold": true,
+    "native_field_setup_primitives_unpriced": true,
+    "all_arms_full_base_inside_cold": true,
+    "arithmetic_stage_cache_reset": true,
+    "no_s3": true,
+    "no_paid_cloud": true
+  }
+}

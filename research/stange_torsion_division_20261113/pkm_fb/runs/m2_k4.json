@@ -1,0 +1,470 @@
+{
+ "m": 2,
+ "k": 4,
+ "n": 16,
+ "p": 257,
+ "A": 120,
+ "B": 98,
+ "zeta": 249,
+ "seed": 20261115,
+ "targets": 8,
+ "arms": [
+  "D",
+  "T2",
+  "T4"
+ ],
+ "reps": 3,
+ "baseline_s": 0.0020925229999875228,
+ "msolve": "0.6.5 (-g 2 -t 1); nondeterministic run time",
+ "summary": {
+  "D": {
+   "median_s": 0.0009805360000427754,
+   "n_ok": 8,
+   "max_step_deg_values": [
+    18
+   ]
+  },
+  "T2": {
+   "median_s": 0.0022603175000881492,
+   "n_ok": 8,
+   "max_step_deg_values": [
+    4
+   ]
+  },
+  "T4": {
+   "median_s": 0.0010860730000104013,
+   "n_ok": 8,
+   "max_step_deg_values": [
+    6
+   ]
+  }
+ },
+ "failures": [],
+ "records": [
+  {
+   "target": 0,
+   "xR": 187,
+   "brute_ordered_tuples": 2,
+   "relation_multisets_xcoord": 1,
+   "arms": {
+    "T4": {
+     "time_s": 0.00141004600004635,
+     "raw_min_s": 0.0035025690000338727,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 4,
+     "quotient_dim": 2,
+     "max_step_deg": 6,
+     "nvars": 4,
+     "neqs": 5
+    },
+    "D": {
+     "time_s": 0.0009620580000273549,
+     "raw_min_s": 0.0030545810000148776,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 2,
+     "quotient_dim": 2,
+     "max_step_deg": 18,
+     "nvars": 2,
+     "neqs": 3
+    },
+    "T2": {
+     "time_s": 0.002313986000103796,
+     "raw_min_s": 0.004406509000091319,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 8,
+     "quotient_dim": 2,
+     "max_step_deg": 4,
+     "nvars": 8,
+     "neqs": 9
+    }
+   }
+  },
+  {
+   "target": 1,
+   "xR": 216,
+   "brute_ordered_tuples": 0,
+   "relation_multisets_xcoord": 0,
+   "arms": {
+    "T4": {
+     "time_s": 0.0010601950000364013,
+     "raw_min_s": 0.003152718000023924,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 6,
+     "nvars": 4,
+     "neqs": 5
+    },
+    "D": {
+     "time_s": 0.0008069389999718624,
+     "raw_min_s": 0.002899461999959385,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 18,
+     "nvars": 2,
+     "neqs": 3
+    },
+    "T2": {
+     "time_s": 0.002097518000027776,
+     "raw_min_s": 0.004190041000015299,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 4,
+     "nvars": 8,
+     "neqs": 9
+    }
+   }
+  },
+  {
+   "target": 2,
+   "xR": 26,
+   "brute_ordered_tuples": 0,
+   "relation_multisets_xcoord": 0,
+   "arms": {
+    "T4": {
+     "time_s": 0.0010813129999860394,
+     "raw_min_s": 0.003173835999973562,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 6,
+     "nvars": 4,
+     "neqs": 5
+    },
+    "T2": {
+     "time_s": 0.0020584129999861034,
+     "raw_min_s": 0.004150935999973626,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 4,
+     "nvars": 8,
+     "neqs": 9
+    },
+    "D": {
+     "time_s": 0.000999014000058196,
+     "raw_min_s": 0.0030915370000457187,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 18,
+     "nvars": 2,
+     "neqs": 3
+    }
+   }
+  },
+  {
+   "target": 3,
+   "xR": 250,
+   "brute_ordered_tuples": 4,
+   "relation_multisets_xcoord": 2,
+   "arms": {
+    "D": {
+     "time_s": 0.0011477719999675173,
+     "raw_min_s": 0.00324029499995504,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 3,
+     "quotient_dim": 4,
+     "max_step_deg": 18,
+     "nvars": 2,
+     "neqs": 3
+    },
+    "T2": {
+     "time_s": 0.0022066490000725025,
+     "raw_min_s": 0.004299172000060025,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 11,
+     "quotient_dim": 4,
+     "max_step_deg": 4,
+     "nvars": 8,
+     "neqs": 9
+    },
+    "T4": {
+     "time_s": 0.0010908330000347632,
+     "raw_min_s": 0.003183356000022286,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 7,
+     "quotient_dim": 4,
+     "max_step_deg": 6,
+     "nvars": 4,
+     "neqs": 5
+    }
+   }
+  },
+  {
+   "target": 4,
+   "xR": 161,
+   "brute_ordered_tuples": 0,
+   "relation_multisets_xcoord": 0,
+   "arms": {
+    "T4": {
+     "time_s": 0.0010135290000334862,
+     "raw_min_s": 0.003106052000021009,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 6,
+     "nvars": 4,
+     "neqs": 5
+    },
+    "T2": {
+     "time_s": 0.002047508000032394,
+     "raw_min_s": 0.004140031000019917,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 4,
+     "nvars": 8,
+     "neqs": 9
+    },
+    "D": {
+     "time_s": 0.0005230360001178269,
+     "raw_min_s": 0.0026155590001053497,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 18,
+     "nvars": 2,
+     "neqs": 3
+    }
+   }
+  },
+  {
+   "target": 5,
+   "xR": 184,
+   "brute_ordered_tuples": 0,
+   "relation_multisets_xcoord": 0,
+   "arms": {
+    "T4": {
+     "time_s": 0.0010358129999303856,
+     "raw_min_s": 0.0031283359999179083,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 6,
+     "nvars": 4,
+     "neqs": 5
+    },
+    "T2": {
+     "time_s": 0.003211458999999195,
+     "raw_min_s": 0.005303981999986718,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 4,
+     "nvars": 8,
+     "neqs": 9
+    },
+    "D": {
+     "time_s": 0.001015864999999394,
+     "raw_min_s": 0.003108387999986917,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 18,
+     "nvars": 2,
+     "neqs": 3
+    }
+   }
+  },
+  {
+   "target": 6,
+   "xR": 117,
+   "brute_ordered_tuples": 0,
+   "relation_multisets_xcoord": 0,
+   "arms": {
+    "T4": {
+     "time_s": 0.001208288000043467,
+     "raw_min_s": 0.00330081100003099,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 6,
+     "nvars": 4,
+     "neqs": 5
+    },
+    "T2": {
+     "time_s": 0.0023524729999735428,
+     "raw_min_s": 0.0044449959999610655,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 4,
+     "nvars": 8,
+     "neqs": 9
+    },
+    "D": {
+     "time_s": 0.0009336840000742086,
+     "raw_min_s": 0.0030262070000617314,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 1,
+     "quotient_dim": 0,
+     "max_step_deg": 18,
+     "nvars": 2,
+     "neqs": 3
+    }
+   }
+  },
+  {
+   "target": 7,
+   "xR": 183,
+   "brute_ordered_tuples": 2,
+   "relation_multisets_xcoord": 1,
+   "arms": {
+    "T4": {
+     "time_s": 0.0013823950000642071,
+     "raw_min_s": 0.00347491800005173,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 4,
+     "quotient_dim": 2,
+     "max_step_deg": 6,
+     "nvars": 4,
+     "neqs": 5
+    },
+    "T2": {
+     "time_s": 0.002329437999947004,
+     "raw_min_s": 0.004421960999934527,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 8,
+     "quotient_dim": 2,
+     "max_step_deg": 4,
+     "nvars": 8,
+     "neqs": 9
+    },
+    "D": {
+     "time_s": 0.001021462000039719,
+     "raw_min_s": 0.0031139850000272418,
+     "runs_ok": 3,
+     "rcs": [
+      0,
+      0,
+      0
+     ],
+     "gb_len": 2,
+     "quotient_dim": 2,
+     "max_step_deg": 18,
+     "nvars": 2,
+     "neqs": 3
+    }
+   }
+  }
+ ],
+ "xcoord_fraction_of_V": 0.5625
+}

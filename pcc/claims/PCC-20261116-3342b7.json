@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:36:16Z",
+ "id": "PCC-20261116-3342b7",
+ "kind": "execution",
+ "producer": {
+  "commit": "016b19ffa20767c5db2b7c52e0f4008998c2a765",
+  "model": "",
+  "session": "01a1dc01-cc02-7381-a21c-3b12d7b79441"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/audits/2026-11-16-artifact-conflict-custody.json",
+    "sha256": "1e03b1a85a73de4cea52b9a43759548f3e3fc8388b532a9fda189bc11cfb8cdd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/audits/2026-11-16-artifact-conflict-evidence/before.log",
+    "sha256": "6e243f6eb2aa729f62222b460b5e8a4240776f25c9c805ba3d488a97abd8080e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/audits/2026-11-16-artifact-conflict-evidence/after.log",
+    "sha256": "0b5577e75866bb363e080227b296cbebca41e3dfc9bb10d07cefa6bfa39d8aeb"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "artifact-index-conflict-custody",
+ "statement": "Recorded artifact offload refusal for an unresolved three-stage index, with unchanged source and index controls; unsigned evidence."
+}

@@ -1,0 +1,37 @@
+import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree
+import Mathlib.Algebra.CharP.Algebra
+import Mathlib.Data.ZMod.Basic
+import Mathlib.Tactic.NormNum
+
+/-! Concrete endpoints from existing Mathlib laws. These do not formalize
+the native Newton evaluator or construct a cross-prime point map. -/
+namespace LocalTorsionBoundary
+
+def model19 : WeierstrassCurve ℤ :=
+  ⟨1048577, 0, 0, 15728640, 6815744⟩
+
+def model83 : WeierstrassCurve ℤ :=
+  ⟨309485009821345068724781057, 0, 0,
+   2824050714619773752113627136, 4052319347348236993615101952⟩
+
+theorem model19_degree : (model19.preΨ' 19).natDegree = 180 := by
+  have h := model19.natDegree_preΨ' (n := 19) (by norm_num)
+  norm_num at h
+  exact h
+
+theorem model83_degree : (model83.preΨ' 83).natDegree = 3444 := by
+  have h := model83.natDegree_preΨ' (n := 83) (by norm_num)
+  norm_num at h
+  exact h
+
+theorem no_binary_residue17 : IsEmpty (ZMod (17 ^ 64) →+* ZMod 2) := by
+  refine ⟨fun f => ?_⟩
+  have h := CharP.dvd_of_ringHom f (17 ^ 64) 2
+  norm_num at h
+
+theorem no_binary_residue257 : IsEmpty (ZMod (257 ^ 64) →+* ZMod 2) := by
+  refine ⟨fun f => ?_⟩
+  have h := CharP.dvd_of_ringHom f (257 ^ 64) 2
+  norm_num at h
+
+end LocalTorsionBoundary

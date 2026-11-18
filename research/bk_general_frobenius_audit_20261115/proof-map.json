@@ -1,0 +1,205 @@
+{
+  "main": "BKGeneralFrobeniusAudit.general_frobenius_certificate",
+  "binding": "1496e8cfdebbf83c0db95c47a6fd234bcd8e9f29294f9a4ae96b80b88e4be677",
+  "custom_imports": {
+    "ActualCriterion": "research/bk_frobenius_bridge_audit_20261114/lean/ActualCriterion.lean",
+    "ActualFrobenius": "research/bk_frobenius_bridge_audit_20261114/lean/ActualFrobenius.lean",
+    "ActualMatrix": "research/bk_frobenius_bridge_audit_20261114/lean/ActualMatrix.lean",
+    "BinaryFrobenius": "research/bk_frobenius_bridge_audit_20261114/lean/BinaryFrobenius.lean",
+    "FrobeniusCertificate": "research/bk_frobenius_bridge_audit_20261114/lean/FrobeniusCertificate.lean",
+    "GenericFrobenius": "research/bk_linear_audit_20261113/lean/GenericFrobenius.lean",
+    "RationalTorsion": "research/bk_linear_audit_20261113/lean/RationalTorsion.lean",
+    "S3Completion": "research/theorem_audit_20261108/lean/S3Completion.lean",
+    "S3Roots": "research/theorem_audit_20261108/lean/S3Roots.lean",
+    "StructuralAudit": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+    "FrobeniusFiniteExtension": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+    "FrobeniusPointDescent": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+    "RationalCounterexample": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+    "TorsionBoundaries": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+    "CharacteristicThree": "research/three_torsion_rank_audit_20261114/lean/CharacteristicThree.lean",
+    "DivisionQuartic": "research/three_torsion_rank_audit_20261114/lean/DivisionQuartic.lean",
+    "GeneralBasis": "research/three_torsion_rank_audit_20261114/lean/GeneralBasis.lean",
+    "GeneralCardinality": "research/three_torsion_rank_audit_20261114/lean/GeneralCardinality.lean",
+    "GeneralRoots": "research/three_torsion_rank_audit_20261114/lean/GeneralRoots.lean",
+    "GeneralTriplePoint": "research/three_torsion_rank_audit_20261114/lean/GeneralTriplePoint.lean",
+    "GeometricCardinality": "research/three_torsion_rank_audit_20261114/lean/GeometricCardinality.lean",
+    "QuarticRoots": "research/three_torsion_rank_audit_20261114/lean/QuarticRoots.lean",
+    "TernaryBasis": "research/three_torsion_rank_audit_20261114/lean/TernaryBasis.lean",
+    "TriplePoint": "research/three_torsion_rank_audit_20261114/lean/TriplePoint.lean",
+    "BKGeneralImports": "research/bk_general_frobenius_audit_20261115/lean/BKGeneralImports.lean",
+    "FixedFields": "research/bk_general_frobenius_audit_20261115/lean/FixedFields.lean",
+    "GeneralCertificate": "research/bk_general_frobenius_audit_20261115/lean/GeneralCertificate.lean",
+    "GeneralFrobenius": "research/bk_general_frobenius_audit_20261115/lean/GeneralFrobenius.lean",
+    "GeneralTorsion": "research/bk_general_frobenius_audit_20261115/lean/GeneralTorsion.lean",
+    "NineteenCubic": "research/bk_general_frobenius_audit_20261115/lean/NineteenCubic.lean",
+    "SourceField": "research/bk_general_frobenius_audit_20261115/lean/SourceField.lean",
+    "SourceGeometric": "research/bk_general_frobenius_audit_20261115/lean/SourceGeometric.lean",
+    "SourceNineteen": "research/bk_general_frobenius_audit_20261115/lean/SourceNineteen.lean",
+    "SourcePowers": "research/bk_general_frobenius_audit_20261115/lean/SourcePowers.lean"
+  },
+  "claims": [
+    {
+      "declaration": "BKGeneralFrobeniusAudit.torsionModule",
+      "conclusion": "Canonical ZModr module on actual killed-point subgroup."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.zeroTorsionEquiv",
+      "conclusion": "Actualr0subgroup is allpoints."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.torsion_one_subsingleton",
+      "conclusion": "Actualr1subgroup trivial."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.linear_frobenius_bijective",
+      "conclusion": "Actual coordinateFrobenius module automorphism overalgebraicfinitebase extension."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.fixedFieldMap_bijective",
+      "conclusion": "Actual coefficientinclusion is bijective onto fixedpowerkernel."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.fixedFieldEquiv",
+      "conclusion": "Actual fixedpower/finitefieldtorsion linear equivalence."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.fixedPower_finite",
+      "conclusion": "Finite fixedpopulation derived fromactualfinitefieldpointencoding."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.actual_prime_fixed_vector",
+      "conclusion": "Actual nonzero rational prime torsion point gives actual fixedvector."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.generator_order",
+      "conclusion": "SourceactualP0,5order18."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.rational_cardinality",
+      "conclusion": "ActualF19sourcepointgroupcard18."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.rational_cyclic",
+      "conclusion": "Actualwholepointgroupcyclic."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.rational_three_torsion_card",
+      "conclusion": "Actualrational3kernelcard3."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.geometric_three_card",
+      "conclusion": "Creditedgenericrank3 theorem applied to actualsourcekernel9."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.source_frobenius_not_identity",
+      "conclusion": "ActualsourceFrobenius notidentity."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.cubic_irreducible",
+      "conclusion": "Actualdegree3cubic/no19roots implies irreducibility."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.cube_field_card",
+      "conclusion": "Actualadjoinedfielddim3/card6859."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.psi_root_frobenius",
+      "conclusion": "Actualrootfinitefield powerlaw x^(19³)=x."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.source_frobenius_order",
+      "conclusion": "ActualsourceFrobenius exactorder3."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.source_all_extensions",
+      "conclusion": "Actualcompatiblechosenfields19^k fullgeometric3torsioniff3|k."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.source_extension_three",
+      "conclusion": "Constructedactualcubicfield embedding/tower containsfull3kernel."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.cubic_three_torsion_card",
+      "conclusion": "Actualcubicfield3kernelcard9."
+    },
+    {
+      "declaration": "BKGeneralFrobeniusAudit.SourceNineteen.sourceMatrix_det",
+      "conclusion": "Actualsource-only determinant19mod3 derived."
+    }
+  ],
+  "prior_reused_claims": [
+    {
+      "packet": "bk_frobenius_bridge_audit_20261114",
+      "claim": "PCC-20261114-e203ff",
+      "scope": "Actual prime3torsion/Frobenius matrices/descent; binaryF2det/control; F7excludedboundary. Generic determinantq an explicit premise there."
+    },
+    {
+      "packet": "bk_linear_audit_20261113",
+      "claim": "PCC-20261113-c139f1",
+      "scope": "Generalfield2x2fixed-vector/determinantq≠1 criterion and Jordanexception, actualfinitepointencoding/Cauchy."
+    },
+    {
+      "packet": "three_torsion_rank_audit_20261114",
+      "scope": "Actualgeneralmodel geometric3torsioncard9/rank2/basis when char≠3, allcharsincluding2; reused forsourceF19 notnewranktheorem."
+    },
+    {
+      "packet": "theorem_census_20261109",
+      "scope": "ActualpointFrobenius and finitechosen-field descent alreadyallr/allk; moduleequivalence links are newformalwork, notrestatingoldpointdescent."
+    },
+    {
+      "packet": "bk_basefield_census_20261112",
+      "scope": "Fullp<500k1nativepopulation alreadyincludesF19; newsourceF19allkproof notnewnativepopulation."
+    },
+    {
+      "packet": "bk_unipotent_audit_20261113",
+      "scope": "ActualF7allk excludedboundary alreadyproved; knownsource F19control attributed separately."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 59,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_allr_torsion_Frobenius_module": true,
+    "actual_algebraic_ambient_Frobenius_automorphism": true,
+    "actual_fixedpower_field_torsion_linear_equivalence": true,
+    "actual_finite_fixedpopulation_derived": true,
+    "actual_rational_prime_fixedpoint": true,
+    "r1_trivial_r0_allpoints": true,
+    "source_F19_known_control_verified": true,
+    "source_F19_allk_criterion": true,
+    "source_actual_cubic_field_and_embedding": true,
+    "source_only_determinantq_derived": true,
+    "arbitrary_prime_geometric_rank2": false,
+    "general_determinantq": false,
+    "canonical_Weil_necessity": false,
+    "qualified_source_refuted": false,
+    "full_allk_p_under500_census": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -111,6 +111,6 @@ jobs:
           export PATH="$HOME/.elan/bin:$PATH"
           lean OnlineRangeCapacity.lean > /tmp/n83-online-range-proof-check.log
           diff -u proof_check.log /tmp/n83-online-range-proof-check.log
-          if rg -n '\b(sorry|admit|sorryAx)\b' OnlineRangeCapacity.lean; then
+          if grep -nE '\b(sorry|admit|sorryAx)\b' OnlineRangeCapacity.lean; then
             exit 1
           fi

@@ -1,0 +1,10 @@
+[package]
+name="hec-batch-inverse"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../counted/native"}
+[[bin]]
+name="batch-inverse"
+path="../main.rs"

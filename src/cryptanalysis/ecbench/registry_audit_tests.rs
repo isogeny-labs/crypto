@@ -215,6 +215,28 @@ const APS: P = &[
     ("lambda", "0"),
     ("prune", "false"),
 ];
+const APS_V3: P = &[
+    ("encoding", "line_chart3"),
+    ("roots", "exact"),
+    ("stop", "first_informative"),
+    ("labels", "guaranteed"),
+    ("subset_size", "0"),
+    ("subset_profile", "2,2,2"),
+    ("attempts", "8"),
+    ("degree", "24"),
+    ("budget_ms", "10000"),
+    ("sampling_draws", "1000"),
+    ("orbit", "none"),
+    ("beta", "0"),
+    ("lambda", "0"),
+    ("prune", "false"),
+    ("guess", "none"),
+    ("trace", "certified"),
+    ("trace_entries", "8"),
+    ("trace_words", "100000"),
+    ("growth", "none"),
+    ("growth_ceiling", "4"),
+];
 const LARGE_PRIME: P = &[
     ("small_dimension", "3"),
     ("envelope_dimension", "4"),
@@ -320,6 +342,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ),
     ("ic.aps_v1", Fx::Aps101, APS),
     ("ic.aps_v2", Fx::Aps101, APS),
+    ("ic.aps_v3", Fx::Aps101, APS_V3),
     ("transfer.isogeny", Fx::Prime14, &[("ell", "3")]),
     ("transfer.quartic_cover", Fx::Prime14, &[]),
     ("transfer.quartic_cover_v2", Fx::Prime14, &[]),
@@ -590,7 +613,7 @@ fn every_registered_method_is_run_skipped_or_exempt_and_its_phases_sum() {
             problems.push(format!("{tag}: refused at plan time: {e}"));
             continue;
         }
-        let k = 1 + 4242 % (facts.r - 1);
+        let k = 1 + 4242 % (facts.r.checked_u128().unwrap() - 1);
         let Some(target) = inst.mul_generator_hex(k) else {
             problems.push(format!("{tag}: no target for k = {k}"));
             continue;
@@ -784,8 +807,13 @@ fn what_the_planner_accepts_the_new_methods_run_without_error() {
             if applicable(&m, &inst, &facts).is_err() {
                 continue;
             }
-            for k in [1u128, 2, facts.r / 2, facts.r - 1] {
-                if k == 0 || k >= facts.r {
+            for k in [
+                1u128,
+                2,
+                facts.r.checked_u128().unwrap() / 2,
+                facts.r.checked_u128().unwrap() - 1,
+            ] {
+                if k == 0 || k >= facts.r.checked_u128().unwrap() {
                     continue;
                 }
                 let Some(target) = inst.mul_generator_hex(k) else {
@@ -841,7 +869,7 @@ fn run_report(id: &str, fx: Fx, params: P) -> SolveReport {
     })
     .unwrap();
     applicable(&m, &inst, &facts).unwrap();
-    let k = 1 + 4242 % (facts.r - 1);
+    let k = 1 + 4242 % (facts.r.checked_u128().unwrap() - 1);
     let target = inst.mul_generator_hex(k).unwrap();
     let mut rep = solve(&m, &inst, &facts, &target, 6).unwrap();
     rep.solve_wall_ns = 0;

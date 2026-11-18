@@ -1,0 +1,76 @@
+name: Prime31 S9 B31 eight-net-root multiplicity (Rust)
+on:
+  push:
+    branches:
+      - research/prime31-aps-walk-source-20261116
+      - research/prime31-s9-zero-fibre-theorem-20261116
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_s9_b31_signature_multiplicity.rs
+      - .github/workflows/prime31-s9-net-multiplicity.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exhaustive-signatures:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Reused native Rust library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Four/eight combinatorics and full original-curve replay controls
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_signature_multiplicity
+      - name: Exhaustively enumerate every B31 4+4 witness and deduplicate into net signatures on two bases
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_signature_multiplicity > prime31-s9-b31-net-signatures.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("prime31-s9-b31-net-signatures.json").read_text())
+          assert x["schema"]=="prime31.s9.b31_net_signature_multiplicity.v1"
+          assert x["exact_integer_four_signature_count"]==618885
+          assert x["exact_integer_eight_signature_count"]==5654193417
+          assert x["exact_ordered_integer_half_pair_count"]==383018643225
+          assert len(x["panels"])==2
+          for p in x["panels"]:
+              assert p["four_sum_integer_signatures"]==618885
+              assert p["unordered_four_token_words"]==677040
+              assert p["four_sum_distinct_group_points"] + p["four_sum_group_collisions"]==618885
+              # D4 injectivity => only zero net d at Q=O in D8; the
+              # 46,376 distinct cancellation x-polynomials are not 46,376 nets.
+              assert p["identity_four_sum_injective"]
+              assert p["identity_unique_net_zero"]
+              assert p["identity_x_polynomial_cancellation_count"]==46376
+              zero=[r for r in p["cases"] if r["type"]=="identity_cancellation"]
+              assert len(zero)==1 and zero[0]["distinct_eight_net_signatures"]==1
+              assert zero[0]["all_net_signatures"]==[[0]*31]
+              assert len(p["cases"])==47
+              regressions=[r for r in p["cases"] if r["type"]=="retrospective_cross_base_regression"]
+              assert len(regressions)==2
+              assert all((not r["positive"]) for r in regressions) if p["base_kind"].startswith("dickson") else all(r["positive"] for r in regressions)
+              natural=[r for r in p["cases"] if r["type"]=="natural_verifier_only_k"]
+              planted=[r for r in p["cases"] if r["type"]=="blinded_constructed_positive"]
+              assert len(natural)==32 and len(planted)==12
+              assert p["natural_eight_leaf_reachable"]==sum(r["positive"] for r in natural)
+              assert all(r["positive"] for r in planted)
+              assert all(r["original_curve_replay_for_every_net_signature"] for r in p["cases"])
+              assert all(r["ordered_four_plus_four_pairs"]>=r["distinct_eight_net_signatures"] for r in p["cases"])
+              assert all(r["distinct_eight_net_signatures"]==len(r["all_net_signatures"]) for r in p["cases"])
+              assert all(r["exhausted_four_point_image"]==p["four_sum_distinct_group_points"] for r in p["cases"])
+              print(p["base_kind"], "natural_hits", p["natural_eight_leaf_reachable"], "/32",
+                    "natural_net_roots", [r["distinct_eight_net_signatures"] for r in natural],
+                    "natural_ordered_halves", [r["ordered_four_plus_four_pairs"] for r in natural],
+                    "half_collisions",p["four_sum_group_collisions"])
+          PY
+      - name: Retain complete source-specific development data (not PCC)
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-s9-b31-net-signatures
+          path: prime31-s9-b31-net-signatures.json
+          retention-days: 30

@@ -1,0 +1,31 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R79-CANDIDATE-U0-FIBERS",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "candidate-u0-79-01",
+      "path": "runs/candidate-u0-79-01/protocol.json",
+      "sha256": "3da842f5c643ef0f63e2abab8b9da32c633cc1d103a3f744ccc3381f322910df",
+      "frozen_revision": "f308c42849eb4446bd332867b76dc21f9900b05a"
+    },
+    {
+      "attempt": "candidate-u0-79-02",
+      "path": "runs/candidate-u0-79-02/protocol.json",
+      "sha256": "0b2f9af9a3de4800c8aabf5e2f3d4b1997f254dd5ccbe6a6bbf03ab666ab3f47",
+      "frozen_revision": "ae7c54825a14a874b77b8663bea3a48d0cf422d1"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "faf2fa1d28bd8fa946274d94be0b15f3d874db7439bee3b8a764c7c779671604"
+  },
+  "flow": {
+    "accepted": 1,
+    "rejected": 1,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual contract/source-byte checks only",
+  "notes": "Rejected R50 normalization candidate has finite 16+16 specialized quotient dimensions and source-factor containment; no normality claim."
+}

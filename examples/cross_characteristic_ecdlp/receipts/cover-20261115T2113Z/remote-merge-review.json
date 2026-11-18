@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-11-15T22:04:46.631Z",
+  "kind": "producer-history-review",
+  "ledgerComparison": [
+    {
+      "ref": "5668d68ccd8f1f1758db7f1e8c1cc1b865ce7a02",
+      "sha256": "b0223fbd7cd8b6628ccd613c79b1039cd81c29c5d62cf00eda911ed422ea5e5d",
+      "rows": 1091,
+      "commonRawRowsWithAuthorParent": 1091
+    },
+    {
+      "ref": "5dddc7d7d3693aac81a83376d4e573cf760e1b0a",
+      "sha256": "8c1e7218525d3594d9d0424be8a00706a7e229d48da17c1710e41151329e7c84",
+      "rows": 1094,
+      "commonRawRowsWithAuthorParent": 1088
+    },
+    {
+      "ref": "c40b39826f0b8378d939b624e78a68ae870208a1",
+      "sha256": "11d521618dae9f8d8730f800dee0739621ea74de9f4db172dc4b931a84ece66a",
+      "rows": 1095,
+      "commonRawRowsWithAuthorParent": 1088
+    },
+    {
+      "ref": "b05c8a03af1034fdc6c92c1bb061a9258ad0b555",
+      "sha256": "3a28fdcb2f367dd58e9007bd4fe78b6935ff00342fae6dd6da064a14f2d9741b",
+      "rows": 1092,
+      "commonRawRowsWithAuthorParent": 1088
+    }
+  ],
+  "exampleFilesChangedByRemoteMerges": [],
+  "checkerChanged": false,
+  "decision": "Preserve unpublished claim event separately; do not reconcile incompatible frozen ledger prefixes. New publication will append only to the existing remote head. The inherited historical prefix failure remains unresolved."
+}

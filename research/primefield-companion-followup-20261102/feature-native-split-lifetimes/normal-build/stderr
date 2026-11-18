@@ -1,0 +1,98 @@
+warning: due to multiple output types requested, the explicitly specified output file name will be adapted for each output type
+
+warning: function `pow` is never used
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-split-lifetimes/lib.rs:9:4
+  |
+9 | fn pow(mut a:u64,mut n:u64,p:u64)->u64{let mut z=1;while n!=0{if n&1!=0{z=mul(z,a,p);}n>>=1;if n!=0{a=mul(a,a,p);}}z}
+  |    ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `labels`, `projective`, and `inverse_z` are never read
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-split-lifetimes/../feature-native-joint-window/lib.rs:18:21
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ----     ^^^^^^              ^^^^^^^^^^                                          ^^^^^^^^^
+   |            |
+   |            fields in this struct
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `initialization`, `snapshots`, and `conversion_batches` are never read
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-split-lifetimes/../feature-native-joint-window/lib.rs:68:43
+   |
+68 | ...ct Window{pub labels:Vec<u64>,pub initialization:&'static str,pub snapshots:Vec<Vec<Option<[u64;3]>>>,pub slots:Vec<Slot>,pub conversion_batches:us...
+   |       ------ fields in this struct   ^^^^^^^^^^^^^^                  ^^^^^^^^^                                                   ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `Window` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `window` is never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-split-lifetimes/../feature-native-joint-window/lib.rs:97:9
+   |
+94 | impl Prepared<'_>{
+   | ----------------- method in this implementation
+...
+97 |  pub fn window(&self,shifts:&[Option<[u64;2]>])->Result<Window,Error>{
+   |         ^^^^^^
+
+warning: field `converted_points` is never read
+   --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-split-lifetimes/../feature-native-joint-window/lib.rs:126:80
+    |
+126 | pub struct JointWindow{pub shifts:Vec<Option<[u64;2]>>,pub geometry:Window,pub converted_points:usize}
+    |            ----------- field in this struct                                    ^^^^^^^^^^^^^^^^
+    |
+    = note: `JointWindow` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `steps` is never read
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-split-lifetimes/schedule.rs:14:48
+   |
+14 | #[derive(Debug)]pub struct Schedule{pub(crate) steps:Vec<Step>,pub(crate) outputs:Vec<(usize,bool)>,stats:Stats,pub(crate) power_fla...
+   |                            --------            ^^^^^
+   |                            |
+   |                            field in this struct
+   |
+   = note: `Schedule` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Tree` is never constructed
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-split-lifetimes/polynomial.rs:6:12
+  |
+6 | pub struct Tree{p:u64,polynomial:Vec<u64>,children:Option<(Box<Tree>,Box<Tree>)>}
+  |            ^^^^
+
+warning: method `polynomial` is never used
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-split-lifetimes/polynomial.rs:7:18
+  |
+7 | impl Tree{pub fn polynomial(&self)->&[u64]{&self.polynomial}}
+  | ---------        ^^^^^^^^^^
+  | |
+  | method in this implementation
+
+warning: multiple methods are never used
+   --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-split-lifetimes/polynomial.rs:94:9
+    |
+ 42 | impl Poly{
+    | --------- methods in this implementation
+...
+ 94 |  pub fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{
+    |         ^^^^^^^^^^^^
+...
+101 |  fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{
+    |     ^^^^^^^^^^^^^^^
+...
+107 |  pub fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{
+    |         ^^^^^^
+...
+171 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+...
+179 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+184 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+192 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: 10 warnings emitted
+

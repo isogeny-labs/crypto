@@ -17,6 +17,7 @@ const V4_SHA256: &str = "8e512b8dbc6577093f8e31f4afb625894cbdedd9f9f3e87dc4f36a7
 const V2_COUNT: u64 = 57_024_000;
 const V3_COUNT: u64 = 518_918_400;
 const V4_COUNT: u64 = 26_939_278_080;
+const RETAINED_K600_ORDERED_ORBIT_ORDINAL: u64 = 26_960_859_236;
 const BASE_COUNT: u64 = 1_320;
 const NESTED_PAIR_COUNT: u64 = 2_970;
 const CROSS_PAIR_COUNT: u64 = 169_884;
@@ -349,7 +350,9 @@ fn case(parents: &Parents, design: &Value, ordinal: u64) -> Result<Value> {
         let solver_index = local % NON_SYMMETRY_SOLVERS;
         let mut choices = solver(&parents.v3["solver_axes"], solver_index, false)?;
         choices["symmetry"] = json!(components(mask));
-        let disposition = if mask == 16 {
+        let disposition = if ordinal == RETAINED_K600_ORDERED_ORBIT_ORDINAL {
+            "retained_k600_ordered_orbit_adapter_implemented_unmeasured"
+        } else if mask == 16 {
             "single_base_first_pair_adapter_unavailable"
         } else {
             "composed_symmetry_adapter_unavailable"
@@ -376,6 +379,19 @@ fn root() -> PathBuf {
 
 fn saved_path(root: &Path) -> PathBuf {
     root.join(STUDY).join("paired-frontier-v5.json")
+}
+
+/// Decode only against the pinned parent files and the saved, exact v5 design.
+/// The exporter uses this entry point before routing a retained-base cell.
+pub(crate) fn verified_case(root: &Path, ordinal: u64) -> Result<Value> {
+    let parents = load_parents(root)?;
+    let design = design(&parents)?;
+    let mut bytes = serde_json::to_vec_pretty(&design)?;
+    bytes.push(b'\n');
+    if fs::read(saved_path(root))? != bytes {
+        return Err(invalid("saved v5 design differs from native generator"));
+    }
+    case(&parents, &design, ordinal)
 }
 
 fn main() -> Result<()> {
@@ -481,6 +497,18 @@ mod tests {
         assert_eq!(last["solver"]["enumeration"], "gray");
         assert_eq!(last["solver"]["max_large_primes"], 2);
         assert!(case(&parents, &design, 143_736_975_360).is_err());
+        let retained = case(&parents, &design, RETAINED_K600_ORDERED_ORBIT_ORDINAL)?;
+        assert_eq!(retained["source"]["base_index"], 92);
+        assert_eq!(retained["symmetry_mask"], 18);
+        assert_eq!(
+            retained["disposition"],
+            "retained_k600_ordered_orbit_adapter_implemented_unmeasured"
+        );
+        assert_eq!(retained["executed_complete_pipeline"], false);
+        assert_eq!(
+            case(&parents, &design, RETAINED_K600_ORDERED_ORBIT_ORDINAL + 1)?["disposition"],
+            "composed_symmetry_adapter_unavailable"
+        );
         Ok(())
     }
 }

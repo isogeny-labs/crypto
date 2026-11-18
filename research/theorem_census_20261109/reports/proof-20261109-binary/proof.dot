@@ -1,0 +1,16 @@
+digraph BinaryS3 {
+  graph [rankdir=TB,bgcolor="white",pad=.12,nodesep=.25,ranksep=.3];
+  node [shape=box,style="rounded,filled",fillcolor="#eaf2f8",fontname="DejaVu Sans",fontsize=11];
+  edge [color="#34546a"];
+  model [label="Actual ordinary binary model\ny^2 + xy = x^3 + a*x^2 + b; char 2; Delta != 0"];
+  chord [label="x != y\nChord elimination + quadratic factor"];
+  tangent [label="Repeated x != 0\nTangent formula + curve equation"];
+  torsion [label="Repeated x = 0\nSum is infinity; S3 = b != 0"];
+  fixed [label="Actual pointX criterion\nS3 = 0 iff x(P+Q) or x(P-Q)",fillcolor="#d4edda"];
+  lifts [label="Algebraically closed field\nActual quadratic y-coordinate lifts"];
+  full [label="Full S3 equivalence\nPrescribed affine coordinates, P+Q+R = 0",fillcolor="#d4edda"];
+  model -> {chord tangent torsion};
+  {chord tangent torsion} -> fixed;
+  fixed -> full;
+  lifts -> full;
+}

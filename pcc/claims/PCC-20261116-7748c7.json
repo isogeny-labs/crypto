@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T19:57:50Z",
+ "id": "PCC-20261116-7748c7",
+ "kind": "statement",
+ "producer": {
+  "commit": "0c23166d62f7ebf9f2252c6963a477ff97ddc8fe",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_k13_batch_factor_base_20261116/test.stdout",
+    "sha256": "8cf778c31e5b58a354ed23d4773c33b67c9075dbf4be81b47ada1997cc028d60"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_k13_batch_factor_base_20261116/test.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_k13_batch_factor_base_20261116/run-focused.sh",
+    "sha256": "1760d39d0a23a61950dd29c28cab62bb77f629294ce17c0bdb8ca9e3c2e7c231"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Local producer correctness screen only; no timing or independent verification",
+ "statement": "At source commit 0c23166d62, the amended batched Koblitz lift focused release command exited 0 with 28 tests passed and zero failed, including both new equivalence tests on fixed K5, K7, K13, K19, and K23 cases."
+}

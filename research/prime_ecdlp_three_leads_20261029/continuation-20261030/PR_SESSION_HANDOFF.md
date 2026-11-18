@@ -604,3 +604,196 @@ process-tree/resume prerequisites; no scientificpanel withoutqualification.
 
 Initialnewstrictlint1 preserved/fixedwithfresh27target;61flog403 notguessed.
 No newsourceafterfc09, no use of oldreceipts to qualify changedgetters/code.
+
+## Independent replay accounting — 2026-11-05
+
+The independent rightmost-pivot checker now retains scalar source-operation
+counts across coefficient and augmented row spaces, including rejected input
+and late certificate failures. Caller-owned affine setup/equation/completed
+oracle counts accompany successful replay v2 and rejected-replay partial-work
+reports. The checkpoint still precedes all input/replay work. Scalar modulus
+`n` is distinct from coordinate field `p`. [pcc:unverified]
+
+[Fresh receipt](validation/replay-accounting-20261105/receipt.json), source
+`f866dd7a4578a5c02cb60ee7d3c2101f3b044cde`: 6 standalone rank tests and
+23 oracle example tests pass; standalone rank strict lint, formatting, CLI
+build and the actual checkpoint-refusal message with exit1 pass at their
+scope. Overall scoped Cargo lint and supervisor exit101 on the two unchanged
+inherited library errors. The Cargo example's strict lint remains unqualified;
+no earlier pass waives this failure. PCC-20261105-f04c69 is unsigned/unverified.
+Four fresh binary hashes and all22 guarded source objects are retained.
+[pcc:unverified]
+
+[Two-page report](replay-accounting-20261105.pdf), [editable ownership diagram](replay-accounting-20261105.svg)
+and [coverage contract](G2_REPLAY_ACCOUNTING_20261105.md) describe source-call
+units and unknown work. Modular/inverse/iteration diagnostics overlap integer
+children, so do not sum/price both. Overflow makes scalar counts unavailable;
+failed internal setup/oracle work stays explicitly unknown. Replay audit work
+is separate from producer timing and is not free. Allocation/copy/branch/
+serialization/counter overhead, complete F4/root/logical coverage, process/
+resume accounting and calibration remain open. Complete pricing/admission
+are unchanged, with no scientific panel. [pcc:unverified]
+
+## Publication status correction — PR3452 merged
+
+A live prepublication check found PR3452 merged at2026-11-05T17:02:10Z as
+2dc51a00cb81bc2f5b4b516e9a08a642a99daae3. Its maintenance has stopped.
+The new sourcef866 replay accounting and reports remain separate on
+`codex/pkm-replay-accounting-20261105`; earlier same-PR plans above are historical.
+[Closure/both-parent review](validation/replay-accounting-20261105/pr3452-closure-and-separate-branch.json)
+preserves original histories and records landed maintainer re-chain operations.
+The local original ledger and current-main ledger still diverge; this session
+has not repeated/adopted a re-chain or integrated newer main code. The report
+and receipt validate sourcef866 only. [pcc:unverified]
+
+## Separate replay-accounting PR3482 — publication
+
+Replay-accounting sourcef866 and reviewed reports were normal-pushed as4488a5a6a
+on `codex/pkm-replay-accounting-20261105` in
+[regular PR3482](https://github.com/isogeny-labs/crypto/pull/3482).
+Exact4488snapshot is OPEN/CONFLICTING/autooff: review and migrate SUCCESS,
+required gate/size/artifacts ABSENT, reviews[]. These successes do not qualify
+required checks. Local old-d30 policies pass with131chainentries, while current
+main prefix fails; no frozen reconciliation was performed. Copilot
+[6664459966](https://github.com/isogeny-labs/crypto/pull/3482#issuecomment-6664459966)
+is strictly REPORT-ONLY about a sanctioned canonical contract, not permission
+to edit or re-chain. [Publication receipt](validation/replay-accounting-20261105/publication-4488a5a6a.json).
+All22sourceobjects remain equal to testedf866. Later publication metadata changes
+no tested Rust/formal source. No native job runs. [pcc:unverified]
+
+## Retained reference-stage work — 2026-11-05
+
+The replay caller now retains setup's affine counts and disjoint oracle request-
+validation, submitted-witness and exhaustive-enumeration stages on success or
+Result-returning refusal. This includes witness checking previously omitted by
+the successful checker. Attempt counts are merged before propagating Err. The
+legacy certificate/completed-oracle fields remain enumeration-only and overlap
+the new attempted-enumeration view; do not charge both. Nested work schema is
+nowv2; outer replay remainsv2 and request/producer outputsv1. [pcc:unverified]
+
+[Final source-c933 receipt](validation/reference-refusal-20261105/final/receipt.json)
+records27oracle tests passed,0failed/ignored:4new ownership/refusal controls plus
+23prior controls. Formatting/CLIbuild and actual checkpoint-refusal message with
+expectedexit1 pass. Final Cargo scopedclippy/supervisor remainFAIL101 on the two
+inherited library errors; final example strict-lint is unqualified. Initialb013
+compilation failed before any test and is preserved separately. No tests or
+assertions were weakened. PCC-20261105-6020c1 is unverified. [pcc:unverified]
+
+[Coverage report](G2_REFERENCE_REFUSAL_20261105.md), [inspected two-page PDF](reference-refusal-20261105.pdf)
+and [editable diagram](reference-refusal-20261105.svg) distinguish retained
+reference work from unpriced parameter guards, constructor/encoder helpers,
+JSON, memory/logical/process/runtime-resume work. The oldf866 producer-prefix
+byteidentity claim does not apply to this setup refactor. No timing/speedup is
+admitted. All22bound objects,2fresh preserved binary copies,8unchanged binary
+hashes, old library raw log and exact formal/gate/Mathlib equivalence are in
+[delivery review](validation/reference-refusal-20261105/final/delivery-review.json).
+No duplicate unchanged library/proof/process-prerequisite run. [pcc:unverified]
+
+Next extend parameter/constructor/shared-encoder helper accounting and a
+nonoverlapping charge frontier. Scientific acceptance and allnull metrics stay
+unchanged; qualified runtime/transport/resume remains open. Frozen PCC history
+still requires a sanctioned contract before resolution. PR3452/2949 maintenance
+stays stopped; publish this continuation only on the current openPR3482.
+
+## Reference-stage publication — 2026-11-05T23:40Z
+
+Sourcec933, guarded27-control evidence and the new inspected report were
+normal-pushed in1b661dbd8 to samePR3482. Its updated title/body describe the
+scalar and affine replay-work scope and actual failures. Exact1b661snapshot:
+OPEN/CONFLICTING/autooff, reviewSUCCESS/migrateIN_PROGRESS, required gate/size/
+artifactsABSENT, reviews[]. No requiredpassclaimed; laterpublicationmetadata
+changes no tested Rust/formal source. [Publication receipt](validation/reference-refusal-20261105/publication-1b661dbd8.json).
+PCC report-only request6664459966 remains; no frozen merge/rechain or oldPR
+maintenance. Allnativejobs terminal and22sourceobjects stillmatchc933. [pcc:unverified]
+
+## Helper and encoder accounting — 2026-11-06
+
+Replay now retains disjoint parameter-check/setup-constructor helper calls,
+including Result-error prefixes. New helper captures mark underlying or
+aggregate overflow unavailable. The raw relation encoder has a separate
+scalar-n/coordinate-p integer ledger; a coordinate-helper snapshot would
+miss that work. Producer output adds encoding diagnostics; replay compares
+them when present using the shared encoder, while older records remain
+readable. This checks consistency, not independent cost completeness.
+[pcc:unverified]
+
+[Fresh source-ab0 receipt](validation/helper-accounting-20261106/receipt.json)
+records32oracle tests passed,0failed/ignored:5new controls plus27prior. Format,
+CLIbuild and actual checkpoint-refusal message+expectedexit1 pass. Final scoped
+CargoClippy/supervisor remainFAIL101 on two inherited library errors; final
+Cargo example strictlint is unqualified. PCC-20261106-59b811 is an unsigned
+producer observation. All22objects,2fresh preserved binary copies,8unchanged
+binaries/oldraw/formal/Mathlib equivalence are bound by the
+[delivery review](validation/helper-accounting-20261106/delivery-review.json).
+No duplicate unchanged library/process/Lean runs. [pcc:unverified]
+
+[Coverage contract](G2_HELPER_ACCOUNTING_20261106.md), [inspected two-page report](helper-accounting-20261106.pdf)
+and [editable diagram](helper-accounting-20261106.svg) distinguish two executed
+paths from duplicate views of one path: charge producer and replay separately;
+do not add inverse/sqrt parent diagnostics to expanded children. The legacy
+completed-oracle view aliases attempted enumeration within replay. Atomic
+inverse/root pricing would require excluded-child attribution not yet emitted.
+No complete price, performance result or scientific panel is admitted.
+[pcc:unverified]
+
+Remaining: uninstrumented primality/discriminant/raw guards and logical/
+container work, full F4/root/native coverage, calibrated nonoverlapping pricing,
+whole-process/journal and qualified runtime/resume. Scientific metrics remain
+null and acceptance unchanged. Frozen ledger reconciliation still blocks merge;
+PR3452/2949 maintenance stays stopped. Continue on the current openPR3482.
+
+## Helper-accounting publication — 2026-11-06
+
+Sourceab0, fresh32-control evidence and inspected helper/encoder report were
+normal-pushed ina583aed2a to samePR3482. Exacta583snapshot is OPEN/CONFLICTING/
+autooff; auxiliary review/migrateSUCCESS, required gate/size/artifactsABSENT,
+reviews[]. Those successes do not qualify the required checks. No newsource
+is validated by older receipts; all22bound objects still match testedab0.
+[Publication receipt](validation/helper-accounting-20261106/publication-a583aed2a.json).
+Later metadata changes no tested Rust/formal code. Allnativejobs terminal;
+no scientific execution or frozen-ledger resolution occurred. [pcc:unverified]
+
+## Observed native F4 windows — 2026-11-06
+
+The oracle now emits previously unreported process-native total/stair
+observations, partitioned into inclusive, callback and outside-callback
+windows. The wrapper preserves Result-refusal observations for a caller-held
+owner, rejects reuse and marks observed bad differences unavailable. Replay
+checks metadata arithmetic and visitor-attempt/callback consistency; older
+missing-field records remain readable. This is metadata consistency, not
+execution proof or complete cost. [pcc:unverified]
+
+[Fresh source-cd76 receipt](validation/native-windows-20261106/receipt.json)
+records36oracle tests passed,0failed/ignored:4new controls plus32prior. Format,
+CLIbuild and actual checkpoint-refusal message+expectedexit1 pass. Final scoped
+CargoClippy/supervisor remainFAIL101 on two inherited library errors; final
+example strictlint is unqualified. PCC-20261106-496201 is unsigned/unverified.
+[Delivery review](validation/native-windows-20261106/delivery-review.json) binds
+all22objects,2freshbinarycopies/8unchanged,oldraw and exact formal/gate/Mathlib
+objects. No shared-core changes or duplicate old library/process/Lean runs.
+[pcc:unverified]
+
+[Coverage/gap report](G2_NATIVE_WINDOWS_20261106.md), [inspected two-page PDF](native-windows-20261106.pdf)
+and [editable diagram](native-windows-20261106.svg) keep ambient interference,
+nontransactional reads and full-wrap limits explicit. Outside callbacks is not
+exclusive solver attribution. Stair aliases part of native total; inclusive
+aliases its parts. Do not sum overlapping views. No price or timing comparison.
+[pcc:unverified]
+
+A concrete root-counter gap remains: linear andp2 shortcuts omit supplied
+multiplication-counter updates, with inverse/addition/control work also open.
+The p2 case is outside currentPKM p>11; linear cases matter. This source review
+is not a shared-core fix. A future root change needs fresh affected core and
+integration validation. Scientific acceptance/metrics remain unchanged and the
+frozen PCC fork remains unresolved; no ordinary merge or waiver was attempted.
+
+## Native-window publication — 2026-11-06
+
+Sourcecd76 and fresh36-control/report evidence were normal-pushed inf2b07f5fa
+to samePR3482. Exactf2bsnapshot: OPEN/CONFLICTING/autooff, auxiliary review/
+migrateSUCCESS, required gate/size/artifactsABSENT,reviews[]. No requiredpass
+claimed; latermetadata changes no testedRust/formal source. All22objects still
+matchcd76. [Publication receipt](validation/native-windows-20261106/publication-f2b07f5fa.json).
+Allnativejobs terminal; root shortcut gap staysopen, no frozenledgerresolution,
+oldPRmaintenance or scientificpanel. Native counts remain observed process
+classes, not isolated solver costs or full-wrap/price qualified. [pcc:unverified]

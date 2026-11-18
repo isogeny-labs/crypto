@@ -1,0 +1,8 @@
+digraph G {
+ graph [rankdir=LR,bgcolor="white"];
+ node [shape=box,style="rounded,filled",fillcolor="#eef4ff",fontname="Helvetica",fontsize=10];
+ a [label="Actual combined H/Z grading\nright factor grade -1"];
+ b [label="Trim Z degrees > k\nright integral, degree <= k"];
+ c [label="Actual matrix residual w+k\nsame 2^u*k labels, left weight w+b"];
+ a -> b -> c;
+}

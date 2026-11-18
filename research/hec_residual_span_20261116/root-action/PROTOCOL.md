@@ -1,0 +1,11 @@
+# Direct root-action versus character setup
+
+Fixed original binomialg2/g3controls:(g,p,c,ell)=(2,101,2,7481),(2,251,18,67931),(2,601,7,411491),(3,113,3,1247429),(3,421,2,77152909). Known full primeorderN=ell from retained strong-solves qualification. Same public firstcanonicalplace and17multiple,2repetitions,2arms=40countedcalls. No targets/hiddenlogs or expectedlambda enter candidate.
+
+Both arms freshly build identicalcanonicalFBandprimitivez, validate nonzerosource and [ell]D=0 inside counts. Arm0 originalfastprepare+character/algebraiccertificate. Arm1 sameFB/zprefix, no character sum, then find a nontrivialnthrootwmodell by w=a^((ell-1)/n),n=5or7prime. Enumerate alln-1roots and compare [r]Dwithsigma(D); require exactly1match. Charge rootsearch,powers,allcandidate scalar multiplications,action,validation andsetup. Compare FB,z,lambdaexactly to oldarm and verify sourceaction outside counts. Exact repeatedmodulusvectors and REDCidentity. No earlystop favorablecandidate. Same public information and source validation in both arms.
+
+Algebra: sigma has ordern and acts on the cyclicorderell rationalgroup as a scalar. The quotient by sigma is genus0 (coordinatey on the binomial model), so the norm endomorphism1+sigma+...+sigma^(n-1) vanishes. For ell!=n, lambda!=1 and Phi_n(lambda)=0. Because source is nonzero and primeorderell, its scalar-action match identifies the action on that rationalgroup. This is classical eigenvalue identification, not newmath/priority. It depends on exact N=ell and known primality; arbitrary cofactor/subgroup multiplicity needs additional qualification.
+
+Compare complete setup16componentvectors separately bymodulus. Directroot groupwork may dwarf saved O(p)character work; no10x/performanceclaim from removing one loop. NoCPU/wall or completesolve inthisgate. Primaryclassicalautomorphism/context and currentalgebra/fastsources alreadyread; KBquery on genus2Cornacchia returned unrelatedhits and doesnotestablishnovelty. Any later largefield model or fullsolve requires a newprotocol, not extrapolation from these5controls.
+
+Compile/freeze/push sources/imports/native/protocol/binaryhashes before onceonlyexecution under600CPU seconds. Nooverwrite/retry/adaptivemodels. Retain raw,stderr,exit,run/hashrecords inGitwhileS3down. Rust1.93.1 localsharedARM,no paidresources. General10xgenus2+objectiveunchanged.

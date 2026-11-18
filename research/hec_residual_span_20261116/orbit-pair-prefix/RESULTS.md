@@ -1,0 +1,11 @@
+# Paid first-grounding prefix: uniform10xcostcase rejected
+
+[pcc:unverified] Freeze16c4cd22c5e pushed beforeonce-onlyexecution;inputhashespass,exit0. All12originaltargetcells/24prefixcalls exactrepeatvectors/REDCidentity andfullprincipal/nativegroupdiagnostics pass.10first-grounding successes/2no-trigger cells matchprioropportunitycoverage. Noactualaction/fullquadraticoracle/expectedk incountedprefix. Knownpublicsource/targetvalidity, sC=D, rootconstruction, batchedphase/denominatorinverses, nativeadd_placeanchorwork andnegativepairtests charged.
+
+On9of12targets, prefixbaseREDC alone exceeds0.1retainedarm0completebasecost. Exactinteger test10P>B; it alsoexceeds0.1arm1 inthosenine. RetainingthisEXACTprefix plusnonnegativefuturebaseworkcannotmeet10xthere, evenwithfree proofgeneration/completion/verification. Twofailedbootstrapsearches included. Remainingthreeare NOTsuccessful10xsolves: onlyfirstgrounding established, withlimitedremainingbudget.
+
+Examples: p101sm1case0 prefix4496 beforefirstgrounding vs5280fullarm0 (85.2percent); p601sm1case1 prefix3702 vs14360(25.8percent); p601sm17case0 no-triggerprefix8330 vs15258(54.6percent). Fullsummary hasall12rows andbothsourcecontrols/core-stepcandidate. P101sm1case1 prefix378/P251sm1case1prefix500/P601sm1case0prefix1242 arebelowarm0tenth butcompletion/proofcostnotmeasured andcannotbeassumedzero.
+
+Decision: do notimplementauniform10xhybridretainingthisprefix. A materiallydifferent queryorder/bootstrappattern couldchangebound, butmustbeprospective/public/noanswerselection andcome withacostcase. This is an implementationprefixfloor, not a universalDLP/IC lowerbound. No standalonefullsolver,rank/completion/wall/externalfastest claim. Nativeadd_placechosencheaply; no futureanchorcertproduction/proofcost creditedfree. Do notaddfullfreshfallbackasmathematicallyunavoidablecost ifworkcanbereused; failurecostretainedwithoutthatdoublecount.
+
+Priorquadraticrecognitionidentity remainscorrect. Admissionrowcountnotindependentlogrank; simpleunitgroundingknownLP principle. Gitcustody,noS3/cloud/retry. Independentreview/publicationartifacts/genus3/4fullcoverage andoriginalgenus2+10xgoal remainopen.

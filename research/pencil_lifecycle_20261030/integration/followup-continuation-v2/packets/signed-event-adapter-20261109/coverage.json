@@ -1,0 +1,56 @@
+{
+  "status": "prospective_source_only",
+  "paths": [
+    {
+      "path": "signed candidate",
+      "source": "three_leads_followup.rs:355-358",
+      "event": "candidate",
+      "coverage": "existing callback, adapter requires disposition"
+    },
+    {
+      "path": "identity nonzero/zero target coefficient",
+      "source": "three_leads_followup.rs:360-373",
+      "event": "identity",
+      "coverage": "before early walk break"
+    },
+    {
+      "path": "duplicate split divisor",
+      "source": "three_leads_followup.rs:391-397",
+      "event": "duplicate",
+      "coverage": "first_attempt checked against retained edge"
+    },
+    {
+      "path": "new node / graph edge",
+      "source": "three_leads_followup.rs:407-440",
+      "event": "node,edge",
+      "coverage": "actual insertion ordering preserved"
+    },
+    {
+      "path": "nonsplit / choice / restart",
+      "source": "three_leads_followup.rs:451-481",
+      "event": "nonsplit,choice,restart",
+      "coverage": "accepted and retained"
+    },
+    {
+      "path": "terminal",
+      "source": "three_leads_followup.rs:546-549",
+      "event": "terminal",
+      "coverage": "no pending candidate and scalar agreement required"
+    },
+    {
+      "path": "Kummer Labels ingest early or ordinary result",
+      "source": "duplicate.rs.candidate: added ingest_observed",
+      "event": "label_candidate,label_result",
+      "coverage": "whole existing ingest wrapped; original arithmetic unchanged"
+    },
+    {
+      "path": "Kummer geometric advance/lift driver",
+      "source": "kummer-duplicate-adapter/src/pruned.rs:151-324",
+      "event": null,
+      "coverage": "inspected, not hooked by this smallest stage extension; pending prospective driver integration"
+    }
+  ],
+  "compiler_runs": 0,
+  "natural_traces": 0,
+  "cost_ratio": null
+}

@@ -26,6 +26,15 @@ precomputation advantage or fixed-size speed claim.
 
 ## Evidence and uncertainty
 
+- **Core graph elimination (2026-11-15):** the
+  [core study](../research/norm_core_elimination_20261115/README.md) removes
+  norm graph and public pre-wrap coordinates, giving15/18/22 variables at
+  depth4 and arities3/5/7, degree at most3. Complete m3 sets and18 cold targets
+  still replay. Dense m5 fails with an allocation/segfault diagnostic; pair
+  batching reaches its fixed cap, and dense m7 remains capped. None produces
+  a basis. Shared Lean support now derives membership/charts from actual
+  retained transitions. The initial-basis cost/yield requirement stays open.
+  PCC-20261115-be28ec is unverified. [pcc:unverified]
 - **New algebraic implementation (2026-11-15):** the
   [shared norm prototype](../research/shared_norm_algebraic_20261115/README.md)
   replaces the old coefficient census with native msolve/FLINT solving and

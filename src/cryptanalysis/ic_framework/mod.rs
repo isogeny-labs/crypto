@@ -63,6 +63,7 @@
 //! report what comes out.
 
 pub mod archive;
+pub mod binary_subtract;
 pub mod cm_orbit;
 pub mod explicit_base;
 pub mod fiber;
@@ -221,6 +222,24 @@ pub struct SolverReport {
     /// Mean solving degree over that bound: below one is structure the
     /// solver exploited.
     pub degree_over_bound: Option<f64>,
+    /// Sum of the per-call solving degrees over the run (the "total" solving
+    /// degree): `solving_degree_mean * calls_with_a_degree`.
+    pub solving_degree_sum: u64,
+    /// Measured degree-fall observables over the run (diagnostic, never
+    /// priced): the smallest working degree at which a fall occurred
+    /// (first fall), the largest (last fall), and the observed degree of
+    /// regularity of the system shape where the engine exposes its Hilbert
+    /// series.  Distinct from the advisory `forecaster` below.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// The per-working-degree history of the richest solver call, for the
+    /// trace drawing.  Empty unless the engine recorded a trace.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub degree_trace: Vec<crate::cryptanalysis::ic_framework::stages::DegreeStep>,
     pub extra: std::collections::BTreeMap<String, u64>,
     /// The advisory degree-of-regularity forecaster over the run's solver
     /// calls, with the relation matrix's columns and rank set; the
@@ -398,6 +417,34 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
+    run_pipeline_inner(ctx, spec, base_builder, oracle, Some(planted), calib, rho_s)
+}
+
+/// Run the pipeline using only public instance and target inputs; recovery is
+/// checked against the source point, without supplying a held answer.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_public<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<RunReport, String> {
+    run_pipeline_inner(ctx, spec, base_builder, oracle, None, calib, rho_s)
+        .map(|(report, _)| report)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_pipeline_inner<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: Option<u64>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -529,6 +576,29 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             }
         }
     }
+    let seed_start = std::time::Instant::now();
+    let (mut setup_seed_independent, mut setup_seed_dependent) = (0u64, 0u64);
+    for seed_row in oracle.setup_rows() {
+        if seed_row.len() != fb.columns {
+            return Err(format!(
+                "oracle setup row has {} columns, expected {}",
+                seed_row.len(),
+                fb.columns
+            ));
+        }
+        let mut row = seed_row.clone();
+        row.push(0);
+        match matrix.add_row(row, 0) {
+            crate::cryptanalysis::ic_boundary::RowStatus::Independent => {
+                setup_seed_independent += 1
+            }
+            crate::cryptanalysis::ic_boundary::RowStatus::Dependent => setup_seed_dependent += 1,
+            crate::cryptanalysis::ic_boundary::RowStatus::Inconsistent => {
+                return Err("verified oracle setup row was inconsistent".into());
+            }
+        }
+    }
+    let setup_seed_ns = seed_start.elapsed().as_nanos() as u64;
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
@@ -664,6 +734,22 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     };
     for (name, value) in oracle.relation_counters() {
         outcome.relations.count(&name, value);
+    }
+    let setup_seed_rows = setup_seed_independent + setup_seed_dependent;
+    if setup_seed_rows > 0 {
+        outcome.linear_algebra.wall_ns += setup_seed_ns;
+        outcome
+            .linear_algebra
+            .count("setup_seed_rows", setup_seed_rows);
+        outcome
+            .linear_algebra
+            .count("setup_seed_independent", setup_seed_independent);
+        outcome
+            .linear_algebra
+            .count("setup_seed_dependent", setup_seed_dependent);
+        outcome
+            .linear_algebra
+            .work("row_build_words", setup_seed_rows * (fb.columns as u64 + 1));
     }
     outcome.relations.work_all(&oracle.relation_work_native());
     // Kept opt-in so the previously recorded full-rank sessions retain
@@ -838,6 +924,11 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             solving_degree_max: t.solving_degree_max,
             semi_regular_degree: t.semi_regular_degree(),
             degree_over_bound: t.degree_over_bound(),
+            solving_degree_sum: t.solving_degree_sum,
+            first_fall_degree: t.first_fall_degree,
+            last_fall_degree: t.last_fall_degree,
+            degree_of_regularity_observed: t.degree_of_regularity_observed,
+            degree_trace: t.degree_trace.clone(),
             extra: t.extra.clone(),
             forecaster: t.forecaster.clone().map(|mut f| {
                 f.set_relation_state(fb.columns, outcome.rank as usize);
@@ -895,7 +986,8 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             cost_qualification: cost_qualification.clone(),
             verify: ver,
             recovered: outcome.recovered,
-            verified: outcome.verified && outcome.recovered == Some(planted),
+            verified: outcome.verified
+                && planted.is_none_or(|known| outcome.recovered == Some(known)),
             total_gae,
             s,
             rho_s,
@@ -908,7 +1000,6 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         fb,
     ))
 }
-
 /// The table a sweep prints.
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
@@ -1107,16 +1198,17 @@ mod tests {
     }
 
     /// **The `k`-sum table oracle recovers the planted logarithm** on a
-    /// 24-bit prime-order curve with `k = 3` and `k = 4`: every relation
-    /// has `k` summands, and the table holds one entry per negation orbit
-    /// of the signed `k`-sums of the base.
+    /// 24-bit prime-order curve with `k = 3` to `7` (`k = 6, 7` pack their
+    /// summand indices in 10 and 9 bits): every relation has `k` summands,
+    /// and the table holds one entry per negation orbit of the signed
+    /// `k`-sums of the base.
     #[test]
-    fn ksum_oracle_recovers_logs_with_three_four_and_five_summands() {
+    fn ksum_oracle_recovers_logs_with_three_to_seven_summands() {
         use super::plugins::{KSumOracle, PrimeAbscissaBase};
         use crate::cryptanalysis::ic_boundary::prime_instance_for;
         let inst = prime_instance_for(24, 5);
         let (ctx, planted) = ctx_and_planted(&inst);
-        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10)] {
+        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10), (6, 10), (7, 10)] {
             let mut spec = PipelineSpec {
                 factor_base: "prime-abscissa".into(),
                 oracle: "ksum".into(),
@@ -1334,6 +1426,19 @@ mod tests {
         assert!(report.s > 0.0 && report.s.is_finite());
         assert!(report.factor_base.columns > 0);
         assert!(report.decomposition.relations_found >= report.linear_algebra.rank);
+
+        let mut public_oracle = MitmOracle::new(2);
+        let public_report = run_pipeline_public(
+            &ctx,
+            &spec,
+            &base,
+            &mut public_oracle,
+            &Calibration::default(),
+            None,
+        )
+        .expect("public-only pipeline should run");
+        assert!(public_report.verified, "public source-point check failed");
+        assert_eq!(public_report.recovered, report.recovered);
         // Every stage marks the work it now counts for `bitop/v1`, and
         // counts some: the base's indexes, the table's inserts, the walk's
         // bookkeeping, the rows and the elimination's scans.
@@ -2844,5 +2949,133 @@ mod tests {
             "the solver is inside the phase"
         );
         assert!(report.s > 0.0 && report.s.is_finite());
+
+        // `bitop/v1` completeness.  The base's phase and the oracle's
+        // set-up each carry what `bitop_tally` saw as `tally_*` counters,
+        // every one of them nonzero (the subspace's XORs and set probes,
+        // the lifts' products, squarings and inversions, the Artin–
+        // Schreier squarings, the frame's inversions; the set-up repeats
+        // the base and adds the membership probes), the set-up carries
+        // the marker, `native` carries none of it, and every solve set
+        // `bitop_complete`.
+        use crate::cryptanalysis::bitop_tally::WORK_NATIVE_KEYS;
+        use std::collections::BTreeMap;
+        for (phase, cost) in [
+            ("factor_base", &report.factor_base.cost),
+            ("oracle_setup", &report.decomposition.setup),
+        ] {
+            for key in WORK_NATIVE_KEYS {
+                assert!(
+                    cost.work_native.get(key).copied().unwrap_or(0) > 0,
+                    "{phase}: {key} is zero"
+                );
+                assert!(
+                    !cost.native.contains_key(key),
+                    "{phase}: {key} leaked into native"
+                );
+            }
+        }
+        assert_eq!(
+            report
+                .decomposition
+                .setup
+                .work_native
+                .get("counted:table_insert_attempts"),
+            Some(&1)
+        );
+        assert_eq!(solver.extra.get("bitop_complete"), Some(&1));
+        // Priced as `ecbench work` prices a record, the run is complete:
+        // nothing unpriced, nothing known uncounted.
+        use crate::cryptanalysis::ecbench::methods::{phase_of, SolverStats};
+        use crate::cryptanalysis::ecbench::work::{price, Priceable};
+        use crate::cryptanalysis::ecbench::workload::CurveFacts;
+        let phases = vec![
+            phase_of("factor_base", &report.factor_base.cost),
+            phase_of("oracle_setup", &report.decomposition.setup),
+            phase_of("relations", &report.decomposition.cost),
+            phase_of("linear_algebra", &report.linear_algebra.cost),
+            phase_of("verify", &report.verify),
+        ];
+        let stats = SolverStats::from_report(solver, oracle.last_system().as_ref());
+        let curve = CurveFacts {
+            slug: inst.name.clone(),
+            icv1: String::new(),
+            family: "koblitz".into(),
+            construction: String::new(),
+            field_degree: Some(inst.n),
+            field_bits: None,
+            group_order: u128::from(inst.group_order).into(),
+            r: u128::from(inst.r).into(),
+            cofactor: u128::from(inst.cofactor).into(),
+            generator: [String::new(), String::new()],
+            automorphisms_available: 2 * inst.n,
+            registered: false,
+            ec1: None,
+            curve_uid: None,
+        };
+        let params = BTreeMap::new();
+        let counters = BTreeMap::new();
+        let work = price(&Priceable {
+            method_id: "ic.pipeline",
+            method_params: &params,
+            curve: &curve,
+            phases: &phases,
+            counters: &counters,
+            solver: Some(&stats),
+        })
+        .expect("the record prices");
+        assert!(work.unpriced.is_empty(), "unpriced: {:?}", work.unpriced);
+        assert!(
+            work.known_uncounted.is_empty(),
+            "known_uncounted: {:?}",
+            work.known_uncounted
+        );
+        assert!(work.complete);
+        let setup = work
+            .phases
+            .iter()
+            .find(|p| p.name == "oracle_setup")
+            .expect("the set-up phase is priced");
+        assert!(setup.prims.get("field_inv").copied().unwrap_or(0) > 0);
+        assert!(setup.prims.get("hash_probe").copied().unwrap_or(0) > 0);
+
+        // Nothing is priced twice.  `koblitz_factor_base` still writes
+        // the natives `as_solves` and `frobenius_maps` (replay compares
+        // them), and marks them as carried by the builder's tally; the
+        // base's phase then prices to exactly its tally plus the index
+        // build, primitive for primitive, with no Artin–Schreier solve
+        // of its own.
+        let fbc = &report.factor_base.cost;
+        for native in ["as_solves", "frobenius_maps"] {
+            assert!(fbc.native.get(native).copied().unwrap_or(0) > 0, "{native}");
+            assert_eq!(
+                fbc.work_native.get(&format!("tallied:{native}")),
+                Some(&1),
+                "{native} is not marked"
+            );
+        }
+        let wn = |k: &str| u128::from(fbc.work_native.get(k).copied().unwrap_or(0));
+        let expect: BTreeMap<String, u128> = [
+            ("word_op", wn("tally_word_ops") + wn("index_sort_word_ops")),
+            ("hash_probe", wn("tally_hash_probes") + wn("index_inserts")),
+            (
+                "field_add",
+                wn("tally_field_adds") + wn("index_point_negations"),
+            ),
+            ("field_mul", wn("tally_field_muls")),
+            ("field_sqr", wn("tally_field_sqrs")),
+            ("field_inv", wn("tally_field_invs")),
+            ("group_add", u128::from(fbc.group_ops.adds)),
+            ("group_double", u128::from(fbc.group_ops.doubles)),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .collect();
+        let base = work
+            .phases
+            .iter()
+            .find(|p| p.name == "factor_base")
+            .expect("the base's phase is priced");
+        assert_eq!(base.prims, expect, "the base's phase is priced twice");
     }
 }

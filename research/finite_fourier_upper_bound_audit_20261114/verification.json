@@ -1,0 +1,76 @@
+{
+  "schema": "finite-fourier-upper-bound-verification/v1",
+  "source_commit": "8592db86fdcdc5da12051fa5a3aef326d2260e86",
+  "claim_id": "PCC-20261114-e1a4a9",
+  "declaration_sha256": "8e1b8c3254622300cf9d726f5eff360ee88e895237fc9e27aedcf53dc96b175b",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 31,
+  "gate_declarations": 38,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 99,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-e1a4a9",
+    "claim_sha256": "63a02599afe3746d2a15543c10b49f104c2f9894e9a72446e01e905861c0374f",
+    "commit": "8592db86fdcdc5da12051fa5a3aef326d2260e86",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/finite_fourier_upper_bound_audit_20261114/lean (UpperBoundCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T12:27:36Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-e1a4a9",
+    "claim_sha256": "63a02599afe3746d2a15543c10b49f104c2f9894e9a72446e01e905861c0374f",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46802,
+    "sha256": "26fa7780c492c3e7eeccb88c14ca51c3b0b911387b4243888133f993a32dc41a",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 38,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "finite_abelian_plancherel_derived": true,
+    "actual_uniform_pmf_and_character_coefficients": true,
+    "actual_half_l1_equals_max_event_by_attainment": true,
+    "actual_nontrivial_fourier_quarter_bound": true,
+    "actual_independent_walk_spectral_upper_bound": true,
+    "actual_two_point_normalization_negation_and_sharpness": true,
+    "full_nonabelian_matrix_bound_closed": false,
+    "canonical_measure_tvDist_bridge_closed": false,
+    "stronger_expected_random_support_mixing_closed": false,
+    "qualified_theorem_one_or_two_refuted": false,
+    "full_diaconis_book_or_paper_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

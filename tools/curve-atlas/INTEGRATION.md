@@ -1,5 +1,29 @@
 # Integration and evidence boundaries
 
+## PNG export update, 2026-11-15
+
+PNG and SVG now share a self-contained diagram serializer. Exported diagrams
+include a title, field/curve/shift/search parameters and a legend; framing
+ignores interactive zoom. The PNG path uses the browser's SVG decoder, canvas
+and `toBlob('image/png')`, with failure feedback and object-URL cleanup.
+The reference reviewed was [MDN's canvas toBlob documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob),
+including null results and origin-clean restrictions. There are no external
+images or font dependencies in the serialized SVG.
+
+`export-checks.mjs` exercises actual PNG/SVG downloads for the bundled HTML
+and modular source over HTTP, dimensions/colors, larger graphs, mobile layout,
+zoom-independent framing and encoder failure recovery. Its producer observation
+log is `export-validation.log`; it is not independent execution standing.
+[pcc:unverified] Direct file:// navigation remains untested here because managed
+Chromium policy blocks that scheme. The original integration notes below
+describe the earlier browser-verification limit; this update tests the export
+flow over HTTP, not every mathematical or interaction path.
+
+No mathematical algorithm, search bound, Rust target or historical validation
+artifact is changed. The prior PCC-pinned `validation.log` is preserved.
+
+## Original integration
+
 This PR packages the existing Curve Atlas browser tool. Its scientific coverage
 is partial: rational 2-isogenies and two explicit families of cyclic covers over
 prime fields 5 through 499. All Jacobian arrows are structural descriptions;
@@ -62,3 +86,18 @@ Open `tools/curve-atlas/curve-atlas.html` directly in a browser. For source
 development, serve `tools/curve-atlas/dist/` with a static HTTP server.
 JavaScript is used for browser-local interaction; no Python runtime is added
 to the application's computation path. Fonts have system fallbacks.
+
+## Diagram layout revision, 2026-11-15
+
+The initial all-to-one diagram was rejected for visual quality. The live graph
+and both image exports now use the same light-background atlas: separate rows
+for isogenies and each higher-genus cover, with local cover/pullback/norm arrows,
+curve equations, map formulas and genus/dimension labels. Repeated elliptic
+source labels explicitly refer to the same model; the JSON graph remains unique.
+The diagram scrolls on narrow screens rather than shrinking all text to fit.
+
+`REDESIGN.md` and `redesign-validation.log` retain the revision scope and
+producer browser observations; no independent execution standing is asserted.
+[pcc:unverified] The original PCC-pinned logs are unchanged. Shared log/ledger
+conflicts remain assigned to Copilot, so this revision modifies only the tool's
+source and its local notes, not the conflicted files.

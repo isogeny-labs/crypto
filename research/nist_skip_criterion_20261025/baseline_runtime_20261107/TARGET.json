@@ -1,0 +1,35 @@
+{
+  "schema": "nist-baseline-runtime-target/v1",
+  "status": "development-preparation-not-launch-admission",
+  "user_request": "Run 60000 baseline",
+  "parent_source_commit": "fc8f438c9261a6ba5d6cb5b97af7c3bdc70c99d7",
+  "scientific_design": "research/nist_skip_criterion_20261025/random_curve_validation_20261029/PROTOCOL.md",
+  "fields_bits": [192, 224, 239, 256, 384, 521],
+  "accepted_per_field": 10000,
+  "accepted_total": 60000,
+  "retain_all_attempts_in_contiguous_prefix": true,
+  "published_targets": [
+    "p192-139", "p192-5228", "p192-6013", "p224-7026", "p239-2185",
+    "p239-2320", "p239-3048", "p256-1842", "p384-2688", "p521-1136"
+  ],
+  "primary_statistic": {"cutoff": 691, "direction": "lower", "odd_prime_character": "+1", "ramified": "separate"},
+  "primary_outputs": [
+    "k_lt", "k_eq", "k_le", "N", "tied_CDF_interval", "descriptive_midrank",
+    "plus_one_lower_tail_probability", "exact_95pct_Clopper_Pearson_endpoints",
+    "Holm_10_test_family_alpha_0.05", "separate_descriptive_lower_decile_flag"
+  ],
+  "descriptive_cutoffs_inclusive": [100, 5000],
+  "pilot": {"accepted_per_field": 10, "nonce": null, "max_requested_vcpus_per_field": 2, "original_deadline_seconds_per_field": 3600, "automatic_retries": 0},
+  "primary_nonce": null,
+  "total_usd_cap": null,
+  "shared_current_budget_headroom": null,
+  "live_capacity_readback": null,
+  "published_payload_image_digest": null,
+  "published_recovery_image_digest": null,
+  "successful_checkpoint_receipt": null,
+  "command_worker_loss_restore_receipt": null,
+  "canonical_primary_protocol_freeze": null,
+  "production_absolute_deadline": null,
+  "baseline_accepted_so_far": 0,
+  "signed_verification": false
+}

@@ -1,0 +1,261 @@
+2026-11-17T15:56:14Z
+32
+               total        used        free      shared  buff/cache   available
+Mem:             503          71         207           0         229         432
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           52 bits physical, 57 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  128
+On-line CPU(s) list:                     0-127
+Vendor ID:                               AuthenticAMD
+Model name:                              AMD EPYC 9575F 64-Core Processor
+CPU family:                              26
+Model:                                   2
+Thread(s) per core:                      2
+Core(s) per socket:                      64
+Socket(s):                               1
+Stepping:                                1
+Frequency boost:                         enabled
+CPU(s) scaling MHz:                      43%
+CPU max MHz:                             5008.0068
+CPU min MHz:                             1500.0000
+BogoMIPS:                                6600.31
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx_vnni avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd amd_ppin cppc amd_ibpb_ret arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif x2avic v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid bus_lock_detect movdiri movdir64b overflow_recov succor smca fsrm avx512_vp2intersect flush_l1d debug_swap srso_user_kernel_no
+Virtualization:                          AMD-V
+L1d cache:                               3 MiB (64 instances)
+L1i cache:                               2 MiB (64 instances)
+L2 cache:                                64 MiB (64 instances)
+L3 cache:                                256 MiB (8 instances)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-127
+Vulnerability Gather data sampling:      Not affected
+Vulnerability Indirect target selection: Not affected
+Vulnerability Itlb multihit:             Not affected
+ 15:56:15 up 23 days,  2:49,  0 user,  load average: 24.25, 56.64, 65.66
+/workspace/in/pilot_candidate: OK
+apt rc=0
+=== A1 probe
+{
+ "host": {
+  "cpu_model": "AMD EPYC 9575F 64-Core Processor",
+  "arch": "x86_64",
+  "kernel": "6.8.0-147-generic",
+  "logical_cpus": 128,
+  "allowed_cpus": [
+   1,
+   10,
+   12,
+   16,
+   17,
+   22,
+   23,
+   35,
+   39,
+   41,
+   43,
+   46,
+   48,
+   53,
+   54,
+   59,
+   65,
+   74,
+   76,
+   80,
+   81,
+   86,
+   87,
+   99,
+   103,
+   105,
+   107,
+   110,
+   112,
+   117,
+   118,
+   123
+  ],
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "avx512_vpopcntdq",
+   "avx512bw",
+   "avx512dq",
+   "avx512f",
+   "avx512ifma",
+   "avx512vl",
+   "bmi2",
+   "fma",
+   "gfni",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "hypervisor": false,
+  "caches_bytes": {
+   "L1d": 49152,
+   "L1i": 32768,
+   "L2": 1048576,
+   "L3": 33554432
+  },
+  "mem_total_bytes": 540354641920,
+  "smt_active": "1",
+  "thread_siblings_cpu0": "0,64",
+  "numa_nodes": 1,
+  "cpufreq_governor": "schedutil",
+  "turbo_disabled": null,
+  "cpufreq_boost": "1",
+  "event_sources": [
+   "amd_iommu_0",
+   "amd_iommu_1",
+   "amd_iommu_2",
+   "amd_iommu_3",
+   "breakpoint",
+   "cpu",
+   "ibs_fetch",
+   "ibs_op",
+   "kprobe",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "perf_event_paranoid": "4",
+  "cgroup_cpu_max": "max 100000",
+  "fingerprint": "8178fb8c5e09a858"
+ },
+ "cpu_tier": "T-timing",
+ "perf": null,
+ "pmu_unavailable_reason": "perf_event_paranoid=4 forbids counting",
+ "gpu": null,
+ "gpu_unavailable_reason": "nvidia-smi is not installed: no NVIDIA GPU is visible to this host",
+ "ncu": null,
+ "uncore_imc": []
+}
+4
+
+  You may need to install the following packages for this specific kernel:
+    linux-tools-6.8.0-147-generic
+    linux-cloud-tools-6.8.0-147-generic
+
+  You may also want to install one of the following packages to keep up to date:
+    linux-tools-generic
+    linux-cloud-tools-generic
+=== A2 controls (quiet host)
+ 15:56:40 up 23 days,  2:49,  0 user,  load average: 23.99, 54.11, 64.59
+optlevel: muladd_u32     peak 3.758e+10 ops/s/core (muladd_u32@native); all 32 cores 6.860e+11
+optlevel: muladd_u64     peak 2.131e+10 ops/s/core (muladd_u64@w512); all 32 cores 3.535e+11
+optlevel: mulwide_u64    peak 2.922e+09 ops/s/core (mulwide_u64@w512); all 32 cores 5.298e+10
+optlevel: modmuladd_p31  peak 6.200e+09 ops/s/core (modmuladd_p31@w512); all 32 cores 1.073e+11
+optlevel: modmuladd_p62  peak 1.022e+09 ops/s/core (modmuladd_p62@scalar); all 32 cores 1.764e+10
+optlevel: xor_u64        peak 2.125e+10 ops/s/core (xor_u64@native); all 32 cores 3.675e+11
+optlevel: popcnt_u64     peak 1.697e+10 ops/s/core (popcnt_u64@native); all 32 cores 3.759e+11
+optlevel: fma_f64        peak 7.516e+10 ops/s/core (fma_f64_reg@w512); all 32 cores 1.167e+12
+optlevel: ptr_hop        peak 1.132e+09 ops/s/core (chase@scalar); all 32 cores 3.362e+10
+optlevel: bandwidth 1 core(s): 43.04 GB/s (xor_u64; triad 36.10, xor_u64 43.04, popcnt_u64 35.70)
+optlevel: bandwidth 2 core(s): 63.82 GB/s (xor_u64; triad 56.50, xor_u64 63.82, popcnt_u64 53.62)
+optlevel: bandwidth 4 core(s): 63.23 GB/s (xor_u64; triad 61.35, xor_u64 63.23, popcnt_u64 59.69)
+optlevel: bandwidth 8 core(s): 92.93 GB/s (popcnt_u64; triad 91.04, xor_u64 90.18, popcnt_u64 92.93)
+optlevel: bandwidth 16 core(s): 83.46 GB/s (popcnt_u64; triad 82.66, xor_u64 82.16, popcnt_u64 83.46)
+optlevel: bandwidth 32 core(s): 129.80 GB/s (xor_u64; triad 127.67, xor_u64 129.80, popcnt_u64 120.58)
+optlevel: wrote /workspace/out/optlevel/controls/calibration.json (host 8178fb8c5e09a858, flags ['CONTENDED'])
+optlevel: T-timing modmuladd_p31 single 5.747e+09 ops/s [5.660e+09, 5.881e+09] noise 0.038 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel/controls/positive-simd-incache.measurement.json
+positive-simd-incache  [T-timing]  class modmuladd_p31
+  attainment single 0.927 [0.913, 0.950]  of 6.200e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.880 [0.862, 0.884]  of 1.073e+11 ops/s (compute roof, 32 thread(s))
+  parallel   raw 0.514, roofline-normalised 0.950 at 32 threads
+  grade      A (score 0.927, scope single-thread only)
+  limiting   none above threshold: near the roofline; what remains is the algorithmic axis  [roofline]
+  noise      A/A 0.038 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing modmuladd_p31 single 8.700e+08 ops/s [8.598e+08, 8.807e+08] noise 0.024 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel/controls/scalar-incache.measurement.json
+scalar-incache  [T-timing]  class modmuladd_p31
+  attainment single 0.140 [0.139, 0.142]  of 6.200e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.131 [0.129, 0.132]  of 1.073e+11 ops/s (compute roof, 32 thread(s))
+  parallel   raw 0.505, roofline-normalised 0.934 at 32 threads
+  grade      D (score 0.140, scope single-thread only)
+  limiting   core bound / not vectorized (static vector share 0.00 in the named symbols; the class's SIMD ceiling is 6.7x its scalar ceiling)  [timing + static disassembly]
+  noise      A/A 0.024 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing modmuladd_p31 single 2.595e+08 ops/s [2.563e+08, 2.678e+08] noise 0.045 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel/controls/serial-dependency.measurement.json
+serial-dependency  [T-timing]  class modmuladd_p31
+  attainment single 0.042 [0.041, 0.043]  of 6.200e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.072 [0.071, 0.073]  of 1.073e+11 ops/s (compute roof, 32 thread(s))
+  parallel   raw 0.937, roofline-normalised 1.732 at 32 threads
+  grade      E (score 0.042, scope single-thread only)
+  limiting   core bound / not vectorized (static vector share 0.00 in the named symbols; the class's SIMD ceiling is 6.7x its scalar ceiling)  [timing + static disassembly]
+  noise      A/A 0.045 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing fma_f64 single 1.523e+09 ops/s [1.252e+09, 2.676e+09] noise 0.936 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel/controls/stream-daxpy.measurement.json
+stream-daxpy  [T-timing]  class fma_f64
+  attainment single 0.849 [0.698, 1.897]  of 1.794e+09 ops/s (memory roof, 1 thread(s))
+  attainment full   0.879 [0.833, 1.211]  of 5.409e+09 ops/s (memory roof, 32 thread(s))
+  parallel   raw 0.098, roofline-normalised 1.035 at 32 threads
+  grade      A/E (score 0.849, scope single-thread only)
+  limiting   at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, fewer bytes per operation) or a different algorithm helps  [roofline]
+  noise      A/A 0.936 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing ptr_hop single 5.759e+06 ops/s [5.612e+06, 5.941e+06] noise 0.057 flags ['SMT_ACTIVE', 'CONTENDED'] -> /workspace/out/optlevel/controls/pointer-chase.measurement.json
+pointer-chase  [T-timing]  class ptr_hop
+  attainment single 0.009 [0.008, 0.011]  of 6.726e+08 ops/s (memory roof, 1 thread(s))
+  attainment full   0.086 [0.084, 0.091]  of 2.028e+09 ops/s (memory roof, 32 thread(s))
+  parallel   raw 0.944, roofline-normalised 10.020 at 32 threads
+  grade      E (score 0.009, scope single-thread only)
+  limiting   memory latency bound: the rate matches one outstanding dependent miss at a time (latency attainment 0.98); far below the bandwidth roof  [roofline + latency calibration]
+  noise      A/A 0.057 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+optlevel: T-timing modmuladd_p31 single 5.712e+09 ops/s [5.620e+09, 5.855e+09] noise 0.041 flags ['SMT_ACTIVE', 'OPS_VARY', 'CONTENDED'] -> /workspace/out/optlevel/controls/aa-repeat.measurement.json
+aa-repeat  [T-timing]  class modmuladd_p31
+  attainment single 0.921 [0.906, 0.946]  of 6.200e+09 ops/s (compute roof, 1 thread(s))
+  attainment full   0.870 [0.861, 0.873]  of 1.073e+11 ops/s (compute roof, 32 thread(s))
+  parallel   raw 0.511, roofline-normalised 0.944 at 32 threads
+  grade      A (score 0.921, scope single-thread only)
+  limiting   none above threshold: near the roofline; what remains is the algorithmic axis  [roofline]
+  noise      A/A 0.041 over 5 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, OPS_VARY, SMT_ACTIVE
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+| control | tier | class | binding roof | A single [low, high] | A full | raw par. eff. | norm. par. eff. | score | grade | A/A noise | other CPU (cores) | limiting factor |
+|:--|:--|:--|:--|:--|--:|--:|--:|--:|:--|--:|--:|:--|
+| positive-simd-incache | T-timing | modmuladd_p31 | compute | 0.927 [0.913, 0.950] | 0.880 | 0.514 | 0.950 | 0.927 | A | 0.038 | 44.25 | none above threshold: near the roofline; what remains is the algorithmic axis |
+| scalar-incache | T-timing | modmuladd_p31 | compute | 0.140 [0.139, 0.142] | 0.131 | 0.505 | 0.934 | 0.14 | D | 0.024 | 43.89 | core bound / not vectorized (static vector share 0.00 in the named symbols; the class's SIMD ceiling is 6.7x its scalar ceiling) |
+| serial-dependency | T-timing | modmuladd_p31 | compute | 0.042 [0.041, 0.043] | 0.072 | 0.937 | 1.732 | 0.042 | E | 0.045 | 43.17 | core bound / not vectorized (static vector share 0.00 in the named symbols; the class's SIMD ceiling is 6.7x its scalar ceiling) |
+| stream-daxpy | T-timing | fma_f64 | memory | 0.849 [0.698, 1.897] | 0.879 | 0.098 | 1.035 | 0.849 | A/E | 0.936 | 40.49 | at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, fewer bytes per operation) or a different algorithm helps |
+| pointer-chase | T-timing | ptr_hop | memory | 0.009 [0.008, 0.011] | 0.086 | 0.944 | 10.020 | 0.009 | E | 0.057 | 44.50 | memory latency bound: the rate matches one outstanding dependent miss at a time (latency attainment 0.98); far below the bandwidth roof |
+| aa-repeat | T-timing | modmuladd_p31 | compute | 0.921 [0.906, 0.946] | 0.870 | 0.511 | 0.944 | 0.921 | A | 0.041 | 49.97 | none above threshold: near the roofline; what remains is the algorithmic axis |
+controls rc=0
+ 16:01:00 up 23 days,  2:53,  0 user,  load average: 63.07, 53.72, 61.24
+=== A3 hky2 at t = 10 under optlevel measure
+optlevel: T-timing modmuladd_p31 single 5.418e+08 ops/s [4.942e+08, 5.731e+08] noise 0.146 flags ['SMT_ACTIVE', 'WALL_INCLUDES_STARTUP', 'CONTENDED'] -> /workspace/out/optlevel/hky2_t10.measure.json
+measure rc=0
+cal=/workspace/out/optlevel/controls/calibration.json
+hky2-t10  [T-timing]  class modmuladd_p31
+  attainment single 0.087 [0.080, 0.093]  of 6.200e+09 ops/s (compute (traffic unknown) roof, 1 thread(s))
+  attainment full   0.072 [0.070, 0.073]  of 1.073e+11 ops/s (compute (traffic unknown) roof, 32 thread(s))
+  parallel   raw 0.445, roofline-normalised 0.823 at 32 threads
+  grade      D/E (score 0.087, scope single-thread only)
+  limiting   core bound / not vectorized or a serial dependency: the rate is 0.59x the class's scalar ceiling and the SIMD ceiling is 6.7x higher (inferred from timing; a PMU top-down and a vector share are needed to split the two) (memory traffic unknown: the bound may be lower than assumed)  [timing inference]
+  noise      A/A 0.146 over 3 pairs
+  flags      CALIBRATION_CONTENDED, CONTENDED, FULL_POINT_CONTENDED, INTENSITY_UNKNOWN, NOISE_FLOOR_UNDER_5_PAIRS, SMT_ACTIVE, WALL_INCLUDES_STARTUP
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).
+=== A done
+2026-11-17T16:23:17Z
+=== B t = 13, draws 0 and 1, c <= 6
+ 16:23:17 up 23 days,  3:16,  0 user,  load average: 59.26, 49.77, 52.74
+t13 rc=127
+2026-11-17T16:23:17Z
+/workspace/code/cpu_job.sh: line 35: /usr/bin/time: No such file or directory
+=== C t = 14, draw 0, c <= 6
+ 16:23:17 up 23 days,  3:16,  0 user,  load average: 59.26, 49.77, 52.74
+t14 rc=127
+2026-11-17T16:23:17Z
+/workspace/code/cpu_job.sh: line 39: /usr/bin/time: No such file or directory
+=== ALL DONE

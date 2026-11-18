@@ -26,14 +26,21 @@ SCHEMA = "result-switches/1"
 RECORDED_PREFIXES = (
     "KIC_", "F4_", "IC_", "ICX_", "GB_", "GAUDRY_", "KOBLITZ_", "JV_", "BSGS_",
     "BTW_", "DREG_", "SOLVER_", "SPOT_", "SOLINAS_", "TRAITS_", "WDSAT_",
-    "ECBENCH_", "DQ_", "W1_", "N37_",
+    "ECBENCH_", "DQ_", "W1_", "N37_", "ZERO_DIM_LA_", "M4GB_", "PROBE_", "CERTICOM_TEST_",
 )
 RECORDED_EXACT = (
     "RAYON_NUM_THREADS", "OMP_NUM_THREADS", "CUDA_VISIBLE_DEVICES",
-    "RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "CC", "CFLAGS", "HASHCLASH_PREFIX",
+    "RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "CC", "CXX", "CFLAGS", "HASHCLASH_PREFIX",
+    "D4_BIN_MVAR", "FES_GPU_TIMING", "PENCIL_RETAINED_INVENTORY", "SMITH_CANONICAL_SWEEP",
+    # HKY2_SIMD selects the field kernel; N83_SAT_PHASE_TRACE times solve phases (overhead).
+    "HKY2_SIMD", "N83_SAT_PHASE_TRACE",
 )
 # Read by the sources but cannot change a computed value.
-NOT_RESULT_AFFECTING = frozenset({"HOSTNAME", "PATH", "TMPDIR", "CRYPTO_AUDIT_DIR", "TASKQ_TASK_ID"})
+# GH_TOKEN and GITHUB_TOKEN are credentials read by `ic update`: they must never
+# be written into a run record, whatever they could change.
+NOT_RESULT_AFFECTING = frozenset({"HOSTNAME", "PATH", "TMPDIR", "CRYPTO_AUDIT_DIR", "TASKQ_TASK_ID",
+                                  "FASTGROUP_SMOKE_OUT",  # output path only
+                                  "GH_TOKEN", "GITHUB_TOKEN"})
 
 
 def is_recorded(name: str) -> bool:

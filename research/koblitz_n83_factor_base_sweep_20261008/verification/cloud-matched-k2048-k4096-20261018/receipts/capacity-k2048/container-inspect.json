@@ -1,0 +1,51 @@
+{
+  "Id": "073a6beaf7d6037036312e33c1f35b636177b7761dd8bbf815568bd59086402c",
+  "Image": "sha256:541096ae9b05d3b850341b78790e2ed31e94d5aa0ea086933c6ff0c09ffa2e63",
+  "State": {
+    "Status": "running",
+    "Running": true,
+    "StartedAt": "2026-10-18T21:30:47.191667686Z"
+  },
+  "HostConfig": {
+    "Memory": 4294967296,
+    "MemorySwap": 4294967296,
+    "NanoCpus": 1000000000,
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "NetworkMode": "none",
+    "ReadonlyRootfs": true,
+    "CapDrop": [
+      "ALL"
+    ],
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "PidsLimit": 64
+  },
+  "Mounts": [
+    {
+      "Type": "bind",
+      "Source": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/k2048",
+      "Destination": "/panel",
+      "RW": false
+    },
+    {
+      "Type": "bind",
+      "Source": "/home/ec2-user/scratch/n83-resume-20261018/reconstruction-target/release/examples/koblitz_n83_factor_base_export",
+      "Destination": "/worker",
+      "RW": false
+    },
+    {
+      "Type": "bind",
+      "Source": "/home/ec2-user/scratch/n83-docker-sweep-20261018/capacity-k2048/source",
+      "Destination": "/source",
+      "RW": false
+    },
+    {
+      "Type": "bind",
+      "Source": "/home/ec2-user/scratch/n83-docker-sweep-20261018/capacity-k2048",
+      "Destination": "/out",
+      "RW": true
+    }
+  ]
+}

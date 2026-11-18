@@ -1,0 +1,5 @@
+# build output of this standalone crate (the driver builds outside the cell by default)
+/target/
+
+# the root .gitignore ignores **/Cargo.lock; the frozen run uses --locked and hashes the lockfile, so track it
+!Cargo.lock

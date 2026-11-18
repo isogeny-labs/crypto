@@ -1,0 +1,114 @@
+{
+  "schema": "research.recorded-machine-evidence-review/v1",
+  "scope": "Independent raw-record consistency audit; no fresh Lean or kernel verification",
+  "reviewer": "mode_source_review",
+  "authorship": {
+    "produced_native_result": false,
+    "executed_native_workflow": false,
+    "prior_source_review_and_operational_preparation": true,
+    "blind": false,
+    "independent_mathematical_rederivation": false
+  },
+  "finding": "No discrepancy found in the inspected record bindings",
+  "archive_files_verified": 64,
+  "frozen_packet_files_verified": 22,
+  "release_receipt_pins_verified": 5,
+  "source_modules_matched": 5,
+  "named_readbacks": 17,
+  "observed_axioms": {
+    "Solve4PivotSwap.search_some": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Solve4PivotSwap.search_none": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Solve4PivotSwap.native_search_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Solve4PivotSwap.swap_involutive": [
+      "propext"
+    ],
+    "Solve4PivotSwap.swap_row_predicate": [
+      "propext"
+    ],
+    "Solve4PivotSwap.canonical_preserved": [],
+    "Solve4PivotSwap.selected_pivot": [
+      "propext"
+    ],
+    "Solve4PivotSwap.selected_zero_prefix": [
+      "propext"
+    ],
+    "Solve4PivotSwap.augmented_equations_preserved": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Solve4PivotSwapControls.first_hit": [
+      "propext"
+    ],
+    "Solve4PivotSwapControls.swapped_pivot": [
+      "propext"
+    ],
+    "Solve4PivotSwapControls.rhs_moves_with_row": [
+      "propext"
+    ],
+    "Solve4PivotSwapControls.zero_prefix": [
+      "propext"
+    ],
+    "Solve4PivotSwapControls.earlier_row_unchanged": [
+      "propext"
+    ],
+    "Solve4PivotSwapControls.exhausted_search": [
+      "propext"
+    ],
+    "Solve4PivotSwapControls.zero_prefix_is_not_automatic": [
+      "propext"
+    ],
+    "Solve4PivotSwapControls.rhs_omission_changes_equation": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "command_exits": [
+    0,
+    0,
+    0,
+    0,
+    1
+  ],
+  "false_control_rejected": true,
+  "recorded_owners_terminal": true,
+  "custody": {
+    "pre_post_equal": true,
+    "dependency_files": 16736,
+    "dependency_bytes": 3111892318,
+    "runtime_maps_equal": true,
+    "live_dependency_rehash_performed": false,
+    "limitation": "Pinned shared caches; pre/post equality does not exclude transient concurrent change."
+  },
+  "retained_prior_failure": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pivot-v2-results-20261111",
+    "summary_sha256": "0a53c2962aaf9fc0ab0b7ad0716744539ef4a4ac205130b81762146d18338749",
+    "failure": "Controls.lean:16:61 failed to synthesize Decidable (swapRows M 1 2 0 = M 0)",
+    "raw_failure_output_checked": true
+  },
+  "conservative_charge_seconds": 2400,
+  "campaign_update_performed": false,
+  "independent_kernel_recheck": false,
+  "compiler_invocations_by_reviewer": 0,
+  "universal_claim": false,
+  "official_promotion": false,
+  "subject_hashes": {
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pivot-control-results-20261111/summary.json": "9ef01abe585c7f59d4662d8b6cbebd3a9dc991612973e8aba546de6e07ea557e",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pivot-control-results-20261111/raw-manifest.json": "7c94f21f5b5387109dccb30ad0ead168cb71b1843a6cd79645603446ee01490c",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pivot-control-results-20261111/raw-receipts.tar.gz": "c27835130ea40ae06faefd252be9836f9158a066f05c9364cddf17612d36a726",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pivot-control-admitted-20261111/freeze.json": "f559a725ba8884fcfe1fdfff1454c1b322dee04c2a6d7f5486c02ebea5605da1",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pivot-control-admitted-20261111/names.json": "83fb9beccf08c88a28a42393427df16cf10ef38b4982a67ef390fb11fac182e6",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pivot-v2-results-20261111/summary.json": "0a53c2962aaf9fc0ab0b7ad0716744539ef4a4ac205130b81762146d18338749"
+  }
+}
