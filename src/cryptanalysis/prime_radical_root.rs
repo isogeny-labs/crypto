@@ -107,6 +107,13 @@ impl Fp {
     pub fn sqr(&self, a: u64) -> u64 {
         self.mul(a, a)
     }
+    #[inline]
+    pub fn half(&self, a: u64) -> u64 {
+        // In an odd prime field, (a + (a&1)*p)/2 is a/2 mod p.
+        // No division or modular multiplication on canonical residues.
+        let a = if a < self.p { a } else { a % self.p };
+        (a >> 1) + ((a & 1) * ((self.p + 1) >> 1))
+    }
     pub fn powm(&self, a: u64, e: u64) -> u64 {
         // Actual production-Rust timing shows the new generic window
         // regresses at the 61-bit Mersenne modulus. Keep the original
@@ -628,17 +635,17 @@ impl RadicalRootCtx {
         let disc = f.sub(f.sqr(b), f.add(twice_c, twice_c));
         match self.sqrt(disc) {
             None => vec![],
-            Some(0) => vec![f.mul(f.neg(b), self.inv2)],
+            Some(0) => vec![f.half(f.neg(b))],
             Some(s) => {
                 let nb = f.neg(b);
                 // Rust benchmarks show Vieta's subtraction is faster
                 // for the 61-bit modulus but slower for native 32-bit primes.
                 // Retain the original second multiplication on small fields.
-                let first = f.mul(f.add(nb, s), self.inv2);
+                let first = f.half(f.add(nb, s));
                 let second = if f.p > u32::MAX as u64 {
                     f.sub(nb, first)
                 } else {
-                    f.mul(f.sub(nb, s), self.inv2)
+                    f.half(f.sub(nb, s))
                 };
                 vec![first, second]
             }
@@ -698,7 +705,7 @@ impl RadicalRootCtx {
                 }
             };
         }
-        let q2 = f.mul(q, self.inv2);
+        let q2 = f.half(q);
         // Keep the original discriminant: algebraic m^3 reuse measured
         // 0.61-0.69x in actual Rust CI despite faster C++ screening.
         let p2 = f.sqr(pp);
@@ -706,8 +713,9 @@ impl RadicalRootCtx {
         if d == 0 {
             // double root -3Q/(2P), simple root 3Q/P
             let ip = f.inv(pp);
-            let r1 = f.mul(f.mul(3, q), ip);
-            let r2 = f.mul(f.neg(r1), self.inv2);
+            let triple_q = f.add(f.add(q, q), q);
+            let r1 = f.mul(triple_q, ip);
+            let r2 = f.half(f.neg(r1));
             return vec![r1, r2];
         }
         let nq2 = f.neg(q2);
@@ -879,8 +887,8 @@ impl RadicalRootCtx {
                         // quartic = (y^2 + al y + be)(y^2 - al y + ga)
                         let qa = f.mul(qq, f.inv(al));
                         let s = f.add(pp, z);
-                        let be = f.mul(f.sub(s, qa), self.inv2);
-                        let ga = f.mul(f.add(s, qa), self.inv2);
+                        let be = f.half(f.sub(s, qa));
+                        let ga = f.half(f.add(s, qa));
                         ys.extend(self.quad_monic(al, be));
                         ys.extend(self.quad_monic(f.neg(al), ga));
                         break;
@@ -913,7 +921,13 @@ impl RadicalRootCtx {
         match c.len() {
             0 => Err("zero polynomial".into()),
             1 => ok(vec![]),
-            2 => ok(vec![fp.mul(fp.neg(c[0]), fp.inv(c[1]))]),
+            2 => {
+                // x + c0 and a*x have roots without an inversion.
+                let root = if c[0] == 0 { 0 }
+                    else if c[1] == 1 { fp.neg(c[0]) }
+                    else { fp.mul(fp.neg(c[0]), fp.inv(c[1])) };
+                ok(vec![root])
+            },
             3 => ok(self.quad_roots(c[2], c[1], c[0])),
             4 => {
                 // Monic cubics are common in normalized rootfinding.
@@ -1015,6 +1029,87 @@ mod tests {
                 b.sort_by(f64::total_cmp);
                 a.sort_by(f64::total_cmp);
                 println!("Fp2 Frobenius p={p} {name}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                         b[6], a[6], b[6] / a[6]);
+            }
+        }
+    }
+
+    #[test]
+    fn modular_half_and_linear_shortcuts_match_frozen_formula() {
+        let mut seed = 0x5fee_a1fe_2026_1118u64;
+        for &p in &[5u64, 7, 17, 97, 487, 65_537, 998_244_353,
+                    1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            for _ in 0..4_096 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let a = seed % p;
+                assert_eq!(f.half(a), f.mul(a, ctx.inv2), "half p={p}, a={a}");
+                assert_eq!(f.half(a + p), f.mul(a, ctx.inv2), "noncanonical half p={p}");
+                let want_monic = f.mul(f.neg(a), f.inv(1));
+                assert_eq!(ctx.roots(&[a, 1]).unwrap().roots, vec![want_monic]);
+                assert_eq!(ctx.roots(&[0, a.max(1)]).unwrap().roots, vec![0]);
+                let nonmonic = 2 % p;
+                let want = f.mul(f.neg(a), f.inv(nonmonic));
+                assert_eq!(ctx.roots(&[a, nonmonic]).unwrap().roots, vec![want]);
+                assert_eq!(f.add(f.add(a, a), a), f.mul(3, a));
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired native production-Rust modular half, linear and tripling benchmark"]
+    fn bench_half_linear_and_tripling() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        let mut seed = 0x60ff_a111_2026_1118u64;
+        for &p in &[487u64, 998_244_353, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            let mut xs = Vec::new();
+            for _ in 0..2_048 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                xs.push(seed % p);
+            }
+            let sample = |optimized: bool, old: fn(&Fp,u64,u64)->u64,
+                          new: fn(&Fp,u64,u64)->u64| {
+                let start = Instant::now();
+                let mut checksum = 0u64;
+                for _ in 0..64 {
+                    for &x in &xs {
+                        let x = black_box(x);
+                        checksum = checksum.wrapping_add(if optimized {
+                            new(&f, x, ctx.inv2)
+                        } else {
+                            old(&f, x, ctx.inv2)
+                        });
+                    }
+                }
+                black_box(checksum);
+                start.elapsed().as_nanos() as f64 / (xs.len() * 64) as f64
+            };
+            let cases: [(&str, fn(&Fp,u64,u64)->u64, fn(&Fp,u64,u64)->u64); 3] = [
+                ("Fp half", |f,x,inv2| f.mul(x,inv2), |f,x,_| f.half(x)),
+                ("linear monic", |f,x,_| f.mul(f.neg(x),f.inv(1)),
+                                 |f,x,_| f.neg(x)),
+                ("triple", |f,x,_| f.mul(3,x), |f,x,_| f.add(f.add(x,x),x)),
+            ];
+            for &(label, before, after) in &cases {
+                for &x in &xs { assert_eq!(before(&f,x,ctx.inv2), after(&f,x,ctx.inv2)); }
+                let (mut b, mut a) = (Vec::new(), Vec::new());
+                for trial in 0..13 {
+                    if trial % 2 == 0 {
+                        b.push(sample(false,before,after));
+                        a.push(sample(true,before,after));
+                    } else {
+                        a.push(sample(true,before,after));
+                        b.push(sample(false,before,after));
+                    }
+                }
+                b.sort_by(f64::total_cmp); a.sort_by(f64::total_cmp);
+                println!("p={p} {label}: {:.3} -> {:.3} ns/op ({:.3}x)",
                          b[6], a[6], b[6] / a[6]);
             }
         }
