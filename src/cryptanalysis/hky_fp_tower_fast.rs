@@ -758,7 +758,12 @@ fn all_keys(ring: &HkyRing, c: u32) -> Vec<Key> {
 }
 
 impl<'a> Space<'a> {
-    pub(super) fn build(ring: &'a HkyRing, c: u32, perm: Option<Vec<usize>>, fast_index: bool) -> Self {
+    pub(super) fn build(
+        ring: &'a HkyRing,
+        c: u32,
+        perm: Option<Vec<usize>>,
+        fast_index: bool,
+    ) -> Self {
         let all = all_keys(ring, c);
         let nt = ring.n_tower();
         let mk_index = |keys: &[Key]| -> Index {

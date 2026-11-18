@@ -455,7 +455,9 @@ fn closure_par(eqs: &[Vec<u64>], nv: u32, c: u32, target: usize) -> (usize, usiz
     };
     let chunk: usize = std::env::var("HKY_CHUNK")
         .ok()
-        .map_or((1usize << 30) / (8 * sp.words.max(1)), |v| v.parse().unwrap())
+        .map_or((1usize << 30) / (8 * sp.words.max(1)), |v| {
+            v.parse().unwrap()
+        })
         .max(256);
     let bases: Vec<Option<Vec<u64>>> = eqs
         .iter()
@@ -585,7 +587,10 @@ fn cell_seed(master: u64, tag: &str, n: u32, ell: usize, m: usize, draw: usize) 
 }
 
 fn getflag(args: &[String], k: &str) -> Option<String> {
-    args.iter().position(|a| a == k).and_then(|i| args.get(i + 1)).cloned()
+    args.iter()
+        .position(|a| a == k)
+        .and_then(|i| args.get(i + 1))
+        .cloned()
 }
 
 fn loadavg() -> f64 {
@@ -673,8 +678,7 @@ fn run(args: &[String]) {
             let mut bases: Vec<(String, Vec<F2mElement>)> = Vec::new();
             let mut all_ok = true;
             for arm in &arms {
-                let mut arng =
-                    StdRng::seed_from_u64(cell_seed(seed, arm, n, ell_eff, m, d));
+                let mut arng = StdRng::seed_from_u64(cell_seed(seed, arm, n, ell_eff, m, d));
                 match build_arm(arm, n, ell_eff, &irr, &mut arng) {
                     Some(b) => bases.push((arm.clone(), b)),
                     None => {
@@ -764,7 +768,10 @@ fn selftest() {
         let ellt = (n as usize) / 2;
         if let Some(b) = orbit_invariant_basis(n, ellt, &irr, &mut rng) {
             let ok = is_squaring_closed(&b, &irr, n) && b.len() >= ellt;
-            println!("[selftest] orbit n={n} ell_eff={} squaring_closed={ok}", b.len());
+            println!(
+                "[selftest] orbit n={n} ell_eff={} squaring_closed={ok}",
+                b.len()
+            );
             if !ok {
                 fails += 1;
             }
@@ -782,7 +789,9 @@ fn selftest() {
     let irr = find_irreducible_sparse(n).unwrap();
     let st = FieldStructure::new(n, &irr);
     let mut rng = StdRng::seed_from_u64(0xabc);
-    let ell_eff = orbit_invariant_basis(n, ellt, &irr, &mut rng).unwrap().len();
+    let ell_eff = orbit_invariant_basis(n, ellt, &irr, &mut rng)
+        .unwrap()
+        .len();
     let b1 = F2mElement::one(n);
     for arm in ["orbit", "random", "subspace"] {
         let mut arng = StdRng::seed_from_u64(99 ^ arm.len() as u64);

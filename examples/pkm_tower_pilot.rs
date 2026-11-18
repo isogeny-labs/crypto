@@ -3057,10 +3057,16 @@ fn parse_args() -> Args {
             "--hky-cmax" => a.hky_cmax = v.parse().expect("--hky-cmax"),
             "--hky3-batch-min" => a.hky3.batch_min = v.parse().expect("--hky3-batch-min"),
             "--hky3-batch-max" => a.hky3.batch_max = v.parse().expect("--hky3-batch-max"),
-            "--hky3-target-pivots" => a.hky3.target_pivots = v.parse().expect("--hky3-target-pivots"),
+            "--hky3-target-pivots" => {
+                a.hky3.target_pivots = v.parse().expect("--hky3-target-pivots")
+            }
             "--hky3-interreduce" => a.hky3.interreduce = v.parse().expect("--hky3-interreduce"),
-            "--hky3-interreduce-min" => a.hky3.interreduce_min = v.parse().expect("--hky3-interreduce-min"),
-            "--hky3-interreduce-block" => a.hky3.interreduce_block = v.parse().expect("--hky3-interreduce-block"),
+            "--hky3-interreduce-min" => {
+                a.hky3.interreduce_min = v.parse().expect("--hky3-interreduce-min")
+            }
+            "--hky3-interreduce-block" => {
+                a.hky3.interreduce_block = v.parse().expect("--hky3-interreduce-block")
+            }
             "--hky3-rebucket" => a.hky3.rebucket = v == "on",
             "--hky3-par-second" => a.hky3.par_second = v == "on",
             "--hky3-bitmap" => a.hky3.bitmap = v == "on",
@@ -3271,14 +3277,19 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             a.null_width,
             &mut rng,
         );
-        if !matches!(a.engine, Engine::F4 | Engine::Hky | Engine::Hky2 | Engine::Hky3)
-            && cell.control == Control::Naive
+        if !matches!(
+            a.engine,
+            Engine::F4 | Engine::Hky | Engine::Hky2 | Engine::Hky3
+        ) && cell.control == Control::Naive
         {
             // The naive control has no tower to rewrite by.
             continue;
         }
         if cell.control == Control::Multiples
-            && !matches!(a.engine, Engine::F4 | Engine::Hky | Engine::Hky2 | Engine::Hky3)
+            && !matches!(
+                a.engine,
+                Engine::F4 | Engine::Hky | Engine::Hky2 | Engine::Hky3
+            )
         {
             // The extra free variables u'_k are not in the tower engines' rings.
             eprintln!(
