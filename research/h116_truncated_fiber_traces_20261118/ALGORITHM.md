@@ -151,6 +151,22 @@ All 60 independently predicted boundary coefficients and all 20 control
 triplets pass. Thus the generic regular factor does not consume an additional
 coefficient on this panel. [pcc:unverified]
 
+The curve-coordinate panel then replaces the synthetic outer unit with the
+actual fixed-point series. At precision 24 on five frozen curves, independent
+fixed-point and coefficient-recurrence implementations agree on
+
+```text
+q_target(zNormalized) = q_source(a*zNormalized)
+q_source * (zNormalized/z)^-2 * q_target(zNormalized)^-1
+  = q_source * (zNormalized/z)^-2 * q_source(a*zNormalized)^-1.
+```
+
+Both wrong `(a^2A,a^4B)` target scaling and wrong `(a+1)zNormalized` parameter
+are rejected at coefficient four in all five cells. This measures the exact
+coordinate expression consumed by the Lean theorem; the input equality for
+the actual `V-1` local parameters remains the next formal-group obligation.
+[pcc:unverified]
+
 The current dense implementation uses 64,426 additions, 67,584
 multiplications and 16 inversions for candidate construction at this fixed
 precision. These counts exclude internal verification, oracle and controls.

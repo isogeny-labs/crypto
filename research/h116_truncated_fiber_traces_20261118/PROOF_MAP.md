@@ -303,6 +303,13 @@ series. [pcc:unverified]
 | normalized x-ratio prefix | curve-coordinate assembly | H116 | source/target coordinate units plus leading-parameter prefix |
 | derive normalized/scalar parameter identity | endpoint obligation | future formal-group owner | `V+pi=[t]`, local Frobenius and formal subtraction |
 
+`H116-CURVE-COORDINATE-001` is the finite instance control for this table. Its
+fixed-point producer and independent recurrence verifier agree through 24
+coefficients on five curves; wrong scaling and wrong parameter controls are
+rejected in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` seals
+the polynomial rescaling step and points to the audited Lean source. The
+control supplies no replacement for the open endpoint row. [pcc:unverified]
+
 ## Inheritance table
 
 | Operation/law | Inheritance |

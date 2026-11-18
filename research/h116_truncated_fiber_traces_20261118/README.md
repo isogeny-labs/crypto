@@ -172,6 +172,17 @@ This tests the generic composition theorem; the new Lean curve-coordinate
 instance supplies its elliptic algebra but not the `V-1` semantics.
 [pcc:unverified]
 
+The frozen [curve-coordinate control](CURVE_COORDINATE_EXPERIMENT.md)
+instantiates that algebra on the p=31 fixture and four completed OOS models.
+An independent recurrence verifier reproduced all 24 coefficients of the
+source and target units: curve identities, `(a^4A,a^6B)` rescaling, double
+substitution and the complete normalized x-ratio match in all five cells.
+Wrong target scaling and wrong local parameter first differ at coefficient
+four in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` and the
+inspected [PDF report](reports/run-20261118T0618Z/REPORT.pdf) bind the algebraic
+and experimental records. This discharges no part of the remaining local
+endomorphism parameter identity. [pcc:unverified]
+
 The preregistered
 [out-of-sample formal-scalar panel](FORMAL_SCALAR_OOS_EXPERIMENT.md) kept the
 candidate source unchanged and sought a different-j curve model in each of five
