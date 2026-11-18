@@ -1,0 +1,5 @@
+Trigger hourly relation-finding benchmark on 2026-11-18 06:14 UTC.
+Harness: scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Frozen control: Koblitz GF(2^23), a=0, m=2; 256 natural / 64 planted / 64 UNSAT.
+Baseline: results/relation_baseline.json; threshold: 20%.
+The workflow records results/hourly_log.csv and files issues on failure or threshold breach.
