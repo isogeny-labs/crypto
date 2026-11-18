@@ -262,6 +262,31 @@ fn panel() -> serde_json::Value {
     let after = ar.counts;
     assert_eq!(dual_points, source_points, "dual-plus-scalar inverse comparator");
 
+    // Reversed B/A order, preserving target sequence and all mathematical inputs.
+    // Timings remain same-host L0 diagnostics, not isolated cycle measurements.
+    let mut dual_ba_meter = FieldMeter::default();
+    let dual_ba_start = Instant::now();
+    let dual_ba: Vec<Point> = targets.iter().map(|&q| {
+        let scaled = forward(q, DUAL_U, dual_tau, dual_v, &mut dual_ba_meter);
+        let back3 = scaled.map(|(x, y)| (
+            dual_ba_meter.mul(x, inv9), dual_ba_meter.mul(y, inv27)
+        ));
+        ar.scalar(PRIME31, INV3, back3)
+    }).collect();
+    let dual_ba_ns = dual_ba_start.elapsed().as_nanos();
+    let mut direct_ba_meter = FieldMeter::default();
+    let direct_ba_start = Instant::now();
+    let direct_ba: Vec<Point> = targets.iter().map(|&q| {
+        invert_public(q, &mut direct_ba_meter).expect("BA unique linear factor")
+    }).collect();
+    let direct_ba_ns = direct_ba_start.elapsed().as_nanos();
+    assert_eq!(dual_ba, source_points, "BA dual inverse replay");
+    assert_eq!(direct_ba, source_points, "BA Frobenius cubic replay");
+    assert_eq!(direct_ba_meter.multiplications, direct_meter.multiplications);
+    assert_eq!(direct_ba_meter.inversions, direct_meter.inversions);
+    assert_eq!(dual_ba_meter.multiplications, dual_meter.multiplications);
+    assert_eq!(dual_ba_meter.inversions, dual_meter.inversions);
+
     let mut certificate = FieldMeter::default();
     for (index, (&q, &source)) in targets.iter().zip(source_points.iter()).enumerate() {
         assert!(ar.on_curve(PRIME31, source), "inverse outside source curve");
@@ -318,6 +343,8 @@ fn panel() -> serde_json::Value {
         "dual_native_group_additions":after.group_additions - before.group_additions,
         "direct_stage_ns_diagnostic":direct_ns.to_string(),
         "dual_stage_ns_diagnostic":dual_ns.to_string(),
+        "dual_stage_ba_ns_diagnostic":dual_ba_ns.to_string(),
+        "direct_stage_ba_ns_diagnostic":direct_ba_ns.to_string(),
         "full_index_calculus_logs_solved":0,
         "full_cost_speedup_claim":false,
         "independent_signed_pcc":false
