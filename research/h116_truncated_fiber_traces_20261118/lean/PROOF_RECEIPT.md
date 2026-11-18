@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-65935a4249acb958dafcc5535563bf5954b9224e86783bdec53a3699a6a7a30b  H116FiberTrace.lean
+0fe4972abb8de4cd11e58f927b7e466470d8172a8790e7d690d14a416c522541  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  191 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  196 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -96,6 +96,9 @@ aeffe27752d9cd4d28b01dcf47992e3b5b5e11396627debbc60ffb685361db05  receipts/gener
 18d5c962ccb50c179bcf616b0c5987e13b7f9353ccaf71ff98f94b7da97ac2fa  receipts/generic-successor-scalar-seven-build.txt
 463f9e1442a6219c211a0d6cea358eb8f217d97cf830fce4f9d654fe08ff3f84  receipts/generic-successor-scalar-seven-full-build.txt
 a31892ff2095c514583f502bfef1ba389f69a4c4a3f39435f87b9029aed57af6  receipts/generic-successor-scalar-seven-audit.txt
+d93b32bc5be9adc6229888fec8e59edb7182d3afbcf2dd4d7abbccee9280a0b5  receipts/second-successor-scalar-eight-build.txt
+ae1b03718e01355a281f31e8c00e0ddb3a652bb091df4f5ba74f80794518cbc2  receipts/second-successor-scalar-eight-full-build.txt
+ac3832511710d08fdaec1912b38116d7702503b3dca339b58c64c250ab88f93d  receipts/second-successor-scalar-eight-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -429,6 +432,16 @@ to `prePsi8`, `Phi7` coprime to `PsiSq7`, and coordinate extension degree
 forty-nine outside characteristics two and seven. The singular `A=B=0`
 control over `ZMod 11` is non-coprime. Arbitrary parity-branch closure remains
 open. [pcc:unverified]
+
+The 196-theorem checkpoint proves a second companion successor stencil with
+no additional premise.  For `d=a*(c-b^2)`,
+`e=c*a^3-b^3*s^2`, and `u=a^2*d-c^2`, the decisive identity is
+`a^2*(d*b^3*s^2-a*c^3)=b^3*s^2*u-c^2*e`.  The preceding successor
+certificate then proves the next recurrence pair coprime.  Its short-curve
+instance proves `prePsi8` coprime to `prePsi9`, `Phi8` coprime to `PsiSq8`,
+and coordinate extension degree sixty-four outside characteristic two.  The
+singular `A=B=0` control over `ZMod 11` is non-coprime.  Arbitrary recurrence
+closure remains open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

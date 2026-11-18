@@ -1673,6 +1673,58 @@ theorem edsTwoFactorSuccessor_isCoprime
   change IsCoprime e (b * u)
   exact hbe.symm.mul_right heu
 
+/-- The second companion successor stencil.  The same invariant proves
+coprimality of one further generated pair. -/
+theorem edsTwoFactorSecondSuccessor_isCoprime
+    {R : Type*} [CommRing R] (a b c s : R)
+    (hc : c = b * s ^ 2 - a ^ 3)
+    (hab : IsCoprime a b) (has : IsCoprime a s)
+    (hbc : IsCoprime b c) :
+    IsCoprime (b * (a ^ 2 * (a * (c - b ^ 2)) - c ^ 2))
+      ((a * (c - b ^ 2)) * b ^ 3 * s ^ 2 - a * c ^ 3) := by
+  let t := c - b ^ 2
+  let d := a * t
+  let e := c * a ^ 3 - b ^ 3 * s ^ 2
+  let u := a ^ 2 * d - c ^ 2
+  let f := b * u
+  let g := d * b ^ 3 * s ^ 2 - a * c ^ 3
+  have hac : IsCoprime a c := by
+    apply IsCoprime.symm
+    rw [hc, show b * s ^ 2 - a ^ 3 = b * s ^ 2 - a ^ 2 * a by ring,
+      IsCoprime.sub_mul_right_left_iff]
+    exact hab.symm.mul_left (has.symm.pow_left)
+  have htc : IsCoprime t c := by
+    dsimp [t]
+    rw [show c - b ^ 2 = -b ^ 2 + c * 1 by ring,
+      IsCoprime.add_mul_left_left_iff, IsCoprime.neg_left_iff]
+    exact hbc.pow_left
+  have huc : IsCoprime u c := by
+    dsimp [u]
+    rw [show a ^ 2 * d - c ^ 2 = a ^ 2 * d - c * c by ring,
+      IsCoprime.sub_mul_left_left_iff]
+    exact hac.pow_left.mul_left (hac.mul_left htc)
+  have hsucc : IsCoprime e f := by
+    dsimp [e, f, u, d, t]
+    exact edsTwoFactorSuccessor_isCoprime a b c s hc hab has hbc
+  have hue : IsCoprime u e := hsucc.of_mul_right_right.symm
+  have hbg : IsCoprime b g := by
+    apply IsCoprime.symm
+    dsimp [g]
+    rw [show d * b ^ 3 * s ^ 2 - a * c ^ 3 =
+        (d * b ^ 2 * s ^ 2) * b - a * c ^ 3 by ring,
+      IsCoprime.mul_sub_right_left_iff]
+    exact hab.mul_left (hbc.symm.pow_left)
+  have hugScaled : IsCoprime u (a ^ 2 * g) := by
+    rw [show a ^ 2 * g = b ^ 3 * s ^ 2 * u - c ^ 2 * e by
+      dsimp [g, u, e]
+      ring,
+      IsCoprime.mul_sub_right_right_iff]
+    exact huc.pow_right.mul_right hue
+  have hug : IsCoprime u g := hugScaled.of_mul_right_right
+  change IsCoprime f g
+  dsimp [f]
+  exact hbg.mul_left hug
+
 /-- The first two-factor recurrence bootstrap: `prePsi6=Psi3*t`, while an
 alternate exact expression for `prePsi7` is a multiple of `t` minus
 `prePsi4^4`. -/
@@ -1885,6 +1937,121 @@ vanish at zero and hence are not coprime. -/
 theorem shortWeierstrassScalarSeven_singular_control :
     let W : WeierstrassCurve (ZMod 11) := WeierstrassCurve.mk 0 0 0 0 0
     ¬IsCoprime (W.Φ 7) (W.ΨSq 7) := by
+  let _ : Fact (Nat.Prime 11) := Fact.mk (by norm_num)
+  let W : WeierstrassCurve (ZMod 11) := WeierstrassCurve.mk 0 0 0 0 0
+  dsimp only
+  intro h
+  have heval := h.map (Polynomial.evalRingHom (0 : ZMod 11))
+  norm_num [WeierstrassCurve.Φ, WeierstrassCurve.ΨSq,
+    WeierstrassCurve.preΨ, preNormEDS, preNormEDS',
+    WeierstrassCurve.Ψ₃, WeierstrassCurve.preΨ₄,
+    WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂, WeierstrassCurve.b₄,
+    WeierstrassCurve.b₆, WeierstrassCurve.b₈] at heval
+
+/-- Instantiate the second successor stencil at the next exact EDS pair. -/
+theorem shortWeierstrass_prePsiEightNine_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.preΨ' 8) (W.preΨ' 9) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have h34 : IsCoprime W.Ψ₃ W.preΨ₄ :=
+    shortWeierstrass_prePsiThreeFour_isCoprime A B hdisc h2
+  have h45 : IsCoprime W.preΨ₄ (W.preΨ' 5) :=
+    shortWeierstrass_prePsiFourFive_isCoprime A B hdisc h2
+  have h3two : IsCoprime W.Ψ₃ W.Ψ₂Sq :=
+    shortWeierstrassPsiThree_PsiTwoSq_isCoprime A B hdisc h2
+  have h5 : W.preΨ' 5 = W.preΨ₄ * W.Ψ₂Sq ^ 2 - W.Ψ₃ ^ 3 := by
+    rw [show 5 = 2 * (0 + 2) + 1 by norm_num, WeierstrassCurve.preΨ'_odd]
+    simp
+  have h6 : W.preΨ' 6 = W.Ψ₃ * (W.preΨ' 5 - W.preΨ₄ ^ 2) := by
+    rw [show 6 = 2 * (0 + 3) by norm_num, WeierstrassCurve.preΨ'_even]
+    simp
+    ring
+  have h8 : W.preΨ' 8 = W.preΨ₄ *
+      (W.Ψ₃ ^ 2 * W.preΨ' 6 - W.preΨ' 5 ^ 2) := by
+    rw [show 8 = 2 * (1 + 3) by norm_num, WeierstrassCurve.preΨ'_even]
+    simp
+    ring
+  have h9 : W.preΨ' 9 = W.preΨ' 6 * W.preΨ₄ ^ 3 * W.Ψ₂Sq ^ 2 -
+      W.Ψ₃ * W.preΨ' 5 ^ 3 := by
+    rw [show 9 = 2 * (2 + 2) + 1 by norm_num, WeierstrassCurve.preΨ'_odd]
+    norm_num
+  change IsCoprime (W.preΨ' 8) (W.preΨ' 9)
+  rw [h8, h9, h6]
+  exact edsTwoFactorSecondSuccessor_isCoprime W.Ψ₃ W.preΨ₄
+    (W.preΨ' 5) W.Ψ₂Sq h5 h34 h3two h45
+
+/-- Scalar eight has no numerator/denominator cancellation on every
+nonsingular short curve outside characteristic two. -/
+theorem shortWeierstrassScalarEight_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.Φ 8) (W.ΨSq 8) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have h78 : IsCoprime (W.preΨ' 7) (W.preΨ' 8) :=
+    shortWeierstrass_prePsiSevenEight_isCoprime A B hdisc h2
+  have h89 : IsCoprime (W.preΨ' 8) (W.preΨ' 9) :=
+    shortWeierstrass_prePsiEightNine_isCoprime A B hdisc h2
+  have h7two : IsCoprime (W.preΨ' 7) W.Ψ₂Sq :=
+    shortWeierstrass_prePsi_odd_isCoprime_PsiTwoSq A B hdisc h2 7 (by decide)
+  have h9two : IsCoprime (W.preΨ' 9) W.Ψ₂Sq :=
+    shortWeierstrass_prePsi_odd_isCoprime_PsiTwoSq A B hdisc h2 9 (by decide)
+  have hden8 : W.ΨSq (8 : ℤ) = W.preΨ' 8 ^ 2 * W.Ψ₂Sq := by
+    rw [show (8 : ℤ) = ((8 : ℕ) : ℤ) by norm_num,
+      WeierstrassCurve.ΨSq_ofNat]
+    norm_num
+  have hplus : IsCoprime (W.preΨ (9 : ℕ)) (W.ΨSq (8 : ℕ)) := by
+    rw [WeierstrassCurve.preΨ_ofNat]
+    change IsCoprime (W.preΨ' 9) (W.ΨSq (8 : ℤ))
+    rw [hden8]
+    exact h89.symm.pow_right.mul_right h9two
+  have hminus : IsCoprime (W.preΨ (7 : ℕ)) (W.ΨSq (8 : ℕ)) := by
+    rw [WeierstrassCurve.preΨ_ofNat]
+    change IsCoprime (W.preΨ' 7) (W.ΨSq (8 : ℤ))
+    rw [hden8]
+    exact h78.pow_right.mul_right h7two
+  convert
+    (shortWeierstrassPhi_isCoprime_of_adjacent A B hdisc h2 8 hplus hminus) using 1
+
+/-- The reduced scalar-eight x-coordinate quotient has coordinate extension
+degree exactly sixty-four outside characteristic two. -/
+theorem shortWeierstrassScalarEight_extension_degree
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    let xMap : RatFunc F :=
+      algebraMap (Polynomial F) (RatFunc F) (W.Φ 8) /
+        algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 8)
+    Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 64 := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  let xMap : RatFunc F :=
+    algebraMap (Polynomial F) (RatFunc F) (W.Φ 8) /
+      algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 8)
+  have h8z : ((8 : ℤ) : F) ≠ 0 := by
+    norm_num
+    rw [show (8 : F) = 2 * 2 * 2 by norm_num]
+    exact mul_ne_zero (mul_ne_zero h2 h2) h2
+  have hcoprime : IsCoprime (W.Φ 8) (W.ΨSq 8) :=
+    shortWeierstrassScalarEight_isCoprime A B hdisc h2
+  have hdenom : W.ΨSq 8 ≠ 0 := W.ΨSq_ne_zero h8z
+  have hextension := reducedRationalQuotient_extension_degree
+    (W.Φ 8) (W.ΨSq 8) hdenom hcoprime
+  have hdegrees := scalarMultiplicationXMap_exact_degrees W 8 h8z
+  change Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 64
+  rw [hextension]
+  norm_num at hdegrees ⊢
+  omega
+
+/-- Singular scalar-eight control: at `A=B=0`, numerator and denominator both
+vanish at zero and hence are not coprime. -/
+theorem shortWeierstrassScalarEight_singular_control :
+    let W : WeierstrassCurve (ZMod 11) := WeierstrassCurve.mk 0 0 0 0 0
+    ¬IsCoprime (W.Φ 8) (W.ΨSq 8) := by
   let _ : Fact (Nat.Prime 11) := Fact.mk (by norm_num)
   let W : WeierstrassCurve (ZMod 11) := WeierstrassCurve.mk 0 0 0 0 0
   dsimp only
@@ -4084,6 +4251,7 @@ theorem rationalMap_separation_strict_control :
 #print axioms edsTwoFactorBootstrap_isCoprime
 #print axioms edsTwoFactorBootstrap_missingAS_control
 #print axioms edsTwoFactorSuccessor_isCoprime
+#print axioms edsTwoFactorSecondSuccessor_isCoprime
 #print axioms shortWeierstrass_prePsiSixSeven_isCoprime
 #print axioms shortWeierstrassScalarSix_isCoprime
 #print axioms shortWeierstrassScalarSix_extension_degree
@@ -4092,6 +4260,10 @@ theorem rationalMap_separation_strict_control :
 #print axioms shortWeierstrassScalarSeven_isCoprime
 #print axioms shortWeierstrassScalarSeven_extension_degree
 #print axioms shortWeierstrassScalarSeven_singular_control
+#print axioms shortWeierstrass_prePsiEightNine_isCoprime
+#print axioms shortWeierstrassScalarEight_isCoprime
+#print axioms shortWeierstrassScalarEight_extension_degree
+#print axioms shortWeierstrassScalarEight_singular_control
 #print axioms polynomial_isCoprime_of_no_common_root
 #print axioms adjacentIntegerTorsion_eq_zero
 #print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics

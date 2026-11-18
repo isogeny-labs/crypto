@@ -1094,6 +1094,41 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | scalar-seven coordinate extension degree is forty-nine | exact degree assembly | H116 | rational function field | same plus `7 != 0` |
 | singular scalar-seven pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
 
+## Second-successor stencil and scalar-eight gate
+
+1. **Structure above.** Retain the generic premises and abbreviations from
+   the two-factor and successor stencils, and put
+   `g=d*b^3*s^2-a*c^3`.  The new reduction identity is
+   `a^2*g=b^3*s^2*(a^2*d-c^2)-c^2*e`.  Thus the inner factor of `f` is
+   coprime to `g` if it is coprime to `c` and `e`; the latter pair is
+   extracted from the proved successor certificate.  The outer factor `b`
+   is handled independently by reducing `g` modulo `b` to `-a*c^3`.
+2. **Theorems used as stated.** The candidate proof uses only the preceding
+   generic successor theorem and Mathlib coprimality product, power,
+   factor-extraction and subtract-multiple laws.  No polynomial resultant or
+   scalar-specific expansion is permitted in the generic theorem.
+3. **Object as an instance.** The planned short-curve instance identifies
+   `f=prePsi8` and `g=prePsi9`, then targets scalar-eight no-cancellation and
+   coordinate extension degree sixty-four.
+4. **Assembly evidence.** Generic elaboration and exact EDS instantiation pass
+   in the tracked module. The pinned full build completed all 3,162 jobs, and
+   the exact repository auditor reports
+   `196 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** Success would cover a third consecutive
+   binary-recurrence output under one invariant, but would not prove that all
+   larger parity branches preserve that invariant. [pcc:unverified]
+6. **Control.** The positive instance requires a nonsingular short curve.
+   At `A=B=0` over `ZMod 11`, the scalar-eight pair is proved non-coprime by
+   evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| second-successor pair `f,g` is coprime | generic recurrence stencil | H116 | arbitrary commutative ring | same three premises as the two-factor bootstrap |
+| `prePsi8` is coprime to `prePsi9` | exact EDS instantiation | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi8` is coprime to `PsiSq8` | exact division-polynomial assembly | H116 | same | same |
+| scalar-eight coordinate extension degree is sixty-four | exact degree assembly | H116 | rational function field | same |
+| singular scalar-eight pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
+
 ## Scalar-six two-factor bootstrap gate
 
 1. **Structure above.** Instantiate the preceding generic gate with
