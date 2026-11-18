@@ -1295,8 +1295,10 @@ mod tests {
                     let (got, _) = ctx.quartic(lead, 0, c, d, e).unwrap();
                     let mut expected = Vec::new();
                     for x in 0..p {
-                        let value = ctx.f.add(e, ctx.f.mul(x, ctx.f.add(d,
-                            ctx.f.mul(x, ctx.f.add(c, ctx.f.mul(lead, ctx.f.sqr(x))))));
+                        let x2 = ctx.f.sqr(x);
+                        let cx2 = ctx.f.add(c, ctx.f.mul(lead, x2));
+                        let dx3 = ctx.f.add(d, ctx.f.mul(x, cx2));
+                        let value = ctx.f.add(e, ctx.f.mul(x, dx3));
                         if value == 0 { expected.push(x); }
                     }
                     assert_eq!(got, expected,
