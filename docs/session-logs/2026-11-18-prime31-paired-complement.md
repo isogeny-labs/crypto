@@ -53,3 +53,26 @@
 
 ### Errors
 - Initial corner-test Option type failure fixed. New CI false-negative was a grep quoting error; to be corrected in workflow.
+
+## 02:35–02:40 UTC — Complete 256-Q source-specific Rust and separate arithmetic replay
+
+### What was done
+- Integrated optional paired relation lookup into existing \`complete_b31_1024_tests\` source module, preserving default Dickson/first-x test behavior; added \`PRIME31_B31_NEGATION_COMPARE=1\` AB/BA paired-versus-original option and source-specific Actions checks.
+- Frozen exact-source [Actions #44224597718](https://github.com/isogeny-labs/crypto/actions/runs/44224597718), source \`b49311293f2617b0187b3a729645850909e31530\`: PASS, original Rust lib 40/40; 256-Q component 1/1; 256 complete unknown-log AB 1/1 and BA 1/1; success gates all pass.
+- AB fully charged: original 3,117.049332 ms versus paired 2,461.077553 ms (1.26654×), both 256/256 target logs, rank 31/31, 16/16 extra relations, first shift 244/256 and zero BSGS fallback.
+- BA order reversed: original 3,117.006964 ms versus paired 2,484.184035 ms (1.25474×). All matching public target Q and recovered k unchanged.
+- Component on final run: 2,161.949278 ms original versus 1,584.961158 ms paired, extra canonical preparation 89.824484 ms; 244 positives, 12 exhaustive negatives, 309,443 representatives and four corner controls.
+- A separately authored BigInt short-Weierstrass checker, without candidate Rust arithmetic, replayed all 62 AB factor-base logs and base points, 62 modular relation rows, 512 AB target scalar products, 512 signed eight-point witnesses and 512 corresponding AB/BA public Q and recovered k, all passed.
+- Committed full raw JSON with source/artifact metadata, report, lead audit and nonduplicate next experiments. GitHub artifact ID 14391903238, recorded ZIP digest sha256:b5110f3979f88d08ea95529a05f64db6c544f95deeb25085dff9bc9b226ecd6b.
+
+### Decisions made
+- Report specifically a 20.3–21.0% *complete generic-equivalent control* gain; this does not prove a novel non-generic prime-field attack or beat cached BSGS.
+- Do not merge while stacked on unmerged #4635; independent signed PCC and host-calibrated performance review remain outstanding.
+- Next hard mathematical gate is sign-free public-residual RR9/S9 or K961/S5 using existing Rust polynomial, quotient and rootfinding infrastructure, coordinated with #4604/#4596.
+
+### Open threads
+- Independent signed PCC validation of the raw evidence; repeated new-host ABBA.
+- Sign-independent algebraic extraction and complete 1,024-Q unknown-log cost comparison to matched BSGS, optimized rho and published index calculus.
+
+### Errors
+- Initial Option typing compiler defect fixed; later source-specific grep quoting false-negative fixed; final exact-source CI all green. No reported failed original-curve relation/target checks.
