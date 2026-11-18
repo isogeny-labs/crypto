@@ -259,7 +259,8 @@ fn study(num_targets: usize) -> Value {
         for attempt in 0..32usize {
             let offset=nonzero_scalar(&mut target_state);
             let wi=(t+attempt)%4;
-            let translated=ar.add(PRIME31,q,ar.scalar(PRIME31,offset,G));
+            let shift_point=ar.scalar(PRIME31,offset,G);
+            let translated=ar.add(PRIME31,q,shift_point);
             online_queries+=1;
             if let Some(word)=oracles[wi].find(&mut ar,translated) {
                 let row=oracles[wi].row(word,0);
