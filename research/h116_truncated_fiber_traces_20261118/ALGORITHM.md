@@ -46,10 +46,12 @@ the nonzero denominators imply `BostanJetRecurrence`; the `ZMod p`
 specialization discharges the denominator premises from prime `p>19`.
 Lean also proves the preceding differential-algebra step: differentiating
 `(x³+Ax+B)(R')²=R³+Atilde*R+Btilde` and cancelling a nonzero `R'`
-gives equation (15). The remaining geometric bridge must prove that the actual
-normalized isogeny coordinate satisfies that first-order curve equation and
-transport equation (15) through the at-infinity PowerSeries substitution.
-[pcc:unverified]
+gives equation (15). `NormalizedIsogenyFirstOrderEquation` is equation (14)
+after the same at-infinity substitution, and Lean proves that it implies
+`NormalizedIsogenySecondOrderEquation`; the factor cancelled in this
+PowerSeries proof has constant coefficient one. The remaining geometric bridge
+must construct the actual normalized isogeny at-infinity series and prove that
+it satisfies `NormalizedIsogenyFirstOrderEquation`. [pcc:unverified]
 
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 

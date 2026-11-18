@@ -88,8 +88,12 @@ to obtain this formal-series equation from the actual normalized isogeny map.
 The preceding paper step is now formalized separately:
 `normalizedMapEquation_implies_secondOrder` differentiates the normalized
 rational-map curve equation and cancels its explicitly nonzero derivative to
-obtain equation (15). The actual isogeny-to-curve-equation fact and the
-at-infinity substitution remain open; the theorem does not construct that map.
+obtain equation (15). The transformed equation (14) is also formalized as
+`NormalizedIsogenyFirstOrderEquation`, and Lean proves it implies the existing
+second-order PowerSeries equation. Its cancelled factor is automatically
+nonzero because its constant coefficient is one. What remains is to construct
+the actual normalized isogeny at-infinity series and prove that it satisfies
+this first-order PowerSeries equation; no theorem here constructs that map.
 [pcc:unverified]
 
 At the formal-series level, the target/reference denominators are now proved

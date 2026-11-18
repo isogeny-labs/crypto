@@ -79,6 +79,33 @@ theorem normalizedMapEquation_implies_secondOrder
   apply (mul_right_cancel₀ hseparable)
   linear_combination hd
 
+/-- The first-order normalized-map equation after `R(x)=xU(w)`, `w=1/x`,
+implies the correspondingly transformed second-order equation. Differentiating
+the first equation and combining it with three copies of the original leaves
+the desired equation times `U-wU'`; the explicit nonzero hypothesis permits
+the final cancellation. -/
+theorem transformedFirstOrderEquation_implies_secondOrder
+    {A : Type*} [CommRing A] [IsDomain A] [Algebra K A]
+    (D : Derivation K A A)
+    (w U Up Udd sourceA sourceB targetA targetB : A)
+    (hw : D w = 1) (hU : D U = Up) (hUp : D Up = Udd)
+    (hsourceA : D sourceA = 0) (hsourceB : D sourceB = 0)
+    (htargetA : D targetA = 0) (htargetB : D targetB = 0)
+    (hseparable : U - w * Up ≠ 0)
+    (hcurve : (1 + sourceA * w ^ 2 + sourceB * w ^ 3) *
+        (U - w * Up) ^ 2 =
+      U ^ 3 + targetA * w ^ 2 * U + targetB * w ^ 3) :
+    (3 + sourceA * w ^ 2) * (U - w * Up) +
+        2 * w ^ 2 * (1 + sourceA * w ^ 2 + sourceB * w ^ 3) * Udd =
+      3 * U ^ 2 + targetA * w ^ 2 := by
+  have hd := congrArg D hcurve
+  simp only [D.map_add, D.map_sub, D.leibniz, D.leibniz_pow,
+    D.map_one_eq_zero, hw, hU, hUp,
+    hsourceA, hsourceB, htargetA, htargetB, smul_eq_mul, nsmul_eq_mul,
+    mul_zero, add_zero, mul_one] at hd
+  apply (mul_right_cancel₀ hseparable)
+  linear_combination 3 * hcurve - w * hd
+
 /-- A factored fiber polynomial has logarithmic derivative equal to the sum of
 its reciprocal linear factors. Root multiplicities are represented by indices. -/
 theorem rootProductLogDeriv (D : Derivation K L L) {ι : Type*} [DecidableEq ι]
@@ -275,6 +302,17 @@ def BostanJetRecurrence (sourceA sourceB targetA targetB : K) (h : ℕ → K) : 
         (2 * ((k - 3 : ℕ) : K) * sourceB * h (k - 3)) /
           ((2 * k + 3 : ℕ) : K)
 
+/-- Equation (14) after substituting `R(x)=xU(w)`, `w=1/x`, and multiplying
+by `w³`. The factor `W=U-wU'` is the transformed derivative `R'(x)`. -/
+def NormalizedIsogenyFirstOrderEquation
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K) : Prop :=
+  let U := normalizedMapAtInfinitySeries h
+  let W := U - PowerSeries.X * PowerSeries.derivative U
+  (1 + PowerSeries.C sourceA * PowerSeries.X ^ 2 +
+      PowerSeries.C sourceB * PowerSeries.X ^ 3) * W ^ 2 =
+    U ^ 3 + PowerSeries.C targetA * PowerSeries.X ^ 2 * U +
+      PowerSeries.C targetB * PowerSeries.X ^ 3
+
 /-- Equation (15) of Bostan--Morain--Salvy--Schost after substituting
 `R(x)=x U(1/x)` and multiplying by `w²`. It is written in distributed form so
 that coefficient extraction does not hide work in nested Cauchy products. -/
@@ -289,6 +327,39 @@ def NormalizedIsogenySecondOrderEquation
       PowerSeries.C (2 * sourceA) * (PowerSeries.X ^ 4 * Udd) +
       PowerSeries.C (2 * sourceB) * (PowerSeries.X ^ 5 * Udd) =
     PowerSeries.C 3 * (U * U) + PowerSeries.C targetA * PowerSeries.X ^ 2
+
+/-- The transformed first-order curve equation implies the exact distributed
+PowerSeries form used for H116. The cancelled factor is automatically nonzero:
+its constant coefficient is one for `normalizedMapAtInfinitySeries`. -/
+theorem NormalizedIsogenyFirstOrderEquation.to_secondOrder
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (hfirst : NormalizedIsogenyFirstOrderEquation
+      sourceA sourceB targetA targetB h) :
+    NormalizedIsogenySecondOrderEquation sourceA sourceB targetA h := by
+  let U := normalizedMapAtInfinitySeries h
+  let Up := PowerSeries.derivative U
+  let Udd := PowerSeries.derivative Up
+  let W := U - PowerSeries.X * Up
+  have hW : W ≠ 0 := by
+    intro hz
+    have hc := congrArg (PowerSeries.coeff 0) hz
+    simp [W, U, Up, normalizedMapAtInfinitySeries, fiberDenominatorSeries] at hc
+  have hcurve :
+      (1 + PowerSeries.C sourceA * PowerSeries.X ^ 2 +
+          PowerSeries.C sourceB * PowerSeries.X ^ 3) * W ^ 2 =
+        U ^ 3 + PowerSeries.C targetA * PowerSeries.X ^ 2 * U +
+          PowerSeries.C targetB * PowerSeries.X ^ 3 := by
+    simpa [NormalizedIsogenyFirstOrderEquation, U, Up, W] using hfirst
+  have hcompact := transformedFirstOrderEquation_implies_secondOrder
+    PowerSeries.derivative PowerSeries.X U Up Udd
+      (PowerSeries.C sourceA) (PowerSeries.C sourceB)
+      (PowerSeries.C targetA) (PowerSeries.C targetB)
+      (by simp) (by simp [Up]) (by simp [Up, Udd])
+      (by simp) (by simp) (by simp) (by simp) hW hcurve
+  unfold NormalizedIsogenySecondOrderEquation
+  dsimp only
+  simp only [map_ofNat, map_mul] at hcompact ⊢
+  linear_combination hcompact
 
 /-- For prime characteristic `p > 19`, every denominator occurring while the
 H116 producer constructs `h₁,…,h₇` from Bostan et al. recurrence (16) is
@@ -530,6 +601,7 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms logDeriv_div
 #print axioms denominator_cancellation
 #print axioms normalizedMapEquation_implies_secondOrder
+#print axioms transformedFirstOrderEquation_implies_secondOrder
 #print axioms rootProductLogDeriv
 #print axioms rootPowerSumOfCoeff
 #print axioms relativeCoeffCancellation
@@ -548,6 +620,7 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero
 #print axioms bostanStepDenominatorsNonzero
+#print axioms NormalizedIsogenyFirstOrderEquation.to_secondOrder
 #print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation
 #print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation_zmod
 #print axioms BostanJetRecurrence.unique
