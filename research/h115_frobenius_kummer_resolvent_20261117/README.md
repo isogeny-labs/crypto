@@ -46,6 +46,8 @@ Post-freeze proof artifacts:
 | `h115_field.rs` | Native extension-field, curve, torsion and irreducibility layer | `577015b44fae9828b9bddf1b2afc0403e4f44d732b3a01325f42253f0982cc82` |
 | `h115_producer.rs` | Frozen producer, controls, exact scoring and scalar-blind decoder | `f0644129c8d7c0161cbddac3283f94453983d25b6f6cdeaf327b170c1fc579bd` |
 | `PRODUCER_SOURCE_GATE.md` | Strict non-scoring compile/selftest receipt | self-hash intentionally omitted |
+| `VERIFIER_BINDING.md` | Bound cryptanalysis PR #1739 revision and independent source hash | self-hash intentionally omitted |
+| `CHECKPOINT_RESUME.md` | Branch-specific checkpoint, EKS and verifier handoff | self-hash intentionally omitted |
 
 The first post-freeze native check is structural only:
 
