@@ -15,7 +15,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 
-- [ ] Prove and audit the complete prime-field ECDLP bound from graded parity counting through order-free recovery (Codex, started 2026-11-18, branch codex/ecdlp-end-to-end-20261118)
+- [x] Prove and audit the complete prime-field ECDLP bound from graded parity counting through order-free recovery (Codex, completed 2026-11-18, branch codex/ecdlp-end-to-end-20261118, PR #4698)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
