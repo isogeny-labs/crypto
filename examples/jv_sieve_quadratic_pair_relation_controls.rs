@@ -11,6 +11,8 @@ pub mod quadratic_pair_graph;
 pub mod quadratic_pair_relation;
 
 /// The controls are unit tests: `cargo test --example <this example>`.
+/// The empty `main` is unused in the test build, hence the allow.
+#[cfg_attr(test, allow(dead_code))]
 fn main() {}
 
 #[cfg(test)]
