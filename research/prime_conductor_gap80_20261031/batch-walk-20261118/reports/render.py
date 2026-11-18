@@ -6,14 +6,17 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 root = Path(__file__).resolve().parents[1]
-cases = [("blocked17", "Degree 10009 · block 17"),
-         ("full64", "Degree 10009 · block 64"),
-         ("explicit18", "Degree 10009 · B=18 · block 200"),
-         ("small1", "Degree 19 · block 1")]
+summary = json.loads((root / "summary.json").read_text())
+cases = [("10009", 17, 50, "Degree 10009 · block 17"),
+         ("10009", 64, 50, "Degree 10009 · block 64"),
+         ("10009", 200, 18, "Degree 10009 · B=18 · block 200"),
+         ("19", 1, 2, "Degree 19 · block 1")]
 fig, axes = plt.subplots(2, 2, figsize=(10, 6.5), layout="constrained")
-for ax, (name, title) in zip(axes.flat, cases):
-    records = [json.loads((root / "results" / f"{name}-batch{cap}.json").read_text())
-               for cap in [1, 7, 64, 4096]]
+for ax, (degree, block, baby, title) in zip(axes.flat, cases):
+    records = sorted([row for row in summary["pipeline_counts"]
+                      if row["ell"] == degree and row["block"] == block
+                      and row["baby_count"] == baby],
+                     key=lambda row: row["walk_backend"]["batch_cap"])
     values = [int(row["walk_backend"]["batch_inverse_calls"]) for row in records]
     bars = ax.bar(["1", "7", "64", "4096"], values, color="#177d9b")
     ax.bar_label(bars, padding=3)

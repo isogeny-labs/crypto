@@ -9,6 +9,14 @@ default remains affine; the coverage gate, quotient and point-map formulas,
 subgroup inputs and direct-PARI cap are unchanged. This implements an optional
 coordinate backend; elapsed-time advantage is unmeasured.
 
+The completed qualifier reports 24 projective pipeline replays and **504
+point-input evaluations across three supplied prime fields**, agreeing with
+direct PARI and the baseline outputs. An additional bounded primitive check
+over the actual 202-bit target field reports **32768 x-coordinate comparisons**
+across two kernel-walk prefixes and four batch caps. These are unsigned producer
+observations in `PCC-20261118-3560cd`; its standing is `not_covered`, not
+independent verification. [pcc:unverified]
+
 ## Coordinate and resource contract
 
 For a finite Jacobian point `(X,Y,Z)`, the affine coordinates are
@@ -40,6 +48,20 @@ The complete 80-bit window remains an independent construction bottleneck.
 
 ## Development checks and counter boundary
 
+| Control | Recorded outcome |
+|---|---|
+| Old default fixture and six new affine-default cases | Byte-equal to their recorded baselines |
+| Six small pipeline schedules, four batch caps each | 504 point-input evaluations; quotient/images and original counters agree |
+| Enumerated small group law, p=7,11,71 | 3717 mixed-add comparisons, including 84 doubling and 84 inverse-pair cases; four y=0 inputs |
+| Small normalization walks | 261 samples: 120 finite walks (600 x checks) and 141 expected infinity rejections |
+| Actual target-field coordinate prefixes | 4096 baby and 4096 giant positions, each checked at four batch caps: 32768 comparisons |
+| Zero, excessive, duplicate, missing and invalid batch cap | Exit 2, empty stdout |
+
+All completed positive commands returned exit 0 with empty stderr. Counts
+include repeated records, infinity and kernel inputs; they are not counts of
+distinct non-kernel images, new conductor crossings or ECDLP trials.
+[pcc:unverified]
+
 The frozen qualifier compares baseline, new affine-default and optional
 projective outputs for six schedules in the supplied fields 6666679, 71 and
 11, with projective batch caps 1, 7, 64 and 4096. It includes explicit windows,
@@ -55,6 +77,7 @@ arithmetic, polynomial/log-norm work and PARI. They are not total field-operatio
 counts. The graph compares batch caps within this backend, not elapsed times
 or a baseline-versus-candidate speedup. Each cell is one development replay;
 deterministic operation counts have no timing uncertainty interval.
+[pcc:unverified]
 
 Raw checks and their completion status are recorded under [results](results/).
 The separate pre-call manifest was created before invoking the independently
@@ -62,6 +85,44 @@ copied frozen qualifier; it is not replaced by later source or reporting work.
 The frozen qualifier is a producer's check, not an independent certificate.
 No benchmark, gap record or execution verification is promoted from these
 controls. [pcc:unverified]
+
+![Recorded walk-local inversion calls at different batch caps](reports/normalization.svg)
+
+For example, the degree-10009/block-64 schedule records 100 normalization
+inverse calls at cap 1 and two at cap 64 or 4096. The block-1 control records six
+at every cap, despite having no recurrence additions to replace. These are
+operation-counter observations; the extra projective multiplications/squarings
+and all excluded stages must be measured before any speed conclusion.
+[pcc:unverified]
+
+The target-field primitive control is separately pinned in
+[wide-field-pre-call-manifest.sha256](wide-field-pre-call-manifest.sha256).
+It reuses the exact walker, checks its starts and reference x-coordinates with
+PARI, and has a 120-second process deadline (exit 0). That deadline is a ceiling,
+not a timing result. It never enters the complete isogeny constructor. Its
+output leaves full quotient, isogeny images and runtime fields null.
+[pcc:unverified]
+
+The [summary](summary.json), raw outputs and [PDF](reports/report.pdf) accompany
+the producer evidence. No signed execution verifier was used. The local
+repository-wide Rust suite and `conductor check` remain unavailable in this
+executor; native checks and eventual remote merge checks have separate scope.
+
+The complete raw tree is preserved in `runs.tar.xz`, with
+`runs.tar.xz.sha256`. The two individual JSON records named by the PCC claim
+also stay loose so their proof paths resolve. All other results are restored
+from the archive; the plotter reads the copied recorded counters in summary.json.
+From this study directory:
+
+```sh
+sha256sum -c runs.tar.xz.sha256
+tar -xJf runs.tar.xz
+```
+
+Deterministic packing uses `--sort=name --mtime='2026-11-18 00:00:00Z'`, numeric
+owner/group 0, `--mode='u+rwX,go+rX,go-w' --format=gnu`, and `xz -6 -T1` on
+the `results` directory. Repacking the extracted tree must reproduce the
+archive's bytes. This newly archived tree was not previously committed loose.
 
 ## Build and replay
 
@@ -80,9 +141,12 @@ complete_pipeline --projective-controls
 
 The `--projective-controls` command is a finite development check over small
 public curves. It is not a parameter search or an ECDLP timing driver. Replaying
-the qualifier should use a new output directory rather than overwrite the
-archived results; its rejection-record sentinel prevents a second complete
-invocation from appending into the same directory.
+the historical frozen qualifier in place would overwrite early output files
+before its late rejection-record sentinel stops it. Do not do that. For a new
+replay, copy the current template into a new frozen qualifier, hash it before
+calls, and pass a fresh output directory as its third argument. The updated
+template refuses an existing output directory before writing anything. The
+original frozen script and its recorded hash remain unchanged.
 
 ## Original requirements remain separate
 

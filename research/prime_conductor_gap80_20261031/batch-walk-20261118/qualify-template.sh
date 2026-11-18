@@ -4,7 +4,9 @@ set -eu
 candidate=$1
 baseline=$2
 study=research/prime_conductor_gap80_20261031
-out="$study/batch-walk-20261118/results"
+out=${3:?supply a fresh output directory for a new replay}
+test ! -e "$out"
+mkdir -p "$out"
 inputs="$study/evaluator-20261118/inputs"
 "$candidate" --fixtures > "$out/default-fixtures.jsonl" 2> "$out/default-fixtures.stderr"
 cmp "$out/default-fixtures.jsonl" "$study/window-audit-20261118/results/default-fixtures.jsonl"
