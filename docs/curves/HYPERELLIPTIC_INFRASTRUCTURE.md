@@ -615,12 +615,22 @@ evidence includes the order-29 overlay and the
 implementation-separated cardinality-486 certificate for the separate fixed
 F8 source fixture. The latter is not an EC1 subgroup-order certificate. All
 computational-advantage and end-to-end solver costs for both the 15,791-row
-historical assessment and the larger live graph remain unknown. The retained
-cryptanalysis parity receipt mirrors the general binary norm and the prior
-prime arithmetic sources, but predates the strict primality helper and 73-bit
-pilot changes; a successor exact-source parity refresh remains open. The
-assessment does not change the geometry semantics or browser status fields in
-`covers.json` and `cover-links.yaml`.
+historical assessment and the larger live graph remain unknown. Cryptanalysis
+successor `f24ebf0f59e6f55ae8ce5a651d3c25ee4dc42512` mirrors the exact
+strict-primality, balanced-arithmetic, and transfer sources from crypto
+producer `153ac585d3b1ece0ebb0d49312b13267f651c94b` and binds the
+corpus-containing crypto revision
+`bb87d501aa763e7243f845d4f07c8a31b88435f1`. Local mirror validation passed
+10 of 10 manifest-parity records, 1 of 1 primality test, 5 of 5 balanced
+tests, 6 of 6 transfer tests including the strict live 73-bit pilot, and 8 of
+8 parity tests; strict library Clippy and targeted `rustfmt` also passed. The
+generated corpus and independent `F_2` source-law oracle remain crypto-owned
+and were not copied into cryptanalysis. The full 486-class `GF(8)` independent
+source-law gate, remote mirror CI and review, and a fresh current-head package
+and extracted-package replay remain open. This receipt is not a Jacobian
+index-calculus solver or evidence of a speedup. The assessment does not change
+the geometry semantics or browser status fields in `covers.json` and
+`cover-links.yaml`.
 [pcc:unverified]
 
 Regenerate and check the assessment deterministically with:

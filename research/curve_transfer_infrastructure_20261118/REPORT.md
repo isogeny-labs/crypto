@@ -235,6 +235,9 @@ as a data extension and applies the generic automatic threshold only above
 1 MiB. The corpus is therefore eligible for a direct Git commit. The successor
 498,477-byte tracked corpus is at
 [`binary-subgroup-transfer-certificates.json`](../../docs/curves/binary-subgroup-transfer-certificates.json).
+It is present in crypto revision
+`bb87d501aa763e7243f845d4f07c8a31b88435f1`; its exact producer remains
+`153ac585d3b1ece0ebb0d49312b13267f651c94b`.
 Its SHA-256 is
 
 `15bcf780f98a3a787f988b737a8b5f82c20053961daaefa15f6c4a7555bfc948`.
@@ -272,18 +275,46 @@ first twelve prime bases with the `psi_13` cutoff. Both now include base 41 and
 regress on `psi_12`; the PCC suite passes 35 of 35 tests. The focused quartic
 Rust test is committed, but local root-crate execution remains blocked by
 unrelated sparse-checkout fixtures and a pre-existing duplicate test symbol.
-Cryptanalysis draft revision
-`cd509d3b6a8b9599f8b975dc8692d772264e5ce4` records local source parity
-against crypto arithmetic revision
-`6cb5ab1edb141b48b9a9767fc63fe95ba1aac217` and separately binds producer
-revision `c01ba3960ada49d73e2c48acb0e175f9e77e1680` and corpus-containing
-revision `07f7d47bd8d58d5cb1065cc83e9f22fefd85e065`. Cross-repository parity,
-8 parity tests, 13 binary transfer tests, 5 balanced tests, 5 prime-transfer
-tests, strict focused Clippy, workflow wiring, YAML parsing, and prose lint
-pass locally. That receipt predates the strict primality helper and 73-bit
-pilot sources. A successor exact-source mirror/parity refresh, final mirror CI,
-and review remain open. Release publication and recovery of the separately
-missing admitted hydration artifact also remain open.
+The predecessor cryptanalysis draft
+`cd509d3b6a8b9599f8b975dc8692d772264e5ce4`, its crypto arithmetic revision
+`6cb5ab1edb141b48b9a9767fc63fe95ba1aac217`, producer
+`c01ba3960ada49d73e2c48acb0e175f9e77e1680`, and corpus-containing revision
+`07f7d47bd8d58d5cb1065cc83e9f22fefd85e065` are retained as historical
+records. Cryptanalysis successor
+`f24ebf0f59e6f55ae8ce5a651d3c25ee4dc42512` is the exact-source mirror of
+crypto producer `153ac585d3b1ece0ebb0d49312b13267f651c94b` and binds the
+corpus-containing crypto revision
+`bb87d501aa763e7243f845d4f07c8a31b88435f1`. The pinned SHA-256 digests are:
+
+- primality source:
+
+  `3b055ac166717960963e4e80b7d75eaba6c1681a7bc2e7ddfbb0d4af4d5aaf1c`;
+
+- balanced arithmetic:
+
+  `5a5f275021cf901e44a2a2a0e3fb9238e55da2772a1620ec153d0d8e4461d451`;
+
+- transfer source:
+
+  `4ac06190059262ab96b9ebc80f84ee27a3d9a660d8b4e05186ea7c8c5362724e`;
+  and
+
+- adapted module:
+
+  `56927be3fc20e4a5f52b1f063c6371b0ca1bdd090e3bb3874693ed62e96b5838`.
+
+The manifest records only the cryptanalysis-only `ops` omission.
+
+Local successor validation passed 10 of 10 manifest-parity records, 1 of 1
+primality test, 5 of 5 balanced tests, 6 of 6 transfer tests including the
+strict live 73-bit pilot, and 8 of 8 parity tests. Strict library Clippy,
+targeted `rustfmt`, JSON/YAML parsing, and source-diff checks also passed. The
+generated corpus and independent `F_2` source-law oracle remain crypto-owned
+and were deliberately not copied. The full independent 486-class `GF(8)`
+source-law gate, remote mirror CI and review, and a fresh current-head package
+with extracted-package replay remain open. This parity receipt is not a
+Jacobian index-calculus solver or evidence of a speedup. Recovery of the
+separately missing admitted hydration artifact also remains open.
 
 # Structured unsupported cases and next work
 
@@ -308,10 +339,10 @@ and 1,405 extension-field maps/9 EC1 records. The two-row widening is therefore
 not general support for wide primes, normalized targets, or extensions.
 The next bounded engineering steps are:
 
-1. commit the atomically rebound successor corpus, then replay it from an
-   extracted current-head release archive;
-2. refresh the cryptanalysis mirror against the exact strict-primality and
-   73-bit-pilot sources, then close required CI and review;
+1. replay the committed, atomically rebound successor corpus from an extracted
+   current-head release archive;
+2. close required remote CI and review for the exact-source cryptanalysis
+   successor;
 3. extend independent source-law evidence to the full 486-class `GF(8)`
    fixture and the generic `F_5` and shifted `F_7` even-model fixtures with
    mutation controls;
