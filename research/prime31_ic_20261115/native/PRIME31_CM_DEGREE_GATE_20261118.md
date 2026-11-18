@@ -1,6 +1,6 @@
 # Prime31 CM endomorphism-degree screen and non-generic ECDLP experiment queue
 
-**Date:** 2026-11-18 UTC. **Standing:** exact mathematical derivation plus native Rust source-specific test; GitHub Actions result must be linked after execution. `[pcc:unverified]`. No new complete-solver speedup or cold timing is claimed.
+**Date:** 2026-11-18 UTC. **Standing:** exact mathematical derivation and committed native Rust source-specific CI gate; GitHub Actions result is pending until its final head run completes. `[pcc:unverified]`. No new complete-solver speedup or cold timing is claimed.
 
 ## Exact registered model
 
@@ -35,7 +35,7 @@ D_K   = -803,827,011            = -(3 * 13 * 20,610,949)
    U(X)=30145591 + 2045657651 X + 1195765287 X².
    U(X)*R(X) ≡ 1 (mod g).
    ```
-   Since `X^p-X` vanishes on every `F_p` element, this identity proves that **g has no root in F_p**; a cubic with no root is irreducible. Hence exactly one of the four distinct x-abscissae of nonzero 3-torsion modulo ± is rational. The proof uses only finite-field polynomial multiplication and Frobenius powering, reproduced by the native Rust source and independently by exact-integer arithmetic.
+   Since `X^p-X` vanishes on every `F_p` element, this identity proves that **g has no root in F_p**; a cubic with no root is irreducible. Hence exactly one of the four distinct x-abscissae of nonzero 3-torsion modulo ± is rational. The certificate uses only finite-field polynomial multiplication and Frobenius powering, encoded in the native Rust source and independently verified with exact-integer arithmetic; source-specific Rust CI was queued at reporting time.
 3. If `End(E)=O_K`, then `π=18407 + 3ω`, where `ω=(1+sqrt(D_K))/2` is an actual endomorphism. On the full geometric 3-torsion `E[3]`, `π` must then act as scalar `[18407]=[-1]`; **all four 3-division x-coordinates would be F_p-rational**. The irreducible cubic contradicts this. Thus `End(E)≠O_K`; the only other allowed order is `Z[π]`, **conductor 3**.
 
 For every nonscalar geometric endomorphism `α=a+bω`, integer `b != 0`, and because `α∈Z[π]` we have `3|b`:
@@ -43,13 +43,13 @@ For every nonscalar geometric endomorphism `α=a+bω`, integer `b != 0`, and bec
 4 deg(α) = (2a+b)^2 + 803827011 b^2
 deg(α) >= (1 + 9*803827011)/4 = 1,808,610,775.
 ```
-This bound is **exact and attained**, not merely a floor: `α=π-[18408] = (1+3sqrt(D_K))/2` has norm `p - 18408*t +18408^2 = 1,808,610,775`. Over `F_p)-rational points it acts as multiplication by `[-18407]`, i.e. is not an exotic cheap automorphism for rho. The earlier `200,956,753` bound is the weaker **maximal-order** bound and is not the actual minimum for this curve. Since `a,b` are both nonzero in the Weierstrass model, `j≠0,1728`, so there are no geometric automorphisms beyond `±1`.
+This bound is **exact and attained**, not merely a floor: `α=π-[18408] = (1+3sqrt(D_K))/2` has norm `p - 18408*t +18408^2 = 1,808,610,775`. Over `F_p`-rational points it acts as multiplication by `[-18407]`, i.e. is not an exotic cheap automorphism for rho. The earlier `200,956,753` bound is the weaker **maximal-order** bound and is not the actual minimum for this curve. Since `a,b` are both nonzero in the Weierstrass model, `j≠0,1728`, so there are no geometric automorphisms beyond `±1`.
 
 **Interpretation boundary:** This excludes low-degree nonscalar self-endomorphisms, a potential direct GLV route. It **does not exclude factored high-degree isogeny loops**, efficient transfers, extension-field representations, higher-genus correspondences or novel algebraic IC. The degree of an expanded endomorphism does not determine the cost of a decomposed evaluation; see `docs/endomorphism-rules.md`. Even an efficient known-scalar endomorphism is not by itself an unknown-scalar ECDLP solver.
 
 ## Reproducible implementation and validation boundary
 
-- Native Rust source: `examples/prime31_cm_degree_gate.rs` in this directory. Reuses `PRIME31`, `Arithmetic` and `check_curve`. Implements only finite integer trial division and the closed-form CM norm certificate; no alternative EC arithmetic and no Python solver.
+- Native Rust source: `examples/prime31_cm_degree_gate.rs` in this directory. Reuses `PRIME31`, `Arithmetic` and `check_curve`. Implements exact cubic quotient arithmetic, finite-field Bezout inversion certification, finite integer trial division and the CM norm certificate; no alternative EC arithmetic and no Python solver.
 - CI: `.github/workflows/prime31-cm-degree-gate.yml`. Overlay only the candidate example onto pinned original arithmetic at `1df714645aa683cf975bc76fcacb9842cb4780fd` with Rust 1.100.0, run 40 existing original-library regressions, three focused tests, and archive the exact JSON trace/discriminant/bound readout. Scope is **arithmetic validation**, not cold index-calculus timing.
 - Independent second arithmetic calculation with exact integers returned the same factorization and norm floors. This is a producer-side double check, not signed independent PCC.
 - Experimental status: neither the 1,024-target algebraic extractor nor a new matched rho/BSGS run was carried out by this screen. Do **not** extrapolate ECDLP speedups or rank from the norm bound.
@@ -81,7 +81,7 @@ This bound is **exact and attained**, not merely a floor: `α=π-[18408] = (1+3s
 
 **P3: complete 1,024 blinded target solver.** When P0/P1/P2 yields independent rank-31 public relations, route directly into the existing Rust linear-algebra / log recovery, keep every failed random shift and precomputation, use exactly the same public targets for same-host optimized shared BSGS and negation-map rho. Report one-target *cold* and 1,024-target amortized intervals separately. A speedup requires less complete cost than the **strongest** matched baseline (not only an earlier generic IC), with independent arithmetic replay and signed PCC. The old shared BSGS 170.113 ms / 1,024 gives only a historical engineering yardstick, not a current same-host threshold. Test increasing prime sizes and holdout seeds before claiming scaling.
 
-**P4: CM side branch (low priority).** Determine End(E) conductor (1 or 3) if explicit isogeny-loop endomorphisms remain a prioritized *scalar-multiplication* lead. Bound only direct low-degree self maps by the theorem here; actual factored path performance still needs a typed isogeny chain and map evaluation. This does not by itself solve ECDLP.
+**P4: CM side branch (low priority).** The exact conductor is now proved to be 3. For explicitly proposed isogeny loops, use that order to enumerate norm and ideal classes, then measure any candidate *factored* path's evaluation cost. The lower bound on composite degree is not an evaluation-cost lower bound. This does not by itself solve ECDLP.
 
 ## Decision
 
