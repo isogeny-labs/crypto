@@ -96,6 +96,9 @@ impl Fp {
             } else {
                 folded
             }
+        } else if self.p <= u32::MAX as u64 && a < self.p && b < self.p {
+            // Canonical 32-bit operands fit in a native 64-bit product.
+            (a * b) % self.p
         } else {
             ((a as u128 * b as u128) % self.p as u128) as u64
         }
@@ -150,6 +153,9 @@ pub(crate) trait Ring {
     fn zero(&self) -> Self::E;
     fn one(&self) -> Self::E;
     fn mul(&self, a: Self::E, b: Self::E) -> Self::E;
+    fn sqr(&self, a: Self::E) -> Self::E {
+        self.mul(a, a)
+    }
     fn order(&self) -> u128; // |K^*|
     fn cand(&self, k: u64) -> Self::E; // k-th nonzero candidate (for non-cube search)
 }
@@ -201,6 +207,20 @@ impl Ring for Fq2 {
         let s = f.mul(f.add(x.0, x.1), f.add(y.0, y.1));
         (f.add(ac, nbd), f.sub(f.sub(s, ac), bd))
     }
+    // Dedicated Fp2 squaring: (a+bi)^2=(a^2+n*b^2)+2abi.
+    // Saves additions/subtractions versus generic Karatsuba multiply.
+    fn sqr(&self, x: (u64, u64)) -> (u64, u64) {
+        let f = &self.f;
+        let aa = f.sqr(x.0);
+        let bb = f.sqr(x.1);
+        let nbb = match self.n {
+            2 => f.add(bb, bb),
+            3 => f.add(f.add(bb, bb), bb),
+            _ => f.mul(self.n, bb),
+        };
+        let ab = f.mul(x.0, x.1);
+        (f.add(aa, nbb), f.add(ab, ab))
+    }
     fn order(&self) -> u128 {
         (self.f.p as u128) * (self.f.p as u128) - 1
     }
@@ -217,7 +237,7 @@ pub(crate) fn rpow<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
         }
         e >>= 1;
         if e > 0 {
-            b = r.mul(b, b);
+            b = r.sqr(b);
         }
     }
     acc
@@ -311,7 +331,7 @@ impl<R: Ring> Cube<R> {
         let g = rpow(r, a, t);
         let mut residue = g;
         for _ in 1..self.s {
-            residue = r.mul(residue, r.mul(residue, residue));
+            residue = r.mul(residue, r.sqr(residue));
         }
         if residue != r.one() {
             return None;
@@ -355,7 +375,7 @@ impl<R: Ring> Cube<R> {
             // z = (h*c^{-l})^(3^(s-1-j)). Repeated cubing uses only
             // 2(s-1-j) field multiplications, not binary exponentiation.
             for _ in (j + 1)..self.s {
-                z = r.mul(z, r.mul(z, z));
+                z = r.mul(z, r.sqr(z));
             }
             let digit = if z == r.one() {
                 0
@@ -388,7 +408,7 @@ impl<R: Ring> Cube<R> {
             }
             previous_power = inverse_power;
             if j + 1 < self.s {
-                inverse_power = r.mul(inverse_power, r.mul(inverse_power, inverse_power));
+                inverse_power = r.mul(inverse_power, r.sqr(inverse_power));
             }
         }
         Some(r.mul(x0, root_correction))
@@ -550,11 +570,10 @@ impl RadicalRootCtx {
             };
         }
         let q2 = f.mul(q, self.inv2);
-        // m=-P/3 is needed for Cardano below. Reuse m^3:
-        // q^2/4 + P^3/27 = (q/2)^2 - (-P/3)^3.
-        // This saves two wide modular multiplications on the common path.
-        let m = f.neg(f.mul(pp, self.inv3));
-        let d = f.sub(f.sqr(q2), f.mul(f.sqr(m), m));
+        // Keep the original discriminant: algebraic m^3 reuse measured
+        // 0.61-0.69x in actual Rust CI despite faster C++ screening.
+        let p2 = f.sqr(pp);
+        let d = f.add(f.sqr(q2), f.mul(f.mul(p2, pp), self.inv27));
         if d == 0 {
             // double root -3Q/(2P), simple root 3Q/P
             let ip = f.inv(pp);
@@ -563,6 +582,7 @@ impl RadicalRootCtx {
             return vec![r1, r2];
         }
         let nq2 = f.neg(q2);
+        let m = f.neg(f.mul(pp, self.inv3));
         match self.sqrt(d) {
             Some(sg) => {
                 let u3 = f.add(nq2, sg);
@@ -624,15 +644,13 @@ impl RadicalRootCtx {
     /// F_p-roots of the monic cubic x^3 + c2 x^2 + c1 x + c0.
     pub fn cubic_monic(&self, c2: u64, c1: u64, c0: u64) -> Vec<u64> {
         let f = &self.f;
-        let c2sq = f.sqr(c2);
-        let pp = f.sub(c1, f.mul(c2sq, self.inv3));
-        // q = 2 c2^3/27 - c1 c2/3 + c0
-        // 2/27 is a fixed coefficient: one modular doubling instead of
-        // a generic (u128 remainder) field multiplication.
-        let t1 = f.mul(f.mul(c2sq, c2), f.add(self.inv27, self.inv27));
-        let t2 = f.mul(f.mul(c1, c2), self.inv3);
-        let q = f.add(f.sub(t1, t2), c0);
+        // Shift x=t-sh, sh=c2/3. Reuse sh:
+        // P=c1-c2*sh; Q=2*sh^3-c1*sh+c0.
+        // Five field multiplications instead of seven.
         let sh = f.mul(c2, self.inv3);
+        let pp = f.sub(c1, f.mul(c2, sh));
+        let sh3 = f.mul(f.sqr(sh), sh);
+        let q = f.add(f.sub(f.add(sh3, sh3), f.mul(c1, sh)), c0);
         self.cubic_depressed(pp, q)
             .into_iter()
             .map(|t| f.sub(t, sh))
