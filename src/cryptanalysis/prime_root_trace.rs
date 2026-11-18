@@ -210,6 +210,43 @@ fn trim(mut v: Vec<u64>) -> Vec<u64> {
     }
     v
 }
+/// Accelerated arithmetic for canonical public field elements emitted by
+/// the trace engine. Keep the general u128 fallback so event values remain
+/// identical even for noncanonical internal callers.
+#[inline]
+fn field_value(op: FieldOp, a: u64, b: u64, p: u64) -> u64 {
+    match op {
+        FieldOp::Add => {
+            if a < p && b < p {
+                let sum = a + b; // p <= 2^61-1: no u64 overflow
+                if sum >= p { sum - p } else { sum }
+            } else {
+                ((a as u128 + b as u128) % p as u128) as u64
+            }
+        }
+        FieldOp::Sub => {
+            if a < p && b < p {
+                if a >= b { a - b } else { a + p - b }
+            } else {
+                ((a as u128 + p as u128 - b as u128) % p as u128) as u64
+            }
+        }
+        FieldOp::Mul | FieldOp::Square => {
+            if p == MAX_PRIME && a < p && b < p {
+                // 2^61 = 1 mod p: end-around carry rather than u128 divide.
+                let product = a as u128 * b as u128;
+                let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
+                let folded = (folded & MAX_PRIME) + (folded >> 61);
+                if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
+            } else if p <= u32::MAX as u64 && a < p && b < p {
+                (a * b) % p
+            } else {
+                ((a as u128 * b as u128) % p as u128) as u64
+            }
+        }
+    }
+}
+
 fn validate_input(f: &[u64], p: u64, limits: &RootLimits) -> Result<(), String> {
     limits.validate()?;
     if !(3..=MAX_PRIME).contains(&p) || !is_prime_u64(p) {
@@ -250,12 +287,7 @@ impl Engine<'_> {
         if self.report.counters.field_work() >= self.report.limits.field_work {
             return Err(RootStop::WorkLimit);
         }
-        let p = self.report.p;
-        let value = match op {
-            FieldOp::Add => ((a as u128 + b as u128) % p as u128) as u64,
-            FieldOp::Sub => ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
-            FieldOp::Mul | FieldOp::Square => ((a as u128 * b as u128) % p as u128) as u64,
-        };
+        let value = field_value(op.clone(), a, b, self.report.p);
         self.event(RootEvent::Field { op, a, b, value })?;
         Ok(value)
     }
@@ -927,6 +959,99 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    #[test]
+    fn round22_fast_trace_field_exact_under_frozen_arithmetic() {
+        let mut seed = 0x524f_4f54_2026_1118u64;
+        for p in [3, 487, 998244353, 1000000007, MAX_PRIME - 30, MAX_PRIME] {
+            for _ in 0..4096 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let b = seed % p;
+                for op in [FieldOp::Add, FieldOp::Sub, FieldOp::Mul, FieldOp::Square] {
+                    let reference = match op {
+                        FieldOp::Add => ((a as u128 + b as u128) % p as u128) as u64,
+                        FieldOp::Sub => ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
+                        FieldOp::Mul | FieldOp::Square =>
+                            ((a as u128 * b as u128) % p as u128) as u64,
+                    };
+                    assert_eq!(field_value(op.clone(), a, b, p), reference,
+                               "p={p} a={a} b={b} op={op:?}");
+                    if a < p - 2 && b < p - 2 {
+                        assert_eq!(
+                            field_value(op, a + p, b, p),
+                            match op {
+                                FieldOp::Add => ((a as u128 + p as u128 + b as u128) % p as u128) as u64,
+                                FieldOp::Sub => ((a as u128 + p as u128 + p as u128 - b as u128) % p as u128) as u64,
+                                FieldOp::Mul | FieldOp::Square =>
+                                    (((a + p) as u128 * b as u128) % p as u128) as u64,
+                            }
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired production-Rust trace field microbench"]
+    fn bench_round22_trace_field_arithmetic() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn old(op: FieldOp, a: u64, b: u64, p: u64) -> u64 {
+            match op {
+                FieldOp::Add => ((a as u128 + b as u128) % p as u128) as u64,
+                FieldOp::Sub => ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
+                FieldOp::Mul | FieldOp::Square =>
+                    ((a as u128 * b as u128) % p as u128) as u64,
+            }
+        }
+        fn sample(xs: &[(u64,u64)], op: FieldOp, p: u64, fast: bool) -> f64 {
+            let start = Instant::now();
+            let mut checksum = 0u64;
+            for _ in 0..32 {
+                for &(a,b) in xs {
+                    let (a,b) = (black_box(a), black_box(b));
+                    checksum ^= if fast {
+                        field_value(op.clone(), a, b, p)
+                    } else {
+                        old(op.clone(), a, b, p)
+                    };
+                }
+            }
+            black_box(checksum);
+            start.elapsed().as_nanos() as f64 / (32 * xs.len()) as f64
+        }
+        let mut seed = 0x2549_2026_1118u64;
+        for p in [487, 1000000007, MAX_PRIME] {
+            let mut xs = Vec::new();
+            for _ in 0..4096 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let b = seed % p;
+                xs.push((a,b));
+            }
+            for op in [FieldOp::Add, FieldOp::Sub, FieldOp::Mul, FieldOp::Square] {
+                let (mut before, mut after) = (Vec::new(), Vec::new());
+                for i in 0..13 {
+                    if i % 2 == 0 {
+                        before.push(sample(&xs, op.clone(), p, false));
+                        after.push(sample(&xs, op.clone(), p, true));
+                    } else {
+                        after.push(sample(&xs, op.clone(), p, true));
+                        before.push(sample(&xs, op.clone(), p, false));
+                    }
+                }
+                before.sort_by(f64::total_cmp);
+                after.sort_by(f64::total_cmp);
+                println!("round22 field p={p} op={op:?}: {:.3} -> {:.3} ns ({:.3}x)",
+                         before[6], after[6], before[6] / after[6]);
+            }
+        }
+    }
     use super::*;
     fn limits() -> RootLimits {
         RootLimits {
