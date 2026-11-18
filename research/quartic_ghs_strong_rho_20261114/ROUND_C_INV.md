@@ -47,8 +47,8 @@ a^-1 = N^-1 * (A + B*z + C*z^2).
 
 Both paths use one base-field inversion and three final base-field products.
 With the existing `fmul_small` helper, the frozen Frobenius path uses 16
-counted `fq_mul` when `c <= 16` and 18 when `c > 16`; the direct path must use
-12 and 14 respectively. Thus the required delta is exactly four `fq_mul` for
+counted `fq_mul` when `c <= 16` and 19 when `c > 16`; the direct path must use
+12 and 15 respectively. Thus the required delta is exactly four `fq_mul` for
 both the small-constant path and the fallback path. Addition counts may differ
 and remain explicit. The direct path must not increment `f3_mul`; this is a
 kernel specialization, not a general cubic multiplication.
@@ -58,8 +58,9 @@ kernel specialization, not a general cubic multiplication.
 1. On the existing public synthetic `q=223` instance, compare 200
    deterministic nonzero field inputs against both the frozen `Kf::inv` and a
    retained Frobenius reference that exactly reproduces the baseline kernel.
-2. Exercise the `c > 16` fallback on a deterministic valid cubic field with
-   `q = 223` and a non-cube `c > 16`. Compare the direct and Frobenius paths
+2. Exercise the `c > 16` fallback on the deterministic valid cubic field
+   `q = 223`, `c = 18`, `w = c^((q-1)/3) = 39`, `w^2 = 183`; `c` is a
+   non-cube because `39 != 1`. Compare the direct and Frobenius paths
    value-for-value and count-for-count on 200 deterministic nonzero inputs.
 3. Run the existing standalone self-test, including planted-log recovery at
    widths 1, 8, and 32.
