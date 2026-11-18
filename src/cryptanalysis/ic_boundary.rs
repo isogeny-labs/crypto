@@ -6960,6 +6960,72 @@ impl CountedGroup for BinaryGroup<'_> {
         ops.doubles += 1;
         self.0.double(p)
     }
+    fn supports_siblings(&self) -> bool {
+        true
+    }
+    fn sibling_pair(
+        &self,
+        _ops: &mut GroupOps,
+        p: FastPoint,
+        j: FastPoint,
+        want_minus: bool,
+    ) -> Option<SiblingPair> {
+        if p.infinity || j.infinity || p.x == j.x {
+            return None;
+        }
+        crate::cryptanalysis::group_op_count::count_adds(1);
+        let f = &self.0.field;
+        let dx = p.x ^ j.x;
+        let inv = f.inv(dx);
+        let lp = f.mul(p.y ^ j.y, inv);
+        let lp2 = f.sqr(lp);
+        let xp = lp2 ^ lp ^ dx ^ self.0.a;
+        let mut out = SiblingPair {
+            key_plus: xp + 1,
+            lambda_plus: lp,
+            key_minus: 0,
+            lambda_minus: 0,
+        };
+        if want_minus {
+            let lm = lp ^ f.mul(j.x, inv);
+            let lm2 = f.sqr(lm);
+            let xm = lm2 ^ lm ^ dx ^ self.0.a;
+            out.key_minus = xm + 1;
+            out.lambda_minus = lm;
+        }
+        Some(out)
+    }
+    fn sibling_lambda(
+        &self,
+        _ops: &mut GroupOps,
+        p: FastPoint,
+        j: FastPoint,
+        minus: bool,
+    ) -> Option<u64> {
+        if p.infinity || j.infinity || p.x == j.x {
+            return None;
+        }
+        let f = &self.0.field;
+        let dx = p.x ^ j.x;
+        let inv = f.inv(dx);
+        let num = if minus { p.y ^ j.x ^ j.y } else { p.y ^ j.y };
+        Some(f.mul(num, inv))
+    }
+    fn sibling_lift(
+        &self,
+        _ops: &mut GroupOps,
+        p: FastPoint,
+        key: u64,
+        lambda: u64,
+    ) -> Option<FastPoint> {
+        if p.infinity || key == 0 {
+            return None;
+        }
+        let x = key - 1;
+        let f = &self.0.field;
+        let y = f.mul(lambda, p.x ^ x) ^ x ^ p.y;
+        Some(FastPoint::affine(x, y))
+    }
     fn neg(&self, p: FastPoint) -> FastPoint {
         self.0.neg(p)
     }
@@ -9558,7 +9624,7 @@ impl KSumTable {
         sib: bool,
     ) -> Result<Self, String> {
         if sib && !g.supports_siblings() {
-            return Err("ksum sib=1 needs a group with x-only siblings (a prime curve)".into());
+            return Err("ksum sib=1 needs a group with x-only siblings".into());
         }
         if !(3..=KSUM_MAX_K).contains(&k) {
             return Err(format!(
