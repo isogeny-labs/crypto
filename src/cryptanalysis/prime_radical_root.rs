@@ -862,6 +862,143 @@ mod tests {
     }
 
 
+    // Frozen pre-reuse coefficient arithmetic, for exact regression comparison.
+    #[inline(never)]
+    fn cubic_coeffs_before(f: Fp, c2: u64, c1: u64, c0: u64, inv3: u64, inv27: u64)
+        -> (u64, u64, u64)
+    {
+        let c2sq = f.sqr(c2);
+        let pp = f.sub(c1, f.mul(c2sq, inv3));
+        let t1 = f.mul(f.mul(c2sq, c2), f.add(inv27, inv27));
+        let t2 = f.mul(f.mul(c1, c2), inv3);
+        (pp, f.add(f.sub(t1, t2), c0), f.mul(c2, inv3))
+    }
+
+    #[inline(never)]
+    fn cubic_coeffs_after(f: Fp, c2: u64, c1: u64, c0: u64, inv3: u64)
+        -> (u64, u64, u64)
+    {
+        let sh = f.mul(c2, inv3);
+        let pp = f.sub(c1, f.mul(c2, sh));
+        let sh3 = f.mul(f.sqr(sh), sh);
+        (pp, f.add(f.sub(f.add(sh3, sh3), f.mul(c1, sh)), c0), sh)
+    }
+
+    #[test]
+    fn cubic_shift_fq2_square_and_small_field_mul_match_reference() {
+        let mut seed = 0xd1da_a200_26fa_0001u64;
+        for &p in &[5u64, 17, 487, 998_244_353, 1_000_000_009, MAX_PRIME] {
+            let f = Fp::new(p);
+            let inv3 = f.inv(3);
+            let inv27 = f.inv(27 % p);
+            let n = (2..p).find(|&z| f.powm(z, (p - 1) / 2) != 1).unwrap();
+            let q = Fq2 { f, n };
+            for _ in 0..4096 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let c2 = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let c1 = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let c0 = seed % p;
+                assert_eq!(cubic_coeffs_before(f,c2,c1,c0,inv3,inv27),
+                           cubic_coeffs_after(f,c2,c1,c0,inv3));
+                assert_eq!(f.mul(c2, c1),
+                           ((c2 as u128 * c1 as u128) % p as u128) as u64);
+                let x = (c2, c1);
+                assert_eq!(q.sqr(x), q.mul(x, x));
+                let mut e = 0x12d5_931f_u128;
+                let (mut acc, mut b) = (q.one(), x);
+                while e > 0 {
+                    if e & 1 == 1 { acc = q.mul(acc,b); }
+                    e >>= 1;
+                    if e > 0 { b = q.mul(b,b); }
+                }
+                assert_eq!(rpow(&q, x, 0x12d5_931f), acc);
+            }
+            if p <= u32::MAX as u64 {
+                assert_eq!(f.mul(p + 1, p + 2),
+                           (((p + 1) as u128 * (p + 2) as u128) % p as u128) as u64);
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired actual Rust microbenchmarks"]
+    fn bench_cubic_shift_fq2_square_and_small_field_mul() {
+        use std::hint::black_box;
+        use std::time::Instant;
+
+        fn timed<T: Copy, F: Fn(T) -> u64>(xs: &[T], reps: usize, op: &F) -> f64 {
+            let mut sink = 0u64;
+            let start = Instant::now();
+            for _ in 0..reps {
+                for &x in xs {
+                    sink ^= op(black_box(x));
+                }
+            }
+            black_box(sink);
+            start.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+        fn paired<T: Copy, F: Fn(T) -> u64, G: Fn(T) -> u64>(
+            label: &str, xs: &[T], reps: usize, before: F, after: G,
+        ) {
+            for &x in xs { assert_eq!(before(x), after(x), "{label} mismatch"); }
+            let (mut b, mut a) = (Vec::new(), Vec::new());
+            for i in 0..13 {
+                if i % 2 == 0 {
+                    b.push(timed(xs, reps, &before));
+                    a.push(timed(xs, reps, &after));
+                } else {
+                    a.push(timed(xs, reps, &after));
+                    b.push(timed(xs, reps, &before));
+                }
+            }
+            b.sort_by(f64::total_cmp);
+            a.sort_by(f64::total_cmp);
+            println!("{label}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                     b[6], a[6], b[6]/a[6]);
+        }
+
+        let mut seed = 0x2026_abcd_1234_ef56u64;
+        for &p in &[487u64, 998_244_353, 1_000_000_009, MAX_PRIME] {
+            let f = Fp::new(p);
+            let inv3 = f.inv(3);
+            let inv27 = f.inv(27 % p);
+            let n = (2..p).find(|&z| f.powm(z, (p-1)/2) != 1).unwrap();
+            let q = Fq2 { f, n };
+            let mut triples = Vec::with_capacity(2048);
+            let mut pairs = Vec::with_capacity(2048);
+            for _ in 0..2048 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let x = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let y = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let z = seed % p;
+                triples.push((x,y,z));
+                pairs.push((x,y));
+            }
+            println!("p={p}, Fp2 nonsquare={n}");
+            paired("cubic shift", &triples, 8,
+                 |(x,y,z)| { let (a,b,c)=cubic_coeffs_before(f,x,y,z,inv3,inv27); a^b^c },
+                 |(x,y,z)| { let (a,b,c)=cubic_coeffs_after(f,x,y,z,inv3); a^b^c });
+            paired("Fq2 square", &pairs, 20,
+                 |x| { let y=q.mul(x,x); y.0^y.1 },
+                 |x| { let y=q.sqr(x); y.0^y.1 });
+            if p <= u32::MAX as u64 {
+                paired("Fp canonical mul", &pairs, 24,
+                     |(x,y)| ((x as u128 * y as u128) % p as u128) as u64,
+                     |(x,y)| f.mul(x,y));
+            }
+        }
+    }
+
     #[inline(never)]
     fn cardano_before(f: Fp, inv2: u64, inv3: u64, inv27: u64,
                       pp: u64, q: u64) -> (u64, u64) {
