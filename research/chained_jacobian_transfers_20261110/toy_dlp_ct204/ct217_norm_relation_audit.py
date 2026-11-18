@@ -184,6 +184,24 @@ def perform():
     raw_rank = rank_mod(relations,R)
     assert raw_rank <= len(witnesses)
 
+    # Offsets are explicit sums of cover points, not independent free
+    # generators. Eliminate them in a second matrix, substituting their
+    # actual support. This prevents inflating a rank deficiency by leaving
+    # artificial offset columns unconstrained.
+    all_points = sorted({pt for _,pts,_,supp in witnesses
+                         for pt in (pts + supp)})
+    full_index = {pt:i for i,pt in enumerate(all_points)}
+    eliminated_rows = []
+    for _,pts,_,support in witnesses:
+        row = [0]*len(all_points)
+        for pt in support:
+            row[full_index[pt]] += 1
+        for pt in pts:
+            row[full_index[pt]] -= 1
+        eliminated_rows.append([v % R for v in row])
+    eliminated_rank = rank_mod(eliminated_rows,R)
+    assert eliminated_rank <= len(witnesses)
+
     # Genuine full-target recovery uses only the public T and explicit elliptic
     # BSGS for every factor-base/offset norm logarithm; cost is NOT amortized away.
     target_scalar = 37  # verification fixture ONLY; solver below never reads it
@@ -240,6 +258,9 @@ def perform():
         'relation_unknowns':len(variables),
         'relation_row_rank_mod_109':raw_rank,
         'relation_nullity':len(variables)-raw_rank,
+        'eliminated_offset_factor_symbols':len(all_points),
+        'eliminated_offset_rank_mod_109':eliminated_rank,
+        'eliminated_offset_nullity':len(all_points)-eliminated_rank,
         'toy_target':list(target),
         'toy_recovered_scalar':recovered,
         'toy_offset':name, 'toy_walk_coefficient':a,
@@ -260,6 +281,7 @@ if __name__=='__main__':
     if args.self_test:
         assert result['toy_recovered_scalar'] == 37
         assert result['relation_nullity'] > 0
+        assert result['eliminated_offset_nullity'] > 0
         assert result['projector_coset_identities_verified'] == 16*R
         assert result['toy_factor_norm_bsgs_ec_additions'] >= result['toy_direct_bsgs_ec_additions']
         print('CT217_SELFTEST_PASS',result['squarefree_split_witnesses'],
