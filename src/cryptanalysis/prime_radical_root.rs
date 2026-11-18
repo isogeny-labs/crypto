@@ -459,6 +459,13 @@ impl<R: Ring> Cube<R> {
         if self.s == 0 {
             return Some(r.pow(a, self.e3));
         }
+        // For v3(|K*|)=1, a is a cube iff (a^e3)^3 == a.
+        // Verify the candidate rather than computing a second full power.
+        // Variable-time public rootfinder inputs only.
+        if self.s == 1 {
+            let x0 = r.pow(a, self.e3);
+            return if r.cube(x0) == a { Some(x0) } else { None };
+        }
         // N = t * 3^s. Reuse a^t for both the cube-residuosity
         // test (a^t)^(3^(s-1)) and the Sylow correction h.
         // Since 3*e3-1 is either t or 2*t, this removes one
@@ -789,6 +796,10 @@ impl RadicalRootCtx {
     /// Distinct roots of monic y^2 + b y + c.
     pub fn quad_monic(&self, b: u64, c: u64) -> Vec<u64> {
         let f = &self.f;
+        // y(y+b)=0 has roots 0 and -b; no Legendre/sqrt needed.
+        if c == 0 {
+            return if b == 0 { vec![0] } else { vec![0, f.neg(b)] };
+        }
         // Four times c needs only two reduced doublings, not a
         // generic base-field multiply (wide remainder on most p).
         let twice_c = f.add(c, c);
@@ -823,6 +834,14 @@ impl RadicalRootCtx {
             roots.sort_unstable();
             roots.dedup();
             return roots;
+        }
+        // ax²+bx = x(ax+b): invert a once, skip the square-root path.
+        if c == 0 {
+            return if b == 0 {
+                vec![0]
+            } else {
+                vec![0, f.mul(f.neg(b), f.inv(a))]
+            };
         }
         // Test b^2-4ac before inverting 2a. For a nonresidue
         // discriminant, skip the expensive modular inversion entirely.
@@ -1017,6 +1036,15 @@ impl RadicalRootCtx {
             let ia = f.inv(a);
             (f.mul(b, ia), f.mul(c, ia), f.mul(d, ia), f.mul(e, ia))
         };
+        // x divides the quartic when e1=0. Solve the cubic cofactor,
+        // bypassing Ferrari's resolvent and the Frobenius fallback.
+        if e1 == 0 {
+            let mut roots = self.cubic_monic(b1, c1, d1);
+            roots.push(0);
+            roots.sort_unstable();
+            roots.dedup();
+            return Ok((roots, false));
+        }
         // x = y - B, B = b1/4
         let (bb, pp, qq, rr) = self.quartic_depressed_coeffs(b1, c1, d1, e1);
         let mut ys: Vec<u64> = vec![];
