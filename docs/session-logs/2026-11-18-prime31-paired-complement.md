@@ -35,3 +35,21 @@
 
 ### Errors
 - Rust E0308 at line ~2004 (corner input type mismatch), to be corrected in next commit.
+
+## 02:34 UTC — Exact 256-Q paired-complement component passes in Rust
+
+### What was done
+- [Source-specific run #44224128962](https://github.com/isogeny-labs/crypto/actions/runs/44224128962): Rust example compiles, 40/40 library tests pass and the 256-Q paired-complement test passes.
+- Source test reports same first-shift hit/miss mask (244 successes, 12 exhaustively rejected), 309443 quotient representatives from 618885 original four-sums, four corner controls and 248 total signed witness replays.
+- In the same interleaved AB/BA test, measured baseline query 1,899,587,307 ns vs paired 1,375,302,415 ns. Extra quotient setup 69,422,344 ns. Original diagnostic multiplications 192,014,281 versus paired 129,033,251; batch inversion windows 61,292 vs 27,645.
+- Original source test passed but workflow's trailing grep gate failed because the quoted shell grep patterns accidentally contained literal backslashes. No test assertion failed.
+
+### Decisions made
+- Fix the YAML grep pattern only (no algorithm, corpus, or outcome change), preserve exact raw result, then integrate paired candidate into the *complete* unknown-log rank/256-Q harness.
+- First component improvement is not a complete ECDLP speed comparison and not an algebraic RR9 attack.
+
+### Open threads
+- Repeat successful workflow gate and full rank/relation/256-target matched comparison.
+
+### Errors
+- Initial corner-test Option type failure fixed. New CI false-negative was a grep quoting error; to be corrected in workflow.
