@@ -1,0 +1,69 @@
+name: Prime31 signed W8 formal support (bounded no-speed claim)
+
+on:
+  push:
+    branches:
+      - automation/prime31-m6-throughput-ceiling-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_signed_formal.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_signed_formal.py
+      - research/prime31_ic_20261115/native/PRIME31_W8_SIGNED_FORMAL_PROTOCOL_20261118.md
+      - .github/workflows/prime31-w8-signed-formal.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_signed_formal.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_signed_formal.py
+      - .github/workflows/prime31-w8-signed-formal.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signed-w8-formal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout experiment branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout pinned original Rust crate
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay experiment only onto original crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_signed_formal.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_w8_signed_formal.rs
+      - name: Existing native Rust library tests
+        run: |
+          cargo +1.100.0 test --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: New signed eight-slot focused Rust tests
+        run: |
+          cargo +1.100.0 test --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_signed_formal
+      - name: Native exact formal count original-curve JSON
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_signed_formal > prime31-w8-signed-formal.json
+          test -s prime31-w8-signed-formal.json
+      - name: Independently recompute and check original-curve replay
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_w8_signed_formal.py \
+             prime31-w8-signed-formal.json
+      - name: Archive producer source record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-signed-w8-formal-support
+          path: prime31-w8-signed-formal.json
+          if-no-files-found: warn
+          retention-days: 30
