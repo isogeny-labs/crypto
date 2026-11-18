@@ -1,0 +1,43 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | inc | 432/432 | 0.355 | 0.458 | 1.388 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | inc-aa | 432/432 | 0.355 | 0.458 | 1.388 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | inc-off | 432/432 | 0.355 | 0.458 | 1.388 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-strong | 432/432 | 4.527 | 4.637 | 5.623 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-v5 | 432/432 | 0.356 | 0.387 | 0.664 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | w1 | 432/432 | 0.350 | 0.436 | 1.211 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | w1-ids | 432/432 | 0.350 | 0.449 | 1.344 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | w1-neg | 432/432 | 0.355 | 0.445 | 1.255 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m29-tm40309-30c52b96 | inc vs inc-aa | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | inc vs inc-off | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | inc vs rho-strong | inc < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | inc vs rho-v5 | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | inc vs w1 | w1 < inc |
+| icv1-f2m29-tm40309-30c52b96 | inc vs w1-ids | w1-ids < inc |
+| icv1-f2m29-tm40309-30c52b96 | inc vs w1-neg | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | inc-aa vs inc-off | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | inc-aa vs rho-strong | inc-aa < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | inc-aa vs rho-v5 | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | inc-aa vs w1 | w1 < inc-aa |
+| icv1-f2m29-tm40309-30c52b96 | inc-aa vs w1-ids | w1-ids < inc-aa |
+| icv1-f2m29-tm40309-30c52b96 | inc-aa vs w1-neg | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | inc-off vs rho-strong | inc-off < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | inc-off vs rho-v5 | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | inc-off vs w1 | w1 < inc-off |
+| icv1-f2m29-tm40309-30c52b96 | inc-off vs w1-ids | w1-ids < inc-off |
+| icv1-f2m29-tm40309-30c52b96 | inc-off vs w1-neg | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | rho-strong vs rho-v5 | rho-v5 < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | rho-strong vs w1 | w1 < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | rho-strong vs w1-ids | w1-ids < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | rho-strong vs w1-neg | w1-neg < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | rho-v5 vs w1 | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | rho-v5 vs w1-ids | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | rho-v5 vs w1-neg | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | w1 vs w1-ids | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | w1 vs w1-neg | w1 < w1-neg |
+| icv1-f2m29-tm40309-30c52b96 | w1-ids vs w1-neg | unresolved inside the band |
