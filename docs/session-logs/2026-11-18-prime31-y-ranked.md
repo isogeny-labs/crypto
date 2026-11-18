@@ -57,3 +57,19 @@
 
 ### Errors
 - No new CI failures. The exact-source Rust and Python checker tests passed in final run; independent signed PCC is a separate outstanding evidence gate.
+
+## 03:35 UTC — Exact matched-corpus contingency and conservative inference
+
+### What was done
+- Parsed frozen final Rust AB transcript and computed first-shift hit contingency (both hit 221, x only 23, y only 11, neither 1), 34 discordant points. Exact two-sided conditional binomial/McNemar tail is `p=0.05761267291381955`. Added this explicitly post hoc to the scientific report, structured summary and PR description.
+- Cross-checked primary literature metadata for PKM 2016, APS 2018 and Yokoyama–Yasuda–Takahashi–Kogure JMC 2020 (DOI 10.1515/jmc-2019-0029); recorded the latter's statistical-assumption qualification for the naive Semaev obstruction.
+
+### Decisions made
+- Restrict the inference to measured **fixed-corpus full-cost loss**. The four CI panel orders are technical repeats on one 256-public-target cohort; they are **not** independent sampling replications. A universal y-base disadvantage is **not** established at a conventional 5% coverage test threshold.
+- No additional generic factor-base tuning without preregistered held-out targets and a real non-generic theory of advantage.
+
+### Open threads
+- Public-only target-conditioned algebraic relation finding and matched full-solver frontier remain in independently owned tasks (#4604, #4596). Parent #4647 must integrate before stacked PR #4652 can be merged.
+
+### Errors
+- None in mathematical replay; inferential correction prevents over-generalization of the measured negative.
