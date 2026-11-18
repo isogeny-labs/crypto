@@ -883,6 +883,171 @@ impl RadicalRootCtx {
 mod tests {
     use super::*;
 
+    // Frozen November 18 Tonelli path (before sharing the t/r exponent).
+    // The production path must match the chosen root, not only the root set.
+    fn sqrt_before_fused(ctx: &RadicalRootCtx, a: u64) -> Option<u64> {
+        let f = &ctx.f;
+        let p = f.p;
+        if a == 0 { return Some(0); }
+        if p % 4 == 3 {
+            let r = f.powm(a, (p + 1) / 4);
+            return if f.sqr(r) == a { Some(r) } else { None };
+        }
+        let mut t = f.powm(a, ctx.t2);
+        let mut legendre = t;
+        for _ in 1..ctx.s2 { legendre = f.sqr(legendre); }
+        if legendre != 1 { return None; }
+        let mut m = ctx.s2;
+        let mut c = ctx.zc;
+        let mut r = f.powm(a, ctx.t2.div_ceil(2));
+        loop {
+            if t == 1 { return Some(r); }
+            let mut i = 0u32;
+            let mut tt = t;
+            while tt != 1 && i < m { tt = f.sqr(tt); i += 1; }
+            if i == m { return None; }
+            let mut b = c;
+            for _ in 0..m - i - 1 { b = f.sqr(b); }
+            m = i;
+            c = f.sqr(b);
+            t = f.mul(t, c);
+            r = f.mul(r, b);
+        }
+    }
+
+    fn quartic_coeffs_before(
+        ctx: &RadicalRootCtx, b: u64, c: u64, d: u64, e: u64,
+    ) -> (u64, u64, u64, u64) {
+        let f = &ctx.f;
+        let bb = f.mul(b, ctx.inv4);
+        let b2 = f.sqr(bb);
+        let pp = f.sub(c, f.mul(6, b2));
+        let b3 = f.mul(b2, bb);
+        let qq = f.add(f.sub(d, f.mul(f.mul(2, bb), c)), f.mul(8, b3));
+        let rr = f.sub(
+            f.add(f.sub(e, f.mul(bb, d)), f.mul(b2, c)),
+            f.mul(3, f.sqr(b2)),
+        );
+        (bb, pp, qq, rr)
+    }
+
+    fn resolvent_before(
+        ctx: &RadicalRootCtx, pp: u64, qq: u64, rr: u64,
+    ) -> (u64, u64, u64) {
+        let f = &ctx.f;
+        (f.mul(2, pp), f.sub(f.sqr(pp), f.mul(4, rr)), f.neg(f.sqr(qq)))
+    }
+
+    #[test]
+    fn fused_tonelli_and_quartic_coefficients_match_frozen() {
+        let mut seed = 0x18a7_26fb_91dc_7e23u64;
+        for &p in &[5u64, 7, 13, 17, 19, 37, 97, 193, 257, 487,
+                    65_537, 998_244_353, 1_000_000_009, 2_013_265_921,
+                    MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let count = if p <= 257 { p as usize } else { 2_048 };
+            for i in 0..count {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let a = if p <= 257 { i as u64 } else { seed % p };
+                assert_eq!(ctx.sqrt(a), sqrt_before_fused(&ctx, a),
+                           "sqrt p={p} a={a}");
+                let b = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let c = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let d = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let e = seed % p;
+                assert_eq!(ctx.quartic_depressed_coeffs(b, c, d, e),
+                           quartic_coeffs_before(&ctx, b, c, d, e),
+                           "quartic depression p={p}");
+                assert_eq!(ctx.quartic_resolvent_coeffs(b, c, d),
+                           resolvent_before(&ctx, b, c, d),
+                           "quartic resolvent p={p}");
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired native Rust benchmark for fused Tonelli and quartic coefficients"]
+    fn bench_fused_tonelli_and_quartic_coefficients() {
+        use std::hint::black_box;
+        use std::time::Instant;
+
+        fn timed<T: Copy, F: Fn(T) -> u64>(xs: &[T], reps: usize, op: &F) -> f64 {
+            let mut hash = 0u64;
+            let start = Instant::now();
+            for _ in 0..reps {
+                for &x in xs {
+                    hash ^= black_box(op(black_box(x)));
+                }
+            }
+            black_box(hash);
+            start.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+        fn paired<T: Copy, F: Fn(T) -> u64, G: Fn(T) -> u64>(
+            label: &str, xs: &[T], reps: usize, before: F, after: G,
+        ) {
+            for &x in xs { assert_eq!(before(x), after(x), "{label} mismatch"); }
+            let (mut b, mut a) = (Vec::new(), Vec::new());
+            for trial in 0..13 {
+                if trial % 2 == 0 {
+                    b.push(timed(xs, reps, &before));
+                    a.push(timed(xs, reps, &after));
+                } else {
+                    a.push(timed(xs, reps, &after));
+                    b.push(timed(xs, reps, &before));
+                }
+            }
+            b.sort_by(f64::total_cmp);
+            a.sort_by(f64::total_cmp);
+            println!("{label}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                     b[6], a[6], b[6] / a[6]);
+        }
+
+        let mut seed = 0x9123_abba_2026_cdefu64;
+        for &p in &[17u64, 97, 998_244_353, 1_000_000_009, 2_013_265_921, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            let mut squares = Vec::new();
+            let mut mixed = Vec::new();
+            let mut coeffs = Vec::new();
+            for _ in 0..2048 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let a = seed % p;
+                squares.push(f.sqr(a));
+                mixed.push(a);
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let b = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let c = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let d = seed % p;
+                coeffs.push((a,b,c,d));
+            }
+            println!("p={p} Tonelli t2={} s2={}", ctx.t2, ctx.s2);
+            for (label, xs) in [("sqrt squares", &squares), ("sqrt mixed", &mixed)] {
+                paired(label, xs, 2,
+                       |a| sqrt_before_fused(&ctx, a).unwrap_or(u64::MAX),
+                       |a| ctx.sqrt(a).unwrap_or(u64::MAX));
+            }
+            paired("quartic depression", &coeffs, 10,
+                   |(b,c,d,e)| { let (x,y,z,w)=quartic_coeffs_before(&ctx,b,c,d,e);x^y^z^w },
+                   |(b,c,d,e)| { let (x,y,z,w)=ctx.quartic_depressed_coeffs(b,c,d,e);x^y^z^w });
+            paired("quartic resolvent", &coeffs, 12,
+                   |(p,q,r,_)| { let (x,y,z)=resolvent_before(&ctx,p,q,r);x^y^z },
+                   |(p,q,r,_)| { let (x,y,z)=ctx.quartic_resolvent_coeffs(p,q,r);x^y^z });
+        }
+    }
+
 
     #[test]
     fn quadratic_direct_discriminant_matches_frozen_normalized_formula() {
