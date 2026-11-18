@@ -1,0 +1,15 @@
+name = "semaev_reassociation_audit"
+version = "0.1.0"
+defaultTargets = ["SemaevReassociationAudit"]
+
+[[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[require]]
+name = "resultant_interchange_audit"
+path = "../../resultant_interchange_audit_20261113/lean"
+
+[[lean_lib]]
+name = "SemaevReassociationAudit"
+roots = ["ActualS3", "Reassociation", "GenericSpecialization", "PrescribedDegree", "CanonicalBridge", "LiteralPolynomial", "S4Cross", "SourceOrder"]

@@ -607,7 +607,9 @@ impl<S: RhoScalar> Wiedemann<S> {
             seed ^= seed << 17;
             seed
         };
-        let m128 = m.to_u128();
+        // This legacy deterministic preconditioner draws at most two words.
+        // A wider modulus is unsupported; never truncate a scalar.
+        let m128 = m.checked_u128()?;
         let d: Vec<S> = (0..r.len())
             .map(|_| {
                 let w = if m128 <= u64::MAX as u128 {

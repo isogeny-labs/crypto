@@ -2,15 +2,20 @@
 
 - **Status:** investigating
 - **Kind:** resource limit; implementation gap; proof gap (separate issues below)
-- **Affected work:** [protocol](../research/conductor_gap_cm_orbits_20261015/PROTOCOL.md), [evidence](../research/conductor_gap_cm_orbits_20261015/REPORT.md)
+- **Affected work:** [protocol](../research/conductor_gap_cm_orbits_20261015/PROTOCOL.md), [evidence](../research/conductor_gap_cm_orbits_20261015/REPORT.md), [2026-10-25 replication](../research/conductor_gap_replication_20261025/REPORT.md)
 - **Next action owner:** conductor-gap research workstream
-- **Last updated:** 2026-10-15
+- **Last updated:** 2026-10-25
 
 ## Problem
 
 One 96-bit rational-family floor is now independently certified. Other upper
 models, the older non-rational-kernel candidate, complete common pricing and
 the Lean CM classification bridges remain open.
+
+The 2026-10-25 replication strengthens bounded generic-rho evidence but
+does not close the algebraic-method or transfer obligations. Its eight
+deep-volcano classes and four separate hard-kernel CM classes do not yet
+combine deep-stratum CM collection with hard-gap target transport.
 
 The rational-torsion family has explicit independently checked floors through
 96 field bits. Its other upper inputs have rigorous prime and kernel certificates,
@@ -55,8 +60,56 @@ homomorphism and order classification are unformalized bridges, listed in
   IC/rho windows with matching resource envelopes and earned isolation.
 - [ ] Formalize the stated CM bridges in a pinned proof environment and attach
   checked proof receipts; arithmetic tests alone do not discharge them.
+- [ ] Emit complete counts for CM action modular arithmetic, twist-kernel
+  square-root search and codomain normalization, then price these together
+  with the reference's native work. A finite band over reported counters
+  does not price missing counters.
+- [ ] Extend CM relation collection beyond the cofactor-one implementation,
+  charging seed projection into the prime subgroup, and certify the actual
+  small-map prerequisites on eligible deep-volcano craters.
+- [ ] Implement and independently compare a prime-field algebraic relation
+  oracle (F4/SAT or another explicit endomorphism-sensitive method) on the
+  same frozen targets with the strongest matched reference. A MITM orbit
+  collector alone does not measure algebraic elimination complexity.
 
 ## Next discriminating step
+
+### Replication evidence, 2026-10-25
+
+**Observed:** All 43,520 main observations and 128 excluded calibration
+observations verify and deterministically replay. Independent C++ checks
+verify every recovered scalar, all 12 class parameter sets, 1,440 rational
+2-isogeny edges and floor completeness. The secondary equal-level rho
+ratio is 0.99943, 95% whole-class interval [0.98606, 1.01455]. All five
+nominal +/-5% rules pass; the simultaneous crater rule is inconclusive.
+These are fixed-cohort counted-work observations, not a population or
+cryptographic-size theorem.
+
+**Exact construction comparison:** All 512 scalar/recurrence and 128
+scalar/direct-map comparisons keep algorithm seeds, recovered scalars,
+queries, relations, ranks and non-base phase counts identical. Generic
+recurrence is available on both endpoints. This separates a factor-base
+construction effect from unknown-scalar recovery and leaves the
+prime-field algebraic-oracle hypothesis untested.
+
+**Missing capability:** Complete CM setup accounting and a cofactor-aware
+prime-field algebraic pipeline remain implementation gaps. The separate B
+fixtures have hard large-conductor kernel fields but no executed cross-gap
+target map. They do not construct the older near-limit candidate's map.
+
+**Next bounded discrimination:** First add counted cofactor projection to
+the CM builder and check scalar/recurrence bases on the existing D=-19/-43
+deep fixtures. Then freeze a separate matched-reference protocol for an
+algebraic oracle and eligible direct maps, with explicit construction and
+transfer costs, independent replay and fixed resource guards. A lower
+complete cold cost would establish a scoped pipeline improvement; identical
+queries with cheaper setup remains a setup result. Censoring or a failed
+control stays inconclusive. No such follow-on measurement is claimed here.
+
+The [report](../research/conductor_gap_replication_20261025/REPORT.md) links
+raw records, pricing bands, failed v1 preparation and all validation sources.
+
+### Earlier upper-floor construction work
 
 The bounded-batch constructor matched all 100 reference codomains. Its first
 95/96-bit attempts hit the recorded 1,800-second or 6-GiB limits. A separate

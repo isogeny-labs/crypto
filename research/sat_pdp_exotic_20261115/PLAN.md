@@ -238,6 +238,19 @@ hardware as not worth a round. GNN branching: `pdp_ml_sat_ceiling_20261027`
 ("the ceiling is real, the signal is not"). Both reopen only if 3.1 or 3.2
 fires.
 
+## 3.7 Status after the first session (2026-11-15, all `[pcc:unverified]` until the rows and validator land)
+
+| item | status | evidence |
+|:--|:--|:--|
+| B0 instrument | built; ℓ = 5, 6 checks clean (0 disagreements, 0 unverified models); protocol frozen at dec928b6; rows ℓ = 7…10 running | `b0/PROTOCOL.md`, `b0/protocol.json`, session log |
+| incumbent | `R₃ ≈ 1.06–1.16` (one conflict per triple) at ℓ = 5, 6, 7 — the survey's reading reproduces | ℓ = 7 check: R₃ 1.062 |
+| repository chain encoder (`chain-p12`) | 15–25× worse than the incumbent at ℓ = 5 (R 160–262): AND-gate products hide the linear structure | ℓ = 5 run |
+| **new solver `lin`** (field-product gates, §3.1-adjacent, built instead of XOR-learning) | `R = 1.20 / 1.46 / 1.27` at ℓ = 5 / 6 / 7 vs incumbent 10.9 / 21.9 / 43.9; 35× fewer conflicts and 11× less wall at ℓ = 7; every verdict matches the oracle | ℓ = 5–7 checks |
+| 3.3 REUSE | plateau `R → 1.00` at ℓ = 6 (from 1.46); learns the root-less pairs; ℓ = 7, 8 running for the falsifier | 64-target runs |
+| 3.2 certificate generalisation | answered negatively by B3 data: no refutation below the pair count in any arm | learnt-width histograms |
+| 3.1 XOR-learning in `sat.rs` | superseded: the product-gate solver realises the linear structure directly; XLIN learning would act on the same residual | — |
+| ceiling | per-target pair count is the floor of any CDCL formulation here (inverse lookup `t ↦ (x₁,x₂)` is not expressible as propagation); the pair table stays 2^ℓ ahead | argument in the session log; to be written in the B0 report |
+
 ## 4. Decision rules for the programme as a whole
 
 1. **Baseline first.** No candidate run starts until B0 is frozen, validated at

@@ -1,0 +1,539 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "s3-hosted-continuation-43501438026",
+  "created": "2026-11-13T20:31:02.777Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "3bd9bdec28e8a27d0c30bdf8a0448185b53f7a1b020f91d950149a754e5ac8ef",
+    "protocol_id": "s3-hosted-continuation-20261113",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "ci",
+    "model": null,
+    "session": "43501438026/1",
+    "role": "executor; export assembled from complete public logs"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "43875b707caedfb7b8175de0961e219a1152bbb3",
+    "dirty": false
+  },
+  "backend": "ephemeral",
+  "host": {
+    "path": "evidence/hosted/rust/host.json",
+    "sha256": "c9e3f5ec386e6a09768312ed81435ed1d06f7a796077e7a35a1fad1c56cbef19",
+    "class_id": "github-hosted-ubuntu-24.04-20261111.370.1",
+    "summary": {
+      "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": "7.0.0-1017-azure",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "cpp-hosted",
+      "role": "reference",
+      "binary_sha256": "612903b2b4246400726eaa66fa8fefafd251fe7b1dc84b33ec8ead28e955502c",
+      "commit": "6925923d8b7eaa76058a98ffc6063b8c8e1eb8bd"
+    },
+    {
+      "id": "rust-hosted",
+      "role": "candidate",
+      "binary_sha256": "597621e63d472e2e34d4839da689270078d55e8d27f6ad4f1023056d1eadd1c9",
+      "commit": "e3658b4d6ffc6839e32bad1f5f732f796a2c8e4d"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "43501438026/132147937956/cpp",
+      "arm": "cpp-hosted",
+      "instance_id": "0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "fields": 6,
+          "models": 942,
+          "tuples": 4188162,
+          "zeros": 244236,
+          "comparison": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "false_zeros": 0,
+          "missing_zeros": 0
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Correctness-only public hosted runner; no isolation or valid clock claim."
+        ]
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Exact known-answer comparators pass; no signed execution verdict."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/hosted/cpp/actual.jsonl",
+          "sha256": "05f17aa398dd686de673ea8d012fa7f3fcf76d88cdef930958ab439d2c5ceab1",
+          "bytes": 1131,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/actual.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/binary.sha256",
+          "sha256": "f5ef2d722371fb1fa491c26a69e660785aaa9fa01de9289a5aefd396d5ca2d78",
+          "bytes": 127,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/build.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/build.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/build.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/comparison.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/comparison.json",
+          "sha256": "1d827d9ee448a6a40588c308dbfb67d32bd24c8a5e6cd0927e330c6b9f069c4a",
+          "bytes": 216,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/comparison.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/compiler.txt",
+          "sha256": "59d1cbef41d4ae78d5063d525b7aa13d18dc0493ea00537efc19b2ee398cb5a8",
+          "bytes": 246,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/run.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/cpp/source.json",
+          "sha256": "155b6c79052d0824bc84bea693226629cd3b6cf761934bd0b63b03976ece150f",
+          "bytes": 673,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "GitHub-hosted ubuntu-24.04",
+      "backend_ref": "https://github.com/isogeny-labs/crypto/actions/runs/43501438026/job/132147937956"
+    },
+    {
+      "run_id": "43501438026/132147937956/rust",
+      "arm": "rust-hosted",
+      "instance_id": "0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "fields": 6,
+          "models": 942,
+          "tuples": 4188162,
+          "zeros": 244236,
+          "comparison": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "false_zeros": 0,
+          "missing_zeros": 0
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Correctness-only public hosted runner; no isolation or valid clock claim."
+        ]
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Exact known-answer comparators pass; no signed execution verdict."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/hosted/rust/actual.jsonl",
+          "sha256": "d0b53b7747be5ba07fe7591547e9d1fd90627c4a1c33dd934bdf87daa5a4a8be",
+          "bytes": 545,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/actual.stderr",
+          "sha256": "f45d807ab9b9e0eb69c93e1f42f058af1068ccd37431c417e7f728621794f4a9",
+          "bytes": 570,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/build.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/build.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/build.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/comparison.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/comparison.json",
+          "sha256": "7c5ddda5ea4783f47f65e5e0fd24b4f9d9a3312e6381d7b8731c6e30ef5747cb",
+          "bytes": 234,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/comparison.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/end-epoch",
+          "sha256": "a5b48236ea6b4c26581a84984348a78569afe24789578b1db2d0c042bebe30a4",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/host.json",
+          "sha256": "c9e3f5ec386e6a09768312ed81435ed1d06f7a796077e7a35a1fad1c56cbef19",
+          "bytes": 632,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/run.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/hosted/rust/start-epoch",
+          "sha256": "e7418e5d8f7bb3351144521d2c281b10c0db11668838e44dea0eede718b155f4",
+          "bytes": 11,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "GitHub-hosted ubuntu-24.04",
+      "backend_ref": "https://github.com/isogeny-labs/crypto/actions/runs/43501438026/job/132147937956"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "254856faa7bb0bbc29ec39e57e273a7ea5f1260b61a3a315e69d2e26d9cf3e99",
+      "bytes": 23370,
+      "kind": "protocol"
+    },
+    {
+      "path": "evidence/hosted/cpp/actual.jsonl",
+      "sha256": "05f17aa398dd686de673ea8d012fa7f3fcf76d88cdef930958ab439d2c5ceab1",
+      "bytes": 1131,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/actual.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/binary.sha256",
+      "sha256": "f5ef2d722371fb1fa491c26a69e660785aaa9fa01de9289a5aefd396d5ca2d78",
+      "bytes": 127,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/build.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/build.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/comparison.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/comparison.json",
+      "sha256": "1d827d9ee448a6a40588c308dbfb67d32bd24c8a5e6cd0927e330c6b9f069c4a",
+      "bytes": 216,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/comparison.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/compiler.txt",
+      "sha256": "59d1cbef41d4ae78d5063d525b7aa13d18dc0493ea00537efc19b2ee398cb5a8",
+      "bytes": 246,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/run.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/cpp/source.json",
+      "sha256": "155b6c79052d0824bc84bea693226629cd3b6cf761934bd0b63b03976ece150f",
+      "bytes": 673,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/event.json",
+      "sha256": "84e4933ccd4e38e9567d5b9f610ca14cde9c7b5e3035de64b6bcbadc0647db0c",
+      "bytes": 463,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/job.log",
+      "sha256": "776fe9323ab7c8e06da7991570c67b015c84f08f807a639e35d9c86d067f5afd",
+      "bytes": 33784,
+      "kind": "log"
+    },
+    {
+      "path": "evidence/hosted/jobs.json",
+      "sha256": "4aa825c0380f6d3ef6c58d6f1a19f53b3618e88cceeb188aa7ece0635d252eaa",
+      "bytes": 1542,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/run.json",
+      "sha256": "2e990315dcbb9183dc7e216a100e703a2781b9517e5e729cb9cb97e8c90d6728",
+      "bytes": 13754,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/actual.jsonl",
+      "sha256": "d0b53b7747be5ba07fe7591547e9d1fd90627c4a1c33dd934bdf87daa5a4a8be",
+      "bytes": 545,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/actual.stderr",
+      "sha256": "f45d807ab9b9e0eb69c93e1f42f058af1068ccd37431c417e7f728621794f4a9",
+      "bytes": 570,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/build.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/build.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/comparison.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/comparison.json",
+      "sha256": "7c5ddda5ea4783f47f65e5e0fd24b4f9d9a3312e6381d7b8731c6e30ef5747cb",
+      "bytes": 234,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/comparison.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/end-epoch",
+      "sha256": "a5b48236ea6b4c26581a84984348a78569afe24789578b1db2d0c042bebe30a4",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/host.json",
+      "sha256": "c9e3f5ec386e6a09768312ed81435ed1d06f7a796077e7a35a1fad1c56cbef19",
+      "bytes": 632,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/run.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/hosted/rust/start-epoch",
+      "sha256": "e7418e5d8f7bb3351144521d2c281b10c0db11668838e44dea0eede718b155f4",
+      "bytes": 11,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "compare-cpp.mjs",
+      "sha256": "2157434ab5c8d71f7281f370387cf228212f1df80534d7c0a183ec58f3fa7ecb",
+      "bytes": 1352,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "evidence/hosted/cpp/comparison.json",
+        "sha256": "1d827d9ee448a6a40588c308dbfb67d32bd24c8a5e6cd0927e330c6b9f069c4a",
+        "bytes": 216,
+        "kind": "analysis"
+      },
+      {
+        "path": "evidence/hosted/rust/comparison.json",
+        "sha256": "7c5ddda5ea4783f47f65e5e0fd24b4f9d9a3312e6381d7b8731c6e30ef5747cb",
+        "bytes": 234,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Two fresh native calls on first main-push run attempt. Original failed manual route remains not completed; no historical executions imported. Per-field records agree in both directions. No clocks used.",
+      "by": "public run43501438026 logs"
+    },
+    {
+      "kind": "observation",
+      "text": "Source.commit is workflow event commit43875b7; CPP instrument commit6925923 is the frozen continuation producer and both arithmetic source checkouts are pinnede3658b4. Exact original source/component pins match. Compiler/runtime/physical host and author independence are not proved; signed execution standing not established.",
+      "by": "public log event/source/host records"
+    },
+    {
+      "kind": "observation",
+      "text": "Timestamped complete public log is retained unchanged. Extracted files remove only timestamp prefixes and one explicit marker separator; extracted byte hashes identify reconstructed files, not remote-file attestation. Per-arm native-only start/end times were not logged; row times null. Rust start/end epochs cover compile plus native and are not used as duration.",
+      "by": "extract-hosted.mjs"
+    }
+  ],
+  "reviews_dir": "reviews",
+  "backend_record": {
+    "run_id": 43501438026,
+    "job_id": 132147937956,
+    "run_attempt": 1,
+    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/43501438026",
+    "event_sha": "43875b707caedfb7b8175de0961e219a1152bbb3",
+    "source_checkout": "e3658b4d6ffc6839e32bad1f5f732f796a2c8e4d",
+    "log_sha256": "776fe9323ab7c8e06da7991570c67b015c84f08f807a639e35d9c86d067f5afd",
+    "paid_spend": 0,
+    "agent_uploads": 0
+  }
+}

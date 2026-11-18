@@ -1,0 +1,14 @@
+digraph method {
+ graph [rankdir=LR,bgcolor="white",fontname="DejaVu Sans",label="Fixed F101 chain · exhaustive geometric7 action · PCCe78426 (unsigned)",labelloc=t];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=12];
+ edge [fontname="DejaVu Sans",fontsize=10];
+ B [label="Each E_i[7] × F_i[7]\n49 × 49 checked points"];
+ A [label="Each Jac(T_i)[7]\n2401 valid / distinct / 7-annihilated"];
+ C [label="Six restricted map directions\n49 kernel / 49 image each"];
+ N [label="Pointwise quintic norms\nH_i K_i = [4] on every input",fillcolor="#e4f2e7"];
+ S [label="Shadows + backtracking\nNondual intersection = identity",fillcolor="#fff0d7"];
+ B -> A [label="raw-fibre pulls + separate Cantor"];
+ A -> C [label="pointwise norms / elliptic maps / pulls"];
+ A -> N;
+ C -> S;
+}

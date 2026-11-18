@@ -1,0 +1,170 @@
+{
+  "flat_oracles": {
+    "out": {
+      "circuits": 96,
+      "assignments": 8064,
+      "value_checks": 96768,
+      "cap_checks": {
+        "work": {
+          "work": 2,
+          "stored_monomials": 3,
+          "needed_nodes": 3,
+          "expanded_nodes": 2,
+          "maximum_degree": 1
+        },
+        "degree": {
+          "work": 1,
+          "stored_monomials": 3,
+          "needed_nodes": 3,
+          "expanded_nodes": 2,
+          "maximum_degree": 1
+        },
+        "monomial": {
+          "work": 2,
+          "stored_monomials": 3,
+          "needed_nodes": 3,
+          "expanded_nodes": 2,
+          "maximum_degree": 1
+        },
+        "storage": {
+          "work": 0,
+          "stored_monomials": 2,
+          "needed_nodes": 1,
+          "expanded_nodes": 0,
+          "maximum_degree": 0
+        },
+        "initialstorage": {
+          "work": 0,
+          "stored_monomials": 1,
+          "needed_nodes": 1,
+          "expanded_nodes": 0,
+          "maximum_degree": 0
+        }
+      },
+      "invalid_cap_checks": 3,
+      "constant_checks": 2,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "flat_profiles": {
+    "out": {
+      "variants": {
+        "1": {
+          "status": "unknown_cap",
+          "reason": "workcap",
+          "seconds": 1.2152489159780089,
+          "stats": {
+            "work": 2083000,
+            "stored_monomials": 644264,
+            "needed_nodes": 3455,
+            "expanded_nodes": 2046,
+            "maximum_degree": 3
+          }
+        },
+        "2": {
+          "status": "unknown_cap",
+          "reason": "workcap",
+          "seconds": 0.5246814319980331,
+          "stats": {
+            "work": 2085297,
+            "stored_monomials": 646561,
+            "needed_nodes": 3775,
+            "expanded_nodes": 2170,
+            "maximum_degree": 3
+          }
+        },
+        "4": {
+          "status": "unknown_cap",
+          "reason": "workcap",
+          "seconds": 0.3613752940145787,
+          "stats": {
+            "work": 2089018,
+            "stored_monomials": 650282,
+            "needed_nodes": 4401,
+            "expanded_nodes": 2385,
+            "maximum_degree": 3
+          }
+        },
+        "8": {
+          "status": "unknown_cap",
+          "reason": "workcap",
+          "seconds": 0.4087606910034083,
+          "stats": {
+            "work": 2097314,
+            "stored_monomials": 658578,
+            "needed_nodes": 5704,
+            "expanded_nodes": 2837,
+            "maximum_degree": 3
+          }
+        }
+      },
+      "actual_value_checks": 0,
+      "original_complete": false,
+      "source_graph_sha256": "256c3b08787e5c1352c6b9518e838c4b9c0791152f94d5c68cc5170d9c5f6768",
+      "source_variables": 47430,
+      "input_bits": 63,
+      "total_seconds": 3.597196869988693
+    },
+    "error": null
+  },
+  "compressed_oracles_profiles": {
+    "out": {
+      "circuits": 48,
+      "small_assignments": 2288,
+      "value_checks": 22880,
+      "polynomial_checks": 480,
+      "cap_checks": 3,
+      "variants": {
+        "1": {
+          "status": "unknown_cap",
+          "reason": "nodecap",
+          "seconds": 0.3938121599785518,
+          "stats": {
+            "nodes": 100000,
+            "cache_entries": 186886,
+            "work": 434746
+          }
+        },
+        "2": {
+          "status": "unknown_cap",
+          "reason": "nodecap",
+          "seconds": 0.3895413580175955,
+          "stats": {
+            "nodes": 100000,
+            "cache_entries": 180803,
+            "work": 420512
+          }
+        },
+        "4": {
+          "status": "unknown_cap",
+          "reason": "nodecap",
+          "seconds": 0.36531045398442075,
+          "stats": {
+            "nodes": 100000,
+            "cache_entries": 176907,
+            "work": 410876
+          }
+        },
+        "8": {
+          "status": "unknown_cap",
+          "reason": "nodecap",
+          "seconds": 0.417386227985844,
+          "stats": {
+            "nodes": 100000,
+            "cache_entries": 166651,
+            "work": 384850
+          }
+        }
+      },
+      "actual_value_checks": 0,
+      "original_complete": false,
+      "source_graph_sha256": "256c3b08787e5c1352c6b9518e838c4b9c0791152f94d5c68cc5170d9c5f6768",
+      "total_seconds": 2.933073180989595
+    },
+    "error": null
+  },
+  "original_complete": false,
+  "qualified_speedup": null,
+  "goal_active": true
+}

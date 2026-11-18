@@ -1,0 +1,79 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T03:42:13Z",
+ "id": "PCC-20261116-77ebba",
+ "kind": "statement",
+ "producer": {
+  "commit": "6e77f73d58d5565dfa7ba3d0d827c53822c003f1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-source-publication-parent-merged-01/actual-remote-heads.txt.xz",
+    "sha256": "df794743702b859ac7f36afd6e72d4ea24124aee135f97dd3269cd2f350ad878"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-source-publication-parent-merged-01/ct189-root-normal-publication-caller01.txt.xz",
+    "sha256": "957bc020bc724167adeb0177e07ab3a15fdd8f30ec3a6bf4402423aa5b16c1ed"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-source-publication-parent-merged-01/ct189-root-source-governance-caller01.txt.xz",
+    "sha256": "3b38102bb00fb74c93ec67cee74673d3c5b5a9990b0ee4a2eb678d41158bc037"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-source-publication-parent-merged-01/entire-absent-old-head-readback.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-source-publication-parent-merged-01/observation.json",
+    "sha256": "3396ce3d8ca522f33827f9dda09c33673c102fcbaddb279c8fc3f991cb9987d1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-source-publication-parent-merged-01/whole-commit-8fa71fc97b880553899ff3b29234ab813e89aab1.txt.xz",
+    "sha256": "9fb4d03971f050a80c36cb8b56dc8d14ed1929e1bf14b08fe7ae7550adbd61f6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-source-publication-parent-merged-01/whole-commit-966648f5414694e1b1c0a0954568f0b586b73367.txt.xz",
+    "sha256": "69ea52fc679f4ca82917f1ed07120e51a08f51e687078f6696c9489669eb255d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-source-publication-parent-merged-01/whole-fetch-8fa71fc97b880553899ff3b29234ab813e89aab1.txt.xz",
+    "sha256": "dd3b4d2f44b8878cca619dafd246f53738f969c9bd2562812628d1c18690b8d3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-source-publication-parent-merged-01/whole-fetch-966648f5414694e1b1c0a0954568f0b586b73367.txt.xz",
+    "sha256": "42b9e0daa4d1a82b7a2c11e0d904deae8e2e8ec91d8c0e343cffd7d9c1702ee2"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Root source6e77/531e88 committed after all positive source checks0 and historical benchrec1 exact, but normal publication refused before any push because old PR4366 was externally merged and its head ref deleted. Public metadata and fetched genuine commits show external empty CI-refresh8fa then merge966648 into the preserved parent branch at02:28:20. Merge966 tree exactly equals oldd3 tree; no source or ledger changes in that external refresh/merge relative to d3. Whole publisher failure and remote Git/API observations retained. Do not restore/rewrite the deleted old branch or manufacture an empty rerun. Integrate genuine external history ordinarily and publish a fresh owned successor/source tag/ready PR with original gates."
+}

@@ -1,0 +1,70 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:36:6: error: unexpected token 'section'; expected '(', ':=', '|' or term
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:36:6: error: Missing cases:
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:34:53: error: unsolved goals
+A B C : Type
+q : A → B
+f : A → C
+hq : ∀ (b : B), ∃ a, q a = b
+hf : ∀ (a b : A), q a = q b → f a = f b
+⊢ ∃ g, (∀ (a : A), g (q a) = f a) ∧ ∀ (h : B → C), (∀ (a : A), h (q a) = f a) → h = g
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:36:14: error: unexpected token ':'; expected command
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:37:29: error: unexpected token ')'; expected command
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:38:32: error: unexpected token ')'; expected command
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:40:22: error: unexpected token '('; expected command
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:43:28: error: unexpected token ')'; expected command
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:68:2: error: `grind` failed
+case grind.1
+H : Type
+inst : IntModule H
+a identity : H
+hc : ∀ (h : H), 4 • h = 0 → h = 0
+hn : 4 • a = 28 • identity
+hz : 4 • (a - 7 • identity) = 0
+hh : a - 7 • identity = 0
+h : ¬a = 7 • identity
+h_1 : 4 • a = 0
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] ∀ (h : H), 4 • h = 0 → h = 0
+    [prop] 4 • a = 28 • identity
+    [prop] 4 • (a - 7 • identity) = 0
+    [prop] a - 7 • identity = 0
+    [prop] ¬a = 7 • identity
+    [prop] 4 • (a - 7 • identity) = 0 → a - 7 • identity = 0
+    [prop] 4 • a = 0 → a = 0
+    [prop] 4 • a = 0
+  [eqc] True propositions
+    [prop] ∀ (h : H), 4 • h = 0 → h = 0
+    [prop] a = 0
+    [prop] 4 • a = 0
+    [prop] 4 • (a - 7 • identity) = 0
+    [prop] a - 7 • identity = 0
+    [prop] 4 • a = 0 → a = 0
+    [prop] 4 • (a - 7 • identity) = 0 → a - 7 • identity = 0
+  [eqc] False propositions
+    [prop] a = 7 • identity
+  [eqc] Equivalence classes
+    [eqc] {a, 0, 4 • a, 4 • (a - 7 • identity), 28 • identity, a - 7 • identity}
+  [cases] Case analyses
+    [cases] [1/2]: 4 • a = 0
+      [cases] source: E-matching `hc`
+  [ematch] E-matching patterns
+    [thm] hc: [@HSMul.hSMul `[Int] `[H] `[H] `[instHSMul] `[4] #1]
+  [linarith] Linarith assignment for `H`
+    [assign] a := 0
+    [assign] identity := 0
+[grind] Diagnostics
+  [ematch] E-matching Diagnostics
+    [thm] Theorem Instance Count
+      [thm] hc ↦ 2
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:78:0: error: Invalid name after `end`: Expected `b`, but found `SevenJacobian`
+'SevenJacobian.support_cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SevenJacobian.matched_pullback_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SevenJacobian.kernel_fiber_constancy' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SevenJacobian.factor_through_surjection' depends on axioms: [sorryAx]
+'SevenJacobian.factor_respects_addition' does not depend on any axioms
+'SevenJacobian.cancel_factor_norm' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'SevenJacobian.recover_norm14_order109' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SevenJacobian.recover_norm28_order109' depends on axioms: [propext, Classical.choice, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0

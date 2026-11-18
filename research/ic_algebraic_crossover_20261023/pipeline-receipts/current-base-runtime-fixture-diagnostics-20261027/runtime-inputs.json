@@ -1,0 +1,960 @@
+{
+  "source": "974f2e9cd46b000021cb20e6a78c3f54063f8882",
+  "paths": [
+    "research/ecbench_all_candidates_20261003/sessions/",
+    "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/",
+    "research/ecbench_bounds_challenges_20261006/",
+    "research/cryptopro_b_chain_sweep_20261006/frozen_inputs/",
+    "tests/fixtures/ecbench/work-v1/",
+    "docs/bounds/records/",
+    "research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl",
+    "docs/ic/LEADERBOARD.md",
+    "docs/ic/leaderboard.json",
+    "research/ecbench_rootfinding_batchtable_20261013/followup/reports/holdout/REPORT.md",
+    "research/ecbench_rootfinding_batchtable_20261013/followup/reports/sweep/REPORT.md",
+    "research/ic_oracle_setup_blocked_20261020/README.md",
+    "research/ic_linalg_pipeline_20261019/README.md",
+    "research/la_engines_20261014/README.md",
+    "research/ecbench_rootfind_engine_20261012/README.md",
+    "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md",
+    "research/ecbench_frobenius_orbit_vs_rho_20261014/README.md",
+    "research/ecbench_frobenius_orbit_vs_rho_20261014/PROTOCOL.md"
+  ],
+  "files": [
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-bsgs-il-v2.json",
+      "blob": "42d0de3cfe5402976b9c17fe50e6c29bfc51197e",
+      "bytes": 9420
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-bsgs-il.json",
+      "blob": "2bd29f9558b9db8060fc7243523febaa692eb9ef",
+      "bytes": 6485
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-bsgs-neg-v2.json",
+      "blob": "132bc450d358e716634669a6b454fe81117cdae5",
+      "bytes": 9382
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-bsgs-neg.json",
+      "blob": "e96df11a6733b6d3ee51d1505443ce50f5af8fa3",
+      "bytes": 6441
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-kangaroo-v2.json",
+      "blob": "48bac0ab884fa7e8535b9b02a3a873232af7f6f9",
+      "bytes": 9460
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-kangaroo.json",
+      "blob": "482c7374a42ee47781f8d21e6826b678c9c23cb1",
+      "bytes": 6491
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-rho-frob-v2.json",
+      "blob": "72f1ac85bc7e1e4c428cc0136b39c57731146d75",
+      "bytes": 9764
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-rho-frob.json",
+      "blob": "d439236d9ee0cb00e87113d5030fccb50860f4a2",
+      "bytes": 6768
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-rho-neg-v2.json",
+      "blob": "a311000855d6ac3946f406398d17b83472a93e89",
+      "bytes": 9724
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-rho-neg.json",
+      "blob": "825f5ebeadd567dbd6f5597e2f6c002a7a6b5c56",
+      "bytes": 6759
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-rho-plain-v2.json",
+      "blob": "6d4b69cd80305482c8d97210d833e1c598f93828",
+      "bytes": 9468
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-medium-rho-plain.json",
+      "blob": "62f377d2478ef06d91e3472f380186027a84c2e4",
+      "bytes": 6645
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-bsgs-il-v2.json",
+      "blob": "8c0f40e67083cdddfb868fbaa612defc8e75b171",
+      "bytes": 9376
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-bsgs-il.json",
+      "blob": "fa7a8c57eaeb62181813594955af3e3b372cd9c9",
+      "bytes": 6440
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-bsgs-neg-v2.json",
+      "blob": "b85a9fbc5c00457990532c5404abca5889a2282b",
+      "bytes": 9338
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-bsgs-neg.json",
+      "blob": "e9e03fe62f626780762e5e129f1a7f7a5f479c43",
+      "bytes": 6392
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-kangaroo-v2.json",
+      "blob": "bd03f352cc89608b737d8101ef477500371cd867",
+      "bytes": 9383
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-kangaroo.json",
+      "blob": "61bb40ce30e30908f87b43fe67254b471199625f",
+      "bytes": 6431
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-rho-frob-v2.json",
+      "blob": "31a6459f491aa1f77d04151ff2f8537f438a9983",
+      "bytes": 9632
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-rho-frob.json",
+      "blob": "6ab5fe112a4ce54426e97063ca78eb506b90fa03",
+      "bytes": 6665
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-rho-neg-v2.json",
+      "blob": "c49c451f6f25aea199da122ae4bbfa20834a8c58",
+      "bytes": 9666
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-rho-neg.json",
+      "blob": "0e2d87eb380fe9e8987843a378558065222863aa",
+      "bytes": 6729
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-rho-plain-v2.json",
+      "blob": "1f23118cb1b8682785e1e5151ce58924507761f0",
+      "bytes": 9393
+    },
+    {
+      "path": "docs/bounds/records/calibration-koblitz-toy-rho-plain.json",
+      "blob": "7c47720be20bfa161cf88ffc9564decd277eca56",
+      "bytes": 6576
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-bsgs-il-v2.json",
+      "blob": "33c92582dd9530649886db8b269be4a64c2fdaa1",
+      "bytes": 14311
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-bsgs-il.json",
+      "blob": "585ae29f4ed0b8199e463cd723839975b1eeec1e",
+      "bytes": 8623
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-bsgs-neg-v2.json",
+      "blob": "5b4b8ca115966e7d061f71b58f24d3ac257aca44",
+      "bytes": 14240
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-bsgs-neg.json",
+      "blob": "1a5459a0347099b91e2fdbb7de5acfa9c4987c5c",
+      "bytes": 8531
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-bsgs-v2.json",
+      "blob": "d296e676ebe482c7be1d52e5e4e8d12265359606",
+      "bytes": 14225
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-bsgs.json",
+      "blob": "b6585d076c115655b28f75f83c2b7ca45b295582",
+      "bytes": 8522
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-kangaroo-v2.json",
+      "blob": "18beefd17eecb7df55f384e48df8e9782e3423b7",
+      "bytes": 14282
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-kangaroo.json",
+      "blob": "05f2b1740e6341dcaea22b667ca7779b121a2643",
+      "bytes": 8557
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-rho-frozen-v2.json",
+      "blob": "62ce2646010bffbb7f7b7e178a0170a5febc3e20",
+      "bytes": 13703
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-rho-frozen.json",
+      "blob": "d96d60e85fe5b7a827cce34642e3c828bf0db0eb",
+      "bytes": 8248
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-rho-neg-v2.json",
+      "blob": "0c1ce792dce8f3275ae8aaaa0d47a7cf996eab2e",
+      "bytes": 14635
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-rho-neg.json",
+      "blob": "d2efa5e4bc785df54a1165fd0209d2c683e6a7de",
+      "bytes": 8909
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-rho-plain-v2.json",
+      "blob": "cd2a79a3f613c026b04f9cd09abbe71f917ec0cf",
+      "bytes": 14276
+    },
+    {
+      "path": "docs/bounds/records/calibration-prime-rho-plain.json",
+      "blob": "78e3c43b1deddc9c66b5dda5e6f993c840b9b4ff",
+      "bytes": 8811
+    },
+    {
+      "path": "docs/bounds/records/challenge-koblitz-toy-reference-e1-rho-signed-frobenius.json",
+      "blob": "d32705b2838cab47322899bb9dbab65954e56787",
+      "bytes": 7271
+    },
+    {
+      "path": "docs/bounds/records/challenge-prime-toy-reference-e1-bsgs-negation.json",
+      "blob": "31c78b6f01f6af4a9a5c8a2abc8d500615502436",
+      "bytes": 6908
+    },
+    {
+      "path": "docs/bounds/records/koblitz-bsgs-il-v2.json",
+      "blob": "33e300700150fa39ef8e7a8457f3c54d4aaa1591",
+      "bytes": 11144
+    },
+    {
+      "path": "docs/bounds/records/koblitz-bsgs-il.json",
+      "blob": "387fcae06a3aebe35c1d0135a83c914954f8c73f",
+      "bytes": 7274
+    },
+    {
+      "path": "docs/bounds/records/koblitz-bsgs-neg-v2.json",
+      "blob": "86b100f294c1dddca74a0bde63089b91aa879eaa",
+      "bytes": 11099
+    },
+    {
+      "path": "docs/bounds/records/koblitz-bsgs-neg.json",
+      "blob": "e7e8f1104e94277425b66c5b7d865ec0f09fd0dc",
+      "bytes": 7206
+    },
+    {
+      "path": "docs/bounds/records/koblitz-bsgs-v2.json",
+      "blob": "4acbc0a27f88a99c4d9661c74bb4639fab906da7",
+      "bytes": 11084
+    },
+    {
+      "path": "docs/bounds/records/koblitz-bsgs.json",
+      "blob": "a00e407c78c5538213c91dfec6f7a3b0b1016f51",
+      "bytes": 7202
+    },
+    {
+      "path": "docs/bounds/records/koblitz-ic-frob-m2-v2.json",
+      "blob": "d152e3a2158d502e1fb4143ef4b32490c929165a",
+      "bytes": 9951
+    },
+    {
+      "path": "docs/bounds/records/koblitz-ic-frob-m2.json",
+      "blob": "1cb56ee6f61047390db9d3242c20e79b2fa252e1",
+      "bytes": 7743
+    },
+    {
+      "path": "docs/bounds/records/koblitz-ic-frob-m3-v2.json",
+      "blob": "d61a8f2816a4b6a3a3ae6a8388989c8de4b53301",
+      "bytes": 9961
+    },
+    {
+      "path": "docs/bounds/records/koblitz-ic-frob-m3.json",
+      "blob": "006426f7aa8923b13b16fe13b448e1203e12fdef",
+      "bytes": 7754
+    },
+    {
+      "path": "docs/bounds/records/koblitz-ic-subtract-v2.json",
+      "blob": "fdf6bb5d0f44e357c466b6ad1cb2def3fe583834",
+      "bytes": 9900
+    },
+    {
+      "path": "docs/bounds/records/koblitz-ic-subtract.json",
+      "blob": "06a7e7ab068e370e073a9c35a0e7e3b448a3576d",
+      "bytes": 7695
+    },
+    {
+      "path": "docs/bounds/records/koblitz-kangaroo-v2.json",
+      "blob": "92e7f9d5f6da5e362923d86198d38e16bc9f3a12",
+      "bytes": 11148
+    },
+    {
+      "path": "docs/bounds/records/koblitz-kangaroo.json",
+      "blob": "fe32e3c2bab750bf1315632fa15ab752c47799e6",
+      "bytes": 7250
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-frob-v2.json",
+      "blob": "16157b39fafd32e669be55b21d0a79bc640d9767",
+      "bytes": 11502
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-frob.json",
+      "blob": "ed2cff1d06923115233fc73c93e7356ca675a4cc",
+      "bytes": 7583
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-frozen-v2.json",
+      "blob": "0af91b4a9771b22fe19978ff34989a43686e4d13",
+      "bytes": 10648
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-frozen.json",
+      "blob": "4ec6dfe12fce28ae4457ea6ef195e606f4c25756",
+      "bytes": 6937
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-neg-v2.json",
+      "blob": "41078c1d21b11e6fdc8ac98b2da2de98a1f43e48",
+      "bytes": 11543
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-neg.json",
+      "blob": "7a97d4c4f4f82405b86c063da8a2a8a2e4151613",
+      "bytes": 7644
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-plain-v2.json",
+      "blob": "56e77633b32c54eb6410e80dd63d789b221ab8c6",
+      "bytes": 11228
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-plain.json",
+      "blob": "5c43b3ff61a4566dc6179507965cd5e19487cef4",
+      "bytes": 7499
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-strong-v2.json",
+      "blob": "12cb1c6ef107de06fee4e47944010bf6cd28f075",
+      "bytes": 11381
+    },
+    {
+      "path": "docs/bounds/records/koblitz-rho-strong.json",
+      "blob": "59215b3489097c9f1550b37f7a197e172180bf8e",
+      "bytes": 7470
+    },
+    {
+      "path": "docs/bounds/records/pair-claw-koblitz-bsgs-neg-v2.json",
+      "blob": "42c52d5f42ff4905fe622aa236c758877f39ed58",
+      "bytes": 14308
+    },
+    {
+      "path": "docs/bounds/records/pair-claw-koblitz-bsgs-neg.json",
+      "blob": "ff78ee87efd6dd236529b54bd20635f501814b72",
+      "bytes": 8603
+    },
+    {
+      "path": "docs/bounds/records/pair-claw-koblitz-claw-c1-v2.json",
+      "blob": "3a4cd5fbee1ec8f641f20eb1136bc8b04c81781d",
+      "bytes": 14985
+    },
+    {
+      "path": "docs/bounds/records/pair-claw-koblitz-claw-c1.json",
+      "blob": "c7449c5c80d8a68907c5e0f8a5a9858e472de7f6",
+      "bytes": 9238
+    },
+    {
+      "path": "docs/bounds/records/pair-claw-koblitz-claw-pr-v2.json",
+      "blob": "0eacff279a7c33aea319155347da17cc60ac174e",
+      "bytes": 14908
+    },
+    {
+      "path": "docs/bounds/records/pair-claw-koblitz-claw-pr.json",
+      "blob": "616153f40fe41ccee27dbc47c35c1eef706a85c2",
+      "bytes": 9203
+    },
+    {
+      "path": "docs/bounds/records/pair-claw-koblitz-rho-strong-v2.json",
+      "blob": "0b9e0aab20b03ce1a112e9a9baf175ac4c97101f",
+      "bytes": 14729
+    },
+    {
+      "path": "docs/bounds/records/pair-claw-koblitz-rho-strong.json",
+      "blob": "3df3efaadb04e31e33601f5b2fabdeb3aa3ddaea",
+      "bytes": 8926
+    },
+    {
+      "path": "docs/bounds/records/prime-bsgs-il-v2.json",
+      "blob": "1a453c91c89bee8c27ce33f1b97ca204e2c6b7a2",
+      "bytes": 11171
+    },
+    {
+      "path": "docs/bounds/records/prime-bsgs-il.json",
+      "blob": "7a6cf476578860da49aa30f8847855b7f778667e",
+      "bytes": 7287
+    },
+    {
+      "path": "docs/bounds/records/prime-bsgs-neg-v2.json",
+      "blob": "9c9b7fc2ba71115eefc5fd67a7fe2aaf1f951dbc",
+      "bytes": 11113
+    },
+    {
+      "path": "docs/bounds/records/prime-bsgs-neg.json",
+      "blob": "14e708c26b1062139b29837cf301a6283f94bb16",
+      "bytes": 7221
+    },
+    {
+      "path": "docs/bounds/records/prime-bsgs-v2.json",
+      "blob": "9cade0f912c5d602ff28d86703bfc2fdbea60f66",
+      "bytes": 11099
+    },
+    {
+      "path": "docs/bounds/records/prime-bsgs.json",
+      "blob": "7e0f48f81dab1b85d930cd8d12084342d5788db6",
+      "bytes": 7208
+    },
+    {
+      "path": "docs/bounds/records/prime-ic-mitm-v2.json",
+      "blob": "abbd98f687187a53af3f3455da1b766e20451f75",
+      "bytes": 10958
+    },
+    {
+      "path": "docs/bounds/records/prime-ic-mitm.json",
+      "blob": "cfac3313c6093edef48f09b4144f201d48ac59b7",
+      "bytes": 7912
+    },
+    {
+      "path": "docs/bounds/records/prime-ic-subtract-v2.json",
+      "blob": "05f780dfc333a0646f1d3f7991421cdffac455f5",
+      "bytes": 10830
+    },
+    {
+      "path": "docs/bounds/records/prime-ic-subtract.json",
+      "blob": "c6bf8097472d07796c77d0260e04307b5b56b344",
+      "bytes": 7793
+    },
+    {
+      "path": "docs/bounds/records/prime-kangaroo-v2.json",
+      "blob": "b12053ca388bd4cc9d31f3e0b42ebe69c01a2259",
+      "bytes": 11162
+    },
+    {
+      "path": "docs/bounds/records/prime-kangaroo.json",
+      "blob": "6144411376530993136de3e3490f0c2fd177d293",
+      "bytes": 7253
+    },
+    {
+      "path": "docs/bounds/records/prime-rho-frozen-v2.json",
+      "blob": "8e84dee65fbf9276f2e9db99663b90cfa7ddbdb5",
+      "bytes": 10661
+    },
+    {
+      "path": "docs/bounds/records/prime-rho-frozen.json",
+      "blob": "af3105dad9a97d40cd46f28a8391f35e78994462",
+      "bytes": 6934
+    },
+    {
+      "path": "docs/bounds/records/prime-rho-neg-v2.json",
+      "blob": "b527116f2cf88de009db3db6ff2aab062e035b03",
+      "bytes": 11501
+    },
+    {
+      "path": "docs/bounds/records/prime-rho-neg.json",
+      "blob": "fb6ff7f957000b02d9472a8ec9fa468c68173baf",
+      "bytes": 7601
+    },
+    {
+      "path": "docs/bounds/records/prime-rho-plain-v2.json",
+      "blob": "7f51fe60b5de11f4225e68ab4f0e7cd42bc7c8b9",
+      "bytes": 11227
+    },
+    {
+      "path": "docs/bounds/records/prime-rho-plain.json",
+      "blob": "5017d931a4a7f7e308134076df641462d8e94145",
+      "bytes": 7496
+    },
+    {
+      "path": "docs/bounds/records/session-koblitz-toy-reference-e1-candidate-v2.json",
+      "blob": "9101393de7c92276ce918c2a7f7b2d63a2c706ba",
+      "bytes": 11438
+    },
+    {
+      "path": "docs/bounds/records/session-koblitz-toy-reference-e1-incumbent-v2.json",
+      "blob": "bc1e48b9fc5b30ed24471ebb206278d52a10f749",
+      "bytes": 11325
+    },
+    {
+      "path": "docs/bounds/records/session-prime-toy-reference-e1-candidate-v2.json",
+      "blob": "ff799acaf712be310ec4bc545933d4182b90218d",
+      "bytes": 11047
+    },
+    {
+      "path": "docs/bounds/records/session-prime-toy-reference-e1-incumbent-v2.json",
+      "blob": "b1c78508cf00c13eba0da4dfc8fbf6372370d341",
+      "bytes": 11431
+    },
+    {
+      "path": "docs/ic/LEADERBOARD.md",
+      "blob": "91e1b3478b3e5a8df1e570a08dd059d7e782be0a",
+      "bytes": 96618
+    },
+    {
+      "path": "docs/ic/leaderboard.json",
+      "blob": "c6ef6e78770903ac57bad184e8d4bf8b66377daa",
+      "bytes": 7252109
+    },
+    {
+      "path": "research/cryptopro_b_chain_sweep_20261006/frozen_inputs/SHA256SUMS",
+      "blob": "8c89e47824345c383057fc7e658fed72e0f489a8",
+      "bytes": 176
+    },
+    {
+      "path": "research/cryptopro_b_chain_sweep_20261006/frozen_inputs/chains.constants.json",
+      "blob": "5c1ee8fb94d174132755d126154c2159359192a6",
+      "bytes": 205232
+    },
+    {
+      "path": "research/cryptopro_b_chain_sweep_20261006/frozen_inputs/chainsweep_model.json",
+      "blob": "903b4d720b7c8b0a28d57a16030f69b23b946d8f",
+      "bytes": 46889
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/comparisons/rho-strong__ic-sub6-mitm.json",
+      "blob": "894ca2138a736fbdb80e0e54b492cc4a0bbdac66",
+      "bytes": 6773
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/comparisons/rho-strong__ic-sub6-subtract.json",
+      "blob": "8febf48c5dfd13a503d161966fea796ff48fcc7c",
+      "bytes": 6797
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/comparisons/rho-strong__ic-sub8-mitm.json",
+      "blob": "d3f3d060ab579776f022f46cc9f507230e529ac1",
+      "bytes": 7088
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/comparisons/rho-strong__ic-sub8-subtract.json",
+      "blob": "4cd0f0c9af13675bd059bb741b5c5ef5e1dad2a9",
+      "bytes": 7100
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/comparisons/rho-strong__rho-frob.json",
+      "blob": "10bb75bd00241f2adb07821fadf34a94cf9c208d",
+      "bytes": 7119
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/comparisons/rho-strong__rho-strong-aa.json",
+      "blob": "09ffa8e61ad7562b0b1880799592e062931958c8",
+      "bytes": 6738
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/host.json",
+      "blob": "e2f507305fc048231abd3f45c2df263d61069bd7",
+      "bytes": 3456
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/plan.json",
+      "blob": "c89ef4df734812b1e364559ed0bf1266184679db",
+      "bytes": 90057
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/records.jsonl",
+      "blob": "f19adf76d725097a8365cbd23c0a68b177d56260",
+      "bytes": 2518689
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/session.json",
+      "blob": "894a9b180a2810e203be7f425ba2c1d7d3588cb7",
+      "bytes": 3276
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/spec.json",
+      "blob": "cfb9677ecba4c595a87748080c65283d8f8722df",
+      "bytes": 2711
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup/host.json",
+      "blob": "8dfe7b0b95e0f48c1a29fd2517e6ee91b041acc5",
+      "bytes": 3456
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup/plan.json",
+      "blob": "0982068faf8b70d64e69dc740391e95a67eeb1e6",
+      "bytes": 90065
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup/records.jsonl",
+      "blob": "7e5bc5a7658179b41f6b5f3f0286531a95428edd",
+      "bytes": 570367
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup/session.json",
+      "blob": "0bfaea8540dd58999f88d909c7950def5e79e025",
+      "bytes": 3305
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz-followup/spec.json",
+      "blob": "54b917ed94a9123fe834a6be547f712ba7520cb7",
+      "bytes": 2098
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__bsgs-il.json",
+      "blob": "c4123dd81bbc4cc2ee9b2bdbb9a0a37f28919a10",
+      "bytes": 12258
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__bsgs-neg.json",
+      "blob": "fc31026af83b2749e3e1e934d0c5d6e7a5b9bed6",
+      "bytes": 12280
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__bsgs.json",
+      "blob": "b4371e8fbaa832fefb4a3533030a99927d3d50ad",
+      "bytes": 12250
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__ic-frob-m2.json",
+      "blob": "d3083f46062053d3b29972a19f0539eb6cb59ff8",
+      "bytes": 11530
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__ic-frob-m3.json",
+      "blob": "f5c57ab08d3ac81524b3b0b64ca305df6d1bd258",
+      "bytes": 11532
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__ic-subtract.json",
+      "blob": "61c2f48e71d37f28c7de872cbb3b9f9372f97b1b",
+      "bytes": 11527
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__kangaroo.json",
+      "blob": "155bd18e729edf9a770238b77bd1b13f11aa497b",
+      "bytes": 12265
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__rho-frob.json",
+      "blob": "b460f91b175214ea5243fcffba3713043d38364e",
+      "bytes": 12293
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__rho-frozen.json",
+      "blob": "d339c2d906a80d643b0d735d598ed877f5c81aa0",
+      "bytes": 12236
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__rho-neg.json",
+      "blob": "d3f90304d13c0be7c46c5406c585319d13dbe47a",
+      "bytes": 12261
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__rho-plain.json",
+      "blob": "6c3bf0a16d732198f44fc1ddd1f2ed4dfbad4eab",
+      "bytes": 12259
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/comparisons/rho-strong__rho-strong-aa.json",
+      "blob": "ae659d236e45a0b4d016a8d68b3cd629d5132195",
+      "bytes": 11574
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/host.json",
+      "blob": "2094e172f901898aade579c617bf7e9a96cbd5cd",
+      "bytes": 3456
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/plan.json",
+      "blob": "bf7a070bd9bddf054d52edb7971a07d8cf91606a",
+      "bytes": 297734
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/records.jsonl",
+      "blob": "2be8ee24c8d38f7004ca8ba4fec347a7e07cdb9e",
+      "bytes": 7246146
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/session.json",
+      "blob": "f4df5edc08f06639f7201cfbbe4000a41492c1fd",
+      "bytes": 3263
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/koblitz/spec.json",
+      "blob": "c3190d8007d992062a0fc17029891c6e3bcecab0",
+      "bytes": 2505
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/comparisons/rho-neg__bsgs-il.json",
+      "blob": "34d49fcde5851616bfe33c5ce6e097f8a3c4132c",
+      "bytes": 12194
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/comparisons/rho-neg__bsgs-neg.json",
+      "blob": "798f7c452582163b4987fc3544e2efaf4c9acf6b",
+      "bytes": 12209
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/comparisons/rho-neg__bsgs.json",
+      "blob": "9ee91ac21db9070943dc4f2697f188671579b91d",
+      "bytes": 12191
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/comparisons/rho-neg__ic-mitm.json",
+      "blob": "1ba668fdee5286d69fdb7eca905bf266b99ea440",
+      "bytes": 12175
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/comparisons/rho-neg__ic-subtract.json",
+      "blob": "d21e9dd37ab8e7103c25c176edb7b6b5f1826ad1",
+      "bytes": 12191
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/comparisons/rho-neg__kangaroo.json",
+      "blob": "fb62d5b1b2ae6bcc8b0bffbd04d2241ebeb249ef",
+      "bytes": 12206
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/comparisons/rho-neg__rho-frozen.json",
+      "blob": "18b364a0369df663d94268e280bcd3675957c323",
+      "bytes": 12195
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/comparisons/rho-neg__rho-neg-aa.json",
+      "blob": "70834c30f27cd479c8a5314ade2068b549019f8c",
+      "bytes": 11519
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/comparisons/rho-neg__rho-plain.json",
+      "blob": "087866bf36dd50fa78f3aeb3b5359cb0df9abb6e",
+      "bytes": 12205
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/host.json",
+      "blob": "f81dcc637a9760edec16be2497f57b24fc699aba",
+      "bytes": 3456
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/plan.json",
+      "blob": "5c2b6f6343d234faa870758e7af5bd239eb58c55",
+      "bytes": 236808
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl",
+      "blob": "641784a764be689aa3ce4088cb4871e9e9972d58",
+      "bytes": 5889468
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/session.json",
+      "blob": "e28760d5303f3c2578d02c56277f4824baeb88ac",
+      "bytes": 3240
+    },
+    {
+      "path": "research/ecbench_all_candidates_20261003/sessions/prime/spec.json",
+      "blob": "77477b060b8af763918bfd8de0a471f3a58ab39a",
+      "bytes": 2080
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/HOST.txt",
+      "blob": "14c4f9edfcc1a5654bc209eb03d2201e4eb741e1",
+      "bytes": 440
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/README.md",
+      "blob": "461c9b6c7f7ae17872de01a253ade39f6344e1c3",
+      "bytes": 14581
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/audit-koblitz-toy-reference-e1.json",
+      "blob": "b291971bb185b417f6f19a6da0bd30ee1491e9fe",
+      "bytes": 37144
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/audit-prime-toy-reference-e1.json",
+      "blob": "e6d925f9dc4126fa9a4f1df4c138bc7f5b7986d2",
+      "bytes": 37144
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/run-koblitz-toy-reference-e1.log",
+      "blob": "444da7b4e09898be5328c7d3d4900171f4655383",
+      "bytes": 150
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/run-prime-toy-reference-e1.log",
+      "blob": "24f8e52c408f3db53631ee914fe390ae7fddb422",
+      "bytes": 148
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/comparisons/incumbent__candidate.json",
+      "blob": "a1ad0dbcf4ee7a3c067c87f721ea6921ff6fcbbe",
+      "bytes": 12256
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/host.json",
+      "blob": "3d5730599519dca9cfeeab2058c0ac093394ab27",
+      "bytes": 3505
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/plan.json",
+      "blob": "4692d2b9ca60b94d01d793b09be9a9b8bb02d96f",
+      "bytes": 95525
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/records.jsonl",
+      "blob": "ce3bbc2ccf47f48597a4a77ec9bdf9c970949c66",
+      "bytes": 1679417
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/session.json",
+      "blob": "71d5c82a4d43c5cf69081ab92599a965981a76df",
+      "bytes": 1930
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/spec.json",
+      "blob": "f5246480fd22116581ef3d9045a1fb20e6ef4ae7",
+      "bytes": 1621
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/comparisons/incumbent__candidate.json",
+      "blob": "f5275172f2c6fc0a677decb55a57649175c3286e",
+      "bytes": 12178
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/host.json",
+      "blob": "1814c7881f51d607499df22e6d6e967705e24b20",
+      "bytes": 3505
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/plan.json",
+      "blob": "26c6caffd874184d8d8adefaddcb6057babf2234",
+      "bytes": 96003
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/records.jsonl",
+      "blob": "a7f7c5bcc6ea084908c0b532f018d73202c1a868",
+      "bytes": 1608782
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/session.json",
+      "blob": "5fb0ab2628851d4f5644b539ab2565daa3bd6294",
+      "bytes": 1908
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/spec.json",
+      "blob": "7ca11736fda70e1b9390f4c145a0227f4818b5ba",
+      "bytes": 1622
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/specs/koblitz-toy-reference-e1.json",
+      "blob": "f5246480fd22116581ef3d9045a1fb20e6ef4ae7",
+      "bytes": 1621
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/specs/prime-toy-reference-e1.json",
+      "blob": "7ca11736fda70e1b9390f4c145a0227f4818b5ba",
+      "bytes": 1622
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/table-koblitz-toy-reference-e1.md",
+      "blob": "c10ed8106f9ac18e6408d860805766bd87ef7de2",
+      "bytes": 2390
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/table-prime-toy-reference-e1.md",
+      "blob": "665cc03ecc26095c601930a74689d96ac2b0ae02",
+      "bytes": 2215
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/verdict-koblitz-toy-reference-e1.json",
+      "blob": "0882487edc769046bbb4712916d48584469fcc21",
+      "bytes": 6841
+    },
+    {
+      "path": "research/ecbench_bounds_challenges_20261006/verdict-prime-toy-reference-e1.json",
+      "blob": "a05ffbd5b491627f281b69fb61d1ec9b4dbc9bd4",
+      "bytes": 6617
+    },
+    {
+      "path": "research/ecbench_frobenius_orbit_vs_rho_20261014/PROTOCOL.md",
+      "blob": "0aab19bc96dcf21fb54f71561eb94933e66cbb9d",
+      "bytes": 8438
+    },
+    {
+      "path": "research/ecbench_frobenius_orbit_vs_rho_20261014/README.md",
+      "blob": "27c657c428938a2cf5f15e5463354c1bd003c80a",
+      "bytes": 13523
+    },
+    {
+      "path": "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/host.json",
+      "blob": "7fe79164549ff803d6da2603e217e01d750f35a8",
+      "bytes": 3540
+    },
+    {
+      "path": "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/plan.json",
+      "blob": "0c39eaa1a18b80134445d9babe6a96c0424e2f4a",
+      "bytes": 79546
+    },
+    {
+      "path": "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl",
+      "blob": "893631dfa9d9355447d41da2ab4b15882c605415",
+      "bytes": 4684301
+    },
+    {
+      "path": "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/session.json",
+      "blob": "53d867a164344308245b68a50dcac0a73c86ddc5",
+      "bytes": 3248
+    },
+    {
+      "path": "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/spec.json",
+      "blob": "9efb58f624118ba9d85f271448171b7622b1fff5",
+      "bytes": 1579
+    },
+    {
+      "path": "research/ecbench_rootfind_engine_20261012/README.md",
+      "blob": "65b2d876a7fa12e5ecefb9b1ae58392f07a2ba94",
+      "bytes": 6103
+    },
+    {
+      "path": "research/ecbench_rootfinding_batchtable_20261013/followup/reports/holdout/REPORT.md",
+      "blob": "e0367bcfffadc1224c5975d7fac5b04f5ef1e27a",
+      "bytes": 1784
+    },
+    {
+      "path": "research/ecbench_rootfinding_batchtable_20261013/followup/reports/sweep/REPORT.md",
+      "blob": "e4adf2c27fb3f1c232dda56e00f5be16b921f546",
+      "bytes": 2627
+    },
+    {
+      "path": "research/ic_linalg_pipeline_20261019/README.md",
+      "blob": "7e48c734401b2ab0853f5585adf0f4be7922b21e",
+      "bytes": 6975
+    },
+    {
+      "path": "research/ic_oracle_setup_blocked_20261020/README.md",
+      "blob": "70ea78b9f74a4a256798fdc09f028bd1c151a679",
+      "bytes": 9071
+    },
+    {
+      "path": "research/la_engines_20261014/README.md",
+      "blob": "7f3da84c15598f9c360e74cb955fe4180221a972",
+      "bytes": 2597
+    },
+    {
+      "path": "research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl",
+      "blob": "a76240f3719cac07db952f9a06c226148ab9952b",
+      "bytes": 127620
+    },
+    {
+      "path": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md",
+      "blob": "9f8e01442b1174e68d113f2e93b7321396dc3e22",
+      "bytes": 186269
+    },
+    {
+      "path": "tests/fixtures/ecbench/work-v1/expected.jsonl",
+      "blob": "bc2628414e437211b824cdedf36a55c568602bfb",
+      "bytes": 4826
+    },
+    {
+      "path": "tests/fixtures/ecbench/work-v1/records.jsonl",
+      "blob": "f472593e221281ce1c09f63005ad0a2abfcbada7",
+      "bytes": 23562
+    }
+  ]
+}

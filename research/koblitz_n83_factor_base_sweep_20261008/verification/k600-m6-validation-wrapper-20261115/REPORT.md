@@ -1,0 +1,7 @@
+# Signal-aware validation receipt wrapper
+
+This is thin Bash orchestration for a future N83 release-library or isolated checkpoint validation attempt. It repairs the missing-exit-record path observed in the storage-censored [attempt 1](../k600-m6-validation-20261115/attempt-1/REPORT.md). It does not run a K600 relation, measure IC runtime, or clear the library gate.
+
+[run-with-receipt.sh](run-with-receipt.sh) takes new absolute log and receipt paths and one command. It writes start/end UTC, wrapper and child exit codes, signal status, log byte count, and log SHA-256. It places the child in a separate process group, handles HUP/INT/TERM, terminates that group, and records `child_exit_code=unknown` when stopped. SIGKILL, host crash, or exhausted receipt storage can still prevent a terminal record; the outer supervisor must retain those as missing receipts.
+
+The committed [controls](controls) ran on Darwin arm64 with Bash 3.2: normal pass returned 0 and recorded child 0; explicit failure returned 7 and recorded child 7; TERM to the wrapper returned 143, recorded `stop_signal=TERM`, and left child exit unknown. `bash -n` and `shellcheck -s bash` passed. The control logs and receipts are preserved byte-for-byte. The full checkpoint test and root release library suite remain unverified after their storage-censored attempts. A new run requires stable storage and a separate source-bound test protocol. No IC performance graph changes from this harness control.

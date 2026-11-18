@@ -203,3 +203,100 @@ ended with the verdict ``neither'': one variant met its generic degree
 window on 32/32 draws, the other fell below it on 8, and the heaviest
 degree-10 Macaulay solves were $2.4\cdot10^5\times2.0\cdot10^5$ matrices at
 42--51 minutes each (\art{research/ic_semiregular_law_20261005/}).
+
+\section{Prime-field encodings at toy size, 15 November}\label{sec:gb-toy15}
+
+A study opened on Stange's division polynomials
+(\art{research/stange_torsion_division_20261113/}) ended with exploratory
+measurements of how a Gröbner decomposition over $\FF_p$ grows with the
+factor base. They are msolve~0.6.5 and Python runs on a shared container,
+not \texttt{bench.record} sessions, with a second reviewer's reruns but no
+validator report; every number is \texttt{[pcc:unverified]}.
+
+\paragraph{Encodings at $m=4$.} On $y^2=x^3+5x+7$ with $p\approx n^3/3$ and
+$n=8$--30, a target is written $R=P_1+P_2+P_3$ through $\Sem4$, with 8
+targets per cell and every Gröbner answer checked against brute force
+(\art{research/stange_torsion_division_20261113/sym_m4/README.md}).
+Symmetrising $\Sem4$ cut the solve time about $2.3$--$2.8\times$ for a dense
+small-$x$ base and for the base $\mu_n$ alike. The base $\mu_n$, which is
+PKM's \S3.3 base~\cite{pkm2016}, gave 3--12 times fewer distinct
+relations, because only about half of $\mu_n$ are abscissae of
+$\FF_p$-points, and no advantage per relation. The split-variable encoding
+of Amadori, Pintore and Sala~\cite{aps2018} (two $\Sem3$ joined by an
+auxiliary variable) was $1.7$--$2.7\times$ slower than $\Sem4$, by a factor
+that grows with $n$. Disjoint partitioned bases, one part per variable, were the cheapest
+Gröbner encoding per relation, about $5$--$8\times$ below the symmetrised
+one and $13$--$20\times$ below plain $\Sem4$, at about one sixth of the
+relations. A hash join of $x(P_1\pm P_2)$ against $x(R\mp P_3)$ returned
+exactly the brute-force relations and beat every Gröbner encoding by two
+to four orders of magnitude.
+
+\paragraph{Growth exponents.} Least-squares slopes of log time on $\log n$
+(Table~\ref{tab:gb-growth}) put every msolve $\Sem4$ arm at a per-target
+exponent $\alpha$ of about $3.9$--$4.7$
+(\art{research/stange_torsion_division_20261113/growth_fit/README.md}). The
+encodings change the constant, not the exponent. The only arm with
+$\alpha\le1$ is the amortised hash join, whose counted cost is exactly
+$2n$ additions per target after an $n^2+n$ pair table; it is generic, and
+its one fitted interval below 1 (wall time over $n=40$--60, three sizes) is
+an artefact of call overhead, since its counted additions are exactly
+linear. Under the study's heuristic model, $k$ points per relation and a
+per-target cost $n^\alpha$ give a total of $p^{2/(k+1-\alpha)}$ for
+$\alpha\le1$ and no gain from a larger base once $\alpha\ge k-1$, which
+every Gröbner arm here meets. The reviewer limited the verdict to the
+encodings tested: each enters the base as a degree-$n$ univariate, so the
+ideal degree grows with $n$ by construction, low-degree composed-map bases
+were not tested, and $n$ is confounded with $p$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llrrl@{}}
+\toprule
+Arm & data & $n$ & $\alpha$ per target & 95\% interval \\
+\midrule
+dense $\Sem4$ & saved & 8--30 & $4.30$ & $[4.12,4.59]$ (sizes) \\
+dense $\Sem4$ & rerun & 8--20 & $4.09$ & $[4.00,4.17]$ (targets) \\
+$\mu_n$, symmetrised & saved & 8--30 & $4.33$ & $[4.03,4.77]$ (sizes) \\
+dense, symmetrised & saved & 8--16 & $3.90$ & OLS $t$ $[3.71,4.09]$ \\
+APS split variable & saved & 8--30 & $4.63$ & $[4.49,4.92]$ (sizes) \\
+partitioned bases & rerun & 16--50 & $4.42$ & $[4.38,4.47]$ (targets) \\
+$m=2$, $\Sem3$ (sympy) & saved & 4--16 & $2.13$ & $[2.05,2.39]$ (sizes) \\
+hash join, additions & rerun & 8--60 & $1.87$ & exact ($n^2+3n$) \\
+amortised hash join, additions & rerun & 8--60 & $1.00$ & exact ($2n$) \\
+\bottomrule
+\end{tabular}
+\caption[]{Per-target growth exponents $\alpha$ (cost $\sim n^\alpha$) of
+prime-field decomposition at toy size: msolve or sympy wall time, or exact
+addition counts for the hash joins; bootstrap over sizes or targets as
+marked. One curve, $p<2^{17}$, $p\approx n^3/3$. Exploratory;
+\texttt{[pcc:unverified]}. Source:
+\art{research/stange_torsion_division_20261113/growth_fit/fit_table.md}.}
+\label{tab:gb-growth}
+\end{table}
+
+\paragraph{End to end, in group operations.} The same study ran the hash
+join as a complete toy index calculus against Pollard rho on prime-order
+curves, three per prime, every logarithm asserted
+(\art{research/stange_torsion_division_20261113/ic_e2e/README.md}). The
+plain form was $7.9$, $10.0$ and $12.9\times$ Brent rho at $p=10{,}007$,
+$100{,}003$ and $1{,}000{,}003$. Storing the $2n$ leftover points per
+target as single large primes brought it to $2.15$--$2.40\times$ a
+store-all negation rho, a constant: its best $n$ is 1--4, so it is a
+two-collision birthday search with an almost empty base. Counted in field
+operations, sharing one inversion between $x(R-F)$ and $x(R+F)$ cut that
+arm by 32--33\%, but a rho given the same shared inversion and batching
+stays ahead: best index calculus over best rho $1.96$ ($I=20M$) and $2.03$
+($I=80M$) at $p=1{,}000{,}003$
+(\art{research/stange_torsion_division_20261113/ic_e2e_pm/README.md}; the
+reviewer notes that uncounted set-up exceeds the counted work at these
+primes). An independent Python Weil-descent decomposer over $\FF_{p^2}$
+(double large primes, $\log_2r=16$--36) was $14$--$27\times$ a store-all
+negation rho with inversions at $3M$ and $11$--$15\times$ at
+$1.5\log_2p\,M$; over $\FF_{p^3}$, with msolve and linear algebra
+uncounted, its lower bound fell from $137$ to $95\times$ over $\log_2r=15$--24
+(\art{research/stange_torsion_division_20261113/ext_field/README.md}). The
+README sets the $\FF_{p^2}$ gap beside the repository's Rust study of
+Gaudry's $k=2$ on $E(\FF_{p^2})$
+(\art{research/blindspots_20261018/01-fp2-gaudry-k2/}), whose best arms
+cost $50$ and $52\times$ the matched negation rho at 40 bits in GAE; the
+units differ. None of these arms beats rho.

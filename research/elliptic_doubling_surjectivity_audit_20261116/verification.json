@@ -1,0 +1,106 @@
+{
+  "schema": "doubling-surjectivity-verification/v1",
+  "source_commit": "dbef61c9457485cf8e39b426613be00957d92ef1",
+  "claim_id": "PCC-20261116-3b1033",
+  "declaration_sha256": "7dfe887cc3949392b6f23eb77a13fa15fff652fa038e8e7806a32654f2175c35",
+  "all_source_and_artifact_pins_match": true,
+  "preservation_entries": 7906,
+  "initial_plans": 57,
+  "formal_source_files": 282,
+  "artifact_pins": 22,
+  "actual_verdict": {
+    "claim_id": "PCC-20261116-3b1033",
+    "claim_sha256": "c2cd602939b872ba3dc4134d43f350dfef74c4f7c6a8794daeb6115afc206920",
+    "commit": "dbef61c9457485cf8e39b426613be00957d92ef1",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/elliptic_doubling_surjectivity_audit_20261116/lean (SurjectiveCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-16T19:51:07Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261116-3b1033",
+    "claim_sha256": "c2cd602939b872ba3dc4134d43f350dfef74c4f7c6a8794daeb6115afc206920",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "known_source_theorem": true,
+  "Scheme_isogeny_API_comparison": false,
+  "corrected_general_factorization_proved": false,
+  "assurance": {
+    "schema": "doubling-surjectivity-preflight/v1",
+    "build_snapshots": 8,
+    "failed_states": [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06"
+    ],
+    "successful_states": [
+      "07",
+      "08"
+    ],
+    "published_preservation_entries": 7860,
+    "additional_dependency_entries": 46,
+    "all_checked_entries": 7906,
+    "frozen_plans": 57,
+    "manifest_packages": 28,
+    "copied_import_modules": 0,
+    "hydration": 0,
+    "lake_update": false,
+    "registered_roots_from01": true,
+    "actual_inverse_fiber_degree_four": true,
+    "actual_closed_field_half_coordinates": true,
+    "actual_denominator_nonzero": true,
+    "actual_point_doubling_all_characteristics_surjective": true,
+    "actual_dyadic_point_surjectivity_all_powers": true,
+    "actual_F5_all_rational_doubles_zero": true,
+    "actual_F5_nonzero_point_no_half": true,
+    "explicit_unguarded_point_surjectivity_reading_false": true,
+    "actual_closed_characteristic_zero_two_three_controls": true,
+    "point_surjectivity_not_function_field_surjectivity": true,
+    "Scheme_isogeny_API_comparison": false,
+    "general_nonzero_multiplication_surjectivity": false,
+    "general_Weil_nondegeneracy_proved": false,
+    "larger_pairing_levels_closed": false,
+    "novelty_claim": false,
+    "qualified_modern_source_refuted": false,
+    "signed_standing": "unverified",
+    "full14complete": false,
+    "paid_compute": 0,
+    "native_experiments": 0,
+    "gate_declarations": 20,
+    "new_modules": 6,
+    "new_concrete_modules": 5,
+    "official_import_bridge_modules": 1,
+    "pinned_custom_source_modules": 222,
+    "actually_imported_custom_modules": 204,
+    "actually_imported_frozen_modules": 198,
+    "additional_frozen_pinned_modules": 18,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "new_source_warnings": 0
+  }
+}

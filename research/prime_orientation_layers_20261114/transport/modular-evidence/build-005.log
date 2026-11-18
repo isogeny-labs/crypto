@@ -1,0 +1,155 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.integer_bivariate_clearing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.Rep.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.geometric_denominator_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actual_geometric_denominator_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.numerator_divisible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.quotientResidue_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.reduceCleared_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.bivariate_coefficient_modular' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_denominator_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.actual_geometric_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+../modular-evidence/draft-005.lean.txt:629:38: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ?a * -?b
+in the target expression
+  -(C (C ↑r.den) * P) = C (C ↑r.den) * -P
+
+P : ℚ[X][X]
+r : Rep P
+⊢ -(C (C ↑r.den) * P) = C (C ↑r.den) * -P
+../modular-evidence/draft-005.lean.txt:646:19: error: Invalid simp theorem: Expected a proposition, but found
+  ℚ → ℕ → ℚ[X]
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+../modular-evidence/draft-005.lean.txt:641:83: error: unsolved goals
+a j : ℕ
+t : ℤ
+d : ℚ
+r : Rep ((C (C (2 ^ j - ↑t)) - C (C (2 ^ (a + 1))) * C X) * C (C (2 ^ j - d)⁻¹)) :=
+  ((Rep.rational (2 ^ j - ↑t)).sub ((Rep.rational (2 ^ (a + 1))).mul Rep.innerX)).mul (Rep.rational (2 ^ j - d)⁻¹)
+⊢ C (C (2 ^ j)) * C (C (-d + 2 ^ j)⁻¹) - C (C ↑t) * C (C (-d + 2 ^ j)⁻¹) -
+      C (C (2 ^ a * 2)) * C X * C (C (-d + 2 ^ j)⁻¹) =
+    C ((OrientationAnchor.factor d j).comp (C ↑t + C (2 ^ a * 2) * X))
+../modular-evidence/draft-005.lean.txt:646:26: warning: This simp argument is unused:
+  mul_comp
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [chart, factor, sub_comp, X_comp, C_comp, map_sub, map_add, map_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-005.lean.txt:646:35: warning: This simp argument is unused:
+  sub_comp
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [chart, factor, mul_comp, X_comp, C_comp, map_sub, map_add, map_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-005.lean.txt:646:44: warning: This simp argument is unused:
+  X_comp
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [chart, factor, mul_comp, sub_comp, C_comp, map_sub, map_add, map_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-005.lean.txt:646:51: warning: This simp argument is unused:
+  C_comp
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [chart, factor, mul_comp, sub_comp, X_comp, map_sub, map_add, map_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-005.lean.txt:646:66: warning: This simp argument is unused:
+  map_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [chart, factor, mul_comp, sub_comp, X_comp, C_comp, map_sub, map_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-005.lean.txt:646:74: warning: This simp argument is unused:
+  map_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [chart, factor, mul_comp, sub_comp, X_comp, C_comp, map_sub, map_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-005.lean.txt:653:28: error: Ambiguous term
+  prod_comp
+Possible interpretations:
+  Finset.prod_comp : ∀ (f : ?m.31 → ?m.32) (g : ?m.30 → ?m.31),
+    ∏ a ∈ ?m.33, f (g a) = ∏ b ∈ image g ?m.33, f b ^ #({a ∈ ?m.33 | g a = b})
+  
+  Polynomial.prod_comp : ∀ (s : Finset ?m.32) (p : ?m.32 → ?m.30[X]) (q : ?m.30[X]),
+    (∏ j ∈ s, p j).comp q = ∏ j ∈ s, (p j).comp q
+../modular-evidence/draft-005.lean.txt:650:42: error: unsolved goals
+S : Finset ℚ
+d : ℚ
+a : ℕ
+t : ℤ
+r : Rep (∏ i ∈ S.erase d, C (chart a t (X - C i))) :=
+  Rep.prod (S.erase d) (fun s => C (chart a t (X - C s))) (chartRootRep a t)
+⊢ ∏ i ∈ S.erase d, C ((X - C i).comp (C ↑t + C (2 ^ (a + 1)) * X)) =
+    C ((∏ t ∈ S.erase d, (X - C t)).comp (C ↑t + C (2 ^ (a + 1)) * X))
+../modular-evidence/draft-005.lean.txt:653:38: warning: This simp argument is unused:
+  map_prod
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [chart, puncture, prod_comp]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-005.lean.txt:660:30: error: Ambiguous term
+  prod_comp
+Possible interpretations:
+  Finset.prod_comp : ∀ (f : ?m.23 → ?m.24) (g : ?m.22 → ?m.23),
+    ∏ a ∈ ?m.25, f (g a) = ∏ b ∈ image g ?m.25, f b ^ #({a ∈ ?m.25 | g a = b})
+  
+  Polynomial.prod_comp : ∀ (s : Finset ?m.24) (p : ?m.24 → ?m.22[X]) (q : ?m.22[X]),
+    (∏ j ∈ s, p j).comp q = ∏ j ∈ s, (p j).comp q
+../modular-evidence/draft-005.lean.txt:656:48: error: unsolved goals
+a u x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+r : Rep (∏ i ∈ mask u x y, C (chart a t (OrientationAnchor.factor (delta x y) i)) ^ m i) :=
+  Rep.prod (mask u x y) (fun j => C (chart a t (OrientationAnchor.factor (delta x y) j)) ^ m j) fun j =>
+    (chartFactorRep a j t (delta x y)).pow (m j)
+⊢ ∏ x_1 ∈ mask u x y, C ((OrientationAnchor.factor (delta x y) x_1).comp (C ↑t + C 2 ^ (a + 1) * X)) ^ m x_1 =
+    C ((∏ j ∈ mask u x y, OrientationAnchor.factor (delta x y) j ^ m j).comp (C ↑t + C 2 ^ (a + 1) * X))
+../modular-evidence/draft-005.lean.txt:660:40: warning: This simp argument is unused:
+  pow_comp
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [chart, correction, prod_comp, map_prod, map_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-005.lean.txt:660:49: warning: This simp argument is unused:
+  map_prod
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [chart, correction, prod_comp, pow_comp, map_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'OrientationCommonDenominator.rowNumeratorRep' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.approximationRep_exact' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

@@ -1,0 +1,11 @@
+{
+ "frozen_before_run": "2026-11-15",
+ "method": "4-summand relation collection (examples/prime_fast_j0_sym.rs summands=4), extension of frozen_sym4_holdout.json to 36 and 38 bits",
+ "tuning": "CSKIP=150; sym4 B: 36b B=44/52/60/68 = 265.6/209.8/224.9/246.1 ms (8 rows), 38b B=60/76/92 = 511.4/477.2/640.2 ms (6 rows); ic_solve c at the chosen B (plain3 seconds, 6 rows each): 36b c=0.35/0.5/0.7/0.9 = 5.03/6.23/5.68/6.45; 38b c=0.35/0.5/0.7/0.9 = 21.36/18.42/17.95/20.89. Rows in sym4_tune36/. The 36-bit best c is on the grid edge (lower c untested).",
+ "frozen_parameters": {"36": {"B4": 52, "baseline_c": 0.35, "B3": 700}, "38": {"B4": 76, "baseline_c": 0.7, "B3": 1100}},
+ "holdout_command": "CSKIP=1300 NOPLAIN2=1 C3=<baseline_c> prime_fast_j0_sym out.jsonl <bits> <B> 8 40 <4 or 3>",
+ "holdout": "CSKIP=1300 (curves never used in tuning, debugging or the exploratory 36-bit run), 8 instances per arm per size, wall clock, one host, no isolation; each row times tuned ic_solve in-row (plain3_ms). The 3-summand arm uses B3 from the p^(1/3) scaling of the earlier tuned B3 and is not tuned at these sizes.",
+ "prediction": "pooled sum(plain3_ms)/sum(sym4_ms) >= 18 (36 bits) and >= 25 (38 bits); all solves verified",
+ "abandon_rule": "any pooled plain3/sym4 < 8 or any failed verification => the claim that the 4-summand advantage over tuned ic_solve grows to 36-38 bits is withdrawn",
+ "known_limits": "6-8 rows, one group per size, no isolation or A/A, baseline c at 36 bits on the grid edge, sym3 arm untuned, rho reference has a fixed overhead of about 2 ms"
+}

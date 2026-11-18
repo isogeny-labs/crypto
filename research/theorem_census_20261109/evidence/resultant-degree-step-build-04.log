@@ -1,0 +1,53 @@
+ResultantDegreeStep.lean:128:9: error(lean.invalidField): Invalid field notation: Type of
+  (quad ?m.203 ?m.204 ?m.205).coeff k
+is not known; cannot resolve field `natDegree`
+
+Hint: Consider replacing the field projection with a call to one of the following:
+  • `natDegree`
+  • `MonicDegreeEq.natDegree`
+ResultantDegreeStep.lean:145:2: error: unsolved goals
+case pos
+R : Type u_1
+inst✝ : CommRing R
+b2 b4 b6 b8 : R
+hq : (X - C X) ^ 2 = quad 1 (-2 * X) (X ^ 2)
+hk2 : ¬1 = 2
+⊢ -(2 * C X * (C X ^ 2).coeff 0).coeff 2 + -(2 * ((C (C X) ^ 2).coeff 0).coeff 1) = -(2 * X) + (C X ^ 2).coeff 1
+ResultantDegreeStep.lean:148:2: error: unsolved goals
+case pos
+R : Type u_1
+inst✝ : CommRing R
+b2 b4 b6 b8 : R
+hq : (X - C X) ^ 2 = quad 1 (-2 * X) (X ^ 2)
+hk2 : ¬0 = 2
+hk1 : ¬0 = 1
+⊢ ((C (C X) ^ 2).coeff 0 * (C X ^ 2).coeff 0).coeff 2 = (C X ^ 2).coeff 0
+ResultantDegreeStep.lean:134:46: error: unsolved goals
+case neg
+R : Type u_1
+inst✝ : CommRing R
+b2 b4 b6 b8 : R
+k : ℕ
+hq : (X - C X) ^ 2 = quad 1 (-2 * X) (X ^ 2)
+hk2 : ¬k = 2
+hk1 : ¬k = 1
+hk0 : ¬k = 0
+⊢ (qbRing (C (C b2)) (C (C b4)) (C (C b6)) (C X) X * X.coeff k).coeff 2 +
+      ((C (qcRing (C (C b4)) (C (C b6)) (C (C b8)) (C X) X)).coeff k).coeff 2 =
+    -(C 2 * C X * X).coeff k + (C X ^ 2).coeff k
+ResultantDegreeStep.lean:150:28: warning: This simp argument is unused:
+  hk1
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [secondLift, quad, hk2, hk0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+ResultantDegreeStep.lean:150:32: warning: This simp argument is unused:
+  hk0
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [secondLift, quad, hk2, hk1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'ResultantDegreeStepAudit.determinant_coeff_column_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResultantDegreeStepAudit.secondLift_coeff_top' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

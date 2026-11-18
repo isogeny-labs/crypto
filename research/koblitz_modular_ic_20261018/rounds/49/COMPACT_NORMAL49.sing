@@ -1,0 +1,49 @@
+LIB "normal.lib";
+LIB "primdec.lib";
+option(redSB);short=0;
+print("COMPACT_NORMAL49_STAGE minimal_primes_begin=true");
+list primes49=minAssGTZ(compactSource49);
+print("COMPACT_NORMAL49_COMPONENT_COUNT "+string(size(primes49)));
+link primeOut49="ASCII:w prime-components49.sing";open(primeOut49);
+write(primeOut49,"ring components49=2,(n,l,b,c),dp;list primes49;");
+int idx49;int gen49;ideal candidate49;int selected49=0;int matches49=0;
+for(idx49=1;idx49<=size(primes49);idx49++){
+ candidate49=primes49[idx49];
+ write(primeOut49,"ideal component49_"+string(idx49)+";");
+ for(gen49=1;gen49<=size(candidate49);gen49++){write(primeOut49,"component49_"+string(idx49)+"["+string(gen49)+"]="+string(candidate49[gen49])+";");}
+ ring probe49=(2,u),(n,l,v),dp;
+ poly rnProbe49=(u+1)*v+1;poly cnProbe49=rnProbe49+u^3;
+ map compactProbe49=compact49,n,l,rnProbe49*cnProbe49/u^7,cnProbe49/u^4;
+ ideal probeIdeal49=compactProbe49(candidate49),v^2+v+u^3+u;
+ int degree49=vdim(std(probeIdeal49));
+ print("COMPACT_NORMAL49_COMPONENT index="+string(idx49)+" generic_degree="+string(degree49));
+ if(degree49==32){setring compact49;matches49++;selected49=idx49;}else{setring compact49;}
+ kill probe49;
+}
+close(primeOut49);
+if(matches49!=1){ERROR("COMPACT_NORMAL49_UNIQUE_DEGREE32_COMPONENT");quit;}
+ideal selectedPrime49=primes49[selected49];ideal selectedStd49=std(selectedPrime49);
+if(size(reduce(compactSource49,selectedStd49))!=0){ERROR("COMPACT_NORMAL49_SOURCE_CONTAINMENT");quit;}
+link selectedOut49="ASCII:w selected-prime49.sing";open(selectedOut49);
+write(selectedOut49,"ring selected49=2,(n,l,b,c),dp;ideal selectedPrime49;ideal originalIdeal49;");
+for(gen49=1;gen49<=size(selectedPrime49);gen49++){write(selectedOut49,"selectedPrime49["+string(gen49)+"]="+string(selectedPrime49[gen49])+";");}
+for(gen49=1;gen49<=size(compactSource49);gen49++){write(selectedOut49,"originalIdeal49["+string(gen49)+"]="+string(compactSource49[gen49])+";");}
+close(selectedOut49);
+print("COMPACT_NORMAL49_STAGE selected_prime_exported=true normalization_begin=true");
+list normalizedOutput49=normalP(selectedPrime49,"withRing");
+if(size(normalizedOutput49[1])!=1){ERROR("COMPACT_NORMAL49_COMPONENT_NOT_ONE");quit;}
+ideal module49=normalizedOutput49[2][1];
+if(reduce(module49[size(module49)],selectedStd49)==0){ERROR("COMPACT_NORMAL49_ZERO_DENOMINATOR");quit;}
+link moduleOut49="ASCII:w fractional-module49.sing";open(moduleOut49);
+write(moduleOut49,"ideal module49;");
+for(gen49=1;gen49<=size(module49);gen49++){write(moduleOut49,"module49["+string(gen49)+"]="+string(module49[gen49])+";");}
+write(moduleOut49,"int delta49="+string(normalizedOutput49[3][2])+";");close(moduleOut49);
+def normalRing49=normalizedOutput49[1][1];setring normalRing49;
+link normalOut49="ASCII:w normalization49.sing";open(normalOut49);
+write(normalOut49,"ring normalized49=2,("+varstr(basering)+"),dp;ideal norid;ideal normap;");
+int entry49;
+for(entry49=1;entry49<=size(norid);entry49++){write(normalOut49,"norid["+string(entry49)+"]="+string(norid[entry49])+";");}
+for(entry49=1;entry49<=size(normap);entry49++){write(normalOut49,"normap["+string(entry49)+"]="+string(normap[entry49])+";");}
+close(normalOut49);
+print("COMPACT_NORMAL49_RESULT normalization_output_computed=true independent_verification_required=true");
+print("COMPACT_NORMAL49_PRODUCER_PASS");quit;

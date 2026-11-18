@@ -1,0 +1,7 @@
+# Independent exact contract review
+
+ADMITTED_COMPONENT_ONLY. Every genuine guarded-chart tuple satisfies J=aS²+BS+C-gammaT-deltaU=0modp, with S=x+y+z,T=xy+xz+yz,U=xyz. Substitution yields C+Bsumx+a sumx²+(2a-gamma)sumxy-deltaxyz overintegers. Exact tensor Bernstein degree(2,2,2)coefficients enclose allrealcube values; integerceil/floor and intersection with the old independently proved interval remain safe. Ten symmetric coefficient classes equal the generic27transform. Source representatives gamma/delta and unshiftedC are retained, so no phase/coupling cancellation is silently changed.
+
+Only already-audited old aggregate exclusions skip Bernstein work. Each formerly unknownu receives every25candidate range; exact resulting mask contains the old mask. Every otherfiber is recovered completely. Each all-hmapping has80unique IDs in deterministic40+40batches; tiny controls45IDs force40+5. Missing/capped/duplicate second batches are rejected and emptybatchoutput is explicit. Independent Fraction/Sturm enumeration and literal norm k replay certify complete conditional ordered unions, including multiplicities/permutations. This is not alloriginalS3/ghost/auxiliary/anchor/hcoverage.
+
+Frozen domain-expansion panel hash534edd6f5cad10dbb5da99bc4b5d2754f18ed6972bd861f3a86f96894eceac5e is checked before use; allfivefields and rows remain present. No favorable field or slowarm is discarded. Priorprime/group setups are reused, not coldreproved. No actualheadroom or benefit is assumed.

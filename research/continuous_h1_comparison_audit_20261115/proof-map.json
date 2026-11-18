@@ -1,0 +1,216 @@
+{
+  "main": "ContinuousH1ComparisonAudit.continuous_h1_comparison_certificate",
+  "binding": "65928939b66df9e96c426f625abbea3493ad127ec27c3bae6ed4cc38c7d8848d",
+  "custom_imports": {
+    "PrincipalBoundaries": "research/continuous_h1_comparison_audit_20261115/lean/PrincipalBoundaries.lean",
+    "HomogeneousCocycles": "research/continuous_h1_comparison_audit_20261115/lean/HomogeneousCocycles.lean",
+    "FiniteQuotients": "research/continuous_h1_comparison_audit_20261115/lean/FiniteQuotients.lean",
+    "CocycleClasses": "research/continuous_h1_comparison_audit_20261115/lean/CocycleClasses.lean",
+    "CanonicalPairing": "research/continuous_h1_comparison_audit_20261115/lean/CanonicalPairing.lean",
+    "GaloisCoefficients": "research/continuous_h1_comparison_audit_20261115/lean/GaloisCoefficients.lean",
+    "PerfectEvaluation": "research/continuous_h1_comparison_audit_20261115/lean/PerfectEvaluation.lean",
+    "FiniteCocycles": "research/continuous_h1_comparison_audit_20261115/lean/FiniteCocycles.lean",
+    "ComplexH1": "research/continuous_h1_comparison_audit_20261115/lean/ComplexH1.lean",
+    "ContinuousH1Certificate": "research/continuous_h1_comparison_audit_20261115/lean/ContinuousH1Certificate.lean",
+    "FieldCharacterRoots": "research/continuous_h1_comparison_audit_20261115/lean/FieldCharacterRoots.lean",
+    "GaloisCharacters": "research/continuous_h1_comparison_audit_20261115/lean/GaloisCharacters.lean",
+    "GaloisGenerator": "research/continuous_h1_comparison_audit_20261115/lean/GaloisGenerator.lean",
+    "GaloisUnits": "research/continuous_h1_comparison_audit_20261115/lean/GaloisUnits.lean",
+    "CharTwoGaloisControl": "research/continuous_h1_comparison_audit_20261115/lean/CharTwoGaloisControl.lean",
+    "PerfectCocyclePairing": "research/continuous_h1_comparison_audit_20261115/lean/PerfectCocyclePairing.lean",
+    "CoinvariantCharacters": "research/continuous_h1_comparison_audit_20261115/lean/CoinvariantCharacters.lean"
+  },
+  "claims": [
+    {
+      "declaration": "ContinuousH1ComparisonAudit.kernelCrossedEquiv",
+      "conclusion": "Actual homogeneous d1 kernel is linearly equivalent to all continuous crossed cocycles."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.boundaries_map_to_all_principals",
+      "conclusion": "Actual d0 image maps onto all principal cocycles."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.actualHomologyKernelQuotient",
+      "conclusion": "Actual categorical homology/kernel quotient via actual kernel/cokernel universal properties."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.actualKernelClass_formula",
+      "conclusion": "Actual categorical homology projection yields the expected quotient representative."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.actualContinuousH1CrossedClasses",
+      "conclusion": "Actual continuousCohomology1 comparison with whole crossed/principal quotient."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.homogeneous_crossed_class_formula",
+      "conclusion": "Actual homogeneous representative formula on actual categorical homology classes."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.coefficient_joint_continuous",
+      "conclusion": "Joint action continuity derived from original continuous Galois action into discrete automorphisms."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.crossed_to_classes_kernel",
+      "conclusion": "Whole old class-map kernel equals all principals."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.actualGaloisH1Equiv",
+      "conclusion": "Actual canonical Galois H1 equals whole original standard class quotient."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.actualGaloisH1CoinvariantEquiv",
+      "conclusion": "Actual finite-coefficient canonical Galois H1 equals actual Frobenius coinvariants."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.actualGaloisH1_representative",
+      "conclusion": "Exact old-class formula on every actual homogeneous kernel representative."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.canonicalLeftDuality",
+      "conclusion": "Actual canonical H1 / Galois-character left perfectness MulEquiv."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.canonicalRightDuality",
+      "conclusion": "Actual canonical H1 / Galois-character right perfectness MulEquiv."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.canonical_homogeneous_formula",
+      "conclusion": "Exact actual source formula chi(F(1,Frob)) in Omega units on homology-projection representatives."
+    },
+    {
+      "declaration": "ContinuousH1ComparisonAudit.canonical_annihilation_guard_needed",
+      "conclusion": "Characteristic2 same actual canonical H1 domain admits no right-nondegenerate bilinear map without annihilation."
+    }
+  ],
+  "reuse": {
+    "copies": [
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/GaloisGenerator.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/GaloisGenerator.lean",
+        "sha256": "a5288bdb05416d3f6c450c5368df741353adc2b8dea41d1f1406a5c9ca6486db",
+        "bytes": 3939,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteQuotients.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/FiniteQuotients.lean",
+        "sha256": "3814a32c42a4a12516889d23e78daf97e009440688d6a861ed63bce3c7025adb",
+        "bytes": 4324,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteCocycles.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/FiniteCocycles.lean",
+        "sha256": "5b1d532721a575ede866588a03fd4d874b344555a24e40d76fe91068ca30c867",
+        "bytes": 5449,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/CocycleClasses.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/CocycleClasses.lean",
+        "sha256": "c321b70efd4c340af8b1a7308471a25539b56736c5e0b8b1de05eabeba262ef7",
+        "bytes": 4491,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/FieldCharacterRoots.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/FieldCharacterRoots.lean",
+        "sha256": "32579d797877c0657c0708ac02b29b7f175d2e6cde9ed57c4dec07483866994b",
+        "bytes": 1459,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/CoinvariantCharacters.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/CoinvariantCharacters.lean",
+        "sha256": "4ad1669833b5b28e8c0ad62a6dec0bf9eb22fe44dd1ca7c9dc8921bdc82a080e",
+        "bytes": 2859,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/PerfectEvaluation.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/PerfectEvaluation.lean",
+        "sha256": "ce8bf9ce8e9a137730b5b4a9feed3543632eb2eb76a4638594303ec8d8ee6faa",
+        "bytes": 3197,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/GaloisUnits.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/GaloisUnits.lean",
+        "sha256": "e6ae41090a9d89a7defaed7dc816b19e4b7aa748ceb5d8e7c393307e4c97ad83",
+        "bytes": 3718,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/GaloisCharacters.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/GaloisCharacters.lean",
+        "sha256": "ae45b926cfb3b38aff8e630ff4ed6a487624b299e4526c2441362ce62b2ddfcb",
+        "bytes": 5156,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/PerfectCocyclePairing.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/PerfectCocyclePairing.lean",
+        "sha256": "39bf43cdbf0a3267319cb508f39a3121de64b20aed009d6b42d8b2e1a36236fc",
+        "bytes": 4885,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/CharTwoGaloisControl.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/CharTwoGaloisControl.lean",
+        "sha256": "70eb368514f9785f149a8ab0cf07d0df6c32eee9c137e5cf417319955d76a376",
+        "bytes": 3510,
+        "byte_identical": true
+      }
+    ],
+    "prior_claim": "PCC-20261115-ed6495",
+    "prior_all_23_pins_match": true,
+    "originals_unchanged": true,
+    "prior_galois_pairing_claim": "PCC-20261115-4711ad",
+    "prior_all_29_pairing_pins_match": true,
+    "copy_count": 11
+  },
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 100,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "inherited_unused_section_advisories": 2,
+    "new_module_advisories": 0,
+    "actual_homology_projection_representative_formula_proved": true,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_all_Gamma_equivariant_Omega_characters": true,
+    "actual_character_descent_derived": true,
+    "actual_all_continuous_cocycle_principal_class_quotient": true,
+    "both_duality_MulEquivs_derived": true,
+    "exact_source_Omega_value_formula_proved": true,
+    "actual_characteristic2_guard_deletion_counterexample": true,
+    "canonical_continuous_complex_H1_comparison_proved": true,
+    "full_isogeny_Tate_pairing_proved": false,
+    "original_FR_read": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T07:09:28Z",
+ "id": "PCC-20261116-756492",
+ "kind": "statement",
+ "producer": {
+  "commit": "53c0d1e08ede752fc82ed3c1b8776be817ffbdb8",
+  "model": "Codex",
+  "session": "native-paper-pullback-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/native/audit-data/006-rust-example-result.json",
+    "sha256": "74de6c8d087d400003913bb5a1e6478f5a43afc23bb6d82c58a739027ec4d288"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/native/audit-data/006-rust-library-result.json",
+    "sha256": "742301a00f3ba355f6db3e9161c57ddd6b8d9db7ce0341ea0c724019fe7cd383"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/native/audit-data/007-edge-result.json",
+    "sha256": "085256a95c43b9f0a97566c20cb05e0b1a0f4181889710ea4f93598112934c8c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/native/SOURCES_v2.sha256",
+    "sha256": "69c838dfe8499c6edbfb20577804e03706c97725f86a6bb01b377066c4645e59"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/native",
+ "statement": "Additional native development observations: source-exact Rust rho adapter three tests pass, full library compile remains blocked by legacy inputs, and the positive characteristic-p auxiliary torsion edge suite passes using the independent arithmetic unchanged. No timing claim."
+}

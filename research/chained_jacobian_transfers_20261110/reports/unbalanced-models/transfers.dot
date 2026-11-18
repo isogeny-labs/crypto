@@ -1,0 +1,12 @@
+digraph transfers {
+  graph [rankdir=LR, bgcolor="white", pad="0.15", nodesep="0.4", ranksep="0.45", fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4f5", color="#49616c", fontname="DejaVu Sans", fontsize=11, margin="0.12,0.12"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#49616c"];
+  c0 [label="C0 / Jac(C0)\nE0 (1,46) × F0 (44,21)\nsource two-graph Gamma0"];
+  c10 [label="C10 / Jac(C10)\n61x⁶ + 8x⁴ + 93x² + 89\nE1 (26,58) × F0\nactual Gamma21", fillcolor="#e5f2e8"];
+  c20 [label="C20 / Jac(C20)\n18x⁶ + 75x⁴ + 45x² + 40\nE2 (59,27) × F0\nactual Gamma6", fillcolor="#e5f2e8"];
+  c0 -> c10 [label="(alpha,id)\ndegree 7\nwritten quotient map", style=dashed];
+  c10 -> c20 [label="(alpha2,id)\ndegree 7\nwritten quotient map", style=dashed];
+  legend [shape=note, fillcolor="#fff6df", label="Solid boxes: actual model / cover / graph checks\nDashed arrows: global written maps; whole evaluation pending\nFull suite 34 · all 622 source hashes unchanged\nUnsigned PCC 925b02 / 128eb1", fontsize=10];
+  {rank=same;c10;legend;}
+}

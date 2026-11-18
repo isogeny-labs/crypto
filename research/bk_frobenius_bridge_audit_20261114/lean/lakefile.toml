@@ -1,0 +1,19 @@
+name = "bk_frobenius_bridge_audit"
+version = "0.1.0"
+defaultTargets = ["BKFrobeniusBridgeAudit"]
+
+[[require]]
+name = "three_torsion_rank_audit"
+path = "../../three_torsion_rank_audit_20261114/lean"
+
+[[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[require]]
+name = "bk_linear_audit"
+path = "../../bk_linear_audit_20261113/lean"
+
+[[lean_lib]]
+name = "BKFrobeniusBridgeAudit"
+roots = ["ActualFrobenius", "ActualMatrix", "ActualCriterion", "BinaryFrobenius", "FrobeniusCertificate"]

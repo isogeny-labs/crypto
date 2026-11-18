@@ -1,0 +1,13 @@
+# Orbit incidence algebra qualified
+
+[pcc:unverified] Freeze f71d88998c3 pushed before the once-only run; input hashes passed; exit0. 181408 exhaustive scalar coefficient cases over F11/F31 and 65210 polynomial-coefficient comparisons over the original12 genus-two target fixtures passed. Original16anchor sequence and both signs retained; degree-one anchors skipped exactly as declared. Full records in CONTROL.txt.
+
+There were920 base-point zero products,63400 degree-five products and61660 products with five distinct finite pencil parameters. These counts include repeated enumeration of members of the same orbit; they count checked input products, not independent orbits, relations or samples. They demonstrate both the nondegenerate case and a real base-point hazard. No point was selected based on a desired result.
+
+DERIVATION.md proves the explicit norm identity by Newton recurrence and gives the function-field argument that the pencil parameter has trivial rotation stabilizer for n=2g+1. It therefore has degree n over rotation invariants. This reasoning applies to smooth binomial models with rational rotation in genera2/3/4, including composite n9; the finite coefficient checks cover genus2 only and do not certify the proof generally.
+
+Decision: reject replacing an orbit by one rational pencil parameter. Retain the norm as an exact implicit representation, with mandatory fixed-base-point factor removal. This is an algebra qualification, not a runtime gain or a new complexity exponent.
+
+Next discriminating cost case: for each anchor, remove fixed factors and form signed orbit polynomials N_i(T). A product P=product_i N_i contains a repeated root precisely when at least two retained incidence factors give the same parameter (including within-orbit collisions). gcd(P,P') detects repeated factors, but root extraction, sign/phase lifting and rejecting repeated copies of a fixed base point must be charged. Incremental gcd(P_old,N_new) plus gcd(N_new,N_new') is a possible update interface; using P_old as a giant polynomial can dominate costs. It must compete against explicit parameter generation with batch inversion and persistent buckets, including their cheaper incremental update, not against repeated full rescans alone. No performance implementation is admitted without this complete construction/update/lifting cost case. This sets a falsifier rather than claiming polynomial compression is an acceleration.
+
+Sources and KB receipt in DERIVATION.md; shared-native finite checks and producer proof remain independently unreviewed. Original genus2+10x goal stays open. Git custody; no S3/cloud/retry.

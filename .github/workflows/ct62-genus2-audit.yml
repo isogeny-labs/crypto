@@ -8,6 +8,7 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct62/**'
       - '.github/workflows/ct62-genus2-audit.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct62/**'
       - '.github/workflows/ct62-genus2-audit.yml'
@@ -18,6 +19,7 @@ permissions:
 
 jobs:
   ct62-finite-arithmetic:
+    if: ${{ !github.event.pull_request.draft }}
     name: CT62 exact F2/F4 arithmetic and independent Cantor audit
     runs-on: ubuntu-latest
     timeout-minutes: 5

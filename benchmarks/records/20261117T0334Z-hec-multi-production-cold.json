@@ -1,0 +1,854 @@
+{
+  "schema": "bench.record/v1",
+  "id": "20261117T0334Z-hec-multi-production-cold",
+  "slug": "hec-multi-production-cold",
+  "problem": "ic:hec-standard-input-multi-orbit",
+  "curve_uid": null,
+  "repo": "crypto",
+  "created_utc": "2026-11-17T03:35:28Z",
+  "closed_utc": "2026-11-17T03:45:36Z",
+  "status": "measured",
+  "commit": "714fa3e242b2f1571c9101c029d81eb5c8d0599e",
+  "commit_dirty": false,
+  "branch": "research/hec-git-custody-20261116",
+  "host": {
+    "cpu": "Apple M4 Pro",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "platform": "macOS 27.2 arm64",
+    "isolation": "L0 shared, no exclusive core or frequency guarantee"
+  },
+  "entries": [
+
+  ],
+  "commands": [
+    "research/hec_residual_span_20261116/production-cost/run.sh",
+    "Rust frozen summarize.rs over CONTROL.tsv"
+  ],
+  "raw": [
+    {
+      "path": "research/hec_residual_span_20261116/production-cost/CONTROL.tsv",
+      "sha256": "549562c8c6255f76f861efc950a4bcfe18077df965b866cbd6bf8d07f1dbe24f",
+      "bytes": 234792,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/production-cost/CONTROL.stderr",
+      "sha256": "e08f256de8b96a06dd147019c1d59c3a865c0e34249c977344cc4a6c7236b368",
+      "bytes": 8008,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/production-cost/FIXTURES.tsv",
+      "sha256": "fd994738c55ce90a878d02de7f69f58a20337cdef9fd61bcb47f14b8c0d63ec8",
+      "bytes": 235,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/production-cost/WORKLOADS.tsv",
+      "sha256": "612350f4d56fadd09c6281af7dcef627a342ce68be08d967b452695c34156510",
+      "bytes": 506,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/production-cost/SUMMARY.tsv",
+      "sha256": "bf80fcddfa919d93d082c1997c29df005d89082c4baf01ce7fb223e079f3600e",
+      "bytes": 4955,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/production-cost/SUMMARY.stderr",
+      "sha256": "670b3ed32b83247af43714fd8535ce83725e69eae8af2e298215ce252e94bf46",
+      "bytes": 2660,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/production-cost/EXIT.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/production-cost/RUN.txt",
+      "sha256": "61445a586c339aaf2ba0d86a98733dfb370c1b88eaa826641fda55d1dc0d31ed",
+      "bytes": 182,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/production-cost/OUTPUT.sha256",
+      "sha256": "cfa729aa879fcd9aa7b4b276a4a92dc60a675225e137cf93869104277c51fff9",
+      "bytes": 779,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    }
+  ],
+  "metrics": [
+    {
+      "workload": 0,
+      "arm": "folded",
+      "median_batch_ns": 59044.312,
+      "min_batch_ns": 56854.125,
+      "max_batch_ns": 64250.0,
+      "spread": 1.130085
+    },
+    {
+      "workload": 0,
+      "arm": "expanded",
+      "median_batch_ns": 96854.188,
+      "min_batch_ns": 87789.062,
+      "max_batch_ns": 101411.375,
+      "spread": 1.155171
+    },
+    {
+      "workload": 0,
+      "arm": "plain_prefix",
+      "median_batch_ns": 677382.875,
+      "min_batch_ns": 626666.812,
+      "max_batch_ns": 727656.312,
+      "spread": 1.161153
+    },
+    {
+      "workload": 0,
+      "arm": "native",
+      "median_batch_ns": 154958.312,
+      "min_batch_ns": 142817.75,
+      "max_batch_ns": 170411.5,
+      "spread": 1.19321
+    },
+    {
+      "workload": 0,
+      "arm": "native_aa",
+      "median_batch_ns": 145666.688,
+      "min_batch_ns": 134169.312,
+      "max_batch_ns": 154974.062,
+      "spread": 1.155063
+    },
+    {
+      "workload": 1,
+      "arm": "folded",
+      "median_batch_ns": 59549.438,
+      "min_batch_ns": 57583.25,
+      "max_batch_ns": 64968.562,
+      "spread": 1.128255
+    },
+    {
+      "workload": 1,
+      "arm": "expanded",
+      "median_batch_ns": 92825.438,
+      "min_batch_ns": 87398.562,
+      "max_batch_ns": 95195.438,
+      "spread": 1.089211
+    },
+    {
+      "workload": 1,
+      "arm": "plain_prefix",
+      "median_batch_ns": 604137.938,
+      "min_batch_ns": 538531.312,
+      "max_batch_ns": 639338.5,
+      "spread": 1.187189
+    },
+    {
+      "workload": 1,
+      "arm": "native",
+      "median_batch_ns": 131658.875,
+      "min_batch_ns": 126458.062,
+      "max_batch_ns": 138171.875,
+      "spread": 1.09263
+    },
+    {
+      "workload": 1,
+      "arm": "native_aa",
+      "median_batch_ns": 123489.438,
+      "min_batch_ns": 121450.438,
+      "max_batch_ns": 134588.562,
+      "spread": 1.108177
+    },
+    {
+      "workload": 2,
+      "arm": "folded",
+      "median_batch_ns": 66541.625,
+      "min_batch_ns": 62385.375,
+      "max_batch_ns": 67883.0,
+      "spread": 1.088124
+    },
+    {
+      "workload": 2,
+      "arm": "expanded",
+      "median_batch_ns": 99575.625,
+      "min_batch_ns": 90341.25,
+      "max_batch_ns": 103174.5,
+      "spread": 1.142053
+    },
+    {
+      "workload": 2,
+      "arm": "plain_prefix",
+      "median_batch_ns": 642158.75,
+      "min_batch_ns": 554611.938,
+      "max_batch_ns": 655419.312,
+      "spread": 1.181762
+    },
+    {
+      "workload": 2,
+      "arm": "native",
+      "median_batch_ns": 167252.562,
+      "min_batch_ns": 151330.625,
+      "max_batch_ns": 169229.312,
+      "spread": 1.118275
+    },
+    {
+      "workload": 2,
+      "arm": "native_aa",
+      "median_batch_ns": 157031.25,
+      "min_batch_ns": 152362.062,
+      "max_batch_ns": 164809.938,
+      "spread": 1.081699
+    },
+    {
+      "workload": 3,
+      "arm": "folded",
+      "median_batch_ns": 54869.75,
+      "min_batch_ns": 52666.75,
+      "max_batch_ns": 55562.438,
+      "spread": 1.054981
+    },
+    {
+      "workload": 3,
+      "arm": "expanded",
+      "median_batch_ns": 95593.938,
+      "min_batch_ns": 83518.188,
+      "max_batch_ns": 97471.438,
+      "spread": 1.167068
+    },
+    {
+      "workload": 3,
+      "arm": "plain_prefix",
+      "median_batch_ns": 651661.5,
+      "min_batch_ns": 606987.125,
+      "max_batch_ns": 662112.125,
+      "spread": 1.090817
+    },
+    {
+      "workload": 3,
+      "arm": "native",
+      "median_batch_ns": 161244.75,
+      "min_batch_ns": 149158.875,
+      "max_batch_ns": 165679.75,
+      "spread": 1.11076
+    },
+    {
+      "workload": 3,
+      "arm": "native_aa",
+      "median_batch_ns": 152830.688,
+      "min_batch_ns": 142463.625,
+      "max_batch_ns": 155737.125,
+      "spread": 1.093171
+    },
+    {
+      "workload": 4,
+      "arm": "folded",
+      "median_batch_ns": 65518.375,
+      "min_batch_ns": 64669.188,
+      "max_batch_ns": 67953.25,
+      "spread": 1.050782
+    },
+    {
+      "workload": 4,
+      "arm": "expanded",
+      "median_batch_ns": 101562.562,
+      "min_batch_ns": 96755.188,
+      "max_batch_ns": 103054.688,
+      "spread": 1.065108
+    },
+    {
+      "workload": 4,
+      "arm": "plain_prefix",
+      "median_batch_ns": 718432.25,
+      "min_batch_ns": 658153.562,
+      "max_batch_ns": 740679.625,
+      "spread": 1.12539
+    },
+    {
+      "workload": 4,
+      "arm": "native",
+      "median_batch_ns": 157132.875,
+      "min_batch_ns": 152513.0,
+      "max_batch_ns": 163414.062,
+      "spread": 1.071476
+    },
+    {
+      "workload": 4,
+      "arm": "native_aa",
+      "median_batch_ns": 150533.812,
+      "min_batch_ns": 145109.5,
+      "max_batch_ns": 153062.438,
+      "spread": 1.054806
+    },
+    {
+      "workload": 5,
+      "arm": "folded",
+      "median_batch_ns": 54317.875,
+      "min_batch_ns": 49945.375,
+      "max_batch_ns": 57369.938,
+      "spread": 1.148654
+    },
+    {
+      "workload": 5,
+      "arm": "expanded",
+      "median_batch_ns": 80898.25,
+      "min_batch_ns": 75848.812,
+      "max_batch_ns": 83354.125,
+      "spread": 1.098951
+    },
+    {
+      "workload": 5,
+      "arm": "plain_prefix",
+      "median_batch_ns": 340549.438,
+      "min_batch_ns": 320651.062,
+      "max_batch_ns": 373578.125,
+      "spread": 1.165061
+    },
+    {
+      "workload": 5,
+      "arm": "native",
+      "median_batch_ns": 130143.125,
+      "min_batch_ns": 125273.438,
+      "max_batch_ns": 138231.688,
+      "spread": 1.10344
+    },
+    {
+      "workload": 5,
+      "arm": "native_aa",
+      "median_batch_ns": 126039.125,
+      "min_batch_ns": 122013.0,
+      "max_batch_ns": 134059.938,
+      "spread": 1.098735
+    },
+    {
+      "workload": 6,
+      "arm": "folded",
+      "median_batch_ns": 182164.062,
+      "min_batch_ns": 180411.5,
+      "max_batch_ns": 187232.0,
+      "spread": 1.037805
+    },
+    {
+      "workload": 6,
+      "arm": "expanded",
+      "median_batch_ns": 225916.812,
+      "min_batch_ns": 220937.5,
+      "max_batch_ns": 229216.125,
+      "spread": 1.03747
+    },
+    {
+      "workload": 6,
+      "arm": "plain_prefix",
+      "median_batch_ns": 2255385.5,
+      "min_batch_ns": 2206291.562,
+      "max_batch_ns": 2267135.25,
+      "spread": 1.027577
+    },
+    {
+      "workload": 6,
+      "arm": "native",
+      "median_batch_ns": 1144000.125,
+      "min_batch_ns": 1133026.125,
+      "max_batch_ns": 1156106.75,
+      "spread": 1.020371
+    },
+    {
+      "workload": 6,
+      "arm": "native_aa",
+      "median_batch_ns": 1119736.938,
+      "min_batch_ns": 1108208.312,
+      "max_batch_ns": 1135268.125,
+      "spread": 1.024418
+    },
+    {
+      "workload": 7,
+      "arm": "folded",
+      "median_batch_ns": 207687.562,
+      "min_batch_ns": 207125.062,
+      "max_batch_ns": 211898.312,
+      "spread": 1.023045
+    },
+    {
+      "workload": 7,
+      "arm": "expanded",
+      "median_batch_ns": 274528.625,
+      "min_batch_ns": 270958.312,
+      "max_batch_ns": 277127.5,
+      "spread": 1.022768
+    },
+    {
+      "workload": 7,
+      "arm": "plain_prefix",
+      "median_batch_ns": 1977010.312,
+      "min_batch_ns": 1942286.5,
+      "max_batch_ns": 1997093.812,
+      "spread": 1.028218
+    },
+    {
+      "workload": 7,
+      "arm": "native",
+      "median_batch_ns": 989963.625,
+      "min_batch_ns": 975976.562,
+      "max_batch_ns": 1005221.438,
+      "spread": 1.029965
+    },
+    {
+      "workload": 7,
+      "arm": "native_aa",
+      "median_batch_ns": 989841.125,
+      "min_batch_ns": 977580.938,
+      "max_batch_ns": 996903.625,
+      "spread": 1.019766
+    },
+    {
+      "workload": 8,
+      "arm": "folded",
+      "median_batch_ns": 150536.5,
+      "min_batch_ns": 145310.188,
+      "max_batch_ns": 156044.312,
+      "spread": 1.07387
+    },
+    {
+      "workload": 8,
+      "arm": "expanded",
+      "median_batch_ns": 200737.125,
+      "min_batch_ns": 198557.438,
+      "max_batch_ns": 206315.062,
+      "spread": 1.03907
+    },
+    {
+      "workload": 8,
+      "arm": "plain_prefix",
+      "median_batch_ns": 1855096.312,
+      "min_batch_ns": 1797388.062,
+      "max_batch_ns": 1878507.812,
+      "spread": 1.045132
+    },
+    {
+      "workload": 8,
+      "arm": "native",
+      "median_batch_ns": 838632.938,
+      "min_batch_ns": 813640.688,
+      "max_batch_ns": 849960.938,
+      "spread": 1.044639
+    },
+    {
+      "workload": 8,
+      "arm": "native_aa",
+      "median_batch_ns": 830510.375,
+      "min_batch_ns": 810908.875,
+      "max_batch_ns": 834065.125,
+      "spread": 1.028556
+    },
+    {
+      "workload": 9,
+      "arm": "folded",
+      "median_batch_ns": 325057.312,
+      "min_batch_ns": 317942.75,
+      "max_batch_ns": 334010.438,
+      "spread": 1.050536
+    },
+    {
+      "workload": 9,
+      "arm": "expanded",
+      "median_batch_ns": 388950.438,
+      "min_batch_ns": 384070.438,
+      "max_batch_ns": 398830.75,
+      "spread": 1.038431
+    },
+    {
+      "workload": 9,
+      "arm": "plain_prefix",
+      "median_batch_ns": 2201807.375,
+      "min_batch_ns": 2162562.438,
+      "max_batch_ns": 2256523.438,
+      "spread": 1.043449
+    },
+    {
+      "workload": 9,
+      "arm": "native",
+      "median_batch_ns": 1111367.188,
+      "min_batch_ns": 1094002.625,
+      "max_batch_ns": 1142802.062,
+      "spread": 1.044606
+    },
+    {
+      "workload": 9,
+      "arm": "native_aa",
+      "median_batch_ns": 1122325.688,
+      "min_batch_ns": 1103692.75,
+      "max_batch_ns": 1138666.562,
+      "spread": 1.031688
+    },
+    {
+      "workload": 10,
+      "arm": "folded",
+      "median_batch_ns": 196330.75,
+      "min_batch_ns": 194309.75,
+      "max_batch_ns": 200200.375,
+      "spread": 1.030316
+    },
+    {
+      "workload": 10,
+      "arm": "expanded",
+      "median_batch_ns": 235158.938,
+      "min_batch_ns": 228078.125,
+      "max_batch_ns": 242700.5,
+      "spread": 1.064111
+    },
+    {
+      "workload": 10,
+      "arm": "plain_prefix",
+      "median_batch_ns": 1936513.0,
+      "min_batch_ns": 1851828.0,
+      "max_batch_ns": 1960554.688,
+      "spread": 1.058713
+    },
+    {
+      "workload": 10,
+      "arm": "native",
+      "median_batch_ns": 868427.062,
+      "min_batch_ns": 840114.562,
+      "max_batch_ns": 871101.562,
+      "spread": 1.036884
+    },
+    {
+      "workload": 10,
+      "arm": "native_aa",
+      "median_batch_ns": 859932.375,
+      "min_batch_ns": 835328.0,
+      "max_batch_ns": 872531.125,
+      "spread": 1.044537
+    },
+    {
+      "workload": 11,
+      "arm": "folded",
+      "median_batch_ns": 186382.75,
+      "min_batch_ns": 184218.75,
+      "max_batch_ns": 188539.062,
+      "spread": 1.023452
+    },
+    {
+      "workload": 11,
+      "arm": "expanded",
+      "median_batch_ns": 233976.438,
+      "min_batch_ns": 231419.375,
+      "max_batch_ns": 239091.188,
+      "spread": 1.033151
+    },
+    {
+      "workload": 11,
+      "arm": "plain_prefix",
+      "median_batch_ns": 2190791.812,
+      "min_batch_ns": 2186682.312,
+      "max_batch_ns": 2195315.188,
+      "spread": 1.003948
+    },
+    {
+      "workload": 11,
+      "arm": "native",
+      "median_batch_ns": 1372487.125,
+      "min_batch_ns": 1366718.812,
+      "max_batch_ns": 1384184.938,
+      "spread": 1.01278
+    },
+    {
+      "workload": 11,
+      "arm": "native_aa",
+      "median_batch_ns": 1366445.5,
+      "min_batch_ns": 1352807.188,
+      "max_batch_ns": 1382664.062,
+      "spread": 1.02207
+    },
+    {
+      "workload": 12,
+      "arm": "folded",
+      "median_batch_ns": 283736.938,
+      "min_batch_ns": 278906.312,
+      "max_batch_ns": 285924.438,
+      "spread": 1.025163
+    },
+    {
+      "workload": 12,
+      "arm": "expanded",
+      "median_batch_ns": 384195.25,
+      "min_batch_ns": 378406.375,
+      "max_batch_ns": 385570.375,
+      "spread": 1.018932
+    },
+    {
+      "workload": 12,
+      "arm": "plain_prefix",
+      "median_batch_ns": 10123903.625,
+      "min_batch_ns": 9945033.875,
+      "max_batch_ns": 10170526.062,
+      "spread": 1.022674
+    },
+    {
+      "workload": 12,
+      "arm": "native",
+      "median_batch_ns": 2265726.375,
+      "min_batch_ns": 2233585.875,
+      "max_batch_ns": 2277567.812,
+      "spread": 1.019691
+    },
+    {
+      "workload": 12,
+      "arm": "native_aa",
+      "median_batch_ns": 2240057.25,
+      "min_batch_ns": 2229651.125,
+      "max_batch_ns": 2275612.0,
+      "spread": 1.020613
+    },
+    {
+      "workload": 13,
+      "arm": "folded",
+      "median_batch_ns": 248218.812,
+      "min_batch_ns": 242713.562,
+      "max_batch_ns": 250013.0,
+      "spread": 1.030074
+    },
+    {
+      "workload": 13,
+      "arm": "expanded",
+      "median_batch_ns": 341159.0,
+      "min_batch_ns": 333679.625,
+      "max_batch_ns": 351981.75,
+      "spread": 1.054849
+    },
+    {
+      "workload": 13,
+      "arm": "plain_prefix",
+      "median_batch_ns": 10272202.875,
+      "min_batch_ns": 10157573.0,
+      "max_batch_ns": 10299731.688,
+      "spread": 1.013995
+    },
+    {
+      "workload": 13,
+      "arm": "native",
+      "median_batch_ns": 2363140.625,
+      "min_batch_ns": 2298533.75,
+      "max_batch_ns": 2386013.062,
+      "spread": 1.038059
+    },
+    {
+      "workload": 13,
+      "arm": "native_aa",
+      "median_batch_ns": 2325320.312,
+      "min_batch_ns": 2289187.625,
+      "max_batch_ns": 2361760.375,
+      "spread": 1.031702
+    },
+    {
+      "workload": 14,
+      "arm": "folded",
+      "median_batch_ns": 211427.125,
+      "min_batch_ns": 203864.625,
+      "max_batch_ns": 212812.5,
+      "spread": 1.043891
+    },
+    {
+      "workload": 14,
+      "arm": "expanded",
+      "median_batch_ns": 286757.625,
+      "min_batch_ns": 273328.188,
+      "max_batch_ns": 290435.0,
+      "spread": 1.062587
+    },
+    {
+      "workload": 14,
+      "arm": "plain_prefix",
+      "median_batch_ns": 8748640.688,
+      "min_batch_ns": 8691677.188,
+      "max_batch_ns": 8847119.875,
+      "spread": 1.017884
+    },
+    {
+      "workload": 14,
+      "arm": "native",
+      "median_batch_ns": 2214515.562,
+      "min_batch_ns": 2178752.562,
+      "max_batch_ns": 2235075.438,
+      "spread": 1.025851
+    },
+    {
+      "workload": 14,
+      "arm": "native_aa",
+      "median_batch_ns": 2210114.438,
+      "min_batch_ns": 2176942.812,
+      "max_batch_ns": 2213658.812,
+      "spread": 1.016866
+    },
+    {
+      "workload": 15,
+      "arm": "folded",
+      "median_batch_ns": 236059.875,
+      "min_batch_ns": 234036.5,
+      "max_batch_ns": 243273.438,
+      "spread": 1.039468
+    },
+    {
+      "workload": 15,
+      "arm": "expanded",
+      "median_batch_ns": 327333.438,
+      "min_batch_ns": 322973.875,
+      "max_batch_ns": 329885.312,
+      "spread": 1.021399
+    },
+    {
+      "workload": 15,
+      "arm": "plain_prefix",
+      "median_batch_ns": 9646838.562,
+      "min_batch_ns": 9583955.812,
+      "max_batch_ns": 9700325.438,
+      "spread": 1.012142
+    },
+    {
+      "workload": 15,
+      "arm": "native",
+      "median_batch_ns": 2083481.812,
+      "min_batch_ns": 2062049.5,
+      "max_batch_ns": 2089052.125,
+      "spread": 1.013095
+    },
+    {
+      "workload": 15,
+      "arm": "native_aa",
+      "median_batch_ns": 2043244.688,
+      "min_batch_ns": 2000419.0,
+      "max_batch_ns": 2071153.438,
+      "spread": 1.03536
+    },
+    {
+      "workload": 16,
+      "arm": "folded",
+      "median_batch_ns": 233984.312,
+      "min_batch_ns": 231203.062,
+      "max_batch_ns": 237843.938,
+      "spread": 1.028723
+    },
+    {
+      "workload": 16,
+      "arm": "expanded",
+      "median_batch_ns": 330796.812,
+      "min_batch_ns": 327286.438,
+      "max_batch_ns": 337653.688,
+      "spread": 1.031676
+    },
+    {
+      "workload": 16,
+      "arm": "plain_prefix",
+      "median_batch_ns": 9547843.688,
+      "min_batch_ns": 9466054.688,
+      "max_batch_ns": 9604945.438,
+      "spread": 1.014673
+    },
+    {
+      "workload": 16,
+      "arm": "native",
+      "median_batch_ns": 2484711.062,
+      "min_batch_ns": 2457041.625,
+      "max_batch_ns": 2492463.562,
+      "spread": 1.014416
+    },
+    {
+      "workload": 16,
+      "arm": "native_aa",
+      "median_batch_ns": 2457078.062,
+      "min_batch_ns": 2427651.062,
+      "max_batch_ns": 2484192.688,
+      "spread": 1.023291
+    },
+    {
+      "workload": 17,
+      "arm": "folded",
+      "median_batch_ns": 289427.188,
+      "min_batch_ns": 285317.812,
+      "max_batch_ns": 293901.125,
+      "spread": 1.030083
+    },
+    {
+      "workload": 17,
+      "arm": "expanded",
+      "median_batch_ns": 383893.375,
+      "min_batch_ns": 374906.312,
+      "max_batch_ns": 392645.812,
+      "spread": 1.047317
+    },
+    {
+      "workload": 17,
+      "arm": "plain_prefix",
+      "median_batch_ns": 9929637.938,
+      "min_batch_ns": 9832747.5,
+      "max_batch_ns": 10103424.438,
+      "spread": 1.027528
+    },
+    {
+      "workload": 17,
+      "arm": "native",
+      "median_batch_ns": 2384205.562,
+      "min_batch_ns": 2325992.188,
+      "max_batch_ns": 2402700.312,
+      "spread": 1.032979
+    },
+    {
+      "workload": 17,
+      "arm": "native_aa",
+      "median_batch_ns": 2336585.875,
+      "min_batch_ns": 2319596.312,
+      "max_batch_ns": 2381559.875,
+      "spread": 1.026713
+    }
+  ],
+  "reports": {
+    "pdf": "research/hec_residual_span_20261116/reports/git-custody/REPORT.pdf",
+    "svg": [
+
+    ],
+    "png": [
+
+    ]
+  },
+  "validation": {
+    "calls": 7200,
+    "correct": true,
+    "spread_pass": true,
+    "aa_pass": true,
+    "numerical_tenfold": false,
+    "local_qualified": true,
+    "admitted": false,
+    "independent_replay": false,
+    "strongest_external_comparison": false,
+    "primary_operation_count_qualified": false
+  },
+  "summary": "All 7200 calls verified; local noise gates pass. Equal-information Expanded is fastest control in all 18 workloads; Expanded/Folded 1.196560–1.742197, rejecting tenfold from representation alone.",
+  "session": null,
+  "custody": {
+    "kind": "git",
+    "authorization": "research/hec_degree2_lp_20261116/GIT-CUSTODY-AMENDMENT.md",
+    "s3_available": false
+  },
+  "protocol": "research/hec_residual_span_20261116/production-cost/PROTOCOL.md",
+  "input_contract": "Provided valid compatible public instance; common curve/order/source qualification and public target construction excluded equally. Fresh per-call algorithm setup and final verification included."
+}

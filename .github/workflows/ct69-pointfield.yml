@@ -1,6 +1,7 @@
 name: CT69 explicit degree-eight two-prime point field
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct69/**'
       - '.github/workflows/ct69-pointfield.yml'
@@ -9,6 +10,7 @@ permissions:
   contents: read
 jobs:
   ct69-pointfield:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

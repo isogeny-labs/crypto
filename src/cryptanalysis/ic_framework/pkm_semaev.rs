@@ -2343,6 +2343,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                         solving_degree: (!undecided).then_some(rep.solving_degree_max),
                         timed_out: rep.timed_out,
                         extra,
+                        ..Default::default()
                     };
                     let shape = self.shape.clone().unwrap_or_default();
                     self.totals.absorb(&shape, Some(&cost), undecided);

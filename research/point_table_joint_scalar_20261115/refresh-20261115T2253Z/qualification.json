@@ -1,0 +1,113 @@
+{
+  "schema": "native-point-table.merge-refresh-qualification/v1",
+  "at": "2026-11-15T23:12:18.670189+00:00",
+  "source_manifest_sha256": "5f3f0f0ffe3d8c74c12667dacfe03bf558cb339438970230d793d3bebdecf586",
+  "source_status": "Every native source/fixture/manifest input equals the original source manifest; original manifest/archive is untouched. Current combined worktree checked before merge commit.",
+  "checks": [
+    {
+      "check": "tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets"
+      ],
+      "cwd": "/workspace/crypto-point-joint",
+      "at": "2026-11-15T23:10:36.203903+00:00",
+      "exit_code": 0,
+      "stdout": "joint.tests.stdout.log",
+      "stdout_sha256": "2c9055cb01c99fdace31034986d3468c723b600cd992e7dc971e1952a9414426",
+      "stderr": "joint.tests.stderr.log",
+      "stderr_sha256": "bab3de72b02096adca8ae86b75fee931c494e8983ff33a17a77341338fcbd7d9",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/joint-scalar-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    },
+    {
+      "check": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "cwd": "/workspace/crypto-point-joint",
+      "at": "2026-11-15T23:10:36.550579+00:00",
+      "exit_code": 0,
+      "stdout": "joint.fmt.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "joint.fmt.stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/joint-scalar-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    },
+    {
+      "check": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/workspace/crypto-point-joint",
+      "at": "2026-11-15T23:10:44.104428+00:00",
+      "exit_code": 0,
+      "stdout": "joint.clippy.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "joint.clippy.stderr.log",
+      "stderr_sha256": "7efcae1fa9280064aede115cdf930759c5ad80f9422dcc3e09d34e66b5b3663d",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/joint-scalar-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    },
+    {
+      "check": "msrv",
+      "argv": [
+        "cargo",
+        "+1.78.0",
+        "check",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets"
+      ],
+      "cwd": "/workspace/crypto-point-joint",
+      "at": "2026-11-15T23:10:44.345466+00:00",
+      "exit_code": 0,
+      "stdout": "joint.msrv.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "joint.msrv.stderr.log",
+      "stderr_sha256": "0171639dd474e362264e1e53e76644f6d808103ee5a17f9d115580a1163eb99b",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/joint-scalar-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    }
+  ],
+  "all_target_passing_cases": 169,
+  "archive": {
+    "path": "development.tar.xz",
+    "bytes": 59244,
+    "sha256": "a334d31f5a775bf555137e912686f4ad6790f065b2be66cc741844bf0e8b77b7",
+    "check": "Extract into fresh directory; cd development; sha256sum -c SHA256SUMS"
+  },
+  "canonical_ledger": "Incoming base/main exact bytes; original head remains complete byte prefix; no producer row, rechain or migration",
+  "standing": "Producer development/merge-retention observations only, not signed execution/audit/performance",
+  "scientific_runs": 0,
+  "new_ci": "Pending new uploaded head; never infer from these local checks",
+  "blocking_dependency": "Unrelated open genus-ladder benchmark record in applicable records check; see problems/point-table-crypto-applicable-ci.md"
+}

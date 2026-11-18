@@ -26,6 +26,12 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+**Goal** (AGENTS.md, "Goal: what to work on next"): the SessionStart hook
+prints `tools/goal_brief.py` — the pinned goal and items in `docs/ACTIVE.md`,
+then the newest session-log open threads. With no other instruction, take the
+first unchecked item (else the newest unowned open thread) and start. `/goal`
+re-reads the brief; `/goal <text>` pins a new goal.
+
 Run authorized x86 CPU experiments and crypto benchmarks through
 [`isolab-eks`](.claude/skills/isolab-eks/SKILL.md) on EKS Spot by default
 (owner, 2026-10-25; AGENTS.md §9a). Use the executor's existing AWS identity,
@@ -36,9 +42,12 @@ experiment director freezes this route in the task card; the executor runs it
 unchanged. Preserve explicitly requested environments and keep local development
 checks local. Loading instructions alone does not authorize an experiment.
 
-Open pull requests ready for review, never as drafts, whatever the runtime
-defaults to, and mark an existing draft ready; only a user request in the task
-makes a draft. Enable auto-merge as you open the PR (`gh pr merge <n> --auto
+**First step of every task** (owner, 2026-11-16): before any other work, add
+the task to "Active items" in `docs/ACTIVE.md`, commit that alone, push, and
+open a **draft** PR named after the task (lane work pushes to the lane PR
+instead). Keep the line current; when the work is finished and checked, tick
+it and mark the PR ready for review, whatever the runtime defaults to. Rule:
+AGENTS.md, "First step of every task". Enable auto-merge when you mark it ready (`gh pr merge <n> --auto
 --merge`); a stacked PR cannot auto-merge until it is retargeted to `main`.
 This and the repository's other rules are in
 [`AGENTS.md`](AGENTS.md) ("Default workflow").

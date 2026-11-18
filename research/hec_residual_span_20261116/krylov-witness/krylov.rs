@@ -1,0 +1,13 @@
+use hec_native_ic::{fp::Fp,rng::Rng};
+#[derive(Default,Debug)]pub struct Stats{pub attempts:usize,pub applies:usize,pub transposes:usize,pub zero_constant:usize,pub rejected_witness:usize,pub degree:usize}
+fn dot(x:&[u64],y:&[u64],f:&Fp)->u64{assert_eq!(x.len(),y.len());x.iter().zip(y).fold(0,|v,(&a,&b)|f.add(v,f.mul(a,b)))}
+fn bm(sequence:&[u64],f:&Fp)->Vec<u64>{let(mut c,mut b)=(vec![1],vec![1]);let(mut l,mut m,mut last)=(0,1,1);for n in 0..sequence.len(){let mut d=sequence[n];for i in 1..=l{d=f.add(d,f.mul(c[i],sequence[n-i]));}if d==0{m+=1;continue}let old=c.clone();let factor=f.mul(d,f.inv(last));if c.len()<b.len()+m{c.resize(b.len()+m,0);}for j in 0..b.len(){c[j+m]=f.sub(c[j+m],f.mul(factor,b[j]));}if 2*l<=n{l=n+1-l;b=old;last=d;m=1;}else{m+=1;}}c.resize(l+1,0);c}
+fn apply_a(x:&[u64],dr:&[u64],dc:&[u64],f:&Fp,apply:&dyn Fn(&[u64])->Vec<u64>,transpose:&dyn Fn(&[u64])->Vec<u64>,stats:&mut Stats)->Vec<u64>{let mut y=apply(x);stats.applies+=1;assert_eq!(y.len(),dr.len());for(i,v)in y.iter_mut().enumerate(){*v=f.mul(*v,dr[i]);}let mut z=transpose(&y);stats.transposes+=1;assert_eq!(z.len(),dc.len());for(i,v)in z.iter_mut().enumerate(){*v=f.mul(*v,dc[i]);}z}
+// Bounded verified search. None is UNKNOWN, never an inconsistency certificate.
+pub fn find(n:usize,m:usize,f:&Fp,apply:&dyn Fn(&[u64])->Vec<u64>,transpose:&dyn Fn(&[u64])->Vec<u64>,seed:u64)->(Option<Vec<u64>>,Stats){assert!(n>0);let mut stats=Stats::default();let mut rng=Rng::new(seed);let mut target=vec![0;n];target[n-1]=1;
+for attempt in 1..=3{stats.attempts=attempt;let dr:Vec<_>=(0..m).map(|_|1+rng.below(f.p-1)).collect();let dc:Vec<_>=(0..n).map(|_|1+rng.below(f.p-1)).collect();let u:Vec<_>=(0..n).map(|_|rng.below(f.p)).collect();let mut b=vec![0;n];b[n-1]=dc[n-1];let mut cur=b.clone();let mut sequence=vec![];
+for i in 0..2*n+2{sequence.push(dot(&u,&cur,f));if i+1<2*n+2{cur=apply_a(&cur,&dr,&dc,f,apply,transpose,&mut stats);}}
+let recurrence=bm(&sequence,f);let degree=recurrence.len()-1;stats.degree=degree;let constant=recurrence[degree];if degree==0||constant==0{stats.zero_constant+=1;continue}let scale=f.neg(f.inv(constant));let mut solution=vec![0;n];cur=b;
+for j in 0..degree{let a=f.mul(scale,recurrence[degree-1-j]);for i in 0..n{solution[i]=f.add(solution[i],f.mul(a,cur[i]));}if j+1<degree{cur=apply_a(&cur,&dr,&dc,f,apply,transpose,&mut stats);}}
+let mut witness=apply(&solution);stats.applies+=1;for(i,x)in witness.iter_mut().enumerate(){*x=f.mul(*x,dr[i]);}let check=transpose(&witness);stats.transposes+=1;if check==target{return(Some(witness),stats)}stats.rejected_witness+=1;
+}(None,stats)}

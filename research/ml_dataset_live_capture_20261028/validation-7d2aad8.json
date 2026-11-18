@@ -1,0 +1,45 @@
+{
+  "schema": "crypto.ml-dataset.software-validation/v1",
+  "recorded_utc": "2026-10-28T13:37:36Z",
+  "kind": "software-validation-only",
+  "source_commit": "7d2aad8baa5fa5851e3f2ac16b6024cd3999210a",
+  "rust_toolchain": "1.98.0",
+  "test_binary_sha256": "4fb48e0d7ba537067324e87cf8b74711c8deeea56cac4c9448a288ce9d5c1d78",
+  "source_file": {
+    "path": "src/ml_dataset/budget.rs",
+    "sha256": "ea77ca4a938f3a9841a44878c70d08f01046b6bf8e8f1b87b58876bada9f95f4"
+  },
+  "checks": {
+    "focused_budget": {
+      "passed": 25,
+      "failed": 0
+    },
+    "strict_release_library_clippy": "passed",
+    "full_library": {
+      "passed": 5130,
+      "failed": 0,
+      "ignored": 123,
+      "duration_seconds": 1616.44,
+      "rayon_threads": 16,
+      "test_threads": 1
+    }
+  },
+  "retained_failures": [
+    "pre-migration full suite interrupted by host shutdown without terminal result",
+    "first migrated suite stopped after missing C++ dependency caused device-emulation failures; dependencies installed and six isolated device tests passed before final full suite"
+  ],
+  "claims": {
+    "complete_full_suite_pass": true,
+    "actual_cloud_dataset_worker_verified": false,
+    "solver_memory_recovery_verified": false,
+    "scientific_result": false,
+    "corpus_complete": false,
+    "accountwide_dollar_budget_enforced": false
+  },
+  "limitations": [
+    "No actual dataset-worker S3 deployment or independent durable quota mount is verified",
+    "The 30-second deadline bounds contention retries, not a stalled filesystem syscall",
+    "Future main/persistence integration requires new validation, including main scoped-head tests",
+    "USD200 total campaign ceiling unchanged"
+  ]
+}

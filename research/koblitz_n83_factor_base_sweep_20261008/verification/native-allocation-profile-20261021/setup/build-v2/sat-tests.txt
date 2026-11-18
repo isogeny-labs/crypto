@@ -1,0 +1,39 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-n83-resume)
+    Finished `release` profile [optimized] target(s) in 4m 08s
+     Running unittests src/lib.rs (/var/tmp/n83-1m-validation-target/release/deps/crypto_lib-85c62367deb6e665)
+
+running 31 tests
+test cryptanalysis::sat::tests::add_clause_drops_tautologies_before_checking_literals ... ok
+test cryptanalysis::sat::tests::add_clause_refuses_a_literal_past_the_variables_after_add_vars - should panic ... ok
+test cryptanalysis::sat::tests::add_clause_refuses_literal_zero - should panic ... ok
+test cryptanalysis::sat::tests::add_vars_one_at_a_time_recentres_logarithmically ... ok
+test cryptanalysis::sat::tests::aggressive_clause_reduction_preserves_answers ... ok
+test cryptanalysis::sat::tests::dimacs_roundtrip ... ok
+test cryptanalysis::sat::tests::extended_dimacs_export_round_trips_xors_and_root_unsat ... ok
+test cryptanalysis::sat::tests::incremental_matrix_matches_full_elimination ... ok
+test cryptanalysis::sat::tests::indexed_words_match_dense_across_growth_and_blocking ... ok
+test cryptanalysis::sat::tests::lazy_clause_callback_installs_guarded_theory_consequences_on_current_trail ... ok
+test cryptanalysis::sat::tests::lazy_clause_conflict_backjumps_and_preserves_theory_answer ... ok
+test cryptanalysis::sat::tests::lazy_theory_clause_past_the_variables_panics - should panic ... ok
+test cryptanalysis::sat::tests::lazy_trigger_past_the_variables_panics_after_add_vars - should panic ... ok
+test cryptanalysis::sat::tests::luby_sequence_starts_correctly ... ok
+test cryptanalysis::sat::tests::parse_dimacs_xor_reads_parity_convention ... ok
+test cryptanalysis::sat::tests::pigeonhole_3_into_2_is_unsat ... ok
+test cryptanalysis::sat::tests::pigeonhole_5_into_4_is_unsat ... ok
+test cryptanalysis::sat::tests::random_3sat_around_threshold ... ok
+test cryptanalysis::sat::tests::search_trace_is_pinned ... ok
+test cryptanalysis::sat::tests::search_trace_is_pinned_across_word_boundaries ... ok
+test cryptanalysis::sat::tests::simple_sat ... ok
+test cryptanalysis::sat::tests::storage_inventory_partitions_clause_words_and_nested_buffers ... ok
+test cryptanalysis::sat::tests::storage_observation_leaves_the_search_and_model_unchanged ... ok
+test cryptanalysis::sat::tests::storage_sampling_is_limited_to_boundaries_and_ten_thousand_conflicts ... ok
+test cryptanalysis::sat::tests::trivial_unsat ... ok
+test cryptanalysis::sat::tests::xor_and_cnf_interact ... ok
+test cryptanalysis::sat::tests::xor_duplicate_vars_cancel ... ok
+test cryptanalysis::sat::tests::xor_empty_row_with_true_rhs_is_unsat ... ok
+test cryptanalysis::sat::tests::xor_engine_agrees_with_brute_force ... ok
+test cryptanalysis::sat::tests::xor_odd_cycle_is_unsat ... ok
+test cryptanalysis::sat::tests::xor_system_propagates_to_unique_solution ... ok
+
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 4559 filtered out; finished in 0.24s
+

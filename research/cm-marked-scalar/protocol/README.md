@@ -1,0 +1,11 @@
+# Native protocol validation and pending execution
+
+`protocol.draft.json` is the current six-window draft; it is not executable authorization. It has null source/binary bindings and a draft freeze. Versions v1/v2 and the initial jq generator are retained as invalid development attempts; v3 is a superseded five-window draft. Validation logs are immutable attempt records.
+
+The native Rust checker in `validate.rs` uses jsonschema 0.59.0 and serde_json 1.0.154, with the standalone manifest and lock in `validator/`. Run the resulting `cm-protocol-validator experiment-protocol.v1.schema.json protocol.draft.json`. The initially capped Cargo install, wrapper API correction, positive schema control and negative missing-freeze control are retained under `qualification/schema-validator-v*/`.
+
+Before any actual timing, bind every arm to the published source revision and benchmark binary SHA-256, the analysis source SHA-256, the isolation binary SHA-256, compiler/dependencies and admitted host. Set freeze.status=frozen and freeze.commit to that source revision. Hash the canonical JSON object without its freeze member (`jq -cjS 'del(.freeze)'` with no trailing newline), then set freeze.protocol_sha256, UTC frozen_at and filed_before_affected_data=true. Validate and commit/push the frozen record before affected data. The native analysis independently recomputes this digest. Do not overwrite an existing frozen version after observations.
+
+The proposed design is four calibration and eight held-out points per curve, seven arms, widths 2..7, six measured rounds plus warmup, two cold calls per row. Counts including warmups are 2352 calibration and 4704 held-out rows. Selection uses calibration only; held-out success requires every point's median speedup to exceed max(1.01, the matching reference A/A envelope). This is a finite-panel decision without a population confidence claim.
+
+No production launch command is approved or runnable yet: the local admission checks refused the host, the draft is unfrozen, and cloud live limits/funds and the job-submitter role have not been verified. Do not weaken the thresholds or substitute another role/pool. Native `bench --structural FIXTURES` disables clocks and is governed separately by `schedule-scope.json`; it cannot establish the timing objective.

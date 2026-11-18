@@ -1,0 +1,217 @@
+{
+  "recorded_at": "2026-11-16T21:46:07.150977+00:00",
+  "kb_available": false,
+  "kb_calls": 6,
+  "kb_exits": {
+    "theorems": 127,
+    "conductor": 127,
+    "status": 127,
+    "mechanism": 127,
+    "negative": 127,
+    "adjacent": 127,
+    "application": 127
+  },
+  "primary": {
+    "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf",
+    "bytes": 222784,
+    "sha256": "c06cf2df9b8003e19694a4ebfe298a1557d61169f87ec01542258438ceac015e",
+    "fresh_extracted_ranges": [
+      [
+        159,
+        371
+      ],
+      [
+        583,
+        622
+      ]
+    ],
+    "printed_ranges": [
+      [
+        576,
+        580
+      ],
+      [
+        583,
+        584
+      ]
+    ],
+    "reading_timing": "Before approach/protocol/setup/code",
+    "read": "Full bounded extracted ranges; proper Tate quotient/formula/representative proof/extra representative conditions and MOV-FR-BK guards",
+    "fresh_full_page_read": false,
+    "full_chapter_read": false,
+    "full_external_proof_read": false
+  },
+  "frey_ruck_1994": {
+    "metadata": {
+      "DOI": "10.1090/s0025-5718-1994-1218343-6",
+      "title": [
+        "A remark concerning 𝑚-divisibility and the discrete logarithm in the divisor class group of curves"
+      ],
+      "page": "865-874",
+      "links": [
+        {
+          "URL": "http://www.ams.org/mcom/1994-62-206/S0025-5718-1994-1218343-6/S0025-5718-1994-1218343-6.pdf",
+          "content-type": "unspecified",
+          "content-version": "vor",
+          "intended-application": "similarity-checking"
+        },
+        {
+          "URL": "https://www.ams.org/mcom/1994-62-206/S0025-5718-1994-1218343-6/S0025-5718-1994-1218343-6.pdf",
+          "content-type": "unspecified",
+          "content-version": "vor",
+          "intended-application": "similarity-checking"
+        }
+      ],
+      "git_commit": "84136ca5b3dd18d080c6f5a1b2d93bc698e5d502",
+      "path": "research/pairing_miller_audit_20261110/evidence/frey-ruck-crossref.json",
+      "bytes": 14362,
+      "sha256": "f6693b073613666898e3370992be52e13713b506dde5e76d31252f94a3a52e9c",
+      "primary_proof_read": false
+    },
+    "http_receipts": [
+      {
+        "argv": [
+          "curl",
+          "--location",
+          "--silent",
+          "--show-error",
+          "--max-time",
+          "30",
+          "--output",
+          "/workspace/scratch/weil-rational-prior/frey-ruck-ams-response",
+          "--write-out",
+          "%{http_code}\\n%{url_effective}\\n%{size_download}\\n",
+          "https://www.ams.org/journals/mcom/1994-62-206/S0025-5718-1994-1218343-6/S0025-5718-1994-1218343-6.pdf"
+        ],
+        "curl_exit": 0,
+        "http_status": 403,
+        "effective_url": "https://www.ams.org/journals/mcom/1994-62-206/S0025-5718-1994-1218343-6/S0025-5718-1994-1218343-6.pdf",
+        "bytes": 55,
+        "recorded_from_completed_commands": true,
+        "not_rerun": true
+      },
+      {
+        "argv": [
+          "curl",
+          "--location",
+          "--silent",
+          "--show-error",
+          "--max-time",
+          "30",
+          "--output",
+          "/workspace/scratch/weil-rational-prior/frey-ruck-ams-canonical-response",
+          "--write-out",
+          "%{http_code}\\n%{url_effective}\\n%{size_download}\\n",
+          "https://www.ams.org/mcom/1994-62-206/S0025-5718-1994-1218343-6/S0025-5718-1994-1218343-6.pdf"
+        ],
+        "curl_exit": 0,
+        "http_status": 403,
+        "effective_url": "https://www.ams.org/mcom/1994-62-206/S0025-5718-1994-1218343-6/S0025-5718-1994-1218343-6.pdf",
+        "bytes": 55,
+        "recorded_from_completed_commands": true,
+        "not_rerun": true
+      },
+      {
+        "argv": [
+          "curl",
+          "--location",
+          "--silent",
+          "--show-error",
+          "--max-time",
+          "30",
+          "--output",
+          "/workspace/scratch/weil-rational-prior/frey-ruck-openalex.json",
+          "--write-out",
+          "%{http_code}\\n%{url_effective}\\n%{size_download}\\n",
+          "https://api.openalex.org/works/https://doi.org/10.1090/s0025-5718-1994-1218343-6"
+        ],
+        "curl_exit": 0,
+        "http_status": 200,
+        "effective_url": "https://api.openalex.org/works/https://doi.org/10.1090/s0025-5718-1994-1218343-6",
+        "bytes": 14328,
+        "recorded_from_completed_commands": true,
+        "not_rerun": true
+      }
+    ],
+    "openalex_id": "W2094556471",
+    "openalex_repository_fulltext": false,
+    "original_primary_read": false,
+    "access_bypass": false
+  },
+  "canonical_parent_plans": [
+    "research/weil_mixed_level_audit_20261116/sources.json",
+    "research/bk_general_frobenius_audit_20261115/sources.json"
+  ],
+  "canonical_declarations": [
+    "WeilMixedLevelAudit.geometric_pairing_nsmul_left",
+    "WeilGeometricLawsAudit.geometric_pairing_alternating",
+    "WeilGeometricLawsAudit.geometric_pairing_three_left_nondegenerate",
+    "BKGeneralFrobeniusAudit.SourceNineteen.generator_order",
+    "BKGeneralFrobeniusAudit.SourceNineteen.rational_cardinality",
+    "BKGeneralFrobeniusAudit.SourceNineteen.rational_cyclic",
+    "BKGeneralFrobeniusAudit.SourceNineteen.rational_three_torsion_card",
+    "BKGeneralFrobeniusAudit.SourceNineteen.geometric_three_card",
+    "BKGeneralFrobeniusAudit.SourceNineteen.source_all_extensions"
+  ],
+  "historical_BK_primary_scope": "Previously read full bounded printed142–143; no fresh current full-paper or visual claim",
+  "reviewed_git_sources": [
+    {
+      "git_commit": "84136ca5b3dd18d080c6f5a1b2d93bc698e5d502",
+      "path": "research/pairing_miller_audit_20261110/lean/MillerCurve.lean",
+      "git_blob": "0aa0daaf2d9b7f4fa8c62a469f8be7b234385648",
+      "bytes": 2458,
+      "sha256": "689300e3c8e6ecf23da0ed27b455193d8ca8c530d259b7e91ed8757b471325b9",
+      "read": "complete committed source via Git; sparse filesystem path was off disk",
+      "not_imported_by_new_target": true
+    },
+    {
+      "git_commit": "84136ca5b3dd18d080c6f5a1b2d93bc698e5d502",
+      "path": "research/pairing_miller_audit_20261110/lean/MillerExpressions.lean",
+      "git_blob": "69b6ee5fefdea2f09ecde0a88297e52ea539fd79",
+      "bytes": 2286,
+      "sha256": "b9fb8a504e1fdfa078809837286c3510e48e6dd9030fc9fd8f0f6d9f86e09422",
+      "read": "complete committed source via Git; sparse filesystem path was off disk",
+      "not_imported_by_new_target": true
+    },
+    {
+      "git_commit": "84136ca5b3dd18d080c6f5a1b2d93bc698e5d502",
+      "path": "research/pairing_miller_audit_20261110/lean/TateQuotient.lean",
+      "git_blob": "2b3a3a7655f55b6ca42463da928de87789c52733",
+      "bytes": 4328,
+      "sha256": "10e2963e7c2caf88e7ba0887d68258d9888c73a82721b569bad726fec05c26cd",
+      "read": "complete committed source via Git; sparse filesystem path was off disk",
+      "not_imported_by_new_target": true
+    }
+  ],
+  "official_declarations": [
+    "exists_zsmul_surjective",
+    "AddSubgroup.isAddCyclic",
+    "card_nsmul_eq_zero'",
+    "addOrderOf_dvd_iff_zsmul_eq_zero",
+    "WeierstrassCurve.Affine.Point.map",
+    "WeierstrassCurve.Affine.Point.map_injective",
+    "QuotientAddGroup.mk'",
+    "QuotientAddGroup.eq_zero_iff",
+    "natCast_zsmul"
+  ],
+  "method": "Actual integer scalar/cyclic pullback, honest self-base-change point equivalence plus field inclusion, actual F19 source facts and algebraic quotient operations",
+  "actual_curve": "F19:y²=x³+x+6",
+  "actual_generator": [
+    0,
+    5
+  ],
+  "generator_order": 18,
+  "rational_three_witness": "6G",
+  "healthy_two_witness": "9G",
+  "new_canonical_Tate_pairing_proved": false,
+  "new_Miller_expression_identification": false,
+  "general_MOV_FR_proved": false,
+  "known_mathematics": true,
+  "novelty_claim": false,
+  "correctly_qualified_source_refuted": false,
+  "root_rename_and_import_ambiguity_recorded": true,
+  "paid_compute": 0,
+  "orphan_adapter_after_01_preserved_outside_active_build": true,
+  "two_whole_gates_due_to_focused_cache_reproducibility_check": true,
+  "http_command_transcription_correction": "evidence/http-command-correction.json; original escaped recording preserved in attempts archive"
+}

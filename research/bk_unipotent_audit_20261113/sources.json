@@ -1,0 +1,235 @@
+{
+  "schema": "bk-all-extension-boundary-source-plan/v1",
+  "created": "2026-11-13T19:01:54.709933+00:00",
+  "formal": {
+    "project": "research/bk_unipotent_audit_20261113/lean",
+    "theorem": "BKUnipotentAudit.all_extension_boundary_certificate",
+    "statement": "theorem all_extension_boundary_certificate : curve.Δ≠0 ∧ Nat.card curve.Point=9 ∧ Nat.card {P : geometricCurve.Point // (3:ℕ) • P=0}=9 ∧ Nat.Prime 3 ∧ Nat.Coprime 3 7 ∧ 3 ∣ 7-1 ∧ 3^2 ∣ Nat.card curve.Point ∧ TorsionBoundaryAudit.embeddingDegree 7 3=1 ∧ (∀ k : ℕ, (∀ P : geometricCurve.Point, (3:ℕ) • P=0 → sigma^[k] P=P) ↔ 3 ∣ k) ∧ (∀ k : ℕ, 3 ∣ 7^k-1) ∧ (∀ (A : Type) [Field A] [Fintype A] [Algebra F A] (ι : A →ₐ[F] K) (k : ℕ), Fintype.card A=7^k → (fullTorsionImage ι ↔ 3 ∣ k)) ∧ (∀ k : ℕ, 0<k → Nat.card (GaloisField 7 k)=7^k ∧ Nonempty (GaloisField 7 k →ₐ[F] K) ∧ ∀ ι : GaloisField 7 k →ₐ[F] K, fullTorsionImage ι ↔ 3 ∣ k) ∧ (∀ n : ℕ, Nonempty (GaloisField 7 (3*n+1) →ₐ[F] K) ∧ 3 ∣ 7^(3*n+1)-1 ∧ ∀ ι : GaloisField 7 (3*n+1) →ₐ[F] K, ¬fullTorsionImage ι)",
+    "decl_sha256": "ad9e103939425245daae347385ac8cdc461f8e3313a2df01d1386deb199c62f3",
+    "scope": "Actual nonsingular E/F7:y²=x³+3x+2 has #E(F7)=9 and geometric3torsioncard9. For every k, actual point Frobenius iterate fixes all3torsion iff3dividesk; cyclotomic3divides7^k-1 always and embeddingdegree1. Actual full geometric3torsion inclusion in every chosen field of cardinality7^k and every compatible embedding is iff3dividesk. GaloisField7k cardinality/existence/all-embedding criterion for every positivek; infinite actual image counterexamples in degrees3n+1. Literal division-quartic coordinate classification and small polynomial factors, actual Frobenius cube and actual nonfixed witness; arbitrary actual short-curve geometriccardinality used with explicit curve/discriminant checks. No generic torsion basis/determinant/Weil assumption. Confirms originalBK excluded-boundary mechanism, disproves deletingr not dividingq-1 evenr²#E; not a qualified source refutation, source own F19example remains distinct. Generic all-prime rank/determinant/Weil and complete all-extension census remain open. No native experiment or execution assurance.",
+    "sources": [
+      {
+        "path": "research/bk_unipotent_audit_20261113/lean/CubicCoordinates.lean",
+        "bytes": 5415,
+        "sha256": "0017321c413b9446ea7efd6927ad3084f18a88b5825de4cf367ce7a39368b773"
+      },
+      {
+        "path": "research/bk_unipotent_audit_20261113/lean/ExtensionCounterexample.lean",
+        "bytes": 4089,
+        "sha256": "082480fea8ea74fe93add37a0100ba99a5dae83052e8a464f3bd8b80dd0c1a09"
+      },
+      {
+        "path": "research/bk_unipotent_audit_20261113/lean/FrobeniusPeriod.lean",
+        "bytes": 4314,
+        "sha256": "b3e7bbd056e18c51693655f7e4c9a4adf042ebfd3fcdbf187aaa52b12368a41c"
+      },
+      {
+        "path": "research/bk_unipotent_audit_20261113/lean/lake-manifest.json",
+        "bytes": 4366,
+        "sha256": "f500043037f88ea42b43b7f947e994a9a5b8aec02ccdfdf12292ee4084e876fb"
+      },
+      {
+        "path": "research/bk_unipotent_audit_20261113/lean/lakefile.toml",
+        "bytes": 386,
+        "sha256": "f10028d2eb43c3be2c14b5c8ad2d4f2d7f87fd0da0235243cf119c657305b20f"
+      },
+      {
+        "path": "research/bk_unipotent_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+        "bytes": 8610,
+        "sha256": "71cc43700fceabc138db6ad52f4e41449c1a7b440f92054d582836e2571eeb9a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/ActualTorsion.lean",
+        "bytes": 3428,
+        "sha256": "2219c9455c4abfe0f087a8456d3c8a3aba8f82c36556651352c44d0f5a8e106b"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/GeometricCardinality.lean",
+        "bytes": 2969,
+        "sha256": "78064d83b97715888a0fe9665b7b6779420ede16f33137949f33c536d456da19"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/QuarticRoots.lean",
+        "bytes": 2524,
+        "sha256": "cd22c5dda5d05d15f0f9003600d9d66469eaf1aff2f0a2f720781a8eb6547971"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/lake-manifest.json",
+        "bytes": 3819,
+        "sha256": "e8b97409bd1aff9d12b3d184c53712a4bbd9b2ea93bf745253383d4a95ffdfb2"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/lakefile.toml",
+        "bytes": 285,
+        "sha256": "5f4264d079b43d11acf3cf999d7d942799e7614094d2c587d0ccbe7eb2655152"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/bk_unipotent_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 11417,
+      "sha256": "5239c6c6d30f7ec09284d606cf811f692159674d8d5e9518e4a057cc1e2465a8"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/evidence/attempts.json",
+      "bytes": 6542,
+      "sha256": "aeb09ac2c39b5a384d0ecbb1bfbf818a37702b468320ff7c1400c49a287e8eb1"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 2865,
+      "sha256": "749e1b59c192503ef3ffe43157bff690fe297f05ead4e98a0ec7f630cbcacd46"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/evidence/gate.json",
+      "bytes": 1142,
+      "sha256": "62976836bcf643c1cacfc590eca188cf0c73379dc723ba216f05afd21532d856"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/evidence/source-review.json",
+      "bytes": 2757,
+      "sha256": "95d2e27481362c8c64ce1f9984fce073d6bc9a10c3faeb8d2b38d54c5be4f474"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/evidence/primary-excerpt.txt",
+      "bytes": 3400,
+      "sha256": "58a84ecbcf9ad6c48646bd1b2dc757ec4bf7a5261263ac133723c70832cd2f14"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/proof-map.json",
+      "bytes": 1575,
+      "sha256": "94429febffab7c770a9fc52404e4460583a8649b98fc9c2af0994407dbaceb30"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/render_report.py",
+      "bytes": 6029,
+      "sha256": "ecc1b8f6d0fed36249ba288e829c8cee6505431554bc3fed9f7facc6fd29bc0e"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/reports/extension-criterion.svg",
+      "bytes": 6163,
+      "sha256": "0bb1742e584b8aeca3edd60986f8a1958fdc60e55d8e06e29e605081564e2f39"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/reports/layout.json",
+      "bytes": 219,
+      "sha256": "bc1e9a9b474c90e09514b4c3e5b1e0f635f93435fc12491959afcb001b5ce7d2"
+    },
+    {
+      "path": "research/bk_unipotent_audit_20261113/reports/report.pdf",
+      "bytes": 48328,
+      "sha256": "7209235d8ea877b40fb25713a6a017c3657cf53ab17d99847d5f21f01ec3b4d4"
+    }
+  ],
+  "custom_import_modules": [
+    "ActualTorsion",
+    "CubicCoordinates",
+    "ExtensionCounterexample",
+    "FrobeniusFiniteExtension",
+    "FrobeniusPeriod",
+    "FrobeniusPointDescent",
+    "GeometricCardinality",
+    "QuarticRoots",
+    "RationalCounterexample",
+    "S3Completion",
+    "S3Roots",
+    "StructuralAudit",
+    "TorsionBoundaries"
+  ],
+  "assurance": {
+    "gate_declarations": 32,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "global_elaboration_flags": false,
+    "waivers": false,
+    "actual_curve_and_group": true,
+    "actual_geometric_cardinality": 9,
+    "all_extension_degrees": true,
+    "actual_point_images_all_compatible_embeddings": true,
+    "generic_rank_or_determinant_assumed": false,
+    "generic_all_prime_BK": false,
+    "qualified_source_refuted": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

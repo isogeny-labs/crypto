@@ -1,0 +1,7 @@
+# General original-coordinate native conditional solve
+
+Inputs are field/domain,curve A/B,target Q,h,k only. The caller derives the complete affine r/s coefficient-span fiber, compacts its polynomial coefficient model and supplies its explicit r/s basis. For x!=z, the point-root equation is (x+z)r+s=x²+xz+z²+((hz+k)yQ+(hx+k)y)/(x+z). The constant s image is eliminated once; projected columns vary linearly in x and use Gray XOR increments. No trace-zero normalization is assumed.
+
+Scan every low18bit x including0. At0 use the unique y=sqrt(B). If G(x)!=0, both rational lifts are retained and no-lift cells are empty. If G(x)=0, test the single F(x)=0 equation even without a rational lift. Thus repeated/zero/ghost branches are not omitted. Native dimension/kernel/candidate/deadline caps return incomplete, never an empty exact count. The generic reference evaluates every root-conditioned matrix directly, also including0.
+
+Both results must match complete candidate and supported-norm sets on each frozen positive instance. Independent portable-arithmetic row verification checks all checkpoint fibers; every emitted candidate is reconstructed and tested at its root, then receives exact eighth-power support and complete factor reconstruction retaining multiplicities and zero. Witness r/s and source roots are read only after solving for validation. This is conditional norm completeness, not full global original-chain output or a new timing comparison.

@@ -1,0 +1,7 @@
+Observed original validator exit1 after successful fresh archive checks:
+fatal: path 'research/koblitz_modular_ic_20261018/rounds/34/source-data/proof-cache-source-roots.txt' exists on disk, but not in '9f1dc0c1fa4746401a3eafcf446922ad823e1d47'
+The original VALIDATE_PUBLICATION.py attempted git show for every source pin.
+The exact retained raw donor is authenticated by R34/runs.sha256 instead:
+3989aa51b7282405159de67684f945bb972152f357971d562b6b250c8e6c7a77  source-data/proof-cache-source-roots.txt
+This is a metadata-validator assumption failure, not a mathematical rerun.
+The original checker, all sealed science/source hashes, and raw archive remain unchanged.

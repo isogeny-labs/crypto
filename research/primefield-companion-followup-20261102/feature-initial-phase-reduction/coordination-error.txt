@@ -1,0 +1,1 @@
+Scope reservation for shared log/PCC was refused because T-1909 owns those paths. Initial command incorrectly continued and appended a planning entry before inspecting the refusal. Component directory explicitly reserved immediately afterward. No further shared writes until reservation succeeds; no PCC record has been written.

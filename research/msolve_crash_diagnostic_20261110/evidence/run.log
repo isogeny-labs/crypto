@@ -1,0 +1,9 @@
+protocol.json: OK
+provenance.json: OK
+build-sanitized.sh: OK
+run.sh: OK
+native/analyze.cpp: OK
+native/polynomial.hpp: OK
+inputs/ordinary.ms: OK
+inputs/saturation.ms: OK
+research/msolve_crash_diagnostic_20261110/run.sh: line 23: 105193 Segmentation fault      LD_LIBRARY_PATH=/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu OMP_NUM_THREADS=1 ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=1 UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 timeout 5s "$binary" "${args[@]}" > "$prefix.stdout" 2> "$prefix.stderr"

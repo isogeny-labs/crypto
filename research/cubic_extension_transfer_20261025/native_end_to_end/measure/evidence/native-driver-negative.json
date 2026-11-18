@@ -1,0 +1,28 @@
+{
+  "schema": "cubic.native_driver_negative_control/v1",
+  "purpose": "actual instrumented C++ entry point rejects missing arguments; no ECDLP instance",
+  "outcome": {
+    "binary_changed": false,
+    "completed": false,
+    "descendants_left": false,
+    "exit_code": 2,
+    "inputs_changed": false,
+    "interrupted": null,
+    "observation_error": null,
+    "signal": null,
+    "timed_out": false
+  },
+  "isolation": {
+    "blockers": [
+      "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+    ],
+    "grading_version": 3,
+    "level": "L0"
+  },
+  "child_schema": "cubic.native_process_observations/v1",
+  "performance_admitted": false,
+  "correct_contract_exit_code": 2,
+  "initial_assertion_error": "The first producer assertion expected 1; the unchanged driver catch returns 2.",
+  "compatibility_note": "Host-built runner emitted a weak GLIBC_2.39 warning in the old cached userspace; future qualified image must bind a compatible toolchain/userspace.",
+  "benchmark_timing_published": false
+}

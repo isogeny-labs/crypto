@@ -1,0 +1,373 @@
+{
+  "branch": "lane/relation-identity",
+  "closed_utc": "2026-11-17T03:49:36+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/workspace/relation-native-qualifiers/direct-monitor-20261117/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/identity-development-monitor-60.jsonl",
+        "--label",
+        "identity-development-60",
+        "--",
+        "taskset",
+        "-c",
+        "0",
+        "/workspace/relation-native-qualifiers/identity-driver-12dab54dc-60",
+        "identity-paired",
+        "/workspace/identity-development-results-60",
+        "research/relation_degree_trace_20261115/native-identity-20261117/config-60.json",
+        "development"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T03:41:13+00:00",
+      "wall_s": 17.93
+    }
+  ],
+  "commit": "12dab54dc4e8a9088f62729d2f3bf42f608f3cc1",
+  "commit_dirty": true,
+  "created_utc": "2026-11-17T03:40:22+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261117-native-identity"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261117T0340Z-native-identity-20261117",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n3-prefix-singular-over-prefix-rust-work",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=True,prospective simultaneous pass=True; adjusted lower1/720=3.084745742416147",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.131160679147975,
+        3.567048083382622
+      ],
+      "unit": "ratio",
+      "value": 3.2425099823704504
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n3-prefix-singular-over-prefix-rust-paid",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=True,prospective simultaneous pass=True; adjusted lower1/720=1.2850098317289909",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2888711438725962,
+        1.3170342262433263
+      ],
+      "unit": "ratio",
+      "value": 1.3067922078420977
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n3-frontier-rust-over-prefix-rust-work",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=True,prospective simultaneous pass=True; adjusted lower1/720=1.0809939375705706",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1287700360380553,
+        1.2992256903893773
+      ],
+      "unit": "ratio",
+      "value": 1.1583485189612193
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n3-frontier-rust-over-prefix-rust-paid",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=True,prospective simultaneous pass=True; adjusted lower1/720=1.0108338467093043",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0140403685236983,
+        1.031583204490295
+      ],
+      "unit": "ratio",
+      "value": 1.0233026458585477
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n3-frontier-singular-over-frontier-rust-work",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=True,prospective simultaneous pass=True; adjusted lower1/720=2.74396810375353",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.827764503944183,
+        3.207937575101848
+      ],
+      "unit": "ratio",
+      "value": 3.0223903284654816
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n3-frontier-singular-over-frontier-rust-paid",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=True,prospective simultaneous pass=True; adjusted lower1/720=1.2717195538241235",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2853702192410612,
+        1.348945846188993
+      ],
+      "unit": "ratio",
+      "value": 1.301915471063726
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n4-prefix-singular-over-prefix-rust-work",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=2.938722751109531",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.9559001204418873,
+        3.2495550691715445
+      ],
+      "unit": "ratio",
+      "value": 3.067128361253878
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n4-prefix-singular-over-prefix-rust-paid",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=1.2666833474238108",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2783805785110756,
+        1.3048377057432017
+      ],
+      "unit": "ratio",
+      "value": 1.2860391285313137
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n4-frontier-rust-over-prefix-rust-work",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=1.1837408166007104",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2148081241423698,
+        1.3097876128336658
+      ],
+      "unit": "ratio",
+      "value": 1.236276232955833
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n4-frontier-rust-over-prefix-rust-paid",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=1.024787114344304",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0289144398767593,
+        1.043752776952736
+      ],
+      "unit": "ratio",
+      "value": 1.0335522315642958
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n4-frontier-singular-over-frontier-rust-work",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=2.55698165597485",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.579214828328193,
+        2.8253083762953297
+      ],
+      "unit": "ratio",
+      "value": 2.6431831002057935
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n4-frontier-singular-over-frontier-rust-paid",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=1.2609581278253228",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.268398061731106,
+        1.286414056021293
+      ],
+      "unit": "ratio",
+      "value": 1.2753197654217932
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n6-prefix-singular-over-prefix-rust-work",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=2.799336197364643",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.8109715294410482,
+        3.050430651346006
+      ],
+      "unit": "ratio",
+      "value": 2.9072750793903306
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n6-prefix-singular-over-prefix-rust-paid",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=1.2349745213066017",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2387968333140895,
+        1.2614122649513932
+      ],
+      "unit": "ratio",
+      "value": 1.25426907060567
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n6-frontier-rust-over-prefix-rust-work",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=1.284129153936474",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.3208431583963054,
+        1.4068196642768906
+      ],
+      "unit": "ratio",
+      "value": 1.3555310603883182
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n6-frontier-rust-over-prefix-rust-paid",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=1.0359715595578203",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.041898766705793,
+        1.0522233005971262
+      ],
+      "unit": "ratio",
+      "value": 1.0480891045980305
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n6-frontier-singular-over-frontier-rust-work",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=2.348419967273883",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.384304426123507,
+        2.5082934668337242
+      ],
+      "unit": "ratio",
+      "value": 2.4301016928665273
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "n6-frontier-singular-over-frontier-rust-paid",
+      "note": "Unsigned native statistic; ordinary95 neutral pass=False,prospective simultaneous pass=True; adjusted lower1/720=1.228848055875221",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2321248663004887,
+        1.2508791980457568
+      ],
+      "unit": "ratio",
+      "value": 1.2416667793577314
+    }
+  ],
+  "problem": "kernel:relation_identity",
+  "raw": [
+    {
+      "bytes": 58116,
+      "path": "research/relation_degree_trace_20261115/native-identity-20261117/raw-global-60.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3d/3d260442a801e3dabfed6a90e0267b5183d5bacf859907689fd3a12d97424973",
+      "sha256": "3d260442a801e3dabfed6a90e0267b5183d5bacf859907689fd3a12d97424973",
+      "uploaded": false
+    },
+    {
+      "bytes": 102428,
+      "path": "research/relation_degree_trace_20261115/native-identity-20261117/raw-n3-60.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2c/2c4ba939f40cb561e56165b18f3cbf1c3d8dbf5ec25ed002402b7fe70f2cce2d",
+      "sha256": "2c4ba939f40cb561e56165b18f3cbf1c3d8dbf5ec25ed002402b7fe70f2cce2d",
+      "uploaded": false
+    },
+    {
+      "bytes": 103172,
+      "path": "research/relation_degree_trace_20261115/native-identity-20261117/raw-n4-60.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d9/d9c62f2532aeb178d98ad0fb9252e2c1e118bb9377d43de80a91cce54bdb2599",
+      "sha256": "d9c62f2532aeb178d98ad0fb9252e2c1e118bb9377d43de80a91cce54bdb2599",
+      "uploaded": false
+    },
+    {
+      "bytes": 123132,
+      "path": "research/relation_degree_trace_20261115/native-identity-20261117/raw-n6-60.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/40/4087a99db233517ca3291bb57208d92524fdc816fb646591a17aebb6519c4343",
+      "sha256": "4087a99db233517ca3291bb57208d92524fdc816fb646591a17aebb6519c4343",
+      "uploaded": false
+    },
+    {
+      "bytes": 2154,
+      "path": "research/relation_degree_trace_20261115/native-identity-20261117/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/23/237f01658a7ef05d7e240e5a08a94f8d1c8fc904b6d39b26b0ebb5e38eb54066",
+      "sha256": "237f01658a7ef05d7e240e5a08a94f8d1c8fc904b6d39b26b0ebb5e38eb54066",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261117-native-identity/results-report.pdf",
+    "png": [
+      "benchmarks/20261117-native-identity/ratios.png"
+    ],
+    "svg": [
+      "benchmarks/20261117-native-identity/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "native-identity-20261117",
+  "status": "measured",
+  "summary": "Unsigned fixed816-answer component study:primary prospective screens pass,ordinary95 rejects n4/n6,no15x;full checks and prior nulls retained;user checkpoint/local waiver,S3 not attested",
+  "validation": null
+}

@@ -1,0 +1,28 @@
+# Shared cyclotomic LP state qualifies all retained components
+
+Frozen25bea240859 once-only gate exits0. TheR=Fell[Z]/Phi5LPstateandCRT-aware2variablelabelsolverprocessall6one-corestreams,416rowprefixes. AtEVERYprefix,all4componentstatuses,coefficientranksandtargetanswersmatchindependentfieldBTreeMapANDreversed-FB-pivotdenseelimination. Post-inferenceoriginalsourceactionandtargetchecks pass. All416survivor/lambda/kprefixrecordsalsomatchearlierfour-fieldinferenceexactly. [pcc:unverified]
+
+|p|source|selectedrows|firstuniqueaction+krow|inferredlambda|verifiedk|
+|---|---:|---:|---:|---:|---:|
+|101|1|35|8|2909|71|
+|101|17|48|8|2909|6092|
+|251|1|82|24|13156|8453|
+|251|17|73|26|13156|44840|
+|601|1|84|50|68305|104551|
+|601|17|94|44|68305|188934|
+
+## Zero-divisor and cycle controls
+
+Synthetic(Z-lambda0)*C=0retainsALL4componentsdespitedifferentpivotranks. Addingk=5preservesall4. Thepartialinconsistency0=Z-lambda0retainsONLYlambda0withk5;0=1thenrejectsall. The separate(Z-lambda0)*C=1rejectsONLYlambda0. Anexplicit2LPunbalancedcyclegroundsafreecomponentwithoutdiscardinganyhypothesis. Everycontrolischeckedcomponentwiseagainstbothfieldreferences. Thusazero/nonunitpivotisnotmisusedasproofahypothesisisfalse.
+
+TheLPphaseusesoneweightedunion-findwithaffineRpotentialsratherthan4fieldLPgraphs. Multiplicationisfive-cyclicconvolutionmoduloPhi5,with4canonicalcoefficients;signedmonomialinversesarespecializedandotherLPunitsuseexactxgcd. LabelpivotswithpropergcdSPLITthebranchandkeepbothfactors,whereas0=rhskeepsonlygcd(modulus,rhs). Pendingcomponentsarenotdiscardedbecauseapivotvanishes. `learn-eigenvalue/THEORY.md` supplies the restricted2LPunitargument; arbitrarymatrices/3LProws are not covered.
+
+Noactualcharacterarray,scalarrootortruthkis passedtotheRengine. The4rootsaregeneratedonlyinreferencequalification;engineusesellandformalZ. GeometricFB/zandpublicsource-normalizationremain;point/targetfixtureconstructionisnotsecretloginputtorowselection. Conditionalmapsareadmittedonlyafterinferredactionischeckedontheoriginalsource. No falsecomponent'sprovisionalkisreportedastargetrecovery.
+
+## Cost and scientific scope
+
+Thisqualifiesthenewrepresentationandzerodivisorlogic,notaperformancegain. Polynomial/CRTworkmaycostmorethan4fieldsolvesoroldcharactersetup. Source/FB/orbitpreparation,extrarows,relationgenerationandfinalgroupchecksremain. A futurecostgate mustpricethose operationsandcomparewithknown-actionstrongSparse/affinecontrols,notclaimafourfoldgainfromsharingstatecountalone.
+
+Thegateusesretainedgenus2one-coredata,notfreshheldoutfullsolvesoragenus3/4construction. Itdoesnotproveuniversalseparation,asymptoticimprovementornewpriority. ItdoesaltertheeageractionbootstrapandthereforeisnotexcludedbythepreviousUNCHANGED-prefixfloor,butfull10xgenus2+remainsunachieved/active.
+
+Rawallstream/prefix/auxrecords,referenceidentityreceipt,exit/run/source/native/import/protocol/input/binaryhashesremaininGitduringS3outage. No scientificfailure/retry,producer rerun,S3pollingorcloudspend.

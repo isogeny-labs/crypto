@@ -1,0 +1,1 @@
+The original portable replay is preserved. Its field constructor received an integer rather than the required coefficient list; V2 changes only this replay argument. Execute from repository root with python -m research.autolab_cycle_20261116_v101.REPLAY_V2. Scientific workers and evidence are unchanged. Publication remains pending.

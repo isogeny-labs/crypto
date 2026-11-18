@@ -558,6 +558,14 @@ pub struct AlgebraReport {
     /// F4 row-reduction work only, not a full-cost counter.
     pub f4_field_multiplications: u64,
     pub timed_out: bool,
+    /// Measured degree-fall observables of the F4 solves (diagnostic, never
+    /// priced): the smallest working degree at which the basis has fewer
+    /// standard monomials than the semi-regular expectation (first fall), the
+    /// largest (last fall), and the first degree the quotient vanishes
+    /// (observed degree of regularity). `None` when no solve recorded them.
+    pub first_fall_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
     /// Absent for the legacy scan: its root-stage work is not instrumented.
     pub roots: Option<RootDiagnostics>,
 }
@@ -594,7 +602,9 @@ pub fn solve_system_reference(
         &system.equations,
         system.variables,
         p,
-        &F4Options::new(Ordering::Grevlex, degree).with_budget(budget),
+        &F4Options::new(Ordering::Grevlex, degree)
+            .with_budget(budget)
+            .recording_degree_falls(),
     );
     let complete = !report.timed_out && !matches!(report.verdict, Verdict::Undetermined);
     let mut sets = BTreeSet::new();
@@ -619,6 +629,8 @@ pub fn solve_system_reference(
         max_columns: report.max_cols,
         f4_field_multiplications: report.field_ops,
         timed_out: report.timed_out,
+        // The legacy full-field scan is an exact-set control; its F4 stage is
+        // not degree-instrumented, so the degree-fall fields stay None.
         ..AlgebraReport::default()
     })
 }
@@ -669,7 +681,9 @@ fn solve_system_visit(
         &system.equations,
         system.variables,
         p,
-        &F4Options::new(Ordering::Grevlex, degree).with_budget(budget),
+        &F4Options::new(Ordering::Grevlex, degree)
+            .with_budget(budget)
+            .recording_degree_falls(),
         &system.domains,
         |root| {
             let result = decode_root(system, root).and_then(|coordinates| {
@@ -701,6 +715,9 @@ fn solve_system_visit(
         max_columns: report.max_cols,
         f4_field_multiplications: report.field_ops,
         timed_out: report.timed_out,
+        first_fall_degree: report.first_fall_degree,
+        last_fall_degree: report.last_fall_degree,
+        degree_of_regularity_observed: report.degree_of_regularity_observed,
         roots: Some(RootDiagnostics {
             equation_roots_visited: report.solutions_visited,
             candidates_rejected: report.candidates_rejected,
@@ -726,6 +743,21 @@ impl AlgebraReport {
         self.timed_out |= other.timed_out;
         self.solver_calls += other.solver_calls;
         self.solving_degree = self.solving_degree.max(other.solving_degree);
+        self.first_fall_degree = match (self.first_fall_degree, other.first_fall_degree) {
+            (Some(a), Some(b)) => Some(a.min(b)),
+            (a, b) => a.or(b),
+        };
+        self.last_fall_degree = match (self.last_fall_degree, other.last_fall_degree) {
+            (Some(a), Some(b)) => Some(a.max(b)),
+            (a, b) => a.or(b),
+        };
+        self.degree_of_regularity_observed = match (
+            self.degree_of_regularity_observed,
+            other.degree_of_regularity_observed,
+        ) {
+            (Some(a), Some(b)) => Some(a.max(b)),
+            (a, b) => a.or(b),
+        };
         self.max_rows = self.max_rows.max(other.max_rows);
         self.max_columns = self.max_columns.max(other.max_columns);
         self.f4_field_multiplications += other.f4_field_multiplications;

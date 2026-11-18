@@ -1,0 +1,86 @@
+name: N83 primary canonical six-summand high-cap feasibility
+
+on:
+  push:
+    branches: [codex/n83-hosted-regenerate-20261016]
+    paths:
+      - research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-m6-highcap-20261018/dispatch.json
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: n83-hosted-m6-highcap-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  exposed-target-cap:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-hosted-regenerate-20261016'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [gray_pool, hash_pool]
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      IMAGE_REF: rust:1.98.1-bookworm@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+      STUDY: research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-m6-highcap-20261018
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Prepare immutable provider input and host receipts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/n83-highcap-${{ matrix.arm }}"
+          mkdir -p "$ROOT"
+          git rev-parse HEAD > "$ROOT/source-commit.txt"
+          git status --porcelain=v1 > "$ROOT/source-status.txt"
+          test ! -s "$ROOT/source-status.txt"
+          uname -a > "$ROOT/host.txt"
+          docker version >> "$ROOT/host.txt"
+          gh api repos/aburan28/crypto/actions/artifacts/12121096452/zip > "$ROOT/provider.zip"
+          python3 "$STUDY/prepare.py" --archive "$ROOT/provider.zip" \
+            --output "$ROOT/inputs" > "$ROOT/prepare.stdout.json" \
+            2> "$ROOT/prepare.stderr.txt"
+          docker pull --platform linux/arm64 "$IMAGE_REF" \
+            > "$ROOT/image-pull.stdout" 2> "$ROOT/image-pull.stderr"
+          docker image inspect "$IMAGE_REF" \
+            --format '{{.Id}} {{.Architecture}} {{.Os}} {{json .RepoDigests}}' \
+            > "$ROOT/image-identity.txt"
+
+      - name: Check pinned source, exact base archives and bounded command
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/n83-highcap-${{ matrix.arm }}"
+          python3 "$STUDY/run.py" --inputs "$ROOT/inputs" \
+            --output "$ROOT/results" --arm '${{ matrix.arm }}' \
+            --image "$IMAGE_REF" --run-id "$GITHUB_RUN_ID" --check \
+            > "$ROOT/preflight.stdout.json" 2> "$ROOT/preflight.stderr.txt"
+
+      - name: Run one exposed-target canonical SAT cap rung
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/n83-highcap-${{ matrix.arm }}"
+          python3 "$STUDY/run.py" --inputs "$ROOT/inputs" \
+            --output "$ROOT/results" --arm '${{ matrix.arm }}' \
+            --image "$IMAGE_REF" --run-id "$GITHUB_RUN_ID" \
+            > "$ROOT/run.stdout.json" 2> "$ROOT/run.stderr.txt"
+
+      - name: Preserve complete input and failed or successful stage receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-hosted-m6-highcap-${{ matrix.arm }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-highcap-${{ matrix.arm }}/
+          if-no-files-found: warn
+          retention-days: 90

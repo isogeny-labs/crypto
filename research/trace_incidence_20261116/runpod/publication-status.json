@@ -1,0 +1,15 @@
+{
+  "schema": "trace-runpod-publication-status/v1",
+  "paid_experiment": "complete; worker exit0 and both own pods deleted",
+  "raw_custody": "both archives uploaded and fully read back with matching hashes before later credential failure",
+  "first_cas": "promoted and readback matched in workflow43908905617",
+  "second_cas": "pending; later S3 API returns InvalidAccessKeyId",
+  "failed_publication_workflows": [
+    43913644273,
+    43914193608
+  ],
+  "launch_admission": "actual paid source c0176f942 had successful standard S3 checkpoint before launch",
+  "progress_report": "blocked by unchanged base record20261105T0828Z-icb-large-prime-n53-s1-archive.json; own two records pass schema/closure validation",
+  "standing": "pcc:unverified; no L2, signed replay or canonical benchmark-index promotion",
+  "optional_final_provider_get": "Follow-up recheck blocked by proxy CONNECT403; original successful DELETE204 receipts for both pods are retained."
+}

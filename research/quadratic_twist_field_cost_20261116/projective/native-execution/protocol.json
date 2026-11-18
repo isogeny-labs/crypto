@@ -1,0 +1,1157 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-native-execution-correction-20261116",
+  "version": 1,
+  "created": "2026-11-16",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_field_cost_20261116/projective/native-execution",
+  "authors": [
+    "producer"
+  ],
+  "question": "Correct research dispatch to thin shell/native qualification, then reexecute the entire unchanged finite native panel and external-counter preflight without Python research orchestration.",
+  "claims": [
+    {
+      "id": "native-execution",
+      "text": "All fixed native scalar/witness/row/control checks and immutable source/input qualification pass through the corrected thin-shell/native execution path; producer observations remain unsigned",
+      "class": "exact_computation",
+      "decided_by": [
+        "native-execution"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "Original-input witness pullback degree, intrinsic regularity, full speed/cold attack/fastest comparisons and signed standing remain outside this execution correction",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "qualifier-build",
+      "role": "reference",
+      "description": "Native execution repair stage qualifier-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "cpp-build",
+      "role": "reference",
+      "description": "Native execution repair stage cpp-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "rust-build",
+      "role": "reference",
+      "description": "Native execution repair stage rust-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "ir-cpp-build",
+      "role": "reference",
+      "description": "Native execution repair stage ir-cpp-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "ir-rust-build",
+      "role": "reference",
+      "description": "Native execution repair stage ir-rust-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "describe-build",
+      "role": "reference",
+      "description": "Native execution repair stage describe-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "protocol-check",
+      "role": "reference",
+      "description": "Native execution repair stage protocol-check",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-qualifier-head",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-qualifier-head",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-qualifier-source",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-qualifier-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "produce-C",
+      "role": "candidate",
+      "description": "Native execution repair stage produce-C",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "produce-A",
+      "role": "candidate",
+      "description": "Native execution repair stage produce-A",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "produce-B",
+      "role": "control_aa",
+      "description": "Native execution repair stage produce-B",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "independent-audit",
+      "role": "control_positive",
+      "description": "Native execution repair stage independent-audit",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "describe",
+      "role": "reference",
+      "description": "Native execution repair stage describe",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-map",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-map",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-missing-policy",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-missing-policy",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-target",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-target",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-scalar",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-scalar",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-log",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-log",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-cost",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-cost",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-degree",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-degree",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-witness",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-witness",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-root",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-root",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-source",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-columns",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-columns",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-missing-failure",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-missing-failure",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "count-IR-A",
+      "role": "candidate",
+      "description": "Native execution repair stage count-IR-A",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "audit-IR-A",
+      "role": "reference",
+      "description": "Native execution repair stage audit-IR-A",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "count-IR-B",
+      "role": "candidate",
+      "description": "Native execution repair stage count-IR-B",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "audit-IR-B",
+      "role": "reference",
+      "description": "Native execution repair stage audit-IR-B",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-IR-cost",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-IR-cost",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-IR-raw-summary",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-IR-raw-summary",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-IR-missing",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-IR-missing",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-IR-source",
+      "role": "control_negative",
+      "description": "Native execution repair stage reject-IR-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "dispatch": "thin shell, native copied qualifier",
+          "official_python_metadata_only": "canonical protocol/schema validator; no binary dispatch or arithmetic in Python",
+          "clock_valid": "false"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "native-repeat",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "independent-audit",
+      "expected_detection": "Full unchanged actual-point/witness/source-scalar replay and complete native execution stage plan; external counter positive also checked by native reader",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-witness",
+      "null_population": {
+        "description": "Two source/input qualification controls plus12frozen full-study and4frozen counter false input corpora",
+        "generator": "Clearly labelled jq metadata controls and immutable prior file-IO generated corpora; every read-only input hash pinned and checked natively",
+        "n": 18,
+        "why_n": "Exact declared integrity categories; no population p-value",
+        "matched_on": [
+          "unchanged arithmetic/solvers",
+          "full fixed curve/policy/target population",
+          "native independent replay",
+          "frozen input hashes"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "payload_truth",
+        "levels": [
+          "original",
+          "clearly labelled false qualifier/corpus"
+        ]
+      },
+      {
+        "name": "process_repeat",
+        "levels": [
+          "C",
+          "A",
+          "B",
+          "IR-A",
+          "IR-B"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "Unchanged parent C++/Rust algorithms, new thin-shell/native qualification path",
+        "how": "All source files and PINS metadata hash-bound in frozen protocol before affected launch"
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Entire455policy/3role/2cap/31query/30target panel; all nine counter calls; immutable negative corpora",
+        "how": "No new favorable policy/target selection, all failures retained"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "qualifier-build",
+          "cpp-build",
+          "rust-build",
+          "ir-cpp-build",
+          "ir-rust-build",
+          "describe-build",
+          "protocol-check",
+          "reject-qualifier-head",
+          "reject-qualifier-source",
+          "produce-C",
+          "produce-A",
+          "produce-B",
+          "independent-audit",
+          "describe",
+          "reject-map",
+          "reject-missing-policy",
+          "reject-target",
+          "reject-scalar",
+          "reject-log",
+          "reject-cost",
+          "reject-degree",
+          "reject-witness",
+          "reject-root",
+          "reject-source",
+          "reject-columns",
+          "reject-missing-failure",
+          "count-IR-A",
+          "audit-IR-A",
+          "count-IR-B",
+          "audit-IR-B",
+          "reject-IR-cost",
+          "reject-IR-raw-summary",
+          "reject-IR-missing",
+          "reject-IR-source"
+        ],
+        "how": "Dependency-ordered exact engineering replication, no clock statistic or total-cost promotion"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "measured",
+        "value": "Fresh C/A/B and counter A/B executions",
+        "how": "No lookup of positive answers; native replay verifies every separate original scalar"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "native-execution",
+        "arms": [
+          "qualifier-build",
+          "cpp-build",
+          "rust-build",
+          "ir-cpp-build",
+          "ir-rust-build",
+          "describe-build",
+          "protocol-check",
+          "reject-qualifier-head",
+          "reject-qualifier-source",
+          "produce-C",
+          "produce-A",
+          "produce-B",
+          "independent-audit",
+          "describe",
+          "reject-map",
+          "reject-missing-policy",
+          "reject-target",
+          "reject-scalar",
+          "reject-log",
+          "reject-cost",
+          "reject-degree",
+          "reject-witness",
+          "reject-root",
+          "reject-source",
+          "reject-columns",
+          "reject-missing-failure",
+          "count-IR-A",
+          "audit-IR-A",
+          "count-IR-B",
+          "audit-IR-B",
+          "reject-IR-cost",
+          "reject-IR-raw-summary",
+          "reject-IR-missing",
+          "reject-IR-source"
+        ],
+        "differs_in": [
+          "payload_truth"
+        ],
+        "design": "absolute",
+        "threshold": "All34expected stage outcomes, copied qualifier/source/input hashes stable, distinct immutable build/pre/post manifests, every native source/row/scalar check, all18meaningful false controls reject101/no receipt"
+      },
+      {
+        "id": "native-repeat",
+        "arms": [
+          "produce-A",
+          "produce-B"
+        ],
+        "differs_in": [
+          "process_repeat"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false,
+    "transfer_obligations": [
+      {
+        "domain": "Actual F61/r31 cyclic source points and actual twist-assisted reduced Tate images",
+        "check": "Independent full group/image homomorphism, point/domain checks, legitimate admitted public logs and original scalar check; no generic twist map claim"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact full finite declared population, no p-value or timed effect claim"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 60,
+      "per_sample_seconds": 30,
+      "threads": 2,
+      "estimated_total_seconds": 1200,
+      "measured_on": "Prior exact instrument execution informs bounded repair runtime; complete new native dispatch has not run before freeze"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native exit code; no timing or pricing inference",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "profiles",
+        "name": "profiles",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "2730complete policy/role/cap profiles per fresh execution",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "target_workloads",
+        "name": "target_workloads",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "81900separate configuration-target attempts per fresh execution, not distinct challenges",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "map_calls",
+        "name": "map_calls",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Actual cold mapping requests from producer counts and independent reconstruction",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "algebraic_recoveries",
+        "name": "algebraic_recoveries",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Original source target scalar recovered using admitted public logs and a certified query",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "blocked_setups",
+        "name": "blocked_setups",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Rank-deficient admitted public setup, never patched by a scalar oracle",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "audited_theorems",
+      "failing_axioms",
+      "trusted_native"
+    ],
+    "record": [
+      "actual published source head",
+      "exact true/false sources",
+      "compiler release/binary SHA",
+      "Mathlib/dependency identities and cache inventory",
+      "gate/auditor/trust-file SHA",
+      "all commands/exits/build/audit/status logs"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 3600,
+    "placement": {
+      "outer_seconds": 3600,
+      "per_stage_seconds": 600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All34stages or first unexpected outcome;600s per stage, fixed06:45UTC deadline, no partial favorable subset/criterion change/native gate skip",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Native execution path correction and exact full engineering replication only",
+    "comparison_ids": [
+      "native-execution"
+    ],
+    "threshold": "All34expected stage outcomes, copied qualifier/source/input hashes stable, distinct immutable build/pre/post manifests, every native source/row/scalar check, all18meaningful false controls reject101/no receipt",
+    "statistic": "Exact source/input/manifests and native semantic replay, not speed significance",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Engineering conformance with unchanged population/algorithms; all prior data observed",
+    "verdict_vocabulary": [
+      "native_execution_observed_unsigned",
+      "failed",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/quadratic_twist_field_cost_20261116/projective/audit.rs",
+      "sha256": "579b600d7555b7783a9c653286a39593c3d0d694da912a14a30de37f0f4de5d1"
+    },
+    "inputs": [
+      "All fresh native positive profiles/targets and actual source points",
+      "Exact complete legacy false corpora read-only; qualification manifests/binaries",
+      "Native external-counter data and source replay"
+    ],
+    "outputs": [
+      "Full independent native scalar/witness/row replay",
+      "Native descriptive panel/frontier and counter-validity outputs only"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Coordinate/exception-domain diagram only if proofs complete; no quantitative solver graph without data"
+    ],
+    "report_dir": "reports/kernel-20261115"
+  },
+  "inadmissible": [
+    "Change full population/caps/criteria after data",
+    "Feed reference point enumeration into candidate stopping",
+    "Use target scalar labels or unadmitted public logs in recovery",
+    "Turn cap-unknown into a certified root",
+    "Claim named chart degree is original witness degree or intrinsic regularity",
+    "Infer speed from unisolated clocks or incomplete cost vectors",
+    "Discard ties/losses/blocked setups/failed queries",
+    "Upload denied findings/assets or use paid resources/credential fallback"
+  ],
+  "literature": [
+    {
+      "ref": "https://www.math.uci.edu/~asilverb/bibliography/ceilidh.pdf",
+      "provenance": "retrieved",
+      "claim": "Indexed primary section5.2 equations inspected; fullPDF inaccessible403/502/503, reciprocal chart is established not novel"
+    },
+    {
+      "ref": "https://hackmd.io/@yelhousni/emulated-pairing",
+      "provenance": "retrieved",
+      "claim": "Primary author torus compression/operations and exceptional±1 section read; SNARK inverse cost not native CPU price"
+    },
+    {
+      "ref": "https://doi.org/10.1007/11535218_5",
+      "provenance": "retrieved",
+      "claim": "Primary institutional record confirms established rational-torus IC; no extension-field/prime-field security inference"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "593160e3c5487bd25f380b5bc66acd9b487979d4463f4eb4205e1c37c3a5b32e",
+    "commit": "f8a6d2613f2dadacb23be18fb046f7abd7c62751",
+    "frozen_at": "2026-11-16T06:35:03Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "window": "05:45-06:45UTC2026-11-16",
+    "correction": "Old native instruments were dispatched by forbidden Python launchers; these inputs/provenance remain immutable. This new replication replaces only execution path, not algorithms/criteria/population. No blinded or original independent-discovery claim.",
+    "pins_sha256": "453d8d159f00cd5e2dc1d6feb1d021b4181b97e7916dc684b7d72a27ca5e8f26",
+    "separate_immutable_qualifier": true,
+    "manifest_names": [
+      "build-manifest.json",
+      "pre-call-manifest.json",
+      "post-call-manifest.json"
+    ],
+    "pre_call_replacement_forbidden": true,
+    "profiles_per_stream": 2730,
+    "target_workloads_per_stream": 81900,
+    "counter_calls_per_process": 9,
+    "counter_processes": [
+      "A",
+      "B"
+    ],
+    "legacy_false_corpora": 16,
+    "qualifier_negative_controls": 2,
+    "original_input_pullback_witness_degree": null,
+    "no_performance_claim": true,
+    "no_new_asset_upload": true,
+    "coordination": "Copilot integration request6908279022 pending; no shared/conflicted ledger/journal edits; no Conductor executable/lease",
+    "canonical_guide_status": "Current encrypted/unreadable; historical explicit skill/rules fallback plus current unmodified checker/schema and current AGENTS language rules"
+  }
+}

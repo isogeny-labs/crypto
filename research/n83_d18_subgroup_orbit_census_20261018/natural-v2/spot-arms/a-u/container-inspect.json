@@ -1,0 +1,325 @@
+[
+    {
+        "Id": "ec8ed38413ea0545724dbc25e6cfc4e7f1f135f87dc4626d456e75e258330dc3",
+        "Created": "2026-10-19T08:00:51.751346178Z",
+        "Path": "/usr/bin/timeout",
+        "Args": [
+            "-s",
+            "TERM",
+            "-k",
+            "5",
+            "610",
+            "/opt/worker",
+            "primary-paired-orbit-m5",
+            "positive",
+            "U",
+            "0",
+            "/inputs/base",
+            "/inputs/evidence",
+            "/inputs/fixture",
+            "/out/worker.json"
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-10-19T08:00:51.953600323Z",
+            "FinishedAt": "2026-10-19T08:01:28.208374797Z"
+        },
+        "Image": "sha256:24b8580b081b53113046267a47ad12858ad97752c9735e1125fcdb7a62d1d2c9",
+        "ResolvConfPath": "/var/lib/docker/containers/ec8ed38413ea0545724dbc25e6cfc4e7f1f135f87dc4626d456e75e258330dc3/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/ec8ed38413ea0545724dbc25e6cfc4e7f1f135f87dc4626d456e75e258330dc3/hostname",
+        "HostsPath": "/var/lib/docker/containers/ec8ed38413ea0545724dbc25e6cfc4e7f1f135f87dc4626d456e75e258330dc3/hosts",
+        "LogPath": "/var/lib/docker/containers/ec8ed38413ea0545724dbc25e6cfc4e7f1f135f87dc4626d456e75e258330dc3/ec8ed38413ea0545724dbc25e6cfc4e7f1f135f87dc4626d456e75e258330dc3-json.log",
+        "Name": "/n83-m5-a-u",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "Tmpfs": {
+                "/tmp": "rw,noexec,nosuid,nodev,size=64m"
+            },
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 4294967296,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "7",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 4294967296,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 256,
+            "Ulimits": [
+                {
+                    "Name": "nofile",
+                    "Hard": 65536,
+                    "Soft": 32768
+                }
+            ],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m5/target/release/examples/koblitz_n83_factor_base_export",
+                    "Target": "/opt/worker",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m5/inputs/U",
+                    "Target": "/inputs/base",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m5/source/research/n83_d18_subgroup_orbit_census_20261018",
+                    "Target": "/inputs/evidence",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m5/inputs/U",
+                    "Target": "/inputs/fixture",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m5/snapshot",
+                    "Target": "/snapshot",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m5/runs/a-u",
+                    "Target": "/out"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware",
+                "/sys/devices/virtual/powercap"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/604d96ebb27f44e40e19b53ee8ed566abafaf6af9cfc9a29ed2c8d49cc53fdc7-init/diff:/var/lib/docker/overlay2/ff15081e84eeffb5a432706552ce3015390bb6c91d9f8648e281871f4a89b5a8/diff",
+                "MergedDir": "/var/lib/docker/overlay2/604d96ebb27f44e40e19b53ee8ed566abafaf6af9cfc9a29ed2c8d49cc53fdc7/merged",
+                "UpperDir": "/var/lib/docker/overlay2/604d96ebb27f44e40e19b53ee8ed566abafaf6af9cfc9a29ed2c8d49cc53fdc7/diff",
+                "WorkDir": "/var/lib/docker/overlay2/604d96ebb27f44e40e19b53ee8ed566abafaf6af9cfc9a29ed2c8d49cc53fdc7/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m5/target/release/examples/koblitz_n83_factor_base_export",
+                "Destination": "/opt/worker",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m5/inputs/U",
+                "Destination": "/inputs/base",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m5/source/research/n83_d18_subgroup_orbit_census_20261018",
+                "Destination": "/inputs/evidence",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m5/inputs/U",
+                "Destination": "/inputs/fixture",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m5/snapshot",
+                "Destination": "/snapshot",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m5/runs/a-u",
+                "Destination": "/out",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "ec8ed38413ea",
+            "Domainname": "",
+            "User": "1000:1000",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "ICV1_FROZEN_SOURCE_DIR=/snapshot",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "/usr/bin/timeout",
+                "-s",
+                "TERM",
+                "-k",
+                "5",
+                "610",
+                "/opt/worker",
+                "primary-paired-orbit-m5",
+                "positive",
+                "U",
+                "0",
+                "/inputs/base",
+                "/inputs/evidence",
+                "/inputs/fixture",
+                "/out/worker.json"
+            ],
+            "Image": "amazonlinux@sha256:8ed3c0a996841537f75607e7d1de2114d8150391f75792e8da9268738547e73f",
+            "Volumes": null,
+            "WorkingDir": "/",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "b89db510c38774cf5fc5b69d28f5b9f3c50674f743450fabe649abc3386d3b05",
+            "SandboxKey": "/var/run/docker/netns/b89db510c387",
+            "Ports": {},
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "none": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "",
+                    "NetworkID": "4fe12fe07ea03b6d68e2573c16d237a59ff7cb2338731fa35328aacb0b87eedf",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DriverOpts": null,
+                    "DNSNames": null
+                }
+            }
+        }
+    }
+]

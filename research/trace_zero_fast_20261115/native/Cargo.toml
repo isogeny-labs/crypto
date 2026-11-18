@@ -1,0 +1,14 @@
+[package]
+name = "trace-zero-fast"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[workspace]
+[dependencies]
+full-trace-zero-backend = { path = "../../full_trace_zero_variety_20261109/native/backend" }
+trace-zero-experiments = { path = "../../trace_zero_experiments_20261109/native" }
+trace-zero-leads = { path = "../../trace_zero_leads_20261109/native" }
+num-bigint = "0.4"
+serde_json = "1"
+[profile.release]
+debug = "line-tables-only"

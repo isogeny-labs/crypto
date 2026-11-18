@@ -1,0 +1,2666 @@
+--- HEAD/Cargo.toml
++++ assembled/Cargo.toml
+@@ -199,7 +199,7 @@
+ # HashClash C library (see src/cryptanalysis/md5_hashclash_ffi.rs).
+ # `ecbench_reader` is set by tools/backend-leaderboard/build.rs, which compiles
+ # shared ecbench sources without the full harness.
+-unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hashclash_linked)", "cfg(ecbench_reader)"] }
++unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hashclash_linked)", "cfg(ecbench_reader)", "cfg(sat_qualification_child)"] }
+ 
+ [lints.clippy]
+ # The whole allow list; CI runs clippy with -D warnings for everything else.
+--- HEAD/src/cryptanalysis/binary_semaev_chain_provenance.rs
++++ assembled/src/cryptanalysis/binary_semaev_chain_provenance.rs
+@@ -1163,3 +1163,13 @@
+         }),
+     }
+ }
++
++#[path = "checked_binary_sat_model.rs"]
++pub mod checked_model;
++
++#[path="checked_binary_search_lift.rs"]
++pub mod signed_lift;
++
++#[cfg(all(test, sat_qualification_child))]
++#[path = "sat_qualification_reference.rs"]
++pub mod qualification_reference;
+--- HEAD/src/cryptanalysis/checked_boolean_equations.rs
++++ assembled/src/cryptanalysis/checked_boolean_equations.rs
+@@ -249,6 +249,10 @@
+     pub fn status(&self) -> Result<(), Failure> { self.attempt.result }
+     pub fn owner_failure(&self) -> Option<Error> { self.owner_failure }
+     pub fn charged(&self) -> Charge { self.attempt.charge }
++    /// Partial rows are diagnostics, never a complete admitted generator.
++    pub fn retained(&self) -> (&Polynomial, &Polynomial, Stage, usize, usize) {
++        (&self.attempt.partial, &self.attempt.scratch, self.attempt.stage, self.attempt.row, self.attempt.literal)
++    }
+ }
+ 
+ /// Distinct checked-domain encoding; never substitutes raw-domain generators.
+--- HEAD/src/cryptanalysis/sat.rs
++++ assembled/src/cryptanalysis/sat.rs
+@@ -612,7 +612,46 @@
+ }
+ 
+ /// CDCL SAT solver.
++
++/// Partial native admission increment. Not sufficient for owned binary SAT:
++/// observers, XOR, conflict analysis and incremental theories fail closed.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum NativeAdmissionFailure { Work, Bytes, Deadline, Allocation, Overflow, UncoveredPath }
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum NativeOperation { Entry, Loop, WatchList, Watcher, Literal, WatchGrowth, Assignment, TrailGrowth, LevelGrowth, DetachedGrowth, Heap, Model, XorSetup, XorGrowth, XorPivot, XorScan, XorWord, XorReason, EventPayload, Analyze, AnalyzeGrowth, ClauseGrowth, Backjump, Reduction, Restart }
++#[derive(Clone, Copy, Debug)]
++pub struct NativeCharge { pub operation: NativeOperation, pub work: u64, pub requested_replacement_bytes: u64 }
++type NativeAdmission = Box<dyn FnMut(NativeCharge) -> Result<(), NativeAdmissionFailure> + Send + Sync>;
++fn native_pay(hook: &mut Option<NativeAdmission>, failure: &mut Option<NativeAdmissionFailure>, deadline: Option<std::time::Instant>, operation: NativeOperation, work: u64, bytes: u64) -> bool {
++    if failure.is_some() { return false; }
++    if hook.is_none() { return true; }
++    if deadline.is_some_and(|d| std::time::Instant::now() >= d) { *failure=Some(NativeAdmissionFailure::Deadline);return false; }
++    if let Err(e)=hook.as_mut().unwrap()(NativeCharge {operation,work,requested_replacement_bytes:bytes}) { *failure=Some(e);return false; }
++    if deadline.is_some_and(|d|std::time::Instant::now()>=d){*failure=Some(NativeAdmissionFailure::Deadline);return false;}
++    true
++}
++fn native_reserve<T>(v: &mut Vec<T>, needed: usize, hook: &mut Option<NativeAdmission>, failure: &mut Option<NativeAdmissionFailure>, deadline: Option<std::time::Instant>, operation: NativeOperation) -> bool {
++    if failure.is_some() {return false;}
++    if hook.is_none() || needed<=v.capacity() { return true; }
++    let Some(target)=v.capacity().checked_mul(2).and_then(|n|n.max(needed).checked_add(0)) else { *failure=Some(NativeAdmissionFailure::Overflow);return false; };
++    let Some(bytes)=target.checked_mul(std::mem::size_of::<T>()).and_then(|n|u64::try_from(n).ok()) else { *failure=Some(NativeAdmissionFailure::Overflow);return false; };
++    if !native_pay(hook,failure,deadline,operation,v.len() as u64,bytes) {return false;}
++    if v.try_reserve_exact(target-v.len()).is_err() { *failure=Some(NativeAdmissionFailure::Allocation);return false; }
++    if deadline.is_some_and(|d|std::time::Instant::now()>=d){*failure=Some(NativeAdmissionFailure::Deadline);return false;}
++    true
++}
++
+ pub struct Solver {
++    native_admission: Option<NativeAdmission>,
++    native_failure: Option<NativeAdmissionFailure>,
++    native_pending_model: Option<Vec<bool>>,
++    // Slot, original vector, next unread index, compacted prefix length.
++    // On sticky refusal the actual allocation stays owned without suffix copying.
++    native_pending_watch: Option<(usize,Vec<Watcher>,usize,usize)>,
++    native_partial_xor: Option<(usize,usize,usize,bool)>,
++    native_sort_scratch: Vec<usize>,
++    native_pending_clause: Option<Vec<Lit>>,
++    native_pending_reduction: Option<(Vec<bool>,Vec<usize>)>,
+     progress: Option<Arc<SolverProgress>>,
+     event_observer: Option<EventObserver>,
+     event_failure: Option<String>,
+@@ -809,6 +848,8 @@
+ 
+ /// Outcome of one Gauss-Jordan pass over the XOR rows.
+ enum XorStep {
++    /// Sticky native admission refusal, never a fixpoint or contradiction.
++    Refused,
+     /// Nothing new could be derived.
+     Fixpoint,
+     /// At least one literal was enqueued; re-run clause propagation.
+@@ -858,6 +899,14 @@
+             progress: None,
+             event_observer: None,
+             event_failure: None,
++            native_admission: None,
++            native_failure: None,
++            native_pending_model: None,
++            native_pending_watch: None,
++            native_partial_xor: None,
++            native_sort_scratch: Vec::new(),
++            native_pending_clause: None,
++            native_pending_reduction: None,
+             n_vars,
+             lit_base: n_vars,
+             arena: Vec::new(),
+@@ -910,6 +959,122 @@
+         }
+     }
+ 
++    /// Attach once without replacing the existing event observer or deadline.
++    /// This increment supports only the audited conflict-free CNF subset.
++    pub fn set_search_admission(&mut self, mut hook: impl FnMut(NativeCharge)->Result<(),NativeAdmissionFailure> + Send + Sync + 'static) -> Result<(),NativeAdmissionFailure> {
++        if self.native_admission.is_some() || self.native_failure.is_some() || self.stats.decisions!=0 || self.conflicts!=0 || !self.trail_lim.is_empty() {return Err(NativeAdmissionFailure::UncoveredPath);}
++        if self.deadline.is_some_and(|d|std::time::Instant::now()>=d) {self.native_failure=Some(NativeAdmissionFailure::Deadline);return Err(NativeAdmissionFailure::Deadline);}
++        let charge=NativeCharge {operation:NativeOperation::Entry,work:1,requested_replacement_bytes:std::mem::size_of_val(&hook) as u64};
++        if let Err(error)=hook(charge) {self.native_failure=Some(error);return Err(error);}
++        if self.deadline.is_some_and(|d|std::time::Instant::now()>=d){self.native_failure=Some(NativeAdmissionFailure::Deadline);return Err(NativeAdmissionFailure::Deadline);}
++        self.native_admission=Some(Box::new(hook));Ok(())
++    }
++    pub fn search_admission_failure(&self)->Option<NativeAdmissionFailure> { self.native_failure }
++    fn native_charge(&mut self, op:NativeOperation, work:u64)->bool { if self.native_observer_refused(){return false;} native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,op,work,0) }
++    // An observer refusal retains the native owner at its exact boundary.
++    // Legacy (unadmitted) search keeps its prior boundary behavior.
++    fn native_observer_refused(&self)->bool {
++        self.native_admission.is_some() && self.event_failure.is_some()
++    }
++    fn native_fill_detached(&mut self, length:usize)->bool {
++        if self.native_admission.is_none() {self.detached.resize(length,false);return true;}
++        while self.detached.len()<length {
++            let end=self.detached.len().saturating_add(64).min(length);
++            if !self.native_charge(NativeOperation::DetachedGrowth,(end-self.detached.len()) as u64){return false;}
++            self.detached.resize(end,false);
++        }
++        self.detached.truncate(length);
++        true
++    }
++    fn native_event_payload(&mut self, elements:usize, element_bytes:usize)->bool {
++        let Some(bytes)=elements.checked_mul(element_bytes).and_then(|b|b.checked_add(128)).and_then(|b|u64::try_from(b).ok()) else {self.native_failure=Some(NativeAdmissionFailure::Overflow);return false;};
++        native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::EventPayload,elements as u64+32,bytes)
++    }
++    fn native_conflict_payload(&mut self, conflict:Conflict,resolved:Lit)->bool {
++        let n=match conflict {Conflict::Clause(id)=>clause_in(&self.arena,id).len(),Conflict::Xor if resolved==0=>self.xor_conflict.len(),Conflict::Xor=>self.xor_reason[var_of(resolved) as usize].len()};
++        let copies=if matches!(conflict,Conflict::Xor){2}else{1};
++        match n.checked_mul(copies) {Some(n)=>self.native_event_payload(n,std::mem::size_of::<Lit>()),None=>{self.native_failure=Some(NativeAdmissionFailure::Overflow);false}}
++    }
++    fn native_assignment_payload(&mut self,reason:Reason,variable:usize)->bool {
++        let n=if matches!(reason,Reason::XorPropagated){self.xor_reason[variable].len()}else{0};
++        self.native_event_payload(n,std::mem::size_of::<Lit>())
++    }
++    fn native_lowest(&mut self,row:std::ops::Range<usize>)->Result<Option<u32>,()> {
++        for (w,index) in row.enumerate() {
++            if !self.native_charge(NativeOperation::XorWord,4) {return Err(());}
++            let free=self.matrix[index]&!self.assigned_w[w];
++            if free!=0 {return Ok(Some((w*64) as u32+free.trailing_zeros()));}
++        }
++        Ok(None)
++    }
++    fn native_residual(&mut self,i:usize,words:usize)->Result<bool,()> {
++        let mut parity=self.matrix_rhs[i];
++        for w in 0..words {
++            if !self.native_charge(NativeOperation::XorWord,8) {return Err(());}
++            let m=self.matrix[i*words+w];
++            parity^=((m&self.assigned_w[w]&self.value_w[w]).count_ones()&1)==1;
++        }
++        Ok(parity)
++    }
++    fn native_reason(&mut self,row:std::ops::Range<usize>,implied:Option<Lit>,clause:&mut Vec<Lit>)->bool {
++        clause.clear();
++        if let Some(l)=implied {clause.push(l);}
++        for (w,index) in row.enumerate() {
++            if !self.native_charge(NativeOperation::XorReason,8) {return false;}
++            let mut bits=self.matrix[index]&self.assigned_w[w];let value=self.value_w[w];
++            while bits!=0 {
++                if !self.native_charge(NativeOperation::XorReason,4) {return false;}
++                let b=bits.trailing_zeros();bits&=bits-1;let v=((w*64) as u32+b+1) as Lit;
++                clause.push(if (value>>b)&1==1 {-v}else{v});
++            }
++        }
++        true
++    }
++    /// Stable descending clause-length order with admitted comparisons/copies.
++    /// Partial scratch remains owned on every refusal.
++    fn native_clause_sort(&mut self,candidates:&mut Vec<usize>)->bool {
++        if self.native_admission.is_none() {candidates.sort_by_key(|&i|std::cmp::Reverse(clause_in(&self.arena,self.clause_at[i]).len()));return true;}
++        let n=candidates.len();
++        if !native_reserve(&mut self.native_sort_scratch,n,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Reduction) {return false;}
++        self.native_sort_scratch.clear();
++        for _ in 0..n {if !self.native_charge(NativeOperation::Reduction,1){return false;}self.native_sort_scratch.push(0);}
++        let mut width=1usize;
++        while width<n {
++            let mut start=0usize;
++            while start<n {
++                let middle=start.saturating_add(width).min(n);let end=middle.saturating_add(width).min(n);
++                let (mut left,mut right)=(start,middle);
++                for dest in start..end {
++                    if !self.native_charge(NativeOperation::Reduction,8){return false;}
++                    let take_left=right==end || (left<middle && clause_in(&self.arena,self.clause_at[candidates[left]]).len()>=clause_in(&self.arena,self.clause_at[candidates[right]]).len());
++                    self.native_sort_scratch[dest]=if take_left {let v=candidates[left];left+=1;v}else{let v=candidates[right];right+=1;v};
++                }
++                start=end;
++            }
++            std::mem::swap(candidates,&mut self.native_sort_scratch);
++            width=width.saturating_mul(2);
++        }
++        true
++    }
++    fn native_entry(&mut self, theory:bool)->bool {
++        if !self.native_charge(NativeOperation::Entry,32) {return false;}
++        if self.native_admission.is_some() && (self.event_observer.is_some() || !self.xors.is_empty() || theory || !self.trail_lim.is_empty()) {self.native_failure=Some(NativeAdmissionFailure::UncoveredPath);return false;}
++        true
++    }
++    /// Prepaid copy of the actual native assignment; no second solver/model.
++    pub fn admitted_model(&mut self)->Option<Vec<bool>> {
++        if !self.native_charge(NativeOperation::Model,self.n_vars as u64) {return None;}
++        let mut model=Vec::new();
++        if !native_reserve(&mut model,self.n_vars as usize,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Model) {return None;}
++        for start in (0..self.n_vars as usize).step_by(64) {
++            let end=start.saturating_add(64).min(self.n_vars as usize);
++            if !self.native_charge(NativeOperation::Model,(end-start) as u64){self.native_pending_model=Some(model);return None;}
++            model.extend(self.assignment()[start..end].iter().map(|a|a.unwrap_or(false)));
++        }
++        if !self.native_charge(NativeOperation::Model,0){self.native_pending_model=Some(model);return None;}
++        Some(model)
++    }
++
+     /// Attach before search. Emits the existing formula and trail immediately,
+     /// allowing attachment after encoding-time unit assignments. Observation
+     /// never changes native operation counters. The first sink error is sticky:
+@@ -918,6 +1083,7 @@
+         &mut self,
+         observer: impl FnMut(&SolverEvent) -> Result<(), String> + Send + Sync + 'static,
+     ) -> Result<(), String> {
++        if self.native_admission.is_some() || self.native_failure.is_some() {return Err("SAT observer must be installed before native admission".into());}
+         if self.event_observer.is_some() || self.event_failure.is_some() {
+             return Err("SAT event observer already installed or failed".into());
+         }
+@@ -1120,6 +1286,7 @@
+     /// Duplicated variables cancel (`x ⊕ x = 0`), so the caller need
+     /// not deduplicate.
+     pub fn add_xor(&mut self, vars: &[u32], rhs: bool) -> bool {
++        if self.native_admission.is_some() {self.native_failure.get_or_insert(NativeAdmissionFailure::UncoveredPath);return false;}
+         let mut mask = vec![0u64; bs_words(self.n_vars)];
+         // One per variable flipped, and the row's words twice: the
+         // emptiness test and the copy into the row store.
+@@ -1171,6 +1338,7 @@
+     /// symmetry breaking, cardinality chains — over an encoding they
+     /// did not size themselves; call it before `solve`, at level 0.
+     pub fn add_vars(&mut self, count: u32) -> std::ops::RangeInclusive<u32> {
++        if self.native_admission.is_some(){self.native_failure.get_or_insert(NativeAdmissionFailure::UncoveredPath);return 1..=0;}
+         if self.observing() && count != 0 {
+             self.event_failure =
+                 Some("changing variable count after event attachment is not supported".into());
+@@ -1346,6 +1514,7 @@
+     /// Add a clause `lits` (DIMACS literal encoding). Returns false if
+     /// the empty clause is added (immediately UNSAT).
+     pub fn add_clause(&mut self, mut lits: Vec<Lit>) -> bool {
++        if self.native_admission.is_some() {self.native_failure.get_or_insert(NativeAdmissionFailure::UncoveredPath);return false;}
+         // Normalisation: the sort's `k⌈log₂ k⌉` comparisons, then one
+         // pass each to deduplicate and to test for a tautology.
+         let k = lits.len() as u64;
+@@ -1478,7 +1647,7 @@
+             cref: idx,
+             blocker: l0,
+         });
+-        self.detached.resize(self.clause_at.len(), false);
++        if !self.native_fill_detached(self.clause_at.len()) {return None;}
+         // Theory clauses are permanent propagation lemmas. Advancing this
+         // boundary also retains any learnt clauses that preceded them, which
+         // costs memory but cannot change an answer.
+@@ -1556,6 +1725,12 @@
+ 
+     /// Append a clause to the arena, returning its offset.
+     fn push_clause(&mut self, lits: &[Lit]) -> u32 {
++        if !self.native_charge(NativeOperation::ClauseGrowth,lits.len() as u64+8) {return 0;}
++        let Some(needed)=self.arena.len().checked_add(lits.len()).and_then(|n|n.checked_add(1)) else {self.native_failure=Some(NativeAdmissionFailure::Overflow);return 0;};
++        if !native_reserve(&mut self.arena,needed,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::ClauseGrowth) {return 0;}
++        let needed=self.clause_at.len()+1;
++        if !native_reserve(&mut self.clause_at,needed,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::ClauseGrowth) {return 0;}
++        if self.observing() && !self.native_event_payload(lits.len(),std::mem::size_of::<Lit>()) {return 0;}
+         let cref = self.next_cref();
+         let len = Lit::try_from(lits.len()).expect("clause exceeds 2^31 literals");
+         // The length word, the literals, and the index entry.
+@@ -1607,6 +1782,9 @@
+     /// call then costs more than the check it saves.
+     #[inline(always)]
+     fn assign(&mut self, lit: Lit, r: Reason) {
++        if !self.native_charge(NativeOperation::Assignment,32) {return;}
++        let needed=self.trail.len()+1;
++        if !native_reserve(&mut self.trail,needed,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::TrailGrowth) {return;}
+         debug_assert!(self.lit_value(lit).is_none(), "assign over {lit}");
+         let v = var_of(lit) as usize;
+         let n = self.lit_base as i32;
+@@ -1626,6 +1804,7 @@
+         self.epoch += 1;
+         self.stats.propagations += 1;
+         if self.observing() {
++            if !self.native_assignment_payload(r,v) {return;}
+             self.emit(SolverEvent::Assignment {
+                 literal: lit,
+                 level: self.level[v],
+@@ -1647,7 +1826,7 @@
+     /// no special-casing.
+     fn propagate(&mut self) -> Option<Conflict> {
+         loop {
+-            if self.event_failure.is_some() {
++            if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                 return None;
+             }
+             self.progress_phase(SolverProgressPhase::ClausePropagation);
+@@ -1655,7 +1834,7 @@
+             let cnf = self.propagate_clauses();
+             self.stats.ns_propagate_clauses += t.elapsed().as_nanos() as u64;
+             self.progress_phase(SolverProgressPhase::Idle);
+-            if self.event_failure.is_some() {
++            if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                 return None;
+             }
+             if let Some(c) = cnf {
+@@ -1700,6 +1879,7 @@
+             }
+             self.progress_phase(SolverProgressPhase::Idle);
+             match step {
++                XorStep::Refused => return None,
+                 XorStep::Conflict => return Some(Conflict::Xor),
+                 XorStep::Propagated => continue,
+                 XorStep::Fixpoint => return None,
+@@ -1717,10 +1897,12 @@
+     /// elimination — which is what lets us read a reason clause straight
+     /// off a reduced row.
+     fn propagate_xors(&mut self) -> XorStep {
++        if !self.native_charge(NativeOperation::XorSetup,32) {return XorStep::Refused;}
+         self.stats.xor_passes += 1;
+         let words = bs_words(self.n_vars);
+         if self.matrix_rhs.len() != self.xors.len() {
+             self.rebuild_matrix();
++            if self.native_failure.is_some() || self.native_observer_refused() {return XorStep::Refused;}
+         }
+         let rows = self.matrix_rhs.len();
+         // Each pass tests every row's pivot (phase 1) and every row's
+@@ -1734,9 +1916,9 @@
+         // the `O(rows² × words)` of re-eliminating from scratch.
+         let mut step = XorStep::Fixpoint;
+         for i in 0..rows {
+-            if self.event_failure.is_some() {
+-                return XorStep::Fixpoint;
+-            }
++            if self.native_failure.is_some() || self.native_observer_refused() {return XorStep::Refused;}
++            if self.event_failure.is_some() {return XorStep::Fixpoint;}
++            if !self.native_charge(NativeOperation::XorPivot,16) {return XorStep::Refused;}
+             let intact = match self.pivot[i] {
+                 Some(p) => self.var_value(p as usize).is_none(),
+                 None => false,
+@@ -1747,26 +1929,36 @@
+             self.stats.xor_repivots += 1;
+ 
+             let row_i = i * words..(i + 1) * words;
+-            match self.lowest_unassigned(&self.matrix[row_i.clone()]) {
++            // Prepay bounded scans before helpers borrow the matrix.
++            if !self.native_charge(NativeOperation::XorScan,2*words as u64+1) {return XorStep::Refused;}
++            let lowest=if self.native_admission.is_some(){match self.native_lowest(row_i.clone()){Ok(v)=>v,Err(())=>return XorStep::Refused}}else{self.lowest_unassigned(&self.matrix[row_i.clone()])};
++            match lowest {
+                 None => {
+                     // No unassigned variable left: the row is decided.
+                     // Its words were scanned for a pivot, then for the
+                     // residual parity.
+                     self.stats.word_ops += 2 * words as u64;
+                     self.pivot[i] = None;
+-                    if self.row_residual(i, words) {
++                    let residual=if self.native_admission.is_some(){match self.native_residual(i,words){Ok(v)=>v,Err(())=>return XorStep::Refused}}else{self.row_residual(i,words)};
++                    if residual {
++                        if !self.native_charge(NativeOperation::XorReason,(words+self.n_vars as usize+1) as u64) {return XorStep::Refused;}
++                        if !native_reserve(&mut self.xor_conflict,self.n_vars as usize,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorGrowth) {return XorStep::Refused;}
+                         let mut buf = std::mem::take(&mut self.xor_conflict);
+-                        self.write_xor_reason(&self.matrix[row_i], None, &mut buf);
++                        if self.native_admission.is_some() {
++                            if !self.native_reason(row_i,None,&mut buf){self.xor_conflict=buf;return XorStep::Refused;}
++                        }else{self.write_xor_reason(&self.matrix[row_i],None,&mut buf);}
+                         // The reason: one per row word, one per literal.
+                         self.stats.word_ops += (words + buf.len()) as u64;
+                         self.xor_conflict = buf;
+                         self.stats.xor_conflicts += 1;
+                         if self.observing() {
++                            if !self.native_event_payload(self.xor_conflict.len(),std::mem::size_of::<Lit>()) {return XorStep::Refused;}
+                             self.emit(SolverEvent::XorConflict {
+                                 row_id: i,
+                                 explanation: self.xor_conflict.clone(),
+                             });
+                         }
++                        if self.native_observer_refused(){return XorStep::Refused;}
+                         return XorStep::Conflict;
+                     }
+                 }
+@@ -1780,20 +1972,38 @@
+                     // row instead of sharing registers with the XOR.
+                     let (pw, pbit) = (p as usize / 64, 1u64 << (p % 64));
+                     let src_rhs = self.matrix_rhs[i];
++                    if !self.native_charge(NativeOperation::XorScan,words as u64) {return XorStep::Refused;}
++                    if !native_reserve(&mut self.xor_src,words,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorGrowth) {return XorStep::Refused;}
+                     let mut src = std::mem::take(&mut self.xor_src);
+                     src.clear();
+-                    src.extend_from_slice(&self.matrix[row_i]);
++                    if self.native_admission.is_some() {
++                        for chunk in self.matrix[row_i].chunks(64) {
++                            if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorScan,0,0){self.xor_src=src;return XorStep::Refused;}
++                            src.extend_from_slice(chunk);
++                        }
++                    }else{src.extend_from_slice(&self.matrix[row_i]);}
+                     let matrix = &mut self.matrix[..rows * words];
+                     let matrix_rhs = &mut self.matrix_rhs[..rows];
+                     let mut row_ops = 0u64;
+                     for j in 0..rows {
++                        if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorScan,1,0) {break;}
+                         if j == i || matrix[j * words + pw] & pbit == 0 {
+                             continue;
+                         }
++                        if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorWord,words as u64+1,0) {break;}
+                         row_ops += 1;
++                        if self.native_admission.is_some(){self.native_partial_xor=Some((i,j,0,true));}
+                         matrix_rhs[j] ^= src_rhs;
+-                        xor_into(&mut matrix[j * words..(j + 1) * words], &src);
+-                        if self.event_observer.is_some() && self.event_failure.is_none() {
++                        if self.native_admission.is_some() {
++                            for (dest,source) in matrix[j*words..(j+1)*words].chunks_mut(64).zip(src.chunks(64)) {
++                                if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorWord,dest.len() as u64,0){break;}
++                                xor_into(dest,source);
++                                if let Some(partial)=&mut self.native_partial_xor {partial.2+=dest.len();}
++                            }
++                            if self.native_failure.is_some(){break;}
++                        }else{xor_into(&mut matrix[j*words..(j+1)*words],&src);}
++                        if self.event_observer.is_some() && (self.event_failure.is_none() && self.native_failure.is_none()) {
++                            if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::EventPayload,32,128) {break;}
+                             emit_to(
+                                 &mut self.event_observer,
+                                 &mut self.event_failure,
+@@ -1803,6 +2013,8 @@
+                                 },
+                             );
+                         }
++                        if self.native_admission.is_some() && self.event_failure.is_some(){break;}
++                        if self.event_failure.is_none(){self.native_partial_xor=None;}
+                     }
+                     self.stats.xor_row_ops += row_ops;
+                     // Pivot search up to `p`'s word, the row copied out,
+@@ -1811,6 +2023,7 @@
+                     self.stats.word_ops +=
+                         (pw + 1 + words + rows) as u64 + row_ops * (words as u64 + 1);
+                     self.xor_src = src;
++                    if self.native_failure.is_some() || self.native_observer_refused() {return XorStep::Refused;}
+                 }
+             }
+         }
+@@ -1822,9 +2035,9 @@
+         // a popcount, and no further elimination is needed.
+         let mut propagated = false;
+         'rows: for i in 0..rows {
+-            if self.event_failure.is_some() {
+-                return XorStep::Fixpoint;
+-            }
++            if self.native_failure.is_some() || self.native_observer_refused() {return XorStep::Refused;}
++            if self.event_failure.is_some() {return XorStep::Fixpoint;}
++            if !self.native_charge(NativeOperation::XorPivot,16) {return XorStep::Refused;}
+             let p = match self.pivot[i] {
+                 Some(p) => p,
+                 None => continue, // decided in phase 1
+@@ -1838,6 +2051,7 @@
+                 .zip(&self.value_w)
+                 .enumerate()
+             {
++                if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorWord,8,0) {return XorStep::Refused;}
+                 if m == 0 {
+                     continue;
+                 }
+@@ -1859,24 +2073,26 @@
+             } else {
+                 -((p + 1) as Lit)
+             };
++            if !self.native_charge(NativeOperation::XorReason,(words+self.n_vars as usize+1) as u64) {return XorStep::Refused;}
++            if !native_reserve(&mut self.xor_reason[p as usize],self.n_vars as usize,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorGrowth) {return XorStep::Refused;}
+             let mut buf = std::mem::take(&mut self.xor_reason[p as usize]);
+-            self.write_xor_reason(
+-                &self.matrix[i * words..(i + 1) * words],
+-                Some(lit),
+-                &mut buf,
+-            );
++            if self.native_admission.is_some() {
++                if !self.native_reason(i*words..(i+1)*words,Some(lit),&mut buf){self.xor_reason[p as usize]=buf;return XorStep::Refused;}
++            }else{self.write_xor_reason(&self.matrix[i*words..(i+1)*words],Some(lit),&mut buf);}
+             self.stats.xor_reason_lits += buf.len() as u64;
+             // The reason: one per row word, one per literal.
+             self.stats.word_ops += (words + buf.len()) as u64;
+             self.xor_reason[p as usize] = buf;
+             self.stats.xor_propagations += 1;
+             if self.observing() {
++                if !self.native_event_payload(self.xor_reason[p as usize].len(),std::mem::size_of::<Lit>()) {return XorStep::Refused;}
+                 self.emit(SolverEvent::XorImplication {
+                     row_id: i,
+                     literal: lit,
+                     explanation: self.xor_reason[p as usize].clone(),
+                 });
+             }
++            if self.native_observer_refused(){return XorStep::Refused;}
+             if self.enqueue(lit, Reason::XorPropagated).is_err() {
+                 // Unreachable while the invariant holds — the pivot was
+                 // unassigned — but treat it as a conflict rather than
+@@ -1885,10 +2101,13 @@
+                 self.stats.xor_conflicts += 1;
+                 return XorStep::Conflict;
+             }
++            if self.native_failure.is_some() || self.native_observer_refused() {return XorStep::Refused;}
+             propagated = true;
+         }
+ 
++        if !self.native_charge(NativeOperation::XorSetup,1) {return XorStep::Refused;}
+         match step {
++            XorStep::Refused => XorStep::Refused,
+             XorStep::Conflict => XorStep::Conflict,
+             _ if propagated => {
+                 step = XorStep::Propagated;
+@@ -1906,21 +2125,40 @@
+     /// the reason clauses read off them.  Rebuilding at restarts, where
+     /// the trail is empty anyway, bounds that drift.
+     fn rebuild_matrix(&mut self) {
++        if !self.native_charge(NativeOperation::XorSetup,self.xors.len() as u64) {return;}
++        let mut total=0usize;
++        for row in &self.xors {
++            if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorSetup,0,0){return;}
++            let Some(next)=total.checked_add(row.mask.len()) else {self.native_failure=Some(NativeAdmissionFailure::Overflow);return;};
++            total=next;
++        }
++        if !native_reserve(&mut self.matrix,total,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorGrowth) {return;}
++        if !native_reserve(&mut self.matrix_rhs,self.xors.len(),&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorGrowth) {return;}
++        if !native_reserve(&mut self.pivot,self.xors.len(),&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorGrowth) {return;}
++        if !self.native_charge(NativeOperation::XorSetup,total as u64+2*self.xors.len() as u64) {return;}
+         // Every row's words copied, its rhs and its pivot slot reset.
+-        self.stats.word_ops += self
+-            .xors
+-            .iter()
+-            .map(|row| row.mask.len() as u64 + 2)
+-            .sum::<u64>();
++        self.stats.word_ops += total as u64+2*self.xors.len() as u64;
+         self.matrix.clear();
+         self.matrix_rhs.clear();
+         for row in &self.xors {
+-            self.matrix.extend_from_slice(&row.mask);
++            if self.native_admission.is_some() {
++                for chunk in row.mask.chunks(64) {
++                    if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::XorWord,chunk.len() as u64,0){return;}
++                    self.matrix.extend_from_slice(chunk);
++                }
++            }else{self.matrix.extend_from_slice(&row.mask);}
+             self.matrix_rhs.push(row.rhs);
+         }
+         self.pivot.clear();
+-        self.pivot.resize(self.matrix_rhs.len(), None);
++        if self.native_admission.is_some() {
++            while self.pivot.len()<self.matrix_rhs.len() {
++                let end=self.pivot.len().saturating_add(64).min(self.matrix_rhs.len());
++                if !self.native_charge(NativeOperation::XorPivot,(end-self.pivot.len()) as u64){return;}
++                self.pivot.resize(end,None);
++            }
++        }else{self.pivot.resize(self.matrix_rhs.len(), None);}
+         if self.observing() {
++            if !self.native_event_payload(0,0) {return;}
+             self.emit(SolverEvent::XorMatrixReset);
+         }
+     }
+@@ -2008,7 +2246,7 @@
+     fn propagate_clauses(&mut self) -> Option<u32> {
+         let n = self.lit_base as i32;
+         let mut conflict: Option<u32> = None;
+-        while conflict.is_none() && self.qhead < self.trail.len() && self.event_failure.is_none() {
++        while conflict.is_none() && self.qhead < self.trail.len() && (self.event_failure.is_none() && self.native_failure.is_none()) {
+             let lit = self.trail[self.qhead];
+             self.qhead += 1;
+             // Clauses watching `¬lit` — that watcher has just become
+@@ -2019,6 +2257,7 @@
+             // cursor.  Building a fresh vector here meant one heap
+             // allocation per propagated literal, which at ~280
+             // propagations a conflict is millions per solve.
++            if !self.native_charge(NativeOperation::WatchList,1+self.watches[wi].len() as u64) {return None;}
+             let mut ws = std::mem::take(&mut self.watches[wi]);
+             // The trail read, then every watcher once: its blocker test
+             // and write-back in the scan, or its copy after a conflict.
+@@ -2028,9 +2267,10 @@
+             let (mut i, mut j) = (0usize, 0usize);
+ 
+             while i < ws.len() {
+-                if self.event_failure.is_some() {
++                if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                     break;
+                 }
++                if !self.native_charge(NativeOperation::Watcher,32) {break;}
+                 let w = ws[i];
+                 i += 1;
+                 // Blocker: if this literal is already true the clause is
+@@ -2064,9 +2304,13 @@
+                 // Look for a literal that is not false to watch instead.
+                 let mut moved = false;
+                 for slot in rest.iter_mut() {
++                    if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Literal,1,0) {break;}
+                     self.stats.clause_lit_visits += 1;
+                     let l = *slot;
+                     if self.values[(l + n) as usize] != Some(false) {
++                        let destination=(l+n) as usize;
++                        let needed=self.watches[destination].len()+1;
++                        if !native_reserve(&mut self.watches[destination],needed,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::WatchGrowth) {break;}
+                         // Swap it into the watched position.
+                         *slot = watch[0];
+                         watch[0] = l;
+@@ -2082,6 +2326,7 @@
+                         break;
+                     }
+                 }
++                if self.native_failure.is_some() {ws[j]=w;j+=1;break;}
+                 if moved {
+                     continue; // the watch now lives elsewhere
+                 }
+@@ -2106,8 +2351,16 @@
+                 }
+             }
+ 
+-            // Keep whatever the loop did not reach.
++            // Refusal retains both the compacted prefix and untouched suffix.
++            if self.native_admission.is_some() && (self.native_failure.is_some() || self.event_failure.is_some()) {
++                self.native_pending_watch=Some((wi,ws,i,j));return None;
++            }
++            // Successful/conflict cleanup was prepaid by WatchList; check the
++            // original deadline before every bounded copy batch.
+             while i < ws.len() {
++                if i % 64 == 0 && !self.native_charge(NativeOperation::WatchList,0) {
++                    self.native_pending_watch=Some((wi,ws,i,j));return None;
++                }
+                 ws[j] = ws[i];
+                 i += 1;
+                 j += 1;
+@@ -2132,10 +2385,13 @@
+     /// now known to be implied by the clause — and rolled back on
+     /// failure, which is what `top` records.
+     fn lit_redundant(&mut self, p: Lit, abstract_levels: u32, stack: &mut Vec<Lit>) -> bool {
++        if !self.native_charge(NativeOperation::Analyze,8+self.seen_stack.len() as u64) {return false;}
+         let top = self.seen_stack.len();
+         stack.clear();
++        if !native_reserve(stack,stack.len()+1,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth){return false;}
+         stack.push(p);
+         while let Some(q) = stack.pop() {
++            if !self.native_charge(NativeOperation::Analyze,8) {return false;}
+             let qv = var_of(q) as usize;
+             // The reason is borrowed once per step, field by field, so the
+             // walk below is a slice iteration; re-matching the source and
+@@ -2152,6 +2408,7 @@
+             // for literals it did not reach).
+             self.stats.word_ops += 1 + reason.len() as u64;
+             for &r in reason {
++                if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Analyze,16,0) {return false;}
+                 let rv = var_of(r) as usize;
+                 // The propagated literal itself, anything already in the
+                 // clause, and anything fixed at level 0 are all fine.
+@@ -2160,13 +2417,14 @@
+                 }
+                 let has_reason = !matches!(self.reason[rv], Reason::Decision);
+                 if has_reason && (abstract_level(self.level[rv]) & abstract_levels) != 0 {
+-                    self.seen[rv] = true;
+-                    self.seen_stack.push(rv as u32);
+-                    stack.push(r);
++                    let needed=self.seen_stack.len()+1;
++                    if !native_reserve(&mut self.seen_stack,needed,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth) || !native_reserve(stack,stack.len()+1,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth){return false;}
++                    self.seen[rv] = true;self.seen_stack.push(rv as u32);stack.push(r);
+                 } else {
+                     // The rollback of this walk's marks.
+                     self.stats.word_ops += (self.seen_stack.len() - top) as u64;
+                     for j in top..self.seen_stack.len() {
++                        if !self.native_charge(NativeOperation::Analyze,0){return false;}
+                         self.seen[self.seen_stack[j] as usize] = false;
+                     }
+                     self.seen_stack.truncate(top);
+@@ -2175,6 +2433,26 @@
+             }
+         }
+         true
++    }
++
++    /// Own both actual minimization buffers through every admission boundary.
++    fn minimize_for_search(&mut self,mut learnt:Vec<Lit>,abstract_levels:u32)->Option<Vec<Lit>> {
++        let mut stack=std::mem::take(&mut self.redundant_stack);
++        let mut w=0usize;
++        for r in 0..learnt.len() {
++            // Decision reasons skip lit_redundant, but still perform real work.
++            if !self.native_charge(NativeOperation::Analyze,4) {
++                self.redundant_stack=stack;self.learnt_buf=learnt;return None;
++            }
++            let q=learnt[r];let v=var_of(q) as usize;
++            let redundant=!matches!(self.reason[v],Reason::Decision)
++                && self.lit_redundant(q,abstract_levels,&mut stack);
++            if self.native_failure.is_some() || self.native_observer_refused() {
++                self.redundant_stack=stack;self.learnt_buf=learnt;return None;
++            }
++            if !redundant {learnt[w]=q;w+=1;}
++        }
++        learnt.truncate(w);self.redundant_stack=stack;Some(learnt)
+     }
+ 
+     /// 1-UIP conflict analysis. Returns `(learnt_clause, backjump_level)`.
+@@ -2183,7 +2461,23 @@
+     /// re-zeroing a per-variable vector, and reason clauses are copied
+     /// into a reused buffer rather than cloned — both were per-conflict
+     /// allocations on a path taken millions of times.
++    /// Search boundary preserves analysis-owned partial output on refusal.
++    fn analyze_for_search(&mut self, conflict: Conflict) -> Option<(Vec<Lit>, i32)> {
++        let result = self.analyze(conflict);
++        if self.native_failure.is_some() || self.native_observer_refused() {
++            if self.native_pending_clause.is_none() && !result.0.is_empty() {
++                self.native_pending_clause = Some(result.0);
++            }
++            return None;
++        }
++        Some(result)
++    }
++
+     fn analyze(&mut self, conflict: Conflict) -> (Vec<Lit>, i32) {
++        if !self.native_charge(NativeOperation::Analyze,32) {return (Vec::new(),0);}
++        if !native_reserve(&mut self.learnt_buf,self.n_vars as usize,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth) {return (Vec::new(),0);}
++        if !native_reserve(&mut self.seen_stack,self.n_vars as usize,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth) {return (Vec::new(),0);}
++        if !native_reserve(&mut self.redundant_stack,self.n_vars as usize,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth) {return (Vec::new(),0);}
+         let current_level = self.trail_lim.len() as i32;
+         let mut learnt = std::mem::take(&mut self.learnt_buf);
+         learnt.clear();
+@@ -2193,7 +2487,9 @@
+         let mut trail_pos = self.trail.len();
+ 
+         loop {
++            if !self.native_charge(NativeOperation::Analyze,16) {self.learnt_buf=learnt;return (Vec::new(),0);}
+             if self.observing() {
++                if !self.native_conflict_payload(src,p) {self.learnt_buf=learnt;return (Vec::new(),0);}
+                 let (reason, literals) = self.conflict_event(src, p);
+                 self.emit(SolverEvent::AnalysisReason {
+                     resolved_literal: p,
+@@ -2201,6 +2497,7 @@
+                     literals,
+                 });
+             }
++            if self.native_observer_refused(){self.learnt_buf=learnt;return (Vec::new(),0);}
+             // Read the reason in place.  Copying it into a scratch
+             // buffer was a memcpy of up to a hundred literals at every
+             // resolution step, and conflict analysis is the hottest
+@@ -2216,6 +2513,7 @@
+ 
+             self.stats.analyze_lit_visits += reason.len() as u64;
+             for &q in reason {
++                if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Analyze,16+(u32::BITS-self.n_vars.leading_zeros()) as u64*8,0) {self.learnt_buf=learnt;return (Vec::new(),0);}
+                 // `p` is 0 on the first step, which no literal equals.
+                 if q == p {
+                     continue;
+@@ -2231,11 +2529,13 @@
+                     // The mark, the activity bump and its new key, and the
+                     // clause or counter update; the heap charges itself.
+                     self.stats.word_ops += 4;
+-                    self.seen[v] = true;
+-                    self.seen_stack.push(v as u32);
++                    let needed=self.seen_stack.len()+1;
++                    if !native_reserve(&mut self.seen_stack,needed,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth){self.learnt_buf=learnt;return(Vec::new(),0);}
++                    self.seen[v] = true;self.seen_stack.push(v as u32);
+                     // Bump activity, and reposition in the branching heap.
+                     self.activity[v] += self.activity_inc;
+                     if self.activity[v] > 1e100 {
++                        if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Analyze,2*self.activity.len() as u64+1,0) {self.learnt_buf=learnt;return (Vec::new(),0);}
+                         // Rescale: every activity and key rewritten.
+                         self.stats.word_ops += 2 * self.activity.len() as u64;
+                         for (a, (k, &prio)) in self
+@@ -2243,6 +2543,7 @@
+                             .iter_mut()
+                             .zip(self.heap_key.iter_mut().zip(&self.branch_priority))
+                         {
++                            if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Analyze,0,0){self.learnt_buf=learnt;return(Vec::new(),0);}
+                             *a *= 1e-100;
+                             *k = order_key(*a, prio);
+                         }
+@@ -2253,6 +2554,8 @@
+                     if self.level[v] >= current_level {
+                         counter += 1;
+                     } else {
++                        let needed=learnt.len()+1;
++                        if !native_reserve(&mut learnt,needed,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth){self.learnt_buf=learnt;return(Vec::new(),0);}
+                         learnt.push(q);
+                     }
+                 }
+@@ -2260,6 +2563,7 @@
+ 
+             // Find the next literal to resolve on — walk back the trail.
+             while trail_pos > 0 {
++                if !self.native_charge(NativeOperation::Analyze,4) {self.learnt_buf=learnt;return (Vec::new(),0);}
+                 trail_pos -= 1;
+                 let l = self.trail[trail_pos];
+                 if self.seen[var_of(l) as usize] {
+@@ -2303,40 +2607,43 @@
+         if learnt.len() > 1 {
+             // Cheap filter: a literal can only be redundant if its
+             // reason stays inside the levels the clause already covers.
++            if !self.native_charge(NativeOperation::Analyze,learnt.len() as u64) {self.learnt_buf=learnt;return (Vec::new(),0);}
+             let mut abstract_levels = 0u32;
+             for &q in &learnt {
++                if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Analyze,0,0){self.learnt_buf=learnt;return(Vec::new(),0);}
+                 abstract_levels |= abstract_level(self.level[var_of(q) as usize]);
+             }
+             let t_min = std::time::Instant::now();
+-            let mut stack = std::mem::take(&mut self.redundant_stack);
+-            let mut w = 0usize;
+-            for r in 0..learnt.len() {
+-                let q = learnt[r];
+-                let v = var_of(q) as usize;
+-                let redundant = !matches!(self.reason[v], Reason::Decision)
+-                    && self.lit_redundant(q, abstract_levels, &mut stack);
+-                if !redundant {
+-                    learnt[w] = q;
+-                    w += 1;
+-                }
+-            }
+-            learnt.truncate(w);
+-            self.redundant_stack = stack;
++            learnt=match self.minimize_for_search(learnt,abstract_levels) {
++                Some(kept)=>kept,
++                None=>return (Vec::new(),0),
++            };
+             self.stats.ns_minimize += t_min.elapsed().as_nanos() as u64;
+         }
+         self.stats.learnt_lits_kept += learnt.len() as u64;
+ 
++        if !self.native_charge(NativeOperation::Analyze,self.seen_stack.len() as u64+learnt.len() as u64+8) {self.learnt_buf=learnt;return (Vec::new(),0);}
+         // Clear only the marks we set.
+         self.stats.word_ops += self.seen_stack.len() as u64;
+-        for v in self.seen_stack.drain(..) {
+-            self.seen[v as usize] = false;
+-        }
++        if self.native_admission.is_some() {
++            for i in 0..self.seen_stack.len() {
++                if !self.native_charge(NativeOperation::Analyze,0){self.learnt_buf=learnt;return(Vec::new(),0);}
++                self.seen[self.seen_stack[i] as usize]=false;
++            }
++            self.seen_stack.clear();
++        }else{for v in self.seen_stack.drain(..){self.seen[v as usize]=false;}}
+ 
+         // Asserting literal: ¬p, then the clause exactly sized for the
+         // database.  The accumulator goes back for the next conflict.
+-        let mut clause: Vec<Lit> = Vec::with_capacity(learnt.len() + 1);
++        let mut clause: Vec<Lit> = if self.native_admission.is_none() {Vec::with_capacity(learnt.len()+1)}else{Vec::new()};
++        if !native_reserve(&mut clause,learnt.len()+1,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth) {self.learnt_buf=learnt;return (Vec::new(),0);}
+         clause.push(-p);
+-        clause.extend_from_slice(&learnt);
++        if self.native_admission.is_some(){
++            for chunk in learnt.chunks(64){
++                if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Analyze,0,0){self.native_pending_clause=Some(clause);self.learnt_buf=learnt;return(Vec::new(),0);}
++                clause.extend_from_slice(chunk);
++            }
++        }else{clause.extend_from_slice(&learnt);}
+         learnt.clear();
+         self.learnt_buf = learnt;
+ 
+@@ -2345,6 +2652,7 @@
+         if clause.len() > 1 {
+             let mut max_i = 1;
+             for i in 2..clause.len() {
++                if !self.native_charge(NativeOperation::Analyze,0){self.native_pending_clause=Some(clause);return(Vec::new(),0);}
+                 if self.level[var_of(clause[i]) as usize]
+                     > self.level[var_of(clause[max_i]) as usize]
+                 {
+@@ -2366,7 +2674,11 @@
+             return;
+         }
+         let target = self.trail_lim[level];
++        let work=(self.trail.len()-target) as u64*(16+8*(u32::BITS-self.n_vars.leading_zeros()) as u64);
++        if !self.native_charge(NativeOperation::Backjump,work) {return;}
++        if !native_reserve(&mut self.order.heap,self.n_vars as usize,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::AnalyzeGrowth) {return;}
+         if self.observing() {
++            if !self.native_event_payload(self.trail.len()-target,std::mem::size_of::<Lit>()) {return;}
+             self.emit(SolverEvent::Backjump {
+                 from_level: self.trail_lim.len(),
+                 to_level: level,
+@@ -2374,10 +2686,12 @@
+                 removed: self.trail[target..].to_vec(),
+             });
+         }
++        if self.native_observer_refused() {return;}
+         // Each unassignment: the two literal slots, the bitset word and
+         // the level; the heap re-insertion charges itself.
+         self.stats.word_ops += 3 * (self.trail.len() - target) as u64 + 1;
+         while self.trail.len() > target {
++            if !self.native_charge(NativeOperation::Backjump,0){return;}
+             let l = self.trail.pop().unwrap();
+             let v = var_of(l) as usize;
+             let n = self.lit_base as i32;
+@@ -2399,7 +2713,11 @@
+     /// surface because unassignment re-inserts rather than repositions,
+     /// so we skip those.
+     fn pick_branching_variable(&mut self) -> Option<u32> {
+-        while let Some(v) = self.order.pop_max(&self.heap_key) {
++        let work=(self.n_vars as u64+1)*(u32::BITS-self.n_vars.leading_zeros()+1) as u64*8;
++        if !self.native_charge(NativeOperation::Heap,work) {return None;}
++        loop {
++            if !self.native_charge(NativeOperation::Heap,0) {return None;}
++            let Some(v)=self.order.pop_max(&self.heap_key) else {break;};
+             // The popped variable's value test.
+             self.stats.word_ops += 1;
+             if self.var_value(v as usize).is_none() {
+@@ -2427,14 +2745,23 @@
+     /// trail holds nothing but level-0 implications.
+     fn reduce_db(&mut self) {
+         let n_clauses = self.clause_at.len();
+-        self.detached.resize(n_clauses, false);
++        let work=(n_clauses as u64+1)*(32+8*(usize::BITS-n_clauses.leading_zeros()) as u64)+self.trail.len() as u64*64+self.watches.len() as u64;
++        if !self.native_charge(NativeOperation::Reduction,work) {return;}
++        if !native_reserve(&mut self.detached,n_clauses,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Reduction) {return;}
++        if !self.native_fill_detached(n_clauses) {return;}
+         // The lock table cleared, each trail literal's reason tested and
+         // a propagated one's clause found by binary search over the index.
+         let log_clauses = (64 - (n_clauses as u64).leading_zeros()) as u64;
+         self.stats.word_ops += n_clauses as u64 + self.trail.len() as u64 * (1 + log_clauses);
+ 
+-        let mut locked = vec![false; n_clauses];
++        let mut locked=if self.native_admission.is_none(){vec![false;n_clauses]}else{Vec::new()};
++        if !native_reserve(&mut locked,n_clauses,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Reduction) {self.native_pending_reduction=Some((locked,Vec::new()));return;}
++        while locked.len()<n_clauses {
++            if !self.native_charge(NativeOperation::Reduction,0){self.native_pending_reduction=Some((locked,Vec::new()));return;}
++            locked.resize(locked.len().saturating_add(64).min(n_clauses),false);
++        }
+         for &l in &self.trail {
++            if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Reduction,0,0){self.native_pending_reduction=Some((locked,Vec::new()));return;}
+             if let Reason::Propagated(cref) = self.reason[var_of(l) as usize] {
+                 let idx = self
+                     .clause_at
+@@ -2445,9 +2772,12 @@
+         }
+ 
+         let clause_len = |i: usize| clause_in(&self.arena, self.clause_at[i]).len();
+-        let mut candidates: Vec<usize> = (self.n_orig_clauses..n_clauses)
+-            .filter(|&i| !self.detached[i] && !locked[i] && clause_len(i) > 2)
+-            .collect();
++        let mut candidates=Vec::new();
++        if !native_reserve(&mut candidates,n_clauses-self.n_orig_clauses,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Reduction) {self.native_pending_reduction=Some((locked,candidates));return;}
++        for i in self.n_orig_clauses..n_clauses {
++            if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Reduction,0,0){self.native_pending_reduction=Some((locked,candidates));return;}
++            if !self.detached[i] && !locked[i] && clause_len(i)>2 {candidates.push(i);}
++        }
+         // The learnt clauses filtered: detached, locked, length.
+         self.stats.word_ops += 3 * (n_clauses - self.n_orig_clauses) as u64;
+         if candidates.len() < 2 {
+@@ -2458,14 +2788,17 @@
+         let c = candidates.len() as u64;
+         self.stats.word_ops += 2 * c * (64 - c.leading_zeros()) as u64 + c / 2;
+         // Longest first, so the front half is the one to drop.
+-        candidates.sort_by_key(|&i| std::cmp::Reverse(clause_len(i)));
++        if !self.native_clause_sort(&mut candidates){self.native_pending_reduction=Some((locked,candidates));return;}
+         for &i in candidates.iter().take(candidates.len() / 2) {
++            if !self.native_charge(NativeOperation::Reduction,2) {self.native_pending_reduction=Some((locked,candidates));return;}
+             self.detached[i] = true;
+             if self.observing() {
++                if !self.native_event_payload(0,0) {self.native_pending_reduction=Some((locked,candidates));return;}
+                 self.emit(SolverEvent::DeleteClause {
+                     clause_id: self.clause_at[i],
+                 });
+             }
++            if self.native_observer_refused() {self.native_pending_reduction=Some((locked,candidates));return;}
+         }
+ 
+         // Rebuild the watch lists from what survives.  Cheaper and much
+@@ -2474,18 +2807,21 @@
+         // test) and two watchers per survivor, charged as every clause.
+         self.stats.word_ops += self.watches.len() as u64 + 4 * n_clauses as u64;
+         for w in self.watches.iter_mut() {
++            if !native_pay(&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::Reduction,0,0){self.native_pending_reduction=Some((locked,candidates));return;}
+             w.clear();
+         }
+         let n = self.lit_base as i32;
+         for idx in 0..n_clauses {
++            if !self.native_charge(NativeOperation::Reduction,0){self.native_pending_reduction=Some((locked,candidates));return;}
+             let cref = self.clause_at[idx];
+             let c = clause_in(&self.arena, cref);
+             if c.len() < 2 || self.detached.get(idx).copied().unwrap_or(false) {
+                 continue;
+             }
+             let (l0, l1) = (c[0], c[1]);
+-            self.watches[(l0 + n) as usize].push(Watcher { cref, blocker: l1 });
+-            self.watches[(l1 + n) as usize].push(Watcher { cref, blocker: l0 });
++            let (w0,w1)=((l0+n) as usize,(l1+n) as usize);let need0=self.watches[w0].len()+2;let need1=self.watches[w1].len()+2;
++            if !native_reserve(&mut self.watches[w0],need0,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::WatchGrowth) || !native_reserve(&mut self.watches[w1],need1,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::WatchGrowth) {self.native_pending_reduction=Some((locked,candidates));return;}
++            self.watches[w0].push(Watcher {cref,blocker:l1});self.watches[w1].push(Watcher{cref,blocker:l0});
+         }
+     }
+ 
+@@ -2494,11 +2830,12 @@
+     /// internal wall check: callers that need a hard limit must provide an
+     /// outer process cap and preserve a checkpoint before entering it.
+     pub fn propagate_root(&mut self) -> RootPropagationResult {
++        if !self.native_entry(false) { return RootPropagationResult::Unknown; }
+         assert!(
+             self.trail_lim.is_empty(),
+             "root propagation requires decision level zero"
+         );
+-        if self.event_failure.is_some() {
++        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+             return RootPropagationResult::Unknown;
+         }
+         let conflict = if self.is_unsat {
+@@ -2508,6 +2845,7 @@
+         };
+         if let Some(conflict) = conflict {
+             if self.observing() {
++                if !self.native_conflict_payload(conflict,0) {return RootPropagationResult::Unknown;}
+                 let (reason, literals) = self.conflict_event(conflict, 0);
+                 self.emit(SolverEvent::Conflict {
+                     level: 0,
+@@ -2516,9 +2854,10 @@
+                 });
+             }
+         }
+-        if self.event_failure.is_some() {
++        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+             return RootPropagationResult::Unknown;
+         }
++        if !self.native_charge(NativeOperation::Entry,0){return RootPropagationResult::Unknown;}
+         if self.is_unsat || conflict.is_some() {
+             self.is_unsat = true;
+             RootPropagationResult::Unsat
+@@ -2557,28 +2896,32 @@
+     where
+         F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
+     {
+-        if self.event_failure.is_some() {
++        if !self.native_entry(!trigger_vars.is_empty()) { return SolveResult::Unknown; }
++        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+             return SolveResult::Unknown;
+         }
+         if self.observing() {
++            if !self.native_event_payload(0,0) {return SolveResult::Unknown;}
+             self.emit(SolverEvent::SolveBegin {
+                 conflicts: self.conflicts,
+                 conflict_budget: self.conflict_budget,
+             });
+         }
+-        if self.event_failure.is_some() {
++        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+             return SolveResult::Unknown;
+         }
+         let result = self.solve_with_lazy_clauses_inner(trigger_vars, theory);
+-        if self.event_failure.is_some() {
++        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+             return SolveResult::Unknown;
+         }
+         if self.observing() {
++            if !self.native_event_payload(16,1) {return SolveResult::Unknown;}
+             self.emit(SolverEvent::SolveEnd {
+                 result: format!("{result:?}"),
+             });
+         }
+-        if self.event_failure.is_some() {
++        if !self.native_charge(NativeOperation::Entry,0){return SolveResult::Unknown;}
++        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+             SolveResult::Unknown
+         } else {
+             result
+@@ -2605,6 +2948,7 @@
+         // unit clauses.
+         if let Some(conflict) = self.propagate() {
+             if self.observing() {
++                if !self.native_conflict_payload(conflict,0) {return SolveResult::Unknown;}
+                 let (reason, literals) = self.conflict_event(conflict, 0);
+                 self.emit(SolverEvent::Conflict {
+                     level: self.trail_lim.len(),
+@@ -2614,7 +2958,7 @@
+             }
+             return SolveResult::Unsat;
+         }
+-        if self.event_failure.is_some() {
++        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+             return SolveResult::Unknown;
+         }
+         if self.max_learnts == 0 {
+@@ -2622,12 +2966,14 @@
+         }
+         // The detached flags extended over the clauses, a word per 64.
+         self.stats.word_ops += (self.clause_at.len() as u64).div_ceil(64);
+-        self.detached.resize(self.clause_at.len(), false);
++        if !native_reserve(&mut self.detached,self.clause_at.len(),&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::DetachedGrowth) {return SolveResult::Unknown;}
++        if !self.native_fill_detached(self.clause_at.len()) {return SolveResult::Unknown;}
+         let mut luby_index = 1u64;
+         let mut restart_limit = 100u64 * luby(luby_index);
+         let mut pending_conflict = None;
+         loop {
+-            if self.event_failure.is_some() {
++            if !self.native_charge(NativeOperation::Loop,64) {return SolveResult::Unknown;}
++            if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                 return SolveResult::Unknown;
+             }
+             if self
+@@ -2637,7 +2983,9 @@
+                 return SolveResult::Unknown;
+             }
+             if let Some(conflict_idx) = pending_conflict.take().or_else(|| self.propagate()) {
++                if self.native_admission.is_some() {self.native_failure=Some(NativeAdmissionFailure::UncoveredPath);return SolveResult::Unknown;}
+                 if self.observing() {
++                    if !self.native_conflict_payload(conflict_idx,0) {return SolveResult::Unknown;}
+                     let (reason, literals) = self.conflict_event(conflict_idx, 0);
+                     self.emit(SolverEvent::Conflict {
+                         level: self.trail_lim.len(),
+@@ -2645,7 +2993,7 @@
+                         literals,
+                     });
+                 }
+-                if self.event_failure.is_some() {
++                if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                     return SolveResult::Unknown;
+                 }
+                 self.conflicts += 1;
+@@ -2673,24 +3021,29 @@
+                 }
+                 self.progress_phase(SolverProgressPhase::ConflictAnalysis);
+                 let t = std::time::Instant::now();
+-                let (learnt, bj_level) = self.analyze(conflict_idx);
++                let Some((learnt, bj_level)) = self.analyze_for_search(conflict_idx) else {
++                    return SolveResult::Unknown;
++                };
+                 self.stats.ns_analyze += t.elapsed().as_nanos() as u64;
+                 if self.observing() {
++                    if !self.native_event_payload(learnt.len(),std::mem::size_of::<Lit>()) {self.native_pending_clause=Some(learnt);return SolveResult::Unknown;}
+                     self.emit(SolverEvent::Learned {
+                         clause_id: self.next_cref(),
+                         literals: learnt.clone(),
+                         backjump_level: bj_level,
+                     });
+                 }
+-                if self.event_failure.is_some() {
+-                    return SolveResult::Unknown;
++                if (self.event_failure.is_some() || self.native_failure.is_some()) {
++                    self.native_pending_clause=Some(learnt);return SolveResult::Unknown;
+                 }
+                 self.backjump(bj_level);
++                if self.native_failure.is_some() || self.native_observer_refused() {self.native_pending_clause=Some(learnt);return SolveResult::Unknown;}
+                 self.progress_phase(SolverProgressPhase::Idle);
+                 // Install the learnt clause.
+                 if learnt.len() == 1 {
+                     // It's a unit at the backjump level (which is 0).
+                     let _ = self.enqueue(learnt[0], Reason::Propagated(self.next_cref()));
++                    if self.native_failure.is_some() || self.native_observer_refused(){self.native_pending_clause=Some(learnt);return SolveResult::Unknown;}
+                     self.push_clause(&learnt);
+                 } else {
+                     self.stats.learnt_clauses += 1;
+@@ -2698,8 +3051,11 @@
+                     let l1 = learnt[1];
+                     // The two watchers; the arena push charges itself.
+                     self.stats.word_ops += 2;
++                    let (w0,w1)=(self.watch_slot(l0),self.watch_slot(l1));
++                    let n0=self.watches[w0].len()+2;let n1=self.watches[w1].len()+2;
++                    if !native_reserve(&mut self.watches[w0],n0,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::WatchGrowth) || !native_reserve(&mut self.watches[w1],n1,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::WatchGrowth) {self.native_pending_clause=Some(learnt);return SolveResult::Unknown;}
+                     let idx = self.push_clause(&learnt);
+-                    let (w0, w1) = (self.watch_slot(l0), self.watch_slot(l1));
++                    if self.native_failure.is_some() || self.native_observer_refused() {self.native_pending_clause=Some(learnt);return SolveResult::Unknown;}
+                     self.watches[w0].push(Watcher {
+                         cref: idx,
+                         blocker: l1,
+@@ -2712,16 +3068,21 @@
+                     // implied at the new (lower) level.
+                     let _ = self.enqueue(l0, Reason::Propagated(idx));
+                 }
++                if self.native_failure.is_some() || self.native_observer_refused() {self.native_pending_clause=Some(learnt);return SolveResult::Unknown;}
+                 // Restart?
+                 if self.conflicts_since_restart >= restart_limit {
++                    if !self.native_charge(NativeOperation::Restart,128) {return SolveResult::Unknown;}
+                     if self.observing() {
++                        if !self.native_event_payload(0,0) {return SolveResult::Unknown;}
+                         self.emit(SolverEvent::Restart {
+                             restart: self.stats.restarts + 1,
+                             conflicts: self.conflicts,
+                         });
+                     }
++                    if self.native_observer_refused() {return SolveResult::Unknown;}
+                     self.progress_phase(SolverProgressPhase::Restart);
+                     self.backjump(0);
++                    if self.native_failure.is_some() || self.native_observer_refused() {return SolveResult::Unknown;}
+                     self.stats.restarts += 1;
+                     // The restart's own bookkeeping: the limit tests, and
+                     // the Luby recurrence's at most `⌈log₂ i⌉` steps.
+@@ -2731,12 +3092,14 @@
+                     // fill-in in the parity matrix.
+                     if !self.xors.is_empty() {
+                         self.rebuild_matrix();
++                        if self.native_failure.is_some() || self.native_observer_refused() {return SolveResult::Unknown;}
+                         self.xor_epoch = u64::MAX;
+                     }
+                     let learnt_now = self.clause_at.len() - self.n_orig_clauses;
+                     if learnt_now > self.max_learnts {
+                         let t = std::time::Instant::now();
+                         self.reduce_db();
++                        if self.native_failure.is_some() || self.native_observer_refused() {return SolveResult::Unknown;}
+                         self.stats.ns_reduce_db += t.elapsed().as_nanos() as u64;
+                         // Let the budget grow, so reductions get rarer
+                         // as the solve goes deeper.
+@@ -2752,7 +3115,7 @@
+                     self.progress_phase(SolverProgressPhase::Idle);
+                 }
+             } else {
+-                if self.event_failure.is_some() {
++                if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                     return SolveResult::Unknown;
+                 }
+                 // Through the `n_vars`-long assignment, so a trigger past the
+@@ -2800,7 +3163,7 @@
+                                     return SolveResult::Unsat;
+                                 }
+                             }
+-                            self.detached.resize(self.clause_at.len(), false);
++                            if !self.native_fill_detached(self.clause_at.len()) {return SolveResult::Unknown;}
+                         } else {
+                             for clause in normalized {
+                                 let conflict = self.add_lazy_clause_at_current_level(clause);
+@@ -2815,10 +3178,11 @@
+                 // No conflict — pick a new variable.
+                 self.progress_phase(SolverProgressPhase::BranchSelection);
+                 match self.pick_branching_variable() {
+-                    None => return SolveResult::Sat,
++                    None => return if self.native_failure.is_some() || self.native_observer_refused() {SolveResult::Unknown} else {SolveResult::Sat},
+                     Some(v) => {
++                        let needed=self.trail_lim.len()+1;
++                        if !native_reserve(&mut self.trail_lim,needed,&mut self.native_admission,&mut self.native_failure,self.deadline,NativeOperation::LevelGrowth) {return SolveResult::Unknown;}
+                         self.stats.decisions += 1;
+-                        // The level push and the saved phase.
+                         self.stats.word_ops += 2;
+                         self.trail_lim.push(self.trail.len());
+                         let lit = if self.saved_phase[v as usize] {
+@@ -2827,6 +3191,7 @@
+                             -((v + 1) as i32)
+                         };
+                         if self.observing() {
++                            if !self.native_event_payload(0,0) {return SolveResult::Unknown;}
+                             self.emit(SolverEvent::Decision {
+                                 literal: lit,
+                                 level: self.trail_lim.len(),
+@@ -2835,7 +3200,7 @@
+                                 priority: self.branch_priority[v as usize],
+                             });
+                         }
+-                        if self.event_failure.is_some() {
++                        if (self.event_failure.is_some() || self.native_failure.is_some()) {
+                             return SolveResult::Unknown;
+                         }
+                         self.assign(lit, Reason::Decision);
+@@ -4966,3 +5331,349 @@
+         assert!(z.model()[0] && z.model()[2]);
+     }
+ }
++
++#[cfg(test)]
++mod native_admission_increment_tests {
++    use super::*;
++    use std::sync::{Arc,Mutex};
++    #[test]
++    fn real_nonroot_cnf_search_preserves_legacy_answer_and_work() {
++        fn fixture()->Solver {let mut s=Solver::new(4);s.add_clause(vec![-1,2]);s.add_clause(vec![-2,3]);s}
++        let mut legacy=fixture();let mut metered=fixture();
++        let charges=Arc::new(Mutex::new(Vec::new()));let sink=Arc::clone(&charges);
++        metered.set_search_admission(move |c|{sink.lock().unwrap().push(c);Ok(())}).unwrap();
++        assert_eq!(legacy.solve(),SolveResult::Sat);assert_eq!(metered.solve(),SolveResult::Sat);
++        assert!(metered.stats.decisions>0);assert!(metered.stats.propagations>0);
++        let model=metered.admitted_model().unwrap();assert!(metered.check_original_assignment(&model));
++        assert_eq!(model,legacy.model());assert_eq!(metered.word_ops(),legacy.word_ops());
++        let calls=charges.lock().unwrap();assert!(calls.iter().any(|c|c.operation==NativeOperation::Heap));
++        assert!(calls.iter().any(|c|c.operation==NativeOperation::Watcher));
++    }
++    #[test]
++    fn late_native_work_and_growth_refusal_are_sticky_unknown() {
++        let mut s=Solver::new(3);let mut assignments=0;
++        s.set_search_admission(move |c|{if c.operation==NativeOperation::Assignment {assignments+=1;if assignments==2{return Err(NativeAdmissionFailure::Work)}}Ok(())}).unwrap();
++        assert_eq!(s.solve(),SolveResult::Unknown);assert!(s.trail.len()==1);
++        assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Work));
++        let trail=s.trail.clone();assert_eq!(s.solve(),SolveResult::Unknown);assert_eq!(s.trail,trail);
++        let mut allocation=Solver::new(2);
++        allocation.set_search_admission(|c|if c.operation==NativeOperation::LevelGrowth {Err(NativeAdmissionFailure::Bytes)}else{Ok(())}).unwrap();
++        assert_eq!(allocation.solve(),SolveResult::Unknown);assert!(allocation.trail_lim.is_empty());assert!(allocation.trail.is_empty());
++        assert_eq!(allocation.search_admission_failure(),Some(NativeAdmissionFailure::Bytes));
++    }
++    #[test]
++    fn original_expired_deadline_precedes_root_propagation() {
++        let mut s=Solver::new(2);s.add_clause(vec![1]);s.add_clause(vec![-1,2]);
++        s.set_search_admission(|_|Ok(())).unwrap();s.deadline=Some(std::time::Instant::now());
++        let before=(s.qhead,s.trail.clone(),s.stats.propagations);
++        assert_eq!(s.propagate_root(),RootPropagationResult::Unknown);
++        assert_eq!((s.qhead,s.trail.clone(),s.stats.propagations),before);
++        assert_eq!(s.solve(),SolveResult::Unknown);
++    }
++    #[test]
++    fn uncovered_observer_xor_and_analysis_do_not_run_or_replace_observer() {
++        let mut observed=Solver::new(2);let events=Arc::new(Mutex::new(Vec::new()));let sink=Arc::clone(&events);
++        observed.set_event_observer(move |e|{sink.lock().unwrap().push(e.clone());Ok(())}).unwrap();
++        let before=events.lock().unwrap().clone();observed.set_search_admission(|_|Ok(())).unwrap();
++        assert_eq!(observed.solve(),SolveResult::Unknown);assert_eq!(*events.lock().unwrap(),before);
++        assert!(observed.set_event_observer(|_|Ok(())).is_err());
++        let mut xor=Solver::new(2);xor.add_xor(&[1,2],true);xor.set_search_admission(|_|Ok(())).unwrap();
++        assert_eq!(xor.solve(),SolveResult::Unknown);assert_eq!(xor.stats.xor_passes,0);
++        let mut conflict=Solver::new(2);for c in [vec![1,2],vec![-1,2],vec![1,-2],vec![-1,-2]] {conflict.add_clause(c);}
++        conflict.set_search_admission(|_|Ok(())).unwrap();assert_eq!(conflict.solve(),SolveResult::Unknown);
++        assert_eq!(conflict.search_admission_failure(),Some(NativeAdmissionFailure::UncoveredPath));
++        assert_eq!(conflict.stats.learnt_clauses,0);
++    }
++    #[test]
++    fn native_root_unsat_remains_distinct_from_refusal() {
++        let mut s=Solver::new(1);s.add_clause(vec![1]);s.add_clause(vec![-1]);s.set_search_admission(|_|Ok(())).unwrap();
++        assert_eq!(s.solve(),SolveResult::Unsat);assert_eq!(s.search_admission_failure(),None);
++        let mut legacy=Solver::new(1);legacy.add_clause(vec![1]);assert_eq!(legacy.solve(),SolveResult::Sat);
++    }
++}
++
++#[cfg(test)]
++mod native_xor_admission_increment_tests {
++    use super::*;
++    #[test]
++    fn actual_xor_rebuild_word_refusal_preserves_owned_matrix_and_sticky_failure() {
++        let mut s=Solver::new(3);s.add_xor(&[1,2],true);s.add_xor(&[2,3],false);
++        let mut word_calls=0;
++        s.set_search_admission(move |c| {
++            if c.operation==NativeOperation::XorWord {
++                word_calls+=1;
++                if word_calls==2 {return Err(NativeAdmissionFailure::Work);}
++            }
++            Ok(())
++        }).unwrap();
++        assert!(matches!(s.propagate_xors(),XorStep::Refused));
++        assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Work));
++        assert_eq!(s.matrix,vec![0b011u64]);
++        assert_eq!(s.matrix_rhs,vec![true]);
++        assert!(s.pivot.is_empty());
++        assert_eq!(s.solve(),SolveResult::Unknown);
++    }
++    #[test]
++    fn actual_xor_growth_refusal_precedes_clear_and_copy() {
++        let mut s=Solver::new(2);s.add_xor(&[1,2],true);
++        s.set_search_admission(|c|if c.operation==NativeOperation::XorGrowth {Err(NativeAdmissionFailure::Bytes)}else{Ok(())}).unwrap();
++        assert!(matches!(s.propagate_xors(),XorStep::Refused));
++        assert!(s.matrix.is_empty()&&s.matrix_rhs.is_empty()&&s.pivot.is_empty());
++        assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Bytes));
++    }
++}
++
++#[cfg(test)]
++mod native_event_admission_increment_tests {
++ use super::*;
++ use std::sync::{Arc,Mutex};
++ #[test]
++ fn existing_observer_is_retained_and_late_reason_copy_refusal_does_not_publish() {
++  let mut s=Solver::new(2);let events=Arc::new(Mutex::new(Vec::new()));let sink=Arc::clone(&events);
++  s.set_event_observer(move |e|{sink.lock().unwrap().push(e.clone());Ok(())}).unwrap();
++  let original=events.lock().unwrap().clone();
++  s.set_search_admission(|c|if c.operation==NativeOperation::EventPayload{Err(NativeAdmissionFailure::Bytes)}else{Ok(())}).unwrap();
++  s.assign(1,Reason::Decision);
++  assert_eq!(s.trail,vec![1]);assert_eq!(*events.lock().unwrap(),original);
++  assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Bytes));
++  assert_eq!(s.solve(),SolveResult::Unknown);
++ }
++}
++
++#[cfg(test)]
++mod native_analysis_admission_increment_tests {
++ use super::*;
++ fn installed()->Solver {
++  let mut s=Solver::new(2);s.add_clause(vec![-1,2]);s.add_clause(vec![-1,-2]);s
++ }
++ fn conflict(s:&mut Solver)->Conflict {
++  assert!(native_reserve(&mut s.trail_lim,1,&mut s.native_admission,&mut s.native_failure,s.deadline,NativeOperation::LevelGrowth));
++  s.trail_lim.push(0);s.assign(1,Reason::Decision);
++  s.propagate().expect("actual watched propagation conflict")
++ }
++ #[test]
++ fn actual_native_analysis_and_backjump_are_charged_before_use() {
++  let mut s=installed();s.set_search_admission(|_|Ok(())).unwrap();
++  let c=conflict(&mut s);let (learnt,level)=s.analyze(c);
++  assert_eq!(learnt,vec![-1]);assert_eq!(level,0);assert_eq!(s.search_admission_failure(),None);
++  s.backjump(level);assert!(s.trail.is_empty());
++  let cref=s.push_clause(&learnt);assert_eq!(clause_in(&s.arena,cref),&[-1]);
++ }
++ #[test]
++ fn actual_analysis_growth_refusal_retains_conflicting_native_state() {
++  let mut s=installed();s.set_search_admission(|c|if c.operation==NativeOperation::AnalyzeGrowth {Err(NativeAdmissionFailure::Bytes)}else{Ok(())}).unwrap();
++  let c=conflict(&mut s);let before=s.trail.clone();let (learnt,_)=s.analyze(c);
++  assert!(learnt.is_empty());assert_eq!(s.trail,before);assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Bytes));
++  assert_eq!(s.solve(),SolveResult::Unknown);
++ }
++}
++
++#[cfg(test)]
++mod native_batch_admission_increment_tests {
++ use super::*;
++ #[test]
++ fn charged_stable_clause_sort_matches_legacy_ties_and_retains_scratch_on_refusal() {
++  let mut s=Solver::new(4);s.add_clause(vec![1,2]);s.add_clause(vec![1,2,3]);s.add_clause(vec![-1,2]);
++  let mut expected=vec![0,1,2];expected.sort_by_key(|&i|std::cmp::Reverse(clause_in(&s.arena,s.clause_at[i]).len()));
++  s.set_search_admission(|_|Ok(())).unwrap();let mut actual=vec![0,1,2];assert!(s.native_clause_sort(&mut actual));assert_eq!(actual,expected);
++  let mut t=Solver::new(3);t.add_clause(vec![1,2]);t.add_clause(vec![1,2,3]);let mut steps=0;
++  t.set_search_admission(move |c|{if c.operation==NativeOperation::Reduction{steps+=1;if steps==4{return Err(NativeAdmissionFailure::Work)}}Ok(())}).unwrap();
++  let mut partial=vec![0,1];assert!(!t.native_clause_sort(&mut partial));assert!(!t.native_sort_scratch.is_empty());assert_eq!(t.solve(),SolveResult::Unknown);
++ }
++}
++
++#[cfg(test)]
++mod native_deadline_retention_increment_tests {
++ use super::*;
++ #[test]
++ fn model_copy_refusal_retains_actual_partial_assignment_buffer() {
++  let mut s=Solver::new(130);let mut copies=0;
++  s.set_search_admission(move |c|{if c.operation==NativeOperation::Model{copies+=1;if copies==4{return Err(NativeAdmissionFailure::Work)}}Ok(())}).unwrap();
++  assert_eq!(s.solve(),SolveResult::Sat);
++  assert!(s.admitted_model().is_none());assert!(s.native_pending_model.as_ref().is_some_and(|v|v.len()==64));
++  assert_eq!(s.solve(),SolveResult::Unknown);
++ }
++}
++
++#[cfg(test)]
++mod native_analysis_boundary_retention_tests {
++    use super::*;
++    fn fixture(stop: usize) -> (Solver, Conflict) {
++        let mut s=Solver::new(3);
++        s.add_clause(vec![-1,-2,3]);s.add_clause(vec![-1,-2,-3]);
++        let mut zero_steps=0;
++        s.set_search_admission(move |c| {
++            if c.operation==NativeOperation::Analyze && c.work==0 {
++                zero_steps+=1;
++                if zero_steps==stop {return Err(NativeAdmissionFailure::Work);}
++            }
++            Ok(())
++        }).unwrap();
++        s.trail_lim.push(0);s.assign(1,Reason::Decision);
++        assert!(s.propagate().is_none());
++        s.trail_lim.push(s.trail.len());s.assign(2,Reason::Decision);
++        let conflict=s.propagate().expect("real second-level watched conflict");
++        (s,conflict)
++    }
++    #[test]
++    fn actual_analysis_partial_clause_survives_search_boundary() {
++        // Find the actual output-copy refusal among finitely many zero-work
++        // deadline checkpoints; no synthetic pending clause is installed.
++        let mut witnessed=false;
++        for stop in 1..=64 {
++            let (mut direct,c)=fixture(stop);
++            let output=direct.analyze(c);
++            if direct.native_pending_clause.as_ref().is_some_and(|v|!v.is_empty()) {
++                assert!(output.0.is_empty());
++                let expected=direct.native_pending_clause.clone();
++                let (mut boundary,c)=fixture(stop);
++                assert!(boundary.analyze_for_search(c).is_none());
++                assert_eq!(boundary.native_pending_clause,expected);
++                assert_eq!(boundary.search_admission_failure(),Some(NativeAdmissionFailure::Work));
++                assert_eq!(boundary.solve(),SolveResult::Unknown);
++                assert_eq!(boundary.native_pending_clause,expected);
++                witnessed=true;break;
++            }
++        }
++        assert!(witnessed,"actual analysis must reach retained nonempty output before refusal");
++    }
++}
++
++#[cfg(test)]
++mod native_observer_boundary_increment_tests {
++    use super::*;
++    #[test]
++    fn observer_backjump_refusal_keeps_actual_trail_and_levels() {
++        let mut s=Solver::new(3);
++        s.set_event_observer(|event| if matches!(event,SolverEvent::Backjump{..}) {Err("stop at backjump".into())}else{Ok(())}).unwrap();
++        s.set_search_admission(|_|Ok(())).unwrap();
++        s.trail_lim.push(0);s.assign(1,Reason::Decision);
++        let before=(s.trail.clone(),s.trail_lim.clone(),s.values.clone(),s.assigned_w.clone());
++        s.backjump(0);
++        assert_eq!((s.trail.clone(),s.trail_lim.clone(),s.values.clone(),s.assigned_w.clone()),before);
++        assert_eq!(s.event_failure.as_deref(),Some("stop at backjump"));
++        assert_eq!(s.solve(),SolveResult::Unknown);
++        assert_eq!(s.trail,before.0);
++    }
++    #[test]
++    fn detached_fill_charges_reused_capacity_and_retains_prefix() {
++        let mut s=Solver::new(1);s.detached.reserve(192);
++        let mut fills=0;
++        s.set_search_admission(move |c|{if c.operation==NativeOperation::DetachedGrowth {fills+=1;if fills==2{return Err(NativeAdmissionFailure::Work);}}Ok(())}).unwrap();
++        assert!(!s.native_fill_detached(150));
++        assert_eq!(s.detached,vec![false;64]);
++        assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Work));
++        assert!(!s.native_fill_detached(150));assert_eq!(s.detached.len(),64);
++    }
++    #[test]
++    fn heap_refusal_precedes_next_actual_pop() {
++        let mut s=Solver::new(3);
++        s.assign(1,Reason::Decision);s.assign(2,Reason::Decision);s.assign(3,Reason::Decision);
++        let mut pops=0;
++        s.set_search_admission(move |c|{if c.operation==NativeOperation::Heap && c.work==0 {pops+=1;if pops==2{return Err(NativeAdmissionFailure::Work);}}Ok(())}).unwrap();
++        let before=s.order.heap.len();
++        assert_eq!(s.pick_branching_variable(),None);
++        assert_eq!(s.order.heap.len(),before-1);
++        assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Work));
++    }
++}
++
++#[cfg(test)]
++mod native_pending_watch_increment_tests {
++    use super::*;
++    #[test]
++    fn watcher_refusal_retains_actual_vector_and_two_cursors() {
++        let mut s=Solver::new(4);
++        for v in 2..=4 {s.add_clause(vec![-1,v]);}
++        s.assign(1,Reason::Decision);
++        let mut scans=0;
++        s.set_search_admission(move |c|{if c.operation==NativeOperation::Watcher {scans+=1;if scans==2{return Err(NativeAdmissionFailure::Work);}}Ok(())}).unwrap();
++        assert!(s.propagate_clauses().is_none());
++        let (slot,ws,read,written)=s.native_pending_watch.as_ref().unwrap();
++        assert_eq!(*slot,s.watch_slot(-1));assert_eq!(ws.len(),3);
++        assert_eq!((*read,*written),(1,1));assert!(s.watches[*slot].is_empty());
++        assert_eq!(s.trail,vec![1,2]);
++        assert_eq!(s.solve(),SolveResult::Unknown);
++        assert_eq!(s.native_pending_watch.as_ref().unwrap().1.len(),3);
++    }
++    #[test]
++    fn xor_observer_refusal_retains_reason_before_assignment() {
++        let mut s=Solver::new(2);s.add_xor(&[1,2],true);s.add_clause(vec![1]);
++        s.set_event_observer(|e|if matches!(e,SolverEvent::XorImplication{..}){Err("stop XOR implication".into())}else{Ok(())}).unwrap();
++        s.set_search_admission(|_|Ok(())).unwrap();
++        let before=s.trail.clone();
++        assert!(matches!(s.propagate_xors(),XorStep::Refused));
++        assert_eq!(s.trail,before);assert!(s.var_value(1).is_none());
++        assert!(!s.xor_reason[1].is_empty());
++        assert_eq!(s.event_failure.as_deref(),Some("stop XOR implication"));
++    }
++}
++
++#[cfg(test)]
++mod native_bulk_boundary_increment_tests {
++    use super::*;
++    #[test]
++    fn pivot_fill_refusal_keeps_actual_matrix_and_initialized_prefix() {
++        let mut s=Solver::new(2);
++        for _ in 0..130 {s.add_xor(&[1,2],true);}
++        assert_eq!(s.xors.len(),130);
++        let mut fills=0;
++        s.set_search_admission(move |c|{if c.operation==NativeOperation::XorPivot {fills+=1;if fills==2{return Err(NativeAdmissionFailure::Work);}}Ok(())}).unwrap();
++        s.rebuild_matrix();
++        assert_eq!(s.matrix.len(),130);assert_eq!(s.matrix_rhs.len(),130);
++        assert_eq!(s.pivot,vec![None;64]);
++        assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Work));
++        s.rebuild_matrix();assert_eq!(s.pivot.len(),64);
++    }
++    #[test]
++    fn xor_row_observer_refusal_keeps_only_first_actual_row_operation() {
++        let mut s=Solver::new(3);
++        s.add_xor(&[1,2],true);s.add_xor(&[1,3],false);s.add_xor(&[1,2,3],true);
++        s.set_event_observer(|e|if matches!(e,SolverEvent::XorRowXor{..}){Err("stop first XOR row".into())}else{Ok(())}).unwrap();
++        s.set_search_admission(|_|Ok(())).unwrap();
++        assert!(matches!(s.propagate_xors(),XorStep::Refused));
++        assert_eq!(s.matrix,vec![0b011,0b110,0b111]);
++        assert_eq!(s.matrix_rhs,vec![true,true,true]);
++        assert_eq!(s.native_partial_xor,Some((0,1,1,true)));
++        assert_eq!(s.event_failure.as_deref(),Some("stop first XOR row"));
++        assert_eq!(s.stats.xor_row_ops,1);
++    }
++}
++
++#[cfg(test)]
++mod native_minimize_deletion_increment_tests {
++    use super::*;
++    #[test]
++    fn decision_only_minimization_refusal_retains_both_actual_buffers() {
++        let mut s=Solver::new(3);s.redundant_stack=vec![-3];
++        let mut visits=0;
++        s.set_search_admission(move |c|{if c.operation==NativeOperation::Analyze && c.work==4 {visits+=1;if visits==2{return Err(NativeAdmissionFailure::Work);}}Ok(())}).unwrap();
++        assert!(s.minimize_for_search(vec![1,2,3],0).is_none());
++        assert_eq!(s.learnt_buf,vec![1,2,3]);assert_eq!(s.redundant_stack,vec![-3]);
++        assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Work));
++        assert_eq!(s.solve(),SolveResult::Unknown);
++        assert_eq!(s.learnt_buf,vec![1,2,3]);
++    }
++    #[test]
++    fn decision_only_minimization_retains_legacy_output_when_admitted() {
++        let mut legacy=Solver::new(3);let mut metered=Solver::new(3);
++        metered.set_search_admission(|_|Ok(())).unwrap();
++        assert_eq!(legacy.minimize_for_search(vec![1,-2,3],0),Some(vec![1,-2,3]));
++        assert_eq!(metered.minimize_for_search(vec![1,-2,3],0),Some(vec![1,-2,3]));
++        assert_eq!(legacy.word_ops(),metered.word_ops());
++    }
++    #[test]
++    fn unobserved_deletion_refusal_precedes_second_actual_flag_mutation() {
++        let mut s=Solver::new(4);
++        for c in [vec![1,2,3],vec![-1,2,4],vec![1,-3,4],vec![2,3,-4]] {s.push_clause(&c);}
++        s.n_orig_clauses=0;
++        let mut deletions=0;
++        s.set_search_admission(move |c|{if c.operation==NativeOperation::Reduction && c.work==2 {deletions+=1;if deletions==2{return Err(NativeAdmissionFailure::Work);}}Ok(())}).unwrap();
++        assert!(s.event_observer.is_none());s.reduce_db();
++        assert_eq!(s.detached,vec![true,false,false,false]);
++        let (locked,candidates)=s.native_pending_reduction.as_ref().unwrap();
++        assert_eq!(locked,&vec![false;4]);assert_eq!(candidates,&vec![0,1,2,3]);
++        assert_eq!(s.search_admission_failure(),Some(NativeAdmissionFailure::Work));
++        assert_eq!(s.solve(),SolveResult::Unknown);assert_eq!(s.detached,vec![true,false,false,false]);
++    }
++}
+--- HEAD/src/ml_dataset/affine_replay_caller.rs
++++ assembled/src/ml_dataset/affine_replay_caller.rs
+@@ -549,6 +549,7 @@
+         }
+         fn args(&self) -> DatasetArgs {
+             DatasetArgs {
++                search_replay_policy:None,search_replay_receipt:None,
+                 sat_replay_policy:None,sat_replay_receipt:None,
+                 affine_replay_policy: Some(self.policy.clone()),
+                 affine_replay_receipt: Some(self.receipt.clone()),
+--- HEAD/src/ml_dataset/binary_m3_boolean_replay.rs
++++ assembled/src/ml_dataset/binary_m3_boolean_replay.rs
+@@ -919,7 +919,7 @@
+         let mut equations=vec![0u8;23];equations[0]=3;equations[1]=5;
+         let baseline=bounded_projection_json(&PublicEquations::from_admitted(&math,&config,&equations).unwrap(),32768).unwrap();
+         let mut changed=config.clone();changed.solver="f5".into();changed.work_limit=65536;changed.degree_bound=6;
+-        changed.channels=Some(crate::ml_dataset::types::ChannelRequests{schema:"crypto.ml-dataset.channel-requests/v1".into(),
++        changed.channels=Some(crate::ml_dataset::types::ChannelRequests{owned_boolean_search:None,sat_search:None,schema:"crypto.ml-dataset.channel-requests/v1".into(),
+             boolean_consequence:Some(crate::ml_dataset::types::BooleanRequest::Produce{row_index:7}),sat_initial:None,affine_boolean_row:None});
+         let same=bounded_projection_json(&PublicEquations::from_admitted(&math,&changed,&equations).unwrap(),32768).unwrap();
+         assert_eq!(baseline,same);
+--- HEAD/src/ml_dataset/capture.rs
++++ assembled/src/ml_dataset/capture.rs
+@@ -343,6 +343,8 @@
+ /// Closed kinds for typed solver events. Payload commits remain emitter-owned.
+ #[derive(Clone, Copy, Debug, Serialize)]
+ pub enum TypedEventKind {
++    #[serde(rename = "binary_sat_search")]
++    BinarySatSearch,
+     #[serde(rename = "binary_sat_initial")]
+     BinarySatInitial,
+     #[serde(rename = "binary_m3_native")]
+@@ -3228,7 +3230,7 @@
+             "filed_before_affected_data":true,"frozen_at":"2026-10-29T00:00:00Z"});
+         let protocol_bytes = serde_json::to_vec(&protocol).unwrap();
+         let plan = super::super::DatasetPlan {
+-                        channels: None,
++            channels: None,
+             factor_base_policies: vec![],
+             schema: "crypto.ml-dataset.plan/v1".into(),
+             field_sizes: vec![23],
+--- HEAD/src/ml_dataset/export.rs
++++ assembled/src/ml_dataset/export.rs
+@@ -1109,6 +1109,7 @@
+     let mut algebraic_degree_reductions = 0u64;
+     let mut prefix_occurrences = 0u64;
+     let mut affine_identity_records=0u64;
++    let mut search_relation_records=0u64;
+     let mut feature_occurrences = 0u64;
+     let mut sealed = 0u64;
+     let mut unsealed = 0u64;
+@@ -1166,6 +1167,27 @@
+             if manifest_sha!=before_manifest_sha {return Err("source manifest changed during export admission".into());}
+             let target_id =
+                 super::digest(format!("{source_run_sha}\n{manifest_sha}\n{cell_index}").as_bytes());
++            if super::solvers::needs_search_replay(&manifest.config,&manifest.outcome) {
++                let record=if manifest.outcome["strategy"]=="sat-search-unsupported" {
++                    json!({"schema":"crypto.ml-dataset.sat-model-relation/v1","visibility":"restricted","status":"unsupported", "model_relation_checked":false,"native_unsat_uncertified":false,"causal_search_verified":false,"unsat_proved":false,"scalar_recovered":false,"all_patterns_negative":false,"solver_completed":false})
++                } else {
++                    super::search_replay_caller::with_current(|session|session.ok_or("search export requires retained original replay caller")?.project(&dir,&manifest))?
++                };
++                let(group,partition)=split_for_size(manifest.config.n as u64);
++                let record_id=super::digest(format!("{target_id}\nsat-model-relation-record").as_bytes());
++                prefix_records.push(&record_id,&json!({"schema":"ml-dataset.restricted-prefix-record/v1","record_id":record_id,
++                    "source_target_id":target_id,"feature_id":null,"split_component":group,"split":partition,"record":record}))?;
++                targets.push(&target_id,&json!({"schema":"ml-dataset.restricted-targets/v1","target_id":target_id,"feature_id":null,
++                    "pdp_domain":null,"split_component":group,"split":partition,"solver":"sat","labels":record,
++                    "known_answer_scalar":null,"independently_recovered_scalar":null,"witness_artifact":null,
++                    "solution_certificates":[],"feature_status":"restricted_model_relation_only"}))?;
++                index.push(&target_id,&json!({"schema":"ml-dataset.export-index/v1","record_id":target_id,"target_id":target_id,
++                    "feature_id":null,"cell":relative,"source_manifest_sha256":manifest_sha,"source_run_sha256":source_run_sha,
++                    "source_artifacts":manifest.artifacts,"status":"restricted_search_scope"}))?;
++                search_relation_records+=1;sealed+=1;
++                // Explicitly avoid generic witness/causal/degree label construction.
++                continue;
++            }
+             if super::solvers::needs_affine_row_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
+                 let record=super::affine_replay_caller::with_current(|session|session.ok_or("affine export requires retained replay invocation")?.project(&dir,&manifest))?;
+                 let(group,partition)=split_for_size(manifest.config.n as u64);
+@@ -1597,6 +1619,11 @@
+         "prime_chain_graph_occurrences":prime_chain_graph_occurrences,
+         "prefix_feature_occurrences":prefix_occurrences,"unique_prefix_feature_rows":unique_prefix_features,
+         "restricted_prefix_record_rows":prefix_record_rows});
++    if search_relation_records>0 {
++        manifest["sat_model_relations"]=json!({"schema":"ml-dataset.sat-model-relation-export/v1",
++            "restricted_records":search_relation_records,"restricted_file":"restricted/prefix-records.jsonl",
++            "public_model_features":0,"causal_solver_training_admitted":false,"degree_labels_available":false});
++    }
+     if affine_identity_records>0 {
+         manifest["affine_unit_identities"]=json!({"schema":"ml-dataset.affine-unit-identity-export/v1",
+             "verified_restricted_records":affine_identity_records,"public_consequence_features":0,
+--- HEAD/src/ml_dataset/koblitz_m3.rs
++++ assembled/src/ml_dataset/koblitz_m3.rs
+@@ -291,6 +291,21 @@
+     pub fn reserve_addition(&mut self, now: Instant) -> Result<(), Stop> {
+         self.check(now)?;
+         if self.phase != Phase::Extraction {
++            return self.fail(Stop::Phase);
++        }
++        if self.additions == self.addition_limit {
++            return self.fail(Stop::Additions);
++        }
++        self.additions += 1;
++        Ok(())
++    }
++
++    /// Admit an actual signed-candidate group addition during bounded matrix
++    /// search. This shares the original addition count and deadline, and never
++    /// resets native phase counters or begins final extraction.
++    pub fn reserve_matrix_candidate_addition(&mut self, now: Instant) -> Result<(), Stop> {
++        self.check(now)?;
++        if self.phase != Phase::Matrix {
+             return self.fail(Stop::Phase);
+         }
+         if self.additions == self.addition_limit {
+--- HEAD/src/ml_dataset/mod.rs
++++ assembled/src/ml_dataset/mod.rs
+@@ -34,6 +34,10 @@
+ 
+ #[derive(Args)]
+ pub struct DatasetArgs {
++    #[arg(long,global=true,requires="search_replay_receipt",conflicts_with_all=["sat_replay_policy","affine_replay_policy"])]
++    pub search_replay_policy:Option<PathBuf>,
++    #[arg(long,global=true,requires="search_replay_policy")]
++    pub search_replay_receipt:Option<PathBuf>,
+     /// Independently authorized finite historical SAT replay allowance.
+     #[arg(long, global=true, requires="sat_replay_receipt")]
+     pub sat_replay_policy: Option<PathBuf>,
+@@ -1005,7 +1009,7 @@
+ }
+ 
+ pub fn run(args: &DatasetArgs) -> Result<(), String> {
+-    sat_replay_caller::invoke(args, || affine_replay_caller::invoke(args, || run_dispatch(args)))
++    search_replay_caller::invoke(args, || sat_replay_caller::invoke(args, || affine_replay_caller::invoke(args, || run_dispatch(args))))
+ }
+ fn run_dispatch(args: &DatasetArgs) -> Result<(), String> {
+     match &args.command {
+@@ -1442,6 +1446,9 @@
+ ) -> Result<Value, String> {
+     let (data, stored, residual) = output.into_parts();
+     *retained = residual;
++    if retained.boolean_search_report_unavailable(){
++        return Err("Boolean matrix search report publication is not admitted".into());
++    }
+     if retained.boolean_rows_report_unavailable() {
+         return Err("Boolean finite-row report publication is not admitted".into());
+     }
+@@ -1760,6 +1767,7 @@
+         // Gate independently authorized replay before dispatch, not after generating evidence.
+         sat_replay_caller::authorize_generation(&plan, &binding)?;
+         affine_replay_caller::authorize_generation(&plan,&binding)?;
++        search_replay_caller::authorize_generation(&plan,&binding)?;
+         storage::write_json(&out, "run.json", "run-binding", &binding)?;
+         storage::write_json(&out, "plan.json", "frozen-plan", &plan)?;
+         storage::write_bytes(&out, "protocol.json", "frozen-protocol", "json", &protocol)?;
+@@ -1792,6 +1800,7 @@
+             }
+             sat_replay_caller::authorize_cell_dispatch(index, &config)?;
+             affine_replay_caller::authorize_cell_dispatch(index,&config)?;
++            search_replay_caller::authorize_cell_dispatch(index,&config)?;
+             let scope = cell_budget_scope(context.as_ref(), envelope.as_ref(), &plan_sha, index)?;
+             fs::create_dir(&dir).map_err(|e| e.to_string())?;
+             sync_dir(&cells)?;
+@@ -2728,6 +2737,8 @@
+ mod sat_replay_caller;
+ #[path="affine_replay_caller.rs"]
+ mod affine_replay_caller;
++#[path="search_replay_caller.rs"]
++mod search_replay_caller;
+ fn verify_cell_with_boolean_projection(dir:&Path,replay:bool,project:bool)
+     ->Result<(CellManifest,Option<solvers::BooleanProjection>),String>{
+     sat_replay_caller::with_current(|session| verify_cell_with_replay_session(dir,replay,project,session))
+@@ -2770,6 +2781,16 @@
+         return Err("cell provenance differs from frozen plan".into());
+     }
+     solvers::verify_requested_channel_disposition(&manifest.config, &manifest.outcome)?;
++    let search_present=solvers::needs_search_replay(&manifest.config,&manifest.outcome);
++    if search_present && manifest.outcome["strategy"]!="sat-search-unsupported" {
++        if manifest.config.channels.as_ref().is_some_and(|c|c.affine_boolean_row.is_some()||c.sat_initial.is_some()||c.boolean_consequence.is_some()) {
++            return Err("mixed search/initial/row modes".into())
++        }
++        search_replay_caller::with_current(|session|session.ok_or("explicit cumulative search replay policy required")?.verify(dir,&manifest))?;
++    }
++    if search_present && manifest.outcome["strategy"]=="sat-search-unsupported" && (solvers::search_request_supported(&manifest.config)||manifest.artifacts.iter().any(|a|a.role=="sat-original-gate-map"||a.path.contains("sat-original-pattern-"))||manifest.outcome["status"]!="unsupported"||manifest.outcome["solver_completed"]!=false||manifest.outcome["scalar_recovered_without_witness"]!=false) {
++        return Err("unsupported search overclaim".into())
++    }
+     let affine_present=solvers::needs_affine_row_replay(&manifest.config,&manifest.outcome,&manifest.artifacts);
+     if manifest.config.channels.as_ref().is_some_and(|c|c.affine_boolean_row.is_some()) && !affine_present {
+         if manifest.outcome["strategy"]!="original-affine-unit-row-unsupported"||manifest.outcome["status"]!="unsupported"
+@@ -2782,7 +2803,7 @@
+         affine_replay_caller::with_current(|session|session.ok_or("explicit cumulative affine replay policy required")?.verify(dir,&manifest))?;
+     }
+ 
+-    if !affine_present && solvers::needs_sat_initial_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
++    if !search_present && !affine_present && solvers::needs_sat_initial_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
+         let session=sat_session.ok_or("explicit independently bounded SAT replay policy required")?;
+         session.verify(dir,&manifest)?;
+     }
+@@ -7393,7 +7414,7 @@
+         fs::create_dir(&path).unwrap();
+         let request_path=path.join("request.json");let plan_path=path.join("plan.json");
+         fs::write(&request_path,serde_json::to_vec(&request()).unwrap()).unwrap();
+-        run(&DatasetArgs{affine_replay_policy:None,affine_replay_receipt:None,sat_replay_policy:None,sat_replay_receipt:None,command:DatasetCommand::Plan(PlanArgs{
++        run(&DatasetArgs{search_replay_policy:None,search_replay_receipt:None,affine_replay_policy:None,affine_replay_receipt:None,sat_replay_policy:None,sat_replay_receipt:None,command:DatasetCommand::Plan(PlanArgs{
+             channels:Some(request_path),out:plan_path.clone(),n:"23-31,47-61".into(),m:"2-15".into(),
+             families:"binary,koblitz,prime".into(),solvers:"f4,f5,sat".into(),curve_seeds:1,generators:1,keys:1,
+             seed:20261027,factor_base_size:4,factor_base_policies:None,degree_bound:3,work_limit:16384,
+--- HEAD/src/ml_dataset/sat_initial_central.rs
++++ assembled/src/ml_dataset/sat_initial_central.rs
+@@ -14,6 +14,8 @@
+ mod ledger;
+ #[path = "sat_initial_replay.rs"]
+ mod transcript;
++#[path = "sat_search_central.rs"]
++mod search;
+ /// Must be supplied by the separately authorized replay caller, never inferred
+ /// from a successful producer prefix or reset after a failure.
+ pub(in crate::ml_dataset::solvers) struct Policy {
+@@ -79,6 +81,7 @@
+ pub(in crate::ml_dataset::solvers) struct Frame {
+     budget: ReplayBudget,
+     row_mode: Option<RowReplay>,
++    search_mode: Option<search::Replay>,
+     config: Vec<u8>,
+     public: Vec<u8>,
+     factor: Vec<u8>,
+@@ -413,9 +416,11 @@
+     artifacts: &[Artifact],
+     policy: Policy,
+     row_mode: Option<RowReplay>,
++    search_mode: Option<search::Replay>,
+ ) -> Result<Outcome, Failed> {
+     let mut frame = Frame {
+         row_mode,
++        search_mode,
+         budget: ReplayBudget {
+             policy,
+             work: 0,
+@@ -940,6 +945,13 @@
+                         marker = Some((sequence, hash.to_owned()));
+                     }
+                 }
++            } else if row.event["kind"] == "binary_sat_search" {
++                let replay = f.search_mode.as_mut().ok_or("search event in initial-only mode")?;
++                let checkpoint = checkpoint_receipt.as_ref().ok_or("search before initial ledger")?;
++                let map = f.map.as_ref().ok_or("search before checked map")?;
++                let math = f.parts.complete.as_ref().ok_or("search before original math")?;
++                replay.feed(line, &binding_hash, original_binding, map, &math.signed,
++                    math.signed_target, checkpoint, &mut f.budget)?;
+             } else {
+                 return Err("unsupported event in initial-only capture".into());
+             }
+@@ -1013,6 +1025,11 @@
+     };
+     complete
+     };
++    let complete = if let Some(search) = f.search_mode.as_ref() {
++        if complete {
++            search.finish(f.checkpoint.as_ref().ok_or("search lacks initial ledger")?, &head)?
++        } else { false }
++    } else { complete };
+     // Visitor effects remain provisional until every immutable join is repeated.
+     f.budget
+         .reserve_checking(
+@@ -1741,9 +1758,9 @@
+ }
+ pub(in crate::ml_dataset::solvers) struct VerifiedRow {frame:Frame}
+ pub(in crate::ml_dataset::solvers) enum RowOutcome {Verified(VerifiedRow),UnknownOriginalMath(Frame),Incomplete(Frame)}
+-pub(in crate::ml_dataset::solvers) fn verify(dir:&Path,config:&CaseConfig,artifacts:&[Artifact],policy:Policy)->Result<Outcome,Failed>{verify_mode(dir,config,artifacts,policy,None)}
++pub(in crate::ml_dataset::solvers) fn verify(dir:&Path,config:&CaseConfig,artifacts:&[Artifact],policy:Policy)->Result<Outcome,Failed>{verify_mode(dir,config,artifacts,policy,None,None)}
+ pub(in crate::ml_dataset::solvers) fn verify_boolean_row(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact],policy:Policy,limits:RowLimits)->Result<RowOutcome,Failed>{
+-    match verify_mode(dir,config,artifacts,policy,Some(RowReplay::new(limits)))? {
++    match verify_mode(dir,config,artifacts,policy,Some(RowReplay::new(limits)),None)? {
+         Outcome::Verified(mut verified)=>{
+             if let Err(error)=join_row_terminal(dir,outcome,artifacts,&mut verified.frame){
+                 verified.frame.diagnostic=Some(error);
+@@ -1827,3 +1844,280 @@
+     if f.terminal_head_raw!=f.head_raw{return Err("row head changed during terminal join".into())}
+     DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"row terminal deadline".to_owned())
+ }
++
++// Distinct original-owned search result. No initial-only terminal/release API.
++pub(in crate::ml_dataset::solvers) struct VerifiedSearch { frame: Frame }
++pub(in crate::ml_dataset::solvers) enum SearchOutcome {
++    Verified(VerifiedSearch), Incomplete(Frame), UnknownOriginalMath(Frame),
++}
++pub(in crate::ml_dataset::solvers) fn verify_search(
++    dir: &Path, config: &CaseConfig, artifacts: &[Artifact], policy: Policy,
++    event_limit: usize,
++) -> Result<SearchOutcome, Failed> {
++    match verify_mode(dir, config, artifacts, policy, None, Some(search::Replay::new(event_limit)))? {
++        Outcome::Verified(v) => Ok(SearchOutcome::Verified(VerifiedSearch {frame:v.frame})),
++        Outcome::IncompleteMissingProducerLedger(f) => Ok(SearchOutcome::Incomplete(f)),
++        Outcome::UnknownOriginalMath(f) => Ok(SearchOutcome::UnknownOriginalMath(f)),
++    }
++}
++impl VerifiedSearch {
++    pub(in crate::ml_dataset::solvers) fn model_relation_checked(&self) -> bool {
++        self.frame.budget.first_stop.is_none() && self.frame.search_mode.as_ref()
++            .is_some_and(|s| s.model_relation_checked())
++    }
++    pub(in crate::ml_dataset::solvers) fn native_unsat_uncertified(&self) -> bool {
++        self.frame.budget.first_stop.is_none() && self.frame.search_mode.as_ref()
++            .is_some_and(|s| s.native_unsat_uncertified())
++    }
++}
++
++
++// Report joins confer only producer-report/custody scope; no causal completion.
++fn search_report_join(f:&mut Frame,dir:&Path,outcome:&Value,artifacts:&[Artifact])->Result<(),String>{
++    f.budget.reserve_checking(65536,65536,Instant::now()).map_err(|_|"search report admission")?;
++    let mut candidates=artifacts.iter().filter(|a|a.path=="result.json" || a.role=="solver-outcome");
++    let a=candidates.next().ok_or("missing search result artifact")?;
++    if candidates.next().is_some() || a.path!="result.json" || a.role!="solver-outcome" || a.encoding!="json" || a.bytes>4096 {
++        return Err("search result descriptor".into())
++    }
++    f.terminal_raw=read(dir,"result.json",a.bytes,&mut f.budget,&mut f.pending_read)?;
++    if f.terminal_raw.len() as u64!=a.bytes || hex::encode(Sha256::digest(&f.terminal_raw))!=a.sha256 {
++        return Err("search result artifact bytes".into())
++    }
++    f.terminal=Some(serde_json::from_slice(&f.terminal_raw).map_err(|_|"search result decode")?);
++    let stored=f.terminal.as_ref().unwrap();
++    if stored!=outcome || stored["adapter_id"]!="sat-search-v1" || stored["strategy"]!="sat-search-v1"
++        || stored["status"]!="partial" || stored["solver_completed"]!=false
++        || stored["scalar_recovered_without_witness"]!=false || stored["all_patterns_negative"]!=false {
++        return Err("search producer report identity or overclaim".into())
++    }
++    let head=f.head.as_ref().ok_or("search report missing authenticated head")?;
++    if stored["terminal_sequence"].as_u64()!=Some(head.event_count)
++        || stored["terminal_sha256"].as_str()!=Some(head.last_event_sha256.as_str()) {
++        return Err("search report terminal acknowledgment".into())
++    }
++    f.search_mode.as_ref().ok_or("missing search mode")?.check_report(&stored["search_report"])?;
++    let mut telemetry=artifacts.iter().filter(|a|a.path=="telemetry/solver.json");
++    let t=telemetry.next().ok_or("search requires completed solver telemetry")?;
++    if telemetry.next().is_some()||t.encoding!="json"||t.bytes>65536{return Err("search solver telemetry descriptor".into())}
++    f.budget.reserve_checking(t.bytes.checked_mul(256).ok_or("telemetry quote")?,t.bytes.checked_mul(128).ok_or("telemetry quote")?,Instant::now()).map_err(|_|"search telemetry admission")?;
++    f.terminal_head_raw=read(dir,&t.path,t.bytes,&mut f.budget,&mut f.pending_read)?;
++    if f.terminal_head_raw.len() as u64!=t.bytes||hex::encode(Sha256::digest(&f.terminal_head_raw))!=t.sha256{return Err("search solver telemetry bytes".into())}
++    let measured:Value=serde_json::from_slice(&f.terminal_head_raw).map_err(|_|"search solver telemetry parse")?;
++    if measured["returned_ok"]!=true{return Err("search solver telemetry failed".into())}
++    crate::ml_dataset::telemetry::checked::verify_artifacts(dir,artifacts)?;
++    execution::verify(dir,artifacts)?;
++    DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"search report post-join deadline".into())
++}
++impl VerifiedSearch {
++    pub(in crate::ml_dataset::solvers) fn join_report(&mut self,dir:&Path,outcome:&Value,artifacts:&[Artifact])->Result<(),Stop>{
++        match search_report_join(&mut self.frame,dir,outcome,artifacts) {
++            Ok(())=>Ok(()),Err(error)=>{self.frame.diagnostic=Some(error);self.frame.budget.fail(Stop::NativeFailure)}
++        }
++    }
++    pub(in crate::ml_dataset::solvers) fn project_restricted(&mut self)->Result<Value,Stop>{
++        let f=&mut self.frame;
++        f.budget.reserve_checking(65536,65536,Instant::now())?;
++        if f.terminal.is_none(){return f.budget.fail(Stop::Phase)}
++        let value=f.search_mode.as_ref().ok_or(Stop::Phase)?.restricted_projection();
++        DecodeBudget::check(&mut f.budget,Instant::now())?;
++        Ok(value)
++    }
++}
++
++impl VerifiedSearch {
++    pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
++        self.frame.usage()
++    }
++    /// Recheck every persisted input against the already checked original and
++    /// exact capture chain. All costs accrue to this same retained replay owner.
++    pub(in crate::ml_dataset::solvers) fn revalidate(
++        &mut self,
++        dir: &Path,
++        config: &CaseConfig,
++        outcome: &Value,
++        artifacts: &[Artifact],
++    ) -> Result<(), Stop> {
++        let f = &mut self.frame;
++        if let Some(stop) = f.budget.first_stop {
++            return Err(stop);
++        }
++        let result = (|| -> Result<(), String> {
++            f.budget
++                .reserve_checking(8192, 16384, Instant::now())
++                .map_err(|_| "revalidation report/context admission refused")?;
++            if artifacts.len() > 4096 {
++                return Err("revalidation artifact count".into());
++            }
++            let artifact_bytes = artifacts.iter().try_fold(0u64, |n, a| {
++                n.checked_add(a.bytes)
++                    .ok_or("revalidation artifact overflow")
++            })?;
++            let head = f.head.as_ref().ok_or("missing checked revalidation head")?;
++            // Retain the whole aggregate floor. No optimistic owner discount.
++            f.budget
++                .reserve_checking(
++                    head.byte_end
++                        .checked_add(head.payload_bytes)
++                        .and_then(|n| n.checked_mul(64))
++                        .ok_or("revalidation capture work overflow")?,
++                    head.byte_end
++                        .checked_mul(128)
++                        .and_then(|n| n.checked_add(2 * 1024 * 1024))
++                        .ok_or("revalidation capture owner overflow")?,
++                    Instant::now(),
++                )
++                .map_err(|_| "revalidation capture admission refused")?;
++            let head = head.clone();
++            let (binding, caps) = f
++                .original_capture
++                .as_ref()
++                .ok_or("missing original capture context")?
++                .clone();
++
++            for pass in 0..2 {
++                f.budget
++                    .reserve_checking(
++                        artifact_bytes
++                            .checked_mul(64)
++                            .ok_or("revalidation manifest work overflow")?,
++                        2 * 1024 * 1024,
++                        Instant::now(),
++                    )
++                    .map_err(|_| "revalidation manifest admission refused")?;
++                if Some(hash_artifact_descriptors(artifacts, &mut f.budget)?)
++                    != f.artifact_fingerprint
++                {
++                    return Err("revalidation artifact descriptors changed".into());
++                }
++                for a in artifacts {
++                    f.revalidation_raw =
++                        read(dir, &a.path, a.bytes, &mut f.budget, &mut f.pending_read)?;
++                    if f.revalidation_raw.len() as u64 != a.bytes
++                        || hex::encode(Sha256::digest(&f.revalidation_raw)) != a.sha256
++                    {
++                        return Err("revalidation artifact bytes changed".into());
++                    }
++                }
++                // AttemptBinding records exact raw hashes, including formatting.
++                // These paths may be omitted from small component-fixture manifests.
++                for (path, expected) in [
++                    ("run.json", &binding.run_sha256),
++                    ("plan.json", &binding.plan_sha256),
++                    ("protocol.json", &binding.protocol_sha256),
++                    ("attempt.json", &binding.attempt_sha256),
++                ] {
++                    f.revalidation_raw = read(
++                        dir,
++                        path,
++                        crate::ml_dataset::JSON_INPUT_MAX_BYTES,
++                        &mut f.budget,
++                        &mut f.pending_read,
++                    )?;
++                    if hex::encode(Sha256::digest(&f.revalidation_raw)) != *expected {
++                        return Err("revalidation bound context bytes changed".into());
++                    }
++                }
++                f.revalidation_raw = read(
++                    dir,
++                    "measurement-policy.json",
++                    65536,
++                    &mut f.budget,
++                    &mut f.pending_read,
++                )?;
++                if Some(<[u8; 32]>::from(Sha256::digest(&f.revalidation_raw)))
++                    != f.measurement_policy_hash
++                {
++                    return Err("revalidation measurement policy changed".into());
++                }
++                for (path, expected) in [
++                    ("config.json", f.config.as_slice()),
++                    ("public.json", f.public.as_slice()),
++                    ("factor-base.json", f.factor.as_slice()),
++                ] {
++                    f.revalidation_raw = read(
++                        dir,
++                        path,
++                        expected.len() as u64,
++                        &mut f.budget,
++                        &mut f.pending_read,
++                    )?;
++                    if f.revalidation_raw.as_slice() != expected {
++                        return Err("revalidation original bytes changed".into());
++                    }
++                }
++                let n = f.config.len() as u64;
++                f.budget
++                    .reserve_checking(
++                        n.checked_mul(256)
++                            .ok_or("revalidation config work overflow")?,
++                        n.checked_mul(128)
++                            .ok_or("revalidation config owner overflow")?,
++                        Instant::now(),
++                    )
++                    .map_err(|_| "revalidation config admission refused")?;
++                f.revalidation_config =
++                    Some(serde_json::from_slice(&f.config).map_err(|e| e.to_string())?);
++                if f.revalidation_config.as_ref() != Some(config) {
++                    return Err("revalidation caller config differs".into());
++                }
++                search_report_join(f, dir, outcome, artifacts)?;
++                if pass == 0 {
++                    let authenticated=capture::verify_live_committed_prefix_owned(dir,&binding,&caps,&head,&mut |request| {
++                        match request {
++                            capture::OwnedReplayRequest::Head(_) => {
++                                f.revalidation_raw=read(dir,"live/committed.json",caps.metadata_reserve_bytes,&mut f.budget,&mut f.pending_read)?;
++                                f.revalidation_head=Some(revalidation_head(&f.revalidation_raw,&mut f.budget)?);
++                                Ok(capture::OwnedReplayReply::Head(f.revalidation_head.as_ref().unwrap().clone()))
++                            }
++                            capture::OwnedReplayRequest::Record(phase,line) => {
++                                if phase==capture::RecordPhase::BeforeRecordDecode {
++                                    f.pending_line.clear();f.pending_line.extend_from_slice(line);
++                                    f.budget.reserve_checking((line.len() as u64).checked_mul(8).and_then(|n|n.checked_add(1024)).ok_or("revalidation scan overflow")?,32768,Instant::now())
++                                        .map_err(|_|"revalidation scan refused")?;
++                                    let shape=provenance::gate_wire::json_shape::inspect(line,||DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|provenance::gate_wire::json_shape::Error::Admission))
++                                        .map_err(|_|"revalidation shape refused")?;
++                                    f.budget.reserve_checking(0,shape.owner_bytes().map_err(|_|"revalidation owner overflow")?.checked_mul(4).ok_or("revalidation owner overflow")?,Instant::now())
++                                        .map_err(|_|"revalidation record owner refused")?;
++                                }
++                                Ok(capture::OwnedReplayReply::Done)
++                            }
++                            capture::OwnedReplayRequest::Payload(_,a) => {
++                                let path=format!("live/{}",a.path);
++                                f.revalidation_payload=read(dir,&path,a.bytes,&mut f.budget,&mut f.pending_read)?;
++                                DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"revalidation payload deadline")?;
++                                let proof=capture::verify_replay_payload_bytes(a,&f.revalidation_payload)?;
++                                DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"revalidation payload deadline")?;
++                                Ok(capture::OwnedReplayReply::Payload(proof))
++                            }
++                        }
++                    })?.ok_or("revalidation capture disappeared")?;
++                    if authenticated.payloads.len() != 1 {
++                        return Err("revalidation payload count changed".into());
++                    }
++                }
++                f.revalidation_raw = read(
++                    dir,
++                    "live/committed.json",
++                    caps.metadata_reserve_bytes,
++                    &mut f.budget,
++                    &mut f.pending_read,
++                )?;
++                f.revalidation_head = Some(revalidation_head(&f.revalidation_raw, &mut f.budget)?);
++                if f.revalidation_head.as_ref() != Some(&head) {
++                    return Err("revalidation capture endpoint changed".into());
++                }
++                DecodeBudget::check(&mut f.budget, Instant::now())
++                    .map_err(|_| "revalidation deadline refused")?;
++            }
++            Ok(())
++        })();
++        match result {
++            Ok(()) => Ok(()),
++            Err(error) => {
++                f.diagnostic = Some(error);
++                f.budget.fail(Stop::NativeFailure)
++            }
++        }
++    }
++}
+--- HEAD/src/ml_dataset/sat_initial_checkpoint.rs
++++ assembled/src/ml_dataset/sat_initial_checkpoint.rs
+@@ -166,3 +166,6 @@
+         }
+     }
+ }
++
++#[path = "sat_search_owned.rs"]
++pub(in crate::ml_dataset::solvers) mod search;
+--- HEAD/src/ml_dataset/sat_initial_native.rs
++++ assembled/src/ml_dataset/sat_initial_native.rs
+@@ -122,6 +122,7 @@
+     position: capture::CommittedEventPosition,
+ }
+ struct CaptureState {
++    search: Option<checkpoint::search::SearchCapture>,
+     budget: Budget,
+     sink: capture::CaptureEmitter,
+     limits: capture::CaptureLimits,
+@@ -202,6 +203,23 @@
+     cap: usize,
+     payload: &T,
+ ) -> Result<Publication, Stop> {
++    publish_kind(
++        capture::TypedEventKind::BinarySatInitial,
++        budget,
++        sink,
++        buffer,
++        cap,
++        payload,
++    )
++}
++fn publish_kind<T: Serialize + ?Sized>(
++    kind: capture::TypedEventKind,
++    budget: &mut Budget,
++    sink: &mut capture::CaptureEmitter,
++    buffer: &mut capture::TypedEventBuffer,
++    cap: usize,
++    payload: &T,
++) -> Result<Publication, Stop> {
+     let mut count = Count {
+         budget,
+         len: 0,
+@@ -214,7 +232,7 @@
+     let next = before.event_count.checked_add(1).ok_or(Stop::Overflow)?;
+     let ledger = RefCell::new(budget);
+     let result = sink.event_typed_admit_encoding_with_limit(
+-        capture::TypedEventKind::BinarySatInitial,
++        kind,
+         payload,
+         buffer,
+         cap,
+@@ -317,6 +335,9 @@
+         }
+     }
+     fn on_event_inner(&mut self, event: &SolverEvent) -> Result<(), Stop> {
++        if self.search.is_some() {
++            return checkpoint::search::on_event(self, event);
++        }
+         if self.closed || self.pending.is_some() || self.events.len() >= self.event_limit {
+             return Err(Stop::Events);
+         }
+@@ -450,6 +471,7 @@
+             capture_limits,
+         } = owner;
+         let shared = Arc::new(Mutex::new(CaptureState {
++            search: None,
+             budget,
+             sink,
+             limits: capture_limits,
+@@ -748,6 +770,7 @@
+             .unwrap();
+         let cap = limits.max_event_bytes;
+         let shared = Arc::new(Mutex::new(CaptureState {
++            search: None,
+             budget,
+             sink,
+             limits,
+--- HEAD/src/ml_dataset/sat_original_owner.rs
++++ assembled/src/ml_dataset/sat_original_owner.rs
+@@ -19,6 +19,7 @@
+     b: F2mElement,
+     irr: IrreduciblePoly,
+     target: Option<F2mElement>,
++    signed_target: Option<(u64, u64)>,
+     signed: Vec<(u64, u64)>,
+     codes: Vec<BigUint>,
+ }
+@@ -30,6 +31,7 @@
+     a: Option<F2mElement>,
+     b: Option<F2mElement>,
+     target: Option<Option<F2mElement>>,
++    signed_target: Option<Option<(u64, u64)>>,
+     low_terms: Vec<u32>,
+     signed: Vec<(u64, u64)>,
+     codes: Vec<BigUint>,
+@@ -197,6 +199,11 @@
+         // Native binary point format uses the same infinity tag as group replay.
+         state.a = Some(field(a, c.n));
+         state.b = Some(field(b, c.n));
++        state.signed_target = Some(if p["target"].is_null() {
++            None
++        } else {
++            Some((scalar(&p["target"]["x"])?, scalar(&p["target"]["y"])?))
++        });
+         state.target = Some(if p["target"].is_null() {
+             None
+         } else {
+@@ -251,6 +258,10 @@
+                 low_terms: std::mem::take(&mut state.low_terms),
+             },
+             target: state.target.take().expect("decoder assigned target"),
++            signed_target: state
++                .signed_target
++                .take()
++                .expect("decoder assigned signed target"),
+             signed: std::mem::take(&mut state.signed),
+             codes: std::mem::take(&mut state.codes),
+         });
+@@ -960,10 +971,19 @@
+ #[path = "original_boolean_rows.rs"]
+ pub(in crate::ml_dataset::solvers) mod boolean_rows;
+ 
+-#[path="original_affine_rows.rs"]
++#[path="original_boolean_search.rs"]
++pub(in crate::ml_dataset::solvers) mod boolean_search;
++
++#[path = "affine_row_central.rs"]
++pub(in crate::ml_dataset::solvers) mod affine_central;
++#[path = "original_affine_rows.rs"]
+ pub(in crate::ml_dataset::solvers) mod affine_rows;
+-#[path="affine_row_central.rs"]
+-pub(in crate::ml_dataset::solvers) mod affine_central;
+-
+-#[path="affine_boolean_row_worker.rs"]
++
++#[path = "affine_boolean_row_worker.rs"]
+ pub(in crate::ml_dataset::solvers) mod affine_worker;
++
++#[path="sat_search_worker.rs"]
++pub(in crate::ml_dataset::solvers) mod search_worker;
++
++#[path="owned_boolean_search_worker.rs"]
++pub(in crate::ml_dataset::solvers) mod owned_search_worker;
+--- HEAD/src/ml_dataset/sat_replay_caller.rs
++++ assembled/src/ml_dataset/sat_replay_caller.rs
+@@ -535,6 +535,7 @@
+         }
+         fn args(&self) -> DatasetArgs {
+             DatasetArgs {
++                search_replay_policy:None,search_replay_receipt:None,
+                 affine_replay_policy:None,affine_replay_receipt:None,
+                 sat_replay_policy: Some(self.policy.clone()),
+                 sat_replay_receipt: Some(self.receipt.clone()),
+--- HEAD/src/ml_dataset/solvers.rs
++++ assembled/src/ml_dataset/solvers.rs
+@@ -367,6 +367,9 @@
+ /// performs no storage retry and makes no durable-publication claim.
+ #[derive(Default)]
+ pub(super) struct WorkerResidualCustody {
++    boolean_search:Option<koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt>,
++    boolean_search_report_unavailable:bool,
++    search:Option<koblitz_m3::sat_original_owner::search_worker::Custody>,
+     items: Vec<WorkerResidualArtifact>,
+     // Moves the existing admitted owners; no Box, sink reopening or ledger reset.
+     sat: Option<koblitz_m3::sat_original_owner::worker::Custody>,
+@@ -393,7 +396,7 @@
+         items
+             .try_reserve_exact(Self::CAPACITY)
+             .map_err(|e| e.to_string())?;
+-        Ok(Self { items, sat: None, sat_report_unavailable: false, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false })
++        Ok(Self { items, search:None,boolean_search:None,boolean_search_report_unavailable:false,sat: None, sat_report_unavailable: false, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false })
+     }
+     fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
+         if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
+@@ -402,6 +405,7 @@
+         self.items.push(item);
+         Ok(())
+     }
++    pub(super) fn boolean_search_report_unavailable(&self)->bool{self.boolean_search_report_unavailable}
+     pub(super) fn boolean_rows_report_unavailable(&self) -> bool { self.boolean_rows_report_unavailable || self.affine_rows_report_unavailable }
+     pub(super) fn affine_rows_report_unavailable(&self)->bool {self.affine_rows_report_unavailable}
+     pub(super) fn sat_report_unavailable(&self) -> bool {
+@@ -419,6 +423,23 @@
+     residual: WorkerResidualCustody,
+ }
+ impl WorkerSolveOutput {
++    fn from_original_boolean_search_failure(custody:koblitz_m3::sat_original_owner::worker::Custody)->Self{
++        Self{data:SolverData{outcome:Value::Null,artifacts:Vec::new()},stored:Vec::new(),
++            residual:WorkerResidualCustody{sat:Some(custody),boolean_search_report_unavailable:true,..Default::default()}}
++    }
++    // A fixed partial report is admitted against the retained original ledger.
++    // Refused reporting keeps its guard and all native custody.
++    fn from_original_boolean_search(mut custody:koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt)->Self{
++        let outcome=custody.outcome();let unavailable=outcome.is_none();
++        Self{data:SolverData{outcome:outcome.unwrap_or(Value::Null),artifacts:Vec::new()},stored:Vec::new(),
++            residual:WorkerResidualCustody{boolean_search:Some(custody),boolean_search_report_unavailable:unavailable,..Default::default()}}
++    }
++
++    fn from_search_custody(mut custody:koblitz_m3::sat_original_owner::search_worker::Custody)->Self {
++        let outcome=custody.outcome();let unavailable=outcome.is_none();
++        Self{data:SolverData{outcome:outcome.unwrap_or(Value::Null),artifacts:Vec::new()},stored:Vec::new(),
++            residual:WorkerResidualCustody{search:Some(custody),sat_report_unavailable:unavailable,..Default::default()}}
++    }
+     pub(super) fn legacy(data: SolverData) -> Self {
+         Self {
+             data,
+@@ -442,7 +463,7 @@
+         let unavailable=outcome.is_none();
+         Self { data: SolverData { outcome:outcome.unwrap_or(Value::Null), artifacts:Vec::new() },
+             stored:Vec::new(), residual:WorkerResidualCustody {
+-                items:Vec::new(),sat:None,sat_report_unavailable:false,
++                items:Vec::new(),sat:None,search:None,boolean_search:None,boolean_search_report_unavailable:false,sat_report_unavailable:false,
+                 boolean_rows:Some(custody),boolean_rows_report_unavailable:unavailable, affine_rows:None, affine_rows_report_unavailable:false,
+             } }
+     }
+@@ -455,7 +476,7 @@
+             data: SolverData { outcome: outcome.unwrap_or(Value::Null), artifacts: Vec::new() },
+             stored: Vec::new(),
+             residual: WorkerResidualCustody {
+-                items: Vec::new(), sat: Some(custody), sat_report_unavailable: unavailable, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false,
++                items: Vec::new(), search:None,boolean_search:None,boolean_search_report_unavailable:false,sat: Some(custody), sat_report_unavailable: unavailable, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false,
+             },
+         }
+     }
+@@ -643,6 +664,11 @@
+ pub(super) fn requested_channel_disposition(config:&CaseConfig)->Result<Option<Value>,String>{
+     let Some(c)=&config.channels else {return Ok(None)};
+     c.validate()?;
++    let sat_search=c.sat_search.as_ref().map(|r| {
++        let eligible=koblitz_m3::sat_original_owner::search_worker::supported(config);
++        super::types::ChannelDisposition{request:r.clone(),status:if eligible{super::types::ChannelDispositionStatus::Requested}else{super::types::ChannelDispositionStatus::Unsupported},
++            reason:if eligible{super::types::ChannelDispositionReason::RequiresActualSatSearchReplay}else{super::types::ChannelDispositionReason::OutsideSatSearchProfile},execution_verified:false,training_export_admitted:false}
++    });
+     let boolean=c.boolean_consequence.as_ref().map(|r| {
+         let eligible=config.family=="binary" && config.m==3
+             && ((23..=31).contains(&config.n)||(47..=61).contains(&config.n))
+@@ -669,7 +695,7 @@
+             execution_verified:false,training_export_admitted:false}
+     });
+     Ok(Some(serde_json::to_value(super::types::RequestedChannelDispositions {
+-        schema:"crypto.ml-dataset.requested-channels/v1".into(),boolean_consequence:boolean,sat_initial:sat,affine_boolean_row,
++        schema:"crypto.ml-dataset.requested-channels/v1".into(),sat_search,boolean_consequence:boolean,sat_initial:sat,affine_boolean_row,
+     }).map_err(|e|e.to_string())?))
+ }
+ /// Historical replay allowance explicitly supplied by an authorized caller.
+@@ -793,6 +819,16 @@
+     if context.is_some_and(|c| c.launch.binding != binding) {
+         return Err("verified worker originals differ from execution attempt".into());
+     }
++    if koblitz_m3::sat_original_owner::owned_search_worker::requested(config) {
++        config.channels.as_ref().unwrap().validate()?;
++        if !koblitz_m3::sat_original_owner::owned_search_worker::supported(config) {
++            return Ok(WorkerSolveOutput::legacy(SolverData{outcome:json!({"strategy":"original-boolean-search-unsupported","status":"unsupported","solver_completed":false,"all_patterns_negative":false,"training_export_admitted":false}),artifacts:Vec::new()}));
++        }
++        let context=context.ok_or("owned Boolean search requires original execution context")?;
++        if LIVE_SINK.with(|slot|slot.borrow().is_some()){return Err("nested live owned search sink".into())}
++        let sink=CaptureEmitter::create(directory,binding,limits.clone())?;
++        return Ok(koblitz_m3::sat_original_owner::owned_search_worker::run(original,case,context,sink,&limits));
++    }
+     if config.channels.as_ref().is_some_and(|c|c.affine_boolean_row.is_some()) {
+         config.channels.as_ref().unwrap().validate()?;
+         if !koblitz_m3::sat_original_owner::affine_worker::supported(config) {
+@@ -807,6 +843,15 @@
+     }
+     // Optional initial channel owns one original-budget pattern. Once selected,
+     // no partial or refused attempt can fall through to the legacy SAT solver.
++    if koblitz_m3::sat_original_owner::search_worker::requested(config) {
++        if !koblitz_m3::sat_original_owner::search_worker::supported(config) {
++            return Ok(WorkerSolveOutput::legacy(SolverData{outcome:json!({"strategy":"sat-search-unsupported","status":"unsupported","solver_completed":false,"scalar_recovered_without_witness":false,"all_patterns_negative":false}),artifacts:Vec::new()}));
++        }
++        let context=context.ok_or("search requires original execution context")?;
++        if LIVE_SINK.with(|slot|slot.borrow().is_some()){return Err("nested live search sink".into())}
++        let sink=CaptureEmitter::create(directory,binding,limits.clone())?;
++        return Ok(WorkerSolveOutput::from_search_custody(koblitz_m3::sat_original_owner::search_worker::run(original,case,context,sink,&limits)));
++    }
+     if koblitz_m3::sat_original_owner::worker::eligibility(config)
+         == koblitz_m3::sat_original_owner::worker::Eligibility::Requested
+     {
+@@ -6655,17 +6700,78 @@
+                 execution_required, positive_control, policy, family, degree_bound, None)
+         }
+         fn with_family_policy_channels(
+-            n: u32, twist: bool, factor_base_size: usize, solver: &str, work_limit: u64,
+-            execution_required: bool, positive_control: bool,
+-            policy: Option<crate::ml_dataset::types::FactorBasePolicy>, family: &str,
+-            degree_bound: u32, channels: Option<crate::ml_dataset::types::ChannelRequests>,
++            n: u32,
++            twist: bool,
++            factor_base_size: usize,
++            solver: &str,
++            work_limit: u64,
++            execution_required: bool,
++            positive_control: bool,
++            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
++            family: &str,
++            degree_bound: u32,
++            channels: Option<crate::ml_dataset::types::ChannelRequests>,
++        ) -> Self {
++            Self::with_family_policy_channels_recipe(
++                n,
++                twist,
++                factor_base_size,
++                solver,
++                work_limit,
++                execution_required,
++                positive_control,
++                policy,
++                family,
++                degree_bound,
++                channels,
++                false,
++            )
++        }
++        #[cfg(sat_qualification_child)]
++        pub(super) fn with_fixed_sat_qualification(family: &str, twist: bool) -> Self {
++            let channels=serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v2","sat_initial":{"mode":"capture_and_check_initial"}})).unwrap();
++            Self::finish_original_capture_setup(Self::with_family_policy_channels_recipe(
++                23,
++                twist,
++                4,
++                "sat",
++                16384,
++                true,
++                false,
++                Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),
++                family,
++                3,
++                Some(channels),
++                true,
++            ))
++        }
++        fn with_family_policy_channels_recipe(
++            n: u32,
++            twist: bool,
++            factor_base_size: usize,
++            solver: &str,
++            work_limit: u64,
++            execution_required: bool,
++            positive_control: bool,
++            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
++            family: &str,
++            degree_bound: u32,
++            channels: Option<crate::ml_dataset::types::ChannelRequests>,
++            qualification: bool,
+         ) -> Self {
+             let nonce = std::time::SystemTime::now()
+                 .duration_since(std::time::UNIX_EPOCH)
+                 .unwrap()
+                 .as_nanos();
+-            let root = std::env::temp_dir()
+-                .join(format!("verified-worker-{}-{nonce}", std::process::id()));
++            let root = if qualification {
++                PathBuf::from(
++                    std::env::var_os("SAT_REFERENCE_RESTRICTED_OUTPUT")
++                        .expect("supervised qualification output required"),
++                )
++                .join("original-case")
++            } else {
++                std::env::temp_dir().join(format!("verified-worker-{}-{nonce}", std::process::id()))
++            };
+             fs::create_dir(&root).unwrap();
+             let mut protocol = json!({"schema":"experiment.protocol/v1", "purpose":"verified worker input software controls"});
+             if positive_control {
+@@ -6680,6 +6786,9 @@
+                     "root_failure_rule":"conflicting raw pdp-witness.json before producer entry"
+                 });
+             }
++            if qualification {
++                protocol["software_control"] = json!({"schema":"sat-fixed-nonroot-qualification/v3","fixed_rows":[0,0,2],"pattern":0,"qualification":"at least two distinct complete original-map models; conditional candidate","fallback":"forbidden","baby_slot_cap":4096,"reference_work":8000000,"reference_bytes":16777216,"reference_additions":100000,"checkpoint_total_bytes":67108864,"deadline":"original monotonic deadline; no renewal"});
++            }
+             if let Some(request) = &channels {
+                 protocol["extensions"]["dataset_channels"] = serde_json::to_value(request).unwrap();
+             }
+@@ -6689,7 +6798,9 @@
+             let plan = dataset::DatasetPlan {
+                 channels: channels.clone(),
+                 factor_base_policies: policy.clone().into_iter().collect(),
+-                schema: if channels.is_some() { "crypto.ml-dataset.plan/v3" } else if policy.is_some() {
++                schema: if channels.is_some() {
++                    "crypto.ml-dataset.plan/v3"
++                } else if policy.is_some() {
+                     "crypto.ml-dataset.plan/v2"
+                 } else {
+                     "crypto.ml-dataset.plan/v1"
+@@ -6733,7 +6844,15 @@
+             .unwrap();
+             storage::write_bytes(&root, "protocol.json", "protocol", "json", &bytes).unwrap();
+             let binding = AttemptBinding::from_cell_files(&root).unwrap();
+-            let case = curves::generate(&config).unwrap();
++            let case = if qualification {
++                CaseData {
++                    public_instance: Value::Null,
++                    private_witness: Value::Null,
++                    factor_base: Value::Null,
++                }
++            } else {
++                curves::generate(&config).unwrap()
++            };
+             Self {
+                 root,
+                 config,
+@@ -7397,3 +7516,44 @@
+ #[path="affine_replay_owner.rs"]
+ mod affine_replay_owner;
+ pub(super) use affine_replay_owner::{AffineReplayCustody,AffineReplayVerdict,verify_affine_row_cell,needs_affine_row_replay};
++
++#[derive(Clone,Copy,Debug,PartialEq,Eq)]
++pub(super) enum SearchReplayVerdict{CheckedScope,Incomplete,Unknown,Rejected}
++enum SearchReplayOwner{Outcome(koblitz_m3::sat_original_owner::central::SearchOutcome),Failed(koblitz_m3::sat_original_owner::central::Failed)}
++pub(super) struct SearchReplayCustody{owner:SearchReplayOwner,verdict:SearchReplayVerdict}
++impl SearchReplayCustody {
++    pub(super) fn verdict(&self)->SearchReplayVerdict{self.verdict}
++    pub(super) fn retained_slot_bytes()->usize{std::mem::size_of::<Self>()}
++    pub(super) fn charged(&self)->(u64,u64){use koblitz_m3::sat_original_owner::central::SearchOutcome as O;
++        match &self.owner {SearchReplayOwner::Outcome(O::Verified(v))=>v.usage(),SearchReplayOwner::Outcome(O::Incomplete(f)|O::UnknownOriginalMath(f))=>f.usage(),SearchReplayOwner::Failed(f)=>f.frame.usage()}}
++    pub(super) fn revalidate(&mut self,dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact])->SearchReplayVerdict{
++        if self.verdict!=SearchReplayVerdict::CheckedScope{return self.verdict}
++        if let SearchReplayOwner::Outcome(koblitz_m3::sat_original_owner::central::SearchOutcome::Verified(v))=&mut self.owner {
++            if v.revalidate(dir,config,outcome,artifacts).is_err(){self.verdict=SearchReplayVerdict::Rejected}
++        }else{self.verdict=SearchReplayVerdict::Rejected}self.verdict
++    }
++    pub(super) fn project_identity(&mut self)->Result<Value,String>{
++        if self.verdict!=SearchReplayVerdict::CheckedScope{return Err("search scope not joined".into())}
++        if let SearchReplayOwner::Outcome(koblitz_m3::sat_original_owner::central::SearchOutcome::Verified(v))=&mut self.owner {
++            match v.project_restricted(){Ok(value)=>Ok(value),Err(_)=>{self.verdict=SearchReplayVerdict::Rejected;Err("search projection refused".into())}}
++        }else{Err("search owner missing".into())}
++    }
++}
++pub(super) fn needs_search_replay(config:&CaseConfig,outcome:&Value)->bool{
++    koblitz_m3::sat_original_owner::search_worker::requested(config)||outcome["adapter_id"]=="sat-search-v1"||outcome.get("search_report").is_some()
++}
++pub(super) fn verify_search_cell(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact],policy:SatReplayPolicy)->SearchReplayCustody{
++    use koblitz_m3::sat_original_owner::central;
++    let events=config.channels.as_ref().and_then(|c|c.sat_search.as_ref()).map(|r|match r{super::types::SatSearchRequest::CaptureAndCheckModel{events,..}=>*events as usize}).unwrap_or(0);
++    let result=central::verify_search(dir,config,artifacts,central::Policy{work:policy.work,bytes:policy.bytes,deadline:policy.deadline,stream_bytes:policy.stream_bytes,payload_bytes:policy.payload_bytes},events);
++    match result {
++        Ok(mut outcome_owner)=>{let verdict=match &mut outcome_owner {
++            central::SearchOutcome::Verified(v)=>if v.join_report(dir,outcome,artifacts).is_ok(){SearchReplayVerdict::CheckedScope}else{SearchReplayVerdict::Rejected},
++            central::SearchOutcome::Incomplete(_)=>SearchReplayVerdict::Incomplete,
++            central::SearchOutcome::UnknownOriginalMath(_)=>SearchReplayVerdict::Unknown,
++        };SearchReplayCustody{owner:SearchReplayOwner::Outcome(outcome_owner),verdict}},
++        Err(f)=>SearchReplayCustody{owner:SearchReplayOwner::Failed(f),verdict:SearchReplayVerdict::Rejected},
++    }
++}
++
++pub(super) fn search_request_supported(c:&CaseConfig)->bool{koblitz_m3::sat_original_owner::search_worker::supported(c)}
+--- HEAD/src/ml_dataset/types.rs
++++ assembled/src/ml_dataset/types.rs
+@@ -82,6 +82,10 @@
+ #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+ #[serde(deny_unknown_fields)]
+ pub struct ChannelRequests {
++    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_owned_search")]
++    pub owned_boolean_search:Option<OwnedBooleanSearchRequest>,
++    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_search")]
++    pub sat_search:Option<SatSearchRequest>,
+     pub schema: String,
+     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_boolean")]
+     pub boolean_consequence: Option<BooleanRequest>,
+@@ -113,8 +117,30 @@
+     c.validate().map_err(serde::de::Error::custom)?;
+     Ok(Some(c))
+ }
++#[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
++#[serde(tag="mode",rename_all="snake_case",deny_unknown_fields)]
++pub enum SatSearchRequest { CaptureAndCheckModel {events:u32,conflicts:u64} }
++fn present_search<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<SatSearchRequest>,D::Error>{SatSearchRequest::deserialize(d).map(Some)}
++#[derive(Clone,Copy,Debug,Serialize,Deserialize,PartialEq,Eq)]
++#[serde(rename_all="snake_case")]
++pub enum OwnedBooleanSearchPolicy { ConservativeAffineEnvelopeV1 }
++#[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
++#[serde(tag="mode",rename_all="snake_case",deny_unknown_fields)]
++pub enum OwnedBooleanSearchRequest { MatrixContinuation { pattern:u32, policy:OwnedBooleanSearchPolicy } }
++fn present_owned_search<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<OwnedBooleanSearchRequest>,D::Error>{OwnedBooleanSearchRequest::deserialize(d).map(Some)}
+ impl ChannelRequests {
+     pub fn validate(&self)->Result<(),String>{
++        if self.schema=="crypto.ml-dataset.channel-requests/v5" {
++            if self.owned_boolean_search.is_none() || self.boolean_consequence.is_some() || self.sat_initial.is_some() || self.affine_boolean_row.is_some() || self.sat_search.is_some() {return Err("v5 requires exclusive owned_boolean_search".into())}
++            return Ok(());
++        }
++        if self.owned_boolean_search.is_some(){return Err("owned search requires explicit v5".into())}
++
++        if self.schema=="crypto.ml-dataset.channel-requests/v4" {
++            if self.boolean_consequence.is_some()||self.sat_initial.is_some()||self.affine_boolean_row.is_some(){return Err("v4 search request is exclusive".into())}
++            return match self.sat_search {Some(SatSearchRequest::CaptureAndCheckModel{events,conflicts}) if events>0 && events<=1_000_000 && conflicts>0=>Ok(()),_=>Err("v4 requires bounded sat_search".into())};
++        }
++        if self.sat_search.is_some(){return Err("search requires explicit v4".into())}
+         if self.schema == "crypto.ml-dataset.channel-requests/v3" {
+             if self.affine_boolean_row.is_none() || self.boolean_consequence.is_some() || self.sat_initial.is_some() {
+                 return Err("v3 requires only affine_boolean_row".into());
+@@ -290,6 +316,7 @@
+     SatCentralWorkerReplayNotIntegrated,
+     RequiresActualSatInitialReplay, OutsideSatInitialProfile,
+     RequiresActualAffineUnitRow, OutsideAffineUnitRowProfile,
++    RequiresActualSatSearchReplay, OutsideSatSearchProfile,
+ }
+ #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
+ #[serde(deny_unknown_fields)]
+@@ -300,6 +327,8 @@
+ #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
+ #[serde(deny_unknown_fields)]
+ pub struct RequestedChannelDispositions {
++    #[serde(default,skip_serializing_if="Option::is_none")]
++    pub sat_search:Option<ChannelDisposition<SatSearchRequest>>,
+     pub schema:String,
+     pub boolean_consequence:Option<ChannelDisposition<BooleanRequest>>,
+     pub sat_initial:Option<ChannelDisposition<SatRequest>>,

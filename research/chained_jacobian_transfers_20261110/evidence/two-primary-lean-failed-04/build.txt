@@ -1,0 +1,69 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean:75:2: error: `grind` failed
+case grind
+A C : Type
+inst : IntModule A
+inst_1 : IntModule C
+f l : A → C
+fz : f 0 = 0
+linear : ∀ (n : Int) (a : A), f (n • a) = n • f a
+cleared : ∀ (a : A), l a = 4 • f a
+a : A
+ha : 4 • a = 0
+hf : f (4 • a) = 0
+hl : l a = 0
+n : Int
+h : ¬n • 0 = 0
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] f 0 = 0
+    [prop] ∀ (n : Int) (a : A), f (n • a) = n • f a
+    [prop] ∀ (a : A), l a = 4 • f a
+    [prop] 4 • a = 0
+    [prop] f (4 • a) = 0
+    [prop] l a = 0
+    [prop] ¬n • 0 = 0
+    [prop] f (4 • a) = 4 • f a
+    [prop] l a = 4 • f a
+    [prop] l 0 = 4 • f 0
+  [eqc] True propositions
+    [prop] ∀ (a : A), l a = 4 • f a
+    [prop] ∀ (n : Int) (a : A), f (n • a) = n • f a
+  [eqc] False propositions
+    [prop] n • 0 = 0
+  [eqc] Equivalence classes
+    [eqc] {f 0, f (4 • a), l a, 0, 4 • f a}
+    [eqc] {0, 4 • a}
+    [eqc] {l 0, 4 • f 0}
+  [ematch] E-matching patterns
+    [thm] linear: [f (@HSMul.hSMul `[Int] `[A] `[A] `[instHSMul] #1 #0)]
+    [thm] cleared: [l #0]
+    [thm] cleared: [f #0]
+  [cutsat] Assignment satisfying linear constraints
+    [assign] n := 1
+  [linarith] Linarith
+    [linarith] Linarith assignment for `A`
+      [assign] a := 0
+    [linarith] Linarith assignment for `C`
+      [assign] f 0 := 0
+      [assign] f (4 • a) := 0
+      [assign] l a := 0
+      [assign] f a := 0
+      [assign] l 0 := 0
+[grind] Issues
+  [issue] `grind linarith` term with unexpected instance
+        n • 0
+  [issue] `grind linarith` term with unexpected instance
+        n • 0
+[grind] Diagnostics
+  [ematch] E-matching Diagnostics
+    [thm] Theorem Instance Count
+      [thm] cleared ↦ 2
+      [thm] linear ↦ 1
+'TwoPrimaryQuotient.halving_abscissa_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwoPrimaryQuotient.quotient_lift_independent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwoPrimaryQuotient.four_classes_have_sixteen_lifts' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwoPrimaryQuotient.frobenius_twelve_mod_sixteen' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwoPrimaryQuotient.reverse_cross_degree_four' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwoPrimaryQuotient.integer_cleared_maps_vanish_on_four' depends on axioms: [sorryAx]
+toolchain pin: leanprover/lean4:v4.35.0

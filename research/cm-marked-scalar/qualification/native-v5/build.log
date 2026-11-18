@@ -1,0 +1,32 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations native.cpp -o /tmp/cm-marked-scalar-build/native -lcrypto
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations bench.cpp -o /tmp/cm-marked-scalar-build/bench -lcrypto
+bench.cpp: In function ‘Result compute(const Fixture&, const Sample&, const string&, unsigned int, bool)’:
+bench.cpp:29:2: warning: this ‘else’ clause does not guard... [-Wmisleading-indentation]
+   29 |  else throw std::runtime_error("unknown arm");uint64_t group=elapsed(phase);phase=now();require(EC_POINT_is_on_curve(r.group,Y.get(),r.field.ctx)==1,"output curve");require(encoded(r,Y.get())==s.expected,"identical verified output");uint64_t verify=elapsed(phase);uint64_t total=elapsed(start);return {setup,maps,group,verify,total,count};
+      |  ^~~~
+bench.cpp:29:47: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘else’
+   29 |  else throw std::runtime_error("unknown arm");uint64_t group=elapsed(phase);phase=now();require(EC_POINT_is_on_curve(r.group,Y.get(),r.field.ctx)==1,"output curve");require(encoded(r,Y.get())==s.expected,"identical verified output");uint64_t verify=elapsed(phase);uint64_t total=elapsed(start);return {setup,maps,group,verify,total,count};
+      |                                               ^~~~~~~~
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations isolate.cpp -o /tmp/cm-marked-scalar-build/isolate -pthread -lcrypto
+isolate.cpp: In function ‘int run(int, char**)’:
+isolate.cpp:41:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   41 |  if(argc<6||std::string(argv[4])!="--")throw std::runtime_error("usage: isolate CPUS RECEIPT ROWS -- COMMAND ...");if(fs::exists(argv[2])||fs::exists(argv[3]))throw std::runtime_error("write-once output already exists");struct sigaction action{};action.sa_handler=interrupted_signal;sigemptyset(&action.sa_mask);sigaction(SIGTERM,&action,nullptr);sigaction(SIGINT,&action,nullptr);auto reserved=cpus(argv[1]);int self=getpid();cpu_set_t initial;if(sched_getaffinity(0,sizeof(initial),&initial))throw std::runtime_error("get affinity");for(int c:reserved){if(!CPU_ISSET(c,&initial))throw std::runtime_error("CPU outside current affinity");auto siblings=cpus(read("/sys/devices/system/cpu/cpu"+std::to_string(c)+"/topology/thread_siblings_list"));for(int s:siblings)if(!reserved.count(s))throw std::runtime_error("SMT sibling must also be reserved");}if(reserved.size()>=size_t(CPU_COUNT(&initial)))throw std::runtime_error("reservation leaves no CPU for other work");
+      |  ^~
+isolate.cpp:41:116: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   41 |  if(argc<6||std::string(argv[4])!="--")throw std::runtime_error("usage: isolate CPUS RECEIPT ROWS -- COMMAND ...");if(fs::exists(argv[2])||fs::exists(argv[3]))throw std::runtime_error("write-once output already exists");struct sigaction action{};action.sa_handler=interrupted_signal;sigemptyset(&action.sa_mask);sigaction(SIGTERM,&action,nullptr);sigaction(SIGINT,&action,nullptr);auto reserved=cpus(argv[1]);int self=getpid();cpu_set_t initial;if(sched_getaffinity(0,sizeof(initial),&initial))throw std::runtime_error("get affinity");for(int c:reserved){if(!CPU_ISSET(c,&initial))throw std::runtime_error("CPU outside current affinity");auto siblings=cpus(read("/sys/devices/system/cpu/cpu"+std::to_string(c)+"/topology/thread_siblings_list"));for(int s:siblings)if(!reserved.count(s))throw std::runtime_error("SMT sibling must also be reserved");}if(reserved.size()>=size_t(CPU_COUNT(&initial)))throw std::runtime_error("reservation leaves no CPU for other work");
+      |                                                                                                                    ^~
+isolate.cpp:45:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   45 |  if(interrupted)throw std::runtime_error("interrupted before reservation");Restore restore;unsigned unmovable=0,kernel=0;
+      |  ^~
+isolate.cpp:45:76: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   45 |  if(interrupted)throw std::runtime_error("interrupted before reservation");Restore restore;unsigned unmovable=0,kernel=0;
+      |                                                                            ^~~~~~~
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations analysis.cpp -o /tmp/cm-marked-scalar-build/analysis -lcrypto
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations replay.cpp -o /tmp/cm-marked-scalar-build/replay -lcrypto
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

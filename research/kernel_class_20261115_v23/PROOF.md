@@ -1,0 +1,9 @@
+# Complete low-degree kernel class through a linear pencil
+
+For fixedh andcompletebasek0norm-spanfamilies, the kernel guards are u2+(z+r)u inW3 and(A+z)u2+(z2+h*yT+w)u inW4. Squaring isF2linear. Their affine matrices andright-hand sides aretherefore linear in the9coordinates of u inspan(1,T,...,T8). Precompute9basis systems. ExactGray changes XORonebasis system, andevery nonzero low9u isvisited once. Directfield rebuilding at frozenunit/spread probes verifies the implementation; everyrecord also carries a checked contradiction or positiveparticular. No enumeration ofthe73/69innerfamily occurs.
+
+A commondual lambda mustannihilate everycoefficientmatrix M(e_j),checked onallinnercolumns. Itsright-side evaluation gives alinear9bit syndrome. If anysyndrome detects u,theentireinnerfamily has a contradiction. The numberofindependent syndromes measures thisrestricted certificateclass; azerocommondualspace refutesonlytheconstantdualapproach,notgeneral u-dependent certificates. Rowbasis reduction ofthehomogeneous dualconstraints preserves theircompletekernel.
+
+Independent tinycontrols exhaustall4096two-by-two pencils withtwouparameters andtwoinnerparameters. For all3nonzerou, Gaussianfibers are comparedwithcomplete4pointtruthsets, andeverycommondualrejection must beoracle-empty. Actualclassification coversall511nonzero low9directions inbothpre-Gold73andGold69families,notall2^35-1kernel directions. Fixedh/basek0andcoefficient-span scope remain; supported-source/originalroots do not follow.
+
+One90s4GiBonecoreworker,final84s,raw512KiB/stdout8KiB,unchangednorm-helper200000checks. No novelty orspeedratio claim; this is exactlinear-pencil/incidence/dual algebra applied to a new fully specified class. Source/input/budgets frozen before resume/run-ready. Sole-modelpreparation withindependentoracles;externalpromotionpending.

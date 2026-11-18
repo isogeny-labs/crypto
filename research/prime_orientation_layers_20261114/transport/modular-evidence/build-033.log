@@ -1,0 +1,100 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.integer_bivariate_clearing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.Rep.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.geometric_denominator_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actual_geometric_denominator_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.numerator_divisible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.quotientResidue_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.reduceCleared_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.bivariate_coefficient_modular' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_denominator_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.actual_geometric_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.rowNumeratorRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.approximationRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_absolute_right_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.chartRootRep_den_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_right_modular_with_budget' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.finiteExtract_intCast' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_finite_right_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.boxEval_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.modular_box_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.multiplicationProducts_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.rowNumeratorCode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.approximationCode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.boundedRightEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.matches_prod' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.Matches.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.scalarDiagonal_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.packedApprox_matches' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.packedEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCost.packedApprox_nodes_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCost.actualApprox_scalarProducts_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationStoredBox.evaluate_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationStoredBox.entry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.convolutionLogged_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.convolutionLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.convolutionLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.materializeLogged_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.multiplyLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.multiplyLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+../modular-evidence/draft-033.lean.txt:2094:18: error: unsolved goals
+case add
+R : Type u_1
+inst✝ : CommRing R
+h z : ℕ
+a b : Expr
+ha : view (evaluateLogged h z a).value = sample h z (fullEval a)
+hb : view (evaluateLogged h z b).value = sample h z (fullEval b)
+⊢ (fun b_1 n => sample h z (fullEval a) b_1 n + sample h z (fullEval b) b_1 n) =
+    add (sample h z (fullEval a)) (sample h z (fullEval b))
+../modular-evidence/draft-033.lean.txt:2097:13: error: unsolved goals
+case neg
+R : Type u_1
+inst✝ : CommRing R
+h z : ℕ
+a : Expr
+ha : view (evaluateLogged h z a).value = sample h z (fullEval a)
+⊢ (fun b n => -sample h z (fullEval a) b n) = neg (sample h z (fullEval a))
+../modular-evidence/draft-033.lean.txt:2096:6: warning: This simp argument is unused:
+  OrientationCoefficientBox.add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [evaluateLogged, materializeLogged_value, emitAdd, ha, hb, fullEval, sample_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-033.lean.txt:2099:6: warning: This simp argument is unused:
+  OrientationCoefficientBox.neg
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [evaluateLogged, materializeLogged_value, emitNegate, ha, fullEval, sample_neg]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'OrientationConvolutionTrace.evaluateLogged_value' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.evaluateLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.coefficientLogged_multiply_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationConvolutionTrace.coefficientLogged_cast_bound' depends on axioms: [propext, Classical.choice, Quot.sound]

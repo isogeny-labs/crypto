@@ -1,0 +1,85 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Action completed."
+    }
+  ],
+  "structuredContent": {
+    "commit": {
+      "sha": "032a36cffd7e85e9986f13486c79bb7c3cd31735",
+      "message": "Move PR data files to the artifact store",
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/032a36cffd7e85e9986f13486c79bb7c3cd31735",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/032a36cffd7e85e9986f13486c79bb7c3cd31735",
+      "diff": "@@ -0,0 +1,7 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"entire-current-hold.json.xz\": {\"sha256\": \"4ef6a61b3b2b1bc5ae4a72d2f0d27d6c61528f4de89d05d50f5ccbc17cb56559\", \"bytes\": 302044},\n+  \"entire-published-source-ledger.jsonl.xz\": {\"sha256\": \"e4fc3101e75dd98504e60bec3d3361f66bbfc5bb21fcccfefd1d8740b78e2a7f\", \"bytes\": 151496}\n+ }\n+}\n@@ -0,0 +1,5 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/entire-current-hold.json.xz\n+/entire-published-source-ledger.jsonl.xz\n+# <<< artifacts\n\n\n@@ -0,0 +1,6 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"PCC-entire-original-job-log.txt.xz\": {\"sha256\": \"d720e9e99ab6822dec96a87677505f0d8767370563e7747155c4c8afcc9bcf8f\", \"bytes\": 67360}\n+ }\n+}\n@@ -0,0 +1,4 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/PCC-entire-original-job-log.txt.xz\n+# <<< artifacts\n\n@@ -0,0 +1,6 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"entire-original-guarded-source.tar.xz\": {\"sha256\": \"45155cf75dcc9a46d4beeac3327c38810955f10e3c9bb5eade1d1ee17e990271\", \"bytes\": 14170288}\n+ }\n+}\n@@ -0,0 +1,4 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/entire-original-guarded-source.tar.xz\n+# <<< artifacts\n",
+      "files": [
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-current-final-byte-guard-08/.artifacts.json",
+          "patch": "@@ -0,0 +1,7 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"entire-current-hold.json.xz\": {\"sha256\": \"4ef6a61b3b2b1bc5ae4a72d2f0d27d6c61528f4de89d05d50f5ccbc17cb56559\", \"bytes\": 302044},\n+  \"entire-published-source-ledger.jsonl.xz\": {\"sha256\": \"e4fc3101e75dd98504e60bec3d3361f66bbfc5bb21fcccfefd1d8740b78e2a7f\", \"bytes\": 151496}\n+ }\n+}"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-current-final-byte-guard-08/.gitignore",
+          "patch": "@@ -0,0 +1,5 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/entire-current-hold.json.xz\n+/entire-published-source-ledger.jsonl.xz\n+# <<< artifacts"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-current-final-byte-guard-08/entire-current-hold.json.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-current-final-byte-guard-08/entire-published-source-ledger.jsonl.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-current-own-CI-and-genuine-migration-07/.artifacts.json",
+          "patch": "@@ -0,0 +1,6 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"PCC-entire-original-job-log.txt.xz\": {\"sha256\": \"d720e9e99ab6822dec96a87677505f0d8767370563e7747155c4c8afcc9bcf8f\", \"bytes\": 67360}\n+ }\n+}"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-current-own-CI-and-genuine-migration-07/.gitignore",
+          "patch": "@@ -0,0 +1,4 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/PCC-entire-original-job-log.txt.xz\n+# <<< artifacts"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-current-own-CI-and-genuine-migration-07/PCC-entire-original-job-log.txt.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/whole-guarded-source-original-object-12/.artifacts.json",
+          "patch": "@@ -0,0 +1,6 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"entire-original-guarded-source.tar.xz\": {\"sha256\": \"45155cf75dcc9a46d4beeac3327c38810955f10e3c9bb5eade1d1ee17e990271\", \"bytes\": 14170288}\n+ }\n+}"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/whole-guarded-source-original-object-12/.gitignore",
+          "patch": "@@ -0,0 +1,4 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/entire-original-guarded-source.tar.xz\n+# <<< artifacts"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/whole-guarded-source-original-object-12/entire-original-guarded-source.tar.xz",
+          "patch": null
+        }
+      ],
+      "repository_full_name": "isogeny-labs/crypto",
+      "comments": null,
+      "author": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "committer": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "created_at": "2026-11-16T12:48:57Z",
+      "git_author_email": null,
+      "display_url": "https://github.com/isogeny-labs/crypto/commit/032a36cffd7e85e9986f13486c79bb7c3cd31735",
+      "display_title": "Move PR data files to the artifact store"
+    },
+    "url": "https://github.com/isogeny-labs/crypto/commit/032a36cffd7e85e9986f13486c79bb7c3cd31735",
+    "title": "Move PR data files to the artifact store",
+    "diff": "@@ -0,0 +1,7 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"entire-current-hold.json.xz\": {\"sha256\": \"4ef6a61b3b2b1bc5ae4a72d2f0d27d6c61528f4de89d05d50f5ccbc17cb56559\", \"bytes\": 302044},\n+  \"entire-published-source-ledger.jsonl.xz\": {\"sha256\": \"e4fc3101e75dd98504e60bec3d3361f66bbfc5bb21fcccfefd1d8740b78e2a7f\", \"bytes\": 151496}\n+ }\n+}\n@@ -0,0 +1,5 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/entire-current-hold.json.xz\n+/entire-published-source-ledger.jsonl.xz\n+# <<< artifacts\n\n\n@@ -0,0 +1,6 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"PCC-entire-original-job-log.txt.xz\": {\"sha256\": \"d720e9e99ab6822dec96a87677505f0d8767370563e7747155c4c8afcc9bcf8f\", \"bytes\": 67360}\n+ }\n+}\n@@ -0,0 +1,4 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/PCC-entire-original-job-log.txt.xz\n+# <<< artifacts\n\n@@ -0,0 +1,6 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"entire-original-guarded-source.tar.xz\": {\"sha256\": \"45155cf75dcc9a46d4beeac3327c38810955f10e3c9bb5eade1d1ee17e990271\", \"bytes\": 14170288}\n+ }\n+}\n@@ -0,0 +1,4 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/entire-original-guarded-source.tar.xz\n+# <<< artifacts\n",
+    "display_url": "https://github.com/isogeny-labs/crypto/commit/032a36cffd7e85e9986f13486c79bb7c3cd31735",
+    "display_title": "Move PR data files to the artifact store"
+  },
+  "isError": false
+}

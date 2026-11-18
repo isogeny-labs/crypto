@@ -1,0 +1,56 @@
+   Compiling twist-route-experiments v0.1.0 (/workspace/crypto-twist-runs/research/twist_routes_1_3_20261021/runner)
+warning: unused import: `PathBuf`
+  --> src/bin/twist-incidence-frontier.rs:11:18
+   |
+11 |     path::{Path, PathBuf},
+   |                  ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: function `reference_calls` is never used
+ --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:6:8
+  |
+6 | pub fn reference_calls() -> u64 {
+  |        ^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: methods `pm`, `trace`, and `points` are never used
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:183:12
+    |
+ 81 | impl Quad {
+    | --------- methods in this implementation
+...
+183 |     pub fn pm(self, mut x: P, mut n: u128) -> P {
+    |            ^^
+...
+195 |     pub fn trace(self, x: P) -> P {
+    |            ^^^^^
+...
+213 |     pub fn points(self) -> Vec<P> {
+    |            ^^^^^^
+
+warning: methods `lift`, `fp`, `pn`, `pm`, and `frob` are never used
+   --> src/bin/../../../../../src/cryptanalysis/twist_ic_field.rs:393:12
+    |
+256 | impl Sext {
+    | --------- methods in this implementation
+...
+393 |     pub fn lift(self, q: Q) -> S {
+    |            ^^^^
+...
+397 |     pub fn fp(self, s: S) -> Option<u64> {
+    |            ^^
+...
+405 |     pub fn pn(self, x: SP) -> SP {
+    |            ^^
+...
+434 |     pub fn pm(self, mut x: SP, mut n: u128, a: S) -> SP {
+    |            ^^
+...
+446 |     pub fn frob(self, x: SP) -> SP {
+    |            ^^^^
+
+warning: `twist-route-experiments` (bin "twist-incidence-frontier" test) generated 4 warnings (run `cargo fix --bin "twist-incidence-frontier" --tests` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 1.34s
+     Running unittests src/bin/twist-incidence-frontier.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_incidence_frontier-0a5a9eaea7d0524a)

@@ -1,0 +1,15 @@
+digraph indexed {
+  graph [rankdir=TB, bgcolor="white", nodesep=0.28, ranksep=0.45, pad=0.12];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, color="#254250", fillcolor="#e9f0f3", margin="0.13,0.11"];
+  edge [color="#526b77", arrowsize=0.65, fontname="DejaVu Sans", fontsize=9];
+  original [label="Original public target system\n1,059 variables / 1,089 equations"];
+  append [label="Append UNKNOWN index bits\nrange, borrow, public products", fillcolor="#fff0d9"];
+  augmented [label="Augmented system\n1,989 variables / 2,223 equations\nEvery original equation retained"];
+  replay [label="Known-witness extension controls\nOriginal equation + signed-row replay", fillcolor="#e1f3ea"];
+  future [label="Next: public-input root discovery\nNeeds a separately qualified solver", style="rounded,dashed", fillcolor="white"];
+  { rank=same; original; append; augmented; }
+  { rank=same; replay; future; }
+  original -> append -> augmented;
+  augmented -> replay [label="qualification only"];
+  augmented -> future [style=dashed];
+}

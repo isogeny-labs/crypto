@@ -1,0 +1,27 @@
+{
+  "launch": [
+    "python3",
+    "launch.py",
+    "--execute",
+    "--freeze-sha256",
+    "FROZEN_SHA",
+    "--release-record",
+    "ABSOLUTE_RELEASE_PATH",
+    "--release-sha256",
+    "RELEASE_SHA"
+  ],
+  "calls": [
+    "BranchRootMultiplicity",
+    "BranchCoefficientMultiplicity",
+    "IndependentControls",
+    "Readback",
+    "ExpectedFailure"
+  ],
+  "expected_exits": [
+    0,
+    0,
+    0,
+    0,
+    1
+  ]
+}

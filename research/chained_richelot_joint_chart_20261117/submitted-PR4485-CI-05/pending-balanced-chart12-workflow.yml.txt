@@ -1,0 +1,33 @@
+name: Shifted balanced divisor class charts12
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/chained_richelot_balanced_chart_20261117/**'
+      - '.github/workflows/chained-transfer-balanced-chart-12.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-balanced-classes-and-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install fixed native compiler and checks
+        run: rustup toolchain install 1.99.1 --profile minimal --component clippy,rustfmt
+      - name: Replay frozen class adapter with guarded locked dependencies
+        env:
+          BALANCED12_CUSTODY_DIR: ${{ runner.temp }}/balanced-class-chart12-entire-custody
+        run: bash research/chained_richelot_balanced_chart_20261117/replay_balanced_12.sh
+      - name: Retain whole custody tree on every outcome
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: balanced-class-chart12-whole-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/balanced-class-chart12-entire-custody
+          include-hidden-files: true
+          if-no-files-found: error

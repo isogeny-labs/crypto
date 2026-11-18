@@ -1,0 +1,34 @@
+   Compiling n83-sweep-runner v0.1.0 (/home/ec2-user/crypto-n83-resume/tools/n83-sweep-runner)
+    Finished `release` profile [optimized] target(s) in 2.04s
+     Running unittests src/main.rs (/home/ec2-user/scratch/n83-xor-opt-20261019/runner-target/release/deps/n83_sweep_runner-8259a2c63d1f2079)
+
+running 12 tests
+test card::tests::canonical_sha256 ... ok
+test native_isolation::tests::auto_takes_a_whole_core_away_from_cpu0 ... ok
+test native_isolation::tests::a_lone_sibling_and_every_cpu_are_refused ... ok
+test native_isolation::tests::placements_stay_inside_the_cpuset ... ok
+test tests::isolation_forgery_rejected ... ok
+test sat_trace_distinguishes_censoring_and_rejects_forged_order ... ok
+test card::tests::scope_escape_rejected ... ok
+test native_isolation::tests::cpulists_parse ... ok
+test tests::phase_regression_rejected ... ok
+test tests::retained_policy_preflight_rejects_wrong_or_ambiguous_rows ... ok
+test tests::zero_relation_forgery_rejected ... ok
+test tests::original_group_and_query_forgery ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/card_execution.rs (/home/ec2-user/scratch/n83-xor-opt-20261019/runner-target/release/deps/card_execution-64aff4b9ea37695c)
+
+running 7 tests
+test card_report_preserves_original_float_bytes ... ok
+test altered_binding_refuses_before_execute ... ok
+test spawn_error_writes_stopped_receipt ... ok
+test native_card_capture_and_write_once ... ok
+test relay_verification_rejects_stream_edit ... ok
+test deadline_retains_failure_receipt ... ok
+test card_edit_during_execution_retains_original_hash ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.02s
+
+    Finished `release` profile [optimized] target(s) in 0.01s

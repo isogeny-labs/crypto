@@ -91,12 +91,23 @@ pub fn profile_of(inst: &Instance) -> CurveProfile {
             r: w.kc.r as f64,
             cofactor: w.kc.cofactor as u64,
         },
+        // A Koblitz curve past two words: the same, with its order as the
+        // nearest f64.
+        Instance::Big(b) => CurveProfile {
+            class: CurveClass::Koblitz,
+            p: None,
+            n: Some(b.kc.n),
+            group_order: num_traits::ToPrimitive::to_f64(&b.kc.group_order).unwrap_or(f64::MAX),
+            r: num_traits::ToPrimitive::to_f64(&b.kc.r).unwrap_or(f64::MAX),
+            cofactor: b.kc.cofactor,
+        },
         // These research-only families do not have an IC planner profile.
         Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
         | Instance::Fp4(_)
         | Instance::ThreeLeads(_)
         | Instance::Ext(_)
+        | Instance::Hec(_)
         | Instance::Genus2(_)
         | Instance::Quartic(_)
         | Instance::Ghs(_)

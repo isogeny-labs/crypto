@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.2,ranksep=0.3];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=10];
+ edge [fontname="DejaVu Sans",fontsize=9];
+ a [label="Untrusted proof-input constructors\nGMP / FLINT coordinates, slopes, factors",fillcolor="#eeeeee"];
+ b [label="35 kernel-checked Lucas nodes\nActual prime p; 160-bit bounds"];
+ c [label="448 actual point nodes\nOn-curve checks + secant/tangent certificates"];
+ d [label="Actual Mathlib group conclusion\npG = O; G != O; exact order p\nFixed known-answer relation Q = dG",fillcolor="#dcf1e2"];
+ e [label="Known source correction\nOld coefficient has different j\nCorrected curve has j = -32768",fillcolor="#fff1cf"];
+ f [label="Scope remains explicit\nNo Smart execution or security cost yet\nWhole curve point count not formalized",fillcolor="#eeeeee"];
+ a -> b; a -> c; b -> d; c -> d; e -> f; d -> f;
+ {rank=same;b;c;e}
+}

@@ -1,0 +1,405 @@
+{
+ "schema": "optlevel.registry/v1",
+ "updated": "2026-11-17",
+ "description": "Hot kernels across isogeny-labs/crypto, isogeny-labs/cryptanalysis and lfd-summation-systems, with how each counts operations. Compiled by reading sources at crypto origin/main (sparse checkout), cryptanalysis 5dfcf82e6 and lfd-summation-systems 2cb270c. 'emitted' = the code already reports a count; 'derivable' = the count follows from shapes or inputs; 'none' = no count exists, itself a finding. Entries with status other than 'measured here' were NOT run; their measure commands are templates to be checked against the binary's actual output before use.",
+ "status_values": [
+  "measured here",
+  "needs PMU host",
+  "needs GPU",
+  "needs build"
+ ],
+ "kernels": [
+  {
+   "id": "crypto.rho.prime_fast",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/prime_fast.rs (rho_parallel, Fp64 p < 2^62)",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "RhoResult.steps (walk steps) plus look_ahead_adds, table_adds, restart_adds; a step is one affine addition with a batched-inversion share, not one modmuladd"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --op-class modmuladd_p62 --ops-regex '\"field_mults\":(\\d+)' --scale env:RAYON_NUM_THREADS:1,4 --out R.json -- target/release/examples/prime_fast_rho_multi <args>",
+   "status": "needs build",
+   "note": "Counts walk steps, not field multiplications. Either convert with the documented multiplications per step and say so, or add a field-multiplication counter; until then an attainment against modmuladd_p62 is a lower bound by the per-step multiplication count."
+  },
+  {
+   "id": "crypto.rho.koblitz_strong",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/koblitz_strong_rho.rs; examples/koblitz_rho_fixture.rs",
+   "device": "cpu",
+   "op_class": "xor_u64",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "walk_steps, group_additions, scalar_multiplications in the fixture's JSON; no count of GF(2^m) word operations or carry-less multiplies"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex '\"walk_steps\":(\\d+)' --op-class xor_u64 --out R.json -- env RAYON_NUM_THREADS=1 target/release/examples/koblitz_rho_fixture 53 0 signed_frobenius 4 strong",
+   "status": "needs build",
+   "note": "Binary-field arithmetic is carry-less multiplication (PCLMULQDQ), for which v1 has no operation class. Finding: add a clmul_u64 class and a per-step clmul count before scoring this kernel."
+  },
+  {
+   "id": "crypto.ecbench.arms",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/ecbench/ (rho, BSGS, kangaroo and IC arms)",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "the ecbench counted unit (group-addition equivalents) and, where the curve counts them, fmul/fsqr/finv per arm"
+   },
+   "measure": "run the arm under a frozen ecbench spec; take fmul from the session record and pass it with --ops",
+   "status": "needs build",
+   "note": "The counted unit is method-level and priced under AGENTS.md section 5a. Use the fmul counter, never GAE, as the operation: GAE mixes classes."
+  },
+  {
+   "id": "crypto.ic.relations.jv_sieve",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/jv_sieve.rs",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "base_muls, descent_muls and their sub-counters, adds, base_steps"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'base_muls[\"=: ]+(\\d+)' ...",
+   "status": "needs build",
+   "note": ""
+  },
+  {
+   "id": "crypto.ic.relations.koblitz_solver",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/koblitz_relation_solver.rs",
+   "device": "cpu",
+   "op_class": "xor_u64",
+   "ops_counter": {
+    "kind": "none",
+    "what": "no operation counter found in the module (relations and trials only at the caller)"
+   },
+   "measure": "not measurable as it stands",
+   "status": "needs build",
+   "note": "Finding: relation collection reports relations and trials but not the field or word operations they cost."
+  },
+  {
+   "id": "crypto.f4.fp",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/f4_fp.rs",
+   "device": "cpu",
+   "op_class": "modmuladd_p31",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "field_multiplications, field_ops, root_field_multiplications per run"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'field_multiplications[\"=: ]+(\\d+)' --op-class modmuladd_p31 -- target/release/examples/f4_fp_bench <args>",
+   "status": "needs build",
+   "note": "Check the prime width of the run against the class (p31 or p62)."
+  },
+  {
+   "id": "crypto.f4.fp_tower",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/f4_fp_tower.rs",
+   "device": "cpu",
+   "op_class": "modmuladd_p31",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "muladds (row-reduction multiply-adds)"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'muladds[\"=: ]+(\\d+)' ...",
+   "status": "needs build",
+   "note": ""
+  },
+  {
+   "id": "crypto.hky.closure",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/hky_fp_tower.rs",
+   "device": "cpu",
+   "op_class": "modmuladd_p31",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "Closure.muladds (the unit f4_fp_tower reports) and rows_reduced; also returned on censored runs"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'muladds[\"=: ]+(\\d+)' --op-class modmuladd_p31 -- target/release/examples/hky_grid <args>",
+   "status": "needs build",
+   "note": "Sparse row reduction: declare the traffic from the echelon's entry count, or measure it on a PMU host; in-cache only for small closures."
+  },
+  {
+   "id": "crypto.f4.gf2",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/f4_gf2.rs",
+   "device": "cpu",
+   "op_class": "xor_u64",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "word_ops (64-bit word xors) and pivots"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'word_ops[\"=: ]+(\\d+)' --op-class xor_u64 -- target/release/examples/f4_f2_bench <args>",
+   "status": "needs build",
+   "note": "The cleanest CPU case: the counter is exactly the class."
+  },
+  {
+   "id": "crypto.f5.matrix_f2",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/matrix_f5_f2.rs",
+   "device": "cpu",
+   "op_class": "xor_u64",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "reduce_word_ops, criterion_word_ops, zero_reductions"
+   },
+   "measure": "as crypto.f4.gf2",
+   "status": "needs build",
+   "note": ""
+  },
+  {
+   "id": "crypto.la.gf2_elim",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/gf2_elim.rs; examples/gf2_elim_bench.rs",
+   "device": "cpu",
+   "op_class": "xor_u64",
+   "ops_counter": {
+    "kind": "none",
+    "what": "no word-operation counter in the module"
+   },
+   "measure": "derive from matrix shape (rows x words x pivots / 2) and pass --ops, labelled derived",
+   "status": "needs build",
+   "note": "Finding: dense F_2 elimination has no counter; the F4 path that calls similar code does."
+  },
+  {
+   "id": "crypto.la.koblitz_sparse",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/koblitz_sparse_la.rs; examples/sparse_la_stage.rs",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "products and sparse_products (matrix-vector products), row_ops; not the nonzeros multiplied"
+   },
+   "measure": "ops = sparse_products x nnz, both from the stage output, passed with --ops",
+   "status": "needs build",
+   "note": "Counter is one level too coarse: a product's cost is nnz mulmods. Emit nnz x products."
+  },
+  {
+   "id": "crypto.la.wiedemann",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/pq_wiedemann.rs",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "none",
+    "what": "no operation counter"
+   },
+   "measure": "not measurable as it stands",
+   "status": "needs build",
+   "note": "Finding: block Wiedemann reports no matvec or mulmod count."
+  },
+  {
+   "id": "crypto.la.zero_dim",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/zero_dim_la.rs",
+   "device": "cpu",
+   "op_class": "modmuladd_p31",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "krylov_muls, bm_muls, nf_muls, readout_muls, roots_muls"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex 'krylov_muls[\"=: ]+(\\d+)' ...",
+   "status": "needs build",
+   "note": ""
+  },
+  {
+   "id": "crypto.field.ifma",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/fp_backend_ifma.rs; examples/fp_backend_bench.rs",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "derivable",
+    "what": "no counter; the bench performs a fixed number of multiplications per iteration"
+   },
+   "measure": "--ops from the bench's iteration count",
+   "status": "needs build",
+   "note": "Needs an IFMA host (avx512ifma is present on the authoring host). v1 has no 52-bit IFMA class; mulwide_u64 is the nearest ceiling."
+  },
+  {
+   "id": "crypto.gpu.ecc2k130",
+   "repository": "isogeny-labs/crypto",
+   "path": "ecc2k130/src/main.cu (packed walk)",
+   "device": "gpu",
+   "op_class": "xor_u64",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "--bench prints scalar updates per second and total updates"
+   },
+   "measure": "prefer ecc2k130/roofline.py and cryptanalysis/gpueff for this kernel; optlevel gpu measure --ops-regex 'updates[=: ]+(\\d+)' -- ./ecc2k130 --curve 131 --bench ...",
+   "status": "needs GPU",
+   "note": "Already has a per-pipe roofline (ROOFLINE.md: 0.73 of the carry-less speed of light at 20 B/s). The bound is the CLMAD pipe, which v1's classes do not model; do not re-score it more coarsely."
+  },
+  {
+   "id": "crypto.gpu.ecc",
+   "repository": "isogeny-labs/crypto",
+   "path": "gpu/ecc/rho.cuh, kernels.cuh (prime-field rho, 256-bit)",
+   "device": "gpu",
+   "op_class": "muladd_u32",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "bench.cu reports steps per second"
+   },
+   "measure": "optlevel gpu measure --ops-regex ... -- gpu/ecc/bench",
+   "status": "needs GPU",
+   "note": "A step is many 32-bit multiply-adds; convert with the limb count or score as a lower bound."
+  },
+  {
+   "id": "crypto.gpu.spmv",
+   "repository": "isogeny-labs/crypto",
+   "path": "gpu/spmv/spmv.cu",
+   "device": "gpu",
+   "op_class": "muladd_u64",
+   "ops_counter": {
+    "kind": "derivable",
+    "what": "none emitted; ops = nnz x products from the solve"
+   },
+   "measure": "optlevel gpu measure --ops <nnz x products> ...",
+   "status": "needs GPU",
+   "note": "Memory-roof kernel: declare 12-16 bytes per nonzero."
+  },
+  {
+   "id": "crypto.gpu.macaulay",
+   "repository": "isogeny-labs/crypto",
+   "path": "gpu/macaulay/macaulay.cuh, bench.cu",
+   "device": "gpu",
+   "op_class": "muladd_u32",
+   "ops_counter": {
+    "kind": "derivable",
+    "what": "bench reports timings; multiply-adds follow from rows x columns x pivots"
+   },
+   "measure": "optlevel gpu measure --ops <derived> ...",
+   "status": "needs GPU",
+   "note": ""
+  },
+  {
+   "id": "crypto.gpu.fes",
+   "repository": "isogeny-labs/crypto",
+   "path": "gpu/fes/fes.cu",
+   "device": "gpu",
+   "op_class": "xor_u64",
+   "ops_counter": {
+    "kind": "derivable",
+    "what": "candidates enumerated (2^n); one Gray-code step is a few xors"
+   },
+   "measure": "optlevel gpu measure --ops <2^n> ...",
+   "status": "needs GPU",
+   "note": ""
+  },
+  {
+   "id": "crypto.gpu.rootfind",
+   "repository": "isogeny-labs/crypto",
+   "path": "gpu/rootfind/rootfind.cuh",
+   "device": "gpu",
+   "op_class": "muladd_u64",
+   "ops_counter": {
+    "kind": "derivable",
+    "what": "polynomials processed; no multiplication counter"
+   },
+   "measure": "optlevel gpu measure --ops <derived> ...",
+   "status": "needs GPU",
+   "note": ""
+  },
+  {
+   "id": "cryptanalysis.rho.c",
+   "repository": "isogeny-labs/cryptanalysis",
+   "path": "src/rho.c, src/group_ec.c, src/group_zp.c; tools/ca_perfbench.c",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "group_ops and iterations per solve, printed by ca_perfbench"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --ops-regex ... -- build/ca_perfbench <case>",
+   "status": "needs build",
+   "note": "A group operation is several mulmods; same caveat as crypto.rho.prime_fast. Existing benchmarks: benchmarks/20261103-rho-zp-step, 20261101-rho-ec-step (cycles per step under perf)."
+  },
+  {
+   "id": "cryptanalysis.linalg.lanczos",
+   "repository": "isogeny-labs/cryptanalysis",
+   "path": "src/linalg.c (dense row operations and threaded Lanczos mod q)",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "lanczos_iterations; no mulmod count"
+   },
+   "measure": "ops = iterations x 2 x nnz, passed with --ops",
+   "status": "needs build",
+   "note": "Counter too coarse, as crypto.la.koblitz_sparse."
+  },
+  {
+   "id": "cryptanalysis.indexcalc",
+   "repository": "isogeny-labs/cryptanalysis",
+   "path": "src/indexcalc.c",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "none",
+    "what": "relations kept; no count of smoothness-test operations found"
+   },
+   "measure": "not measurable as it stands",
+   "status": "needs build",
+   "note": "Finding."
+  },
+  {
+   "id": "cryptanalysis.cuda.rho",
+   "repository": "isogeny-labs/cryptanalysis",
+   "path": "cuda/rho_kernel.cu, cuda/gpu_cuda.c",
+   "device": "gpu",
+   "op_class": "muladd_u64",
+   "ops_counter": {
+    "kind": "derivable",
+    "what": "iterations per launch x walkers"
+   },
+   "measure": "optlevel gpu measure --ops <iterations x walkers> ...",
+   "status": "needs GPU",
+   "note": ""
+  },
+  {
+   "id": "lfd.closure.batched",
+   "repository": "lfd-summation-systems",
+   "path": "csd/ic_bounds_m3_batched.py, csd/ic_bounds_split_m.py (float64 exact products through numpy/OpenBLAS)",
+   "device": "cpu",
+   "op_class": "fma_f64",
+   "ops_counter": {
+    "kind": "derivable",
+    "what": "none in the engine; r*s*n per product follows from the shapes (research/optlevel_20261117/real_kernel/closure_wrapper.py counts it from outside)"
+   },
+   "measure": "python3 tools/optlevel/optlevel.py measure --scale env:OPENBLAS_NUM_THREADS:1,4 --out M.json -- python3 research/optlevel_20261117/real_kernel/closure_wrapper.py /home/user/lfd-summation-systems OUT -- cell --m 4 --k 2 --primes 7681 --seeds 1",
+   "status": "measured here",
+   "note": "Finding: the engine reports seconds and batches but no operation count. The compiled echelon (csd/_elim.c) does count row operations and returns them; the callers drop the value."
+  },
+  {
+   "id": "lfd.closure.big",
+   "repository": "lfd-summation-systems",
+   "path": "csd/ic_bounds_big.py (numpy and CuPy backends sharing one path; matmul_sub, rref_block)",
+   "device": "gpu",
+   "op_class": "fma_f64",
+   "ops_counter": {
+    "kind": "none",
+    "what": "per-phase seconds (reduce, rref, update, h2d, d2h) and peak memory; no operation count"
+   },
+   "measure": "optlevel gpu measure --ops <sum of r*s*n over matmul_sub calls> ... after adding the counter or wrapping matmul_sub as closure_wrapper.py does",
+   "status": "needs GPU",
+   "note": "Finding: the largest runs in the three repositories (k = 14, 499,178 columns) have phase timings but no operation count, so no attainment can be computed for them. The host/device transfer seconds are the host-idle-share analogue."
+  },
+  {
+   "id": "lfd.elim.c",
+   "repository": "lfd-summation-systems",
+   "path": "csd/_elim.c (gf2_echelon, fp_echelon via ctypes)",
+   "device": "cpu",
+   "op_class": "modmuladd_p31",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "row operations in *ops (returned as the third value of elim.fp_echelon)"
+   },
+   "measure": "call through a small driver and pass the returned count with --ops",
+   "status": "needs PMU host",
+   "note": "A row operation is `cols` multiply-adds; multiply before scoring."
+  }
+ ]
+}

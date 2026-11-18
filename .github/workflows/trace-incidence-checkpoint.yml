@@ -1,0 +1,118 @@
+name: Trace incidence Runpod source checkpoint
+on:
+  push:
+    branches: [lane/trace-incidence]
+    paths:
+      - research/trace_incidence_20261116/runpod/**
+      - .github/workflows/trace-incidence-checkpoint.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: trace-incidence-source-checkpoint
+  cancel-in-progress: false
+jobs:
+  checkpoint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      AWS_EC2_METADATA_DISABLED: 'true'
+      AWS_DEFAULT_REGION: us-east-2
+      CHECKPOINT_AWS_REGION: us-east-2
+      CHECKPOINT_TOKEN_FILE: /dev/null
+      CHECKPOINT_SESSION: trace-incidence-runpod
+      SOURCE_MANIFEST: research/trace_incidence_20261116/runpod/SOURCES_v3.sha256
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.gitignore
+            /scripts/checkpoint.sh
+            /research/trace_incidence_20261116/
+            /src/cryptanalysis/prime_fast.rs
+            /src/cryptanalysis/residual_walk.rs
+            /examples/trace_incidence_rho.rs
+            /Cargo.toml
+            /Cargo.lock
+      - name: Check source closure and prepare resume note
+        run: |
+          set -euo pipefail
+          sha256sum -c "$SOURCE_MANIFEST"
+          mkdir -p .resume
+          sed -e "s/SOURCE_REVISION/${GITHUB_SHA}/g" -e 's/^# /## /' research/trace_incidence_20261116/runpod/RESUME.template.md > .resume/RESUME.md
+          if test -f research/trace_incidence_20261116/runpod/RUN_STATE.json; then
+            printf '\n## Actual Runpod run state\n' >> .resume/RESUME.md
+            cat research/trace_incidence_20261116/runpod/RUN_STATE.json >> .resume/RESUME.md
+          fi
+      - name: Run standard S3 checkpoint gate
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          status=0
+          timeout --kill-after=5 180 bash scripts/checkpoint.sh gate > "$RUNNER_TEMP/checkpoint.private.log" 2>&1 || status=$?
+          source_hash=$(sha256sum "$SOURCE_MANIFEST" | cut -d' ' -f1)
+          protocol_hash=$(sha256sum research/trace_incidence_20261116/runpod/PROTOCOL.json | cut -d' ' -f1)
+          checkpoint_state=""
+          if test -f .resume/.last-push; then checkpoint_state=$(cat .resume/.last-push); fi
+          jq -n --arg source "$GITHUB_SHA" --arg closure "$source_hash" --arg protocol "$protocol_hash" --arg state "$checkpoint_state" --argjson status "$status" \
+            '{schema:"trace-runpod-checkpoint/v1",source_revision:$source,source_manifest_sha256:$closure,protocol_sha256:$protocol,gate_exit:$status,checkpoint_state:$state}' > "$RUNNER_TEMP/checkpoint-receipt.json"
+          printf 'TRACE_CHECKPOINT_RECEIPT='
+          jq -c . "$RUNNER_TEMP/checkpoint-receipt.json"
+          if test "$status" -ne 0; then
+            openssl cms -encrypt -binary -aes256 -in "$RUNNER_TEMP/checkpoint.private.log" \
+              -outform DER -out "$RUNNER_TEMP/checkpoint-log.cms" research/trace_incidence_20261116/runpod/upload-recipient.pem
+            printf 'TRACE_CHECKPOINT_PRIVATE_LOG_CIPHERTEXT='
+            base64 -w0 "$RUNNER_TEMP/checkpoint-log.cms"
+            printf '\n'
+          fi
+          exit "$status"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: trace-runpod-checkpoint-${{ github.sha }}
+          path: ${{ runner.temp }}/checkpoint-receipt.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Prepare narrowly scoped encrypted result upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet boto3
+          python3 - <<'PY'
+          import boto3, json, os
+          key = "store/runpod/trace-incidence/" + os.environ["GITHUB_SHA"] + "/" + os.environ["GITHUB_RUN_ID"] + "/results.tar.gz"
+          client = boto3.client("s3",region_name="us-east-2")
+          token = client.generate_presigned_post(
+              Bucket="setec-astronomy-artifacts",Key=key,
+              Conditions=[["content-length-range",1,33554432]],ExpiresIn=3600)
+          readback = client.generate_presigned_url("get_object",Params={"Bucket":"setec-astronomy-artifacts","Key":key},ExpiresIn=3600)
+          with open(os.environ["RUNNER_TEMP"]+"/upload.private.json","w") as f:
+              json.dump({"bucket":"setec-astronomy-artifacts","key":key,"post":token,"readback_url":readback},f)
+          PY
+          openssl cms -encrypt -binary -aes256 \
+            -in "$RUNNER_TEMP/upload.private.json" -outform DER \
+            -out "$RUNNER_TEMP/result-upload.cms" research/trace_incidence_20261116/runpod/upload-recipient.pem
+          rm "$RUNNER_TEMP/upload.private.json"
+          printf 'TRACE_UPLOAD_CIPHERTEXT='
+          base64 -w0 "$RUNNER_TEMP/result-upload.cms"
+          printf '\n'
+      - name: Promote completed Runpod archives to immutable CAS
+        if: always() && hashFiles('research/trace_incidence_20261116/runpod/CUSTODY_PROMOTION.json') != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+        run: bash research/trace_incidence_20261116/runpod/promote-results.sh research/trace_incidence_20261116/runpod/CUSTODY_PROMOTION.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: trace-runpod-result-upload-${{ github.sha }}
+          path: ${{ runner.temp }}/result-upload.cms
+          retention-days: 1

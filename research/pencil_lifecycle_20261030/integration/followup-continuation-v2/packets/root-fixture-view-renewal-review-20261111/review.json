@@ -1,0 +1,49 @@
+{
+  "schema": "independent-source-review/v1",
+  "subject": "root-fixture-view-renewal-20261111",
+  "status": "source_delta_accepted_execution_not_admitted",
+  "producer_manifest_sha256": "48e6e50c0b923e783876ee9db6e935f0e90e8375cb00c2228984f4d8278d791b",
+  "predecessor_manifest_sha256": "2226e43890d3a8710f54c9f2fc1cf704236d01cb0845da601d5d6f7c58cb9377",
+  "predecessor_review_sha256": "18b1ba02930b314bfc368f521ab03b5a0ae2fa75af4a25be50ef131071249bc4",
+  "checks": [
+    "all 24 producer manifest members match recorded hashes and sizes",
+    "materialize and suite launchers are byte-identical to the reviewed predecessor",
+    "materialize and suite workers are byte-identical to the reviewed predecessor",
+    "both durable_io changes are limited to the 129600-second campaign arithmetic and renewed UTC deadline",
+    "6179 expected test names are present and unique",
+    "135 additive input rows retain the 41117354-byte declared total",
+    "18 historical failure rows remain present",
+    "the two command paths use fresh renewal identities and remain not released",
+    "both admission drafts remain false with ledger, lease, terminal, review and publication fields unresolved"
+  ],
+  "operational_delta": {
+    "campaign_ceiling_seconds": 129600,
+    "absolute_deadline": "2026-11-11T12:00:00Z",
+    "materialization_cap_seconds": 120,
+    "suite_cap_seconds": 1800,
+    "attempts_each": 1,
+    "automatic_retry": false,
+    "fresh_workspace_unit_and_durable_paths": true
+  },
+  "findings": [],
+  "release_preconditions": [
+    "bind the exact current campaign ledger and interpret campaign_remaining_seconds as pre-attempt remaining so charged plus remaining equals 129600",
+    "bind a live exclusive lease and a terminal serial predecessor",
+    "publish and read back the exact source plus independent review",
+    "set admitted true only in a separate immutable admission file",
+    "run materialization first; suite admission additionally requires the successful materialized-view and terminal receipt hashes"
+  ],
+  "limitations": [
+    "The native admission helper verifies internally consistent charged and remaining integers but does not itself read a campaign ledger; the coordinator's final binding must supply and bind that evidence.",
+    "This review is source-only. It observed no materialized view, systemd unit, compiler, test binary, or runtime receipt.",
+    "The full 6179-test acceptance behavior is inherited from the predecessor review and was not executed here."
+  ],
+  "execution": {
+    "compiler": false,
+    "tests": false,
+    "fixture_materialization": false,
+    "suite": false,
+    "service": false
+  },
+  "recommendation": "eligible_for_publication_and_final_binding_not_execution_by_this_review"
+}

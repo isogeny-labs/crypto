@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:22:37Z",
+ "id": "PCC-20261116-80ec09",
+ "kind": "statement",
+ "producer": {
+  "commit": "664b075e5dc0151c937e7ba4bba1224963509ee9",
+  "model": "GPT-6",
+  "session": "vieta-polynomial-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/summary.json",
+    "sha256": "f75a40aac79c65f1a5e91824f25bcc9126150dc04fe9d3d36f634343c7cb7b91"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/continuation-20261116/run/replay.json",
+    "sha256": "da08d0575c3c42822bcb280f64bf1e06715ac121984de9405a53ddd31774c9ff"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/continuation-20261116/protocol-main.json",
+    "sha256": "5989566ed9c667b8d26c35f2b2f8592c5f2c8a682454fa4822df9dd16682a9ad"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/continuation-20261116/protocol-supplemental.json",
+    "sha256": "37f4ef8fb7dbd61ce158fea71535c92a91a83052a36e9093796fbb839ed5fb83"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/vieta_coset_rust_20261115/continuation-20261116",
+ "statement": "Producer Rust comparison: all192 primary calls succeeded; supplemental P224/m8192 has4 lookup successes and8 fixed30s polynomial deadlines. Wide scalar replay checked196 successful calls without mismatch, retaining8 failures. Conditioned median field multiplication counts: word62/m16384 schoolbook2509465297 vs Karatsuba1168899497 (paired ratio2.14686147); P224/m2048 41002731 vs22039567 (ratio1.86041454). Newton divisions are zero on successful study queries. Generic-reference component counts only; clocks belowL2; pending independent signed validation."
+}

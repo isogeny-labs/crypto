@@ -54,12 +54,12 @@ fn cheon_methods_recover_the_planted_log_and_count_the_oracle() {
             let Instance::Prime(pi) = &inst else {
                 panic!("prime instance")
             };
-            let alpha = w.planted.unwrap();
+            let alpha = w.planted.unwrap().checked_u64().unwrap();
             // The method is refused without the oracle: it cannot see alpha.
             let err = solve(&m, &inst, &w.curve, &w.target, 1).unwrap_err();
             assert!(err.contains("static-DH oracle"), "{err}");
 
-            let oracle = PlantedStaticDh::new(&pi.curve, alpha as u64);
+            let oracle = PlantedStaticDh::new(&pi.curve, alpha);
             let rep = solve_with_oracle(&m, &inst, &w.curve, &w.target, 1, Some(&oracle)).unwrap();
             assert_eq!(
                 rep.recovered,
@@ -91,7 +91,7 @@ fn cheon_methods_recover_the_planted_log_and_count_the_oracle() {
             assert!(rep.field_ops.is_some());
             assert!(rep.deterministic);
             // Deterministic: the same inputs give the same counts.
-            let oracle2 = PlantedStaticDh::new(&pi.curve, alpha as u64);
+            let oracle2 = PlantedStaticDh::new(&pi.curve, alpha);
             let again =
                 solve_with_oracle(&m, &inst, &w.curve, &w.target, 99, Some(&oracle2)).unwrap();
             assert_eq!(again.total_gae, rep.total_gae);
@@ -113,10 +113,10 @@ fn a_wrong_oracle_does_not_return_the_planted_log() {
         let m = resolve(&method(id, shape)).unwrap();
         let (w, inst) = Workload::build(&spec, 5, 0, TargetKind::Planted).unwrap();
         let Instance::Prime(pi) = &inst else { panic!() };
-        let alpha = w.planted.unwrap() as u64;
+        let alpha = w.planted.unwrap().checked_u64().unwrap();
         let wrong = PlantedStaticDh::new(&pi.curve, alpha % (pi.r - 3) + 1);
         let rep = solve_with_oracle(&m, &inst, &w.curve, &w.target, 1, Some(&wrong)).unwrap();
-        assert_ne!(rep.recovered, w.planted.map(ExactScalar::from), "{id}");
+        assert_ne!(rep.recovered, w.planted, "{id}");
     }
 }
 
@@ -127,7 +127,7 @@ fn an_integer_d_and_a_public_target_are_handled() {
     let m = resolve(&method("cheon.pminus1_comb", &(s.d + 1).to_string())).unwrap();
     let (w, inst) = Workload::build(&spec, 5, 0, TargetKind::Planted).unwrap();
     let Instance::Prime(pi) = &inst else { panic!() };
-    let o = PlantedStaticDh::new(&pi.curve, w.planted.unwrap() as u64);
+    let o = PlantedStaticDh::new(&pi.curve, w.planted.unwrap().checked_u64().unwrap());
     let rep = solve_with_oracle(&m, &inst, &w.curve, &w.target, 1, Some(&o)).unwrap();
     assert!(rep.exhausted && rep.recovered.is_none());
     // The registered method has no default for d.

@@ -1,0 +1,36 @@
+name: CT118 certified global advice negative control
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct118/**'
+      - '.github/workflows/ct118-certified-advice.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct118/**'
+      - '.github/workflows/ct118-certified-advice.yml'
+  workflow_dispatch:
+jobs:
+  ct118:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct118
+      - name: Crosscheck Python fraction-polynomial and independent BigInt barycentric arithmetic
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct118
+          python3 -B "$D/ct118_certified_advice.py" > /tmp/ct118-py.json
+          python3 -O -B "$D/ct118_certified_advice.py" > /tmp/ct118-pyo.json
+          node "$D/ct118_certified_advice_independent.js" > /tmp/ct118-js.json
+          node --no-opt "$D/ct118_certified_advice_independent.js" > /tmp/ct118-jso.json
+          cmp /tmp/ct118-py.json /tmp/ct118-pyo.json
+          cmp /tmp/ct118-py.json /tmp/ct118-js.json
+          cmp /tmp/ct118-py.json /tmp/ct118-jso.json
+          printf '%s  %s\n' 5da78c89bef8fbd902c56c97b400a971e1f28d6a5f40fa8c49f9de7aada54527 /tmp/ct118-py.json | sha256sum -c

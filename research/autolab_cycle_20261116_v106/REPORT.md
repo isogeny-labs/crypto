@@ -1,0 +1,13 @@
+# C106: exact-root kernel prototype and independently caught zero-polynomial boundary
+
+Hypothesis: inversion-free binary discriminant dispatch can reduce repeated quintics to exact quadratic/cubic problems while returning every field root with original multiplicity. A new univariate kernel and two strong specialized comparators were implemented; it is not the original coupled339-variable solver.
+
+The first independent oracle verifies1,186 quintic cases before encountering a GF3 assertion. The failed source and raw outcome are preserved. Two distinct bounded diagnostics isolate H=[0,0,1,1,1,1] overGF3. Independent literal division gives roots0 with multiplicity2 and2 with multiplicity1. The complete exception stack identifies gcd(H,A) when the odd splitter samples an all-zero polynomial A represented by a nonempty coefficient list. The GCD loop tests list truth before normalization and passes a zero divisor to division.
+
+A fresh v106d source proposes exactly the needed normalization: trim both GCD inputs before the loop, restoring gcd(a,0)=monic(a). It is prepared and reviewed but UNEXECUTED because this session has already used its three-experiment budget. No repaired correctness or timing claim is made. The first attempt is inconclusive; both diagnostics pass their narrow reporting contracts. Broad binary/odd cold panels remain unregistered/unexecuted until the repaired full oracle passes.
+
+The proposed panels include GF2^83 and binary degrees163,233,283,409,571, plus all five NIST prime fields and odd extensions. Their presence in configuration is not field correctness, solve coverage or measurements. No panel fixture was accepted because the oracle failed first. The exact discriminant reduction remains proved in C105; implementation checks correctly prevented promotion of a broken polynomial boundary.
+
+All three experiments used lab.runner resume/run-ready with frozen hashes,90-second deadlines,4GiB and CPU0. Sources, counterexample, raw stdout/stderr, exception stacks and process records are preserved. Replay verifies hashes and the literal counterexample without executing the untested repair. Standard Frobenius/GCD, radical, trace and Cantor-Zassenhaus methods are known; no novelty or qualified speed ratio is claimed. The original all-roots goal,20hard matching genuine F4/F5/F6 comparisons and unchanged release gate remain open.
+
+Next: register a new v106d full oracle including zero-padded zero polynomials and exact GF3 regression. Only after it passes freeze full-width fixtures and compare every root/multiplicity, repeated cold timings and memory against both strong specialized comparators.
