@@ -4,7 +4,7 @@
 - **Kind:** access/tool limit; experimental admission gap
 - **Affected work:** [strong-rho protocol](../research/quartic_ghs_strong_rho_20261114/PROTOCOL.md), [round-A amendment](../research/quartic_ghs_strong_rho_20261114/ROUND_A.md), [frontier report](../research/ecbench_e2e_frontier_20261031/REPORT.md)
 - **Next action owner:** authorized IsoLab budget/pool operator; experiment executor after every preflight gate passes
-- **Last updated:** 2026-11-15
+- **Last updated:** 2026-11-18
 
 ## Problem
 
@@ -22,12 +22,24 @@ acceptance criterion remains a complete, admitted, same-target, cold
 IC/strong-rho comparison across all eleven sizes and all three native-work
 weights.
 
+Round B now prospectively specializes cubic-field squaring from six to five
+base-field products. Its deterministic `q=223` producer control preserved the
+walk and removed exactly one `fq_mul` per `f3_sq`, but no profile, isolated
+timing, complete grid, or independent admission exists `[pcc:unverified]`.
+The Round A launch plumbing remains source-hash-bound to the older comparator;
+it must not be silently reused for Round B.
+
 ## Evidence and uncertainty
 
 - **Observed:** on 2026-11-14, `aws sts get-caller-identity` in the selected
   cloud runtime returned `Unable to locate credentials`; no checkpoint upload
   token or configured checkpoint profile was present. No build or Job was
   submitted. [pcc:unverified]
+- **Observed:** on 2026-11-18, checkpoint push/gate again exited 1 in the
+  selected runtime because it had no configured profile, upload token, or
+  token file. The Round B profile and benchmark were not run. The exact
+  refusal is retained in `research/quartic_ghs_strong_rho_20261114/round-b/`.
+  [pcc:unverified]
 - **Observed:** the deployed GitHub OIDC trigger policy in
   `taskq/deploy/eks-karpenter/remote/bridge.yaml` permits the publisher,
   CodeBuild request bridge, and selected S3 receipts, but not AWS Budgets
@@ -62,7 +74,9 @@ weights.
   revision.
 - [ ] A custom image is published by digest with the pinned scientific-source
   hashes, and an authorized result reader can retrieve every raw object and
-  verify `SHA256SUMS`.
+  verify `SHA256SUMS`. If Round B is selected as the stronger comparator, its
+  new source hash, image, requests, and validation expectations must replace
+  the Round A bindings prospectively; do not mix revisions.
 
 These conditions admit a launch; they do not admit a performance conclusion.
 Correctness, repetition, calibration, rho-step, replay, independent-validator,
@@ -90,5 +104,7 @@ PCC, benchmark-record, and leaderboard gates remain downstream.
 ## Resolution and history
 
 Unresolved. Opened 2026-11-14 after the implementation/protocol PR merged and
-the selected runtime's read-only access checks failed. This record neither
-launches the panel nor changes the historical frontier.
+the selected runtime's read-only access checks failed. Updated 2026-11-18 with
+the prospective five-product Round B candidate and a second checkpoint
+refusal. This record neither launches the panel nor changes the historical
+frontier.

@@ -1,9 +1,12 @@
 # Strong-rho control for the GHS-weak plane-quartic frontier
 
-Status: implementation and protocol frozen; measurement pending. The
+Status: Round A implementation and protocol frozen; measurement pending. The
 [round-A amendment](ROUND_A.md) changes only the high/top active deadlines and
-was frozen before primary output. There is no measured result, frontier
-change, or leaderboard row yet. The live execution-admission gap is tracked in
+was frozen before primary output. [Round B](ROUND_B.md) prospectively replaces
+the generic six-product cubic square with a five-product specialization. Its
+profile and benchmark are checkpoint-blocked in the current runtime, so it has
+no measured throughput result, frontier change, or leaderboard row. The live
+execution-admission gap is tracked in
 [the problem record](../../problems/ghs-strong-rho-measurement-admission.md).
 
 This study reopens the restricted `E0/F_{q^3}` plane-quartic program for one
@@ -30,7 +33,13 @@ is made [pcc:unverified].
 - [`PROTOCOL.md`](PROTOCOL.md) freezes the scientific question, grid, arms,
   estimator, cost model, admission interval, and publication gates.
 - [`ROUND_A.md`](ROUND_A.md) is the prospective deadline-only amendment.
-- `main.rs` and `strong_rho.rs` are the source-hash-pinned measurement code;
+- [`ROUND_B.md`](ROUND_B.md) freezes the five-product squaring lead;
+  [`round-b/RESULTS.md`](round-b/RESULTS.md) retains its partial
+  correctness/count result and checkpoint blocker.
+- `main.rs` and the Round A revision of `strong_rho.rs` are the
+  source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
+  the prospective Round B candidate; Round A remains bound by the source hash
+  in [`ROUND_A.md`](ROUND_A.md).
   [`pod_run.sh`](pod_run.sh) compiles it for the worker and seals each split.
 - [`build_context.sh`](build_context.sh) and [`Dockerfile`](Dockerfile) create
   the exact-revision private image; [`LAUNCH.md`](LAUNCH.md) specifies the
