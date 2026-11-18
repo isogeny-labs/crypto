@@ -43,7 +43,7 @@ static RF_NOINLINE void core_before(const Fp64Ctx &f, const uint64_t *x, int cnt
 static RF_NOINLINE void core_after(const Fp64Ctx &f, const uint64_t *x, int cnt, uint64_t *out) {
     uint64_t d[CHUNK], pre[CHUNK];
     for (int i = 0; i < CHUNK; ++i) d[i] = i < cnt ? x[i] : f.one;
-    const int len = cnt <= CHUNK / 2 ? cnt : CHUNK;
+    const int len = cnt <= (3 * CHUNK) / 4 ? cnt : CHUNK;
     uint64_t acc = d[0];
     for (int i = 1; i < len; ++i) {
         pre[i] = acc;
@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
     const size_t n = 2048;
     std::vector<uint64_t> xs(n * CHUNK);
     for (uint64_t &x : xs) x = fp64_to_mont(f, 1 + rng() % (f.p - 1));
-    for (int cnt : {1, 2, 8, 16, 17, 31, 32}) {
+    for (int cnt : {1, 2, 8, 16, 17, 20, 24, 28, 31, 32}) {
         for (size_t k = 0; k < n; ++k) {
             uint64_t oldv[CHUNK], newv[CHUNK];
             core_before(f, &xs[k * CHUNK], cnt, oldv);
@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
         std::fprintf(stderr, "Usage: %s [--perf-{tail8,full32}-{before,after}]\n", argv[0]);
         return 2;
     }
-    for (int cnt : {1, 8, 16, 32}) {
+    for (int cnt : {1, 8, 16, 20, 24, 32}) {
         const double b = median_ns(core_before, f, xs, cnt);
         const double a = median_ns(core_after, f, xs, cnt);
         std::printf("tail-core cnt=%d before %.3f after %.3f ns/run speedup %.3fx\n", cnt, b, a, b / a);
