@@ -28,7 +28,20 @@ Before committing the new Rust code, a separate Python implementation reconstruc
 
 The independent finite-field Gaussian elimination preflight accumulated **8,432 vs 11,936 elimination-stage field multiplications** and **368 vs 416 field inversions** (8x8 vs 9x9), excluding matrix construction and multiplication work inside inversions. This is a **finite operation count from local Python**, not a native Rust timing or full solver advantage. The exact original-Rust example additionally instruments all modular multiplications including inversion exponentiation and emits per-case costs, so unlike the preflight it is designed to produce source-bound native costs.
 
-**Source-bound validation:** the Rust 1.100.0 example, two focused tests, existing 40 library tests, independent Python replay of all 48 exact numeric determinant residues, and CI workflow have been committed to the PR branch. A GitHub Actions success and raw artifact must be linked **only after it is actually observed**; this report does not infer a PASS merely from creating the workflow.
+**Source-bound validation — PASS.** Two independent source-specific GitHub-hosted executions of the new Rust 1.100.0 example both passed the 40 original crate library tests, 2 new focused tests, complete 48-case Rust panel, and separately implemented Python BigInt replay of all 48 exact numeric determinant residues and both rejected degenerate cases:
+
+- [Run #44370179138](https://github.com/isogeny-labs/crypto/actions/runs/44370179138), [raw artifact #14458893252](https://github.com/isogeny-labs/crypto/actions/runs/44370179138/artifacts/14458893252), extracted JSON SHA-256 `0418319331cbd780e607dc6f542a2ad1af56283ffa7ad1c8f914037f632de2bf`.
+- [Run #44370491567](https://github.com/isogeny-labs/crypto/actions/runs/44370491567), [raw artifact #14459190987](https://github.com/isogeny-labs/crypto/actions/runs/44370491567/artifacts/14459190987), extracted JSON SHA-256 `f61a22afb3289a574cef7191f40ef0dd35d87646ce08723ed36802baad8d7e84`.
+
+| Source-bound 48-case diagnostic | 8x8 target-reduced | 9x9 prior predicate |
+|---|---:|---:|
+| Instrumented total field multiplications (including inversion exponentiation and row construction) | **35,120** | 39,488 |
+| Instrumented field inversions | **368** | 416 |
+| 48-case accumulated Rust determinant elapsed, run 1 | **79.364 µs** | 106.187 µs |
+| 48-case accumulated Rust determinant elapsed, run 2 | **77.982 µs** | 90.749 µs |
+| Correct exact residues and relation classifications | 48/48 | 48/48 |
+
+The **exact** fixed-panel operation reduction is 4,368 field multiplications (11.06%) and 48 inversions (11.54%). These microscale wall times are **diagnostics only**: one fixed execution order, no AB/BA pairing, negligible runtime, and not a full solver benchmark. They do not justify a general speedup claim. Independent signed PCC validation remains open.
 
 ## Why this could matter, and what remains hard
 
