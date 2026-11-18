@@ -7679,6 +7679,13 @@ impl PairSumTable {
         if !self.admitted_hash(h) {
             return false;
         }
+        self.contains_admitted_key_hash(key, h)
+    }
+
+    /// [`Self::contains_key_hash`] past its filter test, for a key the
+    /// caller already found admitted.
+    #[inline]
+    fn contains_admitted_key_hash(&self, key: u64, h: u64) -> bool {
         if self.is_compact() {
             return self.compact_contains_hash(key, h);
         }
@@ -16299,6 +16306,16 @@ fn advise_huge_pages<T>(v: &[T]) {
     let _ = v;
 }
 
+/// Whether the descent's walk fills a round's filter hashes, words and
+/// bits a block at a time (`KIC_WALK_VFILTER`, default on), as the
+/// collection scan does, instead of hashing and slotting each key apart.
+/// The keys, the trials, the counted filter probes and bucket reads and
+/// the decomposition found are the same; `0` keeps the per-key route.
+fn walk_vfilter_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_WALK_VFILTER").map_or(true, |v| v != "0"))
+}
+
 /// Whether the sparse relation system builds each row straight from
 /// its summands (`KIC_DIRECT_ROWS`, default on) instead of through a
 /// dense big-integer row.  Both give the same row; `0` restores the
@@ -17828,6 +17845,10 @@ impl<'a> IndividualLogSolver<'a> {
         let mut keys: Vec<u64> = Vec::with_capacity(DESCENT_WALKS);
         let mut hashes: Vec<u64> = Vec::with_capacity(DESCENT_WALKS);
         let mut hit_pairs: Vec<(u32, u32)> = Vec::new();
+        // The filter word and bits of each key, filled a round at a time
+        // ([`walk_vfilter_enabled`]); empty on the per-key route.
+        let walk_vfilter = walk_vfilter_enabled();
+        let (mut fwords, mut fbits): (Vec<u64>, Vec<u64>) = (Vec::new(), Vec::new());
         while report.trials < self.opts.max_trials {
             // Key every state of the round first and prefetch its filter
             // word, so the 64 probes' cache misses overlap instead of
@@ -17843,18 +17864,29 @@ impl<'a> IndividualLogSolver<'a> {
             // answer.
             measurement::mark(Phase::TargetPdp);
             pair.keys_of(&states, &mut keys);
-            hashes.clear();
-            hashes.reserve(keys.len());
-            for &key in &keys {
-                let h = pair_filter_hash(key);
-                hashes.push(h);
-                pair.prefetch_key_hash(h);
+            if walk_vfilter {
+                // The same hashes, and the filter slot `admitted_hash`
+                // would take, eight keys at a time.
+                pair.filter
+                    .fill_block(&keys, &mut hashes, &mut fwords, &mut fbits);
+                for &w in &fwords {
+                    prefetch(&pair.present[w as usize]);
+                }
+            } else {
+                hashes.clear();
+                hashes.reserve(keys.len());
+                for &key in &keys {
+                    let h = pair_filter_hash(key);
+                    hashes.push(h);
+                    pair.prefetch_key_hash(h);
+                }
             }
-            for (((state, (a, b)), &key), &h) in states
+            for (at, (((state, (a, b)), &key), &h)) in states
                 .iter()
                 .zip(coefficients.iter())
                 .zip(&keys)
                 .zip(&hashes)
+                .enumerate()
             {
                 if report.trials >= self.opts.max_trials {
                     break;
@@ -17886,7 +17918,18 @@ impl<'a> IndividualLogSolver<'a> {
                     continue;
                 }
                 if m == 2 {
-                    if !pair.contains_key_hash(key, h) {
+                    let contained = if walk_vfilter {
+                        // `contains_key_hash` with its filter test read
+                        // from the round's arrays: one probe counted, then
+                        // the bucket only for an admitted key.
+                        group_op_count::count_filter_probes(1);
+                        let bits = fbits[at];
+                        pair.present[fwords[at] as usize] & bits == bits
+                            && pair.contains_admitted_key_hash(key, h)
+                    } else {
+                        pair.contains_key_hash(key, h)
+                    };
+                    if !contained {
                         report.record(*a, *b, progress, observer, || {
                             PdpAttempt::bare(None, PdpOutcome::Unresolved)
                         });
