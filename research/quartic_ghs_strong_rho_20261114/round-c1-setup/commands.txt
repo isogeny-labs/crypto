@@ -1,0 +1,22 @@
+Protocol correction freeze:
+git commit -m 'research: freeze fail-closed GHS setup correction'
+git push
+
+Exact source-bound build:
+GHS_SOURCE_REVISION=0e92c5352f9674881e41cefaa9e6a76b08bdb2d8 rustc --edition 2021 -O research/quartic_ghs_strong_rho_20261114/main.rs -o /dev/shm/ghs-leads/ghs-setup-0e92c535
+
+Deterministic self-test:
+stdbuf -oL -eL /dev/shm/ghs-leads/ghs-setup-0e92c535 selftest 2>&1
+
+Paired q=223 code/count control:
+GHS_CALIB_TRIPLES=1 GHS_ISOLATION=development /dev/shm/ghs-leads/ghs-setup-0e92c535 run 223 1 0 1 ic-repeat strong-b8-legacy-setup,strong-b8
+
+Package unit tests (from the package directory):
+python3 -m unittest test_make_requests.py test_analyze.py
+
+Static rollback/direct-construction check:
+rg -n 'restore_counts|rng_before|field_before|walker_coeffs|walker_points|Walker \\{' research/quartic_ghs_strong_rho_20261114/strong_rho.rs
+
+Checkpoint check:
+scripts/checkpoint.sh gate
+

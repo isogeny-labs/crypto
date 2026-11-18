@@ -1,5 +1,11 @@
 # Round C result: exact batched strong-rho setup
 
+> **Superseded for integration and accounting by
+> [Round C1](../round-c1-setup/RESULTS.md).** The retained `q=223` path did not
+> take the defective fallback, but integration review found that a rare
+> identity-walker fallback could restore counters after tentative work. Do not
+> integrate the Round C implementation; its raw records remain audit evidence.
+
 Status: deterministic `q=223` correctness/count control passed. The profile,
 isolated timing panel, larger cells, matched frontier grid, independent
 validation, and PCC were not run. This is a producer-side code/count result,

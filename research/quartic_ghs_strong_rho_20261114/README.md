@@ -12,8 +12,13 @@ execution-admission gap is tracked in
 [Round C setup](ROUND_C_SETUP.md) replaces independent affine construction of
 the 32 jumps and initial walkers with a cold-charged, batched width-2
 simultaneous multiplication. Its deterministic `q=223` point/state/count
-control is under [`round-c-setup/`](round-c-setup/RESULTS.md). It is likewise a
-code/count result only, not an isolated throughput or frontier result.
+control is retained under [`round-c-setup/`](round-c-setup/RESULTS.md), but its
+rare fallback accounting was rejected during integration review.
+[Round C1](ROUND_C1_SETUP.md) is the fail-closed replacement: only the 32 jumps
+are batched and initial walkers retain the charged sequential retry path. Its
+corrected evidence is under
+[`round-c1-setup/`](round-c1-setup/RESULTS.md). Both are code/count rounds, not
+isolated throughput or frontier results.
 
 This study reopens the restricted `E0/F_{q^3}` plane-quartic program for one
 specific obligation: compare its end-to-end index-calculus result with a rho
@@ -43,11 +48,14 @@ is made [pcc:unverified].
   [`round-b/RESULTS.md`](round-b/RESULTS.md) retains its partial
   correctness/count result and checkpoint blocker.
 - [`ROUND_C_SETUP.md`](ROUND_C_SETUP.md) freezes the batched cold-setup lead;
-  [`round-c-setup/RESULTS.md`](round-c-setup/RESULTS.md) retains its exact
-  deterministic setup and trajectory controls.
+  [`round-c-setup/RESULTS.md`](round-c-setup/RESULTS.md) retains its superseded
+  deterministic setup and trajectory controls for audit.
+- [`ROUND_C1_SETUP.md`](ROUND_C1_SETUP.md) freezes the fail-closed jump-only
+  correction; [`round-c1-setup/RESULTS.md`](round-c1-setup/RESULTS.md) is the
+  integration candidate.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
   source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
-  the prospective Round C setup candidate built on Round B; Round A remains
+  the prospective Round C1 jump-setup candidate built on Round B; Round A remains
   bound by the source hash in [`ROUND_A.md`](ROUND_A.md).
   [`pod_run.sh`](pod_run.sh) compiles it for the worker and seals each split.
 - [`build_context.sh`](build_context.sh) and [`Dockerfile`](Dockerfile) create
