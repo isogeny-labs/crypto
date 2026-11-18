@@ -135,7 +135,6 @@ struct SymStats {
     rels: usize,
 }
 
-
 /// Four-summand variant: relations R = eps*phi^k F_h + (F_i + s1 phi^m F_j + s2 phi^n F_l),
 /// matched through a table of orbit-canonical x-coordinates of all triple sums (i<j<l).
 fn sym4_solve_ex(
@@ -174,8 +173,14 @@ fn sym4_solve_ex(
     let mut cand: Vec<Pt> = Vec::with_capacity(3 * b_size);
     for r in &reps {
         cand.push(*r);
-        cand.push(Pt { x: f.mul(beta, r.x), y: r.y });
-        cand.push(Pt { x: f.mul(beta2, r.x), y: r.y });
+        cand.push(Pt {
+            x: f.mul(beta, r.x),
+            y: r.y,
+        });
+        cand.push(Pt {
+            x: f.mul(beta2, r.x),
+            y: r.y,
+        });
     }
     let canon = |x3: u64| -> (u64, usize) {
         let x1 = f.mul(beta, x3);
@@ -197,8 +202,14 @@ fn sym4_solve_ex(
         for j in (i + 1)..b_size {
             for m in 0..3usize {
                 for s1 in 0..2u8 {
-                    let qj = if s1 == 1 { c.neg(cand[3 * j + m]) } else { cand[3 * j + m] };
-                    let Some(pp) = c.add(Some(fi), Some(qj)) else { continue };
+                    let qj = if s1 == 1 {
+                        c.neg(cand[3 * j + m])
+                    } else {
+                        cand[3 * j + m]
+                    };
+                    let Some(pp) = c.add(Some(fi), Some(qj)) else {
+                        continue;
+                    };
                     dd.clear();
                     for l in (j + 1)..b_size {
                         for nn in 0..3usize {
@@ -219,9 +230,17 @@ fn sym4_solve_ex(
                             let sx = c.add_x_with_inv(pp, ql, inv);
                             let dx2 = c.add_x_with_inv(pp, c.neg(ql), inv);
                             let (k1, e1) = canon(sx);
-                            ents.push((k1, [i as u32, j as u32, l as u32], [m as u8, nn as u8, s1 * 2, e1 as u8]));
+                            ents.push((
+                                k1,
+                                [i as u32, j as u32, l as u32],
+                                [m as u8, nn as u8, s1 * 2, e1 as u8],
+                            ));
                             let (k2, e2) = canon(dx2);
-                            ents.push((k2, [i as u32, j as u32, l as u32], [m as u8, nn as u8, s1 * 2 + 1, e2 as u8]));
+                            ents.push((
+                                k2,
+                                [i as u32, j as u32, l as u32],
+                                [m as u8, nn as u8, s1 * 2 + 1, e2 as u8],
+                            ));
                         }
                     }
                 }
@@ -311,8 +330,12 @@ fn sym4_solve_ex(
                     let fb_ = if s1 == 1 { c.neg(fb_) } else { fb_ };
                     let fc_ = cand[3 * el as usize + en as usize];
                     let fc_ = if s2 == 1 { c.neg(fc_) } else { fc_ };
-                    let Some(p2) = c.add(Some(fa), Some(fb_)) else { continue };
-                    let Some(p3) = c.add(Some(p2), Some(fc_)) else { continue };
+                    let Some(p2) = c.add(Some(fa), Some(fb_)) else {
+                        continue;
+                    };
+                    let Some(p3) = c.add(Some(p2), Some(fc_)) else {
+                        continue;
+                    };
                     let y3 = f.sub(f.mul(l, f.sub(r.x, x3)), r.y);
                     let tau = if y3 == p3.y { 1i8 } else { -1 };
                     let sgn = |v: i8, neg: bool| if neg { -v } else { v };
@@ -383,7 +406,9 @@ fn sym4_solve_ex(
         if row >= nrows {
             break;
         }
-        let Some(piv) = (row..nrows).find(|&rr| rows[rr][col] != 0) else { continue };
+        let Some(piv) = (row..nrows).find(|&rr| rows[rr][col] != 0) else {
+            continue;
+        };
         rows.swap(row, piv);
         rhs.swap(row, piv);
         let inv = fnum.inv(rows[row][col]);
