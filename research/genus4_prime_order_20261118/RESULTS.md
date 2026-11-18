@@ -1,7 +1,8 @@
 # Results: genus 4 on prime-order Jacobians against the ideal negation-rho bound
 
-Every number is `[pcc:unverified]`. The study was run once, on a local 4-core host, and no validator
-has replayed it yet. The protocol, frozen before data, is `PROTOCOL.md`. The deviations, each logged
+Every number is `[pcc:unverified]` in pcc terms. An independent validator replayed it (73/73 rows identical) and
+recomputed every number exactly: disposition **validated** (`benchmarks/20261118-genus4-prime-order/`). Wording
+corrections are in `ERRATA.md` (E1: per-step walk bookkeeping is not counted; x\* stays below at 0.885). The protocol, frozen before data, is `PROTOCOL.md`. The deviations, each logged
 before its data was read, are in `DEVIATIONS.md`. The tables come from `analyze.py` (frozen).
 
 ## Headline
