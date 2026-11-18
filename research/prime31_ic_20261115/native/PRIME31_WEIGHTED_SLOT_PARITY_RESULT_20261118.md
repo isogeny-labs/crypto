@@ -4,26 +4,26 @@
 
 ## 1. New exact obstruction: repeated-slot parity collapses
 
-Write \\(G=E(\\mathbb F_p)\\), and in the group algebra \\(\\mathbb F_2[G]\\) define \\(A_c=\\sum_{P\\in A}[cP]\\) for a fixed finite point factor base \\(A\\subset G\\). The multiplication is the group law; the coefficient of \\([R]\\) is the *parity of the number of ordered decompositions* of \\(R\\) into the indicated slot bases. By commutativity and characteristic two,
+Write \(G=E(\mathbb F_p)\), and in the group algebra \(\mathbb F_2[G]\) define \(A_c=\sum_{P\in A}[cP]\) for a fixed finite point factor base \(A\subset G\). The multiplication is the group law; the coefficient of \([R]\) is the *parity of the number of ordered decompositions* of \(R\) into the indicated slot bases. By commutativity and characteristic two,
 
-\\[
-A_c^{2^k}=\\sum_{P\\in A}[2^kcP].
-\\]
+\[
+A_c^{2^k}=\sum_{P\in A}[2^kcP].
+\]
 
-In particular, for eight **identical positive** slots, \\(A_1^8=\\sum_{P\\in A}[8P]\\). On the unchanged odd-prime-order Prime31 curve, multiplication by eight is bijective. Therefore, an eight-slot ordered-parity oracle with all slots equal to an ordinary B31 base has **exactly 31 odd-support points**, even though the old **signed ordinary-membership** 8-leaf relation oracle covers almost all targets. Ordinary membership and parity are different questions: a large even number of decompositions produces zero parity.
+In particular, for eight **identical positive** slots, \(A_1^8=\sum_{P\in A}[8P]\). On the unchanged odd-prime-order Prime31 curve, multiplication by eight is bijective. Therefore, an eight-slot ordered-parity oracle with all slots equal to an ordinary B31 base has **exactly 31 odd-support points**, even though the old **signed ordinary-membership** 8-leaf relation oracle covers almost all targets. Ordinary membership and parity are different questions: a large even number of decompositions produces zero parity.
 
-The generalization is useful for experimental design. If scalar \\(c\\) occurs \\(m_c\\) times across the slots, write its binary digits as \\(m_c=\\sum_k\\epsilon_{c,k}2^k\\). Then
+The generalization is useful for experimental design. If scalar \(c\) occurs \(m_c\) times across the slots, write its binary digits as \(m_c=\sum_k\epsilon_{c,k}2^k\). Then
 
-\\[
-\\prod_c A_c^{m_c}=
-\\prod_{c,k:\\epsilon_{c,k}=1} A_{2^k c},
-\\qquad
-|\\operatorname{supp}|\\le B^{\\sum_c\\operatorname{popcount}(m_c)}.
-\\]
+\[
+\prod_c A_c^{m_c}=
+\prod_{c,k:\epsilon_{c,k}=1} A_{2^k c},
+\qquad
+|\operatorname{supp}|\le B^{\sum_c\operatorname{popcount}(m_c)}.
+\]
 
-Thus eight identical weights give exponent 1; four weight pairs give exponent at most 4; eight distinct weights *can* retain exponent 8. Distinct weights are a necessary design defense against **this** formal cancellation, not a guarantee of high parity yield. Also, replacing the eight slot bases by independent **translations** \\([T_i]A_1\\) does not help: the product is \\([\\sum_iT_i]A_1^8\\), a translate of the 31-point support. These are elementary group-algebra identities, not new general mathematical discoveries or evidence of an ECDLP attack.
+Thus eight identical weights give exponent 1; four weight pairs give exponent at most 4; eight distinct weights *can* retain exponent 8. Distinct weights are a necessary design defense against **this** formal cancellation, not a guarantee of high parity yield. Also, replacing the eight slot bases by independent **translations** \([T_i]A_1\) does not help: the product is \([\sum_iT_i]A_1^8\), a translate of the 31-point support. These are elementary group-algebra identities, not new general mathematical discoveries or evidence of an ECDLP attack.
 
-For uniform random \\(R\\) on this curve, the exact unweighted B31 odds-hit probability is \\(31/2147446831\\), about \\(1.4436\\times 10^{-8}\\). It follows that 1,024 independent random residuals have an expected unweighted-parity hit count of only \\(1.48\\times 10^{-5}\\), *without* applying independent hashing in each slot.
+For uniform random \(R\) on this curve, the exact unweighted B31 odds-hit probability is \(31/2147446831\), about \(1.4436\times 10^{-8}\). It follows that 1,024 independent random residuals have an expected unweighted-parity hit count of only \(1.48\times 10^{-5}\), *without* applying independent hashing in each slot.
 
 The independent-slot hashes in [#4698](https://github.com/isogeny-labs/crypto/pull/4698) and the Bochum paper do not have the identical-slot premise. This lemma **does not refute** those algorithms; it rules out a naive reuse of the same Prime31 B31 base in all eight parity slots.
 
@@ -31,12 +31,12 @@ The independent-slot hashes in [#4698](https://github.com/isogeny-labs/crypto/pu
 
 Fixed public curve and subgroup:
 
-- \\(p=2147483647=2^{31}-1\\).
-- \\(E:y^2=x^3+847514846x+2087444724\\).
-- \\(n=2147446831\\), cofactor 1, \\(G=(625037715,2100627251)\\).
-- First \\(B\\) rational-x abscissae with canonical y, for \\(B\\in\\{8,16,31\\}\\).
-- Eight positive-weighted factor-base slots, with **known public** \\(c_i=(1,3,5,7,11,13,17,19)\\). Each relation has \\(\\sum_i c_i\\log_G(P_{j_i})=\\log_G(R)\\pmod n\\) when the target RHS logarithm is known or becomes a symbolic target column. The relation extractor itself **never receives a secret log**.
-- Twelve identical public residuals generated by SplitMix64 seed \\(`0x57534c4f54503131`\\); two public planted controls for each base size. Exact B=2 brute-force controls check uniform, weighted and translation-only cases.
+- \(p=2147483647=2^{31}-1\).
+- \(E:y^2=x^3+847514846x+2087444724\).
+- \(n=2147446831\), cofactor 1, \(G=(625037715,2100627251)\).
+- First \(B\) rational-x abscissae with canonical y, for \(B\in\{8,16,31\}\).
+- Eight positive-weighted factor-base slots, with **known public** \(c_i=(1,3,5,7,11,13,17,19)\). Each relation has \(\sum_i c_i\log_G(P_{j_i})=\log_G(R)\pmod n\) when the target RHS logarithm is known or becomes a symbolic target column. The relation extractor itself **never receives a secret log**.
+- Twelve identical public residuals generated by SplitMix64 seed `0x57534c4f54503131`; two public planted controls for each base size. Exact B=2 brute-force controls check uniform, weighted and translation-only cases.
 
 This uses the **existing Rust** `prime31_algebraic_ic::Arithmetic`, `PRIME31`, and generator certificate, pinned at original source `1df714645aa683cf975bc76fcacb9842cb4780fd`. No new elliptic-curve arithmetic implementation, changed group order, weak substitution curve or target secret was introduced into the candidate. The candidate is deliberately an exact **generic** parity diagnostic: two ordered four-slot tables with XOR cancellation, searched by a public-target 4+4 MITM. This provides an independent correctness/cost gate before attempting a nonenumerative algebraic parity engine.
 
@@ -85,8 +85,8 @@ Checked existing Rust sources and recorded results before implementation; the kn
 
 **Next experiments** (do not claim they ran):
 
-1. **Nonenumerative weighted-slot membership:** Represent scalar images \\([c_i]P\\) with explicit, low-degree *addition/doubling circuits* over the original coordinates, rather than high-degree expanded division polynomials. Wire into the existing Rust F4 or shared coefficient RR9 lead. Demand exact B4/B8 parity and witness equivalence, with **no 4+4 point table, no scalar guesses, and no leaked target logs**. Measure algebraic system degree, first/last fall degree, field arithmetic, memory and all failures. If polynomial systems inflate beyond the table control, retire.
-2. **Better compact slot encodings:** Compare independent low-degree affine-coordinate filters, independently hashed slot bases (as in published subexponential proposal) and the distinct-public-scalar variant. Record \\(\\sum_c popcount(m_c)\\) for every weight multiset; reject identical weights or mere translations before benchmarks. Keep a finite factor-base dimension and prove row rank, not just hits.
+1. **Nonenumerative weighted-slot membership:** Represent scalar images \([c_i]P\) with explicit, low-degree *addition/doubling circuits* over the original coordinates, rather than high-degree expanded division polynomials. Wire into the existing Rust F4 or shared coefficient RR9 lead. Demand exact B4/B8 parity and witness equivalence, with **no 4+4 point table, no scalar guesses, and no leaked target logs**. Measure algebraic system degree, first/last fall degree, field arithmetic, memory and all failures. If polynomial systems inflate beyond the table control, retire.
+2. **Better compact slot encodings:** Compare independent low-degree affine-coordinate filters, independently hashed slot bases (as in published subexponential proposal) and the distinct-public-scalar variant. Record \(\sum_c popcount(m_c)\) for every weight multiset; reject identical weights or mere translations before benchmarks. Keep a finite factor-base dimension and prove row rank, not just hits.
 3. **Rank and full solver:** Feed **naturally extracted** signed/weighted relations into the already measured native Rust rank-31 learning/recovery pipeline, verify every relation and recover 1,024 blinded original-curve logs without generic fallback. Charge one-time factor-base selection, hashing, extractor failures, modular LA, target processing, point verification and isogeny costs when present.
 4. **Competitive frontier and validation:** Same-host ABBA versus best optimized generic-equivalent IC, cached/shared BSGS, tuned negation rho and published index-calculus frontiers; independent signed PCC, distinct target sets, and a second ordinary nonspecial prime-field curve to check generality.
 
