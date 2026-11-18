@@ -89,9 +89,10 @@ static Poly baby_product(Point K,Z start,unsigned long count,Point step,Work&wor
  }
  Poly h;fmpz_mod_poly_product_roots_fmpz_vec(h.z,roots.data,roots.size,ctx);work.baby_products++;return h;
 }
-static Result construct(Z ell,Point K,const std::vector<Point>&points,unsigned long block,unsigned long max_window=std::numeric_limits<unsigned long>::max()){
+static Result construct(Z ell,Point K,const std::vector<Point>&points,unsigned long block,unsigned long max_window=std::numeric_limits<unsigned long>::max(),Z baby_window=0){
  require(ell>=3&&mpz_odd_p(ell.get_mpz_t())&&block>0,"invalid degree/block");
  Z n=(ell-1)/2,rad=n/2,bs;mpz_sqrt(bs.get_mpz_t(),rad.get_mpz_t());if(bs<1)bs=1;
+ if(baby_window!=0){require(baby_window>0&&2*baby_window<=n,"baby window outside coverage range");bs=baby_window;}
  require(mpz_fits_ulong_p(bs.get_mpz_t()),"window index exceeds native width");unsigned long B=bs.get_ui();Z gs=n/(2*bs);require(mpz_fits_ulong_p(gs.get_mpz_t()),"giant index width");unsigned long G=gs.get_ui();
  require(G>0,"use direct path for degree below five");require(B<=max_window&&G<=max_window,"window exceeds declared limit; assembly refused");
  require(on(K,a,b)&&!K.inf&&mul(K,ell).inf,"kernel witness");Coverage coverage(B,G,block,n);Work work;
@@ -150,7 +151,7 @@ static bool equal(Point u,GEN v){if(u.inf)return lg(v)==2;return lg(v)==3&&integ
 static unsigned long bound(const char*s){Z n(s);require(n>0&&mpz_fits_ulong_p(n.get_mpz_t()),"invalid positive native bound");return n.get_ui();}
 static void print_point(Point P){if(P.inf)std::cout<<"null";else std::cout<<"[\""<<P.x<<"\",\""<<P.y<<"\"]";}
 // Explicitly supplied public cases only; no parameter search or timing arm.
-static void evaluate_case(unsigned long max_window,unsigned long block,bool compare){
+static void evaluate_case(unsigned long max_window,unsigned long block,bool compare,Z baby_window){
  Z ell;Point K;unsigned long count;
  require(bool(std::cin>>p>>a>>b>>ell>>K.x>>K.y>>count),"case header: p a b ell Kx Ky point_count");K.inf=false;
  require(p>3&&ell>=5&&ell!=p,"invalid characteristic/degree");
@@ -169,7 +170,7 @@ static void evaluate_case(unsigned long max_window,unsigned long block,bool comp
  require(!compare||ell<=10009,"PARI direct-reference degree cap exceeded");
  fmpz_t prime;fmpz_init(prime);fmpz_set_mpz(prime,p.get_mpz_t());fmpz_mod_ctx_init(ctx,prime);
  try{
-   Result out=construct(ell,K,points,block,max_window);
+   Result out=construct(ell,K,points,block,max_window,baby_window);
    if(compare){
      GEN E=ellinit(mkvec5(gen_0,gen_0,gen_0,gen(a),gen(b)),gen(p),DEFAULTPREC),ref=ellisogeny(E,gp(K),0,0,1);
      GEN coeff=gel(ref,1),map=gel(ref,2);
@@ -220,10 +221,16 @@ static void coverage_tests(){
  std::cout<<"{\"coverage_negative_controls_passed\":"<<passed<<",\"controls\":[\"incomplete\",\"gap\",\"wrong_extent\",\"duplicate\",\"missing_leftover\",\"wrong_leftover_ordinal\"]}"<<std::endl;
 }
 int main(int argc,char**argv){try{
- if((argc==4||argc==5)&&std::string(argv[1])=="--evaluate"){
-   require(argc==4||std::string(argv[4])=="--pari-reference","unknown evaluation option");
+ if(argc>=4&&std::string(argv[1])=="--evaluate"){
+   bool compare=false;Z baby_window=0;
+   for(int i=4;i<argc;i++){
+     std::string option=argv[i];
+     if(option=="--pari-reference"&&!compare)compare=true;
+     else if(option=="--baby-window"&&baby_window==0&&i+1<argc){baby_window=Z(argv[++i]);require(baby_window>0,"baby window must be positive");}
+     else throw std::runtime_error("unknown/duplicate evaluation option");
+   }
    unsigned long max_window=bound(argv[2]),block=bound(argv[3]);
-   pari_init(256000000,2000000);evaluate_case(max_window,block,argc==5);pari_close();flint_cleanup();return 0;
+   pari_init(256000000,2000000);evaluate_case(max_window,block,compare,baby_window);pari_close();flint_cleanup();return 0;
  }
  if(argc==2&&std::string(argv[1])=="--target80-check"){
    Z ell("729845429276318409687041"),n=(ell-1)/2,B;Z rad=n/2;mpz_sqrt(B.get_mpz_t(),rad.get_mpz_t());Z G=n/(2*B);
