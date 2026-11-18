@@ -1,6 +1,7 @@
 import Mathlib.Algebra.Polynomial.Derivation
 import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
+import Mathlib.RingTheory.FormalGroup.Basic
 import Mathlib.RingTheory.LaurentSeries
 import Mathlib.RingTheory.PowerSeries.Derivative
 import Mathlib.RingTheory.PowerSeries.Substitution
@@ -563,6 +564,136 @@ theorem leading_X_inv_sq_mul_subst_inv
   apply subst_inv outer (mono (by omega) hfg) <;> simp_all
 
 end PowerSeriesPrefixEq
+
+/-- Every one-dimensional formal group law differs from its first input by a
+multiple of its second variable. This is the algebraic filtration statement
+behind the H116 Frobenius cutoff; it uses Mathlib's actual `FormalGroup`, not a
+locally copied group-law interface. -/
+theorem FormalGroup.secondVariable_dvd_sub_X
+    {R : Type*} [CommRing R] (F : FormalGroup R) :
+    (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) R) ∣
+      F.toPowerSeries - MvPowerSeries.X 0 := by
+  rw [MvPowerSeries.X_dvd_iff]
+  intro m hm
+  have h := congrArg (PowerSeries.coeff (m 0)) F.Xzero_eq_X
+  change MvPowerSeries.coeff (Finsupp.single () (m 0))
+      (MvPowerSeries.subst ![MvPowerSeries.X (), 0] F.toPowerSeries) =
+    MvPowerSeries.coeff (Finsupp.single () (m 0)) (MvPowerSeries.X ()) at h
+  rw [MvPowerSeries.coeff_subst, finsum_eq_single _ m] at h
+  · have heq : MvPowerSeries.coeff m F.toPowerSeries =
+        MvPowerSeries.coeff m (MvPowerSeries.X 0) := by
+      simp [hm] at h
+      change MvPowerSeries.coeff m F.toPowerSeries *
+          PowerSeries.coeff (m 0) (PowerSeries.X ^ m 0) =
+        PowerSeries.coeff (m 0) PowerSeries.X at h
+      rw [PowerSeries.coeff_X_pow] at h
+      simp at h
+      rw [h]
+      change MvPowerSeries.coeff (Finsupp.single () (m 0))
+          (MvPowerSeries.X ()) =
+        MvPowerSeries.coeff m (MvPowerSeries.X 0)
+      rw [MvPowerSeries.coeff_X, MvPowerSeries.coeff_X]
+      by_cases hm0 : m 0 = 1
+      · have hms : m = Finsupp.single 0 1 := by
+          ext i
+          fin_cases i
+          · simpa using hm0
+          · simpa using hm
+        simp [hms]
+      · have hms : m ≠ Finsupp.single 0 1 := by
+          intro he
+          apply hm0
+          rw [he]
+          simp
+        simp [hm0, hms]
+    simp [heq]
+  · intro d hd
+    by_cases hd1 : d 1 = 0
+    · have hd0 : d 0 ≠ m 0 := by
+        intro hdm
+        apply hd
+        ext i
+        fin_cases i
+        · exact hdm
+        · exact hd1.trans hm.symm
+      simp [hd1]
+      change MvPowerSeries.coeff d F.toPowerSeries *
+        PowerSeries.coeff (m 0) (PowerSeries.X ^ d 0) = 0
+      rw [PowerSeries.coeff_X_pow]
+      simp [Ne.symm hd0]
+    · simp [hd1]
+  · exact MvPowerSeries.HasSubst.X_zero
+
+/-- Substituting two zero-constant parameters into a formal group makes the
+second input an explicit multiplicative correction to the first. -/
+theorem FormalGroup.add_correction_eq
+    {R : Type*} [CommRing R] (F : FormalGroup R)
+    {f correction : PowerSeries R}
+    (hf : PowerSeries.constantCoeff f = 0)
+    (hc : PowerSeries.constantCoeff correction = 0) :
+    ∃ q : PowerSeries R,
+      F.toPowerSeries.subst ![f, correction] = f + correction * q := by
+  obtain ⟨q, hq⟩ := FormalGroup.secondVariable_dvd_sub_X F
+  let a : Fin 2 → PowerSeries R := ![f, correction]
+  have ha : MvPowerSeries.HasSubst a :=
+    MvPowerSeries.hasSubst_of_constantCoeff_nilpotent fun i => by
+      fin_cases i
+      · change IsNilpotent (MvPowerSeries.constantCoeff f)
+        rw [show MvPowerSeries.constantCoeff f = 0 by
+          simpa [PowerSeries.constantCoeff] using hf]
+        exact IsNilpotent.zero
+      · change IsNilpotent (MvPowerSeries.constantCoeff correction)
+        rw [show MvPowerSeries.constantCoeff correction = 0 by
+          simpa [PowerSeries.constantCoeff] using hc]
+        exact IsNilpotent.zero
+  refine ⟨MvPowerSeries.subst a q, ?_⟩
+  have hsub := congrArg (MvPowerSeries.subst a) hq
+  rw [MvPowerSeries.subst_sub ha, MvPowerSeries.subst_X ha,
+    MvPowerSeries.subst_mul ha, MvPowerSeries.subst_X ha] at hsub
+  simpa [a, add_comm] using (sub_eq_iff_eq_add.mp hsub)
+
+/-- A formal-group correction divisible by `X^m` cannot change coefficients
+strictly below degree `m`. -/
+theorem FormalGroup.filtered_correction_prefix
+    {R : Type*} [Field R] (F : FormalGroup R)
+    {f correction tail : PowerSeries R} {m : ℕ}
+    (hf : PowerSeries.constantCoeff f = 0)
+    (hc : PowerSeries.constantCoeff correction = 0)
+    (horder : correction = PowerSeries.X ^ m * tail) :
+    PowerSeriesPrefixEq m
+      (F.toPowerSeries.subst ![f, correction]) f := by
+  obtain ⟨q, hq⟩ := FormalGroup.add_correction_eq F hf hc
+  rw [hq, horder]
+  simpa only [mul_assoc] using
+    PowerSeriesPrefixEq.add_X_pow_mul f (tail * q) m
+
+/-- Composing the filtered formal-group correction with the H116 pole bridge
+loses exactly the shared leading `X`: an order `n+1` parameter correction gives
+an order `n` normalized double-pole/regular-unit prefix. -/
+theorem FormalGroup.filtered_pole_prefix
+    {R : Type*} [Field R] (F : FormalGroup R)
+    {outer scalarParameter correction correctionTail
+      actualUnit scalarUnit : PowerSeries R} {n : ℕ}
+    (hscalarZero : PowerSeries.constantCoeff scalarParameter = 0)
+    (hcorrectionZero : PowerSeries.constantCoeff correction = 0)
+    (hcorrectionOrder : correction =
+      PowerSeries.X ^ (n + 1) * correctionTail)
+    (hactual : F.toPowerSeries.subst ![scalarParameter, correction] =
+      PowerSeries.X * actualUnit)
+    (hscalar : scalarParameter = PowerSeries.X * scalarUnit)
+    (hactualUnit : PowerSeries.constantCoeff actualUnit ≠ 0)
+    (hscalarUnit : PowerSeries.constantCoeff scalarUnit ≠ 0)
+    (houter : PowerSeries.constantCoeff outer ≠ 0) :
+    PowerSeriesPrefixEq n
+      (actualUnit⁻¹ ^ 2 *
+        (outer.subst (PowerSeries.X * actualUnit))⁻¹)
+      (scalarUnit⁻¹ ^ 2 *
+        (outer.subst (PowerSeries.X * scalarUnit))⁻¹) := by
+  have hparameter := FormalGroup.filtered_correction_prefix F
+    hscalarZero hcorrectionZero hcorrectionOrder
+  rw [hactual, hscalar] at hparameter
+  exact PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv
+    outer hparameter hactualUnit hscalarUnit houter
 
 /-- The regular unit in the short-Weierstrass local coordinate
 `x(z)=z⁻² q(z)⁻¹`. Clearing the curve equation gives this fixed-point identity. -/
@@ -1583,6 +1714,10 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms PowerSeriesPrefixEq.subst
 #print axioms PowerSeriesPrefixEq.subst_inv
 #print axioms PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv
+#print axioms FormalGroup.secondVariable_dvd_sub_X
+#print axioms FormalGroup.add_correction_eq
+#print axioms FormalGroup.filtered_correction_prefix
+#print axioms FormalGroup.filtered_pole_prefix
 #print axioms WeierstrassCoordinateUnit.constantCoeff
 #print axioms WeierstrassCoordinateUnit.clearedCurveIdentity
 #print axioms WeierstrassCoordinateUnit.rescale

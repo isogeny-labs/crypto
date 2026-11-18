@@ -135,7 +135,13 @@ the outer unit by `q=1+A X^4q^2+B X^6q^3`, proves its cleared affine identity,
 rescales it to target coefficients `(a^4A,a^6B)`, and proves the exact double-
 substitution identity used by the constructor whenever
 `a*zNormalized=zScalar`. Proving that the actual elliptic endomorphism supplies
-that parameter identity remains separate. [pcc:unverified]
+that parameter identity remains separate. The generic formal-group filtration
+is now proved against Mathlib's `FormalGroup`: `F(X,Y)-X` has a factor `Y`, so
+substituting an `X^m` correction cannot change coefficients below degree `m`.
+Composing this with the leading-`X` pole theorem proves the normalized
+double-pole/regular-unit prefix below degree `m-1`. The curve-specific
+`V+pi=[t]`, local Frobenius, sign and scaling identification is still the
+endpoint hypothesis. [pcc:unverified]
 
 A frozen 20-case boundary panel over five primes and four cutoffs measures this
 loss directly. All local-parameter pairs first differ at `m+1`, all normalized
@@ -166,6 +172,15 @@ are rejected at coefficient four in all five cells. This measures the exact
 coordinate expression consumed by the Lean theorem; the input equality for
 the actual `V-1` local parameters remains the next formal-group obligation.
 [pcc:unverified]
+
+The first beyond-prefix control directly measures that omitted term on the
+excluded p=31 map. The normalized `V-1` and independently constructed scalar
+`[-6]` prefixes agree through index 14, first differ at the preregistered index
+15, and have the preregistered delta ten modulo 31. Both cleared map identities
+pass, while omitted scaling, wrong target and a coefficient-15 mutation are
+rejected. The producer required 96,757 additions, 96,881 multiplications and
+four inversions at precision 18. This single fixed cell checks the predicted
+boundary and not the generic endpoint or any scaling claim. [pcc:unverified]
 
 The current dense implementation uses 64,426 additions, 67,584
 multiplications and 16 inversions for candidate construction at this fixed

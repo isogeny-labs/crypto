@@ -152,7 +152,12 @@ prefix. The curve-specific instance now defines that series by
 `q=1+A X^4q^2+B X^6q^3`, proves the cleared affine identity, proves rescaling to
 `(a^4A,a^6B)`, and matches the complete source/target x-ratio used by the
 implementation. The remaining formal-group obligation is the parameter
-identity derived from `V+pi=[t]` and local Frobenius. [pcc:unverified]
+identity derived from `V+pi=[t]` and local Frobenius. The generic filtration
+part of that obligation is now discharged against Mathlib's actual
+`FormalGroup`: Lean proves `Y | F(X,Y)-X`, proves that an `X^m` correction is
+invisible below degree `m`, and composes it with the existing one-degree pole
+loss. What remains is the actual elliptic Verschiebung/Frobenius, sign and
+target-scaling instance. [pcc:unverified]
 
 The frozen [prefix-transfer boundary control](PREFIX_TRANSFER_EXPERIMENT.md)
 then tests that precision loss on 20 finite-field series cases. In every case a
@@ -180,8 +185,21 @@ substitution and the complete normalized x-ratio match in all five cells.
 Wrong target scaling and wrong local parameter first differ at coefficient
 four in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` and the
 inspected [PDF report](reports/run-20261118T0618Z/REPORT.pdf) bind the algebraic
-and experimental records. This discharges no part of the remaining local
-endomorphism parameter identity. [pcc:unverified]
+and experimental records. This does not discharge the actual local
+endomorphism parameter identification. [pcc:unverified]
+
+The preregistered
+[first omitted-Frobenius boundary experiment](FROBENIUS_BOUNDARY_EXPERIMENT.md)
+tests the coefficient immediately beyond the matched low jet. On the excluded
+p=31, r=37 fixture, the retained normalized `V-1` map and an independently
+constructed scalar `[-6]` map agree through coefficient 14, first differ at
+the predicted coefficient `(p-1)/2=15`, and have the predicted delta
+`2/(t-1)=10 mod 31`. Both map identities pass and all three controls reject.
+The first producer's wrong duplication sign is retained as a failed positive
+control; v2 changed only that sign under a new source freeze. The
+[inspected report](reports/run-20261118T0645Z/REPORT.pdf) includes the data and
+formal dependency chain. This is one small-curve boundary result, not a
+growing-family theorem or ECDLP speedup. [pcc:unverified]
 
 The preregistered
 [out-of-sample formal-scalar panel](FORMAL_SCALAR_OOS_EXPERIMENT.md) kept the

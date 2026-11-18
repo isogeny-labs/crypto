@@ -44,9 +44,10 @@ This map is written before the first H116 Lean declaration.
    recurrence coefficients, so for prime `p>19` that identity alone implies the
    full finite recurrence. The remaining geometric bridge constructs the actual
    normalized isogeny at-infinity series and proves that it satisfies
-   transformed equation (14). The formal-group congruence for `V-1` is a
-   separate endpoint premise unless an existing verified elliptic formal-group
-   theorem is located. A finite reversed numerator/denominator certificate is
+   transformed equation (14). The generic formal-group filtration congruence
+   is now proved against Mathlib's actual `FormalGroup`; identifying the
+   supplied `V-1` map with that formal sum remains a separate elliptic endpoint
+   premise. A finite reversed numerator/denominator certificate is
    now proved sufficient for transformed equation (14), so the map bridge can
    be discharged by a checked polynomial identity rather than a trusted map
    evaluator. One excluded `p=31`, `r=37` Vélu control constructs this
@@ -310,6 +311,53 @@ rejected in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` seals
 the polynomial rescaling step and points to the audited Lean source. The
 control supplies no replacement for the open endpoint row. [pcc:unverified]
 
+## Mathlib formal-group filtration instance gate
+
+1. **Structure above.** The quantified object is Mathlib's
+   `FormalGroup R` from `Mathlib.RingTheory.FormalGroup.Basic`, with underlying
+   bivariate series `F.toPowerSeries`, identity theorem `F.Xzero_eq_X`, and
+   substitution through `MvPowerSeries.HasSubst`. The coordinate endpoint uses
+   the pre-existing H116 `PowerSeriesPrefixEq` and normalized pole bridge.
+2. **Theorems used as stated.** `MvPowerSeries.X_dvd_iff` converts
+   second-variable divisibility into coefficient vanishing;
+   `FormalGroup.Xzero_eq_X` identifies the restriction `F(X,0)`;
+   `MvPowerSeries.subst_sub`, `subst_mul`, and `subst_X` transport the quotient
+   through substitution. `PowerSeriesPrefixEq.add_X_pow_mul` and
+   `leading_X_inv_sq_mul_subst_inv` supply the filtration and pole transfer.
+3. **Object as an instance.** A zero-constant scalar parameter `s` and
+   correction `c` are substituted into the actual Mathlib formal group as
+   `F(s,c)`. If `c=X^m tail`, the resulting series is prefix-equal to `s`
+   below degree `m`; after writing both parameters as `X` times units, an
+   order-`n+1` correction yields an order-`n` normalized pole prefix.
+4. **Assembly probe.** A temporary module importing `H116FiberTrace` and
+   Mathlib's formal-group module checked all four declarations at default
+   heartbeats. A first direct curve-coordinate wrapper timed out during
+   elaboration; replacing it by the generic pole theorem made every component
+   explicit and passed without a limit override. The tracked module then built
+   at default limits.
+5. **Missing components only.** The generic laws no longer assume the desired
+   prefix. The remaining endpoint hypotheses are the actual elliptic
+   identification `V+pi=[t]` in the chosen formal parameter, the local
+   characteristic-`p` formula for `pi`, and the sign/target scaling that turns
+   it into the supplied `V-1` rational map. Parity then translates the
+   `z^(p-1)` normalized boundary to `w^((p-1)/2)`; that translation is not
+   asserted by the generic theorem.
+6. **Inheritance table.** The formal group, identity restriction and
+   substitution algebra are inherited from Mathlib; finite prefix arithmetic
+   and the double-pole loss are inherited from earlier H116 theorems. The only
+   new generic lemma extracts the second-variable quotient from
+   `F(X,0)=X`. No curve equation, endomorphism relation, complexity bound,
+   trusted decision procedure or resource-limit override is introduced.
+   [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `Y` divides `F(X,Y)-X` | generic law, upstream candidate | H116 over Mathlib `FormalGroup` | commutative ring formal group | Mathlib formal-group laws only |
+| `F(s,c)=s+cq` for some `q` | generic assembly | H116 | commutative ring formal group and univariate power series | zero constant coefficients |
+| order-`m` correction preserves the prefix below `m` | generic assembly | H116 | field formal group | `c=X^m tail` and zero constants |
+| order-`n+1` correction preserves normalized pole prefix below `n` | generic assembly | H116 | field formal group and regular outer unit | leading-`X` factorizations and unit constants |
+| actual `V-1` normalized x-ratio prefix | endpoint obligation | future elliptic formal-group owner | ordinary elliptic curve over `F_p` | `V+pi=[t]`, local Frobenius, sign and scaling identifications |
+
 ## Inheritance table
 
 | Operation/law | Inheritance |
@@ -319,7 +367,8 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
 | finite sums and coefficient extraction | Mathlib finite sums plus existing H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
 | field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
 | isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; no Mathlib isogeny object was found, so a finite `N,D` certificate is the checked interface; producing it from the actual kernel and independently validating map semantics remain open |
-| `V+pi=[t]` and `pi(z)=z^p` | H115 algebra plus formal-group instance; lookup pending |
+| formal-group filtration of an `X^m` correction | Mathlib `FormalGroup` plus `FormalGroup.filtered_correction_prefix` and `filtered_pole_prefix`; generic layer proved |
+| `V+pi=[t]` and the actual local `pi` series | elliptic formal-group instance; endpoint identification still pending |
 | radix-six decoder | reuse H115 generic theorem after source import/binding |
 
 The assembly lookup found no ready-made `Derivation K (RatFunc K) (RatFunc K)`

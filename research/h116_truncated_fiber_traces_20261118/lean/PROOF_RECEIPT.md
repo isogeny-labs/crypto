@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-8af7cc31f5ed3749a574d6b76b530108c0528d38fcb004034a82d561e75c14e6  H116FiberTrace.lean
+40ab0cd58dac6de13f43ca0a12e87e1ca1371f5c1c4b11f7cba7d96001ac88aa  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  80 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  84 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -31,10 +31,12 @@ eddb483c58d97a0aab4af93e933272a8f37d6208040be118d6826a5c3202776e  receipts/regul
 378ac3322b032621070229de6c5f6e222ecd31f5729b8d198cd9b5e39282303b  receipts/regular-substitution-audit.log
 b9a7d56d16d41dc867cb768b114d87dd81b1cd3c745b2968adca395e95dca634  receipts/curve-coordinate-build.log
 621d395aacdb96c526881fd73cab63ea937df6f7779cb10d69eca36669e8ac5f  receipts/curve-coordinate-audit.log
+43aa3a63525c4f4249a311b4ace2f04f1510ceb6d73f1666a60913ee6e2b6579  receipts/formal-group-build.log
+4f1d11d86bd8040b77073409c5d5e07f2f75bb18257ef6b9d5f0a5f31b9f4ac4  receipts/formal-group-audit.log
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
-For this 80-theorem checkpoint its mandatory cache-fetch preflight could not
+For the 80-theorem checkpoint its mandatory cache-fetch preflight could not
 complete because the managed 32-GiB workspace had insufficient free space;
 the incomplete task-owned cache was deleted. The same pinned `lake build`
 completed, and the gate's exact `AuditAxioms.lean` auditor passed directly over
@@ -103,8 +105,13 @@ elliptic x-coordinate series is now discharged by
 `WeierstrassCoordinateUnit`: its fixed-point equation forces constant one and
 the regularized affine curve identity. Rescaling proves the target coefficients
 `(a⁴A,a⁶B)`, and double substitution proves the exact target/source identity
-when `a*zNormalized=zScalar`. Proving that this parameter equality comes from
-`V+pi=[t]`, local Frobenius and formal subtraction remains open.
+when `a*zNormalized=zScalar`. The 84-theorem checkpoint additionally imports
+Mathlib's actual `FormalGroup` and proves that `Y` divides `F(X,Y)-X`, that a
+substituted correction factors multiplicatively, and that an `X^m` correction
+preserves the formal parameter prefix below degree `m`. It composes this with
+the leading-`X` pole bridge at one degree less. Instantiating this generic
+result with the actual elliptic `V+pi=[t]`, local Frobenius, sign and scaling
+identifications remains open.
 [pcc:unverified]
 
 The first integration build is retained at

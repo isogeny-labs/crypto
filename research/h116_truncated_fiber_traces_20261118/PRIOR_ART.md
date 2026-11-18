@@ -106,6 +106,15 @@ the pinned Mathlib source. Mathlib supplies ring Frobenius and Weierstrass base
 change, but this search found no elliptic formal-group or Verschiebung instance.
 [pcc:unverified]
 
+The pinned revision does contain the new generic module
+`Mathlib.RingTheory.FormalGroup.Basic`. It defines one-dimensional
+`FormalGroup R` and proves `F.Xzero_eq_X`, `F.zeroX_eq_X`, substitution
+associativity and zero laws. H116 uses that structure directly and derives the
+filtered consequence `Y | F(X,Y)-X`; it does not define a competing formal
+group. The same scoped search still found no theorem instantiating this object
+with a short-Weierstrass elliptic curve and its Frobenius/Verschiebung maps.
+[pcc:unverified]
+
 Milne, *Elliptic Curves* (2006),
 [online text](https://www.jmilne.org/math/Books/ectext6.pdf), PDF SHA-256
 `14a89055a0a7f52b08fad1d53786c9165caba8be837491024b9b210afa384486`,
