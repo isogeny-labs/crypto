@@ -62,3 +62,14 @@ statement still requires the Round A grid's isolation, same-target,
 calibration, rho-step, validation, PCC, and publication gates. Until then the
 historical restricted GHS-weak IC exception remains separate from this pending
 matched-rho re-establishment.
+
+## Test status
+
+The edited standalone source compiled and its source-bound self-test passed.
+The repository-required `cargo test --release --lib` did not compile on the
+unchanged base. Its first attempt found a sparse-checkout omission; after the
+tracked path dependencies were materialized, the second attempt ended with 39
+errors in untouched modules (duplicate definitions, missing included fixtures,
+and mismatched F4 diagnostic APIs). `git diff origin/main -- src Cargo.toml
+Cargo.lock` was empty. The retained summary is `full-test-status.txt`; these
+base failures are not attributed to Round B.

@@ -22,7 +22,10 @@ assertions are implemented. Standalone self-test and the deterministic q=223
 producer control pass; raw records show the same walk and exactly 5,500 fewer
 `fq_mul`, one per `f3_sq`. Research-KB and Conductor executables are
 unavailable. Checkpoint push/gate exited 1 because no upload transport exists,
-so no profile, isolated timing, or frontier run was started.
+so no profile, isolated timing, or frontier run was started. The standalone
+source check passes. The required full release library test reaches unrelated
+base compilation failures after sparse dependencies are materialized; retained
+in `round-b/full-test-status.txt`.
 
 ## Next steps
 1. Commit and push the implementation, raw correctness/count evidence, report,
