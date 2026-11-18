@@ -30,7 +30,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 - [x] Repair main-side CI breakage left by the 2026-11-16 merges: parity lock and IC reference currency (workflow store pulls deferred until the store is repaired) (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4576)
 
-- [ ] Add the pcc CI verdict key (ci-main) to pcc/keyring.json; owner sets PCC_KEYRING_SHA256 and PCC_SIGNING_KEY (claude, started 2026-11-18, branch claude/codebase-assessment-report-fp044d)
+- [x] Add the pcc CI verdict key (ci-main) to pcc/keyring.json (claude, started 2026-11-18, branch claude/codebase-assessment-report-fp044d, PR #4634; the pcc gate fails until the owner sets PCC_KEYRING_SHA256, by design)
 
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
@@ -39,6 +39,8 @@ _(none pinned — set one with `/goal <text>`)_
 - [ ] Autolab rounds 38 to 40 (claude, started 2026-11-17, branch ic-autolab-20261117b): round 39 ratchets `tw2l-x20-j16-n2` at k = 28 (0.944, counted GAE; wall time 1.236x slower; validator disposition validated for the counted claim); open: a second-host replay or human validation, a code-level lever beyond the K = 3 collision floor, and the `hashed-ecdl-tensor` standalone build failure (eight modules with no `mod` line in `lib.rs`)
 
 ## Blocked / questions for the owner
+
+- PR #4634 (pcc CI key): set repository variable `PCC_KEYRING_SHA256` to `21929cc6389f58d0f847912af7f3fbf44e91ca90725965780085353c1322031c` and re-run the pcc `gate` job; set repository secret `PCC_SIGNING_KEY` to the key file handed over in the session.
 
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 
