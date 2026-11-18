@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-b93966fc75b926a94d1fe2ba245bfa674bbd020fc9a8d2b6f04669b92cfefc20  H116FiberTrace.lean
+0415c992d6330ba52fe82b896c9dd86e265abadff32fa9a04fb83810333c09dc  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  175 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  180 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -84,6 +84,9 @@ f5beab595d8df926ce8d0c4cd16d80c35c58d22fd24cb2f618f89f4ec3db9603  receipts/odd-e
 ee6ea7e75626e2699c5ee765246480ec2ec6183de2604b89bdf1a65318c85b34  receipts/scalar-four-bootstrap-build.txt
 fc6bd72d5b93ee2d369243a94342a924ab1a640e60b08f6b5c0006037822a3c1  receipts/scalar-four-bootstrap-full-build.txt
 2d0c1fa8ac87304c62c9473c57727eaba88342d2e89c3834e6a0b20883e2f1a6  receipts/scalar-four-bootstrap-audit.txt
+3aede61bd0d0a8e98614966570d22e58e3145afafbee48099d9ebf57b2621564  receipts/scalar-five-bootstrap-build.txt
+7e627e64916a948ec3a65944f76b62e333d95f03b8a7e2c653cf3765a71fd3f6  receipts/scalar-five-bootstrap-full-build.txt
+883eaa9ccd73b5cedd8a50fa4200a8fe2fafc6981fb0e495552983861db6ec38  receipts/scalar-five-bootstrap-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -382,6 +385,15 @@ sixteen.  This avoids a separate high-degree resultant certificate.  The
 singular `A=B=0` scalar-four pair over `ZMod 5` is proved non-coprime by
 evaluation at zero.  Arbitrary adjacent-EDS coprimality remains open.
 [pcc:unverified]
+
+The 180-theorem checkpoint extends the recurrence bootstrap through scalar
+five.  It proves `Psi3` coprime to `prePsi5`, then `prePsi5` coprime to
+`prePsi6`, assembles `IsCoprime (Phi 5) (PsiSq 5)`, and derives coordinate
+extension degree twenty-five when the characteristic does not divide five.
+Coprimality itself requires only the prior nonsingularity and characteristic-
+two hypotheses, separating cancellation from inseparable degree collapse. A
+singular `A=B=0` control over `ZMod 7` is proved non-coprime. Arbitrary
+adjacent-EDS coprimality remains open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

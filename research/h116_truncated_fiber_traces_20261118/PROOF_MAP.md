@@ -980,6 +980,48 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | scalar-four coordinate extension degree is sixteen | exact degree assembly | H116 | rational function field | same |
 | singular scalar-four pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 5` | none |
 
+## Scalar-five recurrence bootstrap gate
+
+1. **Structure above.** The scalar-five step first reduces
+   `prePsi5=prePsi4*Psi2Sq^2-Psi3^3` modulo `Psi3`; the scalar-four adjacent
+   pair and the odd-parity base certificate prove `Psi3` coprime to
+   `prePsi5`. The even recurrence then gives
+   `prePsi6=Psi3*(prePsi5-prePsi4^2)`. Both surviving factors are coprime to
+   `prePsi5`, so the next adjacent pair follows. Since `PsiSq5=prePsi5^2`,
+   the two adjacent factors assemble scalar-five no-cancellation directly.
+2. **Theorems used as stated.** Mathlib's `prePsi'_odd`, `prePsi'_even`, and
+   `PsiSq_ofNat` supply the exact formulas. The audited scalar-four adjacent
+   pairs and parity theorem provide the base certificates. Coprimality product,
+   power, symmetry and subtract-multiple laws perform the reductions. The
+   generic two-adjacent-factor theorem assembles `Phi5,PsiSq5`; the reduced
+   quotient and exact-degree theorem give degree twenty-five when `5 != 0`.
+3. **Object as an instance.** On every nonsingular short curve outside
+   characteristic two, scalar-five numerator and denominator are coprime.
+   Outside characteristic five as well, the coordinate extension has degree
+   twenty-five. This explicitly separates cancellation from inseparable
+   degree collapse.
+4. **Assembly probe.** Both auxiliary pair derivations, scalar-five assembly,
+   degree endpoint and singular control first elaborated in a temporary
+   importing module. The tracked project then completed all 3,162 build jobs;
+   the exact repository auditor reports
+   `180 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** Exact no-cancellation now holds through scalar
+   five. The proof remains a fixed-depth recurrence bootstrap; an invariant
+   closing arbitrary adjacent indices and any ECDLP runtime conclusion remain
+   open. [pcc:unverified]
+6. **Inheritance table.** EDS identities, coprimality transformations and
+   degree formulas are inherited. H116 supplies their new composition. The
+   singular `A=B=0` scalar-five pair over `ZMod 7` is proved non-coprime by
+   evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `Psi3` is coprime to `prePsi5` | recurrence extraction | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `prePsi5` is coprime to `prePsi6` | recurrence bootstrap | H116 | same | same |
+| `Phi5` is coprime to `PsiSq5` | exact division-polynomial assembly | H116 | same | same |
+| scalar-five coordinate extension degree is twenty-five | exact degree assembly | H116 | rational function field | same plus `5 != 0` |
+| singular scalar-five pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 7` | none |
+
 ## Adjacent-torsion root-semantics gate
 
 1. **Structure above.** Over an algebraically closed field, two polynomials

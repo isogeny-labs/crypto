@@ -1448,6 +1448,133 @@ theorem shortWeierstrassScalarFour_singular_control :
     WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂, WeierstrassCurve.b₄,
     WeierstrassCurve.b₆, WeierstrassCurve.b₈] at heval
 
+/-- The scalar-five recurrence reduces modulo `Psi3` to the already-proved
+scalar-four adjacent and parity certificates. -/
+theorem shortWeierstrass_prePsiThreeFive_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime W.Ψ₃ (W.preΨ' 5) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have h34 : IsCoprime W.Ψ₃ W.preΨ₄ :=
+    shortWeierstrass_prePsiThreeFour_isCoprime A B hdisc h2
+  have h3two : IsCoprime W.Ψ₃ W.Ψ₂Sq :=
+    shortWeierstrassPsiThree_PsiTwoSq_isCoprime A B hdisc h2
+  have h5 : W.preΨ' 5 = W.preΨ₄ * W.Ψ₂Sq ^ 2 - W.Ψ₃ ^ 3 := by
+    rw [show 5 = 2 * (0 + 2) + 1 by norm_num, WeierstrassCurve.preΨ'_odd]
+    simp
+  dsimp only
+  rw [h5]
+  apply IsCoprime.symm
+  rw [show W.preΨ₄ * W.Ψ₂Sq ^ 2 - W.Ψ₃ ^ 3 =
+    (W.preΨ₄ * W.Ψ₂Sq ^ 2) - (W.Ψ₃ ^ 2) * W.Ψ₃ by ring,
+    IsCoprime.sub_mul_right_left_iff]
+  exact h34.symm.mul_left (h3two.symm.pow_left)
+
+/-- The even EDS recurrence then bootstraps the adjacent scalar-five/six
+auxiliary pair. -/
+theorem shortWeierstrass_prePsiFiveSix_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.preΨ' 5) (W.preΨ' 6) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have h45 : IsCoprime W.preΨ₄ (W.preΨ' 5) :=
+    shortWeierstrass_prePsiFourFive_isCoprime A B hdisc h2
+  have h35 : IsCoprime W.Ψ₃ (W.preΨ' 5) :=
+    shortWeierstrass_prePsiThreeFive_isCoprime A B hdisc h2
+  have h6 : W.preΨ' 6 = W.Ψ₃ * (W.preΨ' 5 - W.preΨ₄ ^ 2) := by
+    rw [show 6 = 2 * (0 + 3) by norm_num, WeierstrassCurve.preΨ'_even]
+    simp
+    ring
+  dsimp only
+  rw [h6]
+  apply IsCoprime.symm
+  rw [IsCoprime.mul_left_iff]
+  constructor
+  · exact h35
+  · rw [show W.preΨ' 5 - W.preΨ₄ ^ 2 =
+      1 * W.preΨ' 5 - W.preΨ₄ ^ 2 by ring,
+      IsCoprime.mul_sub_right_left_iff]
+    exact h45.pow_left
+
+/-- Scalar five has no numerator/denominator cancellation on every
+nonsingular short curve outside characteristic two. -/
+theorem shortWeierstrassScalarFive_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.Φ 5) (W.ΨSq 5) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have h45 : IsCoprime W.preΨ₄ (W.preΨ' 5) :=
+    shortWeierstrass_prePsiFourFive_isCoprime A B hdisc h2
+  have h56 : IsCoprime (W.preΨ' 5) (W.preΨ' 6) :=
+    shortWeierstrass_prePsiFiveSix_isCoprime A B hdisc h2
+  have hden5 : W.ΨSq (5 : ℤ) = W.preΨ' 5 ^ 2 := by
+    rw [show (5 : ℤ) = ((5 : ℕ) : ℤ) by norm_num,
+      WeierstrassCurve.ΨSq_ofNat]
+    norm_num
+  have hplus : IsCoprime (W.preΨ (6 : ℕ)) (W.ΨSq (5 : ℕ)) := by
+    rw [WeierstrassCurve.preΨ_ofNat]
+    change IsCoprime (W.preΨ' 6) (W.ΨSq (5 : ℤ))
+    rw [hden5]
+    exact h56.symm.pow_right
+  have hminus : IsCoprime (W.preΨ (4 : ℕ)) (W.ΨSq (5 : ℕ)) := by
+    rw [WeierstrassCurve.preΨ_ofNat, WeierstrassCurve.preΨ'_four]
+    change IsCoprime W.preΨ₄ (W.ΨSq (5 : ℤ))
+    rw [hden5]
+    exact h45.pow_right
+  convert
+    (shortWeierstrassPhi_isCoprime_of_adjacent A B hdisc h2 5 hplus hminus) using 1
+
+/-- The reduced scalar-five x-coordinate quotient has coordinate extension
+degree exactly twenty-five outside characteristics two and five. -/
+theorem shortWeierstrassScalarFive_extension_degree
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) (h5 : (5 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    let xMap : RatFunc F :=
+      algebraMap (Polynomial F) (RatFunc F) (W.Φ 5) /
+        algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 5)
+    Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 25 := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  let xMap : RatFunc F :=
+    algebraMap (Polynomial F) (RatFunc F) (W.Φ 5) /
+      algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 5)
+  have h5z : ((5 : ℤ) : F) ≠ 0 := by
+    norm_num
+    exact h5
+  have hcoprime : IsCoprime (W.Φ 5) (W.ΨSq 5) :=
+    shortWeierstrassScalarFive_isCoprime A B hdisc h2
+  have hdenom : W.ΨSq 5 ≠ 0 := W.ΨSq_ne_zero h5z
+  have hextension := reducedRationalQuotient_extension_degree
+    (W.Φ 5) (W.ΨSq 5) hdenom hcoprime
+  have hdegrees := scalarMultiplicationXMap_exact_degrees W 5 h5z
+  change Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 25
+  rw [hextension]
+  norm_num at hdegrees ⊢
+  omega
+
+/-- Singular scalar-five control: at `A=B=0`, numerator and denominator both
+vanish at zero and hence are not coprime. -/
+theorem shortWeierstrassScalarFive_singular_control :
+    let W : WeierstrassCurve (ZMod 7) := WeierstrassCurve.mk 0 0 0 0 0
+    ¬IsCoprime (W.Φ 5) (W.ΨSq 5) := by
+  let _ : Fact (Nat.Prime 7) := Fact.mk (by norm_num)
+  let W : WeierstrassCurve (ZMod 7) := WeierstrassCurve.mk 0 0 0 0 0
+  dsimp only
+  intro h
+  have heval := h.map (Polynomial.evalRingHom (0 : ZMod 7))
+  norm_num [WeierstrassCurve.Φ, WeierstrassCurve.ΨSq,
+    WeierstrassCurve.preΨ, preNormEDS, preNormEDS',
+    WeierstrassCurve.Ψ₃, WeierstrassCurve.preΨ₄,
+    WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂, WeierstrassCurve.b₄,
+    WeierstrassCurve.b₆, WeierstrassCurve.b₈] at heval
+
 /-- Over an algebraically closed field, absence of a common root is an exact
 certificate that two polynomials are coprime. -/
 theorem polynomial_isCoprime_of_no_common_root
@@ -3628,6 +3755,11 @@ theorem rationalMap_separation_strict_control :
 #print axioms shortWeierstrassScalarFour_isCoprime
 #print axioms shortWeierstrassScalarFour_extension_degree
 #print axioms shortWeierstrassScalarFour_singular_control
+#print axioms shortWeierstrass_prePsiThreeFive_isCoprime
+#print axioms shortWeierstrass_prePsiFiveSix_isCoprime
+#print axioms shortWeierstrassScalarFive_isCoprime
+#print axioms shortWeierstrassScalarFive_extension_degree
+#print axioms shortWeierstrassScalarFive_singular_control
 #print axioms polynomial_isCoprime_of_no_common_root
 #print axioms adjacentIntegerTorsion_eq_zero
 #print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics
