@@ -189,6 +189,113 @@ fn invert_public(q: Point, m: &mut FieldMeter) -> Result<Point, String> {
     let y = m.mul(y_image, factor);
     Ok(Some((x, y)))
 }
+
+fn pseudo_remainder(mut a: Poly, b: &[u64], m: &mut FieldMeter) -> Poly {
+    // Field pseudo-division: no leading-coefficient inversions.
+    a = trim(a);
+    assert!(!b.is_empty(), "zero pseudo-divisor");
+    while a.len() >= b.len() {
+        let lead_a = *a.last().unwrap();
+        let lead_b = *b.last().unwrap();
+        assert_ne!(lead_b, 0, "untrimmed pseudo-divisor");
+        let shift = a.len() - b.len();
+        for coeff in &mut a {
+            *coeff = m.mul(*coeff, lead_b);
+        }
+        for (j, &bj) in b.iter().enumerate() {
+            a[j + shift] = sub(a[j + shift], m.mul(lead_a, bj));
+        }
+        a = trim(a);
+    }
+    a
+}
+fn gcd_fraction_free(mut a: Poly, mut b: Poly, m: &mut FieldMeter) -> Poly {
+    a = trim(a);
+    b = trim(b);
+    while !b.is_empty() {
+        let next = pseudo_remainder(a, &b, m);
+        a = b;
+        b = next;
+    }
+    a // Unnormalized: a degree-one gcd has root -a[0] / a[1].
+}
+fn batch_nonzero_inverses(values: &[u64], m: &mut FieldMeter) -> Result<Vec<u64>, String> {
+    if values.is_empty() {
+        return Ok(Vec::new());
+    }
+    if values.contains(&0) {
+        return Err("batch inverse contains zero".into());
+    }
+    let mut prefix = Vec::with_capacity(values.len());
+    let mut product = 1;
+    for &v in values {
+        prefix.push(product);
+        product = m.mul(product, v);
+    }
+    let mut suffix = m.inv(product);
+    let mut inverses = vec![0; values.len()];
+    for i in (0..values.len()).rev() {
+        inverses[i] = m.mul(suffix, prefix[i]);
+        suffix = m.mul(suffix, values[i]);
+    }
+    Ok(inverses)
+}
+fn invert_public_pseudo_batch(qs: &[Point], m: &mut FieldMeter) -> Result<Vec<Point>, String> {
+    // Input is strictly public Q. No source scalar, point table, or signed leaf
+    // enumeration is used. Two inversions for all nonidentity Q, not per Q.
+    let mut entries = Vec::new();
+    let mut leading = Vec::new();
+    for (index, &q) in qs.iter().enumerate() {
+        let Some((xi, yi)) = q else { continue; };
+        if !on_target(q, m) {
+            return Err("off-curve or out-of-range codomain point".into());
+        }
+        let f = inverse_cubic(xi, m);
+        let mut xp_minus_x = pow_mod(vec![0, 1], P, &f, m);
+        if xp_minus_x.len() < 2 {
+            xp_minus_x.resize(2, 0);
+        }
+        xp_minus_x[1] = sub(xp_minus_x[1], 1);
+        let g = gcd_fraction_free(f, xp_minus_x, m);
+        if g.len() != 2 || g[1] == 0 {
+            return Err("fraction-free inverse fibre did not have a linear gcd".into());
+        }
+        entries.push((index, xi, yi, g[0]));
+        leading.push(g[1]);
+    }
+    let lead_inverses = batch_nonzero_inverses(&leading, m)?;
+    let mut coords = Vec::with_capacity(entries.len());
+    let mut denominators = Vec::with_capacity(entries.len());
+    for (j, &(index, xi, yi, g0)) in entries.iter().enumerate() {
+        let x = m.mul(sub(0, g0), lead_inverses[j]);
+        let h = sub(x, U);
+        if h == 0 {
+            return Err("fraction-free inverse reached geometric kernel pole".into());
+        }
+        let h2 = m.mul(h, h);
+        let h3 = m.mul(h2, h);
+        let tau_term = m.mul((2 * TAU) % P, h);
+        let first = m.mul(x, h2);
+        let xh2 = m.mul(xi, h2);
+        if sub(add(add(first, tau_term), (4 * V) % P), xh2) != 0 {
+            return Err("fraction-free x failed cubic verification".into());
+        }
+        let denominator = sub(sub(h3, tau_term), (8 * V) % P);
+        if denominator == 0 {
+            return Err("fraction-free ordinate denominator is zero".into());
+        }
+        coords.push((index, x, yi, h3));
+        denominators.push(denominator);
+    }
+    let den_inverses = batch_nonzero_inverses(&denominators, m)?;
+    let mut out = vec![None; qs.len()];
+    for (j, &(index, x, yi, h3)) in coords.iter().enumerate() {
+        let y = m.mul(yi, m.mul(h3, den_inverses[j]));
+        out[index] = Some((x, y));
+    }
+    Ok(out)
+}
+
 fn forward(q: Point, u: u64, tau: u64, v: u64, m: &mut FieldMeter) -> Point {
     q.map(|(x, y)| {
         let h_inverse = m.inv(sub(x, u));
@@ -233,6 +340,14 @@ fn panel() -> serde_json::Value {
         .map(|&q| invert_public(q, &mut direct_meter).expect("unique linear factor"))
         .collect();
     let direct_ns = start.elapsed().as_nanos();
+    let mut batch_meter = FieldMeter::default();
+    let start_batch = Instant::now();
+    let batch_points = invert_public_pseudo_batch(&targets, &mut batch_meter)
+        .expect("fraction-free batch inverse");
+    let batch_ns = start_batch.elapsed().as_nanos();
+    assert_eq!(batch_points, source_points, "pseudo-gcd batch vs original gcd");
+    assert_eq!(batch_meter.inversions, 2, "256 full inverses require two batched inversions");
+    assert_eq!(direct_meter.inversions, 1024, "original four per-point inverses");
 
     // Dual inverse reference: normalized dual gives (9*x([3]P),27*y([3]P)).
     // Undo scaling then multiply by 1/3 modulo n using original EC arithmetic.
@@ -274,6 +389,11 @@ fn panel() -> serde_json::Value {
         ar.scalar(PRIME31, INV3, back3)
     }).collect();
     let dual_ba_ns = dual_ba_start.elapsed().as_nanos();
+    let mut batch_ba_meter = FieldMeter::default();
+    let start_batch_ba = Instant::now();
+    let batch_ba = invert_public_pseudo_batch(&targets, &mut batch_ba_meter)
+        .expect("reversed fraction-free batch inverse");
+    let batch_ba_ns = start_batch_ba.elapsed().as_nanos();
     let mut direct_ba_meter = FieldMeter::default();
     let direct_ba_start = Instant::now();
     let direct_ba: Vec<Point> = targets.iter().map(|&q| {
@@ -282,6 +402,9 @@ fn panel() -> serde_json::Value {
     let direct_ba_ns = direct_ba_start.elapsed().as_nanos();
     assert_eq!(dual_ba, source_points, "BA dual inverse replay");
     assert_eq!(direct_ba, source_points, "BA Frobenius cubic replay");
+    assert_eq!(batch_ba, source_points, "BA pseudo-gcd batch replay");
+    assert_eq!(batch_ba_meter.multiplications, batch_meter.multiplications);
+    assert_eq!(batch_ba_meter.inversions, batch_meter.inversions);
     assert_eq!(direct_ba_meter.multiplications, direct_meter.multiplications);
     assert_eq!(direct_ba_meter.inversions, direct_meter.inversions);
     assert_eq!(dual_ba_meter.multiplications, dual_meter.multiplications);
@@ -309,6 +432,10 @@ fn panel() -> serde_json::Value {
     assert_eq!(neg_source, ar.neg(PRIME31, source_points[0]));
     let wrong_y = (E2.g.1 + 1) % P;
     assert!(invert_public(Some((E2.g.0, wrong_y)), &mut certificate).is_err());
+    assert_eq!(invert_public_pseudo_batch(&[None, neg_q], &mut certificate).unwrap(),
+               vec![None, neg_source]);
+    assert!(invert_public_pseudo_batch(&[Some((E2.g.0, wrong_y))], &mut certificate).is_err());
+    assert_eq!(invert_public_pseudo_batch(&[], &mut certificate).unwrap(), Vec::<Point>::new());
     let (direct_fp_multiplications, direct_fp_inversions) =
         (direct_meter.multiplications, direct_meter.inversions);
     let dual_native_muls = after.fp_multiplications - before.fp_multiplications;
@@ -333,6 +460,11 @@ fn panel() -> serde_json::Value {
         "dual_agreement":targets.len(),
         "negation_identity_bad_point_controls":3,
         "direct_inverse_fp_multiplications":direct_fp_multiplications,
+        "fraction_free_batch_matches":batch_points.len(),
+        "fraction_free_batch_fp_multiplications":batch_meter.multiplications,
+        "fraction_free_batch_fp_inversions":batch_meter.inversions,
+        "fraction_free_batch_stage_ns_diagnostic":batch_ns.to_string(),
+        "fraction_free_batch_stage_ba_ns_diagnostic":batch_ba_ns.to_string(),
         "direct_inverse_fp_inversions":direct_fp_inversions,
         "dual_setup_fp_multiplications":setup_meter.multiplications,
         "dual_setup_fp_inversions":setup_meter.inversions,
@@ -361,6 +493,8 @@ mod tests {
         let v = panel();
         assert_eq!(v["public_targets"], 256);
         assert_eq!(v["dual_agreement"], 256);
+        assert_eq!(v["fraction_free_batch_matches"], 256);
+        assert_eq!(v["fraction_free_batch_fp_inversions"], 2);
         assert_eq!(v["full_index_calculus_logs_solved"], 0);
     }
     #[test]
