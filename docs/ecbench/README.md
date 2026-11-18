@@ -291,6 +291,37 @@ no record's `automorphisms_used` exceeds the `A` available. The *reference* is a
 rho: `rho.negation` on a prime curve, `rho.signed_frobenius` on a Koblitz
 curve. `ecbench table` divides every arm by it.
 
+### Paired prime-curve execution order
+
+`measurement.order: "paired_curves_v1"` selects a versioned execution and
+algorithm-seed law for `planted_shared` prime-field workloads with u64
+subgroup orders. It requires an even measured-round count and at least two
+distinct curve workloads for every subgroup order. Six measured rounds and
+one warm-up retain the usual repeated-measurement minimum.
+
+The planner groups by `(target_index,r)`, in ascending order. Each group
+uses listed curve order on even measured rounds and reversed curve order
+on odd measured rounds. Arms reverse by the same parity. Warm-ups alternate
+separately, so the first measured round starts in listed order.
+
+The seed is the first eight SHA-256 bytes, big-endian, of canonical JSON
+with domain `ecbench.paired_curves_v1.algorithm_seed` and integer parts
+`[measurement.seed,r,target_seed,target_index,seed_round]`. Warm-ups use
+the separate `ecbench.paired_curves_v1.warmup_seed` domain. The existing
+`algorithm_seed_round` option selects absolute or measured indices;
+`"measured_index"` keeps measured streams independent of warm-up count.
+Same-order/scalar-index workloads share RNG inputs across models and arms.
+This does not make coordinate-hashed walks identical.
+
+This mode preserves individual cold single-target executions, workload
+identities, solver implementations and accounting. The spec identity binds
+the new order. Historical scheduling modes keep their seed/order laws.
+Equal subgroup order does not certify an isogeny or conductor gap; those
+need external evidence. The ordinary `compare` command still compares
+methods within workloads: endpoint statistics require an explicit transport
+join. Scheduling alone does not establish registration, wall admission,
+scalar timing or a measured endpoint comparison.
+
 ## 4. Names and identities
 
 Every object is named by a hash of what it is. A label never enters an

@@ -265,7 +265,7 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
     }
     if spec.measurement.order == Order::PairedCurvesV1
         && (spec.workloads.target_kind != TargetKind::PlantedShared
-            || spec.measurement.rounds % 2 != 0)
+            || !spec.measurement.rounds.is_multiple_of(2))
     {
         return Err(
             "paired_curves_v1 requires planted_shared and an even measured-round count".into(),

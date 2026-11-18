@@ -1,6 +1,7 @@
 // Public integration controls link the actual library without legacy cfg(test).
 pub use crypto_lib::ecc;
 #[path = "prime_mont4.rs"]
+#[allow(unused_imports)] // Its crate-root reexport is unused only in this nested wrapper.
 mod legacy_wide_tests;
 
 mod paired_schedule {
