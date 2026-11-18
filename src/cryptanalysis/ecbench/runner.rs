@@ -50,6 +50,8 @@ use crate::cryptanalysis::ecbench::record::{
     UNIT,
 };
 use crate::cryptanalysis::ecbench::signals;
+#[cfg(test)]
+use crate::cryptanalysis::ecbench::spec::plan;
 use crate::cryptanalysis::ecbench::spec::{Execution, Plan, Spec};
 use crate::cryptanalysis::ecbench::workload::{Workload, FLOOR_RULE_V2};
 
@@ -2029,7 +2031,7 @@ mod watchdog_record_tests {
           "arms":[{"name":"bsgs","role":"reference","method":{"id":"bsgs.textbook"}}],
           "measurement":{"rounds":1,"warmup":0,"seed":1,"isolation_required":"L0"}
         }"#).unwrap();
-        let p = super::spec::plan(spec).unwrap();
+        let p = plan(spec).unwrap();
         let ex = &p.executions[0];
         let arm = &p.arms[ex.arm];
         let w = &p.workloads[ex.workload];
@@ -2403,7 +2405,7 @@ mod robustness_tests {
     #[test]
     fn an_interrupted_child_is_not_a_crash_and_carries_no_result() {
         let spec = Spec::from_json(SPEC).unwrap();
-        let p = super::spec::plan(spec).unwrap();
+        let p = plan(spec).unwrap();
         let ex = &p.executions[0];
         let arm = &p.arms[ex.arm];
         let w = &p.workloads[ex.workload];
@@ -2509,7 +2511,7 @@ mod diagnostic_acceptance_tests {
     fn assemble_censors_complete_synthetic_late_report() {
         // Build only a tiny known-answer unit fixture; never invoke any solver.
         let spec=Spec::from_json(r#"{"schema":"ecbench.spec/v1","label":"diagnostic assembly fixture","workloads":{"curves":[{"kind":"prime_explicit","p":113,"a":19,"b":2,"group_order":112,"r":7,"gx":52,"gy":110}],"targets_per_curve":1,"target_seed":7,"target_kind":"planted"},"arms":[{"name":"fixture","role":"reference","method":{"id":"bsgs.textbook"}}],"measurement":{"rounds":1,"warmup":0,"seed":1,"isolation_required":"L0"}}"#).unwrap();
-        let p = super::spec::plan(spec).unwrap();
+        let p = plan(spec).unwrap();
         let ex = &p.executions[0];
         let arm = &p.arms[ex.arm];
         let w = &p.workloads[ex.workload];
