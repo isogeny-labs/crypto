@@ -1,0 +1,21 @@
+digraph evidence {
+  graph [rankdir=LR, pad=0.10, nodesep=0.18, bgcolor="white",
+         label="Exact synthetic comparisons  |  PCC-unverified", labelloc=t, fontname="DejaVu Sans", fontsize=13];
+  node [shape=plain, fontname="DejaVu Sans", fontsize=10];
+  probes [label=<
+    <TABLE BORDER="0" CELLBORDER="0" CELLPADDING="3">
+      <TR><TD COLSPAN="3"><B>Estimator variance at six probes</B></TD></TR>
+      <TR><TD>Three fixed positions</TD><TD>Uniform</TD><TD>Weighted plant</TD></TR>
+      <TR><TD ALIGN="LEFT">Fixture A</TD><TD BGCOLOR="#E5EFF8">39 / 361</TD><TD BGCOLOR="#B8D7ED">29 / 361</TD></TR>
+      <TR><TD ALIGN="LEFT">Fixture B</TD><TD BGCOLOR="#B8D7ED">39 / 361</TD><TD BGCOLOR="#E5EFF8">107 / 361</TD></TR>
+    </TABLE>>];
+  ranks [label=<
+    <TABLE BORDER="0" CELLBORDER="0" CELLPADDING="3">
+      <TR><TD COLSPAN="4"><B>Rank at selected work cutoffs</B></TD></TR>
+      <TR><TD>Charged work</TD><TD>Total rank</TD><TD>Primary A</TD><TD>Primary B</TD></TR>
+      <TR><TD>10</TD><TD>2</TD><TD>1</TD><TD>0</TD></TR>
+      <TR><TD>15</TD><TD>3</TD><TD BGCOLOR="#BDE4C8">2</TD><TD>1</TD></TR>
+      <TR><TD>21</TD><TD>4</TD><TD BGCOLOR="#BDE4C8">2</TD><TD BGCOLOR="#BDE4C8">2</TD></TR>
+    </TABLE>>];
+  probes -> ranks [style=invis];
+}

@@ -19,7 +19,7 @@ use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
 use crypto_lib::cryptanalysis::koblitz_strong_rho::{
-    RawPointG, RhoField, RhoScalar, StrongRhoCharges, StrongRhoG, StrongRhoParams,
+    NarrowRhoScalar, RawPointG, RhoField, RhoScalar, StrongRhoCharges, StrongRhoG, StrongRhoParams,
 };
 use crypto_lib::cryptanalysis::semaev_decomp::Gf2_128;
 use num_bigint::BigUint;
@@ -228,6 +228,12 @@ impl ExactMulCtx {
         };
         debug_assert!(reduced < m);
         reduced as u64
+    }
+}
+
+impl NarrowRhoScalar for ExactScalar {
+    fn to_u128(self) -> u128 {
+        u128::from(self.0)
     }
 }
 

@@ -642,3 +642,9 @@ pub fn projective_degree_nine_witness_controls() -> Value {
 #[path = "prime31_rr9_barycentric_core.rs"]
 mod barycentric_core;
 pub fn public_b8_barycentric_controls() -> Value { barycentric_core::run() }
+
+// #4604: Matrix-free RR9 D9 full-rank negative gate, no supports in candidate.
+#[path = "prime31_rr9_d9_blackbox_core.rs"]
+mod d9_blackbox_core;
+pub fn rr9_d9_blackbox_controls(index: usize) -> Value { d9_blackbox_core::run(index) }
+pub fn rr9_d9_blackbox_smoke() -> Value { d9_blackbox_core::smoke() }
