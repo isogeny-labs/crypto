@@ -290,7 +290,8 @@ fn invert_public_pseudo_batch(qs: &[Point], m: &mut FieldMeter) -> Result<Vec<Po
     let den_inverses = batch_nonzero_inverses(&denominators, m)?;
     let mut out = vec![None; qs.len()];
     for (j, &(index, x, yi, h3)) in coords.iter().enumerate() {
-        let y = m.mul(yi, m.mul(h3, den_inverses[j]));
+        let scale = m.mul(h3, den_inverses[j]);
+        let y = m.mul(yi, scale);
         out[index] = Some((x, y));
     }
     Ok(out)
