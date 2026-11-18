@@ -61,7 +61,8 @@ independent-verifier SHA-256 is
 
 ## Lean mechanism and evidence boundary
 
-The tracked Lean module now imports Mathlib's actual `FormalGroup` and proves:
+The tracked Lean module now imports Mathlib's actual `FormalGroup` and proves
+the following statements. [pcc:unverified]
 
 1. `Y` divides `F(X,Y)-X` for every one-dimensional formal group over a
    commutative ring;

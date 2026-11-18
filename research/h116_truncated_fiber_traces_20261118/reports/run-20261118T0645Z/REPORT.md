@@ -31,7 +31,8 @@ one fixed cell, not runtime scaling evidence. [pcc:unverified]
 # Proof and experiment chain
 
 ![The generic filtration mechanism is proved; the actual elliptic
-Verschiebung/Frobenius identification remains an endpoint.](frobenius_bridge.png){width=99%}
+Verschiebung/Frobenius identification remains an endpoint.
+[pcc:unverified]](frobenius_bridge.png){width=99%}
 
 The Lean source imports Mathlib's actual one-dimensional `FormalGroup`. It
 proves `Y | F(X,Y)-X`, transports that quotient through substitution, proves
