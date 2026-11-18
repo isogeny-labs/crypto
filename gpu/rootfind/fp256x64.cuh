@@ -22,6 +22,9 @@
 #define GPU_ROOTFIND_FP256X64_CUH
 
 #include <stdint.h>
+#if defined(__x86_64__) && !defined(__CUDACC__)
+#include <x86intrin.h>  /* CPU carry-flag chain; nvcc/device stays generic */
+#endif
 #include "fp64.cuh"   /* RF_HD / RF_BIG / rf_mulhi64 */
 
 struct U256x64 {
@@ -70,6 +73,15 @@ RF_HD uint64_t u256_adc(U256x64 &r, const U256x64 &a, const U256x64 &b) {
 
 /* r = a - b, returns borrow (0/1). */
 RF_HD uint64_t u256_sbb(U256x64 &r, const U256x64 &a, const U256x64 &b) {
+#if defined(__x86_64__) && !defined(__CUDACC__)
+    unsigned char bw = 0;
+    for (int i = 0; i < 4; i++) {
+        unsigned long long diff;
+        bw = _subborrow_u64(bw, a.v[i], b.v[i], &diff);
+        r.v[i] = (uint64_t)diff;
+    }
+    return bw;
+#else
     uint64_t bw = 0;
 #pragma unroll
     for (int i = 0; i < 4; i++) {
@@ -81,6 +93,7 @@ RF_HD uint64_t u256_sbb(U256x64 &r, const U256x64 &a, const U256x64 &b) {
         bw = b1 | b2;
     }
     return bw;
+#endif
 }
 
 RF_HD void u256_cmov(U256x64 &r, const U256x64 &a, uint64_t flag) {
@@ -100,9 +113,13 @@ RF_HD int u256_is_zero(const U256x64 &a) {
     return (a.v[0] | a.v[1] | a.v[2] | a.v[3]) == 0;
 }
 
-/* acc = cur + a*b + carry, as (hi, lo).  The 64x64->128 product is the
- * one place the device and host differ (see rf_mulhi64). */
+/* acc = cur + a*b + carry, as (hi, lo).
+ * Host: let the compiler lower a single 128-bit multiply/accumulate into
+ * MUL/ADC instructions.  This is equivalent to the explicit carry chain.
+ * Device: preserve the original 64-bit implementation and register use.
+ * The maximum sum is 2^128-1, so the wide host accumulator cannot wrap. */
 RF_HD void u64_mac(uint64_t cur, uint64_t a, uint64_t b, uint64_t carry, uint64_t &lo, uint64_t &hi) {
+#ifdef __CUDA_ARCH__
     uint64_t plo = a * b;
     uint64_t phi = rf_mulhi64(a, b);
     uint64_t s1 = plo + cur;
@@ -111,6 +128,11 @@ RF_HD void u64_mac(uint64_t cur, uint64_t a, uint64_t b, uint64_t carry, uint64_
     phi += (s2 < s1);
     lo = s2;
     hi = phi;
+#else
+    const unsigned __int128 sum = (unsigned __int128)a * b + cur + carry;
+    lo = (uint64_t)sum;
+    hi = (uint64_t)(sum >> 64);
+#endif
 }
 
 /* --- field operations ------------------------------------------------ */
@@ -124,6 +146,8 @@ RF_HD U256x64 fp256_add(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
 }
 
 RF_HD U256x64 fp256_sub(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
+    /* Retain the original candidate-select implementation. Actual-header
+     * CI benchmarks found masked-modulus addition regressed on GCC -O2. */
     U256x64 d, t;
     uint64_t bw = u256_sbb(d, a, b);
     u256_adc(t, d, f.p);
@@ -132,8 +156,20 @@ RF_HD U256x64 fp256_sub(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
 }
 
 RF_HD U256x64 fp256_neg(const Fp256Ctx &f, const U256x64 &a) {
+#ifdef __CUDA_ARCH__
     U256x64 z = {{0, 0, 0, 0}};
     return fp256_sub(f, z, a);
+#else
+    /* For canonical a != 0, (-a mod p) == p-a.  Zero is the sole
+     * exception: mask it to zero without a data-dependent branch.
+     * Avoid the general sub(0,a) conditional-modulus pass. */
+    U256x64 d;
+    u256_sbb(d, f.p, a);
+    const uint64_t nz = (uint64_t)((a.v[0] | a.v[1] | a.v[2] | a.v[3]) != 0);
+    const uint64_t mask = (uint64_t)0 - nz;
+    for (int i = 0; i < 4; ++i) d.v[i] &= mask;
+    return d;
+#endif
 }
 
 /* SOS Montgomery multiplication, identical phase structure to
@@ -160,6 +196,8 @@ RF_HD U256x64 fp256_mul(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
     /* phase 2: reduction */
 #pragma unroll
     for (int i = 0; i < 4; i++) {
+#ifdef __CUDA_ARCH__
+        /* Device path is unchanged until GPU occupancy/throughput validation. */
         uint64_t m = t[i] * f.pinv;
         uint64_t carry = 0;
 #pragma unroll
@@ -169,6 +207,26 @@ RF_HD U256x64 fp256_mul(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
             t[i + j] = lo;
             carry = hi;
         }
+#else
+        /* P-256 specialization: pinv=1, p[0]=B-1, p[2]=0, B=2^64.
+         * Therefore m=t[i], and t[i]+m*(B-1)=m*B exactly:
+         * eliminate the first wide MAC, set the cleared limb to zero,
+         * and use m as the next carry.  The zero p[2] limb also needs
+         * just a single add-with-carry, not a wide multiplication.
+         * fp256_ctx_p256() is the only constructor of this field. */
+        const uint64_t m = t[i];
+        uint64_t carry = m, lo, hi;
+        t[i] = 0;
+        u64_mac(t[i + 1], m, 0x00000000ffffffffull, carry, lo, hi);
+        t[i + 1] = lo;
+        carry = hi;
+        const uint64_t sum = t[i + 2] + carry;
+        carry = sum < t[i + 2];
+        t[i + 2] = sum;
+        u64_mac(t[i + 3], m, 0xffffffff00000001ull, carry, lo, hi);
+        t[i + 3] = lo;
+        carry = hi;
+#endif
         /* propagate through t[i+4 .. 8] */
 #pragma unroll
         for (int k = i + 4; k < 9; k++) {
@@ -189,18 +247,68 @@ RF_HD U256x64 fp256_sqr(const Fp256Ctx &f, const U256x64 &a) { return fp256_mul(
 
 RF_HD U256x64 fp256_to_mont(const Fp256Ctx &f, const U256x64 &a) { return fp256_mul(f, a, f.r2); }
 
+/* Conversion from Montgomery form only needs REDC(a), not the generic
+ * 4x4 schoolbook product a * {1,0,0,0} followed by REDC.  Keep the
+ * CUDA path unchanged pending GPU validation.  The host specialization
+ * uses exactly the sparse P-256 reduction rounds of fp256_mul. */
 RF_HD U256x64 fp256_from_mont(const Fp256Ctx &f, const U256x64 &a) {
+#ifdef __CUDA_ARCH__
     U256x64 one = {{1, 0, 0, 0}};
     return fp256_mul(f, a, one);
+#else
+    uint64_t t[9] = {
+        a.v[0], a.v[1], a.v[2], a.v[3], 0, 0, 0, 0, 0
+    };
+    for (int i = 0; i < 4; ++i) {
+        /* pinv=1, p[0]=2^64-1, p[2]=0 for P-256. */
+        const uint64_t m = t[i];
+        uint64_t carry = m, lo, hi;
+        t[i] = 0;
+        u64_mac(t[i + 1], m, 0x00000000ffffffffull, carry, lo, hi);
+        t[i + 1] = lo;
+        carry = hi;
+        const uint64_t sum = t[i + 2] + carry;
+        carry = sum < t[i + 2];
+        t[i + 2] = sum;
+        u64_mac(t[i + 3], m, 0xffffffff00000001ull, carry, lo, hi);
+        t[i + 3] = lo;
+        carry = hi;
+        for (int k = i + 4; k < 9; ++k) {
+            const uint64_t s = t[k] + carry;
+            carry = s < t[k];
+            t[k] = s;
+        }
+    }
+    U256x64 r, s;
+    for (int i = 0; i < 4; ++i) r.v[i] = t[i + 4];
+    const uint64_t bw = u256_sbb(s, r, f.p);
+    u256_cmov(r, s, (t[8] & 1) | (bw ^ 1));
+    return r;
+#endif
 }
 
-/* Fermat inversion a^(p-2), left-to-right square-and-multiply over the
- * fixed public exponent: ~256 squarings + ~128 multiplications, no
- * divergence.  (The Rust side uses a cmov Montgomery ladder for
- * constant time; we need neither constant time nor its 2x cost.) */
+/* Repeated squarings by a public constant; the compiler specializes
+ * the fixed calls in the host inversion chain. */
+RF_HD U256x64 fp256_sqr_n(const Fp256Ctx &f, U256x64 x, int n) {
+    for (int i = 0; i < n; ++i) x = fp256_sqr(f, x);
+    return x;
+}
+
+/* Invert a Montgomery residue using the fixed public exponent p-2.
+ * CUDA deliberately retains the original uniform exponentiation.
+ *
+ * Host: exploit p-2's 32-bit words
+ *   FFFFFFFF 00000001 00000000 00000000
+ *   00000000 FFFFFFFF FFFFFFFF FFFFFFFD.
+ * Build x32=a^(2^32-1) and b32=a^(2^32-3), then assemble the eight
+ * words by squaring and multiplying by the precomputed blocks.  This
+ * chain needs 255 squarings and 13 field multiplications, versus the
+ * previous radix-16 host chain's 255 squarings and 35 multiplications.
+ * The exponent is fixed/public, and inv(0) remains zero. */
 RF_BIG U256x64 fp256_inv(const Fp256Ctx &f, const U256x64 &a) {
+#ifdef __CUDA_ARCH__
     U256x64 e = f.p;
-    e.v[0] -= 2;   /* p[0] = 2^64 - 1, no borrow */
+    e.v[0] -= 2;
     U256x64 acc = f.one;
 #pragma unroll 1
     for (int i = 255; i >= 0; i--) {
@@ -208,20 +316,41 @@ RF_BIG U256x64 fp256_inv(const Fp256Ctx &f, const U256x64 &a) {
         if ((e.v[i >> 6] >> (i & 63)) & 1) acc = fp256_mul(f, acc, a);
     }
     return acc;
+#else
+    const U256x64 a2 = fp256_sqr(f, a);
+    const U256x64 x2 = fp256_mul(f, a2, a);
+    const U256x64 x4 = fp256_mul(f, fp256_sqr_n(f, x2, 2), x2);
+    const U256x64 x8 = fp256_mul(f, fp256_sqr_n(f, x4, 4), x4);
+    const U256x64 x16 = fp256_mul(f, fp256_sqr_n(f, x8, 8), x8);
+    const U256x64 x24 = fp256_mul(f, fp256_sqr_n(f, x16, 8), x8);
+    const U256x64 x28 = fp256_mul(f, fp256_sqr_n(f, x24, 4), x4);
+    const U256x64 x30 = fp256_mul(f, fp256_sqr_n(f, x28, 2), x2);
+    const U256x64 b32 = fp256_mul(f, fp256_sqr_n(f, x30, 2), a);
+    const U256x64 x32 = fp256_mul(f, b32, a2);
+    U256x64 acc = fp256_mul(f, fp256_sqr_n(f, x32, 32), a);
+    acc = fp256_sqr_n(f, acc, 96);
+    acc = fp256_mul(f, fp256_sqr_n(f, acc, 32), x32);
+    acc = fp256_mul(f, fp256_sqr_n(f, acc, 32), x32);
+    return fp256_mul(f, fp256_sqr_n(f, acc, 32), b32);
+#endif
 }
 
+/* Montgomery simultaneous inversion; for n>0 omit the three redundant
+ * products with Montgomery one. scratch[0] is intentionally unused. */
 RF_HD void fp256_batch_inv(const Fp256Ctx &f, U256x64 *x, int n, U256x64 *scratch) {
-    U256x64 acc = f.one;
-    for (int i = 0; i < n; i++) {
+    if (n <= 0) return;
+    U256x64 acc = x[0];
+    for (int i = 1; i < n; i++) {
         scratch[i] = acc;
         acc = fp256_mul(f, acc, x[i]);
     }
     U256x64 inv_acc = fp256_inv(f, acc);
-    for (int i = n - 1; i >= 0; i--) {
+    for (int i = n - 1; i > 0; i--) {
         U256x64 xi = x[i];
         x[i] = fp256_mul(f, inv_acc, scratch[i]);
         inv_acc = fp256_mul(f, inv_acc, xi);
     }
+    x[0] = inv_acc;
 }
 
 #endif /* GPU_ROOTFIND_FP256X64_CUH */

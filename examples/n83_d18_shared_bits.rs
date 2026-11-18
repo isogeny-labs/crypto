@@ -137,7 +137,7 @@ fn run(input: &Path, output: &Path) -> Result<()> {
             );
             let actual = model
                 .constrain_frobenius_orbit_summands_with_encoding(
-                    &reps, 300_000, 8_000_000, encoding,
+                    &reps, encoding, 300_000, 8_000_000,
                 )
                 .map_err(|e| format!("domain installation: {e:?}"))?;
             let after = (
