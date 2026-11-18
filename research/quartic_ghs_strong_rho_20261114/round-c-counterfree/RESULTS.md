@@ -8,8 +8,10 @@ The merged GHS strong-rho arithmetic now has one const-generic implementation.
 fast specialization removes `FastF3`'s `FieldCounts` read/modify/write hooks at
 optimization time. It deliberately retains `NativeCounts` in the walk hot
 loop, so “counter-free” in this round means field-counter-free only.
-The analyzer rejects any record carrying `count_authoritative=false` before
-modeled-cost parsing, preventing fast-mode zero totals from entering M-eq.
+The analyzer requires `count_authoritative` to be boolean `true` when present
+and rejects false, null, numeric and string values before modeled-cost parsing.
+Legacy counted records without the field remain accepted. This prevents
+fast-mode zero totals or malformed authority markers from entering M-eq.
 
 ## Deterministic evidence
 

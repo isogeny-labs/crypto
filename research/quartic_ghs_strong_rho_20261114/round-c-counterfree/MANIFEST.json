@@ -28,11 +28,12 @@
     "removed_in_fast_mode": "FastF3 FieldCounts Cell read/modify/write hooks",
     "retained_in_fast_mode": "NativeCounts walk diagnostics",
     "shared_math_implementation": true,
-    "modeled_cost_guard": "analyze.py rejects count_authoritative=false"
+    "modeled_cost_guard": "analyze.py requires boolean true when count_authoritative is present; absent legacy counted records default to true"
   },
   "evidence": {
     "paired_raw": "q223-paired.jsonl",
     "selftest": "selftest.txt",
+    "analyzer_authority_gate": "analyzer-test.txt",
     "optimized_ir_gate": "ir-gate.txt",
     "validation": "validation.txt",
     "whole_tree_test_status": "full-test-status.txt"
