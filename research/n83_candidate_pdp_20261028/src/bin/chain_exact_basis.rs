@@ -999,7 +999,7 @@ fn exact_run(root: &Path, replay: bool) {
         assert_eq!(read(&out.join("summary.json")), summary);
         save(
             &root.join("replay.json"),
-            &json!({"cases":84,"all_passed":errors==0,"summary_sha256":sha(&fs::read(out.join("summary.json")).unwrap())}),
+            &json!({"cases":cases.len(),"all_passed":errors==0,"summary_sha256":sha(&fs::read(out.join("summary.json")).unwrap())}),
         );
     } else {
         save(&out.join("summary.json"), &summary);

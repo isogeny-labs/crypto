@@ -1,0 +1,185 @@
+{
+  "branch": "lane/vieta-speedup-20261117",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--cpus",
+        "4",
+        "--out",
+        "research/vieta_coset_rust_20261115/speedup-20261117/profiles/isolation.jsonl",
+        "--",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "120",
+        "bash",
+        "research/vieta_coset_rust_20261115/speedup-20261117/profile-native.sh",
+        "/workspace/scratch/vieta-speedup-profile-bin",
+        "research/vieta_coset_rust_20261115/speedup-20261117/profiles/raw-20261117T0709Z"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T07:10:20+00:00",
+      "wall_s": 17.011
+    }
+  ],
+  "commit": "508fc656bfdf1ad002caaa7850465b1f2a63f564",
+  "commit_dirty": false,
+  "created_utc": "2026-11-17T07:09:26+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "2b48a61969ab",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261117T0709Z-vieta-speedup-cpu-profile",
+  "metrics": [],
+  "problem": "vieta-component-profile",
+  "raw": [
+    {
+      "bytes": 2196,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/PROFILE_FINDINGS.md",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1e/1e9dac6b54197d134c52bd62eac6f19ab5785f852b3417fcb68df438bb10070e",
+      "sha256": "1e9dac6b54197d134c52bd62eac6f19ab5785f852b3417fcb68df438bb10070e",
+      "uploaded": false
+    },
+    {
+      "bytes": 6880,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/RESULTS.md",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/da/dac6fbf20e78554464c0b285d155282b60d476b355a3abb8b3b6403aa3eed07e",
+      "sha256": "dac6fbf20e78554464c0b285d155282b60d476b355a3abb8b3b6403aa3eed07e",
+      "uploaded": false
+    },
+    {
+      "bytes": 83087,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/cold-ratios.svg",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/00/001c964127adb5ea3a7550d310f9b92cbcf3feb710c453743b589791b4b08b00",
+      "sha256": "001c964127adb5ea3a7550d310f9b92cbcf3feb710c453743b589791b4b08b00",
+      "uploaded": false
+    },
+    {
+      "bytes": 6919,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/export-profile.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/de/de65f7ce11b6e676ce779d932e3a5de10694e59d89f11f94deabbb82b8ef1958",
+      "sha256": "de65f7ce11b6e676ce779d932e3a5de10694e59d89f11f94deabbb82b8ef1958",
+      "uploaded": false
+    },
+    {
+      "bytes": 124,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/driver.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/85/8534df8b168ad606a6775150e04be507bd2386a2487eca18c0dbea24a60aca45",
+      "sha256": "8534df8b168ad606a6775150e04be507bd2386a2487eca18c0dbea24a60aca45",
+      "uploaded": false
+    },
+    {
+      "bytes": 2739,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/half-functions.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4c/4c18a020c2d5ccad65d29be811b35da59c49465aa23a60dccf6520d984b03d01",
+      "sha256": "4c18a020c2d5ccad65d29be811b35da59c49465aa23a60dccf6520d984b03d01",
+      "uploaded": false
+    },
+    {
+      "bytes": 1133,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/half-header.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8b/8b56894abe98ef822bad61269e2494ed1442b51d8974f6f6a5e218d0355744b8",
+      "sha256": "8b56894abe98ef822bad61269e2494ed1442b51d8974f6f6a5e218d0355744b8",
+      "uploaded": false
+    },
+    {
+      "bytes": 5,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/half-set-check.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "uploaded": false
+    },
+    {
+      "bytes": 1979,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/half-statistics.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/53/53ebb75fa04c87dd1919d5495ff806c0728ea5c0192d83d23dfab70de596c5f5",
+      "sha256": "53ebb75fa04c87dd1919d5495ff806c0728ea5c0192d83d23dfab70de596c5f5",
+      "uploaded": false
+    },
+    {
+      "bytes": 1860,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f2/f2abc69dcbc4080e57c12ef6e3f1f9bd2b393136c1162e32c6af121e55052e1d",
+      "sha256": "f2abc69dcbc4080e57c12ef6e3f1f9bd2b393136c1162e32c6af121e55052e1d",
+      "uploaded": false
+    },
+    {
+      "bytes": 1868,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/newton-functions.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c5/c58ededcf2387b514ff7f180723b66c1bd49aa48c3cc382ee7bbfed08a31f992",
+      "sha256": "c58ededcf2387b514ff7f180723b66c1bd49aa48c3cc382ee7bbfed08a31f992",
+      "uploaded": false
+    },
+    {
+      "bytes": 1137,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/newton-header.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fb/fb3f0aa86402273ac2a7d2a3d1e986f56b2e9c480702b2ffd816673190f0d8d2",
+      "sha256": "fb3f0aa86402273ac2a7d2a3d1e986f56b2e9c480702b2ffd816673190f0d8d2",
+      "uploaded": false
+    },
+    {
+      "bytes": 5,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/newton-set-check.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "uploaded": false
+    },
+    {
+      "bytes": 1981,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/newton-statistics.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/85/8526d2d1a4aba8aa523f5a344b63daf51c6b11a195fe1ab2ec490a6fdb35293d",
+      "sha256": "8526d2d1a4aba8aa523f5a344b63daf51c6b11a195fe1ab2ec490a6fdb35293d",
+      "uploaded": false
+    },
+    {
+      "bytes": 1852,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/attribution-20261117T0709Z/newton.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/67/672717768f92a65fc427ba24c17355b8bcdf8b42c55a4dbaf7e0093132ce9850",
+      "sha256": "672717768f92a65fc427ba24c17355b8bcdf8b42c55a4dbaf7e0093132ce9850",
+      "uploaded": false
+    },
+    {
+      "bytes": 2307,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/profiles/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/db/dbac612e9f5f9225cd4c26151d6fc1e86b6aceca5dbf357ca8b6dfd4b7f10f46",
+      "sha256": "dbac612e9f5f9225cd4c26151d6fc1e86b6aceca5dbf357ca8b6dfd4b7f10f46",
+      "uploaded": false
+    },
+    {
+      "bytes": 13540,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/protocol-profile.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/73047d76ccf6369c6d91a971ea2054e69164466a53f8ac1286efb926c385b548",
+      "sha256": "73047d76ccf6369c6d91a971ea2054e69164466a53f8ac1286efb926c385b548",
+      "uploaded": false
+    },
+    {
+      "bytes": 96543,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/report.pdf",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/347e11123ce9164b3717dae6f04cf179b825729c135f55bdfc6c9b7b5aa18804",
+      "sha256": "347e11123ce9164b3717dae6f04cf179b825729c135f55bdfc6c9b7b5aa18804",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "vieta-speedup-cpu-profile",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

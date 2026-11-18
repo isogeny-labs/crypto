@@ -1,0 +1,11 @@
+# Portability-family subgroup admission audit
+
+Frozen same four Fermatquartics X4+Y4=Z4over97,257,509,1009. They were selected for section controls, not generic subgroup hardness. Class: mathematical applicability audit/engineering exact arithmetic, not novelty or speedup result.
+
+Explicit involutions changing Xsign,Ysign,orboth give genus1quotients E0:s²=1−t⁴ twice, E1:s²=t⁴+1 once. Maps on affine opens: (t,s)=(y,x²),(x,y²),(x/y,1/y²). Quotient by the full signgroup is the genus0conic U²+V²=1. Pullbacks of the three regular differentials are proportional to x dx/y³,y dx/y³,dx/y³, hence independent. Standard Jacobian decomposition yields J_C isogenous overFp to E0²×E1. This geometric step is a readable argument with primary-source context, not automatically proved by pointcounts/code or a fullLeanformalization.
+
+One once-only audit: count E0/E1by Legendre sums plus correct0/2pointsatinfinity, count C independently by allaffinepointpairs plus infinity, check each quotient's equation at allpointswhere defined and differential substitution identities, require #C=p+1−2t0−t1. Derive #J=#E0²#E1using the stated isogeny argument; factor exactly and printlargestprime, checking ellipticHassebound. No extension-fieldbruteforce or claim that Fpcountalone certifies fullLpolynomial. Mark family inadmissible for genericell~q³scalingcomparison irrespectiveofactualnumericoutcome; no field/curve substitution.
+
+Source/lock/binaryhash commit, S3checkpoint/gate BEFORE execution. Single RUN.txt/stderr/exit, stopfirstfailure, retainoutputs/no silentrerun. No DLP/timing/new10xclaim. Existing sectioncontrols remain valid; their family cannot be promoted to a representative genericDLPcohort. ActualF127source-to-quotient instance is distinct and unaffected by this family's decomposition.
+
+Sharedcorpus searched first. Primarycontext: Fité–LorenzoGarcía–Sutherland2018, https://link.springer.com/article/10.1007/s40687-018-0162-0 (Fermat/Klein twists and elliptic-cube structure). Our exactFpquotientmodels/maps above fix field-of-definition issues independently; do not infer rational decomposition for arbitrarytwists from geometricisogeny alone. Known alternative transfer context: Smith2008/2009 https://arxiv.org/abs/0806.2995 ; no Smithmapexecutedhere.

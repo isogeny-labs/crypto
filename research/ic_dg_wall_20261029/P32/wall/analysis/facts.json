@@ -1,0 +1,75 @@
+{
+  "audit": {
+    "checks": {
+      "arms": true,
+      "env_class": true,
+      "executions": true,
+      "host_hash": true,
+      "plan_hash": true,
+      "record_count": true,
+      "records": true,
+      "records_hash": true,
+      "replays": true,
+      "session_complete": true,
+      "spec_id": true,
+      "workloads": true
+    },
+    "ok": true,
+    "problems": [],
+    "records": 1680,
+    "records_bound": true,
+    "regraded": true,
+    "replay_detail_counts": {
+      "identical": 1440
+    },
+    "replays_reproduced_true": 1440,
+    "replays_total": 1440,
+    "schema": "ecbench.audit/v1",
+    "session_id": "ECBS1h353fffc21b5e",
+    "session_status": "complete",
+    "verified_records": 1680
+  },
+  "audit_path": "audit.json",
+  "binary_sha256_file": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c  /usr/local/bin/ecbench",
+  "binary_sha256_file_first_field_equals_build_info_ecbench_sha256": true,
+  "binary_used": "/dev/shm/isolab-build/ecbench",
+  "binary_used_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+  "binary_used_sha256_equals_build_info_ecbench_sha256": true,
+  "binary_used_source": "dev-shm-build",
+  "build_info": {
+    "architecture": "linux/amd64",
+    "built_at": "2026-10-29T07:29:58Z",
+    "default_features": false,
+    "ecbench_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+    "rustflags": "-C target-cpu=x86-64",
+    "source_repository": "https://github.com/aburan28/crypto",
+    "source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+    "target": "x86_64-unknown-linux-musl"
+  },
+  "build_info_path": "build-info.json",
+  "control_comparison_present": true,
+  "job_exit": {
+    "exit_code": 0,
+    "job_name": "ic-dgw-p32-20261029",
+    "node_name": "ip-10-84-188-77.us-east-2.compute.internal",
+    "pod_uid": "0a2c6cc8-9100-4049-b2d0-5dafe097721d"
+  },
+  "job_exit_path": "job-exit.json",
+  "l2_gate": {
+    "accepted": true,
+    "below_l2": [],
+    "executions": 1680,
+    "grades": [
+      {
+        "count": 1680,
+        "level": "L2"
+      }
+    ],
+    "invalid_outcomes": [],
+    "required": "L2"
+  },
+  "l2_gate_path": "l2-gate.json",
+  "session_spec_equals_input_spec": true,
+  "source_revision_equals_want": true
+}

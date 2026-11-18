@@ -1,0 +1,114 @@
+{
+  "schema": "jv-canonical-graded-source-review/v1",
+  "created": "2026-11-14T16:02:02.461173+00:00",
+  "scope": "Actual canonical graded pieces of the frozen first literal Joux–Vitse homogeneous F101 source ideal I in P=F101[x,y,h]. Proves I is homogeneous for Mathlib standard grading. DegreeMap is the actual quotient map P→P/I restricted to Mathlib degree-d homogeneous submodule; its kernel is exactly I intersected with that domain. Canonical piece P_d/ker(DegreeMap) is linearly equivalent to its actual image; image equals span of precisely matching-degree vectors of the previously proved actual quotient basis, derived from checked actual multiplication tables and monomial/homogeneous induction. Exact canonical degree-piece dimensions1,3,3,1,0 thereafter, zero iff d≥4; total scalar dimension/length8 retained and direct graded-dimension-versus-total-dimension inequality. No ideal-homogeneity/basis/Hilbert/GB/regularity/native-output conclusion is supplied as a premise; unchanged old actual-object proof reused. Closes the finite canonical per-degree identification, not generic JV Assumption2, FGHR genericity/n≥3, internalF4 degree/refinement, whole-curve order/scalar relations or a general graded-module Hilbert polynomial theory. Mathematical source and prior work credited, no novelty or qualified-source refutation. Independent native written-header check is procedural, not kernel parser/hash/execution refinement. Standard foundations/default settings; no holes/custom axioms/native proof evaluation/global flags/raised limits/waivers/new cryptographic experiment/paid compute/agent upload.",
+  "primary": {
+    "url": "https://www-fourier.ujf-grenoble.fr/~viva/research/articles/DLFq5.pdf",
+    "sha256": "6f3268a0ef8c50b51a79f8b64deff0c60374228a827bea73d4e590284cb68377",
+    "bytes": 466920,
+    "pdf_pages": 21,
+    "read_scope": "Selected fullp7literal F101^3 example/coordinate equations and fullp9Assumption2/generic-vs-empty-affine/degree discussion read and visually inspected. No fullpaper reading or source-claim refutation. Earlier primary read scopes credited in unchanged studies."
+  },
+  "known_method": "Canonical homogeneous quotient components P_d/(I∩P_d), standard firstisomorphism and a homogeneous basis; unchanged actual JV quotient/basis/multiplication source proof reused, no native GB/Hilbert oracle.",
+  "kb": "Fresh status/exactJVgradedHilbert query/negativecanonical-imagegap query/exact old theorem query unavailable/no MCP. Prior/primary/official fallback completed before new code. Conductor unavailable127.",
+  "immutable_references": [
+    {
+      "path": "research/jv_hilbert_audit_20261113/sources.json",
+      "commit": "06cb452e025b2a43f623a27e7ec4de0421ab050c",
+      "bytes": 7892,
+      "sha256": "2d6fddce91d93047f3f5fe7f57f992d27e3182bb47222b1e40b96e8ce9a21e91"
+    },
+    {
+      "path": "research/jv_hilbert_audit_20261113/verification.json",
+      "commit": "06cb452e025b2a43f623a27e7ec4de0421ab050c",
+      "bytes": 1829,
+      "sha256": "50c9fce84e18eb93cd50ac652e521e4f25ed93f8f50cc82161bc93e4875f09a1"
+    },
+    {
+      "path": "research/jv_hilbert_audit_20261113/lean/QuotientBasis.lean",
+      "commit": "06cb452e025b2a43f623a27e7ec4de0421ab050c",
+      "bytes": 9044,
+      "sha256": "fce18061d53ae6d02800947e9602a0312f82e0058c7488919f00e9fd27c32666"
+    },
+    {
+      "path": "research/jv_source_field_audit_20261113/sources.json",
+      "commit": "06cb452e025b2a43f623a27e7ec4de0421ab050c",
+      "bytes": 8052,
+      "sha256": "1772e402a3587648fa863bd9c8277871840355e34fa0b65f0f71c322406d2840"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/sources.json",
+      "commit": "06cb452e025b2a43f623a27e7ec4de0421ab050c",
+      "bytes": 13060,
+      "sha256": "60af6e57785ed50bef82680d86cf61031ccb19ebdabb94a37bd3465ae7d9026f"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/lean/BindingProbe.lean",
+      "commit": "06cb452e025b2a43f623a27e7ec4de0421ab050c",
+      "bytes": 8775,
+      "sha256": "6f8540089cd34c2f30cab620a7c9520ecec17415fe0541cef476b2fb0f416f11"
+    },
+    {
+      "path": "tools/pcc/pcc.py",
+      "commit": "06cb452e025b2a43f623a27e7ec4de0421ab050c",
+      "bytes": 80120,
+      "sha256": "5e1a97036633b9798adc39aded657708decb244ca9ed98e4a41408be9ac17010"
+    }
+  ],
+  "official_mathlib": {
+    "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "sources": [
+      {
+        "path": "Mathlib/RingTheory/MvPolynomial/Homogeneous.lean",
+        "sha256": "b39c0dfe5de107efdb5ec74c13e248777ba5d8d0acf9d37e363d9b2159a6148f"
+      },
+      {
+        "path": "Mathlib/RingTheory/MvPolynomial/WeightedHomogeneous.lean",
+        "sha256": "8b4377fe0e85e65f68fa96c15a0563578421c6e9c5d7eed279a43c1c729d47bc"
+      },
+      {
+        "path": "Mathlib/RingTheory/GradedAlgebra/Basic.lean",
+        "sha256": "71d4054cc702ce7d589e4e50fcbe97bb2a7d6e31ecfa50cc1d8a24178c9648e4"
+      },
+      {
+        "path": "Mathlib/RingTheory/GradedAlgebra/Homogeneous/Ideal.lean",
+        "sha256": "87557525af044fe216f35f0f310d7e3254a8078e217f95a1c1e7e1ae040b1413"
+      },
+      {
+        "path": "Mathlib/LinearAlgebra/Isomorphisms.lean",
+        "sha256": "fa74ae549f0a2e0fe1f7d98aa94950490c7a7a086ab4c50134cf6db1713c54fe"
+      },
+      {
+        "path": "Mathlib/LinearAlgebra/Dimension/Constructions.lean",
+        "sha256": "401fc11924868d9527228d691c2753ee482c65812899c7ceaff8df981c1b8cec"
+      },
+      {
+        "path": "Mathlib/RingTheory/Polynomial/HilbertPoly.lean",
+        "sha256": "79ab4a14772b0273da741a75561fda09fd3623f9ffb04dcd2e480cad397b4250"
+      }
+    ],
+    "grading_instance": "Mathlib explicitly prescribes attribute[localinstance]MvPolynomial.gradedAlgebra; used locally in canonical/main declarations, not an added mathematical premise.",
+    "hilbert_poly_scope": "Mathlib HilbertPoly explicitly TODOs general graded-module Hilbert polynomials; current theorem uses canonical degree-piece dimensions, no nonexistent generic HilbertPoly API assumed."
+  },
+  "native_summary": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "binding": "288fa232f61b729eee2a64e17f2741efcf7c144c019684d0bc676e5fcd2db8b6",
+  "attempts": "01Pi-one/typealias Fintype;02empty-index competing finite instance;03dependent subtype rewrite and intentionally nonglobal grading instance;04auxiliary iff tactic;05fullpass. Complete states/logs/exits retained. Legacy-module advisories retained for unchanged source compatibility; no flags/limits/waivers.",
+  "actual_canonical_kernel_proved": true,
+  "actual_source_ideal_homogeneous": true,
+  "graded_image_equal_matching_basis_span": true,
+  "canonical_degree_piece_function_proved": true,
+  "generic_JV_assumption_refuted": false,
+  "internal_F4_degree_refinement_proved": false,
+  "general_graded_module_Hilbert_polynomial_proved": false,
+  "novelty_claim": false,
+  "canonical_corpus_promoted": false,
+  "new_native_cryptographic_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

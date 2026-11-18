@@ -1,0 +1,33 @@
+# Proposed full-isogeny construction from a rational reference divisor
+
+Update:the formal/global construction and source evaluator pass their declared checks,including the public bridge. All26 actual kernel witnesses now pass and the exact heights support the degree27/polarization3 argument;see [POLARIZED_QUOTIENT.md](POLARIZED_QUOTIENT.md),PCC-20261116-3f440b,PCC-20261116-ce4a7b and PCC-20261116-8559fc. Generic transpose-dual execution and individual descent remain open. The rest of this file preserves the original design notes. [pcc:unverified]
+
+Design notes,2026-11-16. This is not an executed map or a proof of the generic isogeny. Sources: Tian arXiv:2007.03172 section4.3,especially its coefficient-by-coefficient differential reconstruction and Remark4.4 on changing the target divisor reference;existing exact candidate differential and the successful degree6 elliptic backmap. KB unavailable. Freeze an implementation/control protocol before affected data.
+
+The candidate derivative D=sqrt(s)*M0 is already available over Fp. At the source hyperelliptic infinity,phi(0)=0. Choose a known effective degree3 divisor Eref on the base-field quartic,with three retained Fp points of distinct x and noncollinear support. Represent the formal image by E(z) with [E(z)-Eref]=phi([P(z)-infinity]). Then E(0)=Eref is a known regular Abel-map seed over Fp. This avoids needing the unknown finite-point Kummer inverse merely to start the differential construction. It also avoids the auxiliary Fp24 origin frame.
+
+Use the exact source odd model Y^2=h(X),monic degree7. At infinity take X=z^-2,Y=z^-7*w(z),where w(0)=1,w^2=1+h6*z^2+...+h0*z^14. In the native basis X^j*dX/(2Y),the source velocities are -z^4/w,-z^2/w,-1/w. Multiply by D to obtain velocities for the target canonical basis (x,y,1)*dx/F_y.
+
+Maintain the effective divisor as U(z,T)=T^3+u2*T^2+u1*T+u0,V(z,T)=v2*T^2+v1*T+v0 in the cubic algebra. Solve for H(T)=h0+h1*T+h2*T^2 using
+
+sum Trace(canonical_i(T,V)*T^k)*h_k = target_velocity_i.
+
+Set dx=F_y(T,V)*H modU,dy=-F_x(T,V)*H modU. The coefficient equations are
+
+U_z=-(U_T*dx) modU,V_z=(dy-V_T*dx) modU.
+
+All coefficients and the known seed can be Fp. The trace3 matrix is invertible at the chosen noncollinear/distinct-x seed. Build its rational scalar operations as a static DAG. At order n,evaluate addition/product/inverse coefficients topologically,using convolutions against previously known coefficients,and integrate to set input u_(n+1),v_(n+1). This gives an online coefficient recurrence rather than recomputing full series at every order. Keep the native field arithmetic and exact denominator controls.
+
+Recover the three elementary symmetric x-functions from U and the three y-functions from the characteristic polynomial of multiplication by V. Under the candidate polarized3-isogeny identification,each has poles bounded by four theta translates on the target,whose pullback to the source curve has degree36. This bound is a hypothesis to justify in the frozen construction protocol,not an observed outcome. A safe hyperelliptic fraction ansatz is (A(X)+B(X)*Y)/C(X),with degA,degC<=36,degB<=32. At infinity,multiply by z^72:the equation becomes f(z)*Cbar(z^2)=Abar(z^2)+z*Bbar(z^2)*w(z),linear in107 coefficients. A proposed224-term series gives192 training and32 unused coefficients. Preserve failures and never silently raise these bounds.
+
+Global acceptance must recover the pairing of x/y support coordinates,not just two independent multisets. Work over the source function field Fp(X)[Y]/(Y^2-h) and the recovered cubic U(T). Compute the gcd in the target y-variable of F_C(T,y) and the recovered y-characteristic polynomial;require a linear relation and recover V(T),with exact nonunit splitting if needed. Verify the complete quartic incidence and characteristic data symbolically. Source function-field elements can use (a+bY)/c with native polynomial gcd normalization.
+
+The resulting correspondence would give a curve map H->J(C) based at infinity,and therefore a Jacobian homomorphism. It still needs actual recorded-kernel checks,field/Frobenius,addition,degree/polarization and dual composition[3]. Degree/pole bounds cannot be asserted merely from a formal fit. The existing kernel points live over Fp8;use their closed divisor algebras and native target arithmetic rather than assuming rational support. A transpose correspondence may supply the dual,but this is an implementation proposal only.
+
+Do not replace the pending full-isogeny requirement with the successful elliptic-subgroup map. Continue the public-class transfer and projected descent independently.
+
+Possible kernel check after a global correspondence exists:three independently spanned recorded K generators suffice for a homomorphism. Push each closed source divisor of degree d to a target effective divisor of degree3d using norm polynomials in its source coordinate algebra. Test linear equivalence to d*Eref directly. A cubic through d*Eref has residual degree12-3d;then a cubic through that residual plus the mapped3d-divisor supplies a small Riemann--Roch principal-divisor test. This could avoid full target group arithmetic over Fp8 for the kernel checks. Include an actual3-torsion point outside K as a negative control. These are proposals requiring explicit chart/multiplicity handling and a frozen test contract.
+
+Possible dual implementation:transpose the recovered curve correspondence. A generic target point should have a degree9 source fiber if the polarized identification is correct;this degree is to be checked,not assumed as an outcome. Recover its hyperelliptic source ideal by original-field elimination and reduce with the existing Cantor arithmetic. Seed-reference target points can contribute source infinity;retain that multiplicity while reducing their finite part. Check dual composition[3] on independent source classes,preferably by a generic function-field identity as well as finite fixtures. The degree/polarization argument remains required even if these proposed tests pass.
+
+A useful original-field bridge control is phi(pi^*G)=the already executed f^*G,and likewise Q. Use the actual existing source Mumford pullback:it can have degree3 because the raw degree2 fiber is shifted by the rational branch class. Do not discard that shift. A degree3 source divisor maps to a target effective degree9 divisor minus3*Eref. Add a common auxiliary3-divisor for an effective12 KM input;the rational reference3*Eref has multiplicity3 at each of its three points,within the existing jet constructor's supported bound. This is a proposed independent class comparison,not a completed result.

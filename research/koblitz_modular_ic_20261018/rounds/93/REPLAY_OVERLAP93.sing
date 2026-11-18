@@ -1,0 +1,32 @@
+proc require93r(int ok,string tag){if(!ok){print("REPLAY93_FATAL "+tag);exit;}}
+string saved93r=read("rr-pid50.sing");
+int start93r=find(saved93r,"ring inverseBaseCertificate50=");
+require93r(start93r>0,"PID_HEADER");
+execute(saved93r[start93r,size(saved93r)-start93r+1]);
+setring inverseBaseCertificate50;
+matrix B093r=matrix(basis50);poly F093r=commonDenominator50;
+ring replayField93=(2,u),(c),dp;
+map replayMap93=inverseBaseCertificate50,u;
+matrix Br93=replayMap93(B093r);poly Fr93=replayMap93(F093r);
+execute(read("overlap93.sing"));
+require93r(nrows(C93)==32 && ncols(C93)==7 && nrows(W93)==32 && ncols(W93)==7,"MATRIX_SHAPE");
+require93r(Br93*C93==Fr93*W93,"FULL_MODULE_PRODUCT");
+matrix expected93[32][7];
+expected93[1,1]=1;expected93[1,2]=u;expected93[17,3]=1;
+expected93[1,4]=u;expected93[17,4]=1;
+expected93[1,5]=u+u^2;expected93[17,5]=1;
+expected93[1,6]=1+u+u^2;expected93[17,6]=u;
+expected93[1,7]=1+u+u^2+u^3;expected93[17,7]=u;
+require93r(W93==expected93,"NAMED_FUNCTIONS_MISMATCH");
+int col93r;int row93r;int checked93r=0;
+matrix bad93r=C93;bad93r[1,1]=bad93r[1,1]+1;
+require93r(Br93*bad93r!=Fr93*W93,"CORRUPTION_ACCEPTED");
+for(col93r=1;col93r<=7;col93r++){
+ for(row93r=1;row93r<=32;row93r++){
+  require93r(C93[row93r,col93r]==leadcoef(C93[row93r,col93r]) && denominator(leadcoef(C93[row93r,col93r]))==1,"NONPOLYNOMIAL_COORDINATE");
+  checked93r=checked93r+1;
+ }
+}
+print("REPLAY93_RESULT named_members=7 polynomial_coordinates="+string(checked93r)+" full_product=1 corruption=1");
+print("REPLAY93_ALL_CHECKS_PASS");
+quit;

@@ -1,0 +1,50 @@
+short=0;option(redSB);
+// Two independently computed chart module lengths must match the actual
+// diagonal-transition Euler-characteristic difference.
+int planeWeightSum50=0;int refinedWeightSum50=0;int i50;int j50;
+for(i50=0;i50<32;i50++){planeWeightSum50=planeWeightSum50+4*i50;}
+for(i50=0;i50<16;i50++){for(j50=0;j50<2;j50++){refinedWeightSum50=refinedWeightSum50+4*i50+2*j50;}}
+int expectedLength50=planeWeightSum50-refinedWeightSum50;
+if(expectedLength50!=992){ERROR("DEFECT50_WEIGHT_SUM");quit;}
+ring defectFinite50=2,(t,u),wp(4,1);
+map finiteCoefficients50=relativeFinite50,t,0,u;
+ideal finiteCoefficientValues50=finiteCoefficients50(relativeIdeal50);
+poly finiteA50=finiteCoefficientValues50[2];
+poly finiteB50=finiteCoefficients50(relativeB50);
+ideal finiteDefect50=finiteA50,finiteB50;ideal finiteStd50=std(finiteDefect50);
+int finiteLength50=vdim(finiteStd50);
+if(finiteLength50<128 || size(reduce(finiteDefect50,finiteStd50))!=0){ERROR("DEFECT50_FINITE_SOURCE_LENGTH");quit;}
+print("DEFECT50_STAGE finite_length="+string(finiteLength50)+" infinity_begin=true");
+link out50="ASCII:w defect-lengths50.sing";open(out50);
+write(out50,"ring defectFiniteCertificate50=2,(t,u),wp(4,1);ideal finiteDefect50;ideal finiteStd50;int finiteLength50="+string(finiteLength50)+";");
+for(i50=1;i50<=size(finiteDefect50);i50++){write(out50,"finiteDefect50["+string(i50)+"]="+string(finiteDefect50[i50])+";");}
+for(i50=1;i50<=size(finiteStd50);i50++){write(out50,"finiteStd50["+string(i50)+"]="+string(finiteStd50[i50])+";");}
+close(out50);
+ring defectInfinity50=2,(T,z),wp(4,1);
+map infinityCoefficients50=relativeInfinity50,T,0,z;
+ideal infinityCoefficientValues50=infinityCoefficients50(relativeInfinityIdeal50);
+poly infinityA50=infinityCoefficientValues50[2];
+setring relativeInfinity50;
+poly infinityBSource50=(relativeInfinityIdeal50[2]-subst(relativeInfinityIdeal50[2],V,0))/V;
+if(subst(infinityBSource50,V,0)!=infinityBSource50){ERROR("DEFECT50_INFINITY_LINEAR_V");quit;}
+setring defectInfinity50;
+poly infinityB50=infinityCoefficients50(infinityBSource50);
+ideal infinityDefect50=infinityA50,infinityB50;
+int exponent50=1;int previous50=-1;int localLength50=-1;ideal localStd50;ideal truncation50;
+for(i50=0;i50<12;i50++){
+ truncation50=infinityDefect50,z^exponent50;localStd50=std(truncation50);
+ localLength50=vdim(localStd50);
+ if(localLength50<0){ERROR("DEFECT50_LOCAL_NOT_FINITE");quit;}
+ print("DEFECT50_INFINITY_TRUNCATION exponent="+string(exponent50)+" F2_dimension="+string(localLength50));
+ if(localLength50==previous50){break;}
+ previous50=localLength50;exponent50=2*exponent50;
+}
+if(i50==12 || localLength50<0){ERROR("DEFECT50_LOCAL_NOT_STABILIZED");quit;}
+if(finiteLength50+localLength50!=expectedLength50){ERROR("DEFECT50_GLOBAL_LENGTH_MISMATCH");quit;}
+link infinityOut50="ASCII:a defect-lengths50.sing";open(infinityOut50);
+write(infinityOut50,"ring defectInfinityCertificate50=2,(T,z),wp(4,1);ideal infinityDefect50;ideal localStd50;int exponent50="+string(exponent50)+";int localLength50="+string(localLength50)+";");
+for(i50=1;i50<=size(infinityDefect50);i50++){write(infinityOut50,"infinityDefect50["+string(i50)+"]="+string(infinityDefect50[i50])+";");}
+for(i50=1;i50<=size(localStd50);i50++){write(infinityOut50,"localStd50["+string(i50)+"]="+string(localStd50[i50])+";");}
+close(infinityOut50);
+print("DEFECT50_RESULT finite_F2_length="+string(finiteLength50)+" infinity_local_F2_length="+string(localLength50)+" global_F2_length="+string(expectedLength50)+" plane_arithmetic_genus="+string(planeWeightSum50-31)+" refined_arithmetic_genus="+string(refinedWeightSum50-31));
+print("DEFECT50_ALL_CHECKS_PASS");quit;

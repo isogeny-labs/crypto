@@ -10,11 +10,11 @@ use crypto_lib::cryptanalysis::koblitz_factor_base_search::{
 use crypto_lib::cryptanalysis::koblitz_index_calculus::is_irreducible_f2;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_subgroup_orbit_factor_base_with_cost, factor_x_n_minus_1, find_irreducible_sparse,
-    individual_log, individual_log_with_progress,
-    koblitz_index_calculus_dlp_with_factor_base_and_progress, koblitz_point_count,
-    order_of_2_mod_n, solve_factor_base_logs, solve_factor_base_logs_with_progress,
-    DecompositionStrategy, FactorBaseLogTable, FactorBaseSelectionCost, FrobeniusFactorBase,
-    KoblitzCurve, KoblitzIcEvent, KoblitzIcOptions, LinearAlgebra, LogTableReport, LogTableStage,
+    individual_log, individual_log_with_trace,
+    koblitz_index_calculus_dlp_with_factor_base_and_trace, koblitz_point_count, order_of_2_mod_n,
+    solve_factor_base_logs, solve_factor_base_logs_with_trace, DecompositionStrategy,
+    FactorBaseLogTable, FactorBaseSelectionCost, FrobeniusFactorBase, KoblitzCurve, KoblitzIcEvent,
+    KoblitzIcOptions, LinearAlgebra, LogTableReport, LogTableStage, QueryObserver, QueryTrace,
     MAX_N, MAX_SUBFIELD_DEGREE,
 };
 use crypto_lib::cryptanalysis::koblitz_sparse_la::{
@@ -909,24 +909,38 @@ pub fn logs(args: LogsArgs, quiet: bool) -> Result<Value, String> {
         "logs: constructing collector and pair table (if needed)"
     ));
     let result = if super::progress::enabled() {
-        solve_factor_base_logs_with_progress(&c, &fb, &opts, &mut |stage, report| {
-            let label = match stage {
-                LogTableStage::Collection => "collection",
-                LogTableStage::LinearAlgebraAndVerification => {
-                    "linear algebra and column verification started"
-                }
-                LogTableStage::Finished => "finished",
-            };
-            super::progress::line(format_args!(
-                "logs: {label}; {}/{} trials, {} relations, rank {}/{}; verified={}",
-                report.trials,
-                opts.max_trials,
-                report.relations,
-                report.coefficient_rank,
-                report.columns,
-                report.verified
-            ));
-        })
+        super::progress::inputs(format_args!("logs"), c.generator(), None);
+        solve_factor_base_logs_with_trace(
+            &c,
+            &fb,
+            &opts,
+            &mut |stage, report| {
+                let label = match stage {
+                    LogTableStage::Collection => "collection",
+                    LogTableStage::LinearAlgebraAndVerification => {
+                        "linear algebra and column verification started"
+                    }
+                    LogTableStage::Finished => "finished",
+                };
+                super::progress::line(format_args!(
+                    "logs: {label}; {}/{} trials, {} relations, rank {}/{}; verified={}",
+                    report.trials,
+                    opts.max_trials,
+                    report.relations,
+                    report.coefficient_rank,
+                    report.columns,
+                    report.verified
+                ));
+            },
+            Some(&|trace| {
+                super::progress::query(
+                    format_args!("logs: trial"),
+                    trace,
+                    opts.max_trials as u64,
+                    &fb,
+                )
+            }),
+        )
     } else {
         solve_factor_base_logs(&c, &fb, &opts)
     };
@@ -1054,12 +1068,14 @@ pub fn solve(args: SolveArgs, quiet: bool) -> Result<Value, String> {
         "solve: building descent tables and starting target search"
     ));
     let outcome = if super::progress::enabled() {
-        individual_log_with_progress(&c, &fb, &table, &target, &opts, &mut |trial, outcome| {
-            super::progress::line(format_args!(
-                "solve: trial {trial}/{}: {}",
-                opts.max_trials,
-                super::progress::outcome(outcome)
-            ));
+        super::progress::inputs(format_args!("solve"), c.generator(), Some(&target));
+        individual_log_with_trace(&c, &fb, &table, &target, &opts, &|trace| {
+            super::progress::query(
+                format_args!("solve: trial"),
+                trace,
+                opts.max_trials as u64,
+                &fb,
+            );
         })
     } else {
         individual_log(&c, &fb, &table, &target, &opts)
@@ -1463,7 +1479,16 @@ pub fn run(args: RunArgs, quiet: bool) -> Result<Value, String> {
         }
     };
     let mut columns = 0usize;
-    let report = koblitz_index_calculus_dlp_with_factor_base_and_progress(
+    super::progress::inputs(format_args!("run"), c.generator(), Some(&target));
+    let observer = |trace: QueryTrace<'_>| {
+        super::progress::query(
+            format_args!("[2/4] trial"),
+            trace,
+            opts.max_trials as u64,
+            &fb,
+        )
+    };
+    let report = koblitz_index_calculus_dlp_with_factor_base_and_trace(
         &c,
         &target,
         &fb,
@@ -1503,7 +1528,8 @@ pub fn run(args: RunArgs, quiet: bool) -> Result<Value, String> {
                     }
                     return;
                 }
-                KoblitzIcEvent::RelationAttemptFinished { .. } => return,
+                KoblitzIcEvent::RelationQueryStarted { .. }
+                | KoblitzIcEvent::RelationAttemptFinished { .. } => return,
                 KoblitzIcEvent::RelationCollectionFinished { collected, trials } => (
                     "relation_collection",
                     "stopped",
@@ -1539,6 +1565,7 @@ pub fn run(args: RunArgs, quiet: bool) -> Result<Value, String> {
             };
             record(&mut stages, stage, state, details, &mut stage_start);
         },
+        super::progress::enabled().then_some(&observer as &QueryObserver<'_>),
     );
     let factor_base = factor_base_json(&spec, &fb, columns);
     let mode = json!({"control":args.control,"collapse_negation":!args.control,

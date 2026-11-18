@@ -1,0 +1,30 @@
+import OrientationProduct
+open Finset
+namespace OrientationModeDraft
+abbrev Variables (K B : ℕ) := Fin K × Fin (B+1)
+
+def weight (g : ℕ) (v : Variables K B) : ℕ := g+1+v.2.val
+
+theorem every_binary_subset_admissible (K B g P : ℕ)
+    (h : K*(B+1)*(g+1+B)<P) (S : Finset (Variables K B)) :
+    (∑ v ∈ S, weight g v) < P := by
+  have hw : ∑ v ∈ S, weight g v ≤ S.card*(g+1+B) := by
+    calc
+      _ ≤ ∑ _v ∈ S, (g+1+B) := sum_le_sum fun v _ => by dsimp [weight]; omega
+      _ = _ := by simp
+  have hc : S.card ≤ K*(B+1) := by
+    simpa using (card_le_univ S)
+  exact (hw.trans (Nat.mul_le_mul_right _ hc)).trans_lt h
+
+theorem binary_subset_count (K B g P : ℕ)
+    (h : K*(B+1)*(g+1+B)<P) :
+    ((univ : Finset (Finset (Variables K B))).filter
+      fun S => (∑ v ∈ S, weight g v)<P).card = 2^(K*(B+1)) := by
+  have he : ((univ : Finset (Finset (Variables K B))).filter
+      fun S => (∑ v ∈ S, weight g v)<P) = univ := by
+    apply filter_eq_self.mpr
+    intro S _
+    exact every_binary_subset_admissible K B g P h S
+  rw [he]
+  simp [Fintype.card_finset]
+end OrientationModeDraft

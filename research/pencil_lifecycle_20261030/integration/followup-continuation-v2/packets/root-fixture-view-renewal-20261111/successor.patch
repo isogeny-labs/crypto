@@ -1,0 +1,162 @@
+--- a/materialize/durable_io.py
++++ b/materialize/durable_io.py
+@@ -41,8 +41,10 @@
+     assert a['phase'] in ('materialize','suite')
+     assert a['total_seconds']==(120 if a['phase']=='materialize' else 1800)
+     assert a['attempts']==1 and not a['automatic_retry']
+-    assert a['campaign_ceiling_seconds']==43200 and a['campaign_remaining_seconds']>=a['total_seconds']
+-    assert a['absolute_deadline']=='2026-11-10T05:11:39Z'
++    assert type(a['campaign_charged_seconds']) is int and type(a['campaign_remaining_seconds']) is int
++    assert a['campaign_charged_seconds']>=0 and a['campaign_charged_seconds']+a['campaign_remaining_seconds']==129600
++    assert a['campaign_ceiling_seconds']==129600 and a['campaign_remaining_seconds']>=a['total_seconds']
++    assert a['absolute_deadline']=='2026-11-11T12:00:00Z'
+     assert a['serial_predecessor_terminal_sha256'] and a['independent_review_sha256']
+     assert a['publication']['verified_github_commit'] and a['publication']['readback_sha256']
+     for n,digest in a['recipe_files'].items():
+--- a/materialize/admission-draft.json
++++ b/materialize/admission-draft.json
+@@ -3,18 +3,18 @@
+   "admitted": false,
+   "phase": "materialize",
+   "total_seconds": 120,
+-  "campaign_ceiling_seconds": 43200,
++  "campaign_ceiling_seconds": 129600,
+   "campaign_remaining_seconds": null,
+-  "absolute_deadline": "2026-11-10T05:11:39Z",
++  "absolute_deadline": "2026-11-11T12:00:00Z",
+   "attempts": 1,
+   "automatic_retry": false,
+   "uid": 1000,
+   "gid": 1000,
+-  "workspace": "/var/tmp/pencil-fixture-materialize-20261109",
+-  "view_source": "/var/tmp/pencil-fixture-materialize-20261109/source",
++  "workspace": "/var/tmp/pencil-fixture-materialize-renewal-20261111",
++  "view_source": "/var/tmp/pencil-fixture-materialize-renewal-20261111/source",
+   "compiled_source": "/var/tmp/pencil-root-materialize-t1953-20261109/source",
+-  "durable_run": "/home/ec2-user/pencil-validation-receipts/fixture-materialize-20261109",
+-  "unit": "pencil-fixture-materialize-20261109.service",
++  "durable_run": "/home/ec2-user/pencil-validation-receipts/fixture-materialize-renewal-20261111",
++  "unit": "pencil-fixture-materialize-renewal-20261111.service",
+   "lease": null,
+   "serial_predecessor_terminal_sha256": null,
+   "independent_review_sha256": null,
+@@ -25,7 +25,7 @@
+   "cost_mode": "owner-waived-dollar-facts/v1",
+   "recipe_files": {
+     "durable-launcher.py": "ef3b42eb91a998ac3b6beb1dcfb4fcfa035b624c8f8086053e4ce9ba12d806fa",
+-    "durable_io.py": "282e197839a4ec8633f0798cb8f2ce928dfae3aeaa348cdec78c35dd0c32793a",
++    "durable_io.py": "58e98fbb39b8a5a6c9052f3f0e6774498869a76eb6345218deee8abf6c9435e9",
+     "durable-worker.py": "757f210418974d61fa876791c52cce25b953ae193c158e18ee22b38f0cc1403a"
+   },
+   "materialized_view_sha256": null,
+@@ -42,13 +42,14 @@
+   },
+   "initial_manifest": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+   "initial_manifest_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
+-  "additions_manifest": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/additive-inputs-proposal.json",
++  "additions_manifest": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-renewal-20261111/additive-inputs-proposal.json",
+   "additions_manifest_sha256": "056cfa1690a64526ed99d602a7c94a452e1ea8547bc8837a51816b822899d4e1",
+   "git_repository": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105",
+   "git_commit": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+-  "materialized_view_manifest": "/home/ec2-user/pencil-validation-receipts/fixture-materialize-20261109/worker/materialized-view.json",
+-  "elf_dependencies": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/elf-dependency-source-readback.json",
++  "materialized_view_manifest": "/home/ec2-user/pencil-validation-receipts/fixture-materialize-renewal-20261111/worker/materialized-view.json",
++  "elf_dependencies": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-renewal-20261111/elf-dependency-source-readback.json",
+   "elf_dependencies_sha256": "a6a4cb3b9fc5bf6242449d835395976d1303d73cf8d6e29c1aed889e921dd862",
+-  "test_inventory": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/expected-test-inventory.json",
+-  "test_inventory_sha256": "31bbf3894564c2dbe9cd7c79dca0b3b6d9e35496c0faf129acefa8e187be8016"
++  "test_inventory": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-renewal-20261111/expected-test-inventory.json",
++  "test_inventory_sha256": "31bbf3894564c2dbe9cd7c79dca0b3b6d9e35496c0faf129acefa8e187be8016",
++  "campaign_charged_seconds": null
+ }
+--- a/suite/durable_io.py
++++ b/suite/durable_io.py
+@@ -41,8 +41,10 @@
+     assert a['phase'] in ('materialize','suite')
+     assert a['total_seconds']==(120 if a['phase']=='materialize' else 1800)
+     assert a['attempts']==1 and not a['automatic_retry']
+-    assert a['campaign_ceiling_seconds']==43200 and a['campaign_remaining_seconds']>=a['total_seconds']
+-    assert a['absolute_deadline']=='2026-11-10T05:11:39Z'
++    assert type(a['campaign_charged_seconds']) is int and type(a['campaign_remaining_seconds']) is int
++    assert a['campaign_charged_seconds']>=0 and a['campaign_charged_seconds']+a['campaign_remaining_seconds']==129600
++    assert a['campaign_ceiling_seconds']==129600 and a['campaign_remaining_seconds']>=a['total_seconds']
++    assert a['absolute_deadline']=='2026-11-11T12:00:00Z'
+     assert a['serial_predecessor_terminal_sha256'] and a['independent_review_sha256']
+     assert a['publication']['verified_github_commit'] and a['publication']['readback_sha256']
+     for n,digest in a['recipe_files'].items():
+--- a/suite/admission-draft.json
++++ b/suite/admission-draft.json
+@@ -3,18 +3,18 @@
+   "admitted": false,
+   "phase": "suite",
+   "total_seconds": 1800,
+-  "campaign_ceiling_seconds": 43200,
++  "campaign_ceiling_seconds": 129600,
+   "campaign_remaining_seconds": null,
+-  "absolute_deadline": "2026-11-10T05:11:39Z",
++  "absolute_deadline": "2026-11-11T12:00:00Z",
+   "attempts": 1,
+   "automatic_retry": false,
+   "uid": 1000,
+   "gid": 1000,
+-  "workspace": "/var/tmp/pencil-fixture-suite-20261109",
+-  "view_source": "/var/tmp/pencil-fixture-materialize-20261109/source",
++  "workspace": "/var/tmp/pencil-fixture-suite-renewal-20261111",
++  "view_source": "/var/tmp/pencil-fixture-materialize-renewal-20261111/source",
+   "compiled_source": "/var/tmp/pencil-root-materialize-t1953-20261109/source",
+-  "durable_run": "/home/ec2-user/pencil-validation-receipts/fixture-suite-20261109",
+-  "unit": "pencil-fixture-suite-20261109.service",
++  "durable_run": "/home/ec2-user/pencil-validation-receipts/fixture-suite-renewal-20261111",
++  "unit": "pencil-fixture-suite-renewal-20261111.service",
+   "lease": null,
+   "serial_predecessor_terminal_sha256": null,
+   "independent_review_sha256": null,
+@@ -25,7 +25,7 @@
+   "cost_mode": "owner-waived-dollar-facts/v1",
+   "recipe_files": {
+     "durable-launcher.py": "ef3b42eb91a998ac3b6beb1dcfb4fcfa035b624c8f8086053e4ce9ba12d806fa",
+-    "durable_io.py": "282e197839a4ec8633f0798cb8f2ce928dfae3aeaa348cdec78c35dd0c32793a",
++    "durable_io.py": "58e98fbb39b8a5a6c9052f3f0e6774498869a76eb6345218deee8abf6c9435e9",
+     "durable-worker.py": "757f210418974d61fa876791c52cce25b953ae193c158e18ee22b38f0cc1403a"
+   },
+   "materialized_view_sha256": null,
+@@ -42,13 +42,14 @@
+   },
+   "initial_manifest": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+   "initial_manifest_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
+-  "additions_manifest": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/additive-inputs-proposal.json",
++  "additions_manifest": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-renewal-20261111/additive-inputs-proposal.json",
+   "additions_manifest_sha256": "056cfa1690a64526ed99d602a7c94a452e1ea8547bc8837a51816b822899d4e1",
+   "git_repository": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105",
+   "git_commit": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+-  "materialized_view_manifest": "/home/ec2-user/pencil-validation-receipts/fixture-materialize-20261109/worker/materialized-view.json",
+-  "elf_dependencies": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/elf-dependency-source-readback.json",
++  "materialized_view_manifest": "/home/ec2-user/pencil-validation-receipts/fixture-materialize-renewal-20261111/worker/materialized-view.json",
++  "elf_dependencies": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-renewal-20261111/elf-dependency-source-readback.json",
+   "elf_dependencies_sha256": "a6a4cb3b9fc5bf6242449d835395976d1303d73cf8d6e29c1aed889e921dd862",
+-  "test_inventory": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/expected-test-inventory.json",
+-  "test_inventory_sha256": "31bbf3894564c2dbe9cd7c79dca0b3b6d9e35496c0faf129acefa8e187be8016"
++  "test_inventory": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-renewal-20261111/expected-test-inventory.json",
++  "test_inventory_sha256": "31bbf3894564c2dbe9cd7c79dca0b3b6d9e35496c0faf129acefa8e187be8016",
++  "campaign_charged_seconds": null
+ }
+--- a/commands.json
++++ b/commands.json
+@@ -7,7 +7,7 @@
+       "--kill-after=5",
+       "115",
+       "/usr/bin/python3",
+-      "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/materialize/durable-launcher.py"
++      "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-renewal-20261111/materialize/durable-launcher.py"
+     ],
+     "suite": [
+       "timeout",
+@@ -15,7 +15,7 @@
+       "--kill-after=5",
+       "1795",
+       "/usr/bin/python3",
+-      "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-20261109/suite/durable-launcher.py"
++      "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-fixture-view-renewal-20261111/suite/durable-launcher.py"
+     ]
+   },
+   "no_automatic_continuation": true

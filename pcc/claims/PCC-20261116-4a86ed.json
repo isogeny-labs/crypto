@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T05:00:58Z",
+ "id": "PCC-20261116-4a86ed",
+ "kind": "statement",
+ "producer": {
+  "commit": "88112c5a930009c883059c1c2e3c6c92c4b23f18",
+  "model": "",
+  "session": "codex-20261116-nist-three"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/point-replay-v2.txt",
+    "sha256": "44a5c08a817c10de3d9b1f431d9914a04fe05ee14403eb4519cdb0e2b44c9797"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/point_replay.cpp",
+    "sha256": "b83c10bc4ec2861ce0c216a3e8e5c93b4b8ba122149b8c9361b5710530df37d3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/pre-call-v2-manifest.sha256",
+    "sha256": "7ac534f29f26eaef2a1818dfe325d6d710d27d3d3b20ee483b75ca7f0c7329d9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Native GMP replay accepts archived P-192 d7 finite-field, genus2 torsion and tangent witnesses after the recorded monic coordinate normalization: four independent order3 divisors,81 classes, actual Frobenius action, four cubic tangent identities and six Weil pairings. The elliptic basis/order/Frobenius/pairing also replay. This is a producer implementation, not signed independent verification, and does not construct a quotient."
+}

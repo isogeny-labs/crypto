@@ -1,0 +1,286 @@
+{
+  "audit_results": "/workspace/ecdlp_research/pool_design/audit_results.json",
+  "dependencies": [
+    "Python 3 with sympy",
+    "g++ supporting C++17",
+    "Linux CPU affinity; CPU 3 must be available"
+  ],
+  "embedding_degrees": [
+    {
+      "multiplicative_order_p_mod_r": 2039,
+      "p": 4099,
+      "r": 4079,
+      "trace": 21
+    },
+    {
+      "multiplicative_order_p_mod_r": 2069,
+      "p": 4099,
+      "r": 4139,
+      "trace": -39
+    },
+    {
+      "multiplicative_order_p_mod_r": 4026,
+      "p": 4099,
+      "r": 4027,
+      "trace": 73
+    },
+    {
+      "multiplicative_order_p_mod_r": 8199,
+      "p": 32771,
+      "r": 32797,
+      "trace": -25
+    },
+    {
+      "multiplicative_order_p_mod_r": 4089,
+      "p": 32771,
+      "r": 32713,
+      "trace": 59
+    },
+    {
+      "multiplicative_order_p_mod_r": 33028,
+      "p": 32771,
+      "r": 33029,
+      "trace": -257
+    },
+    {
+      "multiplicative_order_p_mod_r": 261328,
+      "p": 262147,
+      "r": 261329,
+      "trace": 819
+    },
+    {
+      "multiplicative_order_p_mod_r": 43733,
+      "p": 262147,
+      "r": 262399,
+      "trace": -251
+    },
+    {
+      "multiplicative_order_p_mod_r": 261982,
+      "p": 262147,
+      "r": 261983,
+      "trace": 165
+    },
+    {
+      "multiplicative_order_p_mod_r": 349295,
+      "p": 2097169,
+      "r": 2095771,
+      "trace": 1399
+    },
+    {
+      "multiplicative_order_p_mod_r": 1048506,
+      "p": 2097169,
+      "r": 2097013,
+      "trace": 157
+    },
+    {
+      "multiplicative_order_p_mod_r": 1048511,
+      "p": 2097169,
+      "r": 2097023,
+      "trace": 147
+    },
+    {
+      "multiplicative_order_p_mod_r": 8388734,
+      "p": 16777259,
+      "r": 16777469,
+      "trace": -209
+    },
+    {
+      "multiplicative_order_p_mod_r": 8388083,
+      "p": 16777259,
+      "r": 16776167,
+      "trace": 1093
+    },
+    {
+      "multiplicative_order_p_mod_r": 5592574,
+      "p": 16777259,
+      "r": 16777723,
+      "trace": -463
+    }
+  ],
+  "manifest": "/workspace/ecdlp_research/prime_fixtures/manifest.json",
+  "memory": {
+    "all_fixture_files_bytes": 1987427,
+    "generator_peak_rss_kib": 47012,
+    "scope": "Includes Python, sympy, generation and validation workload; C++ child peak memory not measured by this value."
+  },
+  "natural_fixture_design": {
+    "curves_per_size": 3,
+    "group_order_target": "r approximately 8 B^3; exact r/B^3 stored per fixture",
+    "independent_public_label_seeds_per_curve": 4,
+    "natural_fixture_count": 60,
+    "prime_field_selection": "p=nextprime(8 B^3); p>3; random nonsingular short-Weierstrass curves, exact prime total order r != p",
+    "sample_conditioning": "No infinity or repeated x across all three pools. Relation existence does not influence natural generation.",
+    "secret_separation": "Natural solver input contains P,Q and public alpha,beta labels. Secret k and reference existence/witness are in separate .validation.json files.",
+    "sizes_B": [
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
+    "total_signed_miss": 32,
+    "total_signed_positive": 28
+  },
+  "reproduction_commands": [
+    "taskset -c 3 python /workspace/ecdlp_research/pool_design/generate.py --sizes 8,16,32,64,128 --curves 3 --seeds 4",
+    "taskset -c 3 python /workspace/ecdlp_research/pool_design/add_controls.py",
+    "taskset -c 3 python /workspace/ecdlp_research/pool_design/audit.py"
+  ],
+  "schema": "pool-design-report/v1",
+  "scope_limits": [
+    "Small toy fields, p from 4099 to 16777259. No cryptographic-size speed claim.",
+    "Natural generation uses straightforward double-and-add affine scalar multiplication; optimized simultaneous/precomputed multiplication could reduce this common cost.",
+    "Counter values count explicit group/field API operations; modular inverse internals and fixed-constant multiplications are not expanded. CPU/wall include them.",
+    "Shared host, single pinned CPU; no timing isolation guarantee. Control aliases are not independent samples.",
+    "15 planted controls use secret k to relabel forced relations informatively and are correctness controls only.",
+    "Independent C++ point-count implementation; group-law label replay uses the reference Python group law and is not independent group arithmetic."
+  ],
+  "status": "complete",
+  "structured_vs_labelled": {
+    "asymptotic_cost_at_r_approx_B_cubed": "M~B: first hit Theta(B^2) draws; complete coverage Theta(B^3 log B) draws, each requiring two public scalar multiplications plus an addition.",
+    "bare_control_has_mixed_labels": false,
+    "control": "Abscissae 0 <= x < 2B, canonical ordinate; actual liftable M varies and is recorded.",
+    "expected_draws_all_M": "(r/2) H_M, for this public independent rejection method",
+    "expected_draws_first_hit": "r/(2M)",
+    "measured_B8_label_acquisition": [
+      {
+        "actual_label_acquisition_cpu_seconds": 0.23759158100000005,
+        "actual_label_acquisition_draws": 4079,
+        "actual_unsigned_points": 5,
+        "expected_uniform_draws_per_accepted_point": 407.9,
+        "id": "b008_c0_structured",
+        "label_acquisition_measured": true,
+        "nominal_B": 8
+      },
+      {
+        "actual_label_acquisition_cpu_seconds": 0.45147162399999985,
+        "actual_label_acquisition_draws": 8117,
+        "actual_unsigned_points": 5,
+        "expected_uniform_draws_per_accepted_point": 413.9,
+        "id": "b008_c1_structured",
+        "label_acquisition_measured": true,
+        "nominal_B": 8
+      },
+      {
+        "actual_label_acquisition_cpu_seconds": 0.38101597,
+        "actual_label_acquisition_draws": 6834,
+        "actual_unsigned_points": 7,
+        "expected_uniform_draws_per_accepted_point": 287.64285714285717,
+        "id": "b008_c2_structured",
+        "label_acquisition_measured": true,
+        "nominal_B": 8
+      }
+    ],
+    "not_a_lower_bound": "Other explicit constructions could do better; this audit proves no general label-construction lower bound.",
+    "one_hit_probability": "2M/r for M nonzero canonical representatives without 2-torsion",
+    "public_label_acquisition_method": "Draw alpha,beta uniformly modulo r; compute alpha P + beta Q; reject points outside the interval, duplicates and infinity; negate labels to match canonical y as needed.",
+    "why_no_free_merger": "A compact interval/power-map/isogeny description specifies point coordinates. It does not give alpha,beta with R=alpha P+beta Q. Public random mixed labels give coordinates distributed over the group. Combining these objects needs an explicit algorithm and its costs."
+  },
+  "summaries": [
+    {
+      "B": 8,
+      "density_first_moment_heuristic_range": [
+        0.49480550857695094,
+        0.5085671715917557
+      ],
+      "instances": 12,
+      "median_generation_cpu_seconds": 0.001611317000000001,
+      "median_generation_wall_seconds": 0.0016296620005959994,
+      "median_operation_counts": {
+        "affine_additions": 258.0,
+        "affine_doublings": 534.0,
+        "field_inversions": 791.5,
+        "field_multiplications": 1583.0,
+        "field_squarings": 1327.0,
+        "group_add_calls": 841.0,
+        "scalar_bits": 534.0,
+        "scalar_multiplications": 48.0
+      },
+      "total_rejected_draws": 5
+    },
+    {
+      "B": 16,
+      "density_first_moment_heuristic_range": [
+        0.4960489267007781,
+        0.5008406443921377
+      ],
+      "instances": 12,
+      "median_generation_cpu_seconds": 0.003771988000000004,
+      "median_generation_wall_seconds": 0.0037819769995621755,
+      "median_operation_counts": {
+        "affine_additions": 675.5,
+        "affine_doublings": 1346.5,
+        "field_inversions": 2015.0,
+        "field_multiplications": 4030.0,
+        "field_squarings": 3361.0,
+        "group_add_calls": 2111.0,
+        "scalar_bits": 1346.5,
+        "scalar_multiplications": 96.0
+      },
+      "total_rejected_draws": 1
+    },
+    {
+      "B": 32,
+      "density_first_moment_heuristic_range": [
+        0.4995140987579983,
+        0.5015593370808444
+      ],
+      "instances": 12,
+      "median_generation_cpu_seconds": 0.009258747000000067,
+      "median_generation_wall_seconds": 0.009279806000449753,
+      "median_operation_counts": {
+        "affine_additions": 1633.5,
+        "affine_doublings": 3255.5,
+        "field_inversions": 4891.0,
+        "field_multiplications": 9782.0,
+        "field_squarings": 8137.5,
+        "group_add_calls": 5083.0,
+        "scalar_bits": 3255.5,
+        "scalar_multiplications": 192.0
+      },
+      "total_rejected_draws": 1
+    },
+    {
+      "B": 64,
+      "density_first_moment_heuristic_range": [
+        0.5000307578886831,
+        0.5003294730197144
+      ],
+      "instances": 12,
+      "median_generation_cpu_seconds": 0.021548441000000196,
+      "median_generation_wall_seconds": 0.021569578999333316,
+      "median_operation_counts": {
+        "affine_additions": 3824.5,
+        "affine_doublings": 7687.5,
+        "field_inversions": 11517.0,
+        "field_multiplications": 23034.0,
+        "field_squarings": 19209.5,
+        "group_add_calls": 11901.0,
+        "scalar_bits": 7687.5,
+        "scalar_multiplications": 384.0
+      },
+      "total_rejected_draws": 0
+    },
+    {
+      "B": 128,
+      "density_first_moment_heuristic_range": [
+        0.49998489067914637,
+        0.5000312645910118
+      ],
+      "instances": 12,
+      "median_generation_cpu_seconds": 0.05246919549999984,
+      "median_generation_wall_seconds": 0.05258745250011998,
+      "median_operation_counts": {
+        "affine_additions": 8823.5,
+        "affine_doublings": 17675.0,
+        "field_inversions": 26506.0,
+        "field_multiplications": 53012.0,
+        "field_squarings": 44189.5,
+        "group_add_calls": 27274.0,
+        "scalar_bits": 17675.0,
+        "scalar_multiplications": 768.0
+      },
+      "total_rejected_draws": 0
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 2445,
+  "standing": "unverified",
+  "parent": "f1991e1602c3b5d581b2f96a1a7e3ff42e782113",
+  "observed_failure": {
+    "job": 127169304661,
+    "path": "scripts/site/test_build.py",
+    "line": 548,
+    "issue": "asserted an exact single-line publisher condition"
+  },
+  "change": "Check test/publish scheduling behavior via restricted expression evaluation",
+  "cases": {
+    "events": [
+      "pull_request",
+      "pull_request_target",
+      "push",
+      "schedule",
+      "release",
+      "workflow_dispatch",
+      "merge_group"
+    ],
+    "draft_states": 2,
+    "refs": 2,
+    "connection_check_values": 2,
+    "conditions": 2,
+    "total_policy_assertions": 112
+  },
+  "preserved": [
+    "read-only global permissions",
+    "no pull_request_target trigger",
+    "no deploy/upload steps in PR test job",
+    "cited-document path filters on push and pull_request",
+    "production workflow behavior",
+    "all benchmark, evidence and PCC ledger inputs"
+  ],
+  "validation": "CI pending; no local execution claimed; previous rho-status/YAML/37-record CI checks passed on unchanged relevant inputs"
+}

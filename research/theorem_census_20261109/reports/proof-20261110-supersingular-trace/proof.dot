@@ -1,0 +1,11 @@
+digraph G {
+  graph [rankdir=TB,bgcolor="white",nodesep=0.24,ranksep=0.32];
+  node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=11];
+  a [label="Actual finite-field curve\nq = field cardinality, N = point count"];
+  b [label="Explicit trace-square classification\nt = q + 1 - N; t² = 0,q,2q,3q,or4q",fillcolor="#fff1cf"];
+  c [label="Prime r divides N\nZ/r is a field"];
+  d [label="q², q³, q⁴, or q⁶ = 1 (mod r)"];
+  e [label="ord_r(q) in {1,2,3,4,6}\nr coprime to q",fillcolor="#dcf1e2"];
+  f [label="Finite point equivalence + Cauchy\nActual point of additive order r",fillcolor="#dcf1e2"];
+  a -> b; a -> c; b -> d; c -> d; d -> e; c -> f;
+}

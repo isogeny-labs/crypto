@@ -1,5 +1,17 @@
 # Native log-norm optimization and 80-bit candidate evidence
 
+The [18 November complete-evaluator continuation](evaluator-20261118/README.md)
+adds balanced baby products, block reuse, additive kernel walks and a guarded
+supplied-case interface. Its independent-PARI development controls and raw
+receipts are recorded separately from the still-open 80-bit crossing and
+endpoint timings. No new runtime measurement is reported.
+
+The [13 November record search](record-search-20261113/README.md) reconstructs
+the published 263-bit K-571 conductor factor and retains a PARI primality
+certificate. It reviews vertical construction prerequisites while preserving
+the distinction between a conductor factor and an evaluated crossing. The
+existing 80-bit quotient, full images and endpoint timings remain open.
+
 This study publishes the native C trace optimization, its native checks, and
 the frozen 80-bit source/kernel study. The shared trace functional avoids
 three trace-only polynomial products; a reversed-modulus inverse is also

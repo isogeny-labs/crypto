@@ -1,0 +1,58 @@
+{
+  "schema": "producer.publication-resync/v1",
+  "validated_parent": "0ead8ca498bbd3add9d124537bcc2a8cba7f2697",
+  "unpublished_archive": "c3239936dbbcf317a8f4025c92467994ad41a6aa",
+  "publication_parent": "b478a9770ea35f84bddf4e9b9ffbf7efeab30f06",
+  "all_27_pinned_inputs_identical": true,
+  "new_claim_registration_events": [
+    {
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1179,
+      "prev": "4d59e9251e22cb2b31aa84eb8c8a7c1bedbacea2f93df29b6e3e89ed86a34915",
+      "type": "claim",
+      "at": "2026-11-16T01:51:23Z",
+      "body": {
+        "claim_id": "PCC-20261116-a3e9e1",
+        "claim_sha256": "67ddf34fba7b8822f0b87dcbdf7528c787f751436810acf52ca980758b4bac15",
+        "path": "pcc/claims/PCC-20261116-a3e9e1.json"
+      },
+      "hash": "2d807d006f30af159de56869f07bf6bbcc3cc123f99882cb96486389b911b0d4"
+    },
+    {
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1180,
+      "prev": "2d807d006f30af159de56869f07bf6bbcc3cc123f99882cb96486389b911b0d4",
+      "type": "claim",
+      "at": "2026-11-16T01:51:23Z",
+      "body": {
+        "claim_id": "PCC-20261116-4d7a4e",
+        "claim_sha256": "fecf37bda2d2f57a99da8f302a4eee4326ea76e6acfade6a41eba431e484906e",
+        "path": "pcc/claims/PCC-20261116-4d7a4e.json"
+      },
+      "hash": "c26e3e438659ae2976d49ec7dffe9e79cb1d1332525a84020b73d624d7708b22"
+    },
+    {
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1181,
+      "prev": "c26e3e438659ae2976d49ec7dffe9e79cb1d1332525a84020b73d624d7708b22",
+      "type": "claim",
+      "at": "2026-11-16T01:51:23Z",
+      "body": {
+        "claim_id": "PCC-20261116-3bd2b2",
+        "claim_sha256": "3536e8ac7684aff15a6954f578be307737bc001023b00cb4a7636db081fa9d90",
+        "path": "pcc/claims/PCC-20261116-3bd2b2.json"
+      },
+      "hash": "7eee537fdddf4aac58aef4379420dc0d5783e8c565ef07bc8f7e5229654dacf1"
+    }
+  ],
+  "parent_ledger_sha256": "1500375cf6da6f442c4e761613e204468638e88b0c1666c44889134ff1213a15",
+  "parent_ledger_rows": 1179,
+  "parent_prefix_preserved": true,
+  "journal": {
+    "incoming_full_blocks": 9,
+    "own_full_blocks": 3,
+    "all_normalized_block_multiplicities_preserved": true,
+    "order": "timestamp order, retaining original order for ties and untimestamped blocks"
+  },
+  "explanation": "Unpublished claim registration bytes are retained in unpublished-ledger.snapshot and the archive commit. Claim records are unchanged; fresh publication registrations use the existing PCC tool. No published ledger prefix was rewritten and no incompatible frozen histories were merged. The final proof and native inputs are byte-identical; no redundant validation rerun is claimed."
+}

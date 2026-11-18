@@ -1,0 +1,18 @@
+# Matched D prebuilt/on-demand N83 finite-query run
+
+**Run ID:** `paired-mode-v1`. **UTC interval:** 2026-10-19 06:01:45–06:18:33 (16 min 48 s across the card). **Host:** owner-authorized EC2 `i-01f85a6c905181498` m8i.8xlarge Spot, x86_64, shared L0. Each native worker container had CPU 31, 4 GiB hard memory, zero swap, no network, read-only root and inputs. The [protocol](../../PAIRED_MODE_PROTOCOL.md), [frozen host addendum](../../PAIRED_MODE_SPOT_ADDENDUM.md), [exact card](../../run-paired-mode-card.sh) and [Docker wrapper](../../run-paired-mode-docker.sh) define the run.
+
+The card checked six SHA-256 inputs before creating its output: source `8600970b3b73a2ff3dab7f642809ea0496407d892d0c347f328c497e7eedbe7d`, binary `80a53099ff4db99519de3d3700bbde3948dc0b435e6a3c7ac800164ac7450a24`, wrapper `0618cb9f87f6a0c556525a845a243095b567dcd35747cbef40025d60ada3071d`, manifest, D archive and public corpus. The D archive SHA-256 is `347d465bef217ae5f76e9b664710440a735a26211bf3957c4be4bcb4b46345a7`, and the eight-point public corpus SHA-256 is `2895a78d28935a992d8d6155492eae928e165eafcc622e6c866080b8f91e70b5`. The validation sidecar did not enter containers.
+
+Two setup modes produced identical point-set BLAKE3 `8c1c245cda15bdd0019b487a5535a3b7eac642c259c4dc0bae25875d87d345b0` and labeled-row BLAKE3 `805d1cbc65cac0a74ebf49315b8c17b0d5229bdceba5725ba4349fb1cc6c9e9c`. Constructed m=2 and m=3 controls passed before public probes. Both [separate general-field control replays](control-replay/) passed with rank lower bound one and changed-target/changed-row rejection, using verifier binary SHA-256 `fbbc57bd09110a823b2681e6e91d25bc823cace765b8ad8d2c0edc2e20cc96bc`. The frozen order was prebuilt/on-demand/on-demand/prebuilt for target 0 at each m, then alternating modes for targets 1–7. Every probe was followed by a fresh replay process.
+
+| m | preparation mode | arms | finite attempts | process-wall mean, range (s) | mean preparation / group-query wall (s) | natural rows / rank |
+| ---: | :--- | ---: | ---: | :--- | :--- | :--- |
+| 2 | prebuilt import | 9 | 24,840,738 | 9.848 [9.769, 10.212] | 3.600 / 5.985 | 0 / 0 |
+| 2 | on-demand generation | 9 | 24,840,738 | 35.131 [35.033, 35.459] | 28.686 / 6.179 | 0 / 0 |
+| 3 | prebuilt import | 9 | 9,437,184 | 8.828 [8.659, 9.815] | 3.635 / 4.923 | 0 / 0 |
+| 3 | on-demand generation | 9 | 9,437,184 | 34.601 [33.894, 39.585] | 29.242 / 5.088 | 0 / 0 |
+
+All 36 probes have status `COMPLETE`, all 36 replay receipts say `PASS`, and all 76 containers exited zero. The total 16 min 48 s card interval also includes two setup arms, two controls, replay and per-container launch/teardown; this overhead is retained in the raw host start/end receipts and is excluded from the isolated process-wall means. The mean per-query wall ratios on-demand/prebuilt are 3.567 (m=2) and 3.919 (m=3). The prebuilt peak RSS of 651,149,312 bytes exceeds the on-demand peak of 563,486,720 bytes. The worker produced no natural relation row under either exact finite event. This run provides no positive natural useful-rank estimate or completed IC cost.
+
+The [raw run tree](../../runs/paired-mode-v1/), [SHA-256 manifest](../../runs/paired-mode-v1.sha256) and transferred archive SHA-256 `236e64b40cc836ff91509f86006df886046d18df61e145d79e958d98b1ff24ed` preserve every sample, progress file, empty relation file, Docker inspection, exit and replay. The [cost graph](../result-20261019/cost.svg), [150 dpi render](../result-20261019/cost.png), [graph data](../result-20261019/cost-data.json) and [results report](../../RESULT.md) show the separately charged one-time construction. The graph's one/eight-query values are derived projections, not total host-card wall measurements.

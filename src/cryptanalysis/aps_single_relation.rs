@@ -16,6 +16,8 @@ use super::f4_fp::{self, F4Options, Ordering, Poly, Verdict};
 use super::prime_fast::{FastCurve, Pt};
 use super::residual_walk::{inv_mod, is_prime_u64};
 
+/// Opt-in extensions; existing encodings and registered method IDs are unchanged.
+pub mod leads;
 /// Independent, bounded replay of the public fixture transcripts.
 pub mod replay;
 
@@ -297,6 +299,8 @@ enum Decode {
     Coordinates(usize),
     Cubic(Vec<u64>),
     Line { values: Vec<u64>, a: u64, b: u64 },
+    LineChart { values: Vec<u64>, a: u64, b: u64 },
+    Horizontal { values: Vec<u64>, a: u64, b: u64 },
     TwoPairs(Vec<Vec<u64>>),
 }
 #[derive(Clone)]
@@ -331,6 +335,27 @@ pub fn build_system(
     parts: &[Vec<u64>],
     encoding: Encoding,
 ) -> Result<System, String> {
+    let (p, all, a, b) = checked_model(curve, parts)?;
+    let (vars, expected) = match encoding {
+        Encoding::Partitioned3 => (3, 3),
+        Encoding::Unordered3 => (3, 1),
+        Encoding::Line3 => (2, 1),
+        Encoding::Expanded4 => (4, 4),
+        Encoding::Split4 => (5, 4),
+        Encoding::BlockSymmetric4 => (5, 2),
+    };
+    if parts.len() != expected {
+        return Err(format!(
+            "encoding {encoding:?} requires {expected} coordinate blocks"
+        ));
+    }
+    build_checked_system(p, all, a, b, vars, parts, encoding)
+}
+
+fn checked_model(
+    curve: &FastCurve,
+    parts: &[Vec<u64>],
+) -> Result<(u64, Vec<u64>, u64, u64), String> {
     let p = curve.f.p;
     if p <= 3 || p > MAX_FIELD || !is_prime_u64(p) {
         return Err("unsupported prime field".into());
@@ -348,19 +373,19 @@ pub fn build_system(
     if (4 * mul(mul(a, a, p), a, p) + 27 * mul(b, b, p)).is_multiple_of(p) {
         return Err("singular curve".into());
     }
-    let (vars, expected) = match encoding {
-        Encoding::Partitioned3 => (3, 3),
-        Encoding::Unordered3 => (3, 1),
-        Encoding::Line3 => (2, 1),
-        Encoding::Expanded4 => (4, 4),
-        Encoding::Split4 => (5, 4),
-        Encoding::BlockSymmetric4 => (5, 2),
-    };
-    if parts.len() != expected {
-        return Err(format!(
-            "encoding {encoding:?} requires {expected} coordinate blocks"
-        ));
-    }
+    Ok((p, all, a, b))
+}
+
+#[allow(clippy::too_many_arguments)]
+fn build_checked_system(
+    p: u64,
+    all: Vec<u64>,
+    a: u64,
+    b: u64,
+    vars: usize,
+    parts: &[Vec<u64>],
+    encoding: Encoding,
+) -> Result<System, String> {
     let x: Vec<_> = (0..vars).map(|i| Expr::var(i, vars, p)).collect();
     let (mut equations, decode) = match encoding {
         Encoding::Partitioned3 => (vec![s3(&x[0], &x[1], &x[2], a, b)], Decode::Coordinates(3)),
@@ -457,6 +482,28 @@ fn decode_root(system: &System, root: &[u64]) -> Result<Vec<u64>, String> {
                 p,
             )?
         }
+        Decode::LineChart { values, a, b } => {
+            let (u, v) = (root[0], root[1]);
+            if u == 0 {
+                return Err("nonhorizontal chart has zero U".into());
+            }
+            let out = divisor_roots(
+                values,
+                &[
+                    u,
+                    (a + p - mul(2 * u % p, v, p)) % p,
+                    (mul(u, mul(v, v, p), p) + p - b) % p,
+                ],
+                p,
+            )?;
+            if out.iter().any(|x| (x + v) % p == 0) {
+                return Err("nonhorizontal chart has a zero lifting denominator".into());
+            }
+            out
+        }
+        Decode::Horizontal { values, a, b } => {
+            divisor_roots(values, &[0, *a, (mul(root[0], root[0], p) + p - b) % p], p)?
+        }
         Decode::TwoPairs(parts) => {
             let mut values = divisor_roots(&parts[0], &root[..2], p)?;
             values.extend(divisor_roots(&parts[1], &root[2..4], p)?);
@@ -511,6 +558,27 @@ pub struct AlgebraReport {
     /// F4 row-reduction work only, not a full-cost counter.
     pub f4_field_multiplications: u64,
     pub timed_out: bool,
+    /// Measured degree-fall observables of the F4 solves (diagnostic, never
+    /// priced): the smallest working degree at which the basis has fewer
+    /// standard monomials than the semi-regular expectation (first fall), the
+    /// largest (last fall), and the first degree the quotient vanishes
+    /// (observed degree of regularity). `None` when no solve recorded them.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// Post-hoc deviations of the computed leading-monomial staircase from
+    /// the semi-regular expectation and its extinction degree. These are
+    /// diagnostics, not first/last fall degree or homogeneous regularity.
+    /// None when no solve recorded them; never priced into solver work.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub staircase_extinction_degree: Option<u32>,
     /// Absent for the legacy scan: its root-stage work is not instrumented.
     pub roots: Option<RootDiagnostics>,
 }
@@ -572,6 +640,8 @@ pub fn solve_system_reference(
         max_columns: report.max_cols,
         f4_field_multiplications: report.field_ops,
         timed_out: report.timed_out,
+        // The legacy full-field scan is an exact-set control; its F4 stage is
+        // not degree-instrumented, so the degree-fall fields stay None.
         ..AlgebraReport::default()
     })
 }
@@ -584,7 +654,7 @@ pub fn solve_system(
     degree: u32,
     budget: Duration,
 ) -> Result<AlgebraReport, String> {
-    solve_system_visit(system, p, degree, budget, |_| Ok(false))
+    solve_system_visit(system, p, degree, budget, false, |_| Ok(false))
 }
 
 /// Visit decoded, deduplicated coordinate sets from the existing exact-domain
@@ -598,7 +668,19 @@ pub fn visit_system(
     budget: Duration,
     visitor: impl FnMut(&[u64]) -> Result<bool, String>,
 ) -> Result<AlgebraReport, String> {
-    solve_system_visit(system, p, degree, budget, visitor)
+    solve_system_visit(system, p, degree, budget, false, visitor)
+}
+
+/// Request post-hoc Hilbert observations without changing the frozen default
+/// traversal or treating those observations as formal fall-degree invariants.
+pub fn visit_system_recording_hilbert(
+    system: &System,
+    p: u64,
+    degree: u32,
+    budget: Duration,
+    visitor: impl FnMut(&[u64]) -> Result<bool, String>,
+) -> Result<AlgebraReport, String> {
+    solve_system_visit(system, p, degree, budget, true, visitor)
 }
 
 fn solve_system_visit(
@@ -606,6 +688,7 @@ fn solve_system_visit(
     p: u64,
     degree: u32,
     budget: Duration,
+    record_hilbert_diagnostics: bool,
     mut visitor: impl FnMut(&[u64]) -> Result<bool, String>,
 ) -> Result<AlgebraReport, String> {
     let start = Instant::now();
@@ -618,11 +701,13 @@ fn solve_system_visit(
     };
     let mut sets = BTreeSet::new();
     let mut error = None;
+    let mut options = F4Options::new(Ordering::Grevlex, degree).with_budget(budget);
+    options.record_hilbert_diagnostics = record_hilbert_diagnostics;
     let report = f4_fp::solve_visit(
         &system.equations,
         system.variables,
         p,
-        &F4Options::new(Ordering::Grevlex, degree).with_budget(budget),
+        &options,
         &system.domains,
         |root| {
             let result = decode_root(system, root).and_then(|coordinates| {
@@ -654,6 +739,12 @@ fn solve_system_visit(
         max_columns: report.max_cols,
         f4_field_multiplications: report.field_ops,
         timed_out: report.timed_out,
+        first_fall_degree: report.first_fall_degree,
+        last_fall_degree: report.last_fall_degree,
+        degree_of_regularity_observed: report.degree_of_regularity_observed,
+        first_hilbert_deviation_degree: report.first_hilbert_deviation_degree,
+        last_hilbert_deviation_degree: report.last_hilbert_deviation_degree,
+        staircase_extinction_degree: report.staircase_extinction_degree,
         roots: Some(RootDiagnostics {
             equation_roots_visited: report.solutions_visited,
             candidates_rejected: report.candidates_rejected,
@@ -679,6 +770,27 @@ impl AlgebraReport {
         self.timed_out |= other.timed_out;
         self.solver_calls += other.solver_calls;
         self.solving_degree = self.solving_degree.max(other.solving_degree);
+        self.first_hilbert_deviation_degree = match (
+            self.first_hilbert_deviation_degree,
+            other.first_hilbert_deviation_degree,
+        ) {
+            (Some(a), Some(b)) => Some(a.min(b)),
+            (a, b) => a.or(b),
+        };
+        self.last_hilbert_deviation_degree = match (
+            self.last_hilbert_deviation_degree,
+            other.last_hilbert_deviation_degree,
+        ) {
+            (Some(a), Some(b)) => Some(a.max(b)),
+            (a, b) => a.or(b),
+        };
+        self.staircase_extinction_degree = match (
+            self.staircase_extinction_degree,
+            other.staircase_extinction_degree,
+        ) {
+            (Some(a), Some(b)) => Some(a.max(b)),
+            (a, b) => a.or(b),
+        };
         self.max_rows = self.max_rows.max(other.max_rows);
         self.max_columns = self.max_columns.max(other.max_columns);
         self.f4_field_multiplications += other.f4_field_multiplications;
@@ -764,16 +876,23 @@ fn solve_hybrid_visit(
             total.timed_out = true;
             break;
         };
-        let report = solve_system_visit(&branch, curve.f.p, degree, remaining, |coordinates| {
-            let mut coordinates = coordinates.to_vec();
-            coordinates.push(guess);
-            coordinates.sort_unstable();
-            if sets.insert(coordinates.clone()) {
-                visitor(&coordinates)
-            } else {
-                Ok(false)
-            }
-        })?;
+        let report = solve_system_visit(
+            &branch,
+            curve.f.p,
+            degree,
+            remaining,
+            false,
+            |coordinates| {
+                let mut coordinates = coordinates.to_vec();
+                coordinates.push(guess);
+                coordinates.sort_unstable();
+                if sets.insert(coordinates.clone()) {
+                    visitor(&coordinates)
+                } else {
+                    Ok(false)
+                }
+            },
+        )?;
         total.include(&report);
         if !total.complete {
             break;
@@ -864,13 +983,20 @@ fn solve_cover_visit(
             total.timed_out = true;
             break;
         };
-        let report = solve_system_visit(&system, curve.f.p, degree, remaining, |coordinates| {
-            if sets.insert(coordinates.to_vec()) {
-                visitor(coordinates)
-            } else {
-                Ok(false)
-            }
-        })?;
+        let report = solve_system_visit(
+            &system,
+            curve.f.p,
+            degree,
+            remaining,
+            false,
+            |coordinates| {
+                if sets.insert(coordinates.to_vec()) {
+                    visitor(coordinates)
+                } else {
+                    Ok(false)
+                }
+            },
+        )?;
         total.include(&report);
         if !total.complete {
             break;
@@ -1125,6 +1251,36 @@ pub fn build_pruned_line_system(
     beta: u64,
     lambda: u64,
 ) -> Result<System, String> {
+    let values = certified_line_values(curve, g, q, base, beta, lambda)?;
+    let p = curve.f.p;
+    let mut system = build_system(curve, &[values], Encoding::Line3)?;
+    // Extend the two line parameters by the inverse of t. Do not give
+    // that inverse a coordinate-domain tag.
+    for equation in &mut system.equations {
+        for (e, _) in equation {
+            e.push(0);
+        }
+    }
+    let t = Expr::var(0, 3, p);
+    let z = Expr::var(2, 3, p);
+    system.equations.push(f4_fp::normalise(
+        &t.mul(&z).sub(&t.c(1)).terms,
+        p,
+        Ordering::Grevlex,
+    ));
+    system.variables = 3;
+    system.domains.push(None);
+    Ok(system)
+}
+
+fn certified_line_values(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    base: &LabeledBase,
+    beta: u64,
+    lambda: u64,
+) -> Result<Vec<u64>, String> {
     validate_instance(curve, g, q)?;
     validate_base(curve, g, q, base)?;
     checked_order_three(curve, g, q, beta, lambda)?;
@@ -1153,25 +1309,7 @@ pub fn build_pruned_line_system(
             return Err("orbit labels are independent; horizontal pruning is not justified".into());
         }
     }
-    let values: Vec<_> = base.points.keys().copied().collect();
-    let mut system = build_system(curve, &[values], Encoding::Line3)?;
-    // Extend the two line parameters by the inverse of t. Do not give
-    // that inverse a coordinate-domain tag.
-    for equation in &mut system.equations {
-        for (e, _) in equation {
-            e.push(0);
-        }
-    }
-    let t = Expr::var(0, 3, p);
-    let z = Expr::var(2, 3, p);
-    system.equations.push(f4_fp::normalise(
-        &t.mul(&z).sub(&t.c(1)).terms,
-        p,
-        Ordering::Grevlex,
-    ));
-    system.variables = 3;
-    system.domains.push(None);
-    Ok(system)
+    Ok(base.points.keys().copied().collect())
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -1385,14 +1523,18 @@ pub fn find_relation(
         RelationSearch::System(encoding) => {
             let system = build_system(curve, &grouped_parts(base, encoding), encoding)?;
             match remaining() {
-                Some(budget) => solve_system_visit(&system, curve.f.p, degree, budget, &mut visit)?,
+                Some(budget) => {
+                    solve_system_visit(&system, curve.f.p, degree, budget, false, &mut visit)?
+                }
                 None => exhausted(),
             }
         }
         RelationSearch::PrunedLine3 { beta, lambda } => {
             let system = build_pruned_line_system(curve, g, q, base, beta, lambda)?;
             match remaining() {
-                Some(budget) => solve_system_visit(&system, curve.f.p, degree, budget, &mut visit)?,
+                Some(budget) => {
+                    solve_system_visit(&system, curve.f.p, degree, budget, false, &mut visit)?
+                }
                 None => exhausted(),
             }
         }
@@ -1621,6 +1763,48 @@ pub fn line_intersection_identity() -> super::identity_certificate::IdentityStat
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn hilbert_observations_are_opt_in_and_absent_from_frozen_default_serialization() {
+        let system = System {
+            variables: 1,
+            equations: vec![vec![(vec![2], 1), (vec![0], 6)]],
+            modulus: 7,
+            decode: Decode::Coordinates(1),
+            domains: vec![None],
+            model: (0, 1),
+        };
+        let plain = solve_system(&system, 7, 8, Duration::from_secs(5)).unwrap();
+        let observed =
+            visit_system_recording_hilbert(&system, 7, 8, Duration::from_secs(5), |_| Ok(false))
+                .unwrap();
+        assert!(plain.complete && observed.complete);
+        assert_eq!(plain.coordinate_sets, observed.coordinate_sets);
+        assert_eq!(plain.coordinate_sets, vec![vec![1], vec![6]]);
+        assert_eq!(observed.staircase_extinction_degree, Some(2));
+        let value = serde_json::to_value(&plain).unwrap();
+        for key in [
+            "first_hilbert_deviation_degree",
+            "last_hilbert_deviation_degree",
+            "staircase_extinction_degree",
+        ] {
+            assert!(
+                value.get(key).is_none(),
+                "{key} changed the frozen default record"
+            );
+        }
+        let cells = vec![leads::Cell {
+            system,
+            fixed_coordinates: vec![],
+        }];
+        let plan =
+            leads::visit_plan_recording_hilbert(&cells, 7, 8, Duration::from_secs(5), None, |_| {
+                Ok(false)
+            })
+            .unwrap();
+        assert_eq!(plan.coordinate_sets, plain.coordinate_sets);
+        assert_eq!(plan.staircase_extinction_degree, Some(2));
+    }
 
     #[test]
     fn expression_arithmetic_preserves_relative_coefficients() {
@@ -2051,10 +2235,17 @@ mod tests {
         )
         .unwrap();
         let mut order = Vec::new();
-        let full = solve_system_visit(&system, 101, 24, Duration::from_secs(20), |coordinates| {
-            order.push(coordinates.to_vec());
-            Ok(false)
-        })
+        let full = solve_system_visit(
+            &system,
+            101,
+            24,
+            Duration::from_secs(20),
+            false,
+            |coordinates| {
+                order.push(coordinates.to_vec());
+                Ok(false)
+            },
+        )
         .unwrap();
         assert!(full.complete);
         assert!(order.len() > 1);

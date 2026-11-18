@@ -1,0 +1,72 @@
+{
+  "schema": "qualified-bk-linear-verification/v1",
+  "source_commit": "a6aafb301da440b435e62e6c03274b104f10c63a",
+  "claim_id": "PCC-20261113-c139f1",
+  "declaration_sha256": "90b14f0e36dddcf0c5bd7a05fa8b905ec64cfb580f3c4490c875b884d1ce0712",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 10,
+  "gate_declarations": 22,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 30,
+  "actual_verdict": {
+    "claim_id": "PCC-20261113-c139f1",
+    "claim_sha256": "6e9cddecb90179062bdcb90a2832a4518c82a1c03531be7034be9ad29b9c84cd",
+    "commit": "a6aafb301da440b435e62e6c03274b104f10c63a",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/bk_linear_audit_20261113/lean (LinearCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-13T21:20:25Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261113-c139f1",
+    "claim_sha256": "6e9cddecb90179062bdcb90a2832a4518c82a1c03531be7034be9ad29b9c84cd",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47658,
+    "sha256": "8bdf8d30e8473c9adef05b846cefe2de364def336eef943c597be6f429429931",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 22,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "global_elaboration_flags": false,
+    "waivers": false,
+    "actual_rational_prime_order_points": true,
+    "actual_generic_two_by_two_matrices": true,
+    "derived_trace_and_charpoly": true,
+    "every_prime_Jordan_boundary": true,
+    "direct_deleted_hypothesis_negation": true,
+    "generic_geometric_rank_two_proved": false,
+    "actual_Frobenius_determinant_proved": false,
+    "actual_generic_torsion_field_descent_proved": false,
+    "qualified_source_refuted": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -1,0 +1,33 @@
+name: Richelot chart separate implementation trace audit11
+on:
+  pull_request:
+    paths:
+      - 'research/chained_richelot_chart_audit_20261116/**'
+      - 'research/chained_jacobian_transfers_20261110/native-richelot-chart-boundary-10/**'
+      - '.github/workflows/chained-transfer-chart-trace-audit-11.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-whole-trace-and-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install fixed native compiler and checks
+        run: rustup toolchain install 1.99.1 --profile minimal --component clippy,rustfmt
+      - name: Replay frozen auditor without running the producer
+        env:
+          AUDIT11_CUSTODY_DIR: ${{ runner.temp }}/chart-trace-audit11-entire-custody
+        run: bash research/chained_richelot_chart_audit_20261116/replay_audit_11.sh
+      - name: Retain the whole custody tree on every outcome
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: chart-trace-audit11-whole-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/chart-trace-audit11-entire-custody
+          include-hidden-files: true
+          if-no-files-found: error

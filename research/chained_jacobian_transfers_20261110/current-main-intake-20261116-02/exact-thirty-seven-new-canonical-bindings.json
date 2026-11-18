@@ -1,0 +1,412 @@
+[
+  {
+    "legacy": "pcc/claims/PCC-20261116-36ea9c.json",
+    "canonical_new": "pcc/claims/PCC-20261116-79945d.json",
+    "theorem": "CubicFiniteNorm22308.base_unit_certificate",
+    "normalized_statement": "theorem base_unit_certificate : \u2200 x : Fin 223, x=0 \u2228 x^221*x=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.base_unit_certificate",
+      "decl_sha256": "3ccaf29798687900a37689efd4666eb8bff9e00357788e274c0ba9aa8d73f55d"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-906992.json",
+    "canonical_new": "pcc/claims/PCC-20261116-9db256.json",
+    "theorem": "CubicFiniteNorm22308.base_cube_zero",
+    "normalized_statement": "theorem base_cube_zero : \u2200 x : Fin 223, x^3=0 \u2192 x=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.base_cube_zero",
+      "decl_sha256": "3007a2ee402abdf551dfde33ef6c2af20795a903870b607661e978ab37c4cbab"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-de9483.json",
+    "canonical_new": "pcc/claims/PCC-20261116-e62893.json",
+    "theorem": "CubicFiniteNorm22308.cofactor_cubic_relation",
+    "normalized_statement": "theorem cofactor_cubic_relation {R : Type} [CommRing R] (a b c : R) : (3*c^2-a*b)^3-3*(b^2-a*c)^3 = (a^3+3*b^3+9*c^3-9*a*b*c)*(3*c^3-b^3)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.cofactor_cubic_relation",
+      "decl_sha256": "1140da9015a88f3857f35ba285ada58af0eafcfcfb5179c5e9040e259cdf1fe6"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-2dcf13.json",
+    "canonical_new": "pcc/claims/PCC-20261116-1dad62.json",
+    "theorem": "CubicFiniteNorm22308.unit_cube_ratio",
+    "normalized_statement": "theorem unit_cube_ratio {R : Type} [CommRing R] (x y u : R) (hc : x^3=3*y^3) (hu : u*y=1) : (u*x)^3=3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.unit_cube_ratio",
+      "decl_sha256": "de5ebd8243d161dc8dfd124a45e958f3d6c962e54e140c52beecf3e3bd2661e0"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-141764.json",
+    "canonical_new": "pcc/claims/PCC-20261116-de86b6.json",
+    "theorem": "CubicFiniteNorm22308.zero_norm_cofactor_cubes",
+    "normalized_statement": "theorem zero_norm_cofactor_cubes (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hn : coefficientNorm x=0) : (cofactor x).2.1^3=3*(cofactor x).2.2^3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_cofactor_cubes",
+      "decl_sha256": "423695267c8fd20f53e6563130f486e02341a012f28db85b76565b66e2c55cb3"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-f851b5.json",
+    "canonical_new": "pcc/claims/PCC-20261116-0f0e90.json",
+    "theorem": "CubicFiniteNorm22308.zero_norm_second_cofactor",
+    "normalized_statement": "theorem zero_norm_second_cofactor (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hn : coefficientNorm x=0) : (cofactor x).2.2=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_second_cofactor",
+      "decl_sha256": "7738973e450ea3c233875741503b8e2d895bce69872ed9e8f159f028c0fb93f9"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-5c24db.json",
+    "canonical_new": "pcc/claims/PCC-20261116-4be376.json",
+    "theorem": "CubicFiniteNorm22308.zero_norm_first_cofactor",
+    "normalized_statement": "theorem zero_norm_first_cofactor (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hn : coefficientNorm x=0) : (cofactor x).2.1=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_first_cofactor",
+      "decl_sha256": "2bc2200a43f2f079d16e76599133452a316e6a305d0a9ba0e8bfef9a791a60dc"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-895088.json",
+    "canonical_new": "pcc/claims/PCC-20261116-aa68cd.json",
+    "theorem": "CubicFiniteNorm22308.zero_cofactors_cube_relation",
+    "normalized_statement": "theorem zero_cofactors_cube_relation {R : Type} [CommRing R] (a b c : R) (h1 : 3*c^2-a*b=0) (h2 : b^2-a*c=0) : b^3=3*c^3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_cofactors_cube_relation",
+      "decl_sha256": "0f4ba46b07c45baa1148a65ef50a14ca57f3d7aa48ea1720fdcd9ea7fc77ea48"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-628db1.json",
+    "canonical_new": "pcc/claims/PCC-20261116-8db4e3.json",
+    "theorem": "CubicFiniteNorm22308.zero_norm_coordinate_cube_relation",
+    "normalized_statement": "theorem zero_norm_coordinate_cube_relation (a b c : Fin 223) (hn : coefficientNorm (a,b,c)=0) : b^3=3*c^3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_coordinate_cube_relation",
+      "decl_sha256": "554f6ba2e093fd099d137d08e990c40708c8b2fc5253468850c83597e77a8f46"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-904526.json",
+    "canonical_new": "pcc/claims/PCC-20261116-b55c1f.json",
+    "theorem": "CubicFiniteNorm22308.zero_norm_third_coordinate",
+    "normalized_statement": "theorem zero_norm_third_coordinate (a b c : Fin 223) (hn : coefficientNorm (a,b,c)=0) : c=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_third_coordinate",
+      "decl_sha256": "ea2317b04fc40f67b10e416d45d82646993d05b589f61e02c7c67eed07480575"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-43a9b6.json",
+    "canonical_new": "pcc/claims/PCC-20261116-fe85eb.json",
+    "theorem": "CubicFiniteNorm22308.zero_norm_all_coordinates",
+    "normalized_statement": "theorem zero_norm_all_coordinates (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hn : coefficientNorm x=0) : x=(0,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_norm_all_coordinates",
+      "decl_sha256": "33f581b26e555d1c797549b641397a5f90e8d595985d9a7e8ac79e70aed21185"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-2e7c0a.json",
+    "canonical_new": "pcc/claims/PCC-20261116-fe249d.json",
+    "theorem": "CubicFiniteNorm22308.norm_zero_iff",
+    "normalized_statement": "theorem norm_zero_iff (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : coefficientNorm x=0 \u2194 x=(0,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.norm_zero_iff",
+      "decl_sha256": "3b4db0952384a143d24fd3e9134cdc8e6ba1e45d65c4deb4275cf47f98e58869"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-e288b6.json",
+    "canonical_new": "pcc/claims/PCC-20261116-b5215a.json",
+    "theorem": "CubicFiniteNorm22308.nonzero_input_nonzero_norm",
+    "normalized_statement": "theorem nonzero_input_nonzero_norm (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hx : x\u2260(0,0,0)) : coefficientNorm x\u22600",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.nonzero_input_nonzero_norm",
+      "decl_sha256": "d26e2527e6d12fce364f15805ce9df285935c53ae3c8ac8f3762338308c990ff"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-103800.json",
+    "canonical_new": "pcc/claims/PCC-20261116-c31626.json",
+    "theorem": "CubicFiniteNorm22308.derived_norm_unit",
+    "normalized_statement": "theorem derived_norm_unit (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hx : x\u2260(0,0,0)) : (coefficientNorm x)^221*coefficientNorm x=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.derived_norm_unit",
+      "decl_sha256": "4d769089c648d18c3cb19942881a628c3264b7ec6a38939bb7109f2ff018f688"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-99e465.json",
+    "canonical_new": "pcc/claims/PCC-20261116-139131.json",
+    "theorem": "CubicFiniteNorm22308.coefficient_cofactor_product",
+    "normalized_statement": "theorem coefficient_cofactor_product (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : coefficientProduct x (cofactor x)=(coefficientNorm x,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.coefficient_cofactor_product",
+      "decl_sha256": "57cc2b00808b8cc772bc24c97bc79383662318942acb039f7d36a57461afdf8c"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-00f1a5.json",
+    "canonical_new": "pcc/claims/PCC-20261116-e03752.json",
+    "theorem": "CubicFiniteNorm22308.coefficient_product_scale",
+    "normalized_statement": "theorem coefficient_product_scale (x y : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (s : Fin 223) : coefficientProduct x (scale s y)=scale s (coefficientProduct x y)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.coefficient_product_scale",
+      "decl_sha256": "388d634f0f72140abb334cc1ea8835b74704dec75f2d8c1ccb08b4109a720764"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-c67f93.json",
+    "canonical_new": "pcc/claims/PCC-20261116-2720d8.json",
+    "theorem": "CubicFiniteNorm22308.coefficient_product_comm",
+    "normalized_statement": "theorem coefficient_product_comm (x y : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : coefficientProduct x y=coefficientProduct y x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.coefficient_product_comm",
+      "decl_sha256": "8dea60fc87423056c64a4306f7b433c255c1b522eebc644b89824d9a5ced1706"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-434958.json",
+    "canonical_new": "pcc/claims/PCC-20261116-d501e0.json",
+    "theorem": "CubicFiniteNorm22308.every_nonzero_coefficient_inverse",
+    "normalized_statement": "theorem every_nonzero_coefficient_inverse (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (hx : x\u2260(0,0,0)) : coefficientProduct x (scale ((coefficientNorm x)^221) (cofactor x))=(1,0,0) \u2227 coefficientProduct (scale ((coefficientNorm x)^221) (cofactor x)) x=(1,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.every_nonzero_coefficient_inverse",
+      "decl_sha256": "0528a25808157cb0a8616f271b8b20573607e61f63fbe836d1e9834b324c4988"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-b5632d.json",
+    "canonical_new": "pcc/claims/PCC-20261116-99fd31.json",
+    "theorem": "CubicFiniteNorm22308.zero_and_unit_controls",
+    "normalized_statement": "theorem zero_and_unit_controls : coefficientNorm (0,0,0)=0 \u2227 coefficientNorm (1,0,0)=1 \u2227 coefficientProduct (1,0,0) (1,0,0)=(1,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.zero_and_unit_controls",
+      "decl_sha256": "eabe304e39041fc84afb12c5e0daf2bde452068ddebc3be9b572c31172e93439"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-8252cb.json",
+    "canonical_new": "pcc/claims/PCC-20261116-840a06.json",
+    "theorem": "CubicFiniteNorm22308.reducible_parameter_control",
+    "normalized_statement": "theorem reducible_parameter_control : ((222,1,0) : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223)\u2260(0,0,0) \u2227 ((222 : Fin 223)^3+1*(1 : Fin 223)^3+1^2*(0 : Fin 223)^3- 3*1*222*1*0)=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+      "theorem": "CubicFiniteNorm22308.reducible_parameter_control",
+      "decl_sha256": "55e4c632a07600958df834bdc046a41e868a16ceb9605ec1269afb20477cf8be"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-051194.json",
+    "canonical_new": "pcc/claims/PCC-20261116-2663ed.json",
+    "theorem": "CubicNativeNormEuclid22309.raw_norm_canonical",
+    "normalized_statement": "theorem raw_norm_canonical (a b c p0 p1 p2 : UInt64) : (rawNormBlock a b c p0 p1 p2).toNat<223",
+    "proof": {
+      "decl_sha256": "43dd251722b3cccbe28de647d54b360f729195fb5291305e01f626c59e97dade",
+      "kind": "lean",
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-final-03/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.raw_norm_canonical"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-627b3a.json",
+    "canonical_new": "pcc/claims/PCC-20261116-1bbb54.json",
+    "theorem": "CubicNativeNormEuclid22309.raw_norm_value",
+    "normalized_statement": "theorem raw_norm_value (a b c p0 p1 p2 : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) (hp0 : p0.toNat<223) (hp1 : p1.toNat<223) (hp2 : p2.toNat<223) : (rawNormBlock a b c p0 p1 p2).toNat= ((a.toNat*p0.toNat)%223+3*((b.toNat*p2.toNat+c.toNat*p1.toNat)%223))%223",
+    "proof": {
+      "decl_sha256": "5c8f2e7bf401e6049c1bd9d9ddf9783d68ec6eac3200eac505774083d21925b2",
+      "kind": "lean",
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-final-03/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.raw_norm_value"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-1fb162.json",
+    "canonical_new": "pcc/claims/PCC-20261116-cb189e.json",
+    "theorem": "CubicNativeNormEuclid22309.raw_norm_decode",
+    "normalized_statement": "theorem raw_norm_decode (a b c p0 p1 p2 : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) (hp0 : p0.toNat<223) (hp1 : p1.toNat<223) (hp2 : p2.toNat<223) : decodeWord (rawNormBlock a b c p0 p1 p2)= decodeWord a*decodeWord p0+3*(decodeWord b*decodeWord p2+decodeWord c*decodeWord p1)",
+    "proof": {
+      "decl_sha256": "c5613a93bb82cbdccb382f2e5a3d9f0c7c0972678bb1ea555e279e12b25521bd",
+      "kind": "lean",
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-final-03/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.raw_norm_decode"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-979277.json",
+    "canonical_new": "pcc/claims/PCC-20261116-80491d.json",
+    "theorem": "CubicNativeNormEuclid22309.checked_inverse_unit_table",
+    "normalized_statement": "theorem checked_inverse_unit_table : \u2200 n : Fin 223, n=0 \u2228 checkedInverse n\u2260none \u2227 (resultWord n).toNat<223 \u2227 decodeWord (resultWord n)*n=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.checked_inverse_unit_table",
+      "decl_sha256": "9d5a3cb11568ba791ad0d6b0f45be8c4e0644ada4354541cd18d97e0f3afa8fe"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-aae551.json",
+    "canonical_new": "pcc/claims/PCC-20261116-c8f007.json",
+    "theorem": "CubicNativeNormEuclid22309.euclid_terminal_table",
+    "normalized_statement": "theorem euclid_terminal_table : \u2200 n : Fin 223, n=0 \u2228 (euclidLoop 16 (initialState n)).isSome=true \u2227 (finalState n).nr=0 \u2227 (finalState n).r=1 \u2227 0\u2264normalizedCoefficient (finalState n) \u2227 normalizedCoefficient (finalState n)<223",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.euclid_terminal_table",
+      "decl_sha256": "935e318ef2d8e17d6f4fbc41cf00924efd4f76f5642f0ece3354441cba0942c3"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-240c3a.json",
+    "canonical_new": "pcc/claims/PCC-20261116-00e3f6.json",
+    "theorem": "CubicNativeNormEuclid22309.euclid_trace_safety_table",
+    "normalized_statement": "theorem euclid_trace_safety_table : \u2200 n : Fin 223, (euclidTrace 16 (initialState n)).all (fun s => decide (safeState s))=true",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.euclid_trace_safety_table",
+      "decl_sha256": "77797db223f6a239b8961f961343f0f8bde205744ce75c52a5b6bab11f2a2080"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-3beb1b.json",
+    "canonical_new": "pcc/claims/PCC-20261116-e307b5.json",
+    "theorem": "CubicNativeNormEuclid22309.every_visited_state_safe",
+    "normalized_statement": "theorem every_visited_state_safe (n : Fin 223) (s : EuclidState) (hs : s\u2208euclidTrace 16 (initialState n)) : safeState s",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.every_visited_state_safe",
+      "decl_sha256": "78afc3c4e9e0c60e435edb4543ed1c2c1f7bb5bee4254c8c889b1617f1919c34"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-d5a6be.json",
+    "canonical_new": "pcc/claims/PCC-20261116-0ff3d5.json",
+    "theorem": "CubicNativeNormEuclid22309.actual_division_matches",
+    "normalized_statement": "theorem actual_division_matches (n : Fin 223) (s : EuclidState) (hs : s\u2208euclidTrace 16 (initialState n)) (hnr : s.nr\u22600) : 0<s.nr \u2227 s.r.tdiv s.nr=s.r/s.nr",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.actual_division_matches",
+      "decl_sha256": "a2a696cd7d7c3ab0ee9dbbba4c82e601973453ca76ca5716aed33fe2d5ae63ab"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-471bec.json",
+    "canonical_new": "pcc/claims/PCC-20261116-5c1449.json",
+    "theorem": "CubicNativeNormEuclid22309.nonzero_checked_inverse",
+    "normalized_statement": "theorem nonzero_checked_inverse (n : Fin 223) (hn : n\u22600) : checkedInverse n\u2260none \u2227 (resultWord n).toNat<223 \u2227 decodeWord (resultWord n)*n=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.nonzero_checked_inverse",
+      "decl_sha256": "de6b79e97d6a040bea8adddca60fc2eedefcdc3b9fcdce4ff18a0ebf5c4ac121"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-a6488e.json",
+    "canonical_new": "pcc/claims/PCC-20261116-619631.json",
+    "theorem": "CubicNativeNormEuclid22309.nonzero_loop_terminates",
+    "normalized_statement": "theorem nonzero_loop_terminates (n : Fin 223) (hn : n\u22600) : (euclidLoop 16 (initialState n)).isSome=true \u2227 (finalState n).nr=0 \u2227 (finalState n).r=1 \u2227 0\u2264normalizedCoefficient (finalState n) \u2227 normalizedCoefficient (finalState n)<223",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.nonzero_loop_terminates",
+      "decl_sha256": "6d5a1edf72e95a99bb0e229263727d8a26b33efdb5ae051f55d83b861ffcb27d"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-6fe646.json",
+    "canonical_new": "pcc/claims/PCC-20261116-a9b16f.json",
+    "theorem": "CubicNativeNormEuclid22309.actual_returned_inverse",
+    "normalized_statement": "theorem actual_returned_inverse (n : Fin 223) (hn : n\u22600) (u : UInt64) (hu : checkedInverse n=some u) : u.toNat<223 \u2227 decodeWord u*n=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.actual_returned_inverse",
+      "decl_sha256": "77ee101b29804e81455de7408f2a3ba3ffd9ed7ff164042befa4ff12fc606f41"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-efd731.json",
+    "canonical_new": "pcc/claims/PCC-20261116-2e3705.json",
+    "theorem": "CubicNativeNormEuclid22309.zero_and_exhaustion_controls",
+    "normalized_statement": "theorem zero_and_exhaustion_controls : checkedInverse 0=none \u2227 euclidLoop 0 (initialState 2)=none",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.zero_and_exhaustion_controls",
+      "decl_sha256": "9cf84cb243a1e61a4dbeae73a0b462e9a87faa990d40874af337b9043262dd72"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-b32550.json",
+    "canonical_new": "pcc/claims/PCC-20261116-8ae7a5.json",
+    "theorem": "CubicNativeNormEuclid22309.negative_normalization_control",
+    "normalized_statement": "theorem negative_normalization_control : (finalState 2).t=(-111) \u2227 normalizedCoefficient (finalState 2)=112 \u2227 checkedInverse 2=some 112 \u2227 (112 : Fin 223)*2=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.negative_normalization_control",
+      "decl_sha256": "26ed1368f0ad80f79eb744743cc8fdb4c5f293f9b8b283d0f78a734e94bdadab"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-3278a4.json",
+    "canonical_new": "pcc/claims/PCC-20261116-eb2e95.json",
+    "theorem": "CubicNativeNormEuclid22309.last_residue_inverse_control",
+    "normalized_statement": "theorem last_residue_inverse_control : checkedInverse 222=some 222 \u2227 (222 : Fin 223)*222=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.last_residue_inverse_control",
+      "decl_sha256": "db93d7ebb4b0830c3f94a170e9f8fd44fb3a3423e6f436589aa51a50da1e18a7"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-76d5c4.json",
+    "canonical_new": "pcc/claims/PCC-20261116-705454.json",
+    "theorem": "CubicNativeNormEuclid22309.noncanonical_norm_overflow_control",
+    "normalized_statement": "theorem noncanonical_norm_overflow_control : rawNormBlock (UInt64.ofNat (2^63)) 0 0 2 0 0=0 \u2227 decodeWord (rawNormBlock (UInt64.ofNat (2^63)) 0 0 2 0 0)\u2260 decodeWord (UInt64.ofNat (2^63))*2",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.noncanonical_norm_overflow_control",
+      "decl_sha256": "61ebfd6fce0ff36ad1be0a92d128bd69e3423cace41c837eb603fa94a5fa554b"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-aa7e4c.json",
+    "canonical_new": "pcc/claims/PCC-20261116-fa42fe.json",
+    "theorem": "CubicNativeNormEuclid22309.cofactor_norm_decode_complete",
+    "normalized_statement": "theorem cofactor_norm_decode_complete (a b c : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) : decodeWord (rawNormBlock a b c (wordCofactor a b c).1 (wordCofactor a b c).2.1 (wordCofactor a b c).2.2)= CubicNormDescent.norm 3 (decodeWord a) (decodeWord b) (decodeWord c)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.cofactor_norm_decode_complete",
+      "decl_sha256": "634247f81fcea3496bb12bce82760050dc5991b062c5af726d123150da3710c5"
+    }
+  },
+  {
+    "legacy": "pcc/claims/PCC-20261116-48b9ae.json",
+    "canonical_new": "pcc/claims/PCC-20261116-e13946.json",
+    "theorem": "CubicNativeNormEuclid22309.cofactor_norm_exact_value_complete",
+    "normalized_statement": "theorem cofactor_norm_exact_value_complete (a b c : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) : (rawNormBlock a b c (wordCofactor a b c).1 (wordCofactor a b c).2.1 (wordCofactor a b c).2.2).toNat= (CubicNormDescent.norm 3 (decodeWord a) (decodeWord b) (decodeWord c)).val",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+      "theorem": "CubicNativeNormEuclid22309.cofactor_norm_exact_value_complete",
+      "decl_sha256": "1c9cd86856aa4eba03e32b79751d00900252711c530f0a15e692bdec02fb060c"
+    }
+  }
+]

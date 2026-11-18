@@ -1,0 +1,55 @@
+name: agent-learning
+
+# The continuous-learning loop (AGENTS.md "Continuous learning loop"):
+# lesson entries are content-addressed and append-only, every entry carries
+# evidence, and the Lean health report gives advisory notes on changed proofs
+# (skill lean-instance-gate). The Lean step never blocks.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-learning-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  learning:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Lessons tool tests
+        run: python3 tools/test_lessons.py
+      - name: Autonomy tool tests and records
+        run: |
+          python3 tools/test_autonomy_report.py
+          if [ -n "${{ github.base_ref }}" ]; then
+            python3 tools/autonomy_report.py verify --base "origin/${{ github.base_ref }}"
+          else
+            python3 tools/autonomy_report.py verify
+          fi
+      - name: Lessons ledger is append-only and evidenced
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ -n "$BASE_REF" ]; then
+            python3 tools/lessons.py verify --base "origin/$BASE_REF"
+          else
+            python3 tools/lessons.py verify
+          fi
+      - name: Lean health (advisory)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: tools/lean/lean-health.sh --diff "origin/$BASE_REF"

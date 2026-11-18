@@ -63,6 +63,13 @@ class Scratch(unittest.TestCase):
     def repin(self, d: Path, key: str, name: str) -> None:
         self.edit(d, "VALIDATION.json", lambda m: m[key].update(sha256=g.sha256_file(d / name)))
 
+    def artifacts(self, name="sweep/ev", mutate=None) -> dict:
+        """The three artifact keys of a passing sweep verdict, naming real files that check."""
+        d = self.evidence(name, mutate)
+        return {"replay_certificate": f"{name}/replay-certificate.json",
+                "validator_report": f"{name}/validator-report.json",
+                "rho_reference": f"{name}/VALIDATION.json"}
+
 
 class EvidenceDir(Scratch):
     def errors(self, d: Path) -> list[str]:
@@ -143,6 +150,93 @@ class EvidenceDir(Scratch):
         self.assertIn("same_binary_or_process", e)
         self.assertIn("kind", e)
 
+    # --- the comparison is the gate's, not the producer's (audit 2026-11-15, V-4) ---
+
+    def headline(self, d: Path, **kw) -> list[str]:
+        self.edit(d, "validator-report.json", lambda r: r["headline"][0].update(**kw))
+        self.repin(d, "validator_report", "validator-report.json")
+        return self.errors(d)
+
+    def test_nan_rel_tol_does_not_switch_the_comparison_off(self):
+        e = self.headline(self.evidence(), claimed=0.01, recomputed=5.47, rel_tol=float("nan"))
+        self.assertEqual(len(e), 1)
+        self.assertIn("rel_tol of 1 headline(s) is not a finite number", e[0])
+
+    def test_rel_tol_that_is_not_a_finite_number_from_zero_is_refused(self):
+        for n, tol in enumerate((float("inf"), float("nan"), -1e-9, "1e-9", None, True)):
+            e = self.headline(self.evidence(f"runs/t{n}"), rel_tol=tol)
+            self.assertTrue(any("rel_tol" in x for x in e), tol)
+
+    def test_rel_tol_above_the_maximum_is_refused_once_the_cap_is_enforced(self):
+        wide = (1e300, 1e-3, 2 * g.HEADLINE_REL_TOL_MAX)
+        self.assertFalse(g.HEADLINE_REL_TOL_ENFORCE_MAX, "the cap is an owner decision; see the gate's comment")
+        for n, tol in enumerate(wide):
+            self.assertEqual(self.headline(self.evidence(f"runs/l{n}"), rel_tol=tol), [], tol)
+        g.HEADLINE_REL_TOL_ENFORCE_MAX = True
+        try:
+            for n, tol in enumerate(wide):
+                e = self.headline(self.evidence(f"runs/t{n}"), rel_tol=tol)
+                self.assertTrue(any("rel_tol" in x for x in e), tol)
+        finally:
+            g.HEADLINE_REL_TOL_ENFORCE_MAX = False
+
+    def test_rel_tol_up_to_the_maximum_is_honoured(self):
+        d = self.evidence()
+        near = 1.25 * (1 + 5e-7)
+        self.assertEqual(self.headline(d, recomputed=near, rel_tol=g.HEADLINE_REL_TOL_MAX), [])
+        self.assertIn("recomputed", self.headline(d, recomputed=near, rel_tol=1e-7)[0])
+
+    def test_default_tolerance_is_the_gates_constant(self):
+        d = self.evidence()
+        self.assertEqual(self.headline(d, recomputed=1.25 * (1 + 1e-10)), [])
+        self.assertIn("recomputed", self.headline(d, recomputed=1.25 * (1 + 1e-7))[0])
+
+    def test_non_finite_headline_numbers_are_refused(self):
+        for n, bad in enumerate((float("nan"), float("inf"))):
+            e = self.headline(self.evidence(f"runs/t{n}"), claimed=bad, recomputed=bad)
+            self.assertIn("lacks numeric claimed/recomputed", e[0])
+
+    def test_pinned_artifact_must_be_a_json_object(self):
+        d = self.evidence()
+        dump(d / "replay-certificate.json", [])
+        self.repin(d, "replay_certificate", "replay-certificate.json")
+        self.assertEqual(self.errors(d), ["replay certificate: replay-certificate.json is not a JSON object"])
+
+    def band(self, d: Path, holds, **points) -> list[str]:
+        def fn(m):
+            m["rho_reference"]["order_holds_across_band"] = holds
+            for k, ic in points.items():
+                m["rho_reference"]["gae_band"][k.replace("_", ".")[1:]]["ic"] = ic
+        self.edit(d, "VALIDATION.json", fn)
+        return self.errors(d)
+
+    def test_order_holds_across_band_is_derived_from_the_band(self):
+        d = self.evidence()  # the fixture: ic above rho (10.0) at all three points, stored true
+        self.assertIn("is false but the gae_band numbers give true", self.band(d, False)[0])
+        # ic below rho at 0, above it at 0.1 and 1: the order does not hold
+        self.assertIn("is true but the gae_band numbers give false", self.band(d, True, p0=9.0)[0])
+        self.assertEqual(self.band(d, False, p0=9.0), [])
+        # a tie is not an order
+        self.assertIn("give false", self.band(d, True, p0=10.0)[0])
+        self.assertEqual(self.band(d, True, p0=12.5), [])
+
+    def test_non_finite_band_numbers_are_refused(self):
+        d = self.evidence()
+        self.assertTrue(any("gae_band[0.1]" in e for e in self.band(d, True, p0_1=float("nan"))))
+        self.assertTrue(any("gae_band[1]" in e for e in self.band(d, True, p0_1=13.0, p1=float("inf"))))
+
+    def test_row_digest_binds_the_manifest_to_the_row(self):
+        d = self.evidence()
+        self.assertEqual(g.check_evidence_dir(d, self.repo, "icv1-toy", "a" * 64), [])  # no binding: not checked
+        self.edit(d, "VALIDATION.json", lambda m: m.update(row_digest="a" * 64))
+        self.assertEqual(g.check_evidence_dir(d, self.repo, "icv1-toy", "a" * 64), [])
+        self.assertIn("row_digest does not match", g.check_evidence_dir(d, self.repo, "icv1-toy", "b" * 64)[0])
+        self.edit(d, "VALIDATION.json", lambda m: m.update(row_digest={"icv1-toy": "a" * 64}))
+        self.assertEqual(g.check_evidence_dir(d, self.repo, "icv1-toy", "a" * 64), [])
+        self.assertTrue(g.check_evidence_dir(d, self.repo, "icv1-other", "a" * 64))
+        self.assertEqual(g.check_evidence_dir(d, self.repo, None, "a" * 64), [])  # a benchmarks row has no slug
+        self.assertTrue(g.check_evidence_dir(d, self.repo, None, "b" * 64))
+
     def test_manifest_row_list_restricts_rows(self):
         d = self.evidence()
         self.edit(d, "VALIDATION.json", lambda m: m.update(rows=["icv1-other"]))
@@ -201,9 +295,67 @@ class Board(Scratch):
 
     def test_sweep_pass_verdict_validates_a_pre_gate_row(self):
         r = row()
-        v = {"row": r["slug"], "verdict": "validated", "replay_certificate": "c", "validator_report": "v",
-             "rho_reference": "r"}
+        v = {"row": r["slug"], "verdict": "validated", **self.artifacts()}
         self.run_board([r], pre_gate={g.board_key(r): g.row_digest(r)}, verdicts=[v])
+        self.assertEqual(r["validation"]["status"], g.VALIDATED)
+
+    # --- a passing verdict needs artifacts that exist and check (audit 2026-11-15, V-3) ---
+
+    PLACEHOLDERS = {"verdict": "ok", "replay_certificate": "-", "validator_report": "-", "rho_reference": "-"}
+
+    def test_sweep_pass_naming_no_real_artifact_does_not_validate(self):
+        r = row()
+        self.run_board([r], pre_gate=self.frozen(r), verdicts=[{"row": r["slug"], **self.PLACEHOLDERS}])
+        self.assertEqual(r["validation"]["status"], g.PRE_GATE)
+        why = "; ".join(r["validation"]["reasons"])
+        for key in g.VERDICT_ARTIFACTS:
+            self.assertIn(f"{key}: - is not a file", why)
+
+    def test_sweep_pass_naming_no_real_artifact_cannot_admit_a_new_row(self):
+        with self.assertRaises(SystemExit) as cm:
+            self.run_board([row()], pre_gate={}, verdicts=[{"row": row()["slug"], **self.PLACEHOLDERS}])
+        self.assertIn("does not validate", str(cm.exception))
+
+    def test_sweep_pass_artifacts_get_the_manifest_checks(self):
+        def unverified(d):
+            self.edit(d, "replay-certificate.json", lambda c: c.update(scalars_verified=False))
+        def disagrees(d):
+            self.edit(d, "validator-report.json", lambda v: v["headline"][0].update(recomputed=2.0))
+        def crossed(d):
+            self.edit(d, "VALIDATION.json", lambda m: m["rho_reference"]["gae_band"]["0"].update(ic=9.0))
+        for n, (mutate, reason) in enumerate(((unverified, "scalars_verified is not true"),
+                                              (disagrees, "recomputed 2.0"),
+                                              (crossed, "order_holds_across_band is true but"))):
+            r = row()
+            v = {"row": r["slug"], "verdict": "validated", **self.artifacts(f"sweep/ev{n}", mutate)}
+            self.run_board([r], pre_gate=self.frozen(r), verdicts=[v])
+            self.assertEqual(r["validation"]["status"], g.PRE_GATE, reason)
+            self.assertIn(reason, "; ".join(r["validation"]["reasons"]))
+
+    def test_sweep_pass_artifact_cannot_leave_the_repository(self):
+        r = row()
+        v = {"row": r["slug"], "verdict": "validated", **self.artifacts()}
+        v["replay_certificate"] = str(FIX / "positive/replay-certificate.json")  # a real file, outside self.repo
+        self.run_board([r], pre_gate=self.frozen(r), verdicts=[v])
+        self.assertEqual(r["validation"]["status"], g.PRE_GATE)
+        self.assertIn("leaves the repository", "; ".join(r["validation"]["reasons"]))
+
+    def test_sweep_pass_artifact_may_pin_a_sha256(self):
+        art = self.artifacts()
+        cert = art["replay_certificate"]
+        for sha, want in ((g.sha256_file(self.repo / cert), g.VALIDATED), ("0" * 64, g.PRE_GATE)):
+            r = row()
+            v = {"row": r["slug"], "verdict": "validated", **art, "replay_certificate": {"path": cert, "sha256": sha}}
+            self.run_board([r], pre_gate=self.frozen(r), verdicts=[v])
+            self.assertEqual(r["validation"]["status"], want)
+
+    def test_sweep_pass_rho_reference_may_be_a_descriptor_file(self):
+        art = self.artifacts()
+        ref = json.loads((self.repo / art["rho_reference"]).read_text())["rho_reference"]
+        dump(self.repo / "sweep/rho-reference.json", ref)
+        r = row()
+        v = {"row": r["slug"], "verdict": "validated", **art, "rho_reference": "sweep/rho-reference.json"}
+        self.run_board([r], pre_gate=self.frozen(r), verdicts=[v])
         self.assertEqual(r["validation"]["status"], g.VALIDATED)
 
     def test_sweep_pass_without_the_three_artifacts_does_not_validate(self):
@@ -307,7 +459,7 @@ class Board(Scratch):
         self.assertIn("lacks replay_certificate", "; ".join(r["validation"]["reasons"]))
 
     def test_validated_with_pointers_passes_only_when_caveats_are_clean(self):
-        art = {"replay_certificate": "c", "validator_report": "v", "rho_reference": "r"}
+        art = self.artifacts()
         r = row(family="A")
         self.run_board([r], pre_gate=self.frozen(r), verdicts=[self.sweep_line(r, "validated", **art)])
         self.assertEqual(r["validation"]["status"], g.VALIDATED)
@@ -333,7 +485,7 @@ class Board(Scratch):
     def test_failing_verdict_wins_over_manifest_and_over_a_later_passing_line(self):
         d = self.evidence("ev")
         r = row(source=self.rel(d) + "/analysis.json", family="A")
-        art = {"replay_certificate": "c", "validator_report": "v", "rho_reference": "r"}
+        art = self.artifacts()
         lines = [self.sweep_line(r, "contradicted"), self.sweep_line(r, "validated", **art)]
         with self.assertRaises(SystemExit):
             self.run_board([r], pre_gate={}, verdicts=lines)
@@ -461,6 +613,16 @@ class CiCheck(Scratch):
                                         old_readme if path == g.BENCHMARKS_README else None):
             self.assertEqual(g.benchmark_archive_errors(self.repo, {}, base="base"), [])
 
+    def test_archived_duplicate_identical_legacy_rows_need_one_disposition(self):
+        self.tree([], [])
+        self.archive()
+        old_readme = "# Benchmarks\n" + self.LINE + "\n" + self.LINE + "\n"
+        with unittest.mock.patch.object(
+            g, "git_show", side_effect=lambda ref, path:
+            old_readme if path == g.BENCHMARKS_README else None,
+        ):
+            self.assertEqual(g.benchmark_archive_errors(self.repo, {}, base="base"), [])
+
     def test_archive_row_hash_and_provenance_are_required(self):
         self.tree([], [])
         row = self.archive()
@@ -495,6 +657,89 @@ class CiCheck(Scratch):
         files = {g.BENCHMARKS_README: "# Benchmarks\n", g.BENCHMARKS_ARCHIVE: json.dumps(old)}
         with unittest.mock.patch.object(g, "git_show", side_effect=lambda ref, path: files.get(path)):
             self.assertEqual(g.benchmark_archive_errors(self.repo, {}, base="base"), [])
+
+    # --- sweep verdict files against the base, and the base itself (audit 2026-11-15, V-3, V-18) ---
+
+    FAILING = {"row": "icv1-toy", "verdict": "contradicted"}
+    CAVEATED = {"row": "icv1-other", "verdict": "validated_with_caveats", "pricing_ok": False}
+    PLACEHOLDERS = {"verdict": "ok", "replay_certificate": "-", "validator_report": "-", "rho_reference": "-"}
+
+    def sweep(self, lines, kind="leaderboard") -> str:
+        text = "".join(json.dumps(v) + "\n" for v in lines)
+        p = self.repo / g.SWEEPS[kind]
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text)
+        return text
+
+    def check_against(self, base_files: dict) -> list[str]:
+        """g.check against a base that resolves and holds exactly `base_files`."""
+        with unittest.mock.patch.object(g, "base_resolves", return_value=True), \
+                unittest.mock.patch.object(g, "git_show", side_effect=lambda ref, path: base_files.get(path)):
+            return g.check(self.repo, base="base")
+
+    def test_sweep_verdict_file_is_append_only_against_the_base(self):
+        r = row("icv1-kept")
+        self.tree([self.annotated(r, g.PRE_GATE)], [], lb_pre={g.board_key(r): g.row_digest(r)})
+        rel = g.SWEEPS["leaderboard"]
+        base = {rel: self.sweep([self.FAILING, self.CAVEATED])}
+        self.assertEqual(self.check_against(base), [])
+        self.sweep([self.FAILING, self.CAVEATED, {"row": "icv1-new", "verdict": "unvalidated"}])
+        self.assertEqual(self.check_against(base), [])  # appending is the one permitted change
+        for lines, n in (([self.CAVEATED], 1),                                           # the failing line deleted
+                         ([{**self.FAILING, "verdict": "unvalidated"}, self.CAVEATED], 1),  # ... or altered
+                         ([self.FAILING], 2),                                            # a later line deleted
+                         ([self.CAVEATED, self.FAILING], 1)):                            # reordered
+            self.sweep(lines)
+            problems = self.check_against(base)
+            self.assertEqual(len(problems), 1, lines)
+            self.assertIn(f"{rel}: verdict {n} of the base file is missing or altered", problems[0])
+        (self.repo / rel).unlink()
+        self.assertIn("missing or altered", self.check_against(base)[0])
+
+    def test_new_sweep_verdict_file_needs_artifacts_that_check(self):
+        r = row()
+        self.tree([self.annotated(r, g.PRE_GATE)], [self.LINE],
+                  lb_pre={g.board_key(r): g.row_digest(r)}, bm_pre={"20261019-toy": g.line_digest(self.LINE)})
+        for kind, key in (("leaderboard", r["slug"]), ("benchmarks", "20261019-toy")):
+            self.sweep([{"row": key, **self.PLACEHOLDERS}], kind)
+            self.assertEqual(g.check(self.repo), [], kind)  # without a base: the row just stays frozen
+            problems = self.check_against({})
+            self.assertEqual(len(problems), 1, kind)
+            self.assertIn(f"{g.SWEEPS[kind]} is new and its passing verdict 1 ({key}) does not check", problems[0])
+            self.assertIn("replay_certificate: - is not a file", problems[0])
+            (self.repo / g.SWEEPS[kind]).unlink()
+        # a new file whose lines do not pass, or whose passing line names artifacts that check, is allowed
+        self.sweep([self.CAVEATED], "leaderboard")
+        self.sweep([{"row": "20261019-toy", "verdict": "ok", **self.artifacts()}], "benchmarks")
+        self.assertEqual(self.check_against({}), [])
+
+    def test_placeholder_verdict_does_not_admit_a_benchmarks_row(self):
+        self.tree([], [self.LINE])
+        self.sweep([{"row": "20261019-toy", **self.PLACEHOLDERS}], "benchmarks")
+        problems = g.check(self.repo)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("benchmarks 20261019-toy: unvalidated: sweep verdict ok does not validate", problems[0])
+        self.sweep([{"row": "20261019-toy", "verdict": "ok", **self.artifacts()}], "benchmarks")
+        self.assertEqual(g.check(self.repo), [])
+
+    def test_base_that_does_not_resolve_stops_the_check(self):
+        r = row()
+        self.tree([self.annotated(r, g.PRE_GATE)], [], lb_pre={g.board_key(r): g.row_digest(r)})
+        self.assertFalse(g.base_resolves("no-such-ref-for-the-validation-gate"))
+        with self.assertRaises(SystemExit) as cm:
+            g.check(self.repo, base="no-such-ref-for-the-validation-gate")
+        self.assertIn("does not resolve to a commit", str(cm.exception))
+        run = subprocess.run([sys.executable, str(REPO / "scripts/validation_gate.py"), "check",
+                              "--base", "no-such-ref-for-the-validation-gate"], capture_output=True, text=True)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("does not resolve to a commit", run.stderr)
+
+    def test_file_absent_at_a_base_that_resolves_is_allowed(self):
+        r = row()
+        self.tree([self.annotated(r, g.PRE_GATE)], [], lb_pre={g.board_key(r): g.row_digest(r)})
+        self.assertTrue(g.base_resolves("HEAD"))
+        with unittest.mock.patch.object(g, "git_show", return_value=None):
+            self.assertEqual(g.check(self.repo, base="HEAD"), [])
 
     def test_freeze_may_only_shrink(self):
         self.assertEqual(g.grown({"a": "1", "b": "2"}, {"a": "1", "b": "2"}), [])

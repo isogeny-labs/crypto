@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>CM transfer recognition: coefficient geometry gives unchanged coverage</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="round-05.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">CM transfer recognition: coefficient geometry gives
+unchanged coverage</h1>
+<p class="date">16 November 2026 — round five</p>
+</header>
+<p>Replacing Euclidean coefficient geometry with the classical
+Eisenstein metric gives <strong>no observed coverage gain</strong> in
+the fixed round04 bins. All five declared calls finish with their
+global-root, source, target and scalar controls intact. Native claim
+<strong>PCC-20261116-fc5aeb is unsigned</strong>. This is a bounded
+local correctness trial, with no timing, performance or novelty claim.
+[pcc:unverified]</p>
+<figure>
+<img src="round-05-route.svg"
+alt="The single changed component and its finite matrix certificates" />
+<figcaption aria-hidden="true">The single changed component and its
+finite matrix certificates</figcaption>
+</figure>
+<p>For coefficient pairs (a,b),(c,d), the new bilinear form is
+2ac−ad−bc+2bd. Exact Gram–Schmidt initialization and final recomputation
+both use this metric; the original integer lattice, unimodular change
+certificate, delta3/4,10000-step cap and reduced-basis-row inspection
+stay the same. The core still receives model,Q,N only, with no source
+scalar, subgroup lookup or orbit label. This change leaves the dense
+field degree d=(r−1)/6 and lattice dimension2d+2 unchanged.</p>
+<figure>
+<img src="round-05-coverage.svg"
+alt="Recorded original and metric-trial coverage; fixed finite inputs, no statistical intervals" />
+<figcaption aria-hidden="true">Recorded original and metric-trial
+coverage; fixed finite inputs, no statistical intervals</figcaption>
+</figure>
+<p>Order19 accepts6/18 at tested1/2/4 digits and18/18 at8/16/32. Order61
+accepts1/4 public inputs at4/8/16 digits and3/4 at32. The same fourth
+public input remains uncovered. Every call has the original60-second
+cap; none times out. No order127 setup is repeated, and all earlier
+constructor failures remain preserved. Do not infer minimum precision or
+untested input coverage from these counts. [pcc:unverified]</p>
+<p>Five new Lean endpoints concern the literal real2x2 matrix with
+rational entries: its two displayed factorizations, their
+positive-semidefinite consequences and positive definiteness. They apply
+existing Mathlib matrix laws. They do not formalize native LLL, vector
+encoding, CM specialization, the target solver or full scalar transfer.
+The first sources fail on a missing notation scope and are archived
+unchanged; V4 explicitly imports the existing real star-order instance
+and writes the scalar matrix explicitly. Final axiom and proof-gate
+records accompany the declaration bindings. [pcc:unverified]</p>
+<p>The tested coverage is unchanged. In particular, a classical
+norm/separation criterion for rejecting false relations is different
+from an existence bound for a small representative of every input. Next
+is a useful a priori representation-height/precision guarantee and a
+compact evaluator, beyond tuning one uncovered fixture. The original
+arbitrary-curve goal remains active.</p>
+<p><strong>Evidence:</strong> <a
+href="../round-05/PROTOCOL.md">protocol</a>, <a
+href="../round-05/PROOF-MAP.md">six-field instance gate</a>, <a
+href="../receipts/round-05/">raw calls and claims</a>, and <a
+href="../round-04/RESULT.md">round04 construction and scalar
+argument</a>. Prior art: original LLL1982 §§1–2 and repository CT84.
+KB/Conductor/Cargo remain unavailable. Mathlib4.24 revision
+f897ebcf72cd16f89ab4577d0c826cd14afaafc7; one Lake process, no limit
+overrides or native_decide. All86 older scientific pins remain
+unchanged; no PNG or direct artifact upload is added.</p>
+</body>
+</html>

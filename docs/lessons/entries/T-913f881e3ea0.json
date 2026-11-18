@@ -1,0 +1,11 @@
+{
+  "context": "GB-SOLVER-SHOOTOUT-20261116 run-local (local diagnostic): the study script (analysis-local/analyze_amend1.rs) computes the band from cells.json rho (U = partition_hashes + canonicalizations); recomputed with band.rs's rule independently; U_rho and w-readings match (111.296; log2 22.33/24.33 inherited-f4), and the check surfaced that C_rho uses walk additions only while band.rs G charges setup (17 adds) and scalar multiplications (35) per DLP",
+  "created": "2026-11-17T08:46:03Z",
+  "evidence": [
+    "research/groebner_solver_shootout_20261116/run-local/cells.json sha256 87d4b7a84b71c3f22167292f77f560d26c79419716e29c667b17af88f71b7f0f; src/cryptanalysis/ecbench/band.rs priced_gae; src/cryptanalysis/ecbench/methods.rs rho_report"
+  ],
+  "kind": "test",
+  "lesson": "L-546d37ca7750",
+  "outcome": "confirm",
+  "schema": "crypto.lesson/v1"
+}

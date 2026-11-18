@@ -1,0 +1,80 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "wallfix isolab 2026-11-13: Koblitz gate (identity + wall), draft derived from gate-koblitz.json",
+  "description": "Same workloads, arms and target_seed as docs/perf/20261110-wall-only-rust-fixes/gate-koblitz.json; measurement block copied from taskq/deploy/eks-karpenter/l2-validation.json (timeout_seconds 300 from the gate); control arm rho-strong-aa repeats the reference. Not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 17
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261110
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "rf-mitm",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "rootfind-mitm:m=3"
+        }
+      }
+    },
+    {
+      "name": "rf-pairs",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "rootfind-pairs:m=3",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "da-f4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=6",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2"
+        }
+      }
+    },
+    {
+      "name": "rho-strong-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

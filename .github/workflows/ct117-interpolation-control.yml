@@ -1,0 +1,36 @@
+name: CT117 interpolation anti-table control
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct117/**'
+      - '.github/workflows/ct117-interpolation-control.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct117/**'
+      - '.github/workflows/ct117-interpolation-control.yml'
+  workflow_dispatch:
+jobs:
+  ct117:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct117
+      - name: Independently compare exact Lagrange and Newton sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct117
+          python3 -B "$D/ct117_interpolation_control.py" > /tmp/ct117-py.json
+          python3 -O -B "$D/ct117_interpolation_control.py" > /tmp/ct117-pyo.json
+          node "$D/ct117_interpolation_independent.js" > /tmp/ct117-js.json
+          node --no-opt "$D/ct117_interpolation_independent.js" > /tmp/ct117-jso.json
+          cmp /tmp/ct117-py.json /tmp/ct117-pyo.json
+          cmp /tmp/ct117-py.json /tmp/ct117-js.json
+          cmp /tmp/ct117-py.json /tmp/ct117-jso.json
+          printf '%s  %s\n' 46b50bc0c22d432987572a848dbe056f8095120b571eb07c5b93e3e82b54e21b /tmp/ct117-py.json | sha256sum -c

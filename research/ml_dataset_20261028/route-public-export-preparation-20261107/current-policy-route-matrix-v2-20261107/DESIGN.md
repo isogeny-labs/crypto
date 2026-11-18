@@ -1,0 +1,24 @@
+# Source-bound campaign routing correction
+
+Draft only. No approved protocol, native validation, runtime, cloud submission or new spending. Original objective and original four templates remain preserved verbatim under templates/. This packet changes no production source.
+
+Two concrete necessary admission conditions were missing from the current-policy design:
+
+1. `f4-wide-dynamic-v1` requires degree_bound exactly12, primen33–61 andm4–15 (solvers.rs::dynamic_supported). The existing degree3 prime template therefore cannot enter this route even where size/arity otherwise qualify. The corrected block uses requested widen47–61,m4–15 and degree12. The ordinary f4 stream remains separate; changing its degree silently would confound the comparison.
+2. Legacy supervised binary/Koblitz F4/F5m3 requires configured factor_base_size4, four actual signed points/two x codes, degree1–6 and positive work (solvers.rs::binary_m3_worker_shape). Existing size8 blocks cannot enter it. Corrected m3 blocks use requested size4 under the same policy recipes. Realized domain admission is still conditional. The explicit owned v5 f4 route is separate and is not assigned this legacy restriction.
+
+MATRIX.json is a compressed necessary-axis admission inventory of every original cell:103 homogeneous family/method/size-band/arity groups. Counts preserve all original seed/generator/key/policy/twist multipliers. They sum exactly to the original four templates. Statuses distinguish conditional_route (necessary axes only), encoding_only (Weil; not a solve), pending_configuration (implemented route needs a different explicit block), and pending_capability (that specific method/family/size/arity is absent).
+
+ELIGIBLE_DRAFT_PLANS.json contains58 derived plan blocks: existing necessary-axis-admitted blocks plus the separately identified degree12 and size4 corrections. It is a design envelope, not itself a DatasetPlan or launch manifest. Each nested plan is a native-schema draft with null protocol hash and zero authorized cells. Old configuration failures stay in PENDING_REQUIREMENTS.json, with pointers to their reason; unsupported requirements are not discarded or declared satisfied. Corrected blocks must become registered crossed comparisons, not retroactive substitutions for observed old cells.
+
+check_routes.py verifies frozen template and current source hashes, recomputes all compressed counts from DatasetPlan's axes, checks every derived axis against a documented handwritten routing predicate, and contains six regression assertions for the identified gates/negative cases. It writes MATRIX, ELIGIBLE_DRAFT_PLANS and PENDING_REQUIREMENTS. This Python run is a static document/source check, not a native experiment or native DatasetPlan validation. Source changes fail the hash guard; update the reviewed rules deliberately rather than trusting stale predicates. It does not prove the Rust predicate is exhaustively modeled or that a solver completes.
+
+Actual instance construction, factor-base policy validity and realized cardinality/sign closure, affine targets, source-context/capture admission, exact equations, native matrix/circuit limits, runtime work/memory/trace caps and original owner deadlines remain unresolved until authentic execution. All pending methods and entire requested populations remain in scope. F6 is geometric four-sum, Weil is encoding-only, PKM uses its different Kummer domain, and degree/complete-solver labels cannot be inferred from necessary-axis admission.
+
+The total original inventory is649,592,832 nominal cells:316,342,272 conditional-route cells,3,145,728 encoding-only cells,317,915,136 pending-capability cells and12,189,696 pending-configuration cells. These are not independent targets, prices, successful solves or authorized work. Shared sampled-base/target correlations and whole-field-size splits remain those of the parent design. This packet grants no budget or deadline extension.
+
+## V2 checker replay and scope
+
+This supersedes the preserved v1 packet. Replay with `python3 check_routes.py --repo /path/to/checkout`. Default mode recomputes and compares all three frozen outputs without writing them. Optional --output-dir writes a separate recomputed copy; it cannot target this packet. Pre-freeze generation requires --generate and an explicit external --output-dir. Repository defaults to the current directory. The checker verifies only the exact hash-pinned templates; it is not a general capability API. Positive work, paired twists, m3 size/degree and owned profile ranges are checked.
+
+Ordinary f4 at wide high arity is marked pending_capability for that specific method; selecting separately implemented f4-wide-dynamic-v1 is a different-method alternative, not a configuration change silently satisfying ordinary f4. Explicit dynamic degree3 and m3 requested-base8 are pending_configuration and get separately identified corrections. Native runtime/domain admission remains unresolved.

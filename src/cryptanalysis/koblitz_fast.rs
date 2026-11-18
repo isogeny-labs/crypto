@@ -18,10 +18,93 @@
 //! in the general arithmetic where the code already did so.
 
 use num_bigint::BigUint;
+use std::cell::Cell;
+use std::sync::{Arc, OnceLock};
 
 use crate::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement};
 use crate::cryptanalysis::group_op_count;
 use crate::cryptanalysis::semaev_decomp::Gf2;
+
+thread_local! {
+    static CACHED_POINT_LIFTS: Cell<bool> = const { Cell::new(false) };
+}
+
+/// Select cached odd-degree point lifts for one synchronous builder call.
+///
+/// The default stays false for replay of existing recipes. Nested calls and
+/// unwinding restore the previous selection; concurrent threads are independent.
+pub fn with_cached_point_lifts<T>(enabled: bool, build: impl FnOnce() -> T) -> T {
+    struct Restore(bool);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            CACHED_POINT_LIFTS.with(|flag| flag.set(self.0));
+        }
+    }
+    let _restore = Restore(CACHED_POINT_LIFTS.with(|flag| flag.replace(enabled)));
+    build()
+}
+
+pub(crate) fn cached_point_lifts_enabled() -> bool {
+    CACHED_POINT_LIFTS.with(Cell::get)
+}
+
+/// The binary-linear halftrace, with a trace admission mask for an odd field.
+/// This is scoped to one field instance, never keyed by degree alone.
+#[derive(Debug)]
+struct OddHalfTrace {
+    degree: u32,
+    modulus: u64,
+    trace_mask: u64,
+    tables: Vec<[u64; 256]>,
+}
+
+impl OddHalfTrace {
+    fn new(field: &Gf2) -> Self {
+        let n = field.n;
+        debug_assert_eq!(n % 2, 1);
+        let mut trace_mask = 0;
+        let basis: Vec<u64> = (0..n)
+            .map(|i| {
+                let value = 1u64 << i;
+                let mut power = value;
+                let mut half_trace = value;
+                for _ in 0..(n - 1) / 2 {
+                    power = field.sqr(field.sqr(power));
+                    half_trace ^= power;
+                }
+                let trace = field.sqr(half_trace) ^ half_trace ^ value;
+                debug_assert!(trace <= 1);
+                trace_mask |= trace << i;
+                half_trace
+            })
+            .collect();
+        let tables = (0..n.div_ceil(8) as usize)
+            .map(|byte_index| {
+                let mut table = [0; 256];
+                for byte in 1usize..256 {
+                    let bit = byte_index * 8 + byte.trailing_zeros() as usize;
+                    table[byte] = table[byte & (byte - 1)] ^ basis.get(bit).copied().unwrap_or(0);
+                }
+                table
+            })
+            .collect();
+        Self {
+            degree: n,
+            modulus: field.irr,
+            trace_mask,
+            tables,
+        }
+    }
+
+    fn solve(&self, rhs: u64) -> Option<u64> {
+        if (rhs & self.trace_mask).count_ones() & 1 != 0 {
+            return None;
+        }
+        Some(self.tables.iter().enumerate().fold(0, |root, (i, table)| {
+            root ^ table[((rhs >> (8 * i)) & 255) as usize]
+        }))
+    }
+}
 
 /// A point with single-word coordinates, or `O`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -85,6 +168,9 @@ pub struct FastCurve {
     pub n: u32,
     pub a: u64,
     pub b: u64,
+    /// Lazy and opt-in: ordinary arithmetic and the legacy lifting path do
+    /// not allocate it. Clones share an initialized immutable cache.
+    half_trace: OnceLock<Arc<OddHalfTrace>>,
     /// The eight-lane AVX-512 kernel for [`Self::add_many_lazy`], when
     /// the CPU has it and the field's reduction polynomial suits it.
     #[cfg(target_arch = "x86_64")]
@@ -111,7 +197,32 @@ impl FastCurve {
             n: curve.m,
             a,
             b,
+            half_trace: OnceLock::new(),
         })
+    }
+
+    /// The same first Artin-Schreier root as the halftrace squaring loop.
+    /// Returns `None` for trace-one inputs or unsupported even degrees.
+    /// Intended for repeated public-input point lifting, not secret arithmetic.
+    pub fn half_trace_root_cached(&self, rhs: u64) -> Option<u64> {
+        if self.n & 1 == 0 || self.n != self.field.n {
+            return None;
+        }
+        let rhs = rhs & self.field.mask;
+        let cache = self
+            .half_trace
+            .get_or_init(|| Arc::new(OddHalfTrace::new(&self.field)));
+        // FastCurve's field is public. A caller may replace the field of an
+        // initialized clone; never reuse another modulus's linear map.
+        if cache.degree != self.field.n || cache.modulus != self.field.irr {
+            let (mut root, mut power) = (rhs, rhs);
+            for _ in 0..(self.n - 1) / 2 {
+                power = self.field.sqr(self.field.sqr(power));
+                root ^= power;
+            }
+            return (self.field.sqr(root) ^ root == rhs).then_some(root);
+        }
+        cache.solve(rhs)
     }
 
     /// Project a general point down.
@@ -328,6 +439,78 @@ impl FastCurve {
             .filter(|&&l| l != Self::LAZY_DONE)
             .count();
         group_op_count::count_adds(sums as u64);
+    }
+
+    /// Lazy sums with adjacent addends sharing an abscissa. The two signs
+    /// above one binary-field abscissa have the same denominator `x_P + x_Q`,
+    /// so only one copy of each adjacent equal denominator enters the batch
+    /// product chain. The batch still uses one field inversion in total.
+    /// Singles at either end of a scan block retain their own denominator.
+    ///
+    /// The existing eight-lane SIMD path remains in use where available.
+    /// Infinity falls back to the ordinary batch path. Equal-abscissa
+    /// exceptional sums stay complete, with the same `LAZY_DONE` marker as
+    /// [`Self::add_many_lazy`].
+    pub fn add_many_lazy_paired_x(
+        &self,
+        p: FastPoint,
+        qs: &[FastPoint],
+        out: &mut Vec<FastPoint>,
+        lambdas: &mut Vec<u64>,
+        scratch: &mut BatchScratch,
+    ) {
+        #[cfg(target_arch = "x86_64")]
+        if self.simd.is_some() {
+            self.add_many_lazy(p, qs, out, lambdas, scratch);
+            return;
+        }
+        if p.infinity
+            || qs.iter().any(|q| q.infinity)
+            || !qs.windows(2).any(|pair| pair[0].x == pair[1].x)
+        {
+            self.add_many_lazy(p, qs, out, lambdas, scratch);
+            return;
+        }
+        let first = lambdas.len();
+        scratch.dens.clear();
+        let mut at = 0;
+        while at < qs.len() {
+            let x = qs[at].x;
+            scratch.dens.push(if x == p.x { 0 } else { p.x ^ x });
+            at += 1;
+            while at < qs.len() && qs[at].x == x {
+                at += 1;
+            }
+        }
+        self.field.batch_inv(&mut scratch.dens, &mut scratch.acc);
+        out.reserve(qs.len());
+        lambdas.reserve(qs.len());
+        let mut at = 0;
+        for &inv in &scratch.dens {
+            let x = qs[at].x;
+            let from = at;
+            at += 1;
+            while at < qs.len() && qs[at].x == x {
+                at += 1;
+            }
+            for &q in &qs[from..at] {
+                if inv == 0 {
+                    out.push(self.add(p, q));
+                    lambdas.push(Self::LAZY_DONE);
+                } else {
+                    let lambda = self.field.mul(p.y ^ q.y, inv);
+                    let x3 = self.field.sqr(lambda) ^ lambda ^ p.x ^ q.x ^ self.a;
+                    out.push(FastPoint::affine(x3, 0));
+                    lambdas.push(lambda);
+                }
+            }
+        }
+        group_op_count::count_adds(
+            lambdas[first..]
+                .iter()
+                .filter(|&&lambda| lambda != Self::LAZY_DONE)
+                .count() as u64,
+        );
     }
 
     fn add_many_lazy_dispatch(
@@ -770,9 +953,13 @@ pub struct FrobeniusCanon {
     /// The same map as GFNI affine matrices, for [`Self::coords16_gfni`]:
     /// `gfni[i]`'s lane `k` is the 8 × 8 block from byte `i` of the field
     /// element to byte `k` of its coordinates.
+    #[cfg_attr(not(target_arch = "x86_64"), allow(dead_code))]
+    // ISA-specific table, preserving build-work identity.
     gfni: [[u64; 8]; 8],
     /// The inverse map, normal coordinates to field element, as GFNI
     /// affine matrices in the same layout, for [`Self::frobenius_reps`].
+    #[cfg_attr(not(target_arch = "x86_64"), allow(dead_code))]
+    // ISA-specific table, preserving build-work identity.
     gfni_back: [[u64; 8]; 8],
 }
 
@@ -1150,10 +1337,14 @@ impl FrobeniusCanon {
 
     /// The normal coordinates of a field element.
     #[inline]
-    pub fn coords(&self, x: u64) -> u64 {
+    pub fn coords(&self, mut x: u64) -> u64 {
+        // The low byte is consumed and `x` shifted by a constant eight,
+        // rather than shifting by `8 * i`: no per-byte variable shift or
+        // index to keep.  At most eight tables, so `x` is spent by then.
         let mut acc = 0u64;
-        for (i, table) in self.tables.iter().enumerate() {
-            acc ^= table[((x >> (8 * i)) & 0xff) as usize];
+        for table in &self.tables {
+            acc ^= table[(x & 0xff) as usize];
+            x >>= 8;
         }
         acc
     }
@@ -1279,7 +1470,7 @@ impl FrobeniusCanon {
     /// well — 90% of random words have at most two — and only the rest
     /// loop.  The lanes advance in lockstep so their chains overlap.  Only
     /// the word is returned; ties between rotations do not change it.
-    #[inline]
+    #[inline(always)]
     fn least_rotations<const L: usize>(&self, words: [u64; L]) -> [u64; L] {
         let (n, mask) = (self.n, self.mask);
         // `rotl^t` for any `0 ≤ t < n` without a branch on `t = 0`:
@@ -1294,10 +1485,38 @@ impl FrobeniusCanon {
         let levels = (u32::BITS - (n - 1).leading_zeros()) as usize;
         let mut pow = [[0u64; L]; 6];
         pow[0] = std::array::from_fn(|l| !c[l] & mask);
-        for k in 1..levels {
+        // With five or more levels, build only `Z_1 … Z_16` first: a
+        // random word's longest zero run is a handful of bits, so `Z_16`
+        // is empty in every lane of nearly every block, and then the
+        // levels above `Z_8` have nothing to lift.  The branch is taken
+        // about once in four hundred blocks, so it predicts.  Where it is
+        // not taken the lift below visits `Z_8 … Z_1` only, reaching run
+        // lengths up to 16, which no lane has: the same `run` the full
+        // lift ends on.
+        let shallow = levels >= 5;
+        let built = if shallow { 5 } else { levels };
+        for k in 1..built {
             let w = 1u32 << (k - 1);
             for l in 0..L {
                 pow[k][l] = pow[k - 1][l] & rot(pow[k - 1][l], w);
+            }
+        }
+        let mut top = built;
+        if shallow {
+            let mut deep = 0u64;
+            for l in 0..L {
+                deep |= pow[4][l];
+            }
+            if deep == 0 {
+                top = 4;
+            } else {
+                for k in built..levels {
+                    let w = 1u32 << (k - 1);
+                    for l in 0..L {
+                        pow[k][l] = pow[k - 1][l] & rot(pow[k - 1][l], w);
+                    }
+                }
+                top = levels;
             }
         }
         // Lift from `Z_1`.  A longer run implies a shorter one, so taking
@@ -1305,7 +1524,7 @@ impl FrobeniusCanon {
         // powers below `n` sum past any `L ≤ n − 1`; `len < n` throughout.
         let mut run = pow[0];
         let mut len = [1u32; L];
-        for k in (0..levels).rev() {
+        for k in (0..top).rev() {
             for l in 0..L {
                 let next = run[l] & rot(pow[k][l], len[l]);
                 let longer = next != 0;
@@ -1315,7 +1534,9 @@ impl FrobeniusCanon {
         }
         // `run` marks the top bit `p` of every longest zero run, and the
         // rotation starting there is `rotl^{n − 1 − p}`.
-        std::array::from_fn(|l| {
+        // A plain loop over the lanes, like the stages above.
+        let mut out = [0u64; L];
+        for l in 0..L {
             let (r, c) = (run[l], c[l]);
             let p1 = 63 - r.leading_zeros();
             let rest = r & !(1u64 << p1);
@@ -1327,12 +1548,9 @@ impl FrobeniusCanon {
                 tops &= !(1u64 << p);
                 best = best.min(rot(c, n - 1 - p));
             }
-            if flat[l] {
-                words[l]
-            } else {
-                best
-            }
-        })
+            out[l] = if flat[l] { words[l] } else { best };
+        }
+        out
     }
 
     /// [`Self::canon`] of every element of `xs`, appended to `out` in
@@ -1406,11 +1624,43 @@ impl FrobeniusCanon {
                 };
                 chunk.copy_from_slice(&mins);
             }
-            for x in chunks.into_remainder() {
-                *x = self.canon(*x);
+            // The tail runs as one padded block: the scalar key costs
+            // several times a vector lane inside a scan, and a window is
+            // rarely a multiple of sixteen. Padding repeats a real key, so
+            // the extra lanes compute a canonical name that is dropped.
+            let rest = chunks.into_remainder();
+            if let Some(&last) = rest.last() {
+                let mut block = [last; 16];
+                block[..rest.len()].copy_from_slice(rest);
+                self.canon_in_place(&mut block);
+                rest.copy_from_slice(&block[..rest.len()]);
             }
             return;
         }
+        #[cfg(target_arch = "x86_64")]
+        if canon_bmi2_enabled() {
+            // SAFETY: `canon_bmi2_enabled` checked BMI1, BMI2 and LZCNT.
+            return unsafe { self.canon_scalar_bmi2(xs) };
+        }
+        self.canon_scalar(xs);
+    }
+
+    /// [`Self::canon_scalar`] compiled with BMI2 and LZCNT: the rotations'
+    /// variable shifts are `shlx`/`shrx` and the leading-zero counts one
+    /// `lzcnt`, where the baseline target spends a `cl` move and a
+    /// `bsr`/`xor` pair on each.
+    ///
+    /// # Safety
+    ///
+    /// The CPU must support BMI1, BMI2 and LZCNT.
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "bmi1,bmi2,lzcnt")]
+    unsafe fn canon_scalar_bmi2(&self, xs: &mut [u64]) {
+        self.canon_scalar(xs);
+    }
+
+    #[inline(always)]
+    fn canon_scalar(&self, xs: &mut [u64]) {
         const LANES: usize = 8;
         let mut chunks = xs.chunks_exact_mut(LANES);
         for chunk in &mut chunks {
@@ -1516,6 +1766,21 @@ fn canon_simd_enabled() -> bool {
     static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ON.get_or_init(|| {
         is_x86_feature_detected!("avx512f") && std::env::var("KIC_SCAN_SIMD").as_deref() != Ok("0")
+    })
+}
+
+/// Whether the scalar [`FrobeniusCanon::canon_in_place`] runs compiled
+/// with BMI2 and LZCNT: the CPU has BMI1, BMI2 and LZCNT, and
+/// `KIC_CANON_BMI2=0` has not asked for the baseline build, which stays as
+/// the same-binary control.  The words computed are the same either way.
+#[cfg(target_arch = "x86_64")]
+fn canon_bmi2_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| {
+        is_x86_feature_detected!("bmi1")
+            && is_x86_feature_detected!("bmi2")
+            && is_x86_feature_detected!("lzcnt")
+            && std::env::var("KIC_CANON_BMI2").as_deref() != Ok("0")
     })
 }
 
@@ -1783,6 +2048,7 @@ unsafe fn least_rotation16_funnel_one_chain_avx512(c: &[u64; 16], n: u32) -> [u6
 /// faster but did not establish it against the same session's A/A, so the
 /// default stays one chain
 /// (`research/ic_tool_program/explorations/key-chains-20261114/`).
+#[cfg(target_arch = "x86_64")]
 fn key_chains_split() -> bool {
     static SPLIT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *SPLIT.get_or_init(|| std::env::var("KIC_KEY_CHAINS").as_deref() == Ok("2"))
@@ -1830,8 +2096,10 @@ pub struct BatchScratch {
     #[cfg_attr(not(target_arch = "x86_64"), allow(dead_code))]
     qy: Vec<u64>,
     /// The folding kernel's prefix products, a vector of eight per group.
+    #[cfg(target_arch = "x86_64")]
     pre: Vec<u64>,
     /// The folding kernel's lane products, inverted together.
+    #[cfg(target_arch = "x86_64")]
     lanes: Vec<u64>,
 }
 
@@ -2678,6 +2946,94 @@ mod simd512 {
 mod tests {
     use super::*;
 
+    #[test]
+    fn cached_halftrace_matches_definition_and_is_field_local() {
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        for n in [5, 7, 9, 11, 19, 31, 53, 61] {
+            let irr = find_irreducible_sparse(n).expect("test field");
+            let curve = BinaryCurve {
+                m: n,
+                irreducible: irr.clone(),
+                a: F2mElement::zero(n),
+                b: F2mElement::one(n),
+                generator: BinaryPoint::Infinity,
+                order: BigUint::from(1u8),
+                cofactor: BigUint::from(1u8),
+            };
+            let fast = FastCurve::new(&curve).unwrap();
+            assert!(fast.half_trace.get().is_none());
+            let mut state = 0x9e37_79b9_7f4a_7c15u64;
+            for i in 0..if n <= 11 { 1u64 << n } else { 256 } {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let rhs = if n <= 11 { i } else { state & fast.field.mask };
+                let element = F2mElement::from_biguint(&BigUint::from(rhs), n);
+                let expected = (element.trace(&irr) == 0)
+                    .then(|| fast.field.from_element(&element.half_trace(&irr).unwrap()));
+                assert_eq!(
+                    fast.half_trace_root_cached(rhs),
+                    expected,
+                    "n={n}, rhs={rhs}"
+                );
+            }
+            let cloned = fast.clone();
+            assert!(Arc::ptr_eq(
+                fast.half_trace.get().unwrap(),
+                cloned.half_trace.get().unwrap()
+            ));
+        }
+        // Reciprocal irreducibles of the same degree must not share a cache.
+        let mut roots = Vec::new();
+        let mut curves = Vec::new();
+        for low_terms in [vec![0, 2], vec![0, 3]] {
+            let curve = BinaryCurve {
+                m: 5,
+                irreducible: crate::binary_ecc::IrreduciblePoly {
+                    degree: 5,
+                    low_terms,
+                },
+                a: F2mElement::zero(5),
+                b: F2mElement::one(5),
+                generator: BinaryPoint::Infinity,
+                order: BigUint::from(1u8),
+                cofactor: BigUint::from(1u8),
+            };
+            let fast = FastCurve::new(&curve).unwrap();
+            roots.push(
+                (0..32)
+                    .map(|v| fast.half_trace_root_cached(v))
+                    .collect::<Vec<_>>(),
+            );
+            curves.push(fast);
+        }
+        assert_ne!(roots[0], roots[1]);
+        let mut changed = curves[0].clone();
+        changed.field = curves[1].field.clone();
+        for rhs in 0..32 {
+            assert_eq!(changed.half_trace_root_cached(rhs), roots[1][rhs as usize]);
+        }
+    }
+
+    #[test]
+    fn cached_lift_scope_restores_on_nesting_unwind_and_new_threads() {
+        assert!(!cached_point_lifts_enabled());
+        with_cached_point_lifts(true, || {
+            assert!(cached_point_lifts_enabled());
+            with_cached_point_lifts(false, || assert!(!cached_point_lifts_enabled()));
+            assert!(cached_point_lifts_enabled());
+            std::thread::spawn(|| assert!(!cached_point_lifts_enabled()))
+                .join()
+                .unwrap();
+            let caught = std::panic::catch_unwind(|| {
+                with_cached_point_lifts(false, || panic!("restore the outer selection"));
+            });
+            assert!(caught.is_err());
+            assert!(cached_point_lifts_enabled());
+        });
+        assert!(!cached_point_lifts_enabled());
+    }
+
     /// The run-based least rotation, scalar and laned, against the
     /// exhaustive scan, on random words and on the patterns where it could
     /// go wrong: all zeros and ones, single bits, periodic words where
@@ -3244,6 +3600,39 @@ mod tests {
     }
 
     #[test]
+    fn the_scalar_bulk_keys_agree_with_and_without_bmi2() {
+        // The BMI2/LZCNT build of the scalar bulk key and the baseline
+        // build must give `canon` word for word, on blocks that take the
+        // shallow lift (random words) and the full one (a lane with a
+        // zero run of 16 or more).
+        for n in NB_DEGREES {
+            let f = nb_field(n);
+            let canon = FrobeniusCanon::new(&f, n).unwrap();
+            let mask = (1u64 << n) - 1;
+            let mut rng = StdRng::seed_from_u64(0xB312_0000 + n as u64);
+            let mut xs: Vec<u64> = (0..1000).map(|_| rng.gen::<u64>() & mask).collect();
+            for k in 0..n.min(40) {
+                // Sparse words in the normal basis: a long run of zeros
+                // in the coordinates, pulled back to the field element.
+                xs.push(canon.element_of_coords((1u64 << k) & mask));
+                xs.push(canon.element_of_coords(((1u64 << k) | 1) & mask));
+            }
+            let want: Vec<u64> = xs.iter().map(|&x| canon.canon(x)).collect();
+            let mut plain = xs.clone();
+            canon.canon_scalar(&mut plain);
+            assert_eq!(plain, want, "degree {n}, baseline build");
+            #[cfg(target_arch = "x86_64")]
+            if is_x86_feature_detected!("bmi2") && is_x86_feature_detected!("lzcnt") {
+                let mut fast = xs.clone();
+                // SAFETY: BMI1, BMI2 and LZCNT were just detected (BMI1
+                // accompanies BMI2 on every CPU that has it).
+                unsafe { canon.canon_scalar_bmi2(&mut fast) };
+                assert_eq!(fast, want, "degree {n}, BMI2 build");
+            }
+        }
+    }
+
+    #[test]
     fn the_least_rotation_partitions_exactly_as_the_squaring_chain() {
         // The two keys pick different representatives; the claim is
         // that they cut the field into the *same* orbits.  These degrees
@@ -3343,6 +3732,58 @@ mod tests {
                 assert_eq!((l.x, l.infinity), (e.x, e.infinity));
                 assert_eq!(fc.finish_lazy(p, l, lambda), e);
             }
+        }
+    }
+
+    #[test]
+    fn paired_abscissa_lazy_additions_match_order_and_exceptional_sums() {
+        for (a, n) in [(0u8, 13u32), (1, 19)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fc = FastCurve::new(&kc.curve).unwrap();
+            let points: Vec<FastPoint> = random_points(&kc, 12, 20261115)
+                .iter()
+                .map(|p| fc.lift(p))
+                .collect();
+            let mut qs = Vec::new();
+            for &q in points.iter().take(4) {
+                qs.extend([q, fc.neg(q)]);
+            }
+            qs.push(points[4]); // the last scan block can have one point
+            let mut targets = points.clone();
+            targets.push(fc.neg(points[0]));
+            targets.push(FastPoint::INFINITY);
+            for p in targets {
+                for scan in [&qs[..], &qs[1..]] {
+                    let (mut want, mut want_l) = (Vec::new(), Vec::new());
+                    let (mut got, mut got_l) = (Vec::new(), Vec::new());
+                    let mut scratch = BatchScratch::default();
+                    let before = crate::cryptanalysis::group_op_count::ops_snapshot().adds;
+                    fc.add_many_lazy(p, scan, &mut want, &mut want_l, &mut scratch);
+                    let ordinary_adds =
+                        crate::cryptanalysis::group_op_count::ops_snapshot().adds - before;
+                    let before = crate::cryptanalysis::group_op_count::ops_snapshot().adds;
+                    fc.add_many_lazy_paired_x(p, scan, &mut got, &mut got_l, &mut scratch);
+                    let paired_adds =
+                        crate::cryptanalysis::group_op_count::ops_snapshot().adds - before;
+                    assert_eq!(got, want, "n={n}, p={p:?}: sums");
+                    assert_eq!(got_l, want_l, "n={n}, p={p:?}: slopes");
+                    assert_eq!(
+                        paired_adds, ordinary_adds,
+                        "n={n}, p={p:?}: addition ledger"
+                    );
+                    for ((&sum, &lambda), &q) in got.iter().zip(&got_l).zip(scan) {
+                        assert_eq!(fc.finish_lazy(p, sum, lambda), fc.add(p, q));
+                    }
+                }
+            }
+            let mut nonpaired = qs.clone();
+            nonpaired[0] = FastPoint::INFINITY;
+            let (mut want, mut want_l) = (Vec::new(), Vec::new());
+            let (mut got, mut got_l) = (Vec::new(), Vec::new());
+            let mut scratch = BatchScratch::default();
+            fc.add_many_lazy(points[5], &nonpaired, &mut want, &mut want_l, &mut scratch);
+            fc.add_many_lazy_paired_x(points[5], &nonpaired, &mut got, &mut got_l, &mut scratch);
+            assert_eq!((got, got_l), (want, want_l), "n={n}: fallback");
         }
     }
 

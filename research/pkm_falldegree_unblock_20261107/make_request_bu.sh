@@ -25,7 +25,7 @@ here=$(cd "$(dirname "$0")" && pwd -P); repo=$(cd "$here/../.." && pwd -P)
 [[ $# -ge 3 ]] || { echo "usage: make_request_bu.sh IMAGE_JSON N STAMP [PREV | close:<ladder>:<T> | allow:<unit>:<K> | skip:<n>:<reason>]..." >&2; exit 5; }
 img=$1; n=$2; stamp=$3; shift 3
 [[ $stamp =~ ^[0-9]+$ ]] || { echo "STAMP must be all digits (the job name is pfd-bu-<N>-<STAMP>)" >&2; exit 5; }
-RUNNER_SHA=__RUNNER_SHA__
+RUNNER_SHA=1c2229386976e8d6f22e5f243b269a5d23d588d0e105d6cb530c9a5488157a79
 outdir=$here/requests_r2i
 if [[ -n ${RUNNER_SHA_OVERRIDE:-} || -n ${OUT_DIR_OVERRIDE:-} ]]; then
   [[ -n ${OUT_DIR_OVERRIDE:-} ]] || { echo "RUNNER_SHA_OVERRIDE needs OUT_DIR_OVERRIDE (a directory outside the repository)" >&2; exit 8; }

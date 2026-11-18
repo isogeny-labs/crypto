@@ -1,0 +1,36 @@
+{
+  "schema": "native-family-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "cubic-family-certificate",
+      "expected_decl_sha256": "bb894ca30f297e8548c0a85fdbce66f660ae55191557c09b50f5f846b9c3dcaa",
+      "full_characters": 1230,
+      "full_decl_sha256": "bb894ca30f297e8548c0a85fdbce66f660ae55191557c09b50f5f846b9c3dcaa",
+      "full_normalized_signature": "theorem cubic_permutation_count_certificate : (∀ (K : Type*) [Field K] [Fintype K] [DecidableEq K], Fintype.card K % 3 = 2 → (2 : K) ≠ 0 → (3 : K) ≠ 0 → ∀ b : K, b ≠ 0 → Function.Bijective (fun x : K => x ^ 3) ∧ (curve b).Δ ≠ 0 ∧ Nonempty ((curve b).Point ≃ Option K) ∧ Nat.card (curve b).Point = Fintype.card K + 1 ∧ pointTrace b = 0 ∧ (∀ r : ℕ, 2 < r → r ∣ Nat.card (curve b).Point → orderOf (Fintype.card K : ZMod r) = 2) ∧ (∀ P : (curve b).Point, 2 < addOrderOf P → orderOf (Fintype.card K : ZMod (addOrderOf P)) = 2)) ∧ (∀ (p : ℕ) [Fact (Nat.Prime p)], 5 ≤ p → p % 3 = 2 → ∀ b : ZMod p, b ≠ 0 → (curve b).Δ ≠ 0 ∧ Nat.card (curve b).Point = p + 1 ∧ pointTrace b = 0 ∧ (∀ r : ℕ, 2 < r → r ∣ Nat.card (curve b).Point → orderOf (p : ZMod r) = 2)) ∧ (Nat.card (curve (0 : ZMod 5)).Point = 5 ∧ ¬∀ b : ZMod 5, Nat.card (curve b).Point = 6) ∧ (Nat.card (curve (1 : ZMod 2)).Point = 2 ∧ ¬Nat.card (curve (1 : ZMod 2)).Point = Fintype.card (ZMod 2) + 1) ∧ (Nat.card (curve (1 : ZMod 7)).Point = 12 ∧ ¬Nat.card (curve (1 : ZMod 7)).Point = Fintype.card (ZMod 7) + 1) ∧ ((curve (1 : ZMod 5)).Δ ≠ 0 ∧ Nat.card (curve (1 : ZMod 5)).Point = 6 ∧ 2 ∣ Nat.card (curve (1 : ZMod 5)).Point ∧ orderOf (5 : ZMod 2) = 1 ∧ ¬orderOf (5 : ZMod 2) = 2)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "cubic_permutation_count_certificate",
+        "end_byte": 7304,
+        "file": "/workspace/scratch/cubic-permutation-input01/CubicCountCertificate.lean",
+        "qualified_decl_id": "CubicPermutationCountAudit.cubic_permutation_count_certificate",
+        "signature": "theorem cubic_permutation_count_certificate :\n    (∀ (K : Type*) [Field K] [Fintype K] [DecidableEq K],\n      Fintype.card K % 3 = 2 → (2 : K) ≠ 0 → (3 : K) ≠ 0 →\n      ∀ b : K, b ≠ 0 →\n        Function.Bijective (fun x : K => x ^ 3) ∧ (curve b).Δ ≠ 0 ∧\n        Nonempty ((curve b).Point ≃ Option K) ∧\n        Nat.card (curve b).Point = Fintype.card K + 1 ∧ pointTrace b = 0 ∧\n        (∀ r : ℕ, 2 < r → r ∣ Nat.card (curve b).Point →\n          orderOf (Fintype.card K : ZMod r) = 2) ∧\n        (∀ P : (curve b).Point, 2 < addOrderOf P →\n          orderOf (Fintype.card K : ZMod (addOrderOf P)) = 2)) ∧\n    (∀ (p : ℕ) [Fact (Nat.Prime p)], 5 ≤ p → p % 3 = 2 →\n      ∀ b : ZMod p, b ≠ 0 → (curve b).Δ ≠ 0 ∧ Nat.card (curve b).Point = p + 1 ∧\n        pointTrace b = 0 ∧\n        (∀ r : ℕ, 2 < r → r ∣ Nat.card (curve b).Point → orderOf (p : ZMod r) = 2)) ∧\n    (Nat.card (curve (0 : ZMod 5)).Point = 5 ∧\n      ¬∀ b : ZMod 5, Nat.card (curve b).Point = 6) ∧\n    (Nat.card (curve (1 : ZMod 2)).Point = 2 ∧\n      ¬Nat.card (curve (1 : ZMod 2)).Point = Fintype.card (ZMod 2) + 1) ∧\n    (Nat.card (curve (1 : ZMod 7)).Point = 12 ∧\n      ¬Nat.card (curve (1 : ZMod 7)).Point = Fintype.card (ZMod 7) + 1) ∧\n    ((curve (1 : ZMod 5)).Δ ≠ 0 ∧ Nat.card (curve (1 : ZMod 5)).Point = 6 ∧\n      2 ∣ Nat.card (curve (1 : ZMod 5)).Point ∧ orderOf (5 : ZMod 2) = 1 ∧\n      ¬orderOf (5 : ZMod 2) = 2)",
+        "start_byte": 5807
+      },
+      "recorded_statement": "theorem cubic_permutation_count_certificate : (∀ (K : Type*) [Field K] [Fintype K] [DecidableEq K], Fintype.card K % 3 = 2 → (2 : K) ≠ 0 → (3 : K) ≠ 0 → ∀ b : K, b ≠ 0 → Function.Bijective (fun x : K => x ^ 3) ∧ (curve b).Δ ≠ 0 ∧ Nonempty ((curve b).Point ≃ Option K) ∧ Nat.card (curve b).Point = Fintype.card K + 1 ∧ pointTrace b = 0 ∧ (∀ r : ℕ, 2 < r → r ∣ Nat.card (curve b).Point → orderOf (Fintype.card K : ZMod r) = 2) ∧ (∀ P : (curve b).Point, 2 < addOrderOf P → orderOf (Fintype.card K : ZMod (addOrderOf P)) = 2)) ∧ (∀ (p : ℕ) [Fact (Nat.Prime p)], 5 ≤ p → p % 3 = 2 → ∀ b : ZMod p, b ≠ 0 → (curve b).Δ ≠ 0 ∧ Nat.card (curve b).Point = p + 1 ∧ pointTrace b = 0 ∧ (∀ r : ℕ, 2 < r → r ∣ Nat.card (curve b).Point → orderOf (p : ZMod r) = 2)) ∧ (Nat.card (curve (0 : ZMod 5)).Point = 5 ∧ ¬∀ b : ZMod 5, Nat.card (curve b).Point = 6) ∧ (Nat.card (curve (1 : ZMod 2)).Point = 2 ∧ ¬Nat.card (curve (1 : ZMod 2)).Point = Fintype.card (ZMod 2) + 1) ∧ (Nat.card (curve (1 : ZMod 7)).Point = 12 ∧ ¬Nat.card (curve (1 : ZMod 7)).Point = Fintype.card (ZMod 7) + 1) ∧ ((curve (1 : ZMod 5)).Δ ≠ 0 ∧ Nat.card (curve (1 : ZMod 5)).Point = 6 ∧ 2 ∣ Nat.card (curve (1 : ZMod 5)).Point ∧ orderOf (5 : ZMod 2) = 1 ∧ ¬orderOf (5 : ZMod 2) = 2)",
+      "recorded_text_sha256": "bb894ca30f297e8548c0a85fdbce66f660ae55191557c09b50f5f846b9c3dcaa",
+      "source_plan": "research/cubic_permutation_count_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "CubicPermutationCountAudit.cubic_permutation_count_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native source-processing check; complete written outer field telescope and all positive/negative clauses. Not proved by the mathematical family theorem."
+}

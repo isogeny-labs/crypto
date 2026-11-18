@@ -1,0 +1,89 @@
+setring compactPid51;short=0;
+matrix masterH51=matrix(basis51);int expectedPower51=maxPower51-deg(commonDenominator51)+62;
+if(clearingPower51<expectedPower51){expectedPower51=clearingPower51;}
+int case51;int row51;int index51;int fieldDirection51;int fieldPower51;
+ring sourceTemplate51=2,(l,v,u),dp;short=0;
+map pidToTemplate51=compactPid51,u;
+matrix templateH51=pidToTemplate51(masterH51);poly templateD51=pidToTemplate51(commonDenominator51);
+map infinityToTemplate51=relativeInfinity50,l,v,u;
+ideal templateIdeal51=infinityToTemplate51(relativeInfinityIdeal50);ideal numeratorFunctions51;
+poly function51;
+for(index51=1;index51<=32;index51++){
+ function51=0;
+ for(row51=1;row51<=32;row51++){function51=function51+templateH51[row51,index51]*l^((row51-1)%16)*v^((row51-1) div 16);}
+ numeratorFunctions51[index51]=function51;
+}
+setring compactField51;short=0;
+map templateInitial51=sourceTemplate51,l,v,u;
+ideal actualSource51=templateInitial51(templateIdeal51);ideal baseStd51=std(ideal(actualSource51[1]));
+proc br51(poly a){return(reduce(a,baseStd51));}
+map masterPidToField51=compactPid51,u;
+poly masterD51=masterPidToField51(commonDenominator51);
+execute(read("../../source-data/diamond-maps51.sing"));
+ideal historicalSource51=actualSource51;
+setring compactField51;
+map historicalMap51=diamondMapsCertificate51,l,v;
+ideal checkedHistoricalSource51=historicalMap51(historicalSource51);
+if(checkedHistoricalSource51[1]!=actualSource51[1] || checkedHistoricalSource51[2]!=actualSource51[2]){ERROR("GLUE_RELOAD51_SOURCE_RING_BINDING");quit;}
+execute(read("../../source-data/diamond-iterates51.sing"));
+list firstData51=images51[1];list ninthData51=images51[9];list tenthData51=images51[10];
+ideal firstCoordinates51=firstData51[1],firstData51[2],firstData51[3];
+ideal ninthCoordinates51=ninthData51[1],ninthData51[2],ninthData51[3];
+ideal tenthCoordinates51=tenthData51[1],tenthData51[2],tenthData51[3];
+setring compactField51;map iterateMap51=diamondIteratesCertificate51,l,v;
+ideal firstCheck51=iterateMap51(firstCoordinates51);ideal ninthCheck51=iterateMap51(ninthCoordinates51);ideal tenthCheck51=iterateMap51(tenthCoordinates51);
+for(row51=1;row51<=3;row51++){if(firstCheck51[row51]!=forwardImages51[row51] || ninthCheck51[row51]!=inverseImages51[row51]){ERROR("GLUE_RELOAD51_COORDINATE_MAP_BINDING");quit;}}
+if(tenthCheck51[1]!=l || tenthCheck51[2]!=v || tenthCheck51[3]!=u){ERROR("GLUE_RELOAD51_FIELD_INVERSE_CERTIFICATE");quit;}
+link out51="ASCII:w glue-reload-certificate51.sing";open(out51);
+write(out51,"ring glueReloadCertificate51=(2,u),(l,v),dp;ideal source51;ideal residuals51;ideal quotients51;");
+write(out51,"source51[1]="+string(actualSource51[1])+";source51[2]="+string(actualSource51[2])+";");
+string fieldPath51;string pidPath51;ideal chosen51;matrix sourceLiftCase51;int total51=0;
+for(case51=1;case51<=2;case51++){
+ if(case51==1){fieldPath51="../glue-forward51-01/glue-field-witness51.sing";pidPath51="../glue-forward51-01/glue-pid-witness51.sing";}else{fieldPath51="../glue-reverse51-01/glue-field-witness51.sing";pidPath51="../glue-reverse51-01/glue-pid-witness51.sing";}
+ execute(read(fieldPath51));fieldDirection51=direction51;fieldPower51=clearingPower51;
+ execute(read(pidPath51));
+ if(direction51!=case51 || fieldDirection51!=case51 || clearingPower51!=expectedPower51 || fieldPower51!=expectedPower51){ERROR("GLUE_RELOAD51_CASE_OR_BOUND");quit;}
+ setring compactPid51;
+ map pidCase51=gluePidWitness51,u;
+ matrix coefficientCase51=pidCase51(mapCoefficients51);matrix numeratorCase51=pidCase51(imageNumeratorMatrix51);
+ if(nrows(coefficientCase51)!=32 || ncols(coefficientCase51)!=32 || masterH51*coefficientCase51!=numeratorCase51){ERROR("GLUE_RELOAD51_FULL_PID_PRODUCT");quit;}
+ matrix corruptedCase51=coefficientCase51;corruptedCase51[1,1]=corruptedCase51[1,1]+1;
+ if(masterH51*corruptedCase51==numeratorCase51){ERROR("GLUE_RELOAD51_PID_CORRUPTION_ACCEPTED");quit;}
+ setring compactField51;
+ matrix numeratorFieldCase51=masterPidToField51(numeratorCase51);
+ map fieldCase51=glueFieldWitness51,l,v;
+ ideal savedImages51=fieldCase51(images51);ideal savedCleared51=fieldCase51(cleared51);
+ module savedVectors51=fieldCase51(coefficientVectors51);
+ poly savedH51=fieldCase51(h51);poly savedD51=fieldCase51(originalDenominator51);
+ if(savedD51!=masterD51){ERROR("GLUE_RELOAD51_DENOMINATOR_BINDING");quit;}
+ if(case51==1){chosen51=forwardImages51;sourceLiftCase51=historicalMap51(liftCase51_1);if(savedH51!=u+v){ERROR("GLUE_RELOAD51_FORWARD_OPEN");quit;}}
+ else{chosen51=inverseImages51;sourceLiftCase51=historicalMap51(liftCase51_2);if(savedH51!=u+v+u^2){ERROR("GLUE_RELOAD51_INVERSE_OPEN");quit;}}
+ map directSubstitution51=sourceTemplate51,chosen51[1],chosen51[2],chosen51[3];
+ ideal mappedSource51=directSubstitution51(templateIdeal51);
+ if(matrix(actualSource51)*sourceLiftCase51!=matrix(mappedSource51)){ERROR("GLUE_RELOAD51_FULL_FIELD_SOURCE_PRODUCTS");quit;}
+ poly otherOpen51=chosen51[3]+chosen51[2];if(case51==1){otherOpen51=otherOpen51+chosen51[3]^2;}
+ if(br51(chosen51[3]*savedH51+1)!=0 || br51(otherOpen51*u+1)!=0){ERROR("GLUE_RELOAD51_LOCALIZATION_UNIT_IMAGES");quit;}
+ poly directDenominator51=directSubstitution51(templateD51);poly hPower51=br51(savedH51^expectedPower51);
+ ideal directNumerators51=directSubstitution51(numeratorFunctions51);
+ poly directNumerator51;poly residual51;poly quotient51;poly reconstructed51;vector savedVector51;matrix division51;
+ for(index51=1;index51<=32;index51++){
+  directNumerator51=directNumerators51[index51];
+  residual51=directNumerator51+directDenominator51*savedImages51[index51];
+  if(residual51==0){quotient51=0;}else{division51=lift(ideal(actualSource51[1]),ideal(residual51));quotient51=division51[1,1];}
+  if(actualSource51[1]*quotient51!=residual51){ERROR("GLUE_RELOAD51_FULL_DIRECT_SUBSTITUTION_PRODUCT");quit;}
+  if(index51==1 && br51(directNumerator51+directDenominator51*(savedImages51[index51]+1))==0){ERROR("GLUE_RELOAD51_FIELD_CORRUPTION_ACCEPTED");quit;}
+  if(savedCleared51[index51]!=br51(hPower51*savedImages51[index51])){ERROR("GLUE_RELOAD51_CLEARING_IDENTITY");quit;}
+  savedVector51=savedVectors51[index51];reconstructed51=0;
+  for(row51=1;row51<=32;row51++){
+   if(savedVector51[row51]!=numeratorFieldCase51[row51,index51]){ERROR("GLUE_RELOAD51_FIELD_PID_COEFFICIENT_LINK");quit;}
+   reconstructed51=reconstructed51+savedVector51[row51]*l^((row51-1)%16)*v^((row51-1) div 16);
+  }
+  if(reconstructed51!=masterD51*savedCleared51[index51]){ERROR("GLUE_RELOAD51_COMPLETE_FIELD_RECONSTRUCTION");quit;}
+  total51++;write(out51,"residuals51["+string(total51)+"]="+string(residual51)+";quotients51["+string(total51)+"]="+string(quotient51)+";");
+  print("GLUE_RELOAD51_GENERATOR direction="+string(case51)+" index="+string(index51)+" direct_substitution_product=true full_PID_link=true clearing_identity=true");
+ }
+}
+close(out51);
+if(total51!=64){ERROR("GLUE_RELOAD51_GENERATOR_COUNT");quit;}
+print("GLUE_RELOAD51_RESULT localized_maps=2 generator_compatibilities=64 complete_PID_products=2 source_field_products=4 both_corruption_controls=true field_inverse_certificate_bound=true proper_RR_cover_interpretation_recorded=true");
+print("GLUE_RELOAD51_ALL_CHECKS_PASS");quit;

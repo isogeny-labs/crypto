@@ -1,0 +1,15 @@
+digraph Dimensions {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", label="Jet storage: logical length and retained capacity\nSource-shape diagnostic; PCC standing unverified", labelloc=t, fontsize=17, pad=0.25];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fa", color="#44617b", fontname="Helvetica", fontsize=12, margin="0.18,0.12"];
+  edge [color="#44617b", fontname="Helvetica", fontsize=11];
+  modes [label="Mode candidates\nK * 2^(i+1) * (p_t-1)\nIncludes discarded weight candidates"];
+  samples [label="Interpolate I coefficients per node\nFixture: I=15, N=6 active nodes"];
+  modes -> samples [style=dashed, label="resource-ledger dimensions"];
+  logical [label="resize/truncate: live payload\n4 jets of length 6 + 2 of length 3\nJ=30 live Elements", fillcolor="#e4f2e9"];
+  capacity [label="Outer Vec allocations retained\ncapacity >= I for each stored jet\n>= 90 Element metadata slots", fillcolor="#fff0d8"];
+  samples -> logical [label="length"];
+  samples -> capacity [label="capacity"];
+  ledger [label="Storage ledger needs both\nMetadata capacity + live inner payload\nplus ancestors, scratch and allocator overhead", fillcolor="#f1ebfa"];
+  logical -> ledger;
+  capacity -> ledger;
+}

@@ -17,6 +17,7 @@ for the 13.3 image, which --cuda-versions asks RunPod to guarantee.
 import argparse
 import hashlib
 import json
+import os
 import pathlib
 import shlex
 import subprocess
@@ -75,11 +76,14 @@ def main():
     parser.add_argument("--job", required=True, help="job script path relative to ecc2k130/")
     parser.add_argument("--out", type=pathlib.Path, required=True)
     parser.add_argument("--gpu-type", default="", help='RunPod GPU type id; default: first match for "RTX PRO 6000"')
+    parser.add_argument("--gpu-types", default="",
+                        help="comma-separated GPU type ids to try in order when --gpu-type is not given")
     parser.add_argument("--gpu-match", default="RTX PRO 6000", help="substring to pick the GPU type by")
     parser.add_argument("--cloud-type", default="SECURE", choices=("SECURE", "COMMUNITY", "ALL"))
     parser.add_argument("--cuda-versions", default="13.0,13.1,13.2,13.3,13.4",
                         help="host CUDA driver versions RunPod may place the pod on ('' to not filter)")
     parser.add_argument("--container-disk-gb", type=int, default=40)
+    parser.add_argument("--image", default=CUDA_IMAGE, help="container image (default: %s)" % CUDA_IMAGE)
     parser.add_argument("--extra", action="append", default=[], help="extra tree paths to ship")
     parser.add_argument("--env", action="append", default=[], help="KEY=VALUE passed to the job")
     parser.add_argument("--job-minutes", type=int, default=80)
@@ -90,6 +94,8 @@ def main():
     import runpod
     import boto3
     from botocore.config import Config
+    if not runpod.api_key:  # the SDK 1.9.1 only reads ~/.runpod/config.toml
+        runpod.api_key = os.environ.get("RUNPOD_API_KEY") or None
     if runpod.api_key is None:
         raise SystemExit("set RUNPOD_API_KEY")
     gpus = runpod.get_gpus()
@@ -106,6 +112,10 @@ def main():
         # Prefer the server-edition Blackwell part, the campaign's SKU.
         matches.sort(key=lambda g: ("server" not in g.get("displayName", "").lower(), g.get("displayName", "")))
         gpu_type = matches[0]["id"]
+    if args.gpu_types:
+        candidates = [s.strip() for s in args.gpu_types.split(",") if s.strip()]
+    else:
+        candidates = [gpu_type]
     out = args.out.resolve(); out.mkdir(parents=True, exist_ok=False)
     config = Config(connect_timeout=30, read_timeout=60, retries={"max_attempts": 3, "mode": "standard"})
     session = boto3.Session()
@@ -121,6 +131,11 @@ def main():
                                       ("results", "put_object", "results.tgz"), ("done", "put_object", "done")]}
     env = [tuple(kv.split("=", 1)) for kv in args.env]
     command = start_command(urls, source_sha, job, env, args.job_minutes)
+    # RunPod's SDK splices docker_args into a GraphQL string; keep it to plain
+    # characters so newlines and quotes in the bootstrap cannot break the query.
+    import base64
+    command = "bash -c " + shlex.quote(
+        "echo %s | base64 -d | bash" % base64.b64encode(command.encode()).decode())
     receipt = dict(valid=False, provider="runpod", gpuType=gpu_type, cloudType=args.cloud_type, token=token, job=job,
                    sourceSha256=source_sha, gitRev=rev, gitDirty=dirty, resultPrefix=prefix, podId=None,
                    startedAt=None, doneAt=None)
@@ -128,20 +143,36 @@ def main():
     save()
     pod = None
     try:
-        kwargs = dict(name="ecc2k130-job-" + token[:8], image_name=CUDA_IMAGE, gpu_type_id=gpu_type,
-                      cloud_type=args.cloud_type, gpu_count=1, container_disk_in_gb=args.container_disk_gb,
-                      volume_in_gb=0, docker_args=command, start_ssh=False, support_public_ip=False)
+        base = dict(name="ecc2k130-job-" + token[:8], image_name=args.image,
+                    cloud_type=args.cloud_type, gpu_count=1, container_disk_in_gb=args.container_disk_gb,
+                    volume_in_gb=0, docker_args=command, start_ssh=False, support_public_ip=False)
         if args.cuda_versions:
-            kwargs["allowed_cuda_versions"] = [v.strip() for v in args.cuda_versions.split(",") if v.strip()]
-        try:
-            pod = runpod.create_pod(**kwargs)
-        except Exception as exc:  # the CUDA filter is the usual reason a create is refused
-            if "allowed_cuda_versions" in kwargs:
-                print("create_pod with the CUDA filter failed (%s); retrying without it" % exc, flush=True)
-                kwargs.pop("allowed_cuda_versions")
-                pod = runpod.create_pod(**kwargs)
-            else:
-                raise
+            base["allowed_cuda_versions"] = [v.strip() for v in args.cuda_versions.split(",") if v.strip()]
+        for gid in candidates:
+            for attempt in range(2):
+                kwargs = dict(base, gpu_type_id=gid)
+                if attempt:
+                    kwargs.pop("allowed_cuda_versions", None)
+                try:
+                    pod = runpod.create_pod(**kwargs)
+                except Exception as exc:
+                    msg = str(exc)
+                    print("create_pod %s%s failed: %s" % (gid, " (no CUDA filter)" if attempt else "", msg), flush=True)
+                    if "instances available" in msg:
+                        break                       # try the next GPU type
+                    if attempt == 0 and "allowed_cuda_versions" in kwargs:
+                        continue                    # retry this type without the driver filter
+                    if "balance" in msg.lower():
+                        raise SystemExit("RunPod account balance is too low: " + msg)
+                    raise
+                else:
+                    gpu_type = gid
+                    receipt["gpuType"] = gid
+                    break
+            if pod:
+                break
+        if not pod:
+            raise SystemExit("no RunPod capacity for: " + ", ".join(candidates))
         receipt["podId"] = pod["id"]
         receipt["startedAt"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         save()

@@ -1,0 +1,37 @@
+{
+  "scope": "publication-to-merge only; not a full authoring episode",
+  "pr": "https://github.com/isogeny-labs/crypto/pull/4386",
+  "created_at": "2026-11-16T02:51:40Z",
+  "merged_at": "2026-11-16T03:07:37Z",
+  "merged_by": "aburan28",
+  "head": "6c123eb24953a6791ec066dc84d23fb0c19be634",
+  "merge": "21f5d99e6aecf4189dd693522b3568a8bb8d52b9",
+  "base": "codex/curve25519-four-point-20261115",
+  "all_green_at_merge": false,
+  "missing_required_standard_checks": [
+    "size",
+    "artifacts"
+  ],
+  "pcc_gate": {
+    "job": 133065613309,
+    "started_at": "2026-11-16T03:07:39Z",
+    "completed_at": "2026-11-16T03:12:08Z",
+    "conclusion": "failure",
+    "observed_reason": "PCC-20261115-806be3 attestation subject root-library-compatibility/incomplete-run.log does not exist",
+    "introduced_by_new_many_coset_component": false,
+    "parent_identity_evidence": "merge-retention.json"
+  },
+  "check_timestamp_anomaly": "sign started_at03:07:37 is after completed_at02:51:44; preserve raw fields, infer no duration",
+  "this_continuation_issued_merge": false,
+  "unknown": [
+    "original prompt/message timestamps",
+    "human intervention counts",
+    "recovery attribution",
+    "full-session duration",
+    "token and dollar cost"
+  ],
+  "no_zero_counts_or_merge_authorization_inferred": true,
+  "revert_check_due": "2026-11-30T03:07:37Z",
+  "log_fetch": "direct endpoint denied; gh run view fallback retained complete job log losslessly; no signed access URL retained",
+  "closure_result": "partial; not an unsupervised all-green success"
+}

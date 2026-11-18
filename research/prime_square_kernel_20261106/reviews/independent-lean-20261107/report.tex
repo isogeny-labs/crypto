@@ -1,0 +1,42 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\definecolor{proved}{HTML}{E5F5EA}
+\definecolor{open}{HTML}{FFF4DF}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\begin{document}
+\begin{center}
+{\LARGE Independent Lean review: square-kernel normalizer}\\[5pt]
+{\small Crypto commit a2be6609; Conductor T-1829; 2026-11-07 UTC}
+\end{center}
+\textbf{Review outcome.} The 24 named Lean theorems are validated at their exact pointwise algebraic scope. This technical review records no experiment or PCC admission.
+\section*{Evidence}
+The exact source hashes in the frozen review plan were unchanged after verification. Lean 4.35.0 and pinned CryptoLean 148f5dc and Mathlib cfc55fc were used. The build of CauchyNormalizer and KernelNodes completed 3142 jobs with exit 0. A fresh axiom audit checked 26 declarations: zero failures, zero native-trusted, with only propext, Classical.choice and Quot.sound. The fresh kernel replay completed with exit 0 at 18:26:07 UTC. Its first 180-second attempt timed out without a verdict; the preserved 600-second retry passed. Two independent reviewers checked the algebra and source correspondence separately.
+\section*{Scope diagram}
+\begin{center}
+\fcolorbox{green!50!black}{proved}{\begin{minipage}{0.27\linewidth}\textbf{Normalizer unit}\\Valid index implies v2(rho)=0.\end{minipage}}
+$\longrightarrow$
+\fcolorbox{green!50!black}{proved}{\begin{minipage}{0.27\linewidth}\textbf{Node identity}\\S(k,node)=B(k,node); origin matrix is identity.\end{minipage}}
+$\longrightarrow$
+\fcolorbox{green!50!black}{proved}{\begin{minipage}{0.27\linewidth}\textbf{Valuation}\\At nonzero kernel values, valuation doubles.\end{minipage}}
+\end{center}
+\begin{center}
+\fcolorbox{orange!70!black}{open}{\begin{minipage}{0.27\linewidth}\textbf{Native refinement}\\GMP, bounds, conversion, sentinel, serialization.\end{minipage}}
+\hspace{0.02\linewidth}
+\fcolorbox{orange!70!black}{open}{\begin{minipage}{0.27\linewidth}\textbf{Coefficient bridge}\\Chart content, counts, polynomial degree and recovery.\end{minipage}}
+\hspace{0.02\linewidth}
+\fcolorbox{orange!70!black}{open}{\begin{minipage}{0.27\linewidth}\textbf{Algorithm bridge}\\Recursion, correctness and actual cost.\end{minipage}}
+\end{center}
+\textit{Green boxes are reviewed theorem scope. Amber boxes are open bridges. Editable vector source: scope.svg.}
+\section*{Adverse controls and correction}
+The all-ones-row premise matters: $\binom{2}{1}=2$ is even. For $a=0,k=2$, outside $k<2$, $\rho=2$ and $v_2(\rho)=1$. At a valid non-node point $a=0,k=0,t=1$, $B=1$ but $S=-1$: node equality is not polynomial equality. The blind reviewer's initial $a=2$ table had three sign errors; its separate corrigendum gives the correct ratio list $[35,-5,5/3,-1,1,-5/3,5,-35]$. The unit verdict is unchanged.
+\section*{Fidelity boundary}
+The native and Lean formulas match under $l=2^a$, $d=k-l$, $s=j-l$. This checks formula and index correspondence, not compiled execution. No theorem establishes coefficientwise chart content, mode counts, degree/recovery cost, recursion or an end-to-end claim. Next formal work: a Polynomial-typed coefficient and degree bridge with an explicit native input/output refinement.
+\section*{Source pointers}
+Full source-bound report: REPORT.md. Frozen plan: REVIEW\_PLAN.md. Machine receipts and logs: machine/. Blind review and correction: blind/. Source-fidelity report: source/. No canonical quantitative graph was changed because this review added no measured values.
+\end{document}

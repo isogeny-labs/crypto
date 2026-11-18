@@ -18,7 +18,8 @@ implementation, so a verdict verifies the same way on every host.
     pcc verify-all [--json]
     pcc verdict --sign-key KEYFILE --key-id ID CLAIM # verify, sign, append
     pcc sign --sign-key KEYFILE --key-id ID ARTIFACT # ARTIFACT.sig.json
-    pcc ledger verify [--base GITREF]
+    pcc ledger verify [--base GITREF]                # also: the keyring is GITREF's, or the owner's pin
+    pcc --keyring-ref GITREF standing|verify-all|lint-prose ...   # trust the base keyring, not the tree's
     pcc ledger append-bypass --reason R --command C
     pcc standing CLAIM-ID
     pcc standing-by-type [--json]                    # standings per claim_type
@@ -32,8 +33,10 @@ not be checked), 3 usage or infrastructure error.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as _dt
 import hashlib
+import io
 import json
 import os
 import re
@@ -85,6 +88,9 @@ PCC_DIR = "pcc"
 CLAIMS_DIR = "pcc/claims"
 LEDGER_PATH = "pcc/ledger.jsonl"
 KEYRING_PATH = "pcc/keyring.json"
+# Commands that read no verdict and no signature: they run without a keyring,
+# so a pin or a keyring ref meant for the gate does not stop them.
+NO_TRUST_CMDS = ("keygen", "claim", "sign", "canary")
 
 
 # ----------------------------------------------------------------------------
@@ -127,22 +133,38 @@ def git(repo: Path, *args: str) -> str | None:
         return None
 
 
-def base_ledger_text(repo: Path, base: str) -> str | None:
-    """Read the base ledger through the vault filter when Git stores ciphertext."""
+def ref_is_commit(repo: Path, ref: str) -> bool:
+    """Whether a git ref resolves to a commit.  A ref that does not resolve is
+    never the same thing as a ref whose tree lacks a file: the first means the
+    comparison cannot be made, and a gate that cannot compare must fail."""
+    return bool(git(repo, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"))
+
+
+def file_at_ref(repo: Path, ref: str, rel: str, what: str) -> bytes | None:
+    """A file's bytes at a git ref, through the vault filter when Git stores
+    ciphertext; None when the ref has no such file."""
     try:
-        blob = subprocess.check_output(["git", "-C", str(repo), "show", f"{base}:{LEDGER_PATH}"],
+        blob = subprocess.check_output(["git", "-C", str(repo), "show", f"{ref}:{rel}"],
                                        stderr=subprocess.DEVNULL)
     except (OSError, subprocess.CalledProcessError):
         return None
     if blob.startswith(b"VLT1"):
         command = git(repo, "config", "--get", "filter.vault.smudge")
         if not command:
-            raise PccError("ledger: vault smudge filter is not configured for the base ledger")
+            raise PccError(f"{what}: vault smudge filter is not configured for the base {what}")
         try:
             blob = subprocess.run(shlex.split(command), input=blob, capture_output=True,
                                   check=True).stdout
         except (OSError, ValueError, subprocess.CalledProcessError) as exc:
-            raise PccError("ledger: could not decrypt the base ledger") from exc
+            raise PccError(f"{what}: could not decrypt the base {what}") from exc
+    return blob
+
+
+def base_ledger_text(repo: Path, base: str) -> str | None:
+    """Read the base ledger through the vault filter when Git stores ciphertext."""
+    blob = file_at_ref(repo, base, LEDGER_PATH, "ledger")
+    if blob is None:
+        return None
     try:
         return blob.decode("utf-8")
     except UnicodeDecodeError as exc:
@@ -287,15 +309,69 @@ def empty_keyring() -> dict[str, Any]:
     return {"schema": KEYRING_SCHEMA, "keys": [], "trusted_verifiers": []}
 
 
-def load_keyring(path: Path | None) -> dict[str, Any]:
-    if path is None or not path.is_file():
-        return empty_keyring()
-    kr = load_json(path)
+def parse_keyring(raw: bytes, label: str) -> dict[str, Any]:
+    try:
+        kr = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError) as exc:
+        raise PccError(f"{label}: not a {KEYRING_SCHEMA} keyring") from exc
     if not isinstance(kr, dict) or kr.get("schema") != KEYRING_SCHEMA:
-        raise PccError(f"{path}: not a {KEYRING_SCHEMA} keyring")
+        raise PccError(f"{label}: not a {KEYRING_SCHEMA} keyring")
     kr.setdefault("keys", [])
     kr.setdefault("trusted_verifiers", [])
     return kr
+
+
+def load_keyring(path: Path | None) -> dict[str, Any]:
+    if path is None or not path.is_file():
+        return empty_keyring()
+    return parse_keyring(path.read_bytes(), str(path))
+
+
+def load_keyring_at_ref(repo: Path, ref: str) -> dict[str, Any]:
+    """The keyring as a git ref has it.  This is the trust anchor of a pull
+    request: a key the request adds to its own tree is not in the base keyring,
+    so a verdict it signs does not count."""
+    if not ref_is_commit(repo, ref):
+        raise PccError(f"keyring: {ref} does not resolve to a commit, so there is no keyring to trust")
+    raw = file_at_ref(repo, ref, KEYRING_PATH, "keyring")
+    return empty_keyring() if raw is None else parse_keyring(raw, f"{ref}:{KEYRING_PATH}")
+
+
+def keyring_pin(value: str | None) -> str | None:
+    """The owner's out-of-repository pin of the keyring: the SHA-256 of
+    pcc/keyring.json, held where a pull request cannot write (a repository
+    variable).  Empty means no pin."""
+    pin = (value or "").strip().lower()
+    if not pin:
+        return None
+    if not HEX64_RE.match(pin):
+        raise PccError("keyring pin is not a SHA-256 (64 hex digits)")
+    return pin
+
+
+def check_keyring_pin(path: Path, pin: str) -> None:
+    got = sha256_file(path) if path.is_file() else "absent"
+    if got != pin:
+        raise PccError(f"keyring: {path.name} is {got}, the pinned keyring is {pin}")
+
+
+def check_keyring_unchanged(repo: Path, base: str, pin: str | None, errors: list[str]) -> None:
+    """The keyring decides whose verdicts count, so a change to it is the
+    owner's alone.  Relative to the base ref it must be byte-identical, unless
+    it matches the owner's pin; an empty keyring may be introduced."""
+    path = repo / KEYRING_PATH
+    head_raw = path.read_bytes() if path.is_file() else None
+    base_raw = file_at_ref(repo, base, KEYRING_PATH, "keyring")
+    if head_raw == base_raw:
+        return
+    if pin is not None and head_raw is not None and sha256_bytes(head_raw) == pin:
+        return
+    if base_raw is None and head_raw is not None:
+        kr = parse_keyring(head_raw, KEYRING_PATH)
+        if not kr["keys"] and not kr["trusted_verifiers"]:
+            return
+    errors.append(f"keyring: {KEYRING_PATH} differs from {base}. A producer cannot change whose verdicts "
+                  f"count: the owner pins the new keyring's SHA-256 (PCC_KEYRING_SHA256) before it merges")
 
 
 def keyring_public(kr: dict[str, Any], key_id: str) -> bytes | None:
@@ -1200,9 +1276,14 @@ def verdict_subject(verdict: dict[str, Any]) -> str:
 
 
 def standing(claim: dict[str, Any], entries: list[dict[str, Any]], kr: dict[str, Any]) -> dict[str, Any]:
-    """verified | scoped | failed | not_covered | unverified, from signed verdicts only."""
+    """A schema-valid payload and a current signed verdict are both required."""
     digest = claim_digest(claim)
     result = {"claim_id": claim.get("id"), "claim_sha256": digest, "standing": "unverified", "verdicts": []}
+    schema_reasons: list[str] = []
+    validate_claim(claim, schema_reasons)
+    type_problem = claim_type_problem(claim, _claim_entry_dates(entries).get(str(claim.get("id")), ""))
+    if type_problem and f"claim: {type_problem}" not in schema_reasons:
+        schema_reasons.append(f"claim: {type_problem}")
     for e in entries:
         if e.get("type") != "verdict" or not isinstance(e.get("body"), dict):
             continue
@@ -1219,10 +1300,13 @@ def standing(claim: dict[str, Any], entries: list[dict[str, Any]], kr: dict[str,
         row["reasons"] = reasons
         result["verdicts"].append(row)
     current = [r for r in result["verdicts"] if r["signed"] and r["current"]]
-    if current:
+    if current and not schema_reasons:
         last = current[-1]
         result["standing"] = {"pass": "verified", "fail": "failed", "not_covered": "not_covered",
                               "scoped": "scoped"}.get(str(last["verdict"]), "unverified")
+    if schema_reasons:
+        result["standing"] = "failed"
+        result["schema_rejected"] = schema_reasons
     return result
 
 
@@ -1678,6 +1762,70 @@ def _ledger_canaries(fx: Fixture) -> list[tuple[str, str, str, list[str]]]:
     return rows
 
 
+def _cli(args: list[str]) -> tuple[int, str]:
+    """Run the real command line in-process: (exit status, stdout).  The trust
+    canaries go through `main`, so they exercise the path the gate runs, and the
+    caller's own keyring settings are kept out of it."""
+    saved = {k: os.environ.pop(k) for k in ("PCC_KEYRING_REF", "PCC_KEYRING_SHA256", "PCC_REPO") if k in os.environ}
+    buf = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buf):
+            rc = main(args)
+    except PccError as exc:
+        rc = 3
+        buf.write(f"pcc: {exc}\n")
+    finally:
+        os.environ.update(saved)
+    return rc, buf.getvalue()
+
+
+def _trust_canaries(fx: Fixture) -> list[tuple[str, str, str, list[str]]]:
+    """A producer that controls its own tree: it adds a key to the keyring,
+    signs its own verdict, or points the gate at a base that is not there."""
+    rows: list[tuple[str, str, str, list[str]]] = []
+    root = fx.root
+    led = root / LEDGER_PATH
+    claim = fx.claims["solve"]
+    repo = ["--repo", str(root)]
+
+    def commit(msg: str) -> str:
+        ident = ["-c", "user.name=canary", "-c", "user.email=canary@example.invalid"]
+        subprocess.run(["git", "-C", str(root), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(root), *ident, "commit", "-q", "--no-verify", "-m", msg], check=True)
+        return git(root, "rev-parse", "HEAD") or ""
+
+    def row(name: str, expected: str, args: list[str]) -> None:
+        rc, text = _cli(repo + args)
+        got = {0: "pass", 2: "unverified"}.get(rc, "fail")
+        rows.append((name, expected, got, text.splitlines()[-4:]))
+
+    if led.exists():
+        led.unlink()
+    _cli(repo + ["ledger", "init"])
+    append_entry(led, "claim", {"claim_id": claim["id"], "claim_sha256": claim_digest(claim)})
+    base = commit("base: the keyring the owner merged")
+    row("trust:unchanged keyring against the base", "pass", ["ledger", "verify", "--base", base])
+
+    # The producer adds its own key and signs its own verdict.
+    evil = secrets.token_bytes(32)
+    kr = load_json(root / KEYRING_PATH)
+    kr["keys"].append({"id": "evil", "algo": "ed25519", "public_key": ed25519_public(evil).hex(), "role": "verifier"})
+    fx.write(KEYRING_PATH, kr)
+    verdict = verify_claim(claim, root, load_keyring(root / KEYRING_PATH))
+    append_entry(led, "verdict", verdict, make_signature(evil, "evil", "verdict", verdict_subject(verdict)))
+    pinned = sha256_file(root / KEYRING_PATH)
+
+    row("trust:self-added key under the base keyring", "unverified", ["--keyring-ref", base, "standing", claim["id"]])
+    row("trust:keyring changed relative to the base", "fail", ["ledger", "verify", "--base", base])
+    row("trust:keyring change the owner pinned", "pass",
+        ["--keyring-sha256", pinned, "ledger", "verify", "--base", base])
+    row("trust:keyring that does not match the pin", "fail", ["--keyring-sha256", "0" * 64, "standing", claim["id"]])
+    row("trust:base ref that does not resolve", "fail", ["ledger", "verify", "--base", "refs/heads/no-such-base"])
+    row("trust:keyring ref that does not resolve", "fail",
+        ["--keyring-ref", "refs/heads/no-such-base", "standing", claim["id"]])
+    return rows
+
+
 def _prose_canaries() -> list[tuple[str, str, str, list[str]]]:
     rows = []
     st = {"PCC-20260101-aaaaaa": "verified", "PCC-20260101-bbbbbb": "unverified"}
@@ -1699,7 +1847,7 @@ def _prose_canaries() -> list[tuple[str, str, str, list[str]]]:
 def run_canary(out) -> int:
     with tempfile.TemporaryDirectory() as td:
         fx = Fixture(Path(td) / "fixture")
-        rows = _run_canaries(fx) + _ledger_canaries(fx) + _prose_canaries()
+        rows = _run_canaries(fx) + _ledger_canaries(fx) + _prose_canaries() + _trust_canaries(fx)
     bad = 0
     for name, expected, got, reasons in rows:
         ok = (got == expected) or (expected == "pass_or_not_covered" and got in ("pass", "not_covered"))
@@ -1746,10 +1894,57 @@ def _claim_entry_dates(entries: list[dict[str, Any]]) -> dict[str, str]:
     return out
 
 
-def check_claim_types(repo: Path, entries: list[dict[str, Any]], errors: list[str]) -> None:
+SCHEMA_REJECTIONS_PATH = "pcc/schema-rejections.json"
+SCHEMA_REJECTIONS_SCHEMA = "pcc.schema-rejections/v1"
+
+
+def schema_rejections(repo: Path, base: str | None, errors: list[str]) -> dict[str, Any]:
+    """Audit immutable rejected payloads; this never validates a claim or its proofs."""
+    path = repo / SCHEMA_REJECTIONS_PATH
+    prior = file_at_ref(repo, base, SCHEMA_REJECTIONS_PATH, "schema rejections") if base else None
+    if not path.exists():
+        if prior is not None:
+            errors.append("schema rejections: the base manifest cannot be removed")
+        return {}
+    try:
+        data = load_json(path)
+        if not isinstance(data, dict) or data.get("schema") != SCHEMA_REJECTIONS_SCHEMA or not isinstance(data.get("records"), dict):
+            raise ValueError("invalid schema or records map")
+        records = data["records"]
+        old = json.loads(prior)["records"] if prior is not None else {}
+        if not isinstance(old, dict) or any(records.get(k) != v for k, v in old.items()):
+            raise ValueError("base rejection entries may only be appended to")
+        for name, pin in records.items():
+            if not re.fullmatch(r"pcc/claims/PCC-[0-9]{8}-[0-9a-f]{6}\.json", name):
+                raise ValueError(f"unsafe or noncanonical claim path: {name}")
+            if (not isinstance(pin, dict) or pin.get("issue") != "missing_claim_type"
+                    or pin.get("disposition") != "rejected"
+                    or not isinstance(pin.get("reason"), str) or not pin["reason"].strip()
+                    or not HEX64_RE.fullmatch(str(pin.get("sha256", "")))):
+                raise ValueError(f"{name}: needs an exact hash, rejected disposition and specific reason")
+            raw = (repo / name).read_bytes()
+            claim = json.loads(raw)
+            if (sha256_bytes(raw) != pin["sha256"] or not isinstance(claim, dict)
+                    or claim.get("schema") != CLAIM_SCHEMA or claim.get("id") != Path(name).stem
+                    or "claim_type" in claim or claim_type_problem(claim) is None):
+                raise ValueError(f"{name}: payload or expected missing-type defect changed")
+            if base:
+                original = file_at_ref(repo, base, name, "rejected claim")
+                if original != raw:
+                    raise ValueError(f"{name}: rejection requires the unchanged payload already present in the base")
+        return records
+    except (ValueError, KeyError, OSError) as exc:
+        errors.append(f"schema rejections: {exc}")
+        return {}
+
+
+def check_claim_types(repo: Path, entries: list[dict[str, Any]], errors: list[str],
+                      *, base: str | None = None) -> list[str]:
     """Every claim file must carry a valid claim_type unless it is a legacy
     claim; the ledger entry's own date also counts against the exemption."""
     dates = _claim_entry_dates(entries)
+    rejected = schema_rejections(repo, base, errors)
+    notes: list[str] = []
     for p in sorted((repo / CLAIMS_DIR).glob("*.json")) if (repo / CLAIMS_DIR).is_dir() else []:
         try:
             c = load_json(p)
@@ -1759,7 +1954,12 @@ def check_claim_types(repo: Path, entries: list[dict[str, Any]], errors: list[st
             continue
         problem = claim_type_problem(c, dates.get(str(c.get("id")), ""))
         if problem:
-            errors.append(f"claim {c.get('id')}: {problem}")
+            name = p.relative_to(repo).as_posix()
+            if name in rejected:
+                notes.append(f"claim {c.get('id')}: rejected missing-type payload, exact hash retained; ineligible as evidence")
+            else:
+                errors.append(f"claim {c.get('id')}: {problem}")
+    return notes
 
 
 def _all_claims(repo: Path) -> list[dict[str, Any]]:
@@ -1849,6 +2049,11 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="pcc", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--repo", type=Path, default=None, help="repository root (default: the enclosing git root)")
     ap.add_argument("--keyring", type=Path, default=None, help=f"keyring (default: {KEYRING_PATH})")
+    ap.add_argument("--keyring-ref", default=None, metavar="GITREF",
+                    help=f"trust the keyring of this git ref instead of the working tree's (a pull request "
+                         f"gate passes its base branch; default: $PCC_KEYRING_REF)")
+    ap.add_argument("--keyring-sha256", default=None, metavar="HEX",
+                    help="the owner's pin of the working-tree keyring (default: $PCC_KEYRING_SHA256)")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     s = sub.add_parser("keygen")
@@ -1918,7 +2123,18 @@ def main(argv: list[str] | None = None) -> int:
     a = ap.parse_args(argv)
     out = sys.stdout
     repo = (a.repo or repo_root()).resolve()
-    kr = load_keyring(a.keyring or repo / KEYRING_PATH)
+    keyring_ref = a.keyring_ref or os.environ.get("PCC_KEYRING_REF") or None
+    pin = keyring_pin(a.keyring_sha256 or os.environ.get("PCC_KEYRING_SHA256"))
+    if a.cmd in NO_TRUST_CMDS:
+        kr = empty_keyring()
+    elif keyring_ref:
+        if a.keyring:
+            raise PccError("--keyring and --keyring-ref are exclusive")
+        kr = load_keyring_at_ref(repo, keyring_ref)
+    else:
+        if pin is not None:
+            check_keyring_pin(a.keyring or repo / KEYRING_PATH, pin)
+        kr = load_keyring(a.keyring or repo / KEYRING_PATH)
 
     if a.cmd == "keygen":
         secret = secrets.token_bytes(32)
@@ -1937,12 +2153,26 @@ def main(argv: list[str] | None = None) -> int:
             if rest.startswith("{"):
                 proofs.append({"kind": kind, **json.loads(rest)})
             else:
+                if kind == "execution":
+                    raise PccError("execution requires structured JSON with receipt, verifier, "
+                                   "image_id and journal_binds; native logs are not execution proofs. "
+                                   "Use attestation:PATH for unsigned producer artifacts")
                 p = (repo / rest).resolve()
                 if not p.is_file():
                     raise PccError(f"no such proof file {rest}")
                 pin = {"path": rest, "sha256": sha256_file(p)}
                 proofs.append({"kind": kind, "subject": pin} if kind == "attestation"
                               else {"kind": kind, **pin})
+            if kind == "execution":
+                proof = proofs[-1]
+                for field in ("receipt", "verifier", "journal_binds"):
+                    pin = proof.get(field)
+                    if (not isinstance(pin, dict) or not isinstance(pin.get("path"), str)
+                            or not pin["path"] or not isinstance(pin.get("sha256"), str)
+                            or not re.fullmatch(r"[0-9a-f]{64}", pin["sha256"])):
+                        raise PccError(f"execution requires {field} {{path, sha256}}")
+                if not isinstance(proof.get("image_id"), str) or not proof["image_id"]:
+                    raise PccError("execution requires a nonempty image_id")
         claim = {"schema": CLAIM_SCHEMA, "id": new_claim_id(), "kind": a.kind, "statement": a.statement,
                  "scope": a.scope, "proofs": proofs,
                  "producer": {"commit": head_commit(repo), "session": a.session, "model": a.model},
@@ -2006,16 +2236,23 @@ def main(argv: list[str] | None = None) -> int:
         errors: list[str] = []
         head = read_ledger(path)
         check_chain(head, errors)
-        if a.base and not errors:
-            text = base_ledger_text(repo, a.base)
-            if text is None:
-                print(f"ledger: {a.base} has no {LEDGER_PATH}; nothing to compare", file=out)
-            else:
-                base = read_ledger_text(text)
-                check_chain(base, errors)
-                check_prefix(base, head, errors)
+        if a.base and not ref_is_commit(repo, a.base):
+            errors.append(f"ledger: base ref {a.base} does not resolve to a commit; the prefix and the "
+                          f"keyring cannot be compared (fetch the base before the gate)")
+        elif a.base:
+            check_keyring_unchanged(repo, a.base, pin, errors)
+            if not errors:
+                text = base_ledger_text(repo, a.base)
+                if text is None:
+                    print(f"ledger: {a.base} has no {LEDGER_PATH}; nothing to compare", file=out)
+                else:
+                    base = read_ledger_text(text)
+                    check_chain(base, errors)
+                    check_prefix(base, head, errors)
         if not errors:
-            check_claim_types(repo, head, errors)
+            notes = check_claim_types(repo, head, errors, base=a.base)
+            for note in notes:
+                print(note, file=out)
         for err in errors:
             print(err, file=out)
         print(f"ledger: {len(head)} entries, {'BROKEN' if errors else 'chain ok'}", file=out)

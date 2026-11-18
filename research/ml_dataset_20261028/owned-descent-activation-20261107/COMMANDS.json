@@ -1,0 +1,67 @@
+[
+  {
+    "command": [
+      "git",
+      "apply",
+      "/home/ec2-user/ml-dataset-resume-20261029/owned-search-descent-integration-20261107/integration.patch"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "apply",
+      "/home/ec2-user/ml-dataset-resume-20261029/owned-search-descent-integration-20261107/export.patch"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "rustfmt",
+      "+1.98",
+      "--edition",
+      "2021",
+      "--emit",
+      "stdout",
+      "--config",
+      "skip_children=true",
+      "/home/ec2-user/crypto-ml-checkpoint-integration-20261107/src/ml_dataset/owned_search_central.rs"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "rustfmt",
+      "+1.98",
+      "--edition",
+      "2021",
+      "--emit",
+      "stdout",
+      "--config",
+      "skip_children=true",
+      "/home/ec2-user/crypto-ml-checkpoint-integration-20261107/src/ml_dataset/export.rs"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "rustfmt",
+      "+1.98",
+      "--edition",
+      "2021",
+      "--emit",
+      "stdout",
+      "--config",
+      "skip_children=true",
+      "/home/ec2-user/crypto-ml-checkpoint-integration-20261107/src/ml_dataset/owned_search_original_descent.rs"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  }
+]

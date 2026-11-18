@@ -1,0 +1,1 @@
+Sole-model preparation only. Reviewed primary/witness allocation, exact existential factor contract and inverse-on-image caveat; independent numeric rank oracle exhaustive controls. No external source admission. All candidate norms require additional support/original-branch work.

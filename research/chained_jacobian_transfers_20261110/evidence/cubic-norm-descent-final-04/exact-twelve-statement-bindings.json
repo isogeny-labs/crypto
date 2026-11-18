@@ -1,0 +1,125 @@
+{
+  "data": "pcc/claims/PCC-20261116-26ec43.json",
+  "bindings": [
+    {
+      "theorem": "CubicNormDescent.determinant_formula",
+      "claim": "pcc/claims/PCC-20261116-25bee3.json",
+      "normalized_statement": "theorem determinant_formula {R : Type} [CommRing R] (d a b c : R) : a*(a*a-d*c*b)-d*c*(b*a-d*c*c)+d*b*(b*b-a*c)=norm d a b c",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.determinant_formula",
+        "decl_sha256": "95cca2a1341de5f4f647721356faf7393c7af12f45d7e3cb48d9f5b04823addb"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.norm_square",
+      "claim": "pcc/claims/PCC-20261116-559c7e.json",
+      "normalized_statement": "theorem norm_square {R : Type} [CommRing R] (d a b c : R) : norm d (square0 d a b c) (square1 d a b c) (square2 a b c) = (norm d a b c)^2",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.norm_square",
+        "decl_sha256": "2ce2645a90477ca57341e219d5d66d0614488aa2bdfc7af68652bec016f7115e"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.norm_of_constant_square",
+      "claim": "pcc/claims/PCC-20261116-739945.json",
+      "normalized_statement": "theorem norm_of_constant_square {R : Type} [CommRing R] (d a b c D : R) (h0 : square0 d a b c = D) (h1 : square1 d a b c = 0) (h2 : square2 a b c = 0) : (norm d a b c)^2 = D^3",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.norm_of_constant_square",
+        "decl_sha256": "431fb00ce3665d7c1a2fb748272f73adecfa8ef7b0333f654b053adc6e49c015"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.recover_base_square_root",
+      "claim": "pcc/claims/PCC-20261116-9bfaad.json",
+      "normalized_statement": "theorem recover_base_square_root {R : Type} [CommRing R] (D invD u : R) (hinv : invD*D=1) (hu : u^2=D^3) : (u*invD)^2=D",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.recover_base_square_root",
+        "decl_sha256": "d429052c5f4fbfeea06669c637bbe978469448f0505518367a63b7cb12b5da56"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.base_nonroots",
+      "claim": "pcc/claims/PCC-20261116-112101.json",
+      "normalized_statement": "theorem base_nonroots : \u2200 x : Fin 223, x^2 \u2260 (12 : Fin 223) \u2227 x^2 \u2260 (24 : Fin 223)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.base_nonroots",
+        "decl_sha256": "a266c03ffbc0fffe8a8554ccbebff361414e64f3b4e6a009ff28f066810163bb"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.actual_constant_units",
+      "claim": "pcc/claims/PCC-20261116-f4c1d2.json",
+      "normalized_statement": "theorem actual_constant_units : (93 : Fin 223)*12=1 \u2227 (158 : Fin 223)*24=1",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.actual_constant_units",
+        "decl_sha256": "18395af056911874175fbd70abd82e28abf8a3f1313fa3ff8a831406f70da0d0"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.no_cubic_square_root12",
+      "claim": "pcc/claims/PCC-20261116-3d5c0c.json",
+      "normalized_statement": "theorem no_cubic_square_root12 (a b c : Fin 223) : \u00ac (square0 3 a b c=12 \u2227 square1 3 a b c=0 \u2227 square2 a b c=0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.no_cubic_square_root12",
+        "decl_sha256": "b508277a209546fb0e0b31284315198ee3ea6040e562e10d781ede7fbf7eae38"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.no_cubic_square_root24",
+      "claim": "pcc/claims/PCC-20261116-f3fe26.json",
+      "normalized_statement": "theorem no_cubic_square_root24 (a b c : Fin 223) : \u00ac (square0 3 a b c=24 \u2227 square1 3 a b c=0 \u2227 square2 a b c=0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.no_cubic_square_root24",
+        "decl_sha256": "be26fc6569d0bad009382c11c2e28b0434e87241eff2350d921898876c26a8e2"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.square_constant_control",
+      "claim": "pcc/claims/PCC-20261116-0abe9b.json",
+      "normalized_statement": "theorem square_constant_control : square0 (3 : Fin 223) 2 0 0=4 \u2227 square1 (3 : Fin 223) 2 0 0=0 \u2227 square2 (2 : Fin 223) 0 0=0",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.square_constant_control",
+        "decl_sha256": "e30849a63d6f5dfa6557d873bd0e9c13310c00356b63314b87b1e79797032700"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.original_square_coordinates",
+      "claim": "pcc/claims/PCC-20261116-8c325d.json",
+      "normalized_statement": "theorem original_square_coordinates (a b c : Fin 223) : originalSquare223 a b c = (square0 3 a b c,square1 3 a b c,square2 a b c)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.original_square_coordinates",
+        "decl_sha256": "3ea0c7d0fb077c0cbdc43b65b3d76d13be8b1563ca4e3394c9b9bb7d6ca81753"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.original_square_ne12",
+      "claim": "pcc/claims/PCC-20261116-6ade5a.json",
+      "normalized_statement": "theorem original_square_ne12 (a b c : Fin 223) : originalSquare223 a b c \u2260 (12,0,0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.original_square_ne12",
+        "decl_sha256": "c1aabaa71893172c2680821851827057f493749b8660d856289d7d178c02231a"
+      }
+    },
+    {
+      "theorem": "CubicNormDescent.original_square_ne24",
+      "claim": "pcc/claims/PCC-20261116-2f1fe7.json",
+      "normalized_statement": "theorem original_square_ne24 (a b c : Fin 223) : originalSquare223 a b c \u2260 (24,0,0)",
+      "proof": {
+        "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+        "theorem": "CubicNormDescent.original_square_ne24",
+        "decl_sha256": "ad5853ba3ccfeffa8bbf80f6ab2a33730af889ab5bf08506ee34ed304638575f"
+      }
+    }
+  ]
+}

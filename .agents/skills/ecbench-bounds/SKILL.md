@@ -43,6 +43,12 @@ there. This skill is the procedure. Native `ecbench` only; no Python harness.
 Only a verdict answers this. A `compare` of two arms in a session of your own
 design is a measurement; it is not a frontier move.
 
+Before sealing or running a challenge, write the cost chain from the
+incumbent to the candidate (AGENTS.md §3a): restructure lines are
+cost-neutral, each replace line swaps one component and names the arm that
+measures it. A chain with a line that does both is split first; a chain whose
+last line changes the target, curve or unit compares different problems.
+
 1. Register the candidate as a method (`ecbench-extend`). A changed algorithm
    is a new registry id; never change what a registered id counts.
 2. Pick the standing challenge for the domain and axis in
@@ -98,3 +104,22 @@ design is a measurement; it is not a frontier move.
   one. One verdict is one session; one domain is one tier.
 - Do not report wall time as a bound. It is a practicality note, graded by
   isolation level, elsewhere.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope ecbench-bounds`. Apply the
+   adopted lessons; treat candidates as hypotheses this run can test.
+2. **While acting**: resolve a blocker yourself within your authority
+   (diagnose the cause, try the documented remedy, then a materially different
+   approach) before escalating; AGENTS.md "Persistent scientific research loop".
+   Persistence grants no extra execution or spending authority.
+3. **After acting**: record the outcome with evidence,
+   `python3 tools/lessons.py outcome --scope ecbench-bounds --task "..." --result success|partial|fail|blocked --evidence <receipt|commit|job> [--applied L-...]`,
+   and `lessons.py test --lesson L-... --outcome confirm|refute --evidence ...`
+   for each lesson you applied. A surprise that would change what the next run
+   does becomes `lessons.py add --scope ecbench-bounds --trigger "..." --action "..." --evidence ...`.
+4. **Adapt**: when a lesson scoped to `ecbench-bounds` is adopted (two distinct
+   confirmations), propose the edit to this file in a PR that cites the lesson
+   id; when one is refuted twice more than confirmed, it retires itself.

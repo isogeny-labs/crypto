@@ -72,7 +72,13 @@ pub fn automorphisms(curve: &CurveSpec) -> f64 {
 }
 
 /// A forecaster for one candidate, before any solve.
-pub fn forecaster(request: &Request, dump: &FactorBaseDump, r: u64, cofactor: u64) -> Forecaster {
+pub fn forecaster(
+    request: &Request,
+    dump: &FactorBaseDump,
+    r: u64,
+    cofactor: u64,
+    falls: Option<u32>,
+) -> Forecaster {
     let mut f = Forecaster::new(request.plan.max_degree)
         .with_work_unit("F4 row-reduction field multiplications (f4_fp field_ops)");
     f.set_relation_state(dump.factor_base.columns as usize, 0);
@@ -96,7 +102,55 @@ pub fn forecaster(request: &Request, dump: &FactorBaseDump, r: u64, cofactor: u6
             f.set_prior_degree(d, dreg_prior_table::SOURCE);
         }
     }
+    // Effective-degree cap for binary subspaces of dimension >= 7 (used only where no
+    // calibrated point applies; the forecaster gives the calibrated point precedence).
+    if let Some(falls) = falls {
+        f.set_affine_falls(falls, FALLS_SOURCE);
+    }
     f
+}
+
+/// Smallest factor-base dimension at which the effective degree never fell below the
+/// measured solving degree on the measured (random-target) systems. Not a guarantee:
+/// constructed targets with four or more decompositions break it at every `k`
+/// (ml-cryptanalysis `experiments/dmut-mechanistic-20261114/BOUND_ANALYSIS.md`).
+pub const MIN_EFFECTIVE_DIMENSION: u32 = 7;
+
+const FALLS_SOURCE: &str = "affine falls n - dim(V*V) + 1 of the binary-subspace factor base \
+     (ml-cryptanalysis ic-fb-structure P1; effective-degree bound, experiments/dmut-mechanistic-20261114)";
+
+/// The affine falls `n - dim(V*V) + 1` of a binary-subspace factor base of dimension
+/// `k >= MIN_EFFECTIVE_DIMENSION`, from the persisted dump (so the live engine and the
+/// offline replay agree); `None` for any other instance or factor base.
+pub fn affine_falls(
+    inst: &crypto_lib::cryptanalysis::ecbench::workload::Instance,
+    dump: &FactorBaseDump,
+) -> Option<u32> {
+    let crypto_lib::cryptanalysis::ecbench::workload::Instance::Binary(i) = inst else {
+        return None;
+    };
+    if dump.factor_base.family != "binary-subspace" {
+        return None;
+    }
+    let k = dump.factor_base.dimension?;
+    if k < MIN_EFFECTIVE_DIMENSION {
+        return None;
+    }
+    let basis = super::shapes::recipe_basis(&dump.factor_base.params, k).ok()?;
+    let mut pivots: Vec<u64> = Vec::new();
+    for (a_idx, &a) in basis.iter().enumerate() {
+        for &b in &basis[a_idx..] {
+            let mut v = i.gf.mul(a, b);
+            for &p in &pivots {
+                v = v.min(v ^ p);
+            }
+            if v != 0 {
+                pivots.push(v);
+                pivots.sort_unstable_by(|x, y| y.cmp(x));
+            }
+        }
+    }
+    Some(i.n.saturating_sub(pivots.len() as u32) + 1)
 }
 
 /// The extension degree of a binary curve, or `None` for a prime-field curve.
@@ -200,12 +254,13 @@ pub fn from_attempt(dir: &Path) -> Result<Option<(Forecast, Value)>> {
         return Ok(None);
     }
     let dump: FactorBaseDump = read(&dir.join("base.json"))?;
-    let (r, cofactor) = match request.candidate.curve.build()? {
+    let inst = request.candidate.curve.build()?;
+    let (r, cofactor) = match &inst {
         crypto_lib::cryptanalysis::ecbench::workload::Instance::Prime(i) => (i.r, i.cofactor),
         crypto_lib::cryptanalysis::ecbench::workload::Instance::Binary(i) => (i.r, i.cofactor),
         _ => return Err("forecast replay supports native prime/binary instances only".into()),
     };
-    let mut f = forecaster(&request, &dump, r, cofactor);
+    let mut f = forecaster(&request, &dump, r, cofactor, affine_falls(&inst, &dump));
     let mut rows = IncrementalGauss::new(dump.factor_base.columns as usize, r);
     let mut records = Vec::new();
     let mut admitted_rows = 0usize;

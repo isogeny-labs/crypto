@@ -1,0 +1,88 @@
+⚠ [3156/3160] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [3157/3160] Replayed S3Completion
+warning: S3Completion.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Completion.lean:25:2: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Completion.lean:25:2: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Completion.lean:67:44: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [WeierstrassCurve.Affine.addX, ha1, ha2, hn, zero_mul, mul_zero, add_zero, sub_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [3158/3160] Replayed BinaryS3
+warning: BinaryS3.lean: imports `Mathlib.Algebra.CharP.Two` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: BinaryS3.lean:45:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.zero_coordinate_no_root`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: BinaryS3.lean:107:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.curve_equation`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: BinaryS3.lean:212:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.exists_binary_y`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+info: BinaryS3.lean:268:0: 'BinaryS3Audit.binaryS3_pointX_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: BinaryS3.lean:269:0: 'BinaryS3Audit.binaryS3_zero_iff_exists_points' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [3159/3160] Replayed BinaryMisapplication
+info: BinaryMisapplication.lean:28:0: 'BinaryS3Audit.short_formula_binary_counterexample' depends on axioms: [propext, Classical.choice, Quot.sound]
+✖ [3160/3160] Building CharacteristicTorsionBoundary (3.4s)
+warning: CharacteristicTorsionBoundary.lean: imports `Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/mathlib4/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/crypto-audit/research/theorem_census_20261109/lean/CharacteristicTorsionBoundary.lean -o /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/CharacteristicTorsionBoundary.olean -i /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/CharacteristicTorsionBoundary.ilean -c /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/CharacteristicTorsionBoundary.c --setup /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/CharacteristicTorsionBoundary.setup.json --json
+error: CharacteristicTorsionBoundary.lean:87:6: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ?n • ?f ?a
+in the target expression
+  2 • (WeierstrassCurve.Affine.Point.map (Algebra.ofId F K)) rationalTwoPoint = 0
+
+⊢ 2 • (WeierstrassCurve.Affine.Point.map (Algebra.ofId F K)) rationalTwoPoint = 0
+
+Note: The target expression is not type-correct under the `implicit` transparency level, which may have triggered the failure. This is usually caused by unfolding of semireducible definitions in prior tactic steps. Use `set_option linter.tacticCheckInstances true` to investigate the source of the issue.
+Full error:
+  Application type mismatch: The argument
+    rationalTwoPoint
+  has type
+    @WeierstrassCurve.Affine.Point (ZMod 2) (ZMod.commRing 2) curve
+  but is expected to have type
+    @WeierstrassCurve.Affine.Point F (ZMod.instField 2).toCommRing (curve.baseChange F)
+  in the application
+    (WeierstrassCurve.Affine.Point.map (Algebra.ofId F K)) rationalTwoPoint
+info: CharacteristicTorsionBoundary.lean:108:0: 'CharacteristicTorsionAudit.characteristic_torsion_field_counterexample' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: CharacteristicTorsionBoundary.lean:109:0: 'CharacteristicTorsionAudit.no_pointwise_nondegenerate_pairing' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+error: CharacteristicTorsionBoundary.lean:111:0: Unexpected name `CharacteristicTorsionAudit` after `end`: The current section is unnamed
+
+Hint: Delete the name `CharacteristicTorsionAudit` to end the current unnamed scope; outer named scopes can then be closed using additional `end` command(s):
+  end ̵C̵h̵a̵r̵a̵c̵t̵e̵r̵i̵s̵t̵i̵c̵T̵o̵r̵s̵i̵o̵n̵A̵u̵d̵i̵t̵
+Some required targets logged failures:
+- CharacteristicTorsionBoundary
+error: build failed

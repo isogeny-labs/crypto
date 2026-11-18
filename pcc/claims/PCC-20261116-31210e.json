@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:37:17Z",
+ "id": "PCC-20261116-31210e",
+ "kind": "execution",
+ "producer": {
+  "commit": "f68145a347f46f032d1f866ba6bda56e5271e190",
+  "model": "GPT-6",
+  "session": "selected-root-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/selected-cli-e060f3ee6-01-post-call.json",
+    "sha256": "3042203a76a8db3c1560ade6002652cf0867f2f5be848b8deae6ac3eea4d802d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/selected-worker-e060f3ee6-01-post-call.json",
+    "sha256": "e0003e6fa852aceedc4082d1774109c47e93755a663b3ead3909f73d750a0faf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/native-cli-tests-01.log",
+    "sha256": "2c07905a555511d920ac983f8d86b60ad5721f2607f0818ba151c99baa316889"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115",
+ "statement": "Frozen actual-root CLI release qualifier and worker built at e060f3ee6 completed three fixed contract checks: four-arm complete-basis agreement, explicit capped-F4 incompleteness and unsupported wide-F4 status. Both copied executables retain pre/post hashes; clocks are not compared."
+}

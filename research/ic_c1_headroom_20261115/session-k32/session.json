@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h6cced8742dd9",
+  "label": "C = 1 boundary confirmation k = 32: pre-registered c1-x07-j16-g on five fresh sibling curves",
+  "spec_id": "ECS1h1f035589c5d8",
+  "spec_sha256": "1f035589c5d865446277c336ea1cff66cde44779e5248cdfcca223bae4a95024",
+  "env_class_id": "ECBENV3h4c00cb718a45",
+  "host_sha256": "bf3403ebf0abdd508c41d54c5a76c568c5b3b2fdf7158be681c1a2908d69f999",
+  "plan_sha256": "4f2c5a1cde545482068480e19f12e8bc5e213395d796ad651292076934e3fe72",
+  "binary_sha256": "64d09834c671e607f2d9b57483b624a1928423ba3e8e2148c7164dd290c56ff7",
+  "git_commit": "ded279c285cbb37bf6fd7771738db00a976a24dc",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794762499771,
+  "finished_unix_ms": 1794762508485,
+  "status": "complete",
+  "executions_planned": 540,
+  "records_written": 540,
+  "records_sha256": "5b827e95ccc920d3130e882bacc12d9d02a75a75824d3b884d8309513bac094b",
+  "status_counts": {
+    "verified": 540
+  },
+  "last_seq": 539
+}

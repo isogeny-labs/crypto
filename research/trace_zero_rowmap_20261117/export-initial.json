@@ -1,0 +1,4314 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "TZR-20261117-complete",
+  "created": "2026-11-17T04:03:07Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "7703daa3af347a76a52bd0bc5b5587516e658ecb04c0b5c887d6b7d550aadfcf",
+    "protocol_id": "TZR-20261117-packed-projected-rows",
+    "version": 1
+  },
+  "producer": {
+    "runtime": null,
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": null,
+    "dirty": null
+  },
+  "backend": "manual",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "binary_sha256": null,
+      "commit": null
+    },
+    {
+      "id": "lookup",
+      "role": "candidate",
+      "binary_sha256": null,
+      "commit": null
+    },
+    {
+      "id": "baseline-aa",
+      "role": "control_aa",
+      "binary_sha256": null,
+      "commit": null
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "row-0",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611467,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244060,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-1",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 29445307,
+          "oracle_instructions": 10139342,
+          "setup_instructions": 18244022,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-2",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611504,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244097,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-3",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 33962805,
+          "oracle_instructions": 14823673,
+          "setup_instructions": 18245011,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-4",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805674,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245100,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-5",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805623,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245049,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-6",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24911030,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243811,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-7",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24910969,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243750,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-8",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24860333,
+          "oracle_instructions": 5555656,
+          "setup_instructions": 18243736,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-9",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39214706,
+          "oracle_instructions": 12512633,
+          "setup_instructions": 25608777,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-10",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39975047,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608889,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-11",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39974973,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608815,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-12",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068909,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614407,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-13",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068848,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614346,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-14",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 46231195,
+          "oracle_instructions": 19691864,
+          "setup_instructions": 25614332,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-15",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885116,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606280,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-16",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32834844,
+          "oracle_instructions": 6135617,
+          "setup_instructions": 25606266,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-17",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885163,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606327,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-18",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 29445307,
+          "oracle_instructions": 10139342,
+          "setup_instructions": 18244022,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-19",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611504,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244097,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-20",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611467,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244060,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-21",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805674,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245100,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-22",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805623,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245049,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-23",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 33962805,
+          "oracle_instructions": 14823673,
+          "setup_instructions": 18245011,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-24",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24910969,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243750,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-25",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24860333,
+          "oracle_instructions": 5555656,
+          "setup_instructions": 18243736,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-26",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24911030,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243811,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-27",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39975047,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608889,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-28",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39974973,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608815,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-29",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39214706,
+          "oracle_instructions": 12512633,
+          "setup_instructions": 25608777,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-30",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068848,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614346,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-31",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 46231195,
+          "oracle_instructions": 19691864,
+          "setup_instructions": 25614332,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-32",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068909,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614407,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-33",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32834844,
+          "oracle_instructions": 6135617,
+          "setup_instructions": 25606266,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-34",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885163,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606327,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-35",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885116,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606280,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-36",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611504,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244097,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-37",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611467,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244060,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-38",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 29445307,
+          "oracle_instructions": 10139342,
+          "setup_instructions": 18244022,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-39",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805623,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245049,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-40",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 33962805,
+          "oracle_instructions": 14823673,
+          "setup_instructions": 18245011,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-41",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805674,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245100,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-42",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24860333,
+          "oracle_instructions": 5555656,
+          "setup_instructions": 18243736,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-43",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24911030,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243811,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-44",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24910969,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243750,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-45",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39974973,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608815,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-46",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39214706,
+          "oracle_instructions": 12512633,
+          "setup_instructions": 25608777,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-47",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39975047,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608889,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-48",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 46231195,
+          "oracle_instructions": 19691864,
+          "setup_instructions": 25614332,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-49",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068909,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614407,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-50",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068848,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614346,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-51",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885163,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606327,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-52",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885116,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606280,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-53",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32834844,
+          "oracle_instructions": 6135617,
+          "setup_instructions": 25606266,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-54",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611467,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244060,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-55",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 29445307,
+          "oracle_instructions": 10139342,
+          "setup_instructions": 18244022,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-56",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611504,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244097,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-57",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 33962805,
+          "oracle_instructions": 14823673,
+          "setup_instructions": 18245011,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-58",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805674,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245100,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-59",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805623,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245049,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-60",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24911030,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243811,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-61",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24910969,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243750,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-62",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24860333,
+          "oracle_instructions": 5555656,
+          "setup_instructions": 18243736,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-63",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39214706,
+          "oracle_instructions": 12512633,
+          "setup_instructions": 25608777,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-64",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39975047,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608889,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-65",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39974973,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608815,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-66",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068909,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614407,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-67",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068848,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614346,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-68",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 46231195,
+          "oracle_instructions": 19691864,
+          "setup_instructions": 25614332,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-69",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885116,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606280,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-70",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32834844,
+          "oracle_instructions": 6135617,
+          "setup_instructions": 25606266,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-71",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885163,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606327,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-72",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 29445307,
+          "oracle_instructions": 10139342,
+          "setup_instructions": 18244022,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-73",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611504,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244097,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-74",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-distinct-planted-0",
+      "seed": 202611159420,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 31611467,
+          "oracle_instructions": 12305464,
+          "setup_instructions": 18244060,
+          "post_instructions": 1061943,
+          "field_mul": 9281,
+          "field_square": 18230
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-75",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805674,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245100,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-76",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 40805623,
+          "oracle_instructions": 21666453,
+          "setup_instructions": 18245049,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-77",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-uniform",
+      "seed": 202611159422,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 33962805,
+          "oracle_instructions": 14823673,
+          "setup_instructions": 18245011,
+          "post_instructions": 894121,
+          "field_mul": 17425,
+          "field_square": 18580
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-78",
+      "arm": "baseline",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24910969,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243750,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-79",
+      "arm": "lookup",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24860333,
+          "oracle_instructions": 5555656,
+          "setup_instructions": 18243736,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-80",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n83-d12-cancellation",
+      "seed": 202611159423,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 24911030,
+          "oracle_instructions": 5606278,
+          "setup_instructions": 18243811,
+          "post_instructions": 1060941,
+          "field_mul": 3400,
+          "field_square": 17366
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-81",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39975047,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608889,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-82",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39974973,
+          "oracle_instructions": 13272862,
+          "setup_instructions": 25608815,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-83",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-distinct-planted-0",
+      "seed": 202611164220,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 39214706,
+          "oracle_instructions": 12512633,
+          "setup_instructions": 25608777,
+          "post_instructions": 1093296,
+          "field_mul": 8199,
+          "field_square": 39084
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-84",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068848,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614346,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-85",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 46231195,
+          "oracle_instructions": 19691864,
+          "setup_instructions": 25614332,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-86",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 52068909,
+          "oracle_instructions": 25529503,
+          "setup_instructions": 25614407,
+          "post_instructions": 924999,
+          "field_mul": 17952,
+          "field_square": 39529
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-87",
+      "arm": "lookup",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32834844,
+          "oracle_instructions": 6135617,
+          "setup_instructions": 25606266,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-88",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885163,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606327,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-89",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-cancellation",
+      "seed": 202611164223,
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 32885116,
+          "oracle_instructions": 6185875,
+          "setup_instructions": 25606280,
+          "post_instructions": 1092961,
+          "field_mul": 3465,
+          "field_square": 38559
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 90,
+    "attempted": 90,
+    "completed": 90,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "rows.jsonl",
+      "sha256": "8d5b5236748f02c221ee384b345559569981d846c89cb860d408c8c37cdd2df6",
+      "bytes": 111810,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": null,
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [],
+  "reviews_dir": "reviews"
+}

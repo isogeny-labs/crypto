@@ -26,6 +26,12 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+**Goal** (AGENTS.md, "Goal: what to work on next"): the SessionStart hook
+prints `tools/goal_brief.py` — the pinned goal and items in `docs/ACTIVE.md`,
+then the newest session-log open threads. With no other instruction, take the
+first unchecked item (else the newest unowned open thread) and start. `/goal`
+re-reads the brief; `/goal <text>` pins a new goal.
+
 Run authorized x86 CPU experiments and crypto benchmarks through
 [`isolab-eks`](.claude/skills/isolab-eks/SKILL.md) on EKS Spot by default
 (owner, 2026-10-25; AGENTS.md §9a). Use the executor's existing AWS identity,
@@ -36,9 +42,12 @@ experiment director freezes this route in the task card; the executor runs it
 unchanged. Preserve explicitly requested environments and keep local development
 checks local. Loading instructions alone does not authorize an experiment.
 
-Open pull requests ready for review, never as drafts, whatever the runtime
-defaults to, and mark an existing draft ready; only a user request in the task
-makes a draft. Enable auto-merge as you open the PR (`gh pr merge <n> --auto
+**First step of every task** (owner, 2026-11-16): before any other work, add
+the task to "Active items" in `docs/ACTIVE.md`, commit that alone, push, and
+open a **draft** PR named after the task (lane work pushes to the lane PR
+instead). Keep the line current; when the work is finished and checked, tick
+it and mark the PR ready for review, whatever the runtime defaults to. Rule:
+AGENTS.md, "First step of every task". Enable auto-merge when you mark it ready (`gh pr merge <n> --auto
 --merge`); a stacked PR cannot auto-merge until it is retargeted to `main`.
 This and the repository's other rules are in
 [`AGENTS.md`](AGENTS.md) ("Default workflow").
@@ -50,6 +59,10 @@ breakthrough. Report each row's gap to the matched rho as the distance
 remaining, not as a pass/fail gate. Relabelling and accounting changes are
 not improvements. Full rule: [`AGENTS.md`](AGENTS.md), "Success criterion:
 iterative improvement of the index-calculus baseline".
+Claim tiers T0–T3 (below rho, smaller exponent, subexponential; transfers
+to hyperelliptic or other groups count when fully charged; cold, public
+targets, preregistered):
+[`docs/ic/SUCCESS_CRITERIA.md`](docs/ic/SUCCESS_CRITERIA.md).
 
 Look up curve facts in the curve database before computing them or
 scanning `docs/curves/*.json`: MCP server `ecdb` (export `ECDB_TOKEN` from
@@ -149,6 +162,12 @@ report in `benchmarks/progress/`, in the same PR. The hooks refuse unrecorded
 benchmark launchers and unrecorded pushes; the `bench-records` check fails
 the PR. AGENTS.md, "Benchmark records: data in S3, metadata in Git, one
 progress report"; [docs/benchmark-records.md](docs/benchmark-records.md).
+
+**Continuous learning** (owner, 2026-11-15): every skill and agent reads
+`python3 tools/lessons.py brief --scope <name>` before acting, records an
+evidenced outcome and lesson tests after, and folds adopted lessons back into
+its own instructions by PR. Ledger: `docs/lessons/`. Rule: AGENTS.md
+"Continuous learning loop".
 
 ## Persistent scientific research loop
 

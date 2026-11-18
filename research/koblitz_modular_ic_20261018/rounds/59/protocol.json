@@ -1,0 +1,121 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R59-CERTIFICATE-CHECK",
+  "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
+  "claims": [
+    {
+      "id": "check",
+      "class": "exact_computation",
+      "statement": "Fresh exactcheckerreplays640/320products,pointJordan/sourceoperators/oldcolumns/100evaluationinjection/all18kernelcertificateswithrowdotparity."
+    }
+  ],
+  "arms": {
+    "reference": "R55normalA andsourceannihilator;R52normalbasis/table/nu;R58complete100functions",
+    "baseline": "reducedB/A80sourcequotient",
+    "candidate": "640/320normalA4quotientwithcomplete18-patternprincipaldivisortest",
+    "positive": [
+      "allE M4=0,E G=I320,M4H+GE=I640",
+      "fourpoint-labelled80-dimensionalnilpotentJordanblocks",
+      "full100-columnfiniteevaluationleftinverse",
+      "all160oldCRTcolumnsrecovered",
+      "globallyregularxspacepositivekernelA\u00b2dimension1",
+      "all18completeC K/R K/K R+H Cproducts"
+    ],
+    "negative": [
+      "knownx=1/A\u00b2failsglobalregularconditions",
+      "changedcokernelprojectionfailsinverseproduct"
+    ],
+    "A_A": {
+      "not_applicable_reason": "fixedexactproducts,no noisycomparison"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "donorbytes",
+      "seed59",
+      "4GiBvirtual/1200s",
+      "oneSingularFLINTthread",
+      "32normalbasisvectors",
+      "fdegree5 fourthpowerdegree20",
+      "all100numerators"
+    ],
+    "measured": [
+      "binaryhash",
+      "nativeUTC",
+      "exit/errors"
+    ],
+    "statistical": "notapplicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "exhaustive prescribed polynomial identities",
+    "seeds": [
+      59
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exactpredeclaredproducts"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "notapplicable"
+  },
+  "metrics": [
+    "quotient320",
+    "nilpotentA rankladder320/240/160/80/0",
+    "4localblocks80",
+    "finiteRRrank100",
+    "positivecontrolrank99",
+    "all18ranks/kerneldimensions",
+    "principal/excludedpatterncounts"
+  ],
+  "execution": {
+    "launcher": "REPLAY_CHECK.sh checkcohort59-01",
+    "timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 59,
+    "queue": "one mathematical job atonce",
+    "checkpoint": "immutable raw sources,logs,exit,binaryhash,tar",
+    "source_gate": "sixexecutedfiles matchGit;all donor hashes",
+    "backend": "existing user-authorized local exact Rust bit arithmetic",
+    "compiler_timeout_seconds": 1200,
+    "run_timeout_seconds": 1200,
+    "compiler": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "CPU_affinity": "0"
+  },
+  "stopping": {
+    "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
+    "failure": "retain errors/caps/partials;freeze repairbeforefreshattempt",
+    "no_duplicate": "reconcilelivehandlebeforeretry"
+  },
+  "decision": {
+    "accept": "exit0,exactmarker,no nativeerrorlines,allpredeclaredsourceproducts",
+    "failure": "preserveeverycap/error/partial;freezearepairbeforefreshattempt",
+    "scope": "normalA4dataonly;full640rank320/cokernel/CRT/all18patternsnext"
+  },
+  "analysis": {
+    "kind": "exactpolynomialmatrix/rationalcoefficienttransportandbinarypresentation",
+    "comparative": false,
+    "precision": "exact,no seriestruncationinthisstage"
+  },
+  "literature": [
+    {
+      "source": "R55QUOTIENT55source-annihilator;R52CLOSURE52/table/compact/nu;R50RR_PIDparameterinversion;R58complete100andNEXT",
+      "use": "actualnormalbasisandcoordinatebridge,avoidingunnormalizedlambda-jets"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Singular/Singular/spielwiese/doc/reference.doc",
+      "use": "nativepolynomial/rationalcoefficientmapping,unitlifts;officialmanualwebsiteinaccessible;reusealreadycheckedinverseParameterprocedure"
+    }
+  ],
+  "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
+  "version": 4,
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "cohort59-01accepted320quotient/all18rank100/regularpositive99;freeze separatecheckerwithrowdotimplementation"
+  }
+}

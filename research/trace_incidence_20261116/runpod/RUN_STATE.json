@@ -1,0 +1,101 @@
+{
+  "schema": "trace-runpod-deployment/v1",
+  "source_revision": "c0176f942c03a549a98cb680b816e864b8820333",
+  "pod_id": "wg53vkdhjsv6lk",
+  "pod_name": "trace-incidence-20261116-c0176f942c",
+  "image": "debian:trixie-slim@sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392",
+  "price_per_hour_usd": 0.28,
+  "vcpu_count": 8,
+  "memory_gb": 16,
+  "created_epoch": 1794846349,
+  "deadline_epoch": 1794848149,
+  "cost_ceiling_usd": 1,
+  "status": "completed",
+  "worker_source_revision": "c0176f942c03a549a98cb680b816e864b8820333",
+  "supervisor_exec_session": 32539,
+  "checkpoint_admission": {
+    "schema": "trace-runpod-checkpoint/v1",
+    "source_revision": "c0176f942c03a549a98cb680b816e864b8820333",
+    "source_manifest_sha256": "b36916725844c7f5d7c5d6f1f13a84cc38b66774d325968d154a558b071fda57",
+    "protocol_sha256": "aafc4a1096f4cd4544e956ba6561993185be293569a5350f2766179cff25b8b8",
+    "gate_exit": 0,
+    "checkpoint_state": "dafab2e44fd4c7da4974de9b2fb4063c8c18089bbf53655529ca1c23ca2e7257 20261116T162434Z-c0176f942c03 s3://setec-astronomy-artifacts/checkpoints/crypto/lane__trace-incidence/20261116T162434Z-c0176f942c03/"
+  },
+  "previous_attempt": {
+    "schema": "trace-runpod-deployment/v1",
+    "source_revision": "c7b146a05b543beb66e42a2d5f1c869d90a672b1",
+    "pod_id": "8yoqn5n838rcfp",
+    "pod_name": "trace-incidence-20261116-c7b146a05b",
+    "image": "debian:trixie-slim@sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392",
+    "price_per_hour_usd": 0.28,
+    "vcpu_count": 8,
+    "memory_gb": 16,
+    "created_epoch": 1794845483,
+    "deadline_epoch": 1794847283,
+    "cost_ceiling_usd": 1,
+    "status": "closed-before-timing",
+    "supervisor_exec_session": 57381,
+    "worker_source_revision": "c7b146a05b543beb66e42a2d5f1c869d90a672b1",
+    "checkpoint_admission": {
+      "schema": "trace-runpod-checkpoint/v1",
+      "source_revision": "c7b146a05b543beb66e42a2d5f1c869d90a672b1",
+      "source_manifest_sha256": "60330b82a01f85a2f6db483a1564736a7851e91d04b34fccc049d2c84143fd87",
+      "protocol_sha256": "aafc4a1096f4cd4544e956ba6561993185be293569a5350f2766179cff25b8b8",
+      "gate_exit": 0,
+      "checkpoint_state": "ceb480107bf878f625a54374f33ab1e38e3e4042ed7b28503ef9b0c97b252e5e 20261116T160926Z-c7b146a05b54 s3://setec-astronomy-artifacts/checkpoints/crypto/lane__trace-incidence/20261116T160926Z-c7b146a05b54/"
+    },
+    "result_directory": "/workspace/crypto_pr_context/runpod-c7b146a05",
+    "collection": "External supervise.sh session57381; HTTP result namespace and credential paths remain private in the result directory and /tmp",
+    "cleanup": {
+      "schema": "trace-runpod-cleanup/v1",
+      "pod_id": "8yoqn5n838rcfp",
+      "http_status": "204",
+      "utc": "2026-11-16T16:14:01Z",
+      "deleted": true
+    },
+    "launcher_incident": "Receipt copy targeted the same file after creation; attached supervisor to the existing pod and original deadline, no new pod",
+    "completion": {
+      "schema": "trace-runpod-transfer/v1",
+      "sha256": "db2d28bd5543fc42300a30a9e259363fb8f836caee5acb4281f27dd3d1817fd6",
+      "bytes": 244872,
+      "worker_exit": 129
+    },
+    "custody": {
+      "schema": "trace-runpod-custody/v1",
+      "bucket": "setec-astronomy-artifacts",
+      "key": "store/runpod/trace-incidence/c7b146a05b543beb66e42a2d5f1c869d90a672b1/43904307401/results.tar.gz",
+      "sha256": "db2d28bd5543fc42300a30a9e259363fb8f836caee5acb4281f27dd3d1817fd6",
+      "bytes": 244872,
+      "upload_http_status": "204",
+      "readback_hash_matches": true
+    },
+    "next_step": "One amended preflight-correction attempt under AMENDMENT_A2.json; no pod currently active for this request"
+  },
+  "result_directory": "/workspace/crypto_pr_context/runpod-c0176f942",
+  "collection": "supervise-v2.sh live mirrors and final archive, original source c0176f942; credential/namespace material stays outside Git",
+  "active_own_pods": 0,
+  "maximum_allocations_total": 2,
+  "completion": {
+    "schema": "trace-runpod-transfer/v1",
+    "sha256": "0b27d27910807fc9e5b047e4f64999ba71d603178537c78ac7b7f1cb06be81fa",
+    "bytes": 3298986,
+    "worker_exit": 0
+  },
+  "cleanup": {
+    "schema": "trace-runpod-cleanup/v1",
+    "pod_id": "wg53vkdhjsv6lk",
+    "http_status": "204",
+    "utc": "2026-11-16T16:39:33Z",
+    "deleted": true
+  },
+  "custody": {
+    "schema": "trace-runpod-custody/v1",
+    "bucket": "setec-astronomy-artifacts",
+    "key": "store/runpod/trace-incidence/c0176f942c03a549a98cb680b816e864b8820333/43907109841/results.tar.gz",
+    "sha256": "0b27d27910807fc9e5b047e4f64999ba71d603178537c78ac7b7f1cb06be81fa",
+    "bytes": 3298986,
+    "upload_http_status": "204",
+    "readback_hash_matches": true
+  },
+  "next_step": "Publish native descriptive report and immutable CAS promotion; no Runpod pod remains active for this request."
+}

@@ -1,0 +1,492 @@
+{
+  "main": "MsolveDegreeWordAudit.actual_degree_word_certificate",
+  "binding": "285221ce90632adbf8398f66d7c011b1c8b9ad6cdc5be42b95e1616cd6011e64",
+  "custom_imports": {
+    "SubspaceCriterion": "research/theorem_census_20261109/lean/SubspaceCriterion.lean",
+    "F4Containment": "research/theorem_census_20261109/lean/F4Containment.lean",
+    "F4SaturationBoundary": "research/theorem_census_20261109/lean/F4SaturationBoundary.lean",
+    "F4ExpectedOutputs": "research/theorem_census_20261109/lean/F4ExpectedOutputs.lean",
+    "SolvingDegreeBound": "research/theorem_audit_20261108/lean/SolvingDegreeBound.lean",
+    "DegreeCertificate": "research/msolve_degree_word_audit_20261116/lean/DegreeCertificate.lean",
+    "DegreeFamily": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+    "DegreeImports": "research/msolve_degree_word_audit_20261116/lean/DegreeImports.lean",
+    "DegreeWords": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+    "F4Boundary": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+    "NativeWitness": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean"
+  },
+  "claims": [
+    {
+      "declaration": "MsolveDegreeWordAudit.actual_degree_word_mathematical_certificate",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeCertificate.lean",
+      "statement": "theorem actual_degree_word_mathematical_certificate : ActualWordBounds ∧ ActualPolynomialBoundary ∧ LegacyFullF4Statement",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.highX_ne_highXY",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem highX_ne_highXY (n : ℕ) : highX n ≠ highXY n",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.highX_ne_zero",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem highX_ne_zero (n : ℕ) : highX n ≠ 0",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.highXY_ne_zero",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem highXY_ne_zero (n : ℕ) : highXY n ≠ 0",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.highX_ne_exponentY",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem highX_ne_exponentY (n : ℕ) : highX n ≠ exponentY",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.highXY_ne_exponentY",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem highXY_ne_exponentY (n : ℕ) : highXY n ≠ exponentY",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.exponentY_ne_zero",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem exponentY_ne_zero : exponentY ≠ 0",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.highX_degree",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem highX_degree (n : ℕ) : (highX n).sum (fun _ e => e) = n+2",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.highXY_degree",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem highXY_degree (n : ℕ) : (highXY n).sum (fun _ e => e) = n+2",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.row_exponents_equal",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem row_exponents_equal (n : ℕ) : exponentY + highX n = exponentX + highXY n",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.combination_highX",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem combination_highX (n : ℕ) (a b : K) : ((a • firstPoly n + b • secondPoly n) : Poly K).coeff (highX n) = a",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.combination_highXY",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem combination_highXY (n : ℕ) (a b : K) : ((a • firstPoly n + b • secondPoly n) : Poly K).coeff (highXY n) = b",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.combination_linearY",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem combination_linearY (n : ℕ) (a b : K) : ((a • firstPoly n + b • secondPoly n) : Poly K).coeff exponentY = 0",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.span_representation",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem span_representation (n : ℕ) {p : Poly K} (hp : p ∈ Submodule.span K (inputs n)) : ∃ a b : K, p = a • firstPoly n + b • secondPoly n",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.low_span_zero",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem low_span_zero (n : ℕ) {p : Poly K} (hp : p ∈ Submodule.span K (inputs n)) (hd : p.totalDegree+1 ≤ n+2) : p=0",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.input_span_closed",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem input_span_closed (n : ℕ) : DClosed (n+2) (Submodule.span K (inputs n))",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.linearY_not_span",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem linearY_not_span (n : ℕ) : (linearY : Poly K) ∉ Submodule.span K (inputs n)",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.first_degree",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem first_degree (n : ℕ) : (firstPoly n : Poly K).totalDegree = n+2",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.second_degree",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem second_degree (n : ℕ) : (secondPoly n : Poly K).totalDegree = n+2",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.reduction_identity",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeFamily.lean",
+      "statement": "theorem reduction_identity (n : ℕ) : monomial exponentY (1 : K) * firstPoly n - monomial exponentX (1 : K) * secondPoly n = linearY",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.degree_word_mod",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+      "statement": "theorem degree_word_mod (as : List ℕ) : (degreeWord as).toNat = as.sum % 65536",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.degree_word_exact_iff",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+      "statement": "theorem degree_word_exact_iff (as : List ℕ) : (degreeWord as).toNat = as.sum ↔ as.sum < 65536",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.lcm_degree_guard",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+      "statement": "theorem lcm_degree_guard (a b c d : ℕ) (h : max a c + max b d < 65536) : (lcmDegreeWord a b c d).toNat = max a c + max b d",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.boundary_input_degrees",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+      "statement": "theorem boundary_input_degrees : 65535+0 < 65536 ∧ 65534+1 < 65536",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.boundary_lcm_word",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+      "statement": "theorem boundary_lcm_word : (lcmDegreeWord 65535 0 65534 1).toNat = 0",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.boundary_lcm_natural",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+      "statement": "theorem boundary_lcm_natural : max 65535 65534 + max 0 1 = 65536",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.unrestricted_lcm_degree_reading_false",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+      "statement": "theorem unrestricted_lcm_degree_reading_false : ¬ ∀ a b c d : ℕ, a+b<65536 → c+d<65536 → (lcmDegreeWord a b c d).toNat = max a c + max b d",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.small_lcm_word",
+      "source": "research/msolve_degree_word_audit_20261116/lean/DegreeWords.lean",
+      "statement": "theorem small_lcm_word : (lcmDegreeWord 2 0 1 1).toNat = 3",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.no_lower_run",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem no_lower_run (n : ℕ) (G : ℕ → Set (Poly K)) (hG : F4Run (n+2) (inputs n) G) (t : ℕ) : linearY ∉ G t",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.first_ne_zero",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem first_ne_zero (n : ℕ) : (firstPoly n : Poly K) ≠ 0",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.second_ne_zero",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem second_ne_zero (n : ℕ) : (secondPoly n : Poly K) ≠ 0",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.first_row_degree",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem first_row_degree (n : ℕ) : (monomial exponentY (1 : K)*firstPoly n).totalDegree = n+3",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.second_row_degree",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem second_row_degree (n : ℕ) : (monomial exponentX (1 : K)*secondPoly n).totalDegree = n+3",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.healthy_run",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem healthy_run (n : ℕ) : F4Run (n+3) (inputs n) (healthyRun n : ℕ → Set (Poly K))",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.healthy_run_contains_y",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem healthy_run_contains_y (n : ℕ) : (linearY : Poly K) ∈ healthyRun n 1",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.small_degree_fall_control",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem small_degree_fall_control : F4Run 3 (inputs 0) (healthyRun 0 : ℕ → Set (Poly K)) ∧ (∀ G : ℕ → Set (Poly K), F4Run 2 (inputs 0) G → ∀ t, linearY ∉ G t)",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.boundary_stored_bound",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem boundary_stored_bound : max 65535 (lcmDegreeWord 65535 0 65534 1).toNat = 65535",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.boundary_no_run",
+      "source": "research/msolve_degree_word_audit_20261116/lean/F4Boundary.lean",
+      "statement": "theorem boundary_no_run : ¬ ∃ (G : ℕ → Set (Poly (ZMod 101))) (t : ℕ), F4Run 65535 (inputs 65533) G ∧ linearY ∈ G t",
+      "section_variables": [
+        "variable {K : Type*} [Field K]"
+      ],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.native_control_inputs",
+      "source": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean",
+      "statement": "theorem native_control_inputs : decodeSet nativeControlInputs = inputs 0",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.native_boundary_inputs",
+      "source": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean",
+      "statement": "theorem native_boundary_inputs : decodeSet nativeBoundaryInputs = inputs 65533",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.written_control_contains_y",
+      "source": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean",
+      "statement": "theorem written_control_contains_y : (linearY : Poly (ZMod 101)) ∈ decodeSet nativeControlBasis",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.written_boundary_contains_y",
+      "source": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean",
+      "statement": "theorem written_boundary_contains_y : (linearY : Poly (ZMod 101)) ∈ decodeSet nativeBoundaryBasis",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.recorded_lcm_arithmetic",
+      "source": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean",
+      "statement": "theorem recorded_lcm_arithmetic : (∀ r ∈ nativeControlLCM, ValidRecordedLCM r) ∧ (∀ r ∈ nativeBoundaryLCM, ValidRecordedLCM r)",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.recorded_boundary_events",
+      "source": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean",
+      "statement": "theorem recorded_boundary_events : [65534,1,65535,0,65535,1,0,65536] ∈ nativeBoundaryLCM ∧ [0,0,65536,1] ∈ nativeBoundaryRows ∧ [0,2147483647] ∈ nativeBoundarySelections",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.recorded_bounds",
+      "source": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean",
+      "statement": "theorem recorded_bounds : recordedBound 2 nativeControlRows nativeControlSelections = nativeControlStoredBound ∧ recordedBound 65535 nativeBoundaryRows nativeBoundarySelections = nativeBoundaryStoredBound ∧ nativeControlStoredBound = 3 ∧ nativeBoundaryStoredBound = 65535",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    },
+    {
+      "declaration": "MsolveDegreeWordAudit.written_boundary_not_degree_word_run",
+      "source": "research/msolve_degree_word_audit_20261116/lean/NativeWitness.lean",
+      "statement": "theorem written_boundary_not_degree_word_run : ¬ ∃ (G : Nat → Set (Poly (ZMod 101))) (t : Nat), F4Run nativeBoundaryStoredBound (decodeSet nativeBoundaryInputs) G ∧ decodeSet nativeBoundaryBasis ⊆ G t",
+      "section_variables": [],
+      "verification": "Same-host Lean gate; signedunverified"
+    }
+  ],
+  "transparent_proposition_bundles": {
+    "source": "lean/DegreeCertificate.lean",
+    "names": [
+      "ActualWordBounds",
+      "ActualPolynomialBoundary",
+      "ActualRecordedPrefix",
+      "LegacyFullF4Statement"
+    ]
+  },
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "legacy_negative_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 0,
+    "summary": true,
+    "truncated_prefixes": 1,
+    "unresolved": 0
+  },
+  "assurance": {
+    "schema": "msolve-degree-preflight/v1",
+    "build_snapshots": 7,
+    "failed_states": [
+      "01",
+      "02",
+      "03",
+      "05"
+    ],
+    "successful_states": [
+      "04",
+      "06",
+      "07"
+    ],
+    "published_preservation_entries": 6260,
+    "all_checked_entries": 6306,
+    "frozen_plans": 51,
+    "native_preservation_pins": 46,
+    "manifest_packages": 11,
+    "copied_Lean_modules": 0,
+    "hydrated_Lean_modules": 0,
+    "lake_update": false,
+    "registered_roots_from01": [
+      "DegreeCertificate",
+      "DegreeFamily",
+      "DegreeImports",
+      "DegreeWords",
+      "F4Boundary",
+      "NativeWitness"
+    ],
+    "native_protocol_hash": "e36c897190211f1824a1c3baebfb766660a0d82be55d5f6cb6f007daaaf95796",
+    "native_calls": 2,
+    "native_control_exit": 0,
+    "native_boundary_exit": 124,
+    "native_boundary_validated": false,
+    "native_scope": "Captured written set/log prefix, not normal completion/full execution trace",
+    "export_flow": {
+      "planned": 2,
+      "attempted": 2,
+      "completed": 1,
+      "not_completed": 1,
+      "interrupted": 0,
+      "resumed": 0,
+      "excluded": []
+    },
+    "signed_standing": "unverified",
+    "full14complete": false,
+    "paid_compute": 0,
+    "gate_declarations": 68,
+    "new_modules": 6,
+    "new_concrete_modules": 5,
+    "official_import_bridge_modules": 1,
+    "pinned_custom_modules": 11,
+    "actually_imported_custom_modules": 11,
+    "credited_custom_modules": 5,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_source_warnings": 0
+  }
+}

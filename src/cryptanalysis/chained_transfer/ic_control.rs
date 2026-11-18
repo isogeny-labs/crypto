@@ -79,7 +79,7 @@ pub(crate) fn pa(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
     }
 }
 #[inline]
-fn ps(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
+pub(crate) fn ps(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
     n.add += 1;
     if a >= b {
         a - b
@@ -288,6 +288,310 @@ pub(crate) fn roots_of(p: u64, u: &Poly, rng: &mut StdRng, n: &mut Nat) -> Optio
         return Some(out);
     }
     None
+}
+
+// ── Cardano–Lucas splitting oracle for cubics (port of round 4's C1) ────
+//
+// `research/ic_improve4_20261015/01-genus3-relations` (C1, in
+// `examples/ic_improve4_01_genus3_rel.rs`) replaced the `x^p mod u` test on
+// a cubic by field-level work, with identical decisions:
+//
+// 1. Stickelberger: a squarefree cubic that splits has a square
+//    discriminant; one with a non-square discriminant has exactly one root.
+//    A zero discriminant means a repeated root, so `u ∤ x^p − x`.
+// 2. A square-discriminant squarefree cubic is split or irreducible.  With
+//    `P' = 3b − a²` (three times the depressed linear coefficient) and the
+//    Cardano resolvent ratio `y = z₂/z₁`, `y + 1/y = 2 + 27·disc/P'³ ∈ F_p`,
+//    and `u` splits iff `y` is a cube in the cyclic group of order
+//    `n = p − (−3|p)`, i.e. iff `V_{n/3}(y + 1/y) = 2` for the Lucas
+//    sequence `V`.  Two products per bit instead of a cubic-residue
+//    exponentiation (15 products per bit here).
+// 3. Roots (only in [`SplitOracle::LucasRoots`]): when `3 ∤ n/3`,
+//    `γ = y^e` with `e = 3⁻¹ mod n/3` is a cube root of `y`, a root of the
+//    depressed cubic is `±√(−P'(V_e(y+1/y) + 2))/3`, and the other two come
+//    from the quotient quadratic.  Otherwise the baseline Cantor–Zassenhaus.
+//
+// Every native operation goes through the same counters as the baseline.
+
+/// Which complete-splitting test the relation phase uses.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SplitOracle {
+    /// The baseline: `u | x^p − x` by `x^p mod u`, Cantor–Zassenhaus roots.
+    Frobenius,
+    /// Cardano–Lucas test on cubics; baseline root finding.  Identical
+    /// decisions and identical random stream, so the walk, the relations
+    /// and the group operations equal [`SplitOracle::Frobenius`]'s exactly.
+    Lucas,
+    /// Cardano–Lucas test and Cardano root finding.  Same decisions; the
+    /// root finder draws no randomness, so the walk differs from the
+    /// baseline after the first split.
+    LucasRoots,
+    /// [`SplitOracle::LucasRoots`], and where the Cardano cube root is not
+    /// available (`3 | n/3`) one deterministic Cantor–Zassenhaus split of the
+    /// cubic (shifts `b = 0, 1, 2, …`) plus the quadratic formula, instead of
+    /// the randomized recursive [`roots_of`].  Draws no randomness.
+    LucasRootsFast,
+}
+
+impl SplitOracle {
+    pub fn name(self) -> &'static str {
+        match self {
+            SplitOracle::Frobenius => "frobenius",
+            SplitOracle::Lucas => "lucas",
+            SplitOracle::LucasRoots => "lucas_roots",
+            SplitOracle::LucasRootsFast => "lucas_roots_fast",
+        }
+    }
+}
+
+/// Per-`p` constants of the Cardano–Lucas oracle (computed once per run and
+/// charged to the relation phase).
+pub(crate) struct CubicOracle {
+    p: u64,
+    /// `n/3` with `n = p − (−3|p)`.
+    m: u64,
+    /// `3⁻¹ mod m` when `3 ∤ m` (single-exponent cube root).
+    e: Option<u64>,
+    inv3: u64,
+    /// Tonelli–Shanks data for `p ≡ 1 (mod 4)`: `(s, odd part, z^odd)`.
+    ts: Option<(u32, u64, u64)>,
+}
+
+fn inv_mod_u64(a: u64, m: u64) -> Option<u64> {
+    let (mut r0, mut r1) = (m as i128, (a % m) as i128);
+    let (mut t0, mut t1) = (0i128, 1i128);
+    while r1 != 0 {
+        let q = r0 / r1;
+        (r0, r1) = (r1, r0 - q * r1);
+        (t0, t1) = (t1, t0 - q * t1);
+    }
+    (r0 == 1).then(|| t0.rem_euclid(m as i128) as u64)
+}
+
+impl CubicOracle {
+    pub(crate) fn new(p: u64, n: &mut Nat) -> CubicOracle {
+        assert!(p > 3);
+        let order = if p % 3 == 1 { p - 1 } else { p + 1 };
+        let m = order / 3;
+        let e = if m % 3 == 0 { None } else { inv_mod_u64(3, m) };
+        let inv3 = pinv(p, 3, n);
+        let ts = (p % 4 == 1).then(|| {
+            let (mut qo, mut s) = (p - 1, 0u32);
+            while qo % 2 == 0 {
+                qo /= 2;
+                s += 1;
+            }
+            let mut z = 2u64;
+            while ppow(p, z, (p - 1) / 2, n) != p - 1 {
+                z += 1;
+            }
+            (s, qo, ppow(p, z, qo, n))
+        });
+        CubicOracle { p, m, e, inv3, ts }
+    }
+
+    /// `V_k(t)` by the ladder `(V_j, V_{j+1})`: two products per bit.
+    fn lucas_v(&self, t: u64, k: u64, n: &mut Nat) -> u64 {
+        let p = self.p;
+        if k == 0 {
+            return 2;
+        }
+        let (mut v0, mut v1) = (t, ps(p, pm(p, t, t, n), 2, n));
+        let bits = 64 - k.leading_zeros();
+        for i in (0..bits - 1).rev() {
+            if (k >> i) & 1 == 0 {
+                v1 = ps(p, pm(p, v0, v1, n), t, n);
+                v0 = ps(p, pm(p, v0, v0, n), 2, n);
+            } else {
+                v0 = ps(p, pm(p, v0, v1, n), t, n);
+                v1 = ps(p, pm(p, v1, v1, n), 2, n);
+            }
+        }
+        v0
+    }
+
+    /// Square root of a square (Tonelli–Shanks, every product counted).
+    pub(crate) fn sqrt(&self, a: u64, n: &mut Nat) -> u64 {
+        let p = self.p;
+        if a == 0 {
+            return 0;
+        }
+        match self.ts {
+            None => ppow(p, a, (p + 1) / 4, n),
+            Some((s, qo, c0)) => {
+                let x = ppow(p, a, (qo - 1) / 2, n);
+                let mut r = pm(p, a, x, n);
+                let mut t = pm(p, r, x, n);
+                let (mut mm, mut c) = (s, c0);
+                while t != 1 {
+                    let (mut i, mut tt) = (0u32, t);
+                    while tt != 1 {
+                        tt = pm(p, tt, tt, n);
+                        i += 1;
+                    }
+                    let mut b = c;
+                    for _ in 0..(mm - i - 1) {
+                        b = pm(p, b, b, n);
+                    }
+                    mm = i;
+                    c = pm(p, b, b, n);
+                    t = pm(p, t, c, n);
+                    r = pm(p, r, b, n);
+                }
+                r
+            }
+        }
+    }
+
+    /// Complete-splitting test of the monic cubic `x³ + a x² + b x + c`
+    /// (`u = [c, b, a, 1]`).  Returns the decision and, for a split cubic
+    /// with `P' ≠ 0`, `(t, P')` for root finding.  `None` means "use the
+    /// baseline" (`P' = 0`).
+    pub(crate) fn split_cubic(&self, u: &Poly, n: &mut Nat) -> Option<(bool, Option<(u64, u64)>)> {
+        let p = self.p;
+        let (c, b, a) = (u[0], u[1], u[2]);
+        let a2 = pm(p, a, a, n);
+        let b2 = pm(p, b, b, n);
+        let ab = pm(p, a, b, n);
+        let t1 = pm(p, a2, b2, n);
+        let t2 = pm(p, 4, pm(p, b2, b, n), n);
+        let t3 = pm(p, 4, pm(p, pm(p, a2, a, n), c, n), n);
+        let t4 = pm(p, 27, pm(p, c, c, n), n);
+        let t5 = pm(p, 18, pm(p, ab, c, n), n);
+        let disc = pa(p, ps(p, ps(p, ps(p, t1, t2, n), t3, n), t4, n), t5, n);
+        if disc == 0 {
+            return Some((false, None));
+        }
+        if ppow(p, disc, (p - 1) / 2, n) != 1 {
+            return Some((false, None));
+        }
+        let pp = ps(p, pm(p, 3, b, n), a2, n);
+        if pp == 0 {
+            return None;
+        }
+        let p3 = pm(p, pm(p, pp, pp, n), pp, n);
+        let ip3 = pinv(p, p3, n);
+        let t = pa(p, 2, pm(p, pm(p, 27, disc, n), ip3, n), n);
+        let split = self.lucas_v(t, self.m, n) == 2;
+        Some((split, split.then_some((t, pp))))
+    }
+
+    /// Roots of a monic quadratic known to split: the quadratic formula.
+    fn quadratic_roots(&self, b: u64, c: u64, n: &mut Nat) -> [u64; 2] {
+        let p = self.p;
+        let d = ps(p, pm(p, b, b, n), pm(p, 4, c, n), n);
+        let sq = self.sqrt(d, n);
+        let inv2 = p.div_ceil(2);
+        let nb = ps(p, 0, b, n);
+        [
+            pm(p, pa(p, nb, sq, n), inv2, n),
+            pm(p, ps(p, nb, sq, n), inv2, n),
+        ]
+    }
+
+    /// Roots of a squarefree monic cubic known to split, without the
+    /// Cardano cube root: the first shift `b` with
+    /// `gcd(u, (x + b)^((p−1)/2) − 1)` of degree 1 or 2 splits `u`, and the
+    /// quadratic part is solved by the quadratic formula.
+    pub(crate) fn split_cubic_roots_det(&self, u: &Poly, n: &mut Nat) -> Option<Vec<u64>> {
+        let p = self.p;
+        let ctx = ModU {
+            p,
+            d: 3,
+            u: [u[0], u[1], u[2]],
+        };
+        for b in 0..p.min(64) {
+            let h = ctx.pow_xpa(b, (p - 1) / 2, n);
+            let mut hm1: Poly = h.to_vec();
+            hm1[0] = ps(p, hm1[0], 1, n);
+            ptrim(&mut hm1);
+            if hm1.is_empty() {
+                continue;
+            }
+            let g = pgcd_monic(p, u, &hm1, n);
+            let (lin, quad) = match g.len() - 1 {
+                1 => (g.clone(), pdiv_monic(p, u, &g, n)),
+                2 => (pdiv_monic(p, u, &g, n), g.clone()),
+                _ => continue,
+            };
+            let [r1, r2] = self.quadratic_roots(quad[1], quad[0], n);
+            return Some(vec![ps(p, 0, lin[0], n), r1, r2]);
+        }
+        None
+    }
+
+    /// Roots of a split monic cubic from the Lucas data, when `3 ∤ m`.
+    pub(crate) fn cubic_roots(&self, u: &Poly, t: u64, pp: u64, n: &mut Nat) -> Option<Vec<u64>> {
+        let p = self.p;
+        let e = self.e?;
+        let ve = self.lucas_v(t, e, n);
+        let s2 = pm(p, (p - pp) % p, pa(p, ve, 2, n), n);
+        let r = self.sqrt(s2, n);
+        let t1 = pm(p, r, self.inv3, n);
+        let (c0, b0, a0) = (u[0], u[1], u[2]);
+        let a3 = pm(p, a0, self.inv3, n);
+        let ev = |x: u64, n: &mut Nat| {
+            let h = pm(p, pa(p, x, a0, n), x, n);
+            pa(p, pm(p, pa(p, h, b0, n), x, n), c0, n)
+        };
+        let mut x1 = ps(p, t1, a3, n);
+        if ev(x1, n) != 0 {
+            x1 = ps(p, ps(p, 0, t1, n), a3, n);
+        }
+        // u = (x − x1)(x² + B x + C), B = a + x1, C = b + x1·B.
+        let bq = pa(p, a0, x1, n);
+        let cq = pa(p, b0, pm(p, x1, bq, n), n);
+        let dq = ps(p, pm(p, bq, bq, n), pm(p, 4, cq, n), n);
+        let sq = self.sqrt(dq, n);
+        let inv2 = p.div_ceil(2);
+        let nb = ps(p, 0, bq, n);
+        Some(vec![
+            x1,
+            pm(p, pa(p, nb, sq, n), inv2, n),
+            pm(p, ps(p, nb, sq, n), inv2, n),
+        ])
+    }
+}
+
+/// The relation phase's splitting test and root finder under `oracle`.
+/// Returns `None` when `u` does not split completely.
+fn split_and_roots(
+    oracle: SplitOracle,
+    co: Option<&CubicOracle>,
+    p: u64,
+    u: &Poly,
+    rng: &mut StdRng,
+    n: &mut Nat,
+) -> Option<Vec<u64>> {
+    let cubic = match (oracle, co) {
+        (SplitOracle::Frobenius, _) | (_, None) => None,
+        (_, Some(co)) if u.len() == 4 => co.split_cubic(u, n).map(|d| (co, d)),
+        _ => None,
+    };
+    match cubic {
+        None => {
+            if !splits_completely(p, u, n) {
+                return None;
+            }
+            roots_of(p, u, rng, n)
+        }
+        Some((_, (false, _))) => None,
+        Some((co, (true, info))) => {
+            if oracle != SplitOracle::Lucas {
+                if let Some((t, pp)) = info {
+                    if let Some(rs) = co.cubic_roots(u, t, pp, n) {
+                        return Some(rs);
+                    }
+                }
+            }
+            if oracle == SplitOracle::LucasRootsFast {
+                if let Some(rs) = co.split_cubic_roots_det(u, n) {
+                    return Some(rs);
+                }
+            }
+            roots_of(p, u, rng, n)
+        }
+    }
 }
 
 // ── arithmetic modulo r (prime, < 2^50 for the fast path) ───────────────
@@ -589,6 +893,9 @@ pub struct IcResult {
     pub core_rows: usize,
     pub core_cols: usize,
     pub attempts: u32,
+    /// Coordinate solves ([`LaMode::Coord`], [`LaMode::CoordSquare`]) whose
+    /// answer failed the group check and fell back to the baseline solver.
+    pub la_fallbacks: u32,
     pub wall_ns: u64,
 }
 
@@ -610,20 +917,25 @@ impl IcResult {
     }
 }
 
+/// Factor-base entries one relation can hold.  Genus 3 uses three; the
+/// genus ladder (`genus_ladder.rs`, genus up to 5) and the plane-quartic
+/// line relations (four points) share the struct.
+pub(crate) const REL_FB: usize = 5;
+
 #[derive(Clone, Copy, Debug)]
-struct Rel {
-    fb: [(u32, i8); 3],
-    nfb: u8,
-    lp: [(u32, i8); 2],
-    nlp: u8,
+pub(crate) struct Rel {
+    pub(crate) fb: [(u32, i8); REL_FB],
+    pub(crate) nfb: u8,
+    pub(crate) lp: [(u32, i8); 2],
+    pub(crate) nlp: u8,
     /// Coefficient of `t`: `−h·b mod r`.
-    tcoef: u64,
+    pub(crate) tcoef: u64,
     /// `h·a mod r`.
-    rhs: u64,
+    pub(crate) rhs: u64,
 }
 
 impl Rel {
-    fn endpoints(&self) -> (u32, i8, u32, i8) {
+    pub(crate) fn endpoints(&self) -> (u32, i8, u32, i8) {
         match self.nlp {
             0 => (0, 0, 0, 0),
             1 => (0, 0, self.lp[0].0, self.lp[0].1),
@@ -718,7 +1030,13 @@ impl Dsu {
 
 /// The cycle rows of the relation graph: large-prime columns eliminated
 /// along a breadth-first spanning tree of the component of the vertex "1".
-fn build_rows(rels: &[Rel], nverts: usize, tcol: u32, r: u64, nat: &mut Nat) -> Vec<Row> {
+pub(crate) fn build_rows(
+    rels: &[Rel],
+    nverts: usize,
+    tcol: u32,
+    r: u64,
+    nat: &mut Nat,
+) -> Vec<Row> {
     let neg = |e: i8| if e > 0 { 1u64 } else { r - 1 }; // coefficient as residue
     let frow = |rel: &Rel| -> Vec<(u32, u64)> {
         let mut v: Vec<(u32, u64)> = rel.fb[..rel.nfb as usize]
@@ -1056,6 +1374,108 @@ pub(crate) fn wiedemann(
     }
 }
 
+/// How the linear-algebra stage finds the target's logarithm.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LaMode {
+    /// The baseline: [`wiedemann`] on `AᵀDA x = AᵀD c` with a sparse
+    /// random projection, then the whole solution vector by Horner.
+    Baseline,
+    /// Same system `AᵀDA`, but the projection is the unit vector at the
+    /// target column and only that coordinate is formed, from the Krylov
+    /// sequence itself ([`wiedemann_coord`]): no projection products and no
+    /// reconstruction pass.
+    Coord,
+    /// [`LaMode::Coord`] on a random square subset `A'` of the rows
+    /// (non-symmetric Wiedemann): no `AᵀA`, no diagonal `D`, half the
+    /// matrix touches per step.
+    CoordSquare,
+}
+
+impl LaMode {
+    pub fn name(self) -> &'static str {
+        match self {
+            LaMode::Baseline => "baseline",
+            LaMode::Coord => "coord",
+            LaMode::CoordSquare => "coord_square",
+        }
+    }
+}
+
+/// `x[ct]` for `A x = c`, one coordinate only.
+///
+/// With `M` invertible and `M x = b`, let `s_k = e_ctᵀ M^k b` and let
+/// `P(z) = z^L + c_1 z^{L−1} + … + c_L` be the minimal polynomial of `(s_k)`
+/// (Berlekamp–Massey on `2n + 2` terms).  The sequence `t_k = e_ctᵀ M^k x`
+/// has `t_{k+1} = s_k`; its minimal polynomial divides `M`'s, so it has a
+/// nonzero constant term and divides `z·P(z)`, hence divides `P`.  So
+/// `P` annihilates `t` too, and its first relation gives
+/// `x[ct] = t_0 = −c_L⁻¹ (s_{L−1} + c_1 s_{L−2} + … + c_{L−1} s_0)`.
+///
+/// `square = false`: `M = AᵀDA`, `b = AᵀD c` (the baseline system).
+/// `square = true`: `M = A'`, `b = c'` for a random choice of `ncols` rows.
+/// The caller certifies the answer by group arithmetic; a singular `M`
+/// gives a wrong value or `None`, never an unchecked answer.
+pub(crate) fn wiedemann_coord(
+    rows: &[Row],
+    ncols: usize,
+    ct: usize,
+    r: u64,
+    rng: &mut StdRng,
+    square: bool,
+    nat: &mut Nat,
+) -> Option<u64> {
+    let len = 2 * ncols + 2;
+    let mut seq = Vec::with_capacity(len);
+    if square {
+        if rows.len() < ncols {
+            return None;
+        }
+        let mut idx: Vec<usize> = (0..rows.len()).collect();
+        for i in 0..ncols {
+            let j = rng.gen_range(i..idx.len());
+            idx.swap(i, j);
+        }
+        let sub: Vec<Row> = idx[..ncols].iter().map(|&i| rows[i].clone()).collect();
+        let mut v: Vec<u64> = sub.iter().map(|row| row.1).collect();
+        let mut w = vec![0u64; ncols];
+        for _ in 0..len {
+            seq.push(v[ct]);
+            mat_vec(&sub, &v, &mut w, r, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    } else {
+        let nr = rows.len();
+        let d: Vec<u64> = (0..nr).map(|_| rng.gen_range(1..r)).collect();
+        let mut tmp = vec![0u64; nr];
+        for ((t, row), &di) in tmp.iter_mut().zip(rows.iter()).zip(d.iter()) {
+            nat.mul += 1;
+            *t = mulmod(row.1, di, r);
+        }
+        let mut v = vec![0u64; ncols];
+        mat_t_vec(rows, &tmp, &mut v, r, nat);
+        let mut w = vec![0u64; ncols];
+        for _ in 0..len {
+            seq.push(v[ct]);
+            m_apply(rows, &d, &v, &mut tmp, &mut w, r, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    }
+    let c = berlekamp_massey(&seq, r, nat);
+    let l = c.len() - 1;
+    if l == 0 || c[l] == 0 {
+        return None;
+    }
+    // Σ_{j=0}^{L−1} c_{L−1−j} s_j
+    let mut acc = 0u64;
+    for j in 0..l {
+        nat.mul += 1;
+        nat.add += 1;
+        acc = addm(acc, mulmod(c[l - 1 - j], seq[j], r), r);
+    }
+    nat.mul += pivot_inversion_steps(r) + 1;
+    Some(mulmod(acc, subm(0, invm(c[l], r), r), r))
+}
+
 /// Walk length between fresh random starts in [`run_ic`].
 pub const RESTART_DEFAULT: u64 = 4096;
 
@@ -1069,6 +1489,88 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
 /// about `sqrt(r)` steps, so when `r` is small the default of 4096 wastes
 /// trials on repeats; `instrument::ic_on_rung` passes `~sqrt(r)`.
 pub fn run_ic_with(inst: &Instance, prm: IcParams, restart: u64) -> IcResult {
+    run_ic_oracle(inst, prm, restart, SplitOracle::Frobenius)
+}
+
+/// [`run_ic_with`] with the relation phase's splitting test chosen by
+/// `oracle` ([`SplitOracle`]).  `Frobenius` is the baseline `run_ic_with`.
+pub fn run_ic_oracle(
+    inst: &Instance,
+    prm: IcParams,
+    restart: u64,
+    oracle: SplitOracle,
+) -> IcResult {
+    run_ic_cfg(inst, prm, restart, oracle, LaMode::Baseline)
+}
+
+/// [`run_ic_oracle`] with the linear-algebra stage chosen by `la`
+/// ([`LaMode`]).  A coordinate solve whose answer fails the group check
+/// falls back, in the same attempt and fully counted, to the baseline
+/// dense-projection [`wiedemann`].
+pub fn run_ic_cfg(
+    inst: &Instance,
+    prm: IcParams,
+    restart: u64,
+    oracle: SplitOracle,
+    la: LaMode,
+) -> IcResult {
+    run_ic_full(
+        inst,
+        prm,
+        restart,
+        IcCfg {
+            oracle,
+            la,
+            walk: WalkMode::Mixed,
+        },
+    )
+}
+
+/// How the relation walk combines `G` and `T`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum WalkMode {
+    /// The baseline: starts `a G + b T` and jumps `α G + β T`, so every
+    /// relation carries a random `T`-coefficient (a dense column).
+    Mixed,
+    /// Starts `a G + T` and jumps `α G`: every relation's `T`-coefficient
+    /// is the cofactor constant `−h`.  The unknown is `h · log T`, whose
+    /// column is all `−1` (cycle-combined rows: small integers), and
+    /// `log T` is that times `h⁻¹ mod r`.
+    UnitT,
+    /// [`WalkMode::UnitT`] with the segment between restarts capped at
+    /// `max(64, ⌊√r / 16⌋)` steps.  A unit-T segment that falls into a rho
+    /// cycle only repeats rows (a revisit has the same coefficients), so the
+    /// segment must stay well inside the expected cycle length `≈ √r`.
+    UnitTCapped,
+}
+
+impl WalkMode {
+    pub fn name(self) -> &'static str {
+        match self {
+            WalkMode::Mixed => "mixed",
+            WalkMode::UnitT => "unit_t",
+            WalkMode::UnitTCapped => "unit_t_capped",
+        }
+    }
+}
+
+/// Every choice [`run_ic_full`] takes beyond [`IcParams`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct IcCfg {
+    pub oracle: SplitOracle,
+    pub la: LaMode,
+    pub walk: WalkMode,
+}
+
+/// [`run_ic_cfg`] with the walk chosen too ([`IcCfg`]).
+pub fn run_ic_full(inst: &Instance, prm: IcParams, restart: u64, cfg: IcCfg) -> IcResult {
+    let IcCfg { oracle, la, walk } = cfg;
+    let unit_t = walk != WalkMode::Mixed;
+    let restart = if walk == WalkMode::UnitTCapped {
+        restart.min((((inst.r as f64).sqrt() / 16.0) as u64).max(64))
+    } else {
+        restart
+    };
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -1110,6 +1612,9 @@ pub fn run_ic_with(inst: &Instance, prm: IcParams, restart: u64) -> IcResult {
         }
     }
     res.fb_cols = ncols;
+    // Cardano–Lucas constants, charged to the relation phase.
+    let cubic =
+        (oracle != SplitOracle::Frobenius && p > 3).then(|| CubicOracle::new(p, &mut res.rel));
     let tcol = ncols as u32;
     let nunk = ncols + 1;
 
@@ -1118,6 +1623,10 @@ pub fn run_ic_with(inst: &Instance, prm: IcParams, restart: u64) -> IcResult {
     let mut jumps: Vec<(H64Div, u64, u64)> = Vec::new();
     for _ in 0..16 {
         let a = rng.gen_range(1..short);
+        if unit_t {
+            jumps.push((curve.mul(&mut ops, inst.g, a), a, 0));
+            continue;
+        }
         let b = rng.gen_range(1..short);
         let ag = curve.mul(&mut ops, inst.g, a);
         let bt = curve.mul(&mut ops, inst.target, b);
@@ -1142,7 +1651,14 @@ pub fn run_ic_with(inst: &Instance, prm: IcParams, restart: u64) -> IcResult {
                 res.exhausted = true;
                 break 'outer;
             }
-            if since_restart >= restart.max(1) {
+            if since_restart >= restart.max(1) && unit_t {
+                let a = rng.gen_range(1..r);
+                let ag = curve.mul(&mut ops, inst.g, a);
+                cur = curve.add(&mut ops, ag, inst.target);
+                ca = a;
+                cb = 1;
+                since_restart = 0;
+            } else if since_restart >= restart.max(1) {
                 let a = rng.gen_range(1..r);
                 let b = rng.gen_range(1..r);
                 let ag = curve.mul(&mut ops, inst.g, a);
@@ -1164,16 +1680,15 @@ pub fn run_ic_with(inst: &Instance, prm: IcParams, restart: u64) -> IcResult {
                 continue;
             }
             let u: Poly = cur.u_coeffs();
-            if !splits_completely(p, &u, &mut res.rel) {
-                continue;
-            }
-            res.splits += 1;
-            let Some(roots) = roots_of(p, &u, &mut rng, &mut res.rel) else {
+            let Some(roots) =
+                split_and_roots(oracle, cubic.as_ref(), p, &u, &mut rng, &mut res.rel)
+            else {
                 continue;
             };
+            res.splits += 1;
             let vc = cur.v_coeffs();
             let mut rel = Rel {
-                fb: [(0, 0); 3],
+                fb: [(0, 0); REL_FB],
                 nfb: 0,
                 lp: [(0, 0); 2],
                 nlp: 0,
@@ -1206,9 +1721,16 @@ pub fn run_ic_with(inst: &Instance, prm: IcParams, restart: u64) -> IcResult {
             if rel.nfb == 0 && lps.is_empty() {
                 continue;
             }
-            res.rel.mul += 2;
             rel.rhs = mulmod(h % r, ca, r);
-            rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            if unit_t {
+                // unknown h·log T: coefficient −1 (cb = 1 on every row)
+                debug_assert_eq!(cb, 1);
+                res.rel.mul += 1;
+                rel.tcoef = r - 1;
+            } else {
+                res.rel.mul += 2;
+                rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            }
             if prm.verify_relations {
                 // Σ ε hP_i must equal h R, tested on the divisor classes.
                 let mut sum = H64Div::IDENTITY;
@@ -1269,15 +1791,71 @@ pub fn run_ic_with(inst: &Instance, prm: IcParams, restart: u64) -> IcResult {
         }
         let mut w_nat = Nat::default();
         let dense = res.attempts > 1;
-        let sol = wiedemann(&core, cc, r, &mut rng, dense, &mut w_nat);
+        // UnitT solves for h·log T: one inversion of h and one product.
+        let h_inv = if unit_t {
+            w_nat.mul += pivot_inversion_steps(r) + 1;
+            invm(h % r, r)
+        } else {
+            1
+        };
+        let to_log = |t: u64| if unit_t { mulmod(t, h_inv, r) } else { t };
+        let certify = |t: u64, ops: &mut GroupOps| {
+            curve.mul(ops, inst.g, t) == inst.target && curve.mul_rtl(inst.g, t) == inst.target
+        };
+        let coord = match la {
+            LaMode::Baseline => None,
+            LaMode::Coord | LaMode::CoordSquare => {
+                let t = wiedemann_coord(
+                    &core,
+                    cc,
+                    ct as usize,
+                    r,
+                    &mut rng,
+                    la == LaMode::CoordSquare,
+                    &mut w_nat,
+                );
+                match t.map(to_log) {
+                    Some(t) => {
+                        let v0 = ops.adds + ops.doubles;
+                        let ok = certify(t, &mut ops);
+                        res.verify_ops += ops.adds + ops.doubles - v0;
+                        if ok {
+                            Some(t)
+                        } else {
+                            res.la_fallbacks += 1;
+                            None
+                        }
+                    }
+                    None => {
+                        res.la_fallbacks += 1;
+                        None
+                    }
+                }
+            }
+        };
+        if let Some(t) = coord {
+            res.la_wied.merge(w_nat);
+            res.la.merge(w_nat);
+            res.recovered = Some(t);
+            res.certified = true;
+            solved = true;
+            continue;
+        }
+        let sol = wiedemann(
+            &core,
+            cc,
+            r,
+            &mut rng,
+            dense || la != LaMode::Baseline,
+            &mut w_nat,
+        );
         res.la_wied.merge(w_nat);
         res.la.merge(w_nat);
         if let Some(x) = sol {
-            let t = x[ct as usize];
+            let t = to_log(x[ct as usize]);
             let v0 = ops.adds + ops.doubles;
-            let chk = curve.mul(&mut ops, inst.g, t);
-            res.verify_ops = ops.adds + ops.doubles - v0;
-            let ok = chk == inst.target && curve.mul_rtl(inst.g, t) == inst.target;
+            let ok = certify(t, &mut ops);
+            res.verify_ops += ops.adds + ops.doubles - v0;
             if ok {
                 res.recovered = Some(t);
                 res.certified = true;
@@ -1369,6 +1947,240 @@ mod tests {
             }
         }
         panic!("no instance at p = {p}");
+    }
+
+    /// Every monic cubic over F_p: the Cardano–Lucas decision equals
+    /// `u | x^p − x`, and its roots (both root finders) equal the brute-force
+    /// root set.  The primes cover p ≡ ±1 (mod 3), p ≡ 1, 3 (mod 4), and
+    /// both `3 | n/3` (fallback root finder) and `3 ∤ n/3`.
+    #[test]
+    fn lucas_oracle_matches_frobenius_on_every_cubic() {
+        for p in [5u64, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43] {
+            let mut nat = Nat::default();
+            let co = CubicOracle::new(p, &mut nat);
+            let mut rng = StdRng::seed_from_u64(p);
+            let mut splits = 0u32;
+            for c in 0..p {
+                for b in 0..p {
+                    for a in 0..p {
+                        let u: Poly = vec![c, b, a, 1];
+                        let want = splits_completely(p, &u, &mut nat);
+                        let truth: Vec<u64> = (0..p)
+                            .filter(|&x| (((x + a) * x % p + b) * x % p + c) % p == 0)
+                            .collect();
+                        assert_eq!(want, truth.len() == 3, "baseline p={p} u={u:?}");
+                        for oracle in [
+                            SplitOracle::Lucas,
+                            SplitOracle::LucasRoots,
+                            SplitOracle::LucasRootsFast,
+                        ] {
+                            let got = split_and_roots(oracle, Some(&co), p, &u, &mut rng, &mut nat);
+                            assert_eq!(got.is_some(), want, "{oracle:?} p={p} u={u:?}");
+                            if let Some(mut rs) = got {
+                                rs.sort_unstable();
+                                assert_eq!(rs, truth, "{oracle:?} roots p={p} u={u:?}");
+                            }
+                        }
+                        splits += u32::from(want);
+                    }
+                }
+            }
+            // p(p-1)(p-2)/6 squarefree split cubics
+            assert_eq!(u64::from(splits), p * (p - 1) * (p - 2) / 6, "p={p}");
+        }
+    }
+
+    /// `Lucas` changes only native work: the walk, relations, group
+    /// operations and the answer equal the baseline's, and the relation
+    /// phase is cheaper.  `LucasRoots` certifies.
+    #[test]
+    fn lucas_oracle_keeps_the_trajectory_and_cuts_relation_work() {
+        for p in [101u64, 131] {
+            let inst = small_instance(p);
+            for (arm, nb) in [(Arm::SingleLp, 14), (Arm::DoubleLp, 9)] {
+                let prm = IcParams {
+                    arm,
+                    nb,
+                    seed: 11,
+                    max_trials: 3_000_000,
+                    verify_relations: true,
+                };
+                let base = run_ic_oracle(&inst, prm, RESTART_DEFAULT, SplitOracle::Frobenius);
+                let luc = run_ic_oracle(&inst, prm, RESTART_DEFAULT, SplitOracle::Lucas);
+                let lr = run_ic_oracle(&inst, prm, RESTART_DEFAULT, SplitOracle::LucasRoots);
+                assert!(base.certified && luc.certified && lr.certified);
+                assert_eq!(lr.bad_relations, 0);
+                assert_eq!(luc.recovered, base.recovered);
+                assert_eq!(luc.trials, base.trials);
+                assert_eq!(luc.splits, base.splits);
+                assert_eq!(luc.relations, base.relations);
+                assert_eq!(luc.rels_by_lp, base.rels_by_lp);
+                assert_eq!(luc.group_ops(), base.group_ops());
+                assert_eq!(luc.la, base.la);
+                assert!(
+                    luc.rel.mul < base.rel.mul,
+                    "p={p} {arm:?}: {} vs {}",
+                    luc.rel.mul,
+                    base.rel.mul
+                );
+            }
+        }
+    }
+
+    /// On random full-rank systems the coordinate solve returns the true
+    /// coordinate, in both modes, with fewer multiplications than the
+    /// baseline solve of the whole vector.
+    #[test]
+    fn coordinate_wiedemann_returns_the_target_coordinate() {
+        let r = 1_000_003u64;
+        let mut rng = StdRng::seed_from_u64(5);
+        for trial in 0..20 {
+            let n = 30 + trial;
+            let nr = n + 5;
+            let x: Vec<u64> = (0..n).map(|_| rng.gen_range(0..r)).collect();
+            let rows: Vec<Row> = (0..nr)
+                .map(|i| {
+                    let mut t: Vec<(u32, u64)> = vec![((i % n) as u32, 1)];
+                    for _ in 0..4 {
+                        let c = rng.gen_range(0..n) as u32;
+                        if t.iter().all(|e| e.0 != c) {
+                            let v = [1, r - 1, 2, r - 2][rng.gen_range(0..4)];
+                            t.push((c, v));
+                        }
+                    }
+                    let rhs = t
+                        .iter()
+                        .fold(0u64, |a, &(c, v)| addm(a, mulmod(v, x[c as usize], r), r));
+                    (t, rhs)
+                })
+                .collect();
+            let ct = n - 1;
+            let mut nb = Nat::default();
+            let base = wiedemann(&rows, n, r, &mut rng, true, &mut nb).expect("baseline solves");
+            assert_eq!(base[ct], x[ct]);
+            for square in [false, true] {
+                let mut nc = Nat::default();
+                // a random square subset can be singular: retry a few times,
+                // as the caller's certified fallback would
+                let got = (0..8).find_map(|_| {
+                    let v = wiedemann_coord(&rows, n, ct, r, &mut rng, square, &mut nc)?;
+                    (v == x[ct]).then_some(v)
+                });
+                assert_eq!(got, Some(x[ct]), "trial {trial} square={square}");
+                if !square {
+                    assert!(nc.mul < nb.mul, "coord {} vs baseline {}", nc.mul, nb.mul);
+                }
+            }
+        }
+    }
+
+    /// Every LA mode certifies on real instances, and the coordinate modes
+    /// spend fewer LA multiplications than the baseline on the same rows.
+    #[test]
+    fn la_modes_certify_and_cut_la_work() {
+        for p in [101u64, 131] {
+            let inst = small_instance(p);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: 9,
+                seed: 11,
+                max_trials: 3_000_000,
+                verify_relations: true,
+            };
+            let o = SplitOracle::LucasRoots;
+            let b = run_ic_cfg(&inst, prm, RESTART_DEFAULT, o, LaMode::Baseline);
+            assert!(b.certified);
+            for la in [LaMode::Coord, LaMode::CoordSquare] {
+                let x = run_ic_cfg(&inst, prm, RESTART_DEFAULT, o, la);
+                assert!(x.certified, "{la:?} p={p}");
+                assert_eq!(x.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+                assert_eq!(x.relations, b.relations);
+                assert_eq!(x.trials, b.trials);
+                if x.la_fallbacks == 0 {
+                    assert!(x.la_wied.mul < b.la_wied.mul, "{la:?} p={p}");
+                }
+            }
+        }
+    }
+
+    /// The unit-T walk certifies with every LA mode, every relation has the
+    /// T-coefficient −1 (before cycle combination), and with the coordinate
+    /// square solver it spends fewer LA multiplications than the mixed walk.
+    #[test]
+    fn unit_t_walk_certifies_and_removes_the_dense_column() {
+        for p in [101u64, 131, 257] {
+            let inst = small_instance(p);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: 12,
+                seed: 7,
+                max_trials: 3_000_000,
+                verify_relations: true,
+            };
+            let cfg = |la, walk| IcCfg {
+                oracle: SplitOracle::LucasRoots,
+                la,
+                walk,
+            };
+            for la in [LaMode::Baseline, LaMode::Coord, LaMode::CoordSquare] {
+                let u = run_ic_full(&inst, prm, RESTART_DEFAULT, cfg(la, WalkMode::UnitT));
+                assert!(u.certified, "{la:?} p={p}");
+                assert_eq!(u.bad_relations, 0);
+                assert_eq!(u.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+            }
+            let m = run_ic_full(
+                &inst,
+                prm,
+                RESTART_DEFAULT,
+                cfg(LaMode::CoordSquare, WalkMode::Mixed),
+            );
+            let u = run_ic_full(
+                &inst,
+                prm,
+                RESTART_DEFAULT,
+                cfg(LaMode::CoordSquare, WalkMode::UnitT),
+            );
+            if m.la_fallbacks == 0 && u.la_fallbacks == 0 && u.core_cols >= m.core_cols {
+                assert!(
+                    u.la_wied.mul < m.la_wied.mul,
+                    "p={p}: {} vs {}",
+                    u.la_wied.mul,
+                    m.la_wied.mul
+                );
+            }
+        }
+    }
+
+    /// The capped unit-T walk solves the small-r instances where uncapped
+    /// segments fall into rho cycles, with the coordinate solver and no
+    /// fallback.
+    #[test]
+    fn capped_unit_t_walk_solves_small_r_without_fallback() {
+        for p in [101u64, 131] {
+            let inst = small_instance(p);
+            for seed in [11u64, 1001, 2001] {
+                let prm = IcParams {
+                    arm: Arm::DoubleLp,
+                    nb: fb_size(Arm::DoubleLp, p, 2.0, 2.0),
+                    seed,
+                    max_trials: 3_000_000,
+                    verify_relations: true,
+                };
+                let cfg = IcCfg {
+                    oracle: SplitOracle::LucasRootsFast,
+                    la: LaMode::CoordSquare,
+                    walk: WalkMode::UnitTCapped,
+                };
+                let x = run_ic_full(&inst, prm, RESTART_DEFAULT, cfg);
+                assert!(x.certified, "p={p} seed={seed}");
+                assert_eq!(x.bad_relations, 0);
+                assert!(
+                    x.la_fallbacks <= 1,
+                    "p={p} seed={seed}: {} fallbacks",
+                    x.la_fallbacks
+                );
+            }
+        }
     }
 
     #[test]

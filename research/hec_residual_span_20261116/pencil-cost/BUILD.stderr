@@ -1,0 +1,56 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-pencil-cold v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_residual_span_20261116/pencil-cost/build)
+warning: variant `Plain` is never constructed
+  --> ../../production/core.rs:16:5
+   |
+13 | pub enum Mode {
+   |          ---- variant in this enum
+...
+16 |     Plain,
+   |     ^^^^^
+   |
+   = note: `Mode` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `m`, `unknowns`, and `state_len` are never read
+  --> ../../production/core.rs:23:9
+   |
+19 | pub struct Report {
+   |            ------ fields in this struct
+...
+23 |     pub m: usize,
+   |         ^
+24 |     pub unknowns: usize,
+   |         ^^^^^^^^
+25 |     pub state_len: usize,
+   |         ^^^^^^^^^
+   |
+   = note: `Report` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: enum `Mode` is never used
+  --> ../../pencil-runtime/core.rs:12:10
+   |
+12 | pub enum Mode {
+   |          ^^^^
+
+warning: fields `trials`, `m`, `unknowns`, and `state_len` are never read
+  --> ../../pencil-runtime/core.rs:20:9
+   |
+18 | pub struct Report {
+   |            ------ fields in this struct
+19 |     pub k: Option<u64>,
+20 |     pub trials: u64,
+   |         ^^^^^^
+21 |     pub relations: usize,
+22 |     pub m: usize,
+   |         ^
+23 |     pub unknowns: usize,
+   |         ^^^^^^^^
+24 |     pub state_len: usize,
+   |         ^^^^^^^^^
+   |
+   = note: `Report` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `hec-pencil-cold` (bin "pencil-cold") generated 4 warnings
+    Finished `release` profile [optimized] target(s) in 2.59s

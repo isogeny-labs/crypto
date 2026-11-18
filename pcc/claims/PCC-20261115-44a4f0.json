@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T06:43:27Z",
+ "id": "PCC-20261115-44a4f0",
+ "kind": "execution",
+ "producer": {
+  "commit": "9ac51774eb01325fa7cba7d3f082cacae27a2f68",
+  "model": "GPT-6",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/results/post-merge-checks.txt",
+    "sha256": "83d8173795aac73924238c75af98abdbff62560bb570db5b1c5519b98120c503"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/runpod/package.sh",
+    "sha256": "b48e6e661d91463bb5274bf6c55b1fab2a27725191dffb577cc01a12ec134825"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/runpod/README.md",
+    "sha256": "5108dd199ed7b94af7bdbae40e5c715938a575f352c92e9e0279da1986aed6c9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/PROTOCOL.md",
+    "sha256": "ea087b859399decff195bbf389a40cba6c8fca1682e8577c1dff2c570319bb3e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/results/runpod-access.json",
+    "sha256": "f7d8355be216edd0e8b047f57e9c4f44e280e6c28d2131516e2a70edfe6849c9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_genus_dlp_20261115/folded_walk",
+ "statement": "Post-merge producer formatting, four release tests, strict package Clippy and exact toy/trace output comparisons pass. Main ledger prefix and unchanged prior claim bodies were retained using append_entry. RunPod job/package shell syntax and the extracted source-archive rebuild were checked. No cloud allocation, timing admission or signed result."
+}

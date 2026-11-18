@@ -1,0 +1,94 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "round 7 E11b: the 2E half of the default span against the default base, Koblitz curves over F_2^19 and F_2^23",
+ "description": "research/isogeny_conductor_gap_round7_20261019/PROTOCOL.md E11b: rho, MITM and the S3 descent with f4-f2 over binary-subspace:dimension=9 (default) and binary-subspace:dimension=8,trace_kernel=1 (the points of <1..z^8> in 2E, the half base of d = 9), on the a = 0 and a = 1 Koblitz curves over F_2^19 and F_2^23.",
+ "arms": [
+  {
+   "method": {
+    "id": "rho.negation"
+   },
+   "name": "rho-neg",
+   "role": "reference"
+  },
+  {
+   "name": "mitm-default9",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=9",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-half9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8,trace_kernel=1",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "f4-default9",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=9",
+     "oracle": "descent-algebraic:m=2",
+     "solver": "f4-f2"
+    }
+   }
+  },
+  {
+   "name": "f4-half9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8,trace_kernel=1",
+     "oracle": "descent-algebraic:m=2",
+     "solver": "f4-f2"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "isolation_required": "L2",
+  "order": "alternate",
+  "rounds": 2,
+  "seed": 1,
+  "timeout_seconds": 1800,
+  "warmup": 0
+ },
+ "workloads": {
+  "curves": [
+   {
+    "a": 0,
+    "kind": "koblitz",
+    "n": 19
+   },
+   {
+    "a": 1,
+    "kind": "koblitz",
+    "n": 19
+   },
+   {
+    "a": 0,
+    "kind": "koblitz",
+    "n": 23
+   },
+   {
+    "a": 1,
+    "kind": "koblitz",
+    "n": 23
+   }
+  ],
+  "target_seed": 20261019,
+  "targets_per_curve": 4
+ }
+}

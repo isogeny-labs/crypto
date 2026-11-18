@@ -1,0 +1,83 @@
+diff -ru --strip-trailing-cr ../cadical-sys.orig/src/bridge.rs src/bridge.rs
+--- ../cadical-sys.orig/src/bridge.rs	2026-11-16 01:00:01.965895915 +0000
++++ src/bridge.rs	2026-11-16 01:00:01.989119338 +0000
+@@ -553,6 +553,8 @@
+         ///
+         pub fn phase(solver: &mut UniquePtr<Solver>, lit: i32);
+         pub fn unphase(solver: &mut UniquePtr<Solver>, lit: i32);
++        pub fn f1_saved_phase(solver: &UniquePtr<Solver>, eidx: i32) -> i32;
++        pub fn f1_seed_saved_phase(solver: &mut UniquePtr<Solver>, elit: i32) -> bool;
+ 
+         //------------------------------------------------------------------------
+         /// Enables clausal proof tracing in DRAT format and returns 'true' if
+diff -ru --strip-trailing-cr ../cadical-sys.orig/src/cadical_bridge.hpp src/cadical_bridge.hpp
+--- ../cadical-sys.orig/src/cadical_bridge.hpp	2026-11-16 01:00:01.965924172 +0000
++++ src/cadical_bridge.hpp	2026-11-16 01:00:01.988802110 +0000
+@@ -12,6 +12,8 @@
+ #include <string>
+ #include <unistd.h>
+ #include "rust/cxx.h"
++#include "../cadical/src/internal.hpp"
++#include "../cadical/src/testing.hpp"
+ 
+ // ************************************************************************************************
+ // types
+@@ -475,6 +477,38 @@
+     return solver->unphase(lit);
+ }
+ 
++// ---- F1 lane patch (2026-11-16): read-only saved-phase getter and saved-phase seeding.
++// Uses CaDiCaL's own 'Testing' friend accessor; CaDiCaL sources are unchanged.
++static int f1_map(CaDiCaL::External *ex, int eidx)
++{
++    if (eidx <= 0 || eidx > ex->max_var) return 0;
++    if ((size_t)eidx >= ex->e2i.size()) return 0;
++    return ex->e2i[eidx];
++}
++int f1_saved_phase(const std::unique_ptr<Solver> &solver, int eidx)
++{
++    CaDiCaL::Testing t(*solver);
++    int ilit = f1_map(t.external(), eidx);
++    if (!ilit) return 0;
++    CaDiCaL::Internal *in = t.internal();
++    int idx = abs(ilit);
++    if ((size_t)idx >= in->phases.saved.size()) return 0;
++    int sp = in->phases.saved[idx];
++    return ilit < 0 ? -sp : sp;
++}
++bool f1_seed_saved_phase(std::unique_ptr<Solver> &solver, int elit)
++{
++    CaDiCaL::Testing t(*solver);
++    int ilit = f1_map(t.external(), abs(elit));
++    if (!ilit) return false;
++    CaDiCaL::Internal *in = t.internal();
++    int idx = abs(ilit);
++    if ((size_t)idx >= in->phases.saved.size()) return false;
++    int s = (elit > 0 ? 1 : -1) * (ilit > 0 ? 1 : -1);
++    in->phases.saved[idx] = (signed char)s;
++    return true;
++}
++
+ static bool _has_suffix(const char *str, const char *suffix)
+ {
+     size_t length = strlen(str), suffix_length = strlen(suffix);
+diff -ru --strip-trailing-cr ../cadical-sys.orig/src/lib.rs src/lib.rs
+--- ../cadical-sys.orig/src/lib.rs	2026-11-16 01:00:01.965947300 +0000
++++ src/lib.rs	2026-11-16 01:00:01.989438187 +0000
+@@ -1544,6 +1544,16 @@
+         ffi::unphase(&mut self.solver, lit);
+     }
+ 
++    /// F1 lane patch: saved phase (-1, 0, 1) of external variable `eidx` (read-only).
++    pub fn f1_saved_phase(&self, eidx: i32) -> i32 {
++        ffi::f1_saved_phase(&self.solver, eidx)
++    }
++
++    /// F1 lane patch: overwrite the saved phase of the variable of `lit` with the sign of `lit`.
++    pub fn f1_seed_saved_phase(&mut self, lit: i32) -> bool {
++        ffi::f1_seed_saved_phase(&mut self.solver, lit)
++    }
++
+     //------------------------------------------------------------------------
+     /// Enables clausal proof tracing in DRAT format and returns 'true' if
+     /// successfully opened for writing.  Writing proofs has to be enabled

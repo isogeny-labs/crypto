@@ -1,0 +1,14 @@
+{
+  "action": "check the w=0 and calibrated-factor-0 readings first: the arm is nearly free there, so the order flips inside the band and negation_remeasure::classify returns unresolved; require a field-operation base unit (O3 rerun Amendment 1) so every band weight stays in the rule",
+  "created": "2026-11-15T17:01:14Z",
+  "evidence": [
+    "research/chained_transfer_next_20261115/REDTEAM.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "reviewing an IC protocol whose arm does no group operations (all its work is native: field mults, LA mod r) priced in GAE with the 5a band",
+  "why": "the O4 protocol dropped w=0 from its closed rule to make it reachable, which AGENTS.md 5a forbids; with classify as named, closed was unreachable"
+}

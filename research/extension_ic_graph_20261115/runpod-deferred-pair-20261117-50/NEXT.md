@@ -1,0 +1,9 @@
+# Continue from the measured phase costs
+
+The bounded deferred collector is viable on the registered extension-field fixture: original complete qualification0,508certified rank at B155648,5.165%lower observed subtotal than grounded screened pairs. Process time27.829sis below the fastest registered rho36.908son this one exposed target; incomplete/native/fresh/scaling/signed gaps remain. Do not turn that observation into primary parity or repeat the consumed50registration. PCC7defbb/6224b9are UNVERIFIED. [pcc:unverified]
+
+The next technical bottleneck is descent:3415residuals cost3426280619436observed bitops in both graph arms. First review the actual Nagao implementation and primary assumptions for a cheaper extension-field descent finder. Any partial-descent route must establish that its residual classes match the collected class domain and preserve exact target/cofactor incidence; a flag change or arbitrary unsigned cycle is insufficient. Do not select a seed because it is already faster on this exposed target. [pcc:unverified]
+
+In parallel with technical reasoning, review how to obtain complete accounting, a genuinely fresh public target, growing-size checks and the strongest applicable rho fold. New natural-yield/timing remains Runpod-only with preregistered source/native/protocol and bounded owned lifetime. Finite algebra and recorded-source replay may run locally. These are open tasks, not claims that a new finder or parity protocol has already been implemented. [pcc:unverified]
+
+Preserve all original50qualification/result subjects and previous49failure/replay. Current public export has a documented format-only successor; use its separate manifest when preparing any future source, while reconstructing measurement50from11c9a031/its original archive. All owned runners through50are deleted. [pcc:unverified]

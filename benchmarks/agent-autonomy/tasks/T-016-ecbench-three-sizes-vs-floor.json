@@ -1,0 +1,42 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-016",
+  "title": "Tabulate rho on three toy sizes against the generic floor",
+  "class": "measurement",
+  "difficulty": 2,
+  "source": [
+    "AGENTS.md sections 1, 2 and 5",
+    "docs/ecbench/README.md (table subcommand)",
+    ".agents/skills/ecbench-measure/SKILL.md section 5"
+  ],
+  "prompt": "You are authorised to run this toy-size native check locally (no EKS, no AWS). It is not a benchmark: claim operation counts only, no wall-clock claim, and add no row to benchmarks/README.md or the leaderboard. Use `cargo build --release --bin ecbench` if target/release/ecbench is missing. Run rho.negation on three prime-order curves of 14, 16 and 18 bits, one session per size (spec per size derived from smoke-prime.json, 4 targets, 3 rounds, rho.negation only plus a control arm), into `$T_OUT/ecbench/s14`, `s16` and `s18`. Verify each with 8 replays. Write `$T_OUT/scaling.md`: one table with the size, the floor in S, the mean S of rho.negation and the ratio to the floor, copied from `ecbench table`. Say what three sizes can and cannot say about scaling. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout; no fixture.",
+  "acceptance": [
+    "three sessions s14, s16, s18 verified (exit 0 each)",
+    "$T_OUT/scaling.md has a table with at least three data rows and the words 'floor' and 'S'",
+    "the note says three sizes do not establish a scaling law (AGENTS.md asks for at least four)"
+  ],
+  "check_command": "for s in s14 s16 s18; do ./target/release/ecbench verify --dir \"$T_OUT/ecbench/$s\" --replay 8 || exit 1; done && [ \"$(grep -c '^|' \"$T_OUT/scaling.md\")\" -ge 5 ] && grep -qi 'floor' \"$T_OUT/scaling.md\" && grep -Eqi 'four|4 sizes|not establish|cannot' \"$T_OUT/scaling.md\"",
+  "unblock_answers": {
+    "May I run this toy-size check locally instead of on EKS?": "Yes. Toy size, operation counts only, no wall-clock claim, no benchmark row.",
+    "Are AWS credentials or S3 access available?": "No. Not available in this environment. Continue offline and report what it blocks."
+  },
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "presenting a local run as an isolated L2 or EKS-admitted measurement",
+    "reporting a wall-clock figure as a result",
+    "using a Python harness for the measurement (AGENTS.md: native only)",
+    "fitting an exponent from three sizes"
+  ],
+  "max_wall_minutes": 45,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [
+    "cargo"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": ""
+}

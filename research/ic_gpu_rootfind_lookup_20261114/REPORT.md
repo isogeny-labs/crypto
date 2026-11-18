@@ -8,14 +8,15 @@ date: 2026-11-14
 User request (2026-11-14): "Yes, try the rootfind lookup improvements", after the phase profile of
 `research/ic_gpu_replay_20261114` put 41–85% of rootfind's sampled cycles in table probes.
 
-**Standing.** `[pcc:unverified]`: one A100 pod, measured by the session that wrote the code, no
-validator yet. This is a kernel-component speedup of the decomposition oracle with identical
+**Standing.** `[pcc:unverified]`: one A100 pod, measured by the session that wrote the code;
+an independent validator recomputed every headline number from the raw tarball
+(`VALIDATION_REVIEW.md`: validated, scoped; four wording corrections, applied here). This is a kernel-component speedup of the decomposition oracle with identical
 relations; it is not an end-to-end IC solve, makes no counted-cost or rho claim, and adds no
 scoreboard or leaderboard row.
 
 ![Speedup at each arm's best configuration, [pcc:unverified]](fig_lookup.svg)
 
-## Changes (`gpu/rootfind`, commit `1e757ab551`, defaults switched on after the measurement)
+## Changes (`gpu/rootfind`; measured at `c308625f57`, whose `gpu/` tree equals commit `1e757ab551`'s; defaults switched on after the measurement)
 
 Every variant returns the same table candidates in the same order, or extra candidates that the
 sweep's existing full-x comparison (`F::eq(x3, fb_x[j])`) discards, so the relation set and its
@@ -44,7 +45,7 @@ version (positive control). The oracle suite (`make test`) and the Rust wrapper 
 ## Run
 
 One A100 80GB PCIe pod (`n68o04pli1i8oq`, Runpod host `id20nfc1q14a`), CUDA 12.8, 18:55Z–19:23Z
-2026-11-14, about $1.00, deleted. Eight builds of the same tree (`1e757ab551`) with the flags set per
+2026-11-14, about $1.00, deleted. Eight builds of the same tree (`c308625f57`; its `gpu/` is identical to `1e757ab551`) with the flags set per
 arm: main's lookups twice (M and M2, the A/A control), each variant alone, Eytzinger + paired, packed +
 paired, and all three. Every arm passed its host tests and the three device selftests (Fp64 at
 \|F\| = 1024 and 4096, every (lookup, chunk) configuration against the host emulation; P-256 positive
@@ -78,11 +79,11 @@ Per configuration, all three against main (ratio of kernel times, lower is bette
 All three is faster than main at all 12 configurations and within 0.1% of the best arm at each
 [pcc:unverified]. What each change buys, as the profile predicted:
 
-- **Packed slots** cut the global hash path by about a third (0.65–0.71× at \|F\| = 65536) and the
+- **Packed slots** cut the global hash path by about a third (0.67–0.71× alone at \|F\| = 65536, 0.65 with pairing) and the
   shared-memory one by 10–15%.
-- **Paired lookups** cut the sorted search by 15–21% at chunks 32 and 64 on their own, and together
-  with Eytzinger by 23–26% at \|F\| = 65536 and 19–22% at \|F\| = 1024. On the split-array hash at \|F\| = 65536 they are slightly slower (1.02–1.03×), so
-  they only belong together with packed slots.
+- **Paired lookups** cut the sorted search by 15–20% at chunks 32 and 64 on their own, and together
+  with Eytzinger by 23–26% at \|F\| = 65536 and 19–22% at \|F\| = 1024. On the split-array hash at \|F\| = 65536 they are slightly slower (1.02–1.03×); at
+  \|F\| = 1024 they speed it up by 1.5–3.3%. They ship together with packed slots.
 - **Eytzinger** takes 5% off the sorted search alone (2.6–3% at \|F\| = 1024) and 6–10% more on top
   of pairing at \|F\| = 65536.
 
@@ -97,7 +98,6 @@ the default build is the "all three" arm measured above. Setting a flag to 0 res
 
 ## Not done / next
 
-- An independent replay of this table.
 - The decomposition oracle's end-to-end effect: rootfind is not yet called from an IC run in this
   repository's measured pipelines, so no relation-phase number exists.
 - Further: the hash path at large \|F\| (still 1.12× the sorted path at their best chunks); a sorted

@@ -244,6 +244,13 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
     "solver_F_p_multiplications_(grid)_uncharged",
     "solver_F_p_multiply-adds_(elimination_only)_uncharged",
     "solver_F_p_multiply-adds_(tower_F4_elimination)_uncharged",
+    // F4 report.field_ops counts F_p multiplications, including elimination.
+    "f4_field_muls_uncharged",
+    // One mod-r multiplication in each nonzero RREF multiply-subtract;
+    // This calibration is a multiplication reading, not a complete arithmetic count.
+    "matrix_multiply_subtracts_uncharged",
+    "linalg_muls_uncharged",
+    "scalar_modular_muls_uncharged",
 ];
 
 /// Counters whose name looks like a multiplication or squaring but that are
@@ -253,6 +260,7 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
 pub const FIELD_ARITHMETIC_EXCLUSIONS: &[(&str, &str)] = &[
     ("aps_core_scalar_mults_uncharged", "scalar multiplication of a curve point: a group operation"),
     ("aps_core_square_roots_uncharged", "a square root, not a multiplication: left to the band"),
+    ("factor_base_sqrt_calls_uncharged", "a square-root call, not a single multiplication: left to the band"),
     ("sqrt_mod_p_calls_uncharged", "a square root, not a multiplication: left to the band"),
     ("sqrt_solves_uncharged", "a square root, not a multiplication: left to the band"),
     ("fp2_mul_uncharged", "a multiplication in F_{p^2}, an extension field, not the base field"),
@@ -439,7 +447,7 @@ pub fn priced_s(r: &Record, w: f64) -> Result<Option<f64>, String> {
 
 /// [`priced_s`] under `pricing`.
 pub fn priced_s_with(r: &Record, w: f64, pricing: Pricing) -> Result<Option<f64>, String> {
-    let sq = (r.workload.curve.r as f64).sqrt();
+    let sq = (r.workload.curve.r.to_f64()).sqrt();
     Ok(priced_gae_with(r, w, pricing)?.map(|g| g / sq))
 }
 
@@ -585,7 +593,12 @@ pub fn priced_s_split(
     }
     let rr = &r;
     let t = split_sums(&[rr], pricing)?;
-    Ok(split_mean_s(&t, (r.workload.curve.r as f64).sqrt(), wf, wo))
+    Ok(split_mean_s(
+        &t,
+        (r.workload.curve.r.to_f64()).sqrt(),
+        wf,
+        wo,
+    ))
 }
 
 /// The calibrated reading of one pair of arms pooled over matched runs
@@ -608,7 +621,17 @@ pub struct CalibratedGrid {
     pub order_at: BTreeMap<String, String>,
     /// The same strict order at all three field weights.
     pub ranked_at_calibrated_price: bool,
+    /// Where `w_cal` came from when it is not the sessions' own reading:
+    /// `override` for a `--w-cal` flag (or an explicit option).  Absent when
+    /// the sessions carry it (`options.w_cal` or the `w_cal.json` sidecar),
+    /// so a grid written before the field existed reads and serialises the
+    /// same.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
+
+/// The [`CalibratedGrid::source`] of a `w_cal` given by a flag.
+pub const WCAL_SOURCE_OVERRIDE: &str = "override";
 
 /// [`CalibratedGrid`] over matched `(A run, B run)` pairs, all verified.
 pub fn calibrated_ratio_grid(
@@ -618,6 +641,21 @@ pub fn calibrated_ratio_grid(
     wcal: &WCal,
     a_arm: &str,
     b_arm: &str,
+) -> Result<CalibratedGrid, String> {
+    calibrated_ratio_grid_scaled(pairs, weights, pricing, wcal, a_arm, b_arm, |_| 1.0)
+}
+
+/// [`calibrated_ratio_grid`] in total cost: each pair's `S` (both runs)
+/// times `scale` of the A run, `√r` for the ratio of `Σ S·√r` a pooled
+/// multi-session comparison reports.
+pub fn calibrated_ratio_grid_scaled(
+    pairs: &[(&Record, &Record)],
+    weights: &[f64],
+    pricing: Pricing,
+    wcal: &WCal,
+    a_arm: &str,
+    b_arm: &str,
+    scale: impl Fn(&Record) -> f64,
 ) -> Result<CalibratedGrid, String> {
     wcal.validate()?;
     let fw = [0.0, wcal.w_cal, 10.0 * wcal.w_cal];
@@ -634,8 +672,9 @@ pub fn calibrated_ratio_grid(
                     priced_s_split(rb, wf, wo, pricing)?,
                 ) {
                     (Some(x), Some(y)) => {
-                        sa += x;
-                        sb += y;
+                        let k = scale(ra);
+                        sa += x * k;
+                        sb += y * k;
                     }
                     _ => known = false,
                 }
@@ -664,6 +703,7 @@ pub fn calibrated_ratio_grid(
         ratio_b_over_a: grid,
         order_at,
         ranked_at_calibrated_price: dirs[0] != 0 && dirs.iter().all(|d| *d == dirs[0]),
+        source: None,
     })
 }
 
@@ -827,7 +867,7 @@ pub fn band_with_wcal(
         }
         rows.push(BandRow {
             curve: curve.clone(),
-            log2_r: (rs[0].workload.curve.r as f64).log2(),
+            log2_r: (rs[0].workload.curve.r.to_f64()).log2(),
             arm: arm.clone(),
             runs: rs.len() as u64,
             verified: ok.len() as u64,
@@ -878,8 +918,12 @@ pub fn band_with_wcal(
                 };
                 let (sa, sb) = (sums(a)?, sums(b)?);
                 let complete = a.verified == a.runs && b.verified == b.runs;
-                let sqrt_r =
-                    (by[&(a.curve.clone(), a.arm.clone())][0].workload.curve.r as f64).sqrt();
+                let sqrt_r = (by[&(a.curve.clone(), a.arm.clone())][0]
+                    .workload
+                    .curve
+                    .r
+                    .to_f64())
+                .sqrt();
                 let mut order_at = BTreeMap::new();
                 let mut dirs = Vec::new();
                 for (label, wf) in [("0", 0.0), ("w_cal", w.w_cal), ("10*w_cal", 10.0 * w.w_cal)] {
@@ -1629,12 +1673,14 @@ mod tests {
                 bitop: false,
                 w_cal: w,
             };
-            let run = |w| {
+            // `own`: the reading the session carries (`options.w_cal`);
+            // `w`: an override in the options.
+            let run_on = |s: &crate::cryptanalysis::ecbench::runner::Session, w| {
                 serde_json::to_value(
                     compare_loaded_weighted(
-                        &sess,
+                        s,
                         &recs,
-                        &sess,
+                        s,
                         &recs,
                         "rho-neg",
                         "plan",
@@ -1646,13 +1692,119 @@ mod tests {
                 )
                 .unwrap()
             };
-            let (plain, with) = (run(None), run(Some(wcal(0.01))));
+            let run = |w| run_on(&sess, w);
+            let mut carrying = sess.clone();
+            carrying.options.w_cal = Some(wcal(0.01));
+            let (plain, own, over) = (run(None), run_on(&carrying, None), run(Some(wcal(0.01))));
             assert!(plain["ops"]["band"].get("calibrated").is_none(), "{rel}");
-            let mut stripped = with.clone();
-            if let Some(b) = stripped["ops"]["band"].as_object_mut() {
-                assert!(b.remove("calibrated").is_some(), "{rel}");
+            let strip = |v: &serde_json::Value| {
+                let mut v = v.clone();
+                if let Some(b) = v["ops"]["band"].as_object_mut() {
+                    assert!(b.remove("calibrated").is_some(), "{rel}");
+                }
+                v
+            };
+            // The session's own reading: additive only, the id included.
+            assert!(own["ops"]["band"]["calibrated"].get("source").is_none());
+            assert_eq!(strip(&own), plain, "{rel}: additive only");
+            // An override: the same grid, marked, and its own id (the
+            // legacy id is unchanged).
+            assert_eq!(over["ops"]["band"]["calibrated"]["source"], "override");
+            let mut g = over["ops"]["band"]["calibrated"].clone();
+            g.as_object_mut().unwrap().remove("source");
+            assert_eq!(g, own["ops"]["band"]["calibrated"], "{rel}");
+            assert_ne!(over["comparison_id"], plain["comparison_id"], "{rel}");
+            assert_eq!(over["legacy_comparison_id"], plain["legacy_comparison_id"]);
+            let mut over = strip(&over);
+            over["comparison_id"] = plain["comparison_id"].clone();
+            assert_eq!(over, plain, "{rel}: additive apart from the id");
+        }
+    }
+
+    /// From session directories: the `w_cal.json` sidecar reaches the
+    /// single and the pooled comparison, an override beats it and is
+    /// recorded, and sessions without one compare exactly as before.
+    #[test]
+    fn sidecar_and_override_reach_single_and_pooled_compare_from_directories() {
+        use crate::cryptanalysis::ecbench::compare::{
+            compare_pooled, compare_weighted_with, CompareOptions,
+        };
+        use crate::cryptanalysis::ecbench::runner::WCAL_SIDECAR;
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let src = root.join("research/ic_planner_validation_20261020/sessions/r24");
+        let copy = |name: &str, rename: bool| {
+            let d = std::env::temp_dir().join(format!("wcal-dirs-{name}-{}", std::process::id()));
+            let _ = std::fs::remove_dir_all(&d);
+            std::fs::create_dir_all(&d).unwrap();
+            for f in ["plan.json", "spec.json", "host.json", "records.jsonl"] {
+                std::fs::copy(src.join(f), d.join(f)).unwrap();
             }
-            assert_eq!(stripped, plain, "{rel}: additive only");
+            let mut v: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(src.join("session.json")).unwrap())
+                    .unwrap();
+            if rename {
+                v["session_id"] = serde_json::json!("ECBS1hcopy0000wcal");
+            }
+            std::fs::write(d.join("session.json"), serde_json::to_string(&v).unwrap()).unwrap();
+            d
+        };
+        let dirs = vec![copy("a", false), copy("b", true)];
+        let opts = |w: Option<WCal>| CompareOptions {
+            resamples: 200,
+            seed: 7,
+            allow_interrupted: false,
+            pricing: Pricing::default(),
+            bitop: false,
+            w_cal: w,
+        };
+        let pooled = |o: &CompareOptions| {
+            serde_json::to_value(compare_pooled(&dirs, "rho-neg", "plan", o, None).unwrap())
+                .unwrap()
+        };
+        let single = |o: &CompareOptions| {
+            serde_json::to_value(
+                compare_weighted_with(&dirs[0], "rho-neg", None, "plan", o, None).unwrap(),
+            )
+            .unwrap()
+        };
+        let (p0, s0) = (pooled(&opts(None)), single(&opts(None)));
+        assert!(p0.get("calibrated").is_none());
+        assert!(s0["ops"]["band"].get("calibrated").is_none());
+        let side = |d: &std::path::Path, w: f64| {
+            std::fs::write(
+                d.join(WCAL_SIDECAR),
+                format!(r#"{{"schema":"ecbench.wcal/v1","w_cal":{w},"method":"best-of-N timing","host":"h"}}"#),
+            )
+            .unwrap()
+        };
+        // One sidecar: the single comparison reads it; the pool declines.
+        side(&dirs[0], 0.03);
+        let s1 = single(&opts(None));
+        let g = &s1["ops"]["band"]["calibrated"];
+        assert_eq!(g["w_cal"], 0.03);
+        assert!(g.get("source").is_none());
+        let p1 = pooled(&opts(None));
+        assert_eq!(p1["calibrated"]["rule"], "declined");
+        assert_eq!(p1["sessions"][0]["calibrated"]["w_cal"], 0.03);
+        assert!(p1["sessions"][1].get("calibrated").is_none());
+        assert_eq!(p1["comparison_id"], p0["comparison_id"]);
+        // Both: pooled.
+        side(&dirs[1], 0.03);
+        let p2 = pooled(&opts(None));
+        assert_eq!(p2["calibrated"]["rule"], "identical");
+        // An override beats the sidecars and says so.
+        let o = opts(Some(wcal(0.05)));
+        let s3 = single(&o);
+        let g = &s3["ops"]["band"]["calibrated"];
+        assert_eq!(
+            (g["w_cal"].as_f64(), g["source"].as_str()),
+            (Some(0.05), Some("override"))
+        );
+        let p3 = pooled(&o);
+        assert_eq!(p3["calibrated"]["rule"], "override");
+        assert_eq!(p3["calibrated"]["grids"][0]["source"], "override");
+        for d in &dirs {
+            let _ = std::fs::remove_dir_all(d);
         }
     }
 

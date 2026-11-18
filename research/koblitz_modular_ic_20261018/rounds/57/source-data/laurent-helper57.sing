@@ -1,0 +1,49 @@
+// Append in the univariate seed ring s, with sourceTerms (integer lists).
+// (p,e,P) represents w^e p + O(w^P). p is normalized with constant1.
+proc lnrm(poly p,int e,int pr){
+ if(pr<=e){return(list(poly(0),pr,pr));}
+ p=jet(p,pr-e-1);
+ if(p==0){return(list(poly(0),pr,pr));}
+ int vv=deg(p[size(p)]);p=p/w^vv;e=e+vv;
+ return(list(p,e,pr));
+}
+proc lc(int a){return(list(poly(a),0,4096));}
+proc lseed(poly p,int pr){return(lnrm(p,0,pr));}
+proc la(list a,list b){
+ int pr=min(a[3],b[3]);int e=min(a[2],b[2]);
+ return(lnrm(a[1]*w^(a[2]-e)+b[1]*w^(b[2]-e),e,pr));
+}
+proc lm(list a,list b){
+ int pr=min(a[3]+b[2],b[3]+a[2]);
+ return(lnrm(a[1]*b[1],a[2]+b[2],pr));
+}
+proc li(list a){
+ if(a[1]==0){ERROR("Laurent inverse unresolved zero");return(lc(0));}
+ int rel=a[3]-a[2];poly ans=1;int z;
+ if(rel>4096){ERROR("inverse precision exceeds frozen iteration bound");}
+ for(z=1;z<=13;z++){ans=jet(a[1]*ans^2,rel-1);}
+ if(jet(a[1]*ans,rel-1)!=1){ERROR("Laurent unit inverse failed");}
+ return(lnrm(ans,-a[2],a[3]-2*a[2]));
+}
+proc lpw(list a,int k){
+ list ans=lc(1);
+ while(k>0){if(k%2==1){ans=lm(ans,a);}k=k div 2;if(k>0){a=lm(a,a);}}
+ return(ans);
+}
+proc leval(list terms,list coords){
+ list ans=lc(0);list mon;int z;int j;intvec ex;
+ for(z=1;z<=size(terms);z++){
+  mon=lc(1);ex=terms[z];
+  for(j=1;j<=4;j++){if(ex[j]>0){mon=lm(mon,lpw(coords[j],ex[j]));}}
+  ans=la(ans,mon);
+ }
+ return(ans);
+}
+proc lzero(string name,list a){
+ print("RESIDUAL "+name+" ABS_PRECISION "+string(a[3]));
+ if(a[1]!=0 || a[3]<=0){ERROR("source residual nonzero or precision insufficient: "+name);}
+}
+proc lrecord(string name,list a){
+ if(a[1]==0 || a[2]>=a[3]){ERROR("valuation unresolved: "+name);}
+ print("LAURENT_ORDER "+name+" "+string(a[2])+" ABS_PRECISION "+string(a[3])+" LEAD "+string(subst(a[1],w,0)));
+}

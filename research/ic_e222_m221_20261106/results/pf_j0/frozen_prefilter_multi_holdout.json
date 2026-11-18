@@ -1,0 +1,10 @@
+{
+  "frozen_before_run": "2026-11-14",
+  "code": "examples/prime_fast_j0_multi.rs with default bitset prefilter (NOPREFILTER=1 disables); not yet committed at freeze time, committed together with this file",
+  "tuning": "32 bits, CSKIP=40, 2 curves x 2 instances, B in {100,160,240,350,500,700,1000}, T in {64,512,4096}; exploratory, not frozen before; best B about 350 (T=64, 512, 4096)",
+  "frozen_parameters": {"32": {"B": 350}, "30": {"B": 220}},
+  "holdout_command": "CSKIP=700 prime_fast_j0_multi out.jsonl <bits> <B> <T> 4 40 0.5 ; T in {64, 512}; comparator rows are base_total_ms (ic_multi_solve_ex, same binary)",
+  "prediction": "pooled sum(base_total_ms)/sum(sym_total_ms) >= 1.3 at both T and both sizes; all targets solved",
+  "abandon_rule": "any pooled ratio < 1.1 or any failed verification => the claim 'symmetric multi-target IC beats ic_multi_solve_ex' is withdrawn",
+  "known_limits": "wall clock, one host, no isolation, one twist group per size; the folded multi-target BSGS (separate binary, prime_fast_j0_bsgs_multi) was 2.0x-3.4x faster than symmetric multi at 32 bits in the exploratory runs (46/123/333 ms vs 128/241/1119 ms at T=64/512/4096)"
+}

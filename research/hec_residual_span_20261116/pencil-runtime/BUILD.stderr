@@ -1,0 +1,29 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-pencil-runtime v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_residual_span_20261116/pencil-runtime/build)
+warning: enum `Mode` is never used
+  --> ../core.rs:12:10
+   |
+12 | pub enum Mode {
+   |          ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `trials`, `m`, and `unknowns` are never read
+  --> ../core.rs:20:9
+   |
+18 | pub struct Report {
+   |            ------ fields in this struct
+19 |     pub k: Option<u64>,
+20 |     pub trials: u64,
+   |         ^^^^^^
+21 |     pub relations: usize,
+22 |     pub m: usize,
+   |         ^
+23 |     pub unknowns: usize,
+   |         ^^^^^^^^
+   |
+   = note: `Report` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `hec-pencil-runtime` (bin "pencil-runtime-gate") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 1.09s

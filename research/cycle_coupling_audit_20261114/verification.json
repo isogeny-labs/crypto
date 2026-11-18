@@ -1,0 +1,75 @@
+{
+  "schema": "cycle-coupling-verification/v1",
+  "source_commit": "678b511312947bc362c66cfe24578f2540fa92d0",
+  "claim_id": "PCC-20261114-13f615",
+  "declaration_sha256": "dbd609ef808defc71765389c4746628d85d20739fc39bec056a270e1855631f0",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 11,
+  "gate_declarations": 51,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 92,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-13f615",
+    "claim_sha256": "5c8674f42745229c2dd8d96ad9551fb1db46db956bd39d9d32a572a28ae16a03",
+    "commit": "678b511312947bc362c66cfe24578f2540fa92d0",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/cycle_coupling_audit_20261114/lean (CycleCouplingCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T09:48:10Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-13f615",
+    "claim_sha256": "5c8674f42745229c2dd8d96ad9551fb1db46db956bd39d9d32a572a28ae16a03",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46941,
+    "sha256": "369faba9bbd768f77a5077a8b22bcc6b2f042cb99b0f9a30d108162f549a3e05",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 51,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_independent_PMF_and_both_marginal_expectations": true,
+    "actual_potential_and_uniform_stationarity": true,
+    "all_cycle_fair_event_bound": true,
+    "prime_two_distinct_equalweight_event_bound": true,
+    "time_dependent_affine_not_static_conjugacy": true,
+    "deterministic_alltime_nonmixing_and_zero_time_counter": true,
+    "qualified_full_Hildebrand_theorem_proved": false,
+    "qualified_source_refuted": false,
+    "static_rho_mixing_or_collision_law_proved": false,
+    "full_primary_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -1,0 +1,22 @@
+if(actualCount37!=10){ERROR("ORDER37_POINT_COUNT");}
+list deckPoint37=actualPoints37[1];list startPoint37=deckPoint37;list orbit37;int step37;int phase37;int index37;int found37;int match37;int foundPhase37;intvec used37=0,0,0,0,0,0,0,0,0,0;
+intvec weights37=4,1,-1,1,-1,-4,-1,1,-1,1;int total37;int badIndex37;int badMatched37;
+link out37="ASCII:w deck-order.txt";open(out37);
+for(step37=0;step37<10;step37++){
+ orbit37=deckPoint37;found37=0;match37=0;foundPhase37=-1;
+ for(phase37=0;phase37<83;phase37++){
+  for(index37=1;index37<=10;index37++){if(equal37(orbit37,actualPoints37[index37])){found37++;match37=index37;foundPhase37=phase37;}}
+  orbit37=square37(orbit37);if(phase37<82 && equal37(orbit37,deckPoint37)){ERROR("ORDER37_SHORT_FROBENIUS_PERIOD");}
+ }
+ if(equal37(orbit37,deckPoint37)==0 || found37!=1 || used37[match37]!=0){ERROR("ORDER37_NOT_UNIQUE_CLOSED_MATCH");}used37[match37]=1;
+ total37=total37+weights37[step37+1];
+ write(out37,string(step37)+" "+string(actualLabels37[match37])+" "+string(foundPhase37)+" "+string(weights37[step37+1]));
+ print("ORDER37_MATCH step="+string(step37)+" label="+string(actualLabels37[match37])+" phase="+string(foundPhase37)+" weight="+string(weights37[step37+1])+" old_sections=68 period=83");
+ badIndex37=(match37%10)+1;badMatched37=0;orbit37=deckPoint37;
+ for(phase37=0;phase37<83;phase37++){if(equal37(orbit37,actualPoints37[badIndex37])){badMatched37++;}orbit37=square37(orbit37);}
+ if(badMatched37!=0){ERROR("ORDER37_CORRUPTED_MATCH_ACCEPTED");}
+ deckPoint37=deck37(deckPoint37);
+}
+close(out37);if(equal37(deckPoint37,startPoint37)==0 || total37!=0){ERROR("ORDER37_CLOSURE_OR_AUGMENTATION");}
+for(index37=1;index37<=10;index37++){if(used37[index37]!=1){ERROR("ORDER37_UNUSED_LABEL");}}
+print("ORDER37_RESULT labels=10 full_coordinate_orbits=10 old_section_bindings=680 least_period=83 deck_period=10 augmentation=0 corrupt_label_controls=10");print("ORDER37_ALL_CHECKS_PASS");quit;

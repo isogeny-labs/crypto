@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Development check of the `multiples` presentation control against the `tower`
 # control, on this host (4 cores, no isolation): Kummer towers at P1 = 15*2^27+1,
-# the fall-degree study's seed 0x504B4D54, two random targets per cell
+# the fall-degree study's seed 1347106132 = 0x504B3554, two random targets per cell
 # (`--planted 0 --random 2`, as stage A/C), closure engine (`--engine hky`).
 # Not an admitted run: no isolation tier, no bench.record, no timing claim.
 set -euo pipefail

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="330" viewBox="0 0 900 330">
+<rect width="900" height="330" fill="#f5f7fa"/>
+<g font-family="sans-serif" fill="#183047">
+<text x="25" y="35" font-size="23">RR Dickson continuation — implemented path and pending qualification</text>
+<rect x="25" y="65" width="255" height="105" rx="8" fill="#dbece8"/>
+<text x="40" y="94" font-size="19">Original RR equations</text><text x="40" y="121" font-size="16">Constant-coefficient pivots only</text><text x="40" y="145" font-size="16">No variable division / saturation</text>
+<path d="M280 115H320" stroke="#183047" stroke-width="3"/>
+<rect x="320" y="65" width="255" height="105" rx="8" fill="#dbece8"/>
+<text x="335" y="94" font-size="19">Degree-capped substitution</text><text x="335" y="121" font-size="16">All input degrees remain ≤ 2</text><text x="335" y="145" font-size="16">Emit reverse reconstruction map</text>
+<path d="M575 115H615" stroke="#183047" stroke-width="3"/>
+<rect x="615" y="65" width="260" height="105" rx="8" fill="#fff0d2" stroke="#bc8a2e" stroke-dasharray="5 4"/>
+<text x="630" y="94" font-size="19">Matched RR / F solving</text><text x="630" y="121" font-size="16">F4 degree, matrices, complete cost</text><text x="630" y="145" font-size="16">NOT RUN — admission pending</text>
+<path d="M745 170V205H445V170" fill="none" stroke="#183047" stroke-width="2"/>
+<text x="240" y="239" font-size="17">Lift arbitrary coordinates → check every original equation</text>
+<text x="25" y="280" font-size="16">Implemented: preprocessor + checked lift. Pending: complete point extraction and equal-output comparison.</text>
+<text x="25" y="308" font-size="15">Development scope only; input degree is not F4 solving degree. No measured width or speed improvement.</text>
+</g></svg>

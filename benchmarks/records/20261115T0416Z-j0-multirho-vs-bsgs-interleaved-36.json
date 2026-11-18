@@ -1,0 +1,473 @@
+{
+  "branch": "aburan28/inspiring-dijkstra-ay05qi",
+  "closed_utc": "2026-11-15T04:31:22+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_e222_m221_20261106/interleaved_rho_bsgs/run.sh",
+        "36 200",
+        "36 1000",
+        "36 3000"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T04:16:29+00:00",
+      "wall_s": 846.116
+    }
+  ],
+  "commit": "ec3b88e2c4302aac2c7d49cc07660d237dda6269",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T04:16:09+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0416Z-j0-multirho-vs-bsgs-interleaved-36",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "rho_over_bsgs_36b_t200",
+      "note": "geomean of paired rounds, 95% bootstrap; A/A 1.00 [0.94,1.06]; below 1 means rho faster",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.803,
+        0.902
+      ],
+      "unit": "ratio",
+      "value": 0.849
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "rho_over_bsgs_36b_t1000",
+      "note": "geomean of paired rounds, 95% bootstrap; A/A 0.98 [0.97,1.00]; below 1 means rho faster",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.633,
+        0.677
+      ],
+      "unit": "ratio",
+      "value": 0.658
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "rho_over_bsgs_36b_t3000",
+      "note": "geomean of paired rounds, 95% bootstrap; A/A 1.00 [0.96,1.04]; below 1 means rho faster",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.561,
+        0.59
+      ],
+      "unit": "ratio",
+      "value": 0.577
+    }
+  ],
+  "problem": "ecdlp-prime-multi-target",
+  "raw": [
+    {
+      "bytes": 550,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T1000_r0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/26/265076b98dbf32091c6bc2643db0aa35f2cd0a5fc26fa12ac2e168a9186c1278",
+      "sha256": "265076b98dbf32091c6bc2643db0aa35f2cd0a5fc26fa12ac2e168a9186c1278",
+      "uploaded": false
+    },
+    {
+      "bytes": 539,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T1000_r1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f6/f6519dc099ea0d57bf253d555ab715be65c6516abf208ccddfc43f8495aa3f9c",
+      "sha256": "f6519dc099ea0d57bf253d555ab715be65c6516abf208ccddfc43f8495aa3f9c",
+      "uploaded": false
+    },
+    {
+      "bytes": 531,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T1000_r2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6b/6b2018c57c4e9b5ad51fda6f772e730aa6c7ebfaa82754002cf44f70816580f5",
+      "sha256": "6b2018c57c4e9b5ad51fda6f772e730aa6c7ebfaa82754002cf44f70816580f5",
+      "uploaded": false
+    },
+    {
+      "bytes": 539,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T1000_r3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9a/9a2a5fb0fddd4a3e25e017fc30c399912541e6ce7de87507003b50e031052609",
+      "sha256": "9a2a5fb0fddd4a3e25e017fc30c399912541e6ce7de87507003b50e031052609",
+      "uploaded": false
+    },
+    {
+      "bytes": 539,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T1000_r4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d8/d838e95143e65d0c2cb050a6dc0518ccc8e720fb2d754464fe478338ab4eb4e0",
+      "sha256": "d838e95143e65d0c2cb050a6dc0518ccc8e720fb2d754464fe478338ab4eb4e0",
+      "uploaded": false
+    },
+    {
+      "bytes": 537,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T1000_r5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6d/6d57c7aed5bd65f0ea2f90d7fe5745a5c106cb0de1de199597eddc0316c18de0",
+      "sha256": "6d57c7aed5bd65f0ea2f90d7fe5745a5c106cb0de1de199597eddc0316c18de0",
+      "uploaded": false
+    },
+    {
+      "bytes": 540,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T200_r0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9e3e0d0692579019bd60452bb230c2bae8e91bbef75afc2a6135b38c996b28f2",
+      "sha256": "9e3e0d0692579019bd60452bb230c2bae8e91bbef75afc2a6135b38c996b28f2",
+      "uploaded": false
+    },
+    {
+      "bytes": 530,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T200_r1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4f/4f77a55f42f896710fc50eb53082a129d263c47304dedeaaca335ac2a2c7b4e2",
+      "sha256": "4f77a55f42f896710fc50eb53082a129d263c47304dedeaaca335ac2a2c7b4e2",
+      "uploaded": false
+    },
+    {
+      "bytes": 540,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T200_r2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0c/0cfd0cbafb7e4cd166aff695b32d9696ed57a0d449164ed490968482430d3263",
+      "sha256": "0cfd0cbafb7e4cd166aff695b32d9696ed57a0d449164ed490968482430d3263",
+      "uploaded": false
+    },
+    {
+      "bytes": 523,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T200_r3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/df/df2573ce4bd0e02379fada0612b514e7711f99bfb9be212157b09970c2ee6a4a",
+      "sha256": "df2573ce4bd0e02379fada0612b514e7711f99bfb9be212157b09970c2ee6a4a",
+      "uploaded": false
+    },
+    {
+      "bytes": 540,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T200_r4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/02/02b977f288293b23e0d1025a6d4f05a6a3c0704e0391b663c0e32fd199590735",
+      "sha256": "02b977f288293b23e0d1025a6d4f05a6a3c0704e0391b663c0e32fd199590735",
+      "uploaded": false
+    },
+    {
+      "bytes": 532,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T200_r5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b9/b963331465c3de2ea3cce5cd0f9f8495860f3265da0ba618375c9b5ac612d21c",
+      "sha256": "b963331465c3de2ea3cce5cd0f9f8495860f3265da0ba618375c9b5ac612d21c",
+      "uploaded": false
+    },
+    {
+      "bytes": 536,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T3000_r0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/33/33c5ba2ac7b5505010c9544c63109abd8f5250fdc89c40237241b6d860ec067f",
+      "sha256": "33c5ba2ac7b5505010c9544c63109abd8f5250fdc89c40237241b6d860ec067f",
+      "uploaded": false
+    },
+    {
+      "bytes": 556,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T3000_r1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6f/6ff96ae6e508a13e8cd3ab8c6eeee7cadb1613e916deba983f3f3d61ada733f6",
+      "sha256": "6ff96ae6e508a13e8cd3ab8c6eeee7cadb1613e916deba983f3f3d61ada733f6",
+      "uploaded": false
+    },
+    {
+      "bytes": 541,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T3000_r2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a1baf8c03b47e8515a64580c80f9eaa5bb61b33b3f755c29501fb649bc22096b",
+      "sha256": "a1baf8c03b47e8515a64580c80f9eaa5bb61b33b3f755c29501fb649bc22096b",
+      "uploaded": false
+    },
+    {
+      "bytes": 557,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T3000_r3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d0/d0607bbec598dd1c8c78b791ba44fad4797ba7c486475bb48f0c75031dc30212",
+      "sha256": "d0607bbec598dd1c8c78b791ba44fad4797ba7c486475bb48f0c75031dc30212",
+      "uploaded": false
+    },
+    {
+      "bytes": 535,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T3000_r4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/11/1191527562e0dae1ee39315e357843363f0dab4fea93bb6109178997d30897c1",
+      "sha256": "1191527562e0dae1ee39315e357843363f0dab4fea93bb6109178997d30897c1",
+      "uploaded": false
+    },
+    {
+      "bytes": 542,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/bsgs_b36_T3000_r5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/91/919502746a1ed3747c264a873b7fcde647640fc2f69222715e71276e906df756",
+      "sha256": "919502746a1ed3747c264a873b7fcde647640fc2f69222715e71276e906df756",
+      "uploaded": false
+    },
+    {
+      "bytes": 487,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T1000_r0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3c/3cb209861c785853b4b25d722f2ea49678bc4b7e5cbcb33e068569235fc62f02",
+      "sha256": "3cb209861c785853b4b25d722f2ea49678bc4b7e5cbcb33e068569235fc62f02",
+      "uploaded": false
+    },
+    {
+      "bytes": 479,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T1000_r1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/52/52f6203ba5fa38bbfa5026ba9ec96a614f27d081616cedcacdf872287889bbc6",
+      "sha256": "52f6203ba5fa38bbfa5026ba9ec96a614f27d081616cedcacdf872287889bbc6",
+      "uploaded": false
+    },
+    {
+      "bytes": 478,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T1000_r2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/05/05f68ecc0dff838bf791d47998ef4fd8b8bbc62f346b1371bdd7acc44618e083",
+      "sha256": "05f68ecc0dff838bf791d47998ef4fd8b8bbc62f346b1371bdd7acc44618e083",
+      "uploaded": false
+    },
+    {
+      "bytes": 495,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T1000_r3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8a/8a8aa77c15d885236c3c623a6b260216c79712d91e38c80ce42fa491d171b519",
+      "sha256": "8a8aa77c15d885236c3c623a6b260216c79712d91e38c80ce42fa491d171b519",
+      "uploaded": false
+    },
+    {
+      "bytes": 488,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T1000_r4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/33/334f563934cc33d28cd98a08317db13960f741da3cdf06312584d3566f697063",
+      "sha256": "334f563934cc33d28cd98a08317db13960f741da3cdf06312584d3566f697063",
+      "uploaded": false
+    },
+    {
+      "bytes": 496,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T1000_r5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/28/286ed42d81cb9e539b3e7180a9192e72ff464f61a3d20175860cac07969bb396",
+      "sha256": "286ed42d81cb9e539b3e7180a9192e72ff464f61a3d20175860cac07969bb396",
+      "uploaded": false
+    },
+    {
+      "bytes": 471,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T200_r0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f0/f0a2fb9324079fc233de2ca6bf141d49309d38decf371afec8f0eaa806e9b788",
+      "sha256": "f0a2fb9324079fc233de2ca6bf141d49309d38decf371afec8f0eaa806e9b788",
+      "uploaded": false
+    },
+    {
+      "bytes": 479,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T200_r1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9c/9cd9e7dec5f838c414ade623fb5f6630e7f0efc916f8dfed588f6f8b8a82debd",
+      "sha256": "9cd9e7dec5f838c414ade623fb5f6630e7f0efc916f8dfed588f6f8b8a82debd",
+      "uploaded": false
+    },
+    {
+      "bytes": 480,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T200_r2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e0/e0b071fede5788452876e6c6675497c0ae27fe7bf9336a32e2671ad1f697a63f",
+      "sha256": "e0b071fede5788452876e6c6675497c0ae27fe7bf9336a32e2671ad1f697a63f",
+      "uploaded": false
+    },
+    {
+      "bytes": 480,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T200_r3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ae/aed253f29fcdb1cc44446a7b3934b705db72ae43f83618fe430628a7be1d1d47",
+      "sha256": "aed253f29fcdb1cc44446a7b3934b705db72ae43f83618fe430628a7be1d1d47",
+      "uploaded": false
+    },
+    {
+      "bytes": 480,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T200_r4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e1/e1e730020a4ade3c462d05a0028edeb8b3b5881c1be6bc3e6bb0583508655873",
+      "sha256": "e1e730020a4ade3c462d05a0028edeb8b3b5881c1be6bc3e6bb0583508655873",
+      "uploaded": false
+    },
+    {
+      "bytes": 480,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T200_r5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f1/f1651e51a0021cb3d8213060449af509e84142961a80c4e3bf29b3ca5380573f",
+      "sha256": "f1651e51a0021cb3d8213060449af509e84142961a80c4e3bf29b3ca5380573f",
+      "uploaded": false
+    },
+    {
+      "bytes": 498,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T3000_r0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2e/2efe3dc1d9bf5bf19690af7ec1cdc5e8e79a059201a133d5bdd8768c33cf647c",
+      "sha256": "2efe3dc1d9bf5bf19690af7ec1cdc5e8e79a059201a133d5bdd8768c33cf647c",
+      "uploaded": false
+    },
+    {
+      "bytes": 491,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T3000_r1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e5/e5492f88a028f683008a31d9b699ae7fdddda4c3f0693360ea0efb6420160574",
+      "sha256": "e5492f88a028f683008a31d9b699ae7fdddda4c3f0693360ea0efb6420160574",
+      "uploaded": false
+    },
+    {
+      "bytes": 484,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T3000_r2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5c/5cd90e3cb741774799afebbc06f1398176343ada353dea4ad29770eda9b00539",
+      "sha256": "5cd90e3cb741774799afebbc06f1398176343ada353dea4ad29770eda9b00539",
+      "uploaded": false
+    },
+    {
+      "bytes": 491,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T3000_r3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a4/a4d097db62484e6306ec60c94a72cf58abe370738f22e759b6ac95c1c4909a4c",
+      "sha256": "a4d097db62484e6306ec60c94a72cf58abe370738f22e759b6ac95c1c4909a4c",
+      "uploaded": false
+    },
+    {
+      "bytes": 498,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T3000_r4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fe/fe2186ab20a57c5d46e75c9e5fc03e0a797715d344fe3bbd8af02829fb30aad4",
+      "sha256": "fe2186ab20a57c5d46e75c9e5fc03e0a797715d344fe3bbd8af02829fb30aad4",
+      "uploaded": false
+    },
+    {
+      "bytes": 491,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_aa_b36_T3000_r5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f6/f641119bbd5d9183e66ffd65b3f0e357966648f569a5081288f55ba87c14b7c0",
+      "sha256": "f641119bbd5d9183e66ffd65b3f0e357966648f569a5081288f55ba87c14b7c0",
+      "uploaded": false
+    },
+    {
+      "bytes": 480,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T1000_r0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3d/3ded7b6f7f30760cf89a729a633e5ba113638fd59128d737d6830d3cc79b69b0",
+      "sha256": "3ded7b6f7f30760cf89a729a633e5ba113638fd59128d737d6830d3cc79b69b0",
+      "uploaded": false
+    },
+    {
+      "bytes": 486,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T1000_r1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/13/13ce6b24d0c8b5f425a6de580a6f28489a89d22299024b728dffd19afe036902",
+      "sha256": "13ce6b24d0c8b5f425a6de580a6f28489a89d22299024b728dffd19afe036902",
+      "uploaded": false
+    },
+    {
+      "bytes": 494,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T1000_r2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/31/3113ea69be68da9ba84391e5c91ce809b946bab3967a4ca1b07d6aa165a0f248",
+      "sha256": "3113ea69be68da9ba84391e5c91ce809b946bab3967a4ca1b07d6aa165a0f248",
+      "uploaded": false
+    },
+    {
+      "bytes": 488,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T1000_r3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e7640f7a50dd5772ffbe68ffe4cd2a52de186cf42a130452642bec95b6295c90",
+      "sha256": "e7640f7a50dd5772ffbe68ffe4cd2a52de186cf42a130452642bec95b6295c90",
+      "uploaded": false
+    },
+    {
+      "bytes": 479,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T1000_r4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/15/154ff56f4d8cc174a350d1169217f6d5dc357e4bd50ae16c6a4a653218e906c1",
+      "sha256": "154ff56f4d8cc174a350d1169217f6d5dc357e4bd50ae16c6a4a653218e906c1",
+      "uploaded": false
+    },
+    {
+      "bytes": 488,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T1000_r5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/53/5354b16ce1922e7200b67d25bef323f4c6316867327b91002075970e75bfbaa2",
+      "sha256": "5354b16ce1922e7200b67d25bef323f4c6316867327b91002075970e75bfbaa2",
+      "uploaded": false
+    },
+    {
+      "bytes": 480,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T200_r0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2d/2dc96d3efa99a246b340d434c03d4341c4aac7406adfdab909df02b160740c85",
+      "sha256": "2dc96d3efa99a246b340d434c03d4341c4aac7406adfdab909df02b160740c85",
+      "uploaded": false
+    },
+    {
+      "bytes": 488,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T200_r1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/86/8642732d81a39357d4d2adc087cc3de4556512b95356c0f046eb3f6d31f9378c",
+      "sha256": "8642732d81a39357d4d2adc087cc3de4556512b95356c0f046eb3f6d31f9378c",
+      "uploaded": false
+    },
+    {
+      "bytes": 471,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T200_r2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0e/0e12b89853b5d6741a712394fce2c4a2ee064c02fa7fa89df20445b3c7f238ef",
+      "sha256": "0e12b89853b5d6741a712394fce2c4a2ee064c02fa7fa89df20445b3c7f238ef",
+      "uploaded": false
+    },
+    {
+      "bytes": 472,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T200_r3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e1/e1b030a3fa0b92b31a8c2a268548115ed66912db7db8720fb6dda5eb28084ca8",
+      "sha256": "e1b030a3fa0b92b31a8c2a268548115ed66912db7db8720fb6dda5eb28084ca8",
+      "uploaded": false
+    },
+    {
+      "bytes": 471,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T200_r4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c2/c2194b9c6d4570cf74646b8934091cab05fb9ca765cdf3fc6992c7865d4006c0",
+      "sha256": "c2194b9c6d4570cf74646b8934091cab05fb9ca765cdf3fc6992c7865d4006c0",
+      "uploaded": false
+    },
+    {
+      "bytes": 472,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T200_r5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f6/f6dde165f050c6af297322a4b42065387b2a1c50762233934cc4da85ef1554c6",
+      "sha256": "f6dde165f050c6af297322a4b42065387b2a1c50762233934cc4da85ef1554c6",
+      "uploaded": false
+    },
+    {
+      "bytes": 491,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T3000_r0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/90/90997de304277d2e9aa1fa70691dec4ca5362f23e16c829ae81623593317a58b",
+      "sha256": "90997de304277d2e9aa1fa70691dec4ca5362f23e16c829ae81623593317a58b",
+      "uploaded": false
+    },
+    {
+      "bytes": 498,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T3000_r1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bf/bf59c9d35101ff14799c2be273d877674f4390b58d093bb69fa7e3fd502b6cc8",
+      "sha256": "bf59c9d35101ff14799c2be273d877674f4390b58d093bb69fa7e3fd502b6cc8",
+      "uploaded": false
+    },
+    {
+      "bytes": 483,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T3000_r2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/72/724637c8feec296fbc4718bdeb05a1d4ad8c806f649b2ea27b2101a2de370c24",
+      "sha256": "724637c8feec296fbc4718bdeb05a1d4ad8c806f649b2ea27b2101a2de370c24",
+      "uploaded": false
+    },
+    {
+      "bytes": 491,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T3000_r3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/02/02d3ea7d3620fd7abd1d864914c26b56af4978eaae10f73a9fc59a3d1ea0b37a",
+      "sha256": "02d3ea7d3620fd7abd1d864914c26b56af4978eaae10f73a9fc59a3d1ea0b37a",
+      "uploaded": false
+    },
+    {
+      "bytes": 491,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T3000_r4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/08/08fcb301a54a7e8615c22bf78d897cc3672aa62d472c38c005a049a568316b2c",
+      "sha256": "08fcb301a54a7e8615c22bf78d897cc3672aa62d472c38c005a049a568316b2c",
+      "uploaded": false
+    },
+    {
+      "bytes": 483,
+      "path": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rows/rho_b36_T3000_r5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d5/d5c45fcb14a0def965ec35823b208e043d289c12d5a9312dd5d3c0331ea7d542",
+      "sha256": "d5c45fcb14a0def965ec35823b208e043d289c12d5a9312dd5d3c0331ea7d542",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rho_vs_bsgs.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_e222_m221_20261106/interleaved_rho_bsgs/rho_vs_bsgs.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "j0-multirho-vs-bsgs-interleaved-36",
+  "status": "measured",
+  "summary": "Interleaved at 36 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.85, 0.66, 0.58); ratio flat vs 34 bits",
+  "validation": null
+}

@@ -1,0 +1,20 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations residual.cpp -o /tmp/cm-marked-scalar-build/residual -lcrypto
+residual.cpp: In function ‘Counts residual::direct_count(const Big&, unsigned int)’:
+residual.cpp:30:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   30 |  if(n.zero())return {};auto ds=wnaf(n,width);uint64_t nonzero=0,negative=0;for(int d:ds){nonzero+=d!=0;negative+=d<0;}
+      |  ^~
+residual.cpp:30:24: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   30 |  if(n.zero())return {};auto ds=wnaf(n,width);uint64_t nonzero=0,negative=0;for(int d:ds){nonzero+=d!=0;negative+=d<0;}
+      |                        ^~~~
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations residual_replay.cpp -o /tmp/cm-marked-scalar-build/residual-replay -lcrypto -lgmpxx -lgmp
+residual_replay.cpp: In function ‘Digits recode(Int, unsigned int, bool)’:
+residual_replay.cpp:23:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   23 |  if(sign)reconstruct=-reconstruct;check(reconstruct==target,"independent digit reconstruction");return d;
+      |  ^~
+residual_replay.cpp:23:35: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   23 |  if(sign)reconstruct=-reconstruct;check(reconstruct==target,"independent digit reconstruction");return d;
+      |                                   ^~~~~
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

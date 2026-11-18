@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T05:05:19Z",
+ "id": "PCC-20261116-c1b577",
+ "kind": "statement",
+ "producer": {
+  "commit": "40839ddeaf174801500bff4fdacc746ccf016d0c",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/PCC-CI-checkpoint-stage-scope-failure-02/entire-original-command.py",
+    "sha256": "4a090d156baf780960d6d81744d542384dea9cb79c060ba13b1be18cea0834d7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/PCC-CI-checkpoint-stage-scope-failure-02/previous-governance-claim-ids.json",
+    "sha256": "c2b17a2a914885e80ad4ef4985007e2fdb75fbaa13b09c77d992774872cb0a12"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/PCC-CI-checkpoint-stage-scope-failure-02/actual-failure.txt",
+    "sha256": "c2e5ff6fd44c45d589a3544f655f622771563784ef88900133aeadfdee1fac44"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Root metadata governor second attempt stops after actual checks and data-claim creation, before commit/push, because changed-path enumeration forgot to union already staged paths. All whole source/logs and failed alternate Git indices retained; canonical index/source history unchanged. Successor fixes only metadata scope enumeration and uses fresh output paths, preserving old claims. Original raw policy remains1 until genuine bot migration; no failure or checkpoint is represented as completed publication."
+}

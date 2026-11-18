@@ -1,0 +1,25 @@
+{
+  "schema": "crypto.isolab-queue/v1",
+  "id": "EXP-LAZYCOL-N29-001",
+  "status": "blocked",
+  "note": "Lazy-orbit column sweep, Koblitz n=29 (protocol frozen before data). Blocked on: (1) live daily and monthly budget headroom in account 104186811093 (latest shared readback is over the monthly cap; unknown headroom admits no paid job); (2) an approved expspec record at the record path with a committed decision; (3) source_commit merged into main and a digest-pinned isolab/tasks image built from it with image.ecbench_sha256; (4) a perf-ipc w_cal measurement on an isolated PMU host for the calibrated band. Do not promote by flipping status alone.",
+  "record": "experiments/specs/EXP-LAZYCOL-N29-001.yaml",
+  "protocol": {
+    "path": "research/ic_lead_chase_20261116/protocol.json",
+    "sha256": "19116bb1970ff8cb24ce14c7b028bb7f052e38cff954788df3bcf79c05dfbdb0"
+  },
+  "source_commit": "",
+  "trial": "first-sweep",
+  "kind": "benchmark",
+  "image": {
+    "uri": "",
+    "source_commit": ""
+  },
+  "outputs": [
+    "export.json"
+  ],
+  "workload_spec": "research/ic_lead_chase_20261116/specs/lazycol-a1-n29.json",
+  "cpu": 4,
+  "memory": "8Gi",
+  "seconds": 3600
+}

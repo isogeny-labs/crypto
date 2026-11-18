@@ -1,0 +1,15 @@
+# Continued five-curve block work
+
+This timestamped checkpoint supersedes the operational state in BLOCK_CONTINUATION.md without rewriting it. The objective remains actual complete first-use e2e performance over matched regular scalar multiplication. P-192 primary, P-224/P-256/P-384/P-521 all retained; no success from count/qualification/PR state.
+
+The 27,090-row frozen block-tuning census and 80 minimum-set replay are complete. All 400 selected point/count checks and four fault controls passed as recorded. Full relation D+A is 230,265,303,451,611 versus prior selected direct 228,260,300,449,606 and matched folded binary 229,260,300,450,606. Weights 2-4 also lose. This rejects the finite family's declared count prediction, not a global chain or runtime conclusion. Local results have no signed PCC standing. [pcc:unverified]
+
+Source 850a36dd03da, freeze 24b03006a877, guarded launch b700cb0bb8fa preceded data. Raw publication 84cb43d91459 precedes reports. Bot be6490725cd3 externalized only the 110,312-byte archive; ARTIFACT_LOCATOR.md supplies hash and derived URI, with no agent S3 read. Native use 17/20 includes the failed compile and controlled replays; no scan repeat. Existing frozen source remains unchanged. [pcc:unverified]
+
+After the user chose this host, V4 freeze/launch 3d22ec698fe0 and PR update preceded its one preflight. It refused: 4.24 other CPU-seconds over two seconds > 0.2; PSI 0/0; no timing worker/rows, held-out launch or retry. Raw records a10b64427cd5 and block-v4/ retain this refusal. A question asking quiet-window start/readiness is pending. Do not restart, repeatedly probe busy admission, stop other jobs or infer host quietness from the host preference. [pcc:unverified]
+
+Reports block-tuning-20261109T1810Z (two pages) and block-window-20261109T1840Z (one page) were rendered and all pages inspected. Full planning/allocation, normalization, output verification and destruction remain within the qualified cold worker, with eleven regular/binary references and paired A/A gates unchanged. No actual e2e timing exists. [pcc:unverified]
+
+Delivery: PR3674 open with auto-merge enabled at last read. Shared November9 log conflict unresolved; Copilot was asked first and its no-response fallback was explicitly recorded. The guarded local merge aborted before editing when ownership changed. At this checkpoint T-2014 holds both shared log and PCC namespace; do not bypass. No canonical PCC claim has been registered; pcc-submission-draft.json is explicitly a draft. Recheck scopes and exact hosted head before further delivery.
+
+Source followup while timing waits: inspect per-transition heap use in the existing DP, and implement a separate bounded inline representation if it can preserve program/cost/tie semantics. Qualify against the frozen old planner, independent GMP cases and point outputs before any use. No source change authorizes a timing retry; publish source/protocol/PR before future data. No new cloud spending, quota/role/cap changes or Diem/old-followup restart. Diem receipt is deadline-expired, pending false, launcher null, 50 of 52 durable; do not launch a duplicate.

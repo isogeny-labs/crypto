@@ -132,8 +132,10 @@ impl Fq {
         *a == E2::ZERO || self.pow(a, self.order() / 2) == E2::ONE
     }
     pub fn random(&self, rng: &mut StdRng) -> E2 {
-        super::jv_bitops::rng_words(2);
-        E2([rng.gen_range(0..self.p), rng.gen_range(0..self.p)])
+        E2([
+            super::jv_bitops::uniform_mod_u64(rng, 0, self.p),
+            super::jv_bitops::uniform_mod_u64(rng, 0, self.p),
+        ])
     }
     /// Tonelli–Shanks in `F_{p²}^×`.
     pub fn sqrt(&self, a: &E2, rng: &mut StdRng) -> Option<E2> {
@@ -1290,6 +1292,15 @@ impl WeilForms {
 pub struct ZeroDimStats {
     pub degree_reached: u32,
     pub solving_degree: u32,
+    /// Final-basis Hilbert observations from explicitly instrumented F4 runs.
+    /// These are not formal fall-degree or regularity invariants and never
+    /// change counted work or the stopping rule.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub staircase_extinction_degree: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_muls: u64,
@@ -1462,6 +1473,9 @@ pub fn solve_zero_dim_mode(
     st.f4_muls = r.field_ops;
     st.degree_reached = r.degree_reached;
     st.solving_degree = r.solving_degree;
+    st.first_hilbert_deviation_degree = r.first_hilbert_deviation_degree;
+    st.last_hilbert_deviation_degree = r.last_hilbert_deviation_degree;
+    st.staircase_extinction_degree = r.staircase_extinction_degree;
     st.max_rows = r.max_rows;
     st.max_cols = r.max_cols;
     st.f4_ms = r.ms;
@@ -2668,6 +2682,14 @@ pub struct NagaoCost {
     pub post_muls: u64,
     pub delta: usize,
     pub degree_reached: u32,
+    /// Optional final-basis Hilbert observations carried from the F4 solve.
+    /// These are not formal fall-degree or regularity invariants.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub staircase_extinction_degree: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_ms: f64,
@@ -2768,6 +2790,9 @@ pub fn nagao_decompose(
     cost.lin_muls = st.lin_muls;
     cost.delta = st.delta;
     cost.degree_reached = st.degree_reached;
+    cost.first_hilbert_deviation_degree = st.first_hilbert_deviation_degree;
+    cost.last_hilbert_deviation_degree = st.last_hilbert_deviation_degree;
+    cost.staircase_extinction_degree = st.staircase_extinction_degree;
     cost.max_rows = st.max_rows;
     cost.max_cols = st.max_cols;
     cost.f4_ms = st.f4_ms;
@@ -4804,6 +4829,98 @@ mod tests {
             applied >= n - 3,
             "applied {applied} fallbacks {fallbacks} of {n}"
         );
+    }
+
+    /// Explicit Hilbert observations preserve solutions and counted work. A
+    /// regular sequence's computed staircase expires at n+1; an extra relation
+    /// can reduce that staircase. Neither observation is a formal degree fall.
+    #[test]
+    fn solve_zero_dim_records_opt_in_hilbert_observations() {
+        let p = 101u64;
+        // x_i^2 - 1 in n variables.
+        let quad = |i: usize, n: usize| -> f4_fp::Poly {
+            let mut e = vec![0u32; n];
+            e[i] = 2;
+            vec![(e, 1u64), (vec![0u32; n], p - 1)]
+        };
+        let opts = jv_options(6, 120.0).recording_hilbert_diagnostics();
+        let mut rng = StdRng::seed_from_u64(0x0D_FA11);
+
+        // Regular sequence {x^2 - 1, y^2 - 1}: realized Hilbert == semi-regular
+        // prediction at every degree; staircase extinction is n + 1 = 3.
+        let reg: Vec<f4_fp::Poly> = (0..2).map(|i| quad(i, 2)).collect();
+        let (sols, st) = solve_zero_dim(&reg, 2, p, &opts, &mut rng);
+        let mut baseline_rng = StdRng::seed_from_u64(0x0D_FA11);
+        let (mut baseline_solutions, baseline) =
+            solve_zero_dim(&reg, 2, p, &jv_options(6, 120.0), &mut baseline_rng);
+        let mut observed_solutions = sols.clone();
+        baseline_solutions.sort();
+        observed_solutions.sort();
+        assert_eq!(baseline_solutions, observed_solutions);
+        assert_eq!(baseline.f4_muls, st.f4_muls);
+        assert_eq!(baseline.lin_muls, st.lin_muls);
+        assert!(baseline.first_hilbert_deviation_degree.is_none());
+        assert!(baseline.last_hilbert_deviation_degree.is_none());
+        assert!(baseline.staircase_extinction_degree.is_none());
+        let default_json = serde_json::to_value(&baseline).unwrap();
+        for field in [
+            "first_hilbert_deviation_degree",
+            "last_hilbert_deviation_degree",
+            "staircase_extinction_degree",
+        ] {
+            assert!(default_json.get(field).is_none());
+        }
+        assert_eq!(
+            st.staircase_extinction_degree,
+            Some(3),
+            "regular sequence: staircase extinction is n+1"
+        );
+        assert_eq!(
+            st.first_hilbert_deviation_degree, None,
+            "regular sequence has no Hilbert deviation"
+        );
+        // All four rational roots (±1, ±1) are found and every returned point
+        // satisfies the system (recording did not perturb the solve).
+        for w in [[1u64, 1], [1, 100], [100, 1], [100, 100]] {
+            assert!(
+                sols.iter().any(|s| s[0] == w[0] && s[1] == w[1]),
+                "missing root {w:?} among {sols:?}"
+            );
+        }
+        for s in &sols {
+            assert_eq!((s[0] * s[0]) % p, 1);
+            assert_eq!((s[1] * s[1]) % p, 1);
+        }
+
+        // Over-determined consistent system {x^2-1, y^2-1, xy-1}: the third
+        // relation cuts the four points to {(1,1), (-1,-1)}, reducing the final staircase.
+        let xy: f4_fp::Poly = vec![(vec![1u32, 1u32], 1u64), (vec![0u32, 0u32], p - 1)];
+        let over: Vec<f4_fp::Poly> = vec![quad(0, 2), quad(1, 2), xy];
+        let (sols2, st2) = solve_zero_dim(&over, 2, p, &opts, &mut rng);
+        assert!(
+            st2.staircase_extinction_degree.is_some(),
+            "staircase extinction recorded on the over-determined system"
+        );
+        if let (Some(f), Some(l)) = (
+            st2.first_hilbert_deviation_degree,
+            st2.last_hilbert_deviation_degree,
+        ) {
+            assert!(
+                f <= l,
+                "first deviation {f} must not exceed last deviation {l}"
+            );
+        }
+        for w in [[1u64, 1], [100, 100]] {
+            assert!(
+                sols2.iter().any(|s| s[0] == w[0] && s[1] == w[1]),
+                "missing root {w:?} among {sols2:?}"
+            );
+        }
+        for s in &sols2 {
+            assert_eq!((s[0] * s[0]) % p, 1);
+            assert_eq!((s[1] * s[1]) % p, 1);
+            assert_eq!((s[0] * s[1]) % p, 1, "xy = 1");
+        }
     }
 
     #[test]

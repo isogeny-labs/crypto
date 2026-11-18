@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T19:20:27Z",
+ "id": "PCC-20261116-102d1d",
+ "kind": "theorem",
+ "producer": {
+  "commit": "5f7c710d6d9b3f442107d9d97425b2b4d04ed283",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ba71311335a8812adda8eacfb09efd231ec9c57e40b71f7d61f2f572d425206f",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+   "theorem": "CubicCofactorWordBridge22307.word_sub_value"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact normalized UInt64 multiply/subtract/cofactor model at223/3, decoded Fin223 polynomial plus raw canonical values, explicit normalization and overflow counterexample. Both unchanged original gates42/0 underj1/120/default memory. Not Rust compiler/base inverse/universal field/Jacobian/counter/runtime or signed standing.",
+ "statement": "theorem word_sub_value (a b : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) : (wordSub a b).toNat= if b.toNat\u2264a.toNat then a.toNat-b.toNat else a.toNat+223-b.toNat"
+}

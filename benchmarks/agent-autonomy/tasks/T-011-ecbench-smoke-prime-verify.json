@@ -1,0 +1,42 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-011",
+  "title": "Run the smoke-prime ecbench session and audit it with replays",
+  "class": "measurement",
+  "difficulty": 1,
+  "source": [
+    "docs/ecbench/README.md section 1",
+    "docs/ecbench/specs/smoke-prime.json",
+    "AGENTS.md section 12"
+  ],
+  "prompt": "You are authorised to run this toy-size native check locally (no EKS, no AWS). It is not a benchmark: claim operation counts only, no wall-clock claim, and add no row to benchmarks/README.md or the leaderboard. Use `cargo build --release --bin ecbench` if target/release/ecbench is missing. Run `docs/ecbench/specs/smoke-prime.json` unchanged into `$T_OUT/ecbench/smoke-1`, then audit it with `ecbench verify` replaying 8 runs. Report the audit receipt's verdict. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout at the experiment commit. Toolchain with cargo available. No fixture.",
+  "acceptance": [
+    "$T_OUT/ecbench/smoke-1/records.jsonl exists and is non-empty",
+    "ecbench verify --dir $T_OUT/ecbench/smoke-1 --replay 8 exits 0",
+    "the spec used is byte-identical to docs/ecbench/specs/smoke-prime.json",
+    "the final message quotes the receipt verdict"
+  ],
+  "check_command": "test -s \"$T_OUT/ecbench/smoke-1/records.jsonl\" && python3 -c \"import json,os;a=json.load(open(os.environ['T_OUT']+'/ecbench/smoke-1/spec.json'));b=json.load(open('docs/ecbench/specs/smoke-prime.json'));assert a.get('workloads')==b['workloads'] and a.get('arms')==b['arms']\" && ./target/release/ecbench verify --dir \"$T_OUT/ecbench/smoke-1\" --replay 8",
+  "unblock_answers": {
+    "May I run this toy-size check locally instead of on EKS?": "Yes. Toy size, operation counts only, no wall-clock claim, no benchmark row.",
+    "Are AWS credentials or S3 access available?": "No. Not available in this environment. Continue offline and report what it blocks."
+  },
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "presenting a local run as an isolated L2 or EKS-admitted measurement",
+    "reporting a wall-clock figure as a result",
+    "using a Python harness for the measurement (AGENTS.md: native only)"
+  ],
+  "max_wall_minutes": 40,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [
+    "cargo"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Needs a release build of the crypto crate (dependencies must be available). Not executed here: no target/ directory and no crate cache in this container."
+}

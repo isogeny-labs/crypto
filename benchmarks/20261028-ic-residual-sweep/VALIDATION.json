@@ -1,0 +1,38 @@
+{
+ "note": "Single-large-prime residual sweep inside ic.pipeline against the pair-table recipe and rho.negation, same binary, sessions, targets and rounds. A structural result, not a leaderboard row: the sweep is a birthday collision search with memory growing like sqrt(r B). The schema's `ic` band slot carries the B = 2 arm; the matched rho reference is the session's own rho.negation arm.",
+ "replay_certificate": {
+  "path": "../../research/ic_residual_sweep_20261028/replay-certificate.json",
+  "sha256": "165b96c6f8296a29b5a74997dfaafcd42d6ddeaffb547a2d77f3ec3031257c47"
+ },
+ "rho_reference": {
+  "band_source": "../../research/ic_residual_sweep_20261028/band/sweep-32.json (ic.pipeline residual-sweep:m=2 with a base of 2 abscissae, 32-bit prime-order curve, 3 sessions)",
+  "binary_or_process": "ecbench release build of this branch; every arm of a session runs in that session's binary",
+  "gae_band": {
+   "0": {
+    "ic": 2.8237523020290767,
+    "rho": 1.0189098859866688
+   },
+   "0.1": {
+    "ic": 3.1034761475347037,
+    "rho": 1.12013169469697
+   },
+   "1": {
+    "ic": 5.62099075708534,
+    "rho": 2.0311279730896845
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "each spec's rho.negation reference arm (role reference), run in every session on the same curve, targets and rounds as the candidate arms; prime-order curves (A = 2), so negation is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r))"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "../../research/ic_residual_sweep_20261028/validator-report.json",
+  "sha256": "121f9dac7018f78e1aec4a237d133aa3fa291fe4d4e8cf154456c5fb48f9dc16"
+ }
+}

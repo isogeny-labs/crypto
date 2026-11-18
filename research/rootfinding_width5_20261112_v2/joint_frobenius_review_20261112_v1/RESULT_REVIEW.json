@@ -1,0 +1,52 @@
+{
+  "schema": "independent-recorded-evidence-review/v1",
+  "created_utc": "2026-11-12T05:15:17.617784+00:00",
+  "decision": "PASSED_SPECIAL_FAMILY_CORRECTNESS_COST_MIXED",
+  "operation": "Parsed recorded bytes, canonical target/source coverage, complete target-root batch equality and timing-statistic recomputation; no measured algorithm or field arithmetic re-executed.",
+  "raw_sha256": "94dc9e615dc5d1ba627e74ad8989395ea4b0e1f5e3029a91ee5dfc8b3beabdac",
+  "controls_fields": 5,
+  "complete_canonical_correctness_targets": 46309,
+  "ordered_source_pairs_partitioned": 373,
+  "profile_records": 18,
+  "complete_profile_target_rows": 18642,
+  "all_profile_batches_equal_correctness_records": true,
+  "recorded_predicates": 111980,
+  "profile_summaries": [
+    {
+      "cost_prediction_supported": false,
+      "d": 2,
+      "diagnostic_component_ratio": 0.9055338259110819,
+      "frobenius_median_seconds": 0.00022720299966749735,
+      "indexed_median_seconds": 0.00020574000154738314,
+      "nonempty_targets": 9,
+      "p": 3,
+      "q": 9,
+      "targets": 81
+    },
+    {
+      "cost_prediction_supported": false,
+      "d": 3,
+      "diagnostic_component_ratio": 0.8856526860953233,
+      "frobenius_median_seconds": 0.001237046999449376,
+      "indexed_median_seconds": 0.0010955939978884999,
+      "nonempty_targets": 25,
+      "p": 5,
+      "q": 25,
+      "targets": 625
+    },
+    {
+      "cost_prediction_supported": true,
+      "d": 3,
+      "diagnostic_component_ratio": 1.380126998170837,
+      "frobenius_median_seconds": 0.0037309110011847224,
+      "indexed_median_seconds": 0.005149131000507623,
+      "nonempty_targets": 49,
+      "p": 7,
+      "q": 49,
+      "targets": 2401
+    }
+  ],
+  "wall_seconds": 0.4664876339993498,
+  "peak_process_rss_kib": 38064,
+  "scope": "Exact only for the declared invertible Fp-source quadratic-extension map. O(q)cache/O(q\u00b2)output; no curve/global original roots, signed PCC, novelty, or qualified GB8x standing."
+}

@@ -1,0 +1,13 @@
+Amendment 17 gate, stage C t = 2, m = 6 (P1, Kummer, draw 0), run on the 4-vCPU session host. [pcc:unverified]
+
+Rebuilt row vs committed pfdC_summary.json draw (frozen image, EKS):
+  equal: x_r 832376253, ffd 4, falls [4, 5, 6], last closure degree c = 7, cols 61183
+  both:  censored by the 1800 s wall budget at c = 7 (reference "stopped by budget at c=7", 1840 s;
+         rebuild censored=budget at c = 7, 1984 s)
+  differs: closure muladds 1919888251154 (reference) vs 1249366296975 (rebuild)
+
+Reading: a wall-budget censoring, the host effect Amendment 17 names. The multiply-add count of a closure stopped by
+its wall budget measures how far the elimination got before the stop, so it is host-dependent and is not a
+binary-identity field for budget-censored rows. Every field that does not depend on the stop point agrees.
+Draw 1 and the P0 m = 6 cells were not completed locally (run stopped to free the host); they add no information
+beyond the budget censoring. No uncensored row disagrees anywhere in the gate (66 draws, 558 checks).
