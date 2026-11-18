@@ -564,10 +564,10 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
 #ifdef __CUDA_ARCH__
     const int inv_len = CHUNK;
 #else
-    /* Benchmark on CHUNK=32: extend the previous 24/32 cutoff to
-     * 27/32; 28..32 retain fixed-length code to avoid near-full regressions.
-     * Scale the cutoff as floor(27*CHUNK/32) for other CHUNK values. */
-    const int inv_len = cnt <= (uint32_t)((27 * CHUNK) / 32) ? (int)cnt : CHUNK;
+    /* Only change the tested CHUNK=32 case. Other chunk sizes retain
+     * the previous 3/4 cutoff until independently benchmarked. */
+    const int cutoff = CHUNK == 32 ? 27 : (3 * CHUNK) / 4;
+    const int inv_len = cnt <= (uint32_t)cutoff ? (int)cnt : CHUNK;
 #endif
     elt acc = d[0];
 #pragma unroll
