@@ -1002,6 +1002,183 @@ impl RadicalRootCtx {
 mod tests {
     use super::*;
 
+    // Frozen immediate-pre-optimization Tonelli path (no p=5 mod 8 shortcut).
+    fn sqrt_before_mod8_5(ctx: &RadicalRootCtx, a: u64) -> Option<u64> {
+        let f = &ctx.f;
+        if a == 0 { return Some(0); }
+        if f.p % 4 == 3 {
+            let r = f.powm(a, (f.p + 1) / 4);
+            return if f.sqr(r) == a { Some(r) } else { None };
+        }
+        let a = if ctx.t2 == 1 && a >= f.p { a % f.p } else { a };
+        let (mut t, half_power) = if ctx.t2 == 1 {
+            (a, 1)
+        } else if ctx.t2 >= 1_024 {
+            let h = f.powm(a, (ctx.t2 - 1) / 2);
+            (f.mul(f.sqr(h), a), h)
+        } else {
+            (f.powm(a, ctx.t2), 0)
+        };
+        let mut legendre = t;
+        for _ in 1..ctx.s2 { legendre = f.sqr(legendre); }
+        if legendre != 1 { return None; }
+        let mut m = ctx.s2;
+        let mut c = ctx.zc;
+        let mut r = if ctx.t2 == 1 { a }
+            else if ctx.t2 >= 1_024 { f.mul(half_power, a) }
+            else { f.powm(a, ctx.t2.div_ceil(2)) };
+        loop {
+            if t == 1 { return Some(r); }
+            let mut i = 0u32;
+            let mut t2 = t;
+            while t2 != 1 && i < m { t2 = f.sqr(t2); i += 1; }
+            if i == m { return None; }
+            let mut b = c;
+            for _ in 0..(m - i - 1) { b = f.sqr(b); }
+            m = i;
+            c = f.sqr(b);
+            t = f.mul(t, c);
+            r = f.mul(r, b);
+        }
+    }
+
+    #[derive(Clone, Copy)]
+    struct Fq2BeforeCube(Fq2);
+    impl Ring for Fq2BeforeCube {
+        type E = (u64, u64);
+        fn zero(&self) -> Self::E { self.0.zero() }
+        fn one(&self) -> Self::E { self.0.one() }
+        fn mul(&self, x: Self::E, y: Self::E) -> Self::E { self.0.mul(x, y) }
+        fn sqr(&self, x: Self::E) -> Self::E { self.0.sqr(x) }
+        // Intentionally uses Ring::cube default (old sqr+mul).
+        fn pow(&self, x: Self::E, e: u128) -> Self::E { self.0.pow(x, e) }
+        fn order(&self) -> u128 { self.0.order() }
+        fn cand(&self, k: u64) -> Self::E { self.0.cand(k) }
+    }
+
+    #[test]
+    fn fp2_cube_norm_and_mod8_sqrt_match_previous_algorithm() {
+        let primes = [13u64, 29, 101, 487, 17_497, 998_244_353,
+                      1_000_000_009, MAX_PRIME];
+        let mut state = 0x631a_ef35_8f61_2071u64;
+        for p in primes {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let q = Fq2 { f: ctx.f, n: ctx.n };
+            for _ in 0..2048 {
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = state % p;
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let b = state % p;
+                let x = (a,b);
+                assert_eq!(q.cube(x), q.mul(x, q.sqr(x)), "cube p={p}");
+                let old_norm = ctx.f.sub(ctx.f.sqr(a), ctx.f.mul(ctx.n, ctx.f.sqr(b)));
+                assert_eq!(q.norm(x), old_norm, "norm p={p}");
+            }
+        }
+        for p in [13u64, 29, 101, 1_000_037, 536_870_909,
+                  1_000_000_021, 2_147_483_693] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            assert_eq!(p % 8, 5);
+            for _ in 0..4096 {
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = state % p;
+                for v in [a, ctx.f.sqr(a), ctx.f.mul(ctx.n, ctx.f.sqr(a))] {
+                    let old = sqrt_before_mod8_5(&ctx, v);
+                    let new = ctx.sqrt(v);
+                    assert_eq!(old.is_some(), new.is_some(), "sqrt status p={p} v={v}");
+                    if let Some(r) = new {
+                        assert_eq!(ctx.f.sqr(r), v, "bad sqrt p={p} v={v}");
+                    }
+                }
+            }
+        }
+        for p in [487u64, 17_497, 1_000_000_009] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let old = Cube::new(Fq2BeforeCube(ctx.cube_q.r));
+            for _ in 0..128 {
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = state % p;
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let b = state % p;
+                assert_eq!(old.root((a,b)), ctx.cube_q.root((a,b)),
+                           "Fp2 AMM p={p}");
+            }
+        }
+    }
+
+    #[test]
+    #[ignore]
+    fn bench_fp2_cubing_and_mod8_sqrt_actual_rust() {
+        fn sample<T: Copy, F: Fn(T) -> u64>(xs: &[T], reps: usize, f: &F) -> f64 {
+            let start = std::time::Instant::now();
+            let mut check = 0u64;
+            for _ in 0..reps {
+                for &x in xs {
+                    check = check.wrapping_add(std::hint::black_box(
+                        f(std::hint::black_box(x))
+                    ));
+                }
+            }
+            std::hint::black_box(check);
+            start.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+        fn paired<T: Copy, B: Fn(T)->u64, A: Fn(T)->u64>(
+            name: &str, xs: &[T], reps: usize, before: B, after: A,
+        ) {
+            let mut old = Vec::new();
+            let mut new = Vec::new();
+            for i in 0..13 {
+                if i % 2 == 0 {
+                    old.push(sample(xs, reps, &before));
+                    new.push(sample(xs, reps, &after));
+                } else {
+                    new.push(sample(xs, reps, &after));
+                    old.push(sample(xs, reps, &before));
+                }
+            }
+            old.sort_by(|x,y| x.total_cmp(y));
+            new.sort_by(|x,y| x.total_cmp(y));
+            let (a,b) = (old[6],new[6]);
+            println!("{name} before={a:.3}ns after={b:.3}ns speedup={:.3}x",a/b);
+        }
+        let mut seed = 0xadef_6143_2026_1118u64;
+        for p in [487u64,17_497,998_244_353,1_000_000_009,MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let q = ctx.cube_q.r;
+            let mut xs = Vec::new();
+            for _ in 0..512 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let b = seed % p;
+                xs.push((a,b));
+            }
+            paired(&format!("p={p} fp2 cube"), &xs, 100,
+                   |x| { let y=q.mul(x,q.sqr(x)); y.0 ^ y.1 },
+                   |x| { let y=q.cube(x); y.0 ^ y.1 });
+            paired(&format!("p={p} seven fp2 cubes"), &xs, 25,
+                   |mut x| { for _ in 0..7 { x=q.mul(x,q.sqr(x)); } x.0 ^ x.1 },
+                   |mut x| { for _ in 0..7 { x=q.cube(x); } x.0 ^ x.1 });
+        }
+        for p in [536_870_909u64, 1_000_000_021, 2_147_483_693] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let mut squares = Vec::new();
+            let mut nonsquares = Vec::new();
+            for _ in 0..512 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let v = seed % p;
+                squares.push(ctx.f.sqr(v));
+                nonsquares.push(ctx.f.mul(ctx.n,ctx.f.sqr(v)));
+            }
+            for (name,xs) in [("squares",squares),("nonsquares",nonsquares)] {
+                paired(&format!("p={p} sqrt {name}"), &xs, 35,
+                       |x| sqrt_before_mod8_5(&ctx,x).unwrap_or(u64::MAX),
+                       |x| ctx.sqrt(x).unwrap_or(u64::MAX));
+            }
+        }
+    }
+
+
     #[test]
     fn frobenius_fp2_power_matches_frozen_binary_and_cube_root() {
         let mut seed = 0x52f1_911a_2026_1118u64;
