@@ -27,4 +27,6 @@ for ax, (degree, block, baby, title) in zip(axes.flat, cases):
     ax.spines[["top", "right"]].set_visible(False)
 fig.suptitle("Small development controls · same outputs, different batch caps", fontsize=13)
 fig.savefig(Path(__file__).with_name("normalization.svg"))
+svg = Path(__file__).with_name("normalization.svg")
+svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
 fig.savefig("/tmp/conductor-batch-normalization.png", dpi=150)

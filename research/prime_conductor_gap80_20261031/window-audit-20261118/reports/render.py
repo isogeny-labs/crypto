@@ -36,3 +36,5 @@ fig.text(0.5, 0.02,
          ha="center", fontsize=9)
 fig.tight_layout(rect=(0, 0.08, 1, 0.93))
 fig.savefig(here / "schedules.svg", bbox_inches="tight")
+svg = here / "schedules.svg"
+svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
