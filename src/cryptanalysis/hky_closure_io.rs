@@ -60,6 +60,8 @@ pub struct ExportReport {
     pub column_order: u32,
     pub contains_one: bool,
     pub seconds: f64,
+    /// The write error, if the export failed (no file then).
+    pub error: Option<String>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -72,6 +74,9 @@ pub struct IoReport {
     pub resumed_at_batch: u64,
     pub export: Option<ExportReport>,
     pub elapsed_total_s: f64,
+    /// Checkpoints that could not be written (disk full, I/O error).
+    pub checkpoint_failures: u64,
+    pub last_checkpoint_error: Option<String>,
 }
 
 // ── stop requests ──────────────────────────────────────────────────────
@@ -211,16 +216,23 @@ struct HW<W: Write> {
     w: W,
     h: Sha256,
     n: u64,
+    /// The first write error; later writes are skipped (disk full must not
+    /// kill a multi-day closure: the caller discards the file and goes on).
+    err: Option<std::io::Error>,
 }
 
 impl<W: Write> HW<W> {
     fn new(w: W) -> Self {
-        HW { w, h: Sha256::new(), n: 0 }
+        HW { w, h: Sha256::new(), n: 0, err: None }
     }
     fn put(&mut self, b: &[u8]) {
         self.h.update(b);
         self.n += b.len() as u64;
-        self.w.write_all(b).expect("hky_closure_io: write");
+        if self.err.is_none() {
+            if let Err(e) = self.w.write_all(b) {
+                self.err = Some(e);
+            }
+        }
     }
     fn u8(&mut self, x: u8) {
         self.put(&[x]);
@@ -253,12 +265,35 @@ impl<W: Write> HW<W> {
         self.put(&buf);
     }
     /// Appends the digest (not hashed) and returns it.
-    fn finish(mut self) -> ([u8; 32], W, u64) {
+    fn finish(mut self) -> std::io::Result<([u8; 32], W, u64)> {
         let d: [u8; 32] = self.h.clone().finalize().into();
-        self.w.write_all(&d).expect("hky_closure_io: write");
+        if let Some(e) = self.err.take() {
+            return Err(e);
+        }
+        self.w.write_all(&d)?;
         let n = self.n + 32;
-        (d, self.w, n)
+        Ok((d, self.w, n))
     }
+}
+
+/// Flush, fsync and rename a finished stream; any error removes `tmp`.
+fn seal(
+    res: std::io::Result<([u8; 32], BufWriter<File>, u64)>,
+    tmp: &Path,
+    fin: &Path,
+) -> std::io::Result<([u8; 32], u64)> {
+    let out = (|| {
+        let (d, bw, n) = res?;
+        let f = bw.into_inner().map_err(|e| e.into_error())?;
+        f.sync_all()?;
+        drop(f);
+        fs::rename(tmp, fin)?;
+        Ok((d, n))
+    })();
+    if out.is_err() {
+        let _ = fs::remove_file(tmp);
+    }
+    out
 }
 
 struct HR<R: Read> {
@@ -389,7 +424,15 @@ pub(super) fn checkpoint_now(io: &IoOptions, fp: &[u8; 32], st: &ClosureState, r
     fs::create_dir_all(&dir).expect("hky_closure_io: create checkpoint dir");
     let tmp = dir.join("state.ckpt.tmp");
     let fin = dir.join("state.ckpt");
-    let f = File::create(&tmp).expect("hky_closure_io: create state.ckpt.tmp");
+    let f = match File::create(&tmp) {
+        Ok(f) => f,
+        Err(e) => {
+            rep.checkpoint_failures += 1;
+            rep.last_checkpoint_error = Some(e.to_string());
+            eprintln!("hky3 checkpoint FAILED to create {} ({e})", tmp.display());
+            return;
+        }
+    };
     let mut w = HW::new(BufWriter::with_capacity(8 << 20, f));
     w.put(CKPT_MAGIC);
     w.put(fp);
@@ -439,11 +482,17 @@ pub(super) fn checkpoint_now(io: &IoOptions, fp: &[u8; 32], st: &ClosureState, r
             }
         }
     }
-    let (digest, bw, bytes) = w.finish();
-    let f = bw.into_inner().expect("hky_closure_io: flush checkpoint");
-    f.sync_all().expect("hky_closure_io: fsync checkpoint");
-    drop(f);
-    fs::rename(&tmp, &fin).expect("hky_closure_io: rename checkpoint");
+    let (digest, bytes) = match seal(w.finish(), &tmp, &fin) {
+        Ok(x) => x,
+        Err(e) => {
+            // a failed checkpoint (disk full, I/O error) is reported, not fatal:
+            // the previous checkpoint stays, the closure goes on
+            rep.checkpoint_failures += 1;
+            rep.last_checkpoint_error = Some(e.to_string());
+            eprintln!("hky3 checkpoint FAILED ({e}); tmp removed, previous checkpoint kept");
+            return;
+        }
+    };
     fsync_dir(&dir);
     let rank: usize = st.ech.iter().map(|e| e.rows.len()).sum();
     let queued: usize = st.queue.iter().map(|b| b.len()).sum();
@@ -853,11 +902,23 @@ pub(super) fn export_basis(
         }
     }
     assert_eq!(written, rank, "hky.basis/v1: rank");
-    let (digest, bw, bytes) = w.finish();
-    let f = bw.into_inner().expect("hky.basis/v1: flush");
-    f.sync_all().expect("hky.basis/v1: fsync");
-    drop(f);
-    fs::rename(&tmp, path).expect("hky.basis/v1: rename");
+    let (digest, bytes) = match seal(w.finish(), Path::new(&tmp), Path::new(path)) {
+        Ok(x) => x,
+        Err(e) => {
+            eprintln!("hky.basis/v1: export FAILED ({e}); {tmp} removed");
+            return ExportReport {
+                path: path.to_string(),
+                n_cols: n_cols as u64,
+                rank,
+                profile,
+                column_order: if split { 1 } else { 0 },
+                contains_one,
+                seconds: t0.elapsed().as_secs_f64(),
+                error: Some(e.to_string()),
+                ..ExportReport::default()
+            };
+        }
+    };
     // whole-file hash, read back from disk
     let mut h = Sha256::new();
     let mut rd = BufReader::with_capacity(8 << 20, File::open(path).expect("hky.basis/v1: reopen"));
@@ -880,5 +941,6 @@ pub(super) fn export_basis(
         column_order: if split { 1 } else { 0 },
         contains_one,
         seconds: t0.elapsed().as_secs_f64(),
+        error: None,
     }
 }

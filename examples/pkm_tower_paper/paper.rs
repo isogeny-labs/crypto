@@ -286,11 +286,13 @@ pub fn run(argv: &[String]) {
             let ex = st.io.export.as_ref().map(|e| {
                 json!({"path": e.path, "content_sha256": e.content_sha256, "file_sha256": e.file_sha256,
                        "bytes": e.bytes, "n_cols": e.n_cols, "rank": e.rank, "profile": e.profile,
-                       "column_order": e.column_order, "contains_one": e.contains_one, "seconds": e.seconds})
+                       "column_order": e.column_order, "contains_one": e.contains_one, "seconds": e.seconds,
+                       "error": e.error})
             });
             let io = json!({"checkpoints": st.io.checkpoints, "last_checkpoint_bytes": st.io.last_checkpoint_bytes,
                 "checkpoint_s": st.io.checkpoint_s, "resumed_from": st.io.resumed_from, "resumes": st.io.resumes,
                 "resumed_at_batch": st.io.resumed_at_batch, "elapsed_total_s": st.io.elapsed_total_s,
+                "checkpoint_failures": st.io.checkpoint_failures, "last_checkpoint_error": st.io.last_checkpoint_error,
                 "export": ex});
             let o = &opts;
             let ej = json!({"name": "hky_fp_tower_fast2", "symmetry": st.symmetry, "part_cols": st.part_cols,
@@ -360,7 +362,7 @@ pub fn run(argv: &[String]) {
         "rayon_threads": rayon::current_num_threads(),
     });
     // sidecar of an exported basis
-    if let Some(ex) = rec["io"]["export"].as_object() {
+    if let Some(ex) = rec["io"]["export"].as_object().filter(|e| e["error"].is_null()) {
         let path = ex["path"].as_str().unwrap().to_string();
         let side = json!({
             "schema": "hky.basis.sidecar/v1",
