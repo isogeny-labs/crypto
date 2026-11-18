@@ -46,7 +46,10 @@ This map is written before the first H116 Lean declaration.
    normalized isogeny at-infinity series and proves that it satisfies
    transformed equation (14). The formal-group congruence for `V-1` is a
    separate endpoint premise unless an existing verified elliptic formal-group
-   theorem is located.
+   theorem is located. A finite reversed numerator/denominator certificate is
+   now proved sufficient for transformed equation (14), so the map bridge can
+   be discharged by a checked polynomial identity rather than a trusted map
+   evaluator.
    [pcc:unverified]
 6. **Inheritance table.** Below. A blank or `lookup pending` entry blocks the
    first Lean edit.
@@ -87,6 +90,7 @@ This map is written before the first H116 Lean declaration.
 | normalized rational-map curve equation implies equation (15) | generic law | H116 Lean module | differential field, coordinate `x`, map `R`, curve coefficients | coefficients constant under the derivation, `D x=1`, `D R≠0`, equation (14) |
 | transformed equation (14) implies transformed equation (15) | instance law | H116 Lean module | field, source/target coefficients, normalized PowerSeries | `NormalizedIsogenyFirstOrderEquation`; the normalized series definition proves the cancelled factor nonzero |
 | transformed equation (14) forces the initial coefficients and finite recurrence | instance law | H116 Lean module | field or `ZMod p`, source/target coefficients, normalized PowerSeries | nonzero 5, 7 and recurrence denominators; prime specialization uses `p>19` |
+| reversed numerator/denominator certificate implies transformed equation (14) and the recurrence | instance law | H116 Lean module | field or `ZMod p`, normalized series, finite polynomials `N,D` | `D(0)=1`, `DU=N`, one displayed cleared-denominator polynomial identity; prime specialization uses `p>19` |
 | transformed normalized-isogeny equation implies the finite recurrence | instance law | H116 Lean module | field or `ZMod p`, source/target coefficients, coefficient function | PowerSeries equation (15), initial `h₁,h₂`; generic denominator premises or prime `p>19` |
 | `Y_j` fiber identity | endpoint | H116 | isogeny coordinate data | normalized differential formula, non-2-torsion target |
 | Frobenius low-jet specialization | instance obligation or explicit premise | crypto-lean candidate | elliptic formal group | ordinary `E/F_p`, `V+pi=[t]` |
@@ -100,7 +104,7 @@ This map is written before the first H116 Lean declaration.
 | finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
 | finite sums and coefficient extraction | Mathlib finite sums plus proved H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
 | field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
-| isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; both generic and transformed equation (14)-to-(15) implications are proved, while constructing the actual at-infinity series and proving transformed equation (14) remain open; crypto-lean lookup pending |
+| isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; no Mathlib isogeny object was found, so a finite `N,D` certificate is the checked interface; producing it from the actual kernel and independently validating map semantics remain open |
 | `V+pi=[t]` and `pi(z)=z^p` | H115 algebra plus formal-group instance; lookup pending |
 | radix-six decoder | reuse H115 generic theorem after source import/binding |
 

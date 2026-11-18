@@ -106,6 +106,41 @@ theorem transformedFirstOrderEquation_implies_secondOrder
   apply (mul_right_cancel₀ hseparable)
   linear_combination 3 * hcurve - w * hd
 
+/-- A cleared-denominator certificate for a quotient `U=N/D` implies the
+transformed first-order curve equation. The auxiliary numerator
+`D(N-wN')+wD'N` is exactly `D²(U-wU')`; clearing the target equation therefore
+costs the visible factor `D⁴`. -/
+theorem quotientCertificate_implies_firstOrderEquation
+    {A : Type*} [CommRing A] [IsDomain A] [Algebra K A]
+    (w U Up N Np D Dp sourceA sourceB targetA targetB : A)
+    (hD : D ≠ 0)
+    (hquot : D * U = N)
+    (hderiv : Dp * U + D * Up = Np)
+    (hcert :
+      (1 + sourceA * w ^ 2 + sourceB * w ^ 3) *
+          (D * (N - w * Np) + w * Dp * N) ^ 2 =
+        D * N ^ 3 + targetA * w ^ 2 * N * D ^ 3 +
+          targetB * w ^ 3 * D ^ 4) :
+    (1 + sourceA * w ^ 2 + sourceB * w ^ 3) *
+        (U - w * Up) ^ 2 =
+      U ^ 3 + targetA * w ^ 2 * U + targetB * w ^ 3 := by
+  have hH : D * (N - w * Np) + w * Dp * N = D ^ 2 * (U - w * Up) := by
+    rw [← hquot, ← hderiv]
+    ring
+  apply (mul_left_cancel₀ (pow_ne_zero 4 hD))
+  calc
+    D ^ 4 * ((1 + sourceA * w ^ 2 + sourceB * w ^ 3) *
+        (U - w * Up) ^ 2) =
+        (1 + sourceA * w ^ 2 + sourceB * w ^ 3) *
+          (D ^ 2 * (U - w * Up)) ^ 2 := by ring
+    _ = (1 + sourceA * w ^ 2 + sourceB * w ^ 3) *
+          (D * (N - w * Np) + w * Dp * N) ^ 2 := by rw [hH]
+    _ = D * N ^ 3 + targetA * w ^ 2 * N * D ^ 3 +
+          targetB * w ^ 3 * D ^ 4 := hcert
+    _ = D ^ 4 * (U ^ 3 + targetA * w ^ 2 * U + targetB * w ^ 3) := by
+      rw [← hquot]
+      ring
+
 /-- A factored fiber polynomial has logarithmic derivative equal to the sum of
 its reciprocal linear factors. Root multiplicities are represented by indices. -/
 theorem rootProductLogDeriv (D : Derivation K L L) {ι : Type*} [DecidableEq ι]
@@ -312,6 +347,70 @@ def NormalizedIsogenyFirstOrderEquation
       PowerSeries.C sourceB * PowerSeries.X ^ 3) * W ^ 2 =
     U ^ 3 + PowerSeries.C targetA * PowerSeries.X ^ 2 * U +
       PowerSeries.C targetB * PowerSeries.X ^ 3
+
+/-- Checkable cleared-denominator certificate for a normalized rational map at
+infinity. `N` and `D` are the reversed numerator and denominator series. The
+constant coefficient condition both fixes the denominator normalization and
+proves that it is nonzero. -/
+def NormalizedRationalMapSeriesCertificate
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (N D : PowerSeries K) : Prop :=
+  let U := normalizedMapAtInfinitySeries h
+  let Np := PowerSeries.derivative N
+  let Dp := PowerSeries.derivative D
+  let H := D * (N - PowerSeries.X * Np) + PowerSeries.X * Dp * N
+  PowerSeries.constantCoeff D = 1 ∧
+    D * U = N ∧
+    (1 + PowerSeries.C sourceA * PowerSeries.X ^ 2 +
+        PowerSeries.C sourceB * PowerSeries.X ^ 3) * H ^ 2 =
+      D * N ^ 3 + PowerSeries.C targetA * PowerSeries.X ^ 2 * N * D ^ 3 +
+        PowerSeries.C targetB * PowerSeries.X ^ 3 * D ^ 4
+
+/-- Finite polynomial wrapper for the series certificate. Coercion into
+PowerSeries preserves multiplication and formal differentiation, so a producer
+can emit ordinary reversed numerator and denominator polynomials. -/
+def NormalizedRationalMapPolynomialCertificate
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (N D : Polynomial K) : Prop :=
+  NormalizedRationalMapSeriesCertificate sourceA sourceB targetA targetB h N D
+
+/-- A valid reversed rational-map certificate supplies transformed equation
+(14), with quotient differentiation and every denominator cancellation proved
+inside Lean. -/
+theorem NormalizedRationalMapSeriesCertificate.to_firstOrder
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (N D : PowerSeries K)
+    (hcert : NormalizedRationalMapSeriesCertificate
+      sourceA sourceB targetA targetB h N D) :
+    NormalizedIsogenyFirstOrderEquation sourceA sourceB targetA targetB h := by
+  let U := normalizedMapAtInfinitySeries h
+  let Up := PowerSeries.derivative U
+  change PowerSeries.constantCoeff D = 1 ∧ D * U = N ∧ _ at hcert
+  rcases hcert with ⟨hconst, hquot, hpoly⟩
+  have hD : D ≠ 0 := by
+    intro hzero
+    rw [hzero] at hconst
+    exact zero_ne_one hconst
+  have hderiv := congrArg PowerSeries.derivative hquot
+  simp only [PowerSeries.derivative.leibniz, smul_eq_mul] at hderiv
+  have hfirst := quotientCertificate_implies_firstOrderEquation
+    (K := K) (A := PowerSeries K)
+    PowerSeries.X U Up N (PowerSeries.derivative N) D
+      (PowerSeries.derivative D) (PowerSeries.C sourceA)
+      (PowerSeries.C sourceB) (PowerSeries.C targetA)
+      (PowerSeries.C targetB) hD hquot
+      (by simpa [Up, add_comm, mul_comm] using hderiv) hpoly
+  simpa [NormalizedIsogenyFirstOrderEquation, U, Up] using hfirst
+
+/-- Finite polynomial certificates are accepted by the same checked bridge. -/
+theorem NormalizedRationalMapPolynomialCertificate.to_firstOrder
+    (sourceA sourceB targetA targetB : K) (h : ℕ → K)
+    (N D : Polynomial K)
+    (hcert : NormalizedRationalMapPolynomialCertificate
+      sourceA sourceB targetA targetB h N D) :
+    NormalizedIsogenyFirstOrderEquation sourceA sourceB targetA targetB h := by
+  exact NormalizedRationalMapSeriesCertificate.to_firstOrder
+    sourceA sourceB targetA targetB h N D hcert
 
 /-- Equation (15) of Bostan--Morain--Salvy--Schost after substituting
 `R(x)=x U(1/x)` and multiplying by `w²`. It is written in distributed form so
@@ -604,6 +703,20 @@ theorem BostanJetRecurrence.of_normalizedFirstOrderEquation_zmod
     sourceA sourceB targetA targetB h hfirst h5 h7
       (fun k hk3 hk7 ↦ bostanStepDenominatorsNonzero hp hk3 hk7)
 
+/-- A finite reversed numerator/denominator certificate implies the complete
+H116 recurrence over every prime field in the frozen characteristic range. -/
+theorem BostanJetRecurrence.of_normalizedRationalMapPolynomialCertificate_zmod
+    {p : ℕ} [Fact p.Prime] (hp : 19 < p)
+    (sourceA sourceB targetA targetB : ZMod p) (h : ℕ → ZMod p)
+    (N D : Polynomial (ZMod p))
+    (hcert : NormalizedRationalMapPolynomialCertificate
+      sourceA sourceB targetA targetB h N D) :
+    BostanJetRecurrence sourceA sourceB targetA targetB h := by
+  exact BostanJetRecurrence.of_normalizedFirstOrderEquation_zmod hp
+    sourceA sourceB targetA targetB h
+      (NormalizedRationalMapPolynomialCertificate.to_firstOrder
+        sourceA sourceB targetA targetB h N D hcert)
+
 /-- The seven coefficients satisfying the H116 recurrence are unique. -/
 theorem BostanJetRecurrence.unique
     {sourceA sourceB targetA targetB : K} {h g : ℕ → K}
@@ -662,6 +775,7 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms denominator_cancellation
 #print axioms normalizedMapEquation_implies_secondOrder
 #print axioms transformedFirstOrderEquation_implies_secondOrder
+#print axioms quotientCertificate_implies_firstOrderEquation
 #print axioms rootProductLogDeriv
 #print axioms rootPowerSumOfCoeff
 #print axioms relativeCoeffCancellation
@@ -682,10 +796,13 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms bostanStepDenominatorsNonzero
 #print axioms NormalizedIsogenyFirstOrderEquation.to_secondOrder
 #print axioms NormalizedIsogenyFirstOrderEquation.base_coefficients
+#print axioms NormalizedRationalMapSeriesCertificate.to_firstOrder
+#print axioms NormalizedRationalMapPolynomialCertificate.to_firstOrder
 #print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation
 #print axioms BostanJetRecurrence.of_normalizedSecondOrderEquation_zmod
 #print axioms BostanJetRecurrence.of_normalizedFirstOrderEquation
 #print axioms BostanJetRecurrence.of_normalizedFirstOrderEquation_zmod
+#print axioms BostanJetRecurrence.of_normalizedRationalMapPolynomialCertificate_zmod
 #print axioms BostanJetRecurrence.unique
 #print axioms fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 

@@ -56,6 +56,26 @@ frozen recurrence. The remaining geometric bridge must construct the actual
 normalized isogeny at-infinity series and prove that it satisfies this one
 first-order identity. [pcc:unverified]
 
+The remaining interface now has a finite certificate form. For reversed
+numerator and denominator polynomials `N,D`, put
+
+```text
+H = D(N-wN') + wD'N.
+```
+
+`NormalizedRationalMapPolynomialCertificate` checks `D(0)=1`, `DU=N`, and
+
+```text
+(1+A w²+B w³)H²
+  = D N³ + Atilde w² N D³ + Btilde w³ D⁴.
+```
+
+Lean proves that this cleared-denominator identity implies transformed
+equation (14), then the complete recurrence for prime `p>19`. Producing and
+independently validating `N,D` for the actual isogeny remains open; the
+certificate theorem does not assert that arbitrary polynomials are an isogeny.
+[pcc:unverified]
+
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 
 ```text

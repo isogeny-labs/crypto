@@ -99,6 +99,15 @@ is to construct the actual normalized isogeny at-infinity series and prove that
 it satisfies this first-order PowerSeries equation; no theorem here constructs
 that map. [pcc:unverified]
 
+The open geometric bridge now has an explicit finite proof-carrying interface.
+`NormalizedRationalMapPolynomialCertificate` accepts reversed numerator and
+denominator polynomials `N,D`, checks the quotient relation and the single
+cleared-denominator curve identity, and Lean proves that certificate implies
+the first-order equation and hence the complete recurrence for prime `p>19`.
+This moves the remaining obligation to producing and independently checking
+the actual rational-map polynomials; it does not treat a supplied polynomial
+pair as an isogeny without that identity. [pcc:unverified]
+
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
 `(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying

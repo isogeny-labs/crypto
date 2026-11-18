@@ -6,23 +6,23 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-2ee3b8292ddfb9d6217c1f1905884a33618552d9f7bd1ac309530814e80c8865  H116FiberTrace.lean
+02bb36792047afa035deec587c9384cf280757b18238cba0e50059601d892890  H116FiberTrace.lean
 ```
 
 The repository proof gate built both the default target and the explicitly
 tracked source, then transitively audited all theorem declarations:
 
 ```text
-PASS  35 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS  39 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
 
 ```text
-8f2cb91239545043c068321eb647f6a3fa7bb1454a790c04159e9c26aec10f9c  receipts/audit.log
-1628728cf2a1a40e707e79dbc83656061e87861685df4b9058a9b12c1b6b3cb1  receipts/build.log
+7eb41219460d3a3c930e0e274286733919b89920f100b92470e017c84425e24e  receipts/audit.log
+f2844539a43530ba73f9528e689930f4178326c39545928acc948bef6687c542  receipts/build.log
 29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483  receipts/cache.log
-e61cc471b66de7953befd50eb7054f4b72b988303270642fd69b45f120c3ab44  receipts/source-build.log
+47c0205156651285d6a4d5a8dab1ea2d7cf9817d2769f1de78b4cc2459fe53b0  receipts/source-build.log
 c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/status.txt
 6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
 ```
@@ -56,9 +56,13 @@ its constant coefficient. It proves that the degree-two and degree-three
 coefficients of transformed equation (14) force the two initial jet identities,
 then packages the chain showing that this one first-order identity implies the
 complete recurrence for prime `p>19`. It does not yet construct the actual
-normalized isogeny at-infinity series, prove that series satisfies transformed
-equation (14), or construct the `V-1` formal jet, a scalar predicate or an
-ECDLP decoder. [pcc:unverified]
+normalized isogeny at-infinity series or prove that series satisfies transformed
+equation (14). It does, however, define a finite reversed polynomial
+numerator/denominator certificate, prove the cleared-denominator identity
+implies transformed equation (14), and compose that certificate to the complete
+prime-field recurrence. Producing and independently validating those
+polynomials for the actual isogeny, the `V-1` formal jet, a scalar predicate and
+an ECDLP decoder remain open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made
