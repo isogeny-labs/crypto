@@ -1,0 +1,2 @@
+prefix=/workspace/tools/conductor-native/usr
+c++ -O2 -Wall -Wextra -Werror -std=c++17 -isystem "$prefix/include" -isystem "$prefix/include/x86_64-linux-gnu" research/prime_conductor_gap80_20261031/construction-audit-20261118/cm_prerequisites.cpp /tmp/conductor-native-build/optimized.o -L"$prefix/lib/x86_64-linux-gnu" -Wl,-rpath,"$prefix/lib/x86_64-linux-gnu" -lpari -lflint -lgmpxx -lgmp -lcrypto -o /tmp/conductor-construction-audit-20261118/cm-prerequisites-v2

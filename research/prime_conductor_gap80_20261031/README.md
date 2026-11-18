@@ -1,5 +1,11 @@
 # Native log-norm optimization and 80-bit candidate evidence
 
+The [18 November source construction audit](construction-audit-20261118/README.md)
+checks explicit CM action on the actual kernel and the specific
+single-power-of-two torsion prerequisites for a higher-dimensional route.
+Its source-only checks do not supply the degree-ell quotient or images.
+[pcc:unverified]
+
 The [18 November fixed published Lucas reconstruction](published-lucas-20261118/README.md)
 checks a 3673-bit prime Frobenius conductor at extension degree 7351,
 with a complete PARI ECPP certificate and fresh-process replay. The source

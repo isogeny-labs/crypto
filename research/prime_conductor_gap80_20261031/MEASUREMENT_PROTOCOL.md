@@ -84,6 +84,13 @@ native/build/measurement_preflight 729845429276318409687041 137438953472
 
 ## Required measurements once prerequisites pass
 
+The [source construction audit](construction-audit-20261118/README.md)
+checks CM stability and full-two-power-torsion extension orders using the
+frozen CM trace. Its degree-2 source endomorphisms and kernel pairing are
+not evaluations of the requested degree-ell map. Neither that audit nor
+the separate larger Frobenius conductor certificate closes any measurement
+item below. Other smooth-torsion constructions remain open.
+
 1. **Construction.** Freeze source/binary hashes and exact parameters.
    Record complete setup, quotient construction, verification, peak RSS,
    memory limit, timeout, CPU seconds and wall seconds separately. Retain
