@@ -178,9 +178,12 @@ proof of the implementation.
 The generated JSON is 467,669 bytes, so repository policy excludes it from a
 direct Git commit.  It remains a local replay result until publication through
 the content-addressed artifact store at a committed producer revision.
-Release publication, cross-repository mirror parity, required CI/review, and
-recovery of the separately missing admitted hydration artifact also remain
-open.
+Cryptanalysis draft revision
+`010f1bdb5a24d6d6b3cccbca3fcd5264c245c1c2` records local source parity
+against crypto implementation revision
+`6cb5ab1edb141b48b9a9767fc63fe95ba1aac217`; final mirror CI and review remain
+open.  Release publication and recovery of the separately missing admitted
+hydration artifact also remain open.
 
 # Structured unsupported cases and next work
 
@@ -193,8 +196,7 @@ The next bounded engineering steps are:
 1. regenerate the complete binary certificate corpus at the committed
    producer revision, publish it through the artifact store, and replay its
    hash from the packaged executable;
-2. mirror the stable transfer sources and fixtures into `cryptanalysis` and
-   compare the output byte-for-byte;
+2. close required CI and review on the exact-source cryptanalysis mirror;
 3. add independent full arithmetic replay for the balanced odd-prime source,
    then extend one explicitly selected unsupported model family; and
 4. publish a packaged standalone binary only after the evidence-store, CI,
@@ -224,7 +226,3 @@ pandoc \
   --lua-filter=research/curve_transfer_infrastructure_20261118/vector-image-for-latex.lua \
   -o research/curve_transfer_infrastructure_20261118/REPORT.pdf
 ```
-
-The diagram is qualitative; no benchmark was run and no quantitative
-performance graph is applicable.  Existing scoreboards and performance graphs
-therefore do not change in this slice.
