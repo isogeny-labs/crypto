@@ -2893,4 +2893,132 @@ mod tests {
         }
     }
 
+
+    // Frozen before-cache variant, retaining the repeated per-root cubings
+    // and squarings of the 3-Sylow correction constants.
+    fn root_before_cached_sylow<R: Ring>(cube: &Cube<R>, a: R::E) -> Option<R::E> {
+        let r = &cube.r;
+        if a == r.zero() { return Some(a); }
+        if cube.s <= 2 { return cube.root(a); }
+        let t = cube.n / cube.p3s;
+        let g = r.pow(a, t);
+        let mut residue = g;
+        for _ in 1..cube.s { residue = r.cube(residue); }
+        if residue != r.one() { return None; }
+        let x0 = r.pow(a, cube.e3);
+        let h = if t % 3 == 1 { r.mul(g, g) } else { g };
+        if h == r.one() { return Some(x0); }
+        let w2 = r.mul(cube.w, cube.w);
+        let mut correction = r.one();
+        let mut root_correction = r.one();
+        let mut previous_power = cube.c_inv;
+        let mut inverse_power = r.cube(cube.c_inv);
+        for j in 1..cube.s {
+            let mut z = r.mul(h, correction);
+            for _ in (j + 1)..cube.s { z = r.cube(z); }
+            let digit = if z == r.one() { 0 }
+                        else if z == cube.w { 1 }
+                        else if z == w2 { 2 }
+                        else { return None };
+            if digit != 0 {
+                let factor = if digit == 1 { previous_power }
+                             else { r.mul(previous_power, previous_power) };
+                root_correction = r.mul(root_correction, factor);
+                if j + 1 < cube.s {
+                    let term = if digit == 1 { inverse_power }
+                               else { r.mul(inverse_power, inverse_power) };
+                    correction = r.mul(correction, term);
+                }
+            }
+            previous_power = inverse_power;
+            if j + 1 < cube.s { inverse_power = r.cube(inverse_power); }
+        }
+        Some(r.mul(x0, root_correction))
+    }
+
+    #[test]
+    fn cached_sylow_factors_match_precache_roots() {
+        let mut seed = 0x2026_cafe_17b0_ade2u64;
+        for &p in &[7u64, 17, 97, 163, 487, 1459, 17_497,
+                     998_244_353, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            for _ in 0..512 {
+                let a = lcg(&mut seed) % p;
+                let b = lcg(&mut seed) % p;
+                let fq = (a, b);
+                let fq_cube = ctx.cube_q.r.cube(fq);
+                let fp_cube = ctx.f.mul(a, ctx.f.sqr(a));
+                for x in [a, fp_cube] {
+                    assert_eq!(root_before_cached_sylow(&ctx.cube_p, x),
+                               ctx.cube_p.root(x), "Fp p={p} x={x}");
+                }
+                for x in [fq, fq_cube] {
+                    assert_eq!(root_before_cached_sylow(&ctx.cube_q, x),
+                               ctx.cube_q.root(x), "Fp2 p={p} x={x:?}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired actual-production-Rust Sylow factor cache benchmark"]
+    fn bench_cached_sylow_factors() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn measure<R: Ring>(ctx: &Cube<R>, xs: &[R::E], cached: bool) -> f64 {
+            let start = Instant::now();
+            let mut checksum = 0usize;
+            for _ in 0..12 {
+                for &x in xs {
+                    let v = if cached { ctx.root(black_box(x)) }
+                            else { root_before_cached_sylow(ctx, black_box(x)) };
+                    checksum = checksum.wrapping_add(usize::from(v.is_some()));
+                    black_box(v);
+                }
+            }
+            black_box(checksum);
+            start.elapsed().as_nanos() as f64 / (xs.len() * 12) as f64
+        }
+        fn paired<R: Ring>(name: &str, ctx: &Cube<R>, xs: &[R::E]) {
+            for &x in xs {
+                assert_eq!(root_before_cached_sylow(ctx, x), ctx.root(x), "{name}");
+            }
+            let (mut b, mut a) = (Vec::new(), Vec::new());
+            for k in 0..13 {
+                if k % 2 == 0 {
+                    b.push(measure(ctx, xs, false));
+                    a.push(measure(ctx, xs, true));
+                } else {
+                    a.push(measure(ctx, xs, true));
+                    b.push(measure(ctx, xs, false));
+                }
+            }
+            b.sort_by(f64::total_cmp);
+            a.sort_by(f64::total_cmp);
+            println!("{name}: {:.3} -> {:.3} ns/root ({:.3}x)",
+                     b[6], a[6], b[6] / a[6]);
+        }
+        let mut seed = 0xcace_2026_1118_1700u64;
+        for &p in &[163u64, 487, 1459, 17_497, 1_000_000_009] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let mut fp_cubes = Vec::new();
+            let mut fq_cubes = Vec::new();
+            let mut fq_mixed = Vec::new();
+            for _ in 0..384 {
+                let a = lcg(&mut seed) % p;
+                let b = lcg(&mut seed) % p;
+                fp_cubes.push(ctx.f.mul(a, ctx.f.sqr(a)));
+                let qx = (a, b);
+                fq_cubes.push(ctx.cube_q.r.cube(qx));
+                fq_mixed.push(qx);
+            }
+            paired(&format!("Fp p={p} s={}: cubes", ctx.cube_p.s),
+                   &ctx.cube_p, &fp_cubes);
+            paired(&format!("Fp2 p={p} s={}: cubes", ctx.cube_q.s),
+                   &ctx.cube_q, &fq_cubes);
+            paired(&format!("Fp2 p={p} s={}: mixed", ctx.cube_q.s),
+                   &ctx.cube_q, &fq_mixed);
+        }
+    }
+
 }
