@@ -327,6 +327,7 @@ pub mod nist_seed_provenance;
 pub mod nonanom_formal_log;
 pub mod orbit_homology;
 pub mod orbit_pair_table;
+pub mod order_free_hyperelliptic_ic;
 pub mod p192_cm_norm_sieve;
 pub mod p192_cm_relation_search;
 pub mod p192_interval_bsgs;

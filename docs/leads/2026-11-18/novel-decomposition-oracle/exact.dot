@@ -1,0 +1,13 @@
+digraph exact_oracle {
+    graph [bgcolor="transparent", rankdir=LR, nodesep=0.23, ranksep=0.32, pad=0.10]
+    node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.13,0.09", color="#9AADB9", fillcolor="#F0F6F9", fontcolor="#17303F"]
+    edge [color="#587482", arrowsize=0.63]
+    network [label="Pinned Boolean network\nHalf-edge grouping"]
+    factors [label="Integral crossing factors\nTwo directional widths"]
+    recursion [label="Grid recursion\nCubic clique schedule"]
+    count [label="Exact Boolean count\nResidue modulo 2^(s+1)", fillcolor="#DFEFF0", color="#79A4A6"]
+    network -> recursion
+    factors -> recursion
+    recursion -> count
+    {rank=same; network; factors}
+}
