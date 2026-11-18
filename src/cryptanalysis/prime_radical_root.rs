@@ -108,9 +108,24 @@ impl Fp {
         self.mul(a, a)
     }
     pub fn powm(&self, a: u64, e: u64) -> u64 {
-        // Share the adaptive exponentiation core with Fp2. Inputs here may
-        // be noncanonical, while the generic Ring path expects field values.
-        rpow(self, a % self.p, e as u128)
+        // Actual production-Rust timing shows the new generic window
+        // regresses at the 61-bit Mersenne modulus. Keep the original
+        // binary Fp path there; Fp2 still benefits from adaptive rpow.
+        if self.p == MAX_PRIME {
+            let mut b = a % self.p;
+            let mut exponent = e;
+            let mut acc = 1u64;
+            while exponent > 0 {
+                if exponent & 1 != 0 {
+                    acc = self.mul(acc, b);
+                }
+                b = self.sqr(b);
+                exponent >>= 1;
+            }
+            acc
+        } else {
+            rpow(self, a % self.p, e as u128)
+        }
     }
     pub fn inv(&self, a: u64) -> u64 {
         // Extended Euclid replaces ~log(p) Fermat squarings/multiplies on
@@ -561,10 +576,16 @@ impl RadicalRootCtx {
             Some(0) => vec![f.mul(f.neg(b), self.inv2)],
             Some(s) => {
                 let nb = f.neg(b);
-                // Root sum is -b: derive the second root with one subtraction
-                // rather than another modular multiplication by inv2.
+                // Rust benchmarks show Vieta's subtraction is faster
+                // for the 61-bit modulus but slower for native 32-bit primes.
+                // Retain the original second multiplication on small fields.
                 let first = f.mul(f.add(nb, s), self.inv2);
-                vec![first, f.sub(nb, first)]
+                let second = if f.p > u32::MAX as u64 {
+                    f.sub(nb, first)
+                } else {
+                    f.mul(f.sub(nb, s), self.inv2)
+                };
+                vec![first, second]
             }
         }
     }
@@ -1011,6 +1032,12 @@ mod tests {
                 let want_first = f.mul(f.add(nb, s), ctx.inv2);
                 let want_second = f.mul(f.sub(nb, s), ctx.inv2);
                 assert_eq!(f.sub(nb, want_first), want_second, "quad p={p}");
+                let selected = if p > u32::MAX as u64 {
+                    f.sub(nb, want_first)
+                } else {
+                    f.mul(f.sub(nb, s), ctx.inv2)
+                };
+                assert_eq!(selected, want_second, "selected quad p={p}");
             }
         }
     }
@@ -1089,7 +1116,11 @@ mod tests {
                    |(b, s)| {
                        let nb = f.neg(b);
                        let a = f.mul(f.add(nb, s), ctx.inv2);
-                       let c = f.sub(nb, a);
+                       let c = if p > u32::MAX as u64 {
+                           f.sub(nb, a)
+                       } else {
+                           f.mul(f.sub(nb, s), ctx.inv2)
+                       };
                        a ^ c
                    });
         }
