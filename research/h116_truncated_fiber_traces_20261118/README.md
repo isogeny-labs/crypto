@@ -307,7 +307,13 @@ nonsingular short-Weierstrass curve outside characteristic two has coprime
 Mathlib division polynomials `Phi_2,Psi_2^2`.  Combining this with the reduced
 quotient theorem proves the exact coordinate extension degree
 `[F(X):F(Phi_2/Psi_2^2)]=4`.  Arbitrary `n`, the curve-map identification and
-the H116 pullback fields remain open. [pcc:unverified]
+the H116 pullback fields remain open.  The next Lean checkpoint repeats the
+construction at scalar three with a degree-eight extended-Euclid witness whose
+constant is `64*(4*A^3+27*B^2)^2`.  It proves coprimality of Mathlib's
+`Phi_3,Psi_3^2` and exact reduced coordinate degree nine outside the stated
+characteristic exclusions; the singular `A=B=0` pair over `ZMod 5` is a
+proved negative control.  These fixed-scalar results do not establish the
+generic-`n` premise. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

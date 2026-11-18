@@ -958,6 +958,158 @@ theorem scalarMultiplicationXMap_characteristic_control :
     (3 : ZMod 3) = 0 := by
   exact ZMod.natCast_self 3
 
+/-- The univariate scalar-three division polynomial specialized to a short
+Weierstrass equation. -/
+noncomputable def shortWeierstrassScalarThreePsi
+    (F : Type*) [CommRing F] (A B : F) : Polynomial F :=
+  C 3 * X ^ 4 + C (6 * A) * X ^ 2 + C (12 * B) * X - C (A ^ 2)
+
+/-- The short-Weierstrass cubic used by the scalar-three numerator. -/
+noncomputable def shortWeierstrassScalarThreeCubic
+    (F : Type*) [CommRing F] (A B : F) : Polynomial F :=
+  X ^ 3 + C A * X + C B
+
+/-- The auxiliary degree-six factor in the scalar-three numerator. -/
+noncomputable def shortWeierstrassScalarThreeAux
+    (F : Type*) [CommRing F] (A B : F) : Polynomial F :=
+  X ^ 6 + C (5 * A) * X ^ 4 + C (20 * B) * X ^ 3 -
+    C (5 * A ^ 2) * X ^ 2 - C (4 * A * B) * X -
+    C (8 * B ^ 2) - C (A ^ 3)
+
+/-- The scalar-three x-coordinate numerator in factored division-polynomial
+form. -/
+noncomputable def shortWeierstrassScalarThreePhi
+    (F : Type*) [CommRing F] (A B : F) : Polynomial F :=
+  X * shortWeierstrassScalarThreePsi F A B ^ 2 -
+    C 8 * shortWeierstrassScalarThreeCubic F A B *
+      shortWeierstrassScalarThreeAux F A B
+
+/-- A degree-eight explicit Bezout certificate proves coprimality of the
+scalar-three numerator and division polynomial on a nonsingular short curve
+outside characteristic two. -/
+theorem shortWeierstrassScalarThree_explicit_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    IsCoprime (shortWeierstrassScalarThreePhi F A B)
+      (shortWeierstrassScalarThreePsi F A B) := by
+  let d : F := 4 * A ^ 3 + 27 * B ^ 2
+  let U : Polynomial F :=
+    C 27 * (C (15 * A) * X + C (27 * B) + C 7 * X ^ 3)
+  let V : Polynomial F :=
+    -C (1024 * A ^ 4) - C (2499 * A ^ 3) * X ^ 2 -
+      C (2487 * A ^ 2 * B) * X - C (1785 * A ^ 2) * X ^ 4 -
+      C (7992 * A * B ^ 2) + C (2286 * A * B) * X ^ 3 +
+      C (747 * A) * X ^ 6 - C (3924 * B ^ 2) * X ^ 2 +
+      C (6057 * B) * X ^ 5 - C 63 * X ^ 8
+  have hbezout :
+      U * shortWeierstrassScalarThreePhi F A B +
+        V * shortWeierstrassScalarThreePsi F A B = C (64 * d ^ 2) := by
+    dsimp [U, V, shortWeierstrassScalarThreePhi,
+      shortWeierstrassScalarThreePsi, shortWeierstrassScalarThreeCubic,
+      shortWeierstrassScalarThreeAux, d]
+    simp only [map_add, map_mul, map_pow, map_ofNat]
+    ring
+  have h64 : (64 : F) ≠ 0 := by
+    rw [show (64 : F) = (2 : F) ^ 6 by norm_num]
+    exact pow_ne_zero 6 h2
+  have hc : 64 * d ^ 2 ≠ 0 := mul_ne_zero h64 (pow_ne_zero 2 hdisc)
+  refine Exists.intro (C (64 * d ^ 2)⁻¹ * U) ?_
+  refine Exists.intro (C (64 * d ^ 2)⁻¹ * V) ?_
+  calc
+    _ = C (64 * d ^ 2)⁻¹ *
+        (U * shortWeierstrassScalarThreePhi F A B +
+          V * shortWeierstrassScalarThreePsi F A B) := by ring
+    _ = C (64 * d ^ 2)⁻¹ * C (64 * d ^ 2) := by rw [hbezout]
+    _ = C ((64 * d ^ 2)⁻¹ * (64 * d ^ 2)) := Polynomial.C_mul.symm
+    _ = 1 := by rw [inv_mul_cancel₀ hc, Polynomial.C_1]
+
+/-- Mathlib's exact scalar-three division-polynomial numerator and squared
+denominator are coprime on a nonsingular short-Weierstrass curve outside
+characteristic two. -/
+theorem shortWeierstrassScalarThree_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.Φ 3) (W.ΨSq 3) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have hq : W.Ψ₃ = shortWeierstrassScalarThreePsi F A B := by
+    dsimp [W, WeierstrassCurve.Ψ₃, WeierstrassCurve.b₂,
+      WeierstrassCurve.b₄, WeierstrassCurve.b₆, WeierstrassCurve.b₈,
+      shortWeierstrassScalarThreePsi]
+    norm_num [Polynomial.C_mul, Polynomial.C_ofNat]
+    ring
+  have hcubic : W.Ψ₂Sq =
+      C (4 : F) * shortWeierstrassScalarThreeCubic F A B := by
+    dsimp [W, WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂,
+      WeierstrassCurve.b₄, WeierstrassCurve.b₆,
+      shortWeierstrassScalarThreeCubic]
+    norm_num [Polynomial.C_mul, Polynomial.C_ofNat]
+    ring
+  have haux : W.preΨ₄ =
+      C (2 : F) * shortWeierstrassScalarThreeAux F A B := by
+    dsimp [W, WeierstrassCurve.preΨ₄, WeierstrassCurve.b₂,
+      WeierstrassCurve.b₄, WeierstrassCurve.b₆, WeierstrassCurve.b₈,
+      shortWeierstrassScalarThreeAux]
+    norm_num [Polynomial.C_mul, Polynomial.C_ofNat]
+    ring
+  have hphi : W.Φ 3 = shortWeierstrassScalarThreePhi F A B := by
+    rw [WeierstrassCurve.Φ_three, hq, haux, hcubic]
+    dsimp [shortWeierstrassScalarThreePhi]
+    norm_num [Polynomial.C_mul, Polynomial.C_ofNat]
+    ring
+  have hpsi : W.ΨSq 3 = shortWeierstrassScalarThreePsi F A B ^ 2 := by
+    rw [WeierstrassCurve.ΨSq_three, hq]
+  have hbase := shortWeierstrassScalarThree_explicit_isCoprime A B hdisc h2
+  change IsCoprime (W.Φ 3) (W.ΨSq 3)
+  rw [hphi, hpsi]
+  exact hbase.pow_right
+
+/-- The reduced scalar-three x-coordinate quotient has rational-function
+coordinate extension degree exactly nine outside characteristics two and
+three. -/
+theorem shortWeierstrassScalarThree_extension_degree
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) (h3 : (3 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    let xMap : RatFunc F :=
+      algebraMap (Polynomial F) (RatFunc F) (W.Φ 3) /
+        algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 3)
+    Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 9 := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  let xMap : RatFunc F :=
+    algebraMap (Polynomial F) (RatFunc F) (W.Φ 3) /
+      algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 3)
+  have h3z : ((3 : ℤ) : F) ≠ 0 := by
+    norm_num
+    exact h3
+  have hcoprime : IsCoprime (W.Φ 3) (W.ΨSq 3) :=
+    shortWeierstrassScalarThree_isCoprime A B hdisc h2
+  have hdenom : W.ΨSq 3 ≠ 0 := W.ΨSq_ne_zero h3z
+  have hextension := reducedRationalQuotient_extension_degree
+    (W.Φ 3) (W.ΨSq 3) hdenom hcoprime
+  have hdegrees := scalarMultiplicationXMap_exact_degrees W 3 h3z
+  change Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 9
+  rw [hextension]
+  norm_num at hdegrees ⊢
+  omega
+
+/-- Singular negative control: at `A=B=0`, the displayed scalar-three
+numerator and squared denominator both vanish at `X=0`, so they cannot be
+coprime. -/
+theorem shortWeierstrassScalarThree_singular_control :
+    ¬IsCoprime
+      (shortWeierstrassScalarThreePhi (ZMod 5) 0 0)
+      (shortWeierstrassScalarThreePsi (ZMod 5) 0 0 ^ 2) := by
+  let _ : Fact (Nat.Prime 5) := Fact.mk (by norm_num)
+  intro h
+  have heval := h.map (Polynomial.evalRingHom (0 : ZMod 5))
+  norm_num [shortWeierstrassScalarThreePhi,
+    shortWeierstrassScalarThreePsi, shortWeierstrassScalarThreeCubic,
+    shortWeierstrassScalarThreeAux] at heval
+
 /-- Specialize the Frobenius--Verschiebung ring calculation to additive
 endomorphisms of a point group. Integer scalars are central automatically, and
 pointwise injectivity of Frobenius supplies cancellation of left composition.
@@ -2975,6 +3127,10 @@ theorem rationalMap_separation_strict_control :
 #print axioms scalarMultiplicationXMap_leadingCoefficients
 #print axioms scalarMultiplicationXMap_denominator_degree_lt_of_char_dvd
 #print axioms scalarMultiplicationXMap_characteristic_control
+#print axioms shortWeierstrassScalarThree_explicit_isCoprime
+#print axioms shortWeierstrassScalarThree_isCoprime
+#print axioms shortWeierstrassScalarThree_extension_degree
+#print axioms shortWeierstrassScalarThree_singular_control
 #print axioms endomorphism_frobeniusVerschiebung_sum
 #print axioms endomorphism_injectivity_control
 #print axioms affineFrobeniusPointEnd_injective

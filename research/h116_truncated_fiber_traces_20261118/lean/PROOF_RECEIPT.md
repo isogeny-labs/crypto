@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-8ceb943498a0d5fd8d20541961b6899603387fe2f625da6f141705ea4beccf8b  H116FiberTrace.lean
+50496085a3c01d8cf7afd8e921611f0e3e8e8882fdb7e4b97826ba634e3401a2  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  142 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  150 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -66,6 +66,8 @@ a9be1857e0b978b1b0a5cff9ca238ae04b13e02c00023384e481b1ec45d70eb2  receipts/funct
 af1f55a38f86370e51a9e4038009738a845709279204f56dbc3e487737715f11  receipts/no-cancellation-audit.txt
 ea01d069a7682bd04bb64a5aa113cba204622e24b66ef16a0fd376403eb8f584  receipts/scalar-two-coprimality-build.txt
 597fdddd8ad379ed42f458a779b17367c87ff4a4878412bcd2e30d57a274a73c  receipts/scalar-two-coprimality-audit.txt
+912ad7b074051d0da17a004b556754ab5aeb2c4932d8aa788c23a3225afdf3f9  receipts/scalar-three-coprimality-build.txt
+5731fc9c7bc418dc7f99cdd3b422f4618771e1843776691afc5736f5b66aaecc  receipts/scalar-three-coprimality-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -298,6 +300,16 @@ with the generic reduced-quotient theorem proves
 `n=2`; it does not establish arbitrary-scalar coprimality, identify the
 quotient with the scheme morphism, or prove a subexponential ECDLP bound.
 [pcc:unverified]
+
+The 150-theorem checkpoint extends the same concrete bridge to scalar three.
+An explicit degree-eight extended-Euclid witness proves the scalar-three
+numerator coprime to `Psi_3`; `IsCoprime.pow_right` and Mathlib's exact
+division-polynomial formulas prove `IsCoprime (Phi 3) (PsiSq 3)`.  Outside
+characteristics two and three the reduced quotient consequently satisfies
+`[F(X):F(Phi_3/Psi_3^2)]=9`.  A singular `A=B=0` control over `ZMod 5` is
+proved not coprime by mapping evaluation at zero.  This remains a fixed-scalar
+coordinate result, not arbitrary-scalar coprimality or a curve-map/ECDLP
+complexity theorem. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

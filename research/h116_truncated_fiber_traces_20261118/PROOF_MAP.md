@@ -814,6 +814,48 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | `[F(X):F(Phi_2/Psi_2^2)]=4` | exact coordinate-degree assembly | H116 over the coprimality endpoint and reduced-quotient theorem | rational function field of the short curve's x-coordinate | same hypotheses |
 | singular cubic loses the premise | negative control | frozen Rust verifier | `y^2=x^3` over `F_13` | `A=B=0` |
 
+## Scalar-three short-Weierstrass coprimality instance gate
+
+1. **Structure above.** Put `f=X^3+A*X+B`,
+   `q=3*X^4+6*A*X^2+12*B*X-A^2`, and
+   `r=X^6+5*A*X^4+20*B*X^3-5*A^2*X^2-4*A*B*X-8*B^2-A^3`.
+   The scalar-three numerator is `p=X*q^2-8*f*r`.  With
+   `d=4*A^3+27*B^2`, exact extended Euclid gives `U*p+V*q=64*d^2`, where
+   `U=27*(15*A*X+27*B+7*X^3)` and `V` is the explicit degree-eight
+   polynomial recorded in the Lean witness.  Thus `d != 0` and `2 != 0`
+   make `p` and `q` coprime, hence `p` and `q^2` coprime.
+2. **Theorems used as stated.** `WeierstrassCurve.Phi_three`, `PsiSq_three`,
+   `Psi3`, `prePsi4`, and `Psi2Sq` specialize Mathlib's exact recurrence to
+   `p` and `q^2`.  `IsCoprime.pow_right` transfers the constructive witness to
+   the squared denominator.  The reduced-quotient theorem and exact degree
+   formulas then give coordinate extension degree nine when `3 != 0`.
+3. **Object as an instance.** The declarations separate the explicit
+   `p,q` Bezout law, the Mathlib division-polynomial endpoint, and the exact
+   rational-function extension degree.  No root enumeration, point counting,
+   or finite-field decision procedure enters the proof.
+4. **Assembly probe.** The full degree-eight witness, every Mathlib
+   specialization and the singular control first elaborated in a temporary
+   importing module at default limits.  The tracked project then completed all
+   3,162 build jobs; the exact repository auditor reports
+   `150 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This extends no-cancellation from scalar two
+   to scalar three, not to arbitrary scalar.  The degree-nine assembly assumes
+   `3 != 0`; characteristic-three inseparability is intentionally outside that
+   statement.  Scheme-map identification and the H116 pullback tower remain
+   separate. [pcc:unverified]
+6. **Inheritance table.** Polynomial rings, Mathlib division polynomials,
+   coprimality under powers, and rational-function degree are inherited.
+   H116 supplies the explicit extended-Euclid witness and specialization.  At
+   `A=B=0`, both displayed scalar-three polynomials vanish at `X=0`; a mapped
+   evaluation contradiction is the negative control.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| explicit scalar-three `p,q` Bezout certificate | constructive instance law | H116 over polynomial ring laws | arbitrary field and `A,B` | `4*A^3+27*B^2 != 0`, `2 != 0` |
+| `IsCoprime (W.Phi 3) (W.PsiSq 3)` | exact Mathlib endpoint | H116 over Mathlib division polynomials | short Weierstrass curve over arbitrary field | same hypotheses |
+| `[F(X):F(Phi_3/Psi_3^2)]=9` | exact coordinate-degree assembly | H116 over reduced quotients | rational function field of the short curve's x-coordinate | same hypotheses and `3 != 0` |
+| singular scalar-three pair is not coprime | negative control | H116 evaluation homomorphism | short singular cubic over `ZMod 5` | `A=B=0` |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression
