@@ -100,3 +100,44 @@
 
 ### Errors
 - None.
+
+## 10:30Z: round 4, the probe in AVX-512
+
+### What was done
+- Wrote `probe_block_simd` and `pipeline_simd_probe` in
+  `examples/rootfind_lever_probe.rs`: a one-multiply filter probing 8 keys
+  per step (`vpmullq`, `vpgatherqq`, `vpsllvq`, compare to mask), with the
+  survivors going to the exact set. They come with a filter-only arm, a
+  pipeline arm and a thread sweep, each checked against the exact hit count.
+- Ran 10 runs (commit `214d4e4b11`) and re-measured the library arms at the
+  same time (2 sessions × 5 rounds). Data: `probe-side/round4-*`.
+  RESULTS.md, PLAN.md status, the figures and report.pdf are updated.
+
+### Results (`[pcc:unverified]`, medians of 10, 4 threads)
+- A = 256: 0.867 ns/point, which is 116x `rootfind-mitm` (99.3/101.9 ns)
+  and 22.4x `rootfind-subtract` (19.0/19.8 ns).
+- A = 1024: 1.172 ns/point, which is 96.6x `rootfind-mitm` (113.4/112.9 ns)
+  and 32.8x `rootfind-subtract` (39.1/37.8 ns).
+- One thread: 3.03 ns at A = 256 and 3.97 ns at A = 1024, against 3.71 and
+  4.73 ns for the scalar one-multiply probe.
+- Filter alone: the AVX-512 probe is 1.7x faster at A = 256 (64 KiB filter)
+  but no faster at A = 1024 (1 MiB filter, L2 latency).
+
+### Decisions made
+- Report the 100x as a median with its spread, against baselines re-measured
+  at the same time, and state that the comparison is 4 threads against
+  1 thread.
+- The first filter-only timing of the SIMD probe read 0.03 ns/probe, because
+  the compiler had hoisted the repeated pure loop. Fixed with `black_box` on
+  the inputs before any data was kept. The smoke run is kept in
+  `exploratory/run8` for the record.
+
+### Open threads
+- A smaller or partitioned filter at large A (the gather is L2-bound).
+- The explicit-intrinsics arithmetic kernel.
+- The oracle id with witness recovery and the parity test.
+- An isolated replay when AWS works.
+- `bench.record/v1` filing when S3 is reachable (explained on PR #4708).
+
+### Errors
+- The hoisted-loop artefact above.

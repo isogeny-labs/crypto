@@ -79,7 +79,9 @@ were not in PLAN.md, so treat them as post hoc:
 | + mix-hash exact set (post hoc) | 6.18 [5.12, 7.11] | 17.8x | 5.6x |
 | + lever 4: 4 threads | 1.685 [1.61, 3.57] | 65x | 20.7x |
 | round 3: one-multiply filter hash, 1 thread (post hoc) | 5.18 [4.46, 5.36] | 21.2x | 6.7x |
-| round 3: + 4 threads | **1.365** [1.15, 2.04] | **80.5x** | **25.5x** |
+| round 3: + 4 threads | 1.365 [1.15, 2.04] | 80.5x | 25.5x |
+| round 4: AVX-512 gather probe, 1 thread (post hoc) | 3.97 [3.75, 4.26] | 27.7x | 8.8x |
+| round 4: + 4 threads | **1.172** [1.04, 1.46] | **93.8x** | **29.7x** |
 
 The two round-3 rows come from a later build (`probe-side/`, commit
 `31bfc33071`) on the same host and in the same session. In that build, the
@@ -148,12 +150,63 @@ were wasted work. Measured alone, the filter probe falls from 2.32 to
 reach 1.365 ns/point at A = 1024. At A = 256 the gain is on one thread only
 (4.36 to 3.72 ns): 4 threads stay at 1.18 ns, against 1.16 ns in round 1.
 
+## Round 4: the probe in AVX-512 (post hoc)
+
+Rounds 2–3 showed the probe is bound by instructions. Round 4 does the
+one-multiply probe 8 keys at a time: one `vpmullq` for the hashes, one
+gather for the filter words, variable shifts for the four bits, one
+compare. The keys that pass (about 3.4 %) go to the exact set. Data:
+`probe-side/round4-runs.jsonl`, 10 runs, commit `214d4e4b11`.
+
+| Arm (16 lanes, 8-bit one-multiply filter) | A = 256 | A = 1024 |
+|---|---|---|
+| filter alone, scalar probe (ns/probe) | 1.27 [1.23, 1.90] | 1.89 [1.71, 2.43] |
+| filter alone, AVX-512 probe (ns/probe) | **0.73** [0.70, 0.89] | 2.08 [1.74, 2.29] |
+| pipeline, 1 thread, scalar probe | 3.71 [3.54, 3.88] | 4.73 [4.47, 5.37] |
+| pipeline, 1 thread, AVX-512 probe | **3.03** [2.83, 3.20] | **3.97** [3.75, 4.26] |
+| pipeline, 4 threads, scalar probe | 1.113 [0.97, 1.57] | 1.378 [1.33, 1.92] |
+| pipeline, 4 threads, AVX-512 probe | **0.867** [0.84, 1.34] | **1.172** [1.04, 1.46] |
+
+The filter-only rows show two regimes. At A = 256 the filter (64 KiB) sits
+in L1/L2, and the vector probe is 1.7x the scalar one. At A = 1024 (1 MiB)
+it is no faster: the gather waits on L2. Inside the pipeline the vector
+probe still gains 1.19x at A = 1024, because it frees issue slots for the
+arithmetic it is interleaved with.
+
+**Against the library arms re-measured at the same time**
+(`probe-side/round4-baseline.jsonl`, two 5-round sessions run right after
+the 10 probe runs):
+- `rootfind-mitm`: 99.3 and 101.9 ns at A = 256; 113.4 and 112.9 ns at
+  A = 1024.
+- The A/A copy: 98.8 and 101.0 ns at A = 256; 115.7 and 112.2 ns at
+  A = 1024.
+- `rootfind-subtract`: 19.0 and 19.8 ns at A = 256; 39.1 and 37.8 ns at
+  A = 1024.
+
+The 4-thread AVX-512 probe then stands at:
+
+| | vs `rootfind-mitm` | vs `rootfind-subtract` |
+|---|---|---|
+| A = 256 | **116x** | 22.4x |
+| A = 1024 | **96.6x** | 32.8x |
+
+Read this as a median on a shared host, not a settled 100x:
+- The 4-thread spread over the 10 runs is wide (A = 256: 0.84–1.34 ns, so
+  about 75–120x).
+- One more run taken just after the baselines came in at 1.07 and 1.57 ns
+  (`round4-extra-run-after-baseline.jsonl`).
+- The reference arms run on one thread; the stack uses 4. PLAN.md defines
+  the stack that way, but it is not a like-for-like single-core comparison.
+
+On one core, the kernel is 33x (A = 256) and 28.5x (A = 1024) faster than
+`rootfind-mitm`.
+
 ## Next levers (in order)
 
-1. **Vectorize the probe.** Rounds 2–3 show the probe is bound by
-   instructions, not by memory latency. Computing slots for 8 or 16 keys
-   with AVX-512 and fetching the words with a gather is the next step.
-   Prefetch is ruled out.
+1. **A smaller filter at large A.** With the probe vectorized (round 4),
+   the 1 MiB filter is gather-latency bound at A = 1024. A 4- or 6-bit
+   filter in L1/L2 plus a cheaper exact stage, or probes partitioned by
+   filter range across a batch of targets, is the next thing to test.
 2. **Explicit-intrinsics lane kernel**, for robustness and for 52-bit IFMA.
 3. **Land the kernel as an oracle id** with witness recovery and the ledger
    parity test (PLAN.md order of work, step 1). That parity test is what lets
@@ -166,9 +219,9 @@ reach 1.365 ns/point at A = 1024. At A = 256 the gain is on one thread only
 - `floor-thishost.jsonl`, `baseline-thishost.jsonl`: lever 1 and the library
   arms on the same host.
 - `exploratory/`: the single runs made while arms were being added (runs 1
-  to 7). They are kept for the record but are not part of any summary.
-- `probe-side/`: rounds 2 and 3, with their binary hashes, source commits
-  and host notes.
+  to 8). They are kept for the record but are not part of any summary.
+- `probe-side/`: rounds 2 to 4 with their binary hashes, source commits and
+  host notes, plus the round-4 same-time library baseline.
 - `stack.svg`, `stack-256.svg`, `lanes.svg`, `probe-side.svg`, the PNG
   renders and `report.pdf`: built by `make_report.py` (with `render.js`)
   from the rows above.

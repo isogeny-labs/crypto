@@ -26,6 +26,7 @@ def med(vals):
 probe = rows("runs.jsonl")
 round2 = rows("probe-side/round2-runs.jsonl")
 round3 = rows("probe-side/round3-runs.jsonl")
+round4 = rows("probe-side/round4-runs.jsonl")
 floor = rows("floor-thishost.jsonl")
 base = [r for r in rows("baseline-thishost.jsonl") if "arm" in r]
 
@@ -49,6 +50,11 @@ def stack(a):
     out += [
         ("round 3: one-multiply filter hash, 1 thread", med([r["cheap_hash_fused_ns_per_point"] for r in r3]), "post hoc arm"),
         ("round 3: + 4 threads", med([r["probe_side_best_arm_ns_per_point_by_threads"]["4"] for r in r3]), ""),
+    ]
+    r4 = [r for r in round4 if r["abscissae"] == a]
+    out += [
+        ("round 4: AVX-512 gather probe, 1 thread", med([r["simd_probe_fused_ns_per_point"] for r in r4]), "post hoc arm"),
+        ("round 4: + 4 threads", med([r["simd_probe_ns_per_point_by_threads"]["4"] for r in r4]), ""),
     ]
     return out
 
@@ -134,6 +140,7 @@ def main():
     st1024 = stack(1024)
     st256 = stack(256)
     svg_stack = bar_svg("Root-finding kernel, prime 32-bit, A = 1024: the measured stack (same host)", st1024, st1024[0][1][0])
+    # Ratios on the figures are against the 08:03Z library run; RESULTS.md also gives them against the 10:15Z rerun.
     svg_stack256 = bar_svg("Same stack at A = 256", st256, st256[0][1][0])
     svg_lanes = lanes_svg(1024)
     (D / "stack.svg").write_text(svg_stack)
