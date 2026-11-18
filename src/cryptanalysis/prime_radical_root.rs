@@ -550,8 +550,11 @@ impl RadicalRootCtx {
             };
         }
         let q2 = f.mul(q, self.inv2);
-        let p2 = f.sqr(pp);
-        let d = f.add(f.mul(q2, q2), f.mul(f.mul(p2, pp), self.inv27)); // q^2/4 + P^3/27
+        // m=-P/3 is needed for Cardano below. Reuse m^3:
+        // q^2/4 + P^3/27 = (q/2)^2 - (-P/3)^3.
+        // This saves two wide modular multiplications on the common path.
+        let m = f.neg(f.mul(pp, self.inv3));
+        let d = f.sub(f.sqr(q2), f.mul(f.sqr(m), m));
         if d == 0 {
             // double root -3Q/(2P), simple root 3Q/P
             let ip = f.inv(pp);
@@ -560,7 +563,6 @@ impl RadicalRootCtx {
             return vec![r1, r2];
         }
         let nq2 = f.neg(q2);
-        let m = f.neg(f.mul(pp, self.inv3)); // -P/3
         match self.sqrt(d) {
             Some(sg) => {
                 let u3 = f.add(nq2, sg);
