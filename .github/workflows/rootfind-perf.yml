@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and verify shared rootfinder headers
         run: |
-          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep bench-chain256 bench-thread-map bench-from256
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-tail-threshold bench-pair-sweep bench-chain256 bench-thread-map bench-from256
 
       - name: Record before and after perf counters when accessible
         shell: bash
@@ -119,6 +119,13 @@ jobs:
           for arm in tail8-before tail8-after full32-before full32-after; do
             perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/tail-${arm}.txt" \
               -- taskset -c "$cpu" gpu/rootfind/bench_tail_core "--perf-$arm"
+          done
+          # Incremental 16->24/32 CPU host tail cutoff, with full controls.
+          for arm in tail17-before tail17-after tail20-before tail20-after \
+                     tail24-before tail24-after tail28-before tail28-after \
+                     full32-before full32-after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/tail-threshold-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_tail_threshold "--perf-$arm"
           done
           # Pair-table and two-sign S3 sweep, frozen baseline vs actual header.
           for arm in pair-before pair-after sweep-before sweep-after; do
