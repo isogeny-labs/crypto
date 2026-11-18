@@ -5,6 +5,10 @@
 = Exact wide-field ecbench inputs
 Implementation and public controls · 18 November 2026 · PR #4723
 
+*Publication pending:* trusted S3 migration received HeadObject 403; a public
+read at the correct regional endpoint returned AllAccessDisabled. The archive
+was not uploaded or replayed, so this PR remains draft. See publication/status.json.
+
 The new prime_mont4_explicit path carries large prime-field coordinates through
 the native ecbench harness. It reuses the repository's Mont〈4〉 arithmetic and
 CountedGroup ledger. Subgroup orders remain u64; field coordinates and supplied

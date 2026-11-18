@@ -3,6 +3,16 @@
 [PR #4723](https://github.com/isogeny-labs/crypto/pull/4723), stacked on
 [#4721](https://github.com/isogeny-labs/crypto/pull/4721).
 
+**Publication blocked:** the complete packet is pushed in this draft PR, but
+the committed-head artifact check requires the 318420-byte archive to move to
+S3. The trusted migration workflow failed on signed HeadObject with 403;
+the correct-region public GET returns `AllAccessDisabled`. No upload or remote
+replay occurred. [Publication receipt](publication/status.json) and the
+[workflow log](https://github.com/isogeny-labs/crypto/actions/runs/44359438843/job/134996425963)
+retain the exact outcomes. The task stays open until configured access is
+restored or an approved verified replacement store is supplied.
+[pcc:unverified]
+
 `prime_mont4_explicit` adds exact large-prime-field inputs to ecbench through
 the repository's existing `Mont<4>` arithmetic. Coordinates use four limbs;
 subgroup orders for these generic methods remain u64. The original 202-bit
