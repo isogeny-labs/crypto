@@ -34,3 +34,16 @@ the run; a failed checkpoint is recorded and the closure continues (450d5b295b).
   watchdog fire, and a replacement watchdog misread host uptime and fired too; neither stopped the pod or the
   job. The same holds for every earlier pod launched by this `pod.py`. Spend is bounded only by explicit
   termination; hard-stop reminders are scheduled (J1/J2 at 24 h, J3 at 216,000 s, bl-ladder at 104 h).
+- 12:22-13:34 UTC: hky-j3's host hung (control server unreachable from ~12:53), container restarted at 13:34
+  and 13:53; job j3r (in verify since ~11:30) died with SIGTERM. Checkpoint (rank 598,501, 40.5 GB,
+  sha256 9b620a28...) survived. Resumed 15:4x UTC as job `j3r2` (VERIFY=1; the verify pass restarts).
+- 13:37:53 UTC: **J1 done, status ok.** k=14, D=6, unit p=65537: cols 499,178, profile
+  [0,0,2,154,4451,73587,448922], 1 not in V_6, rank 448,922; split part ranks 224,688 + 224,234 (cols
+  249,824 / 249,354); `--hky3-verify-closed` closed=true, 0 non-zero over 4,120,873 products (18,495 s);
+  muladds 1.0729e14; wall 26,723 s; peak RSS 73.9 GB (with verify); basis.bin sha256 06fdd4e4...
+  The lift (`hky_lift`, pod_k14.sh) started on the pod at 13:37. Records in `results/J1/`.
+- 15:37 UTC: **J4 relaunched with the skip** on owner instruction ("Launch j4 with skip"): pod hky-j4s
+  `u2h6guqi1vozbx`, cpu3m, EU-RO-1, EPYC 9655P, 320 GB disk; binary `pilot_skip` 36a047ff... (43d5c40d1f),
+  `ENGINE_FLAGS=--hky3-skip on --hky3-skip-witness leads`, EXPORT=0, VERIFY=0, job J4s-unit-p786433-a1-s10-k16-D6.
+  Prediction (written before data, PREDICTIONS.md): 230,000 s (100k-950k), 160 GB, ~US$112 central.
+  No working in-pod cap: hard-stop reminder set.
