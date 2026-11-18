@@ -3283,5 +3283,51 @@ mod sparse_round18_tests {
         paired("quartic constant=0 p=487",&quartics,6,
             |(a,b,c,d)|ctx.quartic_before_sparse(a,b,c,d,0).unwrap().0.into_iter().fold(0,|h,v|h^v),
             |(a,b,c,d)|ctx.quartic(a,b,c,d,0).unwrap().0.into_iter().fold(0,|h,v|h^v));
+        // Unchanged-input controls expose branch overhead and regressions.
+        let ctx=RadicalRootCtx::new(1_000_000_007).unwrap();
+        let mut monic_nonzero=Vec::new();let mut nonmonic_nonzero=Vec::new();
+        for _ in 0..512 {
+            let a=2+(next(&mut seed)%(ctx.f.p-2));
+            let b=next(&mut seed)%ctx.f.p;
+            let c=1+(next(&mut seed)%(ctx.f.p-1));
+            monic_nonzero.push((b,c));nonmonic_nonzero.push((a,b,c));
+        }
+        paired("monic quadratic c!=0 control p=1000000007",&monic_nonzero,32,
+            |(b,c)| before_quad_monic(&ctx,b,c).iter().fold(0,|h,&v|h^v),
+            |(b,c)| ctx.quad_monic(b,c).iter().fold(0,|h,&v|h^v));
+        paired("general quadratic c!=0 control p=1000000007",&nonmonic_nonzero,32,
+            |(a,b,c)| before_quad(&ctx,a,b,c).iter().fold(0,|h,&v|h^v),
+            |(a,b,c)| ctx.quad_roots(a,b,c).iter().fold(0,|h,&v|h^v));
+        let ctx=RadicalRootCtx::new(487).unwrap();
+        let f=&ctx.f;let mut quartic_controls=Vec::new();
+        for _ in 0..128 {
+            let a=1+(next(&mut seed)%(f.p-1));
+            let x=1+(next(&mut seed)%(f.p-1));
+            let y=1+(next(&mut seed)%(f.p-1));
+            let z=1+(next(&mut seed)%(f.p-1));
+            let w=1+(next(&mut seed)%(f.p-1));
+            let roots=[x,y,z,w];
+            let mut poly=[a,0,0,0,0];
+            // Construct coefficients in ascending order by multiplying
+            // (X-r) successively, then scale by a.
+            let mut coeff=[1u64,0,0,0,0];
+            let mut degree=0;
+            for &root in &roots {
+                for j in (1..=degree+1).rev() {
+                    coeff[j]=f.sub(if j<=degree {f.mul(coeff[j],f.neg(root))} else {0},f.neg(coeff[j-1]));
+                }
+                coeff[0]=f.mul(coeff[0],f.neg(root));
+                degree+=1;
+            }
+            for j in 0..5 {poly[j]=f.mul(coeff[j],a);}
+            quartic_controls.push((poly[4],poly[3],poly[2],poly[1],poly[0]));
+        }
+        for &(a,b,c,d,e) in &quartic_controls {
+            assert_eq!(ctx.quartic(a,b,c,d,e).unwrap().0,
+                       ctx.quartic_before_sparse(a,b,c,d,e).unwrap().0);
+        }
+        paired("quartic e!=0 control p=487",&quartic_controls,6,
+            |(a,b,c,d,e)| ctx.quartic_before_sparse(a,b,c,d,e).unwrap().0.into_iter().fold(0,|h,v|h^v),
+            |(a,b,c,d,e)| ctx.quartic(a,b,c,d,e).unwrap().0.into_iter().fold(0,|h,v|h^v));
     }
 }
