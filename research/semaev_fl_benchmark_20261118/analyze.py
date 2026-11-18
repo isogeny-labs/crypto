@@ -147,7 +147,7 @@ def main() -> None:
     }
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     with (args.out / "pairs.csv").open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=csv_rows[0].keys())
+        writer = csv.DictWriter(handle, fieldnames=csv_rows[0].keys(), lineterminator="\n")
         writer.writeheader()
         writer.writerows(csv_rows)
     print(json.dumps(summary, indent=2))
