@@ -146,16 +146,41 @@ RF_HD U256x64 fp256_add(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
 }
 
 RF_HD U256x64 fp256_sub(const Fp256Ctx &f, const U256x64 &a, const U256x64 &b) {
+#ifdef __CUDA_ARCH__
+    /* Preserve the original CUDA instruction path pending GPU profiling. */
     U256x64 d, t;
     uint64_t bw = u256_sbb(d, a, b);
     u256_adc(t, d, f.p);
     u256_cmov(d, t, bw);
     return d;
+#else
+    /* Host-only: add a masked modulus when the subtraction borrowed.
+     * This needs no second full-width result or conditional move.
+     * The operands are canonical Montgomery residues in [0,p). */
+    U256x64 d, addend;
+    const uint64_t bw = u256_sbb(d, a, b);
+    const uint64_t mask = (uint64_t)0 - bw;
+    for (int i = 0; i < 4; ++i) addend.v[i] = f.p.v[i] & mask;
+    u256_adc(d, d, addend); /* 256-bit wrap is intentional */
+    return d;
+#endif
 }
 
 RF_HD U256x64 fp256_neg(const Fp256Ctx &f, const U256x64 &a) {
+#ifdef __CUDA_ARCH__
     U256x64 z = {{0, 0, 0, 0}};
     return fp256_sub(f, z, a);
+#else
+    /* For canonical a != 0, (-a mod p) == p-a.  Zero is the sole
+     * exception: mask it to zero without a data-dependent branch.
+     * Avoid the general sub(0,a) conditional-modulus pass. */
+    U256x64 d;
+    u256_sbb(d, f.p, a);
+    const uint64_t nz = (uint64_t)((a.v[0] | a.v[1] | a.v[2] | a.v[3]) != 0);
+    const uint64_t mask = (uint64_t)0 - nz;
+    for (int i = 0; i < 4; ++i) d.v[i] &= mask;
+    return d;
+#endif
 }
 
 /* SOS Montgomery multiplication, identical phase structure to
