@@ -49,7 +49,9 @@ This map is written before the first H116 Lean declaration.
    theorem is located. A finite reversed numerator/denominator certificate is
    now proved sufficient for transformed equation (14), so the map bridge can
    be discharged by a checked polynomial identity rather than a trusted map
-   evaluator.
+   evaluator. One excluded `p=31`, `r=37` Vélu control constructs this
+   certificate and passes an independent Python replay; this is not an admitted
+   H116 run or a fast-construction proof.
    [pcc:unverified]
 6. **Inheritance table.** Below. A blank or `lookup pending` entry blocks the
    first Lean edit.

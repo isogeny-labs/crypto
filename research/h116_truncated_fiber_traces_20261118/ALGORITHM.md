@@ -76,6 +76,12 @@ independently validating `N,D` for the actual isogeny remains open; the
 certificate theorem does not assert that arbitrary polynomials are an isogeny.
 [pcc:unverified]
 
+The excluded `p=31`, `r=37` control now constructs an actual Vélu `N,D`,
+checks this identity twice in independent Rust/Python implementations and
+matches the recurrence through degree eight. The full degree-`r` construction
+is retained only as a proof/control oracle; it is not part of the fixed-length
+candidate cost. [pcc:unverified]
+
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 
 ```text

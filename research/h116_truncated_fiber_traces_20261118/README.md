@@ -108,6 +108,14 @@ This moves the remaining obligation to producing and independently checking
 the actual rational-map polynomials; it does not treat a supplied polynomial
 pair as an isogeny without that identity. [pcc:unverified]
 
+The separate [map-certificate control](MAP_CERTIFICATE_EXPERIMENT.md) exercised
+this interface on the excluded H115 `p=31`, `r=37` fixture. Rust reconstructed
+the full Vélu map, and an independent Python verifier reproduced the cleared
+identity, the coefficient prefix `[1,0,20,0,13,7,2,4,8]` and rejection of a
+one-coefficient mutation. This is proof/control evidence only: the degree-`r`
+construction is not charged as the fixed-length candidate and no gated H116
+target was read. [pcc:unverified]
+
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
 `(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying
