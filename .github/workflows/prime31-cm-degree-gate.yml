@@ -1,0 +1,62 @@
+name: Prime31 CM exact-degree gate (native Rust)
+on:
+  push:
+    branches: [automation/prime31-cm-degree-gate-20261118]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_cm_degree_gate.rs'
+      - '.github/workflows/prime31-cm-degree-gate.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_cm_degree_gate.rs'
+      - '.github/workflows/prime31-cm-degree-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-cm:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout new exact arithmetic gate only
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_cm_degree_gate.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout registered original Rust arithmetic source
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only candidate CM gate
+        run: cp research/prime31_ic_20261115/native/examples/prime31_cm_degree_gate.rs native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Original Rust curve, field and library regression tests
+        run: cargo +1.100.0 test --locked --release --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Exact factor and norm bound tests
+        run: cargo +1.100.0 test --locked --release --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_cm_degree_gate
+      - name: Reproducible exact invariant readout
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo +1.100.0 run --locked --release --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_cm_degree_gate | tee cm-gate.jsonl
+          grep -Fq '"trace":"36817"' cm-gate.jsonl
+          grep -Fq '"fundamental_discriminant":"-803827011"' cm-gate.jsonl
+          grep -Fq '"noninteger_endomorphism_degree_lower_bound":"200956753"' cm-gate.jsonl
+          grep -Fq '"performance_measured":false' cm-gate.jsonl
+      - name: Archive exact integer result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-cm-exact-arithmetic
+          path: cm-gate.jsonl
+          retention-days: 30
+          if-no-files-found: warn

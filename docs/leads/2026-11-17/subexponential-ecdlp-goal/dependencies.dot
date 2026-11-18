@@ -1,0 +1,23 @@
+digraph evidence {
+  graph [rankdir=LR, nodesep=0.24, ranksep=0.48, bgcolor="white", pad=0.14,
+         label="Where the subexponential claims stand", labelloc=t,
+         fontname="DejaVu Sans", fontsize=14];
+  node [shape=box, style="rounded,filled", margin="0.16,0.10",
+        fontname="DejaVu Sans", fontsize=10, color="#374151"];
+  edge [color="#64748b", fontname="DejaVu Sans", fontsize=9];
+  goal [label="Classical ECDLP\nTotal expected work r^o(1)", fillcolor="#E6EDF7"];
+  ext [label="Growing extension fields\nDiem I and II", fillcolor="#DBF2E4"];
+  ext_end [label="Published unconditional bounds\nunder the field-family hypotheses", fillcolor="#DBF2E4"];
+  prime [label="Growing prime fields\nGeneral large-prime subgroup", fillcolor="#F3EADD"];
+  tensor [label="Akshima et al.\nConditional explicit rate", fillcolor="#FFF0CB"];
+  oracle [label="Kaarelson v2\nFixed-arity family and Lean components", fillcolor="#FFF0CB"];
+  internal [label="Lab portfolio\nFinite certificates and controls", fillcolor="#ECEFF1"];
+  d1 [label="Audit the full D.1\ncontraction theorem", fillcolor="#F7E4DD"];
+  analytic [label="Audit oracle cost,\ncoverage and recovery", fillcolor="#F7E4DD"];
+  bounds [label="Show natural yield and total cost\non a growing family", fillcolor="#F7E4DD"];
+  goal -> ext -> ext_end;
+  goal -> prime;
+  prime -> tensor -> d1;
+  prime -> oracle -> analytic;
+  prime -> internal -> bounds;
+}

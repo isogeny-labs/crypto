@@ -5,6 +5,7 @@ use isogeny_algos::fpr::{FpR, ER};
 use isogeny_algos::poly;
 use std::collections::HashSet;
 
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn cross_ratio(f: &FpR, roots: [ER; 3]) -> [ER; 4] {
     let [a, b, c] = roots;
     let u = f.sub(b, c);
@@ -12,6 +13,7 @@ fn cross_ratio(f: &FpR, roots: [ER; 3]) -> [ER; 4] {
     [u, f.neg(f.mul(a, u)), v, f.neg(f.mul(c, v))]
 }
 
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn from_triples(f: &FpR, source: [ER; 3], target: [ER; 3]) -> [ER; 4] {
     let [a, b, c, d] = cross_ratio(f, source);
     let [u, v, w, z] = cross_ratio(f, target);
@@ -29,6 +31,7 @@ fn from_triples(f: &FpR, source: [ER; 3], target: [ER; 3]) -> [ER; 4] {
     matrix.map(|x| f.div(x, pivot))
 }
 
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn image(f: &FpR, m: &[ER; 4], x: ER) -> Option<ER> {
     let denominator = f.add(f.mul(m[2], x), m[3]);
     if denominator == f.zero() {
@@ -38,6 +41,7 @@ fn image(f: &FpR, m: &[ER; 4], x: ER) -> Option<ER> {
     }
 }
 
+#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
 fn audit(f: &FpR, coefficients: [u64; 7]) -> usize {
     let p = coefficients.map(|c| f.from_u64(c)).to_vec();
     let mut rng = Rng::new(0x0021_a017);

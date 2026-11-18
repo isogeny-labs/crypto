@@ -22,7 +22,9 @@ STUDY = ["run.sh", "build-info.json"]
 ISO_BIN = ["pkm_tower_pilot_r4", "prime_fall_degree_tools", "hky_fp_tower_check"]
 ISO_ENTRY = "/opt/repo/research/pkm_falldegree_unblock_20261107/iso/entry_iso.sh"
 ISO_OPTIONAL = ["pkm_tower_pilot", "rows.tar"]   # Amendment 20: frozen Kummer pilot and stage B rows for g3-b
-ALLOWED = set(BIN + STUDY + ISO_BIN + ["repo.tar"] + ISO_OPTIONAL)
+# Amendment 31: m = 2 closure cells (entry "m2c"): the gated pilot and grid-zero binaries plus the committed entry_m2c.sh.
+M2C_BIN = ["pkm_tower_pilot", "pfd_grid_zeros", "entry_m2c.sh"]
+ALLOWED = set(BIN + STUDY + ISO_BIN + ["repo.tar"] + ISO_OPTIONAL + M2C_BIN)
 SHIM = """#!/bin/bash
 # aws shim: `aws s3 sync|cp SRC s3://local/PATH` -> copy into /results/PATH (entry_r2.sh stays byte-identical)
 [ "$1" = s3 ] || exit 0
@@ -130,6 +132,7 @@ class H(BaseHTTPRequestHandler):
         req = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         got = {n: sha(f"{IN}/{n}") for n in ALLOWED if os.path.exists(f"{IN}/{n}")}
         iso = req.get("entry") == "iso"
+        m2c = req.get("entry") == "m2c"
         # E3.2/E3.3/E3.4: refuse before anything runs.
         seconds = int(req.get("seconds", 0))
         cost_per_hr, max_usd = float(req.get("cost_per_hr", 0)), float(req.get("max_usd", 40))
@@ -150,7 +153,7 @@ class H(BaseHTTPRequestHandler):
         cpus = cgroup_cpus()
         if cpus < 12:
             return self.reply(409, {"error": "fewer than 12 vCPU", "cpus": cpus})
-        required = set(ISO_BIN) | {"repo.tar"} if iso else set(BIN) | {"run.sh"}  # build-info.json: recorded only
+        required = set(ISO_BIN) | {"repo.tar"} if iso else set(M2C_BIN) if m2c else set(BIN) | {"run.sh"}  # build-info.json: recorded only
         bad = {n: [req["sha256"].get(n), got.get(n)] for n in required if not got.get(n) or req["sha256"].get(n) != got.get(n)}
         if iso:   # optional iso uploads must match the hash the request names for them
             bad.update({n: [req["sha256"].get(n), got.get(n)] for n in ISO_OPTIONAL
@@ -174,6 +177,8 @@ class H(BaseHTTPRequestHandler):
                     for n, h in pins.items() if not os.path.exists(f"/opt/repo/{n}") or sha(f"/opt/repo/{n}") != h}
             if badb:
                 return self.reply(409, {"error": "bundle sha256 mismatch", "detail": badb})
+        elif m2c:
+            for n in M2C_BIN: subprocess.check_call(["install", "-m755", f"{IN}/{n}", f"/usr/local/bin/{n}"])
         else:
             for n in BIN: subprocess.check_call(["install", "-m755", f"{IN}/{n}", f"/usr/local/bin/{n}"])
             for n in STUDY:
@@ -182,7 +187,7 @@ class H(BaseHTTPRequestHandler):
         os.chmod("/opt/shim/aws", 0o755)
         with open(f"{RES}/runner_request.json", "w") as f: json.dump({**req, "verified_sha256": got}, f, indent=1)
         state.update(state="running", started=time.strftime("%FT%TZ", time.gmtime()), stages=req["stages"])
-        entry = ISO_ENTRY if iso else "/usr/local/bin/entry_r2.sh"
+        entry = ISO_ENTRY if iso else "/usr/local/bin/entry_m2c.sh" if m2c else "/usr/local/bin/entry_r2.sh"
         state.update(seconds=seconds, cost_per_hr=cost_per_hr, max_usd=max_usd, memory_bytes=mem, cpus=cpus,
                      runner_sha256=RUNNER_SHA256, commit=req.get("commit"))
         threading.Thread(target=run, args=(entry, req["stages"], 12, seconds), daemon=True).start()  # rayon pinned at 12
