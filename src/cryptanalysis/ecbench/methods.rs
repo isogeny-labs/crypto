@@ -11550,6 +11550,7 @@ mod accounting_tests {
             &json!({
                 "schema": SPEC_SCHEMA,
                 "label": "accounting",
+                "curve_policy": {"mode": "diagnostic", "off_panel_reason": "method accounting applicability fixture"},
                 "workloads": {"curves": [curve], "targets_per_curve": 1, "target_seed": 1},
                 "arms": [{"name": "a", "role": "candidate", "method": {"id": id, "params": params}}],
                 "measurement": {"rounds": 1, "seed": 9},

@@ -46,6 +46,8 @@ pub struct JobOptions {
     pub timeout_seconds: u64,
     /// `strict`, `standard` or `best_effort` (isolab's fidelity policy).
     pub policy: String,
+    /// Reproduce a frozen v1 spec rather than starting current evidence.
+    pub allow_legacy_spec: bool,
 }
 
 /// The job document.  `spec_text` travels inline as `spec.json`.
@@ -87,6 +89,19 @@ pub fn job(plan: &Plan, spec_text: &str, o: &JobOptions) -> Result<Value, String
         }
     };
     let timeout = plan.executions.len() as u64 * plan.spec.measurement.timeout_seconds.max(1) + 600;
+    let mut run_argv = vec![bin, "run".to_string()];
+    if o.allow_legacy_spec {
+        run_argv.push("--allow-legacy-spec".to_string());
+    }
+    run_argv.extend([
+        "--spec".to_string(),
+        "spec.json".to_string(),
+        "--out".to_string(),
+        "${ISOLAB_OUTPUT_DIR}/session".to_string(),
+        "--cpus".to_string(),
+        "inherit".to_string(),
+        "--allow-busy".to_string(),
+    ]);
     let mut doc = json!({
         "schema": "isolab.job/v1",
         "name": format!("ecbench {}", plan.spec.label).chars().take(120).collect::<String>(),
@@ -95,8 +110,7 @@ pub fn job(plan: &Plan, spec_text: &str, o: &JobOptions) -> Result<Value, String
         "inputs": inputs,
         "build": build,
         "command": {
-            "argv": [bin, "run", "--spec", "spec.json", "--out", "${ISOLAB_OUTPUT_DIR}/session",
-                     "--cpus", "inherit", "--allow-busy"],
+            "argv": run_argv,
             "env": {"RAYON_NUM_THREADS": "1"},
         },
         "measure": {"warmups": 0, "repeats": 1},

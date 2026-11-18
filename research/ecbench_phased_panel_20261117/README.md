@@ -44,9 +44,12 @@ blocked cell is not silently replaced or reported as measured.
 3. Before any probe, freeze candidate IDs and parameters, FB1/FBM1 and IC1
    identities, seeds, row cap, episode count, look schedule, error budget,
    target-rank definition, target list, timeouts, and resource envelope.
-4. Create one ecbench spec per compatible curve/method family using the
-   `ecbench.curve_spec` fragment. Do not combine arms that are inapplicable to
-   some curve merely to obtain a rectangular table.
+4. Create one `ecbench.spec/v2` per compatible curve/method family with
+   `curve_policy` set to the phase and select each curve by exact cell ID, for
+   example `{"kind":"panel","cell":"P1-K0-23"}`. The native resolver reads
+   the manifest's `ecbench.curve_spec`; do not copy that fragment into a phase
+   spec. Do not combine arms that are inapplicable to some curve merely to
+   obtain a rectangular table.
 5. Run ecbench `plan` before computation. Preserve refusals and plan IDs.
 6. Apply the candidate-pruning gate during relation probes, then the phase
    promotion gate in `PROTOCOL.md` after complete cold workloads and replay.

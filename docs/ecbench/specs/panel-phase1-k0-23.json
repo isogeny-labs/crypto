@@ -1,0 +1,48 @@
+{
+  "schema": "ecbench.spec/v2",
+  "label": "canonical Phase 1 Koblitz K0-23 template",
+  "description": "One compatible-family slice of the canonical Phase 1 panel. It uses the exact P1-K0-23 identity, public one-target workloads, and the Phase 1 target-count floor. This is an executable template, not a completed phase dossier or a performance claim.",
+  "curve_policy": {
+    "mode": "phase",
+    "phase": 1
+  },
+  "workloads": {
+    "curves": [
+      {
+        "kind": "panel",
+        "cell": "P1-K0-23"
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 20261118,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "ic",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "mitm-frobenius:m=2"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261118,
+    "isolation_required": "L2",
+    "timeout_seconds": 600
+  }
+}

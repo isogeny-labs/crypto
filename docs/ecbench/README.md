@@ -62,6 +62,7 @@ Factor bases (build with `ecbench fb`, publish to Git/`store:`, run
 | `ecbench …` | does | described in |
 |---|---|---|
 | `methods` | list every method with its parameters | §7, §11 |
+| `panel` | list/filter the canonical 20/30/60/80-subgroup-bit curve ladder and its exact cell IDs | [phased panel](../../research/ecbench_phased_panel_20261117/README.md) |
 | `optimize` | `optimize inventory [--json]` lists every registered method with its search strategy, claim scope and knob count (`--json` adds parameter roles and nested solvers/engines); `optimize audit --development SPEC... [--holdout SPEC...] [--require-all]` audits the split between adaptive development specs and fresh confirmatory holdout specs, prints a JSON report, and exits 1 when the campaign is not admissible (`--require-all` also demands that development cover the live method registry, every system solver, every PDP3 engine and every prime PKM tower engine). It runs nothing and makes no performance claim | `src/cryptanalysis/ecbench/optimization.rs` (module header) |
 | `host` | print the host capsule | §5 |
 | `plan` | validate a spec and print what it expands to; an arm its curve cannot run is refused here | §1, §3 |
@@ -95,6 +96,40 @@ and static musl), Apple silicon, and Windows. A source build is:
 ```bash
 cargo build --release --bin ecbench
 ```
+
+List the shared curve ladder before writing a scaling spec:
+
+```bash
+./target/release/ecbench panel
+./target/release/ecbench panel --phase 1 --family koblitz --json
+```
+
+New specs use `ecbench.spec/v2` and classify curve selection explicitly:
+
+- `{"mode":"phase","phase":1}` is scaling/claim evidence. Every curve must
+  be named as `{"kind":"panel","cell":"P1-K0-23"}`, use public targets,
+  and meet the phase's target-count floor. Copied parameters, wrong-phase
+  cells, a phase whose admission state is blocked, and substitutes are refused
+  before execution.
+- `{"mode":"smoke"}` is for correctness and plumbing fixtures.
+- `{"mode":"diagnostic","off_panel_reason":"..."}` is for research that
+  cannot use the panel and records why.
+
+Smoke and diagnostic sessions are never current `vs_rho` claim evidence. In
+particular, tiny fields such as `F_5` may remain unit-test fixtures, but cannot
+enter a phase. Size always means `ceil(log2(r))`; field bits or binary degree
+are recorded separately. The authoritative cells are embedded from
+[`panel.json`](../../research/ecbench_phased_panel_20261117/panel.json), so a
+cell ID resolves to the same parameters and identities everywhere.
+
+An executable Phase 1 compatible-family slice is
+[`panel-phase1-k0-23.json`](specs/panel-phase1-k0-23.json). A full phase still
+requires all mandatory compatible-family specs and the promotion dossier in
+the panel protocol.
+
+Frozen `ecbench.spec/v1` files still plan, verify, and replay unchanged. A new
+`run`, `isolab-job`, or claim reconstruction refuses them unless
+`--allow-legacy-spec` is supplied explicitly for reproduction.
 
 ```bash
 ./target/release/ecbench plan --spec docs/ecbench/specs/smoke-prime.json

@@ -679,10 +679,10 @@ jobs:
           test "$(sqlite3 "$RUNNER_TEMP/ecbench.db" 'select count(*) from runs')" = 72
       - name: A vs_rho claim builds, loads, and fails closed at L0
         run: |
-          ./target/release/ecbench run --spec docs/ecbench/specs/claim-koblitz.json \
+          ./target/release/ecbench run --allow-legacy-spec --spec docs/ecbench/specs/claim-koblitz.json \
             --out "$RUNNER_TEMP/claim" --cpus none --lock "$RUNNER_TEMP/claim.lock" --allow-busy --settle 1 --quiet
           w=$(./target/release/ecbench plan --spec docs/ecbench/specs/claim-koblitz.json --json | jq -r '.workloads[0].workload_id')
-          ./target/release/ecbench claim build --dir "$RUNNER_TEMP/claim" --ic ic --rho rho-strong \
+          ./target/release/ecbench claim build --allow-legacy-spec --dir "$RUNNER_TEMP/claim" --ic ic --rho rho-strong \
             --workload "$w" --out "$RUNNER_TEMP/claim.json"
           # This L0 diagnostic also needs an independent replay. The native
           # checker enforces both conditions without a legacy Python verifier.

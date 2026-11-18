@@ -2,6 +2,7 @@
 //!
 //! ```text
 //! ecbench methods                      what can be measured
+//! ecbench panel [--phase N] [--family F]  canonical curve ladder
 //! ecbench optimize inventory           registry-wide optimization coverage
 //! ecbench optimize audit --development S... --holdout H...
 //! ecbench host                         the host capsule and its class id
@@ -53,8 +54,8 @@ use clap::{Parser, Subcommand};
 
 use crypto_lib::cryptanalysis::ecbench::{
     audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
-    full_price, gpu, host, isolab, isolation, methods, optimization, record, resources, runner,
-    signals, spec, stats, trend, wordram_price, workload,
+    full_price, gpu, host, isolab, isolation, methods, optimization, panel, record, resources,
+    runner, signals, spec, stats, trend, wordram_price, workload,
 };
 
 #[derive(Parser)]
@@ -211,6 +212,21 @@ enum Cmd {
         #[arg(long)]
         json: bool,
     },
+    /// List the canonical 20/30/60/80-bit curve ladder and exact cell ids.
+    Panel {
+        /// Only cells in this phase (1, 2, 3, or 4).
+        #[arg(long)]
+        phase: Option<u8>,
+        /// Only this family: koblitz, binary, or prime.
+        #[arg(long)]
+        family: Option<String>,
+        /// Omit blocked cells that have no runnable curve spec.
+        #[arg(long)]
+        runnable: bool,
+        /// Print the selected phase/cell records as JSON.
+        #[arg(long)]
+        json: bool,
+    },
     /// Inventory and audit the registry-wide optimization loop.
     Optimize(OptimizeArgs),
     /// Measure the full-pricing units (src/cryptanalysis/ecbench/full_prices.json) on
@@ -257,7 +273,7 @@ enum Cmd {
     },
     /// Validate a spec and print what it expands to.
     Plan {
-        /// An `ecbench.spec/v1` file.
+        /// An `ecbench.spec/v2` file, or a frozen v1 file for audit/replay.
         #[arg(long)]
         spec: PathBuf,
         /// Print the whole plan (workloads, arms, every execution) as JSON.
@@ -285,9 +301,12 @@ enum Cmd {
         /// The host `w_cal` was measured on.
         #[arg(long)]
         w_cal_host: Option<String>,
-        /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
+        /// An `ecbench.spec/v2` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
+        /// Reproduce a frozen v1 spec. New sessions use v2 curve_policy.
+        #[arg(long)]
+        allow_legacy_spec: bool,
         /// A new directory; `${VAR}` is expanded from the environment.
         #[arg(long)]
         out: String,
@@ -582,6 +601,9 @@ enum Cmd {
         /// The spec the worker runs.
         #[arg(long)]
         spec: PathBuf,
+        /// Reproduce a frozen v1 spec. New jobs use v2 curve_policy.
+        #[arg(long)]
+        allow_legacy_spec: bool,
         /// Upload this binary (built for the worker's architecture).
         #[arg(long, conflicts_with_all = ["git_url", "commit"])]
         binary: Option<String>,
@@ -911,6 +933,9 @@ enum ClaimCmd {
         /// first measured round both arms ran).
         #[arg(long)]
         round: Option<u32>,
+        /// Rebuild a historical claim from a frozen v1 session.
+        #[arg(long)]
+        allow_legacy_spec: bool,
         /// An audit receipt (`ecbench verify --replay-all --out`) made on
         /// another host class that reproduced both runs.
         #[arg(long, requires = "pointer")]
@@ -939,6 +964,9 @@ enum ClaimCmd {
         workload: String,
         #[arg(long)]
         round: Option<u32>,
+        /// Rebuild a historical claim from a frozen v1 session.
+        #[arg(long)]
+        allow_legacy_spec: bool,
         #[arg(long)]
         base_report: PathBuf,
         #[arg(long)]
@@ -1420,6 +1448,83 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 }
             }
         }
+        Cmd::Panel {
+            phase,
+            family,
+            runnable,
+            json,
+        } => {
+            if let Some(value) = &family {
+                if !["koblitz", "binary", "prime"].contains(&value.as_str()) {
+                    return Err(format!(
+                        "panel family is koblitz, binary, or prime, not `{value}`"
+                    ));
+                }
+            }
+            let catalog = panel::catalog()?;
+            if let Some(number) = phase {
+                catalog
+                    .phase(number)
+                    .ok_or_else(|| format!("canonical panel has no phase {number}"))?;
+            }
+            let mut rows = Vec::new();
+            for record in &catalog.phases {
+                if phase.is_some_and(|number| record.phase != number) {
+                    continue;
+                }
+                for cell in &record.curves {
+                    if family.as_deref().is_some_and(|value| value != cell.family)
+                        || (runnable && !cell.runnable())
+                    {
+                        continue;
+                    }
+                    rows.push((record, cell));
+                }
+            }
+            if json {
+                print_json(&serde_json::json!({
+                    "schema": panel::PANEL_SCHEMA,
+                    "source": panel::PANEL_SOURCE,
+                    "size_metric": catalog.size_metric,
+                    "gate_defaults": catalog.gate_defaults,
+                    "cells": rows.iter().map(|(record, cell)| serde_json::json!({
+                        "phase": record.phase,
+                        "nominal_subgroup_bits": record.nominal_subgroup_bits,
+                        "subgroup_bit_window": record.subgroup_bit_window,
+                        "minimum_public_targets_per_curve": record.minimum_public_targets_per_curve,
+                        "admission_state": record.admission_state,
+                        "cell": cell,
+                    })).collect::<Vec<_>>(),
+                }))?;
+            } else {
+                println!(
+                    "canonical panel: subgroup bits = ceil(log2(r)); source {}",
+                    panel::PANEL_SOURCE
+                );
+                println!(
+                    "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
+                    "phase", "cell", "family", "r bits", "field", "identity", "status"
+                );
+                for (record, cell) in rows {
+                    let identity = cell
+                        .identity
+                        .icv1
+                        .as_deref()
+                        .or(cell.identity.external_name.as_deref())
+                        .unwrap_or("-");
+                    println!(
+                        "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
+                        record.phase,
+                        cell.cell_id,
+                        cell.family,
+                        cell.size.subgroup_bits,
+                        cell.size.field_bits_or_degree,
+                        identity,
+                        cell.ecbench.status
+                    );
+                }
+            }
+        }
         Cmd::Optimize(args) => match args.action {
             OptimizeAction::Inventory { json } => {
                 if json {
@@ -1691,6 +1796,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 print_json(&runner::PlanDoc {
                     schema: "ecbench.plan/v1".into(),
                     spec_id: p.spec_id.clone(),
+                    curve_policy: p.spec.curve_policy.clone(),
                     arms: p.arms.clone(),
                     workloads: p.workloads.clone(),
                     executions: p.executions.clone(),
@@ -1747,6 +1853,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             w_cal_method,
             w_cal_host,
             spec: path,
+            allow_legacy_spec,
             out,
             cpus,
             lock,
@@ -1761,6 +1868,14 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             // take minutes): a rebuild meanwhile cannot null or swap it.
             host::pin_binary_hash();
             let text = read(&path)?;
+            let parsed = spec::Spec::from_json(&text)?;
+            if !allow_legacy_spec {
+                parsed.require_current_curve_policy()?;
+            } else if parsed.curve_policy.is_legacy() {
+                eprintln!(
+                    "ecbench: warning: reproducing a legacy v1 spec; this session is not canonical-panel claim evidence"
+                );
+            }
             let out = PathBuf::from(isolab::expand_env(&out)?);
             let mut req = isolation::CpuRequest::parse(&cpus)?;
             if req == isolation::CpuRequest::Auto && isolation::topology().cpus.is_empty() {
@@ -2327,6 +2442,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rho,
                 workload,
                 round,
+                allow_legacy_spec,
                 independent_receipt,
                 pointer,
                 out,
@@ -2336,7 +2452,15 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     (Some(p), Some(pointer)) => Some(load_independent(&p, pointer)?),
                     _ => None,
                 };
-                let report = claim::build(&dir, &ic, &rho, &workload, round, independent.as_ref())?;
+                let report = claim::build(
+                    &dir,
+                    &ic,
+                    &rho,
+                    &workload,
+                    round,
+                    independent.as_ref(),
+                    allow_legacy_spec,
+                )?;
                 return emit_claim(report, out, exit_code);
             }
             ClaimCmd::Attach {
@@ -2345,6 +2469,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rho,
                 workload,
                 round,
+                allow_legacy_spec,
                 base_report,
                 independent_receipt,
                 pointer,
@@ -2362,6 +2487,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     round,
                     &original,
                     &independent,
+                    allow_legacy_spec,
                 )?;
                 return emit_claim(report, out, exit_code);
             }
@@ -2407,6 +2533,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         },
         Cmd::IsolabJob {
             spec: path,
+            allow_legacy_spec,
             binary,
             git_url,
             commit,
@@ -2418,7 +2545,11 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             timeout_seconds,
         } => {
             let text = read(&path)?;
-            let p = spec::plan(spec::Spec::from_json(&text)?)?;
+            let parsed = spec::Spec::from_json(&text)?;
+            if !allow_legacy_spec {
+                parsed.require_current_curve_policy()?;
+            }
+            let p = spec::plan(parsed)?;
             let delivery = match (binary, git_url, commit) {
                 (Some(b), None, None) => isolab::Delivery::Binary { path: b },
                 (None, Some(url), Some(commit)) => isolab::Delivery::Source { url, commit },
@@ -2435,6 +2566,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     image,
                     timeout_seconds,
                     policy,
+                    allow_legacy_spec,
                 },
             )?;
             print_json(&job)?;
