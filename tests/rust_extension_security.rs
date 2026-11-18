@@ -126,6 +126,7 @@ fn summaries_support_application_sinks_and_do_not_export_private_scalars() {
 
 #[test]
 fn extension_curve_constructors_keep_distinct_models_and_dispatch_to_generic_solvers() {
+    use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
     use crypto_lib::cryptanalysis::ecbench::methods::{resolve, solve, MethodSpec};
     use crypto_lib::cryptanalysis::ecbench::workload::CurveSpec;
     let method = resolve(&MethodSpec {
@@ -152,19 +153,21 @@ fn extension_curve_constructors_keep_distinct_models_and_dispatch_to_generic_sol
             facts.r.to_biguint() * facts.cofactor.to_biguint(),
             facts.group_order.to_biguint()
         );
-        assert_eq!(instance.mul_generator_exact(instance.r()), None);
+        let r = instance
+            .r()
+            .checked_u128()
+            .expect("subgroup order fits u128");
+        assert_eq!(instance.mul_generator_hex(r), None);
         let target = instance.mul_generator_hex(7).unwrap();
         let report = solve(&method, &instance, &facts, &target, 7).unwrap();
         assert_eq!(
             report.recovered,
-            Some(7u64.into()),
+            Some(ExactScalar::from(7u64)),
             "{}",
             facts.construction
         );
-        assert_eq!(
-            instance.mul_generator_exact(report.recovered.unwrap()),
-            Some(target)
-        );
+        let recovered = report.recovered.unwrap().checked_u128().unwrap();
+        assert_eq!(instance.mul_generator_hex(recovered), Some(target));
     }
 }
 

@@ -99,8 +99,10 @@ use crate::cryptanalysis::ic_boundary::{
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
 use linalg::matrix_by_name;
-use stages::{DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SystemShape, Targets};
-use stages::{PipelineStages, RelationSolverFactory};
+use stages::{
+    DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, PipelineStages,
+    RelationSolverFactory, SystemShape, Targets,
+};
 
 /// One configuration: a choice at each stage, with its parameters.
 #[derive(Clone, Debug, Default, Serialize)]
@@ -413,25 +415,8 @@ pub enum PipelineEvent<'a, E> {
     },
 }
 
-/// Run one configuration end to end.
-///
-/// `planted` is the logarithm the runner checks the answer against.  No
-/// stage receives it: a stage that could read it could fake a relation.
-#[allow(clippy::too_many_arguments)]
-pub fn run_pipeline<G: CountedGroup>(
-    ctx: &InstanceCtx<G>,
-    spec: &PipelineSpec,
-    base_builder: &dyn FactorBaseBuilder<G>,
-    oracle: &mut dyn DecompositionOracle<G>,
-    planted: u64,
-    calib: &Calibration,
-    rho_s: Option<f64>,
-) -> Result<RunReport, String> {
-    run_pipeline_with_base(ctx, spec, base_builder, oracle, planted, calib, rho_s)
-        .map(|(report, _)| report)
-}
-
-/// Original live progress contract, borrowing the actual pipeline outputs.
+/// [`run_pipeline`] with live setup and query notifications. Callbacks borrow
+/// the existing points and oracle output; no query is replayed or retained.
 #[allow(clippy::too_many_arguments)]
 pub fn run_pipeline_with_progress<G: CountedGroup>(
     ctx: &InstanceCtx<G>,
@@ -457,7 +442,15 @@ pub fn run_pipeline_with_progress<G: CountedGroup>(
     .map(|(report, _)| report)
 }
 
-/// Restore the original application-owned stage contract (f73b2edcc78).
+/// Run with application-supplied factor-base, decomposition and matrix stages.
+/// The optional observer sees the actual queries and borrowed witnesses. The
+/// matrix's completion/verification contract is independent of `spec.linalg`;
+/// reports use the injected factory's name. No registry or CLI changes needed.
+/// `expected` is optional: with `None`, the recovered logarithm is verified
+/// solely by its group equation, so consumers need not know it beforehand.
+///
+/// These are variable-time research APIs for public fixtures, not secret-key
+/// arithmetic. Plug-ins run in process as trusted code; this is not a sandbox.
 #[allow(clippy::too_many_arguments)]
 pub fn run_pipeline_with_stages<G: CountedGroup>(
     ctx: &InstanceCtx<G>,
@@ -468,9 +461,6 @@ pub fn run_pipeline_with_stages<G: CountedGroup>(
     rho_s: Option<f64>,
     progress: Option<&mut dyn FnMut(PipelineEvent<'_, G::Elt>)>,
 ) -> Result<RunReport, String> {
-    if ctx.r < 2 || ctx.cofactor.is_multiple_of(ctx.r) {
-        return Err("pipeline requires r >= 2 and a cofactor nonzero modulo r".into());
-    }
     run_pipeline_inner(
         ctx,
         spec,
@@ -483,6 +473,24 @@ pub fn run_pipeline_with_stages<G: CountedGroup>(
         Some(stages.matrix),
     )
     .map(|(report, _)| report)
+}
+
+/// Run one configuration end to end.
+///
+/// `planted` is the logarithm the runner checks the answer against.  No
+/// stage receives it: a stage that could read it could fake a relation.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: u64,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<RunReport, String> {
+    run_pipeline_with_base(ctx, spec, base_builder, oracle, planted, calib, rho_s)
+        .map(|(report, _)| report)
 }
 
 /// [`run_pipeline`], also returning the factor base it built and used,
@@ -565,24 +573,6 @@ fn run_pipeline_inner<G: CountedGroup>(
     }
     let fb_started = Instant::now();
     let fb = base_builder.build(ctx, &spec.factor_base_params, &mut fb_ops)?;
-    if matrix_factory.is_some()
-        && (fb.points.len() != fb.col_of.len()
-            || fb.points.len() != fb.coef_of.len()
-            || fb.points.len() != fb.neg_index.len()
-            || fb.col_of.iter().any(|&column| column >= fb.columns)
-            || fb.neg_index.iter().any(|&index| index >= fb.points.len())
-            || fb
-                .point_index
-                .values()
-                .any(|&index| index >= fb.points.len())
-            || fb
-                .x_index
-                .values()
-                .flatten()
-                .any(|&index| index >= fb.points.len()))
-    {
-        return Err("factor-base plug-in returned inconsistent point/column indexes".into());
-    }
     let archive_import = base_builder.name() == "archive";
     if archive_import
         && matches!(oracle.name(), "mitm-frobenius" | "mitm-frobenius-counted")
@@ -597,6 +587,8 @@ fn run_pipeline_inner<G: CountedGroup>(
     if audit_enabled && (fb.columns == 0 || fb.columns > 4096) {
         return Err("rank audit requires 1..4096 columns".into());
     }
+    // An injected factory owns the matrix contract and names it; the
+    // built-in name is the fallback.
     let linalg_name = if let Some(factory) = matrix_factory {
         factory.name()
     } else if spec.linalg.is_empty() {
@@ -605,7 +597,6 @@ fn run_pipeline_inner<G: CountedGroup>(
         spec.linalg.as_str()
     };
     if audit_enabled
-        && matrix_factory.is_none()
         && !matches!(
             linalg_name,
             "incremental-gauss"
@@ -657,9 +648,6 @@ fn run_pipeline_inner<G: CountedGroup>(
     // so a framework row is comparable with a ledger row rather than
     // merely similar to it.
     let known = fb.known_logs.is_some();
-    if known && matrix_factory.is_some() {
-        return Err("injected matrices require an unknown-log factor base; known-log bases use their dedicated solver".into());
-    }
     let linalg_name = {
         let prior = linalg_name;
         if known {
@@ -671,38 +659,45 @@ fn run_pipeline_inner<G: CountedGroup>(
     // The loop's unknowns are the logs of `[h]P_v` (its rows read
     // `Σ c·x − h·b·d = h·a`), so on a cofactor-`h` curve a known column
     // log `s` enters as `h·s`; at `h = 1` this is the identity.
-    let mut plain: Option<Box<dyn RelationSolver + '_>> =
-        Some(if let Some(factory) = matrix_factory {
-            factory.create(
-                fb.columns
-                    .checked_add(1)
-                    .ok_or("factor-base column count overflow")?,
-                ctx.r,
-            )?
-        } else {
-            match &fb.known_logs {
-                Some(logs) => {
-                    let h = ctx.cofactor % ctx.r;
-                    let scaled = logs
-                        .iter()
-                        .map(|&s| ((s as u128 * h as u128) % ctx.r as u128) as u64)
-                        .collect();
-                    Box::new(KnownLogSolver::new(scaled, ctx.r)) as Box<dyn RelationSolver>
-                }
-                None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?,
-            }
-        });
+    // An injected matrix may borrow its factory, so it is kept apart from
+    // the built-in (owned) matrices the rank audit can wrap.
+    let mut injected = match matrix_factory {
+        Some(factory) if !known => {
+            let columns = fb
+                .columns
+                .checked_add(1)
+                .ok_or("factor-base column count overflow")?;
+            Some(factory.create(columns, ctx.r)?)
+        }
+        _ => None,
+    };
+    let plain = injected.is_none().then(|| match &fb.known_logs {
+        Some(logs) => {
+            let h = ctx.cofactor % ctx.r;
+            let scaled = logs
+                .iter()
+                .map(|&s| ((s as u128 * h as u128) % ctx.r as u128) as u64)
+                .collect();
+            Ok(Box::new(KnownLogSolver::new(scaled, ctx.r)) as Box<dyn RelationSolver>)
+        }
+        None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r),
+    });
+    let mut plain = plain.transpose()?;
     let mut audited = if audit_enabled && !known {
         Some(useful_rank::AuditedMatrix::new(
             ctx,
             &fb,
-            plain.take().unwrap(),
+            plain
+                .take()
+                .ok_or("rank audit requires a built-in incremental Gaussian solver")?,
         )?)
     } else {
         None
     };
     let matrix: &mut dyn RelationSolver = if let Some(m) = &mut audited {
         m
+    } else if let Some(m) = &mut injected {
+        m.as_mut()
     } else {
         plain.as_mut().unwrap().as_mut()
     };
@@ -804,26 +799,33 @@ fn run_pipeline_inner<G: CountedGroup>(
     {
         return Err("walk-prime-serial/batch requires a prime curve with p < 2^62".into());
     }
-    let checked_full_rank = matrix_factory.map_or(
-        linalg_name == "incremental-gauss-full-rank-checked",
-        |factory| factory.verify_base_columns(),
-    );
-    // `sparse-cado` is a batch solver that answers only at full column
-    // rank, so it runs under the full-rank rule.
-    let completion = if let Some(factory) = matrix_factory {
-        factory.completion_rule()
-    } else if linalg_name == "incremental-gauss-full-rank"
-        || checked_full_rank
-        || linalg::is_deferred_sparse(linalg_name)
-    {
-        CompletionRule::FullRank
-    } else {
-        CompletionRule::TargetPinned
-    };
-    if checked_full_rank && completion != CompletionRule::FullRank {
-        return Err("base-column verification requires full-rank completion".into());
-    }
     measurement::begin_online(measurement::Phase::TargetQuery);
+    let (checked_full_rank, completion) = match matrix_factory.filter(|_| !known) {
+        // An injected factory states its own completion and verification
+        // policy instead of the built-in name comparison below.
+        Some(factory) => {
+            let checked = factory.verify_base_columns();
+            let completion = factory.completion_rule();
+            if checked && completion != CompletionRule::FullRank {
+                return Err("base-column verification requires full-rank completion".into());
+            }
+            (checked, completion)
+        }
+        None => {
+            let checked_full_rank = linalg_name == "incremental-gauss-full-rank-checked";
+            // `sparse-cado` is a batch solver that answers only at full column
+            // rank, so it runs under the full-rank rule.
+            let completion = if linalg_name == "incremental-gauss-full-rank"
+                || checked_full_rank
+                || linalg::is_deferred_sparse(linalg_name)
+            {
+                CompletionRule::FullRank
+            } else {
+                CompletionRule::TargetPinned
+            };
+            (checked_full_rank, completion)
+        }
+    };
     let mut outcome: PipelineOutcome = if matches!(
         spec.targets,
         Targets::Residual
@@ -937,15 +939,6 @@ fn run_pipeline_inner<G: CountedGroup>(
             .extend(matrix.work_counters());
     }
     measurement::end_online();
-    let verified = outcome.verified && planted.is_none_or(|known| outcome.recovered == Some(known));
-    if let Some(progress) = &mut progress {
-        progress(PipelineEvent::Finished {
-            trials: outcome.trials,
-            relations: outcome.relations_found,
-            rank: outcome.rank,
-            verified,
-        });
-    }
     let (work, work_unit) = matrix.work();
     let useful_rank = audited.map(|audit| {
         outcome.linear_algebra.group_ops.merge(audit.cost.group_ops);
@@ -956,6 +949,15 @@ fn run_pipeline_inner<G: CountedGroup>(
         outcome.verified &= audit.audit.invalid_rows == 0;
         audit.audit
     });
+    let verified = outcome.verified && planted.is_none_or(|known| outcome.recovered == Some(known));
+    if let Some(progress) = &mut progress {
+        progress(PipelineEvent::Finished {
+            trials: outcome.trials,
+            relations: outcome.relations_found,
+            rank: outcome.rank,
+            verified,
+        });
+    }
     let mut unpriced_work = Vec::new();
     // A pinned `ns_per_hashed_tensor_step` charges the steps
     // (`price_phase`, `PINNABLE_NATIVE`) and lifts only the step clauses:
@@ -1122,20 +1124,19 @@ fn run_pipeline_inner<G: CountedGroup>(
     let total_gae = fb_phase.gae + prep_cost.gae + rel.gae + la.gae + ver.gae;
     let sqrt_r = (ctx.r as f64).sqrt();
     let s = total_gae / sqrt_r;
-
     let mut effective_spec = spec.clone();
-    if matrix_factory.is_some() {
-        effective_spec.linalg = linalg_name.into();
+    if matrix_factory.is_some() && !known {
+        effective_spec.linalg = linalg_name.to_string();
     }
-    let label = effective_spec.label();
+
     Ok((
         RunReport {
             instance: ctx.name.clone(),
             log2_r: (ctx.r as f64).log2(),
             r: ctx.r,
             group_order: ctx.group_order,
+            label: effective_spec.label(),
             spec: effective_spec,
-            label,
             factor_base: FactorBaseReport {
                 name: base_builder.name().to_string(),
                 description: base_builder.describe(&spec.factor_base_params),
@@ -1252,6 +1253,32 @@ mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::{roster_prime_instance, Calibration};
 
+    fn ctx_and_planted(
+        inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    ) -> (
+        InstanceCtx<'_, crate::cryptanalysis::ic_boundary::PrimeCurve>,
+        u64,
+    ) {
+        let g = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let planted = 30_011 % inst.r;
+        let q =
+            crate::cryptanalysis::ic_boundary::CountedGroup::mul(&inst.curve, &mut ops, g, planted);
+        (
+            InstanceCtx {
+                group: &inst.curve,
+                generator: g,
+                target: q,
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: None,
+            },
+            planted,
+        )
+    }
+
     #[test]
     fn live_pipeline_witnesses_are_real_equations_and_preserve_the_result() {
         let inst = roster_prime_instance(16).unwrap();
@@ -1287,38 +1314,36 @@ mod tests {
             planted,
             &Calibration::default(),
             None,
-            &mut |event| {
-                match event {
-                    PipelineEvent::FactorBaseReady { points: base, .. } => points = base.to_vec(),
-                    PipelineEvent::Query {
-                        a,
-                        b,
-                        point,
-                        relations,
-                        ..
-                    } => {
-                        // Separate counters for test replay must never enter the
-                        // pipeline's operation accounting.
-                        let mut replay = GroupOps::default();
-                        let ag = ctx.group.mul(&mut replay, ctx.generator, a);
-                        let bq = ctx.group.mul(&mut replay, ctx.target, b);
-                        assert_eq!(ctx.group.add(&mut replay, ag, bq), point);
-                        for relation in relations {
-                            if let Relation::Summands(indices) = relation {
-                                let sum = indices.iter().fold(ctx.group.identity(), |sum, &i| {
-                                    ctx.group.add(&mut replay, sum, points[i])
-                                });
-                                assert_eq!(sum, point);
-                                witnesses += 1;
-                            }
+            &mut |event| match event {
+                PipelineEvent::FactorBaseReady { points: base, .. } => points = base.to_vec(),
+                PipelineEvent::Query {
+                    a,
+                    b,
+                    point,
+                    relations,
+                    ..
+                } => {
+                    // Separate counters for test replay must never enter the
+                    // pipeline's operation accounting.
+                    let mut replay = GroupOps::default();
+                    let ag = ctx.group.mul(&mut replay, ctx.generator, a);
+                    let bq = ctx.group.mul(&mut replay, ctx.target, b);
+                    assert_eq!(ctx.group.add(&mut replay, ag, bq), point);
+                    for relation in relations {
+                        if let Relation::Summands(indices) = relation {
+                            let sum = indices.iter().fold(ctx.group.identity(), |sum, &i| {
+                                ctx.group.add(&mut replay, sum, points[i])
+                            });
+                            assert_eq!(sum, point);
+                            witnesses += 1;
                         }
                     }
-                    PipelineEvent::Finished { verified, .. } => {
-                        assert!(verified);
-                        finished = true;
-                    }
-                    _ => {}
                 }
+                PipelineEvent::Finished { verified, .. } => {
+                    assert!(verified);
+                    finished = true;
+                }
+                _ => {}
             },
         )
         .unwrap();
@@ -1334,32 +1359,6 @@ mod tests {
             original.decomposition.relations_found
         );
         assert_eq!(traced.linear_algebra.rank, original.linear_algebra.rank);
-    }
-
-    fn ctx_and_planted(
-        inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
-    ) -> (
-        InstanceCtx<'_, crate::cryptanalysis::ic_boundary::PrimeCurve>,
-        u64,
-    ) {
-        let g = inst.generator_point();
-        let mut ops = GroupOps::default();
-        let planted = 30_011 % inst.r;
-        let q =
-            crate::cryptanalysis::ic_boundary::CountedGroup::mul(&inst.curve, &mut ops, g, planted);
-        (
-            InstanceCtx {
-                group: &inst.curve,
-                generator: g,
-                target: q,
-                r: inst.r,
-                cofactor: inst.cofactor,
-                group_order: inst.group_order,
-                name: inst.name.clone(),
-                field_degree: None,
-            },
-            planted,
-        )
     }
 
     fn known_log_spec(size: u64) -> PipelineSpec {

@@ -2624,14 +2624,17 @@ enum F4PackedMatrix {
 
 /// Explicit, identity-bound matrix implementation, leaving historical defaults
 /// untouched. Baseline includes the three previously qualified GF2 switches;
-/// Prepared adds exact active layouts/top-degree/linear-tail/direct packing;
-/// QuadraticTail additionally finishes small quadratic recursive branches.
+/// Prepared/QuadraticTail retain the initial all-width scheduling for replay.
+/// Adaptive variants keep cheap early degrees below sixteen variables.
+/// The quadratic-tail variants additionally finish bounded recursive branches.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum MatrixRuntime {
     Baseline,
     Prepared,
     QuadraticTail,
+    AdaptivePrepared,
+    AdaptiveQuadraticTail,
 }
 
 thread_local! {
@@ -2644,8 +2647,10 @@ impl MatrixRuntime {
             "baseline" => Ok(Self::Baseline),
             "prepared" => Ok(Self::Prepared),
             "quadratic-tail" => Ok(Self::QuadraticTail),
+            "adaptive-prepared" => Ok(Self::AdaptivePrepared),
+            "adaptive-quadratic-tail" => Ok(Self::AdaptiveQuadraticTail),
             _ => Err(format!(
-                "unknown matrix runtime `{value}`; expected baseline, prepared or quadratic-tail"
+                "unknown matrix runtime `{value}`; expected baseline, prepared, quadratic-tail, adaptive-prepared or adaptive-quadratic-tail"
             )),
         }
     }
@@ -2655,42 +2660,34 @@ fn prepared_matrix_runtime() -> bool {
     MATRIX_RUNTIME.with(|slot| {
         matches!(
             slot.get(),
-            Some(MatrixRuntime::Prepared | MatrixRuntime::QuadraticTail)
+            Some(
+                MatrixRuntime::Prepared
+                    | MatrixRuntime::QuadraticTail
+                    | MatrixRuntime::AdaptivePrepared
+                    | MatrixRuntime::AdaptiveQuadraticTail
+            )
         )
     })
 }
 
 /// Run synchronously with an explicit policy, restoring both matrix and GF2
 /// settings after nested calls or panics. No process-wide tuning mutation.
-struct MatrixRuntimeScope {
-    matrix: Option<MatrixRuntime>,
-    kernel: Option<crate::cryptanalysis::gf2_elim::KernelPolicy>,
-}
-
-impl MatrixRuntimeScope {
-    fn enter(policy: Option<MatrixRuntime>) -> Self {
-        let matrix = MATRIX_RUNTIME.with(|slot| slot.replace(policy));
-        let kernel = crate::cryptanalysis::gf2_elim::set_kernel_policy_thread(policy.map(|_| {
-            crate::cryptanalysis::gf2_elim::KernelPolicy {
-                single_write: true,
-                vector_tables: true,
-                serial_one_worker: std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1"),
-            }
-        }));
-        Self { matrix, kernel }
-    }
-}
-
-impl Drop for MatrixRuntimeScope {
-    fn drop(&mut self) {
-        MATRIX_RUNTIME.with(|slot| slot.set(self.matrix));
-        crate::cryptanalysis::gf2_elim::set_kernel_policy_thread(self.kernel);
-    }
-}
-
 pub fn with_matrix_runtime<T>(policy: MatrixRuntime, work: impl FnOnce() -> T) -> T {
-    let _restore = MatrixRuntimeScope::enter(Some(policy));
-    work()
+    struct Restore(Option<MatrixRuntime>);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            MATRIX_RUNTIME.with(|slot| slot.set(self.0));
+        }
+    }
+    let _restore = Restore(MATRIX_RUNTIME.with(|slot| slot.replace(Some(policy))));
+    crate::cryptanalysis::gf2_elim::with_kernel_policy(
+        crate::cryptanalysis::gf2_elim::KernelPolicy {
+            single_write: true,
+            vector_tables: true,
+            serial_one_worker: std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1"),
+        },
+        work,
+    )
 }
 
 impl F4PackedMatrix {
@@ -4749,6 +4746,128 @@ fn build_macaulay_flat_with_multiplier_mask(
     )
 }
 
+type F4DirectPacker<P> =
+    fn(&[F2BoolPoly], usize, u32, Mask, &F4ColumnLayout, Option<&F5Criterion>) -> Option<P>;
+
+/// Cached-layout construction shared by F4 and criterion-selected F5. XOR
+/// products directly into the final row; only surviving bits count as column
+/// support. Missing or disappearing support rejects this cache hit, so the
+/// ordinary builder still determines the exact layout and admission caps.
+fn pack_polynomials_flat_direct(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    multiplier_mask: Mask,
+    layout: &F4ColumnLayout,
+    criterion: Option<&F5Criterion>,
+) -> Option<FlatF2Matrix> {
+    // Select the representation once, not once for each term of every
+    // product. The three monomorphisations preserve the same exact-support
+    // rejection and ordinary-builder fallback.
+    let columns = layout.columns.len();
+    match &layout.index {
+        F4ColumnIndex::Standard(index) => pack_polynomials_flat_lookup(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            columns,
+            criterion,
+            |mask| index.get(&mask).copied(),
+        ),
+        F4ColumnIndex::Fast(F4FastColumnIndex::Hashed(index)) => pack_polynomials_flat_lookup(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            columns,
+            criterion,
+            |mask| index.get(&mask).copied(),
+        ),
+        F4ColumnIndex::Fast(F4FastColumnIndex::Dense(index)) => pack_polynomials_flat_lookup(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            columns,
+            criterion,
+            |mask| {
+                index
+                    .get(usize::try_from(mask).ok()?)
+                    .copied()
+                    .filter(|&column| column != u16::MAX)
+                    .map(usize::from)
+            },
+        ),
+    }
+}
+
+fn pack_polynomials_flat_lookup(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    multiplier_mask: Mask,
+    columns: usize,
+    criterion: Option<&F5Criterion>,
+    lookup: impl Fn(Mask) -> Option<usize>,
+) -> Option<FlatF2Matrix> {
+    let words = columns.div_ceil(64);
+    if words == 0 {
+        return None;
+    }
+    let mut schedules: Vec<Option<std::rc::Rc<[Mask]>>> = vec![None; degree as usize + 1];
+    let mut seen = vec![false; columns];
+    let mut data = Vec::new();
+    let mut rows = 0;
+    let row_cap = max_f4_rows();
+    for (i, polynomial) in polys.iter().enumerate() {
+        let pdeg = polynomial
+            .terms
+            .iter()
+            .map(|t| t.degree())
+            .max()
+            .unwrap_or(0);
+        if pdeg > degree {
+            continue;
+        }
+        let gap = (degree - pdeg) as usize;
+        let multipliers = schedules[gap]
+            .get_or_insert_with(|| cached_monomials_up_to_mask(multiplier_mask, gap as u32));
+        for &multiplier in multipliers.iter() {
+            if criterion.is_some_and(|c| c.prunes(i, multiplier)) {
+                continue;
+            }
+            let start = data.len();
+            data.resize(start + words, 0u64);
+            let row = &mut data[start..];
+            for term in &polynomial.terms {
+                let column = lookup(term.mask | multiplier)?;
+                row[column / 64] ^= 1u64 << (column % 64);
+            }
+            if row.iter().all(|word| *word == 0) {
+                data.truncate(start);
+                continue;
+            }
+            if rows == row_cap {
+                return None;
+            }
+            for (word_index, &word) in row.iter().enumerate() {
+                let mut bits = word;
+                while bits != 0 {
+                    seen[word_index * 64 + bits.trailing_zeros() as usize] = true;
+                    bits &= bits - 1;
+                }
+            }
+            rows += 1;
+        }
+    }
+    if seen.iter().any(|present| !present) {
+        return None;
+    }
+    let _ = n_vars; // The explicit multiplier mask owns the schedule.
+    Some(FlatF2Matrix { data, rows, words })
+}
+
 // ── Sort-free parity row generation (KIC_M4RI_OLD=1 restores the old path) ──
 //
 // A cold Macaulay build used to materialise every product `t · f` as a
@@ -5140,78 +5259,6 @@ fn build_macaulay_packed_parity<P: Default + ParityPack>(
         }
         Some(Some(finish(layout.columns.clone(), matrix)))
     })
-}
-
-type F4DirectPacker<P> =
-    fn(&[F2BoolPoly], usize, u32, Mask, &F4ColumnLayout, Option<&F5Criterion>) -> Option<P>;
-
-/// Cached-layout construction shared by F4 and criterion-selected F5. XOR
-/// products directly into the final row; only surviving bits count as column
-/// support. Missing or disappearing support rejects this cache hit, so the
-/// ordinary builder still determines the exact layout and admission caps.
-fn pack_polynomials_flat_direct(
-    polys: &[F2BoolPoly],
-    n_vars: usize,
-    degree: u32,
-    multiplier_mask: Mask,
-    layout: &F4ColumnLayout,
-    criterion: Option<&F5Criterion>,
-) -> Option<FlatF2Matrix> {
-    let words = layout.columns.len().div_ceil(64);
-    if words == 0 {
-        return None;
-    }
-    let mut schedules: Vec<Option<std::rc::Rc<[Mask]>>> = vec![None; degree as usize + 1];
-    let mut seen = vec![false; layout.columns.len()];
-    let mut data = Vec::new();
-    let mut rows = 0;
-    let row_cap = max_f4_rows();
-    for (i, polynomial) in polys.iter().enumerate() {
-        let pdeg = polynomial
-            .terms
-            .iter()
-            .map(|t| t.degree())
-            .max()
-            .unwrap_or(0);
-        if pdeg > degree {
-            continue;
-        }
-        let gap = (degree - pdeg) as usize;
-        let multipliers = schedules[gap]
-            .get_or_insert_with(|| cached_monomials_up_to_mask(multiplier_mask, gap as u32));
-        for &multiplier in multipliers.iter() {
-            if criterion.is_some_and(|c| c.prunes(i, multiplier)) {
-                continue;
-            }
-            let start = data.len();
-            data.resize(start + words, 0u64);
-            let row = &mut data[start..];
-            for term in &polynomial.terms {
-                let column = layout.index.get(&(term.mask | multiplier))?;
-                row[column / 64] ^= 1u64 << (column % 64);
-            }
-            if row.iter().all(|word| *word == 0) {
-                data.truncate(start);
-                continue;
-            }
-            if rows == row_cap {
-                return None;
-            }
-            for (word_index, &word) in row.iter().enumerate() {
-                let mut bits = word;
-                while bits != 0 {
-                    seen[word_index * 64 + bits.trailing_zeros() as usize] = true;
-                    bits &= bits - 1;
-                }
-            }
-            rows += 1;
-        }
-    }
-    if seen.iter().any(|present| !present) {
-        return None;
-    }
-    let _ = n_vars; // The explicit multiplier mask owns the schedule.
-    Some(FlatF2Matrix { data, rows, words })
 }
 
 fn build_macaulay_packed<P: Default + ParityPack>(
@@ -7111,7 +7158,17 @@ impl SolverEngine {
             }
         });
         let highest_only = (matches!(self, Self::MatrixF4 { .. } | Self::MatrixF5 { .. })
-            && prepared_matrix_runtime())
+            && prepared_matrix_runtime()
+            // Tiny overdetermined Semaev systems usually refute at degree
+            // two. Paying for degree three on every relation query regresses
+            // the complete pipeline, even when wider complete-root calls win.
+            && (n_vars >= 16
+                || MATRIX_RUNTIME.with(|slot| {
+                    matches!(
+                        slot.get(),
+                        Some(MatrixRuntime::Prepared | MatrixRuntime::QuadraticTail)
+                    )
+                })))
             || forced.unwrap_or(n_vars >= 24);
         let first = if highest_only { top } else { base };
         Some(first..=top)
@@ -8686,6 +8743,7 @@ pub fn solve_boolean_system_with_node_oracle(
         InheritPolicy::resolve(opts.engine),
         accept,
         node_oracle,
+        false,
     )
 }
 
@@ -8708,9 +8766,9 @@ fn solve_with_policy(
         n_vars,
         opts,
         policy,
-        true,
         accept,
         |_, _| NodeOracleDecision::Continue,
+        true,
     );
     PARALLEL_LEVELS.with(|c| c.set(saved));
     result
@@ -8723,6 +8781,7 @@ fn solve_with_policy_and_oracle(
     policy: InheritPolicy,
     accept: impl FnMut(Mask) -> bool,
     node_oracle: impl FnMut(&[Option<bool>], Mask) -> NodeOracleDecision,
+    tail_allowed: bool,
 ) -> (Vec<Mask>, SolveStats) {
     // A node oracle runs on the calling thread only: no parallel split.
     let saved = PARALLEL_LEVELS.with(|c| c.replace(0));
@@ -8731,9 +8790,9 @@ fn solve_with_policy_and_oracle(
         n_vars,
         opts,
         policy,
-        false,
         accept,
         node_oracle,
+        tail_allowed,
     );
     PARALLEL_LEVELS.with(|c| c.set(saved));
     result
@@ -8744,9 +8803,9 @@ fn solve_with_policy_and_oracle_inner(
     n_vars: usize,
     opts: &SolveOptions,
     policy: InheritPolicy,
-    tail_allowed: bool,
     mut accept: impl FnMut(Mask) -> bool,
     mut node_oracle: impl FnMut(&[Option<bool>], Mask) -> NodeOracleDecision,
+    tail_allowed: bool,
 ) -> (Vec<Mask>, SolveStats) {
     let mut stats = SolveStats::default();
     let mut out = Vec::new();
@@ -8861,10 +8920,8 @@ fn solve_children_parallel(
 ) {
     let levels = PARALLEL_LEVELS.with(|c| c.get());
     let caller = std::thread::current().id();
-    let runtime = MATRIX_RUNTIME.with(std::cell::Cell::get);
     let budget = opts.node_budget.saturating_sub(stats.reductions);
     let run = |value: bool| {
-        let _runtime_scope = MatrixRuntimeScope::enter(runtime);
         bitop_tally::word_ops((assignment.len() as u64).div_ceil(8));
         let mut branch = assignment.to_vec();
         branch[free] = Some(value);
@@ -8950,12 +9007,12 @@ fn quadratic_tail_roots(
         return None;
     }
     let mut local = [u8::MAX; 64];
-    let mut false_mask = 0 as Mask;
-    let mut true_mask = 0 as Mask;
+    let mut false_mask: Mask = 0;
+    let mut true_mask: Mask = 0;
     for (v, value) in assignment.iter().enumerate() {
         match value {
-            Some(false) => false_mask |= (1 as Mask) << v,
-            Some(true) => true_mask |= (1 as Mask) << v,
+            Some(false) => false_mask |= bit(v as u32),
+            Some(true) => true_mask |= bit(v as u32),
             None => {}
         }
     }
@@ -9140,15 +9197,20 @@ fn solve_rec(
                 opts.engine,
                 SolverEngine::MatrixF4 { .. } | SolverEngine::MatrixF5 { .. }
             )
-            && MATRIX_RUNTIME.with(|slot| slot.get() == Some(MatrixRuntime::QuadraticTail))
+            && MATRIX_RUNTIME.with(|slot| {
+                matches!(
+                    slot.get(),
+                    Some(MatrixRuntime::QuadraticTail | MatrixRuntime::AdaptiveQuadraticTail)
+                )
+            })
         {
             if let Some((variables, roots)) = quadratic_tail_roots(&system, &assignment) {
                 stats.tail_enumerations += 1;
                 stats.tail_assignments_tested += 1usize << variables.len();
                 for root in roots {
                     let mut complete = assignment.clone();
-                    for (bit, &variable) in variables.iter().enumerate() {
-                        complete[variable] = Some((root >> bit) & 1 != 0);
+                    for (position, &variable) in variables.iter().enumerate() {
+                        complete[variable] = Some((root >> position) & 1 != 0);
                     }
                     let point = point_with_definitions(&complete, &defined);
                     if original.iter().all(|equation| equation.eval(point) == 0) {
@@ -9422,44 +9484,10 @@ fn solve_rec(
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test]
-    fn matrix_runtime_parallel_children_keep_policy_and_root_order() {
-        let equations = vec![
-            F2BoolPoly::from_monos(vec![F2BoolMono::from_mask(7)], 7),
-            F2BoolPoly::from_monos(vec![F2BoolMono::from_mask(56)], 7),
-        ];
-        let opts = SolveOptions {
-            engine: SolverEngine::MatrixF4 { max_degree: 3 },
-            max_solutions: 128,
-            node_budget: 100_000,
-            split_rule: SplitRule::LowestFree,
-        };
-        let pool = rayon::ThreadPoolBuilder::new()
-            .num_threads(2)
-            .build()
-            .unwrap();
-        pool.install(|| {
-            let previous = PARALLEL_DEPTH_OVERRIDE.with(|slot| slot.replace(Some(0)));
-            let (serial, serial_stats) = with_matrix_runtime(MatrixRuntime::QuadraticTail, || {
-                solve_boolean_system(&equations, 7, &opts)
-            });
-            assert!(!serial_stats.exhausted);
-            set_parallel_depth(Some(2));
-            let (parallel, parallel_stats) =
-                with_matrix_runtime(MatrixRuntime::QuadraticTail, || {
-                    solve_boolean_system(&equations, 7, &opts)
-                });
-            set_parallel_depth(previous);
-            assert!(!parallel_stats.exhausted);
-            assert_eq!(parallel, serial);
-            assert!(!prepared_matrix_runtime());
-        });
-        pool.broadcast(|_| {
-            assert!(MATRIX_RUNTIME.with(std::cell::Cell::get).is_none());
-            let previous = crate::cryptanalysis::gf2_elim::set_kernel_policy_thread(None);
-            assert!(previous.is_none());
-        });
-    }
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     #[test]
     fn matrix_runtime_direct_packing_matches_f4_and_f5_rows() {
@@ -9467,11 +9495,11 @@ mod tests {
             let equations: Vec<_> = (0..4)
                 .map(|salt| {
                     F2BoolPoly::from_monos(
-                        (0..(1 as Mask) << n)
+                        (0..1u64 << n)
                             .filter(|mask| {
                                 mask.count_ones() <= 2 && (mask.wrapping_mul(13) + salt) % 5 < 2
                             })
-                            .map(F2BoolMono::from_mask)
+                            .map(|mask| F2BoolMono::from_mask(mask_from64(mask)))
                             .collect(),
                         n,
                     )
@@ -9502,6 +9530,30 @@ mod tests {
                     .unwrap();
                     assert_eq!(got.data, want.data);
                     assert_eq!((got.rows, got.words), (want.rows, want.words));
+                    for index in [
+                        F4ColumnIndex::Standard(
+                            columns.iter().enumerate().map(|(i, &m)| (m, i)).collect(),
+                        ),
+                        F4ColumnIndex::Fast(F4FastColumnIndex::Hashed(
+                            columns.iter().enumerate().map(|(i, &m)| (m, i)).collect(),
+                        )),
+                    ] {
+                        let layout = F4ColumnLayout {
+                            columns: columns.clone(),
+                            index,
+                        };
+                        let got = pack_polynomials_flat_direct(
+                            &equations,
+                            n,
+                            degree,
+                            mask,
+                            &layout,
+                            f5.as_ref(),
+                        )
+                        .unwrap();
+                        assert_eq!(got.data, want.data);
+                        assert_eq!((got.rows, got.words), (want.rows, want.words));
+                    }
                     let stale = F4ColumnLayout::new(columns[1..].to_vec());
                     assert!(pack_polynomials_flat_direct(
                         &equations,
@@ -9518,6 +9570,78 @@ mod tests {
     }
 
     #[test]
+    fn matrix_runtime_small_systems_keep_cheap_degree_ladder() {
+        for runtime in [
+            MatrixRuntime::AdaptivePrepared,
+            MatrixRuntime::AdaptiveQuadraticTail,
+        ] {
+            with_matrix_runtime(runtime, || {
+                for engine in [
+                    SolverEngine::MatrixF4 { max_degree: 3 },
+                    SolverEngine::MatrixF5 { max_degree: 3 },
+                ] {
+                    for n in [8, 10, 12, 15] {
+                        assert_eq!(engine.degree_ladder(2, n).unwrap(), 2..=3);
+                    }
+                    for n in [16, 22] {
+                        assert_eq!(engine.degree_ladder(2, n).unwrap(), 3..=3);
+                    }
+                }
+                assert_eq!(
+                    SolverEngine::InheritedF4 { max_degree: 3 }
+                        .degree_ladder(2, 12)
+                        .unwrap(),
+                    2..=3
+                );
+            });
+        }
+        // Previously recorded method identities retain their exact ladder.
+        for runtime in [MatrixRuntime::Prepared, MatrixRuntime::QuadraticTail] {
+            with_matrix_runtime(runtime, || {
+                assert_eq!(
+                    SolverEngine::MatrixF4 { max_degree: 3 }
+                        .degree_ladder(2, 12)
+                        .unwrap(),
+                    3..=3
+                );
+                assert_eq!(
+                    SolverEngine::MatrixF5 { max_degree: 3 }
+                        .degree_ladder(2, 10)
+                        .unwrap(),
+                    3..=3
+                );
+            });
+        }
+    }
+
+    #[test]
+    fn matrix_runtime_direct_lookup_handles_high_variable_masks() {
+        let high = bit(63);
+        let equations = [F2BoolPoly::from_monos(
+            vec![
+                F2BoolMono::from_mask(high | 1),
+                F2BoolMono::from_mask(high),
+                F2BoolMono::from_mask(1),
+            ],
+            64,
+        )];
+        for criterion in [RowCriterion::None, RowCriterion::F5] {
+            let f5 = (criterion == RowCriterion::F5)
+                .then(|| F5Criterion::new(&equations, 64, 3, high | 1));
+            let rows =
+                macaulay_rows_monos_with_mask(&equations, 64, 3, high | 1, f5.as_ref()).unwrap();
+            let columns = macaulay_columns(&rows).unwrap();
+            let layout = F4ColumnLayout::new(columns);
+            let want = pack_rows_flat_with_layout(&rows, &layout, false).unwrap();
+            let got =
+                pack_polynomials_flat_direct(&equations, 64, 3, high | 1, &layout, f5.as_ref())
+                    .unwrap();
+            assert_eq!(got.data, want.data);
+            assert_eq!((got.rows, got.words), (want.rows, want.words));
+        }
+    }
+
+    #[test]
     fn matrix_runtime_quadratic_tails_preserve_all_roots_and_caps() {
         for n in 2..=8 {
             let systems = [
@@ -9527,14 +9651,14 @@ mod tests {
                     n,
                 )],
                 (0..n)
-                    .map(|i| F2BoolPoly::from_monos(vec![F2BoolMono::from_mask(1 << i)], n))
+                    .map(|i| F2BoolPoly::from_monos(vec![F2BoolMono::from_mask(bit(i as u32))], n))
                     .collect(),
                 (0..n)
                     .map(|i| {
                         F2BoolPoly::from_monos(
                             vec![
-                                F2BoolMono::from_mask(1 << i),
-                                F2BoolMono::from_mask(1 << ((i + 1) % n)),
+                                F2BoolMono::from_mask(bit(i as u32)),
+                                F2BoolMono::from_mask(bit(((i + 1) % n) as u32)),
                             ],
                             n,
                         )
@@ -9542,7 +9666,8 @@ mod tests {
                     .collect(),
             ];
             for system in systems {
-                let mut literal: Vec<_> = (0..(1 as Mask) << n)
+                let mut literal: Vec<Mask> = (0..1u64 << n)
+                    .map(mask_from64)
                     .filter(|p| system.iter().all(|e| e.eval(*p) == 0))
                     .collect();
                 literal.sort_unstable_by_key(|p| p.reverse_bits());
@@ -9560,13 +9685,17 @@ mod tests {
                         let (want, _) = with_matrix_runtime(MatrixRuntime::Baseline, || {
                             solve_boolean_system(&system, n, &opts)
                         });
-                        let (got, stats) =
-                            with_matrix_runtime(MatrixRuntime::QuadraticTail, || {
+                        for runtime in [
+                            MatrixRuntime::QuadraticTail,
+                            MatrixRuntime::AdaptiveQuadraticTail,
+                        ] {
+                            let (got, stats) = with_matrix_runtime(runtime, || {
                                 solve_boolean_system(&system, n, &opts)
                             });
-                        assert!(!stats.exhausted);
-                        assert_eq!(got, want);
-                        assert_eq!(got, literal.iter().take(cap).copied().collect::<Vec<_>>());
+                            assert!(!stats.exhausted);
+                            assert_eq!(got, want);
+                            assert_eq!(got, literal.iter().take(cap).copied().collect::<Vec<_>>());
+                        }
                     }
                 }
             }
@@ -9608,11 +9737,6 @@ mod tests {
         });
         assert!(!prepared_matrix_runtime());
     }
-
-    #[allow(unused_imports)]
-    use crate::cryptanalysis::pq_groebner_f2::{
-        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
-    };
 
     #[test]
     fn direct_fused_pack_matches_sorted_parity_and_exact_layout() {
@@ -9836,13 +9960,13 @@ mod tests {
             let support = p
                 .terms
                 .iter()
-                .fold(mask_from64(0), |acc, term| acc | term.mask);
+                .fold(0u64, |acc, term| acc | mask_low64(term.mask));
             old_rows.extend(
                 macaulay_rows_monos_with_mask(
                     std::slice::from_ref(p),
                     n_vars,
                     degree,
-                    mask & support,
+                    mask & mask_from64(support),
                     None,
                 )
                 .unwrap(),
@@ -10682,11 +10806,11 @@ mod tests {
             deg(&full)
         );
         // Nothing in the fixed system may touch a variable above 2ℓ.
-        let top: Mask = fixed
+        let top: u64 = fixed
             .iter()
             .flat_map(|e| e.terms.iter())
             .map(|t| t.mask)
-            .fold(mask_from64(0), |a, b| a | b);
+            .fold(0, |a, b| a | mask_low64(b));
         assert_eq!(top >> two, 0, "fixed system used a variable beyond 2ℓ");
     }
 
@@ -10920,12 +11044,7 @@ mod tests {
             let mut got = sols.clone();
             got.sort_unstable();
             brute.sort_unstable();
-            assert_eq!(
-                crate::cryptanalysis::pq_groebner_f2::masks_to_words_checked(&got)
-                    .expect("bounded one-word fixture returned unexpected high mask bits"),
-                brute,
-                "x_R = {raw}"
-            );
+            assert_eq!(masks_low64(&got), brute, "x_R = {raw}");
         }
     }
 
@@ -11099,11 +11218,11 @@ mod tests {
                             for _ in 0..d {
                                 mask |= 1u64 << (next() % n_vars as u64);
                             }
-                            F2BoolMono::from_mask(mask_from64(mask))
+                            F2BoolMono::from_mask(mask)
                         })
                         .collect();
                     let p = F2BoolPoly::from_monos(monos.clone(), n_vars);
-                    if p.eval(mask_from64(planted)) != 0 {
+                    if p.eval(planted) != 0 {
                         monos.push(F2BoolMono::one());
                     }
                     F2BoolPoly::from_monos(monos, n_vars)
@@ -11111,7 +11230,7 @@ mod tests {
                 .filter(|p| !p.is_zero())
                 .collect();
             let brute: Vec<u64> = (0..(1u64 << n_vars))
-                .filter(|pt| system.iter().all(|e| e.eval(mask_from64(*pt)) == 0))
+                .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
                 .collect();
             assert!(brute.contains(&planted), "trial {trial}: fixture unsound");
             satisfiable += 1;
@@ -11125,12 +11244,7 @@ mod tests {
                 let (mut got, stats) = solve_boolean_system(&system, n_vars, &opts);
                 got.sort_unstable();
                 assert!(!stats.exhausted, "trial {trial}");
-                assert_eq!(
-                    crate::cryptanalysis::pq_groebner_f2::masks_to_words_checked(&got)
-                        .expect("bounded one-word fixture returned unexpected high mask bits"),
-                    brute,
-                    "trial {trial} Closure({max_degree})"
-                );
+                assert_eq!(got, brute, "trial {trial} Closure({max_degree})");
             }
         }
         assert_eq!(satisfiable, 80);
@@ -11257,8 +11371,7 @@ mod tests {
                         "trial {trial} {split_rule:?} {policy:?}: the splitting tree differs"
                     );
                     assert_eq!(
-                        crate::cryptanalysis::pq_groebner_f2::masks_to_words_checked(&got)
-                            .expect("bounded one-word fixture returned unexpected high mask bits"),
+                        masks_low64(&got),
                         brute,
                         "trial {trial} {split_rule:?} {policy:?}: roots are not the variety"
                     );
@@ -11272,9 +11385,7 @@ mod tests {
                     let (mut got, _) = solve_boolean_system(&system, n_vars, &opts);
                     got.sort_unstable();
                     assert_eq!(
-                        crate::cryptanalysis::pq_groebner_f2::masks_to_words_checked(&got)
-                            .expect("bounded one-word fixture returned unexpected high mask bits"),
-                        brute,
+                        got, brute,
                         "trial {trial} {split_rule:?} Closure({max_degree}): roots differ"
                     );
                 }
@@ -11853,8 +11964,7 @@ mod tests {
                 got.sort_unstable();
                 got.dedup();
                 assert_eq!(
-                    crate::cryptanalysis::pq_groebner_f2::masks_to_words_checked(&got)
-                        .expect("bounded one-word fixture returned unexpected high mask bits"),
+                    masks_low64(&got),
                     brute,
                     "trial {trial} {cfg:?}: roots differ"
                 );
@@ -11937,10 +12047,7 @@ mod tests {
                         let (mut got, stats) = solve_pinned(&system, n_vars, &opts, policy);
                         got.sort_unstable();
                         assert_eq!(
-                            crate::cryptanalysis::pq_groebner_f2::masks_to_words_checked(&got)
-                                .expect(
-                                    "bounded one-word fixture returned unexpected high mask bits"
-                                ),
+                            masks_low64(&got),
                             brute,
                             "trial {trial} {engine:?} {split_rule:?} {policy:?}: roots differ"
                         );
@@ -12344,8 +12451,7 @@ mod tests {
                     "case {case} rule {rule:?} ran out of budget"
                 );
                 assert_eq!(
-                    crate::cryptanalysis::pq_groebner_f2::masks_to_words_checked(&got)
-                        .expect("bounded one-word fixture returned unexpected high mask bits"),
+                    masks_low64(&got),
                     truth,
                     "case {case} rule {rule:?} disagrees with enumeration"
                 );
@@ -13617,7 +13723,6 @@ mod eliminated_s4_tests {
     use crate::cryptanalysis::binary_semaev::binary_semaev_s4;
     use crate::cryptanalysis::koblitz_bench::random_subspace_basis;
     use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
-    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
     use rand::rngs::StdRng;
     use rand::SeedableRng;
 
@@ -13667,9 +13772,11 @@ mod eliminated_s4_tests {
                 })
                 .collect();
             let want = word(&binary_semaev_s4(&pt[0], &pt[1], &pt[2], &pt[3], &b, &irr));
-            let got = sys.equations.iter().enumerate().fold(0u64, |acc, (j, p)| {
-                acc | (p.eval(mask_from64(a)) as u64) << j
-            });
+            let got = sys
+                .equations
+                .iter()
+                .enumerate()
+                .fold(0u64, |acc, (j, p)| acc | (p.eval(a) as u64) << j);
             assert_eq!(got, want, "n={n} ell={ell} twists={twists:?} a={a:#x}");
             zeros += (want == 0) as usize;
         }
@@ -13694,7 +13801,6 @@ mod target_free_tests {
     use super::*;
     use crate::cryptanalysis::koblitz_bench::{random_subspace_basis, S3LinkRoots};
     use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
-    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
     use rand::rngs::StdRng;
     use rand::SeedableRng;
 
@@ -13745,7 +13851,7 @@ mod target_free_tests {
         }
         let mut got = std::collections::BTreeSet::new();
         for a in 0..1u64 << sys.n_vars {
-            if sys.equations.iter().all(|p| p.eval(mask_from64(a)) == 0) {
+            if sys.equations.iter().all(|p| p.eval(a) == 0) {
                 got.insert(a);
             }
         }

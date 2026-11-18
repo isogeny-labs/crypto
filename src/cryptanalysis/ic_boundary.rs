@@ -7208,7 +7208,10 @@ pub struct FactorBase<E> {
     pub cost: PhaseCost,
     /// Subspace basis (single words) when the base is a linear subspace.
     pub subspace_basis: Option<Vec<u64>>,
-    /// Exact affine offset, separate from a linear-subspace declaration.
+    /// `(basis, offset)` when the abscissae form the affine subspace
+    /// `offset + span(basis)`, `offset` outside the span.  Such a base
+    /// has no `subspace_basis`, so only consumers that read this field
+    /// (the algebraic descent) accept it.
     pub affine_subspace: Option<(Vec<u64>, u64)>,
     /// `Some(n)` when the builder laid the base out by signed Frobenius
     /// orbit: `points[2(o·n + t)] = σ^t(S_o)` and `points[2(o·n + t) + 1]
@@ -7536,6 +7539,9 @@ pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> Fact
     binary_affine_subspace_factor_base(inst, basis, 0)
 }
 
+/// The points above `offset + span(basis)`; `offset = 0` is
+/// [`binary_subspace_factor_base`].  With `offset ≠ 0` (outside the span)
+/// the base records `affine_subspace` instead of `subspace_basis`.
 pub fn binary_affine_subspace_factor_base(
     inst: &BinaryInstance,
     basis: &[u64],

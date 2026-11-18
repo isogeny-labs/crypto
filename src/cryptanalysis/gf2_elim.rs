@@ -80,11 +80,6 @@ pub fn with_kernel_policy<T>(policy: KernelPolicy, work: impl FnOnce() -> T) -> 
     work()
 }
 
-/// Install a synchronous caller's policy on this thread, returning its old value.
-pub(crate) fn set_kernel_policy_thread(policy: Option<KernelPolicy>) -> Option<KernelPolicy> {
-    KERNEL_POLICY.with(|slot| slot.replace(policy))
-}
-
 /// Whether table buffers are reused across pivot blocks (see the module
 /// documentation); off unless `KIC_GF2_REUSE_TABLE=1`.
 fn reuse_table_enabled() -> bool {
@@ -1392,19 +1387,16 @@ mod tests {
                         .map(|_| (0..suffix + 4).map(|_| rng.gen()).collect())
                         .collect();
                     let mut ops = 17;
-                    #[cfg(not(target_arch = "x86_64"))]
-                    let variants = vec![SimdKind::Scalar];
+                    let mut variants = vec![SimdKind::Scalar];
                     #[cfg(target_arch = "x86_64")]
-                    let variants = {
-                        let mut variants = vec![SimdKind::Scalar];
+                    {
                         if std::is_x86_feature_detected!("avx2") {
                             variants.push(SimdKind::Avx2);
                         }
                         if std::is_x86_feature_detected!("avx512f") {
                             variants.push(SimdKind::Avx512);
                         }
-                        variants
-                    };
+                    }
                     for simd in variants {
                         build_tables_once(
                             &matrix,

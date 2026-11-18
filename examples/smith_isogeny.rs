@@ -1,5 +1,5 @@
 //! W3b driver: Smith's explicit isogeny `psi` on divisor classes
-//! (`cryptanalysis::smith_isogeny`, `cryptanalysis::smith_route_s`), protocol
+//! (`cryptanalysis::smith_isogeny_divisor_map`, `cryptanalysis::smith_route_s`), protocol
 //! `research/smith_isogeny_divisor_map_20261018/PROTOCOL.md`.
 //!
 //! ```text
@@ -11,7 +11,7 @@
 //! Every run appends JSONL rows to `--out DIR` (default the study's `data/`),
 //! file `<cmd>_q<q>.jsonl`.
 
-use crypto_lib::cryptanalysis::smith_isogeny as si;
+use crypto_lib::cryptanalysis::smith_isogeny_divisor_map as si;
 use crypto_lib::cryptanalysis::smith_prop24::{
     analyze_curve, h_point_count, random_curve, x_point_count, SplitMix64,
 };

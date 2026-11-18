@@ -55,7 +55,8 @@ use super::chained_transfer::ic_control::{
     wiedemann_coord, CubicOracle, Dsu, Nat, Rel, Row, REL_FB,
 };
 use super::ic_boundary::{
-    invmod, pivot_inversion_steps, rho_reference_walk, CountedGroup, GroupOps, RhoWalk,
+    invmod, pivot_inversion_steps, rho_walk_with_policy, CountedGroup, GroupOps, NegationClasses,
+    PointClasses, RhoWalk, WalkPolicy,
 };
 use super::residual_walk::{is_prime_u64, mix64};
 
@@ -1659,14 +1660,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
         // UnitT solves for h·log T: one inversion of h and one product.
         let h_inv = if ext.unit_t {
             w_nat.mul += pivot_inversion_steps(r) + 1;
-            let Some(inverse) = invmod(h % r, r) else {
-                // Unit-T cannot recover log T when the cofactor is not a unit.
-                res.la_wied.merge(w_nat);
-                res.la.merge(w_nat);
-                res.exhausted = true;
-                break 'outer;
-            };
-            inverse
+            invmod(h % r, r).expect("h is a unit modulo the prime r")
         } else {
             1
         };
@@ -2187,17 +2181,41 @@ pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
 /// points).  `native` is the walk's canonicalisations, floored at one per
 /// step, as in [`run_rho`].
 pub fn run_rho_walk(inst: &Instance, seed: u64, walk: RhoWalk) -> RhoOut {
+    run_rho_policy(inst, seed, walk, WalkPolicy::legacy())
+}
+
+/// [`run_rho_walk`] under a [`WalkPolicy`]. `WalkPolicy::legacy()` is
+/// `run_rho_walk` exactly (`rho_reference_walk` is that policy). Used for the
+/// leaner references: negation with `cycle_window = 0` and Brent detection
+/// (arm B), and the plain walk with `cycle_window = 0` (arm Q).
+pub fn run_rho_policy(inst: &Instance, seed: u64, walk: RhoWalk, policy: WalkPolicy) -> RhoOut {
     let (fm0, fi0) = (inst.curve.fmul(), inst.curve.finv());
     let max_steps = (60.0 * (inst.r as f64).sqrt()) as u64 + 10_000;
-    let rr = rho_reference_walk(
-        &inst.curve,
-        inst.g,
-        inst.target,
-        inst.r,
-        seed,
-        max_steps,
-        walk,
-    );
+    let rr = if walk.negation {
+        rho_walk_with_policy(
+            &inst.curve,
+            &NegationClasses { r: inst.r },
+            inst.g,
+            inst.target,
+            inst.r,
+            seed,
+            max_steps,
+            walk,
+            policy,
+        )
+    } else {
+        rho_walk_with_policy(
+            &inst.curve,
+            &PointClasses,
+            inst.g,
+            inst.target,
+            inst.r,
+            seed,
+            max_steps,
+            walk,
+            policy,
+        )
+    };
     let (cm, ci) = (inst.curve.fmul() - fm0, inst.curve.finv() - fi0);
     let certified = rr
         .recovered
@@ -3074,6 +3092,39 @@ mod tests {
             assert!(rho.certified);
             assert_eq!(rho.recovered, Some(inst.t_secret));
             assert!(rho.cantor_mul > 0);
+        }
+    }
+
+    /// The legacy policy is `run_rho_walk` count for count; the window-free
+    /// walks (arms B and Q) certify, and the plain walk without its window is
+    /// the same walk with zero compares (validator finding B13).
+    #[test]
+    fn lean_rho_walks_certify_and_drop_window_compares() {
+        for (p, g) in [(131u64, 3u32), (131, 4), (257, 3), (1031, 3)] {
+            let inst = first_instance(p, g);
+            for seed in 1..=3u64 {
+                let a = run_rho_walk(&inst, seed, RhoWalk::negation());
+                let b = run_rho_policy(&inst, seed, RhoWalk::negation(), WalkPolicy::legacy());
+                assert_eq!(
+                    (a.recovered, a.steps, a.cantor_mul, a.compares, a.native),
+                    (b.recovered, b.steps, b.cantor_mul, b.compares, b.native)
+                );
+                let mut nw = RhoWalk::negation();
+                nw.cycle_window = 0;
+                let br = run_rho_policy(&inst, seed, nw, WalkPolicy::v2());
+                assert!(br.certified, "B p={p} g={g} seed={seed}");
+                assert_eq!(br.recovered, Some(inst.t_secret));
+                let pl = run_rho_walk(&inst, seed, RhoWalk::plain());
+                let mut pw = RhoWalk::plain();
+                pw.cycle_window = 0;
+                let q = run_rho_policy(&inst, seed, pw, WalkPolicy::legacy());
+                assert!(q.certified);
+                assert_eq!(q.compares, 0);
+                if pl.compares > 0 {
+                    // same walk when the window never fired
+                    assert_eq!((pl.recovered, pl.steps), (q.recovered, q.steps));
+                }
+            }
         }
     }
 }

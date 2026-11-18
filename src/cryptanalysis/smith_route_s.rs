@@ -899,7 +899,7 @@ fn cof(n: u64) -> Option<(u64, u64)> {
 // construction's own order, test Props. 2 and 4 on each descended `H`, and
 // where they pass run the planted ECDLP through `psi` to the quartic.
 
-use super::smith_isogeny::{smith_data_with_subgroups, Hyp, Mum, Smith, W1Bridge};
+use super::smith_isogeny_divisor_map::{smith_data_with_subgroups, Hyp, Mum, Smith, W1Bridge};
 use super::smith_prop24::SplitMix64;
 
 /// One instance of the split arm.

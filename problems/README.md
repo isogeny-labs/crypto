@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Quartic matched-rho overpricing](quartic-matched-rho-overpricing.md) | open; review requested from quartic-row owners | trusting the IC/rho gap on existing plane-quartic IC rows (may be ~1.73x too favourable to IC) | an executed negation-walk and `<rho>`-class-walk rho on the same Jacobians, under the validation gate, then a row correction |
 | [Curve25519 target-conditioned section coefficients](curve25519-section-coefficient-selection.md) | investigating | converting structured membership into exponent-moving discovery | biased coefficient constructor with complete attempt/yield/cold-cost and original-row bounds; native quotient query and actual-object proofs |
 | [P-192 mixed-3 quotient and projected relations](nist-mixed-three-quotient-and-relation-solver.md) | open | complete mixed-3 transfer/solver comparison | quotient and maps implemented at producer standing; independent/search certification, restricted solver, complete costs and budget admission remain |
 | [Current-main research regression gates](current-main-research-regressions.md) | open; library/lint repairs validated | merging the Rust/IC changes with passing final-head CI/review | local release library, 53 consumers, full maintained Clippy and workspace types pass; shared frozen-lock, checkout, registry, leaderboard and backlog gates remain |

@@ -633,10 +633,13 @@ pub struct F4Options {
     pub max_pairs_per_step: Option<usize>,
     /// Collect per-step diagnostics for explicit research runs. Disabled by default.
     pub capture_run_log: bool,
-    /// Compare the final leading-monomial staircase with the semi-regular
-    /// Hilbert expectation. Off by default and never priced into solver work.
-    /// This does not establish first/last fall degree or degree of regularity.
-    pub record_hilbert_diagnostics: bool,
+    /// Compute the post-hoc degree-fall diagnostic after the run: the
+    /// first-fall degree, the last-fall degree, the observed degree of
+    /// regularity and the per-degree Hilbert deviation of the final basis from
+    /// the complete-intersection (semi-regular) expectation. Off by default —
+    /// the diagnostic is a single post-hoc staircase scan, never on the hot
+    /// path and never priced.
+    pub record_degree_falls: bool,
     /// Write the run's state to this file (and resume from it if it already
     /// holds a checkpoint of this very run), at the top of a step once the
     /// given time has passed since the last write.  `None` (the default)
@@ -667,7 +670,7 @@ impl F4Options {
             hilbert_expect: None,
             max_pairs_per_step: None,
             capture_run_log: false,
-            record_hilbert_diagnostics: false,
+            record_degree_falls: false,
             checkpoint: None,
             checkpoint_stop_after: None,
             checkpoint_in_step: None,
@@ -719,9 +722,9 @@ impl F4Options {
         self
     }
     /// Record the post-hoc degree-fall diagnostic. See
-    /// [`F4Options::record_hilbert_diagnostics`].
-    pub fn recording_hilbert_diagnostics(mut self) -> Self {
-        self.record_hilbert_diagnostics = true;
+    /// [`F4Options::record_degree_falls`].
+    pub fn recording_degree_falls(mut self) -> Self {
+        self.record_degree_falls = true;
         self
     }
     /// See [`F4Options::stop_staircase`].
@@ -1529,28 +1532,35 @@ pub struct F4Report {
     /// Milliseconds of the run (inside `ms`) that a resumed checkpoint had
     /// already spent; 0 when the run did not resume.
     pub resumed_ms: f64,
-    /// Post-hoc Hilbert diagnostics, present only when requested. These scan
-    /// the final computed leading ideal, including a degree-truncated basis.
-    /// Deviations and staircase extinction are not formal fall-degree or
-    /// regularity measurements. Empty/None when not requested or interrupted.
+    /// Degree-fall diagnostic, present only when
+    /// [`F4Options::record_degree_falls`] was set. `first_fall_degree` is the
+    /// smallest working degree at which the final basis has **fewer** standard
+    /// monomials than the complete-intersection (semi-regular) expectation — a
+    /// degree fall; `last_fall_degree` the largest; `degree_of_regularity_observed`
+    /// the first degree at which the quotient vanishes (no standard monomials
+    /// remain). `degree_falls` is the per-degree Hilbert deviation. All
+    /// diagnostic: never priced into `S`, outside the replay comparison, never
+    /// a stopping rule. Empty/`None` when the diagnostic was not requested.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_hilbert_deviation_degree: Option<u32>,
+    pub first_fall_degree: Option<u32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub last_hilbert_deviation_degree: Option<u32>,
+    pub last_fall_degree: Option<u32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub staircase_extinction_degree: Option<u32>,
+    pub degree_of_regularity_observed: Option<u32>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub hilbert_deviations: Vec<HilbertDeviation>,
+    pub degree_falls: Vec<DegreeFall>,
 }
 
-/// One degree of the final leading-monomial staircase against the semi-regular
-/// expectation. A deviation does not certify a degree fall in the input system.
+/// One working degree of the post-hoc degree-fall diagnostic: the
+/// complete-intersection (semi-regular) expectation, the realized count of
+/// standard monomials of the final basis, and whether the realized count is
+/// below the expectation (a degree fall at this degree).
 #[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
-pub struct HilbertDeviation {
+pub struct DegreeFall {
     pub degree: u32,
     pub hilbert_expected: usize,
     pub hilbert_realized: usize,
-    pub is_below_expectation: bool,
+    pub is_fall: bool,
 }
 
 /// What [`F4Options::stopping_by_hilbert`] did.
@@ -4342,44 +4352,25 @@ pub fn complete_intersection_hilbert(degrees: &[u32]) -> Vec<usize> {
 /// it agrees with [`complete_intersection_hilbert`], and for an over-determined
 /// one it uses the right `(1 - t)^{n_vars}` denominator and truncates, where
 /// the complete-intersection form would not.
-pub fn semi_regular_hilbert(degrees: &[u32], n_vars: usize) -> Option<Vec<usize>> {
-    semi_regular_hilbert_before(degrees, n_vars, None)
-}
-
-fn semi_regular_hilbert_before(
-    degrees: &[u32],
-    n_vars: usize,
-    deadline: Option<Instant>,
-) -> Option<Vec<usize>> {
-    let sum_d = degrees
-        .iter()
-        .try_fold(0usize, |sum, &d| sum.checked_add(d as usize))?;
-    let max_deg = sum_d.checked_add(n_vars)?.checked_add(2)?;
+pub fn semi_regular_hilbert(degrees: &[u32], n_vars: usize) -> Vec<usize> {
+    let sum_d: usize = degrees.iter().map(|&d| d as usize).sum();
+    let max_deg = sum_d + n_vars + 2;
     // 1 / (1 - t)^{n_vars} up to max_deg: n_vars prefix-sum passes from [1,0,0,…].
-    let count = max_deg.checked_add(1)?;
-    let mut s = Vec::<i128>::new();
-    s.try_reserve_exact(count).ok()?;
-    s.resize(count, 0);
+    let mut s: Vec<i128> = vec![0; max_deg + 1];
     s[0] = 1;
     for _ in 0..n_vars {
-        if deadline.is_some_and(|d| Instant::now() >= d) {
-            return None;
-        }
         for k in 1..=max_deg {
-            s[k] = s[k].checked_add(s[k - 1])?;
+            s[k] += s[k - 1];
         }
     }
     // multiply by prod_i (1 - t^{d_i}).
     for &d in degrees {
-        if deadline.is_some_and(|d| Instant::now() >= d) {
-            return None;
-        }
         let d = d as usize;
         if d == 0 || d > max_deg {
             continue;
         }
         for k in (d..=max_deg).rev() {
-            s[k] = s[k].checked_sub(s[k - d])?;
+            s[k] -= s[k - d];
         }
     }
     // Coefficients up to (not including) the first non-positive one.
@@ -4388,70 +4379,29 @@ fn semi_regular_hilbert_before(
         if c <= 0 {
             break;
         }
-        out.push(usize::try_from(c).ok()?);
+        out.push(c as usize);
     }
-    Some(out)
+    out
 }
 
-/// Compare the computed basis's leading-monomial staircase with the generic
-/// semi-regular expectation. This is not a closure-space computation or a
-/// top-form syzygy calculation, so it cannot establish first/last fall degree.
-/// Extinction refers only to this computed leading ideal, not regularity of
-/// the homogeneous top-form system. A degree bound may leave a partial basis.
-/// The scan is diagnostic only and does not affect solving or charged work.
-// Diagnostic-only counting must not mutate the native staircase counter.
-// Return no value if the caller's original deadline or integer range is exhausted.
-fn diagnostic_staircase_count(
-    lms: &[&[u32]],
-    n_vars: usize,
-    degree: u32,
-    deadline: Option<Instant>,
-) -> Option<usize> {
-    fn count(
-        k: usize,
-        left: u32,
-        mono: &mut [u32],
-        lms: &[&[u32]],
-        deadline: Option<Instant>,
-    ) -> Option<usize> {
-        if deadline.is_some_and(|d| Instant::now() >= d) {
-            return None;
-        }
-        if k + 1 == mono.len() {
-            mono[k] = left;
-            for lm in lms {
-                if deadline.is_some_and(|d| Instant::now() >= d) {
-                    return None;
-                }
-                if divides(lm, mono) {
-                    return Some(0);
-                }
-            }
-            return Some(1);
-        }
-        let mut result = 0usize;
-        for exponent in 0..=left {
-            mono[k] = exponent;
-            result = result.checked_add(count(k + 1, left - exponent, mono, lms, deadline)?)?;
-        }
-        Some(result)
-    }
-    if deadline.is_some_and(|d| Instant::now() >= d) {
-        return None;
-    }
-    if n_vars == 0 {
-        return Some(usize::from(degree == 0 && lms.is_empty()));
-    }
-    let mut mono = vec![0; n_vars];
-    count(0, degree, &mut mono, lms, deadline)
-}
-
-fn hilbert_diagnostic(
+/// Post-hoc degree-fall diagnostic (gated by [`F4Options::record_degree_falls`]).
+///
+/// Compares the realized standard-monomial count of the final leading ideal
+/// (`uncovered_in_degree` of the computed basis) against the
+/// complete-intersection — i.e. semi-regular — Hilbert function of the input
+/// generator degrees (`complete_intersection_hilbert`, the same expectation the
+/// Hilbert stop uses). A **degree fall** at degree `d` is a degree where the
+/// realized count is strictly below the expectation: the ideal is larger than a
+/// generic system of the same degrees would be, which is exactly the first-fall
+/// phenomenon that makes a structured system cheaper than its generic bound.
+/// Returns `(first_fall, last_fall, degree_of_regularity_observed, per_degree)`.
+/// Purely diagnostic: it reads the finished basis, is never on the hot path, is
+/// never priced into `S`, and is never a stopping rule.
+fn degree_fall_diagnostic(
     input: &[Poly],
     basis: &[Poly],
     n_vars: usize,
-    deadline: Option<Instant>,
-) -> (Option<u32>, Option<u32>, Option<u32>, Vec<HilbertDeviation>) {
+) -> (Option<u32>, Option<u32>, Option<u32>, Vec<DegreeFall>) {
     let degs: Vec<u32> = input
         .iter()
         .filter_map(|f| f.iter().map(|(e, _)| total_degree(e)).max())
@@ -4460,16 +4410,14 @@ fn hilbert_diagnostic(
     if degs.is_empty() {
         return (None, None, None, Vec::new());
     }
-    let Some(expected) = semi_regular_hilbert_before(&degs, n_vars, deadline) else {
-        return (None, None, None, Vec::new());
-    };
+    let expected = semi_regular_hilbert(&degs, n_vars);
     let lms: Vec<&[u32]> = basis
         .iter()
         .filter(|f| !f.is_empty())
         .map(|f| f[0].0.as_slice())
         .collect();
     // Scan the degrees the expectation covers, then on until the quotient
-    // vanishes (the computed staircase extinction), with a hard
+    // vanishes (so the observed degree of regularity is captured), with a hard
     // cap so a positive-dimensional ideal still terminates.
     let scan_max = expected.len() as u32 + n_vars as u32 + 1;
     let mut first_fall = None;
@@ -4478,23 +4426,21 @@ fn hilbert_diagnostic(
     let mut falls = Vec::with_capacity(expected.len() + 1);
     for d in 0..=scan_max {
         let exp = expected.get(d as usize).copied().unwrap_or(0);
-        let Some(real) = diagnostic_staircase_count(&lms, n_vars, d, deadline) else {
-            return (None, None, None, Vec::new());
-        };
-        let is_below_expectation = real < exp;
-        if is_below_expectation {
+        let real = uncovered_in_degree(&lms, n_vars, d);
+        let is_fall = real < exp;
+        if is_fall {
             if first_fall.is_none() {
                 first_fall = Some(d);
             }
             last_fall = Some(d);
         }
-        falls.push(HilbertDeviation {
+        falls.push(DegreeFall {
             degree: d,
             hilbert_expected: exp,
             hilbert_realized: real,
-            is_below_expectation,
+            is_fall,
         });
-        // No standard monomial remains in this degree of the computed staircase.
+        // The quotient is exhausted: this is the observed degree of regularity.
         if d > 0 && real == 0 {
             dreg = Some(d);
             break;
@@ -4668,8 +4614,8 @@ fn f4_with_arithmetic(
                 .map(|(f, _)| f.clone())
                 .collect()
         };
-        let (dff, dlf, ddreg, dfalls) = if opts.record_hilbert_diagnostics && !inconsistent && !to {
-            hilbert_diagnostic(input, &b, n_vars, opts.deadline)
+        let (dff, dlf, ddreg, dfalls) = if opts.record_degree_falls && !inconsistent && !to {
+            degree_fall_diagnostic(input, &b, n_vars)
         } else {
             (None, None, None, Vec::new())
         };
@@ -4694,10 +4640,10 @@ fn f4_with_arithmetic(
             hilbert: HilbertStop::Off,
             hilbert_check_ops: 0,
             resumed_ms: carried.get().as_secs_f64() * 1e3,
-            first_hilbert_deviation_degree: dff,
-            last_hilbert_deviation_degree: dlf,
-            staircase_extinction_degree: ddreg,
-            hilbert_deviations: dfalls,
+            first_fall_degree: dff,
+            last_fall_degree: dlf,
+            degree_of_regularity_observed: ddreg,
+            degree_falls: dfalls,
         }
     };
 
@@ -5865,8 +5811,8 @@ fn f4_with_arithmetic(
     if debug {
         eprintln!("f4 interreduce ms: {:.2}", ti.elapsed().as_secs_f64() * 1e3);
     }
-    let (dff, dlf, ddreg, dfalls) = if opts.record_hilbert_diagnostics {
-        hilbert_diagnostic(input, &reduced, n_vars, opts.deadline)
+    let (dff, dlf, ddreg, dfalls) = if opts.record_degree_falls {
+        degree_fall_diagnostic(input, &reduced, n_vars)
     } else {
         (None, None, None, Vec::new())
     };
@@ -5899,10 +5845,10 @@ fn f4_with_arithmetic(
         },
         hilbert_check_ops: 0,
         resumed_ms: carried.get().as_secs_f64() * 1e3,
-        first_hilbert_deviation_degree: dff,
-        last_hilbert_deviation_degree: dlf,
-        staircase_extinction_degree: ddreg,
-        hilbert_deviations: dfalls,
+        first_fall_degree: dff,
+        last_fall_degree: dlf,
+        degree_of_regularity_observed: ddreg,
+        degree_falls: dfalls,
     }
 }
 
@@ -6487,12 +6433,17 @@ pub struct VisitReport {
     pub solutions_visited: usize,
     pub candidates_rejected: usize,
     pub solving_degree: u32,
-    /// Post-hoc Hilbert diagnostics folded over recorded F4 calls: min first
-    /// deviation, max last deviation and max staircase extinction degree.
-    /// These describe computed leading ideals, not formal system invariants.
-    pub first_hilbert_deviation_degree: Option<u32>,
-    pub last_hilbert_deviation_degree: Option<u32>,
-    pub staircase_extinction_degree: Option<u32>,
+    /// Measured degree-fall observables, folded over the F4 runs of the
+    /// traversal (first fall = min, last fall = max, observed degree of
+    /// regularity = max). Diagnostic; `None` unless a run recorded them
+    /// (`F4Options::record_degree_falls`). Omitted from serialised reports when
+    /// `None`, so transcripts written without the opt-in are unchanged.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_runs: usize,
@@ -6690,27 +6641,6 @@ where
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
-        if let Some(d) = r.first_hilbert_deviation_degree {
-            self.report.first_hilbert_deviation_degree = Some(
-                self.report
-                    .first_hilbert_deviation_degree
-                    .map_or(d, |c| c.min(d)),
-            );
-        }
-        if let Some(d) = r.last_hilbert_deviation_degree {
-            self.report.last_hilbert_deviation_degree = Some(
-                self.report
-                    .last_hilbert_deviation_degree
-                    .map_or(d, |c| c.max(d)),
-            );
-        }
-        if let Some(d) = r.staircase_extinction_degree {
-            self.report.staircase_extinction_degree = Some(
-                self.report
-                    .staircase_extinction_degree
-                    .map_or(d, |c| c.max(d)),
-            );
-        }
         // An alive-only native basis can retire an input before its deferred
         // pair is processed. Preserve the exact incoming generators in the
         // opt-in traced traversal instead of claiming equality for that subset.
@@ -6725,6 +6655,21 @@ where
             generators
         });
         let generating_set = preserved.as_deref().unwrap_or(&r.basis);
+        if let Some(d) = r.first_fall_degree {
+            self.report.first_fall_degree =
+                Some(self.report.first_fall_degree.map_or(d, |c| c.min(d)));
+        }
+        if let Some(d) = r.last_fall_degree {
+            self.report.last_fall_degree =
+                Some(self.report.last_fall_degree.map_or(d, |c| c.max(d)));
+        }
+        if let Some(d) = r.degree_of_regularity_observed {
+            self.report.degree_of_regularity_observed = Some(
+                self.report
+                    .degree_of_regularity_observed
+                    .map_or(d, |c| c.max(d)),
+            );
+        }
         if let Some(trace) = &trace {
             if !self.emit(VisitEvent::NativeResult {
                 node_id,
@@ -7367,55 +7312,17 @@ mod tests {
     fn semi_regular_hilbert_matches_hand_computed_series() {
         // Square complete intersection of two quadrics in two variables:
         // (1 - t^2)^2 / (1 - t)^2 = (1 + t)^2 = 1 + 2t + t^2.
-        assert_eq!(semi_regular_hilbert(&[2, 2], 2), Some(vec![1, 2, 1]));
+        assert_eq!(semi_regular_hilbert(&[2, 2], 2), vec![1, 2, 1]);
         // Over-determined: three quadrics in two variables,
         // (1 - t^2)^3 / (1 - t)^2, truncated at the first non-positive
         // coefficient, is [1, 2].
-        assert_eq!(semi_regular_hilbert(&[2, 2, 2], 2), Some(vec![1, 2]));
+        assert_eq!(semi_regular_hilbert(&[2, 2, 2], 2), vec![1, 2]);
         // One linear form in one variable: 1 / (1 - t) * (1 - t) = 1.
-        assert_eq!(semi_regular_hilbert(&[1], 1), Some(vec![1]));
+        assert_eq!(semi_regular_hilbert(&[1], 1), vec![1]);
     }
 
     #[test]
-    fn diagnostic_staircase_matches_exact_counts_and_obeys_the_original_deadline() {
-        let leading = [vec![2, 0], vec![1, 1]];
-        let lms: Vec<&[u32]> = leading.iter().map(Vec::as_slice).collect();
-        for degree in 0..=8 {
-            assert_eq!(
-                diagnostic_staircase_count(&lms, 2, degree, None),
-                Some(uncovered_in_degree(&lms, 2, degree))
-            );
-        }
-        let expired = Some(Instant::now() - Duration::from_millis(1));
-        assert_eq!(diagnostic_staircase_count(&lms, 2, 8, expired), None);
-        assert_eq!(semi_regular_hilbert_before(&[2, 2], 2, expired), None);
-    }
-
-    #[test]
-    fn affine_staircase_extinction_is_not_top_form_regularity() {
-        // x^2-1 and xy-1 give the affine basis {x-y, y^2-1}, whose
-        // staircase is empty in degree 2. Their top forms generate (x^2,xy),
-        // which retains y^d at every degree and has no finite regularity degree.
-        let input = vec![
-            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
-            vec![(vec![1, 1], 1), (vec![0, 0], 6)],
-        ];
-        let opts = F4Options::new(Ordering::Grevlex, 8).recording_hilbert_diagnostics();
-        let report = f4(&input, 2, 7, &opts);
-        assert!(!report.inconsistent && !report.timed_out);
-        assert_eq!(report.staircase_extinction_degree, Some(2));
-        let top = [vec![2, 0], vec![1, 1]];
-        let lms: Vec<&[u32]> = top.iter().map(Vec::as_slice).collect();
-        assert_eq!(diagnostic_staircase_count(&lms, 2, 8, None), Some(1));
-    }
-
-    #[test]
-    fn hilbert_expectation_overflow_is_unavailable_instead_of_wrapping() {
-        assert!(semi_regular_hilbert(&[2; 128], 128).is_none());
-    }
-
-    #[test]
-    fn hilbert_deviations_absent_for_a_regular_sequence() {
+    fn degree_falls_absent_for_a_regular_sequence() {
         // x^2 - 1, y^2 - 1 over F_7: a regular sequence (square complete
         // intersection), so the realized Hilbert function equals the
         // semi-regular expectation at every degree — no degree fall — and the
@@ -7425,20 +7332,20 @@ mod tests {
             vec![(vec![0, 2], 1), (vec![0, 0], 6)], // y^2 - 1
         ];
         let mut opts = F4Options::new(Ordering::Grevlex, 8);
-        opts.record_hilbert_diagnostics = true;
+        opts.record_degree_falls = true;
         let r = f4(&input, 2, 7, &opts);
         assert!(!r.inconsistent && !r.timed_out);
-        assert!(!r.hilbert_deviations.is_empty(), "the diagnostic ran");
+        assert!(!r.degree_falls.is_empty(), "the diagnostic ran");
         assert!(
-            r.hilbert_deviations.iter().all(|s| !s.is_below_expectation),
+            r.degree_falls.iter().all(|s| !s.is_fall),
             "a regular sequence has no degree fall: {:?}",
-            r.hilbert_deviations
+            r.degree_falls
         );
-        assert_eq!(r.first_hilbert_deviation_degree, None);
-        assert_eq!(r.last_hilbert_deviation_degree, None);
-        assert_eq!(r.staircase_extinction_degree, Some(3));
+        assert_eq!(r.first_fall_degree, None);
+        assert_eq!(r.last_fall_degree, None);
+        assert_eq!(r.degree_of_regularity_observed, Some(3));
         let realized: Vec<usize> = r
-            .hilbert_deviations
+            .degree_falls
             .iter()
             .take(3)
             .map(|s| s.hilbert_realized)
@@ -7447,48 +7354,42 @@ mod tests {
     }
 
     #[test]
-    fn hilbert_deviation_does_not_claim_a_formal_first_fall_degree() {
+    fn degree_fall_detected_on_an_over_determined_system() {
         // x^2 - 1, y^2 - 1, x*y - x over F_7. The extra form forces y = 1
         // (reduced basis {x^2 - 1, y - 1}), so the realized Hilbert function
         // {1, x} is [1, 1, 0] — below the semi-regular [1, 2] at degree 1.
-        // The staircase deviates at degree 1 and is empty at degree 2.
-        // Every input has degree 2, so V_{F,1} is zero: a formal degree
-        // fall at degree 1 is impossible. This prevents the old relabelling.
+        // First and last fall are degree 1; the quotient vanishes at degree 2.
         let input: Vec<Poly> = vec![
             vec![(vec![2, 0], 1), (vec![0, 0], 6)], // x^2 - 1
             vec![(vec![0, 2], 1), (vec![0, 0], 6)], // y^2 - 1
             vec![(vec![1, 1], 1), (vec![1, 0], 6)], // x*y - x
         ];
         let mut opts = F4Options::new(Ordering::Grevlex, 8);
-        opts.record_hilbert_diagnostics = true;
+        opts.record_degree_falls = true;
         let r = f4(&input, 2, 7, &opts);
         assert!(!r.inconsistent && !r.timed_out);
-        assert_eq!(r.first_hilbert_deviation_degree, Some(1));
-        assert_eq!(r.last_hilbert_deviation_degree, Some(1));
-        assert_eq!(r.staircase_extinction_degree, Some(2));
-        let d1 = r.hilbert_deviations.iter().find(|s| s.degree == 1).unwrap();
+        assert_eq!(r.first_fall_degree, Some(1));
+        assert_eq!(r.last_fall_degree, Some(1));
+        assert_eq!(r.degree_of_regularity_observed, Some(2));
+        let d1 = r.degree_falls.iter().find(|s| s.degree == 1).unwrap();
         assert_eq!(
-            (
-                d1.hilbert_realized,
-                d1.hilbert_expected,
-                d1.is_below_expectation
-            ),
+            (d1.hilbert_realized, d1.hilbert_expected, d1.is_fall),
             (1, 2, true)
         );
     }
 
     #[test]
-    fn hilbert_deviations_off_by_default() {
-        // Without record_hilbert_diagnostics the diagnostic does not run (zero cost).
+    fn degree_falls_off_by_default() {
+        // Without record_degree_falls the diagnostic does not run (zero cost).
         let input: Vec<Poly> = vec![
             vec![(vec![2, 0], 1), (vec![0, 0], 6)],
             vec![(vec![0, 2], 1), (vec![0, 0], 6)],
         ];
         let opts = F4Options::new(Ordering::Grevlex, 8);
         let r = f4(&input, 2, 7, &opts);
-        assert!(r.hilbert_deviations.is_empty());
-        assert_eq!(r.first_hilbert_deviation_degree, None);
-        assert_eq!(r.staircase_extinction_degree, None);
+        assert!(r.degree_falls.is_empty());
+        assert_eq!(r.first_fall_degree, None);
+        assert_eq!(r.degree_of_regularity_observed, None);
     }
 
     #[test]

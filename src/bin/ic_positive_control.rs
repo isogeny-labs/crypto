@@ -17,8 +17,8 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::chained_transfer::ic_control as ic;
 use crypto_lib::cryptanalysis::chained_transfer::ic_control::{
-    fb_size, jacobian_order_bsgs, random_curve, run_ic_oracle, run_rho, split_order, Arm, IcParams,
-    IcResult, Instance, RhoOut, SplitOracle, RESTART_DEFAULT,
+    fb_size, jacobian_order_bsgs, random_curve, run_ic_full, run_rho, split_order, Arm, IcCfg,
+    IcParams, IcResult, Instance, LaMode, RhoOut, SplitOracle, WalkMode, RESTART_DEFAULT,
 };
 use crypto_lib::cryptanalysis::ic_boundary::CountedGroup;
 use serde_json::{json, Value};
@@ -479,12 +479,57 @@ fn main() -> ExitCode {
                             };
                             // L, M: arm C with the Cardano–Lucas splitting
                             // test (M also with Cardano root finding).
-                            let (oracle, label) = match a {
-                                'L' => (SplitOracle::Lucas, Some("C_lucas")),
-                                'M' => (SplitOracle::LucasRoots, Some("C_lucas_roots")),
-                                _ => (SplitOracle::Frobenius, None),
+                            // N, S: arm M with the coordinate Wiedemann
+                            // (S on a square row subset).
+                            let (oracle, label, la) = match a {
+                                'L' => (SplitOracle::Lucas, Some("C_lucas"), LaMode::Baseline),
+                                'M' => (
+                                    SplitOracle::LucasRoots,
+                                    Some("C_lucas_roots"),
+                                    LaMode::Baseline,
+                                ),
+                                'N' => (SplitOracle::LucasRoots, Some("C_coord"), LaMode::Coord),
+                                'S' | 'U' | 'V' | 'W' => (
+                                    SplitOracle::LucasRoots,
+                                    Some(if a == 'S' {
+                                        "C_coord_square"
+                                    } else {
+                                        "C_unit_t"
+                                    }),
+                                    LaMode::CoordSquare,
+                                ),
+                                _ => (SplitOracle::Frobenius, None, LaMode::Baseline),
                             };
-                            let o = run_ic_oracle(
+                            // V: arm U with the deterministic fallback root finder.
+                            let oracle = if a == 'V' {
+                                SplitOracle::LucasRootsFast
+                            } else {
+                                oracle
+                            };
+                            let label = if a == 'V' {
+                                Some("C_unit_t_fast")
+                            } else {
+                                label
+                            };
+                            // U: arm S with the unit-T walk.  (V, as run in the
+                            // unit-T study, kept the mixed walk: deviation D1.)
+                            // W: unit-T with capped restarts + fallback roots.
+                            let walk = match a {
+                                'U' => WalkMode::UnitT,
+                                'W' => WalkMode::UnitTCapped,
+                                _ => WalkMode::Mixed,
+                            };
+                            let oracle = if a == 'W' {
+                                SplitOracle::LucasRootsFast
+                            } else {
+                                oracle
+                            };
+                            let label = if a == 'W' {
+                                Some("C_unit_t_capped_fast")
+                            } else {
+                                label
+                            };
+                            let o = run_ic_full(
                                 inst,
                                 IcParams {
                                     arm,
@@ -494,13 +539,16 @@ fn main() -> ExitCode {
                                     verify_relations: false,
                                 },
                                 RESTART_DEFAULT,
-                                oracle,
+                                IcCfg { oracle, la, walk },
                             );
                             if !o.certified {
                                 *bad.lock().unwrap() = true;
                             }
                             let mut v = ic_json(&o, inst, j.seed, j.ci, w_rel, w_la);
                             v["oracle"] = json!(oracle.name());
+                            v["la_mode"] = json!(la.name());
+                            v["walk"] = json!(walk.name());
+                            v["la_fallbacks"] = json!(o.la_fallbacks);
                             if let Some(l) = label {
                                 v["arm"] = json!(l);
                             }
