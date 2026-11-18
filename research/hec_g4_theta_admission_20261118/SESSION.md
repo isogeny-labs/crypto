@@ -1,0 +1,6 @@
+## Genus-four theta input gate prepared
+
+What was done: reviewedKNRRfinitecharSchottky,evenisogenyparitygap,HPSreconstructionpremises,NaranjoPirolacharacteristic0scope. Compilednativeextensionfields/coordinate2torsion/sourceThomaecontrol andoddtracepointcountgate.
+Decisions made: kernelstabilitynotpointfield; sourceSchottkyispositivecontrolonly. Rationalp31quotientthetasstillmissing; p61rationalkernelzero retained. T-7117scope, Gitprefreeze.
+Open threads: runonce; inspectkernelpointfields/sourceSchottky/tracelemma; findcompatibleevenisogenyformula beforequotientclassification.
+Errors: compileambiguousemptyVecfixedbeforefreeze;unusedpahelperwarning. SomeprimaryPDFfetchesfailed;char/premisegapsretained.No scientificexecutionyet. Userno-subagentpreferenceoverridesskilldefaultdelegation.
