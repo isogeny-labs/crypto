@@ -62,6 +62,24 @@ jobs:
         run: |
           set -euo pipefail
           python3 research/prime31_ic_20261115/native/verify_prime31_frobenius_inverse.py prime31-frobenius-inverse.json | tee prime31-frobenius-independent.json
+      - name: Report exact counted primitive costs (not ECDLP costs)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          with open("prime31-frobenius-inverse.json", encoding="utf-8") as f:
+              d = json.load(f)
+          fields = [
+              "public_targets", "unique_linear_gcd", "dual_agreement",
+              "direct_inverse_fp_multiplications", "direct_inverse_fp_inversions",
+              "dual_component_fp_multiplications", "dual_component_fp_inversions",
+              "dual_native_scalar_fp_multiplications", "dual_native_scalar_fp_inversions",
+              "dual_native_group_additions", "direct_stage_ns_diagnostic",
+              "dual_stage_ns_diagnostic", "full_index_calculus_logs_solved",
+              "full_cost_speedup_claim",
+          ]
+          print("UNSIGNED PRIME31 INVERSE COMPONENT:", json.dumps({k:d[k] for k in fields},sort_keys=True))
+          PY
       - name: Retain original counters and independent replay
         if: always()
         uses: actions/upload-artifact@v4
