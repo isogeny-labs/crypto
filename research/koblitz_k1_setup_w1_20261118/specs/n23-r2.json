@@ -1,0 +1,119 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "K1 set-up levers lazy_neg + orbit_ids vs current best arm, K1 a=1 n=23, replicate 2",
+ "description": "Frozen in research/koblitz_k1_setup_w1_20261118/PROTOCOL.md before its data. Candidate w1 = incumbent + lazy_neg=1 + orbit_ids=1; w1-neg, w1-ids each lever alone (secondary); rho strong and v5 references in the same session.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 23
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261118772,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-v5",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v5"
+   }
+  },
+  {
+   "name": "inc",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1,generator_multiples=4,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "inc-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1,generator_multiples=4,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "inc-off",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1,generator_multiples=4,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1,lazy_neg=0",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1,orbit_ids=0",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "w1",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1,generator_multiples=4,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1,lazy_neg=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1,orbit_ids=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "w1-neg",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1,generator_multiples=4,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1,lazy_neg=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "w1-ids",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1,generator_multiples=4,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1,orbit_ids=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261119772,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}
