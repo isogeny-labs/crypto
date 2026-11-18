@@ -231,12 +231,15 @@ impl NestedOracle {
         let b = fb.len();
         let mut found: Vec<Row> = Vec::new();
         let mut cands: Vec<(usize, i8)> = Vec::new();
-        self.sw.run(curve, fb, r, &mut found, |i, eps, _| cands.push((i, eps)));
+        self.sw
+            .run(curve, fb, r, &mut found, |i, eps, _| cands.push((i, eps)));
         for (i, eps) in cands {
             let fi = fb.pts[i];
             let fie = if eps == 1 { curve.neg(fi) } else { fi };
             // T = R - eps*F_i = R + (-eps F_i)
-            let Some(t) = curve.add(Some(r), Some(fie)) else { continue };
+            let Some(t) = curve.add(Some(r), Some(fie)) else {
+                continue;
+            };
             // 2-sum on T: T = s*F_j + t'*F_k, j >= i, k >= j.
             self.d.clear();
             let mut idxs = Vec::new();
@@ -320,7 +323,11 @@ impl StreamOracle {
         let mut d = Vec::with_capacity(b);
         let mut scratch = Vec::with_capacity(b);
         let mut hits: Vec<(u32, u32, u32, u32, u32)> = Vec::new(); // (t, i2, j, k_raw)
-        let probe = |xc: u64, j: u32, k_raw: u32, this: &Self, hits: &mut Vec<(u32, u32, u32, u32, u32)>| {
+        let probe = |xc: u64,
+                     j: u32,
+                     k_raw: u32,
+                     this: &Self,
+                     hits: &mut Vec<(u32, u32, u32, u32, u32)>| {
             let bk = (xc >> this.shift) as usize;
             if bk + 1 >= this.starts.len() {
                 return;
@@ -351,7 +358,13 @@ impl StreamOracle {
                 let diff_x = curve.add_x_with_inv(fj, curve.neg(fk), inv);
                 sums += 2;
                 probe(f.from_mont(sum_x), j as u32, k as u32, self, &mut hits);
-                probe(f.from_mont(diff_x), j as u32, k as u32 | DIFF, self, &mut hits);
+                probe(
+                    f.from_mont(diff_x),
+                    j as u32,
+                    k as u32 | DIFF,
+                    self,
+                    &mut hits,
+                );
             }
         }
         self.pair_sums += sums;
@@ -381,7 +394,9 @@ fn gen_targets(curve: &FastCurve, g: Pt, q: Pt, n: usize, seed: u64) -> Vec<(u64
     let mut cur: Option<(u64, u64, Pt)> = None;
     while out.len() < n {
         let nxt = match cur {
-            Some((a, b, r)) if out.len() % 64 != 0 => curve.add(Some(r), Some(g)).map(|nr| (a + 1, b, nr)),
+            Some((a, b, r)) if out.len() % 64 != 0 => {
+                curve.add(Some(r), Some(g)).map(|nr| (a + 1, b, nr))
+            }
             _ => None,
         };
         let t = match nxt {
@@ -464,23 +479,30 @@ fn main() {
             let build_s = t.elapsed().as_secs_f64();
             let rss_after_build = vmrss_kb();
             let t = Instant::now();
-            let (rels, st) = collect_relations(&fc, g, q, &fb, Some(&pairs), needed, 4_000_000_000, a.seed);
+            let (rels, st) =
+                collect_relations(&fc, g, q, &fb, Some(&pairs), needed, 4_000_000_000, a.seed);
             let collect_s = t.elapsed().as_secs_f64();
             let t = Instant::now();
             let log = solve_relations(&fc, b, &rels);
             let la_s = t.elapsed().as_secs_f64();
             assert_eq!(log, Some(k), "baseline wrong log");
-            println!("{}", json!({"mode":"baseline","bits":a.bits,"p":fc.f.p,"B":b,"needed":needed,
+            println!(
+                "{}",
+                json!({"mode":"baseline","bits":a.bits,"p":fc.f.p,"B":b,"needed":needed,
                 "pair_entries":pairs.len(),"pair_bytes":pairs.len()*16,
                 "build_s":build_s,"collect_s":collect_s,"la_s":la_s,"total_s":build_s+collect_s+la_s,
                 "targets":st.targets,"rows":[st.rows_one,st.rows_two,st.rows_three],
-                "rss_base_kb":base_rss,"rss_after_build_kb":rss_after_build,"vmhwm_kb":vmhwm_kb(),"log_ok":true}));
+                "rss_base_kb":base_rss,"rss_after_build_kb":rss_after_build,"vmhwm_kb":vmhwm_kb(),"log_ok":true})
+            );
         }
         // equality of oracles on a fixed target list + copy-vs-crate adaptive check
         "validate" => {
             let pairs = PairTable::build(&fc, &fb);
             let tg = gen_targets(&fc, g, q, a.n, a.seed);
-            let mut to = TableOracle { pairs: &pairs, sw: Sweeper::new(b) };
+            let mut to = TableOracle {
+                pairs: &pairs,
+                sw: Sweeper::new(b),
+            };
             let ref_rows: Vec<Vec<Row>> = tg.iter().map(|t| to.target(&fc, &fb, t.2)).collect();
             let total_rows: usize = ref_rows.iter().map(|r| r.len()).sum();
             let rows3: usize = ref_rows.iter().flatten().filter(|r| r.len() == 3).count();
@@ -497,7 +519,8 @@ fn main() {
                     }
                 };
                 let want = b.min(40);
-                let (crate_rels, _) = collect_relations(&fc, g, q, &fb, Some(&pairs), want, 4_000_000_000, a.seed);
+                let (crate_rels, _) =
+                    collect_relations(&fc, g, q, &fb, Some(&pairs), want, 4_000_000_000, a.seed);
                 let (mut aa, mut bb, mut r) = fresh(&mut rng2);
                 let mut mine: Vec<FastRelation> = Vec::new();
                 while mine.len() < want {
@@ -505,23 +528,35 @@ fn main() {
                     let mut prod = false;
                     for m in rows {
                         // crate pushes in discovery order; compare as set below, order-insensitively per target
-                        mine.push(FastRelation { a: aa, b: bb, entries: m });
+                        mine.push(FastRelation {
+                            a: aa,
+                            b: bb,
+                            entries: m,
+                        });
                         prod = true;
                     }
                     if prod {
                         let nn = fresh(&mut rng2);
-                        aa = nn.0; bb = nn.1; r = nn.2;
+                        aa = nn.0;
+                        bb = nn.1;
+                        r = nn.2;
                     } else if let Some(nr) = fc.add(Some(r), Some(g)) {
                         r = nr;
                         aa = (aa + 1) % n;
                     } else {
                         let nn = fresh(&mut rng2);
-                        aa = nn.0; bb = nn.1; r = nn.2;
+                        aa = nn.0;
+                        bb = nn.1;
+                        r = nn.2;
                     }
                 }
                 // compare as multiset of (a,b,sorted entries) over the first `want`
                 let norm = |v: &[FastRelation]| {
-                    let mut x: Vec<(u64, u64, Row)> = v.iter().take(want).map(|r| (r.a, r.b, r.entries.clone())).collect();
+                    let mut x: Vec<(u64, u64, Row)> = v
+                        .iter()
+                        .take(want)
+                        .map(|r| (r.a, r.b, r.entries.clone()))
+                        .collect();
                     x.sort();
                     x
                 };
@@ -534,7 +569,11 @@ fn main() {
                 res["copy_vs_crate_ok"] = json!(common == cn.len());
             }
             if b <= a.nested_max {
-                let mut no = NestedOracle { sw: Sweeper::new(b), d: vec![], scratch: vec![] };
+                let mut no = NestedOracle {
+                    sw: Sweeper::new(b),
+                    d: vec![],
+                    scratch: vec![],
+                };
                 let t = Instant::now();
                 let mut ok = true;
                 for (ti, t_) in tg.iter().enumerate() {
@@ -548,7 +587,15 @@ fn main() {
             }
             for ch in [1usize, 7, 64, 1000, a.n] {
                 let ch = ch.min(a.n).max(1);
-                let mut so = StreamOracle { sw: Sweeper::new(b), cands: vec![], sorted: vec![], starts: vec![], shift: 0, pair_sums: 0, probes_hit: 0 };
+                let mut so = StreamOracle {
+                    sw: Sweeper::new(b),
+                    cands: vec![],
+                    sorted: vec![],
+                    starts: vec![],
+                    shift: 0,
+                    pair_sums: 0,
+                    probes_hit: 0,
+                };
                 let mut ok = true;
                 let mut ti = 0;
                 for c in tg.chunks(ch) {
@@ -576,19 +623,35 @@ fn main() {
                     let t = Instant::now();
                     let pairs = PairTable::build(&fc, &fb);
                     build_s = t.elapsed().as_secs_f64();
-                    let mut to = TableOracle { pairs: &pairs, sw: Sweeper::new(b) };
-                    let mut rt = 0; let mut r3 = 0;
+                    let mut to = TableOracle {
+                        pairs: &pairs,
+                        sw: Sweeper::new(b),
+                    };
+                    let mut rt = 0;
+                    let mut r3 = 0;
                     for t_ in &tg {
                         let rows = to.target(&fc, &fb, t_.2);
                         rt += rows.len();
                         r3 += rows.iter().filter(|r| r.len() == 3).count();
                     }
-                    rows_total = rt; rows3 = r3; mem_struct = pairs.len() * 16; extra_j = json!({});
+                    rows_total = rt;
+                    rows3 = r3;
+                    mem_struct = pairs.len() * 16;
+                    extra_j = json!({});
                 }
                 "stream" => {
                     build_s = 0.0;
-                    let mut so = StreamOracle { sw: Sweeper::new(b), cands: vec![], sorted: vec![], starts: vec![], shift: 0, pair_sums: 0, probes_hit: 0 };
-                    let mut rt = 0; let mut r3 = 0;
+                    let mut so = StreamOracle {
+                        sw: Sweeper::new(b),
+                        cands: vec![],
+                        sorted: vec![],
+                        starts: vec![],
+                        shift: 0,
+                        pair_sums: 0,
+                        probes_hit: 0,
+                    };
+                    let mut rt = 0;
+                    let mut r3 = 0;
                     for c in tg.chunks(a.chunk) {
                         let pts: Vec<Pt> = c.iter().map(|t| t.2).collect();
                         for rows in so.chunk(&fc, &fb, &pts) {
@@ -596,32 +659,53 @@ fn main() {
                             r3 += rows.iter().filter(|r| r.len() == 3).count();
                         }
                     }
-                    rows_total = rt; rows3 = r3; mem_struct = so.mem_bytes();
+                    rows_total = rt;
+                    rows3 = r3;
+                    mem_struct = so.mem_bytes();
                     extra_j = json!({"chunk":a.chunk,"pair_sums":so.pair_sums,"probe_hits":so.probes_hit,"chunks":a.n.div_ceil(a.chunk)});
                 }
                 "nested" => {
                     build_s = 0.0;
-                    let mut no = NestedOracle { sw: Sweeper::new(b), d: vec![], scratch: vec![] };
-                    let mut rt = 0; let mut r3 = 0;
+                    let mut no = NestedOracle {
+                        sw: Sweeper::new(b),
+                        d: vec![],
+                        scratch: vec![],
+                    };
+                    let mut rt = 0;
+                    let mut r3 = 0;
                     for t_ in &tg {
                         let rows = no.target(&fc, &fb, t_.2);
                         rt += rows.len();
                         r3 += rows.iter().filter(|r| r.len() == 3).count();
                     }
-                    rows_total = rt; rows3 = r3; mem_struct = 0; extra_j = json!({});
+                    rows_total = rt;
+                    rows3 = r3;
+                    mem_struct = 0;
+                    extra_j = json!({});
                 }
                 o => panic!("oracle {o}"),
             }
             let total = t_all.elapsed().as_secs_f64();
-            println!("{}", json!({"mode":"bench","oracle":a.oracle,"bits":a.bits,"p":fc.f.p,"B":b,"targets":a.n,
+            println!(
+                "{}",
+                json!({"mode":"bench","oracle":a.oracle,"bits":a.bits,"p":fc.f.p,"B":b,"targets":a.n,
                 "rows_total":rows_total,"rows3":rows3,"build_s":build_s,"total_s":total,
                 "s_per_target":total/a.n as f64,"struct_bytes":mem_struct,
-                "rss_base_kb":base_rss,"vmhwm_kb":vmhwm_kb(),"extra":extra_j}));
+                "rss_base_kb":base_rss,"vmhwm_kb":vmhwm_kb(),"extra":extra_j})
+            );
         }
         // complete solve using the stream oracle on a non-adaptive stream; log checked against planted k
         "solve" => {
             let t0 = Instant::now();
-            let mut so = StreamOracle { sw: Sweeper::new(b), cands: vec![], sorted: vec![], starts: vec![], shift: 0, pair_sums: 0, probes_hit: 0 };
+            let mut so = StreamOracle {
+                sw: Sweeper::new(b),
+                cands: vec![],
+                sorted: vec![],
+                starts: vec![],
+                shift: 0,
+                pair_sums: 0,
+                probes_hit: 0,
+            };
             let mut rels: Vec<FastRelation> = Vec::new();
             let mut targets = 0u64;
             let mut gen_seed = a.seed;
@@ -634,7 +718,11 @@ fn main() {
                 for (t_, rows) in tg.iter().zip(out) {
                     for m in rows {
                         if rels.len() < needed {
-                            rels.push(FastRelation { a: t_.0, b: t_.1, entries: m });
+                            rels.push(FastRelation {
+                                a: t_.0,
+                                b: t_.1,
+                                entries: m,
+                            });
                         }
                     }
                 }
@@ -643,10 +731,13 @@ fn main() {
             let t = Instant::now();
             let log = solve_relations(&fc, b, &rels);
             let la_s = t.elapsed().as_secs_f64();
-            println!("{}", json!({"mode":"solve","bits":a.bits,"p":fc.f.p,"B":b,"chunk":a.chunk,"needed":needed,
+            println!(
+                "{}",
+                json!({"mode":"solve","bits":a.bits,"p":fc.f.p,"B":b,"chunk":a.chunk,"needed":needed,
                 "targets":targets,"chunks":(targets as usize).div_ceil(a.chunk),"collect_s":collect_s,"la_s":la_s,
                 "total_s":collect_s+la_s,"log_ok":log==Some(k),"struct_bytes":so.mem_bytes(),
-                "rss_base_kb":base_rss,"vmhwm_kb":vmhwm_kb()}));
+                "rss_base_kb":base_rss,"vmhwm_kb":vmhwm_kb()})
+            );
             assert_eq!(log, Some(k));
         }
         // is sorting by x a usable order for a priority-queue merge? fraction of order-preserving pairs
@@ -654,24 +745,36 @@ fn main() {
             let mut cnt = 0u64;
             let mut tot = 0u64;
             let f = fc.f;
-            let mut srt: Vec<(u64, usize)> = fb.pts.iter().enumerate().map(|(i, p)| (f.from_mont(p.x), i)).collect();
+            let mut srt: Vec<(u64, usize)> = fb
+                .pts
+                .iter()
+                .enumerate()
+                .map(|(i, p)| (f.from_mont(p.x), i))
+                .collect();
             srt.sort();
             for bi in 0..b.min(64) {
                 let fbp = fb.pts[bi];
                 let mut prev: Option<(u64, u64)> = None;
                 for &(x, i) in &srt {
-                    if i == bi { continue; }
+                    if i == bi {
+                        continue;
+                    }
                     let s = fc.add(Some(fb.pts[i]), Some(fbp));
                     let Some(s) = s else { continue };
                     let sx = f.from_mont(s.x);
                     if let Some((_, px)) = prev {
                         tot += 1;
-                        if sx > px { cnt += 1; }
+                        if sx > px {
+                            cnt += 1;
+                        }
                     }
                     prev = Some((x, sx));
                 }
             }
-            println!("{}", json!({"mode":"monotone","B":b,"adjacent_pairs":tot,"order_preserving_fraction":cnt as f64/tot as f64}));
+            println!(
+                "{}",
+                json!({"mode":"monotone","B":b,"adjacent_pairs":tot,"order_preserving_fraction":cnt as f64/tot as f64})
+            );
         }
         m => panic!("mode {m}"),
     }
