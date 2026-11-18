@@ -1,14 +1,15 @@
 import S3Roots
+import PointDecompositionSAT
 import Lean.Util.CollectAxioms
 import Lean.Elab.Command
 
 /-!
 Axiom audit for `S3Roots.lean` (Proposition 1 of
-`rootfinding_decomposition.tex`). Run `lake exe cache get && lake build &&
-lake env lean AxiomAudit.lean` in this directory. The `run_cmd` block fails
-the run if any listed declaration depends on an axiom outside `propext`,
-`Classical.choice` and `Quot.sound`, for example `sorryAx`. The
-`#print axioms` lines are the log that CI keeps
+`rootfinding_decomposition.tex`) and `PointDecompositionSAT.lean`. Run
+`lake exe cache get && lake build && lake env lean AxiomAudit.lean` in this
+directory. The `run_cmd` block fails the run if any listed declaration
+depends on an axiom outside `propext`, `Classical.choice` and `Quot.sound`,
+for example `sorryAx`. The `#print axioms` lines are the log that CI keeps
 (`.github/workflows/rootfinding-s3roots-lean.yml`).
 -/
 
@@ -22,7 +23,11 @@ run_cmd do
       `SemaevS3.addX_eq_mathlib_addX,
       `SemaevS3.pointX_add_eq_xPlus,
       `SemaevS3.pointX_add_neg_eq_xMinus,
-      `SemaevS3.S3_factor_mathlib] do
+      `SemaevS3.S3_factor_mathlib,
+      `PointDecompositionSAT.sound,
+      `PointDecompositionSAT.complete,
+      `PointDecompositionSAT.satisfiable_iff_valid,
+      `PointDecompositionSAT.decomposition_satisfiable_iff] do
     let axioms ← Lean.collectAxioms name
     let forbidden := axioms.filter fun ax => !allowed.contains ax
     unless forbidden.isEmpty do
@@ -36,3 +41,7 @@ run_cmd do
 #print axioms SemaevS3.pointX_add_eq_xPlus
 #print axioms SemaevS3.pointX_add_neg_eq_xMinus
 #print axioms SemaevS3.S3_factor_mathlib
+#print axioms PointDecompositionSAT.sound
+#print axioms PointDecompositionSAT.complete
+#print axioms PointDecompositionSAT.satisfiable_iff_valid
+#print axioms PointDecompositionSAT.decomposition_satisfiable_iff
