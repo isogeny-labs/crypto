@@ -15,6 +15,8 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 
+- [ ] Prime31 explicit rational 3-isogeny to maximal CM order; Rust scalar-blind transfer certificates and IC follow-up (automation, started 2026-11-18, branch automation/prime31-3isogeny-maxorder-20261118)
+
 - [ ] Certify prime31 exact geometric CM conductor via 3-division and tighten nonscalar endomorphism degree bound (automation, started 2026-11-18, branch automation/prime31-cm-conductor3-certificate-20261118)
 - [x] Publish prime-field coverage, Split4 and RR9 follow-up evidence (Codex, started 2026-11-17, branch research/prime-field-followup-20261117, PR #4624)
 
