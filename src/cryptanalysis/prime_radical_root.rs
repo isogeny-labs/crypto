@@ -49,11 +49,23 @@ impl Fp {
     }
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
-        ((a as u128 + b as u128) % self.p as u128) as u64
+        // Radical arithmetic normally operates on canonical residues.
+        // For a,b < p <= 2^61-1, a+b fits in u64 and needs one correction.
+        // Keep the former wide-modulus behavior for noncanonical callers.
+        if a < self.p && b < self.p {
+            let sum = a + b;
+            if sum >= self.p { sum - self.p } else { sum }
+        } else {
+            ((a as u128 + b as u128) % self.p as u128) as u64
+        }
     }
     #[inline]
     pub fn sub(&self, a: u64, b: u64) -> u64 {
-        ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64
+        if a < self.p && b < self.p {
+            if a >= b { a - b } else { a + self.p - b }
+        } else {
+            ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64
+        }
     }
     #[inline]
     pub fn neg(&self, a: u64) -> u64 {
@@ -65,7 +77,16 @@ impl Fp {
     }
     #[inline]
     pub fn mul(&self, a: u64, b: u64) -> u64 {
-        ((a as u128 * b as u128) % self.p as u128) as u64
+        if self.p == MAX_PRIME && a < MAX_PRIME && b < MAX_PRIME {
+            // p = 2^61 - 1: 2^61 == 1 mod p. The 122-bit product
+            // reduces with two end-around-carry folds, no wide division.
+            let product = a as u128 * b as u128;
+            let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
+            let folded = (folded & MAX_PRIME) + (folded >> 61);
+            if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
+        } else {
+            ((a as u128 * b as u128) % self.p as u128) as u64
+        }
     }
     #[inline]
     pub fn sqr(&self, a: u64) -> u64 {
@@ -84,7 +105,26 @@ impl Fp {
         r
     }
     pub fn inv(&self, a: u64) -> u64 {
-        self.powm(a, self.p - 2)
+        // Extended Euclid replaces ~log(p) Fermat squarings/multiplies on
+        // public root-finder inputs. The modulus is prime and < 2^61;
+        // Euclidean coefficients and q*t stay within signed i64 bounds.
+        // Variable time: NEVER use for secret-dependent field operations.
+        let mut r0 = self.p;
+        let mut r1 = if a < self.p { a } else { a % self.p };
+        if r1 == 0 {
+            return 0; // preserve powm(0, p-2)
+        }
+        let (mut t0, mut t1) = (0i64, 1i64);
+        while r1 != 0 {
+            let q = r0 / r1;
+            let r2 = r0 - q * r1;
+            let t2 = t0 - (q as i64) * t1;
+            r0 = r1;
+            r1 = r2;
+            t0 = t1;
+            t1 = t2;
+        }
+        if t0 < 0 { (t0 + self.p as i64) as u64 } else { t0 as u64 }
     }
 }
 
@@ -133,7 +173,15 @@ impl Ring for Fq2 {
         let f = &self.f;
         let ac = f.mul(x.0, y.0);
         let bd = f.mul(x.1, y.1);
-        let nbd = f.mul(self.n, bd);
+        // The first quadratic non-residue is commonly 2 or 3.
+        // In these cases, one or two cheap modular additions replace a
+        // fourth full base-field multiplication (particularly costly for
+        // generic primes using 128-bit remainder).
+        let nbd = match self.n {
+            2 => f.add(bd, bd),
+            3 => f.add(f.add(bd, bd), bd),
+            _ => f.mul(self.n, bd),
+        };
         let s = f.mul(f.add(x.0, x.1), f.add(y.0, y.1));
         (f.add(ac, nbd), f.sub(f.sub(s, ac), bd))
     }
@@ -604,6 +652,57 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn optimized_field_arithmetic_matches_wide_reference() {
+        fn ref_mul(p: u64, a: u64, b: u64) -> u64 {
+            ((a as u128 * b as u128) % p as u128) as u64
+        }
+        let mut seed = 0x7d3af0192ebc42u64;
+        for &p in &[5u64, 7, 11, 13, 97, 65_537, 998_244_353,
+                     1_000_000_007, 2_147_483_647, MAX_PRIME] {
+            let f = Fp::new(p);
+            let mut input = vec![0, 1, 2, p / 2, p - 2, p - 1];
+            for _ in 0..4_096 {
+                input.push(lcg(&mut seed) % p);
+            }
+            for (i, &a) in input.iter().enumerate() {
+                let b = input[(i * 37 + 1) % input.len()];
+                let expected_add = ((a as u128 + b as u128) % p as u128) as u64;
+                let expected_sub = ((a as u128 + p as u128 - b as u128) % p as u128) as u64;
+                assert_eq!(f.add(a, b), expected_add, "add p={p} a={a} b={b}");
+                assert_eq!(f.sub(a, b), expected_sub, "sub p={p} a={a} b={b}");
+                assert_eq!(f.mul(a, b), ref_mul(p, a, b), "mul p={p} a={a} b={b}");
+                if i < 300 {
+                    let inv = f.inv(a);
+                    assert_eq!(inv, f.powm(a, p - 2), "inv p={p} a={a}");
+                    if a != 0 { assert_eq!(ref_mul(p, a, inv), 1); }
+                }
+                let q = Fq2 { f, n: if i & 1 == 0 { 2 } else { 3 } };
+                let x = (a, b);
+                let y = (input[(i + 7) % input.len()], input[(i + 13) % input.len()]);
+                let ac = ref_mul(p, x.0, y.0);
+                let bd = ref_mul(p, x.1, y.1);
+                let nbd = ref_mul(p, q.n, bd);
+                let s = ref_mul(
+                    p,
+                    ((x.0 as u128 + x.1 as u128) % p as u128) as u64,
+                    ((y.0 as u128 + y.1 as u128) % p as u128) as u64,
+                );
+                let real = ((ac as u128 + nbd as u128) % p as u128) as u64;
+                let imag = ((s as u128 + 2 * p as u128 - ac as u128 - bd as u128)
+                    % p as u128) as u64;
+                assert_eq!(q.mul(x, y), (real, imag), "Fq2 p={p} x={x:?} y={y:?}");
+            }
+            // Public Fp entry points previously accepted noncanonical values.
+            if p == MAX_PRIME {
+                assert_eq!(f.mul(p + 1, p + 2), 2);
+                assert_eq!(f.add(p + 1, p + 2), 3);
+                assert_eq!(f.sub(p + 1, p + 2), p - 1);
+                assert_eq!(f.inv(p + 2), f.inv(2));
+            }
+        }
+    }
 
     fn eval(p: u64, poly: &[u64], x: u64) -> u64 {
         poly.iter().rev().fold(0u64, |a, &b| {
