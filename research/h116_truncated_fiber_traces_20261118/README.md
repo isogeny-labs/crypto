@@ -483,3 +483,13 @@ search exponent `log_6(6)=1`. The signal is therefore useful only as a finite
 search ordering here. The next candidate changes the radix and measures
 whether correct ranks compress with growing arity; no exact or subexponential
 ECDLP follows. [pcc:unverified]
+
+That frozen [growing-radix test](QUOTIENT_MULTIRADIX_EXPERIMENT.md) measures
+radices 2 through 64. Pooled mean rank grows as `B^0.8351`, below every one of
+4,096 shuffled slopes, but exact path width is all of `B` through radix 48 and
+61/64 at radix 64. The apparent compression is dominated by `B` approaching
+the smaller subgroup orders: per-curve slope rises from 0.332 at order 127 to
+0.910 at order 547, whose radix-64 rank is nearly uniform. Radices at least 24
+also have only one recursion level. A larger fixed-ratio panel is required;
+this finite association is not a complete subexponential decoder.
+[pcc:unverified]
