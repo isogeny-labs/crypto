@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and verify shared rootfinder headers
         run: |
-          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-pair-sweep
+          make -C gpu/rootfind test bench_host_inv bench_host_inv256 bench-batch-core bench-mul256 bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-pair-sweep
 
       - name: Record before and after perf counters when accessible
         shell: bash
@@ -104,6 +104,11 @@ jobs:
           for arm in sub-before sub-after neg-before neg-after; do
             perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/subneg256-${arm}.txt" \
               -- taskset -c "$cpu" gpu/rootfind/bench_subneg256 "--perf-$arm"
+          done
+          # Branchy-vs-branchless host Fp64 modular subtraction.
+          for arm in before after; do
+            perf stat -r 5 -e "$events" -o "$RUNNER_TEMP/rootfind-perf/sub64-${arm}.txt" \
+              -- taskset -c "$cpu" gpu/rootfind/bench_sub64 "--perf-$arm"
           done
           # Pair-table and two-sign S3 sweep, frozen baseline vs actual header.
           for arm in pair-before pair-after sweep-before sweep-after; do
