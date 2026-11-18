@@ -6,26 +6,40 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-7d77482bed908cc294f8a5828a7227981df487ba66ba6e855ffc8b7789295bb9  H116FiberTrace.lean
+8af7cc31f5ed3749a574d6b76b530108c0528d38fcb004034a82d561e75c14e6  H116FiberTrace.lean
 ```
 
-The repository proof gate built both the default target and the explicitly
-tracked source, then transitively audited all theorem declarations:
+The pinned toolchain built the explicitly tracked source, then the repository's
+`AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS  60 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  80 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
 
 ```text
-97d6cb403fe102771a210cc38fdc9df47487e37b3e6842b03cc6de64d7494c3e  receipts/audit.log
-efa2d5bb0383a722e51fc41647b1727f0449b9c07b989db8b11da91d78e37aa3  receipts/build.log
+f1b4db9afa0d4c3ffeec03cdf730348f7ed2e69bc11f7357cb7abf1cdd4f8fdc  receipts/audit.log
+794675580f9fd3f0540a4d3aca6c2fde586605da1df53390941f3fc8e26474a3  receipts/build.log
 29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483  receipts/cache.log
-4b4996d4b0d404b60305f5a8e7b17c82e47e4ee14294e4f65ec1afc92c64fd24  receipts/source-build.log
+84e0cf16eb81ad2cf8a5dce3dfa08b1e35977e0d56207f1d82ac5e3c80b05025  receipts/source-build.log
 c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/status.txt
 6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
+8e6e042fd064c36089b12d0eb28fa670d0fecdb7b8b40a4064767b147ea9ad4f  receipts/prefix-transfer-build.log
+d42999adfc5a4d88469b491c5ae9f72d329172b50d322d8c69b45c9e5f4a77cc  receipts/prefix-transfer-audit.log
+eddb483c58d97a0aab4af93e933272a8f37d6208040be118d6826a5c3202776e  receipts/regular-substitution-build.log
+378ac3322b032621070229de6c5f6e222ecd31f5729b8d198cd9b5e39282303b  receipts/regular-substitution-audit.log
+b9a7d56d16d41dc867cb768b114d87dd81b1cd3c745b2968adca395e95dca634  receipts/curve-coordinate-build.log
+621d395aacdb96c526881fd73cab63ea937df6f7779cb10d69eca36669e8ac5f  receipts/curve-coordinate-audit.log
 ```
+
+The earlier repository-wide gate receipts above cover the first 64 theorems.
+For this 80-theorem checkpoint its mandatory cache-fetch preflight could not
+complete because the managed 32-GiB workspace had insufficient free space;
+the incomplete task-owned cache was deleted. The same pinned `lake build`
+completed, and the gate's exact `AuditAxioms.lean` auditor passed directly over
+the resulting module. This is recorded as `PASS_DIRECT`, not silently reported
+as a successful cache preflight. [pcc:unverified]
 
 Every theorem reports only `propext`, `Classical.choice`, and `Quot.sound`.
 There is no `sorry`, custom axiom, `native_decide`, trusted declaration, raised
@@ -71,6 +85,27 @@ fixed certificate directly to `BostanJetRecurrence` for every prime `p>19`.
 Producing the correct eleven coefficients without the full degree-`r` map,
 validating their intended kernel semantics, the `V-1` formal jet, a scalar
 predicate and an ECDLP decoder remain open. [pcc:unverified]
+
+The formal-scalar follow-up also packages Mathlib's monomial truncation theorem
+in `PowerSeriesPrefixEq` and proves that, for every prime `p>19`, a normalized
+`X^(p-1)` correction vanishes below degree 22 and at the eleven even degrees
+used by the frozen x-map prefix. This is a precision theorem only. The actual
+elliptic identities `V+pi=[t]`, `pi(z)=z^p`, and formal subtraction remain open
+endpoint obligations. The follow-up now proves the generic double-pole core:
+coefficientwise reconstruction, cancellation of a shared nonunit leading `X`
+with exactly one degree of precision loss, unit-series inversion, inverse-square
+preservation, and invisibility of an `X^m` multiple. The regular elliptic
+x-coordinate unit-factor algebra is now generic as well: substitution of
+prefix-equal zero-constant parameters preserves a fixed regular series,
+preserves its inverse when the outer constant is a unit, and composes with the
+inverse-square pole term. Identifying the supplied outer unit with the actual
+elliptic x-coordinate series is now discharged by
+`WeierstrassCoordinateUnit`: its fixed-point equation forces constant one and
+the regularized affine curve identity. Rescaling proves the target coefficients
+`(a⁴A,a⁶B)`, and double substitution proves the exact target/source identity
+when `a*zNormalized=zScalar`. Proving that this parameter equality comes from
+`V+pi=[t]`, local Frobenius and formal subtraction remains open.
+[pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

@@ -152,13 +152,171 @@ generic square-root work remain separate endpoint obligations.  The generic
 prefix congruence lemmas are plausible `crypto-lean` candidates, but remain
 local to H116 until the study demonstrates a reusable theorem boundary.
 
+## Formal-scalar Frobenius-cutoff instance gate
+
+1. **Structure above.** The existing H116 `PowerSeriesPrefixEq`, itself
+   equality under Mathlib `PowerSeries.trunc`, represents equality through a
+   finite local-parameter precision. The only operations touched here are the
+   Mathlib monomial `PowerSeries.X ^ n`, truncation and coefficient extraction.
+2. **Theorems used as stated.** `PowerSeries.trunc_X_pow_self_mul` states that a
+   monomial of order `m` vanishes under `trunc m`;
+   `PowerSeries.coeff_X_pow` identifies its first nonzero coefficient. The
+   prime-gap step uses `Nat.Prime` plus finite arithmetic for the only integers
+   strictly between 19 and 23.
+3. **Object as an instance.** After the normalized local parameter loses the
+   leading factor `z`, the first Frobenius correction is represented by
+   `X^(p-1)`. Its invisibility is a `PowerSeriesPrefixEq 22` instance, not a new
+   formal-series type.
+4. **Assembly probe.** A temporary module importing `H116FiberTrace` first
+   wrapped `PowerSeries.trunc_X_pow_self_mul` at its exact precision
+   `trunc m (X^m)=0`, then used the pre-existing prefix monotonicity theorem to
+   instantiate it at `n=22`, `m=p-1` under `[Fact p.Prime]` and `19<p`. The
+   exact wrapper avoided the default-heartbeat timeout triggered by coercing a
+   truncated polynomial back to a series inside a more general wrapper. The
+   successful probe uses the default limits.
+5. **Missing components only.** The H116-specific component is the arithmetic
+   fact that a prime strictly above 19 is at least 23. The elliptic identities
+   `V+pi=[t]`, `pi(z)=z^p`, the formal-group subtraction law and the regular
+   unit factor in the elliptic x-coordinate remain separate semantic
+   obligations; this cutoff lemma must not claim them.
+6. **Inheritance table.** Monomial formation and coefficients come from
+   Mathlib PowerSeries; prefix equality and monotonicity come from the existing
+   H116 wrapper; primality comes from `Fact p.Prime`; the `22 <= p-1` bound is
+   the only local instance proof. There is no limit override, copied formal
+   group law or curve-specific computation.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| a monomial of order `m` is zero below degree `m` | generic wrapper | H116 over Mathlib `PowerSeries.trunc_X_pow_self_mul` | semiring power series | none; lower precision uses existing `PowerSeriesPrefixEq.mono` |
+| normalized Frobenius correction is invisible below degree 22 | instance obligation | H116 Lean module | `ZMod p` power series | `Fact p.Prime`, `19<p`, supplied identification of the correction with `X^(p-1)` |
+| the first eleven normalized x-map coefficients equal the scalar-formal jet | endpoint obligation, not established by the cutoff alone | future elliptic formal-group owner | ordinary elliptic curve and normalized `V-1` map | `V+pi=[t]`, local Frobenius, regular x-coordinate unit substitution |
+
+[pcc:unverified]
+
+The implemented wrapper and three specialization theorems passed the repository
+gate at `64 thm, 0 trusted` under the default limits. The first attempted
+general wrapper coerced a truncated polynomial back to a series and exceeded
+the default heartbeat budget; it was discarded. The checked implementation
+uses Mathlib's theorem at its exact precision and the pre-existing H116
+monotonicity lemma, so no limit was raised and no theorem was weakened.
+[pcc:unverified]
+
+## Generic leading-parameter prefix-transfer gate
+
+1. **Structure above.** The same `PowerSeriesPrefixEq` truncation relation is
+   used; no elliptic curve object is introduced. A local parameter is factored
+   as `X*f`, where `f` has nonzero constant coefficient, and the normalized
+   double-pole term is `f⁻¹²`.
+2. **Theorems used as stated.** `PowerSeries.coeff_X_pow_mul` performs the
+   coefficient shift behind cancellation of `X`; Mathlib's
+   `PowerSeries.inv_mul_cancel` and `mul_inv_cancel` discharge inversion of
+   unit power series. `PowerSeries.coeff_subst'` expands substitution
+   coefficientwise. The existing H116 multiplication, power and coefficient
+   congruences assemble the normalized pole result.
+3. **Object as an instance.** `leading_X_inv_sq` is quantified over every field,
+   cutoff and pair of power series. It consumes a prefix through degree `n`
+   for `X*f` and `X*g` and returns a prefix through degree `n-1` for `f⁻¹²`
+   and `g⁻¹²`; only the two visible unit hypotheses are required.
+   `leading_X_inv_sq_mul_subst_inv` additionally composes any fixed regular
+   outer unit with the two zero-constant parameters.
+4. **Assembly probe.** The first proof let unrestricted simplification rewrite
+   `X` as `X^1` and hit the default recursion-depth limit. The checked proof
+   instead invokes `coeff_X_pow_mul` explicitly. `lake build` then passed at
+   default limits, and the exact repository axiom auditor reported
+   `80 theorems, 0 failing, 0 trusted` after the curve-coordinate instance was
+   added.
+5. **Missing components only.** This now proves the double-pole and regular-unit
+   substitution algebra. The curve-coordinate instance below identifies the
+   supplied series. Proving `V+pi=[t]`, local Frobenius and formal subtraction
+   still requires an instance.
+6. **Inheritance table.** Truncation, coefficient shifts and unit inverses are
+   Mathlib operations; prefix arithmetic is the pre-existing H116 wrapper. The
+   only new local laws reconstruct a prefix from coefficients, cancel `X`,
+   preserve inverse/inverse-square prefixes and add an invisible `X^m`
+   multiple. The new substitution law uses Mathlib's coefficient formula and
+   `finsum` congruence. No curve law, limit override or native decision
+   procedure appears.
+   [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| cancel a shared leading `X` with one-degree loss | generic law | H116 over Mathlib coefficient shift | field power series | input prefix through degree `n` |
+| inversion and inverse square preserve prefixes | generic law | H116 over Mathlib unit inversion | field power series | nonzero constant coefficients |
+| normalized double-pole prefix transfer | generic assembly | H116 | field power series | leading-`X` prefix and two unit hypotheses |
+| regular-unit substitution and inverse | generic law | H116 over Mathlib substitution | field power series | zero inner constants and nonzero outer constant |
+| normalized pole with regular unit | generic assembly | H116 | field power series | leading-`X` prefix and unit hypotheses |
+| actual normalized elliptic x-ratio prefix | curve-coordinate instance plus open endpoint | H116/future formal-group owner | ordinary elliptic curve | checked `q` equation plus endomorphism parameter identity |
+
+The current source and direct repository-auditor receipts are pinned in
+`lean/PROOF_RECEIPT.md`. The proof-gate cache-fetch preflight itself is recorded
+as infrastructure-incomplete because the managed workspace lacked room for a
+second Mathlib cache; the pinned build and exact axiom audit both completed.
+[pcc:unverified]
+
+The separately frozen `H116-PREFIX-TRANSFER-001` boundary control provides the
+tightness check. Across 20 finite-field cases the local-parameter difference is
+first visible exactly one degree after the normalized inverse-square
+difference, and the boundary coefficient matches its independent closed form.
+The zero and shifted-degree controls pass in all cases. This is experimental
+support for the precision boundary, not an elliptic instance.
+[pcc:unverified]
+
+`H116-REGULAR-SUBSTITUTION-001` separately tests the new regular-unit assembly.
+All 20 substitution and inverse-substitution differences occur at degree
+`m+1`; all complete normalized pole-coordinate differences occur at degree
+`m`; and all three independent boundary formulas plus the frozen control
+triplets pass. This still supplies no elliptic identification of the outer
+series. [pcc:unverified]
+
+## Short-Weierstrass coordinate-unit instance gate
+
+1. **Structure above.** `WeierstrassCoordinateUnit A B q` is the exact fixed-
+   point equation `q=1+A X⁴q²+B X⁶q³` obtained from the short-Weierstrass curve
+   after writing `x(z)=z⁻²q(z)⁻¹`. No curve group law is copied.
+2. **Theorems used as stated.** Mathlib constant coefficients show `q(0)=1`;
+   unit cancellation proves the regularized affine identity. Mathlib power-
+   series substitution, composition and coefficient maps prove coordinate
+   rescaling and double substitution.
+3. **Object as an instance.** `normalizedWeierstrassXRatio` is exactly the
+   implementation expression `qSource*f⁻²*qTarget(Xf)⁻¹`. The generic prefix
+   theorem is instantiated with source and target coordinate-unit equations.
+4. **Assembly probe.** The source builds at default limits and the exact axiom
+   auditor reports `80 theorems, 0 failing, 0 trusted`. The first rescaling
+   proof exposed the distinction between `MvPowerSeries.C` and the univariate
+   wrapper `PowerSeries.C`; rewriting through Mathlib's definitional bridge
+   resolved it without changing the statement.
+5. **Missing components only.** The algebra now proves the target coefficients
+   `(a⁴A,a⁶B)` and the exact identity
+   `qTarget(zNormalized)=qSource(zScalar)` whenever
+   `a*zNormalized=zScalar`. The remaining endpoint must derive that parameter
+   equality from `V+pi=[t]`, `pi(z)=z^p` and formal subtraction.
+6. **Inheritance table.** Curve-unit arithmetic uses PowerSeries ring laws;
+   rescaling uses `subst_comp_subst_apply`; prefix transfer reuses the prior
+   H116 theorem. No isogeny semantics, decoder, complexity bound, limit
+   override or native decision procedure is introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Hypotheses |
+| --- | --- | --- | --- |
+| `q(0)=1` and cleared affine identity | curve-coordinate instance | H116 | coordinate-unit equation |
+| `(A,B,q) -> (a⁴A,a⁶B,q(aX))` | generic scaling law | H116 over Mathlib substitution | field and scale |
+| target/source substitution identity | generic assembly | H116 | zero-constant normalized parameter and `a*zNormalized=zScalar` |
+| normalized x-ratio prefix | curve-coordinate assembly | H116 | source/target coordinate units plus leading-parameter prefix |
+| derive normalized/scalar parameter identity | endpoint obligation | future formal-group owner | `V+pi=[t]`, local Frobenius and formal subtraction |
+
+`H116-CURVE-COORDINATE-001` is the finite instance control for this table. Its
+fixed-point producer and independent recurrence verifier agree through 24
+coefficients on five curves; wrong scaling and wrong parameter controls are
+rejected in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` seals
+the polynomial rescaling step and points to the audited Lean source. The
+control supplies no replacement for the open endpoint row. [pcc:unverified]
+
 ## Inheritance table
 
 | Operation/law | Inheritance |
 | --- | --- |
 | polynomial multiplication, derivative, evaluation | Mathlib instances plus `Polynomial.derivative'` |
 | finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
-| finite sums and coefficient extraction | Mathlib finite sums plus proved H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
+| finite sums and coefficient extraction | Mathlib finite sums plus existing H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
 | field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
 | isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; no Mathlib isogeny object was found, so a finite `N,D` certificate is the checked interface; producing it from the actual kernel and independently validating map semantics remain open |
 | `V+pi=[t]` and `pi(z)=z^p` | H115 algebra plus formal-group instance; lookup pending |

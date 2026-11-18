@@ -15,9 +15,8 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 
-- [x] Fold the Kaarelson v2 "Fast Algorithm for Elliptic-Curve Discrete Logarithms" preprint into the program: full-paper assessment with a verification map (Lean vs paper vs engine-conditional) and a crossover-threshold reading; separate the unconditional coverage theorem (Theorem 3, adoptable for the lab's own prime-field work) from the engine-conditional (Theorem 7) and AI-sourced parts; tee up audit/adoption follow-ons. Extends the 2026-11-17 subexponential-ecdlp-goal lead (claude, started 2026-11-18, branch claude/ecdlp-sub-sqrt-algorithm-rp5cvm, PR #4672; report in docs/leads/2026-11-18/fast-ecdlp-v2-assessment) [pcc:unverified]
-- [ ] Adopt Kaarelson Theorem 3 coverage engine-free: re-derive the averaging-over-isomorphic-models second moment and measure mean coverage and E_2/X^2 with the lab's native coverage harness at p in {1009,4099,10007}, m=2; compare against the paper's 0.39-0.42 and ~4, and test the plain-box u=1 open question at the lab's own primes (next after PR #4672)
-- [ ] Audit the Kaarelson Lean engine claim: independently re-check Thm 2(ii) `subexponentialRate_all` (module L104_Final), the disclosed `sorry` in L35_Challenge, and the Rudich-Rousseau [24] import, via lean-instance-gate; sibling to the Bochum D.1 tensor-contraction audit item (next after PR #4672)
+- [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
+
 - [ ] Certify prime31 exact geometric CM conductor via 3-division and tighten nonscalar endomorphism degree bound (automation, started 2026-11-18, branch automation/prime31-cm-conductor3-certificate-20261118)
 - [x] Publish prime-field coverage, Split4 and RR9 follow-up evidence (Codex, started 2026-11-17, branch research/prime-field-followup-20261117, PR #4624)
 
@@ -36,7 +35,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Freeze H115 Frobenius--Kummer resolvent-moment ECDLP lead, derive its cohomological cost obligations, and preregister exact small-curve controls (Codex, started 2026-11-17, branch research/h115-frobenius-kummer-resolvent-freeze, PR #4625)
 
-- [ ] Audit the tensor-contraction and fixed-arity proof routes to total subexponential ECDLP, and test the other assessed leads against the same scaling criterion (Codex, started 2026-11-18, branch codex/ecdlp-subexponential-proof-20261118)
+- [x] Audit the tensor-contraction and fixed-arity proof routes to total subexponential ECDLP, and test the other assessed leads against the same scaling criterion (Codex, completed 2026-11-18, branch codex/ecdlp-subexponential-proof-report-20261118, PR #4665)
 
 - [x] Assess the subexponential ECDLP literature and the status of the lab's index-calculus leads, then identify the first unresolved mathematical test (Codex, completed 2026-11-17, branch codex/ecdlp-subexponential-goal-20261117, PR #4627)
 
@@ -82,6 +81,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 - [ ] Autolab rounds 38 to 40 (claude, started 2026-11-17, branch ic-autolab-20261117b): round 39 ratchets `tw2l-x20-j16-n2` at k = 28 (0.944, counted GAE; wall time 1.236x slower; validator disposition validated for the counted claim); open: a second-host replay or human validation, a code-level lever beyond the K = 3 collision floor, and the `hashed-ecdl-tensor` standalone build failure (eight modules with no `mod` line in `lib.rs`)
 
 ## Blocked / questions for the owner
+
 
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 
