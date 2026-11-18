@@ -111,3 +111,39 @@ direct diffusion at one target shared by all three bases.
 [Run and replay](reports/run-20261118T0159Z/RUN.md) ·
 [Figure](reports/run-20261118T0159Z/base_flow.svg) ·
 [PDF](reports/run-20261118T0159Z/report.pdf)
+
+## Method for tracking variable effects
+
+Use the [direct coupling and regularity trace](#variable-effects-and-direct-diffusion)
+alongside the [conditional survivor trace](reports/run-20261118T0409Z/RUN.md).
+Direct coupling follows input equation structure. Conditional support
+shows how the feasible values change as filters accumulate.
+
+1. Fix the target, candidate universe, stage order, and base sizes for
+   each matched comparison. Vary the base or filter being tested and
+   record the choice in the run protocol.
+2. Choose each source variable in turn. Apply each pin common to all
+   bases being compared, and retain the unpinned result at every stage.
+   Report the shared values used for the probes.
+3. At each stage record the total ordered tuples, the feasible values
+   of each other coordinate, and the feasible pairs of those coordinates.
+   Report both the actual supports and the retained counts against the
+   same-stage unpinned denominator. Record a dead end when a pin has zero
+   survivors from a nonempty stage. A stage with an empty baseline has
+   no retention fraction.
+4. Compare stages with the same pin to locate where the restriction
+   appears. Compare bases at the same stage, target, and pin to see
+   which values or pairs differ. Use the direct trace to identify
+   equation-level coupling and the observed degree to track the
+   separate regularity effect.
+
+The membership stage in the toy fixture is a control. A pin reduces the
+number of triples while retaining the full support of the remaining
+variables. The centered base at the sum stage shows why joint support
+matters. For `x=2`, both remaining coordinates retain all four of
+their individual values, while the number of jointly feasible pairs
+drops from ten to four. [pcc:unverified]
+[Heatmap](reports/run-20261118T0409Z/survivor_retention.svg) ·
+[PDF](reports/run-20261118T0409Z/report.pdf) ·
+[Summary](reports/run-20261118T0409Z/survivor_summary.csv) ·
+[Exact supports](reports/run-20261118T0409Z/survivor_support.csv)
