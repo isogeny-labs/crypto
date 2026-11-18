@@ -144,6 +144,18 @@ eleven even z-degrees corresponding to coefficients `w^0,...,w^10`. The theorem
 does not identify the actual elliptic Frobenius term with that monomial; the
 formal-group and pole-order bridge remains open. [pcc:unverified]
 
+The preregistered
+[out-of-sample formal-scalar panel](FORMAL_SCALAR_OOS_EXPERIMENT.md) kept the
+candidate source unchanged and sought a different-j curve model in each of five
+frozen trace classes. The p=107 cell exhausted all models without a qualifying
+second j-invariant and was retained as a selection failure. On the other four
+cells, the candidate exactly matched full Vélu maps through coefficient ten at
+degrees 197, 257, 397 and 547. An independent JSON-only verifier repeated model
+selection, quotient division, the recurrence, both curve identities, codomain
+scaling and mutation rejection. Thus the same constructor now matches five
+full maps including the earlier degree-37 fixture; the finite panel still does
+not replace the generic formal-group bridge. [pcc:unverified]
+
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
 `(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying

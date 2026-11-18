@@ -134,6 +134,15 @@ precision. These counts exclude internal verification, oracle and controls.
 They are construction measurements, not an end-to-end comparison or an
 asymptotic bound. [pcc:unverified]
 
+The unchanged constructor was subsequently compared with four additional full
+maps on deterministic different-j models at degrees 197, 257, 397 and 547. It
+matched all eleven coefficients in every constructed cell, while wrong-scalar
+and unscaled-target controls disagreed. A fifth frozen p=107 cell had no
+qualifying alternative j-invariant and was retained without replacement. The
+candidate construction count remained exactly 64,426 additions, 67,584
+multiplications and 16 inversions per completed cell because its precision and
+dense control flow are fixed. [pcc:unverified]
+
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 
 ```text
