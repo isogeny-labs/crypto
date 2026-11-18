@@ -60,8 +60,9 @@ This is a proposed decision rule, not a measured outcome.
 
 = Evidence boundary
 
-The study-local Rust diagnostic exited 0 under rustc 1.94.1 and wrote the
-checked values to `raw/contract-check.json`. The root release build is blocked
+The study-local Rust diagnostic imports the exact model/S3 source, uses an
+independent minimal BigUint affine point adapter, exited 0 under rustc 1.94.1,
+and wrote `raw/contract-check.json`. The root release build is blocked
 by 35 unrelated current-main errors already covered by the ACTIVE repair lane;
 the integrated tests therefore remain implemented but not checked by the root gate.
 No timing, solver, relation-collection, or end-to-end DLP claim is made.

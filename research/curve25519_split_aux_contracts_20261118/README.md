@@ -110,7 +110,7 @@ branches.
 | Planned | Two integrated release-mode tests plus the complete `curve25519_ic` subset |
 | Attempted | Root release build with Rust 1.90.0 and 1.94.1 |
 | Blocked | 1.90.0 is below the locked AWS dependency MSRV; 1.94.1 reaches the root crate but `main` has 35 unrelated compile errors, including duplicate definitions and missing/drifted APIs |
-| Completed | Study-local Rust diagnostic imports `src/cryptanalysis/curve25519_ic.rs` and checks the same frozen full-width witnesses; exit 0 |
+| Completed | Study-local Rust diagnostic imports `src/cryptanalysis/curve25519_ic.rs`, uses an independent minimal BigUint affine point adapter, and checks the same frozen full-width witnesses; exit 0 |
 | Excluded by protocol | Timings, solver runs, relation collection, exponent estimates, and end-to-end DLP claims |
 
 The root blocker corresponds to the existing ACTIVE compile-repair task for 28
@@ -128,7 +128,9 @@ cargo +1.94.1 run --release \
   --manifest-path research/curve25519_split_aux_contracts_20261118/native/Cargo.toml
 ```
 
-The successful command used source revision
+The adapter is separate from the blocked repository point implementation; its
+role is an independent diagnostic of the exact model/S3 source, not a root-test
+substitute. The successful command used source revision
 `61f107c94bd95317da2243558738689c590cf096` plus the uncommitted test and
 study files in this PR. Host isolation is not relevant because no duration is
 used as evidence. Toolchain: `rustc 1.94.1 (e408947bf 2026-03-25)`.

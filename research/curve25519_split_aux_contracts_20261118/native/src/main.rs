@@ -281,6 +281,7 @@ fn main() {
         serde_json::json!({
             "schema": "curve25519-split-aux-contract-check/v1",
             "model_source": "src/cryptanalysis/curve25519_ic.rs",
+            "point_arithmetic": "study-local-minimal-BigUint-affine-adapter",
             "field_prime": model.p.to_string(),
             "finite_split": {
                 "scalars": {"p": 2, "q": 3, "auxiliary": 5, "t": 7, "target": 12},
