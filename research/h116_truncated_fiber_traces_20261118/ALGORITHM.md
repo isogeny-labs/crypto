@@ -161,7 +161,13 @@ remaining positive point-group algebraic premise for `V+pi=[t]`. Identifying
 this pointwise `V` with the retained rational/scheme Verschiebung and binding
 the resulting equality, elliptic negation, sign and scaling identifications to
 the formal parameter are still endpoint obligations. The coordinate formulas
-themselves are now formal:
+are tested separately by an exhaustive eight-cell extension-field panel. The
+characteristic equation and pointwise `V` equality pass on all 5,066 points,
+with exact agreement from an independent implementation. One frozen
+missing-inverse mutation is degenerate on the 35-point `p=5`, degree-two group,
+so the experiment-level protocol records seven accepted cells and one failed
+control. This does not change the generic proof obligation. The coordinate
+formulas themselves are formal as well:
 for `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
 the exact `z -> z^p` formula for a supplied coordinatewise `p`-power
 endomorphism. Connecting those formulas to the actual elliptic formal-group

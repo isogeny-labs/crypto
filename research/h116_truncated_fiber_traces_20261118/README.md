@@ -181,6 +181,15 @@ the only remaining positive point-group algebraic premise needed to derive
 `V+pi=[t]`. Identifying this pointwise candidate with the retained
 rational/scheme Verschiebung and transporting the equality to the formal
 parameter, negation, sign and target scaling remain open.
+An eight-cell exhaustive extension-field panel then checks the remaining
+pointwise characteristic equation and the constructed `V` on all 5,066
+enumerated points. All positive equations and point-count recurrences pass,
+and an independent implementation matches every correctness field. The frozen
+protocol nevertheless fails one of 24 mutation requirements: on the 35-point
+`p=5`, degree-two group, `[5]pi^-1=[5]`, so omitting `pi^-1` is algebraically
+invisible. The failed control is retained in
+`POINTWISE_CHARPOLY_EXPERIMENT.md`; it is finite evidence, not the missing
+generic theorem. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

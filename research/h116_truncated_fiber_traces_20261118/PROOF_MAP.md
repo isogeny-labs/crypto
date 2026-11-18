@@ -496,6 +496,16 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
 | characteristic equation implies `V+pi=[t]` | composed point theorem | H116 | actual affine point group | supplied characteristic equation only |
 | identify pointwise `V` with retained rational/scheme map and local series | endpoint obligation | future elliptic owner | rational morphism and local formal group | morphism semantics, characteristic equation, equality-to-series transport |
 
+The separately frozen `H116-POINTWISE-CHARPOLY-001` panel exhaustively checks
+the supplied characteristic equation and constructed pointwise `V` on 5,066
+points across eight extension-field cells. All positive equations and the
+point-count recurrence pass, and a separate Python implementation matches
+every correctness field. The protocol result remains a failure because one
+missing-inverse mutation is identical to the correct map on the 35-point
+`p=5`, degree-two group. This is finite falsification evidence for the control
+design only; it supplies no generic theorem and leaves the endpoint row above
+unchanged. [pcc:unverified]
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression
