@@ -142,3 +142,13 @@ also contains the committed f4_fp.rs merge fix 1b9590d88e, so `f4_fp_mergefix.di
 `808511395723f84505d4fe8edaf32e66e8d8bff34cdad57777360c5999ffe161` (`BINARY.sha256`). Commits between fc0babc73e and e93c3cb2da touch
 `f4_fp.rs`, `compact-orbit-scan` (Koblitz base) and this study only: no code path of these arms. Specs, arms, seeds, tests and
 predictions unchanged (`REGISTRATION.A3.sha256`).
+
+## Amendment A4 (2026-11-18, container restart during the run; no cost data read)
+
+The container restarted during the A3 launch and killed it: 23 sessions had completed (`launch-a3-interrupted/runlog.tsv`);
+B27-r3 stopped at 928 of 1,920 records (status `interrupted`, `launch-a3-interrupted/B27-r3.status.json`) and no session had been
+verified. Each session is an independent, self-contained measurement unit with its own seeds, so the 23 complete sessions are kept;
+the interrupted B27-r3 was deleted unread and re-run from its spec under a fresh `benchrec.py run` with the same binary
+(`run_all.sh` skips complete sessions), then all 24 sessions are verified with `--replay-all`. Raw session trees live outside Git
+(disk limit; `sessions/` is a local link, not committed): the committed evidence is the gzipped verify reports, the analysis
+outputs and the per-session digests in `data/sessions.sha256`.

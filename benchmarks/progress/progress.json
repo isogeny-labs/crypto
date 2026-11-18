@@ -152,13 +152,13 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261118T0223Z-koblitz-rho-reference-check",
+  "latest_record": "20261118T0611Z-ksum-split-stride-tableb-final",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 30 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 17,
-    "invalid": 7,
-    "measured": 286,
-    "open": 13
+    "invalid": 8,
+    "measured": 287,
+    "open": 14
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -16171,6 +16171,654 @@
         }
       ],
       "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.5361,
+      "latest": 5.5361,
+      "latest_derived": {
+        "value_over_reference": 2.779864
+      },
+      "metric": "s_best_ksum_w0_b15",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 2.779864
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.9915,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.5361
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.338,
+      "latest": 5.338,
+      "latest_derived": {
+        "value_over_reference": 2.883224
+      },
+      "metric": "s_best_ksum_w0_b18",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 2.883224
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.8514,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.338
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.0142,
+      "latest": 5.0142,
+      "latest_derived": {
+        "value_over_reference": 3.858264
+      },
+      "metric": "s_best_ksum_w0_b21",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 3.858264
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.2996,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.0142
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.2906,
+      "latest": 5.2906,
+      "latest_derived": {
+        "value_over_reference": 4.335847
+      },
+      "metric": "s_best_ksum_w0_b24",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 4.335847
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.2202,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.2906
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.2463,
+      "latest": 5.2463,
+      "latest_derived": {
+        "value_over_reference": 4.968087
+      },
+      "metric": "s_best_ksum_w0_b27",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 4.968087
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.056,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.2463
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 4.9256,
+      "latest": 4.9256,
+      "latest_derived": {
+        "value_over_reference": 3.886688
+      },
+      "metric": "s_best_ksum_w0_p20",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 3.886688
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.2673,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 4.9256
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 4.965,
+      "latest": 4.965,
+      "latest_derived": {
+        "value_over_reference": 4.418439
+      },
+      "metric": "s_best_ksum_w0_p22",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 4.418439
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.1237,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 4.965
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.1052,
+      "latest": 5.1052,
+      "latest_derived": {
+        "value_over_reference": 4.596795
+      },
+      "metric": "s_best_ksum_w0_p24",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 4.596795
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.1106,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.1052
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.23,
+      "latest": 6.23,
+      "latest_derived": {
+        "value_over_reference": 2.920221
+      },
+      "metric": "s_best_ksum_w0p1_b15",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 2.920221
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 2.1334,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 6.23
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.0861,
+      "latest": 6.0861,
+      "latest_derived": {
+        "value_over_reference": 3.051901
+      },
+      "metric": "s_best_ksum_w0p1_b18",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 3.051901
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.9942,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 6.0861
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.762,
+      "latest": 5.762,
+      "latest_derived": {
+        "value_over_reference": 4.077271
+      },
+      "metric": "s_best_ksum_w0p1_b21",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 4.077271
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.4132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.762
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.1507,
+      "latest": 6.1507,
+      "latest_derived": {
+        "value_over_reference": 4.622849
+      },
+      "metric": "s_best_ksum_w0p1_b24",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 4.622849
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.3305,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 6.1507
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.9978,
+      "latest": 5.9978,
+      "latest_derived": {
+        "value_over_reference": 5.198752
+      },
+      "metric": "s_best_ksum_w0p1_b27",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 5.198752
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.1537,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.9978
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.6598,
+      "latest": 5.6598,
+      "latest_derived": {
+        "value_over_reference": 4.108151
+      },
+      "metric": "s_best_ksum_w0p1_p20",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 4.108151
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.3777,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.6598
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.695,
+      "latest": 5.695,
+      "latest_derived": {
+        "value_over_reference": 4.642915
+      },
+      "metric": "s_best_ksum_w0p1_p22",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 4.642915
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.2266,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.695
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.8725,
+      "latest": 5.8725,
+      "latest_derived": {
+        "value_over_reference": 4.851301
+      },
+      "metric": "s_best_ksum_w0p1_p24",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 4.851301
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 1.2105,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 5.8725
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 12.4748,
+      "latest": 12.4748,
+      "latest_derived": {
+        "value_over_reference": 3.658085
+      },
+      "metric": "s_best_ksum_w1_b15",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 3.658085
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 3.4102,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 12.4748
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 12.644,
+      "latest": 12.644,
+      "latest_derived": {
+        "value_over_reference": 3.854643
+      },
+      "metric": "s_best_ksum_w1_b18",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 3.854643
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 3.2802,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 12.644
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 12.4923,
+      "latest": 12.4923,
+      "latest_derived": {
+        "value_over_reference": 5.129044
+      },
+      "metric": "s_best_ksum_w1_b21",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 5.129044
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 2.4356,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 12.4923
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 13.0421,
+      "latest": 13.0421,
+      "latest_derived": {
+        "value_over_reference": 5.614577
+      },
+      "metric": "s_best_ksum_w1_b24",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 5.614577
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 2.3229,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 13.0421
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 12.7608,
+      "latest": 12.7608,
+      "latest_derived": {
+        "value_over_reference": 6.276215
+      },
+      "metric": "s_best_ksum_w1_b27",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 6.276215
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 2.0332,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 12.7608
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 12.2673,
+      "latest": 12.2673,
+      "latest_derived": {
+        "value_over_reference": 5.172802
+      },
+      "metric": "s_best_ksum_w1_p20",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 5.172802
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 2.3715,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 12.2673
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 12.2652,
+      "latest": 12.2652,
+      "latest_derived": {
+        "value_over_reference": 5.698383
+      },
+      "metric": "s_best_ksum_w1_p22",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 5.698383
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 2.1524,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 12.2652
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 12.7789,
+      "latest": 12.7789,
+      "latest_derived": {
+        "value_over_reference": 6.057499
+      },
+      "metric": "s_best_ksum_w1_p24",
+      "points": [
+        {
+          "commit": "26dac15b74b5",
+          "date": "2026-11-18",
+          "derived": {
+            "value_over_reference": 6.057499
+          },
+          "n": 432,
+          "record": "20261118T0611Z-ksum-split-stride-tableb-final",
+          "reference": 2.1096,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] Table B k-sum IC (research/ic_ksum_split_20261118): split=1 (pair-sum build) alone 0.910-0.943 of the pruned incumbent (k=5, w=0, all 8 rows, identical outputs); with targets=stride-renew best-vs-best 0.525-0.866 at w=0, 0.710-0.937 at w=1; gap to rho-neg (w=0) 4.95-5.73 -> 2.78-4.97. Sessions produced by the A4-interrupted launch (23) and the B27-r3 re-run (record 20261118T0509Z, invalid); this command re-verified all 24 (--replay-all, 0 problems). Validation pending.",
+          "value": 12.7789
+        }
+      ],
+      "problem": "ic:ksum_split_stride_tableb",
       "unit": "S"
     },
     {

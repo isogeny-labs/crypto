@@ -1,13 +1,13 @@
 // T1 correctness (PROTOCOL.md section 3) and T2 verification, over every record of every session (warm-up included).
 //   node analysis/correctness.mjs <sessions dir> > data/correctness.json      (cwd = study directory)
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 const sess = process.argv[2];
 const C = (n, j) => { let c = 1; for (let i = 0; i < j; i++) c = (c * (n - i)) / (i + 1); return n < j ? 0 : Math.round(c); };
 const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const res = { pairs_checked: 0, mismatches: [], runs: 0, unverified: [], setup_adds_saved: {} };
 for (const s of readdirSync(sess).sort()) {
-  const recs = gunzipSync(readFileSync(`${sess}/${s}/records.jsonl.gz`)).toString().trim().split("\n").map((l) => JSON.parse(l));
+  const f = `${sess}/${s}/records.jsonl`, recs = (existsSync(f) ? readFileSync(f) : gunzipSync(readFileSync(f + ".gz"))).toString().trim().split("\n").map((l) => JSON.parse(l));
   const by = {};
   for (const r of recs) {
     res.runs++;
