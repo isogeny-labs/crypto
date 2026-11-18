@@ -1336,7 +1336,17 @@ mod tests {
     fn round22_nonresidue_reciprocity_preserves_first_candidate() {
         // Exact first non-residue, not merely any non-residue: the Fp2
         // representation and deterministic AMM generator must not change.
-        for p in (5..20_000u64).filter(|&p| is_prime_u64(p)).chain(
+        // The isolated arithmetic CI crate stubs is_prime_u64, so use an
+        // independent exact trial division predicate for this small range.
+        fn prime_small(p: u64) -> bool {
+            let mut d = 2u64;
+            while d * d <= p {
+                if p % d == 0 { return false; }
+                d += 1;
+            }
+            true
+        }
+        for p in (5..20_000u64).filter(|&p| prime_small(p)).chain(
             [487u64, 1459, 17497, 998244353, 1000000007,
              1000000009, MAX_PRIME]
         ) {
