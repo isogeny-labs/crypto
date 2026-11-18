@@ -133,11 +133,11 @@ def signed_f(r, c, q):
 
 def validate(record):
     assert record["schema"] == "prime31.rr9.weighted-resultants.v1"
-    for field, value in [("p",P),("a",A),("b",B),("n",N),("cofactor",1),
+    for field, expected in [("p",P),("a",A),("b",B),("n",N),("cofactor",1),
                           ("unique_weighted_x",248),("planted_certificates_verified",16),
                           ("complete_unknown_ecdlp_solves",0),
                           ("unknown_public_chart_extractions",0)]:
-        assert record[field] == value, field
+        assert record[field] == expected, field
     assert record["weights"] == list(W)
     assert scalar(N,G) is None and curve(G)
     points = base()
