@@ -19,3 +19,11 @@ plan remains a separate scientific obligation: infrastructure alone does not
 supply the original80bit quotient, non-kernel images or endpoint measurements.
 The next unchanged store check is no earlier than22:34UTC. Parent-PR polling
 cadence remains as already recorded; none was repeated here. [pcc:unverified]
+
+The later blocked-handoff.json records the third consecutive no-progress goal
+turn. Automatic continuation is paused as blocked after publication of that
+checkpoint. The underlying service receipts are reused with their original
+timestamp; no repeated cloud call is presented as new evidence. Resumption
+requires an external access/admission change, and then a fresh counter starts.
+The scientific construction and measurement obligations remain unfulfilled.
+[pcc:unverified]
