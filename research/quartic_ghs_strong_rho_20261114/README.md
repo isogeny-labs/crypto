@@ -8,6 +8,10 @@ profile and benchmark are checkpoint-blocked in the current runtime, so it has
 no measured throughput result, frontier change, or leaderboard row. The live
 execution-admission gap is tracked in
 [the problem record](../../problems/ghs-strong-rho-measurement-admission.md).
+[Round C](ROUND_C_INV.md) replaces the Frobenius/product cubic inverse with a
+direct adjugate. Its deterministic correctness and exact-count controls passed
+in [`round-c/RESULTS.md`](round-c/RESULTS.md); checkpoint refusal likewise
+prevents a profile, throughput conclusion, frontier change, or leaderboard row.
 
 This study reopens the restricted `E0/F_{q^3}` plane-quartic program for one
 specific obligation: compare its end-to-end index-calculus result with a rho
@@ -36,6 +40,9 @@ is made [pcc:unverified].
 - [`ROUND_B.md`](ROUND_B.md) freezes the five-product squaring lead;
   [`round-b/RESULTS.md`](round-b/RESULTS.md) retains its partial
   correctness/count result and checkpoint blocker.
+- [`ROUND_C_INV.md`](ROUND_C_INV.md) freezes the direct-adjugate inversion
+  lead; [`round-c/RESULTS.md`](round-c/RESULTS.md) retains its deterministic
+  correctness/count result, raw controls, and checkpoint blocker.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
   source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
   the prospective Round B candidate; Round A remains bound by the source hash
