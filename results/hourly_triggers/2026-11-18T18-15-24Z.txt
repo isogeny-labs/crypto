@@ -1,0 +1,7 @@
+Hourly relation-finding monitor trigger
+Date: 2026-11-18T18:15:24Z
+Workflow: .github/workflows/hourly-relation-finding.yml
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: frozen Koblitz GF(2^23) two-summand natural-arm control
+Baseline: results/relation_baseline.json; threshold ±20%
+Log: results/hourly_log.csv
