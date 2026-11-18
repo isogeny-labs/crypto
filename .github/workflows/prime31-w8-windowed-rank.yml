@@ -1,0 +1,69 @@
+name: Prime31 B8 windowed rank and 1024-log generic oracle control
+
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-weighted-resultant-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_windowed_rank.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_windowed_rank.py
+      - .github/workflows/prime31-w8-windowed-rank.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_windowed_rank.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_windowed_rank.py
+      - .github/workflows/prime31-w8-windowed-rank.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  original-rust-prime31-windowed-b8:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout experiment source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout immutable original Prime31 Rust crate
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay ONLY new oracle example on original source
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_windowed_rank.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_w8_windowed_rank.rs
+          test -f pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Original library regression tests
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Exact signed B8 windowed rank and small online control
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_windowed_rank
+      - name: Execute full 31-rank 1024-target generic-oracle control
+        run: |
+          cargo +1.100.0 run --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_windowed_rank > prime31-w8-windowed-rank.json
+          test -s prime31-w8-windowed-rank.json
+      - name: Independent BigInt replay of all accepted training and 1024 recovered targets
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_w8_windowed_rank.py \
+            prime31-w8-windowed-rank.json
+      - name: Publish full source-specific evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-w8-windowed-rank-1024
+          path: prime31-w8-windowed-rank.json
+          if-no-files-found: warn
+          retention-days: 30
