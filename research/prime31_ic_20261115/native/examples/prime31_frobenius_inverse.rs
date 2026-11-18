@@ -288,6 +288,10 @@ fn panel() -> serde_json::Value {
         (direct_meter.multiplications, direct_meter.inversions);
     let dual_native_muls = after.fp_multiplications - before.fp_multiplications;
     let dual_native_invs = after.fp_inversions - before.fp_inversions;
+    let transcript: Vec<_> = targets.iter().zip(source_points.iter()).enumerate()
+        .map(|(case, (&public_q, &source_preimage))| json!({
+            "case":case + 1, "public_q":public_q, "source_preimage":source_preimage
+        })).collect();
     json!({
         "schema":"prime31.frobenius_inverse_cubic.v1",
         "standing":"[pcc:unverified]",
@@ -296,6 +300,7 @@ fn panel() -> serde_json::Value {
         "source_curve":[PRIME31.a,PRIME31.b],
         "codomain_curve":[E2.a,E2.b],
         "public_targets":targets.len(),
+        "public_transcript":transcript,
         "unique_linear_gcd":targets.len(),
         "nontrivial_quadratic_irreducible":targets.len(),
         "forward_roundtrip_ok":targets.len(),
