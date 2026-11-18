@@ -493,3 +493,13 @@ the smaller subgroup orders: per-curve slope rises from 0.332 at order 127 to
 also have only one recursion level. A larger fixed-ratio panel is required;
 this finite association is not a complete subexponential decoder.
 [pcc:unverified]
+
+The required [fixed-ratio large panel](QUOTIENT_LARGE_PANEL_EXPERIMENT.md)
+then moves to independently selected prime subgroup orders 5,081, 9,851 and
+19,927 while capping the radix at 16. It generates 69,712 model records with
+zero repeat or invariant mismatch and retains three recursion levels at radix
+16. The prior signal disappears: every radix needs its full width, mean ranks
+are null-like or slightly worse than shuffled labels, and all 4,096 shuffled
+pooled and per-curve slopes are more favorable. This closes the frozen `IX1`
+ordering mechanism, while leaving different observables and covers open.
+[pcc:unverified]
