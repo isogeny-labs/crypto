@@ -14,7 +14,25 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
+- [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
+
+- [ ] Benchmark the Boolean Faugère–Lachartre F4 split on matched Semaev systems (Codex, started 2026-11-18, branch codex/semaev-fl-benchmark-20261118, PR #4679)
+
+- [ ] Execute the frozen ecbench Phase-1 panel through the cold one-target IC-versus-rho gates, starting with the smallest runnable Koblitz and prime cells (Codex, started 2026-11-18, branch codex/ecbench-phase1-e2e-20261118, PR #4681)
+
+- [ ] Improve the exact Semaev projection/index-calculus lane toward cold one-target rho parity, with complete counted costs and verified recovery (Codex, started 2026-11-18, branch codex/semaev-rho-parity-20261118, PR #4682)
+
+- [ ] Complete the next curve-transfer infrastructure slice: catalog-general norm replay, independent divisor-map oracle, odd two-infinity support, cryptanalysis mirror, standalone packaging, and CI evidence (Codex, started 2026-11-18, branch codex/curve-transfer-next-phase-20261118, PR #4683)
+
+- [ ] Formalize or refute the ready yield/rank frontier obligations: population contract, solver visibility, and kernel-mode scope (Codex, started 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4685)
+
+- [x] Split the index-calculus yield/rank frontier into attackable obligations and evidence-linked targets (Codex, completed 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4685)
+
+- [ ] Preregister and execute the exact GitHub-runner norm-branch fallback after EKS admission failure (Codex, started 2026-11-17, branch codex/norm-branch-github-fallback-20261117, PR #4686)
+
+- [x] Add the fail-closed pre-launch checkpoint for the frozen norm-branch tensor census (Codex, started 2026-11-17, branch codex/norm-branch-census-run-20261117, PR #4570)
 - [ ] Certify prime31 exact geometric CM conductor via 3-division and tighten nonscalar endomorphism degree bound (automation, started 2026-11-18, branch automation/prime31-cm-conductor3-certificate-20261118)
 - [x] Publish prime-field coverage, Split4 and RR9 follow-up evidence (Codex, started 2026-11-17, branch research/prime-field-followup-20261117, PR #4624)
 
@@ -33,7 +51,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Freeze H115 Frobenius--Kummer resolvent-moment ECDLP lead, derive its cohomological cost obligations, and preregister exact small-curve controls (Codex, started 2026-11-17, branch research/h115-frobenius-kummer-resolvent-freeze, PR #4625)
 
-- [ ] Audit the tensor-contraction and fixed-arity proof routes to total subexponential ECDLP, and test the other assessed leads against the same scaling criterion (Codex, started 2026-11-18, branch codex/ecdlp-subexponential-proof-20261118)
+- [x] Audit the tensor-contraction and fixed-arity proof routes to total subexponential ECDLP, and test the other assessed leads against the same scaling criterion (Codex, completed 2026-11-18, branch codex/ecdlp-subexponential-proof-report-20261118, PR #4665)
 
 - [x] Assess the subexponential ECDLP literature and the status of the lab's index-calculus leads, then identify the first unresolved mathematical test (Codex, completed 2026-11-17, branch codex/ecdlp-subexponential-goal-20261117, PR #4627)
 
@@ -57,7 +75,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
-- [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
+- [x] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562; merged)
 
 - [x] Freeze and audit #4556 exact-source public B8 RR9 result with native JSON receipt (automation, started 2026-11-17, branch research/prime31-barycentric-evidence-20261117, PR #4558)
 
@@ -65,7 +83,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
-- [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
+- [ ] Derive and measure an exponent-moving Curve25519 mechanism in native Rust (Codex, started 2026-11-17, resumed 2026-11-18, branch codex/curve25519-exponent-ideas-20261117, PR #4677; split/sign contracts complete; projective m=3 qualification protocol frozen before implementation; m=4 exponent stage gated on correctness)
 - [x] Port the linearized two-summand root finder (lfd-summation-systems PR #28) into the Semaev decomposer and measure it vs the pair loop (claude, started 2026-11-17, branch claude/index-calculus-root-finding-e95kd6, PR #4578); follow-up: wrap as an ic_framework oracle and compare with rootfind-mitm in the harness unit
 
 - [x] Repair main-side CI breakage left by the 2026-11-16 merges: parity lock and IC reference currency (workflow store pulls deferred until the store is repaired) (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4576)
@@ -79,6 +97,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 - [ ] Autolab rounds 38 to 40 (claude, started 2026-11-17, branch ic-autolab-20261117b): round 39 ratchets `tw2l-x20-j16-n2` at k = 28 (0.944, counted GAE; wall time 1.236x slower; validator disposition validated for the counted claim); open: a second-host replay or human validation, a code-level lever beyond the K = 3 collision floor, and the `hashed-ecdl-tensor` standalone build failure (eight modules with no `mod` line in `lib.rs`)
 
 ## Blocked / questions for the owner
+
 
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 

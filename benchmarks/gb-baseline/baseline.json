@@ -1,14 +1,14 @@
 {
   "host": {
-    "commit": "c1688e5f1b7cba0c8d3bfdcf354206c75a40011d",
+    "commit": "224e39ad0a09a55364c68438b240a8fe2aa17089",
     "cpu": "AMD EPYC 7763 64-Core Processor",
     "cpus": 4,
     "host": "runnervmccnms",
     "python": "3.12.16",
     "ref": "refs/heads/main",
-    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/44112581369",
+    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/44235614366",
     "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
-    "utc": "2026-11-17T17:19:56Z"
+    "utc": "2026-11-18T05:28:09Z"
   },
   "rows": [
     {
@@ -25,7 +25,7 @@
       "solving_degree_max": 4,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.002055584
+      "wall_s": 0.002284197
     },
     {
       "N": 6,
@@ -41,7 +41,7 @@
       "solving_degree_max": 5,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.019076335
+      "wall_s": 0.019386919
     },
     {
       "N": 8,
@@ -50,14 +50,14 @@
       "cost": 214289944,
       "cost_unit": "multiply-adds (F_p elimination)",
       "curve": "M31",
-      "elapsed_s": 0.266,
+      "elapsed_s": 0.265,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 4,
       "solving_degree_max": 6,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.221616906
+      "wall_s": 0.219805381
     },
     {
       "command": "pkm_tower_pilot --p 2147483647 --kinds dickson-torus --engine generic --m 5 --controls tower --t-min 2 --max-t 2 --max-t-m3 2 --max-t-m4 2 --planted 2 --random 2 --ladder-t none --budget 595 --out /tmp/gbb/raw/M31-m5.jsonl",
@@ -117,11 +117,11 @@
       "curve": "N31",
       "decomposed": 0,
       "detail": {
-        "build_ns": 180668,
+        "build_ns": 230860,
         "ell": 5,
         "exhausted": 0,
         "factor_base_points": 63,
-        "reduce_ns": 751,
+        "reduce_ns": 1171,
         "reductions": 4,
         "splits": 0
       },
@@ -132,7 +132,7 @@
       "matrix_cols": 144,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.000607286
+      "wall_s": 0.000634943
     },
     {
       "answer_digest": "10055e840b7b42c7",
@@ -142,11 +142,11 @@
       "curve": "N31",
       "decomposed": 0,
       "detail": {
-        "build_ns": 167272277,
+        "build_ns": 167224006,
         "ell": 5,
         "exhausted": 0,
         "factor_base_points": 63,
-        "reduce_ns": 1788947,
+        "reduce_ns": 1749388,
         "reductions": 568,
         "splits": 248
       },
@@ -157,7 +157,7 @@
       "matrix_cols": 443700,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.186986824
+      "wall_s": 0.18678423
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -182,7 +182,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.0899e-05
+      "wall_s": 2.1811e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -207,7 +207,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.8144e-05
+      "wall_s": 2.6609e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -232,7 +232,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.8174e-05
+      "wall_s": 4.7658e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -257,7 +257,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.8365e-05
+      "wall_s": 2.0979e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -282,7 +282,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.164e-05
+      "wall_s": 2.3023e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -307,7 +307,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.8504e-05
+      "wall_s": 2.2853e-05
     }
   ],
   "schema": "gb-baseline.baseline/v1",

@@ -76,3 +76,22 @@ source for the differential equation and recurrence. This scoped search found
 no cited result asserting H116's exact `11 -> 10 -> 9` fixed-prefix certificate,
 but absence from these queries is not a publication-novelty claim.
 [pcc:unverified]
+
+## Formal-scalar construction follow-up
+
+Before freezing the formal-scalar experiment, the unavailable shared KB
+wrapper was queried for normalized isogeny jets, source/target uniqueness,
+`Verschiebung-1` formal-group coefficients, low division-polynomial
+coefficients and the first coefficients of the Bostan recurrence. The fallback
+repository and pinned-source search located Mathlib's
+`PowerSeries.trunc_X_pow_self_mul` and `PowerSeries.coeff_X_pow`, which are used
+as stated for the Lean cutoff. [pcc:unverified]
+
+Bostan--Morain--Salvy--Schost remains the primary source for constructing a
+normalized isogeny Laurent series from its source and target curves. H116's
+implementation specializes that prior recurrence context to the formal
+identity `V-1=[t-1]-pi` and tests whether the first fixed coefficients can be
+obtained from `[t-1]` alone because the Frobenius term begins beyond the frozen
+precision. The scoped search did not locate this exact fixed-prefix
+specialization, but that search gap is not evidence of publication novelty.
+[pcc:unverified]
