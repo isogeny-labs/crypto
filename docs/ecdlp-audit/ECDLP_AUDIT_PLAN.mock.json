@@ -1,9 +1,9 @@
 {
   "schema_version": "ecdlp-audit-plan/v1",
   "record_state": "mock_non_authoritative",
-  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:0b1442dd28f194b0001424177c49c1b9301fb58ee20a44cad131018d4595f700",
+  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:332b00c79c9c430bbdb37e7babe69f2e87179fd7f79ae9683f6cac20fdd20827",
   "title": "Comprehensive elliptic-curve private-key recovery audit",
-  "as_of": "2026-10-14",
+  "as_of": "2026-11-18",
   "authoritative": false,
   "promotion_allowed": false,
   "scope": {
@@ -33,7 +33,7 @@
     {
       "id": "source.cover-transfer-ledger",
       "path": "docs/curves/cover-transfer-assessments.json",
-      "role": "Pinned pre-execution catalog-wide cover and subgroup classification baseline at the stated revision; classification is not blanket support, and current generated outputs are separate.",
+      "role": "Frozen 2026-10-13 pre-execution cover and subgroup classification baseline at the stated revision; it is historical evidence, not the live catalog inventory, blanket support, or a current generated output.",
       "revision": "da6ae6d1b030f6b7455bfb042634520d2e93b7aa",
       "sha256": "9bdf27316c0370ef4e7013d8d36186ec1c7d186858b76c6ac885475df1a456e9",
       "status": "pinned"
@@ -122,7 +122,7 @@
     "unit_expression": "curve_model × representation × subgroup × protocol_role × implementation_revision × attack_route × adversary_model",
     "denominator_manifest_sha256": null,
     "expected_units": null,
-    "note": "WS3, WS5, and WS6 must freeze the authoritative populations before any completeness percentage is reported."
+    "note": "WS3, WS5, and WS6 must freeze the authoritative populations before any completeness percentage is reported. Dated cover-specific observation only: the 2026-11-18 generated snapshot at registry SHA-256 b7046bad4a8e0b9e261a851b20e54affc035bd3dda12bc893796c38db5dc6183 has 22,417 registry models, 22,417 map rows, 22,415 unique covers, zero generator-reported missing/invalid/unsupported rows, and 1,090 EC1 representations; this is neither the universal denominator nor a transfer, subgroup, solver, or security claim."
   },
   "workstreams": [
     {
@@ -131,12 +131,12 @@
       "title": "Finish the present cover evidence gate",
       "requirement_status": "partial",
       "depends_on": [],
-      "summary": "Close CI, formal replay, exact-artifact packaging, catalog replay, and independent review for the current cover assessment without adding a solver claim.",
+      "summary": "Preserve the frozen October assessment, then close CI, formal replay, exact-artifact packaging, live-catalog replay, and independent review on a separately pinned current snapshot without adding a solver claim.",
       "deliverables": [
         {
           "id": "WS1-D1",
           "kind": "artifact_replay",
-          "description": "Fresh standalone artifact and exact 2,572-input replay receipt.",
+          "description": "Fresh standalone artifact and an exact 22,417-model replay receipt for the 2026-11-18 generated registry snapshot, retaining constructed, unsupported, rejected, and failed records.",
           "path": null,
           "artifact_sha256": null,
           "status": "not_attempted",
@@ -150,7 +150,7 @@
           "kind": "review_receipt",
           "description": "Partial CI, Lean, semantic replay, and review evidence; final closure remains open.",
           "path": "research/cover_transfer_assessment_20261013/README.md",
-          "artifact_sha256": "cd7f68549bd1c18e92fcfdb484ab203a142137a2c4d83a41f3fc0e056b3e1d29",
+          "artifact_sha256": "c814a0c515d939bffbc02726cd327cc2f1fc05a904b7ba7a7803caf794324603",
           "status": "partial",
           "acceptance_gate_ids": [
             "WS1-G3"
@@ -171,8 +171,8 @@
           "id": "WS1-G2",
           "required": true,
           "claim_status": "unknown",
-          "scope": "The exact fresh artifact replays all 2,572 current cover inputs and retains failures and unsupported results.",
-          "rationale": "The published package was not replayed against all current inputs.",
+          "scope": "The exact fresh artifact replays all 22,417 models at registry SHA-256 b7046bad4a8e0b9e261a851b20e54affc035bd3dda12bc893796c38db5dc6183 and retains constructed, unsupported, rejected, and failed results; the frozen October assessment remains a separate historical population.",
+          "rationale": "No package built from the active implementation revision has been published and replayed against the complete live registry population.",
           "evidence_refs": [],
           "obligation_id": "catalog-wide-packaged-replay"
         },
@@ -206,12 +206,12 @@
         "WS1",
         "WS4"
       ],
-      "summary": "Implement balanced two-infinity arithmetic, arbitrary binary norm, subgroup certificates, and an independent reference oracle as separate gated changes.",
+      "summary": "Retain the implemented general binary norm, advance a bounded balanced two-infinity arithmetic slice and bounded transfer sweeper, and keep cryptanalysis parity, catalog-wide induced maps, subgroup certificates, package publication, and independent reference oracles as separate gated changes.",
       "deliverables": [
         {
           "id": "WS2-D1",
           "kind": "implementation",
-          "description": "Balanced two-infinity odd-characteristic Jacobian arithmetic and induced maps.",
+          "description": "Catalog-scoped balanced two-infinity odd-characteristic Jacobian arithmetic and induced maps; a bounded prime-field arithmetic draft does not by itself satisfy this deliverable.",
           "path": null,
           "artifact_sha256": null,
           "status": "not_attempted",
@@ -222,7 +222,7 @@
         {
           "id": "WS2-D2",
           "kind": "implementation",
-          "description": "Catalog-general arbitrary-class binary Jacobian pushforward/norm and elliptic-image projector for checked cubic covers, including nonsplit support.",
+          "description": "Implemented arbitrary-class binary Jacobian pushforward/norm and elliptic-image projector for checked cubic covers, including nonsplit support; current CLI, catalog replay, independent-oracle, and cryptanalysis-mirror evidence remain gated.",
           "path": "src/binary_ecc/cover_transfer.rs",
           "artifact_sha256": "bfddf75758b9a4e11af1944b84e40cda4dd35c557776ae8c05df9892bd3b4909",
           "status": "partial",
@@ -235,7 +235,7 @@
           "kind": "certificate_corpus",
           "description": "Partial catalog certificate inventory and an explicit record of the remaining exact subgroup/image obligations.",
           "path": "problems/catalog-cover-subgroup-certificates-incomplete.md",
-          "artifact_sha256": "d9cc55020c2dce647e72132430f54410382b65c81cde79671e4cdcd3aa4530d4",
+          "artifact_sha256": "de6bf3c7e2826b7cde34ef32df129542f30019ed0af986ec22336cb49fefd6b8",
           "status": "partial",
           "acceptance_gate_ids": [
             "WS2-G3"
@@ -258,8 +258,8 @@
           "id": "WS2-G1",
           "required": true,
           "claim_status": "unknown",
-          "scope": "Balanced two-infinity arithmetic and degree-two induced maps cover the exact 1,940-row odd catalog population: 586 direct-prime maps (membership SHA-256 4777fd59ca63da0e7ac527f927b637a06918e92b8315ab5ce330c938fed07e6a), 30 normalized-prime maps (2ae30bea62e93a0681b087d94911ce50b13f152033943e04ed065830730c9d85), and 1,324 extension maps (a5f91e972a2a64b56757b39a35023e1a830a1668fc0de5827954286c3b45fcde), with exhaustive small-field and independent checks.",
-          "rationale": "The current odd even-sextic sources are outside the one-infinity backend.",
+          "scope": "Balanced two-infinity arithmetic and degree-two induced maps cover the exact 22,243-map, 940-representation odd population at the 2026-11-18 live registry snapshot: 20,808 direct-prime maps/909 representations, 30 normalized-prime maps/22 representations, and 1,405 extension maps/9 representations, with exact membership hashes, exhaustive supported small-field checks, exceptional-divisor tests, and an independent oracle.",
+          "rationale": "The existing production one-infinity backend does not support even-sextic two-infinity sources. The active bounded draft handles monic squarefree degree-six genus-two split models over deterministically checked odd primes up to 64 bits, with exhaustive enumeration only through p=31; it has no induced maps, extension fields, nonsplit infinity, normalized-model maps, or catalog-wide support. The bounded candidate sweeper likewise does not close this gate.",
           "evidence_refs": [],
           "obligation_id": "balanced-two-infinity-jacobian"
         },
@@ -267,8 +267,8 @@
           "id": "WS2-G2",
           "required": true,
           "claim_status": "unknown",
-          "scope": "A catalog-general binary norm handles every valid reduced class for all 160 exact map.binary-cubic.same-field rows (membership SHA-256 fe39b6b1a6f833b5e45585b8deef032ce5b6ee1a65c4cad659defabd1a8f7379), including shared, nonsplit, repeated, and exceptional support, verifies degree-three composition, exports exact EC1/ICV1/HC1/CV1 bindings and certificates for the fixed fixture and catalog rows, and has a current cryptanalysis mirror/integration receipt.",
-          "rationale": "The native implementation now handles arbitrary valid reduced classes for checked binary cubic covers and certifies degree-three composition and projectors, including exhaustive GF(8) and exact n=83 checks; an independent divisor-class oracle, catalog-wide bound certificates, and solver advantage remain open.",
+          "scope": "A catalog-general binary norm handles every valid reduced class for all 174 binary cubic map rows and 150 representations at the 2026-11-18 live registry snapshot, including shared, nonsplit, repeated, and exceptional support, verifies degree-three composition, exports exact EC1/ICV1/HC1/CV1 bindings and certificates, and has a current cryptanalysis mirror/integration receipt.",
+          "rationale": "The native implementation handles arbitrary valid reduced classes for checked binary cubic covers and certifies degree-three composition and projectors, including exhaustive GF(8) and exact n=83 checks. A new standalone transfer command and a bounded EC1/ICV1/model sweeper for binary-cubic and odd-quadratic candidate families are active-branch work; the sweeper is not an enumeration of all transfers. Independent divisor-class oracle agreement, a freshly pinned all-row replay, current cryptanalysis parity, package publication, and any solver advantage remain open.",
           "evidence_refs": [],
           "obligation_id": "arbitrary-binary-jacobian-norm"
         },
@@ -276,7 +276,7 @@
           "id": "WS2-G3",
           "required": true,
           "claim_status": "unknown",
-          "scope": "All 664 exact EC1/curve/map bindings have exact order, image, kernel-intersection, composition, and recovery evidence: 134 binary degree-three bindings (membership SHA-256 f8a8d5740ec643bfcfc13e5dd52f09e5cbc93c020452538d4d0f6f6e23494056) and 530 odd degree-two bindings (afafcfccc9d6e9632c29c235e2bc117e9d660b1ce0a41870accf3a4cbfec128b).",
+          "scope": "All 1,090 exact EC1/curve/map bindings at the 2026-11-18 live snapshot have exact order, image, kernel-intersection, composition, and recovery evidence: 150 binary degree-three bindings and 940 odd degree-two bindings, with separate membership hashes.",
           "rationale": "Generator-level checks do not establish all-element homomorphism, injectivity, or exact image order.",
           "evidence_refs": [],
           "obligation_id": "catalog-subgroup-certificates"
@@ -299,7 +299,8 @@
       },
       "non_claims": [
         "A cover or transfer does not establish a faster destination solver.",
-        "The full Jacobian index-calculus solver is a separate deliverable."
+        "A bounded candidate sweeper does not enumerate all mathematical transfers, and an empty bounded result is not a nonexistence proof.",
+        "The full Jacobian index-calculus solver is a separate deliverable with actual relations, checked linear algebra and target decomposition, independent output verification, explicit parameters, and total resource accounting."
       ]
     },
     {
@@ -937,7 +938,7 @@
       "workstream_id": "WS1",
       "status": "open",
       "required": true,
-      "description": "Bind a fresh current-catalog artifact to exact source, build, configuration, dependency, registry, and SBOM identities.",
+      "description": "Bind a fresh artifact for a newly pinned live catalog snapshot to exact source, build, configuration, dependency, registry, and SBOM identities.",
       "exit_evidence": "Signed or hashed build manifest plus reproducible artifact receipt."
     },
     {
@@ -945,7 +946,7 @@
       "workstream_id": "WS1",
       "status": "open",
       "required": true,
-      "description": "Replay all 2,572 current inputs against the exact fresh package.",
+      "description": "Replay all 22,417 models at registry SHA-256 b7046bad4a8e0b9e261a851b20e54affc035bd3dda12bc893796c38db5dc6183 against the exact fresh package, retaining constructed, unsupported, rejected, and failed records.",
       "exit_evidence": "Per-input manifest, commands, results, failures, resource accounting, and independent replay receipt."
     },
     {
@@ -961,24 +962,24 @@
       "workstream_id": "WS2",
       "status": "open",
       "required": true,
-      "description": "Implement and certify odd-characteristic balanced two-infinity arithmetic and induced maps for the frozen 1,940-row odd catalog population (586 direct prime, 30 normalized prime, and 1,324 extension maps with the WS2-G1 membership hashes).",
-      "exit_evidence": "Exhaustive small-field and all-1,940 catalog fixtures, exceptional cases, map identities, and independent oracle agreement."
+      "description": "Promote the bounded monic squarefree degree-six prime-field balanced arithmetic slice into reviewed odd-characteristic two-infinity arithmetic and induced maps for all 22,243 odd map rows and 940 representations at the 2026-11-18 live snapshot, including extension fields and normalized target models.",
+      "exit_evidence": "Exact live membership hashes; exhaustive supported small-field and all-live-row fixtures; exceptional and shared-support cases; map identities; extension-field and infinity-configuration coverage; and independent oracle agreement."
     },
     {
       "id": "arbitrary-binary-jacobian-norm",
       "workstream_id": "WS2",
       "status": "open",
       "required": true,
-      "description": "Generalize and independently verify arbitrary valid-class binary Jacobian pushforward from the exact GF(8) fixture to the frozen 160-row binary map population, export exact catalog-style object/map/certificate bindings, and mirror or integrate it at a current aburan28/cryptanalysis revision.",
-      "exit_evidence": "Independent tiny-field oracle agreement; all-160 field/model coverage; shared/nonsplit/repeated support, homomorphism, and composition receipts; EC1/ICV1/HC1/CV1 linkage for the positive fixture and supported rows; and exact current-tip cryptanalysis parity or integration evidence."
+      "description": "Independently verify the implemented arbitrary valid-class binary Jacobian pushforward for all 174 binary cubic map rows and 150 representations at the 2026-11-18 live snapshot, export exact catalog-style object/map/certificate bindings, and mirror or integrate it at a current aburan28/cryptanalysis revision.",
+      "exit_evidence": "Independent tiny-field oracle agreement; exact all-live-row field/model coverage and membership hash; shared/nonsplit/repeated support, homomorphism, and composition receipts; EC1/ICV1/HC1/CV1 linkage; exact current-tip cryptanalysis parity or integration evidence; and replay from the packaged executable."
     },
     {
       "id": "catalog-subgroup-certificates",
       "workstream_id": "WS2",
       "status": "open",
       "required": true,
-      "description": "Produce exact map-bound subgroup and image certificates for the frozen 664 EC1/curve/map bindings (134 binary and 530 odd with the WS2-G3 membership hashes).",
-      "exit_evidence": "All-664 order/factor, nonzero image, exact image order, kernel intersection, composition, and recovery certificates."
+      "description": "Produce exact map-bound subgroup and image certificates for all 1,090 EC1/curve/map bindings at the 2026-11-18 live snapshot: 150 binary and 940 odd, with distinct membership hashes.",
+      "exit_evidence": "All-live-binding order/factor, nonzero image, exact image order, kernel intersection, composition, and recovery certificates, plus explicit unsupported records where the hypotheses are unavailable."
     },
     {
       "id": "independent-divisor-class-oracle",
