@@ -51,6 +51,9 @@ jobs:
           grep -Fq '"trace":"36817"' cm-gate.jsonl
           grep -Fq '"fundamental_discriminant":"-803827011"' cm-gate.jsonl
           grep -Fq '"noninteger_endomorphism_degree_lower_bound":"200956753"' cm-gate.jsonl
+          grep -Fq '"actual_endomorphism_conductor":3' cm-gate.jsonl
+          grep -Fq '"actual_minimal_nonscalar_degree":"1808610775"' cm-gate.jsonl
+          grep -Fq '"no_nonscalar_endomorphism_degree_below":"1808610775"' cm-gate.jsonl
           grep -Fq '"performance_measured":false' cm-gate.jsonl
       - name: Archive exact integer result
         if: always()
