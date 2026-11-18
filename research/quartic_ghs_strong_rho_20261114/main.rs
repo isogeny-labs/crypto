@@ -190,21 +190,27 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 );
                 continue;
             }
-            let width: usize = arm
+            let setup_control = arm.ends_with("-legacy-setup");
+            let width_text = arm
                 .strip_prefix("strong-b")
-                .unwrap_or_else(|| panic!("unknown arm {arm}"))
+                .unwrap_or_else(|| panic!("unknown arm {arm}"));
+            let width: usize = width_text
+                .strip_suffix("-legacy-setup")
+                .unwrap_or(width_text)
                 .parse()
                 .expect("batch width");
-            let out = strong_rho(
-                &inst,
-                k,
-                seed * 1000 + i as u64,
-                StrongOpts::for_instance(&inst, width),
-            );
+            let mut opts = StrongOpts::for_instance(&inst, width);
+            opts.batch_setup = !setup_control;
+            let out = strong_rho(&inst, k, seed * 1000 + i as u64, opts);
             println!(
-                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"setup.reciprocal_div\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
+                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"setup_mode\":\"{}\",\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"setup.reciprocal_div\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
                 arm,
                 width,
+                if setup_control {
+                    "legacy"
+                } else {
+                    "batched-window2-jumps"
+                },
                 q,
                 seed,
                 i,
@@ -233,7 +239,7 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
 
 fn usage() -> ! {
     eprintln!(
-        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,...>"
+        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,strong-b1-legacy-setup,...>"
     );
     std::process::exit(2)
 }
