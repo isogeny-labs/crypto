@@ -281,16 +281,18 @@ impl FastF3 {
         [self.fm(p[0], ni), self.fm(p[1], ni), self.fm(p[2], ni)]
     }
 
-    pub fn batch_inv(&self, values: &[K]) -> Vec<K> {
+    fn batch_inv_into(&self, values: &[K], prefix: &mut Vec<K>, out: &mut Vec<K>) {
         assert!(values.iter().all(|v| *v != KZERO));
+        prefix.clear();
+        out.clear();
         if values.is_empty() {
-            return Vec::new();
+            return;
         }
         self.bump(|c| c.batch_inv += 1);
         if values.len() == 1 {
-            return vec![self.inv(&values[0])];
+            out.push(self.inv(&values[0]));
+            return;
         }
-        let mut prefix = Vec::with_capacity(values.len());
         let mut acc = values[0];
         prefix.push(acc);
         for v in &values[1..] {
@@ -298,14 +300,28 @@ impl FastF3 {
             prefix.push(acc);
         }
         let mut inv_acc = self.inv(&acc);
-        let mut out = vec![KZERO; values.len()];
+        out.resize(values.len(), KZERO);
         for i in (1..values.len()).rev() {
             out[i] = self.mul(&inv_acc, &prefix[i - 1]);
             inv_acc = self.mul(&inv_acc, &values[i]);
         }
         out[0] = inv_acc;
+    }
+
+    pub fn batch_inv(&self, values: &[K]) -> Vec<K> {
+        let mut prefix = Vec::with_capacity(values.len());
+        let mut out = Vec::with_capacity(values.len());
+        self.batch_inv_into(values, &mut prefix, &mut out);
         out
     }
+}
+
+#[derive(Default)]
+struct BatchAddScratch {
+    active: Vec<usize>,
+    den: Vec<K>,
+    prefix: Vec<K>,
+    inv: Vec<K>,
 }
 
 pub struct FastEc<'a> {
@@ -389,25 +405,39 @@ impl<'a> FastEc<'a> {
         r
     }
 
-    pub fn batch_add(&self, points: &[EP], jumps: &[EP]) -> Vec<EP> {
+    fn batch_add_into(
+        &self,
+        points: &[EP],
+        jumps: &[EP],
+        out: &mut Vec<EP>,
+        scratch: &mut BatchAddScratch,
+    ) {
         assert_eq!(points.len(), jumps.len());
-        let mut out = vec![EP::Inf; points.len()];
-        let mut active = Vec::new();
-        let mut den = Vec::new();
+        out.clear();
+        out.resize(points.len(), EP::Inf);
+        scratch.active.clear();
+        scratch.den.clear();
         for i in 0..points.len() {
             match (&points[i], &jumps[i]) {
                 (EP::Inf, _) | (_, EP::Inf) => out[i] = self.add(&points[i], &jumps[i]),
                 (EP::A(x1, _), EP::A(x2, _)) if x1 != x2 => {
-                    active.push(i);
-                    den.push(self.f.sub(x2, x1));
+                    scratch.active.push(i);
+                    scratch.den.push(self.f.sub(x2, x1));
                 }
                 _ => out[i] = self.add(&points[i], &jumps[i]),
             }
         }
-        let inv = self.f.batch_inv(&den);
-        for (j, &i) in active.iter().enumerate() {
-            out[i] = self.mixed_with_inv(&points[i], &jumps[i], &inv[j]);
+        self.f
+            .batch_inv_into(&scratch.den, &mut scratch.prefix, &mut scratch.inv);
+        for (j, &i) in scratch.active.iter().enumerate() {
+            out[i] = self.mixed_with_inv(&points[i], &jumps[i], &scratch.inv[j]);
         }
+    }
+
+    pub fn batch_add(&self, points: &[EP], jumps: &[EP]) -> Vec<EP> {
+        let mut out = Vec::with_capacity(points.len());
+        let mut scratch = BatchAddScratch::default();
+        self.batch_add_into(points, jumps, &mut out, &mut scratch);
         out
     }
 }
@@ -456,6 +486,7 @@ pub struct StrongOut {
 #[derive(Clone)]
 struct Walker {
     p: EP,
+    h: Option<u64>,
     a: u64,
     b: u64,
     tail: u64,
@@ -493,6 +524,16 @@ fn smul(a: u64, b: u64, n: u64, c: &mut NativeCounts) -> u64 {
 #[inline(always)]
 fn hx(x: &K) -> u64 {
     x[0].wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ x[1].wrapping_mul(0xC2B2_AE3D_27D4_EB4F) ^ x[2]
+}
+
+#[inline(always)]
+fn partition_index(h: u64, r: usize) -> usize {
+    debug_assert!(r > 0);
+    if r.is_power_of_two() {
+        (h & (r as u64 - 1)) as usize
+    } else {
+        (h % r as u64) as usize
+    }
 }
 
 fn canon(f: &FastF3, p: EP, a: u64, b: u64, n: u64, c: &mut NativeCounts) -> (EP, u64, u64) {
@@ -533,6 +574,7 @@ fn new_walker(
             let (p, a, b) = canon(f, p, a, b, n, c);
             return Walker {
                 p,
+                h: None,
                 a,
                 b,
                 tail: 0,
@@ -543,6 +585,20 @@ fn new_walker(
     }
 }
 
+#[derive(Default)]
+struct StepScratch {
+    first: Vec<usize>,
+    chosen: Vec<usize>,
+    next: Vec<EP>,
+    next_hash: Vec<Option<u64>>,
+    pending: Vec<usize>,
+    retry: Vec<usize>,
+    points: Vec<EP>,
+    addends: Vec<EP>,
+    candidates: Vec<EP>,
+    batch_add: BatchAddScratch,
+}
+
 /// One quotient-walk step for every lane, with the frozen rho-neg look-ahead
 /// rule applied in batches. If jump j would land in partition j again, retry
 /// from the original point with j+1. This removes the dominant fruitless
@@ -551,39 +607,63 @@ fn batched_lookahead_step(
     ec: &FastEc<'_>,
     jumps: &[EP],
     walkers: &[Walker],
-    first: Vec<usize>,
     native: &mut NativeCounts,
-) -> (Vec<EP>, Vec<usize>, u64) {
+    scratch: &mut StepScratch,
+) -> u64 {
     let r = jumps.len();
-    let mut chosen = first;
-    let mut next = vec![EP::Inf; walkers.len()];
-    let mut pending: Vec<usize> = (0..walkers.len()).collect();
+    let StepScratch {
+        first,
+        chosen,
+        next,
+        next_hash,
+        pending,
+        retry,
+        points,
+        addends,
+        candidates,
+        batch_add,
+    } = scratch;
+    chosen.clear();
+    chosen.extend(first.iter().copied());
+    next.clear();
+    next.resize(walkers.len(), EP::Inf);
+    next_hash.clear();
+    next_hash.resize(walkers.len(), None);
+    pending.clear();
+    pending.extend(0..walkers.len());
     let mut lookahead = 0u64;
     for attempt in 0..r {
-        let points: Vec<_> = pending.iter().map(|&i| walkers[i].p).collect();
-        let addends: Vec<_> = pending.iter().map(|&i| jumps[chosen[i]]).collect();
-        let candidates = ec.batch_add(&points, &addends);
-        let mut retry = Vec::new();
-        for (&i, candidate) in pending.iter().zip(candidates) {
+        points.clear();
+        points.extend(pending.iter().map(|&i| walkers[i].p));
+        addends.clear();
+        addends.extend(pending.iter().map(|&i| jumps[chosen[i]]));
+        ec.batch_add_into(points, addends, candidates, batch_add);
+        retry.clear();
+        for (slot, &i) in pending.iter().enumerate() {
+            let candidate = candidates[slot];
             native.lookahead_tests += 1;
-            let same_partition = match candidate {
-                EP::Inf => false,
+            let candidate_hash = match candidate {
+                EP::Inf => None,
                 EP::A(x, _) => {
                     native.hashes += 1;
-                    (hx(&x) % r as u64) as usize == chosen[i]
+                    Some(hx(&x))
                 }
             };
+            let same_partition = candidate_hash
+                .map(|h| partition_index(h, r) == chosen[i])
+                .unwrap_or(false);
             if same_partition && attempt + 1 < r {
                 chosen[i] = (chosen[i] + 1) % r;
                 lookahead += 1;
                 retry.push(i);
             } else {
                 next[i] = candidate;
+                next_hash[i] = candidate_hash;
             }
         }
-        pending = retry;
+        std::mem::swap(pending, retry);
         if pending.is_empty() {
-            return (next, chosen, lookahead);
+            return lookahead;
         }
     }
     unreachable!("look-ahead loop accepts its final candidate")
@@ -614,7 +694,7 @@ fn single_lookahead_step(
     let r = jumps.len();
     let EP::A(x, _) = p else { return None };
     native.hashes += 1;
-    let mut j = (hx(x) % r as u64) as usize;
+    let mut j = partition_index(hx(x), r);
     let mut adds = 0u64;
     let mut extra = 0u64;
     for attempt in 0..r {
@@ -625,7 +705,7 @@ fn single_lookahead_step(
             EP::Inf => false,
             EP::A(nx, _) => {
                 native.hashes += 1;
-                (hx(&nx) % r as u64) as usize == j
+                partition_index(hx(&nx), r) == j
             }
         };
         if same_partition && attempt + 1 < r {
@@ -697,38 +777,46 @@ pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> Stro
     let setup_native = native;
     let mask = (1u64 << opts.dp_bits) - 1;
     let tail_cap = 20u64 << opts.dp_bits;
-    let mut table: HashMap<K, (K, u64, u64)> = HashMap::new();
+    let mut table: HashMap<K, (K, u64, u64)> = HashMap::with_capacity(128);
+    let mut scratch = StepScratch::default();
     let (mut steps, mut restarts, mut lookahead, mut cycles, mut cycle_adds) =
         (0u64, 0u64, 0u64, 0u64, 0u64);
     let mut found = None;
 
     'main: while steps <= opts.max_steps {
-        let first: Vec<_> = walkers
-            .iter()
-            .map(|w| {
-                let EP::A(x, _) = w.p else { unreachable!() };
-                native.hashes += 1;
-                (hx(&x) % opts.r as u64) as usize
-            })
-            .collect();
-        let (next, js, extra) = batched_lookahead_step(&ec, &mp, &walkers, first, &mut native);
+        scratch.first.clear();
+        for walker in &mut walkers {
+            let h = match walker.h {
+                Some(h) => h,
+                None => {
+                    let EP::A(x, _) = walker.p else {
+                        unreachable!()
+                    };
+                    let h = hx(&x);
+                    walker.h = Some(h);
+                    native.hashes += 1;
+                    h
+                }
+            };
+            scratch.first.push(partition_index(h, opts.r));
+        }
+        let extra = batched_lookahead_step(&ec, &mp, &walkers, &mut native, &mut scratch);
         lookahead += extra;
 
         for i in 0..walkers.len() {
             steps += 1;
-            let j = js[i];
+            let j = scratch.chosen[i];
             let a = sadd(walkers[i].a, ma[j], n, &mut native);
             let b = sadd(walkers[i].b, mb[j], n, &mut native);
-            if next[i] == EP::Inf {
+            if scratch.next[i] == EP::Inf {
                 restarts += 1;
                 walkers[i] = new_walker(&ec, &f, &inst.g, &target, n, &mut rng, &mut native);
                 continue;
             }
-            let (mut p, mut a, mut b) = canon(&f, next[i], a, b, n, &mut native);
+            let (mut p, mut a, mut b) = canon(&f, scratch.next[i], a, b, n, &mut native);
 
             let EP::A(mut x, _) = p else { unreachable!() };
-            let mut h = hx(&x);
-            native.hashes += 1;
+            let mut h = scratch.next_hash[i].expect("affine candidate hash");
             walkers[i].local += 1;
             let mut cycle_len = None;
             if let Some((snapshot, snapshot_step)) = walkers[i].snapshot {
@@ -782,6 +870,7 @@ pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> Stro
             }
 
             walkers[i].p = p;
+            walkers[i].h = Some(h);
             walkers[i].a = a;
             walkers[i].b = b;
             walkers[i].tail += 1;
@@ -841,6 +930,12 @@ pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> Stro
 /// (its own `cfg(test)` suite depends on Cargo-only test dependencies).
 pub fn selftest() {
     let instance = || Inst::search(223, 1, 200_000).expect("q=223 instance");
+    for r in [1usize, 2, 4, 8, 16, 32, 3, 5, 31, 33] {
+        for h in [0, 1, 31, 32, 33, u32::MAX as u64, u64::MAX] {
+            assert_eq!(partition_index(h, r), (h % r as u64) as usize);
+        }
+    }
+    eprintln!("selftest: masked and fallback partitions match modulo");
     {
         let inst = instance();
         let f = FastF3::from_instance(&inst);
@@ -901,13 +996,34 @@ pub fn selftest() {
         for (p, q) in points.iter().zip(jumps.iter()) {
             assert_eq!(ec.add(p, q), inst.ec.add(p, q));
         }
+        let expected: Vec<_> = points
+            .iter()
+            .zip(jumps.iter())
+            .map(|(p, q)| inst.ec.add(p, q))
+            .collect();
+        assert_eq!(ec.batch_add(&points, &jumps), expected);
+        let mut scratch = BatchAddScratch::default();
+        let mut reused = Vec::new();
+        ec.batch_add_into(&points, &jumps, &mut reused, &mut scratch);
+        assert_eq!(reused, expected);
+        let capacities = (
+            reused.capacity(),
+            scratch.active.capacity(),
+            scratch.den.capacity(),
+            scratch.prefix.capacity(),
+            scratch.inv.capacity(),
+        );
+        ec.batch_add_into(&points, &jumps, &mut reused, &mut scratch);
+        assert_eq!(reused, expected);
         assert_eq!(
-            ec.batch_add(&points, &jumps),
-            points
-                .iter()
-                .zip(jumps.iter())
-                .map(|(p, q)| inst.ec.add(p, q))
-                .collect::<Vec<_>>()
+            capacities,
+            (
+                reused.capacity(),
+                scratch.active.capacity(),
+                scratch.den.capacity(),
+                scratch.prefix.capacity(),
+                scratch.inv.capacity(),
+            )
         );
         for k in [1u128, 2, 3, 17, 255, 65_537] {
             assert_eq!(ec.mul(&inst.g, k), inst.ec.mul(&inst.g, k));
@@ -930,6 +1046,7 @@ pub fn selftest() {
                 out.found, out.steps
             );
             assert_eq!(out.found, Some(k));
+            assert_selftest_oracle(width, &out);
             if width > 1 {
                 assert!(out.walk_field.fq_inv < out.steps);
             }
@@ -937,4 +1054,82 @@ pub fn selftest() {
         eprintln!("selftest: planted logs recovered at widths 1, 8, and 32");
     }
     println!("SELFTEST OK");
+}
+
+fn assert_selftest_oracle(width: usize, out: &StrongOut) {
+    macro_rules! fc {
+        ($qm:expr, $qi:expr, $qa:expr, $m:expr, $s:expr, $i:expr, $bi:expr, $ga:expr) => {
+            FieldCounts {
+                fq_mul: $qm,
+                fq_inv: $qi,
+                fq_add: $qa,
+                f3_mul: $m,
+                f3_sq: $s,
+                f3_inv: $i,
+                batch_inv: $bi,
+                group_add: $ga,
+            }
+        };
+    }
+    macro_rules! nc {
+        ($rng:expr, $hash:expr, $canon:expr, $look:expr, $dp:expr, $table:expr,
+         $cycle:expr, $sa:expr, $sm:expr, $si:expr) => {
+            NativeCounts {
+                rng_draws: $rng,
+                hashes: $hash,
+                canonicalisations: $canon,
+                lookahead_tests: $look,
+                dp_tests: $dp,
+                table_ops: $table,
+                cycle_compares: $cycle,
+                scalar_adds: $sa,
+                scalar_muls: $sm,
+                scalar_invs: $si,
+            }
+        };
+    }
+    let expected = match width {
+        1 => (
+            (Some(17), 1177, 63, 0, 33, 1, 5),
+            fc!(77627, 1928, 245776, 7057, 3201, 1928, 0, 1995),
+            fc!(40106, 1215, 118351, 3646, 1216, 1215, 1210, 1215),
+            fc!(209, 5, 670, 19, 9, 5, 0, 6),
+            nc!(66, 0, 1, 0, 0, 0, 0, 0, 0, 0),
+            nc!(0, 1220, 1182, 1214, 1177, 127, 925, 3556, 1, 1),
+        ),
+        8 => (
+            (Some(118), 1917, 119, 0, 65, 1, 5),
+            fc!(96261, 2394, 304547, 8751, 3963, 2394, 0, 2475),
+            fc!(69055, 303, 250997, 9345, 1991, 303, 298, 1990),
+            fc!(396, 10, 1246, 36, 16, 10, 0, 11),
+            nc!(80, 0, 8, 0, 0, 0, 0, 6, 0, 0),
+            nc!(0, 2002, 1922, 1989, 1917, 239, 785, 5708, 1, 1),
+        ),
+        32 => (
+            (Some(219), 1421, 76, 0, 45, 0, 0),
+            fc!(153758, 3819, 487027, 13978, 6340, 3819, 0, 3948),
+            fc!(51827, 74, 192424, 7277, 1485, 74, 74, 1485),
+            fc!(473, 12, 1486, 43, 19, 12, 0, 13),
+            nc!(128, 0, 32, 0, 0, 0, 0, 46, 0, 0),
+            nc!(0, 1517, 1421, 1485, 1421, 153, 0, 4220, 1, 1),
+        ),
+        _ => unreachable!("self-test width"),
+    };
+    assert_eq!(
+        (
+            out.found,
+            out.steps,
+            out.dps,
+            out.restarts,
+            out.lookahead,
+            out.cycles,
+            out.cycle_adds,
+        ),
+        expected.0
+    );
+    assert_eq!(out.setup_field, expected.1);
+    assert_eq!(out.walk_field, expected.2);
+    assert_eq!(out.verify_field, expected.3);
+    assert_eq!(out.setup_native, expected.4);
+    assert_eq!(out.walk_native, expected.5);
 }
