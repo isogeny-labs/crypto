@@ -756,3 +756,61 @@ perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses -- \
 
 The pull request remains **draft** until actual PMU, CUDA correctness
 and end-to-end decomposition throughput can be validated.
+
+
+## Follow-up: P-256 direct Montgomery-to-canonical conversion (2026-11-18 UTC)
+
+**Retained:** `fp256_from_mont` on host now directly reduces the four-limb
+Montgomery residue, rather than evaluating a generic schoolbook
+`fp256_mul(a, {1,0,0,0})`.  This removes the four-by-four product phase
+entirely.  The reduction is identical to the P-256 sparse-modulus REDC
+rounds already used by `fp256_mul`; device code is unchanged.
+The optimization targets a conversion primitive, **not** the full
+decomposition hot path.
+
+**Actual checked-out header in CI:** [rootfind validation run 44227483129](https://github.com/isogeny-labs/crypto/actions/runs/44227483129)
+on Ubuntu 24.04, GCC `-O2`, 32,768 deterministic 256-bit input
+residues (zero, one, Montgomery one, p-1 and random values included).
+Byte-for-byte baseline equality passed; the full C++ rootfinder test suite
+and all benchmark builds passed.  Nine-sample median time:
+**39.670 ns/op before -> 27.521 ns/op after = 1.441x speedup**.
+
+**Independent pinned local reproduction:** AMD EPYC 9V74 KVM,
+`taskset -c 0`, `g++ -O2 -std=c++17`.  The original wide-limb
+multiply/reduce and the direct REDC were reproduced from the shared
+headers, with 32,768 equality tests.  Linux `perf_event_open` software
+`PERF_COUNT_SW_TASK_CLOCK` was successfully collected around each
+128-pass isolated arm; per paired trial the speedups were approximately
+**1.41x, 1.50x, 1.49x, 1.54x** in one process, and
+**1.54x, 1.55x, 1.51x, 1.52x** in a second process.
+The reduced local reproduction also passed UBSan.  This is task-clock
+sampling, **not hardware cycles, instructions or cache-misses**.
+The local VM returns `ENOENT` for `PERF_COUNT_HW_CPU_CYCLES`;
+hosted CI installed `perf` but has `perf_event_paranoid=4`.
+
+**Screened, rejected, not committed:**
+- Specialized P-256 squaring using 10 distinct limb products rather
+  than 16, but with additional carry propagation: about **0.65–0.71x**
+  relative to generic multiplication in the local `-O2` reproduction.
+  No speedup; do not adopt.
+- Masked Fp64 modular addition, masked Fp64 negation, and masked final
+  reduction: noisy or slower across several prime moduli.  Do not adopt.
+- Algebraic simplification of `rf_pair_offset` to one multiply:
+  the dependency path offset the lower multiply count and timings
+  were inconsistent.  Do not adopt without application-level profiling.
+
+Reproduction against the PR checkout:
+
+```sh
+make -C gpu/rootfind test
+make -C gpu/rootfind bench-from256
+# Separate arms for hardware counters only when the runner exposes PMU:
+perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses \\
+  -- gpu/rootfind/bench_from256 --perf-before
+perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses \\
+  -- gpu/rootfind/bench_from256 --perf-after
+```
+
+**Limits:** the host-only conversion benchmark does not establish an
+end-to-end rootfinder speedup.  The code remains in draft PR #4609
+until CUDA validation and complete oracle throughput measurements.
