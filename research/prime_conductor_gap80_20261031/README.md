@@ -203,3 +203,17 @@ conductor 1. This arithmetic fixture supplies no lower endpoint or evaluated
 map; the original 80-bit source/kernel and measurement criteria remain open.
 The [paired planner component](paired-schedule-20261118/README.md) is qualified
 separately; no new endpoint performance session has executed.
+
+
+## Prepared native context, 18 November
+
+The optional [prepared norm backend](prepared-norm-20261118/RESULTS.md)
+reuses baby-polynomial preparation and native FLINT objects. It passes the
+recorded primitive/cache controls and 21 pipeline replays/483 point-input
+evaluations over four fields, with explicit PARI oracle reuse for degree
+10009. Default bytes match. PCC-20261118-2521f3 retains the final corrected
+producer interpretation, unsigned/unverified/not_covered. [pcc:unverified]
+
+The full target window, quotient/non-kernel images and paired endpoint
+measurements remain open. No elapsed advantage or peak-RSS change has been
+measured; the context adds live cache/scratch data during later tile builds.
