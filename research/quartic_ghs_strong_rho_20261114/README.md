@@ -9,12 +9,18 @@ no measured throughput result, frontier change, or leaderboard row. The live
 execution-admission gap is tracked in
 [the problem record](../../problems/ghs-strong-rho-measurement-admission.md).
 
+[Round C setup](ROUND_C_SETUP.md) replaces independent affine construction of
+the 32 jumps and initial walkers with a cold-charged, batched width-2
+simultaneous multiplication. Its deterministic `q=223` point/state/count
+control is under [`round-c-setup/`](round-c-setup/RESULTS.md). It is likewise a
+code/count result only, not an isolated throughput or frontier result.
+
 This study reopens the restricted `E0/F_{q^3}` plane-quartic program for one
 specific obligation: compare its end-to-end index-calculus result with a rho
 reference that combines the negation map, lockstep walks, Montgomery batch
-inversion, and six-product cubic-field multiplication. It preserves the frozen
-N4 and N4-v2 sources and runs their historical rho in the same driver as a
-control.
+inversion, six-product general cubic-field multiplication, and five-product
+cubic squaring. It preserves the frozen N4 and N4-v2 sources and runs their
+historical rho in the same driver as a control.
 
 The preregistered primary is `strong-b8`. A development-only width pilot fixed
 that choice before paid data: wider batches saved inversions but increased
@@ -36,10 +42,13 @@ is made [pcc:unverified].
 - [`ROUND_B.md`](ROUND_B.md) freezes the five-product squaring lead;
   [`round-b/RESULTS.md`](round-b/RESULTS.md) retains its partial
   correctness/count result and checkpoint blocker.
+- [`ROUND_C_SETUP.md`](ROUND_C_SETUP.md) freezes the batched cold-setup lead;
+  [`round-c-setup/RESULTS.md`](round-c-setup/RESULTS.md) retains its exact
+  deterministic setup and trajectory controls.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
   source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
-  the prospective Round B candidate; Round A remains bound by the source hash
-  in [`ROUND_A.md`](ROUND_A.md).
+  the prospective Round C setup candidate built on Round B; Round A remains
+  bound by the source hash in [`ROUND_A.md`](ROUND_A.md).
   [`pod_run.sh`](pod_run.sh) compiles it for the worker and seals each split.
 - [`build_context.sh`](build_context.sh) and [`Dockerfile`](Dockerfile) create
   the exact-revision private image; [`LAUNCH.md`](LAUNCH.md) specifies the
