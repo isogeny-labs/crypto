@@ -1,0 +1,14 @@
+#[path="../native-pencil-3lp/dense.rs"]mod dense;
+#[path="../native-pencil-3lp/linear.rs"]mod linear;
+#[path="../native-pencil-3lp/pencil.rs"]mod pencil;
+#[path="../native-pencil-3lp/prepared.rs"]mod prepared;
+#[path="../native-pencil-3lp/table_oracle.rs"]mod table_oracle;
+#[path="../native-prepared-solvers/walk.rs"]mod walk;
+use hec_native_ic::{counted,instance::pick_instance,rng::Rng};
+fn normalize(s:&str)->String{let Some((a,b))=s.split_once("dense_audits: ")else{panic!("missing audit field")};let(_,b)=b.split_once(',').unwrap();format!("{a}dense_audits: 0,{b}")}
+fn main(){let qualified=include_str!("../native-pencil-3lp/CONTROL.txt");let mut calls=0;
+for line in include_str!("../native-pencil-3lp/INSTANCES.tsv").lines().skip(1){counted::disable();let v:Vec<_>=line.split('\t').collect();let g:usize=v[0].parse().unwrap();let p:u64=v[1].parse().unwrap();let cc:u64=v[2].parse().unwrap();let ell:u64=v[3].parse().unwrap();let inst=pick_instance(p,g).unwrap();assert_eq!(inst.c,cc);assert_eq!(inst.ell,ell);assert_eq!(inst.curve.f.c[..inst.curve.f.n].iter().map(u64::to_string).collect::<Vec<_>>().join(","),v[4]);let mut rng=Rng::new(2026111800^p^((g as u64)<<32));
+for case in 0..2{let sm=if case==0{1}else{17};let d=inst.curve.mul(&inst.d1,sm);let expected=1+rng.below(ell-1);let t=inst.curve.mul(&d,expected);let prefix=format!("CASE g={g} p={p} c={cc} ell={ell} sm={sm} case={case} expected={expected} report=");let old=qualified.lines().find_map(|s|s.strip_prefix(&prefix)).unwrap();let mut prior=None;
+for rep in 0..2{eprintln!("start g={g} p={p} sm={sm} rep={rep}");counted::reset();walk::validate(&inst.curve,&d,&t,ell);let prep=prepared::prepare(&inst.curve,false);let report=pencil::solve(&inst.curve,&d,&t,ell,512,false,&prep);let counts=counted::snapshot();counted::disable();assert_eq!(report.k,Some(expected));assert_eq!(inst.curve.mul(&d,expected),t);let signature=format!("{report:?}");assert_eq!(signature,normalize(old));let lookups=(prep.roots.sqrt_lookups.get(),prep.roots.legendre_lookups.get(),prep.roots.bytes());let state=(signature.clone(),counts.clone(),lookups);if let Some(old)=&prior{assert_eq!(old,&state);}else{prior=Some(state);}
+for(modulus,values)in counts{assert_eq!(values[8],2*values[7]+values[5]+values[6]);println!("COUNT g={g} p={p} source_multiple={sm} case={case} arm=pencil_3lp rep={rep} modulus={modulus} vector={values:?}");}println!("OUTCOME g={g} p={p} sm={sm} case={case} arm=pencil_3lp rep={rep} sqrt_lookups={} legendre_lookups={} root_bytes={} report={signature}",lookups.0,lookups.1,lookups.2);calls+=1;
+}}}assert_eq!(calls,44);eprintln!("PASS calls={calls} native_answers=true qualified_outcomes_replay=true repeat_vectors_and_lookups_exact=true validation_and_fresh_preparation_charged=true audits_disabled=true no_wall_or_tenfold_claim=true");}
