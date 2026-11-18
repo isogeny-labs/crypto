@@ -1,0 +1,8 @@
+Trigger: Assess relation-finding benchmark
+Requested UTC: 2026-11-18T12:11:26Z
+Target branch: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: frozen Koblitz GF(2^23), a=0, m=2, natural=256, planted=64, proven-UNSAT=64. This is NOT ECC2K-130.
+Telemetry: results/hourly_log.csv, wall_seconds, relations_per_sec, success_rate, correctness controls.
+Baseline: results/relation_baseline.json; alert on failures or >20% absolute deviation in throughput or yield.
+Workflow: .github/workflows/hourly-relation-finding.yml (push trigger)
