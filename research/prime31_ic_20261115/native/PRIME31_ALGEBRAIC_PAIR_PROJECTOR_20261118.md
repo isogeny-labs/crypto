@@ -58,7 +58,7 @@ The passing GitHub runner produced the following same-process original-curve com
 
 | B | algebraic field multiplications | algebraic screen EC additions / field inversions | group-subtraction control EC additions / field inversions | recorded algebraic / control time |
 |---|---:|---:|---:|---:|
-| 4 | 8,? (see artifact) | see artifact | 604 / 600 | 0.038 / 0.193 ms |
+| 4 | 9,016 | 28 / 28 | 604 / 600 | 0.038 / 0.193 ms |
 | 8 | 43,232 | 120 / 120 | 1,608 / 1,600 | 0.154 / 0.465 ms |
 | 31 | 471,584 | 120 / 120 | 4,920 / 4,912 | 1.220 / 1.443 ms |
 
