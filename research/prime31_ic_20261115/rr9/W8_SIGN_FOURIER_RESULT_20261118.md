@@ -42,3 +42,16 @@ Research-KB is unavailable in this connector runtime; this is a primary-GitHub a
 3. **Complete path:** For any surviving extraction arm, B31 must produce rank 31 and recover 1,024 blinded unknown Prime31 logarithms in the original Rust pipeline, with cold/online setup, failed trials, elimination, and certification. Compare same-host against strongest mixed IC, shared BSGS and rho in both single-target and amortized regimes. Signed independent PCC is separately pending.
 
 **Evidence label:** original-curve BigInt preflight mathematically checked; native Rust source and CI committed; source-specific CI and independent signed PCC statuses are tracked separately. No cheaper complete solver claimed here.
+
+
+## Fixed-x combinatorial scaling screen (exact accounting, no extrapolated wall times)
+
+The committed current Fourier kernel executes **70 × (12 Vandermonde + 4 left-factor + 16 × 4 sign-monomial) = 5,600 finite-field multiplications** for each known 8-tuple of x-coordinates, followed by 1,024 Walsh butterflies, and no inversions. It is not efficient to iterate all x tuples as the extraction algorithm:
+
+| Factor-base size | 8 unsigned x-index tuples | This implementation's raw sweep multiplications per target if fully enumerated |
+|---|---:|---:|
+| B4 | 65,536 | 367,001,600 |
+| B8 | 16,777,216 | 93,952,409,600 |
+| B31 | 852,891,037,441 | 4,776,189,809,669,600 |
+
+For B4, the product is exactly **367,001,600** Fp multiplications. (The Walsh adds and signed-witness extraction are additional.) These are *counts for the specified naive enumeration*, **not unconditional lower bounds** for F4, tensor contraction, reuse across tuples, or every possible algebraic extractor. They demonstrate why the Fourier component cannot progress to B31 merely by looping over the 31^8 possible x choices. Public-target x-index recovery is the decisive missing algorithm.
