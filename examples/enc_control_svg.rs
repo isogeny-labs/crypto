@@ -28,7 +28,9 @@ fn main() {
     for (pi, panel) in panels.iter().enumerate() {
         let ox = pi as f64 * w;
         let series = &data[panel];
-        let logx = panel.starts_with("dose");
+        // Panel kinds: "a_k" D vs k; "b_dose" D vs r (log2, r = 0 drawn at −1);
+        // "c_opsdose" field_ops / tower-H vs r; "d_cu" D vs coset-union j.
+        let logx = panel.contains("dose");
         let tx = |x: f64| if logx { (x.max(0.5)).log2() } else { x };
         let (mut x0, mut x1, mut y0, mut y1) = (f64::MAX, f64::MIN, 0.0f64, f64::MIN);
         for pts in series.values() {
@@ -43,10 +45,11 @@ fn main() {
         let (l, r, t, b) = (ox + 55.0, ox + w - 120.0, 35.0, h - 45.0);
         let px = |x: f64| l + (tx(x) - x0) / (x1 - x0).max(1e-9) * (r - l);
         let py = |y: f64| b - (y - y0) / (y1 - y0) * (b - t);
-        let title = if logx {
-            format!("D vs replaced points r (k = {}), log2 x", &panel[4..])
-        } else {
-            "F4 solving degree D vs k (random targets)".to_string()
+        let (title, xlabel, ylabel) = match panel.as_str() {
+            p if p.starts_with("a_") => ("F4 solving degree D vs k (random targets)", "k  (|F| = 2^k)", "D"),
+            p if p.starts_with("b_") => ("Dose: D vs points of H replaced (log2 r)", "r (0 = H)", "D"),
+            p if p.starts_with("c_") => ("Dose: F4 field ops / tower-H ops", "r (0 = H)", "ops ratio"),
+            _ => ("Coset union: D vs j (2^j cosets of H_{k-j})", "j = degree bound of closing relation", "D"),
         };
         out += &format!("<text x=\"{}\" y=\"20\" font-weight=\"bold\">{title}</text>\n", l);
         out += &format!("<line x1=\"{l}\" y1=\"{b}\" x2=\"{r}\" y2=\"{b}\" stroke=\"black\"/><line x1=\"{l}\" y1=\"{t}\" x2=\"{l}\" y2=\"{b}\" stroke=\"black\"/>\n");
@@ -60,8 +63,8 @@ fn main() {
         for x in &xs {
             out += &format!("<text x=\"{}\" y=\"{}\" text-anchor=\"middle\">{x}</text>\n", px(*x), b + 16.0);
         }
-        out += &format!("<text x=\"{}\" y=\"{}\" text-anchor=\"middle\">{}</text>\n", (l + r) / 2.0, b + 34.0, if logx { "r" } else { "k  (|F| = 2^k)" });
-        out += &format!("<text x=\"{}\" y=\"{}\" transform=\"rotate(-90 {} {})\" text-anchor=\"middle\">D</text>\n", ox + 18.0, (t + b) / 2.0, ox + 18.0, (t + b) / 2.0);
+        out += &format!("<text x=\"{}\" y=\"{}\" text-anchor=\"middle\">{xlabel}</text>\n", (l + r) / 2.0, b + 34.0);
+        out += &format!("<text x=\"{}\" y=\"{}\" transform=\"rotate(-90 {} {})\" text-anchor=\"middle\">{ylabel}</text>\n", ox + 18.0, (t + b) / 2.0, ox + 18.0, (t + b) / 2.0);
         for (si, (name, pts)) in series.iter().enumerate() {
             let c = COLORS[si % COLORS.len()];
             let mut pts = pts.clone();
