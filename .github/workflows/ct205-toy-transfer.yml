@@ -26,8 +26,11 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
-      - name: Recount quotient curves and genus-two Jacobian
-        run: python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct206_sextic_obstruction.py
+      - name: Recount quotient curves, Jacobian and sextic-twist obstruction
+        run: |
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct206_sextic_obstruction.py
 
   native-toy-dlp:
     runs-on: ubuntu-latest
