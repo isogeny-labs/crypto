@@ -1159,6 +1159,31 @@ mod tests {
             paired(&format!("p={p} seven fp2 cubes"), &xs, 25,
                    |mut x| { for _ in 0..7 { x=q.mul(x,q.sqr(x)); } x.0 ^ x.1 },
                    |mut x| { for _ in 0..7 { x=q.cube(x); } x.0 ^ x.1 });
+            paired(&format!("p={p} fp2 norm"), &xs, 120,
+                   |x| q.f.sub(q.f.sqr(x.0), q.f.mul(q.n, q.f.sqr(x.1))),
+                   |x| q.norm(x));
+        }
+        // Complete Fp2 AMM root extraction, old generic cubing vs new formula.
+        for p in [487u64, 17_497, 1_000_000_009] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let q = ctx.cube_q.r;
+            let old = Cube::new(Fq2BeforeCube(q));
+            let mut cubes = Vec::new();
+            let mut mixed = Vec::new();
+            for _ in 0..256 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let b = seed % p;
+                let x = (a,b);
+                cubes.push(q.cube(x));
+                mixed.push(x);
+            }
+            for (name,xs) in [("cubes",cubes),("mixed",mixed)] {
+                paired(&format!("p={p} full fp2 AMM {name}"),&xs,16,
+                       |x| { let y=old.root(x).unwrap_or((u64::MAX,u64::MAX)); y.0 ^ y.1 },
+                       |x| { let y=ctx.cube_q.root(x).unwrap_or((u64::MAX,u64::MAX)); y.0 ^ y.1 });
+            }
         }
         for p in [536_870_909u64, 1_000_000_021, 2_147_483_693] {
             let ctx = RadicalRootCtx::new(p).unwrap();
