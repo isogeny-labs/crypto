@@ -7607,6 +7607,74 @@ pub fn binary_affine_subspace_factor_base(
     fb
 }
 
+/// The points above `offset + span(basis)`; `offset = 0` is
+/// [`binary_subspace_factor_base`].  With `offset ≠ 0` (outside the span)
+/// the base records `affine_subspace` instead of `subspace_basis`.
+pub fn binary_affine_subspace_factor_base(
+    inst: &BinaryInstance,
+    basis: &[u64],
+    offset: u64,
+) -> FactorBase<FastPoint> {
+    let start = Instant::now();
+    let l = basis.len() as u32;
+    let mut fb = FactorBase::empty(if offset == 0 {
+        format!("subspace of dimension {l}")
+    } else {
+        format!("affine subspace of dimension {l}")
+    });
+    let mut solves = 0u64;
+    let first = if offset == 0 { 1 } else { 0 };
+    for idx in first..(1u64 << l) {
+        let mut x = offset;
+        for (j, &e) in basis.iter().enumerate() {
+            if (idx >> j) & 1 == 1 {
+                x ^= e;
+            }
+        }
+        solves += 1;
+        let pts = inst.points_with_x(x);
+        if pts.is_empty() {
+            continue;
+        }
+        let col = fb.abscissae;
+        let i = fb.points.len();
+        let mut idxs = Vec::new();
+        for (k, &p) in pts.iter().enumerate() {
+            fb.points.push(p);
+            fb.col_of.push(col);
+            fb.coef_of.push(if k == 0 { 1 } else { inst.r - 1 });
+            idxs.push(i + k);
+        }
+        if pts.len() == 2 {
+            fb.neg_index.push(i + 1);
+            fb.neg_index.push(i);
+        } else {
+            fb.neg_index.push(i);
+        }
+        fb.x_index.insert(x, idxs);
+        fb.abscissae += 1;
+    }
+    fb.columns = fb.abscissae;
+    fb.dimension = Some(l);
+    if offset == 0 {
+        fb.subspace_basis = Some(basis.to_vec());
+    } else {
+        fb.affine_subspace = Some((basis.to_vec(), offset));
+    }
+    for (i, p) in fb.points.iter().enumerate() {
+        fb.point_index.insert(p.pack(), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    // `points_with_x` returns both signs, so no negation is formed here.
+    let (a, n) = (fb.abscissae as u64, fb.points.len() as u64);
+    count_index_build(&mut fb, a + n, 0);
+    fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+    fb.cost.count("abscissae_scanned", (1u64 << l) - first);
+    fb.cost.count("as_solves", solves);
+    fb
+}
+
 // ── LEAD-19: cofactor-projected and subgroup-only bases ────────────
 
 /// Which factor bases the two-summand walk rows run on
@@ -9498,6 +9566,14 @@ pub struct KSumTable {
     /// ([`KSumTable::build_negation_folded_opts`]).
     pub prune: bool,
     pub collisions: Vec<(u64, u64)>,
+    /// `sib`: the last level forms both signs `x(S ± P)` of a base pair
+    /// from ONE inversion ([`CountedGroup::sibling_pair`]) instead of two
+    /// additions.  Same keys, witnesses and insert order as without it.
+    pub sib: bool,
+    /// Pairs formed that way: each is charged ONE group addition plus one
+    /// unit of the native counter `sibling_second_points` (`work.rs`), the
+    /// walk's convention, so its `bitop/v1` price equals its field work.
+    pub sib_second_points: u64,
 }
 
 impl KSumTable {
@@ -9534,6 +9610,24 @@ impl KSumTable {
         keep_collisions: bool,
         prune: bool,
     ) -> Result<Self, String> {
+        Self::build_negation_folded_full(g, fb, k, keep_collisions, prune, false)
+    }
+
+    /// [`Self::build_negation_folded_opts`] with `sib`: the last level's
+    /// signed pairs share one inversion (x-only siblings), charged as one
+    /// group addition plus `sibling_second_points`.  Needs a group with
+    /// siblings (a prime curve); the kept sums and keys are identical.
+    pub fn build_negation_folded_full<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
+        sib: bool,
+    ) -> Result<Self, String> {
+        if sib && !g.supports_siblings() {
+            return Err("ksum sib=1 needs a group with x-only siblings (a prime curve)".into());
+        }
         if !(3..=KSUM_MAX_K).contains(&k) {
             return Err(format!(
                 "a k-sum table needs k = 3 to {KSUM_MAX_K}, not {k}"
@@ -9579,6 +9673,8 @@ impl KSumTable {
             keep_collisions: false,
             prune,
             collisions: Vec::new(),
+            sib,
+            sib_second_points: 0,
         };
         t.keep_collisions = keep_collisions;
         let mut idx = [u32::MAX; KSUM_MAX_K as usize];
@@ -9586,6 +9682,27 @@ impl KSumTable {
         t.entries = t.map.len() as u64;
         t.build_wall_ns = start.elapsed().as_nanos() as u64;
         Ok(t)
+    }
+
+    /// Insert one complete sum under its folded key (`x + 1`), first
+    /// witness kept, collisions recorded when asked.
+    fn insert_last(&mut self, key: u64, idx: &[u32; KSUM_MAX_K as usize]) {
+        let bits = self.bits;
+        let packed = idx[..self.k as usize]
+            .iter()
+            .rev()
+            .fold(0u64, |w, &i| (w << bits) | u64::from(i));
+        match self.map.entry(key) {
+            std::collections::hash_map::Entry::Vacant(v) => {
+                v.insert(packed);
+            }
+            std::collections::hash_map::Entry::Occupied(o) => {
+                if self.keep_collisions {
+                    self.collisions.push((*o.get(), packed));
+                }
+            }
+        }
+        self.insert_attempts += 1;
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -9609,6 +9726,27 @@ impl KSumTable {
         };
         for (ai, group) in groups.iter().enumerate().take(end).skip(from) {
             let signs: &[usize] = if depth == 0 { &group[..1] } else { group };
+            // `sib`: both signs of this abscissa from one inversion.  Falls
+            // back to the additions when the pair is degenerate (same x, so
+            // a sum would be the identity) or the group is not `{P, −P}`.
+            if last && self.sib && signs.len() == 2 {
+                if let Some(p) = partial {
+                    let (j0, j1) = (signs[0], signs[1]);
+                    if fb.points[j1] == g.neg(fb.points[j0]) {
+                        if let Some(sp) =
+                            g.sibling_pair(&mut self.build_ops, p, fb.points[j0], true)
+                        {
+                            self.build_ops.adds += 1;
+                            self.sib_second_points += 1;
+                            for (j, key) in [(j0, sp.key_plus), (j1, sp.key_minus)] {
+                                idx[depth] = j as u32;
+                                self.insert_last(key, idx);
+                            }
+                            continue;
+                        }
+                    }
+                }
+            }
             for &j in signs {
                 let s = match partial {
                     None => fb.points[j],
@@ -9619,22 +9757,7 @@ impl KSumTable {
                 }
                 idx[depth] = j as u32;
                 if last {
-                    let bits = self.bits;
-                    let packed = idx[..self.k as usize]
-                        .iter()
-                        .rev()
-                        .fold(0u64, |w, &i| (w << bits) | u64::from(i));
-                    match self.map.entry(g.key(&s) >> 1) {
-                        std::collections::hash_map::Entry::Vacant(v) => {
-                            v.insert(packed);
-                        }
-                        std::collections::hash_map::Entry::Occupied(o) => {
-                            if self.keep_collisions {
-                                self.collisions.push((*o.get(), packed));
-                            }
-                        }
-                    }
-                    self.insert_attempts += 1;
+                    self.insert_last(g.key(&s) >> 1, idx);
                 } else {
                     self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), idx);
                 }
@@ -9651,6 +9774,11 @@ impl KSumTable {
         }
         if self.index_lookups > 0 {
             out.insert("lookups".to_string(), self.index_lookups);
+        }
+        if self.sib {
+            // The marker the band reads (`band::SIBLING_WORK_COUNTERS`).
+            out.insert("counted:sibling_second_points".to_string(), 1);
+            out.insert("sibling_second_points".to_string(), self.sib_second_points);
         }
         out
     }
@@ -22310,6 +22438,41 @@ mod ksum_wide_index_tests {
             assert!(full.build_ops.adds <= want_full && full.build_ops.adds + 64 >= want_full);
             assert!(pr.build_ops.adds <= want_pr && pr.build_ops.adds + 64 >= want_pr);
             assert!(pr.build_ops.adds < full.build_ops.adds, "k = {k}");
+        }
+    }
+
+    /// `sib` builds the same table (keys, witnesses, collisions, inserts),
+    /// and each last-level signed pair is one charged addition plus one
+    /// `sibling_second_points`, so exactly that many additions go, and as
+    /// many inversions: one per pair instead of two.
+    #[test]
+    fn sibling_build_is_the_same_table_with_one_inversion_per_last_pair() {
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        for (k, a) in [(3u32, 14usize), (4, 12), (5, 11), (6, 12)] {
+            let fb = prime_factor_base(&inst, a);
+            for prune in [false, true] {
+                let base =
+                    KSumTable::build_negation_folded_full(g, &fb, k, true, prune, false).unwrap();
+                let sib =
+                    KSumTable::build_negation_folded_full(g, &fb, k, true, prune, true).unwrap();
+                assert_eq!(base.map, sib.map, "k = {k}, prune = {prune}");
+                assert_eq!(base.collisions, sib.collisions, "k = {k}");
+                assert_eq!(base.insert_attempts, sib.insert_attempts, "k = {k}");
+                assert_eq!(base.entries, sib.entries, "k = {k}");
+                let pairs = sib.sib_second_points;
+                assert!(pairs > 0, "k = {k}");
+                assert_eq!(base.build_ops.adds, sib.build_ops.adds + pairs, "k = {k}");
+                assert_eq!(
+                    base.build_ops.field_ops.invs,
+                    sib.build_ops.field_ops.invs + pairs,
+                    "k = {k}"
+                );
+                let w = sib.work_counters();
+                assert_eq!(w.get("sibling_second_points"), Some(&pairs));
+                assert_eq!(w.get("counted:sibling_second_points"), Some(&1));
+                assert!(!base.work_counters().contains_key("sibling_second_points"));
+            }
         }
     }
 
