@@ -2870,6 +2870,97 @@ mod tests {
         }
     }
 
+    /// `multiple_doublings=d`: the known seeds are `[2^(d(j-1))]G`, built by
+    /// `d(k-1)` doublings and no addition, with logs `h*2^(d(j-1))`; the
+    /// all-known base still pins the target with one relation.
+    #[test]
+    fn multiple_doublings_spread_the_known_log_seeds() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{koblitz_instance, BinaryGroup, CountedGroup};
+
+        for (a, n, planted_seed, k, d) in
+            [(1u8, 23u32, 4_242u64, 4u64, 3u64), (1, 29, 40_009, 2, 5)]
+        {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let spec = format!(
+                "columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k},multiple_doublings={d}"
+            );
+            let (_, params) = Params::parse_spec(&format!("compact-orbit-scan:{spec}")).unwrap();
+            let mut ops = GroupOps::default();
+            let fb = base.build(&ctx, &params, &mut ops).unwrap();
+            assert_eq!(
+                (ops.doubles, ops.adds, ops.scalar_mults),
+                (d * (k - 1), 0, 0)
+            );
+            let logs = base.known_column_logs(&ctx, &params).unwrap();
+            let h = (inst.cofactor % inst.r) as u128;
+            for j in 1..=k {
+                let s = (1u128 << (d * (j - 1))) % inst.r as u128;
+                assert_eq!(
+                    logs[(j - 1) as usize],
+                    ((j - 1) as usize, (h * s % inst.r as u128) as u64)
+                );
+            }
+            let mut check = GroupOps::default();
+            for (i, p) in fb.points.iter().enumerate() {
+                let x = logs[fb.col_of[i]].1;
+                let e = ((fb.coef_of[i] as u128 * x as u128) % inst.r as u128) as u64;
+                assert_eq!(
+                    group.mul(&mut check, inst.generator, e),
+                    group.mul(&mut check, *p, inst.cofactor),
+                    "{spec}: member {i}"
+                );
+            }
+            for bad in [
+                format!("columns={k},raw_x_cap=100000000,generator_orbit=1,multiple_doublings={d}"),
+                format!("columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k},multiple_doublings=0"),
+            ] {
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{bad}")).unwrap();
+                assert!(base.build(&ctx, &params, &mut GroupOps::default()).is_err(), "{bad}");
+            }
+            for seed in [3u64, 11] {
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                for (key, v) in [
+                    ("columns", k.to_string()),
+                    ("raw_x_cap", "100000000".to_string()),
+                    ("generator_orbit", "1".to_string()),
+                    ("generator_multiples", k.to_string()),
+                    ("multiple_doublings", d.to_string()),
+                ] {
+                    pspec.factor_base_params.set(key, v);
+                }
+                pspec.oracle_params.set("m", "2");
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                let rep = run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .expect("the configuration should run");
+                assert!(rep.verified, "n{n} seed {seed}");
+                assert_eq!(rep.recovered, Some(planted), "n{n} seed {seed}");
+                assert_eq!(rep.decomposition.relations_found, 1, "n{n} seed {seed}");
+            }
+        }
+    }
+
     #[test]
     fn layout_table_returns_the_lazy_pairs_with_no_maps_and_half_the_same_orbit_sums() {
         use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};

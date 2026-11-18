@@ -1043,6 +1043,34 @@ fn generator_multiples(params: &Params) -> Result<u64, String> {
     }
 }
 
+/// `multiple_doublings` of `compact-orbit-scan`: absent is the progression
+/// `[j]G`; `d >= 1` makes the known seeds `[2^(d*(j-1))]G` (d doublings
+/// each), whose pair sums do not cluster along the generator stride.
+fn multiple_doublings(params: &Params) -> Result<Option<u32>, String> {
+    match params.get("multiple_doublings") {
+        None => Ok(None),
+        Some(_) => {
+            let d = params.u64("multiple_doublings")?;
+            let k = generator_multiples(params)?;
+            if d == 0 || k < 2 || d * (k - 1) >= 63 {
+                return Err(
+                    "multiple_doublings needs d >= 1, generator_multiples >= 2 and d*(k-1) < 63"
+                        .into(),
+                );
+            }
+            Ok(Some(d as u32))
+        }
+    }
+}
+
+/// The log of the `j`-th known seed (1-based) over `G`.
+fn generator_multiple_log(j: u64, doublings: Option<u32>) -> u128 {
+    match doublings {
+        None => j as u128,
+        Some(d) => 1u128 << (d as u64 * (j - 1)),
+    }
+}
+
 /// The archived compact-orbit producer's public, deterministic raw-x scan.
 /// All group work is charged to `ops`; native field and container work is
 /// retained on the base as priced counters or explicit lower-bound gaps.
@@ -1079,6 +1107,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
                 "1: column 0 is the signed Frobenius orbit of the generator G itself, whose logarithm is known (no lift, cofactor projection, order or eigenvalue check: the instance's lambda is used as the signed-Frobenius rho uses it), so the relation search needs one row fewer; the other columns come from the raw-x scan. 0 or absent: every column from the scan",
             ),
             (
+                "multiple_doublings",
+                "d (needs generator_multiples >= 2): the known seeds are [2^(d*(j-1))]G, d doublings each, instead of the progression [j]G; absent: the progression",
+            ),
+            (
                 "generator_multiples",
                 "k (needs generator_orbit=1, k <= columns; absent or 1: only G): columns 0..k are the signed Frobenius orbits of [1]G, ..., [k]G, built by one doubling and k-2 additions, every logarithm known (h*j), so the relation search needs k rows fewer; at k = columns the base is all known-log and one relation pins the target. A multiple whose orbit repeats an earlier column is an error",
             ),
@@ -1093,8 +1125,12 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         // x = h·log_G(seed) with seed = G (see collect_and_solve_relations).
         Ok(if generator_orbit(params)? {
             let h = (ctx.cofactor % ctx.r) as u128;
+            let doublings = multiple_doublings(params)?;
             (1..=generator_multiples(params)?)
-                .map(|j| ((j - 1) as usize, ((h * j as u128) % ctx.r as u128) as u64))
+                .map(|j| {
+                    let s = generator_multiple_log(j, doublings) % ctx.r as u128;
+                    ((j - 1) as usize, ((h * s) % ctx.r as u128) as u64)
+                })
                 .collect()
         } else {
             Vec::new()
@@ -1140,6 +1176,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         let mut multiplier_points = 0u64;
         let from_generator = generator_orbit(params)?;
         let multiples = generator_multiples(params)?;
+        let doublings = multiple_doublings(params)?;
         if from_generator && !multipliers.is_empty() {
             return Err("generator_orbit=1 does not combine with norm > 0".into());
         }
@@ -1186,7 +1223,11 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
             // [j]G (one doubling, then one addition each), log h*j.
             let mut seed = ctx.generator;
             for j in 1..=multiples {
-                if j == 2 {
+                if let (Some(d), true) = (doublings, j > 1) {
+                    for _ in 0..d {
+                        seed = g.double(ops, seed);
+                    }
+                } else if j == 2 {
                     seed = g.double(ops, seed);
                 } else if j > 2 {
                     seed = g.add(ops, seed, ctx.generator);
