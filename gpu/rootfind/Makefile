@@ -10,6 +10,8 @@
 #   make bench-sub64     compare Fp64 host modular subtraction
 #   make bench-tail-core  compare padded vs short-tail Fp64 batch inversion
 #   make bench-host-inv256  P-256 sparse-exponent host inverse + batch benchmark
+#   make bench-chain256     previous radix16 vs 13-multiply P-256 inversion
+#   make bench-mulneg64     previous vs wide host Fp64 mul and masked negation
 #   make lib             librootfind_oracle.a, emulation backend only
 #                        (what gpu/rootfind/rs/build.rs builds for the gpu-rootfind cargo crate)
 #   make lib-cuda        librootfind_cuda.a, emulation + CUDA backend (needs nvcc)
@@ -56,7 +58,7 @@ RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
-.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep ptxas-info clean
+.PHONY: all test lib lib-cuda serve serve-cuda bench bench-host-inv bench-host-inv256 bench-batch-core bench-sparse256 bench-carry256 bench-subneg256 bench-sub64 bench-tail-core bench-pair-sweep bench-chain256 bench-mulneg64 ptxas-info clean
 
 all: test
 
@@ -135,6 +137,20 @@ bench_pair_sweep: bench_pair_sweep.cpp rootfind.cuh fp64.cuh fp256x64.cuh rootfi
 bench-pair-sweep: bench_pair_sweep
 	./bench_pair_sweep
 
+# Fixed P-256 chain: 35 vs 13 multiplications, actual header.
+bench_chain256: bench_chain256.cpp fp256x64.cuh fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_chain256.cpp
+
+bench-chain256: bench_chain256
+	./bench_chain256
+
+# Host Fp64 wide Montgomery arithmetic and branchless negation.
+bench_mulneg64: bench_mulneg64.cpp fp64.cuh
+	$(CXX) $(CXXFLAGS) -o $@ bench_mulneg64.cpp
+
+bench-mulneg64: bench_mulneg64
+	./bench_mulneg64
+
 # --- emulation-only static library (no CUDA toolchain required) -------
 rootfind_api_emul.o: rootfind_api.cpp $(HDRS)
 	$(CXX) $(CXXFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=0 -c -o $@ rootfind_api.cpp
@@ -175,4 +191,4 @@ ptxas-info: rootfind_cuda.cu $(HDRS)
 	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -Xptxas -v -c -o /dev/null rootfind_cuda.cu
 
 clean:
-	rm -f test_cpu bench bench_host_inv bench_host_inv256 bench_batch_core bench_pair_sweep rootfind_serve rootfind_serve_cuda *.o *.a
+	rm -f test_cpu bench bench_host_inv bench_host_inv256 bench_batch_core bench_pair_sweep bench_chain256 bench_mulneg64 rootfind_serve rootfind_serve_cuda *.o *.a
