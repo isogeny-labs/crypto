@@ -44,6 +44,18 @@ The independent host runs differ substantially in absolute wall time. Paired *wi
 
 Both arms in both orders: **31/31 rank, 256/256 unknown logs verified, 0 BSGS fallbacks**. In both complete-run repetitions the first-x base has 244/256 unshifted hits, 12 exhaustive misses, 268 target attempts, 309443 ±-folded `4A` representatives; the y-ranked base has 232/256 hits, 24 misses, 280 attempts, 309365 representatives. The signed table has nearly identical size, so smaller table size does not determine the improvement.
 
+### Paired coverage uncertainty (post hoc; same corpus)
+
+The full 256 public targets are matched *point-by-point*, so the proper binary first-shift contingency is:
+
+| First shift hit? | y-ranked yes | y-ranked no |
+| --- | ---: | ---: |
+| x-first yes | 221 | 23 |
+| x-first no | 11 | 1 |
+
+There are 34 discordant points, with 23 favoring x-first and 11 favoring y-ranked. A two-sided exact conditional McNemar/binomial test on those **same 256 targets** gives `p = 2 Pr(Binomial(34,1/2) <= 11) = 0.05761267291381955`. This diagnostic is post hoc and not a registered significance test. The repeat GitHub runner only repeats the **same target corpus**, so it does not furnish a second independent sampling trial. Thus this work establishes a **complete-cost deficit for this specific fixed 256-target study**, not high-confidence population dominance of first-x over all y-ranked bases or target cohorts. Reopen only with a distinct predeclared held-out target corpus and scientific power calculation, not by cherry-picking a favorable seed.
+
+
 ## Independent exact validation and evidence
 
 The source-specific workflow pins Rust `1.100.0`, overlays only the candidate example onto immutable original arithmetic, and runs pinned original library regressions plus both complete full-solver AB/BA tests.
@@ -76,6 +88,8 @@ The initial CI [#44230419721](https://github.com/isogeny-labs/crypto/actions/run
 | [#4596](https://github.com/isogeny-labs/crypto/pull/4596) | Actual-prime31 1024Q batched pair-table vs matched cached BSGS, **benchmark pending in reviewed PR** | **Reuse** for complete-cost frontier |
 | `native/examples/prime31_m8_balanced_f4_input.rs` | Existing Rust balanced S4/S3 `8 leaves + 3 free abscissae` F4 input and bounded resource gates; no demonstrated fast extraction | **Promote this as first non-generic next test**, not another input-bridge rewrite |
 | `crypto-autoresearcher` [#3305](https://github.com/isogeny-labs/crypto-autoresearcher/pull/3305), `cryptanalysis` [#1536](https://github.com/isogeny-labs/cryptanalysis/pull/1536) | Failed/conditional Semaev alternatives and auxiliary-vs-random factor-base comparison with accounting details | Preserve prior exclusions and independent matched controls |
+
+A complementary prior-art warning is Yokoyama–Yasuda–Takahashi–Kogure, *Complexity bounds on Semaev’s naive index calculus method for ECDLP* (J. Math. Cryptol. 2020, DOI `10.1515/jmc-2019-0029`): its Gröbner-cost obstruction is under stated statistical assumptions, not an unconditional exclusion of every target-conditioned algebraic extractor. Do not infer easy F4 solving from low-degree input alone.
 
 Published relevant established methods: Petit–Kosters–Messeng, *Algebraic Approaches for the Elliptic Curve Discrete Logarithm Problem over Prime Fields* (PKC 2016, DOI `10.1007/978-3-662-49387-8_1`); Amadori–Pintore–Sala, *On the Discrete Logarithm Problem for Prime-Field Elliptic Curves* (FFA 2018, DOI `10.1016/j.ffa.2018.01.009`). Structural relations and summation polynomials are prior art; no claim of novelty clearance. Knowledge-base MCP/CLI were not exposed in this runtime, so repo/primary-paper audit is bounded.
 
