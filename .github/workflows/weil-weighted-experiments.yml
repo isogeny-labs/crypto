@@ -2,6 +2,7 @@ name: Weighted Weil experiments
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'examples/weil_weighted_decomposition.rs'
       - 'src/cryptanalysis/gaudry_cubic.rs'
@@ -27,7 +28,9 @@ permissions:
 
 jobs:
   native-controls:
-    if: github.event_name == 'pull_request'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'pull_request')
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -40,7 +43,9 @@ jobs:
       - run: rustfmt --edition 2021 --check examples/weil_weighted_decomposition.rs
       - run: cargo test --release --example weil_weighted_decomposition
   diagnostic:
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:

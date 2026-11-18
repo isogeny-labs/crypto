@@ -2,6 +2,7 @@ name: N83 scalar arithmetic Lean proofs
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/n83_speed_20261012/audit/**'
       - '.github/workflows/n83-scalar-arithmetic-lean.yml'
@@ -17,6 +18,7 @@ permissions:
 
 jobs:
   proofs:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:

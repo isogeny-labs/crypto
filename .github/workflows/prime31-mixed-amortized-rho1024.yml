@@ -9,6 +9,7 @@ on:
       - research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
       - .github/workflows/prime31-mixed-amortized-rho1024.yml
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/prime31_ic_20261115/mixed_base/MIXED_AMORTIZED_MATCHED_RHO_PROTOCOL_20261117.md
       - research/prime31_ic_20261115/mixed_base/prime31_amortized_rho_1024q_suffix.rsfrag
@@ -21,6 +22,7 @@ permissions:
 
 jobs:
   identical-1024q:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:

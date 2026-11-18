@@ -8,6 +8,7 @@ on:
       - research/prime31_ic_20261115/mixed_base/SHARED_BSGS_1024Q_PROTOCOL_20261117.md
       - .github/workflows/prime31-shared-bsgs-1024.yml
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/prime31_ic_20261115/mixed_base/prime31_shared_bsgs_1024q_suffix.rsfrag
       - research/prime31_ic_20261115/mixed_base/SHARED_BSGS_1024Q_PROTOCOL_20261117.md
@@ -19,6 +20,7 @@ permissions:
 
 jobs:
   source-exact-three-advice-sizes:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:

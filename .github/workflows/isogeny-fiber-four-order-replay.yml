@@ -2,6 +2,7 @@ name: Isogeny fiber four-order independent Linux replay
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/isogeny-fiber-four-order-replay.yml'
       - 'examples/different_j_trend_batch.rs'
@@ -19,6 +20,7 @@ permissions:
 
 jobs:
   independent-replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:

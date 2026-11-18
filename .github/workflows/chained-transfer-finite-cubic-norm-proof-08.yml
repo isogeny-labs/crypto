@@ -1,6 +1,7 @@
 name: Finite cubic norm current Root and original Consumer gates08
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/lean/CubicFiniteNorm22308.lean'
       - 'research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/**'
@@ -10,6 +11,7 @@ permissions:
   contents: read
 jobs:
   current-root-original-consumer-proof-gates:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:

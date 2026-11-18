@@ -8,6 +8,7 @@ on:
       - research/prime31_ic_20261115/mixed_base/**
       - .github/workflows/prime31-mixed-base-ic.yml
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_mixed_base_ic.rs
       - research/prime31_ic_20261115/mixed_base/**
@@ -19,6 +20,7 @@ permissions:
 
 jobs:
   mixed-base-complete-ic:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:

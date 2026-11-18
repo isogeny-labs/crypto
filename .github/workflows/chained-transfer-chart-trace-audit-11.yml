@@ -1,6 +1,7 @@
 name: Richelot chart separate implementation trace audit11
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_richelot_chart_audit_20261116/**'
       - 'research/chained_jacobian_transfers_20261110/native-richelot-chart-boundary-10/**'
@@ -10,6 +11,7 @@ permissions:
   contents: read
 jobs:
   frozen-whole-trace-and-controls:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

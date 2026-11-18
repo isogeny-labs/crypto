@@ -1,6 +1,7 @@
 name: Native hyperelliptic IC
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'crates/hec-native-ic/**'
       - 'research/hec_relation_math_20261114/**'
@@ -15,6 +16,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   native:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

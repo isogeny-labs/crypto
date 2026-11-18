@@ -8,6 +8,7 @@ on:
       - 'research/prime31_ic_20261115/native/verify_b31_y_ranked.py'
       - '.github/workflows/prime31-b31-y-ranked-full-cost.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
       - 'research/prime31_ic_20261115/native/verify_b31_y_ranked.py'
@@ -17,6 +18,7 @@ permissions:
   contents: read
 jobs:
   y-ranked-compare:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:

@@ -2,6 +2,7 @@ name: conductor-gap-size-certificates
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/conductor_gap_size_ladder_20261026/**
       - .github/workflows/conductor-gap-size-certificates.yml
@@ -12,6 +13,7 @@ permissions:
 
 jobs:
   retained-parameter-certificates:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:

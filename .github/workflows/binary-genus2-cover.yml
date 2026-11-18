@@ -2,6 +2,7 @@ name: Binary genus-two cover
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'tools/binary-genus2-cover/**'
       - 'tools/volcano-cli/**'
@@ -23,6 +24,7 @@ permissions:
 
 jobs:
   native:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -62,6 +64,7 @@ jobs:
           components: rustfmt, clippy
       - run: tools/binary-genus2-cover/check.sh
   lean:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

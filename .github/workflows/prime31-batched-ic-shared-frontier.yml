@@ -2,6 +2,7 @@ name: Prime31 1024-Q batched table IC versus shared BSGS
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'examples/prime31_batched_ic_same_1024q.rs'
       - 'research/prime31_ic_20261115/batched_frontier/**'
@@ -15,6 +16,7 @@ permissions:
 
 jobs:
   exact-cohort-frontier:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:

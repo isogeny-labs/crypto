@@ -9,6 +9,7 @@ on:
       - research/prime31_ic_20261115/native/APS_LINEAR_CHORD_PROTOCOL_20261117.md
       - .github/workflows/prime31-aps-linear-chord.yml
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
       - research/prime31_ic_20261115/native/APS_LINEAR_CHORD_PROTOCOL_20261117.md
@@ -20,6 +21,7 @@ permissions:
 
 jobs:
   prime31-chord-cold:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:

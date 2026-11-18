@@ -8,6 +8,7 @@ on:
       - 'research/prime31_ic_20261115/rr9/RR9_B8_GENERIC_MITM_PROTOCOL_20261117.md'
       - '.github/workflows/prime31-rr9-b8-generic-mitm.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_b8_generic_mitm.rs'
       - 'research/prime31_ic_20261115/rr9/RR9_B8_GENERIC_MITM_PROTOCOL_20261117.md'
@@ -19,6 +20,7 @@ permissions:
 
 jobs:
   native-b8-mitm:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:

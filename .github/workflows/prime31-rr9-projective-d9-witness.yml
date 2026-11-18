@@ -8,6 +8,7 @@ on:
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_projective_d9_witness.rs'
       - '.github/workflows/prime31-rr9-projective-d9-witness.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_projective_d9_witness.rs'
@@ -20,6 +21,7 @@ permissions:
 
 jobs:
   sparse-positive-d9-witness:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:

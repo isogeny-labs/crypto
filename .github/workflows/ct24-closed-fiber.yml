@@ -2,6 +2,7 @@ name: CT24 explicit closed-fiber Jacobian leg
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/ct24_closed_fiber_transport.py'
       - 'research/chained_jacobian_transfers_20261110/ct24_fiber_replay.py'
@@ -14,6 +15,7 @@ permissions:
 
 jobs:
   closed-fiber:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

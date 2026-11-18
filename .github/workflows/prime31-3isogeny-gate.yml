@@ -7,6 +7,7 @@ on:
       - 'research/prime31_ic_20261115/native/verify_prime31_velu.py'
       - '.github/workflows/prime31-3isogeny-gate.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_velu_3isogeny_gate.rs'
       - 'research/prime31_ic_20261115/native/verify_prime31_velu.py'
@@ -16,6 +17,7 @@ permissions:
   contents: read
 jobs:
   exact-prime31-3-isogeny:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:

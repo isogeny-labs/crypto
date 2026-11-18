@@ -1,6 +1,7 @@
 name: CT23 rational product-coordinate acceptance
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/ct23_rational_product_transport.py'
       - 'research/chained_jacobian_transfers_20261110/CT23_RATIONAL_PRODUCT_CONTROL.md'
@@ -12,6 +13,7 @@ permissions:
 
 jobs:
   bounded-control:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

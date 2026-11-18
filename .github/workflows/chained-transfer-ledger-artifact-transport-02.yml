@@ -2,6 +2,7 @@ name: Original ledger artifact transport02 through a new tag
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/chained-transfer-ledger-artifact-transport-02.yml'
       - 'research/chained_jacobian_transfers_20261110/LEDGER_ARTIFACT_TRANSPORT_02.md'
@@ -16,7 +17,9 @@ concurrency:
 
 jobs:
   original-transport:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:

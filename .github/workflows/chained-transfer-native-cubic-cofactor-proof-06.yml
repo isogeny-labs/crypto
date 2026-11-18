@@ -1,6 +1,7 @@
 name: Native cubic cofactor and original word proof gates06
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/**'
       - 'research/chained_jacobian_transfers_20261110/lean/CubicCofactorWordBridge22307.lean'
@@ -11,6 +12,7 @@ permissions:
   contents: read
 jobs:
   original-dual-proof-gates:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -120,6 +122,7 @@ jobs:
           path: ${{ runner.temp }}/cubic-cofactor-word-proof-custody
           if-no-files-found: error
   native-cofactor-development:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
