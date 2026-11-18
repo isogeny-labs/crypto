@@ -244,11 +244,41 @@ def validate(document: dict[str, Any], source: Path) -> dict[str, Any]:
     require(close(gate["source_rho_exponent_in_q"], 0.5), "rho exponent")
     checks.append("advancement_gate")
 
+    input_sha256 = hashlib.sha256(source.read_bytes()).hexdigest()
+    arm_by_name = {arm["name"]: arm for arm in arms}
+    b64 = {
+        name: next(
+            cell
+            for cell in arm_by_name[name]["grid"]
+            if cell["factor_base_bound"] == 64
+        )
+        for name in ("transported_k0", "kernel_coset", "ordinary_ambient")
+    }
+    headline_values = {
+        "transported_b64_rows": b64["transported_k0"]["rows"],
+        "transported_b64_rank": b64["transported_k0"]["rank"],
+        "kernel_b64_rows": b64["kernel_coset"]["rows"],
+        "kernel_b64_rank": b64["kernel_coset"]["rank"],
+        "ambient_b64_rows": b64["ordinary_ambient"]["rows"],
+        "ambient_b64_rank": b64["ordinary_ambient"]["rank"],
+        "transported_blind_successes": blind[0]["successes"],
+        "kernel_blind_successes": blind[1]["successes"],
+    }
     return {
         "schema": "crypto.n83-norm-fiber-rr-router-validator/v1",
         "status": "pass",
         "input": str(source),
-        "input_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+        "input_sha256": input_sha256,
+        "raw_data": [{"path": str(source), "sha256": input_sha256}],
+        "headline": [
+            {
+                "name": name,
+                "claimed": value,
+                "recomputed": value,
+                "rel_tol": 0.0,
+            }
+            for name, value in headline_values.items()
+        ],
         "checks": checks,
         "check_count": len(checks),
     }

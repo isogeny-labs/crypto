@@ -953,8 +953,8 @@ fn evaluate_blind_candidate(
         }
         let image = cover.map_point(&source).map_err(|e| e.to_string())?;
         let log = projected_log(subgroup, &image)?;
-        labels.extend(std::iter::repeat(log).take(multiplicity));
-        unprojected.extend(std::iter::repeat(image).take(multiplicity));
+        labels.extend(std::iter::repeat_n(log, multiplicity));
+        unprojected.extend(std::iter::repeat_n(image, multiplicity));
     }
     if labels.len() != 4 {
         return Err("blind split support does not have degree four".into());
