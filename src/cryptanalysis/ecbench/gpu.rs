@@ -104,6 +104,14 @@ fn spawn_snapshot(
     started: Instant,
     budget: Duration,
 ) -> std::io::Result<std::process::Child> {
+    spawn_with_deadline(|| cmd.spawn(), started, budget)
+}
+
+fn spawn_with_deadline<T>(
+    mut spawn: impl FnMut() -> std::io::Result<T>,
+    started: Instant,
+    budget: Duration,
+) -> std::io::Result<T> {
     loop {
         if started.elapsed() >= budget {
             return Err(std::io::Error::new(
@@ -111,7 +119,7 @@ fn spawn_snapshot(
                 "GPU executable launch deadline expired",
             ));
         }
-        match cmd.spawn() {
+        match spawn() {
             #[cfg(unix)]
             Err(error) if error.raw_os_error() == Some(libc::ETXTBSY) => {
                 let remaining = budget.saturating_sub(started.elapsed());
@@ -1184,6 +1192,8 @@ mod tests {
             .write(true)
             .open(&driver)
             .unwrap();
+        // Linux enforces writer/executable exclusion; macOS permits it.
+        #[cfg(target_os = "linux")]
         assert_eq!(
             Command::new(&driver).spawn().unwrap_err().raw_os_error(),
             Some(libc::ETXTBSY)
@@ -1192,6 +1202,27 @@ mod tests {
             std::thread::sleep(Duration::from_millis(50));
             drop(writer);
         });
+        // Exercise the identical retry loop on every host without depending
+        // on its executable-file locking semantics.
+        let mut attempts = 0;
+        let mut command = Command::new(&driver);
+        command.stdout(Stdio::piped());
+        let child = spawn_with_deadline(
+            || {
+                attempts += 1;
+                if attempts <= 5 {
+                    Err(std::io::Error::from_raw_os_error(libc::ETXTBSY))
+                } else {
+                    command.spawn()
+                }
+            },
+            Instant::now(),
+            Duration::from_secs(3),
+        );
+
+        let child = child.unwrap();
+        assert_eq!(child.wait_with_output().unwrap().stdout, b"launched\n");
+        assert!(attempts >= 6);
         let (receipt, output) = run_one(&driver, &[], &root, "released", 3).unwrap();
         release.join().unwrap();
         assert_eq!(receipt.exit_code, Some(0));
@@ -1217,8 +1248,22 @@ mod tests {
             .open(&driver)
             .unwrap();
         let start = Instant::now();
-        let error = spawn_snapshot(&mut Command::new(&driver), start, Duration::from_millis(30))
-            .unwrap_err();
+        let mut attempts = 0;
+        let error = spawn_with_deadline::<std::process::Child>(
+            || {
+                attempts += 1;
+                Err(std::io::Error::from_raw_os_error(libc::ETXTBSY))
+            },
+            start,
+            Duration::from_millis(30),
+        )
+        .unwrap_err();
+        assert!(attempts <= 4);
+        #[cfg(target_os = "linux")]
+        assert_eq!(
+            Command::new(&driver).spawn().unwrap_err().raw_os_error(),
+            Some(libc::ETXTBSY)
+        );
         // A descheduled test can exhaust its budget before the first attempt.
         assert!(
             error.raw_os_error() == Some(libc::ETXTBSY)

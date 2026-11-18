@@ -475,6 +475,10 @@ fn authority(p: &BudgetPolicy, hash: &str) -> Result<(), String> {
     Ok(())
 }
 
+#[allow(
+    dead_code,
+    reason = "The original legacy initializer is retained for source compatibility; the current admission path remains authoritative."
+)]
 pub fn initialize(policy_path: &Path) -> Result<Value, String> {
     let (p, hash) = policy(policy_path)?;
     directory(

@@ -58,8 +58,16 @@ impl Slot {
                 "json",
             ),
             Self::Witness => ("pdp-witness.json", "independently-verified-pdp", "json"),
-            Self::BooleanAnchor => ("binary-m3-boolean-anchor.json", "restricted-binary-m3-boolean-anchor/v1", "json"),
-            Self::BooleanCheck => ("binary-m3-boolean-check.json", "restricted-binary-m3-boolean-check/v1", "json"),
+            Self::BooleanAnchor => (
+                "binary-m3-boolean-anchor.json",
+                "restricted-binary-m3-boolean-anchor/v1",
+                "json",
+            ),
+            Self::BooleanCheck => (
+                "binary-m3-boolean-check.json",
+                "restricted-binary-m3-boolean-check/v1",
+                "json",
+            ),
         }
     }
     fn matches(self, artifact: &types::Artifact) -> bool {
@@ -83,6 +91,10 @@ pub(super) struct OrdinaryRootRegistry<'o> {
     slots: Option<retained_storage::RetainedSlots>,
 }
 impl<'o> OrdinaryRootRegistry<'o> {
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn admit(
         original: &'o VerifiedWorkerOriginal<'o>,
         ledger: &mut Budget,
@@ -91,8 +103,10 @@ impl<'o> OrdinaryRootRegistry<'o> {
         Self::admit_with_boolean(original, ledger, limits, false)
     }
     pub(super) fn admit_with_boolean(
-        original: &'o VerifiedWorkerOriginal<'o>, ledger: &mut Budget,
-        limits: &capture::CaptureLimits, boolean: bool,
+        original: &'o VerifiedWorkerOriginal<'o>,
+        ledger: &mut Budget,
+        limits: &capture::CaptureLimits,
+        boolean: bool,
     ) -> Result<Self, String> {
         if ledger.phase != Phase::Setup
             || original.binding.is_none()
@@ -105,12 +119,15 @@ impl<'o> OrdinaryRootRegistry<'o> {
         ledger
             .reserve_checking(1024, 1024, Instant::now())
             .map_err(|s| format!("ordinary sealed identity comparison admission: {s:?}"))?;
-        let receipts =
-            solvers::WorkerStoredReceipts::admit(original, Slot::ALL.len() + if boolean { 2 } else { 0 }, |work, bytes| {
+        let receipts = solvers::WorkerStoredReceipts::admit(
+            original,
+            Slot::ALL.len() + if boolean { 2 } else { 0 },
+            |work, bytes| {
                 ledger
                     .reserve_checking(work, bytes, Instant::now())
                     .map_err(|s| format!("ordinary receipt admission: {s:?}"))
-            })?;
+            },
+        )?;
         // Fixed storage quotes must use the actual installed original sink's
         // limits; a caller cannot buy cheaper terminal metadata allowances.
         solvers::LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
@@ -131,6 +148,10 @@ impl<'o> OrdinaryRootRegistry<'o> {
             input_identity_used: false,
         })
     }
+    #[allow(
+        clippy::result_large_err,
+        reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+    )]
     pub(super) fn adopt_input<'a>(
         &mut self,
         step: OrdinaryMatrixStep<'a>,
@@ -245,6 +266,10 @@ impl<'o> OrdinaryRootRegistry<'o> {
     }
     // Future orchestrator consumes this registry with its completed/failed data;
     // actual root receipts move directly into the existing worker transport.
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn finish(self, data: solvers::SolverData) -> OrdinaryWorkerOutput {
         OrdinaryWorkerOutput {
             worker: self.receipts.finish(data),
@@ -254,6 +279,10 @@ impl<'o> OrdinaryRootRegistry<'o> {
 }
 /// Handoff keeps incomplete encodings, rejected roots and authoritative bytes
 /// alive alongside accepted worker roots. The orchestrator must retain both.
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(super) struct OrdinaryWorkerOutput {
     worker: solvers::WorkerSolveOutput,
     retained_slots: Option<retained_storage::RetainedSlots>,
@@ -263,6 +292,10 @@ pub(super) struct OrdinaryWorkerOutput {
 pub(super) struct RegisteredMatrixInput<'a> {
     input_sha256: [u8; 32],
     retained: Retained,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     bytes: Vec<u8>,
     capture_sequence: u64,
     math: MathInput,

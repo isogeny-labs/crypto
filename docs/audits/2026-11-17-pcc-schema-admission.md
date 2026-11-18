@@ -1,0 +1,13 @@
+# PCC schema admission audit
+
+The unchanged baseline `55393d2dbf6b95497e8bc1b0440f34dd46857919` allows a schema-invalid claim to acquire verified standing from a current Ed25519-signed pass. The regression uses a real signature and a disposable test-only keyring. The repaired standing function requires schema validity, including the ledger-date type cutoff, before a verdict can confer standing. All 34 maintained PCC tests pass. [pcc:unverified]
+
+Exactly 151 of the 3,544 retained claims omit the required post-cutoff claim type. No type is inferred. `pcc/schema-rejections.json` records their exact original file hashes and rejected disposition. With `ledger verify --base`, each must already exist byte for byte in the protected base; previously recorded rejection entries are append-only. New claims, changed payloads, malformed dispositions, deleted base entries, invalid types and backdated claims remain subject to rejection. The manifest recognizes a historical defect; it does not validate a claim, proof, measurement or signature. [pcc:unverified]
+
+The actual 1,361-entry ledger verifies against protected base `833a35d21ec2368ab081b2083d7762ed0bfd2bbc`. Hash comparison confirms that all 3,544 claim files, the ledger and the keyring remain unchanged. Before this repair all retained claims had unverified standing. Afterwards 3,393 remain unverified and the 151 schema-invalid claims are failed. No scientific evidence is promoted. The adjacent JSON receipt records every metadata hash and every standing change. [pcc:unverified]
+
+Negative controls reject a new payload disguised as historical, altered retained bytes, and removal of prior rejection entries. Signed-pass admission is tested with actual Ed25519 verification. The successful execution-creation fixture now supplies its required claim type; production schema rules are unchanged. [pcc:unverified]
+
+This is correctness validation. No optimization was introduced and no timing speedup is claimed. The shared PCC implementation is owned here; consumer synchronization follows this owner's landing. The benchmark-tool owner repair is tracked in crypto-autoresearcher PR #3323. PR #4621 remains subject to all applicable CI, artifact availability and review; this note does not resolve the separate malformed historical benchmark or S3 outage. [pcc:unverified]
+
+Sources checked: current PCC source and maintained tests; research-KB revision `9b2119e8fbac482b98b50521c0d604bb`, refreshed `2026-11-17T06:15:25Z`; source `source:6374c4cd43f2847fc7f26410172cb9cf` for exact archival custody practice. Catalog evidence predates the repair and is supplemented by the direct source and new regression results. [pcc:unverified]

@@ -176,6 +176,7 @@ mod tests {
                 include_str!("../../../research/isogeny_walk_20261004/runs/p224-ell61-radius2/isogeny_routes.json"),
             ),
             ("docs/curves/ic/curves.yaml", include_str!("../../../docs/curves/ic/curves.yaml")),
+            ("docs/curves/level-certificates.json", include_str!("../../../docs/curves/level-certificates.json")),
         ];
         let digests: Vec<_> = inputs
             .into_iter()

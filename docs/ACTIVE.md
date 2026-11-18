@@ -11,21 +11,25 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-_(none pinned — set one with `/goal <text>`)_
+Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [x] Publish prime-field coverage, Split4 and RR9 follow-up evidence (Codex, started 2026-11-17, branch research/prime-field-followup-20261117, PR #4624)
 
-- [x] Compare Dickson31 with first-rational-x B31 on the same prime31 256 blinded logs; full Rust rank, retries and charged costs (automation, started 2026-11-17, branch automation/prime31-b31-firstx-complete-frontier-20261117, PR #4635)
+- [ ] Prime31 CM endomorphism-degree exclusion and non-generic solver lead triage (automation, started 2026-11-18, branch automation/prime31-cm-degree-gate-20261118, PR #4657; exact gate implemented, CI pending)
 
-- [x] Prime31 same-256-Q complete Rust B27/B29/B31 arity, rank and full-cost sensitivity; test candidate extractor trade-off (automation, started 2026-11-17, branch automation/prime31-b27-b29-complete-sensitivity-20261117, PR #4629)
+- [ ] Repair the 28 examples/tests/bins on main broken by lossy merges (syntax, struct drift, lost library APIs) (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw; in progress)
+- [x] Clean up main CI breakages and add an ecbench CI check (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4569 merged; ecbench-smoke check passing; remaining main blockers need the owner: AWS key, pcc claim_type, hec-multi record, rho currency)
 
-- [x] Audit actual prime31 B31 eight-leaf coverage against matched random and first-x bases; reuse original Rust 4A oracle and pre-registered 256-Q corpus (automation, started 2026-11-17, branch automation/prime31-b31-coverage-null-control-20261117, PR #4626)
+- [ ] Freeze H115 Frobenius--Kummer resolvent-moment ECDLP lead, derive its cohomological cost obligations, and preregister exact small-curve controls (Codex, started 2026-11-17, branch research/h115-frobenius-kummer-resolvent-freeze, PR #4625)
 
-- [x] Dickson31 8A relation-index full 31-column modular solve and 1024 blinded prime31 targets; scoped generic-equivalent complete-control benchmark (automation, started 2026-11-17, branch automation/prime31-dickson31-complete-1024-20261117, PR #4623)
+- [ ] Independently audit the general Boolean tensor contraction theorem D.1 used by the conditional prime-field result, beginning with the recursive description and precision invariants. See [the assessed leads and proof dependencies](leads/2026-11-17/subexponential-ecdlp-goal/REPORT.md) (next after PR #4627).
 
-- [x] Benchmark Montgomery batch-inverted 4A complement checks for Dickson31 eight-sum IC relation controls, same 98 public targets (automation, started 2026-11-17, branch automation/prime31-dickson31-batched-complement-20261117, PR #4618)
+- [x] Assess the subexponential ECDLP literature and the status of the lab's index-calculus leads, then identify the first unresolved mathematical test (Codex, completed 2026-11-17, branch codex/ecdlp-subexponential-goal-20261117, PR #4627)
 
-- [x] Prime31 Dickson31 blinded adaptive eight-sum coverage gate (automation, started 2026-11-17, branch automation/prime31-dickson31-adaptive-holdout-20261117, PR #4615)
+- [x] Regenerate artifact-store pull steps in the 36 drifted workflows (`tools/artifacts/wire_workflows.py`) so the `artifacts` check passes (claude, started 2026-11-18, branch aburan28/vigilant-wright-xm1vt6-workflow-wiring)
+
+- [ ] Chase open graph-IC (extension_ic_graph_20261115) leads in parallel: Run51 outcome, descent finder, complete accounting, fresh/scaling protocol, rho fold, independent validation, root build (claude, started 2026-11-18, branch aburan28/charming-clarke-qfc2gp)
 
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
@@ -38,9 +42,11 @@ _(none pinned — set one with `/goal <text>`)_
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
-- [ ] Port the linearized two-summand root finder (lfd-summation-systems PR #28) into ic_framework as a decomposition oracle and compare it with rootfind-mitm, rootfind-pairs and matrix-F4 on the same instances (claude, started 2026-11-17, branch claude/index-calculus-root-finding-e95kd6)
+- [x] Port the linearized two-summand root finder (lfd-summation-systems PR #28) into the Semaev decomposer and measure it vs the pair loop (claude, started 2026-11-17, branch claude/index-calculus-root-finding-e95kd6, PR #4578); follow-up: wrap as an ic_framework oracle and compare with rootfind-mitm in the harness unit
 
 - [x] Repair main-side CI breakage left by the 2026-11-16 merges: parity lock and IC reference currency (workflow store pulls deferred until the store is repaired) (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4576)
+
+- [x] Unbreak main: remove the duplicate recording_degree_falls and VisitReport fall-degree fields in f4_fp.rs left by a double-restore (claude, started 2026-11-17, branch claude/fix-f4fp-dup-degree-falls-20261117)
 
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
