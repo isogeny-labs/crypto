@@ -85,6 +85,8 @@ digraph ecdlp_claims {
     "ASM-XEDNI-TRIAL-MARGINAL" [label="ASM-XEDNI-TRIAL-MARGINAL\\nEach adaptive xedni trial, as run, succeeds with marginal probability O(1/p)", fillcolor="#fff4cc", color="#8a6200", style="rounded,filled"];
     "CLAIM-PA-SS-IMPLIES-FS" [label="CLAIM-PA-SS-IMPLIES-FS\\n'Special soundness implies Fiat-Shamir security'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "CLAIM-PA-AMBIENT-BLINDING" [label="CLAIM-PA-AMBIENT-BLINDING\\n'Blinding by any group element preserves a subgroup DLP instance'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "DEF-PKM-CLOSURE-DUAL-CERTIFICATE" [label="DEF-PKM-CLOSURE-DUAL-CERTIFICATE\\nPKM closure-dual lower-bound certificate\\nA_c ell = 0; ell_constant = 1", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-WAGNER-BUCKET-VARIANCE" [label="DEF-WAGNER-BUCKET-VARIANCE\\nRelative Wagner bucket variance W\\nW=sum_c q_c*(pi_c/delta-1)^2", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
   }
   subgraph cluster_bounds {
     label="Rigorous model bounds and structural theorems"; color="#cad5df"; style="rounded";
@@ -331,6 +333,8 @@ digraph ecdlp_claims {
     "THM-F4-CONTAINMENT" [label="THM-F4-CONTAINMENT\\nF4 runs with step degree <= D stay in every D-closed subspace containing the generators", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CEX-SUBFIELD-FACTOR-BASE" [label="CEX-SUBFIELD-FACTOR-BASE\\nSubfield curve, odd n: every sum of x in F_q factor-base points lies in E(F_q), at most 2q + 1 points (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CLAIM-JV-ASSUMPTION1-ALL-CURVES" [label="CLAIM-JV-ASSUMPTION1-ALL-CURVES\\n'Omega(q^(n-1)/(n-1)!) decomposable points whenever #F in Omega(q)', over all E/F_{q^n}\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "THM-TENSOR-D4-NUMERIC-BOUNDARY" [label="THM-TENSOR-D4-NUMERIC-BOUNDARY\\nExact D.4 numeric recursion boundary", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-ARITY3-FP-UNIT-EXPLANATION" [label="THM-ARITY3-FP-UNIT-EXPLANATION\\nSource-bound Fp unit-equation explanation checker", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -447,6 +451,8 @@ digraph ecdlp_claims {
     "COND-SP-SEMAEV15-COMPLEXITY" [label="COND-SP-SEMAEV15-COMPLEXITY\\nSemaev 2015: binary ECDLP in 2^(c sqrt(n ln n)), c ~ 1.69\\nT ~ 2^(c sqrt(n ln n)); first stage m! 2^(n/m) n^(4 omega); second 2^(2k)", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
     "COND-SP-KARABINA-PDP" [label="COND-SP-KARABINA-PDP\\nKarabina 2015: S_3-split PDP with constant D_reg extrapolation\\nT ~ 2^31 2^(n/5) n^12 + 2^(2n/5) (m = 5, D_reg = 4)", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
     "COND-PA-FS-BATCH-SOUNDNESS" [label="COND-PA-FS-BATCH-SOUNDNESS\\nFiat-Shamir RLC batch verification fails with probability <= d/|F|", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
+    "COND-HASHED-ECDL-TENSOR-BOUND" [label="COND-HASHED-ECDL-TENSOR-BOUND\\nHashed-ECDL Boolean tensor contraction bound\\n2^{O(b/(log b)^(1/4))} under the complete source hypotheses", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
+    "COND-WAGNER-ECDLP-FILTER-GAIN" [label="COND-WAGNER-ECDLP-FILTER-GAIN\\nWagner-style ECDLP representation-filter gain", fillcolor="#fde2e2", color="#a33a3a", style="rounded,filled"];
   }
   subgraph cluster_evidence {
     label="Measured and heuristic evidence"; color="#cad5df"; style="rounded";
@@ -629,6 +635,18 @@ digraph ecdlp_claims {
     "GAP-PA-CURVE-SELECTION" [label="GAP-PA-CURVE-SELECTION\\nCurve-selection assumptions with exact curve and subgroup identities", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-PQ2-M2-RANK-CENSUS" [label="GAP-PQ2-M2-RANK-CENSUS\\nDoes r2 < k hold on m = 2 descended S_3 instances for infinitely many n?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-PF-TRACE-PULLBACK-FACTOR-BASE" [label="GAP-PF-TRACE-PULLBACK-FACTOR-BASE\\nCan a trace-pulled-back subspace factor base be small?", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-TENSOR-PREDICATE-COST-CERTIFICATE" [label="GAP-TENSOR-PREDICATE-COST-CERTIFICATE\\nTyped tensor predicate-cost certificate", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-TENSOR-AGGREGATE-COST-CERTIFICATE" [label="GAP-TENSOR-AGGREGATE-COST-CERTIFICATE\\nTensor aggregate construction and space certificate", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PRIME-YIELD-RANK-POPULATION" [label="GAP-PRIME-YIELD-RANK-POPULATION\\nFixed-population prime-field yield and rank evidence", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-ARITY3-BOOLEAN-BINDING" [label="GAP-ARITY3-BOOLEAN-BINDING\\nBind Fp explanations to Boolean trail literals", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-ARITY3-PROOF-COMPOSITION" [label="GAP-ARITY3-PROOF-COMPOSITION\\nCompose finite-field and Boolean proof logs", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PKM-GROWING-DUAL-CERTIFICATE" [label="GAP-PKM-GROWING-DUAL-CERTIFICATE\\nGrowing PKM closure-dual certificate family", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-PKM-MATRIX-WIDTH-BRIDGE" [label="GAP-PKM-MATRIX-WIDTH-BRIDGE\\nPKM closure degree to matrix-width bridge", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-WAGNER-W-SCALING" [label="GAP-WAGNER-W-SCALING\\nWagner bucket-variance scaling law\\ncandidate fit W=Theta(M^a*p^(-1/2)); proof-repair direction requires a<1/2 at M=p^(1/3)", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-WAGNER-FILTER-GAIN-BRIDGE" [label="GAP-WAGNER-FILTER-GAIN-BRIDGE\\nWagner variance to useful filter-gain bridge", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-XEDNI-SELECTOR-TERMINATION" [label="GAP-XEDNI-SELECTOR-TERMINATION\\nExplicit terminating xedni lift selector", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-XEDNI-MINIMAL-MODEL-HEIGHT" [label="GAP-XEDNI-MINIMAL-MODEL-HEIGHT\\nSelected-lift height versus global minimal discriminant", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-XEDNI-REDUCTION-CORRESPONDENCE" [label="GAP-XEDNI-REDUCTION-CORRESPONDENCE\\nXedni selected-lift reduction and subgroup correspondence", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
   }
   "ASM-CLASSICAL-ECDLP" -> "PROB-ECDLP" [label="defines", color="#66788a", style="solid"];
   "PROB-CDH" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
@@ -1626,4 +1644,35 @@ digraph ecdlp_claims {
   "MEAS-EXT-DECOMP-CENSUS" -> "CEX-SUBFIELD-FACTOR-BASE" [label="measures", color="#66788a", style="solid"];
   "MEAS-PQ2-MSOLVE-N37-STEP5" -> "HEUR-SP-SEMAEV15-ASSUMPTION1" [label="obstructs", color="#a33a3a", style="solid"];
   "MEAS-PQ2-MSOLVE-N37-STEP5" -> "MEAS-GB-KW-TABLE1" [label="measures", color="#66788a", style="solid"];
+  "GAP-TENSOR-PREDICATE-COST-CERTIFICATE" -> "COND-HASHED-ECDL-TENSOR-BOUND" [label="conditions", color="#66788a", style="solid"];
+  "GAP-TENSOR-AGGREGATE-COST-CERTIFICATE" -> "COND-HASHED-ECDL-TENSOR-BOUND" [label="conditions", color="#66788a", style="solid"];
+  "GAP-END-TO-END-IC-EXPONENT" -> "COND-HASHED-ECDL-TENSOR-BOUND" [label="conditions", color="#66788a", style="solid"];
+  "HEUR-DECOMPOSITION-PROBABILITY" -> "COND-HASHED-ECDL-TENSOR-BOUND" [label="conditions", color="#66788a", style="solid"];
+  "HEUR-RELATION-RANK" -> "COND-HASHED-ECDL-TENSOR-BOUND" [label="conditions", color="#66788a", style="solid"];
+  "THM-TENSOR-D4-NUMERIC-BOUNDARY" -> "COND-HASHED-ECDL-TENSOR-BOUND" [label="qualifies", color="#66788a", style="dashed"];
+  "COND-HASHED-ECDL-TENSOR-BOUND" -> "GAP-COORDINATE-ALGEBRAIC" [label="instantiates", color="#66788a", style="solid"];
+  "GAP-PRIME-YIELD-RANK-POPULATION" -> "HEUR-DECOMPOSITION-PROBABILITY" [label="leaves_open", color="#66788a", style="dashed"];
+  "GAP-PRIME-YIELD-RANK-POPULATION" -> "HEUR-RELATION-RANK" [label="leaves_open", color="#66788a", style="dashed"];
+  "THM-ARITY3-FP-UNIT-EXPLANATION" -> "GAP-ARITY3-BOOLEAN-BINDING" [label="enables", color="#66788a", style="solid"];
+  "GAP-ARITY3-BOOLEAN-BINDING" -> "GAP-ARITY3-PROOF-COMPOSITION" [label="conditions", color="#66788a", style="solid"];
+  "GAP-ARITY3-PROOF-COMPOSITION" -> "GAP-RP-SAT-SCALING" [label="conditions", color="#66788a", style="solid"];
+  "GAP-ARITY3-PROOF-COMPOSITION" -> "GAP-END-TO-END-IC-EXPONENT" [label="instantiates", color="#66788a", style="solid"];
+  "DEF-PKM-CLOSURE-DUAL-CERTIFICATE" -> "GAP-PKM-GROWING-DUAL-CERTIFICATE" [label="defines", color="#66788a", style="solid"];
+  "GAP-PKM-GROWING-DUAL-CERTIFICATE" -> "GAP-PKM-SOLVING-DEGREE" [label="instantiates", color="#66788a", style="solid"];
+  "GAP-PKM-MATRIX-WIDTH-BRIDGE" -> "GAP-PKM-SOLVING-DEGREE" [label="qualifies", color="#66788a", style="dashed"];
+  "FACT-GROEBNER-COST-DEPENDENCE" -> "GAP-PKM-MATRIX-WIDTH-BRIDGE" [label="leaves_open", color="#66788a", style="dashed"];
+  "THM-PF-REPO-KUMMER-FFD-FOUR" -> "GAP-PKM-MATRIX-WIDTH-BRIDGE" [label="qualifies", color="#66788a", style="dashed"];
+  "DEF-WAGNER-BUCKET-VARIANCE" -> "GAP-WAGNER-W-SCALING" [label="defines", color="#66788a", style="solid"];
+  "GAP-WAGNER-W-SCALING" -> "COND-WAGNER-ECDLP-FILTER-GAIN" [label="conditions", color="#66788a", style="solid"];
+  "GAP-WAGNER-FILTER-GAIN-BRIDGE" -> "COND-WAGNER-ECDLP-FILTER-GAIN" [label="conditions", color="#66788a", style="solid"];
+  "HEUR-WAGNER-FOUR-SUM" -> "COND-WAGNER-ECDLP-FILTER-GAIN" [label="conditions", color="#66788a", style="solid"];
+  "GAP-END-TO-END-IC-EXPONENT" -> "COND-WAGNER-ECDLP-FILTER-GAIN" [label="conditions", color="#66788a", style="solid"];
+  "COND-WAGNER-ECDLP-FILTER-GAIN" -> "GAP-COORDINATE-ALGEBRAIC" [label="instantiates", color="#66788a", style="solid"];
+  "GAP-XEDNI-SELECTOR-TERMINATION" -> "GAP-XEDNI-END-TO-END" [label="instantiates", color="#66788a", style="solid"];
+  "GAP-XEDNI-MINIMAL-MODEL-HEIGHT" -> "GAP-XEDNI-END-TO-END" [label="instantiates", color="#66788a", style="solid"];
+  "GAP-XEDNI-REDUCTION-CORRESPONDENCE" -> "GAP-XEDNI-END-TO-END" [label="instantiates", color="#66788a", style="solid"];
+  "GAP-XEDNI-SELECTOR-TERMINATION" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="conditions", color="#66788a", style="solid"];
+  "GAP-XEDNI-MINIMAL-MODEL-HEIGHT" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="conditions", color="#66788a", style="solid"];
+  "GAP-XEDNI-REDUCTION-CORRESPONDENCE" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="conditions", color="#66788a", style="solid"];
+  "THEOREM-XEDNI-FINITE-CORE" -> "GAP-XEDNI-REDUCTION-CORRESPONDENCE" [label="leaves_open", color="#66788a", style="dashed"];
 }
