@@ -36,7 +36,7 @@ The previous 70-minor Fourier implementation counts 5,600 Fp multiplications per
 
 - Independent local Python BigInt feasibility pilot (not Rust): **2,048 exact determinant residues** for four planted/shifted original-curve target fixtures, all identical to independently evaluated 8x8 Gaussian residues, 2026-11-18. Local code was not committed, so this is exploratory preflight evidence [pcc:unverified].
 - Native Rust source uses the pinned Prime31 original arithmetic crate `1df714645aa683cf975bc76fcacb9842cb4780fd`, unchanged `p=2147483647`, `a=847514846`, `b=2087444724`, `n=2147446831`, cofactor one, 31-point canonical positive x factor base and weights (1,3,5,7,11,13,17,19).
-- **Native source-specific GitHub Actions and independent full 8,192-case Python checks: pending at this initial report commit.** The Python checker independently reconstructs all original-curve points, rechecks the 8,192 direct Gaussian residues and group identities through the prior checker, then evaluates this result's complementary zeta formula independently (sum over superset 4-subsets, with direct sign-monomial evaluation rather than Rust Walsh).
+- **Native source-specific GitHub Actions and independent full 8,192-case Python checks: PASSED on source-specific run #44391371316 (producer evidence only).** The Python checker independently reconstructs all original-curve points, rechecks the 8,192 direct Gaussian residues and group identities through the prior checker, then evaluates this result's complementary zeta formula independently (sum over superset 4-subsets, with direct sign-monomial evaluation rather than Rust Walsh).
 - No signed independent PCC verdict or whole-solver cost advantage.
 
 ## Rejected or already-explored leads and next decisive gate
@@ -47,3 +47,20 @@ The previous 70-minor Fourier implementation counts 5,600 Fp multiplications per
 4. Primary published prime-field methods [Petit–Kosters–Messeng 2016](https://doi.org/10.1007/978-3-662-49387-8_1) and [Amadori–Pintore–Sala 2018](https://doi.org/10.1016/j.ffa.2018.01.009) are the relevant algebraic prior art. No research-KB access in this runtime; primary repository and paper metadata were consulted instead.
 
 **Next experiment, not yet accomplished:** Build the public-target unknown-slot-index selector that treats each x_i,y_i as an algebraic element of the B4/B8 slot-membership set, symbolically contracts the h_U terms in a polynomial constraint system, and recovers true witnesses with no planted chart, generic 3+3/4+4 sum tables or leaked x indices. Evaluate against the frozen B8 46-hit/18-miss natural panel with strict component cost and negative controls. If it survives, feed natural B31 relations into the existing Rust rank31/1024-Q full solve and account for all collection, linear algebra, target attempts, setup and verification against strongest mixed IC, shared BSGS and rho on one host. Do not claim a cheaper complete solver until these gates are passed.
+
+## Native original-curve source-specific result (2026-11-18, 20:31 UTC)
+
+[Exact-source GitHub Actions run #44391371316](https://github.com/isogeny-labs/crypto/actions/runs/44391371316) **PASS** at Rust source commit `5d82f7b39ab4e04d08eff94a7c86b11aebdd769b` (original arithmetic pinned at `1df714645aa683cf975bc76fcacb9842cb4780fd`). [Raw 32-case JSON artifact #14468601894](https://github.com/isogeny-labs/crypto/actions/runs/44391371316/artifacts/14468601894) has per-case counted field operations and alternate-order diagnostic nanoseconds.
+
+| Whole 32-target, 8192-mask supplied-x panel | Direct 8x8 Gaussian | Prior Fourier | New zeta/Walsh |
+|---|---:|---:|---:|
+| Counted Fp multiplications | 6,159,408 | 179,200 | **44,800** |
+| Counted Fp inversions | 65,520 | 0 | **0** |
+| Exact determinant residue decisions | 8,192/8,192 | 8,192/8,192 | **8,192/8,192** |
+| Public unknown x-index extractions | 0 | 0 | **0** |
+
+Exactly **4.00× fewer Fp multiplications than the previous Fourier kernel** (or 137.49× fewer than direct Gaussian) on this isolated **given-x** task. This number is **not** a speedup of a complete ECDLP solver; total wall-time is separately recorded without a calibrated speedup claim. All original 40 Rust library tests and one new full Rust example test passed. The independent Python BigInt checker recomputed all 8192 direct 8x8 determinant residues and elliptic-curve group identities, all 16 planted sign positives and 16 shifted negatives, and separately evaluated the new complementary-zeta formula with direct monomial summation instead of the Rust Walsh implementation. It also recalculated the 32×1400=44800 instrumented multiplications and checked the raw record's per-target counters.
+
+The first CI execution [#44390771119](https://github.com/isogeny-labs/crypto/actions/runs/44390771119) **failed** because the emitted Rust example contained `nz+zeros.len()` instead of `nz+=zeros.len()` when accumulating fixture positives. This was a producer bug in the result counter, **not** the determinant evaluator. It was corrected at `5d82f7b`, then exact-source CI passed, including all 16 positive controls. Failed runs are retained and disclosed.
+
+**Evidence standing:** source-bound producer execution plus separately authored independent Python arithmetic replay [pcc:unverified]. No signed PCC verdict; no nonenumerative x-index selection; no new complete-solver advantage. The next experiment remains the *unknown-index algebraic selector*, not further given-x micro-optimization.
