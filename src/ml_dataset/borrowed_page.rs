@@ -1,18 +1,27 @@
 //! Constant-space paging of retained data. The bound counts borrowed elements,
 //! not nested bytes or serialization work; encoding needs separate admission.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub enum Error {
     ZeroLimit,
     Cursor,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub struct Page<'a, T> {
     pub items: &'a [T],
     pub next: Option<usize>,
     pub total: usize,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 pub fn page<T>(items: &[T], start: usize, limit: usize) -> Result<Page<'_, T>, Error> {
     if limit == 0 {
         return Err(Error::ZeroLimit);

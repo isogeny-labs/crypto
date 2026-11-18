@@ -35,7 +35,10 @@ impl Audit {
     pub fn source(&self) -> &CheckedMap {
         self.expansion.source()
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn expansion(&self) -> &equations::OwnedExpansion {
         &self.expansion
     }

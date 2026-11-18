@@ -328,7 +328,10 @@ fn token_poly(p: &Polynomial) -> Result<usize, Failure> {
 pub struct Encoded {
     pub result: Result<(), Failure>,
     pub raw: Vec<u8>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub charge: Charge,
 }
 pub fn encode_retained(
@@ -411,7 +414,10 @@ pub fn encode_retained(
     }
 }
 #[cfg(test)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained independent checker/control interface; not producer-completion admission."
+)]
 pub fn encode(
     n: u32,
     g: &[Polynomial],
@@ -425,12 +431,18 @@ pub fn encode(
     e.result.map(|_| e.raw)
 }
 /// Prepay checker independently on the SAME owner; its audit authenticates arithmetic only.
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub struct Checked {
     pub audit: Option<super::bqi::Audit>,
     pub failure: Option<Failure>,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 pub fn independent_check_retained(
     raw: &[u8],
     limits: super::bqi::Limits,
@@ -461,7 +473,10 @@ pub fn independent_check_retained(
     out
 }
 #[cfg(test)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained independent checker/control interface; not producer-completion admission."
+)]
 pub fn independent_check(
     raw: &[u8],
     limits: super::bqi::Limits,

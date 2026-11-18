@@ -5513,7 +5513,7 @@ mod tests {
             for twist in [false, true] {
                 for m in 4..=15 {
                     let cfg = super::super::CaseConfig {
-                                                channels: None,
+                        channels: None,
                         factor_base_policy: None,
                         family: "prime".into(),
                         n,
@@ -7635,7 +7635,7 @@ mod tests {
             );
             let mut parent = crate::ml_dataset::types::SolverData {
                 outcome: serde_json::json!({
-                    "strategy": super::super::DYNAMIC_STRATEGY,
+                    "strategy": super::super::dynamic_strategy(m).unwrap(),
                     "status": "partial", "solver_completed": false,
                     "pdp_witness_verified": true, "certificate_durably_persisted": true
                 }),
@@ -7645,10 +7645,18 @@ mod tests {
             assert!(super::super::retains_canonical_artifacts(&parent));
             let allocations: Vec<_> = parent.artifacts.iter().map(|a| a.bytes.as_ptr()).collect();
             super::super::flush_prime_chain_payloads(&mut parent);
-            assert!(parent.outcome.get("live_persistence_errors").is_none());
+            assert!(
+                parent.outcome.get("live_persistence_errors").is_none(),
+                "{}",
+                parent.outcome
+            );
             // The parent flush is idempotent and retains the original owners.
             super::super::flush_prime_chain_payloads(&mut parent);
-            assert!(parent.outcome.get("live_persistence_errors").is_none());
+            assert!(
+                parent.outcome.get("live_persistence_errors").is_none(),
+                "{}",
+                parent.outcome
+            );
             assert_eq!(
                 allocations,
                 parent

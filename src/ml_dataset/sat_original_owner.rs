@@ -38,7 +38,7 @@ struct DecodedParts {
     complete: Option<Math>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(in crate::ml_dataset::solvers) enum AdmissionStage {
+pub(super) enum AdmissionStage {
     AttemptBinding,
     Context,
     Reservation,
@@ -52,11 +52,11 @@ pub(in crate::ml_dataset::solvers) enum AdmissionStage {
 /// Fixed-size typed reporting, with no format!/String/Box allocation on refusal.
 /// An error before the budget is returned is distinct from charged admission.
 #[allow(clippy::large_enum_variant)]
-pub(in crate::ml_dataset::solvers) enum AdmissionFailure<'a> {
+pub(super) enum AdmissionFailure<'a> {
     BeforeBudget(AdmissionStage),
     Retained(FailedAdmission<'a>),
 }
-pub(in crate::ml_dataset::solvers) struct FailedAdmission<'a> {
+pub(super) struct FailedAdmission<'a> {
     original: &'a VerifiedWorkerOriginal<'a>,
     budget: Budget,
     decoded: DecodedParts,
@@ -74,7 +74,7 @@ impl FailedAdmission<'_> {
     }
 }
 
-pub(in crate::ml_dataset::solvers) struct OriginalOwner<'a> {
+pub(super) struct OriginalOwner<'a> {
     original: &'a VerifiedWorkerOriginal<'a>,
     budget: Budget,
     binding: [u8; 32],
@@ -276,7 +276,10 @@ fn decode_into(
 impl<'a> OriginalOwner<'a> {
     /// Original attempt and sink joins precede construction. Reuses the admitted
     /// absolute deadline; no Instant::now()+10 seconds or per-pattern reset.
-    #[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+    #[allow(
+        clippy::result_large_err,
+        reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+    )]
     pub(super) fn admit(
         original: &'a VerifiedWorkerOriginal<'a>,
         case: &crate::ml_dataset::types::CaseData,
@@ -502,7 +505,10 @@ impl<'a> OriginalOwner<'a> {
 
     /// This seal authenticates insertion only. It intentionally provides no
     /// durable acknowledgement and authorizes no search or public export.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn verify_snapshot<'s>(
         &'s mut self,
         events: &'s [crate::cryptanalysis::sat::SolverEvent],

@@ -534,10 +534,10 @@ pub struct ChainedS3Encoding {
     orbit_choice_wires: Vec<FrobeniusOrbitChoiceWires>,
     first_pair_exchangeable: bool,
     first_pair_ordered: bool,
-    all_summands_exchangeable: bool,
-    all_summands_ordered: bool,
     adjacent_domains_equal: Vec<bool>,
     adjacent_ordered: Vec<bool>,
+    all_summands_exchangeable: bool,
+    all_summands_ordered: bool,
     full_trace_zero: Option<(TraceZeroVariety, Vec<Vec<u32>>)>,
     intermediate_trace_enforced: bool,
     kummer_trace_zero: Option<(TraceZeroVariety, Vec<Vec<u32>>)>,
@@ -861,10 +861,10 @@ impl ChainedS3Encoding {
             orbit_choice_wires: Vec::new(),
             first_pair_exchangeable: false,
             first_pair_ordered: false,
-            all_summands_exchangeable: false,
-            all_summands_ordered: false,
             adjacent_domains_equal: vec![false; m - 1],
             adjacent_ordered: vec![false; m - 1],
+            all_summands_exchangeable: false,
+            all_summands_ordered: false,
             full_trace_zero: None,
             intermediate_trace_enforced: false,
             kummer_trace_zero: None,
@@ -1390,6 +1390,8 @@ impl ChainedS3Encoding {
             );
             self.adjacent_ordered[*edge] = true;
         }
+        self.first_pair_ordered = self.adjacent_ordered[0];
+        self.all_summands_ordered = self.adjacent_ordered.iter().all(|ordered| *ordered);
         Ok(edges.len())
     }
 

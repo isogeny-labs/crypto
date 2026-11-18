@@ -1,0 +1,633 @@
+diff --git a/src/bin/genus_ladder.rs b/src/bin/genus_ladder.rs
+index 8221aa04b9..6b7e8199a6 100644
+--- a/src/bin/genus_ladder.rs
++++ b/src/bin/genus_ladder.rs
+@@ -394,6 +394,11 @@ fn main() -> ExitCode {
+                     'a' => (Arm::Full, true, no_ext),
+                     'C' => (Arm::DoubleLp, false, no_ext),
+                     'c' => (Arm::DoubleLp, true, no_ext),
++                    // D: every degree-1 and degree-2 place in the base;
++                    // E: 2LP degree-1 base, degree-2 places as large primes.
++                    'D' => (Arm::Deg2Full, false, no_ext),
++                    'E' => (Arm::Deg2Lp, false, no_ext),
++                    'F' => (Arm::Deg2Part, false, no_ext),
+                     'v' => (
+                         Arm::DoubleLp,
+                         true,
+@@ -507,7 +512,7 @@ fn main() -> ExitCode {
+                                 gl::RESTART
+                             },
+                             prefilter: pre,
+-                            verify_relations: false,
++                            verify_relations: std::env::var("GL_VERIFY_RELATIONS").is_ok(),
+                             sge,
+                         },
+                         ext,
+@@ -552,6 +557,7 @@ fn main() -> ExitCode {
+                     rec["trials"] = json!(o.trials);
+                     rec["candidates"] = json!(o.candidates);
+                     rec["prefilter_rejects"] = json!(o.prefilter_rejects);
++                    rec["bad_relations"] = json!(o.bad_relations);
+                     rec["splits"] = json!(o.splits);
+                     rec["relations"] = json!(o.relations);
+                     rec["rels_by_lp"] = json!(o.rels_by_lp);
+diff --git a/src/cryptanalysis/chained_transfer/ic_control.rs b/src/cryptanalysis/chained_transfer/ic_control.rs
+index d58f6a605d..aa2bcc26d3 100644
+--- a/src/cryptanalysis/chained_transfer/ic_control.rs
++++ b/src/cryptanalysis/chained_transfer/ic_control.rs
+@@ -920,7 +920,7 @@ impl IcResult {
+ /// Factor-base entries one relation can hold.  Genus 3 uses three; the
+ /// genus ladder (`genus_ladder.rs`, genus up to 5) and the plane-quartic
+ /// line relations (four points) share the struct.
+-pub(crate) const REL_FB: usize = 5;
++pub(crate) const REL_FB: usize = 16;
+ 
+ #[derive(Clone, Copy, Debug)]
+ pub(crate) struct Rel {
+diff --git a/src/cryptanalysis/genus_ladder.rs b/src/cryptanalysis/genus_ladder.rs
+index b0b96531d1..08585e924c 100644
+--- a/src/cryptanalysis/genus_ladder.rs
++++ b/src/cryptanalysis/genus_ladder.rs
+@@ -60,10 +60,10 @@ use super::ic_boundary::{
+ use super::residual_walk::{is_prime_u64, mix64};
+ 
+ /// Largest genus the fixed arrays hold.
+-pub const MAX_GENUS: usize = 5;
++pub const MAX_GENUS: usize = 16;
+ /// Polynomial capacity: the largest Cantor intermediate at `g = 5` is
+ /// `v²` with `deg v ≤ 2g − 1`, 19 coefficients.
+-const CAP: usize = 24;
++const CAP: usize = 4 * MAX_GENUS + 8;
+ 
+ // ── polynomials over F_p on the stack ───────────────────────────────────
+ 
+@@ -627,6 +627,130 @@ impl JCurve {
+ 
+     // ── point counts and the group order ────────────────────────────
+ 
++    /// `#C(F_{p^k})` with the point at infinity for any `k ≥ 1`, by
++    /// enumeration of `F_{p^k} = F_p[t]/(m)`.  `k ≤ 2` is [`count_points`].
++    /// For `k ≥ 3`: a bitmap of squares, then `f(x0 + c)` for `c = 0..p`
++    /// by forward differences (additions only), one Horner table per `x0`.
++    pub fn count_points_ext(&self, k: u32) -> u64 {
++        if k <= 2 {
++            return self.count_points(k);
++        }
++        let p = self.k.p;
++        let k = k as usize;
++        let q = (p as u128).pow(k as u32);
++        assert!(q <= 4_000_000_000, "F_{{p^k}} too large to enumerate");
++        let q = q as u64;
++        let m = irreducible_poly(p, k);
++        let ctx = mod_u(p, &m);
++        let mut scratch = Nat::default();
++        let elt = |mut idx: u64| -> Res {
++            let mut a = [0u64; MAX_GENUS];
++            for c in a.iter_mut().take(k) {
++                *c = idx % p;
++                idx /= p;
++            }
++            a
++        };
++        let index = |a: &Res| -> u64 { (0..k).rev().fold(0u64, |acc, i| acc * p + a[i]) };
++        let addv = |a: &mut Res, b: &Res| {
++            for i in 0..k {
++                let s = a[i] + b[i];
++                a[i] = if s >= p { s - p } else { s };
++            }
++        };
++        let mut sq = vec![0u64; (q / 64 + 1) as usize];
++        for hi in 0..q / p {
++            let y0 = elt(hi * p);
++            let mut val = ctx.mul(&y0, &y0, &mut scratch);
++            let mut d1 = y0;
++            addv(&mut d1, &y0);
++            d1[0] = (d1[0] + 1) % p; // 2 y0 + 1
++            let mut d2 = [0u64; MAX_GENUS];
++            d2[0] = 2 % p;
++            for _ in 0..p {
++                let ix = index(&val);
++                sq[(ix / 64) as usize] |= 1 << (ix % 64);
++                addv(&mut val, &d1);
++                addv(&mut d1, &d2);
++            }
++        }
++        let fdeg = self.f.n - 1;
++        let mut n = 1u64;
++        let mut tab = vec![[0u64; MAX_GENUS]; fdeg + 1];
++        for hi in 0..q / p {
++            let x0 = elt(hi * p);
++            for (j, slot) in tab.iter_mut().enumerate() {
++                let mut x = x0;
++                x[0] = (x[0] + j as u64 % p) % p;
++                let mut acc = [0u64; MAX_GENUS];
++                for i in (0..self.f.n).rev() {
++                    acc = ctx.mul(&acc, &x, &mut scratch);
++                    acc[0] = (acc[0] + self.f.c[i]) % p;
++                }
++                *slot = acc;
++            }
++            for i in 1..=fdeg {
++                for j in (i..=fdeg).rev() {
++                    let prev = tab[j - 1];
++                    for t in 0..k {
++                        tab[j][t] = (tab[j][t] + p - prev[t]) % p;
++                    }
++                }
++            }
++            for _ in 0..p {
++                let v = tab[0];
++                if v[..k].iter().all(|&c| c == 0) {
++                    n += 1;
++                } else {
++                    let ix = index(&v);
++                    if (sq[(ix / 64) as usize] >> (ix % 64)) & 1 == 1 {
++                        n += 2;
++                    }
++                }
++                for i in 0..fdeg {
++                    let nxt = tab[i + 1];
++                    addv(&mut tab[i], &nxt);
++                }
++            }
++        }
++        n
++    }
++
++    /// How many `N_k` the order computation enumerates at genus `g ≥ 6`.
++    pub fn known_coeffs(g: usize, p: u64) -> usize {
++        // Minimise a rough cost: enumeration of F_{p^k}, k = 3..=K (about
++        // (2g + 2)·k additions per element), plus 2√W baby/giant steps of
++        // about 30 g² field operations each.  p^K ≤ 2·10^8 (bitmap memory).
++        let pf = p as f64;
++        let gf = g as f64;
++        let mut best = (f64::INFINITY, 2usize);
++        let mut enum_cost = 0.0;
++        for kk in 2..=g {
++            if kk >= 3 {
++                if pf.powi(kk as i32) > 2.0e8 {
++                    break;
++                }
++                // Per element: (2g+2)k additions of the difference walk, or,
++                // when p < deg f, the per-line Horner table (fdeg+1)·fdeg·k²/p.
++                let fdeg = 2.0 * gf + 1.0;
++                let per = ((2.0 * gf + 2.0) * kk as f64)
++                    .max((fdeg + 1.0) * fdeg * (kk * kk) as f64 / pf);
++                enum_cost += pf.powi(kk as i32) * per;
++            }
++            let w: f64 = (kk + 1..=g)
++                .map(|i| {
++                    let binom = (0..i).fold(1.0f64, |a, j| a * (2 * g - j) as f64 / (j + 1) as f64);
++                    binom * pf.powf(i as f64 / 2.0) * (1.0 + pf.powi((g - i) as i32))
++                })
++                .sum();
++            let cost = enum_cost + 2.0 * (w + 1.0).sqrt() * 30.0 * gf * gf;
++            if cost < best.0 {
++                best = (cost, kk);
++            }
++        }
++        best.1
++    }
++
+     /// `#C(F_{p^k})` with the point at infinity, `k ∈ {1, 2}`, by enumeration.
+     pub fn count_points(&self, k: u32) -> u64 {
+         assert!((1..=2).contains(&k));
+@@ -680,15 +804,45 @@ impl JCurve {
+     /// window the Weil bounds leave for the remaining ones; every candidate
+     /// is checked on 32 random divisors and exactly one must survive.
+     pub fn jacobian_order(&self, seed: u64) -> Result<u64, String> {
++        let g = self.genus as usize;
++        let first = self.jacobian_order_k(seed, None);
++        if g <= 5 {
++            return first;
++        }
++        // Genus >= 6 (P1 extension): an ambiguous or failed window is retried
++        // with one more enumerated point count, up to K = g (exact L(1)).
++        let mut out = first;
++        let mut kk = Self::known_coeffs(g, self.k.p);
++        // One escalation only, and not for an ambiguous window that the
++        // shared-r rule could not resolve (more K rarely helps there and costs p^K).
++        let stop = kk + 1;
++        while out.is_err() && kk < g.min(stop) {
++            kk += 1;
++            if (self.k.p as f64).powi(kk as i32) > 2.0e8 {
++                break;
++            }
++            out = self.jacobian_order_k(seed, Some(kk));
++        }
++        out
++    }
++
++    fn jacobian_order_k(&self, seed: u64, force: Option<usize>) -> Result<u64, String> {
+         let g = self.genus as usize;
+         let p = i128::from(self.k.p);
+         let known = match g {
+             1 => 0,
+             2 => 1,
+-            _ => 2,
++            3..=5 => 2,
++            _ => Self::known_coeffs(g, self.k.p),
+         };
++        // Test hook: GL_KNOWN=K forces K enumerated point counts (K ≤ g).
++        let known = std::env::var("GL_KNOWN")
++            .ok()
++            .and_then(|v| v.parse::<usize>().ok())
++            .map_or(known, |kk| kk.min(g));
++        let known = force.unwrap_or(known);
+         let s: Vec<i128> = (1..=known as u32)
+-            .map(|k| self.count_points(k) as i128 - p.pow(k) - 1)
++            .map(|k| self.count_points_ext(k) as i128 - p.pow(k) - 1)
+             .collect();
+         let mut c = vec![0i128; known + 1];
+         c[0] = 1;
+@@ -787,6 +941,28 @@ impl JCurve {
+         match surv.as_slice() {
+             [one] => Ok(*one),
+             [] => Err("no candidate".into()),
++            // Genus >= 6 (P1): every survivor kills 32 random divisors, so is
++            // a multiple of the group exponent.  If all share the same large
++            // prime r, any of them projects onto the order-r subgroup; take
++            // the smallest cofactor.  ("order" is then an exponent multiple.)
++            many if g >= 6 => {
++                let splits: Vec<Option<(u64, u64)>> =
++                    many.iter().map(|&n| split_order(n, 1 << 16)).collect();
++                match splits.first() {
++                    Some(Some((_, r0)))
++                        if splits.iter().all(|s| matches!(s, Some((_, r)) if r == r0)) =>
++                    {
++                        let best = many
++                            .iter()
++                            .zip(&splits)
++                            .min_by_key(|(_, s)| s.map(|(h, _)| h))
++                            .map(|(&n, _)| n)
++                            .expect("non-empty");
++                        Ok(best)
++                    }
++                    _ => Err(format!("ambiguous: {} candidates", many.len())),
++                }
++            }
+             many => Err(format!("ambiguous: {} candidates", many.len())),
+         }
+     }
+@@ -969,6 +1145,159 @@ impl ModU {
+         }
+         res
+     }
++    /// `a^e mod u`, `e ≥ 1`, by left-to-right square-and-multiply.
++    fn pow_res(&self, a: &Res, e: u64, n: &mut Nat) -> Res {
++        let mut res = *a;
++        let bits = 64 - e.leading_zeros();
++        for i in (0..bits - 1).rev() {
++            res = self.mul(&res, &res, n);
++            if (e >> i) & 1 == 1 {
++                res = self.mul(&res, a, n);
++            }
++        }
++        res
++    }
++}
++
++// ── degree-2 places (genus 2-16 extension, research/ic_genus2_16_speedup_20261117) ──
++
++/// For squarefree monic `u` of degree `d ≥ 2`: if every irreducible factor
++/// of `u` has degree 1 or 2 (`u | x^{p²} − x`), its roots and its monic
++/// quadratic factors `(q0, q1)` (`x² + q1 x + q0`); otherwise `None`.
++/// The outer `Option` is `None` when `u` is not 2-smooth; the inner one is
++/// `None` when the randomised splitting gave up (a skipped relation).
++pub fn split_deg2(
++    p: u64,
++    u: &[u64],
++    rng: &mut StdRng,
++    n: &mut Nat,
++) -> Option<Option<(Vec<u64>, Vec<(u64, u64)>)>> {
++    let ctx = mod_u(p, u);
++    let d = ctx.d;
++    debug_assert!(d >= 2);
++    let xp = ctx.pow_xpa(0, p, n);
++    let xpp = ctx.pow_res(&xp, p, n);
++    if xpp[..d] != ctx.base(0)[..d] {
++        return None;
++    }
++    let mut xpm: Vec<u64> = xp[..d].to_vec();
++    xpm[1] = (xpm[1] + p - 1) % p;
++    vtrim(&mut xpm);
++    let lin = if xpm.is_empty() {
++        u.to_vec()
++    } else {
++        vgcd_monic(p, u, &xpm, n)
++    };
++    let rest = vdiv_monic(p, u, &lin, n);
++    let Some(roots) = roots_of(p, &lin, rng, n) else {
++        return Some(None);
++    };
++    let Some(quads) = quad_factors(p, &rest, rng, n) else {
++        return Some(None);
++    };
++    Some(Some((roots, quads)))
++}
++
++/// The monic quadratic factors of `w`, a product of distinct irreducible
++/// quadratics (Cantor–Zassenhaus with `(x + a)^{(p²−1)/2}`).
++fn quad_factors(p: u64, w: &[u64], rng: &mut StdRng, n: &mut Nat) -> Option<Vec<(u64, u64)>> {
++    let d = w.len() - 1;
++    if d == 0 {
++        return Some(Vec::new());
++    }
++    if d == 2 {
++        return Some(vec![(w[0], w[1])]);
++    }
++    debug_assert!(d % 2 == 0, "w is a product of quadratics");
++    let e = (p * p - 1) / 2;
++    for _ in 0..64 {
++        let aa = rng.gen_range(0..p);
++        let ctx = mod_u(p, w);
++        let h = ctx.pow_xpa(aa, e, n);
++        let mut hm1: Vec<u64> = h[..d].to_vec();
++        hm1[0] = (hm1[0] + p - 1) % p;
++        vtrim(&mut hm1);
++        if hm1.is_empty() {
++            continue;
++        }
++        let g = vgcd_monic(p, w, &hm1, n);
++        let dg = g.len() - 1;
++        if dg == 0 || dg == d {
++            continue;
++        }
++        let q = vdiv_monic(p, w, &g, n);
++        let mut out = quad_factors(p, &g, rng, n)?;
++        out.extend(quad_factors(p, &q, rng, n)?);
++        return Some(out);
++    }
++    None
++}
++
++/// `v mod (x² + q1 x + q0)` as `(w0, w1)`; two multiplications per
++/// coefficient of `v`.
++fn v_mod_quad(p: u64, v: &[u64], q0: u64, q1: u64, n: &mut Nat) -> (u64, u64) {
++    let (mut r0, mut r1) = (0u64, 0u64);
++    for &c in v.iter().rev() {
++        let n1 = (r0 + p - r1 * q1 % p) % p;
++        let n0 = (c + p - r1 * q0 % p) % p;
++        r1 = n1;
++        r0 = n0;
++    }
++    n.mul += 2 * v.len() as u64;
++    n.add += 2 * v.len() as u64;
++    (r0, r1)
++}
++
++/// Sign of a degree-2 place `(q, w)` against its negative `(q, −w)`.
++fn quad_sign(p: u64, w0: u64, w1: u64) -> i8 {
++    let half = (p - 1) / 2;
++    if (w1 != 0 && w1 <= half) || (w1 == 0 && w0 <= half) {
++        1
++    } else {
++        -1
++    }
++}
++
++/// An irreducible monic polynomial of degree `k` over `F_p` (Rabin's test,
++/// deterministic search); lowest degree first, with its leading 1.
++fn irreducible_poly(p: u64, k: usize) -> Vec<u64> {
++    assert!((1..=MAX_GENUS).contains(&k));
++    let mut scratch = Nat::default();
++    let primes_of_k: Vec<usize> = (2..=k)
++        .filter(|&r| k % r == 0 && (2..r).all(|s| r % s != 0))
++        .collect();
++    let mut st = 0x5151_u64 ^ p ^ (k as u64) << 40;
++    loop {
++        st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
++        let mut m: Vec<u64> = (0..k).map(|i| mix64(st ^ i as u64) % p).collect();
++        m.push(1);
++        if m[0] == 0 {
++            continue;
++        }
++        if k == 1 {
++            return m;
++        }
++        let ctx = mod_u(p, &m);
++        // frob[j] = x^{p^j} mod m
++        let mut frob = vec![ctx.pow_xpa(0, p, &mut scratch)];
++        for _ in 1..k {
++            let last = *frob.last().expect("non-empty");
++            frob.push(ctx.pow_res(&last, p, &mut scratch));
++        }
++        let x = ctx.base(0);
++        if frob[k - 1][..k] != x[..k] {
++            continue;
++        }
++        let ok = primes_of_k.iter().all(|&r| {
++            let mut t: Vec<u64> = frob[k / r - 1][..k].to_vec();
++            t[1] = (t[1] + p - 1) % p;
++            vtrim(&mut t);
++            !t.is_empty() && vgcd_monic(p, &m, &t, &mut scratch).len() == 1
++        });
++        if ok {
++            return m;
++        }
++    }
+ }
+ 
+ fn mod_u(p: u64, u: &[u64]) -> ModU {
+@@ -1168,6 +1497,15 @@ pub fn disc_character(p: u64, u: &[u64], chi: &[i8], n: &mut Nat) -> i8 {
+ pub enum Arm {
+     Full,
+     DoubleLp,
++    /// Every place of degree 1 or 2 in the base, no large primes.
++    Deg2Full,
++    /// A degree-1 base of `nb` columns; degree-1 places outside it and
++    /// every degree-2 place are large primes (at most two per relation).
++    Deg2Lp,
++    /// P2 interpolation: the degree-1 base of `Deg2Lp` plus a hash-selected
++    /// fraction `GL_D2FRAC` (default 0.1) of degree-2 places; the other
++    /// places are large primes (at most two per relation).
++    Deg2Part,
+ }
+ 
+ impl Arm {
+@@ -1175,14 +1513,25 @@ impl Arm {
+         match self {
+             Arm::Full => "A_full",
+             Arm::DoubleLp => "C_double_lp",
++            Arm::Deg2Full => "D_deg2_full",
++            Arm::Deg2Lp => "E_deg2_lp",
++            Arm::Deg2Part => "F_deg2_part",
+         }
+     }
+     pub fn max_lp(self) -> usize {
+         match self {
+-            Arm::Full => 0,
+-            Arm::DoubleLp => 2,
++            Arm::Full | Arm::Deg2Full => 0,
++            Arm::DoubleLp | Arm::Deg2Lp | Arm::Deg2Part => 2,
+         }
+     }
++    /// The base is every admissible place (the peel/core stop rule).
++    pub fn full_base(self) -> bool {
++        matches!(self, Arm::Full | Arm::Deg2Full)
++    }
++    /// Relations may contain degree-2 places.
++    pub fn deg2(self) -> bool {
++        matches!(self, Arm::Deg2Full | Arm::Deg2Lp | Arm::Deg2Part)
++    }
+ }
+ 
+ #[derive(Clone, Copy, Debug)]
+@@ -1428,7 +1777,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+         chi[(y * y % p) as usize] = 1;
+     }
+     res.rel.mul += (p - 1) / 2;
+-    let want = if prm.arm == Arm::Full {
++    let want = if prm.arm.full_base() {
+         usize::MAX
+     } else {
+         prm.nb
+@@ -1450,6 +1799,45 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+             ncols += 1;
+         }
+     }
++    // Degree-2 places: monic irreducible x² + q1 x + q0 with f mod q a
++    // non-zero square in F_{p²} (norm test); one column per ± pair.
++    let mut col2: Vec<u32> = Vec::new();
++    let d2frac: f64 = std::env::var("GL_D2FRAC")
++        .ok()
++        .and_then(|v| v.parse().ok())
++        .unwrap_or(0.1);
++    if prm.arm == Arm::Deg2Full || prm.arm == Arm::Deg2Part {
++        assert!(g >= 2 && p < 65_536);
++        col2 = vec![u32::MAX; (p * p) as usize];
++        for q1 in 0..p {
++            for q0 in 0..p {
++                let disc = (q1 * q1 % p + p - 4 * q0 % p) % p;
++                res.rel.mul += 2;
++                if chi[disc as usize] != -1 {
++                    continue;
++                }
++                let (mut a0, mut a1) = (0u64, 0u64);
++                for &cf in f.iter().rev() {
++                    let n1 = (a0 + p - a1 * q1 % p) % p;
++                    let n0 = (cf + p - a1 * q0 % p) % p;
++                    a1 = n1;
++                    a0 = n0;
++                }
++                res.rel.mul += 2 * f.len() as u64 + 5;
++                res.rel.add += 2 * f.len() as u64 + 2;
++                let nrm = (a0 * a0 % p + p - q1 * (a0 * a1 % p) % p + q0 * (a1 * a1 % p)) % p;
++                let keep = prm.arm == Arm::Deg2Full
++                    || (mix64((q0 * p + q1) ^ 0xD2D2_D2D2) as f64) < d2frac * 18_446_744_073_709_551_616.0;
++                if chi[nrm as usize] == 1 && keep {
++                    col2[(q0 * p + q1) as usize] = ncols as u32;
++                    ncols += 1;
++                }
++            }
++        }
++    }
++    if prm.arm == Arm::Deg2Lp {
++        assert!(g >= 2 && p < 65_536);
++    }
+     res.fb_cols = ncols;
+     let tcol = ncols as u32;
+     let nunk = ncols + 1;
+@@ -1523,8 +1911,23 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+             }
+             res.candidates += 1;
+             let u = curve.u_coeffs(&cur);
+-            let mut decided = false;
+-            if prm.prefilter && g >= 2 {
++            let mut quads: Vec<(u64, u64)> = Vec::new();
++            let mut deg2_roots: Option<Vec<u64>> = None;
++            if prm.arm.deg2() {
++                match split_deg2(p, &u, &mut rng, &mut res.rel) {
++                    None => continue,
++                    Some(None) => {
++                        res.splits += 1;
++                        continue;
++                    }
++                    Some(Some((rts, qs))) => {
++                        deg2_roots = Some(rts);
++                        quads = qs;
++                    }
++                }
++            }
++            let mut decided = deg2_roots.is_some();
++            if prm.prefilter && g >= 2 && !prm.arm.deg2() {
+                 let ch = disc_character(p, &u, &chi, &mut res.rel);
+                 if ch != 1 {
+                     res.prefilter_rejects += 1;
+@@ -1534,7 +1937,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+                 decided = g == 2;
+             }
+             let mut fer_roots = None;
+-            if let (Some(co), true) = (cubic.as_ref(), prm.prefilter && g == 4) {
++            if let (Some(co), true) = (cubic.as_ref(), prm.prefilter && g == 4 && !prm.arm.deg2()) {
+                 match ferrari_split(co, p, &u, &mut res.rel) {
+                     Some(None) => continue,
+                     Some(Some(r)) => fer_roots = Some(r),
+@@ -1545,9 +1948,10 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+                 continue;
+             }
+             res.splits += 1;
+-            let roots = match fer_roots {
+-                Some(r) => r,
+-                None => {
++            let roots = match (fer_roots, deg2_roots) {
++                (Some(r), _) => r,
++                (None, Some(r)) => r,
++                (None, None) => {
+                     let Some(r) = roots_of(p, &u, &mut rng, &mut res.rel) else {
+                         continue;
+                     };
+@@ -1584,6 +1988,28 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+                     lps.push((x as u32, eps));
+                 }
+             }
++            let mut places2: Vec<(u64, u64, u64, u64)> = Vec::new();
++            for &(q0, q1) in &quads {
++                let (w0, w1) = v_mod_quad(p, &vc, q0, q1, &mut res.rel);
++                places2.push((q0, q1, w0, w1));
++                if w0 == 0 && w1 == 0 {
++                    continue; // q | f: a ramified place, log 0 in the r-part
++                }
++                let eps = quad_sign(p, w0, w1);
++                let in_base = match prm.arm {
++                    Arm::Deg2Full => true,
++                    Arm::Deg2Part => col2[(q0 * p + q1) as usize] != u32::MAX,
++                    _ => false,
++                };
++                if in_base {
++                    let c = col2[(q0 * p + q1) as usize];
++                    assert!(c != u32::MAX, "a degree-2 place outside the table");
++                    rel.fb[rel.nfb as usize] = (c, eps);
++                    rel.nfb += 1;
++                } else {
++                    lps.push(((p + q0 * p + q1) as u32, eps));
++                }
++            }
+             if lps.len() > prm.arm.max_lp() {
+                 continue;
+             }
+@@ -1605,6 +2031,15 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+                     let pt = curve.point(x, y).expect("a root of u lies on the curve");
+                     sum = curve.cantor(sum, pt);
+                 }
++                for &(q0, q1, w0, w1) in &places2 {
++                    let mut d = JDiv { deg: 2, ..JDiv::IDENTITY };
++                    d.u[0] = q0 as u32;
++                    d.u[1] = q1 as u32;
++                    d.v[0] = w0 as u32;
++                    d.v[1] = w1 as u32;
++                    assert!(curve.is_valid(&d), "a degree-2 place lies on the curve");
++                    sum = curve.cantor(sum, d);
++                }
+                 if sum != cur {
+                     res.bad_relations += 1;
+                 }
+@@ -1623,7 +2058,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+ 
+         res.cycles = dsu.cycles0();
+         let nver = dsu.parent.len();
+-        if prm.arm != Arm::Full {
++        if !prm.arm.full_base() {
+             let need = (nunk + margin(nunk)) as i64;
+             if res.cycles < need {
+                 next_check = rels.len() as u64 + (need - res.cycles).max(1) as u64;

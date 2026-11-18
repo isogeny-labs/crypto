@@ -1,7 +1,10 @@
 //! Bounded decision search over the original Boolean equations. No group lift.
 use super::*;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub enum Origin {
     Original(usize),
     Branch {
@@ -11,7 +14,10 @@ pub enum Origin {
     },
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub enum NodeStatus {
     Building,
     Ready,
@@ -22,27 +28,39 @@ pub enum NodeStatus {
     Witness,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub enum Verdict {
     Unknown,
     Witness,
     UnsatDerived,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub enum NativeDisposition {
     Complete,
     LocalCap,
     Stopped,
 }
 #[derive(Clone, Copy)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub struct SearchLimits {
     pub native: Limits,
     pub nodes: usize,
 }
 #[derive(Debug)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub struct Node {
     pub parent: Option<usize>,
     pub origins: Vec<Origin>,
@@ -57,7 +75,10 @@ pub struct Node {
     pub refutation_row: Option<usize>,
 }
 #[derive(Debug)]
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub struct SearchAttempt {
     pub result: Result<(), Failure>,
     pub verdict: Verdict,
@@ -67,7 +88,10 @@ pub struct SearchAttempt {
     pub witness_node: Option<usize>,
     pub charge: Charge,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 struct NativeOwner<'a, 'b, T: Owner> {
     meter: &'a mut Meter<'b, T>,
     failure: Option<Failure>,
@@ -84,7 +108,10 @@ impl<T: Owner> Owner for NativeOwner<'_, '_, T> {
         })
     }
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 fn copied_poly<T: Owner>(p: &Polynomial, m: &mut Meter<T>) -> Result<Polynomial, Failure> {
     m.pay(1, 0)?;
     let mut q = m.alloc(p.len())?;
@@ -93,7 +120,10 @@ fn copied_poly<T: Owner>(p: &Polynomial, m: &mut Meter<T>) -> Result<Polynomial,
     }
     Ok(q)
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 fn empty_node<T: Owner>(
     parent: Option<usize>,
     eqs: usize,
@@ -114,7 +144,10 @@ fn empty_node<T: Owner>(
         refutation_row: None,
     })
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 fn eval<T: Owner>(g: &[Polynomial], point: &[bool], m: &mut Meter<T>) -> Result<bool, Failure> {
     let mut all = true;
     for p in g {
@@ -131,7 +164,10 @@ fn eval<T: Owner>(g: &[Polynomial], point: &[bool], m: &mut Meter<T>) -> Result<
 /// Stops at the first exactly evaluated Boolean witness. A witness is not a signed
 /// ECDLP relation. UnsatDerived requires every visited branch leaf to contain an
 /// actual retained constant-one row; source identity checker is a separate gate.
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 pub fn solve(
     n: u32,
     g: &[Polynomial],
@@ -141,7 +177,10 @@ pub fn solve(
 ) -> SearchAttempt {
     solve_inner(n, g, limits, deadline, owner, None)
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 pub fn solve_with_checkpoint<T: Owner>(
     n: u32,
     g: &[Polynomial],
@@ -153,7 +192,10 @@ pub fn solve_with_checkpoint<T: Owner>(
 ) -> SearchAttempt {
     solve_inner(n, g, limits, deadline, owner, Some((control, hook)))
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 fn solve_inner<T: Owner>(
     n: u32,
     g: &[Polynomial],

@@ -64,7 +64,7 @@ fn reserve<T>(v: &mut Vec<T>, n: usize, b: &mut Budget) -> Result<(), Stop> {
     }
     Ok(())
 }
-pub(in crate::ml_dataset::solvers) fn on_event(
+pub(in super::super) fn on_event(
     state: &mut CaptureState,
     event: &SolverEvent,
 ) -> Result<(), Stop> {
@@ -360,11 +360,17 @@ impl OwnedSearch<'_> {
         self.verdict = Verdict::CheckedSignedRelation;
         Ok(())
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn verdict(&self) -> Verdict {
         self.verdict
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn stop(&self) -> Option<Stop> {
         self.first_stop
     }

@@ -2,7 +2,10 @@
 //! deliberately exposes no solve method: search-prefix admission comes next.
 #[path = "sat_initial_checkpoint.rs"]
 pub(in crate::ml_dataset::solvers) mod checkpoint;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "sat_initial_packed.rs"]
 mod packed;
 use super::*;
@@ -103,7 +106,10 @@ fn quote(
 
 /// All original evidence remains owned across native or capture failure.
 struct Evidence<'a> {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     original: Option<&'a VerifiedWorkerOriginal<'a>>,
     original_hashes: ([u8; 32], [u8; 32]),
     binding: [u8; 32],
@@ -118,15 +124,24 @@ struct Evidence<'a> {
     map_published: bool,
 }
 struct BatchAck {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     valid: bool,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     first: usize,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     last: usize,
     position: capture::CommittedEventPosition,
 }
-pub(in crate::ml_dataset::solvers) struct CaptureState {
+struct CaptureState {
     search: Option<checkpoint::search::SearchCapture>,
     budget: Budget,
     sink: capture::CaptureEmitter,
@@ -149,7 +164,7 @@ pub(in crate::ml_dataset::solvers) struct CaptureState {
     seal_ack: Option<capture::CommittedEventPosition>,
 }
 #[allow(clippy::large_enum_variant)]
-pub(in crate::ml_dataset::solvers) enum Failure<'a> {
+pub(super) enum Failure<'a> {
     BeforeNative {
         owner: OriginalOwner<'a>,
         sink: capture::CaptureEmitter,
@@ -160,7 +175,7 @@ pub(in crate::ml_dataset::solvers) enum Failure<'a> {
         stop: Stop,
     },
 }
-pub(in crate::ml_dataset::solvers) struct NativeInitial<'a> {
+pub(super) struct NativeInitial<'a> {
     evidence: Evidence<'a>,
     shared: Arc<Mutex<CaptureState>>,
     solver: Option<Solver>,
@@ -422,7 +437,10 @@ impl CaptureState {
 }
 
 impl<'a> NativeInitial<'a> {
-    #[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+    #[allow(
+        clippy::result_large_err,
+        reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+    )]
     pub(super) fn prepare(
         mut owner: OriginalOwner<'a>,
         sink: capture::CaptureEmitter,

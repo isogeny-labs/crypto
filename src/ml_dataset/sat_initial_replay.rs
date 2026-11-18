@@ -2,7 +2,10 @@
 //! Verifies one contiguous original-map -> initial-batches -> marker segment.
 //! Full custody, original-file authentication and exporter release are separate
 //! mandatory caller gates. No search, UNSAT, producer-cost or fall-degree claim.
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "sat_initial_packed.rs"]
 mod packed;
 use crate::cryptanalysis::binary_semaev_chain_sat::provenance::{
@@ -208,9 +211,15 @@ pub(super) struct Transcript {
 /// Mathematical consistency of this transcript against a checked original map.
 /// Not a release token for exporter callbacks or proof of producer costs.
 pub(super) struct VerifiedInitialTranscript<'a> {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     initial: provenance::initial::VerifiedInitial<'a>,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     transcript: &'a Transcript,
 }
 fn admit(a: &mut impl Admission, work: u64, bytes: u64) -> Result<(), Error> {

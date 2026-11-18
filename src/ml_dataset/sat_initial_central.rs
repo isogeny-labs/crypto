@@ -3,7 +3,10 @@
 use super::boolean_rows::receipt as row_wire;
 use super::*;
 use provenance::boolean_equations::{self as row_equations, matrix_rows as row_matrix};
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "sat_original_math_preflight.rs"]
 mod original_math;
 use crate::ml_dataset::{
@@ -11,7 +14,10 @@ use crate::ml_dataset::{
     types::{Artifact, CaseConfig, CaseData},
 };
 use std::path::Path;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "sat_producer_ledger.rs"]
 mod ledger;
 #[path = "owned_search_central.rs"]
@@ -20,7 +26,10 @@ pub(in crate::ml_dataset::solvers) mod owned;
 mod owned_identity;
 #[path = "sat_search_central.rs"]
 mod search;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "sat_initial_replay.rs"]
 mod transcript;
 /// Must be supplied by the separately authorized replay caller, never inferred
@@ -127,7 +136,10 @@ impl Frame {
     pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
         (self.budget.work, self.budget.bytes)
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn has_checked_map(&self) -> bool {
         self.map.is_some()
     }
@@ -139,7 +151,10 @@ pub(in crate::ml_dataset::solvers) enum Outcome {
 }
 pub(in crate::ml_dataset::solvers) struct Failed {
     pub frame: Frame,
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub stop: Stop,
 }
 pub(in crate::ml_dataset::solvers) struct VerifiedInitialCapture {
@@ -147,7 +162,10 @@ pub(in crate::ml_dataset::solvers) struct VerifiedInitialCapture {
 }
 impl VerifiedInitialCapture {
     /// Deliberately no export or training release method. This is initial-only.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn initial_and_ledger_consistent(&self) -> bool {
         self.frame.budget.first_stop.is_none()
     }
@@ -220,7 +238,10 @@ pub(in crate::ml_dataset::solvers) fn check_terminal_fields_for_control(
 impl VerifiedInitialCapture {
     /// Consume the same admitted replay owner. Failure is terminal and retains
     /// all original/map/transcript/checkpoint and terminal raw/parsed owners.
-    #[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+    #[allow(
+        clippy::result_large_err,
+        reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+    )]
     pub(in crate::ml_dataset::solvers) fn join_terminal(
         mut self,
         dir: &Path,
@@ -354,7 +375,10 @@ impl VerifiedInitialCapture {
     }
 }
 
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "sat_initial_read.rs"]
 mod retained_read;
 use retained_read::read;
@@ -471,7 +495,10 @@ fn new_frame(
         measurement_policy_hash: None,
     }
 }
-#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+#[allow(
+    clippy::result_large_err,
+    reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+)]
 fn verify_mode(
     dir: &Path,
     config: &CaseConfig,
@@ -1552,7 +1579,10 @@ mod map_path_tests {
 }
 
 impl TerminalVerified {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
         self.capture.frame.usage()
     }
@@ -1913,7 +1943,10 @@ struct RowReplay {
     arithmetic: Option<row_matrix::OwnedReplay>,
 }
 impl RowReplay {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn new(limits: RowLimits) -> Self {
         Self {
             limits,
@@ -1929,17 +1962,26 @@ impl RowReplay {
         }
     }
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(in crate::ml_dataset::solvers) struct VerifiedRow {
     frame: Frame,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker state and source interface; not a producer-completion admission."
+)]
 pub(in crate::ml_dataset::solvers) enum RowOutcome {
     Verified(VerifiedRow),
     UnknownOriginalMath(Frame),
     Incomplete(Frame),
 }
-#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+#[allow(
+    clippy::result_large_err,
+    reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+)]
 pub(in crate::ml_dataset::solvers) fn verify(
     dir: &Path,
     config: &CaseConfig,
@@ -1948,8 +1990,14 @@ pub(in crate::ml_dataset::solvers) fn verify(
 ) -> Result<Outcome, Failed> {
     verify_mode(dir, config, artifacts, policy, None, None)
 }
-#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    clippy::result_large_err,
+    reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+)]
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 pub(in crate::ml_dataset::solvers) fn verify_boolean_row(
     dir: &Path,
     config: &CaseConfig,
@@ -1988,11 +2036,17 @@ pub(in crate::ml_dataset::solvers) fn verify_boolean_row(
     }
 }
 impl VerifiedRow {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
         self.frame.usage()
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn audit(&self) -> &row_matrix::Audit {
         self.frame
             .row_mode
@@ -2095,7 +2149,10 @@ fn verify_row_math(
     Ok(())
 }
 
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+)]
 fn join_row_terminal(
     dir: &Path,
     outcome: &Value,
@@ -2185,7 +2242,10 @@ pub(in crate::ml_dataset::solvers) enum SearchOutcome {
     Incomplete(Frame),
     UnknownOriginalMath(Frame),
 }
-#[allow(clippy::result_large_err)] // the error hands owned state back to the caller
+#[allow(
+    clippy::result_large_err,
+    reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+)]
 pub(in crate::ml_dataset::solvers) fn verify_search(
     dir: &Path,
     config: &CaseConfig,
@@ -2207,7 +2267,10 @@ pub(in crate::ml_dataset::solvers) fn verify_search(
     }
 }
 impl VerifiedSearch {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn model_relation_checked(&self) -> bool {
         self.frame.budget.first_stop.is_none()
             && self
@@ -2216,7 +2279,10 @@ impl VerifiedSearch {
                 .as_ref()
                 .is_some_and(|s| s.model_relation_checked())
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(in crate::ml_dataset::solvers) fn native_unsat_uncertified(&self) -> bool {
         self.frame.budget.first_stop.is_none()
             && self

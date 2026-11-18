@@ -1852,6 +1852,9 @@ fn verify_planted_factor_base(public: &Value, base: &Value) -> Result<(), String
 }
 
 fn verify_natural_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+    if base["schema"] == "ml-ecdlp-factor-base/v2" {
+        return super::factor_bases::verify(public, base);
+    }
     if base["schema"] != "ml-ecdlp-factor-base/v1"
         || base["rule"] != "small-x-prime-primary-projection-with-cyclic-membership"
     {

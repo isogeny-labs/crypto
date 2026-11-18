@@ -1461,9 +1461,12 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             peak_bytes: 0,
             degree_reached: Some(stats.max_degree_built),
             solving_degree: None,
+            first_fall_degree: None,
+            last_fall_degree: None,
+            degree_of_regularity_observed: None,
+            degree_trace: Vec::new(),
             timed_out: stats.exhausted,
             extra,
-            ..Default::default()
         };
         self.totals.absorb(shape, Some(&cost), stats.exhausted);
         let indices = indices?;

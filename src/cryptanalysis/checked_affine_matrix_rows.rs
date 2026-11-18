@@ -4,10 +4,16 @@ use super::super::{sparse, Admission, CheckedMap, Error, Quote};
 use super::{audit, Attempt, Identity, ORDER, SCHEMA};
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "boolean_identity_bqi.rs"]
 mod bqi;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "matrix_rows.rs"]
 mod kernel;
 pub use bqi::{Audit, Limits as CheckerLimits};
@@ -279,7 +285,10 @@ fn certify_inner(
     }
     out
 }
-#[allow(clippy::large_enum_variant)] // variants carry owned state; boxing would change the API
+#[allow(
+    clippy::large_enum_variant,
+    reason = "Retains admitted replay ownership in place without an additional uncharged allocation."
+)]
 enum ReplaySource {
     Checked(CheckedMap),
     Constructed(Attempt),

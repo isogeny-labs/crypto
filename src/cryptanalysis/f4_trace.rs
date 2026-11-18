@@ -538,6 +538,25 @@ fn audit_dropped(
 
 #[cfg(test)]
 mod tests {
+    use crate::cryptanalysis::pq_groebner_f2::mask_from64;
+
+    #[cfg(feature = "wide-vars")]
+    #[test]
+    fn wide_trace_products_keep_high_monomial_coordinates() {
+        use crate::cryptanalysis::pq_groebner_f2::{bit, F2BoolMono};
+        let polynomial = F2BoolPoly::from_monos(
+            vec![F2BoolMono::from_mask(bit(80)), F2BoolMono::from_mask(1)],
+            96,
+        );
+        let mut wanted = vec![bit(80) | bit(90), 1 | bit(90)];
+        wanted.sort_unstable();
+        assert_eq!(product_row(&polynomial, bit(90)), wanted);
+        let (_, trace) = matrix_f4_f2_record(std::slice::from_ref(&polynomial), 96, 1).unwrap();
+        let replayed =
+            matrix_f4_f2_replay(std::slice::from_ref(&polynomial), 96, 1, &trace).unwrap();
+        assert_eq!(key(&replayed), key(&[polynomial]));
+    }
+
     use super::*;
     use crate::binary_ecc::F2mElement;
     use crate::cryptanalysis::koblitz_bench::ladder_sample;
@@ -566,7 +585,7 @@ mod tests {
             st ^= st << 17;
             st
         };
-        let mut monos: Vec<Mask> = vec![0];
+        let mut monos = vec![0u64];
         for i in 0..nv {
             monos.push(1 << i);
             for j in i + 1..nv {
@@ -580,7 +599,7 @@ mod tests {
                         let t = monos
                             .iter()
                             .filter(|_| next() & 1 == 1)
-                            .map(|&m| F2BoolMono::from_mask(m))
+                            .map(|&m| F2BoolMono::from_mask(mask_from64(m)))
                             .collect();
                         F2BoolPoly::from_monos(t, nv)
                     })
@@ -675,7 +694,7 @@ mod tests {
                             if t.mask >> var & 1 == 0 {
                                 Some(*t)
                             } else if value {
-                                Some(F2BoolMono::from_mask(t.mask & !((1 as Mask) << var)))
+                                Some(F2BoolMono::from_mask(t.mask & !(mask_from64(1) << var)))
                             } else {
                                 None
                             }

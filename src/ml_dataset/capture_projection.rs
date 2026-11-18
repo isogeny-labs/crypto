@@ -38,7 +38,10 @@ impl<'a> View<'a> {
     pub fn of(owner: &'a OwnedAttempt) -> Self {
         Self { owner }
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn identity(&self) -> SourceIdentity<'a> {
         let o = &self.owner.original;
         SourceIdentity {
@@ -55,7 +58,10 @@ impl<'a> View<'a> {
     }
     /// Signed domain and target are borrowed from authenticated original Math;
     /// no caller-selected substitute can enter this projection.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn signed_domain(
         &self,
         start: usize,
@@ -63,7 +69,10 @@ impl<'a> View<'a> {
     ) -> Result<Page<'a, (u64, u64)>, PageError> {
         paging::page(&self.owner.original.math.signed, start, limit)
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn signed_target(&self) -> Option<(u64, u64)> {
         self.owner.original.math.signed_target
     }
@@ -90,11 +99,17 @@ impl<'a> View<'a> {
         Status::Incomplete
     }
     /// Raw failed expansion and normalization cursors stay inspectable.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn expansion(&self) -> Option<&'a equations::OwnedExpansion> {
         self.owner.expansion.as_ref()
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn normalization_cursor(&self) -> (usize, usize, usize) {
         (
             self.owner.normalization_generator,
@@ -102,7 +117,10 @@ impl<'a> View<'a> {
             self.owner.normalization_sort,
         )
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn normalized(
         &self,
         start: usize,
@@ -111,7 +129,10 @@ impl<'a> View<'a> {
         paging::page(&self.owner.normalized, start, limit)
     }
     /// Retains nested search basis/proof objects in each borrowed partition.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn partitions(
         &self,
         start: usize,
@@ -127,23 +148,38 @@ impl<'a> View<'a> {
         )
     }
     /// None differs from Some(empty): search was not entered versus no partitions.
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn continuation(&self) -> Option<&'a continuation::Attempt> {
         self.owner.continuation.as_ref()
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn lifts(&self, start: usize, limit: usize) -> Result<Page<'a, LiftRecord>, PageError> {
         paging::page(&self.owner.lift_records, start, limit)
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn coverage(&self) -> Option<&'a continuation::CoverageAudit> {
         self.owner.coverage.as_ref()
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn exclusion_audit(&self) -> Option<&'a exclusions::Audit> {
         self.owner.exclusion_audit()
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub fn replays(
         &self,
         start: usize,

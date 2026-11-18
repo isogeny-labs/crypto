@@ -10,10 +10,16 @@ pub(in crate::ml_dataset::solvers) fn requested(c: &CaseConfig) -> bool {
 pub(in crate::ml_dataset::solvers) fn supported(c: &CaseConfig) -> bool {
     requested(c) && c.solver == "sat" && profile(&c.family, c.n, c.m)
 }
-#[allow(clippy::large_enum_variant)] // variants carry owned state; boxing would change the API
+#[allow(
+    clippy::large_enum_variant,
+    reason = "Retains admitted replay ownership in place without an additional uncharged allocation."
+)]
 pub(in crate::ml_dataset::solvers) enum Custody {
     Search(search::ReportedSearch),
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     BeforeSearch(worker::Custody),
 }
 pub(in crate::ml_dataset::solvers) fn run<'a>(

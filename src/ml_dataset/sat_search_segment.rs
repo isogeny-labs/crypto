@@ -263,7 +263,10 @@ impl Segment {
     pub(super) fn uncertified_native_unsat(&self) -> bool {
         self.first_error.is_none() && self.phase == Phase::UncertifiedUnsatEnd
     }
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn observed_decisions(&self) -> usize {
         self.decisions
     }

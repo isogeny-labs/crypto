@@ -1,7 +1,10 @@
 //! Historical ordinary N3 semantic identity admission. No feature emission.
 use super::*;
 use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
-#[allow(clippy::duplicate_mod)] // file shared by more than one owner module
+#[allow(
+    clippy::duplicate_mod,
+    reason = "Independent original-protocol owner contexts intentionally require distinct module types."
+)]
 #[path = "boolean_identity.rs"]
 mod identity;
 use std::io::Write;
@@ -27,7 +30,6 @@ pub(super) enum Assessment {
 }
 #[derive(serde::Serialize)]
 #[serde(rename_all = "snake_case")]
-#[allow(clippy::enum_variant_names)] // variant names are the serialized wire values
 pub(super) enum Unknown {
     ReplayBudget,
     ReplayDeadline,
@@ -35,6 +37,10 @@ pub(super) enum Unknown {
     MissingAnchor,
     SourceNotReached,
     ProducerRefusal,
+    #[allow(
+        clippy::enum_variant_names,
+        reason = "Preserves the retained producer wire status recorded_unknown."
+    )]
     RecordedUnknown,
     PostCheckRefusal,
     MissingInput,

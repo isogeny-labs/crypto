@@ -16264,6 +16264,7 @@ struct LogSystem<'a> {
 /// page size behind them changes, and so the TLB misses of the scan's
 /// filter probes and run lookups and of the build's scatter.  `0` turns
 /// the advice off for A/B timing.
+#[cfg(target_os = "linux")]
 fn huge_pages_enabled() -> bool {
     static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ON.get_or_init(|| std::env::var("KIC_HUGE_PAGES").map_or(true, |v| v != "0"))
@@ -16275,23 +16276,27 @@ fn huge_pages_enabled() -> bool {
 /// faulted in.  Small slices, other systems and a refused advice are
 /// left as they are; the advice never changes the contents.
 fn advise_huge_pages<T>(v: &[T]) {
-    const HUGE: usize = 2 << 20;
-    let bytes = std::mem::size_of_val(v);
-    if bytes < 2 * HUGE || !huge_pages_enabled() {
-        return;
-    }
     #[cfg(target_os = "linux")]
     {
-        let start = v.as_ptr() as usize;
-        let (lo, hi) = (start.next_multiple_of(HUGE), (start + bytes) / HUGE * HUGE);
-        if hi > lo {
-            // SAFETY: `[lo, hi)` lies inside `v`'s allocation, and
-            // `MADV_HUGEPAGE` changes only how its pages are backed.
-            unsafe {
-                libc::madvise(lo as *mut libc::c_void, hi - lo, libc::MADV_HUGEPAGE);
+        const HUGE: usize = 2 << 20;
+        let bytes = std::mem::size_of_val(v);
+        if bytes < 2 * HUGE || !huge_pages_enabled() {
+            return;
+        }
+        {
+            let start = v.as_ptr() as usize;
+            let (lo, hi) = (start.next_multiple_of(HUGE), (start + bytes) / HUGE * HUGE);
+            if hi > lo {
+                // SAFETY: `[lo, hi)` lies inside `v`'s allocation, and
+                // `MADV_HUGEPAGE` changes only how its pages are backed.
+                unsafe {
+                    libc::madvise(lo as *mut libc::c_void, hi - lo, libc::MADV_HUGEPAGE);
+                }
             }
         }
     }
+    #[cfg(not(target_os = "linux"))]
+    let _ = v;
 }
 
 /// Whether the sparse relation system builds each row straight from
@@ -20470,8 +20475,54 @@ mod tests {
             },
             ..KoblitzIcOptions::default()
         };
-        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+        let mut queries = Vec::new();
+        let report = koblitz_index_calculus_dlp_with_factor_base_and_progress(
+            &kc,
+            &target,
+            &fb,
+            &opts,
+            &mut |event| {
+                if let KoblitzIcEvent::RelationQueryStarted {
+                    trial,
+                    coefficient_a,
+                    coefficient_b,
+                    target_x,
+                    target_y,
+                    target_infinity,
+                } = event
+                {
+                    queries.push((
+                        trial,
+                        coefficient_a,
+                        coefficient_b,
+                        target_x,
+                        target_y,
+                        target_infinity,
+                    ));
+                }
+            },
+        )
+        .unwrap();
         assert_eq!(report.log, Some(known), "{report:?}");
+        assert!(!queries.is_empty());
+        assert_eq!(queries.len(), report.trials);
+        for (index, (trial, a, b, x, y, infinity)) in queries.iter().enumerate() {
+            assert_eq!(*trial, index + 1);
+            let a = BigUint::parse_bytes(a.as_bytes(), 10).unwrap();
+            let b = BigUint::parse_bytes(b.as_bytes(), 10).unwrap();
+            let public_query = kc.add(&kc.mul(kc.generator(), &a), &kc.mul(&target, &b));
+            match public_query {
+                BinaryPoint::Affine {
+                    x: actual_x,
+                    y: actual_y,
+                } => {
+                    assert!(!*infinity);
+                    assert_eq!(x, &actual_x.to_biguint().to_string());
+                    assert_eq!(y, &actual_y.to_biguint().to_string());
+                }
+                BinaryPoint::Infinity => assert!(*infinity),
+            }
+        }
         assert!(report.sat_calls > 0);
         assert!(report.independent_relations > 0);
         assert!(report.linear_solve_attempts > 0);
@@ -20503,8 +20554,54 @@ mod tests {
             },
             ..KoblitzIcOptions::default()
         };
-        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+        let mut queries = Vec::new();
+        let report = koblitz_index_calculus_dlp_with_factor_base_and_progress(
+            &kc,
+            &target,
+            &fb,
+            &opts,
+            &mut |event| {
+                if let KoblitzIcEvent::RelationQueryStarted {
+                    trial,
+                    coefficient_a,
+                    coefficient_b,
+                    target_x,
+                    target_y,
+                    target_infinity,
+                } = event
+                {
+                    queries.push((
+                        trial,
+                        coefficient_a,
+                        coefficient_b,
+                        target_x,
+                        target_y,
+                        target_infinity,
+                    ));
+                }
+            },
+        )
+        .unwrap();
         assert_eq!(report.log, Some(known), "{report:?}");
+        assert!(!queries.is_empty());
+        assert_eq!(queries.len(), report.trials);
+        for (index, (trial, a, b, x, y, infinity)) in queries.iter().enumerate() {
+            assert_eq!(*trial, index + 1);
+            let a = BigUint::parse_bytes(a.as_bytes(), 10).unwrap();
+            let b = BigUint::parse_bytes(b.as_bytes(), 10).unwrap();
+            let public_query = kc.add(&kc.mul(kc.generator(), &a), &kc.mul(&target, &b));
+            match public_query {
+                BinaryPoint::Affine {
+                    x: actual_x,
+                    y: actual_y,
+                } => {
+                    assert!(!*infinity);
+                    assert_eq!(x, &actual_x.to_biguint().to_string());
+                    assert_eq!(y, &actual_y.to_biguint().to_string());
+                }
+                BinaryPoint::Infinity => assert!(*infinity),
+            }
+        }
         assert!(report.sat_calls > 0);
         assert!(report.independent_relations > 0);
         assert!(report.linear_solve_attempts > 0);
@@ -23606,6 +23703,8 @@ mod tests {
                 "degree {degree}: shifted coordinates changed nothing, so the scan ignores them"
             );
         }
+        #[cfg(not(target_arch = "x86_64"))]
+        assert_eq!(fused, 0, "x86 folding kernel must not run on this host");
         #[cfg(target_arch = "x86_64")]
         if scan_soa_enabled()
             && is_x86_feature_detected!("avx512f")
@@ -23820,6 +23919,8 @@ mod tests {
                 "degree {degree}: the scans found nothing to compare"
             );
         }
+        #[cfg(not(target_arch = "x86_64"))]
+        assert_eq!(fused, 0, "x86 folding kernel must not run on this host");
         #[cfg(target_arch = "x86_64")]
         if is_x86_feature_detected!("avx512f") && is_x86_feature_detected!("vpclmulqdq") {
             assert!(fused >= 4, "the folding kernel ran at only {fused} degrees");
@@ -25378,6 +25479,22 @@ mod tests {
     /// is a single degree-3 rung.  Gate-first never costs stage units.
     #[test]
     fn w5_gate_first_and_lane_roots_keep_every_decomposition() {
+        const MODE: &str = "CRYPTO_LANE_ROOT_CONTROL";
+        if std::env::var_os(MODE).is_none() {
+            for (mode, linear) in [("eligible", "0"), ("linear-elimination", "1")] {
+                let result = std::process::Command::new(std::env::current_exe().unwrap())
+                    .args(["--exact", "cryptanalysis::koblitz_index_calculus::tests::w5_gate_first_and_lane_roots_keep_every_decomposition", "--nocapture"])
+                    .env(MODE, mode).env("KIC_LINEAR_ELIM", linear).output().unwrap();
+                assert!(
+                    result.status.success(),
+                    "{mode}: {}\n{}",
+                    String::from_utf8_lossy(&result.stdout),
+                    String::from_utf8_lossy(&result.stderr)
+                );
+                assert!(String::from_utf8_lossy(&result.stdout).contains("1 passed"));
+            }
+            return;
+        }
         use crate::cryptanalysis::koblitz_groebner::{
             clear_lane_roots, f4_word_ops_thread, gate_first_skips_thread, lane_roots_pending,
             set_gate_first,
@@ -25390,6 +25507,16 @@ mod tests {
         let targets: Vec<BinaryPoint> = (1..=4u32)
             .map(|k| kc.mul(kc.generator(), &BigUint::from(k)))
             .collect();
+        if std::env::var(MODE).as_deref() == Ok("linear-elimination") {
+            clear_lane_roots();
+            let (_, placed) = prebuild_decomposition_roots(&kc, &fb, &st, &targets, 3, engine);
+            assert_eq!(
+                placed, 0,
+                "linear generators must be handled by the solver before batching"
+            );
+            assert_eq!(lane_roots_pending(), 0);
+            return;
+        }
         type Key = (
             Option<Vec<usize>>,
             bool,

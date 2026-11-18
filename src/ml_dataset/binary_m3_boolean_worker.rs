@@ -7,7 +7,10 @@ const PROOF_CAP: usize = 4096;
 // Future finite-span producer must be separately admitted on the same ledger.
 #[derive(Clone, Copy)]
 pub(in crate::ml_dataset::solvers) enum ProofMode<'a> {
-    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Supplied(&'a [u8]),
     Produce,
 }
@@ -117,7 +120,7 @@ impl<'a> Owned<'a> {
             // preserving existing EventIndex/MatrixResult replay equalities.
             let tail = events.retained_wire.len();
             let retained = events.acknowledged_prefix_len.checked_add(tail);
-            if let Some(retained) = retained.filter(|_| bounded_report_shape(input.report.as_ref()))
+            if let (true, Some(retained)) = (bounded_report_shape(input.report.as_ref()), retained)
             {
                 let view = MatrixResult {
                     schema: "crypto.ml-dataset.binary-m3-matrix-result/v4",

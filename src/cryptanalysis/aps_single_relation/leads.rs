@@ -201,7 +201,31 @@ pub fn visit_plan(
     p: u64,
     degree: u32,
     budget: Duration,
+    pool: Option<&mut f4_fp::TracePool>,
+    visitor: impl FnMut(&[u64]) -> Result<bool, String>,
+) -> Result<AlgebraReport, String> {
+    visit_plan_impl(cells, p, degree, budget, pool, false, visitor)
+}
+
+/// Explicit diagnostic traversal; frozen measurement methods keep the default.
+pub fn visit_plan_recording_hilbert(
+    cells: &[Cell],
+    p: u64,
+    degree: u32,
+    budget: Duration,
+    pool: Option<&mut f4_fp::TracePool>,
+    visitor: impl FnMut(&[u64]) -> Result<bool, String>,
+) -> Result<AlgebraReport, String> {
+    visit_plan_impl(cells, p, degree, budget, pool, true, visitor)
+}
+
+fn visit_plan_impl(
+    cells: &[Cell],
+    p: u64,
+    degree: u32,
+    budget: Duration,
     mut pool: Option<&mut f4_fp::TracePool>,
+    record_hilbert_diagnostics: bool,
     mut visitor: impl FnMut(&[u64]) -> Result<bool, String>,
 ) -> Result<AlgebraReport, String> {
     if budget.is_zero() || degree == 0 {
@@ -240,13 +264,13 @@ pub fn visit_plan(
                 break;
             };
             let mut error = None;
+            let mut options = F4Options::new(Ordering::Grevlex, degree).with_budget(remaining);
+            options.record_hilbert_diagnostics = record_hilbert_diagnostics;
             let r = f4_fp::solve_visit_reusing(
                 &cell.system.equations,
                 cell.system.variables,
                 p,
-                &F4Options::new(Ordering::Grevlex, degree)
-                    .with_budget(remaining)
-                    .recording_degree_falls(),
+                &options,
                 &cell.system.domains,
                 pool,
                 |root| match decode_root(&cell.system, root).and_then(|x| emit(&x)) {
@@ -269,9 +293,9 @@ pub fn visit_plan(
                 max_rows: r.max_rows,
                 max_columns: r.max_cols,
                 f4_field_multiplications: r.field_ops,
-                first_fall_degree: r.first_fall_degree,
-                last_fall_degree: r.last_fall_degree,
-                degree_of_regularity_observed: r.degree_of_regularity_observed,
+                first_hilbert_deviation_degree: r.first_hilbert_deviation_degree,
+                last_hilbert_deviation_degree: r.last_hilbert_deviation_degree,
+                staircase_extinction_degree: r.staircase_extinction_degree,
                 roots: Some(RootDiagnostics {
                     equation_roots_visited: r.solutions_visited,
                     candidates_rejected: r.candidates_rejected,
@@ -283,7 +307,14 @@ pub fn visit_plan(
                 ..AlgebraReport::default()
             }
         } else {
-            visit_system(&cell.system, p, degree, remaining, &mut emit)?
+            super::solve_system_visit(
+                &cell.system,
+                p,
+                degree,
+                remaining,
+                record_hilbert_diagnostics,
+                &mut emit,
+            )?
         };
         total.include(&r);
         if !reusable_coverage(&r) {

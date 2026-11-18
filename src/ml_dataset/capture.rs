@@ -248,6 +248,10 @@ pub struct EventRecord {
 /// Snapshot of an installed durable head, minted without rehashing its bytes.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
+#[allow(
+    dead_code,
+    reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+)]
 pub(super) struct CommittedEventPosition {
     pub binding_sha256: String,
     pub event_count: u64,
@@ -366,16 +370,28 @@ pub struct TypedEventBuffer {
 impl TypedEventBuffer {
     /// Current encoded buffer length. Only a successful event_typed return
     /// establishes acknowledgement; this accessor alone does not.
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
     pub(super) fn encoded_len(&self) -> usize {
         self.bytes.len()
     }
 
     /// Move already allocated encoded bytes to a failure owner. This does not
     /// establish publication or acknowledge any event.
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
     pub(super) fn clear_encoded(&mut self) {
         self.bytes.clear();
     }
 
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
     pub(super) fn take_encoded(&mut self) -> Vec<u8> {
         std::mem::take(&mut self.bytes)
     }
@@ -466,6 +482,10 @@ struct TypedEventRecord<'a, T: Serialize + ?Sized> {
 }
 
 #[cfg(test)]
+#[allow(
+    dead_code,
+    reason = "Retained wire equivalence seam for the original native producer; current dispatch remains closed."
+)]
 pub(super) fn maximum_sequence_typed_wire<T: Serialize + ?Sized>(
     kind: TypedEventKind,
     payload: &T,
@@ -908,6 +928,10 @@ fn witness_write(
 }
 impl CaptureEmitter {
     /// Read-only directory ownership check; never creates or substitutes a sink.
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
     pub(super) fn verify_directory(&self, expected: &Path) -> Result<(), String> {
         if self.directory != storage::root_dir(expected, false)? {
             return Err("capture sink differs from original live directory".into());
@@ -916,6 +940,10 @@ impl CaptureEmitter {
     }
 
     /// Actual acknowledged stream head for worker-only adapter admission.
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
     pub(super) fn committed_event_position(&self) -> CommittedEventPosition {
         CommittedEventPosition {
             binding_sha256: self.head.binding_sha256.clone(),
@@ -925,6 +953,10 @@ impl CaptureEmitter {
         }
     }
 
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
     pub(super) fn committed_event_count(&self) -> u64 {
         self.head.event_count
     }
@@ -1330,6 +1362,10 @@ pub struct CaptureEmitter {
 impl CaptureEmitter {
     /// Read-only runtime admission. The caller must separately authenticate
     /// execution parameters against the original run; this binds the live sink.
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
     pub(super) fn verify_attempt_limits(
         &self,
         binding: &AttemptBinding,
@@ -1341,6 +1377,10 @@ impl CaptureEmitter {
 
     /// Compare a previously admitted original binding digest without encoding
     /// and hashing the unchanged binding again for every bounded event.
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
     pub(super) fn verify_digest_limits(
         &self,
         binding_digest: &[u8],
@@ -1361,6 +1401,10 @@ impl CaptureEmitter {
 
     /// Bind an adapter's shared counter to the actual committed stream before
     /// it records an anticipated capture sequence.
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
     pub(super) fn verify_digest_limits_at_count(
         &self,
         binding_digest: &[u8],
@@ -1666,9 +1710,15 @@ impl CaptureEmitter {
 
     /// One serialization for the private, original-budget-admitted native view.
     /// The exact length is independently calculated from its closed Rust schema.
-    pub(super) fn event_koblitz_native_precommit(
+    #[allow(
+        dead_code,
+        reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+    )]
+    pub(super) fn event_koblitz_native_precommit<
+        T: super::solvers::AdmittedKoblitzNativePayload,
+    >(
         &mut self,
-        payload: &super::solvers::AdmittedKoblitzNative<'_>,
+        payload: &T,
         buffer: &mut TypedEventBuffer,
         before_commit: &mut impl FnMut(&[u8]) -> Result<(), CaptureError>,
     ) -> Result<(), CaptureError> {
@@ -1744,11 +1794,20 @@ impl CaptureEmitter {
         bytes: &[u8],
     ) -> Result<(), CaptureError> {
         self.ready()?;
-        if path == "pdp-witness.json" || role == WITNESS_ROLE {
+        if (path == "pdp-witness.json" || role == WITNESS_ROLE)
+            && (!self.witness.committed
+                || path != "pdp-witness.json"
+                || role != WITNESS_ROLE
+                || encoding != "json")
+        {
             return Err(self.reject(CaptureError::Integrity(
                 "borrowed witness requires dedicated publication".into(),
             )));
         }
+        // The dedicated publisher already paid for publication and final
+        // confirmation. Parent custody can check that exact committed identity;
+        // payload_parts refuses changed role, encoding, length or bytes and
+        // writes neither another payload nor another event for this witness.
         self.payload_parts(path, role, encoding, bytes)
     }
 
@@ -2047,7 +2106,10 @@ pub(super) fn verify_live_committed_prefix_visit(
 /// Read-only replay pinned to the caller's already admitted exact head.
 /// Check before any stream read/record parse, so a larger substituted head
 /// cannot consume work or allocations outside that caller's admitted prefix.
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+)]
 pub(super) fn verify_live_committed_prefix_visit_at_head(
     cell_dir: &Path,
     binding: &AttemptBinding,
@@ -2076,7 +2138,10 @@ pub(super) enum RecordPhase {
     BeforeRecordDecode,
     Authenticated,
 }
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+)]
 pub(super) fn verify_live_committed_prefix_visit_at_head_preflight(
     cell_dir: &Path,
     binding: &AttemptBinding,
@@ -2104,6 +2169,10 @@ pub(super) enum OwnedReplayReply {
     Payload(VerifiedReplayPayload),
     Done,
 }
+#[allow(
+    dead_code,
+    reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+)]
 pub(super) fn verify_replay_payload_bytes(
     artifact: &Artifact,
     raw: &[u8],
@@ -2117,6 +2186,10 @@ pub(super) fn verify_replay_payload_bytes(
         bytes: artifact.bytes,
     })
 }
+#[allow(
+    dead_code,
+    reason = "Retained source-bound capture seam for original producers which are not dispatched by the current runtime."
+)]
 pub(super) fn verify_live_committed_prefix_owned(
     cell_dir: &Path,
     binding: &AttemptBinding,
@@ -2602,6 +2675,10 @@ pub fn verify_captured_delta(
 }
 
 #[cfg(test)]
+#[allow(
+    dead_code,
+    reason = "Retained wire equivalence seam for the original native producer; current dispatch remains closed."
+)]
 pub(super) fn native_single_pass_reference_wire<T: serde::Serialize + ?Sized>(
     sequence: u64,
     payload: &T,
@@ -3251,7 +3328,8 @@ mod tests {
         let protocol_bytes = serde_json::to_vec(&protocol).unwrap();
         let plan = super::super::DatasetPlan {
             channels: None,
-            factor_base_policies: vec![],
+            factor_base_policies: Vec::new(),
+
             schema: "crypto.ml-dataset.plan/v1".into(),
             field_sizes: vec![23],
             arities: vec![2],
@@ -3740,6 +3818,51 @@ mod tests {
             assert_eq!(e.head.event_count, 1);
             assert_eq!(global, usize::from(!legacy_first));
         }
+    }
+    #[test]
+    fn borrowed_witness_only_checks_an_existing_dedicated_commit() {
+        for tamper in [false, true] {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let p = witness_payload();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            let mut global = 0;
+            e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                .unwrap();
+            let events = fs::read(f.live().join("events.jsonl")).unwrap();
+            e.payload_borrowed(&p.path, &p.role, &p.encoding, &p.bytes)
+                .unwrap();
+            assert_eq!(fs::read(f.live().join("events.jsonl")).unwrap(), events);
+            assert_eq!(e.head.payload_count, 1);
+            assert_eq!(global, 1);
+            if tamper {
+                fs::write(f.live().join(WITNESS_PATH), b"tampered").unwrap();
+                assert!(e
+                    .payload_borrowed(&p.path, &p.role, &p.encoding, &p.bytes)
+                    .is_err());
+            } else {
+                assert!(e
+                    .payload_borrowed(&p.path, &p.role, &p.encoding, b"changed")
+                    .is_err());
+            }
+            assert!(e.failed);
+        }
+    }
+    #[test]
+    fn borrowed_witness_cannot_duplicate_the_role_at_another_path() {
+        let f = Fixture::new();
+        let mut e = f.emitter();
+        let p = witness_payload();
+        let mut b = witness_budget();
+        let mut w = e.prepare_witness(&mut b).unwrap();
+        e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut 0)
+            .unwrap();
+        assert!(e
+            .payload_borrowed("other.json", &p.role, &p.encoding, &p.bytes)
+            .is_err());
+        assert!(!f.live().join("payloads/other.json").exists());
+        assert_eq!(e.head.payload_count, 1);
     }
     #[test]
     fn witness_changed_identity_and_file_are_sticky_in_both_apis() {

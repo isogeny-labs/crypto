@@ -27,10 +27,16 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 mod generic;
 
 pub(super) const GENERIC_V2_SCHEMA: &str = generic::V2_SCHEMA;
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Original producer filter-wire validation is retained without enabling its unfinished runtime dispatcher."
+)]
 pub(super) const FILTER_CERTIFICATE_ROLE: &str = generic::FILTER_ROLE;
 
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Original producer filter-wire validation is retained without enabling its unfinished runtime dispatcher."
+)]
 pub(super) fn verify_generic_v2_labels(
     public: &Value,
     base: &Value,
@@ -41,7 +47,10 @@ pub(super) fn verify_generic_v2_labels(
     generic::verify_v2_labels(public, base, config, transcript, outcome)
 }
 
-#[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
+#[allow(
+    dead_code,
+    reason = "Original producer filter-wire validation is retained without enabling its unfinished runtime dispatcher."
+)]
 pub(super) fn generic_v2_filter_payloads(
     transcript: &Value,
 ) -> Result<Vec<ArtifactPayload>, String> {

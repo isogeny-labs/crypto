@@ -5279,6 +5279,32 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e() {
+        use crate::cryptanalysis::ic_boundary::{
+            binary_affine_subspace_factor_base, koblitz_instance,
+        };
+        let ko = koblitz_instance(1, 17).expect("a = 1 over F_2^17");
+        let (basis, offset) = trace_coset_basis(&ko, 6).unwrap();
+        let tr = |v: u64| ko.artin_schreier.trace(v);
+        assert_eq!(tr(offset), 1);
+        assert!(basis.iter().all(|&v| tr(v) == 0));
+        let fb = binary_affine_subspace_factor_base(&ko, &basis, offset);
+        assert!(fb.subspace_basis.is_none());
+        assert_eq!(fb.affine_subspace, Some((basis.clone(), offset)));
+        assert!(!fb.points.is_empty());
+        let g = BinaryGroup(&ko.fast);
+        let mut ops = GroupOps::default();
+        let half = ko.r * ko.cofactor / 2;
+        assert!(fb.points.iter().all(|&p| g.mul(&mut ops, p, half).infinity));
+        let (b0, o0) = trace_coset_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap();
+        assert_eq!(o0, 0);
+        assert_eq!(
+            b0,
+            trace_kernel_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap()
+        );
+    }
+
     use super::*;
     use crate::cryptanalysis::ic_boundary::koblitz_instance;
     #[allow(unused_imports)]
@@ -7755,4 +7781,29 @@ mod ksum_frobenius_tests {
             }
         }
     }
+}
+
+pub fn trace_kernel_basis(inst: &BinaryInstance, dim: u32) -> Result<Vec<u64>, String> {
+    if inst.artin_schreier.trace(inst.a) != 0 {
+        return Err("trace_kernel needs Tr(a) = 0: with Tr(a) = 1 the points of 2E lie over an affine hyperplane".into());
+    }
+    trace_coset_basis(inst, dim).map(|(basis, _)| basis)
+}
+
+pub fn trace_coset_basis(inst: &BinaryInstance, dim: u32) -> Result<(Vec<u64>, u64), String> {
+    let tr = |v: u64| inst.artin_schreier.trace(v);
+    let t0 = (0..inst.n)
+        .map(|k| 1u64 << k)
+        .find(|&e| tr(e) == 1)
+        .ok_or("no monomial of trace 1")?;
+    let basis: Vec<u64> = (0..inst.n)
+        .map(|k| 1u64 << k)
+        .filter(|&e| e != t0)
+        .map(|e| if tr(e) == 1 { e ^ t0 } else { e })
+        .take(dim as usize)
+        .collect();
+    if basis.len() < dim as usize {
+        return Err(format!("ker Tr has dimension {} < {dim}", inst.n - 1));
+    }
+    Ok((basis, if tr(inst.a) == 0 { 0 } else { t0 }))
 }
