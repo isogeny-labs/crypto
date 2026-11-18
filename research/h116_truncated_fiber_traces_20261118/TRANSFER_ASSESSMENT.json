@@ -72,7 +72,7 @@
     "forbidden scalar-label oracle"
   ],
   "protocol": {
-    "parameter_scope": "COHORT_RULE.json",
+    "parameter_scope": "COHORT_RULE_V2.json; original COHORT_RULE.json retained as infeasible at n=5",
     "sample_selection": "deterministic structural rule frozen before selection",
     "stopping_rules": "protocol.json",
     "invalidation_rules": "protocol.json",
@@ -81,7 +81,7 @@
   },
   "exploration_boundary": {
     "families": ["V-1 on ordinary prime-field curves", "J=8 moments", "Bostan recurrence in its unit-denominator range"],
-    "parameters": "53<=p<=2000, d<=6, p^d<=1e8 for the direct control",
+    "parameters": "53<=p<=2000, d<=6, p^d<=1e10 for the direct control; cap chosen by the precommitted feasibility ladder before affected data",
     "completed_scope": null,
     "completeness_claim": "none"
   },

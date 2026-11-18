@@ -1,7 +1,10 @@
 # H116 frozen protocol (human form)
 
-The machine record is `protocol.json`; `COHORT_RULE.json` fixes the structural
-selection before the selector is run.
+The machine record is `protocol.json`; `COHORT_RULE_V2.json` fixes the current
+structural selection. The original `COHORT_RULE.json` is retained as the failed
+v1 rule: its `10^8` extension-size cap yielded only two of the required five
+curves. Before any affected data, `FEASIBILITY_PLAN.md` fixed a monotone cap
+ladder; `10^10` was its smallest successful rung and is the sole v2 change.
 
 ## Question
 
