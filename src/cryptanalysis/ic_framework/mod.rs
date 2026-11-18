@@ -70,6 +70,7 @@ pub mod fiber;
 pub mod hashed;
 pub mod large_prime;
 pub mod linalg;
+pub mod linalg_mixed;
 pub mod pkm_semaev;
 pub mod planner;
 pub mod plugins;

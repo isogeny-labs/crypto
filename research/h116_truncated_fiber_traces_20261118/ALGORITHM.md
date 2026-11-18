@@ -102,6 +102,86 @@ matches the recurrence through degree eight. The full degree-`r` construction
 is retained only as a proof/control oracle; it is not part of the fixed-length
 candidate cost. [pcc:unverified]
 
+The formal-scalar constructor supplies a concrete candidate for the missing
+low-jet construction. With `z=-x/y`, it computes the series defined by
+
+```text
+q = 1 + A z^4 q^2 + B z^6 q^3,
+x = z^-2 q^-1,
+L(z) = integral dx/(2y),
+L([a](z)) = a L(z),              a=t-1.
+```
+
+It then substitutes the normalized parameter `[a](z)/a` into the curve with
+coefficients `(a^4 A,a^6 B)`, divides its x-series by the source x-series, and
+re-expands in `w=1/x`. At precision eleven, this path accepts only `(p,A,B,t)`;
+the full numerator and denominator are reserved for the post-construction
+oracle. On the excluded `p=31,r=37` fixture it returns
+`[1,0,20,0,13,7,2,4,8,14,5]`, exactly the full-map quotient. [pcc:unverified]
+
+The proposed reason the omitted Frobenius term is invisible is local: in
+`V-1=[t-1]-pi`, the leading `z^p` term becomes degree `z^(p-1)` after removing
+the normalized leading parameter, and the x-coordinate pole converts that to
+the first possible `w^((p-1)/2)` difference. Synthetic p=23 and p=19 controls
+place the first differences at coefficients 11 and 9 respectively. Lean proves
+the monomial truncation at `z`-degree 22 for prime `p>19`. It now also proves
+the generic one-degree-loss step: equality of `X*f` and `X*g` through one extra
+degree implies equality of `f⁻¹²` and `g⁻¹²` through the requested degree when
+both unit factors have nonzero constant coefficient. This discharges the pure
+double-pole algebra. A follow-up substitution theorem also preserves any fixed
+regular outer unit, its inverse and its product with the pole term for
+prefix-equal zero-constant parameters. The curve-specific instance identifies
+the outer unit by `q=1+A X^4q^2+B X^6q^3`, proves its cleared affine identity,
+rescales it to target coefficients `(a^4A,a^6B)`, and proves the exact double-
+substitution identity used by the constructor whenever
+`a*zNormalized=zScalar`. Proving that the actual elliptic endomorphism supplies
+that parameter identity remains separate. [pcc:unverified]
+
+A frozen 20-case boundary panel over five primes and four cutoffs measures this
+loss directly. All local-parameter pairs first differ at `m+1`, all normalized
+inverse-square pairs first differ at `m`, and all boundary deltas equal
+`-2 c f(0)^-3`; zero-correction and one-degree-shift controls also pass. Thus
+the generic theorem's precision is tight on the panel and cannot be promoted
+to one more coefficient without additional structure. [pcc:unverified]
+
+A second frozen 20-case panel composes the perturbed parameters with a
+nonconstant regular outer unit. Substitution and inverse substitution first
+differ at `m+1`; the complete normalized pole coordinate first differs at `m`.
+All 60 independently predicted boundary coefficients and all 20 control
+triplets pass. Thus the generic regular factor does not consume an additional
+coefficient on this panel. [pcc:unverified]
+
+The curve-coordinate panel then replaces the synthetic outer unit with the
+actual fixed-point series. At precision 24 on five frozen curves, independent
+fixed-point and coefficient-recurrence implementations agree on
+
+```text
+q_target(zNormalized) = q_source(a*zNormalized)
+q_source * (zNormalized/z)^-2 * q_target(zNormalized)^-1
+  = q_source * (zNormalized/z)^-2 * q_source(a*zNormalized)^-1.
+```
+
+Both wrong `(a^2A,a^4B)` target scaling and wrong `(a+1)zNormalized` parameter
+are rejected at coefficient four in all five cells. This measures the exact
+coordinate expression consumed by the Lean theorem; the input equality for
+the actual `V-1` local parameters remains the next formal-group obligation.
+[pcc:unverified]
+
+The current dense implementation uses 64,426 additions, 67,584
+multiplications and 16 inversions for candidate construction at this fixed
+precision. These counts exclude internal verification, oracle and controls.
+They are construction measurements, not an end-to-end comparison or an
+asymptotic bound. [pcc:unverified]
+
+The unchanged constructor was subsequently compared with four additional full
+maps on deterministic different-j models at degrees 197, 257, 397 and 547. It
+matched all eleven coefficients in every constructed cell, while wrong-scalar
+and unscaled-target controls disagreed. A fifth frozen p=107 cell had no
+qualifying alternative j-invariant and was retained without replacement. The
+candidate construction count remained exactly 64,426 additions, 67,584
+multiplications and 16 inversions per completed cell because its precision and
+dense control flow are fixed. [pcc:unverified]
+
 For target `Q=(u,v)` and fixed reference `Q0=(u0,v0)`, set
 
 ```text

@@ -1,0 +1,28 @@
+{
+  "schema": "complete-evaluator-development/v1",
+  "date": "2026-11-18",
+  "scope": "Native development correctness checks; no new conductor-gap record or runtime measurement",
+  "fixture_output_byte_equal_to_before": true,
+  "fixture_output_byte_equal_to_frozen_receipt": true,
+  "existing_fixture_inputs": 42,
+  "existing_known_answer_recoveries": 68,
+  "supplied_case_checks": [
+    {"field_prime": "6666679", "degree": "10009", "block": 17, "point_inputs": 36, "baby_products": 3, "rectangles": 9, "lognorm_calls": 320, "direct_reference": "PARI ellisogeny/ellisogenyapply", "receipt": "validation/blocked17.json"},
+    {"field_prime": "6666679", "degree": "10009", "block": 64, "point_inputs": 36, "baby_products": 1, "rectangles": 1, "lognorm_calls": 36, "direct_reference": "PARI ellisogeny/ellisogenyapply", "receipt": "validation/full64.json"},
+    {"field_prime": "71", "degree": "19", "block": 1, "point_inputs": 6, "direct_reference": "PARI ellisogeny/ellisogenyapply", "receipt": "validation/small1.json"},
+    {"field_prime": "11", "degree": "5", "block": 2, "point_inputs": 6, "leftover_starts": 0, "direct_reference": "PARI ellisogeny/ellisogenyapply", "receipt": "validation/empty-leftover.json"}
+  ],
+  "supplied_case_image_evaluations": 84,
+  "degree10009_schedules_semantically_equal": true,
+  "additional_rejection_controls": 8,
+  "existing_coverage_rejection_controls": 6,
+  "rejection_receipt": "validation/rejections/rejections.jsonl",
+  "build_stderr_empty": true,
+  "compiler": "GCC 14.2.0, C++17, -O2 -Wall -Wextra; dependency include roots marked system",
+  "dependency_versions": {"FLINT": "3.1.3-2", "PARI": "2.17.2-1", "MPFR_headers": "4.2.2-1"},
+  "manifest": "validation/post-call-manifest.sha256",
+  "manifest_timing": "Post-call reconstruction, not a pre-call checkpoint",
+  "prime_conductor_gap_80_complete": false,
+  "runtime_measurements": null,
+  "independent_pcc_standing": "not established"
+}

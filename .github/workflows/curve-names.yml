@@ -57,6 +57,9 @@ jobs:
           # The PR check needs both parents of the synthetic merge commit,
           # not the repository's full history.
           fetch-depth: 2
+          # Partial clone, so store pulls can read Git recovery blobs
+          # (.artifacts/recovery/index.json) from the promisor remote.
+          filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             **/*.md
