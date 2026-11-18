@@ -546,12 +546,14 @@ done
 
 ## Follow-up: P-256 subtract/negate and Fp64 branchless subtract (2026-11-17)
 
-This run adds three host-only arithmetic improvements, preserving all device
-branches. These are modular field primitives used by the rootfinder rather than
-new algebraic rootfinding algorithms:
+This run screened three host-only field-arithmetic changes and retained two,
+preserving all device branches. These are modular field primitives used by
+the rootfinder rather than new algebraic rootfinding algorithms:
 
-1. `fp256_sub` uses a masked modulus and a single carry-add in place of
-   constructing both full-width candidates and selecting one.
+1. **Rejected after actual-header CI:** a candidate `fp256_sub` replaced
+   a full-width conditional move with a masked modulus carry-add. CI
+   measured **12.978 -> 14.183 ns/op (0.915x)**, so the original
+   implementation was restored.
 2. `fp256_neg` computes `p-a` and masks out zero, avoiding a general
    modular subtraction. The inputs are canonical residues in `[0,p)`.
 3. `fp64_sub` calculates the unsigned difference, then adds
@@ -575,7 +577,7 @@ the paired **median** speedups were:
 
 | Host primitive | Local old median task ns/op | New median task ns/op | Median of paired speedups | Range across processes |
 |---|---:|---:|---:|---:|
-| P-256 modular subtract | 12.443 | 9.608 | **1.279x** | 1.048–1.800x |
+| P-256 modular subtract (**rejected in CI**) | 12.443 | 9.608 | 1.279x | 1.048–1.800x |
 | P-256 modular negate | 11.884 | 7.684 | **1.548x** | 1.235–1.877x |
 | Fp64 modular subtract | 11.186 | 2.414 | **4.675x** | 3.786–5.600x |
 
@@ -593,8 +595,13 @@ P-256 masked modular add. Those changes were **not retained** due to
 mixed compiler results, noise or regression. The P-256 add rewrite
 showed a median paired task-clock speedup of 0.952x (slower) across the
 same 8 executions. An `_addcarry_u64` variant of the P-256 subtraction
-was also benchmarked, but the portable masked addition was favored for
-cross-compiler consistency.
+was also benchmarked, but no variant was retained after the actual-header
+CI regression. The P-256 negation and Fp64 subtraction both passed CI
+and improved **14.523 -> 12.197 ns/op (1.191x)** and
+**5.615 -> 1.883 ns/op (2.982x)** respectively in the same
+[GitHub rootfinder run](https://github.com/isogeny-labs/crypto/actions/runs/44217374685).
+That run passed the complete C++ rootfinder suite. It installed
+`perf 7.0.14` but denied hardware PMU counters (`perf_event_paranoid=4`).
 
 Repository verification command (CI):
 ```sh
@@ -605,3 +612,33 @@ The corresponding `rootfind-perf.yml` job separates these four P-256
 and two Fp64 before/after arms under `perf stat -r 5` when PMU access
 is available. The operations still need end-to-end `rf64_decompose` and
 `rf256_decompose` measurements before claiming any oracle speedup.
+
+
+## Follow-up: host short-tail batch inversion (2026-11-17)
+
+For the final partially filled oracle chunk, the previous inverse core
+performed `3*(CHUNK-1)` modular multiplications even when only `cnt`
+valid denominators existed. The extra entries were padded with the
+Montgomery identity. `rf_decompose_thread` now chooses `inv_len=cnt`
+**on host only when `cnt <= CHUNK/2`**, saving
+`3*(CHUNK-cnt)` identity-related products. Normal and nearly full
+chunks retain the original full-`CHUNK` loop; CUDA always uses the
+original fixed unrolled path. Valid thread IDs guarantee `cnt >= 1`.
+
+A pinned local standalone Fp64 mirror (GCC 14.2 `-O2`, the same 61-bit
+prime, software task-clock via `perf_event_open`) compared all inverses
+for 2048 deterministic batches with counts 1, 2, 8, 17, 31, 32.
+Outputs matched exactly. Across four independent process runs the
+8-of-32 tail improved in each run (software task-clock medians
+before/after: 618.9/417.1, 576.5/339.1, 951.9/440.5,
+612.9/337.0 ns per chunk). This is a **batch inversion core**
+measurement, not complete `rf_decompose_thread` or whole-system
+throughput. Larger-tail cases fluctuated, which motivated restricting
+the dynamic shortening to at most half-full host chunks.
+
+The checked-in `bench_tail_core.cpp` compiles the repository Fp64
+header, checks count 1/2/8/16/17/31/32, and exposes separate
+`--perf-tail8-{before,after}` and `--perf-full32-{before,after}`
+arms. `make -C gpu/rootfind test bench-tail-core` checks the full host
+oracle alongside this inversion-core reproduction. Hardware PMU and
+GPU validation still remain separate gates.
