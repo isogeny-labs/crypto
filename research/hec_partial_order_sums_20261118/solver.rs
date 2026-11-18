@@ -435,10 +435,17 @@ pub fn solve<const HARVEST: bool>(
                         let old=recipes[state[i]-1].take().unwrap();
                         let (saved,srhs)=old.build(&fb,j,m,fp,&linear.f);
                         crate::phases::mark("linear");
-                        assert_eq!(linear.push(saved,srhs,audit),None);
+                        out.replayed += 1;
+                        state[i] = USED;
+                        if let Some(k) = linear.push(saved, srhs, audit) {
+                            if product(k) == *target {
+                                out.k = Some(k);
+                            } else {
+                                out.final_rejected = true;
+                            }
+                            break 'anchors;
+                        }
                         crate::phases::mark("row");
-                        out.replayed+=1;
-                        state[i]=USED;
                     }
                 }
             }
