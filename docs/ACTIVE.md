@@ -15,7 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Prime31 negation-quotient paired complements in original Rust, exact B31 full-cost controls (automation, started 2026-11-18, branch automation/prime31-b31-negation-quotient-20261118)
+- [ ] Prime31 negation-quotient paired complements in original Rust, exact B31 full-cost controls (automation, started 2026-11-18, branch automation/prime31-b31-negation-quotient-20261118, PR #4647)
 
 - [x] Compare Dickson31 with first-rational-x B31 on the same prime31 256 blinded logs; full Rust rank, retries and charged costs (automation, started 2026-11-17, branch automation/prime31-b31-firstx-complete-frontier-20261117, PR #4635)
 
