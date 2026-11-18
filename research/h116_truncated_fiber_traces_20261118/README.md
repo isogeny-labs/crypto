@@ -290,7 +290,7 @@ quadratic source and target coordinate projections force the curve-map degree
 to equal the rational coordinate extension degree. Mathlib's exact reduced
 rational-function theorem then identifies that coordinate degree as
 `max(deg num(f),deg denom(f))`. The remaining scalar-specific steps are to
-prove that `Phi_n` and `Psi_n^2` do not cancel, construct the actual H116
+prove generic-`n` no-cancellation, construct the actual H116
 pullback fields and identify the quotient with the curve map. The
 [source-linked report](reports/search-20261118T1152Z/REPORT.md) contains the
 tower diagram, references, audit receipt and unequal-projection control.
@@ -300,8 +300,14 @@ for nonzero `q` with `IsCoprime p q`, canonical `RatFunc` normalization keeps
 the degrees of both `p` and `q`, and the coordinate extension therefore has
 degree `max(deg p,deg q)`. The separately frozen
 [`H116-SCALAR-DIVPOLY-COPRIMALITY-001`](SCALAR_DIVPOLY_COPRIMALITY_PROTOCOL.md)
-panel targets the still-open premise `IsCoprime Phi_n Psi_n^2` with exact gcds
-and two negative controls. [pcc:unverified]
+panel targets the generic premise `IsCoprime Phi_n Psi_n^2` with exact gcds
+and two negative controls.  A new scalar-two Lean instance no longer waits on
+that panel: the explicit Bezout constant is `4*A^3+27*B^2`, so every
+nonsingular short-Weierstrass curve outside characteristic two has coprime
+Mathlib division polynomials `Phi_2,Psi_2^2`.  Combining this with the reduced
+quotient theorem proves the exact coordinate extension degree
+`[F(X):F(Phi_2/Psi_2^2)]=4`.  Arbitrary `n`, the curve-map identification and
+the H116 pullback fields remain open. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

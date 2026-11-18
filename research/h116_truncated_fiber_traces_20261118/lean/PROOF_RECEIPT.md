@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-0d71734e54c3e6b095756511e5608a40ebe2303169441e149000c8072e12de17  H116FiberTrace.lean
+8ceb943498a0d5fd8d20541961b6899603387fe2f625da6f141705ea4beccf8b  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  139 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  142 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -64,6 +64,8 @@ a9be1857e0b978b1b0a5cff9ca238ae04b13e02c00023384e481b1ec45d70eb2  receipts/funct
 523f28dceb06d84847126a8066a7a15d6059bff9a215504fbc2c03a7ccf82b1b  receipts/function-field-sandwich-audit.txt
 9134d32b084b1163d4e4c54d4dcccc1c093f67da34cbd66a5c086914348d9f5b  receipts/no-cancellation-build.txt
 af1f55a38f86370e51a9e4038009738a845709279204f56dbc3e487737715f11  receipts/no-cancellation-audit.txt
+ea01d069a7682bd04bb64a5aa113cba204622e24b66ef16a0fd376403eb8f584  receipts/scalar-two-coprimality-build.txt
+597fdddd8ad379ed42f458a779b17367c87ff4a4878412bcd2e30d57a274a73c  receipts/scalar-two-coprimality-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -286,6 +288,16 @@ degrees, so the coordinate extension degree is exactly
 `max(deg p,deg q)`. The proof uses the public gcd normalization and rational-
 function APIs; it does not assume that `Phi_n` and `Psi_n^2` satisfy the
 coprimality premise. [pcc:unverified]
+
+The 142-theorem checkpoint closes that premise for scalar two on every
+nonsingular short-Weierstrass curve outside characteristic two.  An explicit
+Bezout identity has constant `4*A^3+27*B^2`; Mathlib's exact `Phi 2` and
+`PsiSq 2` formulas then give `IsCoprime (Phi 2) (PsiSq 2)`.  Composing this
+with the generic reduced-quotient theorem proves
+`[F(X):F(Phi_2/Psi_2^2)]=4`.  This is an exact coordinate-field result for
+`n=2`; it does not establish arbitrary-scalar coprimality, identify the
+quotient with the scheme morphism, or prove a subexponential ECDLP bound.
+[pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

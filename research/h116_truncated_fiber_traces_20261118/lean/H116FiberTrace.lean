@@ -799,6 +799,109 @@ theorem reducedRationalQuotient_extension_degree
     max p.natDegree q.natDegree
   rw [rationalFunctionCoordinateExtension_degree f, hdegree.1, hdegree.2]
 
+open Polynomial
+
+/-- An explicit Bezout certificate for the scalar-two numerator and the
+short-Weierstrass cubic.  Its constant is the short discriminant factor
+`4*A^3+27*B^2`, so nonsingularity makes the two polynomials coprime over any
+field. -/
+theorem shortWeierstrassScalarTwo_explicit_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0) :
+    IsCoprime
+      (X ^ 4 - C (2 * A) * X ^ 2 - C (8 * B) * X + C (A ^ 2))
+      (X ^ 3 + C A * X + C B) := by
+  let d : F := 4 * A ^ 3 + 27 * B ^ 2
+  have hbezout :
+      (C (4 * A) + C 3 * X ^ 2) *
+          (X ^ 4 - C (2 * A) * X ^ 2 - C (8 * B) * X + C (A ^ 2)) +
+        (C (5 * A) * X + C (27 * B) - C 3 * X ^ 3) *
+          (X ^ 3 + C A * X + C B) = C d := by
+    dsimp [d]
+    simp only [map_add, map_mul, map_pow, map_ofNat]
+    ring
+  refine Exists.intro (C d⁻¹ * (C (4 * A) + C 3 * X ^ 2)) ?_
+  refine Exists.intro
+    (C d⁻¹ * (C (5 * A) * X + C (27 * B) - C 3 * X ^ 3)) ?_
+  calc
+    _ = C d⁻¹ *
+        ((C (4 * A) + C 3 * X ^ 2) *
+            (X ^ 4 - C (2 * A) * X ^ 2 - C (8 * B) * X + C (A ^ 2)) +
+          (C (5 * A) * X + C (27 * B) - C 3 * X ^ 3) *
+            (X ^ 3 + C A * X + C B)) := by ring
+    _ = C d⁻¹ * C d := by rw [hbezout]
+    _ = 1 := by
+      rw [← map_mul]
+      simp [d, hdisc]
+
+/-- Mathlib's exact scalar-two division-polynomial numerator and denominator
+are coprime on a nonsingular short-Weierstrass curve outside characteristic
+two. -/
+theorem shortWeierstrassScalarTwo_isCoprime
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    IsCoprime (W.Φ 2) (W.ΨSq 2) := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  have hbase := shortWeierstrassScalarTwo_explicit_isCoprime A B hdisc
+  have hfour : IsUnit (C (4 : F) : Polynomial F) := by
+    rw [Polynomial.isUnit_C]
+    apply isUnit_iff_ne_zero.mpr
+    rw [show (4 : F) = (2 : F) * 2 by norm_num]
+    exact mul_ne_zero h2 h2
+  have hphi : W.Φ 2 =
+      X ^ 4 - C (2 * A) * X ^ 2 - C (8 * B) * X + C (A ^ 2) := by
+    rw [WeierstrassCurve.Φ_two]
+    dsimp [W, WeierstrassCurve.b₄, WeierstrassCurve.b₆,
+      WeierstrassCurve.b₈]
+    norm_num
+    simp only [Polynomial.C_ofNat]
+    ring
+  have hpsi : W.ΨSq 2 = C (4 : F) * (X ^ 3 + C A * X + C B) := by
+    rw [WeierstrassCurve.ΨSq_two]
+    dsimp [W, WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂,
+      WeierstrassCurve.b₄, WeierstrassCurve.b₆]
+    norm_num [Polynomial.C_mul, Polynomial.C_ofNat]
+    ring
+  change IsCoprime (W.Φ 2) (W.ΨSq 2)
+  rw [hphi, hpsi]
+  exact (isCoprime_mul_unit_left_right hfour _ _).2 hbase
+
+/-- The reduced scalar-two x-coordinate quotient on a nonsingular short
+Weierstrass curve has rational-function coordinate extension degree exactly
+four.  Coprimality above closes the cancellation premise that was previously
+external to the generic degree theorem. -/
+theorem shortWeierstrassScalarTwo_extension_degree
+    {F : Type*} [Field F] (A B : F)
+    (hdisc : 4 * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (h2 : (2 : F) ≠ 0) :
+    let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+    let xMap : RatFunc F :=
+      algebraMap (Polynomial F) (RatFunc F) (W.Φ 2) /
+        algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 2)
+    Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 4 := by
+  let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
+  let xMap : RatFunc F :=
+    algebraMap (Polynomial F) (RatFunc F) (W.Φ 2) /
+      algebraMap (Polynomial F) (RatFunc F) (W.ΨSq 2)
+  have h2z : ((2 : ℤ) : F) ≠ 0 := by
+    norm_num
+    exact h2
+  have hcoprime : IsCoprime (W.Φ 2) (W.ΨSq 2) :=
+    shortWeierstrassScalarTwo_isCoprime A B hdisc h2
+  have hdenom : W.ΨSq 2 ≠ 0 := W.ΨSq_ne_zero h2z
+  have hextension := reducedRationalQuotient_extension_degree
+    (W.Φ 2) (W.ΨSq 2) hdenom hcoprime
+  have hdegrees :
+      (W.Φ 2).natDegree = Int.natAbs 2 ^ 2 ∧
+        (W.ΨSq 2).natDegree = Int.natAbs 2 ^ 2 - 1 :=
+    ⟨W.natDegree_Φ 2, W.natDegree_ΨSq h2z⟩
+  change Module.finrank (IntermediateField.adjoin F {xMap}) (RatFunc F) = 4
+  rw [hextension]
+  norm_num at hdegrees ⊢
+  omega
+
 /-- Mutation control for the sandwich theorem: if the two line-to-curve
 degrees differ, equality of the total tower degrees does not identify the two
 adjacent map degrees. -/
@@ -2864,6 +2967,9 @@ theorem rationalMap_separation_strict_control :
 #print axioms rationalFunctionCoordinateExtension_degree
 #print axioms reducedRationalQuotient_degrees
 #print axioms reducedRationalQuotient_extension_degree
+#print axioms shortWeierstrassScalarTwo_explicit_isCoprime
+#print axioms shortWeierstrassScalarTwo_isCoprime
+#print axioms shortWeierstrassScalarTwo_extension_degree
 #print axioms unequalCoordinateLineDegrees_control
 #print axioms scalarMultiplicationXMap_exact_degrees
 #print axioms scalarMultiplicationXMap_leadingCoefficients

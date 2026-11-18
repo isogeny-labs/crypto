@@ -771,6 +771,49 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | displayed coprime quotient has extension degree `max(deg p,deg q)` | generic assembly | H116 over the preceding bridge and `RatFunc.finrank_eq_max_natDegree` | rational function field | same hypotheses |
 | shared-factor mutation is not coprime | negative control | native finite polynomial arithmetic | fixed toy polynomials | multiply both sides by the same linear factor |
 
+## Scalar-two short-Weierstrass coprimality instance gate
+
+1. **Structure above.** Put `f=X^3+A*X+B`,
+   `N=X^4-2*A*X^2-8*B*X+A^2`, and
+   `d=4*A^3+27*B^2`.  Direct polynomial expansion gives the explicit
+   Bezout identity
+   `(d*(4*A+3*X^2))*N + (d*(5*A*X+27*B-3*X^3))*f = d^2`.
+   Thus `d != 0` makes `N` and `f` coprime over any field.
+2. **Theorems used as stated.** `IsCoprime` is Mathlib's explicit Bezout
+   predicate.  `WeierstrassCurve.Phi_two` and `PsiSq_two` expose the exact
+   scalar-two division polynomials.  The definitions of `b2,b4,b6,b8`
+   specialize the short curve `(0,0,0,A,B)` to `N` and `4*f`.
+   `isCoprime_mul_unit_left_right` removes the nonzero constant factor four
+   when `2 != 0`.
+3. **Object as an instance.** The first theorem proves coprimality of
+   the displayed `N` and `f` from the explicit discriminant factor `d != 0`.
+   The endpoint theorem instantiates Mathlib's exact `Phi 2` and `PsiSq 2`
+   for `W=<0,0,0,A,B>`, with no copied division-polynomial recurrence.  The
+   final assembly applies the preceding reduced-quotient theorem and Mathlib's
+   exact division-polynomial degrees to prove coordinate extension degree four.
+4. **Assembly probe.** Both the Bezout witness and exact Mathlib specialization
+   first elaborated in a temporary module importing the tracked H116 file at
+   default limits.  The tracked project then completed all 3,162 build jobs;
+   the exact repository auditor reports `142 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This is an actual nonsingular scalar-two
+   instance of the no-cancellation premise; it is not a proof for arbitrary
+   scalar `n`.  The `2 != 0` premise excludes characteristic two, where this
+   short model and the factor-four reduction degenerate.  Identifying the
+   quotient with pointwise scalar multiplication and the curve-field map
+   remains separate. [pcc:unverified]
+6. **Inheritance table.** Field inversion, constant-polynomial embedding,
+   division-polynomial definitions and unit-invariance of coprimality are
+   inherited from Mathlib.  H116 supplies only the explicit Bezout witness
+   and the exact specialization.  The singular case `A=B=0` remains the
+   frozen negative control in the independent finite-field experiment.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| explicit `N,f` Bezout certificate | constructive instance law | H116 over polynomial ring laws | arbitrary field and `A,B` | `4*A^3+27*B^2 != 0` |
+| `IsCoprime (W.Phi 2) (W.PsiSq 2)` for `W=<0,0,0,A,B>` | exact Mathlib endpoint | H116 over Mathlib division polynomials | short Weierstrass curve over arbitrary field | discriminant factor nonzero and `2 != 0` |
+| `[F(X):F(Phi_2/Psi_2^2)]=4` | exact coordinate-degree assembly | H116 over the coprimality endpoint and reduced-quotient theorem | rational function field of the short curve's x-coordinate | same hypotheses |
+| singular cubic loses the premise | negative control | frozen Rust verifier | `y^2=x^3` over `F_13` | `A=B=0` |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression
