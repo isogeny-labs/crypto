@@ -80,6 +80,11 @@ recovered logarithm, and 60/60 verified. So `sweep=1` leaves the default path un
 f = 1/8 arms, an independent sample of the falsifier cell, give 0.403, 0.388, 0.562 and 0.433
 (`replicate_check.txt`).
 
+The first replication run (18:16Z) was recorded by `benchrec run` while the replay audit was also
+running under `benchrec run` on the same record; the audit wrote the record back at its end and the
+replication command entry was lost. The control was rerun alone under `benchrec run` at 18:40Z
+(recorded); its 60 records equal the first run's in S and recovered logarithm.
+
 ## Falsifiers (PROTOCOL.md)
 - f = 1/8 at |F_x| = 4096 above 0.75 of f = 1 on both curves: no (0.571 and 0.435; control 0.562, 0.433).
 - Rows above 1.05 a in any candidate record: no (max 0.937 a).
