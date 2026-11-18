@@ -29,7 +29,6 @@ use std::io::Write;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
-use crypto_lib::cryptanalysis::ic_boundary::RowStatus;
 use crypto_lib::cryptanalysis::ic_framework::linalg::{is_deferred_sparse, matrix_by_name};
 
 const MODULUS: u64 = (1u64 << 61) - 1;

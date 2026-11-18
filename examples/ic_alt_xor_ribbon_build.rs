@@ -53,6 +53,7 @@ impl Cv {
         self.pow(v, (self.p + 1) / 4) // p = 3 mod 4
     }
     // affine add; None = infinity
+    #[allow(non_snake_case)]
     fn add(&self, P: (u64, u64), Q: (u64, u64)) -> Option<(u64, u64)> {
         let p = self.p;
         let l;

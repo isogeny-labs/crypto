@@ -15,7 +15,7 @@ use std::io::Write;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
-use crypto_lib::cryptanalysis::ic_boundary::{RelationSolver, RowStatus};
+use crypto_lib::cryptanalysis::ic_boundary::RowStatus;
 use crypto_lib::cryptanalysis::ic_framework::linalg::matrix_by_name;
 use crypto_lib::cryptanalysis::ic_framework::linalg_mixed::MatchGate;
 

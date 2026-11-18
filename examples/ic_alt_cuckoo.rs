@@ -53,6 +53,7 @@ impl Cv {
         self.pow(v, (self.p + 1) / 4) // p = 3 mod 4
     }
     // affine add; None = infinity
+    #[allow(non_snake_case)]
     fn add(&self, P: (u64, u64), Q: (u64, u64)) -> Option<(u64, u64)> {
         let p = self.p;
         let l;
@@ -364,6 +365,7 @@ fn pair_table(c: &Cv, fb: &[(u64, u64)]) -> Vec<(u32, u32)> {
     v
 }
 /// recompute x for a packed value (1 group add)
+#[allow(dead_code)] // kept for the README's value-table description; not called by the measured arms
 fn resolve(c: &Cv, fb: &[(u64, u64)], v: u32) -> Option<u32> {
     let f = fb.len() as u32;
     let sg = v & 1;

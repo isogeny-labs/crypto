@@ -105,6 +105,7 @@ impl Rng {
 struct Table {
     keys: Vec<u32>,
     start: Vec<u32>,
+    #[allow(dead_code)] // kept: the entries the README describes; the merge arm reads keys only
     ent: Vec<(u8, u8, u8)>,
     slots: Vec<u64>,
     mask: usize,
