@@ -144,3 +144,8 @@ pushed, which are this directory at commit `833a35d21e`.
 
 - Depth 14 c = 6 still running (5 h 50 min, peak RSS 22.4 GB). Only pod left. Within the pre-run estimate
   (4 to 13.5 h on 16 cores; this host is 32 shared vCPU under heavy neighbour load).
+
+## 00:48 UTC (2026-11-18)
+
+- Depth 14 c = 6 still running (7 h 02 min, peak RSS 22.8 GB, barely growing — deep in the dense elimination).
+  Within the 4-13.5 h estimate. Only pod left.
