@@ -1,6 +1,6 @@
 {
   "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
-  "closed_utc": null,
+  "closed_utc": "2026-11-18T03:11:43+00:00",
   "commands": [
     {
       "argv": [
@@ -55,7 +55,9 @@
   "commit_dirty": true,
   "created_utc": "2026-11-18T02:23:33+00:00",
   "curve_uid": null,
-  "entries": [],
+  "entries": [
+    "research/koblitz_rho_reference_20261115"
+  ],
   "host": {
     "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
     "cpus_online": 4,
@@ -157,14 +159,18 @@
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/koblitz_rho_reference_20261115/REPORT.pdf",
+    "png": [
+      "research/koblitz_rho_reference_20261115/figures/fig1-reference-ratio.png"
+    ],
+    "svg": [
+      "research/koblitz_rho_reference_20261115/figures/fig1-reference-ratio.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "koblitz-rho-reference-check",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "v5/strong paired ratio 0.079 (n29) to 0.96 (n53) at w=0; recommendation only [pcc:unverified]",
   "validation": null
 }
