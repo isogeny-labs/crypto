@@ -107,6 +107,10 @@ impl FastF3 {
         self.counts.get()
     }
 
+    fn restore_counts(&self, counts: FieldCounts) {
+        self.counts.set(counts);
+    }
+
     fn bump(&self, f: impl FnOnce(&mut FieldCounts)) {
         let mut c = self.counts.get();
         f(&mut c);
@@ -410,6 +414,141 @@ impl<'a> FastEc<'a> {
         }
         out
     }
+
+    /// Complete affine batch addition for setup work.  Unlike the walk's
+    /// mixed-addition helper above, this also batches tangent denominators,
+    /// so a layer of independent doublings pays one field inversion.
+    fn batch_add_complete(&self, points: &[EP], addends: &[EP]) -> Vec<EP> {
+        assert_eq!(points.len(), addends.len());
+        let mut out = vec![EP::Inf; points.len()];
+        let mut active = Vec::new();
+        let mut nums = Vec::new();
+        let mut dens = Vec::new();
+        for i in 0..points.len() {
+            match (&points[i], &addends[i]) {
+                (EP::Inf, _) | (_, EP::Inf) => {
+                    out[i] = self.add(&points[i], &addends[i]);
+                }
+                (EP::A(x1, y1), EP::A(x2, y2)) if x1 == x2 => {
+                    if self.f.add(y1, y2) == KZERO {
+                        self.f.bump(|c| c.group_add += 1);
+                        out[i] = EP::Inf;
+                        continue;
+                    }
+                    let x12 = self.f.sq(x1);
+                    let three = self.f.add(&self.f.add(&x12, &x12), &x12);
+                    let num = self.f.add(
+                        &self
+                            .f
+                            .add(&three, &self.f.mul(&self.f.add(&self.a2, &self.a2), x1)),
+                        &self.a4,
+                    );
+                    active.push(i);
+                    nums.push(num);
+                    dens.push(self.f.add(y1, y1));
+                }
+                (EP::A(x1, y1), EP::A(x2, y2)) => {
+                    active.push(i);
+                    nums.push(self.f.sub(y2, y1));
+                    dens.push(self.f.sub(x2, x1));
+                }
+            }
+        }
+        let inv = self.f.batch_inv(&dens);
+        for (j, &i) in active.iter().enumerate() {
+            self.f.bump(|c| c.group_add += 1);
+            out[i] = self.add_with_inv_uncounted(&points[i], &addends[i], &inv[j], &nums[j]);
+        }
+        out
+    }
+
+    /// Cold width-2 table for simultaneous `[a]g + [b]q` multiplication.
+    /// All thirteen nontrivial construction operations are counted, while
+    /// their denominators are shared in three complete-addition batches.
+    fn window2_table(&self, g: &EP, q: &EP) -> [EP; 16] {
+        let mut table = [EP::Inf; 16];
+        table[4] = *g;
+        table[1] = *q;
+
+        let doubled = self.batch_add_complete(&[*g, *q], &[*g, *q]);
+        table[8] = doubled[0];
+        table[2] = doubled[1];
+        let tripled = self.batch_add_complete(&[table[8], table[2]], &[*g, *q]);
+        table[12] = tripled[0];
+        table[3] = tripled[1];
+
+        let mut left = Vec::with_capacity(9);
+        let mut right = Vec::with_capacity(9);
+        let mut slots = Vec::with_capacity(9);
+        for i in 1..4 {
+            for j in 1..4 {
+                left.push(table[4 * i]);
+                right.push(table[j]);
+                slots.push(4 * i + j);
+            }
+        }
+        let mixed = self.batch_add_complete(&left, &right);
+        for (&slot, point) in slots.iter().zip(mixed) {
+            table[slot] = point;
+        }
+        table
+    }
+
+    /// Evaluate many exact simultaneous multiplications with one shared,
+    /// cold-charged width-2 table. Each base-4 Horner layer batches all live
+    /// affine denominators across outputs.
+    fn batch_window2_mul(&self, table: &[EP; 16], coeffs: &[(u64, u64)]) -> Vec<EP> {
+        let Some(bits) = coeffs
+            .iter()
+            .map(|&(a, b)| 64 - (a | b).leading_zeros() as usize)
+            .max()
+        else {
+            return Vec::new();
+        };
+        if bits == 0 {
+            return vec![EP::Inf; coeffs.len()];
+        }
+        let top_shift = ((bits - 1) / 2) * 2;
+        let mut out = vec![EP::Inf; coeffs.len()];
+        let mut first = true;
+        for window in (0..=top_shift / 2).rev() {
+            let shift = 2 * window;
+            if !first {
+                for _ in 0..2 {
+                    let lanes: Vec<_> = out
+                        .iter()
+                        .enumerate()
+                        .filter_map(|(i, p)| (*p != EP::Inf).then_some(i))
+                        .collect();
+                    if !lanes.is_empty() {
+                        let points: Vec<_> = lanes.iter().map(|&i| out[i]).collect();
+                        let doubled = self.batch_add_complete(&points, &points);
+                        for (&i, point) in lanes.iter().zip(doubled) {
+                            out[i] = point;
+                        }
+                    }
+                }
+            }
+
+            let mut lanes = Vec::new();
+            let mut points = Vec::new();
+            let mut addends = Vec::new();
+            for (i, &(a, b)) in coeffs.iter().enumerate() {
+                let digit = ((((a >> shift) & 3) << 2) | ((b >> shift) & 3)) as usize;
+                if digit != 0 {
+                    lanes.push(i);
+                    points.push(out[i]);
+                    addends.push(table[digit]);
+                }
+            }
+            let summed = self.batch_add_complete(&points, &addends);
+            for (&i, point) in lanes.iter().zip(summed) {
+                out[i] = point;
+            }
+            first = false;
+        }
+        out
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -419,6 +558,9 @@ pub struct StrongOpts {
     pub dp_bits: u32,
     pub snapshot_period: u64,
     pub max_steps: u64,
+    /// Batch the cold jump/initial-walker simultaneous multiplications.
+    /// `false` is retained only as an in-source exact control.
+    pub batch_setup: bool,
 }
 
 impl StrongOpts {
@@ -431,6 +573,7 @@ impl StrongOpts {
             dp_bits,
             snapshot_period: 128,
             max_steps: 60 * (inst.ell as f64).sqrt() as u64 + 200_000,
+            batch_setup: true,
         }
     }
 }
@@ -540,6 +683,102 @@ fn new_walker(
                 snapshot: None,
             };
         }
+    }
+}
+
+struct InitialState {
+    ma: Vec<u64>,
+    mb: Vec<u64>,
+    mp: Vec<EP>,
+    walkers: Vec<Walker>,
+}
+
+/// Build the jump table and initial walkers. The candidate keeps the exact
+/// baseline RNG stream and coefficients; only point construction changes.
+fn initial_state(
+    ec: &FastEc<'_>,
+    f: &FastF3,
+    g: &EP,
+    q: &EP,
+    n: u64,
+    r: usize,
+    batch: usize,
+    rng: &mut Rng,
+    native: &mut NativeCounts,
+    batch_setup: bool,
+) -> InitialState {
+    let mut ma = Vec::with_capacity(r);
+    let mut mb = Vec::with_capacity(r);
+    for _ in 0..r {
+        ma.push(rng.below(n - 1) + 1);
+        mb.push(rng.below(n - 1) + 1);
+        native.rng_draws += 2;
+    }
+
+    if !batch_setup {
+        let mp = ma
+            .iter()
+            .zip(&mb)
+            .map(|(&a, &b)| ec.add(&ec.mul(g, a as u128), &ec.mul(q, b as u128)))
+            .collect();
+        let walkers = (0..batch)
+            .map(|_| new_walker(ec, f, g, q, n, rng, native))
+            .collect();
+        return InitialState {
+            ma,
+            mb,
+            mp,
+            walkers,
+        };
+    }
+
+    let table = ec.window2_table(g, q);
+    let jump_coeffs: Vec<_> = ma.iter().copied().zip(mb.iter().copied()).collect();
+    let mp = ec.batch_window2_mul(&table, &jump_coeffs);
+
+    // The baseline retries one lane to completion before drawing the next.
+    // Tentatively batch the overwhelmingly common no-identity case; on an
+    // identity, restore every observable counter and RNG bit before taking
+    // the exact sequential path.
+    let rng_before = rng.0;
+    let native_before = *native;
+    let field_before = f.counts();
+    let walker_coeffs: Vec<_> = (0..batch)
+        .map(|_| {
+            native.rng_draws += 2;
+            (rng.below(n), rng.below(n - 1) + 1)
+        })
+        .collect();
+    let walker_points = ec.batch_window2_mul(&table, &walker_coeffs);
+    let walkers = if walker_points.iter().any(|p| *p == EP::Inf) {
+        rng.0 = rng_before;
+        *native = native_before;
+        f.restore_counts(field_before);
+        (0..batch)
+            .map(|_| new_walker(ec, f, g, q, n, rng, native))
+            .collect()
+    } else {
+        walker_points
+            .into_iter()
+            .zip(walker_coeffs)
+            .map(|(p, (a, b))| {
+                let (p, a, b) = canon(f, p, a, b, n, native);
+                Walker {
+                    p,
+                    a,
+                    b,
+                    tail: 0,
+                    local: 0,
+                    snapshot: None,
+                }
+            })
+            .collect()
+    };
+    InitialState {
+        ma,
+        mb,
+        mp,
+        walkers,
     }
 }
 
@@ -678,21 +917,23 @@ pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> Stro
     let mut native = NativeCounts::default();
     let mut rng = Rng::new(seed ^ 0x4E45_47);
     let target = ec.mul(&inst.g, k_true as u128);
-
-    let mut ma = Vec::with_capacity(opts.r);
-    let mut mb = Vec::with_capacity(opts.r);
-    let mut mp = Vec::with_capacity(opts.r);
-    for _ in 0..opts.r {
-        let a = rng.below(n - 1) + 1;
-        let b = rng.below(n - 1) + 1;
-        native.rng_draws += 2;
-        ma.push(a);
-        mb.push(b);
-        mp.push(ec.add(&ec.mul(&inst.g, a as u128), &ec.mul(&target, b as u128)));
-    }
-    let mut walkers: Vec<_> = (0..opts.batch)
-        .map(|_| new_walker(&ec, &f, &inst.g, &target, n, &mut rng, &mut native))
-        .collect();
+    let InitialState {
+        ma,
+        mb,
+        mp,
+        mut walkers,
+    } = initial_state(
+        &ec,
+        &f,
+        &inst.g,
+        &target,
+        n,
+        opts.r,
+        opts.batch,
+        &mut rng,
+        &mut native,
+        opts.batch_setup,
+    );
     let setup_field = f.counts();
     let setup_native = native;
     let mask = (1u64 << opts.dp_bits) - 1;
@@ -909,10 +1150,104 @@ pub fn selftest() {
                 .map(|(p, q)| inst.ec.add(p, q))
                 .collect::<Vec<_>>()
         );
+        let neg_g = match inst.g {
+            EP::Inf => unreachable!(),
+            EP::A(x, y) => EP::A(x, f.neg(&y)),
+        };
+        let complete_left = [EP::Inf, inst.g, inst.g, inst.g, points[1], points[2]];
+        let complete_right = [inst.g, EP::Inf, inst.g, neg_g, points[1], points[7]];
+        assert_eq!(
+            ec.batch_add_complete(&complete_left, &complete_right),
+            complete_left
+                .iter()
+                .zip(&complete_right)
+                .map(|(p, q)| inst.ec.add(p, q))
+                .collect::<Vec<_>>()
+        );
         for k in [1u128, 2, 3, 17, 255, 65_537] {
             assert_eq!(ec.mul(&inst.g, k), inst.ec.mul(&inst.g, k));
         }
-        eprintln!("selftest: fast and batched curve addition match frozen curve");
+        let table = ec.window2_table(&inst.g, &points[16]);
+        let mut coeff_rng = Rng::new(0xB47C_2002);
+        let mut coeffs = vec![(0, 0), (1, 0), (0, 1), (3, 3), (inst.ell - 1, 1)];
+        coeffs.extend((0..64).map(|_| (coeff_rng.below(inst.ell), coeff_rng.below(inst.ell))));
+        let got = ec.batch_window2_mul(&table, &coeffs);
+        let expected: Vec<_> = coeffs
+            .iter()
+            .map(|&(a, b)| {
+                inst.ec.add(
+                    &inst.ec.mul(&inst.g, a as u128),
+                    &inst.ec.mul(&points[16], b as u128),
+                )
+            })
+            .collect();
+        assert_eq!(got, expected);
+        eprintln!(
+            "selftest: complete batches and width-2 simultaneous multiplication match frozen curve"
+        );
+    }
+    {
+        let inst = instance();
+        let target = inst.ec.mul(&inst.g, 119);
+        let f_legacy = FastF3::from_instance(&inst);
+        let ec_legacy = FastEc::from_instance(&f_legacy, &inst);
+        let f_batch = FastF3::from_instance(&inst);
+        let ec_batch = FastEc::from_instance(&f_batch, &inst);
+        let mut rng_legacy = Rng::new(0x51A7_E001);
+        let mut rng_batch = Rng::new(0x51A7_E001);
+        let mut native_legacy = NativeCounts::default();
+        let mut native_batch = NativeCounts::default();
+        let legacy = initial_state(
+            &ec_legacy,
+            &f_legacy,
+            &inst.g,
+            &target,
+            inst.ell,
+            32,
+            8,
+            &mut rng_legacy,
+            &mut native_legacy,
+            false,
+        );
+        let batched = initial_state(
+            &ec_batch,
+            &f_batch,
+            &inst.g,
+            &target,
+            inst.ell,
+            32,
+            8,
+            &mut rng_batch,
+            &mut native_batch,
+            true,
+        );
+        assert_eq!(legacy.ma, batched.ma);
+        assert_eq!(legacy.mb, batched.mb);
+        assert_eq!(legacy.mp, batched.mp);
+        assert_eq!(legacy.walkers.len(), batched.walkers.len());
+        for (a, b) in legacy.walkers.iter().zip(&batched.walkers) {
+            assert_eq!(a.p, b.p);
+            assert_eq!((a.a, a.b, a.tail, a.local), (b.a, b.b, b.tail, b.local));
+            assert_eq!(a.snapshot, b.snapshot);
+        }
+        assert_eq!(rng_legacy.0, rng_batch.0);
+        assert_eq!(native_legacy, native_batch);
+        let lc = f_legacy.counts();
+        let bc = f_batch.counts();
+        assert!(
+            bc.fq_mul <= lc.fq_mul,
+            "batch fq_mul {} > legacy {}",
+            bc.fq_mul,
+            lc.fq_mul
+        );
+        assert!(
+            bc.fq_inv <= lc.fq_inv,
+            "batch fq_inv {} > legacy {}",
+            bc.fq_inv,
+            lc.fq_inv
+        );
+        assert!(bc.fq_mul < lc.fq_mul || bc.fq_inv < lc.fq_inv);
+        eprintln!("selftest: setup state exact; field legacy={lc:?} batch={bc:?}");
     }
     {
         let inst = instance();
@@ -935,6 +1270,35 @@ pub fn selftest() {
             }
         }
         eprintln!("selftest: planted logs recovered at widths 1, 8, and 32");
+    }
+    {
+        let inst = instance();
+        let mut legacy_opts = StrongOpts::for_instance(&inst, 8);
+        legacy_opts.batch_setup = false;
+        let legacy = strong_rho(&inst, 119, 0xC01D, legacy_opts);
+        let batched = strong_rho(&inst, 119, 0xC01D, StrongOpts::for_instance(&inst, 8));
+        assert!(legacy.ok && batched.ok);
+        assert_eq!(legacy.found, batched.found);
+        assert_eq!(legacy.steps, batched.steps);
+        assert_eq!(legacy.dps, batched.dps);
+        assert_eq!(legacy.restarts, batched.restarts);
+        assert_eq!(legacy.lookahead, batched.lookahead);
+        assert_eq!(legacy.cycles, batched.cycles);
+        assert_eq!(legacy.cycle_adds, batched.cycle_adds);
+        assert_eq!(legacy.setup_native, batched.setup_native);
+        assert_eq!(legacy.walk_field, batched.walk_field);
+        assert_eq!(legacy.verify_field, batched.verify_field);
+        assert_eq!(legacy.walk_native, batched.walk_native);
+        assert!(batched.setup_field.fq_mul <= legacy.setup_field.fq_mul);
+        assert!(batched.setup_field.fq_inv <= legacy.setup_field.fq_inv);
+        assert!(
+            batched.setup_field.fq_mul < legacy.setup_field.fq_mul
+                || batched.setup_field.fq_inv < legacy.setup_field.fq_inv
+        );
+        eprintln!(
+            "selftest: full trajectory exact; setup legacy={:?} batch={:?}",
+            legacy.setup_field, batched.setup_field
+        );
     }
     println!("SELFTEST OK");
 }
