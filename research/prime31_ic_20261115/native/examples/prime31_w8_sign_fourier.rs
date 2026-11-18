@@ -97,7 +97,8 @@ fn fourier(points:&[(u64,u64);8],r:(u64,u64))->([u64;256],Ops){
 fn base(ar:&mut Arithmetic)->Vec<(u64,u64)>{
  let mut v=Vec::new();
  for x in 0..10_000{
-  if let Some(y)=ar.sqrt(ar.rhs(PRIME31,x),P){
+  let rhs=ar.rhs(PRIME31,x);
+  if let Some(y)=ar.sqrt(rhs,P){
    if y!=0{let q=(x,y.min(P-y));assert!(ar.on_curve(PRIME31,Some(q)));v.push(q)}
   }
   if v.len()==31{break}
