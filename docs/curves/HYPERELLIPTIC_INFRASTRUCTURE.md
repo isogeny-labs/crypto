@@ -664,9 +664,11 @@ The exported catalog identifies its wrapper with
 `generated_by = "hyperelliptic-cover catalog-export"`. Its
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
-that order. Read the value from the exact export rather than copying a digest
-from an earlier revision. Changing any of the three producer inputs changes
-the provenance digest. Both
+that order. At this revision that digest is
+`7b25f2e1c4830be8bec5d98f13a136df5722c916f2bb431ba3433d0910a6e9cc`.
+Read the value from the exact export rather than copying a digest from an
+earlier revision. Changing any of the three producer inputs changes the
+provenance digest, so this literal must change with them. Both
 `hyperelliptic-cover catalog-export` and `curve_cover_check` require callers
 to supply a registry path; the release archive bundles one, but neither
 executable embeds it.
