@@ -1127,19 +1127,88 @@ function membership(profileId, members, domain) {
 }
 
 async function buildLedger() {
-  const [covers, graph] = await Promise.all([
+  const [registry, covers, graph] = await Promise.all([
+    readJson("docs/curves/registry.json"),
     readJson("docs/curves/covers.json"),
     readJson("docs/curves/cover-links.yaml"),
   ]);
+
+  const registryRowsByModel = new Map(
+    registry.curves.map((row) => [sha256Bytes(row.model_json), row]),
+  );
+  const coverRowsByModel = new Map(
+    covers.curves.map((row) => [row.model_sha256, row]),
+  );
+  const graphRowsByModel = new Map(
+    graph.curves.map((row) => [row.model_sha256, row]),
+  );
+  assert(
+    registryRowsByModel.size === registry.curves.length,
+    "duplicate registry model",
+  );
+  assert(
+    coverRowsByModel.size === covers.curves.length,
+    "duplicate cover model",
+  );
+  assert(
+    graphRowsByModel.size === graph.curves.length,
+    "duplicate graph model",
+  );
+
+  const sortedModelHashes = (rowsByModel) => [...rowsByModel.keys()].sort(compareText);
+  const registryModelHashes = sortedModelHashes(registryRowsByModel);
+  assert(
+    canonicalJson(sortedModelHashes(coverRowsByModel)) === canonicalJson(registryModelHashes),
+    "cover rows: not the exact catalog membership",
+  );
+  assert(
+    canonicalJson(sortedModelHashes(graphRowsByModel)) === canonicalJson(registryModelHashes),
+    "graph rows: not the exact catalog membership",
+  );
+
+  const comparableRepresentation = (representation) => ({
+    ec1: representation.ec1,
+    curve_uid: representation.curve_uid,
+    field: representation.field,
+    curve: representation.curve,
+  });
+  for (const [modelHash, registryRow] of registryRowsByModel) {
+    const graphRow = graphRowsByModel.get(modelHash);
+    assert(graphRow.icv1_identity.slug === registryRow.slug, "registry slug binding mismatch");
+    assert(graphRow.model_json === registryRow.model_json, "registry model binding mismatch");
+    const registryRepresentations = registryRow.representations
+      .map(comparableRepresentation)
+      .sort((left, right) => compareText(left.ec1, right.ec1));
+    const graphRepresentations = graphRow.representations
+      .map(comparableRepresentation)
+      .sort((left, right) => compareText(left.ec1, right.ec1));
+    assert(
+      canonicalJson(graphRepresentations) === canonicalJson(registryRepresentations),
+      "registry representation binding mismatch",
+    );
+  }
+
+  const linkedMapUids = sortedUnique(
+    graph.curves.flatMap((curve) => curve.cover_links.map((link) => link.map_uid)),
+    "curve map links",
+  );
+  assert(
+    canonicalJson(Object.keys(graph.maps).sort(compareText)) === canonicalJson(linkedMapUids),
+    "typed map bindings: not the exact catalog membership",
+  );
+  const linkedCoverUids = [...new Set(
+    graph.curves.flatMap((curve) => curve.cover_links.map((link) => link.cover_uid)),
+  )].sort(compareText);
+  assert(
+    canonicalJson(Object.keys(graph.covers).sort(compareText)) === canonicalJson(linkedCoverUids),
+    "typed cover bindings: not the exact catalog membership",
+  );
+
+  assert(registry.curves.length === 15791, "unexpected registry row count");
   assert(covers.curves.length === 15791, "unexpected covers row count");
   assert(Object.keys(graph.maps).length === 15791, "unexpected graph map count");
   assert(Object.keys(graph.covers).length === 15789, "unexpected graph cover count");
   assert(graph.curves.length === 15791, "unexpected graph curve count");
-
-  const coverRowsByModel = new Map(
-    covers.curves.map((row) => [row.model_sha256, row]),
-  );
-  assert(coverRowsByModel.size === 15791, "cover rows must have unique model hashes");
 
   const mapMembers = new Map(
     Object.entries(profiles)
