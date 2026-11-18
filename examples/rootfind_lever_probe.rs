@@ -117,6 +117,9 @@ struct WordBloom {
     words: Vec<u64>,
     mask: usize,
     h: u32,
+    /// One multiply and four fixed bits: the keys are uniform field
+    /// elements already, so a single odd-constant product spreads them.
+    cheap: bool,
 }
 
 impl WordBloom {
@@ -126,10 +129,24 @@ impl WordBloom {
             words: vec![0; words],
             mask: words - 1,
             h,
+            cheap: false,
         }
+    }
+    fn new_cheap(keys: usize, bits_per_key: usize) -> Self {
+        let mut b = Self::new(keys, bits_per_key, 4);
+        b.cheap = true;
+        b
     }
     #[inline(always)]
     fn slot(&self, key: u64) -> (usize, u64) {
+        if self.cheap {
+            let h = key.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+            let bits = (1u64 << (h & 63))
+                | (1u64 << ((h >> 6) & 63))
+                | (1u64 << ((h >> 12) & 63))
+                | (1u64 << ((h >> 18) & 63));
+            return ((h >> 34) as usize & self.mask, bits);
+        }
         let h = key.wrapping_mul(0x9E37_79B9_7F4A_7C15);
         let h2 = (h ^ (h >> 29)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
         let mut bits = 0u64;
@@ -397,18 +414,47 @@ type FastSet = HashSet<u64, BuildHasherDefault<MixHasher>>;
 /// filter while it is still in L1.
 const BLK: usize = 32;
 
+/// Storage of the forward-pass prefix products: `u64`, or `u32` (residues
+/// are below 2^32), which halves the `A K` array that shares L2 with the filter.
+trait PreSlot: Copy + Default {
+    fn put(v: u64) -> Self;
+    fn get(self) -> u64;
+}
+
+impl PreSlot for u64 {
+    #[inline(always)]
+    fn put(v: u64) -> Self {
+        v
+    }
+    #[inline(always)]
+    fn get(self) -> u64 {
+        self
+    }
+}
+
+impl PreSlot for u32 {
+    #[inline(always)]
+    fn put(v: u64) -> Self {
+        v as u32
+    }
+    #[inline(always)]
+    fn get(self) -> u64 {
+        u64::from(self)
+    }
+}
+
 /// `row_lanes` with the filter fused into the backward pass: every `BLK`
 /// abscissae a lane, the block (`2 K BLK` values, L1-resident) goes to
 /// `sink` instead of a `2 A K` row buffer that competes with the filter for L2.
 #[inline(always)]
 #[allow(clippy::too_many_arguments)]
-fn row_lanes_fused<const K: usize, F: FnMut(&[u64])>(
+fn row_lanes_fused<const K: usize, P: PreSlot, F: FnMut(&[u64])>(
     f: &Mont,
     bx: &[u64],
     by: &[u64],
     xr: &[u64; K],
     yr: &[u64; K],
-    pre: &mut [u64],
+    pre: &mut [P],
     buf: &mut [u64],
     mut sink: F,
 ) {
@@ -420,7 +466,7 @@ fn row_lanes_fused<const K: usize, F: FnMut(&[u64])>(
         let p = &mut pre[k * K..k * K + K];
         for l in 0..K {
             let d = f.sub(xr[l], b);
-            p[l] = acc[l];
+            p[l] = P::put(acc[l]);
             acc[l] = f.mul(acc[l], if d == 0 { one } else { d });
         }
     }
@@ -445,7 +491,7 @@ fn row_lanes_fused<const K: usize, F: FnMut(&[u64])>(
         for l in 0..K {
             let d = f.sub(xr[l], b);
             let zero = d == 0;
-            let dinv = f.mul(inv[l], p[l]);
+            let dinv = f.mul(inv[l], p[l].get());
             inv[l] = f.mul(inv[l], if zero { one } else { d });
             let base = f.add(xr[l], b);
             let lm = f.mul(f.add(yr[l], c), dinv);
@@ -487,7 +533,7 @@ fn pipeline_fused<const K: usize>(
     for chunk in tm.chunks_exact(K) {
         let xr: [u64; K] = std::array::from_fn(|l| chunk[l].0);
         let yr: [u64; K] = std::array::from_fn(|l| chunk[l].1);
-        row_lanes_fused::<K, _>(f, bx, by, &xr, &yr, &mut pre, &mut buf, |blk| {
+        row_lanes_fused::<K, u64, _>(f, bx, by, &xr, &yr, &mut pre, &mut buf, |blk| {
             for &x in blk {
                 let pass = match bloom {
                     Some(b) => b.maybe(x),
@@ -532,6 +578,106 @@ fn pipeline_fused_any(
         unsafe { lanes_dispatch!(k, pipeline_fused_v, f, bx, by, tm, bloom, keys) }
     } else {
         lanes_dispatch!(k, pipeline_fused, f, bx, by, tm, bloom, keys)
+    }
+}
+
+/// Probe-side variants of the fused pipeline at 16 lanes, one change at a
+/// time: `PF` prefetches each block's filter words before probing them (the
+/// block's 2 K BLK probes then overlap their L2 misses), `P` sets the width of
+/// the prefix-product array, `blk` the abscissae per lane in a block.
+#[inline(always)]
+#[allow(clippy::too_many_arguments)]
+fn pipeline_tuned<const PF: bool, P: PreSlot>(
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+    bloom: &WordBloom,
+    keys: &HashSet<u64, impl BuildHasher>,
+    blk: usize,
+) -> u64 {
+    const K: usize = 16;
+    let a = bx.len();
+    let mut pre = vec![P::default(); a * K];
+    let mut buf = vec![0u64; 2 * K * blk];
+    let mut found = 0;
+    for chunk in tm.chunks_exact(K) {
+        let xr: [u64; K] = std::array::from_fn(|l| chunk[l].0);
+        let yr: [u64; K] = std::array::from_fn(|l| chunk[l].1);
+        row_lanes_fused::<K, P, _>(f, bx, by, &xr, &yr, &mut pre, &mut buf, |block| {
+            if PF {
+                #[cfg(target_arch = "x86_64")]
+                for &x in block {
+                    let (w, _) = bloom.slot(x);
+                    // SAFETY: `w` is masked to the word array's length.
+                    unsafe {
+                        use std::arch::x86_64::{_mm_prefetch, _MM_HINT_T0};
+                        _mm_prefetch::<_MM_HINT_T0>(bloom.words.as_ptr().add(w) as *const i8);
+                    }
+                }
+            }
+            for &x in block {
+                if bloom.maybe(x) && x != u64::MAX && keys.contains(&x) {
+                    found += 1;
+                }
+            }
+        });
+    }
+    found
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2,avx512f,avx512dq,avx512vl,bmi2")]
+#[allow(clippy::too_many_arguments)]
+unsafe fn pipeline_tuned_v<const PF: bool, P: PreSlot>(
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+    bloom: &WordBloom,
+    keys: &HashSet<u64, impl BuildHasher>,
+    blk: usize,
+) -> u64 {
+    pipeline_tuned::<PF, P>(f, bx, by, tm, bloom, keys, blk)
+}
+
+/// The probe-side arms, by name: (prefetch, 32-bit prefix array, block).
+const TUNED_ARMS: [(&str, bool, bool, usize); 6] = [
+    ("fused", false, false, 32),
+    ("prefetch", true, false, 32),
+    ("pre32", false, true, 32),
+    ("prefetch+pre32", true, true, 32),
+    ("prefetch+pre32+blk128", true, true, 128),
+    ("prefetch+pre32+blk8", true, true, 8),
+];
+
+#[allow(clippy::too_many_arguments)]
+fn pipeline_tuned_any(
+    arm: (&str, bool, bool, usize),
+    simd: bool,
+    f: &Mont,
+    bx: &[u64],
+    by: &[u64],
+    tm: &[(u64, u64)],
+    bloom: &WordBloom,
+    keys: &HashSet<u64, impl BuildHasher>,
+) -> u64 {
+    let (_, pf, p32, blk) = arm;
+    macro_rules! go {
+        ($pf:literal, $p:ty) => {
+            if simd {
+                // SAFETY: only called when have_avx512() is true.
+                unsafe { pipeline_tuned_v::<$pf, $p>(f, bx, by, tm, bloom, keys, blk) }
+            } else {
+                pipeline_tuned::<$pf, $p>(f, bx, by, tm, bloom, keys, blk)
+            }
+        };
+    }
+    match (pf, p32) {
+        (false, false) => go!(false, u64),
+        (true, false) => go!(true, u64),
+        (false, true) => go!(false, u32),
+        (true, true) => go!(true, u32),
     }
 }
 
@@ -822,6 +968,81 @@ fn main() {
             assert_eq!(n, hits_ref);
         }
 
+        let mut bloom8c = WordBloom::new_cheap(keys.len(), 8);
+        for &k in &keys {
+            bloom8c.insert(k);
+        }
+        let (t_cheap_filter, pos_c) = best(reps, || {
+            let mut pos = 0u64;
+            for _ in 0..probe_rounds {
+                pos += sample.iter().filter(|x| bloom8c.maybe(**x)).count() as u64;
+            }
+            pos
+        });
+        let cheap_fpr = (pos_c / probe_rounds as u64 - sample_hits) as f64 / sample.len() as f64;
+
+        // Probe-side arms (16 lanes, 8-bit filter, mix-hash set), interleaved
+        // round by round so drift on the shared host hits every arm alike.
+        let mut tuned_best = vec![f64::INFINITY; TUNED_ARMS.len()];
+        let mut t_cheap_pipe = f64::INFINITY;
+        for _ in 0..reps {
+            for (i, &arm) in TUNED_ARMS.iter().enumerate() {
+                let t0 = Instant::now();
+                let n = black_box(pipeline_tuned_any(
+                    arm, best_simd, &f, &bx, &by, &tm, &bloom8, &fast,
+                ));
+                tuned_best[i] = tuned_best[i].min(t0.elapsed().as_secs_f64());
+                assert_eq!(n, hits_ref, "arm {}", arm.0);
+            }
+            let t0 = Instant::now();
+            let n = black_box(pipeline_tuned_any(
+                TUNED_ARMS[0],
+                best_simd,
+                &f,
+                &bx,
+                &by,
+                &tm,
+                &bloom8c,
+                &fast,
+            ));
+            t_cheap_pipe = t_cheap_pipe.min(t0.elapsed().as_secs_f64());
+            assert_eq!(n, hits_ref, "cheap-hash arm");
+        }
+        let mut tuned_ns = serde_json::Map::new();
+        for (i, arm) in TUNED_ARMS.iter().enumerate() {
+            tuned_ns.insert(arm.0.to_string(), json!(tuned_best[i] * 1e9 / points));
+        }
+        // Lever 4 again on the best probe-side arm.
+        let best_arm = TUNED_ARMS[(0..TUNED_ARMS.len())
+            .min_by(|&x, &y| tuned_best[x].total_cmp(&tuned_best[y]))
+            .unwrap()];
+        let mut tuned_threads_ns = serde_json::Map::new();
+        if best_k == 16 {
+            for &nt in &thread_set {
+                let per = (tm.len() / nt / 16) * 16;
+                let (t, found) = best(reps, || {
+                    std::thread::scope(|s| {
+                        let hs: Vec<_> = (0..nt)
+                            .map(|i| {
+                                let part = &tm[i * per..(i + 1) * per];
+                                let (f, bx, by, fast, bl) = (&f, &bx, &by, &fast, &bloom8);
+                                s.spawn(move || {
+                                    pipeline_tuned_any(
+                                        best_arm, best_simd, f, bx, by, part, bl, fast,
+                                    )
+                                })
+                            })
+                            .collect();
+                        hs.into_iter().map(|h| h.join().unwrap()).sum::<u64>()
+                    })
+                });
+                if per * nt == tm.len() {
+                    assert_eq!(found, hits_ref);
+                }
+                tuned_threads_ns.insert(nt.to_string(), json!(t * 1e9 / (per * nt * 2 * a) as f64));
+            }
+        }
+
         // Lever 4: threads over targets.
         let mut threads_ns = serde_json::Map::new();
         for &nt in &thread_set {
@@ -886,6 +1107,12 @@ fn main() {
                 "fused_ns_per_point_filter8_mix_set": t_fused_fast * 1e9 / points,
                 "fused_ns_per_point_filter16_mix_set": t_fused_fast16 * 1e9 / points,
                 "fused_ns_per_point_no_filter_mix_set": t_fused_nofilter * 1e9 / points,
+                "probe_side_ns_per_point_by_arm": tuned_ns,
+                "probe_side_best_arm": best_arm.0,
+                "cheap_hash_filter8_ns_per_probe": t_cheap_filter * 1e9 / probes,
+                "cheap_hash_filter8_false_positive_rate": cheap_fpr,
+                "cheap_hash_fused_ns_per_point": t_cheap_pipe * 1e9 / points,
+                "probe_side_best_arm_ns_per_point_by_threads": tuned_threads_ns,
                 "lever4_ns_per_point_by_threads": threads_ns,
             })
         );
