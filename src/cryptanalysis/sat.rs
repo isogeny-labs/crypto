@@ -422,11 +422,10 @@ pub struct SolverStats {
     /// Literals implied by a parity row.
     pub xor_propagations: u64,
     pub xor_conflicts: u64,
-    /// Times a row had to choose a new pivot, the only work the
-    /// incremental matrix does beyond a popcount per row.
+    /// Visits to rows without an intact unassigned pivot, including
+    /// fully assigned rows whose residual is checked again.
     pub xor_repivots: u64,
-    /// Satisfied, fully assigned rows skipped by the opt-in cache
-    /// ([`Solver::set_xor_decided_cache`]).
+    /// Satisfied, fully assigned rows skipped by the opt-in cache.
     pub xor_decided_skips: u64,
     pub learnt_clauses: u64,
 
@@ -848,9 +847,9 @@ pub struct Solver {
     /// `pivot[i]` is row `i`'s basic variable; `None` once the row has
     /// no unassigned variable left.
     pivot: Vec<Option<u32>>,
-    /// Opt-in ([`Self::set_xor_decided_cache`]): `xor_decided[i]` marks a
-    /// fully assigned, satisfied row that later assignments cannot change.
-    /// Backjumping and every matrix mutation invalidate it.
+    /// Opt-in policy set by `set_xor_decided_cache`: `xor_decided[i]` marks
+    /// row `i` fully assigned and satisfied since the last unassignment or
+    /// matrix mutation.  Empty while the policy is off.
     cache_decided_xors: bool,
     xor_decided: Vec<bool>,
     /// Scratch copy of the row being pivoted on, reused across passes.
@@ -1167,6 +1166,18 @@ impl Solver {
                 )
             }
         }
+    }
+
+    /// Skip rechecking satisfied, fully assigned XOR rows until an
+    /// unassignment or matrix mutation. Disabled by default. Changing the
+    /// setting invalidates every cached row, including during incremental use.
+    pub fn set_xor_decided_cache(&mut self, enabled: bool) {
+        self.cache_decided_xors = enabled;
+        self.xor_decided.clear();
+        if enabled {
+            self.xor_decided.resize(self.matrix_rhs.len(), false);
+        }
+        self.xor_epoch = u64::MAX;
     }
 
     /// Install an observer before search. Existing counters are copied so a
@@ -2257,10 +2268,6 @@ impl Solver {
             if !self.native_charge(NativeOperation::XorPivot, 16) {
                 return XorStep::Refused;
             }
-            if self.cache_decided_xors && self.xor_decided[i] {
-                self.stats.xor_decided_skips += 1;
-                continue;
-            }
             let intact = match self.pivot[i] {
                 Some(p) => self.var_value(p as usize).is_none(),
                 None => false,
@@ -2345,12 +2352,6 @@ impl Solver {
                         }
                         return XorStep::Conflict;
                     }
-                    if self.cache_decided_xors {
-                        // All row variables are assigned and its residual is
-                        // false. Further assignments cannot change this row.
-                        // Backjump and every matrix mutation invalidate it.
-                        self.xor_decided[i] = true;
-                    }
                 }
                 Some(p) => {
                     self.pivot[i] = Some(p);
@@ -2423,9 +2424,6 @@ impl Solver {
                             break;
                         }
                         row_ops += 1;
-                        if self.cache_decided_xors {
-                            self.xor_decided[j] = false;
-                        }
                         if self.native_admission.is_some() {
                             self.native_partial_xor = Some((i, j, 0, true));
                         }
@@ -2704,6 +2702,7 @@ impl Solver {
         }
         // Every row's words copied, its rhs and its pivot slot reset.
         self.stats.word_ops += total as u64 + 2 * self.xors.len() as u64;
+        self.xor_decided.clear();
         self.matrix.clear();
         self.matrix_rhs.clear();
         self.matrix_support.clear();
@@ -2752,7 +2751,6 @@ impl Solver {
         } else {
             self.pivot.resize(self.matrix_rhs.len(), None);
         }
-        self.xor_decided.clear();
         if self.cache_decided_xors {
             self.xor_decided.resize(self.matrix_rhs.len(), false);
         }
@@ -2762,18 +2760,6 @@ impl Solver {
             }
             self.emit(SolverEvent::XorMatrixReset);
         }
-    }
-
-    /// Skip rechecking satisfied, fully assigned XOR rows until an
-    /// unassignment or matrix mutation. Disabled by default. Changing the
-    /// setting invalidates every cached row, including during incremental use.
-    pub fn set_xor_decided_cache(&mut self, enabled: bool) {
-        self.cache_decided_xors = enabled;
-        self.xor_decided.clear();
-        if enabled {
-            self.xor_decided.resize(self.matrix_rhs.len(), false);
-        }
-        self.xor_epoch = u64::MAX;
     }
 
     /// Select the dense reference or exact nonzero-word engine. Resetting the
@@ -3517,6 +3503,7 @@ impl Solver {
             return;
         }
         let target = self.trail_lim[level];
+        self.xor_decided.fill(false);
         let work = (self.trail.len() - target) as u64
             * (16 + 8 * (u32::BITS - self.n_vars.leading_zeros()) as u64);
         if !self.native_charge(NativeOperation::Backjump, work) {
@@ -3549,8 +3536,6 @@ impl Solver {
         // Each unassignment: the two literal slots, the bitset word and
         // the level; the heap re-insertion charges itself.
         self.stats.word_ops += 3 * (self.trail.len() - target) as u64 + 1;
-        // Unassignment can falsify a cached "decided and satisfied" row.
-        self.xor_decided.fill(false);
         while self.trail.len() > target {
             if !self.native_charge(NativeOperation::Backjump, 0) {
                 return;
@@ -4026,6 +4011,31 @@ impl Solver {
         result
     }
 
+    /// Solve while allowing a theory callback to install globally valid lazy
+    /// clauses whenever every `trigger_var` is assigned.
+    ///
+    /// The callback sees the current partial assignment and may return guarded
+    /// consequence clauses. Non-unit clauses are attached at the current
+    /// propagation fixpoint, where they can imply theory variables without
+    /// losing the decisions that selected the current pattern. Empty or unit
+    /// consequences use the conservative level-zero [`Self::add_clause`] path.
+    /// Returning `None` means the current frontier has already been handled and
+    /// ordinary CDCL should continue.
+    ///
+    /// The caller is responsible for clause soundness.  This is intended for
+    /// small theory propagators whose consequences are expensive to encode
+    /// eagerly, such as finite-field root relations.
+    pub fn solve_with_lazy_clauses<F>(
+        &mut self,
+        trigger_vars: &[u32],
+        theory: &mut F,
+    ) -> SolveResult
+    where
+        F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
+    {
+        self.solve_entry(trigger_vars, theory, &[], false)
+    }
+
     /// **Solve under assumptions** (MiniSat semantics).
     ///
     /// Each literal of `assumptions` (1-indexed, signed as in
@@ -4058,10 +4068,7 @@ impl Solver {
     /// those of [`Self::solve`]; it differs in two incremental details:
     /// each call forces one Gauss-Jordan pass at level 0, and a level-0
     /// conflict (the formula itself unsat) is remembered, so later calls
-    /// return `Unsat` at once.  (`solve()` re-run after a level-0 parity
-    /// conflict skips that pass and can meet the conflict above level 0
-    /// with a reason of level-0 literals only; the tests here found that
-    /// on repeated calls, and this entry point avoids it.)
+    /// return `Unsat` at once.
     pub fn solve_with_assumptions(&mut self, assumptions: &[Lit]) -> SolveResult {
         for &a in assumptions {
             assert!(
@@ -4082,34 +4089,9 @@ impl Solver {
         self.assumption_decisions
     }
 
-    /// Solve while allowing a theory callback to install globally valid lazy
-    /// clauses whenever every `trigger_var` is assigned.
-    ///
-    /// The callback sees the current partial assignment and may return guarded
-    /// consequence clauses. Non-unit clauses are attached at the current
-    /// propagation fixpoint, where they can imply theory variables without
-    /// losing the decisions that selected the current pattern. Empty or unit
-    /// consequences use the conservative level-zero [`Self::add_clause`] path.
-    /// Returning `None` means the current frontier has already been handled and
-    /// ordinary CDCL should continue.
-    ///
-    /// The caller is responsible for clause soundness.  This is intended for
-    /// small theory propagators whose consequences are expensive to encode
-    /// eagerly, such as finite-field root relations.
-    pub fn solve_with_lazy_clauses<F>(
-        &mut self,
-        trigger_vars: &[u32],
-        theory: &mut F,
-    ) -> SolveResult
-    where
-        F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
-    {
-        self.solve_entry(trigger_vars, theory, &[], false)
-    }
-
     /// Shared entry of [`Self::solve_with_lazy_clauses`] and
     /// [`Self::solve_with_assumptions`]: native admission, observer
-    /// begin/end events and the phase trace around the search.
+    /// begin/end events and the phase trace around the CDCL loop.
     fn solve_entry<F>(
         &mut self,
         trigger_vars: &[u32],
@@ -4740,7 +4722,6 @@ impl Solver {
                         }
                     }
                     if let Some(lit) = next_assumption {
-                        // Charged exactly like a free decision below.
                         let needed = self.trail_lim.len() + 1;
                         if !native_reserve(
                             &mut self.trail_lim,
@@ -4753,7 +4734,6 @@ impl Solver {
                             return SolveResult::Unknown;
                         }
                         self.stats.decisions += 1;
-                        self.stats.word_ops += 2;
                         self.assumption_decisions += 1;
                         self.trail_lim.push(self.trail.len());
                         if self.observing() {
@@ -4773,11 +4753,6 @@ impl Solver {
                             return SolveResult::Unknown;
                         }
                         self.assign(lit, Reason::Decision);
-                        if let Some(progress) = &self.progress {
-                            progress
-                                .decisions
-                                .store(self.stats.decisions, Ordering::Relaxed);
-                        }
                         continue;
                     }
                 }
@@ -7801,6 +7776,106 @@ mod tests {
         assert_eq!(s.solve_with_assumptions(&[1]), SolveResult::Unsat);
         assert_eq!(s.solve_with_assumptions(&[-1, 2]), SolveResult::Unsat);
         assert_eq!(s.solve(), SolveResult::Unsat);
+    }
+
+    // ── xor_decided cache ──────────────────────────────────────────
+
+    #[test]
+    fn decided_xor_cache_invalidates_on_backjump_and_matrix_changes() {
+        let mut s = Solver::new(3);
+        s.set_xor_decided_cache(true);
+        assert!(s.add_xor(&[1, 2], false));
+        s.trail_lim.push(0);
+        s.enqueue(1, Reason::Decision).unwrap();
+        s.enqueue(2, Reason::Decision).unwrap();
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.xor_decided, vec![true]);
+        s.enqueue(3, Reason::Decision).unwrap();
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.stats.xor_decided_skips, 1);
+        s.backjump(0);
+        assert_eq!(s.xor_decided, vec![false]);
+        s.trail_lim.push(0);
+        s.enqueue(1, Reason::Decision).unwrap();
+        s.enqueue(-2, Reason::Decision).unwrap();
+        assert!(matches!(s.propagate_xors(), XorStep::Conflict));
+        s.backjump(0);
+        s.rebuild_matrix();
+        assert_eq!(s.xor_decided, vec![false]);
+        s.add_vars(2);
+        assert!(s.xor_decided.is_empty());
+        assert!(s.add_xor(&[4, 5], true));
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.xor_decided.len(), 2);
+        s.set_xor_decided_cache(false);
+        assert!(s.xor_decided.is_empty());
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+    }
+
+    #[test]
+    fn decided_xor_cache_matches_mixed_cnf_xor_truth_tables() {
+        let mut state = 0x2718_2818_2845_9045u64;
+        let mut next = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        for trial in 0..400 {
+            let mut a = Solver::new(8);
+            let mut b = Solver::new(8);
+            b.set_xor_decided_cache(true);
+            let mut rows = Vec::new();
+            let mut clauses = Vec::new();
+            for _ in 0..6 {
+                let vars: Vec<u32> = (1..=8).filter(|_| next() & 1 == 1).collect();
+                let rhs = next() & 1 == 1;
+                assert_eq!(a.add_xor(&vars, rhs), b.add_xor(&vars, rhs));
+                rows.push((vars, rhs));
+            }
+            for _ in 0..16 {
+                let lits: Vec<Lit> = (0..3)
+                    .map(|_| {
+                        let v = (next() % 8 + 1) as Lit;
+                        if next() & 1 == 1 {
+                            v
+                        } else {
+                            -v
+                        }
+                    })
+                    .collect();
+                assert_eq!(a.add_clause(lits.clone()), b.add_clause(lits.clone()));
+                clauses.push(lits);
+            }
+            let brute = (0..256u32).any(|bits| {
+                rows.iter().all(|(vs, rhs)| {
+                    vs.iter().filter(|&&v| bits & (1 << (v - 1)) != 0).count() % 2 == *rhs as usize
+                }) && clauses.iter().all(|c| {
+                    c.iter()
+                        .any(|&l| ((bits & (1 << (l.unsigned_abs() - 1))) != 0) == (l > 0))
+                })
+            });
+            let x = a.solve();
+            let y = b.solve();
+            assert_eq!(x, y, "trial {trial}");
+            assert_eq!(x == SolveResult::Sat, brute, "trial {trial}");
+            if x == SolveResult::Sat {
+                assert_eq!(a.model(), b.model(), "trial {trial}");
+                assert!(b.check_xors(&b.model()));
+                assert!(clauses
+                    .iter()
+                    .all(|c| c.iter().any(|&l| b.lit_value(l) == Some(true))));
+            }
+            assert_eq!(a.stats.decisions, b.stats.decisions);
+            assert_eq!(a.stats.conflicts, b.stats.conflicts);
+            assert_eq!(a.stats.xor_passes, b.stats.xor_passes);
+            assert_eq!(a.stats.xor_row_ops, b.stats.xor_row_ops);
+            assert_eq!(a.stats.xor_row_scans, b.stats.xor_row_scans);
+            assert_eq!(
+                a.stats.xor_repivots,
+                b.stats.xor_repivots + b.stats.xor_decided_skips
+            );
+        }
     }
 }
 

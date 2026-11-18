@@ -1,7 +1,6 @@
 //! Independent accounting reconstruction; never alters sealed records.
-use crypto_lib::cryptanalysis::ecbench::{
-    band, exact_scalar::ExactScalar, methods::PRICED_NATIVE, record::Record,
-};
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
+use crypto_lib::cryptanalysis::ecbench::{band, methods::PRICED_NATIVE, record::Record};
 use crypto_lib::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, fq_muls_per_add, BinCurve};
 use crypto_lib::cryptanalysis::ic_boundary::pinned_calibration_ratios;
 use rand::{rngs::StdRng, SeedableRng};
@@ -34,12 +33,12 @@ fn virtual_row(v: &Value) -> (Map<String, Value>, Value) {
     let h = spec["max_cofactor"].as_u64().unwrap();
     let inst = find_bin_curve(m, seed, h).unwrap();
     let facts = &v["workload"]["curve"];
-    // Records carry orders as `ExactScalar` (a JSON number up to u64, else a
-    // decimal string); compare exactly through its own decoder.
-    let scalar = |v: &Value| serde_json::from_value::<ExactScalar>(v.clone()).unwrap();
-    assert_eq!(scalar(&facts["r"]), ExactScalar::from(inst.r));
+    // Orders are u128 in BinCurve and ExactScalar (number through u64,
+    // decimal string above) in the record; compare exactly.
+    let exact = |x: &Value| serde_json::from_value::<ExactScalar>(x.clone()).unwrap();
+    assert_eq!(exact(&facts["r"]), ExactScalar::from(inst.r));
     assert_eq!(
-        scalar(&facts["group_order"]),
+        exact(&facts["group_order"]),
         ExactScalar::from(inst.group_order)
     );
     for (j, coord) in [inst.generator.x, inst.generator.y].into_iter().enumerate() {

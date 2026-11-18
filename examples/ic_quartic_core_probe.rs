@@ -24,6 +24,7 @@ fn main() {
         for i in 0..64u16 {
             for j in 0..64u16 {
                 if u32::from(i) < a.f.q && u32::from(j) < a.f.q {
+                    // The narrow module's elements widened to u32 (e6375d6053).
                     assert_eq!(
                         a.f.mul_nc(u32::from(i), u32::from(j)),
                         b.f.mul_nc(u32::from(i), u32::from(j))

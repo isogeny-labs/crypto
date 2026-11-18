@@ -20551,9 +20551,54 @@ mod tests {
                 },
                 ..KoblitzIcOptions::default()
             };
-            let report =
-                koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+            let mut queries = Vec::new();
+            let report = koblitz_index_calculus_dlp_with_factor_base_and_progress(
+                &kc,
+                &target,
+                &fb,
+                &opts,
+                &mut |event| {
+                    if let KoblitzIcEvent::RelationQueryStarted {
+                        trial,
+                        coefficient_a,
+                        coefficient_b,
+                        target_x,
+                        target_y,
+                        target_infinity,
+                    } = event
+                    {
+                        queries.push((
+                            trial,
+                            coefficient_a,
+                            coefficient_b,
+                            target_x,
+                            target_y,
+                            target_infinity,
+                        ));
+                    }
+                },
+            )
+            .unwrap();
             assert_eq!(report.log, Some(known.clone()), "{strategy:?}: {report:?}");
+            assert!(!queries.is_empty());
+            assert_eq!(queries.len(), report.trials);
+            for (index, (trial, a, b, x, y, infinity)) in queries.iter().enumerate() {
+                assert_eq!(*trial, index + 1);
+                let a = BigUint::parse_bytes(a.as_bytes(), 10).unwrap();
+                let b = BigUint::parse_bytes(b.as_bytes(), 10).unwrap();
+                let public_query = kc.add(&kc.mul(kc.generator(), &a), &kc.mul(&target, &b));
+                match public_query {
+                    BinaryPoint::Affine {
+                        x: actual_x,
+                        y: actual_y,
+                    } => {
+                        assert!(!*infinity);
+                        assert_eq!(x, &actual_x.to_biguint().to_string());
+                        assert_eq!(y, &actual_y.to_biguint().to_string());
+                    }
+                    BinaryPoint::Infinity => assert!(*infinity),
+                }
+            }
             assert!(report.sat_calls > 0);
             assert!(report.independent_relations > 0);
             assert!(report.linear_solve_attempts > 0);

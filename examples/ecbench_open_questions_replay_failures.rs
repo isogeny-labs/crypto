@@ -128,6 +128,8 @@ fn main() -> Result<(), String> {
                 },
                 expected_method_id: r.method.method_id.clone(),
                 algorithm_seed: ex.algorithm_seed,
+                diagnostics: None,
+                diagnostic_lifecycle: None,
             };
             let input_bytes = serde_json::to_vec(&input).map_err(|e| e.to_string())?;
             let stem = format!("{}-{}", r.session_id, r.seq);

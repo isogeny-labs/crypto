@@ -4799,20 +4799,6 @@ mod wide {
         columns: usize,
     }
 
-    fn indexed5_fixed31_capacity_ok(max_states: usize) -> bool {
-        max_states < (1usize << 30)
-            && max_states
-                .checked_mul(5)
-                .is_some_and(|bound| bound <= (1usize << 31) * 2)
-    }
-
-    #[test]
-    fn indexed5_fixed31_accepts_exact_eighty_percent_boundary() {
-        let states = |k: usize| k * (k - 1) / 2 * 83 + k * 42;
-        assert!(indexed5_fixed31_capacity_ok(states(4549)));
-        assert!(!indexed5_fixed31_capacity_ok(states(4550)));
-    }
-
     /// How the index build runs.  `serial()` is the original loop (the
     /// control); the other settings change only how the same states and the
     /// same table are produced, never their content or order.
@@ -4853,6 +4839,20 @@ mod wide {
         }
     }
 
+    fn indexed5_fixed31_capacity_ok(max_states: usize) -> bool {
+        max_states < (1usize << 30)
+            && max_states
+                .checked_mul(5)
+                .is_some_and(|bound| bound <= (1usize << 31) * 2)
+    }
+
+    #[test]
+    fn indexed5_fixed31_accepts_exact_eighty_percent_boundary() {
+        let states = |k: usize| k * (k - 1) / 2 * 83 + k * 42;
+        assert!(indexed5_fixed31_capacity_ok(states(4549)));
+        assert!(!indexed5_fixed31_capacity_ok(states(4550)));
+    }
+
     fn build_index128(
         gf: &Gf2_128,
         basis: &NormalBasis128,
@@ -4864,7 +4864,7 @@ mod wide {
         let indexed5_load80 = std::env::var("KIC_INDEXED5_LOAD80").as_deref() == Ok("1");
         let batch_roots = std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1");
         let opts = IndexBuildOpts::from_env();
-        let index = build_index128_core(
+        let index = build_index128_impl(
             gf,
             basis,
             solver,
@@ -4877,7 +4877,7 @@ mod wide {
         );
         if !opts.is_serial() && std::env::var("KIC_VERIFY_INDEX").as_deref() == Ok("1") {
             let started = Instant::now();
-            let reference = build_index128_core(
+            let reference = build_index128_impl(
                 gf,
                 basis,
                 solver,
@@ -5033,6 +5033,7 @@ mod wide {
     }
 
     #[cfg(test)]
+    #[allow(clippy::too_many_arguments)]
     fn build_index128_with_symmetry(
         gf: &Gf2_128,
         basis: &NormalBasis128,
@@ -5043,7 +5044,7 @@ mod wide {
         indexed5_load80: bool,
         batch_roots: bool,
     ) -> Index128 {
-        build_index128_core(
+        build_index128_impl(
             gf,
             basis,
             solver,
@@ -5056,31 +5057,8 @@ mod wide {
         )
     }
 
-    #[cfg(test)]
-    fn build_index128_impl(
-        gf: &Gf2_128,
-        basis: &NormalBasis128,
-        solver: &S3Solver128,
-        reps: &[u128],
-        symmetric_states: bool,
-        indexed5_load75: bool,
-        opts: IndexBuildOpts,
-    ) -> Index128 {
-        build_index128_core(
-            gf,
-            basis,
-            solver,
-            reps,
-            symmetric_states,
-            indexed5_load75,
-            false,
-            false,
-            opts,
-        )
-    }
-
     #[allow(clippy::too_many_arguments)]
-    fn build_index128_core(
+    fn build_index128_impl(
         gf: &Gf2_128,
         basis: &NormalBasis128,
         solver: &S3Solver128,
@@ -7108,6 +7086,8 @@ mod wide {
                     &reps,
                     symmetric,
                     false,
+                    false,
+                    false,
                     IndexBuildOpts::serial(),
                 );
                 assert!(reference.states.len() > 100);
@@ -7118,6 +7098,8 @@ mod wide {
                         &solver,
                         &reps,
                         symmetric,
+                        false,
+                        false,
                         false,
                         IndexBuildOpts { threads, batch_inv },
                     );
@@ -7234,6 +7216,8 @@ mod wide {
                 &basis,
                 &solver,
                 &reps,
+                false,
+                false,
                 false,
                 false,
                 IndexBuildOpts::serial(),

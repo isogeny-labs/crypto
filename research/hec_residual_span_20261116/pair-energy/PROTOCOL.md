@@ -1,0 +1,3 @@
+# Prospective complete pair-sum census
+
+One120CPU-second Rust process; fixed curves g2p251c18, g3p421c2, g4p271c2, all ordered pairs of full signed affine degree-one points. No model/point selection by results. Require unique valid nonzero base classes, every pair sum valid/reduced degree<=2; zero multiplicitym; nonzero histogram1:m-w,2:(m²-2m+w)/2 and no other keys; totalm², sumset1+(m²-w)/2 and energy3m²-3m+w. Retain all failures and output. Ambient groups only, no subgroup projection/order assumptions, no actual quotient map or timing. Theory contains explicit proof and scope. Compile with overflow checks, hash sources/native/protocol/binary and push freeze before one invocation. Git custody; no S3/cloud/merge/retries. [pcc:unverified].

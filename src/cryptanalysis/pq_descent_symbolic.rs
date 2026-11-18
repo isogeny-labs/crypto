@@ -702,7 +702,7 @@ mod tests {
                     } else {
                         semaev_s4_word(gf, inst.b, xs[0], xs[1], xs[2], x_r)
                     };
-                    let zero = sys.equations.iter().all(|e| e.eval(v) == 0);
+                    let zero = sys.equations.iter().all(|e| e.eval(mask_from64(v)) == 0);
                     assert_eq!(zero, word == 0, "summands {summands}, v = {v:#x}");
                 }
             }

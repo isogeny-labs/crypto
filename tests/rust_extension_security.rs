@@ -126,6 +126,7 @@ fn summaries_support_application_sinks_and_do_not_export_private_scalars() {
 
 #[test]
 fn extension_curve_constructors_keep_distinct_models_and_dispatch_to_generic_solvers() {
+    use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
     use crypto_lib::cryptanalysis::ecbench::methods::{resolve, solve, MethodSpec};
     use crypto_lib::cryptanalysis::ecbench::workload::CurveSpec;
     let method = resolve(&MethodSpec {
@@ -152,13 +153,16 @@ fn extension_curve_constructors_keep_distinct_models_and_dispatch_to_generic_sol
             facts.r.to_biguint() * facts.cofactor.to_biguint(),
             facts.group_order.to_biguint()
         );
-        let r = instance.r().checked_u128().expect("toy order fits u128");
+        let r = instance
+            .r()
+            .checked_u128()
+            .expect("subgroup order fits u128");
         assert_eq!(instance.mul_generator_hex(r), None);
         let target = instance.mul_generator_hex(7).unwrap();
         let report = solve(&method, &instance, &facts, &target, 7).unwrap();
         assert_eq!(
-            report.recovered.and_then(|k| k.checked_u64()),
-            Some(7),
+            report.recovered,
+            Some(ExactScalar::from(7u64)),
             "{}",
             facts.construction
         );
