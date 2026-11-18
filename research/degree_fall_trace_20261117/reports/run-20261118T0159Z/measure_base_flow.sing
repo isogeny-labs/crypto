@@ -1,0 +1,143 @@
+// Fixed synthetic relation flow. All arithmetic is over F_101.
+ring toy = 101,(x,y,z),dp;
+poly sum_relation = x+y+z;
+poly mixed_relation = y*(x+z);
+intvec shared_point = 0,1,2;
+
+proc degree_checked(ideal equations, int expected_count)
+{
+  ideal basis = std(equations);
+  if (dim(basis) != 0 || vdim(basis) != expected_count)
+  {
+    ERROR("Gröbner staircase and exhaustive count disagree");
+  }
+  return(deg(kbase(basis)) + 1);
+}
+
+proc directed_hits(ideal equations, int source, int target)
+{
+  int hits = 0;
+  int index;
+  poly delta;
+  for (index = 1; index <= size(equations); index++)
+  {
+    delta = subst(equations[index], var(source), shared_point[source]+1)
+          - subst(equations[index], var(source), shared_point[source]);
+    if (diff(delta, var(target)) != 0)
+    {
+      hits++;
+    }
+  }
+  return(hits);
+}
+
+proc pair_hits(ideal equations, int first, int second)
+{
+  int hits = directed_hits(equations, first, second);
+  if (hits != directed_hits(equations, second, first))
+  {
+    ERROR("expected symmetric coupling for the fixed relations");
+  }
+  return(hits);
+}
+
+proc emit(string label, string stage, string target_sum, string target_mixed,
+          ideal equations, int count, intvec pin_counts)
+{
+  int observed = degree_checked(equations, count);
+  string row = label+","+stage+","+target_sum+","+target_mixed
+             +","+string(count)+","+string(observed);
+  int source;
+  for (source = 1; source <= 3; source++)
+  {
+    row = row + ",";
+    if (pin_counts[source] > 0)
+    {
+      row = row + string(degree_checked(
+        equations + ideal(var(source)-shared_point[source]), pin_counts[source]));
+    }
+  }
+  row = row + "," + string(pair_hits(equations, 1, 2))
+            + "," + string(pair_hits(equations, 1, 3))
+            + "," + string(pair_hits(equations, 2, 3))
+            + "," + string(size(equations));
+  print(row);
+}
+
+// Hold the two targets anonymous while enumerating every ordered triple.
+// The integer counts and the finite-field basis checks use separate paths.
+proc measure(string label, intvec base)
+{
+  int i,j,k,t,s;
+  int x_value,y_value,z_value;
+  intvec pin_counts = 0,0,0;
+  intvec no_pins = 0,0,0;
+  intmat sum_counts[101][1];
+  intmat pair_counts[101][101];
+  for (i = 1; i <= size(base); i++)
+  {
+    x_value = base[i];
+    for (j = 1; j <= size(base); j++)
+    {
+      y_value = base[j];
+      for (k = 1; k <= size(base); k++)
+      {
+        z_value = base[k];
+        t = (x_value + y_value + z_value) % 101;
+        s = (y_value * (x_value + z_value)) % 101;
+        sum_counts[t+1,1] = sum_counts[t+1,1] + 1;
+        pair_counts[t+1,s+1] = pair_counts[t+1,s+1] + 1;
+        if (t == 3 && s == 2)
+        {
+          pin_counts[1] = pin_counts[1] + (x_value == shared_point[1]);
+          pin_counts[2] = pin_counts[2] + (y_value == shared_point[2]);
+          pin_counts[3] = pin_counts[3] + (z_value == shared_point[3]);
+        }
+      }
+    }
+  }
+
+  ideal membership;
+  for (i = 1; i <= 3; i++)
+  {
+    membership[i] = 1;
+    for (j = 1; j <= size(base); j++)
+    {
+      membership[i] = membership[i] * (var(i)-base[j]);
+    }
+  }
+
+  emit(label, "membership", "", "", membership, size(base)^3, no_pins);
+  ideal sum_stage, mixed_stage;
+  for (t = 0; t < 101; t++)
+  {
+    if (sum_counts[t+1,1] > 0)
+    {
+      sum_stage = membership + ideal(sum_relation-t);
+      emit(label, "sum", string(t), "", sum_stage, sum_counts[t+1,1], no_pins);
+      for (s = 0; s < 101; s++)
+      {
+        if (pair_counts[t+1,s+1] > 0)
+        {
+          mixed_stage = sum_stage + ideal(mixed_relation-s);
+          if (t == 3 && s == 2)
+          {
+            emit(label, "mixed", string(t), string(s), mixed_stage,
+                 pair_counts[t+1,s+1], pin_counts);
+          }
+          else
+          {
+            emit(label, "mixed", string(t), string(s), mixed_stage,
+                 pair_counts[t+1,s+1], no_pins);
+          }
+        }
+      }
+    }
+  }
+}
+
+print("base,stage,t,s,candidates,dreg,pin_x,pin_y,pin_z,xy,xz,yz,relations");
+measure("Centered", intvec(99,100,0,1,2));
+measure("Consecutive", intvec(0,1,2,3,4));
+measure("Spread", intvec(0,1,2,17,43));
+quit;

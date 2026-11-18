@@ -1,0 +1,213 @@
+{
+  "branch": "claude/bloom-hyperloglog-index-calculus-kh3pgr",
+  "closed_utc": "2026-11-18T01:25:40+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--spec",
+        "research/ic_sketch_mixed_solver_20261115/specs/partB-p24.json",
+        "--out",
+        "research/ic_sketch_mixed_solver_20261115/sessions/partB-p24"
+      ],
+      "cwd": ".",
+      "exit": 2,
+      "started_utc": "2026-11-15T23:10:00+00:00",
+      "wall_s": 2.854
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--spec",
+        "research/ic_sketch_mixed_solver_20261115/specs/partC-large-prime.json",
+        "--out",
+        "research/ic_sketch_mixed_solver_20261115/sessions/partC-lp"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T23:10:08+00:00",
+      "wall_s": 3.285
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--spec",
+        "research/ic_sketch_mixed_solver_20261115/specs/partB-p24.json",
+        "--out",
+        "research/ic_sketch_mixed_solver_20261115/sessions/partB-p24"
+      ],
+      "cwd": ".",
+      "exit": 2,
+      "started_utc": "2026-11-15T23:10:21+00:00",
+      "wall_s": 2.826
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--spec",
+        "research/ic_sketch_mixed_solver_20261115/specs/partB-p28.json",
+        "--out",
+        "research/ic_sketch_mixed_solver_20261115/sessions/partB-p28"
+      ],
+      "cwd": ".",
+      "exit": 2,
+      "started_utc": "2026-11-15T23:10:24+00:00",
+      "wall_s": 2.761
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--allow-busy",
+        "--spec",
+        "research/ic_sketch_mixed_solver_20261115/specs/partB-p24.json",
+        "--out",
+        "research/ic_sketch_mixed_solver_20261115/sessions/partB-p24"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T23:10:41+00:00",
+      "wall_s": 1666.406
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--allow-busy",
+        "--spec",
+        "research/ic_sketch_mixed_solver_20261115/specs/partB-p24.json",
+        "--out",
+        "research/ic_sketch_mixed_solver_20261115/sessions/partB-p24"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T01:11:26+00:00",
+      "wall_s": 47.183
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--allow-busy",
+        "--spec",
+        "research/ic_sketch_mixed_solver_20261115/specs/partB-p28.json",
+        "--out",
+        "research/ic_sketch_mixed_solver_20261115/sessions/partB-p28"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T01:12:13+00:00",
+      "wall_s": 279.86
+    }
+  ],
+  "commit": "57a3475d5b445384ff118b2a6ac90e14da8b681d",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T23:09:55+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-ic-sketch-mixed-solver"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T2309Z-ic-sketch-mixed-solver-partb",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 24,
+      "name": "s-incremental-gauss-p24-w0",
+      "note": "target-pinned incumbent, unchanged",
+      "reference": 1.268,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 13.852
+    },
+    {
+      "baseline": 47.057,
+      "better": "lower",
+      "n": 24,
+      "name": "s-mixed-peel-p24-w0",
+      "note": "equals incremental-gauss-full-rank (full-rank rule)",
+      "reference": 1.268,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 47.057
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 24,
+      "name": "s-incremental-gauss-p28-w0",
+      "note": "target-pinned incumbent, unchanged",
+      "reference": 0.905,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 37.98
+    },
+    {
+      "baseline": 184.289,
+      "better": "lower",
+      "n": 24,
+      "name": "s-mixed-peel-p28-w0",
+      "note": "equals incremental-gauss-full-rank (full-rank rule)",
+      "reference": 0.905,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 184.289
+    }
+  ],
+  "problem": "ic:relation-solving-arms-prime-p24-p28",
+  "raw": [
+    {
+      "bytes": 3270166,
+      "path": "research/ic_sketch_mixed_solver_20261115/sessions/partB-p24/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1a/1a7dcee1e489a4348028ec847b443c90c5e80fe49dd4e0d94d1a1f3610589b35",
+      "sha256": "1a7dcee1e489a4348028ec847b443c90c5e80fe49dd4e0d94d1a1f3610589b35",
+      "uploaded": false
+    },
+    {
+      "bytes": 3274026,
+      "path": "research/ic_sketch_mixed_solver_20261115/sessions/partB-p28/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a7/a79ed245f0b133348f3005f24d381b0887e1ed0d6dac6c1865ee7f9322a0c8c0",
+      "sha256": "a79ed245f0b133348f3005f24d381b0887e1ed0d6dac6c1865ee7f9322a0c8c0",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-ic-sketch-mixed-solver/REPORT.pdf",
+    "png": [
+      "benchmarks/20261115-ic-sketch-mixed-solver/partB_band.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-ic-sketch-mixed-solver/partB_band.svg",
+      "benchmarks/20261115-ic-sketch-mixed-solver/partA_row_ops.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-sketch-mixed-solver-partb",
+  "status": "censored",
+  "summary": "Censored: commands 0, 2, 3 were ecbench host-busy refusals (exit 2) and the Part B v1 sessions were aborted on the mixed-peel defect (amendment A3; kept in sessions/aborted-A3). Commands 5-6 are the valid v2 sessions: 704/704 verified, 12/12 replays per curve. No sketch or LA device reduced counted IC cost; full-rank arms tie at w=0 and cost 3.7x/4.9x the target-pinned incumbent; incumbent 10.9x/42.0x rho at w=0 (p24/p28). [pcc:unverified]",
+  "validation": null
+}

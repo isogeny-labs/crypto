@@ -34,7 +34,7 @@ fn prime_big(n: u128) -> bool {
         if n == u128::from(p) {
             return true;
         }
-        if n % u128::from(p) == 0 {
+        if n.is_multiple_of(u128::from(p)) {
             return false;
         }
         let mut x = BigUint::from(p).modpow(&d, &bn);
