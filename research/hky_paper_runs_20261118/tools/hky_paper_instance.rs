@@ -399,6 +399,31 @@ fn main() {
         println!("selftest ok");
         return;
     }
+    if argv.iter().any(|a| a == "--planted") {
+        // negative-control target: X = x(P1 + P2) with x(P1), x(P2) in the order-2^k subgroup,
+        // so the system has scalar solutions and its ideal is not the unit ideal.
+        let get = |f: &str| argv.iter().position(|a| a == f).map(|i| argv[i + 1].clone());
+        let p: u64 = get("--prime").expect("--prime").parse().unwrap();
+        let a: u64 = get("--a").expect("--a").parse().unwrap();
+        let k: u32 = get("--k").expect("--k").parse().unwrap();
+        let g = subgroup_generator(p, k);
+        for e1 in 1..(1u64 << k) {
+            for e2 in (e1 + 1)..(1u64 << k) {
+                let (x1, x2) = (powm(g, e1, p), powm(g, e2, p));
+                let (r1, r2) = (rhs(x1, a, 0, p), rhs(x2, a, 0, p));
+                if legendre(r1, p) != 1 || legendre(r2, p) != 1 {
+                    continue;
+                }
+                let (y1, y2) = (sqrt_mod(r1, p).unwrap(), sqrt_mod(r2, p).unwrap());
+                let lam = mulm((y2 + p - y1) % p, powm((x2 + p - x1) % p, p - 2, p), p);
+                let x3 = (mulm(lam, lam, p) + 2 * p - x1 - x2) % p;
+                let y3 = mulm(lam, (x1 + p - x3) % p, p);
+                let y3 = (y3 + p - y1) % p;
+                println!("{{\"x\": {x3}, \"y\": {y3}, \"e1\": {e1}, \"e2\": {e2}, \"scalar_solutions\": {}}}", solutions(p, a, 0, x3, k));
+                return;
+            }
+        }
+    }
     let get = |f: &str| -> Option<String> {
         argv.iter().position(|a| a == f).map(|i| argv[i + 1].clone())
     };

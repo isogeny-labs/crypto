@@ -30,3 +30,6 @@ for sig in KILL TERM; do
   echo "$sig identical to reference: $same"
   cmp -s "$OUT/ref.basis" "$OUT/$sig.basis" && echo "$sig basis files byte-identical: true" || echo "$sig basis files byte-identical: false"
 done
+# disk is tight: keep the records, drop the bases and checkpoint states
+ls -la "$OUT"/*.basis 2>/dev/null | awk '{print "basis bytes:", $5, $9}'
+rm -f "$OUT"/*.basis "$OUT"/ckpt-*/state.ckpt "$OUT"/ckpt-*/state.ckpt.tmp
