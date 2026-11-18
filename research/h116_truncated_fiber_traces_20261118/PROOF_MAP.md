@@ -1129,6 +1129,45 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | scalar-eight coordinate extension degree is sixty-four | exact degree assembly | H116 | rational function field | same |
 | singular scalar-eight pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
 
+## Third-successor stencil and scalar-nine gate
+
+1. **Structure above.** Under the same base invariant, retain
+   `t=c-b^2`, `d=a*t`, `e=c*a^3-b^3*s^2`, and
+   `u=a^2*d-c^2`.  Put `w=b^2*u-c*t^2`, so the next odd output is
+   `g=a*w`.  The following even inner factor has the exact alternate form
+   `v=(2*b^2-c)*u-c*t^2=w-t*u`.  The prior second-successor certificate
+   supplies `w` coprime to `u`; the base invariant supplies `w` coprime to
+   `t`.  This is the proposed reduction for `g` coprime to `c*v`.
+2. **Theorems used as stated.** The candidate proof factors the preceding
+   generic certificate and otherwise uses only Mathlib coprimality product,
+   power, factor-extraction and subtract-multiple laws.  The generic theorem
+   may not invoke a scalar-specific resultant.
+3. **Object as an instance.** Mathlib's exact recurrences identify
+   `g=prePsi9` and `c*v=prePsi10`.  The planned endpoint is scalar-nine
+   no-cancellation and coordinate extension degree eighty-one outside
+   characteristic three.
+4. **Exploratory control.** Exhaustive arithmetic over the 13 prime fields
+   from `F_3` through `F_43` found zero simultaneous zeros of the candidate
+   pair among 249,580 tuples satisfying the nonzero field versions of all
+   base premises.  This off-panel sweep is motivation only, not proof and not
+   a frozen benchmark.
+5. **Assembly evidence.** Generic elaboration and exact EDS instantiation pass
+   in the tracked module. The pinned full build completed all 3,162 jobs, and
+   the exact repository auditor reports
+   `201 theorems, 0 failing, 0 trusted`. The singular `A=B=0` specialization
+   over `ZMod 11` is proved non-coprime by evaluation at zero.
+6. **Missing components only.** A successful third successor would extend one
+   invariant through four adjacent outputs, but arbitrary recurrence-tree
+   closure would remain unproved. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| third-successor pair `g,c*v` is coprime | generic recurrence stencil | H116 | arbitrary commutative ring | same three premises as the two-factor bootstrap |
+| `prePsi9` is coprime to `prePsi10` | exact EDS instantiation | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi9` is coprime to `PsiSq9` | exact division-polynomial assembly | H116 | same | same |
+| scalar-nine coordinate extension degree is eighty-one | exact degree assembly | H116 | rational function field | same plus `3 != 0` |
+| singular scalar-nine pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
+
 ## Scalar-six two-factor bootstrap gate
 
 1. **Structure above.** Instantiate the preceding generic gate with

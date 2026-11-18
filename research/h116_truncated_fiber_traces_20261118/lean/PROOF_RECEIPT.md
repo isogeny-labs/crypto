@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-0fe4972abb8de4cd11e58f927b7e466470d8172a8790e7d690d14a416c522541  H116FiberTrace.lean
+8afac8222c1ea6656e6ff167ae2e7ae31885bf2bda11f268945a16035447833e  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  196 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  201 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -99,6 +99,9 @@ a31892ff2095c514583f502bfef1ba389f69a4c4a3f39435f87b9029aed57af6  receipts/gener
 d93b32bc5be9adc6229888fec8e59edb7182d3afbcf2dd4d7abbccee9280a0b5  receipts/second-successor-scalar-eight-build.txt
 ae1b03718e01355a281f31e8c00e0ddb3a652bb091df4f5ba74f80794518cbc2  receipts/second-successor-scalar-eight-full-build.txt
 ac3832511710d08fdaec1912b38116d7702503b3dca339b58c64c250ab88f93d  receipts/second-successor-scalar-eight-audit.txt
+b67421427618cb5c1774e9bbb66583a164d9dbf7c8772fc06c0ec4f44e46fb49  receipts/third-successor-scalar-nine-build.txt
+62633ade5c49413ba2bfa42efefb3a28112cea149c61137843762d298ee79964  receipts/third-successor-scalar-nine-full-build.txt
+7829dc01b1738d829455dd90dfb4bfdb17a6a5ed17c4eb21a4d29da8d948e3e6  receipts/third-successor-scalar-nine-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -442,6 +445,18 @@ instance proves `prePsi8` coprime to `prePsi9`, `Phi8` coprime to `PsiSq8`,
 and coordinate extension degree sixty-four outside characteristic two.  The
 singular `A=B=0` control over `ZMod 11` is non-coprime.  Arbitrary recurrence
 closure remains open. [pcc:unverified]
+
+The 201-theorem checkpoint proves a third companion successor stencil under
+the same invariant.  Factoring the new odd output as `g=a*w` exposes the next
+inner factor as `v=w-t*u`; factor extraction from the preceding certificate
+gives `w` coprime to `u`, while the base relation gives `w` coprime to `t`.
+The exact short-curve instance proves `prePsi9` coprime to `prePsi10`,
+`Phi9` coprime to `PsiSq9`, and coordinate extension degree eighty-one
+outside characteristics two and three.  The singular `A=B=0` control over
+`ZMod 11` is non-coprime.  A motivational exhaustive sweep over 249,580 valid
+tuples in 13 small prime fields found no counterexample, but was not a frozen
+benchmark and is not used as proof.  Arbitrary recurrence closure remains
+open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made
