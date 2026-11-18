@@ -34,6 +34,8 @@
 //!
 //! The standard is `docs/ecbench/README.md`.
 
+#[path = "ecbench/endpoint_pairs.rs"]
+mod endpoint_pairs;
 #[path = "ecbench/pdp3_koblitz.rs"]
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
@@ -70,6 +72,20 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Join distinct endpoint workloads without admitting costs or timings.
+    EndpointPairs {
+        #[arg(long)]
+        dir: PathBuf,
+        #[arg(long)]
+        source_curve: String,
+        #[arg(long)]
+        destination_curve: String,
+        #[arg(long)]
+        arm: String,
+        /// Validate an unexecuted plan; refuses existing observations/sessions.
+        #[arg(long)]
+        plan_only: bool,
+    },
     /// Run the frozen retained-chain probe or complete toy relation pipeline.
     /// Counters are raw observations; this command does not admit timings.
     RetainedChainStudy {
@@ -1231,6 +1247,21 @@ fn compare_pooled_cmd(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::EndpointPairs {
+            dir,
+            source_curve,
+            destination_curve,
+            arm,
+            plan_only,
+        } => {
+            print_json(&endpoint_pairs::join(
+                &dir,
+                &source_curve,
+                &destination_curve,
+                &arm,
+                plan_only,
+            )?)?;
+        }
         Cmd::RetainedChainStudy { phase, out } => retained_chain_study::run(&phase, &out)?,
         Cmd::DiagnosticPreflight {
             request,

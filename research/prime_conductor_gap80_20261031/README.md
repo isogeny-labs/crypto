@@ -233,3 +233,6 @@ unverified/not_covered producer statement. [pcc:unverified]
 No production evaluator source or original acceptance criterion changes.
 External-memory/different traversals are not ruled out. The complete target
 quotient, non-kernel images and paired endpoint measurements remain open.
+
+
+The [endpoint record join](endpoint-join-20261118/RESULTS.md) now preserves original endpoint workload/record identities, missing/failure/warmup rows and raw numeric tokens. Native codec controls and frozen two-field plan selections are qualified; statistical and wall admission, actual measured sessions and the original explicit prime-conductor crossing remain open. [pcc:unverified]

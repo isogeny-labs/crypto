@@ -12,6 +12,10 @@ publish = false
 name = "ecbench"
 path = "../../../../src/bin/ecbench.rs"
 
+[[test]]
+name = "endpoint_pairs"
+path = "../../../../tests/endpoint_pairs.rs"
+
 [dependencies]
 crypto_lib = { package = "crypto", path = "../../../.." }
 clap = { version = "=4.6.7", features = ["derive"] }
