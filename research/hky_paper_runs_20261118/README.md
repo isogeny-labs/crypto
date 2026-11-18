@@ -75,9 +75,12 @@ Files:
 <!-- GATE:begin -->
 Expected = `lfd-summation-systems/experiments/ic-bounds-k14/runs/<cell>.json` (`columns`, `profile` = dim(V_D ∩ M_≤w) for
 w = 0..D, `contains_one`); got = this engine's `--instance` record; `match` requires all three equal and the closure
-closed. Binaries: `d31a012b` = `bin/pilot_gate` (pre-merge engine); `52b47153` = the first provisional pod binary (same sources,
-commit-stamped); **`0dfbffad` = the merged engine (wt/engine-opt c51685b6a9 merged at 9fb60e9c13), the pod binary**. Muladds are equal across all three binaries on every shared cell (the optimizer changes no counter). Scripts: `gate/run_gate.sh`,
-`gate/table.sh`; records under `gate/raw*/`.
+closed. Binaries (§8): `d31a012b` = `bin/pilot_gate` (pre-merge engine); `52b47153` = first provisional build (same
+sources, commit-stamped); `0dfbffad` = the merged engine (wt/engine-opt c51685b6a9 merged at 9fb60e9c13); **`39acdeac` =
+the final pod binary** (9fb60e9c13 + non-fatal checkpoint/export failures, stamped 450d5b295b). Muladds are equal across all
+binaries on every shared cell (the optimizer changes no counter). Scripts: `gate/run_gate.sh`, `gate/final_gate.sh`,
+`gate/table.sh`; records under `gate/raw*/`. Walls: 4 shared vCPU; the pre-merge rows ran at load 15–27, the merged/final
+rows at load ≈ 4.
 
 | cell (instance : D) | columns | expected profile | got profile | 1 ∈ V_D exp / got | match | muladds | wall (s, shared 4 vCPU) | binary |
 |:--|--:|:--|:--|:-:|:-:|--:|--:|:--|
@@ -107,15 +110,29 @@ commit-stamped); **`0dfbffad` = the merged engine (wt/engine-opt c51685b6a9 merg
 | unit-p65537-a1-s10-k15 : 5 | 174437 | 0,0,2,158,4633,56649 | 0,0,2,158,4633,56649 | false / false | **true** | 19233087929 | 9 | 0dfbffad |
 | unit-p65537-a1-s10-k11 : 6 | 110056 | 1,23,254,1794,9109,35443,110056 | 1,23,254,1794,9109,35443,110056 | true / true | **true** | 321522714727 | 110 | 0dfbffad |
 | unit-p65537-a1-s10-k12 : 6 | 190051 | 1,25,301,2325,12951,55455,190051 | 1,25,301,2325,12951,55455,190051 | true / true | **true** | 2104737035939 | 586 | 0dfbffad |
+| unit-p65537-a1-s10-k10 : 5 | 21700 | 0,0,2,138,3163,18569 | 0,0,2,138,3163,18569 | false / false | **true** | 16024605579 | 6 | 39acdeac |
+| unit-p65537-a1-s10-k11 : 5 | 35443 | 0,0,2,142,3441,25033 | 0,0,2,142,3441,25033 | false / false | **true** | 16340811395 | 5 | 39acdeac |
+| unit-p65537-a1-s10-k12 : 5 | 55455 | 0,0,2,146,3727,32057 | 0,0,2,146,3727,32057 | false / false | **true** | 17441038634 | 7 | 39acdeac |
+| unit-p65537-a1-s10-k10 : 6 | 60460 | 1,21,211,1351,6196,21700,60460 | 1,21,211,1351,6196,21700,60460 | true / true | **true** | 43706615635 | 15 | 39acdeac |
+| unit-p65537-a1-s10-k13 : 5 | 83682 | 0,0,2,150,4021,39657 | 0,0,2,150,4021,39657 | false / false | **true** | 17993100441 | 9 | 39acdeac |
+| unit-p163841-a3-s21-k13 : 5 | 83682 | 0,0,2,150,4021,39657 | 0,0,2,150,4021,39657 | false / false | **true** | 17993415519 | 8 | 39acdeac |
+| unit-p65537-a1-s10-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299157464 | 9 | 39acdeac |
+| unit-p163841-a3-s21-k14 : 5 | 122438 | 0,0,2,154,4323,47849 | 0,0,2,154,4323,47849 | false / false | **true** | 18299505466 | 10 | 39acdeac |
+| unit-p65537-a1-s10-k15 : 5 | 174437 | 0,0,2,158,4633,56649 | 0,0,2,158,4633,56649 | false / false | **true** | 19233087929 | 10 | 39acdeac |
+| unit-p65537-a1-s10-k11 : 6 | 110056 | 1,23,254,1794,9109,35443,110056 | 1,23,254,1794,9109,35443,110056 | true / true | **true** | 321522714727 | 103 | 39acdeac |
+| unit-p65537-a1-s10-k12 : 6 | 190051 | 1,25,301,2325,12951,55455,190051 | 1,25,301,2325,12951,55455,190051 | true / true | **true** | 2104737035939 | 550 | 39acdeac |
 
 The profile definition is the same on both sides: the records' `profile` ends at `rank` and is cumulative by degree, as
-the engine's `dims` (pivot degrees, cumulative). **Every row matches exactly, no discrepancy.**
+the engine's `dims` (pivot degrees, cumulative). **Every row matches exactly; no discrepancy anywhere.**
 
-Not run locally (do not fit on this shared 4-vCPU box): unit-p65537 k = 13, D = 6 and unit-p163841 k = 13, D = 6 (1 enters
-at full rank 313,912; hky2 needed 2.39e13 muladds on the pod; from the k = 10 → 11 → 12 D = 6 muladd growth here, ≈ 18 h
-each at the effective rate of this box), and k = 14, D = 6 (the pod jobs J1/J2). A container restart killed the first
-k = 12, D = 6 attempt; it was re-run with `CKPT_ROOT` (checkpoint every 10 min), stopped once by SIGTERM at batch 2129 and
-resumed from that checkpoint — so this row also exercises resume in a real run.
+Not reproduced locally: unit-p65537 and unit-p163841 k = 13, D = 6 (1 enters at full rank 313,912). One attempt with the merged
+engine through `pod/run_job.sh` and a 14.5 GB memory limit (this box has 16 GB) reached 12.4 GB RSS after 37 min, the memory
+guard sent SIGTERM, and the clean checkpoint then filled the disk (3.4 GB free) and the engine panicked; `job.json` recorded
+`censored_memory_guard_soft` (`gate/raw-merged/k13/`). That exposed the disk-full panic, fixed in 450d5b295b (a failed
+checkpoint or export is now reported and the closure continues). k = 13, D = 6 needs > 13 GB (the hky2 pod run peaked at
+10.4 GB with sparser rows), so it belongs on a pod, as do the k = 14 D = 6 cells (J1/J2). An earlier pre-merge k = 12, D = 6
+attempt died the same way (a 3.4 GB checkpoint at 10 min filled the disk); the merged and final binaries completed it without
+checkpoints.
 <!-- GATE:end -->
 
 ## 4. Negative controls
@@ -211,6 +228,8 @@ the next batch boundary and exit with a closure censored `"signal"` (exit code 3
 
 Measured (`gate/ckpt-k10D5*.log`, unit-p65537 k = 10, D = 5, 522 batches, 16 interreductions): an uninterrupted run against runs killed with **SIGKILL** and resumed, at three points — batch 150, batch 300 (`ckpt-k10D5-mid`), and after 22 s of wall at batch 475 = 30 % of the muladds, past several interreductions (`ckpt-k10D5-t22`) — and runs stopped with **SIGTERM** (clean checkpoint, exit 3) at batches 145, 308, 488 and resumed. Every resumed run: same columns, profile, contains_one, **muladds (16,024,605,579), rows_reduced (31,631)**, and the exported basis is **byte-identical** (content SHA-256 5fa47095…, file SHA-256 16108d90…). Checkpoint size at batch 488: 83.7 MB, written in 0.4 s.
 
+After the engine-opt merge (rows stored in epoch coordinates; the checkpoint now also saves each part's `np_cols` and resume rebuilds with `Echelon::with_epoch`; the export reads rows through `Echelon::row_full`; fingerprint v2 also covers `np_epochs` and the sweep options) the same test on the merged binary (`gate/ckpt-merged-k10D5-t5.log`: SIGKILL at batch 475 = 30 % of the muladds, SIGTERM at batch 510 = 66 %) and on the final binary (`gate/ckpt-final-k10D5-t3.log`) gives the same muladds and a basis byte-identical to the pre-merge engine's (content SHA-256 5fa47095…): the optimizer changed neither the closure nor its exported basis. Checkpoint or export write failures (disk full) no longer stop the engine: tested with a checkpoint path on `/dev/full` (one failure recorded in `io.checkpoint_failures`, the next checkpoint written, the result and basis unchanged). Size: a checkpoint is up to ≈ 1 × RSS (k = 12, D = 6: > 3.4 GB at 10 min), and the previous one stays on disk while the next is written.
+
 ## 8. Frozen binary and pod jobs
 
 The owner's optimizer pass (`wt/engine-opt`) will replace the engine; **the final pod binary is built
@@ -222,7 +241,8 @@ binaries of this report.
 |:--|:--|:--|:--|
 | `bin/pilot_gate` | d31a012b5e5d938b1b7ccb80b227ea6cf4322375b6a1170f1a587482204137bc | source of e4d5a6ec08 (stamp says 50262dc257: built before that commit, same pilot sources) | the gate rows of §3 |
 | `bin/pkm_tower_pilot` first provisional build (pre-merge) | 52b47153eb732c85c17a693c8f85bd481e66b5fce90b752ab7d51217c7048d04 | e295580642 (stamped) | re-gated on a subset (§3); superseded |
-| `bin/pkm_tower_pilot` = `bin/pkm_tower_pilot_merged` (**pod binary**, `pod/BINARY.sha256`) | 0dfbffadf7bf4c18762cc53b2aac28f51e3e6de7bfb183bbd34511d011903c08 | 9fb60e9c13 = merge of wt/engine-opt c51685b6a9 (stamped) | the full gate (§3), checkpoint test (§7), pods |
+| `bin/pkm_tower_pilot_merged` | 0dfbffadf7bf4c18762cc53b2aac28f51e3e6de7bfb183bbd34511d011903c08 | 9fb60e9c13 = merge of wt/engine-opt c51685b6a9 (stamped) | full gate (§3), checkpoint test (§7); superseded by the final binary |
+| `bin/pkm_tower_pilot_final` (**pod binary**, `pod/BINARY.sha256`; copy it to `/workspace/bin/pkm_tower_pilot`) | 39acdeac81689a49fa98a9b71e9924bdc29418d80247bece72e372aa41cac74f | 450d5b295b (merge + non-fatal checkpoint/export failures; stamped) | full gate (§3), checkpoint test (§7), pods |
 
 All: `cargo build --release`, no target-cpu flags, runtime SIMD (avx512/avx2/portable), dynamically linked against libgcc_s/libm/libc only, max GLIBC_2.34.
 
