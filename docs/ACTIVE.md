@@ -15,7 +15,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 - [x] Prime31 weighted-slot parity gate on unchanged p=2^31−1 curve: uniform-slot/Frobenius cancellation proved; distinct-weight positive-parity test B8/B16/B31 measured; pinned original Rust 40/40 + independent Python replay passed (#4714, exact-source CI #44278553811). This is a generic-MITM parity feasibility control, not a cheaper full solver; next nonenumerative extractor remains open.
-- [ ] Extend PR #4714 with an original-curve weighted six-slot 3+3 Rust index-calculus complete-solve control, same 2^31−1 curve, 1,024 public targets, rank/cost and prior-lead audit (automation, started 2026-11-18, branch automation/prime31-weighted-slot-parity-20261118, PR #4714)
+- [x] Extend PR #4714 with an original-curve weighted six-slot 3+3 Rust index-calculus complete-solve control, same 2^31−1 curve, 1,024 public targets, rank/cost and prior-lead audit; 31/31 rank, 1,024/1,024 target recovery, 7.368x matched scalar-vs-batched whole-program gain (generic-equivalent; unsigned; #44295520583), (automation, started 2026-11-18, branch automation/prime31-weighted-slot-parity-20261118, PR #4714)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
