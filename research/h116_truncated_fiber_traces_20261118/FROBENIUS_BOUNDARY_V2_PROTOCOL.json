@@ -1,0 +1,21 @@
+{
+  "schema": "h116.frobenius-boundary-protocol/v2",
+  "protocol_id": "H116-FROBENIUS-BOUNDARY-002",
+  "parent_protocol": "H116-FROBENIUS-BOUNDARY-001",
+  "frozen_before_execution": true,
+  "permitted_source_change": "replace -A^2*D^4 by +A^2*D^4 in the scalar duplication numerator",
+  "unchanged": {
+    "fixture": "excluded-h115-fp31-r37",
+    "p": 31,
+    "precision_w": 18,
+    "first_difference": 15,
+    "phi_minus_scalar_delta": 10,
+    "controls": [
+      "omitted normalization first differs at 0",
+      "wrong target curve identity rejected",
+      "coefficient-15 mutation first differs at 15 and fails identity"
+    ]
+  },
+  "replacement_cells": 0
+}
+
