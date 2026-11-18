@@ -34,6 +34,22 @@ integration, the strongest supported wall reference, registry identity and
 live cloud admission remain prerequisites. No recorded timing is available.
 All measurement requirements below remain in force.
 
+The later [wide-field harness component](wide-harness-20261118/README.md)
+adds a separate `prime_mont4_explicit` path with exact four-limb coordinates,
+u64 subgroup orders, counted rho and full-point-key BSGS. Corrected-source
+development tests cover the actual 202-bit source and 96-bit pilot fields;
+degree-2 and degree-5 controls supply fully evaluated paired input data.
+The earlier word-only exporter's guard and historical receipts are unchanged.
+These small control degrees do not evaluate either large target kernel.
+[pcc:unverified]
+
+The current CLI warns that five measured rounds with alternating arm order
+are unbalanced. The separately qualified planning packet therefore uses six
+rounds and one warmup; the original at-least-five requirement is preserved.
+Endpoint order/algorithm-seed pairing, native scalar timing, registration,
+wide-field IC, strongest wall reference, full target construction and cloud
+admission remain open. No measured wide-field session has executed.
+
 ### Earlier implementation audit (retained history)
 
 The existing native codomain constructor

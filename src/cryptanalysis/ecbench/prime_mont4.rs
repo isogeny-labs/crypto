@@ -317,7 +317,7 @@ mod tests {
         let coordinates = curve.encode(curve.generator).unwrap();
         let coordinate = |s: &str| {
             FieldElement::new(
-                BigUint::parse_bytes(s[2..].as_bytes(), 16).unwrap(),
+                BigUint::parse_bytes(&s.as_bytes()[2..], 16).unwrap(),
                 curve.p.clone(),
             )
         };

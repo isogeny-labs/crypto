@@ -736,7 +736,7 @@ impl CurveSpec {
             Instance::PrimeMont4(curve) => {
                 let generator = curve.encode(curve.generator)?;
                 let decode = |s: &str| {
-                    num_bigint::BigUint::parse_bytes(s[2..].as_bytes(), 16)
+                    num_bigint::BigUint::parse_bytes(&s.as_bytes()[2..], 16)
                         .unwrap()
                         .to_string()
                 };
@@ -1330,7 +1330,8 @@ impl Instance {
             let generator = curve
                 .encode(curve.generator)
                 .expect("finite checked generator");
-            let decode = |s: &str| num_bigint::BigUint::parse_bytes(s[2..].as_bytes(), 16).unwrap();
+            let decode =
+                |s: &str| num_bigint::BigUint::parse_bytes(&s.as_bytes()[2..], 16).unwrap();
             let entry = registry_entry(&curve.id.slug);
             let rep = entry.as_ref().and_then(|entry| {
                 matching_representation(
