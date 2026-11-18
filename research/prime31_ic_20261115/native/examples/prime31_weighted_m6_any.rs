@@ -135,6 +135,64 @@ fn counted_pow(ar: &mut Arithmetic, mut x: u64, mut k: u64) -> u64 {
     }
     result
 }
+fn query_batched(ar: &mut Arithmetic, left: &[(Point, Word3)],
+                 right: &HashMap<Point, Word3>, target: Point) -> Option<Word6> {
+    let p = PRIME31.p;
+    let mut complements = vec![None; left.len()];
+    let mut denoms = Vec::<u64>::with_capacity(left.len());
+    let mut offsets = Vec::<(usize, u64, u64, u64, u64)>::with_capacity(left.len());
+    let mut prefix = Vec::<u64>::with_capacity(left.len()+1);
+    prefix.push(1);
+    for (i, &(lp, _)) in left.iter().enumerate() {
+        ar.counts.group_additions += 1;
+        match (target, lp) {
+            (None, _) => complements[i] = ar.neg(PRIME31, lp),
+            (_, None) => complements[i] = target,
+            (Some((x, y)), Some((z, w))) => {
+                let neg_w = (p - w) % p;
+                if x == z && (y + neg_w) % p == 0 {
+                    complements[i] = None;
+                    continue;
+                }
+                let (numer, denom) = if x == z {
+                    ((3 * counted_mul(ar, x, x) + PRIME31.a) % p, (2 * y) % p)
+                } else {
+                    ((neg_w + p - y) % p, (z + p - x) % p)
+                };
+                assert_ne!(denom, 0, "original odd-order curve cannot have exceptional zero denominator");
+                let pr = *prefix.last().expect("unit prefix");
+                prefix.push(counted_mul(ar, pr, denom));
+                denoms.push(denom);
+                offsets.push((i, x, y, z, numer));
+            }
+        }
+    }
+    if !denoms.is_empty() {
+        ar.counts.fp_inversions += 1;
+        let mut u = counted_pow(ar, *prefix.last().unwrap(), p - 2);
+        for j in (0..denoms.len()).rev() {
+            let inv_d = counted_mul(ar, u, prefix[j]);
+            u = counted_mul(ar, u, denoms[j]);
+            let (i, x, y, z, numer) = offsets[j];
+            let slope = counted_mul(ar, numer, inv_d);
+            let xout = (counted_mul(ar, slope, slope) + 2*p - x - z) % p;
+            let yout = (counted_mul(ar, slope, (x + p - xout) % p) + p - y) % p;
+            complements[i] = Some((xout, yout));
+        }
+        debug_assert_eq!(u, 1, "batch inverse returned initial unit");
+    }
+    let mut parity = false;
+    let mut witness = None;
+    for (i, &complement) in complements.iter().enumerate() {
+        if let Some(&rw) = right.get(&complement) {
+            parity = !parity;
+            let lw = left[i].1;
+            witness = Some([lw[0], lw[1], lw[2], rw[0], rw[1], rw[2]]);
+        }
+    }
+    if parity { witness } else { None }
+}
+
 fn query_any_chunk(ar: &mut Arithmetic, left: &[(Point, Word3)],
                  right: &HashMap<Point, Word3>, target: Point) -> Option<Word6> {
     let p = PRIME31.p;
