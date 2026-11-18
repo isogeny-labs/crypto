@@ -2362,6 +2362,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
             ("m", "summands, 3 to 9 (the packed index is 12 bits for m <= 5, 64/m bits above: bases of up to 1023, 511, 255, 127 points for m = 6..9)"),
             ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
             ("prune", "1: skip the adds of partial sums that cannot be completed to m summands; same table, fewer build adds (default 0)"),
+            ("split", "1: form the last two summands of every sum from a precomputed pair-sum table (two adds per abscissa pair) instead of building the (m-1)-summand partial sums; same table, fewer build adds (default 0)"),
         ]
     }
 
@@ -2374,12 +2375,13 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     ) -> Result<(), String> {
         self.free = params.flag("free");
         self.free_pending = self.free;
-        let table = KSumTable::build_negation_folded_opts(
+        let table = KSumTable::build_negation_folded_split(
             ctx.group,
             fb,
             self.k,
             self.free,
             params.flag("prune"),
+            params.flag("split"),
         )?;
         // The table's construction is part of the pipeline's cost.
         ops.merge(table.build_ops);
@@ -2446,6 +2448,106 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
             m.insert("free_rows_emitted".to_string(), self.free_emitted);
         }
         m
+    }
+}
+
+#[cfg(test)]
+mod ksum_split_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{roster_prime_instance, Calibration};
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+    /// `split=1` leaves every output of a run unchanged (recovered log,
+    /// relations, trials, rank, every relation-phase operation and
+    /// counter, the table's insert count) and lowers only the
+    /// oracle-setup additions; off (absent or `split=0`) it is the
+    /// unsplit build exactly.
+    #[test]
+    fn split_runs_are_identical_but_for_fewer_setup_adds() {
+        let inst = roster_prime_instance(20).unwrap();
+        let g = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let planted = 300_011 % inst.r;
+        let q = CountedGroup::mul(&inst.curve, &mut ops, g, planted);
+        let ctx = InstanceCtx {
+            group: &inst.curve,
+            generator: g,
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        };
+        let base = PrimeAbscissaBase { instance: &inst };
+        for (k, size, targets) in [
+            (4u32, "12", Targets::Walk),
+            (5, "10", Targets::Walk),
+            (5, "10", Targets::StrideRenew),
+        ] {
+            let run = |extra: &str| {
+                let mut spec = PipelineSpec {
+                    factor_base: "prime-abscissa".into(),
+                    oracle: "ksum".into(),
+                    targets,
+                    max_trials: 50_000_000,
+                    seed: 11,
+                    ..Default::default()
+                };
+                spec.factor_base_params.set("size", size);
+                spec.oracle_params.set("prune", "1");
+                if !extra.is_empty() {
+                    spec.oracle_params.set("split", extra);
+                }
+                let mut oracle = KSumOracle::new(k);
+                run_pipeline(
+                    &ctx,
+                    &spec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .expect("the configuration should run")
+            };
+            let (plain, off, on) = (run(""), run("0"), run("1"));
+            for r in [&plain, &off, &on] {
+                assert!(r.verified, "k = {k}");
+                assert_eq!(r.recovered, Some(planted));
+            }
+            let d = |r: &crate::cryptanalysis::ic_framework::RunReport| {
+                (
+                    r.decomposition.targets_tried,
+                    r.decomposition.relations_found,
+                    r.decomposition.cost.group_ops,
+                    r.decomposition.cost.native.clone(),
+                    r.decomposition.cost.work_native.clone(),
+                    r.decomposition.setup.native.clone(),
+                    r.decomposition.setup.work_native.clone(),
+                    r.linear_algebra.rank,
+                )
+            };
+            assert_eq!(d(&plain), d(&on), "k = {k}");
+            assert_eq!(d(&plain), d(&off), "k = {k}");
+            assert_eq!(
+                plain.decomposition.setup.group_ops,
+                off.decomposition.setup.group_ops
+            );
+            let (su, ss) = (
+                plain.decomposition.setup.group_ops,
+                on.decomposition.setup.group_ops,
+            );
+            assert!(
+                ss.adds < su.adds,
+                "k = {k}: {} against {}",
+                ss.adds,
+                su.adds
+            );
+            assert_eq!((ss.doubles, ss.scalar_mults), (su.doubles, su.scalar_mults));
+            assert!(on.total_gae < plain.total_gae);
+        }
     }
 }
 

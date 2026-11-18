@@ -9471,6 +9471,11 @@ pub struct KSumTable {
     /// Skip partial sums that cannot be completed to `k` summands
     /// ([`KSumTable::build_negation_folded_opts`]).
     pub prune: bool,
+    /// Form the last two summands as one precomputed pair sum
+    /// ([`KSumTable::build_negation_folded_split`]).
+    pub split: bool,
+    /// Group additions spent on that pair-sum table (inside `build_ops`).
+    pub split_pair_adds: u64,
     pub collisions: Vec<(u64, u64)>,
 }
 
@@ -9507,6 +9512,30 @@ impl KSumTable {
         k: u32,
         keep_collisions: bool,
         prune: bool,
+    ) -> Result<Self, String> {
+        Self::build_negation_folded_split(g, fb, k, keep_collisions, prune, false)
+    }
+
+    /// The same table; with `split`, the last two summands of every sum
+    /// come from a table of pair sums `P_j + P_l` (abscissa of `P_j`
+    /// below that of `P_l`, both at or above the `(k − 1)`-th smallest),
+    /// built once with two additions per abscissa pair (the other two
+    /// sign patterns are their negatives).  Each sum is then its
+    /// `(k − 2)`-summand prefix plus one pair sum: one addition, as
+    /// before, but the `(k − 1)`-summand partial sums, `2^{k−2}` of them
+    /// per `(k − 1)`-subset of abscissae, are never formed.  The sums are
+    /// visited in the same order and a `(k − 1)`-summand partial equal to
+    /// the identity (`prefix = −P_j`, an equality test, no group
+    /// operation) still skips its completions, so the kept sums, keys,
+    /// inserts and collisions are identical; only the build adds fall,
+    /// from `2^{k−2}·C(a′, k−1)` (level `k − 1`) to `2·C(a − k + 2, 2)`.
+    pub fn build_negation_folded_split<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
+        split: bool,
     ) -> Result<Self, String> {
         if !(3..=KSUM_MAX_K).contains(&k) {
             return Err(format!(
@@ -9552,14 +9581,126 @@ impl KSumTable {
             index_lookups: a,
             keep_collisions: false,
             prune,
+            split,
+            split_pair_adds: 0,
             collisions: Vec::new(),
         };
         t.keep_collisions = keep_collisions;
+        let pairs = if split {
+            Some(t.pair_sums(g, fb, &groups))
+        } else {
+            None
+        };
         let mut idx = [u32::MAX; KSUM_MAX_K as usize];
-        t.extend(g, fb, &groups, 0, 0, None, &mut idx);
+        t.extend(g, fb, &groups, 0, 0, None, pairs.as_deref(), &mut idx);
         t.entries = t.map.len() as u64;
         t.build_wall_ns = start.elapsed().as_nanos() as u64;
         Ok(t)
+    }
+
+    /// `P_j + P_l` for every signed point `j` above an abscissa of index
+    /// at least `k − 2` and every signed `l` above a later abscissa, at
+    /// `j · n + l` (`n` the number of base points).  Two additions per
+    /// abscissa pair: the first point of the first abscissa against each
+    /// point of the second; the remaining sums are negatives of those
+    /// (`−P_j − P_l = −(P_j + P_l)`, no group operation).  Distinct
+    /// abscissae never sum to the identity.
+    fn pair_sums<G: CountedGroup>(
+        &mut self,
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        groups: &[&Vec<usize>],
+    ) -> Vec<Option<G::Elt>> {
+        let n = fb.points.len();
+        let mut pairs: Vec<Option<G::Elt>> = vec![None; n * n];
+        let first = self.k as usize - 2;
+        for (ai, ga) in groups.iter().enumerate().skip(first) {
+            for gb in groups.iter().skip(ai + 1) {
+                for &l in gb.iter() {
+                    let j = ga[0];
+                    let s = g.add(&mut self.build_ops, fb.points[j], fb.points[l]);
+                    self.split_pair_adds += 1;
+                    pairs[j * n + l] = Some(s);
+                    let (nj, nl) = (fb.neg_index[j], fb.neg_index[l]);
+                    if nj != j && ga.contains(&nj) && gb.contains(&nl) {
+                        pairs[nj * n + nl] = Some(g.neg(s));
+                    }
+                }
+                // Any sign pattern a missing negative left open (a base
+                // that lists only one point of an abscissa pair) is added.
+                for &j in ga.iter().skip(1) {
+                    for &l in gb.iter() {
+                        if pairs[j * n + l].is_none() {
+                            let s = g.add(&mut self.build_ops, fb.points[j], fb.points[l]);
+                            self.split_pair_adds += 1;
+                            pairs[j * n + l] = Some(s);
+                        }
+                    }
+                }
+            }
+        }
+        pairs
+    }
+
+    /// The last two levels of [`KSumTable::extend`] from one pair-sum
+    /// read: same visiting order, same identity skips, same inserts.
+    #[allow(clippy::too_many_arguments)]
+    fn extend_split<G: CountedGroup>(
+        &mut self,
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        groups: &[&Vec<usize>],
+        depth: usize,
+        from: usize,
+        prefix: G::Elt,
+        pairs: &[Option<G::Elt>],
+        idx: &mut [u32; KSUM_MAX_K as usize],
+    ) {
+        let n = fb.points.len();
+        let end = groups.len().saturating_sub(1);
+        for (ai, group) in groups.iter().enumerate().take(end).skip(from) {
+            for &j in group.iter() {
+                // `prefix + P_j` is the identity exactly when `prefix` is
+                // `−P_j`: the unsplit build skips that subtree, and so
+                // does this one.
+                if prefix == fb.points[fb.neg_index[j]] {
+                    continue;
+                }
+                idx[depth] = j as u32;
+                for gb in groups.iter().skip(ai + 1) {
+                    for &l in gb.iter() {
+                        let pair = pairs[j * n + l].expect("pair sum built");
+                        let s = g.add(&mut self.build_ops, prefix, pair);
+                        if g.is_identity(&s) {
+                            continue;
+                        }
+                        idx[depth + 1] = l as u32;
+                        self.insert(g, &s, idx);
+                    }
+                }
+                idx[depth + 1] = u32::MAX;
+            }
+        }
+        idx[depth] = u32::MAX;
+    }
+
+    fn insert<G: CountedGroup>(&mut self, g: &G, s: &G::Elt, idx: &[u32; KSUM_MAX_K as usize]) {
+        let bits = self.bits;
+        let packed = idx[..self.k as usize]
+            .iter()
+            .rev()
+            .fold(0u64, |w, &i| (w << bits) | u64::from(i));
+        match self.map.entry(g.key(s) >> 1) {
+            std::collections::hash_map::Entry::Vacant(v) => {
+                v.insert(packed);
+            }
+            std::collections::hash_map::Entry::Occupied(o) => {
+                if self.keep_collisions {
+                    self.collisions.push((*o.get(), packed));
+                }
+            }
+        }
+        self.insert_attempts += 1;
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -9571,8 +9712,15 @@ impl KSumTable {
         depth: usize,
         from: usize,
         partial: Option<G::Elt>,
+        pairs: Option<&[Option<G::Elt>]>,
         idx: &mut [u32; KSUM_MAX_K as usize],
     ) {
+        if let (Some(pairs), Some(prefix)) = (pairs, partial) {
+            if depth + 2 == self.k as usize {
+                self.extend_split(g, fb, groups, depth, from, prefix, pairs, idx);
+                return;
+            }
+        }
         let last = depth + 1 == self.k as usize;
         // With `prune`, stop where fewer than `k - depth - 1` abscissae
         // would remain for the deeper levels.
@@ -9593,24 +9741,9 @@ impl KSumTable {
                 }
                 idx[depth] = j as u32;
                 if last {
-                    let bits = self.bits;
-                    let packed = idx[..self.k as usize]
-                        .iter()
-                        .rev()
-                        .fold(0u64, |w, &i| (w << bits) | u64::from(i));
-                    match self.map.entry(g.key(&s) >> 1) {
-                        std::collections::hash_map::Entry::Vacant(v) => {
-                            v.insert(packed);
-                        }
-                        std::collections::hash_map::Entry::Occupied(o) => {
-                            if self.keep_collisions {
-                                self.collisions.push((*o.get(), packed));
-                            }
-                        }
-                    }
-                    self.insert_attempts += 1;
+                    self.insert(g, &s, idx);
                 } else {
-                    self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), idx);
+                    self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), pairs, idx);
                 }
             }
         }
@@ -22284,6 +22417,68 @@ mod ksum_wide_index_tests {
             assert!(full.build_ops.adds <= want_full && full.build_ops.adds + 64 >= want_full);
             assert!(pr.build_ops.adds <= want_pr && pr.build_ops.adds + 64 >= want_pr);
             assert!(pr.build_ops.adds < full.build_ops.adds, "k = {k}");
+        }
+    }
+
+    /// `split` builds the same table (keys, entries, inserts, collisions,
+    /// in the same order) on prime and binary curves, with or without
+    /// `prune`, and saves the `(k − 1)`-summand partial sums: exactly
+    /// `2^{k−2}·C(a − 1, k − 1) − 2·C(a − k + 2, 2)` adds below the pruned
+    /// build when no partial sum is the identity.
+    #[test]
+    fn split_build_is_the_same_table_with_fewer_adds() {
+        let choose = |n: u64, j: u64| (0..j).fold(1u64, |c, i| c * (n - i) / (i + 1));
+        let check = |name: &str, unsplit: &KSumTable, split: &KSumTable, a: u64, k: u64| {
+            assert_eq!(unsplit.map, split.map, "{name} k = {k}");
+            assert_eq!(unsplit.collisions, split.collisions, "{name} k = {k}");
+            assert_eq!(
+                unsplit.insert_attempts, split.insert_attempts,
+                "{name} k = {k}"
+            );
+            assert_eq!(unsplit.entries, split.entries, "{name} k = {k}");
+            assert_eq!(
+                split.split_pair_adds,
+                2 * choose(a - k + 2, 2),
+                "{name} k = {k}"
+            );
+            assert_eq!(unsplit.split_pair_adds, 0);
+            assert!(
+                split.build_ops.adds < unsplit.build_ops.adds,
+                "{name} k = {k}"
+            );
+        };
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        for (k, a) in [(3u32, 14usize), (4, 12), (5, 11), (5, 10), (6, 12), (7, 11)] {
+            let fb = prime_factor_base(&inst, a);
+            let a = fb.abscissae as u64;
+            for prune in [false, true] {
+                let base = KSumTable::build_negation_folded_opts(g, &fb, k, true, prune).unwrap();
+                let sp =
+                    KSumTable::build_negation_folded_split(g, &fb, k, true, prune, true).unwrap();
+                check("prime", &base, &sp, a, u64::from(k));
+                if prune {
+                    let k = u64::from(k);
+                    let level = (1u64 << (k - 2)) * choose(a - 1, k - 1);
+                    let want = base.build_ops.adds - level + 2 * choose(a - k + 2, 2);
+                    // Identity partials skip subtrees in both builds.
+                    assert!(
+                        sp.build_ops.adds <= want && sp.build_ops.adds + 64 >= want,
+                        "prime k = {k}: {} against {want}",
+                        sp.build_ops.adds
+                    );
+                }
+            }
+        }
+        let bin = random_binary_instance(17, 3, 4).expect("binary instance");
+        let bg = BinaryGroup(&bin.fast);
+        let fb = binary_subspace_factor_base(&bin, &[1, 2, 4, 8, 16]);
+        let a = fb.abscissae as u64;
+        assert!(a >= 8, "binary base has {a} abscissae");
+        for k in [3u32, 4, 5] {
+            let base = KSumTable::build_negation_folded_opts(&bg, &fb, k, true, true).unwrap();
+            let sp = KSumTable::build_negation_folded_split(&bg, &fb, k, true, true, true).unwrap();
+            check("binary", &base, &sp, a, u64::from(k));
         }
     }
 
