@@ -114,14 +114,6 @@ fn all_43_public_logs_recovered_through_real_balanced_jacobian() {
     }
     assert_eq!(number_of_rational_points, 43);
 
-    let image_g = cover.pullback_point_class(&g).unwrap();
-    assert!(!image_g.is_identity());
-    assert!(
-        image_g
-            .checked_scalar_mul(&big(43), source)
-            .unwrap()
-            .is_identity()
-    );
     let mut direct_adds = 0u64;
     let mut jacobian_adds = 0u64;
 
@@ -139,6 +131,11 @@ fn all_43_public_logs_recovered_through_real_balanced_jacobian() {
             |left, right| cover.checked_target_add(left, right).unwrap(),
             |value| cover.checked_target_neg(value).unwrap(),
         );
+        // Recreate even the generator image for each public target rather
+        // than borrowing it from an earlier target's solve.
+        let image_g = cover.pullback_point_class(&g).unwrap();
+        assert!(!image_g.is_identity());
+        assert!(image_g.checked_scalar_mul(&big(43), source).unwrap().is_identity());
         let image_q = cover.pullback_point_class(&q).unwrap();
         let transferred = solve_bsgs(
             BalancedDivisorP::try_identity(source).unwrap(),
@@ -173,10 +170,11 @@ fn all_43_public_logs_recovered_through_real_balanced_jacobian() {
     // Group-operation COUNTS, not comparable primitive or wall-clock costs.
     // Same BSGS roster and order means equal addition counts in both groups.
     assert_eq!(direct_adds, jacobian_adds);
+    assert_eq!(direct_adds, 706);
     eprintln!(
         "CT204: 43/43 actual toy logarithms; direct E additions={direct_adds}; \
          Jacobian additions={jacobian_adds}; 43 pullbacks and norms \
-         plus fixed generator pullback; no complete-cost speedup inferred \
+         plus 43 generator pullbacks; no complete-cost speedup inferred \
          [pcc:unverified]"
     );
 }
