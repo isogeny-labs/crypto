@@ -671,3 +671,88 @@ in that core. End-to-end rootfinder throughput is not measured.
 The workflow installed `perf version 7.0.14` but the Azure VM had
 `perf_event_paranoid=4` and no permitted hardware PMU events,
 so these CI figures are **wall-clock**, not hardware cycles.
+
+## Follow-up: fixed P-256 inversion chain and host thread-map fast path (2026-11-18 UTC)
+
+Two **retained** CPU/host changes after screening and actual-header CI validation:
+
+1. `fp256_inv` now uses a fixed 32-bit-block addition chain for P-256's
+   `p-2 = FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFD`
+   exponent. It builds `a^(2^32-1)` and `a^(2^32-3)`, then assembles
+   those fixed words. Compared with the previous host radix-16 chain,
+   the operation count is **255 squarings + 13 field multiplies**, down
+   from **255 squarings + 35 multiplies**. The device code is unchanged.
+   The exponent identity was independently checked using Python big integers;
+   a separate pinned local C++ arithmetic replica matched the old result
+   on 512 public nonzero/zero/one cases and confirmed the multiplicative
+   inverse on nonzero inputs.
+2. `rf_decompose_thread` now calls `rf_thread_map`. On the CPU only,
+   `tid <= UINT32_MAX` uses 32-bit quotient/remainder when mapping
+   linear thread IDs to target/chunk. For larger IDs it retains the
+   original 64-bit operations, preserving the documented >2^32 thread-count
+   range. CUDA retains the original mapping.
+
+**Actual repository-header CI** with GCC `-O2` on Ubuntu 24.04,
+[run 44225479500](https://github.com/isogeny-labs/crypto/actions/runs/44225479500):
+the rootfinder C++ correctness test and both paired microbenchmarks passed.
+The timing benchmark uses the same deterministic input stream, an isolated
+frozen-before comparison, and the median of nine timed trials per arm.
+
+| Measured CPU operation | Frozen before | Retained after | Speedup |
+|---|---:|---:|---:|
+| P-256 inversion chain | 10,242.963 ns/op | 9,457.756 ns/op | **1.083x** |
+| 32-bit-sized thread-ID mapping | 1.547 ns/op | 1.363 ns/op | **1.135x** |
+| 64-bit mapping fallback | 1.561 ns/op | 1.564 ns/op | 0.998x (neutral) |
+
+An earlier actual-header CI run
+([44224694599](https://github.com/isogeny-labs/crypto/actions/runs/44224694599))
+measured the same P-256 change at **15,284.719 -> 13,660.389 ns/op
+(1.119x)**; the different runner timings show why this is a preliminary
+microbenchmark result rather than a system-wide claim. The differences
+are CPU-only. GPU throughput and end-to-end decomposition were not measured.
+
+**Local `perf` status:** the Debian sandbox has no `perf` executable or
+package-repository DNS. Direct `perf_event_open` can collect **software
+task-clock** on an allowed CPU (the local process was pinned with
+`taskset -c 0`), but a hardware-cycles event returns `ENOENT` under
+the virtual machine. Pinned local C++ replicas used this software counter
+for paired candidate screening. For 16 additional paired fixed-chain
+trials, the median speedup was about **1.062x** (noisy, including
+regressions); for 70 thread-map comparisons across five divisor sizes,
+the median was about **1.666x** (also noisy). These are *not* readings
+from the actual checked-out repository. A GitHub-hosted Ubuntu runner did
+install `perf 7.0.14` but exposed `perf_event_paranoid=4` and rejected
+hardware PMU events. **No cycles, instructions, branch-miss, or cache-miss
+counts were obtained.** The workflow now has isolated
+`bench_chain256 --perf-before/--perf-after` and
+`bench_thread_map --perf-map32-before/--perf-map32-after` modes ready
+for a PMU-enabled runner.
+
+**Discarded after validation:** a host-only wide-expression Fp64
+Montgomery multiplication initially looked faster in a local replica,
+but the actual-header CI benchmark was **1.820 -> 2.507 ns/op
+(0.726x, regression)**. Masked Fp64 modular negation showed
+**2.228 -> 2.227 ns/op (1.000x)** in the same actual-header CI.
+Both changes were reverted, and the rejected-candidate benchmark
+was removed. A locally correct symmetric P-256 Comba square
+(32,768 outputs bit-identical) was also rejected after repeatedly
+slower task-clock measurements. CPU timings are compiler/machine sensitive;
+do not extrapolate these microbenchmarks to GPU or the IC pipeline.
+
+Reproduction on a checkout of this branch:
+
+```sh
+make -C gpu/rootfind test bench-chain256 bench-thread-map
+# On a host that permits PMU access:
+perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses -- \
+  gpu/rootfind/bench_chain256 --perf-before
+perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses -- \
+  gpu/rootfind/bench_chain256 --perf-after
+perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses -- \
+  gpu/rootfind/bench_thread_map --perf-map32-before
+perf stat -r 5 -e cycles,instructions,branches,branch-misses,cache-misses -- \
+  gpu/rootfind/bench_thread_map --perf-map32-after
+```
+
+The pull request remains **draft** until actual PMU, CUDA correctness
+and end-to-end decomposition throughput can be validated.
