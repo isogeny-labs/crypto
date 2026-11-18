@@ -25,6 +25,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           filter: blob:none
+          # The full crypto repository is unusually large; this isolated
+          # crate imports only the exact production source file.
+          sparse-checkout: |
+            research/radical_field_perf_20261117/isolated
+            src/cryptanalysis/prime_radical_root.rs
       - uses: dtolnay/rust-toolchain@stable
       - name: Compile actual Rust module and check arithmetic
         run: |
@@ -44,6 +49,8 @@ jobs:
             adaptive_window_power_and_quadratic_finish_match_frozen -- --nocapture
           cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
             quadratic_direct_discriminant_matches_frozen_normalized_formula -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            monic_cubic_entry_point_matches_frozen_normalization -- --nocapture
       - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
         shell: bash
         run: |
