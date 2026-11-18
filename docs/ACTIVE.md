@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Port the solver code the last four non-compiling targets need (SAT assumption API and decided-XOR cache; Groebner MatrixRuntime) and run the two adapted tests (Claude, started 2026-11-18, branch claude/bloom-hyperloglog-index-calculus-kh3pgr)
+- [x] Repair main's last non-compiling targets and restore the lost pipeline input checks (duplicate items from overlapping repairs removed; r/cofactor and factor-base index checks from f73b2edcc7 restored; rust_extension_security 7/7) (Claude, 2026-11-18, PR #4743)
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
