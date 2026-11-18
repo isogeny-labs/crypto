@@ -34,7 +34,8 @@ fn splitmix64(s: &mut u64) -> u64 {
 fn first_rational_points(ar: &mut Arithmetic, b: usize) -> Vec<Point> {
     let mut out = Vec::with_capacity(b);
     for x in 0..PRIME31.p {
-        if let Some(y) = ar.sqrt(ar.rhs(PRIME31, x), PRIME31.p) {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, PRIME31.p) {
             assert_ne!(y, 0);
             out.push(Some((x, y.min(PRIME31.p - y))));
             if out.len() == b { return out; }
@@ -84,7 +85,8 @@ fn query(ar: &mut Arithmetic, left: &[(Point, Word3)],
     let mut parity = false;
     let mut witness = None;
     for &(lp, lw) in left {
-        let complement = ar.add(PRIME31, target, ar.neg(PRIME31, lp));
+        let minus_lp = ar.neg(PRIME31, lp);
+        let complement = ar.add(PRIME31, target, minus_lp);
         if let Some(&rw) = right.get(&complement) {
             parity = !parity;
             witness = Some([lw[0], lw[1], lw[2], rw[0], rw[1], rw[2]]);
