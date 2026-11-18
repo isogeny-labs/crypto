@@ -75,6 +75,10 @@ impl Drop for OperationTally {
 /// Bounded field callers refuse the allocating optional tally path. Any live
 /// borrow also refuses admission: tick() needs an exclusive borrow even when
 /// this thread's stack is empty. The probe never changes stack or tally contents.
+#[allow(
+    dead_code,
+    reason = "Bounded original producer preflight is retained while its production dispatcher remains closed."
+)]
 pub(crate) fn current_thread_active_or_borrowed() -> bool {
     TALLIES.with(|stack| match stack.try_borrow_mut() {
         Ok(stack) => !stack.is_empty(),

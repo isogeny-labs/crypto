@@ -17,10 +17,30 @@ pub(super) enum Error {
 pub(super) struct Plan {
     pub work: u64,
     pub bytes: u64,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub scalar_steps: u64,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub scalar_calls: u64,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub primality_calls: u64,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub generated_wire_bound: u64,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub generated_owner_bytes: u64,
     pub bounds: ReplayBounds,
 }
@@ -147,15 +167,17 @@ pub(super) fn plan(
     let k = public["symmetry"]["frobenius_power"]
         .as_u64()
         .ok_or(Error::Shape)?;
-    if k == 0 || k > n || n % k != 0 {
+    if k == 0 || k > n || !n.is_multiple_of(k) {
         return Err(Error::Shape);
     }
     let groups = array(&public["curve"]["group_order_factorization"])?;
     if groups.len() > 64 {
         return Err(Error::Shape);
     }
-    let mut s = Scalars::default();
-    s.factors = groups.len() as u64;
+    let mut s = Scalars {
+        factors: groups.len() as u64,
+        ..Scalars::default()
+    };
     certificate(&public["curve"]["order_certificate"], config.twist, &mut s)?;
     s.scalar(r)?;
     s.scalar(r)?; // original generator and target, once

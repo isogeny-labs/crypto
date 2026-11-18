@@ -1,0 +1,9 @@
+# Original genus-two target subgroup has54.06percent full-base smoothness
+
+[pcc:unverified]. Freezedb3d1166dbb; input hashes passed; sole invocation exit0. C:y²=x⁵+18 over F251.67931 verified prime, first canonical place nonzero/order67931. All67931 successive subgroup elements valid, no intermediate identity, final closure. Degree counts[1,270,67660].135canonical affine places,270signed affine points,0affine Weierstrass points.
+
+Splitting oracle accepts36721 classes and rejects31210. This exactly matches independent reduced-pair formula1+270+270²/2=36721. This is a complete target-subgroup census rather than a sample or walk-yield estimate. Native group/oracle implementation is shared, not independently reviewed.
+
+Uniform full-base acceptance is36721/67931 (~0.5405632). Perfect acceptance is bounded by1, so the success-probability-only improvement is at most67931/36721=1.849922387735. This is an exact ratio with a displayed approximation, not a measured speedup. It excludes a10x mechanism based solely on replacing/unioning acceptance sets under identical uniform trial/useful-relation/cost assumptions on this instance. It does not bound nonuniform constructive samplers, new factor-base choices, useful-rank changes, arithmetic reductions, or linear-algebra improvements. No claim about the actual stationary law of an existing finite seeded walk is made.
+
+Decision: do not prioritize expensive exact CM reconstruction as if distinguishing four quotient candidates itself supplies a10x genus-two route. Keep the exact modules and rigorous complex invariants available, but require a cost/rank mechanism beyond smoothness probability before further curve/map construction for this goal. The genus-three nonhyperelliptic route has a distinct possible geometric mechanism and retains its separate reduction/recognition gap. Genus2+ scope remains open.

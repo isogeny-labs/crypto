@@ -145,6 +145,7 @@ impl Fixture {
         });
         write_json(&cell.join("protocol.json"), &protocol);
         let plan = DatasetPlan {
+            channels: None,
             schema: "crypto.ml-dataset.plan/v1".into(),
             field_sizes: vec![23],
             arities: vec![2],
@@ -161,6 +162,7 @@ impl Fixture {
             protocol_sha256: Some(digest(&fs::read(cell.join("protocol.json")).unwrap())),
             split_rule: "curve-twist-component-sha256-v1".into(),
             factor_base_policies: Vec::new(),
+            channels: None,
         };
         let canonical_plan_sha = digest(&serde_json::to_vec(&plan).unwrap());
         write_json(&cell.join("plan.json"), &plan);
@@ -720,7 +722,10 @@ fn cli_s3_without_complete_budget_arguments_rejects_before_aws_process() {
         .arg("s3://setec-astronomy-artifacts/synthetic-cli-fixture")
         .arg("--budget-policy")
         .arg(fixture.root.join("absent-policy.json"));
-    failure(&fixture.run(command), "provide all of --budget-policy");
+    failure(
+        &fixture.run(command),
+        "budget-policy, budget-grant, budget-owner and budget-state must be supplied together",
+    );
     assert!(!destination.exists());
     fixture.assert_no_aws();
 }

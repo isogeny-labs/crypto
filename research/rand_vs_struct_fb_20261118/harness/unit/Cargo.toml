@@ -1,0 +1,17 @@
+# Unit tests of the two HKY engines alone (`cargo test --release`): the
+# harness library cannot compile its other modules' test code, which names
+# parts of the root crate that are not built here.
+[package]
+name = "hky-speed-unit"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[lib]
+name = "crypto_lib"
+path = "src/lib.rs"
+
+[dependencies]
+rayon = "1.10"
