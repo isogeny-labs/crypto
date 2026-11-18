@@ -1,0 +1,124 @@
+name: Prime31 M6 any-witness complete Rust and matched baseline
+
+on:
+  push:
+    branches: [automation/prime31-weighted-slot-parity-20261118]
+    paths:
+      - '.github/workflows/prime31-weighted-m6-any.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_m6_any.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_weighted_m6_any.py'
+      - 'research/prime31_ic_20261115/native/PRIME31_M6_ANY_WITNESS_PROTOCOL_20261118.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  original-curve-complete:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Fetch exact candidate sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_weighted_m6_any.rs
+            research/prime31_ic_20261115/native/examples/prime31_weighted_m6_batch.rs
+            research/prime31_ic_20261115/native/verify_prime31_weighted_m6_any.py
+            research/prime31_ic_20261115/native/verify_prime31_weighted_m6_batch.py
+            research/prime31_ic_20261115/native/PRIME31_M6_ANY_WITNESS_PROTOCOL_20261118.md
+          sparse-checkout-cone-mode: false
+
+      - name: Fetch pinned original arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+
+      - name: Overlay candidates and verify original arithmetic identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C native-pinned rev-parse HEAD)" = "1df714645aa683cf975bc76fcacb9842cb4780fd"
+          for arm in prime31_weighted_m6_batch prime31_weighted_m6_any; do
+            cp "research/prime31_ic_20261115/native/examples/$arm.rs" "native-pinned/research/prime31_ic_20261115/native/examples/$arm.rs"
+          done
+          echo "candidate=$GITHUB_SHA pinned=1df714645aa683cf975bc76fcacb9842cb4780fd"
+          sha256sum native-pinned/research/prime31_ic_20261115/native/examples/prime31_weighted_m6_{any,batch}.rs
+
+      - name: Existing native library and B2 parity/existence tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          M=native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          cargo +1.100.0 test --locked --release --lib --manifest-path "$M"
+          cargo +1.100.0 test --locked --release --example prime31_weighted_m6_batch --manifest-path "$M"
+          cargo +1.100.0 test --locked --release --example prime31_weighted_m6_any --manifest-path "$M"
+
+      - name: Matched complete A B B A executions
+        shell: bash
+        run: |
+          set -euo pipefail
+          M=native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          cargo +1.100.0 build --locked --release --example prime31_weighted_m6_batch --example prime31_weighted_m6_any --manifest-path "$M"
+          cd native-pinned/research/prime31_ic_20261115/native/target/release/examples
+          ./prime31_weighted_m6_batch > "$GITHUB_WORKSPACE/parity-1.json"
+          ./prime31_weighted_m6_any > "$GITHUB_WORKSPACE/any-1.json"
+          ./prime31_weighted_m6_any > "$GITHUB_WORKSPACE/any-2.json"
+          ./prime31_weighted_m6_batch > "$GITHUB_WORKSPACE/parity-2.json"
+
+      - name: Independent complete group-law replay and matched summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in 1 2; do
+            python3 research/prime31_ic_20261115/native/verify_prime31_weighted_m6_batch.py "parity-$i.json" >> replay.jsonl
+            python3 research/prime31_ic_20261115/native/verify_prime31_weighted_m6_any.py "any-$i.json" >> replay.jsonl
+          done
+          python3 - <<'PY' | tee prime31-any-abba-summary.json
+          import json, statistics
+          data={(arm,i):json.load(open(f"{arm}-{i}.json")) for arm in ("parity","any") for i in (1,2)}
+          for arm in ("parity","any"):
+              a,b=data[arm,1],data[arm,2]
+              assert a["completed"]==b["completed"]==1024
+              assert a["train_rank"]==b["train_rank"]==31
+              assert a["target_attempts"]==b["target_attempts"]
+              assert a["train_calls"]==b["train_calls"]
+          for i in (1,2):
+              a,b=data["parity",i],data["any",i]
+              assert [x["public_point"] for x in a["targets"]]==[x["public_point"] for x in b["targets"]]
+              assert [x["recovered"] for x in a["targets"]]==[x["recovered"] for x in b["targets"]]
+              assert a["source_n"]==b["source_n"]==2147446831 and a["source_p"]==b["source_p"]==2147483647
+              assert a["nonenumerative_algebraic_extractor"] is False and b["nonenumerative_algebraic_extractor"] is False
+          times={arm:[data[arm,i]["total_ns_diagnostic"]/1e6 for i in (1,2)] for arm in ("parity","any")}
+          print(json.dumps({"protocol":"prime31-m6-any-abba-v1",
+              "same_runner":True, "original_prime31":True, "rank":31,
+              "logs_solved":1024, "timings_ms":times,
+              "paired_parity_over_any_speedup":[times["parity"][j]/times["any"][j] for j in range(2)],
+              "calls_and_costs":{arm:{key:data[arm,1][key] for key in ("train_calls","target_attempts","setup_cost","train_cost","query_cost")} for arm in ("parity","any")},
+              "general_prime_field_nongeneric_claim":False,
+              "pcc":"unverified"},sort_keys=True))
+          PY
+
+      - name: Preserve raw complete evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-m6-any-matched-1024q
+          path: |
+            parity-*.json
+            any-*.json
+            replay.jsonl
+            prime31-any-abba-summary.json
+          retention-days: 30
+          if-no-files-found: warn

@@ -1,0 +1,96 @@
+name: Prime31 weighted-slot parity exact Rust gate
+on:
+  push:
+    branches: [automation/prime31-weighted-slot-parity-20261118]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_slot_parity.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_weighted_slot_parity.py'
+      - '.github/workflows/prime31-weighted-slot-parity.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_slot_parity.rs'
+      - '.github/workflows/prime31-weighted-slot-parity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-prime31:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout only candidate and protocol
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_weighted_slot_parity.rs
+            research/prime31_ic_20261115/native/verify_prime31_weighted_slot_parity.py
+            research/prime31_ic_20261115/native/PRIME31_WEIGHTED_SLOT_PARITY_WITNESSES_20261118.json
+            research/prime31_ic_20261115/native/PRIME31_WEIGHTED_SLOT_PARITY_PROTOCOL_20261118.md
+          sparse-checkout-cone-mode: false
+      - name: Checkout pinned original Prime31 Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay candidate experiment, preserve original curve
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C native-pinned rev-parse HEAD)" = "1df714645aa683cf975bc76fcacb9842cb4780fd"
+          cp research/prime31_ic_20261115/native/examples/prime31_weighted_slot_parity.rs native-pinned/research/prime31_ic_20261115/native/examples/
+          echo "Candidate $GITHUB_SHA; original source 1df714645aa683cf975bc76fcacb9842cb4780fd"
+      - name: Original library regression
+        run: cargo +1.100.0 test --release --locked --lib --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Exhaustive weighted, uniform and translated B2 controls
+        run: cargo +1.100.0 test --release --locked --example prime31_weighted_slot_parity --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Exact B8 B16 B31 original-curve parity and witness panel
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --release --locked --example prime31_weighted_slot_parity --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml > prime31-weighted-slot-parity.json
+          python3 -m json.tool prime31-weighted-slot-parity.json > /dev/null
+          python3 - <<'PY'
+          import json
+          with open("prime31-weighted-slot-parity.json",encoding="utf-8") as f:
+              r=json.load(f)
+          assert r["source_curve_p"]==2**31-1 and r["source_group_order"]==2147446831
+          assert r["exhaustive_b2_original_curve_parity_checked"]
+          assert [x["b"] for x in r["experimental_panels"]]==[8,16,31]
+          for x in r["experimental_panels"]:
+              assert x["unweighted_theorem_odd_support_size"]==x["b"]
+              assert x["public_residuals"]==12
+              assert len(x["targets"])==12
+              assert sum(z["weighted_slot_odd_parity"] for z in x["targets"])==x["odd_residuals"]
+              for z in x["targets"]:
+                  assert bool(z["weighted_witness_index_per_slot_if_odd"])==z["weighted_slot_odd_parity"]
+          assert r["new_complete_ecdpl_logs"]==0
+          print("EXACT original Prime31 weighted-slot parity panels:",
+                json.dumps([{k:x[k] for k in ("b","left_parity_support","right_parity_support",
+                            "odd_residuals","charged_candidate_setup_operations",
+                            "public_query_group_additions","public_query_ns_total_diagnostic")}
+                            for x in r["experimental_panels"]],sort_keys=True))
+          PY
+      - name: Independently replay witnesses and B8 exact parity with Python integer arithmetic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/prime31_ic_20261115/native/verify_prime31_weighted_slot_parity.py prime31-weighted-slot-parity.json research/prime31_ic_20261115/native/PRIME31_WEIGHTED_SLOT_PARITY_WITNESSES_20261118.json | tee prime31-weighted-slot-parity-independent.json
+      - name: Retain complete original-curve parity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-weighted-slot-parity-source-specific
+          path: |
+            prime31-weighted-slot-parity.json
+            prime31-weighted-slot-parity-independent.json
+          retention-days: 30
+          if-no-files-found: warn
