@@ -2811,7 +2811,7 @@ fn groebner_basis_f4_inner(
         // Keep the column map for the next system's step of this key (a
         // move, no copy), and account the skeleton's growth.
         let mut skel_removed = 0u64;
-        if let Some(e) = entry.as_deref_mut() {
+        if let Some(e) = entry {
             skel_added += F4Skeleton::columns_bytes(&cols);
             skel_removed = stored_bytes;
             e.columns = Some(cols);

@@ -1834,7 +1834,7 @@ fn inv_mod_u64(a: u64, n: u64) -> Option<u64> {
 /// for `n` uses.
 trait EchelonField {
     type E: Clone;
-    fn from_big(&self, v: &BigUint) -> Self::E;
+    fn lift_big(&self, v: &BigUint) -> Self::E;
     fn to_big(&self, v: &Self::E) -> BigUint;
     fn is_zero(v: &Self::E) -> bool;
     /// `t − f·p mod n`.
@@ -1846,7 +1846,7 @@ struct WordField(u64);
 
 impl EchelonField for WordField {
     type E = u64;
-    fn from_big(&self, v: &BigUint) -> u64 {
+    fn lift_big(&self, v: &BigUint) -> u64 {
         (v % self.0).to_u64_digits().first().copied().unwrap_or(0)
     }
     fn to_big(&self, v: &u64) -> BigUint {
@@ -1866,7 +1866,7 @@ struct BigField(BigUint);
 
 impl EchelonField for BigField {
     type E = BigUint;
-    fn from_big(&self, v: &BigUint) -> BigUint {
+    fn lift_big(&self, v: &BigUint) -> BigUint {
         v % &self.0
     }
     fn to_big(&self, v: &BigUint) -> BigUint {
@@ -1916,9 +1916,9 @@ impl<F: EchelonField> Echelon<F> {
         let rank = pivot_row.iter().filter(|&&r| r != usize::MAX).count();
         let rows = matrix[..rank]
             .iter()
-            .map(|r| r.iter().map(|v| field.from_big(v)).collect())
+            .map(|r| r.iter().map(|v| field.lift_big(v)).collect())
             .collect();
-        let rhs = rhs[..rank].iter().map(|v| field.from_big(v)).collect();
+        let rhs = rhs[..rank].iter().map(|v| field.lift_big(v)).collect();
         Self {
             field,
             m: pivot_row.len(),
@@ -1953,8 +1953,8 @@ impl<F: EchelonField> Echelon<F> {
         let mut block: Vec<Vec<F::E>> = Vec::with_capacity(matrix.len());
         let mut block_rhs: Vec<F::E> = Vec::with_capacity(matrix.len());
         for (row, b) in matrix.iter().zip(&rhs) {
-            let mut row: Vec<F::E> = row.iter().map(|v| field.from_big(v)).collect();
-            let mut b = field.from_big(b);
+            let mut row: Vec<F::E> = row.iter().map(|v| field.lift_big(v)).collect();
+            let mut b = field.lift_big(b);
             for &(c, pr) in &old_pivots {
                 bitop_ops::word_op(1);
                 if F::is_zero(&row[c]) {
@@ -1992,9 +1992,9 @@ impl<F: EchelonField> Echelon<F> {
         }
         let new_rows: Vec<Vec<F::E>> = bm[..block_rank]
             .iter()
-            .map(|r| r.iter().map(|v| field.from_big(v)).collect())
+            .map(|r| r.iter().map(|v| field.lift_big(v)).collect())
             .collect();
-        let new_rhs: Vec<F::E> = bb[..block_rank].iter().map(|v| field.from_big(v)).collect();
+        let new_rhs: Vec<F::E> = bb[..block_rank].iter().map(|v| field.lift_big(v)).collect();
         // 3. Clear each new pivot column from the old pivot rows.  A new
         //    pivot row is zero left of its pivot, in every old pivot
         //    column and in every other new pivot column, so the old rows
