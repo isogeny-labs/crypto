@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T15:27:58Z",
+ "id": "PCC-20261118-07cc48",
+ "kind": "statement",
+ "producer": {
+  "commit": "ac8899bf8fcecc1c2efc2c80a1306417aa7653c0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-driver-20261118/pre-call-manifest.sha256",
+    "sha256": "a56099d19d5c5056e121d1f02ebf5d9ca11200986c373f802c759a106c9b4060"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-driver-20261118/results/qualification-a/main/prepared.json",
+    "sha256": "14abafe47518bbbc67cdc4417a0c5dd06f78c18b3b8ba0815a6b331a3e00ba2b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-driver-20261118/results/qualification-a/main.check.json",
+    "sha256": "22b641f162acbd81f48b8580636c3c754aa17bdf6309dd7c727afac4287305de"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-driver-20261118/results/qualification-a/field223.check.json",
+    "sha256": "f6fd81a75f8d54eccb3c6bfdbb5e8f60046f632426b072353e9e05c146038607"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-driver-20261118/results/qualification-a/field229.check.json",
+    "sha256": "f6fd81a75f8d54eccb3c6bfdbb5e8f60046f632426b072353e9e05c146038607"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-driver-20261118/results/pilot47-guard-exit.json",
+    "sha256": "f7b78100f9443fc32a3041e57c86412603095592526c364a512e10ff65fd6297"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/paired-driver-20261118",
+ "statement": "A native input bridge evaluates three small isogeny cases and checks their transported known-scalar targets and coordinate-isomorphism controls. The pinned ecbench release planner agrees on 144 scalar/coordinate rows, including a 32-distinct-target case. The actual 202-bit target and 96-bit pilot are rejected by the consumer field-width guard before any large construction. No timings, IC solve, admitted paired-endpoint benchmark or new conductor-gap record is established."
+}
