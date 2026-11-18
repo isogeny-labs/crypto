@@ -1,0 +1,185 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "m = 3 rootfind-subtract with a rotating sweep window (sweep = 1, 1/2, 1/4, 1/8, 1/16), |F_x| 2048/4096, incremental-gauss-echelon, the 37.4/39.3-bit curves of rf3la",
+ "description": "research/ic_m3_sweep_window_20261118, frozen before the run (PROTOCOL.md). Lead 1 of research/ic_m3_cost_leads_20261115. Same curves and target seed as research/ic_gpu_rootfind_la_20261115/specs/rf3la.json so the sweep=1 arm replicates its rf3-cpu-echelon records. Public synthetic curves; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 179789274499,
+    "a": 179789274496,
+    "b": 173964404864,
+    "group_order": 179789343343,
+    "r": 179789343343,
+    "gx": 59620662219,
+    "gy": 171377409987
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 697556657731,
+    "a": 697556657728,
+    "b": 166992763911,
+    "group_order": 697556764217,
+    "r": 697556764217,
+    "gx": 32890058555,
+    "gy": 671668786987
+   }
+  ],
+  "targets_per_curve": 3,
+  "target_seed": 20261127
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rf3-f1-F2048",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f2-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3,sweep=1/2",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f4-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3,sweep=1/4",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f8-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3,sweep=1/8",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f16-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3,sweep=1/16",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f1-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f2-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=3,sweep=1/2",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f4-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=3,sweep=1/4",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f8-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=3,sweep=1/8",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f16-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=3,sweep=1/16",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261182,
+  "isolation_required": "L0",
+  "timeout_seconds": 7200
+ }
+}
