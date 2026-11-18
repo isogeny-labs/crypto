@@ -1,51 +1,47 @@
-# Resume: crypto @ codex/ghs-rho-opt-20261118
+# Resume: crypto @ codex/ghs-rho-parallel-20261118
 
 ## Goal
-Optimize the matched strong-rho comparator for the restricted GHS-weak
-`E0/F_{q^3}` frontier while preserving the frozen Round A record, then open a
-ready PR with correctness, count, profile, and local timing evidence.
+Compose the reviewed strong-rho optimization lanes for the restricted
+GHS-weak `E0/F_{q^3}` comparator, preserve exact evidence boundaries, and land
+the result through PR #4757.
 
 ## Lead / hypothesis
-`strong_rho.rs::sq` currently calls the six-product generic cubic multiply.
-The prospective Round B protocol derives a five-product cubic square. It
-should preserve the exact walk and remove one priced `F_q` multiplication per
-`F_{q^3}` square; it cannot alone move the E2E leaderboard.
+Direct cubic inversion, jump-only setup batching, reciprocal reduction,
+counter-free arithmetic, and hot-loop storage/hash cleanup compose while
+preserving the exact public q=223 trajectory. Retry2 is count-negative and is
+retained only as evidence.
 
 ## Spec
-`research/quartic_ghs_strong_rho_20261114/ROUND_B.md`; baseline revision
-`9ec88b7637aac4ce816739155f12f518b393da37`; public diagnostic `q=4051`, seed
-1, target 0, `ic-repeat`, `strong-b8`, calibration triples 3, one thread.
+`research/quartic_ghs_strong_rho_parallel_20261118/PLAN.md`; integration
+evidence in `research/quartic_ghs_strong_rho_20261114/round-c-integration/`;
+public deterministic control q=223, seed 1, `ic-repeat`, widths 1/4/8/16/32.
 
 ## State
-Round B was frozen at `90c3faf97b`. The five-product square and its count
-assertions are implemented. Standalone self-test and the deterministic q=223
-producer control pass; raw records show the same walk and exactly 5,500 fewer
-`fq_mul`, one per `f3_sq`. Research-KB and Conductor executables are
-unavailable. Checkpoint push/gate exited 1 because no upload transport exists,
-so no profile, isolated timing, or frontier run was started. The standalone
-source check passes. The required full release library test reaches unrelated
-base compilation failures after sparse dependencies are materialized; retained
-in `round-b/full-test-status.txt`. Ready PR #4687 is open with merge-method
-auto-merge enabled; the first ecbench scope check failed while hydrating
-unrelated historical artifacts from its cache.
+Integration head `e6dae43a8a` is pushed. Scoped selftest, twelve-arm q=223
+validator, ten analyzer tests, optimized-IR counter-elision, artifact hashes,
+PCC ledger, prose, lesson, and diff checks pass. The composed b8 control keeps
+the 1,487-step trajectory and changes total `fq_mul` 149,558 to 110,435 and
+`fq_inv` 2,619 to 782. The required release-library attempt reaches one
+duplicate unrelated test already present on main; receipt is retained. No
+profile, isolated timing, matched grid, or frontier update ran because
+checkpoint admission is unavailable. Draft PR #4757 is open.
 
 ## Next steps
-1. Follow PR #4687 under the repository check-in cadence; address only
-   attributable review or CI failures.
-2. When checkpoint transport exists, rerun `scripts/checkpoint.sh push` and
-   `gate`, then profile baseline/candidate with `tools/profile.sh`.
-3. Run the frozen A/A and five-pair ABAB local diagnostic, followed by the
-   separately admitted complete grid before any frontier update.
+1. Update PR #4757, mark it ready, enable merge auto-merge, and follow the
+   required gate/size/artifacts checks.
+2. When checkpoint transport exists, run the admitted source-bound profile,
+   A/A/ABAB diagnostic, and complete matched grid before any frontier update.
+3. Start separate prospective lanes for five-product general cubic
+   multiplication and reuse of the joint setup table for initial walkers.
 
 ## Runs in flight
-None.
+PR #4757 CI after the follow-up commit; no benchmark or cloud run.
 
 ## Stop and success conditions
-Stop on checkpoint refusal before any experiment, a wrong square or DLP,
-walk/count divergence outside the frozen formula, or missing raw output.
-Success for this round is exact correctness plus one fewer `fq_mul` per
-`f3_sq`; local wall time remains diagnostic. The leaderboard changes only
-after a complete isolated, validated, source-bound grid.
+Stop on checkpoint refusal before any experiment, trajectory/count divergence,
+or missing raw output. Success for this round is merged, source-bound code and
+deterministic evidence. The leaderboard changes only after a complete
+isolated, validated, source-bound grid.
 
 ---
 
