@@ -1104,4 +1104,436 @@ mod complete_b31_1024_tests {
             "independent_signed_pcc":false
         }));
     }
+
+    // Frozen protocol B27_B29_B31_FULL_COST_PROTOCOL_20261117.md.
+    // Sensitivity of a GENERIC 4A+4A complete pipeline, not an algebraic
+    // sign-independent prime-field index-calculus breakthrough.
+    #[test]
+    fn actual_prime31_b27_b29_b31_256q_complete_cost() {
+        const QCOUNT: usize = 256;
+        let mut panels = Vec::new();
+
+        for &active in &[27usize, 29, 31] {
+            let setup_start = Instant::now();
+            let mut ar = Arithmetic::default();
+            check_curve(PRIME31, &mut ar).expect("actual ordinary prime-order curve");
+            let entire_dickson = Base::build(PRIME31, 6, &mut ar)
+                .expect("unchanged depth-six Dickson base");
+            assert_eq!(entire_dickson.points.len(), 31);
+            let base = entire_dickson.points[..active].to_vec();
+            let mut unique_x = HashSet::new();
+            for &(x,y) in &base {
+                assert!(unique_x.insert(x));
+                assert_eq!(ar.rhs(PRIME31,x), ((y as u128*y as u128)%PRIME31.p as u128) as u64);
+            }
+            let pts = tokens(&ar, &base);
+            let half = FourSet::build(&mut ar, &pts);
+            let setup_ns = setup_start.elapsed().as_nanos();
+            let n4 = signature_count(active, 4);
+            let n8 = signature_count(active, 8);
+            assert_eq!(half.integer_signatures as u128, n4);
+            assert!(half.index.len() <= n4 as usize);
+            if active == 31 {
+                assert_eq!(half.index.len(), 618_885);
+                assert_eq!(n8, 5_654_193_417);
+            }
+
+            // Generate exactly the same 256 public Q as the 1024-Q control
+            // outside candidate phase timings. Harness-only k never reaches
+            // public_relation, rank learning or the factor-base oracle.
+            let corpus_start = Instant::now();
+            let mut seed = CORPUS_SEED;
+            let mut seen = HashSet::<u64>::new();
+            let mut targets = Vec::with_capacity(QCOUNT);
+            while targets.len() < QCOUNT {
+                let k = 1 + splitmix64(&mut seed) % (PRIME31.n - 1);
+                if !seen.insert(k) { continue; }
+                targets.push((ar.scalar(PRIME31,k,Some(PRIME31.g)), k));
+            }
+            assert_eq!(targets[0].0, Some((872_133_043,510_239_525)));
+            let corpus_generation_ns_excluded = corpus_start.elapsed().as_nanos();
+
+            let mut batch = BatchStats::default();
+            let mut rank = ModRank::default();
+            let mut rows = Vec::<Row>::new();
+            let mut relation_seed = RELATION_SEED;
+            let mut source_attempts = 0usize;
+            let mut source_negatives = 0usize;
+            let mut source_count = 0usize;
+            let mut source_unresolved = 0usize;
+            let before_rank = ar.counts;
+            let rank_start = Instant::now();
+            for _ in 0..MAX_SOURCES {
+                if rank.count == active { break; }
+                source_count += 1;
+                let a = 1 + splitmix64(&mut relation_seed) % (PRIME31.n - 1);
+                let q = ar.scalar(PRIME31,a,Some(PRIME31.g));
+                if let Some((w,shift)) = public_relation(
+                    &mut ar,&half,&pts,q,&mut batch,&mut source_attempts,&mut source_negatives
+                ) {
+                    let row = signed_row(w,nadd(a,shift));
+                    for &coeff in &row[active..DIM] {
+                        assert_eq!(coeff,0,"inactive factor-base column must be zero");
+                    }
+                    rank.insert(row);
+                    rows.push(row);
+                } else { source_unresolved += 1; }
+            }
+            assert_eq!(rank.count,active,"128-public-source rank cap insufficient for B={active}");
+
+            // The existing 31-column solver is restricted to its first
+            // active columns without weakening the modular consistency gate.
+            let mut logs = [0u64; DIM];
+            for i in (0..active).rev() {
+                let row = rank.pivots[i].expect("rank-active pivot absent");
+                let mut rhs = row[DIM];
+                for j in (i+1)..active {
+                    rhs = nsub(rhs, nmul(row[j],logs[j]));
+                }
+                logs[i] = rhs;
+            }
+            for i in active..DIM { assert!(rank.pivots[i].is_none()); }
+            for (i,&v) in logs.iter().enumerate().take(active) {
+                assert_eq!(
+                    ar.scalar(PRIME31,v,Some(PRIME31.g)),
+                    Some(base[i]),
+                    "recovered prefix factor-base log does not replay"
+                );
+            }
+            for row in &rows {
+                assert_eq!(evaluate_row(row,&logs),row[DIM]);
+            }
+            let rank_ns = rank_start.elapsed().as_nanos();
+            let rank_fp_mults = ar.counts.fp_multiplications-before_rank.fp_multiplications;
+
+            // Same 16 separate known-public-source equations as #4623.
+            let controls_start = Instant::now();
+            let mut controls_verified = 0usize;
+            let mut controls_unresolved = 0usize;
+            for _ in 0..16 {
+                let a = 1 + splitmix64(&mut relation_seed) % (PRIME31.n - 1);
+                let q = ar.scalar(PRIME31,a,Some(PRIME31.g));
+                if let Some((w,shift)) = public_relation(
+                    &mut ar,&half,&pts,q,&mut batch,&mut source_attempts,&mut source_negatives
+                ) {
+                    let row = signed_row(w,nadd(a,shift));
+                    assert_eq!(evaluate_row(&row,&logs),row[DIM]);
+                    controls_verified += 1;
+                } else { controls_unresolved += 1; }
+            }
+            assert_eq!(controls_verified+controls_unresolved,16);
+            let controls_ns = controls_start.elapsed().as_nanos();
+
+            let before_targets = ar.counts;
+            let target_start = Instant::now();
+            let mut target_attempts = 0usize;
+            let mut target_negatives = 0usize;
+            let mut first_shift = [0usize;10];
+            let mut generic_bsgs_fallbacks = 0usize;
+            let mut transcript = Vec::with_capacity(QCOUNT);
+            for (case,&(q,caller_only_k)) in targets.iter().enumerate() {
+                let old_attempts = target_attempts;
+                let old_negatives = target_negatives;
+                let (recovered,witness,shift) =
+                    if let Some((w,shift))=public_relation(
+                        &mut ar,&half,&pts,q,&mut batch,&mut target_attempts,&mut target_negatives
+                    ) {
+                        let mut rlog = 0u64;
+                        for token in w {
+                            let i=(token/2) as usize;
+                            assert!(i<active);
+                            rlog=if token&1==0 {
+                                nadd(rlog,logs[i])
+                            } else { nsub(rlog,logs[i]) };
+                        }
+                        first_shift[shift as usize]+=1;
+                        (nsub(rlog,shift),Some(w),Some(shift))
+                    } else {
+                        generic_bsgs_fallbacks+=1;
+                        (
+                            fallback_bsgs(&mut ar,q)
+                                .expect("charged total group BSGS fallback failed"),
+                            None,None
+                        )
+                    };
+                assert_eq!(ar.scalar(PRIME31,recovered,Some(PRIME31.g)),q);
+                assert_eq!(recovered,caller_only_k,"hidden known answer only in harness");
+                transcript.push(json!({
+                    "index":case,
+                    "public_Q":q,
+                    "recovered_k":recovered,
+                    "first_successful_shift":shift,
+                    "signed_eight_witness":witness,
+                    "exact_attempts":target_attempts-old_attempts,
+                    "exhaustive_negative_attempts":target_negatives-old_negatives,
+                    "charged_generic_BSGS_fallback":witness.is_none()
+                }));
+            }
+            let target_ns = target_start.elapsed().as_nanos();
+            assert_eq!(transcript.len(),QCOUNT);
+            if active == 31 {
+                assert_eq!(first_shift[0],237,
+                    "same first-256 frozen corpus as previous B31 coverage");
+            }
+            let target_fp_mults =
+                ar.counts.fp_multiplications-before_targets.fp_multiplications;
+            let target_native_adds =
+                ar.counts.group_additions-before_targets.group_additions;
+            let charged_ns=setup_ns+rank_ns+controls_ns+target_ns;
+
+            panels.push(json!({
+                "base_size":active,
+                "factor_base_prefix_points":base,
+                "formal_signed_four_nets":n4.to_string(),
+                "formal_signed_eight_nets":n8.to_string(),
+                "distinct_four_group_points":half.index.len(),
+                "four_signature_collisions":n4 as usize-half.index.len(),
+                "four_sum_hashmap_capacity":half.index.capacity(),
+                "four_sum_ordered_capacity":half.ordered.capacity(),
+                "rank":rank.count,
+                "rank_target":active,
+                "public_known_source_count_to_full_rank":source_count,
+                "public_known_source_unresolved_after_9_shifts":source_unresolved,
+                "factor_base_logs":logs[..active].to_vec(),
+                "signed_modular_relation_rows":rows,
+                "extra_known_source_equations_verified":controls_verified,
+                "extra_known_source_equations_unresolved":controls_unresolved,
+                "known_source_membership_attempts_including_controls":source_attempts,
+                "known_source_exhaustive_negative_attempts":source_negatives,
+                "unknown_log_results":transcript,
+                "unknown_logs_recovered":QCOUNT,
+                "target_membership_attempts":target_attempts,
+                "target_exhaustive_negative_attempts":target_negatives,
+                "first_successful_public_shift_histogram":first_shift,
+                "generic_BSGS_fallback_count":generic_bsgs_fallbacks,
+                "charged_common_curve_base_and_four_index_setup_ns":setup_ns.to_string(),
+                "charged_public_basis_learning_and_original_curve_replay_ns":rank_ns.to_string(),
+                "charged_16_public_source_controls_ns":controls_ns.to_string(),
+                "charged_256_blinded_target_solve_and_original_curve_verification_ns":target_ns.to_string(),
+                "charged_total_ns":charged_ns.to_string(),
+                "target_generation_harness_ns_excluded":corpus_generation_ns_excluded.to_string(),
+                "rank_learning_native_fp_mults":rank_fp_mults,
+                "target_native_fp_mults":target_fp_mults,
+                "target_native_group_additions":target_native_adds,
+                "full_panel_native_fp_mults":ar.counts.fp_multiplications,
+                "full_panel_native_fp_inversions":ar.counts.fp_inversions,
+                "full_panel_native_group_additions":ar.counts.group_additions,
+                "batched_complement_operation_counters":format!("{batch:?}")
+            }));
+        }
+
+        println!("PRIME31_B27_B29_B31_COMPLETE_JSON={}", json!({
+            "schema":"prime31.actual_bsize_256q_complete.v1",
+            "validation":"source-specific producer Rust [pcc:unverified]",
+            "field_p":PRIME31.p,"subgroup_n":PRIME31.n,
+            "same_public_256_target_corpus_seed":format!("{CORPUS_SEED:#018x}"),
+            "same_known_source_seed":format!("{RELATION_SEED:#018x}"),
+            "same_public_shift_cap":MAX_PUBLIC_SHIFT,
+            "same_public_target_count":QCOUNT,
+            "original_rust_curve_and_batched_four_sum_oracle":true,
+            "all_attempts_and_generic_fallback_charged":true,
+            "true_sign_independent_algebraic_extraction":false,
+            "external_matched_IC_frontier_measured_here":false,
+            "independent_signed_pcc":false,
+            "panels":panels
+        }));
+    }
+
+}
+
+
+// Original-curve matched-coverage *null control* for signed eight-leaf sums.
+// Public-Q candidate reuses the existing generic FourSet and 512-lane batch
+// complement engine. It is NOT sign-independent S9/RR9 extraction or ECDLP.
+// Preregistered: B31_MATCHED_COVERAGE_NULL_PROTOCOL_20261117.md (PR #4626).
+#[cfg(test)]
+mod b31_coverage_null_tests {
+    use super::*;
+    use super::batch_complement_tests::{recover_batched, BatchStats};
+
+    const TARGETS: usize = 256;
+    const CORPUS_SEED: u64 = 0x4d49_5834_5033_3131;
+    const RANDOM_SEEDS: [u64; 2] = [
+        0x5241_4e44_4233_3101,
+        0x5241_4e44_4233_3102,
+    ];
+
+    // In the abstract null, z_i are independent uniform scalars modulo n.
+    // The conditioned fixed-x bases below are empirical controls, not an
+    // independently hashed family of all N signed-net signatures.
+    const NET8: u128 = 5_654_193_417;
+    const NET4: u128 = 618_885;
+
+    fn random_distinct_x_base(ar: &mut Arithmetic, mut seed: u64) -> Vec<(u64, u64)> {
+        let mut seen_x = HashSet::new();
+        let mut points = Vec::with_capacity(B31);
+        while points.len() < B31 {
+            let k = 1 + splitmix64(&mut seed) % (PRIME31.n - 1);
+            let (x, y) = ar.scalar(PRIME31, k, Some(PRIME31.g))
+                .expect("nonzero generator scalar gives a finite point");
+            if seen_x.insert(x) {
+                points.push((x, y.min(PRIME31.p - y)));
+            }
+        }
+        assert_eq!(seen_x.len(), B31);
+        points
+    }
+
+    fn corpus(ar: &mut Arithmetic) -> Vec<Point> {
+        let mut seed = CORPUS_SEED;
+        let mut seen = HashSet::new();
+        let mut targets = Vec::with_capacity(TARGETS);
+        while targets.len() < TARGETS {
+            let scalar = 1 + splitmix64(&mut seed) % (PRIME31.n - 1);
+            if seen.insert(scalar) {
+                targets.push(ar.scalar(PRIME31, scalar, Some(PRIME31.g)));
+            }
+        }
+        assert_eq!(targets[0], Some((872_133_043, 510_239_525)),
+            "must reuse original frozen 1024-Q Rust corpus");
+        targets
+    }
+
+    #[test]
+    fn actual_prime31_matched_b31_256q_unshifted_coverage() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31, &mut ar).expect("original ordinary cofactor-one curve");
+        assert_eq!(signature_count(B31, 4), NET4);
+        assert_eq!(signature_count(B31, 8), NET8);
+
+        let targets = corpus(&mut ar);
+        let dickson = Base::build(PRIME31, 6, &mut ar)
+            .expect("original 31-point Dickson depth-six factor base");
+        assert_eq!(dickson.points.len(), B31);
+        let arms: Vec<(&str, Vec<(u64, u64)>)> = vec![
+            ("actual_dickson31", dickson.points),
+            ("first31_rational_x", first_rational_points(&mut ar, B31)),
+            ("seeded_random31_a", random_distinct_x_base(&mut ar, RANDOM_SEEDS[0])),
+            ("seeded_random31_b", random_distinct_x_base(&mut ar, RANDOM_SEEDS[1])),
+        ];
+
+        let mut all_hits: Vec<Vec<bool>> = Vec::with_capacity(arms.len());
+        let mut panels = Vec::with_capacity(arms.len());
+        for (name, base) in arms {
+            assert_eq!(base.len(), B31);
+            let mut unique_x = HashSet::new();
+            for &(x, y) in &base {
+                assert!(unique_x.insert(x), "every point has a distinct x");
+                assert_eq!(y, y.min(PRIME31.p - y), "canonical y sign");
+                assert_eq!(ar.rhs(PRIME31, x), ((y as u128*y as u128)%PRIME31.p as u128) as u64);
+            }
+            let setup_start = Instant::now();
+            let pts = tokens(&ar, &base);
+            let half = FourSet::build(&mut ar, &pts);
+            let setup_ns = setup_start.elapsed().as_nanos();
+            assert!(half.index.len() <= NET4 as usize);
+            let mut stats = BatchStats::default();
+            let before = ar.counts;
+            let query_start = Instant::now();
+            let mut mask = Vec::with_capacity(TARGETS);
+            let mut probes = 0u64;
+            let mut positives = 0usize;
+            let mut negatives = 0usize;
+            for &q in &targets {
+                let (witness, visited) = recover_batched(&mut ar, &half, &pts, q, &mut stats);
+                probes += visited as u64;
+                if witness.is_some() {
+                    positives += 1;
+                } else {
+                    negatives += 1;
+                    assert_eq!(visited, half.ordered.len(),
+                        "negative query must exhaust every distinct 4A sum");
+                }
+                mask.push(witness.is_some());
+            }
+            let query_ns = query_start.elapsed().as_nanos();
+            assert_eq!(mask.len(), TARGETS);
+            assert_eq!(positives + negatives, TARGETS);
+            if name == "actual_dickson31" {
+                // Recheck against the frozen first-256 JSON from #4623.
+                assert_eq!(positives, 237, "Dickson coverage changed vs exact 1024-Q Rust transcript");
+                assert_eq!(half.index.len() as u128, NET4, "Dickson 4A cardinality changed");
+            }
+            panels.push(json!({
+                "base_name":name,
+                "public_base_points":base,
+                "four_net_signatures":NET4.to_string(),
+                "distinct_four_group_points":half.index.len(),
+                "four_signature_collisions":NET4 as usize-half.index.len(),
+                "four_set_hash_capacity_entries":half.index.capacity(),
+                "four_set_ordered_capacity_entries":half.ordered.capacity(),
+                "charged_four_set_build_and_tokens_ns":setup_ns.to_string(),
+                "charged_all_256_public_queries_ns":query_ns.to_string(),
+                "original_arithmetic_native_fp_mults":ar.counts.fp_multiplications-before.fp_multiplications,
+                "original_arithmetic_native_fp_inversions":ar.counts.fp_inversions-before.fp_inversions,
+                "native_group_additions":ar.counts.group_additions-before.group_additions,
+                "custom_batch_operation_counters":format!("{stats:?}"),
+                "first_shift_zero_hits":positives,
+                "first_shift_zero_exhaustive_negatives":negatives,
+                "total_exact_four_set_complement_probes":probes,
+                "unshifted_public_target_hit_mask":mask,
+                "original_curve_signed_witness_replay_for_each_hit":true
+            }));
+            all_hits.push(mask);
+        }
+
+        let mut paired = Vec::new();
+        for j in 1..all_hits.len() {
+            let mut both = 0usize;
+            let mut dickson_only = 0usize;
+            let mut comparator_only = 0usize;
+            let mut neither = 0usize;
+            for i in 0..TARGETS {
+                match (all_hits[0][i], all_hits[j][i]) {
+                    (true, true) => both += 1,
+                    (true, false) => dickson_only += 1,
+                    (false, true) => comparator_only += 1,
+                    (false, false) => neither += 1,
+                }
+            }
+            assert_eq!(both+dickson_only+comparator_only+neither, TARGETS);
+            paired.push(json!({
+                "comparator_index":j,
+                "both_hit":both,
+                "dickson_only":dickson_only,
+                "comparator_only":comparator_only,
+                "neither_hit":neither
+            }));
+        }
+
+        let n = PRIME31.n as u128;
+        // Pairwise-collision formula is rigorous only for independent uniform
+        // abstract z_i. Bin/Poisson coverage below is heuristic because every
+        // signed-net map reuses the same 31 scalars, inducing correlations.
+        let expected_energy_numerator = NET8 * (n + NET8 - 1);
+        let mean_occupancy = NET8 as f64 / PRIME31.n as f64;
+        let heuristic_hit = 1.0 - (-mean_occupancy).exp();
+        println!("B31_MATCHED_COVERAGE_JSON={}", json!({
+            "schema":"prime31.b31.matched_256q_coverage_null.v1",
+            "validation":"producer exact-source Rust [pcc:unverified]",
+            "field_p":PRIME31.p,
+            "order_n":PRIME31.n,
+            "curve_a":PRIME31.a,
+            "curve_b":PRIME31.b,
+            "common_frozen_corpus_seed":format!("{CORPUS_SEED:#018x}"),
+            "random_factor_base_seeds":[format!("{:#018x}",RANDOM_SEEDS[0]),format!("{:#018x}",RANDOM_SEEDS[1])],
+            "same_public_target_count":TARGETS,
+            "public_shift":0,
+            "formal_signed_four_net_count":NET4.to_string(),
+            "formal_signed_eight_net_count":NET8.to_string(),
+            "uniform_scalar_null_expected_collision_energy_numerator":expected_energy_numerator.to_string(),
+            "uniform_scalar_null_expected_collision_energy_denominator":PRIME31.n,
+            "uniform_scalar_null_support_lower_bound_fraction":NET8 as f64/(n+NET8-1) as f64,
+            "independent_bin_occupancy_heuristic_mean":mean_occupancy,
+            "independent_bin_occupancy_heuristic_hit_fraction":heuristic_hit,
+            "independent_bin_occupancy_is_not_a_theorem":true,
+            "matched_panels":panels,
+            "paired_outcomes_against_dickson":paired,
+            "reused_original_generic_four_plus_four_oracle":true,
+            "sign_independent_extraction":false,
+            "new_unknown_logarithms_solved":0,
+            "full_cost_ecdlp_benchmark":false,
+            "signed_pcc":false
+        }));
+    }
 }
