@@ -165,8 +165,14 @@ short-Weierstrass negation certificate `F(omitted,-omitted)=0` avoids a
 separately constructed inverse series. A new possibly noncommutative-ring
 theorem derives `V+pi=[t]` from the Frobenius characteristic polynomial,
 `pi*V=[p]`, left cancellation by `pi`, and centrality of `[t]`. Binding those
-four elliptic certificates, negation, order-`p` Frobenius, sign and target
-scaling remains open.
+abstract premises to additive endomorphisms now removes two certificates:
+integer scalar maps are central automatically, and injective `pi` supplies
+left-composition cancellation. Thus an actual point-group instance needs
+injective Frobenius plus the norm and characteristic equations. A checked
+`ZMod 2` mutation shows injectivity is necessary: the two equations hold for
+zero `pi,V`, cardinality two and trace one, while the sum conclusion fails.
+Constructing the elliptic maps and connecting their equality to the formal
+parameter, negation, order-`p` Frobenius, sign and target scaling remains open.
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

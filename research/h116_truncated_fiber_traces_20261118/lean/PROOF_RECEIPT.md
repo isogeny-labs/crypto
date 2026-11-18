@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-b3232b3e3960a8b419acff9e20d71a252d8419150f6300727fb045c0ea1d6b6a  H116FiberTrace.lean
+158fb904645af9ddf79b7a250f085b91b3fd9a116cbd936a394502afcc6d267a  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  94 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  96 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -35,6 +35,8 @@ b9a7d56d16d41dc867cb768b114d87dd81b1cd3c745b2968adca395e95dca634  receipts/curve
 4f1d11d86bd8040b77073409c5d5e07f2f75bb18257ef6b9d5f0a5f31b9f4ac4  receipts/formal-group-audit.log
 e799ca27fd505fd3bd6d62389f8a609bf2a99e23765c810eb2c8ab8fff7210e1  receipts/formal-cancellation-build.txt
 555c4dbcbbc1bf204023d35b37e47b1211b2dfc2eacc0aa1b4c9d5be673849fd  receipts/formal-cancellation-audit.txt
+d0b4471bb8940fdc9338cdafd1a2067462d9b7dcaa8d872b3ab3b17b35ad047e  receipts/endomorphism-specialization-build.txt
+79e02a8aac2abe78f8053a1c859a4617a379e25cb973f0beacaa86992af0243e  receipts/endomorphism-specialization-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -130,8 +132,16 @@ does not construct the missing formal-group/endomorphism instance.
 It additionally proves, over a possibly noncommutative ring, that the
 Frobenius characteristic equation and norm relation imply `V+pi=trace` when
 left composition by `pi` is cancellable and the scalar trace commutes with
-`pi`. Binding those four premises to the actual elliptic endomorphisms remains
-an explicit instance obligation.
+`pi`. The 95-theorem checkpoint specializes this result to the concrete ring
+`AddMonoid.End G`: preservation of integer multiples proves scalar centrality,
+and pointwise injectivity of `pi` proves left-composition cancellation. Hence
+injective `pi`, `pi*V=[p]`, and `pi^2-[t]*pi+[p]=0` imply `V+pi=[t]` as
+additive endomorphisms. A checked `ZMod 2` mutation control sets `pi=V=0`,
+`p=2`, and `t=1`: the norm and characteristic equations still hold while the
+sum conclusion fails, demonstrating that injectivity is a necessary boundary.
+Constructing the actual elliptic maps, proving the three positive certificates,
+and transporting pointwise equality to the local formal group remain explicit
+endpoint obligations.
 [pcc:unverified]
 
 The first integration build is retained at

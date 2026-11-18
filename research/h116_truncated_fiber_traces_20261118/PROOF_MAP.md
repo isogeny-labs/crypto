@@ -347,6 +347,58 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
 | `V+pi=trace` from characteristic and norm equations | abstract endomorphism algebra | H116 over Mathlib ring laws | possibly noncommutative ring | left cancellation by `pi`, `pi` commutes with `trace`, `pi*V=cardinality`, characteristic equation |
 | actual elliptic `V+pi=[t]` | endpoint instance | future elliptic formal-group owner | elliptic endomorphism ring | bind the four abstract premises to Frobenius, Verschiebung and scalar maps |
 
+## Additive-endomorphism specialization instance gate
+
+1. **Structure above.** The quantified object is `AddMonoid.End G` for an
+   arbitrary additive commutative group `G`. Mathlib equips this type with a
+   generally noncommutative ring structure whose multiplication is function
+   composition, so `(pi * V)(P)=pi(V(P))`. Integer casts are the scalar
+   endomorphisms `P -> n • P`.
+2. **Theorems used as stated.** `AddMonoid.End.coe_mul` fixes the composition
+   orientation; `AddMonoidHom.map_zsmul` proves that every additive
+   endomorphism commutes with every integer scalar map; extensionality and
+   `Function.Injective pi` prove cancellation of left composition by `pi`.
+   The preceding abstract
+   `frobeniusVerschiebung_sum_of_characteristic` theorem performs the remaining
+   ring calculation.
+3. **Object as an instance.** `pi` and `V` are additive endomorphisms of `G`;
+   `trace` and `cardinality` are integers, coerced to scalar endomorphisms.
+   From pointwise injectivity of `pi`, `pi*V=[cardinality]`, and
+   `pi^2-[trace]*pi+[cardinality]=0`, the specialization derives
+   `V+pi=[trace]` as equality of additive endomorphisms.
+4. **Assembly probe.** A temporary module importing the tracked H116 module
+   and `Mathlib.Algebra.Group.Hom.End` checked scalar centrality, cancellation,
+   and the composed theorem at default limits. Probe source SHA-256 is
+   `662669a9b4d377d30dda3d03cffe5d61f86e4dfe7b65af6454a8a2a36ae77b46`;
+   successful output SHA-256 is
+   `822260e51bb3c89e64865a33a1fde187afdf55670fa38e51b32c4a6d71b95b93`.
+   A second probe added the frozen noninjective mutation control on
+   `AddMonoid.End (ZMod 2)`; source SHA-256 is
+   `43346a0e463c9f238ba179aff9c02b48a95b86efb69722b4f763d506e14e5df2`
+   and successful output SHA-256 is
+   `46055e171c5b3dd5f6753c2d0a0ac3e7ca4c82cd0546d98a958ccd9bd9da98ba`.
+5. **Missing components only.** Scalar centrality and the abstract
+   left-cancellation premise are no longer endpoint certificates. An actual
+   elliptic instance must still define Frobenius and Verschiebung on the chosen
+   point group, prove pointwise injectivity of Frobenius, and supply the norm
+   and characteristic-polynomial equalities. Equality on points must still be
+   connected to the local formal-group series; this specialization does not
+   silently identify the two categories.
+6. **Inheritance table.** Composition, the endomorphism ring, integer scalar
+   maps, preservation of integer multiples, and function extensionality are
+   inherited from Mathlib. H116 only specializes its preceding abstract ring
+   identity. No curve law, point-counting theorem, endomorphism constructor,
+   decoder, complexity claim, trusted decision procedure or limit override is
+   introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| integer scalar maps are central in `AddMonoid.End G` | inherited instance law | H116 over `map_zsmul` | additive commutative group | none |
+| injective `pi` cancels left composition | inherited instance law | H116 over function extensionality | additive commutative group | `Function.Injective pi` |
+| `V+pi=[trace]` on an additive point group | endomorphism specialization | H116 | `AddMonoid.End G` | injective `pi`, norm equation, characteristic equation |
+| noninjective mutation rejects the sum conclusion | negative control | H116 | `AddMonoid.End (ZMod 2)` | `pi=V=0`, `trace=1`, `cardinality=2`; norm and characteristic equations hold but the conclusion fails |
+| actual elliptic-point instance | endpoint obligation | future elliptic owner | geometric points of an elliptic curve | construct `pi,V`; prove injectivity, norm and characteristic equations |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

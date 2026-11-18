@@ -1,4 +1,5 @@
 import Mathlib.Algebra.Polynomial.Derivation
+import Mathlib.Algebra.Group.Hom.End
 import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
 import Mathlib.RingTheory.FormalGroup.Basic
@@ -587,6 +588,61 @@ theorem frobeniusVerschiebung_sum_of_characteristic
             pi ^ 2 - trace * pi + cardinality := by abel
         _ = 0 := hchar
     _ = pi * trace := htraceComm.eq.symm
+
+/-- Specialize the Frobenius--Verschiebung ring calculation to additive
+endomorphisms of a point group. Integer scalars are central automatically, and
+pointwise injectivity of Frobenius supplies cancellation of left composition.
+Thus the only remaining elliptic certificates are the concrete norm and
+characteristic-polynomial identities (plus construction and injectivity of the
+concrete Frobenius map). -/
+theorem endomorphism_frobeniusVerschiebung_sum
+    {G : Type*} [AddCommGroup G]
+    (pi verschiebung : AddMonoid.End G) (trace cardinality : ℤ)
+    (hpi : Function.Injective pi)
+    (hnorm : pi * verschiebung = (cardinality : AddMonoid.End G))
+    (hchar : pi ^ 2 - (trace : AddMonoid.End G) * pi +
+        (cardinality : AddMonoid.End G) = 0) :
+    verschiebung + pi = (trace : AddMonoid.End G) := by
+  apply frobeniusVerschiebung_sum_of_characteristic
+      (pi := pi) (verschiebung := verschiebung)
+      (trace := (trace : AddMonoid.End G))
+      (cardinality := (cardinality : AddMonoid.End G))
+  · intro a b hab
+    ext point
+    apply hpi
+    exact DFunLike.congr_fun hab point
+  · rw [Commute]
+    ext point
+    change pi (trace • point) = trace • pi point
+    exact pi.map_zsmul trace point
+  · exact hnorm
+  · exact hchar
+
+/-- Frozen mutation control showing why pointwise injectivity cannot simply be
+dropped from `endomorphism_frobeniusVerschiebung_sum`. On the additive group
+`ZMod 2`, zero maps satisfy the displayed norm and characteristic equations
+for cardinality two and trace one, but their sum is not the trace scalar map. -/
+theorem endomorphism_injectivity_control :
+    let pi : AddMonoid.End (ZMod 2) := 0
+    let verschiebung : AddMonoid.End (ZMod 2) := 0
+    pi * verschiebung = (2 : AddMonoid.End (ZMod 2)) ∧
+      pi ^ 2 - (1 : AddMonoid.End (ZMod 2)) * pi +
+          (2 : AddMonoid.End (ZMod 2)) = 0 ∧
+      verschiebung + pi ≠ (1 : AddMonoid.End (ZMod 2)) := by
+  dsimp
+  constructor
+  · ext point
+    change 0 = (2 : ℤ) • point
+    exact (CharTwo.two_zsmul point).symm
+  constructor
+  · rw [pow_two]
+    simp only [zero_mul, one_mul, sub_zero, zero_add]
+    ext point
+    change (2 : ℤ) • point = 0
+    exact CharTwo.two_zsmul point
+  · intro h
+    have h1 := DFunLike.congr_fun h (1 : ZMod 2)
+    norm_num at h1
 
 /-- Every one-dimensional formal group law differs from its first input by a
 multiple of its second variable. This is the algebraic filtration statement
@@ -1935,6 +1991,8 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms PowerSeriesPrefixEq.subst_inv
 #print axioms PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv
 #print axioms frobeniusVerschiebung_sum_of_characteristic
+#print axioms endomorphism_frobeniusVerschiebung_sum
+#print axioms endomorphism_injectivity_control
 #print axioms FormalGroup.secondVariable_dvd_sub_X
 #print axioms FormalGroup.add_correction_eq
 #print axioms FormalGroup.filtered_correction_prefix
