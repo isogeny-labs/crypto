@@ -67,6 +67,8 @@ jobs:
             cached_sylow_factors_match_precache_roots -- --nocapture
           cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
             s1_and_sparse_quadratic_quartic_match_previous -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            stack_coefficient_buffer_preserves_padding_and_modular_zeroes -- --nocapture
       - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
         shell: bash
         run: |
@@ -103,6 +105,8 @@ jobs:
               bench_cached_sylow_factors -- --ignored --nocapture
             cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
               bench_s1_and_sparse_roots_actual_rust -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_stack_coefficient_buffer_actual_rust -- --ignored --nocapture
           } | tee "$RUNNER_TEMP/radical-power-reuse.txt"
           cat "$RUNNER_TEMP/radical-power-reuse.txt" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
