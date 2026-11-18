@@ -142,7 +142,7 @@
          if let Some(d) = ar.add(PRIME31,q,minus_point) {
              if let Some(j) = base.iter().position(|pt| pt.0 == d.0) {
                  if d == base[j] { return Some(Witness{i,j,sign:1}); }
-                 if d == ar.neg(PRIME31,Some(base[j])) {
+                 if Some(d) == ar.neg(PRIME31,Some(base[j])) {
                      return Some(Witness{i,j,sign:-1});
                  }
                  panic!("x-coordinate matched but neither sign was valid");
