@@ -126,6 +126,75 @@ mutation controls. This does not remove the degree-`r` cost of constructing the
 correct low jet or certify its intended kernel semantics; those remain the
 active algorithmic obligations. [pcc:unverified]
 
+The next [formal-scalar low-jet experiment](FORMAL_SCALAR_JET_EXPERIMENT.md)
+constructs that eleven-coefficient prefix from only `(p,A,B,t)` on the excluded
+`p=31,r=37` fixture. It computes the elliptic formal logarithm, solves
+`L([t-1](z))=(t-1)L(z)`, applies the normalized target scaling, and re-expands
+the x-coordinate ratio in `w=1/x`. Its prefix exactly matches both the retained
+full-map quotient through coefficient ten and the recurrence through
+coefficient eight; wrong-scalar, omitted-scaling, coordinate-isomorphism and
+synthetic Frobenius-boundary controls also pass. An independent verifier
+recomputes the comparisons and the first-order curve identity. This supports
+one fixed-size excluded-fixture construction, not generic map semantics or an
+asymptotic advantage. [pcc:unverified]
+
+Lean now proves the associated precision cutoff: for prime `p>19`, a normalized
+monomial correction `X^(p-1)` vanishes below degree 22, so it cannot affect the
+eleven even z-degrees corresponding to coefficients `w^0,...,w^10`. The theorem
+does not identify the actual elliptic Frobenius term with that monomial. A
+subsequent generic proof cancels a shared leading local parameter `X` with one
+degree of precision loss and shows that inversion and inverse-square preserve
+the remaining unit-series prefix. Thus the double-pole core of the x-coordinate
+bridge is checked. A further generic theorem now shows that substitution of
+prefix-equal zero-constant parameters into any fixed regular unit series, its
+inverse, and its product with the inverse-square pole preserve the same output
+prefix. The curve-specific instance now defines that series by
+`q=1+A X^4q^2+B X^6q^3`, proves the cleared affine identity, proves rescaling to
+`(a^4A,a^6B)`, and matches the complete source/target x-ratio used by the
+implementation. The remaining formal-group obligation is the parameter
+identity derived from `V+pi=[t]` and local Frobenius. [pcc:unverified]
+
+The frozen [prefix-transfer boundary control](PREFIX_TRANSFER_EXPERIMENT.md)
+then tests that precision loss on 20 finite-field series cases. In every case a
+correction first visible at degree `m+1` in the local parameter is first visible
+at degree `m` after normalized inverse-square transfer, and the boundary
+coefficient matches `-2 c f(0)^-3`. Zero and one-degree-shifted controls pass in
+all 20 cases. This demonstrates that the proved one-degree loss is sharp; it
+does not establish the endomorphism parameter identity.
+[pcc:unverified]
+
+The frozen [regular-unit substitution control](REGULAR_SUBSTITUTION_EXPERIMENT.md)
+adds a nonconstant outer unit. Across the same 20 prime/cutoff cells,
+substitution and its inverse first differ at `m+1`, the full normalized pole
+coordinate first differs at `m`, and all three closed-form boundary deltas
+match. Zero-correction, constant-outer and nonunit-outer controls all pass.
+This tests the generic composition theorem; the new Lean curve-coordinate
+instance supplies its elliptic algebra but not the `V-1` semantics.
+[pcc:unverified]
+
+The frozen [curve-coordinate control](CURVE_COORDINATE_EXPERIMENT.md)
+instantiates that algebra on the p=31 fixture and four completed OOS models.
+An independent recurrence verifier reproduced all 24 coefficients of the
+source and target units: curve identities, `(a^4A,a^6B)` rescaling, double
+substitution and the complete normalized x-ratio match in all five cells.
+Wrong target scaling and wrong local parameter first differ at coefficient
+four in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` and the
+inspected [PDF report](reports/run-20261118T0618Z/REPORT.pdf) bind the algebraic
+and experimental records. This discharges no part of the remaining local
+endomorphism parameter identity. [pcc:unverified]
+
+The preregistered
+[out-of-sample formal-scalar panel](FORMAL_SCALAR_OOS_EXPERIMENT.md) kept the
+candidate source unchanged and sought a different-j curve model in each of five
+frozen trace classes. The p=107 cell exhausted all models without a qualifying
+second j-invariant and was retained as a selection failure. On the other four
+cells, the candidate exactly matched full Vélu maps through coefficient ten at
+degrees 197, 257, 397 and 547. An independent JSON-only verifier repeated model
+selection, quotient division, the recurrence, both curve identities, codomain
+scaling and mutation rejection. Thus the same constructor now matches five
+full maps including the earlier degree-37 fixture; the finite panel still does
+not replace the generic formal-group bridge. [pcc:unverified]
+
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
 `(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying
