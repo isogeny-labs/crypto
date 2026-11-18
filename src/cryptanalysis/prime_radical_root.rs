@@ -382,6 +382,9 @@ pub(crate) struct Cube<R: Ring> {
     inverse_powers: Vec<R::E>,
     inverse_squares: Vec<R::E>,
     pub w: R::E,
+    // Cache repeated AMM digit corrections for all roots in this field.
+    w_squared: R::E,
+    c_inv_squared: R::E,
     p3s: u128,
 }
 impl<R: Ring> Cube<R> {
@@ -410,6 +413,8 @@ impl<R: Ring> Cube<R> {
                 inverse_powers: vec![],
                 inverse_squares: vec![],
                 w: one,
+                w_squared: one,
+                c_inv_squared: one,
                 p3s: 1,
             };
         }
@@ -425,6 +430,9 @@ impl<R: Ring> Cube<R> {
         let p3s = 3u128.pow(s);
         let c_inv = if s >= 2 { r.pow(c, p3s - 1) } else { r.one() };
         let w = r.pow(c, p3s / 3); // primitive cube root of unity
+        // Cache w^2 for all s>=2 roots; c^-2 is also needed when s=2.
+        let w_squared = if s >= 2 { r.sqr(w) } else { r.one() };
+        let c_inv_squared = if s == 2 { r.sqr(c_inv) } else { r.one() };
         let e3 = if t % 3 == 1 {
             (2 * t + 1) / 3
         } else {
@@ -456,6 +464,8 @@ impl<R: Ring> Cube<R> {
             inverse_powers,
             inverse_squares,
             w,
+            w_squared,
+            c_inv_squared,
             p3s,
         }
     }
@@ -503,7 +513,7 @@ impl<R: Ring> Cube<R> {
         if self.s >= 3 && h == r.one() {
             return Some(x0);
         }
-        let w2 = r.mul(self.w, self.w);
+        let w2 = self.w_squared;
         // For s=2, cube membership forces h into <w> of order 3.
         // The correction is c^{-d} for h=w^d, d=0,1,2.
         if self.s == 2 {
@@ -512,7 +522,7 @@ impl<R: Ring> Cube<R> {
             } else if h == self.w {
                 self.c_inv
             } else if h == w2 {
-                r.mul(self.c_inv, self.c_inv)
+                self.c_inv_squared
             } else {
                 return None;
             };
@@ -705,15 +715,26 @@ impl RadicalRootCtx {
         let cube_p = Cube::new(f);
         let cube_q = Cube::new(Fq2 { f, n });
         let w2 = cube_q.w;
-        let i4 = f.inv(4 % p);
-        let i27 = f.inv(27 % p);
+        // Constant inverses via congruences: eliminate three extended-Euclid
+        // calls, and a fourth when the first nonresidue is 2 or 3.
+        // At p<=2^61-1, even 3*p+1 fits in u64.
+        let i2 = (p + 1) / 2;
+        let i3 = if p % 3 == 1 { (2 * p + 1) / 3 } else { (p + 1) / 3 };
+        let i4 = if p % 4 == 1 { (3 * p + 1) / 4 } else { (p + 1) / 4 };
+        let i27 = f.mul(f.sqr(i3), i3);
+        let in_ = match n {
+            2 => i2,
+            3 => i3,
+            4 => i4,
+            _ => f.inv(n),
+        };
         Ok(RadicalRootCtx {
             f,
-            inv2: f.inv(2),
-            inv3: f.inv(3),
+            inv2: i2,
+            inv3: i3,
             inv4: i4,
             inv27: i27,
-            inv_n: f.inv(n),
+            inv_n: in_,
             n,
             s2,
             t2,
