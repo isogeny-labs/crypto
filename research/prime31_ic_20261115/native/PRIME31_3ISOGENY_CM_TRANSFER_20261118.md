@@ -57,3 +57,10 @@ Research KB MCP and its wrapper unavailable in this connector session; searched 
 ## Explicit status
 
 Rust implementation/check-in: completed, native CI status separately verified. Ordinary cofactor-one p=2^31−1: unchanged. Prior leads audited: bounded. Novel non-generic relation extraction and cheaper complete solver: NOT ESTABLISHED; no 1024-target timing has been run on E'. Claim standing: [pcc:unverified].
+
+## Executed exact-source native Rust gate (2026-11-18T05:37Z)
+
+- [Successful GitHub Actions run #44245421825](https://github.com/isogeny-labs/crypto/actions/runs/44245421825): original pinned native Rust 40/40 library tests passed, new Vélu/CM tests 2/2 passed, Rust JSON emitted, separately written Python exact arithmetic replay passed 16/16 public-scalar and dual controls. [pcc:unverified]
+- New native Rust JSON for the full control panel (not a DLP benchmark) charges 205 Fp multiplications, 0 inversions in setup certificate construction; 2,516 Fp multiplications and 37 inversions across 16 scalar transport/dual controls and the additional group-law sanity checks. These raw counters are **not a cold one-target or 1,024-target ECDLP runtime**. [pcc:unverified]
+- Earlier source-specific CI failed Rust E0499 (nested mutable field-meter calls); commit db64c5a630f9b57ef9169a0e793296d5019396c2 split two statements into local variables; the registered exact-source CI then passed all focused checks. Retain this failure/fix history.
+- Independent signed PCC remains absent; no leaderboard promotion or claim of a new complete speedup.
