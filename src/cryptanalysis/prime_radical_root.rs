@@ -249,7 +249,10 @@ impl Ring for Fq2 {
     // Public-input, variable-time arithmetic only.
     fn pow(&self, x: (u64, u64), e: u128) -> (u64, u64) {
         let p = self.f.p as u128;
-        if e < p || e >= self.order() || x == (0, 0) {
+        if e < p || e >= self.order() || x == (0, 0)
+            || x.0 >= self.f.p || x.1 >= self.f.p
+        {
+            // Preserve generic support for noncanonical public inputs.
             return rpow(self, x, e);
         }
         let lo = (e % p) as u64;
@@ -978,6 +981,14 @@ mod tests {
                 for &e in &exp {
                     assert_eq!(q.pow(a, e), rpow(q, a, e),
                                "Fp2 Frobenius p={p} a={a:?} e={e}");
+                }
+                let random_e = (((seed as u128) << 59) | ((seed >> 5) as u128)) % n;
+                assert_eq!(q.pow(a, random_e), rpow(q, a, random_e),
+                           "random exponent p={p} e={random_e}");
+                if j == 1 {
+                    let raw = (p + 1, p + 2);
+                    assert_eq!(q.pow(raw, n / 3), rpow(q, raw, n / 3),
+                               "noncanonical Fp2 p={p}");
                 }
                 if j < 24 {
                     assert_eq!(ctx.cube_q.root(a), previous_amm_root(&ctx.cube_q, a),
