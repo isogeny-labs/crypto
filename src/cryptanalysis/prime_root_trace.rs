@@ -603,9 +603,17 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     if b.is_empty() {
         return Err("division by zero polynomial".into());
     }
+    // Degree-short dividends need neither a quotient allocation nor a
+    // costly field inversion. The input is already canonical here.
+    if a.len() < b.len() {
+        return Ok((vec![], a.to_vec()));
+    }
     let mut r = a.to_vec();
-    let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
-    let inv = vpow(*b.last().unwrap(), p - 2, p);
+    let mut q = vec![0; a.len() - b.len() + 1];
+    // GCD factors, X^p mod f divisors and root certificates are commonly
+    // monic. Avoid a full exponentiation to invert their leading 1.
+    let lead = *b.last().unwrap();
+    let inv = if lead == 1 { 1 } else { vpow(lead, p - 2, p) };
     while !r.is_empty() && r.len() >= b.len() {
         let shift = r.len() - b.len();
         let c = vmul(*r.last().unwrap(), inv, p);
@@ -627,16 +635,25 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
         if e & 1 == 1 {
             r = vdiv(&vproduct(&r, &b, p), m, p)?.1;
         }
-        b = vdiv(&vproduct(&b, &b, p), m, p)?.1;
         e >>= 1;
+        // No subsequent iteration reads b after the final exponent bit.
+        // Skipping the last modular square saves a polynomial product
+        // and a polynomial division in the verifier's independent replay.
+        if e != 0 {
+            b = vdiv(&vproduct(&b, &b, p), m, p)?.1;
+        }
     }
     Ok(r)
 }
 fn vmonic(mut a: Vec<u64>, p: u64) -> Vec<u64> {
     if let Some(&lead) = a.last() {
-        let inv = vpow(lead, p - 2, p);
-        for c in &mut a {
-            *c = vmul(*c, inv, p);
+        // The typical GCD result is already monic. No Fermat inversion
+        // or coefficient multiplies are needed to normalize it again.
+        if lead != 1 {
+            let inv = vpow(lead, p - 2, p);
+            for c in &mut a {
+                *c = vmul(*c, inv, p);
+            }
         }
     }
     a
