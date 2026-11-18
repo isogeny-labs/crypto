@@ -1,141 +1,509 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aburan28/crypto/blob/main/docs/curves/cover-links.schema.json",
   "title": "Content-addressed curve cover graph",
+  "description": "Structural schema for the ICV1/EC1 target rows, hyperelliptic source models, and H -> E maps in curve-cover-graph/v1. Schema validity cannot prove content-address hashes, object-key/self-UID equality, cross-table membership, registry equality, or complete coverage; the repository semantic verifier and deterministic generator replay remain required.",
   "type": "object",
-  "required": [
-    "schema_version",
-    "registry_sha256",
-    "curves",
-    "covers",
-    "maps"
-  ],
+  "additionalProperties": false,
+  "required": ["schema_version", "registry_sha256", "identity_rule", "global_standard_coverage", "curves", "covers", "maps"],
   "properties": {
-    "schema_version": {
-      "const": "curve-cover-graph/v1"
-    },
-    "registry_sha256": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
-    },
-    "curves": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "icv1_identity",
-          "model_sha256",
-          "model_json",
-          "representations",
-          "cover_links",
-          "status"
-        ],
-        "properties": {
-          "cover_links": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": [
-                "cover_uid",
-                "map_uid",
-                "direction"
-              ],
-              "properties": {
-                "direction": {
-                  "const": "H -> E"
-                },
-                "cover_uid": {
-                  "type": "string",
-                  "pattern": "^urn:hc-model:1:sha256:[0-9a-f]{64}$"
-                },
-                "map_uid": {
-                  "type": "string",
-                  "pattern": "^urn:curve-cover-map:1:sha256:[0-9a-f]{64}$"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
+    "schema_version": {"const": "curve-cover-graph/v1"},
+    "registry_sha256": {"$ref": "#/$defs/sha256"},
+    "identity_rule": {"$ref": "#/$defs/nonemptyString"},
+    "global_standard_coverage": {"$ref": "#/$defs/nonemptyString"},
+    "curves": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/curveBinding"}},
     "covers": {
       "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "required": [
-          "cover_uid",
-          "cover_id",
-          "record"
-        ],
-        "properties": {
-          "record": {
-            "type": "object",
-            "required": [
-              "schema_version",
-              "field",
-              "form",
-              "h",
-              "f",
-              "genus"
-            ],
-            "properties": {
-              "schema_version": {
-                "const": "hyperelliptic-model/v1"
-              },
-              "genus": {
-                "type": "integer",
-                "minimum": 2
-              },
-              "h": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "f": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
+      "minProperties": 1,
+      "propertyNames": {"$ref": "#/$defs/coverUid"},
+      "additionalProperties": {"$ref": "#/$defs/coverBinding"}
     },
     "maps": {
       "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "required": [
-          "map_uid",
-          "map_id",
-          "record",
-          "verification_status"
-        ],
-        "properties": {
-          "record": {
-            "type": "object",
-            "required": [
-              "schema_version",
-              "source_cover_uid",
-              "target_model_sha256",
-              "target_model_json",
-              "degree",
-              "x",
-              "y_v",
-              "y_0",
-              "target_model_map"
-            ],
-            "properties": {
-              "schema_version": {
-                "const": "curve-cover-map/v1"
-              },
-              "degree": {
-                "type": "integer",
-                "minimum": 1
-              }
-            }
+      "minProperties": 1,
+      "propertyNames": {"$ref": "#/$defs/mapUid"},
+      "additionalProperties": {"$ref": "#/$defs/mapBinding"}
+    }
+  },
+  "$defs": {
+    "nonemptyString": {"type": "string", "minLength": 1},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "gitObject": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "modelSha256": {"$ref": "#/$defs/sha256"},
+    "coverUid": {"type": "string", "pattern": "^urn:hc-model:1:sha256:[0-9a-f]{64}$"},
+    "coverId": {"type": "string", "pattern": "^HC1G[1-9][0-9]*h[0-9a-f]{12}$"},
+    "mapUid": {"type": "string", "pattern": "^urn:curve-cover-map:1:sha256:[0-9a-f]{64}$"},
+    "mapId": {"type": "string", "pattern": "^CV1D[1-9][0-9]*h[0-9a-f]{12}$"},
+    "curveUid": {"type": "string", "pattern": "^urn:ec-record:1:sha256:[0-9a-f]{64}$"},
+    "ec1": {"type": "string", "pattern": "^EC1(?:N[0-9]+|P[0-9]+|Q[0-9]+D[0-9]+)C[a-z][a-z0-9]*h[0-9a-f]{12,64}$"},
+    "icv1Slug": {"type": "string", "pattern": "^icv1-[a-z0-9-]+-[0-9a-f]{8}$"},
+    "icv1Full": {"type": "string", "pattern": "^ICV1:[^\\s]+$"},
+    "encodedFieldElement": {"type": "string", "pattern": "^0x[0-9a-f]+$"},
+    "encodedPolynomial": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {"$ref": "#/$defs/encodedFieldElement"}
+    },
+    "icv1Identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full", "slug"],
+      "properties": {
+        "full": {"$ref": "#/$defs/icv1Full"},
+        "slug": {"$ref": "#/$defs/icv1Slug"}
+      }
+    },
+    "coverLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cover_uid", "map_uid", "direction"],
+      "properties": {
+        "direction": {"const": "H -> E"},
+        "cover_uid": {"$ref": "#/$defs/coverUid"},
+        "map_uid": {"$ref": "#/$defs/mapUid"}
+      }
+    },
+    "representationField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["characteristic", "degree", "representation", "element_encoding"],
+          "properties": {
+            "characteristic": {"type": "integer", "minimum": 3},
+            "degree": {"const": 1},
+            "representation": {"const": "prime"},
+            "element_encoding": {"$ref": "#/$defs/nonemptyString"}
           }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["characteristic", "degree", "representation", "modulus_exponents", "element_encoding"],
+          "properties": {
+            "characteristic": {"const": 2},
+            "degree": {"type": "integer", "minimum": 2},
+            "representation": {"const": "polynomial"},
+            "modulus_exponents": {
+              "type": "array",
+              "minItems": 2,
+              "uniqueItems": true,
+              "items": {"type": "integer", "minimum": 0}
+            },
+            "element_encoding": {"$ref": "#/$defs/nonemptyString"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["characteristic", "degree", "representation", "modulus", "element_encoding"],
+          "properties": {
+            "characteristic": {"type": "integer", "minimum": 3},
+            "degree": {"type": "integer", "minimum": 2},
+            "representation": {"const": "polynomial"},
+            "modulus": {
+              "type": "array",
+              "minItems": 3,
+              "items": {"type": "integer", "minimum": 0}
+            },
+            "element_encoding": {"$ref": "#/$defs/nonemptyString"}
+          }
+        }
+      ]
+    },
+    "curveCoordinate": {
+      "oneOf": [
+        {"type": "integer", "minimum": 0},
+        {"type": "array", "minItems": 2, "items": {"type": "integer", "minimum": 0}}
+      ]
+    },
+    "montgomeryCoefficients": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["a", "b"],
+      "properties": {
+        "a": {"type": "integer", "minimum": 0},
+        "b": {"type": "integer", "minimum": 0}
+      }
+    },
+    "twistedEdwardsCoefficients": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["a", "d"],
+      "properties": {
+        "a": {"type": "integer", "minimum": 0},
+        "d": {"type": "integer", "minimum": 0}
+      }
+    },
+    "edwardsCoefficients": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["c", "d"],
+      "properties": {
+        "c": {"type": "integer", "minimum": 0},
+        "d": {"type": "integer", "minimum": 0}
+      }
+    },
+    "generatorCoordinate": {
+      "oneOf": [
+        {"type": "string", "pattern": "^(?:0x)?[0-9a-f]+$"},
+        {"type": "array", "minItems": 2, "items": {"type": "integer", "minimum": 0}}
+      ]
+    },
+    "curveRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "coefficients", "subgroup_order", "cofactor", "generator", "target_group"],
+      "properties": {
+        "model": {"enum": ["binary Weierstrass", "short Weierstrass", "Montgomery", "Edwards", "TwistedEdwards"]},
+        "coefficients": {
+          "oneOf": [
+            {
+              "type": "array",
+              "minItems": 5,
+              "maxItems": 5,
+              "items": {"$ref": "#/$defs/curveCoordinate"}
+            },
+            {"$ref": "#/$defs/montgomeryCoefficients"},
+            {"$ref": "#/$defs/twistedEdwardsCoefficients"},
+            {"$ref": "#/$defs/edwardsCoefficients"}
+          ]
+        },
+        "subgroup_order": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+        "cofactor": {"type": "integer", "minimum": 1},
+        "generator": {
+          "type": "array",
+          "prefixItems": [
+            {"$ref": "#/$defs/generatorCoordinate"},
+            {"$ref": "#/$defs/generatorCoordinate"}
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "target_group": {"const": "prime-order subgroup"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"model": {"enum": ["binary Weierstrass", "short Weierstrass"]}},
+            "required": ["model"]
+          },
+          "then": {"properties": {"coefficients": {"type": "array"}}}
+        },
+        {
+          "if": {"properties": {"model": {"const": "Montgomery"}}, "required": ["model"]},
+          "then": {"properties": {"coefficients": {"$ref": "#/$defs/montgomeryCoefficients"}}}
+        },
+        {
+          "if": {"properties": {"model": {"const": "TwistedEdwards"}}, "required": ["model"]},
+          "then": {"properties": {"coefficients": {"$ref": "#/$defs/twistedEdwardsCoefficients"}}}
+        },
+        {
+          "if": {"properties": {"model": {"const": "Edwards"}}, "required": ["model"]},
+          "then": {"properties": {"coefficients": {"$ref": "#/$defs/edwardsCoefficients"}}}
+        }
+      ]
+    },
+    "subgroupTransport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence_ref"],
+      "properties": {
+        "status": {"const": "not_tested"},
+        "evidence_ref": {"type": "null"}
+      }
+    },
+    "representation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ec1", "curve_uid", "field", "curve", "subgroup_transport"],
+      "properties": {
+        "ec1": {"$ref": "#/$defs/ec1"},
+        "curve_uid": {"$ref": "#/$defs/curveUid"},
+        "field": {"$ref": "#/$defs/representationField"},
+        "curve": {"$ref": "#/$defs/curveRecord"},
+        "subgroup_transport": {"$ref": "#/$defs/subgroupTransport"}
+      }
+    },
+    "standardSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url"],
+      "properties": {
+        "name": {"$ref": "#/$defs/nonemptyString"},
+        "url": {"type": "string", "pattern": "^https?://"},
+        "blob_sha": {"$ref": "#/$defs/gitObject"}
+      }
+    },
+    "standardProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adoption_status", "category", "display_name", "oid", "parameter_validation", "source_id", "sources"],
+      "properties": {
+        "adoption_status": {"$ref": "#/$defs/nonemptyString"},
+        "category": {"$ref": "#/$defs/nonemptyString"},
+        "display_name": {"$ref": "#/$defs/nonemptyString"},
+        "oid": {"type": ["string", "null"]},
+        "parameter_validation": {"$ref": "#/$defs/nonemptyString"},
+        "source_id": {"$ref": "#/$defs/nonemptyString"},
+        "sources": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/standardSource"}}
+          ]
+        }
+      }
+    },
+    "curveBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["icv1_identity", "model_sha256", "model_json", "representations", "standard_names", "standards_provenance", "cover_links", "status"],
+      "properties": {
+        "icv1_identity": {"$ref": "#/$defs/icv1Identity"},
+        "model_sha256": {"$ref": "#/$defs/modelSha256"},
+        "model_json": {"$ref": "#/$defs/nonemptyString"},
+        "representations": {"type": "array", "items": {"$ref": "#/$defs/representation"}},
+        "standard_names": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/nonemptyString"}},
+        "standards_provenance": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/standardProvenance"}}
+          ]
+        },
+        "cover_links": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/coverLink"}},
+        "status": {"const": "verified_over_declared_field"}
+      }
+    },
+    "declaredField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "p"],
+          "properties": {
+            "label": {"type": "string", "pattern": "^fp-[1-9][0-9]*$"},
+            "p": {"type": "string", "pattern": "^[1-9][0-9]*$"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "modulus"],
+          "properties": {
+            "label": {"type": "string", "pattern": "^f2m-[1-9][0-9]*-[0-9a-f]{8}$"},
+            "modulus": {"type": "string", "pattern": "^0x[0-9a-f]+$"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "p", "modulus"],
+          "properties": {
+            "label": {"type": "string", "pattern": "^fpk-[1-9][0-9]*-[1-9][0-9]*-[0-9a-f]{8}$"},
+            "p": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+            "modulus": {"type": "array", "minItems": 2, "items": {"type": "string", "pattern": "^[0-9]+$"}}
+          }
+        }
+      ]
+    },
+    "coverRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "field", "form", "h", "f", "genus"],
+      "properties": {
+        "schema_version": {"const": "hyperelliptic-model/v1"},
+        "field": {"$ref": "#/$defs/declaredField"},
+        "form": {"const": "v^2+h(u)*v=f(u)"},
+        "h": {"$ref": "#/$defs/encodedPolynomial"},
+        "f": {"$ref": "#/$defs/encodedPolynomial"},
+        "genus": {"enum": [2, 3]}
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "genus": {"const": 2},
+            "field": {"properties": {"label": {"pattern": "^fpk?-"}}},
+            "h": {"maxItems": 0},
+            "f": {"minItems": 7, "maxItems": 7}
+          },
+          "required": ["genus", "h", "f"]
+        },
+        {
+          "properties": {
+            "genus": {"const": 3},
+            "field": {"properties": {"label": {"pattern": "^f2m-"}}},
+            "h": {"minItems": 3, "maxItems": 3},
+            "f": {"minItems": 8, "maxItems": 8}
+          },
+          "required": ["genus", "h", "f"]
+        }
+      ]
+    },
+    "coverBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cover_uid", "cover_id", "record"],
+      "properties": {
+        "cover_uid": {"$ref": "#/$defs/coverUid"},
+        "cover_id": {"$ref": "#/$defs/coverId"},
+        "record": {"$ref": "#/$defs/coverRecord"}
+      }
+    },
+    "shortModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["v", "form", "p", "field", "a", "b"],
+      "properties": {
+        "v": {"const": "1"},
+        "form": {"const": "y^2=x^3+a*x+b"},
+        "p": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+        "field": {"type": "string", "pattern": "^fp-[1-9][0-9]*$"},
+        "a": {"$ref": "#/$defs/nonemptyString"},
+        "b": {"$ref": "#/$defs/nonemptyString"}
+      }
+    },
+    "normalizedModel": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["v", "form", "p", "field", "A", "B"],
+          "properties": {
+            "v": {"const": "1"},
+            "form": {"const": "B*y^2=x^3+A*x^2+x"},
+            "p": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+            "field": {"type": "string", "pattern": "^fp-[1-9][0-9]*$"},
+            "A": {"$ref": "#/$defs/nonemptyString"},
+            "B": {"$ref": "#/$defs/nonemptyString"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["v", "form", "p", "field", "a", "d"],
+          "properties": {
+            "v": {"const": "1"},
+            "form": {"const": "a*x^2+y^2=1+d*x^2*y^2"},
+            "p": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+            "field": {"type": "string", "pattern": "^fp-[1-9][0-9]*$"},
+            "a": {"$ref": "#/$defs/nonemptyString"},
+            "d": {"$ref": "#/$defs/nonemptyString"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["v", "form", "p", "field", "c", "d"],
+          "properties": {
+            "v": {"const": "1"},
+            "form": {"const": "x^2+y^2=c^2*(1+d*x^2*y^2)"},
+            "p": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+            "field": {"type": "string", "pattern": "^fp-[1-9][0-9]*$"},
+            "c": {"$ref": "#/$defs/nonemptyString"},
+            "d": {"$ref": "#/$defs/nonemptyString"}
+          }
+        }
+      ]
+    },
+    "coordinateFormula": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 2,
+      "maxProperties": 2,
+      "properties": {
+        "x": {"$ref": "#/$defs/nonemptyString"},
+        "y": {"$ref": "#/$defs/nonemptyString"},
+        "X": {"$ref": "#/$defs/nonemptyString"},
+        "Y": {"$ref": "#/$defs/nonemptyString"}
+      },
+      "oneOf": [
+        {"required": ["x", "y"]},
+        {"required": ["X", "Y"]}
+      ]
+    },
+    "targetModelMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "kind", "degree", "source_model", "target_model", "forward", "inverse", "shift_A_over_3", "montgomery_A", "montgomery_B", "edwards_scale", "exceptional_points", "status"],
+      "properties": {
+        "schema_version": {"const": "elliptic-model-map/v1"},
+        "kind": {"enum": ["montgomery_from_short", "edwards_from_short"]},
+        "degree": {"const": 1},
+        "source_model": {"$ref": "#/$defs/shortModel"},
+        "target_model": {"$ref": "#/$defs/normalizedModel"},
+        "forward": {"$ref": "#/$defs/coordinateFormula"},
+        "inverse": {"$ref": "#/$defs/coordinateFormula"},
+        "shift_A_over_3": {"$ref": "#/$defs/nonemptyString"},
+        "montgomery_A": {"$ref": "#/$defs/nonemptyString"},
+        "montgomery_B": {"$ref": "#/$defs/nonemptyString"},
+        "edwards_scale": {"$ref": "#/$defs/nonemptyString"},
+        "exceptional_points": {"$ref": "#/$defs/nonemptyString"},
+        "status": {"const": "verified_algebraic_identity"}
+      }
+    },
+    "mapRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "source_cover_uid", "target_model_sha256", "target_model_json", "degree", "x", "y_v", "y_0", "target_model_map"],
+      "properties": {
+        "schema_version": {"const": "curve-cover-map/v1"},
+        "source_cover_uid": {"$ref": "#/$defs/coverUid"},
+        "target_model_sha256": {"$ref": "#/$defs/modelSha256"},
+        "target_model_json": {"$ref": "#/$defs/nonemptyString"},
+        "degree": {"enum": [2, 3]},
+        "x": {"$ref": "#/$defs/encodedPolynomial"},
+        "y_v": {"$ref": "#/$defs/encodedPolynomial"},
+        "y_0": {"$ref": "#/$defs/encodedPolynomial"},
+        "target_model_map": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/targetModelMap"}
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "degree": {"const": 2},
+            "x": {"minItems": 3, "maxItems": 3},
+            "y_v": {"minItems": 1, "maxItems": 1},
+            "y_0": {"maxItems": 0}
+          },
+          "required": ["degree", "x", "y_v", "y_0"]
+        },
+        {
+          "properties": {
+            "degree": {"const": 3},
+            "x": {"minItems": 4, "maxItems": 4},
+            "y_v": {"minItems": 2, "maxItems": 2},
+            "y_0": {"minItems": 1, "maxItems": 1}
+          },
+          "required": ["degree", "x", "y_v", "y_0"]
+        }
+      ]
+    },
+    "mapBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["map_uid", "map_id", "record", "verification_status", "field_check", "proof_refs"],
+      "properties": {
+        "map_uid": {"$ref": "#/$defs/mapUid"},
+        "map_id": {"$ref": "#/$defs/mapId"},
+        "record": {"$ref": "#/$defs/mapRecord"},
+        "verification_status": {"const": "verified_over_declared_field"},
+        "field_check": {
+          "enum": [
+            "irreducibility_proved_by_Rabin",
+            "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+            "20_fixed_base_probable_prime_screen of p, whose primality remains an input assumption; irreducibility of the modulus over GF(p) proved by Rabin"
+          ]
+        },
+        "proof_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*//)[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$"}
         }
       }
     }
