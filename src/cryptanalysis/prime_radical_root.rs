@@ -171,6 +171,10 @@ pub(crate) trait Ring {
     fn sqr(&self, a: Self::E) -> Self::E {
         self.mul(a, a)
     }
+    // AMM uses repeated cubing; extension fields can specialize it.
+    fn cube(&self, a: Self::E) -> Self::E {
+        self.mul(a, self.sqr(a))
+    }
     // Override when a field admits a faster powering method.
     fn pow(&self, a: Self::E, e: u128) -> Self::E where Self: Sized {
         rpow(self, a, e)
@@ -201,6 +205,21 @@ impl Ring for Fp {
 pub(crate) struct Fq2 {
     pub f: Fp,
     pub n: u64,
+}
+impl Fq2 {
+    #[inline]
+    fn mul_nonresidue(&self, x: u64) -> u64 {
+        let f = &self.f;
+        match self.n {
+            2 => f.add(x, x),
+            3 => f.add(f.add(x, x), x),
+            _ => f.mul(self.n, x),
+        }
+    }
+    #[inline]
+    fn norm(&self, x: (u64, u64)) -> u64 {
+        self.f.sub(self.f.sqr(x.0), self.mul_nonresidue(self.f.sqr(x.1)))
+    }
 }
 impl Ring for Fq2 {
     type E = (u64, u64);
@@ -240,6 +259,17 @@ impl Ring for Fq2 {
         let ab = f.mul(x.0, x.1);
         (f.add(aa, nbb), f.add(ab, ab))
     }
+    // (a+bi)^3 = a(a^2+3nb^2) + b(3a^2+nb^2)i.
+    // Uses four Fp products, versus six for squaring then multiplying.
+    fn cube(&self, x: (u64, u64)) -> (u64, u64) {
+        let f = &self.f;
+        let aa = f.sqr(x.0);
+        let nbb = self.mul_nonresidue(f.sqr(x.1));
+        let three_nbb = f.add(nbb, f.add(nbb, nbb));
+        let three_aa = f.add(aa, f.add(aa, aa));
+        (f.mul(x.0, f.add(aa, three_nbb)),
+         f.mul(x.1, f.add(three_aa, nbb)))
+    }
     fn order(&self) -> u128 {
         (self.f.p as u128) * (self.f.p as u128) - 1
     }
@@ -258,7 +288,7 @@ impl Ring for Fq2 {
         let lo = (e % p) as u64;
         let hi = (e / p) as u64;
         let f = &self.f;
-        let norm = f.sub(f.sqr(x.0), f.mul(self.n, f.sqr(x.1)));
+        let norm = self.norm(x);
         if lo == hi {
             return (f.powm(norm, lo), 0);
         }
@@ -418,7 +448,7 @@ impl<R: Ring> Cube<R> {
         let g = r.pow(a, t);
         let mut residue = g;
         for _ in 1..self.s {
-            residue = r.mul(residue, r.sqr(residue));
+            residue = r.cube(residue);
         }
         if residue != r.one() {
             return None;
@@ -462,7 +492,7 @@ impl<R: Ring> Cube<R> {
             // z = (h*c^{-l})^(3^(s-1-j)). Repeated cubing uses only
             // 2(s-1-j) field multiplications, not binary exponentiation.
             for _ in (j + 1)..self.s {
-                z = r.mul(z, r.sqr(z));
+                z = r.cube(z);
             }
             let digit = if z == r.one() {
                 0
@@ -495,7 +525,7 @@ impl<R: Ring> Cube<R> {
             }
             previous_power = inverse_power;
             if j + 1 < self.s {
-                inverse_power = r.mul(inverse_power, r.sqr(inverse_power));
+                inverse_power = r.cube(inverse_power);
             }
         }
         Some(r.mul(x0, root_correction))
@@ -568,6 +598,17 @@ impl RadicalRootCtx {
         if p % 4 == 3 {
             let r = f.powm(a, (p + 1) / 4);
             return if f.sqr(r) == a { Some(r) } else { None };
+        }
+        // p = 5 (mod 8): one exponentiation and one optional multiplication
+        // by the precomputed square root of -1 (zc). Final square verifies
+        // both roots and nonresidue rejection.
+        if p % 8 == 5 {
+            let mut root = f.powm(a, (p + 3) / 8);
+            if f.sqr(root) == a {
+                return Some(root);
+            }
+            root = f.mul(root, self.zc);
+            return if f.sqr(root) == a { Some(root) } else { None };
         }
         // The t2=1 shortcut must retain powm's canonical reduction even
         // when a caller passes an unreduced public element.
@@ -759,7 +800,7 @@ impl RadicalRootCtx {
                     Some(u) => u,
                 };
                 // 1/u = conj(u)/N(u)
-                let nrm = f.sub(f.sqr(u.0), f.mul(self.n, f.sqr(u.1)));
+                let nrm = self.cube_q.r.norm(u);
                 let ni = f.inv(nrm);
                 let uinv = (f.mul(u.0, ni), f.mul(f.neg(u.1), ni));
                 let v = (f.mul(m, uinv.0), f.mul(m, uinv.1));
