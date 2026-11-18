@@ -1,0 +1,100 @@
+name: IsoLab read-only budget telemetry
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: isolab-readonly-budget-telemetry
+  cancel-in-progress: false
+jobs:
+  telemetry:
+    if: github.repository == 'isogeny-labs/crypto' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            taskq/deploy/eks-karpenter
+      - name: Check existing role configuration
+        id: config
+        continue-on-error: true
+        env:
+          EXISTING_TRIGGER_ROLE: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+        shell: bash
+        run: |
+          RECEIPTS="$RUNNER_TEMP/isolab-budget-telemetry"
+          printf 'RECEIPTS=%s\n' "$RECEIPTS" >> "$GITHUB_ENV"
+          mkdir "$RECEIPTS"
+          if [ -z "$EXISTING_TRIGGER_ROLE" ]; then
+            printf '%s\n' '{"status":"existing_trigger_role_not_configured"}' > "$RECEIPTS/auth.json"
+            exit 1
+          fi
+          printf '%s\n' '{"status":"existing_role_configured"}' > "$RECEIPTS/auth.json"
+      - name: Obtain read-only short-lived session
+        id: credentials
+        if: steps.config.outcome == 'success'
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: isolab-budget-${{ github.run_id }}
+          role-duration-seconds: 900
+          aws-region: us-east-2
+          allowed-account-ids: '104186811093'
+          output-credentials: false
+          unset-current-credentials: true
+          disable-retry: true
+          inline-session-policy: >-
+            {"Version":"2012-10-17","Statement":[
+              {"Effect":"Allow","Action":"sts:GetCallerIdentity","Resource":"*"},
+              {"Effect":"Allow","Action":"budgets:ViewBudget","Resource":[
+                "arn:aws:budgets::104186811093:budget/isolab-daily-cost-100",
+                "arn:aws:budgets::104186811093:budget/spot-experiments-daily-25",
+                "arn:aws:budgets::104186811093:budget/isolab-monthly-account-cost"]}]}
+      - name: Read the existing budgets
+        id: budgets
+        if: steps.credentials.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: sh taskq/deploy/eks-karpenter/read-budget-telemetry.sh "$RECEIPTS/budgets"
+      - name: Record workflow outcomes
+        if: always()
+        shell: bash
+        env:
+          CONFIG_OUTCOME: ${{ steps.config.outcome }}
+          CREDENTIAL_OUTCOME: ${{ steps.credentials.outcome }}
+          BUDGET_OUTCOME: ${{ steps.budgets.outcome }}
+        run: |
+          RECEIPTS="$RUNNER_TEMP/isolab-budget-telemetry"
+          mkdir -p "$RECEIPTS"
+          jq -n --arg config "$CONFIG_OUTCOME" --arg auth "$CREDENTIAL_OUTCOME" \
+            --arg budgets "$BUDGET_OUTCOME" --arg revision "$GITHUB_SHA" \
+            --arg run "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            '{schema:"isolab.budget-workflow/v1",config_outcome:$config,auth_outcome:$auth,
+              budget_outcome:$budgets,source_revision:$revision,run_url:$run,
+              launch_admitted:false,aws_compute_started:false}' > "$RECEIPTS/workflow.json"
+          printf '%s\n' 'Read-only budget telemetry. No compute launch admitted or started.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve bounded non-secret receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: isolab-budget-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/isolab-budget-telemetry
+          retention-days: 7
+          if-no-files-found: error
+      - name: Require successful telemetry reads
+        if: always()
+        env:
+          CONFIG_OUTCOME: ${{ steps.config.outcome }}
+          CREDENTIAL_OUTCOME: ${{ steps.credentials.outcome }}
+          BUDGET_OUTCOME: ${{ steps.budgets.outcome }}
+        shell: bash
+        run: |
+          test "$CONFIG_OUTCOME" = success
+          test "$CREDENTIAL_OUTCOME" = success
+          test "$BUDGET_OUTCOME" = success
