@@ -5,6 +5,7 @@ This checker does not import Rust's Arithmetic, factor-base selection, scalar
 routine, witness validation or parity membership code. It proves neither
 non-generic extraction nor a full ECDLP cost advantage. [pcc:unverified]
 """
+import hashlib
 import itertools
 import json
 import sys
@@ -170,6 +171,25 @@ def main(path):
             verified_rows += 1
     assert verified_rows == 36
     assert d["new_nongeneric_relations"] == 0 and d["new_complete_ecdpl_logs"] == 0
+    if len(sys.argv) == 3:
+        with open(sys.argv[2], encoding="utf-8") as frozen_file:
+            frozen = json.load(frozen_file)
+        with open(path, "rb") as original:
+            assert hashlib.sha256(original.read()).hexdigest() == frozen["original_full_json_sha256"]
+        assert frozen["target_points"] == [list(q) for q in residuals]
+        assert frozen["p"] == P and frozen["n"] == N
+        assert frozen["weights"] == list(WEIGHTS) and frozen["seed"] == SEED
+        assert len(frozen["experiments"]) == 3
+        for row, selected in zip(d["experimental_panels"], frozen["experiments"]):
+            assert selected["B"] == row["b"]
+            assert selected["left_support"] == row["left_parity_support"]
+            assert selected["right_support"] == row["right_parity_support"]
+            assert selected["odd_count"] == row["odd_residuals"]
+            assert selected["setup_group_additions"] == row["charged_candidate_setup_operations"]["group_additions"]
+            assert selected["query_group_additions"] == row["public_query_group_additions"]
+            assert selected["setup_fp_muls"] == row["charged_candidate_setup_operations"]["fp_multiplications"]
+            assert selected["setup_fp_inversions"] == row["charged_candidate_setup_operations"]["fp_inversions"]
+            assert selected["witnesses"] == [x["weighted_witness_index_per_slot_if_odd"] for x in row["targets"]]
     print(json.dumps({"verifier": "independent Python integer EC group arithmetic",
                       "verified_public_residuals": verified_rows,
                       "verified_signed_or_weighted_witnesses": verified_witnesses,
@@ -186,6 +206,6 @@ def sum_points(points):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        raise SystemExit("usage: verify_prime31_weighted_slot_parity.py rust-transcript.json")
+    if len(sys.argv) not in (2, 3):
+        raise SystemExit("usage: verify_prime31_weighted_slot_parity.py rust-transcript.json [frozen-witness-summary.json]")
     main(sys.argv[1])
