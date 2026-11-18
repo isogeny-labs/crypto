@@ -22,3 +22,22 @@
 
 ### Errors (what went wrong, how it was handled)
 - Local runtime lacks cargo/rustc and cannot clone the repository. Only source-specific GitHub Actions may establish Rust execution; Python preflight is labelled development-only, not a Rust solver or signed independent PCC verification.
+
+
+## 2026-11-18T23:33Z — exact-source CI PASS and final fully charged comparison
+
+### What was done (commands, files, features)
+- Verified GitHub Actions [run #44421016999](https://github.com/isogeny-labs/crypto/actions/runs/44421016999) and job #135213676744 completed SUCCESS: pinned original Rust library 40/40, 3 focused tests, all four exact-source full 1024-target runs, independent Python BigInt replay of all 31 training rows, 31 basis logs and 1024 targets per arm, and same-public-Q cross-arm check.
+- Fully paid ABBA means: OLD 11516.224ms, TERNARY 9127.743ms, 1.26167x old/new; identical 31/31 rank and 1024/1024 target recovery. Exact 4-arm old/new operation counts: 44,344,469 vs 35,150,980 EC additions; 2,837,165,077 vs 2,249,470,574 field multiplications. Online relation attempts 1315 vs 1177; training 37 vs 42 queries.
+- Froze raw evidence at [artifact #14481802819](https://github.com/isogeny-labs/crypto/actions/runs/44421016999/artifacts/14481802819), ZIP SHA256 `b6252858872121cffe63009ac18382b3d46724478b97d68abbe05a15e6fd2804`. Committed [report](../../research/prime31_ic_20261115/rr9/W8_TERNARY_WEIGHT_RESULT_20261118.md) and [durable JSON](../../research/prime31_ic_20261115/rr9/W8_TERNARY_WEIGHT_SUMMARY_20261118.json); marked scoped task completed in docs/ACTIVE.md.
+
+### Decisions made (and why)
+- The 1.262x advantage is a **source-specific measured complete Rust generic-table index-calculus control** improvement; not a claimed non-generic algebraic relation-extraction result. The historical 170ms cached BSGS is from a different runner and must not be compared as a matched new result.
+- TERNARY is now preferred candidate weight schedule for **a costed public-only B8 RR9/F4 extractor ablation** in #4692, not blindly promoted to the whole-solver frontier.
+
+### Open threads (unfinished, pick up next time)
+- Integrate ternary and original weighted slot polynomials into genuinely public-residual-only B8 unknown-index F4 solver (no 4+4 generic tables), grade unseeded positives and negatives and every failure/censored cost, then use the same Rust four-window 31-rank 1024-target path and matched BSGS/rho/index calculus on one runner.
+- Retain independent signed PCC validation as outstanding.
+
+### Errors (what went wrong, how it was handled)
+- No source-specific Rust or Python test failures on this run. Rust warned that test-only `signed_formal_injective` was dead code in release execution, without affecting measurements or verification.
