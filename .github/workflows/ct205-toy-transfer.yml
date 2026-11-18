@@ -1,0 +1,60 @@
+name: CT205 toy cover independent arithmetic and native DLP
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/ct205-toy-transfer.yml'
+      - 'tests/prime_cover_toy_complete_dlp.rs'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
+      - 'src/prime_hyperelliptic/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-field-oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
+      - name: Recount quotient curves and genus-two Jacobian
+        run: python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
+
+  native-toy-dlp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      CARGO_BUILD_JOBS: '2'
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_RELEASE_DEBUG: '0'
+    steps:
+      - name: Recover hosted-runner disk
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+          df -h .
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/*/
+            /src/
+            /tests/prime_cover_toy_complete_dlp.rs
+            /.cargo/
+            /build.rs
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - name: Compile and actually execute all toy logs
+        run: cargo test --locked --release --test prime_cover_toy_complete_dlp -- --nocapture
