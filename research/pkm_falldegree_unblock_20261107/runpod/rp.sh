@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Client for runpod/server.py (Amendment R3 draft). Auth to rest.runpod.io is injected by the session proxy.
+# Client for runpod/server.py (Amendment R3 draft). RunPod REST v2 (api.runpod.io/v2, Amendment 32; v1 returned 502
+# on 2026-11-18). Auth is injected by the session proxy. CPU_ID picks the flavor (default cpu5m, 8 GB per vCPU).
 # Usage:
 #   rp.sh create NAME VCPU          -> creates a reserved (interruptible=false) CPU pod running server.py; prints pod JSON
 #   rp.sh pod ID                    -> pod record (costPerHr, vcpuCount, memoryInGb, desiredStatus)
@@ -8,7 +9,7 @@
 #   rp.sh status ID | fetch ID OUT.tar.gz | delete ID
 # Token: $RUNNER_TOKEN (generated per pod by `create`, kept in $TOKDIR/<pod>.token, never committed).
 set -euo pipefail
-API=https://rest.runpod.io/v1; H=(-H "Authorization: Bearer proxy-injected" -H "Content-Type: application/json")
+API=https://api.runpod.io/v2; H=(-H "Authorization: Bearer proxy-injected" -H "Content-Type: application/json")
 here=$(cd "$(dirname "$0")" && pwd); TOKDIR=${TOKDIR:?scratch dir for pod tokens}
 url() { echo "https://$1-8000.proxy.runpod.net"; }
 tok() { cat "$TOKDIR/$1.token"; }
@@ -16,14 +17,13 @@ case "$1" in
   create)
     name=$2 vcpu=$3; t=$(python3 -c 'import secrets;print(secrets.token_hex(24))')
     boot="import base64;exec(base64.b64decode('$(base64 -w0 "$here/server.py")'))"
-    body=$(jq -n --arg n "$name" --argjson v "$vcpu" --arg t "$t" --arg b "$boot" --arg h "$(sha256sum "$here/server.py" | cut -c1-64)" '{name:$n,computeType:"CPU",
-      cpuFlavorIds:["cpu5m","cpu3m"],cpuFlavorPriority:"custom",vcpuCount:$v,interruptible:false,
-      imageName:"python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",containerDiskInGb:20,ports:["8000/http"],env:{RUNNER_TOKEN:$t,RUNNER_SHA256:$h,RESULTS_DIR:"/workspace/results"},volumeInGb:20,volumeMountPath:"/workspace",
-      dockerEntrypoint:["python3","-u","-c"],dockerStartCmd:[$b]}')
+    body=$(jq -n --arg n "$name" --argjson v "$vcpu" --arg t "$t" --arg b "$boot" --arg h "$(sha256sum "$here/server.py" | cut -c1-64)" --arg c "${CPU_ID:-cpu5m}" '{name:$n,cloud:"SECURE",cpu:{id:$c,vcpuCount:$v},
+      image:"python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",disk:20,ports:["8000/http"],
+      env:{RUNNER_TOKEN:$t,RUNNER_SHA256:$h,RESULTS_DIR:"/workspace/results"},entrypoint:["python3","-u","-c"],cmd:[$b]}')
     out=$(curl -sS -X POST "$API/pods" "${H[@]}" -d "$body"); id=$(jq -r '.id // empty' <<<"$out")
     [ -n "$id" ] || { echo "$out" >&2; exit 1; }
-    umask 077; echo "$t" > "$TOKDIR/$id.token"; jq '{id,name,costPerHr,vcpuCount,memoryInGb,interruptible,machine,imageName}' <<<"$out" | tee "$TOKDIR/$id.create.json" ;;
-  pod) curl -sS "$API/pods/$2" "${H[@]}" | jq '{id,name,desiredStatus,costPerHr,vcpuCount,memoryInGb,interruptible,lastStartedAt,machine}' ;;
+    umask 077; echo "$t" > "$TOKDIR/$id.token"; jq '{id,name,cost,cpu,dataCenterId,image,status}' <<<"$out" | tee "$TOKDIR/$id.create.json" ;;
+  pod) curl -sS "$API/pods/$2" "${H[@]}" | jq '{id,name,status,cost,cpu,dataCenterId,startedAt}' ;;
   upload) # 2 MB chunks (Amendment 16): first chunk via /upload (truncates), the rest via /append
     for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zeros entry_r2.sh run.sh build-info.json entry_m2c.sh; do
       [ -f "$3/$f" ] || continue; tmp=$(mktemp -d); split -b 2M -d -a 4 "$3/$f" "$tmp/part."; ep=upload
@@ -32,7 +32,7 @@ case "$1" in
   start) # Kummer jobs. SHA_FILE (main's Amendment 17): a JSON {name: sha256} of the reproduction-gated rebuild; default: the
       # frozen image's. Guard fields as start-iso (branch amendments, preregistration 22-29)
       shas=$(if [ -n "${SHA_FILE:-}" ]; then jq . "$SHA_FILE"; else jq '.study_binary_sha256 | del(.["entry.sh"])' "$here/../image/image.json"; fi)
-      cph=$(curl -sS "$API/pods/$2" "${H[@]}" | jq -r .costPerHr)
+      cph=$(curl -sS "$API/pods/$2" "${H[@]}" | jq -r .cost)
       jq -n --argjson s "$3" --argjson h "$shas" --argjson sec "${SECONDS_LIMIT:?}" --argjson cph "$cph" \
         --argjson mx "${MAX_USD:-40}" --argjson mf "${MEMORY_FLOOR_GIB:-56}" \
         --arg en "${ENTRY:-}" '{stages:$s,sha256:$h,rayon:12,seconds:$sec,cost_per_hr:$cph,max_usd:$mx,memory_floor_gib:$mf} + (if $en == "" then {} else {entry:$en} end)' |
@@ -55,7 +55,7 @@ case "$1" in
       commit=$(cut -d' ' -f4 "$TOKDIR/$2.repo.tar.sha256"); repo=$(cd "$here/../../.." && pwd)
       pins=$(git -C "$repo" show "$commit:research/pkm_falldegree_unblock_20261107/iso/BUNDLE.sha256" |
         jq -R 'split("  ") | {(.[1]): .[0]}' | jq -s add)
-      cph=$(curl -sS "$API/pods/$2" "${H[@]}" | jq -r .costPerHr)   # the pod's live price (E3.2)
+      cph=$(curl -sS "$API/pods/$2" "${H[@]}" | jq -r .cost)   # the pod's live price (E3.2)
       jq -n --argjson s "$3" --argjson h "$shas" --argjson b "$pins" --arg c "$commit" --argjson sec "${SECONDS_LIMIT:?}" \
         --argjson cph "$cph" --argjson mx "${MAX_USD:-40}" --argjson mf "${MEMORY_FLOOR_GIB:-56}" \
         '{entry:"iso",stages:$s,sha256:$h,bundle_sha256:$b,commit:$c,rayon:12,seconds:$sec,cost_per_hr:$cph,max_usd:$mx,memory_floor_gib:$mf}' |

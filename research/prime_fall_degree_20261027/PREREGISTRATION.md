@@ -1079,3 +1079,24 @@ Every number is `[pcc:unverified]`.
   within the US$500 ceiling (Amendment 20).
 - **Fetch cadence.** Results are fetched every 15 minutes (Amendment 29).
 - No hypothesis, §6 rule, seed or draw changes.
+
+## Amendment 32 (2026-11-18; route procedure and spend record; no job launched)
+
+Every number is `[pcc:unverified]`.
+
+- **Owner instruction (2026-11-18, session 01TCbLH6osebpnEbutNogBzD).** After the Amendment 31 batch was found lost, the owner
+  said "Try again", then "Use run pod api v2".
+- **Route change.** REST v1 (`rest.runpod.io/v1`) returned 502. `runpod/rp.sh` now uses REST v2 (`api.runpod.io/v2`): body
+  `{name, cloud: SECURE, cpu: {id, vcpuCount}, image, disk: 20, ports, env, entrypoint, cmd}`, price field `cost`. The flavor is
+  `CPU_ID` (default `cpu5m`, 8 GB per vCPU). Same image digest, same `server.py`, same guards. A 2-vCPU smoke pod reached the
+  runner's `/status` and was deleted.
+- **The Amendment 31 batch: what it cost (measured, `GET /v2/billing/pods?podId=…`, 2026-11-14 to 2026-11-19).**
+  - Route F `t14 k0`, `k1`: US$63.40 each. Route C decisive `t14 k0`: US$63.40; `k1`: US$53.66.
+  - Validation `t12/t13 k0/k1`: US$31.74 each.
+  - Total: **US$370.84**. Every pod was billed for about 30.5 h, then disappeared. No row was fetched.
+- **Why it overran.** The runner's guard bounds the *job*, not the *pod*. A pod stays billed after its job ends until the client
+  deletes it, and the session that would delete it was down. The validation pods ran 30.5 h for a 4 h job.
+- **Ceiling.** About US$95 before Amendment 31 plus US$370.84 is about US$466 of the US$500 ceiling (Amendment 20). The
+  Amendment 31 batch at v2 prices (worst about US$220) does not fit. **No job is launched under this amendment.** A relaunch
+  needs the owner to raise the ceiling or to choose a subset, and a pod-lifetime fix: the client deletes each pod when its job
+  ends, and no batch starts unless a check-in is scheduled within the shortest job limit.
