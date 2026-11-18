@@ -162,6 +162,7 @@ SOURCES = {
     "genus4_followup": "research/genus4_followup_20261118/analysis.json",
     "genus4_followup_sens": "research/genus4_followup_20261118/sensitivity.json",
     "genus4_followup_curves": "research/genus4_followup_20261118/per_curve.json",
+    "genus4_prime_order": "research/genus4_prime_order_20261118/analysis.json",
     "fes_then_batched": "research/fes_then_batched_20261112/validation/headline.json",
     "fes_then_batched_readme": "research/fes_then_batched_20261112/README.md",
     "gpu_fes_e2e": "research/ic_gpu_e2e_20261113/results.json",
@@ -538,7 +539,8 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "benchmarks/20261115-ksum-prune-tableb",
                            "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1",
                            "benchmarks/20261115-tableb-ksum",
-                           "benchmarks/20261118-genus4-followup")
+                           "benchmarks/20261118-genus4-followup",
+                           "benchmarks/20261118-genus4-prime-order")
 
 
 def gate_inputs(evidence: Path) -> set[str]:
@@ -2197,7 +2199,19 @@ def genus4_followup_component() -> dict:
         arms[a] = {"q3": {n: v[f"Q3_w{n}"] for n in ("0", "0.1", "1")}, "q4_w1": v["Q4_w1"],
                    "plain_theory_w1": sens[a]["vs_plain_theory_w1"], "neg_ideal": {n: sens[a][f"vs_neg_ideal_w{n}"] for n in ("0.1", "1")},
                    "seed_stability": sens[a]["q3_w1_hi_over_50_seeds"], "la_share": v["share_la"]}
-    return {"arms": arms, "curves": pc["curves"], "n_targets": an["n_targets"], "n_keys": an["n_keys"],
+    po = load(SOURCES["genus4_prime_order"])
+    po_errs = checked_evidence_dir(REPO / "benchmarks/20261118-genus4-prime-order", REPO)
+    prime_order = {"validated": not po_errs, "tune": po["tune"], "rows": [], "slope": po["slope"],
+                   "study": "research/genus4_prime_order_20261118/",
+                   "results": "research/genus4_prime_order_20261118/RESULTS.md",
+                   "errata": "research/genus4_prime_order_20261118/ERRATA.md",
+                   "validator": "benchmarks/20261118-genus4-prime-order/validator-report.md"}
+    for pr, cell in po["primes"].items():
+        for arm, v in cell["arms"].items():
+            prime_order["rows"].append({"p": int(pr), "arm": arm,
+                                        "neg": {n: v[f"neg_w{n}"] for n in ("0", "0.1", "1")},
+                                        "below_all_w": v["below_neg_all_w"]})
+    return {"prime_order": prime_order, "arms": arms, "curves": pc["curves"], "n_targets": an["n_targets"], "n_keys": an["n_keys"],
             "q_over_theory": an["q_mean_over_theory"], "cc_star": an["cc_star"],
             "study": "research/genus4_followup_20261118/", "report": "research/genus4_followup_20261118/REPORT.pdf",
             "results": "research/genus4_followup_20261118/RESULTS.md", "source": SOURCES["genus4_followup"],
@@ -4092,6 +4106,19 @@ def genus4_followup_markdown(g: dict) -> list[str]:
     L += ["", f"Distance remaining: IC / ideal negation rho at w = 1. Factor-base size retuned on p = 8209 (frozen rule): "
           f"cc* = {g['cc_star']}, the existing setting. Study: [{g['study']}](../../{g['study']}); "
           f"[results](../../{g['results']}); [report](../../{g['report']}); [validator report](../../{g['validator']}).", ""]
+    po = g["prime_order"]
+    L += ["### Prime-order Jacobians at p = 16411 and 32771 (" + ("validated" if po["validated"] else "not validated") + ")", "",
+          "Five prime-order curves per prime (#J about 2^56 and 2^60), 6 targets x 2 seeds each. x is arm x at the lab "
+          f"factor base (cc 2.0); x* is arm x at cc {po['tune']['cc']}, tuned on held-out cofactor-2 curves. Ratio of IC cost "
+          "to the ideal negation-rho bound sqrt(pi r/4), every emitted native operation at w GAE; the walk's per-step "
+          "hash and coefficient additions are not counted (charging them moves x* at p = 16411 from 0.876 to 0.885). "
+          "Confirms known asymptotics (double large prime, genus 4) on this implementation; not an elliptic-curve result.", "",
+          "| p | arm | w=0 | w=0.1 | w=1 | below at all w |", "|--:|:--|--:|--:|--:|:--|"]
+    for r in po["rows"]:
+        L.append(f"| {r['p']} | {r['arm']} | {f(r['neg']['0'])} | {f(r['neg']['0.1'])} | {f(r['neg']['1'])} | {r['below_all_w']} |")
+    L += ["", f"Slope of ln(x*/ideal negation rho) in ln p: {po['slope']['x*']['ratio_vs_neg_w1']['slope']:.3f} (two primes). "
+          f"Study: [{po['study']}](../../{po['study']}); [results](../../{po['results']}); [errata](../../{po['errata']}); "
+          f"[validator report](../../{po['validator']}).", ""]
     return L
 
 
@@ -4116,7 +4143,21 @@ def genus4_followup_html(g: dict) -> str:
             f'<th class="n">/ ideal negation</th><th class="n">/ measured plain rho</th></tr></thead><tbody>{crow}</tbody></table>'
             f'<p>Distance remaining: IC / ideal negation rho at w = 1. Factor-base size retuned on p = 8209: cc* = {esc(g["cc_star"])}. '
             f'<a href="{gh}{esc(g["study"])}">Study</a>; <a href="{gh}{esc(g["results"])}">results</a>; '
-            f'<a href="{gh}{esc(g["report"])}">report</a>; <a href="{gh}{esc(g["validator"])}">validator report</a>.</p></section>')
+            f'<a href="{gh}{esc(g["report"])}">report</a>; <a href="{gh}{esc(g["validator"])}">validator report</a>.</p>'
+            + genus4_prime_order_html(g["prime_order"], f, gh) + '</section>')
+
+
+def genus4_prime_order_html(po: dict, f, gh: str) -> str:
+    rows = "".join(f'<tr><td class="n">{r["p"]}</td><td>{esc(r["arm"])}</td><td>{f(r["neg"]["0"])}</td><td>{f(r["neg"]["0.1"])}</td>'
+                   f'<td>{f(r["neg"]["1"])}</td><td>{esc(str(r["below_all_w"]))}</td></tr>' for r in po["rows"])
+    return ('<h3>Prime-order Jacobians at p = 16411 and 32771 (' + ("validated" if po["validated"] else "not validated") + ')</h3>'
+            f'<p>Five prime-order curves per prime; x at cc 2.0, x* at cc {esc(po["tune"]["cc"])} (tuned on held-out curves). '
+            'IC cost over the ideal negation-rho bound sqrt(&pi; r/4), every emitted native operation at w GAE (per-step walk '
+            'hash and coefficient additions not counted). Confirms known asymptotics on this implementation; not an '
+            'elliptic-curve result.</p><table><thead><tr><th class="n">p</th><th>arm</th><th>w=0</th><th>w=0.1</th><th>w=1</th>'
+            f'<th>below at all w</th></tr></thead><tbody>{rows}</tbody></table>'
+            f'<p><a href="{gh}{esc(po["study"])}">Study</a>; <a href="{gh}{esc(po["results"])}">results</a>; '
+            f'<a href="{gh}{esc(po["errata"])}">errata</a>; <a href="{gh}{esc(po["validator"])}">validator report</a>.</p>')
 
 
 def markdown(doc: dict) -> str:

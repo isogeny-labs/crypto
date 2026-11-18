@@ -15,7 +15,8 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 - [x] Genus-4 follow-up: more p = 16411 targets for arm x with matched plain rho, Ferrari inside the sieve (not applicable; factor-base balance instead), validator replay for the leaderboard (Claude, completed 2026-11-18, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4693; validated)
-- [ ] Genus-4 arm x on prime-order (h = 1) Jacobians at p = 16411 and 32771 against the ideal negation bound, with linear-algebra tuning (cc x SGE) on the h = 2 curves (Claude, started 2026-11-18, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4693). Also regenerate the IC leaderboard outputs once store inputs can be pulled
+- [x] Genus-4 arm x on prime-order (h = 1) Jacobians at p = 16411 and 32771 against the ideal negation bound, with linear-algebra tuning (cc x SGE) on the h = 2 curves (Claude, completed 2026-11-18, PR #4693; validated: x* 0.876 / 0.640 of ideal negation rho at w = 1, below at all w)
+- [ ] Regenerate the IC leaderboard outputs (docs/ic/LEADERBOARD.md, leaderboard.json, ic-leaderboard.html) once artifact-store inputs can be pulled; the genus-4 section is in the builder (PR #4693)
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
