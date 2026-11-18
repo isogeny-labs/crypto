@@ -197,6 +197,14 @@ struct Algebra {
     _max_columns: usize,
     #[serde(rename = "f4_field_multiplications")]
     _f4_field_multiplications: u64,
+    // Degree-fall diagnostics the producer writes since 1998650583; parsed
+    // for schema compatibility only (diagnostic, never priced).
+    #[serde(default, rename = "first_fall_degree")]
+    _first_fall_degree: Option<u32>,
+    #[serde(default, rename = "last_fall_degree")]
+    _last_fall_degree: Option<u32>,
+    #[serde(default, rename = "degree_of_regularity_observed")]
+    _degree_of_regularity_observed: Option<u32>,
     #[serde(default, rename = "roots")]
     _roots: Option<Roots>,
 }
