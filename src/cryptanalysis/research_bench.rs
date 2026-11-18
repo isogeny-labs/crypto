@@ -588,6 +588,26 @@ pub fn bench_curves_a_minus_3() -> Vec<(u32, CurveParams)> {
             6_655_615,
             16_784_527,
         ),
+        // 28-bit P-256-class rung (p = 268435399 ≡ 3 mod 4).
+        a3(
+            28,
+            "a3-bench-28bit-p256class",
+            268_435_399,
+            3,
+            1,
+            1,
+            268_407_199,
+        ),
+        // 28-bit CryptoPro-B-class rung (p = 268435361 ≡ 1 mod 4).
+        a3(
+            28,
+            "a3-bench-28bit-cryptoproclass",
+            268_435_361,
+            10,
+            1,
+            27_786_607,
+            268_448_867,
+        ),
     ]
 }
 

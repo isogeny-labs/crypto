@@ -114,6 +114,8 @@ fn main() {
         (20, 1, "cryptoproclass"),
         (24, 3, "p256class"),
         (24, 1, "cryptoproclass"),
+        (28, 3, "p256class"),
+        (28, 1, "cryptoproclass"),
     ] {
         match find_curve(bits, residue) {
             Some((p, a, b, gx, gy, order)) => {
