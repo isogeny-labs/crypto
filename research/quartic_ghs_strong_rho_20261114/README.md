@@ -8,6 +8,10 @@ profile and benchmark are checkpoint-blocked in the current runtime, so it has
 no measured throughput result, frontier change, or leaderboard row. The live
 execution-admission gap is tracked in
 [the problem record](../../problems/ghs-strong-rho-measurement-admission.md).
+[Round C](ROUND_C.md) prospectively replaces run-time base-field remainder
+division with fixed-modulus reciprocal reduction and separately re-screens
+batch widths 4, 8, and 16. Its `q=223` cell is correctness/count sensitivity,
+not throughput or a primary-width selection.
 
 This study reopens the restricted `E0/F_{q^3}` plane-quartic program for one
 specific obligation: compare its end-to-end index-calculus result with a rho
@@ -36,6 +40,8 @@ is made [pcc:unverified].
 - [`ROUND_B.md`](ROUND_B.md) freezes the five-product squaring lead;
   [`round-b/RESULTS.md`](round-b/RESULTS.md) retains its partial
   correctness/count result and checkpoint blocker.
+- [`ROUND_C.md`](ROUND_C.md) freezes reciprocal-reduction correctness and
+  count-identity gates plus a prospective b4/b8/b16 development screen.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
   source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
   the prospective Round B candidate; Round A remains bound by the source hash
