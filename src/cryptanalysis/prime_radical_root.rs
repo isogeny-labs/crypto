@@ -1980,7 +1980,7 @@ mod tests {
         let c = &ctx.cube_q;
         Cube { r: Fq2BeforePower(c.r), n: c.n, s: c.s, e3: c.e3,
                c: c.c, c_inv: c.c_inv, inverse_powers: c.inverse_powers.clone(),
-               inverse_squares: c.inverse_squares.clone(), w: c.w, p3s: c.p3s }
+               inverse_squares: c.inverse_squares.clone(), w: c.w, w_squared: c.w_squared,\n               c_inv_squared: c.c_inv_squared, p3s: c.p3s }
     }
 
     #[test]
