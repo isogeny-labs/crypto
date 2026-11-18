@@ -455,6 +455,107 @@ impl<R: Ring> Cube<R> {
         if self.s == 1 {
             return Some(x0);
         }
+        // Membership guarantees h^(3^(s-1)) = 1 for cubes. If h=1,
+        // the initial Cardano/AMM power is already a cube root.
+        // Only branch here for s>=3: smaller cases had mixed perf results.
+        if self.s >= 3 && h == r.one() {
+            return Some(x0);
+        }
+        let w2 = r.mul(self.w, self.w);
+        // For s=2, cube membership forces h into <w> of order 3.
+        // The correction is c^{-d} for h=w^d, d=0,1,2.
+        if self.s == 2 {
+            let factor = if h == r.one() {
+                r.one()
+            } else if h == self.w {
+                self.c_inv
+            } else if h == w2 {
+                r.mul(self.c_inv, self.c_inv)
+            } else {
+                return None;
+            };
+            return Some(r.mul(x0, factor));
+        }
+        // General s: find 3-adic digits of log_c(h), but maintain
+        // c^{-l} incrementally instead of recomputing c^{-l} for each
+        // digit. For cubes, the low digit is zero, so accumulate
+        // c^{-l/3} at the same time and eliminate the final power.
+        // Public root-finding inputs only: branches are variable-time.
+        let mut correction = r.one();
+        let mut root_correction = r.one();
+        // The low 3-adic digit is guaranteed zero by the cube-residuosity
+        // test above. Skip its s-1 repeated cubings and start at digit 1.
+        // These are the states the original digit-0 loop left behind.
+        let mut previous_power = self.c_inv;      // c^-1
+        let mut inverse_power = r.cube(self.c_inv); // c^-3
+        for j in 1..self.s {
+            let mut z = r.mul(h, correction);
+            // z = (h*c^{-l})^(3^(s-1-j)). Repeated cubing uses only
+            // 2(s-1-j) field multiplications, not binary exponentiation.
+            for _ in (j + 1)..self.s {
+                z = r.cube(z);
+            }
+            let digit = if z == r.one() {
+                0
+            } else if z == self.w {
+                1
+            } else if z == w2 {
+                2
+            } else {
+                return None;
+            };
+            if digit != 0 {
+                let factor = if digit == 1 {
+                    previous_power
+                } else {
+                    r.mul(previous_power, previous_power)
+                };
+                root_correction = r.mul(root_correction, factor);
+                if j + 1 < self.s {
+                    let term = if digit == 1 {
+                        inverse_power
+                    } else {
+                        r.mul(inverse_power, inverse_power)
+                    };
+                    correction = r.mul(correction, term);
+                }
+            }
+            previous_power = inverse_power;
+            if j + 1 < self.s {
+                inverse_power = r.cube(inverse_power);
+            }
+        }
+        Some(r.mul(x0, root_correction))
+    }
+
+    #[cfg(test)]
+    fn root_before_skip_digit(&self, a: R::E) -> Option<R::E> {
+        let r = &self.r;
+        if a == r.zero() {
+            return Some(a);
+        }
+        if self.s == 0 {
+            return Some(r.pow(a, self.e3));
+        }
+        // N = t * 3^s. Reuse a^t for both the cube-residuosity
+        // test (a^t)^(3^(s-1)) and the Sylow correction h.
+        // Since 3*e3-1 is either t or 2*t, this removes one
+        // full-length exponentiation from the AMM hot path.
+        let t = self.n / self.p3s;
+        let g = r.pow(a, t);
+        let mut residue = g;
+        for _ in 1..self.s {
+            residue = r.cube(residue);
+        }
+        if residue != r.one() {
+            return None;
+        }
+        let x0 = r.pow(a, self.e3); // x0^3 = a * h, h in the 3-Sylow
+        let h = if t % 3 == 1 { r.mul(g, g) } else { g };
+        // For s=1, a cube has h=1 and x0 is already a root.
+        if self.s == 1 {
+            return Some(x0);
+        }
         let w2 = r.mul(self.w, self.w);
         // For s=2, cube membership forces h into <w> of order 3.
         // The correction is c^{-d} for h=w^d, d=0,1,2.
@@ -2680,4 +2781,96 @@ mod tests {
         );
         assert!(fb > 0, "the (1,3) class must be exercised");
     }
+    #[test]
+    fn skip_zeroth_amm_digit_preserves_roots_fp_and_fp2() {
+        let mut seed = 0x16a1_2026_b00f_1234u64;
+        for &p in &[7u64, 17, 97, 163, 487, 1459, 17_497,
+                    998_244_353, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            for _ in 0..384 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let a = seed % p;
+                let cube = f.mul(a, f.sqr(a));
+                for x in [a, cube] {
+                    assert_eq!(ctx.cube_p.root_before_skip_digit(x), ctx.cube_p.root(x),
+                               "Fp p={p}, x={x}, s={}", ctx.cube_p.s);
+                }
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let x = (a, seed % p);
+                let cube_q = ctx.cube_q.r.cube(x);
+                for y in [x, cube_q] {
+                    assert_eq!(ctx.cube_q.root_before_skip_digit(y), ctx.cube_q.root(y),
+                               "Fp2 p={p}, x={y:?}, s={}", ctx.cube_q.s);
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "isolated production-Rust benchmark of skipped AMM digit"]
+    fn bench_skip_zeroth_amm_digit_actual_rust() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn sample<R: Ring>(ctx: &Cube<R>, xs: &[R::E], reps: usize, after: bool) -> f64 {
+            let now = Instant::now();
+            let mut hits = 0u64;
+            for _ in 0..reps {
+                for &x in xs {
+                    let got = if after { ctx.root(black_box(x)) }
+                              else { ctx.root_before_skip_digit(black_box(x)) };
+                    if black_box(got).is_some() { hits += 1; }
+                }
+            }
+            black_box(hits);
+            now.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+        fn paired<R: Ring>(label: &str, ctx: &Cube<R>, xs: &[R::E], reps: usize) {
+            for &x in xs { assert_eq!(ctx.root_before_skip_digit(x), ctx.root(x)); }
+            let (mut before, mut after) = (Vec::new(), Vec::new());
+            for j in 0..13 {
+                if j % 2 == 0 {
+                    before.push(sample(ctx, xs, reps, false));
+                    after.push(sample(ctx, xs, reps, true));
+                } else {
+                    after.push(sample(ctx, xs, reps, true));
+                    before.push(sample(ctx, xs, reps, false));
+                }
+            }
+            before.sort_by(f64::total_cmp);
+            after.sort_by(f64::total_cmp);
+            println!("{label}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                     before[6], after[6], before[6] / after[6]);
+        }
+        let mut seed = 0x6811_2026_1655_abcd_u64;
+        for &p in &[163u64, 487, 1459, 17_497, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            let mut fp_cubes = Vec::new();
+            let mut fp_mixed = Vec::new();
+            let mut fq_cubes = Vec::new();
+            let mut fq_mixed = Vec::new();
+            for _ in 0..256 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let x = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let y = (x, seed % p);
+                fp_cubes.push(f.mul(x, f.sqr(x)));
+                fp_mixed.push(x);
+                fq_cubes.push(ctx.cube_q.r.cube(y));
+                fq_mixed.push(y);
+            }
+            for (label, xs) in [("Fp cubes", &fp_cubes), ("Fp mixed", &fp_mixed)] {
+                paired(&format!("p={p} s={} {label}", ctx.cube_p.s), &ctx.cube_p, xs, 8);
+            }
+            for (label, xs) in [("Fp2 cubes", &fq_cubes), ("Fp2 mixed", &fq_mixed)] {
+                paired(&format!("p={p} s={} {label}", ctx.cube_q.s), &ctx.cube_q, xs, 8);
+            }
+        }
+    }
+
 }
