@@ -19,7 +19,7 @@ case "$1" in
     boot="import base64;exec(base64.b64decode('$(base64 -w0 "$here/server.py")'))"
     body=$(jq -n --arg n "$name" --argjson v "$vcpu" --arg t "$t" --arg b "$boot" --arg h "$(sha256sum "$here/server.py" | cut -c1-64)" --arg c "${CPU_ID:-cpu5m}" '{name:$n,cloud:"SECURE",cpu:{id:$c,vcpuCount:$v},
       image:"python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",disk:20,ports:["8000/http"],
-      env:{RUNNER_TOKEN:$t,RUNNER_SHA256:$h,RESULTS_DIR:"/workspace/results"},entrypoint:["python3","-u","-c"],cmd:[$b]}')
+      env:{RUNNER_TOKEN:$t,RUNNER_SHA256:$h,RESULTS_DIR:"/workspace/results"},entrypoint:["python3","-u","-c"],cmd:[$b]} + (if env.DC then {dataCenterIds:(env.DC|split(","))} else {} end)')
     out=$(curl -sS -X POST "$API/pods" "${H[@]}" -d "$body"); id=$(jq -r '.id // empty' <<<"$out")
     [ -n "$id" ] || { echo "$out" >&2; exit 1; }
     umask 077; echo "$t" > "$TOKDIR/$id.token"; jq '{id,name,cost,cpu,dataCenterId,image,status}' <<<"$out" | tee "$TOKDIR/$id.create.json" ;;
@@ -74,9 +74,8 @@ case "$1" in
       st=$(curl -sS -m 60 -H "X-Token: $(tok $2)" "$(url $2)/status" | jq -r '.state // "unreachable"' 2>/dev/null || echo unreachable)
       if [ "$st" = done ] || [ "$(date +%s)" -gt "$4" ]; then
         mkdir -p "$3"; out="$3/$2-$(date -u +%Y%m%dT%H%MZ).tar.gz"
-        "$0" fetch "$2" "$out" || echo "fetch failed for $2 (state $st)"
-        if [ "$st" = done ] || [ "$(date +%s)" -gt "$4" ]; then "$0" delete "$2"; fi
-        echo "reaped $2 state=$st"
+        if "$0" fetch "$2" "$out" || [ "$(date +%s)" -gt "$4" ]; then "$0" delete "$2"; echo "reaped $2 state=$st"
+        else echo "fetch failed for $2 (state $st); kept until the deadline"; fi
       else echo "alive $2 state=$st"; fi ;;
   *) echo "unknown command" >&2; exit 2 ;;
 esac
