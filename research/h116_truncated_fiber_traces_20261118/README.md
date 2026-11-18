@@ -78,3 +78,8 @@ ECDLP ratio. [pcc:unverified]
 Files are added in this order: literature and protocol freeze, producer and
 Lean source, independent verifier binding, checkpointed EKS execution, raw
 export, report/diagram/PDF, and only then any claim record.
+
+The independent verifier source is now bound in
+`INDEPENDENT_VERIFIER_GATE.md`. Its target-admission run has not started
+because the mandatory cryptanalysis checkpoint upload credential is absent;
+this blocks the producer run rather than weakening the gate. [pcc:unverified]
