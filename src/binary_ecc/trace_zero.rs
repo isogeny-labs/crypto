@@ -250,9 +250,9 @@ fn exact_field(curve: &BinaryCurve) -> bool {
     let mut remaining = n;
     let mut d = 2;
     while d * d <= remaining {
-        if remaining % d == 0 {
+        if remaining.is_multiple_of(d) {
             divisors.push(d);
-            while remaining % d == 0 {
+            while remaining.is_multiple_of(d) {
                 remaining /= d;
             }
         }
@@ -278,7 +278,7 @@ impl TraceZeroVariety {
     pub fn new(curve: &BinaryCurve) -> Result<Self, TraceZeroError> {
         let n = curve.m;
         if !(3..=131).contains(&n)
-            || n % 2 == 0
+            || n.is_multiple_of(2)
             || curve.a.m_value() != n
             || !curve.a.is_zero()
             || curve.b != F2mElement::one(n)

@@ -253,8 +253,7 @@ fn run<T: Admission>(out: &mut Attempt, meter: &mut Meter<'_, T>) -> Result<(), 
     let n = out.source.0.identity.n as usize;
     let m = out.source.0.identity.m;
     if !(1..=61).contains(&n)
-        || m < 2
-        || m > 15
+        || !(2..=15).contains(&m)
         || out.source.variables() > meter.limits.variables
         || out.source.0.blocks.len() < m
     {

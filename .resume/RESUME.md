@@ -1,3 +1,31 @@
+# Resume: crypto @ claude/peaceful-babbage-wddn3o (genus 2-16 IC speed-up)
+
+## Goal
+Measured index-calculus speed-ups for genus 2-16 curves (hyperelliptic first,
+then non-hyperelliptic small-e models). Plan: research/ic_genus2_16_speedup_20261117/PLAN.md.
+
+## Lead / hypothesis
+The 1/g! split probability of a degree-1 base dominates from genus ~8. A base
+with degree-2 places (arm D) or degree-2 large primes (arm E) should cut trials
+by orders of magnitude at g >= 8, at an LA price (D: base ~p^2/4).
+
+## Spec
+Instrument: genus_ladder from fffa1b1243 + P1/instrument.patch (MAX_GENUS 16,
+REL_FB 16, F_{p^k} point counts, arms D/E). Binary /home/user/bin/genus_ladder_g16
+(build in sparse worktree /home/user/crypto-c0b657b; ~8 min). Cell runner P1/run_cell.sh.
+
+## State
+P0 and P1 done (P1/RESULTS.md); P2 lever F negative (P2/RESULTS_F.md); crossover
+p*(g) measured/extrapolated (P2/RESULTS_crossover.md). Binaries g16d (P1) and g16e
+(adds arm F) in /home/user/bin; source patches in P1/instrument.patch and P2_instrument.patch.
+PR #4598 open, subscribed.
+
+## Next steps
+P3 non-hyperelliptic small-e models (PLAN.md); optional degree-3 base for g >= 10;
+more p at g=8 to measure its decay. Keep cells short; use run_curve.sh for big p.
+
+---
+
 # Resume: crypto @ codex/retained-chain-ic-20261109
 
 ## Goal

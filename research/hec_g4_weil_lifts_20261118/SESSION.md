@@ -1,0 +1,13 @@
+## Pairing and compatible-lift gate prepared
+
+What was done: implementedclosedandCantor-trackedfourfunctions, normdeterminants,moved-divisornormalization,exactF2liftadjustment/Z4symplecticcompletion andnative28pairreplayontheactualnewbasis; compiledwithoverflowchecks.
+Decisions made: frozenoriginalp31inputs/field/halfcoordinates; allsupport/normalizationexceptionsfail, no0/0cancellation/freebasis. T-7119scope, Gitprefreeze.
+Open threads: executegateonce; ifqualifiedcontinuecoherenttheta-null/affineconversion/quotientSchottky. Full10xobjectiveactive.
+Errors: unusedneghelperwarning; no scientificexecutionyet. Primarypairingsurveyfetchgaprecorded.
+
+## Actual isotropic four-lifts and symplectic basis qualified
+
+What was done: freeze480cd915e06/hashpass/soleexit0.28closedversusMiller/known2Weilchecks pass,84moved-divisorevaluationsincludingnewbasis. ExactF2adjustment2098212 andZ4completionconstructactual8pointbasis;28nativepairsreplaycanonicalGram. First4span256distinct/doubleoriginal16kernel. Structured64Gramchecks/Cantorcopyidentitypass.
+Decisions made: originalunadjustedliftwasnotisotropic;compatibilityfixedratherthanassumed. Fullsymplectic4basisqualifiedunderwrittenstandardpairingargument; source theta/affineconversionremainmissing. Noquotient/speedclaim.
+Open threads: coherenttheta-null/Mumford-to-thetaconversionwithRiemannchecks,evenquotientSchottky,descent/transport/completecost. Full10xgoalactive/unachieved.
+Errors: noneinscientificrun;unusednegwarningonly. RawPASSmovedcount56isinitialstage;28newbasiscontrolsalsocomputed,84totalretainedinresults. NoS3/cloud/merge.

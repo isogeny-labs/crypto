@@ -1,0 +1,11 @@
+# Native infinity resolution and adjoint constraints [pcc:unverified]
+
+Fixed both original F61 Smith maps in native-smith-affine/CONTROL.txt. The degree10 homogenization of a(t)rho^4+c(t)rho²+d(t)rho+e(t) has unique point at infinity [t:rho:z]=[0:1:0]. In its rho=1 chart set u=t/rho, v=z/rho. The local equation is sum a_i u^i v^(6-i) + sum c_i u^i v^(8-i) + sum d_i u^i v^(9-i) + sum e_i u^i v^(10-i). Require initial multiplicity6.
+
+Resolve repeated tangent directions by exact substitutions (u,v)=(u,u(v+c)), dividing by u^m for curve multiplicity m. Simple tangent directions yield smooth points after blowup; stop ordinary singularities when the homogeneous tangent cone is squarefree, including vertical direction accounting. Explicitly fail on repeated vertical, nonrational repeated, multiple repeated chains or depth>=20; do not infer resolution on unsupported cases. Record every local polynomial, multiplicity, tangent cone and slope. Delta contribution is the sum m(m-1)/2 over retained infinitely near singular points.
+
+At every singular point impose degree7 adjoint multiplicity>=m-1. Transport all36 homogeneous degree7 monomials through the same changes, dividing by u^(m-1). Laurent negative terms represent linear cancellation constraints, not accepted poles. Collect all negative-exponent and insufficient-multiplicity coefficients, row reduce over F61, print a nullspace basis and check every original constraint. This is only the infinity subsystem; finite singularities must still be imposed.
+
+Controls on v²-u², v²-u³, v²-u⁴ require delta1,1,2 respectively. No prescribed answer for actual multiplicity path, delta or adjoint dimension. Retain all outcomes, one600CPU invocation with overflow checks. Git custody while S3 unavailable: push source/protocol/input/binary hashes before execution; preserve failures/no unchanged rerun.
+
+This is local blowup data and necessary adjoint constraints, not a complete canonical basis, nonhyperellipticity, divisor transport or speed result. Canonical adjoints and ordinary/general singularity distinctions: https://magma.maths.usyd.edu.au/magma/handbook/text/1466 and https://magma.maths.usyd.edu.au/magma/handbook/text/1445 . Smith model source: https://arxiv.org/abs/0806.2995 section6. Native code is independent of Magma; no CAS service, Python, source egress or cloud execution.
