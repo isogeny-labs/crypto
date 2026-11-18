@@ -15,18 +15,9 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
-- [ ] Paper runs: hky engine loads the paper's exact unit instances (gate vs recorded profiles), basis export, checkpoint/resume; second-engine depth-14 V6 on unit p65537 and p163841 (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
-- [ ] Paper runs: depth-15 V6 on unit p65537 (+ Rust degree lift for the exact value) and depth-16 on a new unit instance (prime with 2^17 | p-1) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
-- [ ] Rust port of the degree lift (LIFT.md), validated vs direct closures and the recorded k=14 lift records (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
-- [ ] Encoding-vs-intrinsic control: random factor base given a low-degree (tower-shaped / multilinear-bit) encoding, plus subgroup-perturbation dose-response, vs the structured tower (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
-- [ ] Binary Koblitz fall-degree ladder to d_F >= 5 (POD_PLAN P1/P2 + calibrated A/A) on RunPod (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
-- [ ] n=83 m=6 decomposition probe: expected-hit arithmetic first, E-model validation at small n, pod only if informative (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
-- [ ] Prime-field random vs structured factor-base baseline: controlled d_F comparison (tower vs randbase, matched size), isolating the degree-floor confound (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
-- [ ] Binary GF(2^n) Koblitz fall-degree sweep: d_F of the Weil-descent/Semaev system vs n, with/without Frobenius-orbit structure (preregister + small-n local data + pod plan) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
-- [ ] Diagnose the n=83 Frobenius-orbit IC zero-relations result: search-cap/tuning artifact vs fundamental (forensic on koblitz_n83_factor_base_sweep_20261008, read-only) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
-- [ ] Design an experiment that attacks the IC-vs-rho slope beta (factor-base structures that could change the exponent, not the constant) — preregistration only, no claim (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
-- [ ] hky2 engine, second speed pass: adaptive schedule and parallel sequential pass, equality-gated (claude, started 2026-11-17, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4601)
-- [x] hky2 pod runs, part 3: depth-14 degree-6 closure and (6,3) degree-8 closure, final write-up, pods and proxy hosts cleaned up (claude, started 2026-11-17, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
+- [ ] Repair the 28 examples/tests/bins on main broken by lossy merges (syntax, struct drift, lost library APIs) (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw; in progress)
+- [x] Clean up main CI breakages and add an ecbench CI check (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4569 merged; ecbench-smoke check passing; remaining main blockers need the owner: AWS key, pcc claim_type, hec-multi record, rho currency)
+
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
 - [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
@@ -38,7 +29,7 @@ _(none pinned — set one with `/goal <text>`)_
 - [ ] Publish Vieta Rust speed results and resolve official record/publication blockers (codex, started 2026-11-17, branch lane/vieta-speed-20261117, PR #4525)
 
 - [ ] Derive exponent-moving Curve25519 mechanism contracts (Codex, started 2026-11-17, branch codex/curve25519-exponent-ideas-20261117; in progress)
-- [ ] Port the linearized two-summand root finder (lfd-summation-systems PR #28) into ic_framework as a decomposition oracle and compare it with rootfind-mitm, rootfind-pairs and matrix-F4 on the same instances (claude, started 2026-11-17, branch claude/index-calculus-root-finding-e95kd6)
+- [x] Port the linearized two-summand root finder (lfd-summation-systems PR #28) into the Semaev decomposer and measure it vs the pair loop (claude, started 2026-11-17, branch claude/index-calculus-root-finding-e95kd6, PR #4578); follow-up: wrap as an ic_framework oracle and compare with rootfind-mitm in the harness unit
 
 - [x] Repair main-side CI breakage left by the 2026-11-16 merges: parity lock and IC reference currency (workflow store pulls deferred until the store is repaired) (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4576)
 
