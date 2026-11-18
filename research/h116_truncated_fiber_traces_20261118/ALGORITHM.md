@@ -168,6 +168,10 @@ missing-inverse mutation is degenerate on the 35-point `p=5`, degree-two group,
 so the experiment-level protocol records seven accepted cells and one failed
 control. This does not change the generic proof obligation. The coordinate
 formulas themselves are formal as well:
+the point-endomorphism equality is rearranged to `V-1=[t-1]-pi`, and evaluating
+both sides through a total affine-point observable proves equality of the
+chosen `z=-x/y` value. This is pointwise observation, not yet equality of the
+retained rational map or its formal power series.
 for `z=-x/y`, Lean proves negation `z -> -z`, naturality under field maps, and
 the exact `z -> z^p` formula for a supplied coordinatewise `p`-power
 endomorphism. Connecting those formulas to the actual elliptic formal-group

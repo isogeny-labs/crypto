@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-150990155391764ec3fdfffaa930d5c3cec20263db2033ac4eb1da2a22c81384  H116FiberTrace.lean
+b864765cafe7f48c0856549cad8f17fbb483ddda783d0e10dc72daa16b56562e  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  105 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  109 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -41,6 +41,9 @@ b07aea6e5114e29df4209e1c4548be6a807dffb4853c91323e2ceb574a994c2c  receipts/affin
 9b5f3da4fc8ef2c694fdd9942086c3a7f42e936a4512ba3c0067ca94257164f4  receipts/affine-frobenius-audit.txt
 cca767c7b41617791f74533e98d52d7dff185195899aff1e711d6f38dcdf2832  receipts/pointwise-verschiebung-build.txt
 d394c8993e2163bbf80c4cdb313da455d456402cdee0eb4d62edbf559431157d  receipts/pointwise-verschiebung-audit.txt
+7032125ddbcf9a9ed2cbfabea7cc42f7bb3fbc045637bf72133e57158de58902  receipts/point-observable-first-build-failure.txt
+7089cef1d434cf9a73ca41ef2d0e1a3b03fe7ffdd1016e7e03c19c8344e123b7  receipts/point-observable-build.txt
+47b5ab662d6ffb77e3b5e0a098741d3c2bc293d3c7a05f69764b4f39a133a7ab  receipts/point-observable-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -167,6 +170,16 @@ scheme morphism, and it does not transport equality of point endomorphisms to
 equality of the selected local formal power series. Those semantic
 identifications and the characteristic equation remain open; no runtime or
 asymptotic conclusion follows. [pcc:unverified]
+
+The 109-theorem checkpoint rearranges the point-endomorphism identity into the
+exact candidate orientation `V-1=[t-1]-pi`. It defines a total observable on
+Mathlib affine points, sending infinity to zero and `(x,y)` to the existing
+short-Weierstrass parameter `-x/y`, then proves that the two point expressions
+have equal observed parameter values under the explicit characteristic
+premise. This closes additive orientation and pointwise observation only.
+Identifying the constructed pointwise map with the retained rational or scheme
+morphism, and transporting that representation to equality of completed local
+power series, remain open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

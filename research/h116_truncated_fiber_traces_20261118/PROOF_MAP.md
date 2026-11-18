@@ -506,6 +506,50 @@ missing-inverse mutation is identical to the correct map on the 35-point
 design only; it supplies no generic theorem and leaves the endpoint row above
 unchanged. [pcc:unverified]
 
+## Pointwise `V-1` orientation and observable instance gate
+
+1. **Structure above.** Work first in `AddMonoid.End G` for an arbitrary
+   additive commutative group, then specialize `G` to Mathlib's nonsingular
+   affine point group. The observable is an arbitrary function on points; the
+   chosen elliptic instance sends infinity to zero and an affine point
+   `(x,y)` to `-x/y`.
+2. **Theorems used as stated.** Additive-group rearrangement turns
+   `V+pi=[t]` into `V-1=[t-1]-pi`. `DFunLike.congr_fun` evaluates equality of
+   additive endomorphisms at a point. The preceding pointwise Verschiebung
+   theorem supplies the sum identity under the explicit characteristic
+   premise.
+3. **Object as an instance.** The left side is the actual constructed
+   pointwise `V` applied to `P`, then subtracts `P`. The right side is
+   `(t-1)P-pi(P)`. Applying the selected local-parameter function transports
+   the point equality without asserting equality of rational maps or formal
+   power series.
+4. **Assembly probe.** A temporary module checked the endomorphism
+   rearrangement, its characteristic-polynomial specialization, the total
+   local-parameter definition and the observed point equality at default
+   limits. Probe source SHA-256 is
+   `0f62a2522b7f2c538df1df4d3bdd5b5e236269dad570b2a00e9aeee6df2e0aec`;
+   successful empty output SHA-256 is
+   `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+5. **Missing components only.** Equality after evaluation on algebraic points
+   does not construct the retained rational/scheme morphism or identify its
+   completed local-ring map. A later theorem must show that the retained map
+   represents the constructed pointwise endomorphism and transport it to the
+   selected formal parameter series.
+6. **Inheritance table.** Endomorphism subtraction, integer scalar casts,
+   point-group subtraction, the constructed Frobenius and pointwise `V` are
+   inherited from Mathlib and the preceding H116 declarations. This gate adds
+   only additive rearrangement and congruence through a total observable. It
+   introduces no point-counting theorem, rational-map evaluator, series
+   equality, runtime claim or trusted procedure. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `V-1=[t-1]-pi` from `V+pi=[t]` | generic endomorphism algebra | H116 | `AddMonoid.End G` | supplied sum identity |
+| characteristic equation implies pointwise `V-1` orientation | affine-point specialization | H116 | algebraic prime-field extension points | supplied characteristic equation |
+| equality survives an arbitrary point observable | generic congruence | H116 | function from point group to any type | endomorphism orientation |
+| `z=-x/y` agrees on the two point expressions | elliptic observable instance | H116 | actual affine points | supplied characteristic equation |
+| equality of retained rational/formal maps | endpoint obligation | future morphism owner | rational morphism and completed local ring | representation and local-series transport |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

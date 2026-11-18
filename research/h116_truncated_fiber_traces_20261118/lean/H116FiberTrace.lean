@@ -853,6 +853,41 @@ theorem zmodAffineVerschiebung_sum_of_characteristic
     (zmodAffineVerschiebungPointEnd W) trace
     (zmodAffineFrobenius_mul_verschiebung W) hchar
 
+/-- Rearrange an additive-endomorphism sum identity into the exact orientation
+used by the H116 map: `V - 1 = [trace - 1] - pi`. -/
+theorem endomorphism_sub_one_eq_trace_sub_one_sub
+    {G : Type*} [AddCommGroup G]
+    (verschiebung pi : AddMonoid.End G) (trace : ℤ)
+    (hsum : verschiebung + pi = (trace : AddMonoid.End G)) :
+    verschiebung - 1 =
+      ((trace - 1 : ℤ) : AddMonoid.End G) - pi := by
+  have hV : verschiebung = (trace : AddMonoid.End G) - pi :=
+    eq_sub_of_add_eq hsum
+  rw [hV, Int.cast_sub, Int.cast_one]
+  abel
+
+/-- Under the explicit Frobenius characteristic equation, the constructed
+pointwise Verschiebung has exactly the `V-1=[trace-1]-pi` orientation used by
+the candidate rational map. This is still an equality of additive point
+endomorphisms, not an identification of rational or scheme morphisms. -/
+theorem zmodAffineVerschiebung_sub_one_eq
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p)) (trace : ℤ)
+    (hchar : affineFrobeniusPointEnd (E := E) W ^ 2 -
+        (trace : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) *
+            affineFrobeniusPointEnd (E := E) W +
+        ((p : ℤ) : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) = 0) :
+    zmodAffineVerschiebungPointEnd W - 1 =
+      ((trace - 1 : ℤ) : AddMonoid.End
+        (WeierstrassCurve.Affine.Point (W.baseChange E))) -
+          affineFrobeniusPointEnd (E := E) W := by
+  apply endomorphism_sub_one_eq_trace_sub_one_sub
+  exact zmodAffineVerschiebung_sum_of_characteristic W trace hchar
+
 /-- Every one-dimensional formal group law differs from its first input by a
 multiple of its second variable. This is the algebraic filtration statement
 behind the H116 Frobenius cutoff; it uses Mathlib's actual `FormalGroup`, not a
@@ -1179,6 +1214,46 @@ theorem shortWeierstrassLocalParameter_frobenius
     shortWeierstrassLocalParameter (phi x) (phi y) =
       shortWeierstrassLocalParameter x y ^ p := by
   rw [shortWeierstrassLocalParameter_map, hphi]
+
+/-- A total version of the short-Weierstrass affine local parameter on
+Mathlib's point type: infinity maps to zero and `(x,y)` maps to `-x/y`. -/
+def affinePointLocalParameter
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) :
+    W.Point → K
+  | .zero => 0
+  | .some x y _ => shortWeierstrassLocalParameter x y
+
+@[simp] theorem affinePointLocalParameter_some
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K)
+    {x y : K} (h : W.Nonsingular x y) :
+    affinePointLocalParameter W
+      (WeierstrassCurve.Affine.Point.some x y h) =
+        shortWeierstrassLocalParameter x y := by
+  rfl
+
+/-- Evaluate the pointwise `V-1=[trace-1]-pi` identity through the selected
+affine local parameter. This closes the orientation and point-observation
+step while deliberately leaving rational-map and formal-series transport as a
+separate semantic obligation. -/
+theorem zmodAffineVerschiebung_sub_one_localParameter
+    {p : ℕ} [Fact p.Prime]
+    {E : Type*} [Field E] [DecidableEq E] [Algebra (ZMod p) E]
+    [Algebra.IsAlgebraic (ZMod p) E]
+    (W : WeierstrassCurve.Affine (ZMod p)) (trace : ℤ)
+    (hchar : affineFrobeniusPointEnd (E := E) W ^ 2 -
+        (trace : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) *
+            affineFrobeniusPointEnd (E := E) W +
+        ((p : ℤ) : AddMonoid.End
+          (WeierstrassCurve.Affine.Point (W.baseChange E))) = 0)
+    (point : WeierstrassCurve.Affine.Point (W.baseChange E)) :
+    affinePointLocalParameter (W.baseChange E)
+        (zmodAffineVerschiebungPointEnd W point - point) =
+      affinePointLocalParameter (W.baseChange E)
+        ((trace - 1) • point - affineFrobeniusPointEnd (E := E) W point) := by
+  have horient := DFunLike.congr_fun
+    (zmodAffineVerschiebung_sub_one_eq W trace hchar) point
+  exact congrArg (affinePointLocalParameter (W.baseChange E)) horient
 
 /-- The regular unit in the short-Weierstrass local coordinate
 `x(z)=z⁻² q(z)⁻¹`. Clearing the curve equation gives this fixed-point identity. -/
@@ -2210,6 +2285,9 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms zmodAffineFrobeniusPointEnd_mul_inv
 #print axioms zmodAffineFrobenius_mul_verschiebung
 #print axioms zmodAffineVerschiebung_sum_of_characteristic
+#print axioms endomorphism_sub_one_eq_trace_sub_one_sub
+#print axioms zmodAffineVerschiebung_sub_one_eq
+#print axioms zmodAffineVerschiebung_sub_one_localParameter
 #print axioms FormalGroup.secondVariable_dvd_sub_X
 #print axioms FormalGroup.add_correction_eq
 #print axioms FormalGroup.filtered_correction_prefix

@@ -190,6 +190,13 @@ protocol nevertheless fails one of 24 mutation requirements: on the 35-point
 invisible. The failed control is retained in
 `POINTWISE_CHARPOLY_EXPERIMENT.md`; it is finite evidence, not the missing
 generic theorem. [pcc:unverified]
+Lean now also rearranges the point identity into the exact candidate
+orientation `V-1=[t-1]-pi`. A total observable on actual affine points maps
+infinity to zero and `(x,y)` to `z=-x/y`; the two point expressions are proved
+to have the same observed `z` value under the explicit characteristic
+premise. This closes pointwise orientation but not identification with the
+retained rational/scheme morphism or equality of completed local series.
+[pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from
