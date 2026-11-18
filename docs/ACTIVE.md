@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Prime31 weighted-slot parity index-calculus gate: prove uniform-slot collapse and test distinct scalar weights in existing Rust arithmetic (automation, started 2026-11-18, branch automation/prime31-weighted-slot-parity-20261118)
+- [x] Prime31 weighted-slot parity gate on unchanged p=2^31−1 curve: uniform-slot/Frobenius cancellation proved; distinct-weight positive-parity test B8/B16/B31 measured; pinned original Rust 40/40 + independent Python replay passed (#4714, exact-source CI #44278553811). This is a generic-MITM parity feasibility control, not a cheaper full solver; next nonenumerative extractor remains open.
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
