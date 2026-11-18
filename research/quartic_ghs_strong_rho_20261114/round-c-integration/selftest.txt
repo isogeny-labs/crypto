@@ -1,0 +1,11 @@
+selftest: reciprocal reduction matches widened remainder
+selftest: masked and fallback partitions match modulo
+selftest: small-c: 200 inverses match; fq_mul direct=12..12, reference=16..16, delta=4 each
+selftest: fast field matches frozen field
+selftest: fallback-c=18: 200 inverses match; fq_mul direct=13..15, reference=17..19, delta=4 each
+selftest: batch inverse matches pointwise inversion
+selftest: complete batches and width-2 simultaneous multiplication match frozen curve; cold table=FieldCounts { fq_mul: 459, fq_inv: 3, fq_add: 1642, f3_mul: 58, f3_sq: 15, f3_inv: 3, batch_inv: 3, group_add: 13 }
+selftest: setup state exact; field legacy=FieldCounts { fq_mul: 86017, fq_inv: 2374, fq_add: 273888, f3_mul: 6309, f3_sq: 3935, f3_inv: 2374, batch_inv: 0, group_add: 2454 } batch=FieldCounts { fq_mul: 56756, fq_inv: 520, fq_add: 204914, f3_mul: 6456, f3_sq: 2356, f3_inv: 520, batch_inv: 33, group_add: 1463 }
+selftest: counted and counter-free planted logs match at widths 1, 4, 8, 16, and 32
+selftest: full trajectory exact; setup legacy=FieldCounts { fq_mul: 84767, fq_inv: 2340, fq_add: 269884, f3_mul: 6217, f3_sq: 3877, f3_inv: 2340, batch_inv: 0, group_add: 2421 } batch=FieldCounts { fq_mul: 56050, fq_inv: 487, fq_add: 203048, f3_mul: 6431, f3_sq: 2324, f3_inv: 487, batch_inv: 33, group_add: 1441 }
+SELFTEST OK

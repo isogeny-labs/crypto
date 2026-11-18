@@ -1,0 +1,22 @@
+Protocol freeze:
+git commit -m 'research: freeze GHS rho setup batch protocol'
+git push -u origin codex/ghs-rho-setup-20261118
+
+Exact source-bound build:
+GHS_SOURCE_REVISION=f3f2cbcc11ad8ddea9a3c1730144c406bed9fb2b rustc --edition 2021 -O research/quartic_ghs_strong_rho_20261114/main.rs -o /dev/shm/ghs-leads/ghs-setup-f3f2cbcc
+
+Deterministic self-test:
+stdbuf -oL -eL /dev/shm/ghs-leads/ghs-setup-f3f2cbcc selftest 2>&1
+
+Paired q=223 code/count control:
+GHS_CALIB_TRIPLES=1 GHS_ISOLATION=development /dev/shm/ghs-leads/ghs-setup-f3f2cbcc run 223 1 0 1 ic-repeat strong-b8-legacy-setup,strong-b8
+
+Package unit tests (from the package directory):
+python3 -m unittest test_make_requests.py test_analyze.py
+
+Formatting and diff checks:
+rustfmt --edition 2021 --config skip_children=true research/quartic_ghs_strong_rho_20261114/strong_rho.rs research/quartic_ghs_strong_rho_20261114/main.rs
+git diff --check
+
+Checkpoint check:
+scripts/checkpoint.sh gate

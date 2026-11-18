@@ -1,0 +1,16 @@
+Projection check command:
+
+jq -cS '<identity projection>' q223.jsonl | sort | uniq -c
+
+The identity projection contains the instance/target, answer and trajectory,
+all walk counts, all verification counts, setup native counts, and walk native
+counts. It deliberately excludes arm/setup labels, setup field counts, and
+wall time.
+
+Result: exactly two copies of one canonical projection.
+
+      2 {"cycle_adds":10,"cycles":2,"dps":76,"ell":2773073,"i":0,"k":1765657,"k_found":1765657,"lookahead":53,"ok":true,"q":223,"restarts":0,"seed":1,"setup_native.band_ops":8,"setup_native.canon":8,"setup_native.cycle_cmp":0,"setup_native.dp":0,"setup_native.hash":0,"setup_native.lookahead_test":0,"setup_native.rng":80,"setup_native.scalar_add":12,"setup_native.scalar_inv":0,"setup_native.scalar_mul":0,"setup_native.table":0,"steps":1487,"verify.batch_inv":0,"verify.f3_inv":30,"verify.f3_mul":110,"verify.f3_sq":50,"verify.fq_add":3826,"verify.fq_inv":30,"verify.fq_mul":1210,"verify.group_add":31,"walk.batch_inv":231,"walk.f3_inv":241,"walk.f3_mul":7275,"walk.f3_sq":1553,"walk.fq_add":195560,"walk.fq_inv":241,"walk.fq_mul":53825,"walk.group_add":1551,"walk_native.band_ops":5041,"walk_native.canon":1497,"walk_native.cycle_cmp":355,"walk_native.dp":1487,"walk_native.hash":4534,"walk_native.lookahead_test":1549,"walk_native.rng":0,"walk_native.scalar_add":4496,"walk_native.scalar_inv":1,"walk_native.scalar_mul":1,"walk_native.table":153}
+
+Canonical projection SHA-256 (including final newline):
+
+24235e91f84580fc53aee3e9be4e95c5956195d267ab4a75db6c8ad3d6a655aa
