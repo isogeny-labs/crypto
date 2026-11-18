@@ -313,7 +313,13 @@ constant is `64*(4*A^3+27*B^2)^2`.  It proves coprimality of Mathlib's
 `Phi_3,Psi_3^2` and exact reduced coordinate degree nine outside the stated
 characteristic exclusions; the singular `A=B=0` pair over `ZMod 5` is a
 proved negative control.  These fixed-scalar results do not establish the
-generic-`n` premise. [pcc:unverified]
+generic-`n` premise.  A further generic Lean reduction now removes the
+`X*PsiSq_n` multiple from Mathlib's exact `Phi_n` definition and proves that
+three certificates suffice: `prePsi_(n+1)`, `prePsi_(n-1)`, and the parity
+factor must each be coprime to `PsiSq_n`.  An integer mutation shows that one
+certificate cannot simply be omitted.  The unresolved generic theorem is now
+this adjacent-EDS/parity coprimality package rather than an opaque rational-
+function cancellation claim. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

@@ -1110,6 +1110,37 @@ theorem shortWeierstrassScalarThree_singular_control :
     shortWeierstrassScalarThreePsi, shortWeierstrassScalarThreeCubic,
     shortWeierstrassScalarThreeAux] at heval
 
+/-- Removing a multiple of the denominator reduces numerator coprimality to
+coprimality of the three remaining factors. -/
+theorem subMultiple_isCoprime_of_factors
+    {R : Type*} [CommRing R] (x m a b c : R)
+    (ha : IsCoprime a m) (hb : IsCoprime b m) (hc : IsCoprime c m) :
+    IsCoprime (x * m - a * b * c) m := by
+  rw [IsCoprime.mul_sub_right_left_iff]
+  exact (ha.mul_left hb).mul_left hc
+
+/-- Exact generic no-cancellation reduction for Mathlib's division
+polynomials: it is enough to prove that the two adjacent EDS terms and the
+parity factor are each coprime to the full squared denominator. -/
+theorem divisionPolynomialPhi_isCoprime_of_factors
+    {R : Type*} [CommRing R] (W : WeierstrassCurve R) (n : ℤ)
+    (hplus : IsCoprime (W.preΨ (n + 1)) (W.ΨSq n))
+    (hminus : IsCoprime (W.preΨ (n - 1)) (W.ΨSq n))
+    (hparity : IsCoprime (if Even n then 1 else W.Ψ₂Sq) (W.ΨSq n)) :
+    IsCoprime (W.Φ n) (W.ΨSq n) := by
+  rw [WeierstrassCurve.Φ]
+  exact subMultiple_isCoprime_of_factors Polynomial.X (W.ΨSq n)
+    (W.preΨ (n + 1)) (W.preΨ (n - 1))
+    (if Even n then 1 else W.Ψ₂Sq) hplus hminus hparity
+
+/-- Mutation control for the generic reduction: keeping the second and third
+factor certificates cannot compensate for a first factor sharing the
+denominator. -/
+theorem divisionPolynomialCoprimality_missingFactor_control :
+    IsCoprime (1 : ℤ) 2 ∧ IsCoprime (1 : ℤ) 2 ∧
+      ¬IsCoprime ((0 : ℤ) * 2 - 2 * 1 * 1) 2 := by
+  norm_num [IsCoprime]
+
 /-- Specialize the Frobenius--Verschiebung ring calculation to additive
 endomorphisms of a point group. Integer scalars are central automatically, and
 pointwise injectivity of Frobenius supplies cancellation of left composition.
@@ -3131,6 +3162,9 @@ theorem rationalMap_separation_strict_control :
 #print axioms shortWeierstrassScalarThree_isCoprime
 #print axioms shortWeierstrassScalarThree_extension_degree
 #print axioms shortWeierstrassScalarThree_singular_control
+#print axioms subMultiple_isCoprime_of_factors
+#print axioms divisionPolynomialPhi_isCoprime_of_factors
+#print axioms divisionPolynomialCoprimality_missingFactor_control
 #print axioms endomorphism_frobeniusVerschiebung_sum
 #print axioms endomorphism_injectivity_control
 #print axioms affineFrobeniusPointEnd_injective

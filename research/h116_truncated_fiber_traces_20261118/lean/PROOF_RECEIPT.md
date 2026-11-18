@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-50496085a3c01d8cf7afd8e921611f0e3e8e8882fdb7e4b97826ba634e3401a2  H116FiberTrace.lean
+087a923199f21152b06c96ed872d11b4668efa5824fc2aa47bace34ebdb60349  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  150 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  153 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -68,6 +68,8 @@ ea01d069a7682bd04bb64a5aa113cba204622e24b66ef16a0fd376403eb8f584  receipts/scala
 597fdddd8ad379ed42f458a779b17367c87ff4a4878412bcd2e30d57a274a73c  receipts/scalar-two-coprimality-audit.txt
 912ad7b074051d0da17a004b556754ab5aeb2c4932d8aa788c23a3225afdf3f9  receipts/scalar-three-coprimality-build.txt
 5731fc9c7bc418dc7f99cdd3b422f4618771e1843776691afc5736f5b66aaecc  receipts/scalar-three-coprimality-audit.txt
+912ad7b074051d0da17a004b556754ab5aeb2c4932d8aa788c23a3225afdf3f9  receipts/generic-coprimality-reduction-build.txt
+1932e63c3f78d6ed02cba849b8c5040c19c4fccee3c541e930c35b3848c8a664  receipts/generic-coprimality-reduction-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -310,6 +312,14 @@ characteristics two and three the reduced quotient consequently satisfies
 proved not coprime by mapping evaluation at zero.  This remains a fixed-scalar
 coordinate result, not arbitrary-scalar coprimality or a curve-map/ECDLP
 complexity theorem. [pcc:unverified]
+
+The 153-theorem checkpoint extracts the exact generic algebraic reduction from
+Mathlib's definition of `Phi n`.  If `prePsi(n+1)`, `prePsi(n-1)`, and the
+parity factor are each coprime to `PsiSq n`, then `Phi n` is coprime to
+`PsiSq n`: the `X*PsiSq n` term is removed as a denominator multiple and the
+three factor certificates compose.  An integer mutation proves that omitting
+one factor premise is unsound.  The adjacent-EDS and parity-factor premises
+are now the explicit remaining generic obligations. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

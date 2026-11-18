@@ -30,19 +30,21 @@ sandwich and rational-coordinate extension theorem directly, while keeping the
 concrete pullback tower, generic division-polynomial coprimality, scalar-map
 identification and duality as explicit caller obligations.  The scalar-two
 and scalar-three short-Weierstrass instances are now discharged separately by
-explicit Bezout certificates.
+explicit Bezout certificates.  For generic scalar, no-cancellation is reduced
+exactly to the two adjacent EDS terms and the parity factor being coprime to
+the squared denominator.
 `degree_product_without_duality_control` checks the logical
 boundary: at `N=6`, unequal degrees 4 and 9 still multiply to `N^2=36`, so the
 dual/equal-degree premise cannot be dropped.
 
 The current Lean source SHA-256 is
-`50496085a3c01d8cf7afd8e921611f0e3e8e8882fdb7e4b97826ba634e3401a2`.
-The pinned build succeeds, and the repository auditor reports 150 theorems,
+`087a923199f21152b06c96ed872d11b4668efa5824fc2aa47bace34ebdb60349`.
+The pinned build succeeds, and the repository auditor reports 153 theorems,
 zero failures and zero trusted native decisions.  This proves the implication
 from the geometric degree certificates; it does not construct those elliptic
 certificates and is not a subexponential ECDLP proof. [pcc:unverified]
 
-The eighteen degree-layer theorem declarations are:
+The twenty-one degree-layer theorem declarations are:
 
 - `finiteFieldTower_degree_mul`, Mathlib's finite-rank tower law in the
   orientation used by curve-map degrees;
@@ -73,6 +75,13 @@ The eighteen degree-layer theorem declarations are:
   coordinate quotient has rational-function extension degree exactly nine;
 - `shortWeierstrassScalarThree_singular_control`, which proves the `A=B=0`
   pair over `ZMod 5` is not coprime by evaluation at zero;
+- `subMultiple_isCoprime_of_factors`, the generic ring reduction that removes
+  a multiple of the denominator and composes three factor certificates;
+- `divisionPolynomialPhi_isCoprime_of_factors`, which specializes that law to
+  Mathlib's exact `Phi n` definition and exposes the adjacent-EDS/parity
+  obligations;
+- `divisionPolynomialCoprimality_missingFactor_control`, which proves that
+  dropping one of those factor premises is unsound;
 - `unequalCoordinateLineDegrees_control`, which proves that unequal projection
   degrees make the adjacent map degree nonidentifiable from a shared total;
 - `scalarMultiplicationXMap_exact_degrees`, which exposes the exact

@@ -856,6 +856,43 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | `[F(X):F(Phi_3/Psi_3^2)]=9` | exact coordinate-degree assembly | H116 over reduced quotients | rational function field of the short curve's x-coordinate | same hypotheses and `3 != 0` |
 | singular scalar-three pair is not coprime | negative control | H116 evaluation homomorphism | short singular cubic over `ZMod 5` | `A=B=0` |
 
+## Generic division-polynomial coprimality reduction gate
+
+1. **Structure above.** In any commutative ring,
+   `IsCoprime (x*m-a*b*c) m` is equivalent to
+   `IsCoprime (a*b*c) m`, because the `x*m` term is a multiple of the
+   denominator.  Mathlib defines
+   `Phi_n=X*PsiSq_n-prePsi_(n+1)*prePsi_(n-1)*epsilon_n`, with
+   `epsilon_n=1` for even `n` and `Psi2Sq` for odd `n`.
+2. **Theorems used as stated.** `IsCoprime.mul_sub_right_left_iff` removes the
+   multiple of the denominator.  `IsCoprime.mul_left` combines three factor
+   certificates.  `WeierstrassCurve.Phi` supplies the exact Mathlib
+   definition; no copied recurrence is introduced.
+3. **Object as an instance.** One generic ring theorem assembles three factor
+   certificates.  Its division-polynomial wrapper reduces generic
+   `IsCoprime (Phi n) (PsiSq n)` to coprimality of `prePsi(n+1)`,
+   `prePsi(n-1)`, and the parity factor against the full denominator.
+4. **Assembly probe.** The generic ring theorem, exact
+   `WeierstrassCurve.Phi` wrapper and missing-factor mutation first elaborated
+   in a temporary importing module.  The tracked project then completed all
+   3,162 build jobs; the exact repository auditor reports
+   `153 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This does not prove the three factor premises.
+   It converts the previous opaque generic-`n` no-cancellation gap into exact
+   adjacent-EDS and parity-factor obligations.  Proving those obligations for
+   nonsingular curves under characteristic hypotheses remains the next
+   mathematical task. [pcc:unverified]
+6. **Inheritance table.** All algebraic coprimality transformations and the
+   division-polynomial definition are inherited from Mathlib.  H116 supplies
+   only their exact composition and an integer mutation showing that omitting
+   one factor premise is unsound.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `IsCoprime (x*m-a*b*c) m` from three factor certificates | generic ring law | H116 over Mathlib coprimality | arbitrary commutative ring | each of `a,b,c` coprime to `m` |
+| `IsCoprime (W.Phi n) (W.PsiSq n)` | exact division-polynomial reduction | H116 over Mathlib `Phi` | arbitrary Weierstrass curve over a commutative ring | adjacent and parity factors coprime to `PsiSq n` |
+| omitted first factor premise can fail | negative control | H116 integer arithmetic | fixed `x=0,m=2,a=2,b=c=1` | only the retained factors are coprime |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression
