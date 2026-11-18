@@ -76,7 +76,15 @@ GATE_TABLE
 
 ## 4. Negative controls
 
-NEGCTL
+At D = 5 the profile is generic, so a control there does not discriminate (measured, `gate/negative_controls.log`: X = 4272, X = 4270 and a = 2 all give (0,0,2,138,3163,18569) at k = 10 — as the paper itself reports for random curves at k = 14). Discriminating controls (measured):
+
+| control (k = 10, instance unit-p65537) | D | profile | 1 ∈ V_D | vs recorded (1,21,211,1351,6196,21700,60460), 1 ∈ V_6 |
+|:--|:-:|:--|:-:|:--|
+| target X = 11932 = x(P_1 + P_2), x(P_i) ∈ H (36 scalar solutions) | 6 | (0,0,175,1315,6160,21664,60424) | no | **differs** (codim 36 = number of solutions: V_6 = I ∩ M_≤6) |
+| target X = 4272 (perturbed) | 6 | (1,21,…,60460) | yes | same: a generic X is a unit instance too (expected solutions ≈ 2^20/p ≈ 16 is not a guarantee either way) |
+| a = 2 (wrong curve) | 6 | (1,21,…,60460) | yes | same, as above |
+
+Basis-level controls (`gate/negative_controls_basis.log`): the exported basis of the true k = 10, D = 5 instance is rejected by the independent checker when the generator is built with X = 4272 or with a = 2 (`generator in span: false`); the basis exported for X = 4272 has the same profile but a different SHA-256 (086ff0a5… vs 5fa47095…) and is rejected with the true generator. The generator cross-check against the instance file fails on every override (`generator_matches_file: false`). So a wrong a or target cannot pass: either the profile/contains_one changes, or the generator check and the basis check fail.
 
 ## 5. Basis export and round trip
 
@@ -97,7 +105,7 @@ reduces every product; the default tests each product against 4 random annihilat
 (a product outside the span passes with probability ≤ p^−4). Together: W ⊇ V_D, and with the
 engine's W ⊆ V_D, W = V_D.
 
-ROUNDTRIP
+Measured (`gate/unitness_786433.log`, `gate/negative_controls_basis.log`): every closure without 1 at k = 4..10 (p = 786433) and k = 10, D = 5 (p = 65537) exported, re-read and checked: all `ok`, closedness exact (k ≤ 9: every product reduced) or by annihilators (k = 10: 63,260 products, D = 6 with 1: 434,000). Power of the detector (`--drop-row`, k = 10, D = 5): removing one row (index 18568 / 18500 / 17000 / 5000) makes 12,244 / 8,676 / 5,055 / 152 products fail and the check reject. Sizes: 14.3 bytes of file per final stored engine word; k = 10, D = 5: 220.9 MB; k = 8..11, D = 4: 0.8–1.4 MB (`gate/basis_size_scaling.log`).
 
 ## 6. The depth-16 unit instance
 
@@ -132,7 +140,17 @@ solutions enumerated over H × H: 0 ✓ ⇒ unit ideal (Lemma `lem:unit`). The s
 **Unit-ness by running** (small depth, same prime and target; expected last fall degree
 ⌊(k+14)/4⌋ = 4 (k ≤ 5), 5 (k = 6..9), 6 (k = 10..13)):
 
-UNITNESS
+| k | D | expected | profile | 1 ∈ V_D | basis check |
+|--:|--:|:--|:--|:-:|:--|
+| 4 | 3 / 4 | LFD 4 | (0,0,1,9) / (1,9,37,93,163) | no / yes | ok exact / ok exact |
+| 5 | 3 / 4 | LFD 4 | (0,0,1,11) / (1,11,56,176,386) | no / yes | ok / ok |
+| 6 | 4 / 5 | LFD 5 | (0,0,2,111,605) / full 1586 | no / yes | ok / ok |
+| 7 | 4 / 5 | LFD 5 | (0,0,2,115,829) / full 3473 | no / yes | ok / ok |
+| 8 | 4 / 5 | LFD 5 | (0,0,2,119,1061) / full 6885 | no / yes | ok / ok |
+| 9 | 4 / 5 | LFD 5 | (0,0,2,123,1301) / full 12616 | no / yes | ok / ok |
+| 10 | 5 / 6 | LFD 6 | (0,0,2,138,3163,18569) / full 60460 | no / yes | ok annihilator / ok |
+
+1 enters exactly at ⌊(k+14)/4⌋ at every k = 4..10 on the new prime (measured, `gate/unitness_786433.log`), and the closures without 1 have the same profiles as the paper's p = 65537 instance (k = 10, D = 5: (0,0,2,138,3163,18569)), as expected for this generic invariant. This is the evidence that the recipe gives unit ideals on p = 786433 before it is trusted at k = 16 (where the lemma is the proof).
 
 ## 7. Checkpoint/resume
 
@@ -146,7 +164,7 @@ hash) and continues; the engine has no RNG and its schedule depends only on this
 continuation performs the same batches. SIGTERM/SIGINT/SIGUSR1 make the engine write a checkpoint at
 the next batch boundary and exit with a closure censored `"signal"` (exit code 3).
 
-CKPT
+Measured (`gate/ckpt-k10D5*.log`, unit-p65537 k = 10, D = 5, 522 batches, 16 interreductions): an uninterrupted run against runs killed with **SIGKILL** and resumed, at three points — batch 150, batch 300 (`ckpt-k10D5-mid`), and after 22 s of wall at batch 475 = 30 % of the muladds, past several interreductions (`ckpt-k10D5-t22`) — and runs stopped with **SIGTERM** (clean checkpoint, exit 3) at batches 145, 308, 488 and resumed. Every resumed run: same columns, profile, contains_one, **muladds (16,024,605,579), rows_reduced (31,631)**, and the exported basis is **byte-identical** (content SHA-256 5fa47095…, file SHA-256 16108d90…). Checkpoint size at batch 488: 83.7 MB, written in 0.4 s.
 
 ## 8. Frozen binary and pod jobs (PROVISIONAL)
 
@@ -155,7 +173,12 @@ after that merge and must pass this gate again** (`gate/run_gate.sh <new binary>
 `match: true` on every row, then `pod/BINARY.sha256` is replaced). The binary below is the gate
 binary of this report.
 
-FROZEN
+| binary | SHA-256 | built from | use |
+|:--|:--|:--|:--|
+| `bin/pilot_gate` | d31a012b5e5d938b1b7ccb80b227ea6cf4322375b6a1170f1a587482204137bc | source of e4d5a6ec08 (stamp says 50262dc257: built before that commit, same pilot sources) | the gate rows of §3 |
+| `bin/pkm_tower_pilot` (**provisional pod binary**, `pod/BINARY.sha256`) | 52b47153eb732c85c17a693c8f85bd481e66b5fce90b752ab7d51217c7048d04 | e295580642 (stamped) | pods, re-gated on a subset (§3) |
+
+Both: `cargo build --release`, no target-cpu flags, runtime SIMD (avx512/avx2/portable), dynamically linked against libgcc_s/libm/libc only, max GLIBC_2.34.
 
 Pod scripts (`pod/`, bash + coreutils only): `run_job.sh <job> <instance> <D>` verifies the binary's
 SHA-256 against `pod/BINARY.sha256`, logs host facts (CPU model, nproc, MemTotal, cgroup limit, disk,
