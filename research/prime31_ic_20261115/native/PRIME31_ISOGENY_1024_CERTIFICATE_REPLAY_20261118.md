@@ -52,6 +52,18 @@ Run on Ubuntu with Rust 1.100.0; checkout *pinned* original Rust source, overlay
 
 **Measurements:** Read actual successful workflow's JSON and report them here before any comparison. No runtime or speedup claim has been prespecified. Inversion costs must include the exponentiation multiplications used by this native adapter. A/A host noise is not established for one run.
 
+## Exact-source CI measurements (two source-identical GitHub Actions executions)
+
+Both workflow executions completed successfully, with **40/40 pinned Rust library tests**, **1/1 focused exact 1024-target test**, the Rust JSON readback and the independent Python integer replay:
+- [Source-specific CI #44252591759](https://github.com/isogeny-labs/crypto/actions/runs/44252591759): 1024 scalar-loop public maps = **173,721 ns**, **69,632 counted Fp multiplications**, **1,024 inversions**. 1024 Montgomery batch public maps = **43,285 ns**, **10,301 Fp multiplications**, **1 inversion**. Full replay diagnostic ~21,097,815 ns (contains verification, not cold IC setup or extraction).
+- [Source-specific CI #44252584543](https://github.com/isogeny-labs/crypto/actions/runs/44252584543): scalar maps = **178,299 ns**, 69,632 multiplications, 1,024 inversions. Batched maps = **47,442 ns**, 10,301 multiplications, 1 inversion. Full replay diagnostic ~21,892,343 ns.
+
+The diagnostic map-only wall-time improvement is approximately **4.01x** in the first listed execution and **3.76x** in the second. These nanosecond-scale host measurements are exploratory and not a statistically calibrated cycle/energy cost; the more robust arithmetic improvement is 1024 -> 1 full inversions and 69,632 -> 10,301 Fp multiplications, with every inversion's exponentiation multiplications counted. The batch technique is classical Montgomery arithmetic, **not cryptanalytic algorithm novelty**.
+
+Replayed full-rank linear equations on 31 points, **1,024/1,024 archived witness-derived k**, **2,048/2,048 signed eight-point relations across E and E'**, and **2,048/2,048 target scalar replays**; independent Python also checked 62 basis scalar images, all 31 row equations, and a wrong-k mutation rejection. First-x31 source transported to E' has **zero** rational x-coordinate overlap with the first-x31 chosen directly on E'. This is an exact coordinate-specific observation, not a distribution theorem.
+
+The first CI attempt [#44251991996](https://github.com/isogeny-labs/crypto/actions/runs/44251991996) failed a Rust E0499 nested mutable-borrow compilation error and was corrected by separating the scalar and addition calls before the two successful runs; the failure remains visible for reproducibility. No matrix cost, fresh-target extraction time or rho/BSGS result was obtained for a new E' solver.
+
 ## Prior-lead and duplication audit (source checked, no novelty clearance implied)
 
 | Source | Evidence status / consequence |
