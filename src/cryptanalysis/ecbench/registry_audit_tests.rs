@@ -50,6 +50,8 @@ enum Fx {
     Genus2,
     Ghs,
     Hyper,
+    Hec,
+    Hashed7,
     Gls,
     Subfield,
     Fp4,
@@ -140,6 +142,16 @@ fn spec(fx: Fx) -> CurveSpec {
         },
         Fx::Ghs => CurveSpec::GhsFp6Search { p: 13, seed: 1 },
         Fx::Hyper => CurveSpec::HyperellipticThread { p: 23, genus: 3 },
+        Fx::Hec => CurveSpec::HecThread { p: 41, genus: 2 },
+        Fx::Hashed7 => CurveSpec::PrimeExplicit {
+            p: 5,
+            a: 2,
+            b: 1,
+            group_order: 7,
+            r: 7,
+            gx: 0,
+            gy: 1,
+        },
         Fx::Gls => CurveSpec::GlsFp2 {
             p_bits: 14,
             seed: 1,
@@ -249,6 +261,49 @@ const LARGE_PRIME: P = &[
 /// Every (id, fixture, parameters) that is run.  An id may be listed on
 /// several fixtures.
 const CASES: &[(&str, Fx, P)] = &[
+    (
+        "hec.ic_fb_walk",
+        Fx::Hec,
+        &[
+            ("branches", "64"),
+            ("d_step_in", "4"),
+            ("extra_relations", "8"),
+            ("max_trials", "50000"),
+        ],
+    ),
+    ("hec.rho_full_width", Fx::Hec, &[("max_steps", "200000")]),
+    (
+        "ic.orbit_rank_v1",
+        Fx::K0n7,
+        &[
+            ("columns", "2"),
+            ("raw_x_cap", "127"),
+            ("max_trials", "1000"),
+            ("max_pair_visits", "20000"),
+            ("table_mode", "orbit"),
+        ],
+    ),
+    (
+        "ic.hashed_native_v1",
+        Fx::Hashed7,
+        &[
+            ("backend", "selectors"),
+            ("m", "2"),
+            ("trials", "16"),
+            ("columns", "128"),
+            ("steps", "10000000"),
+            ("vector", "2000000"),
+            ("bits", "1000000"),
+            ("threshold", "11"),
+            ("derive_last", "1"),
+            ("smallest_first", "1"),
+            ("cache_entries", "4096"),
+            ("rank", "16"),
+            ("slices", "16"),
+            ("outer_multiplier", "1"),
+            ("attempts", "128"),
+        ],
+    ),
     ("rho.three_leads_negation_v1", Fx::Scholten, TL_RHO),
     ("rho.three_leads_plain_v1", Fx::Scholten, TL_RHO),
     ("rho.three_leads_jacobian_v1", Fx::Scholten, TL_RHO),
@@ -462,6 +517,8 @@ const CASES: &[(&str, Fx, P)] = &[
 /// Ids that are not run, each with why.  Only an external backend or the
 /// lack of any instance small enough for a unit test belongs here.
 const SKIPS: &[(&str, &str)] = &[
+    ("rho.curve25519_bounded", "fixed 253-bit subgroup: bounded arbitrary-target runs are censoring controls, independently covered by curve25519_bounded_tests"),
+    ("ic.curve25519_pair_v1", "fixed full-width curve: the generic planted target is not guaranteed to decompose in a bounded pair base; independent high-scalar positive and refusal controls run in curve25519_pair_dispatch_tests"),
     ("ic.cm_folded_native_v1", "needs the external native backend binary"),
     ("ic.cm_folded_recurrence_v1", "needs the external native backend binary"),
     ("ic.cm_folded_native_d43_v1", "needs the external native backend binary"),
@@ -490,6 +547,7 @@ const EXEMPT: &[(&str, &str)] = &[];
 /// the descent's modular combination, the host-dependent vector decline
 /// count): honest declarations, not counters.
 const UNCOUNTED_NAMES: &[&str] = &[
+    crate::cryptanalysis::ecbench::hec::GAE_GAP, // Legacy group-operation GAE explicitly omits native ring/field work.
     "field_arithmetic_uncharged",
     "hash_and_allocation_uncharged",
     "modular_combination_uncharged",

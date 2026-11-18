@@ -36,6 +36,10 @@ pub struct Envelope {
 #[derive(Debug)]
 pub struct Audit {
     pub result: Result<Envelope, Failure>,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     pub charged_work: u64,
 }
 struct Meter<'a, O> {

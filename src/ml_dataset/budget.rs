@@ -403,6 +403,7 @@ pub struct BudgetSession {
 
 /// Live worker state used by the local startup gate after an interrupted handoff.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg(target_os = "linux")]
 pub(super) enum ActivationPhase {
     Pending,
     Active,
@@ -879,6 +880,7 @@ fn worker_grant(policy: &CampaignPolicy, request: &GrantRequest) -> Result<Worke
 
 /// Check a delivered grant against the pinned reservation and observed local
 /// owner. This validates the relationship, not the truth of Kubernetes evidence.
+#[cfg(target_os = "linux")]
 pub(super) fn validate_launch_delivery(
     policy: &CampaignPolicy,
     reservation: &LaunchReservation,
@@ -1985,6 +1987,7 @@ impl BudgetSession {
     /// Read the retained live phase without credentials, remote requests or
     /// accounting changes. In particular, an already active worker must not
     /// repeat activation merely because the gate's later transition was lost.
+    #[cfg(target_os = "linux")]
     pub(super) fn activation_phase(&self) -> Result<ActivationPhase, String> {
         let conn = self
             .connection

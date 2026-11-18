@@ -79,7 +79,7 @@ fn supported_controls_match_old_fields_points_scalars_and_counts() {
             assert_eq!(old_element(narrow.f.mul(&a, &c)), wide.f.mul(&b, &d));
             assert_eq!(old_element(narrow.f.sq(&a)), wide.f.sq(&b));
             assert_eq!(old_element(narrow.f.frob(&a)), wide.f.frob(&b));
-            assert_eq!(u128::from(narrow.f.pack(&a)), wide.f.pack(&b));
+            assert_eq!(narrow.f.pack(&a), wide.f.pack(&b));
             assert_eq!(wide.f.unpack(wide.f.pack(&b)), b);
             let p = narrow.lift_x(&a, &mut nr);
             let q = wide.lift_x(&b, &mut wr);

@@ -1,0 +1,10 @@
+mod solver;
+use hec_native_ic::{counted,instance::pick_instance,rng::Rng,ic::{solve_dlp,IcParams},solve::Solver};
+fn main(){counted::disable();let mut calls=0;let mut failures=0;
+ for line in include_str!("INSTANCES.tsv").lines().skip(1){let v:Vec<_>=line.split('\t').collect();let g:usize=v[0].parse().unwrap();let p:u64=v[1].parse().unwrap();let cc:u64=v[2].parse().unwrap();let ell:u64=v[3].parse().unwrap();let inst=pick_instance(p,g).expect("initial instance");assert_eq!(inst.c,cc);assert_eq!(inst.ell,ell);let coefficients=inst.curve.f.c[..inst.curve.f.n].iter().map(u64::to_string).collect::<Vec<_>>().join(",");assert_eq!(coefficients,v[4]);
+ let mut rng=Rng::new(2026111800^p^((g as u64)<<32));for case in 0..2{let sm=if case==0{1}else{17};let source=inst.curve.mul(&inst.d1,sm);assert!(!inst.curve.is_zero(&source));let k=1+rng.below(ell-1);let target=inst.curve.mul(&source,k);let seed=2026111800+case as u64;
+ eprintln!("start g={g} p={p} c={cc} ell={ell} source_multiple={sm} case={case}");let rep=solver::solve(&inst.curve,&source,&target,ell,&solver::Params{seed,limit:200000,audit_prefix:128});
+ let reference=solve_dlp(&inst.curve,&source,&target,ell,&IcParams{seed,max_trials:200000,solver:Solver::Fast,reference_oracle:false,..IcParams::default()});assert_eq!(reference.k,Some(k));if let Some(answer)=rep.k{assert_eq!(answer,k);assert_eq!(inst.curve.mul(&source,answer),target);}else{failures+=1;}
+ println!("CASE g={g} p={p} c={cc} ell={ell} source_multiple={sm} case={case} seed={seed} expected={k} answer={:?} small={} catalogue={} trials={} admitted={} partials={} pivots={} full_rows={} dense_native_prefix_checks={} max_lp={} fullbase_trials={} correct={}",rep.k,rep.small,rep.catalogue,rep.trials,rep.admitted,rep.partials,rep.pivots,rep.full_rows,rep.audits,rep.max_lp,reference.trials,rep.k==Some(k));calls+=1;
+ }}assert_eq!(calls,22);eprintln!("SUMMARY original_native_models=11 public_target_calls={calls} failures={failures} independent_dense_prefix_and_native_decomposition_checks=true no_cofactor_or_expected_scalar_in_solver=true no_speed_claim=true");if failures>0{std::process::exit(2);}
+}

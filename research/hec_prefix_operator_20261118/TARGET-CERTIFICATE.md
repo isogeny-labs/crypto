@@ -1,0 +1,11 @@
+# Target-only dual certificate without normal equations [pcc:unverified]
+
+This is elementary linear algebra for the same exact retained row system, not a new DLP algorithm. Write the inhomogeneous relations B*L+c*k=a, where B has only FB columns. Consistency is required. A target value is determined iff there exists a row weight vector w with B^T*w=0 and c^T*w!=0.
+
+Sufficiency: weighting all equations gives (c^T*w)*k=a^T*w, so k=(a^T*w)/(c^T*w). Necessity: if all left-kernel vectors annihilate c, then c belongs to columnspace B by finite-dimensional annihilator duality. Choose v with B*v=c. For any solution (L,k), (L-delta*v,k+delta) is another solution for every delta, so k is not determined. Thus a determined target yields a separating w. The proof applies to rectangular and rank-deficient B.
+
+The augmented operator A=[B c -a] computes A^T*w. A dual certificate has zero FB coordinates, nonzero target coordinate gamma and constant coordinate eta; inferred k=-eta/gamma. Checking it needs one exact transpose multiply plus inversion/multiplication, followed by original curve verification. Producing w is the unresolved kernel/search problem; arbitrary w with B^T*w!=0 is invalid even if its scalar guess happens to verify. A random left-kernel vector may annihilate c; a complete deterministic solver or specified finite randomized failure/retry policy must retain those outcomes. No scalar label is needed to obtain or check the certificate.
+
+An exact symbolic falsifier to a one-vector heuristic: B=[1;0], c=[0;1], a=[5;7]. The first-row weight (1,0) is not in ker B^T and cannot certify k=7. The valid separating weight is (0,1). Replacing B with an empty-width matrix permits every w; replacing c with B*v removes all separating certificates. These cases should be controls in any future certificate solver.
+
+There is no claim that A^T*A preserves rank over the finite field. Even B=[1;2] overF5 has B^T*B=0 while rankB=1. A bordered symmetric construction preserves nonzero rank structure but still requires handling its kernel, consistency and finite-field Krylov breakdown. This note supplies an exact acceptance certificate, not free access to the nullspace or a complete Krylov solver.
