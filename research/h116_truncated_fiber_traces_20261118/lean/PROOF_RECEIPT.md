@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-35981c80d170cf7edd2e4d865ec58b4dedc700049d516ff4d0e8d8ab2105f2ac  H116FiberTrace.lean
+42b403444a6de1465f0436489d76de54def3b6c6ba74bf0234b729a1ebd7c79a  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  208 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  219 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -108,6 +108,8 @@ adb1b8bc7f8ffed0b98a5e6738517bc4aef4bf7a9de6d9aaa09fbfed61a36d7a  receipts/fourt
 4dc704395d7e60183108909d5da55306c0c5e8764cc95b732305353ba6f1c545  receipts/universal-resultant-bridge-build.txt
 a04f47643f15f3f7a638952de8247f3557459ff90f164607f69112c5624cdf01  receipts/universal-resultant-bridge-full-build.txt
 c9f870c9861c119d13611b98799f546192717f3f52c71190c251be4b4306213a  receipts/universal-resultant-bridge-audit.txt
+ef592d2dd12b3d0310ff9033bb2993d5878ac904ee662c8382ecd68b964512f6  receipts/kummer-parity-obstruction-build.txt
+11c05abc769c4c504f62feba348545ac6860ef49b1815922ab5882e1d38bc147  receipts/kummer-parity-obstruction-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -501,3 +503,13 @@ The pinned 3,164-job build passes.  The exact auditor reports 215 theorems,
 zero failures and zero trusted/native decisions.  This identifies the OOS
 association as a scaled x-coordinate sixth-power ordering bias, not an exact
 digit oracle or subexponential ECDLP algorithm. [pcc:unverified]
+
+The 219-theorem checkpoint explains the exact half accuracy of the frozen
+quadratic-Kummer parity experiment. Lean proves that subtraction from an odd
+order reverses parity, that `[(n-k)]P=-[k]P` on an orbit killed by `n`, and
+that any decoder fed a negation-invariant observable must fail on at least one
+member of each paired scalar orbit. An even-order mutation shows why oddness
+is necessary. The theorem covers every x-only observable, not only the 184
+tested covers; y-sensitive and nonsymmetric observables remain outside its
+scope. The pinned 3,164-job build passes and the exact auditor reports 219
+theorems, zero failures and zero trusted/native decisions. [pcc:unverified]

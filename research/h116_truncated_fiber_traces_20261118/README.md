@@ -503,3 +503,14 @@ are null-like or slightly worse than shuffled labels, and all 4,096 shuffled
 pooled and per-curve slopes are more favorable. This closes the frozen `IX1`
 ordering mechanism, while leaving different observables and covers open.
 [pcc:unverified]
+
+The next frozen [quadratic-Kummer parity test](KUMMER_PARITY_EXPERIMENT.md)
+uses split/inert Frobenius bits from 184 covers
+`z^2=product(x-x([j]P))`. Every rule is exactly balanced: the retained
+single-anchor rule scores 755/1,510, exactly half on each of five curves, with
+family-wise p=1 and no exact-on-covered rule. The accompanying
+[Lean obstruction](KUMMER_PARITY_PROOF.md) proves the reason for every x-only
+observable: `kP` and `(r-k)P=-kP` have equal negation-invariant observations
+but opposite parity when `r` is odd. The 219-theorem audit has zero failures
+and zero trusted/native decisions. A new parity route must use signed y-data or
+another nonsymmetric cover. [pcc:unverified]

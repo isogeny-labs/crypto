@@ -381,6 +381,49 @@ scalar, so an exact digit oracle would terminate. -/
 theorem quotientDigit_strict_decrease (k : ℕ) (hk : 6 ≤ k) : k / 6 < k := by
   omega
 
+/-- Subtraction from an odd natural reverses parity.  This is the arithmetic
+half of the x-only Kummer-cover obstruction. -/
+theorem odd_sub_mod_two_ne (n k : ℕ) (hn : n % 2 = 1) (hk : k ≤ n) :
+    (n - k) % 2 ≠ k % 2 := by
+  omega
+
+/-- In a cyclic orbit killed by `n`, the scalar paired with `k` under
+subtraction from `n` is the negative point. -/
+theorem orbit_sub_eq_neg
+    {G : Type*} [AddCommGroup G] (P : G) (n k : ℕ)
+    (hk : k ≤ n) (hnP : n • P = 0) :
+    (n - k) • P = -(k • P) := by
+  apply eq_neg_of_add_eq_zero_left
+  rw [← add_nsmul, Nat.sub_add_cancel hk, hnP]
+
+/-- Any decoder fed only an observable invariant under point negation fails on
+at least one member of every odd-order scalar pair `k,n-k`.  Since an elliptic
+x-coordinate and every quadratic cover in `H116-KUMMER-PARITY-001` are
+negation-invariant, none can be a total exact low-parity oracle. -/
+theorem negInvariant_binaryDecoder_pair_failure
+    {G A : Type*} [AddCommGroup G]
+    (P : G) (n k : ℕ) (observable : G → A) (decode : A → ℕ)
+    (hn : n % 2 = 1) (hk : k ≤ n) (hnP : n • P = 0)
+    (hneg : ∀ Q, observable (-Q) = observable Q) :
+    decode (observable (k • P)) ≠ k % 2 ∨
+      decode (observable ((n - k) • P)) ≠ (n - k) % 2 := by
+  have horbit := orbit_sub_eq_neg P n k hk hnP
+  have hobs : observable ((n - k) • P) = observable (k • P) := by
+    rw [horbit, hneg]
+  by_contra h
+  push Not at h
+  have hparity : (n - k) % 2 = k % 2 := by
+    calc
+      (n - k) % 2 = decode (observable ((n - k) • P)) := h.2.symm
+      _ = decode (observable (k • P)) := congrArg decode hobs
+      _ = k % 2 := h.1
+  exact odd_sub_mod_two_ne n k hn hk hparity
+
+/-- Oddness is a necessary boundary: subtraction from the even order four
+does not reverse the parity of the paired indices one and three. -/
+theorem evenOrder_parityMutation_control : (4 - 1) % 2 = 1 % 2 := by
+  norm_num
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -4739,6 +4782,10 @@ theorem rationalMap_separation_strict_control :
 #print axioms quotientDigit_nsmul_identity
 #print axioms quotientDigit_sub_identity
 #print axioms quotientDigit_strict_decrease
+#print axioms odd_sub_mod_two_ne
+#print axioms orbit_sub_eq_neg
+#print axioms negInvariant_binaryDecoder_pair_failure
+#print axioms evenOrder_parityMutation_control
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero
