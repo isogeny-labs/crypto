@@ -43,6 +43,8 @@ is made [pcc:unverified].
   correctness/count result and checkpoint blocker.
 - [`ROUND_C.md`](ROUND_C.md) freezes reciprocal-reduction correctness and
   count-identity gates plus a prospective b4/b8/b16 development screen;
+  [`ROUND_C_DEVIATION.md`](ROUND_C_DEVIATION.md) corrects the initially
+  unrecorded reciprocal setup division;
   [`round-c/RESULTS.md`](round-c/RESULTS.md) retains its producer controls and
   the performance-admission blocker.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
