@@ -159,7 +159,9 @@ fn invert_public(q: Point, m: &mut FieldMeter) -> Result<Point, String> {
     }
     let f = inverse_cubic(x_image, m);
     let mut x_to_p = pow_mod(vec![0, 1], P, &f, m);
-    x_to_p.resize(2.max(x_to_p.len()), 0);
+    if x_to_p.len() < 2 {
+        x_to_p.resize(2, 0);
+    }
     x_to_p[1] = sub(x_to_p[1], 1);
     let common = gcd(f.clone(), x_to_p, m);
     if common.len() != 2 || common[1] != 1 {
@@ -270,8 +272,9 @@ fn panel() -> serde_json::Value {
         );
         assert_eq!(forward(source, U, TAU, V, &mut certificate), q);
         let (x, _) = source.expect("nonidentity public panel");
+        let inverse_poly = inverse_cubic(q.unwrap().0, &mut certificate);
         assert!(
-            quadratic_nonsquare(&inverse_cubic(q.unwrap().0, &mut certificate), x, &mut certificate),
+            quadratic_nonsquare(&inverse_poly, x, &mut certificate),
             "nonlinear conjugate factor must be irreducible"
         );
     }
