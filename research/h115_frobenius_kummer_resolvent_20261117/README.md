@@ -49,6 +49,12 @@ Post-freeze proof artifacts:
 | `VERIFIER_BINDING.md` | Bound cryptanalysis PR #1739 revision and independent source hash | self-hash intentionally omitted |
 | `CHECKPOINT_RESUME.md` | Branch-specific checkpoint, EKS and verifier handoff | self-hash intentionally omitted |
 | `RUN_BLOCKED.md` | Exact checkpoint-transport failure and recovery condition | self-hash intentionally omitted |
+| `H115_REPORT.html` | Editable, source-linked three-page technical evidence note | `a1d17a4882a80529fdf33cfe09ddd4f9c0f5cb7b4b305de3466da2fc96569d18` |
+| `H115_REPORT_RENDER.lua` | Print page-break and table-width filter | `e07e4dd341269bcf45e49cde59e8afb1a835b97d638361360ef1d3b8c8280229` |
+| `H115_REPORT_HEADER.tex` | XeLaTeX long-table print settings | `509ab0dcfca3fd21e87f19c373e6ff9d8cc4f9aa0abcc59ea8f83cfc2bea1103` |
+| `render_h115_report.sh` | Reproducible Pandoc/XeLaTeX render recipe | hash recorded in `REPORT_GATE.md` |
+| `H115_REPORT.pdf` | Visually inspected illustrated A4 report | hash recorded in `REPORT_GATE.md` |
+| `REPORT_GATE.md` | Render receipt, artifact hashes and visual-inspection record | self-hash intentionally omitted |
 
 The first post-freeze native check is structural only:
 
