@@ -13,7 +13,7 @@ through an auxiliary abscissa.
 
 This is a correctness-only search round on the repository's exact RFC 7748
 Curve25519 model. It does not time a solver, estimate an exponent, collect
-relations, solve a discrete logarithm, or claim a performance improvement.
+relations, solve a discrete logarithm, or claim a performance result.
 
 ## Fixed model and baseline
 
@@ -25,7 +25,7 @@ relations, solve a discrete logarithm, or claim a performance improvement.
 - Arithmetic: the repository's generic exact `BigUint` point path.
 - Algebraic oracle: `Curve25519IcModel::semaev_s3` on short-Weierstrass
   abscissae.
-- Existing baseline check: `exact_s3_vanishes_on_a_zero_sum_triple` verifies
+- Existing baseline check: `exact_s3_vanishes_on_a_zero_sum_triple` checks
   one unsplit three-point witness.
 
 The repository's 2026-11-12 closure note treats split `S3` chains with
