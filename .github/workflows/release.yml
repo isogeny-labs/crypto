@@ -69,26 +69,6 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /tools/artifacts/
             /.artifacts/
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -112,26 +92,6 @@ jobs:
             /Cargo.toml
             /tools/artifacts/
             /.artifacts/
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - id: v
         run: |
           version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
@@ -194,27 +154,6 @@ jobs:
             /LICENSE*
             /tools/artifacts/
             /.artifacts/
-      - name: Pull store data this workflow reads (tools/artifacts)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Materialize compile-time inputs without research archives
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         run: node .github/scripts/ci-scope.mjs --materialize
@@ -398,26 +337,6 @@ jobs:
             /LICENSE*
             /tools/artifacts/
             /.artifacts/
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - uses: dtolnay/rust-toolchain@1.98.0
       - uses: Swatinem/rust-cache@v2
         with:
@@ -493,27 +412,6 @@ jobs:
           exit 1
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - uses: dtolnay/rust-toolchain@1.93.1
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         with:
@@ -634,27 +532,6 @@ jobs:
             /LICENSE.md
             /tools/artifacts/
             /.artifacts/
-      - name: Pull store data this workflow reads (tools/artifacts)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       # the crate's own CI toolchain (isogeny-algos.yml); it uses slice APIs newer than 1.93
       - uses: dtolnay/rust-toolchain@1.98
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -751,27 +628,6 @@ jobs:
           df -h .
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Build the ECC2K-130 CPU client
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         run: make -C ecc2k130 cpu MARCH="$ECC_MARCH"
@@ -851,27 +707,6 @@ jobs:
             /gpu/btcpuzzle/
             /tools/artifacts/
             /.artifacts/
-      - name: Pull store data this workflow reads (tools/artifacts)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Install nvcc
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
         # Compiler and CUDA headers only, not the full toolkit: ~330 MB
@@ -924,26 +759,6 @@ jobs:
             /docs/curves/
             /tools/artifacts/
             /.artifacts/
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Test binary asset publication
         run: |
           bash -n .github/scripts/publish_release_assets.sh .github/scripts/test_publish_release_assets.sh
@@ -970,26 +785,6 @@ jobs:
             /docs/curves/
             /tools/artifacts/
             /.artifacts/
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - uses: actions/download-artifact@v4
         with:
           path: staging
@@ -1043,7 +838,7 @@ jobs:
           `isogeny search --curve p224 --ell 1471 --out p224-1471` constructs
           and independently verifies the recorded one-eigenline map.
 
-          The Rust archives also include the `docs/curves` catalog snapshot,
+          The Rust archives also include the curve-catalog snapshot,
           hyperelliptic command contract and transfer-assessment records, plus
           non-authoritative `docs/ecdlp-audit` examples. Run `ecdlp-audit --help`
           to inspect the audit CLI. Its packaged mock is not self-validating:

@@ -57,7 +57,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/compact_k_boundary_20260929 research/notes/ecc2k130/compact_orbit_point_panel_20260929 research/notes/ecc2k130/compact_orbit_strong_rho_20260929 research/notes/ecc2k130/compact_s3_batch_20260929 research/notes/ecc2k130/compact_s3_prefilter_20260930 research/notes/ecc2k130/compact_swap_quotient_20260929 research/notes/ecc2k130/point_sum_cold_20260930 research/sat_factor_base_review_20260908
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/point_sum_cold_20260930
       - uses: Swatinem/rust-cache@v2
       - name: Replay the frozen inputs and check runner syntax
         run: |
@@ -191,7 +191,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/compact_k_boundary_20260929 research/notes/ecc2k130/compact_orbit_point_panel_20260929 research/notes/ecc2k130/compact_orbit_strong_rho_20260929 research/notes/ecc2k130/compact_s3_batch_20260929 research/notes/ecc2k130/compact_s3_prefilter_20260930 research/notes/ecc2k130/compact_swap_quotient_20260929 research/notes/ecc2k130/point_sum_cold_20260930 research/sat_factor_base_review_20260908
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/point_sum_cold_20260930
       - uses: Swatinem/rust-cache@v2
       - uses: actions/checkout@v4
         with:

@@ -641,17 +641,77 @@ class WorkflowPullStep(unittest.TestCase):
         self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
 
 
+class WorkflowPerJobPulls(unittest.TestCase):
+    MOVED = {
+        "research/study_a/data.bin",
+        "research/study_b/data.bin",
+    }
+
+    def wire(self, text):
+        return wire_workflows.wire_workflow(
+            text,
+            self.MOVED,
+            wire_workflows.moved_dirs(self.MOVED),
+            {},
+        )
+
+    def test_event_filters_and_sparse_checkout_are_not_data_reads(self):
+        source = (
+            "on:\n  push:\n    paths:\n      - 'research/study_a/**'\n"
+            "jobs:\n  scope:\n    steps:\n      - uses: actions/checkout@v4\n"
+            "        with:\n          sparse-checkout: research/study_a\n"
+            "      - run: node .github/scripts/ci-scope.mjs\n"
+        )
+        wired, _, by_job = self.wire(source)
+        self.assertEqual(wired, source)
+        self.assertEqual(by_job, {})
+
+    def test_jobs_receive_only_their_own_inputs(self):
+        source = (
+            "jobs:\n"
+            "  a:\n    steps:\n      - uses: actions/checkout@v4\n"
+            "      - run: python3 research/study_a/verify.py\n"
+            "  scope:\n    steps:\n      - uses: actions/checkout@v4\n"
+            "      - run: node .github/scripts/ci-scope.mjs\n"
+            "  b:\n    steps:\n      - uses: actions/checkout@v4\n"
+            "      - run: python3 research/study_b/verify.py\n"
+        )
+        legacy, _ = wire_workflows.wire(source, ["research/study_a", "research/study_b"])
+        wired, _, by_job = self.wire(legacy)
+        self.assertEqual(
+            by_job,
+            {
+                "a": ["research/study_a"],
+                "b": ["research/study_b"],
+            },
+        )
+        self.assertEqual(wired.count(wire_workflows.STEP_NAME), 2)
+        scope = wired[wire_workflows.job_spans(wired)[1][1]:wire_workflows.job_spans(wired)[1][2]]
+        self.assertNotIn(wire_workflows.STEP_NAME, scope)
+
+    def test_tracked_data_file_does_not_hydrate_artifact_siblings(self):
+        moved = {"docs/curves/historical/raw.bin"}
+        dirs = wire_workflows.moved_dirs(moved)
+        self.assertEqual(
+            wire_workflows.needed("run: cp docs/curves/registry.json out/", moved, dirs),
+            [],
+        )
+        self.assertEqual(
+            wire_workflows.needed("run: python3 docs/curves/historical/verify.py", moved, dirs),
+            ["docs/curves/historical"],
+        )
+
+
 class WorkflowStalePullEntries(unittest.TestCase):
     """The generated pull line is output, not a reference: entries it names
     must go once the rest of the workflow stops naming them."""
 
-    MOVED = {"research/study_a_20261031/establishment/certificate.json",
+    MOVED = {"research/study_a_20261031/certificate.json",
              "research/study_b_20261031/data.bin"}
-    BEFORE = ("on:\n  push:\n    paths:\n"
-              "      - 'research/study_a_20261031/**'\n"
-              "      - 'research/study_b_20261031/**'\n"
-              "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n"
-              "      - run: python3 build.py\n")
+    A_READ = "      - run: python3 research/study_a_20261031/verify.py\n"
+    B_READ = "      - run: python3 research/study_b_20261031/verify.py\n"
+    BEFORE = ("jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n"
+              + A_READ + B_READ)
 
     def _paths(self, text):
         return wire_workflows.needed(text, self.MOVED, wire_workflows.moved_dirs(self.MOVED))
@@ -670,8 +730,8 @@ class WorkflowStalePullEntries(unittest.TestCase):
         return wire_workflows.wire(self.BEFORE, old)[0]
 
     def test_moved_directory_is_dropped_on_regeneration(self):
-        # The paths: glob narrows to study_a only; the old pull line still names study_b.
-        stale = self._wired().replace("      - 'research/study_b_20261031/**'\n", "")
+        # The job stops reading study_b; the old pull line still names it.
+        stale = self._wired().replace(self.B_READ, "")
         self.assertIn("research/study_b_20261031", stale)
         self.assertEqual(self._paths(stale), ["research/study_a_20261031"])
         regenerated = wire_workflows.wire(stale, self._paths(stale))[0]
@@ -679,7 +739,7 @@ class WorkflowStalePullEntries(unittest.TestCase):
         self.assertIn("pull --jobs 16 research/study_a_20261031\n", regenerated)
 
     def test_check_flags_and_regeneration_fixes_the_stale_entry(self):
-        stale = self._wired().replace("      - 'research/study_b_20261031/**'\n", "")
+        stale = self._wired().replace(self.B_READ, "")
         with tempfile.TemporaryDirectory() as d:
             wf = Path(d) / "wf.yml"
             wf.write_text(stale)
@@ -702,8 +762,7 @@ class WorkflowStalePullEntries(unittest.TestCase):
 
     def test_step_is_removed_when_nothing_is_named(self):
         wired = self._wired()
-        bare = wired.replace("      - 'research/study_a_20261031/**'\n", "").replace(
-            "      - 'research/study_b_20261031/**'\n", "")
+        bare = wired.replace(self.A_READ, "").replace(self.B_READ, "")
         self.assertEqual(self._paths(bare), [])
         with tempfile.TemporaryDirectory() as d:
             wf = Path(d) / "wf.yml"
@@ -714,7 +773,7 @@ class WorkflowStalePullEntries(unittest.TestCase):
             self.assertEqual(self._main(wf).returncode, 0)
             text = wf.read_text()
             self.assertNotIn(wire_workflows.STEP_NAME, text)
-            self.assertIn("      - uses: actions/checkout@v4\n      - run: python3 build.py\n", text)
+            self.assertIn("      - uses: actions/checkout@v4\n", text)
 
 
 class S3Argv(unittest.TestCase):
@@ -851,9 +910,9 @@ class GateEvidenceDerivation(unittest.TestCase):
         self.assertNotIn("pcc/ledger.jsonl", moved)
         self.assertIn("pcc/old-records.jsonl", moved)
         self.assertEqual(wire_workflows.needed("run: cat pcc/ledger.jsonl", moved,
-                                             wire_workflows.moved_dirs(moved)), ["pcc"])
-        # A broad explicit read may still pull siblings, but cannot select the
-        # tracked ledger itself as a moved file.
+                                             wire_workflows.moved_dirs(moved)), [])
+        # Reading the restored tracked ledger does not hydrate a historical
+        # sibling. An explicit moved-data read may still select that sibling.
         self.assertEqual(wire_workflows.cover({"pcc/old-records.jsonl"}, moved),
                          ["pcc/old-records.jsonl"])
 

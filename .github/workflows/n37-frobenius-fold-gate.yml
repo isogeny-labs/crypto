@@ -85,7 +85,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures research/notes/ecc2k130/n37_four_policy_pdp_20261003 research/notes/ecc2k130/n37_four_policy_support_20261003 research/notes/ecc2k130/n37_frobenius_fold_gate_20261003 research/notes/ecc2k130/n37_native_m6_mitm_20261002
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/n37_frobenius_fold_gate_20261003
       # This byte-matching historical source snapshot is checked separately
       # from current-tree producer/parity checks below.
       - uses: actions/checkout@v4

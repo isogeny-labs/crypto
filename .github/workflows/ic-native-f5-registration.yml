@@ -50,7 +50,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ic_candidate_tournament_20260915/goal_20260924/native-f5-control-registration-v1
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ic_candidate_tournament_20260915/goal_20260924/native-f5-control-registration-v1/failed-packaging-v1 research/ic_candidate_tournament_20260915/goal_20260924/native-f5-control-registration-v1/publication
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Bootstrap native build serialization

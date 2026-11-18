@@ -43,7 +43,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/f5_support_cut19_call_20261002 research/f5_support_rank_bits_20261002
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/f5_support_cut19_call_20261002
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'

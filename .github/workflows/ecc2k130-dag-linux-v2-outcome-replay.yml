@@ -39,7 +39,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
