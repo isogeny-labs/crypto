@@ -153,7 +153,10 @@ fn extension_curve_constructors_keep_distinct_models_and_dispatch_to_generic_sol
             facts.r.to_biguint() * facts.cofactor.to_biguint(),
             facts.group_order.to_biguint()
         );
-        let r = u128::try_from(instance.r()).unwrap();
+        let r = instance
+            .r()
+            .checked_u128()
+            .expect("subgroup order fits u128");
         assert_eq!(instance.mul_generator_hex(r), None);
         let target = instance.mul_generator_hex(7).unwrap();
         let report = solve(&method, &instance, &facts, &target, 7).unwrap();
@@ -163,7 +166,7 @@ fn extension_curve_constructors_keep_distinct_models_and_dispatch_to_generic_sol
             "{}",
             facts.construction
         );
-        let recovered = u128::try_from(report.recovered.unwrap()).unwrap();
+        let recovered = report.recovered.unwrap().checked_u128().unwrap();
         assert_eq!(instance.mul_generator_hex(recovered), Some(target));
     }
 }

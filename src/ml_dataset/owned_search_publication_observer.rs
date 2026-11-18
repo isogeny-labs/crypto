@@ -10,19 +10,59 @@ pub(in crate::ml_dataset::solvers) enum Boundary<'a> {
     /// Head installation and acknowledgement equality checks already succeeded.
     /// The producer's subsequent deadline check has not necessarily succeeded.
     ChunkAcknowledged {
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         pattern: u32,
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         snapshot: u64,
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         chunk: u64,
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         bytes: u64,
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         receipt: &'a capture::CommittedEventPosition,
     },
     /// Encoder completion, exact acknowledgements, byte totals and original
     /// budget check already succeeded; native mathematical success is not implied.
     SnapshotComplete {
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         pattern: u32,
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         snapshot: u64,
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         chunks: u64,
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         bytes: u64,
+        #[allow(
+            dead_code,
+            reason = "Retained independent checker/control interface; not producer-completion admission."
+        )]
         receipt: &'a capture::CommittedEventPosition,
     },
 }
@@ -31,6 +71,10 @@ thread_local! {
     static OBSERVER: Cell<Option<Observer>> = const { Cell::new(None) };
 }
 /// Not Send/Sync: unregister only on the installing producer thread.
+#[allow(
+    dead_code,
+    reason = "Retained independent checker/control interface; not producer-completion admission."
+)]
 pub(in crate::ml_dataset::solvers) struct Guard {
     _same_thread: PhantomData<Rc<()>>,
 }
@@ -45,13 +89,19 @@ impl Drop for Guard {
 /// scientific timings and must be recorded separately. No owner renewal occurs.
 /// Callback return resumes the ordinary producer checks; callback panic is a test
 /// failure, never an accepted interruption envelope or a verified snapshot.
+#[allow(
+    dead_code,
+    reason = "Retained independent checker/control interface; not producer-completion admission."
+)]
 pub(in crate::ml_dataset::solvers) fn install(observer: Observer) -> Result<Guard, &'static str> {
     OBSERVER.with(|slot| {
         if slot.get().is_some() {
             return Err("publication test observer already installed on this thread");
         }
         slot.set(Some(observer));
-        Ok(Guard { _same_thread: PhantomData })
+        Ok(Guard {
+            _same_thread: PhantomData,
+        })
     })
 }
 pub(super) fn notify(boundary: Boundary<'_>) {

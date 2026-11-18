@@ -197,10 +197,21 @@ struct Algebra {
     _max_columns: usize,
     #[serde(rename = "f4_field_multiplications")]
     _f4_field_multiplications: u64,
+    // Degree-fall observables (`AlgebraReport`, commit 1998650583):
+    // diagnostic and never priced, so parsed for schema compatibility only.
+    // Absent in transcripts written before they existed.
+    #[serde(default, rename = "first_fall_degree")]
+    _first_fall_degree: Option<u32>,
+    #[serde(default, rename = "last_fall_degree")]
+    _last_fall_degree: Option<u32>,
+    #[serde(default, rename = "degree_of_regularity_observed")]
+    _degree_of_regularity_observed: Option<u32>,
     #[serde(default, rename = "roots")]
     _roots: Option<Roots>,
-    // Degree-fall diagnostics added to `AlgebraReport` in 1998650583
-    // (never priced); optional so transcripts written before it still parse.
+    // Degree-fall diagnostics (first-fall / last-fall degree, observed degree
+    // of regularity). Parsed strictly for schema compatibility — never trusted
+    // as a cost certificate — and `default` so transcripts predating the
+    // diagnostic still replay. Their underscore names mark that boundary.
     #[serde(default, rename = "first_fall_degree")]
     _first_fall_degree: Option<u32>,
     #[serde(default, rename = "last_fall_degree")]

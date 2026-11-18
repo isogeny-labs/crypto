@@ -851,7 +851,8 @@ mod tests {
         for a in [0, 1, LEGACY_R, u64::MAX] {
             let s = ExactScalar::from_biguint(&BigUint::from(a)).unwrap();
             assert_eq!(s.0, a);
-            assert_eq!(s.to_u128(), u128::from(a));
+            assert_eq!(s.checked_u128(), Some(u128::from(a)));
+            assert_eq!(s.to_biguint(), BigUint::from(a));
             assert_eq!(s.to_string(), a.to_string());
             assert_eq!(s.bit_len(), <u64 as RhoScalar>::bit_len(a));
             for bit in 0..64 {

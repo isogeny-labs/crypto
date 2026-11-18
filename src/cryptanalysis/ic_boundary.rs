@@ -7536,12 +7536,28 @@ pub fn prime_factor_base_strided(
 /// A binary base over the span of `basis` (single words), every point
 /// above every non-zero element, columns by abscissa.
 pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> FactorBase<FastPoint> {
+    binary_affine_subspace_factor_base(inst, basis, 0)
+}
+
+/// The points above `offset + span(basis)`; `offset = 0` is
+/// [`binary_subspace_factor_base`].  With `offset ≠ 0` (outside the span)
+/// the base records `affine_subspace` instead of `subspace_basis`.
+pub fn binary_affine_subspace_factor_base(
+    inst: &BinaryInstance,
+    basis: &[u64],
+    offset: u64,
+) -> FactorBase<FastPoint> {
     let start = Instant::now();
     let l = basis.len() as u32;
-    let mut fb = FactorBase::empty(format!("subspace of dimension {l}"));
+    let mut fb = FactorBase::empty(if offset == 0 {
+        format!("subspace of dimension {l}")
+    } else {
+        format!("affine subspace of dimension {l}")
+    });
     let mut solves = 0u64;
-    for idx in 1..(1u64 << l) {
-        let mut x = 0u64;
+    let first = if offset == 0 { 1 } else { 0 };
+    for idx in first..(1u64 << l) {
+        let mut x = offset;
         for (j, &e) in basis.iter().enumerate() {
             if (idx >> j) & 1 == 1 {
                 x ^= e;
@@ -7572,7 +7588,11 @@ pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> Fact
     }
     fb.columns = fb.abscissae;
     fb.dimension = Some(l);
-    fb.subspace_basis = Some(basis.to_vec());
+    if offset == 0 {
+        fb.subspace_basis = Some(basis.to_vec());
+    } else {
+        fb.affine_subspace = Some((basis.to_vec(), offset));
+    }
     for (i, p) in fb.points.iter().enumerate() {
         fb.point_index.insert(p.pack(), i);
     }
@@ -7582,7 +7602,7 @@ pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> Fact
     let (a, n) = (fb.abscissae as u64, fb.points.len() as u64);
     count_index_build(&mut fb, a + n, 0);
     fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
-    fb.cost.count("abscissae_scanned", (1u64 << l) - 1);
+    fb.cost.count("abscissae_scanned", (1u64 << l) - first);
     fb.cost.count("as_solves", solves);
     fb
 }

@@ -26,10 +26,6 @@ fn lift_muls(inst: &BinCurve) -> f64 {
     }
     muls as f64 / n as f64
 }
-/// Curve facts carry exact scalars: a JSON number through u64, a string above.
-fn exact_json(value: u128) -> Value {
-    serde_json::to_value(ExactScalar::from(value)).unwrap()
-}
 fn virtual_row(v: &Value) -> (Map<String, Value>, Value) {
     let spec = &v["workload"]["curve_spec"];
     let m = spec["m"].as_u64().unwrap() as u32;
@@ -37,8 +33,14 @@ fn virtual_row(v: &Value) -> (Map<String, Value>, Value) {
     let h = spec["max_cofactor"].as_u64().unwrap();
     let inst = find_bin_curve(m, seed, h).unwrap();
     let facts = &v["workload"]["curve"];
-    assert_eq!(facts["r"], exact_json(inst.r));
-    assert_eq!(facts["group_order"], exact_json(inst.group_order));
+    // Orders are u128 in BinCurve and ExactScalar (number through u64,
+    // decimal string above) in the record; compare exactly.
+    let exact = |x: &Value| serde_json::from_value::<ExactScalar>(x.clone()).unwrap();
+    assert_eq!(exact(&facts["r"]), ExactScalar::from(inst.r));
+    assert_eq!(
+        exact(&facts["group_order"]),
+        ExactScalar::from(inst.group_order)
+    );
     for (j, coord) in [inst.generator.x, inst.generator.y].into_iter().enumerate() {
         let text = facts["generator"][j].as_str().unwrap();
         assert_eq!(

@@ -1,0 +1,342 @@
+{
+ "achieved": {
+  "single": {
+   "cpu_s": {
+    "max": 1.002426000000014,
+    "median": 0.9992960000000011,
+    "min": 0.992477000000008,
+    "n": 10
+   },
+   "cpu_utilisation": {
+    "max": 0.9991425617615697,
+    "median": 0.996787154881321,
+    "min": 0.9901579876130651,
+    "n": 10
+   },
+   "loadavg_1m_before": {
+    "max": 2.03,
+    "median": 1.9449999999999998,
+    "min": 1.86,
+    "n": 10
+   },
+   "mode": "single",
+   "ops": {
+    "max": 3827845120.0,
+    "median": 3395778560.0,
+    "min": 3154606080.0,
+    "n": 10
+   },
+   "ops_per_s": {
+    "max": 3827724837.5747046,
+    "median": 3395657996.462599,
+    "min": 3154304525.3330736,
+    "n": 10
+   },
+   "other_cpu_cores": {
+    "max": 0.031123412375916003,
+    "median": 0.012509642198182711,
+    "min": 0.0,
+    "n": 10
+   },
+   "threads": 1,
+   "wall_s": {
+    "max": 1.003318789,
+    "median": 1.0025322825,
+    "min": 1.002342063,
+    "n": 10
+   }
+  },
+  "threads_4": {
+   "cpu_s": {
+    "max": 3.979329000000007,
+    "median": 3.9664909999999907,
+    "min": 3.9515580000000057,
+    "n": 5
+   },
+   "cpu_utilisation": {
+    "max": 0.9903664499890531,
+    "median": 0.987103352578007,
+    "min": 0.9832462258888339,
+    "n": 5
+   },
+   "loadavg_1m_before": {
+    "max": 2.03,
+    "median": 1.94,
+    "min": 1.86,
+    "n": 5
+   },
+   "mode": "copies",
+   "ops": {
+    "max": 14466562048.0,
+    "median": 13943021568.0,
+    "min": 12440918016.0,
+    "n": 5
+   },
+   "ops_per_s": {
+    "max": 14465992462.026731,
+    "median": 13942834385.310436,
+    "min": 12440543142.50655,
+    "n": 5
+   },
+   "other_cpu_cores": {
+    "max": 0.01835356967465203,
+    "median": 0.003492652264135266,
+    "min": 0.0,
+    "n": 5
+   },
+   "threads": 4,
+   "wall_s": {
+    "max": 1.004722392,
+    "median": 1.004578444,
+    "min": 1.004381085,
+    "n": 5
+   }
+  }
+ },
+ "algorithmic": {
+  "best_known_ops": null,
+  "counted_ops": null,
+  "note": "not supplied; never folded into the score",
+  "ratio": null
+ },
+ "attainment": {
+  "full": {
+   "high": 1.032958001579033,
+   "low": 0.8827042617172246,
+   "value": 0.9892975886462186
+  },
+  "single": {
+   "high": 1.0565718696883166,
+   "low": 0.8531138971604616,
+   "value": 0.9183904101587659
+  }
+ },
+ "calibration": {
+  "conditions": {
+   "loadavg_1m_after": 1.94,
+   "loadavg_1m_before": 1.07,
+   "other_cpu_cores": 0.041955302940443605,
+   "psi_cpu_some_avg10_before": 0.0,
+   "steal_cores": 0.016453202670333397,
+   "thermal_throttle_events": null
+  },
+  "created_utc": "2026-11-17T20:28:14Z",
+  "fingerprint": "44113cdb2d87e834",
+  "sha256": "ac8ccd1a476c24b2b474d3c20a779039fcdb5d605c8d8f2ffd02635b4c688869"
+ },
+ "conditions": {
+  "loadavg_1m": {
+   "max": 2.03,
+   "median": 1.94,
+   "min": 1.86,
+   "n": 15
+  },
+  "other_cpu_cores": {
+   "max": 0.031123412375916003,
+   "median": 0.0075048423790785215,
+   "min": 0.0,
+   "n": 15
+  },
+  "psi_cpu_some_avg10": {
+   "max": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "n": 15
+  },
+  "steal_cores": {
+   "max": 0.05971229695756698,
+   "median": 0.0,
+   "min": 0.0,
+   "n": 15
+  }
+ },
+ "created_utc": "2026-11-17T20:28:29Z",
+ "device": "cpu",
+ "diagnosis": {
+  "branch_miss_rate": null,
+  "cycles_per_op": null,
+  "dtlb_misses_per_op": null,
+  "gpu": null,
+  "instructions_per_op": null,
+  "ipc": null,
+  "l1d_misses_per_op": null,
+  "latency_attainment": null,
+  "llc_misses_per_op": null,
+  "scalar_ceiling_ratio": 5.233476577206456,
+  "simd_headroom": 5.698531386343336,
+  "startup_share": 0.002488514228096206,
+  "topdown": null,
+  "unavailable": {
+   "branch_miss_rate": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+   "cycles_per_op": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+   "dtlb_misses_per_op": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+   "instructions_per_op": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+   "ipc": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+   "l1d_misses_per_op": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+   "llc_misses_per_op": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+   "topdown": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+   "vector_share_sampled": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)"
+  },
+  "vector_share_sampled": null,
+  "vector_share_static": 0.3150684931506849
+ },
+ "flags": [
+  "CALIBRATION_VIRTUALIZED",
+  "OPS_VARY",
+  "VIRTUALIZED"
+ ],
+ "grade": {
+  "invalid": [],
+  "letter": "A",
+  "letter_range": "A",
+  "limiting_basis": "roofline",
+  "limiting_factor": "none above threshold: near the roofline; what remains is the algorithmic axis",
+  "rule": "sqrt(A_single * A_full); letters A>=0.70 B>=0.40 C>=0.20 D>=0.08 E",
+  "scope": "single+parallel",
+  "score": 0.9531848814400482
+ },
+ "host": {
+  "affinity_cpus": 4,
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "arch": "x86_64",
+  "caches_bytes": {
+   "L1d": 49152,
+   "L1i": 32768,
+   "L2": 2097152,
+   "L3": 272629760
+  },
+  "cgroup_cpu_max": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cpu_quota_cores": null,
+  "cpu_quota_source": null,
+  "cpufreq_boost": null,
+  "cpufreq_governor": null,
+  "event_sources": [
+   "breakpoint",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "fingerprint": "44113cdb2d87e834",
+  "hypervisor": true,
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "avx512_vpopcntdq",
+   "avx512bw",
+   "avx512dq",
+   "avx512f",
+   "avx512ifma",
+   "avx512vl",
+   "bmi2",
+   "fma",
+   "gfni",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "kernel": "6.18.44-fc-v553",
+  "logical_cpus": 4,
+  "mem_total_bytes": 16869134336,
+  "numa_nodes": 1,
+  "perf_event_paranoid": "2",
+  "smt_active": "0",
+  "thread_siblings_cpu0": "0",
+  "turbo_disabled": null,
+  "usable_cpus": 4,
+  "usable_cpus_basis": "affinity mask (4 CPUs)"
+ },
+ "intensity": {
+  "bytes_per_op": 0.0,
+  "declared_bytes_per_op": 12.0,
+  "declared_over_measured": null,
+  "in_cache": true,
+  "measured_bytes_per_op": null,
+  "ops_per_byte": null,
+  "source": "declared",
+  "working_set_bytes": 16384
+ },
+ "kernel": {
+  "command": [
+   "/home/user/crypto-wt/optlevel-rs/tools/optlevel/target/release/optlevel",
+   "kernel",
+   "modmuladd_p31",
+   "--isa",
+   "avx2",
+   "--seconds",
+   "1"
+  ],
+  "expectation": "modular multiply-add row operation, vectorized, in cache (expected: near the compute roof)",
+  "op_class": "modmuladd_p31",
+  "ops_source": "optlevel.ops/v1 line",
+  "path": "tools/optlevel/src/kernels.rs",
+  "repository": "isogeny-labs/crypto"
+ },
+ "kind": "record",
+ "label": "positive-simd-incache",
+ "noise_floor": {
+  "aa_ratio_deviation": 0.02723053481744586,
+  "full_rel_range": 0.14526811862974626,
+  "pairs": 5,
+  "rel_range": 0.19831806175508887,
+  "sufficient": true,
+  "value": 0.19831806175508887
+ },
+ "not_a_speed_claim": "An optimization level describes how close one implementation runs to what its own machine can do for the operations it counts. It is not a speed result, not a comparison between algorithms, not a benchmark or leaderboard row, and not evidence under the validation gate. A perfectly tuned bad algorithm scores high.",
+ "parallel": {
+  "curve": [
+   {
+    "ops_per_s": 3395657996.462599,
+    "raw_efficiency": 1.0,
+    "threads": 1
+   },
+   {
+    "ops_per_s": 13942834385.310436,
+    "raw_efficiency": 1.0265193373298547,
+    "threads": 4
+   }
+  ],
+  "machine_scaling": 0.9529443173275577,
+  "raw_efficiency": 1.0265193373298547,
+  "roofline_normalised_efficiency": 1.0772080998485107,
+  "threads": 4
+ },
+ "roofline": {
+  "full": {
+   "bandwidth_bytes_per_s": 75290135380.04034,
+   "binding": "compute",
+   "bound_low_ops_per_s": 14004434294.437206,
+   "bound_ops_per_s": 14093670646.049168,
+   "ceiling_extrapolated": false,
+   "ceiling_interpolated": false,
+   "compute_roof_ops_per_s": 14093670646.049168,
+   "memory_roof_ops_per_s": null,
+   "next_roof_ratio": null,
+   "threads": 4
+  },
+  "single": {
+   "bandwidth_bytes_per_s": 19289137273.95047,
+   "binding": "compute",
+   "bound_low_ops_per_s": 3622777538.7431655,
+   "bound_ops_per_s": 3697401408.9232244,
+   "ceiling_extrapolated": false,
+   "ceiling_interpolated": false,
+   "compute_roof_ops_per_s": 3697401408.9232244,
+   "memory_roof_ops_per_s": null,
+   "next_roof_ratio": null,
+   "threads": 1
+  }
+ },
+ "schema": "optlevel.record/v1",
+ "tier": "T-timing",
+ "tool_version": "2.0.0"
+}

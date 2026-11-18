@@ -106,6 +106,7 @@ fn run() -> Result<(), String> {
         negation: true,
         seed,
         max_steps,
+        // Legacy walk, as when this runner was written (fields added later).
         look_ahead: false,
         cycle_window: 0,
         coeff_bits: 0,

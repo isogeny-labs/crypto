@@ -111,6 +111,8 @@ fn main() -> Result<(), String> {
             let ex = &p.executions[r.seq as usize];
             let w = &p.workloads[ex.workload];
             let input = ChildInput {
+                // A plain replay: no diagnostic context or lifecycle transport
+                // (both are skipped when absent, so the input bytes are unchanged).
                 diagnostics: None,
                 diagnostic_lifecycle: None,
                 schema: CHILD_INPUT_SCHEMA.into(),
@@ -126,6 +128,8 @@ fn main() -> Result<(), String> {
                 },
                 expected_method_id: r.method.method_id.clone(),
                 algorithm_seed: ex.algorithm_seed,
+                diagnostics: None,
+                diagnostic_lifecycle: None,
             };
             let input_bytes = serde_json::to_vec(&input).map_err(|e| e.to_string())?;
             let stem = format!("{}-{}", r.session_id, r.seq);

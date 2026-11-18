@@ -42,12 +42,11 @@ use super::smith_canonical::{
 };
 use super::smith_prop24::{deg, SplitMix64};
 
-// The W3b divisor-class engine (`Smith`, `W1Bridge`, `Pic`, `Mum`, ...) lived
-// in this file until 2026-11-16, when the module name was reused for the
-// transfer above; it is restored verbatim (blob 9342045201, commit a3e870b92b)
-// as `smith_isogeny_w3b` and re-exported so `smith_route_s` and
-// `examples/smith_isogeny.rs` resolve it under its original path.
-pub use super::smith_isogeny_w3b::*;
+/// The divisor-class Smith map (`Smith`, `Hyp`, `Mum`, `Pic`, `W1Bridge`, the
+/// T1-T6 engines), restored from before the 2026-11-16 sparse merge; used by
+/// [`super::smith_route_s`] and `examples/smith_isogeny.rs`.
+pub mod divisor_map;
+pub use divisor_map::*;
 
 /// Smith's isogeny on one curve, with everything needed to move classes.
 pub struct SmithIso {
@@ -94,7 +93,7 @@ fn largest_prime_factor(mut n: u128) -> u128 {
     let mut best = 1;
     let mut d = 2u128;
     while d * d <= n {
-        while n % d == 0 {
+        while n.is_multiple_of(d) {
             best = d;
             n /= d;
         }

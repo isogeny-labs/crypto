@@ -6436,9 +6436,13 @@ pub struct VisitReport {
     /// Measured degree-fall observables, folded over the F4 runs of the
     /// traversal (first fall = min, last fall = max, observed degree of
     /// regularity = max). Diagnostic; `None` unless a run recorded them
-    /// (`F4Options::record_degree_falls`).
+    /// (`F4Options::record_degree_falls`). Omitted from serialised reports when
+    /// `None`, so transcripts written without the opt-in are unchanged.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub first_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub last_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub degree_of_regularity_observed: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,

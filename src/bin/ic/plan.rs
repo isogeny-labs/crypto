@@ -80,6 +80,14 @@ impl PlanArgs {
 pub fn profile_of(inst: &Instance) -> CurveProfile {
     match inst {
         Instance::Prime(p) => CurveProfile::of_prime(p),
+        Instance::Curve25519(c) => {
+            use num_traits::ToPrimitive;
+            CurveProfile::other(
+                (&c.r * c.cofactor).to_f64().unwrap_or(f64::MAX),
+                c.r.to_f64().unwrap_or(f64::MAX),
+                c.cofactor,
+            )
+        }
         Instance::Binary(b) => CurveProfile::of_binary(b),
         // A Koblitz curve past one word: the planner has no recipe for it,
         // but names the Frobenius rho.

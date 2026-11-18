@@ -4557,6 +4557,7 @@ mod wide {
     }
 
     #[inline(always)]
+    #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
     fn root_from_tables(
         primary: &RootTable128,
         overflow: Option<&RootTable128>,
@@ -4575,6 +4576,7 @@ mod wide {
 
     impl Index128 {
         #[inline(always)]
+        #[allow(dead_code)] // no caller in this build; kept pending owner review (#4607)
         fn get_root(&self, key: u128, basis: &NormalBasis128) -> Option<u64> {
             root_from_tables(
                 &self.table,
@@ -5032,6 +5034,8 @@ mod wide {
         states
     }
 
+    #[cfg(test)]
+    #[allow(clippy::too_many_arguments)]
     fn build_index128_with_symmetry(
         gf: &Gf2_128,
         basis: &NormalBasis128,
@@ -5402,6 +5406,11 @@ mod wide {
         let mut core_state_insertions = 0usize;
         let mut overflow_state_insertions = 0usize;
         let mut states_wide = Vec::new();
+        let blocked_states = !opts.is_serial()
+            && !(packed_state83 || packed_state26 || root_only83 || root_only21 || root_only11);
+        if blocked_states {
+            states_wide = build_states_blocked(gf, basis, solver, &shifted, symmetric_states, opts);
+        }
         let mut root_batch = RootBatch128::with_capacity(n);
         let mut root_inputs = Vec::with_capacity(n);
         let root_threads: usize = match std::env::var("KIC_INDEX_ROOT_THREADS") {
@@ -5418,11 +5427,6 @@ mod wide {
             Err(std::env::VarError::NotPresent) => 1,
             Err(error) => panic!("invalid KIC_INDEX_ROOT_THREADS: {error}"),
         };
-        let blocked_states = !opts.is_serial()
-            && !(packed_state83 || packed_state26 || root_only83 || root_only21 || root_only11);
-        if blocked_states {
-            states_wide = build_states_blocked(gf, basis, solver, &shifted, symmetric_states, opts);
-        }
         for left in 0..if blocked_states { 0 } else { reps.len() } {
             let right_start = if symmetric_states { left } else { 0 };
             // Compute each left row concurrently, then insert states and exact

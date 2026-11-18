@@ -445,43 +445,7 @@ pub fn descend_with_bases(
     x_r: u64,
     bases: &[Vec<u64>],
 ) -> Result<SymbolicDescent, String> {
-    let summands = bases.len() as u32;
-    let n_prime = bases.first().map_or(0, |v| v.len()) as u32;
-    if bases.iter().any(|v| v.len() as u32 != n_prime) {
-        return Err("every summand's basis must have the same dimension".into());
-    }
-    let v_basis = bases.first().cloned().unwrap_or_default();
-    // The copies of the bases (here and into the result): a word an
-    // element.
-    note(|w| w.word_ops += (n_prime as u64) * (1 + summands as u64));
-    if !(2..=3).contains(&summands) {
-        return Err(format!(
-            "the symbolic descent takes 2 or 3 summands, not {summands}"
-        ));
-    }
-    if n_prime == 0 || n_prime > max_n_prime(summands) {
-        return Err(format!(
-            "a subspace of dimension {n_prime} at {summands} summands needs {} boolean variables; \
-             the monomial mask holds {MAX_VARS}",
-            n_prime * summands
-        ));
-    }
-    let n_vars = (summands * n_prime) as usize;
-    let poly = match summands {
-        2 => s3_symbolic(gf, b, x_r, &bases[0], &bases[1]),
-        _ => s4_symbolic(gf, b, x_r, &bases[0], &bases[1], &bases[2]),
-    };
-    Ok(SymbolicDescent {
-        n: gf.n,
-        n_prime,
-        summands,
-        n_vars,
-        equations: poly.split(gf.n, n_vars),
-        v_basis,
-        summand_bases: bases.to_vec(),
-        offset: 0,
-        field_monomials: poly.len(),
-    })
+    descend_affine(gf, b, x_r, bases, 0)
 }
 
 /// [`descend_with_bases`] with every summand over the affine subspace
@@ -502,6 +466,9 @@ pub fn descend_affine(
         return Err("every summand's basis must have the same dimension".into());
     }
     let v_basis = bases.first().cloned().unwrap_or_default();
+    // The copies of the bases (here and into the result): a word an
+    // element.
+    note(|w| w.word_ops += (n_prime as u64) * (1 + summands as u64));
     if !(2..=3).contains(&summands) {
         return Err(format!(
             "the symbolic descent takes 2 or 3 summands, not {summands}"
@@ -608,12 +575,6 @@ impl SymbolicDescent {
     }
 }
 
-/// `S_3(x_1, x_2, x_R)` with `x_1`, `x_2` linear forms, term for term
-/// the formula [`semaev_s3_word`] evaluates.
-fn s3_symbolic(gf: &Gf2, b: u64, x_r: u64, b1: &[u64], b2: &[u64]) -> FieldBoolPoly {
-    s3_symbolic_poly(gf, b, &FieldBoolPoly::constant(x_r), b1, b2)
-}
-
 /// `S_3(x_1, x_2, X)` with `X` any polynomial in the boolean variables:
 /// a constant for the plain descent, a linear form in its own `n`
 /// variables for the fiber-combined one ([`descend_fiber`]).  Summand `i`
@@ -627,51 +588,7 @@ fn s3_symbolic_poly(
     b1: &[u64],
     b2: &[u64],
 ) -> FieldBoolPoly {
-    let np = b1.len() as u32;
-    let x1 = FieldBoolPoly::linear(0, b1);
-    let x2 = FieldBoolPoly::linear(np, b2);
-    let sum12_sq = x1.add(&x2).sqr(gf);
-    let prod12 = x1.mul(&x2, gf);
-    let t1 = sum12_sq.mul(&x_r.sqr(gf), gf);
-    let t2 = prod12.mul(x_r, gf);
-    let t3 = prod12.sqr(gf).add(&FieldBoolPoly::constant(b));
-    t1.add(&t2).add(&t3)
-}
-
-/// `S_4(x_1, x_2, x_3, x_R)` with `x_1`, `x_2`, `x_3` linear forms,
-/// term for term the resultant [`semaev_s4_word`] evaluates.
-fn s4_symbolic(gf: &Gf2, b: u64, x_r: u64, b1: &[u64], b2: &[u64], b3: &[u64]) -> FieldBoolPoly {
-    s4_symbolic_poly(gf, b, &FieldBoolPoly::constant(x_r), b1, b2, b3)
-}
-
-/// `S_4(x_1, x_2, x_3, X)` with `X` any polynomial in the boolean
-/// variables and summand `i` over the span of its own basis.
-fn s4_symbolic_poly(
-    gf: &Gf2,
-    b: u64,
-    x_r: &FieldBoolPoly,
-    b1: &[u64],
-    b2: &[u64],
-    b3: &[u64],
-) -> FieldBoolPoly {
-    let np = b1.len() as u32;
-    let x1 = FieldBoolPoly::linear(0, b1);
-    let x2 = FieldBoolPoly::linear(np, b2);
-    let x3 = FieldBoolPoly::linear(2 * np, b3);
-    let x4 = x_r.counted_clone();
-    let bconst = FieldBoolPoly::constant(b);
-    let s3_in_x3 = |p: &FieldBoolPoly, q: &FieldBoolPoly| {
-        let a = p.add(q).sqr(gf);
-        let bb = p.mul(q, gf);
-        let c = bb.sqr(gf).add(&bconst);
-        (a, bb, c)
-    };
-    let (a1, b1, c1) = s3_in_x3(&x1, &x2);
-    let (a2, b2, c2) = s3_in_x3(&x3, &x4);
-    let t1 = a1.mul(&c2, gf).add(&a2.mul(&c1, gf)).sqr(gf);
-    let left = a1.mul(&b2, gf).add(&a2.mul(&b1, gf));
-    let right = b1.mul(&c2, gf).add(&b2.mul(&c1, gf));
-    t1.add(&left.mul(&right, gf))
+    s3_symbolic_poly_affine(gf, b, x_r, b1, b2, 0)
 }
 
 /// `offset + Σ_k v_{var + k} · basis[k]`.
@@ -700,6 +617,19 @@ fn s3_symbolic_poly_affine(
     t1.add(&t2).add(&t3)
 }
 
+/// `S_4(x_1, x_2, x_3, X)` with `X` any polynomial in the boolean
+/// variables and summand `i` over the span of its own basis.
+fn s4_symbolic_poly(
+    gf: &Gf2,
+    b: u64,
+    x_r: &FieldBoolPoly,
+    b1: &[u64],
+    b2: &[u64],
+    b3: &[u64],
+) -> FieldBoolPoly {
+    s4_symbolic_poly_affine(gf, b, x_r, b1, b2, b3, 0)
+}
+
 /// `S_4(x_1, x_2, x_3, X)` with `x_i = offset + Σ_k v_k b_i[k]`, term
 /// for term the resultant [`semaev_s4_word`] evaluates.
 fn s4_symbolic_poly_affine(
@@ -715,7 +645,7 @@ fn s4_symbolic_poly_affine(
     let x1 = affine_form(0, b1, offset);
     let x2 = affine_form(np, b2, offset);
     let x3 = affine_form(2 * np, b3, offset);
-    let x4 = x_r.clone();
+    let x4 = x_r.counted_clone();
     let bconst = FieldBoolPoly::constant(b);
     let s3_in_x3 = |p: &FieldBoolPoly, q: &FieldBoolPoly| {
         let a = p.add(q).sqr(gf);
@@ -772,7 +702,7 @@ mod tests {
                     } else {
                         semaev_s4_word(gf, inst.b, xs[0], xs[1], xs[2], x_r)
                     };
-                    let zero = sys.equations.iter().all(|e| e.eval(v) == 0);
+                    let zero = sys.equations.iter().all(|e| e.eval(mask_from64(v)) == 0);
                     assert_eq!(zero, word == 0, "summands {summands}, v = {v:#x}");
                 }
             }

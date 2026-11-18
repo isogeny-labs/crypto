@@ -1,0 +1,16 @@
+2026-11-17T18:38:11.9011590Z ##[group]Run set -euo pipefail
+2026-11-17T18:38:11.9011784Z [36;1mset -euo pipefail[0m
+2026-11-17T18:38:11.9011983Z [36;1mtest -n "$AWS_ACCESS_KEY_ID" && test -n "$AWS_SECRET_ACCESS_KEY"[0m
+2026-11-17T18:38:11.9012401Z [36;1mcd candidate[0m
+2026-11-17T18:38:11.9012551Z [36;1mbase=$(git merge-base "$BASE_SHA" HEAD)[0m
+2026-11-17T18:38:11.9012786Z [36;1mpython3 ../trusted/tools/artifacts/artifacts.py migrate "$base" HEAD[0m
+2026-11-17T18:38:11.9013137Z [36;1mgit diff --cached --check[0m
+2026-11-17T18:38:11.9053383Z shell: /usr/bin/bash -e {0}
+2026-11-17T18:38:11.9053522Z env:
+2026-11-17T18:38:11.9053745Z   AWS_ACCESS_KEY_ID: ***
+2026-11-17T18:38:11.9053936Z   AWS_SECRET_ACCESS_KEY: ***
+2026-11-17T18:38:11.9054076Z   AWS_REGION: us-west-2
+2026-11-17T18:38:11.9054235Z   BASE_SHA: 833a35d21ec2368ab081b2083d7762ed0bfd2bbc
+2026-11-17T18:38:11.9054403Z ##[endgroup]
+2026-11-17T18:38:16.5440614Z artifacts: head-object store/sha256/58/58c651d8cfe08e049db1605d8bb1f89a79de5388d5c879e81cb213715c4ab248: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)
+2026-11-17T18:38:16.5549925Z ##[error]Process completed with exit code 2.
