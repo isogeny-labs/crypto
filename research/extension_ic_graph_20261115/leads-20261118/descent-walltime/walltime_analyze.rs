@@ -9,7 +9,7 @@
 //!       Complete counted descent work per arm from run_counted.sh output,
 //!       with and without the learning-RREF bound, and the field_mul
 //!       reconciliation that shows which named terms are inside the hooks.
-//!   walltime_analyze run50 RUN50_DIR PROD_COUNTED_JSON TRACED_COUNTED_JSON
+//!   walltime_analyze run50 RUN50_DIR PROD_COUNTED_JSON TRACED_COUNTED_JSON [RECOUNT_JSON]
 //!       MODEL ONLY: Run50 arm totals with descent normalised to the
 //!       expected residual count (pooled success rate), not observed counts.
 //!
@@ -352,8 +352,21 @@ fn bisect(f: impl Fn(f64) -> f64, mut lo: f64, mut hi: f64) -> f64 {
     0.5 * (lo + hi)
 }
 
-fn run50(dir: &str, prod: &str, traced: &str) {
+thread_local! {
+    static BAND: std::cell::RefCell<Vec<(String, Vec<(f64, f64)>)>> = const { std::cell::RefCell::new(Vec::new()) };
+}
+
+fn run50(dir: &str, prod: &str, traced: &str, recount: Option<&str>) {
     let study = parse(&format!("{dir}/run-study.json"));
+    // Optional: complete-accounting's run50-recount.json for the uniform
+    // sampler's priced-but-excluded work U and unpriced native op counts B.
+    let rc = recount.map(parse);
+    let gae = rc.as_ref().and_then(|r| r.get("gae_bitops").f()).unwrap_or(0.0);
+    let ub = |mode: &str| -> Option<(f64, f64)> {
+        let r = rc.as_ref()?;
+        let a = r.get("arms").arr().iter().find(|a| a.get("mode").s() == mode)?;
+        Some((a.get("U_uniform_known_native_priced_bitops").f()?, a.get("B_unpriced_native_ops").f()?))
+    };
     // Independent residual streams (successes, residuals): Run50 original IC,
     // Run50 shared graph stream (counted once), nagao-e2e seed 401.
     let streams = [("run50-original-ic", 2u64, 1728u64), ("run50-graph-shared", 2, 3415), ("nagao-e2e-seed401", 2, 1506)];
@@ -383,6 +396,11 @@ fn run50(dir: &str, prod: &str, traced: &str) {
         let descent = o.get("phases").arr().iter().find(|p| p.get("phase").s() == "descent").unwrap().get("observed_incomplete_bitops").f().unwrap();
         let per_res = descent / resid;
         let non_descent = total - descent;
+        let band: Vec<(f64, f64)> = match ub(mode) {
+            Some((u, b)) => [0.0, 0.1, 1.0].iter().map(|w| (*w, non_descent + u + w * b * gae)).collect(),
+            None => vec![],
+        };
+        BAND.with(|bb| bb.borrow_mut().push((mode.to_string(), band.clone())));
         let sc: Vec<String> = scenarios
             .iter()
             .map(|(name, en)| {
@@ -395,7 +413,8 @@ fn run50(dir: &str, prod: &str, traced: &str) {
             })
             .collect();
         rows.push((non_descent, format!(
-            "{{\"mode\":\"{mode}\",\"observed_total\":{total:.0},\"observed_descent\":{descent:.0},\"observed_residuals\":{resid:.0},\"descent_per_residual\":{per_res:.1},\"non_descent\":{non_descent:.0},\"normalised\":{{{}}}}}",
+            "{{\"mode\":\"{mode}\",\"non_descent_plus_U_plus_w_B_gae\":[{}],\"observed_total\":{total:.0},\"observed_descent\":{descent:.0},\"observed_residuals\":{resid:.0},\"descent_per_residual\":{per_res:.1},\"non_descent\":{non_descent:.0},\"normalised\":{{{}}}}}",
+            band.iter().map(|(w, v)| format!("{{\"w\":{w},\"bitops\":{v:.0}}}")).collect::<Vec<_>>().join(","),
             sc.join(",")
         )));
     }
@@ -411,6 +430,19 @@ fn run50(dir: &str, prod: &str, traced: &str) {
         let s = &r.1; let i = s.find("\"mode\":\"").unwrap() + 8; let j = s[i..].find('"').unwrap();
         format!("\"{}\"", &s[i..i + j])
     }).collect();
+    let band_rank: Vec<String> = BAND.with(|bb| {
+        let bb = bb.borrow();
+        (0..3).filter_map(|k| {
+            let mut v: Vec<(f64, String)> = bb.iter().filter(|(_, b)| b.len() == 3).map(|(m, b)| (b[k].1, m.clone())).collect();
+            if v.is_empty() { return None; }
+            v.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+            Some(format!("{{\"w\":{},\"rank_low_to_high\":[{}]}}", [0.0, 0.1, 1.0][k], v.iter().map(|x| format!("\"{}\"", x.1)).collect::<Vec<_>>().join(",")))
+        }).collect()
+    });
+    println!(
+        "{{\"schema\":\"descent-walltime.run50-band-rank/v1\",\"pcc\":\"unverified\",\"band_note\":\"MODEL ONLY: ranking by non-descent + U + w*B*GAE (U, B and GAE from complete-accounting/runs/run50-recount.json); with a common expected descent this is the normalised ranking; arms are ordered only where the order holds at w=0, 0.1 and 1 (AGENTS.md 5a)\",\"gae_bitops\":{gae},\"band_rank\":[{}]}}",
+        band_rank.join(",")
+    );
     println!(
         "{{\"schema\":\"descent-walltime.run50-normalised-model/v1\",\"pcc\":\"unverified\",\"label\":\"MODEL ONLY: descent normalised to the expected residual count; not a measurement and not a re-accounting of Run50\",\"streams\":[{}],\"pooled_successes\":{k},\"pooled_residuals\":{n},\"p_hat\":{p_hat:.6e},\"garwood95_rate\":[{:.6e},{:.6e}],\"accepted_needed\":2,\"assumptions\":[\"per-residual success probability is arm-independent (same Nagao descent code, same 509-element base size; graph arms rank 508)\",\"accepted descents needed = 2 in every arm (all Run50 arms stopped at 2)\",\"descent cost per residual is the arm's recorded mean\",\"complete_linear_stage uses this lane's counted production descent per residual on the reconstructed Run50 graph stream\",\"complete_with_traced_descent uses the traced arm plus the learning-RREF bound, as if C1 replaced production descent in every arm\"],\"observed_rank_low_to_high\":[{}],\"model_rank_low_to_high\":[{}],\"rank_note\":\"with an arm-independent expected residual count the descent term is common, so the model ranking equals the non-descent ranking for every expected count\",\"arms\":[{}]}}",
         streams.iter().map(|s| format!("{{\"stream\":\"{}\",\"successes\":{},\"residuals\":{}}}", s.0, s.1, s.2)).collect::<Vec<_>>().join(","),
@@ -425,7 +457,7 @@ fn main() {
     match a.get(1).map(String::as_str) {
         Some("ab") => ab(&a[2], &a[3], &a[4], a[5].parse().expect("rounds")),
         Some("counted") => counted(&a[2], &a[3], &a[4]),
-        Some("run50") => run50(&a[2], &a[3], &a[4]),
+        Some("run50") => run50(&a[2], &a[3], &a[4], a.get(5).map(String::as_str)),
         _ => panic!("usage: walltime_analyze ab|counted|run50 ..."),
     }
 }
