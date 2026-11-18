@@ -492,6 +492,10 @@ impl<R: Ring> Cube<R> {
     }
     /// One cube root of `a`, or None if `a` is not a cube.
     pub fn root(&self, a: R::E) -> Option<R::E> {
+        self.root_inner::<true>(a)
+    }
+    #[inline]
+    fn root_inner<const CACHED: bool>(&self, a: R::E) -> Option<R::E> {
         let r = &self.r;
         if a == r.zero() {
             return Some(a);
@@ -531,7 +535,9 @@ impl<R: Ring> Cube<R> {
         if self.s >= 3 && h == r.one() {
             return Some(x0);
         }
-        let w2 = self.w_squared;
+        // The uncached instantiation is only used as a frozen benchmark
+        // reference; const generics specialize away this branch.
+        let w2 = if CACHED { self.w_squared } else { r.sqr(self.w) };
         // For s=2, cube membership forces h into <w> of order 3.
         // The correction is c^{-d} for h=w^d, d=0,1,2.
         if self.s == 2 {
@@ -540,7 +546,7 @@ impl<R: Ring> Cube<R> {
             } else if h == self.w {
                 self.c_inv
             } else if h == w2 {
-                self.c_inv_squared
+                if CACHED { self.c_inv_squared } else { r.sqr(self.c_inv) }
             } else {
                 return None;
             };
@@ -1383,6 +1389,74 @@ mod tests {
             after.sort_by(|a,b| a.total_cmp(b));
             println!("round21 actual Rust constant inverses p={p}: {:.3} -> {:.3} ns ({:.3}x)",
                 before[6], after[6], before[6]/after[6]);
+        }
+    }
+
+
+    #[test]
+    #[ignore]
+    fn bench_round21_cached_amm_sylow_actual_rust() {
+        use std::hint::black_box;
+        use std::time::Instant;
+
+        fn sample<R: Ring>(ctx: &Cube<R>, xs: &[R::E], reps: usize, cached: bool) -> f64 {
+            let mut checksum = 0usize;
+            let st = Instant::now();
+            for _ in 0..reps {
+                for &x in xs {
+                    let result = if cached {
+                        ctx.root(black_box(x))
+                    } else {
+                        ctx.root_inner::<false>(black_box(x))
+                    };
+                    checksum ^= usize::from(black_box(result).is_some());
+                    black_box(checksum);
+                }
+            }
+            black_box(checksum);
+            st.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+        fn paired<R: Ring>(label: &str, ctx: &Cube<R>, xs: &[R::E]) {
+            for &x in xs {
+                assert_eq!(ctx.root(x), ctx.root_inner::<false>(x),
+                           "round21 cached factors {label} x={x:?}");
+            }
+            let mut before = Vec::new();
+            let mut after = Vec::new();
+            for trial in 0..13 {
+                let (b,a) = if trial % 2 == 0 {
+                    (sample(ctx,xs,32,false), sample(ctx,xs,32,true))
+                } else {
+                    let a = sample(ctx,xs,32,true);
+                    (sample(ctx,xs,32,false),a)
+                };
+                before.push(b);
+                after.push(a);
+            }
+            before.sort_by(|a,b| a.total_cmp(b));
+            after.sort_by(|a,b| a.total_cmp(b));
+            println!("round21 actual Rust AMM {label}: {:.3} -> {:.3} ns ({:.3}x)",
+                     before[6],after[6],before[6]/after[6]);
+        }
+        for p in [487, 17497, 1000000009] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let mut xs = Vec::new();
+            let mut qs = Vec::new();
+            let mut seed = 0x726f6f7466696e64u64;
+            for _ in 0..128 {
+                seed ^= seed << 13; seed ^= seed >> 7; seed ^= seed << 17;
+                let a = 1 + seed % (p - 1);
+                seed ^= seed << 13; seed ^= seed >> 7; seed ^= seed << 17;
+                let b = 1 + seed % (p - 1);
+                xs.push(a);
+                qs.push((a,b));
+            }
+            let cubes: Vec<u64> = xs.iter().map(|&x| ctx.f.mul(x,ctx.f.sqr(x))).collect();
+            let q_cubes: Vec<(u64,u64)> = qs.iter().map(|&x| ctx.cube_q.r.cube(x)).collect();
+            paired(&format!("Fp cubes p={p}"), &ctx.cube_p, &cubes);
+            paired(&format!("Fp mixed p={p}"), &ctx.cube_p, &xs);
+            paired(&format!("Fp2 cubes p={p}"), &ctx.cube_q, &q_cubes);
+            paired(&format!("Fp2 mixed p={p}"), &ctx.cube_q, &qs);
         }
     }
 
