@@ -198,3 +198,150 @@ the model puts S / rho near 103 and 143 at the same sizes: still above 100 times
 of at least 100, and the exponent difference (r^(2/3) against r^(1/2)) is not touched by any lead here. They
 are constant-factor, counted-cost improvements to the index-calculus baseline, to be reported as distance
 remaining.
+
+## Skeptic review
+
+Reviewer: a second session, 2026-11-18, reading the committed records and sources only. No experiment was run,
+no code changed. Every figure below is `[pcc:unverified]`. Scratch scripts (not committed):
+`/tmp/claude-0/-home-user/648c3177-6621-55ff-b9d8-09ead07ab678/scratchpad/skeptic_t1/m.py`. The research-kb
+and lead atlas are unreachable here too, so "already done" below means found by grep and reading, and a
+"not found" is as weak as the author's.
+
+### What I recomputed and confirmed
+
+- **S decomposition.** From `research/ic_gpu_rootfind_la_20261115/raw/out_rla.tgz` (member
+  `sessions/rf3la/records.jsonl`, arm `rf3-cpu-echelon-F*`, 6 records a cell) I got the same S, pair-table
+  build, relation-phase GAE, trials, rows, rows per trial and rank / a as the table above: S 123.8, 70.6,
+  474.5 and 246.6 M; build 3.4, 23.8, 0.9 and 6.8%; rows per trial against 1 - exp(-mu) 0.0614 / 0.0617,
+  0.3961 / 0.3993, 0.0162 / 0.0163, 0.1218 / 0.1231; rank / a 0.916 to 0.918. [pcc:unverified]
+- **Model, out of sample.** I re-implemented the first-hit model independently (`m.py`) and applied it to
+  `research/ic_gpu_rootfind_m3_20261115/results.json` (rf3 session, a = 1024 and 2048, 25 to 31 bits, 4 curves,
+  which the author did not use). Model / measured S is 0.94 to 0.99 in all 8 cells. The out-of-sample fit
+  supports Leads 1 and 2 as a description of the full-sweep arm. [pcc:unverified]
+- **Lead 1 and 2 tables.** My code reproduces the f-fraction ratios (0.55 and 0.41 at f = 1/16), the retuned
+  optima (a 3,500 / 5,600, S 37.4 M / 92.3 M, S / rho 103 / 143) and the full-sweep optima (5,500 and 8,700).
+  [pcc:unverified]
+- **Per-trial overhead.** Relations-phase adds minus lookups is 50 k a run at a = 4096 (about 1 walk
+  addition a trial plus a fixed 2,080 scalar multiplications), so the "target set-up is 1 addition a trial"
+  assumption holds. [pcc:unverified]
+
+### Problems that apply to all three leads
+
+1. **The baseline is not named, and it is not the best IC arm.** AGENTS.md ("Baseline") says the baseline is the
+   best current verified IC pipeline at that curve and size. In this repository the `ic plan` recipe (m = 2
+   pair table) is 41 to 47 times rho at 36.0 to 36.25 bits and `res2` is 2.6 to 2.7 times rho
+   (`research/ic_planner_exhaustive_20261026/README.md`, table "distance remaining"). A power-law scaling of
+   the plan row (r^(1/6)) puts it near 53 at 37.4 bits and 66 at 39.3 bits; my model of the m = 2 table,
+   S = a^2 + 0.25 r / a, gives 66 and 92 and matches the 32-bit measurement (`research/ic_oracle_setup_blocked_20261020/analysis/table-A.md`,
+   N = 1,024: 33). The leads' end points (103 and 143 for Leads 1 + 2) are still about 2 times worse than that.
+   So none of the three leads, even if confirmed, improves the best IC baseline at these sizes. They improve
+   the `rootfind-subtract:m=3` arm, a component or arm-level result. State that in the first line of each test
+   and report the gap to `plan` as well as to rho. (`res2` is, per that README, a birthday search on Z/r that
+   does not use the curve, so it is not a fair IC reference, but `plan` is.) [pcc:unverified]
+2. **Exponent.** All three keep S proportional to r^(2/3) (the note says so in "Reading the gap"). None can
+   reach T1 or T2 of `docs/ic/SUCCESS_CRITERIA.md`. They are constant-factor results.
+3. **The rho denominator is noisy.** The rho.negation S has a coefficient of variation of 0.61 to 0.68 over the
+   6 records of a cell (I computed it from the same records.jsonl); the IC arms have 0.01 to 0.03. So the
+   "S / rho" figures (194, 383, ...) carry about 25 to 28% one-sigma error from the denominator, and the
+   measured rho means are 0.97 (37.4) and 0.87 (39.3) of the theoretical 0.886 sqrt(r). Gains must be stated
+   as paired S ratios between IC arms (tight), and the rho column needs a larger ensemble or the theory value
+   with the A/A band. As written, "n = 6 rho records" cannot discriminate a 194 to 103 move in S / rho on its own.
+   [pcc:unverified]
+4. **The A/A copy proposed is not informative for S.** At fixed seeds S is deterministic per arm. The A/A that
+   matters is the spread of the new arm over seeds (1 to 3% here), plus an A/A on rho.
+
+### Lead 1 (rotating sweep fraction): keep, with revisions
+
+- **Mechanism check.** `RootfindSubtractOracle::decompose` (`src/cryptanalysis/ic_framework/plugins.rs` about
+  line 3631) sweeps every abscissa to the first hit, and `prepare` rejects every parameter except `m`, so no
+  window exists. I grepped `src` and `research` for sweep-fraction, window and partial-sweep parameters and
+  found none for this oracle. The decomposition-count argument is right: yield per probe is 2 a^2 / r
+  (3 mu / (2a)) for any window, and the per-trial overhead is small. Not a relabelling: fewer counted additions
+  for the same recovered logarithm [pcc:unverified].
+- **Revisions.**
+  - At w = 1 the gain is diluted. From `band.json` (echelon, a = 4096, 37.4 bits: S 166.6, 194.6, 446.8 at
+    w = 0, 0.1, 1) the priced items at w = 1 are the sweep adds (about 54 M), their lookups (54 M), the
+    build adds and inserts (16.8 M each) and the echelon `row_ops` (48 M). Scaling the sweep items by 0.55 and
+    keeping the build and row ops gives a w = 1 ratio near 0.67, not 0.55 (my arithmetic from the record
+    counters, not a model run). The order still holds, but the note's "S falls with the sweep" at w = 1 is too
+    strong, and linear algebra becomes about 38% of the w = 1 cost. Use the echelon arm as the baseline;
+    `incremental-gauss` has 361 M row_ops and would hide the sweep.
+  - The batched-inversion cost per trial is priced at w > 0 (the inversion count rises about four times at
+    f = 1/16: 9.5 k to about 39 k trials). Pre-register it in the falsification list.
+  - Falsification as written is good (f = 1/8 above 0.75 at a = 4096). Add the row-yield check: rows per
+    trial must equal 1 - exp(-mu (1 - (1 - f)^3)) within 5%; a miss means the window biases the matrix.
+  - The 34- and 36-bit curves are fine because the law scales with a / r^(1/3); give the a values scaled that
+    way (see Lead 2) so the grid is not run at sizes whose optimum differs.
+  - On the GPU path the lanes process 1024 targets in lockstep; a window changes the kernel launch shape. S is
+    unaffected, wall time is not claimed, so say that the test is CPU-only and counted.
+- **Rank.** 1 (largest predicted S effect on this arm, no new data structure, deterministic and cheap).
+
+### Lead 2 (size the base): revise
+
+- **Evidence it is not already done.** `size=` in all m = 3 rootfind specs is 1024, 2048, 4096 only (grep of
+  `research/ic_gpu_rootfind_*` and `ic_la_m3_20261115`). Larger bases (8k, 16k) exist only for the m = 2
+  pair table (`ic_oracle_setup_blocked_20261020`, `ic_linalg_pipeline_20261019`) and rootfind m = 2 (16,384 in
+  `ic_gpu_rootfind_ic_20261114`). The out-of-sample fit above gives some confidence in the 0.65 prediction.
+- **Defect: the test does not match the falsifier.** The falsifier is stated at 39.3 bits (a = 8192 against
+  4096), but the "cheapest test" runs 34- and 36-bit curves "with a in {3072, ..., 8192}". The optimum scales as
+  0.98 r^(1/3) (5,500 / 5,640 at 37.4 and 8,700 / 8,870 at 39.3 in the author's own numbers), so at 36 bits it
+  is near 4,000 and a = 8192 is two times past it: that test would show a loss and refute the lead for the
+  wrong reason. Either run the two existing curves of `rf3la.json` (a = 6144 and 8192 cost about 4 to 10
+  minutes a record on one CPU thread, by my scaling of the a = 4096 wall times, at 1.5 to 2.4 GiB RSS), or run
+  36-bit curves at a in {1536, 2048, 3072, 4096} and compare against the model at the same a / r^(1/3).
+- **Also.** The 37.4-bit gain is at most 9%, so only the 39.3-bit cell is a real test; the note should say the
+  lead is a tuning result (engineering), not an advance. After Lead 1 the optimum moves down (3,500 / 5,600),
+  so run Lead 2 as a grid with Lead 1, as the author already says, and do not claim Lead 2 separately.
+- **Rank.** 3 (a tuning knob, valid only as part of the Lead 1 grid).
+
+### Lead 3 (orbit-folded pair table on j = 0): revise, with a prior-art correction
+
+- **Prior art the note missed.** `src/cryptanalysis/orbit_pair_table.rs` already implements the pair table over
+  orbit representatives (key x^3 on j = 0) with an oracle that takes `m` and probes once per R - P at m = 3;
+  `research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md` section 8.6 (E12) measured it on F_p
+  j = 0 at 12.9 to 26 bits (table / 2.97, build / 2.77, probe 1.005 times, S / 1.18 on mean, because the table is
+  26% of S there), and section 6.7 (E7) measured the m = 3 fold on j = 0 (relations to full rank ratio about
+  1.4 to 7.7, mean near 3.5). The planner records the 2-summand outcome as `E_GLV` in
+  `src/cryptanalysis/ic_framework/planner.rs` ("S moves only 1.00 to 1.13"). The note classes these as
+  engineering and accounting. So "not found" is wrong, "new code in the rootfind oracle" is partly wrong (the
+  table exists, but it is not an `ic_framework` plugin: grep finds no registration), and the lead must cite and
+  reuse them.
+- **Cheaper first test, no new oracle.** `glv-orbit` returns a `FactorBase` with `col_of` and `coef_of`, and
+  `rootfind-subtract` reads only `fb.points`, `x_index` and `PairTable::build_negation_folded`, so
+  `factor_base=glv-orbit:size=...` with `oracle=rootfind-subtract:m=3` appears to run as it stands (by reading,
+  not tested). It keeps the unfolded table (about 9 a^2 additions for a orbit columns) but already divides the
+  rows needed and the number of targets by 3 at the same hit rate. By my algebra, at the same point count N
+  the unfolded arm costs exactly 3 times the fully folded one, S_u = 3 S_f, and the folded column base alone
+  gives most of it when the sweep dominates (as here, 76 to 99%). Run that arm first; the orbit table then adds
+  only the table share (divide 9 a^2 by 3). [pcc:unverified]
+- **Baseline and accounting trap.** The honest comparison is S_f against S_u, both optimised in a over the same
+  curve, with `no_fold=1` as the control (the plugin has that flag). The GLV note's own rule is that a fold
+  that moves only the relation count with its floor is accounting. The lead survives that rule only if S itself
+  falls at the best a of each arm, which my algebra predicts (1/3) and the note's 0.52 does not state clearly:
+  0.52 = (1/3) / 0.647 is S_f / rho.cubic against the generic S_u / rho.negation. Against the same-curve
+  unfolded arm and the same rho.cubic the ratio is 1/3. Report S_f / S_u, and S_f / rho.cubic as distance
+  remaining (about 0.515 x 194 = 100 at a comparable a before Lead 1; about 50 at the ideal 0.375 r^(2/3)
+  at 37.4 bits). [pcc:unverified]
+- **Curves.** `research/prime_rho_automorphism_20261015` builds crater curves with composite order and subgroup
+  r of 14 to 24 bits; it does not supply prime-order j = 0 curves of 34 to 36 bits. They need a CM
+  construction (4p = t^2 + 3 v^2, prime r with 3 | r - 1). `rho.cubic / rho.negation = 0.647 [0.543, 0.770]` is
+  from 22 to 28-bit p and its class set-up is unpriced in ecbench, so its interval (0.33 / 0.647 gives
+  0.43 to 0.61) is wide and the verdict must use §5a pricing for both arms (canonicalisation, 2 multiplications
+  a probe for x^3, is unpriced at w = 0 and cheap against an addition at w = 1).
+- **Scope.** j = 0 only; the tier rules count transfers only when fully charged. A j = 0 gain is a family
+  result and does not move the generic prime baseline.
+- **Rank.** 2 (largest possible gain, 3 times, but a family-limited result with a missing curve set and prior
+  measurements classed as engineering). Test it after the no-code `glv-orbit` run.
+
+### Ranked order
+
+1. Lead 1, as a grid with Lead 2 (sweep fraction x size), on the echelon arm, with the revisions above.
+2. Lead 3, starting with `glv-orbit` + `rootfind-subtract:m=3` + `no_fold=1` control on generated 34 to 36-bit
+   prime-order j = 0 curves, then the E12 orbit table.
+3. Lead 2 alone: fold into 1; its own claim is a tuning gain, and its test must be re-scaled.
+
+Net: the S model is sound (out-of-sample 0.94 to 0.99), the mechanisms are real, but the three leads together
+cannot take this arm below the existing `plan` baseline at these sizes (their best case, about 100 to 140 at
+37.4 to 39.3 bits against about 55 to 70 for `plan`), and no lead changes the exponent. Report them as
+arm-level constant-factor results, state the `plan` gap beside the rho gap, and do not describe them as an
+improvement of the best index-calculus baseline. [pcc:unverified]
