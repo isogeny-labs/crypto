@@ -122,7 +122,7 @@ impl Budget {
             .min(original_deadline);
         static NEXT_OWNERSHIP: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
         let ownership_id = NEXT_OWNERSHIP
-            .fetch_update(
+            .try_update(
                 std::sync::atomic::Ordering::Relaxed,
                 std::sync::atomic::Ordering::Relaxed,
                 |id| id.checked_add(1),
@@ -1171,7 +1171,7 @@ mod admission_tests {
             protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-30T00:00:00Z"});
             let bytes = serde_json::to_vec(&protocol).unwrap();
             let plan = dataset::DatasetPlan {
-                                channels: None,
+                channels: None,
                 factor_base_policies: vec![],
                 schema: "crypto.ml-dataset.plan/v1".into(),
                 field_sizes: vec![23],
@@ -1316,7 +1316,7 @@ mod mathematical_tests {
 
     fn config(n: u32, twist: bool, size: usize) -> CaseConfig {
         CaseConfig {
-                        channels: None,
+            channels: None,
             factor_base_policy: None,
             family: "koblitz".into(),
             n,
@@ -1420,7 +1420,7 @@ mod construction_tests {
 
     pub(super) fn fixture() -> MathInput {
         let config = CaseConfig {
-                        channels: None,
+            channels: None,
             factor_base_policy: None,
             family: "koblitz".into(),
             n: 23,
@@ -1819,7 +1819,7 @@ mod input_verification_tests {
         for n in [23, 31, 47, 53, 61] {
             for twist in [false, true] {
                 let config = CaseConfig {
-                                        channels: None,
+                    channels: None,
                     factor_base_policy: None,
                     family: "koblitz".into(),
                     n,
@@ -2031,7 +2031,7 @@ mod signed_prefix_tests {
         for n in [23, 31, 47, 53, 61] {
             for twist in [false, true] {
                 let cfg = CaseConfig {
-                                        channels: None,
+                    channels: None,
                     factor_base_policy: None,
                     family: "koblitz".into(),
                     n,
@@ -2203,6 +2203,10 @@ mod signed_binding_tests {
 }
 /// Checked mathematical candidate. Durable custody is a separate publication.
 pub(super) struct CheckedSignedWitness {
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     indices: [u8; 3],
     points: [(u64, u64); 3],
     target: (u64, u64),
@@ -3310,10 +3314,12 @@ mod bound_signed_publisher_tests {
         for p in value["summands"].as_array().unwrap() {
             let point = group.point(p).unwrap();
             assert!(group.on_curve(&point));
-            assert!(original
-                .signed
-                .iter()
-                .any(|&(x, y)| p["x"] == x.to_string() && p["y"] == y.to_string()));
+            assert!(original.signed.iter().any(|&(x, y)| {
+                let expected_x = x.to_string();
+                let expected_y = y.to_string();
+                p["x"].as_str() == Some(expected_x.as_str())
+                    && p["y"].as_str() == Some(expected_y.as_str())
+            }));
             sum = group.add(&sum, &point);
         }
         assert_eq!(sum, group.point(&value["target"]).unwrap());
@@ -4100,7 +4106,15 @@ struct SavedGroupReplay {
 }
 pub(super) struct VerifiedGroupReplay {
     math: VerifiedSignedMath,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_witness_check_additions: u8,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_total_additions: u64,
 }
 pub(super) fn verify_group_replay(
@@ -4484,7 +4498,15 @@ struct SavedMatrixReport {
 /// This is not a derivation certificate, full row-space check or solver verdict.
 struct MatrixAssessment {
     input_zero_assignments: usize,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     rows_checked: usize,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_native_step_complete: bool,
 }
 fn check_saved_boolean_polynomial(poly: &SavedEquation) -> Result<(), String> {
@@ -5280,10 +5302,8 @@ fn decode_boundary_record(
                 MatrixBoundaryStage::MainCandidate {
                     generator,
                     multiplier,
-                } => {
-                    if generator >= equations || multiplier > 7 {
-                        return Err("native main candidate mismatch".into());
-                    }
+                } if (generator >= equations || multiplier > 7) => {
+                    return Err("native main candidate mismatch".into());
                 }
                 _ => {}
             }
@@ -5559,8 +5579,8 @@ fn verify_boundary_stream(
                 let valid = match next_phase {
                     1 => matrix_phase == 0,
                     2 => matches!(matrix_phase, 1 | 2),
-                    3 => matches!(matrix_phase, 1 | 2 | 3),
-                    4 => matches!(matrix_phase, 1 | 2 | 3),
+                    3 => matches!(matrix_phase, 1..=3),
+                    4 => matches!(matrix_phase, 1..=3),
                     5..=7 => matrix_phase + 1 == next_phase,
                     _ => false,
                 };
@@ -5766,11 +5786,12 @@ impl serde::Serialize for AdmittedKoblitzNative<'_> {
         serde::Serialize::serialize(&self.view, serializer)
     }
 }
-impl AdmittedKoblitzNative<'_> {
-    pub(in crate::ml_dataset) fn expected_wire_bytes(&self) -> usize {
+impl super::admitted_native_payload::Sealed for AdmittedKoblitzNative<'_> {}
+impl super::AdmittedKoblitzNativePayload for AdmittedKoblitzNative<'_> {
+    fn expected_wire_bytes(&self) -> usize {
         self.expected_wire_bytes
     }
-    pub(in crate::ml_dataset) fn capture_sequence(&self) -> u64 {
+    fn capture_sequence(&self) -> u64 {
         self.view.capture_sequence
     }
 }
@@ -6429,9 +6450,21 @@ impl Budget {
     }
 }
 struct BudgetLedgerAssessment {
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_work: u64,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reported_bytes: u64,
     reported_over_limit: bool,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     completion_eligible: bool,
 }
 fn verify_budget_ledger(
@@ -6815,8 +6848,8 @@ fn run_bound_pipeline<'a>(
         let counter = std::cell::RefCell::new(global);
         out.signed = Some(enumerate_prepared_signed(
             prepared,
-            &mut |event, b| events.emit(event, b, &mut **counter.borrow_mut()),
-            &mut |witness, b| publisher.publish(witness, b, &mut **counter.borrow_mut()),
+            &mut |event, b| events.emit(event, b, &mut counter.borrow_mut()),
+            &mut |witness, b| publisher.publish(witness, b, &mut counter.borrow_mut()),
         ));
         if let Some(stop) = out.signed.as_ref().unwrap().stop {
             return Err(stop);
@@ -7622,6 +7655,10 @@ struct SavedReceipt {
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SavedPersistenceResult {
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     reason: String,
     serialized_complete: bool,
     retained_bytes: usize,
@@ -7977,8 +8014,16 @@ mod terminal_result_reader_tests {
 struct VerifiedCanonicalComponents {
     producer_ledger: SavedBudgetLedger,
     math: VerifiedCanonicalMath,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     native_boundaries: usize,
     reported_group_complete: bool,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     input_zero_assignments: usize,
 }
 /// Join canonical arithmetic, reported terminal metadata and authenticated
@@ -9121,29 +9166,30 @@ mod parent_retention_admission_tests {
         let phase = b.phase;
         let deadline = b.deadline;
         let before = (b.checking_work, b.adapter_bytes, b.trace_bytes);
-        let mut parent = ParentRetention::begin(&mut b).unwrap();
-        let r = parent.execute(
-            RetentionQuote {
-                work: 7,
-                bytes: 11,
-                trace: 13,
-            },
-            || Ok::<_, ()>("saved"),
-        );
-        assert_eq!(r.value, Some("saved"));
-        assert!(r.error.is_none() && r.stop.is_none());
-        assert_eq!(parent.budget.stopped, Some(Stop::Observer));
-        assert_eq!(parent.budget.phase, phase);
-        assert_eq!(parent.budget.deadline, deadline);
-        assert_eq!(
-            (
-                parent.budget.checking_work,
-                parent.budget.adapter_bytes,
-                parent.budget.trace_bytes
-            ),
-            (before.0 + 7, before.1 + 11, before.2 + 13)
-        );
-        drop(parent);
+        {
+            let mut parent = ParentRetention::begin(&mut b).unwrap();
+            let r = parent.execute(
+                RetentionQuote {
+                    work: 7,
+                    bytes: 11,
+                    trace: 13,
+                },
+                || Ok::<_, ()>("saved"),
+            );
+            assert_eq!(r.value, Some("saved"));
+            assert!(r.error.is_none() && r.stop.is_none());
+            assert_eq!(parent.budget.stopped, Some(Stop::Observer));
+            assert_eq!(parent.budget.phase, phase);
+            assert_eq!(parent.budget.deadline, deadline);
+            assert_eq!(
+                (
+                    parent.budget.checking_work,
+                    parent.budget.adapter_bytes,
+                    parent.budget.trace_bytes
+                ),
+                (before.0 + 7, before.1 + 11, before.2 + 13)
+            );
+        }
         assert!(matches!(ParentRetention::begin(&mut b), Err(Stop::Phase)));
         assert_eq!(b.check(Instant::now()), Err(Stop::Observer));
     }
@@ -10340,10 +10386,26 @@ fn verify_native_projection_receipt(
 }
 #[derive(Debug)]
 struct VerifiedParentDelivery {
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     producer_transition_valid: bool,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     producer_entry_anchor_verified: bool,
     delivery_complete: bool,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     root_artifacts: usize,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     capture_acknowledgements: usize,
 }
 /// Admission and original mathematical replay supply expected_before. This
@@ -10584,7 +10646,7 @@ fn verify_parent_delivery(
         if let Some(p) = producer {
             if let Some(sequence) = p.capture_sequence {
                 if committed[0].0 != sequence
-                    || p.payload_sha256.map(|h| hex::encode(h)).as_deref()
+                    || p.payload_sha256.map(hex::encode).as_deref()
                         != Some(committed[0].1.sha256.as_str())
                 {
                     return Err("producer input capture receipt mismatch".into());
@@ -12176,8 +12238,8 @@ pub(super) fn verify_worker_cell(
             input_verified = true;
         }
     }
-    if input_sha.is_none() {
-        if artifact(
+    if input_sha.is_none()
+        && artifact(
             artifacts,
             "partial-koblitz-m3-input.raw",
             "unregistered-partial-artifact",
@@ -12185,24 +12247,23 @@ pub(super) fn verify_worker_cell(
             false,
         )?
         .is_some()
+    {
+        let bytes = read_bounded(dir, "partial-koblitz-m3-input.raw", INPUT_BYTE_CAP)?;
+        // Truncated raw encoding remains raw custody, not a malformed
+        // canonical assertion. Only a full strict mathematical replay
+        // supplies a digest for subsequent terminal/group binding.
+        if verify_original_input(
+            &bytes,
+            &original,
+            &binding,
+            &public.sha256,
+            &factor.sha256,
+            limits,
+        )
+        .is_ok()
         {
-            let bytes = read_bounded(dir, "partial-koblitz-m3-input.raw", INPUT_BYTE_CAP)?;
-            // Truncated raw encoding remains raw custody, not a malformed
-            // canonical assertion. Only a full strict mathematical replay
-            // supplies a digest for subsequent terminal/group binding.
-            if verify_original_input(
-                &bytes,
-                &original,
-                &binding,
-                &public.sha256,
-                &factor.sha256,
-                limits,
-            )
-            .is_ok()
-            {
-                input_sha = Some(crate::ml_dataset::digest(&bytes));
-                raw_input_verified = true;
-            }
+            input_sha = Some(crate::ml_dataset::digest(&bytes));
+            raw_input_verified = true;
         }
     }
     let native = if canonical(KOBLITZ_SLOTS[1]) {

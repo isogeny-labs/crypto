@@ -679,7 +679,7 @@ fn install(root: &Path, source: &Path, name: &str) -> Result<Artifact, String> {
     Ok(artifact)
 }
 
-fn output_directory(root: &Path, requested: &Path) -> Result<PathBuf, String> {
+fn output_candidate(root: &Path, requested: &Path) -> Result<PathBuf, String> {
     let absolute = if requested.is_absolute() {
         requested.to_path_buf()
     } else {
@@ -710,13 +710,17 @@ fn output_directory(root: &Path, requested: &Path) -> Result<PathBuf, String> {
     if root.starts_with(&candidate) || candidate.starts_with(root) {
         return Err("coverage report must be outside its source run tree".into());
     }
-    super::checked_directory(&candidate, true)
+    Ok(candidate)
+}
+fn output_directory(root: &Path, destination: &Path) -> Result<PathBuf, String> {
+    super::checked_directory(&output_candidate(root, destination)?, true)
 }
 
 /// Hash and describe observed artifacts without scientific computation. A new
 /// snapshot requires a new destination; byte-identical retries are idempotent.
 pub fn report_run(root: &Path, destination: &Path) -> Result<Value, String> {
     let root = super::checked_directory(root, false)?;
+    output_candidate(&root, destination)?;
     let _source_lease = super::Lease::acquire(&root)?;
     super::assert_no_workers(&root)?;
     for path in ["plan.json", "protocol.json", "run.json"] {
@@ -881,6 +885,8 @@ mod tests {
             protocol["freeze"] = json!({"status":"frozen","protocol_sha256":body_hash,"filed_before_affected_data":true,"frozen_at":"2026-10-28T00:00:00Z"});
             let protocol = serde_json::to_vec(&protocol).unwrap();
             let plan = DatasetPlan {
+                channels: None,
+
                 schema: if policies.is_empty() {
                     "crypto.ml-dataset.plan/v1"
                 } else {
@@ -902,7 +908,6 @@ mod tests {
                 protocol_sha256: Some(super::super::digest(&protocol)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
                 factor_base_policies: policies,
-                channels: None,
             };
             let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":super::super::digest(&serde_json::to_vec(&plan).unwrap()),
                 "source_commit":"a".repeat(40),"binary_sha256":"b".repeat(64),"shard_index":0,"shard_count":1,
@@ -1671,9 +1676,8 @@ mod tests {
         let f = Fixture::new();
         f.sealed(0);
         let nested = f.source.join("cells/new-report");
-        assert!(report_run(&f.source, &nested)
-            .unwrap_err()
-            .contains("outside"));
+        let error = report_run(&f.source, &nested).unwrap_err();
+        assert!(error.contains("outside"), "{error}");
         assert!(!nested.exists());
         let alias = f.root.join("alias");
         std::os::unix::fs::symlink(&f.source, &alias).unwrap();
