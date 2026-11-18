@@ -91,6 +91,17 @@
       "exit": 0,
       "started_utc": "2026-11-18T20:20:51+00:00",
       "wall_s": 1582.395
+    },
+    {
+      "argv": [
+        "bash",
+        "research/genus4_prime_order_20261118/run.sh",
+        "B32"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T20:51:23+00:00",
+      "wall_s": 1282.348
     }
   ],
   "commit": "6da1e3c5b28342e2afd3a8753f844be9398bc5b8",
@@ -108,9 +119,142 @@
     "platform": "Linux-6.18.44-fc-v595-x86_64-with-glibc2.39"
   },
   "id": "20261118T1652Z-genus4-prime-order",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 60,
+      "name": "x_over_ideal_negation_w1_p16411",
+      "note": "[pcc:unverified] reference sqrt(pi r/4) ideal negation rho, prime-order genus-4 Jacobians",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.9949237570204839,
+        1.0023446412815091
+      ],
+      "unit": "ratio",
+      "value": 0.998658198228236
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 60,
+      "name": "xstar_over_ideal_negation_w1_p16411",
+      "note": "[pcc:unverified] reference sqrt(pi r/4) ideal negation rho, prime-order genus-4 Jacobians",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.871708656890283,
+        0.8797115608352073
+      ],
+      "unit": "ratio",
+      "value": 0.8759164341231793
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 60,
+      "name": "x_over_ideal_negation_w1_p32771",
+      "note": "[pcc:unverified] reference sqrt(pi r/4) ideal negation rho, prime-order genus-4 Jacobians",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.7667034561805969,
+        0.7717819199761331
+      ],
+      "unit": "ratio",
+      "value": 0.7692901822734871
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 60,
+      "name": "xstar_over_ideal_negation_w1_p32771",
+      "note": "[pcc:unverified] reference sqrt(pi r/4) ideal negation rho, prime-order genus-4 Jacobians",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.6382939078878485,
+        0.6413844341589613
+      ],
+      "unit": "ratio",
+      "value": 0.6398675544584828
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "xstar_slope_vs_ideal_negation_w1",
+      "note": "[pcc:unverified] d ln(IC/rho_neg)/d ln p between 16411 and 32771",
+      "reference": 0.0,
+      "reference_kind": "baseline",
+      "spread": [
+        -0.4621696937194344,
+        -0.4455310511122419
+      ],
+      "unit": "ratio",
+      "value": -0.45403853847632314
+    }
+  ],
   "problem": "prime-field-chained-transfer-no-advantage",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 5643,
+      "path": "research/genus4_prime_order_20261118/a_cc1.4.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/82/82bbe8880aa8070f47b3a4e4fe39f2df6398feadb44eeab429cc44e329b190a3",
+      "sha256": "82bbe8880aa8070f47b3a4e4fe39f2df6398feadb44eeab429cc44e329b190a3",
+      "uploaded": false
+    },
+    {
+      "bytes": 5680,
+      "path": "research/genus4_prime_order_20261118/a_cc2.0.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/14/145dea537cdd36721b2afc5a9d0d308707ae0634314e20665f6e031accc501e4",
+      "sha256": "145dea537cdd36721b2afc5a9d0d308707ae0634314e20665f6e031accc501e4",
+      "uploaded": false
+    },
+    {
+      "bytes": 5784,
+      "path": "research/genus4_prime_order_20261118/a_cc2.8.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/38f9f45b6848a3bc4f9d89d06586b7558dc867a4a68fbaff3942740a5e28d6fb",
+      "sha256": "38f9f45b6848a3bc4f9d89d06586b7558dc867a4a68fbaff3942740a5e28d6fb",
+      "uploaded": false
+    },
+    {
+      "bytes": 1056,
+      "path": "research/genus4_prime_order_20261118/b_p16411_q.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1e/1e53df6d533eb07bc4eaa67831158c735a0753f55de2447c5e78ccd651b0f136",
+      "sha256": "1e53df6d533eb07bc4eaa67831158c735a0753f55de2447c5e78ccd651b0f136",
+      "uploaded": false
+    },
+    {
+      "bytes": 9483,
+      "path": "research/genus4_prime_order_20261118/b_p16411_x.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/96/96b186020b8c809d241b36ae5671cf0356cd04e5924a0554bab9d85a507c5a9e",
+      "sha256": "96b186020b8c809d241b36ae5671cf0356cd04e5924a0554bab9d85a507c5a9e",
+      "uploaded": false
+    },
+    {
+      "bytes": 9341,
+      "path": "research/genus4_prime_order_20261118/b_p16411_xstar.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bd/bdec1befb18af007b07caa929b02e74e8c4d783d7bdc8988c3f8e50d12a26924",
+      "sha256": "bdec1befb18af007b07caa929b02e74e8c4d783d7bdc8988c3f8e50d12a26924",
+      "uploaded": false
+    },
+    {
+      "bytes": 9676,
+      "path": "research/genus4_prime_order_20261118/b_p32771_x.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/49/499637a37583867c1c49254c8f1913016521c16d7c6f0eb15ced5cff499b47bf",
+      "sha256": "499637a37583867c1c49254c8f1913016521c16d7c6f0eb15ced5cff499b47bf",
+      "uploaded": false
+    },
+    {
+      "bytes": 9606,
+      "path": "research/genus4_prime_order_20261118/b_p32771_xstar.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dd/dd87a5345a12aabcd2722328cf186e8eaa5eaf15f3e48ef5c289765d7430ea4a",
+      "sha256": "dd87a5345a12aabcd2722328cf186e8eaa5eaf15f3e48ef5c289765d7430ea4a",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,
