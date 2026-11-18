@@ -27,7 +27,16 @@ mod koblitz_m3;
 #[path = "binary_m3_resultant.rs"]
 mod binary_m3_resultant;
 
-pub(in crate::ml_dataset) use koblitz_m3::AdmittedKoblitzNative;
+// Bind specialized capture to the actual producer-admitted view.
+mod admitted_native_payload {
+    pub trait Sealed {}
+}
+pub(super) trait AdmittedKoblitzNativePayload:
+    serde::Serialize + admitted_native_payload::Sealed
+{
+    fn expected_wire_bytes(&self) -> usize;
+    fn capture_sequence(&self) -> u64;
+}
 
 #[path = "prime_f4_wide.rs"]
 mod prime_f4_wide;
@@ -408,20 +417,44 @@ pub(super) fn verify_and_store_worker_originals<'a>(
 /// performs no storage retry and makes no durable-publication claim.
 #[derive(Default)]
 pub(super) struct WorkerResidualCustody {
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     boolean_search: Option<koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt>,
     boolean_search_report_unavailable: bool,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     search: Option<koblitz_m3::sat_original_owner::search_worker::Custody>,
     items: Vec<WorkerResidualArtifact>,
     // Moves the existing admitted owners; no Box, sink reopening or ledger reset.
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     sat: Option<koblitz_m3::sat_original_owner::worker::Custody>,
     sat_report_unavailable: bool,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     boolean_rows: Option<koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt>,
     boolean_rows_report_unavailable: bool,
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     affine_rows: Option<koblitz_m3::sat_original_owner::affine_rows::OwnedAttempt>,
     affine_rows_report_unavailable: bool,
 }
 
 pub(super) struct WorkerResidualArtifact {
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     path: &'static str,
     bytes: Vec<u8>,
     untransferred_root: Option<super::types::Artifact>,
@@ -452,6 +485,10 @@ impl WorkerResidualCustody {
             affine_rows_report_unavailable: false,
         })
     }
+    #[allow(
+        clippy::result_large_err,
+        reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+    )]
     fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
         if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
             return Err(item);
@@ -465,6 +502,10 @@ impl WorkerResidualCustody {
     pub(super) fn boolean_rows_report_unavailable(&self) -> bool {
         self.boolean_rows_report_unavailable || self.affine_rows_report_unavailable
     }
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn affine_rows_report_unavailable(&self) -> bool {
         self.affine_rows_report_unavailable
     }
@@ -580,6 +621,10 @@ impl WorkerSolveOutput {
             },
         }
     }
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     fn from_original_boolean_rows(
         mut custody: koblitz_m3::sat_original_owner::boolean_rows::OwnedAttempt,
     ) -> Self {
@@ -679,6 +724,10 @@ impl<'a> WorkerStoredReceipts<'a> {
             capacity,
         })
     }
+    #[allow(
+        clippy::result_large_err,
+        reason = "Refusal returns the original owner and payload without a new unadmitted allocation."
+    )]
     fn push(
         &mut self,
         artifact: super::types::Artifact,
@@ -954,7 +1003,15 @@ pub(super) enum SatReplayVerdict {
 #[allow(clippy::large_enum_variant)]
 enum SatReplayOwner {
     Terminal(koblitz_m3::sat_original_owner::central::TerminalVerified),
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Outcome(koblitz_m3::sat_original_owner::central::Outcome),
+    #[allow(
+        dead_code,
+        reason = "Retains original-protocol observations or owned custody; the field is not a producer-completion authority."
+    )]
     Failed(koblitz_m3::sat_original_owner::central::Failed),
 }
 
@@ -972,6 +1029,10 @@ impl SatReplayCustody {
     pub(super) fn retained_slot_bytes() -> usize {
         std::mem::size_of::<Self>()
     }
+    #[allow(
+        dead_code,
+        reason = "Retained original-protocol checker interface; this host uses a subset of independently checked entrypoints."
+    )]
     pub(super) fn charged(&self) -> (u64, u64) {
         match &self.owner {
             SatReplayOwner::Terminal(t) => t.usage(),
@@ -2841,22 +2902,32 @@ const PRIME_CHAIN_TRACE_CAP: &str = "prime F4 chain event or byte limit reached"
 const DYNAMIC_STRATEGY: &str = "prime_f4_wide_dynamic";
 
 fn retains_canonical_artifacts(data: &SolverData) -> bool {
-    data.outcome["strategy"] == PRIME_CHAIN_STRATEGY
+    is_dynamic_strategy(&data.outcome["strategy"])
+        || data.outcome["strategy"] == PRIME_CHAIN_STRATEGY
         || data.outcome["strategy"] == prime_f4_wide::STRATEGY
         || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
         || data.outcome["strategy"] == DYNAMIC_STRATEGY
 }
 
-fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, error: &str) {
-    if data.outcome["strategy"] == prime_f4_wide::STRATEGY
+fn suppress_wide_completion_after_persistence_failure(data: &mut SolverData) -> bool {
+    let wide = is_dynamic_strategy(&data.outcome["strategy"])
+        || data.outcome["strategy"] == prime_f4_wide::STRATEGY
         || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
-        || data.outcome["strategy"] == DYNAMIC_STRATEGY
-    {
+        || data.outcome["strategy"] == DYNAMIC_STRATEGY;
+    if wide {
         data.outcome["solver_completed"] = json!(false);
-        data.outcome["status"] = json!("partial");
-        if data.outcome.get("live_persistence_errors").is_some() {
-            return;
+        if data.outcome["status"] != "partial" {
+            data.outcome["status"] = json!("partial");
         }
+    }
+    wide
+}
+
+fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, error: &str) {
+    if suppress_wide_completion_after_persistence_failure(data)
+        && data.outcome.get("live_persistence_errors").is_some()
+    {
+        return;
     }
     data.outcome["live_persistence_complete"] = json!(false);
     data.outcome["exposed_event_stream_complete"] = json!(false);
@@ -2873,9 +2944,11 @@ fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, erro
 
 fn flush_prime_chain_payloads(data: &mut SolverData) {
     if data.outcome.get("live_persistence_errors").is_some() {
+        suppress_wide_completion_after_persistence_failure(data);
         return;
     }
-    let dynamic = data.outcome["strategy"] == DYNAMIC_STRATEGY;
+    let dynamic = is_dynamic_strategy(&data.outcome["strategy"])
+        || data.outcome["strategy"] == DYNAMIC_STRATEGY;
     let failure = data.artifacts.iter().find_map(|payload| {
         let persisted = if dynamic {
             // This exact artifact has already crossed dedicated publication and
@@ -4252,17 +4325,42 @@ fn dynamic_original(
     memory_bytes: u64,
     trace_bytes: u64,
 ) -> Result<DynamicOriginal, String> {
-    use prime_f4_wide_dynamic_replay::Point as ReplayPoint;
-    if config.solver != DYNAMIC_PROFILE && !(config.solver == "f4" && (4..=15).contains(&config.m))
-        || config.family != "prime"
-        || !(33..=61).contains(&config.n)
-        || !(4..=15).contains(&config.m)
-        || !(1..=12).contains(&config.degree_bound)
-        || config.work_limit == 0
-        || memory_bytes == 0
-        || trace_bytes == 0
-    {
+    if config.solver != DYNAMIC_PROFILE || !dynamic_supported(config) {
         return Err("configuration is outside the frozen dynamic profile".into());
+    }
+    dynamic_original_inputs(config, case, memory_bytes, trace_bytes)
+}
+
+fn live_dynamic_supported(config: &CaseConfig) -> bool {
+    config.solver == "f4"
+        && config.family == "prime"
+        && (33..=61).contains(&config.n)
+        && (4..=15).contains(&config.m)
+        && (1..=12).contains(&config.degree_bound)
+        && config.work_limit > 0
+}
+
+fn dynamic_live_original(
+    config: &CaseConfig,
+    case: &CaseData,
+    memory_bytes: u64,
+    trace_bytes: u64,
+) -> Result<DynamicOriginal, String> {
+    if !live_dynamic_supported(config) {
+        return Err("configuration is outside the live dynamic profile".into());
+    }
+    dynamic_original_inputs(config, case, memory_bytes, trace_bytes)
+}
+
+fn dynamic_original_inputs(
+    config: &CaseConfig,
+    case: &CaseData,
+    memory_bytes: u64,
+    trace_bytes: u64,
+) -> Result<DynamicOriginal, String> {
+    use prime_f4_wide_dynamic_replay::Point as ReplayPoint;
+    if memory_bytes == 0 || trace_bytes == 0 {
+        return Err("dynamic profile requires positive memory and trace limits".into());
     }
     let public = &case.public_instance;
     if public["family"] != config.family
@@ -4712,6 +4810,9 @@ pub(super) fn verify_dynamic_cell(
 ) -> Result<DynamicReplayDisposition, String> {
     use super::execution;
     use prime_f4_wide::artifact;
+    if live_dynamic_supported(config) {
+        return Ok(DynamicReplayDisposition::Ordinary);
+    }
     let selected = config.solver == DYNAMIC_PROFILE;
     if !selected
         && outcome["strategy"] != DYNAMIC_STRATEGY
@@ -5021,8 +5122,6 @@ mod tests {
         assert_eq!(result.outcome["solver_completed"], false);
         assert!(result.artifacts.is_empty());
     }
-
-    use super::*;
 
     use super::*;
 
@@ -5538,6 +5637,12 @@ mod tests {
             }
             assert!(dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err());
         }
+        assert!(dynamic_live_original(&config, &case, 256 << 20, 128 << 20).is_err());
+        let mut live = config.clone();
+        live.solver = "f4".into();
+        live.degree_bound = 8;
+        assert!(dynamic_live_original(&live, &case, 256 << 20, 128 << 20).is_ok());
+        assert!(dynamic_original(&live, &case, 256 << 20, 128 << 20).is_err());
         assert!(dynamic_original(&config, &case, 0, 128 << 20).is_err());
         assert!(dynamic_original(&config, &case, 256 << 20, 0).is_err());
     }
@@ -6922,6 +7027,12 @@ mod tests {
             }
             assert!(dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err());
         }
+        assert!(dynamic_live_original(&config, &case, 256 << 20, 128 << 20).is_err());
+        let mut live = config.clone();
+        live.solver = "f4".into();
+        live.degree_bound = 8;
+        assert!(dynamic_live_original(&live, &case, 256 << 20, 128 << 20).is_ok());
+        assert!(dynamic_original(&live, &case, 256 << 20, 128 << 20).is_err());
         assert!(dynamic_original(&config, &case, 0, 128 << 20).is_err());
         assert!(dynamic_original(&config, &case, 256 << 20, 0).is_err());
     }
@@ -9229,7 +9340,7 @@ fn prime_f4_wide_dynamic(
     context: &super::execution::SolverExecutionContext,
 ) -> Result<SolverData, String> {
     use prime_f4_wide_dynamic as d;
-    let original = dynamic_original(
+    let original = dynamic_live_original(
         config,
         case,
         context.launch.memory_bytes,
@@ -9342,6 +9453,11 @@ fn verify_prime_f4_dynamic(
     outcome: &Value,
     artifacts: &[super::types::Artifact],
 ) -> Result<bool, String> {
+    // The frozen profile is authenticated by verify_dynamic_cell before this
+    // ordinary solver verifier is reached.
+    if config.solver == DYNAMIC_PROFILE {
+        return Ok(false);
+    }
     let reserved = artifacts.iter().any(|a| {
         a.path.starts_with("prime-f4-wide-dynamic-")
             || a.role.starts_with("restricted-wide-prime-dynamic-")
@@ -9363,7 +9479,7 @@ fn verify_prime_f4_dynamic(
         factor_base: super::read_json(&dir.join("factor-base.json"))?,
         private_witness: Value::Null,
     };
-    let original = dynamic_original(config, &case, launch.memory_bytes, launch.trace_bytes)?;
+    let original = dynamic_live_original(config, &case, launch.memory_bytes, launch.trace_bytes)?;
     let capture_limits = super::capture::capture_limits(launch.trace_bytes / (1024 * 1024))?;
     let verified = prime_f4_wide_dynamic_replay::verify_files(
         dir,
@@ -9516,7 +9632,8 @@ impl OwnedReplayCustody {
         outcome: &Value,
         artifacts: &[super::types::Artifact],
     ) -> OwnedReplayVerdict {
-        self.owner.revalidate(dir, config, outcome, artifacts);
+        // Revalidation records a sticky rejection in the owner; return that verdict.
+        let _ = self.owner.revalidate(dir, config, outcome, artifacts);
         self.verdict()
     }
     pub(super) fn project_identity(&mut self) -> Result<Value, String> {

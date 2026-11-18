@@ -1,0 +1,72 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261118-h115-frobenius-kummer",
+  "title": "Run the frozen H115 Frobenius--Kummer moment falsification panel",
+  "created": "2026-11-18",
+  "authors": ["ECDLP experimental research lane"],
+  "status": "blocked",
+  "status_note": "Producer, Lean proof layer and independent verifier are published before data; the managed runtime has no checkpoint upload transport or digest-pinned EKS task image.",
+  "blocked_on": [
+    "problem:problems/arity-completion-launch-gates.md shared checkpoint and EKS command-image access",
+    "pr:4625 producer draft must retain exact source revision",
+    "url:https://github.com/isogeny-labs/cryptanalysis/pull/1739 independent verifier draft must retain exact source revision"
+  ],
+  "links": {
+    "lead": "research/h115_frobenius_kummer_resolvent_20261117/README.md",
+    "notes": [
+      "research/h115_frobenius_kummer_resolvent_20261117/PROTOCOL.md",
+      "research/h115_frobenius_kummer_resolvent_20261117/PROTOCOL.json",
+      "research/h115_frobenius_kummer_resolvent_20261117/RUN_BLOCKED.md",
+      "research/h115_frobenius_kummer_resolvent_20261117/PROOF_MAP.md",
+      "research/h115_frobenius_kummer_resolvent_20261117/VERIFIER_BINDING.md"
+    ],
+    "prs": [4625]
+  },
+  "question": "Does one unchanged predicate in the frozen 648-member H115 family give an exact scalar digit modulo six on all 15 rows and decode all 366 toy-curve targets?",
+  "decision_value": "A nonempty independently verified 15-row exact-ID intersection advances the candidate to larger out-of-sample cohorts and a uniform moment-computation proof obligation; an empty intersection rejects this frozen low-order resolvent-moment family.",
+  "protocol": {"path": null, "blob": null},
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "research/h115-frobenius-kummer-resolvent-freeze",
+    "build": [["rustc", "--edition=2021", "-D", "warnings", "research/h115_frobenius_kummer_resolvent_20261117/h115_producer.rs", "-o", "/tmp/h115_producer"]]
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": 1,
+    "est_wall_hours": 1,
+    "notes": "The frozen execution deadline is 1,800 seconds and budget is USD 1.00. Integer-hour estimates round that ceiling upward; they are planning limits, not observed runtime. Zero scientific retries are allowed."
+  },
+  "run": {
+    "argv": ["/tmp/h115_producer", "--run", "{out}/h115.jsonl", "--inputs", "research/h115_frobenius_kummer_resolvent_20261117"],
+    "env": {"RUST_BACKTRACE": "1"},
+    "timeout_per_shard_s": 1800
+  },
+  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
+  "checkpoint": {"file": null, "resume_flag": null},
+  "outputs": {
+    "result_schema": "h115.raw/v1",
+    "verify": ["python3", "h115_verify.py", "--verify", "{out}/h115.jsonl"],
+    "land": "research/h115_frobenius_kummer_resolvent_20261117/results"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": ["XP-20261118-h115-frobenius-kummer"],
+    "ttl_s": 3600,
+    "env": {
+      "name": "crypto-h115-frobenius-kummer",
+      "recipe": "Build a UID-1000-compatible digest-pinned Isolab image from crypto producer source revision 6d8def5473 and retain cryptanalysis verifier revision ed206d8d for independent output verification."
+    },
+    "exec": {"cpus": 2, "memory_mb": 4096, "timeout_s": 1800, "sandbox": "auto", "publish": "runs/XP-20261118-h115-frobenius-kummer"},
+    "notes": "Single exhaustive frozen run; not preemptible because the producer has no mid-run checkpoint. Do not replace it with a local scoring run. Promotion to ready must copy/freeze the existing protocol in this card, pin merged source commits and bind the runnable independent verifier.",
+    "funding": {
+      "units": 131072,
+      "rationale": "Lower seed-card level: one bounded toy-cohort falsification with complete producer and verifier source, but no generic-speedup claim."
+    }
+  },
+  "owner_hint": "authorized Isolab EKS experimental runner"
+}

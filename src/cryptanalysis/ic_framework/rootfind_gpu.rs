@@ -390,12 +390,13 @@ struct NativeSweep {
     pool: rayon::ThreadPool,
     /// `simd=ifma`: eight targets a step in AVX-512 IFMA lanes; the probe
     /// set then holds canonical abscissae instead of Montgomery forms.
+    #[cfg(target_arch = "x86_64")]
     ifma: Option<ifma::Ifma52>,
 }
 
 impl NativeSweep {
     /// `probe`: the probe set's abscissae in Montgomery form, or canonical
-    /// when `simd` (then [`ifma::Ifma52`] sweeps).
+    /// when `simd` (then the AVX-512 IFMA backend sweeps).
     fn new(
         f: Fp64,
         reps: &[SweepRep],
@@ -403,6 +404,14 @@ impl NativeSweep {
         threads: usize,
         simd: bool,
     ) -> Result<Self, String> {
+        #[cfg(not(target_arch = "x86_64"))]
+        if simd {
+            return Err(
+                "rootfind-subtract-gpu: simd=ifma needs AVX-512 IFMA on this host and p < 2^52"
+                    .into(),
+            );
+        }
+        #[cfg(target_arch = "x86_64")]
         let ifma = if simd {
             let xs: Vec<u64> = reps.iter().map(|r| f.from_mont(r.x)).collect();
             let ys: Vec<u64> = reps.iter().map(|r| f.from_mont(r.y)).collect();
@@ -435,6 +444,7 @@ impl NativeSweep {
             slots,
             shift,
             pool,
+            #[cfg(target_arch = "x86_64")]
             ifma,
         })
     }
@@ -497,6 +507,7 @@ impl NativeSweep {
 
     fn sweep(&self, pts: &[PrimePoint]) -> Vec<Hits> {
         use rayon::prelude::*;
+        #[cfg(target_arch = "x86_64")]
         if let Some(v) = &self.ifma {
             return self.pool.install(|| {
                 pts.par_chunks(ifma::LANES)
@@ -522,6 +533,7 @@ impl NativeSweep {
 /// in AVX-512 IFMA lanes, one target a lane, each with its own batched
 /// inversion over the base's abscissae; the same candidates, in the same
 /// order, as [`NativeSweep::sweep_one`].
+#[cfg(target_arch = "x86_64")]
 mod ifma {
     use super::{Hits, PrimePoint};
     #[cfg(target_arch = "x86_64")]
@@ -1573,8 +1585,18 @@ mod tests {
         }
     }
 
+    #[cfg(not(target_arch = "x86_64"))]
+    #[test]
+    fn ifma_request_refuses_before_allocating_a_native_sweep() {
+        let result = NativeSweep::new(Fp64::new(1_000_003), &[], &[], 1, true);
+        assert!(matches!(result, Err(message) if message.contains("needs AVX-512 IFMA")));
+    }
+
     fn ifma_present() -> bool {
+        #[cfg(target_arch = "x86_64")]
         let ok = ifma::Ifma52::new(1_000_003, &[1], &[1]).is_some();
+        #[cfg(not(target_arch = "x86_64"))]
+        let ok = false;
         if !ok {
             eprintln!("skipped: no AVX-512 IFMA on this host");
         }

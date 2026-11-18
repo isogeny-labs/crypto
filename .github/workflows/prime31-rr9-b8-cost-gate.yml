@@ -1,0 +1,80 @@
+name: Prime31 exact B8 random-residual cost gate (Rust 1.100)
+
+on:
+  push:
+    branches: [automation/prime31-rr9-b8-cost-gate-20261117]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_b8_cost_gate.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_B8_COST_GATE_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-b8-cost-gate.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_b8_cost_gate.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_B8_COST_GATE_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-b8-cost-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-b8-feasibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact proposed gate source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_rr9_b8_cost_gate.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout immutable prime31 native arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Pin Rust 1.100
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay exact gate source
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_b8_cost_gate.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Original native library and new gate tests
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          timeout -k 10 300 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_b8_cost_gate
+          cargo +1.100.0 build --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_b8_cost_gate
+      - name: Produce exact-source receipt and assert boundary
+        run: |
+          timeout -k 10 300 prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_b8_cost_gate > prime31-rr9-b8-cost-gate.json
+          jq -e '
+            .schema == "prime31.rr9.b8-cost-gate.v1" and
+            .curve_p == 2147483647 and .curve_n == 2147446831 and
+            .first_eight_base_x == [0,1,2,3,5,6,8,9] and
+            .b8_sign_masks_enumerated == 256 and
+            .b8_distinct_group_sums == 256 and
+            .probability_uniform_residual_numerator == 256 and
+            .probability_uniform_residual_denominator == 2147446831 and
+            .single_success_expected_draws_numerator == 2147446831 and
+            .eight_success_expected_draws_numerator == 17179574648 and
+            .expected_draws_denominator == 256 and
+            .hypothetical_eight_success_max_ns_per_attempt > 2.53 and
+            .hypothetical_eight_success_max_ns_per_attempt < 2.54 and
+            .complete_unknown_prime31_logs == 0 and
+            .is_complete_ecdlp_benchmark == false and
+            .pcc == "unverified"
+          ' prime31-rr9-b8-cost-gate.json
+      - name: Archive receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-b8-cost-gate
+          path: prime31-rr9-b8-cost-gate.json
+          if-no-files-found: warn
+          retention-days: 30

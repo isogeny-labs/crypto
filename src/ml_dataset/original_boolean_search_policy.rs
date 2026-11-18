@@ -14,11 +14,17 @@ pub(in crate::ml_dataset::solvers) enum ProposedPolicy {
 /// Additional committed-batch hook attempts only. Existing initial,
 /// post-exclusion and final snapshots remain under global capture limits.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(super) struct CheckpointCadence {pub every_batches:u64,pub max_snapshots:u64}
-fn checkpoint_for(policy:ProposedPolicy)->Option<CheckpointCadence>{
+pub(in crate::ml_dataset::solvers) struct CheckpointCadence {
+    pub every_batches: u64,
+    pub max_snapshots: u64,
+}
+fn checkpoint_for(policy: ProposedPolicy) -> Option<CheckpointCadence> {
     match policy {
-        ProposedPolicy::ConservativeAffineEnvelopeV1=>None,
-        ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1=>Some(CheckpointCadence{every_batches:1,max_snapshots:16}),
+        ProposedPolicy::ConservativeAffineEnvelopeV1 => None,
+        ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1 => Some(CheckpointCadence {
+            every_batches: 1,
+            max_snapshots: 16,
+        }),
     }
 }
 
@@ -35,21 +41,21 @@ const CHECKER_CAPS: [u64; 9] = [
 ];
 
 fn eligible(config: &CaseConfig, policy: ProposedPolicy) -> bool {
-    super::super::owned_search_worker::selection(config).is_some_and(|(_,chosen)|chosen==policy)
+    super::super::owned_search_worker::selection(config).is_some_and(|(_, chosen)| chosen == policy)
 }
 /// Called by the consuming entry only after its existing setup reservation and
 /// actual sink/attempt checks, before it moves the original fields. The caller
 /// performs a final Budget::check after this bounded, allocation-free factory.
-pub(super) fn for_owner(
-    owner: &OriginalOwner<'_>,
-    policy: ProposedPolicy,
-) -> Result<Caps, Stop> {
+pub(super) fn for_owner(owner: &OriginalOwner<'_>, policy: ProposedPolicy) -> Result<Caps, Stop> {
     if !eligible(owner.original.config, policy)
-        || super::super::owned_search_worker::selection(owner.original.config).map(|(pattern,_)|pattern)!=owner.pattern {
+        || super::super::owned_search_worker::selection(owner.original.config)
+            .map(|(pattern, _)| pattern)
+            != owner.pattern
+    {
         return Err(Stop::InvalidLimits);
     }
-    let mut caps=from_budget(&owner.budget, owner.original.config.degree_bound)?;
-    caps.checkpoint=checkpoint_for(policy);
+    let mut caps = from_budget(&owner.budget, owner.original.config.degree_bound)?;
+    caps.checkpoint = checkpoint_for(policy);
     Ok(caps)
 }
 
@@ -112,7 +118,7 @@ fn from_budget(budget: &Budget, requested_degree: u32) -> Result<Caps, Stop> {
         caps: checker_caps,
     };
     Ok(Caps {
-        checkpoint:None,
+        checkpoint: None,
         expansion: equations::Limits {
             variables: COUNT_MAX as u32,
             generators: count,
@@ -169,15 +175,30 @@ mod tests {
 
     fn budget() -> Budget {
         let now = Instant::now();
-        Budget::new(100_000, 64 * 1024 * 1024, 1024, now + Duration::from_secs(30), now)
-            .unwrap()
+        Budget::new(
+            100_000,
+            64 * 1024 * 1024,
+            1024,
+            now + Duration::from_secs(30),
+            now,
+        )
+        .unwrap()
     }
 
     #[test]
     fn inherited_envelope_caps_every_private_limit_without_changing_owner() {
         let b = budget();
-        let before = (b.ownership_id, b.deadline, b.construction_deadline, b.phase,
-            b.native, b.phase_native, b.checking_work, b.adapter_bytes, b.additions);
+        let before = (
+            b.ownership_id,
+            b.deadline,
+            b.construction_deadline,
+            b.phase,
+            b.native,
+            b.phase_native,
+            b.checking_work,
+            b.adapter_bytes,
+            b.additions,
+        );
         let c = from_budget(&b, 100).unwrap();
         assert_eq!(c.expansion.work, WORK_MAX);
         assert_eq!(c.expansion.bytes, BYTES_MAX);
@@ -189,8 +210,20 @@ mod tests {
         assert_eq!(c.continuation.search.native.batches, COUNT_MAX);
         assert_eq!(c.continuation.audit.certificate.wire, WIRE_MAX);
         assert_eq!(c.continuation.audit.checker.caps, CHECKER_CAPS);
-        assert_eq!(before, (b.ownership_id, b.deadline, b.construction_deadline, b.phase,
-            b.native, b.phase_native, b.checking_work, b.adapter_bytes, b.additions));
+        assert_eq!(
+            before,
+            (
+                b.ownership_id,
+                b.deadline,
+                b.construction_deadline,
+                b.phase,
+                b.native,
+                b.phase_native,
+                b.checking_work,
+                b.adapter_bytes,
+                b.additions
+            )
+        );
     }
 
     #[test]
@@ -208,15 +241,20 @@ mod tests {
         assert_eq!(c.continuation.audit.certificate.wire, 200);
         for (index, cap) in c.continuation.audit.checker.caps.into_iter().enumerate() {
             assert!(cap <= CHECKER_CAPS[index]);
-            assert!(cap <= if index == bqi::Resource::AllocationBytes as usize {200} else {100});
+            assert!(
+                cap <= if index == bqi::Resource::AllocationBytes as usize {
+                    200
+                } else {
+                    100
+                }
+            );
         }
     }
 
     #[test]
     fn original_quarter_memory_ceiling_is_preserved_before_construction() {
         let now = Instant::now();
-        let b = Budget::new(100_000, 4000, 1024, now + Duration::from_secs(30), now)
-            .unwrap();
+        let b = Budget::new(100_000, 4000, 1024, now + Duration::from_secs(30), now).unwrap();
         let c = from_budget(&b, 3).unwrap();
         assert_eq!(c.expansion.bytes, 1000);
         assert_eq!(c.continuation.bytes, 4000);
@@ -240,16 +278,44 @@ mod tests {
     }
 
     #[test]
-    fn legacy_has_no_batch_hook_and_new_policy_is_finite(){
-        assert_eq!(checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeV1),None);
-        assert_eq!(checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1),Some(CheckpointCadence{every_batches:1,max_snapshots:16}));
+    fn legacy_has_no_batch_hook_and_new_policy_is_finite() {
+        assert_eq!(
+            checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeV1),
+            None
+        );
+        assert_eq!(
+            checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1),
+            Some(CheckpointCadence {
+                every_batches: 1,
+                max_snapshots: 16
+            })
+        );
     }
     #[test]
-    fn cadence_selection_cannot_mutate_arithmetic_or_owner_allowance(){
-        let b=budget();let mut c=from_budget(&b,3).unwrap();
-        let before=(c.expansion.work,c.expansion.bytes,c.continuation.work,c.continuation.bytes,b.native,b.checking_work,b.deadline);
-        c.checkpoint=checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1);
-        assert_eq!(before,(c.expansion.work,c.expansion.bytes,c.continuation.work,c.continuation.bytes,b.native,b.checking_work,b.deadline));
+    fn cadence_selection_cannot_mutate_arithmetic_or_owner_allowance() {
+        let b = budget();
+        let mut c = from_budget(&b, 3).unwrap();
+        let before = (
+            c.expansion.work,
+            c.expansion.bytes,
+            c.continuation.work,
+            c.continuation.bytes,
+            b.native,
+            b.checking_work,
+            b.deadline,
+        );
+        c.checkpoint = checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1);
+        assert_eq!(
+            before,
+            (
+                c.expansion.work,
+                c.expansion.bytes,
+                c.continuation.work,
+                c.continuation.bytes,
+                b.native,
+                b.checking_work,
+                b.deadline
+            )
+        );
     }
-
 }
