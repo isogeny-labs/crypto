@@ -1022,9 +1022,47 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | scalar-five coordinate extension degree is twenty-five | exact degree assembly | H116 | rational function field | same plus `5 != 0` |
 | singular scalar-five pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 7` | none |
 
+## Generic two-factor EDS bootstrap gate
+
+1. **Structure above.** In an arbitrary commutative ring, suppose
+   `c=b*s^2-a^3`, with `a` coprime to `b` and `s`, and `b` coprime to `c`.
+   Put `t=c-b^2`. The next recurrence-shaped pair is
+   `d=a*t` and `e=c*a^3-b^3*s^2`. The defining identity rewrites the second
+   element as `e=(a^3-b^2)*t-b^4`. Coprimality with `a` and `t` follows
+   separately, hence `d` and `e` are coprime.
+2. **Theorems used as stated.** Only Mathlib's generic `IsCoprime` product,
+   power, symmetry, and subtract-multiple equivalences plus commutative-ring
+   normalization are used. No elliptic object or polynomial-specific result
+   occurs in the theorem.
+3. **Object as an instance.** The scalar-six construction instantiates
+   `a=Psi3`, `b=prePsi4`, `c=prePsi5`, and `s=Psi2Sq`. Its recurrence formulas
+   identify `d=prePsi6` and `e=prePsi7`, so the curve-specific adjacent proof
+   becomes a direct application of this generic law.
+4. **Assembly probe.** The generic theorem and its integer mutation first
+   elaborated in a temporary importing module. Scalar six was then refactored
+   as a direct instance. The tracked project completed all 3,162 build jobs;
+   the exact repository auditor reports
+   `186 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This packages one binary EDS recurrence
+   stencil. An arbitrary-index proof must show that recursive subproblems
+   always provide its three base coprimality premises or supply companion
+   stencils for the other parity branches. [pcc:unverified]
+6. **Inheritance table.** All ring and coprimality laws are inherited from
+   Mathlib. H116 supplies their composition. The mutation
+   `a=2,b=1,s=2,c=-4` retains `a` coprime to `b` and `b` coprime to `c` but
+   produces `d=-10,e=-36`, which are not coprime; thus the `a`/`s` premise
+   cannot be dropped.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| recurrence-shaped pair `d,e` is coprime | generic algebraic law | H116 over Mathlib `IsCoprime` | arbitrary commutative ring | `c=b*s^2-a^3`, `a` coprime to `b,s`, `b` coprime to `c` |
+| dropping `a` coprime to `s` is unsound | negative mutation | H116 integer arithmetic | fixed integer tuple | retained two pair premises only |
+
 ## Scalar-six two-factor bootstrap gate
 
-1. **Structure above.** Set `t=prePsi5-prePsi4^2`. The even recurrence gives
+1. **Structure above.** Instantiate the preceding generic gate with
+   `a=Psi3`, `b=prePsi4`, `c=prePsi5`, and `s=Psi2Sq`. Set
+   `t=prePsi5-prePsi4^2`. The even recurrence gives
    `prePsi6=Psi3*t`.  The next odd recurrence initially gives
    `prePsi7=prePsi5*Psi3^3-prePsi4^3*Psi2Sq^2`; using the scalar-five
    identity, H116 rewrites this exactly as

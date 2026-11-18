@@ -1575,6 +1575,48 @@ theorem shortWeierstrassScalarFive_singular_control :
     WeierstrassCurve.Ψ₂Sq, WeierstrassCurve.b₂, WeierstrassCurve.b₄,
     WeierstrassCurve.b₆, WeierstrassCurve.b₈] at heval
 
+/-- Generic two-factor EDS bootstrap.  The recurrence-shaped pair remains
+coprime whenever the three smaller base pairs are coprime. -/
+theorem edsTwoFactorBootstrap_isCoprime
+    {R : Type*} [CommRing R] (a b c s : R)
+    (hc : c = b * s ^ 2 - a ^ 3)
+    (hab : IsCoprime a b) (has : IsCoprime a s)
+    (hbc : IsCoprime b c) :
+    IsCoprime (a * (c - b ^ 2)) (c * a ^ 3 - b ^ 3 * s ^ 2) := by
+  let t := c - b ^ 2
+  let d := a * t
+  let e := c * a ^ 3 - b ^ 3 * s ^ 2
+  have heAlt : e = (a ^ 3 - b ^ 2) * t - b ^ 4 := by
+    dsimp [e, t]
+    rw [hc]
+    ring
+  have hea : IsCoprime e a := by
+    dsimp [e]
+    rw [show c * a ^ 3 - b ^ 3 * s ^ 2 =
+        (c * a ^ 2) * a - b ^ 3 * s ^ 2 by ring,
+      IsCoprime.mul_sub_right_left_iff]
+    exact hab.symm.pow_left.mul_left (has.symm.pow_left)
+  have hbt : IsCoprime b t := by
+    apply IsCoprime.symm
+    dsimp [t]
+    rw [show c - b ^ 2 = c - b * b by ring,
+      IsCoprime.sub_mul_left_left_iff]
+    exact hbc.symm
+  have het : IsCoprime e t := by
+    rw [heAlt, IsCoprime.mul_sub_right_left_iff]
+    exact hbt.pow_left
+  change IsCoprime d e
+  dsimp [d]
+  exact hea.symm.mul_left het.symm
+
+/-- Mutation control for the generic bootstrap: retaining `a` coprime to `b`
+and `b` coprime to `c` does not compensate for omitting `a` coprime to `s`. -/
+theorem edsTwoFactorBootstrap_missingAS_control :
+    IsCoprime (2 : ℤ) 1 ∧ IsCoprime (1 : ℤ) (-4) ∧
+      ¬IsCoprime (2 * ((-4) - 1 ^ 2))
+        ((-4) * 2 ^ 3 - 1 ^ 3 * 2 ^ 2) := by
+  norm_num [IsCoprime]
+
 /-- The first two-factor recurrence bootstrap: `prePsi6=Psi3*t`, while an
 alternate exact expression for `prePsi7` is a multiple of `t` minus
 `prePsi4^4`. -/
@@ -1585,7 +1627,6 @@ theorem shortWeierstrass_prePsiSixSeven_isCoprime
     let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
     IsCoprime (W.preΨ' 6) (W.preΨ' 7) := by
   let W : WeierstrassCurve F := WeierstrassCurve.mk 0 0 0 A B
-  let t : Polynomial F := W.preΨ' 5 - W.preΨ₄ ^ 2
   have h34 : IsCoprime W.Ψ₃ W.preΨ₄ :=
     shortWeierstrass_prePsiThreeFour_isCoprime A B hdisc h2
   have h45 : IsCoprime W.preΨ₄ (W.preΨ' 5) :=
@@ -1595,40 +1636,18 @@ theorem shortWeierstrass_prePsiSixSeven_isCoprime
   have h5 : W.preΨ' 5 = W.preΨ₄ * W.Ψ₂Sq ^ 2 - W.Ψ₃ ^ 3 := by
     rw [show 5 = 2 * (0 + 2) + 1 by norm_num, WeierstrassCurve.preΨ'_odd]
     simp
-  have h6 : W.preΨ' 6 = W.Ψ₃ * t := by
+  have h6 : W.preΨ' 6 = W.Ψ₃ * (W.preΨ' 5 - W.preΨ₄ ^ 2) := by
     rw [show 6 = 2 * (0 + 3) by norm_num, WeierstrassCurve.preΨ'_even]
-    simp [t]
+    simp
     ring
   have h7 : W.preΨ' 7 =
       W.preΨ' 5 * W.Ψ₃ ^ 3 - W.preΨ₄ ^ 3 * W.Ψ₂Sq ^ 2 := by
     rw [show 7 = 2 * (1 + 2) + 1 by norm_num, WeierstrassCurve.preΨ'_odd]
     norm_num
-  have h7alt : W.preΨ' 7 =
-      (W.Ψ₃ ^ 3 - W.preΨ₄ ^ 2) * t - W.preΨ₄ ^ 4 := by
-    rw [h7]
-    dsimp [t]
-    rw [h5]
-    ring
-  have h7three : IsCoprime (W.preΨ' 7) W.Ψ₃ := by
-    rw [h7, show W.preΨ' 5 * W.Ψ₃ ^ 3 -
-        W.preΨ₄ ^ 3 * W.Ψ₂Sq ^ 2 =
-      (W.preΨ' 5 * W.Ψ₃ ^ 2) * W.Ψ₃ -
-        W.preΨ₄ ^ 3 * W.Ψ₂Sq ^ 2 by ring,
-      IsCoprime.mul_sub_right_left_iff]
-    exact h34.symm.pow_left.mul_left (h3two.symm.pow_left)
-  have h4t : IsCoprime W.preΨ₄ t := by
-    apply IsCoprime.symm
-    dsimp [t]
-    rw [show W.preΨ' 5 - W.preΨ₄ ^ 2 =
-      W.preΨ' 5 - W.preΨ₄ * W.preΨ₄ by ring,
-      IsCoprime.sub_mul_left_left_iff]
-    exact h45.symm
-  have h7t : IsCoprime (W.preΨ' 7) t := by
-    rw [h7alt, IsCoprime.mul_sub_right_left_iff]
-    exact h4t.pow_left
   dsimp only
-  rw [h6]
-  exact h7three.symm.mul_left h7t.symm
+  rw [h6, h7]
+  exact edsTwoFactorBootstrap_isCoprime W.Ψ₃ W.preΨ₄
+    (W.preΨ' 5) W.Ψ₂Sq h5 h34 h3two h45
 
 /-- Scalar six has no numerator/denominator cancellation on every nonsingular
 short curve outside characteristic two. -/
@@ -3895,6 +3914,8 @@ theorem rationalMap_separation_strict_control :
 #print axioms shortWeierstrassScalarFive_isCoprime
 #print axioms shortWeierstrassScalarFive_extension_degree
 #print axioms shortWeierstrassScalarFive_singular_control
+#print axioms edsTwoFactorBootstrap_isCoprime
+#print axioms edsTwoFactorBootstrap_missingAS_control
 #print axioms shortWeierstrass_prePsiSixSeven_isCoprime
 #print axioms shortWeierstrassScalarSix_isCoprime
 #print axioms shortWeierstrassScalarSix_extension_degree

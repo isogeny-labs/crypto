@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-cfb04cab53080f20398ca34c74dee29c66c63a45521d9b53db6ad1d28013ac06  H116FiberTrace.lean
+82d5661e279a08db3f21a19d19ad7fb81280232a9ab2cde427586918650f9cdc  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  184 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  186 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -90,6 +90,9 @@ fc6bd72d5b93ee2d369243a94342a924ab1a640e60b08f6b5c0006037822a3c1  receipts/scala
 7f9ddfb534f85f11e68a751767bc5e3a5f8dd410d24404b248183a3048b3725a  receipts/scalar-six-bootstrap-build.txt
 04b9838bc270b57f7cc9cebdcef7f50dba2783257cfea30e217d750e8a185d8e  receipts/scalar-six-bootstrap-full-build.txt
 4d709be2432832e9635842df1f72edee24f07792482475f54a6e5b02bf9b4a1a  receipts/scalar-six-bootstrap-audit.txt
+a74ee17eea454b66f6fc1e3f8acd75fd7de2bfa723c56a9b9193a3858bc4ca8c  receipts/generic-two-factor-bootstrap-build.txt
+988f903ed14a3cda6f1ba517dc407c00957773c6bdb73bce3dc2055244832238  receipts/generic-two-factor-bootstrap-full-build.txt
+aeffe27752d9cd4d28b01dcf47992e3b5b5e11396627debbc60ffb685361db05  receipts/generic-two-factor-bootstrap-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -406,6 +409,14 @@ certificates then prove the adjacent pair coprime. This assembles
 outside characteristics two and three. The singular `A=B=0` control over
 `ZMod 7` is non-coprime. The factorization is a candidate invariant for an
 arbitrary-index proof, which remains open. [pcc:unverified]
+
+The 186-theorem checkpoint abstracts that scalar-six argument to an arbitrary
+commutative ring. If `c=b*s^2-a^3`, `a` is coprime to `b` and `s`, and `b` is
+coprime to `c`, then `a*(c-b^2)` is coprime to
+`c*a^3-b^3*s^2`. Scalar six is now a direct instance. The integer mutation
+`a=2,b=1,s=2,c=-4` retains the other pair premises but yields `-10,-36`,
+proving that `a` coprime to `s` is essential. Companion recurrence stencils
+and recursive preservation of all premises remain open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made
