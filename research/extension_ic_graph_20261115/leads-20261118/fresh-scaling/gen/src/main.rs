@@ -6,6 +6,9 @@
 //!   fresh-scaling-gen batch --nonce HEX --sizes P1,P2,.. --n N [--kind K] [--start I0] --out DIR
 //!   fresh-scaling-gen check FILE...           (public.json files; exit 1 on any failure)
 //!   fresh-scaling-gen estimate [--sizes ..] [--n N]
+//!   fresh-scaling-gen nonce --protocol-sha256 H --commit C --drand-round R --drand-randomness X
+//!   fresh-scaling-gen pilot-nonce --protocol-sha256 H
+//!   fresh-scaling-gen seed --nonce N --p P --index I --role ROLE   (worker seed, u64 >> 1)
 //!
 //! All outputs are [pcc:unverified] producer artifacts. A planted target's
 //! scalar is written to `owner/` beside, never into, the public file.
@@ -249,12 +252,43 @@ fn main() {
             }
             std::process::exit(if bad == 0 { 0 } else { 1 });
         }
+        "nonce" => {
+            // measured-target nonce: SHA-256 over the frozen protocol hash, the
+            // commit that first contains the commitment, and a later drand round
+            let h = a.get("protocol-sha256").expect("--protocol-sha256");
+            let c = a.get("commit").expect("--commit");
+            let r = a.get("drand-round").expect("--drand-round");
+            let x = a.get("drand-randomness").expect("--drand-randomness");
+            for v in [h, c, x] {
+                assert!(v.len() >= 16 && v.chars().all(|ch| ch.is_ascii_hexdigit()), "hex inputs");
+            }
+            let pre = format!("{}|nonce|protocol={h}|commit={c}|drand-round={r}|randomness={x}", gen::SCHEME);
+            println!("{}", sha256::hex(&sha256::sha256(pre.as_bytes())));
+        }
+        "pilot-nonce" => {
+            // planted pilot/control nonce: fixed by the protocol hash alone (known-answer use only)
+            let h = a.get("protocol-sha256").expect("--protocol-sha256");
+            let pre = format!("{}|pilot-nonce|protocol={h}", gen::SCHEME);
+            println!("{}", sha256::hex(&sha256::sha256(pre.as_bytes())));
+        }
+        "seed" => {
+            // derived per-row worker seed (u64) for arm role R of target (nonce, p, index)
+            let nonce = a.get("nonce").expect("--nonce");
+            let p = a.get("p").expect("--p");
+            let i = a.get("index").expect("--index");
+            let role = a.get("role").expect("--role");
+            let pre = format!("{}|seed|nonce={nonce}|p={p}|index={i}|role={role}", gen::SCHEME);
+            let d = sha256::sha256(pre.as_bytes());
+            let mut b = [0u8; 8];
+            b.copy_from_slice(&d[..8]);
+            println!("{}", u64::from_le_bytes(b) >> 1);
+        }
         "estimate" => {
             let n: u64 = a.get("n").map(|s| s.parse().unwrap()).unwrap_or(32);
             estimate(&sizes(a.get("sizes")), n);
         }
         _ => {
-            eprintln!("usage: fresh-scaling-gen gen|batch|check|estimate (see source header)");
+            eprintln!("usage: fresh-scaling-gen gen|batch|check|estimate|nonce|pilot-nonce|seed (see source header)");
             std::process::exit(2);
         }
     }

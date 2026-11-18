@@ -18,5 +18,5 @@ sed "s#LANE#$lane#g" "$here/Cargo.toml.in" > "$SCRATCH/mini3/Cargo.toml"
 cd "$SCRATCH/mini3"
 cargo test --offline --release --lib zero_dim_la::tests 2>&1 | tail -25
 cargo test --offline --release --test conservation -- --nocapture 2>&1 | tail -15
-cargo build --offline --release --bin linear_stage_recount 2>&1 | tail -3
-sha256sum src/cryptanalysis/*.rs Cargo.toml Cargo.lock "$CARGO_TARGET_DIR/release/linear_stage_recount"
+cargo build --offline --release --bin linear_stage_recount --bin accounting_recount 2>&1 | tail -3
+sha256sum src/cryptanalysis/*.rs Cargo.toml Cargo.lock "$CARGO_TARGET_DIR/release/linear_stage_recount" "$CARGO_TARGET_DIR/release/accounting_recount"
