@@ -658,6 +658,23 @@ degree alone cannot discharge it. The pinned Mathlib tree contains no elliptic-
 isogeny, dual-isogeny or morphism-degree object, so these three premises remain
 future instance obligations rather than hidden axioms. [pcc:unverified]
 
+The 134-theorem checkpoint discharges two strictly algebraic sub-obligations.
+`finiteFieldTower_degree_mul` imports the exact finite-rank tower law, and
+`finiteFieldTower_degree_eq_norm_of_paired` shows that an already-constructed
+pullback tower with equal adjacent degrees and total degree `N^2` has adjacent
+degree `N`. Separately, Mathlib's division-polynomial theorems give exact
+coordinate degrees `deg Phi_n=n^2` and `deg Psi_n^2=n^2-1`, with leading
+coefficients `(1,n^2)`, when `n` is nonzero in the coefficient field. If
+`n` instead vanishes in the field and `|n|>1`, Lean proves the denominator
+degree is strictly below `n^2-1`; a `ZMod 3` theorem records a concrete
+instance. The exhaustive frozen experiment checks the
+coordinate quotient against direct scalar multiplication on 5,058 affine
+points with zero failures and independently reproduces the characteristic
+degree collapse. Remaining obligations are the concrete function-field
+pullback tower, identification of `Phi_n/Psi_n^2` with the point/scheme map,
+coordinate degree equals morphism degree, and the duality
+`(V-1)^vee=pi-1`. [pcc:unverified]
+
 The frozen kernel x-orbit experiment tests the denominator consequence that
 point enumeration misses. For cyclic `ker(V-1)`, a rational x-root occurs when
 `(t-1)^d P=+P` or `-P`, because `x(P)=x(-P)`. All eight cells match the locked
@@ -799,7 +816,7 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
 | finite sums and coefficient extraction | Mathlib finite sums plus existing H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
 | field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
-| isogeny homomorphism, dual and degree laws | hypothesis at study endpoint; no Mathlib elliptic-isogeny or morphism-degree object was found, so finite `N,D` and paired-degree certificates are the checked interfaces; constructing the actual map, proving degree multiplicativity, `deg[N]=N^2`, `(V-1)^vee=pi-1`, and the differential formula remain open |
+| isogeny homomorphism, dual and degree laws | finite field-tower multiplication and exact division-polynomial coordinate degrees are now proved; no Mathlib elliptic-isogeny or dual object was found, so constructing the actual pullback tower, identifying the scalar coordinate quotient with the scheme map and its degree, proving `(V-1)^vee=pi-1`, and the differential formula remain open |
 | formal-group filtration of an `X^m` correction | Mathlib `FormalGroup` plus `FormalGroup.filtered_correction_prefix` and `filtered_pole_prefix`; generic layer proved |
 | `V+pi=[t]`, `F(pi,-pi)=0` in parameter coordinates, and the actual local `pi` series of order `p` | elliptic formal-group instance; endpoint identification still pending |
 | radix-six decoder | reuse H115 generic theorem after source import/binding |

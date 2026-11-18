@@ -271,6 +271,19 @@ stable rational x-maps have the same respective degrees `(7,6)`, `(5,4)` and
 right-factor subtraction and changing `[N]` to `[N+1]` reject in every cell.
 This is finite evidence for the paired-degree certificate, not a proof that
 the maps are scheme-theoretic dual isogenies. [pcc:unverified]
+The next Lean layer imports the finite field-tower degree law and Mathlib's
+exact division-polynomial degrees. For any field where `n` is nonzero,
+`Phi_n/Psi_n^2` has numerator/denominator degrees
+`(n^2,n^2-1)` and leading coefficients `(1,n^2)`. When `n` vanishes
+in the field and `|n|>1`, Lean proves the denominator degree strictly
+collapses; a `ZMod 3` control records a concrete case. The frozen
+[scalar division-polynomial experiment](SCALAR_DIVPOLY_DEGREE_EXPERIMENT.md)
+independently constructs these maps for `N=7,5,14`, matches direct scalar
+multiplication on 5,058 affine points with zero failures, and measures the
+`[p]` denominator-degree collapses `24->20`, `48->42`, and
+`120->110`. The concrete pullback tower, point-map identification,
+coordinate-to-scheme degree theorem, and duality remain open.
+[pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

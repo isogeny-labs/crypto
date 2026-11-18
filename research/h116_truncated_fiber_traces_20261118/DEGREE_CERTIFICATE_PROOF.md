@@ -17,20 +17,47 @@ For an actual elliptic curve the remaining inputs have precise meanings:
 
 | Certificate premise | Required elliptic theorem | State in pinned Mathlib |
 |---|---|---|
-| `degree (f*g)=degree f*degree g` | multiplicativity of isogeny degree | unavailable |
-| `degree [N]=N^2` | degree of scalar multiplication | unavailable |
+| `degree (f*g)=degree f*degree g` | multiplicativity of curve-map/function-field degree | proved for an already-supplied finite field tower; constructing the pullback tower from the elliptic maps remains open |
+| `degree [N]=N^2` | degree of scalar multiplication | exact coordinate degrees `deg Phi_N=N^2`, `deg Psi_N^2=N^2-1` proved when `N` is nonzero in the field; map and scheme-degree identification remain open |
 | `degree(V-1)=degree(pi-1)` | `(V-1)^vee=pi-1` and equal degree of duals | unavailable |
 
-The pinned Mathlib audit found affine/projective elliptic points and
-division-polynomial degree results, but no elliptic-isogeny type, dual isogeny,
-or morphism-degree API.  Consequently these are explicit caller obligations,
-not hidden axioms.  `degree_product_without_duality_control` checks the logical
+The pinned Mathlib audit found affine/projective elliptic points, generic finite
+field-tower degree multiplication, and exact division-polynomial coordinate
+degrees, but no elliptic-isogeny type or dual-isogeny API. H116 now exposes the
+tower law and scalar coordinate degrees directly, while keeping the concrete
+pullback tower, scalar-map identification, coordinate-to-scheme degree bridge,
+and duality as explicit caller obligations. `degree_product_without_duality_control` checks the logical
 boundary: at `N=6`, unequal degrees 4 and 9 still multiply to `N^2=36`, so the
 dual/equal-degree premise cannot be dropped.
 
 The current Lean source SHA-256 is
-`fe907f1887b4a963dcb1dafbcf3f93eac8037355c656189eacc5a227dcc2d3ca`.
-The pinned build succeeds, and the repository auditor reports 128 theorems,
+`aaf910ee4b5308db8cd07057658631bd0bb04a3390ff37f5030ab6832960ffa4`.
+The pinned build succeeds, and the repository auditor reports 134 theorems,
 zero failures and zero trusted native decisions.  This proves the implication
 from the geometric degree certificates; it does not construct those elliptic
 certificates and is not a subexponential ECDLP proof. [pcc:unverified]
+
+The six added declarations are:
+
+- `finiteFieldTower_degree_mul`, Mathlib's finite-rank tower law in the
+  orientation used by curve-map degrees;
+- `finiteFieldTower_degree_eq_norm_of_paired`, which derives either adjacent
+  degree from equal adjacent degrees and total degree `N^2`;
+- `scalarMultiplicationXMap_exact_degrees`, which exposes the exact
+  `(N^2,N^2-1)` degrees of `Phi_N/Psi_N^2` when `N` is nonzero in the
+  coefficient field;
+- `scalarMultiplicationXMap_leadingCoefficients`, which proves leading
+  coefficients `(1,N^2)`;
+- `scalarMultiplicationXMap_denominator_degree_lt_of_char_dvd`, which proves
+  a strict denominator-degree collapse whenever `N` vanishes in the field
+  and `|N|>1`;
+- `scalarMultiplicationXMap_characteristic_control`, which proves that this
+  nonvanishing premise fails for `[3]` over `ZMod 3`.
+
+The frozen scalar division-polynomial experiment independently instantiates
+the coordinate layer on eight extension-field cells. Exact degrees
+`(49,48),(25,24),(196,195)` agree with all 5,058 affine point actions, while
+the characteristic controls collapse from expected denominator degrees
+`24,48,120` to `20,42,110`. This is evidence for the coordinate bridge,
+not a proof of the remaining scheme/function-field identification.
+[pcc:unverified]

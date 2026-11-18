@@ -2,10 +2,12 @@ import Mathlib.Algebra.Polynomial.Derivation
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Algebra.Group.Hom.End
 import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
+import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree
 import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
+import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.RingTheory.FormalGroup.Basic
 import Mathlib.RingTheory.LaurentSeries
 import Mathlib.RingTheory.PowerSeries.Derivative
@@ -662,6 +664,92 @@ product, so the dual/equal-degree premise above is logically necessary. -/
 theorem degree_product_without_duality_control :
     (4 : ℕ) * 9 = 6 * 6 ∧ (4 : ℕ) ≠ 6 ∧ (9 : ℕ) ≠ 6 := by
   norm_num
+
+/-- Function-field degrees multiply in a finite field tower. This discharges
+the abstract multiplicativity arithmetic once concrete pullbacks from two
+dominant curve maps have supplied the three fields and their scalar-tower
+structure. Constructing that tower from `V-1`, `pi-1`, and their composition
+remains a separate geometric obligation. -/
+theorem finiteFieldTower_degree_mul
+    {F E M : Type*} [Field F] [Field E] [Field M]
+    [Algebra F E] [Algebra E M] [Algebra F M] [IsScalarTower F E M] :
+    Module.finrank F M = Module.finrank F E * Module.finrank E M := by
+  exact (Module.finrank_mul_finrank F E M).symm
+
+/-- In a finite function-field tower, equal adjacent degrees and total degree
+`N²` force each adjacent degree to be `N`. This is the field-tower version of
+the paired-factor arithmetic used by H116; it deliberately assumes rather
+than invents the pullback tower associated to the elliptic maps. -/
+theorem finiteFieldTower_degree_eq_norm_of_paired
+    {F E M : Type*} [Field F] [Field E] [Field M]
+    [Algebra F E] [Algebra E M] [Algebra F M] [IsScalarTower F E M]
+    (norm : ℕ)
+    (hpaired : Module.finrank F E = Module.finrank E M)
+    (htotal : Module.finrank F M = norm * norm) :
+    Module.finrank F E = norm := by
+  have hsquare : Module.finrank F E * Module.finrank F E = norm * norm := by
+    calc
+      Module.finrank F E * Module.finrank F E =
+          Module.finrank F E * Module.finrank E M := by rw [hpaired]
+      _ = Module.finrank F M :=
+        (finiteFieldTower_degree_mul (F := F) (E := E) (M := M)).symm
+      _ = norm * norm := htotal
+  apply le_antisymm
+  · by_contra hnot
+    have hlt : norm < Module.finrank F E := Nat.lt_of_not_ge hnot
+    nlinarith
+  · by_contra hnot
+    have hlt : Module.finrank F E < norm := Nat.lt_of_not_ge hnot
+    nlinarith
+
+/-- Exact numerator and denominator degrees for Mathlib's univariate
+division-polynomial x-map candidate `Φₙ/Ψₙ²`, provided the scalar is
+nonzero in the coefficient field. Connecting this candidate to Mathlib's
+pointwise scalar multiplication, and then its coordinate degree to the
+scheme/function-field degree of `[n]`, are explicit remaining bridges. -/
+theorem scalarMultiplicationXMap_exact_degrees
+    {F : Type*} [Field F] (W : WeierstrassCurve F) (n : ℤ)
+    (hn : (n : F) ≠ 0) :
+    (W.Φ n).natDegree = n.natAbs ^ 2 ∧
+      (W.ΨSq n).natDegree = n.natAbs ^ 2 - 1 := by
+  exact ⟨W.natDegree_Φ n, W.natDegree_ΨSq hn⟩
+
+/-- The same coordinate certificate has the expected leading coefficients:
+`Φₙ` is monic and `Ψₙ²` has leading coefficient `n²`. -/
+theorem scalarMultiplicationXMap_leadingCoefficients
+    {F : Type*} [Field F] (W : WeierstrassCurve F) (n : ℤ)
+    (hn : (n : F) ≠ 0) :
+    (W.Φ n).leadingCoeff = 1 ∧
+      (W.ΨSq n).leadingCoeff = (n : F) ^ 2 := by
+  exact ⟨W.leadingCoeff_Φ n, W.leadingCoeff_ΨSq hn⟩
+
+/-- Generic characteristic boundary: if the scalar vanishes in the
+coefficient field and `|n|>1`, the denominator cannot attain the nominal
+degree `n²-1`. This turns the excluded-characteristic premise into a
+strict degree-collapse theorem, including the case where `Ψₙ²` is zero. -/
+theorem scalarMultiplicationXMap_denominator_degree_lt_of_char_dvd
+    {F : Type*} [Field F] (W : WeierstrassCurve F) (n : ℤ)
+    (hn : (n : F) = 0) (hnAbs : 1 < n.natAbs) :
+    (W.ΨSq n).natDegree < n.natAbs ^ 2 - 1 := by
+  apply lt_of_le_of_ne (W.natDegree_ΨSq_le n)
+  intro heq
+  by_cases hzero : W.ΨSq n = 0
+  · simp only [hzero, Polynomial.natDegree_zero] at heq
+    have hsquare : 1 < n.natAbs ^ 2 := by nlinarith
+    have hpositive : 0 < n.natAbs ^ 2 - 1 := Nat.sub_pos_of_lt hsquare
+    omega
+  · have hlead : (W.ΨSq n).leadingCoeff ≠ 0 :=
+      Polynomial.leadingCoeff_ne_zero.mpr hzero
+    apply hlead
+    rw [← Polynomial.coeff_natDegree, heq, W.coeff_ΨSq n]
+    simp [hn]
+
+/-- Characteristic control for the preceding certificate: the nonvanishing
+premise is genuinely unavailable for `[p]` over `F_p`. The degree theorem does
+not permit silently applying the characteristic-zero formula in this case. -/
+theorem scalarMultiplicationXMap_characteristic_control :
+    (3 : ZMod 3) = 0 := by
+  exact ZMod.natCast_self 3
 
 /-- Specialize the Frobenius--Verschiebung ring calculation to additive
 endomorphisms of a point group. Integer scalars are central automatically, and
@@ -2666,6 +2754,12 @@ theorem rationalMap_separation_strict_control :
 #print axioms degree_eq_norm_of_paired_factor
 #print axioms verschiebung_sub_one_degree_of_dual_certificate
 #print axioms degree_product_without_duality_control
+#print axioms finiteFieldTower_degree_mul
+#print axioms finiteFieldTower_degree_eq_norm_of_paired
+#print axioms scalarMultiplicationXMap_exact_degrees
+#print axioms scalarMultiplicationXMap_leadingCoefficients
+#print axioms scalarMultiplicationXMap_denominator_degree_lt_of_char_dvd
+#print axioms scalarMultiplicationXMap_characteristic_control
 #print axioms endomorphism_frobeniusVerschiebung_sum
 #print axioms endomorphism_injectivity_control
 #print axioms affineFrobeniusPointEnd_injective

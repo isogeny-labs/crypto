@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-fe907f1887b4a963dcb1dafbcf3f93eac8037355c656189eacc5a227dcc2d3ca  H116FiberTrace.lean
+aaf910ee4b5308db8cd07057658631bd0bb04a3390ff37f5030ab6832960ffa4  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  128 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  134 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -58,6 +58,8 @@ f6b367568557629e55b46748360a01a251768e8c0d8ce4ed53953eb8e65a9e58  receipts/norm-
 f61a96a76811c2cd4736b7515e2f2a4126a1b500e397894ff6c090dc4a8864c2  receipts/norm-factor-audit.txt
 543996048dcfc71e49530f69165e90f4a49322258d91b93101ced228ee8f0389  receipts/degree-certificate-build.txt
 1e567fafe38bf9cdc1f29d0399a60b69f0272055ff039e49bb168e78d2689b2f  receipts/degree-certificate-audit.txt
+6f25eceebc85cce9cc43bcd1b0265beb8596c3a32043580266e51aa107b886df  receipts/scalar-degree-tower-build.txt
+369a478a267c3adc7bfe821025d5a5b31546d1f96e1f2e3071b2e45f7c3d8d51  receipts/scalar-degree-tower-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -250,6 +252,18 @@ factorization into `deg(V-1)=N`.  The composed theorem applies this directly to
 dual/equal-degree premise.  The pinned Mathlib snapshot has no elliptic-isogeny,
 dual-isogeny, or morphism-degree API, so instantiating the three geometric
 premises remains explicit and open. [pcc:unverified]
+
+The 134-theorem checkpoint proves finite field-tower degree multiplication and
+its equal-adjacent-degree consequence, then exposes Mathlib's exact
+`(n^2,n^2-1)` numerator/denominator degrees and `(1,n^2)` leading
+coefficients for the division-polynomial coordinate quotient when `n` is
+nonzero in the field. It also proves strict denominator-degree collapse when
+`n` vanishes in the field and `|n|>1`; a `ZMod 3` control supplies a
+concrete instance. The
+remaining bridge is geometric: construct the pullback tower, identify the
+division-polynomial quotient with scalar multiplication as a curve morphism,
+identify coordinate and morphism degrees, and prove the dual-pair theorem.
+[pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made
