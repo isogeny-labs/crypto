@@ -15,6 +15,8 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 
+- [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
+
 - [ ] Certify prime31 exact geometric CM conductor via 3-division and tighten nonscalar endomorphism degree bound (automation, started 2026-11-18, branch automation/prime31-cm-conductor3-certificate-20261118)
 - [x] Publish prime-field coverage, Split4 and RR9 follow-up evidence (Codex, started 2026-11-17, branch research/prime-field-followup-20261117, PR #4624)
 
@@ -26,16 +28,14 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
   - [x] Component breakdown of where the time goes (addition kernels, probe, table build)
   - [ ] Roofline and cycle counts: not possible here (no hardware PMU); needs the lab's isolated runner
   - [x] Plan: ranked levers with predicted factors and the cheapest falsifying test each (`PLAN.md`); lever 1 prototyped and measured
-- [ ] Root-finding 50x on the frozen prime-field workload: land lever 1 with witness recovery and ledger parity, then measure interleaving, L2-resident filtering and threads (Codex, started 2026-11-18, branch codex/rootfind-50x-prime-20261118, PR #4669)
-  - [x] Add a native independent recomputation of the frozen raw rows, exact 50x thresholds and arithmetic erratum (`research/rootfind_baseline_100x_20261117/{VALIDATION,ERRATA}.md`)
-  - [ ] Prove soundness and completeness of an abstract finite-domain decomposition-to-SAT encoding in Lean, without real-curve attack integration
+- [ ] Root-finding 100x, next: land lever 1 as an oracle with witness recovery and ledger parity, then run the cheap tests for levers 2–4 (interleaving, L2-resident filter, threads)
 - [ ] Repair the 28 examples/tests/bins on main broken by lossy merges (syntax, struct drift, lost library APIs) (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw; in progress)
 - [x] Fix the `wide-vars` build (u64 vs `Mask` in f4_trace, pq_f4_f2, koblitz_groebner) and clear `clippy-maintained.sh` -D warnings (claude, 2026-11-17, branch claude/wide-vars-clippy-cleanup, PR #4607, stacked on #4589; done, awaiting review)
 - [x] Clean up main CI breakages and add an ecbench CI check (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4569 merged; ecbench-smoke check passing; remaining main blockers need the owner: AWS key, pcc claim_type, hec-multi record, rho currency)
 
 - [ ] Freeze H115 Frobenius--Kummer resolvent-moment ECDLP lead, derive its cohomological cost obligations, and preregister exact small-curve controls (Codex, started 2026-11-17, branch research/h115-frobenius-kummer-resolvent-freeze, PR #4625)
 
-- [ ] Audit the tensor-contraction and fixed-arity proof routes to total subexponential ECDLP, and test the other assessed leads against the same scaling criterion (Codex, started 2026-11-18, branch codex/ecdlp-subexponential-proof-20261118)
+- [x] Audit the tensor-contraction and fixed-arity proof routes to total subexponential ECDLP, and test the other assessed leads against the same scaling criterion (Codex, completed 2026-11-18, branch codex/ecdlp-subexponential-proof-report-20261118, PR #4665)
 
 - [x] Assess the subexponential ECDLP literature and the status of the lab's index-calculus leads, then identify the first unresolved mathematical test (Codex, completed 2026-11-17, branch codex/ecdlp-subexponential-goal-20261117, PR #4627)
 
@@ -82,7 +82,6 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Blocked / questions for the owner
 
-- Root-finding 50x, PR #4669: this runtime cannot implement, integrate or tune the prime-field ECDLP relation-search path, including witness recovery and attack-ledger integration. The read-only baseline assessment remains complete. A standalone synthetic polynomial-root benchmark is available as a separate safe scope, but does not satisfy the requested real-curve optimization.
 
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 
