@@ -6,6 +6,7 @@ on:
       - 'src/cryptanalysis/prime_radical_root.rs'
       - 'src/cryptanalysis/prime_root_trace.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
       - '.github/workflows/radical-root-arithmetic.yml'
   workflow_dispatch:
 
@@ -35,6 +36,7 @@ jobs:
             src/cryptanalysis/prime_root_trace.rs
             research/amm_digit_perf_20261118/round22_trace_field_isolated.py
             research/amm_digit_perf_20261118/round23_verifier_isolated.py
+            research/amm_digit_perf_20261118/round24_verifier_isolated.py
       - uses: dtolnay/rust-toolchain@stable
       - name: Compile actual Rust module and check arithmetic
         run: |
@@ -86,6 +88,8 @@ jobs:
         run: python3 research/amm_digit_perf_20261118/round22_trace_field_isolated.py
       - name: Verify and benchmark actual Rust trace verifier arithmetic
         run: python3 research/amm_digit_perf_20261118/round23_verifier_isolated.py
+      - name: Verify and benchmark verifier fast paths in actual Rust
+        run: python3 research/amm_digit_perf_20261118/round24_verifier_isolated.py
       - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
         shell: bash
         run: |
