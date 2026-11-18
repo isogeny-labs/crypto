@@ -43,3 +43,18 @@ Use a bounded client timeout and clean up only that invocation's container
 after interruption. These development controls are not performance trials.
 The 80-bit quotient/images, matched endpoint measurements, full-window resource
 feasibility and production checkpoint/resume remain separate obligations.
+
+## Projective helper build dependency
+
+The Dockerfile now copies and hashes `projective_walk.hpp` alongside the two
+existing source files. The header is synchronized with #4703's implementation
+checkpoint `bbf30f5b79`; that PR carries the optional bounded-projective evaluator
+change and its development controls. Until both changes land together, this
+worker branch's older evaluator does not enable the new backend merely by
+copying the header.
+
+The retained attempt-A/attempt-B image, source and binary receipts describe
+their historical builds. This packaging correction does not rebuild or qualify
+an image of the new source. A future image must bind the complete tested source
+set, including this header, and retain a new binary/image receipt before a
+cloud run. No old receipt or image identifier is reassigned to it.
