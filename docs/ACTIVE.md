@@ -15,6 +15,7 @@ _(none pinned — set one with `/goal <text>`)_
 
 ## Active items (top = next)
 
+- [ ] Prime-field random vs structured factor-base baseline: controlled d_F comparison (tower vs randbase, matched size), isolating the degree-floor confound (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
 - [ ] Binary GF(2^n) Koblitz fall-degree sweep: d_F of the Weil-descent/Semaev system vs n, with/without Frobenius-orbit structure (preregister + small-n local data + pod plan) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
 - [ ] Diagnose the n=83 Frobenius-orbit IC zero-relations result: search-cap/tuning artifact vs fundamental (forensic on koblitz_n83_factor_base_sweep_20261008, read-only) (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
 - [ ] Design an experiment that attacks the IC-vs-rho slope beta (factor-base structures that could change the exponent, not the constant) — preregistration only, no claim (claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit)
