@@ -3,8 +3,9 @@
 
 After `artifacts.py push` moves files out of Git, a workflow that reads them
 (a replay of `research/x/`, a check over `experiments/y/results/`) would find
-pointers only. This finds, per workflow file, the repository paths it names
-that hold moved files, and inserts after each `actions/checkout` step:
+pointers only. This finds, per workflow job, the repository paths its
+executable steps name that hold moved files, and inserts after that job's
+`actions/checkout` step:
 
     - name: Pull store data this workflow reads (tools/artifacts)
       env: {AWS_ACCESS_KEY_ID: ..., AWS_SECRET_ACCESS_KEY: ..., AWS_REGION: ...}
@@ -21,11 +22,13 @@ is textual (comments and layout survive) and idempotent; checkouts into a
 `--check` edits nothing and exits 1 if any workflow lacks the step it needs
 or carries a stale one, which is how CI keeps new workflows honest.
 
-The pull list is derived from the workflow text outside the generated step:
-the step's own `pull` line is output, never a reference, so a directory the
-workflow stops naming is dropped on regeneration. Inputs a workflow's scripts
+The pull list is derived from each job's text outside checkout and generated
+steps. Event path filters and another job's inputs are not reads. The
+generated step's own `pull` line is output, never a reference, so a directory
+the job stops naming is dropped on regeneration. Inputs a workflow's scripts
 discover at run time are declared with `# tools/artifacts pull: PATH ...`
-comment lines; hand edits to the generated line do not survive.
+comment lines inside the consuming job; hand edits to the generated line do
+not survive.
 """
 
 from __future__ import annotations
@@ -95,10 +98,62 @@ def strip_generated(text: str) -> str:
     return "\n".join(out)
 
 
+def strip_checkouts(text: str) -> str:
+    """Remove checkout steps before discovering data reads.
+
+    Sparse-checkout entries describe which tracked paths are materialized;
+    they do not mean a later command opens every file below those paths.
+    Counting them as reads made one packaging job hydrate unrelated objects in
+    every job of its workflow.
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        m = re.match(r"^(\s*)- (?:uses: actions/checkout@|name:)(.*)$", lines[i])
+        if not m:
+            out.append(lines[i])
+            i += 1
+            continue
+        indent = len(m.group(1))
+        j = i + 1
+        while j < len(lines) and (
+            not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip()) > indent
+        ):
+            j += 1
+        block = lines[i:j]
+        if any(
+            re.match(rf"^{m.group(1)}(?:- |  )uses: actions/checkout@", line)
+            for line in block
+        ):
+            i = j
+            continue
+        out.extend(block)
+        i = j
+    return "\n".join(out)
+
+
+def _may_discover_sibling_data(path: str) -> bool:
+    """Whether a named tracked file may open moved data beside itself."""
+    name = path.rsplit("/", 1)[-1]
+    suffix = Path(name).suffix.lower()
+    return suffix in {
+        ".js",
+        ".mjs",
+        ".pl",
+        ".py",
+        ".rb",
+        ".rs",
+        ".sage",
+        ".sh",
+        ".ts",
+    } or name in {"GNUmakefile", "Justfile", "Makefile", "makefile"}
+
+
 def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
     """Paths the workflow names that are, or contain, moved files; minimal cover."""
     found = set()
-    text = strip_generated(text)
+    text = strip_checkouts(strip_generated(text))
     for line in text.split("\n"):
         if m := DECLARE_RE.match(line):
             # Declared, so kept while it still names moved data, and dropped
@@ -117,6 +172,8 @@ def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
         p = head.rstrip("/.")
         if "*" not in raw:
             if p not in moved and p not in dirs:
+                if not _may_discover_sibling_data(p):
+                    continue
                 # A workflow can name a script or input in the directory
                 # holding moved data. Pull that directory, while leaving
                 # scripts in shared ancestor namespaces alone.
@@ -349,6 +406,88 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
     return "\n".join(out), notes
 
 
+JOB_HEADER_RE = re.compile(r"(?m)^  ([A-Za-z0-9_-]+):(?:\s*#.*)?$")
+
+
+def job_spans(text: str) -> list[tuple[str, int, int]]:
+    """Return `(job_id, start, end)` spans under the top-level `jobs:` map."""
+    jobs = re.search(r"(?m)^jobs:(?:\s*#.*)?$", text)
+    if not jobs:
+        return []
+    end = len(text)
+    top = re.search(r"(?m)^[A-Za-z0-9_-]+:(?:\s*#.*)?$", text[jobs.end():])
+    if top:
+        end = jobs.end() + top.start()
+    headers = list(JOB_HEADER_RE.finditer(text, jobs.end(), end))
+    return [
+        (
+            match.group(1),
+            match.start(),
+            headers[index + 1].start() if index + 1 < len(headers) else end,
+        )
+        for index, match in enumerate(headers)
+    ]
+
+
+def requirements(
+    text: str,
+    moved: set[str],
+    dirs: set[str],
+    evidence: dict[str, set[str]],
+) -> list[str]:
+    """Store paths read by one job, including derived validation evidence."""
+    paths = needed(text, moved, dirs)
+    if reads_validation_gate(text):
+        files = {path for group in evidence.values() for path in group}
+        both = set(paths) | set(cover(files, moved))
+        paths = sorted(
+            path
+            for path in both
+            if not any(path.startswith(parent + "/") for parent in both)
+        )
+    return paths
+
+
+def wire_workflow(
+    text: str,
+    moved: set[str],
+    dirs: set[str],
+    evidence: dict[str, set[str]],
+) -> tuple[str, list[str], dict[str, list[str]]]:
+    """Wire each job from only that job's executable inputs.
+
+    Top-level declarations remain a compatibility surface. New
+    `tools/artifacts pull:` declarations belong inside the consuming job so a
+    multi-job workflow does not hydrate them everywhere.
+    """
+    spans = job_spans(text)
+    if not spans:
+        paths = requirements(text, moved, dirs, evidence)
+        wired, notes = wire(text, paths)
+        return wired, notes, {"<workflow>": paths} if paths else {}
+
+    global_declarations = "\n".join(
+        line for line in text[: spans[0][1]].split("\n") if DECLARE_RE.match(line)
+    )
+    out: list[str] = [text[: spans[0][1]]]
+    notes: list[str] = []
+    by_job: dict[str, list[str]] = {}
+    cursor = spans[0][1]
+    for job_id, start, end in spans:
+        out.append(text[cursor:start])
+        block = text[start:end]
+        scan = f"{global_declarations}\n{block}" if global_declarations else block
+        paths = requirements(scan, moved, dirs, evidence)
+        wired, job_notes = wire(block, paths)
+        out.append(wired)
+        notes.extend(f"{job_id}: {note}" for note in job_notes)
+        if paths:
+            by_job[job_id] = paths
+        cursor = end
+    out.append(text[cursor:])
+    return "".join(out), notes, by_job
+
+
 def add_sparse_pattern(block: list[str], indent: str) -> list[str]:
     """Make a sparse checkout also fetch tools/artifacts and .artifacts (the
     store config the pull step reads; without it the remote is empty)."""
@@ -398,36 +537,40 @@ def main() -> int:
         print(n, file=sys.stderr)
     for f in files:
         text = f.read_text()
-        paths = needed(text, moved, dirs)
-        if reads_validation_gate(text):
-            # Derived, not hand-listed: whatever store-backed evidence the gate
-            # opens (VALIDATION.json -> report -> raw_data) is pulled.
-            both = set(paths) | set(cover({x for v in evidence.values() for x in v}, moved))
-            paths = sorted(p for p in both if not any(p.startswith(q + "/") for q in both))
-        if not paths and STEP_NAME not in text:
+        new, notes, by_job = wire_workflow(text, moved, dirs, evidence)
+        if new == text:
             continue
-        new, notes = wire(text, paths)
         for n in notes:
             print(f"{f.name}: {n}", file=sys.stderr)
-        if new != text:
-            missing += 1
-            if args.check:
-                if paths:
-                    print(f"{f.name}: needs `{STEP_NAME}` for {' '.join(paths)}")
-                else:
-                    print(f"{f.name}: stale `{STEP_NAME}`: the workflow names no moved data")
-                if reads_validation_gate(text):
-                    have = pulled_by(text)
-                    for v, fs in sorted(evidence.items()):
-                        gap = sorted(x for x in fs if not any(x == q or x.startswith(q + "/") for q in have))
-                        if gap:
-                            print(f"  {f.name}: the validation gate reads store-backed evidence of {v} "
-                                  f"that this workflow does not pull: {', '.join(gap[:3])}"
-                                  f"{' ...' if len(gap) > 3 else ''}; run python3 tools/artifacts/wire_workflows.py "
-                                  f"(the list is derived, do not hand-edit it)")
+        missing += 1
+        detail = "; ".join(f"{job}: {' '.join(paths)}" for job, paths in by_job.items())
+        if args.check:
+            if detail:
+                print(f"{f.name}: needs per-job `{STEP_NAME}` for {detail}")
             else:
-                f.write_text(new)
-                print(f"{f.name}: pull {' '.join(paths)}" if paths else f"{f.name}: pull step removed")
+                print(f"{f.name}: stale `{STEP_NAME}`: no job names moved data")
+            spans = job_spans(text) or [("<workflow>", 0, len(text))]
+            for job_id, start, end in spans:
+                block = text[start:end]
+                if not reads_validation_gate(block):
+                    continue
+                have = pulled_by(block)
+                for validation, files_read in sorted(evidence.items()):
+                    gap = sorted(
+                        path
+                        for path in files_read
+                        if not any(path == prefix or path.startswith(prefix + "/") for prefix in have)
+                    )
+                    if gap:
+                        print(
+                            f"  {f.name}:{job_id}: the validation gate reads store-backed evidence of "
+                            f"{validation} that this job does not pull: {', '.join(gap[:3])}"
+                            f"{' ...' if len(gap) > 3 else ''}; run python3 tools/artifacts/wire_workflows.py "
+                            f"(the list is derived, do not hand-edit it)"
+                        )
+        else:
+            f.write_text(new)
+            print(f"{f.name}: per-job pull {detail}" if detail else f"{f.name}: pull step removed")
     if args.check and missing:
         print(f"\n{missing} workflow(s) lack the pull step they need or carry a stale one; run "
               f"python3 tools/artifacts/wire_workflows.py", file=sys.stderr)

@@ -8,6 +8,7 @@ on:
       - research/prime31_ic_20261115/native/WZ_FRONTIER_PROTOCOL_20261116.md
       - .github/workflows/prime31-wz-rho-frontier.yml
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - examples/prime31_wz_rho_frontier.rs
       - research/prime31_ic_20261115/native/WZ_FRONTIER_PROTOCOL_20261116.md
@@ -19,8 +20,9 @@ permissions:
 
 jobs:
   wz-complete-cold:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 55
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 55 }}
     env:
       RAYON_NUM_THREADS: '1'
       CARGO_BUILD_JOBS: '2'

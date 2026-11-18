@@ -8,6 +8,7 @@ on:
       - research/prime31_ic_20261115/mixed_base/MIXED_AMORTIZED_IC_PROTOCOL_20261117.md
       - .github/workflows/prime31-mixed-amortized-ic.yml
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
       - research/prime31_ic_20261115/mixed_base/MIXED_AMORTIZED_IC_PROTOCOL_20261117.md
@@ -19,8 +20,9 @@ permissions:
 
 jobs:
   mixed-ic-amortized:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 35 }}
     env:
       RAYON_NUM_THREADS: '1'
       CARGO_BUILD_JOBS: '2'

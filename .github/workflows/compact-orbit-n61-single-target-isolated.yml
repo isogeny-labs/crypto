@@ -114,7 +114,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 experiments/koblitz-single-target-n61-20260925 experiments/koblitz-single-target-n71-20261002 experiments/koblitz-single-target-n73-20261003 experiments/koblitz-single-target-n83-20261006 research/sat_factor_base_review_20260908
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/sat_factor_base_review_20260908/autolab
       - uses: Swatinem/rust-cache@v2
       - name: Harness tests and single-target guards
         run: |
@@ -191,7 +191,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 experiments/koblitz-single-target-n61-20260925 experiments/koblitz-single-target-n71-20261002 experiments/koblitz-single-target-n73-20261003 experiments/koblitz-single-target-n83-20261006 research/sat_factor_base_review_20260908
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/sat_factor_base_review_20260908
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --release --locked --example koblitz_orbit_dlp_fast_online --example koblitz_rho_batch_ks_strong_online --example koblitz_orbit_dlp_fast --example koblitz_rho_batch_ks_strong
       - name: Run the single-target panel through the autolab on a reserved core

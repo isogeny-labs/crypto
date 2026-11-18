@@ -2,6 +2,7 @@ name: Radical prime-field rootfinder correctness and timing
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'src/cryptanalysis/prime_radical_root.rs'
       - '.github/workflows/radical-root-arithmetic.yml'
@@ -19,6 +20,7 @@ jobs:
   # F4/APS diagnostics. Compile the exact production source in a tiny,
   # dependency-free test crate so field changes are still independently gated.
   isolated-arithmetic:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -54,8 +56,9 @@ jobs:
           if-no-files-found: ignore
 
   radical:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     env:
       CARGO_INCREMENTAL: 0
       CARGO_TERM_COLOR: always

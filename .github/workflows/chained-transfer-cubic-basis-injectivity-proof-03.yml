@@ -1,6 +1,7 @@
 name: Cubic basis injectivity original dual gates03
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/lean/CubicBasisInjectivity22303.lean'
       - 'research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/**'
@@ -10,6 +11,7 @@ permissions:
   contents: read
 jobs:
   original-dual-proof-gates:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:

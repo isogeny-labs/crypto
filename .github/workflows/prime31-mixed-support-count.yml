@@ -8,6 +8,7 @@ on:
       - research/prime31_ic_20261115/mixed_base/MIXED_FORMAL_SUPPORT_THEOREM_20261117.md
       - .github/workflows/prime31-mixed-support-count.yml
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_mixed_signature_count.rs
       - research/prime31_ic_20261115/mixed_base/MIXED_FORMAL_SUPPORT_THEOREM_20261117.md
@@ -19,6 +20,7 @@ permissions:
 
 jobs:
   exact-mixed-support:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:

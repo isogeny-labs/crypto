@@ -7,6 +7,7 @@ on:
       - 'research/prime31_ic_20261115/native/DICKSON31_BATCH_COMPLEMENTS_PROTOCOL_20261117.md'
       - '.github/workflows/prime31-dickson31-batch-complements.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
       - 'research/prime31_ic_20261115/native/DICKSON31_BATCH_COMPLEMENTS_PROTOCOL_20261117.md'
@@ -18,6 +19,7 @@ permissions:
 
 jobs:
   matched-batch-control:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
