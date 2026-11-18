@@ -1115,6 +1115,88 @@ mod tests {
         }
     }
 
+    // Control ring: same Fp2 mul/sqr and same precomputed AMM constants,
+    // but the old generic exponentiation used before Frobenius powering.
+    #[derive(Clone, Copy)]
+    struct Fq2BeforePower(Fq2);
+    impl Ring for Fq2BeforePower {
+        type E = (u64, u64);
+        fn zero(&self) -> Self::E { self.0.zero() }
+        fn one(&self) -> Self::E { self.0.one() }
+        fn mul(&self, a: Self::E, b: Self::E) -> Self::E { self.0.mul(a, b) }
+        fn sqr(&self, a: Self::E) -> Self::E { self.0.sqr(a) }
+        fn order(&self) -> u128 { self.0.order() }
+        fn cand(&self, k: u64) -> Self::E { self.0.cand(k) }
+    }
+    fn cube_before_frobenius(ctx: &RadicalRootCtx) -> Cube<Fq2BeforePower> {
+        let c = &ctx.cube_q;
+        Cube { r: Fq2BeforePower(c.r), n: c.n, s: c.s, e3: c.e3,
+               c: c.c, c_inv: c.c_inv, w: c.w, p3s: c.p3s }
+    }
+
+    #[test]
+    fn actual_fp2_amm_cube_roots_match_pre_frobenius() {
+        let mut seed = 0x500d_2026_1118_4411u64;
+        for &p in &[5u64, 7, 97, 487, 17_497, 998_244_353,
+                    1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let old = cube_before_frobenius(&ctx);
+            let q = &ctx.cube_q.r;
+            for _ in 0..256 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let x = (seed % p, (seed >> 9) % p);
+                let cube = q.mul(q.sqr(x), x);
+                assert_eq!(old.root(cube), ctx.cube_q.root(cube),
+                           "AMM cube full root p={p}, x={x:?}");
+                assert_eq!(old.root(x), ctx.cube_q.root(x),
+                           "AMM arbitrary full root p={p}, x={x:?}");
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired end-to-end Fp2 AMM cube-root kernel benchmark"]
+    fn bench_fp2_amm_cube_root_before_after_frobenius() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        let mut seed = 0x1f2f_2026_1118_aa55u64;
+        for &p in &[487u64, 17_497, 998_244_353, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let old = cube_before_frobenius(&ctx);
+            let q = &ctx.cube_q.r;
+            let mut inputs = Vec::new();
+            for _ in 0..256 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let x = (seed % p, (seed >> 19) % p);
+                inputs.push(q.mul(q.sqr(x), x)); // definite cubes
+            }
+            for &x in &inputs { assert_eq!(old.root(x), ctx.cube_q.root(x)); }
+            let sample = |optimized: bool| {
+                let start = Instant::now();
+                let mut checksum = 0u64;
+                for _ in 0..3 {
+                    for &x in &inputs {
+                        let result = if optimized { ctx.cube_q.root(black_box(x)) }
+                                     else { old.root(black_box(x)) };
+                        checksum = checksum.wrapping_add(result.unwrap().0);
+                    }
+                }
+                black_box(checksum);
+                start.elapsed().as_nanos() as f64 / (inputs.len() * 3) as f64
+            };
+            let (mut b, mut a) = (Vec::new(), Vec::new());
+            for k in 0..13 {
+                if k % 2 == 0 { b.push(sample(false)); a.push(sample(true)); }
+                else { a.push(sample(true)); b.push(sample(false)); }
+            }
+            b.sort_by(f64::total_cmp); a.sort_by(f64::total_cmp);
+            println!("full Fp2 AMM cube root p={p}: {:.3} -> {:.3} ns/op ({:.3}x)",
+                     b[6], a[6], b[6] / a[6]);
+        }
+    }
+
     // Frozen November 18 Tonelli path (before sharing the t/r exponent).
     // The production path must match the chosen root, not only the root set.
     fn sqrt_before_fused(ctx: &RadicalRootCtx, a: u64) -> Option<u64> {
