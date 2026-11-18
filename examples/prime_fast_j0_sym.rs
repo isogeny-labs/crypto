@@ -135,6 +135,301 @@ struct SymStats {
     rels: usize,
 }
 
+
+/// Four-summand variant: relations R = eps*phi^k F_h + (F_i + s1 phi^m F_j + s2 phi^n F_l),
+/// matched through a table of orbit-canonical x-coordinates of all triple sums (i<j<l).
+fn sym4_solve_ex(
+    c: &FastCurve,
+    g: Pt,
+    q: Pt,
+    lam: u64,
+    b_size: usize,
+    extra: usize,
+    seed: u64,
+) -> Option<(u64, SymStats)> {
+    let f = c.f;
+    let n = c.n;
+    let fnum = c.scalar_field();
+    let beta = beta_of(c, g, lam);
+    let beta2 = f.mul(beta, beta);
+    let lam2 = (lam as u128 * lam as u128 % n as u128) as u64;
+    let lams = [1u64, lam, lam2];
+    let t0 = Instant::now();
+    let mut reps: Vec<Pt> = Vec::with_capacity(b_size);
+    let mut tab = XTable::new(3 * b_size);
+    let mut x = 1u64;
+    while reps.len() < b_size {
+        if let Some(pt) = c.lift_x(x) {
+            let xs = [pt.x, f.mul(beta, pt.x), f.mul(beta2, pt.x)];
+            if xs.iter().all(|&v| tab.get(v).is_none()) {
+                let i = reps.len() as u32;
+                for k in 0..3u32 {
+                    tab.insert(xs[k as usize], i * 3 + k);
+                }
+                reps.push(pt);
+            }
+        }
+        x += 1;
+    }
+    let mut cand: Vec<Pt> = Vec::with_capacity(3 * b_size);
+    for r in &reps {
+        cand.push(*r);
+        cand.push(Pt { x: f.mul(beta, r.x), y: r.y });
+        cand.push(Pt { x: f.mul(beta2, r.x), y: r.y });
+    }
+    let canon = |x3: u64| -> (u64, usize) {
+        let x1 = f.mul(beta, x3);
+        let x2 = f.mul(beta2, x3);
+        if x3 <= x1 && x3 <= x2 {
+            (x3, 0)
+        } else if x1 <= x2 {
+            (x1, 2)
+        } else {
+            (x2, 1)
+        }
+    };
+    // entries: (key, i, j, l, m, n, s1, s2, shift)
+    let mut ents: Vec<(u64, [u32; 3], [u8; 4])> = Vec::new();
+    let mut dd = Vec::new();
+    let mut sc = Vec::new();
+    for i in 0..b_size {
+        let fi = reps[i];
+        for j in (i + 1)..b_size {
+            for m in 0..3usize {
+                for s1 in 0..2u8 {
+                    let qj = if s1 == 1 { c.neg(cand[3 * j + m]) } else { cand[3 * j + m] };
+                    let Some(pp) = c.add(Some(fi), Some(qj)) else { continue };
+                    dd.clear();
+                    for l in (j + 1)..b_size {
+                        for nn in 0..3usize {
+                            let dx = f.sub(cand[3 * l + nn].x, pp.x);
+                            dd.push(if dx == 0 { f.one } else { dx });
+                        }
+                    }
+                    f.batch_inv(&mut dd, &mut sc);
+                    let mut pos = 0usize;
+                    for l in (j + 1)..b_size {
+                        for nn in 0..3usize {
+                            let ql = cand[3 * l + nn];
+                            let inv = dd[pos];
+                            pos += 1;
+                            if f.sub(ql.x, pp.x) == 0 {
+                                continue;
+                            }
+                            let sx = c.add_x_with_inv(pp, ql, inv);
+                            let dx2 = c.add_x_with_inv(pp, c.neg(ql), inv);
+                            let (k1, e1) = canon(sx);
+                            ents.push((k1, [i as u32, j as u32, l as u32], [m as u8, nn as u8, s1 * 2, e1 as u8]));
+                            let (k2, e2) = canon(dx2);
+                            ents.push((k2, [i as u32, j as u32, l as u32], [m as u8, nn as u8, s1 * 2 + 1, e2 as u8]));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    let hs = (ents.len() * 2).next_power_of_two().max(16);
+    let hmask = hs - 1;
+    let mut heads = vec![u32::MAX; hs];
+    let mut next = vec![u32::MAX; ents.len()];
+    for (e, ent) in ents.iter().enumerate() {
+        let h = (ent.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & hmask;
+        next[e] = heads[h];
+        heads[h] = e as u32;
+    }
+    let nb = (ents.len() * 3 * 16).next_power_of_two().max(64);
+    let bmask = nb - 1;
+    let mut bits = vec![0u64; nb / 64];
+    for ent in ents.iter() {
+        let k0 = ent.0;
+        for kx in [k0, f.mul(beta, k0), f.mul(beta2, k0)] {
+            let h = (kx.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & bmask;
+            bits[h >> 6] |= 1u64 << (h & 63);
+        }
+    }
+    let ms_fb = t0.elapsed().as_secs_f64() * 1e3;
+    let t1 = Instant::now();
+    let needed = b_size + extra;
+    let cols = b_size + 1;
+    let mut rows: Vec<Vec<u64>> = Vec::new();
+    let mut rhs: Vec<u64> = Vec::new();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let fresh = |rng: &mut StdRng| -> (u64, u64, Pt) {
+        loop {
+            let a = rng.gen_range(1..n);
+            let b = rng.gen_range(1..n);
+            if let Some(r) = c.combine(g, q, a, b) {
+                return (a, b, r);
+            }
+        }
+    };
+    let (mut a, mut b, mut r) = fresh(&mut rng);
+    let mut targets = 0u64;
+    let mut inversions = 0u64;
+    let mut d = vec![0u64; cand.len()];
+    let mut scratch = Vec::new();
+    let mut seen: Vec<Vec<u64>> = Vec::new();
+    while rows.len() < needed && targets < 50_000_000u64 {
+        targets += 1;
+        for (i, p) in cand.iter().enumerate() {
+            let dd = f.sub(r.x, p.x);
+            d[i] = if dd == 0 { f.one } else { dd };
+        }
+        f.batch_inv(&mut d, &mut scratch);
+        inversions += 1;
+        let mut productive = false;
+        seen.clear();
+        'scan: for (id, fi) in cand.iter().enumerate() {
+            let inv = d[id];
+            if f.sub(r.x, fi.x) == 0 {
+                continue;
+            }
+            let lam_minus = f.mul(f.add(r.y, fi.y), inv);
+            let lam_plus = f.mul(f.sub(r.y, fi.y), inv);
+            for (eps, l) in [(1i8, lam_minus), (-1i8, lam_plus)] {
+                let x3 = f.sub(f.sub(f.sqr(l), r.x), fi.x);
+                let h = (x3.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & bmask;
+                if bits[h >> 6] >> (h & 63) & 1 == 0 {
+                    continue;
+                }
+                let (key, sft0) = canon(x3);
+                let h = (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & hmask;
+                let mut e = heads[h];
+                while e != u32::MAX {
+                    let ent = &ents[e as usize];
+                    e = next[e as usize];
+                    if ent.0 != key {
+                        continue;
+                    }
+                    let [ei, ej, el] = ent.1;
+                    let [em, en, sg, se] = ent.2;
+                    let (s1, s2) = (sg / 2, sg % 2);
+                    let sft = (sft0 + 3 - se as usize) % 3;
+                    // P3 = F_ei + s1 phi^em F_ej + s2' phi^en F_el  (s2 stored as sign of the third term)
+                    let fa = reps[ei as usize];
+                    let fb_ = cand[3 * ej as usize + em as usize];
+                    let fb_ = if s1 == 1 { c.neg(fb_) } else { fb_ };
+                    let fc_ = cand[3 * el as usize + en as usize];
+                    let fc_ = if s2 == 1 { c.neg(fc_) } else { fc_ };
+                    let Some(p2) = c.add(Some(fa), Some(fb_)) else { continue };
+                    let Some(p3) = c.add(Some(p2), Some(fc_)) else { continue };
+                    let y3 = f.sub(f.mul(l, f.sub(r.x, x3)), r.y);
+                    let tau = if y3 == p3.y { 1i8 } else { -1 };
+                    let sgn = |v: i8, neg: bool| if neg { -v } else { v };
+                    let (ei, ej, el) = (ei as usize, ej as usize, el as usize);
+                    let (em, en) = (em as usize, en as usize);
+                    let terms = [
+                        (id / 3, id % 3, eps),
+                        (ei, sft, tau),
+                        (ej, (sft + em) % 3, sgn(tau, s1 == 1)),
+                        (el, (sft + en) % 3, sgn(tau, s2 == 1)),
+                    ];
+                    let mut acc: Option<Pt> = None;
+                    for &(ri, kk, sv) in &terms {
+                        let pt = cand[3 * ri + kk];
+                        acc = c.add(acc, Some(if sv > 0 { pt } else { c.neg(pt) }));
+                    }
+                    if acc != Some(r) {
+                        continue;
+                    }
+                    let mut row = vec![0u64; cols];
+                    for &(ri, kk, sv) in &terms {
+                        let cv = if sv > 0 { lams[kk] } else { n - lams[kk] } % n;
+                        row[ri] = fnum.add(row[ri], fnum.to_mont(cv));
+                    }
+                    row[b_size] = fnum.to_mont((n - b % n) % n);
+                    if row[..b_size].iter().all(|&v| v == 0) || seen.contains(&row) {
+                        continue;
+                    }
+                    seen.push(row.clone());
+                    rows.push(row);
+                    rhs.push(fnum.to_mont(a % n));
+                    productive = true;
+                    if rows.len() >= needed {
+                        break 'scan;
+                    }
+                }
+            }
+        }
+        if productive {
+            let (na, nb2, nr) = fresh(&mut rng);
+            a = na;
+            b = nb2;
+            r = nr;
+        } else {
+            match c.add(Some(r), Some(g)) {
+                Some(nr) => {
+                    r = nr;
+                    a = (a + 1) % n;
+                }
+                None => {
+                    let (na, nb2, nr) = fresh(&mut rng);
+                    a = na;
+                    b = nb2;
+                    r = nr;
+                }
+            }
+        }
+    }
+    if rows.len() < needed {
+        return None;
+    }
+    let ms_collect = t1.elapsed().as_secs_f64() * 1e3;
+    let t2 = Instant::now();
+    let nrows = rows.len();
+    let mut pivot_row = vec![usize::MAX; cols];
+    let mut row = 0usize;
+    for col in 0..cols {
+        if row >= nrows {
+            break;
+        }
+        let Some(piv) = (row..nrows).find(|&rr| rows[rr][col] != 0) else { continue };
+        rows.swap(row, piv);
+        rhs.swap(row, piv);
+        let inv = fnum.inv(rows[row][col]);
+        for cc in 0..cols {
+            rows[row][cc] = fnum.mul(rows[row][cc], inv);
+        }
+        rhs[row] = fnum.mul(rhs[row], inv);
+        let (pv, pr) = (rows[row].clone(), rhs[row]);
+        for rr in 0..nrows {
+            if rr == row || rows[rr][col] == 0 {
+                continue;
+            }
+            let fct = rows[rr][col];
+            for cc in col..cols {
+                if pv[cc] != 0 {
+                    rows[rr][cc] = fnum.sub(rows[rr][cc], fnum.mul(fct, pv[cc]));
+                }
+            }
+            rhs[rr] = fnum.sub(rhs[rr], fnum.mul(fct, pr));
+        }
+        pivot_row[col] = row;
+        row += 1;
+    }
+    let pr = pivot_row[b_size];
+    if pr == usize::MAX {
+        return None;
+    }
+    let xsol = fnum.from_mont(rhs[pr]);
+    let ms_la = t2.elapsed().as_secs_f64() * 1e3;
+    if c.mul(Some(g), xsol) != Some(q) {
+        return None;
+    }
+    Some((
+        xsol,
+        SymStats {
+            ms_total: t0.elapsed().as_secs_f64() * 1e3,
+            ms_fb,
+            ms_collect,
+            ms_la,
+            targets,
+            inversions,
+            rels: nrows,
+        },
+    ))
+}
+
 fn sym_solve_ex(
     c: &FastCurve,
     g: Pt,
@@ -146,6 +441,9 @@ fn sym_solve_ex(
     summands: u32,
     fix: bool,
 ) -> Option<(u64, SymStats)> {
+    if summands == 4 {
+        return sym4_solve_ex(c, g, q, lam, b_size, extra, seed);
+    }
     let f = c.f;
     let n = c.n;
     let fnum = c.scalar_field();
@@ -201,6 +499,9 @@ fn sym_solve_ex(
     let mut heads: Vec<u32> = Vec::new();
     let mut next: Vec<u32> = Vec::new();
     let mut hmask = 0usize;
+    let prefilter = summands >= 3 && std::env::var_os("NOPREFILTER").is_none();
+    let mut bits: Vec<u64> = Vec::new();
+    let mut bmask = 0usize;
     if summands >= 3 {
         let mut dd = Vec::new();
         let mut sc = Vec::new();
@@ -261,6 +562,18 @@ fn sym_solve_ex(
             next[e] = heads[h];
             heads[h] = e as u32;
         }
+        if prefilter {
+            let nb = (ents.len() * 3 * 16).next_power_of_two().max(64);
+            bmask = nb - 1;
+            bits = vec![0u64; nb / 64];
+            for ent in ents.iter() {
+                let k0 = ent.0;
+                for kx in [k0, f.mul(beta, k0), f.mul(beta2, k0)] {
+                    let h = (kx.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & bmask;
+                    bits[h >> 6] |= 1u64 << (h & 63);
+                }
+            }
+        }
     }
     let ms_fb = t0.elapsed().as_secs_f64() * 1e3;
     let t1 = Instant::now();
@@ -304,7 +617,11 @@ fn sym_solve_ex(
             let lam_plus = f.mul(f.sub(r.y, fi.y), inv);
             for (eps, l) in [(1i8, lam_minus), (-1i8, lam_plus)] {
                 let x3 = f.sub(f.sub(f.sqr(l), r.x), fi.x);
-                if summands >= 3 {
+                let pass = !prefilter || {
+                    let h = (x3.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & bmask;
+                    bits[h >> 6] >> (h & 63) & 1 == 1
+                };
+                if summands >= 3 && pass {
                     let (key, sft) = canon(x3);
                     let h = (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & hmask;
                     let mut e = heads[h];
@@ -316,6 +633,11 @@ fn sym_solve_ex(
                         }
                         let (ei, ej, em, sg) =
                             (ent.1 as usize, ent.2 as usize, ent.3 as usize, ent.4);
+                        let sft = if fix {
+                            (sft + 3 - ent.5 as usize) % 3
+                        } else {
+                            sft
+                        };
                         // P = F_ei + s*phi^em F_ej ; T = +-phi^sft P
                         let fa = reps[ei];
                         let fb_ = cand[3 * ej + em];
@@ -514,7 +836,7 @@ fn main() {
                     extra,
                     ins + 1,
                     summ,
-                    std::env::var_os("SHIFTFIX").is_some(),
+                    std::env::var_os("NOSHIFTFIX").is_none(),
                 );
                 let t0 = Instant::now();
                 let plain = if std::env::var_os("NOPLAIN2").is_some() {
@@ -536,7 +858,8 @@ fn main() {
                 let row = json!({
                     "plain3_ok": p3.as_ref().map(|s| s.0 == k).unwrap_or(false), "plain3_ms": p3_ms, "plain3_fb": fbs3,
                     "curve": c.name, "rho_neg_median_ms": rho1, "p": c.f.p, "n": c.n, "B": bsz, "inst": ins,
-                    "summands": summ, "sym_ok": sym.as_ref().map(|s| s.0 == k).unwrap_or(false),
+                    "cert": {"g": [c.canonical(g).0, c.canonical(g).1], "q": [c.canonical(q).0, c.canonical(q).1], "k": k, "sym_rec": sym.as_ref().map(|s| s.0), "plain3_rec": p3.as_ref().map(|s| s.0)},
+                    "summands": summ, "shiftfix": std::env::var_os("NOSHIFTFIX").is_none(), "prefilter": std::env::var_os("NOPREFILTER").is_none(), "sym_ok": sym.as_ref().map(|s| s.0 == k).unwrap_or(false),
                     "sym_ms": sym.as_ref().map(|s| s.1.ms_total),
                     "sym_fb_ms": sym.as_ref().map(|s| s.1.ms_fb),
                     "sym_collect_ms": sym.as_ref().map(|s| s.1.ms_collect),
