@@ -6,7 +6,7 @@
 #   rp.sh pod ID                    -> pod record (costPerHr, vcpuCount, memoryInGb, desiredStatus)
 #   rp.sh upload ID DIR             -> PUT every allowed file in DIR
 #   rp.sh start ID STAGES_JSON      -> POST /start with stages + the frozen SHA-256s from ../image/image.json
-#   rp.sh status ID | fetch ID OUT.tar.gz | delete ID
+#   rp.sh status ID | fetch ID OUT.tar.gz | delete ID | reap ID OUTDIR DEADLINE_EPOCH
 # Token: $RUNNER_TOKEN (generated per pod by `create`, kept in $TOKDIR/<pod>.token, never committed).
 set -euo pipefail
 API=https://api.runpod.io/v2; H=(-H "Authorization: Bearer proxy-injected" -H "Content-Type: application/json")
@@ -69,5 +69,14 @@ case "$1" in
         && echo "manifest check: all files match" || echo "manifest check: MISMATCH (files written after the manifest are expected while running)"
       rm -rf "$d"; sha256sum "$3" ;;
   delete) curl -sS -X DELETE "$API/pods/$2" "${H[@]}"; echo "deleted $2" ;;
+  reap) # rp.sh reap ID OUTDIR DEADLINE_EPOCH (Amendment 33): the pod is billed until deleted, not until its job ends.
+      # Job done -> fetch, check the manifest, delete. Past the deadline -> fetch what exists, delete. Else report.
+      st=$(curl -sS -m 60 -H "X-Token: $(tok $2)" "$(url $2)/status" | jq -r '.state // "unreachable"' 2>/dev/null || echo unreachable)
+      if [ "$st" = done ] || [ "$(date +%s)" -gt "$4" ]; then
+        mkdir -p "$3"; out="$3/$2-$(date -u +%Y%m%dT%H%MZ).tar.gz"
+        "$0" fetch "$2" "$out" || echo "fetch failed for $2 (state $st)"
+        if [ "$st" = done ] || [ "$(date +%s)" -gt "$4" ]; then "$0" delete "$2"; fi
+        echo "reaped $2 state=$st"
+      else echo "alive $2 state=$st"; fi ;;
   *) echo "unknown command" >&2; exit 2 ;;
 esac

@@ -1100,3 +1100,23 @@ Every number is `[pcc:unverified]`.
   Amendment 31 batch at v2 prices (worst about US$220) does not fit. **No job is launched under this amendment.** A relaunch
   needs the owner to raise the ceiling or to choose a subset, and a pod-lifetime fix: the client deletes each pod when its job
   ends, and no batch starts unless a check-in is scheduled within the shortest job limit.
+
+## Amendment 33 (2026-11-18; relaunch of the Amendment 31 batch, attempt 2, on REST v2; before any row of these jobs)
+
+Every number is `[pcc:unverified]`.
+
+- **Owner decision (2026-11-18, session 01TCbLH6osebpnEbutNogBzD).** The owner said "resume". Asked which relaunch to run, with
+  the overrun stated, the owner chose **"Full batch"**: both routes of Amendment 31, all 8 jobs. The study ceiling rises from
+  US$500 to **about US$690** (Amendment 20 amended). This answer is also the per-batch balance confirmation (decision 18,
+  Amendment 29).
+- **Jobs, stages, hosts, limits, readings and the validation gate.** Exactly as in Amendment 31, with the job names suffixed
+  `-v2`. The client is `rp.sh` on REST v2 (Amendment 32), flavor `cpu5m` (8 GB per vCPU; US$2.08/h at 32 vCPU, US$1.04/h at
+  16 vCPU).
+- **Pod lifetime (new; the Amendment 32 overrun).** A pod is billed until it is deleted, so:
+  - `rp.sh reap ID OUTDIR DEADLINE` fetches the results, checks them against the pod's manifest, and deletes the pod once its
+    job is done, or once the deadline passes, whatever the job's state. Deadline: launch + job limit + 30 min.
+  - The session runs the reaper every 15 minutes. Scheduled check-ins, which survive a session restart, also run it hourly and
+    at each deadline.
+- **Spend.** Job guards: 2 × US$51.65 (F) + 2 × US$49.92 (C decisive) + 4 × US$4.16 (C validation) = US$219.8 worst case,
+  plus at most 30 min of reap lag per pod. With about US$466 already spent, that is about US$690 worst case.
+- No hypothesis, §6 rule, seed or draw changes.
