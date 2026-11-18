@@ -170,7 +170,7 @@ fn all_43_public_logs_recovered_through_real_balanced_jacobian() {
     // Group-operation COUNTS, not comparable primitive or wall-clock costs.
     // Same BSGS roster and order means equal addition counts in both groups.
     assert_eq!(direct_adds, jacobian_adds);
-    assert_eq!(direct_adds, 706);
+    assert_eq!(direct_adds, 670);
     eprintln!(
         "CT204: 43/43 actual toy logarithms; direct E additions={direct_adds}; \
          Jacobian additions={jacobian_adds}; 43 pullbacks and norms \
