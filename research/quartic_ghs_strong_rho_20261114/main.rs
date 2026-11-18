@@ -48,7 +48,7 @@ mod strong_rho;
 
 use common::*;
 use ghs::*;
-use strong_rho::{strong_rho, FieldCounts, NativeCounts, StrongOpts};
+use strong_rho::{strong_rho, strong_rho_uncounted, FieldCounts, NativeCounts, StrongOpts};
 
 fn median(v: &mut [f64]) -> f64 {
     v.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -190,18 +190,22 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 );
                 continue;
             }
-            let width: usize = arm
-                .strip_prefix("strong-b")
-                .unwrap_or_else(|| panic!("unknown arm {arm}"))
-                .parse()
-                .expect("batch width");
-            let out = strong_rho(
-                &inst,
-                k,
-                seed * 1000 + i as u64,
-                StrongOpts::for_instance(&inst, width),
-            );
-            println!(
+            let (width_text, count_authoritative) =
+                if let Some(width) = arm.strip_prefix("strong-b") {
+                    (width, true)
+                } else if let Some(width) = arm.strip_prefix("fast-b") {
+                    (width, false)
+                } else {
+                    panic!("unknown arm {arm}")
+                };
+            let width: usize = width_text.parse().expect("batch width");
+            let opts = StrongOpts::for_instance(&inst, width);
+            let out = if count_authoritative {
+                strong_rho(&inst, k, seed * 1000 + i as u64, opts)
+            } else {
+                strong_rho_uncounted(&inst, k, seed * 1000 + i as u64, opts)
+            };
+            let mut line = format!(
                 "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
                 arm,
                 width,
@@ -226,13 +230,18 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 flat_native("setup_native", out.setup_native),
                 flat_native("walk_native", out.walk_native),
             );
+            if !count_authoritative {
+                assert_eq!(line.pop(), Some('}'));
+                line.push_str(",\"count_authoritative\":false}");
+            }
+            println!("{line}");
         }
     }
 }
 
 fn usage() -> ! {
     eprintln!(
-        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,...>"
+        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,fast-b1,...>"
     );
     std::process::exit(2)
 }
