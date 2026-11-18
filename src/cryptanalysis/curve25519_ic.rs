@@ -388,6 +388,64 @@ mod tests {
     }
 
     #[test]
+    fn split_join_distinguishes_fixed_signs_from_x_only_witnesses() {
+        let model = Curve25519IcModel::rfc7748();
+        let curve = model.short_weierstrass_params();
+        let a = curve.a_fe();
+        let g = curve.generator();
+        let p = g.scalar_mul_vartime(&BigUint::from(2u32), &a);
+        let q = g.scalar_mul_vartime(&BigUint::from(3u32), &a);
+        let auxiliary = g.scalar_mul_vartime(&BigUint::from(5u32), &a);
+        let t = g.scalar_mul_vartime(&BigUint::from(7u32), &a);
+        let target = g.scalar_mul_vartime(&BigUint::from(12u32), &a);
+
+        assert_eq!(p.add_vartime(&q, &a), auxiliary);
+        assert_eq!(auxiliary.add_vartime(&t, &a), target);
+        assert!(model
+            .semaev_s3(
+                p.x_coord().expect("2G is finite"),
+                q.x_coord().expect("3G is finite"),
+                auxiliary.x_coord().expect("5G is finite"),
+            )
+            .is_zero());
+        assert!(model
+            .semaev_s3(
+                auxiliary.x_coord().expect("5G is finite"),
+                t.x_coord().expect("7G is finite"),
+                target.x_coord().expect("12G is finite"),
+            )
+            .is_zero());
+
+        // S3 sees abscissae and therefore existential signs. Negating the
+        // fixed inputs leaves the split system unchanged, although this
+        // chosen signed four-point equation is now false.
+        let minus_p = p.neg_vartime();
+        let minus_q = q.neg_vartime();
+        assert_eq!(minus_p.x_coord(), p.x_coord());
+        assert_eq!(minus_q.x_coord(), q.x_coord());
+        let opposite_auxiliary = minus_p.add_vartime(&minus_q, &a);
+        assert_eq!(opposite_auxiliary.x_coord(), auxiliary.x_coord());
+        assert_ne!(opposite_auxiliary.add_vartime(&t, &a), target);
+    }
+
+    #[test]
+    fn split_join_keeps_point_at_infinity_branch() {
+        let model = Curve25519IcModel::rfc7748();
+        let curve = model.short_weierstrass_params();
+        let a = curve.a_fe();
+        let g = curve.generator();
+        let p = g.scalar_mul_vartime(&BigUint::from(2u32), &a);
+        let q = p.neg_vartime();
+        let t = g.scalar_mul_vartime(&BigUint::from(7u32), &a);
+        let target = t.clone();
+
+        let auxiliary = p.add_vartime(&q, &a);
+        assert_eq!(auxiliary, Point::Infinity);
+        assert!(auxiliary.x_coord().is_none());
+        assert_eq!(auxiliary.add_vartime(&t, &a), target);
+    }
+
+    #[test]
     fn curve25519_binary_pkm_towers_are_shallow() {
         let limits = Curve25519IcModel::rfc7748().pkm_binary_tower_limits();
         assert_eq!(limits.kummer_height_from_p_minus_1, 2);

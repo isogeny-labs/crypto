@@ -49,11 +49,31 @@ impl Fp {
     }
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
-        ((a as u128 + b as u128) % self.p as u128) as u64
+        // Radical arithmetic normally operates on canonical residues.
+        // For a,b < p <= 2^61-1, a+b fits in u64 and needs one correction.
+        // Keep the former wide-modulus behavior for noncanonical callers.
+        if a < self.p && b < self.p {
+            let sum = a + b;
+            if sum >= self.p {
+                sum - self.p
+            } else {
+                sum
+            }
+        } else {
+            ((a as u128 + b as u128) % self.p as u128) as u64
+        }
     }
     #[inline]
     pub fn sub(&self, a: u64, b: u64) -> u64 {
-        ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64
+        if a < self.p && b < self.p {
+            if a >= b {
+                a - b
+            } else {
+                a + self.p - b
+            }
+        } else {
+            ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64
+        }
     }
     #[inline]
     pub fn neg(&self, a: u64) -> u64 {
@@ -65,7 +85,20 @@ impl Fp {
     }
     #[inline]
     pub fn mul(&self, a: u64, b: u64) -> u64 {
-        ((a as u128 * b as u128) % self.p as u128) as u64
+        if self.p == MAX_PRIME && a < MAX_PRIME && b < MAX_PRIME {
+            // p = 2^61 - 1: 2^61 == 1 mod p. The 122-bit product
+            // reduces with two end-around-carry folds, no wide division.
+            let product = a as u128 * b as u128;
+            let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
+            let folded = (folded & MAX_PRIME) + (folded >> 61);
+            if folded >= MAX_PRIME {
+                folded - MAX_PRIME
+            } else {
+                folded
+            }
+        } else {
+            ((a as u128 * b as u128) % self.p as u128) as u64
+        }
     }
     #[inline]
     pub fn sqr(&self, a: u64) -> u64 {
@@ -84,7 +117,30 @@ impl Fp {
         r
     }
     pub fn inv(&self, a: u64) -> u64 {
-        self.powm(a, self.p - 2)
+        // Extended Euclid replaces ~log(p) Fermat squarings/multiplies on
+        // public root-finder inputs. The modulus is prime and < 2^61;
+        // Euclidean coefficients and q*t stay within signed i64 bounds.
+        // Variable time: NEVER use for secret-dependent field operations.
+        let mut r0 = self.p;
+        let mut r1 = if a < self.p { a } else { a % self.p };
+        if r1 == 0 {
+            return 0; // preserve powm(0, p-2)
+        }
+        let (mut t0, mut t1) = (0i64, 1i64);
+        while r1 != 0 {
+            let q = r0 / r1;
+            let r2 = r0 - q * r1;
+            let t2 = t0 - (q as i64) * t1;
+            r0 = r1;
+            r1 = r2;
+            t0 = t1;
+            t1 = t2;
+        }
+        if t0 < 0 {
+            (t0 + self.p as i64) as u64
+        } else {
+            t0 as u64
+        }
     }
 }
 
@@ -133,7 +189,15 @@ impl Ring for Fq2 {
         let f = &self.f;
         let ac = f.mul(x.0, y.0);
         let bd = f.mul(x.1, y.1);
-        let nbd = f.mul(self.n, bd);
+        // The first quadratic non-residue is commonly 2 or 3.
+        // In these cases, one or two cheap modular additions replace a
+        // fourth full base-field multiplication (particularly costly for
+        // generic primes using 128-bit remainder).
+        let nbd = match self.n {
+            2 => f.add(bd, bd),
+            3 => f.add(f.add(bd, bd), bd),
+            _ => f.mul(self.n, bd),
+        };
         let s = f.mul(f.add(x.0, x.1), f.add(y.0, y.1));
         (f.add(ac, nbd), f.sub(f.sub(s, ac), bd))
     }
@@ -234,11 +298,21 @@ impl<R: Ring> Cube<R> {
         if self.s == 0 {
             return Some(rpow(r, a, self.e3));
         }
-        if rpow(r, a, self.n / 3) != r.one() {
+        // N = t * 3^s. Reuse a^t for both the cube-residuosity
+        // test (a^t)^(3^(s-1)) and the Sylow correction h.
+        // Since 3*e3-1 is either t or 2*t, this removes one
+        // full-length exponentiation from the AMM hot path.
+        let t = self.n / self.p3s;
+        let g = rpow(r, a, t);
+        let mut residue = g;
+        for _ in 1..self.s {
+            residue = r.mul(residue, r.mul(residue, residue));
+        }
+        if residue != r.one() {
             return None;
         }
         let x0 = rpow(r, a, self.e3); // x0^3 = a * h, h in the 3-Sylow
-        let h = rpow(r, a, 3 * self.e3 - 1);
+        let h = if t % 3 == 1 { r.mul(g, g) } else { g };
         let w2 = r.mul(self.w, self.w);
         let mut l: u128 = 0; // h = c^l, l found digit by digit
         for j in 0..self.s {
@@ -331,12 +405,19 @@ impl RadicalRootCtx {
             let r = f.powm(a, (p + 1) / 4);
             return if f.sqr(r) == a { Some(r) } else { None };
         }
-        if f.powm(a, (p - 1) / 2) != 1 {
+        // Euler's criterion from a^t2, reused by Tonelli-Shanks:
+        // a^((p-1)/2) = (a^t2)^(2^(s2-1)).
+        // Avoid a second full-length modular exponentiation.
+        let mut t = f.powm(a, self.t2);
+        let mut legendre = t;
+        for _ in 1..self.s2 {
+            legendre = f.sqr(legendre);
+        }
+        if legendre != 1 {
             return None;
         }
         let mut m = self.s2;
         let mut c = self.zc;
-        let mut t = f.powm(a, self.t2);
         let mut r = f.powm(a, self.t2.div_ceil(2));
         loop {
             if t == 1 {
@@ -351,7 +432,12 @@ impl RadicalRootCtx {
             if i == m {
                 return None;
             }
-            let b = f.powm(c, 1u64 << (m - i - 1));
+            // Power-of-two exponent: repeated squaring is cheaper
+            // than the generic binary-exponentiation loop.
+            let mut b = c;
+            for _ in 0..(m - i - 1) {
+                b = f.sqr(b);
+            }
             m = i;
             c = f.sqr(b);
             t = f.mul(t, c);
@@ -361,7 +447,10 @@ impl RadicalRootCtx {
     /// Distinct roots of monic y^2 + b y + c.
     pub fn quad_monic(&self, b: u64, c: u64) -> Vec<u64> {
         let f = &self.f;
-        let disc = f.sub(f.sqr(b), f.mul(4, c));
+        // Four times c needs only two reduced doublings, not a
+        // generic base-field multiply (wide remainder on most p).
+        let twice_c = f.add(c, c);
+        let disc = f.sub(f.sqr(b), f.add(twice_c, twice_c));
         match self.sqrt(disc) {
             None => vec![],
             Some(0) => vec![f.mul(f.neg(b), self.inv2)],
@@ -604,6 +693,303 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // Frozen unoptimized routines for independent bitwise before/after checks.
+    fn old_sqrt(ctx: &RadicalRootCtx, a: u64) -> Option<u64> {
+        let f = &ctx.f;
+        let p = f.p;
+        if a == 0 { return Some(0); }
+        if p % 4 == 3 {
+            let r = f.powm(a, (p + 1) / 4);
+            return if f.sqr(r) == a { Some(r) } else { None };
+        }
+        if f.powm(a, (p - 1) / 2) != 1 { return None; }
+        let mut m = ctx.s2;
+        let mut c = ctx.zc;
+        let mut t = f.powm(a, ctx.t2);
+        let mut r = f.powm(a, ctx.t2.div_ceil(2));
+        loop {
+            if t == 1 { return Some(r); }
+            let mut i = 0;
+            let mut temp = t;
+            while temp != 1 && i < m {
+                temp = f.sqr(temp);
+                i += 1;
+            }
+            if i == m { return None; }
+            let b = f.powm(c, 1u64 << (m - i - 1));
+            m = i;
+            c = f.sqr(b);
+            t = f.mul(t, c);
+            r = f.mul(r, b);
+        }
+    }
+
+    fn old_cube_root<R: Ring>(ctx: &Cube<R>, a: R::E) -> Option<R::E> {
+        let r = &ctx.r;
+        if a == r.zero() { return Some(a); }
+        if ctx.s == 0 { return Some(rpow(r, a, ctx.e3)); }
+        if rpow(r, a, ctx.n / 3) != r.one() { return None; }
+        let x0 = rpow(r, a, ctx.e3);
+        let h = rpow(r, a, 3 * ctx.e3 - 1);
+        let w2 = r.mul(ctx.w, ctx.w);
+        let mut l = 0u128;
+        for j in 0..ctx.s {
+            let corr = rpow(r, ctx.c, (ctx.p3s - l) % ctx.p3s);
+            let x = r.mul(h, corr);
+            let z = rpow(r, x, 3u128.pow(ctx.s - 1 - j));
+            let d = if z == r.one() { 0 }
+                else if z == ctx.w { 1 }
+                else if z == w2 { 2 }
+                else { return None };
+            l += d * 3u128.pow(j);
+        }
+        if !l.is_multiple_of(3) { return None; }
+        let y_inv = rpow(r, ctx.c, (ctx.p3s - l / 3) % ctx.p3s);
+        Some(r.mul(x0, y_inv))
+    }
+
+    #[test]
+    fn radical_power_reuse_matches_frozen_reference() {
+        // Include high 2-adicity, high 3-adicity (487-1 = 2*3^5),
+        // and large generic moduli. Both residues and non-residues.
+        let mut seed = 0x8e13_d970_ac55_10b2u64;
+        for &p in &[5u64, 7, 13, 19, 97, 109, 487, 65_537,
+                    998_244_353, 1_000_000_009, 2_013_265_921, MAX_PRIME] {
+            let f = Fp::new(p);
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            for _ in 0..128 {
+                seed = seed.wrapping_add(0x9e37_79b9_7f4a_7c15);
+                let mut z = seed;
+                z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+                z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+                let a = (z ^ (z >> 31)) % p;
+                assert_eq!(ctx.sqrt(a), old_sqrt(&ctx, a), "sqrt p={p} a={a}");
+                assert_eq!(ctx.cube_p.root(a), old_cube_root(&ctx.cube_p, a),
+                           "Fp AMM p={p} a={a}");
+                if p <= 487 {
+                    let b = f.mul(a, a);
+                    assert_eq!(ctx.cube_q.root((a, b)),
+                               old_cube_root(&ctx.cube_q, (a, b)),
+                               "Fp2 AMM p={p} a={a}");
+                }
+                let twice = f.add(a, a);
+                assert_eq!(f.add(twice, twice), f.mul(4, a),
+                           "quad discriminant p={p} c={a}");
+            }
+        }
+    }
+
+    // Explicitly run with:
+    // cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml
+    //   bench_radical_power_reuse -- --ignored --nocapture
+    #[test]
+    #[ignore = "paired local timing, separate from correctness gates"]
+    fn bench_radical_power_reuse() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn timing<F: Fn(u64) -> u64>(xs: &[u64], reps: usize, f: &F) -> f64 {
+            let begin = Instant::now();
+            let mut sum = 0u64;
+            for _ in 0..reps {
+                for &x in xs {
+                    sum ^= black_box(f(black_box(x)));
+                }
+            }
+            black_box(sum);
+            begin.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
+        }
+        fn paired<F: Fn(u64) -> u64, G: Fn(u64) -> u64>(
+            label: &str, xs: &[u64], reps: usize, before: F, after: G,
+        ) {
+            for &x in xs { assert_eq!(before(x), after(x), "{label} input={x}"); }
+            let (mut b, mut a) = (Vec::new(), Vec::new());
+            for i in 0..13 {
+                if i % 2 == 0 {
+                    b.push(timing(xs, reps, &before));
+                    a.push(timing(xs, reps, &after));
+                } else {
+                    a.push(timing(xs, reps, &after));
+                    b.push(timing(xs, reps, &before));
+                }
+            }
+            b.sort_by(f64::total_cmp);
+            a.sort_by(f64::total_cmp);
+            println!("{label}: {:.3} -> {:.3} ns/op {:.3}x",
+                     b[6], a[6], b[6] / a[6]);
+        }
+        let mut seed = 0x1234_86f0_d9cb_5678u64;
+        for &p in &[97u64, 998_244_353, 1_000_000_009, 2_013_265_921] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            let mut xs = Vec::new();
+            for _ in 0..2048 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let a = seed % p;
+                xs.push(f.sqr(a));
+            }
+            println!("p={p}");
+            paired("sqrt square", &xs, 2,
+                   |a| old_sqrt(&ctx, a).unwrap(),
+                   |a| ctx.sqrt(a).unwrap());
+            let cs: Vec<u64> = xs.iter().map(|&x| f.mul(x, f.sqr(x))).collect();
+            if !ctx.cube_p.bijective() {
+                paired("AMM cube", &cs, 2,
+                       |a| old_cube_root(&ctx.cube_p, a).unwrap(),
+                       |a| ctx.cube_p.root(a).unwrap());
+            }
+            paired("quad 4*c", &xs, 24,
+                   |c| f.mul(4, c),
+                   |c| { let t = f.add(c, c); f.add(t, t) });
+        }
+    }
+
+    #[test]
+    fn optimized_field_arithmetic_matches_wide_reference() {
+        fn ref_mul(p: u64, a: u64, b: u64) -> u64 {
+            ((a as u128 * b as u128) % p as u128) as u64
+        }
+        let mut seed = 0x7d3af0192ebc42u64;
+        for &p in &[5u64, 7, 11, 13, 97, 65_537, 998_244_353,
+                     1_000_000_007, 2_147_483_647, MAX_PRIME] {
+            let f = Fp::new(p);
+            let mut input = vec![0, 1, 2, p / 2, p - 2, p - 1];
+            for _ in 0..4_096 {
+                input.push(lcg(&mut seed) % p);
+            }
+            for (i, &a) in input.iter().enumerate() {
+                let b = input[(i * 37 + 1) % input.len()];
+                let expected_add = ((a as u128 + b as u128) % p as u128) as u64;
+                let expected_sub = ((a as u128 + p as u128 - b as u128) % p as u128) as u64;
+                assert_eq!(f.add(a, b), expected_add, "add p={p} a={a} b={b}");
+                assert_eq!(f.sub(a, b), expected_sub, "sub p={p} a={a} b={b}");
+                assert_eq!(f.mul(a, b), ref_mul(p, a, b), "mul p={p} a={a} b={b}");
+                if i < 300 {
+                    let inv = f.inv(a);
+                    assert_eq!(inv, f.powm(a, p - 2), "inv p={p} a={a}");
+                    if a != 0 {
+                        assert_eq!(ref_mul(p, a, inv), 1);
+                    }
+                }
+                let q = Fq2 { f, n: if i & 1 == 0 { 2 } else { 3 } };
+                let x = (a, b);
+                let y = (input[(i + 7) % input.len()], input[(i + 13) % input.len()]);
+                let ac = ref_mul(p, x.0, y.0);
+                let bd = ref_mul(p, x.1, y.1);
+                let nbd = ref_mul(p, q.n, bd);
+                let s = ref_mul(
+                    p,
+                    ((x.0 as u128 + x.1 as u128) % p as u128) as u64,
+                    ((y.0 as u128 + y.1 as u128) % p as u128) as u64,
+                );
+                let real = ((ac as u128 + nbd as u128) % p as u128) as u64;
+                let imag = ((s as u128 + 2 * p as u128 - ac as u128 - bd as u128)
+                    % p as u128) as u64;
+                assert_eq!(q.mul(x, y), (real, imag), "Fq2 p={p} x={x:?} y={y:?}");
+            }
+            // Public Fp entry points previously accepted noncanonical values.
+            if p == MAX_PRIME {
+                assert_eq!(f.mul(p + 1, p + 2), 2);
+                assert_eq!(f.add(p + 1, p + 2), 3);
+                assert_eq!(f.sub(p + 1, p + 2), p - 1);
+                assert_eq!(f.inv(p + 2), f.inv(2));
+            }
+        }
+    }
+
+    // Run explicitly with:
+    // cargo test --release --lib bench_radical_field_actual_rust -- --ignored --nocapture
+    // Same corpus for frozen before and actual implementation; microbench only.
+    #[test]
+    #[ignore = "local CPU timing study; not a CI correctness gate"]
+    fn bench_radical_field_actual_rust() {
+        use std::hint::black_box;
+        use std::time::Instant;
+
+        fn frozen_mul(p: u64, a: u64, b: u64) -> u64 {
+            ((a as u128 * b as u128) % p as u128) as u64
+        }
+        fn frozen_inv(p: u64, a: u64) -> u64 {
+            let mut x = a % p;
+            let mut e = p - 2;
+            let mut acc = 1u64 % p;
+            while e > 0 {
+                if e & 1 == 1 {
+                    acc = frozen_mul(p, acc, x);
+                }
+                x = frozen_mul(p, x, x);
+                e >>= 1;
+            }
+            acc
+        }
+        fn sample<F: Fn(u64, u64) -> u64>(
+            op: &F,
+            corpus: &[(u64, u64)],
+            reps: usize,
+        ) -> f64 {
+            let mut sink = 0u64;
+            let start = Instant::now();
+            for _ in 0..reps {
+                for &(a, b) in corpus {
+                    sink = sink.wrapping_add(op(black_box(a), black_box(b)));
+                }
+            }
+            black_box(sink);
+            start.elapsed().as_nanos() as f64 / (corpus.len() * reps) as f64
+        }
+        fn paired<F: Fn(u64, u64) -> u64, G: Fn(u64, u64) -> u64>(
+            label: &str,
+            before: F,
+            after: G,
+            corpus: &[(u64, u64)],
+            reps: usize,
+        ) {
+            for &(a, b) in corpus {
+                assert_eq!(before(a, b), after(a, b), "{label} a={a} b={b}");
+            }
+            let mut pre = Vec::new();
+            let mut post = Vec::new();
+            for i in 0..9 {
+                if i % 2 == 0 {
+                    pre.push(sample(&before, corpus, reps));
+                    post.push(sample(&after, corpus, reps));
+                } else {
+                    post.push(sample(&after, corpus, reps));
+                    pre.push(sample(&before, corpus, reps));
+                }
+            }
+            pre.sort_by(f64::total_cmp);
+            post.sort_by(f64::total_cmp);
+            let a = pre[pre.len() / 2];
+            let b = post[post.len() / 2];
+            println!("{label}: {a:.3} -> {b:.3} ns/op, {:.3}x", a / b);
+        }
+        let mut seed = 0x6ab9_d270_99e4_57f1u64;
+        for &p in &[MAX_PRIME, 1_000_000_007u64] {
+            let f = Fp::new(p);
+            let mut corpus = Vec::new();
+            for _ in 0..8192 {
+                seed = seed.wrapping_add(0x9e37_79b9_7f4a_7c15);
+                let mut v = seed;
+                v = (v ^ (v >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+                v = (v ^ (v >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+                let a = (v ^ (v >> 31)) % (p - 1) + 1;
+                seed = seed.wrapping_add(0x9e37_79b9_7f4a_7c15);
+                let b = seed % p;
+                corpus.push((a, b));
+            }
+            println!("p={p}, 8192 inputs, 9 paired medians");
+            paired("add", |a, b| ((a as u128 + b as u128) % p as u128) as u64,
+                |a, b| f.add(a, b), &corpus, 32);
+            paired("sub", |a, b| ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
+                |a, b| f.sub(a, b), &corpus, 32);
+            paired("mul", |a, b| frozen_mul(p, a, b),
+                |a, b| f.mul(a, b), &corpus, 32);
+            paired("inv", |a, _| frozen_inv(p, a),
+                |a, _| f.inv(a), &corpus, 2);
+        }
+    }
 
     fn eval(p: u64, poly: &[u64], x: u64) -> u64 {
         poly.iter().rev().fold(0u64, |a, &b| {
