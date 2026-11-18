@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-82d5661e279a08db3f21a19d19ad7fb81280232a9ab2cde427586918650f9cdc  H116FiberTrace.lean
+65935a4249acb958dafcc5535563bf5954b9224e86783bdec53a3699a6a7a30b  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  186 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  191 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -93,6 +93,9 @@ fc6bd72d5b93ee2d369243a94342a924ab1a640e60b08f6b5c0006037822a3c1  receipts/scala
 a74ee17eea454b66f6fc1e3f8acd75fd7de2bfa723c56a9b9193a3858bc4ca8c  receipts/generic-two-factor-bootstrap-build.txt
 988f903ed14a3cda6f1ba517dc407c00957773c6bdb73bce3dc2055244832238  receipts/generic-two-factor-bootstrap-full-build.txt
 aeffe27752d9cd4d28b01dcf47992e3b5b5e11396627debbc60ffb685361db05  receipts/generic-two-factor-bootstrap-audit.txt
+18d5c962ccb50c179bcf616b0c5987e13b7f9353ccaf71ff98f94b7da97ac2fa  receipts/generic-successor-scalar-seven-build.txt
+463f9e1442a6219c211a0d6cea358eb8f217d97cf830fce4f9d654fe08ff3f84  receipts/generic-successor-scalar-seven-full-build.txt
+a31892ff2095c514583f502bfef1ba389f69a4c4a3f39435f87b9029aed57af6  receipts/generic-successor-scalar-seven-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -417,6 +420,15 @@ coprime to `c`, then `a*(c-b^2)` is coprime to
 `a=2,b=1,s=2,c=-4` retains the other pair premises but yields `-10,-36`,
 proving that `a` coprime to `s` is essential. Companion recurrence stencils
 and recursive preservation of all premises remain open. [pcc:unverified]
+
+The 191-theorem checkpoint proves the companion successor stencil under the
+same three premises. Lean derives `c` coprime to `s` automatically, rewrites
+the next inner factor as `e-c*(c-b^2)`, and proves the recurrence-shaped
+successor pair coprime. Instantiating this identity proves `prePsi7` coprime
+to `prePsi8`, `Phi7` coprime to `PsiSq7`, and coordinate extension degree
+forty-nine outside characteristics two and seven. The singular `A=B=0`
+control over `ZMod 11` is non-coprime. Arbitrary parity-branch closure remains
+open. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

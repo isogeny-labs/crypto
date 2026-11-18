@@ -1058,6 +1058,42 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | recurrence-shaped pair `d,e` is coprime | generic algebraic law | H116 over Mathlib `IsCoprime` | arbitrary commutative ring | `c=b*s^2-a^3`, `a` coprime to `b,s`, `b` coprime to `c` |
 | dropping `a` coprime to `s` is unsound | negative mutation | H116 integer arithmetic | fixed integer tuple | retained two pair premises only |
 
+## Generic successor stencil and scalar-seven gate
+
+1. **Structure above.** Under the same generic premises, put
+   `d=a(c-b^2)`, `e=c*a^3-b^3*s^2`, and
+   `f=b(a^2*d-c^2)`. The inner factor satisfies
+   `a^2*d-c^2=e-c(c-b^2)`. Also `c` is automatically coprime to `s`, because
+   `c=(b*s)*s-a^3`. These identities prove `e` coprime to both factors of
+   `f`, so the successor pair is coprime without a new premise.
+2. **Theorems used as stated.** The proof uses the same generic Mathlib
+   coprimality product, power and subtract-multiple laws. Mathlib's
+   `prePsi'_even` at the next index identifies `f=prePsi8`; the prior stencil
+   identifies `e=prePsi7`.
+3. **Object as an instance.** The short-curve instantiation proves
+   `prePsi7` coprime to `prePsi8`, assembles `Phi7,PsiSq7` coprimality, and
+   gives coordinate extension degree forty-nine when `7 != 0`.
+4. **Assembly evidence.** The generic successor, scalar-seven instantiation,
+   no-cancellation assembly, degree endpoint and singular control pass in the
+   tracked module. The pinned full build completed all 3,162 jobs, and the
+   exact repository auditor reports `191 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** Two consecutive outputs of this binary
+   recurrence stencil are now covered generically. Arbitrary-index closure
+   still requires showing that every recursive parity branch decomposes into
+   these stencils or proving additional companion stencils. [pcc:unverified]
+6. **Inheritance table.** Ring laws, EDS formulas, coprimality transformations
+   and degree endpoints are inherited. H116 supplies the successor
+   factorization and composition. The singular scalar-seven pair on
+   `A=B=0` over `ZMod 11` is proved non-coprime by evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| successor pair `e,f` is coprime | generic recurrence stencil | H116 | arbitrary commutative ring | same three premises as the two-factor bootstrap |
+| `prePsi7` is coprime to `prePsi8` | exact EDS instantiation | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi7` is coprime to `PsiSq7` | exact division-polynomial assembly | H116 | same | same |
+| scalar-seven coordinate extension degree is forty-nine | exact degree assembly | H116 | rational function field | same plus `7 != 0` |
+| singular scalar-seven pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
+
 ## Scalar-six two-factor bootstrap gate
 
 1. **Structure above.** Instantiate the preceding generic gate with
