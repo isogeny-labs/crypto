@@ -1,0 +1,26 @@
+{
+  "schema": "draft.rho-reference-protocol/v0",
+  "status": "DRAFT - not frozen, not dispatched, no compute allocated",
+  "lane": "rho-fold",
+  "question": "Expected cost of the strongest legitimate rho on the run41-51 target (p1009 seed389, l=263807419614139553) with a Karatsuba/Chung-Hasan F_p6 tower, reported as a mean with interval rather than a single-run minimum",
+  "fold": {"negation": true, "frobenius": false, "reason": "rho-fold/results.txt: no subfield endomorphism, no base-change isogeny class, j not 0/1728"},
+  "source_change_required": "opt-in Arith variant in src/cryptanalysis/jv_rho_strong.rs (outside rho-fold paths); default instantiation unchanged",
+  "pre_dispatch_controls": [
+    "existing native hand vectors (p101, t^2=2) and basis/random/zero differential checks pass for the new tower",
+    "counted per-op totals equal rho-fold model: mul 28M/60A, sq 24M/36A, inv 59M/63A/1I at p1009",
+    "identical semantic walk (same points, same steps) as the registered native tower for a fixed seed"
+  ],
+  "arms": [
+    {"negation": true, "batch": 1, "tower": "registered-native"},
+    {"negation": true, "batch": 1, "tower": "karatsuba"},
+    {"negation": true, "batch": 16, "tower": "registered-native"},
+    {"negation": true, "batch": 16, "tower": "karatsuba"}
+  ],
+  "walk": {"r": 256, "dp_bits": 16},
+  "seeds": "N>=20 derived seeds per arm, interleaved arm order, same host/binary",
+  "metrics": ["steps/E[steps]", "bitop/v1 per step", "mean bitops with bootstrap 95% interval", "mean wall per step (indicative, isolated host only)"],
+  "predictions": {"bitops_per_step_karatsuba_b1": 213699, "expected_bitops_karatsuba_b1": 9.784e13, "expected_bitops_registered_neg_b1": 1.549e14},
+  "rejection": "any semantic-walk mismatch or count mismatch rejects the tower; retain raw results",
+  "compute": "requires owner authorization under isolab-eks or Runpod rules; not authorized by this draft",
+  "claims": "[pcc:unverified]; re-pricing of the reference, not an algorithmic improvement"
+}
