@@ -99,7 +99,8 @@ fn power_gates(h: &[u64], m: &[u64], p: u64) -> [bool; 4] {
 fn first_x_lifts(e: Curve, ar: &mut Arithmetic) -> Vec<(u64, u64)> {
     let mut points = vec![];
     for x in 0..10000 {
-        if let Some(y) = ar.sqrt(ar.rhs(e, x), e.p) {
+        let rhs = ar.rhs(e, x);
+        if let Some(y) = ar.sqrt(rhs, e.p) {
             if y != 0 {
                 let y = y.min(e.p - y);
                 assert!(ar.on_curve(e, Some((x, y))));
