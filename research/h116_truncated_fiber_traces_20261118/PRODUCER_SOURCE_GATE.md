@@ -10,10 +10,10 @@ and H116 copy have SHA-256:
 577015b44fae9828b9bddf1b2afc0403e4f44d732b3a01325f42253f0982cc82
 ```
 
-`h116_producer.rs` implements the fixed-length Bostan recurrence, formal-series
+The initial `h116_producer.rs` binding implemented the fixed-length Bostan recurrence, formal-series
 inversion/logarithmic derivative, direct fiber enumeration, identical A/A,
 λ=2 coordinate control, operation counters and first-mismatch stopping rule.
-Its SHA-256 is:
+Its initial SHA-256 was:
 
 ```text
 10b07f305cfba69a2a79f633db4e5035c0fab5d403e0a1f9a7ae4e66402e5a2c
@@ -34,10 +34,34 @@ c1362bd22f3c45d0ef9524babc9fb192351f3032b7dc76bb6c4aadbfd8c7d611  h116_producer.
 65d3e1b3d59037566bcc6fb5ed8d9c477f9ca8f167793081a91de956fe1bc248  h116_producer.opt
 ```
 
-The self-test uses only the excluded H115 `(p,a,b,r,d)=(31,1,19,37,4)` fixture.
-It requires:
+Before any H116 moment was produced, source review found that the initial run
+loop exposed `target_index` and used scalar order. That violates the frozen
+blinding and seeded-order requirements even though the candidate function did
+not accept a scalar. The initial binding remains above as a failed pre-data
+gate. The corrected producer has two process-separated modes:
 
-- rejection of the p=13 characteristic-boundary fixture;
+- `--prepare-targets` reads scalar indices and emits a shuffled blinded target
+  manifest plus a separate scorer-only label map;
+- `--run` accepts only the blinded coordinates and SHA-256 target digests. It
+  validates the complete nonidentity subgroup census and never opens the label
+  map.
+
+The corrected source and binary SHA-256 values are:
+
+```text
+bbb313c169806ad0099290f161a3462a1171eb8e49b5923f40bcfcbf7a3cd778  h116_producer.rs
+f081399945e967ea75c71b207910a9e6442daf8f5dd891f140dadbd3d2380063  h116_producer.debug
+c8d180ff67f011b492e02e37f42c30f8825528b8891a746ee22f8db4825b34be  h116_producer.opt
+```
+
+The corrected self-test uses only synthetic controls and the excluded H115
+`(p,a,b,r,d)=(31,1,19,37,4)` fixture. It requires:
+
+- rejection of all p=5, p=7 and p=13 characteristic-boundary fixtures;
+- 32/32 exact separable-root polynomial moment vectors and rejection of 32/32
+  deterministic one-coordinate tampers;
+- the FIPS SHA-256 `abc` known-answer vector and deterministic nonidentity
+  target shuffle checks;
 - exact equality between recurrence coefficients and dense kernel Vélu
   coefficients;
 - exact equality of all eight relative X and eight absolute Y moments against
@@ -45,8 +69,8 @@ It requires:
 - the same equality after the λ=2 coordinate isomorphism; and
 - a complete 37-squared torsion-table control.
 
-Optimized self-test stdout was `h116 producer selftest: pass`; it exited zero in
-0.238s user CPU. The source and binary bindings must be committed and pushed
+Corrected optimized self-test stdout was `h116 producer selftest: pass`; it
+exited zero in 0.243s user CPU. The corrected source and binary bindings must be committed and pushed
 before `--run` is invoked on `COHORT_V2.json`.
 
 The pre-data development test initially omitted the normalization `U=a^2u` and

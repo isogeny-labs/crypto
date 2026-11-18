@@ -1,10 +1,14 @@
 mod h116_field;
+#[allow(dead_code)]
+#[path = "../../src/hash/sha256.rs"]
+mod sha256;
 
 use h116_field::{
     first_irreducible, mod_inverse, torsion_table, trace_group_order, CountSnapshot, Curve, Felt,
     Field, Point,
 };
-use std::fs::File;
+use std::collections::HashSet;
+use std::fs::{self, File};
 use std::io::{BufWriter, Write};
 use std::path::Path;
 use std::time::Instant;
@@ -12,6 +16,9 @@ use std::time::Instant;
 const J: usize = 8;
 const PROTOCOL_SHA256: &str = "42b510bd0f67d23ad49e5827d947510de5e1c68bf82d29c78fa35e4861fe4bf3";
 const COHORT_SHA256: &str = "29e2fd5596ce3ed8e93933161e05b92229cd3065a892bc8ee59d6265f6fa2d99";
+const TARGET_SEEDS: [u64; 5] = [116001, 116002, 116003, 116004, 116005];
+const TARGET_HEADER: &str = "h116-targets/v1";
+const LABEL_HEADER: &str = "h116-target-labels/v1";
 
 #[derive(Clone, Copy, Debug)]
 struct CurveSpec {
@@ -31,6 +38,22 @@ const CURVES: [CurveSpec; 5] = [
     CurveSpec { slug: "h116-fp431-a1-b111-r397-d3", p: 431, a: 1, b: 111, order: 397, trace: 35, degree: 3 },
     CurveSpec { slug: "h116-fp587-a1-b204-r547-d3", p: 587, a: 1, b: 204, order: 547, trace: 41, degree: 3 },
 ];
+
+#[derive(Clone, Debug)]
+struct BlindedTarget {
+    generator_label: u64,
+    digest: String,
+    x: u64,
+    y: u64,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct PlantedControl {
+    case_id: usize,
+    candidate: Moments,
+    direct: Moments,
+    tamper_rejected: bool,
+}
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 struct Moments {
@@ -68,6 +91,30 @@ impl BaseField {
         Ok(self.mul(a, inverse))
     }
     fn constant(&self, value: usize) -> u64 { value as u64 % self.p }
+}
+
+fn inverse_and_log(polynomial: &[u64; J + 1], f: &mut BaseField) -> ([u64; J], [u64; J]) {
+    let mut inverse = [0_u64; J];
+    inverse[0] = 1;
+    for n in 1..J {
+        let mut sum = 0;
+        for i in 1..=n {
+            let product = f.mul(polynomial[i], inverse[n - i]);
+            sum = f.add(sum, product);
+        }
+        inverse[n] = f.neg(sum);
+    }
+    let mut log_derivative = [0_u64; J];
+    for n in 0..J {
+        let mut sum = 0;
+        for i in 1..=(n + 1) {
+            let derivative_coefficient = f.mul(f.constant(i), polynomial[i]);
+            let product = f.mul(derivative_coefficient, inverse[n + 1 - i]);
+            sum = f.add(sum, product);
+        }
+        log_derivative[n] = sum;
+    }
+    (inverse, log_derivative)
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -119,39 +166,21 @@ impl Jet {
     }
 
     fn online(&self, target_x: u64, target_y: u64, reference_x: u64) -> Result<(Moments, BaseOps), String> {
-        fn inverse_and_log(jet: &Jet, u: u64, f: &mut BaseField) -> ([u64; J], [u64; J]) {
+        fn polynomial(jet: &Jet, u: u64, f: &BaseField) -> [u64; J + 1] {
             let mut polynomial = [0_u64; J + 1];
             polynomial[0] = 1;
             polynomial[1] = f.neg(u);
             polynomial[2..=J].copy_from_slice(&jet.h[1..J]);
-            let mut inverse = [0_u64; J];
-            inverse[0] = 1;
-            for n in 1..J {
-                let mut sum = 0;
-                for i in 1..=n {
-                    let product = f.mul(polynomial[i], inverse[n - i]);
-                    sum = f.add(sum, product);
-                }
-                inverse[n] = f.neg(sum);
-            }
-            let mut log_derivative = [0_u64; J];
-            for n in 0..J {
-                let mut sum = 0;
-                for i in 1..=(n + 1) {
-                    let derivative_coefficient = f.mul(f.constant(i), polynomial[i]);
-                    let product = f.mul(derivative_coefficient, inverse[n + 1 - i]);
-                    sum = f.add(sum, product);
-                }
-                log_derivative[n] = sum;
-            }
-            (inverse, log_derivative)
+            polynomial
         }
 
         let mut f = BaseField::new(self.p);
         let normalized_target_x = f.mul(self.differential_squared, target_x);
         let normalized_reference_x = f.mul(self.differential_squared, reference_x);
-        let (inverse, target_log) = inverse_and_log(self, normalized_target_x, &mut f);
-        let (_, reference_log) = inverse_and_log(self, normalized_reference_x, &mut f);
+        let target_polynomial = polynomial(self, normalized_target_x, &f);
+        let reference_polynomial = polynomial(self, normalized_reference_x, &f);
+        let (inverse, target_log) = inverse_and_log(&target_polynomial, &mut f);
+        let (_, reference_log) = inverse_and_log(&reference_polynomial, &mut f);
         let y_scale = f.mul(self.differential_cubed, target_y);
         let mut result = Moments::default();
         for index in 0..J {
@@ -299,6 +328,178 @@ fn section(curve: &Curve<'_>, spec: CurveSpec, target: Point) -> Result<Point, S
     curve.scalar_mul(scalar, target)
 }
 
+fn sha256_hex(bytes: &[u8]) -> String {
+    sha256::sha256(bytes).iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+fn target_digest(spec: CurveSpec, generator_label: u64, x: u64, y: u64) -> String {
+    sha256_hex(format!(
+        "H116-TARGET\0{PROTOCOL_SHA256}\0{COHORT_SHA256}\0{}\0{generator_label}\0{x}\0{y}",
+        spec.slug
+    ).as_bytes())
+}
+
+fn splitmix64(state: &mut u64) -> u64 {
+    *state = state.wrapping_add(0x9e3779b97f4a7c15);
+    let mut value = *state;
+    value = (value ^ (value >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+    value = (value ^ (value >> 27)).wrapping_mul(0x94d049bb133111eb);
+    value ^ (value >> 31)
+}
+
+fn shuffled_scalars(order: u64, seed: u64) -> Vec<u64> {
+    let mut values: Vec<u64> = (1..order).collect();
+    let mut state = seed;
+    for index in (1..values.len()).rev() {
+        let swap = (splitmix64(&mut state) % (index as u64 + 1)) as usize;
+        values.swap(index, swap);
+    }
+    values
+}
+
+fn prepare_targets(target_path: &Path, label_path: &Path) -> Result<(), String> {
+    if target_path == label_path { return Err("target and label paths must differ".to_string()); }
+    let target_file = File::create(target_path).map_err(|e| format!("create {}: {e}", target_path.display()))?;
+    let label_file = File::create(label_path).map_err(|e| format!("create {}: {e}", label_path.display()))?;
+    let mut targets = BufWriter::new(target_file);
+    let mut labels = BufWriter::new(label_file);
+    writeln!(targets, "{TARGET_HEADER}\t{PROTOCOL_SHA256}\t{COHORT_SHA256}").map_err(|e| e.to_string())?;
+    writeln!(labels, "{LABEL_HEADER}\t{PROTOCOL_SHA256}\t{COHORT_SHA256}").map_err(|e| e.to_string())?;
+    let mut rows = 0_u64;
+    for (curve_index, spec) in CURVES.iter().copied().enumerate() {
+        let modulus = first_irreducible(spec.p, spec.degree)?;
+        let field = Field::new(spec.p, spec.degree, &modulus)?;
+        let curve = Curve { field: &field, a: field.from_base(spec.a), b: field.from_base(spec.b) };
+        let base_generator = first_base_point(&curve, spec.p)?;
+        if curve.scalar_mul(spec.order, base_generator)? != Point::Infinity {
+            return Err(format!("{} base generator has wrong order", spec.slug));
+        }
+        let scalar_order = shuffled_scalars(spec.order, TARGET_SEEDS[curve_index]);
+        for generator_label in 1..=3_u64 {
+            let generator = curve.scalar_mul(generator_label, base_generator)?;
+            for &scalar in &scalar_order {
+                let point = curve.scalar_mul(scalar, generator)?;
+                let (x, y) = point_base_coordinates(&field, point)?;
+                let digest = target_digest(spec, generator_label, x, y);
+                writeln!(targets, "{}\t{}\t{}\t{}\t{}", spec.slug, generator_label, digest, x, y)
+                    .map_err(|e| e.to_string())?;
+                writeln!(labels, "{}\t{}\t{}\t{}", spec.slug, generator_label, digest, scalar)
+                    .map_err(|e| e.to_string())?;
+                rows += 1;
+            }
+        }
+    }
+    targets.flush().map_err(|e| e.to_string())?;
+    labels.flush().map_err(|e| e.to_string())?;
+    println!("h116 target preparation: rows={rows}");
+    Ok(())
+}
+
+fn read_blinded_targets(path: &Path) -> Result<(Vec<Vec<BlindedTarget>>, String), String> {
+    let bytes = fs::read(path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let manifest_sha256 = sha256_hex(&bytes);
+    let text = std::str::from_utf8(&bytes).map_err(|e| format!("target manifest is not UTF-8: {e}"))?;
+    let mut lines = text.lines();
+    let expected_header = format!("{TARGET_HEADER}\t{PROTOCOL_SHA256}\t{COHORT_SHA256}");
+    if lines.next() != Some(expected_header.as_str()) { return Err("target manifest header mismatch".to_string()); }
+    let mut groups = vec![Vec::new(); CURVES.len() * 3];
+    let mut digests = HashSet::new();
+    for (line_index, line) in lines.enumerate() {
+        let columns: Vec<&str> = line.split('\t').collect();
+        if columns.len() != 5 { return Err(format!("target line {} has {} columns", line_index + 2, columns.len())); }
+        let curve_index = CURVES.iter().position(|spec| spec.slug == columns[0])
+            .ok_or_else(|| format!("unknown target curve {}", columns[0]))?;
+        let spec = CURVES[curve_index];
+        let generator_label: u64 = columns[1].parse().map_err(|_| format!("bad generator label at line {}", line_index + 2))?;
+        if !(1..=3).contains(&generator_label) { return Err(format!("generator label out of range at line {}", line_index + 2)); }
+        let x: u64 = columns[3].parse().map_err(|_| format!("bad x at line {}", line_index + 2))?;
+        let y: u64 = columns[4].parse().map_err(|_| format!("bad y at line {}", line_index + 2))?;
+        if x >= spec.p || y >= spec.p { return Err(format!("noncanonical coordinate at line {}", line_index + 2)); }
+        let digest = columns[2].to_string();
+        if digest != target_digest(spec, generator_label, x, y) {
+            return Err(format!("target digest mismatch at line {}", line_index + 2));
+        }
+        if !digests.insert(digest.clone()) { return Err(format!("duplicate target digest at line {}", line_index + 2)); }
+        groups[curve_index * 3 + generator_label as usize - 1].push(BlindedTarget { generator_label, digest, x, y });
+    }
+    for (curve_index, spec) in CURVES.iter().enumerate() {
+        for generator_label in 1..=3_usize {
+            let count = groups[curve_index * 3 + generator_label - 1].len();
+            if count != spec.order as usize - 1 {
+                return Err(format!("{} label {} has {} targets, expected {}", spec.slug, generator_label, count, spec.order - 1));
+            }
+        }
+    }
+    Ok((groups, manifest_sha256))
+}
+
+fn mul_mod_u64(left: u64, right: u64, modulus: u64) -> u64 {
+    ((left as u128 * right as u128) % modulus as u128) as u64
+}
+
+fn pow_mod_u64(mut base: u64, mut exponent: u64, modulus: u64) -> u64 {
+    let mut result = 1_u64;
+    while exponent != 0 {
+        if exponent & 1 == 1 { result = mul_mod_u64(result, base, modulus); }
+        exponent >>= 1;
+        if exponent != 0 { base = mul_mod_u64(base, base, modulus); }
+    }
+    result
+}
+
+fn planted_controls() -> Result<Vec<PlantedControl>, String> {
+    let p = 1009_u64;
+    let mut controls = Vec::new();
+    for case_id in 0..32_usize {
+        let degree = 9 + case_id % 8;
+        let roots: Vec<u64> = (0..degree)
+            .map(|index| 1 + ((case_id as u64 * 29 + index as u64 * 37) % (p - 1)))
+            .collect();
+        if roots.iter().copied().collect::<HashSet<_>>().len() != degree {
+            return Err(format!("planted case {case_id} has repeated roots"));
+        }
+        let mut f = BaseField::new(p);
+        let mut polynomial = [0_u64; J + 1];
+        polynomial[0] = 1;
+        for &root in &roots {
+            for index in (1..=J).rev() {
+                let product = f.mul(root, polynomial[index - 1]);
+                polynomial[index] = f.sub(polynomial[index], product);
+            }
+        }
+        let (inverse, log_derivative) = inverse_and_log(&polynomial, &mut f);
+        let mut candidate = Moments::default();
+        let mut direct = Moments::default();
+        for index in 0..J {
+            candidate.x[index] = if log_derivative[index] == 0 { 0 } else { p - log_derivative[index] };
+            candidate.y[index] = inverse[index];
+            direct.x[index] = roots.iter().fold(0_u64, |sum, &root| {
+                (sum + pow_mod_u64(root, index as u64 + 1, p)) % p
+            });
+        }
+        for (root_index, &root) in roots.iter().enumerate() {
+            let denominator = roots.iter().enumerate().filter(|(other, _)| *other != root_index)
+                .fold(1_u64, |product, (_, &other)| mul_mod_u64(product, (root + p - other) % p, p));
+            let weight = pow_mod_u64(denominator, p - 2, p);
+            for index in 0..J {
+                let term = mul_mod_u64(weight, pow_mod_u64(root, (degree - 1 + index) as u64, p), p);
+                direct.y[index] = (direct.y[index] + term) % p;
+            }
+        }
+        if candidate != direct { return Err(format!("planted case {case_id} failed exact comparison")); }
+        let mut tampered = candidate;
+        if case_id % 16 < J {
+            let index = case_id % J;
+            tampered.x[index] = (tampered.x[index] + 1) % p;
+        } else {
+            let index = case_id % J;
+            tampered.y[index] = (tampered.y[index] + 1) % p;
+        }
+        controls.push(PlantedControl { case_id, candidate, direct, tamper_rejected: tampered != direct });
+    }
+    Ok(controls)
+}
+
 fn array_json(values: &[u64]) -> String {
     format!("[{}]", values.iter().map(u64::to_string).collect::<Vec<_>>().join(","))
 }
@@ -329,7 +530,8 @@ fn mapped_base_inputs(spec: CurveSpec, target: Point, reference: Point, field: &
     Ok((spec.a * l4 % spec.p, spec.b * l6 % spec.p, u, v, u0))
 }
 
-fn run_curve<W: Write>(writer: &mut W, spec: CurveSpec) -> Result<(u64, u64), String> {
+fn run_curve<W: Write>(writer: &mut W, spec: CurveSpec, target_groups: &[Vec<BlindedTarget>]) -> Result<(u64, u64), String> {
+    if target_groups.len() != 3 { return Err("run_curve requires three blinded target groups".to_string()); }
     let modulus = first_irreducible(spec.p, spec.degree)?;
     let field = Field::new(spec.p, spec.degree, &modulus)?;
     let curve = Curve { field: &field, a: field.from_base(spec.a), b: field.from_base(spec.b) };
@@ -343,14 +545,31 @@ fn run_curve<W: Write>(writer: &mut W, spec: CurveSpec) -> Result<(u64, u64), St
     let mut mismatches = 0_u64;
     for label in 1..=3_u64 {
         let generator = curve.scalar_mul(label, setup.base_generator)?;
+        let targets = &target_groups[label as usize - 1];
+        let mut target_points = Vec::with_capacity(targets.len());
+        let mut point_keys = HashSet::new();
+        for target in targets {
+            if target.generator_label != label { return Err("blinded target label/group mismatch".to_string()); }
+            if !point_keys.insert((target.x, target.y)) { return Err("duplicate blinded target point".to_string()); }
+            let point = Point::Affine(field.from_base(target.x), field.from_base(target.y));
+            if !curve.is_on_curve(point) || point == Point::Infinity {
+                return Err(format!("{} target {} is not a nonidentity curve point", spec.slug, target.digest));
+            }
+            if curve.scalar_mul(spec.order, point)? != Point::Infinity {
+                return Err(format!("{} target {} is outside the order-r subgroup", spec.slug, target.digest));
+            }
+            target_points.push(point);
+        }
+        if target_points.len() != spec.order as usize - 1 {
+            return Err(format!("{} label {label} target census is incomplete", spec.slug));
+        }
         for &lambda in &[1_u64, 2] {
             let (model_a, model_b, _, _, reference_x) = mapped_base_inputs(spec, generator, generator, &field, lambda)?;
             let jet = Jet::new(spec.p, model_a, model_b, spec.trace)?;
             let reference_section = section(&curve, spec, generator)?;
             field.reset_counters();
             let reference_direct = absolute_direct_moments(&curve, reference_section, setup.kernel_generator, spec.order, lambda)?;
-            for scalar in 1..spec.order {
-                let target = curve.scalar_mul(scalar, generator)?;
+            for (blinded, &target) in targets.iter().zip(&target_points) {
                 let (_, _, target_x, target_y, _) = mapped_base_inputs(spec, target, generator, &field, lambda)?;
                 let candidate_start = Instant::now();
                 let (candidate, online_ops) = jet.online(target_x, target_y, reference_x)?;
@@ -365,17 +584,18 @@ fn run_curve<W: Write>(writer: &mut W, spec: CurveSpec) -> Result<(u64, u64), St
                 field.reset_counters();
                 let aa_absolute = absolute_direct_moments(&curve, target_section, setup.kernel_generator, spec.order, lambda)?;
                 let aa = direct_relative(aa_absolute, reference_direct, spec.p);
+                let aa_ops = field.snapshot();
                 if direct != aa { return Err("direct A/A mismatch".to_string()); }
                 let matches = candidate == direct;
                 rows += 1;
                 if !matches { mismatches += 1; }
                 writeln!(writer, concat!("{{\"type\":\"row\",\"curve\":\"{}\",\"generator_label\":{},",
-                    "\"target_index\":{},\"lambda\":{},\"candidate\":{},\"direct\":{},",
+                    "\"target_digest\":\"{}\",\"lambda\":{},\"candidate\":{},\"direct\":{},\"direct_aa\":{},",
                     "\"match\":{},\"jet_setup_ops\":{},\"candidate_online_ops\":{},",
-                    "\"direct_ops\":{},\"candidate_dev_ns\":{},\"direct_dev_ns\":{}}}"),
-                    spec.slug, label, scalar, lambda, moments_json(candidate), moments_json(direct),
+                    "\"direct_ops\":{},\"direct_aa_ops\":{},\"candidate_dev_ns\":{},\"direct_dev_ns\":{}}}"),
+                    spec.slug, label, blinded.digest, lambda, moments_json(candidate), moments_json(direct), moments_json(aa),
                     matches, base_ops_json(jet.setup_ops), base_ops_json(online_ops),
-                    extension_ops_json(direct_ops), candidate_ns, direct_ns).map_err(|e| e.to_string())?;
+                    extension_ops_json(direct_ops), extension_ops_json(aa_ops), candidate_ns, direct_ns).map_err(|e| e.to_string())?;
                 if !matches { return Ok((rows, mismatches)); }
             }
         }
@@ -383,15 +603,26 @@ fn run_curve<W: Write>(writer: &mut W, spec: CurveSpec) -> Result<(u64, u64), St
     Ok((rows, mismatches))
 }
 
-fn run(path: &Path) -> Result<(), String> {
-    let file = File::create(path).map_err(|e| format!("create {}: {e}", path.display()))?;
+fn run(target_path: &Path, output_path: &Path) -> Result<(), String> {
+    let (target_groups, target_manifest_sha256) = read_blinded_targets(target_path)?;
+    let file = File::create(output_path).map_err(|e| format!("create {}: {e}", output_path.display()))?;
     let mut writer = BufWriter::new(file);
-    writeln!(writer, "{{\"type\":\"header\",\"schema\":\"h116.component/v1\",\"protocol_sha256\":\"{PROTOCOL_SHA256}\",\"cohort_sha256\":\"{COHORT_SHA256}\"}}")
+    writeln!(writer, "{{\"type\":\"header\",\"schema\":\"h116.component/v2\",\"protocol_sha256\":\"{PROTOCOL_SHA256}\",\"cohort_sha256\":\"{COHORT_SHA256}\",\"target_manifest_sha256\":\"{target_manifest_sha256}\",\"labels_available_to_process\":false}}")
         .map_err(|e| e.to_string())?;
+    for control in planted_controls()? {
+        writeln!(writer, "{{\"type\":\"positive_control\",\"case_id\":{},\"candidate\":{},\"direct\":{},\"match\":{},\"tamper_rejected\":{}}}",
+            control.case_id, moments_json(control.candidate), moments_json(control.direct), control.candidate == control.direct, control.tamper_rejected)
+            .map_err(|e| e.to_string())?;
+    }
+    for prime in [5_u64, 7, 13] {
+        writeln!(writer, "{{\"type\":\"negative_control\",\"prime\":{prime},\"rejected\":{}}}", Jet::new(prime, 2 % prime, 4 % prime, -3).is_err())
+            .map_err(|e| e.to_string())?;
+    }
     let mut rows = 0;
     let mut mismatches = 0;
-    for spec in CURVES {
-        let (curve_rows, curve_mismatches) = run_curve(&mut writer, spec)?;
+    for (curve_index, spec) in CURVES.iter().copied().enumerate() {
+        let start = curve_index * 3;
+        let (curve_rows, curve_mismatches) = run_curve(&mut writer, spec, &target_groups[start..start + 3])?;
         rows += curve_rows;
         mismatches += curve_mismatches;
         if curve_mismatches != 0 { break; }
@@ -405,7 +636,13 @@ fn run(path: &Path) -> Result<(), String> {
 
 fn selftest() -> Result<(), String> {
     h116_field::selftest()?;
-    assert!(Jet::new(13, 2, 4, -3).is_err());
+    assert_eq!(sha256_hex(b"abc"), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+    for prime in [5_u64, 7, 13] { assert!(Jet::new(prime, 2 % prime, 4 % prime, -3).is_err()); }
+    let controls = planted_controls()?;
+    assert_eq!(controls.len(), 32);
+    assert!(controls.iter().all(|control| control.candidate == control.direct && control.tamper_rejected));
+    assert_eq!(shuffled_scalars(11, 116001), shuffled_scalars(11, 116001));
+    assert_ne!(shuffled_scalars(11, 116001), (1..11).collect::<Vec<_>>());
     let spec = CurveSpec { slug: "h115-control-fp31", p: 31, a: 1, b: 19, order: 37, trace: -5, degree: 4 };
     let modulus = first_irreducible(spec.p, spec.degree)?;
     let field = Field::new(spec.p, spec.degree, &modulus)?;
@@ -432,8 +669,14 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let result = match args.as_slice() {
         [_, flag] if flag == "--selftest" => selftest(),
-        [_, flag, path] if flag == "--run" => run(Path::new(path)),
-        _ => Err("usage: h116_producer --selftest | --run OUTPUT.jsonl".to_string()),
+        [_, flag, target_path, label_path] if flag == "--prepare-targets" => {
+            prepare_targets(Path::new(target_path), Path::new(label_path))
+        }
+        [_, flag, target_path, output_path] if flag == "--run" => {
+            run(Path::new(target_path), Path::new(output_path))
+        }
+        _ => Err(concat!("usage: h116_producer --selftest | ",
+            "--prepare-targets TARGETS.tsv LABELS.tsv | --run TARGETS.tsv OUTPUT.jsonl").to_string()),
     };
     if let Err(error) = result { eprintln!("h116 producer error: {error}"); std::process::exit(1); }
 }

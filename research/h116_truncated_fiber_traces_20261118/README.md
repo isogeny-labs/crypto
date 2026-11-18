@@ -59,6 +59,13 @@ The implemented normalization and exact truncated formulas are recorded in
 `U=(t-1)^2u`, not raw `u`; this scaling is required to make the isogeny
 normalized before applying the Bostan recurrence.
 
+Target generation and moment production are process-separated. The target
+preparer applies the frozen per-curve seeds and emits (1) coordinates plus an
+opaque SHA-256 digest and (2) a separate scalar-label map. The moment producer
+accepts only the first artifact, checks that it is a complete nonidentity
+subgroup census, and serializes only the digest. The label map is reserved for
+the independent scorer after identity verification.
+
 ## Cost boundary
 
 The candidate target for fixed `J` is `O(M(J) log p)` base-field operations,
