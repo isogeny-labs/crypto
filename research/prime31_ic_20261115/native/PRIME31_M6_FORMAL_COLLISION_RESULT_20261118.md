@@ -47,7 +47,7 @@ Pr[R in six-slot support] <= 884350051 / 2147446831
                          = 0.4118146434331905.
 ```
 
-The previous `31^6/n` ceiling was `0.4132831920158493`. The new upper bound is **0.146855 percentage points** stricter; it is not an exact success probability. For i.i.d. uniform random residuals, the expected number of trials for 1,024 positive outcomes is bounded below by `1024*n/F_31 = 2486.48...` (ceil **2,487**), not the previous ceil 2,478. This expectation says nothing deterministic about one seeded corpus, and additional rank constraints can only raise the actual required work.
+The previous `31^6/n` ceiling was `0.4132831920158493`. The new upper bound is **0.146855 percentage points** stricter; it is not an exact success probability. For i.i.d. uniform random residuals, the expected number of trials for 1,024 positive outcomes is bounded below by `1024*n/F_31 = 2486.55558...` (ceil **2,487**), not the previous ceil 2,478. This expectation says nothing deterministic about one seeded corpus, and additional rank constraints can only raise the actual required work.
 
 An explicit original-curve collision certificate needs no logarithms: since `1+7=3+5=8`, words `(0,1,1,0,2,3)` and `(1,0,0,1,2,3)` both represent `[8]P_0+[8]P_1+[11]P_2+[13]P_3`. The native code checks their **actual group sums**, not just integer vectors. The independent checker uses separately written affine EC arithmetic and checks that equality again.
 
