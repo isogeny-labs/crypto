@@ -717,6 +717,42 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
     }
 }
 
+/// `dim` independent elements of `ker Tr`, from `1, z, z², …`: each monomial
+/// of trace 0 as it is, each of trace 1 plus the first monomial of trace 1.
+/// A point `(x, y)` of `y² + xy = x³ + ax² + b` lies in `2E(F_{2^n})` iff
+/// `Tr(x) = Tr(a)`, so with `Tr(a) = 0` every point above the span is in
+/// `2E` (`research/isogeny_conductor_gap_round5_20261012/`, E7b; the
+/// trace-zero bases of `koblitz_factor_base_search` use the same fact).
+pub fn trace_kernel_basis(inst: &BinaryInstance, dim: u32) -> Result<Vec<u64>, String> {
+    if inst.artin_schreier.trace(inst.a) != 0 {
+        return Err("trace_kernel needs Tr(a) = 0: with Tr(a) = 1 the points of 2E lie over an affine hyperplane".into());
+    }
+    trace_coset_basis(inst, dim).map(|(basis, _)| basis)
+}
+
+/// The coset of `ker Tr` holding the abscissae of `2E`, as `(basis,
+/// offset)`: `dim` independent elements of `ker Tr` (see
+/// [`trace_kernel_basis`]) and `offset = 0` when `Tr(a) = 0`, or a
+/// monomial of trace 1 when `Tr(a) = 1`.  Every point above
+/// `offset + span(basis)` then has `Tr(x) = Tr(a)`, so lies in `2E`.
+pub fn trace_coset_basis(inst: &BinaryInstance, dim: u32) -> Result<(Vec<u64>, u64), String> {
+    let tr = |v: u64| inst.artin_schreier.trace(v);
+    let t0 = (0..inst.n)
+        .map(|k| 1u64 << k)
+        .find(|&e| tr(e) == 1)
+        .ok_or("no monomial of trace 1")?;
+    let basis: Vec<u64> = (0..inst.n)
+        .map(|k| 1u64 << k)
+        .filter(|&e| e != t0)
+        .map(|e| if tr(e) == 1 { e ^ t0 } else { e })
+        .take(dim as usize)
+        .collect();
+    if basis.len() < dim as usize {
+        return Err(format!("ker Tr has dimension {} < {dim}", inst.n - 1));
+    }
+    Ok((basis, if tr(inst.a) == 0 { 0 } else { t0 }))
+}
+
 /// **The Frobenius closure of a prefix subspace** (lead L5, the ordered
 /// τ-slot relation space): every point whose abscissa lies in
 /// `σ^t(V)` for some `t`, `V = ⟨1, z, …, z^{d−1}⟩`, each signed Frobenius

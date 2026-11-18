@@ -42,6 +42,13 @@ use super::smith_canonical::{
 };
 use super::smith_prop24::{deg, SplitMix64};
 
+// The W3b divisor-class engine (`Smith`, `W1Bridge`, `Pic`, `Mum`, ...) lived
+// in this file until 2026-11-16, when the module name was reused for the
+// transfer above; it is restored verbatim (blob 9342045201, commit a3e870b92b)
+// as `smith_isogeny_w3b` and re-exported so `smith_route_s` and
+// `examples/smith_isogeny.rs` resolve it under its original path.
+pub use super::smith_isogeny_w3b::*;
+
 /// Smith's isogeny on one curve, with everything needed to move classes.
 pub struct SmithIso {
     pub p: u64,

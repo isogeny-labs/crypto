@@ -7208,6 +7208,11 @@ pub struct FactorBase<E> {
     pub cost: PhaseCost,
     /// Subspace basis (single words) when the base is a linear subspace.
     pub subspace_basis: Option<Vec<u64>>,
+    /// `(basis, offset)` when the abscissae form the affine subspace
+    /// `offset + span(basis)`, `offset` outside the span.  Such a base
+    /// has no `subspace_basis`, so only consumers that read this field
+    /// (the algebraic descent) accept it.
+    pub affine_subspace: Option<(Vec<u64>, u64)>,
     /// `Some(n)` when the builder laid the base out by signed Frobenius
     /// orbit: `points[2(o·n + t)] = σ^t(S_o)` and `points[2(o·n + t) + 1]
     /// = −σ^t(S_o)` for orbit seeds `S_o`, each orbit of size `2n`.  The
@@ -7259,6 +7264,7 @@ impl<E: Copy> FactorBase<E> {
             point_index: fast_map(0),
             cost: PhaseCost::default(),
             subspace_basis: None,
+            affine_subspace: None,
             frobenius_orbit_layout: None,
             known_logs: None,
         }
@@ -7577,6 +7583,74 @@ pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> Fact
     count_index_build(&mut fb, a + n, 0);
     fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
     fb.cost.count("abscissae_scanned", (1u64 << l) - 1);
+    fb.cost.count("as_solves", solves);
+    fb
+}
+
+/// The points above `offset + span(basis)`; `offset = 0` is
+/// [`binary_subspace_factor_base`].  With `offset ≠ 0` (outside the span)
+/// the base records `affine_subspace` instead of `subspace_basis`.
+pub fn binary_affine_subspace_factor_base(
+    inst: &BinaryInstance,
+    basis: &[u64],
+    offset: u64,
+) -> FactorBase<FastPoint> {
+    let start = Instant::now();
+    let l = basis.len() as u32;
+    let mut fb = FactorBase::empty(if offset == 0 {
+        format!("subspace of dimension {l}")
+    } else {
+        format!("affine subspace of dimension {l}")
+    });
+    let mut solves = 0u64;
+    let first = if offset == 0 { 1 } else { 0 };
+    for idx in first..(1u64 << l) {
+        let mut x = offset;
+        for (j, &e) in basis.iter().enumerate() {
+            if (idx >> j) & 1 == 1 {
+                x ^= e;
+            }
+        }
+        solves += 1;
+        let pts = inst.points_with_x(x);
+        if pts.is_empty() {
+            continue;
+        }
+        let col = fb.abscissae;
+        let i = fb.points.len();
+        let mut idxs = Vec::new();
+        for (k, &p) in pts.iter().enumerate() {
+            fb.points.push(p);
+            fb.col_of.push(col);
+            fb.coef_of.push(if k == 0 { 1 } else { inst.r - 1 });
+            idxs.push(i + k);
+        }
+        if pts.len() == 2 {
+            fb.neg_index.push(i + 1);
+            fb.neg_index.push(i);
+        } else {
+            fb.neg_index.push(i);
+        }
+        fb.x_index.insert(x, idxs);
+        fb.abscissae += 1;
+    }
+    fb.columns = fb.abscissae;
+    fb.dimension = Some(l);
+    if offset == 0 {
+        fb.subspace_basis = Some(basis.to_vec());
+    } else {
+        fb.affine_subspace = Some((basis.to_vec(), offset));
+    }
+    for (i, p) in fb.points.iter().enumerate() {
+        fb.point_index.insert(p.pack(), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    // `points_with_x` returns both signs, so no negation is formed here.
+    let (a, n) = (fb.abscissae as u64, fb.points.len() as u64);
+    count_index_build(&mut fb, a + n, 0);
+    fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+    fb.cost.count("abscissae_scanned", (1u64 << l) - first);
     fb.cost.count("as_solves", solves);
     fb
 }
