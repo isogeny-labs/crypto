@@ -60,10 +60,10 @@ XOR/Tseitin compiler, a CDCL implementation, or any real-curve attack path.
 | Boolean equality variable | `[DecidableEq Choice]` | `decide (p = xs i)` |
 | positive clause per slot | `AtLeastOne` | existential semantic clause |
 | pairwise negative clauses | `AtMostOne` | uniqueness implication |
-| invalid-tuple blocking clause | `RejectsInvalid` | one false selected literal |
+| invalid-tuple blocking clause | `RejectsInvalid` | one false tuple variable, hence one true negated literal |
 | point composition | `[AddCommMonoid G]` | `Finset.univ.sum` |
 | target equality checker | `[DecidableEq G]` | `decide (sum = target)` |
-| `S₃` roots/group-law bridge | `SemaevS3.S3_root_iff`, `S3_factor_mathlib` | separate existing algebra layer; not imported or composed here |
+| `S₃` roots/group-law bridge | `SemaevS3.S3_root_iff`, `SemaevS3.S3_factor_mathlib` | separate existing algebra layer; not imported or composed here |
 
 ## Statement table
 
