@@ -1,0 +1,64 @@
+name: Prime31 3-isogeny exact 1024-target certificate replay
+on:
+  push:
+    branches: [automation/prime31-3isogeny-maxorder-20261118]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_isogeny_1024_certificate_replay.rs'
+      - 'research/prime31_ic_20261115/native/DICKSON31_COMPLETE_RANK_1024_RAW_20261117.json'
+      - '.github/workflows/prime31-3isogeny-1024-replay.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_isogeny_1024_certificate_replay.rs'
+      - '.github/workflows/prime31-3isogeny-1024-replay.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-certificate-replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Fetch only the candidate and frozen historical source-bound certificate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_isogeny_1024_certificate_replay.rs
+            research/prime31_ic_20261115/native/DICKSON31_COMPLETE_RANK_1024_RAW_20261117.json
+          sparse-checkout-cone-mode: false
+      - name: Fetch pinned original Rust arithmetic and algebraic engine
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Overlay only the replay candidate and historical evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp research/prime31_ic_20261115/native/examples/prime31_isogeny_1024_certificate_replay.rs native-pinned/research/prime31_ic_20261115/native/examples/
+          cp research/prime31_ic_20261115/native/DICKSON31_COMPLETE_RANK_1024_RAW_20261117.json native-pinned/research/prime31_ic_20261115/native/
+      - name: Install Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Pinned Rust native library regression tests
+        run: cargo +1.100.0 test --release --locked --lib --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Pinned Rust complete transcript / map / RREF test
+        run: cargo +1.100.0 test --release --locked --example prime31_isogeny_1024_certificate_replay --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Reproduce 1024-target exact Rust readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --release --locked --example prime31_isogeny_1024_certificate_replay --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml | tee prime31-isogeny-1024-replay.json
+      - name: Preserve exact-source counters and validation readback
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-3isogeny-1024-certificate-replay
+          path: prime31-isogeny-1024-replay.json
+          retention-days: 30
+          if-no-files-found: warn
