@@ -1,6 +1,8 @@
 //! Public-input workers for original IC and adapted two-LP scalar recovery.
 //! Fixture generation is separate; workers reject fields carrying an answer.
 pub use crypto_lib::cryptanalysis;
+// shared source file; this example does not call every entry point
+#[allow(dead_code)]
 #[path = "../src/cryptanalysis/jv_extension_sparse_dlp.rs"]
 #[allow(clippy::type_complexity)] // Unchanged graph key from the existing collector.
 mod extension_sparse_dlp;

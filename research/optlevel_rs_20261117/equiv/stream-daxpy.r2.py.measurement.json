@@ -1,0 +1,640 @@
+{
+ "command": [
+  "research/optlevel_rs_20261117/equiv/cache/optk-7a91a65fa85c-native",
+  "fma_f64",
+  "--n",
+  "51118080",
+  "--seconds",
+  "1.0"
+ ],
+ "conditions": {
+  "loadavg_1m": {
+   "max": 2.1474609375,
+   "median": 1.98583984375,
+   "min": 1.81005859375,
+   "n": 15
+  },
+  "other_cpu_cores": {
+   "max": 0.0897341947097396,
+   "median": 0.016402756381139232,
+   "min": 0.004907319343577386,
+   "n": 15
+  },
+  "psi_cpu_some_avg10": {
+   "max": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "n": 15
+  },
+  "steal_cores": {
+   "max": 0.044423962840787125,
+   "median": 0.009814638687067601,
+   "min": 0.005278482041751926,
+   "n": 15
+  }
+ },
+ "created_utc": "2026-11-17T20:16:06Z",
+ "cwd": null,
+ "declared_bytes_per_op": 24.0,
+ "flags": [
+  "VIRTUALIZED",
+  "OPS_VARY"
+ ],
+ "host": {
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "arch": "x86_64",
+  "caches_bytes": {
+   "L1d": 49152,
+   "L1i": 32768,
+   "L2": 2097152,
+   "L3": 272629760
+  },
+  "cgroup_cpu_max": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cpufreq_boost": null,
+  "cpufreq_governor": null,
+  "event_sources": [
+   "breakpoint",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "fingerprint": "44113cdb2d87e834",
+  "hypervisor": true,
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "avx512_vpopcntdq",
+   "avx512bw",
+   "avx512dq",
+   "avx512f",
+   "avx512ifma",
+   "avx512vl",
+   "bmi2",
+   "fma",
+   "gfni",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "kernel": "6.18.44-fc-v553",
+  "logical_cpus": 4,
+  "mem_total_bytes": 16869134336,
+  "numa_nodes": 1,
+  "perf_event_paranoid": "2",
+  "smt_active": "0",
+  "thread_siblings_cpu0": "0",
+  "turbo_disabled": null
+ },
+ "label": "stream-daxpy",
+ "noise_floor": {
+  "aa_ratio_deviation": 0.04411883247352577,
+  "pairs": 5,
+  "rel_range": 0.09903321916015456,
+  "sufficient": true,
+  "value": 0.09903321916015456
+ },
+ "op_class": "fma_f64",
+ "ops_source": "optlevel.ops/v1 line",
+ "pmu_unavailable_reason": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+ "points": {
+  "1": {
+   "cpu_s": {
+    "max": 1.929999999999997,
+    "median": 1.85,
+    "min": 1.660000000000002,
+    "n": 10
+   },
+   "cpu_utilisation": {
+    "max": 1.0005887903203254,
+    "median": 0.9915717400908495,
+    "min": 0.9552585333049702,
+    "n": 10
+   },
+   "loadavg_1m_before": {
+    "max": 2.1474609375,
+    "median": 1.98583984375,
+    "min": 1.81005859375,
+    "n": 10
+   },
+   "mode": "single",
+   "ops": {
+    "max": 817889280.0,
+    "median": 792330240.0,
+    "min": 766771200.0,
+    "n": 10
+   },
+   "ops_per_s": {
+    "max": 799217948.6843991,
+    "median": 765377221.9394443,
+    "min": 723420178.5238799,
+    "n": 10
+   },
+   "other_cpu_cores": {
+    "max": 0.0897341947097396,
+    "median": 0.022447451641171,
+    "min": 0.010286491375038767,
+    "n": 10
+   },
+   "threads": 1,
+   "wall_s": {
+    "max": 1.943963495999924,
+    "median": 1.8634363720000238,
+    "min": 1.6676053659998615,
+    "n": 10
+   }
+  },
+  "4": {
+   "cpu_s": {
+    "max": 8.4,
+    "median": 7.820000000000002,
+    "min": 7.439999999999996,
+    "n": 5
+   },
+   "cpu_utilisation": {
+    "max": 0.9620239405892701,
+    "median": 0.9374276386232608,
+    "min": 0.9024950826551484,
+    "n": 5
+   },
+   "loadavg_1m_before": {
+    "max": 2.05517578125,
+    "median": 1.97021484375,
+    "min": 1.81005859375,
+    "n": 5
+   },
+   "mode": "copies",
+   "ops": {
+    "max": 3067084800.0,
+    "median": 2964848640.0,
+    "min": 2862612480.0,
+    "n": 5
+   },
+   "ops_per_s": {
+    "max": 2925271790.221684,
+    "median": 2911612146.234788,
+    "min": 2749439710.0847187,
+    "n": 5
+   },
+   "other_cpu_cores": {
+    "max": 0.017742051843964952,
+    "median": 0.014760633936253263,
+    "min": 0.004907319343577386,
+    "n": 5
+   },
+   "threads": 4,
+   "wall_s": {
+    "max": 2.2659403239999847,
+    "median": 2.0374905979997493,
+    "min": 1.978185207000024,
+    "n": 5
+   }
+  }
+ },
+ "repeats": 5,
+ "runs": [
+  {
+   "bytes_declared": 18402508800.0,
+   "conditions": {
+    "loadavg_1m_after": 1.880859375,
+    "loadavg_1m_before": 1.880859375,
+    "other_cpu_cores": 0.06352398529342007,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.010587330882234857,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.86,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.006660756,
+   "op_class": "fma_f64",
+   "ops": 766771200,
+   "ops_per_s": 761697717.3589152,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.8883754739999858,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 19629342720.0,
+   "conditions": {
+    "loadavg_1m_after": 1.81005859375,
+    "loadavg_1m_before": 1.81005859375,
+    "other_cpu_cores": 0.016402756381139232,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.005467585460354087,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.81,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.023401566,
+   "op_class": "fma_f64",
+   "ops": 817889280,
+   "ops_per_s": 799187051.4687096,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.8286432059999242,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 19629342720.0,
+   "conditions": {
+    "loadavg_1m_after": 1.98583984375,
+    "loadavg_1m_before": 1.98583984375,
+    "other_cpu_cores": 0.010286491375038767,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.010286491374896699,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.929999999999997,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.023362002,
+   "op_class": "fma_f64",
+   "ops": 817889280,
+   "ops_per_s": 799217948.6843991,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.943963495999924,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 19629342720.0,
+   "conditions": {
+    "loadavg_1m_after": 2.05517578125,
+    "loadavg_1m_before": 2.1474609375,
+    "other_cpu_cores": 0.02690814236281358,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.005381628472577247,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.8399999999999999,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.045618191,
+   "op_class": "fma_f64",
+   "ops": 817889280,
+   "ops_per_s": 782206437.3399947,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.8579731340000762,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 18402508800.0,
+   "conditions": {
+    "loadavg_1m_after": 1.97021484375,
+    "loadavg_1m_before": 2.05517578125,
+    "other_cpu_cores": 0.0897341947097396,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.005278482041751926,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.8900000000000006,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.020016205,
+   "op_class": "fma_f64",
+   "ops": 766771200,
+   "ops_per_s": 751724527.7490469,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.89417819900018,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 18402508800.0,
+   "conditions": {
+    "loadavg_1m_after": 1.81005859375,
+    "loadavg_1m_before": 1.880859375,
+    "other_cpu_cores": 0.08557645022709005,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.00534852813920055,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.8699999999999992,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.025343995,
+   "op_class": "fma_f64",
+   "ops": 766771200,
+   "ops_per_s": 747818491.8808638,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.8688996099999713,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 19629342720.0,
+   "conditions": {
+    "loadavg_1m_after": 1.98583984375,
+    "loadavg_1m_before": 1.98583984375,
+    "other_cpu_cores": 0.028922955217905583,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.0115691820872169,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.7100000000000009,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.063496686,
+   "op_class": "fma_f64",
+   "ops": 817889280,
+   "ops_per_s": 769056726.5199734,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.7283941470000173,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 18402508800.0,
+   "conditions": {
+    "loadavg_1m_after": 2.1474609375,
+    "loadavg_1m_before": 2.1474609375,
+    "other_cpu_cores": 0.01058617115674129,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.005293085578345259,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.879999999999999,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.023515292,
+   "op_class": "fma_f64",
+   "ops": 766771200,
+   "ops_per_s": 749154610.5790865,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.8889423529999476,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 19629342720.0,
+   "conditions": {
+    "loadavg_1m_after": 2.05517578125,
+    "loadavg_1m_before": 2.05517578125,
+    "other_cpu_cores": 0.01798676091952842,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.005995586973164425,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.660000000000002,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.038279109,
+   "op_class": "fma_f64",
+   "ops": 817889280,
+   "ops_per_s": 787735468.151464,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.6676053659998615,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 18402508800.0,
+   "conditions": {
+    "loadavg_1m_after": 1.97021484375,
+    "loadavg_1m_before": 1.97021484375,
+    "other_cpu_cores": 0.01110599071032896,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.044423962840787125,
+    "thermal_throttle_events": null
+   },
+   "copies": 1,
+   "cpu_s": 1.7199999999999989,
+   "exit_status": [
+    0
+   ],
+   "kernel_seconds": 1.059925093,
+   "op_class": "fma_f64",
+   "ops": 766771200,
+   "ops_per_s": 723420178.5238799,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3
+   ],
+   "wall_s": 1.8005596809998679,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 68702699520.0,
+   "conditions": {
+    "loadavg_1m_after": 1.880859375,
+    "loadavg_1m_before": 1.880859375,
+    "other_cpu_cores": 0.013238251797892342,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.013238251797876664,
+    "thermal_throttle_events": null
+   },
+   "copies": 4,
+   "cpu_s": 8.18,
+   "exit_status": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "kernel_seconds": 1.064562205,
+   "op_class": "fma_f64",
+   "ops": 2862612480,
+   "ops_per_s": 2749439710.0847187,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3,
+    2,
+    1,
+    0
+   ],
+   "wall_s": 2.2659403239999847,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 68702699520.0,
+   "conditions": {
+    "loadavg_1m_after": 1.98583984375,
+    "loadavg_1m_before": 1.81005859375,
+    "other_cpu_cores": 0.017742051843964952,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.008871025921970263,
+    "thermal_throttle_events": null
+   },
+   "copies": 4,
+   "cpu_s": 8.4,
+   "exit_status": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "kernel_seconds": 1.035674026,
+   "op_class": "fma_f64",
+   "ops": 2862612480,
+   "ops_per_s": 2814955057.8917093,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3,
+    2,
+    1,
+    0
+   ],
+   "wall_s": 2.2542625150003914,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 72383201280.0,
+   "conditions": {
+    "loadavg_1m_after": 2.1474609375,
+    "loadavg_1m_before": 1.98583984375,
+    "other_cpu_cores": 0.014760633936253263,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.03936169049679831,
+    "thermal_throttle_events": null
+   },
+   "copies": 4,
+   "cpu_s": 7.820000000000002,
+   "exit_status": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "kernel_seconds": 1.053386528,
+   "op_class": "fma_f64",
+   "ops": 3015966720,
+   "ops_per_s": 2911612146.234788,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3,
+    2,
+    1,
+    0
+   ],
+   "wall_s": 2.0321739589999197,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 73610035200.0,
+   "conditions": {
+    "loadavg_1m_after": 2.05517578125,
+    "loadavg_1m_before": 2.05517578125,
+    "other_cpu_cores": 0.004907319343577386,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.009814638687067601,
+    "thermal_throttle_events": null
+   },
+   "copies": 4,
+   "cpu_s": 7.640000000000002,
+   "exit_status": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "kernel_seconds": 1.06272116,
+   "op_class": "fma_f64",
+   "ops": 3067084800,
+   "ops_per_s": 2925271790.221684,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3,
+    2,
+    1,
+    0
+   ],
+   "wall_s": 2.0374905979997493,
+   "working_set_bytes": 817889280
+  },
+  {
+   "bytes_declared": 71156367360.0,
+   "conditions": {
+    "loadavg_1m_after": 1.97021484375,
+    "loadavg_1m_before": 1.97021484375,
+    "other_cpu_cores": 0.015163903991941341,
+    "psi_cpu_some_avg10_before": 0.0,
+    "steal_cores": 0.015163903992041006,
+    "thermal_throttle_events": null
+   },
+   "copies": 4,
+   "cpu_s": 7.439999999999996,
+   "exit_status": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "kernel_seconds": 1.022905435,
+   "op_class": "fma_f64",
+   "ops": 2964848640,
+   "ops_per_s": 2925135233.304122,
+   "ops_source": "optlevel.ops/v1 line",
+   "pinned_cpus": [
+    3,
+    2,
+    1,
+    0
+   ],
+   "wall_s": 1.978185207000024,
+   "working_set_bytes": 817889280
+  }
+ ],
+ "scale": {
+  "env_var": null,
+  "mode": "copies",
+  "pinned": true,
+  "points": [
+   1,
+   4
+  ]
+ },
+ "schema": "optlevel.measurement/v1",
+ "startup_share": 0.44585704947911464,
+ "tier": "T-timing",
+ "tool_version": "1.0.0",
+ "working_set_bytes": 817889280
+}

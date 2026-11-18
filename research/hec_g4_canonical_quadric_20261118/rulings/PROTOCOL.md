@@ -1,0 +1,3 @@
+# Explicit rational ruling charts
+
+Construct two hyperbolic pairs for the recovered quadratic form using polar pairing and deterministic projective enumeration. In the resulting basis Q=ab+cd is the determinant of the matrix with rows (a,c),(-d,b). Its column and row directions give the two projections to the projective line; use the other column or row when the first vanishes. Verify the inverse basis and equality of quadrics throughout rational projective 3-space, compatibility wherever both expressions are defined, and exactly one rational quadric point for every ordered pair of P¹ values. Curves of bidegree (3,3) restrict these projections to degree three. Push freeze before one 600-CPU-second invocation.

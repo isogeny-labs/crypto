@@ -1,0 +1,14 @@
+{
+  "schema": "h115.curves/v1",
+  "selection": "lexicographically first nonsingular short-Weierstrass model for each retained (p,r,d), with p and #E(F_p)=r prime, d=ord_r(p), p^d<=1000000, distinct r, and p>=5",
+  "curves": [
+    {"slug":"h115-fp7-a1-b1-r5-d4","p":7,"a":1,"b":1,"order":5,"trace":3,"torsion_degree":4,"extension_size":2401},
+    {"slug":"h115-fp5-a2-b1-r7-d6","p":5,"a":2,"b":1,"order":7,"trace":-1,"torsion_degree":6,"extension_size":15625},
+    {"slug":"h115-fp13-a2-b4-r17-d4","p":13,"a":2,"b":4,"order":17,"trace":-3,"torsion_degree":4,"extension_size":28561},
+    {"slug":"h115-fp31-a1-b19-r37-d4","p":31,"a":1,"b":19,"order":37,"trace":-5,"torsion_degree":4,"extension_size":923521},
+    {"slug":"h115-fp47-a1-b38-r61-d3","p":47,"a":1,"b":38,"order":61,"trace":-13,"torsion_degree":3,"extension_size":103823}
+  ],
+  "generator_multipliers": [1,2,3],
+  "extension_polynomial": "lexicographically first monic irreducible polynomial of degree d over F_p",
+  "coordinate_isomorphism": "lambda=2, (x,y)->(lambda^2*x,lambda^3*y), (a,b)->(lambda^4*a,lambda^6*b)"
+}

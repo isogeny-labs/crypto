@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFil
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
-import { classify, embeddedInputs, materializeInputs, pathDependencyDirs, scopes, select, sourceFiles } from './ci-scope.mjs';
+import { classify, embeddedInputs, materializeInputs, pathDependencyDirs, runtimeInputs, scopes, select, sourceFiles } from './ci-scope.mjs';
 
 test('a cold root checkout resolves path crates and their embedded inputs', () => {
   const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-path-crates-'));
@@ -358,5 +358,32 @@ test('failed Git commands propagate and remove their temporary output', () => {
       assert.throws(() => sourceFiles(process.cwd()), /not a git repository/);
     `], { cwd, env: { ...process.env, TMPDIR: scratch, TMP: scratch, TEMP: scratch } });
     assert.deepEqual(readdirSync(scratch), []);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
+
+test('declared runtime inputs survive sparse materialization and reject unsafe registries', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-runtime-'));
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  const write = (file, text) => { mkdirSync(path.dirname(path.join(cwd, file)), { recursive: true }); writeFileSync(path.join(cwd, file), text); };
+  const registry = 'tests/fixtures/rust-runtime-inputs.json';
+  const declare = paths => write(registry, JSON.stringify({schema: 'crypto.rust-runtime-inputs/v1', paths}));
+  try {
+    git('init', '-q'); git('config', 'user.email', 'ci@example.invalid'); git('config', 'user.name', 'CI scope test');
+    write('src/lib.rs', 'pub fn fixture_reader() {}');
+    write('research/control.json', '{"frozen":true}');
+    write('research/archive/large.json', '{}');
+    declare(['research/control.json']);
+    git('add', '.'); git('commit', '-qm', 'runtime fixture');
+    git('sparse-checkout', 'set', '--no-cone', '/src/');
+    assert.equal(existsSync(path.join(cwd, registry)), false);
+    materializeInputs(cwd);
+    assert.equal(readFileSync(path.join(cwd, 'research/control.json'), 'utf8'), '{"frozen":true}');
+    assert.equal(existsSync(path.join(cwd, 'research/archive/large.json')), false);
+    assert.equal(classify(['research/control.json'], embeddedInputs(cwd)).rust_root, true);
+    for (const paths of [['../outside'], ['/absolute'], ['research/control.json', 'research/control.json'], ['missing.json'], ['research/../control.json']]) {
+      declare(paths);
+      assert.throws(() => runtimeInputs(cwd), /invalid or missing/);
+    }
   } finally { rmSync(cwd, { recursive: true, force: true }); }
 });
