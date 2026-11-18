@@ -236,8 +236,10 @@ fn compute()->Result<Value,String> {
             let lj=if neg {N-logs[j]} else {logs[j]};
             sum_log=(sum_log+lj)%N;
         }
-        let orig_shifted=ar.add(PRIME31,q,ar.scalar(PRIME31,k,Some(PRIME31.g)));
-        let image_shifted=ar.add(E2,single[i],ar.scalar(E2,k,Some(E2.g)));
+        let source_shift_point=ar.scalar(PRIME31,k,Some(PRIME31.g));
+        let orig_shifted=ar.add(PRIME31,q,source_shift_point);
+        let target_shift_point=ar.scalar(E2,k,Some(E2.g));
+        let image_shifted=ar.add(E2,single[i],target_shift_point);
         if src_sum!=orig_shifted || dst_sum!=image_shifted {
             return Err(format!("signed eight-leaf relation failed at {i}"));
         }
