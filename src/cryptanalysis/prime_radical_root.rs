@@ -722,6 +722,99 @@ mod tests {
         }
     }
 
+    // Run explicitly with:
+    // cargo test --release --lib bench_radical_field_actual_rust -- --ignored --nocapture
+    // Same corpus for frozen before and actual implementation; microbench only.
+    #[test]
+    #[ignore = "local CPU timing study; not a CI correctness gate"]
+    fn bench_radical_field_actual_rust() {
+        use std::hint::black_box;
+        use std::time::Instant;
+
+        fn frozen_mul(p: u64, a: u64, b: u64) -> u64 {
+            ((a as u128 * b as u128) % p as u128) as u64
+        }
+        fn frozen_inv(p: u64, a: u64) -> u64 {
+            let mut x = a % p;
+            let mut e = p - 2;
+            let mut acc = 1u64 % p;
+            while e > 0 {
+                if e & 1 == 1 {
+                    acc = frozen_mul(p, acc, x);
+                }
+                x = frozen_mul(p, x, x);
+                e >>= 1;
+            }
+            acc
+        }
+        fn sample<F: Fn(u64, u64) -> u64>(
+            op: &F,
+            corpus: &[(u64, u64)],
+            reps: usize,
+        ) -> f64 {
+            let mut sink = 0u64;
+            let start = Instant::now();
+            for _ in 0..reps {
+                for &(a, b) in corpus {
+                    sink = sink.wrapping_add(op(black_box(a), black_box(b)));
+                }
+            }
+            black_box(sink);
+            start.elapsed().as_nanos() as f64 / (corpus.len() * reps) as f64
+        }
+        fn paired<F: Fn(u64, u64) -> u64, G: Fn(u64, u64) -> u64>(
+            label: &str,
+            before: F,
+            after: G,
+            corpus: &[(u64, u64)],
+            reps: usize,
+        ) {
+            for &(a, b) in corpus {
+                assert_eq!(before(a, b), after(a, b), "{label} a={a} b={b}");
+            }
+            let mut pre = Vec::new();
+            let mut post = Vec::new();
+            for i in 0..9 {
+                if i % 2 == 0 {
+                    pre.push(sample(&before, corpus, reps));
+                    post.push(sample(&after, corpus, reps));
+                } else {
+                    post.push(sample(&after, corpus, reps));
+                    pre.push(sample(&before, corpus, reps));
+                }
+            }
+            pre.sort_by(f64::total_cmp);
+            post.sort_by(f64::total_cmp);
+            let a = pre[pre.len() / 2];
+            let b = post[post.len() / 2];
+            println!("{label}: {a:.3} -> {b:.3} ns/op, {:.3}x", a / b);
+        }
+        let mut seed = 0x6ab9_d270_99e4_57f1u64;
+        for &p in &[MAX_PRIME, 1_000_000_007u64] {
+            let f = Fp::new(p);
+            let mut corpus = Vec::new();
+            for _ in 0..8192 {
+                seed = seed.wrapping_add(0x9e37_79b9_7f4a_7c15);
+                let mut v = seed;
+                v = (v ^ (v >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+                v = (v ^ (v >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+                let a = (v ^ (v >> 31)) % (p - 1) + 1;
+                seed = seed.wrapping_add(0x9e37_79b9_7f4a_7c15);
+                let b = seed % p;
+                corpus.push((a, b));
+            }
+            println!("p={p}, 8192 inputs, 9 paired medians");
+            paired("add", |a, b| ((a as u128 + b as u128) % p as u128) as u64,
+                |a, b| f.add(a, b), &corpus, 32);
+            paired("sub", |a, b| ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
+                |a, b| f.sub(a, b), &corpus, 32);
+            paired("mul", |a, b| frozen_mul(p, a, b),
+                |a, b| f.mul(a, b), &corpus, 32);
+            paired("inv", |a, _| frozen_inv(p, a),
+                |a, _| f.inv(a), &corpus, 2);
+        }
+    }
+
     fn eval(p: u64, poly: &[u64], x: u64) -> u64 {
         poly.iter().rev().fold(0u64, |a, &b| {
             (((a as u128 * x as u128) + b as u128) % p as u128) as u64
