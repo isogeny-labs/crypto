@@ -283,3 +283,135 @@ mod tests {
         assert_eq!(verify_chart(r,&c,&s,&mut ar).0.len(),8);
     }
 }
+
+// Four known *signed* leaves remove four of the seven normalized RR9 chart
+// variables. Only a conditional algebraic preprocessor: unknown prefix
+// selection and public-only F4 coefficient recovery are NOT implemented.
+// Frozen protocol: RR9_FOUR_PREFIX_REDUCTION_PROTOCOL_20261118.md
+fn four_prefix_affine(r:(u64,u64),signed:&[(u64,u64)]) -> Option<[[u64;4];4]> {
+    assert!(signed.len()>=4);
+    let mut xs=[0u64;4];
+    for i in 0..4 {
+        xs[i]=signed[i].0;
+        if xs[i]==r.0 || xs[..i].contains(&xs[i]) {return None;}
+    }
+    let mut output=[[0u64;4];4]; // rows: A_const, A_v0, A_v1, A_v2
+    for i in 0..4 {
+        let (x,y)=signed[i];
+        let x2=mul(x,x);
+        let x3=mul(x2,x);
+        let ratio=mul(sub(0,add(y,r.1)),inv(sub(x,r.0)));
+        let mut basis=vec![1u64];
+        let mut den=1u64;
+        for j in 0..4 {
+            if i==j {continue;}
+            den=mul(den,sub(x,xs[j]));
+            basis=pmul(&basis,&[sub(0,xs[j]),1]);
+        }
+        assert_eq!(basis.len(),4);
+        let scale=mul(ratio,inv(den));
+        for (k,&power) in [x3,1,x,x2].iter().enumerate() {
+            let coeff=mul(scale,power);
+            for d in 0..4 {
+                output[k][d]=add(output[k][d],mul(coeff,basis[d]));
+            }
+        }
+    }
+    Some(output)
+}
+fn four_prefix_eval(affine:&[[u64;4];4],v:[u64;3]) -> [u64;4] {
+    let mut a=affine[0];
+    for j in 0..3 {
+        for k in 0..4 {a[k]=add(a[k],mul(v[j],affine[j+1][k]));}
+    }
+    a
+}
+fn four_prefix_remaining_gradient(r:(u64,u64),c:&[u64;7],x:u64,
+                                  affine:&[[u64;4];4]) -> [u64;3] {
+    let a=eval(&c[..4],x);
+    let v=eval(&[c[4],c[5],c[6],1],x);
+    let d=add(add(mul(x,x),mul(r.0,x)),add(mul(r.0,r.0),PRIME31.a));
+    // ∂M/∂A = -2((x-r)A + sV), ∂M/∂V = 2(DV-sA).
+    let da=sub(0,mul(2,add(mul(sub(x,r.0),a),mul(r.1,v))));
+    let dv=mul(2,sub(mul(d,v),mul(r.1,a)));
+    let px=[1,x,mul(x,x)];
+    std::array::from_fn(|j| {
+        add(mul(da,eval(&affine[j+1],x)),mul(dv,px[j]))
+    })
+}
+fn rank_4x3(mut rows:[[u64;3];4]) -> usize {
+    let mut rank=0;
+    for col in 0..3 {
+        let Some(pivot)=(rank..4).find(|&i|rows[i][col]!=0) else {continue;};
+        rows.swap(rank,pivot);
+        let norm=inv(rows[rank][col]);
+        for j in col..3 {rows[rank][j]=mul(rows[rank][j],norm);}
+        for i in 0..4 {
+            if i==rank {continue;}
+            let factor=rows[i][col];
+            for j in col..3 {
+                rows[i][j]=sub(rows[i][j],mul(factor,rows[rank][j]));
+            }
+        }
+        rank+=1;
+    }
+    rank
+}
+#[cfg(test)]
+mod four_prefix_tests {
+    use super::*;
+    #[test]
+    fn original_curve_four_prefix_elimination_and_mutation_falsifier() {
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).expect("unchanged original prime31");
+        let fb=base(&mut ar);
+        let weighted=slots(&mut ar,&fb);
+        let mut full_rank=0;
+        let mut mutation_rejected=0;
+        for t in 0..16usize {
+            let (target,signed,_,_)=target(t,&weighted,&mut ar);
+            let r=target.expect("nonidentity planted target");
+            let original=chart(r,&signed);
+            let affine=four_prefix_affine(r,&signed)
+                .expect("registered nonexceptional 4-prefix fixture");
+            let v=[original[4],original[5],original[6]];
+            let reconstructed=four_prefix_eval(&affine,v);
+            assert_eq!(&reconstructed[..],&original[..4],"exact A chart recovery");
+            let m=monic_m(r,&original);
+            let mut rows=[[0u64;3];4];
+            for j in 4..8 {
+                assert_eq!(eval(&m,signed[j].0),0,"remaining true x-root");
+                rows[j-4]=four_prefix_remaining_gradient(r,&original,signed[j].0,&affine);
+            }
+            assert_eq!(rank_4x3(rows),3,"exact local Jacobian rank");
+            full_rank+=1;
+
+            // Preserve the FOUR prefix equations while moving v0 by one.
+            // Only a true remaining slot resultant should distinguish it.
+            let mut altered=original;
+            altered[4]=add(altered[4],1);
+            let altered_v=[altered[4],altered[5],altered[6]];
+            let altered_a=four_prefix_eval(&affine,altered_v);
+            altered[..4].copy_from_slice(&altered_a);
+            let altered_m=monic_m(r,&altered);
+            let mut fails=false;
+            for j in 4..8 {
+                let (roots,_)=resultant_zeroes(&altered_m,&weighted[j]);
+                if roots.is_empty() {fails=true;}
+            }
+            assert!(fails,"mutated 3-variable chart escaped remaining constraints");
+            mutation_rejected+=1;
+        }
+        assert_eq!(full_rank,16);
+        assert_eq!(mutation_rejected,16);
+        // An input with x_i==target.x is outside this interpolation pivot.
+        let r=target(0,&weighted,&mut ar).0.unwrap();
+        let mut leaves=target(0,&weighted,&mut ar).1;
+        leaves[0].0=r.0;
+        assert!(four_prefix_affine(r,&leaves).is_none(),"zero divisor must fail closed");
+        // Identical abscissae also have no invertible Vandermonde.
+        let mut leaves=target(0,&weighted,&mut ar).1;
+        leaves[1].0=leaves[0].0;
+        assert!(four_prefix_affine(r,&leaves).is_none(),"duplicate x must fail closed");
+    }
+}
