@@ -80,6 +80,8 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Blocked / questions for the owner
 
+- Root-finding 50x, PR #4669: this runtime cannot implement, integrate or tune the prime-field ECDLP relation-search path, including witness recovery and attack-ledger integration. The read-only baseline assessment remains complete. A standalone synthetic polynomial-root benchmark is available as a separate safe scope, but does not satisfy the requested real-curve optimization.
+
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 
 - Vieta:504/504 primary and72/72 calibration calls completed/replayed. Canonical seed-registration360/60 failures retained; no L2 admission. Official censored-close blocked by unchanged main20261105T0828Z archive command1 lacking successful integer exit. Shared crypto-lean PR26 CI cannot start due account billing lock; no bypass/spend. Full general tower NF instance remains unverified.
