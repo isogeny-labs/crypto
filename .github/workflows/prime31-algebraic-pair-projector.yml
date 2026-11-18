@@ -1,0 +1,69 @@
+name: Prime31 algebraic pair projector exact signed controls
+
+on:
+  push:
+    branches:
+      - automation/prime31-algebraic-pair-projector-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_signed_pair_projector.rs
+      - research/prime31_ic_20261115/native/verify_prime31_signed_pair_projector.py
+      - research/prime31_ic_20261115/native/PRIME31_ALGEBRAIC_PAIR_PROJECTOR_PROTOCOL_20261118.md
+      - .github/workflows/prime31-algebraic-pair-projector.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_signed_pair_projector.rs
+      - research/prime31_ic_20261115/native/verify_prime31_signed_pair_projector.py
+      - research/prime31_ic_20261115/native/PRIME31_ALGEBRAIC_PAIR_PROJECTOR_PROTOCOL_20261118.md
+      - .github/workflows/prime31-algebraic-pair-projector.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prime31-signed-pair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout candidate source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout pinned original Rust source
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Copy only new algebraic control into pinned crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_signed_pair_projector.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_signed_pair_projector.rs
+      - name: Reused library and algebraic signed pair tests
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_signed_pair_projector
+      - name: Produce finite source-specific JSON diagnostics
+        run: |
+          cargo +1.100.0 run --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_signed_pair_projector > prime31-signed-pair-result.json
+          test -s prime31-signed-pair-result.json
+          cat prime31-signed-pair-result.json
+      - name: Independently replay every public-target case in Python BigInt
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_signed_pair_projector.py \
+            prime31-signed-pair-result.json
+      - name: Preserve raw producer diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-algebraic-signed-pair-diagnostic
+          path: prime31-signed-pair-result.json
+          if-no-files-found: warn
+          retention-days: 30
