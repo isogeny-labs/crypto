@@ -71,3 +71,14 @@ research-kb was not reachable in this container (recorded as a gap, as in the ea
 notes instead: `research/ic_m3_cost_leads_20261115/LEADS.md` (Lead 1 and its skeptic review),
 `research/ic_gpu_rootfind_la_20261115` (the round-5 echelon records replicated here),
 `research/ic_la_m3_20261115/PROTOCOL.md` (format).
+
+## Deviation recorded after the main session started (2026-11-18)
+`specs/sweep.json` froze the measurement seed 20261182, not rf3la's 20261128. ecbench derives the
+algorithm seed from (session seed, workload, round), shared by every arm, so the main session's f = 1 arm
+cannot equal round 5's records and prediction 1 cannot be read from it (the first record gave S 299.4
+against round 5's 280.3 on the same workload). Prediction 1 is read instead from `specs/replicate.json`:
+the same curves at seed 20261128 with arms `rho-neg`, `rf3-f1-F{2048,4096}` and `rf3-f8-F{2048,4096}`,
+run after the main session under the same record. Predictions 2–5 and the falsifiers are read from the
+main session as frozen; the f = 1/8 arms of the control are a second, independent sample of the
+falsifier cell. The two rounds of each session are different seeds, so records are paired on
+(workload, round), not compared across rounds.
