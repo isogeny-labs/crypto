@@ -225,6 +225,15 @@ extension degree. The base locus omits 5,002 points, and the union of every
 proper-period stratum omits 4,924 full-period points; the correct
 characteristic expression has zero failures in all strata.
 [pcc:unverified]
+Lean now also proves a finite rational-function separation bridge: equality on
+a finite pole-free sample implies equality after cross multiplication when
+both cross-product degrees are strictly below the sample size. A `ZMod 3`
+control proves that strictness cannot be weakened. The frozen
+`H116-RATIONAL-SEPARATION-CAPACITY-001` experiment finds 2,534 distinct
+affine x-values across the same eight cells, with per-cell raw capacities from
+16 to 1,236, and independently reconstructs the nonzero degree-|S| polynomial
+that vanishes on every sample. This measures capacity only; the actual H116
+map, poles and degree certificate remain open. [pcc:unverified]
 At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
 `(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
 coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from

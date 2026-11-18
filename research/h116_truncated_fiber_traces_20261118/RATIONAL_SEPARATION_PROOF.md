@@ -22,7 +22,7 @@ theorems, zero failures, and zero trusted native decisions.
 |---|---|---|
 | Finite regular evaluations imply rational-function equality below the strict degree bound | `rationalMap_eq_of_eval_finset` | proved |
 | The strict inequality cannot generally be weakened | `rationalMap_separation_strict_control` | proved |
-| Frozen-panel distinct-x capacity | `H116-RATIONAL-SEPARATION-CAPACITY-001` | preregistered, not yet run |
+| Frozen-panel distinct-x capacity | `RATIONAL_SEPARATION_CAPACITY_EXPERIMENT.md` | 8/8 independently replayed |
 | Actual H116 numerators and denominators | no construction supplied by this checkpoint | open |
 | Denominator nonvanishing/pole audit on the sample set | explicit theorem hypothesis | open |
 | Cross-product degree below measured capacity | explicit theorem hypothesis | open |

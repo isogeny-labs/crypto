@@ -613,6 +613,20 @@ points, and the correct characteristic expression has zero stratum failures.
 This instantiates but does not prove the restricted characteristic family.
 [pcc:unverified]
 
+The 121-theorem checkpoint adds a separating certificate for a supplied pair
+of rational functions. Agreement on a finite regular sample implies equality
+of cross products when the sample cardinality is strictly larger than both
+cross-product degrees. A `ZMod 3` theorem proves strictness is essential:
+`X^3-X` is nonzero of degree three but vanishes on all three field elements.
+The frozen separation-capacity census independently replays all eight cells.
+Their 5,058 affine points give 2,534 distinct x-values and raw strict degree
+capacities from 16 through 1,236. In every cell the nonzero monic sample
+vanishing polynomial has degree exactly the sample size and vanishes on every
+sample, while a constant mutation rejects everywhere. The actual H116
+numerators, denominators, pole set and cross-product degree remain open
+certificate inputs; no morphism or speedup follows from capacity alone.
+[pcc:unverified]
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression
