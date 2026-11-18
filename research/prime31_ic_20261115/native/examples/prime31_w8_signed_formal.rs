@@ -109,7 +109,8 @@ fn original_curve_control() -> Vec<u64> {
     assert_eq!(PRIME31.p, 2_147_483_647);
     let mut pts = Vec::new();
     for x in 0..100u64 {
-        if let Some(y) = ar.sqrt(ar.rhs(PRIME31, x), PRIME31.p) {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, PRIME31.p) {
             assert_ne!(y, 0);
             pts.push((x, y.min(PRIME31.p - y)));
             if pts.len() == 31 { break; }
