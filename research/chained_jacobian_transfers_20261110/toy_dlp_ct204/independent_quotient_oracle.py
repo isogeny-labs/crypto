@@ -84,6 +84,15 @@ def elliptic_add(a, b):
 
 def main():
     assert P % 3 == 1
+    # If u^6 = -b then (u²,0) is nontrivial rational 2-torsion on E_b.
+    # Hence a curve E_b of odd cardinality forbids rational Weierstrass
+    # points of the even-degree C_b: v² = u^6 + b.
+    odd_order_cases = 0
+    for b in range(1, P):
+        if elliptic_order(b) % 2:
+            odd_order_cases += 1
+            assert not any((pow(u, 6, P) + b) % P == 0 for u in range(P))
+    assert odd_order_cases == 20
     e_order, companion_order = elliptic_order(B), elliptic_order(B * B)
     assert (e_order, companion_order) == (43, 39)
     assert gcd(e_order, companion_order) == 1
