@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Test genus-2 smooth-companion torsion sieve against matched ECDLP coverage nulls (automation, started 2026-11-18, branch research/genus2-companion-torsion-sieve-20261118)
+- [x] Test genus-2 smooth-companion torsion sieve against matched ECDLP coverage nulls (automation, completed 2026-11-18, branch research/genus2-companion-torsion-sieve-20261118, PR #4761; toy predicate rejected)
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
