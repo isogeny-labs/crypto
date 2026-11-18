@@ -206,7 +206,11 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"setup_mode\":\"{}\",\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
                 arm,
                 width,
-                if setup_control { "legacy" } else { "batched-window2" },
+                if setup_control {
+                    "legacy"
+                } else {
+                    "batched-window2-jumps"
+                },
                 q,
                 seed,
                 i,

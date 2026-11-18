@@ -107,10 +107,6 @@ impl FastF3 {
         self.counts.get()
     }
 
-    fn restore_counts(&self, counts: FieldCounts) {
-        self.counts.set(counts);
-    }
-
     fn bump(&self, f: impl FnOnce(&mut FieldCounts)) {
         let mut c = self.counts.get();
         f(&mut c);
@@ -558,7 +554,8 @@ pub struct StrongOpts {
     pub dp_bits: u32,
     pub snapshot_period: u64,
     pub max_steps: u64,
-    /// Batch the cold jump/initial-walker simultaneous multiplications.
+    /// Batch the cold jump simultaneous multiplications. Initial walkers stay
+    /// on the lane-ordered retry path in `new_walker`.
     /// `false` is retained only as an in-source exact control.
     pub batch_setup: bool,
 }
@@ -735,45 +732,12 @@ fn initial_state(
     let table = ec.window2_table(g, q);
     let jump_coeffs: Vec<_> = ma.iter().copied().zip(mb.iter().copied()).collect();
     let mp = ec.batch_window2_mul(&table, &jump_coeffs);
-
-    // The baseline retries one lane to completion before drawing the next.
-    // Tentatively batch the overwhelmingly common no-identity case; on an
-    // identity, restore every observable counter and RNG bit before taking
-    // the exact sequential path.
-    let rng_before = rng.0;
-    let native_before = *native;
-    let field_before = f.counts();
-    let walker_coeffs: Vec<_> = (0..batch)
-        .map(|_| {
-            native.rng_draws += 2;
-            (rng.below(n), rng.below(n - 1) + 1)
-        })
+    // Keep walker construction on the exact sequential retry path. Apart
+    // from charging every attempted point, this centralizes all Walker state
+    // initialization for later hot-loop cache fields.
+    let walkers = (0..batch)
+        .map(|_| new_walker(ec, f, g, q, n, rng, native))
         .collect();
-    let walker_points = ec.batch_window2_mul(&table, &walker_coeffs);
-    let walkers = if walker_points.iter().any(|p| *p == EP::Inf) {
-        rng.0 = rng_before;
-        *native = native_before;
-        f.restore_counts(field_before);
-        (0..batch)
-            .map(|_| new_walker(ec, f, g, q, n, rng, native))
-            .collect()
-    } else {
-        walker_points
-            .into_iter()
-            .zip(walker_coeffs)
-            .map(|(p, (a, b))| {
-                let (p, a, b) = canon(f, p, a, b, n, native);
-                Walker {
-                    p,
-                    a,
-                    b,
-                    tail: 0,
-                    local: 0,
-                    snapshot: None,
-                }
-            })
-            .collect()
-    };
     InitialState {
         ma,
         mb,
