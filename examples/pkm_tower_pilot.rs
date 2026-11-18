@@ -127,6 +127,11 @@ use serde_json::{json, Value};
 #[path = "pkm_tower_wide/wide.rs"]
 mod wide;
 
+// `--instance`: the paper's normalized two-summand chain system
+// (research/hky_paper_runs_20261118).
+#[path = "pkm_tower_paper/paper.rs"]
+mod paper;
+
 /// Runs `$body` with `$f` bound to the backend `$b` at the prime `$p`
 /// (a `BigUint`).
 macro_rules! with_backend {
@@ -3730,6 +3735,10 @@ fn main() {
             .position(|x| x == "--export-dir")
             .expect("--export-dir");
         export_magma_rows(&files, &argv[j + 1]);
+        return;
+    }
+    if argv.iter().any(|x| x == "--instance") {
+        paper::run(&argv);
         return;
     }
     if let Some(i) = argv.iter().position(|x| x == "--aux-search") {

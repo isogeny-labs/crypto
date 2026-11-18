@@ -105,6 +105,9 @@ pub struct Fast2Options {
     pub deg_weight: usize,
     /// Append one JSON line per batch and per interreduction to this file.
     pub trace: Option<String>,
+    /// Checkpoint/resume and basis export (`hky_closure_io`); off by
+    /// default. Never changes the schedule or the result.
+    pub io: crate::cryptanalysis::hky_closure_io::IoOptions,
 }
 
 impl Default for Fast2Options {
@@ -125,6 +128,7 @@ impl Default for Fast2Options {
             fault: 0,
             deg_weight: 1,
             trace: None,
+            io: Default::default(),
         }
     }
 }
@@ -162,11 +166,32 @@ pub struct Fast2Stats {
     pub peak_words: u64,
     pub threads: usize,
     pub simd: &'static str,
+    /// What `hky_closure_io` did: checkpoints written, the resume source,
+    /// the exported basis.
+    pub io: crate::cryptanalysis::hky_closure_io::IoReport,
 }
 
-struct Echelon {
-    pivot: Vec<u32>,
-    rows: Vec<RowS>,
+pub(super) struct Echelon {
+    pub(super) pivot: Vec<u32>,
+    pub(super) rows: Vec<RowS>,
+}
+
+/// Every piece of state the main loop carries from one batch to the next.
+/// A checkpoint is exactly this struct (`hky_closure_io` serialises it);
+/// state added to the loop must be added here, or resume is not exact.
+pub(super) struct ClosureState {
+    pub(super) ech: Vec<Echelon>,
+    pub(super) queue: Vec<Vec<Item>>,
+    pub(super) rows_reduced: u64,
+    pub(super) contains_one: bool,
+    pub(super) yield_q16: u64,
+    pub(super) fresh_since_ir: usize,
+    pub(super) rank_at_ir: usize,
+    /// The counters of `Fast2Stats` (timers included, so they accumulate
+    /// across restarts).
+    pub(super) stats: Fast2Stats,
+    /// Wall seconds of the closure before this process (restarts).
+    pub(super) elapsed_before_s: f64,
 }
 
 struct Scratch {
@@ -387,7 +412,7 @@ fn store(r: Row, n: usize, num: usize, den: usize) -> RowS {
     }
 }
 
-enum Item {
+pub(super) enum Item {
     Row(u8, Row),
     Prod { part: u8, row: u32, var: u16 },
 }
@@ -541,7 +566,41 @@ pub fn closure_fast2(
     let mut rank_at_ir = 0usize;
     stats.setup_s = started.elapsed().as_secs_f64();
     let dense = (opts.dense_num, opts.dense_den);
+    // ── io hook 1 of 3 (hky_closure_io): resume from a checkpoint ──────
+    let io_fp = crate::cryptanalysis::hky_closure_io::fingerprint(ring, gens, c, opts, &stats.part_cols);
+    let mut io_clock = crate::cryptanalysis::hky_closure_io::Clock::new(&opts.io);
+    let mut elapsed_before_s = 0.0f64;
+    let mut io_report = crate::cryptanalysis::hky_closure_io::IoReport::default();
+    if let Some(st) = crate::cryptanalysis::hky_closure_io::try_resume(&opts.io, &io_fp, &space) {
+        (ech, queue, rows_reduced, contains_one) = (st.ech, st.queue, st.rows_reduced, st.contains_one);
+        (yield_q16, fresh_since_ir, rank_at_ir) = (st.yield_q16, st.fresh_since_ir, st.rank_at_ir);
+        // counters from the checkpoint; this host's facts from this process
+        let here = std::mem::take(&mut stats);
+        stats = Fast2Stats {
+            setup_s: here.setup_s,
+            symmetry: here.symmetry,
+            part_cols: here.part_cols,
+            threads: here.threads,
+            simd: here.simd,
+            ..st.stats
+        };
+        elapsed_before_s = st.elapsed_before_s;
+        io_report = stats.io.clone();
+        io_report.resumed_from = opts.io.checkpoint_dir.clone();
+        io_report.resumes += 1;
+    }
+    // ── end io hook 1 ──────────────────────────────────────────────────
     'outer: while let Some(b) = queue.iter().position(|q| !q.is_empty()) {
+        if crate::cryptanalysis::hky_closure_io::stop_requested() {
+            // a checkpoint first (if configured), then a censored result
+            let st = ClosureState { ech, queue, rows_reduced, contains_one, yield_q16, fresh_since_ir, rank_at_ir,
+                stats: Fast2Stats { io: io_report.clone(), ..stats.clone() },
+                elapsed_before_s: elapsed_before_s + started.elapsed().as_secs_f64() };
+            crate::cryptanalysis::hky_closure_io::checkpoint_now(&opts.io, &io_fp, &st, &mut io_report);
+            let entries: u64 = st.ech.iter().flat_map(|e| &e.rows).map(|r| r.nnz() as u64).sum();
+            stats.io = io_report;
+            return censored("signal", st.rows_reduced, entries, stats);
+        }
         if started.elapsed() > limits.budget {
             let entries: u64 = ech
                 .iter()
@@ -891,6 +950,16 @@ pub fn closure_fast2(
                 );
             }
         }
+        // ── io hook 2 of 3: periodic checkpoint, at a batch boundary ───
+        if io_clock.due(stats.batches) {
+            let st = ClosureState { ech, queue, rows_reduced, contains_one, yield_q16, fresh_since_ir, rank_at_ir,
+                stats: Fast2Stats { io: io_report.clone(), ..stats.clone() },
+                elapsed_before_s: elapsed_before_s + started.elapsed().as_secs_f64() };
+            crate::cryptanalysis::hky_closure_io::checkpoint_now(&opts.io, &io_fp, &st, &mut io_report);
+            (ech, queue) = (st.ech, st.queue);
+            io_clock.reset();
+        }
+        // ── end io hook 2 ──────────────────────────────────────────────
     }
     if let Some(f) = trace.as_mut() {
         let _ = f.flush();
@@ -927,6 +996,17 @@ pub fn closure_fast2(
             "hky_fp_tower_fast2: full space"
         );
     }
+    // ── io hook 3 of 3: export the closed basis ───────────────────────
+    if let Some(path) = &opts.io.export {
+        let ex = crate::cryptanalysis::hky_closure_io::export_basis(
+            path, ring, &space, &ech, opts.symmetry.as_deref(), contains_one, c,
+        );
+        assert_eq!(ex.profile, dims, "hky_closure_io: exported profile differs from the closure's");
+        io_report.export = Some(ex);
+    }
+    io_report.elapsed_total_s = elapsed_before_s + started.elapsed().as_secs_f64();
+    stats.io = io_report;
+    // ── end io hook 3 ──────────────────────────────────────────────────
     (
         Closure {
             c,
