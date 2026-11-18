@@ -21,3 +21,5 @@ Picks on Table B (incumbent = the split study's cheaper `-psr` arm at w = 0, pro
 Model S0 excludes the walk set-up (6 scalar multiplications) and factor base, which do not depend on (k, N).
 Next: a pilot on fresh seeds (PILOT section of PROTOCOL.md) checks the model's ranking around the picks; the confirmatory
 study is frozen only after it, on different seeds.
+
+**Revised after the pilot (R1, PROTOCOL.md section 2):** the objective is C at w = 0.1; picks change on P24 (6, 10), B18 (5, 7), B24 (6, 9); B27 stays (5, 12).
