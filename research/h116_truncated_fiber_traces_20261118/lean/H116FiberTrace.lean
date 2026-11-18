@@ -153,6 +153,59 @@ theorem relativePowerSeriesDerivativeMulCoeff
             PowerSeries.coeff (n - i) gv := by
   rw [map_sub, powerSeriesDerivativeMulCoeff, powerSeriesDerivativeMulCoeff]
 
+/-- The concrete formal denominator used by the H116 native code:
+`F_U(w)=1-Uw+h₁w²+h₂w³+⋯`. -/
+def fiberDenominatorSeries (u : K) (h : ℕ → K) : PowerSeries K :=
+  PowerSeries.mk fun
+    | 0 => 1
+    | 1 => -u
+    | n + 2 => h (n + 1)
+
+@[simp] theorem fiberDenominatorSeries_coeff_zero (u : K) (h : ℕ → K) :
+    PowerSeries.coeff 0 (fiberDenominatorSeries u h) = 1 := by
+  simp [fiberDenominatorSeries]
+
+@[simp] theorem fiberDenominatorSeries_coeff_one (u : K) (h : ℕ → K) :
+    PowerSeries.coeff 1 (fiberDenominatorSeries u h) = -u := by
+  simp [fiberDenominatorSeries]
+
+@[simp] theorem fiberDenominatorSeries_coeff_succ_succ
+    (u : K) (h : ℕ → K) (n : ℕ) :
+    PowerSeries.coeff (n + 2) (fiberDenominatorSeries u h) = h (n + 1) := by
+  simp [fiberDenominatorSeries]
+
+@[simp] theorem fiberDenominatorSeries_derivative_coeff_zero
+    (u : K) (h : ℕ → K) :
+    PowerSeries.coeff 0 (PowerSeries.derivative (fiberDenominatorSeries u h)) = -u := by
+  rw [PowerSeries.coeff_derivative]
+  simp
+
+@[simp] theorem fiberDenominatorSeries_derivative_coeff_succ
+    (u : K) (h : ℕ → K) (n : ℕ) :
+    PowerSeries.coeff (n + 1) (PowerSeries.derivative (fiberDenominatorSeries u h)) =
+      h (n + 1) * (n + 2) := by
+  rw [PowerSeries.coeff_derivative]
+  rw [fiberDenominatorSeries_coeff_succ_succ]
+  have hcast : ((n + 1 : ℕ) : K) + 1 = ((n + 2 : ℕ) : K) := by
+    push_cast
+    ring
+  have hcast' : ((n + 2 : ℕ) : K) = (n : K) + 2 := by
+    push_cast
+    ring
+  rw [hcast, hcast']
+
+/-- The reciprocal recurrence specialized to the concrete H116 denominator
+series, with its unit constant coefficient discharged definitionally. -/
+theorem fiberDenominatorReciprocalRecurrence
+    (u : K) (h : ℕ → K) (g : PowerSeries K)
+    (hfg : fiberDenominatorSeries u h * g = 1) (n : ℕ) :
+    PowerSeries.coeff (n + 1) g =
+      -∑ i ∈ Finset.range (n + 1),
+        PowerSeries.coeff (i + 1) (fiberDenominatorSeries u h) *
+          PowerSeries.coeff (n - i) g := by
+  exact powerSeriesReciprocalRecurrence (fiberDenominatorSeries u h) g
+    (fiberDenominatorSeries_coeff_zero u h) hfg n
+
 #print axioms logDeriv_mul
 #print axioms logDeriv_finset
 #print axioms logDeriv_div
@@ -165,5 +218,11 @@ theorem relativePowerSeriesDerivativeMulCoeff
 #print axioms powerSeriesDerivativeMulCoeff
 #print axioms powerSeriesReciprocalRecurrence
 #print axioms relativePowerSeriesDerivativeMulCoeff
+#print axioms fiberDenominatorSeries_coeff_zero
+#print axioms fiberDenominatorSeries_coeff_one
+#print axioms fiberDenominatorSeries_coeff_succ_succ
+#print axioms fiberDenominatorSeries_derivative_coeff_zero
+#print axioms fiberDenominatorSeries_derivative_coeff_succ
+#print axioms fiberDenominatorReciprocalRecurrence
 
 end H116FiberTrace
