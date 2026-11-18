@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-1294011dc4296e71719a41a815ae9aaedb0a50db18fe1c87ddbd9dff9065e169  H116FiberTrace.lean
+8e991e6dc4a096a62c3c20e922c6a40fdea0677bef2418ecde7decece31b1cfb  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  159 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  163 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -75,6 +75,9 @@ c2024fa98bfb039e1e161b9ee6128ef176a1c04af4c80e3bcaa9952c64f80356  receipts/adjac
 27c565391615e9df1a9b95db99860bd257b2a3ef95b816033ad5cbae69b9f27d  receipts/algebraic-closure-descent-build.txt
 e0bd5924933c7d079a435effee25447e7a4a1b3feb4abdcc007e0c17ebd08f02  receipts/algebraic-closure-descent-full-build.txt
 e94fe66e359305ddbae083f9d86559ad5984ca577e5ccede00fc8cbfaaf36fc6  receipts/algebraic-closure-descent-audit.txt
+118466f845c4c9efdfd729cfcdb9254fbac8a198c9a260c3bfa7da9752a4734a  receipts/affine-point-lift-build.txt
+2bf8d5c08ebb3d7273efbe0fd0035fc5765ff1367afa1c766f0dd0c72d2d613d  receipts/affine-point-lift-full-build.txt
+16c2e15deef97c7e76e47a664f9c7b0822b6e511abb322d5d17087290fa8063a  receipts/affine-point-lift-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -343,6 +346,16 @@ The proof composes Mathlib's exact `Polynomial.isCoprime_map` equivalence with
 the preceding audited theorems.  This closes algebraic-closure descent but
 does not yet construct the elliptic point or prove division-polynomial
 root-to-scalar-multiplication semantics. [pcc:unverified]
+
+The 163-theorem checkpoint closes the root-to-nonzero-point construction.
+For every x-coordinate over an algebraically closed field, Lean constructs a
+root of the monic quadratic Weierstrass equation in `y`; on an elliptic curve,
+Mathlib's `Affine.Point.mk` turns it into a certified nonzero group point.  A
+new assembly theorem reduces base-field adjacent coprimality to only the two
+pointwise scalar equations.  The negative control proves that
+`y^2=x^3+x+1` over `ZMod 5` has no point above `x=1`, so the algebraic-closure
+hypothesis cannot simply be removed.  The remaining gap is the generic
+division-polynomial root-to-scalar-multiplication theorem. [pcc:unverified]
 
 The first integration build is retained at
 `receipts/concrete-first-build-failure.log`. A broader imported namespace made

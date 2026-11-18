@@ -961,6 +961,46 @@ finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
 | mapped no-common-root evidence descends to `IsCoprime p q` | generic field-extension law | H116 over Mathlib `Polynomial.isCoprime_map` | base field, algebraically closed extension field, field homomorphism | no shared mapped root |
 | mapped root-to-adjacent-torsion semantics descends to `IsCoprime p q` | semantic assembly | H116 over the preceding descent and group law | same fields plus additive commutative group | every shared mapped root supplies a nonzero adjacent-torsion point |
 
+## Algebraic-closure affine-point lift gate
+
+1. **Structure above.** For a Weierstrass equation over an algebraically
+   closed field and any chosen `x`, the curve equation is a monic quadratic in
+   `y`.  Its degree-two coefficient is one, so it is nonconstant and has a
+   root.  On an elliptic affine curve the resulting equation witness builds a
+   nonzero `Affine.Point`.  Combining this with the preceding base-change
+   theorem removes point construction from the adjacent-torsion premise.
+2. **Theorems used as stated.** `IsAlgClosed.exists_root` supplies a root of
+   `Y^2+(a1*x+a3)Y-(x^3+a2*x^2+a4*x+a6)`;
+   `Affine.equation_iff`, `Affine.Point.mk`, and `Point.some_ne_zero` turn it
+   into the exact Mathlib point object.  The previous mapped-root semantic
+   bridge supplies the coprimality conclusion.
+3. **Object as an instance.** The first theorem returns an equation witness
+   over any algebraically closed field.  The second returns the associated
+   nonzero elliptic point.  The assembly theorem accepts only the remaining
+   pointwise claim that a common mapped root makes this point satisfy the two
+   adjacent scalar equations.
+4. **Assembly probe.** All three positive statements and the finite-field
+   control first elaborated in a temporary importing module.  The tracked
+   project then completed all 3,162 build jobs; the exact repository auditor
+   reports `163 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The root-to-point construction is closed.
+   The assembly still does not prove that a root of `prePsi_n` is killed by
+   scalar `n`; that pointwise division-polynomial formula is the remaining
+   geometric obligation. [pcc:unverified]
+6. **Inheritance table.** Algebraic-closure root existence, the Weierstrass
+   equation and affine point/group structures are inherited from Mathlib.
+   H116 supplies the quadratic specialization and composition.  The control
+   curve `y^2=x^3+x+1` over `ZMod 5` has no point over `x=1`, verified by
+   exhaustive kernel reduction, showing that algebraic closure cannot be
+   deleted from the lift.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| every `x` lies below a Weierstrass equation point | generic algebraic-closure law | H116 over `IsAlgClosed.exists_root` | arbitrary affine Weierstrass curve over algebraically closed field | none beyond field closure |
+| every `x` lies below a nonzero elliptic affine point | point construction | H116 over Mathlib `Affine.Point.mk` | elliptic affine curve over algebraically closed field | decidable equality for the inherited group instance |
+| pointwise adjacent scalar semantics implies base-field coprimality | semantic assembly | H116 over the point lift and mapped-root descent | base field, closed extension, elliptic affine curve | common-root point is killed by `n` and `n+1` |
+| point lift can fail over the base finite field | negative control | H116 finite reduction | `y^2=x^3+x+1` over `ZMod 5`, `x=1` | none |
+
 ## Short-Weierstrass local-parameter instance gate
 
 1. **Structure above.** The local affine parameter is the field expression

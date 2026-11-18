@@ -1212,6 +1212,73 @@ theorem polynomial_isCoprime_of_adjacent_torsion_root_semantics_after_map
   rw [← Polynomial.isCoprime_map f]
   exact polynomial_isCoprime_of_adjacent_torsion_root_semantics n hsemantic
 
+/-- Every x-coordinate over an algebraically closed field lies below a point
+of an arbitrary affine Weierstrass equation. -/
+theorem weierstrass_exists_equation_point_above
+    {E : Type*} [Field E] [IsAlgClosed E]
+    (W : WeierstrassCurve.Affine E) (x : E) :
+    ∃ y : E, W.Equation x y := by
+  let c := W.a₁ * x + W.a₃
+  let r := x ^ 3 + W.a₂ * x ^ 2 + W.a₄ * x + W.a₆
+  let g : E[X] := X ^ 2 + C c * X - C r
+  have hgdeg : g.degree ≠ 0 := by
+    have hc : g.coeff 2 ≠ 0 := by
+      dsimp [g]
+      simp
+    intro hdegree
+    have hle := Polynomial.le_degree_of_ne_zero hc
+    rw [hdegree] at hle
+    norm_num at hle
+  obtain ⟨y, hy⟩ := IsAlgClosed.exists_root g hgdeg
+  refine ⟨y, (W.equation_iff x y).mpr ?_⟩
+  rw [IsRoot.def] at hy
+  dsimp [g, c, r] at hy ⊢
+  simp only [eval_sub, eval_add, eval_mul, eval_pow, eval_X, eval_C] at hy
+  linear_combination hy
+
+/-- On an elliptic curve, the lifted affine equation point is a nonzero
+element of Mathlib's affine point group. -/
+theorem affineWeierstrass_exists_nonzero_point_above
+    {E : Type*} [Field E] [DecidableEq E] [IsAlgClosed E]
+    (W : WeierstrassCurve.Affine E) [W.IsElliptic] (x : E) :
+    ∃ y : E, ∃ h : W.Equation x y,
+      WeierstrassCurve.Affine.Point.mk h ≠ 0 := by
+  obtain ⟨y, hxy⟩ := weierstrass_exists_equation_point_above W x
+  refine ⟨y, hxy, ?_⟩
+  exact WeierstrassCurve.Affine.Point.some_ne_zero _
+
+/-- Root-to-point assembly after base change: once the actual pointwise
+division-polynomial scalar equations are supplied, adjacent-root coprimality
+holds over the original coefficient field. -/
+theorem polynomial_isCoprime_of_adjacent_torsion_curve_semantics_after_map
+    {F E : Type*} [Field F] [Field E] [DecidableEq E] [IsAlgClosed E]
+    (f : F →+* E) {p q : Polynomial F}
+    (W : WeierstrassCurve.Affine E) [W.IsElliptic] (n : ℤ)
+    (hscalar : ∀ x y : E, ∀ h : W.Equation x y,
+      (p.map f).IsRoot x → (q.map f).IsRoot x →
+      n • WeierstrassCurve.Affine.Point.mk h = 0 ∧
+        (n + 1) • WeierstrassCurve.Affine.Point.mk h = 0) :
+    IsCoprime p q := by
+  apply polynomial_isCoprime_of_adjacent_torsion_root_semantics_after_map
+    (G := W.Point) f n
+  intro x hpx hqx
+  obtain ⟨y, hxy, hnonzero⟩ :=
+    affineWeierstrass_exists_nonzero_point_above W x
+  exact ⟨WeierstrassCurve.Affine.Point.mk hxy, hnonzero,
+    (hscalar x y hxy hpx hqx).1, (hscalar x y hxy hpx hqx).2⟩
+
+/-- Algebraic closure is essential for unconditional lifting: over `F_5`,
+the nonsingular short equation `y^2=x^3+x+1` has no point above `x=1`. -/
+theorem finite_field_point_lift_control :
+    ¬∃ y : ZMod 5,
+      (WeierstrassCurve.mk 0 0 0 1 1 :
+        WeierstrassCurve (ZMod 5)).toAffine.Equation 1 y := by
+  rintro ⟨y, hy⟩
+  rw [WeierstrassCurve.Affine.equation_iff] at hy
+  dsimp [WeierstrassCurve.toAffine] at hy
+  norm_num at hy
+  fin_cases y <;> contradiction
+
 /-- Boundary control: the zero point always satisfies both adjacent torsion
 equations, so the nonzero clause in the root-semantics bridge is essential. -/
 theorem adjacentIntegerTorsion_zero_control
@@ -3248,6 +3315,10 @@ theorem rationalMap_separation_strict_control :
 #print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics
 #print axioms polynomial_isCoprime_of_no_common_root_after_map
 #print axioms polynomial_isCoprime_of_adjacent_torsion_root_semantics_after_map
+#print axioms weierstrass_exists_equation_point_above
+#print axioms affineWeierstrass_exists_nonzero_point_above
+#print axioms polynomial_isCoprime_of_adjacent_torsion_curve_semantics_after_map
+#print axioms finite_field_point_lift_control
 #print axioms adjacentIntegerTorsion_zero_control
 #print axioms endomorphism_frobeniusVerschiebung_sum
 #print axioms endomorphism_injectivity_control
