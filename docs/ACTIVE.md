@@ -33,7 +33,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Freeze H115 Frobenius--Kummer resolvent-moment ECDLP lead, derive its cohomological cost obligations, and preregister exact small-curve controls (Codex, started 2026-11-17, branch research/h115-frobenius-kummer-resolvent-freeze, PR #4625)
 
-- [ ] Independently audit the general Boolean tensor contraction theorem D.1 used by the conditional prime-field result, beginning with the recursive description and precision invariants. See [the assessed leads and proof dependencies](leads/2026-11-17/subexponential-ecdlp-goal/REPORT.md) (next after PR #4627).
+- [ ] Audit the tensor-contraction and fixed-arity proof routes to total subexponential ECDLP, and test the other assessed leads against the same scaling criterion (Codex, started 2026-11-18, branch codex/ecdlp-subexponential-proof-20261118)
 
 - [x] Assess the subexponential ECDLP literature and the status of the lab's index-calculus leads, then identify the first unresolved mathematical test (Codex, completed 2026-11-17, branch codex/ecdlp-subexponential-goal-20261117, PR #4627)
 
