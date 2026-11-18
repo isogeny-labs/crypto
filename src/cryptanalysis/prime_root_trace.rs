@@ -603,7 +603,10 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
 // coefficient pair twice. Both inputs and the result are canonical mod p.
 #[inline]
 fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
-    if a.len() <= 2 {
+    // The general fused product wins for short 32-bit-field inputs in
+    // actual Rust benchmarks; use symmetric squaring for larger polynomials,
+    // and for 61-bit arithmetic where its crossover occurs earlier.
+    if a.len() <= 2 || (a.len() <= 4 && p <= u32::MAX as u64) {
         return vproduct(a, a, p);
     }
     let mut result = vec![0; 2 * a.len() - 1];
