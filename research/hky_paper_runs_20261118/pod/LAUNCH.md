@@ -55,3 +55,16 @@ the run; a failed checkpoint is recorded and the closure continues (450d5b295b).
   madds 5.60e14; peak RSS 234,285 MB (close to the 250 GB job limit); about 3.7 h. The end-of-run fall re-check
   reports 0 rows checked (1 is already in V_7). Records in `results/J1/lift/`.
 - 18:15 UTC: J1 pod `j5ym8cqln1m237` terminated (GET 404). Spend about 12.1 h x US$1.76 = about US$21.
+- 18:28 UTC: **J4s done** (k=16, D=6, unit p=786433, skip on): 1,149,017 columns, profile
+  [0,0,2,162,5079,92323,770594], 1 not in V_6, rank 770,594 (parts 385,594 + 385,000); wall 10,238 s, peak RSS
+  51.5 GB; no closedness check (VERIFY=0, memory). Predicted 230,000 s (100k-950k): the run was 22x faster than
+  the central prediction and below the band.
+- 19:02 UTC: **J3 done** (k=15, D=6, unit p=65537): 768,212 columns, profile [0,0,2,158,4761,82643,600547],
+  1 not in V_6, rank 600,547 (parts 300,535 + 300,012); closedness check closed, 0 non-zero over 4,958,581
+  products; wall of the last attempt 12,205 s; peak RSS 79.6 GB; basis sha256 5da602a8... (not downloaded).
+- **Both profiles equal the frozen recursion** of lfd-summation-systems
+  `experiments/ic-bounds-freeext/predictions-2026-11-10.json` ("recursion": p_j(k+1) = p_j(k) + 2 p_{j-1}(k) +
+  p_{j-2}(k) for k >= 4D-10), applied from the certified V_6(14) profile: k=15 gives (0,0,2,158,4761,82643,600547)
+  and k=16 gives (0,0,2,162,5079,92323,770594), equal entry by entry.
+- 19:5x UTC: pods `g9w09ju7t3idas` (J3) and `u2h6guqi1vozbx` (J4s) terminated (GET 404). The J3 basis was not
+  kept (a k=15 lift needs about 540 GB, beyond these pods). Spend: J3 about 13.7 h, J4s about 4.3 h.
