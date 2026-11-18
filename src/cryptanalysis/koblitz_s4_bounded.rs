@@ -976,7 +976,6 @@ mod multiplier_recurrence_controls {
             };
             let result = gate.mul(&a, &b, &st);
             let reserved = gate.reserved;
-            drop(gate);
             match mode {
                 0 => {
                     let got = result.unwrap();
@@ -1115,9 +1114,10 @@ mod table_recurrence_controls {
                             Ok(())
                         }
                     };
-                    let mut limits = Limits::default();
-                    limits.work = work - u64::from(mode == 1);
-                    limits.bytes = (1 << 20) - u64::from(mode == 2);
+                    let limits = Limits {
+                        work: work - u64::from(mode == 1),
+                        bytes: (1 << 20) - u64::from(mode == 2),
+                    };
                     let mut gate = Gate {
                         limits,
                         reserved: Reserved::default(),
@@ -1153,7 +1153,6 @@ mod table_recurrence_controls {
                             assert_eq!(gate.reserved.work, work);
                         }
                     }
-                    drop(gate);
                     assert_eq!(observed.len(), usize::from(mode == 0 || mode == 4));
                     if !observed.is_empty() {
                         assert!(matches!(observed[0], Stage::Table));

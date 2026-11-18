@@ -22,12 +22,14 @@ use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
 use crypto_lib::cryptanalysis::sat::{
     to_dimacs_xor, RootPropagationResult, SolveResult, SolverProgress, SolverStats,
 use crypto_lib::hash::sha256;
+use crypto_lib::store::{backend::RemoteSpec, Store};
+use flate2::read::GzDecoder;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashSet};
 use std::fs::{self, File, OpenOptions};
-use std::io::{self, Write};
+use std::io::{self, Read, Write};
 use std::path::{Component, Path, PathBuf};
 use std::sync::{mpsc, Arc};
 use std::thread;
@@ -216,6 +218,15 @@ fn from_record(row: &Value, bytes: &[u8]) -> Result<PrimaryBase> {
         return Err("primary orbit maps differ from the stored labels".into());
     Ok(PrimaryBase { curve, factor_base })
 
+/// Replay a newly constructed object with the generic binary-curve path
+/// before it is admitted to the artifact store.
+pub(super) fn replay_constructed_primary(row: &Value, bytes: &[u8]) -> Result<(usize, usize)> {
+    let base = from_record(row, bytes)?;
+    Ok((
+        base.factor_base.points.len(),
+        base.factor_base.signed_orbits.len(),
+    ))
+
 fn load_panel_selected(
     root: &Path,
     columns: usize,
@@ -315,6 +326,109 @@ fn load_panel_selected(
 fn load_panel(root: &Path, columns: usize) -> Result<(PrimaryBase, Value, String)> {
     load_panel_selected(root, columns, "public_x_hash", SEEDS[0])
 
+/// Successor custody path for a newly published primary base. The historical
+/// panel reader above remains bound to its original S3 bucket and receipts.
+fn load_store_primary_base(root: &Path, store: &Store) -> Result<(PrimaryBase, Value)> {
+    let manifest_sha256 = sha256_hex(&manifest_bytes);
+    let storage: Value = serde_json::from_slice(&fs::read(root.join("storage.json"))?)?;
+    let row = &manifest["base"];
+    let remote = manifest["remote"].as_str().ok_or("store remote missing")?;
+    let store_name = row["store_name"].as_str().ok_or("store name missing")?;
+    let digest = row["compressed_sha256"]
+        .as_str()
+        .ok_or("compressed SHA-256 missing")?;
+    let bytes = row["bytes"].as_u64().ok_or("compressed size missing")?;
+    let plain_bytes = row["plain_bytes"].as_u64().ok_or("plain size missing")?;
+    let columns = row["columns"].as_u64().ok_or("orbit columns missing")?;
+    let source_commit = manifest["source_commit"]
+        .ok_or("source commit missing")?;
+    if manifest["schema"] != "n83.factor-base-panel/v3-artifact-store"
+        || manifest["status"] != "completed_factor_base_object"
+        || manifest["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || source_commit.len() != 40
+        || !source_commit.bytes().all(|b| b.is_ascii_hexdigit())
+        || row["a"] != 0
+        || row["closure"] != "signed_frobenius"
+        || ![
+            "public_x_sequential",
+            "public_x_hash",
+            "public_x_gray_prefix",
+        ]
+        .any(|policy| row["policy"] == *policy)
+        || columns == 0
+        || row["points"].as_u64() != columns.checked_mul(166)
+        || bytes == 0
+        || plain_bytes == 0
+        || !store_name.starts_with("factor-bases/icv1-f2m83-tm6151469093347-debefd74/")
+        || !store_name.ends_with(".jsonl.gz")
+        || store.cfg.remote.as_ref() != Some(&RemoteSpec::parse(remote)?)
+        return Err("successor primary base manifest differs from custody contract".into());
+    if replay["schema"] != "n83.factor-base-replay/v3-artifact-store"
+        || replay["manifest_sha256"] != manifest_sha256
+        || replay["store_name"] != store_name
+        || replay["point_set_blake3"] != row["point_set_blake3"]
+        || replay["points_checked"].as_u64() != row["points"].as_u64()
+        || replay["representatives_checked"].as_u64() != Some(columns)
+        || storage["schema"] != "n83.factor-base-storage/v3-artifact-store"
+        || storage["manifest_sha256"] != manifest_sha256
+        || storage["remote"] != remote
+        || storage["store_name"] != store_name
+        || storage["sha256"] != digest
+        || storage["bytes"].as_u64() != Some(bytes)
+        || storage["fresh_download_sha256"] != digest
+        || storage["fresh_download_bytes"].as_u64() != Some(bytes)
+        return Err("successor primary base lacks replay or fresh-download custody".into());
+    let (indexed_name, indexed_digest, indexed_bytes) = store.lookup(store_name)?;
+    if indexed_name.as_deref() != Some(store_name)
+        || indexed_digest != digest
+        || indexed_bytes != Some(bytes)
+        return Err("artifact-store index differs from successor manifest".into());
+    let resolved = store.ensure(store_name)?;
+    if resolved.sha256 != digest || resolved.bytes != bytes {
+        return Err("resolved artifact differs from successor manifest".into());
+    let compressed = fs::read(&resolved.path)?;
+    if compressed.len() as u64 != bytes
+        || sha256_hex(&compressed) != digest
+        || blake3::hash(&compressed).to_hex().as_str()
+            != row["compressed_blake3"]
+                .as_str()
+                .ok_or("compressed BLAKE3 missing")?
+        return Err("successor compressed object differs".into());
+    let mut plain = Vec::new();
+    GzDecoder::new(&compressed[..])
+        .take(plain_bytes.checked_add(1).ok_or("plain size overflow")?)
+        .read_to_end(&mut plain)?;
+    if plain.len() as u64 != plain_bytes
+        || blake3::hash(&plain).to_hex().as_str()
+            != row["plain_blake3"].as_str().ok_or("plain BLAKE3 missing")?
+        return Err("successor decompressed object differs".into());
+    let base = from_record(row, &plain)?;
+    if row["point_set_blake3"]
+        .is_none_or(|value| value.len() != 64)
+        || base.factor_base.points.len() as u64 != row["points"].as_u64().unwrap_or(0)
+        return Err("successor factor-base point count or digest differs".into());
+    Ok((base, row.clone()))
+
+pub(super) fn verify_store_v3(root: &Path, store: &Store) -> Result<Value> {
+    let (base, row) = load_store_primary_base(root, store)?;
+    let receipt = json!({
+        "schema":"n83.factor-base-store-import/v3",
+        "status":"PASS","curve_id":base.curve.label(),
+        "store_name":row["store_name"],
+        "compressed_sha256":row["compressed_sha256"],
+        "point_set_blake3":row["point_set_blake3"],
+        "points_checked":base.factor_base.points.len(),
+        "orbit_columns_checked":base.factor_base.signed_orbits.len(),
+        "selected_best_total_runtime":Value::Null,
+    Ok(receipt)
+
+pub(super) fn check_store_v3_cli(root: &Path, output: &Path) -> Result<Value> {
+    if output.exists() {
+        return Err("successor import output already exists".into());
+    let store = Store::open_default()?;
+    let receipt = verify_store_v3(root, &store)?;
+    write_new_json(output, &receipt)?;
+
 const FULL_D18_MANIFEST: &[u8] =
     include_bytes!("verification/d18-full-orbit-20261025/manifest.json");
 const FULL_D18_REPLAY: &[u8] = include_bytes!("verification/d18-full-orbit-20261025/replay.json");
@@ -357,7 +471,6 @@ fn full_d18_load(root: &Path) -> Result<(PrimaryBase, Value)> {
     let custody: Value = serde_json::from_slice(FULL_D18_CUSTODY)?;
     let object = format!("objects/{FULL_D18_OBJECT}.jsonl.gz");
     if manifest["schema"] != "n83.direct-subgroup-orbit-export/v1"
-        || manifest["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
         || manifest["policy"] != "direct_subgroup_x_d18_full"
         || manifest["source_commit"] != "5bac5f1d9221b908f743520aa9039dd48d175f0e"
         || manifest["columns"] != 32_643
@@ -565,7 +678,6 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
         "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
         "process_usage":process_usage(),"solver_search_executed":false,
         "total_index_calculus_runtime_ms":Value::Null,
-        "selected_best_total_runtime":Value::Null,
     write_new_json(output, &result)?;
     Ok(result)
 
@@ -618,6 +730,257 @@ pub(super) fn k600_m6_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result
         "schema":"n83.k600-m6-xcnf-export/v1",
         "public_fixture":if mode == "natural" { Some(0) } else { None },
 
+/// Parse a complete DIMACS model. Zero is the unused index; 1 and 2 encode
+/// true and false so duplicate and missing assignments cannot be hidden.
+fn k600_model_values(stdout: &str, variables: usize) -> Result<Vec<u8>> {
+    let mut values = vec![0u8; variables.checked_add(1).ok_or("model size overflow")?];
+    let mut statuses = 0usize;
+    for line in stdout.lines() {
+        if line.starts_with("s ") {
+            if line != "s SATISFIABLE" {
+                return Err("solver status is not SAT".into());
+            statuses += 1;
+        } else if let Some(rest) = line.strip_prefix("v ") {
+            for token in rest.split_whitespace() {
+                let literal: i64 = token.parse()?;
+                if literal == 0 {
+                    continue;
+                let index = usize::try_from(literal.unsigned_abs())?;
+                if index == 0 || index > variables || values[index] != 0 {
+                    return Err("model variable out of range or repeated".into());
+                values[index] = if literal > 0 { 1 } else { 2 };
+    if statuses != 1 || values[1..].contains(&0) {
+        return Err("solver model is absent, partial, or ambiguous".into());
+    Ok(values)
+
+/// Check the original XCNF, including parity of signed XOR literals.
+fn k600_check_xcnf(formula: &str, values: &[u8], cnf: usize, xor: usize) -> Result<()> {
+    let mut lines = formula.lines();
+    let header = lines.next().ok_or("empty XCNF")?;
+    if header
+        != format!(
+            "p cnf {} {}",
+            values.len() - 1,
+            cnf.checked_add(xor).ok_or("row count overflow")?
+        return Err("XCNF header differs".into());
+    let (mut seen_cnf, mut seen_xor) = (0usize, 0usize);
+    for (offset, line) in lines.enumerate() {
+        if line.starts_with("c ") {
+            continue;
+        let (is_xor, body) = if let Some(body) = line.strip_prefix("x ") {
+            (true, body)
+        } else {
+            (false, line)
+        };
+        let tokens: Vec<_> = body.split_whitespace().collect();
+        if tokens.len() < 2 || tokens.last() != Some(&"0") {
+            return Err(format!("unterminated XCNF row {}", offset + 2).into());
+        let mut parity = false;
+        let mut satisfied = false;
+        for token in &tokens[..tokens.len() - 1] {
+            let literal: i64 = token.parse()?;
+            let index = usize::try_from(literal.unsigned_abs())?;
+            if literal == 0 || index >= values.len() {
+                return Err(format!("invalid XCNF literal at row {}", offset + 2).into());
+            let truth = (values[index] == 1) == (literal > 0);
+            parity ^= truth;
+            satisfied |= truth;
+        if is_xor {
+            seen_xor += 1;
+            if !parity {
+                return Err(format!("XOR row {} fails", offset + 2).into());
+            seen_cnf += 1;
+            if !satisfied {
+                return Err(format!("CNF row {} fails", offset + 2).into());
+    if (seen_cnf, seen_xor) != (cnf, xor) {
+        return Err("XCNF row counts differ".into());
+
+fn k600_model_x(values: &[u8], block: usize) -> BigUint {
+    let mut x = BigUint::zero();
+    for bit in 0..83usize {
+        if values[block * 83 + bit + 1] == 1 {
+            x |= BigUint::one() << bit;
+    x
+
+fn verify_k600_positive_witness(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    positive: &Value,
+) -> Result<Vec<usize>> {
+    let indices = positive["indices"].as_array().ok_or("positive indices")?;
+    let points = positive["points"].as_array().ok_or("positive points")?;
+    let partial = positive["partial_sums"]
+        .ok_or("positive partial sums")?;
+    if indices.len() != 6 || points.len() != 6 || partial.len() != 6 {
+        return Err("positive witness length differs".into());
+    let mut sum = BinaryPoint::Infinity;
+    let mut selected = Vec::with_capacity(6);
+    for i in 0..6 {
+        let index = indices[i].as_u64().ok_or("positive index")? as usize;
+        let point = fb
+            .points
+            .get(index)
+            .ok_or("positive index outside archive")?;
+        if points[i] != planted_point_json(point) {
+            return Err("positive point differs from archive".into());
+        sum = kc.add(&sum, point);
+        if partial[i] != planted_point_json(&sum) {
+            return Err("positive partial sum differs".into());
+        selected.push(index);
+    if selected.iter().collect::<HashSet<_>>().len() != 6 || sum != *target {
+        return Err("positive witness is repeated or misses target".into());
+    let row = checked_primary_relation_row(kc, fb, &selected, target)?;
+    let row_bytes = serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>())?;
+    if positive["relation_row_decimal_blake3"] != blake3::hash(&row_bytes).to_hex().to_string() {
+        return Err("positive relation-row hash differs".into());
+    Ok(selected)
+
+/// Independently replay a solver model against the saved formula and the
+/// exact retained point base. This command does not perform SAT search.
+pub(super) fn k600_m6_replay_cli(
+    export_path: &Path,
+    xcnf_path: &Path,
+    receipt_path: &Path,
+    stdout_path: &Path,
+    source_commit: &str,
+    exporter_binary_sha256: &str,
+    output: &Path,
+) -> Result<Value> {
+    const CORPUS_SHA256: &str = "760ae5c2e88615152e2569653a0e0c0cf3b2f0731247f9ee3759dcbd";
+        return Err("K600 replay output already exists".into());
+        (
+            "manifest.json",
+            "5bd862987844f709e03beeab9fd265e3d2024011bcadcb82f5af9c72018df6a6",
+        ),
+            "replay.json",
+            "fa5e545c27dd64c32a47ddae05a2a0b3a031545d700897f3e0e34f59abc0d72e",
+            "upload-receipt.json",
+            "0eae40ffa0e938470671cf796633c1e47b61ff676df0807e7a7e8592e56bb828",
+            "probe-validation.json",
+            "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f",
+            return Err(format!("K600 replay input {name} differs from frozen SHA-256").into());
+    let export: Value = serde_json::from_slice(&fs::read(export_path)?)?;
+    let receipt: Value = serde_json::from_slice(&fs::read(receipt_path)?)?;
+    let mode = export["mode"].as_str().ok_or("K600 export mode missing")?;
+    if export["schema"] != "n83.k600-m6-xcnf-export/v1"
+        || export["status"] != "PASS_XCNF_EXPORT_ONLY"
+        || !["positive-pinned", "positive-unpinned", "natural"].contains(&mode)
+        || export["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || export["curve_a"] != 0
+        || export["source_commit"] != source_commit
+        || export["source_attestation_mode"] != "clean_checkout"
+        || export["binary_sha256"] != exporter_binary_sha256
+        || export["object"] != OBJECT
+        || export["object_sha256"] != OBJECT_SHA256
+        || receipt["exit_code"] != 10
+        || !["SAT_PENDING_REPLAY", "SAT_PENDING_XCNF_REPLAY"]
+            .any(|s| receipt["status"] == *s)
+        || receipt["xcnf_sha256"] != export["xcnf_sha256"]
+        return Err("K600 export, source, or SAT receipt binding differs".into());
+    let shape = &export["shape"];
+    if shape["summands"] != 6
+        || shape["identity_mask"] != 0
+        || shape["root_encoding"] != "per_representative"
+        || shape["domain_representatives"] != 600
+        || shape["summand_ordering"] != "none"
+        || shape["positive_x_pins"] != if mode == "positive-pinned" { 913 } else { 0 }
+        return Err("K600 XCNF search policy differs".into());
+    let variables = usize::try_from(shape["variables"].as_u64().ok_or("variable count")?)?;
+    let clauses = usize::try_from(shape["clauses"].as_u64().ok_or("clause count")?)?;
+    let xors = usize::try_from(shape["xor_rows"].as_u64().ok_or("XOR count")?)?;
+    if variables < 913 || variables > 125_000 {
+        return Err("K600 XCNF variable count exceeds frozen bound".into());
+    let xcnf = fs::read(xcnf_path)?;
+    if xcnf.len() > 200_000_000
+        || export["xcnf_bytes"].as_u64() != Some(xcnf.len() as u64)
+        || export["xcnf_sha256"] != sha256_hex(&xcnf)
+        return Err("original XCNF bytes differ".into());
+    let stdout = fs::read(stdout_path)?;
+    if stdout.len() > 20_000_000 || receipt["stdout_sha256"] != sha256_hex(&stdout) {
+        return Err("solver output bytes differ".into());
+    let values = k600_model_values(std::str::from_utf8(&stdout)?, variables)?;
+    k600_check_xcnf(std::str::from_utf8(&xcnf)?, &values, clauses, xors)?;
+    if sha256_hex(&fs::read(root.join(OBJECT))?) != OBJECT_SHA256 {
+        return Err("retained K600 factor-base bytes differ".into());
+        || row["point_set_blake3"] != export["point_set_blake3"]
+        || export["panel_manifest_blake3"] != manifest_blake3
+        return Err("retained K600 factor-base identity differs".into());
+    let (_, corpus_blake3) = public_target_fixture(root, &base.curve, 0)?;
+    if export["public_corpus_blake3"] != corpus_blake3 {
+        return Err("K600 public corpus binding differs".into());
+    let target = general(Some(
+        parse_point(&export["target"])?.ok_or("identity target")?,
+    ));
+    if !base.curve.curve.is_on_curve(&target)
+        || base.curve.mul(&target, &base.curve.subgroup_order) != BinaryPoint::Infinity
+        return Err("K600 target fails curve or subgroup check".into());
+    if mode == "natural" {
+        if !export["positive"].is_null()
+            || export["public_fixture"] != 0
+            || sha256_hex(&fs::read(root.join("probe-corpus.json"))?) != CORPUS_SHA256
+            return Err("natural public fixture identity differs".into());
+        let (public, _) = public_target_fixture(root, &base.curve, 0)?;
+        if target != public {
+            return Err("natural target differs from public fixture".into());
+        verify_k600_positive_witness(&base.curve, fb, &target, &export["positive"])?;
+    let xs: Vec<_> = (0..6).map(|block| k600_model_x(&values, block)).collect();
+    let intermediate: Vec<_> = (6..10).map(|block| k600_model_x(&values, block)).collect();
+    if k600_model_x(&values, 10)
+        != match &target {
+            BinaryPoint::Affine { x, .. } => x.to_biguint(),
+            BinaryPoint::Infinity => unreachable!(),
+        return Err("model target block differs".into());
+    let candidates: Vec<Vec<usize>> = xs
+        .map(|x| {
+            fb.points
+                .iter()
+                .enumerate()
+                .filter_map(|(i, p)| match p {
+                    BinaryPoint::Affine { x: px, .. } if px.to_biguint() == *x => Some(i),
+                    _ => None,
+                })
+                .collect()
+    if candidates.iter().any(|c| c.is_empty() || c.len() > 2) {
+        return Err("model x-coordinate has no bounded archive lift".into());
+    let mut chosen = None;
+    for mask in 0..64usize {
+        let mut indices = Vec::with_capacity(6);
+        let mut valid = true;
+        for (j, lifts) in candidates.iter().enumerate() {
+            let bit = (mask >> j) & 1;
+            if bit >= lifts.len() {
+                valid = false;
+                break;
+            let index = lifts[bit];
+            indices.push(index);
+            if (1..=4).contains(&j) {
+                match &sum {
+                    BinaryPoint::Affine { x, .. } if x.to_biguint() == intermediate[j - 1] => (),
+                    _ => {
+                        valid = false;
+                        break;
+                    }
+        if valid && sum == target {
+            chosen = Some(indices);
+            break;
+    let chosen = chosen.ok_or("SAT model has no checked six-point relation lift")?;
+    let relation = checked_primary_relation_row(&base.curve, fb, &chosen, &target)?;
+    let chosen_points: Vec<_> = chosen
+        .map(|&i| point_json(words(&fb.points[i])))
+    let columns: Vec<_> = chosen.iter().map(|&i| fb.signed_orbit_of[i].0).collect();
+        "schema":"n83.k600-m6-model-replay/v2", "status":"PASS_ORIGINAL_XCNF_GROUP_AND_ROW_REPLAY",
+        "mode":mode,"source_commit":source_commit,"export_binary_sha256":exporter_binary_sha256,
+        "replay_binary_sha256":sha256_hex(&fs::read(std::env::current_exe()?)?),
+        "xcnf_sha256":export["xcnf_sha256"],"solver_stdout_sha256":receipt["stdout_sha256"],
+        "object_sha256":OBJECT_SHA256,"model_values_sha256":sha256_hex(&values),
+        "checked_cnf_clauses":clauses,"checked_xor_rows":xors,"target":export["target"],
+        "x_coordinates":xs.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "intermediate_x_coordinates":intermediate.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "chosen_indices":chosen,"chosen_points":chosen_points,"columns":columns,
+        "relation_row_decimal":relation.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "subgroup_order":base.curve.subgroup_order.to_string(),
+
 pub(super) fn check_full_d18_export(root: &Path) -> Result<Value> {
     let (base, row) = full_d18_load(root)?;
     Ok(json!({
@@ -635,10 +998,7 @@ pub(super) fn check_full_d18_export(root: &Path) -> Result<Value> {
     }))
 
 fn full_d18_four_x_lift(
-    kc: &KoblitzCurve,
-    fb: &FrobeniusFactorBase,
     xs: &[F2mElement],
-    target: &BinaryPoint,
 ) -> Result<Option<([usize; 4], Vec<BigUint>)>> {
     if xs.len() != 4 {
         return Err("full D18 SAT model has the wrong summand count".into());
@@ -650,7 +1010,6 @@ fn full_d18_four_x_lift(
                     choices[slot].push(index);
                     if choices[slot].len() > 2 {
                         return Err("full D18 x-coordinate has more than two stored lifts".into());
-                    }
     if choices.iter().any(Vec::is_empty) {
         return Ok(None);
     for &a in &choices[0] {
@@ -673,8 +1032,6 @@ fn full_d18_four_x_lift(
 /// cgroup claim or relation/rank inference.
 pub(super) fn full_d18_m4_model_cli(
     fixture_root: &Path,
-    output: &Path,
-) -> Result<Value> {
     full_d18_m4_model_impl(
         fixture_root,
         FrobeniusOrbitRootEncoding::PerRepresentative,
@@ -683,7 +1040,6 @@ pub(super) fn full_d18_m4_shared_model_cli(
 
 fn full_d18_m4_model_impl(
     encoding: FrobeniusOrbitRootEncoding,
-    if output.exists() {
         return Err("full D18 model output already exists".into());
     let import_ms = started.elapsed().as_secs_f64() * 1000.0;
     if sha256_hex(&fs::read(fixture_root.join("probe-corpus.json"))?)
@@ -1252,9 +1608,6 @@ fn checked_primary_relation_row(
     let mut row = vec![BigUint::zero(); fb.unknowns()];
     let mut point_sum = BinaryPoint::Infinity;
     for &index in indices {
-        let point = fb
-            .points
-            .get(index)
             .ok_or("relation point index out of range")?;
         let &(column, phase, negative) = fb
             .signed_orbit_of
@@ -1272,9 +1625,7 @@ fn checked_primary_relation_row(
         let positive = kc.lambda.modpow(&BigUint::from(phase), r);
         let coefficient = if negative && !positive.is_zero() {
             r - &positive
-        } else {
             positive
-        };
         if kc.mul(representative, &coefficient) != *point {
             return Err("relation point and signed-Frobenius label disagree".into());
         row[column] = (&row[column] + coefficient) % r;
@@ -1284,7 +1635,6 @@ fn checked_primary_relation_row(
     let mut row_sum = BinaryPoint::Infinity;
     for (column, coefficient) in row.iter().enumerate() {
         if coefficient.is_zero() {
-            continue;
         let rep_index = fb.signed_orbits[column][0];
         row_sum = kc.add(&row_sum, &kc.mul(&fb.points[rep_index], coefficient));
     if row_sum != *target {
@@ -1298,10 +1648,8 @@ fn checked_primary_relation_row(
 /// match its compiled bytes.
 fn checked_primary_probe_source(root: &Path) -> Result<()> {
     for (path, compiled) in [
-        (
             "examples/koblitz_n83_factor_base_export.rs",
             include_bytes!("../../examples/koblitz_n83_factor_base_export.rs").as_slice(),
-        ),
             "research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs",
             include_bytes!("primary_adapter.rs").as_slice(),
             "research/koblitz_n83_factor_base_sweep_20261008/compact_cold.rs",
@@ -1309,7 +1657,7 @@ fn checked_primary_probe_source(root: &Path) -> Result<()> {
         if blake3::hash(&fs::read(root.join(path))?) != blake3::hash(compiled) {
             return Err("compiled S3 probe source differs from frozen source".into());
 
-fn frozen_primary_probe_source() -> Result<(String, &'static str)> {
+pub(super) fn frozen_primary_probe_source() -> Result<(String, &'static str)> {
     if let Some(path) = std::env::var_os("ICV1_FROZEN_SOURCE_DIR") {
         let root = std::path::PathBuf::from(path);
         let attestation: Value = serde_json::from_slice(&fs::read(root.join("attestation.json"))?)?;
@@ -1486,8 +1834,6 @@ pub(super) fn chain_capacity_cli(
                 .as_object()
                 .ok_or("invalid chained-S3 measurements")?
                 .clone(),
-    write_new_json(output, &receipt)?;
-    Ok(receipt)
 
 fn planted_point_json(point: &BinaryPoint) -> Value {
     match point {
@@ -1580,7 +1926,6 @@ fn write_progress_sample(
     file: &mut File,
     sequence: &mut u64,
     schema: &str,
-    source_commit: &str,
     progress: &SolverProgress,
     sample_kind: &str,
 ) -> io::Result<()> {
@@ -1746,7 +2091,6 @@ fn chain_witness_impl(
             BinaryPoint::Affine { x, .. } => Ok(x.clone()),
             BinaryPoint::Infinity => Err("planted orbit representative is infinity"),
         .collect::<std::result::Result<_, _>>()?;
-    let mut sum = BinaryPoint::Infinity;
     let mut sums = Vec::with_capacity(4);
     for point in points {
         sum = base.curve.add(&sum, point);
@@ -1864,7 +2208,6 @@ fn chain_witness_impl(
                     "selector_pinned":pins.selector(),
                     "phase_pinned":pins.phase(),
                     "representative_x_decimal":value.to_string(),
-                })
             .collect::<Vec<_>>());
         phases.mark("orbit_choices_pinned", orbit_choice_receipt.clone())?;
     enc.solver.deadline = Some(start + Duration::from_secs(1800));
@@ -2102,7 +2445,6 @@ pub(super) fn chain_planted_cli(
                         .collect(),
                 );
     let solver_ms = solver_start.elapsed().as_secs_f64() * 1000.0;
-    let receipt = json!({
         "schema":"n83.k16627-m4-planted/v1", "status":status,
         "arm":if pinned {"pinned"} else {"unpinned"},
         "object":base_row["object"], "point_set_blake3":base_row["point_set_blake3"],
@@ -2174,7 +2516,6 @@ pub(super) fn s3_probe_cli(
         "policy":policy,
         "seed":seed,
         "object":row["object"],
-        "point_set_blake3":row["point_set_blake3"],
         "source_compact_blake3":blake3::hash(include_bytes!("compact_cold.rs")).to_hex().to_string(),
         "max_candidate_states":max_candidate_states,
         "base_import_ms":base_import_ms,
@@ -2253,7 +2594,6 @@ fn candidate_matches_validation(
     let row = selected.next().ok_or("primary validation fixture absent")?;
         return Err("ambiguous primary validation fixture".into());
     let expected: BigUint = row["known_answer_scalar"]
-        .as_str()
         .ok_or("known-answer encoding")?
     Ok(*candidate == expected)
 
@@ -2278,19 +2618,58 @@ struct ChainRunConfig<'a> {
     memory_limit_bytes: u64,
     source_attestation_mode: &'static str,
 
-/// Execute one replay-bound primary chained-S3 search only inside a verified
-/// hard-memory cgroup. The outer supervisor owns the separate wall deadline.
-pub(super) fn run_chain_cli(
-    if ![64, 256, 600].contains(&columns) && !V2_SIZES.contains(&columns)
+struct StoreRunConfig<'a> {
+    store: &'a Store,
+
+fn seal_store_run_error(run_dir: &Path, result: Result<Value>) -> Result<Value> {
+    match result {
+        Ok(summary) => Ok(summary),
+        Err(error) => {
+            if run_dir.is_dir()
+                && !run_dir.join("summary.json").exists()
+                && !run_dir.join("cap.json").exists()
+                let receipt = json!({
+                    "schema":"n83.primary-store-command-error/v1",
+                    "status":"COMMAND_ERROR",
+                    "reason":error.to_string(),
+                    "solver_stage_executed":Value::Null,
+                    "total_index_calculus_runtime_ms":Value::Null,
+                    "selected_best_total_runtime":Value::Null,
+                write_new_json(&run_dir.join("failure.json"), &receipt).map_err(|write_error| {
+                    format!("{error}; failed to seal store command error: {write_error}")
+                })?;
+            Err(error)
+
+/// Run a bounded enumerate trial against a verified v3 artifact-store base.
+/// Base construction and publication are outside this diagnostic interval.
+pub(super) fn run_store_trial_cli(
+    if columns == 0
+        || !(2..=6).contains(&m)
+        || max_trials > 1000
+        || budget_seconds == 0
+        || budget_seconds > 7200
         || !fixture_root.join("probe-corpus.json").is_file()
         || !fixture_root.join("probe-validation.json").is_file()
-        || ![
-            "public_x_sequential",
-            "public_x_hash",
-            "public_x_gray_prefix",
-        ]
-        .contains(&policy)
-        || max_trials > 1000
+        return Err("v3 store trial caps or fixture inputs invalid".into());
+    let config = StoreRunConfig {
+        store: &store,
+        source_commit,
+        source_attestation_mode,
+    seal_store_run_error(
+        run_with_config(
+            root,
+            columns,
+            "enumerate",
+            max_trials,
+            budget_seconds,
+            run_dir,
+            None,
+            Some(&config),
+
+/// Run a bounded chained-S3 search against a verified v3 artifact-store base.
+/// The hard cgroup gate applies even to a zero-query preflight.
+pub(super) fn run_store_chain_cli(
+        || columns > 32_643
         || limits.max_variables == 0
         || limits.max_variables > i32::MAX as u32
         || limits.max_domain_clauses == 0
@@ -2299,30 +2678,88 @@ pub(super) fn run_chain_cli(
         || limits.max_models > 1_000_000
         || limits.conflict_budget == 0
         || limits.conflict_budget > 10_000_000_000
-        || budget_seconds == 0
-        || budget_seconds > 7200
-        || memory_mib < 128
-        || memory_mib > 65536
-            "primary chained-S3 search caps or base selection outside supported domain".into(),
-    let config = ChainRunConfig {
+        || !(128..=65_536).contains(&memory_mib)
+        return Err("v3 store chained-S3 caps or fixture inputs invalid".into());
+    let manifest: Value = serde_json::from_slice(&fs::read(root.join("manifest.json"))?)?;
+    let policy = manifest["base"]["policy"]
+        .ok_or("v3 store policy missing")?;
+    let seed = manifest["base"]["seed"]
+        .as_u64()
+        .ok_or("v3 store seed missing")?;
+    let chain_config = ChainRunConfig {
         policy,
         seed,
         limits,
         memory_limit_bytes,
-        source_commit,
-        source_attestation_mode,
+        source_commit: source_commit.clone(),
+    let store_config = StoreRunConfig {
     let strategy = match (frobenius_orbits, order_first_pair) {
         (false, false) => "chain-s3",
         (true, false) => "orbit-chain-s3",
         (true, true) => "ordered-orbit-chain-s3",
         (false, true) => unreachable!("checked above"),
+            strategy,
+            Some(&chain_config),
+            Some(&store_config),
+
+fn supported_chain_wall_budget(
+    conflicts: u64,
+    seconds: u64,
+) -> bool {
+    (1..=7200).contains(&seconds)
+        || (m == 5
+            && frobenius_orbits
+            && !order_first_pair
+            && matches!(
+                (columns, conflicts, seconds),
+                (2048, 1_500_000, 8957) | (4096, 1_500_000, 9000)
+            ))
+
+/// Execute one replay-bound primary chained-S3 search only inside a verified
+/// hard-memory cgroup. The outer supervisor owns the separate wall deadline.
+pub(super) fn run_chain_cli(
+    karatsuba: bool,
+    shallow_karatsuba: bool,
+    if ![64, 256, 600].contains(&columns) && !V2_SIZES.contains(&columns)
+        .contains(&policy)
+        || !supported_chain_wall_budget(
+            limits.conflict_budget,
+            frobenius_orbits,
+            order_first_pair,
+        || memory_mib < 128
+        || memory_mib > 65536
+        || (karatsuba && frobenius_orbits)
+        || (karatsuba && shallow_karatsuba)
+            "primary chained-S3 search caps or base selection outside supported domain".into(),
+    let config = ChainRunConfig {
+    let strategy = match (
+        frobenius_orbits,
+        order_first_pair,
+        karatsuba,
+        shallow_karatsuba,
+    ) {
+        (false, false, false, false) => "chain-s3",
+        (false, false, true, false) => "chain-s3-karatsuba",
+        (false, false, false, true) => "chain-s3-shallow-karatsuba",
+        (true, false, false, false) => "orbit-chain-s3",
+        (true, false, false, true) => "orbit-chain-s3-shallow-karatsuba",
+        (true, true, false, false) => "ordered-orbit-chain-s3",
+        (true, true, false, true) => "ordered-orbit-chain-s3-shallow-karatsuba",
+        _ => unreachable!("checked above"),
         strategy,
         Some(&config),
 
 fn run_with_config(
     chain: Option<&ChainRunConfig<'_>>,
-    if ![64, 256, 600].contains(&columns) && !(chain.is_some() && V2_SIZES.contains(&columns))
-        || !(2..=6).contains(&m)
+    store: Option<&StoreRunConfig<'_>>,
+    if let (Some(chain_config), Some(store_config)) = (chain, store) {
+        if chain_config.source_commit != store_config.source_commit
+            || chain_config.fixture_root != store_config.fixture_root
+            || chain_config.source_attestation_mode != store_config.source_attestation_mode
+            return Err("v3 store chain source or fixture mismatch".into());
+    if !(store.is_some()
+        || [64, 256, 600].contains(&columns)
+        || (chain.is_some() && V2_SIZES.contains(&columns)))
         return Err("unsupported primary K or summand count".into());
     let strategy = match strategy_name {
         "enumerate" => DecompositionStrategy::Enumerate,
@@ -2332,36 +2769,68 @@ fn run_with_config(
                     .into(),
             )
         "chain-s3" if chain.is_some() && (4..=6).contains(&m) => DecompositionStrategy::ChainedS3,
+        "chain-s3-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3Karatsuba
+        "chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3ShallowKaratsuba
         "orbit-chain-s3" if chain.is_some() && (4..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbit
+        "orbit-chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
         "ordered-orbit-chain-s3" if chain.is_some() && (4..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
+        "ordered-orbit-chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba
         _ => return Err("unsupported or unguarded primary strategy".into()),
     if budget_seconds == 0 || budget_seconds > 86_400 {
         return Err("primary wall cap must be 1..86400 seconds".into());
+    let trace_chained_s3_phases = match std::env::var("N83_CHAIN_PHASE_TRACE") {
+        Ok(value) if value == "1" => true,
+        Ok(value) if value == "0" => false,
+        Err(std::env::VarError::NotPresent) => false,
+        _ => return Err("N83_CHAIN_PHASE_TRACE must be 0 or 1".into()),
+    if trace_chained_s3_phases
+        && (!matches!(
+            DecompositionStrategy::ChainedS3
+                | DecompositionStrategy::ChainedS3FrobeniusOrbit
+                | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
+        ) || max_trials != 1)
+        return Err("N83 phase trace requires one chained-S3 trial".into());
     fs::create_dir(run_dir)?;
-    write_new_json(
-        &run_dir.join("config.json"),
-        &json!({
-            "schema":"n83.primary-cold-config/v1", "study":STUDY,
-            "panel_dir":root.to_string_lossy(),
-            "fixture_dir":chain.map(|config| config.fixture_root.to_string_lossy().to_string()),
-            "curve_a":0, "fixture":0, "orbit_columns":columns,
-            "summands":m, "strategy":strategy_name, "max_trials":max_trials,
-            "budget_seconds":budget_seconds, "allow_direct_relation":false,
-            "source_adapter_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
-            "source_commit":chain.map(|config| config.source_commit.as_str()),
-            "source_attestation_mode":chain.map(|config| config.source_attestation_mode),
-            "policy":chain.map(|config| config.policy),
-            "seed":chain.map(|config| config.seed),
-            "chain_s3_limits":chain.map(|config| json!({
-                "max_variables":config.limits.max_variables,
-                "max_domain_clauses":config.limits.max_domain_clauses,
-                "max_models":config.limits.max_models,
-                "conflict_budget":config.limits.conflict_budget,
-            })),
-            "memory_cgroup_limit_bytes":chain.map(|config| config.memory_limit_bytes),
-            "memory_cgroup_swap_limit_bytes":chain.map(|_| 0),
+    let mut config_record = json!({
+        "schema":"n83.primary-cold-config/v1", "study":STUDY,
+        "panel_dir":root.to_string_lossy(),
+        "input_kind":if store.is_some() { "artifact_store_v3" } else { "historical_panel_v1v2" },
+        "fixture_dir":chain.map(|config| config.fixture_root.to_string_lossy().to_string())
+            .or_else(|| store.map(|config| config.fixture_root.to_string_lossy().to_string())),
+        "curve_a":0, "fixture":0, "orbit_columns":columns,
+        "summands":m, "strategy":strategy_name, "max_trials":max_trials,
+        "budget_seconds":budget_seconds, "allow_direct_relation":false,
+        "trace_chained_s3_phases":trace_chained_s3_phases,
+        "source_commit":chain.map(|config| config.source_commit.as_str())
+            .or_else(|| store.map(|config| config.source_commit.as_str())),
+        "source_attestation_mode":chain.map(|config| config.source_attestation_mode)
+            .or_else(|| store.map(|config| config.source_attestation_mode)),
+        "policy":chain.map(|config| config.policy),
+        "seed":chain.map(|config| config.seed),
+        "chain_s3_limits":chain.map(|config| json!({
+            "max_variables":config.limits.max_variables,
+            "max_domain_clauses":config.limits.max_domain_clauses,
+            "max_models":config.limits.max_models,
+            "conflict_budget":config.limits.conflict_budget,
+        })),
+        "memory_cgroup_limit_bytes":chain.map(|config| config.memory_limit_bytes),
+        "memory_cgroup_swap_limit_bytes":chain.map(|_| 0),
+    if store.is_some() {
+        config_record["schema"] = json!(if chain.is_some() {
+            "n83.primary-store-chain-config/v1"
+            "n83.primary-store-trial-config/v1"
+        config_record["base_dir"] = json!(root.to_string_lossy().to_string());
+        config_record["panel_dir"] = Value::Null;
+        config_record["measurement_scope"] = json!(if chain.is_some() {
+            "store import and bounded chained-S3 trial; base construction and publication are outside this interval"
+            "store import and bounded enumerate trial; base construction and publication are outside this interval"
+    write_new_json(&run_dir.join("config.json"), &config_record)?;
     let cap_path = run_dir.join("cap.json");
     let cap_strategy = strategy_name.to_owned();
     let deadline = start + Duration::from_secs(budget_seconds);
@@ -2372,12 +2841,24 @@ fn run_with_config(
             "elapsed_process_wall_ms":start.elapsed().as_secs_f64()*1000.0,
             "selected_best_total_runtime":Value::Null
 
-    let (base, row, manifest_hash) = if let Some(config) = chain {
+    let (base, row, manifest_hash) = if let Some(config) = store {
+        let (base, row) = load_store_primary_base(root, config.store)?;
+        if row["columns"].as_u64() != Some(columns as u64) {
+            return Err("v3 store base column count differs from requested workload".into());
+        if let Some(chain_config) = chain {
+            if row["policy"] != chain_config.policy || row["seed"] != chain_config.seed {
+                return Err("v3 store chain selection differs from verified base".into());
+        let manifest_hash = sha256_hex(&fs::read(root.join("manifest.json"))?);
+        (base, row, manifest_hash)
+    } else if let Some(config) = chain {
         load_panel_selected(root, columns, config.policy, config.seed)?
         load_panel(root, columns)?
     let base_import_ms = import_start.elapsed().as_secs_f64() * 1000.0;
     let target_start = Instant::now();
-    let fixture_root = chain.map_or(root, |config| config.fixture_root);
+    let fixture_root = chain
+        .map(|config| config.fixture_root)
+        .or_else(|| store.map(|config| config.fixture_root))
+        .unwrap_or(root);
     let target_validation_ms = target_start.elapsed().as_secs_f64() * 1000.0;
 
     let mut options = KoblitzIcOptions::default();
@@ -2418,7 +2899,13 @@ fn run_with_config(
                     .unwrap_or(false)
         None => false,
     let post_solver_validation_ms = verification_start.elapsed().as_secs_f64() * 1000.0;
-    let memory_cgroup_peak_bytes = if chain.is_some() {
+    // A source-bound zero-trial store preflight must report its real cgroup peak.
+    // The in-process test fixture has no Linux cgroup and remains explicitly
+    // marked `test_fixture`, so it cannot be confused with an admitted run.
+    let fixture_only = store.is_some()
+        && max_trials == 0
+        && chain.is_some_and(|config| config.source_attestation_mode == "test_fixture");
+    let memory_cgroup_peak_bytes = if chain.is_some() && !fixture_only {
             fs::read_to_string(cgroup_v2_file("memory.peak")?)?
                 .parse::<u64>()?,
     let status = if report.inconsistent_relations != 0
@@ -2489,26 +2976,15 @@ fn run_with_config(
                 "rank":rank.rank,
                 "candidate_produced":rank.candidate_produced,
                 "candidate_verified":rank.candidate_verified
-    let summary = json!({
+    let mut summary = json!({
         "schema":"n83.primary-cold-result/v1", "study":STUDY,
         "status":status, "curve_a":0, "fixture":0,
         "object":row["object"], "point_set_blake3":row["point_set_blake3"],
         "orbit_columns":columns, "summands":m, "strategy":strategy_name,
         "policy":row["policy"], "seed":row["seed"],
         "max_trials":max_trials, "sampler_seed":options.seed,
-        "fixture_dir":chain.map(|config| config.fixture_root.to_string_lossy().to_string()),
-        "source_commit":chain.map(|config| config.source_commit.as_str()),
-        "source_attestation_mode":chain.map(|config| config.source_attestation_mode),
         "source_chain_blake3":chain.map(|_| blake3::hash(include_bytes!("../../src/cryptanalysis/binary_semaev_chain_sat.rs")).to_hex().to_string()),
         "source_index_calculus_blake3":chain.map(|_| blake3::hash(include_bytes!("../../src/cryptanalysis/koblitz_index_calculus.rs")).to_hex().to_string()),
-        "chain_s3_limits":chain.map(|config| json!({
-            "max_variables":config.limits.max_variables,
-            "max_domain_clauses":config.limits.max_domain_clauses,
-            "max_models":config.limits.max_models,
-            "conflict_budget":config.limits.conflict_budget,
-        })),
-        "memory_cgroup_limit_bytes":chain.map(|config| config.memory_limit_bytes),
-        "memory_cgroup_swap_limit_bytes":chain.map(|_| 0),
         "process_usage":if chain.is_some() { process_usage() } else { Value::Null },
         "solver_ms":solver_ms, "post_solver_validation_ms":post_solver_validation_ms,
         "pre_summary_process_wall_ms":start.elapsed().as_secs_f64()*1000.0,
@@ -2518,6 +2994,18 @@ fn run_with_config(
         "relation_matrix":relation_matrix,
         "rank_history":rank_history,
         "verified_log":if candidate_valid { report.log.as_ref().map(ToString::to_string) } else { None },
+        summary["schema"] = json!(if chain.is_some() {
+            "n83.primary-store-chain/v1"
+            "n83.primary-store-trial/v1"
+        summary["input_kind"] = json!("artifact_store_v3");
+        summary["object"] = row["store_name"].clone();
+        summary["store_name"] = row["store_name"].clone();
+        summary["store_manifest_sha256"] = summary["panel_manifest_blake3"].clone();
+        summary["panel_manifest_blake3"] = Value::Null;
+        summary["measurement_scope"] = json!(if chain.is_some() {
+            "bounded store import and chained-S3 trial only; base construction and publication are outside this interval; total cold index-calculus runtime remains unset"
+            "bounded store import and enumerate trial only; base construction and publication are outside this interval; total cold index-calculus runtime remains unset"
+        summary["input_kind"] = json!("historical_panel_v1v2");
     write_new_json(&run_dir.join("summary.json"), &summary)?;
     if status == "PRODUCER_FAILURE" {
         Err("primary solver result failed verification; inspect summary.json".into())
@@ -2527,20 +3015,288 @@ fn run_with_config(
 mod tests {
     use super::super::construct;
     use super::*;
+
+    #[test]
+    fn continuation_wall_admission_preserves_legacy_and_rejects_nearby_requests() {
+        for (columns, seconds) in [(2048, 8957), (4096, 9000)] {
+            assert!(supported_chain_wall_budget(
+                columns, 5, 1_500_000, seconds, true, false
+            for (k, m, conflicts, wall, orbits, ordered) in [
+                (columns, 5, 1_500_000, seconds - 1, true, false),
+                (columns, 5, 1_500_000, seconds + 1, true, false),
+                (columns, 5, 1_500_001, seconds, true, false),
+                (columns, 6, 1_500_000, seconds, true, false),
+                (columns, 5, 1_500_000, seconds, false, false),
+                (columns, 5, 1_500_000, seconds, true, true),
+                (8192, 5, 1_500_000, seconds, true, false),
+            ] {
+                assert!(!supported_chain_wall_budget(
+                    k, m, conflicts, wall, orbits, ordered
+                ));
+        for seconds in [1, 6000, 7200] {
+                64, 6, 100, seconds, false, false
+        assert!(!supported_chain_wall_budget(
+            2048, 5, 1_500_000, 0, true, false
+            2048, 5, 1_500_000, 9000, true, false
+            2048, 5, 1_500_000, 8987, true, false
+            4096, 5, 1_500_000, 8957, true, false
+
+    fn actual_chain_entry_passes_continuation_admission_before_cgroup_or_input_refusal() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let tmp =
+            std::env::temp_dir().join(format!("n83-wall-admission-{}-{nonce}", std::process::id()));
+        let fixtures = tmp.join("fixtures");
+        fs::create_dir_all(&fixtures).unwrap();
+        fs::write(fixtures.join("probe-corpus.json"), b"{}").unwrap();
+        fs::write(fixtures.join("probe-validation.json"), b"{}").unwrap();
+            // The deliberately absent panel prevents any SAT execution even
+            // if the test happens to run inside a matching hard-memory cgroup.
+            let err = run_chain_cli(
+                &tmp.join("absent-panel"),
+                &fixtures,
+                columns,
+                "public_x_hash",
+                2026100801,
+                5,
+                1,
+                ChainS3Limits {
+                    max_variables: 150000,
+                    max_domain_clauses: 2000000,
+                    max_models: 32,
+                    conflict_budget: 1500000,
+                seconds,
+                8192,
+                &tmp.join(format!("out-{columns}")),
+                true,
+                false,
+            .unwrap_err()
+            .to_string();
+            assert_ne!(
+                err,
+                "primary chained-S3 search caps or base selection outside supported domain"
+            );
+        fs::remove_dir_all(tmp).unwrap();
     use crypto_lib::cryptanalysis::koblitz_index_calculus::{
         enumerate_decompose, koblitz_index_calculus_dlp_with_factor_base, KoblitzIcOptions,
     use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
+    use crypto_lib::store::{Config as StoreConfig, PushMeta};
+    use flate2::{write::GzEncoder, Compression};
     use std::collections::HashMap;
     use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-    #[test]
+    fn k600_native_replay_rejects_partial_and_false_xcnf_models() {
+        let formula = "p cnf 3 3\n1 -2 0\n3 0\nx -1 2 3 0\n";
+        let model = k600_model_values("s SATISFIABLE\nv 1 -2 3 0\n", 3).unwrap();
+        assert_eq!(model, [0, 1, 2, 1]);
+        k600_check_xcnf(formula, &model, 2, 1).unwrap();
+        assert!(k600_model_values("s SATISFIABLE\nv 1 -2 0\n", 3).is_err());
+        assert!(k600_model_values("s SATISFIABLE\nv 1 -2 3 3 0\n", 3).is_err());
+        assert!(k600_model_values("s UNSATISFIABLE\nv 1 -2 3 0\n", 3).is_err());
+        assert!(k600_check_xcnf(formula, &[0, 2, 2, 1], 2, 1).is_err());
+        assert!(k600_check_xcnf(formula, &[0, 1, 1, 1], 2, 1).is_err());
+        assert!(k600_check_xcnf(formula, &model, 3, 0).is_err());
+        assert!(k600_check_xcnf("p cnf 3 3\n1 -2 0\n3 0\nx -1 2 3\n", &model, 2, 1).is_err());
+
+    fn k600_positive_witness_checks_exported_objects_and_relation_row() {
+        let (bytes, manifest_row) = construct(
+            0,
+            2,
+            17,
+            Instant::now() + Duration::from_secs(60),
+        .unwrap();
+        let base = from_record(&manifest_row, &bytes).unwrap();
+        let kc = &base.curve;
+        let fb = &base.factor_base;
+        let indices = [0usize, 2, 4, 6, 8, 10];
+        let mut partial_sums = Vec::new();
+            sum = kc.add(&sum, &fb.points[index]);
+            assert!(matches!(sum, BinaryPoint::Affine { .. }));
+            partial_sums.push(planted_point_json(&sum));
+        let row = checked_primary_relation_row(kc, fb, &indices, &sum).unwrap();
+            serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>()).unwrap();
+        let positive = json!({
+            "points":indices.iter().map(|&i| planted_point_json(&fb.points[i])).collect::<Vec<_>>(),
+            "partial_sums":partial_sums,
+        assert_eq!(
+            verify_k600_positive_witness(kc, fb, &sum, &positive).unwrap(),
+            indices
+        let mut bad = positive.clone();
+        bad["points"][0] = point_json(words(&fb.points[0]));
+        assert!(verify_k600_positive_witness(kc, fb, &sum, &bad).is_err());
+        bad["partial_sums"][4]["x_decimal"] = json!("0");
+        bad["relation_row_decimal_blake3"] = json!("0");
+        let mut bad = positive;
+        bad["indices"][5] = json!(0);
+
+    fn successor_store_import_checks_index_bytes_replay_and_custody() {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+        let root = std::env::temp_dir().join(format!("n83-store-v3-{nonce}"));
+        let bundle = root.join("bundle");
+        let remote = root.join("remote");
+        fs::create_dir_all(&bundle).unwrap();
+        fs::create_dir_all(&remote).unwrap();
+        let (plain, mut row) = construct(
+            SEEDS[0],
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+        encoder.write_all(&plain).unwrap();
+        let compressed = encoder.finish().unwrap();
+        let object = root.join("base.jsonl.gz");
+        fs::write(&object, &compressed).unwrap();
+        let cfg = StoreConfig {
+            index_path: root.join("index.json"),
+            cache_dir: root.join("cache"),
+            remote: Some(RemoteSpec::Dir(remote.clone())),
+            endpoint: None,
+            aws: "aws".into(),
+        let mut store = Store::open(cfg).unwrap();
+        let name = "factor-bases/icv1-f2m83-tm6151469093347-debefd74/control-k2.jsonl.gz";
+        let pushed = store
+            .push(
+                name,
+                &object,
+                PushMeta {
+                    description: "N83 native store control".into(),
+                    provenance: "release test".into(),
+                    no_cache: true,
+                    ..Default::default()
+            .unwrap();
+        assert!(pushed.uploaded);
+        let pulled = store.ensure(name).unwrap();
+        assert!(pulled.fetched);
+        assert_eq!(pulled.sha256, pushed.sha256);
+        row["closure"] = json!("signed_frobenius");
+        row["store_name"] = json!(name);
+        row["compressed_sha256"] = json!(pushed.sha256);
+        row["compressed_blake3"] = json!(blake3::hash(&compressed).to_hex().to_string());
+        row["plain_blake3"] = json!(blake3::hash(&plain).to_hex().to_string());
+        row["bytes"] = json!(compressed.len());
+        row["plain_bytes"] = json!(plain.len());
+        let remote_uri = format!("file://{}", remote.display());
+        write_new_json(
+            &bundle.join("manifest.json"),
+            &json!({
+                "schema":"n83.factor-base-panel/v3-artifact-store",
+                "status":"completed_factor_base_object","study":STUDY,
+                "curve_id":"icv1-f2m83-tm6151469093347-debefd74",
+                "source_commit":"a".repeat(40),"remote":remote_uri,"base":row,
+        let manifest_sha256 = sha256_hex(&fs::read(bundle.join("manifest.json")).unwrap());
+            &bundle.join("replay.json"),
+                "schema":"n83.factor-base-replay/v3-artifact-store","status":"PASS",
+                "manifest_sha256":manifest_sha256,"store_name":name,
+                "point_set_blake3":row["point_set_blake3"],
+                "points_checked":332,"representatives_checked":2,
+        let storage = json!({
+            "schema":"n83.factor-base-storage/v3-artifact-store","status":"PASS",
+            "manifest_sha256":manifest_sha256,"remote":remote_uri,
+            "store_name":name,"sha256":pushed.sha256,"bytes":compressed.len(),
+            "fresh_download_sha256":pushed.sha256,"fresh_download_bytes":compressed.len(),
+        write_new_json(&bundle.join("storage.json"), &storage).unwrap();
+        let (imported, checked) = load_store_primary_base(&bundle, &store).unwrap();
+        assert_eq!(imported.factor_base.points.len(), 332);
+        assert_eq!(imported.factor_base.signed_orbits.len(), 2);
+        assert_eq!(checked["point_set_blake3"], row["point_set_blake3"]);
+        let fixture_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/koblitz_n83_factor_base_sweep_20261008/pilot-01");
+        let config = StoreRunConfig {
+            store: &store,
+            fixture_root: &fixture_root,
+            source_commit: "a".repeat(40),
+            source_attestation_mode: "test_fixture",
+        let trial = run_with_config(
+            &bundle,
+            7200,
+            &root.join("trial"),
+        assert_eq!(trial["input_kind"], "artifact_store_v3");
+        assert_eq!(trial["schema"], "n83.primary-store-trial/v1");
+        assert_eq!(trial["store_name"], name);
+        assert_eq!(trial["store_manifest_sha256"], manifest_sha256);
+        assert!(trial["panel_manifest_blake3"].is_null());
+        assert!(trial["total_index_calculus_runtime_ms"].is_null());
+        let one_query = run_with_config(
+            1,
+            60,
+            &root.join("one-query"),
+        assert_eq!(one_query["schema"], "n83.primary-store-trial/v1");
+        assert_eq!(one_query["store_name"], name);
+        assert_eq!(one_query["report"]["trials"], 1);
+        assert_eq!(one_query["solver_stage_executed"], true);
+        assert!(one_query["total_index_calculus_runtime_ms"].is_null());
+        let chain_config = ChainRunConfig {
+            policy: "public_x_hash",
+            seed: SEEDS[0],
+            limits: ChainS3Limits {
+                max_variables: 10_000,
+                max_domain_clauses: 100_000,
+                max_models: 1,
+                conflict_budget: 1_000,
+            },
+            memory_limit_bytes: 256 * 1024 * 1024,
+        let chain_preflight = run_with_config(
+            5,
+            "orbit-chain-s3",
+            &root.join("chain-preflight"),
+        assert_eq!(chain_preflight["schema"], "n83.primary-store-chain/v1");
+        assert_eq!(chain_preflight["store_name"], name);
+        assert_eq!(chain_preflight["strategy"], "orbit-chain-s3");
+        assert_eq!(chain_preflight["solver_stage_executed"], false);
+        assert!(chain_preflight["total_index_calculus_runtime_ms"].is_null());
+        let wrong_chain_config = ChainRunConfig {
+            policy: "public_x_sequential",
+            ..chain_config
+        let wrong_chain_dir = root.join("wrong-chain-policy");
+        assert!(seal_store_run_error(
+            &wrong_chain_dir,
+            run_with_config(
+                &bundle,
+                2,
+                "orbit-chain-s3",
+                0,
+                7200,
+                &wrong_chain_dir,
+                Some(&wrong_chain_config),
+                Some(&config),
+            ),
+        .unwrap_err()
+        .to_string()
+        .contains("selection differs from verified base"));
+        let rejected: Value =
+            serde_json::from_slice(&fs::read(wrong_chain_dir.join("failure.json")).unwrap())
+                .unwrap();
+        assert_eq!(rejected["schema"], "n83.primary-store-command-error/v1");
+        assert_eq!(rejected["status"], "COMMAND_ERROR");
+        assert!(rejected["total_index_calculus_runtime_ms"].is_null());
+        let wrong_columns_dir = root.join("wrong-columns");
+            &wrong_columns_dir,
+                3,
+                "enumerate",
+                &wrong_columns_dir,
+                None,
+        .is_err());
+        assert!(wrong_columns_dir.join("failure.json").is_file());
+        let mut bad = storage.clone();
+        bad["fresh_download_sha256"] = json!("0");
+        fs::write(
+            bundle.join("storage.json"),
+            serde_json::to_vec(&bad).unwrap(),
+        assert!(load_store_primary_base(&bundle, &store).is_err());
+            serde_json::to_vec(&storage).unwrap(),
+        let mut old: Value =
+            serde_json::from_slice(&fs::read(bundle.join("manifest.json")).unwrap()).unwrap();
+        old["schema"] = json!("n83.factor-base-panel/v1");
+            bundle.join("manifest.json"),
+            serde_json::to_vec(&old).unwrap(),
+        fs::remove_dir_all(root).unwrap();
+
     fn packed_model_uses_low_bit_first_and_zero_padding() {
         let model = [true, false, true, false, false, false, false, false, true];
         assert_eq!(pack_model_bits(&model), [0b0000_0101, 0b0000_0001]);
         assert!(pack_model_bits(&[]).is_empty());
 
     fn cgroup_v2_membership_resolves_container_and_native_scope() {
-        assert_eq!(
             cgroup_v2_root_from_membership("0::/\n").unwrap(),
             Path::new("/sys/fs/cgroup")
             cgroup_v2_root_from_membership(
@@ -2577,11 +3333,8 @@ mod tests {
                 &kc.curve.irreducible,
                 &kc.curve.b,
                 Some(&expected[6]),
-                0,
                 2_000,
-            .unwrap();
             enc.constrain_frobenius_orbit_summands(&representatives, 2_000, 10_000)
-                .unwrap();
             for (block, value) in expected.iter().enumerate() {
                 enc.pin_x_block(block, value).unwrap();
             let handles = enc.orbit_choice_wires().unwrap().to_vec();
@@ -2629,10 +3382,6 @@ mod tests {
                 assert_eq!(run(mode, false, contradict), run(mode, true, contradict));
 
     fn supervised_source_snapshot_rejects_a_changed_compiled_file() {
-        let nonce = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_nanos();
         let snapshot = std::env::temp_dir().join(format!("n83-probe-source-{nonce}"));
         let checkout = Path::new(env!("CARGO_MANIFEST_DIR"));
         for relative in [
@@ -2640,19 +3389,13 @@ mod tests {
             fs::create_dir_all(destination.parent().unwrap()).unwrap();
             fs::copy(checkout.join(relative), destination).unwrap();
         assert!(checked_primary_probe_source(&snapshot).is_ok());
-        fs::write(
             snapshot.join("research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs"),
             b"changed source",
-        .unwrap();
         assert!(checked_primary_probe_source(&snapshot).is_err());
         fs::remove_dir_all(snapshot).unwrap();
 
     fn small_primary_export_maps_to_generic_orbits_and_zero_trial_preflight() {
         let (bytes, row) = construct(
-            0,
-            2,
-            17,
-            Instant::now() + Duration::from_secs(60),
         let base = from_record(&row, &bytes).unwrap();
         assert_eq!(base.factor_base.points.len(), 332);
         assert_eq!(base.factor_base.orbits.len(), 4);
@@ -2666,11 +3409,8 @@ mod tests {
             assert_eq!(
                 base.factor_base.orbit_of[index].0,
                 2 * column + usize::from(negative)
-            );
                 point,
                 &base.factor_base.points[base.factor_base.signed_orbits[column][index % 166]]
-        let kc = &base.curve;
-        let fb = &base.factor_base;
         let indices = [0, 2, 165, 168];
         let target = indices.iter().fold(BinaryPoint::Infinity, |sum, &index| {
             kc.add(&sum, &fb.points[index])
@@ -2686,7 +3426,6 @@ mod tests {
             .expect("constructed four-point target has a stored group lift");
         assert_eq!(lifted_row, relation);
             lifted_indices
-                .iter()
                 .fold(BinaryPoint::Infinity, |sum, &index| {
                     kc.add(&sum, &fb.points[index])
                 }),
@@ -2709,11 +3448,11 @@ mod tests {
             assert_eq!(rank.insert(row.clone()), column + 1);
             assert_eq!(rank.insert(row), column + 1);
         let mut opts = KoblitzIcOptions::default();
+        opts.strategy = DecompositionStrategy::Enumerate;
         opts.max_trials = 0;
         opts.allow_direct_relation = false;
         // The default pair table packs keys into u64 and cannot represent
         // this degree-83 base. The preflight itself makes no query.
-        opts.strategy = DecompositionStrategy::Enumerate;
         let report = koblitz_index_calculus_dlp_with_factor_base(
             &base.curve,
             base.curve.generator(),
@@ -2821,11 +3560,7 @@ mod tests {
             let error = run_chain_cli(
                 &root,
                 64,
-                "public_x_hash",
                 SEEDS[0],
-                5,
-                1,
-                ChainS3Limits {
                     max_variables: 0,
                     max_domain_clauses: 1,
                     max_models: 1,
@@ -2833,11 +3568,9 @@ mod tests {
                 256,
                 &invalid_caps,
                 orbit_domain,
-                false,
             .unwrap_err();
             assert!(error.to_string().contains("outside supported domain"));
             assert!(!invalid_caps.exists());
-        fs::remove_dir_all(root).unwrap();
 
     fn v2_primary_selection_requires_replay_and_s3_receipts_before_object_import() {
         let root = std::env::temp_dir().join(format!("n83-v2-import-gate-{suffix}"));
@@ -2855,15 +3588,11 @@ mod tests {
         write_new_json(&root.join("manifest.json"), &manifest).unwrap();
         let manifest_hash = blake3::hash(&fs::read(root.join("manifest.json")).unwrap())
             .to_hex()
-            .to_string();
-        write_new_json(
             &root.join("replay.json"),
-            &json!({
                 "schema":"n83.factor-base-replay/v2-size-frontier", "status":"PASS",
                 "panel_manifest_blake3":manifest_hash,
                 "checks":[{"object":object,"points_checked":166*1182,
                     "representatives_checked":1182,"status":"PASS"}],
-        let storage = json!({
             "schema":"n83.factor-base-storage/v2-size-frontier", "status":"PASS",
             "bucket":"crypto-autoresearcher",
             "prefix":format!("{PREFIX}/{STUDY}/{V2_SUBDIR}"),
@@ -2877,1440 +3606,115 @@ mod tests {
         let mut bad = storage;
         bad["objects"][0]["downloaded_hash_matches"] = json!(false);
             root.join("upload-receipt.json"),
-            serde_json::to_vec(&bad).unwrap(),
         assert!(error.to_string().contains("S3 round-trip"), "{error}");
 
-const D18_OBJECT_BLAKE3: &str = "e0c24980207cbb15fa57ec76bcfc6a628a763a80834cba1117ca83ea04678682";
-
-const D18_OBJECT_SHA256: &str = "347d465bef217ae5f76e9b664710440a735a26211bf3957c4be4bcb4b46345a7";
-
-const D18_POINT_SET_BLAKE3: &str =
-    "8c1c245cda15bdd0019b487a5535a3b7eac642c259c4dc0bae25875d87d345b0";
-
-const D18_SOURCE_COMMIT: &str = "b901026b6b05cd1fe9b909620d6746a5a931520c";
-
-const PAIRED_CORPUS_SHA256: &str =
-
-mod xor_cache_worker {
-
-    const MIXED_WORKER_SOURCE: &[u8] =
-        include_bytes!("../n83_xor_decided_cache_20261019/worker.rs");
-    include!("../n83_xor_decided_cache_20261019/worker.rs");
-
-fn file_sha256(path: &Path) -> Result<String> {
-    Ok(format!("{:x}", Sha256::digest(&fs::read(path)?)))
-
-fn load_paired_base(
-    arm: &str,
-    evidence_root: &Path,
-) -> Result<(PrimaryBase, Value, String, &'static str, &'static str)> {
-    match arm {
-        "U" => {
-            let (base, row, manifest_hash) =
-                load_panel_selected(root, 16_627, "public_x_hash", 2026100801)?;
-            if row["object"] != format!("objects/{K16627_OBJECT_BLAKE3}.jsonl.gz")
-                || row["point_set_blake3"] != K16627_POINT_SET_BLAKE3
-                || file_sha256(&root.join("manifest.json"))?
-                    != "0c09f62bde61d3c3e987644508c53ab56fd3f545219013b9bde925ba29969275"
-                || file_sha256(&root.join("replay.json"))?
-                    != "75b3bc17d8366e258e1b8f3f8de5f42911eb893c3d029a2e40c65b9e59cffe60"
-                || file_sha256(&root.join("upload-receipt.json"))?
-                    != "70e82dfef4ad735a6974b46a4d6bca726dba4cc68be5f35ca354fab3262b445b"
-                || file_sha256(&root.join("probe-corpus.json"))? != PAIRED_CORPUS_SHA256
-                || file_sha256(&root.join(format!("objects/{K16627_OBJECT_BLAKE3}.jsonl.gz")))?
-                    != "2457a977ea9c05a11cc60878bdb3b29f6d905dc8db9aa26e52913a702d308369"
-                return Err("uniform paired input differs from frozen panel".into());
-            Ok((
-                base,
-                row,
-                manifest_hash,
-                K16627_OBJECT_BLAKE3,
-                K16627_POINT_SET_BLAKE3,
-            ))
-        "D" => {
-            let (base, row) = load_d18_export(root, &evidence_root.join("export-v1"))?;
-            let imported: Value =
-                serde_json::from_slice(&fs::read(evidence_root.join("import-v1/import.json"))?)?;
-            if imported["schema"] != "n83.primary-d18-factor-base-adapter/v1"
-                || imported["status"] != "PASS"
-                || imported["object"] != row["object"]
-                || imported["point_set_blake3"] != D18_POINT_SET_BLAKE3
-                || imported["orbit_columns"] != 16_627
-                || imported["points"] != 2_760_082
-                || imported["selected_best_total_runtime"] != Value::Null
-                return Err("d18 paired import receipt differs".into());
-            let manifest_hash = blake3::hash(&fs::read(root.join("manifest.json"))?)
-                .to_string();
-                D18_OBJECT_BLAKE3,
-                D18_POINT_SET_BLAKE3,
-        _ => Err("paired arm must be U or D".into()),
-
-fn load_d18_export(export_root: &Path, evidence_root: &Path) -> Result<(PrimaryBase, Value)> {
-    let manifest_bytes = fs::read(export_root.join("manifest.json"))?;
-    let replay_bytes = fs::read(export_root.join("replay.json"))?;
-    if manifest_bytes != fs::read(evidence_root.join("manifest.json"))?
-        || replay_bytes != fs::read(evidence_root.join("replay.json"))?
-        return Err("d18 export and committed evidence copies differ".into());
-    let replay: Value = serde_json::from_slice(&replay_bytes)?;
-    let custody: Value = serde_json::from_slice(&fs::read(evidence_root.join("s3-custody.json"))?)?;
-    let object = format!("objects/{D18_OBJECT_BLAKE3}.jsonl.gz");
-    let uri = format!("{PREFIX}/{STUDY}/d18-direct-subgroup-v1/a0/{object}");
-        || manifest["status"] != "EXPORTED_UNREPLAYED"
-        || manifest["policy"] != "direct_subgroup_x_d18"
-        || manifest["source_commit"] != D18_SOURCE_COMMIT
-        || manifest["columns"] != 16_627
-        || manifest["points"] != 2_760_082
-        || manifest["compressed_blake3"] != D18_OBJECT_BLAKE3
-        || manifest["compressed_sha256"] != D18_OBJECT_SHA256
-        || manifest["point_set_blake3"] != D18_POINT_SET_BLAKE3
-        || manifest["bytes"] != 81_844_623u64
-        || replay["schema"] != "n83.direct-subgroup-orbit-replay/v1"
-        || replay["object"] != object
-        || replay["compressed_blake3"] != D18_OBJECT_BLAKE3
-        || replay["compressed_sha256"] != D18_OBJECT_SHA256
-        || replay["point_set_blake3"] != D18_POINT_SET_BLAKE3
-        || replay["representatives_checked"] != 16_627
-        || replay["points_checked"] != 2_760_082
-        || replay["selected_best_total_runtime"] != Value::Null
-        || custody["schema"] != "n83.d18-s3-custody/v1"
-        || custody["status"] != "PASS"
-        || custody["s3_uri"] != uri
-        || custody["source_commit"] != D18_SOURCE_COMMIT
-        || custody["curve_id"] != manifest["curve_id"]
-        || custody["manifest_expected"]["blake3"] != D18_OBJECT_BLAKE3
-        || custody["manifest_expected"]["sha256"] != D18_OBJECT_SHA256
-        || custody["manifest_expected"]["bytes"] != 81_844_623u64
-        || custody["local"] != custody["manifest_expected"]
-        || custody["fresh_get"] != custody["manifest_expected"]
-        || custody["head_content_length"] != 81_844_623u64
-        || custody["server_side_encryption"] != "AES256"
-        return Err("d18 export, replay or S3 custody binding differs".into());
-    let compressed = fs::read(export_root.join(&object))?;
-    if compressed.len() != 81_844_623
-        || format!("{:x}", Sha256::digest(&compressed)) != D18_OBJECT_SHA256
-        return Err("d18 archive length or SHA-256 differs".into());
-        "a":0, "columns":16_627, "points":2_760_082,
-        "policy":"direct_subgroup_x_d18", "seed":0,
-        "object":object, "compressed_blake3":D18_OBJECT_BLAKE3,
-        "point_set_blake3":D18_POINT_SET_BLAKE3
-    let base = from_record(&row, &load_object(export_root, &row)?)?;
-
-pub(super) fn check_d18_export(export_root: &Path, evidence_root: &Path) -> Result<Value> {
-    let (base, row) = load_d18_export(export_root, evidence_root)?;
-        "schema":"n83.primary-d18-factor-base-adapter/v1", "status":"PASS",
-        "source_commit":D18_SOURCE_COMMIT, "policy":row["policy"],
-        "adapter_source_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
-        "object":row["object"], "compressed_blake3":D18_OBJECT_BLAKE3,
-        "point_set_blake3":D18_POINT_SET_BLAKE3,
-        "orbit_columns":16_627, "points":base.factor_base.points.len(),
-        "signed_frobenius_orbits":base.factor_base.signed_orbits.len(),
-
-/// Five-point counterpart of the checked four-point lift. It accepts
-/// only stored x coordinates and independently checks the full group sum.
-fn checked_five_x_lift(
-) -> Result<Option<([usize; 5], Vec<BigUint>)>> {
-    if xs.len() != 5 {
-        return Err("five-summand model has the wrong x count".into());
-    let mut choices: [Vec<usize>; 5] = std::array::from_fn(|_| Vec::new());
-                    for &e in &choices[4] {
-                        let indices = [a, b, c, d, e];
-                        let sum = indices.iter().fold(BinaryPoint::Infinity, |acc, &index| {
-                            kc.add(&acc, &fb.points[index])
-                        });
-                        if sum == *target {
-                            let row = checked_primary_relation_row(kc, fb, &indices, target)?;
-                            return Ok(Some((indices, row)));
-                        }
-
-    fixture_index: u64,
-    if fixture_index > 63 {
-        return Err("public fixture index outside frozen corpus".into());
-        .filter(|row| row["a"] == 0 && row["fixture"].as_u64() == Some(fixture_index));
-
-/// Same native m=4 model and verifier for the two frozen K=16,627 point sets.
-/// The supervisor supplies the independent 1,800-second wall cap and the
-/// read-only, one-CPU, 4-GiB, zero-swap container envelope.
-pub(super) fn paired_orbit_cli(
-    if !["preflight", "positive", "natural"].contains(&mode) || !["U", "D"].contains(&arm) {
-        return Err("paired mode or arm outside frozen protocol".into());
-        return Err("paired output already exists".into());
-    let memory_limit_bytes = checked_cgroup_memory_limit(4096)?;
-    let binary_sha256 = file_sha256(&std::env::current_exe()?)?;
-    let cap_path = PathBuf::from(format!("{}.cap.json", output.display()));
-    let cap_arm = arm.to_owned();
-        std::thread::sleep(Duration::from_secs(1790));
-            "schema":"n83.paired-orbit-cap/v1", "status":"UNKNOWN_budget",
-            "arm":cap_arm, "mode":cap_mode,
-            "budget_seconds":1790,
-    let (base, row, manifest_hash, object_blake3, point_set_blake3) =
-        load_paired_base(arm, root, evidence_root)?;
-    if file_sha256(&fixture_root.join("probe-corpus.json"))? != PAIRED_CORPUS_SHA256 {
-        return Err("paired public corpus differs".into());
-    let (public, corpus_hash) = public_target(fixture_root, &base.curve)?;
-    if planted_point_json(&public)
-        != json!({
-            "x_decimal":"1834913121178197242856238",
-            "y_decimal":"8797964190732846213981377"
-        return Err("paired public fixture point differs".into());
-    if fb.points.len() != 2_760_082 || fb.signed_orbits.len() != 16_627 {
-        return Err("paired factor-base dimensions differ".into());
-    if mode == "preflight" {
-            "schema":"n83.paired-orbit-worker/v1", "status":"PASS_PREFLIGHT",
-            "arm":arm, "mode":mode, "source_commit":source_commit,
-            "source_attestation_mode":source_attestation_mode,
-            "source_example_blake3":blake3::hash(include_bytes!("../../examples/koblitz_n83_factor_base_export.rs")).to_hex().to_string(),
-            "binary_sha256":binary_sha256, "object_blake3":object_blake3,
-            "point_set_blake3":point_set_blake3, "manifest_blake3":manifest_hash,
-            "policy":row["policy"], "seed":row["seed"],
-            "public_corpus_blake3":corpus_hash, "public_point":planted_point_json(&public),
-            "columns":fb.signed_orbits.len(), "points":fb.points.len(),
-            "memory_cgroup_limit_bytes":memory_limit_bytes,
-            "base_import_ms":import_ms, "target_validation_ms":target_validation_ms,
-            "solver_stage_executed":false,
-
-    let prepare_start = Instant::now();
-            BinaryPoint::Infinity => Err("paired orbit representative is infinity"),
-    let mut positive_indices = None;
-    let mut positive_xs = None;
-    let mut positive_row = None;
-        let mut summand_xs = Vec::with_capacity(4);
-                return Err("positive representative is infinity".into());
-            summand_xs.push(x.clone());
-            || summand_xs
-                .map(F2mElement::to_biguint)
-                .collect::<HashSet<_>>()
-                .len()
-                != 4
-            return Err("paired positive control is not affine and distinct".into());
-        let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
-        let tamper = base.curve.add(&sum, base.curve.generator());
-        if rank.insert(row.clone()) != 1
-            || checked_primary_relation_row(&base.curve, fb, &indices, &tamper).is_ok()
-            return Err("paired positive group/rank/tamper preflight failed".into());
-        positive_indices = Some(indices);
-        positive_xs = Some((summand_xs, partial));
-        positive_row = Some(row);
-        return Err("paired target is infinity".into());
-    let target_hash = blake3::hash(&serde_json::to_vec(&planted_point_json(&target))?)
-    let preparation_ms = prepare_start.elapsed().as_secs_f64() * 1000.0;
-    let mut phases = WitnessPhases::create(
-        source_commit.clone(),
-        "n83.paired-orbit-phase/v1",
-        object_blake3,
-        point_set_blake3,
-        "inputs_checked",
-            "arm":arm, "mode":mode, "binary_sha256":binary_sha256,
-            "target_blake3":target_hash, "public_corpus_blake3":corpus_hash,
-            "manifest_blake3":manifest_hash, "base_import_ms":import_ms,
-            "target_validation_ms":target_validation_ms,
-            "domain_preparation_ms":preparation_ms,
-        300_000,
-    .map_err(|_| "paired chained-S3 model build failed")?;
-    enc.constrain_frobenius_orbit_summands(&representatives, 300_000, 8_000_000)
-        .map_err(|_| "paired orbit-domain install failed")?;
-            "model_ms":model_ms, "variables":enc.solver.n_vars(),
-            "clauses":enc.solver.n_clauses(), "xor_rows":enc.solver.n_xors(),
-    let pin_start = Instant::now();
-    if let Some((summand_xs, partial)) = &positive_xs {
-        let mut pinned = summand_xs.clone();
-        for point in &partial[1..3] {
-                return Err("positive partial sum is infinity".into());
-            pinned.push(x.clone());
-        // Four summands, x(S2), x(S3), x(target): seven named blocks.
-        let pinned = [
-            pinned[0].clone(),
-            pinned[1].clone(),
-            pinned[2].clone(),
-            pinned[3].clone(),
-            pinned[4].clone(),
-            pinned[5].clone(),
-            target_x.clone(),
-        for (block, x) in pinned.iter().enumerate() {
-            enc.pin_x_block(block, x)
-                .map_err(|_| "positive x-block pin failed")?;
-        let mut sorted = representatives.clone();
-        sorted.sort_unstable();
-            .ok_or("positive selector wires absent")?;
-        if handles.len() != 4 || sorted.windows(2).any(|pair| pair[0] == pair[1]) {
-            return Err("positive orbit selectors differ".into());
-            let position = sorted
-                .map_err(|_| "positive representative missing")?;
-            let handle = &handles[slot];
-            if handle.selectors.len() != sorted.len() || handle.phase.len() != 7 {
-                return Err("positive selector wires differ".into());
-            choices.push((handle.selectors[position], handle.phase.clone()));
-        for (selector, phase) in choices {
-            if !enc.solver.add_clause(vec![selector as i32]) {
-                return Err("positive selector pin failed".into());
-            for wire in phase {
-                if !enc.solver.add_clause(vec![-(wire as i32)]) {
-                    return Err("positive phase-zero pin failed".into());
-            "positive_choices_pinned",
-            json!({"selectors":4,"phases":28}),
-    let positive_pin_ms = if mode == "positive" {
-        pin_start.elapsed().as_secs_f64() * 1000.0
-        0.0
-    enc.solver.deadline = Some(started + Duration::from_secs(1790));
-        "root_propagation_entered",
-        json!({"stats":root_phase_stats(&enc.solver.stats)}),
-    let root_start = Instant::now();
-    let root_result = enc.solver.propagate_root();
-    let root_ms = root_start.elapsed().as_secs_f64() * 1000.0;
-        "root_propagation_returned",
-            "result":format!("{root_result:?}"), "root_ms":root_ms,
-            "stats":root_phase_stats(&enc.solver.stats),
-    let answer = if root_result == RootPropagationResult::Unsat {
-        SolveResult::Unsat
-            "sat_entered",
-            json!({"conflict_budget":100_000,"max_models":1}),
-        let progress = Arc::new(SolverProgress::default());
-        enc.solver.set_progress_observer(Arc::clone(&progress));
-        let sampler = ProgressSampler::start(
-            output,
-            "n83.paired-orbit-progress/v1",
-            source_commit.clone(),
-            object_blake3,
-            point_set_blake3,
-            progress,
-        let result = enc.solver.solve();
-        sampler.finish()?;
-        result
-            "answer":format!("{answer:?}"), "search_ms":search_ms,
-    let mut relation_check_ms = 0.0;
-    let mut rank_ms = 0.0;
-        SolveResult::Unsat => "UNVERIFIED_MODEL_UNSAT",
-            let checked = Instant::now();
-            let xs = enc.decode_x_blocks();
-            let result = if !enc.verify_model() || xs.len() != 7 || xs[6] != *target_x {
-                checked_four_x_lift(&base.curve, fb, &xs[..4], &target)?
-                let rank_start = Instant::now();
-                rank_ms = rank_start.elapsed().as_secs_f64() * 1000.0;
-                let changed_target = base.curve.add(&target, base.curve.generator());
-                    checked_primary_relation_row(&base.curve, fb, &indices, &changed_target)
-                let dense: Vec<_> = row.iter().map(ToString::to_string).collect();
-                    "point_indices":indices,
-                    "group_verified":true, "tamper_rejected":tamper_rejected,
-                    "matches_constructed_row":positive_row.as_ref().map(|prior| prior == &row),
-                    "matches_constructed_indices":positive_indices.map(|prior| prior == indices),
-                phases.mark("relation_checked", relation.clone())?;
-                } else if mode == "positive" && positive_row.as_ref() != Some(&row) {
-                    "PASS_NATURAL_RELATION_PENDING_REPLAY"
-            relation_check_ms = checked.elapsed().as_secs_f64() * 1000.0 - rank_ms;
-            result
-        "schema":"n83.paired-orbit-worker/v1", "status":status,
-        "arm":arm, "mode":mode, "source_commit":source_commit,
-        "source_example_blake3":blake3::hash(include_bytes!("../../examples/koblitz_n83_factor_base_export.rs")).to_hex().to_string(),
-        "binary_sha256":binary_sha256, "object_blake3":object_blake3,
-        "point_set_blake3":point_set_blake3, "manifest_blake3":manifest_hash,
-        "public_corpus_blake3":corpus_hash, "target_blake3":target_hash,
-        "target":planted_point_json(&target),
-        "columns":fb.signed_orbits.len(), "points":fb.points.len(),
-        "base_import_ms":import_ms, "target_validation_ms":target_validation_ms,
-        "domain_preparation_ms":preparation_ms, "model_domain_ms":model_ms,
-        "positive_pin_ms":positive_pin_ms, "root_propagation_ms":root_ms,
-        "search_ms":search_ms, "relation_check_ms":relation_check_ms,
-        "rank_ms":rank_ms, "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
-        "process_usage":process_usage(), "memory_cgroup_limit_bytes":memory_limit_bytes,
-        "sat_xor_rows":enc.solver.n_xors(), "relation":relation,
-        "candidate_id":Value::Null,
-
-/// New, opt-in five-summand gate. The m=4 worker and its v1 receipt stay intact.
-pub(super) fn paired_orbit_m5_cli(
-    if !["preflight", "positive", "natural"].contains(&mode)
-        || !["U", "D"].contains(&arm)
-        || fixture_index > 1
-        std::thread::sleep(Duration::from_secs(600));
-        let memory_cgroup_peak_bytes = match cgroup_v2_file("memory.peak")
-            .ok()
-            .and_then(|path| fs::read_to_string(path).ok())
-            .and_then(|value| value.trim().parse::<u64>().ok())
-            Some(value) => value,
-            None => std::process::exit(125),
-            "schema":"n83.paired-orbit-m5-cap/v1", "status":"UNKNOWN_budget",
-            "memory_cgroup_peak_bytes":memory_cgroup_peak_bytes,
-            "process_usage":process_usage(),
-            "summands":5, "fixture_index":fixture_index,
-            "budget_seconds":600,
-            "candidate_id":Value::Null,
-    let (public, corpus_hash) = public_target_fixture(fixture_root, &base.curve, fixture_index)?;
-    let expected_public = match fixture_index {
-        0 => json!({
-        1 => json!({
-            "x_decimal":"5809312440517013698248638",
-            "y_decimal":"3568442427236746854022671"
-        _ => return Err("m5 public fixture outside frozen target pair".into()),
-    if planted_point_json(&public) != expected_public {
-        let indices: [usize; 5] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
-        let mut summand_xs = Vec::with_capacity(5);
-                != 5
-        "n83.paired-orbit-m5-phase/v1",
-            "arm":arm, "mode":mode, "summands":5,
-            "fixture_index":fixture_index, "binary_sha256":binary_sha256,
-        let memory_cgroup_peak_bytes: u64 = fs::read_to_string(cgroup_v2_file("memory.peak")?)?
-            "schema":"n83.paired-orbit-m5-worker/v1", "status":"PASS_PREFLIGHT",
-            "arm":arm, "mode":mode, "summands":5, "fixture_index":fixture_index,
-            "source_commit":source_commit,
-            "target_blake3":target_hash,
-            "domain_preparation_ms":preparation_ms, "model_domain_ms":model_ms,
-            "sat_variables":enc.solver.n_vars(), "sat_clauses":enc.solver.n_clauses(),
-        for point in &partial[1..4] {
-        // Five summands, x(S2), x(S3), x(S4), x(target): nine named blocks.
-            pinned[6].clone(),
-            pinned[7].clone(),
-        if handles.len() != 5 || sorted.windows(2).any(|pair| pair[0] == pair[1]) {
-        let mut choices = Vec::with_capacity(5);
-            json!({"selectors":5,"phases":35}),
-    enc.solver.deadline = Some(started + Duration::from_secs(600));
-            "n83.paired-orbit-m5-progress/v1",
-            let result = if !enc.verify_model() || xs.len() != 9 || xs[8] != *target_x {
-                checked_five_x_lift(&base.curve, fb, &xs[..5], &target)?
-        "schema":"n83.paired-orbit-m5-worker/v1", "status":status,
-        "arm":arm, "mode":mode, "summands":5, "fixture_index":fixture_index,
-
-/// A separate process rereads the exact base and worker result before a
-/// returned row can count as a natural relation or positive control.
-pub(super) fn paired_relation_replay_cli(
-    worker_path: &Path,
-        return Err("paired replay output already exists".into());
-    let worker: Value = serde_json::from_slice(&fs::read(worker_path)?)?;
-    let mode = worker["mode"].as_str().ok_or("paired worker mode absent")?;
-        || worker["schema"] != "n83.paired-orbit-worker/v1"
-        || worker["arm"] != arm
-        || worker["status"]
-            != if mode == "positive" {
-                "PASS_CONSTRUCTED_CONTROL"
-                "PASS_NATURAL_RELATION_PENDING_REPLAY"
-        || worker["object_blake3"] != object_blake3
-        || worker["point_set_blake3"] != point_set_blake3
-        || worker["manifest_blake3"] != manifest_hash
-        || worker["policy"] != row["policy"]
-        || worker["seed"] != row["seed"]
-        || worker["source_commit"]
-            .is_none_or(|commit| commit.len() != 40)
-        || worker["source_adapter_blake3"]
-            != blake3::hash(include_bytes!("primary_adapter.rs"))
-                .to_string()
-        || worker["source_example_blake3"]
-            != blake3::hash(include_bytes!(
-                "../../examples/koblitz_n83_factor_base_export.rs"
-            .to_string()
-        || worker["selected_best_total_runtime"] != Value::Null
-        return Err("paired worker identity or success receipt differs".into());
-    if file_sha256(&fixture_root.join("probe-corpus.json"))? != PAIRED_CORPUS_SHA256
-        || worker["public_corpus_blake3"] != corpus_hash
-        return Err("paired replay public corpus differs".into());
-        (0..4).fold(BinaryPoint::Infinity, |sum, column| {
-            base.curve
-                .add(&sum, &fb.points[fb.signed_orbits[column][0]])
-    if worker["target"] != planted_point_json(&target) || worker["target_blake3"] != target_hash {
-        return Err("paired replay target differs".into());
-    let stored = worker["relation"]["point_indices"]
-        .ok_or("paired point indices absent")?;
-    if stored.len() != 4 {
-        return Err("paired point count differs".into());
-    let mut indices = [0usize; 4];
-    for (slot, value) in stored.iter().enumerate() {
-        indices[slot] = usize::try_from(value.as_u64().ok_or("paired point index absent")?)?;
-        if indices[slot] >= fb.points.len() {
-            return Err("paired point index outside base".into());
-    let checked = Instant::now();
-    let dense = checked_primary_relation_row(&base.curve, fb, &indices, &target)?;
-    let dense_strings: Vec<_> = dense.iter().map(ToString::to_string).collect();
-    let dense_hash = blake3::hash(&serde_json::to_vec(&dense_strings)?)
-    let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
-    let rank_after_insert = rank.insert(dense.clone());
-    let mut changed_indices = indices;
-    changed_indices[0] ^= 1;
-    let changed_point_rejected =
-        checked_primary_relation_row(&base.curve, fb, &changed_indices, &target).is_err();
-    let mut changed_row = dense;
-    changed_row[0] = (&changed_row[0] + BigUint::one()) % &base.curve.subgroup_order;
-    let changed_strings: Vec<_> = changed_row.iter().map(ToString::to_string).collect();
-    let changed_row_rejected = blake3::hash(&serde_json::to_vec(&changed_strings)?)
-        != worker["relation"]["dense_decimal_blake3"]
-            .ok_or("paired dense row digest absent")?;
-    if worker["relation"]["dense_decimal_blake3"] != dense_hash
-        || worker["relation"]["rank_after_insert"] != 1
-        || rank_after_insert != 1
-        || !changed_point_rejected
-        || !changed_row_rejected
-        return Err("paired relation, rank or tamper replay failed".into());
-        "schema":"n83.paired-orbit-replay/v1", "status":"PASS",
-        "arm":arm, "mode":mode, "replay_source_commit":source_commit,
-        "worker_source_commit":worker["source_commit"],
-        "worker_sha256":file_sha256(worker_path)?,
-        "object_blake3":object_blake3, "point_set_blake3":point_set_blake3,
-        "target_blake3":target_hash, "point_indices":indices,
-        "dense_decimal_blake3":dense_hash, "rank_after_insert":rank_after_insert,
-        "changed_point_rejected":changed_point_rejected,
-        "changed_row_rejected":changed_row_rejected,
-        "relation_replay_ms":checked.elapsed().as_secs_f64()*1000.0,
-
-/// Separate-process replay of an m=5 paired worker relation and rank row.
-pub(super) fn paired_relation_m5_replay_cli(
-    let fixture_index = worker["fixture_index"]
-        .as_u64()
-        .ok_or("m5 worker fixture index absent")?;
-        || worker["schema"] != "n83.paired-orbit-m5-worker/v1"
-        || worker["summands"] != 5
-        (0..5).fold(BinaryPoint::Infinity, |sum, column| {
-    if stored.len() != 5 {
-    let mut indices = [0usize; 5];
-        "schema":"n83.paired-orbit-m5-replay/v1", "status":"PASS",
-        "replay_source_commit":source_commit,
-
-pub(super) fn mixed_xor_cache_cli(
-    shape: &str,
-    u_root: &Path,
-    d_root: &Path,
-    cache_enabled: bool,
-    xor_cache_worker::mixed_orbit_cli(
-        shape,
-        fixture_index,
-        u_root,
-        d_root,
-        evidence_root,
-        cache_enabled,
-
-pub(super) fn mixed_xor_cache_replay_cli(
-    xor_cache_worker::mixed_relation_replay_cli(
-        worker_path,
-
-pub(super) fn mixed_orbit_cli(
-
-pub(super) fn mixed_relation_replay_cli(
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            || export_xcnf
-            || native_xcnf_witness)
-    if point_json(words(&public))
-
-
-    indices: &[usize; 4],
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    let row = selected
-        .next()
-        .ok_or("primary public fixture zero absent")?;
-
-
-
-
-fn supported_chain_wall_budget(
-    conflicts: u64,
-    seconds: u64,
-) -> bool {
-    (1..=7200).contains(&seconds)
-        || (m == 5
-            && frobenius_orbits
-            && !order_first_pair
-            && matches!(
-                (columns, conflicts, seconds),
-                (2048, 1_500_000, 8957) | (4096, 1_500_000, 9000)
-
-        || !supported_chain_wall_budget(
-            columns,
-            limits.conflict_budget,
-            budget_seconds,
-            frobenius_orbits,
-            order_first_pair,
-
-    let trace_chained_s3_phases = match std::env::var("N83_CHAIN_PHASE_TRACE") {
-        Ok(value) if value == "1" => true,
-        Ok(value) if value == "0" => false,
-        Err(std::env::VarError::NotPresent) => false,
-        _ => return Err("N83_CHAIN_PHASE_TRACE must be 0 or 1".into()),
-    if trace_chained_s3_phases
-        && (!matches!(
-            strategy,
-            DecompositionStrategy::ChainedS3
-                | DecompositionStrategy::ChainedS3FrobeniusOrbit
-                | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
-        ) || max_trials != 1)
-        return Err("N83 phase trace requires one chained-S3 trial".into());
-            "trace_chained_s3_phases":trace_chained_s3_phases,
-
-
-
-
-    fn continuation_wall_admission_preserves_legacy_and_rejects_nearby_requests() {
-        for (columns, seconds) in [(2048, 8957), (4096, 9000)] {
-            assert!(supported_chain_wall_budget(columns, 5, 1_500_000, seconds, true, false));
-            for (k, m, conflicts, wall, orbits, ordered) in [
-                (columns, 5, 1_500_000, seconds - 1, true, false),
-                (columns, 5, 1_500_000, seconds + 1, true, false),
-                (columns, 5, 1_500_001, seconds, true, false),
-                (columns, 6, 1_500_000, seconds, true, false),
-                (columns, 5, 1_500_000, seconds, false, false),
-                (columns, 5, 1_500_000, seconds, true, true),
-                (8192, 5, 1_500_000, seconds, true, false),
-            ] {
-                assert!(!supported_chain_wall_budget(k, m, conflicts, wall, orbits, ordered));
-        for seconds in [1, 6000, 7200] {
-            assert!(supported_chain_wall_budget(64, 6, 100, seconds, false, false));
-        assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 0, true, false));
-        assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 9000, true, false));
-        assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 8987, true, false));
-        assert!(!supported_chain_wall_budget(4096, 5, 1_500_000, 8957, true, false));
-
-    fn actual_chain_entry_passes_continuation_admission_before_cgroup_or_input_refusal() {
-        let nonce = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
-        let tmp = std::env::temp_dir().join(format!("n83-wall-admission-{}-{nonce}", std::process::id()));
-        let fixtures = tmp.join("fixtures");
-        fs::create_dir_all(&fixtures).unwrap();
-        fs::write(fixtures.join("probe-corpus.json"), b"{}").unwrap();
-        fs::write(fixtures.join("probe-validation.json"), b"{}").unwrap();
-            // The deliberately absent panel prevents any SAT execution even
-            // if the test happens to run inside a matching hard-memory cgroup.
-            let err = run_chain_cli(
-                &tmp.join("absent-panel"), &fixtures, columns, "public_x_hash",
-                2026100801, 5, 1,
-                ChainS3Limits { max_variables:150000, max_domain_clauses:2000000,
-                    max_models:32, conflict_budget:1500000 },
-                seconds, 8192, &tmp.join(format!("out-{columns}")), true, false,
-            ).unwrap_err().to_string();
-            assert_ne!(err, "primary chained-S3 search caps or base selection outside supported domain");
-        fs::remove_dir_all(tmp).unwrap();
-
-
-
-
-
-
-
-
-
-            "targets":[{"a":0,"fixture":0,"point":point_json(words(&target))}]
-
-
-use crypto_lib::store::{backend::RemoteSpec, Store};
-use flate2::read::GzDecoder;
-use std::io::{self, Read, Write};
-
-
-
-
-
-
-
-
-
-
-/// Replay a newly constructed object with the generic binary-curve path
-/// before it is admitted to the artifact store.
-pub(super) fn replay_constructed_primary(row: &Value, bytes: &[u8]) -> Result<(usize, usize)> {
-    let base = from_record(row, bytes)?;
-    Ok((
-        base.factor_base.points.len(),
-        base.factor_base.signed_orbits.len(),
-    ))
-
-
-
-/// Successor custody path for a newly published primary base. The historical
-/// panel reader above remains bound to its original S3 bucket and receipts.
-fn load_store_primary_base(root: &Path, store: &Store) -> Result<(PrimaryBase, Value)> {
-    let manifest_sha256 = sha256_hex(&manifest_bytes);
-    let storage: Value = serde_json::from_slice(&fs::read(root.join("storage.json"))?)?;
-    let row = &manifest["base"];
-    let remote = manifest["remote"].as_str().ok_or("store remote missing")?;
-    let store_name = row["store_name"].as_str().ok_or("store name missing")?;
-    let digest = row["compressed_sha256"]
-        .ok_or("compressed SHA-256 missing")?;
-    let bytes = row["bytes"].as_u64().ok_or("compressed size missing")?;
-    let plain_bytes = row["plain_bytes"].as_u64().ok_or("plain size missing")?;
-    let columns = row["columns"].as_u64().ok_or("orbit columns missing")?;
-    let source_commit = manifest["source_commit"]
-        .ok_or("source commit missing")?;
-    if manifest["schema"] != "n83.factor-base-panel/v3-artifact-store"
-        || manifest["status"] != "completed_factor_base_object"
-        || source_commit.len() != 40
-        || !source_commit.bytes().all(|b| b.is_ascii_hexdigit())
-        || row["a"] != 0
-        || row["closure"] != "signed_frobenius"
-        .any(|policy| row["policy"] == *policy)
-        || columns == 0
-        || row["points"].as_u64() != columns.checked_mul(166)
-        || bytes == 0
-        || plain_bytes == 0
-        || !store_name.starts_with("factor-bases/icv1-f2m83-tm6151469093347-debefd74/")
-        || !store_name.ends_with(".jsonl.gz")
-        || store.cfg.remote.as_ref() != Some(&RemoteSpec::parse(remote)?)
-        return Err("successor primary base manifest differs from custody contract".into());
-    if replay["schema"] != "n83.factor-base-replay/v3-artifact-store"
-        || replay["manifest_sha256"] != manifest_sha256
-        || replay["store_name"] != store_name
-        || replay["point_set_blake3"] != row["point_set_blake3"]
-        || replay["points_checked"].as_u64() != row["points"].as_u64()
-        || replay["representatives_checked"].as_u64() != Some(columns)
-        || storage["schema"] != "n83.factor-base-storage/v3-artifact-store"
-        || storage["manifest_sha256"] != manifest_sha256
-        || storage["remote"] != remote
-        || storage["store_name"] != store_name
-        || storage["sha256"] != digest
-        || storage["bytes"].as_u64() != Some(bytes)
-        || storage["fresh_download_sha256"] != digest
-        || storage["fresh_download_bytes"].as_u64() != Some(bytes)
-        return Err("successor primary base lacks replay or fresh-download custody".into());
-    let (indexed_name, indexed_digest, indexed_bytes) = store.lookup(store_name)?;
-    if indexed_name.as_deref() != Some(store_name)
-        || indexed_digest != digest
-        || indexed_bytes != Some(bytes)
-        return Err("artifact-store index differs from successor manifest".into());
-    let resolved = store.ensure(store_name)?;
-    if resolved.sha256 != digest || resolved.bytes != bytes {
-        return Err("resolved artifact differs from successor manifest".into());
-    let compressed = fs::read(&resolved.path)?;
-    if compressed.len() as u64 != bytes
-        || sha256_hex(&compressed) != digest
-        || blake3::hash(&compressed).to_hex().as_str()
-            != row["compressed_blake3"]
-                .as_str()
-                .ok_or("compressed BLAKE3 missing")?
-        return Err("successor compressed object differs".into());
-    let mut plain = Vec::new();
-    GzDecoder::new(&compressed[..])
-        .take(plain_bytes.checked_add(1).ok_or("plain size overflow")?)
-        .read_to_end(&mut plain)?;
-    if plain.len() as u64 != plain_bytes
-        || blake3::hash(&plain).to_hex().as_str()
-            != row["plain_blake3"].as_str().ok_or("plain BLAKE3 missing")?
-        return Err("successor decompressed object differs".into());
-    let base = from_record(row, &plain)?;
-    if row["point_set_blake3"]
-        .is_none_or(|value| value.len() != 64)
-        || base.factor_base.points.len() as u64 != row["points"].as_u64().unwrap_or(0)
-        return Err("successor factor-base point count or digest differs".into());
-    Ok((base, row.clone()))
-
-pub(super) fn verify_store_v3(root: &Path, store: &Store) -> Result<Value> {
-    let (base, row) = load_store_primary_base(root, store)?;
-        "schema":"n83.factor-base-store-import/v3",
-        "status":"PASS","curve_id":base.curve.label(),
-        "store_name":row["store_name"],
-        "compressed_sha256":row["compressed_sha256"],
-        "points_checked":base.factor_base.points.len(),
-        "orbit_columns_checked":base.factor_base.signed_orbits.len(),
-
-pub(super) fn check_store_v3_cli(root: &Path, output: &Path) -> Result<Value> {
-        return Err("successor import output already exists".into());
-    let store = Store::open_default()?;
-    let receipt = verify_store_v3(root, &store)?;
-
-
-
-
-
-
-
-
-
-
-/// Parse a complete DIMACS model. Zero is the unused index; 1 and 2 encode
-/// true and false so duplicate and missing assignments cannot be hidden.
-fn k600_model_values(stdout: &str, variables: usize) -> Result<Vec<u8>> {
-    let mut values = vec![0u8; variables.checked_add(1).ok_or("model size overflow")?];
-    let mut statuses = 0usize;
-    for line in stdout.lines() {
-        if line.starts_with("s ") {
-            if line != "s SATISFIABLE" {
-                return Err("solver status is not SAT".into());
-            statuses += 1;
-        } else if let Some(rest) = line.strip_prefix("v ") {
-            for token in rest.split_whitespace() {
-                let literal: i64 = token.parse()?;
-                if literal == 0 {
-                    continue;
-                let index = usize::try_from(literal.unsigned_abs())?;
-                if index == 0 || index > variables || values[index] != 0 {
-                    return Err("model variable out of range or repeated".into());
-                values[index] = if literal > 0 { 1 } else { 2 };
-    if statuses != 1 || values[1..].contains(&0) {
-        return Err("solver model is absent, partial, or ambiguous".into());
-    Ok(values)
-
-/// Check the original XCNF, including parity of signed XOR literals.
-fn k600_check_xcnf(formula: &str, values: &[u8], cnf: usize, xor: usize) -> Result<()> {
-    let mut lines = formula.lines();
-    let header = lines.next().ok_or("empty XCNF")?;
-    if header
-        != format!(
-            "p cnf {} {}",
-            values.len() - 1,
-            cnf.checked_add(xor).ok_or("row count overflow")?
-        return Err("XCNF header differs".into());
-    let (mut seen_cnf, mut seen_xor) = (0usize, 0usize);
-    for (offset, line) in lines.enumerate() {
-        if line.starts_with("c ") {
-        let (is_xor, body) = if let Some(body) = line.strip_prefix("x ") {
-            (true, body)
-            (false, line)
-        let tokens: Vec<_> = body.split_whitespace().collect();
-        if tokens.len() < 2 || tokens.last() != Some(&"0") {
-            return Err(format!("unterminated XCNF row {}", offset + 2).into());
-        let mut parity = false;
-        let mut satisfied = false;
-        for token in &tokens[..tokens.len() - 1] {
-            let literal: i64 = token.parse()?;
-            let index = usize::try_from(literal.unsigned_abs())?;
-            if literal == 0 || index >= values.len() {
-                return Err(format!("invalid XCNF literal at row {}", offset + 2).into());
-            let truth = (values[index] == 1) == (literal > 0);
-            parity ^= truth;
-            satisfied |= truth;
-        if is_xor {
-            seen_xor += 1;
-            if !parity {
-                return Err(format!("XOR row {} fails", offset + 2).into());
-            seen_cnf += 1;
-            if !satisfied {
-                return Err(format!("CNF row {} fails", offset + 2).into());
-    if (seen_cnf, seen_xor) != (cnf, xor) {
-        return Err("XCNF row counts differ".into());
-
-fn k600_model_x(values: &[u8], block: usize) -> BigUint {
-    let mut x = BigUint::zero();
-    for bit in 0..83usize {
-        if values[block * 83 + bit + 1] == 1 {
-            x |= BigUint::one() << bit;
-    x
-
-fn verify_k600_positive_witness(
-    positive: &Value,
-) -> Result<Vec<usize>> {
-    let indices = positive["indices"].as_array().ok_or("positive indices")?;
-    let points = positive["points"].as_array().ok_or("positive points")?;
-    let partial = positive["partial_sums"]
-        .ok_or("positive partial sums")?;
-    if indices.len() != 6 || points.len() != 6 || partial.len() != 6 {
-        return Err("positive witness length differs".into());
-    let mut selected = Vec::with_capacity(6);
-    for i in 0..6 {
-        let index = indices[i].as_u64().ok_or("positive index")? as usize;
-            .ok_or("positive index outside archive")?;
-        if points[i] != planted_point_json(point) {
-            return Err("positive point differs from archive".into());
-        sum = kc.add(&sum, point);
-        if partial[i] != planted_point_json(&sum) {
-            return Err("positive partial sum differs".into());
-        selected.push(index);
-    if selected.iter().collect::<HashSet<_>>().len() != 6 || sum != *target {
-        return Err("positive witness is repeated or misses target".into());
-    let row = checked_primary_relation_row(kc, fb, &selected, target)?;
-    let row_bytes = serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>())?;
-    if positive["relation_row_decimal_blake3"] != blake3::hash(&row_bytes).to_hex().to_string() {
-        return Err("positive relation-row hash differs".into());
-    Ok(selected)
-
-/// Independently replay a solver model against the saved formula and the
-/// exact retained point base. This command does not perform SAT search.
-pub(super) fn k600_m6_replay_cli(
-    export_path: &Path,
-    xcnf_path: &Path,
-    receipt_path: &Path,
-    stdout_path: &Path,
-    exporter_binary_sha256: &str,
-    const CORPUS_SHA256: &str = "760ae5c2e88615152e2569653a0e0c0cf3b2f0731247f9ee3759dcbd";
-        return Err("K600 replay output already exists".into());
-            "manifest.json",
-            "5bd862987844f709e03beeab9fd265e3d2024011bcadcb82f5af9c72018df6a6",
-            "replay.json",
-            "fa5e545c27dd64c32a47ddae05a2a0b3a031545d700897f3e0e34f59abc0d72e",
-            "upload-receipt.json",
-            "0eae40ffa0e938470671cf796633c1e47b61ff676df0807e7a7e8592e56bb828",
-            "probe-validation.json",
-            "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f",
-            return Err(format!("K600 replay input {name} differs from frozen SHA-256").into());
-    let export: Value = serde_json::from_slice(&fs::read(export_path)?)?;
-    let receipt: Value = serde_json::from_slice(&fs::read(receipt_path)?)?;
-    let mode = export["mode"].as_str().ok_or("K600 export mode missing")?;
-    if export["schema"] != "n83.k600-m6-xcnf-export/v1"
-        || export["status"] != "PASS_XCNF_EXPORT_ONLY"
-        || !["positive-pinned", "positive-unpinned", "natural"].contains(&mode)
-        || export["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
-        || export["curve_a"] != 0
-        || export["source_commit"] != source_commit
-        || export["source_attestation_mode"] != "clean_checkout"
-        || export["binary_sha256"] != exporter_binary_sha256
-        || export["object"] != OBJECT
-        || export["object_sha256"] != OBJECT_SHA256
-        || receipt["exit_code"] != 10
-        || !["SAT_PENDING_REPLAY", "SAT_PENDING_XCNF_REPLAY"]
-            .any(|s| receipt["status"] == *s)
-        || receipt["xcnf_sha256"] != export["xcnf_sha256"]
-        return Err("K600 export, source, or SAT receipt binding differs".into());
-    let shape = &export["shape"];
-    if shape["summands"] != 6
-        || shape["identity_mask"] != 0
-        || shape["root_encoding"] != "per_representative"
-        || shape["domain_representatives"] != 600
-        || shape["summand_ordering"] != "none"
-        || shape["positive_x_pins"] != if mode == "positive-pinned" { 913 } else { 0 }
-        return Err("K600 XCNF search policy differs".into());
-    let variables = usize::try_from(shape["variables"].as_u64().ok_or("variable count")?)?;
-    let clauses = usize::try_from(shape["clauses"].as_u64().ok_or("clause count")?)?;
-    let xors = usize::try_from(shape["xor_rows"].as_u64().ok_or("XOR count")?)?;
-    if variables < 913 || variables > 125_000 {
-        return Err("K600 XCNF variable count exceeds frozen bound".into());
-    let xcnf = fs::read(xcnf_path)?;
-    if xcnf.len() > 200_000_000
-        || export["xcnf_bytes"].as_u64() != Some(xcnf.len() as u64)
-        || export["xcnf_sha256"] != sha256_hex(&xcnf)
-        return Err("original XCNF bytes differ".into());
-    let stdout = fs::read(stdout_path)?;
-    if stdout.len() > 20_000_000 || receipt["stdout_sha256"] != sha256_hex(&stdout) {
-        return Err("solver output bytes differ".into());
-    let values = k600_model_values(std::str::from_utf8(&stdout)?, variables)?;
-    k600_check_xcnf(std::str::from_utf8(&xcnf)?, &values, clauses, xors)?;
-    if sha256_hex(&fs::read(root.join(OBJECT))?) != OBJECT_SHA256 {
-        return Err("retained K600 factor-base bytes differ".into());
-        || row["point_set_blake3"] != export["point_set_blake3"]
-        || export["panel_manifest_blake3"] != manifest_blake3
-        return Err("retained K600 factor-base identity differs".into());
-    let (_, corpus_blake3) = public_target_fixture(root, &base.curve, 0)?;
-    if export["public_corpus_blake3"] != corpus_blake3 {
-        return Err("K600 public corpus binding differs".into());
-    let target = general(Some(
-        parse_point(&export["target"])?.ok_or("identity target")?,
-    ));
-    if !base.curve.curve.is_on_curve(&target)
-        || base.curve.mul(&target, &base.curve.subgroup_order) != BinaryPoint::Infinity
-        return Err("K600 target fails curve or subgroup check".into());
-    if mode == "natural" {
-        if !export["positive"].is_null()
-            || export["public_fixture"] != 0
-            || sha256_hex(&fs::read(root.join("probe-corpus.json"))?) != CORPUS_SHA256
-            return Err("natural public fixture identity differs".into());
-        let (public, _) = public_target_fixture(root, &base.curve, 0)?;
-        if target != public {
-            return Err("natural target differs from public fixture".into());
-        verify_k600_positive_witness(&base.curve, fb, &target, &export["positive"])?;
-    let xs: Vec<_> = (0..6).map(|block| k600_model_x(&values, block)).collect();
-    let intermediate: Vec<_> = (6..10).map(|block| k600_model_x(&values, block)).collect();
-    if k600_model_x(&values, 10)
-        != match &target {
-            BinaryPoint::Affine { x, .. } => x.to_biguint(),
-            BinaryPoint::Infinity => unreachable!(),
-        return Err("model target block differs".into());
-    let candidates: Vec<Vec<usize>> = xs
-        .map(|x| {
-            fb.points
-                .enumerate()
-                .filter_map(|(i, p)| match p {
-                    BinaryPoint::Affine { x: px, .. } if px.to_biguint() == *x => Some(i),
-                    _ => None,
-                .collect()
-    if candidates.iter().any(|c| c.is_empty() || c.len() > 2) {
-        return Err("model x-coordinate has no bounded archive lift".into());
-    let mut chosen = None;
-    for mask in 0..64usize {
-        let mut indices = Vec::with_capacity(6);
-        let mut valid = true;
-        for (j, lifts) in candidates.iter().enumerate() {
-            let bit = (mask >> j) & 1;
-            if bit >= lifts.len() {
-                valid = false;
-                break;
-            let index = lifts[bit];
-            indices.push(index);
-            if (1..=4).contains(&j) {
-                match &sum {
-                    BinaryPoint::Affine { x, .. } if x.to_biguint() == intermediate[j - 1] => (),
-                    _ => {
-                        valid = false;
-                        break;
-        if valid && sum == target {
-            chosen = Some(indices);
-            break;
-    let chosen = chosen.ok_or("SAT model has no checked six-point relation lift")?;
-    let relation = checked_primary_relation_row(&base.curve, fb, &chosen, &target)?;
-    let chosen_points: Vec<_> = chosen
-        .map(|&i| point_json(words(&fb.points[i])))
-    let columns: Vec<_> = chosen.iter().map(|&i| fb.signed_orbit_of[i].0).collect();
-        "schema":"n83.k600-m6-model-replay/v2", "status":"PASS_ORIGINAL_XCNF_GROUP_AND_ROW_REPLAY",
-        "mode":mode,"source_commit":source_commit,"export_binary_sha256":exporter_binary_sha256,
-        "replay_binary_sha256":sha256_hex(&fs::read(std::env::current_exe()?)?),
-        "xcnf_sha256":export["xcnf_sha256"],"solver_stdout_sha256":receipt["stdout_sha256"],
-        "object_sha256":OBJECT_SHA256,"model_values_sha256":sha256_hex(&values),
-        "checked_cnf_clauses":clauses,"checked_xor_rows":xors,"target":export["target"],
-        "x_coordinates":xs.iter().map(ToString::to_string).collect::<Vec<_>>(),
-        "intermediate_x_coordinates":intermediate.iter().map(ToString::to_string).collect::<Vec<_>>(),
-        "chosen_indices":chosen,"chosen_points":chosen_points,"columns":columns,
-        "relation_row_decimal":relation.iter().map(ToString::to_string).collect::<Vec<_>>(),
-        "subgroup_order":base.curve.subgroup_order.to_string(),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-pub(super) fn frozen_primary_probe_source() -> Result<(String, &'static str)> {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-struct StoreRunConfig<'a> {
-    store: &'a Store,
-
-fn seal_store_run_error(run_dir: &Path, result: Result<Value>) -> Result<Value> {
-    match result {
-        Ok(summary) => Ok(summary),
-        Err(error) => {
-            if run_dir.is_dir()
-                && !run_dir.join("summary.json").exists()
-                && !run_dir.join("cap.json").exists()
-                let receipt = json!({
-                    "schema":"n83.primary-store-command-error/v1",
-                    "status":"COMMAND_ERROR",
-                    "reason":error.to_string(),
-                    "solver_stage_executed":Value::Null,
-                    "total_index_calculus_runtime_ms":Value::Null,
-                    "selected_best_total_runtime":Value::Null,
-                write_new_json(&run_dir.join("failure.json"), &receipt).map_err(|write_error| {
-                    format!("{error}; failed to seal store command error: {write_error}")
-                })?;
-            Err(error)
-
-/// Run a bounded enumerate trial against a verified v3 artifact-store base.
-/// Base construction and publication are outside this diagnostic interval.
-pub(super) fn run_store_trial_cli(
-    if columns == 0
-        return Err("v3 store trial caps or fixture inputs invalid".into());
-    let config = StoreRunConfig {
-        store: &store,
-    seal_store_run_error(
-        run_with_config(
-            root,
-            "enumerate",
-            max_trials,
-            run_dir,
-            None,
-            Some(&config),
-
-/// Run a bounded chained-S3 search against a verified v3 artifact-store base.
-/// The hard cgroup gate applies even to a zero-query preflight.
-pub(super) fn run_store_chain_cli(
-        || columns > 32_643
-        || !(128..=65_536).contains(&memory_mib)
-        return Err("v3 store chained-S3 caps or fixture inputs invalid".into());
-    let manifest: Value = serde_json::from_slice(&fs::read(root.join("manifest.json"))?)?;
-    let policy = manifest["base"]["policy"]
-        .ok_or("v3 store policy missing")?;
-    let seed = manifest["base"]["seed"]
-        .ok_or("v3 store seed missing")?;
-    let chain_config = ChainRunConfig {
-        source_commit: source_commit.clone(),
-    let store_config = StoreRunConfig {
-            Some(&chain_config),
-            Some(&store_config),
-
-    karatsuba: bool,
-    shallow_karatsuba: bool,
-        || (karatsuba && frobenius_orbits)
-        || (karatsuba && shallow_karatsuba)
-    let strategy = match (
-        frobenius_orbits,
-        order_first_pair,
-        karatsuba,
-        shallow_karatsuba,
-    ) {
-        (false, false, false, false) => "chain-s3",
-        (false, false, true, false) => "chain-s3-karatsuba",
-        (false, false, false, true) => "chain-s3-shallow-karatsuba",
-        (true, false, false, false) => "orbit-chain-s3",
-        (true, false, false, true) => "orbit-chain-s3-shallow-karatsuba",
-        (true, true, false, false) => "ordered-orbit-chain-s3",
-        (true, true, false, true) => "ordered-orbit-chain-s3-shallow-karatsuba",
-        _ => unreachable!("checked above"),
-
-    store: Option<&StoreRunConfig<'_>>,
-    if let (Some(chain_config), Some(store_config)) = (chain, store) {
-        if chain_config.source_commit != store_config.source_commit
-            || chain_config.fixture_root != store_config.fixture_root
-            || chain_config.source_attestation_mode != store_config.source_attestation_mode
-            return Err("v3 store chain source or fixture mismatch".into());
-    if !(store.is_some()
-        || [64, 256, 600].contains(&columns)
-        || (chain.is_some() && V2_SIZES.contains(&columns)))
-        "chain-s3-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
-            DecompositionStrategy::ChainedS3Karatsuba
-        "chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
-            DecompositionStrategy::ChainedS3ShallowKaratsuba
-        "orbit-chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
-            DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
-        "ordered-orbit-chain-s3-shallow-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
-            DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba
-    let mut config_record = json!({
-        "schema":"n83.primary-cold-config/v1", "study":STUDY,
-        "panel_dir":root.to_string_lossy(),
-        "input_kind":if store.is_some() { "artifact_store_v3" } else { "historical_panel_v1v2" },
-        "fixture_dir":chain.map(|config| config.fixture_root.to_string_lossy().to_string())
-            .or_else(|| store.map(|config| config.fixture_root.to_string_lossy().to_string())),
-        "curve_a":0, "fixture":0, "orbit_columns":columns,
-        "summands":m, "strategy":strategy_name, "max_trials":max_trials,
-        "budget_seconds":budget_seconds, "allow_direct_relation":false,
-        "source_commit":chain.map(|config| config.source_commit.as_str())
-            .or_else(|| store.map(|config| config.source_commit.as_str())),
-        "source_attestation_mode":chain.map(|config| config.source_attestation_mode)
-            .or_else(|| store.map(|config| config.source_attestation_mode)),
-        "policy":chain.map(|config| config.policy),
-        "seed":chain.map(|config| config.seed),
-    if store.is_some() {
-        config_record["schema"] = json!(if chain.is_some() {
-            "n83.primary-store-chain-config/v1"
-            "n83.primary-store-trial-config/v1"
-        config_record["base_dir"] = json!(root.to_string_lossy().to_string());
-        config_record["panel_dir"] = Value::Null;
-        config_record["measurement_scope"] = json!(if chain.is_some() {
-            "store import and bounded chained-S3 trial; base construction and publication are outside this interval"
-            "store import and bounded enumerate trial; base construction and publication are outside this interval"
-    write_new_json(&run_dir.join("config.json"), &config_record)?;
-
-    let (base, row, manifest_hash) = if let Some(config) = store {
-        let (base, row) = load_store_primary_base(root, config.store)?;
-        if row["columns"].as_u64() != Some(columns as u64) {
-            return Err("v3 store base column count differs from requested workload".into());
-        if let Some(chain_config) = chain {
-            if row["policy"] != chain_config.policy || row["seed"] != chain_config.seed {
-                return Err("v3 store chain selection differs from verified base".into());
-        let manifest_hash = sha256_hex(&fs::read(root.join("manifest.json"))?);
-        (base, row, manifest_hash)
-    } else if let Some(config) = chain {
-    let fixture_root = chain
-        .map(|config| config.fixture_root)
-        .or_else(|| store.map(|config| config.fixture_root))
-        .unwrap_or(root);
-
-    // A source-bound zero-trial store preflight must report its real cgroup peak.
-    // The in-process test fixture has no Linux cgroup and remains explicitly
-    // marked `test_fixture`, so it cannot be confused with an admitted run.
-    let fixture_only = store.is_some()
-        && max_trials == 0
-        && chain.is_some_and(|config| config.source_attestation_mode == "test_fixture");
-    let memory_cgroup_peak_bytes = if chain.is_some() && !fixture_only {
-    let mut summary = json!({
-        summary["schema"] = json!(if chain.is_some() {
-            "n83.primary-store-chain/v1"
-            "n83.primary-store-trial/v1"
-        summary["input_kind"] = json!("artifact_store_v3");
-        summary["object"] = row["store_name"].clone();
-        summary["store_name"] = row["store_name"].clone();
-        summary["store_manifest_sha256"] = summary["panel_manifest_blake3"].clone();
-        summary["panel_manifest_blake3"] = Value::Null;
-        summary["measurement_scope"] = json!(if chain.is_some() {
-            "bounded store import and chained-S3 trial only; base construction and publication are outside this interval; total cold index-calculus runtime remains unset"
-            "bounded store import and enumerate trial only; base construction and publication are outside this interval; total cold index-calculus runtime remains unset"
-        summary["input_kind"] = json!("historical_panel_v1v2");
-
-    use crypto_lib::store::{Config as StoreConfig, PushMeta};
-    use flate2::{write::GzEncoder, Compression};
-
-    fn k600_native_replay_rejects_partial_and_false_xcnf_models() {
-        let formula = "p cnf 3 3\n1 -2 0\n3 0\nx -1 2 3 0\n";
-        let model = k600_model_values("s SATISFIABLE\nv 1 -2 3 0\n", 3).unwrap();
-        assert_eq!(model, [0, 1, 2, 1]);
-        k600_check_xcnf(formula, &model, 2, 1).unwrap();
-        assert!(k600_model_values("s SATISFIABLE\nv 1 -2 0\n", 3).is_err());
-        assert!(k600_model_values("s SATISFIABLE\nv 1 -2 3 3 0\n", 3).is_err());
-        assert!(k600_model_values("s UNSATISFIABLE\nv 1 -2 3 0\n", 3).is_err());
-        assert!(k600_check_xcnf(formula, &[0, 2, 2, 1], 2, 1).is_err());
-        assert!(k600_check_xcnf(formula, &[0, 1, 1, 1], 2, 1).is_err());
-        assert!(k600_check_xcnf(formula, &model, 3, 0).is_err());
-        assert!(k600_check_xcnf("p cnf 3 3\n1 -2 0\n3 0\nx -1 2 3\n", &model, 2, 1).is_err());
-
-    fn k600_positive_witness_checks_exported_objects_and_relation_row() {
-        let (bytes, manifest_row) = construct(
-        let base = from_record(&manifest_row, &bytes).unwrap();
-        let indices = [0usize, 2, 4, 6, 8, 10];
-        let mut partial_sums = Vec::new();
-            sum = kc.add(&sum, &fb.points[index]);
-            assert!(matches!(sum, BinaryPoint::Affine { .. }));
-            partial_sums.push(planted_point_json(&sum));
-        let row = checked_primary_relation_row(kc, fb, &indices, &sum).unwrap();
-            serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>()).unwrap();
-        let positive = json!({
-            "points":indices.iter().map(|&i| planted_point_json(&fb.points[i])).collect::<Vec<_>>(),
-            "partial_sums":partial_sums,
-            verify_k600_positive_witness(kc, fb, &sum, &positive).unwrap(),
-            indices
-        let mut bad = positive.clone();
-        bad["points"][0] = point_json(words(&fb.points[0]));
-        assert!(verify_k600_positive_witness(kc, fb, &sum, &bad).is_err());
-        bad["partial_sums"][4]["x_decimal"] = json!("0");
-        bad["relation_row_decimal_blake3"] = json!("0");
-        let mut bad = positive;
-        bad["indices"][5] = json!(0);
-
-    fn successor_store_import_checks_index_bytes_replay_and_custody() {
-        let root = std::env::temp_dir().join(format!("n83-store-v3-{nonce}"));
-        let bundle = root.join("bundle");
-        let remote = root.join("remote");
-        fs::create_dir_all(&bundle).unwrap();
-        fs::create_dir_all(&remote).unwrap();
-        let (plain, mut row) = construct(
-            SEEDS[0],
-        let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-        encoder.write_all(&plain).unwrap();
-        let compressed = encoder.finish().unwrap();
-        let object = root.join("base.jsonl.gz");
-        fs::write(&object, &compressed).unwrap();
-        let cfg = StoreConfig {
-            index_path: root.join("index.json"),
-            cache_dir: root.join("cache"),
-            remote: Some(RemoteSpec::Dir(remote.clone())),
-            endpoint: None,
-            aws: "aws".into(),
-        let mut store = Store::open(cfg).unwrap();
-        let name = "factor-bases/icv1-f2m83-tm6151469093347-debefd74/control-k2.jsonl.gz";
-        let pushed = store
-            .push(
-                name,
-                &object,
-                PushMeta {
-                    description: "N83 native store control".into(),
-                    provenance: "release test".into(),
-                    no_cache: true,
-                    ..Default::default()
-        assert!(pushed.uploaded);
-        let pulled = store.ensure(name).unwrap();
-        assert!(pulled.fetched);
-        assert_eq!(pulled.sha256, pushed.sha256);
-        row["closure"] = json!("signed_frobenius");
-        row["store_name"] = json!(name);
-        row["compressed_sha256"] = json!(pushed.sha256);
-        row["compressed_blake3"] = json!(blake3::hash(&compressed).to_hex().to_string());
-        row["plain_blake3"] = json!(blake3::hash(&plain).to_hex().to_string());
-        row["bytes"] = json!(compressed.len());
-        row["plain_bytes"] = json!(plain.len());
-        let remote_uri = format!("file://{}", remote.display());
-            &bundle.join("manifest.json"),
-                "schema":"n83.factor-base-panel/v3-artifact-store",
-                "status":"completed_factor_base_object","study":STUDY,
-                "curve_id":"icv1-f2m83-tm6151469093347-debefd74",
-                "source_commit":"a".repeat(40),"remote":remote_uri,"base":row,
-        let manifest_sha256 = sha256_hex(&fs::read(bundle.join("manifest.json")).unwrap());
-            &bundle.join("replay.json"),
-                "schema":"n83.factor-base-replay/v3-artifact-store","status":"PASS",
-                "manifest_sha256":manifest_sha256,"store_name":name,
-                "point_set_blake3":row["point_set_blake3"],
-                "points_checked":332,"representatives_checked":2,
-            "schema":"n83.factor-base-storage/v3-artifact-store","status":"PASS",
-            "manifest_sha256":manifest_sha256,"remote":remote_uri,
-            "store_name":name,"sha256":pushed.sha256,"bytes":compressed.len(),
-            "fresh_download_sha256":pushed.sha256,"fresh_download_bytes":compressed.len(),
-        write_new_json(&bundle.join("storage.json"), &storage).unwrap();
-        let (imported, checked) = load_store_primary_base(&bundle, &store).unwrap();
-        assert_eq!(imported.factor_base.points.len(), 332);
-        assert_eq!(imported.factor_base.signed_orbits.len(), 2);
-        assert_eq!(checked["point_set_blake3"], row["point_set_blake3"]);
-        let fixture_root = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("research/koblitz_n83_factor_base_sweep_20261008/pilot-01");
-        let config = StoreRunConfig {
-            store: &store,
-            fixture_root: &fixture_root,
-            source_commit: "a".repeat(40),
-            source_attestation_mode: "test_fixture",
-        let trial = run_with_config(
-            &bundle,
-            7200,
-            &root.join("trial"),
-        assert_eq!(trial["input_kind"], "artifact_store_v3");
-        assert_eq!(trial["schema"], "n83.primary-store-trial/v1");
-        assert_eq!(trial["store_name"], name);
-        assert_eq!(trial["store_manifest_sha256"], manifest_sha256);
-        assert!(trial["panel_manifest_blake3"].is_null());
-        assert!(trial["total_index_calculus_runtime_ms"].is_null());
-        let one_query = run_with_config(
-            1,
-            60,
-            &root.join("one-query"),
-        assert_eq!(one_query["schema"], "n83.primary-store-trial/v1");
-        assert_eq!(one_query["store_name"], name);
-        assert_eq!(one_query["report"]["trials"], 1);
-        assert_eq!(one_query["solver_stage_executed"], true);
-        assert!(one_query["total_index_calculus_runtime_ms"].is_null());
-        let chain_config = ChainRunConfig {
-            policy: "public_x_hash",
-            seed: SEEDS[0],
-            limits: ChainS3Limits {
-                max_variables: 10_000,
-                max_domain_clauses: 100_000,
-                max_models: 1,
-                conflict_budget: 1_000,
-            },
-            memory_limit_bytes: 256 * 1024 * 1024,
-        let chain_preflight = run_with_config(
-            5,
-            "orbit-chain-s3",
-            &root.join("chain-preflight"),
-        assert_eq!(chain_preflight["schema"], "n83.primary-store-chain/v1");
-        assert_eq!(chain_preflight["store_name"], name);
-        assert_eq!(chain_preflight["strategy"], "orbit-chain-s3");
-        assert_eq!(chain_preflight["solver_stage_executed"], false);
-        assert!(chain_preflight["total_index_calculus_runtime_ms"].is_null());
-        let wrong_chain_config = ChainRunConfig {
-            policy: "public_x_sequential",
-            ..chain_config
-        let wrong_chain_dir = root.join("wrong-chain-policy");
-        assert!(seal_store_run_error(
-            &wrong_chain_dir,
-            run_with_config(
-                &bundle,
-                2,
-                "orbit-chain-s3",
-                7200,
-                &wrong_chain_dir,
-                Some(&wrong_chain_config),
-                Some(&config),
-            ),
-        .unwrap_err()
-        .to_string()
-        .contains("selection differs from verified base"));
-        let rejected: Value =
-            serde_json::from_slice(&fs::read(wrong_chain_dir.join("failure.json")).unwrap())
-        assert_eq!(rejected["schema"], "n83.primary-store-command-error/v1");
-        assert_eq!(rejected["status"], "COMMAND_ERROR");
-        assert!(rejected["total_index_calculus_runtime_ms"].is_null());
-        let wrong_columns_dir = root.join("wrong-columns");
-            &wrong_columns_dir,
-                3,
-                "enumerate",
-                &wrong_columns_dir,
-                None,
-        .is_err());
-        assert!(wrong_columns_dir.join("failure.json").is_file());
-        let mut bad = storage.clone();
-        bad["fresh_download_sha256"] = json!("0");
-            bundle.join("storage.json"),
-        assert!(load_store_primary_base(&bundle, &store).is_err());
-            serde_json::to_vec(&storage).unwrap(),
-        let mut old: Value =
-            serde_json::from_slice(&fs::read(bundle.join("manifest.json")).unwrap()).unwrap();
-        old["schema"] = json!("n83.factor-base-panel/v1");
-            bundle.join("manifest.json"),
-            serde_json::to_vec(&old).unwrap(),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

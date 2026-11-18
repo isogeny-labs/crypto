@@ -222,10 +222,9 @@ jobs:
       - name: Check deterministic catalog-wide assessment generation
         run: node scripts/build_cover_transfer_assessments.mjs --check
       - name: Reject incomplete and incorrect catalog memberships
-        run: node --test scripts/test_cover_transfer_assessment.mjs
         run: |
+          node --test scripts/test_cover_transfer_assessment.mjs
           node --test scripts/test_catalog_snapshot.mjs
-          node scripts/build_cover_transfer_assessments.mjs --check
       - name: Validate the assessment schema
         run: python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
       - name: Install native PDF metadata reader

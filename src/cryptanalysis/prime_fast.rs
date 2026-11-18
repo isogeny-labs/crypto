@@ -2337,6 +2337,68 @@ pub fn ic_multi_solve(
     )
 }
 
+/// Report of [`ic_solve_fast`]: the batched pair-table path's phases for a single target.
+#[derive(Clone, Debug, Default)]
+pub struct IcFastReport {
+    /// Factor-base size actually used (after auto-tuning / clamping).
+    pub factor_base_size: usize,
+    /// Shared setup: factor base + pair table + batched relation collection + log solve (ms).
+    pub setup_ms: f64,
+    /// Per-target lock-step walk until a decomposition over determined logs (ms).
+    pub target_walk_ms: f64,
+    pub total_ms: f64,
+    /// Points visited by the target walk.
+    pub target_points_walked: u64,
+    /// Factor-base logs determined by the linear solve.
+    pub determined_logs: usize,
+}
+
+/// Auto-tuned factor-base size for [`ic_solve_fast`]: `round(p^(1/3))` clamped to `[32, 16384]`
+/// (the measured optimum of the batched table path is B ~ p^(1/3); see
+/// `research/prime_ic_collection_frontier_20261117`).
+pub fn ic_fast_auto_fb(p: u64) -> usize {
+    ((p as f64).cbrt().round() as usize).clamp(32, 16_384)
+}
+
+/// Fast single-target prime-field index calculus: the batched lock-step pair-table path
+/// ([`ic_multi_solve_ex`] with `table = batched = true`) run on `[q]`.  Additive: [`ic_solve`] is
+/// unchanged.  `fb_size = None` auto-tunes via [`ic_fast_auto_fb`].  The returned log is verified
+/// `x G == q` inside the multi solver (fail-closed `None` otherwise).
+pub fn ic_solve_fast(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb_size: Option<usize>,
+    extra_relations: usize,
+    max_walk: u64,
+    seed: u64,
+) -> Option<(u64, IcFastReport)> {
+    let b = fb_size.unwrap_or_else(|| ic_fast_auto_fb(curve.f.p));
+    let (logs, rep) = ic_multi_solve_ex(
+        curve,
+        g,
+        &[q],
+        b,
+        extra_relations,
+        max_walk,
+        seed,
+        true,
+        true,
+    )?;
+    let x = logs.first().copied().flatten()?;
+    Some((
+        x,
+        IcFastReport {
+            factor_base_size: rep.factor_base_size,
+            setup_ms: rep.setup_ms,
+            target_walk_ms: rep.per_target_ms.first().copied().unwrap_or(0.0),
+            total_ms: rep.total_ms,
+            target_points_walked: rep.targets_walked.first().copied().unwrap_or(0),
+            determined_logs: rep.determined_logs,
+        },
+    ))
+}
+
 /// Multi-target index calculus: one shared factor-base log solve (relations against `G`), then per target
 /// one relation `aG + bQ_t = sum s_j F_j` (3-term decompositions) gives `log Q_t = (sum s_j x_j - a)/b`.
 /// Every returned log is verified `k G == Q_t`; `None` entries failed (no relation within `max_walk`
@@ -3125,6 +3187,54 @@ mod tests {
                     assert!(rep.rows_three > 0);
                 }
             }
+        }
+    }
+
+    #[test]
+    fn ic_solve_fast_recovers_same_log_as_ic_solve() {
+        for bits in [16u32, 20, 24] {
+            let (fc, g) = ladder(bits);
+            let mut rng = StdRng::seed_from_u64(555 + bits as u64);
+            let k = rng.gen_range(1..fc.n);
+            let q = fc.mul(Some(g), k).unwrap();
+            let (x_ref, _) = ic_solve(&fc, g, q, 120, 16, 2, 50_000_000, 7)
+                .unwrap_or_else(|| panic!("ic_solve bits={bits}"));
+            assert_eq!(x_ref, k);
+            let (x_auto, rep) = ic_solve_fast(&fc, g, q, None, 16, 50_000_000, 7)
+                .unwrap_or_else(|| panic!("ic_solve_fast auto bits={bits}"));
+            assert_eq!(x_auto, k, "fast(auto) wrong log bits={bits}");
+            assert!(rep.factor_base_size <= ic_fast_auto_fb(fc.f.p));
+            let (x_b, _) = ic_solve_fast(&fc, g, q, Some(120), 16, 50_000_000, 9)
+                .unwrap_or_else(|| panic!("ic_solve_fast B=120 bits={bits}"));
+            assert_eq!(x_b, x_ref, "fast/sweep logs differ bits={bits}");
+        }
+    }
+
+    #[test]
+    fn ic_solve_table_agrees_with_sweep() {
+        // The pair-table 2-decomposition solver recovers the same log as the
+        // sweep `ic_solve(summands = 2)` on the same instance (both decide the
+        // identical decomposable set R = ±F_i ± F_j), and collects the same
+        // number of relations.  Pins the correctness measured in
+        // research/prime_ic_collection_frontier_20261117/.
+        for bits in [16u32, 20, 24] {
+            let (fc, g) = ladder(bits);
+            let mut rng = StdRng::seed_from_u64(101 + bits as u64);
+            let k = rng.gen_range(1..fc.n);
+            let q = fc.mul(Some(g), k).unwrap();
+            let (x_sweep, rep_sweep) = ic_solve(&fc, g, q, 120, 16, 2, 50_000_000, 7)
+                .unwrap_or_else(|| panic!("sweep ic bits={bits}"));
+            let (x_table, rep_table) = ic_solve_table(&fc, g, q, 120, 16, 50_000_000, 7)
+                .unwrap_or_else(|| panic!("table ic bits={bits}"));
+            assert_eq!(x_sweep, k, "sweep wrong log bits={bits}");
+            assert_eq!(x_table, k, "table wrong log bits={bits}");
+            assert_eq!(x_sweep, x_table, "sweep/table logs differ bits={bits}");
+            assert_eq!(rep_sweep.relations, rep_table.relations);
+            // Same seed, same walk rule, same decomposable set: identical target stream.
+            assert_eq!(
+                rep_sweep.targets, rep_table.targets,
+                "sweep/table walked different target counts bits={bits}"
+            );
         }
     }
 

@@ -203,6 +203,24 @@ pub(crate) fn scalar() -> Result<()> {
 mod tests {
     use super::*;
     #[test]
+    fn meter_charges_include_the_failed_limit_attempt_in_the_active_observer() {
+        let session = Session::start().unwrap();
+        let mut meter = crate::Meter::new(crate::Limits {
+            steps: 3,
+            ..crate::Limits::default()
+        });
+        meter.charge(2, "setup work").unwrap();
+        phase("relation_search").unwrap();
+        assert!(matches!(
+            meter.charge(2, "bounded work"),
+            Err(crate::Error::Limit(_))
+        ));
+        assert_eq!(meter.used, 4);
+        let snapshot = session.finish().unwrap();
+        assert_eq!(snapshot.phases["setup"].meter_steps, 2);
+        assert_eq!(snapshot.phases["relation_search"].meter_steps, 2);
+    }
+    #[test]
     fn scoped_observer_keeps_exact_counters_separate_from_clocks_and_cleans_up() {
         let session = Session::start().unwrap();
         assert!(Session::start().is_err());

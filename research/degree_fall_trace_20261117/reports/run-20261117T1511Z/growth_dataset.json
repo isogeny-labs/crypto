@@ -1,0 +1,83 @@
+{
+  "family": "regular sequence {x_i^2 - 1}, n = 2..6 variables over F_101",
+  "field": 101,
+  "fits": {
+    "degree_of_regularity_vs_n": [
+      {
+        "intercept": 1.0,
+        "model": "linear",
+        "n_points": 5,
+        "r2": 1.0,
+        "slope": 1.0,
+        "slope_ci95": [
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "intercept": 0.5519292376695542,
+        "model": "power",
+        "n_points": 5,
+        "r2": 0.9986665290819027,
+        "slope": 0.7709643284175467,
+        "slope_ci95": [
+          0.7390848464765422,
+          0.8028438103585512
+        ]
+      },
+      {
+        "intercept": 0.7263785045480652,
+        "model": "exponential",
+        "n_points": 5,
+        "r2": 0.9845847934805355,
+        "slope": 0.21000608288825715,
+        "slope_ci95": [
+          0.18027057025130297,
+          0.23974159552521132
+        ]
+      }
+    ],
+    "solving_degree_vs_n": [
+      {
+        "intercept": 0.0,
+        "model": "linear",
+        "n_points": 5,
+        "r2": 1.0,
+        "slope": 0.0,
+        "slope_ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  "metric_x": "n_vars",
+  "points": [
+    {
+      "degree_of_regularity_observed": 3,
+      "n_vars": 2,
+      "solving_degree": 0
+    },
+    {
+      "degree_of_regularity_observed": 4,
+      "n_vars": 3,
+      "solving_degree": 0
+    },
+    {
+      "degree_of_regularity_observed": 5,
+      "n_vars": 4,
+      "solving_degree": 0
+    },
+    {
+      "degree_of_regularity_observed": 6,
+      "n_vars": 5,
+      "solving_degree": 0
+    },
+    {
+      "degree_of_regularity_observed": 7,
+      "n_vars": 6,
+      "solving_degree": 0
+    }
+  ],
+  "schema": "ecbench.growth-dataset/v1"
+}

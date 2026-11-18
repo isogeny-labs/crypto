@@ -51,20 +51,30 @@
 //!
 //! ## What is counted
 //!
-//! `word_xors`: 64-bit XORs in the eliminations — the forward pass of
-//! every step and of the initial echelon, and the backward pass of the
-//! final inter-reduction — counting only the words between a pivot's
-//! lead and its last non-zero word, which is the work the row-by-row
-//! elimination performs.  A large step reduces by the leading block's
-//! pivots through lookup tables instead (below), which performs fewer:
-//! it still adds to `word_xors` exactly what the row-by-row loop would,
-//! so the unit means the same on every revision, and reports the words
-//! it actually XORed, table construction included, as
-//! `word_xors_performed`.  The
+//! `word_xors`: logical 64-bit XORs in the selected elimination — the
+//! forward pass of every step and of the initial echelon, and the backward
+//! pass of the final inter-reduction.  On the full-width path it counts the
+//! words between a pivot's lead and its last non-zero word.  The FL path
+//! counts its compact `B'` and free-column XORs.  A large full-width step can
+//! reduce by lookup tables instead (below), which performs fewer physical
+//! XORs; `word_xors_performed` reports those actual table-path XORs,
+//! construction included.  The
 //! construction of the matrices (the products, the column map, the
 //! packing) is **not** in that count; its wall time is reported beside
 //! it as `build_ns`, so a reader can see what share of the run the unit
 //! covers.  Solution extraction counts its monomial tests separately.
+//!
+//! ## Faugère–Lachartre reducer/free-column split
+//!
+//! Symbolic preprocessing puts reducers `[A | B]` first, with one distinct
+//! leading column per row, followed by the critical-pair rows `[C | D]`.
+//! On sufficiently large matrices [`echelon_fl`] reduces the triangular
+//! reducer block once to `[I | B']`, forms `D + C B'`, and sends only that
+//! free-column block to the packed echelon kernel.  Thus pair rows do not
+//! carry reducer columns through the dense elimination and do not replay the
+//! reducer cascade.  `F4_F2_FL=0` retains the full-width path as a control;
+//! small shapes fall back automatically.  Both forms span the same row space
+//! and return the same new pivots in the original column space.
 //!
 //! ## The leading block by tables
 //!
@@ -109,6 +119,8 @@
 //!   Math. Dokl. 11 (1970).
 //! - M. Albrecht, G. Bard, W. Hart, *Algorithm 898: Efficient
 //!   multiplication of dense matrices over GF(2)*, ACM TOMS 37 (2010).
+//! - J.-C. Faugère, S. Lachartre, *Parallel Gaussian Elimination for
+//!   Gröbner Bases Computations in Finite Fields*, PASCO 2010.
 //! - M. Brickenstein, *Boolean Gröbner bases*, PhD thesis, TU
 //!   Kaiserslautern 2010 — the boolean ring and its field pairs.
 
@@ -120,7 +132,7 @@ use rayon::prelude::*;
 use crate::cryptanalysis::bitop_tally as tally;
 use crate::cryptanalysis::fx_hash::{FxMap, FxSet};
 use crate::cryptanalysis::pq_groebner_f2::{
-    bit, cmp_mono, mono_key, sort_masks_descending, F2BoolMono, F2BoolPoly, Mask,
+    bit, cmp_mono, mono_key, sort_masks_descending, F2BoolMono, F2BoolPoly, Mask, MASK_BITS,
 };
 
 /// What one F4 run cost, and how far it got.
@@ -163,7 +175,7 @@ pub struct F4Stats {
     pub matrix_rows_max: u64,
     pub matrix_cols_max: u64,
     pub matrix_rows_sum: u64,
-    /// The unit: 64-bit XORs the row-by-row eliminations perform.
+    /// The unit: logical 64-bit XORs in the selected elimination schedule.
     pub word_xors: u64,
     /// 64-bit XORs actually performed, reducing by the leading block
     /// through tables where a step is large enough (their construction
@@ -192,6 +204,12 @@ pub struct F4Stats {
     pub full_m4ri_matrices: u64,
     pub full_m4ri_blocks: u64,
     pub full_m4ri_table_word_xors: u64,
+    /// Matrices reduced in Faugère–Lachartre form, with their reducer,
+    /// pair-row and free-column totals.
+    pub fl_matrices: u64,
+    pub fl_reducer_rows: u64,
+    pub fl_pair_rows: u64,
+    pub fl_free_cols: u64,
     /// Wall time spent building matrices (products, columns, packing)
     /// and eliminating them.
     pub build_ns: u64,
@@ -246,7 +264,7 @@ struct Pair {
 }
 
 /// A bit-packed row.  Words outside `[start, end)` are zero.
-#[derive(Default)]
+#[derive(Clone, Default)]
 struct Row {
     bits: Vec<u64>,
     start: usize,
@@ -572,11 +590,27 @@ fn echelon_full_m4ri(
     st: &mut F4Stats,
     deadline: Option<Instant>,
 ) -> Option<Vec<(usize, Row)>> {
+    echelon_full_m4ri_with_expiry(rows, n_cols, st, || {
+        deadline.is_some_and(|limit| Instant::now() >= limit)
+    })
+}
+
+fn echelon_full_m4ri_with_expiry(
+    rows: Vec<Row>,
+    n_cols: usize,
+    st: &mut F4Stats,
+    mut deadline_expired: impl FnMut() -> bool,
+) -> Option<Vec<(usize, Row)>> {
     let n_rows = rows.len();
     let words = n_cols.div_ceil(64).max(1);
     let mut row_ends: Vec<usize> = rows.iter().map(|row| row.end).collect();
     let mut matrix: Vec<Vec<u64>> = rows.into_iter().map(|row| row.bits).collect();
-    FULL_M4RI_SCRATCH.with(|scratch| {
+    let mut logical_xors = 0u64;
+    let mut performed_xors = 0u64;
+    let mut preparation_xors = 0u64;
+    let mut blocks = 0u64;
+    let mut aux = 0u64;
+    let result = FULL_M4RI_SCRATCH.with(|scratch| {
         let mut scratch = scratch.borrow_mut();
         scratch.pivot_columns.resize(FULL_M4RI_BLOCK, 0);
         scratch.pivot_ends.resize(FULL_M4RI_BLOCK, 0);
@@ -607,17 +641,12 @@ fn echelon_full_m4ri(
         let mut all_pivots = Vec::with_capacity(n_rows.min(n_cols));
         let mut pivot_row = 0usize;
         let mut column = 0usize;
-        let mut logical_xors = 0u64;
-        let mut performed_xors = 0u64;
-        let mut preparation_xors = 0u64;
-        let mut blocks = 0u64;
         // Word operations besides the XORs: every bit test of the pivot
         // search and of the pattern a row carries on a block, the copy of
         // each pivot into the block, one a pivot row read back.
-        let mut aux = 0u64;
 
         while pivot_row < n_rows && column < n_cols {
-            if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            if deadline_expired() {
                 return None;
             }
             let block_start = pivot_row;
@@ -629,7 +658,7 @@ fn echelon_full_m4ri(
                 for row in next_pivot..n_rows {
                     if row > next_pivot
                         && (row - next_pivot).is_multiple_of(128)
-                        && deadline.is_some_and(|limit| Instant::now() >= limit)
+                        && deadline_expired()
                     {
                         return None;
                     }
@@ -734,7 +763,7 @@ fn echelon_full_m4ri(
             for row in block_start + block_rows..n_rows {
                 if row > block_start + block_rows
                     && (row - block_start - block_rows).is_multiple_of(128)
-                    && deadline.is_some_and(|limit| Instant::now() >= limit)
+                    && deadline_expired()
                 {
                     return None;
                 }
@@ -791,14 +820,16 @@ fn echelon_full_m4ri(
                 },
             ));
         }
-        st.word_xors += logical_xors;
-        st.word_xors_performed += performed_xors;
-        st.full_m4ri_matrices += 1;
-        st.full_m4ri_blocks += blocks;
-        st.full_m4ri_table_word_xors += preparation_xors;
-        tally::word_ops(aux + pivots.len() as u64);
+        aux += pivots.len() as u64;
         Some(pivots)
-    })
+    });
+    st.word_xors += logical_xors;
+    st.word_xors_performed += performed_xors;
+    st.full_m4ri_matrices += u64::from(result.is_some());
+    st.full_m4ri_blocks += blocks;
+    st.full_m4ri_table_word_xors += preparation_xors;
+    tally::word_ops(aux);
+    result
 }
 
 /// Forward elimination: each row in turn is reduced by the pivots found
@@ -818,223 +849,227 @@ fn echelon_block_tables(
     st: &mut F4Stats,
     deadline: Option<Instant>,
 ) -> Option<Vec<(usize, Row)>> {
-    let mut pivot_of = vec![NONE; n_cols];
-    let mut pivots: Vec<(usize, Row)> = Vec::with_capacity(rows.len());
-    // Word operations besides the XORs: clearing the pivot index (two
-    // `u32` slots a word), every lead scan (`Row::lead_counted`), one
-    // pivot-index lookup a reduction step and one pattern extraction a
-    // table reduction.  Charged to this thread at the end.
     let mut aux = (n_cols as u64).div_ceil(2);
-    // the leading block: rows until the first repeated lead (zero rows
-    // are skipped by the serial loop too)
-    let mut fixed = 0usize;
-    while fixed < rows.len() {
-        match rows[fixed].lead_counted(&mut aux) {
-            Some(lead) if pivot_of[lead] != NONE => break,
-            Some(lead) => pivot_of[lead] = 0,
-            None => {}
-        }
-        fixed += 1;
-    }
-    let rest = rows.split_off(fixed);
-    for mut row in rows {
-        if let Some(lead) = row.lead_counted(&mut aux) {
-            pivot_of[lead] = pivots.len() as u32;
-            pivots.push((lead, row));
-        }
-    }
-    let words = n_cols.div_ceil(64).max(1);
-    let expired = std::sync::atomic::AtomicBool::new(false);
-    // The leading block's tables, where enough rows follow it to pay and
-    // they take no more words than the matrix; later pivots join them
-    // within twice that.
-    let matrix_words = (pivots.len() + rest.len()) * words;
-    let budget = matrix_words * TABLE_INITIAL_BUDGET_MULT;
-    let mut tables = (rest.len() >= TABLE_ROWS && pivots.len() >= TABLE_ROWS)
-        .then(|| BlockTables::build(&pivot_of, &pivots, budget))
-        .flatten();
-    if let Some(t) = &tables {
-        st.peak_table_bytes = st.peak_table_bytes.max((t.held_words * 8) as u64);
-    }
     let mut xors = 0u64;
     let mut performed = 0u64;
-    if let Some(t) = &tables {
-        performed += t.built_words;
-        // the scan of the pivot index for runs
-        aux += n_cols as u64;
-    }
-    // One reduction at `lead`, which has pivot `p`: by the table when the
-    // lead is on a tabled block, else by the pivot.  Returns the words the
-    // row-by-row loop would XOR and the words XORed.
-    let step = |row: &mut Row,
-                lead: usize,
-                p: u32,
-                pivots: &[(usize, Row)],
-                tables: Option<&BlockTables>|
-     -> (u64, u64) {
-        if let Some((xors, done)) = tables.and_then(|t| t.reduce(row, lead)) {
-            return (xors, done);
+    let run = || {
+        let mut pivot_of = vec![NONE; n_cols];
+        let mut pivots: Vec<(usize, Row)> = Vec::with_capacity(rows.len());
+        // Word operations besides the XORs: clearing the pivot index (two
+        // `u32` slots a word), every lead scan (`Row::lead_counted`), one
+        // pivot-index lookup a reduction step and one pattern extraction a
+        // table reduction.  Charged to this thread at the end.
+        // the leading block: rows until the first repeated lead (zero rows
+        // are skipped by the serial loop too)
+        let mut fixed = 0usize;
+        while fixed < rows.len() {
+            match rows[fixed].lead_counted(&mut aux) {
+                Some(lead) if pivot_of[lead] != NONE => break,
+                Some(lead) => pivot_of[lead] = 0,
+                None => {}
+            }
+            fixed += 1;
         }
-        let pivot = &pivots[p as usize].1;
-        let (from, to) = (lead / 64, pivot.end);
-        for (a, b) in row.bits[from..to].iter_mut().zip(&pivot.bits[from..to]) {
-            *a ^= *b;
+        let rest = rows.split_off(fixed);
+        for mut row in rows {
+            if let Some(lead) = row.lead_counted(&mut aux) {
+                pivot_of[lead] = pivots.len() as u32;
+                pivots.push((lead, row));
+            }
         }
-        row.end = row.end.max(to);
-        ((to - from) as u64, (to - from) as u64)
-    };
-    // Reduce each of `rows` by the pivots already in the table for as long
-    // as its lead has one; stop at the first lead without.  Pivot rows
-    // never change once made, so these are exactly the reductions the
-    // one-row-at-a-time loop would apply first, in the same order.  The
-    // rows go a range of columns at a time: every row is taken as far as
-    // the range allows before any goes further, so the tables and pivots
-    // of a range are read from cache by all of them, not fetched again
-    // for each.  The ranges are taken in column order and a row stops for
-    // good at a lead without a pivot, so each row's reductions and their
-    // order are unchanged.
-    let by_known = |rows: &mut [Row],
-                    pivot_of: &[u32],
+        let words = n_cols.div_ceil(64).max(1);
+        let expired = std::sync::atomic::AtomicBool::new(false);
+        // The leading block's tables, where enough rows follow it to pay and
+        // they take no more words than the matrix; later pivots join them
+        // within twice that.
+        let matrix_words = (pivots.len() + rest.len()) * words;
+        let budget = matrix_words * TABLE_INITIAL_BUDGET_MULT;
+        let mut tables = (rest.len() >= TABLE_ROWS && pivots.len() >= TABLE_ROWS)
+            .then(|| BlockTables::build(&pivot_of, &pivots, budget))
+            .flatten();
+        if let Some(t) = &tables {
+            st.peak_table_bytes = st.peak_table_bytes.max((t.held_words * 8) as u64);
+        }
+        if let Some(t) = &tables {
+            performed += t.built_words;
+            // the scan of the pivot index for runs
+            aux += n_cols as u64;
+        }
+        // One reduction at `lead`, which has pivot `p`: by the table when the
+        // lead is on a tabled block, else by the pivot.  Returns the words the
+        // row-by-row loop would XOR and the words XORed.
+        let step = |row: &mut Row,
+                    lead: usize,
+                    p: u32,
                     pivots: &[(usize, Row)],
                     tables: Option<&BlockTables>|
-     -> (u64, u64, u64) {
-        if deadline.is_some_and(|d| Instant::now() >= d) {
-            expired.store(true, std::sync::atomic::Ordering::Relaxed);
-            return (0, 0, 0);
-        }
-        let (mut xors, mut done, mut ops) = (0u64, 0u64, 0u64);
-        let mut live: Vec<usize> = (0..rows.len()).collect();
-        while !live.is_empty() {
-            let from = live
-                .iter()
-                .filter_map(|&i| rows[i].lead_counted(&mut ops))
-                .min()
-                .unwrap_or(usize::MAX);
-            let to = from.saturating_add(TILE_COLUMNS);
-            live.retain(|&i| {
-                let row = &mut rows[i];
-                loop {
-                    match row.lead_counted(&mut ops) {
-                        Some(lead) if lead < to => {
-                            let p = pivot_of[lead];
-                            // the pivot lookup, and the table lookup (with
-                            // the pattern it extracts) when tables exist
-                            ops += 1 + 2 * u64::from(tables.is_some());
-                            if p == NONE {
-                                return false;
-                            }
-                            let (x, d) = step(row, lead, p, pivots, tables);
-                            xors += x;
-                            done += d;
-                        }
-                        Some(_) => return true,
-                        None => return false,
-                    }
-                }
-            });
-        }
-        (xors, done, ops)
-    };
-    let mut rest = rest;
-    // The rows after the leading block go in batches.  Each batch is first
-    // reduced — in parallel, a share of its rows to a thread — by the
-    // pivots that exist before it — the leading block's, then every
-    // earlier batch's — and then finished in order: a row resumes where it stopped, against the pivots its
-    // predecessors in the batch have just made, and becomes a pivot if
-    // anything survives.  Every row sees the reductions, the order and
-    // the pivot table the serial loop would give it, so the pivots and
-    // the XOR count are identical to it; only the first phase is shared
-    // out.  The first batch is the whole remainder against the leading
-    // block, whose reductions are the bulk of a symbolic-preprocessing
-    // matrix, so the whole remainder takes that pass together before the
-    // batches start.
-    let mut done = 0usize;
-    let mut first = true;
-    // On one thread, or on a remainder too small to share out, without
-    // tables, reading each batch twice only costs: finish it serially
-    // instead, as the loop always did.  With tables the batches and their
-    // first phase stay, for the cache reuse of `by_known` and so that each
-    // batch's pivots can join the tables for the next.
-    // (Size first: asking rayon its thread count starts its pool.)
-    let batched = rest.len() * words > PAR_WORDS && rayon::current_num_threads() > 1;
-    let batch_rows = (ELIMINATION_BATCH_WORDS / words).clamp(32, 1024);
-    while done < rest.len() {
-        if deadline.is_some_and(|d| Instant::now() >= d) {
-            return None;
-        }
-        let end = if first || !(batched || tables.is_some()) {
-            rest.len()
-        } else {
-            (done + batch_rows).min(rest.len())
+         -> (u64, u64) {
+            if let Some((xors, done)) = tables.and_then(|t| t.reduce(row, lead)) {
+                return (xors, done);
+            }
+            let pivot = &pivots[p as usize].1;
+            let (from, to) = (lead / 64, pivot.end);
+            for (a, b) in row.bits[from..to].iter_mut().zip(&pivot.bits[from..to]) {
+                *a ^= *b;
+            }
+            row.end = row.end.max(to);
+            ((to - from) as u64, (to - from) as u64)
         };
-        let made = pivots.len();
-        let chunk = &mut rest[done..end];
-        if first || batched || tables.is_some() {
-            let (pivot_of, known, tables) = (&pivot_of[..], &pivots[..], tables.as_ref());
-            let threshold = if first { PAR_WORDS } else { PAR_BATCH_WORDS };
-            let (x, d, o) = if chunk.len() > 1 && chunk.len() * words > threshold {
-                let share = chunk.len().div_ceil(rayon::current_num_threads()).max(1);
-                chunk
-                    .par_chunks_mut(share)
-                    .map(|rows| by_known(rows, pivot_of, known, tables))
-                    .reduce(|| (0, 0, 0), |a, b| (a.0 + b.0, a.1 + b.1, a.2 + b.2))
-            } else {
-                by_known(chunk, pivot_of, known, tables)
-            };
-            xors += x;
-            performed += d;
-            aux += o;
-        }
-        if expired.load(std::sync::atomic::Ordering::Relaxed) {
-            return None;
-        }
-        if first {
-            // Only the leading block's reductions: every row has now
-            // stopped at a lead no leading row covers.
-            first = false;
-            continue;
-        }
-        for (k, row) in chunk.iter_mut().enumerate() {
-            if k > 0 && k % 128 == 0 && deadline.is_some_and(|d| Instant::now() >= d) {
+        // Reduce each of `rows` by the pivots already in the table for as long
+        // as its lead has one; stop at the first lead without.  Pivot rows
+        // never change once made, so these are exactly the reductions the
+        // one-row-at-a-time loop would apply first, in the same order.  The
+        // rows go a range of columns at a time: every row is taken as far as
+        // the range allows before any goes further, so the tables and pivots
+        // of a range are read from cache by all of them, not fetched again
+        // for each.  The ranges are taken in column order and a row stops for
+        // good at a lead without a pivot, so each row's reductions and their
+        // order are unchanged.
+        let by_known = |rows: &mut [Row],
+                        pivot_of: &[u32],
+                        pivots: &[(usize, Row)],
+                        tables: Option<&BlockTables>|
+         -> (u64, u64, u64) {
+            if deadline.is_some_and(|d| Instant::now() >= d) {
+                expired.store(true, std::sync::atomic::Ordering::Relaxed);
+                return (0, 0, 0);
+            }
+            let (mut xors, mut done, mut ops) = (0u64, 0u64, 0u64);
+            let mut live: Vec<usize> = (0..rows.len()).collect();
+            while !live.is_empty() {
+                let from = live
+                    .iter()
+                    .filter_map(|&i| rows[i].lead_counted(&mut ops))
+                    .min()
+                    .unwrap_or(usize::MAX);
+                let to = from.saturating_add(TILE_COLUMNS);
+                live.retain(|&i| {
+                    let row = &mut rows[i];
+                    loop {
+                        match row.lead_counted(&mut ops) {
+                            Some(lead) if lead < to => {
+                                let p = pivot_of[lead];
+                                // the pivot lookup, and the table lookup (with
+                                // the pattern it extracts) when tables exist
+                                ops += 1 + 2 * u64::from(tables.is_some());
+                                if p == NONE {
+                                    return false;
+                                }
+                                let (x, d) = step(row, lead, p, pivots, tables);
+                                xors += x;
+                                done += d;
+                            }
+                            Some(_) => return true,
+                            None => return false,
+                        }
+                    }
+                });
+            }
+            (xors, done, ops)
+        };
+        let mut rest = rest;
+        // The rows after the leading block go in batches.  Each batch is first
+        // reduced — in parallel, a share of its rows to a thread — by the
+        // pivots that exist before it — the leading block's, then every
+        // earlier batch's — and then finished in order: a row resumes where it stopped, against the pivots its
+        // predecessors in the batch have just made, and becomes a pivot if
+        // anything survives.  Every row sees the reductions, the order and
+        // the pivot table the serial loop would give it, so the pivots and
+        // the XOR count are identical to it; only the first phase is shared
+        // out.  The first batch is the whole remainder against the leading
+        // block, whose reductions are the bulk of a symbolic-preprocessing
+        // matrix, so the whole remainder takes that pass together before the
+        // batches start.
+        let mut done = 0usize;
+        let mut first = true;
+        // On one thread, or on a remainder too small to share out, without
+        // tables, reading each batch twice only costs: finish it serially
+        // instead, as the loop always did.  With tables the batches and their
+        // first phase stay, for the cache reuse of `by_known` and so that each
+        // batch's pivots can join the tables for the next.
+        // (Size first: asking rayon its thread count starts its pool.)
+        let batched = rest.len() * words > PAR_WORDS && rayon::current_num_threads() > 1;
+        let batch_rows = (ELIMINATION_BATCH_WORDS / words).clamp(32, 1024);
+        while done < rest.len() {
+            if deadline.is_some_and(|d| Instant::now() >= d) {
                 return None;
             }
-            let mut row = std::mem::take(row);
-            while let Some(lead) = row.lead_counted(&mut aux) {
-                aux += 1 + 2 * u64::from(tables.is_some());
-                match pivot_of[lead] {
-                    NONE => {
-                        pivot_of[lead] = pivots.len() as u32;
-                        pivots.push((lead, row));
-                        break;
-                    }
-                    p => {
-                        let (x, d) = step(&mut row, lead, p, &pivots, tables.as_ref());
-                        xors += x;
-                        performed += d;
+            let end = if first || !(batched || tables.is_some()) {
+                rest.len()
+            } else {
+                (done + batch_rows).min(rest.len())
+            };
+            let made = pivots.len();
+            let chunk = &mut rest[done..end];
+            if first || batched || tables.is_some() {
+                let (pivot_of, known, tables) = (&pivot_of[..], &pivots[..], tables.as_ref());
+                let threshold = if first { PAR_WORDS } else { PAR_BATCH_WORDS };
+                let (x, d, o) = if chunk.len() > 1 && chunk.len() * words > threshold {
+                    let share = chunk.len().div_ceil(rayon::current_num_threads()).max(1);
+                    chunk
+                        .par_chunks_mut(share)
+                        .map(|rows| by_known(rows, pivot_of, known, tables))
+                        .reduce(|| (0, 0, 0), |a, b| (a.0 + b.0, a.1 + b.1, a.2 + b.2))
+                } else {
+                    by_known(chunk, pivot_of, known, tables)
+                };
+                xors += x;
+                performed += d;
+                aux += o;
+            }
+            if expired.load(std::sync::atomic::Ordering::Relaxed) {
+                return None;
+            }
+            if first {
+                // Only the leading block's reductions: every row has now
+                // stopped at a lead no leading row covers.
+                first = false;
+                continue;
+            }
+            for (k, row) in chunk.iter_mut().enumerate() {
+                if k > 0 && k % 128 == 0 && deadline.is_some_and(|d| Instant::now() >= d) {
+                    return None;
+                }
+                let mut row = std::mem::take(row);
+                while let Some(lead) = row.lead_counted(&mut aux) {
+                    aux += 1 + 2 * u64::from(tables.is_some());
+                    match pivot_of[lead] {
+                        NONE => {
+                            pivot_of[lead] = pivots.len() as u32;
+                            pivots.push((lead, row));
+                            break;
+                        }
+                        p => {
+                            let (x, d) = step(&mut row, lead, p, &pivots, tables.as_ref());
+                            xors += x;
+                            performed += d;
+                        }
                     }
                 }
             }
-        }
-        done = end;
-        if let Some(t) = &mut tables {
-            if rest.len() - done >= TABLE_ROWS && pivots.len() > made {
-                // the new pivots' groups, sorted, and their columns scanned
-                aux += tally::sort_cost(pivots.len() - made)
-                    + (TABLE_BLOCK * (pivots.len() - made)) as u64;
-                performed += t.extend(
-                    &pivot_of,
-                    &pivots,
-                    &pivots[made..],
-                    matrix_words * TABLE_EXTENDED_BUDGET_MULT,
-                );
-                st.peak_table_bytes = st.peak_table_bytes.max((t.held_words * 8) as u64);
+            done = end;
+            if let Some(t) = &mut tables {
+                if rest.len() - done >= TABLE_ROWS && pivots.len() > made {
+                    // the new pivots' groups, sorted, and their columns scanned
+                    aux += tally::sort_cost(pivots.len() - made)
+                        + (TABLE_BLOCK * (pivots.len() - made)) as u64;
+                    performed += t.extend(
+                        &pivot_of,
+                        &pivots,
+                        &pivots[made..],
+                        matrix_words * TABLE_EXTENDED_BUDGET_MULT,
+                    );
+                    st.peak_table_bytes = st.peak_table_bytes.max((t.held_words * 8) as u64);
+                }
             }
         }
-    }
+        Some(pivots)
+    };
+    let result = run();
     st.word_xors += xors;
     st.word_xors_performed += performed;
     tally::word_ops(aux);
-    Some(pivots)
+    result
 }
 
 fn echelon(
@@ -1071,6 +1106,245 @@ fn echelon(
     st.matrix_profile_performed_xors[bin] = st.matrix_profile_performed_xors[bin]
         .saturating_add(st.word_xors_performed.saturating_sub(performed_before));
     st.matrix_profile_full_m4ri_counts[bin] += u64::from(use_full_m4ri);
+    result
+}
+
+/// Minimum full-matrix width for the Boolean Faugère–Lachartre split.
+const FL_MIN_COLS: usize = 256;
+/// The reducer block and pair block must both be large enough to amortise
+/// splitting and compressing the rows.
+const FL_MIN_ROWS: usize = 32;
+
+/// `F4_F2_FL=0` retains the full-width reducer cascade as a same-binary
+/// control.
+fn fl_enabled() -> bool {
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ENABLED.get_or_init(|| std::env::var("F4_F2_FL").as_deref() != Ok("0"))
+}
+
+fn fl_shape(reducers: usize, pair_rows: usize, n_cols: usize) -> bool {
+    if !fl_enabled()
+        || n_cols < FL_MIN_COLS
+        || reducers < FL_MIN_ROWS
+        || pair_rows < FL_MIN_ROWS
+        || reducers >= n_cols
+    {
+        return false;
+    }
+    let free_words = (n_cols - reducers).div_ceil(64);
+    // Bound the compact reducer and pair blocks by the same allocation cap
+    // as a normal F4 matrix.
+    (reducers + pair_rows).saturating_mul(free_words) <= max_matrix_words() as usize
+}
+
+/// Split one packed row into its reducer-column coefficients and its packed
+/// free-column part.  `pivot_of[c] == NONE` marks a free column.
+fn split_fl_row(
+    row: &Row,
+    pivot_of: &[u32],
+    free_index: &[u32],
+    free_words: usize,
+) -> (Row, Vec<usize>, u64) {
+    let mut bits = vec![0u64; free_words];
+    let mut dependencies = Vec::new();
+    let mut inspected = 0u64;
+    let mut end = 0usize;
+    for (word_index, &packed) in row.bits[..row.end].iter().enumerate() {
+        let mut word = packed;
+        while word != 0 {
+            let column = word_index * 64 + word.trailing_zeros() as usize;
+            word &= word - 1;
+            inspected += 1;
+            let pivot = pivot_of[column];
+            if pivot == NONE {
+                let free = free_index[column] as usize;
+                bits[free / 64] |= 1u64 << (free % 64);
+                end = end.max(free / 64 + 1);
+            } else {
+                dependencies.push(pivot as usize);
+            }
+        }
+    }
+    (
+        Row {
+            bits,
+            start: 0,
+            end,
+        },
+        dependencies,
+        inspected,
+    )
+}
+
+fn xor_fl_row(row: &mut Row, reducer: &Row) -> u64 {
+    for (target, source) in row.bits[..reducer.end]
+        .iter_mut()
+        .zip(&reducer.bits[..reducer.end])
+    {
+        *target ^= *source;
+    }
+    row.end = row.end.max(reducer.end);
+    while row.end > 0 && row.bits[row.end - 1] == 0 {
+        row.end -= 1;
+    }
+    reducer.end as u64
+}
+
+/// Faugère–Lachartre elimination over `F_2`.
+///
+/// Symbolic preprocessing orders the rows as reducers `[A | B]` followed by
+/// pair rows `[C | D]`; reducer leading columns are distinct and every tail
+/// column is to the right of its lead.  Reduce the triangular reducer block
+/// once to `[I | B']`, form the compact Schur complement `D + C B'`, and run
+/// the existing packed echelon kernel only on free columns.  Returned rows are
+/// expanded with zero reducer columns so the caller's polynomial readback is
+/// unchanged.
+fn echelon_fl(
+    rows: Vec<Row>,
+    n_cols: usize,
+    reducer_count: usize,
+    st: &mut F4Stats,
+    deadline: Option<Instant>,
+) -> Option<Vec<(usize, Row)>> {
+    echelon_fl_with_expiry(rows, n_cols, reducer_count, st, deadline, || {
+        deadline.is_some_and(|limit| Instant::now() >= limit)
+    })
+}
+
+// The production wrapper supplies the original deadline predicate. A private
+// stop control permits deterministic interrupted-prefix accounting tests.
+fn echelon_fl_with_expiry(
+    mut rows: Vec<Row>,
+    n_cols: usize,
+    reducer_count: usize,
+    st: &mut F4Stats,
+    deadline: Option<Instant>,
+    mut deadline_expired: impl FnMut() -> bool,
+) -> Option<Vec<(usize, Row)>> {
+    let mut aux = (n_cols as u64).div_ceil(2);
+    let mut xors = 0u64;
+    let run = || {
+        debug_assert!(reducer_count <= rows.len());
+        let pair_rows = rows.split_off(reducer_count);
+        let reducer_rows = rows;
+        let mut pivot_of = vec![NONE; n_cols];
+        let mut leads = Vec::with_capacity(reducer_count);
+        for (index, mut row) in reducer_rows.iter().cloned().enumerate() {
+            let lead = row.lead_counted(&mut aux)?;
+            debug_assert_eq!(pivot_of[lead], NONE, "reducer leads are distinct");
+            pivot_of[lead] = index as u32;
+            leads.push(lead);
+        }
+        let free_cols: Vec<usize> = (0..n_cols).filter(|&c| pivot_of[c] == NONE).collect();
+        let n_free = free_cols.len();
+        let free_words = n_free.div_ceil(64);
+        // While B' is built, the original packed matrix is still live.  Charge
+        // both so the solver's peak-memory report does not hide the FL scratch
+        // matrix behind the already-recorded full-width allocation.
+        let full_words = n_cols.div_ceil(64) as u64;
+        let original_words = (reducer_count + pair_rows.len()) as u64 * full_words;
+        let bprime_words = reducer_count as u64 * free_words as u64;
+        st.peak_matrix_bytes = st.peak_matrix_bytes.max(
+            original_words
+                .saturating_add(bprime_words)
+                .saturating_mul(8),
+        );
+        let mut free_index = vec![NONE; n_cols];
+        for (index, &column) in free_cols.iter().enumerate() {
+            free_index[column] = index as u32;
+        }
+
+        let mut order: Vec<usize> = (0..reducer_count).collect();
+        order.sort_unstable_by_key(|&index| std::cmp::Reverse(leads[index]));
+        let mut bprime: Vec<Row> = (0..reducer_count)
+            .map(|_| Row {
+                bits: vec![0; free_words],
+                start: 0,
+                end: 0,
+            })
+            .collect();
+        for (position, &index) in order.iter().enumerate() {
+            if position.is_multiple_of(64) && deadline_expired() {
+                return None;
+            }
+            let (mut free, dependencies, inspected) =
+                split_fl_row(&reducer_rows[index], &pivot_of, &free_index, free_words);
+            aux += inspected;
+            for dependency in dependencies {
+                if dependency == index {
+                    continue;
+                }
+                debug_assert!(leads[dependency] > leads[index]);
+                xors += xor_fl_row(&mut free, &bprime[dependency]);
+            }
+            bprime[index] = free;
+        }
+        drop(reducer_rows);
+
+        let reduce_pair = |row: Row| {
+            let (mut free, dependencies, inspected) =
+                split_fl_row(&row, &pivot_of, &free_index, free_words);
+            let mut row_xors = 0u64;
+            for dependency in dependencies {
+                row_xors += xor_fl_row(&mut free, &bprime[dependency]);
+            }
+            (free, row_xors, inspected)
+        };
+        let parallel = pair_rows.len() > 1
+            && pair_rows.len().saturating_mul(free_words) > PAR_WORDS
+            && inner_build_parallel_enabled()
+            && rayon::current_num_threads() > 1;
+        let reduced: Vec<(Row, u64, u64)> = if parallel {
+            pair_rows.into_par_iter().map(reduce_pair).collect()
+        } else {
+            pair_rows.into_iter().map(reduce_pair).collect()
+        };
+        let mut compact = Vec::with_capacity(reduced.len());
+        for (row, row_xors, inspected) in reduced {
+            compact.push(row);
+            xors += row_xors;
+            aux += inspected;
+        }
+        st.fl_matrices += 1;
+        st.fl_reducer_rows += reducer_count as u64;
+        st.fl_pair_rows += compact.len() as u64;
+        st.fl_free_cols += n_free as u64;
+
+        if n_free == 0 {
+            return Some(Vec::new());
+        }
+        let compact_pivots = echelon(compact, n_free, st, deadline)?;
+        let full_words = n_cols.div_ceil(64).max(1);
+        let mut expanded = Vec::with_capacity(compact_pivots.len());
+        for (lead, row) in compact_pivots {
+            let mut bits = vec![0u64; full_words];
+            let mut end = 0usize;
+            for word_index in row.start..row.end {
+                let mut word = row.bits[word_index];
+                while word != 0 {
+                    let free = word_index * 64 + word.trailing_zeros() as usize;
+                    word &= word - 1;
+                    let column = free_cols[free];
+                    bits[column / 64] |= 1u64 << (column % 64);
+                    end = end.max(column / 64 + 1);
+                }
+            }
+            let full_lead = free_cols[lead];
+            expanded.push((
+                full_lead,
+                Row {
+                    bits,
+                    start: full_lead / 64,
+                    end,
+                },
+            ));
+        }
+        Some(expanded)
+    };
+    let result = run();
+    st.word_xors += xors;
+    st.word_xors_performed += xors;
+    tally::word_ops(aux);
     result
 }
 
@@ -1721,11 +1995,11 @@ pub fn groebner_basis_f4(
 /// distinct leading variable.  Under a degree ordering an element whose
 /// leading monomial is a variable is affine, so each such element fixes
 /// its leading variable once the smaller ones are fixed.
-fn pinned_variables(lm: &[u64], active: &[bool]) -> u64 {
+fn pinned_variables(lm: &[Mask], active: &[bool]) -> Mask {
     lm.iter()
         .zip(active)
         .filter(|(m, a)| **a && m.count_ones() == 1)
-        .fold(0u64, |acc, (m, _)| acc | m)
+        .fold(0 as Mask, |acc, (m, _)| acc | m)
 }
 
 /// [`groebner_basis_f4`], stopping after the first step at which the
@@ -2106,7 +2380,12 @@ pub fn groebner_basis_f4_until(
         st.build_ns += t.elapsed().as_nanos() as u64;
 
         let t = Instant::now();
-        let Some(pivots) = echelon(rows, cols.monos.len(), &mut st, deadline) else {
+        let pair_row_count = all.len() - reducers.len();
+        let Some(pivots) = (if fl_shape(reducers.len(), pair_row_count, cols.monos.len()) {
+            echelon_fl(rows, cols.monos.len(), reducers.len(), &mut st, deadline)
+        } else {
+            echelon(rows, cols.monos.len(), &mut st, deadline)
+        }) else {
             st.timed_out = true;
             st.eliminate_ns += t.elapsed().as_nanos() as u64;
             break;
@@ -2374,17 +2653,20 @@ pub fn solutions_from_linear_part(
     max_free: usize,
     tests: &mut u64,
     xors: &mut u64,
-) -> Option<Vec<u64>> {
+) -> Option<Vec<Mask>> {
     if basis.iter().any(is_one) {
         return Some(Vec::new());
     }
+    if n_vars > MASK_BITS {
+        return None;
+    }
     // Rows: (variable mask, constant).  Reduce to one pivot per variable.
-    let mut rows: Vec<(u64, u64)> = Vec::new();
+    let mut rows: Vec<(Mask, u64)> = Vec::new();
     for g in basis {
         if degree(g) > 1 {
             continue;
         }
-        let mut mask = 0u64;
+        let mut mask = 0 as Mask;
         let mut c = 0u64;
         for t in &g.terms {
             if t.mask == 0 {
@@ -2395,7 +2677,7 @@ pub fn solutions_from_linear_part(
         }
         rows.push((mask, c));
     }
-    let mut pivots: Vec<(usize, u64, u64)> = Vec::new();
+    let mut pivots: Vec<(usize, Mask, u64)> = Vec::new();
     for (mut mask, mut c) in rows {
         for &(v, pm, pc) in &pivots {
             if (mask >> v) & 1 == 1 {
@@ -2420,25 +2702,28 @@ pub fn solutions_from_linear_part(
         }
         pivots.push((v, mask, c));
     }
-    let pinned = pivots.iter().fold(0u64, |acc, p| acc | (1u64 << p.0));
+    let pinned = pivots
+        .iter()
+        .fold(0 as Mask, |acc, p| acc | bit(p.0 as u32));
     let free: Vec<usize> = (0..n_vars).filter(|&v| (pinned >> v) & 1 == 0).collect();
     if free.len() > max_free {
         return None;
     }
     let mut out = Vec::new();
-    for a in 0u64..(1u64 << free.len()) {
-        let mut point = 0u64;
-        for (bit, &v) in free.iter().enumerate() {
-            if (a >> bit) & 1 == 1 {
-                point |= 1u64 << v;
+    let assignments = 1u64.checked_shl(free.len().try_into().ok()?)?;
+    for a in 0u64..assignments {
+        let mut point = 0 as Mask;
+        for (offset, &v) in free.iter().enumerate() {
+            if (a >> offset) & 1 == 1 {
+                point |= bit(v as u32);
             }
         }
         // Each pivot row is v + (free variables) + c, fully reduced.
         for &(v, m, c) in &pivots {
             *tests += 1;
-            let rest = m & !(1u64 << v);
+            let rest = m & !bit(v as u32);
             if ((point & rest).count_ones() as u64 + c) & 1 == 1 {
-                point |= 1u64 << v;
+                point |= bit(v as u32);
             }
         }
         let mut ok = true;
@@ -2459,6 +2744,40 @@ pub fn solutions_from_linear_part(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn affine_enumeration_refuses_an_unrepresentable_assignment_count() {
+        let mut tests = 0;
+        let mut xors = 0;
+        assert!(solutions_from_linear_part(&[], &[], 64, 64, &mut tests, &mut xors).is_none());
+    }
+
+    #[cfg(feature = "wide-vars")]
+    #[test]
+    fn affine_roots_and_pinned_variables_preserve_coordinates_above_sixty_four() {
+        let n = 96;
+        let free = 80;
+        let basis: Vec<_> = (0..n)
+            .filter(|&v| v != free)
+            .map(|v| {
+                let mut terms = vec![F2BoolMono::from_mask(bit(v as u32))];
+                if v == 95 {
+                    terms.push(F2BoolMono::from_mask(0));
+                }
+                F2BoolPoly::from_monos(terms, n)
+            })
+            .collect();
+        let (mut tests, mut xors) = (0, 0);
+        assert_eq!(
+            solutions_from_linear_part(&basis, &basis, n, 1, &mut tests, &mut xors),
+            Some(vec![bit(95), bit(95) | bit(free as u32)])
+        );
+        assert_eq!(
+            pinned_variables(&[bit(95), bit(1)], &[true, true]),
+            bit(95) | bit(1)
+        );
+    }
+
     #[allow(unused_imports)]
     use crate::cryptanalysis::pq_groebner_f2::{
         bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
@@ -2491,11 +2810,14 @@ mod tests {
                         masks.push(0);
                     }
                     let mut p = F2BoolPoly::from_monos(
-                        masks.iter().map(|&m| F2BoolMono::from_mask(m)).collect(),
+                        masks
+                            .iter()
+                            .map(|&m| F2BoolMono::from_mask(mask_from64(m)))
+                            .collect(),
                         n,
                     );
                     if let Some(x) = planted {
-                        if p.eval(x) == 1 {
+                        if p.eval(mask_from64(x)) == 1 {
                             p = p.add(&F2BoolPoly::one(n));
                         }
                     }
@@ -2508,7 +2830,10 @@ mod tests {
             full.retain(|&v| eqs.iter().all(|e| e.eval(v) == 0));
             full.sort_unstable();
             if let Some(x) = planted {
-                assert!(full.contains(&x), "case {case}: the planted point solves");
+                assert!(
+                    full.contains(&mask_from64(x)),
+                    "case {case}: the planted point solves"
+                );
             }
             for k in [0usize, 2, 5, 8] {
                 let (part, st) = groebner_basis_f4_until(eqs.clone(), n, None, Some(k));
@@ -2679,6 +3004,88 @@ mod tests {
             assert!(stats.full_m4ri_table_word_xors > 0);
             assert!(stats.word_xors > 0);
             assert!(stats.word_xors_performed > 0);
+        }
+    }
+
+    #[test]
+    fn faugere_lachartre_split_matches_the_full_width_cascade() {
+        let mut rng = StdRng::seed_from_u64(0xf4a6_1ac4_2026_1117);
+        for &(n_cols, reducer_count, pair_count) in &[(159usize, 47usize, 83usize), (257, 79, 131)]
+        {
+            let words = n_cols.div_ceil(64);
+            let make_row = |bits: Vec<u64>| {
+                let start = bits.iter().position(|&word| word != 0).unwrap_or(0);
+                let end = bits
+                    .iter()
+                    .rposition(|&word| word != 0)
+                    .map_or(0, |index| index + 1);
+                Row { bits, start, end }
+            };
+            let mut rows = Vec::new();
+            // A triangular reducer block: every tail column lies strictly
+            // right of its distinct leading column, exactly as symbolic
+            // preprocessing orders Boolean F4 reducers.
+            // Interleave pivot and free columns instead of making the
+            // reducer block a contiguous prefix.  Symbolic preprocessing
+            // only guarantees distinct leads and rightward tails.
+            let reducer_leads: Vec<usize> = (0..reducer_count).map(|index| index * 2).collect();
+            for &lead in &reducer_leads {
+                let mut bits = vec![0u64; words];
+                bits[lead / 64] |= 1u64 << (lead % 64);
+                for column in lead + 1..n_cols {
+                    if rng.gen_ratio(1, 5) {
+                        bits[column / 64] |= 1u64 << (column % 64);
+                    }
+                }
+                rows.push(make_row(bits));
+            }
+            for _ in 0..pair_count {
+                let mut bits = vec![0u64; words];
+                for column in 0..n_cols {
+                    if rng.gen_ratio(1, 3) {
+                        bits[column / 64] |= 1u64 << (column % 64);
+                    }
+                }
+                rows.push(make_row(bits));
+            }
+
+            let reducer_space: Vec<Vec<u64>> = rows[..reducer_count]
+                .iter()
+                .map(|row| row.bits.clone())
+                .collect();
+            let mut reference_stats = F4Stats::default();
+            let reference =
+                echelon_block_tables(rows.clone(), n_cols, &mut reference_stats, None).unwrap();
+            let reference_new_leads: Vec<usize> = reference
+                .iter()
+                .filter(|(lead, _)| reducer_leads.binary_search(lead).is_err())
+                .map(|(lead, _)| *lead)
+                .collect();
+            let reference_space: Vec<Vec<u64>> =
+                reference.into_iter().map(|(_, row)| row.bits).collect();
+
+            let mut candidate_stats = F4Stats::default();
+            let candidate =
+                echelon_fl(rows, n_cols, reducer_count, &mut candidate_stats, None).unwrap();
+            let candidate_new_leads: Vec<usize> = candidate.iter().map(|(lead, _)| *lead).collect();
+            let mut candidate_space = reducer_space;
+            candidate_space.extend(candidate.into_iter().map(|(_, row)| row.bits));
+            assert_eq!(
+                candidate_new_leads, reference_new_leads,
+                "new pivots for shape reducers={reducer_count} pairs={pair_count} cols={n_cols}"
+            );
+            assert_eq!(
+                canonical_rref(candidate_space, n_cols),
+                canonical_rref(reference_space, n_cols),
+                "row space for shape reducers={reducer_count} pairs={pair_count} cols={n_cols}"
+            );
+            assert_eq!(candidate_stats.fl_matrices, 1);
+            assert_eq!(candidate_stats.fl_reducer_rows, reducer_count as u64);
+            assert_eq!(candidate_stats.fl_pair_rows, pair_count as u64);
+            assert_eq!(
+                candidate_stats.fl_free_cols,
+                (n_cols - reducer_count) as u64
+            );
         }
     }
 
@@ -2950,7 +3357,12 @@ mod tests {
             let mut tests = 0;
             let mut got = solutions_from_reduced_basis(&gb, n, 24, &mut tests).unwrap();
             got.sort_unstable();
-            assert_eq!(masks_low64(&got), sols, "trial {trial}: extraction");
+            assert_eq!(
+                crate::cryptanalysis::pq_groebner_f2::masks_to_words_checked(&got)
+                    .expect("bounded one-word fixture returned unexpected high mask bits"),
+                sols,
+                "trial {trial}: extraction"
+            );
             // Every generator lies in the ideal the basis generates.
             for e in &eqs {
                 assert!(
@@ -3071,5 +3483,131 @@ mod tests {
         let eqs = random_quadratic(18, 17, &mut rng);
         let (_, st) = groebner_basis_f4(eqs, 18, Some(Duration::from_nanos(1)));
         assert!(st.timed_out);
+    }
+}
+
+#[cfg(test)]
+mod interrupted_elimination_accounting {
+    use super::*;
+
+    #[test]
+    fn fl_interruption_retains_the_completed_xor_prefix() {
+        let n_cols = 257usize;
+        let reducer_count = 128usize;
+        let mut rows = Vec::new();
+        // Distinct reducer leads and strictly rightward tails satisfy the
+        // actual symbolic-preprocessing contract. Descending substitution
+        // alternates three-word and one-word XORs before the stop.
+        for lead in 0..reducer_count {
+            let mut bits = vec![0u64; n_cols.div_ceil(64)];
+            for column in [lead, lead + 1, 256] {
+                bits[column / 64] |= 1u64 << (column % 64);
+            }
+            rows.push(Row {
+                bits,
+                start: lead / 64,
+                end: 5,
+            });
+        }
+        for free in 128..160 {
+            let mut bits = vec![0u64; n_cols.div_ceil(64)];
+            bits[free / 64] |= 1u64 << (free % 64);
+            rows.push(Row {
+                bits,
+                start: free / 64,
+                end: free / 64 + 1,
+            });
+        }
+        let mut checks = 0usize;
+        let mut stats = F4Stats::default();
+        let result = echelon_fl_with_expiry(rows, n_cols, reducer_count, &mut stats, None, || {
+            checks += 1;
+            checks > 1
+        });
+        assert!(result.is_none());
+        assert_eq!(checks, 2);
+        // The 63 completed substitutions perform 32*3 + 31*1 word XORs.
+        assert_eq!(stats.word_xors, 127);
+        assert_eq!(stats.word_xors_performed, 127);
+    }
+}
+
+#[cfg(test)]
+mod interrupted_table_accounting {
+    use super::*;
+
+    #[test]
+    fn full_m4ri_interruption_retains_completed_table_preparation() {
+        let n_cols = 257usize;
+        let mut rows = Vec::new();
+        for lead in 0..2 * FULL_M4RI_BLOCK + 1 {
+            let mut bits = vec![0u64; n_cols.div_ceil(64)];
+            bits[lead / 64] |= 1u64 << (lead % 64);
+            bits[4] |= 1;
+            rows.push(Row {
+                bits,
+                start: lead / 64,
+                end: 5,
+            });
+        }
+        let mut checks = 0usize;
+        let mut stats = F4Stats::default();
+        let result = echelon_full_m4ri_with_expiry(rows, n_cols, &mut stats, || {
+            checks += 1;
+            checks > 1
+        });
+        assert!(result.is_none());
+        assert_eq!(checks, 2);
+        let prepared = ((1u64 << FULL_M4RI_BLOCK) - 1) * 5;
+        assert_eq!(stats.word_xors, 0);
+        assert_eq!(stats.word_xors_performed, prepared);
+        assert_eq!(stats.full_m4ri_table_word_xors, prepared);
+        assert_eq!(stats.full_m4ri_blocks, 1);
+    }
+
+    #[test]
+    fn block_table_expiry_retains_prepared_lookup_words() {
+        let n_cols = 512usize;
+        let words = n_cols.div_ceil(64);
+        let mut rows = Vec::new();
+        let mut pivot_of = vec![NONE; n_cols];
+        let mut pivots = Vec::new();
+        for lead in 0..TABLE_ROWS {
+            let mut bits = vec![0u64; words];
+            bits[lead / 64] |= 1u64 << (lead % 64);
+            bits[7] |= 1u64 << 63;
+            let row = Row {
+                bits,
+                start: lead / 64,
+                end: 8,
+            };
+            pivot_of[lead] = lead as u32;
+            pivots.push((lead, row.clone()));
+            rows.push(row);
+        }
+        for index in 0..4 * TABLE_ROWS {
+            let mut bits = vec![0u64; words];
+            bits[0] |= 1;
+            let free = 256 + index % 255;
+            bits[free / 64] |= 1u64 << (free % 64);
+            rows.push(Row {
+                bits,
+                start: 0,
+                end: free / 64 + 1,
+            });
+        }
+        let expected = BlockTables::build(
+            &pivot_of,
+            &pivots,
+            rows.len() * words * TABLE_INITIAL_BUDGET_MULT,
+        )
+        .unwrap()
+        .built_words;
+        assert!(expected > 0);
+        let mut stats = F4Stats::default();
+        let result = echelon_block_tables(rows, n_cols, &mut stats, Some(Instant::now()));
+        assert!(result.is_none());
+        assert_eq!(stats.word_xors, 0);
+        assert_eq!(stats.word_xors_performed, expected);
     }
 }
