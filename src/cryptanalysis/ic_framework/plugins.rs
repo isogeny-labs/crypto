@@ -7784,28 +7784,3 @@ mod ksum_frobenius_tests {
         }
     }
 }
-
-pub fn trace_kernel_basis(inst: &BinaryInstance, dim: u32) -> Result<Vec<u64>, String> {
-    if inst.artin_schreier.trace(inst.a) != 0 {
-        return Err("trace_kernel needs Tr(a) = 0: with Tr(a) = 1 the points of 2E lie over an affine hyperplane".into());
-    }
-    trace_coset_basis(inst, dim).map(|(basis, _)| basis)
-}
-
-pub fn trace_coset_basis(inst: &BinaryInstance, dim: u32) -> Result<(Vec<u64>, u64), String> {
-    let tr = |v: u64| inst.artin_schreier.trace(v);
-    let t0 = (0..inst.n)
-        .map(|k| 1u64 << k)
-        .find(|&e| tr(e) == 1)
-        .ok_or("no monomial of trace 1")?;
-    let basis: Vec<u64> = (0..inst.n)
-        .map(|k| 1u64 << k)
-        .filter(|&e| e != t0)
-        .map(|e| if tr(e) == 1 { e ^ t0 } else { e })
-        .take(dim as usize)
-        .collect();
-    if basis.len() < dim as usize {
-        return Err(format!("ker Tr has dimension {} < {dim}", inst.n - 1));
-    }
-    Ok((basis, if tr(inst.a) == 0 { 0 } else { t0 }))
-}

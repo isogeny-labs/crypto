@@ -3,6 +3,7 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
 import Mathlib.RingTheory.LaurentSeries
 import Mathlib.RingTheory.PowerSeries.Derivative
+import Mathlib.RingTheory.PowerSeries.Substitution
 import Mathlib.Tactic
 
 /-!
@@ -431,6 +432,29 @@ theorem coeff_eq (hfg : PowerSeriesPrefixEq n f g) {i : ℕ} (hi : i < n) :
     _ = PowerSeries.coeff i (PowerSeries.trunc n g) := by rw [hfg]
     _ = PowerSeries.coeff i g := PowerSeries.coeff_coe_trunc_of_lt hi
 
+/-- Coefficientwise equality below the cutoff reconstructs prefix equality. -/
+theorem of_coeff_eq
+    (hcoeff : ∀ i, i < n → PowerSeries.coeff i f = PowerSeries.coeff i g) :
+    PowerSeriesPrefixEq n f g := by
+  unfold PowerSeriesPrefixEq
+  ext i
+  simp only [PowerSeries.coeff_trunc]
+  split_ifs with hi
+  · exact hcoeff i hi
+  · rfl
+
+/-- Cancelling a shared leading local parameter consumes exactly one degree of
+prefix precision. Unlike `cancel_left`, this applies to the nonunit `X`. -/
+theorem cancel_X
+    (hfg : PowerSeriesPrefixEq (n + 1)
+      (PowerSeries.X * f) (PowerSeries.X * g)) :
+    PowerSeriesPrefixEq n f g := by
+  apply of_coeff_eq
+  intro i hi
+  have hc := coeff_eq hfg (i := i + 1) (by omega)
+  rw [← pow_one (PowerSeries.X : PowerSeries R)] at hc
+  simpa only [PowerSeries.coeff_X_pow_mul] using hc
+
 /-- A power-series unit can be cancelled without losing prefix precision. -/
 theorem cancel_left (D : PowerSeries R)
     (hD : PowerSeries.constantCoeff D ≠ 0)
@@ -439,7 +463,303 @@ theorem cancel_left (D : PowerSeries R)
   have hi := mul (refl (D⁻¹)) hfg
   simpa only [← mul_assoc, PowerSeries.inv_mul_cancel D hD, one_mul] using hi
 
+/-- Inversion of unit power series preserves every established prefix. -/
+theorem inv (hfg : PowerSeriesPrefixEq n f g)
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0) :
+    PowerSeriesPrefixEq n f⁻¹ g⁻¹ := by
+  have hcross := mul (mul (refl (f⁻¹)) hfg) (refl (g⁻¹))
+  have hreverse : PowerSeriesPrefixEq n g⁻¹ f⁻¹ := by
+    simpa only [← mul_assoc, PowerSeries.inv_mul_cancel f hf, one_mul,
+      mul_assoc, PowerSeries.mul_inv_cancel g hg, mul_one] using hcross
+  exact symm hreverse
+
+/-- The inverse square used by a double-pole coordinate preserves a unit-series
+prefix. -/
+theorem inv_sq (hfg : PowerSeriesPrefixEq n f g)
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0) :
+    PowerSeriesPrefixEq n (f⁻¹ ^ 2) (g⁻¹ ^ 2) :=
+  pow (inv hfg hf hg) 2
+
+/-- A monomial contributes nothing below its own degree. This is the exact
+Mathlib truncation theorem, packaged in the prefix relation used by H116. -/
+theorem X_pow_eq_zero (m : ℕ) :
+    PowerSeriesPrefixEq m ((PowerSeries.X : PowerSeries R) ^ m) 0 := by
+  unfold PowerSeriesPrefixEq
+  simpa using PowerSeries.trunc_X_pow_self_mul m (1 : PowerSeries R)
+
+/-- Adding a correction of order at least `m` does not change the prefix below
+degree `m`. -/
+theorem add_X_pow_mul (f correction : PowerSeries R) (m : ℕ) :
+    PowerSeriesPrefixEq m
+      (f + PowerSeries.X ^ m * correction) f := by
+  simpa using add (refl f)
+    (mul (X_pow_eq_zero m) (refl correction))
+
+/-- Generic double-pole core of the pole-transfer bridge. Agreement of two
+local parameters through degree `n` after a shared leading `X` yields agreement
+of their normalized inverse-square terms through degree `n-1`. The regular
+unit factor in the elliptic x-coordinate remains a separate composition
+obligation. -/
+theorem leading_X_inv_sq
+    (hfg : PowerSeriesPrefixEq (n + 1)
+      (PowerSeries.X * f) (PowerSeries.X * g))
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0) :
+    PowerSeriesPrefixEq n (f⁻¹ ^ 2) (g⁻¹ ^ 2) :=
+  inv_sq (cancel_X hfg) hf hg
+
+/-- Substitution of prefix-equal zero-constant parameters into a fixed regular
+power series preserves the prefix. -/
+theorem subst (outer : PowerSeries R)
+    (hfg : PowerSeriesPrefixEq n f g)
+    (hf : PowerSeries.constantCoeff f = 0)
+    (hg : PowerSeries.constantCoeff g = 0) :
+    PowerSeriesPrefixEq n (outer.subst f) (outer.subst g) := by
+  apply of_coeff_eq
+  intro i hi
+  rw [PowerSeries.coeff_subst'
+      (PowerSeries.HasSubst.of_constantCoeff_zero' hf) outer i,
+    PowerSeries.coeff_subst'
+      (PowerSeries.HasSubst.of_constantCoeff_zero' hg) outer i]
+  apply finsum_congr
+  intro d
+  rw [coeff_eq (pow hfg d) hi]
+
+/-- The regular unit factor of a pole coordinate also survives substitution of
+prefix-equal zero-constant parameters. -/
+theorem subst_inv (outer : PowerSeries R)
+    (hfg : PowerSeriesPrefixEq n f g)
+    (hf : PowerSeries.constantCoeff f = 0)
+    (hg : PowerSeries.constantCoeff g = 0)
+    (houter : PowerSeries.constantCoeff outer ≠ 0) :
+    PowerSeriesPrefixEq n (outer.subst f)⁻¹ (outer.subst g)⁻¹ := by
+  have hsubst := subst outer hfg hf hg
+  have hunit_f : PowerSeries.constantCoeff (outer.subst f) ≠ 0 := by
+    change MvPowerSeries.constantCoeff (outer.subst f) ≠ 0
+    rw [PowerSeries.constantCoeff_subst_of_constantCoeff_zero hf outer]
+    simpa using houter
+  have hunit_g : PowerSeries.constantCoeff (outer.subst g) ≠ 0 := by
+    change MvPowerSeries.constantCoeff (outer.subst g) ≠ 0
+    rw [PowerSeries.constantCoeff_subst_of_constantCoeff_zero hg outer]
+    simpa using houter
+  exact inv hsubst hunit_f hunit_g
+
+/-- Generic normalized pole-coordinate transfer. After cancelling a common
+leading `X`, both the inverse-square pole and the inverse of any fixed regular
+unit factor preserve the remaining prefix. -/
+theorem leading_X_inv_sq_mul_subst_inv
+    (outer : PowerSeries R)
+    (hfg : PowerSeriesPrefixEq (n + 1)
+      (PowerSeries.X * f) (PowerSeries.X * g))
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0)
+    (houter : PowerSeries.constantCoeff outer ≠ 0) :
+    PowerSeriesPrefixEq n
+      (f⁻¹ ^ 2 * (outer.subst (PowerSeries.X * f))⁻¹)
+      (g⁻¹ ^ 2 * (outer.subst (PowerSeries.X * g))⁻¹) := by
+  apply mul (leading_X_inv_sq hfg hf hg)
+  apply subst_inv outer (mono (by omega) hfg) <;> simp_all
+
 end PowerSeriesPrefixEq
+
+/-- The regular unit in the short-Weierstrass local coordinate
+`x(z)=z⁻² q(z)⁻¹`. Clearing the curve equation gives this fixed-point identity. -/
+def WeierstrassCoordinateUnit
+    (curveA curveB : K) (q : PowerSeries K) : Prop :=
+  q = 1 + PowerSeries.C curveA * PowerSeries.X ^ 4 * q ^ 2 +
+    PowerSeries.C curveB * PowerSeries.X ^ 6 * q ^ 3
+
+/-- Every solution of the coordinate-unit equation has unit constant
+coefficient. -/
+theorem WeierstrassCoordinateUnit.constantCoeff
+    {curveA curveB : K} {q : PowerSeries K}
+    (hq : WeierstrassCoordinateUnit curveA curveB q) :
+    PowerSeries.constantCoeff q = 1 := by
+  unfold WeierstrassCoordinateUnit at hq
+  have hc := congrArg PowerSeries.constantCoeff hq
+  simpa using hc
+
+/-- The coordinate-unit equation is exactly the regularized affine curve
+identity obtained after substituting `x=z⁻²q⁻¹` and clearing the double pole. -/
+theorem WeierstrassCoordinateUnit.clearedCurveIdentity
+    {curveA curveB : K} {q : PowerSeries K}
+    (hq : WeierstrassCoordinateUnit curveA curveB q) :
+    q⁻¹ + PowerSeries.C curveA * PowerSeries.X ^ 4 * q +
+        PowerSeries.C curveB * PowerSeries.X ^ 6 * q ^ 2 = 1 := by
+  have hconst : PowerSeries.constantCoeff q ≠ 0 := by
+    rw [hq.constantCoeff]
+    exact one_ne_zero
+  have hq_ne : q ≠ 0 := by
+    intro hzero
+    rw [hzero] at hconst
+    exact hconst rfl
+  apply mul_left_cancel₀ hq_ne
+  rw [mul_one]
+  calc
+    q * (q⁻¹ + PowerSeries.C curveA * PowerSeries.X ^ 4 * q +
+        PowerSeries.C curveB * PowerSeries.X ^ 6 * q ^ 2) =
+        1 + PowerSeries.C curveA * PowerSeries.X ^ 4 * q ^ 2 +
+          PowerSeries.C curveB * PowerSeries.X ^ 6 * q ^ 3 := by
+      rw [mul_add, mul_add, PowerSeries.mul_inv_cancel q hconst]
+      ring
+    _ = q := hq.symm
+
+/-- Scaling `(x,y)` by `(scale²,scale³)` sends the source coordinate unit to
+the target coordinate unit by the local-parameter substitution `z ↦ scale*z`. -/
+theorem WeierstrassCoordinateUnit.rescale
+    {curveA curveB : K} {q : PowerSeries K}
+    (hq : WeierstrassCoordinateUnit curveA curveB q) (scale : K) :
+    WeierstrassCoordinateUnit (scale ^ 4 * curveA) (scale ^ 6 * curveB)
+      (q.subst (PowerSeries.C scale * PowerSeries.X)) := by
+  let s : PowerSeries K := PowerSeries.C scale * PowerSeries.X
+  have hs0 : PowerSeries.constantCoeff s = 0 := by
+    simp [s]
+  have hs := PowerSeries.HasSubst.of_constantCoeff_zero' hs0
+  unfold WeierstrassCoordinateUnit at hq ⊢
+  have h := congrArg (fun u : PowerSeries K => u.subst s) hq
+  simp only [PowerSeries.subst_add hs, PowerSeries.subst_mul hs,
+    PowerSeries.subst_pow hs, PowerSeries.subst_C, PowerSeries.subst_X hs,
+    ] at h
+  have h_one : (1 : PowerSeries K).subst s = 1 := by
+    rw [← PowerSeries.coe_substAlgHom hs]
+    exact map_one (PowerSeries.substAlgHom hs)
+  have h' : q.subst s =
+      1 + PowerSeries.C curveA * s ^ 4 * (q.subst s) ^ 2 +
+        PowerSeries.C curveB * s ^ 6 * (q.subst s) ^ 3 := by
+    rw [h_one] at h
+    rw [← PowerSeries.C_apply, ← PowerSeries.C_apply] at h
+    exact h
+  dsimp only [s] at h ⊢
+  calc
+    q.subst (PowerSeries.C scale * PowerSeries.X) =
+        1 + PowerSeries.C curveA *
+            (PowerSeries.C scale * PowerSeries.X) ^ 4 *
+              (q.subst (PowerSeries.C scale * PowerSeries.X)) ^ 2 +
+          PowerSeries.C curveB *
+            (PowerSeries.C scale * PowerSeries.X) ^ 6 *
+              (q.subst (PowerSeries.C scale * PowerSeries.X)) ^ 3 := by
+      simpa [s] using h'
+    _ = 1 + PowerSeries.C (scale ^ 4 * curveA) * PowerSeries.X ^ 4 *
+            (q.subst (PowerSeries.C scale * PowerSeries.X)) ^ 2 +
+          PowerSeries.C (scale ^ 6 * curveB) * PowerSeries.X ^ 6 *
+            (q.subst (PowerSeries.C scale * PowerSeries.X)) ^ 3 := by
+      simp only [map_mul, map_pow]
+      ring
+
+/-- Substituting a scaled variable and then a zero-constant local parameter is
+the same as substituting their product once. -/
+theorem powerSeries_subst_scale
+    (q : PowerSeries K) (scale : K) {z : PowerSeries K}
+    (hz : PowerSeries.constantCoeff z = 0) :
+    PowerSeries.subst z
+        (PowerSeries.subst (PowerSeries.C scale * PowerSeries.X) q) =
+      PowerSeries.subst (PowerSeries.C scale * z) q := by
+  let s : PowerSeries K := PowerSeries.C scale * PowerSeries.X
+  have hs0 : PowerSeries.constantCoeff s = 0 := by simp [s]
+  have hs := PowerSeries.HasSubst.of_constantCoeff_zero' hs0
+  have hzSubst := PowerSeries.HasSubst.of_constantCoeff_zero' hz
+  rw [PowerSeries.subst_comp_subst_apply hs hzSubst]
+  congr 1
+  dsimp only [s]
+  rw [PowerSeries.subst_mul hzSubst, PowerSeries.subst_C,
+    PowerSeries.subst_X hzSubst, ← PowerSeries.C_apply]
+
+/-- Exact target-scaling substitution used by the formal-scalar constructor.
+If `scale*zNormalized=zScalar`, the rescaled target coordinate unit evaluated
+at `zNormalized` is the source coordinate unit evaluated at `zScalar`. -/
+theorem WeierstrassCoordinateUnit.rescaled_subst_normalized
+    {curveA curveB : K} {q zNormalized zScalar : PowerSeries K}
+    (hq : WeierstrassCoordinateUnit curveA curveB q)
+    (scale : K) (hz : PowerSeries.constantCoeff zNormalized = 0)
+    (hscale : PowerSeries.C scale * zNormalized = zScalar) :
+    WeierstrassCoordinateUnit (scale ^ 4 * curveA) (scale ^ 6 * curveB)
+        (q.subst (PowerSeries.C scale * PowerSeries.X)) ∧
+      PowerSeries.subst zNormalized
+          (PowerSeries.subst (PowerSeries.C scale * PowerSeries.X) q) =
+        PowerSeries.subst zScalar q := by
+  refine ⟨hq.rescale scale, ?_⟩
+  rw [powerSeries_subst_scale q scale hz, hscale]
+
+/-- The regularized normalized x-coordinate after writing a zero-constant
+local parameter as `X*f`. -/
+noncomputable def normalizedWeierstrassXUnit
+    (q f : PowerSeries K) : PowerSeries K :=
+  f⁻¹ ^ 2 * (q.subst (PowerSeries.X * f))⁻¹
+
+/-- The complete normalized x-ratio unit, including the common source-curve
+factor used by the implementation. -/
+noncomputable def normalizedWeierstrassXRatio
+    (qSource qTarget f : PowerSeries K) : PowerSeries K :=
+  qSource * normalizedWeierstrassXUnit qTarget f
+
+/-- The actual short-Weierstrass coordinate unit instantiates the generic
+leading-parameter and regular-substitution prefix bridge. -/
+theorem WeierstrassCoordinateUnit.normalizedX_prefix
+    {curveA curveB : K} {q f g : PowerSeries K} {n : ℕ}
+    (hq : WeierstrassCoordinateUnit curveA curveB q)
+    (hfg : PowerSeriesPrefixEq (n + 1)
+      (PowerSeries.X * f) (PowerSeries.X * g))
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0) :
+    PowerSeriesPrefixEq n
+      (normalizedWeierstrassXUnit q f)
+      (normalizedWeierstrassXUnit q g) := by
+  apply PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv q hfg hf hg
+  rw [hq.constantCoeff]
+  exact one_ne_zero
+
+/-- Multiplying by the fixed source-coordinate unit preserves the checked
+target-coordinate prefix. -/
+theorem WeierstrassCoordinateUnit.normalizedXRatio_prefix
+    {sourceA sourceB targetA targetB : K}
+    {qSource qTarget f g : PowerSeries K} {n : ℕ}
+    (_hqSource : WeierstrassCoordinateUnit sourceA sourceB qSource)
+    (hqTarget : WeierstrassCoordinateUnit targetA targetB qTarget)
+    (hfg : PowerSeriesPrefixEq (n + 1)
+      (PowerSeries.X * f) (PowerSeries.X * g))
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0) :
+    PowerSeriesPrefixEq n
+      (normalizedWeierstrassXRatio qSource qTarget f)
+      (normalizedWeierstrassXRatio qSource qTarget g) := by
+  apply PowerSeriesPrefixEq.mul (PowerSeriesPrefixEq.refl qSource)
+  exact hqTarget.normalizedX_prefix hfg hf hg
+
+/-- A prime strictly above 19 is at least 23. Keeping primality explicit is
+necessary: the numerical inequality alone would admit 20, 21 and 22. -/
+theorem prime_ge_twentyThree {p : ℕ} [Fact p.Prime] (hp : 19 < p) : 23 ≤ p := by
+  have hprime : p.Prime := Fact.out
+  by_contra hnot
+  have hp22 : p ≤ 22 := by omega
+  interval_cases p <;> norm_num at hp hprime
+
+/-- Once the leading local-parameter factor has been removed, a `z^p`
+Frobenius correction begins with `z^(p-1)`. For prime `p>19`, that normalized
+correction is invisible through every degree strictly below 22. This theorem
+formalizes only the precision cutoff; identifying an elliptic Frobenius term
+with this monomial is a separate endpoint obligation. -/
+theorem frobeniusNormalizedCorrection_invisible
+    {p : ℕ} [Fact p.Prime] (hp : 19 < p) :
+    PowerSeriesPrefixEq 22
+      ((PowerSeries.X : PowerSeries (ZMod p)) ^ (p - 1)) 0 := by
+  apply PowerSeriesPrefixEq.mono (m := 22) (n := p - 1)
+  · have hp23 := prime_ge_twentyThree hp
+    omega
+  · exact PowerSeriesPrefixEq.X_pow_eq_zero (p - 1)
+
+/-- In particular, the even `z`-degrees corresponding to `w^0,...,w^10`
+cannot contain the normalized Frobenius correction in the frozen prime range. -/
+theorem frobeniusNormalizedCorrection_even_coeff_zero
+    {p : ℕ} [Fact p.Prime] (hp : 19 < p) (n : ℕ) (hn : n ≤ 10) :
+    PowerSeries.coeff (2 * n)
+      ((PowerSeries.X : PowerSeries (ZMod p)) ^ (p - 1)) = 0 := by
+  rw [PowerSeries.coeff_X_pow]
+  have hp23 := prime_ge_twentyThree hp
+  split_ifs with heq
+  · omega
+  · rfl
 
 /-- Equation (14) after substituting `R(x)=xU(w)`, `w=1/x`, and multiplying
 by `w³`. The factor `W=U-wU'` is the transformed derivative `R'(x)`. -/
@@ -1252,7 +1572,27 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms NormalizedRationalMapSeriesCertificate.to_firstOrder
 #print axioms NormalizedRationalMapPolynomialCertificate.to_firstOrder
 #print axioms PowerSeriesPrefixEq.derivative
+#print axioms PowerSeriesPrefixEq.of_coeff_eq
+#print axioms PowerSeriesPrefixEq.cancel_X
 #print axioms PowerSeriesPrefixEq.cancel_left
+#print axioms PowerSeriesPrefixEq.inv
+#print axioms PowerSeriesPrefixEq.inv_sq
+#print axioms PowerSeriesPrefixEq.X_pow_eq_zero
+#print axioms PowerSeriesPrefixEq.add_X_pow_mul
+#print axioms PowerSeriesPrefixEq.leading_X_inv_sq
+#print axioms PowerSeriesPrefixEq.subst
+#print axioms PowerSeriesPrefixEq.subst_inv
+#print axioms PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv
+#print axioms WeierstrassCoordinateUnit.constantCoeff
+#print axioms WeierstrassCoordinateUnit.clearedCurveIdentity
+#print axioms WeierstrassCoordinateUnit.rescale
+#print axioms powerSeries_subst_scale
+#print axioms WeierstrassCoordinateUnit.rescaled_subst_normalized
+#print axioms WeierstrassCoordinateUnit.normalizedX_prefix
+#print axioms WeierstrassCoordinateUnit.normalizedXRatio_prefix
+#print axioms prime_ge_twentyThree
+#print axioms frobeniusNormalizedCorrection_invisible
+#print axioms frobeniusNormalizedCorrection_even_coeff_zero
 #print axioms NormalizedRationalMapJetCertificate.to_firstOrderPrefix
 #print axioms NormalizedIsogenyFirstOrderPrefix.to_secondOrderPrefix
 #print axioms NormalizedIsogenyFirstOrderPrefix.base_coefficients

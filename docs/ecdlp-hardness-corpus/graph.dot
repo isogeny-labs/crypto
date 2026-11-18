@@ -87,6 +87,9 @@ digraph ecdlp_claims {
     "CLAIM-PA-AMBIENT-BLINDING" [label="CLAIM-PA-AMBIENT-BLINDING\\n'Blinding by any group element preserves a subgroup DLP instance'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "DEF-PKM-CLOSURE-DUAL-CERTIFICATE" [label="DEF-PKM-CLOSURE-DUAL-CERTIFICATE\\nPKM closure-dual lower-bound certificate\\nA_c ell = 0; ell_constant = 1", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
     "DEF-WAGNER-BUCKET-VARIANCE" [label="DEF-WAGNER-BUCKET-VARIANCE\\nRelative Wagner bucket variance W\\nW=sum_c q_c*(pi_c/delta-1)^2", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-IC-YIELD-COUNT-VECTOR" [label="DEF-IC-YIELD-COUNT-VECTOR\\nFixed-population decomposition count vector", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-IC-RANK-SUPPORT-TRACE" [label="DEF-IC-RANK-SUPPORT-TRACE\\nIncremental relation-rank and support trace", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
+    "DEF-IC-KERNEL-USAGE-MODE" [label="DEF-IC-KERNEL-USAGE-MODE\\nSingle-target left-kernel versus reusable right-kernel mode", fillcolor="#e8eef5", color="#334e68", style="rounded,filled"];
   }
   subgraph cluster_bounds {
     label="Rigorous model bounds and structural theorems"; color="#cad5df"; style="rounded";
@@ -647,6 +650,15 @@ digraph ecdlp_claims {
     "GAP-XEDNI-SELECTOR-TERMINATION" [label="GAP-XEDNI-SELECTOR-TERMINATION\\nExplicit terminating xedni lift selector", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-XEDNI-MINIMAL-MODEL-HEIGHT" [label="GAP-XEDNI-MINIMAL-MODEL-HEIGHT\\nSelected-lift height versus global minimal discriminant", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-XEDNI-REDUCTION-CORRESPONDENCE" [label="GAP-XEDNI-REDUCTION-CORRESPONDENCE\\nXedni selected-lift reduction and subgroup correspondence", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-IC-YIELD-SCALING-LAW" [label="GAP-IC-YIELD-SCALING-LAW\\nTarget-wise decomposition-yield scaling law", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-IC-SOLVER-VISIBLE-YIELD" [label="GAP-IC-SOLVER-VISIBLE-YIELD\\nMathematical-to-solver-visible yield bridge", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-IC-TARGET-STRATIFICATION" [label="GAP-IC-TARGET-STRATIFICATION\\nNatural-target and exceptional-stratum law", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-IC-STOPPING-CENSORSHIP" [label="GAP-IC-STOPPING-CENSORSHIP\\nAdaptive stopping and failure-censorship bridge", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-IC-ROW-ENSEMBLE-LAW" [label="GAP-IC-ROW-ENSEMBLE-LAW\\nRelation-row ensemble law", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-IC-SUPPORT-CONNECTIVITY-LAW" [label="GAP-IC-SUPPORT-CONNECTIVITY-LAW\\nRelation-support connectivity law", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-IC-TERMINAL-RANK-LAW" [label="GAP-IC-TERMINAL-RANK-LAW\\nTerminal reusable-rank probability law", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-IC-KERNEL-MODE-SCOPE" [label="GAP-IC-KERNEL-MODE-SCOPE\\nRoute-by-route kernel-mode scope", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-IC-YIELD-RANK-COMPOSITION" [label="GAP-IC-YIELD-RANK-COMPOSITION\\nYield-to-terminal-rank composition", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
   }
   "ASM-CLASSICAL-ECDLP" -> "PROB-ECDLP" [label="defines", color="#66788a", style="solid"];
   "PROB-CDH" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
@@ -1675,4 +1687,36 @@ digraph ecdlp_claims {
   "GAP-XEDNI-MINIMAL-MODEL-HEIGHT" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="conditions", color="#66788a", style="solid"];
   "GAP-XEDNI-REDUCTION-CORRESPONDENCE" -> "OBSTRUCTION-XEDNI-HEIGHT" [label="conditions", color="#66788a", style="solid"];
   "THEOREM-XEDNI-FINITE-CORE" -> "GAP-XEDNI-REDUCTION-CORRESPONDENCE" [label="leaves_open", color="#66788a", style="dashed"];
+  "DEF-IC-YIELD-COUNT-VECTOR" -> "GAP-IC-YIELD-SCALING-LAW" [label="defines", color="#66788a", style="solid"];
+  "DEF-IC-YIELD-COUNT-VECTOR" -> "GAP-IC-TARGET-STRATIFICATION" [label="defines", color="#66788a", style="solid"];
+  "DEF-IC-YIELD-COUNT-VECTOR" -> "GAP-IC-STOPPING-CENSORSHIP" [label="defines", color="#66788a", style="solid"];
+  "DEF-IC-RANK-SUPPORT-TRACE" -> "GAP-IC-ROW-ENSEMBLE-LAW" [label="defines", color="#66788a", style="solid"];
+  "DEF-IC-RANK-SUPPORT-TRACE" -> "GAP-IC-SUPPORT-CONNECTIVITY-LAW" [label="defines", color="#66788a", style="solid"];
+  "DEF-IC-RANK-SUPPORT-TRACE" -> "GAP-IC-TERMINAL-RANK-LAW" [label="defines", color="#66788a", style="solid"];
+  "DEF-IC-KERNEL-USAGE-MODE" -> "GAP-IC-KERNEL-MODE-SCOPE" [label="defines", color="#66788a", style="solid"];
+  "THEOREM-YIELD-CONSERVATION" -> "GAP-IC-YIELD-SCALING-LAW" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-RP-YIELD-SUM-COUNT" -> "GAP-IC-YIELD-SCALING-LAW" [label="qualifies", color="#66788a", style="dashed"];
+  "MEAS-PF-YIELD-CENSUS" -> "GAP-IC-YIELD-SCALING-LAW" [label="measures", color="#66788a", style="solid"];
+  "MEAS-PF-YIELD-CENSUS" -> "GAP-IC-TARGET-STRATIFICATION" [label="qualifies", color="#66788a", style="dashed"];
+  "MEAS-RANK-DEFICIT-CENSUS" -> "GAP-IC-SUPPORT-CONNECTIVITY-LAW" [label="measures", color="#66788a", style="solid"];
+  "MEAS-RANK-DEFICIT-CENSUS" -> "GAP-IC-TERMINAL-RANK-LAW" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-LEFT-KERNEL-RELATIONS" -> "GAP-IC-KERNEL-MODE-SCOPE" [label="qualifies", color="#66788a", style="dashed"];
+  "HEUR-BK-GG-RIGHT-KERNEL-RANK" -> "GAP-IC-KERNEL-MODE-SCOPE" [label="instantiates", color="#66788a", style="solid"];
+  "GAP-IC-YIELD-SCALING-LAW" -> "HEUR-DECOMPOSITION-PROBABILITY" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-SOLVER-VISIBLE-YIELD" -> "HEUR-DECOMPOSITION-PROBABILITY" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-TARGET-STRATIFICATION" -> "HEUR-DECOMPOSITION-PROBABILITY" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-STOPPING-CENSORSHIP" -> "HEUR-DECOMPOSITION-PROBABILITY" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-ROW-ENSEMBLE-LAW" -> "HEUR-RELATION-RANK" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-SUPPORT-CONNECTIVITY-LAW" -> "HEUR-RELATION-RANK" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-TERMINAL-RANK-LAW" -> "HEUR-RELATION-RANK" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-KERNEL-MODE-SCOPE" -> "HEUR-RELATION-RANK" [label="qualifies", color="#66788a", style="dashed"];
+  "GAP-IC-STOPPING-CENSORSHIP" -> "HEUR-RELATION-RANK" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-YIELD-SCALING-LAW" -> "GAP-IC-YIELD-RANK-COMPOSITION" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-SOLVER-VISIBLE-YIELD" -> "GAP-IC-YIELD-RANK-COMPOSITION" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-ROW-ENSEMBLE-LAW" -> "GAP-IC-YIELD-RANK-COMPOSITION" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-SUPPORT-CONNECTIVITY-LAW" -> "GAP-IC-YIELD-RANK-COMPOSITION" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-TERMINAL-RANK-LAW" -> "GAP-IC-YIELD-RANK-COMPOSITION" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-KERNEL-MODE-SCOPE" -> "GAP-IC-YIELD-RANK-COMPOSITION" [label="conditions", color="#66788a", style="solid"];
+  "GAP-IC-YIELD-RANK-COMPOSITION" -> "GAP-PRIME-YIELD-RANK-POPULATION" [label="instantiates", color="#66788a", style="solid"];
+  "GAP-IC-YIELD-RANK-COMPOSITION" -> "GAP-END-TO-END-IC-EXPONENT" [label="conditions", color="#66788a", style="solid"];
 }
