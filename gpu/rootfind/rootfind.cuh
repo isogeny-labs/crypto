@@ -533,12 +533,19 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
         }
     }
     RF_PROF_STEP(0);
-    /* Montgomery's trick: prefix products, one inversion, unwind. */
-    /* CHUNK >= 8.  Eliminate first 1*d[0] and final two 1*inv_acc
-     * products.  The inverse vector is bit-identical in Montgomery form. */
+    /* Montgomery's trick: prefix products, one inversion, unwind.
+     * CHUNK >= 8. Host tail chunks that are <= half full omit padding
+     * multiplies entirely. Full/near-full chunks retain the original
+     * fixed length (fewer loop-control penalties); CUDA is unchanged
+     * for uniform unrolling and warp scheduling.  cnt >= 1 for valid tid. */
+#ifdef __CUDA_ARCH__
+    const int inv_len = CHUNK;
+#else
+    const int inv_len = cnt <= (uint32_t)(CHUNK / 2) ? (int)cnt : CHUNK;
+#endif
     elt acc = d[0];
 #pragma unroll
-    for (int w = 1; w < CHUNK; w++) {
+    for (int w = 1; w < inv_len; w++) {
         pre[w] = acc;
         acc = F::mul(f, acc, d[w]);
     }
@@ -546,7 +553,7 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
     elt inv_acc = F::inv(f, acc);
     RF_PROF_STEP(2);
 #pragma unroll
-    for (int w = CHUNK - 1; w > 0; w--) {
+    for (int w = inv_len - 1; w > 0; w--) {
         elt dw = d[w];
         d[w] = F::mul(f, inv_acc, pre[w]);
         inv_acc = F::mul(f, inv_acc, dw);
