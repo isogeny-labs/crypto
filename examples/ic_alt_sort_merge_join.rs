@@ -46,15 +46,15 @@ impl Ec {
             (Some(p), Some(q)) => (p, q),
         };
         self.ops += 1;
-        let l;
-        if p.0 == q.0 {
+
+        let l = if p.0 == q.0 {
             if (p.1 + q.1) % P == 0 {
                 return None;
             }
-            l = (3 * p.0 % P * p.0 + A) % P * inv(2 * p.1 % P) % P;
+            (3 * p.0 % P * p.0 + A) % P * inv(2 * p.1 % P) % P
         } else {
-            l = (q.1 + P - p.1) % P * inv((q.0 + P - p.0) % P) % P;
-        }
+            (q.1 + P - p.1) % P * inv((q.0 + P - p.0) % P) % P
+        };
         let x = (l * l % P + 2 * P - p.0 - q.0) % P;
         let y = (l * ((p.0 + P - x) % P) % P + P - p.1) % P;
         Some((x, y))
@@ -435,11 +435,13 @@ fn batch_arm(t: &Table, n: usize, seed: u64, kq: u64, bs: usize, gallop: bool) -
     }
 }
 
-fn median(v: &mut Vec<f64>) -> f64 {
+fn median(v: &mut [f64]) -> f64 {
     v.sort_by(|a, b| a.partial_cmp(b).unwrap());
     v[v.len() / 2]
 }
 
+// The on-curve check is a guard on the hard-coded constants.
+#[allow(clippy::assertions_on_constants)]
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let n: usize = args.get(1).map(|s| s.parse().unwrap()).unwrap_or(48550);
