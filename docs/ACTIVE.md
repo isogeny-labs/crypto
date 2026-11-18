@@ -14,7 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Genus-4 follow-up: more p = 16411 targets for arm x with matched plain rho, Ferrari inside the sieve, validator replay for the leaderboard (Claude, started 2026-11-18, branch claude/hyperelliptic-index-calculus-td1fdn)
+- [x] Genus-4 follow-up: more p = 16411 targets for arm x with matched plain rho, Ferrari inside the sieve (not applicable; factor-base balance instead), validator replay for the leaderboard (Claude, completed 2026-11-18, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4693; validated)
+- [ ] Genus-4 arm x on more prime-order (h = 1) Jacobians at p = 16411 against ideal negation and plain rho: the pooled result rests on one h = 1 curve (validator F7). Also regenerate the IC leaderboard outputs once store inputs can be pulled (new section is in the builder)
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
