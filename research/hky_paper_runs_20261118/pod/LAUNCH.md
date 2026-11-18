@@ -47,3 +47,11 @@ the run; a failed checkpoint is recorded and the closure continues (450d5b295b).
   `ENGINE_FLAGS=--hky3-skip on --hky3-skip-witness leads`, EXPORT=0, VERIFY=0, job J4s-unit-p786433-a1-s10-k16-D6.
   Prediction (written before data, PREDICTIONS.md): 230,000 s (100k-950k), 160 GB, ~US$112 central.
   No working in-pod cap: hard-stop reminder set.
+- 17:22 UTC: **J1 lift done** (Rust `hky_lift` 6824a8bd..., 32 threads, on the J1 basis 06fdd4e4...): `pod_k14.sh`
+  verify exit 0 against the recorded lift `lift-unit-p65537-k14-D6to7.json` — k, D, p, dim V_6 = 448,922,
+  1 in V_7 (contains_one true), fixed point, dim V_7 = 1,683,218, profile, dim F = 50,256 and
+  dim(V_7 ∩ M_<=6) = 499,178 all **equal**; regular-top count 1,166,824 vs 1,173,002 is informational (a different
+  notion: orbit count summed over parts). Input checks: 4 generators in V_6, 84 shifted random combinations stay in V_6.
+  madds 5.60e14; peak RSS 234,285 MB (close to the 250 GB job limit); about 3.7 h. The end-of-run fall re-check
+  reports 0 rows checked (1 is already in V_7). Records in `results/J1/lift/`.
+- 18:15 UTC: J1 pod `j5ym8cqln1m237` terminated (GET 404). Spend about 12.1 h x US$1.76 = about US$21.
