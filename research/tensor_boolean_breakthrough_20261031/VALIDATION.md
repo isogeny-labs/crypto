@@ -505,3 +505,38 @@ PCC-20261118-06e657  semantic-premise countermodel
 
 No performance run, ECDLP solve, benchmark record, progress point, or
 leaderboard change was produced.
+
+## 2026-11-18 fixed-arity universal-scheduler follow-up
+
+The instance-gate assembly probe type-checked before the module edit. The final
+pinned project build completed successfully with 2,153 jobs. The repository
+proof gate reported:
+
+```text
+PASS 22 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+The focused source scan found no `sorry`, `admit`, `sorryAx`, custom `axiom`,
+or `native_decide`. Explicit axiom output is:
+
+```text
+polynomialUniversalSchedulerIsSubexponential: [propext]
+geometricSchedulerTailBound: [propext, Classical.choice, Quot.sound]
+```
+
+The independent command `lake env leanchecker --fresh TensorBoundaryBounds`
+exited 0. The first invocation from the repository root failed because that
+directory has no pinned Lake toolchain; the recorded successful command ran
+from `research/tensor_boolean_breakthrough_20261031/lean`.
+
+Two theorem claims pass the local PCC Lean verifier and retain unverified
+signed standing:
+
+```text
+PCC-20261118-546652  polynomial universal-scheduler asymptotic endpoint
+PCC-20261118-ed2042  exact geometric scheduler-tail sum
+```
+
+[pcc:unverified] Two earlier append-only claim attempts omitted the required
+declaration hashes (`PCC-20261118-d64e6f` and `PCC-20261118-5c631f`); their
+local verifiers fail closed and they are not cited as evidence.

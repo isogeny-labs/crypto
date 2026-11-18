@@ -187,3 +187,65 @@ semantic rank <= solution count and average solution count <= 2
 The first arrow needs an ECDLP-wide solver-to-work bridge.  The second arrow is
 refuted by the explicit countermodel; it is not a proof that a real
 subexponential ECDLP solver exists.
+
+## Universal scheduling of fixed-arity candidates
+
+1. **Structure above.** Natural-valued expected-work bounds indexed by input
+   bit length, a countable family of candidate bounds, and the existing
+   `IsSubexponentialBinaryWork` predicate.  The scheduler interface is a
+   polynomial-simulation inequality: for every fixed candidate there is a
+   constant overhead such that the universal expected-work bound is no larger
+   than that overhead times a fixed power of the candidate bound.  A separate
+   real-valued geometric-series statement represents the capped-repetition
+   tail calculation.
+2. **Theorem used as stated.** `Nat.pow_le_pow_left` transfers pointwise work
+   domination through the rational-rate test.  Mathlib's geometric-series
+   theorem supplies the finite or summable tail bound; no ECDLP algebra or
+   probability theorem is re-derived in the study.
+3. **Object as an instance.** The candidate family is the family of fixed-arity
+   ECDLP work bounds.  The universal object is a verified dovetailing machine
+   over all finite program descriptions.  The Lean endpoint does not assume a
+   computable selector from arities to programs: the supplied simulation bound
+   may be instantiated by any candidate program that occurs in the universal
+   enumeration.
+4. **Assembly probe.** Assume that, at every positive rational rate, one
+   candidate and its polynomial-simulation overhead meet the corresponding
+   eventual bound.  Rewrite the universal work through the supplied domination,
+   raise both sides to the denominator power, and apply that candidate's bound.
+   Separately, if each post-threshold stage is reached with probability at most
+   `q^j` and costs at most a factor `B^j`, sum the geometric majorant with ratio
+   `q*B < 1`.
+5. **Missing components only.** Predicates for polynomial universal simulation
+   and a vanishing-rate candidate family; their generic subexponential endpoint;
+   and the geometric scheduler-tail lemma.  Still missing are the actual
+   probabilistic-machine semantics, a checked universal-interpreter overhead,
+   and an end-to-end theorem instantiating candidates with the paper's coverage,
+   relation, planted-diagonal and recovery algorithms.
+6. **Inheritance table.** Eventual rational-rate test:
+   `IsSubexponentialBinaryWork`; power monotonicity: `Nat.pow_le_pow_left`;
+   candidate choice: supplied family hypothesis; description enumeration and
+   output verification: external machine-model obligations; scheduler tail:
+   Mathlib geometric series over `ℝ`.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `HasPolynomialUniversalSimulationBound` | definition | `TensorBoundaryBounds` | universal and candidate natural work bounds | fixed simulation degree and per-candidate overhead |
+| `HasVanishingRateCandidateFamily` | definition | same | candidate work family and simulation degree | eventual bound at every positive rational rate |
+| `polynomialUniversalSchedulerIsSubexponential` | endpoint | same; upstream candidate for `crypto-lean` | universal and candidate work bounds | the two preceding interfaces |
+| `geometricSchedulerTailBound` | law | same; upstream candidate for `crypto-lean` | nonnegative real stage ratio and scale | geometric ratio below one |
+
+The proof chain for the asymptotic endpoint is:
+
+```text
+universal(n)
+  <= overhead(m) * candidate(m,n)^degree             simulation interface
+
+universal(n)^b
+  <= (overhead(m) * candidate(m,n)^degree)^b         power monotonicity
+  < 2^(a*n)                                           vanishing-rate family
+```
+
+The fixed-arity paper bound `p^(2/m+o(1))` would make the family premise true
+for every fixed simulator degree by choosing `m` after the requested rational
+rate.  That specialization is not claimed as Lean-verified until the
+paper-to-machine cost bridge is supplied.

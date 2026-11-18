@@ -1,4 +1,5 @@
 import Mathlib.LinearAlgebra.Matrix.Rank
+import Mathlib.Analysis.SpecificLimits.Basic
 
 /-!
 # Exact separator-message bounds
@@ -296,5 +297,56 @@ theorem semanticRankPremisesDoNotEstablishNoSubexponentialECDLPGoal :
     (by intro seed; exact le_rfl) (by simp)
   have solves : solvesOne oneWork := rfl
   exact (rulesOut oneWork solves) constantOneWorkIsSubexponential
+
+/-! ## Universal scheduling of fixed-arity candidates
+
+These interfaces separate the generic diagonal argument from the missing
+probabilistic machine model.  A universal verified scheduler may enumerate all
+finite program descriptions; it need not compute a preferred program from an
+arity.  The first interface records only the resulting polynomial simulation
+bound for each candidate work function.
+-/
+
+/-- A universal expected-work bound polynomially simulates every fixed
+candidate, with a constant overhead that may depend on that candidate. -/
+def HasPolynomialUniversalSimulationBound
+    (universal : ℕ → ℕ) (candidate : ℕ → ℕ → ℕ) (degree : ℕ) : Prop :=
+  0 < degree ∧ ∀ m, ∃ overhead : ℕ, 0 < overhead ∧
+    ∀ n, universal n ≤ overhead * candidate m n ^ degree
+
+/-- After the fixed simulation degree is charged, candidates achieve every
+positive rational exponential rate.  The chosen candidate may depend on the
+rate; its eventual bound absorbs every fixed positive description overhead. -/
+def HasVanishingRateCandidateFamily
+    (candidate : ℕ → ℕ → ℕ) (degree : ℕ) : Prop :=
+  ∀ a b : ℕ, 0 < a → 0 < b →
+    ∃ m : ℕ, ∀ overhead : ℕ, 0 < overhead →
+      ∃ N : ℕ, ∀ n : ℕ, N ≤ n →
+        (overhead * candidate m n ^ degree) ^ b < 2 ^ (a * n)
+
+/-- Polynomial universal simulation of a vanishing-rate candidate family gives
+one subexponential work bound.  This is the generic diagonal endpoint; applying
+it to ECDLP still requires machine semantics, verified output checking and the
+paper-to-work bridge for each fixed-arity candidate. -/
+theorem polynomialUniversalSchedulerIsSubexponential
+    (universal : ℕ → ℕ) (candidate : ℕ → ℕ → ℕ) (degree : ℕ)
+    (simulation : HasPolynomialUniversalSimulationBound universal candidate degree)
+    (vanishing : HasVanishingRateCandidateFamily candidate degree) :
+    IsSubexponentialBinaryWork universal := by
+  intro a b ha hb
+  obtain ⟨m, hm⟩ := vanishing a b ha hb
+  obtain ⟨overhead, overheadPositive, hsimulation⟩ := simulation.2 m
+  obtain ⟨N, hcandidate⟩ := hm overhead overheadPositive
+  refine ⟨N, fun n hn => ?_⟩
+  exact (Nat.pow_le_pow_left (hsimulation n) b).trans_lt (hcandidate n hn)
+
+/-- The exact geometric tail used after capped independent repetitions.  If
+stage reach probability contributes `q^j` and stage cost contributes `B^j`,
+their product has ratio `q*B`; this theorem applies with `ratio = q*B`. -/
+theorem geometricSchedulerTailBound
+    (scale ratio : ℝ) (ratioNonnegative : 0 ≤ ratio) (ratioLtOne : ratio < 1) :
+    HasSum (fun stage : ℕ => scale * ratio ^ stage) (scale / (1 - ratio)) := by
+  simpa [div_eq_mul_inv] using
+    (hasSum_geometric_of_lt_one ratioNonnegative ratioLtOne).mul_left scale
 
 end TensorBoundaryBounds
