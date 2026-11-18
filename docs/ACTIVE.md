@@ -14,6 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [ ] Exact universal formal-collision quotient for weighted Prime31 M6; bound gains from weight retuning (automation, started 2026-11-18, branch automation/prime31-m6-throughput-ceiling-20261118, PR #4722)
 - [x] Prime31 M6 exact uniform-query throughput ceiling and non-generic cost-gate audit (automation, completed 2026-11-18, branch automation/prime31-m6-throughput-ceiling-20261118, PR #4722; pinned Rust 40+2 tests and separate Python exact replay PASS, signed PCC pending)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
