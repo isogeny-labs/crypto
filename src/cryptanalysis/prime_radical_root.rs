@@ -274,6 +274,18 @@ impl Ring for Fq2 {
     // When lo==hi, x^e = Norm(x)^lo lives entirely in Fp.
     // Public-input, variable-time arithmetic only.
     fn pow(&self, x: (u64, u64), e: u128) -> (u64, u64) {
+        // Sparse extension-field elements admit base-field exponentiation.
+        // This path is variable-time and only for public root-finding inputs.
+        let f = &self.f;
+        if x.1 == 0 && x.0 != 0 && x.0 < f.p {
+            return (f.powm(x.0, (e % (f.p - 1) as u128) as u64), 0);
+        }
+        if x.0 == 0 && x.1 != 0 && x.1 < f.p {
+            let squared = self.mul_nonresidue(f.sqr(x.1));
+            let power = f.powm(squared, ((e >> 1) % (f.p - 1) as u128) as u64);
+            return if e & 1 == 0 { (power, 0) }
+                   else { (0, f.mul(x.1, power)) };
+        }
         let p = self.f.p as u128;
         if e < p || e >= self.order() || x == (0, 0)
             || x.0 >= self.f.p || x.1 >= self.f.p
@@ -1068,6 +1080,19 @@ impl RadicalRootCtx {
             roots.dedup();
             return Ok((roots, false));
         }
+        // Factor out x before monic normalization for exact-zero constants.
+        if e == 0 {
+            let mut roots = if a == 1 {
+                self.cubic_monic(b, c, d)
+            } else {
+                let ia = f.inv(a);
+                self.cubic_monic(f.mul(b, ia), f.mul(c, ia), f.mul(d, ia))
+            };
+            roots.push(0);
+            roots.sort_unstable();
+            roots.dedup();
+            return Ok((roots, false));
+        }
         // monic
         let (b1, c1, d1, e1) = if a == 1 {
             (b, c, d, e)
@@ -1085,7 +1110,13 @@ impl RadicalRootCtx {
             return Ok((roots, false));
         }
         // x = y - B, B = b1/4
-        let (bb, pp, qq, rr) = self.quartic_depressed_coeffs(b1, c1, d1, e1);
+        // A zero cubic coefficient means the quartic is already depressed.
+        // Bypass seven or more field operations while retaining the dense path.
+        let (bb, pp, qq, rr) = if b1 == 0 {
+            (0, c1, d1, e1)
+        } else {
+            self.quartic_depressed_coeffs(b1, c1, d1, e1)
+        };
         let mut ys: Vec<u64> = vec![];
         let mut fallback = false;
         if qq == 0 {
