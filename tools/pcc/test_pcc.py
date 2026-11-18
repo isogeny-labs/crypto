@@ -62,6 +62,15 @@ class Ed25519Tests(unittest.TestCase):
         self.assertEqual(theirs.sign(msg), pcc.ed25519_sign(secret, msg))
 
 
+class PrimalityTests(unittest.TestCase):
+    def test_thirteenth_prime_base_rejects_psi_12(self):
+        # psi_12 passes the first twelve prime bases through 37, but base 41
+        # rejects it. It is below psi_13 and therefore guards the exact base
+        # set used with the deterministic cutoff.
+        psi_12 = 318_665_857_834_031_151_167_461
+        self.assertFalse(pcc.is_probable_prime(psi_12))
+
+
 class CanaryTests(unittest.TestCase):
     def test_every_sabotage_class_is_rejected(self):
         out = io.StringIO()

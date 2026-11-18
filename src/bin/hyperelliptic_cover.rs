@@ -24,7 +24,7 @@ use crypto_lib::prime_hyperelliptic::{
     PrimeQuadraticCoverP, PrimeSubgroupTransferStatus, SplitHyperellipticCurveP,
 };
 use num_bigint::BigUint;
-use num_traits::{ToPrimitive, Zero};
+use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
@@ -37,6 +37,7 @@ const RESPONSE_SCHEMA: &str = "hyperelliptic-infrastructure-command/v1";
 const ARITHMETIC_SCHEMA: &str = "hyperelliptic-jacobian-operation/v1";
 const TRANSFER_SCHEMA: &str = "hyperelliptic-transfer-operation/v1";
 const TRANSFER_CATALOG_SCHEMA: &str = "binary-subgroup-transfer-certificates/v1";
+const TRANSFER_CATALOG_VERIFY_SCHEMA: &str = "binary-subgroup-transfer-catalog-verification/v1";
 const MAX_INPUT_BYTES: u64 = 32 * 1024 * 1024;
 const MAX_CATALOG_INPUT_BYTES: u64 = 96 * 1024 * 1024;
 
@@ -116,6 +117,30 @@ enum Command {
         #[arg(long)]
         rustc_version: String,
         /// Certificate-corpus path; omit to write the complete corpus to stdout.
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
+    /// Regenerate and byte-for-byte replay a named binary subgroup corpus.
+    TransferCatalogVerify {
+        /// Exact certificate corpus emitted by `transfer-catalog-export`.
+        #[arg(long)]
+        input: PathBuf,
+        /// Exact EC1/ICV1 registry JSON used by the corpus.
+        #[arg(long)]
+        registry: PathBuf,
+        /// Exact curve-cover graph JSON used by the corpus.
+        #[arg(long)]
+        cover_graph: PathBuf,
+        /// Exact curve-traits JSON used by the corpus.
+        #[arg(long)]
+        traits: PathBuf,
+        /// Optional SHA-256 of the exact raw corpus bytes.
+        #[arg(long)]
+        expected_sha256: Option<String>,
+        /// Optional raw byte length. Must accompany `--expected-sha256`.
+        #[arg(long)]
+        expected_bytes: Option<u64>,
+        /// Verification response path; omit to write it to stdout.
         #[arg(long)]
         output: Option<PathBuf>,
     },
@@ -276,23 +301,76 @@ fn catalog_producer_source_digest() -> String {
     checker::digest(producer_sources.as_bytes())
 }
 
+fn framed_source_digest(sources: &[(&str, &str)]) -> String {
+    let mut framed = Vec::new();
+    for (path, contents) in sources {
+        framed.extend_from_slice(&(path.len() as u64).to_be_bytes());
+        framed.extend_from_slice(path.as_bytes());
+        framed.extend_from_slice(&(contents.len() as u64).to_be_bytes());
+        framed.extend_from_slice(contents.as_bytes());
+    }
+    checker::digest(&framed)
+}
+
 fn transfer_catalog_producer_source_digest() -> String {
-    let producer_sources = [
-        include_str!("curve_cover_check/checker.rs"),
-        include_str!("curve_cover_check/links.rs"),
-        include_str!("curve_cover_check/models.rs"),
-        include_str!("hyperelliptic_cover.rs"),
-        include_str!("../binary_ecc/cover_transfer.rs"),
-        include_str!("../binary_ecc/curve.rs"),
-        include_str!("../binary_ecc/f2m.rs"),
-        include_str!("../binary_ecc/hyperelliptic.rs"),
-        include_str!("../binary_ecc/poly_f2m.rs"),
-        include_str!("../../docs/curves/binary-subgroup-transfer-certificates.schema.json"),
-        include_str!("../../Cargo.toml"),
-        include_str!("../../Cargo.lock"),
-    ]
-    .concat();
-    checker::digest(producer_sources.as_bytes())
+    framed_source_digest(&[
+        (
+            "src/bin/curve_cover_check/checker.rs",
+            include_str!("curve_cover_check/checker.rs"),
+        ),
+        (
+            "src/bin/curve_cover_check/links.rs",
+            include_str!("curve_cover_check/links.rs"),
+        ),
+        (
+            "src/bin/curve_cover_check/models.rs",
+            include_str!("curve_cover_check/models.rs"),
+        ),
+        (
+            "src/bin/hyperelliptic_cover.rs",
+            include_str!("hyperelliptic_cover.rs"),
+        ),
+        (
+            "src/binary_ecc/cover_transfer.rs",
+            include_str!("../binary_ecc/cover_transfer.rs"),
+        ),
+        (
+            "src/binary_ecc/curve.rs",
+            include_str!("../binary_ecc/curve.rs"),
+        ),
+        (
+            "src/binary_ecc/f2m.rs",
+            include_str!("../binary_ecc/f2m.rs"),
+        ),
+        (
+            "src/binary_ecc/hyperelliptic.rs",
+            include_str!("../binary_ecc/hyperelliptic.rs"),
+        ),
+        (
+            "src/binary_ecc/operation_tally.rs",
+            include_str!("../binary_ecc/operation_tally.rs"),
+        ),
+        (
+            "src/binary_ecc/poly_f2m.rs",
+            include_str!("../binary_ecc/poly_f2m.rs"),
+        ),
+        (
+            "src/cryptanalysis/ecc2k130_guard.rs",
+            include_str!("../cryptanalysis/ecc2k130_guard.rs"),
+        ),
+        (
+            "src/cryptanalysis/group_op_count.rs",
+            include_str!("../cryptanalysis/group_op_count.rs"),
+        ),
+        ("src/hash/sha256.rs", include_str!("../hash/sha256.rs")),
+        ("src/utils/mod.rs", include_str!("../utils/mod.rs")),
+        (
+            "docs/curves/binary-subgroup-transfer-certificates.schema.json",
+            include_str!("../../docs/curves/binary-subgroup-transfer-certificates.schema.json"),
+        ),
+        ("Cargo.toml", include_str!("../../Cargo.toml")),
+        ("Cargo.lock", include_str!("../../Cargo.lock")),
+    ])
 }
 
 fn model_error(command: &str, error: checker::ModelError) -> (Value, i32) {
@@ -1996,19 +2074,56 @@ fn affine_certificate_point(point: &BinaryPoint) -> Result<Value, String> {
     }
 }
 
-fn small_prime_by_trial_division(n: u64) -> bool {
-    if n < 2 {
+fn proved_prime_below_miller_rabin_bound(n: &BigUint) -> bool {
+    // Sorenson--Webster (2015), psi_13: strong probable-prime tests to the
+    // first thirteen prime bases prove primality below this strict bound.
+    // We retain the repository's slightly stronger first sixteen prime bases
+    // through 53 so this producer can replay the proof without trusting
+    // `traits.json`.
+    let bound = BigUint::parse_bytes(b"3317044064679887385961981", 10)
+        .expect("static Miller-Rabin proof bound");
+    if n >= &bound || n < &BigUint::from(2u32) {
         return false;
     }
-    if n.is_multiple_of(2) {
-        return n == 2;
-    }
-    let mut divisor = 3u64;
-    while divisor <= n / divisor {
-        if n.is_multiple_of(divisor) {
+    const BASES: [u32; 16] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53];
+    for base in BASES {
+        let base = BigUint::from(base);
+        if n == &base {
+            return true;
+        }
+        if (n % &base).is_zero() {
             return false;
         }
-        divisor += 2;
+    }
+
+    let one = BigUint::from(1u32);
+    let n_minus_one = n - &one;
+    let mut odd_part = n_minus_one.clone();
+    let mut twos = 0u32;
+    while !odd_part.bit(0) {
+        odd_part >>= 1usize;
+        twos += 1;
+    }
+    for base in BASES {
+        let base = BigUint::from(base);
+        if &base >= n {
+            continue;
+        }
+        let mut residue = base.modpow(&odd_part, n);
+        if residue == one || residue == n_minus_one {
+            continue;
+        }
+        let mut witness = true;
+        for _ in 1..twos {
+            residue = (&residue * &residue) % n;
+            if residue == n_minus_one {
+                witness = false;
+                break;
+            }
+        }
+        if witness {
+            return false;
+        }
     }
     true
 }
@@ -2021,18 +2136,15 @@ fn unknown_exact_order_evidence() -> Value {
 }
 
 fn exact_order_evidence(annihilator: &BigUint) -> Value {
-    // The seven current binary bindings absent from the older traits snapshot
-    // have annihilators below 2^27.  Bounded trial division is deterministic
-    // there; nonidentity plus [r]G=O then proves exact order r when r is prime.
-    if let Some(value) = annihilator.to_u64().filter(|value| *value <= 100_000_000) {
-        if small_prime_by_trial_division(value) {
-            let reference =
-                "src/bin/hyperelliptic_cover.rs#small_prime_by_trial_division_and_named_generator_checks";
-            return json!({
-                "annihilator_primality": {"status": "proved", "evidence_ref": reference},
-                "generated_subgroup_cardinality": {"status": "proved", "evidence_ref": reference},
-            });
-        }
+    // A proved-prime annihilator, a checked nonidentity generator, and
+    // [r]G=O establish ord(G)=r. This narrow statement does not assert the
+    // ambient curve order.
+    if proved_prime_below_miller_rabin_bound(annihilator) {
+        let reference = "Sorenson-Webster-Theorem-1.1-psi13;strong-Miller-Rabin-first-16-prime-bases-through-53;exclusive-bound-3317044064679887385961981;src/bin/hyperelliptic_cover.rs#proved_prime_below_miller_rabin_bound_and_named_generator_checks";
+        return json!({
+            "annihilator_primality": {"status": "proved", "evidence_ref": reference},
+            "generated_subgroup_cardinality": {"status": "proved", "evidence_ref": reference},
+        });
     }
 
     unknown_exact_order_evidence()
@@ -2395,6 +2507,113 @@ fn binary_transfer_catalog(
     ))
 }
 
+fn pretty_json_bytes(value: &Value) -> Result<Vec<u8>, String> {
+    let mut bytes = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
+    bytes.push(b'\n');
+    Ok(bytes)
+}
+
+fn require_exact_catalog_bytes(input: &[u8], expected: &Value) -> Result<(), String> {
+    if input != pretty_json_bytes(expected)? {
+        return Err(
+            "certificate corpus is not the exact canonical byte serialization regenerated from the supplied inputs"
+                .into(),
+        );
+    }
+    Ok(())
+}
+
+fn verify_binary_transfer_catalog(
+    corpus_bytes: &[u8],
+    registry_bytes: &[u8],
+    graph_bytes: &[u8],
+    traits_bytes: &[u8],
+    expected_sha256: Option<&str>,
+    expected_bytes: Option<u64>,
+) -> Result<(Value, bool), String> {
+    if expected_sha256.is_some() != expected_bytes.is_some() {
+        return Err("expected_sha256 and expected_bytes must be supplied together".into());
+    }
+    let corpus_sha256 = checker::digest(corpus_bytes);
+    if let Some(expected) = expected_sha256 {
+        if expected.len() != 64
+            || !expected
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        {
+            return Err("expected_sha256 must be exactly 64 lowercase hexadecimal digits".into());
+        }
+        if expected != corpus_sha256 {
+            return Err(format!(
+                "raw certificate corpus SHA-256 mismatch: expected {expected}, got {corpus_sha256}"
+            ));
+        }
+        let actual_bytes = corpus_bytes.len() as u64;
+        if expected_bytes != Some(actual_bytes) {
+            return Err(format!(
+                "raw certificate corpus byte-length mismatch: expected {}, got {actual_bytes}",
+                expected_bytes.expect("paired option checked")
+            ));
+        }
+    }
+
+    let saved: Value = serde_json::from_slice(corpus_bytes)
+        .map_err(|error| format!("parse certificate corpus: {error}"))?;
+    if saved["schema_version"] != TRANSFER_CATALOG_SCHEMA {
+        return Err("unsupported certificate corpus schema".into());
+    }
+    let producer_commit = saved["producer"]["git_commit"]
+        .as_str()
+        .ok_or_else(|| "certificate corpus producer lacks git_commit".to_string())?;
+    let rustc_version = saved["producer"]["rustc_version"]
+        .as_str()
+        .ok_or_else(|| "certificate corpus producer lacks rustc_version".to_string())?;
+    let (regenerated, complete) = binary_transfer_catalog(
+        registry_bytes,
+        graph_bytes,
+        traits_bytes,
+        producer_commit,
+        rustc_version,
+    )?;
+    require_exact_catalog_bytes(corpus_bytes, &regenerated)?;
+
+    Ok((
+        json!({
+            "schema_version": TRANSFER_CATALOG_VERIFY_SCHEMA,
+            "status": if complete { "verified_complete" } else { "verified_incomplete" },
+            "corpus": {
+                "sha256": corpus_sha256,
+                "bytes": corpus_bytes.len(),
+                "schema_version": TRANSFER_CATALOG_SCHEMA,
+                "canonical_pretty_json_with_trailing_newline": true,
+            },
+            "producer": {
+                "git_commit": producer_commit,
+                "rustc_version": rustc_version,
+                "source_sha256": transfer_catalog_producer_source_digest(),
+                "attestation": "caller_supplied_unverified",
+            },
+            "inputs": {
+                "registry_sha256": checker::digest(registry_bytes),
+                "cover_graph_sha256": checker::digest(graph_bytes),
+                "traits_sha256": checker::digest(traits_bytes),
+            },
+            "checks": {
+                "optional_raw_hash_and_size": expected_sha256.is_some(),
+                "schema_and_metadata_reparsed": true,
+                "cover_graph_rebuilt_exactly": true,
+                "all_maps_and_named_generators_replayed": true,
+                "complete_value_regenerated": true,
+                "canonical_bytes_equal": true,
+                "all_records_supported": complete,
+            },
+            "summary": regenerated["summary"],
+            "claim_boundary": "exact corpus replay establishes the recorded construction, map, and named-generated-subgroup checks; it does not establish exact orders marked unknown, a Jacobian solver, or a DLP advantage",
+        }),
+        complete,
+    ))
+}
+
 fn execute(command: Command) -> (Value, i32, Option<PathBuf>) {
     match command {
         Command::Construct { input, output } => match parse_json(&input) {
@@ -2509,6 +2728,55 @@ fn execute(command: Command) -> (Value, i32, Option<PathBuf>) {
                 Err(reason) => (
                     response(
                         "transfer_catalog_export",
+                        "invalid_input",
+                        json!({"reason": reason}),
+                    ),
+                    3,
+                    output,
+                ),
+            }
+        }
+        Command::TransferCatalogVerify {
+            input,
+            registry,
+            cover_graph,
+            traits,
+            expected_sha256,
+            expected_bytes,
+            output,
+        } => {
+            let verified = read_bytes_with_limit(&input, MAX_CATALOG_INPUT_BYTES)
+                .and_then(|corpus_bytes| {
+                    read_bytes(&registry).map(|registry_bytes| (corpus_bytes, registry_bytes))
+                })
+                .and_then(|(corpus_bytes, registry_bytes)| {
+                    read_bytes_with_limit(&cover_graph, MAX_CATALOG_INPUT_BYTES)
+                        .map(|graph_bytes| (corpus_bytes, registry_bytes, graph_bytes))
+                })
+                .and_then(|(corpus_bytes, registry_bytes, graph_bytes)| {
+                    read_bytes(&traits).map(|traits_bytes| {
+                        (corpus_bytes, registry_bytes, graph_bytes, traits_bytes)
+                    })
+                })
+                .and_then(
+                    |(corpus_bytes, registry_bytes, graph_bytes, traits_bytes)| {
+                        verify_binary_transfer_catalog(
+                            &corpus_bytes,
+                            &registry_bytes,
+                            &graph_bytes,
+                            &traits_bytes,
+                            expected_sha256.as_deref(),
+                            expected_bytes,
+                        )
+                    },
+                );
+            match verified {
+                Ok((verification, complete)) => {
+                    (verification, if complete { 0 } else { 1 }, output)
+                }
+                Err(reason) => (
+                    response(
+                        "transfer_catalog_verify",
                         "invalid_input",
                         json!({"reason": reason}),
                     ),
@@ -2661,24 +2929,64 @@ mod tests {
 
     #[test]
     fn transfer_catalog_digest_covers_semantics_schema_and_build_pins() {
-        let expected = checker::digest(
-            [
+        let expected = framed_source_digest(&[
+            (
+                "src/bin/curve_cover_check/checker.rs",
                 include_str!("curve_cover_check/checker.rs"),
+            ),
+            (
+                "src/bin/curve_cover_check/links.rs",
                 include_str!("curve_cover_check/links.rs"),
+            ),
+            (
+                "src/bin/curve_cover_check/models.rs",
                 include_str!("curve_cover_check/models.rs"),
+            ),
+            (
+                "src/bin/hyperelliptic_cover.rs",
                 include_str!("hyperelliptic_cover.rs"),
+            ),
+            (
+                "src/binary_ecc/cover_transfer.rs",
                 include_str!("../binary_ecc/cover_transfer.rs"),
+            ),
+            (
+                "src/binary_ecc/curve.rs",
                 include_str!("../binary_ecc/curve.rs"),
+            ),
+            (
+                "src/binary_ecc/f2m.rs",
                 include_str!("../binary_ecc/f2m.rs"),
+            ),
+            (
+                "src/binary_ecc/hyperelliptic.rs",
                 include_str!("../binary_ecc/hyperelliptic.rs"),
+            ),
+            (
+                "src/binary_ecc/operation_tally.rs",
+                include_str!("../binary_ecc/operation_tally.rs"),
+            ),
+            (
+                "src/binary_ecc/poly_f2m.rs",
                 include_str!("../binary_ecc/poly_f2m.rs"),
+            ),
+            (
+                "src/cryptanalysis/ecc2k130_guard.rs",
+                include_str!("../cryptanalysis/ecc2k130_guard.rs"),
+            ),
+            (
+                "src/cryptanalysis/group_op_count.rs",
+                include_str!("../cryptanalysis/group_op_count.rs"),
+            ),
+            ("src/hash/sha256.rs", include_str!("../hash/sha256.rs")),
+            ("src/utils/mod.rs", include_str!("../utils/mod.rs")),
+            (
+                "docs/curves/binary-subgroup-transfer-certificates.schema.json",
                 include_str!("../../docs/curves/binary-subgroup-transfer-certificates.schema.json"),
-                include_str!("../../Cargo.toml"),
-                include_str!("../../Cargo.lock"),
-            ]
-            .concat()
-            .as_bytes(),
-        );
+            ),
+            ("Cargo.toml", include_str!("../../Cargo.toml")),
+            ("Cargo.lock", include_str!("../../Cargo.lock")),
+        ]);
         assert_eq!(transfer_catalog_producer_source_digest(), expected);
     }
 
@@ -2688,12 +2996,73 @@ mod tests {
         assert_eq!(proved["annihilator_primality"]["status"], "proved");
         assert_eq!(proved["generated_subgroup_cardinality"]["status"], "proved");
 
+        let proved_wide =
+            exact_order_evidence(&BigUint::parse_bytes(b"5902977611275912361963", 10).unwrap());
+        assert_eq!(proved_wide["annihilator_primality"]["status"], "proved");
+
+        let psi_12 =
+            exact_order_evidence(&BigUint::parse_bytes(b"318665857834031151167461", 10).unwrap());
+        assert_eq!(psi_12["annihilator_primality"]["status"], "unknown");
+
         let unknown = exact_order_evidence(&BigUint::from(100_000_001u64));
         assert_eq!(unknown["annihilator_primality"]["status"], "unknown");
         assert_eq!(
             unknown["generated_subgroup_cardinality"]["status"],
             "unknown"
         );
+
+        let at_bound =
+            exact_order_evidence(&BigUint::parse_bytes(b"3317044064679887385961981", 10).unwrap());
+        assert_eq!(at_bound["annihilator_primality"]["status"], "unknown");
+    }
+
+    #[test]
+    fn transfer_catalog_verify_rejects_invalid_raw_pins_and_schema_before_replay() {
+        let corpus = b"{}";
+        let empty = b"";
+        let digest = checker::digest(corpus);
+
+        let unpaired =
+            verify_binary_transfer_catalog(corpus, empty, empty, empty, Some(&digest), None)
+                .unwrap_err();
+        assert!(unpaired.contains("must be supplied together"));
+
+        let malformed = verify_binary_transfer_catalog(
+            corpus,
+            empty,
+            empty,
+            empty,
+            Some(&digest.to_ascii_uppercase()),
+            Some(corpus.len() as u64),
+        )
+        .unwrap_err();
+        assert!(malformed.contains("lowercase hexadecimal"));
+
+        let wrong_hash = verify_binary_transfer_catalog(
+            corpus,
+            empty,
+            empty,
+            empty,
+            Some(&"0".repeat(64)),
+            Some(corpus.len() as u64),
+        )
+        .unwrap_err();
+        assert!(wrong_hash.contains("SHA-256 mismatch"));
+
+        let wrong_size = verify_binary_transfer_catalog(
+            corpus,
+            empty,
+            empty,
+            empty,
+            Some(&digest),
+            Some(corpus.len() as u64 + 1),
+        )
+        .unwrap_err();
+        assert!(wrong_size.contains("byte-length mismatch"));
+
+        let unsupported =
+            verify_binary_transfer_catalog(corpus, empty, empty, empty, None, None).unwrap_err();
+        assert!(unsupported.contains("unsupported certificate corpus schema"));
     }
 
     #[test]
@@ -2992,6 +3361,42 @@ mod tests {
                 .count(),
             27
         );
+        let subgroup_rows = records
+            .iter()
+            .flat_map(|record| {
+                record["named_subgroups"]
+                    .as_array()
+                    .expect("named subgroup array")
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(
+            subgroup_rows
+                .iter()
+                .filter(
+                    |row| row["exact_order_evidence"]["annihilator_primality"]["status"]
+                        == "proved"
+                )
+                .count(),
+            102
+        );
+        assert_eq!(
+            subgroup_rows
+                .iter()
+                .filter(
+                    |row| row["exact_order_evidence"]["annihilator_primality"]["status"]
+                        == "unknown"
+                )
+                .count(),
+            48
+        );
+
+        let encoded = pretty_json_bytes(&catalog).expect("canonical corpus bytes");
+        require_exact_catalog_bytes(&encoded, &catalog).expect("exact replay bytes");
+        let mut noncanonical = encoded.clone();
+        noncanonical.push(b' ');
+        assert!(require_exact_catalog_bytes(&noncanonical, &catalog)
+            .unwrap_err()
+            .contains("exact canonical byte serialization"));
     }
 
     #[test]

@@ -698,6 +698,32 @@ Schema validation does not establish hash preimages, cross-file completeness,
 or arithmetic correctness; replay and independent evidence gates remain
 required.
 
+Replay a saved corpus with the installed executable and the exact three input
+documents:
+
+```text
+./hyperelliptic-cover transfer-catalog-verify \
+  --input docs/curves/binary-subgroup-transfer-certificates.json \
+  --registry docs/curves/registry.json \
+  --cover-graph docs/curves/cover-links.yaml \
+  --traits docs/curves/traits.json \
+  --expected-sha256 CORPUS_SHA256 \
+  --expected-bytes CORPUS_BYTES \
+  --output binary-transfer-certificates.replay.json
+```
+
+The hash and byte arguments are optional as a pair. When present, they are
+checked before parsing. The verifier then rebuilds the graph, replays every
+map and named generator, regenerates the complete corpus using the saved
+caller-supplied producer strings, and requires byte-for-byte equality with
+the producer's canonical pretty JSON (including the trailing newline). Exit
+status `0` means an exact complete replay, `1` means an exact corpus containing
+failed records, and `3` means malformed, noncanonical, stale, foreign, or
+semantically different input. `producer.git_commit` and `rustc_version` remain
+caller-supplied metadata; a successful same-implementation replay is not an
+independent execution attestation or a claim of exact order where the record
+still says unknown.
+
 For the 2026-11-18 graph, the expected bounded population is 174 binary map
 records, 147 maps with 150 named generator bindings, and 27 maps without a
 named subgroup input. A nonzero process exit accompanies any retained failed

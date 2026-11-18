@@ -68,9 +68,11 @@ Every candidate retains:
 The current odd-characteristic cover has two rational points at infinity. The
 separate balanced backend handles monic split sextics over deterministically
 checked prime fields of at most 64 bits, but this sweeper does not replay that
-arithmetic. Odd-characteristic induced maps, extension fields, and larger
-prime fields remain explicitly unsupported. A geometric cover candidate is
-not promoted to subgroup transfer or solver evidence.
+arithmetic. Direct short-Weierstrass induced maps in that same boundary are
+implemented by the library and reported as implemented-but-not-replayed by
+the sweep. Odd extension fields, normalized targets, and larger prime fields
+remain explicitly unsupported by the induced-map backend. A geometric cover
+candidate is not promoted to subgroup transfer or solver evidence.
 
 The command rejects a search whose parameter count exceeds `max_attempts`;
 it never returns a silently truncated prefix. Incompatible families and

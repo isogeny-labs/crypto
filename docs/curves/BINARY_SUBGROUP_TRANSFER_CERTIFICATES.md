@@ -44,6 +44,17 @@ promote either exact-order field. A non-`unknown` exact-order entry requires
 local deterministic evidence produced or replayed by this corpus generator;
 the semantic checker must reject a traits-only promotion. [pcc:unverified]
 
+For candidate annihilators below the strict Sorenson--Webster `psi_13` bound,
+the current producer locally replays strong Miller--Rabin tests to the first
+sixteen prime bases through 53. Below the bound
+`3317044064679887385961981`, passing the first thirteen prime bases is a
+primality proof; the extra bases are retained as a control. Together with the
+record's checked nonidentity and `[r]G=O` obligations, this proves
+`ord(G)=r` for those records. Values at or above the bound remain `unknown`
+without a separately replayed primality certificate; the producer does not
+apply its local probable-prime test above that cutoff. This conclusion is
+only about the named generated subgroup, not the ambient curve order.
+
 ## Required bindings and checks
 
 Every map record binds the complete ICV1 identity, canonical model JSON and

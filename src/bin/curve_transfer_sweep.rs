@@ -459,6 +459,17 @@ fn candidate(
         checker::Field::Prime(_) => "unsupported_prime_exceeds_64_bit_balanced_backend",
         checker::Field::Extension { .. } => "unsupported_odd_extension_field_backend",
     };
+    let arbitrary_class_pushforward = match &model.field {
+        checker::Field::Binary(_) => "implemented_in_library_not_replayed_by_this_sweep",
+        checker::Field::Prime(p) if p > &BigUint::from(3u32) && p.bits() <= 64 => {
+            "implemented_checked_direct_prime_not_replayed_by_this_sweep"
+        }
+        checker::Field::Prime(p) if p <= &BigUint::from(3u32) => {
+            "unsupported_odd_transfer_requires_characteristic_greater_than_three"
+        }
+        checker::Field::Prime(_) => "unsupported_prime_exceeds_64_bit_transfer_backend",
+        checker::Field::Extension { .. } => "unsupported_odd_extension_field_transfer_backend",
+    };
     json!({
         "candidate_id": map_identity["map_id"],
         "family": family,
@@ -487,10 +498,13 @@ fn candidate(
             "defining_equation_identity": "verified_exact_polynomial_identity",
             "map_degree": "verified_by_family_checker",
             "jacobian_arithmetic": jacobian_arithmetic,
-            "arbitrary_class_pushforward": if binary {
+            "arbitrary_class_pushforward": arbitrary_class_pushforward,
+            "composition_identities": if binary {
                 "implemented_in_library_not_replayed_by_this_sweep"
+            } else if matches!(&model.field, checker::Field::Prime(p) if p > &BigUint::from(3u32) && p.bits() <= 64) {
+                "implemented_checked_direct_prime_not_replayed_by_this_sweep"
             } else {
-                "unsupported_odd_induced_map_not_implemented"
+                "unsupported_for_this_arithmetic_backend"
             },
             "subgroup_transfer": "not_verified_by_sweep",
             "solver_evidence": "not_evaluated",
@@ -829,6 +843,14 @@ mod tests {
         assert_eq!(
             result["candidates"][0]["statuses"]["jacobian_arithmetic"],
             "bounded_split_sextic_backend_available_not_replayed_by_sweep"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["arbitrary_class_pushforward"],
+            "implemented_checked_direct_prime_not_replayed_by_this_sweep"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["composition_identities"],
+            "implemented_checked_direct_prime_not_replayed_by_this_sweep"
         );
         assert_eq!(verify(result, &registry).unwrap()["status"], "verified");
     }
