@@ -3,6 +3,7 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.RatFunc.Basic
 import Mathlib.RingTheory.LaurentSeries
 import Mathlib.RingTheory.PowerSeries.Derivative
+import Mathlib.RingTheory.PowerSeries.Substitution
 import Mathlib.Tactic
 
 /-!
@@ -508,6 +509,58 @@ theorem leading_X_inv_sq
     (hg : PowerSeries.constantCoeff g ≠ 0) :
     PowerSeriesPrefixEq n (f⁻¹ ^ 2) (g⁻¹ ^ 2) :=
   inv_sq (cancel_X hfg) hf hg
+
+/-- Substitution of prefix-equal zero-constant parameters into a fixed regular
+power series preserves the prefix. -/
+theorem subst (outer : PowerSeries R)
+    (hfg : PowerSeriesPrefixEq n f g)
+    (hf : PowerSeries.constantCoeff f = 0)
+    (hg : PowerSeries.constantCoeff g = 0) :
+    PowerSeriesPrefixEq n (outer.subst f) (outer.subst g) := by
+  apply of_coeff_eq
+  intro i hi
+  rw [PowerSeries.coeff_subst'
+      (PowerSeries.HasSubst.of_constantCoeff_zero' hf) outer i,
+    PowerSeries.coeff_subst'
+      (PowerSeries.HasSubst.of_constantCoeff_zero' hg) outer i]
+  apply finsum_congr
+  intro d
+  rw [coeff_eq (pow hfg d) hi]
+
+/-- The regular unit factor of a pole coordinate also survives substitution of
+prefix-equal zero-constant parameters. -/
+theorem subst_inv (outer : PowerSeries R)
+    (hfg : PowerSeriesPrefixEq n f g)
+    (hf : PowerSeries.constantCoeff f = 0)
+    (hg : PowerSeries.constantCoeff g = 0)
+    (houter : PowerSeries.constantCoeff outer ≠ 0) :
+    PowerSeriesPrefixEq n (outer.subst f)⁻¹ (outer.subst g)⁻¹ := by
+  have hsubst := subst outer hfg hf hg
+  have hunit_f : PowerSeries.constantCoeff (outer.subst f) ≠ 0 := by
+    change MvPowerSeries.constantCoeff (outer.subst f) ≠ 0
+    rw [PowerSeries.constantCoeff_subst_of_constantCoeff_zero hf outer]
+    simpa using houter
+  have hunit_g : PowerSeries.constantCoeff (outer.subst g) ≠ 0 := by
+    change MvPowerSeries.constantCoeff (outer.subst g) ≠ 0
+    rw [PowerSeries.constantCoeff_subst_of_constantCoeff_zero hg outer]
+    simpa using houter
+  exact inv hsubst hunit_f hunit_g
+
+/-- Generic normalized pole-coordinate transfer. After cancelling a common
+leading `X`, both the inverse-square pole and the inverse of any fixed regular
+unit factor preserve the remaining prefix. -/
+theorem leading_X_inv_sq_mul_subst_inv
+    (outer : PowerSeries R)
+    (hfg : PowerSeriesPrefixEq (n + 1)
+      (PowerSeries.X * f) (PowerSeries.X * g))
+    (hf : PowerSeries.constantCoeff f ≠ 0)
+    (hg : PowerSeries.constantCoeff g ≠ 0)
+    (houter : PowerSeries.constantCoeff outer ≠ 0) :
+    PowerSeriesPrefixEq n
+      (f⁻¹ ^ 2 * (outer.subst (PowerSeries.X * f))⁻¹)
+      (g⁻¹ ^ 2 * (outer.subst (PowerSeries.X * g))⁻¹) := by
+  apply mul (leading_X_inv_sq hfg hf hg)
+  apply subst_inv outer (mono (by omega) hfg) <;> simp_all
 
 end PowerSeriesPrefixEq
 
@@ -1364,6 +1417,9 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms PowerSeriesPrefixEq.X_pow_eq_zero
 #print axioms PowerSeriesPrefixEq.add_X_pow_mul
 #print axioms PowerSeriesPrefixEq.leading_X_inv_sq
+#print axioms PowerSeriesPrefixEq.subst
+#print axioms PowerSeriesPrefixEq.subst_inv
+#print axioms PowerSeriesPrefixEq.leading_X_inv_sq_mul_subst_inv
 #print axioms prime_ge_twentyThree
 #print axioms frobeniusNormalizedCorrection_invisible
 #print axioms frobeniusNormalizedCorrection_even_coeff_zero

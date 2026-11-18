@@ -128,9 +128,12 @@ the monomial truncation at `z`-degree 22 for prime `p>19`. It now also proves
 the generic one-degree-loss step: equality of `X*f` and `X*g` through one extra
 degree implies equality of `f⁻¹²` and `g⁻¹²` through the requested degree when
 both unit factors have nonzero constant coefficient. This discharges the pure
-double-pole algebra. Proving that the actual elliptic endomorphism instantiates
-the monomial model, and transporting the regular unit factor in the elliptic
-x-coordinate through substitution, remain separate steps. [pcc:unverified]
+double-pole algebra. A follow-up substitution theorem also preserves any fixed
+regular outer unit, its inverse and its product with the pole term for
+prefix-equal zero-constant parameters. Proving that the actual elliptic
+endomorphism instantiates the monomial model, and identifying the supplied
+outer series with the regular factor in the elliptic x-coordinate, remain
+separate steps. [pcc:unverified]
 
 A frozen 20-case boundary panel over five primes and four cutoffs measures this
 loss directly. All local-parameter pairs first differ at `m+1`, all normalized

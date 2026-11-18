@@ -145,8 +145,11 @@ does not identify the actual elliptic Frobenius term with that monomial. A
 subsequent generic proof cancels a shared leading local parameter `X` with one
 degree of precision loss and shows that inversion and inverse-square preserve
 the remaining unit-series prefix. Thus the double-pole core of the x-coordinate
-bridge is checked. The actual formal-group identities and the regular elliptic
-x-coordinate unit-factor composition remain open. [pcc:unverified]
+bridge is checked. A further generic theorem now shows that substitution of
+prefix-equal zero-constant parameters into any fixed regular unit series, its
+inverse, and its product with the inverse-square pole preserve the same output
+prefix. The actual formal-group identities and identification of that supplied
+regular series with the elliptic x-coordinate remain open. [pcc:unverified]
 
 The frozen [prefix-transfer boundary control](PREFIX_TRANSFER_EXPERIMENT.md)
 then tests that precision loss on 20 finite-field series cases. In every case a
@@ -154,7 +157,7 @@ correction first visible at degree `m+1` in the local parameter is first visible
 at degree `m` after normalized inverse-square transfer, and the boundary
 coefficient matches `-2 c f(0)^-3`. Zero and one-degree-shifted controls pass in
 all 20 cases. This demonstrates that the proved one-degree loss is sharp; it
-does not fill the regular elliptic x-unit composition obligation.
+does not identify the regular outer unit with an elliptic coordinate series.
 [pcc:unverified]
 
 The preregistered

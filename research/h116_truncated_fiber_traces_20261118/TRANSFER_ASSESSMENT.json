@@ -40,7 +40,7 @@
     "kernel_intersection": "not_applicable: destination is a fiber trace, not an injective group transfer",
     "recovery_map": "candidate moments feed the separately frozen radix-six predicate/decoder",
     "scalar_multiplier": null,
-    "proof_artifact": "PROOF_MAP.md and lean/H116FiberTrace.lean; a full finite certificate and an eleven-coefficient quotient/ten-coefficient curve-identity certificate each imply the recurrence. The Lean cutoff proves X^(p-1) is invisible below degree 22 for prime p>19. The generic prefix-transfer lemmas cancel a shared leading X with one-degree loss and preserve unit inverse squares; PREFIX_TRANSFER_EXPERIMENT.md measures that this loss is sharp in 20 finite-field controls. The regular elliptic x-coordinate factor is still open. MAP_CERTIFICATE_EXPERIMENT.md, JET_CERTIFICATE_EXPERIMENT.md, FORMAL_SCALAR_JET_EXPERIMENT.md and FORMAL_SCALAR_OOS_EXPERIMENT.md record independently replayed excluded-map controls"
+    "proof_artifact": "PROOF_MAP.md and lean/H116FiberTrace.lean; a full finite certificate and an eleven-coefficient quotient/ten-coefficient curve-identity certificate each imply the recurrence. The Lean cutoff proves X^(p-1) is invisible below degree 22 for prime p>19. The generic prefix-transfer lemmas cancel a shared leading X with one-degree loss, preserve unit inverse squares and preserve a supplied regular outer unit under zero-constant substitution; PREFIX_TRANSFER_EXPERIMENT.md measures that the pole loss is sharp in 20 finite-field controls. Identifying the outer unit with the actual elliptic x-coordinate factor is still open. MAP_CERTIFICATE_EXPERIMENT.md, JET_CERTIFICATE_EXPERIMENT.md, FORMAL_SCALAR_JET_EXPERIMENT.md and FORMAL_SCALAR_OOS_EXPERIMENT.md record independently replayed excluded-map controls"
   },
   "mechanism": {
     "proposed_benefit": "replace r explicit extension-field summands by a fixed-length base-field Laurent calculation",
@@ -97,12 +97,12 @@
   ],
   "open_obligations": [
     "prove trace and residue identities",
-    "prove V+pi=[t], pi(z)=z^p, formal-group subtraction and regular elliptic x-coordinate unit-factor composition in the formal-group interface; the generic leading-X inverse-square transfer is now proved",
+    "prove V+pi=[t], pi(z)=z^p and formal-group subtraction, and identify the supplied regular outer unit with the actual elliptic x-coordinate series; the generic leading-X, substitution and inverse transfer are now proved",
     "construct and validate candidate source",
     "bind independent verifier before scoring",
     "measure through EKS and test the fixed predicate family",
     "prove complete decoder complexity only under an exact predicate premise"
   ],
-  "recommended_next_action": "formalize the regular x-coordinate unit-factor substitution and instantiate the checked leading-X inverse-square bridge with V+pi=[t] and pi(z)=z^p before admitting target data",
+  "recommended_next_action": "instantiate the checked normalized pole-coordinate transfer with the curve series q(z), V+pi=[t] and pi(z)=z^p, then prove the target-scaling quotient identity before admitting target data",
   "official_status_change": "none"
 }

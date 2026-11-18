@@ -210,26 +210,31 @@ monotonicity lemma, so no limit was raised and no theorem was weakened.
 2. **Theorems used as stated.** `PowerSeries.coeff_X_pow_mul` performs the
    coefficient shift behind cancellation of `X`; Mathlib's
    `PowerSeries.inv_mul_cancel` and `mul_inv_cancel` discharge inversion of
-   unit power series. The existing H116 multiplication and power congruences
-   assemble the inverse-square result.
+   unit power series. `PowerSeries.coeff_subst'` expands substitution
+   coefficientwise. The existing H116 multiplication, power and coefficient
+   congruences assemble the normalized pole result.
 3. **Object as an instance.** `leading_X_inv_sq` is quantified over every field,
    cutoff and pair of power series. It consumes a prefix through degree `n`
    for `X*f` and `X*g` and returns a prefix through degree `n-1` for `f⁻¹²`
    and `g⁻¹²`; only the two visible unit hypotheses are required.
+   `leading_X_inv_sq_mul_subst_inv` additionally composes any fixed regular
+   outer unit with the two zero-constant parameters.
 4. **Assembly probe.** The first proof let unrestricted simplification rewrite
    `X` as `X^1` and hit the default recursion-depth limit. The checked proof
    instead invokes `coeff_X_pow_mul` explicitly. `lake build` then passed at
    default limits, and the exact repository axiom auditor reported
-   `70 theorems, 0 failing, 0 trusted`.
-5. **Missing components only.** This proves the double-pole core, not the full
-   elliptic x-coordinate. Its regular unit factor, substitution through the two
-   formal parameters, `V+pi=[t]`, local Frobenius and formal subtraction still
-   require instances.
+   `73 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This now proves the double-pole and regular-unit
+   substitution algebra for a supplied outer series. Identifying that series
+   with the actual elliptic x-coordinate unit, then proving `V+pi=[t]`, local
+   Frobenius and formal subtraction still require instances.
 6. **Inheritance table.** Truncation, coefficient shifts and unit inverses are
    Mathlib operations; prefix arithmetic is the pre-existing H116 wrapper. The
    only new local laws reconstruct a prefix from coefficients, cancel `X`,
    preserve inverse/inverse-square prefixes and add an invisible `X^m`
-   multiple. No curve law, limit override or native decision procedure appears.
+   multiple. The new substitution law uses Mathlib's coefficient formula and
+   `finsum` congruence. No curve law, limit override or native decision
+   procedure appears.
    [pcc:unverified]
 
 | Statement | Kind | Owner | Quantified structure | Hypotheses |
@@ -237,7 +242,9 @@ monotonicity lemma, so no limit was raised and no theorem was weakened.
 | cancel a shared leading `X` with one-degree loss | generic law | H116 over Mathlib coefficient shift | field power series | input prefix through degree `n` |
 | inversion and inverse square preserve prefixes | generic law | H116 over Mathlib unit inversion | field power series | nonzero constant coefficients |
 | normalized double-pole prefix transfer | generic assembly | H116 | field power series | leading-`X` prefix and two unit hypotheses |
-| actual normalized elliptic x-ratio prefix | endpoint obligation | future elliptic formal-group owner | ordinary elliptic curve | regular x-unit composition plus endomorphism identities |
+| regular-unit substitution and inverse | generic law | H116 over Mathlib substitution | field power series | zero inner constants and nonzero outer constant |
+| normalized pole with regular unit | generic assembly | H116 | field power series | leading-`X` prefix and unit hypotheses |
+| actual normalized elliptic x-ratio prefix | endpoint obligation | future elliptic formal-group owner | ordinary elliptic curve | identification of the regular series plus endomorphism identities |
 
 The current source and direct repository-auditor receipts are pinned in
 `lean/PROOF_RECEIPT.md`. The proof-gate cache-fetch preflight itself is recorded

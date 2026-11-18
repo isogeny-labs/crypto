@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-d569fc07a9f5244f9b4f3238a70f92530ca75733a9940cd8039a27d5c2d2f623  H116FiberTrace.lean
+e9f7ce1299b8f99f0c180b56bdacec27db0164f8446ed75615b17e4d2a9068d2  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  70 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  73 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -27,10 +27,12 @@ c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431  receipts/statu
 6a9633829db8cd6a3ef7839ce705874f4295ced6b9d83c4e93f5c3f9f667d589  receipts/concrete-first-build-failure.log
 8e6e042fd064c36089b12d0eb28fa670d0fecdb7b8b40a4064767b147ea9ad4f  receipts/prefix-transfer-build.log
 d42999adfc5a4d88469b491c5ae9f72d329172b50d322d8c69b45c9e5f4a77cc  receipts/prefix-transfer-audit.log
+eddb483c58d97a0aab4af93e933272a8f37d6208040be118d6826a5c3202776e  receipts/regular-substitution-build.log
+378ac3322b032621070229de6c5f6e222ecd31f5729b8d198cd9b5e39282303b  receipts/regular-substitution-audit.log
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
-For this 70-theorem checkpoint its mandatory cache-fetch preflight could not
+For this 73-theorem checkpoint its mandatory cache-fetch preflight could not
 complete because the managed 32-GiB workspace had insufficient free space;
 the incomplete task-owned cache was deleted. The same pinned `lake build`
 completed, and the gate's exact `AuditAxioms.lean` auditor passed directly over
@@ -91,7 +93,11 @@ endpoint obligations. The follow-up now proves the generic double-pole core:
 coefficientwise reconstruction, cancellation of a shared nonunit leading `X`
 with exactly one degree of precision loss, unit-series inversion, inverse-square
 preservation, and invisibility of an `X^m` multiple. The regular elliptic
-x-coordinate unit factor and its substitution/composition law remain open.
+x-coordinate unit-factor algebra is now generic as well: substitution of
+prefix-equal zero-constant parameters preserves a fixed regular series,
+preserves its inverse when the outer constant is a unit, and composes with the
+inverse-square pole term. Identifying the supplied outer unit with the actual
+elliptic x-coordinate series, plus the endomorphism identities, remains open.
 [pcc:unverified]
 
 The first integration build is retained at
